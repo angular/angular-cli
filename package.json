@@ -1,0 +1,27 @@
+{
+  "name": "wrenchjs",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "wrenchjs": "./bin/wrenchjs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rodyhaddad/wrenchjs.git"
+  },
+  "author": "rodyhaddad <npm@rodyhaddad.com> (http://rodyhaddad.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rodyhaddad/wrenchjs/issues"
+  },
+  "homepage": "https://github.com/rodyhaddad/wrenchjs",
+  "dependencies": {
+    "ember-cli": "^0.2.1",
+    "exit": "^0.1.2",
+    "resolve": "^1.0.0"
+  }
+}
