@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/rodyhaddad/wrenchjs",
   "dependencies": {
-    "angular-project-draft": "0.0.0",
-    "ember-cli": "^0.2.1",
+    "angular-project-draft": "rodyhaddad/angular-project-draft.git",
+    "ember-cli": "rodyhaddad/ember-cli.git",
     "exit": "^0.1.2",
     "resolve": "^1.0.0"
   }
