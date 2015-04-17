@@ -1,0 +1,10 @@
+{
+  "name": "dummy-blueprint",
+  "main": "index.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/rodyhaddad/wrenchjs",
+  "authors": [
+    "rodyhaddad <rody@rodyhaddad.com>"
+  ],
+  "license": "MIT"
+}
