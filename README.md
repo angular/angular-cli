@@ -7,7 +7,7 @@ So you want to play around with wrenchjs?
 It's easy. To set up the project on your machine, run these commands:
 ```bash
 # Get the source code on your machine
-git clone git@github.com:rodyhaddad/wrenchjs.git;
+git clone https://github.com/rodyhaddad/wrenchjs.git;
 # Step inside the project
 cd wrenchjs;
 # Install the project dependency
