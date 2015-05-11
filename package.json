@@ -25,5 +25,11 @@
     "ember-cli": "rodyhaddad/ember-cli.git",
     "exit": "^0.1.2",
     "resolve": "^1.0.0"
+  },
+  "ember-addon": {
+    "paths": [
+      "./addon/dumm-addon/",
+      "./node_modules/angular-project-draft/"
+    ]
   }
 }
