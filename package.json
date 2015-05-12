@@ -2,7 +2,7 @@
   "name": "wrenchjs",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/cli/index.js",
   "bin": {
     "wrenchjs": "./bin/wrenchjs"
   },
@@ -28,7 +28,8 @@
   },
   "ember-addon": {
     "paths": [
-      "./addon/dumm-addon/",
+      "./addon/dummy-addon/",
+      "./addon/ng2-wrenchjs-cli/",
       "./node_modules/angular-project-draft/"
     ]
   }

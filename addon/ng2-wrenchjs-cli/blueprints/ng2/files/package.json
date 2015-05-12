@@ -1,0 +1,8 @@
+{
+  "name": "<%= htmlComponentName %>",
+  "version": "0.0.0",
+  "license": "MIT",
+  "devDependencies": {
+    "wrenchjs": "rodyhaddad/wrenchjs.git"
+  }
+}
