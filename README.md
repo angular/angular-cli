@@ -32,12 +32,50 @@ If you want to know more about addons, check [here](https://github.com/ember-cli
 
 Since wrenchjs is a customized proxy to wrenchjs, you can check the [existing ember-cli addons](http://www.emberaddons.com/) to get inspired.
 
-If you're curious, to have addons discovered by the `wrenchjs` cli tool, they either need to:
-
-* Be in the `addon` directory of the project
-* As a npm dependency to wrenchjs
-* As a npm dependency to any "wrenchjs" project (meaning you're using `wrenchjs` in that project directory)
+To have addons discovered by the `wrenchjs` cli tool, put them in the package.json `ember-addon.paths`.
 
 Addons should still use the `ember-addon` keyword in their package.json to get discovered for now.
 
 If you have any questions, please let me know :-)
+
+-------
+
+A few Angular2 related blueprints have been developed in the `ng2-wrenchjs-cli` addon (located in the `addon` forlder).
+
+To experiment with them, first execute the commands above to set up the `wrenchjs` cli on your machine.
+
+Then go to wherever you want to generate your ng2 project and run:
+
+```bash
+wrenchjs new --blueprint=ng2 --skip-bower YOUR_PROJECT_NAME
+```
+
+That command will generate all the basic NG2 files, and install its npm dependencies.
+
+To actually run it in your browser, you probably need to do something like:
+```bash
+cd YOUR_PROJECT_NAME
+# Compile all the .ts files to adjavent .js
+tsc
+# Serve this directory using the npm `http-server` module.
+http-server .
+```
+
+You can then generate NG2 components and services:
+
+```bash
+# Generate a component in src/compoenent
+wrenchjs generate ng2-component COMPONENT_NAME
+# Generate a component in src/service
+wrenchjs generate ng2-service SERVICE_NAME
+```
+
+To use your components and services in your app, you'll need to use regular es6 imports and let Angular know about them.
+WrenchJS doesn't help you with that for now.
+
+Since you'll probably be developing the blueprints while experimenting with them, you probaly will want to link the dependency to your local copy
+
+```bash
+# This works because you ran `npm link` before, when you were in the wrenchjs project
+npm link wrenchjs
+```
