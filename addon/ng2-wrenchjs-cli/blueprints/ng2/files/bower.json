@@ -1,6 +1,0 @@
-{
-  "name": "<%= htmlComponentName %>",
-  "main": "index.js",
-  "version": "0.0.0",
-  "license": "MIT"
-}
