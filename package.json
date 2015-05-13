@@ -6,7 +6,7 @@
   "bin": {
     "wrenchjs": "./bin/wrenchjs"
   },
-  "keywords": ["ember-addon"],
+  "keywords": [],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

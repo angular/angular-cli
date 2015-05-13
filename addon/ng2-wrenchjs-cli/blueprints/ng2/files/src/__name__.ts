@@ -4,7 +4,7 @@ import {Component, View, bootstrap} from 'angular2/angular2';
     selector: '<%= htmlComponentName %>-app',
     injectables: []})
 @View({
-    templateUrl: '<%= htmlComponentName %>.html',
+    templateUrl: 'src/<%= htmlComponentName %>.html',
     directives: []
 })
 class <%= jsComponentName %>App {
