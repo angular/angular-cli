@@ -4,8 +4,8 @@
     "module": "amd",
     "target": "es5"
   },
-  "files": [
-    "src/todo.ts",
-    "typings/tsd.d.ts"
+  "filesGlob": [
+    "./**/*.ts",
+    "!./node_modules/**/*.ts"
   ]
 }

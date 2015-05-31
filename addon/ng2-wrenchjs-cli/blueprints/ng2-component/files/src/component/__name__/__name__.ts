@@ -4,7 +4,7 @@ import {Component, View} from 'angular2/angular2';
     selector: '<%= dasherizedModuleName %>',
     injectables: []})
 @View({
-    templateUrl: 'src/component/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>.html',
+    templateUrl: 'component/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>.html',
     directives: []
 })
 export class <%= classifiedModuleName %> {
