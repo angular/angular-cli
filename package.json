@@ -22,15 +22,13 @@
   "homepage": "https://github.com/rodyhaddad/wrenchjs",
   "dependencies": {
     "angular-project-draft": "rodyhaddad/angular-project-draft",
-
-    "ember-cli": "rodyhaddad/ember-cli#rodyhaddad/cli-configurable",
-    "exit": "^0.1.2",
-    "resolve": "^1.0.0",
-
     "broccoli": "^0.16.3",
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-static-compiler": "^0.2.1",
+    "ember-cli": "^0.2.6",
+    "exit": "^0.1.2",
     "fs-extra": "^0.18.4",
+    "resolve": "^1.0.0",
     "symlink-or-copy": "^1.0.1",
     "typescript": "^1.5.0-beta"
   },
