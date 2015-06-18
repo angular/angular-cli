@@ -2,7 +2,7 @@
   "name": "dummy-blueprint",
   "main": "index.js",
   "version": "0.0.0",
-  "homepage": "https://github.com/rodyhaddad/wrenchjs",
+  "homepage": "https://github.com/angular/angular-cli",
   "authors": [
     "rodyhaddad <rody@rodyhaddad.com>"
   ],

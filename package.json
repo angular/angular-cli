@@ -1,10 +1,10 @@
 {
-  "name": "wrenchjs",
+  "name": "angular-cli",
   "version": "0.0.0",
   "description": "",
   "main": "lib/cli/index.js",
   "bin": {
-    "wrenchjs": "./bin/wrenchjs"
+    "ng": "./bin/ng"
   },
   "keywords": [],
   "scripts": {
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rodyhaddad/wrenchjs.git"
+    "url": "https://github.com/angular/angular-cli.git"
   },
   "author": "rodyhaddad <npm@rodyhaddad.com> (http://rodyhaddad.com/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rodyhaddad/wrenchjs/issues"
+    "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/rodyhaddad/wrenchjs",
+  "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "angular-project-draft": "rodyhaddad/angular-project-draft",
     "broccoli": "^0.16.3",
@@ -37,7 +37,7 @@
   "ember-addon": {
     "paths": [
       "./addon/dummy-addon/",
-      "./addon/ng2-wrenchjs-cli/",
+      "./addon/ng2/",
       "./node_modules/angular-project-draft/"
     ]
   }

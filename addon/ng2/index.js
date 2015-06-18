@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-  name: 'ng2-wrenchjs-cli'
+  name: 'ng2'
 };

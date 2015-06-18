@@ -4,5 +4,5 @@
 var path = require('path');
 
 module.exports = {
-    name: 'wrenchjs'
+    name: 'ng'
 };

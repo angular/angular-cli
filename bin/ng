@@ -2,13 +2,13 @@
 'use strict';
 
 // Provide a title to the process in `ps`
-process.title = 'wrenchjs';
+process.title = 'angular-cli';
 
 var path    = require('path');
 var resolve = require('resolve');
 var exit = require('exit');
 
-resolve('wrenchjs', {
+resolve('angular-cli', {
   basedir: process.cwd()
 }, function(error, projectLocalCli) {
   var cli;
