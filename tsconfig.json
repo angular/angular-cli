@@ -1,0 +1,46 @@
+{
+  "version": "1.5.0",
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": false,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "sourceMap": false,
+    "listFiles": false,
+    "outDir": "dist"
+  },
+  "files": [
+    "node_modules/typescript/bin/lib.es6.d.ts",
+    "modules/server/typings/tsd.d.ts",
+    "modules/client/client.ts",
+    "modules/server/server.ts",
+    "modules/examples/app/client/app.ts",
+    "modules/examples/app/server/api.ts",
+    "modules/examples/app/server/routes.ts",
+    "modules/examples/app/server/server.ts",
+    "modules/examples/app/universal/app/App.ts",
+    "modules/examples/app/universal/todo/index.ts"
+  ],
+  "filesGlob": [
+    "modules/server/**/*.ts",
+    "modules/client/**/*.ts",
+    "!./node_modules/**/*.ts"
+  ],
+   "formatCodeOptions": {
+      "indentSize": 2,
+      "tabSize": 2,
+      "newLineCharacter": "\r\n",
+      "convertTabsToSpaces": true,
+      "insertSpaceAfterCommaDelimiter": true,
+      "insertSpaceAfterSemicolonInForStatements": true,
+      "insertSpaceBeforeAndAfterBinaryOperators": true,
+      "insertSpaceAfterKeywordsInControlFlowStatements": true,
+      "insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+      "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+      "placeOpenBraceOnNewLineForFunctions": false,
+      "placeOpenBraceOnNewLineForControlBlocks": false
+    }
+}

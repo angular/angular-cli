@@ -1,0 +1,44 @@
+{
+  "name": "angular2-universal",
+  "version": "0.0.0",
+  "description": "Universal (isomorphic) javascript support for Angular2",
+  "main": "",
+  "scripts": {
+    "start": "nodemon --ext 'js,ts,html' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
+    "watch": "tsc -w",
+    "build": "tsc",
+    "debug": "node-inspector & nodemon --ext 'js,ts,html' --debug 'index.js' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
+    "remove-angular-typings": "rm -rf angular/modules/angular2/typings",
+    "update-angular": "git submodule foreach 'npm install && gulp build.js.cjs || true'",
+    "pull-angular": "git submodule foreach 'git pull --rebase git@github.com:angular/angular.git master'",
+    "angular-submodule": "npm run pull-angular && npm run remove-angular-typings && npm run update-angular",
+    "web_modules": "gulp preboot && ./scripts/update-ng-bundle.sh 2.0.0-alpha.28 0.18.3 v0.1.0 0.0.90",
+    "preinstall": "npm run angular-submodule",
+    "postinstall": "tsc || true && npm run web_modules"
+  },
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "angular2": "file:angular/dist/js/cjs/angular2",
+    "css": "^2.2.0",
+    "parse5": "^1.4.2",
+    "preboot": "^0.2.9",
+    "reflect-metadata": "^0.1.0"
+  },
+  "devDependencies": {
+    "rx": "^2.5.2",
+    "zone.js": "^0.5.0",
+    "connect-history-api-fallback": "^1.1.0",
+    "event-stream": "^3.3.1",
+    "express": "^4.12.3",
+    "gulp": "^3.9.0",
+    "morgan": "^1.5.3",
+    "nodemon": "^1.3.7",
+    "serve-static": "^1.9.3",
+    "typescript": "^1.5.0-beta"
+  }
+}
