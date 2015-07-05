@@ -28,12 +28,14 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 
+typings/**/*.d.ts
+!typings/_custom/
 
 
 # Server
 dist/
 modules/server/dist/
-modules/server/typings/
+# modules/server/typings/
 !modules/server/typings/_custom
 !modules/server/typings/tsd.d.ts
 
@@ -44,5 +46,6 @@ web_modules/
 # Preboot
 modules/preboot/node_modules
 modules/preboot/dist
+# modules/preboot/typings/
 !modules/preboot/typings/_custom
 !modules/preboot/typings/tsd.d.ts

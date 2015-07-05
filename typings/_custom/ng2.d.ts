@@ -1,63 +1,18 @@
-// Type definitions for Angular v2.0.0-alpha.25
-// Project: http://angular.io/
-// Definitions by: gdi2290 <https://github.com/gdi2290/>
-// Definitions: https://github.com/borisyankov/DefinitelyTyped
-
-/******************
- * This is a minimal type definition for the Angular2.
- * We plan to publish a complete definition soon.
- ******************/
-///<reference path="../rx/rx.d.ts"/>
-
-
-interface List<T> extends Array<T> {
-
-}
-interface Type {
-
-}
-
-interface _ComponentArg {
-  selector: string;
-  properties?: Object;
-  hostListeners?: Object;
-  appInjector?: List<any>;
-  viewInjector?: List<any>;
-  lifecycle?: List<any>;
-  changeDetection?: string;
-}
-
-interface _ViewArg {
-  templateUrl?: string;
-  template?: string;
-  directives?: List<Type>;
-}
-
-interface _DirectiveArg {
-  selector: string;
-  properties?: any;
-  events?: List<string>;
-  hostListeners?: any;
-  hostProperties?: any;
-  hostAttributes?: any;
-  hostActions?: any;
-  lifecycle?: List<any>;
-  compileChildren?: boolean;
-  hostInjector?: List<any>;
-}
-
-
 declare var zone: any;
 declare var Zone: any;
 
-declare module "angular2/angular2" {
+declare module "angular2/annotations" {
+  var Component: any;
+  var View: any;
+  var Directive: any;
+  var Query: any;
 }
 
 declare module "angular2/http" {
   class Http {
-    private _backend;
-    private _defaultOptions;
-    constructor(_backend: any, _defaultOptions: any);
+    _backend: any;
+    _defaultOptions: any;
+    constructor(_backend?: any, _defaultOptions?: any);
     request(url: string, options?: any): any;
     get(url: string, options?: any): any;
     post(url: string, body: any, options?: any): any;
@@ -73,6 +28,13 @@ declare module "angular2/http" {
   class XHRBackend {}
   class BaseRequestOptions {}
   var httpInjectables: Array<any>;
+}
+
+declare module "angular2/src/core/life_cycle/life_cycle" {
+  class LifeCycle {
+    constructor(...args)
+    tick(): any;
+  }
 }
 
 declare module "angular2/src/render/dom/compiler/view_loader" {
@@ -289,13 +251,6 @@ declare module "angular2/src/render/dom/events/event_manager" {
   }
 }
 
-declare module "angular2/src/core/life_cycle/life_cycle" {
-  class LifeCycle {
-    constructor(...args)
-    tick(): any;
-  }
-}
-
 declare module "zone.js" {
   var zone: any;
   var Zone: any;
@@ -318,7 +273,34 @@ declare module "angular2/directives" {
 
 }
 
+declare module "angular2/src/change_detection/pipes/pipe" {
+  class PipeFactory {
+  }
+}
+
+declare module "angular2/src/change_detection/change_detection" {
+  var async: any;
+}
+
+declare module "angular2/pipes" {
+  class ObservablePipe {
+    constructor(ref: any)
+    _subscription: any;
+    _observable: any;
+    _updateLatestValue(value: any): any;
+    _subscribe(obs: any): any;
+  }
+}
+
 declare module "angular2/change_detection" {
+  interface PipeFactory {}
+  class Pipe {}
+  class NullPipeFactory {}
+  class PipeRegistry {
+    constructor(pipes: any)
+  }
+  var defaultPipeRegistry: any;
+  var defaultPipes: any;
   class Parser {
 
   }
@@ -331,16 +313,12 @@ declare module "angular2/change_detection" {
   class DynamicChangeDetection {
 
   }
-  class PipeRegistry {
-
-  }
   class PreGeneratedChangeDetection {
     static isSupported(): boolean;
   }
   class JitChangeDetection {
     static isSupported(): boolean;
   }
-  var defaultPipeRegistry: any;
 }
 
 declare module "angular2/src/core/zone/ng_zone" {
@@ -350,6 +328,7 @@ declare module "angular2/src/core/zone/ng_zone" {
     run(context: any): any
   }
 }
+
 
 declare module "angular2/src/core/compiler/element_ref" {
   class ElementRef {
@@ -386,8 +365,9 @@ declare module "angular2/src/core/compiler/compiler" {
 
 declare module "angular2/forms" {
   var formDirectives: any;
+  var formInjectables: any;
   class FormBuilder {
-    group(): any
+    group(config: any): any
     array(): any
   }
   class Validators {
@@ -406,50 +386,169 @@ declare module "angular2/forms" {
     push(): any
     removeAt(): any
   }
+
+  class NgControlName {
+
+  }
+  class NgControlGroup {
+
+  }
+  class NgFormControl {
+
+  }
+  class NgModel {
+
+  }
+  class NgFormModel {
+
+  }
+  class NgForm {
+
+  }
+  class NgSelectOption {
+
+  }
+  class NgRequiredValidator {
+
+  }
+  class NgControl {
+    control: any;
+    valueAccessor: any;
+  }
+
 }
 
 declare module "angular2/src/render/dom/shadow_dom/emulated_unscoped_shadow_dom_strategy" {
   class EmulatedUnscopedShadowDomStrategy {
-    constructor(location: any)
+    styleHost: any;
+    constructor(styleHost: any);
+    hasNativeContentElement(): boolean;
+    prepareShadowRoot(el: any): any;
+    constructLightDom(lightDomView: any, el: any): any;
+    processStyleElement(hostComponentId: string, templateUrl: string, styleEl: any): void;
+
   }
 }
 
 declare module "angular2/core" {
   class ElementRef {
+    constructor(host: any, location?: any)
     nativeElement: any;
   }
-  class ViewResolver {
-    resolve(appComponent: any): any
+  class QueryList<T> {
+    onChange(callback: any): void;
   }
   class DirectiveResolver {
     resolve(appComponent: any): any
   }
-  class EmulatedScopedShadowDomStrategy {
-
-  }
-  class EmulatedUnscopedShadowDomStrategy {
-    constructor(location: any)
-  }
-  class NativeShadowDomStrategy {
-
-  }
-  class ShadowDomStrategy {
-
-  }
 }
 
 declare module "angular2/render" {
-  class EmulatedScopedShadowDomStrategy {
-
-  }
-  class EmulatedUnscopedShadowDomStrategy {
-
-  }
-  class NativeShadowDomStrategy {
-
-  }
   class ShadowDomStrategy {
+    hasNativeContentElement(): boolean;
+    prepareShadowRoot(el: any): any;
+    constructLightDom(lightDomView: any, el: any): any;
+    processStyleElement(hostComponentId: string, templateUrl: string, styleElement: any): void;
+    processElement(hostComponentId: string, elementComponentId: string, element: any): void;
+  }
+  class NativeShadowDomStrategy extends ShadowDomStrategy {
+    prepareShadowRoot(el: any): any;
+  }
+  class EmulatedUnscopedShadowDomStrategy extends ShadowDomStrategy {
+    styleHost: any;
+    constructor(styleHost: any);
+    hasNativeContentElement(): boolean;
+    prepareShadowRoot(el: any): any;
+    constructLightDom(lightDomView: any, el: any): any;
+    processStyleElement(hostComponentId: string, templateUrl: string, styleEl: any): void;
 
+  }
+  class EmulatedScopedShadowDomStrategy extends EmulatedUnscopedShadowDomStrategy {
+    constructor(styleHost: any);
+    processStyleElement(hostComponentId: string, templateUrl: string, styleEl: any): void;
+    _moveToStyleHost(styleEl: any): void;
+    processElement(hostComponentId: string, elementComponentId: string, element: any): void;
+
+  }
+  class Renderer {
+/**
+     * Creates a root host view that includes the given element.
+     * @param {RenderProtoViewRef} hostProtoViewRef a RenderProtoViewRef of type
+     * ProtoViewDto.HOST_VIEW_TYPE
+     * @param {any} hostElementSelector css selector for the host element (will be queried against the
+     * main document)
+     * @return {RenderViewRef} the created view
+     */
+    createRootHostView(hostProtoViewRef: any, hostElementSelector: string): any;
+    /**
+     * Creates a regular view out of the given ProtoView
+     */
+    createView(protoViewRef: any): any;
+    /**
+     * Destroys the given view after it has been dehydrated and detached
+     */
+    destroyView(viewRef: any): void;
+    /**
+     * Attaches a componentView into the given hostView at the given element
+     */
+    attachComponentView(location: any, componentViewRef: any): void;
+    /**
+     * Detaches a componentView into the given hostView at the given element
+     */
+    detachComponentView(location: any, componentViewRef: any): void;
+    /**
+     * Attaches a view into a ViewContainer (in the given parentView at the given element) at the
+     * given index.
+     */
+    attachViewInContainer(location: any, atIndex: number, viewRef: any): void;
+    /**
+     * Detaches a view into a ViewContainer (in the given parentView at the given element) at the
+     * given index.
+     */
+    detachViewInContainer(location: any, atIndex: number, viewRef: any): void;
+    /**
+     * Hydrates a view after it has been attached. Hydration/dehydration is used for reusing views
+     * inside of the view pool.
+     */
+    hydrateView(viewRef: any): void;
+    /**
+     * Dehydrates a view after it has been attached. Hydration/dehydration is used for reusing views
+     * inside of the view pool.
+     */
+    dehydrateView(viewRef: any): void;
+    /**
+     * Returns the native element at the given location.
+     * Attention: In a WebWorker scenario, this should always return null!
+     */
+    getNativeElementSync(location: any): any;
+    /**
+     * Sets a property on an element.
+     */
+    setElementProperty(location: any, propertyName: string, propertyValue: any): void;
+    /**
+     * Sets an attribute on an element.
+     */
+    setElementAttribute(location: any, attributeName: string, attributeValue: string): void;
+    /**
+     * Sets a class on an element.
+     */
+    setElementClass(location: any, className: string, isAdd: boolean): void;
+    /**
+     * Sets a style on an element.
+     */
+    setElementStyle(location: any, styleName: string, styleValue: string): void;
+    /**
+     * Calls a method on an element.
+     */
+    invokeElementMethod(location: any, methodName: string, args: List<any>): void;
+    /**
+     * Sets the value of a text node.
+     */
+    setText(viewRef: any, textNodeIndex: number, text: string): void;
+    /**
+     * Sets the dispatcher for all events of the given view
+     */
+    setEventDispatcher(viewRef: any, dispatcher: any): void;
   }
 }
 
@@ -469,10 +568,10 @@ declare module "angular2/src/facade/async" {
     all(all:any): any;
   }
   class PromiseWrapper {
-    static wrap(func: any): any;
     static completer(): any;
     static all(all: any): any;
-    static then(promise: any, success: any, error?: any): any;
+    static then(pro:any, sucess?: any, failure?: any): any;
+    static wrap(pro:any): any;
   }
 }
 
@@ -500,9 +599,9 @@ declare module "angular2/src/facade/lang" {
   var int: any;
   var Type: Function;
   var assertionsEnabled: any;
-  function isPresent(condition: any): boolean;
-  function isBlank(condition: any): boolean;
-  function isString(condition: any): boolean;
+  function isPresent(bool: any): boolean;
+  function isBlank(bool: any): boolean;
+  function isString(bool: any): boolean;
   class BaseException {
 
   }
@@ -541,6 +640,9 @@ declare module "angular2/router" {
     generate(name:string, params:any): string;
     subscribe(onNext: Function): void;
   }
+  class LocationStrategy {}
+  class HashLocationStrategy {}
+  class HTML5LocationStrategy {}
   var RouterOutlet: any;
   var RouterLink: any;
   var RouteParams: any;
@@ -833,33 +935,20 @@ declare module "angular2/src/di/binding" {
 }
 
 declare module "angular2/di" {
-
+  class Binding {}
   function bind(token: any): any;
   class Injector {
      resolveAndCreateChild(bindings: [any]): Injector;
      static resolveAndCreate(bindings: any): any;
      static fromResolvedBindings(bindings: any): any;
+     asyncGet(di: any):any
      get(di: any):any
   }
+  var Inject: any;
   var Injectable: any;
-  class Dependency {
+  var Dependency: any;
+  var Optional: any;
 
-  }
-  class Inject {
-
-  }
-  class InjectPromise {
-
-  }
-  class InjectLazy {
-
-  }
-  class Optional {
-
-  }
-  class Binding {
-
-  }
   var ResolvedBinding: any;
   var Key: any;
   var KeyRegistry: any;
