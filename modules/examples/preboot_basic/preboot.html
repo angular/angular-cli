@@ -1,0 +1,58 @@
+<html>
+  
+  <head>
+    <link rel="stylesheet" href="preboot.css">
+    <script src="preboot.js"></script>
+  </head>
+  
+  <body>
+    <app>
+      <input style="height: 50px; width: 50%; font-size: 24px; padding: 20px; margin: 20px 25%" type="text" (keyup.enter)="enterEntered()"
+      name="one">
+      <button style="height: 50px; width: 50%; font-size: 24px text-align: center; margin: 20px 25%" preboot-events="click">Server View</button>
+    </app>
+    <div class="client" style="display: none">
+      <input style="height: 50px; width: 50%; font-size: 24px; padding: 20px; margin: 20px 25%" type="text" (keyup.enter)="enterEntered()"
+      name="one">
+      <button style="height: 50px; width: 50%; font-size: 24px text-align: center; margin: 20px 25%" onclick="clientClick()">Client View</button>
+    </div>
+    <button style="height: 50px; width: 50%; font-size: 24px text-align: center; margin: 20px 25%; z-index: 99999999999" onclick="fireBootstrapComplete()">
+      Fire Bootstrap complete yo
+    </button>
+    <script>
+      preboot.start();
+
+        // fire bootstrap complete manually
+        function fireBootstrapComplete() {
+            preboot.complete();
+        }
+
+        // this is our "client app"
+        setTimeout(function () {
+            var clientTemplate = document.querySelector('div.client');
+            var clientRoot = document.querySelector('app');
+
+            var tempNode;
+            for (var i = 0; i < clientTemplate.childNodes.length; i++) {
+                tempNode = clientTemplate.childNodes[i].cloneNode(true);
+                clientRoot.appendChild(tempNode);
+            }
+
+            setTimeout(function () {
+                fireBootstrapComplete();
+            }, 1000);
+        }, 3000);
+
+        // see that client was clicked
+        function clientClick() {
+            console.log('client clicked');
+        }
+
+        // see that client was clicked
+        function enterEntered() {
+            console.log('enter entered');
+        }
+    </script>
+  </body>
+
+</html>

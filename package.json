@@ -1,0 +1,45 @@
+{
+  "name": "universal",
+  "version": "0.0.1",
+  "description": "Record and play back client side events",
+  "main": "src/server/preboot_server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "author": "Jeff Whelpley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
+  "homepage": "https://github.com/angular/universal",
+  "devDependencies": {
+    "connect-livereload": "^0.5.3",
+    "express": "^4.13.0",
+    "gulp-eslint": "^0.14.0",
+    "gulp-jasmine": "^2.0.1",
+    "gulp-livereload": "^3.8.0",
+    "gulp-tslint": "^3.1.0-beta",
+    "jasmine": "^2.3.1",
+    "jasmine-reporters": "^2.0.7",
+    "open": "0.0.5",
+    "serve-index": "^1.7.0",
+    "serve-static": "^1.10.0",
+    "yargs": "^3.13.0"
+  },
+  "dependencies": {
+    "browserify": "^10.2.4",
+    "event-stream": "^3.3.1",
+    "gulp": "^3.9.0",
+    "gulp-insert": "^0.4.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.2.0",
+    "lodash": "^3.10.0",
+    "q": "^1.4.1",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
