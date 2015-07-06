@@ -1,5 +1,5 @@
 /// <reference path="../../../server/typings/tsd.d.ts" />
-'use strict';
+
 var express = require('express');
 var serveStatic = require('serve-static');
 var morgan = require('morgan');
