@@ -22,6 +22,11 @@ import {DirectiveResolver} from 'angular2/core';
 var serverInjector = undefined; // js defaults only work with undefined
 var serverDocument = DOM.createHtmlDocument();
 var serverDirectiveResolver = new DirectiveResolver();
+var prebootScript = `
+  <link rel="stylesheet" type="text/css" href="/css/preboot.css">
+  <script src="/lib/preboot.js"></script>
+  <script>preboot.start()</script>
+`;
 
 export function render(content, AppComponent, options) {
   if (options.clientOnly) {
@@ -66,7 +71,8 @@ export function render(content, AppComponent, options) {
       // <selector></selector>
       selectorRegExpFactory(selector),
       // <selector>{{ serializedCmp }}</selector>
-      serializedCmp/* + showDebug(appRef.hostComponent)*/
+      serializedCmp +/* + showDebug(appRef.hostComponent)*/
+      prebootScript
     );
 
     // destroy appComponent
