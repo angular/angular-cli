@@ -8,13 +8,13 @@
     "removeComments": false,
     "noLib": false,
     "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
   	"sourceMap": true,
     "listFiles": false,
   	"outDir": "dist"
   },
   "files": [
     "typings/tsd.d.ts",
-    "typings/lib.d.ts",
     "modules/index.ts",
     "modules/preboot/src/client/buffer_manager.ts",
     "modules/preboot/src/client/dom.ts",
@@ -46,11 +46,17 @@
     "modules/preboot/test/server/client_code_generator_spec.ts",
     "modules/preboot/test/server/normalize_spec.ts",
     "modules/preboot/test/server/presets_spec.ts",
-    "modules/preboot/test/server/utils_spec.ts"
-  ],
-  "filesGlob": [
-    "./modules/**/*.ts",
-    "!./node_modules/**/*.ts"
+    "modules/preboot/test/server/utils_spec.ts",
+    "node_modules/typescript/bin/lib.es6.d.ts",
+    "modules/server/typings/tsd.d.ts",
+    "modules/client/client.ts",
+    "modules/server/server.ts",
+    "modules/examples/app/client/app.ts",
+    "modules/examples/app/server/api.ts",
+    "modules/examples/app/server/routes.ts",
+    "modules/examples/app/server/server.ts",
+    "modules/examples/app/universal/app/App.ts",
+    "modules/examples/app/universal/todo/index.ts"
   ],
    "formatCodeOptions": {
       "indentSize": 2,

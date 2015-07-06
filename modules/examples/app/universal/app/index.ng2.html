@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Angular 2 + TypeScript + Isomorphic + Server</title>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+  <script type="text/javascript">
+    'use strict';
+    window.addEventListener('load', function () {
+      setTimeout(function (){
+        var t = window.performance.timing;
+        console.log('Network latency', t.responseEnd - t.fetchStart);
+        console.log('Server to Client load: ', t.loadEventEnd - t.responseEnd);
+        console.log('Navigation to Client load:', t.loadEventEnd - t.navigationStart);
+      }, 0);
+    });
+  </script>
+
+  <!-- Needed for ES6 polyfills -->
+  <script src="/lib/traceur-runtime.min.js"></script>
+  <!-- SystemJS -->
+  <script src="/lib/system.js"></script>
+  <!-- <script src="/lib/Reflect.js"></script> -->
+  <!-- Angular2: Zone -->
+  <!-- <script src="/lib/zone-microtask.js"></script> -->
+  <script src="/lib/angular2.dev.js"></script>
+  <script src="/lib/router.dev.js"></script>
+
+  <!-- Angular2: Reflect -->
+  <script type="text/javascript">
+    System.config({
+      'baseURL': '/',
+      'defaultJSExtensions': true,
+      "map": {
+        "*": "*.js",
+        "angular2": "node_modules/angular2",
+        "rx": "node_modules/rx/dist/rx"
+      },
+      'meta': {
+        // auto-detection fails to detect properly
+        "rx": {
+          "format": "cjs" //https://github.com/systemjs/builder/issues/123
+        }
+      }
+    });
+  </script>
+
+</head>
+<body>
+
+<app>
+  Loading...
+</app>
+
+
+<br>
+<br>
+<br>
+<br>
+
+<div id="bootstrapButton" style="z-index:999999999;position: absolute;">
+  <button onclick="bootstrap()">
+    Bootstrap Angular2 Client
+  </button>
+</div>
+
+<script>
+  function ngApp() {
+    return System.import('examples/app/client/app').
+      then(function(module) {
+        return module.main();
+      });
+  }
+
+  function bootstrap() {
+    console.time('bootstrap');
+    var bootstrapTime = new Date();
+    ngApp().
+      then(function() {
+        console.timeEnd('bootstrap');
+        preboot.done();
+
+        var bootstrapTimeEnd = new Date();
+        var milliseconds = bootstrapTimeEnd - bootstrapTime;
+        var seconds = ~~(milliseconds / 1000);
+        var $bootstrap = document.getElementById('bootstrapButton');
+        $bootstrap.innerHTML = ''+
+          'milliseconds: '+milliseconds+'ms'+
+          '<br>'+
+          'seconds: '+seconds+'s'+
+        '';
+      });
+  }
+
+  setTimeout(function() {
+    bootstrap();
+  });
+
+
+</script>
+
+</body>
+</html>

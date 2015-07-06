@@ -25,6 +25,18 @@
     },
     "lodash/lodash.d.ts": {
       "commit": "ab3cc82066805007cbf0db233ddb5879f42be4d2"
+    },
+    "angular2/angular2.d.ts": {
+      "commit": "2a5858c16563634453533009242b8e0b18521370"
+    },
+    "rx/rx.d.ts": {
+      "commit": "2a5858c16563634453533009242b8e0b18521370"
+    },
+    "rx/rx-lite.d.ts": {
+      "commit": "2a5858c16563634453533009242b8e0b18521370"
+    },
+    "es6-promise/es6-promise.d.ts": {
+      "commit": "2a5858c16563634453533009242b8e0b18521370"
     }
   }
 }

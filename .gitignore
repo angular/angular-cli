@@ -28,9 +28,6 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 
-!typings/_custom/
-
-
 # Server
 dist/
 modules/server/dist/

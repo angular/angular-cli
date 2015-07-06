@@ -1,34 +1,54 @@
 {
-  "name": "universal",
+  "name": "angular2-universal",
   "version": "0.0.1",
-  "description": "Record and play back client side events",
-  "main": "src/server/preboot_server.js",
+  "description": "Universal (isomorphic) javascript support for Angular2",
+  "main": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon --ext 'js,ts,html' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
+    "watch": "tsc -w",
+    "build": "tsc",
+    "debug": "node-inspector & nodemon --ext 'js,ts,html' --debug 'index.js' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
+    "remove-angular-typings": "rm -rf angular/modules/angular2/typings",
+    "update-angular": "git submodule foreach 'npm install && gulp build.js.cjs || true'",
+    "pull-angular": "git submodule foreach 'git pull --rebase git@github.com:angular/angular.git master'",
+    "angular-submodule": "npm run pull-angular && npm run remove-angular-typings && npm run update-angular",
+    "web_modules": "./scripts/update-ng-bundle.sh 2.0.0-alpha.28 0.18.3 v0.1.0 0.0.90",
+    "preinstall": "npm run angular-submodule",
+    "postinstall": "tsc || true && npm run web_modules"
   },
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/universal"
   },
-  "author": "Jeff Whelpley",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/angular/universal/issues"
   },
   "homepage": "https://github.com/angular/universal",
   "devDependencies": {
+    "connect-history-api-fallback": "^1.1.0",
     "connect-livereload": "^0.5.3",
     "express": "^4.13.0",
-    "gulp-eslint": "^0.14.0",
+    "gulp-eslint": "^0.15.0",
     "gulp-jasmine": "^2.0.1",
     "gulp-livereload": "^3.8.0",
     "gulp-tslint": "^3.1.0-beta",
     "jasmine": "^2.3.1",
     "jasmine-reporters": "^2.0.7",
+    "morgan": "^1.6.1",
+    "nodemon": "^1.3.7",
     "open": "0.0.5",
+    "rx": "^2.5.3",
     "serve-index": "^1.7.0",
     "serve-static": "^1.10.0",
-    "yargs": "^3.13.0"
+    "typescript": "^1.5.0-beta",
+    "yargs": "^3.14.0",
+    "zone.js": "^0.5.1"
   },
   "dependencies": {
     "browserify": "^10.2.4",
@@ -40,6 +60,10 @@
     "lodash": "^3.10.0",
     "q": "^1.4.1",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "angular2": "file:angular/dist/js/cjs/angular2",
+    "css": "^2.2.1",
+    "parse5": "^1.5.0",
+    "reflect-metadata": "^0.1.0"
   }
 }

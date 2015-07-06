@@ -29,13 +29,7 @@ module.exports = function (gulp) {
     });
     open('http://localhost:3000' + location);
     
-
-    //TODO: figure out how to put tsc -w here
-
-    exec('tsc -w', function (err, out, code) {
-      console.log('got here');
-    });
-
+    exec('tsc -w');
     gulp.watch('dist/**/*', ['build']);
     gulp.watch('modules/examples/**/*', function () {
       reloader.reload();
