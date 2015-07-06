@@ -22,12 +22,26 @@ declare module "angular2/http" {
     head(url: string, options?: any): any;
   }
   class HttpFactory {}
+  class XHRBackend {}
+  class ConnectionBackend {}
+  class RequestOptions {}
+  class ResponseOptions {}
+  class BaseRequestOptions {}
+  class BaseResponseOptions {}
   class MockBackend {
     constructor(req: any)
   }
-  class XHRBackend {}
-  class BaseRequestOptions {}
   var httpInjectables: Array<any>;
+}
+
+declare module "angular2/src/http/backends/browser_xhr" {
+  class BrowserXhr {
+    constructor();
+    build(): any;
+  }
+}
+
+declare module "angular2/mock" {
 }
 
 declare module "angular2/src/core/life_cycle/life_cycle" {
@@ -57,10 +71,6 @@ declare module "angular2/src/core/compiler/view_resolver" {
 
 declare module "angular2/src/services/app_root_url" {
   class AppRootUrl {}
-}
-
-declare module "angular2/src/http/backends/browser_xhr" {
-  class BrowserXHR {}
 }
 
 declare module "angular2/src/core/compiler/view_listener" {
