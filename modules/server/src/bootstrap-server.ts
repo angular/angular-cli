@@ -89,11 +89,11 @@ var _rootBindings = [ bind(Reflector).toValue(reflector), TestabilityRegistry ];
 
 function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
   var bestChangeDetection: Type = DynamicChangeDetection;
-  if (PreGeneratedChangeDetection.isSupported()) {
-    bestChangeDetection = PreGeneratedChangeDetection;
-  } else if (JitChangeDetection.isSupported()) {
-    bestChangeDetection = JitChangeDetection;
-  }
+  // if (PreGeneratedChangeDetection.isSupported()) {
+  //   bestChangeDetection = PreGeneratedChangeDetection;
+  // } else if (JitChangeDetection.isSupported()) {
+  //   bestChangeDetection = JitChangeDetection;
+  // }
 
   return [
     // bind(appComponentTypeToken).toValue(appComponentType),
@@ -111,20 +111,20 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     //         },
     //         [DynamicComponentLoader, Injector, Testability, TestabilityRegistry]),
 
-    bind(appComponentType).toFactory((ref) => ref.instance, [appComponentRefToken]),
-    bind(LifeCycle)
-        .toFactory((exceptionHandler) => new LifeCycle(exceptionHandler, null, assertionsEnabled()),
-                   [ExceptionHandler]),
-    bind(EventManager)
-        .toFactory(
-            (ngZone) => {
-              var plugins =
-                  [new HammerGesturesPlugin(), new KeyEventsPlugin(), new DomEventsPlugin()];
-              return new EventManager(plugins, ngZone);
-            },
-            [NgZone]),
-    bind(ShadowDomStrategy)
-        .toFactory((doc) => new EmulatedUnscopedShadowDomStrategy(doc.head), [DOCUMENT_TOKEN]),
+    bind(appComponentType)
+      .toFactory((p: any) => p.then(ref => ref.instance), [appComponentRefToken]),
+    bind(LifeCycle).toFactory(exceptionHandler => {
+      return new LifeCycle(exceptionHandler, null, assertionsEnabled());
+    }, [ ExceptionHandler ]),
+    bind(EventManager).toFactory(ngZone => {
+      var plugins = [
+        new HammerGesturesPlugin(), new KeyEventsPlugin(), new DomEventsPlugin()
+      ];
+      return new EventManager(plugins, ngZone);
+    }, [ NgZone ]),
+    bind(ShadowDomStrategy).toFactory(doc => {
+      return new EmulatedUnscopedShadowDomStrategy(doc.head);
+    }, [DOCUMENT_TOKEN]),
     DomRenderer,
     DefaultDomCompiler,
     bind(Renderer).toAlias(DomRenderer),
@@ -188,7 +188,7 @@ export function bootstrap(appComponentType: Type,
   let componentLoader   = (dynamicComponentLoader, injector, testability, registry) => {
     // TODO(rado): investigate whether to support bindings on root component.
     return dynamicComponentLoader.loadAsRoot(appComponentType, null, injector).
-      then( (componentRef) => {
+      then(componentRef => {
         registry.registerApplication(componentRef.location.nativeElement, testability);
         return componentRef;
       });
@@ -214,7 +214,7 @@ export function bootstrap(appComponentType: Type,
 
   }
   // Server
-  let promise = PromiseWrapper.all([
+  let compRefToken = PromiseWrapper.all([
     PromiseWrapper.wrap(() => appInjector.get(DynamicComponentLoader)),
     PromiseWrapper.wrap(() => appInjector.get(Testability)),
     PromiseWrapper.wrap(() => appInjector.get(TestabilityRegistry))
@@ -223,21 +223,18 @@ export function bootstrap(appComponentType: Type,
     return componentLoader(results[0], appInjector, results[1], results[2]);
   });
 
-  PromiseWrapper.then(
-    promise,
-    componentRef => {
-      var appChangeDetector = internalView(componentRef.hostView).changeDetector;
+  let tick = componentRef => {
+    var appChangeDetector = internalView(componentRef.hostView).changeDetector;
 
-      bootstrapProcess.resolve(
-        new ApplicationRef(componentRef, appComponentType, appInjector, appChangeDetector)
-      );
-    },
-    (err, stackTrace) => {
-      bootstrapProcess.reject(err, stackTrace)
-    }
-  );
+    bootstrapProcess.resolve(
+      new ApplicationRef(componentRef, appComponentType, appInjector, appChangeDetector)
+    );
+  };
+
+  PromiseWrapper.then(compRefToken, tick,
+    (err, stackTrace) => {bootstrapProcess.reject(err, stackTrace)});
+
   // Server
-
   return bootstrapProcess.promise;
 }
 
@@ -296,7 +293,7 @@ function _createAppInjector(appComponentType: Type, bindings: List<Type | Bindin
     _rootInjector = Injector.resolveAndCreate(_rootBindings);
   }
 
-  var mergedBindings: any =                 isPresent(bindings) ?
+  var mergedBindings: any = isPresent(bindings) ?
     ListWrapper.concat(_injectorBindings(appComponentType), bindings) :
                                    _injectorBindings(appComponentType);
 
