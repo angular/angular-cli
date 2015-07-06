@@ -1,14 +1,18 @@
 /// <reference path="../typings/tsd.d.ts" />
+import {BrowserXhr} from 'angular2/src/http/backends/browser_xhr';
 
-import {BrowserXHR} from 'angular2/src/http/backends/browser_xhr';
-import {bind} from 'angular2/di';
+import {bind, Injectable} from 'angular2/di';
+
 import {
-  MockBackend,
-  XHRBackend,
-  HttpFactory,
+  Http,
+  ConnectionBackend,
+  RequestOptions,
+  ResponseOptions,
+  BaseResponseOptions,
   BaseRequestOptions,
-  Http
+  MockBackend
 } from 'angular2/http';
+
 
 function logging(type) {
   return function(...args) {
@@ -16,7 +20,8 @@ function logging(type) {
   }
 }
 
-export class MockBrowserXHR {
+@Injectable()
+export class NodeXhr extends BrowserXhr {
   abort: any;
   send: any;
   open: any;
@@ -25,24 +30,33 @@ export class MockBrowserXHR {
   response: any;
   responseText: string;
   constructor() {
+    super();
     this.abort = logging('about');
     this.send  = logging('send');
     this.open  = logging('open');
     this.addEventListener = logging('addEventListener');
     this.removeEventListener = logging('removeEventListener');
   }
-}
-
-export class NodeBackend extends MockBackend {
-  constructor(req: any) {
-    super(req);
+  build() {
+    return new NodeXhr();
   }
 }
 
+@Injectable()
+export class NodeBackend extends MockBackend {
+  constructor(private _browserXHR: BrowserXhr, private _baseResponseOptions: ResponseOptions) {
+    super(_browserXHR, _baseResponseOptions);
+  }
+  // createConnection(request: any) {
+  //   return new XHRConnection(request, this._browserXHR, this._baseResponseOptions);
+  // }
+}
+
 export var httpInjectables: Array<any> = [
-  bind(BrowserXHR).toValue(MockBrowserXHR),
-  bind(XHRBackend).toClass(NodeBackend),
-  BaseRequestOptions,
-  bind(HttpFactory).toFactory(HttpFactory, [XHRBackend, BaseRequestOptions]),
+  bind(ConnectionBackend).toClass(NodeBackend),
+  bind(BrowserXhr).toClass(NodeXhr),
+
+  bind(RequestOptions).toClass(BaseRequestOptions),
+  bind(ResponseOptions).toClass(BaseResponseOptions),
   Http
 ];
