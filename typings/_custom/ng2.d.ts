@@ -8,7 +8,14 @@ declare module "angular2/annotations" {
   var Query: any;
 }
 
+declare module "angular2/src/http/backends/browser_xhr" {
+  class BrowserXhr {
+    constructor();
+    build(): any;
+  }
+}
 declare module "angular2/http" {
+  import {BrowserXhr} from "angular2/src/http/backends/browser_xhr"
   class Http {
     _backend: any;
     _defaultOptions: any;
@@ -22,24 +29,25 @@ declare module "angular2/http" {
     head(url: string, options?: any): any;
   }
   class HttpFactory {}
-  class XHRBackend {}
-  class ConnectionBackend {}
-  class RequestOptions {}
   class ResponseOptions {}
+  class XHRBackend {
+    private _browserXHR: BrowserXhr;
+    private _baseResponseOptions: ResponseOptions;
+    constructor(_browserXHR: BrowserXhr, _baseResponseOptions: ResponseOptions)
+    createConnection(request: any): any;
+  }
+  class ConnectionBackend {
+    constructor(req: any, browserXHR: any, baseResponseOptions?: any)
+  }
+  class RequestOptions {}
   class BaseRequestOptions {}
   class BaseResponseOptions {}
   class MockBackend {
-    constructor(req: any)
+    constructor(browserXHR: any, baseResponseOptions: any)
   }
   var httpInjectables: Array<any>;
 }
 
-declare module "angular2/src/http/backends/browser_xhr" {
-  class BrowserXhr {
-    constructor();
-    build(): any;
-  }
-}
 
 declare module "angular2/mock" {
 }
