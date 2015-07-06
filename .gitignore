@@ -28,7 +28,6 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 
-typings/**/*.d.ts
 !typings/_custom/
 
 
