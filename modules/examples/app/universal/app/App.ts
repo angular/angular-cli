@@ -3,6 +3,12 @@ import {Component, View, onInit} from 'angular2/angular2';
 import {Http} from 'angular2/http';
 import {coreDirectives} from 'angular2/angular2';
 
+
+function transformData(data) {
+  data.created_at = new Date(data.created_at);
+  return data;
+}
+
 @Component({
   selector: 'app',
   lifecycle: [ onInit ]
@@ -22,7 +28,11 @@ import {coreDirectives} from 'angular2/angular2';
 {{ buttonTest | json }}</pre>
   </div>
   <div>
-    <input type="text" autofocus [value]="value" (keyup)="value = $event.target.value; log(value)">
+    <input
+      type="text"
+      autofocus
+      [value]="value"
+      (keyup)="value = $event.target.value">
     {{ value }}
   </div>
   <div>
@@ -38,8 +48,11 @@ import {coreDirectives} from 'angular2/angular2';
 
   <ul>
     <li *ng-for="var item of items">
-      <input type="checkbox" [value]="item.completed">
-      {{ item.title }}
+      <input
+        type="checkbox"
+        [value]="item.completed"
+        (change)="item.completed = $event.target.checked">
+      <pre>{{ item | json }}</pre>
     </li>
   </ul>
 
@@ -67,8 +80,9 @@ export class App {
   itemCount: number    = 0;
   buttonTest: string   = '';
   testingInput: string = 'default state on component';
-  constructor(private http: Http) {
-  }
+  constructor(
+    private http: Http
+  ) {}
 
   onInit() {
     this.addItem();
@@ -76,21 +90,25 @@ export class App {
     this.addItem();
 
     var todosObs = this.http.get('/api/todos').
-      // filter(res => res.status >= 200 && res.status < 300).
-      map(res => res.json());
+      toRx().
+      filter(res => res.status >= 200 && res.status < 300).
+      map(res => res.json()).
+      map(data => data.map(transformData));
+
     todosObs.subscribe(
-      value => {
-        this.addItem(value);
-        console.log('next', value)
+      todos => {
+        console.log('next', todos);
+        todos.map(this.addItem.bind(this));
       },
       err => {
         console.error('err', err);
         throw err;
       },
       complete => {
-        console.log('complete', complete)
+        console.log('complete', complete);
       }
     );
+
   }
 
   log(val) {
@@ -111,10 +129,12 @@ export class App {
   }
 
   addItem(value?: any) {
-    this.items.push(value || {
-      title: `item ${ this.itemCount++ }`,
-      completed: false
-    });
+    var defaultItem = {
+      value: `item ${ this.itemCount++ }`,
+      completed: false,
+      created_at: new Date()
+    };
+    this.items.push(value || defaultItem);
   }
 
   removeItem() {
