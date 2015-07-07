@@ -16,6 +16,8 @@
   "files": [
     "typings/tsd.d.ts",
     "modules/index.ts",
+    "modules/preboot/client.ts",
+    "modules/preboot/server.ts",
     "modules/preboot/src/client/buffer_manager.ts",
     "modules/preboot/src/client/dom.ts",
     "modules/preboot/src/client/event_manager.ts",
