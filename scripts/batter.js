@@ -5,17 +5,18 @@ var path        = require('path');
 var delim       = path.normalize('/');
 var taskRegex   = /^task\.(.*)\.js$/;
 
+var SCRIPTS_FOLDER = 'scripts';
 /**
  * Set options defaults that are used for batter tasks
  */
 function normalizeOptions(opts) {
   opts = opts || {};
-  
+
   // command line arguments override options
   _.extend(opts, argv);
   delete opts.$0;
   delete opts._;
-  
+
   // these values are used in multiple tasks, so set defaults here
   opts.unitTestCode = opts.unitTestCode || 'test/unit/**/*.js';
   opts.unitTargetCode = opts.unitTargetCode || 'lib/**/*.js';
@@ -23,7 +24,7 @@ function normalizeOptions(opts) {
   opts.rootDir = opts.rootDir || process.cwd();
   opts.targetDir = opts.targetDir || (opts.rootDir + '/lib');
   opts.tasksets = _.extend({ 'default': ['lint', 'test'] }, opts.tasksets);
-  
+
   return opts;
 }
 
@@ -35,7 +36,7 @@ function whip(gulp, opts) {
 
   // tasksets can be set in the gulpfile
   var tasks = _.extend({}, opts.tasksets);
-  var buildDir = process.cwd() + delim + 'build';
+  var buildDir = process.cwd() + delim + SCRIPTS_FOLDER;
   var buildFiles = fs.readdirSync(buildDir);
 
   _.each(buildFiles, function (buildFile) {

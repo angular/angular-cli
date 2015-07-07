@@ -23,8 +23,8 @@ var serverInjector = undefined; // js defaults only work with undefined
 var serverDocument = DOM.createHtmlDocument();
 var serverDirectiveResolver = new DirectiveResolver();
 var prebootScript = `
-  <link rel="stylesheet" type="text/css" href="/css/preboot.css">
-  <script src="/lib/preboot.js"></script>
+  <link rel="stylesheet" type="text/css" href="/preboot/preboot.css">
+  <script src="/preboot/preboot.js"></script>
   <script>preboot.start()</script>
 `;
 

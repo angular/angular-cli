@@ -53,7 +53,11 @@ module.exports = function(ROOT) {
     serveStatic(ROOT + '/angular/dist/bundle')(req, res, next);
   });
 
-  router.use('/lib', function(req, res, next) {
+  router.use('/preboot', function(req, res, next) {
+    serveStatic(ROOT + '/modules/examples/preboot_basic')(req, res, next);
+  });
+
+  router.use('/web_modules', function(req, res, next) {
     serveStatic(ROOT + '/web_modules')(req, res, next);
   });
 

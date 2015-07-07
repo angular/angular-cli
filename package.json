@@ -20,7 +20,8 @@
     "pull-angular": "git submodule foreach 'git pull --rebase git@github.com:angular/angular.git master'",
     "angular-submodule": "npm run pull-angular && npm run remove-angular-typings && npm run update-angular",
     "bower": "bower install",
-    "web_modules": "./scripts/update-ng-bundle.sh",
+    "web_modules": "bash ./scripts/update-ng-bundle.sh",
+    "preboot": "gulp build",
     "preinstall": "#npm run angular-submodule",
     "postinstall": "tsc || true && npm run web_modules && npm run bower"
   },
