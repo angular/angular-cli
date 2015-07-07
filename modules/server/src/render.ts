@@ -18,7 +18,7 @@ import {stringifyElement} from './stringifyElement';
 import {DOM} from 'angular2/src/dom/dom_adapter';
 import {DirectiveResolver} from 'angular2/core';
 
-// Maintain stateless Injector/document and directiveResolver
+// maintain stateless Injector/document and directiveResolver
 var serverInjector = undefined; // js defaults only work with undefined
 var serverDocument = DOM.createHtmlDocument();
 var serverDirectiveResolver = new DirectiveResolver();
@@ -71,7 +71,7 @@ export function render(content, AppComponent, options) {
       // <selector></selector>
       selectorRegExpFactory(selector),
       // <selector>{{ serializedCmp }}</selector>
-      serializedCmp +/* + showDebug(appRef.hostComponent)*/
+      serializedCmp + /* + showDebug(appRef.hostComponent)*/
       prebootScript
     );
 

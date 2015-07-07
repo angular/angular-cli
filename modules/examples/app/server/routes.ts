@@ -8,10 +8,10 @@ module.exports = function(ROOT) {
   var router = express.Router();
 
   var universalPath = ROOT + '/dist/examples/app/universal';
-  var App     = require(universalPath+'/app/App').App;
-  var TodoApp = require(universalPath+'/todo/index').TodoApp;
+  var App     = require(universalPath + '/app/App').App;
+  var TodoApp = require(universalPath + '/todo/index').TodoApp;
 
-  var httpInjectables = require(ROOT+'/dist/server/server').httpInjectables;
+  var httpInjectables = require(ROOT + '/dist/server/server').httpInjectables;
 
   router.
     route('/').
@@ -71,4 +71,4 @@ module.exports = function(ROOT) {
 
 
   return router;
-}
+};

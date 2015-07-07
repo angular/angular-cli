@@ -17,7 +17,7 @@ import {
 function logging(type) {
   return function(...args) {
     console.log('logging ', type, ':', ...args);
-  }
+  };
 }
 
 @Injectable()

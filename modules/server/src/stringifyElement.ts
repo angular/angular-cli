@@ -15,10 +15,10 @@ export function stringifyElement(el): string {
   if (DOM.isElementNode(el)) {
     var tagName = StringWrapper.toLowerCase(DOM.tagName(el));
 
-    // Opening tag
+    // opening tag
     result += `<${ tagName }`;
 
-    // Attributes in an ordered way
+    // attributes in an ordered way
     var attributeMap = DOM.attributeMap(el);
     var keys = [];
     MapWrapper.forEach(attributeMap, (v, k) => { keys.push(k); });
@@ -34,13 +34,13 @@ export function stringifyElement(el): string {
     }
     result += '>';
 
-    // Children
+    // children
     var children = DOM.childNodes(DOM.templateAwareRoot(el));
     for (let j = 0; j < children.length; j++) {
       result += stringifyElement(children[j]);
     }
 
-    // Closing tag
+    // closing tag
     if (!ListWrapper.contains(_singleTagWhitelist, tagName)) {
       result += `</${ tagName }>`;
     }

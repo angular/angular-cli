@@ -1,3 +1,4 @@
+/* tslint:disable */
 import {Injector, bind, OpaqueToken, Binding} from 'angular2/di';
 import {
   NumberWrapper,

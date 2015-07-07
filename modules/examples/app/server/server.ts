@@ -8,7 +8,7 @@ var path = require('path');
 module.exports = function(ROOT) {
   var app = express();
 
-  var ng2Engine = require(ROOT+'/dist/server/server').ng2engine;
+  var ng2Engine = require(ROOT + '/dist/server/server').ng2engine;
   // rendering engine
 
   app.engine('ng2.html', ng2Engine);

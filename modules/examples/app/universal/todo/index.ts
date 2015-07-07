@@ -135,7 +135,7 @@ export class TodoApp {
   }
 
   enterTodo($event, inputElement) {
-    if (!inputElement.value) return;
+    if (!inputElement.value) { return; }
     this.addTodo(inputElement.value);
     inputElement.value = '';
   }

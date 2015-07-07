@@ -124,7 +124,7 @@ export class App {
   }
 
   clickingTest() {
-    this.buttonTest = `click ${ this.testing() } ${ ~~(Math.random()*20) }`;
+    this.buttonTest = `click ${ this.testing() } ${ ~~(Math.random() * 20) }`;
     console.log(this.buttonTest);
   }
 

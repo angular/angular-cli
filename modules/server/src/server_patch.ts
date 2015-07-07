@@ -4,10 +4,10 @@
 // typescript decoratos
 import 'reflect-metadata';
 
-// Polyfills
+// polyfills
 import 'angular2/node_modules/traceur/bin/traceur-runtime';
 
-// Angular2 assert
+// angular 2 assert
 // import 'angular2/node_modules/rtts_assert/src/rtts_assert';
 
 // dom closure

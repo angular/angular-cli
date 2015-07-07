@@ -36,7 +36,7 @@ module.exports = function(ROOT) {
       } else {
         res.end();
       }
-    })
+    });
 
   router.param('todo_id', function(req, res, next, todo_id) {
     var id = Number(req.params.todo_id);
@@ -45,7 +45,7 @@ module.exports = function(ROOT) {
       req.todo_id = id;
       req.todo = todos[id];
       next();
-    } catch(e) {
+    } catch (e) {
       next(new Error('failed to load todo'));
     }
   });
@@ -74,4 +74,4 @@ module.exports = function(ROOT) {
     });
 
   return router;
-}
+};
