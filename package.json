@@ -1,10 +1,17 @@
 {
   "name": "angular2-universal",
+  "main": "index.js",
   "version": "0.0.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
-  "main": "",
+  "homepage": "https://github.com/angular/universal",
+  "license": "Apache-2.0",
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>"
+  ],
   "scripts": {
-    "start": "nodemon --ext 'js,ts,html' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
+    "start": "npm run build && nodemon --ext 'js,ts,html' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
     "watch": "tsc -w",
     "build": "tsc",
     "debug": "node-inspector & nodemon --ext 'js,ts,html' --debug 'index.js' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
@@ -12,25 +19,20 @@
     "update-angular": "git submodule foreach 'npm install && gulp build.js.cjs || true'",
     "pull-angular": "git submodule foreach 'git pull --rebase git@github.com:angular/angular.git master'",
     "angular-submodule": "npm run pull-angular && npm run remove-angular-typings && npm run update-angular",
-    "web_modules": "./scripts/update-ng-bundle.sh 2.0.0-alpha.28 0.18.3 v0.1.0 0.0.90",
-    "preinstall": "npm run angular-submodule",
-    "postinstall": "tsc || true && npm run web_modules"
+    "bower": "bower install",
+    "web_modules": "./scripts/update-ng-bundle.sh",
+    "preinstall": "#npm run angular-submodule",
+    "postinstall": "tsc || true && npm run web_modules && npm run bower"
   },
-  "contributors": [
-    "Tobias Bosch <tbosch@google.com>",
-    "PatrickJS <github@gdi2290.com>",
-    "Jeff Whelpley <jeff@gethuman.com>"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/universal"
   },
-  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/angular/universal/issues"
   },
-  "homepage": "https://github.com/angular/universal",
   "devDependencies": {
+    "bower": "^1.4.1",
     "connect-history-api-fallback": "^1.1.0",
     "connect-livereload": "^0.5.3",
     "express": "^4.13.0",

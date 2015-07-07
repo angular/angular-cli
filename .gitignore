@@ -37,6 +37,7 @@ modules/server/dist/
 
 # Static files
 
+bower_components/
 web_modules/
 
 # Preboot
@@ -45,3 +46,4 @@ modules/preboot/dist
 # modules/preboot/typings/
 !modules/preboot/typings/_custom
 !modules/preboot/typings/tsd.d.ts
+

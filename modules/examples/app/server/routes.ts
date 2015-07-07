@@ -57,6 +57,10 @@ module.exports = function(ROOT) {
     serveStatic(ROOT + '/web_modules')(req, res, next);
   });
 
+  router.use('/bower_components', function(req, res, next) {
+    serveStatic(ROOT + '/bower_components')(req, res, next);
+  });
+
   router.use(historyApiFallback({
     // verbose: true
   }));
