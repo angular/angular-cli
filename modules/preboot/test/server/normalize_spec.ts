@@ -202,7 +202,7 @@ describe('normalize', function () {
         it('should throw error if invalid option', function () {
             let opts = { blahbalh: 'sdf' };
             let fn = () => normalize(opts);
-            expect(fn).toThrowError('Invalid option: blahbalh');
+            expect(fn).toThrowError('Invalid preboot option: blahbalh');
         });
     });
 

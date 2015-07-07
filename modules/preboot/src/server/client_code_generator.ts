@@ -34,9 +34,9 @@ export function ignoreUnusedStrategies(b: BrowserifyObject, bOpts: Object, strat
 /**
  * Generate client code as a readable stream for preboot based on the input options
  */
-export function getClientCodeStream(opts: PrebootOptions): NodeJS.ReadableStream {
+export function getClientCodeStream(opts?: PrebootOptions): NodeJS.ReadableStream {
   opts = normalize(opts);
-  
+
   let bOpts = {
     entries: [__dirname + '/../client/preboot_client.js'],
     standalone: 'preboot',
@@ -66,10 +66,10 @@ export function getClientCodeStream(opts: PrebootOptions): NodeJS.ReadableStream
 }
 
 /**
- * Generate client code as a string for preboot 
+ * Generate client code as a string for preboot
  * based on the input options
  */
-export function getClientCode(opts: PrebootOptions, done: Function) {
+export function getClientCode(opts?: PrebootOptions, done?: Function) {
   let deferred = Q.defer();
   let clientCode = '';
 
