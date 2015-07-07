@@ -46,7 +46,7 @@
     "rx": "^2.5.3",
     "serve-index": "^1.7.0",
     "serve-static": "^1.10.0",
-    "typescript": "^1.5.0-beta",
+    "typescript": "git://github.com/Microsoft/TypeScript.git#release-1.5",
     "yargs": "^3.14.0",
     "zone.js": "^0.5.1"
   },

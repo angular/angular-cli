@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",  
+  "version": "1.5.0",
   "compilerOptions": {
   	"target": "es5",
   	"module": "commonjs",
@@ -31,7 +31,6 @@
     "modules/preboot/test/client/dom_spec.ts",
     "modules/preboot/test/client/event_manager_spec.ts",
     "modules/preboot/test/client/log_spec.ts",
-    "modules/preboot/test/client/preboot_client_spec.ts",
     "modules/preboot/test/client/freeze/freeze_with_spinner_spec.ts",
     "modules/preboot/test/client/listen/listen_by_attributes_spec.ts",
     "modules/preboot/test/client/listen/listen_by_event_bindings_spec.ts",
