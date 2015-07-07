@@ -1,5 +1,5 @@
 var gulp    = require('gulp');
-var batter  = require('./build/batter');
+var batter  = require('./scripts/batter');
 
-// all tasks in the /build/ directory
+// all tasks in the /scripts/ directory
 batter.whip(gulp, {});
