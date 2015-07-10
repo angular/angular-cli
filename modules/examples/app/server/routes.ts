@@ -11,16 +11,17 @@ module.exports = function(ROOT) {
   var App     = require(universalPath + '/app/App').App;
   var TodoApp = require(universalPath + '/todo/index').TodoApp;
 
-  var httpInjectables = require(ROOT + '/dist/server/server').httpInjectables;
+  var universal = require(ROOT + '/dist/server/server');
+  var httpInjectables = universal.httpInjectables;
 
   router.
     route('/').
     get(function ngApp(req, res) {
       res.render('app/universal/app/index', {
-        // clientOnly: true,
+        // server: false,
         Component: App,
-        bindings: [
-          httpInjectables
+        serverInjector: [
+          httpInjectables,
         ]
 
       });
@@ -28,12 +29,18 @@ module.exports = function(ROOT) {
 
   router.
     route('/examples/todo').
-    get(function(req, res) {
+    get(function ngTodo(req, res) {
       res.render('app/universal/todo/index', {
-        // clientOnly: true,
+        // client: false,
+        // server: false,
+        // scripts: false,
+        scripts: {
+          preboot: true,
+          angular: true,
+        },
         Component: TodoApp,
-        bindings: [
-          httpInjectables
+        serverInjector: [
+          httpInjectables,
         ]
 
       });

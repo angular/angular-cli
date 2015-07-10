@@ -79,7 +79,7 @@
     ngApp().
       then(function() {
         console.timeEnd('bootstrap');
-        preboot.done();
+        preboot.complete();
 
         var bootstrapTimeEnd = new Date();
         var milliseconds = bootstrapTimeEnd - bootstrapTime;

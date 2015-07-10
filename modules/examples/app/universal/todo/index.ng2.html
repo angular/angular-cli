@@ -4,19 +4,6 @@
   <title>Todo Angular 2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-
-  <script type="text/javascript">
-    'use strict';
-    window.addEventListener('load', function () {
-      setTimeout(function (){
-        var t = window.performance.timing;
-        console.log('Network latency', t.responseEnd - t.fetchStart);
-        console.log('Server to Client load: ', t.loadEventEnd - t.responseEnd);
-        console.log('Navigation to Client load:', t.loadEventEnd - t.navigationStart);
-      }, 0);
-    });
-  </script>
-
   <link rel="stylesheet" href="/css/main.css" media="screen" title="no title" charset="utf-8">
   <!-- Should be in component -->
   <link rel="stylesheet" href="/css/base.css" media="screen" title="no title" charset="utf-8">
@@ -25,101 +12,16 @@
 
   <!-- Angular 2 App -->
   <app>
-    <!-- Initial view -->
-    <section id="todoapp">
-      <h1>Loading...</h1>
-      <header id="header">
-        <input id="new-todo" placeholder="Loading..." autofocus>
-      </header>
-      <section id="main">
-        <ul id="todo-list" class="no_selection"></ul>
-      </section>
-      <footer id="info">
-        <p>Created by <a href="http://gdi2290.com">PatrickJS</a></p>
-      </footer>
-
-    </section>
-    <!-- Initial view -->
- </app>
-
-  <br>
-  <br>
-  <br>
-  <br>
-
-  <div id="bootstrapButton" style="z-index:999999999;position: absolute;">
-    <button onclick="bootstrap()">
-      Bootstrap Angular2 Client
-    </button>
-  </div>
-
-  <!-- Browser polyfills -->
-  <script src="/bower_components/traceur-runtime/traceur-runtime.min.js"></script>
-  <!-- SystemJS -->
-  <script src="/bower_components/system.js/dist/system.js"></script>
-  <!-- Angular2: Zone -->
+    Loading...
+  </app>
   <!--
-  <script src="/web_modules/zone-microtask.js"></script>
-  -->
-  <!-- Angular2: Reflect -->
-  <!--
-  <script src="/web_modules/Reflect.js"></script>
-  -->
-  <script src="/web_modules/angular2.min.js"></script>
-  <script src="/web_modules/router.dev.js"></script>
-
-
-  <script type="text/javascript">
-    System.config({
-      "baseURL": "/",
-      "defaultJSExtensions": true,
-      "map": {
-        "*": "*.js",
-        "angular2": "node_modules/angular2",
-        "rx": "node_modules/rx/dist/rx.js"
-      },
-      'meta': {
-        // auto-detection fails to detect properly
-        "rx": {
-          "format": "cjs" //https://github.com/systemjs/builder/issues/123
-        }
-      }
-    });
-  </script>
-
-
-<script>
-  function ngApp() {
-    return System.import('examples/app/universal/todo/index').
-      then(function(module) {
-        return module.main();
-      });
-  }
-
-  function bootstrap() {
-    console.time('bootstrap');
-    var bootstrapTime = new Date();
-    ngApp().
-      then(function() {
-        console.timeEnd('bootstrap');
-        preboot.done();
-
-        var bootstrapTimeEnd = new Date();
-        var milliseconds = bootstrapTimeEnd - bootstrapTime;
-        var seconds = ~~(milliseconds / 1000);
-        var $bootstrap = document.getElementById('bootstrapButton');
-        $bootstrap.innerHTML = ''+
-          'milliseconds: '+milliseconds+'ms'+
-          '<br>'+
-          'seconds: '+seconds+'s'+
-        '';
-      });
-  }
-
-  setTimeout(function() {
-    bootstrap();
-  });
-
-</script>
+    <script>
+        System.import('examples/app/universal/todo/index').
+          then(function(module) {
+            return module.main();
+          }).
+          then(preboot.complete);
+    </script>
+   -->
 </body>
 </html>

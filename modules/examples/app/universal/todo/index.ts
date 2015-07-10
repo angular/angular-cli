@@ -6,22 +6,9 @@ import {coreDirectives} from 'angular2/directives';
 import {Component, View, Directive, onInit} from 'angular2/angular2';
 import {ElementRef} from 'angular2/core';
 import {bind, Inject} from 'angular2/di';
+import {routerInjectables, routerDirectives} from 'angular2/router';
 
 import {Store, Todo, TodoFactory} from './services/TodoStore';
-
-import {httpInjectables} from 'angular2/http';
-
-@Directive({
-  selector: '[autofocus]'
-})
-export class Autofocus {
-  constructor(public el: ElementRef) {
-    // autofocus fix for multiple views
-    if (this.el.nativeElement.focus) {
-      setTimeout(_ => this.el.nativeElement.focus());
-    }
-  }
-}
 
 @Component({
   selector: 'app',
@@ -29,7 +16,7 @@ export class Autofocus {
   viewInjector: [ Store, TodoFactory ]
 })
 @View({
-  directives: [ coreDirectives, Autofocus ],
+  directives: [ coreDirectives, routerDirectives ],
   template: `
 <section id="todoapp">
 
@@ -94,21 +81,21 @@ export class Autofocus {
     </span>
     <ul id="filters">
       <li>
-        <a href="#/"
+        <a href="/#/"
           [class.selected]="selected === 0"
           (click)="selected = 0">
           All
         </a>
       </li>
       <li>
-        <a href="#/active"
+        <a href="/#/active"
           [class.selected]="selected === 1"
           (click)="selected = 1">
           Active
         </a>
       </li>
       <li>
-        <a href="#/completed"
+        <a href="/#/completed"
           [class.selected]="selected === 2"
           (click)="selected = 2">
           Completed
@@ -128,8 +115,8 @@ export class TodoApp {
   }
 
   onInit() {
-    this.addTodo('Convice browsers');
-    this.addTodo('Convice secure websites');
+    this.addTodo('Universal JavaScript');
+    this.addTodo('Run Angular 2 in Web Workers');
     this.addTodo('Upgrade the web');
     this.addTodo('Release Angular 2');
   }
@@ -191,7 +178,5 @@ export class TodoApp {
 
 
 export function main() {
-  return bootstrap(TodoApp, [
-    httpInjectables
-  ]);
+  return bootstrap(TodoApp, [ routerInjectables ]);
 }
