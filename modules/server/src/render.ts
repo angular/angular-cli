@@ -26,9 +26,11 @@ var serverDirectiveResolver = new DirectiveResolver();
 // TODO: build from preboot config
 // consider declarative config via <preboot minify="true"></preboot>
 var prebootScript = `
-  <link rel="stylesheet" type="text/css" href="/preboot/preboot.css">
-  <script src="/preboot/preboot.js"></script>
-  <script>preboot.start()</script>
+  <preboot>
+    <link rel="stylesheet" type="text/css" href="/preboot/preboot.css">
+    <script src="/preboot/preboot.js"></script>
+    <script>preboot.start()</script>
+  </preboot>
 `;
 // Inject Angular for the developer
 var angularScript = `

@@ -71,7 +71,6 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
 
       </li>
     </ul>
-
   </section>
 
   <footer id="footer" *ng-if="todoStore.list.length">

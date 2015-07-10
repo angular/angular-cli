@@ -4,6 +4,18 @@
   <title>Todo Angular 2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <script type="text/javascript">
+    'use strict';
+    window.addEventListener('load', function () {
+      setTimeout(function (){
+        var t = window.performance.timing;
+        console.log('Network latency', t.responseEnd - t.fetchStart);
+        console.log('Server to Client load: ', t.loadEventEnd - t.responseEnd);
+        console.log('Navigation to Client load:', t.loadEventEnd - t.navigationStart);
+      }, 0);
+    });
+  </script>
+
   <link rel="stylesheet" href="/css/main.css" media="screen" title="no title" charset="utf-8">
   <!-- Should be in component -->
   <link rel="stylesheet" href="/css/base.css" media="screen" title="no title" charset="utf-8">
@@ -14,14 +26,50 @@
   <app>
     Loading...
   </app>
-  <!--
-    <script>
-        System.import('examples/app/universal/todo/index').
-          then(function(module) {
-            return module.main();
-          }).
-          then(preboot.complete);
-    </script>
-   -->
+
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <div id="bootstrapButton" style="z-index:999999999;position: absolute;background-color: rgb(255, 255, 255);padding: 0.5em;border-radius: 3px;border: 1px solid rgb(207, 206, 206)">
+    <button onclick="bootstrap()">
+      Bootstrap Angular2 Client
+    </button>
+  </div>
+
+  <script>
+    function ngApp() {
+      return System.import('examples/app/universal/todo/index').
+        then(function(module) {
+          return module.main();
+        });
+    }
+
+    function bootstrap() {
+      if (this.once) return;
+      console.time('bootstrap');
+      var bootstrapTime = new Date();
+      this.once = true;
+      ngApp().
+        then(function() {
+          console.timeEnd('bootstrap');
+          preboot.complete();
+          // <preboot></preboot>
+          document.body.querySelector('preboot').remove();
+
+          var bootstrapTimeEnd = new Date();
+          var milliseconds = bootstrapTimeEnd - bootstrapTime;
+          var seconds = ~~(milliseconds / 1000);
+          var $bootstrap = document.getElementById('bootstrapButton');
+          $bootstrap.innerHTML = ''+
+            'milliseconds: '+milliseconds+'ms'+
+            '<br>'+
+            'seconds: '+seconds+'s'+
+          '';
+        });
+    }
+  </script>
+
 </body>
 </html>
