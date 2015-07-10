@@ -48,7 +48,10 @@ export function getClientCodeStream(opts?: PrebootOptions): NodeJS.ReadableStrea
   // ignore any strategies that are not being used
   ignoreUnusedStrategies(b, bOpts, opts.listen, listenStrategies, './listen/listen_by_');
   ignoreUnusedStrategies(b, bOpts, opts.replay, replayStrategies, './replay/replay_after_');
-  ignoreUnusedStrategies(b, bOpts, [opts.freeze], freezeStrategies, './freeze/freeze_with_');
+  
+  if (opts.freeze) {
+    ignoreUnusedStrategies(b, bOpts, [opts.freeze], freezeStrategies, './freeze/freeze_with_'); 
+  } 
 
   // ignore other code not being used
   if (!opts.buffer) { b.ignore('./buffer_manager.js', bOpts); }

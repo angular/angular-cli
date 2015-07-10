@@ -3,7 +3,7 @@
 import * as browserify from 'browserify';
 import {ignoreUnusedStrategies, getClientCode} from '../../src/server/client_code_generator';
 
-describe('normalize', function () {
+describe('client_code_generator', function () {
 
   describe('ignoreUnusedStrategies()', function () {
     it('should filter out inactive strategies', function () {
@@ -24,18 +24,15 @@ describe('normalize', function () {
     });
   });
 
-  xdescribe('getClientCode()', function () {
-    it('should get the client code when there are no options', function (done) {
-      let opts = { listen: [], replay: [], freeze: {} };
-      getClientCode(opts, function (err, clientCode) {
-        expect(err).toBeNull();
-        expect(clientCode).not.toMatch(/function getNodeEvents/);
-        done();
-      });
+  describe('getClientCode()', function () {
+    it('should get the client code when there are no options', function () {
+      let opts = {};
+      let fn = () => getClientCode(opts);
+      expect(fn).toThrowError('Not listening for any events. Preboot not going to do anything.')
     });
 
     it('should get client code with a listen strategy', function (done) {
-      let opts = { listen: [{ name: 'selectors' }], replay: [], freeze: {} };
+      let opts = { listen: [{ name: 'selectors' }] };
       getClientCode(opts, function (err, clientCode) {
         expect(err).toBeNull();
         expect(clientCode).toMatch(/function getNodeEvents/);

@@ -37,9 +37,6 @@ export let defaultFreezeStyles = {
   }
 };
 
-// these option values don't have a normalizer
-export let optsWithoutNormalizer = { appRoot: true, uglify: true, buffer: true, debug: true };
-
 // this object contains functions for each PrebootOptions value to validate it
 // and prep it for call to generate client code
 export let normalizers = {
@@ -198,12 +195,8 @@ export let normalizers = {
 export function normalize(opts: PrebootOptions): PrebootOptions {
   opts = opts || {};
 
-  for (let key in opts) {
-    if (normalizers[key]) {
-      normalizers[key](opts);
-    } else if (!optsWithoutNormalizer[key]) {
-      throw new Error('Invalid preboot option: ' + key);
-    }
+  for (let key in normalizers) {
+    normalizers[key](opts);
   }
 
   // if no listen strategies, there is an issue because nothing will happen

@@ -21,12 +21,10 @@ export function replayEvents(preboot: PrebootRef, strategy: ReplayStrategy, even
 
     // if client node found, need to explicitly set value and then dispatch event
     if (clientNode) {
-      console.log('found client node');
       clientNode.value = serverNode.value;
       clientNode.dispatchEvent(event);
       preboot.log(3, serverNode, clientNode, event);
     } else {
-      console.log('DID NOT found client node');
       remainingEvents.push(eventData);
       preboot.log(4, serverNode);
     }
