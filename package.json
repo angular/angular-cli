@@ -11,10 +11,11 @@
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
   "scripts": {
-    "start": "npm run build && nodemon --ext 'js,ts,html' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
+    "prestart": "npm run build",
+    "start": "nodemon --ext 'js,ts,html' --ignore '.git' --ignore 'node_modules/*' --ignore '*.js.map' --ignore '*_spec.js' --ignore 'angular/*' --verbose --watch dist/ --watch modules/examples/",
     "watch": "tsc -w",
     "build": "tsc",
-    "debug": "node-inspector & nodemon --ext 'js,ts,html' --debug 'index.js' --ignore '.git' --ignore 'node_modules/*' --ignore 'angular/*' --verbose",
+    "debug": "node-inspector & nodemon --ext 'js,ts,html' --debug 'index.js' --ignore '.git' --ignore 'node_modules/*' --ignore '*.js.map' --ignore '*_spec.js' --ignore 'angular/*' --verbose --watch dist/ --watch modules/examples/",
     "remove-angular-typings": "rm -rf angular/modules/angular2/typings",
     "update-angular": "git submodule foreach 'npm install && gulp build.js.cjs || true'",
     "pull-angular": "git submodule foreach 'git pull --rebase git@github.com:angular/angular.git master'",
@@ -22,8 +23,13 @@
     "bower": "bower install",
     "web_modules": "bash ./scripts/update-ng-bundle.sh",
     "preboot": "gulp build",
-    "preinstall": "#npm run angular-submodule",
-    "postinstall": "tsc || true && npm run web_modules && npm run bower"
+    "webdriver-update": "webdriver-manager update",
+    "webdriver-start": "webdriver-manager start",
+    "preprotractor": "npm run webdriver-update",
+    "protractor": "protractor",
+    "e2e": "npm run protractor",
+    "preinstall": "npm run angular-submodule",
+    "postinstall": "tsc || true && npm run web_modules && npm run bower && npm run webdriver-update"
   },
   "repository": {
     "type": "git",
@@ -46,6 +52,7 @@
     "morgan": "^1.6.1",
     "nodemon": "^1.3.7",
     "open": "0.0.5",
+    "protractor": "^2.1.0",
     "rx": "^2.5.3",
     "serve-index": "^1.7.0",
     "serve-static": "^1.10.0",
