@@ -1,3 +1,6 @@
+[![Issue Stats](http://issuestats.com/github/angular/universal/badge/pr?style=flat)](http://issuestats.com/github/angular/universal)
+[![Issue Stats](http://issuestats.com/github/angular/universal/badge/issue?style=flat)](http://issuestats.com/github/angular/universal)
+
 # Universal Angular 2
 > Universal (isomorphic) JavaScript support for Angular 2
 
