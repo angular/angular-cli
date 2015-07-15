@@ -1,4 +1,4 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
+/// <reference path="../../typings/tsd.d.ts"/>
 
 import * as dom from '../../src/client/dom';
 
@@ -12,9 +12,9 @@ describe('dom', function () {
       expect(dom.state.body).toEqual(opts.window.document.body);
       expect(dom.state.appRoot).toEqual(opts.window.document.body);
       expect(dom.state.clientRoot).toEqual(opts.window.document.body);
-    });  
+    });
   });
-  
+
   describe('updateRoots()', function () {
     it('should set the roots in the state', function () {
       let appRoot = {};
@@ -23,10 +23,10 @@ describe('dom', function () {
       dom.updateRoots(appRoot, serverRoot, clientRoot);
       expect(dom.state.appRoot).toBe(appRoot);
       expect(dom.state.serverRoot).toBe(serverRoot);
-      expect(dom.state.clientRoot).toBe(clientRoot);  
-    });  
+      expect(dom.state.clientRoot).toBe(clientRoot);
+    });
   });
-  
+
   describe('getAppNode()', function () {
     it('should call appRoot querySelector', function () {
       let selector = 'foo > man > choo';
@@ -35,9 +35,9 @@ describe('dom', function () {
       dom.state.appRoot = appRoot;
       dom.getAppNode(selector);
       expect(appRoot.querySelector).toHaveBeenCalledWith(selector);
-    });  
+    });
   });
-  
+
   describe('getAllAppNodes()', function () {
     it('should call appRoot querySelectorAll', function () {
       let selector = 'foo > man > choo';
@@ -46,9 +46,9 @@ describe('dom', function () {
       dom.state.appRoot = appRoot;
       dom.getAllAppNodes(selector);
       expect(appRoot.querySelectorAll).toHaveBeenCalledWith(selector);
-    });  
+    });
   });
-  
+
   describe('getClientNodes()', function () {
     it('should call clientRoot querySelectorAll', function () {
       let selector = 'foo > man > choo';
@@ -57,9 +57,9 @@ describe('dom', function () {
       dom.state.clientRoot = clientRoot;
       dom.getClientNodes(selector);
       expect(clientRoot.querySelectorAll).toHaveBeenCalledWith(selector);
-    });  
+    });
   });
-  
+
   describe('onLoad()', function () {
     it('should call window addEventListener for load event', function () {
       let handler = function () {};
@@ -68,9 +68,9 @@ describe('dom', function () {
       dom.state.window = window;
       dom.onLoad(handler);
       expect(window.addEventListener).toHaveBeenCalledWith('load', handler);
-    });  
+    });
   });
-  
+
   describe('on()', function () {
     it('should call document addEventListener', function () {
       let eventName = 'boo';
@@ -80,9 +80,9 @@ describe('dom', function () {
       dom.state.document = document;
       dom.on(eventName, handler);
       expect(document.addEventListener).toHaveBeenCalledWith(eventName, handler);
-    });  
+    });
   });
-  
+
   describe('dispatchGlobalEvent()', function () {
     it('should call document dispatchEvent', function () {
       let eventName = 'boo';
@@ -93,9 +93,9 @@ describe('dom', function () {
       dom.state.document = document;
       dom.dispatchGlobalEvent(eventName);
       expect(document.dispatchEvent).toHaveBeenCalled();
-    });  
+    });
   });
-  
+
   describe('dispatchNodeEvent()', function () {
     it('should call node dispatchEvent', function () {
       let node = { dispatchEvent: function () {} };
@@ -105,15 +105,15 @@ describe('dom', function () {
       dom.state.window = window;
       dom.dispatchNodeEvent(node, eventName);
       expect(node.dispatchEvent).toHaveBeenCalled();
-    });  
+    });
   });
-  
+
   describe('addNodeToBody()', function () {
     it('should create node, add styles and append to body', function () {
       let type = 'div';
       let className = 'foo';
       let styles = { display: 'none', width: '300px' };
-      
+
       let newElem = { className: '', style: { display: 'block', height: '200px' } };
       let document = {
         createElement: function () {
@@ -121,53 +121,53 @@ describe('dom', function () {
         }
       };
       let body = { appendChild: function () {} };
-      
+
       spyOn(body, 'appendChild');
       spyOn(document, 'createElement').and.callThrough();
       dom.state.document = document;
       dom.state.body = body;
-      
+
       dom.addNodeToBody(type, className, styles);
-      
+
       expect(document.createElement).toHaveBeenCalledWith(type);
       expect(newElem.className).toEqual(className);
       expect(newElem.style).toEqual({ display: 'none', width: '300px', height: '200px' });
       expect(body.appendChild).toHaveBeenCalledWith(newElem);
-    });  
+    });
   });
-  
+
   describe('removeNode()', function () {
     it('should not do anything if nothing passed in', function () {
-      dom.removeNode(null);  
+      dom.removeNode(null);
     });
-    
+
     it('should call remove on node if it exists', function () {
       let node = { remove: function () {} };
       spyOn(node, 'remove');
       dom.removeNode(node);
-      expect(node.remove).toHaveBeenCalled();  
+      expect(node.remove).toHaveBeenCalled();
     });
-    
+
     it('should set display none when remove not there', function () {
       let node = { style: { display: '' }};
       dom.removeNode(node);
       expect(node.style.display).toEqual('none');
     });
   });
-  
+
   describe('node tree fns', function () {
-    
+
     // this is used to help with the testing of this function
     // create tree like structure
     function addParent(anode) {
       if (anode && anode.childNodes) {
         for (let childNode of anode.childNodes) {
           childNode.parentNode = anode;
-          addParent(childNode);  
+          addParent(childNode);
         }
       }
     }
-   
+
     let node = { nodeName: 'DIV' };
     let document = {
       childNodes: [{}, {}, {
@@ -180,19 +180,19 @@ describe('dom', function () {
     let expectedNodeKey = 'DIV_s2_s4';
 
     addParent(document);
-    
+
     describe('getNodeKey()', function () {
       it('should generate a key based of the node structure', function () {
         let actual = dom.getNodeKey(node, rootNode);
         expect(actual).toEqual(expectedNodeKey);
       });
     });
-    
+
     describe('findClientNode()', function () {
       it('should return null if no serverNode passed in', function () {
         expect(dom.findClientNode(null)).toBeNull();
       });
-      
+
       it('should get a node from cache', function () {
         let clientNode = { name: 'zoo' };
         dom.nodeCache[expectedNodeKey] = [{
@@ -200,11 +200,11 @@ describe('dom', function () {
           clientNode: clientNode
         }];
         dom.state.serverRoot = rootNode;
-        
+
         let actual = dom.findClientNode(node);
         expect(actual).toBe(clientNode);
       });
-      
+
       // todo: other test cases for when not using cache
     });
   });

@@ -14,6 +14,7 @@
   	"outDir": "dist"
   },
   "files": [
+    "node_modules/typescript/bin/lib.es6.d.ts",
     "tsd_typings/tsd.d.ts",
     "modules/index.ts",
     "modules/preboot/client.ts",
@@ -48,7 +49,6 @@
     "modules/preboot/test/server/normalize_spec.ts",
     "modules/preboot/test/server/presets_spec.ts",
     "modules/preboot/test/server/utils_spec.ts",
-    "node_modules/typescript/bin/lib.es6.d.ts",
     "modules/server/typings/tsd.d.ts",
     "modules/experimental/experimental.ts",
     "modules/server/server.ts",

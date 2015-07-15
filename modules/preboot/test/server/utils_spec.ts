@@ -1,8 +1,8 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
+/// <reference path="../../typings/tsd.d.ts"/>
 
 import {stringifyWithFunctions} from '../../src/server/utils';
  /* tslint:disable:eofline no-trailing-whitespace */
- 
+
 /**
  * No downstream deps for utils, so easy to test
  */

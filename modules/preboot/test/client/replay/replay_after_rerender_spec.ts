@@ -1,4 +1,4 @@
-/// <reference path="../../../../../typings/tsd.d.ts"/>
+/// <reference path="../../../typings/tsd.d.ts"/>
 
 import {replayEvents} from '../../../src/client/replay/replay_after_rerender';
 
@@ -12,11 +12,11 @@ describe('replay_after_rerender', function () {
       let actual = replayEvents(preboot, strategy, events);
       expect(actual).toEqual(expected);
     });
-    
+
     it('should dispatch all events', function () {
       let node1 = { name: 'node1', dispatchEvent: function (evt) {} };
       let node2 = { name: 'node2', dispatchEvent: function (evt) {} };
-      let preboot = { 
+      let preboot = {
         dom: {
           findClientNode: function (node) { return node; }
         },
@@ -28,12 +28,12 @@ describe('replay_after_rerender', function () {
         { name: 'evt2', event: { name: 'evt2' }, node: node2 }
       ];
       let expected = [];
-      
+
       spyOn(node1, 'dispatchEvent');
       spyOn(node2, 'dispatchEvent');
       spyOn(preboot.dom, 'findClientNode').and.callThrough();
       spyOn(preboot, 'log');
-      
+
       let actual = replayEvents(preboot, strategy, events);
       expect(actual).toEqual(expected);
       expect(node1.dispatchEvent).toHaveBeenCalledWith(events[0].event);
@@ -43,14 +43,14 @@ describe('replay_after_rerender', function () {
       expect(preboot.log).toHaveBeenCalledWith(3, node1, node1, events[0].event);
       expect(preboot.log).toHaveBeenCalledWith(3, node2, node2, events[1].event);
     });
-    
+
     it('should dispatch one event and return the other', function () {
       let node1 = { name: 'node1', dispatchEvent: function (evt) {} };
       let node2 = { name: 'node2', dispatchEvent: function (evt) {} };
-      let preboot = { 
+      let preboot = {
         dom: {
-          findClientNode: function (node) { 
-            return node.name === 'node1' ? node : null; 
+          findClientNode: function (node) {
+            return node.name === 'node1' ? node : null;
           }
         },
         log: function () {}
@@ -63,12 +63,12 @@ describe('replay_after_rerender', function () {
       let expected = [
         { name: 'evt2', event: { name: 'evt2' }, node: node2 }
       ];
-      
+
       spyOn(node1, 'dispatchEvent');
       spyOn(node2, 'dispatchEvent');
       spyOn(preboot.dom, 'findClientNode').and.callThrough();
       spyOn(preboot, 'log');
-      
+
       let actual = replayEvents(preboot, strategy, events);
       expect(actual).toEqual(expected);
       expect(node1.dispatchEvent).toHaveBeenCalledWith(events[0].event);

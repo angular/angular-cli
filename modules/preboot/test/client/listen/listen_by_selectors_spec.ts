@@ -1,4 +1,4 @@
-/// <reference path="../../../../../typings/tsd.d.ts"/>
+/// <reference path="../../../typings/tsd.d.ts"/>
 
 import {getNodeEvents} from '../../../src/client/listen/listen_by_selectors';
 
@@ -17,7 +17,7 @@ describe('listen_by_selectors', function () {
       let actual = getNodeEvents(preboot, strategy);
       expect(actual).toEqual(expected);
     });
-    
+
     it('should return node events', function () {
       let preboot = {
         dom: {
@@ -35,6 +35,6 @@ describe('listen_by_selectors', function () {
       ];
       let actual = getNodeEvents(preboot, strategy);
       expect(actual).toEqual(expected);
-    }); 
+    });
   });
 });

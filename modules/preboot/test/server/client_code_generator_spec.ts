@@ -1,4 +1,4 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
+/// <reference path="../../typings/tsd.d.ts"/>
 
 import * as browserify from 'browserify';
 import {ignoreUnusedStrategies, getClientCode} from '../../src/server/client_code_generator';

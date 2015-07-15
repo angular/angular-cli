@@ -1,4 +1,4 @@
-/// <reference path="../../../../../typings/tsd.d.ts"/>
+/// <reference path="../../../typings/tsd.d.ts"/>
 
 import {getNodeEvents} from '../../../src/client/listen/listen_by_attributes';
 
@@ -6,7 +6,7 @@ describe('listen_by_attributes', function () {
   describe('getNodeEvents()', function () {
 
     it('should return nothing if no selection found', function () {
-      let preboot = { 
+      let preboot = {
         dom: {
           getAllAppNodes: function () { return null; }
         }
@@ -16,13 +16,13 @@ describe('listen_by_attributes', function () {
       let actual = getNodeEvents(preboot, strategy);
       expect(actual).toEqual(expected);
     });
-    
+
     it('should return node events for elems with attribute', function () {
       let nodes = [
         { name: 'one', getAttribute: function () { return 'yo,mo'; }},
         { name: 'two', getAttribute: function () { return 'shoo,foo'; }}
       ];
-      let preboot = { 
+      let preboot = {
         dom: {
           getAllAppNodes: function () { return nodes; }
         }
