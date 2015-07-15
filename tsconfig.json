@@ -50,7 +50,7 @@
     "modules/preboot/test/server/utils_spec.ts",
     "node_modules/typescript/bin/lib.es6.d.ts",
     "modules/server/typings/tsd.d.ts",
-    "modules/client/client.ts",
+    "modules/experimental/experimental.ts",
     "modules/server/server.ts",
     "modules/examples/app/client/app.ts",
     "modules/examples/app/server/api.ts",
