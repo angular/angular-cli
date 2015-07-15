@@ -1,6 +1,9 @@
 declare var zone: any;
 declare var Zone: any;
 
+declare module "angular2/angular2" {
+}
+
 declare module "angular2/annotations" {
   var Component: any;
   var View: any;
@@ -314,10 +317,9 @@ declare module "angular2/change_detection" {
   interface PipeFactory {}
   class Pipe {}
   class NullPipeFactory {}
-  class PipeRegistry {
+  class Pipes {
     constructor(pipes: any)
   }
-  var defaultPipeRegistry: any;
   var defaultPipes: any;
   class Parser {
 
@@ -343,6 +345,7 @@ declare module "angular2/src/core/zone/ng_zone" {
   class NgZone {
     constructor(config: any)
     initCallbacks(config: any): any
+    overrideOnErrorHandler(reporter: any): any
     run(context: any): any
   }
 }
@@ -370,6 +373,7 @@ declare module "angular2/src/render/xhr" {
 declare module "angular2/src/core/application_tokens" {
   var appComponentRefToken: any;
   var appComponentTypeToken: any;
+  var appComponentRefPromiseToken: any;
 }
 
 declare module "angular2/src/core/compiler/compiler" {

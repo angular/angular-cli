@@ -28,7 +28,8 @@
     "preprotractor": "npm run webdriver-update",
     "protractor": "protractor",
     "e2e": "npm run protractor",
-    "preinstall": "npm run angular-submodule",
+    "tsd": "tsd reinstall",
+    "preinstall": "npm run tsd && npm run angular-submodule",
     "postinstall": "tsc || true && npm run web_modules && npm run bower && npm run webdriver-update"
   },
   "repository": {
@@ -58,7 +59,7 @@
     "serve-static": "^1.10.0",
     "typescript": "Microsoft/TypeScript#release-1.5",
     "yargs": "^3.14.0",
-    "zone.js": "^0.5.1"
+    "zone.js": "^0.5.2"
   },
   "dependencies": {
     "browserify": "^10.2.4",

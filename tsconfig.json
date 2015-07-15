@@ -14,7 +14,7 @@
   	"outDir": "dist"
   },
   "files": [
-    "typings/tsd.d.ts",
+    "tsd_typings/tsd.d.ts",
     "modules/index.ts",
     "modules/preboot/client.ts",
     "modules/preboot/server.ts",

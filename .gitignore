@@ -47,3 +47,7 @@ modules/preboot/dist
 !modules/preboot/typings/_custom
 !modules/preboot/typings/tsd.d.ts
 
+
+# Typings
+typings
+tsd_typings
