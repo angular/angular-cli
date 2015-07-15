@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - '0.12'
+cache:
+  directories:
+    - node_modules
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/3069b7e759e1d02548c1
+    on_success: always  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: false     # default: false
+  slack:
+    secure: EP4MzZ8JMyNQJ4S3cd5LEPWSMjC7ZRdzt3veelDiOeorJ6GwZfCDHncR+4BahDzQAuqyE/yNpZqaLbwRWloDi15qIUsm09vgl/1IyNky1Sqc6lEknhzIXpWSalo4/T9ZP8w870EoDvM/UO+LCV99R3wS8Nm9o99eLoWVb2HIUu0=
+before_script:
+  - npm install -g gulp
+script: gulp lint
