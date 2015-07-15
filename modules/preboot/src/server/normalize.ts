@@ -54,7 +54,7 @@ export let normalizers = {
   resumeEvent: (opts: PrebootOptions) => {
     opts.resumeEvent = opts.resumeEvent || 'PrebootResume';
   },
-  
+
   completeEvent: (opts: PrebootOptions) => {
     opts.completeEvent = opts.completeEvent || 'BootstrapComplete';
   },
@@ -93,7 +93,7 @@ export let normalizers = {
 
   /**
    * Make sure replay options are array of ReplayStrategy objects.
-   * So, callers can just pass in simple string, but converted to 
+   * So, callers can just pass in simple string, but converted to
    * an array before passed into client side preboot.
    */
   replay: function (opts: PrebootOptions) {
@@ -136,7 +136,7 @@ export let normalizers = {
 
     let freezeName = opts.freeze.name || opts.freeze;
     let isFreezeNameString = (typeof freezeName === 'string');
-    
+
     // if freeze strategy doesn't exist, throw error
     if (isFreezeNameString && !freezeStrategies[freezeName]) {
       throw new Error('Invalid freeze option: ' + freezeName);
@@ -157,7 +157,7 @@ export let normalizers = {
   },
 
   /**
-   * Presets are modifications to options. In the future, 
+   * Presets are modifications to options. In the future,
    * we may be simple presets like 'angular' which add
    * all the listeners and replay.
    */
@@ -196,7 +196,9 @@ export function normalize(opts: PrebootOptions): PrebootOptions {
   opts = opts || {};
 
   for (let key in normalizers) {
-    normalizers[key](opts);
+    if (normalizers.hasOwnProperty(o)) {
+      normalizers[key](opts);
+    }
   }
 
   // if no listen strategies, there is an issue because nothing will happen

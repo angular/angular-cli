@@ -28,7 +28,7 @@ describe('client_code_generator', function () {
     it('should get the client code when there are no options', function () {
       let opts = {};
       let fn = () => getClientCode(opts);
-      expect(fn).toThrowError('Not listening for any events. Preboot not going to do anything.')
+      expect(fn).toThrowError('Not listening for any events. Preboot not going to do anything.');
     });
 
     it('should get client code with a listen strategy', function (done) {
