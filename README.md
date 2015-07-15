@@ -2,6 +2,8 @@
 [![Issue Stats](http://issuestats.com/github/angular/universal/badge/issue?style=flat)](http://issuestats.com/github/angular/universal)
 
 # Universal Angular 2
+
+[![Join the chat at https://gitter.im/angular/universal](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/angular/universal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 > Universal (isomorphic) JavaScript support for Angular 2
 
 # Table of Contents
