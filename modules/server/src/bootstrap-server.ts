@@ -25,8 +25,8 @@ import {
   DynamicChangeDetection,
   JitChangeDetection,
   PreGeneratedChangeDetection,
-  PipeRegistry,
-  defaultPipeRegistry
+  Pipes,
+  defaultPipes
 } from 'angular2/change_detection';
 
 // correct path
@@ -77,7 +77,7 @@ import {DomRenderer, DOCUMENT_TOKEN} from 'angular2/src/render/dom/dom_renderer'
 import {DefaultDomCompiler} from 'angular2/src/render/dom/compiler/compiler';
 import {internalView} from 'angular2/src/core/compiler/view_ref';
 
-import {appComponentRefToken, appComponentTypeToken} from 'angular2/src/core/application_tokens';
+import {appComponentRefPromiseToken, appComponentTypeToken} from 'angular2/src/core/application_tokens';
 
 // Server
 import {ElementRef} from 'angular2/src/core/compiler/element_ref';
@@ -97,23 +97,23 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
   // }
 
   return [
+    // bind(DOCUMENT_TOKEN)
+    //     .toValue(DOM.defaultDoc()),
     // bind(appComponentTypeToken).toValue(appComponentType),
-    // bind(appComponentRefToken)
+    // bind(appComponentRefPromiseToken)
     //     .toFactory(
     //         (dynamicComponentLoader, injector, testability, registry) => {
-
     //           // TODO(rado): investigate whether to support bindings on root component.
     //           return dynamicComponentLoader.loadAsRoot(appComponentType, null, injector)
     //               .then((componentRef) => {
     //                 registry.registerApplication(componentRef.location.nativeElement, testability);
-
     //                 return componentRef;
     //               });
     //         },
     //         [DynamicComponentLoader, Injector, Testability, TestabilityRegistry]),
 
     bind(appComponentType)
-      .toFactory((p: any) => p.then(ref => ref.instance), [appComponentRefToken]),
+        .toFactory((p: any) => p.then(ref => ref.instance), [appComponentRefPromiseToken]),
     bind(LifeCycle).toFactory(exceptionHandler => {
       return new LifeCycle(exceptionHandler, null, assertionsEnabled());
     }, [ ExceptionHandler ]),
@@ -139,7 +139,7 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     Compiler,
     CompilerCache,
     ViewResolver,
-    bind(PipeRegistry).toValue(defaultPipeRegistry),
+    bind(Pipes).toValue(defaultPipes),
     bind(ChangeDetection).toClass(bestChangeDetection),
     ViewLoader,
     DirectiveResolver,
@@ -166,9 +166,13 @@ function _createNgZone(givenReporter?:Function): NgZone {
 
   var reporter = isPresent(givenReporter) ? givenReporter : defaultErrorReporter;
 
-  var zone = new NgZone({enableLongStackTrace: assertionsEnabled()});
-  zone.initCallbacks({onErrorHandler: reporter});
-  return zone;
+  var _zone = new NgZone({enableLongStackTrace: assertionsEnabled()});
+
+// Server
+  // _zone.overrideOnErrorHandler(reporter);
+// Server
+
+  return _zone;
 }
 
 
@@ -182,7 +186,7 @@ export function bootstrap(appComponentType: Type,
 
   // TODO(rado): prepopulate template cache, so applications with only
   // index.html and main.js are possible.
-  let zone = _createNgZone(errorReporter);
+  let __zone = _createNgZone(errorReporter);
 
 
   let bindingsCmpLoader = [DynamicComponentLoader, Injector, Testability, TestabilityRegistry];
@@ -207,11 +211,14 @@ export function bootstrap(appComponentType: Type,
 
   if (!appInjector) {
 
-    appInjector = _createAppInjector(appComponentType, mergedBindings, zone);
+    appInjector = _createAppInjector(appComponentType, mergedBindings, __zone);
 
   } else {
 
     appInjector.resolveAndCreateChild(mergedBindings);
+    // appInjector.resolveAndCreateChild(mergedBindings.push([
+    //   bind(NgZone).toValue(__zone)
+    // ]));
 
   }
   // Server
@@ -226,6 +233,10 @@ export function bootstrap(appComponentType: Type,
 
   let tick = componentRef => {
     var appChangeDetector = internalView(componentRef.hostView).changeDetector;
+    // retrieve life cycle: may have already been created if injected in root component
+    // var lc = appInjector.get(LifeCycle);
+    // lc.registerWith(__zone, appChangeDetector);
+    // lc.tick();
 
     bootstrapProcess.resolve(
       new ApplicationRef(componentRef, appComponentType, appInjector, appChangeDetector)

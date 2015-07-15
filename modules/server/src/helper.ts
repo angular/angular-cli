@@ -22,11 +22,6 @@ export function showDebug(options = {}): string {
 }
 
 
-export function getHostElementRef(appRef): any {
-  return appRef._hostComponent.location.domElement;
-}
-
-
 export function selectorRegExpFactory(selector: string): RegExp {
   /*
         $1       $2        $3

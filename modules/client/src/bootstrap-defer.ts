@@ -25,8 +25,8 @@ import {
   DynamicChangeDetection,
   JitChangeDetection,
   PreGeneratedChangeDetection,
-  PipeRegistry,
-  defaultPipeRegistry
+  Pipes,
+  defaultPipes
 } from 'angular2/change_detection';
 
 // correct path
@@ -142,7 +142,7 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     Compiler,
     CompilerCache,
     ViewResolver,
-    bind(PipeRegistry).toValue(defaultPipeRegistry),
+    bind(Pipes).toValue(defaultPipes),
     bind(ChangeDetection).toClass(bestChangeDetection),
     ViewLoader,
     DirectiveResolver,

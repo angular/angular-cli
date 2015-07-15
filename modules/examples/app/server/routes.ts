@@ -36,7 +36,7 @@ module.exports = function(ROOT) {
         // scripts: false,
         scripts: {
           preboot: true,
-          angular: true,
+          angular: true
         },
         Component: TodoApp,
         serverInjector: [
