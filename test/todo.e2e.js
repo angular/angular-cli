@@ -1,26 +1,36 @@
 describe('Todo', function() {
-  it('should have a title', function() {
-    browser.ignoreSynchronization = true;
+  var subject;
+  var result;
+
+  beforeEach(function() {
     browser.get('/examples/todo');
-    expect(browser.getTitle()).toEqual('Todo Angular 2');
+  });
+
+  it('should have a title', function() {
+    subject = browser.getTitle();
+    result  = 'Todo Angular 2';
+
+    expect(subject).toEqual(result);
   });
 
   it('should verify if the main web elements are present in the page', function() {
-    var todoapp = element($('#todoapp').locator());
-    expect(todoapp.isPresent()).toBe(true);
+    subject = element(by.id('todoapp'));
+    result  = true;
+
+    expect(subject).toBe(result);
   });
 
+
   it('should be able to add items in the to do list', function() {
-    var todoLabel = element(by.css('.view label'));
-    expect(todoLabel.getText()).toEqual('Universal JavaScript');
+    subject = element(by.css('.view label'));
+    result  = 'Universal JavaScript';
+
+    expect(subject).toEqual(result);
   });
 
   it('should be able to clean the to do list', function() {
-    var toogleAllCheckBox = element($('#toggle-all').locator());
-    // var clearCompletedButton = element(by.css('#clear-completed'));
-    // var viewDiv = element(by.css('.view label'));
-
-    toogleAllCheckBox.click();
+    subject = element(by.id('toggle-all'));
+    subject.click();
     // clearCompletedButton.click();
     // expect(viewDiv.isPresent()).toBe(false);
 

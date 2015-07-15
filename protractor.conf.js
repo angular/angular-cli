@@ -2,6 +2,10 @@
 exports.config = {
   baseUrl: 'http://localhost:3000/examples/todo',
 
+  specs: [
+    'test/*.e2e.js'
+  ],
+
   allScriptsTimeout: 11000,
 
   framework: 'jasmine',
@@ -17,5 +21,8 @@ exports.config = {
 
   seleniumAddress: 'http://localhost:4444/wd/hub',
 
-  specs: ['test/*.e2e.js']
+  onPrepare: function() {
+    browser.ignoreSynchronization = true;
+  }
+
 };
