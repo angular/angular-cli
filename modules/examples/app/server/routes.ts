@@ -8,11 +8,12 @@ module.exports = function(ROOT) {
   var router = express.Router();
 
   var universalPath = ROOT + '/dist/examples/app/universal';
+
   var App     = require(universalPath + '/app/App').App;
   var TodoApp = require(universalPath + '/todo/index').TodoApp;
 
-  var universal = require(ROOT + '/dist/server/server');
-  var httpInjectables = universal.httpInjectables;
+  var universalServer = require(ROOT + '/dist/server/server');
+  var httpInjectables = universalServer.httpInjectables;
 
   function stringToBoolean(txt) {
     if (typeof txt !== 'string') { return txt; }

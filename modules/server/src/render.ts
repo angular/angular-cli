@@ -1,5 +1,4 @@
 /// <reference path="../typings/tsd.d.ts" />
-import './server_patch';
 
 // server version
 import {bootstrap} from './bootstrap-server';
@@ -8,14 +7,6 @@ export {bootstrap};
 
 import {selectorRegExpFactory} from './helper';
 
-import {
-  prebootScript,
-  angularScript,
-  bootstrapButton,
-  bootstrapFunction,
-  bootstrapApp,
-  buildClientScripts
-} from './build_scripts';
 
 import {stringifyElement} from './stringifyElement';
 
@@ -28,34 +19,25 @@ var serverDocument = DOM.createHtmlDocument();
 var serverInjector = undefined; // js defaults only work with undefined
 var serverDirectiveResolver = new DirectiveResolver();
 
-export function render(content, AppComponent, options: any = {}) {
-  var clientHtml = content.toString();
-  if (options.server === false && options.client === false) { return Promise.resolve(clientHtml); }
-  if (options.server === false && options.client !== false) { return Promise.resolve(buildClientScripts(clientHtml, options)); }
-  options.scripts = options.scripts || {};
-  options.serverInjector = options.serverInjector || [];
-
+export function render(clientHtml, AppComponent, serverBindings: any = []) {
   let annotations = serverDirectiveResolver.resolve(AppComponent);
   let selector = annotations.selector;
 
   let el = DOM.createElement(selector, serverDocument);
   DOM.appendChild(serverDocument.body, el);
 
-  let renderBindings: Array<any> = [
-    // any special server
-  ];
-
-  let serverBindings: Array<any> = [].concat(renderBindings, options.serverInjector);
+  let renderBindings: Array<any> = [].concat(serverBindings);
 
   return bootstrap(
     AppComponent,
     serverInjector,
     serverDocument,
-    serverBindings
+    renderBindings
   )
   .then(appRef => {
 
     // save a reference to appInjector
+    // TODO: refactor out
     if (!serverInjector && appRef.injector) {
       serverInjector = appRef.injector;
     }
@@ -84,7 +66,7 @@ export function render(content, AppComponent, options: any = {}) {
     // DOM.removeChild(serverDocument.body, el);
 
     // return rendered version of our serialized component
-    return buildClientScripts(rendered, options);
+    return rendered;
   })
   .catch(err => {
     console.error(err);

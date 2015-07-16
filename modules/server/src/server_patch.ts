@@ -13,4 +13,3 @@ import 'angular2/node_modules/traceur/bin/traceur-runtime';
 // dom closure
 import {Parse5DomAdapter} from 'angular2/src/dom/parse5_adapter';
 Parse5DomAdapter.makeCurrent();
-
