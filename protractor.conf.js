@@ -32,6 +32,8 @@ exports.config = {
   seleniumAddress: 'http://localhost:4444/wd/hub',
 
   onPrepare: function() {
+    browser.ignoreSynchronization = true;
+    /*
     // open a new browser for every benchmark
     var originalBrowser = browser;
     var _tmpBrowser;
@@ -46,6 +48,7 @@ exports.config = {
       global.browser.quit();
       global.browser = originalBrowser;
     });
+    */
   }
 
 };
