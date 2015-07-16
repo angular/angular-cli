@@ -6,14 +6,15 @@ import {bootstrap} from './bootstrap-server';
 //
 export {bootstrap};
 
-import {selectorRegExpFactory, showDebug} from './helper';
+import {selectorRegExpFactory} from './helper';
 
 import {
   prebootScript,
   angularScript,
   bootstrapButton,
   bootstrapFunction,
-  bootstrapApp
+  bootstrapApp,
+  buildClientScripts
 } from './build_scripts';
 
 import {stringifyElement} from './stringifyElement';
@@ -28,7 +29,9 @@ var serverInjector = undefined; // js defaults only work with undefined
 var serverDirectiveResolver = new DirectiveResolver();
 
 export function render(content, AppComponent, options: any = {}) {
-  if (options.server === false) { return Promise.resolve(content.toString()); }
+  var clientHtml = content.toString();
+  if (options.server === false && options.client === false) { return Promise.resolve(clientHtml); }
+  if (options.server === false && options.client !== false) { return Promise.resolve(buildClientScripts(clientHtml, options)); }
   options.scripts = options.scripts || {};
   options.serverInjector = options.serverInjector || [];
 
@@ -65,33 +68,15 @@ export function render(content, AppComponent, options: any = {}) {
     // serialize html
     let serializedCmp = stringifyElement(element);
 
-    let htmlString = content.toString();
     // selector replacer explained here
     // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
     // replace our component with serialized version
-    let rendered = htmlString.
-      replace(
-        // <selector></selector>
-        selectorRegExpFactory(selector),
-        // <selector>{{ serializedCmp }}</selector>
-        serializedCmp
-      ).
-      replace(
-        selectorRegExpFactory('preboot'),
-        prebootScript
-      ).
-      replace(
-        selectorRegExpFactory('angular'),
-        '$1'+angularScript+'$3'
-      ).
-      replace(
-        selectorRegExpFactory('bootstrap'),
-        '$1' +
-        bootstrapButton +
-        bootstrapFunction(options.componentUrl) +
-        ((options.client === false) ? '' : bootstrapApp) +
-        '$3'
-      );
+    let rendered = clientHtml.replace(
+      // <selector></selector>
+      selectorRegExpFactory(selector),
+      // <selector>{{ serializedCmp }}</selector>
+      serializedCmp
+    );
 
     // destroy appComponent
     // remove from serverDom (should be handled by appRef.dispose already)
@@ -99,6 +84,11 @@ export function render(content, AppComponent, options: any = {}) {
     // DOM.removeChild(serverDocument.body, el);
 
     // return rendered version of our serialized component
-    return rendered;
+    return buildClientScripts(rendered, options);
+  })
+  .catch(err => {
+    console.error(err);
+    console.error(err.stack);
+    return clientHtml;
   });
 }

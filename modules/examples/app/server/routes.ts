@@ -17,7 +17,7 @@ module.exports = function(ROOT) {
   function stringToBoolean(txt) {
     if (typeof txt !== 'string') { return txt; }
     switch(txt.toLowerCase()) {
-      case'false': case'\'false\'': case'"false"':case'0': case'no': return false;
+      case'false': case'\'false\'': case'"false"': case'0': case'no': return false;
       case'true': case'\'true\'': case'"true"': case'1': case'yes': return true;
       default: return txt;
     }

@@ -1,3 +1,5 @@
+import {selectorRegExpFactory} from './helper';
+
 // TODO: hard coded for now
 // TODO: build from preboot config
 // consider declarative config via <preboot minify="true"></preboot>
@@ -78,4 +80,25 @@ export function buildScripts(scripts, appUrl) {
       (scripts.bootstrapApp === true ? angularScript : '')
     )
   );
+}
+
+
+export function buildClientScripts(html, options) {
+  return html.
+    replace(
+      selectorRegExpFactory('preboot'),
+      ((options.preboot === false) ? '' : prebootScript)
+    ).
+    replace(
+      selectorRegExpFactory('angular'),
+      ((options.angular === false) ? '' : '$1'+angularScript+'$3')
+    ).
+    replace(
+      selectorRegExpFactory('bootstrap'),
+      '$1' +
+      ((options.server === false) ? '' : bootstrapButton) +
+      bootstrapFunction(options.componentUrl) +
+      ((options.client === false) ? '' : bootstrapApp) +
+      '$3'
+    );
 }
