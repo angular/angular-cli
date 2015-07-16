@@ -4,6 +4,9 @@ node_js:
 cache:
   directories:
     - node_modules
+    - angular
+    - web_modules
+    - bower_components
 notifications:
   webhooks:
     urls:
