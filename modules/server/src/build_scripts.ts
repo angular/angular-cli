@@ -39,7 +39,13 @@ export var angularScript = `
 `;
 
 export var bootstrapButton = `
-  <div id="bootstrapButton" style="z-index:999999999;position: absolute;background-color: rgb(255, 255, 255);padding: 0.5em;border-radius: 3px;border: 1px solid rgb(207, 206, 206)">
+  <div id="bootstrapButton" style="
+    z-index:999999999;
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    padding: 0.5em;
+    border-radius: 3px;
+    border: 1px solid rgb(207, 206, 206)">
     <button onclick="bootstrap()">
       Bootstrap Angular2 Client
     </button>
@@ -91,7 +97,7 @@ export function buildClientScripts(html, options) {
     ).
     replace(
       selectorRegExpFactory('angular'),
-      ((options.angular === false) ? '' : '$1'+angularScript+'$3')
+      ((options.angular === false) ? '' : '$1' + angularScript + '$3')
     ).
     replace(
       selectorRegExpFactory('bootstrap'),
