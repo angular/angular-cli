@@ -18,7 +18,7 @@
     "debug": "node-inspector & nodemon --ext 'js,ts,html' --debug 'index.js' --ignore '.git' --ignore 'node_modules/*' --ignore '*.js.map' --ignore '*_spec.js' --ignore 'angular/*' --verbose --watch dist/ --watch modules/examples/",
     "remove-angular-typings": "rm -rf angular/modules/angular2/typings",
     "update-angular": "git submodule foreach 'npm install && gulp build.js.cjs || true'",
-    "pull-angular": "git submodule foreach 'git pull --rebase git@github.com:angular/angular.git master'",
+    "pull-angular": "git submodule foreach 'git pull --rebase https://github.com/angular/angular.git master'",
     "angular-submodule": "npm run pull-angular && npm run remove-angular-typings && npm run update-angular",
     "bower": "bower install",
     "web_modules": "bash ./scripts/update-ng-bundle.sh",
