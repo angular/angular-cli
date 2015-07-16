@@ -1,6 +1,6 @@
 
 exports.config = {
-  baseUrl: 'http://localhost:3000/examples/todo',
+  baseUrl: 'http://localhost:3000/examples',
 
   specs: [
     'test/*.e2e.js'
@@ -8,7 +8,7 @@ exports.config = {
 
   allScriptsTimeout: 11000,
 
-  framework: 'jasmine',
+  framework: 'jasmine2',
 
   jasmineNodeOpts: {
     defaultTimeoutInterval: 60000,
@@ -16,13 +16,36 @@ exports.config = {
   },
 
   capabilities: {
-    'browserName': 'chrome'
+    browserName: 'chrome',
+    chromeOptions: {
+      //Important for benchpress to get timeline data from the browser
+      'args': ['--js-flags=--expose-gc'],
+      'perfLoggingPrefs': {
+        'traceCategories': 'blink.console,disabled-by-default-devtools.timeline'
+      }
+    },
+    loggingPrefs: {
+      performance: 'ALL'
+    }
   },
 
   seleniumAddress: 'http://localhost:4444/wd/hub',
 
   onPrepare: function() {
-    browser.ignoreSynchronization = true;
+    // open a new browser for every benchmark
+    var originalBrowser = browser;
+    var _tmpBrowser;
+    beforeEach(function() {
+      global.browser = originalBrowser.forkNewDriverInstance();
+      global.element = global.browser.element;
+      global.$ = global.browser.$;
+      global.$$ = global.browser.$$;
+      global.browser.ignoreSynchronization = true;
+    });
+    afterEach(function() {
+      global.browser.quit();
+      global.browser = originalBrowser;
+    });
   }
 
 };

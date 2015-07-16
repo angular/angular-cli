@@ -20,7 +20,6 @@ describe('Todo', function() {
     expect(subject).toBe(result);
   });
 
-
   it('should be able to add items in the to do list', function() {
     subject = element.all(by.deepCss('.view label')).first().getText();
     result  = 'Universal JavaScript';
