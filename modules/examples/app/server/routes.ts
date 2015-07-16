@@ -14,11 +14,25 @@ module.exports = function(ROOT) {
   var universal = require(ROOT + '/dist/server/server');
   var httpInjectables = universal.httpInjectables;
 
+  function stringToBoolean(txt) {
+    if (typeof txt !== 'string') { return txt; }
+    switch(txt.toLowerCase()) {
+      case'false': case'\'false\'': case'"false"':case'0': case'no': return false;
+      case'true': case'\'true\'': case'"true"': case'1': case'yes': return true;
+      default: return txt;
+    }
+  }
+
   router.
     route('/').
     get(function ngApp(req, res) {
       res.render('app/universal/app/index', {
-        // server: false,
+        client: stringToBoolean(req.query.client),
+        server: stringToBoolean(req.query.server),
+        preboot: stringToBoolean(req.query.preboot),
+        angular: stringToBoolean(req.query.angular),
+        componentUrl: 'examples/app/client/app',
+
         Component: App,
         serverInjector: [
           httpInjectables,
@@ -31,13 +45,12 @@ module.exports = function(ROOT) {
     route('/examples/todo').
     get(function ngTodo(req, res) {
       res.render('app/universal/todo/index', {
-        // client: false,
-        // server: false,
-        // scripts: false,
-        scripts: {
-          preboot: true,
-          angular: true
-        },
+        client: stringToBoolean(req.query.client),
+        server: stringToBoolean(req.query.server),
+        preboot: stringToBoolean(req.query.preboot),
+        angular: stringToBoolean(req.query.angular),
+        componentUrl: 'examples/app/universal/todo/index',
+
         Component: TodoApp,
         serverInjector: [
           httpInjectables,

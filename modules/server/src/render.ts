@@ -8,7 +8,13 @@ export {bootstrap};
 
 import {selectorRegExpFactory, showDebug} from './helper';
 
-import {prebootScript, angularScript, buildScripts} from './build_scripts';
+import {
+  prebootScript,
+  angularScript,
+  bootstrapButton,
+  bootstrapFunction,
+  bootstrapApp
+} from './build_scripts';
 
 import {stringifyElement} from './stringifyElement';
 
@@ -59,20 +65,33 @@ export function render(content, AppComponent, options: any = {}) {
     // serialize html
     let serializedCmp = stringifyElement(element);
 
-    // inject prebppt and angular scripts tags
-    let scripts = buildScripts(options.scripts);
-
     let htmlString = content.toString();
     // selector replacer explained here
     // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
     // replace our component with serialized version
-    let rendered = htmlString.replace(
-      // <selector></selector>
-      selectorRegExpFactory(selector),
-      // <selector>{{ serializedCmp }}</selector>
-      serializedCmp + /* + showDebug(appRef.hostComponent)*/
-      scripts
-    );
+    let rendered = htmlString.
+      replace(
+        // <selector></selector>
+        selectorRegExpFactory(selector),
+        // <selector>{{ serializedCmp }}</selector>
+        serializedCmp
+      ).
+      replace(
+        selectorRegExpFactory('preboot'),
+        prebootScript
+      ).
+      replace(
+        selectorRegExpFactory('angular'),
+        '$1'+angularScript+'$3'
+      ).
+      replace(
+        selectorRegExpFactory('bootstrap'),
+        '$1' +
+        bootstrapButton +
+        bootstrapFunction(options.componentUrl) +
+        ((options.client === false) ? '' : bootstrapApp) +
+        '$3'
+      );
 
     // destroy appComponent
     // remove from serverDom (should be handled by appRef.dispose already)

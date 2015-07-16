@@ -1,4 +1,4 @@
-
+// TODO: hard coded for now
 // TODO: build from preboot config
 // consider declarative config via <preboot minify="true"></preboot>
 export var prebootScript = `
@@ -36,11 +36,46 @@ export var angularScript = `
   </script>
 `;
 
-export function buildScripts(scripts) {
+export var bootstrapButton = `
+  <div id="bootstrapButton" style="z-index:999999999;position: absolute;background-color: rgb(255, 255, 255);padding: 0.5em;border-radius: 3px;border: 1px solid rgb(207, 206, 206)">
+    <button onclick="bootstrap()">
+      Bootstrap Angular2 Client
+    </button>
+  </div>
+`;
+
+export function bootstrapFunction(appUrl) {
+  return `
+  <script>
+    function bootstrap() {
+      System.import("${ appUrl }").
+        then(function(module) {
+          return module.main();
+        }).
+        then(function() {
+          preboot.complete();
+        });
+    }
+  </script>
+`;
+};
+
+export var bootstrapApp = `
+  <script>
+    setTimeout(function() {
+      bootstrap();
+    });
+  </script>
+`;
+
+export function buildScripts(scripts, appUrl) {
   // figure out what scripts to inject
   return (scripts === false ? '' : (
       (scripts.preboot === true ? prebootScript : '') +
-      (scripts.angular === true ? angularScript : '')
+      (scripts.angular === true ? angularScript : '') +
+      (scripts.bootstrapButton === true ? angularScript : '') +
+      (scripts.bootstrapFunction === true ? bootstrapFunction(appUrl || '') : '') +
+      (scripts.bootstrapApp === true ? angularScript : '')
     )
   );
 }
