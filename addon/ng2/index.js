@@ -2,5 +2,10 @@
 'use strict';
 
 module.exports = {
-  name: 'ng2'
+  name: 'ng2',
+  includedCommands: function() {
+    return {
+      'new': require('./commands/new')
+    };
+  }
 };
