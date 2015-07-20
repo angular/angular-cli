@@ -56,12 +56,15 @@ export function bootstrapFunction(appUrl) {
   return `
   <script>
     function bootstrap() {
+      if (this.bootstraped) return;
+      this.bootstraped = true;
       System.import("${ appUrl }").
         then(function(module) {
           return module.main();
         }).
         then(function() {
           preboot.complete();
+          document.body.className += 'angularready';
         });
     }
   </script>
@@ -88,7 +91,7 @@ export function buildScripts(scripts, appUrl) {
   );
 }
 
-
+// TODO: find better ways to configure the App initial state
 export function buildClientScripts(html, options) {
   return html.
     replace(
@@ -102,9 +105,14 @@ export function buildClientScripts(html, options) {
     replace(
       selectorRegExpFactory('bootstrap'),
       '$1' +
-      ((options.server === false) ? '' : bootstrapButton) +
-      bootstrapFunction(options.componentUrl) +
-      ((options.client === false) ? '' : bootstrapApp) +
+      ((options.bootstrap === true) ? (
+        ((options.client === false) ? '' : bootstrapButton) +
+        bootstrapFunction(options.componentUrl) +
+        ((options.client === false) ? '' : bootstrapApp)
+      ) : (
+        bootstrapButton +
+        bootstrapFunction(options.componentUrl)
+      )) +
       '$3'
     );
 }
