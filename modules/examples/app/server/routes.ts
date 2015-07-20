@@ -31,6 +31,7 @@ module.exports = function(ROOT) {
         client: stringToBoolean(req.query.client),
         server: stringToBoolean(req.query.server),
         preboot: stringToBoolean(req.query.preboot),
+        bootstrap: stringToBoolean(req.query.bootstrap),
         angular: stringToBoolean(req.query.angular),
         componentUrl: 'examples/app/client/app',
 
@@ -49,6 +50,7 @@ module.exports = function(ROOT) {
         client: stringToBoolean(req.query.client),
         server: stringToBoolean(req.query.server),
         preboot: stringToBoolean(req.query.preboot),
+        bootstrap: stringToBoolean(req.query.bootstrap),
         angular: stringToBoolean(req.query.angular),
         componentUrl: 'examples/app/universal/todo/index',
 
