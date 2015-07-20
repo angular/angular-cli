@@ -86,13 +86,12 @@ describe('Todo', function() {
 
       var newTodoInput = element(by.deepCss('#new-todo'));
 
-      var newTodoValue = 'new todo '+ Math.random();
-      newTodoInput.sendKeys(newTodoValue);
+      var todoValue = 'new todo ' + Math.random();
+      newTodoInput.sendKeys(todoValue);
       newTodoInput.sendKeys(protractor.Key.ENTER);
 
-      // browser.driver.sleep(500);
       subject = element.all(by.deepCss('.view label')).last().getText();
-      result  = newTodoValue;
+      result  = todoValue;
 
       expect(subject).toEqual(result);
     });
@@ -101,8 +100,8 @@ describe('Todo', function() {
 
       var newTodoInput = element(by.deepCss('#new-todo'));
 
-      var newTodoValue = 'new todo '+ Math.random();
-      newTodoInput.sendKeys(newTodoValue);
+      var todoValue = 'new todo ' + Math.random();
+      newTodoInput.sendKeys(todoValue);
       newTodoInput.sendKeys(protractor.Key.ENTER);
 
 
@@ -110,9 +109,8 @@ describe('Todo', function() {
       var el = element.all(by.deepCss('.view button')).last();
       el.click();
 
-      // browser.driver.sleep(500);
       subject = element.all(by.deepCss('.view label')).last().getText();
-      result  = newTodoValue;
+      result  = todoValue;
 
       expect(subject).not.toEqual(result);
     });
@@ -133,7 +131,7 @@ describe('Todo', function() {
       browser.driver.sleep(500);
     });
 
-    it('should be able to complete a todo in the  list', function() {
+    it('should be able to complete a todo in the list', function() {
 
       var currentTodo = element.all(by.deepCss('.view input')).first();
       browser.actions().mouseMove(currentTodo).click().perform();
@@ -166,23 +164,22 @@ describe('Todo', function() {
 
       var newTodoInput = element(by.deepCss('#new-todo'));
 
-      var newTodoValue = 'new todo '+ Math.random();
-      newTodoInput.sendKeys(newTodoValue);
+      var todoValue = 'new todo ' + Math.random();
+      newTodoInput.sendKeys(todoValue);
       newTodoInput.sendKeys(protractor.Key.ENTER);
 
-      // browser.driver.sleep(500);
       subject = element.all(by.deepCss('.view label')).last().getText();
-      result  = newTodoValue;
+      result  = todoValue;
 
-      expect(subject).toEqual(result);
+      expect(subject).toEqual(todoValue);
     });
 
     it('should be able to remove a todo to the list', function() {
 
       var newTodoInput = element(by.deepCss('#new-todo'));
 
-      var newTodoValue = 'new todo '+ Math.random();
-      newTodoInput.sendKeys(newTodoValue);
+      var todoValue = 'new todo ' + Math.random();
+      newTodoInput.sendKeys(todoValue);
       newTodoInput.sendKeys(protractor.Key.ENTER);
 
 
@@ -190,24 +187,71 @@ describe('Todo', function() {
       var el = element.all(by.deepCss('.view button')).last();
       el.click();
 
-      // browser.driver.sleep(500);
       subject = element.all(by.deepCss('.view label')).last().getText();
-      result  = newTodoValue;
+      result  = todoValue;
 
       expect(subject).not.toEqual(result);
     });
 
   });
 
+  describe('Server and Client rendered with Preboot.js', function() {
+    var subject;
+    var result;
+    beforeEach(function() {
+      browser.get(appendQuery('/examples/todo', {
+        server: true,
+        client: true,
+        preboot: true,
+        bootstrap: false
+      }));
+    });
+
+    it('should be able maintain input values after client render', function() {
+
+      var newTodoInput1 = element(by.deepCss('#new-todo'));
+
+      var subject1 = newTodoInput1.getAttribute('value');
+      var result1  = '';
+
+      expect(subject1).toEqual(result1);
+
+      bootstrapClient({ dontSleep: true});
+
+      var todoValue = 'new todo ' + Math.random();
+      newTodoInput1.sendKeys(todoValue);
+
+      var subject2 = newTodoInput1.getAttribute('value');
+      var result2  = todoValue;
+
+      expect(subject2).toEqual(result2);
+
+      browser.driver.sleep(500);
+
+      var newTodoInput2 = element(by.deepCss('#new-todo'));
+
+      subject = newTodoInput2.getAttribute('value');
+      result  = todoValue;
+
+      expect(subject).toEqual(result);
+
+    });
+
+
+
+  });
 
 });
 
-function bootstrapClient() {
+function bootstrapClient(config) {
+  config = config || {};
   var EC = protractor.ExpectedConditions;
   var bootstrapButton = element(by.deepCss('#bootstrapButton'));
   browser.wait(EC.elementToBeClickable(bootstrapButton), 10000);
   bootstrapButton.click();
-  browser.driver.sleep(500);
+  if (!config.dontSleep) {
+    browser.driver.sleep(500);
+  }
 }
 function verifyNoBrowserErrors() {
   // TODO(tbosch): Bug in ChromeDriver: Need to execute at least one command
