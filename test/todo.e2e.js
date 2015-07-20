@@ -207,34 +207,56 @@ describe('Todo', function() {
       }));
     });
 
-    it('should be able maintain input values after client render', function() {
+    it('should be able maintain input values of server rendered input after client render', function() {
 
-      var newTodoInput1 = element(by.deepCss('#new-todo'));
+      var result = 'new todo ' + Math.random();
 
-      var subject1 = newTodoInput1.getAttribute('value');
-      var result1  = '';
+      var serverInput = element(by.deepCss('#new-todo'));
 
-      expect(subject1).toEqual(result1);
+      // type value on input before bootstrap
+      serverInput.sendKeys(result);
 
+      // bootstrap async
       bootstrapClient({ dontSleep: true});
 
-      var todoValue = 'new todo ' + Math.random();
-      newTodoInput1.sendKeys(todoValue);
+      var serverInputSubject = serverInput.getAttribute('value');
+      expect(serverInputSubject).toEqual(result);
 
-      var subject2 = newTodoInput1.getAttribute('value');
-      var result2  = todoValue;
-
-      expect(subject2).toEqual(result2);
-
+      // wait for bootstrap to finish
       browser.driver.sleep(500);
 
-      var newTodoInput2 = element(by.deepCss('#new-todo'));
+      // Query again for a new reference after bootstrap
+      var clientInputSubject = element(by.deepCss('#new-todo'));
+      subject = clientInputSubject.getAttribute('value');
 
-      subject = newTodoInput2.getAttribute('value');
-      result  = todoValue;
 
       expect(subject).toEqual(result);
+    });
 
+    it('should be able maintain input values during bootstrap', function() {
+
+      var result = 'new todo ' + Math.random();
+
+      var serverInput = element(by.deepCss('#new-todo'));
+
+      // bootstrap async
+      bootstrapClient({ dontSleep: true});
+
+      // type value on input during bootstrap
+      serverInput.sendKeys(result);
+
+      var serverInputSubject = serverInput.getAttribute('value');
+      expect(serverInputSubject).toEqual(result);
+
+      // wait for bootstrap to finish
+      browser.driver.sleep(500);
+
+      // Query again for a new reference after bootstrap
+      var clientInputSubject = element(by.deepCss('#new-todo'));
+      subject = clientInputSubject.getAttribute('value');
+
+
+      expect(subject).toEqual(result);
     });
 
 
