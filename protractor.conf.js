@@ -32,6 +32,7 @@ exports.config = {
   seleniumAddress: 'http://localhost:4444/wd/hub',
 
   onPrepare: function() {
+    browser.manage().deleteAllCookies();
     browser.ignoreSynchronization = true;
     /*
     // open a new browser for every benchmark
