@@ -23,4 +23,6 @@ before_install:
   - git submodule update --init --recursive
 before_script:
   - npm install -g gulp
-script: gulp lint
+script:
+  - gulp lint
+  - gulp test
