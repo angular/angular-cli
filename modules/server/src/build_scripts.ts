@@ -39,13 +39,17 @@ export var angularScript = `
 `;
 
 export var bootstrapButton = `
-  <div id="bootstrapButton" style="
-    z-index:999999999;
-    position: absolute;
-    background-color: rgb(255, 255, 255);
-    padding: 0.5em;
-    border-radius: 3px;
-    border: 1px solid rgb(207, 206, 206)">
+  <div id="bootstrapButton">
+    <style>
+     #bootstrapButton {
+      z-index:999999999;
+      position: absolute;
+      background-color: rgb(255, 255, 255);
+      padding: 0.5em;
+      border-radius: 3px;
+      border: 1px solid rgb(207, 206, 206);
+     }
+    </style>
     <button onclick="bootstrap()">
       Bootstrap Angular2 Client
     </button>
@@ -64,7 +68,9 @@ export function bootstrapFunction(appUrl) {
         }).
         then(function() {
           preboot.complete();
-          document.body.className += 'angularready';
+          document.body.className += ' angularready';
+          var $bootstrapButton = document.getElementById("bootstrapButton");
+          if ($bootstrapButton) { $bootstrapButton.remove(); }
         });
     }
   </script>
@@ -92,6 +98,8 @@ export function buildScripts(scripts, appUrl) {
 }
 
 // TODO: find better ways to configure the App initial state
+// to pay off this technical debt
+// currently checking for explicit values
 export function buildClientScripts(html, options) {
   return html.
     replace(
@@ -105,13 +113,16 @@ export function buildClientScripts(html, options) {
     replace(
       selectorRegExpFactory('bootstrap'),
       '$1' +
-      ((options.bootstrap === true) ? (
-        ((options.client === false) ? '' : bootstrapButton) +
-        bootstrapFunction(options.componentUrl) +
-        ((options.client === false) ? '' : bootstrapApp)
-      ) : (
+      ((options.bootstrap === false) ? (
         bootstrapButton +
         bootstrapFunction(options.componentUrl)
+      ) : (
+        (
+          (options.client === undefined || options.server === undefined) ?
+          '' : (options.client === false) ? '' : bootstrapButton
+        ) +
+        bootstrapFunction(options.componentUrl) +
+        ((options.client === false) ? '' : bootstrapApp)
       )) +
       '$3'
     );
