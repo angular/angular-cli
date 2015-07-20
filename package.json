@@ -27,7 +27,7 @@
     "broccoli-funnel": "^0.2.3",
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-writer": "^0.1.1",
-    "ember-cli": "^0.2.6",
+    "ember-cli": "rodyhaddad/ember-cli#overrideCoreCommand",
     "exit": "^0.1.2",
     "fs-extra": "^0.18.4",
     "resolve": "^1.0.0",
