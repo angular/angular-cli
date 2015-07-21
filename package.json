@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "prestart": "npm run build",
-    "server": "nodemon --ext 'js,ts,html' --ignore '.git' --ignore 'node_modules/*' --ignore '*.js.map' --ignore '*_spec.js' --ignore 'angular/*' --verbose --watch dist/ --watch modules/examples/",
+    "server": "nodemon --ext 'js,ts,html' --ignore '\\.git' --ignore 'node_modules' --ignore '*.js.map' --ignore '*_spec.js' --ignore 'angular' --verbose --watch dist --watch modules/examples",
     "start": "npm run server",
     "watch": "tsc -w",
     "build": "tsc || true",
