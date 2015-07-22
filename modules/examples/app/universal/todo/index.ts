@@ -28,7 +28,7 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
         placeholder="What needs to be done?"
         autofocus
         #newtodo
-        (keyup.enter)="enterTodo($event, newtodo)">
+        (keyup)="enterTodo($event, newtodo)">
   </header>
 
   <section id="main">
@@ -122,6 +122,7 @@ export class TodoApp {
 
   enterTodo($event, inputElement) {
     if (!inputElement.value) { return; }
+    if ($event.which !== 13) { return; }
     this.addTodo(inputElement.value);
     inputElement.value = '';
   }
