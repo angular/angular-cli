@@ -225,6 +225,7 @@ declare module "angular2/src/render/dom/dom_renderer" {
     _createEventListener(): any
   }
   var DOCUMENT_TOKEN: any;
+  var DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES: any;
 }
 
 declare module "angular2/src/render/api" {

@@ -1,5 +1,5 @@
 /// <reference path="../../../../server/typings/tsd.d.ts" />
-import {Component, View, onInit} from 'angular2/angular2';
+import {Component, View, LifecycleEvent} from 'angular2/angular2';
 import {Http} from 'angular2/http';
 import {coreDirectives} from 'angular2/angular2';
 
@@ -11,7 +11,7 @@ function transformData(data) {
 
 @Component({
   selector: 'app',
-  lifecycle: [ onInit ]
+  lifecycle: [ LifecycleEvent.onInit ]
 })
 @View({
   directives: [ coreDirectives ],

@@ -3,7 +3,7 @@
 import {bootstrap} from 'angular2/angular2';
 
 import {coreDirectives} from 'angular2/directives';
-import {Component, View, Directive, onInit} from 'angular2/angular2';
+import {Component, View, Directive, LifecycleEvent} from 'angular2/angular2';
 import {ElementRef} from 'angular2/core';
 import {bind, Inject} from 'angular2/di';
 import {routerInjectables, routerDirectives} from 'angular2/router';
@@ -12,7 +12,7 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
 
 @Component({
   selector: 'app',
-  lifecycle: [ onInit ],
+  lifecycle: [ LifecycleEvent.onInit ],
   viewInjector: [ Store, TodoFactory ]
 })
 @View({
