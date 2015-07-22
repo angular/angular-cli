@@ -11,7 +11,7 @@ function transformData(data) {
 
 @Component({
   selector: 'app',
-  lifecycle: [ LifecycleEvent.onInit ]
+  lifecycle: [ (<any>LifecycleEvent).onInit ]
 })
 @View({
   directives: [ coreDirectives ],

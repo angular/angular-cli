@@ -676,13 +676,11 @@ function replayEvents(preboot, strategy, events) {
         var clientNode = preboot.dom.findClientNode(serverNode);
         // if client node found, need to explicitly set value and then dispatch event
         if (clientNode) {
-            console.log('found client node');
             clientNode.value = serverNode.value;
             clientNode.dispatchEvent(event_1);
             preboot.log(3, serverNode, clientNode, event_1);
         }
         else {
-            console.log('DID NOT found client node');
             remainingEvents.push(eventData);
             preboot.log(4, serverNode);
         }
@@ -696,5 +694,5 @@ exports.replayEvents = replayEvents;
 },{}]},{},[7])(7)
 });
 
-preboot.init({"appRoot":"app","freeze":{"name":"spinner","styles":{"overlay":{"className":"preboot-overlay","style":{"position":"absolute","display":"none","zIndex":"9999999","top":"0","left":"0","width":"100%","height":"100%"}},"spinner":{"className":"preboot-spinner","style":{"position":"absolute","display":"none","zIndex":"99999999"}}},"eventName":"PrebootFreeze","timeout":5000,"doBlur":true},"replay":[{"name":"rerender"}],"buffer":true,"debug":true,"uglify":false,"presets":["keyPress","buttonPress","focus"],"listen":[{"name":"selectors","eventsBySelector":{"input[type=\"text\"],textarea":["keypress","keyup","keydown"]}},{"name":"selectors","preventDefault":true,"eventsBySelector":{"input[type=\"submit\"],button":["click"]},"dispatchEvent":"PrebootFreeze"},{"name":"selectors","eventsBySelector":{"input[type=\"text\"],textarea":["focusin","focusout"]},"trackFocus":true,"doNotReplay":true}]});
+preboot.init({"appRoot":"app","freeze":{"name":"spinner","styles":{"overlay":{"className":"preboot-overlay","style":{"position":"absolute","display":"none","zIndex":"9999999","top":"0","left":"0","width":"100%","height":"100%"}},"spinner":{"className":"preboot-spinner","style":{"position":"absolute","display":"none","zIndex":"99999999"}}},"eventName":"PrebootFreeze","timeout":5000,"doBlur":true},"replay":[{"name":"rerender"}],"buffer":true,"debug":true,"uglify":false,"presets":["keyPress","buttonPress","focus"],"pauseEvent":"PrebootPause","resumeEvent":"PrebootResume","completeEvent":"BootstrapComplete","listen":[{"name":"selectors","eventsBySelector":{"input[type=\"text\"],textarea":["keypress","keyup","keydown"]}},{"name":"selectors","preventDefault":true,"eventsBySelector":{"input[type=\"submit\"],button":["click"]},"dispatchEvent":"PrebootFreeze"},{"name":"selectors","eventsBySelector":{"input[type=\"text\"],textarea":["focusin","focusout"]},"trackFocus":true,"doNotReplay":true}]});
 

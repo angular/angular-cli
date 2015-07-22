@@ -12,7 +12,7 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
 
 @Component({
   selector: 'app',
-  lifecycle: [ LifecycleEvent.onInit ],
+  lifecycle: [ (<any>LifecycleEvent).onInit ],
   viewInjector: [ Store, TodoFactory ]
 })
 @View({

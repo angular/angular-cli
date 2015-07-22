@@ -1,7 +1,12 @@
 declare var zone: any;
 declare var Zone: any;
+interface Type {}
 
 declare module "angular2/angular2" {
+  class LifecycleEvent {
+    static onInit: any;
+    static onChange: any;
+  }
 }
 
 declare module "angular2/annotations" {
