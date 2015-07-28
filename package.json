@@ -56,6 +56,8 @@
     "jasmine-reporters": "^2.0.7",
     "karma": "^0.13.3",
     "karma-browserify": "^4.2.1",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-jasmine": "^0.3.6",
     "morgan": "^1.6.1",
     "nodemon": "^1.3.7",
     "open": "0.0.5",
