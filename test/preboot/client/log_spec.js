@@ -19,4 +19,3 @@ describe('log', function () {
         });
     });
 });
-//# sourceMappingURL=log_spec.js.map

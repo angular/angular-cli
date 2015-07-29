@@ -55,4 +55,3 @@ describe('listen_by_event_bindings', function () {
         });
     });
 });
-//# sourceMappingURL=listen_by_event_bindings_spec.js.map

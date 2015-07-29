@@ -33,4 +33,3 @@ describe('freeze_with_spinner', function () {
         });
     });
 });
-//# sourceMappingURL=freeze_with_spinner_spec.js.map

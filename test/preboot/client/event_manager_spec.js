@@ -136,4 +136,3 @@ describe('event_manager', function () {
         });
     });
 });
-//# sourceMappingURL=event_manager_spec.js.map
