@@ -1,8 +1,7 @@
 /// <reference path="../../../../server/typings/tsd.d.ts" />
 import {Component, View, LifecycleEvent} from 'angular2/angular2';
-import {Http} from 'angular2/http';
+import {Http, httpInjectables} from 'angular2/http';
 import {coreDirectives} from 'angular2/angular2';
-
 
 function transformData(data) {
   data.created_at = new Date(data.created_at);
@@ -11,7 +10,8 @@ function transformData(data) {
 
 @Component({
   selector: 'app',
-  lifecycle: [ (<any>LifecycleEvent).onInit ]
+  lifecycle: [ (<any>LifecycleEvent).onInit ],
+  hostInjector: [ httpInjectables ]
 })
 @View({
   directives: [ coreDirectives ],
@@ -80,34 +80,34 @@ export class App {
   itemCount: number    = 0;
   buttonTest: string   = '';
   testingInput: string = 'default state on component';
-  constructor(
-    private http: Http
-  ) {}
+  constructor(private http: Http) {
+
+  }
 
   onInit() {
     this.addItem();
     this.addItem();
     this.addItem();
 
-    var todosObs = this.http.get('/api/todos').
-      toRx().
-      filter(res => res.status >= 200 && res.status < 300).
-      map(res => res.json()).
-      map(data => data.map(transformData));
+    // var todosObs = this.http.get('/api/todos').
+    //   toRx().
+    //   filter(res => res.status >= 200 && res.status < 300).
+    //   map(res => res.json()).
+    //   map(data => data.map(transformData));
 
-    todosObs.subscribe(
-      todos => {
-        console.log('next', todos);
-        todos.map(this.addItem.bind(this));
-      },
-      err => {
-        console.error('err', err);
-        throw err;
-      },
-      complete => {
-        console.log('complete', complete);
-      }
-    );
+    // todosObs.subscribe(
+    //   todos => {
+    //     console.log('next', todos);
+    //     todos.map(this.addItem.bind(this));
+    //   },
+    //   err => {
+    //     console.error('err', err);
+    //     throw err;
+    //   },
+    //   complete => {
+    //     console.log('complete', complete);
+    //   }
+    // );
 
   }
 

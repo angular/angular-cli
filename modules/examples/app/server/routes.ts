@@ -37,7 +37,7 @@ module.exports = function(ROOT) {
 
         Component: App,
         serverInjector: [
-          httpInjectables,
+          httpInjectables
         ]
 
       });
@@ -56,7 +56,7 @@ module.exports = function(ROOT) {
 
         Component: TodoApp,
         serverInjector: [
-          httpInjectables,
+          httpInjectables
         ]
 
       });

@@ -13,7 +13,7 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
 @Component({
   selector: 'app',
   lifecycle: [ (<any>LifecycleEvent).onInit ],
-  viewInjector: [ Store, TodoFactory ]
+  hostInjector: [ Store, TodoFactory ]
 })
 @View({
   directives: [ coreDirectives, routerDirectives ],

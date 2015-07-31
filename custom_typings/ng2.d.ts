@@ -9,6 +9,23 @@ declare module "angular2/angular2" {
   }
 }
 
+declare module "angular2/src/render/dom/schema/element_schema_registry" {
+  class ElementSchemaRegistry {}
+}
+
+declare module "angular2/src/render/dom/schema/dom_element_schema_registry" {
+  class DomElementSchemaRegistry {}
+}
+
+declare module "angular2/src/render/dom/view/shared_styles_host" {
+  class SharedStylesHost {}
+  class DomSharedStylesHost {}
+}
+
+declare module "angular2/src/services/anchor_based_app_root_url" {
+  class AnchorBasedAppRootUrl {}
+}
+
 declare module "angular2/annotations" {
   var Component: any;
   var View: any;
@@ -229,8 +246,20 @@ declare module "angular2/src/render/dom/dom_renderer" {
     _createGlobalEventListener(): any
     _createEventListener(): any
   }
+  class DefaultDomCompiler {}
+  var DOCUMENT_TOKEN: any;
+}
+
+declare module "angular2/src/render/render" {
+  class DomRenderer {
+    _moveViewNodesIntoParent(): any
+    _createGlobalEventListener(): any
+    _createEventListener(): any
+  }
+  class DefaultDomCompiler {}
   var DOCUMENT_TOKEN: any;
   var DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES: any;
+  var APP_ID_RANDOM_BINDING: any;
 }
 
 declare module "angular2/src/render/api" {
@@ -307,6 +336,28 @@ declare module "angular2/src/change_detection/pipes/pipe" {
 
 declare module "angular2/src/change_detection/change_detection" {
   var async: any;
+  class Pipes {
+    constructor(pipes: any)
+  }
+  var defaultPipes: any;
+  class Parser {
+
+  }
+  class Lexer {
+
+  }
+  class ChangeDetection {
+
+  }
+  class DynamicChangeDetection {
+
+  }
+  class PreGeneratedChangeDetection {
+    static isSupported(): boolean;
+  }
+  class JitChangeDetection {
+    static isSupported(): boolean;
+  }
 }
 
 declare module "angular2/pipes" {
@@ -366,7 +417,7 @@ declare module "angular2/src/core/compiler/element_ref" {
 
 declare module "angular2/src/core/exception_handler" {
   class ExceptionHandler {
-
+    call(): any
   }
 }
 
@@ -595,6 +646,7 @@ declare module "angular2/src/facade/async" {
     then(pro:any): any;
     all(all:any): any;
   }
+  class PromiseCompleter {}
   class PromiseWrapper {
     static completer(): any;
     static all(all: any): any;
@@ -626,6 +678,7 @@ declare module "angular2/src/facade/browser" {
 declare module "angular2/src/facade/lang" {
   var int: any;
   var Type: Function;
+  var isDart: boolean;
   var assertionsEnabled: any;
   function isPresent(bool: any): boolean;
   function isBlank(bool: any): boolean;
