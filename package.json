@@ -8,7 +8,7 @@
   },
   "keywords": [],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/runner"
   },
   "repository": {
     "type": "git",
@@ -43,5 +43,9 @@
       "./addon/ng2/",
       "./node_modules/angular-project-draft/"
     ]
+  },
+  "devDependencies": {
+    "glob": "^5.0.14",
+    "mocha": "^2.2.5"
   }
 }
