@@ -28,8 +28,8 @@ module.exports = NewCommand.extend({
         commandOptions.name = rawArgs.shift();
 
         if (!packageName) {
-            message = chalk.yellow('The `ember ' + this.name + '` command requires a ' +
-            'name to be specified. For more details, use `ember help`.');
+            message = chalk.yellow('The `ng ' + this.name + '` command requires a ' +
+            'name to be specified. For more details, use `ng help`.');
 
             return Promise.reject(new SilentError(message));
         }
@@ -39,7 +39,7 @@ module.exports = NewCommand.extend({
         }
 
         if (packageName === '.') {
-            message = 'Trying to generate an application structure in this directory? Use `ember init` instead.';
+            message = 'Trying to generate an application structure in this directory? Use `ng init` instead.';
 
             return Promise.reject(new SilentError(message));
         }
