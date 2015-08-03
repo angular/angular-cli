@@ -26,7 +26,7 @@
     "remove-web-modules": "rm -rf web_modules",
     "update-angular": "git submodule foreach 'npm install && gulp build.js || true'",
     "pull-angular": "git submodule foreach 'git pull https://github.com/angular/angular.git master'",
-    "angular-submodule": "git submodule update && npm run pull-angular && npm run remove-angular-typings && npm run remove-angular2 && npm run update-angular && git submodule update",
+    "angular-submodule": "git submodule init && git submodule update && npm run pull-angular && npm run remove-angular-typings && npm run remove-angular2 && npm run update-angular && git submodule update",
     "bower": "bower install",
     "web_modules": "bash ./scripts/update-ng-bundle.sh",
     "preboot": "gulp build",
