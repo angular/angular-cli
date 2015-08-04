@@ -13,6 +13,6 @@ module.exports = function (gulp) {
         uglify:   false,
         presets:  ['keyPress', 'buttonPress', 'focus']
       })
-      .pipe(gulp.dest('./modules/examples/preboot_basic'));
+      .pipe(gulp.dest('./examples/preboot_basic'));
   };
 };

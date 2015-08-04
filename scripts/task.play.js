@@ -16,8 +16,8 @@ server.use(livereload({
   port: livereloadport
 }));
 
-server.use('/', serveStatic('modules/examples'));
-server.use('/', serveIndex('modules/examples'));
+server.use('/', serveStatic('examples'));
+server.use('/', serveIndex('examples'));
 
 module.exports = function (gulp) {
 
@@ -31,7 +31,7 @@ module.exports = function (gulp) {
     
     exec('tsc -w');
     gulp.watch('dist/**/*', ['build']);
-    gulp.watch('modules/examples/**/*', function () {
+    gulp.watch('examples/**/*', function () {
       reloader.reload();
     });
   }
