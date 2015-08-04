@@ -38,7 +38,8 @@
     "e2e": "protractor",
     "tsd": "tsd reinstall",
     "preinstall": "npm run tsd && npm run angular-submodule",
-    "postinstall": "tsc || true && npm run web_modules && npm run bower && npm run webdriver-update"
+    "postinstall": "tsc || true && npm run web_modules && npm run bower && npm run webdriver-update",
+    "changelog": "gulp changelog"
   },
   "repository": {
     "type": "git",
@@ -52,6 +53,7 @@
     "brfs": "^1.4.0",
     "connect-history-api-fallback": "^1.1.0",
     "connect-livereload": "^0.5.3",
+    "conventional-changelog": "^0.2.1",
     "express": "^4.13.0",
     "gulp-eslint": "^0.15.0",
     "gulp-jasmine": "^2.0.1",
