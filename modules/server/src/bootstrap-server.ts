@@ -27,7 +27,11 @@ import {
   JitChangeDetection,
   PreGeneratedChangeDetection,
   Pipes,
-  defaultPipes
+  defaultPipes,
+  IterableDiffers,
+  defaultIterableDiffers,
+  KeyValueDiffers,
+  defaultKeyValueDiffers
 } from 'angular2/src/change_detection/change_detection';
 
 // correct path
@@ -80,7 +84,9 @@ import {
   DOCUMENT_TOKEN,
   DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES,
   DefaultDomCompiler,
-  APP_ID_RANDOM_BINDING
+  APP_ID_RANDOM_BINDING,
+  MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE_TOKEN,
+  TemplateCloner
 } from 'angular2/src/render/render';
 import {ElementSchemaRegistry} from 'angular2/src/render/dom/schema/element_schema_registry';
 import {DomElementSchemaRegistry} from 'angular2/src/render/dom/schema/dom_element_schema_registry';
@@ -91,6 +97,7 @@ import {
 import {internalView} from 'angular2/src/core/compiler/view_ref';
 
 import {appComponentRefPromiseToken, appComponentTypeToken} from 'angular2/src/core/application_tokens';
+import {wtfInit} from 'angular2/src/profile/wtf_init';
 
 // Server
 import {ElementRef} from 'angular2/src/core/compiler/element_ref';
@@ -126,7 +133,7 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     //         [DynamicComponentLoader, Injector, Testability, TestabilityRegistry]),
 
     bind(appComponentType)
-        .toFactory((p: Promise<any>) => p.then(ref => ref.instance), [appComponentRefPromiseToken]),
+        .toFactory(p => p.then(ref => ref.instance), [appComponentRefPromiseToken]),
     bind(LifeCycle).toFactory((exceptionHandler) => new LifeCycle(null, assertionsEnabled()),
                               [ExceptionHandler]),
     bind(EventManager)
@@ -140,6 +147,8 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     DomRenderer,
     bind(Renderer).toAlias(DomRenderer),
     APP_ID_RANDOM_BINDING,
+    bind(MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE_TOKEN).toValue(20),
+    TemplateCloner,
     DefaultDomCompiler,
     bind(ElementSchemaRegistry).toValue(new DomElementSchemaRegistry()),
     bind(RenderCompiler).toAlias(DefaultDomCompiler),
@@ -155,6 +164,8 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     CompilerCache,
     ViewResolver,
     bind(Pipes).toValue(defaultPipes),
+    bind(IterableDiffers).toValue(defaultIterableDiffers),
+    bind(KeyValueDiffers).toValue(defaultKeyValueDiffers),
     bind(ChangeDetection).toClass(bestChangeDetection),
     ViewLoader,
     DirectiveResolver,
@@ -188,6 +199,7 @@ export function bootstrap(appComponentType: Type,
                           appInjector: any = null,
                           appDocument: any = null,
                           componentInjectableBindings: List<Binding> = null): Promise {
+  wtfInit();
   let bootstrapProcess = PromiseWrapper.completer();
 
   // TODO(rado): prepopulate template cache, so applications with only

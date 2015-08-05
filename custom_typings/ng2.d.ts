@@ -9,6 +9,10 @@ declare module "angular2/angular2" {
   }
 }
 
+declare module "angular2/src/profile/wtf_init" {
+  function wtfInit(): any;
+}
+
 declare module "angular2/src/render/dom/schema/element_schema_registry" {
   class ElementSchemaRegistry {}
 }
@@ -257,9 +261,11 @@ declare module "angular2/src/render/render" {
     _createEventListener(): any
   }
   class DefaultDomCompiler {}
+  class TemplateCloner {}
   var DOCUMENT_TOKEN: any;
   var DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES: any;
   var APP_ID_RANDOM_BINDING: any;
+  var MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE_TOKEN: any;
 }
 
 declare module "angular2/src/render/api" {
@@ -358,6 +364,10 @@ declare module "angular2/src/change_detection/change_detection" {
   class JitChangeDetection {
     static isSupported(): boolean;
   }
+  class IterableDiffers {}
+  class KeyValueDiffers {}
+  var defaultIterableDiffers: any;
+  var defaultKeyValueDiffers: any;
 }
 
 declare module "angular2/pipes" {
@@ -417,7 +427,8 @@ declare module "angular2/src/core/compiler/element_ref" {
 
 declare module "angular2/src/core/exception_handler" {
   class ExceptionHandler {
-    call(): any
+    constructor(DOM: any, isDart: boolean)
+    call(exception: any, stackTrace: any): any
   }
 }
 
