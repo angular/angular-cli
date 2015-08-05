@@ -23,6 +23,7 @@ notifications:
 
 env:
   global:
+  - SAUCE_ACCESS_KEY=''
   # Token for tsd to increase github rate limit
   # See https://github.com/DefinitelyTyped/tsd#tsdrc
   # This does not use http://docs.travis-ci.com/user/environment-variables/#Secure-Variables
