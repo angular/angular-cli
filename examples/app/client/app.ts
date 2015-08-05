@@ -1,4 +1,4 @@
-/// <reference path="../../../server/typings/tsd.d.ts" />
+/// <reference path="../../../custom_typings/_custom.d.ts" />
 
 console.time('angular2/angular2 in client');
 import * as angular from 'angular2/angular2';

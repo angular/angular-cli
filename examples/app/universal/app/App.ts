@@ -1,4 +1,4 @@
-/// <reference path="../../../../server/typings/tsd.d.ts" />
+/// <reference path="../../../../custom_typings/_custom.d.ts" />
 import {Component, View, LifecycleEvent} from 'angular2/angular2';
 import {Http, httpInjectables} from 'angular2/http';
 import {coreDirectives} from 'angular2/angular2';
@@ -11,7 +11,7 @@ function transformData(data) {
 @Component({
   selector: 'app',
   lifecycle: [ (<any>LifecycleEvent).onInit ],
-  hostInjector: [ httpInjectables ]
+  bindings: [ httpInjectables ]
 })
 @View({
   directives: [ coreDirectives ],

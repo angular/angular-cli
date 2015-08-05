@@ -1,4 +1,4 @@
-/// <reference path="../../../server/typings/tsd.d.ts" />
+/// <reference path="../../../custom_typings/_custom.d.ts" />
 
 var express = require('express');
 var serveStatic = require('serve-static');
@@ -12,7 +12,7 @@ module.exports = function(ROOT) {
   var App     = require(universalPath + '/app/App').App;
   var TodoApp = require(universalPath + '/todo/index').TodoApp;
 
-  var universalServer = require(ROOT + '/dist/server/server');
+  var universalServer = require(ROOT + '/dist/modules/server/server');
   var httpInjectables = universalServer.httpInjectables;
 
   function stringToBoolean(txt) {
@@ -77,7 +77,7 @@ module.exports = function(ROOT) {
   });
 
   router.use('/preboot', function(req, res, next) {
-    serveStatic(ROOT + '/modules/examples/preboot_basic')(req, res, next);
+    serveStatic(ROOT + '/examples/preboot_basic')(req, res, next);
   });
 
   router.use('/web_modules', function(req, res, next) {

@@ -1,4 +1,4 @@
-/// <reference path="../../../server/typings/tsd.d.ts" />
+/// <reference path="../../../custom_typings/_custom.d.ts" />
 
 var express = require('express');
 var serveStatic = require('serve-static');
@@ -7,22 +7,20 @@ var path = require('path');
 
 module.exports = function(ROOT) {
   var app = express();
-
-  var ng2Engine = require(ROOT + '/dist/server/server').ng2engine;
+  var ng2Engine = require(ROOT + '/dist/modules/server/server').ng2engine;
   // rendering engine
 
   app.engine('ng2.html', ng2Engine);
-  app.set('views', path.join(ROOT, 'modules/examples'));
+  app.set('views', path.join(ROOT, 'examples'));
   app.set('view engine', 'ng2.html');
   app.set('view options', { doctype: 'html' });
-
 
   var routes = require('./routes')(ROOT);
   var api = require('./api')(ROOT);
 
 
   app.use(serveStatic(ROOT + '/dist'));
-  app.use(serveStatic(ROOT + '/modules/examples/app/public'));
+  app.use(serveStatic(ROOT + '/examples/app/public'));
 
   app.use('/api', api);
   app.use(routes);

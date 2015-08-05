@@ -1,4 +1,4 @@
-/// <reference path="../../../server/typings/tsd.d.ts" />
+/// <reference path="../../../custom_typings/_custom.d.ts" />
 
 var util = require('util');
 var {Router} = require('express');

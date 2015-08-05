@@ -1,4 +1,4 @@
-/// <reference path="../../../../server/typings/tsd.d.ts" />
+/// <reference path="../../../../custom_typings/_custom.d.ts" />
 // import {bootstrap} from '../../angular2_client/bootstrap-defer';
 import {bootstrap} from 'angular2/angular2';
 
@@ -13,7 +13,7 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
 @Component({
   selector: 'app',
   lifecycle: [ (<any>LifecycleEvent).onInit ],
-  hostInjector: [ Store, TodoFactory ]
+  bindings: [ Store, TodoFactory ]
 })
 @View({
   directives: [ coreDirectives, routerDirectives ],

@@ -39,12 +39,12 @@
     "modules/server/typings/tsd.d.ts",
     "modules/experimental/experimental.ts",
     "modules/server/server.ts",
-    "modules/examples/app/client/app.ts",
-    "modules/examples/app/server/api.ts",
-    "modules/examples/app/server/routes.ts",
-    "modules/examples/app/server/server.ts",
-    "modules/examples/app/universal/app/App.ts",
-    "modules/examples/app/universal/todo/index.ts"
+    "examples/app/client/app.ts",
+    "examples/app/server/api.ts",
+    "examples/app/server/routes.ts",
+    "examples/app/server/server.ts",
+    "examples/app/universal/app/App.ts",
+    "examples/app/universal/todo/index.ts"
   ],
    "formatCodeOptions": {
       "indentSize": 2,

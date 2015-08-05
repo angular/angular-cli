@@ -17,8 +17,8 @@ export var angularScript = `
   <!-- SystemJS -->
   <script src="/bower_components/system.js/dist/system.js"></script>
   <!-- Angular2: Bundle -->
-  <script src="/web_modules/angular2.dev.js"></script>
-  <script src="/web_modules/router.dev.js"></script>
+  <script src="/web_modules/js/bundle/angular2.dev.js"></script>
+  <script src="/web_modules/js/bundle/router.dev.js"></script>
   <script type="text/javascript">
     System.config({
       "baseURL": "/",
