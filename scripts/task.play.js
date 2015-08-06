@@ -38,7 +38,7 @@ module.exports = function (gulp) {
   
   return {
     'preboot': function () { 
-      start('/preboot_basic/preboot.html'); 
+      start('/preboot/preboot.html'); 
     },
     '': function () { 
       start('/'); 

@@ -1,3 +1,5 @@
+/// <reference path="../tsd_typings/tsd.d.ts" />
+
 var _           = require('lodash');
 var argv        = require('yargs').argv;
 var fs          = require('fs');
@@ -6,6 +8,7 @@ var delim       = path.normalize('/');
 var taskRegex   = /^task\.(.*)\.js$/;
 
 var SCRIPTS_FOLDER = 'scripts';
+
 /**
  * Set options defaults that are used for batter tasks
  */

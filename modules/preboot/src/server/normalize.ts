@@ -1,4 +1,5 @@
-/// <reference path="../../typings/tsd.d.ts"/>
+/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
+
 /**
  * this module is used to take input from the user on the server side
  * for the preboot options they want and to standarize those options

@@ -1,4 +1,4 @@
-/// <reference path="../../typings/tsd.d.ts"/>
+/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
 
 import * as Q from 'q';
 import uglify = require('gulp-uglify');
