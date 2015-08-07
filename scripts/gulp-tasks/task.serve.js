@@ -12,9 +12,8 @@ module.exports = function (gulp) {
     
     return $.nodemon({
       verbose: true,
-      watch: ['dist', 'modules/examples'],
       script: path.resolve(__dirname + '/../../index.js'),
-      ext: 'js,ts,html',
+      ext: 'js ts html',
       ignore: ['\\.git', 'node_modules', '*.js.map', '*_spec.js', 'angular']
     }).on('restart', function(){
   		gulp.src('index.js')
