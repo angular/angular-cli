@@ -27,8 +27,12 @@
     "webdriver-start": "gulp protractor.start",
     "preprotractor": "gulp protractor.update",
     "protractor": "gulp protractor",
-    "remove-angular2": "rm -rf node_modules/angular2",
-    "remove-angular-typings": "rm -rf angular/modules/angular2/typings",
+    "remove-dist": "rm -rf ./dist",
+    "remove-tsd-typing": "rm -rf ./tsd_typings",
+    "remove-angular2": "rm -rf ./node_modules/angular2",
+    "remove-angular-typings": "rm -rf ./angular/modules/angular2/typings",
+    "remove-angular-dist": "rm -rf ./angular/dist",
+    "remove-web-modules": "rm -rf ./web_modules",
     "update-angular": "git submodule foreach 'npm install && gulp build.js || true'",
     "pull-angular": "git submodule foreach 'git pull https://github.com/angular/angular.git master'",
     "angular-submodule": "git submodule init && git submodule update && npm run pull-angular && npm run remove-angular-typings && npm run remove-angular2 && npm run update-angular && git submodule update",
@@ -36,7 +40,7 @@
     "web_modules": "bash ./scripts/update-ng-bundle.sh",
     "tsd": "tsd reinstall",
     "preinstall": "npm run tsd && npm run angular-submodule",
-    "postinstall": "tsc || true && npm run web_modules && npm run bower && npm run webdriver-update"
+    "postinstall": "tsc || true && npm run remove-web-modules && npm run web_modules && npm run bower && npm run webdriver-update"
   },
   "repository": {
     "type": "git",
