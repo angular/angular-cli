@@ -5,7 +5,7 @@ var path        = require('path');
 var delim       = path.normalize('/');
 var taskRegex   = /^task\.(.*)\.js$/;
 
-var SCRIPTS_FOLDER = 'scripts';
+var SCRIPTS_FOLDER = 'scripts/gulp-tasks/';
 /**
  * Set options defaults that are used for batter tasks
  */
