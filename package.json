@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "prestart": "gulp build",
-    "build": "gulp build.typescript",
+    "build": "gulp build.typescript && gulp build.preboot",
     "serve": "gulp serve",
     "start": "gulp serve",
     "watch": "gulp watch",
@@ -20,13 +20,13 @@
     "clean": "gulp clean",
     "preboot": "gulp build.preboot",
     "test": "gulp karma",
+    "ci": "gulp lint && gulp karma",
     "changelog": "gulp changelog",
     "e2e": "gulp protractor",
     "webdriver-update": "gulp protractor.update",
     "webdriver-start": "gulp protractor.start",
     "preprotractor": "gulp protractor.update",
     "protractor": "gulp protractor",
-    
     "remove-angular2": "rm -rf node_modules/angular2",
     "remove-angular-typings": "rm -rf angular/modules/angular2/typings",
     "update-angular": "git submodule foreach 'npm install && gulp build.js || true'",
