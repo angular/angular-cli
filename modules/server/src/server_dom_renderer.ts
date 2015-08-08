@@ -11,7 +11,7 @@ import {EventManager} from 'angular2/src/render/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/render/dom/view/shared_styles_host';
 import {TemplateCloner} from 'angular2/src/render/dom/template_cloner';
 import {resolveInternalDomView} from 'angular2/src/render/dom/view/view';
-
+import {DOM} from 'angular2/src/dom/dom_adapter';
 import {bind, Injectable, Inject} from 'angular2/di';
 
 @Injectable()
@@ -29,7 +29,8 @@ export class ServerDomRenderer extends DomRenderer {
   setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
     if (propertyName === 'value' || propertyName === 'checked') {
       var view = resolveInternalDomView(location.renderView);
-      if (view.boundElements[location.renderBoundElementIndex].name === 'input') {
+      var element = view.boundElements[location.renderBoundElementIndex];
+      if (DOM.nodeName(element) === 'input') {
         view.setElementAttribute(location.renderBoundElementIndex, propertyName, propertyValue);
         return;
       }
@@ -40,7 +41,8 @@ export class ServerDomRenderer extends DomRenderer {
   invokeElementMethod(location: RenderElementRef, methodName: string, args: List<any>) {
     if (methodName === 'focus') {
       var view = resolveInternalDomView(location.renderView);
-      if (view.boundElements[location.renderBoundElementIndex].name === 'input') {
+      var element = view.boundElements[location.renderBoundElementIndex];
+      if (DOM.nodeName(element) === 'input') {
         view.setElementAttribute(location.renderBoundElementIndex, 'autofocus', null);
         return;
       }
