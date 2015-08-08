@@ -2,14 +2,14 @@
 'use strict';
 
 module.exports = function (gulp) {
-  
+
   return function() {
-    
+
     var path = require('path'),
         $ = require('gulp-load-plugins')();
-    
+
     $.livereload.listen();
-    
+
     return $.nodemon({
       verbose: true,
       script: path.resolve(__dirname + '/../../index.js'),
@@ -18,9 +18,9 @@ module.exports = function (gulp) {
     }).on('restart', function(){
   		gulp.src('index.js')
   			.pipe($.livereload())
-  			.pipe($.notify('Reloading page, please wait...'));
+  			// .pipe($.notify('Reloading page, please wait...'));
   	});
-    
+
   }
-  
+
 };
