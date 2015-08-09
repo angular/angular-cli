@@ -256,9 +256,8 @@ gulp.task('!serve.nodemon', function(){
   })
   //.on('change', ['serve:watch'])
   .on('restart', function(){
-    gulp.src('index.js')
-      .pipe($.livereload())
-      .pipe($.notify('Reloading page, please wait...'));
+    gulp.src('index.js').pipe($.livereload());
+      // .pipe($.notify('Reloading page, please wait...'));
   });
 });
 
