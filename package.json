@@ -52,6 +52,7 @@
   "devDependencies": {
     "bower": "^1.4.1",
     "brfs": "^1.4.0",
+    "browser-sync": "^2.8.2",
     "connect-history-api-fallback": "^1.1.0",
     "connect-livereload": "^0.5.3",
     "conventional-changelog": "^0.2.1",
@@ -65,6 +66,7 @@
     "gulp-nodemon": "^2.0.3",
     "gulp-notify": "^2.2.0",
     "gulp-protractor": "^1.0.0",
+    "gulp-size": "^1.2.3",
     "gulp-tslint": "^3.1.0-beta",
     "gulp-typescript": "^2.8.0",
     "jasmine": "^2.3.1",
