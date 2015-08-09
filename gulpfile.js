@@ -13,8 +13,8 @@ var child_process = require('child_process');
 
 var $ = require('gulp-load-plugins')({
 	pattern: [
-		'gulp-*', 
-		'gulp.*', 
+		'gulp-*',
+		'gulp.*',
 		'del',
 		'run-sequence',
 		'conventional-changelog',
@@ -47,7 +47,7 @@ var paths = {
 		karma: path.join(__dirname + '/karma.conf.js'),
 		protractor: path.join(__dirname + '/protractor.conf.js')
 	},
-	
+
 	cleanable: [
     './dist/',
     './tsd_typings/',
@@ -62,8 +62,8 @@ var paths = {
 	},
 
   preboot: {
-    server: path.join(__dirname, '/dist/preboot/server'),
-    dest: path.join(__dirname, './modules/examples/preboot_basic')
+    server: path.join(__dirname, '/dist/modules/preboot/server'),
+    dest: path.join(__dirname, './examples/preboot_basic')
   },
 
   changelog: {
@@ -79,7 +79,7 @@ var paths = {
 // Tasks definitions
 
 gulp.task('default', function(done){
-	
+
 	return $.runSequence(
 		'lint',
 		'karma',
@@ -91,9 +91,9 @@ gulp.task('default', function(done){
 gulp.task('build', ['build.preboot']);
 
 gulp.task('build.preboot', function(){
-	
+
 	var preboot = require(paths.preboot.server);
-            
+
   return preboot.getClientCodeStream({
     appRoot:  'app',         // selector for root element
     freeze:   'spinner',     // show spinner w button click & freeze page
@@ -104,7 +104,7 @@ gulp.task('build.preboot', function(){
     presets:  ['keyPress', 'buttonPress', 'focus']
   })
   .pipe($.size())
-  .pipe(gulp.dest(paths.preboot.dest));	
+  .pipe(gulp.dest(paths.preboot.dest));
 });
 
 gulp.task('build.typescript', ['build.typescript.project']);
@@ -119,7 +119,7 @@ gulp.task('build.typescript.project', function(){
 });
 
 gulp.task('build.typescript.all', function(){
-  
+
   return gulp.src(paths.files.ts)
     .pipe($.typescript(tsProject))
     .pipe($.size())
@@ -127,7 +127,7 @@ gulp.task('build.typescript.all', function(){
 });
 
 gulp.task('changelog', function(){
-      
+
   return $.conventionalChangelog({
     preset: 'angular'
   })
@@ -145,17 +145,17 @@ gulp.task('clean', function(){
       console.log('Deleted folders:\n', paths.join('\n'));
     }
   });
-    
+
 });
 
 gulp.task('debug', function(){
-	  
+
   return gulp.src(paths.serverIndex).pipe($.nodeInspector());
 
 });
 
 gulp.task('jasmine', function(){
-	
+
   return gulp.src(paths.specs)
     .pipe($.jasmine({
       reporter: new $.jasmineReporters.TerminalReporter({
@@ -201,14 +201,14 @@ gulp.task('protractor.update', function(done){
 });
 
 gulp.task('lint', function(){
-	
+
 	return gulp.src(paths.files.ts)
     .pipe($.tslint())
 		.pipe($.tslint.report('verbose'));
 
 });
 
-// @todo figure out what "play" should do! 
+// @todo figure out what "play" should do!
 gulp.task('play', ['!browser-sync'], function() {
   //$.opn('http://'+serverip+':' + serverport + '/');
 });
@@ -245,9 +245,9 @@ gulp.task('!browser-sync', function() {
 gulp.task('serve', ['!serve.nodemon']);
 
 gulp.task('!serve.nodemon', function(){
-     
+
   $.livereload.listen();
-  
+
   return $.nodemon({
     verbose: true,
     script: paths.serverIndex,
