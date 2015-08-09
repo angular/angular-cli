@@ -39,3 +39,38 @@ export function ng2engine(filePath: string, options, done) {
     done(e);
   }
 };
+
+export function simpleReplace(filePath: string, options, done) {
+  // defaults
+  options = options || {};
+
+  // read file on disk
+  try {
+    fs.readFile(filePath, (err, content) => {
+
+      if (err) { return done(err); }
+
+      // convert to string
+      var clientHtml = content.toString();
+
+      // TODO: better build scripts abstraction
+      if (options.server === false && options.client === false) {
+        return done(null, clientHtml);
+      }
+      if (options.server === false && options.client !== false) {
+        return done(null, buildClientScripts(clientHtml, options));
+      }
+
+      let rendered = clientHtml.replace(
+        // <selector></selector>
+        selectorRegExpFactory(options.selector),
+        // <selector>{{ serializedCmp }}</selector>
+        options.serializedCmp
+      );
+
+      done(null, buildClientScripts(rendered, options));
+    });
+  } catch (e) {
+    done(e);
+  }
+}
