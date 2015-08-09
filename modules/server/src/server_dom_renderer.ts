@@ -23,7 +23,7 @@ export class ServerDomRenderer extends DomRenderer {
     @Inject(DOCUMENT_TOKEN) document,
     @Inject(DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES) reflectPropertiesAsAttributes: boolean
   ) {
-     super(_eventManager, _domSharedStylesHost, _templateCloner, document, reflectPropertiesAsAttributes)
+     super(_eventManager, _domSharedStylesHost, _templateCloner, document, reflectPropertiesAsAttributes);
   }
 
   setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
