@@ -196,9 +196,9 @@ export function createNgZone(handler: ExceptionHandler): NgZone {
 
 
 export function bootstrap(appComponentType: Type,
+                          componentInjectableBindings: List<Binding> = null,
                           appInjector: any = null,
-                          appDocument: any = null,
-                          componentInjectableBindings: List<Binding> = null): Promise {
+                          appDocument: any = null): Promise {
   wtfInit();
   let bootstrapProcess = PromiseWrapper.completer();
 
@@ -220,9 +220,6 @@ export function bootstrap(appComponentType: Type,
     };
 
     let serverBindings = [
-      bind(DOCUMENT_TOKEN).toValue(appDocument || DOM.defaultDoc()),
-      bind(DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES).toValue(false),
-      bind(appComponentTypeToken).toValue(appComponentType),
       // bind(appComponentRefToken).toFactory(componentLoader, bindingsCmpLoader)
     ];
 

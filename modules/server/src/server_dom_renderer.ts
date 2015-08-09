@@ -54,7 +54,7 @@ export class ServerDomRenderer extends DomRenderer {
 }
 
 
-export var serverInjectables = [
+export var serverDomRendererInjectables = [
   ServerDomRenderer,
   bind(Renderer).toClass(ServerDomRenderer)
 ];

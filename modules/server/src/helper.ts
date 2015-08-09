@@ -21,6 +21,25 @@ export function showDebug(options = {}): string {
   return info;
 }
 
+export function stringToBoolean(txt) {
+  if (typeof txt !== 'string') { return txt; }
+  switch (txt.toLowerCase()) {
+    case'false': case'\'false\'': case'"false"': case'0': case'no': return false;
+    case'true': case'\'true\'': case'"true"': case'1': case'yes': return true;
+    default: return txt;
+  }
+}
+
+export function queryParamsToBoolean(query) {
+  var obj = {};
+  for (let prop in query) {
+    if (query.hasOwnProperty(prop)) {
+      obj[prop] = stringToBoolean(query[prop]);
+    }
+  }
+  return obj;
+}
+
 
 export function selectorRegExpFactory(selector: string): RegExp {
   /*
