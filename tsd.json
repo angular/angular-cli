@@ -33,10 +33,10 @@
       "commit": "2a5858c16563634453533009242b8e0b18521370"
     },
     "angular2/angular2.d.ts": {
-      "commit": "383a3bc8e654a77eb8bd07d9feb7208735dcb6fa"
+      "commit": "3b0f362204ea965952dafdb682a5274d527ef9d0"
     },
     "angular2/router.d.ts": {
-      "commit": "383a3bc8e654a77eb8bd07d9feb7208735dcb6fa"
+      "commit": "3b0f362204ea965952dafdb682a5274d527ef9d0"
     },
     "browserify/browserify.d.ts": {
       "commit": "6baa15a0d760170b4aeefab68d581a1ea4034aa6"
