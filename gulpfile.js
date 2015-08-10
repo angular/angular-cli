@@ -86,13 +86,7 @@ var paths = {
   serverIndex : root('/index.js'),
 
   specs: [
-<<<<<<< HEAD
     'dist/**/*_spec.js'
-=======
-    'dist/**/*_spec.js',
-    'test/**/*_spec.js',
-      '!test/preboot/**/*_spec.js'
->>>>>>> upstream/master
   ]
 
 };
