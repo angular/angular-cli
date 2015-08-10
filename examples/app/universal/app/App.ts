@@ -1,6 +1,6 @@
 /// <reference path="../../../../custom_typings/_custom.d.ts" />
 import {Component, View, LifecycleEvent} from 'angular2/angular2';
-import {Http, httpInjectables} from 'angular2/http';
+import {Http} from 'angular2/http';
 import {coreDirectives} from 'angular2/angular2';
 
 function transformData(data) {
@@ -11,7 +11,7 @@ function transformData(data) {
 @Component({
   selector: 'app',
   lifecycle: [ (<any>LifecycleEvent).onInit ],
-  bindings: [ httpInjectables ]
+  bindings: [ ]
 })
 @View({
   directives: [ coreDirectives ],
@@ -80,6 +80,7 @@ export class App {
   itemCount: number    = 0;
   buttonTest: string   = '';
   testingInput: string = 'default state on component';
+  
   constructor(private http: Http) {
 
   }
@@ -89,30 +90,29 @@ export class App {
     this.addItem();
     this.addItem();
 
-    // var todosObs = this.http.get('/api/todos').
-    //   toRx().
-    //   filter(res => res.status >= 200 && res.status < 300).
-    //   map(res => res.json()).
-    //   map(data => data.map(transformData));
+    var todosObs = this.http.get('/api/todos').
+        toRx().
+        filter(res => res.status >= 200 && res.status < 300).
+        map(res => res.json()).
+        map(data => data.map(transformData));
 
-    // todosObs.subscribe(
-    //   todos => {
-    //     console.log('next', todos);
-    //     todos.map(this.addItem.bind(this));
-    //   },
-    //   err => {
-    //     console.error('err', err);
-    //     throw err;
-    //   },
-    //   complete => {
-    //     console.log('complete', complete);
-    //   }
-    // );
+      todosObs.subscribe(
+        todos => {
+          todos.map(this.addItem.bind(this));
+        },
+        err => {
+          console.error('err', err);
+          throw err;
+        },
+        complete => {
+          // console.log('complete', complete);
+        }
+      );
 
   }
 
   log(val) {
-    console.log(val);
+    console.log('App.ts loggin...', val);
   }
 
   toggleNgIf() {
