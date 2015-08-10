@@ -4,6 +4,7 @@ var express = require('express');
 var serveStatic = require('serve-static');
 var historyApiFallback = require('connect-history-api-fallback');
 
+
 module.exports = function(ROOT) {
   var router = express.Router();
 
@@ -12,54 +13,49 @@ module.exports = function(ROOT) {
   var App     = require(universalPath + '/app/App').App;
   var TodoApp = require(universalPath + '/todo/index').TodoApp;
 
-  var universalServer = require(ROOT + '/dist/modules/server/server');
-  var httpInjectables = universalServer.httpInjectables;
 
-  function stringToBoolean(txt) {
-    if (typeof txt !== 'string') { return txt; }
-    switch (txt.toLowerCase()) {
-      case'false': case'\'false\'': case'"false"': case'0': case'no': return false;
-      case'true': case'\'true\'': case'"true"': case'1': case'yes': return true;
-      default: return txt;
-    }
-  }
+  var {
+    httpInjectables,
+    queryParamsToBoolean
+  } = require(ROOT + '/dist/modules/server/server');
+  // require('@angular/universal')
+
 
   router.
     route('/').
     get(function ngApp(req, res) {
-      res.render('app/universal/app/index', {
-        client: stringToBoolean(req.query.client),
-        server: stringToBoolean(req.query.server),
-        preboot: stringToBoolean(req.query.preboot),
-        bootstrap: stringToBoolean(req.query.bootstrap),
-        angular: stringToBoolean(req.query.angular),
+      let queryParams = queryParamsToBoolean(req.query);
+      let options = Object.assign(queryParams, {
+        // client url for systemjs
         componentUrl: 'examples/app/client/app',
 
         Component: App,
-        serverInjector: [
+        serverBindings: [
           httpInjectables
-        ]
-
+        ],
+        data: {}
       });
+
+      res.render('app/universal/app/index', options);
+
     });
 
   router.
     route('/examples/todo').
     get(function ngTodo(req, res) {
-      res.render('app/universal/todo/index', {
-        client: stringToBoolean(req.query.client),
-        server: stringToBoolean(req.query.server),
-        preboot: stringToBoolean(req.query.preboot),
-        bootstrap: stringToBoolean(req.query.bootstrap),
-        angular: stringToBoolean(req.query.angular),
+      let queryParams = queryParamsToBoolean(req.query);
+      let options = Object.assign(queryParams , {
+        // client url for systemjs
         componentUrl: 'examples/app/universal/todo/index',
 
         Component: TodoApp,
-        serverInjector: [
+        serverBindings: [
           httpInjectables
-        ]
-
+        ],
+        data: {}
       });
+
+      res.render('app/universal/todo/index', options);
 
     });
 

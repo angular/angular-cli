@@ -313,6 +313,12 @@ declare module "angular2/src/render/dom/events/event_manager" {
   }
 }
 
+declare module "angular2/src/render/dom/template_cloner" {
+  class TemplateCloner {
+
+  }
+}
+
 declare module "zone.js" {
   var zone: any;
   var Zone: any;
@@ -534,6 +540,18 @@ declare module "angular2/core" {
 }
 
 declare module "angular2/render" {
+  var DOCUMENT_TOKEN: any;
+  var DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES: any;
+  class RenderElementRef {
+    renderView: any;
+    renderBoundElementIndex: any;
+  }
+  class DomRenderer {
+    constructor(_eventManager: any, _domSharedStylesHost: any, _templateCloner: any, document: any, reflectPropertiesAsAttributes: any)
+    setElementProperty(location: any, propertyName: any, propertyValue: any): any;
+    invokeElementMethod(location: any, methodName: any, args: any): any;
+
+  }
   class ShadowDomStrategy {
     hasNativeContentElement(): boolean;
     prepareShadowRoot(el: any): any;

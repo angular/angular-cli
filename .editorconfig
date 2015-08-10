@@ -13,3 +13,6 @@ trim_trailing_whitespace = true
 [*.md]
 insert_final_newline = false
 trim_trailing_whitespace = false
+
+[*.json]
+insert_final_newline = false

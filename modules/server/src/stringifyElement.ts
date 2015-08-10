@@ -9,16 +9,13 @@ import {DOM} from 'angular2/src/dom/dom_adapter';
 import {isPresent, isString, StringWrapper} from 'angular2/src/facade/lang';
 
 var _singleTagWhitelist = ['br', 'hr', 'input'];
-
 export function stringifyElement(el): string {
   var result = '';
   if (DOM.isElementNode(el)) {
     var tagName = StringWrapper.toLowerCase(DOM.tagName(el));
-
-    // opening tag
-    result += `<${ tagName }`;
-
-    // attributes in an ordered way
+    // Opening tag
+    result += `<${tagName}`;
+    // Attributes in an ordered way
     var attributeMap = DOM.attributeMap(el);
     var keys = [];
     MapWrapper.forEach(attributeMap, (v, k) => { keys.push(k); });
@@ -33,20 +30,19 @@ export function stringifyElement(el): string {
       }
     }
     result += '>';
-
-    // children
+    // Children
     var children = DOM.childNodes(DOM.templateAwareRoot(el));
     for (let j = 0; j < children.length; j++) {
       result += stringifyElement(children[j]);
     }
-
-    // closing tag
+    // Closing tag
     if (!ListWrapper.contains(_singleTagWhitelist, tagName)) {
-      result += `</${ tagName }>`;
+      result += `</${tagName}>`;
     }
+  } else if (DOM.isCommentNode(el)) {
+    result += `<!--${DOM.nodeValue(el)}-->`;
   } else {
     result += DOM.getText(el);
   }
-
   return result;
 }

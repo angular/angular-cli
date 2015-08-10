@@ -36,7 +36,7 @@ env:
 
 before_install:
   - echo ${TSDRC} > .tsdrc
-  - npm install -g webpack
+  # - npm install -g webpack
   - npm install -g tsd
   - git submodule update --init --recursive
 
@@ -44,5 +44,4 @@ before_script:
   - npm install -g gulp
 
 script:
-  - gulp lint
-  - gulp test
+  - npm run ci

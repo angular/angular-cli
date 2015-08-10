@@ -50,7 +50,7 @@ function transformData(data) {
     <li *ng-for="var item of items">
       <input
         type="checkbox"
-        [value]="item.completed"
+        [checked]="item.completed"
         (change)="item.completed = $event.target.checked">
       <pre>{{ item | json }}</pre>
     </li>
@@ -131,7 +131,7 @@ export class App {
   addItem(value?: any) {
     var defaultItem = {
       value: `item ${ this.itemCount++ }`,
-      completed: false,
+      completed: true,
       created_at: new Date()
     };
     this.items.push(value || defaultItem);
