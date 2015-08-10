@@ -86,7 +86,8 @@ var paths = {
 
   specs: [
     'dist/**/*_spec.js',
-    'test/preboot/**/*_spec.js'
+    'test/**/*_spec.js',
+      '!test/preboot/**/*_spec.js'
   ]
 
 };
@@ -178,9 +179,14 @@ gulp.task('jasmine', function() {
     color: true
   });
 
+  var SpecReporter = require('jasmine-spec-reporter');
+  var specReporter = new SpecReporter();
+
   return gulp.src(paths.specs).
     pipe($.jasmine({
-      reporter: terminalReporter
+      verbose: true,
+      includeStackTrace: true,
+      reporter: specReporter
     }));
 
 });
@@ -225,8 +231,15 @@ gulp.task('protractor.update', function(done){
 gulp.task('lint', function() {
 
   return gulp.src(paths.files.ts).
-    pipe($.tslint())
+    pipe($.tslint()).
     pipe($.tslint.report('verbose'));
+
+});
+
+gulp.task('watch', function(){
+
+  gulp.watch(paths.files.ts, ['build.typescript.all']);
+  gulp.watch(paths.specs, ['jasmine']);
 
 });
 
@@ -262,7 +275,7 @@ gulp.task('!browser-sync', function() {
     watchOptions: {
       ignored: ['*.js.map', '*_spec.js']
     },
-    port: 3002,
+    port: 3000,
     host: serverip
   });
 
@@ -272,9 +285,11 @@ gulp.task('!browser-sync', function() {
 // "serve" defaults to nodemon for the moment.
 gulp.task('serve', ['!serve.nodemon']);
 
-gulp.task('!serve.nodemon', function() {
+gulp.task('!serve.nodemon', ['watch'], function() {
 
   $.livereload.listen();
+
+  $.opn('http://'+serverip+':' + serverport + '/');
 
   // TODO: refactor config to configuration section
   return $.nodemon({
@@ -283,17 +298,8 @@ gulp.task('!serve.nodemon', function() {
     ext: 'js ts html',
     ignore: ['\\.git', 'node_modules', '*.js.map', '*_spec.js', 'angular']
   }).
-  //on('change', ['serve:watch']).
   on('restart', function() {
     gulp.src('index.js').pipe($.livereload());
       // .pipe($.notify('Reloading page, please wait...'));
   });
 });
-
-
-
-
-
-
-
-

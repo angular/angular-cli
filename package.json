@@ -71,6 +71,7 @@
     "gulp-typescript": "^2.8.0",
     "jasmine": "^2.3.1",
     "jasmine-reporters": "^2.0.7",
+    "jasmine-spec-reporter": "^2.4.0",
     "karma": "^0.13.3",
     "karma-browserify": "^4.2.1",
     "karma-chrome-launcher": "^0.2.0",
@@ -105,6 +106,7 @@
     "require-dir": "^0.3.0",
     "run-sequence": "^1.1.2",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "xhr2": "^0.1.3"
   }
 }
