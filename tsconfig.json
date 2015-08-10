@@ -14,6 +14,7 @@
   	"outDir": "dist"
   },
   "files": [
+    "node_modules/typescript/bin/lib.es6.d.ts",
     "tsd_typings/tsd.d.ts",
     "modules/index.ts",
     "modules/preboot/client.ts",

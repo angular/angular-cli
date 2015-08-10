@@ -37,6 +37,13 @@ declare module "angular2/annotations" {
   var Query: any;
 }
 
+declare module "angular2/src/http/enums" {
+  class RequestMethodsMap {
+    getMethod(method: any): string;
+
+  }
+}
+
 declare module "angular2/src/http/backends/browser_xhr" {
   class BrowserXhr {
     constructor();
@@ -45,6 +52,17 @@ declare module "angular2/src/http/backends/browser_xhr" {
 }
 declare module "angular2/http" {
   import {BrowserXhr} from "angular2/src/http/backends/browser_xhr"
+  interface Connection {
+
+  }
+  enum ReadyStates {
+    UNSENT,
+    OPEN,
+    HEADERS_RECEIVED,
+    LOADING,
+    DONE,
+    CANCELLED
+  }
   class Http {
     _backend: any;
     _defaultOptions: any;
@@ -57,23 +75,49 @@ declare module "angular2/http" {
     patch(url: string, body: any, options?: any): any;
     head(url: string, options?: any): any;
   }
-  class HttpFactory {}
-  class ResponseOptions {}
+
+  class HttpFactory {
+
+  }
+
+  class ResponseOptions {
+    constructor(options: any)
+    merge(options: any): any;
+  }
+
   class XHRBackend {
     private _browserXHR: BrowserXhr;
     private _baseResponseOptions: ResponseOptions;
     constructor(_browserXHR: BrowserXhr, _baseResponseOptions: ResponseOptions)
     createConnection(request: any): any;
   }
+
+  class XHRConnection {
+    constructor(request: any, browserXHR: any, baseResponseOptions: any)
+  }
+
   class ConnectionBackend {
     constructor(req: any, browserXHR: any, baseResponseOptions?: any)
   }
+
   class RequestOptions {}
   class BaseRequestOptions {}
   class BaseResponseOptions {}
   class MockBackend {
     constructor(browserXHR: any, baseResponseOptions: any)
   }
+
+  class Request {
+    headers: any;
+    text: any;
+    method: any;
+    url: any;
+  }
+
+  class Response {
+    constructor(options: any)
+  }
+
   var httpInjectables: Array<any>;
 }
 
@@ -668,8 +712,9 @@ declare module "angular2/src/render/dom/shadow_dom/style_url_resolver" {
 
 declare module "angular2/src/facade/async" {
   class ObservableWrapper {
-    static callNext(next:any): any;
-    static subscribe(observer:any): any;
+    static callNext(next: any, obs?: any): any;
+    static subscribe(observer: any): any;
+    static callReturn(obs: any): any;
   }
   class Promise {
     then(pro:any): any;
@@ -681,6 +726,9 @@ declare module "angular2/src/facade/async" {
     static all(all: any): any;
     static then(pro:any, sucess?: any, failure?: any): any;
     static wrap(pro:any): any;
+  }
+  class EventEmitter {
+    toRx(): any;
   }
 }
 
@@ -708,6 +756,7 @@ declare module "angular2/src/facade/lang" {
   var int: any;
   var Type: Function;
   var isDart: boolean;
+  function ENUM_INDEX(method: any): any;
   var assertionsEnabled: any;
   function isPresent(bool: any): boolean;
   function isBlank(bool: any): boolean;
