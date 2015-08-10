@@ -20,7 +20,7 @@
     "clean": "gulp clean",
     "preboot": "gulp build.preboot",
     "test": "gulp karma",
-    "ci": "gulp lint # && gulp karma && gulp protractor",
+    "ci": "gulp ci",
     "changelog": "gulp changelog",
     "e2e": "gulp protractor",
     "webdriver-update": "gulp protractor.update",
