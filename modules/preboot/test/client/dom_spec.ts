@@ -155,6 +155,64 @@ describe('dom', function () {
     });
   });
   
+  describe('getSelection', function() {
+    it('should return zero if nothing passed in', function() {
+      expect(dom.getSelection(null)).toEqual({
+        start: 0,
+        end: 0,
+        direction: 'forward'
+      });
+    });
+    
+    it('should return the length of the node text if nothing else', function() {
+      let node = { focus: function() { }, value: 'booyeah' };
+
+      dom.state.document = {};
+      
+      let expected = { start: 7, end: 7, direction: 'forward' };
+      let actual = dom.getSelection(node);
+      expect(actual).toEqual(expected);
+    });
+    
+    it('should return if node.selectionStart exists', function() {
+      let node = { 
+        value: 'boo', 
+        selectionStart: 1,
+        selectionEnd: 3,
+        selectionDirection: 'backward'
+      };
+      
+      let expected = { start: 1, end: 3, direction: 'backward' };
+      let actual = dom.getSelection(node);
+      expect(actual).toEqual(expected);
+    });
+  });
+  
+  describe('setSelection()', function() {
+    it('should do nothing if no node passed in', function() {
+      dom.setSelection(null, null);
+    });
+    
+    it('should use setSelectionRange on node if available', function() {
+      let node = { 
+        focus: function() { }, 
+        setSelectionRange: function() {}
+      };
+      let selection = {
+        start: 4,
+        end: 7,
+        direction: 'forward'
+      };
+      
+      spyOn(node, 'focus');
+      spyOn(node, 'setSelectionRange');
+      
+      dom.setSelection(node, selection);
+      expect(node.focus).toHaveBeenCalled();
+      expect(node.setSelectionRange).toHaveBeenCalledWith(selection.start, selection.end, selection.direction);
+    });
+  });
+  
   describe('node tree fns', function () {
     
     // this is used to help with the testing of this function

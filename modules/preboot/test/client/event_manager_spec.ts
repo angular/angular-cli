@@ -62,7 +62,7 @@ describe('event_manager', function () {
       let preboot = { dom: {}, activeNode: null };
       let strategy = { trackFocus: true };
       let node = {};
-      let eventName = 'click';
+      let eventName = 'focusin';
       let event = { type: 'focusin', target: { name: 'foo' }};
       
       eventManager.state.listening = true;

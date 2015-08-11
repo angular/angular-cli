@@ -108,7 +108,7 @@ gulp.task('ci', function(done){
 
   var tasks = [
     'lint',
-    'karma',
+    'test'
     // 'protractor'
   ];
 
@@ -118,12 +118,11 @@ gulp.task('ci', function(done){
 
 gulp.task('build', [
   'preboot.example',
-  'preboot.karma',
-  'build.typescript'
+  'preboot.karma'
 ]);
 
 // build version of preboot to be used in a simple example
-gulp.task('preboot.example', function() {
+gulp.task('preboot.example', ['build.typescript'], function() {
 
   var preboot = require(paths.preboot.server);
 
@@ -142,7 +141,7 @@ gulp.task('preboot.example', function() {
 });
 
 // build verison of preboot to be used for karma testing
-gulp.task('preboot.karma', function() {
+gulp.task('preboot.karma', ['build.typescript'], function() {
 
       var b = browserify({
         entries: [paths.preboot.karmaEntryPoint],
@@ -203,7 +202,9 @@ gulp.task('debug', function() {
 
 });
 
-gulp.task('jasmine', function() {
+gulp.task('test', ['jasmine', 'karma']);
+
+gulp.task('jasmine', ['build.typescript'], function() {
 
   var terminalReporter = new $.jasmineReporters.TerminalReporter({
     verbose: 3,
@@ -225,7 +226,7 @@ gulp.task('jasmine', function() {
 
 gulp.task('karma', ['karma.preboot']);
 
-gulp.task('karma.preboot', function(done){
+gulp.task('karma.preboot', ['preboot.karma'], function(done){
 
   var karma = new $.karma.Server({
     port: 9201,
@@ -344,8 +345,7 @@ gulp.task('serve.preboot', function() {
   var express = require('express');
   var livereload = require('connect-livereload');
   var reloader = require('gulp-livereload');
-  var serveStatic = require('serve-index');
-  var serveIndex = require('serve-static');
+  var serveStatic = require('serve-static');
   var exec = require('child_process').exec;
   var open = require('open');
   var server = express();
@@ -355,10 +355,9 @@ gulp.task('serve.preboot', function() {
   server.use(livereload({
     port: livereloadport
   }));
-
-  server.use('/', serveStatic('dist/preboot'));
-  server.use('/', serveStatic('examples'));
-  server.use('/', serveIndex('examples'));
+  
+  server.use(serveStatic('dist'));
+  server.use(serveStatic('examples'));
 
   server.listen(serverport);
   reloader.listen({
@@ -368,8 +367,8 @@ gulp.task('serve.preboot', function() {
   open('http://localhost:3000/preboot/preboot.html');
 
   exec('tsc -w');
-  gulp.watch('dist/**/*', ['build']);
-  gulp.watch('examples/**/*', function () {
+  gulp.watch('modules/preboot/**/*', ['build']);
+  gulp.watch('dist/preboot/preboot.js', function () {
     reloader.reload();
   });
 

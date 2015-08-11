@@ -31,7 +31,7 @@ describe('presets', function () {
                 listen: [{
                     name: 'selectors',
                     eventsBySelector: {
-                        'input[type="text"],textarea':   ['focusin', 'focusout']
+                        'input[type="text"],textarea':   ['focusin', 'focusout', 'mousedown', 'mouseup']
                     },
                     trackFocus: true,
                     doNotReplay: true

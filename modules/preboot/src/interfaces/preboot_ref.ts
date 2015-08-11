@@ -10,6 +10,12 @@ interface DomState {
   clientRoot?: Element;
 }
 
+export interface CursorSelection {
+  start?: number;
+  end?: number;
+  direction?: string;
+}
+
 // interface for the dom wrapper
 interface Dom {
   state?: DomState;
@@ -27,6 +33,8 @@ interface Dom {
   addNodeToBody?(type: string, className: string, styles: Object);
   removeNode?(node: Element);
   findClientNode?(serverNode: Element): Element;
+  getSelection?(node: Element): CursorSelection;
+  setSelection?(node: Element, selection: CursorSelection);
 }
 
 // interface for preboot modules available to strategies
@@ -35,4 +43,5 @@ export interface PrebootRef {
   log?: Function;
   activeNode?: any;
   time?: number;
+  selection?: CursorSelection;
 }

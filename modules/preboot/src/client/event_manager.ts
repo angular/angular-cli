@@ -15,6 +15,9 @@ import * as listenSelect from './listen/listen_by_selectors';
 import * as replayHydrate from './replay/replay_after_hydrate';
 import * as replayRerender from './replay/replay_after_rerender';
 
+const caretPositionEvents = ['keyup', 'keydown', 'focusin', 'mouseup', 'mousedown'];
+const caretPositionNodes = ['INPUT', 'TEXTAREA'];
+
 // export state for testing purposes
 export let state = {
   eventListeners: [],
@@ -62,9 +65,16 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
 
     // when tracking focus keep a ref to the last active node
     if (strategy.trackFocus) {
-      preboot.activeNode = (event.type === 'focusin') ? event.target : null;
+      preboot.activeNode = caretPositionEvents.indexOf(eventName) >= 0 ? event.target : null;
     }
 
+    // if event occurred that affects caret position in a node that we care about, record it   
+    if (caretPositionEvents.indexOf(eventName) >= 0 &&
+      caretPositionNodes.indexOf(node.tagName) >= 0) {
+
+      preboot.selection = preboot.dom.getSelection(node);
+    }
+    
     // todo: need another solution for this hack
     if (eventName === 'keyup' && event.which === 13 && node.attributes['(keyup.enter)']) {
       preboot.dom.dispatchGlobalEvent('PrebootFreeze');
@@ -146,7 +156,7 @@ export function cleanup(preboot: PrebootRef, opts: PrebootOptions) {
   if (activeNode) {
     let activeClientNode = preboot.dom.findClientNode(activeNode);
     if (activeClientNode) {
-      activeClientNode.focus();
+      preboot.dom.setSelection(activeClientNode, preboot.selection);
     } else {
       preboot.log(6, activeNode);
     }

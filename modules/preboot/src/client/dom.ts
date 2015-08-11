@@ -6,6 +6,7 @@
  * add fixes for different browser quirks
  */
 import {Element} from '../interfaces/element';
+import {CursorSelection} from '../interfaces/preboot_ref';
 
 export let nodeCache = {};
 export let state = {
@@ -128,6 +129,47 @@ export function removeNode(node: Element) {
   node.remove ?
     node.remove() :
     node.style.display = 'none';
+}
+
+/**
+ * Get the caret position within a given node. Some hackery in
+ * here to make sure this works in all browsers
+ */
+export function getSelection(node: Element): CursorSelection {
+  let selection = {
+    start: 0,
+    end: 0,
+    direction: 'forward'
+  };
+  
+  // if browser support selectionStart on node (Chrome, FireFox, IE9+)
+  if (node && (node.selectionStart || node.selectionStart === 0)) {
+    selection.start = node.selectionStart;
+    selection.end = node.selectionEnd;
+    selection.direction = node.selectionDirection;
+
+  // else if nothing else for older unsupported browsers, just put caret at the end of the text      
+  } else if (node && node.value) {
+    selection.start = selection.end = node.value.length;
+  }
+  
+  return selection;
+}
+
+/**
+ * Set caret position in a given node
+ */
+export function setSelection(node: Element, selection: CursorSelection) {
+
+  // as long as node exists, set focus  
+  if (node) {
+    node.focus();
+  }
+
+  // set selection if a modern browser (i.e. IE9+, etc.)
+  if (node && node.setSelectionRange && selection) {
+    node.setSelectionRange(selection.start, selection.end, selection.direction);
+  }
 }
 
 /**
