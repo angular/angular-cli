@@ -1128,3 +1128,39 @@ declare module "angular2/di" {
   var InjectableAnnotation: any;
   var DependencyAnnotation: any;
 }
+
+declare module "angular2/src/router/location_strategy" {
+ 
+  class LocationStrategy {
+    path(): string;
+    pushState(ctx: any, title: string, url: string): void;
+    forward(): void;
+    back(): void
+    onPopState(fn: (_: any) => any): void;
+    getBaseHref(): string;
+  }
+
+  
+}
+
+declare module 'angular2/src/mock/mock_location_strategy' {
+  
+  import {LocationStrategy} from 'angular2/src/router/location_strategy';
+  import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
+  
+  class MockLocationStrategy extends LocationStrategy {
+    internalBaseHref: string;
+    internalPath: string;
+    internalTitle: string;
+    urlChanges: List<string>;
+    _subject: EventEmitter;
+    simulatePopState(url: string): void;
+    path(): string;
+    simulateUrlPop(pathname: string): void;
+    pushState(ctx: any, title: string, url: string): void;
+    onPopState(fn: (value: any) => void): void;
+    getBaseHref(): string;
+    back(): void;
+  }
+
+}
