@@ -355,7 +355,7 @@ gulp.task('serve.preboot', function() {
   server.use(livereload({
     port: livereloadport
   }));
-  
+
   server.use(serveStatic('dist'));
   server.use(serveStatic('examples'));
 
