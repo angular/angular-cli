@@ -73,11 +73,11 @@ import {AppViewManagerUtils} from 'angular2/src/core/compiler/view_manager_utils
 import {AppViewListener} from 'angular2/src/core/compiler/view_listener';
 import {ProtoViewFactory} from 'angular2/src/core/compiler/proto_view_factory';
 import {Renderer, RenderCompiler} from 'angular2/src/render/api';
-import {DomRenderer, DOCUMENT_TOKEN} from 'angular2/src/render/dom/dom_renderer';
+import {DomRenderer, DOCUMENT} from 'angular2/src/render/dom/dom_renderer';
 import {DefaultDomCompiler} from 'angular2/src/render/dom/compiler/compiler';
 import {internalView} from 'angular2/src/core/compiler/view_ref';
 
-import {appComponentRefToken, appComponentTypeToken} from 'angular2/src/core/application_tokens';
+import {APP_COMPONENT_REF_PROMISE, APP_COMPONENT} from 'angular2/src/core/application_tokens';
 
 // Server
 import {ElementRef} from 'angular2/src/core/compiler/element_ref';
@@ -98,10 +98,10 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
   }
 
   return [
-    bind(DOCUMENT_TOKEN)
+    bind(DOCUMENT)
         .toValue(DOM.defaultDoc()),
-    bind(appComponentTypeToken).toValue(appComponentType),
-    // bind(appComponentRefToken)
+    bind(APP_COMPONENT).toValue(appComponentType),
+    // bind(APP_COMPONENT_REF_PROMISE)
     //     .toFactory(
     //         (dynamicComponentLoader, injector, testability, registry) => {
 
@@ -115,7 +115,7 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     //         },
     //         [DynamicComponentLoader, Injector, Testability, TestabilityRegistry]),
 
-    bind(appComponentType).toFactory((ref) => ref.instance, [appComponentRefToken]),
+    bind(appComponentType).toFactory((ref) => ref.instance, [APP_COMPONENT_REF_PROMISE]),
     bind(LifeCycle)
         .toFactory((exceptionHandler) => new LifeCycle(exceptionHandler, null, assertionsEnabled()),
                    [ExceptionHandler]),
@@ -127,8 +127,6 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
               return new EventManager(plugins, ngZone);
             },
             [NgZone]),
-    bind(ShadowDomStrategy)
-        .toFactory((doc) => new EmulatedUnscopedShadowDomStrategy(doc.head), [DOCUMENT_TOKEN]),
     DomRenderer,
     DefaultDomCompiler,
     bind(Renderer).toAlias(DomRenderer),
@@ -157,7 +155,7 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     DynamicComponentLoader,
     Testability,
     AppRootUrl,
-    bind(appComponentRefToken).toFactory(
+    bind(APP_COMPONENT_REF_PROMISE).toFactory(
       (compiler, viewManager, injector, lifeCycle, testability, registry) => {
         var deferBootstrapProcess = PromiseWrapper.completer();
         function getBinding(typeOrBinding): Binding {
@@ -378,7 +376,7 @@ export function bootstrap(
 
     var appInjector = _createAppInjector(appComponentType, componentInjectableBindings, zone);
     var compRefToken: Promise =
-        PromiseWrapper.wrap(() => appInjector.get(appComponentRefToken));
+        PromiseWrapper.wrap(() => appInjector.get(APP_COMPONENT_REF_PROMISE));
     PromiseWrapper.then(
         compRefToken,
         (defer) => {

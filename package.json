@@ -94,6 +94,8 @@
   },
   "dependencies": {
     "angular2": "file:angular/dist/js/cjs/angular2",
+    "ngHttp": "file:angular/dist/js/cjs/http",
+    "benchpress": "file:angular/dist/js/cjs/benchpress",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
     "event-stream": "^3.3.1",

@@ -1,7 +1,7 @@
 /// <reference path="../../../../custom_typings/_custom.d.ts" />
 import {Component, View, LifecycleEvent} from 'angular2/angular2';
-import {coreDirectives} from 'angular2/angular2';
 // import {Http} from 'http/http';
+import {CORE_DIRECTIVES} from 'angular2/directives';
 
 function transformData(data) {
   data.created_at = new Date(data.created_at);
@@ -14,7 +14,7 @@ function transformData(data) {
   bindings: [ ]
 })
 @View({
-  directives: [ coreDirectives ],
+  directives: [ CORE_DIRECTIVES ],
   template: `
   <h1>Hello Server Renderer</h1>
   <h3>test binding {{ value }}</h3>
@@ -80,8 +80,8 @@ export class App {
   itemCount: number    = 0;
   buttonTest: string   = '';
   testingInput: string = 'default state on component';
-  
-  constructor(private http: Http) {
+
+  constructor(/*private http: Http*/) {
 
   }
 

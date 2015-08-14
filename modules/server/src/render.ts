@@ -18,10 +18,10 @@ import {DOM} from 'angular2/src/dom/dom_adapter';
 import {DirectiveResolver} from 'angular2/core';
 import {bind} from 'angular2/di';
 import {
-  DOCUMENT_TOKEN,
+  DOCUMENT,
   DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES
 } from 'angular2/src/render/render';
-import {appComponentTypeToken} from 'angular2/src/core/application_tokens';
+import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
 
 // TODO: maintain stateless Injector/document and directiveResolver
 var serverInjector = undefined; // js defaults only work with undefined
@@ -52,9 +52,9 @@ export function bootstrapServer(AppComponent, serverBindings: any = [], serverIn
   }
 
   let renderBindings = [
-    bind(DOCUMENT_TOKEN).toValue(serverDocument),
+    bind(DOCUMENT).toValue(serverDocument),
     bind(DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES).toValue(false),
-    bind(appComponentTypeToken).toValue(AppComponent),
+    bind(APP_COMPONENT).toValue(AppComponent),
     serverDomRendererInjectables
   ].
   concat(serverBindings);

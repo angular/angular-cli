@@ -9,8 +9,7 @@ import {
   BaseException,
   assertionsEnabled,
   print,
-  stringify,
-  isDart
+  stringify
 } from 'angular2/src/facade/lang';
 import {BrowserDomAdapter} from 'angular2/src/dom/browser_adapter';
 import {DOM} from 'angular2/src/dom/dom_adapter';
@@ -27,13 +26,13 @@ import {
   DynamicChangeDetection,
   JitChangeDetection,
   PreGeneratedChangeDetection,
-  Pipes,
-  defaultPipes,
   IterableDiffers,
   defaultIterableDiffers,
   KeyValueDiffers,
   defaultKeyValueDiffers
 } from 'angular2/src/change_detection/change_detection';
+
+import {DEFAULT_PIPES} from 'angular2/pipes';
 
 // correct path
 import {ExceptionHandler} from 'angular2/src/core/exception_handler';
@@ -51,6 +50,7 @@ import {ViewResolver} from 'angular2/src/core/compiler/view_resolver';
 // correct path
 import {DirectiveResolver} from 'angular2/src/core/compiler/directive_resolver';
 //
+import {PipeResolver} from 'angular2/src/core/compiler/pipe_resolver';
 
 import {List, ListWrapper} from 'angular2/src/facade/collection';
 import {Promise, PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/async';
@@ -82,11 +82,11 @@ import {ProtoViewFactory} from 'angular2/src/core/compiler/proto_view_factory';
 import {Renderer, RenderCompiler} from 'angular2/src/render/api';
 import {
   DomRenderer,
-  DOCUMENT_TOKEN,
+  DOCUMENT,
   DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES,
   DefaultDomCompiler,
   APP_ID_RANDOM_BINDING,
-  MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE_TOKEN,
+  MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE,
   TemplateCloner
 } from 'angular2/src/render/render';
 import {ElementSchemaRegistry} from 'angular2/src/render/dom/schema/element_schema_registry';
@@ -97,8 +97,9 @@ import {
 } from 'angular2/src/render/dom/view/shared_styles_host';
 import {internalView} from 'angular2/src/core/compiler/view_ref';
 
-import {appComponentRefPromiseToken, appComponentTypeToken} from 'angular2/src/core/application_tokens';
+import {APP_COMPONENT_REF_PROMISE, APP_COMPONENT} from 'angular2/src/core/application_tokens';
 import {wtfInit} from 'angular2/src/profile/wtf_init';
+import {EXCEPTION_BINDING} from 'angular2/src/core/platform_bindings';
 
 // Server
 import {ElementRef} from 'angular2/src/core/compiler/element_ref';
@@ -134,21 +135,19 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     //         [DynamicComponentLoader, Injector, Testability, TestabilityRegistry]),
 
     bind(appComponentType)
-        .toFactory(p => p.then(ref => ref.instance), [appComponentRefPromiseToken]),
+        .toFactory(p => p.then(ref => ref.instance), [APP_COMPONENT_REF_PROMISE]),
     bind(LifeCycle).toFactory((exceptionHandler) => new LifeCycle(null, assertionsEnabled()),
                               [ExceptionHandler]),
-    bind(EventManager)
-        .toFactory(
-            (ngZone) => {
-              var plugins =
-                  [new HammerGesturesPlugin(), new KeyEventsPlugin(), new DomEventsPlugin()];
-              return new EventManager(plugins, ngZone);
-            },
-            [NgZone]),
+    bind(EventManager).toFactory(
+      (ngZone) => {
+        var plugins = [new HammerGesturesPlugin(), new KeyEventsPlugin(), new DomEventsPlugin()];
+        return new EventManager(plugins, ngZone);
+      },
+      [NgZone]),
     DomRenderer,
     bind(Renderer).toAlias(DomRenderer),
     APP_ID_RANDOM_BINDING,
-    bind(MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE_TOKEN).toValue(20),
+    bind(MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE).toValue(20),
     TemplateCloner,
     DefaultDomCompiler,
     bind(ElementSchemaRegistry).toValue(new DomElementSchemaRegistry()),
@@ -164,15 +163,16 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     Compiler,
     CompilerCache,
     ViewResolver,
-    defaultPipes,
+    DEFAULT_PIPES,
     bind(IterableDiffers).toValue(defaultIterableDiffers),
     bind(KeyValueDiffers).toValue(defaultKeyValueDiffers),
     bind(ChangeDetection).toClass(bestChangeDetection),
     ViewLoader,
     DirectiveResolver,
+    PipeResolver,
     Parser,
     Lexer,
-    bind(ExceptionHandler).toFactory(() => new ExceptionHandler(DOM, isDart ? false : true), []),
+    EXCEPTION_BINDING,
     bind(XHR).toValue(new XHRImpl()),
     ComponentUrlMapper,
     UrlResolver,
@@ -185,13 +185,8 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
   ];
 }
 
-export function createNgZone(handler: ExceptionHandler): NgZone {
-  // bootstrapErrorReporter is needed because we cannot use custom exception handler
-  // configured via DI until the root Injector has been created.
-  var bootstrapErrorReporter = (exception, stackTrace) => handler.call(exception, stackTrace);
-  var zone = new NgZone({enableLongStackTrace: assertionsEnabled()});
-  // zone.overrideOnErrorHandler(bootstrapErrorReporter);
-  return zone;
+export function createNgZone(): NgZone {
+  return new NgZone({enableLongStackTrace: assertionsEnabled()});;
 }
 
 
@@ -205,7 +200,7 @@ export function bootstrap(appComponentType: Type,
 
   // TODO(rado): prepopulate template cache, so applications with only
   // index.html and main.js are possible.
-  let __zone = createNgZone(new ExceptionHandler(DOM, isDart ? false : true));
+  let __zone = createNgZone();
 
 
   try {
@@ -220,13 +215,8 @@ export function bootstrap(appComponentType: Type,
         });
     };
 
-    let serverBindings = [
-      // bind(appComponentRefToken).toFactory(componentLoader, bindingsCmpLoader)
-    ];
-
     // Server
-    let mergedBindings = isPresent(componentInjectableBindings) ?
-      ListWrapper.concat(componentInjectableBindings, serverBindings) : serverBindings;
+    let mergedBindings = isPresent(componentInjectableBindings) ? componentInjectableBindings : [];
 
     if (!appInjector) {
 

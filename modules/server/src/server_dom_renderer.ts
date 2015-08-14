@@ -4,7 +4,7 @@ import {
   DomRenderer,
   RenderElementRef,
   Renderer,
-  DOCUMENT_TOKEN,
+  DOCUMENT,
   DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES
 } from 'angular2/render';
 import {EventManager} from 'angular2/src/render/dom/events/event_manager';
@@ -20,7 +20,7 @@ export class ServerDomRenderer extends DomRenderer {
     private _eventManager: EventManager,
     private _domSharedStylesHost: DomSharedStylesHost,
     private _templateCloner: TemplateCloner,
-    @Inject(DOCUMENT_TOKEN) document,
+    @Inject(DOCUMENT) document,
     @Inject(DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES) reflectPropertiesAsAttributes: boolean
   ) {
      super(_eventManager, _domSharedStylesHost, _templateCloner, document, reflectPropertiesAsAttributes);
