@@ -9,6 +9,12 @@ declare module "angular2/angular2" {
   }
 }
 
+declare module "ngHttp/backends/browser_xhr" {
+  class BrowserXhr {
+    build(): any;
+  }
+}
+
 declare module "angular2/src/profile/wtf_init" {
   function wtfInit(): any;
 }
@@ -37,21 +43,26 @@ declare module "angular2/annotations" {
   var Query: any;
 }
 
-declare module "angular2/src/http/enums" {
+declare module "ngHttp/src/enums" {
   class RequestMethodsMap {
     getMethod(method: any): string;
 
   }
 }
 
-declare module "angular2/src/http/backends/browser_xhr" {
+declare module "ngHttp/src/http" {
+
+}
+
+declare module "ngHttp/src/backends/browser_xhr" {
   class BrowserXhr {
     constructor();
     build(): any;
   }
 }
-declare module "angular2/http" {
-  import {BrowserXhr} from "angular2/src/http/backends/browser_xhr"
+
+declare module "ngHttp/http" {
+  import {BrowserXhr} from "ngHttp/src/backends/browser_xhr"
   interface Connection {
 
   }
@@ -121,6 +132,80 @@ declare module "angular2/http" {
   var httpInjectables: Array<any>;
 }
 
+declare module "angular2/src/core/platform_bindings" {
+  var EXCEPTION_BINDING: any;
+}
+
+declare module "http/http" {
+  import {BrowserXhr} from "ngHttp/src/backends/browser_xhr"
+  interface Connection {
+
+  }
+  enum ReadyStates {
+    UNSENT,
+    OPEN,
+    HEADERS_RECEIVED,
+    LOADING,
+    DONE,
+    CANCELLED
+  }
+  class Http {
+    _backend: any;
+    _defaultOptions: any;
+    constructor(_backend?: any, _defaultOptions?: any);
+    request(url: string, options?: any): any;
+    get(url: string, options?: any): any;
+    post(url: string, body: any, options?: any): any;
+    put(url: string, body: any, options?: any): any;
+    delete(url: string, options?: any): any;
+    patch(url: string, body: any, options?: any): any;
+    head(url: string, options?: any): any;
+  }
+
+  class HttpFactory {
+
+  }
+
+  class ResponseOptions {
+    constructor(options: any)
+    merge(options: any): any;
+  }
+
+  class XHRBackend {
+    private _browserXHR: BrowserXhr;
+    private _baseResponseOptions: ResponseOptions;
+    constructor(_browserXHR: BrowserXhr, _baseResponseOptions: ResponseOptions)
+    createConnection(request: any): any;
+  }
+
+  class XHRConnection {
+    constructor(request: any, browserXHR: any, baseResponseOptions: any)
+  }
+
+  class ConnectionBackend {
+    constructor(req: any, browserXHR: any, baseResponseOptions?: any)
+  }
+
+  class RequestOptions {}
+  class BaseRequestOptions {}
+  class BaseResponseOptions {}
+  class MockBackend {
+    constructor(browserXHR: any, baseResponseOptions: any)
+  }
+
+  class Request {
+    headers: any;
+    text: any;
+    method: any;
+    url: any;
+  }
+
+  class Response {
+    constructor(options: any)
+  }
+
+  var httpInjectables: Array<any>;
+}
 
 declare module "angular2/mock" {
 }
@@ -295,7 +380,7 @@ declare module "angular2/src/render/dom/dom_renderer" {
     _createEventListener(): any
   }
   class DefaultDomCompiler {}
-  var DOCUMENT_TOKEN: any;
+  var DOCUMENT: any;
 }
 
 declare module "angular2/src/render/render" {
@@ -306,10 +391,10 @@ declare module "angular2/src/render/render" {
   }
   class DefaultDomCompiler {}
   class TemplateCloner {}
-  var DOCUMENT_TOKEN: any;
+  var DOCUMENT: any;
   var DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES: any;
   var APP_ID_RANDOM_BINDING: any;
-  var MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE_TOKEN: any;
+  var MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE: any;
 }
 
 declare module "angular2/src/render/api" {
@@ -380,8 +465,8 @@ declare module "angular2/directives" {
   function NgIf(): void;
   function NgFor(): void;
 
-  var formDirectives: any;
-  var coreDirectives: any;
+  var FORM_DIRECTIVES: any;
+  var CORE_DIRECTIVES: any;
 
 }
 
@@ -421,6 +506,7 @@ declare module "angular2/src/change_detection/change_detection" {
 }
 
 declare module "angular2/pipes" {
+  var DEFAULT_PIPES: any;
   class ObservablePipe {
     constructor(ref: any)
     _subscription: any;
@@ -489,9 +575,8 @@ declare module "angular2/src/render/xhr" {
 }
 
 declare module "angular2/src/core/application_tokens" {
-  var appComponentRefToken: any;
-  var appComponentTypeToken: any;
-  var appComponentRefPromiseToken: any;
+  var APP_COMPONENT_REF_PROMISE: any;
+  var APP_COMPONENT: any;
 }
 
 declare module "angular2/src/core/compiler/compiler" {
@@ -504,7 +589,7 @@ declare module "angular2/src/core/compiler/compiler" {
 }
 
 declare module "angular2/forms" {
-  var formDirectives: any;
+  var FORM_DIRECTIVES: any;
   var formInjectables: any;
   class FormBuilder {
     group(config: any): any
@@ -584,7 +669,7 @@ declare module "angular2/core" {
 }
 
 declare module "angular2/render" {
-  var DOCUMENT_TOKEN: any;
+  var DOCUMENT: any;
   var DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES: any;
   class RenderElementRef {
     renderView: any;
@@ -781,6 +866,12 @@ declare module "angular2/src/facade/lang" {
 declare module "angular2/src/core/compiler/directive_resolver" {
   class DirectiveResolver {
     resolve(appComponent: any): any
+  }
+}
+
+declare module "angular2/src/core/compiler/pipe_resolver" {
+  class PipeResolver {
+    resolve(pipes: any): any
   }
 }
 
@@ -1130,7 +1221,7 @@ declare module "angular2/di" {
 }
 
 declare module "angular2/src/router/location_strategy" {
- 
+
   class LocationStrategy {
     path(): string;
     pushState(ctx: any, title: string, url: string): void;
@@ -1140,14 +1231,14 @@ declare module "angular2/src/router/location_strategy" {
     getBaseHref(): string;
   }
 
-  
+
 }
 
 declare module 'angular2/src/mock/mock_location_strategy' {
-  
+
   import {LocationStrategy} from 'angular2/src/router/location_strategy';
   import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
-  
+
   class MockLocationStrategy extends LocationStrategy {
     internalBaseHref: string;
     internalPath: string;
