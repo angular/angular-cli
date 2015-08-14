@@ -35,6 +35,7 @@ function transformData(data) {
   </div>
   <div>
     <input
+      id="defaultValueInput"
       type="text"
       autofocus
       [value]="value"
