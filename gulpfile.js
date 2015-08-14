@@ -123,8 +123,14 @@ gulp.task('build', [
 
 // build version of preboot to be used in a simple example
 gulp.task('preboot.example', ['build.typescript'], function() {
-
+  var exec = require('child_process').exec;
   var preboot = require(paths.preboot.server);
+
+  // TODO: refactor these exec out
+  exec('mkdir -p ./dist');
+  exec('mkdir -p ./dist/preboot');
+  // copy static files to dist
+  exec('cp -fR examples/preboot/. ' + paths.preboot.exampleDest);
 
   return preboot.getClientCodeStream({
     appRoot:  'app',         // selector for root element
@@ -319,6 +325,23 @@ gulp.task('!browser-sync', function() {
 
 // "serve" defaults to nodemon for the moment.
 gulp.task('serve', ['!serve.nodemon']);
+
+gulp.task('nodemon', function() {
+
+  $.livereload.listen();
+
+  // TODO: refactor config to configuration section
+  return $.nodemon({
+    verbose: true,
+    script: paths.serverIndex,
+    ext: 'js ts html',
+    ignore: ['\\.git', 'node_modules', '*.js.map', '*_spec.js', 'angular']
+  }).
+  on('restart', function() {
+    gulp.src('index.js').pipe($.livereload());
+      // .pipe($.notify('Reloading page, please wait...'));
+  });
+});
 
 gulp.task('!serve.nodemon', ['watch'], function() {
 
