@@ -1,6 +1,6 @@
 /// <reference path="../../../../custom_typings/_custom.d.ts" />
 // import {bootstrap} from '../../angular2_client/bootstrap-defer';
-import {bootstrap} from 'angular2/angular2';
+import {bootstrap, ViewEncapsulation} from 'angular2/angular2';
 
 import {CORE_DIRECTIVES} from 'angular2/directives';
 import {Component, View, Directive, LifecycleEvent} from 'angular2/angular2';
@@ -16,7 +16,9 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
   bindings: [ Store, TodoFactory ]
 })
 @View({
+  encapsulation: ViewEncapsulation.NONE,
   directives: [ CORE_DIRECTIVES, routerDirectives ],
+  styles: [],
   template: `
 <section id="todoapp">
 

@@ -15,8 +15,13 @@ function transformData(data) {
 })
 @View({
   directives: [ CORE_DIRECTIVES ],
+  styles: [`
+  #intro {
+    background-color: red;
+  }
+  `],
   template: `
-  <h1>Hello Server Renderer</h1>
+  <h1 id="intro">Hello Server Renderer</h1>
   <h3>test binding {{ value }}</h3>
   <span>{{ value }}</span>
   {{ value }}
