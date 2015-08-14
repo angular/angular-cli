@@ -245,13 +245,17 @@ export function bootstrap(appComponentType: Type,
 
     let tick = componentRef => {
       var appChangeDetector = internalView(componentRef.hostView).changeDetector;
+
       // retrieve life cycle: may have already been created if injected in root component
       // var lc = appInjector.get(LifeCycle);
       // lc.registerWith(__zone, appChangeDetector);
       // lc.tick();
 
+      // Allow us to grab all the styles to render down to the client
+      let sharedStylesHost = appInjector.get(SharedStylesHost);
+
       bootstrapProcess.resolve(
-        new ApplicationRef(componentRef, appComponentType, appInjector, appChangeDetector)
+        new ApplicationRef(componentRef, appComponentType, appInjector, appChangeDetector, sharedStylesHost)
       );
     };
 
@@ -270,18 +274,20 @@ export function bootstrap(appComponentType: Type,
 }
 
 export class ApplicationRef {
-  _hostComponent:ComponentRef;
-  _hostComponentType:Type;
-  _hostElementRef:ElementRef;
-  _injector:Injector;
-  _changeDetection:ChangeDetection;
+  _hostComponent: ComponentRef;
+  _hostComponentType: Type;
+  _hostElementRef: ElementRef;
+  _injector: Injector;
+  _changeDetection: ChangeDetection;
+  _sharedStylesHost:SharedStylesHost;
   constructor(
-    hostComponent:ComponentRef, hostComponentType:Type, injector:Injector, changeDetection: ChangeDetection) {
+    hostComponent:ComponentRef, hostComponentType:Type, injector:Injector, changeDetection: ChangeDetection, sharedStylesHost:SharedStylesHost) {
     this._hostComponent = hostComponent;
     this._injector = injector;
     this._hostComponentType = hostComponentType;
     // Server
     this._changeDetection = changeDetection;
+    this._sharedStylesHost = sharedStylesHost;
     // Server
   }
 
@@ -296,6 +302,10 @@ export class ApplicationRef {
 
   get changeDetection() {
     return this._changeDetection;
+  }
+
+  get sharedStylesHost() {
+    return this._sharedStylesHost;
   }
 // Server
 

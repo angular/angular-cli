@@ -32,6 +32,7 @@ export function selectorResolver(Component): string {
   return serverDirectiveResolver.resolve(Component).selector;
 }
 
+
 export function applicationToString(appRef): string {
   // grab parse5 html element or default to the one we provided
   let element = appRef.hostElementRef.nativeElement;
@@ -80,7 +81,12 @@ export function renderToString(AppComponent, serverBindings: any = [], serverDoc
       // change detection
       appRef.changeDetection.detectChanges();
 
-      // serialize html
+      // TODO: we need a better way to manage the style host for server/client
+      // serialize all style hosts
+      let styles = appRef.sharedStylesHost.getAllStyles();
+      let serializedStyleHosts = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
+
+      // serialize Top Level Component
       let serializedCmp = applicationToString(appRef);
 
       // destroy appComponent
@@ -88,7 +94,7 @@ export function renderToString(AppComponent, serverBindings: any = [], serverDoc
       appRef.dispose();
 
       // return rendered version of our serialized component
-      return serializedCmp;
+      return serializedStyleHosts + serializedCmp;
     });
 }
 

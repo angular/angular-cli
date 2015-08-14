@@ -1,5 +1,5 @@
 /// <reference path="../../../../custom_typings/_custom.d.ts" />
-import {Component, View, LifecycleEvent} from 'angular2/angular2';
+import {Component, View, LifecycleEvent, ViewEncapsulation} from 'angular2/angular2';
 // import {Http} from 'http/http';
 import {CORE_DIRECTIVES} from 'angular2/directives';
 
@@ -14,6 +14,7 @@ function transformData(data) {
   bindings: [ ]
 })
 @View({
+  encapsulation: ViewEncapsulation.EMULATED,
   directives: [ CORE_DIRECTIVES ],
   styles: [`
   #intro {
