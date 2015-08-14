@@ -27,7 +27,7 @@ export class ServerDomRenderer extends DomRenderer {
   }
 
   setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
-    if (propertyName === 'value' || propertyName === 'checked') {
+    if (propertyName === 'value' || (propertyName === 'checked' && propertyValue !== false)) {
       var view = resolveInternalDomView(location.renderView);
       var element = view.boundElements[location.renderBoundElementIndex];
       if (DOM.nodeName(element) === 'input') {
