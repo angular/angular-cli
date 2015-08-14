@@ -1,7 +1,7 @@
 /// <reference path="../../../../custom_typings/_custom.d.ts" />
 import {Component, View, LifecycleEvent} from 'angular2/angular2';
-import {Http} from 'angular2/http';
 import {coreDirectives} from 'angular2/angular2';
+// import {Http} from 'http/http';
 
 function transformData(data) {
   data.created_at = new Date(data.created_at);
@@ -90,24 +90,24 @@ export class App {
     this.addItem();
     this.addItem();
 
-    var todosObs = this.http.get('/api/todos').
-        toRx().
-        filter(res => res.status >= 200 && res.status < 300).
-        map(res => res.json()).
-        map(data => data.map(transformData));
+    // var todosObs = this.http.get('/api/todos').
+    //     toRx().
+    //     filter(res => res.status >= 200 && res.status < 300).
+    //     map(res => res.json()).
+    //     map(data => data.map(transformData));
 
-      todosObs.subscribe(
-        todos => {
-          todos.map(this.addItem.bind(this));
-        },
-        err => {
-          console.error('err', err);
-          throw err;
-        },
-        complete => {
-          // console.log('complete', complete);
-        }
-      );
+    //   todosObs.subscribe(
+    //     todos => {
+    //       todos.map(this.addItem.bind(this));
+    //     },
+    //     err => {
+    //       console.error('err', err);
+    //       throw err;
+    //     },
+    //     complete => {
+    //       // console.log('complete', complete);
+    //     }
+    //   );
 
   }
 

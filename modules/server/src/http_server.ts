@@ -4,11 +4,11 @@
 import 'reflect-metadata';
 //
 
-import {BrowserXhr} from 'angular2/src/http/backends/browser_xhr';
-import {RequestMethodsMap} from 'angular2/src/http/enums';
+import {BrowserXhr} from 'ngHttp/src/backends/browser_xhr';
+import {RequestMethodsMap} from 'ngHttp/src/enums';
 
 import {
-  bind, 
+  bind,
   Injectable
 } from 'angular2/di';
 
@@ -26,15 +26,15 @@ import {
   Response,
   MockBackend,
   ReadyStates
-} from 'angular2/http';
+} from 'ngHttp/http';
 
 import {
-  EventEmitter, 
+  EventEmitter,
   ObservableWrapper
 } from 'angular2/src/facade/async';
 
 import {
-  isPresent, 
+  isPresent,
   ENUM_INDEX
 } from 'angular2/src/facade/lang';
 
@@ -53,7 +53,7 @@ class NodeConnection implements Connection {
   constructor(req: Request, browserXHR: BrowserXhr, baseResponseOptions?: ResponseOptions) {
     // TODO: get rid of this when enum lookups are available in ts2dart
     // https://github.com/angular/ts2dart/issues/221
-    
+
     var requestMethodsMap = new RequestMethodsMap();
     this.request = req;
     this.response = new EventEmitter();

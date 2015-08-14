@@ -19,6 +19,7 @@ export var angularScript = `
   <!-- Angular2: Bundle -->
   <script src="/web_modules/js/bundle/angular2.dev.js"></script>
   <script src="/web_modules/js/bundle/router.dev.js"></script>
+  <script src="/web_modules/js/bundle/http.dev.js"></script>
   <script type="text/javascript">
     System.config({
       "baseURL": "/",
