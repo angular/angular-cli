@@ -4,6 +4,25 @@
   "license": "MIT",
   "devDependencies": {
     "angular-cli": "0.0.*",
-    "ember-cli-inject-live-reload": "^1.3.0"
+    "angular2": "^2.0.0-alpha.34",
+    "ember-cli-inject-live-reload": "^1.3.0",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.9",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-jasmine": "^0.3.6",
+    "karma-sourcemap-loader": "^0.3.5",
+    "karma-webpack": "^1.7.0",
+    "reflect-metadata": "^0.1.0",
+    "typescript": "^1.5.3",
+    "typescript-simple-loader": "^0.3.4",
+    "webpack": "^1.11.0",
+    "css-loader": "^0.16.0",
+    "exports-loader": "^0.6.2",
+    "expose-loader": "^0.7.0",
+    "file-loader": "^0.8.4",
+    "json-loader": "^0.5.2",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.12.3",
+    "url-loader": "^0.5.6"
   }
 }

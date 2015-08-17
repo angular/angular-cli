@@ -8,9 +8,11 @@ import {Component, View, bootstrap} from 'angular2/angular2';
     templateUrl: '<%= htmlComponentName %>.html',
     directives: []
 })
-class <%= jsComponentName %>App {
-    constructor() {
+export class <%= jsComponentName %>App {
+    name: string;
 
+    constructor() {
+        this.name = 'World';
     }
 }
 bootstrap(<%= jsComponentName %>App);

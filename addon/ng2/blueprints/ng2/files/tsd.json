@@ -5,6 +5,9 @@
   "path": "src/typings",
   "bundle": "src/typings/tsd.d.ts",
   "installed": {
+    "jasmine/jasmine.d.ts": {
+      "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
+    },
     "angular2/angular2.d.ts": {
       "commit": "a6d979c0d0c210399bef224a451b13bcd62317a2"
     }
