@@ -1,0 +1,228 @@
+'use strict';
+
+var ng     = require('../helpers/ng');
+var expect    = require('chai').expect;
+var walkSync  = require('walk-sync');
+var glob      = require('glob');
+var Blueprint = require('ember-cli/lib/models/blueprint');
+var path      = require('path');
+var tmp       = require('ember-cli/tests/helpers/tmp');
+var root      = process.cwd();
+var util      = require('util');
+var conf      = require('ember-cli/tests/helpers/conf');
+var minimatch = require('minimatch');
+var intersect = require('lodash/array/intersection');
+var remove    = require('lodash/array/remove');
+var forEach   = require('lodash/collection/forEach');
+var any       = require('lodash/collection/some');
+var EOL       = require('os').EOL;
+
+var defaultIgnoredFiles = Blueprint.ignoredFiles;
+
+describe('Acceptance: ng init', function() {
+    this.timeout(20000);
+
+    before(function() {
+        conf.setup();
+    });
+
+    after(function() {
+        conf.restore();
+    });
+
+    beforeEach(function() {
+        Blueprint.ignoredFiles = defaultIgnoredFiles;
+
+        return tmp.setup('./tmp')
+            .then(function() {
+                process.chdir('./tmp');
+            });
+    });
+
+    afterEach(function() {
+        return tmp.teardown('./tmp');
+    });
+
+    function confirmBlueprinted() {
+        var blueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'ng2', 'files');
+        var expected      = walkSync(blueprintPath).sort();
+        var actual        = walkSync('.').sort();
+
+        forEach(Blueprint.renamedFiles, function(destFile, srcFile) {
+            expected[expected.indexOf(srcFile)] = destFile;
+        });
+
+        expected.forEach(function (file, index) {
+            expected[index] = file.replace(/__name__/g, 'angular-cli');
+        });
+
+        removeIgnored(expected);
+        removeIgnored(actual);
+
+        expected.sort();
+
+        expect(expected).to.deep.equal(actual, EOL + ' expected: ' +  util.inspect(expected) +
+        EOL + ' but got: ' +  util.inspect(actual));
+    }
+
+    function confirmGlobBlueprinted(pattern) {
+        var blueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'ng2', 'files');
+        var actual        = pickSync('.', pattern);
+        var expected      = intersect(pickSync(blueprintPath, pattern), actual);
+
+        removeIgnored(expected);
+        removeIgnored(actual);
+
+        expected.sort();
+
+        expect(expected).to.deep.equal(actual, EOL + ' expected: ' +  util.inspect(expected) +
+        EOL + ' but got: ' +  util.inspect(actual));
+    }
+
+    function pickSync(filePath, pattern) {
+        return glob.sync(path.join('**', pattern), {
+            cwd: filePath,
+            dot: true,
+            mark: true,
+            strict: true
+        }).sort();
+    }
+    function removeIgnored(array) {
+        remove(array, function(fn) {
+            return any(Blueprint.ignoredFiles, function(ignoredFile) {
+                return minimatch(fn, ignoredFile, {
+                    matchBase: true
+                });
+            });
+        });
+    }
+
+    it('ng init', function() {
+        return ng([
+            'init',
+            '--skip-npm',
+            '--skip-bower',
+        ]).then(confirmBlueprinted);
+    });
+
+    it('ng init can run in created folder', function() {
+        return tmp.setup('./tmp/foo')
+            .then(function() {
+                process.chdir('./tmp/foo');
+            })
+            .then(function() {
+                return ng([
+                    'init',
+                    '--skip-npm',
+                    '--skip-bower'
+                ]);
+            })
+            .then(confirmBlueprinted)
+            .then(function() {
+                return tmp.teardown('./tmp/foo');
+            });
+    });
+
+    it('init an already init\'d folder', function() {
+        return ng([
+            'init',
+            '--skip-npm',
+            '--skip-bower'
+        ])
+            .then(function() {
+                return ng([
+                    'init',
+                    '--skip-npm',
+                    '--skip-bower'
+                ]);
+            })
+            .then(confirmBlueprinted);
+    });
+
+    it('init a single file', function() {
+        return ng([
+            'init',
+            'package.json',
+            '--skip-npm',
+            '--skip-bower'
+        ])
+            .then(function() { return 'package.json'; })
+            .then(confirmGlobBlueprinted);
+    });
+
+    it('init a single file on already init\'d folder', function() {
+        return ng([
+            'init',
+            '--skip-npm',
+            '--skip-bower'
+        ])
+            .then(function() {
+                return ng([
+                    'init',
+                    'package.json',
+                    '--skip-npm',
+                    '--skip-bower'
+                ]);
+            })
+            .then(confirmBlueprinted);
+    });
+
+    it('init multiple files by glob pattern', function() {
+        return ng([
+            'init',
+            'src/**',
+            '--skip-npm',
+            '--skip-bower'
+        ])
+            .then(function() { return 'src/**'; })
+            .then(confirmGlobBlueprinted);
+    });
+
+    it('init multiple files by glob pattern on already init\'d folder', function() {
+        return ng([
+            'init',
+            '--skip-npm',
+            '--skip-bower'
+        ])
+            .then(function() {
+                return ng([
+                    'init',
+                    'src/**',
+                    '--skip-npm',
+                    '--skip-bower'
+                ]);
+            })
+            .then(confirmBlueprinted);
+    });
+
+    it('init multiple files by glob patterns', function() {
+        return ng([
+            'init',
+            'src/**',
+            'package.json',
+            '--skip-npm',
+            '--skip-bower'
+        ])
+            .then(function() { return '{src/**,package.json}'; })
+            .then(confirmGlobBlueprinted);
+    });
+
+    it('init multiple files by glob patterns on already init\'d folder', function() {
+        return ng([
+            'init',
+            '--skip-npm',
+            '--skip-bower'
+        ])
+            .then(function() {
+                return ng([
+                    'init',
+                    'src/**',
+                    'package.json',
+                    '--skip-npm',
+                    '--skip-bower'
+                ]);
+            })
+            .then(confirmBlueprinted);
+    });
+
+});

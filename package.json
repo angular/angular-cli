@@ -45,7 +45,13 @@
     ]
   },
   "devDependencies": {
+    "chai": "^3.2.0",
+    "exists-sync": "0.0.3",
     "glob": "^5.0.14",
-    "mocha": "^2.2.5"
+    "minimatch": "^2.0.10",
+    "mocha": "^2.2.5",
+    "rewire": "^2.3.4",
+    "through": "^2.3.8",
+    "walk-sync": "^0.1.3"
   }
 }
