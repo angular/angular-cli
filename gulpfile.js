@@ -87,6 +87,10 @@ var paths = {
 
   specs: [
     'dist/**/*_spec.js'
+  ],
+
+  e2e: [
+    'test/**/*.e2e.js'
   ]
 
 };
@@ -259,7 +263,7 @@ gulp.task('karma.preboot', ['preboot.karma'], function(done){
 
 gulp.task('protractor', function() {
 
-  return gulp.src(paths.specs).
+  return gulp.src(paths.e2e).
     pipe($.protractor.protractor({
       configFile: paths.config.protractor
     })).
@@ -335,7 +339,7 @@ gulp.task('nodemon', function() {
     verbose: true,
     script: paths.serverIndex,
     ext: 'js ts html',
-    ignore: ['\\.git', 'node_modules', '*.js.map', '*_spec.js', 'angular']
+    ignore: ['\\.git', 'node_modules', '*.js.map', '*_spec.js', 'angular', '.DS_Store']
   }).
   on('restart', function() {
     gulp.src('index.js').pipe($.livereload());
@@ -396,4 +400,3 @@ gulp.task('serve.preboot', function() {
   });
 
 });
-

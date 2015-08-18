@@ -12,7 +12,8 @@ exports.config = {
 
   jasmineNodeOpts: {
     defaultTimeoutInterval: 60000,
-    showTiming: true
+    showTiming: true,
+    print: function(){} // remove the dots!!
   },
 
   capabilities: {
@@ -36,6 +37,16 @@ exports.config = {
   onPrepare: function() {
     browser.manage().deleteAllCookies();
     browser.ignoreSynchronization = true;
+
+    var SpecReporter = require('jasmine-spec-reporter');
+    jasmine.getEnv().addReporter(new SpecReporter({
+      displayStacktrace:'none',
+      displaySpecDuration: true,
+      verbose: 1,
+      showStack: true,
+      color: true
+    }));
+
     /*
     // open a new browser for every benchmark
     var originalBrowser = browser;
