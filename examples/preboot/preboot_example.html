@@ -2,21 +2,35 @@
   
   <head>
     <link rel="stylesheet" href="preboot.css">
+    <style>
+      .frmelem {
+        height: 50px; width: 50%; font-size: 24px; padding: 0 20px; margin: 20px 25%;
+      }  
+      .frmbtn {
+        height: 50px; width: 50%; font-size: 24px; margin: 20px 25%; text-align: center; z-index: 99999999999;
+      }
+    </style>
     <script src="preboot.js"></script>
   </head>
   
   <body>
     <app>
-      <input style="height: 50px; width: 50%; font-size: 24px; padding: 0 20px; margin: 20px 25%" type="text" (keyup.enter)="enterEntered()"
-      name="one">
-      <button style="height: 50px; width: 50%; font-size: 24px text-align: center; margin: 20px 25%" preboot-events="click">Server View</button>
+      <input class="frmelem" type="text" (keyup.enter)="enterEntered()" name="one">
+      <input  class="frmelem" type="checkbox" name="blahCheck" value="foo">
+      <input class="frmelem" type="radio" name="choo" value="val1">
+      <input class="frmelem" type="radio" name="choo" value="val2">
+      <select class="frmelem"><option>op1</option><option>op2</option></select>
+      <button  class="frmelem" preboot-events="click">Server View</button>
     </app>
     <div class="client" style="display: none">
-      <input style="height: 50px; width: 50%; font-size: 24px; padding: 0 20px; margin: 20px 25%" type="text" (keyup.enter)="enterEntered()"
-      name="one">
-      <button style="height: 50px; width: 50%; font-size: 24px text-align: center; margin: 20px 25%" onclick="clientClick()">Client View</button>
+      <input  class="frmelem" type="text" (keyup.enter)="enterEntered()" name="one">
+      <input  class="frmelem" type="checkbox" name="blahCheck" value="foo">
+      <input class="frmelem" type="radio" name="choo" value="val1">
+      <input class="frmelem" type="radio" name="choo" value="val2">
+      <select class="frmelem"><option>op1</option><option>op2</option></select>
+      <button  class="frmelem" onclick="clientClick()">Client View</button>
     </div>
-    <button style="height: 50px; width: 50%; font-size: 24px text-align: center; margin: 20px 25%; z-index: 99999999999" onclick="fireBootstrapComplete()">
+    <button class="frmbtn" onclick="fireBootstrapComplete()">
       Fire Bootstrap complete yo
     </button>
     <script>

@@ -3,7 +3,8 @@ import {PrebootOptions} from '../interfaces/preboot_options';
 export default {
 
   /**
-   * Record key strokes in all textboxes and textareas
+   * Record key strokes in all textboxes and textareas as well as changes
+   * in other form elements like checkboxes, radio buttons and select dropdowns
    */
   keyPress: (opts: PrebootOptions) => {
     opts.listen = opts.listen || [];
@@ -11,6 +12,12 @@ export default {
       name: 'selectors',
       eventsBySelector: {
         'input[type="text"],textarea': ['keypress', 'keyup', 'keydown']
+      }
+    });
+    opts.listen.push({
+      name: 'selectors',
+      eventsBySelector: {
+        'input[type="checkbox"],input[type="radio"],select,option': ['change']
       }
     });
   },

@@ -7,6 +7,8 @@ export interface Style {
 export interface Element {
   id?: string;
   value?: string;
+  checked?: boolean;
+  selected?: boolean;
   tagName?: string;
   nodeName?: string;
   className?: string;

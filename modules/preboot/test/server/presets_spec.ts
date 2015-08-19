@@ -12,12 +12,20 @@ describe('presets', function () {
         it('should add listen selector', function () {
             let opts = { listen: [] };
             let expected = {
-                listen: [{
-                    name: 'selectors',
-                    eventsBySelector: {
-                        'input[type="text"],textarea': ['keypress', 'keyup', 'keydown']
-                    }
-                }]
+              listen: [
+                {
+                  name: 'selectors',
+                  eventsBySelector: {
+                    'input[type="text"],textarea': ['keypress', 'keyup', 'keydown']
+                  }
+                },
+                {
+                  name: 'selectors',
+                  eventsBySelector: {
+                    'input[type="checkbox"],input[type="radio"],select,option': ['change']
+                  }
+                }
+              ]
             };
             presetFns.keyPress(opts);
             expect(opts).toEqual(expected);

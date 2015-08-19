@@ -389,14 +389,14 @@ gulp.task('serve.preboot', function() {
   server.listen(serverport);
   reloader.listen({
     port: livereloadport,
-    reloadPage: '/preboot/preboot.html'
+    reloadPage: '/preboot/preboot_example.html'
   });
-  open('http://localhost:3000/preboot/preboot.html');
+  open('http://localhost:3000/preboot/preboot_example.html');
 
   exec('tsc -w');
   gulp.watch('modules/preboot/**/*', ['build']);
   gulp.watch('dist/preboot/preboot.js', function () {
     reloader.reload();
   });
-
+  
 });

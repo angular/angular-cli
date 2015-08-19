@@ -21,6 +21,8 @@ export function replayEvents(preboot: PrebootRef, strategy: ReplayStrategy, even
 
     // if client node found, need to explicitly set value and then dispatch event
     if (clientNode) {
+      clientNode.checked = serverNode.checked ? true : undefined;
+      clientNode.selected = serverNode.selected ? true : undefined;
       clientNode.value = serverNode.value;
       clientNode.dispatchEvent(event);
       preboot.log(3, serverNode, clientNode, event);
