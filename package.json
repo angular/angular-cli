@@ -39,7 +39,7 @@
     "bower": "bower install",
     "web_modules": "bash ./scripts/update-ng-bundle.sh",
     "tsd": "tsd reinstall",
-    "preinstall": "npm run tsd && npm run angular-submodule",
+    "preinstall": "npm run tsd # && npm run angular-submodule",
     "postinstall": "tsc || true && npm run remove-web-modules && npm run web_modules && npm run bower && npm run webdriver-update"
   },
   "repository": {
@@ -93,9 +93,7 @@
     "zone.js": "^0.5.2"
   },
   "dependencies": {
-    "angular2": "file:angular/dist/js/cjs/angular2",
-    "ngHttp": "file:angular/dist/js/cjs/http",
-    "benchpress": "file:angular/dist/js/cjs/benchpress",
+    "angular2": "2.0.0-alpha.35",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
     "event-stream": "^3.3.1",
