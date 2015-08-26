@@ -2,7 +2,7 @@ var webdriver = require('selenium-webdriver');
 
 describe('Test Page', function() {
   var EC = protractor.ExpectedConditions;
-  afterEach(verifyNoBrowserErrors);
+  // afterEach(verifyNoBrowserErrors);
 
   describe('Server only render', function() {
 
@@ -72,66 +72,76 @@ describe('Test Page', function() {
       browser.get(appendQuery('/', config));
     });
 
-    runTestSuites(config);
-    var subject, result;
+    // runTestSuites(config);
 
-    it('should have correct selection in an input', function() {
-      var start = browser.executeScript('return document.querySelectorAll("#defaultValueInput")[0].selectionStart');
-      var end   = browser.executeScript('return document.querySelectorAll("#defaultValueInput")[0].selectionEnd');
+    it('should have initial checked values for checkbox inputs', function() {
+      // attr
+      var subject = element.all(by.deepCss('input[checked]:checked')).count();
+      var result  = 3;
 
-      expect(start).toBe(0);
-      expect(end).toBe(0);
+
+      expect(subject).toEqual(result);
     });
-
-    xit('should have correct selection in an input during bootstrap', function() {
-      var start, end;
-
-      start = browser.executeScript('return document.querySelectorAll("#defaultValueInput")[0].selectionStart;');
-      end   = browser.executeScript('return document.querySelectorAll("#defaultValueInput")[0].selectionEnd;');
-
-      expect(start).toBe(0);
-      expect(end).toBe(0);
-
+    it('should have checked values for checkbox inputs', function() {
       bootstrapClient();
 
-      start = browser.executeScript('return document.querySelectorAll("#defaultValueInput")[0].selectionStart;');
-      end   = browser.executeScript('return document.querySelectorAll("#defaultValueInput")[0].selectionEnd;');
+      // prop
+      var result = 3;
+      var subject2 = browser.executeScript(function() {
+        return Array.prototype.filter.call(document.querySelectorAll("input[type=checkbox]"), function(box) {
+          return box.checked;
+        }).length;
+      });
 
-      // should be 0 not 6
-      expect(start).toBe(0);
-      expect(end).toBe(0);
+      expect(subject2).toEqual(result);
     });
 
-
-  });
-
-
-
-  // needed to maintain current element focus
-  describe('Server and Client rendered with Preboot.js and bootstrap', function() {
-
-    var config = {
-      server: true,
-      client: true,
-      preboot: true,
-      bootstrap: true
-    };
-
-    beforeEach(function() {
-      browser.get(appendQuery('/', config));
-    });
-
-    it('should be focused on page load', function() {
-      browser.driver.sleep(500);
-
-      var subject = browser.executeScript('return document.activeElement && document.activeElement.value');
+    it('should be focused on initial page load', function() {
       var result  = 'value8';
+      var subject = browser.executeScript(function() {
+        return document.activeElement && document.activeElement.value
+      });
 
-      expect(subject).toBe(result);
+      expect(subject).toEqual(result);
+    });
+    it('should be focused on client page load', function() {
+      bootstrapClient({focus: true});
+
+      var result  = 'value8';
+      var subject = browser.executeScript(function() {
+        return document.activeElement && document.activeElement.value
+      });
+      expect(subject).toEqual(result);
+    });
+
+    it('should have correct selection in an input during initial render', function() {
+      var result = [0,0];
+      var selection = browser.executeScript(function() {
+        return [
+          document.querySelectorAll("#defaultValueInput")[0].selectionStart,
+          document.querySelectorAll("#defaultValueInput")[0].selectionEnd
+        ]
+      });
+
+      expect(selection).toEqual(result);
+    });
+    it('should have correct selection in an input after bootstrap', function() {
+      bootstrapClient({focus: true});
+
+      var result = [0,0];
+      var selection = browser.executeScript(function() {
+        return [
+          document.querySelectorAll("#defaultValueInput")[0].selectionStart,
+          document.querySelectorAll("#defaultValueInput")[0].selectionEnd
+        ]
+      });
+
+      expect(selection).toEqual(result);
     });
 
 
   });
+
 
 });
 
@@ -151,8 +161,10 @@ function runTestSuites(config, env) {
     });
 
     it('should have default "value" property for inputs', function() {
-      subject = browser.executeScript('return document.querySelector("#defaultValueInput").value;');
-      result = 'value8';
+      var subject = browser.executeScript(function() {
+        return document.querySelector("#defaultValueInput").value;
+      });
+      var result = 'value8';
 
       expect(subject).toEqual(result);
 
@@ -161,7 +173,9 @@ function runTestSuites(config, env) {
     if (isClient) {
 
       it('should have a NULL "value" attribute (by default) for inputs', function() {
-        subject = browser.executeScript('return document.querySelector("#defaultValueInput").getAttribute("value");');
+        var subject = browser.executeScript(function() {
+          return document.querySelector("#defaultValueInput").getAttribute("value");
+        });
 
         expect(subject).toBeNull();
 
@@ -171,23 +185,29 @@ function runTestSuites(config, env) {
 
 
     it('should have a defined "value" attribute for inputs', function() {
-      subject = browser.executeScript(
-        'document.querySelector("#defaultValueInput").setAttribute("value", "value8");' +
-        'return document.querySelector("#defaultValueInput").getAttribute("value");'
-      );
-      result = 'value8';
+      var subject = browser.executeScript(function() {
+        document.querySelector("#defaultValueInput").setAttribute("value", "value8");
+        return document.querySelector("#defaultValueInput").getAttribute("value");
+      });
+      var result = 'value8';
 
       expect(subject).toEqual(result);
 
     });
 
     it('should have attribute "value" NOT EQUAL TO prop "value"', function() {
-      browser.executeScript(
-        'var input = document.querySelector("#defaultValueInput");' +
-        'input.value = "PROP"; input.setAttribute("value", "ATTR");'
-      );
-      var subject_attr = browser.executeScript('return document.querySelector("#defaultValueInput").getAttribute("value");');
-      var subject_prop = browser.executeScript('return document.querySelector("#defaultValueInput").value;');
+      browser.executeScript(function() {
+        var input = document.querySelector("#defaultValueInput");
+        input.value = "PROP";
+        input.setAttribute("value", "ATTR");
+      });
+
+      var subject_attr = browser.executeScript(function() {
+        return document.querySelector("#defaultValueInput").getAttribute("value");
+      });
+      var subject_prop = browser.executeScript(function() {
+        return document.querySelector("#defaultValueInput").value;
+      });
 
       expect(subject_attr).not.toEqual(subject_prop);
 
@@ -195,8 +215,11 @@ function runTestSuites(config, env) {
 
     if (!isServerCilent) {
       it('should be focused on page load', function() {
-        subject = browser.executeScript('return document.activeElement && document.activeElement.value');
-        result  = 'value8';
+        var subject = browser.executeScript(function() {
+          return document.activeElement && document.activeElement.value
+        });
+
+        var result  = 'value8';
 
         expect(subject).toBe(result);
       });
@@ -205,45 +228,40 @@ function runTestSuites(config, env) {
     if (isServer) {
 
       it('should have checked values for checkbox inputs', function() {
-        subject = element.all(by.deepCss('input[checked]:checked')).count();
-        result  = 3;
+        var subject = element.all(by.deepCss('input[checked]:checked')).count();
+        var result  = 3;
 
-        expect(subject).toBe(3);
+        expect(subject).toEqual(result);
 
-        subject = browser.executeScript('return document.querySelectorAll("input[checked]").length');
+        var subject2 = browser.executeScript(function() {
+          return document.querySelectorAll("input[checked]").length
+        });
 
-        expect(subject).toBe(3);
-      });
-    } else if (isPreboot) {
-      it('should have checked values for checkbox inputs', function() {
-        // attr
-        subject = element.all(by.deepCss('input[checked]:checked')).count();
-        result  = 3;
-
-        expect(subject).toBe(3);
-
-        bootstrapClient();
-
-        // prop
-        subject = browser.executeScript(''+
-          'return Array.prototype.filter.call(document.querySelectorAll("input[type=checkbox]"), function(box) {'+
-            'return box.checked'+
-          '}).length;'+
-        '');
-
-        expect(subject).toBe(3);
+        expect(subject2).toEqual(result);
       });
     }
 
 }
 
 function bootstrapClient(config) {
+  browser.driver.sleep(500);
   config = config || {};
   var EC = protractor.ExpectedConditions;
-  var bootstrapButton = element(by.deepCss('#bootstrapButton'));
-  browser.wait(EC.elementToBeClickable(bootstrapButton), 10000);
-  bootstrapButton.click();
-  if (!config.dontSleep) {
+  var bootstrapScript;
+  if (config.focus !== true) {
+    bootstrapScript = element(by.deepCss('#bootstrapButton'));
+    browser.wait(EC.elementToBeClickable(bootstrapScript), 10000);
+  }
+
+  if (config.focus === true) {
+    browser.executeScript(function() {
+      return window.bootstrap();
+    });
+  } else {
+    bootstrapScript.click();
+  }
+
+  if (config.async !== true) {
     browser.driver.sleep(500);
   }
 }
@@ -263,6 +281,7 @@ function verifyNoBrowserErrors() {
 }
 
 function appendQuery(url, options) {
+  options.cacheBuster = getRandomNumber();
   return url + Object.keys(options).map(function(key) {
     return '&' + key + '=' + options[key];
   }).join('').replace('&', '?');
