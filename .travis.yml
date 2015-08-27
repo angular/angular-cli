@@ -1,0 +1,17 @@
+sudo: false
+env:
+  - NODE_VERSION=0.10
+  - NODE_VERSION=0.12
+  - NODE_VERSION=iojs
+
+os:
+  - linux
+script: npm run-script test
+before_install:
+  - nvm install $NODE_VERSION
+  - npm config set spin false
+install:
+  - node --version
+  - npm --version
+  - git --version
+  - npm install --no-optional
