@@ -6,7 +6,7 @@ interface Deferred {
 }
 
 interface Refs<T> {
-  Object<T>;
+  [key: string]: T;
 }
 
 export class PreloadCache {
