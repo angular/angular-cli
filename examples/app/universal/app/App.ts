@@ -27,6 +27,12 @@ function transformData(data) {
   <span>{{ value }}</span>
   {{ value }}
 
+
+  <form name="testingForm">
+    <input name="testingInput" type="test">
+    <button>Submit</button>
+  </form>
+
   <div>
     <pre>// App.testing()
 {{ testing() | json }}</pre>
