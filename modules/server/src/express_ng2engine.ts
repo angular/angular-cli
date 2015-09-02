@@ -1,7 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
 import './server_patch';
 import * as fs from 'fs';
-import {selectorRegExpFactory} from './helper';
+import {selectorRegExpFactory, simpleTemplate} from './helper';
 
 
 import {renderToString, selectorResolver} from './render';
@@ -31,10 +31,10 @@ export function ng2engine(filePath: string, options, done) {
 
       // TODO: better build scripts abstraction
       if (options.server === false && options.client === false) {
-        return done(null, clientHtml);
+        return done(null, simpleTemplate(clientHtml, options));
       }
       if (options.server === false && options.client !== false) {
-        return done(null, buildClientScripts(clientHtml, options));
+        return done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
       }
 
       // bootstrap and render component to string
@@ -54,12 +54,11 @@ export function ng2engine(filePath: string, options, done) {
           // TODO: serializedData
         );
 
-        done(null, buildClientScripts(rendered, options));
+        done(null, buildClientScripts(simpleTemplate(rendered, options), options));
       })
       .catch(e => {
-        console.error(e);
         // if server fail then return client html
-        done(null, buildClientScripts(clientHtml, options));
+        done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
       });
     });
   } catch (e) {
