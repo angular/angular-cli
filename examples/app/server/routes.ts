@@ -13,9 +13,12 @@ module.exports = function(ROOT) {
   var App     = require(universalPath + '/app/App').App;
   var TodoApp = require(universalPath + '/todo/index').TodoApp;
 
+  var di = require('angular2/di');
 
   var {
     HTTP_BINDINGS,
+    SERVER_LOCATION_BINDINGS,
+    BASE_URL,
     queryParamsToBoolean
   } = require(ROOT + '/dist/modules/server/server');
   // require('@angular/universal')
@@ -31,7 +34,9 @@ module.exports = function(ROOT) {
 
         Component: App,
         serverBindings: [
-          HTTP_BINDINGS
+          HTTP_BINDINGS,
+          SERVER_LOCATION_BINDINGS,
+          di.bind(BASE_URL).toValue(req.baseUrl)
         ],
         data: {}
       });
@@ -50,7 +55,9 @@ module.exports = function(ROOT) {
 
         Component: TodoApp,
         serverBindings: [
-          HTTP_BINDINGS
+          HTTP_BINDINGS,
+          SERVER_LOCATION_BINDINGS,
+          di.bind(BASE_URL).toValue(req.baseUrl)
         ],
         data: {}
       });
