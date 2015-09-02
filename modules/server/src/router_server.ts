@@ -50,15 +50,15 @@ export class ServerLocationStrategy extends LocationStrategy {
 
   pushState(state: any, title: string, url: string) {/*TODO*/}
 
-  forward(): void { 
-    this._history.forward(); 
+  forward(): void {
+    this._history.forward();
   }
 
-  back(): void { 
-    this._history.back(); 
+  back(): void {
+    this._history.back();
   }
 }
 
-export const locationInjectables: Array<any> = [
+export const SERVER_LOCATION_BINDINGS: Array<any> = [
   bind(LocationStrategy).toClass(ServerLocationStrategy)
 ];
