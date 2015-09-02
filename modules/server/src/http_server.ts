@@ -7,10 +7,7 @@ import 'reflect-metadata';
 import {BrowserXhr} from 'ngHttp/src/backends/browser_xhr';
 import {RequestMethodsMap} from 'ngHttp/src/enums';
 
-import {
-  bind,
-  Injectable
-} from 'angular2/di';
+import {bind, OpaqueToken, Injectable, Optional, Inject} from 'angular2/di';
 
 import {
   Http,
@@ -35,10 +32,18 @@ import {
 
 import {
   isPresent,
-  ENUM_INDEX
+  ENUM_INDEX,
+  CONST_EXPR
 } from 'angular2/src/facade/lang';
 
+
+import * as XMLHttpRequest from 'xhr2';
+
 import { baseUrl } from './helper';
+
+
+export const BASE_URL: OpaqueToken = CONST_EXPR(new OpaqueToken('baseUrl'));
+
 
 class NodeConnection implements Connection {
   request: Request;
@@ -87,6 +92,13 @@ class NodeConnection implements Connection {
       // TODO(gdi2290): defer complete if array buffer until done
       ObservableWrapper.callReturn(this.response);
     });
+    this._xhr.addEventListener('error', (err) => {
+      var responseOptions = new ResponseOptions({body: err, type: ResponseTypes.Error, status: this._xhr.status});
+      if (isPresent(baseResponseOptions)) {
+        responseOptions = baseResponseOptions.merge(responseOptions);
+      }
+      ObservableWrapper.callThrow(this.response, new Response(responseOptions));
+    });
     // TODO(jeffbcross): make this more dynamic based on body type
 
     if (isPresent(req.headers)) {
@@ -106,11 +118,20 @@ class NodeConnection implements Connection {
 
 @Injectable()
 export class NodeXhr {
-  constructor() {}
+  _baseUrl: string;
+  constructor(@Optional() @Inject(BASE_URL) baseUrl?: string) {
+
+    if (isBlank(baseUrl)) {
+      throw new Error('No base url set. Please provide a BASE_URL bindings.');
+    }
+
+    this._baseUrl = baseUrl;
+
+  }
   build() {
-    let XMLHttpRequest = require('xhr2');
-    XMLHttpRequest.nodejsSet({baseUrl: baseUrl()});
-    return new XMLHttpRequest();
+    let xhr = new XMLHttpRequest()
+    xhr.nodejsSet({ baseUrl: this._baseUrl });
+    return xhr;
   }
 }
 
@@ -123,12 +144,12 @@ export class NodeBackend {
   }
 }
 
-export var httpInjectables: Array<any> = [
+export var HTTP_BINDINGS: Array<any> = [
   bind(RequestOptions).toClass(BaseRequestOptions),
   bind(ResponseOptions).toClass(BaseResponseOptions),
 
   bind(BrowserXhr).toClass(NodeXhr),
   bind(ConnectionBackend).toClass(NodeBackend),
 
-  Http
+  bind(Http).toClass(Http)
 ];

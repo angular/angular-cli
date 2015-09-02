@@ -15,7 +15,7 @@ module.exports = function(ROOT) {
 
 
   var {
-    httpInjectables,
+    HTTP_BINDINGS,
     queryParamsToBoolean
   } = require(ROOT + '/dist/modules/server/server');
   // require('@angular/universal')
@@ -31,7 +31,7 @@ module.exports = function(ROOT) {
 
         Component: App,
         serverBindings: [
-          httpInjectables
+          HTTP_BINDINGS
         ],
         data: {}
       });
@@ -50,7 +50,7 @@ module.exports = function(ROOT) {
 
         Component: TodoApp,
         serverBindings: [
-          httpInjectables
+          HTTP_BINDINGS
         ],
         data: {}
       });
