@@ -7,10 +7,10 @@ var path = require('path');
 
 module.exports = function(ROOT) {
   var app = express();
-  var ng2Engine = require(ROOT + '/dist/modules/server/server').ng2engine;
+  var universal = require(ROOT + '/dist/modules/server/server');
   // rendering engine
 
-  app.engine('ng2.html', ng2Engine);
+  app.engine('ng2.html', universal.ng2engineWithPreboot);
   app.set('views', path.join(ROOT, 'examples'));
   app.set('view engine', 'ng2.html');
   app.set('view options', { doctype: 'html' });
