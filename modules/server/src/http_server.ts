@@ -16,6 +16,7 @@ import {
   // XHRConnection,
   XHRBackend,
   RequestOptions,
+  ResponseTypes,
   ResponseOptions,
   BaseResponseOptions,
   BaseRequestOptions,
@@ -32,12 +33,13 @@ import {
 
 import {
   isPresent,
+  isBlank,
   ENUM_INDEX,
   CONST_EXPR
 } from 'angular2/src/facade/lang';
 
 
-import * as XMLHttpRequest from 'xhr2';
+import XMLHttpRequest = require('xhr2');
 
 import { baseUrl } from './helper';
 
@@ -129,7 +131,7 @@ export class NodeXhr {
 
   }
   build() {
-    let xhr = new XMLHttpRequest()
+    let xhr = new xhr2();
     xhr.nodejsSet({ baseUrl: this._baseUrl });
     return xhr;
   }
