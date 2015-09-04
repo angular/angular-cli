@@ -35,10 +35,10 @@ export function ng2engine(filePath: string, options, done) {
 
       // TODO: better build scripts abstraction
       if (options.server === false && options.client === false) {
-        return done(null, simpleTemplate(clientHtml, options));
+        return done(null, clientHtml);
       }
       if (options.server === false && options.client !== false) {
-        return done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
+        return done(null, buildClientScripts(clientHtml, options));
       }
 
       // bootstrap and render component to string
@@ -58,19 +58,18 @@ export function ng2engine(filePath: string, options, done) {
           // TODO: serializedData
         );
 
-        done(null, buildClientScripts(simpleTemplate(rendered, options), options));
+        done(null, buildClientScripts(rendered, options));
       })
       .catch(e => {
         console.log(e.stack);
         // if server fail then return client html
-        done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
+        done(null, buildClientScripts(clientHtml, options));
       });
     });
   } catch (e) {
     done(e);
   }
 };
-
 
 export function ng2engineWithPreboot(filePath: string, options, done) {
   // defaults
@@ -88,10 +87,10 @@ export function ng2engineWithPreboot(filePath: string, options, done) {
 
       // TODO: better build scripts abstraction
       if (options.server === false && options.client === false) {
-        return done(null, simpleTemplate(clientHtml, options));
+        return done(null, clientHtml);
       }
       if (options.server === false && options.client !== false) {
-        return done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
+        return done(null, buildClientScripts(clientHtml, options));
       }
 
       // bootstrap and render component to string
@@ -111,12 +110,12 @@ export function ng2engineWithPreboot(filePath: string, options, done) {
           // TODO: serializedData
         );
 
-        done(null, buildClientScripts(simpleTemplate(rendered, options), options));
+        done(null, buildClientScripts(rendered, options));
       })
       .catch(e => {
         console.log(e.stack);
         // if server fail then return client html
-        done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
+        done(null, buildClientScripts(clientHtml, options));
       });
     });
   } catch (e) {
