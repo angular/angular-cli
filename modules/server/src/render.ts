@@ -7,7 +7,7 @@ export {bootstrap};
 
 import {selectorRegExpFactory} from './helper';
 
-import {serverDomRendererInjectables} from './server_dom_renderer';
+import {SERVER_DOM_RENDERER_BINDINGS} from './server_dom_renderer';
 
 
 import {stringifyElement} from './stringifyElement';
@@ -56,9 +56,8 @@ export function bootstrapServer(AppComponent, serverBindings: any = [], serverIn
 
   let renderBindings = [
     bind(DOCUMENT).toValue(serverDocument),
-    bind(DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES).toValue(false),
     bind(APP_COMPONENT).toValue(AppComponent),
-    serverDomRendererInjectables
+    SERVER_DOM_RENDERER_BINDINGS
   ].
   concat(serverBindings);
 

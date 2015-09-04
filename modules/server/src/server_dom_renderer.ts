@@ -4,8 +4,7 @@ import {
   DomRenderer,
   RenderElementRef,
   Renderer,
-  DOCUMENT,
-  DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES
+  DOCUMENT
 } from 'angular2/render';
 import {EventManager} from 'angular2/src/render/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/render/dom/view/shared_styles_host';
@@ -20,10 +19,9 @@ export class ServerDomRenderer extends DomRenderer {
     private _eventManager: EventManager,
     private _domSharedStylesHost: DomSharedStylesHost,
     private _templateCloner: TemplateCloner,
-    @Inject(DOCUMENT) document,
-    @Inject(DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES) reflectPropertiesAsAttributes: boolean
+    @Inject(DOCUMENT) document
   ) {
-     super(_eventManager, _domSharedStylesHost, _templateCloner, document, reflectPropertiesAsAttributes);
+     super(_eventManager, _domSharedStylesHost, _templateCloner, document);
   }
 
   setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
@@ -54,8 +52,8 @@ export class ServerDomRenderer extends DomRenderer {
 }
 
 
-export var serverDomRendererInjectables = [
-  ServerDomRenderer,
+export var SERVER_DOM_RENDERER_BINDINGS = [
+  bind(ServerDomRenderer).toClass(ServerDomRenderer),
   bind(Renderer).toClass(ServerDomRenderer)
 ];
 
