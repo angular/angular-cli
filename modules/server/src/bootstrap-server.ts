@@ -201,7 +201,7 @@ export function bootstrap(appComponentType: Type,
   // index.html and main.js are possible.
   let __zone = createNgZone();
 
-
+  var exceptionHandler;
   try {
 
     let bindingsCmpLoader = [DynamicComponentLoader, Injector, Testability, TestabilityRegistry];
@@ -229,7 +229,7 @@ export function bootstrap(appComponentType: Type,
       // ]));
 
     }
-    let exceptionHandler = appInjector.get(ExceptionHandler);
+    exceptionHandler = appInjector.get(ExceptionHandler);
     __zone.overrideOnErrorHandler((e, s) => exceptionHandler.call(e, s));
 
     // Server
