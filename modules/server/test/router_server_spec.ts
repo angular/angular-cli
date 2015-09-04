@@ -2,9 +2,9 @@
 
 import 'reflect-metadata';
 import {LocationStrategy} from 'angular2/src/router/location_strategy';
-import {ServerLocationStrategy, locationInjectables} from '../src/router_server';
+import {ServerLocationStrategy, SERVER_LOCATION_BINDINGS} from '../src/router_server';
 import {Component, Directive, View} from 'angular2/annotations';
-import {routerDirectives, routerInjectables, RouteConfig, Router} from 'angular2/router';
+import {ROUTER_DIRECTIVES, ROUTER_BINDINGS, RouteConfig, Router} from 'angular2/router';
 
 /**
  * These tests are pretty basic, but just have something in
