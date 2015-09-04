@@ -131,7 +131,7 @@ export class NodeXhr {
 
   }
   build() {
-    let xhr = new xhr2();
+    let xhr = new XMLHttpRequest();
     xhr.nodejsSet({ baseUrl: this._baseUrl });
     return xhr;
   }
