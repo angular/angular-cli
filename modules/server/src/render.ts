@@ -80,7 +80,7 @@ export function renderToString(AppComponent, serverBindings: any = [], serverDoc
     then(appRef => {
 
       // change detection
-      appRef.changeDetection.detectChanges();
+      appRef.lifecycle.tick();
 
       // TODO: we need a better way to manage the style host for server/client
       // serialize all style hosts
