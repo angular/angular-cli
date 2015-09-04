@@ -65,7 +65,7 @@ export function simpleTemplate(html: string, options?: any): string {
   var match;
   var result = '';
 
-  function add(line, js) {
+  function add(line, js?: any) {
     js ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
         (code += line != '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
     return add;
