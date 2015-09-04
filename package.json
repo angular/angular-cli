@@ -38,9 +38,10 @@
     "angular-submodule": "git submodule init && git submodule update && npm run pull-angular && npm run remove-angular-typings && npm run remove-angular2 && npm run update-angular && git submodule update",
     "bower": "bower install",
     "web_modules": "bash ./scripts/update-ng-bundle.sh",
-    "tsd": "tsd reinstall",
-    "preinstall": "npm run tsd # && npm run angular-submodule",
-    "postinstall": "tsc || true && npm run remove-web-modules && npm run web_modules && npm run bower && npm run webdriver-update"
+    "remove-http-typings": "rm -rf node_modules/angular2/bundles/typings/angular2/http.d.ts",
+    "tsd": "tsd reinstall && tsd link",
+    "preinstall": "# && npm run angular-submodule",
+    "postinstall": "npm run remove-http-typings && npm run tsd && tsc || true && npm run remove-web-modules && npm run web_modules && npm run bower && npm run webdriver-update"
   },
   "repository": {
     "type": "git",
@@ -87,13 +88,13 @@
     "selenium-webdriver": "^2.46.1",
     "serve-index": "^1.7.0",
     "serve-static": "^1.10.0",
-    "tsd": "^0.6.3",
+    "tsd": "^0.6.4",
     "typescript": "^1.5.3",
     "yargs": "^3.14.0",
     "zone.js": "^0.5.2"
   },
   "dependencies": {
-    "angular2": "2.0.0-alpha.35",
+    "angular2": "2.0.0-alpha.36",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
     "event-stream": "^3.3.1",
