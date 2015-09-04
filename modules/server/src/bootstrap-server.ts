@@ -83,7 +83,6 @@ import {Renderer, RenderCompiler} from 'angular2/src/render/api';
 import {
   DomRenderer,
   DOCUMENT,
-  DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES,
   DefaultDomCompiler,
   APP_ID_RANDOM_BINDING,
   MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE,
@@ -147,8 +146,8 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     DomRenderer,
     bind(Renderer).toAlias(DomRenderer),
     APP_ID_RANDOM_BINDING,
-    bind(MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE).toValue(20),
     TemplateCloner,
+    bind(MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE).toValue(20),
     DefaultDomCompiler,
     bind(ElementSchemaRegistry).toValue(new DomElementSchemaRegistry()),
     bind(RenderCompiler).toAlias(DefaultDomCompiler),
@@ -186,7 +185,7 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
 }
 
 export function createNgZone(): NgZone {
-  return new NgZone({enableLongStackTrace: assertionsEnabled()});;
+  return new NgZone({ enableLongStackTrace: assertionsEnabled() });
 }
 
 
@@ -267,6 +266,14 @@ export function bootstrap(appComponentType: Type,
                         (err, stackTrace) => { bootstrapProcess.reject(err, stackTrace); });
 
   } catch (e) {
+    if (isPresent(exceptionHandler)) {
+      exceptionHandler.call(e, e.stack);
+    } else {
+      // The error happened during the creation of an injector, most likely because of a bug in
+      // DI.
+      // We cannot use the provided exception handler, so we default to writing to the DOM.
+      DOM.logError(e);
+    }
     bootstrapProcess.reject(e, e.stack);
   }
   // Server
