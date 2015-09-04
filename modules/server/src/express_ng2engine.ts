@@ -4,7 +4,11 @@ import * as fs from 'fs';
 import {selectorRegExpFactory, simpleTemplate} from './helper';
 
 
-import {renderToString, selectorResolver} from './render';
+import {
+  renderToString,
+  renderToStringWithPreboot,
+  selectorResolver
+} from './render';
 
 import {
   prebootScript,
@@ -39,6 +43,59 @@ export function ng2engine(filePath: string, options, done) {
 
       // bootstrap and render component to string
       renderToString(options.Component, options.serverBindings)
+      .then(serializedCmp => {
+
+        let selector = selectorResolver(options.Component);
+
+        // selector replacer explained here
+        // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
+        // replace our component with serialized version
+        let rendered = clientHtml.replace(
+          // <selector></selector>
+          selectorRegExpFactory(selector),
+          // <selector>{{ serializedCmp }}</selector>
+          serializedCmp
+          // TODO: serializedData
+        );
+
+        done(null, buildClientScripts(simpleTemplate(rendered, options), options));
+      })
+      .catch(e => {
+        console.log(e);
+        // if server fail then return client html
+        done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
+      });
+    });
+  } catch (e) {
+    done(e);
+  }
+};
+
+
+export function ng2engineWithPreboot(filePath: string, options, done) {
+  // defaults
+  options = options || {};
+  options.serverBindings = options.serverBindings || [];
+
+  // read file on disk
+  try {
+    fs.readFile(filePath, (err, content) => {
+
+      if (err) { return done(err); }
+
+      // convert to string
+      var clientHtml = content.toString();
+
+      // TODO: better build scripts abstraction
+      if (options.server === false && options.client === false) {
+        return done(null, simpleTemplate(clientHtml, options));
+      }
+      if (options.server === false && options.client !== false) {
+        return done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
+      }
+
+      // bootstrap and render component to string
+      renderToStringWithPreboot(options.Component, options.serverBindings, options.preboot)
       .then(serializedCmp => {
 
         let selector = selectorResolver(options.Component);
