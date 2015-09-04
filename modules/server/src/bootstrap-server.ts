@@ -110,7 +110,7 @@ var _rootInjector: Injector;
 var _rootBindings = [ bind(Reflector).toValue(reflector), TestabilityRegistry ];
 
 function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
-  var bestChangeDetection: Type = DynamicChangeDetection;
+  var bestChangeDetection: Type = new DynamicChangeDetection();
   // if (PreGeneratedChangeDetection.isSupported()) {
   //   bestChangeDetection = PreGeneratedChangeDetection;
   // } else if (JitChangeDetection.isSupported()) {
@@ -165,7 +165,7 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     DEFAULT_PIPES,
     bind(IterableDiffers).toValue(defaultIterableDiffers),
     bind(KeyValueDiffers).toValue(defaultKeyValueDiffers),
-    bind(ChangeDetection).toClass(bestChangeDetection),
+    bind(ChangeDetection).toValue(bestChangeDetection),
     ViewLoader,
     DirectiveResolver,
     PipeResolver,
@@ -348,7 +348,7 @@ function _createAppInjector(appComponentType: Type, bindings: List<Type | Bindin
   mergedBindings.push(bind(NgZone).toValue(zone));
 
   // detech which binding is undefined
-  // mergedBindings.map((binding, i) => {
+  // mergedBindings.map(function(binding, i) {
   //   if (binding === undefined) {
   //     console.log('RENDER', i, mergedBindings[i-1]);
   //     // debugger;
