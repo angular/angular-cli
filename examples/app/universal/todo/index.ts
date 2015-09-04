@@ -2,11 +2,12 @@
 // import {bootstrap} from '../../angular2_client/bootstrap-defer';
 import {bootstrap, ViewEncapsulation} from 'angular2/angular2';
 
-import {CORE_DIRECTIVES} from 'angular2/directives';
 import {Component, View, Directive, LifecycleEvent} from 'angular2/angular2';
 import {ElementRef} from 'angular2/core';
 import {bind, Inject} from 'angular2/di';
-import {routerInjectables, routerDirectives} from 'angular2/router';
+
+import {CORE_DIRECTIVES} from 'angular2/directives';
+import {ROUTER_BINDINGS, ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {Store, Todo, TodoFactory} from './services/TodoStore';
 
@@ -17,7 +18,7 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
 })
 @View({
   encapsulation: ViewEncapsulation.NONE,
-  directives: [ CORE_DIRECTIVES, routerDirectives ],
+  directives: [ CORE_DIRECTIVES, ROUTER_DIRECTIVES ],
   styles: [],
   template: `
 <section id="todoapp">
@@ -180,5 +181,5 @@ export class TodoApp {
 
 
 export function main() {
-  return bootstrap(TodoApp, [ routerInjectables ]);
+  return bootstrap(TodoApp, [ ROUTER_BINDINGS ]);
 }
