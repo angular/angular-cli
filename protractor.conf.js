@@ -1,6 +1,6 @@
 
 exports.config = {
-  baseUrl: 'http://localhost:3000/examples',
+  baseUrl: 'http://localhost:3000',
 
   specs: [
     'test/*.e2e.js'
