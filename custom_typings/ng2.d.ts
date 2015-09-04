@@ -128,6 +128,7 @@ declare module "ngHttp/http" {
   class Response {
     constructor(options: any)
   }
+  var ResponseTypes: any;
 
   var httpInjectables: Array<any>;
 }
@@ -800,6 +801,7 @@ declare module "angular2/src/facade/async" {
     static callNext(next: any, obs?: any): any;
     static subscribe(observer: any): any;
     static callReturn(obs: any): any;
+    static callThrow(obs: any, res?: any): any;
   }
   class Promise {
     then(pro:any): any;
@@ -841,6 +843,7 @@ declare module "angular2/src/facade/lang" {
   var int: any;
   var Type: Function;
   var isDart: boolean;
+  function CONST_EXPR(exp: any): any;
   function ENUM_INDEX(method: any): any;
   var assertionsEnabled: any;
   function isPresent(bool: any): boolean;
@@ -896,10 +899,10 @@ declare module "angular2/router" {
   var RouterOutlet: any;
   var RouterLink: any;
   var RouteParams: any;
-  var routerInjectables: any;
   var RouteConfigAnnotation: any;
   var RouteConfig: any;
-  var routerDirectives: any;
+  var ROUTER_BINDINGS: any;
+  var ROUTER_DIRECTIVES: any;
 }
 
 
@@ -1210,7 +1213,9 @@ declare module "angular2/di" {
   var InstantiationError: any;
   var InvalidBindingError: any;
   var NoAnnotationError: any;
-  var OpaqueToken: any;
+  class OpaqueToken {
+    constructor(token: any)
+  }
   var ___esModule: any;
   var InjectAnnotation: any;
   var InjectPromiseAnnotation: any;
