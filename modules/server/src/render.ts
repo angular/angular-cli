@@ -12,6 +12,8 @@ import {serverDomRendererInjectables} from './server_dom_renderer';
 
 import {stringifyElement} from './stringifyElement';
 
+import {getClientCode} from '../../preboot/server';
+
 
 import {isBlank, isPresent} from 'angular2/src/facade/lang';
 import {DOM} from 'angular2/src/dom/dom_adapter';
@@ -98,3 +100,16 @@ export function renderToString(AppComponent, serverBindings: any = [], serverDoc
     });
 }
 
+
+export function renderToStringWithPreboot(AppComponent, serverBindings: any = [], prebootConfig: any = {}, serverDocument: any = null) {
+  return renderToString(AppComponent, serverBindings, serverDocument).
+    then(html => {
+      return getClientCode(prebootConfig).then(code => {
+        let preboot = `
+        <script>${ code }</script>
+        <script>window.preboot.start()</script>
+        `;
+        return html + preboot;
+      });
+    });
+}
