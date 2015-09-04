@@ -2,7 +2,7 @@ import {selectorRegExpFactory} from './helper';
 
 // TODO: hard coded for now
 // TODO: build from preboot config
-// consider declarative config via <preboot minify="true"></preboot>
+// consider declarative config via directive <preboot minify="true"></preboot>
 export var prebootScript = `
   <preboot>
     <link rel="stylesheet" type="text/css" href="/preboot/preboot.css">

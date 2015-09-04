@@ -29,7 +29,7 @@ function transformData(data) {
 
 
   <form name="testingForm">
-    <input name="testingInput" type="test">
+    <input name="testingInput" type="text">
     <button>Submit</button>
   </form>
 

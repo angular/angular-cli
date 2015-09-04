@@ -56,7 +56,7 @@ export function relativeToAbsoluteUrl(relativeUrl: string): string {
   return baseUrl() + relativeUrl;
 }
 
-
+// TODO: use Angular's compiler
 export function simpleTemplate(html: string, options?: any): string {
   var re = /\{\{([^\}\}]+)?\}\}/g;
   var reExp = /(^( )?(var|if|for|else|switch|case|break|{|}|;))(.*)?/g;
