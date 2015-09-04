@@ -57,6 +57,7 @@ export function ng2engine(filePath: string, options, done) {
         done(null, buildClientScripts(simpleTemplate(rendered, options), options));
       })
       .catch(e => {
+        console.log(e);
         // if server fail then return client html
         done(null, buildClientScripts(simpleTemplate(clientHtml, options), options));
       });
