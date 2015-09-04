@@ -121,6 +121,7 @@ gulp.task('ci', function(done){
 });
 
 gulp.task('build', [
+  'build.typescript.all',
   'preboot.example',
   'preboot.karma'
 ]);
@@ -398,5 +399,5 @@ gulp.task('serve.preboot', function() {
   gulp.watch('dist/preboot/preboot.js', function () {
     reloader.reload();
   });
-  
+
 });
