@@ -76,7 +76,7 @@ describe('Test Page', function() {
 
     it('should have initial checked values for checkbox inputs', function() {
       // attr
-      var subject = element.all(by.deepCss('input[checked]:checked')).count();
+      var subject = element.all(by.css('input[checked]:checked')).count();
       var result  = 3;
 
 
@@ -154,7 +154,7 @@ function runTestSuites(config, env) {
     var subject, result;
 
     it('should have a displayed input element', function() {
-      subject = element.all(by.deepCss('#defaultValueInput')).isDisplayed();
+      subject = element.all(by.css('#defaultValueInput')).isDisplayed();
 
       expect(subject).toBeTruthy();
 
@@ -228,7 +228,7 @@ function runTestSuites(config, env) {
     if (isServer) {
 
       it('should have checked values for checkbox inputs', function() {
-        var subject = element.all(by.deepCss('input[checked]:checked')).count();
+        var subject = element.all(by.css('input[checked]:checked')).count();
         var result  = 3;
 
         expect(subject).toEqual(result);
@@ -243,13 +243,17 @@ function runTestSuites(config, env) {
 
 }
 
+function getRandomNumber() {
+  return Math.abs(Math.floor(Math.random() * 1656445656757765));
+}
+
 function bootstrapClient(config) {
   browser.driver.sleep(500);
   config = config || {};
   var EC = protractor.ExpectedConditions;
   var bootstrapScript;
   if (config.focus !== true) {
-    bootstrapScript = element(by.deepCss('#bootstrapButton'));
+    bootstrapScript = element(by.css('#bootstrapButton'));
     browser.wait(EC.elementToBeClickable(bootstrapScript), 10000);
   }
 
