@@ -1,18 +1,8 @@
-declare var require: any;
-declare var __filename: string;
-declare var __dirname: string;
-declare var global: any;
 
-declare module 'fs' {
-  function readFile(filePath: string, callback: Function): any
-}
-
-declare module "dom_renderer" {
-  class IsoDomRenderer {
-    _moveViewNodesIntoParent(): any;
-    _createGlobalEventListener(): any;
-    _createEventListener(): any;
+declare module "xhr2" {
+  class XMLHttpRequest {
   }
+  export = XMLHttpRequest;
 }
 
 declare module "angular2_server" {
