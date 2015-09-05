@@ -40,7 +40,7 @@ module.exports = function(ROOT) {
         ],
         data: {},
 
-        preboot: queryParams.preboot !== true ? null : {
+        preboot: queryParams.preboot === false ? null : {
           start:    true,
           appRoot:  'app',         // selector for root element
           freeze:   'spinner',     // show spinner w button click & freeze page
@@ -73,7 +73,7 @@ module.exports = function(ROOT) {
         ],
         data: {},
 
-        preboot: queryParams.preboot !== true ? null : {
+        preboot: queryParams.preboot === false ? null : {
           start:    true,
           appRoot:  'app',         // selector for root element
           freeze:   'spinner',     // show spinner w button click & freeze page
