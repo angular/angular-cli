@@ -1,13 +1,12 @@
-/// <reference path="ng2.d.ts" />
 /// <reference path="server.d.ts" />
 /// <reference path="event-stream.d.ts" />
 /// <reference path="gulp-insert.d.ts" />
 /// <reference path="gulp-uglify.d.ts" />
 /// <reference path="vinyl-buffer.d.ts" />
 
-
-
-
+/// <reference path="angular2/di.d.ts"/>
+/// <reference path="angular2/core.d.ts"/>
+/// <reference path="angular2/http.d.ts"/>
 
 
 /*

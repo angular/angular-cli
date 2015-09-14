@@ -10,15 +10,15 @@ import {
   assertionsEnabled,
   print,
   stringify
-} from 'angular2/src/facade/lang';
-import {BrowserDomAdapter} from 'angular2/src/dom/browser_adapter';
-import {DOM} from 'angular2/src/dom/dom_adapter';
+} from 'angular2/src/core/facade/lang';
+import {BrowserDomAdapter} from 'angular2/src/core/dom/browser_adapter';
+import {DOM} from 'angular2/src/core/dom/dom_adapter';
 
 // correct path
 import {Compiler, CompilerCache} from 'angular2/src/core/compiler/compiler';
 //
 
-import {Reflector, reflector} from 'angular2/src/reflection/reflection';
+import {Reflector, reflector} from 'angular2/src/core/reflection/reflection';
 import {
   Parser,
   Lexer,
@@ -30,17 +30,15 @@ import {
   defaultIterableDiffers,
   KeyValueDiffers,
   defaultKeyValueDiffers
-} from 'angular2/src/change_detection/change_detection';
+} from 'angular2/src/core/change_detection/change_detection';
 
-import {DEFAULT_PIPES} from 'angular2/pipes';
+import {DEFAULT_PIPES} from 'angular2/src/core/pipes/default_pipes';
 
-// correct path
 import {ExceptionHandler} from 'angular2/src/core/exception_handler';
-//
 
-import {ViewLoader} from 'angular2/src/render/dom/compiler/view_loader';
-import {StyleUrlResolver} from 'angular2/src/render/dom/compiler/style_url_resolver';
-import {StyleInliner} from 'angular2/src/render/dom/compiler/style_inliner';
+import {ViewLoader} from 'angular2/src/core/render/dom/compiler/view_loader';
+import {StyleUrlResolver} from 'angular2/src/core/render/dom/compiler/style_url_resolver';
+import {StyleInliner} from 'angular2/src/core/render/dom/compiler/style_inliner';
 
 // correct path
 import {ViewResolver} from 'angular2/src/core/compiler/view_resolver';
@@ -52,23 +50,23 @@ import {DirectiveResolver} from 'angular2/src/core/compiler/directive_resolver';
 //
 import {PipeResolver} from 'angular2/src/core/compiler/pipe_resolver';
 
-import {List, ListWrapper} from 'angular2/src/facade/collection';
-import {Promise, PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/async';
+import {List, ListWrapper} from 'angular2/src/core/facade/collection';
+import {Promise, PromiseWrapper, PromiseCompleter} from 'angular2/src/core/facade/async';
 import {NgZone} from 'angular2/src/core/zone/ng_zone';
 import {LifeCycle} from 'angular2/src/core/life_cycle/life_cycle';
 // import {ShadowDomStrategy} from 'angular2/src/render/dom/shadow_dom/shadow_dom_strategy';
 // import {
-  // EmulatedUnscopedShadowDomStrategy
+// EmulatedUnscopedShadowDomStrategy
 // } from 'angular2/src/render/dom/shadow_dom/emulated_unscoped_shadow_dom_strategy';
-import {XHR} from 'angular2/src/render/xhr';
-import {XHRImpl} from 'angular2/src/render/xhr_impl';
-import {EventManager, DomEventsPlugin} from 'angular2/src/render/dom/events/event_manager';
-import {KeyEventsPlugin} from 'angular2/src/render/dom/events/key_events';
-import {HammerGesturesPlugin} from 'angular2/src/render/dom/events/hammer_gestures';
+import {XHR} from 'angular2/src/core/render/xhr';
+import {XHRImpl} from 'angular2/src/core/render/xhr_impl';
+import {EventManager, DomEventsPlugin} from 'angular2/src/core/render/dom/events/event_manager';
+import {KeyEventsPlugin} from 'angular2/src/core/render/dom/events/key_events';
+import {HammerGesturesPlugin} from 'angular2/src/core/render/dom/events/hammer_gestures';
 import {ComponentUrlMapper} from 'angular2/src/core/compiler/component_url_mapper';
-import {UrlResolver} from 'angular2/src/services/url_resolver';
-import {AppRootUrl} from 'angular2/src/services/app_root_url';
-import {AnchorBasedAppRootUrl} from 'angular2/src/services/anchor_based_app_root_url';
+import {UrlResolver} from 'angular2/src/core/services/url_resolver';
+import {AppRootUrl} from 'angular2/src/core/services/app_root_url';
+import {AnchorBasedAppRootUrl} from 'angular2/src/core/services/anchor_based_app_root_url';
 import {
   ComponentRef,
   DynamicComponentLoader
@@ -79,38 +77,38 @@ import {AppViewManager} from 'angular2/src/core/compiler/view_manager';
 import {AppViewManagerUtils} from 'angular2/src/core/compiler/view_manager_utils';
 import {AppViewListener} from 'angular2/src/core/compiler/view_listener';
 import {ProtoViewFactory} from 'angular2/src/core/compiler/proto_view_factory';
-import {Renderer, RenderCompiler} from 'angular2/src/render/api';
+import {Renderer, RenderCompiler} from 'angular2/src/core/render/api';
 import {
   DomRenderer,
   DOCUMENT,
-  DefaultDomCompiler,
   APP_ID_RANDOM_BINDING,
   MAX_IN_MEMORY_ELEMENTS_PER_TEMPLATE,
   TemplateCloner
-} from 'angular2/src/render/render';
-import {ElementSchemaRegistry} from 'angular2/src/render/dom/schema/element_schema_registry';
-import {DomElementSchemaRegistry} from 'angular2/src/render/dom/schema/dom_element_schema_registry';
+} from 'angular2/src/core/render/render';
+import {DefaultDomCompiler} from "angular2/src/core/render/dom/compiler/compiler";
+import {ElementSchemaRegistry} from 'angular2/src/core/render/dom/schema/element_schema_registry';
+import {DomElementSchemaRegistry} from 'angular2/src/core/render/dom/schema/dom_element_schema_registry';
 import {
   SharedStylesHost,
   DomSharedStylesHost
-} from 'angular2/src/render/dom/view/shared_styles_host';
+} from 'angular2/src/core/render/dom/view/shared_styles_host';
 import {internalView} from 'angular2/src/core/compiler/view_ref';
 
 import {APP_COMPONENT_REF_PROMISE, APP_COMPONENT} from 'angular2/src/core/application_tokens';
-import {wtfInit} from 'angular2/src/profile/wtf_init';
+import {wtfInit} from 'angular2/src/core/profile/wtf_init';
 import {EXCEPTION_BINDING} from 'angular2/src/core/platform_bindings';
 
 // Server
 import {ElementRef} from 'angular2/src/core/compiler/element_ref';
 // Server
 
-var _rootInjector: Injector;
+var _rootInjector:Injector;
 
 // Contains everything that is safe to share between applications.
-var _rootBindings = [ bind(Reflector).toValue(reflector), TestabilityRegistry ];
+var _rootBindings = [bind(Reflector).toValue(reflector), TestabilityRegistry];
 
-function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
-  var bestChangeDetection: Type = new DynamicChangeDetection();
+function _injectorBindings(appComponentType):Array<Type | Binding | Array<any>> {
+  var bestChangeDetection:Type = new DynamicChangeDetection();
   // if (PreGeneratedChangeDetection.isSupported()) {
   //   bestChangeDetection = PreGeneratedChangeDetection;
   // } else if (JitChangeDetection.isSupported()) {
@@ -134,9 +132,9 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
     //         [DynamicComponentLoader, Injector, Testability, TestabilityRegistry]),
 
     bind(appComponentType)
-        .toFactory(p => p.then(ref => ref.instance), [APP_COMPONENT_REF_PROMISE]),
+      .toFactory(p => p.then(ref => ref.instance), [APP_COMPONENT_REF_PROMISE]),
     bind(LifeCycle).toFactory((exceptionHandler) => new LifeCycle(null, assertionsEnabled()),
-                              [ExceptionHandler]),
+      [ExceptionHandler]),
     bind(EventManager).toFactory(
       (ngZone) => {
         var plugins = [new HammerGesturesPlugin(), new KeyEventsPlugin(), new DomEventsPlugin()];
@@ -184,16 +182,15 @@ function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
   ];
 }
 
-export function createNgZone(): NgZone {
-  return new NgZone({ enableLongStackTrace: assertionsEnabled() });
+export function createNgZone():NgZone {
+  return new NgZone({enableLongStackTrace: assertionsEnabled()});
 }
 
 
-
-export function bootstrap(appComponentType: Type,
-                          componentInjectableBindings: List<Binding> = null,
-                          appInjector: any = null,
-                          appDocument: any = null): Promise {
+export function bootstrap(appComponentType:Type,
+                          componentInjectableBindings:Array<Binding> = null,
+                          appInjector:any = null,
+                          appDocument:any = null):Promise {
   wtfInit();
   let bootstrapProcess = PromiseWrapper.completer();
 
@@ -205,13 +202,13 @@ export function bootstrap(appComponentType: Type,
   try {
 
     let bindingsCmpLoader = [DynamicComponentLoader, Injector, Testability, TestabilityRegistry];
-    let componentLoader   = (dynamicComponentLoader, injector, testability, registry) => {
+    let componentLoader = (dynamicComponentLoader, injector, testability, registry) => {
       // TODO(rado): investigate whether to support bindings on root component.
       return dynamicComponentLoader.loadAsRoot(appComponentType, null, injector).
         then(componentRef => {
-          registry.registerApplication(componentRef.location.nativeElement, testability);
-          return componentRef;
-        });
+        registry.registerApplication(componentRef.location.nativeElement, testability);
+        return componentRef;
+      });
     };
 
     // Server
@@ -238,7 +235,7 @@ export function bootstrap(appComponentType: Type,
       PromiseWrapper.wrap(() => appInjector.get(Testability)),
       PromiseWrapper.wrap(() => appInjector.get(TestabilityRegistry))
     ])
-    .then(results => {
+      .then(results => {
       return componentLoader(results[0], appInjector, results[1], results[2]);
     });
 
@@ -260,9 +257,12 @@ export function bootstrap(appComponentType: Type,
     var tickResult = PromiseWrapper.then(compRefToken, tick);
 
     PromiseWrapper.then(tickResult,
-                        (_) => {});  // required for Dart to trigger the default error handler
+      (_) => {
+      });  // required for Dart to trigger the default error handler
     PromiseWrapper.then(tickResult, null,
-                        (err, stackTrace) => { bootstrapProcess.reject(err, stackTrace); });
+      (err, stackTrace) => {
+        bootstrapProcess.reject(err, stackTrace);
+      });
 
   } catch (e) {
     if (isPresent(exceptionHandler)) {
@@ -280,20 +280,20 @@ export function bootstrap(appComponentType: Type,
 }
 
 export class ApplicationRef {
-  _hostComponent: ComponentRef;
-  _hostComponentType: Type;
-  _hostElementRef: ElementRef;
-  _injector: Injector;
-  _changeDetection: ChangeDetection;
-  _sharedStylesHost: SharedStylesHost;
-  _lifecycle: LifeCycle;
-  constructor(
-    hostComponent: ComponentRef,
-    hostComponentType:Type,
-    injector:Injector,
-    changeDetection: ChangeDetection,
-    lifecycle: LifeCycle,
-    sharedStylesHost:SharedStylesHost) {
+  _hostComponent:ComponentRef;
+  _hostComponentType:Type;
+  _hostElementRef:ElementRef;
+  _injector:Injector;
+  _changeDetection:ChangeDetection;
+  _sharedStylesHost:SharedStylesHost;
+  _lifecycle:LifeCycle;
+
+  constructor(hostComponent:ComponentRef,
+              hostComponentType:Type,
+              injector:Injector,
+              changeDetection:ChangeDetection,
+              lifecycle:LifeCycle,
+              sharedStylesHost:SharedStylesHost) {
 
     this._hostComponent = hostComponent;
     this._injector = injector;
@@ -325,6 +325,7 @@ export class ApplicationRef {
   get sharedStylesHost() {
     return this._sharedStylesHost;
   }
+
 // Server
 
   get hostComponent() {
@@ -346,15 +347,15 @@ export class ApplicationRef {
   }
 }
 
-function _createAppInjector(appComponentType: Type, bindings: List<Type | Binding | List<any>>,
-                            zone: NgZone): Injector {
+function _createAppInjector(appComponentType:Type, bindings:Array<Type | Binding | Array<any>>,
+                            zone:NgZone):Injector {
   if (isBlank(_rootInjector)) {
     _rootInjector = Injector.resolveAndCreate(_rootBindings);
   }
 
-  var mergedBindings: any = isPresent(bindings) ?
+  var mergedBindings:any = isPresent(bindings) ?
     ListWrapper.concat(_injectorBindings(appComponentType), bindings) :
-                                   _injectorBindings(appComponentType);
+    _injectorBindings(appComponentType);
 
   mergedBindings.push(bind(NgZone).toValue(zone));
 

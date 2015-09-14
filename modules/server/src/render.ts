@@ -15,14 +15,14 @@ import {stringifyElement} from './stringifyElement';
 import {getClientCode} from '../../preboot/server';
 
 
-import {isBlank, isPresent} from 'angular2/src/facade/lang';
-import {DOM} from 'angular2/src/dom/dom_adapter';
-import {DirectiveResolver} from 'angular2/core';
+import {isBlank, isPresent} from 'angular2/src/core/facade/lang';
+import {DOM} from 'angular2/src/core/dom/dom_adapter';
+import {DirectiveResolver} from 'angular2/src/core/compiler/directive_resolver';
 import {bind} from 'angular2/di';
 import {
   DOCUMENT,
   DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES
-} from 'angular2/src/render/render';
+} from 'angular2/src/core/render/render';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
 
 // TODO: maintain stateless Injector/document and directiveResolver

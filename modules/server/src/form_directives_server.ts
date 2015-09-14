@@ -1,17 +1,18 @@
 import {Directive} from 'angular2/angular2';
 import {ElementRef} from 'angular2/angular2';
-import {Renderer} from 'angular2/render';
+import {Renderer} from 'angular2/src/core/render/render';
 
-import {isPresent, CONST_EXPR} from 'angular2/src/facade/lang';
+import {isPresent, CONST_EXPR} from 'angular2/src/core/facade/lang';
+import {StringMap} from 'angular2/src/core/facade/collection';
 import {OpaqueToken, Injectable, Optional, Inject} from 'angular2/di';
 
 export const APP_LOCATION: OpaqueToken = CONST_EXPR(new OpaqueToken('appLocation'));
 
 @Directive({
   selector: 'form',
-  host: {
+  host: (<any>{
     'method': 'POST'
-  }
+  })
 })
 export class ServerForm {
   constructor(

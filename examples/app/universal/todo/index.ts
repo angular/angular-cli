@@ -2,22 +2,21 @@
 // import {bootstrap} from '../../angular2_client/bootstrap-defer';
 import {bootstrap, ViewEncapsulation} from 'angular2/angular2';
 
-import {Component, View, Directive, LifecycleEvent} from 'angular2/angular2';
-import {ElementRef} from 'angular2/core';
+import {Component, View, Directive} from 'angular2/angular2';
+import {ElementRef} from 'angular2/angular2';
 import {bind, Inject} from 'angular2/di';
 
-import {CORE_DIRECTIVES} from 'angular2/directives';
+import {CORE_DIRECTIVES} from 'angular2/angular2';
 import {ROUTER_BINDINGS, ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {Store, Todo, TodoFactory} from './services/TodoStore';
 
 @Component({
   selector: 'app',
-  lifecycle: [ (<any>LifecycleEvent).onInit ],
   bindings: [ Store, TodoFactory ]
 })
 @View({
-  encapsulation: ViewEncapsulation.NONE,
+  encapsulation: ViewEncapsulation.None,
   directives: [ CORE_DIRECTIVES, ROUTER_DIRECTIVES ],
   styles: [],
   template: `

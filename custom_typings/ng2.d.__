@@ -32,10 +32,7 @@ declare module "angular2/src/render/dom/view/shared_styles_host" {
   class DomSharedStylesHost {}
 }
 
-declare module "angular2/src/services/anchor_based_app_root_url" {
-  class AnchorBasedAppRootUrl {}
-}
-
+render/
 declare module "angular2/annotations" {
   var Component: any;
   var View: any;
@@ -92,30 +89,30 @@ declare module "ngHttp/http" {
   }
 
   class ResponseOptions {
-    constructor(options: any)
+    constructor(options: any);
     merge(options: any): any;
   }
 
   class XHRBackend {
     private _browserXHR: BrowserXhr;
     private _baseResponseOptions: ResponseOptions;
-    constructor(_browserXHR: BrowserXhr, _baseResponseOptions: ResponseOptions)
+    constructor(_browserXHR: BrowserXhr, _baseResponseOptions: ResponseOptions);
     createConnection(request: any): any;
   }
 
   class XHRConnection {
-    constructor(request: any, browserXHR: any, baseResponseOptions: any)
+    constructor(request: any, browserXHR: any, baseResponseOptions: any);
   }
 
   class ConnectionBackend {
-    constructor(req: any, browserXHR: any, baseResponseOptions?: any)
+    constructor(req: any, browserXHR: any, baseResponseOptions?: any);
   }
 
   class RequestOptions {}
   class BaseRequestOptions {}
   class BaseResponseOptions {}
   class MockBackend {
-    constructor(browserXHR: any, baseResponseOptions: any)
+    constructor(browserXHR: any, baseResponseOptions: any);
   }
 
   class Request {
@@ -126,7 +123,7 @@ declare module "ngHttp/http" {
   }
 
   class Response {
-    constructor(options: any)
+    constructor(options: any);
   }
   var ResponseTypes: any;
 
@@ -168,30 +165,30 @@ declare module "http/http" {
   }
 
   class ResponseOptions {
-    constructor(options: any)
+    constructor(options: any);
     merge(options: any): any;
   }
 
   class XHRBackend {
     private _browserXHR: BrowserXhr;
     private _baseResponseOptions: ResponseOptions;
-    constructor(_browserXHR: BrowserXhr, _baseResponseOptions: ResponseOptions)
+    constructor(_browserXHR: BrowserXhr, _baseResponseOptions: ResponseOptions);
     createConnection(request: any): any;
   }
 
   class XHRConnection {
-    constructor(request: any, browserXHR: any, baseResponseOptions: any)
+    constructor(request: any, browserXHR: any, baseResponseOptions: any);
   }
 
   class ConnectionBackend {
-    constructor(req: any, browserXHR: any, baseResponseOptions?: any)
+    constructor(req: any, browserXHR: any, baseResponseOptions?: any);
   }
 
   class RequestOptions {}
   class BaseRequestOptions {}
   class BaseResponseOptions {}
   class MockBackend {
-    constructor(browserXHR: any, baseResponseOptions: any)
+    constructor(browserXHR: any, baseResponseOptions: any);
   }
 
   class Request {
@@ -202,7 +199,7 @@ declare module "http/http" {
   }
 
   class Response {
-    constructor(options: any)
+    constructor(options: any);
   }
 
   var httpInjectables: Array<any>;
@@ -213,7 +210,7 @@ declare module "angular2/mock" {
 
 declare module "angular2/src/core/life_cycle/life_cycle" {
   class LifeCycle {
-    constructor(...args)
+    constructor(...args);
     tick(): any;
   }
 }
@@ -232,7 +229,7 @@ declare module "angular2/src/render/dom/compiler/style_inliner" {
 
 declare module "angular2/src/core/compiler/view_resolver" {
   class ViewResolver {
-    resolve(appComponent: any): any
+    resolve(appComponent: any): any;
   }
 }
 
@@ -294,13 +291,13 @@ declare module "angular2/src/render/dom/shadow_dom/style_inliner" {
 }
 declare module "angular2/src/core/compiler/dynamic_component_loader" {
   class ComponentRef {
-    constructor(newLocation: any, component: any, dispose: any)
+    constructor(newLocation: any, component: any, dispose: any);
     location: any
     instance: any
     dispose: any
   }
   class DynamicComponentLoader {
-    loadAsRoot(appComponentType: any, bindings: any, injector: any): any
+    loadAsRoot(appComponentType: any, bindings: any, injector: any): any;
   }
 }
 declare module "angular2/src/core/testability/testability" {
@@ -358,8 +355,8 @@ declare module "angular2/src/render/dom/view/proto_view" {
   class DomProtoView {
     rootBindingOffset: any;
     element: any;
-    isTemplateElement(): any
-    elementBinders(): any
+    isTemplateElement(): any;
+    elementBinders(): any;
   }
 
 }
@@ -376,9 +373,9 @@ declare module "angular2/src/render/dom/util" {
 
 declare module "angular2/src/render/dom/dom_renderer" {
   class DomRenderer {
-    _moveViewNodesIntoParent(): any
-    _createGlobalEventListener(): any
-    _createEventListener(): any
+    _moveViewNodesIntoParent(): any;
+    _createGlobalEventListener(): any;
+    _createEventListener(): any;
   }
   class DefaultDomCompiler {}
   var DOCUMENT: any;
@@ -386,9 +383,9 @@ declare module "angular2/src/render/dom/dom_renderer" {
 
 declare module "angular2/src/render/render" {
   class DomRenderer {
-    _moveViewNodesIntoParent(): any
-    _createGlobalEventListener(): any
-    _createEventListener(): any
+    _moveViewNodesIntoParent(): any;
+    _createGlobalEventListener(): any;
+    _createEventListener(): any;
   }
   class DefaultDomCompiler {}
   class TemplateCloner {}
@@ -421,22 +418,22 @@ declare module "angular2/src/render/dom/view/view" {
 
   }
   class DomView {
-    viewContainers(): any
+    viewContainers(): any;
   }
   function resolveInternalDomView(viewRef: any): any;
 }
 declare module "angular2/src/render/dom/shadow_dom/shadow_dom_strategy" {
   class ShadowDomStrategy {
-    prepareShadowRoot(element: any): any
-    constructLightDom(lightDomView: any, el: any): any
+    prepareShadowRoot(element: any): any;
+    constructLightDom(lightDomView: any, el: any): any;
   }
 }
 
 declare module "angular2/src/render/dom/events/event_manager" {
   class EventManager {
-    constructor(...args)
-    addEventListener(element: any, eventName: string, handler: Function): any
-    addGlobalEventListener(target: string, eventName: string, handler: Function): any
+    constructor(...args);
+    addEventListener(element: any, eventName: string, handler: Function): any;
+    addGlobalEventListener(target: string, eventName: string, handler: Function): any;
   }
   class DomEventsPlugin {
 
@@ -479,7 +476,7 @@ declare module "angular2/src/change_detection/pipes/pipe" {
 declare module "angular2/src/change_detection/change_detection" {
   var async: any;
   class Pipes {
-    constructor(pipes: any)
+    constructor(pipes: any);
   }
   var defaultPipes: any;
   class Parser {
@@ -509,7 +506,7 @@ declare module "angular2/src/change_detection/change_detection" {
 declare module "angular2/pipes" {
   var DEFAULT_PIPES: any;
   class ObservablePipe {
-    constructor(ref: any)
+    constructor(ref: any);
     _subscription: any;
     _observable: any;
     _updateLatestValue(value: any): any;
@@ -522,7 +519,7 @@ declare module "angular2/change_detection" {
   class Pipe {}
   class NullPipeFactory {}
   class Pipes {
-    constructor(pipes: any)
+    constructor(pipes: any);
   }
   var defaultPipes: any;
   class Parser {
@@ -547,25 +544,25 @@ declare module "angular2/change_detection" {
 
 declare module "angular2/src/core/zone/ng_zone" {
   class NgZone {
-    constructor(config: any)
-    initCallbacks(config: any): any
-    overrideOnErrorHandler(reporter: any): any
-    run(context: any): any
+    constructor(config: any);
+    initCallbacks(config: any): any;
+    overrideOnErrorHandler(reporter: any): any;
+    run(context: any): any;
   }
 }
 
 
 declare module "angular2/src/core/compiler/element_ref" {
   class ElementRef {
-    constructor(host: any, location?: any)
+    constructor(host: any, location?: any);
     nativeElement: any;
   }
 }
 
 declare module "angular2/src/core/exception_handler" {
   class ExceptionHandler {
-    constructor(DOM: any, isDart: boolean)
-    call(exception: any, stackTrace: any): any
+    constructor(DOM: any, isDart: boolean);
+    call(exception: any, stackTrace: any): any;
   }
 }
 
@@ -593,24 +590,24 @@ declare module "angular2/forms" {
   var FORM_DIRECTIVES: any;
   var formInjectables: any;
   class FormBuilder {
-    group(config: any): any
-    array(): any
+    group(config: any): any;
+    array(): any;
   }
   class Validators {
-    static required(): any
+    static required(): any;
   }
   class ControlGroup {
     value: any
     controls: any
-    include(): any
-    exclude(): any
+    include(): any;
+    exclude(): any;
   }
   class Control {
-    valueChanges(): any
+    valueChanges(): any;
   }
   class ControlArray {
-    push(): any
-    removeAt(): any
+    push(): any;
+    removeAt(): any;
   }
 
   class NgControlName {
@@ -658,14 +655,14 @@ declare module "angular2/src/render/dom/shadow_dom/emulated_unscoped_shadow_dom_
 
 declare module "angular2/core" {
   class ElementRef {
-    constructor(host: any, location?: any)
+    constructor(host: any, location?: any);
     nativeElement: any;
   }
   class QueryList<T> {
     onChange(callback: any): void;
   }
   class DirectiveResolver {
-    resolve(appComponent: any): any
+    resolve(appComponent: any): any;
   }
 }
 
@@ -677,7 +674,7 @@ declare module "angular2/render" {
     renderBoundElementIndex: any;
   }
   class DomRenderer {
-    constructor(_eventManager: any, _domSharedStylesHost: any, _templateCloner: any, document: any, reflectPropertiesAsAttributes: any)
+    constructor(_eventManager: any, _domSharedStylesHost: any, _templateCloner: any, document: any);
     setElementProperty(location: any, propertyName: any, propertyValue: any): any;
     invokeElementMethod(location: any, methodName: any, args: any): any;
 
@@ -868,13 +865,13 @@ declare module "angular2/src/facade/lang" {
 
 declare module "angular2/src/core/compiler/directive_resolver" {
   class DirectiveResolver {
-    resolve(appComponent: any): any
+    resolve(appComponent: any): any;
   }
 }
 
 declare module "angular2/src/core/compiler/pipe_resolver" {
   class PipeResolver {
-    resolve(pipes: any): any
+    resolve(pipes: any): any;
   }
 }
 
@@ -1194,8 +1191,8 @@ declare module "angular2/di" {
      resolveAndCreateChild(bindings: [any]): Injector;
      static resolveAndCreate(bindings: any): any;
      static fromResolvedBindings(bindings: any): any;
-     asyncGet(di: any):any
-     get(di: any):any
+     asyncGet(di: any):any;
+     get(di: any):any;
   }
   var Inject: any;
   var Injectable: any;
@@ -1214,7 +1211,7 @@ declare module "angular2/di" {
   var InvalidBindingError: any;
   var NoAnnotationError: any;
   class OpaqueToken {
-    constructor(token: any)
+    constructor(token: any);
   }
   var ___esModule: any;
   var InjectAnnotation: any;
@@ -1226,17 +1223,14 @@ declare module "angular2/di" {
 }
 
 declare module "angular2/src/router/location_strategy" {
-
   class LocationStrategy {
     path(): string;
     pushState(ctx: any, title: string, url: string): void;
     forward(): void;
-    back(): void
+    back(): void;
     onPopState(fn: (_: any) => any): void;
     getBaseHref(): string;
   }
-
-
 }
 
 declare module 'angular2/src/mock/mock_location_strategy' {

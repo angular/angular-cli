@@ -1,7 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 import {Injectable, bind} from 'angular2/di';
-import {LocationStrategy} from 'angular2/src/router/location_strategy';
+import {LocationStrategy} from 'angular2/router';
 import {MockLocationStrategy} from 'angular2/src/mock/mock_location_strategy';
 
 // TODO: see https://github.com/angular/universal/issues/60#issuecomment-130463593

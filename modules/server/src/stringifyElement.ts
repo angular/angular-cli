@@ -1,12 +1,12 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 // dom closure
-import {Parse5DomAdapter} from 'angular2/src/dom/parse5_adapter';
+import {Parse5DomAdapter} from 'angular2/src/core/dom/parse5_adapter';
 Parse5DomAdapter.makeCurrent();
 
-import {List, ListWrapper, MapWrapper} from 'angular2/src/facade/collection';
-import {DOM} from 'angular2/src/dom/dom_adapter';
-import {isPresent, isString, StringWrapper} from 'angular2/src/facade/lang';
+import {List, ListWrapper, MapWrapper} from 'angular2/src/core/facade/collection';
+import {DOM} from 'angular2/src/core/dom/dom_adapter';
+import {isPresent, isString, StringWrapper} from 'angular2/src/core/facade/lang';
 
 var _singleTagWhitelist = ['br', 'hr', 'input'];
 export function stringifyElement(el): string {

@@ -2,22 +2,21 @@
 import {Injector, bind, OpaqueToken, Binding} from 'angular2/di';
 import {
   NumberWrapper,
-  Type,
   isBlank,
   isPresent,
   BaseException,
   assertionsEnabled,
   print,
   stringify
-} from 'angular2/src/facade/lang';
-import {BrowserDomAdapter} from 'angular2/src/dom/browser_adapter';
-import {DOM} from 'angular2/src/dom/dom_adapter';
+} from 'angular2/src/core/facade/lang';
+import {BrowserDomAdapter} from 'angular2/src/core/dom/browser_adapter';
+import {DOM} from 'angular2/src/core/dom/dom_adapter';
 
 // correct path
 import {Compiler, CompilerCache} from 'angular2/src/core/compiler/compiler';
 //
 
-import {Reflector, reflector} from 'angular2/src/reflection/reflection';
+import {Reflector, reflector} from 'angular2/src/core/reflection/reflection';
 import {
   Parser,
   Lexer,
@@ -27,15 +26,15 @@ import {
   PreGeneratedChangeDetection,
   Pipes,
   defaultPipes
-} from 'angular2/change_detection';
+} from 'angular2/src/core/change_detection/change_detection';
 
 // correct path
 import {ExceptionHandler} from 'angular2/src/core/exception_handler';
 //
 
-import {ViewLoader} from 'angular2/src/render/dom/compiler/view_loader';
-import {StyleUrlResolver} from 'angular2/src/render/dom/compiler/style_url_resolver';
-import {StyleInliner} from 'angular2/src/render/dom/compiler/style_inliner';
+import {ViewLoader} from 'angular2/src/core/render/dom/compiler/view_loader';
+import {StyleUrlResolver} from 'angular2/src/core/render/dom/compiler/style_url_resolver';
+import {StyleInliner} from 'angular2/src/core/render/dom/compiler/style_inliner';
 
 // correct path
 import {ViewResolver} from 'angular2/src/core/compiler/view_resolver';
@@ -46,22 +45,22 @@ import {ViewResolver} from 'angular2/src/core/compiler/view_resolver';
 import {DirectiveResolver} from 'angular2/src/core/compiler/directive_resolver';
 //
 
-import {List, ListWrapper} from 'angular2/src/facade/collection';
-import {Promise, PromiseWrapper} from 'angular2/src/facade/async';
+import {List, ListWrapper} from 'angular2/src/core/facade/collection';
+import {Promise, PromiseWrapper} from 'angular2/src/core/facade/async';
 import {NgZone} from 'angular2/src/core/zone/ng_zone';
 import {LifeCycle} from 'angular2/src/core/life_cycle/life_cycle';
-import {ShadowDomStrategy} from 'angular2/src/render/dom/shadow_dom/shadow_dom_strategy';
+import {ShadowDomStrategy} from 'angular2/src/core/render/dom/shadow_dom/shadow_dom_strategy';
 import {
   EmulatedUnscopedShadowDomStrategy
-} from 'angular2/src/render/dom/shadow_dom/emulated_unscoped_shadow_dom_strategy';
-import {XHR} from 'angular2/src/render/xhr';
-import {XHRImpl} from 'angular2/src/render/xhr_impl';
-import {EventManager, DomEventsPlugin} from 'angular2/src/render/dom/events/event_manager';
-import {KeyEventsPlugin} from 'angular2/src/render/dom/events/key_events';
-import {HammerGesturesPlugin} from 'angular2/src/render/dom/events/hammer_gestures';
+} from 'angular2/src/core/render/dom/shadow_dom/emulated_unscoped_shadow_dom_strategy';
+import {XHR} from 'angular2/src/core/render/xhr';
+import {XHRImpl} from 'angular2/src/core/render/xhr_impl';
+import {EventManager, DomEventsPlugin} from 'angular2/src/core/render/dom/events/event_manager';
+import {KeyEventsPlugin} from 'angular2/src/core/render/dom/events/key_events';
+import {HammerGesturesPlugin} from 'angular2/src/core/render/dom/events/hammer_gestures';
 import {ComponentUrlMapper} from 'angular2/src/core/compiler/component_url_mapper';
-import {UrlResolver} from 'angular2/src/services/url_resolver';
-import {AppRootUrl} from 'angular2/src/services/app_root_url';
+import {UrlResolver} from 'angular2/src/core/services/url_resolver';
+import {AppRootUrl} from 'angular2/src/core/services/app_root_url';
 import {
   ComponentRef,
   DynamicComponentLoader
@@ -72,15 +71,16 @@ import {AppViewManager} from 'angular2/src/core/compiler/view_manager';
 import {AppViewManagerUtils} from 'angular2/src/core/compiler/view_manager_utils';
 import {AppViewListener} from 'angular2/src/core/compiler/view_listener';
 import {ProtoViewFactory} from 'angular2/src/core/compiler/proto_view_factory';
-import {Renderer, RenderCompiler} from 'angular2/src/render/api';
-import {DomRenderer, DOCUMENT} from 'angular2/src/render/dom/dom_renderer';
-import {DefaultDomCompiler} from 'angular2/src/render/dom/compiler/compiler';
+import {Renderer, RenderCompiler} from 'angular2/src/core/render/api';
+import {DomRenderer, DOCUMENT} from 'angular2/src/core/render/dom/dom_renderer';
+import {DefaultDomCompiler} from 'angular2/src/core/render/dom/compiler/compiler';
 import {internalView} from 'angular2/src/core/compiler/view_ref';
 
 import {APP_COMPONENT_REF_PROMISE, APP_COMPONENT} from 'angular2/src/core/application_tokens';
 
 // Server
 import {ElementRef} from 'angular2/src/core/compiler/element_ref';
+import Type = ng.Type;
 // Server
 
 var _rootInjector: Injector;
@@ -89,7 +89,7 @@ var _rootInjector: Injector;
 // Contains everything that is safe to share between applications.
 var _rootBindings = [bind(Reflector).toValue(reflector), TestabilityRegistry];
 
-function _injectorBindings(appComponentType): List<Type | Binding | List<any>> {
+function _injectorBindings(appComponentType): Array<Type | Binding | Array<any>> {
   var bestChangeDetection: Type = DynamicChangeDetection;
   if (PreGeneratedChangeDetection.isSupported()) {
     bestChangeDetection = PreGeneratedChangeDetection;
@@ -363,7 +363,7 @@ function _createNgZone(givenReporter: Function): NgZone {
  */
 export function bootstrap(
   appComponentType: Type,
-  componentInjectableBindings: List<Type | Binding | List<any>> = null,
+  componentInjectableBindings: Array<Type | Binding | Array<any>> = null,
   errorReporter: Function = null): Promise {
 
   BrowserDomAdapter.makeCurrent();
@@ -419,7 +419,7 @@ export class ApplicationRef {
   get injector() { return this._injector; }
 }
 
-function _createAppInjector(appComponentType: Type, bindings: List<Type | Binding | List<any>>,
+function _createAppInjector(appComponentType: Type, bindings: Array<Type | Binding | Array<any>>,
                             zone: NgZone): Injector {
   if (isBlank(_rootInjector)) {
     _rootInjector = Injector.resolveAndCreate(_rootBindings);

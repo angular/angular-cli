@@ -49,6 +49,9 @@ test/coverage
 !/modules/preboot/typings/_custom
 !/modules/preboot/typings/tsd.d.ts
 
+# inline ts compile
+modules/**/*.js
+modules/**/*.d.ts
 
 # Typings
 /typings

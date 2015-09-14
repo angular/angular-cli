@@ -4,8 +4,9 @@
 import 'reflect-metadata';
 //
 
-import {BrowserXhr} from 'ngHttp/src/backends/browser_xhr';
-import {RequestMethodsMap} from 'ngHttp/src/enums';
+// ngHttp/src/backends/browser_xhr
+import {BrowserXhr} from 'angular2/http';
+import {RequestMethods} from 'angular2/http';
 
 import {bind, OpaqueToken, Injectable, Optional, Inject} from 'angular2/di';
 
@@ -24,19 +25,21 @@ import {
   Response,
   MockBackend,
   ReadyStates
-} from 'ngHttp/http';
+} from 'angular2/http';
 
 import {
-  EventEmitter,
+  EventEmitter
+} from 'angular2/angular2';
+
+import {
   ObservableWrapper
-} from 'angular2/src/facade/async';
+} from 'angular2/src/core/facade/async';
 
 import {
   isPresent,
   isBlank,
-  ENUM_INDEX,
   CONST_EXPR
-} from 'angular2/src/facade/lang';
+} from 'angular2/src/core/facade/lang';
 
 
 import XMLHttpRequest = require('xhr2');
@@ -61,13 +64,12 @@ class NodeConnection implements Connection {
     // TODO: get rid of this when enum lookups are available in ts2dart
     // https://github.com/angular/ts2dart/issues/221
 
-    var requestMethodsMap = new RequestMethodsMap();
     this.request = req;
     this.response = new EventEmitter();
     this._xhr = browserXHR.build();
 
     // TODO(jeffbcross): implement error listening/propagation
-    var _method = requestMethodsMap.getMethod(ENUM_INDEX(req.method));
+    var _method = RequestMethods[req.method];
 
     this._xhr.open(_method, req.url );
     this._xhr.addEventListener('load', (_) => {

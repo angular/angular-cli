@@ -1,16 +1,16 @@
 /// <reference path="../typings/tsd.d.ts" />
-import {ListWrapper, MapWrapper, Map, StringMapWrapper, List} from 'angular2/src/facade/collection';
+import {ListWrapper, MapWrapper, Map, StringMapWrapper, List} from 'angular2/src/core/facade/collection';
 import {
   DomRenderer,
   RenderElementRef,
   Renderer,
   DOCUMENT
-} from 'angular2/render';
-import {EventManager} from 'angular2/src/render/dom/events/event_manager';
-import {DomSharedStylesHost} from 'angular2/src/render/dom/view/shared_styles_host';
-import {TemplateCloner} from 'angular2/src/render/dom/template_cloner';
-import {resolveInternalDomView} from 'angular2/src/render/dom/view/view';
-import {DOM} from 'angular2/src/dom/dom_adapter';
+} from 'angular2/src/core/render/render';
+import {EventManager} from 'angular2/src/core/render/dom/events/event_manager';
+import {DomSharedStylesHost} from 'angular2/src/core/render/dom/view/shared_styles_host';
+import {TemplateCloner} from 'angular2/src/core/render/dom/template_cloner';
+import {resolveInternalDomView} from 'angular2/src/core/render/dom/view/view';
+import {DOM} from 'angular2/src/core/dom/dom_adapter';
 import {bind, Injectable, Inject} from 'angular2/di';
 
 @Injectable()
@@ -36,7 +36,7 @@ export class ServerDomRenderer extends DomRenderer {
     return super.setElementProperty(location, propertyName, propertyValue);
   }
 
-  invokeElementMethod(location: RenderElementRef, methodName: string, args: List<any>) {
+  invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
     if (methodName === 'focus') {
       var view = resolveInternalDomView(location.renderView);
       var element = view.boundElements[location.renderBoundElementIndex];

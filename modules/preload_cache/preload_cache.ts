@@ -1,7 +1,10 @@
-interface Deferred {
+/// <reference path="../../custom_typings/_custom.d.ts"/>
+
+
+interface Deferred<T> {
   reject(): any;
   resolve(value?: any): any;
-  promise: Promise;
+  promise: Promise<T>;
 
 }
 
@@ -9,23 +12,23 @@ interface Refs<T> {
   [key: string]: T;
 }
 
-export class PreloadCache {
-  refs: Refs<Deferred> = {};
+export class PreloadCache<T> {
+  refs: Refs<Deferred<T>> = {};
   constructor() {
 
   }
 
-  getRef(key: string): Promise {
+  getRef(key: string): Promise<T> {
     let ref = this.refs[key];
     if (ref && ref.promise) {
       return ref.promise;
     }
   }
 
-  setRef(ref: string): Deferred {
+  setRef(ref: string): Deferred<T> {
     var reject, resolve;
 
-    var promise = new Promise(function(res, rej) {
+    var promise = new Promise<T>(function(res, rej) {
       reject = rej;
       resolve = res;
     });

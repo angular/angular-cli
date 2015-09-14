@@ -50,10 +50,27 @@
     "modules/preboot/test/client/listen/listen_by_selectors_spec.ts",
     "modules/preboot/test/client/replay/replay_after_hydrate_spec.ts",
     "modules/preboot/test/client/replay/replay_after_rerender_spec.ts",
+
+    "modules/preload_cache/index.ts",
+    "modules/preload_cache/preload_cache.ts",
+
+    "modules/server/server.ts",
+    "modules/server/src/bootstrap-server.ts",
+    "modules/server/src/build_scripts.ts",
+    "modules/server/src/express_ng2engine.ts",
+    "modules/server/src/form_directives_server.ts",
+    "modules/server/src/helper.ts",
+    "modules/server/src/http_server.ts",
+    "modules/server/src/render.ts",
+    "modules/server/src/router_server.ts",
+    "modules/server/src/server_dom_renderer.ts",
+    "modules/server/src/server_patch.ts",
+    "modules/server/src/stringifyElement.ts",
     "modules/server/test/router_server_spec.ts",
     "modules/server/typings/tsd.d.ts",
+
     "modules/experimental/experimental.ts",
-    "modules/server/server.ts",
+
     "examples/app/client/app.ts",
     "examples/app/server/api.ts",
     "examples/app/server/routes.ts",

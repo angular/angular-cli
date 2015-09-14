@@ -1,9 +1,9 @@
 /// <reference path="../../../tsd_typings/tsd.d.ts"/>
 
 import 'reflect-metadata';
-import {LocationStrategy} from 'angular2/src/router/location_strategy';
+import {LocationStrategy} from 'angular2/src/core/router/location_strategy';
 import {ServerLocationStrategy, SERVER_LOCATION_BINDINGS} from '../src/router_server';
-import {Component, Directive, View} from 'angular2/annotations';
+import {Component, Directive, View} from 'angular2/angular2';
 import {ROUTER_DIRECTIVES, ROUTER_BINDINGS, RouteConfig, Router} from 'angular2/router';
 
 /**
