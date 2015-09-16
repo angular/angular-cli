@@ -1,4 +1,4 @@
-var serverip = '127.0.0.1'
+var SERVER_IP = '127.0.0.1';
 
 var port = process.env.PORT    || 3000;
 // var ssl  = process.env.SSLPORT || 4000;
@@ -17,37 +17,39 @@ var options = {
 var server = require('./dist/examples/app/server/server')(__dirname);
 
 // Start server
-module.exports.Server = http.createServer(server).listen(port, serverip, function() {
+module.exports.Server = http.createServer(server).listen(port, SERVER_IP, function() {
   console.log('Listening on port: ' + port);
 
-  
+
   // for smoke testing
 
   var req = http.get({
     host: 'localhost',
     port: 3000,
-    path: '/?server=true&client=false&preboot=false&bootstrap=false'
+    path: '/?server=true&client=false&preboot=false&bootstrap=false',
   }, function(res) {
     // console.log('STATUS: ' + res.statusCode);
-    // console.log('HEADERS: ' + JSON.stringify(res.headers));
+    // console.log('HEADERS: ' + JSON.stringify(res.headers, null, 2));
 
     // Buffer the body entirely for processing as a whole.
     var bodyChunks = [];
-    res.on('data', function(chunk) {
-      // You can process streamed parts here...
-      bodyChunks.push(chunk);
-    }).on('end', function() {
-      var body = Buffer.concat(bodyChunks);
-      // console.log('GOOD' /*, body.toString()*/ );
-      // ...and/or process the entire body here.
-    })
+    res.
+      on('data', function(chunk) {
+        // You can process streamed parts here...
+        bodyChunks.push(chunk);
+      }).
+      on('end', function() {
+        var body = Buffer.concat(bodyChunks);
+        // console.log('GOOD' /*, body.toString()*/ );
+        // ...and/or process the entire body here.
+      })
   });
 
   req.on('error', function(e) {
     console.error('ERROR: ' + e.message);
   });
 
-  
+
 
 });
 /*
