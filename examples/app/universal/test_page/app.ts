@@ -1,6 +1,10 @@
 /// <reference path="../../../../custom_typings/_custom.d.ts" />
+console.time('angular2/angular2 in client');
+import * as angular from 'angular2/angular2';
+console.timeEnd('angular2/angular2 in client');
+
 import {Component, View, ViewEncapsulation} from 'angular2/angular2';
-// import {Http} from 'http/http';
+import {Http} from 'angular2/http';
 import {CORE_DIRECTIVES} from 'angular2/angular2';
 
 function transformData(data) {
@@ -153,4 +157,8 @@ export class App {
     this.items.pop();
   }
 
+}
+
+export function main() {
+  return angular.bootstrap(App, []);
 }

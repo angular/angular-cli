@@ -1,19 +1,19 @@
 /// <reference path="../../../custom_typings/_custom.d.ts" />
 
-var express = require('express');
 var serveStatic = require('serve-static');
 var historyApiFallback = require('connect-history-api-fallback');
+var {Router} = require('express');
 
 
 module.exports = function(ROOT) {
-  var router = express.Router();
+  var router = Router();
 
   var universalPath = ROOT + '/dist/examples/app/universal';
 
-  var App     = require(universalPath + '/app/App').App;
-  var TodoApp = require(universalPath + '/todo/index').TodoApp;
+  var {App}     = require(universalPath + '/test_page/app');
+  var {TodoApp} = require(universalPath + '/todo/index');
 
-  var di = require('angular2/di');
+  var {bind} = require('angular2/di');
 
   var {
     HTTP_BINDINGS,
@@ -27,16 +27,17 @@ module.exports = function(ROOT) {
   router.
     route('/').
     get(function ngApp(req, res) {
+      let baseUrl = req.baseUrl;
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
-        componentUrl: 'examples/app/client/app',
+        componentUrl: 'examples/app/universal/test_page/app',
 
         Component: App,
         serverBindings: [
           HTTP_BINDINGS,
           SERVER_LOCATION_BINDINGS,
-          di.bind(BASE_URL).toValue(req.baseUrl)
+          bind(BASE_URL).toValue(baseUrl)
         ],
         data: {},
 
@@ -53,23 +54,24 @@ module.exports = function(ROOT) {
 
       });
 
-      res.render('app/universal/app/index', options);
+      res.render('app/universal/test_page/index', options);
 
     });
 
   router.
     route('/examples/todo').
     get(function ngTodo(req, res) {
+      let baseUrl = req.baseUrl;
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams , {
         // client url for systemjs
-        componentUrl: 'examples/app/universal/todo/index',
+        componentUrl: 'examples/app/universal/todo/app',
 
         Component: TodoApp,
         serverBindings: [
           HTTP_BINDINGS,
           SERVER_LOCATION_BINDINGS,
-          di.bind(BASE_URL).toValue(req.baseUrl)
+          bind(BASE_URL).toValue(baseUrl)
         ],
         data: {},
 
