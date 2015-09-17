@@ -4,11 +4,13 @@ import * as angular from 'angular2/angular2';
 console.timeEnd('angular2/angular2 in client');
 
 import {Component, View, ViewEncapsulation} from 'angular2/angular2';
-import {Http} from 'angular2/http';
+import {Http, HTTP_BINDINGS} from 'angular2/http';
 import {CORE_DIRECTIVES} from 'angular2/angular2';
 
 function transformData(data) {
-  data.created_at = new Date(data.created_at);
+  if (data.hasOwnProperty('created_at')) {
+    data.created_at = new Date(data.created_at);
+  }
   return data;
 }
 
@@ -97,7 +99,7 @@ export class App {
   buttonTest: string   = '';
   testingInput: string = 'default state on component';
 
-  constructor(/*private http: Http*/) {
+  constructor(private http: Http) {
 
   }
 
@@ -106,29 +108,36 @@ export class App {
     this.addItem();
     this.addItem();
 
-    // var todosObs = this.http.get('/api/todos').
-    //     toRx().
-    //     filter(res => res.status >= 200 && res.status < 300).
-    //     map(res => res.json()).
-    //     map(data => data.map(transformData));
+    var todosObs$ = this.http.get('/api/todos').
+        toRx().
+        filter(res => res.status >= 200 && res.status < 300).
+        map(res => res.json()).
+        map(data => transformData(data)); // ensure correct data prop types
 
-    //   todosObs.subscribe(
-    //     todos => {
-    //       todos.map(this.addItem.bind(this));
-    //     },
-    //     err => {
-    //       console.error('err', err);
-    //       throw err;
-    //     },
-    //     complete => {
-    //       // console.log('complete', complete);
-    //     }
-    //   );
+    todosObs$.subscribe(
+      // onValue
+      todos => {
+        console.log('data', todos);
+        todos.map(todo => this.addItem(todo));
+      },
+      // onError
+      err => {
+        console.error('err', err);
+        throw err;
+      },
+      // onComplete
+      () => {
+        console.log('complete request');
+      }
+    );
+
+
 
   }
 
-  log(val) {
-    console.log('App.ts loggin...', val);
+  log(value) {
+    console.log('log:', value);
+    return value;
   }
 
   toggleNgIf() {
@@ -145,13 +154,17 @@ export class App {
   }
 
   addItem(value?: any) {
-    var defaultItem = {
+    if (value) {
+      this.items.push(value);
+    }
+    let defaultItem = {
       value: `item ${ this.itemCount++ }`,
       completed: true,
       created_at: new Date()
     };
-    this.items.push(value || defaultItem);
+    this.items.push(defaultItem);
   }
+
 
   removeItem() {
     this.items.pop();
@@ -160,5 +173,5 @@ export class App {
 }
 
 export function main() {
-  return angular.bootstrap(App, []);
+  return angular.bootstrap(App, [ HTTP_BINDINGS ]);
 }
