@@ -222,7 +222,6 @@ gulp.task('preboot.karma', [ 'build.typescript' ], function() {
 
   return b.bundle().
     pipe(source('preboot_karma.js')).
-    pipe($.size()).
     pipe(gulp.dest(PATHS.preboot.karmaDest));
 
 });
@@ -230,31 +229,32 @@ gulp.task('preboot.karma', [ 'build.typescript' ], function() {
 
 // Build
 
-gulp.task('build', [
-  'build.typescript.all',
-  'preboot.example',
-  'preboot.karma'
-]);
-
 gulp.task('build.typescript', [ 'build.typescript.project' ]);
 
 gulp.task('build.typescript.project', function() {
 
-  return tsProject.src().
-    pipe($.typescript(tsProject)).
+  return TS_PROJECT.src().
+    pipe($.typescript(TS_PROJECT)).
     pipe($.size()).
-    pipe(gulp.dest(tsProject.config.compilerOptions.outDir));
+    pipe(gulp.dest(TS_PROJECT.config.compilerOptions.outDir));
 
 });
 
 gulp.task('build.typescript.all', function() {
 
   return gulp.src(PATHS.files.ts).
-    pipe($.typescript(tsProject)).
+    pipe($.typescript(TS_PROJECT)).
     pipe($.size()).
-    pipe(gulp.dest(tsProject.config.compilerOptions.outDir));
+    pipe(gulp.dest(TS_PROJECT.config.compilerOptions.outDir));
 
 });
+
+
+gulp.task('build', [
+  'build.typescript.all',
+  'preboot.example',
+  'preboot.karma'
+]);
 
 // Changelog
 
@@ -272,10 +272,10 @@ gulp.task('changelog', function() {
 gulp.task('clean', function() {
 
   return $.del(PATHS.cleanable, function (err, paths) {
-    if (PATHS.length <= 0) {
+    if (paths.length <= 0) {
       return console.log('Nothing to clean.');
     }
-    return console.log('Deleted folders:\n', PATHS.join('\n'));
+    return console.log('Deleted folders:\n', paths.join('\n'));
   });
 
 });
