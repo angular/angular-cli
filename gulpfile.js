@@ -1,18 +1,17 @@
 /// <reference path="./tsd_typings/node/node.d.ts"/>
-
-var gulp = require('gulp');
 var path = require('path');
 var http = require('http');
-var source = require('vinyl-source-stream');
-var browserify = require('browserify');
 var fs = require('fs');
 var child_process = require('child_process');
 
-// Plugins
+// Gulp and Plugins
+var gulp = require('gulp');
 var $ = require('gulp-load-plugins')({
   pattern: [
     'gulp-*',
     'gulp.*',
+    'browserify',
+    'vinyl-source-stream',
     'del',
     'run-sequence',
     'conventional-changelog',
@@ -214,14 +213,14 @@ gulp.task('preboot.example', [ 'build.typescript' ], function() {
 // build version of preboot to be used for karma testing
 gulp.task('preboot.karma', [ 'build.typescript' ], function() {
 
-  var b = browserify({
+  var b = $.browserify({
     entries: [ PATHS.preboot.karmaEntryPoint ],
     basedir: PATHS.preboot.clientRoot,
     browserField: false
   });
 
   return b.bundle().
-    pipe(source('preboot_karma.js')).
+    pipe($.vinylSourceStream('preboot_karma.js')).
     pipe(gulp.dest(PATHS.preboot.karmaDest));
 
 });
@@ -377,6 +376,7 @@ gulp.task('!browser-sync', function() {
 
 // "serve" defaults to nodemon for the moment.
 gulp.task('serve', [ 'serve.nodemon']);
+gulp.task('server', [ 'nodemon']);
 
 gulp.task('nodemon', function() {
 
@@ -388,7 +388,7 @@ gulp.task('nodemon', function() {
   });
 });
 
-gulp.task('!serve.nodemon', [ 'watch' ], function() {
+gulp.task('serve.nodemon', [ 'watch' ], function() {
 
   $.livereload.listen();
 
