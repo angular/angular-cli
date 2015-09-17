@@ -11,7 +11,7 @@ module.exports = function(ROOT) {
   var universalPath = ROOT + '/dist/examples/app/universal';
 
   var {App}     = require(universalPath + '/test_page/app');
-  var {TodoApp} = require(universalPath + '/todo/index');
+  var {TodoApp} = require(universalPath + '/todo/app');
 
   var {bind} = require('angular2/di');
 
@@ -27,7 +27,11 @@ module.exports = function(ROOT) {
   router.
     route('/').
     get(function ngApp(req, res) {
-      let baseUrl = req.baseUrl;
+      console.log('req.url', req.url);
+      let baseUrl = 'http://localhost:3000' + req.baseUrl;
+      console.log('baseUrl', baseUrl)
+
+
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
@@ -61,7 +65,7 @@ module.exports = function(ROOT) {
   router.
     route('/examples/todo').
     get(function ngTodo(req, res) {
-      let baseUrl = req.baseUrl;
+      let baseUrl = 'http://localhost:3000' + req.baseUrl;
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams , {
         // client url for systemjs
@@ -92,26 +96,18 @@ module.exports = function(ROOT) {
 
     });
 
+  // modules
+  router.use('/web_modules', serveStatic(ROOT + '/web_modules'));
+  router.use('/bower_components', serveStatic(ROOT + '/bower_components'));
 
-  router.use('/src', function(req, res, next) {
-    serveStatic(ROOT + '/src')(req, res, next);
-  });
 
-  router.use('/node_modules', function(req, res, next) {
-    serveStatic(ROOT + '/node_modules')(req, res, next);
-  });
+  // needed for sourcemaps
 
-  router.use('/angular2/dist', function(req, res, next) {
-    serveStatic(ROOT + '/angular/dist/bundle')(req, res, next);
-  });
+  router.use('/src', serveStatic(ROOT + '/src'));
 
-  router.use('/web_modules', function(req, res, next) {
-    serveStatic(ROOT + '/web_modules')(req, res, next);
-  });
-
-  router.use('/bower_components', function(req, res, next) {
-    serveStatic(ROOT + '/bower_components')(req, res, next);
-  });
+  router.use('/node_modules',  serveStatic(ROOT + '/node_modules'));
+  router.use('/angular2/dist', serveStatic(ROOT + '/angular/dist/bundle'));
+  router.use('/examples/app',  serveStatic(ROOT + '/examples/app'));
 
   router.use(historyApiFallback({
     // verbose: true

@@ -108,7 +108,6 @@ class NodeConnection implements Connection {
     if (isPresent(req.headers)) {
       req.headers.forEach((value, name) => { this._xhr.setRequestHeader(name, value); });
     }
-    // var _url = 'http://127.0.0.1:3000/api/todos';
     var _text = this.request.text();
     this._xhr.send(_text);
   }
