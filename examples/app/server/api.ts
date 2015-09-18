@@ -20,7 +20,11 @@ module.exports = function(ROOT) {
   router.route('/todos')
     .get(function(req, res) {
       console.log('GET');
-      res.json(TODOS);
+      // 70ms latency
+      setTimeout(function() {
+        res.json(TODOS);
+      }, 70);
+
     })
     .post(function(req, res) {
       console.log('POST', util.inspect(req.body, {colors: true}));
