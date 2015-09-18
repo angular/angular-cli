@@ -196,113 +196,102 @@ export function bootstrap(appComponentType:Type,
 
   // TODO(rado): prepopulate template cache, so applications with only
   // index.html and main.js are possible.
-  let __zone = createNgZone();
+  var __zone = createNgZone();
+  __zone.run(_ => {
 
-  var exceptionHandler;
-  try {
+    var exceptionHandler;
+    try {
 
-    let bindingsCmpLoader = [DynamicComponentLoader, Injector, Testability, TestabilityRegistry];
-    let componentLoader = (dynamicComponentLoader, injector, testability, registry) => {
-      // TODO(rado): investigate whether to support bindings on root component.
-      return dynamicComponentLoader.loadAsRoot(appComponentType, null, injector).
-        then(componentRef => {
-        registry.registerApplication(componentRef.location.nativeElement, testability);
-        return componentRef;
-      });
-    };
+      let bindingsCmpLoader = [DynamicComponentLoader, Injector, Testability, TestabilityRegistry];
+      let componentLoader = (dynamicComponentLoader, injector, testability, registry) => {
+        // TODO(rado): investigate whether to support bindings on root component.
+        return dynamicComponentLoader.loadAsRoot(appComponentType, null, injector).
+          then(componentRef => {
+          registry.registerApplication(componentRef.location.nativeElement, testability);
+          return componentRef;
+        });
+      };
 
-    // Server
-    let mergedBindings = isPresent(componentInjectableBindings) ? componentInjectableBindings : [];
+      // Server
+      let mergedBindings = isPresent(componentInjectableBindings) ? componentInjectableBindings : [];
 
-    if (!appInjector) {
+      if (!appInjector) {
 
-      appInjector = _createAppInjector(appComponentType, mergedBindings, __zone);
+        appInjector = _createAppInjector(appComponentType, mergedBindings, __zone);
 
-    } else {
+      } else {
 
-      appInjector.resolveAndCreateChild(mergedBindings);
-      // appInjector.resolveAndCreateChild(mergedBindings.push([
-      //   bind(NgZone).toValue(__zone)
-      // ]));
+        appInjector.resolveAndCreateChild(mergedBindings);
+        // appInjector.resolveAndCreateChild(mergedBindings.push([
+        //   bind(NgZone).toValue(__zone)
+        // ]));
 
-    }
-    exceptionHandler = appInjector.get(ExceptionHandler);
-    __zone.overrideOnErrorHandler((e, s) => exceptionHandler.call(e, s));
+      }
+      exceptionHandler = appInjector.get(ExceptionHandler);
+      __zone.overrideOnErrorHandler((e, s) => exceptionHandler.call(e, s));
 
-    // Server
-    let compRefToken = PromiseWrapper.all([
-      PromiseWrapper.wrap(() => appInjector.get(DynamicComponentLoader)),
-      PromiseWrapper.wrap(() => appInjector.get(Testability)),
-      PromiseWrapper.wrap(() => appInjector.get(TestabilityRegistry))
-    ])
-      .then(results => {
-      return componentLoader(results[0], appInjector, results[1], results[2]);
-    });
-
-    let tick = componentRef => {
-      var appChangeDetector = internalView(componentRef.hostView).changeDetector;
-
-      // retrieve life cycle: may have already been created if injected in root component
-      var lifecycle = appInjector.get(LifeCycle);
-      lifecycle.registerWith(__zone, appChangeDetector);
-
-      // Allow us to grab all the styles to render down to the client
-      let sharedStylesHost = appInjector.get(SharedStylesHost);
-
-      bootstrapProcess.resolve(
-        new ApplicationRef(componentRef, appComponentType, appInjector, appChangeDetector, lifecycle, sharedStylesHost)
-      );
-    };
-
-    var tickResult = PromiseWrapper.then(compRefToken, tick);
-
-    PromiseWrapper.then(tickResult,
-      (_) => {
-      });  // required for Dart to trigger the default error handler
-    PromiseWrapper.then(tickResult, null,
-      (err, stackTrace) => {
-        bootstrapProcess.reject(err, stackTrace);
+      // Server
+      let compRefToken = PromiseWrapper.all([
+        PromiseWrapper.wrap(() => appInjector.get(DynamicComponentLoader)),
+        PromiseWrapper.wrap(() => appInjector.get(Testability)),
+        PromiseWrapper.wrap(() => appInjector.get(TestabilityRegistry))
+      ])
+        .then(results => {
+        return componentLoader(results[0], appInjector, results[1], results[2]);
       });
 
-  } catch (e) {
-    if (isPresent(exceptionHandler)) {
-      exceptionHandler.call(e, e.stack);
-    } else {
-      // The error happened during the creation of an injector, most likely because of a bug in
-      // DI.
-      // We cannot use the provided exception handler, so we default to writing to the DOM.
-      DOM.logError(e);
+      let tick = componentRef => {
+        var appChangeDetector = internalView(componentRef.hostView).changeDetector;
+
+        // retrieve life cycle: may have already been created if injected in root component
+        var lifecycle = appInjector.get(LifeCycle);
+        lifecycle.registerWith(__zone, appChangeDetector);
+        // lifecycle.tick();
+
+        // Allow us to grab all the styles to render down to the client
+        let sharedStylesHost = appInjector.get(SharedStylesHost);
+
+        bootstrapProcess.resolve(
+          new ApplicationRef(componentRef, appComponentType, appInjector, appChangeDetector, lifecycle, sharedStylesHost, __zone)
+        );
+      };
+
+      var tickResult = PromiseWrapper.then(compRefToken, tick);
+
+      PromiseWrapper.then(tickResult,
+        (_) => {
+        });  // required for Dart to trigger the default error handler
+      PromiseWrapper.then(tickResult, null,
+        (err, stackTrace) => {
+          bootstrapProcess.reject(err, stackTrace);
+        });
+
+    } catch (e) {
+      if (isPresent(exceptionHandler)) {
+        exceptionHandler.call(e, e.stack);
+      } else {
+        // The error happened during the creation of an injector, most likely because of a bug in
+        // DI.
+        // We cannot use the provided exception handler, so we default to writing to the DOM.
+        DOM.logError(e);
+      }
+      bootstrapProcess.reject(e, e.stack);
     }
-    bootstrapProcess.reject(e, e.stack);
-  }
+
+  });// zone
+
   // Server
   return bootstrapProcess.promise;
 }
 
 export class ApplicationRef {
-  _hostComponent:ComponentRef;
-  _hostComponentType:Type;
-  _hostElementRef:ElementRef;
-  _injector:Injector;
-  _changeDetection:ChangeDetection;
-  _sharedStylesHost:SharedStylesHost;
-  _lifecycle:LifeCycle;
-
-  constructor(hostComponent:ComponentRef,
-              hostComponentType:Type,
-              injector:Injector,
-              changeDetection:ChangeDetection,
-              lifecycle:LifeCycle,
-              sharedStylesHost:SharedStylesHost) {
-
-    this._hostComponent = hostComponent;
-    this._injector = injector;
-    this._hostComponentType = hostComponentType;
-    // Server
-    this._changeDetection = changeDetection;
-    this._sharedStylesHost = sharedStylesHost;
-    this._lifecycle = lifecycle;
-    // Server
+  constructor(private _hostComponent: ComponentRef,
+              private _hostComponentType: Type,
+              private _injector: Injector,
+              private _changeDetection: ChangeDetection,
+              private _lifecycle: LifeCycle,
+              private _sharedStylesHost: SharedStylesHost,
+              private _zone: NgZone) {
   }
 
   get hostComponentType() {
@@ -317,13 +306,14 @@ export class ApplicationRef {
   get changeDetection() {
     return this._changeDetection;
   }
-
   get lifecycle() {
     return this._lifecycle;
   }
-
   get sharedStylesHost() {
     return this._sharedStylesHost;
+  }
+  get zone() {
+    return this._zone;
   }
 
 // Server
@@ -359,7 +349,7 @@ function _createAppInjector(appComponentType:Type, bindings:Array<Type | Binding
 
   mergedBindings.push(bind(NgZone).toValue(zone));
 
-  // detech which binding is undefined
+  // which binding is undefined
   // mergedBindings.map(function(binding, i) {
   //   if (binding === undefined) {
   //     console.log('RENDER', i, mergedBindings[i-1]);
