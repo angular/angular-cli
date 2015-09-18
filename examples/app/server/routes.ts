@@ -27,11 +27,7 @@ module.exports = function(ROOT) {
   router.
     route('/').
     get(function ngApp(req, res) {
-      console.log('req.url', req.url);
       let baseUrl = 'http://localhost:3000' + req.baseUrl;
-      console.log('baseUrl', baseUrl)
-
-
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
