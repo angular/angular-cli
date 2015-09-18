@@ -1,8 +1,9 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 
-// typescript decoratos
+// typescript emit metadata
 import 'reflect-metadata';
+import 'zone.js';
 
 // polyfills
 import 'angular2/node_modules/traceur/bin/traceur-runtime';
