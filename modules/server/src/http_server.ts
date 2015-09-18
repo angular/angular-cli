@@ -1,8 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 
-// FIX: reflect-metadata shim is required when using class decorators
-import 'reflect-metadata';
-//
+import './server_patch';
 
 // ngHttp/src/backends/browser_xhr
 import {BrowserXhr} from 'angular2/http';
@@ -27,9 +25,7 @@ import {
   ReadyStates
 } from 'angular2/http';
 
-import {
-  EventEmitter
-} from 'angular2/angular2';
+import {EventEmitter} from 'angular2/angular2';
 
 import {
   ObservableWrapper
@@ -72,7 +68,7 @@ class NodeConnection implements Connection {
     var _method = RequestMethods[req.method];
 
     this._xhr.open(_method, req.url );
-    this._xhr.addEventListener('load', (_) => {
+    this._xhr.addEventListener('load', zone.bind((_) => {
       // responseText is the old-school way of retrieving response (supported by IE8 & 9)
       // response/responseType properties were introduced in XHR Level2 spec (supported by IE10)
       let response = ('response' in this._xhr) ? this._xhr.response : this._xhr.responseText;
@@ -87,28 +83,31 @@ class NodeConnection implements Connection {
         status = response ? 200 : 0;
       }
 
-      var responseOptions = new ResponseOptions({body: response, status: status});
+      var responseOptions = <any> new ResponseOptions({body: response, status: status});
+
       if (isPresent(baseResponseOptions)) {
         responseOptions = baseResponseOptions.merge(responseOptions);
       }
 
-      ObservableWrapper.callNext(this.response, new Response(responseOptions));
+      let response = <any>new Response(responseOptions);
+
+      ObservableWrapper.callNext(this.response, response);
       // TODO(gdi2290): defer complete if array buffer until done
       ObservableWrapper.callReturn(this.response);
-    });
-    this._xhr.addEventListener('error', (err) => {
-      var responseOptions = new ResponseOptions({body: err, type: ResponseTypes.Error, status: this._xhr.status});
+    }));
+    this._xhr.addEventListener('error', zone.bind((err) => {
+      var responseOptions = (<any>new ResponseOptions({body: err, type: ResponseTypes.Error, status: this._xhr.status}));
       if (isPresent(baseResponseOptions)) {
         responseOptions = baseResponseOptions.merge(responseOptions);
       }
       ObservableWrapper.callThrow(this.response, new Response(responseOptions));
-    });
+    }));
     // TODO(jeffbcross): make this more dynamic based on body type
 
     if (isPresent(req.headers)) {
       req.headers.forEach((value, name) => { this._xhr.setRequestHeader(name, value); });
     }
-    var _text = this.request.text();
+    var _text = this.request.text() || null;
     this._xhr.send(_text);
   }
 
