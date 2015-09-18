@@ -93,7 +93,7 @@ function transformData(data) {
 })
 export class App {
   value: string        = 'value8';
-  items: Array<string> = [];
+  items: Array<any>    = [];
   toggle: boolean      = true;
   itemCount: number    = 0;
   buttonTest: string   = '';
