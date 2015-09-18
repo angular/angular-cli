@@ -6,7 +6,6 @@
 
 /// <reference path="angular2/di.d.ts"/>
 /// <reference path="angular2/core.d.ts"/>
-/// <reference path="angular2/http.d.ts"/>
 
 
 /*
