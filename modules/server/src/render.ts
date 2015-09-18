@@ -89,13 +89,17 @@ export function renderToString(AppComponent, serverBindings: any = [], serverDoc
 
       // serialize Top Level Component
       let serializedCmp = applicationToString(appRef);
+      let serializedApp = serializedStyleHosts + serializedCmp,
 
-      // destroy appComponent
-      // remove from serverDom (should be handled by appRef.dispose already)
-      appRef.dispose();
+      return new Promise(resolve => {
+        // ensure all xhr calls are done
+        appRef.zone.overrideOnEventDone(_ => {
+          // destroy appComponent
+          appRef.dispose();
+          resolve(serializedApp);
+        }, true);
+      });//Promise
 
-      // return rendered version of our serialized component
-      return serializedStyleHosts + serializedCmp;
     });
 }
 
