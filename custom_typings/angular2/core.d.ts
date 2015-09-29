@@ -588,11 +588,17 @@ declare module "angular2/src/core/facade/async" {
   class PromiseCompleter {
   }
   class PromiseWrapper {
+    static resolve(pro:any, failure:any):any;
+
+    static reject(pro:any, failure:any):any;
+
     static completer():any;
 
     static all(all:any):any;
 
     static then(pro:any, sucess?:any, failure?:any):any;
+
+    static catchError(pro:any, failure:any):any;
 
     static wrap(pro:any):any;
   }
