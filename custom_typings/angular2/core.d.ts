@@ -574,7 +574,7 @@ declare module "angular2/src/core/facade/async" {
   class ObservableWrapper {
     static callNext(next:any, obs?:any):any;
 
-    static subscribe(observer:any):any;
+    static subscribe(observer: any, success?: any, fail?: any, complete?: any):any;
 
     static callReturn(obs:any):any;
 
