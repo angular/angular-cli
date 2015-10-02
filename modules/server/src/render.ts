@@ -13,6 +13,7 @@ import {SERVER_DOM_RENDERER_BINDINGS} from './server_dom_renderer';
 import {stringifyElement} from './stringifyElement';
 
 import {getClientCode} from '../../preboot/server';
+import {getPrebootCSS, createPrebootHTML} from './ng_preboot';
 
 
 import {isBlank, isPresent} from 'angular2/src/core/facade/lang';
@@ -25,6 +26,9 @@ import {
 } from 'angular2/src/core/render/render';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
 
+import {Http} from 'angular2/http';
+import {NgZone} from 'angular2/angular2';
+
 // TODO: maintain stateless Injector/document and directiveResolver
 var serverInjector = undefined; // js defaults only work with undefined
 
@@ -35,11 +39,67 @@ export function selectorResolver(Component): string {
 }
 
 
-export function applicationToString(appRef): string {
-  // grab parse5 html element or default to the one we provided
-  let element = appRef.hostElementRef.nativeElement;
+export function createServerDocument(appSelector) {
+  // 1ms
+  let serverDocument = DOM.createHtmlDocument();
+  let el = DOM.createElement(appSelector, serverDocument);
+  DOM.appendChild(serverDocument.body, el);
+  return serverDocument;
+}
+
+
+export function appRefSaveServerInjector(appRef) {
+  // save a reference to appInjector
+  // TODO: refactor into appRef
+  if (isBlank(serverInjector) && isPresent(appRef.injector)) {
+    serverInjector = appRef.injector;
+  }
+
+  return appRef;
+}
+
+
+export function serializeApplication(element, styles: string[], cache: any) {
+  // serialize all style hosts
+  let serializedStyleHosts = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
+
+  // serialize Top Level Component
   let serializedCmp = stringifyElement(element);
-  return serializedCmp;
+
+  // serialize App Data
+  let serializedData = !cache ? '' : ''+
+    '<script>'+
+    'window.' + 'ngPreloadCache' +' = '+  JSON.stringify(cache) +
+    '</script>'
+  '';
+
+  return serializedStyleHosts + serializedCmp + serializedData;
+}
+
+
+function arrayFlatten(children: any[], arr: any[]): any[] {
+  for (let child of children) {
+    arr.push(child.res)
+    arrayFlatten(child.children, arr)
+  }
+
+  return arr
+}
+
+export function appRefSyncRender(appRef) {
+  // grab parse5 html element
+  let element = appRef.hostElementRef.nativeElement;
+
+  // TODO: we need a better way to manage the style host for server/client
+  let styles = appRef.sharedStylesHost.getAllStyles();
+
+  // TODO: we need a better way to manage data serialized data for server/client
+  let http = appRef.injector.getOptional(Http);
+  let cache = isPresent(http) ? arrayFlatten(http._rootNode.children, []) : null;
+
+  let serializedApp = serializeApplication(element, styles, cache);
+
+  return serializedApp;
 }
 
 
@@ -47,58 +107,38 @@ export function bootstrapServer(AppComponent, serverBindings: any = [], serverIn
 
   // create server document with top level component
   if (isBlank(serverDocument)) {
-    // 1ms
-    serverDocument = DOM.createHtmlDocument();
-    let selector = selectorResolver(AppComponent);
-    let el = DOM.createElement(selector, serverDocument);
-    DOM.appendChild(serverDocument.body, el);
+    serverDocument = createServerDocument(selectorResolver(AppComponent));
   }
 
   let renderBindings = [
     bind(DOCUMENT).toValue(serverDocument),
     bind(APP_COMPONENT).toValue(AppComponent),
     SERVER_DOM_RENDERER_BINDINGS
-  ].
-  concat(serverBindings);
+  ].concat(serverBindings);
 
   return bootstrap(AppComponent, renderBindings, serverInjector, serverDocument).
-    then(appRef => {
-      // save a reference to appInjector
-      // TODO: refactor into appRef
-      if (isBlank(serverInjector) && isPresent(appRef.injector)) {
-        serverInjector = appRef.injector;
-      }
-
-      return appRef;
-    });
-
-
+    then(appRefSaveServerInjector);
 }
 
 export function renderToString(AppComponent, serverBindings: any = [], serverDocument: any = null) {
   return bootstrapServer(AppComponent, serverBindings, serverDocument).
     then(appRef => {
-
-      // change detection
-      appRef.lifecycle.tick();
-
-      // TODO: we need a better way to manage the style host for server/client
-      // serialize all style hosts
-      let styles = appRef.sharedStylesHost.getAllStyles();
-      let serializedStyleHosts = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
-
-      // serialize Top Level Component
-      let serializedCmp = applicationToString(appRef);
-      let serializedApp = serializedStyleHosts + serializedCmp,
-
+      let http = appRef.injector.getOptional(Http);
+      // TODO: fix zone.js ensure overrideOnEventDone callback when there are no pending tasks
+      // ensure all xhr calls are done
       return new Promise(resolve => {
-        // ensure all xhr calls are done
-        appRef.zone.overrideOnEventDone(_ => {
-          // destroy appComponent
-          appRef.dispose();
-          resolve(serializedApp);
+        let ngZone = appRef.injector.get(NgZone);
+        // ngZone
+        ngZone.overrideOnEventDone(() => {
+          if (isBlank(http) || http._async <= 0) {
+            let _html = appRefSyncRender(appRef);
+            appRef.dispose();
+            resolve(_html);
+          }
+
         }, true);
-      });//Promise
+
+      });
 
     });
 }
@@ -107,93 +147,8 @@ export function renderToString(AppComponent, serverBindings: any = [], serverDoc
 export function renderToStringWithPreboot(AppComponent, serverBindings: any = [], prebootConfig: any = {}, serverDocument: any = null) {
   return renderToString(AppComponent, serverBindings, serverDocument).
     then(html => {
-      if (!prebootConfig) {
-        return html
-      }
-      return getClientCode(prebootConfig).then(code => {
-        let preboot_styles = `
-        <style>
-        ${ getPrebootCSS() }
-        </style>
-        `;
-        let preboot = `
-        <script>
-        ${ code }
-        </script>
-        `;
-        if (prebootConfig.start === true) {
-          preboot += '<script>\npreboot.start();\n</script>';
-        }
-        return html + preboot_styles + preboot;
-      });
+      if (!prebootConfig) { return html }
+      return getClientCode(prebootConfig).
+        then(code => html + createPrebootHTML(code, prebootConfig));
     });
-}
-
-
-function getPrebootCSS() {
-  return `
-.preboot-overlay {
-    background: grey;
-    opacity: .27;
-}
-
-@keyframes spin {
-    to { transform: rotate(1turn); }
-}
-
-.preboot-spinner {
-    position: relative;
-    display: inline-block;
-    width: 5em;
-    height: 5em;
-    margin: 0 .5em;
-    font-size: 12px;
-    text-indent: 999em;
-    overflow: hidden;
-    animation: spin 1s infinite steps(8);
-}
-
-.preboot-spinner.small {
-    font-size: 6px;
-}
-
-.preboot-spinner.large {
-    font-size: 24px;
-}
-
-.preboot-spinner:before,
-.preboot-spinner:after,
-.preboot-spinner > div:before,
-.preboot-spinner > div:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 2.25em; /* (container width - part width)/2  */
-    width: .5em;
-    height: 1.5em;
-    border-radius: .2em;
-    background: #eee;
-    box-shadow: 0 3.5em #eee; /* container height - part height */
-    transform-origin: 50% 2.5em; /* container height / 2 */
-}
-
-.preboot-spinner:before {
-    background: #555;
-}
-
-.preboot-spinner:after {
-    transform: rotate(-45deg);
-    background: #777;
-}
-
-.preboot-spinner > div:before {
-    transform: rotate(-90deg);
-    background: #999;
-}
-
-.preboot-spinner > div:after {
-    transform: rotate(-135deg);
-    background: #bbb;
-}
-`
 }
