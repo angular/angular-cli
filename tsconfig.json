@@ -56,7 +56,7 @@
 
     "modules/server/server.ts",
     "modules/server/src/bootstrap-server.ts",
-    "modules/server/src/build_scripts.ts",
+    "modules/server/src/ng_scripts.ts",
     "modules/server/src/express_ng2engine.ts",
     "modules/server/src/form_directives_server.ts",
     "modules/server/src/helper.ts",
@@ -69,7 +69,8 @@
     "modules/server/test/router_server_spec.ts",
     "modules/server/typings/tsd.d.ts",
 
-    "modules/experimental/experimental.ts",
+    "modules/client/client.ts",
+    "modules/client/src/ng_preload_cache.ts",
 
     "examples/app/server/api.ts",
     "examples/app/server/routes.ts",
