@@ -132,15 +132,21 @@ function _injectorBindings(appComponentType):Array<Type | Binding | Array<any>> 
     //         [DynamicComponentLoader, Injector, Testability, TestabilityRegistry]),
 
     bind(appComponentType)
-      .toFactory(p => p.then(ref => ref.instance), [APP_COMPONENT_REF_PROMISE]),
-    bind(LifeCycle).toFactory((exceptionHandler) => new LifeCycle(null, assertionsEnabled()),
-      [ExceptionHandler]),
-    bind(EventManager).toFactory(
-      (ngZone) => {
+      .toFactory(p => {
+        return p.then(ref => ref.instance);
+      }, [APP_COMPONENT_REF_PROMISE]),
+
+    bind(LifeCycle)
+      .toFactory(exceptionHandler => {
+        return new LifeCycle(null, assertionsEnabled());
+      }, [ExceptionHandler]),
+
+    bind(EventManager)
+      .toFactory(ngZone => {
         var plugins = [new HammerGesturesPlugin(), new KeyEventsPlugin(), new DomEventsPlugin()];
         return new EventManager(plugins, ngZone);
-      },
-      [NgZone]),
+      }, [NgZone]),
+
     DomRenderer,
     bind(Renderer).toAlias(DomRenderer),
     APP_ID_RANDOM_BINDING,
@@ -187,10 +193,10 @@ export function createNgZone():NgZone {
 }
 
 
-export function bootstrap(appComponentType:Type,
-                          componentInjectableBindings:Array<Binding> = null,
-                          appInjector:any = null,
-                          appDocument:any = null):Promise {
+export function bootstrap(appComponentType: Type,
+                          componentInjectableBindings: Array<Binding> = null,
+                          appInjector: any = null,
+                          appDocument: any = null): Promise {
   wtfInit();
   let bootstrapProcess = PromiseWrapper.completer();
 
@@ -207,9 +213,9 @@ export function bootstrap(appComponentType:Type,
         // TODO(rado): investigate whether to support bindings on root component.
         return dynamicComponentLoader.loadAsRoot(appComponentType, null, injector).
           then(componentRef => {
-          registry.registerApplication(componentRef.location.nativeElement, testability);
-          return componentRef;
-        });
+            registry.registerApplication(componentRef.location.nativeElement, testability);
+            return componentRef;
+          });
       };
 
       // Server
@@ -221,47 +227,60 @@ export function bootstrap(appComponentType:Type,
 
       } else {
 
-        appInjector.resolveAndCreateChild(mergedBindings);
-        // appInjector.resolveAndCreateChild(mergedBindings.push([
-        //   bind(NgZone).toValue(__zone)
-        // ]));
+        // appInjector.resolveAndCreateChild(mergedBindings);
+        appInjector.resolveAndCreateChild(mergedBindings.push([
+          bind(NgZone).toValue(__zone)
+        ]));
 
       }
+      // defined outside of scope
       exceptionHandler = appInjector.get(ExceptionHandler);
-      __zone.overrideOnErrorHandler((e, s) => exceptionHandler.call(e, s));
+      let ngZone = appInjector.get(NgZone);
+      ngZone.overrideOnErrorHandler((e, s) => exceptionHandler.call(e, s));
 
       // Server
       let compRefToken = PromiseWrapper.all([
         PromiseWrapper.wrap(() => appInjector.get(DynamicComponentLoader)),
         PromiseWrapper.wrap(() => appInjector.get(Testability)),
         PromiseWrapper.wrap(() => appInjector.get(TestabilityRegistry))
-      ])
-        .then(results => {
-        return componentLoader(results[0], appInjector, results[1], results[2]);
-      });
+      ]).
+        then( ([loader, testability, registry]) => {
+          // appInjector created above
+          return componentLoader(loader, appInjector, testability, registry);
+        });
 
       let tick = componentRef => {
-        var appChangeDetector = internalView(componentRef.hostView).changeDetector;
-
-        // retrieve life cycle: may have already been created if injected in root component
-        var lifecycle = appInjector.get(LifeCycle);
-        lifecycle.registerWith(__zone, appChangeDetector);
-        // lifecycle.tick();
+        let appChangeDetector = internalView(componentRef.hostView).changeDetector;
 
         // Allow us to grab all the styles to render down to the client
         let sharedStylesHost = appInjector.get(SharedStylesHost);
+        let ngZone = appInjector.get(NgZone);
 
-        bootstrapProcess.resolve(
-          new ApplicationRef(componentRef, appComponentType, appInjector, appChangeDetector, lifecycle, sharedStylesHost, __zone)
-        );
+        // retrieve life cycle: may have already been created if injected in root component
+        let lifecycle = appInjector.get(LifeCycle);
+
+        lifecycle.registerWith(ngZone, appChangeDetector);
+        // ensure change detection kicks in for zone#overrideOnEventDone
+        lifecycle.tick();
+        // setTimeout(() => lifecycle.tick());
+
+        let appRef = new ApplicationRef(
+          componentRef,
+          appComponentType,
+          appInjector,
+          appChangeDetector,
+          lifecycle,
+          sharedStylesHost,
+          ngZone);
+
+        bootstrapProcess.resolve(appRef);
       };
 
-      var tickResult = PromiseWrapper.then(compRefToken, tick);
+      let tickResult = PromiseWrapper.then(compRefToken, tick);
 
       PromiseWrapper.then(tickResult,
-        (_) => {
-        });  // required for Dart to trigger the default error handler
-      PromiseWrapper.then(tickResult, null,
+        (_) => {});  // required for Dart to trigger the default error handler
+      PromiseWrapper.catchError(tickResult,
         (err, stackTrace) => {
           bootstrapProcess.reject(err, stackTrace);
         });
@@ -291,8 +310,7 @@ export class ApplicationRef {
               private _changeDetection: ChangeDetection,
               private _lifecycle: LifeCycle,
               private _sharedStylesHost: SharedStylesHost,
-              private _zone: NgZone) {
-  }
+              private _zone: NgZone) {}
 
   get hostComponentType() {
     return this._hostComponentType;
@@ -330,6 +348,8 @@ export class ApplicationRef {
     // Server
     this._injector = null;
     this._changeDetection = null;
+    this._sharedStylesHost = null;
+    this._zone = null;
     // Server
 
     // TODO: We also need to clean up the Zone, ... here!
@@ -338,7 +358,7 @@ export class ApplicationRef {
 }
 
 function _createAppInjector(appComponentType:Type, bindings:Array<Type | Binding | Array<any>>,
-                            zone:NgZone):Injector {
+                            zone: NgZone):Injector {
   if (isBlank(_rootInjector)) {
     _rootInjector = Injector.resolveAndCreate(_rootBindings);
   }
