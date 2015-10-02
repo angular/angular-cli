@@ -19,6 +19,7 @@ module.exports = function(ROOT) {
     HTTP_BINDINGS,
     SERVER_LOCATION_BINDINGS,
     BASE_URL,
+    PRIME_CACHE,
     queryParamsToBoolean
   } = require(ROOT + '/dist/modules/server/server');
   // require('@angular/universal')
@@ -37,7 +38,8 @@ module.exports = function(ROOT) {
         serverBindings: [
           HTTP_BINDINGS,
           SERVER_LOCATION_BINDINGS,
-          bind(BASE_URL).toValue(baseUrl)
+          bind(BASE_URL).toValue(baseUrl),
+          bind(PRIME_CACHE).toValue(true)
         ],
         data: {},
 
@@ -71,7 +73,8 @@ module.exports = function(ROOT) {
         serverBindings: [
           HTTP_BINDINGS,
           SERVER_LOCATION_BINDINGS,
-          bind(BASE_URL).toValue(baseUrl)
+          bind(BASE_URL).toValue(baseUrl),
+          bind(PRIME_CACHE).toValue(true)
         ],
         data: {},
 
