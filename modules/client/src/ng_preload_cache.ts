@@ -5,6 +5,7 @@ import {
   Response,
   Headers,
   RequestOptions,
+  ResponseOptions,
   ConnectionBackend,
   XHRBackend
 } from 'angular2/http';
@@ -22,7 +23,6 @@ export const PRIME_CACHE: OpaqueToken = CONST_EXPR(new OpaqueToken('primeCache')
 
 @Injectable()
 export class NgPreloadCacheHttp extends Http {
-  _cache = Object.create(null);
   prime: boolean = true;
   constructor(
     protected _backend: ConnectionBackend,
@@ -30,110 +30,87 @@ export class NgPreloadCacheHttp extends Http {
     super(_backend, _defaultOptions);
   }
 
-  preload(method, key) {
-    // let self = this;
+  preload(method) {
     let obs = new EventEmitter();
-    // setTimeout(() => {
-      let newcache = (<any>window).ngPreloadCache;
+    let newcache = (<any>window).ngPreloadCache;
+    if (newcache) {
 
-      let cache: any = newcache;
+      var preloaded = null;
+
       try {
-        let res = Object.assign({}, newcache[key], {
-          body: newcache[key]._body,
-          headers: new Headers(newcache[key].headers)
-        });
-        cache = new Response(res);
-        newcache[key] = null;
-        newcache = null;
-      } catch(e) {}
+        let res;
+        preloaded = newcache.shift();
+        if (isPresent(preloaded)) {
+          let body = preloaded._body;
+          res = new ResponseOptions(Object.assign({}, preloaded, { body }));
 
-      if (cache && Object.keys(cache).length) {
-        setTimeout(() => {
-          ObservableWrapper.callNext(obs, cache);
-          ObservableWrapper.callReturn(obs);
-        });
-      } else {
-        let request = method();
-        // request.observer(obs);
-        request.observer({
-          next(value) {
-            // self._cache[key] = value;
-            ObservableWrapper.callNext(obs, value);
-          },
-          throw(e) {
-            setTimeout(() => {
-              ObservableWrapper.callThrow(obs, e)
-            });
-          },
-          return() {
-            setTimeout(() => {
-              ObservableWrapper.callReturn(obs)
-            });
+          if (preloaded.headers) {
+            res.headers = new Headers(preloaded);
           }
+          preloaded = new Response(res);
+        }
+      } catch(e) {
+        console.log('WAT', e)
+      }
+
+      if (preloaded) {
+        setTimeout(() => {
+          ObservableWrapper.callNext(obs, preloaded);
+          // setTimeout(() => {
+            ObservableWrapper.callReturn(obs);
+          // });
+        });
+        return obs;
+      }
+
+    }
+    let request = method();
+    // request.observer(obs);
+    request.observer({
+      next(value) {
+        ObservableWrapper.callNext(obs, value);
+      },
+      throw(e) {
+        setTimeout(() => {
+          ObservableWrapper.callThrow(obs, e)
+        });
+      },
+      return() {
+        setTimeout(() => {
+          ObservableWrapper.callReturn(obs)
         });
       }
-    // });
+    });
 
     return obs;
   }
 
   request(url: string, options): EventEmitter {
-    let key = JSON.stringify({
-      url,
-      options: options
-    });
-    return this.prime ? this.preload(() => super.request(url, options), key) : super.request(url, options);
+    return this.prime ? this.preload(() => super.request(url, options)) : super.request(url, options);
   }
 
   get(url: string, options): EventEmitter {
-    let key = JSON.stringify({
-      url,
-      options: options
-    });
-    return this.prime ? this.preload(() => super.get(url, options), key) : super.get(url, options);
+    return this.prime ? this.preload(() => super.get(url, options)) : super.get(url, options);
   }
 
   post(url: string, body: string, options): EventEmitter {
-    let key = JSON.stringify({
-      url,
-      body,
-      options: options
-    });
-    return this.prime ? this.preload(() => super.post(url, body, options), key) : super.post(url, body, options);
+    return this.prime ? this.preload(() => super.post(url, body, options)) : super.post(url, body, options);
   }
 
   put(url: string, body: string, options): EventEmitter {
-    let key = JSON.stringify({
-      url,
-      body,
-      options: options
-    });
-    return this.prime ? this.preload(() => super.put(url, body, options), key) : super.put(url, body, options);
+    return this.prime ? this.preload(() => super.put(url, body, options)) : super.put(url, body, options);
   }
 
   delete(url: string, options): EventEmitter {
-    let key = JSON.stringify({
-      url,
-      options: options
-    });
-    return this.prime ? this.preload(() => super.delete(url, options), key) : super.delete(url, options);
+    return this.prime ? this.preload(() => super.delete(url, options)) : super.delete(url, options);
   }
 
   patch(url: string, body: string, options): EventEmitter {
-    let key = JSON.stringify({
-      url,
-      body,
-      options: options
-    });
-    return this.prime ? this.preload(() => super.patch(url, body, options), key) : super.patch(url, body, options);
+    return this.prime ? this.preload(() => super.patch(url, body, options)) : super.patch(url, body, options);
   }
 
   head(url: string, options): EventEmitter {
-    let key = JSON.stringify({
-      url,
-      options: options
-    });
-    return this.prime ? this.preload(() => super.head(url, options), key) : super.head(url, options);
+    return this.prime ? this.preload(() => super.head(url, options)) : super.head(url, options);
   }
 }
 
