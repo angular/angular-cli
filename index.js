@@ -19,10 +19,17 @@ var server = require('./dist/examples/app/server/server')(__dirname);
 // Start server
 module.exports.Server = http.createServer(server).listen(port, SERVER_IP, function() {
   console.log('Listening on port: ' + port);
-
-
   // for smoke testing
+  smokeTest();
+});
+/*
+https.createServer(options, server).listen(ssl, function() {
+  console.log('Listening on port: ' + ssl + ' in ' + process.env.NODE_ENV);
+});
+*/
 
+
+function smokeTest() {
   var req = http.get({
     host: 'localhost',
     port: 3000,
@@ -48,12 +55,4 @@ module.exports.Server = http.createServer(server).listen(port, SERVER_IP, functi
   req.on('error', function(e) {
     console.error('ERROR: ' + e.message);
   });
-
-
-
-});
-/*
-https.createServer(options, server).listen(ssl, function() {
-  console.log('Listening on port: ' + ssl + ' in ' + process.env.NODE_ENV);
-});
-*/
+}
