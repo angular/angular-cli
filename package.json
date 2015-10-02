@@ -91,7 +91,7 @@
     "tsd": "^0.6.4",
     "typescript": "^1.6.2",
     "yargs": "^3.14.0",
-    "zone.js": "^0.5.2"
+    "zone.js": "^0.5.6"
   },
   "dependencies": {
     "angular2": "2.0.0-alpha.37",
