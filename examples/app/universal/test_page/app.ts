@@ -3,9 +3,25 @@ console.time('angular2/angular2 in client');
 import * as angular from 'angular2/angular2';
 console.timeEnd('angular2/angular2 in client');
 
-import {Component, View, ViewEncapsulation} from 'angular2/angular2';
-import {Http, HTTP_BINDINGS} from 'angular2/http';
-import {CORE_DIRECTIVES} from 'angular2/angular2';
+import {
+  Component,
+  View,
+  ViewEncapsulation,
+  bind,
+  CORE_DIRECTIVES
+} from 'angular2/angular2';
+
+import {
+  Http,
+  HTTP_BINDINGS
+} from 'angular2/http';
+
+import {
+  NG_PRELOAD_CACHE_BINDINGS,
+  PRIME_CACHE
+} from '../../../../modules/client/client';
+
+
 
 function transformData(data) {
   if (data.hasOwnProperty('created_at')) {
@@ -108,17 +124,17 @@ export class App {
     this.addItem();
     this.addItem();
 
-    var todosObs$ = this.http.get('/api/todos').
-        toRx().
-        filter(res => res.status >= 200 && res.status < 300).
-        map(res => res.json()).
-        map(data => transformData(data)); // ensure correct data prop types
+    let todosObs$ = this.http.get('/api/todos')
+        .toRx()
+        .filter(res => res.status >= 200 && res.status < 300)
+        .map(res => res.json())
+        .map(data => transformData(data)); // ensure correct data prop types
 
     todosObs$.subscribe(
       // onValue
       todos => {
-        console.log('data', todos);
         todos.map(todo => this.addItem(todo));
+        // this.anotherAjaxCall();
       },
       // onError
       err => {
@@ -132,7 +148,23 @@ export class App {
     );
 
 
+  }
+  anotherAjaxCall() {
+    let todosObs2$ = this.http.get('/api/todos')
+      .toRx()
+      .map(res => res.json())
+      .map(data => transformData(data));
 
+    todosObs2$.subscribe(
+      val => {
+        console.log('anotherAjaxCall data');
+      },
+      err => {
+        console.log('anotherAjaxCall err')
+      },
+      () => {
+        console.log('anotherAjaxCall complete')
+      });
   }
 
   log(value) {
@@ -155,14 +187,14 @@ export class App {
 
   addItem(value?: any) {
     if (value) {
-      this.items.push(value);
+      return this.items.push(value);
     }
     let defaultItem = {
       value: `item ${ this.itemCount++ }`,
       completed: true,
       created_at: new Date()
     };
-    this.items.push(defaultItem);
+    return this.items.push(defaultItem);
   }
 
 
@@ -172,6 +204,11 @@ export class App {
 
 }
 
+
 export function main() {
-  return angular.bootstrap(App, [ HTTP_BINDINGS ]);
+  return angular.bootstrap(App, [
+    HTTP_BINDINGS,
+    NG_PRELOAD_CACHE_BINDINGS,
+    bind(PRIME_CACHE).toValue(true)
+  ]);
 }
