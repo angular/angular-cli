@@ -3,7 +3,7 @@
 
 // typescript emit metadata
 import 'reflect-metadata';
-import 'zone.js';
+import 'zone.js/dist/zone-microtask';
 
 // polyfills
 import 'angular2/node_modules/traceur/bin/traceur-runtime';
