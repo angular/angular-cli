@@ -17,7 +17,7 @@ import {
   bootstrapFunction,
   bootstrapApp,
   buildClientScripts
-} from './build_scripts';
+} from './ng_scripts';
 
 export function ng2engine(filePath: string, options, done) {
   // defaults
@@ -42,29 +42,29 @@ export function ng2engine(filePath: string, options, done) {
       }
 
       // bootstrap and render component to string
-      renderToString(options.Component, options.serverBindings)
-      .then(serializedCmp => {
+      renderToString(options.Component, options.serverBindings).
+        then(serializedCmp => {
 
-        let selector = selectorResolver(options.Component);
+          let selector = selectorResolver(options.Component);
 
-        // selector replacer explained here
-        // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
-        // replace our component with serialized version
-        let rendered = clientHtml.replace(
-          // <selector></selector>
-          selectorRegExpFactory(selector),
-          // <selector>{{ serializedCmp }}</selector>
-          serializedCmp
-          // TODO: serializedData
-        );
+          // selector replacer explained here
+          // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
+          // replace our component with serialized version
+          let rendered = clientHtml.replace(
+            // <selector></selector>
+            selectorRegExpFactory(selector),
+            // <selector>{{ serializedCmp }}</selector>
+            serializedCmp
+            // TODO: serializedData
+          );
 
-        done(null, buildClientScripts(rendered, options));
-      })
-      .catch(e => {
-        console.log(e.stack);
-        // if server fail then return client html
-        done(null, buildClientScripts(clientHtml, options));
-      });
+          done(null, buildClientScripts(rendered, options));
+        }).
+        catch(e => {
+          console.log(e.stack);
+          // if server fail then return client html
+          done(null, buildClientScripts(clientHtml, options));
+        });
     });
   } catch (e) {
     done(e);
@@ -94,29 +94,29 @@ export function ng2engineWithPreboot(filePath: string, options, done) {
       }
 
       // bootstrap and render component to string
-      renderToStringWithPreboot(options.Component, options.serverBindings, options.preboot)
-      .then(serializedCmp => {
+      renderToStringWithPreboot(options.Component, options.serverBindings, options.preboot).
+        then(serializedCmp => {
 
-        let selector = selectorResolver(options.Component);
+          let selector = selectorResolver(options.Component);
 
-        // selector replacer explained here
-        // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
-        // replace our component with serialized version
-        let rendered = clientHtml.replace(
-          // <selector></selector>
-          selectorRegExpFactory(selector),
-          // <selector>{{ serializedCmp }}</selector>
-          serializedCmp
-          // TODO: serializedData
-        );
+          // selector replacer explained here
+          // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
+          // replace our component with serialized version
+          let rendered = clientHtml.replace(
+            // <selector></selector>
+            selectorRegExpFactory(selector),
+            // <selector>{{ serializedCmp }}</selector>
+            serializedCmp
+            // TODO: serializedData
+          );
 
-        done(null, buildClientScripts(rendered, options));
-      })
-      .catch(e => {
-        console.log(e.stack);
-        // if server fail then return client html
-        done(null, buildClientScripts(clientHtml, options));
-      });
+          done(null, buildClientScripts(rendered, options));
+        }).
+        catch(e => {
+          console.log(e.stack);
+          // if server fail then return client html
+          done(null, buildClientScripts(clientHtml, options));
+        });
     });
   } catch (e) {
     done(e);
