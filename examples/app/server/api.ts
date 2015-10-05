@@ -11,12 +11,10 @@ var TODOS = [
   { id: 2, value: 'include development environment', created_at: new Date(), completed: false },
   { id: 3, value: 'include production environment',  created_at: new Date(), completed: false }
 ];
-
 module.exports = function(ROOT) {
 
   var router = Router();
-
-
+  
   router.route('/todos')
     .get(function(req, res) {
       console.log('GET');

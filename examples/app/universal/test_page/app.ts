@@ -38,9 +38,9 @@ function transformData(data) {
   encapsulation: ViewEncapsulation.Emulated,
   directives: [ CORE_DIRECTIVES ],
   styles: [`
-  #intro {
-    background-color: red;
-  }
+    #intro {
+      background-color: red;
+    }
   `],
   template: `
   <h1 id="intro">Hello Server Renderer</h1>
@@ -108,6 +108,10 @@ function transformData(data) {
   `
 })
 export class App {
+  static queries = {
+    todos: '/api/todos'
+  };
+
   value: string        = 'value8';
   items: Array<any>    = [];
   toggle: boolean      = true;
@@ -115,24 +119,50 @@ export class App {
   buttonTest: string   = '';
   testingInput: string = 'default state on component';
 
+  todosObs1$ = this.http.get(App.queries.todos)
+    .toRx()
+    .filter(res => res.status >= 200 && res.status < 300)
+    .map(res => res.json())
+    .map(data => transformData(data)); // ensure correct data prop types
+  todosObs2$ = this.http.get(App.queries.todos)
+    .toRx()
+    .filter(res => res.status >= 200 && res.status < 300)
+    .map(res => res.json())
+    .map(data => transformData(data)); // ensure correct data prop types
+  todosObs3$ = this.http.get(App.queries.todos)
+    .toRx()
+    .map(res => res.json())
+    .map(data => transformData(data));
+
   constructor(private http: Http) {
 
   }
 
   onInit() {
-    this.addItem();
-    this.addItem();
-    this.addItem();
+    // this.addItem();
+    // this.addItem();
+    // this.addItem();
 
-    let todosObs$ = this.http.get('/api/todos')
-        .toRx()
-        .filter(res => res.status >= 200 && res.status < 300)
-        .map(res => res.json())
-        .map(data => transformData(data)); // ensure correct data prop types
-
-    todosObs$.subscribe(
+    this.todosObs1$.subscribe(
       // onValue
       todos => {
+        todos.map(todo => this.addItem(todo));
+        this.anotherAjaxCall();
+      },
+      // onError
+      err => {
+        console.error('err', err);
+        throw err;
+      },
+      // onComplete
+      () => {
+        console.log('complete request1');
+      });
+
+    this.todosObs2$.subscribe(
+      // onValue
+      todos => {
+        console.log('another call 2', todos);
         todos.map(todo => this.addItem(todo));
         // this.anotherAjaxCall();
       },
@@ -143,27 +173,20 @@ export class App {
       },
       // onComplete
       () => {
-        console.log('complete request');
-      }
-    );
-
+        console.log('complete request2');
+      });
 
   }
   anotherAjaxCall() {
-    let todosObs2$ = this.http.get('/api/todos')
-      .toRx()
-      .map(res => res.json())
-      .map(data => transformData(data));
-
-    todosObs2$.subscribe(
-      val => {
-        console.log('anotherAjaxCall data');
+    this.todosObs3$.subscribe(
+      todos => {
+        console.log('anotherAjaxCall data 3', todos);
       },
       err => {
         console.log('anotherAjaxCall err')
       },
       () => {
-        console.log('anotherAjaxCall complete')
+        console.log('anotherAjaxCall complete ajax')
       });
   }
 

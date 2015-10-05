@@ -69,7 +69,7 @@ export function serializeApplication(element, styles: string[], cache: any) {
   // serialize App Data
   let serializedData = !cache ? '' : ''+
     '<script>'+
-    'window.' + 'ngPreloadCache' +' = '+  JSON.stringify(cache) +
+    'window.' + 'ngPreloadCache' +' = '+  JSON.stringify(cache, null, 2) +
     '</script>'
   '';
 
