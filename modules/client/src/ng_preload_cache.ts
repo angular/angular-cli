@@ -16,7 +16,7 @@ import {
   CONST_EXPR
 } from 'angular2/src/core/facade/lang';
 
-import {bind, OpaqueToken, Injectable, Optional, Inject} from 'angular2/di';
+import {bind, OpaqueToken, Injectable, Optional, Inject} from 'angular2/angular2';
 
 export const PRIME_CACHE: OpaqueToken = CONST_EXPR(new OpaqueToken('primeCache'));
 

@@ -1,12 +1,16 @@
 /// <reference path="../../../../custom_typings/_custom.d.ts" />
 // import {bootstrap} from '../../angular2_client/bootstrap-defer';
-import {bootstrap, ViewEncapsulation} from 'angular2/angular2';
-
-import {Component, View, Directive} from 'angular2/angular2';
-import {ElementRef} from 'angular2/angular2';
-import {bind, Inject} from 'angular2/di';
-
-import {CORE_DIRECTIVES} from 'angular2/angular2';
+import {
+  bootstrap,
+  ViewEncapsulation,
+  Component,
+  View,
+  Directive,
+  ElementRef,
+  bind,
+  Inject,
+  CORE_DIRECTIVES
+} from 'angular2/angular2';
 import {ROUTER_BINDINGS, ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {Http, HTTP_BINDINGS} from 'angular2/http';

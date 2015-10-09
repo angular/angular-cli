@@ -13,7 +13,7 @@ module.exports = function(ROOT) {
   var {App}     = require(universalPath + '/test_page/app');
   var {TodoApp} = require(universalPath + '/todo/app');
 
-  var {bind} = require('angular2/di');
+  var {bind} = require('angular2/angular2');
 
   var {
     HTTP_BINDINGS,

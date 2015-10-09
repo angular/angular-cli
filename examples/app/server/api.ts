@@ -14,14 +14,14 @@ var TODOS = [
 module.exports = function(ROOT) {
 
   var router = Router();
-  
+
   router.route('/todos')
     .get(function(req, res) {
       console.log('GET');
       // 70ms latency
       setTimeout(function() {
         res.json(TODOS);
-      }, 70);
+      }, 0);
 
     })
     .post(function(req, res) {
