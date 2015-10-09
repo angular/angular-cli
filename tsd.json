@@ -8,9 +8,6 @@
     "node/node.d.ts": {
       "commit": "2c96e9e77765b72ce43ab8163f42e504f3e2facb"
     },
-    "jasmine/jasmine.d.ts": {
-      "commit": "6f04d25ad38982d372cc3cda62fa4c0eef9e24d7"
-    },
     "q/Q.d.ts": {
       "commit": "c7b1128cc9a8f5797bade826e7632b36b06a856c"
     },
