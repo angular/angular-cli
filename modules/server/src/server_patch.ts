@@ -1,15 +1,12 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 
+// polyfills
+import 'es6-shim';
 // typescript emit metadata
 import 'reflect-metadata';
+// zone.js to track promises
 import 'zone.js/dist/zone-microtask';
-
-// polyfills
-import 'angular2/node_modules/traceur/bin/traceur-runtime';
-
-// angular 2 assert
-// import 'angular2/node_modules/rtts_assert/src/rtts_assert';
 
 // dom closure
 import {Parse5DomAdapter} from 'angular2/src/core/dom/parse5_adapter';
