@@ -22,7 +22,7 @@ import {
 export function ng2engine(filePath: string, options, done) {
   // defaults
   options = options || {};
-  options.serverBindings = options.serverBindings || [];
+  options.serverProviders = options.serverProviders || [];
 
   // read file on disk
   try {
@@ -42,8 +42,8 @@ export function ng2engine(filePath: string, options, done) {
       }
 
       // bootstrap and render component to string
-      renderToString(options.Component, options.serverBindings).
-        then(serializedCmp => {
+      renderToString(options.Component, options.serverProviders)
+        .then(serializedCmp => {
 
           let selector = selectorResolver(options.Component);
 
@@ -59,8 +59,8 @@ export function ng2engine(filePath: string, options, done) {
           );
 
           done(null, buildClientScripts(rendered, options));
-        }).
-        catch(e => {
+        })
+        .catch(e => {
           console.log(e.stack);
           // if server fail then return client html
           done(null, buildClientScripts(clientHtml, options));
@@ -74,7 +74,7 @@ export function ng2engine(filePath: string, options, done) {
 export function ng2engineWithPreboot(filePath: string, options, done) {
   // defaults
   options = options || {};
-  options.serverBindings = options.serverBindings || [];
+  options.serverProviders = options.serverProviders || [];
 
   // read file on disk
   try {
@@ -94,8 +94,8 @@ export function ng2engineWithPreboot(filePath: string, options, done) {
       }
 
       // bootstrap and render component to string
-      renderToStringWithPreboot(options.Component, options.serverBindings, options.preboot).
-        then(serializedCmp => {
+      renderToStringWithPreboot(options.Component, options.serverProviders, options.preboot)
+        .then(serializedCmp => {
 
           let selector = selectorResolver(options.Component);
 
@@ -111,8 +111,8 @@ export function ng2engineWithPreboot(filePath: string, options, done) {
           );
 
           done(null, buildClientScripts(rendered, options));
-        }).
-        catch(e => {
+        })
+        .catch(e => {
           console.log(e.stack);
           // if server fail then return client html
           done(null, buildClientScripts(clientHtml, options));
