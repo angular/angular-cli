@@ -1,11 +1,20 @@
 import './src/server_patch';
-export * from './src/bootstrap-server';
-export * from './src/express_ng2engine';
-export * from './src/http_server';
-export * from './src/ng_preboot';
-export * from './src/router_server';
-export * from './src/form_directives_server';
-export * from './src/server_dom_renderer';
-export * from './src/render';
+export * from './src/core/application';
+export * from './src/core/application_common';
+export * from './src/core/platform_bindings';
+
+export * from './src/directives/server_form';
+
+export * from './src/express/engine';
+
+export * from './src/http/server_http';
+
+export * from './src/render/server_dom_renderer';
+
+export * from './src/router/server_router';
+
 export * from './src/helper';
-export {stringifyElement} from './src/stringifyElement';
+export * from './src/ng_preboot';
+export * from './src/ng_scripts';
+export * from './src/render';
+export * from './src/stringifyElement';
