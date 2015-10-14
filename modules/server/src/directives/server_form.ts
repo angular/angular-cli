@@ -15,16 +15,16 @@ export const APP_LOCATION: OpaqueToken = CONST_EXPR(new OpaqueToken('appLocation
 
 @Directive({
   selector: 'form',
-  host: (<any>{
+  host: {
     'method': 'POST'
-  })
+  }
 })
 export class ServerForm {
   constructor(
     element: ElementRef,
     renderer: Renderer,
-    @Optional() @Inject(APP_LOCATION) appLocation?: string
-  ) {
+    @Optional() @Inject(APP_LOCATION) appLocation?: string) {
+
     let url = '/';
     if (typeof window === 'object' && 'location' in window) {
       // Grab Browser location if browser
