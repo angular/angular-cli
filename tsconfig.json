@@ -54,15 +54,24 @@
     "modules/preload_cache/preload_cache.ts",
 
     "modules/server/server.ts",
-    "modules/server/src/bootstrap-server.ts",
+
+    "modules/server/src/core/application.ts",
+    "modules/server/src/core/application_common.ts",
+    "modules/server/src/core/platform_bindings.ts",
+
+    "modules/server/src/express/engine.ts",
+
+    "modules/server/src/directives/server_form.ts",
+
+    "modules/server/src/http/server_http.ts",
+
+    "modules/server/src/router/server_router.ts",
+
+    "modules/server/src/render/server_dom_renderer.ts",
+
     "modules/server/src/ng_scripts.ts",
-    "modules/server/src/express_ng2engine.ts",
-    "modules/server/src/form_directives_server.ts",
     "modules/server/src/helper.ts",
-    "modules/server/src/http_server.ts",
     "modules/server/src/render.ts",
-    "modules/server/src/router_server.ts",
-    "modules/server/src/server_dom_renderer.ts",
     "modules/server/src/server_patch.ts",
     "modules/server/src/stringifyElement.ts",
     "modules/server/test/router_server_spec.ts",
