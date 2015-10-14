@@ -8,15 +8,12 @@ import {
   ComponentRef,
   PlatformRef,
   ApplicationRef,
-  NgZone,
-  Renderer,
-  DEFAULT_PIPES_TOKEN
+  NgZone
 } from 'angular2/angular2';
 
 import {
   APP_COMPONENT_REF_PROMISE,
   APP_COMPONENT,
-  APP_ID,
   APP_ID_RANDOM_PROVIDER
 } from 'angular2/src/core/application_tokens';
 
@@ -79,20 +76,13 @@ export function applicationCommonProviders(): Array<Type | Provider | any[]> {
     provide(AppViewManager, {useClass: AppViewManager_}),
     AppViewManagerUtils,
     AppViewListener,
-    ProtoViewFactory,
-    // provide(ProtoViewFactory, {
-    //   useFactory: (renderer, pipes, directiveResolver, viewResolver, pipeResolver, id) => {
-    //     console.log('renderer', renderer)
-    //     return new ProtoViewFactory(renderer, pipes, directiveResolver, viewResolver, pipeResolver, id);
-    //   },
-    //   deps: [Renderer, DEFAULT_PIPES_TOKEN, DirectiveResolver, ViewResolver, PipeResolver, APP_ID]
-    // }),
+    DirectiveResolver,
     ViewResolver,
+    PipeResolver,
+    ProtoViewFactory,
     DEFAULT_PIPES,
     provide(IterableDiffers, {useValue: defaultIterableDiffers}),
     provide(KeyValueDiffers, {useValue: defaultKeyValueDiffers}),
-    DirectiveResolver,
-    PipeResolver,
     provide(DynamicComponentLoader, {useClass: DynamicComponentLoader_}),
     provide(LifeCycle, {
       useFactory: (exceptionHandler) => new LifeCycle_(null, assertionsEnabled()),

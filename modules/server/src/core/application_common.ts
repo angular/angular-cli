@@ -43,6 +43,7 @@ import {DOM} from 'angular2/src/core/dom/dom_adapter';
 import {Testability} from 'angular2/src/core/testability/testability';
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 import {BrowserDetails} from 'angular2/src/animate/browser_details';
+import {DirectiveResolver} from 'angular2/src/core/linker/directive_resolver';
 
 import {ServerDomRenderer_} from '../render/server_dom_renderer';
 
@@ -64,18 +65,24 @@ export function platform(providers?: Array<Type | Provider | any[]>): PlatformRe
 
 
 
-export function applicationServerDomProviders(): Array<Type | Provider | any[]> {
+export function applicationServerDomProviders(appComponentType): Array<Type | Provider | any[]> {
   if (isBlank(DOM)) {
     throw 'Must set a root DOM adapter first.';
   }
 
-  let serverDocument = DOM.createHtmlDocument();
-  let el = DOM.createElement('app', serverDocument);
-  DOM.appendChild(serverDocument.body, el);
 
 
   return [
-    provide(DOCUMENT, {useValue: serverDocument}),
+    provide(DOCUMENT, {
+      useFactory: (directiveResolver) => {
+        let selector = directiveResolver.resolve(appComponentType).selector;
+        let serverDocument = DOM.createHtmlDocument();
+        let el = DOM.createElement(selector, serverDocument);
+        DOM.appendChild(serverDocument.body, el);
+        return serverDocument;
+      },
+      deps: [DirectiveResolver]
+    }),
     // provide(DOCUMENT, {useValue: DOM.defaultDoc()}),
 
     EventManager,
@@ -107,7 +114,7 @@ export function serverBootstrap(appComponentType: /*Type*/ any,
 
   let providers: Array<any> = [
     applicationCommonProviders(),
-    applicationServerDomProviders()
+    applicationServerDomProviders(appComponentType)
   ];
 
   if (isPresent(appProviders)) {
