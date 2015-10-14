@@ -13,7 +13,7 @@ import {
 
 import {
   Http,
-  HTTP_BINDINGS
+  HTTP_PROVIDERS
 } from 'angular2/http';
 
 import {
@@ -32,9 +32,7 @@ function transformData(data) {
 
 @Component({
   selector: 'app',
-  bindings: [ ]
-})
-@View({
+  providers: [],
   encapsulation: ViewEncapsulation.Emulated,
   directives: [ CORE_DIRECTIVES ],
   styles: [`
@@ -120,17 +118,14 @@ export class App {
   testingInput: string = 'default state on component';
 
   todosObs1$ = this.http.get(App.queries.todos)
-    .toRx()
     .filter(res => res.status >= 200 && res.status < 300)
     .map(res => res.json())
     .map(data => transformData(data)); // ensure correct data prop types
   todosObs2$ = this.http.get(App.queries.todos)
-    .toRx()
     .filter(res => res.status >= 200 && res.status < 300)
     .map(res => res.json())
     .map(data => transformData(data)); // ensure correct data prop types
   todosObs3$ = this.http.get(App.queries.todos)
-    .toRx()
     .map(res => res.json())
     .map(data => transformData(data));
 
@@ -230,7 +225,7 @@ export class App {
 
 export function main() {
   return angular.bootstrap(App, [
-    HTTP_BINDINGS,
+    HTTP_PROVIDERS,
     NG_PRELOAD_CACHE_BINDINGS,
     bind(PRIME_CACHE).toValue(true)
   ]);
