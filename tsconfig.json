@@ -57,7 +57,8 @@
 
     "modules/server/src/core/application.ts",
     "modules/server/src/core/application_common.ts",
-    "modules/server/src/core/platform_bindings.ts",
+    "modules/server/src/core/application_ref.ts",
+    "modules/server/src/core/platform_providers.ts",
 
     "modules/server/src/express/engine.ts",
 
