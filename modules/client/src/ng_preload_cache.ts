@@ -1,5 +1,4 @@
 /// <reference path="../typings/tsd.d.ts" />
-import {EventEmitter} from 'angular2/angular2';
 import {
   Http,
   Response,
@@ -16,7 +15,14 @@ import {
   CONST_EXPR
 } from 'angular2/src/core/facade/lang';
 
-import {bind, OpaqueToken, Injectable, Optional, Inject} from 'angular2/angular2';
+import {
+  bind,
+  OpaqueToken,
+  Injectable,
+  Optional,
+  Inject,
+  EventEmitter
+} from 'angular2/angular2';
 
 export const PRIME_CACHE: OpaqueToken = CONST_EXPR(new OpaqueToken('primeCache'));
 
