@@ -1,7 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 import {bootstrap} from './core/application';
-import {SERVER_DOM_RENDERER_BINDINGS} from './render/server_dom_renderer';
+import {SERVER_DOM_RENDERER_PROVIDERS} from './render/server_dom_renderer';
 
 import {selectorRegExpFactory} from './helper';
 import {stringifyElement} from './stringifyElement';
@@ -27,7 +27,7 @@ import {
 } from 'angular2/http';
 
 import {
-  bind,
+  provide,
   NgZone,
   DirectiveResolver,
   ComponentRef
@@ -52,8 +52,7 @@ export function createServerDocument(appComponentType: /*Type*/ any): any {
 
 export function serializeApplication(element, styles: string[], cache: any) {
   // serialize all style hosts
-  let serializedStyleHosts = '';
-  // let serializedStyleHosts = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
+  let serializedStyleHosts = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
 
   // serialize Top Level Component
   let serializedCmp = stringifyElement(element);
@@ -83,9 +82,8 @@ export function appRefSyncRender(appRef) {
   let element = appRef.location.nativeElement;
 
   // TODO: we need a better way to manage the style host for server/client
-  // let stylesHost = appRef.injector.getOptional(SharedStylesHost);
-  // let styles = appRef.sharedStylesHost.getAllStyles();
-  let styles = null;
+  let stylesHost = appRef.injector.getOptional(SharedStylesHost);
+  let styles = stylesHost.getAllStyles();
 
   // TODO: we need a better way to manage data serialized data for server/client
   let http = appRef.injector.getOptional(Http);
@@ -96,26 +94,9 @@ export function appRefSyncRender(appRef) {
   return serializedApp;
 }
 
-
-export function bootstrapServer(AppComponent, serverBindings: any = [], serverDocument: any = null) {
-
-  // create server document with top level component
-  if (isBlank(serverDocument)) {
-    serverDocument = createServerDocument(selectorResolver(AppComponent));
-  }
-
-  let renderBindings = [
-    bind(DOCUMENT).toValue(serverDocument),
-    bind(APP_COMPONENT).toValue(AppComponent),
-    SERVER_DOM_RENDERER_BINDINGS
-  ].concat(serverBindings);
-
-  return bootstrap(AppComponent, renderBindings)
-}
-
-export function renderToString(AppComponent, serverBindings: any = []): Promise<string> {
-  return bootstrapServer(AppComponent, serverBindings).
-    then(appRef => {
+export function renderToString(AppComponent, serverProviders: any = []): Promise<string> {
+  return bootstrap(AppComponent, serverProviders)
+    .then(appRef => {
       let http = appRef.injector.getOptional(Http);
       // TODO: fix zone.js ensure overrideOnEventDone callback when there are no pending tasks
       // ensure all xhr calls are done
@@ -137,11 +118,11 @@ export function renderToString(AppComponent, serverBindings: any = []): Promise<
 }
 
 
-export function renderToStringWithPreboot(AppComponent, serverBindings: any = [], prebootConfig: any = {}): Promise<string> {
-  return renderToString(AppComponent, serverBindings).
-    then(html => {
+export function renderToStringWithPreboot(AppComponent, serverProviders: any = [], prebootConfig: any = {}): Promise<string> {
+  return renderToString(AppComponent, serverProviders)
+    .then(html => {
       if (!prebootConfig) { return html }
-      return getClientCode(prebootConfig).
-        then(code => html + createPrebootHTML(code, prebootConfig));
+      return getClientCode(prebootConfig)
+        .then(code => html + createPrebootHTML(code, prebootConfig));
     });
 }
