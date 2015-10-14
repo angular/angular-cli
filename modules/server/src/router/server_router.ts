@@ -1,6 +1,6 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-import {Injectable, bind} from 'angular2/angular2';
+import {Injectable, provide} from 'angular2/angular2';
 import {LocationStrategy} from 'angular2/router';
 import {MockLocationStrategy} from 'angular2/src/mock/mock_location_strategy';
 
@@ -37,7 +37,7 @@ class MockServerLocation implements Location {
 @Injectable()
 export class ServerLocationStrategy extends LocationStrategy {
   private _location: Location = new MockServerLocation();
-  private _history: History = new MockServerHistory();
+  private _history:  History = new MockServerHistory();
   private _baseHref: string = '/';
 
   constructor() { super(); }
@@ -59,6 +59,6 @@ export class ServerLocationStrategy extends LocationStrategy {
   }
 }
 
-export const SERVER_LOCATION_BINDINGS: Array<any> = [
-  bind(LocationStrategy).toClass(ServerLocationStrategy)
+export const SERVER_LOCATION_PROVIDERS: Array<any> = [
+  provide(LocationStrategy, {useClass: ServerLocationStrategy})
 ];
