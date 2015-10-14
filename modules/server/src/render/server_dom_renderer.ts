@@ -1,9 +1,9 @@
 /// <reference path="../../typings/tsd.d.ts" />
 import {
-  bind,
+  provide,
   Inject,
   Injectable,
-  Binding,
+  Provider,
   Injector,
   OpaqueToken
 } from 'angular2/angular2';
@@ -55,9 +55,9 @@ export class ServerDomRenderer_ extends DomRenderer_ {
   setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
     if (propertyName === 'value' || (propertyName === 'checked' && propertyValue !== false)) {
       var view = resolveInternalDomView(location.renderView);
-      var element = view.boundElements[location.renderBoundElementIndex];
+      var element = view.boundElements[location.boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
-        view.setElementAttribute(location.renderBoundElementIndex, propertyName, propertyValue);
+        DOM.setAttribute(element, propertyName, propertyValue);
         return;
       }
     }
@@ -67,9 +67,9 @@ export class ServerDomRenderer_ extends DomRenderer_ {
   invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
     if (methodName === 'focus') {
       var view = resolveInternalDomView(location.renderView);
-      var element = view.boundElements[location.renderBoundElementIndex];
+      var element = view.boundElements[location.boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
-        view.setElementAttribute(location.renderBoundElementIndex, 'autofocus', null);
+        DOM.invoke(element, 'autofocus', null);
         return;
       }
 
@@ -80,8 +80,8 @@ export class ServerDomRenderer_ extends DomRenderer_ {
 }
 
 
-export const SERVER_DOM_RENDERER_BINDINGS = [
-  bind(DomRenderer).toClass(ServerDomRenderer_),
-  bind(Renderer).toClass(DomRenderer)
+export const SERVER_DOM_RENDERER_PROVIDERS = [
+  provide(DomRenderer, {useClass: ServerDomRenderer_}),
+  provide(Renderer, {useClass: DomRenderer})
 ];
 
