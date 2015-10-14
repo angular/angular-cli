@@ -1,7 +1,7 @@
 import './src/server_patch';
 export * from './src/core/application';
 export * from './src/core/application_common';
-export * from './src/core/platform_bindings';
+export * from './src/core/platform_providers';
 
 export * from './src/directives/server_form';
 
