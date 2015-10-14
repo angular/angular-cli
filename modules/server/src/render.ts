@@ -1,36 +1,37 @@
 /// <reference path="../typings/tsd.d.ts" />
 
-// server version
-import {bootstrap, ApplicationRef} from './bootstrap-server';
-//
-export {bootstrap};
+import {bootstrap} from './core/application';
+import {SERVER_DOM_RENDERER_BINDINGS} from './render/server_dom_renderer';
 
 import {selectorRegExpFactory} from './helper';
-
-import {SERVER_DOM_RENDERER_BINDINGS} from './server_dom_renderer';
-
-
 import {stringifyElement} from './stringifyElement';
 
-import {getClientCode} from '../../preboot/server';
+
 import {getPrebootCSS, createPrebootHTML} from './ng_preboot';
+import {getClientCode} from '../../preboot/server';
 
 
 import {isBlank, isPresent} from 'angular2/src/core/facade/lang';
 import {DOM} from 'angular2/src/core/dom/dom_adapter';
-import {DirectiveResolver} from 'angular2/src/core/compiler/directive_resolver';
-import {bind} from 'angular2/di';
+
+
 import {
   DOCUMENT,
   DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES
 } from 'angular2/src/core/render/render';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
+import {SharedStylesHost} from 'angular2/src/core/render/dom/shared_styles_host';
 
-import {Http} from 'angular2/http';
-import {NgZone} from 'angular2/angular2';
+import {
+  Http
+} from 'angular2/http';
 
-// TODO: maintain stateless Injector/document and directiveResolver
-var serverInjector = undefined; // js defaults only work with undefined
+import {
+  bind,
+  NgZone,
+  DirectiveResolver,
+  ComponentRef
+} from 'angular2/angular2';
 
 export var serverDirectiveResolver = new DirectiveResolver();
 
@@ -38,30 +39,21 @@ export function selectorResolver(Component): string {
   return serverDirectiveResolver.resolve(Component).selector;
 }
 
-
-export function createServerDocument(appSelector) {
+                                                                /* Document */
+export function createServerDocument(appComponentType: /*Type*/ any): any {
   // 1ms
   let serverDocument = DOM.createHtmlDocument();
-  let el = DOM.createElement(appSelector, serverDocument);
+  let el = DOM.createElement(appComponentType, serverDocument);
   DOM.appendChild(serverDocument.body, el);
+
   return serverDocument;
-}
-
-
-export function appRefSaveServerInjector(appRef) {
-  // save a reference to appInjector
-  // TODO: refactor into appRef
-  if (isBlank(serverInjector) && isPresent(appRef.injector)) {
-    serverInjector = appRef.injector;
-  }
-
-  return appRef;
 }
 
 
 export function serializeApplication(element, styles: string[], cache: any) {
   // serialize all style hosts
-  let serializedStyleHosts = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
+  let serializedStyleHosts = '';
+  // let serializedStyleHosts = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
 
   // serialize Top Level Component
   let serializedCmp = stringifyElement(element);
@@ -79,8 +71,8 @@ export function serializeApplication(element, styles: string[], cache: any) {
 
 function arrayFlatten(children: any[], arr: any[]): any[] {
   for (let child of children) {
-    arr.push(child.res)
-    arrayFlatten(child.children, arr)
+    arr.push(child.res);
+    arrayFlatten(child.children, arr);
   }
 
   return arr
@@ -88,10 +80,12 @@ function arrayFlatten(children: any[], arr: any[]): any[] {
 
 export function appRefSyncRender(appRef) {
   // grab parse5 html element
-  let element = appRef.hostElementRef.nativeElement;
+  let element = appRef.location.nativeElement;
 
   // TODO: we need a better way to manage the style host for server/client
-  let styles = appRef.sharedStylesHost.getAllStyles();
+  // let stylesHost = appRef.injector.getOptional(SharedStylesHost);
+  // let styles = appRef.sharedStylesHost.getAllStyles();
+  let styles = null;
 
   // TODO: we need a better way to manage data serialized data for server/client
   let http = appRef.injector.getOptional(Http);
@@ -103,7 +97,7 @@ export function appRefSyncRender(appRef) {
 }
 
 
-export function bootstrapServer(AppComponent, serverBindings: any = [], serverInjector: any = null, serverDocument: any = null) {
+export function bootstrapServer(AppComponent, serverBindings: any = [], serverDocument: any = null) {
 
   // create server document with top level component
   if (isBlank(serverDocument)) {
@@ -116,12 +110,11 @@ export function bootstrapServer(AppComponent, serverBindings: any = [], serverIn
     SERVER_DOM_RENDERER_BINDINGS
   ].concat(serverBindings);
 
-  return bootstrap(AppComponent, renderBindings, serverInjector, serverDocument).
-    then(appRefSaveServerInjector);
+  return bootstrap(AppComponent, renderBindings)
 }
 
-export function renderToString(AppComponent, serverBindings: any = [], serverDocument: any = null) {
-  return bootstrapServer(AppComponent, serverBindings, serverDocument).
+export function renderToString(AppComponent, serverBindings: any = []): Promise<string> {
+  return bootstrapServer(AppComponent, serverBindings).
     then(appRef => {
       let http = appRef.injector.getOptional(Http);
       // TODO: fix zone.js ensure overrideOnEventDone callback when there are no pending tasks
@@ -144,8 +137,8 @@ export function renderToString(AppComponent, serverBindings: any = [], serverDoc
 }
 
 
-export function renderToStringWithPreboot(AppComponent, serverBindings: any = [], prebootConfig: any = {}, serverDocument: any = null) {
-  return renderToString(AppComponent, serverBindings, serverDocument).
+export function renderToStringWithPreboot(AppComponent, serverBindings: any = [], prebootConfig: any = {}): Promise<string> {
+  return renderToString(AppComponent, serverBindings).
     then(html => {
       if (!prebootConfig) { return html }
       return getClientCode(prebootConfig).
