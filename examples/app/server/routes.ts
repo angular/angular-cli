@@ -13,17 +13,16 @@ module.exports = function(ROOT) {
   var {App}     = require(universalPath + '/test_page/app');
   var {TodoApp} = require(universalPath + '/todo/app');
 
-  var {bind} = require('angular2/angular2');
+  var {provide} = require('angular2/angular2');
 
   var {
-    HTTP_BINDINGS,
-    SERVER_LOCATION_BINDINGS,
+    HTTP_PROVIDERS,
+    SERVER_LOCATION_PROVIDERS,
     BASE_URL,
     PRIME_CACHE,
     queryParamsToBoolean
   } = require(ROOT + '/dist/modules/server/server');
   // require('@angular/universal')
-
 
   router.
     route('/').
@@ -35,11 +34,11 @@ module.exports = function(ROOT) {
         componentUrl: 'examples/app/universal/test_page/app',
 
         Component: App,
-        serverBindings: [
-          HTTP_BINDINGS,
-          SERVER_LOCATION_BINDINGS,
-          bind(BASE_URL).toValue(baseUrl),
-          bind(PRIME_CACHE).toValue(true)
+        serverProviders: [
+          HTTP_PROVIDERS,
+          SERVER_LOCATION_PROVIDERS,
+          provide(BASE_URL, {useExisting: baseUrl}),
+          provide(PRIME_CACHE, {useExisting: true})
         ],
         data: {},
 
@@ -70,11 +69,11 @@ module.exports = function(ROOT) {
         componentUrl: 'examples/app/universal/todo/app',
 
         Component: TodoApp,
-        serverBindings: [
-          HTTP_BINDINGS,
-          SERVER_LOCATION_BINDINGS,
-          bind(BASE_URL).toValue(baseUrl),
-          bind(PRIME_CACHE).toValue(true)
+        serverProviders: [
+          HTTP_PROVIDERS,
+          SERVER_LOCATION_PROVIDERS,
+          provide(BASE_URL, {useExisting: baseUrl}),
+          provide(PRIME_CACHE, {useExisting: true})
         ],
         data: {},
 
@@ -104,6 +103,7 @@ module.exports = function(ROOT) {
 
   router.use('/src', serveStatic(ROOT + '/src'));
 
+  router.use('/@reactivex/rxjs',  serveStatic(ROOT + '/node_modules/@reactivex/rxjs'));
   router.use('/node_modules',  serveStatic(ROOT + '/node_modules'));
   router.use('/angular2/dist', serveStatic(ROOT + '/angular/dist/bundle'));
   router.use('/examples/app',  serveStatic(ROOT + '/examples/app'));
