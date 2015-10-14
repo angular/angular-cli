@@ -86,9 +86,3 @@ export function simpleTemplate(html: string, options?: any): string {
   }
   return result;
 }
-
-export function baseUrl(): string {
-  var _server = require('../../../../index.js').Server;
-  var _addr = _server.address();
-  return `http://${ _addr.address }:${ _addr.port }`;
-}
