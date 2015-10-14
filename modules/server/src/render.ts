@@ -3,7 +3,10 @@
 import {bootstrap} from './core/application';
 import {SERVER_DOM_RENDERER_PROVIDERS} from './render/server_dom_renderer';
 
-import {selectorRegExpFactory} from './helper';
+import {
+  selectorRegExpFactory,
+  arrayFlattenTree
+} from './helper';
 import {stringifyElement} from './stringifyElement';
 
 
@@ -35,8 +38,8 @@ import {
 
 export var serverDirectiveResolver = new DirectiveResolver();
 
-export function selectorResolver(Component): string {
-  return serverDirectiveResolver.resolve(Component).selector;
+export function selectorResolver(componentType: /*Type*/ any): string {
+  return serverDirectiveResolver.resolve(componentType).selector;
 }
 
                                                                 /* Document */
@@ -50,15 +53,15 @@ export function createServerDocument(appComponentType: /*Type*/ any): any {
 }
 
 
-export function serializeApplication(element, styles: string[], cache: any) {
+export function serializeApplication(element: any, styles: string[], cache: any): string {
   // serialize all style hosts
-  let serializedStyleHosts = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
+  let serializedStyleHosts: string = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
 
   // serialize Top Level Component
-  let serializedCmp = stringifyElement(element);
+  let serializedCmp: string = stringifyElement(element);
 
   // serialize App Data
-  let serializedData = !cache ? '' : ''+
+  let serializedData: string = !cache ? '' : ''+
     '<script>'+
     'window.' + 'ngPreloadCache' +' = '+  JSON.stringify(cache, null, 2) +
     '</script>'
@@ -68,33 +71,25 @@ export function serializeApplication(element, styles: string[], cache: any) {
 }
 
 
-function arrayFlatten(children: any[], arr: any[]): any[] {
-  for (let child of children) {
-    arr.push(child.res);
-    arrayFlatten(child.children, arr);
-  }
 
-  return arr
-}
-
-export function appRefSyncRender(appRef) {
+export function appRefSyncRender(appRef: any): string {
   // grab parse5 html element
   let element = appRef.location.nativeElement;
 
   // TODO: we need a better way to manage the style host for server/client
-  let stylesHost = appRef.injector.getOptional(SharedStylesHost);
-  let styles = stylesHost.getAllStyles();
+  let sharedStylesHost = appRef.injector.get(SharedStylesHost);
+  let styles: Array<string> = sharedStylesHost.getAllStyles();
 
   // TODO: we need a better way to manage data serialized data for server/client
   let http = appRef.injector.getOptional(Http);
-  let cache = isPresent(http) ? arrayFlatten(http._rootNode.children, []) : null;
+  let cache = isPresent(http) ? arrayFlattenTree(http._rootNode.children, []) : null;
 
-  let serializedApp = serializeApplication(element, styles, cache);
+  let serializedApp: string = serializeApplication(element, styles, cache);
 
   return serializedApp;
 }
 
-export function renderToString(AppComponent, serverProviders: any = []): Promise<string> {
+export function renderToString(AppComponent: any, serverProviders: any = []): Promise<string> {
   return bootstrap(AppComponent, serverProviders)
     .then(appRef => {
       let http = appRef.injector.getOptional(Http);
@@ -105,9 +100,9 @@ export function renderToString(AppComponent, serverProviders: any = []): Promise
         // ngZone
         ngZone.overrideOnEventDone(() => {
           if (isBlank(http) || http._async <= 0) {
-            let _html = appRefSyncRender(appRef);
+            let html: string = appRefSyncRender(appRef);
             appRef.dispose();
-            resolve(_html);
+            resolve(html);
           }
 
         }, true);
@@ -118,9 +113,9 @@ export function renderToString(AppComponent, serverProviders: any = []): Promise
 }
 
 
-export function renderToStringWithPreboot(AppComponent, serverProviders: any = [], prebootConfig: any = {}): Promise<string> {
+export function renderToStringWithPreboot(AppComponent: any, serverProviders: any = [], prebootConfig: any = {}): Promise<string> {
   return renderToString(AppComponent, serverProviders)
-    .then(html => {
+    .then((html: string) => {
       if (!prebootConfig) { return html }
       return getClientCode(prebootConfig)
         .then(code => html + createPrebootHTML(code, prebootConfig));

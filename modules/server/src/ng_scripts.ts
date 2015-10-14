@@ -3,7 +3,7 @@ import {selectorRegExpFactory} from './helper';
 // TODO: hard coded for now
 // TODO: build from preboot config
 // consider declarative config via directive <preboot minify="true"></preboot>
-export var prebootScript = `
+export const prebootScript: string = `
   <preboot>
     <link rel="stylesheet" type="text/css" href="/preboot/preboot.css">
     <script src="/preboot/preboot.js"></script>
@@ -11,7 +11,7 @@ export var prebootScript = `
   </preboot>
 `;
 // Inject Angular for the developer
-export var angularScript = `
+export const angularScript: string = `
   <!-- Browser polyfills -->
   <script src="/bower_components/traceur-runtime/traceur-runtime.min.js"></script>
   <!-- SystemJS -->
@@ -39,7 +39,7 @@ export var angularScript = `
   </script>
 `;
 
-export var bootstrapButton = `
+export const bootstrapButton: string = `
   <div id="bootstrapButton">
     <style>
      #bootstrapButton {
@@ -57,17 +57,17 @@ export var bootstrapButton = `
   </div>
 `;
 
-export function bootstrapFunction(appUrl) {
+export function bootstrapFunction(appUrl: string): string {
   return `
   <script>
     function bootstrap() {
       if (this.bootstraped) return;
       this.bootstraped = true;
-      System.import("${ appUrl }").
-        then(function(module) {
+      System.import("${ appUrl }")
+        .then(function(module) {
           return module.main();
-        }).
-        then(function() {
+        })
+        .then(function() {
           preboot.complete();
           var $bootstrapButton = document.getElementById("bootstrapButton");
           if ($bootstrapButton) { $bootstrapButton.remove(); }
@@ -85,7 +85,7 @@ export var bootstrapApp = `
   </script>
 `;
 
-export function buildScripts(scripts, appUrl) {
+export function buildScripts(scripts: any, appUrl?: string): string {
   // figure out what scripts to inject
   return (scripts === false ? '' : (
       (scripts.preboot === true ? prebootScript : '') +
@@ -100,17 +100,17 @@ export function buildScripts(scripts, appUrl) {
 // TODO: find better ways to configure the App initial state
 // to pay off this technical debt
 // currently checking for explicit values
-export function buildClientScripts(html, options) {
-  return html.
-    replace(
+export function buildClientScripts(html: string, options: any): string {
+  return html
+    .replace(
       selectorRegExpFactory('preboot'),
       ((options.preboot === false) ? '' : prebootScript)
-    ).
-    replace(
+    )
+    .replace(
       selectorRegExpFactory('angular'),
       ((options.angular === false) ? '' : '$1' + angularScript + '$3')
-    ).
-    replace(
+    )
+    .replace(
       selectorRegExpFactory('bootstrap'),
       '$1' +
       ((options.bootstrap === false) ? (

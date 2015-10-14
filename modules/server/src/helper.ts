@@ -51,9 +51,12 @@ export function selectorRegExpFactory(selector: string): RegExp {
   return new RegExp(regExpSelector);
 }
 
-
-export function relativeToAbsoluteUrl(relativeUrl: string): string {
-  return baseUrl() + relativeUrl;
+export function arrayFlattenTree(children: any[], arr: any[]): any[] {
+  for (let child of children) {
+    arr.push(child.res);
+    arrayFlattenTree(child.children, arr);
+  }
+  return arr
 }
 
 // TODO: use Angular's compiler
