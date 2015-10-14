@@ -1,21 +1,23 @@
 /// <reference path="../../typings/tsd.d.ts" />
 import {
   Injector,
-  bind,
+  provide,
   OpaqueToken,
-  Binding,
+  Provider,
   Type,
-  DynamicComponentLoader,
   ComponentRef,
   PlatformRef,
   ApplicationRef,
   NgZone,
-  LifeCycle
+  Renderer,
+  DEFAULT_PIPES_TOKEN
 } from 'angular2/angular2';
 
 import {
   APP_COMPONENT_REF_PROMISE,
-  APP_COMPONENT
+  APP_COMPONENT,
+  APP_ID,
+  APP_ID_RANDOM_PROVIDER
 } from 'angular2/src/core/application_tokens';
 
 import {ExceptionHandler} from 'angular2/src/core/facade/exceptions';
@@ -38,46 +40,105 @@ import {
 import {Reflector, reflector} from 'angular2/src/core/reflection/reflection';
 import {TestabilityRegistry, Testability} from 'angular2/src/core/testability/testability';
 
-
-import {platformBindings, createNgZone} from 'angular2/src/core/application_ref';
+// TODO: submit PR for 43
+import {platformBindings as platformProviders, createNgZone} from 'angular2/src/core/application_ref';
 
 export {
   PlatformRef,
-  platformBindings,
-  createNgZone
+  createNgZone,
+  platformProviders
 }
 
-function _componentBindings(appComponentType: Type): Array<Type | Binding | any[]> {
-  return [
-    bind(APP_COMPONENT).toValue(appComponentType),
 
-    bind(APP_COMPONENT_REF_PROMISE)
-      .toFactory((dynamicComponentLoader, injector: Injector) => {
-        // TODO(rado): investigate whether to support bindings on root component.
-        return dynamicComponentLoader.loadAsRoot(appComponentType, null, injector)
-          .then(componentRef => {
+import {Compiler, Compiler_} from 'angular2/src/core/linker/compiler';
+import {AppViewPool, APP_VIEW_POOL_CAPACITY} from 'angular2/src/core/linker/view_pool';
+import {AppViewManager, AppViewManager_} from 'angular2/src/core/linker/view_manager';
+import {AppViewManagerUtils} from 'angular2/src/core/linker/view_manager_utils';
+import {AppViewListener} from 'angular2/src/core/linker/view_listener';
+import {ProtoViewFactory} from 'angular2/src/core/linker/proto_view_factory';
+import {ViewResolver} from 'angular2/src/core/linker/view_resolver';
+import {DEFAULT_PIPES} from 'angular2/src/core/pipes';
+import {LifeCycle, LifeCycle_} from 'angular2/src/core/life_cycle/life_cycle';
+import {DirectiveResolver} from 'angular2/src/core/linker/directive_resolver';
+import {PipeResolver} from 'angular2/src/core/linker/pipe_resolver';
+import {DynamicComponentLoader, DynamicComponentLoader_} from "angular2/src/core/linker/dynamic_component_loader";
+
+import {
+  IterableDiffers,
+  defaultIterableDiffers,
+  KeyValueDiffers,
+  defaultKeyValueDiffers
+} from 'angular2/src/core/change_detection/change_detection';
+
+export function applicationCommonProviders(): Array<Type | Provider | any[]> {
+  return [
+    provide(Compiler, {useClass: Compiler_}),
+    APP_ID_RANDOM_PROVIDER,
+    AppViewPool,
+    provide(APP_VIEW_POOL_CAPACITY, {useValue: 10000}),
+    provide(AppViewManager, {useClass: AppViewManager_}),
+    AppViewManagerUtils,
+    AppViewListener,
+    ProtoViewFactory,
+    // provide(ProtoViewFactory, {
+    //   useFactory: (renderer, pipes, directiveResolver, viewResolver, pipeResolver, id) => {
+    //     console.log('renderer', renderer)
+    //     return new ProtoViewFactory(renderer, pipes, directiveResolver, viewResolver, pipeResolver, id);
+    //   },
+    //   deps: [Renderer, DEFAULT_PIPES_TOKEN, DirectiveResolver, ViewResolver, PipeResolver, APP_ID]
+    // }),
+    ViewResolver,
+    DEFAULT_PIPES,
+    provide(IterableDiffers, {useValue: defaultIterableDiffers}),
+    provide(KeyValueDiffers, {useValue: defaultKeyValueDiffers}),
+    DirectiveResolver,
+    PipeResolver,
+    provide(DynamicComponentLoader, {useClass: DynamicComponentLoader_}),
+    provide(LifeCycle, {
+      useFactory: (exceptionHandler) => new LifeCycle_(null, assertionsEnabled()),
+      deps: [ExceptionHandler]
+    })
+  ];
+}
+
+
+function _componentProviders(appComponentType: Type): Array<Type | Provider | any[]> {
+  return [
+    provide(APP_COMPONENT, {useValue: appComponentType}),
+
+    provide(APP_COMPONENT_REF_PROMISE, {
+      useFactory: (dynamicComponentLoader, injector: Injector) => {
+
+        // TODO(rado): investigate whether to support providers on root component.
+        return dynamicComponentLoader.loadAsRoot(appComponentType, null, injector).then(componentRef => {
             if (isPresent(componentRef.location.nativeElement)) {
               injector.get(TestabilityRegistry)
                 .registerApplication(componentRef.location.nativeElement,
                                      injector.get(Testability));
             }
             return componentRef;
+          })
+          .catch(e => {
+            return Promise.reject(e);
           });
       },
-      [DynamicComponentLoader, Injector]),
+      deps: [DynamicComponentLoader, Injector]
+    }),
 
-    bind(appComponentType)
-      .toFactory((p: Promise<any>) => p.then(ref => ref.instance), [APP_COMPONENT_REF_PROMISE]),
+    provide(appComponentType, {
+      useFactory: (p: Promise<any>) => p.then(ref => ref.instance),
+      deps: [APP_COMPONENT_REF_PROMISE]
+    }),
   ];
 }
 
 // TODO: more than one instance
 var _platform: PlatformRef;
 
-export function platformCommon(bindings?: Array<Type | Binding | any[]>, initializer?: () => void):
+export function platformCommon(providers?: Array<Type | Provider | any[]>, initializer?: () => void):
     PlatformRef {
   if (isPresent(_platform)) {
-    if (isBlank(bindings)) {
+    if (isBlank(providers)) {
       return _platform;
     }
     throw "platform() can only be called once per page";
@@ -87,10 +148,10 @@ export function platformCommon(bindings?: Array<Type | Binding | any[]>, initial
     initializer();
   }
 
-  if (isBlank(bindings)) {
-    bindings = platformBindings();
+  if (isBlank(providers)) {
+    providers = platformProviders();
   }
-  _platform = new PlatformRef_(Injector.resolveAndCreate(bindings), () => { _platform = null; });
+  _platform = new PlatformRef_(Injector.resolveAndCreate(providers), () => { _platform = null; });
   return _platform;
 }
 
@@ -98,36 +159,46 @@ export function platformCommon(bindings?: Array<Type | Binding | any[]>, initial
 export class PlatformRef_ extends PlatformRef {
   _applications: ApplicationRef[] = [];
 
-  constructor(private _injector: Injector, private _dispose: () => void) { super(); }
+  constructor(
+    private _injector: Injector,
+    private _dispose: () => void) {
+    super();
+  }
 
-  get injector(): Injector { return this._injector; }
+  get injector(): Injector {
+    return this._injector;
+  }
 
-  application(bindings: Array<Type | Binding | any[]>): ApplicationRef {
-    var app = this._initApp(createNgZone(), bindings);
+  application(providers: Array<Type | Provider | any[]>): ApplicationRef {
+    var app = this._initApp(createNgZone(), providers);
     return app;
   }
 
-  asyncApplication(bindingFn: (zone: NgZone) =>
-                       Promise<Array<Type | Binding | any[]>>): Promise<ApplicationRef> {
+  asyncApplication(bindingFn: (zone: NgZone) => Promise<Array<Type | Provider | any[]>>):
+    Promise<ApplicationRef> {
+
     var zone = createNgZone();
     var completer = PromiseWrapper.completer();
     zone.run(() => {
-      PromiseWrapper.then(bindingFn(zone), (bindings: Array<Type | Binding | any[]>) => {
-        completer.resolve(this._initApp(zone, bindings));
+      PromiseWrapper.then(bindingFn(zone), (providers: Array<Type | Provider | any[]>) => {
+        completer.resolve(this._initApp(zone, providers));
       });
     });
     return completer.promise;
   }
 
-  private _initApp(zone: NgZone, bindings: Array<Type | Binding | any[]>): ApplicationRef {
+  private _initApp(
+    zone: NgZone,
+    providers: Array<Type | Provider | any[]>): ApplicationRef {
+
     var injector: Injector;
     zone.run(() => {
-      bindings.push(bind(NgZone).toValue(zone));
-      bindings.push(bind(ApplicationRef).toValue(this));
+      providers.push(provide(NgZone, {useValue: zone}));
+      providers.push(provide(ApplicationRef, {useValue: this}));
 
       var exceptionHandler;
       try {
-        injector = this.injector.resolveAndCreateChild(bindings);
+        injector = this.injector.resolveAndCreateChild(providers);
         exceptionHandler = injector.get(ExceptionHandler);
         zone.overrideOnErrorHandler((e, s) => exceptionHandler.call(e, s));
       } catch (e) {
@@ -149,7 +220,9 @@ export class PlatformRef_ extends PlatformRef {
     this._dispose();
   }
 
-  _applicationDisposed(app: ApplicationRef): void { ListWrapper.remove(this._applications, app); }
+  _applicationDisposed(app: ApplicationRef): void {
+    ListWrapper.remove(this._applications, app);
+  }
 }
 
 
@@ -168,17 +241,17 @@ export class ApplicationRef_ extends ApplicationRef {
     this._bootstrapListeners.push(listener);
   }
 
-  bootstrap(componentType: Type, bindings?: Array<Type | Binding | any[]>): Promise<ComponentRef> {
+  bootstrap(componentType: Type, providers?: Array<Type | Provider | any[]>): Promise<ComponentRef> {
     var completer = PromiseWrapper.completer();
     this._zone.run(() => {
-      var componentBindings = _componentBindings(componentType);
-      if (isPresent(bindings)) {
-        componentBindings.push(bindings);
+      var componentProviders = _componentProviders(componentType);
+      if (isPresent(providers)) {
+        componentProviders.push(providers);
       }
       var exceptionHandler = this._injector.get(ExceptionHandler);
       try {
 
-        var injector: Injector = this._injector.resolveAndCreateChild(componentBindings);
+        var injector: Injector = this._injector.resolveAndCreateChild(componentProviders);
 
         var compRefToken: Promise<ComponentRef> = injector.get(APP_COMPONENT_REF_PROMISE);
 
@@ -205,9 +278,13 @@ export class ApplicationRef_ extends ApplicationRef {
     return completer.promise;
   }
 
-  get injector(): Injector { return this._injector; }
+  get injector(): Injector {
+    return this._injector;
+  }
 
-  get zone(): NgZone { return this._zone; }
+  get zone(): NgZone {
+    return this._zone;
+  }
 
   dispose(): void {
     // TODO(alxhub): Dispose of the NgZone.
