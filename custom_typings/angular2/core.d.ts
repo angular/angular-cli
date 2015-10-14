@@ -690,6 +690,11 @@ declare module "angular2/src/core/life_cycle/life_cycle" {
 
     tick():any;
   }
+  class LifeCycle_ {
+    constructor(...args);
+
+    tick():any;
+  }
 }
 
 declare module "angular2/src/mock/mock_location_strategy" {
