@@ -35,7 +35,7 @@ module.exports = function(ROOT) {
 
         Component: App,
         serverProviders: [
-          HTTP_PROVIDERS,
+          // HTTP_PROVIDERS,
           SERVER_LOCATION_PROVIDERS,
           provide(BASE_URL, {useExisting: baseUrl}),
           provide(PRIME_CACHE, {useExisting: true})
@@ -70,7 +70,7 @@ module.exports = function(ROOT) {
 
         Component: TodoApp,
         serverProviders: [
-          HTTP_PROVIDERS,
+          // HTTP_PROVIDERS,
           SERVER_LOCATION_PROVIDERS,
           provide(BASE_URL, {useExisting: baseUrl}),
           provide(PRIME_CACHE, {useExisting: true})

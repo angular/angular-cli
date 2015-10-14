@@ -117,19 +117,19 @@ export class App {
   buttonTest: string   = '';
   testingInput: string = 'default state on component';
 
-  todosObs1$ = this.http.get(App.queries.todos)
-    .filter(res => res.status >= 200 && res.status < 300)
-    .map(res => res.json())
-    .map(data => transformData(data)); // ensure correct data prop types
-  todosObs2$ = this.http.get(App.queries.todos)
-    .filter(res => res.status >= 200 && res.status < 300)
-    .map(res => res.json())
-    .map(data => transformData(data)); // ensure correct data prop types
-  todosObs3$ = this.http.get(App.queries.todos)
-    .map(res => res.json())
-    .map(data => transformData(data));
+  // todosObs1$ = this.http.get(App.queries.todos)
+  //   .filter(res => res.status >= 200 && res.status < 300)
+  //   .map(res => res.json())
+  //   .map(data => transformData(data)); // ensure correct data prop types
+  // todosObs2$ = this.http.get(App.queries.todos)
+  //   .filter(res => res.status >= 200 && res.status < 300)
+  //   .map(res => res.json())
+  //   .map(data => transformData(data)); // ensure correct data prop types
+  // todosObs3$ = this.http.get(App.queries.todos)
+  //   .map(res => res.json())
+  //   .map(data => transformData(data));
 
-  constructor(private http: Http) {
+  constructor(/*private http: Http*/) {
 
   }
 
@@ -138,51 +138,51 @@ export class App {
     // this.addItem();
     // this.addItem();
 
-    this.todosObs1$.subscribe(
-      // onValue
-      todos => {
-        todos.map(todo => this.addItem(todo));
-        this.anotherAjaxCall();
-      },
-      // onError
-      err => {
-        console.error('err', err);
-        throw err;
-      },
-      // onComplete
-      () => {
-        console.log('complete request1');
-      });
+    // this.todosObs1$.subscribe(
+    //   // onValue
+    //   todos => {
+    //     todos.map(todo => this.addItem(todo));
+    //     this.anotherAjaxCall();
+    //   },
+    //   // onError
+    //   err => {
+    //     console.error('err', err);
+    //     throw err;
+    //   },
+    //   // onComplete
+    //   () => {
+    //     console.log('complete request1');
+    //   });
 
-    this.todosObs2$.subscribe(
-      // onValue
-      todos => {
-        console.log('another call 2', todos);
-        todos.map(todo => this.addItem(todo));
-        // this.anotherAjaxCall();
-      },
-      // onError
-      err => {
-        console.error('err', err);
-        throw err;
-      },
-      // onComplete
-      () => {
-        console.log('complete request2');
-      });
+    // this.todosObs2$.subscribe(
+    //   // onValue
+    //   todos => {
+    //     console.log('another call 2', todos);
+    //     todos.map(todo => this.addItem(todo));
+    //     // this.anotherAjaxCall();
+    //   },
+    //   // onError
+    //   err => {
+    //     console.error('err', err);
+    //     throw err;
+    //   },
+    //   // onComplete
+    //   () => {
+    //     console.log('complete request2');
+    //   });
 
   }
   anotherAjaxCall() {
-    this.todosObs3$.subscribe(
-      todos => {
-        console.log('anotherAjaxCall data 3', todos);
-      },
-      err => {
-        console.log('anotherAjaxCall err')
-      },
-      () => {
-        console.log('anotherAjaxCall complete ajax')
-      });
+    // this.todosObs3$.subscribe(
+    //   todos => {
+    //     console.log('anotherAjaxCall data 3', todos);
+    //   },
+    //   err => {
+    //     console.log('anotherAjaxCall err')
+    //   },
+    //   () => {
+    //     console.log('anotherAjaxCall complete ajax')
+    //   });
   }
 
   log(value) {
@@ -225,7 +225,7 @@ export class App {
 
 export function main() {
   return angular.bootstrap(App, [
-    HTTP_PROVIDERS,
+    // HTTP_PROVIDERS,
     NG_PRELOAD_CACHE_BINDINGS,
     bind(PRIME_CACHE).toValue(true)
   ]);
