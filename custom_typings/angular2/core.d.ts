@@ -5,9 +5,36 @@ interface Map<K,V> {}
 interface StringMap<K,V> extends Map<K,V> {}
 
 
+declare module "angular2/src/core/application_ref" {
+  function platformBindings(): any;
+  function createNgZone(): any;
+  function applicationCommonBindings(): any;
+}
+
+declare module "angular2/src/core/forms" {
+  var FORM_BINDINGS: any;
+}
+
+declare module "angular2/src/animate/browser_details" {
+  class BrowserDetails {
+
+  }
+}
+
+declare module 'angular2/src/animate/animation_builder' {
+  class AnimationBuilder {
+
+  }
+}
+
+declare module 'angular2/src/core/compiler/compiler' {
+   function compilerBindings(): any;
+}
+
 declare module "angular2/src/core/application_tokens" {
   var APP_COMPONENT_REF_PROMISE:any;
   var APP_COMPONENT:any;
+  var APP_ID_RANDOM_BINDING: any;
 }
 declare module "angular2/src/core/pipes/default_pipes" {
   var DEFAULT_PIPES:any;
@@ -112,10 +139,10 @@ declare module "angular2/src/core/compiler/view_listener" {
   class AppViewListener {
   }
 }
-declare module "angular2/src/core/compiler/view_ref" {
+declare module "angular2/src/core/linker/view_ref" {
   var internalView:any
 }
-declare module "angular2/src/core/compiler/element_ref" {
+declare module "angular2/src/core/linker/element_ref" {
   class ElementRef {
     constructor(host:any, location?:any);
 
@@ -649,7 +676,7 @@ declare module "angular2/src/core/facade/collection" {
   var MapWrapper:any;
   var StringMapWrapper:any;
 }
-declare module "angular2/src/core/exception_handler" {
+declare module "angular2/src/core/facade/exceptions" {
   class ExceptionHandler {
     constructor(DOM:any, isDart:boolean);
 
@@ -771,7 +798,7 @@ declare module "angular2/src/core/render/dom/compiler/template_loader" {
 
   }
 }
-declare module "angular2/src/core/render/xhr_impl" {
+declare module "angular2/src/core/compiler/xhr_impl" {
   class XHRImpl {
   }
 }
@@ -809,11 +836,12 @@ declare module "angular2/src/core/render/dom/view/view" {
   }
   function resolveInternalDomView(viewRef: any): any;
 }
-declare module "angular2/src/core/render/xhr" {
+declare module "angular2/src/core/compiler/xhr" {
   class XHR {
   }
 }
 declare module "angular2/src/core/render/dom/events/event_manager" {
+  var EVENT_MANAGER_PLUGINS: any;
   class EventManager {
     constructor(...args);
 
@@ -839,6 +867,14 @@ declare module "angular2/src/core/render/render" {
     renderBoundElementIndex:any;
   }
   class DomRenderer {
+    constructor(_eventManager:any, _domSharedStylesHost:any, _templateCloner:any, document:any);
+
+    setElementProperty(location:any, propertyName:any, propertyValue:any):any;
+
+    invokeElementMethod(location:any, methodName:any, args:any):any;
+
+  }
+  class DomRenderer_ {
     constructor(_eventManager:any, _domSharedStylesHost:any, _templateCloner:any, document:any);
 
     setElementProperty(location:any, propertyName:any, propertyValue:any):any;
@@ -989,7 +1025,7 @@ declare module "angular2/src/core/render/dom/schema/dom_element_schema_registry"
   class DomElementSchemaRegistry {
   }
 }
-declare module "angular2/src/core/render/dom/view/shared_styles_host" {
+declare module "angular2/src/core/render/dom/shared_styles_host" {
   class SharedStylesHost {
   }
   class DomSharedStylesHost {
