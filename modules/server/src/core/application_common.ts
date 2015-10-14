@@ -1,13 +1,12 @@
 /// <reference path="../../typings/tsd.d.ts" />
 import {
   Injector,
-  bind,
   OpaqueToken,
-  Binding,
+  provide,
+  Provider,
   Type,
   ComponentRef,
-  Renderer,
-  FORM_BINDINGS
+  FORM_PROVIDERS
 } from 'angular2/angular2';
 import {
   EventManager,
@@ -20,8 +19,12 @@ import {
 } from 'angular2/src/core/render/dom/shared_styles_host';
 import {Parse5DomAdapter} from 'angular2/src/core/dom/parse5_adapter';
 
-import {DomRenderer, ServerDomRenderer_, DOCUMENT} from '../render/server_dom_renderer';
-
+import {
+  DomRenderer,
+  DomRenderer_,
+  Renderer,
+  DOCUMENT
+} from 'angular2/src/core/render/render';
 import {KeyEventsPlugin} from 'angular2/src/core/render/dom/events/key_events';
 import {HammerGesturesPlugin} from 'angular2/src/core/render/dom/events/hammer_gestures';
 
@@ -40,73 +43,76 @@ import {DOM} from 'angular2/src/core/dom/dom_adapter';
 import {Testability} from 'angular2/src/core/testability/testability';
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 import {BrowserDetails} from 'angular2/src/animate/browser_details';
-import {applicationCommonBindings} from 'angular2/src/core/application_ref';
 
-import {EXCEPTION_BINDING} from './platform_bindings';
+import {ServerDomRenderer_} from '../render/server_dom_renderer';
+
+import {EXCEPTION_PROVIDERS} from './platform_providers';
 import {
   platformCommon,
   PlatformRef,
+  applicationCommonProviders
 } from './application_ref';
 
 import {createServerDocument} from '../render';
 
 
-export function platform(bindings?: Array<Type | Binding | any[]>): PlatformRef {
-  return platformCommon(bindings, () => {
+export function platform(providers?: Array<Type | Provider | any[]>): PlatformRef {
+  return platformCommon(providers, () => {
     Parse5DomAdapter.makeCurrent();
   });
 }
 
 
 
-export function applicationServerDomBindings(): Array<Type | Binding | any[]> {
+export function applicationServerDomProviders(): Array<Type | Provider | any[]> {
   if (isBlank(DOM)) {
     throw 'Must set a root DOM adapter first.';
   }
+
+  let serverDocument = DOM.createHtmlDocument();
+  let el = DOM.createElement('app', serverDocument);
+  DOM.appendChild(serverDocument.body, el);
+
+
   return [
-    // bind(DOCUMENT).toValue(DOM.defaultDoc()),
+    provide(DOCUMENT, {useValue: serverDocument}),
+    // provide(DOCUMENT, {useValue: DOM.defaultDoc()}),
 
     EventManager,
-    new Binding(EVENT_MANAGER_PLUGINS, {toClass: DomEventsPlugin, multi: true}),
-    new Binding(EVENT_MANAGER_PLUGINS, {toClass: KeyEventsPlugin, multi: true}),
-    new Binding(EVENT_MANAGER_PLUGINS, {toClass: HammerGesturesPlugin, multi: true}),
+    provide(EVENT_MANAGER_PLUGINS, {multi: true, useClass: DomEventsPlugin}),
+    provide(EVENT_MANAGER_PLUGINS, {multi: true, useClass: KeyEventsPlugin}),
+    provide(EVENT_MANAGER_PLUGINS, {multi: true, useClass: HammerGesturesPlugin}),
 
-    bind(DomRenderer).toClass(ServerDomRenderer_),
-    bind(Renderer).toAlias(DomRenderer),
+    provide(DomRenderer, {useClass: ServerDomRenderer_}),
+    // provide(DomRenderer, {useClass: DomRenderer_}),
+    provide(Renderer, {useExisting: DomRenderer}),
 
     DomSharedStylesHost,
-    bind(SharedStylesHost).toAlias(DomSharedStylesHost),
+    provide(SharedStylesHost, {useExisting: DomSharedStylesHost}),
 
-    EXCEPTION_BINDING,
-    bind(XHR).toValue(new XHRImpl()),
+    EXCEPTION_PROVIDERS,
+    provide(XHR, {useValue: new XHRImpl()}),
     Testability,
     BrowserDetails,
     AnimationBuilder,
-    FORM_BINDINGS
+    FORM_PROVIDERS
   ];
 }
 
 
 export function serverBootstrap(appComponentType: /*Type*/ any,
-                                appBindings: Array<Type | Binding | any[]> = null):
+                                appProviders: Array<Type | Provider | any[]> = null):
     Promise<ComponentRef> {
   let p = platform();
 
-  let bindings: Array<any> = [
-    applicationCommonBindings(),
-    applicationServerDomBindings()
+  let providers: Array<any> = [
+    applicationCommonProviders(),
+    applicationServerDomProviders()
   ];
 
-  if (isPresent(appBindings)) {
-    bindings.push(appBindings);
+  if (isPresent(appProviders)) {
+    providers.push(appProviders);
   }
 
-  // bindings.map(function(binding, i) {
-  //   if (binding === undefined) {
-  //     console.log('RENDER', i, bindings[i-1]);
-  //     // debugger;
-  //   }
-  // });
-
-  return p.application(bindings).bootstrap(appComponentType);
+  return p.application(providers).bootstrap(appComponentType);
 }
