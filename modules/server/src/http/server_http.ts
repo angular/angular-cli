@@ -1,12 +1,15 @@
-/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../../typings/tsd.d.ts" />
 
-import './server_patch';
+import '../server_patch';
 
-// ngHttp/src/backends/browser_xhr
-import {BrowserXhr} from 'angular2/http';
-import {RequestMethods} from 'angular2/http';
-
-import {bind, OpaqueToken, Injectable, Optional, Inject} from 'angular2/di';
+import {
+  bind,
+  OpaqueToken,
+  Injectable,
+  Optional,
+  Inject,
+  EventEmitter
+} from 'angular2/angular2';
 
 import {
   Http,
@@ -24,10 +27,10 @@ import {
   Request,
   Response,
   MockBackend,
-  ReadyStates
+  ReadyStates,
+  BrowserXhr,
+  RequestMethods
 } from 'angular2/http';
-
-import {EventEmitter} from 'angular2/angular2';
 
 import {ObservableWrapper} from 'angular2/src/core/facade/async';
 
@@ -40,7 +43,7 @@ import {
 
 import XMLHttpRequest = require('xhr2');
 
-import { baseUrl } from './helper';
+import { baseUrl } from '../helper';
 
 
 export const BASE_URL: OpaqueToken = CONST_EXPR(new OpaqueToken('baseUrl'));
