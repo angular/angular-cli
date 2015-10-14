@@ -85,12 +85,12 @@
     "serve-static": "^1.10.0",
     "tsd": "^0.6.4",
     "typescript": "^1.6.2",
-    "yargs": "^3.14.0",
-    "zone.js": "^0.5.6"
+    "yargs": "^3.14.0"
   },
   "dependencies": {
+    "zone.js": "^0.5.8",
     "@reactivex/rxjs": "0.0.0-prealpha.3",
-    "angular2": "2.0.0-alpha.40",
+    "angular2": "2.0.0-alpha.42",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
     "es6-shim": "^0.33.6",
@@ -102,7 +102,7 @@
     "lodash": "^3.10.0",
     "parse5": "^1.5.0",
     "q": "^1.4.1",
-    "reflect-metadata": "^0.1.0",
+    "reflect-metadata": "^0.1.1",
     "require-dir": "^0.3.0",
     "run-sequence": "^1.1.2",
     "vinyl-buffer": "^1.0.0",
