@@ -3,7 +3,7 @@
 import '../server_patch';
 
 import {
-  bind,
+  provide,
   OpaqueToken,
   Injectable,
   Optional,
@@ -40,10 +40,11 @@ import {
   CONST_EXPR
 } from 'angular2/src/core/facade/lang';
 
+var Rx = require('@reactivex/rxjs/dist/cjs/Rx');
+var {Observable} = Rx;
 
+// CJS
 import XMLHttpRequest = require('xhr2');
-
-import { baseUrl } from '../helper';
 
 
 export const BASE_URL: OpaqueToken = CONST_EXPR(new OpaqueToken('baseUrl'));
@@ -57,73 +58,62 @@ class NodeConnection implements Connection {
    * Response {@link EventEmitter} which emits a single {@link Response} value on load event of
    * `XMLHttpRequest`.
    */
-  response: EventEmitter;  // TODO: Make generic of <Response>;
+  response: any;  // TODO: Make generic of <Response>;
   readyState: ReadyStates;
-  private _xhr;  // TODO: make type XMLHttpRequest, pending resolution of
-                 // https://github.com/angular/ts2dart/issues/230
   constructor(req: Request, browserXHR: BrowserXhr, baseResponseOptions?: ResponseOptions) {
-    // TODO: get rid of this when enum lookups are available in ts2dart
-    // https://github.com/angular/ts2dart/issues/221
-
     this.request = req;
-    this.response = new EventEmitter();
-    this._xhr = browserXHR.build();
+    this.response = new Observable(responseObserver => {
+      let _xhr: any = browserXHR.build();
+      _xhr.open(RequestMethods[req.method].toUpperCase(), req.url);
+      // load event handler
+      let onLoad = () => {
+        // responseText is the old-school way of retrieving response (supported by IE8 & 9)
+        // response/responseType properties were introduced in XHR Level2 spec (supported by
+        // IE10)
+        let response = ('response' in _xhr) ? _xhr.response : _xhr.responseText;
 
-    // TODO(jeffbcross): implement error listening/propagation
-    var _method = RequestMethods[req.method];
+        // normalize IE9 bug (http://bugs.jquery.com/ticket/1450)
+        let status = _xhr.status === 1223 ? 204 : _xhr.status;
 
-    this._xhr.open(_method, req.url );
-    this._xhr.addEventListener('load', zone.bind((_) => {
-      // responseText is the old-school way of retrieving response (supported by IE8 & 9)
-      // response/responseType properties were introduced in XHR Level2 spec (supported by IE10)
-      let response = ('response' in this._xhr) ? this._xhr.response : this._xhr.responseText;
+        // fix status code when it is 0 (0 status is undocumented).
+        // Occurs when accessing file resources or on Android 4.1 stock browser
+        // while retrieving files from application cache.
+        if (status === 0) {
+          status = response ? 200 : 0;
+        }
+        var responseOptions = new ResponseOptions({body: response, status: status});
+        if (isPresent(baseResponseOptions)) {
+          responseOptions = baseResponseOptions.merge(responseOptions);
+        }
+        responseObserver.next(new Response(responseOptions));
+        // TODO(gdi2290): defer complete if array buffer until done
+        responseObserver.complete();
+      };
+      // error event handler
+      let onError = (err) => {
+        var responseOptions = new ResponseOptions({body: err, type: ResponseTypes.Error});
+        if (isPresent(baseResponseOptions)) {
+          responseOptions = baseResponseOptions.merge(responseOptions);
+        }
+        responseObserver.error(new Response(responseOptions));
+      };
 
-      // normalize IE9 bug (http://bugs.jquery.com/ticket/1450)
-      let status = this._xhr.status === 1223 ? 204 : this._xhr.status;
-
-      // fix status code when it is 0 (0 status is undocumented).
-      // Occurs when accessing file resources or on Android 4.1 stock browser
-      // while retrieving files from application cache.
-      if (status === 0) {
-        status = response ? 200 : 0;
+      if (isPresent(req.headers)) {
+        req.headers.forEach((values, name) => _xhr.setRequestHeader(name, values.join(',')));
       }
 
-      var responseOptions =  new ResponseOptions<any>({
-        body: response,
-        status: status,
-        url: this.request.url
-      });
+      _xhr.addEventListener('load', onLoad);
+      _xhr.addEventListener('error', onError);
 
-      if (isPresent(baseResponseOptions)) {
-        responseOptions = baseResponseOptions.merge(responseOptions);
-      }
+      _xhr.send(this.request.text());
 
-      let res = new Response<any>(responseOptions);
-
-      ObservableWrapper.callNext(this.response, res);
-      // TODO(gdi2290): defer complete if array buffer until done
-      ObservableWrapper.callReturn(this.response);
-    }));
-    this._xhr.addEventListener('error', zone.bind((err) => {
-      var responseOptions = new ResponseOptions<any>({body: err, type: ResponseTypes.Error, status: this._xhr.status});
-      if (isPresent(baseResponseOptions)) {
-        responseOptions = baseResponseOptions.merge(responseOptions);
-      }
-      ObservableWrapper.callThrow(this.response, new Response(responseOptions));
-    }));
-    // TODO(jeffbcross): make this more dynamic based on body type
-
-    if (isPresent(req.headers)) {
-      req.headers.forEach((value, name) => { this._xhr.setRequestHeader(name, value); });
-    }
-    var _text = this.request.text() || null;
-    this._xhr.send(_text);
+      return () => {
+        _xhr.removeEventListener('load', onLoad);
+        _xhr.removeEventListener('error', onError);
+        _xhr.abort();
+      };
+    });
   }
-
-  /**
-   * Calls abort on the underlying XMLHttpRequest.
-   */
-  dispose(): void { this._xhr.abort(); }
 }
 
 
@@ -255,12 +245,14 @@ export class NgPreloadCacheHttp extends Http {
 }
 
 
-export var HTTP_BINDINGS: Array<any> = [
-  bind(RequestOptions).toClass(BaseRequestOptions),
-  bind(ResponseOptions).toClass(BaseResponseOptions),
+export var HTTP_PROVIDERS: Array<any> = [
+  provide(BASE_URL, {useValue: ''}),
+  provide(PRIME_CACHE, {useValue: false}),
+  provide(RequestOptions, {useClass: BaseRequestOptions}),
+  provide(ResponseOptions, {useClass: BaseResponseOptions}),
 
-  bind(BrowserXhr).toClass(NodeXhr),
-  bind(ConnectionBackend).toClass(NodeBackend),
+  provide(BrowserXhr, {useClass: NodeXhr}),
+  provide(ConnectionBackend, {useClass: NodeBackend}),
 
-  bind(Http).toClass(NgPreloadCacheHttp)
+  provide(Http, {useClass: NgPreloadCacheHttp})
 ];
