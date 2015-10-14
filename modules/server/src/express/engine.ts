@@ -1,14 +1,14 @@
-/// <reference path="../typings/tsd.d.ts" />
-import './server_patch';
+/// <reference path="../../typings/tsd.d.ts" />
+import '../server_patch';
 import * as fs from 'fs';
-import {selectorRegExpFactory, simpleTemplate} from './helper';
+import {selectorRegExpFactory, simpleTemplate} from '../helper';
 
 
 import {
   renderToString,
   renderToStringWithPreboot,
   selectorResolver
-} from './render';
+} from '../render';
 
 import {
   prebootScript,
@@ -17,7 +17,7 @@ import {
   bootstrapFunction,
   bootstrapApp,
   buildClientScripts
-} from './ng_scripts';
+} from '../ng_scripts';
 
 export function ng2engine(filePath: string, options, done) {
   // defaults
