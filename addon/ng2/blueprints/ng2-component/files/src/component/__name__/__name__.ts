@@ -1,15 +1,15 @@
-/// <reference path="./../../typings/angular2/angular2.d.ts"/>
-import {Component, View} from 'angular2/angular2';
+import {Component} from 'angular2/angular2';
+
 
 @Component({
-    selector: '<%= dasherizedModuleName %>',
-    injectables: []})
-@View({
-    templateUrl: 'component/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>.html',
-    directives: []
+  selector: '<%= dasherizedModuleName %>',
+  providers: [],
+  templateUrl: 'component/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>.html',
+  directives: [],
+  pipes: []
 })
 export class <%= classifiedModuleName %> {
-    constructor() {
 
-    }
+  constructor() {}
+
 }
