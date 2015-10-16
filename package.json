@@ -89,8 +89,8 @@
   },
   "dependencies": {
     "zone.js": "^0.5.8",
-    "@reactivex/rxjs": "0.0.0-prealpha.3",
-    "angular2": "2.0.0-alpha.42",
+    "@reactivex/rxjs": "5.0.0-alpha.4",
+    "angular2": "2.0.0-alpha.44",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
     "es6-shim": "^0.33.6",
