@@ -9,7 +9,7 @@ var template = require('lodash/string/template');
 
 var gitEnvironmentVariables = {
   GIT_AUTHOR_NAME: 'angular-cli',
-  GIT_AUTHOR_EMAIL: 'angular-cli@angular339.com',
+  GIT_AUTHOR_EMAIL: 'angular-cli@angular.io',
   get GIT_COMMITTER_NAME(){ return this.GIT_AUTHOR_NAME; },
   get GIT_COMMITTER_EMAIL(){ return this.GIT_AUTHOR_EMAIL; }
 };

@@ -3,27 +3,22 @@
 <head>
   <title><%= jsComponentName %></title>
   <style>/* Cool! */</style>
-  <script src="systemjs/dist/system.src.js"></script>
-  <script src="angular2/bundles/angular2.dev.js"></script>
+  <script src="vendor/systemjs/dist/system.src.js"></script>
+  <script src="vendor/angular2/bundles/angular2.dev.js"></script>
   {{content-for 'head'}}
+  <script>
+    System.config({
+      packages: {
+        app: {
+          format: 'register',
+          defaultExtension: 'js'
+        }
+      }
+    });
+    System.import('app.js').then(null, console.error.bind(console));
+  </script>
 </head>
 <body>
-<<%= htmlComponentName %>-app>Loading...</<%= htmlComponentName %>-app>
-<script>
-  System.config({
-    defaultJSExtensions: true,
-    packages: {
-      angular2: {
-        format: 'register',
-        defaultExtension: false
-      },
-      '@reactivex': {
-        format: 'register',
-        defaultExtension: false
-      }
-    }
-  });
-  System.import('<%= htmlComponentName %>').then(null, console.error.bind(console));
-</script>
+  <<%= htmlComponentName %>-app>Loading...</<%= htmlComponentName %>-app>
 </body>
 </html>
