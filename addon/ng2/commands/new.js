@@ -29,7 +29,7 @@ module.exports = NewCommand.extend({
 
         if (!packageName) {
             message = chalk.yellow('The `ng ' + this.name + '` command requires a ' +
-            'name to be specified. For more details, use `ng help`.');
+            'name argument to be specified. For more details, use `ng help`.');
 
             return Promise.reject(new SilentError(message));
         }
