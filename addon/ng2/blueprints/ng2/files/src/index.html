@@ -2,7 +2,6 @@
 <html>
 <head>
   <title><%= jsComponentName %></title>
-  <style>/* Cool! */</style>
   <script src="vendor/systemjs/dist/system.src.js"></script>
   <script src="vendor/angular2/bundles/angular2.dev.js"></script>
   {{content-for 'head'}}
@@ -17,6 +16,7 @@
     });
     System.import('app.js').then(null, console.error.bind(console));
   </script>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
 </head>
 <body>
   <<%= htmlComponentName %>-app>Loading...</<%= htmlComponentName %>-app>
