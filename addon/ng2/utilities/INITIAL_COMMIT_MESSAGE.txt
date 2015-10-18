@@ -1,1 +1,1 @@
-Initial Commit from Angular CLI v<%= version %>
+chore: initial commit from angular-cli v<%= version %>
