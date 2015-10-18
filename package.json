@@ -38,9 +38,7 @@
   },
   "ember-addon": {
     "paths": [
-      "./addon/dummy-addon/",
-      "./addon/ng2/",
-      "./node_modules/angular-project-draft/"
+      "./addon/ng2/"
     ]
   },
   "devDependencies": {
