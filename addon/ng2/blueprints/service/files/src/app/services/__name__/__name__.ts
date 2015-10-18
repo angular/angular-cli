@@ -1,7 +1,8 @@
 import {Injectable} from 'angular2/angular2';
 
 
-export @Injectable() class <%= classifiedModuleName %> {
+@Injectable()
+export class <%= classifiedModuleName %> {
 
   constructor() {}
 
