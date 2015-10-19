@@ -39,11 +39,9 @@ resolve('angular-cli', {
 
 
 function CustomLeek(options) {
-  console.log('before', options);
   options.trackingCode = packageJson.trackingCode;
   options.globalName = packageJson.name;
   options.name = packageJson.name;
   options.version = packageJson.version;
-  console.log('after', options);
   return new Leek(options);
 }
