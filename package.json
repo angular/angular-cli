@@ -27,7 +27,7 @@
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-writer": "^0.1.1",
     "chalk": "^1.1.0",
-    "ember-cli": "^1.13.8",
+    "ember-cli": "ember-cli/ember-cli#ae5e72614e40f5e6dd57463e526c65da899fde07",
     "exit": "^0.1.2",
     "fs-extra": "^0.18.4",
     "lodash": "^3.10.0",
