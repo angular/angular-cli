@@ -1,4 +1,16 @@
 
+export function prebootConfigDefault(config) {
+  return Object.assign({
+    start:    true,
+    appRoot:  'app',         // selector for root element
+    replay:   'rerender',    // rerender replay strategy
+    buffer:   true,          // client app will write to hidden div until bootstrap complete
+    debug:    false,
+    uglify:   true,
+    presets:  ['keyPress', 'buttonPress', 'focus']
+  }, config || {});
+}
+
 export function getPrebootCSS(): string {
   return `
 .preboot-overlay {
