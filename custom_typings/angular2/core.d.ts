@@ -27,16 +27,12 @@ declare module 'angular2/src/animate/animation_builder' {
   }
 }
 
-declare module 'angular2/src/core/compiler/compiler' {
-   function compilerBindings(): any;
-}
-
 declare module "angular2/src/core/application_tokens" {
   var APP_COMPONENT_REF_PROMISE:any;
   var APP_COMPONENT:any;
-  var APP_ID_RANDOM_BINDING: any;
+  var APP_ID_RANDOM_PROVIDER: any;
 }
-declare module "angular2/src/core/pipes/default_pipes" {
+declare module "angular2/src/core/pipes" {
   var DEFAULT_PIPES:any;
 }
 declare module "angular2/src/core/platform_bindings" {
@@ -80,28 +76,36 @@ declare module "angular2/src/core/change_detection/change_detection" {
 }
 
 declare module "angular2/src/core/compiler/compiler" {
+  function compilerProviders(): Array<any>;
+}
+
+declare module "angular2/src/core/linker/compiler" {
+  function compilerProviders(): Array<any>;
   class Compiler {
+
+  }
+  class Compiler_ {
 
   }
   class CompilerCache {
 
   }
 }
-declare module "angular2/src/core/compiler/view_resolver" {
+declare module "angular2/src/core/linker/view_resolver" {
   class ViewResolver {
     resolve(appComponent:any):any;
   }
 }
-declare module "angular2/src/core/compiler/directive_resolver" {
+declare module "angular2/src/core/linker/directive_resolver" {
   class DirectiveResolver {
     resolve(appComponent:any):any;
   }
 }
-declare module "angular2/src/core/compiler/component_url_mapper" {
+declare module "angular2/src/core/linker/component_url_mapper" {
   class ComponentUrlMapper {
   }
 }
-declare module "angular2/src/core/compiler/dynamic_component_loader" {
+declare module "angular2/src/core/linker/dynamic_component_loader" {
   class ComponentRef {
     constructor(newLocation:any, component:any, dispose:any);
 
@@ -112,30 +116,36 @@ declare module "angular2/src/core/compiler/dynamic_component_loader" {
   class DynamicComponentLoader {
     loadAsRoot(appComponentType:any, bindings:any, injector:any):any;
   }
+  class DynamicComponentLoader_ {
+    loadAsRoot(appComponentType:any, bindings:any, injector:any):any;
+  }
 }
-declare module "angular2/src/core/compiler/view_pool" {
+declare module "angular2/src/core/linker/view_pool" {
   class AppViewPool {
 
   }
   var APP_VIEW_POOL_CAPACITY:any
 }
-declare module "angular2/src/core/compiler/view_manager" {
+declare module "angular2/src/core/linker/view_manager" {
   class AppViewManager {
+
+  }
+  class AppViewManager_ {
 
   }
 
 }
-declare module "angular2/src/core/compiler/view_manager_utils" {
+declare module "angular2/src/core/linker/view_manager_utils" {
   class AppViewManagerUtils {
 
   }
 }
-declare module "angular2/src/core/compiler/proto_view_factory" {
+declare module "angular2/src/core/linker/proto_view_factory" {
   class ProtoViewFactory {
 
   }
 }
-declare module "angular2/src/core/compiler/view_listener" {
+declare module "angular2/src/core/linker/view_listener" {
   class AppViewListener {
   }
 }
@@ -149,7 +159,7 @@ declare module "angular2/src/core/linker/element_ref" {
     nativeElement:any;
   }
 }
-declare module "angular2/src/core/compiler/pipe_resolver" {
+declare module "angular2/src/core/linker/pipe_resolver" {
   class PipeResolver {
     resolve(pipes:any):any;
   }
@@ -337,6 +347,8 @@ declare module "angular2/src/core/dom/dom_adapter" {
     logError(error:any):void;
 
     attrToPropMap:any;
+
+    invoke(element: any, method: any, args: any):any
 
     query(selector:string):any;
 
@@ -607,7 +619,10 @@ declare module "angular2/src/core/facade/async" {
 
     static callThrow(obs:any, res?:any):any;
   }
-  class Promise {
+  class Promise<T> {
+    constructor(fn: Function) {
+
+    }
     then(pro:any):any;
 
     all(all:any):any;
@@ -869,7 +884,7 @@ declare module "angular2/src/core/render/render" {
   var DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES:any;
   class RenderElementRef {
     renderView:any;
-    renderBoundElementIndex:any;
+    boundElementIndex:any;
   }
   class DomRenderer {
     constructor(_eventManager:any, _domSharedStylesHost:any, _templateCloner:any, document:any);
