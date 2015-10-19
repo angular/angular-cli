@@ -7,7 +7,7 @@ var path = require('path');
 
 module.exports = function(ROOT) {
   var app = express();
-  var universal = require(ROOT + '/dist/modules/server/server');
+  var universal = require(ROOT + '/dist/modules/universal/server');
   // rendering engine
 
   app.engine('ng2.html', universal.ng2engineWithPreboot);

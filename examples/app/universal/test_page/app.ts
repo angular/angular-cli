@@ -19,7 +19,7 @@ import {
 import {
   NG_PRELOAD_CACHE_BINDINGS,
   PRIME_CACHE
-} from '../../../../modules/client/client';
+} from '../../../../modules/universal/client/client';
 
 
 
