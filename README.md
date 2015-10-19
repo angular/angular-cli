@@ -1,6 +1,6 @@
 # Angular-CLI
 
-Prototype of a CLI for Angular 2 applications.
+Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
 
@@ -21,15 +21,70 @@ npm install -g angular-cli
 ng --help
 ```
 
-### Generating and serving an Angular2 project
+### Generating and serving an Angular2 project via a development server
 
 ```bash
 ng new PROJECT_NAME
 cd PROJECT_NAME
 ng serve
 ```
+Navigate to `[http://localhost:4200/]`. The app will automatically reload if you change any of the source files.
 
-## Development Hints
+
+### Generating other scaffolds
+
+Add a new component with:
+```bash
+ng generate component my-new-component
+```
+
+Add a new service with:
+```bash
+ng generate service my-new-service
+```
+
+Add a new pipe with:
+```bash
+ng generate pipe my-new-pipe
+```
+
+
+### Creating a build
+
+```bash
+ng build
+```
+
+The build artifacts will be stored in the `dist/` directory.
+
+
+### Deploying the app via GitHub Pages
+
+The CLI currently comes bundled with [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages).
+
+This means that you can deploy your apps quickly via:
+
+```
+git commit -a -m "final tweaks before deployment - what could go wrong?"
+ng github-pages:deploy
+```
+
+Checkout [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages) docs for more info.
+
+
+## Known issues
+
+This project is currently a prototype so there are many known issues. Just to mention a few:
+
+- All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
+- On Windows you need to run the `build` and `serve` commands with Admin permissions otherwise the performance really sucks.
+- [Karma](http://karma-runner.github.io/) and [Protractor](https://angular.github.io/protractor/) integrations are missing.
+- The initial installation as well as `ng new` take too long because of lots of npm dependencies.
+- "ember" branding leaks through many error messages and help text.
+- Many existing ember addons are not compatible with Angular apps built via angular-cli.
+
+
+## Development Hints for hacking on angular-cli
 
 ### Working with master
 
