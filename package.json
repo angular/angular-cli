@@ -3,6 +3,7 @@
   "version": "0.0.6",
   "description": "",
   "main": "lib/cli/index.js",
+  "trackingCode": "UA-8594346-19",
   "bin": {
     "ng": "./bin/ng"
   },
@@ -30,6 +31,7 @@
     "ember-cli": "ember-cli/ember-cli#ae5e72614e40f5e6dd57463e526c65da899fde07",
     "exit": "^0.1.2",
     "fs-extra": "^0.18.4",
+    "leek": "0.0.19",
     "lodash": "^3.10.0",
     "resolve": "^1.0.0",
     "silent-error": "^1.0.0",
