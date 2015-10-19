@@ -53,33 +53,33 @@
     "modules/preload_cache/index.ts",
     "modules/preload_cache/preload_cache.ts",
 
-    "modules/server/server.ts",
+    "modules/universal/server/server.ts",
 
-    "modules/server/src/core/application.ts",
-    "modules/server/src/core/application_common.ts",
-    "modules/server/src/core/application_ref.ts",
-    "modules/server/src/core/platform_providers.ts",
+    "modules/universal/server/src/core/application.ts",
+    "modules/universal/server/src/core/application_common.ts",
+    "modules/universal/server/src/core/application_ref.ts",
+    "modules/universal/server/src/core/platform_providers.ts",
 
-    "modules/server/src/express/engine.ts",
+    "modules/universal/server/src/express/engine.ts",
 
-    "modules/server/src/directives/server_form.ts",
+    "modules/universal/server/src/directives/server_form.ts",
 
-    "modules/server/src/http/server_http.ts",
+    "modules/universal/server/src/http/server_http.ts",
 
-    "modules/server/src/router/server_router.ts",
+    "modules/universal/server/src/router/server_router.ts",
 
-    "modules/server/src/render/server_dom_renderer.ts",
+    "modules/universal/server/src/render/server_dom_renderer.ts",
 
-    "modules/server/src/ng_scripts.ts",
-    "modules/server/src/helper.ts",
-    "modules/server/src/render.ts",
-    "modules/server/src/server_patch.ts",
-    "modules/server/src/stringifyElement.ts",
-    "modules/server/test/router_server_spec.ts",
-    "modules/server/typings/tsd.d.ts",
+    "modules/universal/server/src/ng_scripts.ts",
+    "modules/universal/server/src/helper.ts",
+    "modules/universal/server/src/render.ts",
+    "modules/universal/server/src/server_patch.ts",
+    "modules/universal/server/src/stringifyElement.ts",
+    "modules/universal/server/test/router_server_spec.ts",
+    "modules/universal/server/typings/tsd.d.ts",
 
-    "modules/client/client.ts",
-    "modules/client/src/ng_preload_cache.ts",
+    "modules/universal/client/client.ts",
+    "modules/universal/client/src/ng_preload_cache.ts",
 
     "examples/app/server/api.ts",
     "examples/app/server/routes.ts",
