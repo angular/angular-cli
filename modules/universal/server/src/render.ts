@@ -1,6 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 import {bootstrap} from './core/application';
+// import {Promise} from 'angular2/src/core/facade/async';
 import {SERVER_DOM_RENDERER_PROVIDERS} from './render/server_dom_renderer';
 
 import {
@@ -10,8 +11,14 @@ import {
 import {stringifyElement} from './stringifyElement';
 
 
-import {getPrebootCSS, createPrebootHTML} from './ng_preboot';
-import {getClientCode} from '../../preboot/server';
+import {PRIME_CACHE} from './http/server_http';
+import {
+  prebootConfigDefault,
+  getPrebootCSS,
+  createPrebootHTML
+} from './ng_preboot';
+
+import {getClientCode} from 'preboot';
 
 
 import {isBlank, isPresent} from 'angular2/src/core/facade/lang';
@@ -99,7 +106,7 @@ export function renderToString(AppComponent: any, serverProviders: any = []): Pr
         let ngZone = appRef.injector.get(NgZone);
         // ngZone
         ngZone.overrideOnEventDone(() => {
-          if (isBlank(http) || http._async <= 0) {
+          if (isBlank(http) || !('_async' in http) || http._async <= 0) {
             let html: string = appRefSyncRender(appRef);
             appRef.dispose();
             resolve(html);
@@ -116,8 +123,9 @@ export function renderToString(AppComponent: any, serverProviders: any = []): Pr
 export function renderToStringWithPreboot(AppComponent: any, serverProviders: any = [], prebootConfig: any = {}): Promise<string> {
   return renderToString(AppComponent, serverProviders)
     .then((html: string) => {
-      if (!prebootConfig) { return html }
-      return getClientCode(prebootConfig)
-        .then(code => html + createPrebootHTML(code, prebootConfig));
+      if (typeof prebootConfig === 'boolean' && prebootConfig === false) { return html }
+      let config = prebootConfigDefault(prebootConfig);
+      return getClientCode(config)
+        .then(code => html + createPrebootHTML(code, config));
     });
 }
