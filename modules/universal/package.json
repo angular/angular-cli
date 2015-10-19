@@ -1,0 +1,38 @@
+{
+  "name": "angular2-universal-preview",
+  "main": "dist/server/server.js",
+  "browser": "dist/client/client.js",
+  "version": "0.4.3",
+  "description": "Universal (isomorphic) javascript support for Angular2",
+  "homepage": "https://github.com/angular/universal",
+  "license": "Apache-2.0",
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>"
+  ],
+  "scripts": {
+    "prepublish": "tsc || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
+  "devDependencies": {
+    "typescript": "^1.6.2"
+  },
+  "dependencies": {
+    "@reactivex/rxjs": "5.0.0-alpha.4",
+    "angular2": "2.0.0-alpha.44",
+    "css": "^2.2.1",
+    "es6-shim": "^0.33.6",
+    "parse5": "^1.5.0",
+    "preboot": "^1.0.0",
+    "reflect-metadata": "^0.1.1",
+    "xhr2": "^0.1.3",
+    "zone.js": "^0.5.8"
+  }
+}
