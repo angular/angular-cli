@@ -56,3 +56,5 @@ modules/**/*.d.ts
 # Typings
 /typings
 /tsd_typings
+
+/modules/universal/dist/

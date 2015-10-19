@@ -53,6 +53,7 @@
     "modules/preload_cache/index.ts",
     "modules/preload_cache/preload_cache.ts",
 
+    "modules/universal/server/index.ts",
     "modules/universal/server/server.ts",
 
     "modules/universal/server/src/core/application.ts",
@@ -78,6 +79,7 @@
     "modules/universal/server/test/router_server_spec.ts",
     "modules/universal/server/typings/tsd.d.ts",
 
+    "modules/universal/client/index.ts",
     "modules/universal/client/client.ts",
     "modules/universal/client/src/ng_preload_cache.ts",
 
