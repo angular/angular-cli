@@ -1,0 +1,43 @@
+{
+  "name": "preboot",
+  "version": "1.0.0",
+  "description": "Record and play back client side events",
+  "main": "dist/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "author": "Jeff Whelpley",
+  "license": "Apache-2.0",
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
+  "homepage": "https://github.com/angular/universal/tree/master/modules/preboot",
+  "devDependencies": {
+    "gulp-jasmine": "^2.1.0",
+    "jasmine": "^2.3.2",
+    "jasmine-reporters": "^2.0.7",
+    "jasmine-spec-reporter": "^2.4.0",
+    "karma": "^0.13.11",
+    "karma-jasmine": "^0.3.6"
+  },
+  "dependencies": {
+    "browserify": "^11.2.0",
+    "event-stream": "^3.3.2",
+    "gulp": "^3.9.0",
+    "gulp-insert": "^0.5.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.4.2",
+    "q": "^1.4.1",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
