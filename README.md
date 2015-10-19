@@ -1,5 +1,7 @@
 # Angular-CLI
 
+Prototype of a CLI for Angular 2 applications.
+
 ## Note
 
 This projects is very much still a work in progress.

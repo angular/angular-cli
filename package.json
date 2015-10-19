@@ -1,6 +1,6 @@
 {
   "name": "angular-cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "lib/cli/index.js",
   "bin": {
@@ -27,8 +27,7 @@
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-writer": "^0.1.1",
     "chalk": "^1.1.0",
-    "ember-cli": "ember-cli/ember-cli",
-    "exit": "^0.1.2",
+    "ember-cli": "^1.13.8",
     "fs-extra": "^0.18.4",
     "lodash": "^3.10.0",
     "resolve": "^1.0.0",
