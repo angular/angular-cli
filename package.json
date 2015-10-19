@@ -15,8 +15,12 @@
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
   },
-  "author": "rodyhaddad <npm@rodyhaddad.com> (http://rodyhaddad.com/)",
-  "license": "MIT",
+  "author": "Angular Authors",
+  "contributors": [
+    "Rody Haddad <npm@rodyhaddad.com> (http://rodyhaddad.com/)",
+    "Igor Minar <igor@angularjs.org>"
+  ],
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },

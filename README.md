@@ -116,3 +116,8 @@ The folder you cloned it into, npm's folder where it stores global packages and 
 
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
+
+
+## License
+
+Apache v2
