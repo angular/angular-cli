@@ -53,10 +53,10 @@ export function ng2engine(filePath: string, options: engineOptions, done: Functi
       }
 
       // bootstrap and render component to string
-      renderToString(options.Component, options.serverProviders)
+      renderToString(options.App, options.providers)
         .then(serializedCmp => {
 
-          let selector = selectorResolver(options.Component);
+          let selector: string = selectorResolver(options.App);
 
           // selector replacer explained here
           // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
@@ -105,10 +105,10 @@ export function ng2engineWithPreboot(filePath: string, options: engineOptions, d
       }
 
       // bootstrap and render component to string
-      renderToStringWithPreboot(options.Component, options.serverProviders, options.preboot)
+      renderToStringWithPreboot(options.App, options.providers, options.preboot)
         .then(serializedCmp => {
 
-          let selector = selectorResolver(options.Component);
+          let selector: string = selectorResolver(options.App);
 
           // selector replacer explained here
           // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
