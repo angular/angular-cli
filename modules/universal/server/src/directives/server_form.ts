@@ -25,12 +25,12 @@ export class ServerForm {
     renderer: Renderer,
     @Optional() @Inject(APP_LOCATION) appLocation?: string) {
 
-    let url = '/';
+    let url: string = '/';
     if (typeof window === 'object' && 'location' in window) {
       // Grab Browser location if browser
       url = window.location.toString();
     }
-    var appLocation = isPresent(appLocation) ? appLocation : url;
+    appLocation = isPresent(appLocation) ? appLocation : url;
 
 
     renderer.setElementAttribute(element, 'action', appLocation);

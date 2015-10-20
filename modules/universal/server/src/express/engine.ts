@@ -19,10 +19,21 @@ import {
   buildClientScripts
 } from '../ng_scripts';
 
-export function ng2engine(filePath: string, options, done) {
+
+interface engineOptions {
+  App: Function;
+  providers?: Array<any>;
+  preboot?: Object;
+  selector?: string;
+  serializedCmp?: string;
+  server?: boolean;
+  client?: boolean;
+}
+
+export function ng2engine(filePath: string, options: engineOptions, done: Function) {
   // defaults
-  options = options || {};
-  options.serverProviders = options.serverProviders || [];
+  options = options || <engineOptions>{};
+  options.providers = options.providers || [];
 
   // read file on disk
   try {
@@ -31,7 +42,7 @@ export function ng2engine(filePath: string, options, done) {
       if (err) { return done(err); }
 
       // convert to string
-      var clientHtml = content.toString();
+      var clientHtml: string = content.toString();
 
       // TODO: better build scripts abstraction
       if (options.server === false && options.client === false) {
@@ -50,7 +61,7 @@ export function ng2engine(filePath: string, options, done) {
           // selector replacer explained here
           // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
           // replace our component with serialized version
-          let rendered = clientHtml.replace(
+          let rendered: string = clientHtml.replace(
             // <selector></selector>
             selectorRegExpFactory(selector),
             // <selector>{{ serializedCmp }}</selector>
@@ -71,10 +82,10 @@ export function ng2engine(filePath: string, options, done) {
   }
 };
 
-export function ng2engineWithPreboot(filePath: string, options, done) {
+export function ng2engineWithPreboot(filePath: string, options: engineOptions, done: Function) {
   // defaults
-  options = options || {};
-  options.serverProviders = options.serverProviders || [];
+  options = options || <engineOptions>{};
+  options.providers = options.providers || [];
 
   // read file on disk
   try {
@@ -83,7 +94,7 @@ export function ng2engineWithPreboot(filePath: string, options, done) {
       if (err) { return done(err); }
 
       // convert to string
-      var clientHtml = content.toString();
+      var clientHtml: string = content.toString();
 
       // TODO: better build scripts abstraction
       if (options.server === false && options.client === false) {
@@ -102,7 +113,7 @@ export function ng2engineWithPreboot(filePath: string, options, done) {
           // selector replacer explained here
           // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
           // replace our component with serialized version
-          let rendered = clientHtml.replace(
+          let rendered: string = clientHtml.replace(
             // <selector></selector>
             selectorRegExpFactory(selector),
             // <selector>{{ serializedCmp }}</selector>
@@ -123,9 +134,9 @@ export function ng2engineWithPreboot(filePath: string, options, done) {
   }
 };
 
-export function simpleReplace(filePath: string, options, done) {
+export function simpleReplace(filePath: string, options: engineOptions, done: Function) {
   // defaults
-  options = options || {};
+  options = options || <engineOptions>{};
 
   // read file on disk
   try {
@@ -134,7 +145,7 @@ export function simpleReplace(filePath: string, options, done) {
       if (err) { return done(err); }
 
       // convert to string
-      var clientHtml = content.toString();
+      var clientHtml: string = content.toString();
 
       // TODO: better build scripts abstraction
       if (options.server === false && options.client === false) {
@@ -144,7 +155,7 @@ export function simpleReplace(filePath: string, options, done) {
         return done(null, buildClientScripts(clientHtml, options));
       }
 
-      let rendered = clientHtml.replace(
+      let rendered: string = clientHtml.replace(
         // <selector></selector>
         selectorRegExpFactory(options.selector),
         // <selector>{{ serializedCmp }}</selector>
