@@ -20,7 +20,7 @@ import {
 } from '../ng_scripts';
 
 
-interface engineOptions {
+export interface engineOptions {
   App: Function;
   providers?: Array<any>;
   preboot?: Object;

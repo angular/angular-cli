@@ -620,9 +620,9 @@ declare module "angular2/src/core/facade/async" {
     static callThrow(obs:any, res?:any):any;
   }
   class Promise<T> {
-    constructor(fn: Function) {
-
-    }
+    static reject(pro:any):any;
+    static resolve(pro:any):any;
+    constructor(fn: Function)
     then(pro:any):any;
 
     all(all:any):any;

@@ -21,6 +21,7 @@ import {ExceptionHandler} from 'angular2/src/core/facade/exceptions';
 import {DOM} from 'angular2/src/core/dom/dom_adapter';
 import {internalView} from 'angular2/src/core/linker/view_ref';
 import {
+  Promise,
   PromiseWrapper,
   PromiseCompleter
 } from 'angular2/src/core/facade/async';

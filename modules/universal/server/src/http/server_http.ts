@@ -140,7 +140,7 @@ export class NodeXhr {
 export class NodeBackend {
   constructor(private _browserXHR: BrowserXhr, private _baseResponseOptions: ResponseOptions) {
   }
-  createConnection(request: any) {
+  createConnection(request: any): Connection {
     return new NodeConnection(request, this._browserXHR, this._baseResponseOptions);
   }
 }
@@ -183,7 +183,7 @@ export class NgPreloadCacheHttp extends Http {
       .subscribe(
         request,
         value => {
-          let res = Object.assign({}, value, {
+          let res = (<any>Object).assign({}, value, {
             headers: value.headers.values()
           });
           if (isPresent(currentNode)) {
