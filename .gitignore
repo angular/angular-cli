@@ -53,10 +53,11 @@ test/coverage
 
 # inline ts compile
 modules/**/*.js
-modules/**/*.d.ts
 
 # Typings
 /typings
+/modules/universal/client/typings
+/modules/universal/server/typings
 /tsd_typings
 
 /modules/universal/dist/

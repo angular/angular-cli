@@ -23,6 +23,8 @@
   "files": [
     "../../tsd_typings/tsd.d.ts",
 
+    "universal.d.ts",
+
     "server/index.ts",
     "server/server.ts",
 
