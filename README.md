@@ -9,6 +9,10 @@ This projects is very much still a work in progress.
 We still have a long way before getting out of our alpha stage.
 If you wish to collaborate while the project is still young, checkout [our list issues](https://github.com/angular/angular-cli/issues).
 
+## Prerequisites
+
+The generated project has dependencies that require **Node 4 or greater**.
+
 ## Installation
 
 ```bash
