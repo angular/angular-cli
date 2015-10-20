@@ -1,7 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 import {bootstrap} from './core/application';
-import {Promise} from 'angular2/src/core/facade/async';
+// import {Promise} from 'angular2/src/core/facade/async';
 import {SERVER_DOM_RENDERER_PROVIDERS} from './render/server_dom_renderer';
 
 import {
@@ -106,7 +106,7 @@ export function renderToString(AppComponent: any, serverProviders: any = []): Pr
         let ngZone = appRef.injector.get(NgZone);
         // ngZone
         ngZone.overrideOnEventDone(() => {
-          if (isBlank(http) || !('_async' in http) || http._async <= 0) {
+          if (isBlank(http) || isBlank(http._async) || http._async <= 0) {
             let html: string = appRefSyncRender(appRef);
             appRef.dispose();
             resolve(html);

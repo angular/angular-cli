@@ -36,7 +36,7 @@ import {
   print,
   stringify
 } from 'angular2/src/core/facade/lang';
-import {Promise} from 'angular2/src/core/facade/async';
+// import {Promise} from 'angular2/src/core/facade/async';
 
 import {XHR} from 'angular2/src/core/compiler/xhr';
 import {XHRImpl} from 'angular2/src/core/compiler/xhr_impl';

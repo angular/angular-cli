@@ -1,5 +1,6 @@
 import './src/server_patch';
 export * from './src/core/application';
+export * from './src/core/application_ref';
 export * from './src/core/application_common';
 export * from './src/core/platform_providers';
 

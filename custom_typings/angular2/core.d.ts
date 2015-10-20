@@ -1,5 +1,5 @@
 declare var zone: any;
-declare var Zone: any;
+// declare var Zone: any;
 interface Type {}
 interface Map<K,V> {}
 interface StringMap<K,V> extends Map<K,V> {}
@@ -49,6 +49,9 @@ declare module "angular2/src/core/change_detection/change_detection" {
     constructor(pipes:any);
   }
   var defaultPipes:any;
+  class ChangeDetectionStrategy {
+
+  }
   class Parser {
 
   }
@@ -59,6 +62,27 @@ declare module "angular2/src/core/change_detection/change_detection" {
 
   }
   class DynamicChangeDetection {
+
+  }
+  class Locals {
+
+  }
+  class BindingTarget {
+
+  }
+  class DirectiveIndex {
+
+  }
+  class ChangeDispatcher {
+
+  }
+  class ChangeDetector {
+
+  }
+  class AST {
+
+  }
+  class ChangeDetectorGenConfig {
 
   }
   class PreGeneratedChangeDetection {
@@ -151,6 +175,9 @@ declare module "angular2/src/core/linker/view_listener" {
 }
 declare module "angular2/src/core/linker/view_ref" {
   var internalView:any
+  class ProtoViewRef {
+
+  }
 }
 declare module "angular2/src/core/linker/element_ref" {
   class ElementRef {
@@ -619,6 +646,8 @@ declare module "angular2/src/core/facade/async" {
 
     static callThrow(obs:any, res?:any):any;
   }
+  class Observable {
+  }
   class Promise<T> {
     static reject(pro:any):any;
     static resolve(pro:any):any;
@@ -653,6 +682,10 @@ declare module "angular2/src/core/facade/lang" {
   var Type:Function;
   var isDart:boolean;
 
+  class ConcreteType {
+
+  }
+
   function CONST_EXPR(exp:any):any;
 
   var assertionsEnabled:any;
@@ -685,6 +718,7 @@ declare module "angular2/src/core/facade/collection" {
   class StringMap {
     constructor(obj: any)
   }
+  interface Predicate<T> { (value: T, index?: number, array?: T[]): boolean; }
   var List:Array<any>;
   var Map:any;
   var ListWrapper:any;
@@ -692,6 +726,12 @@ declare module "angular2/src/core/facade/collection" {
   var StringMapWrapper:any;
 }
 declare module "angular2/src/core/facade/exceptions" {
+  class BaseException {
+
+  }
+  class WrappedException {
+
+  }
   class ExceptionHandler {
     constructor(DOM:any, isDart:boolean);
 
@@ -758,13 +798,24 @@ declare module "angular2/src/core/render/api" {
   class Renderer {
 
   }
+  class RenderElementRef {
+
+  }
   class RenderViewRef {
 
   }
   class RenderProtoViewRef {
 
   }
+  class RenderFragmentRef {
 
+  }
+  class RenderViewWithFragments {
+
+  }
+  class RenderEventDispatcher {
+
+  }
 }
 declare module "angular2/src/core/render/dom/shadow_dom/shadow_dom_strategy" {
   class ShadowDomStrategy {
@@ -885,6 +936,27 @@ declare module "angular2/src/core/render/render" {
   class RenderElementRef {
     renderView:any;
     boundElementIndex:any;
+  }
+  class RenderEmbeddedTemplateCmd {
+
+  }
+  class RenderBeginComponentCmd {
+
+  }
+  class RenderNgContentCmd {
+
+  }
+  class RenderTextCmd {
+
+  }
+  class RenderBeginElementCmd {
+
+  }
+  class RenderCommandVisitor {
+
+  }
+  class RenderTemplateCmd {
+
   }
   class DomRenderer {
     constructor(_eventManager:any, _domSharedStylesHost:any, _templateCloner:any, document:any);

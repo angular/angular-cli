@@ -11,13 +11,13 @@ import {
   Inject,
   CORE_DIRECTIVES
 } from 'angular2/angular2';
-import {ROUTER_BINDINGS, ROUTER_DIRECTIVES} from 'angular2/router';
+import {ROUTER_PROVIDERS, ROUTER_DIRECTIVES} from 'angular2/router';
 
-import {Http, HTTP_BINDINGS} from 'angular2/http';
+import {Http, HTTP_PROVIDERS} from 'angular2/http';
 import {
-  NG_PRELOAD_CACHE_BINDINGS,
+  NG_PRELOAD_CACHE_PROVIDERS,
   PRIME_CACHE
-} from '../../../../modules/client/client';
+} from '../../../../modules/universal/client/client';
 
 
 import {Store, Todo, TodoFactory} from './services/TodoStore';
@@ -192,9 +192,9 @@ export class TodoApp {
 
 export function main() {
   return bootstrap(TodoApp, [
-    ROUTER_BINDINGS,
-    HTTP_BINDINGS,
-    NG_PRELOAD_CACHE_BINDINGS,
+    ROUTER_PROVIDERS,
+    HTTP_PROVIDERS,
+    NG_PRELOAD_CACHE_PROVIDERS,
     bind(PRIME_CACHE).toValue(true)
   ]);
 }

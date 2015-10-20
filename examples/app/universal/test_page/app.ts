@@ -17,7 +17,7 @@ import {
 } from 'angular2/http';
 
 import {
-  NG_PRELOAD_CACHE_BINDINGS,
+  NG_PRELOAD_CACHE_PROVIDERS,
   PRIME_CACHE
 } from '../../../../modules/universal/client/client';
 
@@ -226,7 +226,7 @@ export class App {
 export function main() {
   return angular.bootstrap(App, [
     // HTTP_PROVIDERS,
-    NG_PRELOAD_CACHE_BINDINGS,
+    NG_PRELOAD_CACHE_PROVIDERS,
     bind(PRIME_CACHE).toValue(true)
   ]);
 }

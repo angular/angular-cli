@@ -21,7 +21,7 @@ import {ExceptionHandler} from 'angular2/src/core/facade/exceptions';
 import {DOM} from 'angular2/src/core/dom/dom_adapter';
 import {internalView} from 'angular2/src/core/linker/view_ref';
 import {
-  Promise,
+  // Promise,
   PromiseWrapper,
   PromiseCompleter
 } from 'angular2/src/core/facade/async';
@@ -148,7 +148,7 @@ export function platformCommon(providers?: Array<Type | Provider | any[]>, initi
 
 
 export class PlatformRef_ extends PlatformRef {
-  _applications: ApplicationRef[] = [];
+  _applications: Array<ApplicationRef | ApplicationRef_ | any> = [];
 
   constructor(
     private _injector: Injector,
@@ -183,6 +183,7 @@ export class PlatformRef_ extends PlatformRef {
     providers: Array<Type | Provider | any[]>): ApplicationRef {
 
     var injector: Injector;
+    var app: ApplicationRef;
     zone.run(() => {
       providers.push(provide(NgZone, {useValue: zone}));
       providers.push(provide(ApplicationRef, {useValue: this}));
@@ -201,7 +202,7 @@ export class PlatformRef_ extends PlatformRef {
         }
       }
     });
-    var app = new ApplicationRef_(this, zone, injector);
+    app = new ApplicationRef_(this, zone, injector);
     this._applications.push(app);
     return app;
   }
