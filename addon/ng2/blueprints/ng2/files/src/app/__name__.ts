@@ -1,4 +1,4 @@
-import {Component, bootstrap} from 'angular2/angular2';
+import {Component} from 'angular2/angular2';
 
 
 @Component({
