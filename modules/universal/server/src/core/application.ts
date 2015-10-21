@@ -24,7 +24,7 @@ import {serverBootstrap} from './application_common';
 
 
 export function bootstrap(appComponentType: /*Type*/ any,
-                          appProviders: Array<Type | Provider | any[]> = null):
+                          appProviders: Array<Type | Provider | any | any[]> = null):
     Promise<ComponentRef> {
 
   let providers = [ compilerProviders() ];

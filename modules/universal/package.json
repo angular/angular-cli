@@ -2,7 +2,7 @@
   "name": "angular2-universal-preview",
   "main": "dist/server/server.js",
   "browser": "dist/client/client.js",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "Apache-2.0",
