@@ -15,6 +15,9 @@
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
   },
+  "engines": {
+    "node": ">= 4.1.0"
+  },
   "author": "Angular Authors",
   "contributors": [
     "Rody Haddad <npm@rodyhaddad.com> (http://rodyhaddad.com/)",
