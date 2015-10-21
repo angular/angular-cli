@@ -99,7 +99,7 @@
     "gulp-insert": "^0.5.0",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.2.0",
-    "lodash": "^3.10.0",
+    "lodash": "^3.10.1",
     "parse5": "^1.5.0",
     "q": "^1.4.1",
     "reflect-metadata": "^0.1.1",
