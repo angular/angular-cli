@@ -1,6 +1,7 @@
 sudo: false
 env:
   - NODE_VERSION=4
+  - NODE_VERSION=5
 
 os:
   - linux
