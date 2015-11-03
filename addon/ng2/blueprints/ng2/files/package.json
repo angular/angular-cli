@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "systemjs": "0.19.4",
-    "angular2": "2.0.0-alpha.44"
+    "angular2": "2.0.0-alpha.45"
   },
   "devDependencies": {
     "angular-cli": "0.0.*",
