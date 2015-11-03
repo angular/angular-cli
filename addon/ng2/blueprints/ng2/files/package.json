@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "angular-cli": "0.0.*",
-    "angular-cli-github-pages": "^0.1.0",
+    "angular-cli-github-pages": "^0.2.0",
     "ember-cli-inject-live-reload": "^1.3.0"
   }
 }
