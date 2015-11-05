@@ -15,7 +15,7 @@ describe('server_router', () => {
     var serverLocationStrategy: ServerLocationStrategy = null;
 
     beforeAll( () => {
-        serverLocationStrategy = new ServerLocationStrategy();
+        serverLocationStrategy = new ServerLocationStrategy('/');
     });
     afterAll( () => {
         serverLocationStrategy = null;
