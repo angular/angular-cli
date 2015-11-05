@@ -54,20 +54,25 @@ export class ServerDomRenderer_ extends DomRenderer_ {
 
   setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
     if (propertyName === 'value' || (propertyName === 'checked' && propertyValue !== false)) {
-      var view = resolveInternalDomView(location.renderView);
-      var element = view.boundElements[location.boundElementIndex];
+      let view = resolveInternalDomView(location.renderView);
+      let element = view.boundElements[location.boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
         DOM.setAttribute(element, propertyName, propertyValue);
         return;
       }
+    } else if (propertyName === 'src') {
+      let view = resolveInternalDomView(location.renderView);
+      let element = view.boundElements[location.boundElementIndex];
+      DOM.setAttribute(element, propertyName, propertyValue);
+      return;
     }
     return super.setElementProperty(location, propertyName, propertyValue);
   }
 
   invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
     if (methodName === 'focus') {
-      var view = resolveInternalDomView(location.renderView);
-      var element = view.boundElements[location.boundElementIndex];
+      let view = resolveInternalDomView(location.renderView);
+      let element = view.boundElements[location.boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
         DOM.invoke(element, 'autofocus', null);
         return;
