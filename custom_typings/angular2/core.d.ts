@@ -6,9 +6,9 @@ interface StringMap<K,V> extends Map<K,V> {}
 
 
 declare module "angular2/src/core/application_ref" {
-  function platformBindings(): any;
+  function platformProviders(): any;
   function createNgZone(): any;
-  function applicationCommonBindings(): any;
+  function applicationCommonProviders(): any;
 }
 
 declare module "angular2/src/core/forms" {
