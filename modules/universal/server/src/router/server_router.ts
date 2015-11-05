@@ -1,8 +1,9 @@
 /// <reference path="../../typings/tsd.d.ts" />
-
-import {Injectable, provide} from 'angular2/angular2';
+import * as nodeUrl from 'url';
+import {Injectable, Inject, provide} from 'angular2/angular2';
 import {LocationStrategy} from 'angular2/router';
 import {MockLocationStrategy} from 'angular2/src/mock/mock_location_strategy';
+import {BASE_URL} from '../http/server_http';
 
 // TODO: see https://github.com/angular/universal/issues/60#issuecomment-130463593
 class MockServerHistory implements History {
@@ -27,9 +28,22 @@ class MockServerLocation implements Location {
   protocol: string;
   search: string;
   constructor () {/*TODO*/}
-  assign(url: string): void {/*TODO*/}
+  assign(url: string): void {
+    var parsed = nodeUrl.parse(url);
+    this.hash = parsed.hash;
+    this.host = parsed.host;
+    this.hostname = parsed.hostname;
+    this.href = parsed.href;
+    this.pathname = parsed.pathname;
+    this.port = parsed.port;
+    this.protocol = parsed.protocol;
+    this.search = parsed.search;
+    this.origin = parsed.protocol + '//' + parsed.hostname + ':' + parsed.port;
+  }
   reload(forcedReload?: boolean): void {/*TODO*/}
-  replace(url: string): void {/*TODO*/}
+  replace(url: string): void {
+    this.assign(url);
+  }
   toString(): string { /*TODO*/ return ''; }
 }
 
@@ -40,7 +54,10 @@ export class ServerLocationStrategy extends LocationStrategy {
   private _history:  History = new MockServerHistory();
   private _baseHref: string = '/';
 
-  constructor() { super(); }
+  constructor(@Inject(BASE_URL) baseUrl: string) {
+    super();
+    this._location.assign(baseUrl);
+  }
 
   onPopState(fn: EventListener): void {/*TODO*/}
 
