@@ -150,6 +150,8 @@ export function platformCommon(providers?: Array<Type | Provider | any[]>, initi
 export class PlatformRef_ extends PlatformRef {
   _applications: Array<ApplicationRef | ApplicationRef_ | any> = [];
 
+  public componentTypes: Array<Type> = [];
+
   constructor(
     private _injector: Injector,
     private _dispose: () => void) {
@@ -234,6 +236,8 @@ export class ApplicationRef_ extends ApplicationRef {
   }
 
   bootstrap(componentType: Type, providers?: Array<Type | Provider | any[]>): Promise<ComponentRef> {
+    this._platform.componentTypes.push(componentType);
+
     var completer = PromiseWrapper.completer();
     this._zone.run(() => {
       var componentProviders = _componentProviders(componentType);
