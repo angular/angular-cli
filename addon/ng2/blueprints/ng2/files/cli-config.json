@@ -2,7 +2,7 @@
   "funnels": [
     {"from":"node_modules", "to":"vendor", "files": [
       "angular2/bundles/angular2.dev.js",
-      "angular2/bundles/router.dev.j",
+      "angular2/bundles/router.dev.js",
       "angular2/bundles/http.dev.js",
       "systemjs/dist/system.src.js"
     ]}
