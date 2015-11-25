@@ -48,7 +48,7 @@ constructor(element: ElementRef, renderer: Renderer) {
   renderer.setElementStyle(element, 'fontSize', 'x-large');
 }
 ```
-* Don't use any of the browser types provided in the global namespace such as `navigator` or `document`. Anything outside of Angular will not be detected when serializing your applucation into html
+* Don't use any of the browser types provided in the global namespace such as `navigator` or `document`. Anything outside of Angular will not be detected when serializing your application into html
 * Keep your directives stateless as much as possible. For stateful directives you may need to provide an attribute that reflects the corresponding property with an initial string value such as `url` in `img` tag. For our native `<img src"">` element the `src` attribute is reflected as the `src` property of the element type `HTMLImageElement`. 
 
 # What's in a name?
