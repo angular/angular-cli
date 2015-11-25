@@ -11,7 +11,7 @@ export default {
     opts.listen.push({
       name: 'selectors',
       eventsBySelector: {
-        'input[type="text"],textarea': ['keypress', 'keyup', 'keydown']
+        'input,textarea': ['keypress', 'keyup', 'keydown']
       }
     });
     opts.listen.push({
@@ -30,7 +30,7 @@ export default {
     opts.listen.push({
       name: 'selectors',
       eventsBySelector: {
-        'input[type="text"],textarea': ['focusin', 'focusout', 'mousedown', 'mouseup']
+        'input,textarea': ['focusin', 'focusout', 'mousedown', 'mouseup']
       },
       trackFocus: true,
       doNotReplay: true
@@ -61,7 +61,7 @@ export default {
     opts.listen.push({
       name: 'selectors',
       eventsBySelector: {
-        'input[type="text"]': ['focus'],
+        'input': ['focus'],
         'textarea': ['focus']
       },
       doNotReplay: true,
@@ -71,7 +71,7 @@ export default {
     opts.listen.push({
       name: 'selectors',
       eventsBySelector: {
-        'input[type="text"]': ['blur'],
+        'input': ['blur'],
         'textarea': ['blur']
       },
       doNotReplay: true,
