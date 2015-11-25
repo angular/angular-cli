@@ -9,7 +9,9 @@ import {Component} from 'angular2/angular2';
   pipes: []
 })
 export class <%= jsComponentName %>App {
-
-  constructor() {}
-
+  defaultMeaning: number = 42;
+  
+  meaningOfLife(meaning) {
+    return `The meaning of life is ${meaning || this.defaultMeaning}`;
+  }
 }

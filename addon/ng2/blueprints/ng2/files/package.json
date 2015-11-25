@@ -9,6 +9,10 @@
   "devDependencies": {
     "angular-cli": "0.0.*",
     "angular-cli-github-pages": "^0.2.0",
-    "ember-cli-inject-live-reload": "^1.3.0"
+    "ember-cli-inject-live-reload": "^1.3.0",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.15",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-jasmine": "^0.3.6"
   }
 }
