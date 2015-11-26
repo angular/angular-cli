@@ -17,6 +17,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 
 ```bash
 npm install -g angular-cli
+npm install -g ember-cli 
 ```
 
 ## Usage
