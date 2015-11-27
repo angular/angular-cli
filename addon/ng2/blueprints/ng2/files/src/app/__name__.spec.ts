@@ -14,9 +14,5 @@ describe('App: <%= jsComponentName %>', () => {
       expect(app.meaningOfLife(22)).toBe('The meaning of life is 22');
     }));
   });
-
-  it('should be almost passing', function() {
-    expect(1 + 1).toBe(1);
-  });
 });
 
