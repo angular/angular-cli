@@ -62,6 +62,22 @@ ng build
 The build artifacts will be stored in the `dist/` directory.
 
 
+### Running tests
+
+Before running the tests make sure that the project is built. To build the 
+project once you can use:
+
+```bash
+ng build
+```
+
+With the project built in the `dist/` folder you can just run: `karma start`. 
+Karma will run the tests and keep the browser open waiting to run again.
+
+This will be easier when the command 
+[ng test](https://github.com/angular/angular-cli/issues/70) is implemented.
+
+
 ### Deploying the app via GitHub Pages
 
 The CLI currently comes bundled with [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages).
@@ -82,7 +98,7 @@ This project is currently a prototype so there are many known issues. Just to me
 
 - All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
 - On Windows you need to run the `build` and `serve` commands with Admin permissions otherwise the performance really sucks.
-- [Karma](http://karma-runner.github.io/) and [Protractor](https://angular.github.io/protractor/) integrations are missing.
+- [Protractor](https://angular.github.io/protractor/) integration is missing.
 - The initial installation as well as `ng new` take too long because of lots of npm dependencies.
 - "ember" branding leaks through many error messages and help text.
 - Many existing ember addons are not compatible with Angular apps built via angular-cli.
