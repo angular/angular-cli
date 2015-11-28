@@ -15,6 +15,17 @@ describe('Basic end-to-end Workflow', function () {
 
   after(conf.restore);
 
+  var testArgs = [
+      'test',
+      '--single-run'
+    ];
+
+  // In travis CI only run tests in Firefox
+  if (process.env.TRAVIS) {
+    testArgs.push('--browsers');
+    testArgs.push('Firefox');
+  }
+
   it('Installs angular-cli correctly', function() {
     this.timeout(300000);
 
@@ -56,19 +67,17 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test`', function(done) {
-    this.timeout(30000);
+  it('Perform `ng test` after initial build', function() {
+    this.timeout(300000);
 
-    return ng([
-      'test'
-    ]).then(function(err) {
-      // TODO when `ng test` will be implemented
-      //expect(err).to.be.equal(1);
-      done();
+    return ng(testArgs)
+    .then(function(result) {
+      expect(result.exitCode).to.be.equal(0);
     });
   });
 
   it('Can create a test component using `ng generate component test-component`', function() {
+    this.timeout(10000);
     return ng([
       'generate',
       'component',
@@ -82,15 +91,12 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test`', function(done) {
-    this.timeout(30000);
+  it('Perform `ng test` after adding a component', function() {
+    this.timeout(300000);
 
-    return ng([
-      'test'
-    ]).then(function(err) {
-      // TODO when `ng test` will be implemented
-      //expect(err).to.be.equal(1);
-      done();
+    return ng(testArgs)
+    .then(function(result) {
+      expect(result.exitCode).to.be.equal(0);
     });
   });
 
@@ -107,15 +113,12 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test`', function(done) {
-    this.timeout(30000);
+  it('Perform `ng test` after adding a service', function() {
+    this.timeout(300000);
 
-    return ng([
-      'test'
-    ]).then(function(err) {
-      // TODO when `ng test` will be implemented
-      //expect(err).to.be.equal(1);
-      done();
+    return ng(testArgs)
+    .then(function(result) {
+      expect(result.exitCode).to.be.equal(0);
     });
   });
 
@@ -132,15 +135,12 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test`', function(done) {
-    this.timeout(30000);
+  it('Perform `ng test` after adding a pipe', function() {
+    this.timeout(300000);
 
-    return ng([
-      'test'
-    ]).then(function(err) {
-      // TODO when `ng test` will be implemented
-      //expect(err).to.be.equal(1);
-      done();
+    return ng(testArgs)
+    .then(function(result) {
+      expect(result.exitCode).to.be.equal(0);
     });
   });
 
@@ -166,20 +166,16 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test`', function(done) {
+  it('Perform `ng test` after adding a route', function() {
     this.timeout(300000);
 
-    return ng([
-      'test'
-    ]).then(function(err) {
-      // TODO when `ng test` will be implemented
-      //expect(err).to.be.equal(1);
-      // Clean `tmp` folder
+    return ng(testArgs)
+    .then(function(result) {
+      expect(result.exitCode).to.be.equal(0);
 
+      // Clean `tmp` folder
       process.chdir(path.resolve(root, '..'));
       sh.rm('-rf', './tmp'); // tmp.teardown takes too long
-
-      done();
     });
   });
 

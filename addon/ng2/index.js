@@ -8,7 +8,8 @@ module.exports = {
       'new'       : require('./commands/new'),
       'init'      : require('./commands/init'),
       'install'   : require('./commands/install'),
-      'uninstall' : require('./commands/uninstall')
+      'uninstall' : require('./commands/uninstall'),
+      'test'      : require('./commands/test')
     };
   }
 };

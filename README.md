@@ -137,15 +137,11 @@ ng install ng2-cli-test-lib
 
 ### Running unit tests
 
-Before running the tests make sure that the project is built. To build the
-project once you can use:
-
 ```bash
-ng build
+ng test
 ```
 
-With the project built in the `dist/` folder you can just run: `karma start`.
-Karma will run the tests and keep the browser open waiting to run again.
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html)
 
 
 ### Running end-to-end tests
@@ -160,9 +156,6 @@ $(npm bin)/tsc -p e2e/
 
 Afterwards you only need to run `$(npm bin)/protractor` while serving via
 `ng serve`.
-
-This will be easier when the command
-[ng test](https://github.com/angular/angular-cli/issues/70) is implemented.
 
 
 ### Deploying the app via GitHub Pages
