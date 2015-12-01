@@ -124,19 +124,22 @@ describe('Acceptance: ng init', function() {
     });
 
     it('init an already init\'d folder', function() {
+      return ng([
+        'init',
+        '--skip-npm',
+        '--skip-bower'
+      ])
+      .then(function(){
+        Blueprint.ignoredFiles.push('favicon.ico');
+      })
+      .then(function() {
         return ng([
-            'init',
-            '--skip-npm',
-            '--skip-bower'
-        ])
-            .then(function() {
-                return ng([
-                    'init',
-                    '--skip-npm',
-                    '--skip-bower'
-                ]);
-            })
-            .then(confirmBlueprinted);
+          'init',
+          '--skip-npm',
+          '--skip-bower'
+        ]);
+      })
+      .then(confirmBlueprinted);
     });
 
     it('init a single file', function() {
