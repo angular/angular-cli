@@ -37,7 +37,7 @@ System.import('angular2/src/core/dom/browser_adapter').then(function(browser_ada
 });
 
 function onlyAppFiles(filePath) {
-  return /^\/base\/dist\/app\/(?!spec)([a-z0-9-_]+)\.js$/.test(filePath);
+  return /^\/base\/dist\/app\/(?!spec)([a-z0-9-_\/]+)\.js$/.test(filePath);
 }
 
 function onlySpecFiles(path) {
