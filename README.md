@@ -1,5 +1,7 @@
 # Angular-CLI
 
+[![Build Status](https://travis-ci.org/angular/angular-cli.svg?branch=master)](https://travis-ci.org/angular/angular-cli)
+
 Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
