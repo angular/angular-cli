@@ -7,7 +7,8 @@ import {Pipe} from 'angular2/angular2';
 export class <%= classifiedModuleName %> {
 
   transform(value, args?) {
-    return value;
+    return !value;
   }
 
 }
+
