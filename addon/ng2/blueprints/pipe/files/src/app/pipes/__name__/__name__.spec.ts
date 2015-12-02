@@ -15,7 +15,7 @@ import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
 
 describe('<%= classifiedModuleName %> Pipe', () => {
 
-  beforeEachProviders(() => []);
+  beforeEachProviders(() => [<%= classifiedModuleName %>]);
 
 
   it('should ...', inject([<%= classifiedModuleName %>], (pipe:<%= classifiedModuleName %>) => {
@@ -23,3 +23,4 @@ describe('<%= classifiedModuleName %> Pipe', () => {
   }));
 
 });
+

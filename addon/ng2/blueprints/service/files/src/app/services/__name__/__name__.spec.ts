@@ -15,11 +15,11 @@ import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
 
 describe('<%= classifiedModuleName %> Service', () => {
 
-  beforeEachProviders(() => []);
+  beforeEachProviders(() => [<%= classifiedModuleName %>]);
 
 
-  it('should ...', inject([<%= classifiedModuleName %>], (service:<%= classifiedModuleName %>) => {
-
+  it('should do something', inject([<%= classifiedModuleName %>], (service:<%= classifiedModuleName %>) => {
+    expect(service.doSomething()).toBe('something');
   }));
 
 });
