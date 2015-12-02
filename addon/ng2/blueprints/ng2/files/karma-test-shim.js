@@ -20,7 +20,7 @@ System.config({
   }
 });
 
-System.import('angular2/src/core/dom/browser_adapter').then(function(browser_adapter) {
+System.import('angular2/platform/browser').then(function(browser_adapter) {
   // TODO: once beta is out we should change this code to use a "test platform"
   browser_adapter.BrowserDomAdapter.makeCurrent();
 }).then(function() {
