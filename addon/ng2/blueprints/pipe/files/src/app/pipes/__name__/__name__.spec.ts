@@ -15,11 +15,11 @@ import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
 
 describe('<%= classifiedModuleName %> Pipe', () => {
 
-  beforeEachProviders(() => []);
+  beforeEachProviders(() => [<%= classifiedModuleName%>]);
 
 
-  it('should ...', inject([<%= classifiedModuleName %>], (pipe:<%= classifiedModuleName %>) => {
-      expect(pipe.transform(true)).toBe(false);
+  it('should transform the input', inject([<%= classifiedModuleName %>], (pipe:<%= classifiedModuleName %>) => {
+      expect(pipe.transform(true)).toBe(null);
   }));
 
 });

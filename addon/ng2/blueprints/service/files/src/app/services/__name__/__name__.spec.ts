@@ -15,7 +15,7 @@ import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
 
 describe('<%= classifiedModuleName %> Service', () => {
 
-  beforeEachProviders(() => []);
+  beforeEachProviders(() => [<%= classifiedModuleName %>]);
 
 
   it('should ...', inject([<%= classifiedModuleName %>], (service:<%= classifiedModuleName %>) => {

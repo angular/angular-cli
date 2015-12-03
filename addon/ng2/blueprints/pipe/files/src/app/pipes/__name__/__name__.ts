@@ -7,7 +7,7 @@ import {Pipe} from 'angular2/core';
 export class <%= classifiedModuleName %> {
 
   transform(value, args?) {
-    return value;
+    return null;
   }
 
 }
