@@ -3,8 +3,6 @@
 // Definitions by: Jeff Whelpley <https://github.com/jeffwhelpley>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-/// <reference path="../tsd_typings/node/node.d.ts"/>
-
 declare module "event-stream" {
 
     interface EventStream {

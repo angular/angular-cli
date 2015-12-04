@@ -1,40 +1,28 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import {
   provide,
   Inject,
-  Injectable,
-  Provider,
-  Injector,
-  OpaqueToken
+  Injectable
 } from 'angular2/angular2';
 
 import {
-  ListWrapper,
-  MapWrapper,
-  Map,
-  StringMapWrapper,
-  List
-} from 'angular2/src/core/facade/collection';
-import {
+  Renderer,
   DomRenderer,
   DomRenderer_,
-  RenderElementRef,
-  Renderer,
-  DOCUMENT
+  DOCUMENT,
+  RenderElementRef
 } from 'angular2/src/core/render/render';
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 import {EventManager} from 'angular2/src/core/render/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/core/render/dom/shared_styles_host';
-import {TemplateCloner} from 'angular2/src/core/render/dom/template_cloner';
 import {DOM} from 'angular2/src/core/dom/dom_adapter';
 
 function resolveInternalDomView(viewRef) {
   return viewRef;
 }
 
-function resolveInternalDomFragment(fragmentRef) {
-  return fragmentRef.nodes;
-}
+//function resolveInternalDomFragment(fragmentRef) {
+//  return fragmentRef.nodes;
+//}
 
 export {
   DOCUMENT,
@@ -45,11 +33,11 @@ export {
 @Injectable()
 export class ServerDomRenderer_ extends DomRenderer_ {
   constructor(
-    private _eventManager: EventManager,
-    private _domSharedStylesHost: DomSharedStylesHost,
-    private _animate: AnimationBuilder,
+    private eventManager: EventManager,
+    private domSharedStylesHost: DomSharedStylesHost,
+    private animate: AnimationBuilder,
     @Inject(DOCUMENT) document) {
-     super(_eventManager, _domSharedStylesHost, _animate, document);
+     super(eventManager, domSharedStylesHost, animate, document);
   }
 
   setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {

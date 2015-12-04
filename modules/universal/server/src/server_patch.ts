@@ -1,5 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
-
 
 // polyfills
 import 'es6-shim';

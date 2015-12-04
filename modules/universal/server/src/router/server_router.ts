@@ -1,4 +1,3 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import * as nodeUrl from 'url';
 import {Injectable, Inject, provide} from 'angular2/angular2';
 import {LocationStrategy} from 'angular2/router';
@@ -74,6 +73,8 @@ export class ServerLocationStrategy extends LocationStrategy {
   back(): void {
     this._history.back();
   }
+
+  prepareExternalUrl(internal: string): string { return internal; }
 }
 
 export const SERVER_LOCATION_PROVIDERS: Array<any> = [

@@ -1,7 +1,5 @@
-/// <reference path="../typings/tsd.d.ts" />
-
 import {bootstrap} from './core/application';
-// import {Promise} from 'angular2/src/core/facade/async';
+// import {Promise} from 'angular2/src/facade/async';
 import {SERVER_DOM_RENDERER_PROVIDERS} from './render/server_dom_renderer';
 
 import {
@@ -21,13 +19,12 @@ import {
 import {getClientCode} from 'preboot';
 
 
-import {isBlank, isPresent} from 'angular2/src/core/facade/lang';
+import {isBlank, isPresent} from 'angular2/src/facade/lang';
 import {DOM} from 'angular2/src/core/dom/dom_adapter';
 
 
 import {
-  DOCUMENT,
-  DOM_REFLECT_PROPERTIES_AS_ATTRIBUTES
+  DOCUMENT
 } from 'angular2/src/core/render/render';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
 import {SharedStylesHost} from 'angular2/src/core/render/dom/shared_styles_host';

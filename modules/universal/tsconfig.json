@@ -14,49 +14,34 @@
   },
   "exclude": [
     "client/test",
-
-    "server/test/helper_spec.ts",
-    "server/test/router_server_spec.ts",
-
+    "server/test",
     "node_modules"
   ],
   "files": [
     "../../tsd_typings/tsd.d.ts",
-
+    "../../custom_typings/_custom.d.ts",
     "universal.d.ts",
-
     "server/index.ts",
     "server/server.ts",
-
     "server/src/core/application.ts",
     "server/src/core/application_common.ts",
     "server/src/core/application_ref.ts",
     "server/src/core/platform_providers.ts",
-
     "server/src/express/engine.ts",
-
     "server/src/directives/server_form.ts",
-
     "server/src/http/server_http.ts",
-
     "server/src/router/server_router.ts",
-
     "server/src/render/server_dom_renderer.ts",
-
     "server/src/ng_scripts.ts",
     "server/src/helper.ts",
     "server/src/render.ts",
     "server/src/server_patch.ts",
     "server/src/stringifyElement.ts",
     "server/test/router_server_spec.ts",
-    "server/typings/tsd.d.ts",
-
     "client/index.ts",
     "client/client.ts",
     "client/src/ng_preload_cache.ts",
     "client/src/bootstrap.ts"
-
-
   ],
   "formatCodeOptions": {
     "indentSize": 2,

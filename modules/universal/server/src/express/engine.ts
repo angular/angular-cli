@@ -1,4 +1,3 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import '../server_patch';
 import * as fs from 'fs';
 import {selectorRegExpFactory, simpleTemplate} from '../helper';

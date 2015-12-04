@@ -1,5 +1,3 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
 import * as Q from 'q';
 import uglify = require('gulp-uglify');
 import insert = require('gulp-insert');

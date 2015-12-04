@@ -1,4 +1,3 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import {
   bind,
   Provider,
@@ -7,8 +6,8 @@ import {
   ComponentRef
 } from 'angular2/angular2';
 
-import {compilerProviders} from 'angular2/src/core/compiler/compiler';
-// import {Promise} from 'angular2/src/core/facade/async';
+import {compilerProviders} from 'angular2/src/compiler/compiler';
+import {Promise} from 'angular2/src/facade/async';
 import {
   NumberWrapper,
   Type,
@@ -17,7 +16,7 @@ import {
   assertionsEnabled,
   print,
   stringify
-} from 'angular2/src/core/facade/lang';
+} from 'angular2/src/facade/lang';
 
 
 import {serverBootstrap} from './application_common';

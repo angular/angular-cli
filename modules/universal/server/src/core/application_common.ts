@@ -1,13 +1,12 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import {
   Injector,
   OpaqueToken,
   provide,
   Provider,
   Type,
-  ComponentRef,
   FORM_PROVIDERS
 } from 'angular2/angular2';
+import {ComponentRef} from 'angular2/src/core/linker/dynamic_component_loader'
 import {
   EventManager,
   DomEventsPlugin,
@@ -35,11 +34,11 @@ import {
   assertionsEnabled,
   print,
   stringify
-} from 'angular2/src/core/facade/lang';
-// import {Promise} from 'angular2/src/core/facade/async';
+} from 'angular2/src/facade/lang';
+import {Promise} from 'angular2/src/facade/async';
 
-import {XHR} from 'angular2/src/core/compiler/xhr';
-import {XHRImpl} from 'angular2/src/core/compiler/xhr_impl';
+import {XHR} from 'angular2/src/compiler/xhr';
+import {XHRImpl} from 'angular2/src/compiler/xhr_impl';
 import {DOM} from 'angular2/src/core/dom/dom_adapter';
 import {Testability} from 'angular2/src/core/testability/testability';
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';

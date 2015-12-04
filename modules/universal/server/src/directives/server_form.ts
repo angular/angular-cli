@@ -8,8 +8,7 @@ import {
 } from 'angular2/angular2';
 
 import {Renderer} from 'angular2/src/core/render/render';
-import {isPresent, CONST_EXPR} from 'angular2/src/core/facade/lang';
-import {StringMap} from 'angular2/src/core/facade/collection';
+import {isPresent, CONST_EXPR} from 'angular2/src/facade/lang';
 
 export const APP_LOCATION: OpaqueToken = CONST_EXPR(new OpaqueToken('appLocation'));
 

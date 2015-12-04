@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 import {
   Http,
   Response,
@@ -8,12 +7,12 @@ import {
   ConnectionBackend,
   XHRBackend
 } from 'angular2/http';
-import {ObservableWrapper} from 'angular2/src/core/facade/async';
+import {ObservableWrapper} from 'angular2/src/facade/async';
 import {
   isPresent,
   isBlank,
   CONST_EXPR
-} from 'angular2/src/core/facade/lang';
+} from 'angular2/src/facade/lang';
 
 import {
   provide,
@@ -21,7 +20,8 @@ import {
   Injectable,
   Optional,
   Inject,
-  EventEmitter
+  EventEmitter,
+  Observable
 } from 'angular2/angular2';
 
 export const PRIME_CACHE: OpaqueToken = CONST_EXPR(new OpaqueToken('primeCache'));
@@ -63,7 +63,7 @@ export class NgPreloadCacheHttp extends Http {
         setTimeout(() => {
           ObservableWrapper.callNext(obs, preloaded);
           // setTimeout(() => {
-            ObservableWrapper.callReturn(obs);
+            ObservableWrapper.callComplete(obs);
           // });
         });
         return obs;
@@ -78,12 +78,12 @@ export class NgPreloadCacheHttp extends Http {
       },
       throw(e) {
         setTimeout(() => {
-          ObservableWrapper.callThrow(obs, e)
+          ObservableWrapper.callError(obs, e)
         });
       },
       return() {
         setTimeout(() => {
-          ObservableWrapper.callReturn(obs)
+          ObservableWrapper.callComplete(obs)
         });
       }
     });
@@ -91,31 +91,31 @@ export class NgPreloadCacheHttp extends Http {
     return obs;
   }
 
-  request(url: string, options): EventEmitter {
+  request(url: string, options): Observable<Response> {
     return this.prime ? this.preload(() => super.request(url, options)) : super.request(url, options);
   }
 
-  get(url: string, options): EventEmitter {
+  get(url: string, options): Observable<Response> {
     return this.prime ? this.preload(() => super.get(url, options)) : super.get(url, options);
   }
 
-  post(url: string, body: string, options): EventEmitter {
+  post(url: string, body: string, options): Observable<Response> {
     return this.prime ? this.preload(() => super.post(url, body, options)) : super.post(url, body, options);
   }
 
-  put(url: string, body: string, options): EventEmitter {
+  put(url: string, body: string, options): Observable<Response> {
     return this.prime ? this.preload(() => super.put(url, body, options)) : super.put(url, body, options);
   }
 
-  delete(url: string, options): EventEmitter {
+  delete(url: string, options): Observable<Response> {
     return this.prime ? this.preload(() => super.delete(url, options)) : super.delete(url, options);
   }
 
-  patch(url: string, body: string, options): EventEmitter {
+  patch(url: string, body: string, options): Observable<Response> {
     return this.prime ? this.preload(() => super.patch(url, body, options)) : super.patch(url, body, options);
   }
 
-  head(url: string, options): EventEmitter {
+  head(url: string, options): Observable<Response> {
     return this.prime ? this.preload(() => super.head(url, options)) : super.head(url, options);
   }
 }

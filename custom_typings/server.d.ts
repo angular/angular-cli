@@ -1,7 +1,7 @@
 
 declare module "xhr2" {
   class XMLHttpRequest {
-    nodejsSet(url: any): any
+    nodejsSet(url: any): any;
   }
   export = XMLHttpRequest;
 }

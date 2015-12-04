@@ -25,8 +25,8 @@
     "typescript": "^1.6.2"
   },
   "dependencies": {
-    "@reactivex/rxjs": "5.0.0-alpha.4",
-    "angular2": "2.0.0-alpha.45",
+    "@reactivex/rxjs": "5.0.0-alpha.7",
+    "angular2": "2.0.0-alpha.46",
     "css": "^2.2.1",
     "es6-shim": "^0.33.6",
     "parse5": "^1.5.0",
@@ -36,7 +36,7 @@
     "zone.js": "^0.5.8"
   },
   "peerDependencies": {
-    "angular2": "2.0.0-alpha.45",
+    "angular2": "2.0.0-alpha.46",
     "css": "^2.2.1",
     "parse5": "^1.5.0"
   }

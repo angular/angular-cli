@@ -1,4 +1,3 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import {
   Injector,
   provide,
@@ -8,8 +7,9 @@ import {
   ComponentRef,
   PlatformRef,
   ApplicationRef,
-  NgZone
 } from 'angular2/angular2';
+
+import {NgZone} from 'angular2/src/core/zone/ng_zone';
 
 import {
   APP_COMPONENT_REF_PROMISE,
@@ -17,15 +17,15 @@ import {
   APP_ID_RANDOM_PROVIDER
 } from 'angular2/src/core/application_tokens';
 
-import {ExceptionHandler} from 'angular2/src/core/facade/exceptions';
+import {ExceptionHandler} from 'angular2/src/facade/exceptions';
 import {DOM} from 'angular2/src/core/dom/dom_adapter';
 import {internalView} from 'angular2/src/core/linker/view_ref';
 import {
-  // Promise,
+  Promise,
   PromiseWrapper,
   PromiseCompleter
-} from 'angular2/src/core/facade/async';
-import {ListWrapper} from 'angular2/src/core/facade/collection';
+} from 'angular2/src/facade/async';
+import {ListWrapper} from 'angular2/src/facade/collection';
 import {
   NumberWrapper,
   isBlank,
@@ -33,7 +33,7 @@ import {
   assertionsEnabled,
   print,
   stringify
-} from 'angular2/src/core/facade/lang';
+} from 'angular2/src/facade/lang';
 
 import {Reflector, reflector} from 'angular2/src/core/reflection/reflection';
 import {TestabilityRegistry, Testability} from 'angular2/src/core/testability/testability';
@@ -54,11 +54,11 @@ import {AppViewManagerUtils} from 'angular2/src/core/linker/view_manager_utils';
 import {AppViewListener} from 'angular2/src/core/linker/view_listener';
 import {ProtoViewFactory} from 'angular2/src/core/linker/proto_view_factory';
 import {ViewResolver} from 'angular2/src/core/linker/view_resolver';
-import {DEFAULT_PIPES} from 'angular2/src/core/pipes';
-import {LifeCycle, LifeCycle_} from 'angular2/src/core/life_cycle/life_cycle';
+import {PLATFORM_DIRECTIVES, PLATFORM_PIPES} from 'angular2/src/core/platform_directives_and_pipes';
 import {DirectiveResolver} from 'angular2/src/core/linker/directive_resolver';
 import {PipeResolver} from 'angular2/src/core/linker/pipe_resolver';
 import {DynamicComponentLoader, DynamicComponentLoader_} from "angular2/src/core/linker/dynamic_component_loader";
+import {COMMON_DIRECTIVES, COMMON_PIPES} from "angular2/common";
 
 import {
   IterableDiffers,
@@ -76,18 +76,15 @@ export function applicationCommonProviders(): Array<Type | Provider | any[]> {
     provide(AppViewManager, {useClass: AppViewManager_}),
     AppViewManagerUtils,
     AppViewListener,
-    DirectiveResolver,
-    ViewResolver,
-    PipeResolver,
     ProtoViewFactory,
-    DEFAULT_PIPES,
+    ViewResolver,
     provide(IterableDiffers, {useValue: defaultIterableDiffers}),
     provide(KeyValueDiffers, {useValue: defaultKeyValueDiffers}),
-    provide(DynamicComponentLoader, {useClass: DynamicComponentLoader_}),
-    provide(LifeCycle, {
-      useFactory: (exceptionHandler) => new LifeCycle_(null, assertionsEnabled()),
-      deps: [ExceptionHandler]
-    })
+    DirectiveResolver,
+    PipeResolver,
+    provide(PLATFORM_PIPES, {useValue: COMMON_PIPES, multi: true}),
+    provide(PLATFORM_DIRECTIVES, {useValue: COMMON_DIRECTIVES, multi: true}),
+    provide(DynamicComponentLoader, {useClass: DynamicComponentLoader_})
   ];
 }
 
@@ -148,7 +145,7 @@ export function platformCommon(providers?: Array<Type | Provider | any[]>, initi
 
 export class PlatformRef_ extends PlatformRef {
   _applications: Array<ApplicationRef | ApplicationRef_ | any> = [];
-
+  _disposeListeners: Function[] = [];
   public componentTypes: Array<Type> = [];
 
   constructor(
@@ -195,7 +192,7 @@ export class PlatformRef_ extends PlatformRef {
         exceptionHandler = injector.get(ExceptionHandler);
         zone.overrideOnErrorHandler((e, s) => exceptionHandler.call(e, s));
       } catch (e) {
-        console.log('WAT')
+        console.log('WAT');
         if (isPresent(exceptionHandler)) {
           exceptionHandler.call(e, e.stack);
         } else {
@@ -216,13 +213,15 @@ export class PlatformRef_ extends PlatformRef {
   _applicationDisposed(app: ApplicationRef): void {
     ListWrapper.remove(this._applications, app);
   }
+
+  registerDisposeListener(dispose: () => void): void { this._disposeListeners.push(dispose); }
 }
 
 
 export class ApplicationRef_ extends ApplicationRef {
   private _bootstrapListeners: Function[] = [];
   private _rootComponents: ComponentRef[] = [];
-
+  _disposeListeners: Function[] = [];
   constructor(
     private _platform: PlatformRef_,
     private _zone: NgZone,
@@ -252,7 +251,7 @@ export class ApplicationRef_ extends ApplicationRef {
 
         var tick = (componentRef) => {
           var appChangeDetector = internalView(componentRef.hostView).changeDetector;
-          var lc = injector.get(LifeCycle);
+          var lc = injector.get(ExceptionHandler);
           lc.registerWith(this._zone, appChangeDetector);
           lc.tick();
           completer.resolve(componentRef);
@@ -286,4 +285,8 @@ export class ApplicationRef_ extends ApplicationRef {
     this._rootComponents.forEach((ref) => ref.dispose());
     this._platform._applicationDisposed(this);
   }
+
+  registerDisposeListener(dispose: () => void): void { this._disposeListeners.push(dispose); }
+
+  tick(): void { }
 }

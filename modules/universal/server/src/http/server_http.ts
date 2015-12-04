@@ -1,5 +1,3 @@
-/// <reference path="../../typings/tsd.d.ts" />
-
 import '../server_patch';
 
 import {
@@ -8,7 +6,9 @@ import {
   Injectable,
   Optional,
   Inject,
-  EventEmitter
+  EventEmitter,
+  NgZone,
+  Observable
 } from 'angular2/angular2';
 
 import {
@@ -32,16 +32,15 @@ import {
   RequestMethods
 } from 'angular2/http';
 
-import {ObservableWrapper} from 'angular2/src/core/facade/async';
+import {ObservableWrapper} from 'angular2/src/facade/async';
 
 import {
   isPresent,
   isBlank,
   CONST_EXPR
-} from 'angular2/src/core/facade/lang';
+} from 'angular2/src/facade/lang';
 
 var Rx = require('@reactivex/rxjs/dist/cjs/Rx');
-var {Observable} = Rx;
 
 // CJS
 import XMLHttpRequest = require('xhr2');
@@ -155,7 +154,9 @@ export class NgPreloadCacheHttp extends Http {
   constructor(
     protected _backend: ConnectionBackend,
     protected _defaultOptions: RequestOptions,
-    @Optional() @Inject(PRIME_CACHE) protected prime?: boolean) {
+    @Inject(NgZone) protected _ngZone: NgZone,
+    @Optional() @Inject(PRIME_CACHE) protected prime?: boolean
+    ) {
     super(_backend, _defaultOptions);
 
     var _rootNode = { children: [], res: null };
@@ -178,66 +179,54 @@ export class NgPreloadCacheHttp extends Http {
 
     // We need this to ensure all ajax calls are done before rendering the app
     this._async += 1;
-    let request = factory();
-    ObservableWrapper
-      .subscribe(
-        request,
-        value => {
-          let res = (<any>Object).assign({}, value, {
-            headers: value.headers.values()
-          });
-          if (isPresent(currentNode)) {
-            currentNode.res = res;
-          }
-          ObservableWrapper.callNext(obs, value);
-        },
-        e => {
-          // TODO: update Angular 2 Http
-          setTimeout(() => {
-            this._async -= 1;
-            ObservableWrapper.callThrow(obs, e);
-          });
-        },
-        () => {
-          // TODO: update Angular 2 Http
-          setTimeout(() => {
-            this._activeNode = currentNode;
-            this._async -= 1;
-            ObservableWrapper.callReturn(obs);
-            this._activeNode = null;
-          });
-        });
+    var request = factory();
 
-    return obs;
+    request.subscribe({
+        next: () => {
+
+        },
+        error: () => {
+            this._ngZone.run(() => {
+                setTimeout(() => { this._async -= 1; });
+            });
+        },
+        complete: () => {
+            this._ngZone.run(() => {
+                setTimeout(() => { this._async -= 1; });
+            });
+        }
+    });
+
+    return request;
   }
 
-  request(url: string | Request, options?: RequestOptionsArgs): EventEmitter {
+  request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
     return isBlank(this.prime) ? super.request(url, options) : this.preload(() => super.request(url, options));
   }
 
-  get(url: string, options?: RequestOptionsArgs): EventEmitter {
+  get(url: string, options?: RequestOptionsArgs): Observable<Response> {
     return isBlank(this.prime) ? super.get(url, options) : this.preload(() => super.get(url, options));
 
   }
 
-  post(url: string, body: string, options?: RequestOptionsArgs): EventEmitter {
+  post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
     return isBlank(this.prime) ? super.post(url, body, options) : this.preload(() => super.post(url, body, options));
   }
 
-  put(url: string, body: string, options?: RequestOptionsArgs): EventEmitter {
+  put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
     return isBlank(this.prime) ? super.put(url, body, options) : this.preload(() => super.put(url, body, options));
   }
 
-  delete(url: string, options?: RequestOptionsArgs): EventEmitter {
+  delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
     return isBlank(this.prime) ? super.delete(url, options) : this.preload(() => super.delete(url, options));
 
   }
 
-  patch(url: string, body: string, options?: RequestOptionsArgs): EventEmitter {
+  patch(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
     return isBlank(this.prime) ? super.patch(url, body, options) : this.preload(() => super.patch(url, body, options));
   }
 
-  head(url: string, options?: RequestOptionsArgs): EventEmitter {
+  head(url: string, options?: RequestOptionsArgs): Observable<Response> {
     return isBlank(this.prime) ? super.head(url, options) : this.preload(() => super.head(url, options));
   }
 
