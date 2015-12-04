@@ -43,7 +43,7 @@
     "resolve": "^1.0.0",
     "silent-error": "^1.0.0",
     "symlink-or-copy": "^1.0.1",
-    "typescript": "^1.6.2"
+    "typescript": "~1.6.2"
   },
   "ember-addon": {
     "paths": [
