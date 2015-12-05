@@ -9,7 +9,7 @@ import {
   TestComponentBuilder,
   beforeEachProviders
 } from 'angular2/testing';
-import {provide} from 'angular2/angular2';
+import {provide} from 'angular2/core';
 import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
 
 
