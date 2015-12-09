@@ -51,6 +51,7 @@
     ]
   },
   "devDependencies": {
+    "broccoli-sass": "^0.7.0",
     "broccoli-stew": "^0.3.6",
     "chai": "^3.2.0",
     "exists-sync": "0.0.3",
