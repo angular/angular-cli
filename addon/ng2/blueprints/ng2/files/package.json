@@ -3,8 +3,13 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "dependencies": {
+    "angular2": "2.0.0-alpha.52",
+    "es6-promise": "^3.0.2",
+    "es6-shim": "^0.33.3",
+    "reflect-metadata": "0.1.2",
+    "rxjs": "5.0.0-alpha.14",
     "systemjs": "0.19.4",
-    "angular2": "2.0.0-alpha.48"
+    "zone.js": "0.5.8"
   },
   "devDependencies": {
     "angular-cli": "0.0.*",

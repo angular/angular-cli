@@ -12,6 +12,9 @@ function MockUI() {
         inputStream: through(),
         outputStream: through(function(data) {
             this.output += data;
+        }.bind(this)),
+        errorStream: through(function(data) {
+          this.errors += data;
         }.bind(this))
     });
 }
