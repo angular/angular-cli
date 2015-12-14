@@ -1,5 +1,10 @@
-# Angular-CLI
+## Angular-CLI
 
+[![Build Status][travis-badge]][travis-badge-url]
+[![Dependency Status][david-badge]][david-badge-url]
+[![devDependency Status][david-dev-badge]][david-dev-badge-url]
+[![npm][npm-badge]][npm-badge-url]
+ 
 Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
@@ -141,3 +146,13 @@ and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackageloca
 ## License
 
 Apache v2
+
+
+[travis-badge]: https://travis-ci.org/angular/angular-cli.svg?branch=master
+[travis-badge-url]: https://travis-ci.org/angular/angular-cli
+[david-badge]: https://david-dm.org/angular/angular-cli.svg
+[david-badge-url]: https://david-dm.org/angular/angular-cli
+[david-dev-badge]: https://david-dm.org/angular/angular-cli/dev-status.svg
+[david-dev-badge-url]: https://david-dm.org/angular/angular-cli#info=devDependencies
+[npm-badge]: https://img.shields.io/npm/v/angular-cli.svg
+[npm-badge-url]: https://www.npmjs.com/package/angular-cli
