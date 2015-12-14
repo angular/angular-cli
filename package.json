@@ -1,6 +1,6 @@
 {
   "name": "angular-cli",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
