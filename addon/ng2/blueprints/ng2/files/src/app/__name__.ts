@@ -11,7 +11,7 @@ import {Component} from 'angular2/core';
 export class <%= jsComponentName %>App {
   defaultMeaning: number = 42;
   
-  meaningOfLife(meaning) {
+  meaningOfLife(meaning?: number) {
     return `The meaning of life is ${meaning || this.defaultMeaning}`;
   }
 }
