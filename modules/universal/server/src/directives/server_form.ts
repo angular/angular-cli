@@ -5,7 +5,7 @@ import {
   Injectable,
   Optional,
   Inject
-} from 'angular2/angular2';
+} from 'angular2/core';
 
 import {Renderer} from 'angular2/src/core/render/render';
 import {isPresent, CONST_EXPR} from 'angular2/src/facade/lang';

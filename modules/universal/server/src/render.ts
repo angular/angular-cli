@@ -16,18 +16,18 @@ import {
   createPrebootHTML
 } from './ng_preboot';
 
-import {getClientCode} from 'preboot';
+import {getClientCode} from '../../../preboot/server';
 
 
 import {isBlank, isPresent} from 'angular2/src/facade/lang';
-import {DOM} from 'angular2/src/core/dom/dom_adapter';
+import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
 
 import {
   DOCUMENT
 } from 'angular2/src/core/render/render';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
-import {SharedStylesHost} from 'angular2/src/core/render/dom/shared_styles_host';
+import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 
 import {
   Http
@@ -38,7 +38,7 @@ import {
   NgZone,
   DirectiveResolver,
   ComponentRef
-} from 'angular2/angular2';
+} from 'angular2/core';
 
 export var serverDirectiveResolver = new DirectiveResolver();
 

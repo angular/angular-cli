@@ -2,7 +2,7 @@ import {
   provide,
   Inject,
   Injectable
-} from 'angular2/angular2';
+} from 'angular2/core';
 
 import {
   Renderer,
@@ -12,9 +12,9 @@ import {
   RenderElementRef
 } from 'angular2/src/core/render/render';
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
-import {EventManager} from 'angular2/src/core/render/dom/events/event_manager';
-import {DomSharedStylesHost} from 'angular2/src/core/render/dom/shared_styles_host';
-import {DOM} from 'angular2/src/core/dom/dom_adapter';
+import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
+import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
+import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
 function resolveInternalDomView(viewRef) {
   return viewRef;

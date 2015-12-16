@@ -6,12 +6,3 @@
 
 
 /// <reference path="angular2/core.d.ts"/>
-
-
-/*
- * tsd generated types
- */
-/// <reference path="../node_modules/angular2/angular2.d.ts" />
-/// <reference path="../node_modules/angular2/router.d.ts" />
-/// <reference path="../node_modules/angular2/http.d.ts" />
-/// <reference path="../node_modules/angular2/testing.d.ts" />

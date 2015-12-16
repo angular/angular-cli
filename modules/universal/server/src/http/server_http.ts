@@ -7,9 +7,12 @@ import {
   Optional,
   Inject,
   EventEmitter,
-  NgZone,
+  NgZone
+} from 'angular2/core';
+
+import {
   Observable
-} from 'angular2/angular2';
+} from 'rxjs';
 
 import {
   Http,
@@ -18,7 +21,7 @@ import {
   // XHRConnection,
   XHRBackend,
   RequestOptions,
-  ResponseTypes,
+  ResponseType,
   ResponseOptions,
   ResponseOptionsArgs,
   RequestOptionsArgs,
@@ -26,11 +29,13 @@ import {
   BaseRequestOptions,
   Request,
   Response,
-  MockBackend,
-  ReadyStates,
+  ReadyState,
   BrowserXhr,
-  RequestMethods
+  RequestMethod
 } from 'angular2/http';
+import {
+  MockBackend
+} from 'angular2/src/http/backends/mock_backend';
 
 import {ObservableWrapper} from 'angular2/src/facade/async';
 
@@ -40,7 +45,7 @@ import {
   CONST_EXPR
 } from 'angular2/src/facade/lang';
 
-var Rx = require('@reactivex/rxjs/dist/cjs/Rx');
+var Rx = require('rxjs/dist/cjs/Rx');
 
 // CJS
 import XMLHttpRequest = require('xhr2');
@@ -58,12 +63,12 @@ class NodeConnection implements Connection {
    * `XMLHttpRequest`.
    */
   response: any;  // TODO: Make generic of <Response>;
-  readyState: ReadyStates;
+  readyState: ReadyState;
   constructor(req: Request, browserXHR: BrowserXhr, baseResponseOptions?: ResponseOptions) {
     this.request = req;
     this.response = new Observable(responseObserver => {
       let _xhr: any = browserXHR.build();
-      _xhr.open(RequestMethods[req.method].toUpperCase(), req.url);
+      _xhr.open(RequestMethod[req.method].toUpperCase(), req.url);
       // load event handler
       let onLoad = () => {
         // responseText is the old-school way of retrieving response (supported by IE8 & 9)
@@ -90,7 +95,7 @@ class NodeConnection implements Connection {
       };
       // error event handler
       let onError = (err) => {
-        var responseOptions = new ResponseOptions({body: err, type: ResponseTypes.Error});
+        var responseOptions = new ResponseOptions({body: err, type: ResponseType.Error});
         if (isPresent(baseResponseOptions)) {
           responseOptions = baseResponseOptions.merge(responseOptions);
         }

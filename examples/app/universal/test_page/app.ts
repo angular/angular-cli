@@ -1,15 +1,22 @@
 /// <reference path="../../../../custom_typings/_custom.d.ts" />
-console.time('angular2/angular2 in client');
-import * as angular from 'angular2/angular2';
-console.timeEnd('angular2/angular2 in client');
+console.time('angular2/core in client');
+import * as angular from 'angular2/core';
+console.timeEnd('angular2/core in client');
 
 import {
   Component,
   View,
   ViewEncapsulation,
-  bind,
-  CORE_DIRECTIVES
-} from 'angular2/angular2';
+  bind
+} from 'angular2/core';
+
+import {
+  COMMON_DIRECTIVES
+} from 'angular2/common';
+
+import {
+  bootstrap
+} from 'angular2/bootstrap';
 
 import {
   Http,
@@ -34,7 +41,7 @@ function transformData(data) {
   selector: 'app',
   providers: [],
   encapsulation: ViewEncapsulation.Emulated,
-  directives: [ CORE_DIRECTIVES ],
+  directives: [COMMON_DIRECTIVES],
   styles: [`
     #intro {
       background-color: red;
@@ -224,7 +231,7 @@ export class App {
 
 
 export function main() {
-  return angular.bootstrap(App, [
+  return bootstrap(App, [
     // HTTP_PROVIDERS,
     NG_PRELOAD_CACHE_PROVIDERS,
     bind(PRIME_CACHE).toValue(true)

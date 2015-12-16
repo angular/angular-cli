@@ -7,7 +7,7 @@ import {
   ComponentRef,
   PlatformRef,
   ApplicationRef,
-} from 'angular2/angular2';
+} from 'angular2/core';
 
 import {NgZone} from 'angular2/src/core/zone/ng_zone';
 
@@ -18,7 +18,7 @@ import {
 } from 'angular2/src/core/application_tokens';
 
 import {ExceptionHandler} from 'angular2/src/facade/exceptions';
-import {DOM} from 'angular2/src/core/dom/dom_adapter';
+import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 import {internalView} from 'angular2/src/core/linker/view_ref';
 import {
   Promise,
@@ -38,7 +38,8 @@ import {
 import {Reflector, reflector} from 'angular2/src/core/reflection/reflection';
 import {TestabilityRegistry, Testability} from 'angular2/src/core/testability/testability';
 
-import {platformProviders, createNgZone} from 'angular2/src/core/application_ref';
+import {platform as platformProviders, createNgZone} from 'angular2/src/core/application_ref';
+import {PLATFORM_COMMON_PROVIDERS} from 'angular2/src/core/platform_common_providers';
 
 export {
   PlatformRef,
@@ -136,7 +137,7 @@ export function platformCommon(providers?: Array<Type | Provider | any[]>, initi
   }
 
   if (isBlank(providers)) {
-    providers = platformProviders();
+    providers = PLATFORM_COMMON_PROVIDERS;
   }
   _platform = new PlatformRef_(Injector.resolveAndCreate(providers), () => { _platform = null; });
   return _platform;

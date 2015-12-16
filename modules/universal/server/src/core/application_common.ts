@@ -3,20 +3,24 @@ import {
   OpaqueToken,
   provide,
   Provider,
-  Type,
+  Type
+} from 'angular2/core';
+import {
   FORM_PROVIDERS
-} from 'angular2/angular2';
+} from 'angular2/common';
 import {ComponentRef} from 'angular2/src/core/linker/dynamic_component_loader'
 import {
+  DomEventsPlugin
+} from 'angular2/src/platform/dom/events/dom_events';
+import {
   EventManager,
-  DomEventsPlugin,
   EVENT_MANAGER_PLUGINS
-} from 'angular2/src/core/render/dom/events/event_manager';
+} from 'angular2/src/platform/dom/events/event_manager';
 import {
   SharedStylesHost,
   DomSharedStylesHost
-} from 'angular2/src/core/render/dom/shared_styles_host';
-import {Parse5DomAdapter} from 'angular2/src/core/dom/parse5_adapter';
+} from 'angular2/src/platform/dom/shared_styles_host';
+import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
 
 import {
   DomRenderer,
@@ -24,8 +28,8 @@ import {
   Renderer,
   DOCUMENT
 } from 'angular2/src/core/render/render';
-import {KeyEventsPlugin} from 'angular2/src/core/render/dom/events/key_events';
-import {HammerGesturesPlugin} from 'angular2/src/core/render/dom/events/hammer_gestures';
+import {KeyEventsPlugin} from 'angular2/src/platform/dom/events/key_events';
+import {HammerGesturesPlugin} from 'angular2/src/platform/dom/events/hammer_gestures';
 
 import {
   NumberWrapper,
@@ -38,8 +42,8 @@ import {
 import {Promise} from 'angular2/src/facade/async';
 
 import {XHR} from 'angular2/src/compiler/xhr';
-import {XHRImpl} from 'angular2/src/compiler/xhr_impl';
-import {DOM} from 'angular2/src/core/dom/dom_adapter';
+import {XHRImpl} from 'angular2/src/platform/browser/xhr_impl';
+import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 import {Testability} from 'angular2/src/core/testability/testability';
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 import {BrowserDetails} from 'angular2/src/animate/browser_details';

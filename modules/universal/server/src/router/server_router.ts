@@ -1,5 +1,5 @@
 import * as nodeUrl from 'url';
-import {Injectable, Inject, provide} from 'angular2/angular2';
+import {Injectable, Inject, provide} from 'angular2/core';
 import {LocationStrategy} from 'angular2/router';
 import {MockLocationStrategy} from 'angular2/src/mock/mock_location_strategy';
 import {BASE_URL} from '../http/server_http';
@@ -65,6 +65,8 @@ export class ServerLocationStrategy extends LocationStrategy {
   path(): string { return this._location.pathname; }
 
   pushState(state: any, title: string, url: string) {/*TODO*/}
+
+  replaceState(state: any, title: string, url: string) {/*TODO*/}
 
   forward(): void {
     this._history.forward();

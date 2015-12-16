@@ -20,9 +20,12 @@ import {
   Injectable,
   Optional,
   Inject,
-  EventEmitter,
+  EventEmitter
+} from 'angular2/core';
+
+import {
   Observable
-} from 'angular2/angular2';
+} from 'rxjs';
 
 export const PRIME_CACHE: OpaqueToken = CONST_EXPR(new OpaqueToken('primeCache'));
 
