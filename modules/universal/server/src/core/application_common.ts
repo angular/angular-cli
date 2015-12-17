@@ -25,9 +25,9 @@ import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
 import {
   DomRenderer,
   DomRenderer_,
-  Renderer,
-  DOCUMENT
-} from 'angular2/src/core/render/render';
+} from 'angular2/src/platform/dom/dom_renderer';
+import {Renderer} from 'angular2/core';
+import {DOCUMENT} from 'angular2/src/platform/browser_common';
 import {KeyEventsPlugin} from 'angular2/src/platform/dom/events/key_events';
 import {HammerGesturesPlugin} from 'angular2/src/platform/dom/events/hammer_gestures';
 

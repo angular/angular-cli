@@ -81,12 +81,12 @@ function transformData(data) {
   <div>
     <button (click)="toggleNgIf()">Toggle NgIf</button>
   </div>
-  <div *ng-if="toggle">
+  <div *ngIf="toggle">
     NgIf true
   </div>
 
   <ul>
-    <li *ng-for="var item of items">
+    <li *ngFor="var item of items">
       <input
         type="checkbox"
         [checked]="item.completed"

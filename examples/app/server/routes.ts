@@ -13,7 +13,7 @@ module.exports = function(ROOT) {
   var {App}     = require(universalPath + '/test_page/app');
   var {TodoApp} = require(universalPath + '/todo/app');
 
-  var {provide} = require('angular2/angular2');
+  var {provide} = require('angular2/core');
 
   var {
     HTTP_PROVIDERS,
@@ -21,8 +21,8 @@ module.exports = function(ROOT) {
     BASE_URL,
     PRIME_CACHE,
     queryParamsToBoolean
-  } = require(ROOT + '/dist/modules/server/server');
-  // require('@angular/universal')
+  } = require(ROOT + '/dist/modules/universal/server/server');
+  // require('angular2-universal')
 
   router.
     route('/').
@@ -33,7 +33,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/test_page/app',
 
-        Component: App,
+        App: App,
         serverProviders: [
           // HTTP_PROVIDERS,
           SERVER_LOCATION_PROVIDERS,
@@ -68,7 +68,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/todo/app',
 
-        Component: TodoApp,
+        App: TodoApp,
         serverProviders: [
           // HTTP_PROVIDERS,
           SERVER_LOCATION_PROVIDERS,

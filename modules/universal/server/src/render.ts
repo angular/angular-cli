@@ -25,7 +25,7 @@ import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
 import {
   DOCUMENT
-} from 'angular2/src/core/render/render';
+} from 'angular2/src/platform/browser_common';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 

@@ -45,7 +45,7 @@ import {
   CONST_EXPR
 } from 'angular2/src/facade/lang';
 
-var Rx = require('rxjs/dist/cjs/Rx');
+var Rx = require('rxjs');
 
 // CJS
 import XMLHttpRequest = require('xhr2');

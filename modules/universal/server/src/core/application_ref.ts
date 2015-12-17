@@ -16,7 +16,6 @@ import {
   APP_COMPONENT,
   APP_ID_RANDOM_PROVIDER
 } from 'angular2/src/core/application_tokens';
-
 import {ExceptionHandler} from 'angular2/src/facade/exceptions';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 import {internalView} from 'angular2/src/core/linker/view_ref';

@@ -7,7 +7,7 @@ import {
   Inject
 } from 'angular2/core';
 
-import {Renderer} from 'angular2/src/core/render/render';
+import {Renderer} from 'angular2/core';
 import {isPresent, CONST_EXPR} from 'angular2/src/facade/lang';
 
 export const APP_LOCATION: OpaqueToken = CONST_EXPR(new OpaqueToken('appLocation'));

@@ -3,6 +3,3 @@
 /// <reference path="gulp-insert.d.ts" />
 /// <reference path="gulp-uglify.d.ts" />
 /// <reference path="vinyl-buffer.d.ts" />
-
-
-/// <reference path="angular2/core.d.ts"/>
