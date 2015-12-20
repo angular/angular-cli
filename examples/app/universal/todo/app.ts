@@ -187,7 +187,7 @@ export class TodoApp {
   }
 
   pluralize(count, word) {
-    return word + (count === 1 ? '' : 's');
+    return `word${count === 1 ? '' : 's'}`;
   }
 
   remainingCount() {
