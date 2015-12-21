@@ -33,7 +33,7 @@
 Full Stack Angular 2 - AngularConnect, Oct 2015
 [![Full Stack Angular 2](https://img.youtube.com/vi/MtoHFDfi8FM/0.jpg)](https://www.youtube.com/watch?v=MtoHFDfi8FM)
 
-Angular 2 Server Rendering - Angular U, July 2105
+Angular 2 Server Rendering - Angular U, July 2015
 [![Angular 2 Server Rendering](http://img.youtube.com/vi/0wvZ7gakqV4/0.jpg)](http://www.youtube.com/watch?v=0wvZ7gakqV4)
 
 ## [preboot.js](/modules/preboot)
