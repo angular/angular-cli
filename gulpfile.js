@@ -446,7 +446,7 @@ gulp.task('serve.preboot', function() {
 function getProtractorBinary(binaryName){
   var winExt = /^win/.test(process.platform)? '.cmd' : '';
   var pkgPath = require.resolve('protractor');
-  var protractorDir = path.resolve(path.join(path.dirname(pkgPath), '..', 'bin'));
+  var protractorDir = path.resolve(path.join(path.dirname(pkgPath), '..', '..', '.bin'));
   return path.join(protractorDir, '/'+binaryName+winExt);
 }
 
