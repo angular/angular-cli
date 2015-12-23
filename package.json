@@ -53,11 +53,13 @@
   "devDependencies": {
     "broccoli-stew": "^0.3.6",
     "chai": "^3.2.0",
+    "cucumber": "^0.9.2",
     "exists-sync": "0.0.3",
     "glob": "^5.0.14",
     "minimatch": "^2.0.10",
     "mocha": "^2.2.5",
     "rewire": "^2.3.4",
+    "shelljs": "^0.5.3",
     "through": "^2.3.8",
     "walk-sync": "^0.1.3"
   }
