@@ -5,6 +5,8 @@ env:
 
 os:
   - linux
+  - osx
+  
 script: npm run-script test
 before_install:
   - nvm install $NODE_VERSION
