@@ -6,9 +6,9 @@ env:
 os:
   - linux
   - osx
-  
 script: npm run-script test
 before_install:
+  - source build_scripts/osx-before_install.sh
   - nvm install $NODE_VERSION
   - npm config set spin false
 install:
