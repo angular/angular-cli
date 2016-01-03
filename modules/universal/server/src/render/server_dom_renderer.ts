@@ -17,14 +17,6 @@ import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
-function resolveInternalDomView(viewRef) {
-  return viewRef;
-}
-
-//function resolveInternalDomFragment(fragmentRef) {
-//  return fragmentRef.nodes;
-//}
-
 export {
   DOCUMENT,
   DomRenderer,
@@ -43,14 +35,14 @@ export class ServerDomRenderer_ extends DomRenderer_ {
 
   setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
     if (propertyName === 'value' || (propertyName === 'checked' && propertyValue !== false)) {
-      let view = resolveInternalDomView(location.renderView);
+      let view = location.renderView;
       let element = view.boundElements[location.boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
         DOM.setAttribute(element, propertyName, propertyValue);
         return;
       }
     } else if (propertyName === 'src') {
-      let view = resolveInternalDomView(location.renderView);
+      let view = location.renderView;
       let element = view.boundElements[location.boundElementIndex];
       DOM.setAttribute(element, propertyName, propertyValue);
       return;
@@ -60,7 +52,7 @@ export class ServerDomRenderer_ extends DomRenderer_ {
 
   invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
     if (methodName === 'focus') {
-      let view = resolveInternalDomView(location.renderView);
+      let view = location.renderView;
       let element = view.boundElements[location.boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
         DOM.invoke(element, 'autofocus', null);
