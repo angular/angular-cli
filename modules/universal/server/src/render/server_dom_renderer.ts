@@ -1,16 +1,17 @@
 import {
   provide,
   Inject,
-  Injectable
+  Injectable,
+  Renderer,
+  RenderElementRef
 } from 'angular2/core';
 
 import {DOCUMENT} from 'angular2/src/platform/browser_common';
 import {
-  Renderer,
   DomRenderer,
-  DomRenderer_,
-  RenderElementRef
+  DomRenderer_
 } from 'angular2/src/platform/dom/dom_renderer';
+
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
@@ -72,9 +73,4 @@ export class ServerDomRenderer_ extends DomRenderer_ {
 
 }
 
-
-export const SERVER_DOM_RENDERER_PROVIDERS = [
-  provide(DomRenderer, {useClass: ServerDomRenderer_}),
-  provide(Renderer, {useClass: DomRenderer})
-];
 
