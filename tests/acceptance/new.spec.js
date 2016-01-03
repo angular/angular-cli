@@ -159,7 +159,8 @@ describe('Acceptance: ng new', function() {
             .then(confirmBlueprintedForDir('tmp/my_blueprint'));
     });
 
-
+    // Commented out since repository app-blueprint-test not exists
+    /*
     it('ng new with git blueprint uses checks out the blueprint and uses it', function(){
         this.timeout(20000); // relies on GH network stuff
 
@@ -174,6 +175,7 @@ describe('Acceptance: ng new', function() {
             expect(existsSync('.ember-cli'));
         });
     });
+    */
 
     it('ng new without skip-git flag creates .git dir', function(){
         return ng([

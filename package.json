@@ -58,6 +58,7 @@
     "minimatch": "^2.0.10",
     "mocha": "^2.2.5",
     "rewire": "^2.3.4",
+    "shelljs": "^0.5.3",
     "through": "^2.3.8",
     "walk-sync": "^0.1.3"
   }
