@@ -104,7 +104,7 @@ export function ng2engine(filePath: string, options: engineOptions, done: Functi
       }
 
       // bootstrap and render component to string
-      renderToStringWithPreboot(options.App, options.providers, options.preboot)
+      renderToString(options.App, options.providers/*, options.preboot*/)
         .then(serializedCmp => {
 
           let selector: string = selectorResolver(options.App);
