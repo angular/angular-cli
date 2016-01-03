@@ -56,6 +56,7 @@
     "modules/universal/server/src/core/application_common.ts",
     "modules/universal/server/src/core/application_ref.ts",
     "modules/universal/server/src/core/platform_providers.ts",
+    "modules/universal/server/src/platform/node.ts",
     "modules/universal/server/src/express/engine.ts",
     "modules/universal/server/src/directives/server_form.ts",
     "modules/universal/server/src/http/server_http.ts",
