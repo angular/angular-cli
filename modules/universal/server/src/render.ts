@@ -28,32 +28,15 @@ import {DOCUMENT} from 'angular2/src/platform/browser_common';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 
-import {
-  Http
-} from 'angular2/http';
+import {Http} from 'angular2/http';
 
-import {
-  provide,
-  NgZone,
-  DirectiveResolver,
-  ComponentRef
-} from 'angular2/core';
+import {NgZone, DirectiveResolver, ComponentRef} from 'angular2/core';
 
 export var serverDirectiveResolver = new DirectiveResolver();
 
 export function selectorResolver(componentType: /*Type*/ any): string {
   return serverDirectiveResolver.resolve(componentType).selector;
 }
-
-                                                                /* Document */
-// export function createServerDocument(appComponentType: /*Type*/ any): any {
-//   // 1ms
-//   let serverDocument = DOM.createHtmlDocument();
-//   let el = DOM.createElement(appComponentType, serverDocument);
-//   DOM.appendChild(serverDocument.body, el);
-
-//   return serverDocument;
-// }
 
 
 export function serializeApplication(element: any, styles: string[], cache: any): string {
@@ -78,26 +61,25 @@ export function serializeApplication(element: any, styles: string[], cache: any)
 export function appRefSyncRender(appRef: any): string {
   // grab parse5 html element
   let element = appRef.location.nativeElement;
-  console.log('appRefSyncRender: element', element);
 
   // TODO: we need a better way to manage the style host for server/client
-  // let sharedStylesHost = appRef.injector.get(SharedStylesHost);
-  // let styles: Array<string> = sharedStylesHost.getAllStyles();
+  let sharedStylesHost = appRef.injector.get(SharedStylesHost);
+  let styles: Array<string> = sharedStylesHost.getAllStyles();
 
   // TODO: we need a better way to manage data serialized data for server/client
   // let http = appRef.injector.getOptional(Http);
   // let cache = isPresent(http) ? arrayFlattenTree(http._rootNode.children, []) : null;
 
-  // let serializedApp: string = serializeApplication(element, styles, cache);
-  return stringifyElement(element);
-  // return serializedApp;
+  let serializedApp: string = serializeApplication(element, styles);
+  // return stringifyElement(element);
+  return serializedApp;
 }
 
 export function renderToString(AppComponent: any, serverProviders: any = []): Promise<string> {
   return bootstrap(AppComponent, serverProviders)
     .then(appRef => {
       let html = appRefSyncRender(appRef);
-      // appRef.dispose();
+      appRef.dispose();
       return html;
       // let http = appRef.injector.getOptional(Http);
       // // TODO: fix zone.js ensure overrideOnEventDone callback when there are no pending tasks
