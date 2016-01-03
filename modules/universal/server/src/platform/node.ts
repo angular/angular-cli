@@ -4,8 +4,8 @@ import {Type, isPresent, CONST_EXPR} from 'angular2/src/facade/lang';
 import {Promise} from 'angular2/src/facade/promise'
 
 import {Testability} from 'angular2/src/core/testability/testability';
-import {BrowserDetails} from "angular2/src/animate/browser_details";
-import {AnimationBuilder} from "angular2/src/animate/animation_builder";
+import {BrowserDetails} from 'angular2/src/animate/browser_details';
+import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 
 import {
   // DOCUMENT,
@@ -13,7 +13,7 @@ import {
   ELEMENT_PROBE_BINDINGS,
   ELEMENT_PROBE_PROVIDERS,
 } from 'angular2/src/platform/browser_common';
-import {XHRImpl} from "angular2/src/platform/browser/xhr_impl";
+import {XHRImpl} from 'angular2/src/platform/browser/xhr_impl';
 import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
 Parse5DomAdapter.makeCurrent();
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
@@ -38,16 +38,16 @@ import {
   reflector,
   ExceptionHandler,
   Renderer
-} from "angular2/core";
-import {COMMON_DIRECTIVES, COMMON_PIPES, FORM_PROVIDERS} from "angular2/common";
+} from 'angular2/core';
+import {COMMON_DIRECTIVES, COMMON_PIPES, FORM_PROVIDERS} from 'angular2/common';
 
-import {EventManager, EVENT_MANAGER_PLUGINS} from "angular2/src/platform/dom/events/event_manager";
+import {EventManager, EVENT_MANAGER_PLUGINS} from 'angular2/src/platform/dom/events/event_manager';
 import {DomEventsPlugin} from 'angular2/src/platform/dom/events/dom_events';
 import {KeyEventsPlugin} from 'angular2/src/platform/dom/events/key_events';
 import {HammerGesturesPlugin} from 'angular2/src/platform/dom/events/hammer_gestures';
 
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
-import {SharedStylesHost} from "angular2/src/platform/dom/shared_styles_host";
+import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 
 
 

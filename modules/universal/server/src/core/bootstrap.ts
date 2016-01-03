@@ -1,1 +1,0 @@
-export {bootstrap} from './application';
