@@ -10,23 +10,17 @@ import {
   bind
 } from 'angular2/core';
 
-import {
-  COMMON_DIRECTIVES
-} from 'angular2/common';
+import {bootstrap} from 'angular2/platform/browser';
 
-import {
-  bootstrap
-} from 'angular2/bootstrap';
+// import {
+//   Http,
+//   HTTP_PROVIDERS
+// } from 'angular2/http';
 
-import {
-  Http,
-  HTTP_PROVIDERS
-} from 'angular2/http';
-
-import {
-  NG_PRELOAD_CACHE_PROVIDERS,
-  PRIME_CACHE
-} from '../../../../modules/universal/client/client';
+// import {
+//   NG_PRELOAD_CACHE_PROVIDERS,
+//   PRIME_CACHE
+// } from '../../../../modules/universal/client/client';
 
 
 
@@ -40,8 +34,7 @@ function transformData(data) {
 @Component({
   selector: 'app',
   providers: [],
-  encapsulation: ViewEncapsulation.Emulated,
-  directives: [COMMON_DIRECTIVES],
+  directives: [],
   styles: [`
     #intro {
       background-color: red;
@@ -233,7 +226,7 @@ export class App {
 export function main() {
   return bootstrap(App, [
     // HTTP_PROVIDERS,
-    NG_PRELOAD_CACHE_PROVIDERS,
-    bind(PRIME_CACHE).toValue(true)
+    // NG_PRELOAD_CACHE_PROVIDERS,
+    // bind(PRIME_CACHE).toValue(true)
   ]);
 }

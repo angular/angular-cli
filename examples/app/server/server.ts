@@ -10,7 +10,7 @@ module.exports = function(ROOT) {
   var universal = require(`${ROOT}/dist/modules/universal/server`);
   // rendering engine
 
-  app.engine('ng2.html', universal.ng2engineWithPreboot);
+  app.engine('ng2.html', universal.ng2engine);
   app.set('views', path.join(ROOT, 'examples'));
   app.set('view engine', 'ng2.html');
   app.set('view options', { doctype: 'html' });
