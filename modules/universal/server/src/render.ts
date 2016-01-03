@@ -1,6 +1,6 @@
-import {bootstrap} from './core/application';
+import {bootstrap} from './platform/node';
 // import {Promise} from 'angular2/src/facade/async';
-import {SERVER_DOM_RENDERER_PROVIDERS} from './render/server_dom_renderer';
+// import {SERVER_DOM_RENDERER_PROVIDERS} from './render/server_dom_renderer';
 
 import {
   selectorRegExpFactory,
@@ -9,7 +9,8 @@ import {
 import {stringifyElement} from './stringifyElement';
 
 
-import {PRIME_CACHE} from './http/server_http';
+// import {PRIME_CACHE} from './http/server_http';
+
 import {
   prebootConfigDefault,
   getPrebootCSS,
@@ -23,9 +24,7 @@ import {isBlank, isPresent} from 'angular2/src/facade/lang';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
 
-import {
-  DOCUMENT
-} from 'angular2/src/platform/browser_common';
+import {DOCUMENT} from 'angular2/src/platform/browser_common';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 
@@ -47,14 +46,14 @@ export function selectorResolver(componentType: /*Type*/ any): string {
 }
 
                                                                 /* Document */
-export function createServerDocument(appComponentType: /*Type*/ any): any {
-  // 1ms
-  let serverDocument = DOM.createHtmlDocument();
-  let el = DOM.createElement(appComponentType, serverDocument);
-  DOM.appendChild(serverDocument.body, el);
+// export function createServerDocument(appComponentType: /*Type*/ any): any {
+//   // 1ms
+//   let serverDocument = DOM.createHtmlDocument();
+//   let el = DOM.createElement(appComponentType, serverDocument);
+//   DOM.appendChild(serverDocument.body, el);
 
-  return serverDocument;
-}
+//   return serverDocument;
+// }
 
 
 export function serializeApplication(element: any, styles: string[], cache: any): string {
@@ -79,39 +78,43 @@ export function serializeApplication(element: any, styles: string[], cache: any)
 export function appRefSyncRender(appRef: any): string {
   // grab parse5 html element
   let element = appRef.location.nativeElement;
+  console.log('appRefSyncRender: element', element);
 
   // TODO: we need a better way to manage the style host for server/client
-  let sharedStylesHost = appRef.injector.get(SharedStylesHost);
-  let styles: Array<string> = sharedStylesHost.getAllStyles();
+  // let sharedStylesHost = appRef.injector.get(SharedStylesHost);
+  // let styles: Array<string> = sharedStylesHost.getAllStyles();
 
   // TODO: we need a better way to manage data serialized data for server/client
-  let http = appRef.injector.getOptional(Http);
-  let cache = isPresent(http) ? arrayFlattenTree(http._rootNode.children, []) : null;
+  // let http = appRef.injector.getOptional(Http);
+  // let cache = isPresent(http) ? arrayFlattenTree(http._rootNode.children, []) : null;
 
-  let serializedApp: string = serializeApplication(element, styles, cache);
-
-  return serializedApp;
+  // let serializedApp: string = serializeApplication(element, styles, cache);
+  return stringifyElement(element);
+  // return serializedApp;
 }
 
 export function renderToString(AppComponent: any, serverProviders: any = []): Promise<string> {
   return bootstrap(AppComponent, serverProviders)
     .then(appRef => {
-      let http = appRef.injector.getOptional(Http);
-      // TODO: fix zone.js ensure overrideOnEventDone callback when there are no pending tasks
-      // ensure all xhr calls are done
-      return new Promise(resolve => {
-        let ngZone = appRef.injector.get(NgZone);
-        // ngZone
-        ngZone.overrideOnEventDone(() => {
-          if (isBlank(http) || isBlank(http._async) || http._async <= 0) {
-            let html: string = appRefSyncRender(appRef);
-            appRef.dispose();
-            resolve(html);
-          }
+      let html = appRefSyncRender(appRef);
+      // appRef.dispose();
+      return html;
+      // let http = appRef.injector.getOptional(Http);
+      // // TODO: fix zone.js ensure overrideOnEventDone callback when there are no pending tasks
+      // // ensure all xhr calls are done
+      // return new Promise(resolve => {
+      //   let ngZone = appRef.injector.get(NgZone);
+      //   // ngZone
+      //   ngZone.overrideOnEventDone(() => {
+      //     if (isBlank(http) || isBlank(http._async) || http._async <= 0) {
+      //       let html: string = appRefSyncRender(appRef);
+      //       appRef.dispose();
+      //       resolve(html);
+      //     }
 
-        }, true);
+      //   }, true);
 
-      });
+      // });
 
     });
 }
