@@ -31,11 +31,9 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
 
 @Component({
   selector: 'app',
-  bindings: [ Store, TodoFactory ]
-})
-@View({
+  providers: [ Store, TodoFactory ],
   encapsulation: ViewEncapsulation.None,
-  directives: [COMMON_DIRECTIVES, ROUTER_DIRECTIVES],
+  directives: [ROUTER_DIRECTIVES],
   styles: [],
   template: `
 <section id="todoapp">
