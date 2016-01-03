@@ -13,27 +13,21 @@ export const prebootScript: string = `
 // Inject Angular for the developer
 export const angularScript: string = `
   <!-- Browser polyfills -->
-  <script src="/bower_components/traceur-runtime/traceur-runtime.min.js"></script>
+  <script src="/node_modules/es6-shim/es6-shim.min.js"></script>
+  <script src="/node_modules/angular2/bundle/angular2-polyfills.min.js"></script>
   <!-- SystemJS -->
   <script src="/bower_components/system.js/dist/system.js"></script>
   <!-- Angular2: Bundle -->
-  <script src="/web_modules/js/bundle/angular2.dev.js"></script>
-  <script src="/web_modules/js/bundle/router.dev.js"></script>
-  <script src="/web_modules/js/bundle/http.dev.js"></script>
+  <script src="/node_modules/angular2/bundle/angular2.dev.js"></script>
+  <script src="/node_modules/angular2/bundle/router.dev.js"></script>
+  <script src="/node_modules/angular2/bundle/http.dev.js"></script>
   <script type="text/javascript">
     System.config({
       "baseURL": "/",
       "defaultJSExtensions": true,
       "map": {
         "*": "*.js",
-        "angular2": "node_modules/angular2",
-        "rx": "node_modules/rx/dist/rx.min"
-      },
-      'meta': {
-        // auto-detection fails to detect properly
-        "rx": {
-          "format": "cjs" //https://github.com/systemjs/builder/issues/123
-        }
+        "angular2": "node_modules/angular2"
       }
     });
   </script>
