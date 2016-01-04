@@ -6,7 +6,7 @@ import {
   RenderElementRef
 } from 'angular2/core';
 
-import {DOCUMENT} from 'angular2/src/platform/browser_common';
+import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {
   DomRenderer,
   DomRenderer_

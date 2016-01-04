@@ -24,7 +24,7 @@ import {isBlank, isPresent} from 'angular2/src/facade/lang';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
 
-import {DOCUMENT} from 'angular2/src/platform/browser_common';
+import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 
