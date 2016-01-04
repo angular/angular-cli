@@ -1,6 +1,6 @@
 {
   "name": "angular2-universal-preview",
-  "main": "dist/server/server.js",
+  "main": "dist/universal/server/server.js",
   "browser": "dist/client/client.js",
   "version": "0.8.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
