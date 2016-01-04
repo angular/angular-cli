@@ -17,11 +17,12 @@ import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
-export {
-  DOCUMENT,
-  DomRenderer,
-  DomRenderer_
-};
+export {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
+export {DomRenderer, DomRenderer_} from 'angular2/src/platform/dom/dom_renderer';
+
+interface RenderView {
+  boundElements;
+}
 
 @Injectable()
 export class ServerDomRenderer_ extends DomRenderer_ {
@@ -33,16 +34,16 @@ export class ServerDomRenderer_ extends DomRenderer_ {
      super(eventManager, domSharedStylesHost, animate, document);
   }
 
-  setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
+  setElementProperty(location: RenderElementRef | any, propertyName: string, propertyValue: any) {
     if (propertyName === 'value' || (propertyName === 'checked' && propertyValue !== false)) {
-      let view = location.renderView;
+      let view: RenderView = location.renderView;
       let element = view.boundElements[location.boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
         DOM.setAttribute(element, propertyName, propertyValue);
         return;
       }
     } else if (propertyName === 'src') {
-      let view = location.renderView;
+      let view: RenderView = location.renderView;
       let element = view.boundElements[location.boundElementIndex];
       DOM.setAttribute(element, propertyName, propertyValue);
       return;
@@ -50,9 +51,9 @@ export class ServerDomRenderer_ extends DomRenderer_ {
     return super.setElementProperty(location, propertyName, propertyValue);
   }
 
-  invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
+  invokeElementMethod(location: RenderElementRef | any, methodName: string, args: any[]) {
     if (methodName === 'focus') {
-      let view = location.renderView;
+      let view: RenderView = location.renderView;
       let element = view.boundElements[location.boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
         DOM.invoke(element, 'autofocus', null);
