@@ -46,9 +46,10 @@ import {KeyEventsPlugin} from 'angular2/src/platform/dom/events/key_events';
 import {HammerGesturesPlugin} from 'angular2/src/platform/dom/events/hammer_gestures';
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
+import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
+import {DomRenderer} from 'angular2/src/platform/dom/dom_renderer';
 
-
-import {DOCUMENT, DomRenderer, ServerDomRenderer_} from '../render/server_dom_renderer';
+import {ServerDomRenderer_} from '../render/server_dom_renderer';
 
 export function initNodeAdapter() {
   Parse5DomAdapter.makeCurrent();

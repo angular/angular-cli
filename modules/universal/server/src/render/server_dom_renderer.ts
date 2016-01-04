@@ -17,9 +17,6 @@ import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
-export {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
-export {DomRenderer, DomRenderer_} from 'angular2/src/platform/dom/dom_renderer';
-
 interface RenderView {
   boundElements;
 }
