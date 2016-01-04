@@ -39,7 +39,7 @@ export function selectorResolver(componentType: /*Type*/ any): string {
 }
 
 
-export function serializeApplication(element: any, styles: string[], cache: any): string {
+export function serializeApplication(element: any, styles: string[], cache?: any): string {
   // serialize all style hosts
   let serializedStyleHosts: string = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
 
@@ -55,7 +55,6 @@ export function serializeApplication(element: any, styles: string[], cache: any)
 
   return serializedStyleHosts + serializedCmp + serializedData;
 }
-
 
 
 export function appRefSyncRender(appRef: any): string {
@@ -75,7 +74,7 @@ export function appRefSyncRender(appRef: any): string {
   return serializedApp;
 }
 
-export function renderToString(AppComponent: any, serverProviders: any = []): Promise<string> {
+export function renderToString(AppComponent: any, serverProviders?: any): Promise<string> {
   return bootstrap(AppComponent, serverProviders)
     .then(appRef => {
       let html = appRefSyncRender(appRef);
@@ -102,7 +101,7 @@ export function renderToString(AppComponent: any, serverProviders: any = []): Pr
 }
 
 
-export function renderToStringWithPreboot(AppComponent: any, serverProviders: any = [], prebootConfig: any = {}): Promise<string> {
+export function renderToStringWithPreboot(AppComponent: any, serverProviders?: any, prebootConfig: any = {}): Promise<string> {
   return renderToString(AppComponent, serverProviders)
     .then((html: string) => {
       if (typeof prebootConfig === 'boolean' && prebootConfig === false) { return html }

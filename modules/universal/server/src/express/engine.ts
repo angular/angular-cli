@@ -22,7 +22,7 @@ import {
 export interface engineOptions {
   App: Function;
   providers?: Array<any>;
-  preboot?: Object;
+  preboot?: Object | any;
   selector?: string;
   serializedCmp?: string;
   server?: boolean;
@@ -32,7 +32,7 @@ export interface engineOptions {
 export function ng2engine(filePath: string, options: engineOptions, done: Function) {
   // defaults
   options = options || <engineOptions>{};
-  options.providers = options.providers || [];
+  options.providers = options.providers || nul;
 
   // read file on disk
   try {
@@ -52,7 +52,7 @@ export function ng2engine(filePath: string, options: engineOptions, done: Functi
       }
 
       // bootstrap and render component to string
-      var renderPromise = renderToString;
+      var renderPromise: any = renderToString;
       var args = [options.App, options.providers];
       if (options.preboot) {
         renderPromise = renderToStringWithPreboot;
