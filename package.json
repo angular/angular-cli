@@ -85,7 +85,7 @@
     "serve-static": "^1.10.0",
     "tsd": "^0.6.4",
     "tslint": "^3.2.1",
-    "typescript": "^1.6.2",
+    "typescript": "^1.7.3",
     "yargs": "^3.14.0"
   },
   "dependencies": {
