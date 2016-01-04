@@ -1,30 +1,19 @@
-export {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
-
+// Facade
 import {Type, isPresent, CONST_EXPR} from 'angular2/src/facade/lang';
 import {Promise} from 'angular2/src/facade/promise'
 
-import {Testability} from 'angular2/src/core/testability/testability';
+// Compiler
+import {COMPILER_PROVIDERS, XHR} from 'angular2/compiler';
+
+// Animate
 import {BrowserDetails} from 'angular2/src/animate/browser_details';
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 
-import {
-  // DOCUMENT,
-  BROWSER_APP_COMMON_PROVIDERS,
-  ELEMENT_PROBE_BINDINGS,
-  ELEMENT_PROBE_PROVIDERS,
-} from 'angular2/src/platform/browser_common';
-import {XHRImpl} from 'angular2/src/platform/browser/xhr_impl';
-import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
-Parse5DomAdapter.makeCurrent();
-import {DOM} from 'angular2/src/platform/dom/dom_adapter';
-// import {DomRenderer} from 'angular2/src/platform/dom/dom_renderer';
-
-import {COMPILER_PROVIDERS, XHR} from 'angular2/compiler';
+// Core
+import {Testability} from 'angular2/src/core/testability/testability';
 import {ReflectionCapabilities} from 'angular2/src/core/reflection/reflection_capabilities';
-
 import {DirectiveResolver} from 'angular2/src/core/linker/directive_resolver';
 import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
-
 import {
   provide,
   Provider,
@@ -39,16 +28,24 @@ import {
   ExceptionHandler,
   Renderer
 } from 'angular2/core';
+
+// Common
 import {COMMON_DIRECTIVES, COMMON_PIPES, FORM_PROVIDERS} from 'angular2/common';
 
+// Platform
+import {ELEMENT_PROBE_BINDINGS,ELEMENT_PROBE_PROVIDERS,} from 'angular2/platform/common_dom';
+import {XHRImpl} from 'angular2/src/platform/browser/xhr_impl';
+import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
+Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
+// Platform.Dom
+import {DOM} from 'angular2/src/platform/dom/dom_adapter';
+// import {DomRenderer} from 'angular2/src/platform/dom/dom_renderer';
 import {EventManager, EVENT_MANAGER_PLUGINS} from 'angular2/src/platform/dom/events/event_manager';
 import {DomEventsPlugin} from 'angular2/src/platform/dom/events/dom_events';
 import {KeyEventsPlugin} from 'angular2/src/platform/dom/events/key_events';
 import {HammerGesturesPlugin} from 'angular2/src/platform/dom/events/hammer_gestures';
-
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
-
 
 
 import {DOCUMENT, DomRenderer, ServerDomRenderer_} from '../render/server_dom_renderer';
