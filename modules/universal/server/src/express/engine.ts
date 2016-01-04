@@ -32,7 +32,7 @@ export interface engineOptions {
 export function ng2engine(filePath: string, options: engineOptions, done: Function) {
   // defaults
   options = options || <engineOptions>{};
-  options.providers = options.providers || nul;
+  options.providers = options.providers || null;
 
   // read file on disk
   try {
