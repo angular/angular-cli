@@ -6,6 +6,12 @@ export function stringify(obj, replacer = null, spaces = 2): string {
   return JSON.stringify(obj, replacer, spaces);
 }
 
+export function dashCase(str: string): string {
+  return str.replace(
+    /[A-Z](?:(?=[^A-Z])|[A-Z]*(?=[A-Z][^A-Z]|$))/g,
+    (s, i)  => (i > 0 ? '-' : '') + s.toLowerCase());
+}
+
 export function showDebug(options = {}): string {
   var info = '\n';
   for (var prop in options) {
