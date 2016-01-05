@@ -6,10 +6,10 @@ export function stringify(obj, replacer = null, spaces = 2): string {
   return JSON.stringify(obj, replacer, spaces);
 }
 
-export function dashCase(str: string): string {
-  return str.replace(
-    /[A-Z](?:(?=[^A-Z])|[A-Z]*(?=[A-Z][^A-Z]|$))/g,
-    (s, i)  => (i > 0 ? '-' : '') + s.toLowerCase());
+export function cssHyphenate(propertyName: string): string {
+  return propertyName.replace(/([A-Z])/g, '-$1')
+    .replace(/^ms-/, '-ms-') // Internet Explorer vendor prefix.
+    .toLowerCase();
 }
 
 export function showDebug(options = {}): string {

@@ -25,7 +25,7 @@ import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
-import {dashCase} from '../helper';
+import {cssHyphenate} from '../helper';
 
 function resolveInternalDomView(viewRef: RenderViewRef): DefaultRenderView<Node> {
   return <DefaultRenderView<Node>>viewRef;
@@ -61,7 +61,7 @@ export class ServerDomRenderer_ extends DomRenderer_ {
   setElementStyle(location: RenderElementRef, styleName: string, styleValue: string): void {
     let view = resolveInternalDomView(location.renderView);
     let element = <Element>view.boundElements[(<any>location).boundElementIndex];
-    let styleNameCased = dashCase(styleName);
+    let styleNameCased = cssHyphenate(styleName);
     if (isPresent(styleValue)) {
       DOM.setStyle(element, styleNameCased, stringify(styleValue));
     } else {
