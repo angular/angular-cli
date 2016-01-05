@@ -49,10 +49,11 @@ export function selectorRegExpFactory(selector: string): RegExp {
   /*
         $1       $2        $3
     <selector> content </selector>
+   /<([^\s\>]+)[^>]*>([\s\S]*?)<\/\1>/
   */
 
-  let regExpSelector = `(<${ escapeRegExp(selector) }>)((?:.|\\n)*?)(<\/${ escapeRegExp(selector) }>)`;
-  return new RegExp(regExpSelector);
+  let regExpSelect = `<${ escapeRegExp(selector) }[^>]*>([\s\S]*?)<\/${ escapeRegExp(selector) }>`;
+  return new RegExp(regExpSelect);
 }
 
 export function arrayFlattenTree(children: any[], arr: any[]): any[] {
