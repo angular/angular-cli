@@ -1,10 +1,18 @@
 import {
+  isPresent,
+  stringify
+} from 'angular2/src/facade/lang';
+import {
   provide,
   Inject,
   Injectable,
   Renderer,
+  RenderViewRef,
   RenderElementRef
 } from 'angular2/core';
+import {
+  DefaultRenderView,
+} from 'angular2/src/core/render/view';
 
 import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {
@@ -17,8 +25,10 @@ import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
-interface RenderView {
-  boundElements;
+import {dashCase} from '../helper';
+
+function resolveInternalDomView(viewRef: RenderViewRef): DefaultRenderView<Node> {
+  return <DefaultRenderView<Node>>viewRef;
 }
 
 @Injectable()
@@ -31,27 +41,38 @@ export class ServerDomRenderer_ extends DomRenderer_ {
      super(eventManager, domSharedStylesHost, animate, document);
   }
 
-  setElementProperty(location: RenderElementRef | any, propertyName: string, propertyValue: any) {
+  setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
     if (propertyName === 'value' || (propertyName === 'checked' && propertyValue !== false)) {
-      let view: RenderView = location.renderView;
-      let element = view.boundElements[location.boundElementIndex];
+      let view: DefaultRenderView<Node> = resolveInternalDomView(location.renderView);
+      let element = <Element>view.boundElements[(<any>location).boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
         DOM.setAttribute(element, propertyName, propertyValue);
         return;
       }
     } else if (propertyName === 'src') {
-      let view: RenderView = location.renderView;
-      let element = view.boundElements[location.boundElementIndex];
+      let view: DefaultRenderView<Node> = resolveInternalDomView(location.renderView);
+      let element = <Element>view.boundElements[(<any>location).boundElementIndex];
       DOM.setAttribute(element, propertyName, propertyValue);
       return;
     }
     return super.setElementProperty(location, propertyName, propertyValue);
   }
 
-  invokeElementMethod(location: RenderElementRef | any, methodName: string, args: any[]) {
+  setElementStyle(location: RenderElementRef, styleName: string, styleValue: string): void {
+    let view = resolveInternalDomView(location.renderView);
+    let element = <Element>view.boundElements[(<any>location).boundElementIndex];
+    let styleNameCased = dashCase(styleName);
+    if (isPresent(styleValue)) {
+      DOM.setStyle(element, styleNameCased, stringify(styleValue));
+    } else {
+      DOM.removeStyle(element, styleNameCased);
+    }
+  }
+
+  invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
     if (methodName === 'focus') {
-      let view: RenderView = location.renderView;
-      let element = view.boundElements[location.boundElementIndex];
+      let view: DefaultRenderView<Node> = resolveInternalDomView(location.renderView);
+      let element = <Element>view.boundElements[(<any>location).boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
         DOM.invoke(element, 'autofocus', null);
         return;
