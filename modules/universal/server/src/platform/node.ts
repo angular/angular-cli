@@ -72,7 +72,7 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   new Provider(ExceptionHandler, {useFactory: _exceptionHandler, deps: []}),
   new Provider(DOCUMENT, {
     useFactory: (appComponentType, directiveResolver) => {
-      // TODO(gdi2290): don't use app
+      // TODO(gdi2290): determine a better for document on the server
       let selector = directiveResolver.resolve(appComponentType).selector;
       let serverDocument = DOM.createHtmlDocument();
       let el = DOM.createElement(selector, serverDocument);
@@ -109,18 +109,22 @@ export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
  */
 export function bootstrap(
   appComponentType: Type,
-  customAppProviders: Array<any> = [],
+  customAppProviders: Array<any> = null,
   customComponentProviders: Array<any> = null): Promise<ComponentRef> {
 
   reflector.reflectionCapabilities = new ReflectionCapabilities();
 
-  let appProviders = [
+  let appProviders: Array<any> = [
     provide(APP_COMPONENT, {useValue: appComponentType}),
     ...NODE_APP_PROVIDERS,
-    ...customAppProviders
+    ...(isPresent(customAppProviders) ? customAppProviders : [])
+  ];
+
+  let componentProviders: Array<any> = [
+    ...(isPresent(customComponentProviders) ? customComponentProviders : [])
   ];
 
   return platform(NODE_PROVIDERS)
     .application(appProviders)
-    .bootstrap(appComponentType, customComponentProviders);
+    .bootstrap(appComponentType, componentProviders);
 }
