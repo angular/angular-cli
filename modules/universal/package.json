@@ -2,7 +2,6 @@
   "name": "angular2-universal-preview",
   "main": "dist/universal/server/server.js",
   "browser": "dist/universal/client/client.js",
-  "browser": "dist/universal/client/client.js",
   "version": "0.18.0",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
@@ -31,11 +30,11 @@
     "parse5": "^1.5.0",
     "preboot": "^1.0.2",
     "angular2": "2.0.0-beta.0",
-    "es6-shim": "^0.33.3",
     "es6-promise": "^3.0.2",
     "es7-reflect-metadata": "^1.4.0",
     "rxjs": "5.0.0-beta.0",
-    "zone.js": "0.5.10"
+    "zone.js": "0.5.10",
+    "xhr2": "0.1.3"
   },
   "peerDependencies": {
     "rxjs": "5.0.0-beta.0",
