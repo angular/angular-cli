@@ -70,18 +70,17 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   new Provider(PLATFORM_PIPES, {useValue: COMMON_PIPES, multi: true}),
   new Provider(PLATFORM_DIRECTIVES, {useValue: COMMON_DIRECTIVES, multi: true}),
   new Provider(ExceptionHandler, {useFactory: _exceptionHandler, deps: []}),
-  // // we can't use directiveResolver here without appComponentType
-  // new Provider(DOCUMENT, {
-  //   useFactory: (directiveResolver) => {
-  //     // TODO(gdi2290): don't use app
-  //     let selector = 'app';
-  //     let serverDocument = DOM.createHtmlDocument();
-  //     let el = DOM.createElement(selector, serverDocument);
-  //     DOM.appendChild(serverDocument.body, el);
-  //     return serverDocument;
-  //   },
-  //   deps: [DirectiveResolver]
-  // }),
+  new Provider(DOCUMENT, {
+    useFactory: (appComponentType, directiveResolver) => {
+      // TODO(gdi2290): don't use app
+      let selector = directiveResolver.resolve(appComponentType).selector;
+      let serverDocument = DOM.createHtmlDocument();
+      let el = DOM.createElement(selector, serverDocument);
+      DOM.appendChild(serverDocument.body, el);
+      return serverDocument;
+    },
+    deps: [APP_COMPONENT, DirectiveResolver]
+  }),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: DomEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: KeyEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: HammerGesturesPlugin, multi: true}),
@@ -108,23 +107,20 @@ export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
 /**
  *
  */
-export function bootstrap(appComponentType: Type, customProviders?: Array<any>): Promise<ComponentRef> {
+export function bootstrap(
+  appComponentType: Type,
+  customAppProviders: Array<any> = [],
+  customComponentProviders: Array<any> = null): Promise<ComponentRef> {
+
   reflector.reflectionCapabilities = new ReflectionCapabilities();
 
   let appProviders = [
-    new Provider(DOCUMENT, {
-      useFactory: (directiveResolver) => {
-        // TODO(gdi2290): don't use app
-        let selector = directiveResolver.resolve(appComponentType).selector;
-        let serverDocument = DOM.createHtmlDocument();
-        let el = DOM.createElement(selector, serverDocument);
-        DOM.appendChild(serverDocument.body, el);
-        return serverDocument;
-      },
-      deps: [DirectiveResolver]
-    }),
-    ...(isPresent(customProviders) ? [...NODE_APP_PROVIDERS, ...customProviders] : NODE_APP_PROVIDERS)
+    provide(APP_COMPONENT, {useValue: appComponentType}),
+    ...NODE_APP_PROVIDERS,
+    ...customAppProviders
   ];
 
-  return platform(NODE_PROVIDERS).application(appProviders).bootstrap(appComponentType);
+  return platform(NODE_PROVIDERS)
+    .application(appProviders)
+    .bootstrap(appComponentType, customComponentProviders);
 }
