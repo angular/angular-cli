@@ -16,7 +16,7 @@ import {
   createPrebootHTML
 } from './ng_preboot';
 
-import {getClientCode} from '../../../preboot/server';
+import {getClientCode} from 'preboot';
 
 
 import {isBlank, isPresent} from 'angular2/src/facade/lang';
