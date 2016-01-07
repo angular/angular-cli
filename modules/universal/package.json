@@ -2,7 +2,7 @@
   "name": "angular2-universal-preview",
   "main": "dist/universal/server/server.js",
   "browser": "dist/universal/client/client.js",
-  "typings": "universal.d.ts"
+  "typings": "universal.d.ts",
   "version": "0.20.0",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
