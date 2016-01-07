@@ -1,6 +1,9 @@
+import * as http from 'http';
+import * as url from 'url';
+
 // Facade
 import {Type, isPresent, CONST_EXPR} from 'angular2/src/facade/lang';
-import {Promise} from 'angular2/src/facade/promise'
+import {Promise, PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/promise';
 
 // Compiler
 import {COMPILER_PROVIDERS, XHR} from 'angular2/compiler';
@@ -34,7 +37,7 @@ import {COMMON_DIRECTIVES, COMMON_PIPES, FORM_PROVIDERS} from 'angular2/common';
 
 // Platform
 import {ELEMENT_PROBE_BINDINGS,ELEMENT_PROBE_PROVIDERS,} from 'angular2/platform/common_dom';
-import {XHRImpl} from 'angular2/src/platform/browser/xhr_impl';
+import {XHR} from 'angular2/src/compiler/xhr';
 import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 // Platform.Dom
@@ -53,6 +56,41 @@ import {ServerDomRenderer_} from '../render/server_dom_renderer';
 
 export function initNodeAdapter() {
   Parse5DomAdapter.makeCurrent();
+}
+
+export class NodeXHRImpl extends XHR {
+  get(templateUrl: string): Promise<string> {
+    let completer: PromiseCompleter<string> = PromiseWrapper.completer(),
+      parsedUrl = url.parse(templateUrl);
+
+    http.get(templateUrl, (res) => {
+      res.setEncoding('utf8');
+
+      // normalize IE9 bug (http://bugs.jquery.com/ticket/1450)
+      var status = res.statusCode === 1223 ? 204 : res.statusCode;
+
+      if (200 <= status && status <= 300) {
+        let data = '';
+
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          completer.resolve(data);
+        });
+      }
+      else {
+        completer.reject(`Failed to load ${templateUrl}`, null);
+      }
+
+      // consume response body
+      res.resume();
+    }).on('error', (e) => {
+      completer.reject(`Failed to load ${templateUrl}`, null);
+    });
+
+    return completer.promise;
+  }
 }
 
 export const NODE_PROVIDERS: Array<any> = CONST_EXPR([
@@ -100,8 +138,7 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
 export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
   ...NODE_APP_COMMON_PROVIDERS,
   ...COMPILER_PROVIDERS,
-  // TODO(gdi2290): make http node version
-  new Provider(XHR, {useClass: XHRImpl}),
+  new Provider(XHR, {useClass: NodeXHRImpl}),
 ]);
 
 /**
