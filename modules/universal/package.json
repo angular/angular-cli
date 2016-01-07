@@ -3,7 +3,7 @@
   "main": "dist/server/server.js",
   "browser": "dist/client/client.js",
   "typings": "universal.d.ts",
-  "version": "0.22.0",
+  "version": "0.22.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "Apache-2.0",
