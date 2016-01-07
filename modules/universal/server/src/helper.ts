@@ -52,7 +52,7 @@ export function selectorRegExpFactory(selector: string): RegExp {
    /<([^\s\>]+)[^>]*>([\s\S]*?)<\/\1>/
   */
 
-  let regExpSelect = `<${ escapeRegExp(selector) }[^>]*>([\s\S]*?)<\/${ escapeRegExp(selector) }>`;
+  let regExpSelect = `<${ escapeRegExp(selector) }[^>]*>([\\s\\S]*?)<\/${ escapeRegExp(selector) }>`;
   return new RegExp(regExpSelect);
 }
 
