@@ -5,8 +5,10 @@ module.exports = {
   name: 'ng2',
   includedCommands: function() {
     return {
-      'new': require('./commands/new'),
-      'init': require('./commands/init')
+      'new'       : require('./commands/new'),
+      'init'      : require('./commands/init'),
+      'install'   : require('./commands/install'),
+      'uninstall' : require('./commands/uninstall')
     };
   }
 };

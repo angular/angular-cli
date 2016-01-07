@@ -8,6 +8,7 @@ os:
 script: npm run-script test
 before_install:
   - nvm install $NODE_VERSION
+  - npm link npm
   - npm config set spin false
 install:
   - node --version
