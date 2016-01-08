@@ -46,8 +46,7 @@ import {EventManager, EVENT_MANAGER_PLUGINS} from 'angular2/src/platform/dom/eve
 import {DomEventsPlugin} from 'angular2/src/platform/dom/events/dom_events';
 import {KeyEventsPlugin} from 'angular2/src/platform/dom/events/key_events';
 import {HammerGesturesPlugin} from 'angular2/src/platform/dom/events/hammer_gestures';
-import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
-import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
+import {DomSharedStylesHost, SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {DomRenderer} from 'angular2/src/platform/dom/dom_renderer';
 
@@ -112,7 +111,7 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
       // TODO(gdi2290): determine a better for document on the server
       let selector = directiveResolver.resolve(appComponentType).selector;
       let serverDocument = DOM.createHtmlDocument();
-      let el = DOM.createElement(selector, serverDocument);
+      let el = DOM.createElement(selector);
       DOM.appendChild(serverDocument.body, el);
       return serverDocument;
     },
