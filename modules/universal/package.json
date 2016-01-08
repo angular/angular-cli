@@ -3,9 +3,8 @@
   "main": "dist/server/server.js",
   "browser": "dist/client/client.js",
   "typings": "universal.d.ts",
-  "typings": "typings.d.ts",
   "typescript": { "definition": "universal.d.ts" },
-  "version": "0.23.1",
+  "version": "0.24.0",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "Apache-2.0",
@@ -15,7 +14,8 @@
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
   "scripts": {
-    "prepublish": "tsc || true"
+    "build": "tsc || true",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
