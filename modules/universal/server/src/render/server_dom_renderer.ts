@@ -59,14 +59,8 @@ export class ServerDomRenderer_ extends DomRenderer_ {
   }
 
   setElementStyle(location: RenderElementRef, styleName: string, styleValue: string): void {
-    let view = resolveInternalDomView(location.renderView);
-    let element = <Element>view.boundElements[(<any>location).boundElementIndex];
     let styleNameCased = cssHyphenate(styleName);
-    if (isPresent(styleValue)) {
-      DOM.setStyle(element, styleNameCased, stringify(styleValue));
-    } else {
-      DOM.removeStyle(element, styleNameCased);
-    }
+    super.setElementProperty(location, styleNameCased, styleValue);
   }
 
   invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
