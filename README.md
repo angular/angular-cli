@@ -145,7 +145,7 @@ and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackageloca
 
 ## License
 
-Apache v2
+MIT
 
 
 [travis-badge]: https://travis-ci.org/angular/angular-cli.svg?branch=master
