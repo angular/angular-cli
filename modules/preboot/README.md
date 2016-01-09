@@ -2,7 +2,7 @@
 
 Control server-rendered page before client-side web app loads.
 
-**NOTE**: In the process of doing some major refactoring to this library. 
+**NOTE**: In the process of doing some major refactoring to this library.
 It works and you can try it out, but just be aware that there will be major
 changes coming soon.
 
@@ -16,7 +16,7 @@ changes coming soon.
 
 ## Installation
 
-This is a server-side library that generates client-side code. 
+This is a server-side library that generates client-side code.
 To use this library, you would first install it through npm:
 
 ```
@@ -31,7 +31,7 @@ var prebootOptions = {};  // see options section below
 var clientCode = preboot(prebootOptions);
 ```
 
-You then inject clientCode into the HEAD section of your server-side template. 
+You then inject clientCode into the HEAD section of your server-side template.
 We want preboot to ONLY start recording once the web app root exists in the DOM. We are
 still playing with the best way to do this (NOTE: we have tried onLoad and
 it does not work because the callback does not get executed quickly enough).
@@ -94,7 +94,7 @@ or you can implement your own strategy and pass it in here as a function or obje
 
 **3. Flags**
 
-All flags flase by default.
+All flags false by default.
 
 * `focus` - If true, will track and maintain focus even if page re-rendered
 * `buffer` - If true, client will write to a hidden div which is only displayed after bootstrap complete
