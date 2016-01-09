@@ -1,0 +1,13 @@
+<div *ngIf="<%= camelizedModuleName %>">
+  <h3>"{{editName}}"</h3>
+  <div>
+    <label>Id:</label>
+    {{<%= camelizedModuleName %>.id}}
+  </div>
+  <div>
+    <label>Name:</label>
+    <input [(ngModel)]="editName" placeholder="name"/>
+  </div>
+  <button (click)="save()">Save</button>
+  <button (click)="cancel()">Cancel</button>
+</div>

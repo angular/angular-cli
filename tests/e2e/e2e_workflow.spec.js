@@ -132,6 +132,40 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Perform `ng test`', function(done) {
+    this.timeout(30000);
+
+    return ng([
+      'test'
+    ]).then(function(err) {
+      // TODO when `ng test` will be implemented
+      //expect(err).to.be.equal(1);
+      done();
+    });
+  });
+
+  it('Can create a test route using `ng generate route test-route`', function() {
+    return ng([
+      'generate',
+      'route',
+      'test-route'
+    ]).then(function() {
+      var routeDir = path.join(process.cwd(), 'src', 'app', 'test-route');
+      expect(fs.existsSync(routeDir));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-detail.component.css')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-detail.component.html')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-detail.component.spec.ts')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-detail.component.ts')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-list.component.css')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-list.component.html')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-list.component.spec.ts')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-list.component.ts')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-root.component.ts')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-root.service.spec.ts')));
+      expect(fs.existsSync(path.join(routeDir, 'test-pipe-root.service.ts')));
+    });
+  });
+
+  it('Perform `ng test`', function(done) {
     this.timeout(300000);
 
     return ng([
@@ -140,7 +174,7 @@ describe('Basic end-to-end Workflow', function () {
       // TODO when `ng test` will be implemented
       //expect(err).to.be.equal(1);
       // Clean `tmp` folder
-      
+
       process.chdir(path.resolve(root, '..'));
       sh.rm('-rf', './tmp'); // tmp.teardown takes too long
 

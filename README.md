@@ -6,7 +6,7 @@
 [![Dependency Status][david-badge]][david-badge-url]
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
 [![npm][npm-badge]][npm-badge-url]
- 
+
 Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
@@ -58,6 +58,50 @@ Component | `ng g component my-new-component`
 Directive | `ng g directive my-new-directive`
 Pipe      | `ng g pipe my-new-pipe`
 Service   | `ng g service my-new-service`
+
+### Generating a route
+
+You can generate a new route by with the following command (note the singular
+used in `hero`):
+
+```bash
+ng generate route hero
+```
+
+This will create a folder with a routable component (`hero-root.component.ts`)
+with two sub-routes. The file structure will be as follows:
+
+```
+...
+|-- app
+|   |-- hero
+|   |   |-- hero-detail.component.html
+|   |   |-- hero-detail.component.css
+|   |   |-- hero-detail.component.spec.ts
+|   |   |-- hero-detail.component.ts
+|   |   |-- hero-list.component.html
+|   |   |-- hero-list.component.css
+|   |   |-- hero-list.component.spec.ts
+|   |   |-- hero-list.component.ts
+|   |   |-- hero-root.component.spec.ts
+|   |   |-- hero-root.component.ts
+|   |   |-- hero.service.spec.ts
+|   |   |-- hero.service.ts
+|   |-- ...
+|-- app.ts
+...
+```
+
+Afterwards to use the new route open your main app component, import
+`hero-root.component.ts` and add it in the route config:
+
+```
+@RouteConfig([
+  {path:'/hero/...', name: 'HeroRoot', component: HeroRoot}
+])
+```
+
+Visiting `http://localhost:4200/hero` will show the hero list.
 
 
 ### Creating a build
