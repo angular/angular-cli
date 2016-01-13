@@ -56,4 +56,4 @@ constructor(element: ElementRef, renderer: Renderer) {
 We believe that using the word "universal" is correct when referring to a JavaScript Application that runs in more environments than the browser. (inspired by [Universal JavaScript](https://medium.com/@mjackson/universal-javascript-4761051b7ae9))
 
 # License
-[Apache-2.0](/LICENSE)
+[MIT](/LICENSE)
