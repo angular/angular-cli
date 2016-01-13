@@ -18,8 +18,6 @@ import {
   buildClientScripts
 } from '../ng_scripts';
 
-import {enableProdMode} from 'angular2/core';
-
 export interface engineOptions {
   App: Function;
   providers?: Array<any>;
@@ -28,7 +26,6 @@ export interface engineOptions {
   serializedCmp?: string;
   server?: boolean;
   client?: boolean;
-  enableProdMode?: boolean;
 }
 
 export function ng2engine(filePath: string, options: engineOptions, done: Function) {
@@ -51,9 +48,6 @@ export function ng2engine(filePath: string, options: engineOptions, done: Functi
       }
       if (options.server === false && options.client !== false) {
         return done(null, buildClientScripts(clientHtml, options));
-      }
-      if (options.enableProdMode) {
-        enableProdMode();
       }
 
       // bootstrap and render component to string
