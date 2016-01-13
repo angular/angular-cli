@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "contributors": [
     "Tobias Bosch <tbosch@google.com>",
     "PatrickJS <github@gdi2290.com>",
