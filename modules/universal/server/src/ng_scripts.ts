@@ -14,21 +14,19 @@ export const prebootScript: string = `
 export const angularScript: string = `
   <!-- Browser polyfills -->
   <script src="/node_modules/es6-shim/es6-shim.min.js"></script>
-  <script src="/node_modules/angular2/bundle/angular2-polyfills.min.js"></script>
+  <script src="/node_modules/systemjs/dist/system-polyfills.js"></script>
+  <script src="/node_modules/angular2/bundles/angular2-polyfills.min.js"></script>
   <!-- SystemJS -->
-  <script src="/bower_components/system.js/dist/system.js"></script>
+  <script src="/node_modules/systemjs/dist/system.js"></script>
   <!-- Angular2: Bundle -->
-  <script src="/node_modules/angular2/bundle/angular2.dev.js"></script>
-  <script src="/node_modules/angular2/bundle/router.dev.js"></script>
-  <script src="/node_modules/angular2/bundle/http.dev.js"></script>
+  <script src="/node_modules/rxjs/bundles/Rx.js"></script>
+  <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
+  <script src="/node_modules/angular2/bundles/router.dev.js"></script>
+  <script src="/node_modules/angular2/bundles/http.dev.js"></script>
   <script type="text/javascript">
     System.config({
       "baseURL": "/",
-      "defaultJSExtensions": true,
-      "map": {
-        "*": "*.js",
-        "angular2": "node_modules/angular2"
-      }
+      "defaultJSExtensions": true
     });
   </script>
 `;
@@ -102,11 +100,10 @@ export function buildClientScripts(html: string, options: any): string {
     )
     .replace(
       selectorRegExpFactory('angular'),
-      ((options.angular === false) ? '' : '$1' + angularScript + '$3')
+      ((options.angular === false) ? '' : angularScript)
     )
     .replace(
       selectorRegExpFactory('bootstrap'),
-      '$1' +
       ((options.bootstrap === false) ? (
         bootstrapButton +
         bootstrapFunction(options.componentUrl)
@@ -117,7 +114,6 @@ export function buildClientScripts(html: string, options: any): string {
         ) +
         bootstrapFunction(options.componentUrl) +
         ((options.client === false) ? '' : bootstrapApp)
-      )) +
-      '$3'
+      ))
     );
 }

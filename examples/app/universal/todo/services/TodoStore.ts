@@ -1,6 +1,5 @@
-/// <reference path="../../../../../custom_typings/_custom.d.ts" />
 import {Injectable} from 'angular2/core';
-import {ListWrapper} from 'angular2/src/facade/collection';
+
 // base model for RecordStore
 export class KeyModel {
   constructor(public key: number) {}

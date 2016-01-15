@@ -1,26 +1,20 @@
-/// <reference path="../../../../custom_typings/_custom.d.ts" />
-// import {bootstrap} from '../../angular2_client/bootstrap-defer';
 import {
   ViewEncapsulation,
   Component,
   View,
   Directive,
   ElementRef,
-  bind,
+  provide,
   Inject
 } from 'angular2/core';
 
-import {
-  bootstrap
-} from 'angular2/bootstrap';
+import {bootstrap} from 'angular2/bootstrap';
 
-import {
-  COMMON_DIRECTIVES
-} from 'angular2/common';
 
 import {ROUTER_PROVIDERS, ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {Http, HTTP_PROVIDERS} from 'angular2/http';
+
 import {
   NG_PRELOAD_CACHE_PROVIDERS,
   PRIME_CACHE
@@ -200,6 +194,6 @@ export function main() {
     ROUTER_PROVIDERS,
     HTTP_PROVIDERS,
     NG_PRELOAD_CACHE_PROVIDERS,
-    bind(PRIME_CACHE).toValue(true)
+    provide(PRIME_CACHE, {useValue: true})
   ]);
 }

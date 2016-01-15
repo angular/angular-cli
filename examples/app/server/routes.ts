@@ -97,10 +97,11 @@ module.exports = function(ROOT) {
 
   // needed for sourcemaps
 
-  router.use('/src', serveStatic(ROOT + '/src'));
-
+  router.use('/src', serveStatic(`${ROOT}/src`));
+  router.use('/angular2', serveStatic(`${ROOT}/node_modules/angular2`));
+  router.use('/rxjs', serveStatic(`${ROOT}/node_modules/rxjs`));
   router.use('/node_modules',  serveStatic(`${ROOT}/node_modules`));
-  router.use('/examples/app',  serveStatic(`${ROOT}/examples/app`));
+  router.use('/examples/app',  serveStatic(`${ROOT}/dist/examples/app`));
 
   router.use(historyApiFallback({
     // verbose: true

@@ -47,7 +47,7 @@ export function queryParamsToBoolean(query) {
 
 export function selectorRegExpFactory(selector: string): RegExp {
   /*
-        $1       $2        $3
+        $1       $2
     <selector> content </selector>
    /<([^\s\>]+)[^>]*>([\s\S]*?)<\/\1>/
   */
