@@ -1,9 +1,6 @@
-import * as http from 'http';
-import * as url from 'url';
-
 // Facade
 import {Type, isPresent, CONST_EXPR} from 'angular2/src/facade/lang';
-import {Promise, PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/promise';
+import {Promise} from 'angular2/src/facade/promise';
 
 // Compiler
 import {COMPILER_PROVIDERS, XHR} from 'angular2/compiler';
@@ -51,45 +48,12 @@ import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {DomRenderer} from 'angular2/src/platform/dom/dom_renderer';
 
 import {ServerDomRenderer_} from './dom/server_dom_renderer';
+import {NodeXHRImpl} from './node_xhr_impl';
 
 export function initNodeAdapter() {
   Parse5DomAdapter.makeCurrent();
 }
 
-export class NodeXHRImpl extends XHR {
-  get(templateUrl: string): Promise<string> {
-    let completer: PromiseCompleter<string> = PromiseWrapper.completer(),
-      parsedUrl = url.parse(templateUrl);
-
-    http.get(templateUrl, (res) => {
-      res.setEncoding('utf8');
-
-      // normalize IE9 bug (http://bugs.jquery.com/ticket/1450)
-      var status = res.statusCode === 1223 ? 204 : res.statusCode;
-
-      if (200 <= status && status <= 300) {
-        let data = '';
-
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-        res.on('end', () => {
-          completer.resolve(data);
-        });
-      }
-      else {
-        completer.reject(`Failed to load ${templateUrl}`, null);
-      }
-
-      // consume response body
-      res.resume();
-    }).on('error', (e) => {
-      completer.reject(`Failed to load ${templateUrl}`, null);
-    });
-
-    return completer.promise;
-  }
-}
 
 export const NODE_PROVIDERS: Array<any> = CONST_EXPR([
   ...PLATFORM_COMMON_PROVIDERS,

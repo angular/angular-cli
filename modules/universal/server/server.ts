@@ -7,7 +7,7 @@ export * from './src/express/engine';
 export * from './src/http/server_http';
 
 export * from './src/platform/node';
-
+export * from './src/platform/node_xhr_impl';
 export * from './src/platform/dom/server_dom_renderer';
 
 export * from './src/router/server_router';
