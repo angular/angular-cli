@@ -43,14 +43,14 @@ Angular 2 Server Rendering - Angular U, July 2015
 > When building Universal components in Angular 2 there are a few things to keep in mind.
 
 * Know the difference between attributes and properties in relation to the DOM.
-* Don't manipulate the `nativeElement` directly. Use the `Renderer`.
+* Don't manipulate the `nativeElement` directly. Use the `Renderer`. We do this to ensure that in any environment we're able to change our view.
 ```typescript
 constructor(element: ElementRef, renderer: Renderer) {
-  renderer.setElementStyle(element, 'fontSize', 'x-large');
+  renderer.setElementStyle(element.nativeElement, 'font-size', 'x-large');
 }
 ```
-* Don't use any of the browser types provided in the global namespace such as `navigator` or `document`. Anything outside of Angular will not be detected when serializing your application into html.
-* Keep your directives stateless as much as possible. For stateful directives you may need to provide an attribute that reflects the corresponding property with an initial string value such as `url` in `img` tag. For our native `<img src"">` element the `src` attribute is reflected as the `src` property of the element type `HTMLImageElement`. 
+* Don't use any of the browser types provided in the global namespace such as `navigator` or `document`. Anything outside of Angular will not be detected when serializing your application into html. If you need access to these types please consider using `DOM` from `"angular2/src/platform/dom/dom_adapter"`
+* Keep your directives stateless as much as possible. For stateful directives, you may need to provide an attribute that reflects the corresponding property with an initial string value such as `url` in `img` tag. For our native `<img src"">` element the `src` attribute is reflected as the `src` property of the element type `HTMLImageElement`. 
 
 # What's in a name?
 We believe that using the word "universal" is correct when referring to a JavaScript Application that runs in more environments than the browser. (inspired by [Universal JavaScript](https://medium.com/@mjackson/universal-javascript-4761051b7ae9))
