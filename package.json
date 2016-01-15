@@ -27,7 +27,7 @@
     "webdriver-start": "gulp protractor.start",
     "preprotractor": "gulp protractor.update",
     "protractor": "gulp protractor",
-    "remove-dist": "rimraf ./dist",
+    "remove-dist": "rimraf dist modules/**/dist !node_modules/**/*",
     "remove-tsd-typing": "rimraf ./tsd_typings",
     "remove-angular2": "rimraf ./node_modules/angular2",
     "remove-angular-typings": "rimraf ./angular/modules/angular2/typings",
