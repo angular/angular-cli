@@ -29,14 +29,8 @@
     "protractor": "gulp protractor",
     "remove-dist": "rimraf dist modules/**/dist !node_modules/**/*",
     "remove-tsd-typing": "rimraf ./tsd_typings",
-    "remove-angular2": "rimraf ./node_modules/angular2",
-    "remove-angular-typings": "rimraf ./angular/modules/angular2/typings",
-    "remove-angular-dist": "rimraf ./angular/dist",
-    "remove-web-modules": "rimraf ./web_modules",
-    "bower": "bower install",
-    "web_modules": "bash ./scripts/update-ng-bundle.sh",
     "tsd": "tsd reinstall && tsd link",
-    "postinstall": "npm run tsd && tsc || true && npm run remove-web-modules && npm run web_modules && npm run bower && npm run webdriver-update"
+    "postinstall": "npm run tsd && tsc || true && npm run webdriver-update"
   },
   "repository": {
     "type": "git",
