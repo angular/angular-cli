@@ -39,7 +39,7 @@ ng new PROJECT_NAME
 cd PROJECT_NAME
 ng serve
 ```
-Navigate to `[http://localhost:4200/]`. The app will automatically reload if you change any of the source files.
+Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 
 ### Generating other scaffolds
