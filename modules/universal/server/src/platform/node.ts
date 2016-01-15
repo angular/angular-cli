@@ -50,7 +50,7 @@ import {DomSharedStylesHost, SharedStylesHost} from 'angular2/src/platform/dom/s
 import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {DomRenderer} from 'angular2/src/platform/dom/dom_renderer';
 
-import {ServerDomRenderer_} from '../render/server_dom_renderer';
+import {ServerDomRenderer_} from './dom/server_dom_renderer';
 
 export function initNodeAdapter() {
   Parse5DomAdapter.makeCurrent();

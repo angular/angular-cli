@@ -27,7 +27,7 @@
     "server/src/directives/server_form.ts",
     "server/src/http/server_http.ts",
     "server/src/router/server_router.ts",
-    "server/src/render/server_dom_renderer.ts",
+    "server/src/platform/dom/server_dom_renderer.ts",
     "server/src/ng_scripts.ts",
     "server/src/helper.ts",
     "server/src/render.ts",
