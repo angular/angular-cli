@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "prestart": "gulp build",
-    "build": "gulp build.typescript && gulp build.preboot",
+    "build": "gulp build",
     "serve": "gulp serve",
     "start": "gulp server",
     "watch": "gulp watch",
