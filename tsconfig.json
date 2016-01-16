@@ -54,7 +54,7 @@
     "modules/universal/server/server.ts",
     "modules/universal/server/src/platform/dom/server_dom_renderer.ts",
     "modules/universal/server/src/platform/node.ts",
-    "modules/universal/server/src/platform/xhr_node_impl.ts",
+    "modules/universal/server/src/platform/node_xhr_impl.ts",
     "modules/universal/server/src/express/engine.ts",
     "modules/universal/server/src/directives/server_form.ts",
     "modules/universal/server/src/http/server_http.ts",
