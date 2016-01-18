@@ -7,7 +7,6 @@ import {
   ConnectionBackend,
   XHRBackend
 } from 'angular2/http';
-import {ObservableWrapper} from 'angular2/src/facade/async';
 import {
   isPresent,
   isBlank,
@@ -40,56 +39,33 @@ export class NgPreloadCacheHttp extends Http {
   }
 
   preload(method) {
-    let obs = new EventEmitter();
+    let obs = new EventEmitter(false);
     let newcache = (<any>window).ngPreloadCache;
     if (newcache) {
 
       var preloaded = null;
 
-      try {
-        let res;
-        preloaded = newcache.shift();
-        if (isPresent(preloaded)) {
-          let body = preloaded._body;
-          res = new ResponseOptions((<any>Object).assign({}, preloaded, { body }));
+      let res;
+      preloaded = newcache.shift();
+      if (isPresent(preloaded)) {
+        let body = preloaded._body;
+        res = new ResponseOptions((<any>Object).assign({}, preloaded, { body }));
 
-          if (preloaded.headers) {
-            res.headers = new Headers(preloaded);
-          }
-          preloaded = new Response(res);
+        if (preloaded.headers) {
+          res.headers = new Headers(preloaded);
         }
-      } catch(e) {
-        console.log('WAT', e)
+        preloaded = new Response(res);
       }
 
       if (preloaded) {
-        setTimeout(() => {
-          ObservableWrapper.callNext(obs, preloaded);
-          // setTimeout(() => {
-            ObservableWrapper.callComplete(obs);
-          // });
-        });
+        obs.next(preloaded);
+        obs.complete();
         return obs;
       }
 
     }
     let request = method();
-    // request.observer(obs);
-    request.observer({
-      next(value) {
-        ObservableWrapper.callNext(obs, value);
-      },
-      throw(e) {
-        setTimeout(() => {
-          ObservableWrapper.callError(obs, e)
-        });
-      },
-      return() {
-        setTimeout(() => {
-          ObservableWrapper.callComplete(obs)
-        });
-      }
-    });
+    request.observer(obs);
 
     return obs;
   }

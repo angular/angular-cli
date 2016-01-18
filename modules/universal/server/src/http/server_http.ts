@@ -37,7 +37,6 @@ import {
   MockBackend
 } from 'angular2/src/http/backends/mock_backend';
 
-import {ObservableWrapper} from 'angular2/src/facade/async';
 
 import {
   isPresent,
