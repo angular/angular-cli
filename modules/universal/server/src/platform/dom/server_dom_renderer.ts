@@ -60,7 +60,7 @@ export class ServerDomRenderer_ extends DomRenderer_ {
 
   setElementStyle(location: RenderElementRef, styleName: string, styleValue: string): void {
     let styleNameCased = cssHyphenate(styleName);
-    super.setElementProperty(location, styleNameCased, styleValue);
+    super.setElementStyle(location, styleNameCased, styleValue);
   }
 
   invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
