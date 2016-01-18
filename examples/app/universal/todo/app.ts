@@ -1,24 +1,8 @@
-import {
-  ViewEncapsulation,
-  Component,
-  View,
-  Directive,
-  ElementRef,
-  provide,
-  Inject
-} from 'angular2/core';
+import {ViewEncapsulation, Component} from 'angular2/core';
 
-import {bootstrap} from 'angular2/bootstrap';
+import {ROUTER_DIRECTIVES} from 'angular2/router';
 
-
-import {ROUTER_PROVIDERS, ROUTER_DIRECTIVES} from 'angular2/router';
-
-import {Http, HTTP_PROVIDERS} from 'angular2/http';
-
-import {
-  NG_PRELOAD_CACHE_PROVIDERS,
-  PRIME_CACHE
-} from '../../../../modules/universal/client/client';
+import {Http} from 'angular2/http';
 
 
 import {Store, Todo, TodoFactory} from './services/TodoStore';
@@ -187,13 +171,3 @@ export class TodoApp {
   }
 }
 
-
-
-export function main() {
-  return bootstrap(TodoApp, [
-    ROUTER_PROVIDERS,
-    HTTP_PROVIDERS,
-    NG_PRELOAD_CACHE_PROVIDERS,
-    provide(PRIME_CACHE, {useValue: true})
-  ]);
-}

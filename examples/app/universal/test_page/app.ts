@@ -1,27 +1,4 @@
-/// <reference path="../../../../custom_typings/_custom.d.ts" />
-console.time('angular2/core in client');
-import * as angular from 'angular2/core';
-console.timeEnd('angular2/core in client');
-
-import {
-  Component,
-  View,
-  ViewEncapsulation,
-  bind
-} from 'angular2/core';
-
-import {bootstrap} from 'angular2/platform/browser';
-
-// import {
-//   Http,
-//   HTTP_PROVIDERS
-// } from 'angular2/http';
-
-// import {
-//   NG_PRELOAD_CACHE_PROVIDERS,
-//   PRIME_CACHE
-// } from '../../../../modules/universal/client/client';
-
+import {Component} from 'angular2/core';
 
 
 function transformData(data) {
@@ -223,10 +200,3 @@ export class App {
 }
 
 
-export function main() {
-  return bootstrap(App, [
-    // HTTP_PROVIDERS,
-    // NG_PRELOAD_CACHE_PROVIDERS,
-    // bind(PRIME_CACHE).toValue(true)
-  ]);
-}

@@ -31,7 +31,7 @@ module.exports = function(ROOT) {
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
-        componentUrl: 'examples/app/universal/test_page/app',
+        componentUrl: 'examples/app/universal/test_page/client',
 
         App: App,
         serverProviders: [
@@ -66,7 +66,7 @@ module.exports = function(ROOT) {
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams , {
         // client url for systemjs
-        componentUrl: 'examples/app/universal/todo/app',
+        componentUrl: 'examples/app/universal/todo/client',
 
         App: TodoApp,
         serverProviders: [
