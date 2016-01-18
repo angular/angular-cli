@@ -1,5 +1,4 @@
 import {bootstrap} from './platform/node';
-import {Promise} from 'angular2/src/facade/async';
 
 import {
   selectorRegExpFactory,
@@ -72,9 +71,13 @@ export function appRefSyncRender(appRef: any): string {
 export function renderToString(AppComponent: any, serverProviders?: any): Promise<string> {
   return bootstrap(AppComponent, serverProviders)
     .then(appRef => {
-      let html = appRefSyncRender(appRef);
-      appRef.dispose();
-      return html;
+      return new Promise(resolve => {
+        setTimeout(() => {
+          let html = appRefSyncRender(appRef);
+          appRef.dispose();
+          resolve(html);
+        });
+      });
       // let http = appRef.injector.getOptional(Http);
       // // TODO: fix zone.js ensure overrideOnEventDone callback when there are no pending tasks
       // // ensure all xhr calls are done
