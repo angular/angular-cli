@@ -17,3 +17,11 @@ export function bootstrap(appComponentType: /*Type*/ any,
 }
 
 
+export function prebootComplete(value?: any) {
+  if ('preboot' in window) {
+    (<any>window).preboot.complete();
+  }
+  return value;
+}
+
+
