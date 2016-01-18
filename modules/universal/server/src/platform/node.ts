@@ -134,3 +134,13 @@ export function buildNodeAppProviders(appComponentType: Type, providers?: Array<
     ...(isPresent(providers) ? providers : [])
   ];
 }
+
+export function buildNodePlatformProviders(
+  appComponentType: Type,
+  providers?: Array<any>): Array<any> {
+
+  return [
+    ...NODE_PROVIDERS,
+    ...(isPresent(providers) ? providers : [])
+  ];
+}
