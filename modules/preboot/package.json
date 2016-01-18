@@ -1,6 +1,6 @@
 {
   "name": "preboot",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Record and play back client side events",
   "main": "dist/server.js",
   "browser": "dist/client.js",
