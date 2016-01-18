@@ -3,6 +3,9 @@
   "version": "1.0.2",
   "description": "Record and play back client side events",
   "main": "dist/server.js",
+  "browser": "dist/client.js",
+  "typings": "preboot.d.ts",
+  "typescript": { "definition": "preboot.d.ts" },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,4 +1,2 @@
-declare module "preboot" {
-    function getClientCode(opts: any): any;
-    function getClientCodeStream(opts: any): any;
-}
+export function getClientCode(opts: any): any;
+export function getClientCodeStream(opts: any): any;

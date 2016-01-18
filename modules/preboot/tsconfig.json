@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-  	"target": "es5",
-  	"module": "commonjs",
-  	"declaration": false,
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": false,
     "noImplicitAny": false,
     "removeComments": false,
     "noLib": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-  	"sourceMap": true,
+    "sourceMap": true,
     "listFiles": false,
-  	"outDir": "dist"
+    "outDir": "dist"
   }
 }
