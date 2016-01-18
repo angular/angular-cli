@@ -64,7 +64,7 @@ function _exceptionHandler(): ExceptionHandler {
   return new ExceptionHandler(DOM, false);
 }
 
-export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
+export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   ...APPLICATION_COMMON_PROVIDERS,
   ...FORM_PROVIDERS,
   new Provider(PLATFORM_PIPES, {useValue: COMMON_PIPES, multi: true}),
@@ -97,8 +97,8 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
 /**
  * An array of providers that should be passed into `application()` when bootstrapping a component.
  */
-export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
-  ...NODE_APP_COMMON_PROVIDERS,
+export const NODE_APPLICATION_PROVIDERS: Array<any> = CONST_EXPR([
+  ...NODE_APPLICATION_COMMON_PROVIDERS,
   ...COMPILER_PROVIDERS,
   new Provider(XHR, {useClass: NodeXHRImpl}),
 ]);
@@ -115,7 +115,7 @@ export function bootstrap(
 
   let appProviders: Array<any> = [
     provide(APP_COMPONENT, {useValue: appComponentType}),
-    ...NODE_APP_PROVIDERS,
+    ...NODE_APPLICATION_PROVIDERS,
     ...(isPresent(customAppProviders) ? customAppProviders : [])
   ];
 
@@ -127,6 +127,8 @@ export function bootstrap(
     .application(appProviders)
     .bootstrap(appComponentType, componentProviders);
 }
+
+
 export function buildNodeAppProviders(appComponentType: Type, providers?: Array<any>): Array<any> {
   return [
     provide(APP_COMPONENT, {useValue: appComponentType}),
