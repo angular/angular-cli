@@ -1,7 +1,7 @@
 {
   "name": "angular2-universal-preview",
-  "main": "dist/server/server.js",
-  "browser": "dist/client/client.js",
+  "main": "dist/server/index.js",
+  "browser": "dist/client/index.js",
   "typings": "universal.d.ts",
   "typescript": { "definition": "universal.d.ts" },
   "version": "0.27.0",

@@ -17,3 +17,19 @@ export var SERVER_LOCATION_PROVIDERS: [any];
 export var BASE_URL: string;
 export var HTTP_PROVIDERS: [any];
 
+export default {
+  NodeXhr,
+  NodeBackend,
+  ng2engineWithPreboot,
+  ng2engine,
+  bootstrap,
+  renderToString,
+  renderToStringWithPreboot,
+  appRefSyncRender,
+  serializeApplication,
+  selectorResolver,
+  stringifyElement,
+  SERVER_LOCATION_PROVIDERS,
+  BASE_URL,
+  HTTP_PROVIDERS
+}
