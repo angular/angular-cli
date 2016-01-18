@@ -10,10 +10,12 @@ module.exports = function(ROOT) {
 
   var universalPath = `${ROOT}/dist/examples/app/universal`;
 
-  var {App}     = require(`${universalPath}/test_page/app`);
-  var {TodoApp} = require(`${universalPath}/todo/app`);
+  var appPage = require(`${universalPath}/test_page/app`);
+  var todoApp = require(`${universalPath}/todo/app`);
+  var routerApp = require(`${universalPath}/test_router/app`);
 
   var {provide} = require('angular2/core');
+  var {ROUTER_PROVIDERS} = require('angular2/router');
 
   var {
     HTTP_PROVIDERS,
@@ -24,17 +26,17 @@ module.exports = function(ROOT) {
   } = require(`${ROOT}/dist/modules/universal/server/server`);
   // require('angular2-universal')
 
-  router.
-    route('/').
-    get(function ngApp(req, res) {
+  router
+    .route('/')
+    .get(function ngApp(req, res) {
       let baseUrl = `http://localhost:3000${req.baseUrl}`;
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
         componentUrl: 'examples/app/universal/test_page/client',
 
-        App: App,
-        serverProviders: [
+        App: appPage.App,
+        providers: [
           // HTTP_PROVIDERS,
           // SERVER_LOCATION_PROVIDERS,
           // provide(BASE_URL, {useExisting: baseUrl}),
@@ -59,21 +61,21 @@ module.exports = function(ROOT) {
 
     });
 
-  router.
-    route('/examples/todo').
-    get(function ngTodo(req, res) {
-      let baseUrl = `http://localhost:3000${req.baseUrl}`;
+  router
+    .route('/examples/todo')
+    .get(function ngTodo(req, res) {
+      let baseUrl = `http://localhost:3000/examples/todo${req.baseUrl}`;
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams , {
         // client url for systemjs
         componentUrl: 'examples/app/universal/todo/client',
 
-        App: TodoApp,
-        serverProviders: [
+        App: todoApp.TodoApp,
+        providers: [
           // HTTP_PROVIDERS,
-          SERVER_LOCATION_PROVIDERS,
-          provide(BASE_URL, {useExisting: baseUrl}),
-          provide(PRIME_CACHE, {useExisting: true})
+          // SERVER_LOCATION_PROVIDERS,
+          // provide(BASE_URL, {useExisting: baseUrl}),
+          // provide(PRIME_CACHE, {useExisting: true})
         ],
         data: {},
 
@@ -91,6 +93,41 @@ module.exports = function(ROOT) {
       });
 
       res.render('app/universal/todo/index', options);
+
+    });
+
+  router
+    .route('/examples/router')
+    .get(function ngTodo(req, res) {
+      let baseUrl = `http://localhost:3000/examples/router${req.baseUrl}`;
+      let queryParams = queryParamsToBoolean(req.query);
+      let options = Object.assign(queryParams , {
+        // client url for systemjs
+        componentUrl: 'examples/app/universal/test_router/client',
+
+        App: routerApp.App,
+        providers: [
+          // HTTP_PROVIDERS,
+          ROUTER_PROVIDERS,
+          provide(BASE_URL, {useValue: baseUrl}),
+          SERVER_LOCATION_PROVIDERS,
+        ],
+        data: {},
+
+        preboot: queryParams.preboot === false ? null : {
+          start:    true,
+          appRoot:  'app',         // selector for root element
+          freeze:   'spinner',     // show spinner w button click & freeze page
+          replay:   'rerender',    // rerender replay strategy
+          buffer:   true,          // client app will write to hidden div until bootstrap complete
+          debug:    false,
+          uglify:   true,
+          presets:  ['keyPress', 'buttonPress', 'focus']
+        }
+
+      });
+
+      res.render('app/universal/test_router/index', options);
 
     });
 
