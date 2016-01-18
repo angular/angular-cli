@@ -16,7 +16,7 @@ describe('presets', function () {
                 {
                   name: 'selectors',
                   eventsBySelector: {
-                    'input[type="text"],textarea': ['keypress', 'keyup', 'keydown']
+                    'input,textarea': ['keypress', 'keyup', 'keydown']
                   }
                 },
                 {
@@ -28,6 +28,10 @@ describe('presets', function () {
               ]
             };
             presetFns.keyPress(opts);
+            
+            console.log(JSON.stringify(opts));
+            console.log(JSON.stringify(expected));
+            
             expect(opts).toEqual(expected);
         });
     });
@@ -39,7 +43,7 @@ describe('presets', function () {
                 listen: [{
                     name: 'selectors',
                     eventsBySelector: {
-                        'input[type="text"],textarea':   ['focusin', 'focusout', 'mousedown', 'mouseup']
+                        'input,textarea':   ['focusin', 'focusout', 'mousedown', 'mouseup']
                     },
                     trackFocus: true,
                     doNotReplay: true
@@ -77,7 +81,7 @@ describe('presets', function () {
                     {
                         name: 'selectors',
                         eventsBySelector: {
-                            'input[type="text"]': ['focus'],
+                            'input': ['focus'],
                             'textarea': ['focus']
                         },
                         doNotReplay: true,
@@ -86,7 +90,7 @@ describe('presets', function () {
                     {
                         name: 'selectors',
                         eventsBySelector: {
-                            'input[type="text"]': ['blur'],
+                            'input': ['blur'],
                             'textarea': ['blur']
                         },
                         doNotReplay: true,

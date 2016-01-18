@@ -1,3 +1,9 @@
+export class NodeXhr {
+  build(): any;
+}
+export class NodeBackend {
+  createConnection(request: any): any;
+}
 export function ng2engineWithPreboot(): any;
 export function ng2engine(): any;
 export function bootstrap(component: any, providers?: any): any;

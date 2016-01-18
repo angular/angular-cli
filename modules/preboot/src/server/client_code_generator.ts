@@ -70,7 +70,7 @@ export function getClientCodeStream(opts?: PrebootOptions): NodeJS.ReadableStrea
  * Generate client code as a string for preboot
  * based on the input options
  */
-export function getClientCode(opts?: PrebootOptions, done?: Function) {
+export function getClientCode(opts?: PrebootOptions, done?: Function): any {
   let deferred = Q.defer();
   let clientCode = '';
 
