@@ -1,5 +1,6 @@
 import './src/server_patch';
 
+export {provide} from 'angular2/core';
 export * from './src/directives/server_form';
 
 export * from './src/express/engine';

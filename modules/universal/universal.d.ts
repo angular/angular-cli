@@ -1,3 +1,4 @@
+export function provide(token: any, config: any): any;
 export class NodeXhr {
   build(): any;
 }
