@@ -41,10 +41,9 @@ var PATHS = {
   cleanable: rootDir([
     './dist/',
     './tsd_typings/',
-    './node_modules/angular2/',
-    './angular/modules/angular2/typings/',
-    './angular/dist/',
-    './web_modules/'
+    './node_modules/',
+    './modules/**/node_modules',
+    './modules/**/dist'
   ]),
 
   files: {
