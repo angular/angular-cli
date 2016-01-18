@@ -54,6 +54,10 @@ export const BASE_URL: OpaqueToken = CONST_EXPR(new OpaqueToken('baseUrl'));
 
 export const PRIME_CACHE: OpaqueToken = CONST_EXPR(new OpaqueToken('primeCache'));
 
+export function buildBaseUrl(url: string, existing?: boolean): any {
+  let prop = existing ? 'useExisting' : 'useValue';
+  return provide(BASE_URL, { [prop]: url }),
+}
 
 class NodeConnection implements Connection {
   request: Request;
