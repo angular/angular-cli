@@ -5,8 +5,6 @@ export class NodeXhr {
 export class NodeBackend {
   createConnection(request: any): any;
 }
-export function ng2engineWithPreboot(): any;
-export function ng2engine(): any;
 export function bootstrap(component: any, providers?: any): any;
 export function prebootComplete(value?: any): any;
 export function renderToString(AppComponent: any, serverProviders?: any): Promise<string>;
@@ -34,8 +32,6 @@ export default {
   provide,
   NodeXhr,
   NodeBackend,
-  ng2engineWithPreboot,
-  ng2engine,
   bootstrap,
   prebootComplete,
   renderToString,

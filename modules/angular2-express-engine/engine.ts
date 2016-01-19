@@ -1,22 +1,13 @@
-import '../server_patch';
+import '../universal/server/src/server_patch';
 import * as fs from 'fs';
-import {selectorRegExpFactory} from '../helper';
+import {selectorRegExpFactory} from '../universal/server/src/helper';
 
 
 import {
   renderToString,
   renderToStringWithPreboot,
   selectorResolver
-} from '../render';
-
-import {
-  prebootScript,
-  angularScript,
-  bootstrapButton,
-  bootstrapFunction,
-  bootstrapApp,
-  buildClientScripts
-} from '../ng_scripts';
+} from '../universal/server/src/render';
 
 export interface engineOptions {
   App: Function;
@@ -26,6 +17,109 @@ export interface engineOptions {
   serializedCmp?: string;
   server?: boolean;
   client?: boolean;
+}
+
+const prebootScript: string = `
+  <preboot>
+    <link rel="stylesheet" type="text/css" href="/preboot/preboot.css">
+    <script src="/preboot/preboot.js"></script>
+    <script>preboot.start()</script>
+  </preboot>
+`;
+
+const angularScript: string = `
+  <!-- Browser polyfills -->
+  <script src="/node_modules/es6-shim/es6-shim.min.js"></script>
+  <script src="/node_modules/systemjs/dist/system-polyfills.js"></script>
+  <script src="/node_modules/angular2/bundles/angular2-polyfills.min.js"></script>
+  <!-- SystemJS -->
+  <script src="/node_modules/systemjs/dist/system.js"></script>
+  <!-- Angular2: Bundle -->
+  <script src="/node_modules/rxjs/bundles/Rx.js"></script>
+  <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
+  <script src="/node_modules/angular2/bundles/router.dev.js"></script>
+  <script src="/node_modules/angular2/bundles/http.dev.js"></script>
+  <script type="text/javascript">
+    System.config({
+      "baseURL": "/",
+      "defaultJSExtensions": true
+    });
+  </script>
+`;
+
+const bootstrapButton: string = `
+  <div id="bootstrapButton">
+    <style>
+     #bootstrapButton {
+      z-index:999999999;
+      position: absolute;
+      background-color: rgb(255, 255, 255);
+      padding: 0.5em;
+      border-radius: 3px;
+      border: 1px solid rgb(207, 206, 206);
+     }
+    </style>
+    <button onclick="bootstrap()">
+      Bootstrap Angular2 Client
+    </button>
+  </div>
+`;
+
+var bootstrapApp = `
+  <script>
+    setTimeout(function() {
+      bootstrap();
+    });
+  </script>
+`;
+
+function bootstrapFunction(appUrl: string): string {
+  return `
+  <script>
+    function bootstrap() {
+      if (this.bootstraped) return;
+      this.bootstraped = true;
+      System.import("${ appUrl }")
+        .then(function(module) {
+          return module.main();
+        })
+        .then(function() {
+          preboot.complete();
+          var $bootstrapButton = document.getElementById("bootstrapButton");
+          if ($bootstrapButton) { $bootstrapButton.remove(); }
+        });
+    }
+  </script>
+`;
+};
+
+// TODO: find better ways to configure the App initial state
+// to pay off this technical debt
+// currently checking for explicit values
+function buildClientScripts(html: string, options: any): string {
+  return html
+    .replace(
+      selectorRegExpFactory('preboot'),
+      ((options.preboot === false) ? '' : prebootScript)
+    )
+    .replace(
+      selectorRegExpFactory('angular'),
+      ((options.angular === false) ? '' : angularScript)
+    )
+    .replace(
+      selectorRegExpFactory('bootstrap'),
+      ((options.bootstrap === false) ? (
+        bootstrapButton +
+        bootstrapFunction(options.componentUrl)
+      ) : (
+        (
+          (options.client === undefined || options.server === undefined) ?
+          '' : (options.client === false) ? '' : bootstrapButton
+        ) +
+        bootstrapFunction(options.componentUrl) +
+        ((options.client === false) ? '' : bootstrapApp)
+      ))
+    );
 }
 
 export function ng2engine(filePath: string, options: engineOptions, done: Function) {
