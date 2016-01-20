@@ -7,8 +7,6 @@ import {
 import {stringifyElement} from './stringifyElement';
 
 
-// import {PRIME_CACHE} from './http/server_http';
-
 import {
   prebootConfigDefault,
   getPrebootCSS,
@@ -22,9 +20,9 @@ import {isBlank, isPresent} from 'angular2/src/facade/lang';
 
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 
-import {Http} from 'angular2/http';
-
 import {NgZone, DirectiveResolver, ComponentRef} from 'angular2/core';
+import {Http} from 'angular2/http';
+import {Router} from 'angular2/router';
 
 export var serverDirectiveResolver = new DirectiveResolver();
 
@@ -41,7 +39,7 @@ export function serializeApplication(element: any, styles: string[], cache?: any
   let serializedCmp: string = stringifyElement(element);
 
   // serialize App Data
-  let serializedData: string = !cache ? '' : ''+
+  let serializedData: string = isBlank(cache) ? '' : ''+
     '<script>'+
     'window.' + 'ngPreloadCache' +' = '+  JSON.stringify(cache, null, 2) +
     '</script>'
@@ -59,42 +57,24 @@ export function appRefSyncRender(appRef: any): string {
   let sharedStylesHost = appRef.injector.get(SharedStylesHost);
   let styles: Array<string> = sharedStylesHost.getAllStyles();
 
-  // TODO: we need a better way to manage data serialized data for server/client
-  // let http = appRef.injector.getOptional(Http);
-  // let cache = isPresent(http) ? arrayFlattenTree(http._rootNode.children, []) : null;
-
   let serializedApp: string = serializeApplication(element, styles);
-  // return stringifyElement(element);
+
   return serializedApp;
 }
 
 export function renderToString(AppComponent: any, serverProviders?: any): Promise<string> {
   return bootstrap(AppComponent, serverProviders)
-    .then(appRef => {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          let html = appRefSyncRender(appRef);
-          appRef.dispose();
-          resolve(html);
-        });
-      });
-      // let http = appRef.injector.getOptional(Http);
-      // // TODO: fix zone.js ensure overrideOnEventDone callback when there are no pending tasks
-      // // ensure all xhr calls are done
-      // return new Promise(resolve => {
-      //   let ngZone = appRef.injector.get(NgZone);
-      //   // ngZone
-      //   ngZone.overrideOnEventDone(() => {
-      //     if (isBlank(http) || isBlank(http._async) || http._async <= 0) {
-      //       let html: string = appRefSyncRender(appRef);
-      //       appRef.dispose();
-      //       resolve(html);
-      //     }
+    .then((appRef: ComponentRef) => {
+      let injector = appRef.injector;
+      let router = injector.getOptional(Router);
 
-      //   }, true);
-
-      // });
-
+      return Promise.resolve(router && router._currentNavigation)
+        .then(() => new Promise(resolve => setTimeout(() => resolve(appRef))));
+    })
+    .then((appRef: ComponentRef) => {
+      let html = appRefSyncRender(appRef);
+      appRef.dispose();
+      return html;
     });
 }
 
