@@ -1,5 +1,6 @@
 import {
   isPresent,
+  isBlank,
   stringify
 } from 'angular2/src/facade/lang';
 import {
@@ -7,69 +8,69 @@ import {
   Inject,
   Injectable,
   Renderer,
-  RenderViewRef,
-  RenderElementRef
+  RenderComponentType
 } from 'angular2/core';
-import {
-  DefaultRenderView,
-} from 'angular2/src/core/render/view';
 
 import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
-import {
-  DomRenderer,
-  DomRenderer_
-} from 'angular2/src/platform/dom/dom_renderer';
+import {DomRenderer, DomRootRenderer, DomRootRenderer_} from 'angular2/src/platform/dom/dom_renderer';
 
 import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
 import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
+import {ViewEncapsulation} from 'angular2/src/core/metadata';
 
 import {cssHyphenate} from '../../helper';
 
-function resolveInternalDomView(viewRef: RenderViewRef): DefaultRenderView<Node> {
-  return <DefaultRenderView<Node>>viewRef;
-}
 
 @Injectable()
-export class ServerDomRenderer_ extends DomRenderer_ {
-  constructor(
-    private eventManager: EventManager,
-    private domSharedStylesHost: DomSharedStylesHost,
-    private animate: AnimationBuilder,
-    @Inject(DOCUMENT) document) {
-     super(eventManager, domSharedStylesHost, animate, document);
+export class ServerDomRootRenderer_ extends DomRootRenderer {
+  private _registeredComponents: Map<string, DomRenderer>;
+  constructor(@Inject(DOCUMENT) _document: any, _eventManager: EventManager,
+              sharedStylesHost: DomSharedStylesHost, animate: AnimationBuilder) {
+    super(_document, _eventManager, sharedStylesHost, animate);
+  }
+  renderComponent(componentProto: RenderComponentType): Renderer {
+    var renderer = this._registeredComponents.get(componentProto.id);
+    if (isBlank(renderer)) {
+      renderer = new ServerDomRenderer(this, componentProto);
+      this._registeredComponents.set(componentProto.id, renderer);
+    }
+    return renderer;
+  }
+}
+
+
+export class ServerDomRenderer extends DomRenderer {
+  constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType) {
+
+    if (_componentProto.encapsulation === ViewEncapsulation.Native) {
+      _componentProto.encapsulation = ViewEncapsulation.Emulated;
+    }
+
+    super(_rootRenderer, _componentProto);
   }
 
-  setElementProperty(location: RenderElementRef, propertyName: string, propertyValue: any) {
+  setElementProperty(renderElement: any, propertyName: string, propertyValue: any) {
     if (propertyName === 'value' || (propertyName === 'checked' && propertyValue !== false)) {
-      let view: DefaultRenderView<Node> = resolveInternalDomView(location.renderView);
-      let element = <Element>view.boundElements[(<any>location).boundElementIndex];
-      if (DOM.nodeName(element) === 'input') {
-        DOM.setAttribute(element, propertyName, propertyValue);
-        return;
+      if (DOM.nodeName(renderElement) === 'input') {
+        return super.setElementAttribute(renderElement, propertyName, propertyValue);
       }
     } else if (propertyName === 'src') {
-      let view: DefaultRenderView<Node> = resolveInternalDomView(location.renderView);
-      let element = <Element>view.boundElements[(<any>location).boundElementIndex];
-      DOM.setAttribute(element, propertyName, propertyValue);
-      return;
+      return super.setElementAttribute(renderElement, propertyName, propertyValue);
     }
-    return super.setElementProperty(location, propertyName, propertyValue);
+    return super.setElementProperty(renderElement, propertyName, propertyValue);
   }
 
-  setElementStyle(location: RenderElementRef, styleName: string, styleValue: string): void {
+  setElementStyle(renderElement: any, styleName: string, styleValue: string): void {
     let styleNameCased = cssHyphenate(styleName);
-    super.setElementStyle(location, styleNameCased, styleValue);
+    super.setElementStyle(renderElement, styleNameCased, styleValue);
   }
 
-  invokeElementMethod(location: RenderElementRef, methodName: string, args: any[]) {
+  invokeElementMethod(renderElement: any, methodName: string, args: any[]) {
     if (methodName === 'focus') {
-      let view: DefaultRenderView<Node> = resolveInternalDomView(location.renderView);
-      let element = <Element>view.boundElements[(<any>location).boundElementIndex];
       if (DOM.nodeName(element) === 'input') {
-        DOM.invoke(element, 'autofocus', null);
-        return;
+        return super.invokeElementMethod(renderElement, 'autofocus', null);
       }
 
     }

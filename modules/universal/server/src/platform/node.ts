@@ -38,16 +38,16 @@ import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 // Platform.Dom
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
-// import {DomRenderer} from 'angular2/src/platform/dom/dom_renderer';
 import {EventManager, EVENT_MANAGER_PLUGINS} from 'angular2/src/platform/dom/events/event_manager';
 import {DomEventsPlugin} from 'angular2/src/platform/dom/events/dom_events';
 import {KeyEventsPlugin} from 'angular2/src/platform/dom/events/key_events';
 import {HammerGesturesPlugin} from 'angular2/src/platform/dom/events/hammer_gestures';
 import {DomSharedStylesHost, SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
-import {DomRenderer} from 'angular2/src/platform/dom/dom_renderer';
+import {DomRootRenderer} from 'angular2/src/platform/dom/dom_renderer';
+import {RootRenderer} from 'angular2/src/core/render/api';
 
-import {ServerDomRenderer_} from './dom/server_dom_renderer';
+import {ServerDomRootRenderer_} from './dom/server_dom_renderer';
 import {NodeXHRImpl} from './node_xhr_impl';
 
 export function initNodeAdapter() {
@@ -84,8 +84,8 @@ export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: DomEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: KeyEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: HammerGesturesPlugin, multi: true}),
-  new Provider(DomRenderer, {useClass: ServerDomRenderer_}),
-  new Provider(Renderer, {useExisting: DomRenderer}),
+  new Provider(DomRootRenderer, {useClass: ServerDomRootRenderer_}),
+  new Provider(RootRenderer, {useExisting: DomRootRenderer}),
   new Provider(SharedStylesHost, {useExisting: DomSharedStylesHost}),
   DomSharedStylesHost,
   Testability,

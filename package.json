@@ -83,7 +83,7 @@
     "yargs": "^3.14.0"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.0",
+    "angular2": "2.0.0-beta.1",
     "angular2-universal-preview": "^0.24.0",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
