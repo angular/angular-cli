@@ -15,7 +15,7 @@ module.exports = function(ROOT) {
   var routerApp = require(`${universalPath}/test_router/app`);
 
   var {provide} = require('angular2/core');
-  var {ROUTER_PROVIDERS} = require('angular2/router');
+  var {ROUTER_PROVIDERS, APP_BASE_HREF} = require('angular2/router');
 
   var {
     HTTP_PROVIDERS,
@@ -29,7 +29,6 @@ module.exports = function(ROOT) {
   router
     .route('/')
     .get(function ngApp(req, res) {
-      let baseUrl = `http://localhost:3000${req.baseUrl}`;
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
@@ -39,7 +38,7 @@ module.exports = function(ROOT) {
         providers: [
           // HTTP_PROVIDERS,
           // SERVER_LOCATION_PROVIDERS,
-          // provide(BASE_URL, {useExisting: baseUrl}),
+          // provide(BASE_URL, {useExisting: req.originalUrl}),
           // provide(PRIME_CACHE, {useExisting: true})
         ],
         data: {},
@@ -64,7 +63,6 @@ module.exports = function(ROOT) {
   router
     .route('/examples/todo')
     .get(function ngTodo(req, res) {
-      let baseUrl = `http://localhost:3000/examples/todo${req.baseUrl}`;
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams , {
         // client url for systemjs
@@ -74,21 +72,12 @@ module.exports = function(ROOT) {
         providers: [
           // HTTP_PROVIDERS,
           // SERVER_LOCATION_PROVIDERS,
-          // provide(BASE_URL, {useExisting: baseUrl}),
+          // provide(BASE_URL, {useExisting: req.originalUrl}),
           // provide(PRIME_CACHE, {useExisting: true})
         ],
         data: {},
 
-        preboot: queryParams.preboot === false ? null : {
-          start:    true,
-          appRoot:  'app',         // selector for root element
-          freeze:   'spinner',     // show spinner w button click & freeze page
-          replay:   'rerender',    // rerender replay strategy
-          buffer:   true,          // client app will write to hidden div until bootstrap complete
-          debug:    false,
-          uglify:   true,
-          presets:  ['keyPress', 'buttonPress', 'focus']
-        }
+        preboot: queryParams.preboot === false ? null : true
 
       });
 
@@ -96,40 +85,38 @@ module.exports = function(ROOT) {
 
     });
 
-  router
-    .route('/examples/router')
-    .get(function ngTodo(req, res) {
-      let baseUrl = `http://localhost:3000/examples/router${req.baseUrl}`;
-      let queryParams = queryParamsToBoolean(req.query);
-      let options = Object.assign(queryParams , {
-        // client url for systemjs
-        componentUrl: 'examples/app/universal/test_router/client',
+  function ngRouter(req, res) {
+    let baseUrl = '/examples/router';
+    let url = req.originalUrl.replace(baseUrl, '') || '/';
+    let queryParams = queryParamsToBoolean(req.query);
 
-        App: routerApp.App,
-        providers: [
-          // HTTP_PROVIDERS,
-          ROUTER_PROVIDERS,
-          provide(BASE_URL, {useValue: baseUrl}),
-          SERVER_LOCATION_PROVIDERS,
-        ],
-        data: {},
+    let options = Object.assign(queryParams , {
+      // client url for systemjs
+      componentUrl: 'examples/app/universal/test_router/client',
+      client: false,
 
-        preboot: queryParams.preboot === false ? null : {
-          start:    true,
-          appRoot:  'app',         // selector for root element
-          freeze:   'spinner',     // show spinner w button click & freeze page
-          replay:   'rerender',    // rerender replay strategy
-          buffer:   true,          // client app will write to hidden div until bootstrap complete
-          debug:    false,
-          uglify:   true,
-          presets:  ['keyPress', 'buttonPress', 'focus']
-        }
+      App: routerApp.App,
+      providers: [
+        // HTTP_PROVIDERS,
+        ROUTER_PROVIDERS,
+        provide(BASE_URL, {useValue: url}),
+        provide(APP_BASE_HREF, {useValue: baseUrl}),
+        SERVER_LOCATION_PROVIDERS,
+      ],
+      data: {},
 
-      });
-
-      res.render('app/universal/test_router/index', options);
+      preboot: queryParams.preboot === false ? null : true
 
     });
+
+    res.render('app/universal/test_router/index', options);
+
+  }
+
+  router
+    .get('/examples/router', ngRouter)
+    .get('/examples/router/home', ngRouter)
+    .get('/examples/router/about', ngRouter);
 
 
   // needed for sourcemaps
