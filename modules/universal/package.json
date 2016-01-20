@@ -4,7 +4,7 @@
   "browser": "dist/client/index.js",
   "typings": "universal.d.ts",
   "typescript": { "definition": "universal.d.ts" },
-  "version": "0.31.0",
+  "version": "0.32.0",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -32,7 +32,7 @@
     "es6-shim": "^0.33.6",
     "parse5": "^1.5.0",
     "preboot": "^1.0.2",
-    "angular2": "2.0.0-beta.0",
+    "angular2": "2.0.0-beta.1",
     "es6-promise": "^3.0.2",
     "reflect-metadata": "0.1.2",
     "rxjs": "5.0.0-beta.0",
@@ -41,7 +41,7 @@
   },
   "peerDependencies": {
     "rxjs": "5.0.0-beta.0",
-    "angular2": "2.0.0-beta.0",
+    "angular2": "2.0.0-beta.1",
     "css": "*",
     "parse5": "^1.5.0"
   }
