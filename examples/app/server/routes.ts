@@ -1,5 +1,3 @@
-/// <reference path="../../../custom_typings/_custom.d.ts" />
-
 var serveStatic = require('serve-static');
 var historyApiFallback = require('connect-history-api-fallback');
 var {Router} = require('express');

@@ -1,5 +1,3 @@
-/// <reference path="../../../custom_typings/_custom.d.ts" />
-
 var express = require('express');
 var serveStatic = require('serve-static');
 var morgan = require('morgan');

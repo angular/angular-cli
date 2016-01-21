@@ -1,5 +1,3 @@
-/// <reference path="../../../custom_typings/_custom.d.ts" />
-
 var util = require('util');
 var {Router} = require('express');
 
