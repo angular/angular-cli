@@ -84,7 +84,7 @@
   },
   "dependencies": {
     "angular2": "2.0.0-beta.1",
-    "angular2-universal-preview": "^0.24.0",
+    "angular2-universal-preview": "^0.32.1",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
     "es6-shim": "^0.33.8",
