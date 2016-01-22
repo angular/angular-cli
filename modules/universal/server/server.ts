@@ -16,5 +16,4 @@ export * from './src/router/server_router';
 export * from './src/helper';
 export * from './src/ng_preboot';
 export * from './src/ng_scripts';
-export * from './src/render';
 export * from './src/stringifyElement';
