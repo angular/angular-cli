@@ -36,6 +36,10 @@ Full Stack Angular 2 - AngularConnect, Oct 2015
 Angular 2 Server Rendering - Angular U, July 2015  
 [![Angular 2 Server Rendering](http://img.youtube.com/vi/0wvZ7gakqV4/0.jpg)](http://www.youtube.com/watch?v=0wvZ7gakqV4)
 
+Angular Universal Source Code - ReadTheSource, January 2016
+[![Angular Universal Source Code](http://img.youtube.com/vi/qOjtFjXoebY/0.jpg)](https://www.youtube.com/watch?v=qOjtFjXoebY)
+
+
 ## [preboot.js](/modules/preboot)
 > Control server-rendered page and transfer state before client-side web app loads to the client-side-app.
 
