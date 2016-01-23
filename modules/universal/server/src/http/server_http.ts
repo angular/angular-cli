@@ -10,9 +10,7 @@ import {
   NgZone
 } from 'angular2/core';
 
-import {
-  Observable
-} from 'rxjs';
+import {Observable} from 'rxjs';
 
 import {
   Http,
@@ -33,21 +31,13 @@ import {
   BrowserXhr,
   RequestMethod
 } from 'angular2/http';
-import {
-  MockBackend
-} from 'angular2/src/http/backends/mock_backend';
+import {MockBackend} from 'angular2/src/http/backends/mock_backend';
 
 
-import {
-  isPresent,
-  isBlank,
-  CONST_EXPR
-} from 'angular2/src/facade/lang';
-
-var Rx = require('rxjs');
+import {isPresent, isBlank, CONST_EXPR} from 'angular2/src/facade/lang';
 
 // CJS
-import XMLHttpRequest = require('xhr2');
+import {XMLHttpRequest} from 'xhr2';
 
 
 export const BASE_URL: OpaqueToken = CONST_EXPR(new OpaqueToken('baseUrl'));
