@@ -153,8 +153,8 @@ export class NgPreloadCacheHttp extends Http {
     protected _backend: ConnectionBackend,
     protected _defaultOptions: RequestOptions,
     @Inject(NgZone) protected _ngZone: NgZone,
-    @Optional() @Inject(PRIME_CACHE) protected prime?: boolean
-    ) {
+    @Optional() @Inject(PRIME_CACHE) protected prime?: boolean) {
+
     super(_backend, _defaultOptions);
 
     var _rootNode = { children: [], res: null };
@@ -166,10 +166,10 @@ export class NgPreloadCacheHttp extends Http {
 
   preload(factory) {
 
-    // TODO: fix this after the next release with RxNext
-    var obs = new EventEmitter();
+    var obs = new EventEmitter(true);
 
     var currentNode = null;
+
     if (isPresent(this._activeNode)) {
       currentNode = { children: [], res: null };
       this._activeNode.children.push(currentNode);
@@ -181,17 +181,27 @@ export class NgPreloadCacheHttp extends Http {
 
     request.subscribe({
         next: () => {
+          let headers = {};
+          value.headers.forEach((value, name) => {
+            headers[key] = value;
+          });
 
+          let res = Object.assign({}, value, { headers });
+
+          if (isPresent(currentNode)) {
+            currentNode.res = res;
+          }
+          obs.next(value);
         },
-        error: () => {
-            this._ngZone.run(() => {
-                setTimeout(() => { this._async -= 1; });
-            });
+        error: (e) => {
+          this._async -= 1;
+          obs.error(e);
         },
         complete: () => {
-            this._ngZone.run(() => {
-                setTimeout(() => { this._async -= 1; });
-            });
+          this._activeNode = currentNode;
+          this._async -= 1;
+          this._activeNode = null;
+          obs.complete();
         }
     });
 
