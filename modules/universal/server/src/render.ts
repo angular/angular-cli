@@ -10,11 +10,9 @@ import {stringifyElement} from './stringifyElement';
 import {
   prebootConfigDefault,
   getPrebootCSS,
-  createPrebootHTML
+  createPrebootHTML,
+  getClientCode
 } from './ng_preboot';
-
-import {getClientCode} from 'preboot';
-
 
 import {isBlank, isPresent} from 'angular2/src/facade/lang';
 
