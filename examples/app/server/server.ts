@@ -5,10 +5,10 @@ var path = require('path');
 
 module.exports = function(ROOT) {
   var app = express();
-  var universal = require(`${ROOT}/dist/modules/universal/server`);
+  var engine = require('angular2-express-engine');
   // rendering engine
 
-  app.engine('ng2.html', universal.ng2engine);
+  app.engine('ng2.html', engine.ng2engine);
   app.set('views', path.join(ROOT, 'examples'));
   app.set('view engine', 'ng2.html');
   app.set('view options', { doctype: 'html' });
