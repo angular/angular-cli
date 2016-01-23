@@ -67,7 +67,7 @@
     "modules/universal/client/client.ts",
     "modules/universal/client/src/ng_preload_cache.ts",
     "modules/angular2-express-engine/index.ts",
-    "modules/angular2-express-engine/engine.ts",
+    "modules/angular2-express-engine/src/engine.ts",
     "examples/app/server/api.ts",
     "examples/app/server/routes.ts",
     "examples/app/server/server.ts",

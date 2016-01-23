@@ -83,8 +83,10 @@
     "yargs": "^3.14.0"
   },
   "dependencies": {
+    "angular2-express-engine": "file:modules/angular2-express-engine",
+    "angular2-universal": "file:modules/universal",
+    "angular2-universal-preview": "file:modules/universal",
     "angular2": "2.0.0-beta.1",
-    "angular2-universal-preview": "^0.32.1",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
     "es6-shim": "^0.33.8",
