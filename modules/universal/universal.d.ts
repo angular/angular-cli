@@ -27,7 +27,7 @@ export function buildNodePlatformProviders(
   providers?: Array<any>): Array<any>;
 export var NODE_APPLICATION_COMMON_PROVIDERS: [any];
 export var NODE_APPLICATION_PROVIDERS: [any];
-
+export function selectorRegExpFactory(selector: string): RegExp;
 export default {
   provide,
   NodeXhr,
@@ -48,5 +48,6 @@ export default {
   buildNodePlatformProviders,
   NODE_PROVIDERS,
   NODE_APPLICATION_COMMON_PROVIDERS,
-  NODE_APPLICATION_PROVIDERS
+  NODE_APPLICATION_PROVIDERS,
+  selectorRegExpFactory
 }
