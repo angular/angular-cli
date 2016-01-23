@@ -94,10 +94,10 @@ export const SERVER_LOCATION_PROVIDERS: Array<any> = [
 ];
 
 export function joinWithSlash(start: string, end: string): string {
-  if (start.length == 0) {
+  if (start.length === 0) {
     return end;
   }
-  if (end.length == 0) {
+  if (end.length === 0) {
     return start;
   }
   var slashes = 0;
@@ -107,10 +107,10 @@ export function joinWithSlash(start: string, end: string): string {
   if (end.startsWith('/')) {
     slashes++;
   }
-  if (slashes == 2) {
+  if (slashes === 2) {
     return start + end.substring(1);
   }
-  if (slashes == 1) {
+  if (slashes === 1) {
     return start + end;
   }
   return start + '/' + end;
