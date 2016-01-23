@@ -22,19 +22,18 @@ import {ViewEncapsulation} from 'angular2/src/core/metadata';
 
 import {cssHyphenate} from '../../helper';
 
-
 @Injectable()
 export class ServerDomRootRenderer_ extends DomRootRenderer {
-  private _registeredComponents: Map<string, DomRenderer>;
   constructor(@Inject(DOCUMENT) _document: any, _eventManager: EventManager,
               sharedStylesHost: DomSharedStylesHost, animate: AnimationBuilder) {
     super(_document, _eventManager, sharedStylesHost, animate);
   }
   renderComponent(componentProto: RenderComponentType): Renderer {
-    var renderer = this._registeredComponents.get(componentProto.id);
+    // TODO(gdi2290): see PR https://github.com/angular/angular/pull/6584
+    var renderer = (<any>this)._registeredComponents.get(componentProto.id);
     if (isBlank(renderer)) {
       renderer = new ServerDomRenderer(this, componentProto);
-      this._registeredComponents.set(componentProto.id, renderer);
+      (<any>this)._registeredComponents.set(componentProto.id, renderer);
     }
     return renderer;
   }
@@ -78,5 +77,3 @@ export class ServerDomRenderer extends DomRenderer {
   }
 
 }
-
-
