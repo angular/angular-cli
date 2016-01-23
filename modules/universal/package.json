@@ -4,7 +4,7 @@
   "browser": "dist/client/index.js",
   "typings": "universal.d.ts",
   "typescript": { "definition": "universal.d.ts" },
-  "version": "0.32.1",
+  "version": "0.32.2",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
