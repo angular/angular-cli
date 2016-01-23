@@ -3,8 +3,8 @@ import {ReplayStrategy} from '../../interfaces/strategy';
 import {PrebootEvent} from '../../interfaces/event';
 
 /**
- * This replay strategy assumes that the client completely re-rendered
- * the page so reboot will need to find the element in the new client
+ * This replay strategy assumes that the browser completely re-rendered
+ * the page so reboot will need to find the element in the new browser
  * rendered DOM that matches the element it has in memory.
  * 
  * Any events that could not be replayed for whatever reason are returned.
@@ -13,7 +13,7 @@ export function replayEvents(preboot: PrebootRef, strategy: ReplayStrategy, even
   let remainingEvents = [];
   events = events || [];
 
-  // loop through the events, find the appropriate client node and dispatch the event
+  // loop through the events, find the appropriate browser node and dispatch the event
   for (let eventData of events) {
     let event = eventData.event;
     let serverNode = eventData.node;

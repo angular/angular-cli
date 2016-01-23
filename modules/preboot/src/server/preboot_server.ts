@@ -1,1 +1,1 @@
-export {getClientCodeStream, getClientCode} from './client_code_generator';
+export {getClientCodeStream, getClientCode} from './browser_code_generator';

@@ -10,8 +10,8 @@ import {normalize, listenStrategies, replayStrategies, freezeStrategies} from '.
 import {stringifyWithFunctions} from './utils';
 import {PrebootOptions} from '../interfaces/preboot_options';
 
-// map of input opts to client code; exposed for testing purposes
-export let clientCodeCache = {};
+// map of input opts to browser code; exposed for testing purposes
+export let browserCodeCache = {};
 
 /**
  * We want to use the browserify ignore functionality so that any code modules
@@ -30,15 +30,15 @@ export function ignoreUnusedStrategies(b: BrowserifyObject, bOpts: Object, strat
 }
 
 /**
- * Generate client code as a readable stream for preboot based on the input options
+ * Generate browser code as a readable stream for preboot based on the input options
  */
 export function getClientCodeStream(opts?: PrebootOptions): NodeJS.ReadableStream {
   opts = normalize(opts);
 
   let bOpts = {
-    entries: [__dirname + '/../client/preboot_client.js'],
+    entries: [__dirname + '/../browser/preboot_browser.js'],
     standalone: 'preboot',
-    basedir: __dirname + '/../client',
+    basedir: __dirname + '/../browser',
     browserField: false
   };
   let b = browserify(bOpts);
@@ -55,9 +55,9 @@ export function getClientCodeStream(opts?: PrebootOptions): NodeJS.ReadableStrea
   if (!opts.buffer) { b.ignore('./buffer_manager.js', bOpts); }
   if (!opts.debug) { b.ignore('./log.js', bOpts); }
 
-  // use gulp to get the stream with the custom preboot client code
+  // use gulp to get the stream with the custom preboot browser code
   let outputStream = b.bundle()
-    .pipe(source('src/client/preboot_client.js'))
+    .pipe(source('src/browser/preboot_browser.js'))
     .pipe(buffer())
     .pipe(insert.append('\n\n;preboot.init(' + stringifyWithFunctions(opts) + ');\n\n'))
     .pipe(rename('preboot.js'));
@@ -67,7 +67,7 @@ export function getClientCodeStream(opts?: PrebootOptions): NodeJS.ReadableStrea
 }
 
 /**
- * Generate client code as a string for preboot
+ * Generate browser code as a string for preboot
  * based on the input options
  */
 export function getClientCode(opts?: PrebootOptions, done?: Function): any {
@@ -76,11 +76,11 @@ export function getClientCode(opts?: PrebootOptions, done?: Function): any {
 
   // check cache first
   let cacheKey = JSON.stringify(opts);
-  if (clientCodeCache[cacheKey]) {
-    return Q.when(clientCodeCache[cacheKey]);
+  if (browserCodeCache[cacheKey]) {
+    return Q.when(browserCodeCache[cacheKey]);
   }
 
-  // get the client code
+  // get the browser code
   getClientCodeStream(opts)
     .pipe(eventStream.map(function(file, cb) {
       clientCode += file.contents;
@@ -98,7 +98,7 @@ export function getClientCode(opts?: PrebootOptions, done?: Function): any {
         done(null, clientCode);
       }
 
-      clientCodeCache[cacheKey] = clientCode;
+      browserCodeCache[cacheKey] = clientCode;
       deferred.resolve(clientCode);
     });
 

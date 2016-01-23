@@ -1,7 +1,7 @@
 /**
  * this module is used to take input from the user on the server side
  * for the preboot options they want and to standarize those options
- * into a specific format that is known by the client code.
+ * into a specific format that is known by the browser code.
  */
 import * as _ from 'lodash';
 import presetFns from './presets';
@@ -37,7 +37,7 @@ export let defaultFreezeStyles = {
 };
 
 // this object contains functions for each PrebootOptions value to validate it
-// and prep it for call to generate client code
+// and prep it for call to generate browser code
 export let normalizers = {
 
   /**
@@ -189,7 +189,7 @@ export let normalizers = {
 
 /**
  * Normalize options so user can enter shorthand and it is
- * expanded as appropriate for the client code
+ * expanded as appropriate for the browser code
  */
 export function normalize(opts: PrebootOptions): PrebootOptions {
   opts = opts || {};

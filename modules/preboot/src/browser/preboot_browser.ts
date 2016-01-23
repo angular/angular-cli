@@ -1,5 +1,5 @@
 /**
- * This is the main entry point for preboot on the client side. 
+ * This is the main entry point for preboot on the browser. 
  * The primary methods are:
  *    init() - called automatically to initialize preboot according to options
  *    start() - when preboot should start listening to events
@@ -47,8 +47,8 @@ export function complete() {
 
   // else we can complete, so get started with events
   let opts = state.opts;
-  eventManager.replayEvents(preboot, opts);                 // replay events on client DOM
-  if (opts.buffer) { bufferManager.switchBuffer(preboot); } // switch from server to client buffer
+  eventManager.replayEvents(preboot, opts);                 // replay events on browser DOM
+  if (opts.buffer) { bufferManager.switchBuffer(preboot); } // switch from server to browser buffer
   if (opts.freeze) { state.freeze.cleanup(preboot); }       // cleanup freeze divs like overlay
   eventManager.cleanup(preboot, opts);                      // cleanup event listeners
 }

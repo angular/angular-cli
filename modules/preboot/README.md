@@ -28,10 +28,10 @@ Then in your server-side code you would do something like this:
 ```
 var preboot = require('preboot');
 var prebootOptions = {};  // see options section below
-var clientCode = preboot(prebootOptions);
+var browserCode = preboot(prebootOptions);
 ```
 
-You then inject clientCode into the HEAD section of your server-side template.
+You then inject browserCode into the HEAD section of your server-side template.
 We want preboot to ONLY start recording once the web app root exists in the DOM. We are
 still playing with the best way to do this (NOTE: we have tried onLoad and
 it does not work because the callback does not get executed quickly enough).

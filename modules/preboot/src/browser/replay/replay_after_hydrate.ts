@@ -3,7 +3,7 @@ import {ReplayStrategy} from '../../interfaces/strategy';
 import {PrebootEvent} from '../../interfaces/event';
 
 /**
- * this replay strategy assumes that the client did not blow away
+ * this replay strategy assumes that the browser did not blow away
  * the server generated HTML and that the elements in memory for
  * preboot can be used to replay the events.
  * 

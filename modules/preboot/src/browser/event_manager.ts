@@ -1,5 +1,5 @@
 /**
- * This module cooridinates all preboot events on the client side
+ * This module coordinates all preboot events on the client side
  */
 import {PrebootRef} from '../interfaces/preboot_ref';
 import {PrebootOptions} from '../interfaces/preboot_options';

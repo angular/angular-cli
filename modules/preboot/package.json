@@ -1,9 +1,9 @@
 {
   "name": "preboot",
   "version": "1.0.3",
-  "description": "Record and play back client side events",
+  "description": "Record and play back browser events",
   "main": "dist/server.js",
-  "browser": "dist/client.js",
+  "browser": "dist/browser.js",
   "typings": "preboot.d.ts",
   "typescript": { "definition": "preboot.d.ts" },
   "scripts": {
