@@ -21,7 +21,7 @@ module.exports = function(ROOT) {
     BASE_URL,
     PRIME_CACHE,
     queryParamsToBoolean
-  } = require(`${ROOT}/dist/modules/universal/server/server`);
+  } = require('angular2-universal-preview');
   // require('angular2-universal')
 
   router
