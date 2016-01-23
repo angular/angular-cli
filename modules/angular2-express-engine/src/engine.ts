@@ -2,7 +2,8 @@ import * as fs from 'fs';
 import {
   renderToString,
   selectorResolver,
-  selectorRegExpFactory
+  selectorRegExpFactory,
+  renderToStringWithPreboot
 } from 'angular2-universal-preview';
 
 export interface engineOptions {
