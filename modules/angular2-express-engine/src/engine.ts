@@ -131,7 +131,7 @@ export function ng2engine(filePath: string, options: engineOptions, done: Functi
       if (err) { return done(err); }
 
       // convert to string
-      var clientHtml: string = content.toString();
+      const clientHtml: string = content.toString();
 
       // TODO: better build scripts abstraction
       if (options.server === false && options.client === false) {
@@ -140,16 +140,23 @@ export function ng2engine(filePath: string, options: engineOptions, done: Functi
       if (options.server === false && options.client !== false) {
         return done(null, buildClientScripts(clientHtml, options));
       }
+      // bootstrap and render component to string
+      var renderPromise: any = renderToString;
+      const args = [options.App, options.providers];
+      if (options.preboot) {
+        renderPromise = renderToStringWithPreboot;
+        args.push(options.preboot);
+      }
 
-      renderToString(options.App, options.providers, options.preboot)
+      renderPromise(...args)
         .then(serializedCmp => {
 
-          let selector: string = selectorResolver(options.App);
+          const selector: string = selectorResolver(options.App);
 
           // selector replacer explained here
           // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
           // replace our component with serialized version
-          let rendered: string = clientHtml.replace(
+          const rendered: string = clientHtml.replace(
             // <selector></selector>
             selectorRegExpFactory(selector),
             // <selector>{{ serializedCmp }}</selector>
