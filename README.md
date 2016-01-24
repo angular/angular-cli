@@ -69,19 +69,33 @@ ng build
 The build artifacts will be stored in the `dist/` directory.
 
 
-### Running tests
+### Running unit tests
 
-Before running the tests make sure that the project is built. To build the 
+Before running the tests make sure that the project is built. To build the
 project once you can use:
 
 ```bash
 ng build
 ```
 
-With the project built in the `dist/` folder you can just run: `karma start`. 
+With the project built in the `dist/` folder you can just run: `karma start`.
 Karma will run the tests and keep the browser open waiting to run again.
 
-This will be easier when the command 
+
+### Running end-to-end tests
+
+Before running the tests make sure that you have an updated webdriver and that
+the tests are built:
+
+```bash
+$(npm bin)/webdriver-manager update
+$(npm bin)/tsc -p e2e/
+```
+
+Afterwards you only need to run `$(npm bin)/protractor` while serving via
+`ng serve`.
+
+This will be easier when the command
 [ng test](https://github.com/angular/angular-cli/issues/70) is implemented.
 
 
