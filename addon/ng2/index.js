@@ -6,7 +6,8 @@ module.exports = {
   includedCommands: function() {
     return {
       'new': require('./commands/new'),
-      'init': require('./commands/init')
+      'init': require('./commands/init'),
+      'generate': require('./commands/generate')
     };
   }
 };

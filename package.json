@@ -32,6 +32,7 @@
     "broccoli": "^0.16.3",
     "broccoli-concat": "0.0.13",
     "broccoli-funnel": "^1.0.0",
+    "broccoli-less": "^2.1.0",
     "broccoli-merge-trees": "^1.0.0",
     "broccoli-writer": "^0.1.1",
     "chalk": "^1.1.0",
