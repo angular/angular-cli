@@ -44,20 +44,20 @@ Navigate to `[http://localhost:4200/]`. The app will automatically reload if you
 
 ### Generating other scaffolds
 
-Add a new component with:
+You can use the `ng generate` (or just `ng g`) command to generate Angular components:
+
 ```bash
 ng generate component my-new-component
+ng g component my-new-component # using the alias
 ```
+You can find all possible blueprints in the table below:
 
-Add a new service with:
-```bash
-ng generate service my-new-service
-```
-
-Add a new pipe with:
-```bash
-ng generate pipe my-new-pipe
-```
+Scaffold  | Usage
+---       | ---
+Component | `ng g component my-new-component`
+Directive | `ng g directive my-new-directive`
+Pipe      | `ng g pipe my-new-pipe`
+Service   | `ng g service my-new-service`
 
 
 ### Creating a build
