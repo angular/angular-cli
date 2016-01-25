@@ -15,12 +15,14 @@ module.exports = function(ROOT) {
 
   var routes = require('./routes');
   var api = require('./api');
+  var graphApi = require('./graph_api');
 
 
   app.use(serveStatic(`${ROOT}/dist`));
   app.use(serveStatic(`${ROOT}/examples/app/public`));
 
   app.use('/api', api(ROOT));
+  app.use('/graph_api', api(ROOT));
   app.use(routes(ROOT));
 
 

@@ -83,6 +83,31 @@ module.exports = function(ROOT) {
 
     });
 
+  router
+    .route('/examples/falcor_todo')
+    .get(function ngTodo(req, res) {
+      let queryParams = queryParamsToBoolean(req.query);
+      let options = Object.assign(queryParams , {
+        // client url for systemjs
+        componentUrl: 'examples/app/universal/falcor_todo/client',
+
+        App: todoApp.TodoApp,
+        providers: [
+          // HTTP_PROVIDERS,
+          // SERVER_LOCATION_PROVIDERS,
+          // provide(BASE_URL, {useExisting: req.originalUrl}),
+          // provide(PRIME_CACHE, {useExisting: true})
+        ],
+        data: {},
+
+        preboot: queryParams.preboot === false ? null : true
+
+      });
+
+      res.render('app/universal/falcor_todo/index', options);
+
+    });
+
   function ngRouter(req, res) {
     let baseUrl = '/examples/router';
     let url = req.originalUrl.replace(baseUrl, '') || '/';

@@ -19,10 +19,11 @@ var server = require('./dist/examples/app/server/server')(__dirname);
 
 // Start server
 module.exports.Server = http.createServer(server).listen(port, SERVER_IP, function() {
-  console.log('Listening on port: ' + port);
+  console.log(`Listening on port: ${port}`);
   // for smoke testing
   // smokeTest();
 });
+
 /*
 https.createServer(options, server).listen(ssl, function() {
   console.log('Listening on port: ' + ssl + ' in ' + process.env.NODE_ENV);
