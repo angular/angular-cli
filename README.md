@@ -1,5 +1,7 @@
 ## Angular-CLI
 
+[![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status][travis-badge]][travis-badge-url]
 [![Dependency Status][david-badge]][david-badge-url]
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
@@ -9,10 +11,10 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 
 ## Note
 
-This projects is very much still a work in progress.
+This project is very much still a work in progress.
 
 We still have a long way before getting out of our alpha stage.
-If you wish to collaborate while the project is still young, checkout [our list issues](https://github.com/angular/angular-cli/issues).
+If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
 ## Prerequisites
 
@@ -102,7 +104,7 @@ Checkout [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-c
 This project is currently a prototype so there are many known issues. Just to mention a few:
 
 - All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
-- On Windows you need to run the `build` and `serve` commands with Admin permissions otherwise the performance really sucks.
+- On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
 - [Protractor](https://angular.github.io/protractor/) integration is missing.
 - The initial installation as well as `ng new` take too long because of lots of npm dependencies.
 - "ember" branding leaks through many error messages and help text.
@@ -145,7 +147,7 @@ and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackageloca
 
 ## License
 
-Apache v2
+MIT
 
 
 [travis-badge]: https://travis-ci.org/angular/angular-cli.svg?branch=master
