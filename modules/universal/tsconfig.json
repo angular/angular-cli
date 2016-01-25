@@ -13,7 +13,7 @@
   	"outDir": "dist"
   },
   "exclude": [
-    "client/test",
+    "browser/test",
     "server/test",
     "node_modules"
   ],
@@ -25,18 +25,17 @@
     "server/server.ts",
     "server/src/directives/server_form.ts",
     "server/src/http/server_http.ts",
-    "server/src/router/index.ts",
-    "server/src/router/server_platform_location.ts",
+    "server/src/router/server_router.ts",
     "server/src/platform/dom/server_dom_renderer.ts",
     "server/src/helper.ts",
     "server/src/render.ts",
     "server/src/server_patch.ts",
     "server/src/stringifyElement.ts",
-    "server/test/router/server_platform_location.spec.ts",
-    "client/index.ts",
-    "client/client.ts",
-    "client/src/ng_preload_cache.ts",
-    "client/src/bootstrap.ts"
+    "server/test/router_server_spec.ts",
+    "browser/index.ts",
+    "browser/browser.ts",
+    "browser/src/ng_preload_cache.ts",
+    "browser/src/bootstrap.ts"
   ],
   "formatCodeOptions": {
     "indentSize": 2,

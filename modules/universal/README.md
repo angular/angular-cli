@@ -14,7 +14,7 @@
 # Modules
 
 ## Universal
-> Manage your application lifecycle and serialize changes while on the server to be sent to the client
+> Manage your application lifecycle and serialize changes while on the server to be sent to the browser
 
 ### Documentation
 [Design Doc](https://docs.google.com/document/d/1q6g9UlmEZDXgrkY88AJZ6MUrUxcnwhBGS0EXbVlYicY)
