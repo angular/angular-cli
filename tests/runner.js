@@ -3,7 +3,7 @@
 var Mocha = require('mocha');
 var glob = require('glob');
 
-var root = 'tests/{unit,acceptance}';
+var root = 'tests/{unit,acceptance,e2e}';
 var specFiles = glob.sync(root + '/**/*.spec.js');
 var mocha = new Mocha({
   timeout: 5000,
