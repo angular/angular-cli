@@ -117,7 +117,6 @@ var CONFIG = {
       './*_spec.js',
       './angular',
       './.DS_Store',
-      './bower_components',
       './tsd_typings',
       './web_modules',
       './.idea'

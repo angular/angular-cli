@@ -40,7 +40,6 @@
     "url": "https://github.com/angular/universal/issues"
   },
   "devDependencies": {
-    "bower": "^1.4.1",
     "brfs": "^1.4.0",
     "browser-sync": "^2.8.2",
     "connect-history-api-fallback": "^1.1.0",
