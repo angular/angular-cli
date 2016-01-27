@@ -50,5 +50,4 @@ modules/**/*.js
 /modules/universal/server/typings
 /modules/**/dist
 /modules/**/node_modules
-/modules/**/test
 /modules/**/typings

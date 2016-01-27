@@ -1,4 +1,4 @@
-export {getClientCode} from 'preboot';
+export {getBrowserCode} from 'preboot';
 
 export function prebootConfigDefault(config = {}) {
   return Object.assign({

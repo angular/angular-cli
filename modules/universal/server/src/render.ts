@@ -11,7 +11,7 @@ import {
   prebootConfigDefault,
   getPrebootCSS,
   createPrebootHTML,
-  getClientCode
+  getBrowserCode
 } from './ng_preboot';
 
 import {isBlank, isPresent} from 'angular2/src/facade/lang';
@@ -82,7 +82,7 @@ export function renderToStringWithPreboot(AppComponent: any, serverProviders?: a
     .then((html: string) => {
       if (typeof prebootConfig === 'boolean' && prebootConfig === false) { return html }
       let config = prebootConfigDefault(prebootConfig);
-      return getClientCode(config)
+      return getBrowserCode(config)
         .then(code => html + createPrebootHTML(code, config));
     });
 }

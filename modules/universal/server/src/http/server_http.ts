@@ -180,18 +180,18 @@ export class NgPreloadCacheHttp extends Http {
     var request = factory();
 
     request.subscribe({
-        next: () => {
+        next: (response) => {
           let headers = {};
-          value.headers.forEach((value, name) => {
-            headers[key] = value;
+          response.headers.forEach((value, name) => {
+            headers[name] = value;
           });
 
-          let res = Object.assign({}, value, { headers });
+          let res = Object.assign({}, response, { headers });
 
           if (isPresent(currentNode)) {
             currentNode.res = res;
           }
-          obs.next(value);
+          obs.next(response);
         },
         error: (e) => {
           this._async -= 1;

@@ -16,7 +16,6 @@
   "files": [
     "tsd_typings/tsd.d.ts",
     "custom_typings/_custom.d.ts",
-    "modules/index.ts",
     "modules/preboot/browser.ts",
     "modules/preboot/server.ts",
     "modules/preboot/src/browser/buffer_manager.ts",
@@ -62,7 +61,7 @@
     "modules/universal/server/src/render.ts",
     "modules/universal/server/src/server_patch.ts",
     "modules/universal/server/src/stringifyElement.ts",
-    "modules/universal/server/test/router_server_spec.ts",
+    "modules/universal/server/test/router/server_router_spec.ts",
     "modules/universal/browser/index.ts",
     "modules/universal/browser/browser.ts",
     "modules/universal/browser/src/ng_preload_cache.ts",
