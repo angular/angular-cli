@@ -1,0 +1,16 @@
+{
+  "dependencies": {},
+  "devDependencies": {
+    "chalk": "github:typings/typed-chalk#a7e422c5455e70292e5675a727d43a7b05fc3e58"
+  },
+  "ambientDevDependencies": {
+    "assertion-error": "github:DefinitelyTyped/DefinitelyTyped/assertion-error/assertion-error.d.ts#800a7047cf275cc9f695cbd116748cd408a09d6d",
+    "chai": "github:DefinitelyTyped/DefinitelyTyped/chai/chai.d.ts#9c25433c84251bfe72bf0030a95edbbb2c81c9d5",
+    "glob": "github:DefinitelyTyped/DefinitelyTyped/glob/glob.d.ts#a14d724826174d1669d4df04c80f4838b7e71fdf",
+    "minimatch": "github:DefinitelyTyped/DefinitelyTyped/minimatch/minimatch.d.ts#a3900b896f7b3361b79f9b503224777619907d53",
+    "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#d6dd320291705694ba8e1a79497a908e9f5e6617",
+    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#8cf8164641be73e8f1e652c2a5b967c7210b6729",
+    "shelljs": "github:DefinitelyTyped/DefinitelyTyped/shelljs/shelljs.d.ts#ce14ae27a020194da3d35aa3468ca1e9e5296316",
+    "through": "github:DefinitelyTyped/DefinitelyTyped/through/through.d.ts#4ffee4a839f36d4f13ea7b0bc03ed2ca853e79d5"
+  }
+}
