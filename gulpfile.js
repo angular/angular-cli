@@ -202,7 +202,7 @@ gulp.task('preboot.example', [ 'build.typescript' ], function() {
   // copy static files to dist
   exec('cp -fR examples/preboot/. ' + PATHS.preboot.exampleDest);
 
-  return preboot.getClientCodeStream(CONFIG.preboot).
+  return preboot.getBrowserCodeStream(CONFIG.preboot).
     pipe($.size()).
     pipe(gulp.dest(PATHS.preboot.exampleDest));
 
@@ -237,18 +237,8 @@ gulp.task('build.typescript.project', function() {
 
 });
 
-gulp.task('build.typescript.all', function() {
-
-  return gulp.src(PATHS.files.ts).
-    pipe($.typescript(TS_PROJECT)).
-    pipe($.size()).
-    pipe(gulp.dest(TS_PROJECT.config.compilerOptions.outDir));
-
-});
-
-
 gulp.task('build', [
-  'build.typescript.all',
+  'build.typescript.project',
   'preboot.example',
   'preboot.karma'
 ]);
@@ -359,7 +349,7 @@ gulp.task('lint', function() {
 
 gulp.task('watch', function(){
 
-  gulp.watch(PATHS.files.ts, ['build.typescript.all']);
+  gulp.watch(PATHS.files.ts, ['build.typescript.project']);
   gulp.watch(PATHS.specs, ['jasmine']);
 
 });
