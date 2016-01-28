@@ -107,7 +107,6 @@ This project is currently a prototype so there are many known issues. Just to me
 - On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
 - [Protractor](https://angular.github.io/protractor/) integration is missing.
 - The initial installation as well as `ng new` take too long because of lots of npm dependencies.
-- "ember" branding leaks through many error messages and help text.
 - Many existing ember addons are not compatible with Angular apps built via angular-cli.
 
 
