@@ -5,6 +5,7 @@ var port = process.env.PORT    || 3000;
 
 // Module dependencies
 var http = require('http');
+// require('nocycle').detect();
 // var https = require('https');
 
 /*
