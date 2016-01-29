@@ -239,8 +239,7 @@ gulp.task('build.typescript.project', ['clean.dist'], function() {
 
 gulp.task('build', [
   'build.typescript.project',
-  'preboot.example',
-  'preboot.karma'
+  'preboot.example'
 ]);
 
 // Changelog
