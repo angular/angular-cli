@@ -11,5 +11,8 @@
     "sourceMap": true,
     "listFiles": false,
     "outDir": "dist"
-  }
+  },
+  "exclude": [
+    "test"
+  ]
 }
