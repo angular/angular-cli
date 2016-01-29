@@ -61,6 +61,5 @@ export function arrayFlattenTree(children: any[], arr: any[]): any[] {
     arr.push(child.res);
     arrayFlattenTree(child.children, arr);
   }
-  return arr
+  return arr;
 }
-

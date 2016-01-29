@@ -1,4 +1,4 @@
-export {getBrowserCode} from 'preboot';
+export * from 'preboot';
 
 export function prebootConfigDefault(config = {}) {
   return Object.assign({
@@ -77,7 +77,7 @@ export function getPrebootCSS(): string {
   transform: rotate(-135deg);
   background: #bbb;
 }
-`
+`;
 }
 
 

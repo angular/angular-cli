@@ -37,10 +37,10 @@ export function serializeApplication(element: any, styles: string[], cache?: any
   let serializedCmp: string = stringifyElement(element);
 
   // serialize App Data
-  let serializedData: string = isBlank(cache) ? '' : ''+
-    '<script>'+
-    'window.' + 'ngPreloadCache' +' = '+  JSON.stringify(cache, null, 2) +
-    '</script>'
+  let serializedData: string = isBlank(cache) ? '' : '' +
+    '<script>' +
+    'window.' + 'ngPreloadCache' + ' = ' +  JSON.stringify(cache, null, 2) +
+    '</script>' +
   '';
 
   return serializedStyleHosts + serializedCmp + serializedData;
@@ -80,7 +80,7 @@ export function renderToString(AppComponent: any, serverProviders?: any): Promis
 export function renderToStringWithPreboot(AppComponent: any, serverProviders?: any, prebootConfig: any = {}): Promise<string> {
   return renderToString(AppComponent, serverProviders)
     .then((html: string) => {
-      if (typeof prebootConfig === 'boolean' && prebootConfig === false) { return html }
+      if (typeof prebootConfig === 'boolean' && prebootConfig === false) { return html; }
       let config = prebootConfigDefault(prebootConfig);
       return getBrowserCode(config)
         .then(code => html + createPrebootHTML(code, config));
