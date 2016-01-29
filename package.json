@@ -32,7 +32,7 @@
     "remove-tsd-typing": "rimraf ./tsd_typings",
     "remove-local-modules": "rimraf node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-universal node_modules/angular2-express-engine",
     "tsd": "tsd reinstall && tsd link",
-    "postinstall": "npm run tsd && npm run remove-ng2-types && tsc || true && npm run webdriver-update"
+    "postinstall": "npm run tsd && npm run remove-ng2-types && npm run build && npm run webdriver-update"
   },
   "repository": {
     "type": "git",
