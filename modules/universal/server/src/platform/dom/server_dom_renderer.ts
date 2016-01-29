@@ -68,7 +68,7 @@ export class ServerDomRenderer extends DomRenderer {
 
   invokeElementMethod(renderElement: any, methodName: string, args: any[]) {
     if (methodName === 'focus') {
-      if (DOM.nodeName(element) === 'input') {
+      if (DOM.nodeName(renderElement) === 'input') {
         return super.invokeElementMethod(renderElement, 'autofocus', null);
       }
 
