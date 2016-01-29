@@ -13,29 +13,15 @@
   	"outDir": "dist"
   },
   "exclude": [
-    "browser/test",
-    "server/test",
-    "node_modules"
-  ],
-  "files": [
-    "../../tsd_typings/tsd.d.ts",
-    "../../custom_typings/_custom.d.ts",
     "universal.d.ts",
-    "server/index.ts",
-    "server/server.ts",
-    "server/src/directives/server_form.ts",
-    "server/src/http/server_http.ts",
-    "server/src/router/server_router.ts",
-    "server/src/platform/dom/server_dom_renderer.ts",
-    "server/src/helper.ts",
-    "server/src/render.ts",
-    "server/src/server_patch.ts",
-    "server/src/stringifyElement.ts",
-    "server/test/router_server_spec.ts",
-    "browser/index.ts",
-    "browser/browser.ts",
-    "browser/src/ng_preload_cache.ts",
-    "browser/src/bootstrap.ts"
+    "node_modules/angular2/typings",
+    "node_modules/angular2/manual_typings",
+    "node_modules/angular2/bundles/typings",
+    "node_modules/angular2/ts",
+    "node_modules/typescript",
+    "node_modules/reflect-metadata",
+    "browser/test",
+    "server/test"
   ],
   "formatCodeOptions": {
     "indentSize": 2,

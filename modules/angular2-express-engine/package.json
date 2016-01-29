@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "typescript": "^1.7.3",
-    "angular2-universal-preview": "file:../modules/angular2-universal-preview"
+    "angular2-universal-preview": "file:../angular2-universal-preview"
   },
   "dependencies": {
   },

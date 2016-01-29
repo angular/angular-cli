@@ -10,6 +10,18 @@
     },
     "lodash/lodash.d.ts": {
       "commit": "ab3cc82066805007cbf0db233ddb5879f42be4d2"
+    },
+    "gulp-rename/gulp-rename.d.ts": {
+      "commit": "2bbc03a4e408085a50e6315e40c8d42329e4e98e"
+    },
+    "node/node.d.ts": {
+      "commit": "2bbc03a4e408085a50e6315e40c8d42329e4e98e"
+    },
+    "vinyl-source-stream/vinyl-source-stream.d.ts": {
+      "commit": "2bbc03a4e408085a50e6315e40c8d42329e4e98e"
+    },
+    "browserify/browserify.d.ts": {
+      "commit": "2bbc03a4e408085a50e6315e40c8d42329e4e98e"
     }
   }
 }

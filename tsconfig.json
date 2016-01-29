@@ -1,5 +1,4 @@
 {
-  "version": "1.5.0",
   "compilerOptions": {
   	"target": "es5",
   	"module": "commonjs",
@@ -7,6 +6,7 @@
     "noImplicitAny": false,
     "removeComments": false,
     "noLib": false,
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
   	"sourceMap": true,
@@ -14,30 +14,33 @@
   	"outDir": "dist"
   },
   "exclude": [
+    "node_modules/angular2/typings",
+    "node_modules/angular2/manual_typings",
+    "node_modules/angular2/bundles/typings",
     "modules/angular2-express-engine/dist",
     "modules/angular2-express-engine/test",
     "modules/angular2-express-engine/node_modules",
     "modules/universal/dist",
     "modules/universal/server/test",
     "modules/universal/node_modules",
-    "preboot/dist",
-    "preboot/test",
-    "preboot/node_modules",
-    "dist",
-    "node_modules"
+    "modules/preboot/test",
+    "modules/preboot/dist",
+    "modules/preboot/node_modules",
+    "node_modules",
+    "dist"
   ],
-   "formatCodeOptions": {
-      "indentSize": 2,
-      "tabSize": 2,
-      "newLineCharacter": "\r\n",
-      "convertTabsToSpaces": true,
-      "insertSpaceAfterCommaDelimiter": true,
-      "insertSpaceAfterSemicolonInForStatements": true,
-      "insertSpaceBeforeAndAfterBinaryOperators": true,
-      "insertSpaceAfterKeywordsInControlFlowStatements": true,
-      "insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
-      "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
-      "placeOpenBraceOnNewLineForFunctions": false,
-      "placeOpenBraceOnNewLineForControlBlocks": false
-    }
+  "formatCodeOptions": {
+    "indentSize": 2,
+    "tabSize": 2,
+    "newLineCharacter": "\r\n",
+    "convertTabsToSpaces": true,
+    "insertSpaceAfterCommaDelimiter": true,
+    "insertSpaceAfterSemicolonInForStatements": true,
+    "insertSpaceBeforeAndAfterBinaryOperators": true,
+    "insertSpaceAfterKeywordsInControlFlowStatements": true,
+    "insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+    "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+    "placeOpenBraceOnNewLineForFunctions": false,
+    "placeOpenBraceOnNewLineForControlBlocks": false
+  }
 }

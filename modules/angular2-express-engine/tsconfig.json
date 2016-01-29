@@ -15,7 +15,6 @@
   "files": [
     "../../tsd_typings/tsd.d.ts",
     "../../custom_typings/_custom.d.ts",
-    "angular2-express-engine.d.ts",
     "./src/engine.ts",
     "./index.ts"
   ],

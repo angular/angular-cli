@@ -1,13 +1,14 @@
 {
   "name": "preboot",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "Record and play back browser events",
   "main": "dist/server.js",
   "browser": "dist/browser.js",
   "typings": "preboot.d.ts",
   "typescript": { "definition": "preboot.d.ts" },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc || true",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
