@@ -228,7 +228,7 @@ gulp.task('preboot.karma', [ 'build.typescript' ], function() {
 
 gulp.task('build.typescript', [ 'build.typescript.project' ]);
 
-gulp.task('build.typescript.project', function() {
+gulp.task('build.typescript.project', ['clean.dist'], function() {
 
   return TS_PROJECT.src().
     pipe($.typescript(TS_PROJECT)).
@@ -259,6 +259,17 @@ gulp.task('changelog', function() {
 gulp.task('clean', function() {
 
   return $.del(PATHS.cleanable, function (err, paths) {
+    if (paths.length <= 0) {
+      return console.log('Nothing to clean.');
+    }
+    return console.log('Deleted folders:\n', paths.join('\n'));
+  });
+
+});
+
+gulp.task('clean.dist', function() {
+
+  return $.del('dist', function (err, paths) {
     if (paths.length <= 0) {
       return console.log('Nothing to clean.');
     }
