@@ -22,12 +22,6 @@
     },
     "browserify/browserify.d.ts": {
       "commit": "2bbc03a4e408085a50e6315e40c8d42329e4e98e"
-    },
-    "zone.js/zone.js.d.ts": {
-      "commit": "5d0f2126c8dac8fce0ff020218aea06607213b0d"
-    },
-    "es6-promise/es6-promise.d.ts": {
-      "commit": "5d0f2126c8dac8fce0ff020218aea06607213b0d"
     }
   }
 }
