@@ -49,7 +49,7 @@ export class NgPreloadCacheHttp extends Http {
       preloaded = newcache.shift();
       if (isPresent(preloaded)) {
         let body = preloaded._body;
-        res = new ResponseOptions((<any>Object).assign({}, preloaded, { body }));
+        res = new ResponseOptions(Object.assign({}, preloaded, { body }));
 
         if (preloaded.headers) {
           res.headers = new Headers(preloaded);

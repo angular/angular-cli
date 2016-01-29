@@ -28,7 +28,7 @@ module.exports = function(ROOT) {
     .route('/')
     .get(function ngApp(req, res) {
       let queryParams = queryParamsToBoolean(req.query);
-      let options = (<any>Object).assign(queryParams, {
+      let options = Object.assign(queryParams, {
         // client url for systemjs
         componentUrl: 'examples/app/universal/test_page/client',
 
@@ -62,7 +62,7 @@ module.exports = function(ROOT) {
     .route('/examples/todo')
     .get(function ngTodo(req, res) {
       let queryParams = queryParamsToBoolean(req.query);
-      let options = (<any>Object).assign(queryParams , {
+      let options = Object.assign(queryParams , {
         // client url for systemjs
         componentUrl: 'examples/app/universal/todo/client',
 
@@ -88,7 +88,7 @@ module.exports = function(ROOT) {
     let url = req.originalUrl.replace(baseUrl, '') || '/';
     let queryParams = queryParamsToBoolean(req.query);
 
-    let options = (<any>Object).assign(queryParams , {
+    let options = Object.assign(queryParams , {
       // client url for systemjs
       componentUrl: 'examples/app/universal/test_router/client',
       client: false,
