@@ -21,9 +21,6 @@ module.exports = function gulpAngular2Render(config) {
 
     renderPromise.apply(null, args)
     .then(function(serializedApp) {
-
-      file.path = gutil.replaceExtension(file.path, '.html');
-
       var html = str.replace(
         // <selector></selector>
         selectorRegExpFactory(universal.selectorResolver(config.App)),
