@@ -43,14 +43,14 @@ class NodeLocation implements LocationConfig {
     return nodeUrl.format(obj);
   }
   assign(parsed: NodeLocationConfig): this {
+    this.pathname = parsed.pathname || '';
+    this.search = parsed.search || '';
     this.hash = parsed.hash;
     this.host = parsed.host;
     this.hostname = parsed.hostname;
     this.href = parsed.href;
-    this.pathname = parsed.pathname;
     this.port = parsed.port;
     this.protocol = parsed.protocol;
-    this.search = parsed.search;
     return this;
   }
   toJSON(): NodeLocationConfig {
@@ -99,13 +99,13 @@ export class ServerPlatformLocation extends PlatformLocation {
     @Inject(REQUEST_URL) requestUrl: string,
     @Optional() @Inject(APP_BASE_HREF) baseUrl?: string) {
     super();
-    this._baseHref = baseUrl;
-    this.pushState(null, null, requestUrl);
+    this._baseHref = baseUrl || '/';
+    this.pushState(null, null, this._baseHref + requestUrl);
   }
 
-  get pathname(): string { return this._loc.pathname; }
   get search(): string { return this._loc.search; }
   get hash(): string { return this._loc.hash; }
+  get pathname(): string { return this._loc.pathname; }
   set pathname(newPathname: string) { this._loc.pathname = newPathname; }
 
   getBaseHrefFromDOM(): string {
