@@ -58,10 +58,6 @@ export class ServerLocationStrategy extends LocationStrategy {
     @Optional() @Inject(BASE_URL) url?: string,
     @Optional() @Inject(APP_BASE_HREF) baseUrl?: string) {
     super();
-    if (isBlank(baseUrl)) {
-      throw new Error(
-          `No base href set. Please provide a value for the APP_BASE_HREF token or add a base element to the document.`);
-    }
     this._baseHref = baseUrl;
     this._location.assign(url || '/');
   }
