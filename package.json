@@ -31,6 +31,7 @@
     "remove-dist": "rimraf dist modules/**/dist !node_modules/**/*",
     "remove-tsd-typing": "rimraf ./tsd_typings",
     "remove-local-modules": "rimraf node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-universal node_modules/angular2-express-engine",
+    "update": "npm run remove-local-modules && npm install",
     "tsd": "tsd reinstall && tsd link",
     "postinstall": "npm run tsd && npm run remove-ng2-types && npm run build && npm run webdriver-update"
   },
