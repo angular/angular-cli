@@ -170,7 +170,7 @@ gulp.task('default', function(done) {
 
   var tasks = [
     'lint',
-    'karma'
+    'test'
   ];
 
   return $.runSequence(tasks, done);
@@ -238,7 +238,7 @@ gulp.task('build.typescript.project', ['clean.dist'], function() {
 });
 
 gulp.task('build', [
-  'build.typescript.project',
+  'build.typescript',
   'preboot.example'
 ]);
 
