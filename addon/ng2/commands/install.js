@@ -7,7 +7,7 @@ var LibInstallTask  = require('../tasks/lib-install');
 
 module.exports = Command.extend({
   name: 'install',
-  description: 'Adds 3rd party libraries to existing project',
+  description: 'Adds 3rd party library to existing project',
   works: 'insideProject',
   availableOptions: [
     { name: 'skip-injection', type: Boolean, default: false, aliases: ['s'] },
@@ -16,7 +16,7 @@ module.exports = Command.extend({
   run: function (commandOptions, rawArgs) {
     if (!rawArgs.length) {
       var msg = 'The `ng install` command must take an argument with ' +
-        'at least one package name.';
+        'a package name.';
 
       return Promise.reject(new SilentError(msg));
     }

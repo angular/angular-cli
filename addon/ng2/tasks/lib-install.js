@@ -12,7 +12,6 @@ var _           = require('lodash');
 var glob        = require('glob');
 var appRoot     = path.resolve('./src');
 var nodeModules = path.resolve('./node_modules');
-var checkDirs   = ['components', 'providers', 'directives', 'pipes'];
 
 module.exports = Task.extend({
   command: '',
@@ -46,17 +45,27 @@ module.exports = Task.extend({
           return this.announceOKCompletion();
         }
 
-        return this.installProcedure(this.autoInjection)
+        if (this.autoInjection) {
+          var pkg = this.packages[0];
+          
+          if (existsSync(path.resolve(process.cwd(), 'src', 'app.ts'))) {
+            var entryPoint = path.resolve(process.cwd(), 'src', 'app.ts');
+            var packageData = this.parseFile(pkg);
+            this.importInBootstrap(entryPoint, pkg, packageData);
+          }
+
+          return this.announceOKCompletion();
+        }
+
+        return this.installProcedure()
           .then(function(resp) {
             return this.announceOKCompletion();
           }.bind(this));
       }.bind(this));
   },
 
-  installProcedure: function(autoInjection) {
-    var allPackages         = {};
-    allPackages.toUninstall = [];
-    allPackages.toProcess   = [];
+  installProcedure: function() {
+    var allPackages = { toUninstall: [], toProcess: [] };
     var pkgSrcPath;
     var pkgDirs;
 
@@ -76,16 +85,16 @@ module.exports = Task.extend({
 
           return npm('uninstall', allPackages.toUninstall, this.npmOptions, this.npm)
             .then(function() {
-              return this.processPackages(allPackages.toProcess, autoInjection)
+              return this.processPackages(allPackages.toProcess)
                 .then(function(resp) {
-                  resolve(resp);
+                  return resolve(resp);
                 });
             }.bind(this));
         }
         else {
-          return this.processPackages(allPackages.toProcess, autoInjection)
+          return this.processPackages(allPackages.toProcess)
             .then(function(resp) {
-              resolve(resp);
+              return resolve(resp);
             });
         }
 
@@ -93,29 +102,18 @@ module.exports = Task.extend({
     }.bind(this));
   },
 
-  processPackages: function (packages, autoInjection) {
+  processPackages: function (packages) {
     if (!packages.length) {
       this.ui.writeLine(chalk.yellow('No package to process. Quitting.'));
       return Promise.resolve();
     } else {
       this.ui.writeLine(chalk.green('Package successfully installed.'));
-      this.ui.writeLine('');
-
-      if (autoInjection) {
-        if (existsSync(path.resolve(process.cwd(), 'src', 'app.ts'))) {
-          var entryPoint = path.resolve(process.cwd(), 'src', 'app.ts');
-          var packageData = this.parseFile(this.packages[0]);
-          this.importInBootstrap(entryPoint, this.packages[0], packageData);
-        }
-
-        return Promise.resolve(); 
-      }
 
       return this.ui.prompt({
         type: 'text',
         name: 'confirm',
-        message: 'Would you like to inject the installed packages into your app automatically? (N/y)',
-        default: function() { return 'N'; },
+        message: 'Inject the installed package into your app? (Y/n)',
+        default: function() { return 'Y'; },
         validate: function(value) {
           return /[YN]/i.test(value) ? true : 'Enter Y(es) or N(o)';
         }
@@ -125,79 +123,54 @@ module.exports = Task.extend({
           return Promise.resolve();
         }
         else {
-          return this.ui.prompt({
-            type: 'text',
-            name: 'entry',
-            message: 'What is the path to the file which bootstraps your app?',
-            default: function() {
-              if (existsSync(path.join(appRoot, 'app.ts'))) {
-                return path.join(appRoot, 'app.ts');
-              } else {
-                var possibleFiles = glob.sync(appRoot, '*.ts');
-                if (possibleFiles.length) {
-                  return possibleFiles[0];
-                } else {
-                  return '';
-                }
-              }
-            },
-            validate: function(val) {
-              return (existsSync(val)) ? true : 'File not exists.';
-            }
-          })
-          .then(function(boot) {
-            var entryPoint = boot.entry;
-            return packages.reduce(function(promise, packageName) {
-              return promise.then(function() {
-                return this.parsePackage(packageName, entryPoint, autoInjection);
-              }.bind(this));
-            }.bind(this), Promise.resolve());
-          }.bind(this));
+          return this.parsePackage(packages[0]);
         }
       }.bind(this));
-        
     }
   },
 
-  parsePackage: function (packageName, entryPoint, autoInjection) {
+  parsePackage: function (packageName, entryPoint) {
     return new Promise(function(resolve, reject) {
       var packageData;
 
-      if (autoInjection) {
-        packageData = this.parseFile(packageName);
-        this.importInBootstrap(entryPoint, packageName, packageData);
-        return resolve();
-      }
-
-      this.ui.writeLine('');
-
-      var msg = 'Would you like to customize the injection of ' + 
-      chalk.yellow(path.basename(packageName)) + '? (N/y)';
+      var msg = 'Customize the injection of ' + 
+      chalk.yellow(path.basename(packageName)) + '? (Y/n)';
 
       return this.ui.prompt({
         type: 'input',
         name: 'option',
         message: msg,
-        default: function () { return 'N'; },
+        default: function () { return 'Y'; },
         validate: function(value) {
           return /[YN]/i.test(value) ? true : 'Enter Y(es) or N(o)';
         }
       })
       .then(function(answer) {
         if (answer.option.toLowerCase().substring(0, 1) === 'y') {
-          packageData = this.parseFile(packageName);
-          this.importInBootstrap(entryPoint, packageName, packageData);
-
           return this.customImport(packageName)
             .then(function() {
-              return resolve();
-            });
+              packageData = this.parseFile(packageName);
+              if (packageData.Provider && packageData.Provider.length) {
+                return this.importInBootstrapPrompt(packageName, packageData)
+                  .then(function() {
+                    resolve();
+                  });
+              } else {
+                return resolve();
+              }
+            }.bind(this));
         }
         else {
           packageData = this.parseFile(packageName);
-          this.importInBootstrap(entryPoint, packageName, packageData);
-
-          return resolve();
+          if (packageData.Provider && packageData.Provider.length) {
+            return this.importInBootstrapPrompt(packageName, packageData)
+              .then(function() {
+                resolve();
+              });
+          }
+          else {
+            return resolve();
+          }
         }
       }.bind(this));
     }.bind(this));
@@ -292,9 +265,11 @@ module.exports = Task.extend({
                             possibleFiles[fileIndex]);
 
             this.ui.writeLine(chalk.green('Successfully injected.'));
-            this.ui.writeLine('');
 
-            this.customImport(packageName);
+            return this.customImport(packageName)
+              .then(function() {
+                resolve();
+              });
 
           }.bind(this));
         }.bind(this));
@@ -388,11 +363,54 @@ module.exports = Task.extend({
 
   },
 
+  importInBootstrapPrompt: function (packageName, packageData) {
+    return new Promise(function(resolve, reject) {
+      return this.ui.prompt({
+        type: 'text',
+        name: 'option',
+        message: 'Inject providers into bootstrap script? (Y/n)',
+        default: function () { return 'Y'; },
+        validate: function(value) {
+          return /[YN]/i.test(value) ? true : 'Enter Y(es) or N(o)';
+        }
+      })
+      .then(function(answer) {
+        if (answer.option.toLowerCase().substring(0, 1) === 'y') {
+          return this.ui.prompt({
+            type: 'text',
+            name: 'entry',
+            message: 'Path to the file which bootstraps your app?',
+            default: function() {
+              if (existsSync(path.join(appRoot, 'app.ts'))) {
+                return path.join(appRoot, 'app.ts');
+              } else {
+                var possibleFiles = glob.sync(appRoot, '*.ts');
+                if (possibleFiles.length) {
+                  return possibleFiles[0];
+                } else {
+                  return '';
+                }
+              }
+            },
+            validate: function(val) {
+              return (existsSync(val)) ? true : 'File not exists.';
+            }
+          })
+          .then(function(answer) {
+            var entryPoint = answer.entry;
+            this.importInBootstrap(entryPoint, packageName, packageData);
+            return resolve();
+          }.bind(this));
+        }
+        else {
+          return resolve();
+        }
+      }.bind(this));
+    }.bind(this));
+  },
+
   importInBootstrap: function(entryPoint, packageName, packageData) {
     var providers = packageData.Provider;
-    var directives = packageData.Directive;
-    var pipes = packageData.Pipe;
-    var all = [].concat(providers).concat(directives).concat(pipes);
     var contents = fs.readFileSync(entryPoint, 'utf8');
     var contentsArr = contents.split('\n');
     var lastIndex;
@@ -409,10 +427,10 @@ module.exports = Task.extend({
       return false;
     }
 
-    var imports = 'import {' + all.join(',') + '} from \'' + packageName + '\';';
+    var imports = 'import {' + providers.join(',') + '} from \'' + packageName + '\';';
 
     if (imports.length > 100) {
-      imports = 'import {\n' + all.join('  ,\n') + '}\n from \'' + packageName + '\';';
+      imports = 'import {\n' + providers.join('  ,\n') + '}\n from \'' + packageName + '\';';
     }
 
     contentsArr.forEach(function(line, index) {
@@ -456,7 +474,7 @@ module.exports = Task.extend({
     contentsArr.splice(lastIndex + 1, 0, imports);
 
     fs.writeFileSync(entryPoint, contentsArr.join('\n'), 'utf8');
-    this.ui.writeLine(chalk.green('Package imported in', entryPoint));
+    this.ui.writeLine(chalk.green('Providers imported in', entryPoint));
   },
 
   injectItem: function(type, name, file) {
@@ -464,6 +482,10 @@ module.exports = Task.extend({
     var contentsArr = contents.split('\n');
     var replace;
     var match;
+
+    if (type === 'component') {
+      type = 'directive';
+    }
 
     contentsArr.forEach(function(line, index) {
       var regExp = new RegExp(type);
@@ -491,6 +513,7 @@ module.exports = Task.extend({
     var contents = fs.readFileSync(packagePath, 'utf8');
     var data = {};
     
+    data.Component = [];
     data.Directive = [];
     data.Pipe = [];
     data.Provider = [];
@@ -498,6 +521,9 @@ module.exports = Task.extend({
 
     var contentsArr = contents.split('\n');
     contentsArr.forEach(function(line, index) {
+      if (/components:/.test(line)) {
+        data.Component = this.parseData(line);
+      }
       if (/directives:/.test(line)) {
         data.Directive = this.parseData(line);
       }
@@ -530,8 +556,6 @@ module.exports = Task.extend({
   },
 
   checkIfPackageIsAuthentic: function (pkgName) {
-    return true;
-
     if (!existsSync(path.join(nodeModules, pkgName))) {
       return false;
     }
@@ -548,7 +572,6 @@ module.exports = Task.extend({
   },
 
   announceOKCompletion: function() {
-    this.ui.writeLine('');
     this.completionOKMessage = 'Done.';
     this.ui.writeLine(chalk.green(this.completionOKMessage));
     this.done();
