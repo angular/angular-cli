@@ -33,6 +33,7 @@
     "preboot": "file:../preboot"
   },
   "dependencies": {
+    "angular2-express-engine": "*",
     "xhr2": "^0.1.3"
   },
   "peerDependencies": {
