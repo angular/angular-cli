@@ -17,7 +17,7 @@ export function serializeApplication(element: any, styles: string[], cache?: any
 export function selectorResolver(componentType: any): string;
 export function stringifyElement(el: any): string;
 export var SERVER_LOCATION_PROVIDERS: [any];
-export var BASE_URL: string;
+export var REQUEST_URL: string;
 export function buildBaseUrl(url: string, existing?: boolean): any;
 export var HTTP_PROVIDERS: [any];
 export var NODE_PROVIDERS: [any];
@@ -28,7 +28,9 @@ export function buildNodePlatformProviders(
 export var NODE_APPLICATION_COMMON_PROVIDERS: [any];
 export var NODE_APPLICATION_PROVIDERS: [any];
 export function selectorRegExpFactory(selector: string): RegExp;
+export function ng2engine(): any;
 export default {
+  ng2engine,
   provide,
   NodeXhr,
   NodeBackend,
@@ -41,7 +43,7 @@ export default {
   selectorResolver,
   stringifyElement,
   SERVER_LOCATION_PROVIDERS,
-  BASE_URL,
+  REQUEST_URL,
   buildBaseUrl,
   HTTP_PROVIDERS,
   buildNodeAppProviders,
