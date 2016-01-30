@@ -19,7 +19,13 @@ export let browserCodeCache = {};
  * options the only listen strategy is selectors, then the event_bindings and
  * attributes strategies will be stubbed out (meaing the refs will be {})
  */
-export function ignoreUnusedStrategies(b: Browserify.BrowserifyObject, bOpts: Object, strategyOpts: any[], allStrategies: Object, pathPrefix: string) {
+export function ignoreUnusedStrategies(
+  b: Browserify.BrowserifyObject,
+  bOpts: Object,
+  strategyOpts: any[],
+  allStrategies: Object,
+  pathPrefix: string) {
+
   let activeStrategies = strategyOpts
     .filter(x => x.name)
     .map(x => x.name);

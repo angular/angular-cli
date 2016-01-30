@@ -60,7 +60,7 @@ module.exports = function(ROOT) {
           var i = TODOS.length;
 
           while (i--) {
-            if (TODOS[i].id === id) break;
+            if (TODOS[i].id === id) { break; }
           }
 
           if (i > -1) {

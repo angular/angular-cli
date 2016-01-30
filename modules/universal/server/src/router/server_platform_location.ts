@@ -103,10 +103,10 @@ export class ServerPlatformLocation extends PlatformLocation {
     this.pushState(null, null, requestUrl);
   }
 
-  get pathname(): string { return this._loc.pathname }
-  get search(): string { return this._loc.search }
-  get hash(): string { return this._loc.hash }
-  set pathname(newPathname: string) { this._loc.pathname = newPathname }
+  get pathname(): string { return this._loc.pathname; }
+  get search(): string { return this._loc.search; }
+  get hash(): string { return this._loc.hash; }
+  set pathname(newPathname: string) { this._loc.pathname = newPathname; }
 
   getBaseHrefFromDOM(): string {
     throw new Error(`
@@ -130,7 +130,7 @@ export class ServerPlatformLocation extends PlatformLocation {
     this._updateLocation();
   }
 
-  onPopState(fn): void { this._popStateListeners.push(fn) }
+  onPopState(fn): void { this._popStateListeners.push(fn); }
   onHashChange(fn): void { /*TODO*/}
 
   back(): void {

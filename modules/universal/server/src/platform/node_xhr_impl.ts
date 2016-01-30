@@ -24,8 +24,8 @@ export class NodeXHRImpl extends XHR {
         res.on('end', () => {
           completer.resolve(data);
         });
-      }
-      else {
+
+      } else {
         completer.reject(`Failed to load ${templateUrl}`, null);
       }
 
