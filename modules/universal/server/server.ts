@@ -15,3 +15,4 @@ export * from './src/helper';
 export * from './src/ng_preboot';
 export * from './src/render';
 export * from './src/stringifyElement';
+export * from 'angular2-express-engine';
