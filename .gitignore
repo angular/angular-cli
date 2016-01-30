@@ -39,9 +39,6 @@ test/coverage
 /bower_components/
 /web_modules/
 
-# inline ts compile
-modules/**/*.js
-
 # Typings
 /typings
 /tsd_typings
