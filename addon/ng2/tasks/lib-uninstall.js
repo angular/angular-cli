@@ -64,12 +64,12 @@ module.exports = Task.extend({
   },
 
   uninstallProcedure: function() {
-    this.ui.writeLine(chalk.yellow('Uninstalled packages:', this.packages.join(',')));
+    this.ui.writeLine(chalk.yellow('Uninstalled package:', this.packages.join(',')));
 
     return this.ui.prompt({
       type: 'input',
       name: 'remove',
-      message: 'Do you want to automatically remove packages from you app?',
+      message: 'Do you want to automatically remove package from you app?',
       default: function() { return 'Y'; },
       validate: function(value) {
         return /[YN]/i.test(value) ? true : 'Enter Y(es) or N(o)';
@@ -127,8 +127,6 @@ module.exports = Task.extend({
   },
 
   removePackagesFromApp: function() {
-    this.ui.writeLine('');
-
     this.removedPackagesData.forEach(function(packageData) {
       var files = glob.sync(process.cwd() +  '/src/**/*.ts');
       var contents;
@@ -205,7 +203,6 @@ module.exports = Task.extend({
   },
 
   announceOKCompletion: function() {
-    this.ui.writeLine('');
     this.completionOKMessage = 'Done.';
     this.ui.writeLine(chalk.green(this.completionOKMessage));
     this.done();
