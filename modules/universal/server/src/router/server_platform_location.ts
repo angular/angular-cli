@@ -1,17 +1,75 @@
-import { Injectable, Inject, OpaqueToken } from 'angular2/core';
-import { PlatformLocation } from 'angular2/router';
-import { parse } from 'url';
+import { Injectable, Inject, Optional, OpaqueToken } from 'angular2/core';
+import { PlatformLocation, APP_BASE_HREF } from 'angular2/router';
+import * as nodeUrl from 'url';
 
 export const REQUEST_URL = new OpaqueToken('requestUrl');
 
-class Location {
-  constructor(
-    public pathname: string,
-    public search: string,
-    public hash: string
-  ) {}
+interface LocationConfig {
+  pathname?: string;
+  search?: string;
+  hash?: string;
 }
 
+interface NodeLocationConfig {
+  hash?: string;
+  host?: string;
+  hostname?: string;
+  href?: string;
+  pathname?: string;
+  port?: string;
+  protocol?: string;
+  search?: string;
+}
+
+class NodeLocation implements LocationConfig {
+  hash: string;
+  host: string;
+  hostname: string;
+  href: string;
+  pathname: string;
+  port: string;
+  protocol: string;
+  search: string;
+  get origin(): string {
+    return this.protocol + '//' + this.hostname + ':' + this.port;
+  }
+  constructor(config: NodeLocationConfig & LocationConfig) {
+    this.assign(config);
+  }
+  parse(url: string) {
+    return nodeUrl.parse(url);
+  }
+  format(obj: NodeLocationConfig): string {
+    return nodeUrl.format(obj);
+  }
+  assign(parsed: NodeLocationConfig): this {
+    this.hash = parsed.hash;
+    this.host = parsed.host;
+    this.hostname = parsed.hostname;
+    this.href = parsed.href;
+    this.pathname = parsed.pathname;
+    this.port = parsed.port;
+    this.protocol = parsed.protocol;
+    this.search = parsed.search;
+    return this;
+  }
+  toJSON(): NodeLocationConfig {
+    let config: NodeLocationConfig = {
+      hash: this.hash,
+      host: this.host,
+      hostname: this.hostname,
+      href: this.href,
+      pathname: this.pathname,
+      port: this.port,
+      protocol: this.protocol,
+      search: this.search
+    };
+    return config;
+  }
+
+}
+
+// TODO(gdi2290): toJSON
 class State {
   constructor(
     public state: any,
@@ -20,9 +78,10 @@ class State {
   ) {}
 }
 
+// TODO(gdi2290): toJSON
 class PopStateEvent {
   public type = 'popstate';
-  
+
   constructor(
     public state: any
   ) {}
@@ -30,83 +89,128 @@ class PopStateEvent {
 
 @Injectable()
 export class ServerPlatformLocation extends PlatformLocation {
-  private _loc: Location;
+  private _loc: LocationConfig;
   private _stack: Array<State> = [];
   private _stackIndex = -1;
   private _popStateListeners: Array<Function> = [];
-  
-  constructor(@Inject(REQUEST_URL) requestUrl: string) {
+  private _baseHref: string = '/';
+
+  constructor(
+    @Inject(REQUEST_URL) requestUrl: string,
+    @Optional() @Inject(APP_BASE_HREF) baseUrl?: string) {
     super();
+    this._baseHref = baseUrl;
     this.pushState(null, null, requestUrl);
   }
-  
+
   get pathname(): string { return this._loc.pathname }
   get search(): string { return this._loc.search }
   get hash(): string { return this._loc.hash }
   set pathname(newPathname: string) { this._loc.pathname = newPathname }
-  
-  public getBaseHrefFromDOM(): string {
+
+  getBaseHrefFromDOM(): string {
     throw new Error(`
-      Attempt to get base href from DOM on the server. 
+      Attempt to get base href from DOM on the server.
       You have to provide a value for the APP_BASE_HREF token through DI.
     `);
   }
-  
-  public pushState(state: any, title: string, url: string): void {
+
+  getBaseHref(): string { return this._baseHref; }
+
+  path(): string { return this._loc.pathname; }
+
+  pushState(state: any, title: string, url: string): void {
     this._stack.push(new State(state, title, url));
     this._stackIndex++;
     this._updateLocation();
   }
-  
-  public replaceState(state: any, title: string, url: string): void {
+
+  replaceState(state: any, title: string, url: string): void {
     this._stack[this._stackIndex] = new State(state, title, url);
     this._updateLocation();
   }
 
-  public onPopState(fn): void { this._popStateListeners.push(fn) }
-  public onHashChange(fn): void {}
+  onPopState(fn): void { this._popStateListeners.push(fn) }
+  onHashChange(fn): void { /*TODO*/}
 
-  public back(): void {
+  back(): void {
     if (this._stackIndex === 0) {
       return;
     }
-    
+
     this._stackIndex--;
     this._updateLocation();
     this._callPopStateListeners();
   }
-  
-  public forward(): void {
+
+  forward(): void {
     if (this._stackIndex === this._stack.length - 1) {
       return;
     }
-    
+
     this._stackIndex++;
     this._updateLocation();
     this._callPopStateListeners();
   }
-    
+
+  prepareExternalUrl(internal: string): string {
+    return joinWithSlash(this._baseHref, internal);
+  }
+
+  toJSON() {
+    return {
+      location: this._loc,
+      stack: this._stack,
+      stackIndex: this._stackIndex,
+      popStateListeners: this._popStateListeners,
+      baseHref: this._baseHref
+    };
+  }
+
   private _updateLocation(): void {
     const state: State = this._stack[this._stackIndex];
     const url: string = state.url;
-    
+
     this._setLocationByUrl(url);
   }
-    
+
   private _setLocationByUrl(url: string): void {
-    const { pathname, search, hash } = parse(url);
-    
-    this._loc = new Location(pathname || '', search || '', hash || '');
+    const nodeLocation: NodeLocationConfig = nodeUrl.parse(url);
+    this._loc = new NodeLocation(nodeLocation);
   }
-  
+
   private _callPopStateListeners() {
     const state = this._stack[this._stackIndex].state;
     const event = new PopStateEvent(state);
-    
+
     // Actually listeners should be called asynchronously,
     // But right now I don't know what is better for a server side.
-    this._popStateListeners.forEach(listener => listener(event));  
+    this._popStateListeners.forEach(listener => listener(event));
   }
 
   _init() {}
+}
+
+
+export function joinWithSlash(start: string, end: string): string {
+  if (start.length === 0) {
+    return end;
+  }
+  if (end.length === 0) {
+    return start;
+  }
+  var slashes = 0;
+  if (start.endsWith('/')) {
+    slashes++;
+  }
+  if (end.startsWith('/')) {
+    slashes++;
+  }
+  if (slashes === 2) {
+    return start + end.substring(1);
+  }
+  if (slashes === 1) {
+    return start + end;
+  }
+  return start + '/' + end;
 }
