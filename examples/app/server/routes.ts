@@ -122,9 +122,9 @@ module.exports = function(ROOT) {
       App: routerApp.App,
       providers: [
         // HTTP_PROVIDERS,
-        ROUTER_PROVIDERS,
         provide(APP_BASE_HREF, {useValue: baseUrl}),
         provide(REQUEST_URL, {useValue: url}),
+        ROUTER_PROVIDERS,
         SERVER_LOCATION_PROVIDERS,
       ],
       data: {},
