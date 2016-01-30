@@ -18,7 +18,7 @@ module.exports = function(ROOT) {
   var {
     HTTP_PROVIDERS,
     SERVER_LOCATION_PROVIDERS,
-    BASE_URL,
+    REQUEST_URL,
     PRIME_CACHE,
     queryParamsToBoolean
   } = require('angular2-universal-preview');
@@ -95,7 +95,7 @@ module.exports = function(ROOT) {
         providers: [
           // HTTP_PROVIDERS,
           // SERVER_LOCATION_PROVIDERS,
-          // provide(BASE_URL, {useExisting: req.originalUrl}),
+          // provide(REQUEST_URL, {useExisting: req.originalUrl}),
           // provide(PRIME_CACHE, {useExisting: true})
         ],
         data: {},
@@ -116,14 +116,15 @@ module.exports = function(ROOT) {
     let options = Object.assign(queryParams , {
       // client url for systemjs
       componentUrl: 'examples/app/universal/test_router/browser',
+      // ensure that we test only server routes
       client: false,
 
       App: routerApp.App,
       providers: [
         // HTTP_PROVIDERS,
         ROUTER_PROVIDERS,
-        provide(BASE_URL, {useValue: url}),
         provide(APP_BASE_HREF, {useValue: baseUrl}),
+        provide(REQUEST_URL, {useValue: url}),
         SERVER_LOCATION_PROVIDERS,
       ],
       data: {},
