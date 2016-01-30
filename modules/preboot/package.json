@@ -5,7 +5,6 @@
   "main": "dist/server.js",
   "browser": "dist/browser.js",
   "typings": "preboot.d.ts",
-  "typescript": { "definition": "preboot.d.ts" },
   "scripts": {
     "build": "tsc || true",
     "prepublish": "npm run build"

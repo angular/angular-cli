@@ -72,6 +72,9 @@ export function getBrowserCodeStream(opts?: PrebootOptions): NodeJS.ReadableStre
   return opts.uglify ? outputStream.pipe(uglify()) : outputStream;
 }
 
+// TODO: remove
+export var getClientCodeStream = getBrowserCodeStream;
+
 /**
  * Generate browser code as a string for preboot
  * based on the input options
@@ -110,3 +113,6 @@ export function getBrowserCode(opts?: PrebootOptions, done?: Function): any {
 
   return deferred.promise;
 }
+
+
+export var getClientCode = getBrowserCode;
