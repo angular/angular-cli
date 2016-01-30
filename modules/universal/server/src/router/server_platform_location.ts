@@ -100,7 +100,7 @@ export class ServerPlatformLocation extends PlatformLocation {
     @Optional() @Inject(APP_BASE_HREF) baseUrl?: string) {
     super();
     this._baseHref = baseUrl || '/';
-    this.pushState(null, null, this._baseHref + requestUrl);
+    this.pushState(null, null, joinWithSlash(this._baseHref, requestUrl));
   }
 
   get search(): string { return this._loc.search; }
