@@ -23,7 +23,7 @@ module.exports = function gulpAngular2Render(config) {
     .then(function(serializedApp) {
       var html = str.replace(
         // <selector></selector>
-        selectorRegExpFactory(universal.selectorResolver(config.App)),
+        universal.selectorRegExpFactory(universal.selectorResolver(config.App)),
         // <selector>{{ serializedCmp }}</selector>
         serializedApp
       );
