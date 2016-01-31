@@ -5,7 +5,6 @@ import {
   ddescribe,
   expect,
   inject,
-  injectAsync,
   TestComponentBuilder,
   beforeEachProviders
 } from 'angular2/testing';
@@ -18,8 +17,8 @@ describe('<%= classifiedModuleName %> Component', () => {
   beforeEachProviders(() => []);
 
 
-  it('should ...', injectAsync([TestComponentBuilder], (tcb:TestComponentBuilder) => {
-    return tcb.createAsync(<%= classifiedModuleName %>).then((fixture) => {
+  it('should ...', inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
+    tcb.createAsync(<%= classifiedModuleName %>).then((fixture) => {
       fixture.detectChanges();
     });
   }));

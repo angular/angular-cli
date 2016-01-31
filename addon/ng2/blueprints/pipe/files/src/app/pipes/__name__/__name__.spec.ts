@@ -5,7 +5,6 @@ import {
   ddescribe,
   expect,
   inject,
-  injectAsync,
   TestComponentBuilder,
   beforeEachProviders
 } from 'angular2/testing';
