@@ -1,0 +1,59 @@
+{
+  "name": "angular2-grunt-prerender",
+  "main": "tasks/index.js",
+  "version": "0.0.1",
+  "description": "Prerender your Universal (isomorphic) Angular 2 app",
+  "homepage": "https://github.com/angular/universal",
+  "license": "MIT",
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>"
+  ],
+  "scripts": {
+    "remove-ng2-types": "rimraf node_modules/angular2/typings node_modules/angular2/bundles/typings node_modules/angular2/manual_typings",
+    "build": "tsc || true",
+    "postpublish": "npm run remove-ng2-types"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
+  "keywords": [
+    "gruntplugin"
+  ],
+  "devDependencies": {
+    "angular2": "2.0.0-beta.2",
+    "angular2-universal-preview": "file:../universal",
+    "css": "^2.2.1",
+    "es6-shim": "^0.33.3",
+    "parse5": "^1.5.0",
+    "preboot": "^1.1.0",
+    "reflect-metadata": "0.1.2",
+    "rimraf": "^2.5.1",
+    "rxjs": "5.0.0-beta.0",
+    "xhr2": "^0.1.3",
+    "zone.js": "0.5.10"
+  },
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "gutil": "^1.6.4",
+    "through2": "^2.0.0"
+  },
+  "peerDependencies": {
+    "angular2": "2.0.0-beta.2",
+    "angular2-universal-preview": "*",
+    "css": "^2.2.1",
+    "es6-shim": "^0.33.3",
+    "parse5": "^1.5.0",
+    "preboot": "^1.1.0",
+    "reflect-metadata": "0.1.2",
+    "rxjs": "~5.0.0-beta.0",
+    "xhr2": "^0.1.3",
+    "zone.js": "0.5.10"
+
+  }
+}
