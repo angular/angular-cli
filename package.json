@@ -45,7 +45,8 @@
     "resolve": "^1.0.0",
     "silent-error": "^1.0.0",
     "symlink-or-copy": "^1.0.1",
-    "typescript": "~1.7.3"
+    "typescript": "~1.7.3",
+    "typings": "^0.6.2"
   },
   "ember-addon": {
     "paths": [
@@ -62,7 +63,6 @@
     "rewire": "^2.3.4",
     "shelljs": "^0.5.3",
     "through": "^2.3.8",
-    "typings": "^0.6.2",
     "walk-sync": "^0.2.6"
   }
 }
