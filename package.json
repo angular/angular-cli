@@ -42,6 +42,9 @@
   "bugs": {
     "url": "https://github.com/angular/universal/issues"
   },
+  "engines": {
+    "node": ">= 5.4.1 < 6"
+  },
   "devDependencies": {
     "brfs": "^1.4.0",
     "browser-sync": "^2.8.2",
