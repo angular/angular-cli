@@ -45,7 +45,7 @@ class NodeLocation implements LocationConfig {
   assign(parsed: NodeLocationConfig): this {
     this.pathname = parsed.pathname || '';
     this.search = parsed.search || '';
-    this.hash = parsed.hash;
+    this.hash = parsed.hash || '';
     this.host = parsed.host;
     this.hostname = parsed.hostname;
     this.href = parsed.href;
