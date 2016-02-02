@@ -1,6 +1,7 @@
 /**
  * This module coordinates all preboot events on the client side
  */
+import {PrebootEvent} from '../interfaces/event';
 import {PrebootRef} from '../interfaces/preboot_ref';
 import {PrebootOptions} from '../interfaces/preboot_options';
 import {ListenStrategy} from '../interfaces/strategy';
@@ -68,13 +69,13 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
       preboot.activeNode = caretPositionEvents.indexOf(eventName) >= 0 ? event.target : null;
     }
 
-    // if event occurred that affects caret position in a node that we care about, record it   
+    // if event occurred that affects caret position in a node that we care about, record it
     if (caretPositionEvents.indexOf(eventName) >= 0 &&
       caretPositionNodes.indexOf(node.tagName) >= 0) {
 
       preboot.selection = preboot.dom.getSelection(node);
     }
-    
+
     // todo: need another solution for this hack
     if (eventName === 'keyup' && event.which === 13 && node.attributes['(keyup.enter)']) {
       preboot.dom.dispatchGlobalEvent('PrebootFreeze');
@@ -82,12 +83,24 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
 
     // we will record events for later replay unless explicitly marked as doNotReplay
     if (!strategy.doNotReplay) {
-      state.events.push({
+      let eventObj: PrebootEvent = {
         node: node,
         event: event,
         name: eventName,
         time: preboot.time || (new Date()).getTime()
-      });
+      };
+      // TODO(gdi2290): better way to grab serverRoot without buffer
+      if (preboot &&
+          preboot.dom &&
+          preboot.dom.getNodeKey &&
+          preboot.dom.state &&
+          preboot.dom.state.serverRoot) {
+
+        eventObj.nodeKey = preboot.dom.getNodeKey(node, preboot.dom.state.serverRoot);
+
+      }
+
+      state.events.push(eventObj);
     }
   };
 }

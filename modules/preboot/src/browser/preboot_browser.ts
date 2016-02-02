@@ -1,5 +1,5 @@
 /**
- * This is the main entry point for preboot on the browser. 
+ * This is the main entry point for preboot on the browser.
  * The primary methods are:
  *    init() - called automatically to initialize preboot according to options
  *    start() - when preboot should start listening to events
@@ -33,7 +33,7 @@ let state = {
 };
 
 /**
- * Once bootstrap has compled, we replay events, 
+ * Once bootstrap has compled, we replay events,
  * switch buffer and then cleanup
  */
 export function complete() {
@@ -62,8 +62,12 @@ function load() {
   // re-initialize dom now that we have the body
   dom.init({ window: window });
 
+  // grab the root element
+  var root = dom.getDocumentNode(opts.appRoot);
+
   // make sure the app root is set
-  dom.updateRoots(dom.getDocumentNode(opts.appRoot));
+  dom.updateRoots(root);
+  // dom.updateRoots(root, root, root);
 
   // if we are buffering, need to switch around the divs
   if (opts.buffer) { bufferManager.prep(preboot); }

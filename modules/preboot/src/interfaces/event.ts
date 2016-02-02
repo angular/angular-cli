@@ -7,6 +7,7 @@ export interface NodeEvent {
 // our wrapper around DOM events in preboot
 export interface PrebootEvent {
   node: any;
+  nodeKey?: any;
   event: any;
   name: string;
   time?: number;

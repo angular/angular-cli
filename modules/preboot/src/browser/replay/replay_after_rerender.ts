@@ -6,7 +6,7 @@ import {PrebootEvent} from '../../interfaces/event';
  * This replay strategy assumes that the browser completely re-rendered
  * the page so reboot will need to find the element in the new browser
  * rendered DOM that matches the element it has in memory.
- * 
+ *
  * Any events that could not be replayed for whatever reason are returned.
  */
 export function replayEvents(preboot: PrebootRef, strategy: ReplayStrategy, events: PrebootEvent[]): PrebootEvent[] {
@@ -18,6 +18,10 @@ export function replayEvents(preboot: PrebootRef, strategy: ReplayStrategy, even
     let event = eventData.event;
     let serverNode = eventData.node;
     let clientNode = preboot.dom.findClientNode(serverNode);
+    // TODO(gdi2290): better way query root without buffer
+    if (!clientNode) {
+      clientNode = preboot.dom.findClientNode(serverNode, eventData.nodeKey);
+    }
 
     // if client node found, need to explicitly set value and then dispatch event
     if (clientNode) {

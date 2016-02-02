@@ -125,7 +125,7 @@ export function addNodeToBody(type: string, className: string, styles: Object): 
  */
 export function removeNode(node: Element) {
   if (!node) { return; }
-  
+
   node.remove ?
     node.remove() :
     node.style.display = 'none';
@@ -141,18 +141,18 @@ export function getSelection(node: Element): CursorSelection {
     end: 0,
     direction: 'forward'
   };
-  
+
   // if browser support selectionStart on node (Chrome, FireFox, IE9+)
   if (node && (node.selectionStart || node.selectionStart === 0)) {
     selection.start = node.selectionStart;
     selection.end = node.selectionEnd;
     selection.direction = node.selectionDirection;
 
-  // else if nothing else for older unsupported browsers, just put caret at the end of the text      
+  // else if nothing else for older unsupported browsers, just put caret at the end of the text
   } else if (node && node.value) {
     selection.start = selection.end = node.value.length;
   }
-  
+
   return selection;
 }
 
@@ -161,7 +161,7 @@ export function getSelection(node: Element): CursorSelection {
  */
 export function setSelection(node: Element, selection: CursorSelection) {
 
-  // as long as node exists, set focus  
+  // as long as node exists, set focus
   if (node) {
     node.focus();
   }
@@ -212,13 +212,13 @@ export function getNodeKey(node: Element, rootNode: Element): string {
  * Given a node from the server rendered view, find the equivalent
  * node in the client rendered view.
  */
-export function findClientNode(serverNode: Element): Element {
+export function findClientNode(serverNode: Element, nodeKey?: any): Element {
 
   // if nothing passed in, then no client node
   if (!serverNode) { return null; }
 
   // we use the string of the node to compare to the client node & as key in cache
-  let serverNodeKey = getNodeKey(serverNode, state.serverRoot);
+  let serverNodeKey = nodeKey || getNodeKey(serverNode, state.serverRoot);
 
   // first check to see if we already mapped this node
   let nodes = nodeCache[serverNodeKey] || [];

@@ -23,6 +23,7 @@ interface Dom {
   updateRoots?(appRoot: Element, serverRoot?: Element, clientRoot?: Element);
   getDocumentNode?(selector: string): Element;
   getAppNode?(selector: string): Element;
+  getNodeKey?(node: Element, rootNode: Element): string;
   getAllAppNodes?(selector: string): Element[];
   getClientNodes?(selector: string): Element[];
   onLoad?(handler: Function);
@@ -32,7 +33,7 @@ interface Dom {
   appContains?(node: Element): Boolean;
   addNodeToBody?(type: string, className: string, styles: Object);
   removeNode?(node: Element);
-  findClientNode?(serverNode: Element): Element;
+  findClientNode?(serverNode: Element, nodeKey?: any): Element;
   getSelection?(node: Element): CursorSelection;
   setSelection?(node: Element, selection: CursorSelection);
 }
