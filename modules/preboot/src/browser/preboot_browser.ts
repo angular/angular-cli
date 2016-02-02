@@ -66,8 +66,7 @@ function load() {
   var root = dom.getDocumentNode(opts.appRoot);
 
   // make sure the app root is set
-  dom.updateRoots(root);
-  // dom.updateRoots(root, root, root);
+  dom.updateRoots(root, root, root);
 
   // if we are buffering, need to switch around the divs
   if (opts.buffer) { bufferManager.prep(preboot); }
