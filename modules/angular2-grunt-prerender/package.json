@@ -1,7 +1,7 @@
 {
   "name": "angular2-grunt-prerender",
   "main": "tasks/index.js",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Prerender your Universal (isomorphic) Angular 2 app",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -39,9 +39,6 @@
     "zone.js": "0.5.10"
   },
   "dependencies": {
-    "gulp": "^3.9.0",
-    "gutil": "^1.6.4",
-    "through2": "^2.0.0"
   },
   "peerDependencies": {
     "angular2": "2.0.0-beta.2",
