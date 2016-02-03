@@ -33,7 +33,6 @@ import {
 import {COMMON_DIRECTIVES, COMMON_PIPES, FORM_PROVIDERS} from 'angular2/common';
 
 // Platform
-import {ELEMENT_PROBE_BINDINGS, ELEMENT_PROBE_PROVIDERS} from 'angular2/platform/common_dom';
 import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 // Platform.Dom

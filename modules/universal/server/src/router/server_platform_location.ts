@@ -157,7 +157,7 @@ export class ServerPlatformLocation extends PlatformLocation {
     return joinWithSlash(this._baseHref, internal);
   }
 
-  toJSON() {
+  toJSON(): any {
     return {
       location: this._loc,
       stack: this._stack,
