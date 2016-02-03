@@ -59,15 +59,27 @@ describe('event_manager', function () {
     });
     
     it('should track focus', function () {
-      let preboot = { dom: {}, activeNode: null };
+      let preboot = { 
+        dom: { 
+          state: {}, 
+          getNodeKey: function() {
+            return null;
+          }
+        }, 
+        activeNode: null
+      };
       let strategy = { trackFocus: true };
       let node = {};
       let eventName = 'focusin';
-      let event = { type: 'focusin', target: { name: 'foo' }};
+      let event = { type: 'focusin', target: { name: 'foo' } };
+      var expected = {
+        node: { name: 'foo' },
+        nodeKey: null  
+      };  
       
       eventManager.state.listening = true;
       eventManager.getEventHandler(preboot, strategy, node, eventName)(event);
-      expect(preboot.activeNode).toEqual(event.target);
+      expect(preboot.activeNode).toEqual(expected);
     });
     
     it('should add to events', function () {

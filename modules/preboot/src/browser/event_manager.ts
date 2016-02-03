@@ -66,7 +66,16 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
 
     // when tracking focus keep a ref to the last active node
     if (strategy.trackFocus) {
-      preboot.activeNode = caretPositionEvents.indexOf(eventName) >= 0 ? event.target : null;
+      
+      // if no caret, then no active node; else set the node and node key  
+      if (caretPositionEvents.indexOf(eventName) < 0) {
+        preboot.activeNode = null;
+      } else {
+        preboot.activeNode = {
+          node: event.target,
+          nodeKey: preboot.dom.getNodeKey(event.target, preboot.dom.state.serverRoot)  
+        }
+      }
     }
 
     // if event occurred that affects caret position in a node that we care about, record it
@@ -167,7 +176,7 @@ export function cleanup(preboot: PrebootRef, opts: PrebootOptions) {
 
   // if there is an active node set, it means focus was tracked in one or more of the listen strategies
   if (activeNode) {
-    let activeClientNode = preboot.dom.findClientNode(activeNode);
+    let activeClientNode = preboot.dom.findClientNode(activeNode.node, activeNode.nodeKey);
     if (activeClientNode) {
       preboot.dom.setSelection(activeClientNode, preboot.selection);
     } else {
