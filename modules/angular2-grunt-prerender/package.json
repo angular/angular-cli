@@ -1,7 +1,7 @@
 {
   "name": "angular2-grunt-prerender",
   "main": "tasks/index.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Prerender your Universal (isomorphic) Angular 2 app",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
