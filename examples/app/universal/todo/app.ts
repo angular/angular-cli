@@ -109,7 +109,7 @@ export class TodoApp {
   constructor(public todoStore: Store, public factory: TodoFactory) {
   }
 
-  onInit() {
+  ngOnInit() {
     this.addTodo('Universal JavaScript');
     this.addTodo('Run Angular 2 in Web Workers');
     this.addTodo('Upgrade the web');

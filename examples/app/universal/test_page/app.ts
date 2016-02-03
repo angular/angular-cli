@@ -110,10 +110,10 @@ export class App {
 
   }
 
-  onInit() {
-    // this.addItem();
-    // this.addItem();
-    // this.addItem();
+  ngOnInit() {
+    this.addItem();
+    this.addItem();
+    this.addItem();
 
     // this.todosObs1$.subscribe(
     //   // onValue
