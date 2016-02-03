@@ -1,5 +1,4 @@
 var universal = require('angular2-universal-preview');
-var gulp = require('gulp');
 var through = require('through2');
 var gutil = require('gutil');
 

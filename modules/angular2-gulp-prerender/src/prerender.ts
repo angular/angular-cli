@@ -1,5 +1,4 @@
 import universal = require('angular2-universal-preview');
-import gulp = require('gulp');
 import through = require('through2');
 import gutil = require('gutil');
 
@@ -14,7 +13,7 @@ export interface IUniversalConfig {
 export class GulpAngular2Render {
 
   constructor(config: IUniversalConfig) {
-    
+
     return through.obj((file: any, enc: string, cb: Function) => {
 
       if (file.isStream()) {
