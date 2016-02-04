@@ -20,6 +20,20 @@ If you wish to collaborate while the project is still young, check out [our issu
 
 The generated project has dependencies that require **Node 4 or greater**.
 
+## Table of Contents
+
+* [Installation](#installation)
+* [Usage](#usage)
+* [Generating a New Project](#generating-and-serving-an-angular2-project-via-a-development-server)
+* [Generating Components, Directives, Pipes and Services](#generating-other-scaffolds)
+* [Generating a Route](#generating-a-route)
+* [Creating a Build](#creating-a-build)
+* [Installing a 3rd Party Library](#installing-a-3rd-party-library)
+* [Running Unit Tests](#running-unit-tests)
+* [Running End-to-End Tests](#running-end-to-end-tests)
+* [Deploying the App via GitHub Pages](#deploying-the-app-via-gitHub-pages)
+* [Known Issues](#known-issues)
+
 ## Installation
 
 ```bash
@@ -111,6 +125,14 @@ ng build
 ```
 
 The build artifacts will be stored in the `dist/` directory.
+
+### Installing a 3rd party library
+
+```bash
+ng install ng2-cli-test-lib
+```
+
+[You can read more about this here.](https://github.com/angular/angular-cli/blob/master/docs/ng-install.md)
 
 
 ### Running unit tests
