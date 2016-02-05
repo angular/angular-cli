@@ -1,11 +1,13 @@
 import {Component, OnInit} from 'angular2/core';
+import {CORE_DIRECTIVES} from 'angular2/common';
 import {<%= classifiedModuleName %>, <%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.service';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
 @Component({
   templateUrl: 'app/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>-list.component.html',
   styleUrls: ['app/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>-list.component.css'],
-  directives: [ROUTER_DIRECTIVES]
+  directives: [ROUTER_DIRECTIVES],
+  providers: [CORE_DIRECTIVES]
 })
 export class <%= classifiedModuleName %>ListComponent implements OnInit {
   <%= camelizedModuleName %>s: <%= classifiedModuleName %>[];

@@ -1,11 +1,13 @@
 import {Component, OnInit} from 'angular2/core';
+import {CORE_DIRECTIVES} from 'angular2/common';
 import {<%= classifiedModuleName %>, <%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.service';
 import {RouteParams, Router} from 'angular2/router';
 import {CanDeactivate, ComponentInstruction} from 'angular2/router';
 
 @Component({
   templateUrl: 'app/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>-detail.component.html',
-  styleUrls: ['app/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>-detail.component.css']
+  styleUrls: ['app/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>-detail.component.css'],
+  providers: [CORE_DIRECTIVES]
 })
 export class <%= classifiedModuleName %>DetailComponent implements OnInit, CanDeactivate {
 
