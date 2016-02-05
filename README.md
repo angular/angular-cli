@@ -31,7 +31,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Installing a 3rd Party Library](#installing-a-3rd-party-library)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
-* [Deploying the App via GitHub Pages](#deploying-the-app-via-gitHub-pages)
+* [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Known Issues](#known-issues)
 
 ## Installation

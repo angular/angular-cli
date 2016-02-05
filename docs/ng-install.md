@@ -9,12 +9,11 @@
 
 Prerequisites: **You will first want to make sure the library adheres to the Publisher Guide**
 
-How do I find this out?
+How do I find that out?
 
-1. Find the root file in the 3rd party library repo you are interested in
-2. Take a look at the root file (should be the same name as the repo itself in most cases)
-3. If you see `export default { ...some angular2 metadata... }` at the bottom, then the chances are high it's compatible
-4. If you don't see it, [click here](#suggest-a-repo-adhere-to-the-publisher-guide) to copy/paste a feature request to post on the library repo
+1. Look inside the root file of the 3rd party library repo (should be the same name as the repo itself in most cases)
+2. If you see `export default { ...some angular2 metadata... }` at the bottom, then the chances are high it's compatible
+3. If you don't see it, [click here](#suggest-a-repo-adhere-to-the-publisher-guide) to copy/paste a feature request to post on the library repo
 
 ### Ok I'm ready, let's do this!
 
@@ -63,14 +62,13 @@ Providers imported in ~/project/src/app.ts
 Done.
 ```
 
-You library is now successfully installed and injected into your project.
+Your library is now successfully installed and injected into your project.
 
 In this example we chose to inject a `Directive`.
 Specifically we chose `TestDirective` to be injected into `~/project/src/app/project.ts`.
 Upon quitting, we were given the opportunity to inject providers into our bootstrap script. We chose `Y(es)` and specified `~/project/src/app.ts`. Providers were then injected into our bootstrap script.
 
-However, if we don't want that the library to auto-inject anything, we can just answer `N(o)` to the first question.
-
+However, if you don't want to auto-inject anything, you can just answer `N(o)` to the first question.
 Example:
 
 ````shell
@@ -145,6 +143,12 @@ builder
 ````
 
 Just include this script in the root of your app named like `bundler-script.js` and run it before publishing your library to `npm`.
+Example of a `prepublish` script in `package.json`:
+```
+"scripts": {
+  "prepublish": "tsc && tsc -d && node bundler-script.js"
+}
+```
 
 Note that when TypeScript version 1.8 is out of `beta`, this script will no longer be needed and this documentation will be updated.
 
@@ -174,7 +178,7 @@ export * from './src/app/test.styles';
 
 // This is the magic.
 // Provides a standard way to export your library to allow angular-cli to help developers setup your library
-// Please note: keys are optional. Your library can provide any metadata is provides.
+// Please note: keys are optional. Your library should provide any metadata you want to be consumable.
 export default {
   directives: [TestDirective],
   pipes: [TestPipe],
