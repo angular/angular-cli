@@ -23,11 +23,12 @@ import {NgZone, DirectiveResolver, ComponentRef, Provider, Type} from 'angular2/
 import {Http} from 'angular2/http';
 import {Router} from 'angular2/router';
 
-function addPrebootHtml(html, prebootConfig: any = {}) {
+function addPrebootHtml(AppComponent, html, prebootConfig: any = {}) {
   if (typeof prebootConfig === 'boolean' && prebootConfig === false) {
     return html;
   }
 
+  prebootConfig.appRoot = prebootConfig.appRoot || selectorResolver(AppComponent);
   let config = prebootConfigDefault(prebootConfig);
   return getBrowserCode(config).then(code => html + createPrebootHTML(code, config));
 }
@@ -121,5 +122,5 @@ export function renderToString(AppComponent: any, serverProviders?: any): Promis
 
 
 export function renderToStringWithPreboot(AppComponent: any, serverProviders?: any, prebootConfig: any = {}): Promise<string> {
-  return renderToString(AppComponent, serverProviders).then(html => addPrebootHtml(html, prebootConfig));
+  return renderToString(AppComponent, serverProviders).then(html => addPrebootHtml(AppComponent, html, prebootConfig));
 }
