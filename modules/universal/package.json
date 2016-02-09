@@ -6,7 +6,7 @@
   "typescript": {
     "definition": "universal.d.ts"
   },
-  "version": "0.50.0",
+  "version": "0.51.0",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
