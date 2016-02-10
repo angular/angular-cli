@@ -2,6 +2,12 @@
   "name": "angular2-universal-preview",
   "main": "dist/server/index.js",
   "browser": "dist/browser/index.js",
+  "files": [
+    "src",
+    "browser",
+    "server",
+    "dist"
+  ],
   "typings": "universal.d.ts",
   "typescript": {
     "definition": "universal.d.ts"
