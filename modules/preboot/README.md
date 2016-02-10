@@ -19,13 +19,13 @@ changes coming soon.
 This is a server-side library that generates client-side code.
 To use this library, you would first install it through npm:
 
-```
+```sh
 npm install preboot
 ```
 
 Then in your server-side code you would do something like this:
 
-```
+```es6
 var preboot = require('preboot');
 var prebootOptions = {};  // see options section below
 var browserCode = preboot(prebootOptions);
@@ -38,7 +38,7 @@ it does not work because the callback does not get executed quickly enough).
 For now, try putting the following
 `preboot.start()` call immediately after your web app root in your server side template:
 
-```
+```html
 <web-app-root-here>
 
 </web-app-root-here>
@@ -50,7 +50,7 @@ For now, try putting the following
 Finally, once your client-side web app is "alive" it has to tell preboot that it is OK
 to replay events.
 
-```
+```es6
 preboot.done();
 ```
 
@@ -120,7 +120,7 @@ option to true preboot will do it for you.
 
 If you want to play with this library you can clone it locally:
 
-```
+```sh
 git clone git@github.com:jeffwhelpley/preboot.git
 cd preboot
 gulp build
