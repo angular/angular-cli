@@ -43,7 +43,7 @@ test/coverage
 /typings
 /tsd_typings
 
-/modules/universal/client/typings
+/modules/universal/browser/typings
 /modules/universal/server/typings
 /modules/**/dist
 /modules/**/node_modules
