@@ -59,7 +59,7 @@ var PATHS = {
     karmaEntryPoint: root('/dist/modules/preboot/test/preboot_karma'),
     karmaDest: root('/dist/karma'),
     karmaCode: root('/dist/karma/preboot_karma.js'),
-    clientRoot: root('/dist/modules/preboot/src/client')
+    browserRoot: root('/dist/modules/preboot/src/browser')
   },
 
   changelog: {
@@ -213,7 +213,7 @@ gulp.task('preboot.karma', [ 'build.typescript' ], function() {
 
   var b = $.browserify({
     entries: [ PATHS.preboot.karmaEntryPoint ],
-    basedir: PATHS.preboot.clientRoot,
+    basedir: PATHS.preboot.browserRoot,
     browserField: false
   });
 
