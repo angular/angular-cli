@@ -16,8 +16,8 @@ module.exports = function(ROOT) {
   var {ROUTER_PROVIDERS, APP_BASE_HREF} = require('angular2/router');
 
   var {
-    HTTP_PROVIDERS,
-    SERVER_LOCATION_PROVIDERS,
+    NODE_HTTP_PROVIDERS,
+    NODE_LOCATION_PROVIDERS,
     REQUEST_URL,
     PRIME_CACHE,
     queryParamsToBoolean
@@ -34,8 +34,8 @@ module.exports = function(ROOT) {
 
         App: appPage.App,
         providers: [
-          // HTTP_PROVIDERS,
-          // SERVER_LOCATION_PROVIDERS,
+          // NODE_HTTP_PROVIDERS,
+          // NODE_LOCATION_PROVIDERS,
           // provide(BASE_URL, {useExisting: req.originalUrl}),
           // provide(PRIME_CACHE, {useExisting: true})
         ],
@@ -68,8 +68,8 @@ module.exports = function(ROOT) {
 
         App: todoApp.TodoApp,
         providers: [
-          // HTTP_PROVIDERS,
-          // SERVER_LOCATION_PROVIDERS,
+          // NODE_HTTP_PROVIDERS,
+          // NODE_LOCATION_PROVIDERS,
           // provide(BASE_URL, {useExisting: req.originalUrl}),
           // provide(PRIME_CACHE, {useExisting: true})
         ],
@@ -93,8 +93,8 @@ module.exports = function(ROOT) {
 
         App: todoApp.TodoApp,
         providers: [
-          // HTTP_PROVIDERS,
-          // SERVER_LOCATION_PROVIDERS,
+          // NODE_HTTP_PROVIDERS,
+          // NODE_LOCATION_PROVIDERS,
           // provide(REQUEST_URL, {useExisting: req.originalUrl}),
           // provide(PRIME_CACHE, {useExisting: true})
         ],
@@ -121,11 +121,11 @@ module.exports = function(ROOT) {
 
       App: routerApp.App,
       providers: [
-        // HTTP_PROVIDERS,
+        // NODE_HTTP_PROVIDERS,
         provide(APP_BASE_HREF, {useValue: baseUrl}),
         provide(REQUEST_URL, {useValue: url}),
         ROUTER_PROVIDERS,
-        SERVER_LOCATION_PROVIDERS,
+        NODE_LOCATION_PROVIDERS,
       ],
       data: {},
 
