@@ -23,7 +23,7 @@ import {ViewEncapsulation} from 'angular2/src/core/metadata';
 import {cssHyphenate} from '../../helper';
 
 @Injectable()
-export class ServerDomRootRenderer_ extends DomRootRenderer {
+export class NodeDomRootRenderer_ extends DomRootRenderer {
   constructor(@Inject(DOCUMENT) _document: any, _eventManager: EventManager,
               sharedStylesHost: DomSharedStylesHost, animate: AnimationBuilder) {
     super(_document, _eventManager, sharedStylesHost, animate);
@@ -32,15 +32,17 @@ export class ServerDomRootRenderer_ extends DomRootRenderer {
     // TODO(gdi2290): see PR https://github.com/angular/angular/pull/6584
     var renderer = (<any>this)._registeredComponents.get(componentProto.id);
     if (isBlank(renderer)) {
-      renderer = new ServerDomRenderer(this, componentProto);
+      renderer = new NodeDomRenderer(this, componentProto);
       (<any>this)._registeredComponents.set(componentProto.id, renderer);
     }
     return renderer;
   }
 }
 
+export const ServerDomRootRenderer_ = NodeDomRootRenderer_;
 
-export class ServerDomRenderer extends DomRenderer {
+
+export class NodeDomRenderer extends DomRenderer {
   constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType) {
 
     if (_componentProto.encapsulation === ViewEncapsulation.Native) {
@@ -77,3 +79,6 @@ export class ServerDomRenderer extends DomRenderer {
   }
 
 }
+
+
+export const ServerDomRenderer = NodeDomRenderer;

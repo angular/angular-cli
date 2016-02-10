@@ -88,7 +88,7 @@ class PopStateEvent {
 }
 
 @Injectable()
-export class ServerPlatformLocation extends PlatformLocation {
+export class NodePlatformLocation extends PlatformLocation {
   private _loc: LocationConfig;
   private _stack: Array<State> = [];
   private _stackIndex = -1;
@@ -190,6 +190,8 @@ export class ServerPlatformLocation extends PlatformLocation {
 
   _init() {}
 }
+
+export const ServerPlatformLocation = NodePlatformLocation;
 
 
 export function joinWithSlash(start: string, end: string): string {

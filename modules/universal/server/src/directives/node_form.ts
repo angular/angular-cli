@@ -18,7 +18,7 @@ export const APP_LOCATION: OpaqueToken = CONST_EXPR(new OpaqueToken('appLocation
     'method': 'POST'
   }
 })
-export class ServerForm {
+export class NodeForm {
   constructor(
     element: ElementRef,
     renderer: Renderer,
@@ -32,7 +32,9 @@ export class ServerForm {
     appLocation = isPresent(appLocation) ? appLocation : url;
 
 
-    renderer.setElementAttribute(element, 'action', appLocation);
+    renderer.setElementAttribute(element.nativeElement, 'action', appLocation);
   }
 }
 
+
+export const ServerForm = NodeForm;

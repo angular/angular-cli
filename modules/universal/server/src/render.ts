@@ -6,7 +6,7 @@ import {
   selectorRegExpFactory,
   arrayFlattenTree
 } from './helper';
-import {stringifyElement} from './stringifyElement';
+import {stringifyElement} from './stringify_element';
 
 import {
   prebootConfigDefault,
@@ -23,7 +23,7 @@ import {NgZone, DirectiveResolver, ComponentRef, Provider, Type} from 'angular2/
 import {Http} from 'angular2/http';
 import {Router} from 'angular2/router';
 
-function addPrebootHtml(AppComponent, html, prebootConfig: any = {}) {
+export function addPrebootHtml(AppComponent, html, prebootConfig: any = {}): any {
   if (typeof prebootConfig === 'boolean' && prebootConfig === false) {
     return html;
   }
@@ -44,11 +44,11 @@ function waitRouter(appRef: ComponentRef): Promise<ComponentRef> {
 export function renderDocument(
   documentHtml: string,
   componentType: Type,
-  serverProviders?: any
+  nodeProviders?: any
 ): Promise<string> {
 
   return bootstrap(componentType, [
-    ...serverProviders,
+    ...nodeProviders,
     new Provider(DOCUMENT, { useValue: parseDocument(documentHtml) })
   ])
   .then(waitRouter)
@@ -63,11 +63,11 @@ export function renderDocument(
 export function renderDocumentWithPreboot(
   documentHtml: string,
   componentType: Type,
-  serverProviders?: any,
+  nodeProviders?: any,
   prebootConfig: any = {}
 ): Promise<string> {
 
-  return renderDocument(documentHtml, componentType, serverProviders)
+  return renderDocument(documentHtml, componentType, nodeProviders)
     .then(html => addPrebootHtml(html, prebootConfig));
 }
 
@@ -110,8 +110,8 @@ export function appRefSyncRender(appRef: any): string {
   return serializedApp;
 }
 
-export function renderToString(AppComponent: any, serverProviders?: any): Promise<string> {
-  return bootstrap(AppComponent, serverProviders)
+export function renderToString(AppComponent: any, nodeProviders?: any): Promise<string> {
+  return bootstrap(AppComponent, nodeProviders)
     .then(waitRouter)
     .then((appRef: ComponentRef) => {
       let html = appRefSyncRender(appRef);
@@ -121,6 +121,6 @@ export function renderToString(AppComponent: any, serverProviders?: any): Promis
 }
 
 
-export function renderToStringWithPreboot(AppComponent: any, serverProviders?: any, prebootConfig: any = {}): Promise<string> {
-  return renderToString(AppComponent, serverProviders).then(html => addPrebootHtml(AppComponent, html, prebootConfig));
+export function renderToStringWithPreboot(AppComponent: any, nodeProviders?: any, prebootConfig: any = {}): Promise<string> {
+  return renderToString(AppComponent, nodeProviders).then(html => addPrebootHtml(AppComponent, html, prebootConfig));
 }

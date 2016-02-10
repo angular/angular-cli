@@ -1,5 +1,3 @@
-import '../server_patch';
-
 import {
   provide,
   OpaqueToken,
@@ -242,7 +240,7 @@ export class NgPreloadCacheHttp extends Http {
 }
 
 
-export var HTTP_PROVIDERS: Array<any> = [
+export var NODE_HTTP_PROVIDERS: Array<any> = [
   provide(BASE_URL, {useValue: ''}),
   provide(PRIME_CACHE, {useValue: false}),
   provide(RequestOptions, {useClass: BaseRequestOptions}),
@@ -253,3 +251,5 @@ export var HTTP_PROVIDERS: Array<any> = [
 
   provide(Http, {useClass: NgPreloadCacheHttp})
 ];
+
+export const HTTP_PROVIDERS = NODE_HTTP_PROVIDERS;

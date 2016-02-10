@@ -46,7 +46,7 @@ import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {DomRootRenderer} from 'angular2/src/platform/dom/dom_renderer';
 import {RootRenderer} from 'angular2/src/core/render/api';
 
-import {ServerDomRootRenderer_} from './dom/server_dom_renderer';
+import {NodeDomRootRenderer_} from './dom/node_dom_renderer';
 import {NodeXHRImpl} from './node_xhr_impl';
 
 export function initNodeAdapter() {
@@ -83,7 +83,7 @@ export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: DomEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: KeyEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: HammerGesturesPlugin, multi: true}),
-  new Provider(DomRootRenderer, {useClass: ServerDomRootRenderer_}),
+  new Provider(DomRootRenderer, {useClass: NodeDomRootRenderer_}),
   new Provider(RootRenderer, {useExisting: DomRootRenderer}),
   new Provider(SharedStylesHost, {useExisting: DomSharedStylesHost}),
   DomSharedStylesHost,
