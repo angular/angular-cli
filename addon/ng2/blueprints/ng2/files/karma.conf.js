@@ -30,7 +30,7 @@ module.exports = function(config) {
       {pattern: 'dist/**/*.js.map', included: false, watched: false}
     ],
     proxies: {
-      // required for component assests fetched by Angular's compiler
+      // required for component assets fetched by Angular's compiler
       "/app/": "/base/dist/app/"
     },
     exclude: [],
