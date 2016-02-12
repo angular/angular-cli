@@ -1,7 +1,7 @@
 import { format, parse } from 'url';
 import { describe, it, expect, beforeEach } from 'angular2/testing';
 import { PlatformLocation } from 'angular2/router';
-import { ServerPlatformLocation } from '../../src/router/server_platform_location';
+import { NodePlatformLocation } from '../../src/router/node_platform_location';
 
 function normalizeProperties({ pathname, search, hash }) {
   pathname = pathname || '';
@@ -14,7 +14,7 @@ function normalizeProperties({ pathname, search, hash }) {
   return { pathname, search, hash };
 }
 
-function expectProperties(spl: ServerPlatformLocation, props) {
+function expectProperties(spl: NodePlatformLocation, props) {
   if (typeof props === 'string') {
     props = parse(props);
   }
@@ -26,15 +26,15 @@ function expectProperties(spl: ServerPlatformLocation, props) {
   expect(spl.hash).toBe(props.hash);
 }
 
-function back(spl: ServerPlatformLocation, steps) {
+function back(spl: NodePlatformLocation, steps) {
   while (steps--) { spl.back(); }
 }
 
-function forward(spl: ServerPlatformLocation, steps) {
+function forward(spl: NodePlatformLocation, steps) {
   while (steps--) { spl.forward(); }
 }
 
-describe('ServerPlatformLocation', () => {
+describe('NodePlatformLocation', () => {
 
   describe('initialization', () => {
     it('should initialize "pathname", "search" and "hash" properties through "requestUrl" parameter', () => {
@@ -45,7 +45,7 @@ describe('ServerPlatformLocation', () => {
       ];
 
       for (const urlParts of urls) {
-        const spl = new ServerPlatformLocation(format(urlParts));
+        const spl = new NodePlatformLocation(format(urlParts));
         expectProperties(spl, urlParts);
       }
     });
@@ -53,7 +53,7 @@ describe('ServerPlatformLocation', () => {
     it('should set new "pathname"', () => {
       const firstPathname = '/some/pathname';
       const secondPathname = '/another/pathname';
-      const spl = new ServerPlatformLocation(format({ pathname: firstPathname }));
+      const spl = new NodePlatformLocation(format({ pathname: firstPathname }));
 
       expect(spl.pathname).toBe(firstPathname);
       spl.pathname = secondPathname;
@@ -61,13 +61,13 @@ describe('ServerPlatformLocation', () => {
     });
 
     it('should throw on trying to get base href from DOM', () => {
-      const spl = new ServerPlatformLocation('/');
+      const spl = new NodePlatformLocation('/');
       expect(() => spl.getBaseHrefFromDOM()).toThrowError();
     });
   });
 
   describe('history stack', () => {
-    let spl: ServerPlatformLocation;
+    let spl: NodePlatformLocation;
 
     const requestUrl = format({
       pathname: '/some/path',
@@ -82,7 +82,7 @@ describe('ServerPlatformLocation', () => {
     ];
 
     beforeEach(() => {
-      spl = new ServerPlatformLocation(requestUrl);
+      spl = new NodePlatformLocation(requestUrl);
     });
 
     describe('pushState()', () => {
