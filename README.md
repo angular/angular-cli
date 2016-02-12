@@ -176,13 +176,21 @@ ng github-pages:deploy
 
 Checkout [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages) docs for more info.
 
-### Linting code
+### Linting and formatting code
 
-You can lint your app code by running `ng lint`.
-This will use the `lint` npm script that in generated projects uses `tslint`.
+You can lint or format your app code by running `ng lint` or `ng format` respectively.
+This will use the `lint`/`format` npm script that in generated projects uses `tslint`/`clang-format`.
 
-You can modify the `lint` script in `package.json` to run whatever linting tool
-you prefer and `ng lint` will still run it.
+You can modify the these scripts in `package.json` to run whatever tool you prefer.
+
+
+### Formatting code
+
+You can format your app code by running `ng format`.
+This will use the `format` npm script that in generated projects uses `clang-format`.
+
+You can modify the `format` script in `package.json` to run whatever formatting tool
+you prefer and `ng format` will still run it.
 
 
 ## Known issues
