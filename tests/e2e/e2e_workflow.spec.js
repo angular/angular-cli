@@ -18,11 +18,10 @@ describe('Basic end-to-end Workflow', function () {
   it('Installs angular-cli correctly', function() {
     this.timeout(300000);
 
+    sh.exec('npm link', { silent: true });
     return tmp.setup('./tmp')
       .then(function () {
         process.chdir('./tmp');
-
-        sh.exec('npm i angular-cli -g -C ' + process.cwd(), { silent: true });
         expect(fs.existsSync(path.join(process.cwd(), 'bin', 'ng')));
       });
   });
@@ -41,9 +40,10 @@ describe('Basic end-to-end Workflow', function () {
 
   it('Can change current working directory to `test-project`', function() {
     process.chdir(path.join(root, 'test-project'));
+    sh.exec('npm link ../../angular-cli', { silent: true });
     expect(path.basename(process.cwd())).to.equal('test-project');
   });
-
+  
   it('Can run `ng build` in created project', function() {
     this.timeout(10000);
 
