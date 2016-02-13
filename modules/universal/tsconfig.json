@@ -14,10 +14,6 @@
   },
   "exclude": [
     "universal.d.ts",
-    "node_modules/angular2/typings",
-    "node_modules/angular2/manual_typings",
-    "node_modules/angular2/bundles/typings",
-    "node_modules/angular2/ts",
     "node_modules/typescript",
     "node_modules/reflect-metadata",
     "browser/test",
