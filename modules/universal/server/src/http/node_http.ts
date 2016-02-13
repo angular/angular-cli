@@ -184,7 +184,7 @@ export class NgPreloadCacheHttp extends Http {
             headers[name] = value;
           });
 
-          let res = Object.assign({}, response, { headers });
+          let res = (<any>Object).assign({}, response, { headers });
 
           if (isPresent(currentNode)) {
             currentNode.res = res;

@@ -1,7 +1,7 @@
 export * from 'preboot';
 
 export function prebootConfigDefault(config = {}) {
-  return Object.assign({
+  return (<any>Object).assign({
     start:    true,
     appRoot:  'app',         // selector for root element
     replay:   'rerender',    // rerender replay strategy

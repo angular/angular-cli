@@ -202,10 +202,10 @@ export function joinWithSlash(start: string, end: string): string {
     return start;
   }
   var slashes = 0;
-  if (start.endsWith('/')) {
+  if ((<any>start).endsWith('/')) {
     slashes++;
   }
-  if (end.startsWith('/')) {
+  if ((<any>end).startsWith('/')) {
     slashes++;
   }
   if (slashes === 2) {
