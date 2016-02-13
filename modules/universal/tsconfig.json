@@ -13,7 +13,6 @@
   	"outDir": "dist"
   },
   "exclude": [
-    "universal.d.ts",
     "node_modules/typescript",
     "node_modules/reflect-metadata",
     "browser/test",

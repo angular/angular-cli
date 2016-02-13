@@ -39,13 +39,13 @@ export function serializeDocument(document: Object): string;
 export function addPrebootHtml(AppComponent: any, html: any, prebootConfig?: any): any;
 export function renderDocument(
   documentHtml: string,
-  componentType: Type,
+  componentType: Function | any,
   nodeProviders?: any): Promise<string>;
 export function renderDocumentWithPreboot(
   documentHtml: string,
-  componentType: Type,
+  componentType: Function | any,
   nodeProviders?: any,
-  prebootConfig: any = {}
+  prebootConfig?: any
 ): Promise<string>;
 export default {
   renderDocumentWithPreboot,
