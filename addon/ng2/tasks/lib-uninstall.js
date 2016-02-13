@@ -3,7 +3,7 @@
 
 var Promise     = require('ember-cli/lib/ext/promise');
 var Task        = require('ember-cli/lib/models/task');
-var npm         = require('ember-cli/lib/utilities/npm');
+var shellPromise = require ('../utilities/shell-promise');
 var existsSync  = require('exists-sync');
 var chalk       = require('chalk');
 var path        = require('path');
@@ -19,34 +19,27 @@ module.exports = Task.extend({
   completionOKMessage: '',
   completionErrorMessage: 'Error uninstalling packages. Did you misspelt it?',
 
-  init: function() {
-    this.npm = this.npm || require('npm');
-  },
   run: function(options) {
     this.packages = options.packages || [];
     this.autoRemove = options.autoRemove || false;
     this.disableLogger();
 
-    this.ui.startProgress(chalk.green('Uninstalling 3rd party package:', 
+    this.ui.startProgress(chalk.green('Uninstalling 3rd party package:',
       this.packages.join(', ')), chalk.green('.'));
-
-    this.npmOptions = {
-      logLevel: 'error',
-      logstream: this.ui.outputStream,
-      color: 'always',
-      optional: true,
-      'save-dev': true,
-      'save-exact': !!options['save-exact']
-    };
 
     this.getPackagesDataBeforeRemoved(this.packages);
 
-    return npm('uninstall', this.packages, this.npmOptions, this.npm)
+    this.npmOptions = ' --loglevel error --color always --optional --save-dev ' +
+                      '--save-exact ' + !!options['save-exact'];
+
+    var npmCommand = 'npm uninstall ' + this.packages.join(' ') + this.npmOptions;
+
+    return shellPromise(npmCommand)
       .then(function(npmresp) {
         if (!npmresp.length) {
           this.completionErrorMessage = 'No packages uninstalled.';
           return this.announceErrorCompletion();
-        } 
+        }
         else {
           if (this.autoRemove) {
             this.removePackagesFromApp();
@@ -60,7 +53,6 @@ module.exports = Task.extend({
           }
         }
       }.bind(this));
-
   },
 
   uninstallProcedure: function() {
@@ -86,14 +78,14 @@ module.exports = Task.extend({
 
   parseFile: function (packageName) {
     var packagePath = path.resolve(process.cwd(), 'node_modules', packageName, packageName + '.ts');
-    
+
     if (!existsSync(packagePath)) {
       return false;
     }
 
     var contents = fs.readFileSync(packagePath, 'utf8');
     var data = {};
-    
+
     data.Directive = [];
     data.Pipe = [];
     data.Provider = [];
@@ -170,7 +162,7 @@ module.exports = Task.extend({
   cleanAfterRemoval: function(contents) {
     var bootstrap = false;
 
-    contents = contents.filter(function(line) { 
+    contents = contents.filter(function(line) {
       if (/bootstrap\(/.test(line)) {
         bootstrap = true;
       }

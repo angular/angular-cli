@@ -43,6 +43,7 @@
     "node-notifier": "^4.4.0",
     "resolve": "^1.0.0",
     "silent-error": "^1.0.0",
+    "shelljs": "^0.5.3",
     "symlink-or-copy": "^1.0.1",
     "typescript": "~1.7.3",
     "typings": "^0.6.2"
@@ -60,7 +61,6 @@
     "minimatch": "^2.0.10",
     "mocha": "^2.2.5",
     "rewire": "^2.3.4",
-    "shelljs": "^0.5.3",
     "through": "^2.3.8",
     "walk-sync": "^0.2.6"
   }
