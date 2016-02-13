@@ -9,7 +9,7 @@ import {
   TestComponentBuilder,
   beforeEachProviders
 } from 'angular2/testing';
-import {bind} from 'angular2/core';
+import {provide} from 'angular2/core';
 import {<%= classifiedModuleName %>DetailComponent} from './<%= dasherizedModuleName %>-detail.component';
 import {Router, RouteParams} from 'angular2/router';
 import {<%= classifiedModuleName %>, <%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.service';
@@ -29,9 +29,9 @@ class MockRouteParams {
 describe('<%= classifiedModuleName %>DetailComponent', () => {
 
   beforeEachProviders(() => [
-    bind(<%= classifiedModuleName %>Service).toValue(new Mock<%= classifiedModuleName %>Service()),
-    bind(Router).toValue(new MockRouter()),
-    bind(RouteParams).toValue(new MockRouteParams()),
+    provide(<%= classifiedModuleName %>Service, {useClass: Mock<%= classifiedModuleName %>Service}),
+    provide(Router, {useClass: MockRouter}),
+    provide(RouteParams, {useClass: MockRouteParams}),
   ]);
 
   it('should ...', injectAsync([TestComponentBuilder], (tcb:TestComponentBuilder) => {
