@@ -46,12 +46,15 @@ describe('Basic end-to-end Workflow', function () {
 
   it('Can run `ng build` in created project', function() {
     this.timeout(10000);
+    sh.exec('npm link');
 
     return ng([
       'build',
       '--silent'
     ]).then(function() {
       expect(fs.existsSync(path.join(process.cwd(), 'dist')));
+    }).catch(function() {
+      fail();
     });
   });
 
