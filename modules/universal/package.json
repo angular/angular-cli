@@ -6,13 +6,14 @@
     "src",
     "browser",
     "server",
+    "universal.d.ts",
     "dist"
   ],
   "typings": "universal.d.ts",
   "typescript": {
     "definition": "universal.d.ts"
   },
-  "version": "0.55.0",
+  "version": "0.55.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
