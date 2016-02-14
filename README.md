@@ -36,6 +36,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 
 ## Installation
 
+**BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
 npm install -g angular-cli
 ```
@@ -210,6 +211,7 @@ This project is currently a prototype so there are many known issues. Just to me
 - [Protractor](https://angular.github.io/protractor/) integration is missing.
 - The initial installation as well as `ng new` take too long because of lots of npm dependencies.
 - Many existing ember addons are not compatible with Angular apps built via angular-cli.
+- When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
 
 
 ## Development Hints for hacking on angular-cli
