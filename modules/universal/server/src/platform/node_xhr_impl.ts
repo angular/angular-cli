@@ -9,7 +9,7 @@ export class NodeXHRImpl extends XHR {
     let completer: PromiseCompleter<string> = PromiseWrapper.completer(),
       parsedUrl = url.parse(templateUrl);
 
-    http.get(templateUrl, (res) => {
+    http.get(parsedUrl, (res) => {
       res.setEncoding('utf8');
 
       // normalize IE9 bug (http://bugs.jquery.com/ticket/1450)
