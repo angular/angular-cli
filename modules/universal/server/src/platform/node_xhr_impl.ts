@@ -6,14 +6,13 @@ import {Promise, PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/pro
 
 export class NodeXHRImpl extends XHR {
   get(templateUrl: string): Promise<string> {
-    let completer: PromiseCompleter<string> = PromiseWrapper.completer(),
-      parsedUrl = url.parse(templateUrl);
+    const completer: PromiseCompleter<string> = PromiseWrapper.completer();
+    const parsedUrl = url.parse(templateUrl);
 
     http.get(parsedUrl, (res) => {
       res.setEncoding('utf8');
 
-      // normalize IE9 bug (http://bugs.jquery.com/ticket/1450)
-      var status = res.statusCode === 1223 ? 204 : res.statusCode;
+      const status = res.statusCode;
 
       if (200 <= status && status <= 300) {
         let data = '';
