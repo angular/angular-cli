@@ -36,6 +36,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 
 ## Installation
 
+**BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
 npm install -g angular-cli
 ```
