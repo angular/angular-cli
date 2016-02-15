@@ -18,3 +18,4 @@ export * from './src/ng_preboot';
 export * from './src/render';
 export * from './src/stringify_element';
 export * from 'angular2-express-engine';
+export * from 'angular2-hapi-engine';

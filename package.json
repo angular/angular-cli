@@ -93,9 +93,9 @@
   "dependencies": {
     "angular2": "2.0.0-beta.6",
     "angular2-express-engine": "file:modules/angular2-express-engine",
+    "angular2-hapi-engine": "file:modules/angular2-hapi-engine",
     "angular2-universal": "file:modules/universal",
     "angular2-universal-preview": "file:modules/universal",
-    "preboot": "file:modules/preboot",
     "browserify": "^11.0.0",
     "css": "^2.2.1",
     "es6-shim": "^0.33.8",
@@ -104,9 +104,11 @@
     "gulp-insert": "^0.5.0",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.2.0",
+    "hapi": "13.0.0",
     "lodash": "^3.10.1",
     "nocycle": "^1.1.1",
     "parse5": "^1.5.0",
+    "preboot": "file:modules/preboot",
     "q": "^1.4.1",
     "reflect-metadata": "0.1.2",
     "require-dir": "^0.3.0",
@@ -115,6 +117,7 @@
     "systemjs": "^0.19.16",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
+    "vision": "4.0.1",
     "xhr2": "^0.1.3",
     "zone.js": "0.5.14"
   }

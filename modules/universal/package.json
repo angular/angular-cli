@@ -35,12 +35,14 @@
     "url": "https://github.com/angular/universal/issues"
   },
   "devDependencies": {
-    "typescript": "^1.7.3",
     "angular2-express-engine": "file:../angular2-express-engine",
-    "preboot": "file:../preboot"
+    "angular2-hapi-engine": "file:../angular2-hapi-engine",
+    "preboot": "file:../preboot",
+    "typescript": "^1.7.3"
   },
   "dependencies": {
     "angular2-express-engine": "*",
+    "angular2-hapi-engine": "*",
     "xhr2": "^0.1.3"
   },
   "peerDependencies": {
@@ -48,6 +50,7 @@
     "reflect-metadata": "0.1.2",
     "preboot": "~1.1.0",
     "angular2-express-engine": "*",
+    "angular2-hapi-engine": "*",
     "rxjs": "~5.0.0-beta.0",
     "angular2": "2.0.0-beta.1 - 2.0.0-beta.6",
     "es6-shim": "^0.33.3",
