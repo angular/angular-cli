@@ -29,7 +29,6 @@
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.15",
     "karma-chrome-launcher": "^0.2.1",
-    "karma-firefox-launcher": "^0.1.7",
     "karma-jasmine": "^0.3.6",
     "protractor": "^3.0.0",
     "typescript": "^1.7.3",

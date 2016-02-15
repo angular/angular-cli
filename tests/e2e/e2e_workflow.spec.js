@@ -20,10 +20,10 @@ describe('Basic end-to-end Workflow', function () {
       '--single-run'
     ];
 
-  // In travis CI only run tests in Firefox
+  // In travis CI only run tests in Chrome_travis_ci
   if (process.env.TRAVIS) {
     testArgs.push('--browsers');
-    testArgs.push('Firefox');
+    testArgs.push('Chrome_travis_ci');
   }
 
   it('Installs angular-cli correctly', function() {
