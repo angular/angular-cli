@@ -17,9 +17,9 @@ Help us keep Angular open and inclusive. Please read and follow our [Code of Con
 
 ## <a name="question"></a> Got a Question or Problem?
 
-If you have questions about how to *use* Angular Universal, please direct them to [Gitter][gitter]. 
-There is also a slack ground that we would be hapy to invite you to. Just ping @jeffwhelpley
-or @gdi2290 on [Gitter][gitter].
+If you have questions about how to *use* Angular 2 Universal, please direct them to [Gitter][gitter]. 
+There is also a [Slack](https://angular-universal.slack.com) ground that we would be hapy to invite you to. Just ping [@jeffwhelpley](https://twitter.com/jeffwhelpley)
+or [@gdi2290](https://twitter.com/gdi2290) on [Twitter](https://twitter.com) or [Gitter][gitter].
 
 ## <a name="issue"></a> Found an Issue?
 If you find a bug in the source code or a mistake in the documentation, you can help us by
@@ -49,7 +49,7 @@ features, by not reporting duplicate issues.  Providing the following informatio
 chances of your issue being dealt with quickly:
 
 * **Overview of the Issue** - if an error is being thrown a non-minified stack trace helps
-* **Angular Universal Version** - what version of Angular is affected (e.g. 2.0.0-alpha.53)
+* **Angular Universal Version** - what version of Angular is affected (e.g. 2.0.0-beta.6)
 * **Motivation for or Use Case** - explain what are you trying to do and why the current behavior is a bug for you
 * **Browsers and Operating System** - is this a problem with all browsers?
 * **Reproduce the Error** - provide a live example (using [Plunker][plunker],
