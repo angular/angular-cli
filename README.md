@@ -55,6 +55,11 @@ ng serve
 ```
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
+You can configure the default HTTP port and the one used by the LiveReload server with two command-line options : 
+
+```bash
+ng serve --port 4201 --live-reload-port 49153
+```
 
 ### Generating other scaffolds
 
