@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start": "ng server",
-    "postinstall": "typings install --ambient"
+    "postinstall": "typings install --ambient",
+    "lint": "tslint src/**/*.ts"
   },
   "private": true,
   "dependencies": {
@@ -31,6 +32,7 @@
     "karma-chrome-launcher": "^0.2.1",
     "karma-jasmine": "^0.3.6",
     "protractor": "^3.0.0",
+    "tslint": "^3.3.0",
     "typescript": "^1.7.3",
     "typings": "^0.6.6"
   }

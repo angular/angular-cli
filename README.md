@@ -55,7 +55,7 @@ ng serve
 ```
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-You can configure the default HTTP port and the one used by the LiveReload server with two command-line options : 
+You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
 
 ```bash
 ng serve --port 4201 --live-reload-port 49153
@@ -175,6 +175,14 @@ ng github-pages:deploy
 ```
 
 Checkout [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages) docs for more info.
+
+### Linting code
+
+You can lint your app code by running `ng lint`.
+This will use the `lint` npm script that in generated projects uses `tslint`.
+
+You can modify the `lint` script in `package.json` to run whatever linting tool
+you prefer and `ng lint` will still run it.
 
 
 ## Known issues

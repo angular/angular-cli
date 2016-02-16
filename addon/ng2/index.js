@@ -9,7 +9,8 @@ module.exports = {
       'init'      : require('./commands/init'),
       'install'   : require('./commands/install'),
       'uninstall' : require('./commands/uninstall'),
-      'test'      : require('./commands/test')
+      'test'      : require('./commands/test'),
+      'lint'      : require('./commands/lint')
     };
   }
 };
