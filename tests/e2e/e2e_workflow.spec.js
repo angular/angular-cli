@@ -38,7 +38,7 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Can create new project using `ng new test-project`', function() {
-    this.timeout(300000);
+    this.timeout(420000);
 
     return ng([
       'new',
@@ -50,14 +50,14 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Can change current working directory to `test-project`', function() {
-    this.timeout(300000);
+    this.timeout(420000);
     process.chdir(path.join(root, 'test-project'));
     sh.exec('npm link angular-cli', {silent: true});
     expect(path.basename(process.cwd())).to.equal('test-project');
   });
 
   it('Can run `ng build` in created project', function() {
-    this.timeout(10000);
+    this.timeout(420000);
 
     return ng([
       'build',
@@ -68,7 +68,7 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Perform `ng test` after initial build', function() {
-    this.timeout(300000);
+    this.timeout(420000);
 
     return ng(testArgs)
     .then(function(result) {
@@ -92,7 +92,7 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Perform `ng test` after adding a component', function() {
-    this.timeout(300000);
+    this.timeout(420000);
 
     return ng(testArgs)
     .then(function(result) {
@@ -114,7 +114,7 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Perform `ng test` after adding a service', function() {
-    this.timeout(300000);
+    this.timeout(420000);
 
     return ng(testArgs)
     .then(function(result) {
@@ -136,7 +136,7 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Perform `ng test` after adding a pipe', function() {
-    this.timeout(300000);
+    this.timeout(420000);
 
     return ng(testArgs)
     .then(function(result) {
@@ -167,7 +167,7 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Perform `ng test` after adding a route', function() {
-    this.timeout(300000);
+    this.timeout(420000);
 
     return ng(testArgs)
     .then(function(result) {
