@@ -15,13 +15,13 @@ import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
 
 @Component({
   selector: 'test-component',
-  template: `<div <%= dasherizedModuleName %></div>`
+  template: `<div <%= dasherizedModuleName %>></div>`
 })
 class TestComponent {}
 
 describe('<%= classifiedModuleName %> Directive', () => {
 
-  beforeEachProviders(() => []);
+  beforeEachProviders((): any[] => []);
 
 
   it('should ...', injectAsync([TestComponentBuilder], (tcb:TestComponentBuilder) => {

@@ -6,7 +6,7 @@ import {Pipe, PipeTransform} from 'angular2/core';
 })
 export class <%= classifiedModuleName %> implements PipeTransform {
 
-  transform(value, args?) {
+  transform(value: any, args?: any): any {
     return null;
   }
 

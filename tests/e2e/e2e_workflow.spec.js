@@ -63,7 +63,7 @@ describe('Basic end-to-end Workflow', function () {
       'build',
       '--silent'
     ]).then(function() {
-      expect(fs.existsSync(path.join(process.cwd(), 'dist')));
+      expect(fs.existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
     });
   });
 
@@ -174,8 +174,37 @@ describe('Basic end-to-end Workflow', function () {
       expect(result.exitCode).to.be.equal(0);
 
       // Clean `tmp` folder
-      process.chdir(path.resolve(root, '..'));
-      sh.rm('-rf', './tmp'); // tmp.teardown takes too long
+      // process.chdir(path.resolve(root, '..'));
+      // sh.rm('-rf', './tmp'); // tmp.teardown takes too long
+    });
+  });
+  
+  it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
+    this.timeout(420000);
+    
+    var configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
+    fs.readFile(configFilePath, 'utf8', function(err, data){
+      
+      var config = JSON.parse(data);
+      config.compilerOptions.noImplicitAny = true;
+      
+      fs.writeFile(configFilePath, JSON.stringify(config), function(){
+        //clear the dist folder
+        sh.rm('-rf', path.join(process.cwd(), 'dist'));
+        
+        return ng([
+            'build',
+            '--silent'
+          ]).then(function() {
+            expect(fs.existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+          })
+          .finally(function(){
+            // Clean `tmp` folder
+            process.chdir(path.resolve(root, '..'));
+            sh.rm('-rf', './tmp'); // tmp.teardown takes too long
+            done();
+          });
+        });
     });
   });
 
