@@ -67,6 +67,20 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
+  it('Produces a service worker manifest after initial build', function() {
+    var manifestPath = path.join(process.cwd(), 'dist', 'manifest.appcache');
+    expect(fs.existsSync(manifestPath)).to.equal(true);
+    // Read the worker.
+    var lines = fs
+      .readFileSync(manifestPath, {encoding: 'utf8'})
+      .trim()
+      .split('\n');
+      
+    // Check that a few critical files have been detected.
+    expect(lines).to.include('/index.html');
+    expect(lines).to.include('/thirdparty/vendor.js');
+  });
+
   it('Perform `ng test` after initial build', function() {
     this.timeout(420000);
 
