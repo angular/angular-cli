@@ -54,7 +54,7 @@ constructor(element: ElementRef, renderer: Renderer) {
 }
 ```
 * Don't use any of the browser types provided in the global namespace such as `navigator` or `document`. Anything outside of Angular will not be detected when serializing your application into html. If you need access to these types please consider using `DOM` from `"angular2/src/platform/dom/dom_adapter"`
-* Keep your directives stateless as much as possible. For stateful directives, you may need to provide an attribute that reflects the corresponding property with an initial string value such as `url` in `img` tag. For our native `<img src"">` element the `src` attribute is reflected as the `src` property of the element type `HTMLImageElement`. 
+* Keep your directives stateless as much as possible. For stateful directives, you may need to provide an attribute that reflects the corresponding property with an initial string value such as `url` in `img` tag. For our native `<img src="">` element the `src` attribute is reflected as the `src` property of the element type `HTMLImageElement`. 
 
 # What's in a name?
 We believe that using the word "universal" is correct when referring to a JavaScript Application that runs in more environments than the browser. (inspired by [Universal JavaScript](https://medium.com/@mjackson/universal-javascript-4761051b7ae9))
