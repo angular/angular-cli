@@ -9,15 +9,10 @@ var validProjectName   = require('ember-cli/lib/utilities/valid-project-name');
 var normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
 
 var TestCommand = require('ember-cli/lib/commands/test');
+var TestTask = require('../tasks/test');
 var win = require('ember-cli/lib/utilities/windows-admin');
 var path = require('path');
 
-// require dependencies within the target project
-function requireDependency (root, moduleName) {
-  var packageJson = require(path.join(root, 'node_modules', moduleName, 'package.json'));
-  var main = path.normalize(packageJson.main);
-  return require(path.join(root, 'node_modules', moduleName, main));
-}
 
 module.exports = TestCommand.extend({
   availableOptions: [
@@ -37,6 +32,11 @@ module.exports = TestCommand.extend({
       analytics: this.analytics,
       project: this.project
     });
+    var testTask = new TestTask({
+      ui: this.ui,
+      analytics: this.analytics,
+      project: this.project
+    });
 
     var buildCommandOptions = {
       environment: 'development',
@@ -51,19 +51,7 @@ module.exports = TestCommand.extend({
         return buildTask.run(buildCommandOptions);
       })
       .then(function(){
-        return new Promise(function(resolve, reject){
-          var karma = requireDependency(projectRoot, 'karma');
-          var karmaConfig = path.join(projectRoot, 'karma.conf');
-
-          // Convert browsers from a string to an array
-          if (commandOptions.browsers){
-            commandOptions.browsers = commandOptions.browsers.split(',');
-          }
-          commandOptions.configFile = karmaConfig;
-          var karmaServer = new karma.Server(commandOptions, resolve);
-
-          karmaServer.start();
-        });
+        return testTask.run(commandOptions);
       });
   }
 });
