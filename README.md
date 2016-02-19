@@ -152,16 +152,13 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 
 ### Running end-to-end tests
 
-Before running the tests make sure that you have an updated webdriver and that
-the tests are built:
-
 ```bash
-$(npm bin)/webdriver-manager update
-$(npm bin)/tsc -p e2e/
+ng e2e
 ```
 
-Afterwards you only need to run `$(npm bin)/protractor` while serving via
-`ng serve`.
+Before running the tests make sure you are serving the app via `ng serve`.
+
+End-to-end tests are ran via [Protractor](https://angular.github.io/protractor/).
 
 
 ### Deploying the app via GitHub Pages

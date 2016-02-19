@@ -10,6 +10,7 @@ module.exports = {
       'install'   : require('./commands/install'),
       'uninstall' : require('./commands/uninstall'),
       'test'      : require('./commands/test'),
+      'e2e'      : require('./commands/e2e'),
       'lint'      : require('./commands/lint'),
       'format'    : require('./commands/format')
     };

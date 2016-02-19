@@ -1,4 +1,5 @@
-import "angular2/testing";
+/// <reference path="../typings/main.d.ts" />
+
 import { <%= jsComponentName %>Page } from './app.po';
 
 describe('<%= htmlComponentName %> App', function() {
