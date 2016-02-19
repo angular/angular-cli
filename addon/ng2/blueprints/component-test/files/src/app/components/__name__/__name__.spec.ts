@@ -15,7 +15,7 @@ import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
 
 describe('<%= classifiedModuleName %> Component', () => {
 
-  beforeEachProviders(() => []);
+  beforeEachProviders((): any[] => []);
 
 
   it('should ...', injectAsync([TestComponentBuilder], (tcb:TestComponentBuilder) => {

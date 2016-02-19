@@ -32,6 +32,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
+* [Support for offline applications](#support-for-offline-applications)
 * [Known Issues](#known-issues)
 
 ## Installation
@@ -55,6 +56,11 @@ ng serve
 ```
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
+You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
+
+```bash
+ng serve --port 4201 --live-reload-port 49153
+```
 
 ### Generating other scaffolds
 
@@ -137,32 +143,22 @@ ng install ng2-cli-test-lib
 
 ### Running unit tests
 
-Before running the tests make sure that the project is built. To build the
-project once you can use:
-
 ```bash
-ng build
+ng test
 ```
 
-With the project built in the `dist/` folder you can just run: `karma start`.
-Karma will run the tests and keep the browser open waiting to run again.
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html)
 
 
 ### Running end-to-end tests
 
-Before running the tests make sure that you have an updated webdriver and that
-the tests are built:
-
 ```bash
-$(npm bin)/webdriver-manager update
-$(npm bin)/tsc -p e2e/
+ng e2e
 ```
 
-Afterwards you only need to run `$(npm bin)/protractor` while serving via
-`ng serve`.
+Before running the tests make sure you are serving the app via `ng serve`.
 
-This will be easier when the command
-[ng test](https://github.com/angular/angular-cli/issues/70) is implemented.
+End-to-end tests are ran via [Protractor](https://angular.github.io/protractor/).
 
 
 ### Deploying the app via GitHub Pages
@@ -178,6 +174,39 @@ ng github-pages:deploy
 
 Checkout [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages) docs for more info.
 
+### Linting and formatting code
+
+You can lint or format your app code by running `ng lint` or `ng format` respectively.
+This will use the `lint`/`format` npm script that in generated projects uses `tslint`/`clang-format`.
+
+You can modify the these scripts in `package.json` to run whatever tool you prefer.
+
+
+### Formatting code
+
+You can format your app code by running `ng format`.
+This will use the `format` npm script that in generated projects uses `clang-format`.
+
+You can modify the `format` script in `package.json` to run whatever formatting tool
+you prefer and `ng format` will still run it.
+
+### Support for offline applications
+
+By default a file `manifest.appcache` will be generated which lists all files included in
+a project's output, along with SHA1 hashes of all file contents. This file can be used
+directly as an AppCache manifest (for now, `index.html` must be manually edited to set this up).
+
+The manifest is also annotated for use with `angular2-service-worker`. Some manual operations
+are currently required to enable this usage. The package must be installed, and `worker.js`
+manually copied into the project `src` directory:
+
+```bash
+npm install angular2-service-worker
+cp node_modules/angular2-service-worker/dist/worker.js src/
+```
+
+ Then, the commented snippet in `index.html` must be uncommented to register the worker script
+ as a service worker.
 
 ## Known issues
 

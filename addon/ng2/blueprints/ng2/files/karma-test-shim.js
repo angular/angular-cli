@@ -20,9 +20,11 @@ System.config({
   }
 });
 
-System.import('angular2/platform/browser').then(function(browser_adapter) {
-  // TODO: once beta is out we should change this code to use a "test platform"
-  browser_adapter.BrowserDomAdapter.makeCurrent();
+System.import('angular2/testing').then(function(testing) {
+  return System.import('angular2/platform/testing/browser').then(function(providers) {
+    testing.setBaseTestProviders(providers.TEST_BROWSER_PLATFORM_PROVIDERS,
+                                 providers.TEST_BROWSER_APPLICATION_PROVIDERS);
+  });
 }).then(function() {
   return Promise.all(
     Object.keys(window.__karma__.files)

@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES5",
-    "module": "commonjs",
-    "sourceMap": true,
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "removeComments": false
+    "mapRoot": "",
+    "module": "system",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noImplicitAny": false,
+    "rootDir": ".",
+    "sourceMap": true,
+    "sourceRoot": "/",
+    "target": "es5"
   }
 }

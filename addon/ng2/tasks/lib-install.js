@@ -3,7 +3,7 @@
 
 var Promise     = require('ember-cli/lib/ext/promise');
 var Task        = require('ember-cli/lib/models/task');
-var npm         = require('ember-cli/lib/utilities/npm');
+var shellPromise = require ('../utilities/shell-promise');
 var existsSync  = require('exists-sync');
 var chalk       = require('chalk');
 var path        = require('path');
@@ -18,36 +18,30 @@ module.exports = Task.extend({
   completionOKMessage: '',
   completionErrorMessage: 'Error installing packages. Did you misspelt it?',
 
-  init: function() {
-    this.npm = this.npm || require('npm');
-  },
   run: function(options) {
     this.packages = options.packages || [];
     this.skipInjection = options.skipInjection || false;
     this.autoInjection = options.autoInjection || false;
     this.disableLogger();
 
-    this.ui.startProgress(chalk.green('Installing 3rd party package:', 
+    this.ui.startProgress(chalk.green('Installing 3rd party package:',
       this.packages.join(', ')), chalk.green('.'));
 
-    this.npmOptions = {
-      logLevel: 'error',
-      logstream: this.ui.outputStream,
-      color: 'always',
-      optional: true,
-      'save-dev': true,
-      'save-exact': !!options['save-exact']
-    };
+    this.npmOptions = ' --loglevel error --color always --optional --save-dev ' +
+                      '--save-exact ' + !!options['save-exact'];
 
-    return npm('install', this.packages, this.npmOptions, this.npm)
-      .then(function(npmresp) {
+    var npmCommand = 'npm install ' + this.packages.join(' ') + this.npmOptions;
+
+    return shellPromise(npmCommand)
+      .then(function (npmresp) {
+
         if (this.skipInjection) {
           return this.announceOKCompletion();
         }
 
         if (this.autoInjection) {
           var pkg = this.packages[0];
-          
+
           if (existsSync(path.resolve(process.cwd(), 'src', 'app.ts'))) {
             var entryPoint = path.resolve(process.cwd(), 'src', 'app.ts');
             var packageData = this.parseFile(pkg);
@@ -57,10 +51,10 @@ module.exports = Task.extend({
           return this.announceOKCompletion();
         }
 
-        return this.installProcedure()
-          .then(function(resp) {
-            return this.announceOKCompletion();
-          }.bind(this));
+        return this.installProcedure();
+      }.bind(this))
+      .then(function(resp) {
+        return this.announceOKCompletion();
       }.bind(this));
   },
 
@@ -83,12 +77,14 @@ module.exports = Task.extend({
           'as authentic: ' + allPackages.toUninstall.join(', ');
           this.ui.writeLine(chalk.yellow(msg));
 
-          return npm('uninstall', allPackages.toUninstall, this.npmOptions, this.npm)
+          var npmCommand = 'npm uninstall ' + allPackages.toUninstall.join(' ') + this.npmOptions;
+
+          return shellPromise(npmCommand)
             .then(function() {
               return this.processPackages(allPackages.toProcess)
-                .then(function(resp) {
-                  return resolve(resp);
-                });
+              .then(function(resp) {
+                return resolve(resp);
+              });
             }.bind(this));
         }
         else {
@@ -133,7 +129,7 @@ module.exports = Task.extend({
     return new Promise(function(resolve, reject) {
       var packageData;
 
-      var msg = 'Customize the injection of ' + 
+      var msg = 'Customize the injection of ' +
       chalk.yellow(path.basename(packageName)) + '? (Y/n)';
 
       return this.ui.prompt({
@@ -226,7 +222,7 @@ module.exports = Task.extend({
           type: 'input',
           name: 'sel',
           message: msg,
-          filter: function (val) { return val.trim(); }, 
+          filter: function (val) { return val.trim(); },
           validate: function(value) {
             return value > 0 && value <= packageData[componentKey].length ? true : 'Enter a valid value';
           }
@@ -260,8 +256,8 @@ module.exports = Task.extend({
                               packageName,
                               packageData[componentKey][componentIndex]);
 
-            this.injectItem(componentKey.toLowerCase(), 
-                            packageData[componentKey][componentIndex], 
+            this.injectItem(componentKey.toLowerCase(),
+                            packageData[componentKey][componentIndex],
                             possibleFiles[fileIndex]);
 
             this.ui.writeLine(chalk.green('Successfully injected.'));
@@ -336,8 +332,8 @@ module.exports = Task.extend({
 
         if (removeNextLine) {
           arr.splice(index, 1);
-          if (/;/.test(line)) { 
-            removeNextLine = false; 
+          if (/;/.test(line)) {
+            removeNextLine = false;
           }
         }
       });
@@ -348,12 +344,12 @@ module.exports = Task.extend({
     function generateFlatImportLine(arr, fromIndex) {
       var lineArr = [];
       var lastIndex;
-      
+
       arr.forEach(function(line, index) {
         if (index >= fromIndex && !lastIndex) {
           lineArr.push(line);
-          if (/;/.test(line)) { 
-            lastIndex = true; 
+          if (/;/.test(line)) {
+            lastIndex = true;
           }
         }
       });
@@ -443,7 +439,7 @@ module.exports = Task.extend({
 
         if (/\)/.test(line)) {
           replace = line.match(/\((.*?)\)/)[0];
-        } 
+        }
         else {
           replace = contentsArr.splice(index, contentsArr.length - 1).join('\n').replace(/\n/g, '');
           replace = replace.match(/\((.*?)\)/)[0];
@@ -495,7 +491,7 @@ module.exports = Task.extend({
         match = match.replace(/[\[\]]/g, '');
         match = match.split(',');
         match.push(name);
-        match = match.filter(function(n) { return n !== ''; } ); 
+        match = match.filter(function(n) { return n !== ''; } );
         contentsArr[index] = contentsArr[index].replace(replace, '[' + match.join(',') + ']');
       }
     }.bind(this));
@@ -505,14 +501,14 @@ module.exports = Task.extend({
 
   parseFile: function (packageName) {
     var packagePath = path.join(process.cwd(), 'node_modules', packageName, packageName + '.ts');
-    
+
     if (!existsSync(packagePath)) {
       return false;
     }
 
     var contents = fs.readFileSync(packagePath, 'utf8');
     var data = {};
-    
+
     data.Component = [];
     data.Directive = [];
     data.Pipe = [];
