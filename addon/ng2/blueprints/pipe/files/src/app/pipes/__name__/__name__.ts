@@ -2,7 +2,7 @@ import {Pipe, PipeTransform} from 'angular2/core';
 
 
 @Pipe({
-  name: '<%= classifiedModuleName %>'
+  name: '<%= camelizedModuleName %>'
 })
 export class <%= classifiedModuleName %> implements PipeTransform {
 
