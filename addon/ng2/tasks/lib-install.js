@@ -4,7 +4,6 @@
 var Promise     = require('ember-cli/lib/ext/promise');
 var Task        = require('ember-cli/lib/models/task');
 var shellPromise = require ('../utilities/shell-promise');
-var existsSync  = require('exists-sync');
 var chalk       = require('chalk');
 var path        = require('path');
 var fs          = require('fs');
@@ -12,6 +11,18 @@ var _           = require('lodash');
 var glob        = require('glob');
 var appRoot     = path.resolve('./src');
 var nodeModules = path.resolve('./node_modules');
+
+
+function existsSync(path) {
+  try {
+    fs.accessSync(path);
+    return true;
+  }
+  catch (e) {
+    return false;
+  }
+}
+
 
 module.exports = Task.extend({
   command: '',
