@@ -139,6 +139,9 @@ ng test
 
 Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html)
 
+If run with the watch argument `--watch` (shorthand `-w`) builds will run when source files have changed 
+and tests will run after each successful build
+
 
 ### Running end-to-end tests
 

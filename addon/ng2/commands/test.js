@@ -9,15 +9,17 @@ var validProjectName   = require('ember-cli/lib/utilities/valid-project-name');
 var normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
 
 var TestCommand = require('ember-cli/lib/commands/test');
-var TestTask = require('../tasks/test');
 var win = require('ember-cli/lib/utilities/windows-admin');
 var path = require('path');
+
+var BuildTask = require('ember-cli/lib/tasks/build');
+var BuildWatchTask = require('../tasks/build-watch');
+var TestTask = require('../tasks/test');
 
 
 module.exports = TestCommand.extend({
   availableOptions: [
-    { name: 'single-run', type: Boolean, default: true },
-    { name: 'auto-watch', type: Boolean },
+    { name: 'watch', type: Boolean, default: false, aliases: ['w'] },
     { name: 'browsers', type: String },
     { name: 'colors', type: Boolean },
     { name: 'log-level', type: String },
@@ -26,7 +28,11 @@ module.exports = TestCommand.extend({
   ],
 
   run: function(commandOptions, rawArgs) {
-    var BuildTask = this.tasks.Build;
+    var buildWatchTask = new BuildWatchTask({
+      ui: this.ui,
+      analytics: this.analytics,
+      project: this.project
+    });
     var buildTask = new BuildTask({
       ui: this.ui,
       analytics: this.analytics,
@@ -37,22 +43,34 @@ module.exports = TestCommand.extend({
       analytics: this.analytics,
       project: this.project
     });
+    commandOptions.singleRun = true;
 
-    var buildCommandOptions = {
+    var buildOptions = {
       environment: 'development',
-      outputPath: 'dist/',
-      watch: false
+      outputPath: 'dist/'
     };
+    
+    if (commandOptions.watch){
+      return win.checkWindowsElevation(this.ui)
+        .then(function() {
+          var buildWatchResult = buildWatchTask.run(buildOptions);
+          
+          buildWatchResult.watcher.on('change', function(){
+            testTask.run(commandOptions);
+          });
+          
+          return buildWatchResult.completion;
+        });
+    } else {
+      return win.checkWindowsElevation(this.ui)
+        .then(function() {
+          return buildTask.run(buildOptions);
+        })
+        .then(function(){
+          return testTask.run(commandOptions);
+        });
+    }
 
-    var projectRoot = this.project.root;
-
-    return win.checkWindowsElevation(this.ui)
-      .then(function() {
-        return buildTask.run(buildCommandOptions);
-      })
-      .then(function(){
-        return testTask.run(commandOptions);
-      });
   }
 });
 
