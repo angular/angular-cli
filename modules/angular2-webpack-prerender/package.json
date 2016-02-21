@@ -32,7 +32,7 @@
   },
   "peerDependencies": {
     "webpack": "^1.12.12",
-    "angular2": "2.0.0-beta.1 - 2.0.0-beta.6",
+    "angular2": "2.0.0-beta.1 - 2.0.0-beta.7",
     "angular2-universal-preview": "*",
     "css": "^2.2.1",
     "es6-shim": "^0.33.3",
