@@ -38,7 +38,7 @@
     "karma-jasmine": "^0.3.6",
     "protractor": "^3.0.0",
     "tslint": "^3.3.0",
-    "typescript": "^1.7.3",
+    "typescript": "^1.8.2",
     "typings": "^0.6.6",
     "ts-node": "^0.5.5"
   }
