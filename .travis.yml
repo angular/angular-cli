@@ -2,13 +2,10 @@ sudo: false
 env:
   - NODE_VERSION=4
   - NODE_VERSION=5
-
 os:
   - linux
   - osx
 script: npm run-script test
-addons:
-  firefox: "latest"
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.30.1/install.sh | bash; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ~/.nvm/nvm-exec; fi
