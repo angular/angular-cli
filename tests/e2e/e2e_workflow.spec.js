@@ -76,10 +76,10 @@ describe('Basic end-to-end Workflow', function () {
       .readFileSync(manifestPath, {encoding: 'utf8'})
       .trim()
       .split('\n');
-      
+
     // Check that a few critical files have been detected.
-    expect(lines).to.include('/index.html');
-    expect(lines).to.include('/thirdparty/libs.js');
+    expect(lines).to.include(`${path.sep}index.html`);
+    expect(lines).to.include(`${path.sep}thirdparty${path.sep}libs.js`);
   });
 
   it('Perform `ng test` after initial build', function() {
@@ -193,20 +193,20 @@ describe('Basic end-to-end Workflow', function () {
       // sh.rm('-rf', './tmp'); // tmp.teardown takes too long
     });
   });
-  
+
   it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
     this.timeout(420000);
-    
+
     var configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
     fs.readFile(configFilePath, 'utf8', function(err, data){
-      
+
       var config = JSON.parse(data);
       config.compilerOptions.noImplicitAny = true;
-      
+
       fs.writeFile(configFilePath, JSON.stringify(config), function(){
         //clear the dist folder
         sh.rm('-rf', path.join(process.cwd(), 'dist'));
-        
+
         return ng([
             'build',
             '--silent'
