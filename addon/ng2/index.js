@@ -10,7 +10,8 @@ module.exports = {
       'test'      : require('./commands/test'),
       'e2e'       : require('./commands/e2e'),
       'lint'      : require('./commands/lint'),
-      'format'    : require('./commands/format')
+      'format'    : require('./commands/format'),
+      'version'   : require('./commands/version')
     };
   }
 };
