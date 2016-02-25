@@ -2,12 +2,7 @@
   "name": "<%= htmlComponentName %>",
   "version": "0.0.0",
   "license": "Apache-2.0",
-  "angular-cli": {
-    "notifications": {
-      "enabled": true,
-      "playSound": false
-    }
-  },
+  "angular-cli": {},
   "scripts": {
     "start": "ng server",
     "postinstall": "typings install --ambient",
