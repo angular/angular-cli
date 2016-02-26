@@ -1,5 +1,3 @@
-import './src/server_patch';
-
 export {provide} from 'angular2/core';
 
 export * from './src/directives/node_form';
