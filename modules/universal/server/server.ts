@@ -1,3 +1,9 @@
+// dom closure
+import './universal-polyfill';
+
+import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
+Parse5DomAdapter.makeCurrent();
+
 export {provide} from 'angular2/core';
 
 export * from './src/directives/node_form';
