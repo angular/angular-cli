@@ -49,7 +49,7 @@
     "preboot": "~1.1.0",
     "angular2-express-engine": "*",
     "rxjs": "~5.0.0-beta.0",
-    "angular2": "2.0.0-beta.1 - 2.0.0-beta.6",
+    "angular2": "2.0.0-beta.7",
     "es6-shim": "^0.33.3",
     "zone.js": "~0.5.14",
     "css": "^2.2.1",

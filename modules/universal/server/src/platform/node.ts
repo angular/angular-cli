@@ -1,6 +1,5 @@
 // Facade
 import {Type, isPresent, CONST_EXPR} from 'angular2/src/facade/lang';
-import {Promise} from 'angular2/src/facade/promise';
 
 // Compiler
 import {COMPILER_PROVIDERS, XHR} from 'angular2/compiler';

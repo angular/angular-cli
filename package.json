@@ -91,7 +91,7 @@
     "yargs": "^3.14.0"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.6",
+    "angular2": "2.0.0-beta.7",
     "angular2-express-engine": "file:modules/angular2-express-engine",
     "angular2-universal": "file:modules/universal",
     "angular2-universal-preview": "file:modules/universal",
@@ -104,6 +104,7 @@
     "gulp-insert": "^0.5.0",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.2.0",
+    "gutil": "^1.6.4",
     "lodash": "^3.10.1",
     "nocycle": "^1.1.1",
     "parse5": "^1.5.0",
@@ -111,11 +112,12 @@
     "reflect-metadata": "0.1.2",
     "require-dir": "^0.3.0",
     "run-sequence": "^1.1.2",
-    "rxjs": "5.0.0-beta.0",
+    "rxjs": "5.0.0-beta.2",
     "systemjs": "^0.19.16",
+    "through2": "^2.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "xhr2": "^0.1.3",
-    "zone.js": "0.5.14"
+    "zone.js": "0.5.15"
   }
 }

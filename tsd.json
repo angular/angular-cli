@@ -25,6 +25,9 @@
     },
     "jasmine/jasmine.d.ts": {
       "commit": "5d0f2126c8dac8fce0ff020218aea06607213b0d"
+    },
+    "through2/through2.d.ts": {
+      "commit": "27d7b56688bfeba9c6fc1ce0ecb611d929982d44"
     }
   }
 }

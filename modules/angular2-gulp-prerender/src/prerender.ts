@@ -1,6 +1,6 @@
 import universal = require('angular2-universal-preview');
 import through = require('through2');
-import gutil = require('gutil');
+var gutil = require('gutil');
 
 let PluginError = gutil.PluginError;
 

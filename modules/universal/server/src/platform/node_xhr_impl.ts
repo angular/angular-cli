@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as url from 'url';
 
 import {XHR} from 'angular2/compiler';
-import {Promise, PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/promise';
+import {PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/promise';
 
 export class NodeXHRImpl extends XHR {
   get(templateUrl: string): Promise<string> {
