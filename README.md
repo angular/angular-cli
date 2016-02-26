@@ -32,6 +32,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Support for offline applications](#support-for-offline-applications)
+* [Commands autocompletion](#commands-autocompletion)
 * [Known Issues](#known-issues)
 
 ## Installation
@@ -201,6 +202,28 @@ cp node_modules/angular2-service-worker/dist/worker.js src/
 
  Then, the commented snippet in `index.html` must be uncommented to register the worker script
  as a service worker.
+
+### Commands autocompletion
+
+To turn on auto completion use the following commands:
+
+For bash:
+```bash
+ng completion >> ~/.bashrc
+source ~/.bashrc
+```
+
+For zsh:
+```bash
+ng completion >> ~/.zshrc
+source ~/.zshrc
+```
+
+Windows users using gitbash:
+```bash
+ng completion >> ~/.bash_profile
+source ~/.bash_profile
+```
 
 ## Known issues
 
