@@ -5,14 +5,14 @@ import {NodeEvent} from '../../interfaces/event';
 // regex for how events defined in Angular 2 templates; for example:
 //    <div on-click="blah()">
 //    <div (click)="blah()">
-const ngEventPattern = /^(on\-.*)|(\(.*\))$/;
+const ngEventPattern = /^(?:on-|\()([-\w]+)\)?$/;
 
 // state for this module just includes the nodeEvents (exported for testing purposes)
 export let state = { nodeEvents: [] };
 
 /**
  * This is from Crockford to walk the DOM (http://whlp.ly/1Ii6YbR).
- * Recursively walk DOM tree and execute input param function at 
+ * Recursively walk DOM tree and execute input param function at
  * each node.
  */
 export function walkDOM(node: any, func: Function) {
@@ -40,17 +40,14 @@ export function addNodeEvents(node: any) {
   for (let attr of attrs) {
     let name = attr.name;
 
+    // extract event name from the () or on- (TODO: replace this w regex)
+    let matchedEventName = name.match(ngEventPattern);
+
     // if attribute name is an Angular 2 event binding
-    if (ngEventPattern.test(name)) {
-
-      // extract event name from the () or on- (TODO: replace this w regex)
-      name = name.charAt(0) === '(' ?
-        name.substring(1, name.length - 1) :    // remove parenthesis
-        name.substring(3);                      // remove on-
-
+    if (matchedEventName.length > 0) {
       state.nodeEvents.push({
         node: node,
-        eventName: name
+        eventName: matchedEventName.pop()
       });
     }
   }
