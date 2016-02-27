@@ -1,1 +1,0 @@
-The dummy blueprint just got installed.
