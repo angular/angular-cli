@@ -16,7 +16,7 @@ describe('presets', function () {
                 {
                   name: 'selectors',
                   eventsBySelector: {
-                    'input,textarea': ['keypress', 'keyup', 'keydown']
+                    'input,textarea': ['keypress', 'keyup', 'keydown', 'input', 'change']
                   }
                 },
                 {
@@ -28,10 +28,10 @@ describe('presets', function () {
               ]
             };
             presetFns.keyPress(opts);
-            
+
             console.log(JSON.stringify(opts));
             console.log(JSON.stringify(expected));
-            
+
             expect(opts).toEqual(expected);
         });
     });
