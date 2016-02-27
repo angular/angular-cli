@@ -13,13 +13,13 @@ var win = require('ember-cli/lib/utilities/windows-admin');
 var path = require('path');
 
 var BuildTask = require('ember-cli/lib/tasks/build');
-var BuildWatchTask = require('../tasks/build-watch');
+var BuildWatchTask = require('ember-cli/lib/tasks/build-watch');
 var TestTask = require('../tasks/test');
 
 
 module.exports = TestCommand.extend({
   availableOptions: [
-    { name: 'watch', type: Boolean, default: false, aliases: ['w'] },
+    { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
     { name: 'browsers', type: String },
     { name: 'colors', type: Boolean },
     { name: 'log-level', type: String },
@@ -43,25 +43,23 @@ module.exports = TestCommand.extend({
       analytics: this.analytics,
       project: this.project
     });
-    commandOptions.singleRun = true;
 
     var buildOptions = {
       environment: 'development',
       outputPath: 'dist/'
     };
-    
+     
     if (commandOptions.watch){
       return win.checkWindowsElevation(this.ui)
         .then(function() {
-          var buildWatchResult = buildWatchTask.run(buildOptions);
-          
-          buildWatchResult.watcher.on('change', function(){
-            testTask.run(commandOptions);
-          });
-          
-          return buildWatchResult.completion;
+          return Promise.all([
+            buildWatchTask.run(buildOptions),
+            testTask.run(commandOptions)
+          ]);
         });
     } else {
+      // if not watching ensure karma is doing a single run
+      commandOptions.singleRun = true;
       return win.checkWindowsElevation(this.ui)
         .then(function() {
           return buildTask.run(buildOptions);

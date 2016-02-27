@@ -17,7 +17,8 @@ describe('Basic end-to-end Workflow', function () {
 
   var testArgs = [
       'test',
-      '--single-run'
+      '--watch',
+      'false'
     ];
 
   // In travis CI only run tests in Chrome_travis_ci
