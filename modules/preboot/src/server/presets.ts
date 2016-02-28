@@ -11,7 +11,7 @@ export default {
     opts.listen.push({
       name: 'selectors',
       eventsBySelector: {
-        'input,textarea': ['keypress', 'keyup', 'keydown']
+        'input,textarea': ['keypress', 'keyup', 'keydown', 'input', 'change']
       }
     });
     opts.listen.push({
