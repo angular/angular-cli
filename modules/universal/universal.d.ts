@@ -33,7 +33,8 @@ export function buildNodePlatformProviders(
 export var NODE_APPLICATION_COMMON_PROVIDERS: [any];
 export var NODE_APPLICATION_PROVIDERS: [any];
 export function selectorRegExpFactory(selector: string): RegExp;
-export function ng2engine(): any;
+export function expressEngine(): any;
+export function hapiEngine(): any;
 export function parseDocument(documentHtml: string): Object;
 export function serializeDocument(document: Object): string;
 export function addPrebootHtml(AppComponent: any, html: any, prebootConfig?: any): any;
@@ -53,7 +54,8 @@ export default {
   addPrebootHtml,
   serializeDocument,
   parseDocument,
-  ng2engine,
+  expressEngine,
+  hapiEngine,
   provide,
   NodeXhr,
   NodeBackend,

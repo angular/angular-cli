@@ -119,7 +119,7 @@ function buildClientScripts(html: string, options: any): string {
     );
 }
 
-export function ng2engine(filePath: string, options: engineOptions, done: Function) {
+export function expressEngine(filePath: string, options: engineOptions, done: Function) {
   // defaults
   options = options || <engineOptions>{};
   options.providers = options.providers || undefined;
