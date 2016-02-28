@@ -1,0 +1,33 @@
+{
+  "name": "angular2-hapi-engine",
+  "main": "dist/index.js",
+  "typings": "angular2-hapi-engine.d.ts",
+  "version": "0.0.1",
+  "description": "Universal (isomorphic) javascript support for Angular2",
+  "homepage": "https://github.com/angular/universal",
+  "license": "MIT",
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>"
+  ],
+  "scripts": {
+    "build": "tsc || true",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
+  "devDependencies": {
+    "typescript": "^1.7.3",
+    "angular2-universal-preview": "file:../universal"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "angular2-universal-preview": "*"
+  }
+}
