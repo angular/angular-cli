@@ -8,7 +8,7 @@ describe('<%= htmlComponentName %> App', function() {
   })
 
   it('should display message saying app works', () => {
-    page.navigateTo()
+    page.navigateTo();
     expect(page.getParagraphText()).toEqual('<%= htmlComponentName %> Works!');
   });
 });
