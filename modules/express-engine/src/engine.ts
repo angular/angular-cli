@@ -178,6 +178,15 @@ export function expressEngine(filePath: string, options: engineOptions, done: Fu
   }
 };
 
+export const ng2engine = function(...args) {
+  console.warn('DEPRECATION WARNING: `ng2engine` is no longer supported and will be removed in next release. use `expressEngine`');
+  return expressEngine(...args);
+}
+export const ng2Engine = function(...args) {
+  console.warn('DEPRECATION WARNING: `ng2Engine` is no longer supported and will be removed in next release. use `expressEngine`');
+  return expressEngine(...args);
+}
+
 export function simpleReplace(filePath: string, options: engineOptions, done: Function) {
   // defaults
   options = options || <engineOptions>{};
