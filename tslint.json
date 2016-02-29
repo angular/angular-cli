@@ -13,9 +13,9 @@
     "no-arg": true,
     "no-bitwise": false,
     "no-console": [true,
-        "debug",
-        "info",
-        "trace"
+      "debug",
+      "info",
+      "trace"
     ],
     "no-construct": true,
     "no-debugger": true,
@@ -25,7 +25,7 @@
     "no-eval": true,
     "no-string-literal": true,
     "no-switch-case-fall-through": true,
-    "no-trailing-comma": true,
+    "trailing-comma": true,
     "no-trailing-whitespace": false,
     "no-unused-expression": true,
     "no-unused-variable": false,
@@ -33,23 +33,23 @@
     "no-use-before-declare": true,
     "no-var-keyword": false,
     "one-line": [true,
-        "check-open-brace",
-        "check-catch",
-        "check-else",
-        "check-whitespace"
+      "check-open-brace",
+      "check-catch",
+      "check-else",
+      "check-whitespace"
     ],
     "quotemark": false,
     "radix": true,
     "semicolon": true,
-    "sort-object-literal-keys": false,
+    "object-literal-sort-keys": false,
     "triple-equals": [true, "allow-null-check"],
     "variable-name": false,
     "whitespace": [true,
-        "check-branch",
-        "check-decl",
-        "check-operator",
-        "check-separator",
-        "check-type"
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-separator",
+      "check-type"
     ]
   }
 }
