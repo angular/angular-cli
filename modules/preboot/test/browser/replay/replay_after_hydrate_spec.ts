@@ -1,5 +1,3 @@
-/// <reference path="../../../../../tsd_typings/tsd.d.ts"/>
-
 import {replayEvents} from '../../../src/browser/replay/replay_after_hydrate';
 
 describe('replay_after_hydrate', function () {

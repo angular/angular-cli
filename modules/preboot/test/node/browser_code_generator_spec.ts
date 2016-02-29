@@ -1,7 +1,5 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
 import * as browserify from 'browserify';
-import {ignoreUnusedStrategies, getBrowserCode} from '../../src/server/browser_code_generator';
+import {ignoreUnusedStrategies, getBrowserCode} from '../../src/node/browser_code_generator';
 
 describe('clientCodeGenerator', function () {
 

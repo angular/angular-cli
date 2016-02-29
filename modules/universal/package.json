@@ -37,7 +37,7 @@
   "devDependencies": {
     "angular2-express-engine": "file:../express-engine",
     "angular2-hapi-engine": "file:../hapi-engine",
-    "preboot": "file:../preboot",
+    "preboot": "~1.1.0",
     "typescript": "^1.7.3"
   },
   "dependencies": {

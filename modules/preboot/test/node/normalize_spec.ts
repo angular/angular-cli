@@ -1,6 +1,4 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
-import {normalize, normalizers, defaultFreezeStyles} from '../../src/server/normalize';
+import {normalize, normalizers, defaultFreezeStyles} from '../../src/node/normalize';
 
 describe('normalize', function () {
 

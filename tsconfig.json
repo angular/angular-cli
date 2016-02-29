@@ -27,8 +27,7 @@
     "modules/webpack-prerender/dist",
     "modules/universal/dist",
     "modules/universal/node_modules",
-    "modules/preboot/dist",
-    "modules/preboot/node_modules",
+    "modules/preboot",
     "node_modules",
     "dist"
   ],

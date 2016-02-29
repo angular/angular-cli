@@ -1,5 +1,3 @@
-/// <reference path="../../../../../tsd_typings/tsd.d.ts"/>
-
 import {state, walkDOM, addNodeEvents, getNodeEvents} from '../../../src/browser/listen/listen_by_event_bindings';
 
 describe('listen_by_event_bindings', function () {

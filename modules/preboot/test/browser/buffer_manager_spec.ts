@@ -1,5 +1,3 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
 import {state, prep, switchBuffer} from '../../src/browser/buffer_manager';
 
 describe('buffer_manager', function () {

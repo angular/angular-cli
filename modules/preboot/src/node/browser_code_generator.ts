@@ -38,7 +38,7 @@ export function ignoreUnusedStrategies(
 /**
  * Generate browser code as a readable stream for preboot based on the input options
  */
-export function getBrowserCodeStream(opts?: PrebootOptions): NodeJS.ReadableStream {
+export function getBrowserCodeStream(opts?: PrebootOptions): any {
   opts = normalize(opts);
 
   let bOpts = {
@@ -88,7 +88,7 @@ export function getBrowserCode(opts?: PrebootOptions, done?: Function): any {
   if (browserCodeCache[cacheKey]) {
     return Q.when(browserCodeCache[cacheKey]);
   }
-
+  
   // get the browser code
   getBrowserCodeStream(opts)
     .pipe(eventStream.map(function(file, cb) {

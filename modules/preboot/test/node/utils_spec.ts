@@ -1,6 +1,4 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
-import {stringifyWithFunctions} from '../../src/server/utils';
+import {stringifyWithFunctions} from '../../src/node/utils';
  /* tslint:disable:eofline no-trailing-whitespace */
  
 /**

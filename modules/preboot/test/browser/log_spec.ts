@@ -1,5 +1,3 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
 import {log} from '../../src/browser/log';
 
 describe('log', function () {

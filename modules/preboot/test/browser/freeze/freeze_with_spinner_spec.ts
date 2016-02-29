@@ -1,5 +1,3 @@
-/// <reference path="../../../../../tsd_typings/tsd.d.ts"/>
-
 import {state, prep, cleanup} from '../../../src/browser/freeze/freeze_with_spinner';
 
 describe('freeze_with_spinner', function () {

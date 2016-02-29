@@ -1,5 +1,3 @@
-/// <reference path="../../../../../tsd_typings/tsd.d.ts"/>
-
 import {getNodeEvents} from '../../../src/browser/listen/listen_by_attributes';
 
 describe('listen_by_attributes', function () {

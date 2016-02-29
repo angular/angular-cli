@@ -17,11 +17,8 @@ export function replayEvents(preboot: PrebootRef, strategy: ReplayStrategy, even
   for (let eventData of events) {
     let event = eventData.event;
     let serverNode = eventData.node;
-    let clientNode = preboot.dom.findClientNode(serverNode);
-    // TODO(gdi2290): better way query root without buffer
-    if (!clientNode) {
-      clientNode = preboot.dom.findClientNode(serverNode, eventData.nodeKey);
-    }
+    let nodeKey = eventData.nodeKey;
+    let clientNode = preboot.dom.findClientNode(serverNode, nodeKey);
 
     // if client node found, need to explicitly set value and then dispatch event
     if (clientNode) {

@@ -44,7 +44,7 @@ export function addNodeEvents(node: any) {
     let matchedEventName = name.match(ngEventPattern);
 
     // if attribute name is an Angular 2 event binding
-    if (matchedEventName.length > 0) {
+    if (matchedEventName && matchedEventName.length > 0) {
       state.nodeEvents.push({
         node: node,
         eventName: matchedEventName.pop()

@@ -1,6 +1,4 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
-import presetFns from '../../src/server/presets';
+import presetFns from '../../src/node/presets';
 
 /**
  * These tests are pretty basic, but just have something in
@@ -27,11 +25,8 @@ describe('presets', function () {
                 }
               ]
             };
+
             presetFns.keyPress(opts);
-
-            console.log(JSON.stringify(opts));
-            console.log(JSON.stringify(expected));
-
             expect(opts).toEqual(expected);
         });
     });

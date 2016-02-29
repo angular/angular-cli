@@ -1,5 +1,3 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
 import * as eventManager from '../../src/browser/event_manager';
 
 describe('event_manager', function () {

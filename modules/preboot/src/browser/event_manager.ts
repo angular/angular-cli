@@ -73,8 +73,8 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
       } else {
         preboot.activeNode = {
           node: event.target,
-          nodeKey: preboot.dom.getNodeKey(event.target, preboot.dom.state.serverRoot)  
-        }
+          nodeKey: preboot.dom.getNodeKey(event.target, preboot.dom.state.serverRoot)
+        };
       }
     }
 
@@ -89,7 +89,7 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
     if (eventName === 'keyup' && event.which === 13 && node.attributes['(keyup.enter)']) {
       preboot.dom.dispatchGlobalEvent('PrebootFreeze');
     }
-
+    
     // we will record events for later replay unless explicitly marked as doNotReplay
     if (!strategy.doNotReplay) {
       let eventObj: PrebootEvent = {
@@ -98,7 +98,7 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
         name: eventName,
         time: preboot.time || (new Date()).getTime()
       };
-      // TODO(gdi2290): better way to grab serverRoot without buffer
+
       if (preboot &&
           preboot.dom &&
           preboot.dom.getNodeKey &&
@@ -106,7 +106,6 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
           preboot.dom.state.serverRoot) {
 
         eventObj.nodeKey = preboot.dom.getNodeKey(node, preboot.dom.state.serverRoot);
-
       }
 
       state.events.push(eventObj);

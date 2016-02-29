@@ -1,5 +1,3 @@
-/// <reference path="../../../../tsd_typings/tsd.d.ts"/>
-
 import * as dom from '../../src/browser/dom';
 
 describe('dom', function () {

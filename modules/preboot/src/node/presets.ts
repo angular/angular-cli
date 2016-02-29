@@ -17,7 +17,7 @@ export default {
     opts.listen.push({
       name: 'selectors',
       eventsBySelector: {
-        'input[type="checkbox"],input[type="radio"],select,option': ['change']
+        'select,option': ['change']
       }
     });
   },
