@@ -13,7 +13,7 @@
   "typescript": {
     "definition": "universal.d.ts"
   },
-  "version": "0.55.3",
+  "version": "0.55.4",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -52,9 +52,9 @@
     "angular2-express-engine": "*",
     "angular2-hapi-engine": "*",
     "rxjs": "~5.0.0-beta.0",
-    "angular2": "2.0.0-beta.7",
+    "angular2": "2.0.0-beta.1 - 2.0.0-beta.7",
     "es6-shim": "^0.33.3",
-    "zone.js": "~0.5.15",
+    "zone.js": "0.5.10 - 0.5.15",
     "css": "^2.2.1",
     "parse5": "^1.5.0"
   }
