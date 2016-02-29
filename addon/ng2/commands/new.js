@@ -8,10 +8,14 @@ var SilentError        = require('silent-error');
 var validProjectName   = require('ember-cli/lib/utilities/valid-project-name');
 var normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
 
-var NewCommand = require('ember-cli/lib/commands/new');
-var GitInit = require('../tasks/git-init');
+var Command     = require('ember-cli/lib/models/command');
+var InitCommand = require('./init');
 
-module.exports = NewCommand.extend({
+module.exports = Command.extend({
+    name: 'new',
+    description: 'Creates a new directory and runs ' + chalk.green('ng init') + ' in it.',
+    works: 'outsideProject',
+
     availableOptions: [
         { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
         { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
@@ -60,12 +64,6 @@ module.exports = NewCommand.extend({
             ui: this.ui,
             analytics: this.analytics
         });
-        var InitCommand = this.commands.Init;
-
-        var gitInit = new GitInit({
-            ui: this.ui,
-            project: this.project
-        });
 
         var initCommand = new InitCommand({
             ui: this.ui,
@@ -79,8 +77,7 @@ module.exports = NewCommand.extend({
               directoryName: commandOptions.directory,
               dryRun: commandOptions.dryRun
           })
-          .then(initCommand.run.bind(initCommand, commandOptions, rawArgs))
-          .then(gitInit.run.bind(gitInit, commandOptions, rawArgs));
+          .then(initCommand.run.bind(initCommand, commandOptions, rawArgs));
     }
 });
 
