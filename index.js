@@ -1,19 +1,10 @@
 var SERVER_IP = '127.0.0.1';
 
 var port = process.env.PORT || 3000;
-// var ssl  = process.env.SSLPORT || 4000;
 
 // Module dependencies
 var http = require('http');
-// require('nocycle').detect();
-// var https = require('https');
 
-/*
-var options = {
-  key:  fs.readFileSync('/private/etc/apache2/ssl/ssl.key'),
-  cert: fs.readFileSync('/private/etc/apache2/ssl/ssl.crt')
-};
-*/
 
 // Start server
 var framework = process.argv[2] || 'express';
@@ -28,11 +19,12 @@ if (framework === 'hapi') {
     port,
     address: SERVER_IP
   });
-  module.exports.Server = server.start(() => {
-    console.log(`Listening on port: ${port}`);
-    // for smoke testing
-    // smokeTest();
-  });
+  module.exports.Server = server
+    .start(() => {
+      console.log(`Listening on port: ${port}`);
+      // for smoke testing
+      // smokeTest();
+    });
 
 } else {
   // express or other express compliant frameworks
@@ -45,22 +37,16 @@ if (framework === 'hapi') {
     process.exit(1);
   }
 
-  module.exports.Server = http.createServer(server).listen(port, SERVER_IP,
-    function() {
+  module.exports.Server = http
+    .createServer(server)
+    .listen(port, SERVER_IP, function() {
       console.log(`Listening on port: ${port}`);
       // for smoke testing
       // smokeTest();
     });
 
 }
-console.log(`Using framework: ${framework}`);
-
-
-/*
-https.createServer(options, server).listen(ssl, function() {
-  console.log('Listening on port: ' + ssl + ' in ' + process.env.NODE_ENV);
-});
-*/
+console.log(`Using framework: "${framework}"`);
 
 
 function smokeTest() {
