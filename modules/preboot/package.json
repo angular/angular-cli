@@ -13,7 +13,7 @@
     "url": "https://github.com/angular/universal"
   },
   "author": "Jeff Whelpley",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "contributors": [
     "Tobias Bosch <tbosch@google.com>",
     "PatrickJS <github@gdi2290.com>",
