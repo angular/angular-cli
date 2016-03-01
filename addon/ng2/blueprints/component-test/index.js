@@ -1,16 +1,3 @@
-var stringUtils = require('ember-cli/lib/utilities/string');
+var component = require('../component');
 
-module.exports = {
-  description: ''
-
-  //locals: function(options) {
-  //   // Return custom template variables here.
-  //   return {
-  //
-  //   };
-  //}
-
-  // afterInstall: function(options) {
-  //   // Perform extra work here.
-  // }
-};
+module.exports = component;
