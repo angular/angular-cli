@@ -70,6 +70,14 @@ You can use the `ng generate` (or just `ng g`) command to generate Angular compo
 ```bash
 ng generate component my-new-component
 ng g component my-new-component # using the alias
+
+# components support relative path generation
+# if in the directory src/app/feature/ and you run
+ng g component new-cmp
+# your component will be generated in src/app/feature/new-cmp
+# but if you were to run
+ng g component ../newer-cmp
+# your component will be generated in src/app/newer-cmp
 ```
 You can find all possible blueprints in the table below:
 
