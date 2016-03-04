@@ -62,23 +62,19 @@ function _exceptionHandler(): ExceptionHandler {
   return new ExceptionHandler(DOM, false);
 }
 
+function _document(): any {
+  return DOM.createHtmlDocument();
+}
+
 export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   ...APPLICATION_COMMON_PROVIDERS,
   ...FORM_PROVIDERS,
   new Provider(PLATFORM_PIPES, {useValue: COMMON_PIPES, multi: true}),
   new Provider(PLATFORM_DIRECTIVES, {useValue: COMMON_DIRECTIVES, multi: true}),
   new Provider(ExceptionHandler, {useFactory: _exceptionHandler, deps: []}),
-  new Provider(DOCUMENT, {
-    useFactory: (appComponentType, directiveResolver) => {
-      // TODO(gdi2290): determine a better for document on the server
-      let selector = directiveResolver.resolve(appComponentType).selector;
-      let serverDocument = DOM.createHtmlDocument();
-      let el = DOM.createElement(selector);
-      DOM.appendChild(serverDocument.body, el);
-      return serverDocument;
-    },
-    deps: [APP_COMPONENT, DirectiveResolver]
-  }),
+
+  new Provider(DOCUMENT, {useFactory: () => _document }),
+
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: DomEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: KeyEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: HammerGesturesPlugin, multi: true}),
@@ -112,8 +108,20 @@ export function bootstrap(
   reflector.reflectionCapabilities = new ReflectionCapabilities();
 
   let appProviders: Array<any> = [
-    provide(APP_COMPONENT, {useValue: appComponentType}),
     ...NODE_APPLICATION_PROVIDERS,
+
+    new Provider(DOCUMENT, {
+      useFactory: (directiveResolver) => {
+        // TODO(gdi2290): determine a better for document on the server
+        let selector = directiveResolver.resolve(appComponentType).selector;
+        let serverDocument = DOM.createHtmlDocument();
+        let el = DOM.createElement(selector);
+        DOM.appendChild(serverDocument.body, el);
+        return serverDocument;
+      },
+      deps: [DirectiveResolver]
+    }),
+
     ...(isPresent(customAppProviders) ? customAppProviders : [])
   ];
 
@@ -127,17 +135,21 @@ export function bootstrap(
 }
 
 
+export function buildReflector(): void {
+  reflector.reflectionCapabilities = new ReflectionCapabilities();
+}
+
 export function buildNodeProviders(providers?: Array<any>): Array<any> {
   return [
-    ...NODE_PROVIDERS
+    ...NODE_PROVIDERS,
     ...(isPresent(providers) ? providers : [])
   ];
 }
 
-export function buildNodeAppProviders(appComponentType: Type, providers?: Array<any>): Array<any> {
+export function buildNodeAppProviders(document?: any, providers?: Array<any>): Array<any> {
   return [
-    provide(APP_COMPONENT, {useValue: appComponentType}),
     ...NODE_APPLICATION_PROVIDERS,
+    ...(isPresent(document) ? [new Provider(DOCUMENT, {useFactory: () => document})] : []),
     ...(isPresent(providers) ? providers : [])
   ];
 }
