@@ -1,4 +1,7 @@
-export * from 'preboot';
+import {selectorResolver} from './helper';
+import * as _preboot from 'preboot';
+
+export var preboot = _preboot;
 
 export function prebootConfigDefault(config = {}) {
   return (<any>Object).assign({
@@ -10,6 +13,24 @@ export function prebootConfigDefault(config = {}) {
     uglify:   true,
     presets:  ['keyPress', 'buttonPress', 'focus']
   }, config || {});
+}
+
+export function createPrebootCode(componentType: any | Array<any>, prebootConfig: any = {}): Promise<string> {
+  if (typeof prebootConfig === 'boolean' && prebootConfig === false) {
+    return Promise.resolve('');
+  }
+
+  let selector = null;
+  if (!Array.isArray(componentType)) {
+    selector = selectorResolver(componentType);
+  } else {
+    selector = componentType.map(selectorResolver)[0]; // hard code last app
+  }
+  // Get selector from Component selector metadata
+  prebootConfig.appRoot = prebootConfig.appRoot || selector;
+
+  let config = prebootConfigDefault(prebootConfig);
+  return preboot.getBrowserCode(config).then(code => createPrebootHTML(code, config));
 }
 
 export function getPrebootCSS(): string {
