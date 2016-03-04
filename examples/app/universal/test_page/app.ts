@@ -9,13 +9,13 @@ function transformData(data) {
 }
 
 @Component({
- selector:'my-app',
- template:`<h1>HELLO WORLD</h1>`
- 
+ selector: 'my-app',
+ template: `<h1>HELLO WORLD</h1>`
+
 })
 export class MyApp {
-    
-    
+
+
 }
 
 

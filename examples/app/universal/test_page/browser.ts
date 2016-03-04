@@ -2,7 +2,7 @@ console.time('angular2/core in client');
 import * as angular from 'angular2/core';
 console.timeEnd('angular2/core in client');
 
-import {platform, BROWSER_PROVIDERS, BROWSER_APP_PROVIDERS} from 'angular2/platform/browser';
+import {BROWSER_PROVIDERS, BROWSER_APP_PROVIDERS} from 'angular2/platform/browser';
 // import {
 //   Http,
 //   HTTP_PROVIDERS
@@ -16,16 +16,17 @@ import {platform, BROWSER_PROVIDERS, BROWSER_APP_PROVIDERS} from 'angular2/platf
 import {App, MyApp} from './app';
 
 export function main() {
-  var app = platform(BROWSER_PROVIDERS).application([
-    BROWSER_APP_PROVIDERS
-    /*
-    HTTP_PROVIDERS,
-    NG_PRELOAD_CACHE_PROVIDERS,
-    bind(PRIME_CACHE).toValue(true)
-    */
-  ]);
+  var app = angular.platform(BROWSER_PROVIDERS)
+    .application([
+      BROWSER_APP_PROVIDERS
+      /*
+      HTTP_PROVIDERS,
+      NG_PRELOAD_CACHE_PROVIDERS,
+      bind(PRIME_CACHE).toValue(true)
+      */
+    ]);
   return Promise.all([
     app.bootstrap(App),
-    app.bootstrap((MyApp)
+    app.bootstrap(MyApp)
   ]);
 }

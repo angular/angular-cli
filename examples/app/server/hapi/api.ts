@@ -60,7 +60,7 @@ module.exports = function(ROOT) {
 
       reply(TODOS[index]);
     }
-  },{
+  }, {
     method: 'DELETE',
     path: '/api/todos/{todo_id}',
     handler: (request, reply) => {

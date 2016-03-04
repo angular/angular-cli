@@ -32,7 +32,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/test_page/browser',
 
-        App: appPage.App,
+        directives: [appPage.App],
         providers: [
           // NODE_HTTP_PROVIDERS,
           // NODE_LOCATION_PROVIDERS,
@@ -66,7 +66,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/todo/browser',
 
-        App: todoApp.TodoApp,
+        directives: [todoApp.TodoApp],
         providers: [
           // NODE_HTTP_PROVIDERS,
           // NODE_LOCATION_PROVIDERS,
@@ -91,7 +91,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/falcor_todo/client',
 
-        App: todoApp.TodoApp,
+        directives: [todoApp.TodoApp],
         providers: [
           // NODE_HTTP_PROVIDERS,
           // NODE_LOCATION_PROVIDERS,
@@ -119,7 +119,7 @@ module.exports = function(ROOT) {
       // ensure that we test only server routes
       client: false,
 
-      App: routerApp.App,
+      directives: [routerApp.App],
       providers: [
         // NODE_HTTP_PROVIDERS,
         provide(APP_BASE_HREF, {useValue: baseUrl}),

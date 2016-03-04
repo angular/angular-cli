@@ -29,7 +29,7 @@ module.exports = function(ROOT) {
           path: `${ROOT + route}`
         }
       }
-    }
+    };
   }
 
   function ngRouter(request, reply) {
@@ -43,7 +43,7 @@ module.exports = function(ROOT) {
       // ensure that we test only server routes
       client: false,
 
-      App: routerApp.App,
+      directives: [routerApp.App],
       providers: [
         // HTTP_PROVIDERS,
         provide(APP_BASE_HREF, { useValue: baseUrl }),
@@ -70,13 +70,13 @@ module.exports = function(ROOT) {
 
   var router = [{
     method: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    path:'/{param*}',
+    path: '/{param*}',
     handler: (request, reply) => {
       reply({
         'route': 'Sorry this page does not exist!'
-      })
+      });
     }
-  },{
+  }, {
     method: 'GET',
     path: '/',
     handler: (request, reply) => {
@@ -85,7 +85,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/test_page/browser',
 
-        App: appPage.App,
+        directives: [appPage.App],
         providers: [
           // HTTP_PROVIDERS,
           // SERVER_LOCATION_PROVIDERS,
@@ -118,7 +118,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/falcor_todo/client',
 
-        App: todoApp.TodoApp,
+        directives: [todoApp.TodoApp],
         providers: [
           // HTTP_PROVIDERS,
           // SERVER_LOCATION_PROVIDERS,
@@ -142,7 +142,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/todo/browser',
 
-        App: todoApp.TodoApp,
+        directives: [todoApp.TodoApp],
         providers: [
           // HTTP_PROVIDERS,
           // SERVER_LOCATION_PROVIDERS,
