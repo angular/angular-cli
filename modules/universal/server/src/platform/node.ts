@@ -127,6 +127,13 @@ export function bootstrap(
 }
 
 
+export function buildNodeProviders(providers?: Array<any>): Array<any> {
+  return [
+    ...NODE_PROVIDERS
+    ...(isPresent(providers) ? providers : [])
+  ];
+}
+
 export function buildNodeAppProviders(appComponentType: Type, providers?: Array<any>): Array<any> {
   return [
     provide(APP_COMPONENT, {useValue: appComponentType}),

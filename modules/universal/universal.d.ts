@@ -26,6 +26,7 @@ export var REQUEST_URL: string;
 export function buildBaseUrl(url: string, existing?: boolean): any;
 export var NODE_HTTP_PROVIDERS: [any];
 export var NODE_PROVIDERS: [any];
+export function buildNodeProviders(providers?: Array<any>): Array<any>;
 export function buildNodeAppProviders(appComponentType: any, providers?: Array<any>): Array<any>;
 export function buildNodePlatformProviders(
   appComponentType: any,
@@ -76,6 +77,7 @@ export default {
   REQUEST_URL,
   buildBaseUrl,
   NODE_HTTP_PROVIDERS,
+  buildNodeProviders,
   buildNodeAppProviders,
   buildNodePlatformProviders,
   NODE_PROVIDERS,
