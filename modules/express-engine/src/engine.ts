@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
+import {DOM} from 'angular2/src/platform/dom/dom_adapter';
+
 import {
   renderToString,
   applicationToString,
@@ -8,18 +10,22 @@ import {
   renderToStringWithPreboot,
   serializeDocument,
   parseDocument,
+  parseFragment,
   addPrebootHtml,
-  platformNode
+  Bootloader
 } from 'angular2-universal-preview';
 
 export interface engineOptions {
   directives: Array<any>;
   providers?: Array<any>;
   preboot?: Object | any;
+  bootloader?: any;
   selector?: string;
   serializedCmp?: string;
   server?: boolean;
   client?: boolean;
+  componentProviders?: any;
+  platformProviders?: any;
 }
 
 const prebootScript: string = `
@@ -157,30 +163,20 @@ export function expressEngine(filePath: string, options: engineOptions, done: Fu
       }
 
       // bootstrap and render component to string
-      var ng2platform = platformNode({
-        document: parseDocument(clientHtml),
-        providers: options.providers
-      });
-
-      let directives = [];
-      for (let i = 0; i < options.directives.length; ++i) {
-        let App = options.directives[i];
-        directives.push(ng2platform(App));
+      var bootloader = options.bootloader;
+      if (!options.bootloader) {
+        options.bootloader = {
+          document: parseDocument(clientHtml),
+          providers: options.providers,
+          componentProviders: options.componentProviders,
+          platformProviders: options.platformProviders,
+          directives: options.directives,
+          preboot: options.preboot
+        };
       }
+      bootloader = Bootloader.create(options.bootloader);
 
-      Promise.all(directives)
-        .then(applicationRefs => {
-          let injector = applicationRefs[0].injector;
-          let document = injector.get(DOCUMENT);
-          let rendered = serializeDocument(document);
-
-          if ('preboot' in options) {
-            // promise
-            return addPrebootHtml(options.directives, '', options.preboot)
-              .then(html => rendered.replace('</body>', (html + '</body>')));
-          }
-          return rendered;
-        })
+      bootloader.serializeApplication()
         .then(html => done(null, buildClientScripts(html, options)))
         .catch(e => {
           console.log(e.stack);
