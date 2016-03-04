@@ -90,7 +90,7 @@
     "yargs": "^3.14.0"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.7",
+    "angular2": "2.0.0-beta.8",
     "angular2-express-engine": "file:modules/express-engine",
     "angular2-hapi-engine": "file:modules/hapi-engine",
     "angular2-universal": "file:modules/universal",

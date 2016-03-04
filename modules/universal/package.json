@@ -37,7 +37,7 @@
   "devDependencies": {
     "angular2-express-engine": "file:../express-engine",
     "angular2-hapi-engine": "file:../hapi-engine",
-    "preboot": "~1.1.0",
+    "preboot": "file:../preboot",
     "typescript": "^1.7.3"
   },
   "dependencies": {
@@ -48,11 +48,11 @@
   "peerDependencies": {
     "es6-promise": "^3.0.2",
     "reflect-metadata": "0.1.2",
-    "preboot": "~1.1.0",
+    "preboot": "1.1.0 - 2.0.1",
     "angular2-express-engine": "*",
     "angular2-hapi-engine": "*",
     "rxjs": "~5.0.0-beta.2",
-    "angular2": "2.0.0-beta.7",
+    "angular2": "2.0.0-beta.8",
     "es6-shim": "^0.33.3",
     "zone.js": "~0.5.15",
     "css": "^2.2.1",
