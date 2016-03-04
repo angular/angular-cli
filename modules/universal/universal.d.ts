@@ -37,6 +37,7 @@ export function selectorRegExpFactory(selector: string): RegExp;
 export function expressEngine(): any;
 export function hapiEngine(): any;
 export function parseDocument(documentHtml: string): Object;
+export function parseFragment(el: string): Object;
 export function serializeDocument(document: Object): string;
 export function addPrebootHtml(AppComponent: any, html: any, prebootConfig?: any): any;
 export function renderDocument(
@@ -49,16 +50,29 @@ export function renderDocumentWithPreboot(
   nodeProviders?: any,
   prebootConfig?: any
 ): Promise<string>;
-export function platformNode(config: any): any;
+export function bootloader(config: any): any;
 export function buildReflector(): void;
 export function applicationToString(appRef: any): string;
+export class Bootloader {
+  _config: any;
+  static create(config?: any);
+  static serializeDocument(doc?: any);
+  static parseFragment(doc?: any);
+  static parseDocument(doc?: any);
+  static serializeApplications(apps?: any);
+  constructor(config?: any)
+  bootstrap(Component?: any, componentProviders?: Array<any>): Promise<any>;
+}
+
 export default {
   applicationToString,
-  platformNode,
+  Bootloader,
+  bootloader,
   renderDocumentWithPreboot,
   renderDocument,
   addPrebootHtml,
   serializeDocument,
+  parseFragment,
   parseDocument,
   expressEngine,
   hapiEngine,

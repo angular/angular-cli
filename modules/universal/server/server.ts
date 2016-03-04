@@ -18,6 +18,7 @@ export * from './src/platform/node_xhr_impl';
 export * from './src/router/index';
 
 export * from './src/helper';
+export * from './src/bootloader';
 export * from './src/ng_preboot';
 export * from './src/render';
 export * from './src/stringify_element';
