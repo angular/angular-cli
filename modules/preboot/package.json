@@ -1,17 +1,19 @@
 {
   "name": "preboot",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Record and play back browser events",
-  "main": "dist/src/preboot_node.js",
-  "browser": "dist/src/preboot_browser.js",
+  "main": "dist/src/node/preboot_node.js",
+  "browser": "dist/src/browser/preboot_browser.js",
   "typings": "src/node/preboot_node.d.ts",
   "scripts": {
-    "build": "gulp tsc"
+    "prebuild": "rm -rf dist",
+    "build": "gulp tsc",
+    "prepublish": "npm run build"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/angular/universal"
-  },
+  "files": [
+    "src",
+    "dist"
+  ],
   "author": "Jeff Whelpley",
   "license": "MIT",
   "contributors": [
@@ -19,10 +21,6 @@
     "PatrickJS <github@gdi2290.com>",
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
-  "bugs": {
-    "url": "https://github.com/angular/universal/issues"
-  },
-  "homepage": "https://github.com/angular/universal/tree/master/modules/preboot",
   "devDependencies": {
     "connect-livereload": "^0.5.4",
     "del": "^2.2.0",
@@ -57,5 +55,13 @@
     "gulp": "^3.9.1",
     "lodash": "^4.5.1",
     "q": "^1.4.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
+  "homepage": "https://github.com/angular/universal/tree/master/modules/preboot"
 }
