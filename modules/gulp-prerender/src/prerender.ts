@@ -40,7 +40,7 @@ export class GulpAngular2Render {
 
           file.contents = new Buffer(html);
 
-          cb(null, file)
+          cb(null, file);
         });
     });
   }

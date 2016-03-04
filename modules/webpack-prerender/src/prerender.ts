@@ -7,10 +7,10 @@ export interface IUniversalConfig {
 }
 
 class Angular2Prerender {
-  constructor(private options){}
-  
+  constructor(private options) {}
+
   render(file) {
-    
+
     let str: string = file.toString();
 
     let renderPromise = universal.renderToString;
@@ -45,13 +45,15 @@ export class WebpackAngular2Prerender {
   }
 
   apply(compiler) {
-    
+
     compiler.plugin('emit', (compilation, callback) => {
-      
-      for(var file in compilation.assets) {
+
+      for (var file in compilation.assets) {
+        if (compilation.assets.hasOwnProperty(file)) {
           this.prerender
               .render(file)
               .then( (buffer) => compilation.assets[file] = buffer);
+        }
       }
 
       callback();

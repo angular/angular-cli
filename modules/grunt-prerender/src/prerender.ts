@@ -7,10 +7,10 @@ interface IUniversalConfig {
 }
 
 class Angular2Prerender {
-  constructor(private options){}
-  
+  constructor(private options) {}
+
   render(file) {
-    
+
     let str: string = file.toString();
 
     let renderPromise = universal.renderToString;
@@ -47,7 +47,7 @@ class Angular2Prerender {
 // needs to be written like this otherwise Grunt will fail to load this task
 module.exports = class GruntAngular2Prerender {
 
-  constructor(grunt){
+  constructor(grunt) {
 
     // Please see the Grunt documentation for more information regarding task
     // creation: http://gruntjs.com/creating-tasks
@@ -83,13 +83,13 @@ module.exports = class GruntAngular2Prerender {
           .render(src)
           .then((buffer) => src = buffer)
           .then((_src) => grunt.file.write(f.dest, _src))
-          .then(_ => grunt.log.writeln('File "' + f.dest + '" created.'))
+          .then(_ => grunt.log.writeln('File "' + f.dest + '" created.'));
 
       });
     });
 
   }
 
-}
+};
 
 
