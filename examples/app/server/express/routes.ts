@@ -43,7 +43,6 @@ module.exports = function(ROOT) {
 
         preboot: queryParams.preboot === false ? null : {
           start:    true,
-          appRoot:  'app',         // selector for root element
           freeze:   'spinner',     // show spinner w button click & freeze page
           replay:   'rerender',    // rerender replay strategy
           buffer:   true,          // client app will write to hidden div until bootstrap complete
