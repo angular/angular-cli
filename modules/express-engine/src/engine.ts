@@ -1,13 +1,19 @@
 import * as fs from 'fs';
+import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {
   renderToString,
+  applicationToString,
   selectorResolver,
   selectorRegExpFactory,
-  renderToStringWithPreboot
+  renderToStringWithPreboot,
+  serializeDocument,
+  parseDocument,
+  addPrebootHtml,
+  platformNode
 } from 'angular2-universal-preview';
 
 export interface engineOptions {
-  App: Function;
+  directives: Array<any>;
   providers?: Array<any>;
   preboot?: Object | any;
   selector?: string;
@@ -125,6 +131,14 @@ export function expressEngine(filePath: string, options: engineOptions, done: Fu
   options.providers = options.providers || undefined;
   options.preboot   = options.preboot   || undefined;
 
+  if ('App' in options) {
+    throw new Error('Please provide an `directives` property with your Angular 2 application rather than `App`');
+  }
+
+  if (!('directives' in options)) {
+    throw new Error('Please provide an `directives` property with your Angular 2 application');
+  }
+
   // read file on disk
   try {
     fs.readFile(filePath, (err, content) => {
@@ -141,32 +155,33 @@ export function expressEngine(filePath: string, options: engineOptions, done: Fu
       if (options.server === false && options.client !== false) {
         return done(null, buildClientScripts(clientHtml, options));
       }
+
       // bootstrap and render component to string
-      var renderPromise: any = renderToString;
-      const args = [options.App, options.providers];
-      if (options.preboot) {
-        renderPromise = renderToStringWithPreboot;
-        args.push(options.preboot);
+      var ng2platform = platformNode({
+        document: parseDocument(clientHtml),
+        providers: options.providers
+      });
+
+      let directives = [];
+      for (let i = 0; i < options.directives.length; ++i) {
+        let App = options.directives[i];
+        directives.push(ng2platform(App));
       }
 
-      renderPromise(...args)
-        .then(serializedCmp => {
+      Promise.all(directives)
+        .then(applicationRefs => {
+          let injector = applicationRefs[0].injector;
+          let document = injector.get(DOCUMENT);
+          let rendered = serializeDocument(document);
 
-          const selector: string = selectorResolver(options.App);
-
-          // selector replacer explained here
-          // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
-          // replace our component with serialized version
-          const rendered: string = clientHtml.replace(
-            // <selector></selector>
-            selectorRegExpFactory(selector),
-            // <selector>{{ serializedCmp }}</selector>
-            serializedCmp
-            // TODO: serializedData
-          );
-
-          done(null, buildClientScripts(rendered, options));
+          if ('preboot' in options) {
+            // promise
+            return addPrebootHtml(options.directives, '', options.preboot)
+              .then(html => rendered.replace('</body>', (html + '</body>')));
+          }
+          return rendered;
         })
+        .then(html => done(null, buildClientScripts(html, options)))
         .catch(e => {
           console.log(e.stack);
           // if server fail then return client html
@@ -178,18 +193,19 @@ export function expressEngine(filePath: string, options: engineOptions, done: Fu
   }
 };
 
-export const ng2engine = function(...args) {
+export function ng2engine(...args) {
   console.warn('DEPRECATION WARNING: `ng2engine` is no longer supported and will be removed in next release. use `expressEngine`');
   return expressEngine(...args);
-}
-export const ng2Engine = function(...args) {
+};
+
+export function ng2Engine(...args) {
   console.warn('DEPRECATION WARNING: `ng2Engine` is no longer supported and will be removed in next release. use `expressEngine`');
   return expressEngine(...args);
-}
-export const ng2ExpressEngine = function(...args) {
+};
+export function ng2ExpressEngine(...args) {
   console.warn('DEPRECATION WARNING: `ng2ExpressEngine` is no longer supported and will be removed in next release. use `expressEngine`');
   return expressEngine(...args);
-}
+};
 
 export function simpleReplace(filePath: string, options: engineOptions, done: Function) {
   // defaults
@@ -211,6 +227,9 @@ export function simpleReplace(filePath: string, options: engineOptions, done: Fu
       if (options.server === false && options.client !== false) {
         return done(null, buildClientScripts(clientHtml, options));
       }
+      // selector replacer explained here
+      // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
+      // replace our component with serialized version
 
       let rendered: string = clientHtml.replace(
         // <selector></selector>
