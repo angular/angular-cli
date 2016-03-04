@@ -124,7 +124,7 @@ var CONFIG = {
 gulp.task('default', function(done) {
 
   var tasks = [
-    'lint'
+    'lint',
     // 'test'
   ];
 
@@ -135,7 +135,7 @@ gulp.task('default', function(done) {
 gulp.task('ci', function(done) {
 
   var tasks = [
-    'lint'
+    'lint',
     // 'test'
     // 'protractor'
   ];
@@ -231,7 +231,9 @@ gulp.task('protractor.update', function(done){
 
 gulp.task('lint', function() {
 
-  return gulp.src(PATHS.files.ts).
+  return gulp.src(PATHS.files.ts.concat([
+      '!./modules/*/dist/**'
+    ])).
     pipe($.tslint()).
     pipe($.tslint.report('verbose'));
 
