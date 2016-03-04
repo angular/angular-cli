@@ -1,4 +1,11 @@
 
+interface IHapiRoute {
+  method?: string[] | string;
+  path?: string;
+  handler?(request:any, reply:any): any | any;
+}
+
+
 module.exports = function(ROOT) {
 
   var universalPath = `${ROOT}/dist/examples/app/universal`;
@@ -68,7 +75,7 @@ module.exports = function(ROOT) {
     };
   }
 
-  var router = [{
+  var router: IHapiRoute[] = [{
     method: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     path: '/{param*}',
     handler: (request, reply) => {

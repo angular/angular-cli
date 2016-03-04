@@ -1,6 +1,13 @@
 var util = require('util');
 
-var TODOS = [
+interface ITODO {
+  id: number;
+  value: string;
+  created_at: Date;
+  completed: boolean;
+}
+
+var TODOS: ITODO[] = [
   { id: 0, value: 'finish example', created_at: new Date(), completed: false },
   { id: 1, value: 'add tests',      created_at: new Date(), completed: false },
   { id: 2, value: 'include development environment', created_at: new Date(), completed: false },
@@ -10,7 +17,7 @@ var COUNT = TODOS.length;
 
 module.exports = function(ROOT) {
 
-  function findById(todo_id: number): any[] {
+  function findById(todo_id: number|any): ITODO {
     var id = Number(todo_id);
     return TODOS[id];
   }
@@ -47,7 +54,7 @@ module.exports = function(ROOT) {
     handler: (request, reply) => {
       console.log('GET', util.inspect(request.todo, {colors: true}));
 
-      res.json(findById(request.params.todo_id));
+      reply.json(findById(request.params.todo_id));
     }
   }, {
     method: 'PUT',

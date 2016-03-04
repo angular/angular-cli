@@ -189,18 +189,18 @@ export function expressEngine(filePath: string, options: engineOptions, done: Fu
   }
 };
 
-export function ng2engine(...args) {
+export function ng2engine(filePath: string, options: engineOptions, done: Function) {
   console.warn('DEPRECATION WARNING: `ng2engine` is no longer supported and will be removed in next release. use `expressEngine`');
-  return expressEngine(...args);
+  return expressEngine(filePath, options, done);
 };
 
-export function ng2Engine(...args) {
+export function ng2Engine(filePath: string, options: engineOptions, done: Function) {
   console.warn('DEPRECATION WARNING: `ng2Engine` is no longer supported and will be removed in next release. use `expressEngine`');
-  return expressEngine(...args);
+  return expressEngine(filePath, options, done);
 };
-export function ng2ExpressEngine(...args) {
+export function ng2ExpressEngine(filePath: string, options: engineOptions, done: Function) {
   console.warn('DEPRECATION WARNING: `ng2ExpressEngine` is no longer supported and will be removed in next release. use `expressEngine`');
-  return expressEngine(...args);
+  return expressEngine(filePath, options, done);
 };
 
 export function simpleReplace(filePath: string, options: engineOptions, done: Function) {
