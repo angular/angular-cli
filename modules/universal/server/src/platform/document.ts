@@ -1,19 +1,26 @@
-import { OpaqueToken } from 'angular2/core';
-import { Parser, Serializer, TreeAdapters } from 'parse5';
-import { DOM } from 'angular2/src/platform/dom/dom_adapter';
+import {OpaqueToken} from 'angular2/core';
+import {Parser, Serializer, TreeAdapters} from 'parse5';
+import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 
 const parser = new Parser(TreeAdapters.htmlparser2);
 // TODO(gdi2290): fix encodeHtmlEntities: true
 const serializer = new Serializer(TreeAdapters.htmlparser2, { encodeHtmlEntities: false });
 const treeAdapter = parser.treeAdapter;
 
-function isTag(tagName, node): boolean {
+export function isTag(tagName, node): boolean {
   return node.type === 'tag' && node.name === tagName;
+}
+
+export function parseFragment(el: string): Object {
+  return parser.parseFragment(el);
 }
 
 export function parseDocument(documentHtml: string): Object {
   const doc = parser.parse(documentHtml);
-  let rootNode, bodyNode, headNode, titleNode;
+  let rootNode;
+  let bodyNode;
+  let headNode;
+  let titleNode;
 
   for (let i = 0; i < doc.children.length; ++i) {
     const child = doc.children[i];
