@@ -32,7 +32,7 @@ module.exports = function(ROOT) {
         // client url for systemjs
         componentUrl: 'examples/app/universal/test_page/browser',
 
-        directives: [appPage.App],
+        directives: [appPage.App, appPage.MyApp],
         providers: [
           // NODE_HTTP_PROVIDERS,
           // NODE_LOCATION_PROVIDERS,
