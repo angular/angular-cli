@@ -1,52 +1,36 @@
 import {
   bootstrap,
   buildReflector,
-  NODE_PROVIDERS,
+  buildNodeProviders,
   buildNodeAppProviders
 } from './platform/node';
-import {parseDocument, serializeDocument} from './platform/document';
 import {DOCUMENT} from 'angular2/platform/common_dom';
+import {parseDocument, serializeDocument} from './platform/document';
 
 import {
   selectorRegExpFactory,
-  arrayFlattenTree
+  arrayFlattenTree,
+  selectorResolver
 } from './helper';
 import {stringifyElement} from './stringify_element';
 
 import {
   prebootConfigDefault,
   getPrebootCSS,
-  createPrebootHTML,
-  getBrowserCode
+  createPrebootCode
 } from './ng_preboot';
 
 import {isBlank, isPresent} from 'angular2/src/facade/lang';
 
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 
-import {NgZone, platform, DirectiveResolver, ComponentRef, Provider, Type} from 'angular2/core';
+import {NgZone, ComponentRef, Provider, Type} from 'angular2/core';
 import {Http} from 'angular2/http';
 import {Router} from 'angular2/router';
 
-export function addPrebootHtml(AppComponent, html, prebootConfig: any = {}): any {
-  if (typeof prebootConfig === 'boolean' && prebootConfig === false) {
-    return html;
-  }
 
-  let selector = null;
-  if (!Array.isArray(AppComponent)) {
-    selector = selectorResolver(AppComponent);
-  } else {
-    selector = AppComponent.map(selectorResolver);
-  }
-  // Get selector from Component selector metadata
-  prebootConfig.appRoots = prebootConfig.appRoots || selector;
 
-  let config = prebootConfigDefault(prebootConfig);
-  return getBrowserCode(config).then(code => html + createPrebootHTML(code, config));
-}
-
-function waitRouter(appRef: ComponentRef): Promise<ComponentRef> {
+export function waitRouter(appRef: ComponentRef): Promise<ComponentRef> {
   let injector = appRef.injector;
   let router = injector.getOptional(Router);
 
@@ -76,18 +60,10 @@ export function renderDocumentWithPreboot(
   documentHtml: string,
   componentType: Type,
   nodeProviders?: any,
-  prebootConfig: any = {}
-): Promise<string> {
+  prebootConfig: any = {}): Promise<string> {
 
   return renderDocument(documentHtml, componentType, nodeProviders)
-    .then(html => addPrebootHtml(html, prebootConfig));
-}
-
-
-export var serverDirectiveResolver = new DirectiveResolver();
-
-export function selectorResolver(componentType: /*Type*/ any): string {
-  return serverDirectiveResolver.resolve(componentType).selector;
+    .then(html => createPrebootCode(componentType, prebootConfig).then(code => html + code));
 }
 
 
@@ -122,15 +98,6 @@ export function appRefSyncRender(appRef: any): string {
   return serializedApp;
 }
 
-export function platformNode(config: any = {}): any {
-  buildReflector();
-  var app = platform(NODE_PROVIDERS)
-    .application(buildNodeAppProviders(config.document, config.providers));
-  return function bootstrapNode(Component?: any, componentProviders?: Array<any>) {
-    return app.bootstrap(Component || config.component, config.componentProviders)
-      .then(waitRouter);
-  };
-}
 
 export function applicationToString(appRef: ComponentRef): string {
   let html = appRefSyncRender(appRef);
@@ -140,16 +107,14 @@ export function applicationToString(appRef: ComponentRef): string {
 
 
 
-
-
-export function renderToString(AppComponent: any, nodeProviders?: any): Promise<string> {
+export function renderToString(componentType: any, nodeProviders?: any): Promise<string> {
   console.warn('DEPRECATION WARNING: `renderToString` is no longer supported and will be removed in next release.');
-  return bootstrap(AppComponent, nodeProviders)
+  return bootstrap(componentType, nodeProviders)
     .then(applicationToString);
 }
 
-export function renderToStringWithPreboot(AppComponent: any, nodeProviders?: any, prebootConfig: any = {}): Promise<string> {
+export function renderToStringWithPreboot(componentType: any, nodeProviders?: any, prebootConfig: any = {}): Promise<string> {
   console.warn('DEPRECATION WARNING: `renderToStringWithPreboot` is no longer supported and will be removed in next release.');
-  return renderToString(AppComponent, nodeProviders)
-    .then(html => addPrebootHtml(AppComponent, html, prebootConfig));
+  return renderToString(componentType, nodeProviders)
+    .then(html => createPrebootCode(componentType, prebootConfig).then(code => html + code));
 }
