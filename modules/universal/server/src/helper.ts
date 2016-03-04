@@ -1,3 +1,14 @@
+import {DirectiveResolver} from 'angular2/core';
+var directiveResolver: any = new DirectiveResolver();
+
+export function serverDirectiveResolver(componentType: any): any {
+  return directiveResolver.resolve(componentType);
+}
+
+export function selectorResolver(componentType: /*Type*/ any): string {
+  return serverDirectiveResolver(componentType).selector;
+}
+
 export function escapeRegExp(str): string {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
