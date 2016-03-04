@@ -1,4 +1,9 @@
-import {bootstrap} from './platform/node';
+import {
+  bootstrap,
+  buildReflector,
+  NODE_PROVIDERS,
+  buildNodeAppProviders
+} from './platform/node';
 import {parseDocument, serializeDocument} from './platform/document';
 import {DOCUMENT} from 'angular2/platform/common_dom';
 
@@ -19,7 +24,7 @@ import {isBlank, isPresent} from 'angular2/src/facade/lang';
 
 import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
 
-import {NgZone, DirectiveResolver, ComponentRef, Provider, Type} from 'angular2/core';
+import {NgZone, platform, DirectiveResolver, ComponentRef, Provider, Type} from 'angular2/core';
 import {Http} from 'angular2/http';
 import {Router} from 'angular2/router';
 
@@ -28,7 +33,15 @@ export function addPrebootHtml(AppComponent, html, prebootConfig: any = {}): any
     return html;
   }
 
-  prebootConfig.appRoot = prebootConfig.appRoot || selectorResolver(AppComponent);
+  let selector = null;
+  if (!Array.isArray(AppComponent)) {
+    selector = selectorResolver(AppComponent);
+  } else {
+    selector = AppComponent.map(selectorResolver);
+  }
+  // Get selector from Component selector metadata
+  prebootConfig.appRoots = prebootConfig.appRoots || selector;
+
   let config = prebootConfigDefault(prebootConfig);
   return getBrowserCode(config).then(code => html + createPrebootHTML(code, config));
 }
@@ -42,10 +55,9 @@ function waitRouter(appRef: ComponentRef): Promise<ComponentRef> {
 }
 
 export function renderDocument(
-  documentHtml: string,
-  componentType: Type,
-  nodeProviders?: any
-): Promise<string> {
+    documentHtml: string,
+    componentType: Type,
+    nodeProviders?: any): Promise<string> {
 
   return bootstrap(componentType, [
     ...nodeProviders,
@@ -110,17 +122,34 @@ export function appRefSyncRender(appRef: any): string {
   return serializedApp;
 }
 
-export function renderToString(AppComponent: any, nodeProviders?: any): Promise<string> {
-  return bootstrap(AppComponent, nodeProviders)
-    .then(waitRouter)
-    .then((appRef: ComponentRef) => {
-      let html = appRefSyncRender(appRef);
-      appRef.dispose();
-      return html;
-    });
+export function platformNode(config: any = {}): any {
+  buildReflector();
+  var app = platform(NODE_PROVIDERS)
+    .application(buildNodeAppProviders(config.document, config.providers));
+  return function bootstrapNode(Component?: any, componentProviders?: Array<any>) {
+    return app.bootstrap(Component || config.component, config.componentProviders)
+      .then(waitRouter);
+  };
+}
+
+export function applicationToString(appRef: ComponentRef): string {
+  let html = appRefSyncRender(appRef);
+  appRef.dispose();
+  return html;
 }
 
 
+
+
+
+export function renderToString(AppComponent: any, nodeProviders?: any): Promise<string> {
+  console.warn('DEPRECATION WARNING: `renderToString` is no longer supported and will be removed in next release.');
+  return bootstrap(AppComponent, nodeProviders)
+    .then(applicationToString);
+}
+
 export function renderToStringWithPreboot(AppComponent: any, nodeProviders?: any, prebootConfig: any = {}): Promise<string> {
-  return renderToString(AppComponent, nodeProviders).then(html => addPrebootHtml(AppComponent, html, prebootConfig));
+  console.warn('DEPRECATION WARNING: `renderToStringWithPreboot` is no longer supported and will be removed in next release.');
+  return renderToString(AppComponent, nodeProviders)
+    .then(html => addPrebootHtml(AppComponent, html, prebootConfig));
 }
