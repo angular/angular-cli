@@ -49,7 +49,12 @@ export function renderDocumentWithPreboot(
   nodeProviders?: any,
   prebootConfig?: any
 ): Promise<string>;
+export function platformNode(config: any): any;
+export function buildReflector(): void;
+export function applicationToString(appRef: any): string;
 export default {
+  applicationToString,
+  platformNode,
   renderDocumentWithPreboot,
   renderDocument,
   addPrebootHtml,
@@ -77,6 +82,7 @@ export default {
   REQUEST_URL,
   buildBaseUrl,
   NODE_HTTP_PROVIDERS,
+  buildReflector,
   buildNodeProviders,
   buildNodeAppProviders,
   buildNodePlatformProviders,
