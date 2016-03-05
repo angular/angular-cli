@@ -30,7 +30,9 @@ describe('Basic end-to-end Workflow', function () {
   it('Installs angular-cli correctly', function() {
     this.timeout(300000);
 
-    sh.exec('npm link', {silent: true});
+    if (sh.exec('npm link', {silent: true}).code !== 0) {
+      throw new Error('Command returned error.');
+    }
     return tmp.setup('./tmp')
       .then(function () {
         process.chdir('./tmp');
@@ -53,7 +55,9 @@ describe('Basic end-to-end Workflow', function () {
   it('Can change current working directory to `test-project`', function() {
     this.timeout(420000);
     process.chdir(path.join(root, 'test-project'));
-    sh.exec('npm link angular-cli', {silent: true});
+    if (sh.exec('npm link angular-cli', {silent: true}).code !== 0) {
+      throw new Error('Command returned error.');
+    }
     expect(path.basename(process.cwd())).to.equal('test-project');
   });
 
