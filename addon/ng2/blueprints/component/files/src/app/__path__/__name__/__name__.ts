@@ -5,7 +5,7 @@ import {Component} from 'angular2/core';
   selector: '<%= dasherizedModuleName %>',
   templateUrl: 'app/components/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>.html',
   styleUrls: ['app/components/<%= dasherizedModuleName %>/<%= dasherizedModuleName %>.css'],
-  providers: [],
+  provi;ders: [],
   directives: [],
   pipes: []
 })

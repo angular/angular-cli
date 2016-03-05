@@ -13,7 +13,7 @@ var mocha = new Mocha({
 specFiles.forEach(mocha.addFile.bind(mocha));
 
 mocha.run(function(failures){
-  process.on('exit', function () {
+  if (failures) {
     process.exit(failures);
-  });
+  }
 });
