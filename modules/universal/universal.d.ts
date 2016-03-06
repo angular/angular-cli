@@ -59,9 +59,15 @@ export class Bootloader {
   static serializeDocument(doc?: any);
   static parseFragment(doc?: any);
   static parseDocument(doc?: any);
-  static serializeApplications(apps?: any);
+  static appRefToString(apps?: any);
   constructor(config?: any)
+  document(document): any;
+  platform(providers?: any): any;
+  application(document?: any, providers?: any): any;
   bootstrap(Component?: any, componentProviders?: Array<any>): Promise<any>;
+  serialize(Component?: any | Array<any>, componentProviders?: Array<any>): Promise<any>;
+  serializeApplication(): void;
+  dispose(): void;
 }
 
 export default {
