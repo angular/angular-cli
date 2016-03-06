@@ -3,6 +3,7 @@ var path = require('path');
 var http = require('http');
 var fs = require('fs');
 var child_process = require('child_process');
+var package = require('./package.json');
 
 // Gulp and Plugins
 var gulp = require('gulp');
@@ -55,7 +56,7 @@ var PATHS = {
     filename: root('CHANGELOG.md')
   },
 
-  serverIndex : root('/index.js'),
+  serverIndex: root('/index.js'),
 
   specs: rootDir([
     'dist/**/*_spec.js'
@@ -65,6 +66,11 @@ var PATHS = {
     'test/**/*.e2e.js'
   ]),
 
+  doc: {
+    out: root('documentation/'),
+    json: root('documentation/api.json'),
+    theme: 'minimal'
+  }
 
 };
 
@@ -146,14 +152,14 @@ gulp.task('ci', function(done) {
 
 // Build
 
-gulp.task('build.typescript', [ 'build.typescript.project' ]);
+gulp.task('build.typescript', ['build.typescript.project']);
 
 gulp.task('build.typescript.project', ['clean.dist'], function() {
 
   return TS_PROJECT.src().
-    pipe($.typescript(TS_PROJECT)).
-    pipe($.size()).
-    pipe(gulp.dest(TS_PROJECT.config.compilerOptions.outDir));
+  pipe($.typescript(TS_PROJECT)).
+  pipe($.size()).
+  pipe(gulp.dest(TS_PROJECT.config.compilerOptions.outDir));
 
 });
 
@@ -176,7 +182,7 @@ gulp.task('changelog', function() {
 
 gulp.task('clean', function() {
 
-  return $.del(PATHS.cleanable, function (err, paths) {
+  return $.del(PATHS.cleanable, function(err, paths) {
     if (paths.length <= 0) {
       return console.log('Nothing to clean.');
     }
@@ -187,7 +193,7 @@ gulp.task('clean', function() {
 
 gulp.task('clean.dist', function() {
 
-  return $.del('dist', function (err, paths) {
+  return $.del('dist', function(err, paths) {
     if (paths.length <= 0) {
       return console.log('Nothing to clean.');
     }
@@ -207,41 +213,41 @@ gulp.task('debug', function() {
 gulp.task('protractor', function() {
 
   return gulp.src(PATHS.e2e).
-    pipe($.protractor.protractor({
-      configFile: PATHS.config.protractor
-    })).
+  pipe($.protractor.protractor({
+    configFile: PATHS.config.protractor
+  })).
     on('error', function(e) { throw e })
 });
 
-gulp.task('protractor.start', function(done){
+gulp.task('protractor.start', function(done) {
 
   return $.protractor.webdriver_standalone(done);
 
 });
 
-gulp.task('protractor.update', function(done){
+gulp.task('protractor.update', function(done) {
 
   child_process.
-    spawn(getProtractorBinary('webdriver-manager'), ['update'], {
-      stdio: 'inherit'
-    }).
-    once('close', done);
+  spawn(getProtractorBinary('webdriver-manager'), ['update'], {
+    stdio: 'inherit'
+  }).
+  once('close', done);
 
 });
 
 gulp.task('lint', function() {
 
   return gulp.src(PATHS.files.ts.concat([
-      '!./modules/*/dist/**'
-    ])).
-    pipe($.tslint()).
-    pipe($.tslint.report('verbose'));
+    '!./modules/*/dist/**'
+  ])).
+  pipe($.tslint()).
+  pipe($.tslint.report('verbose'));
 
 });
 
 //  Watch
 
-gulp.task('watch', function(){
+gulp.task('watch', function() {
 
   gulp.watch(PATHS.files.ts, ['build.typescript.project']);
   gulp.watch(PATHS.specs, ['jasmine']);
@@ -257,8 +263,8 @@ gulp.task('!browser-sync', function() {
 // Serve
 
 // "serve" defaults to nodemon for the moment.
-gulp.task('serve', [ 'serve.nodemon']);
-gulp.task('server', [ 'nodemon']);
+gulp.task('serve', ['serve.nodemon']);
+gulp.task('server', ['nodemon']);
 
 gulp.task('nodemon', function() {
 
@@ -270,7 +276,7 @@ gulp.task('nodemon', function() {
   });
 });
 
-gulp.task('serve.nodemon', [ 'watch' ], function() {
+gulp.task('serve.nodemon', ['watch'], function() {
 
   $.livereload.listen();
 
@@ -279,17 +285,76 @@ gulp.task('serve.nodemon', [ 'watch' ], function() {
   return $.nodemon(CONFIG.nodemon).
   on('restart', function() {
     gulp.src('index.js').pipe($.livereload());
-      // .pipe($.notify('Reloading page, please wait...'));
+    // .pipe($.notify('Reloading page, please wait...'));
   });
+});
+
+// Documentation
+
+var availableModules = [
+  'express-engine',
+  'grunt-prerender',
+  'gulp-prerender',
+  'hapi-engine',
+  'preboot',
+  'universal',
+  'webpack-prerender'
+];
+// generate a doc gulp task per module
+// ie:
+//  gulp doc:express-engine
+//  gulp doc:universal
+//  ...
+availableModules.forEach(function(moduleName) {
+  var documentationConfig = getDocConfig(moduleName);
+  gulp.task('doc:' + moduleName, function() {
+
+    $.util.log('Building documentation for:', $.util.colors.green(
+      moduleName));
+
+    return gulp.src(documentationConfig.files)
+      .pipe($.typedoc(documentationConfig.config));
+  });
+});
+// add a global (default) doc gulp task for all modules
+gulp.task('doc', function(done) {
+  $.util.log('Building documentation for all modules:', $.util.colors.green(
+    availableModules));
+
+  availableModules = availableModules.map(function(moduleName) {
+    return 'doc:' + moduleName
+  });
+  availableModules.push(done);
+  $.runSequence.apply($.runSequence, availableModules);
 });
 
 // Utilities
 
-function getProtractorBinary(binaryName){
-  var winExt = /^win/.test(process.platform)? '.cmd' : '';
+function getDocConfig(moduleName) {
+  return {
+    files: root('./modules/' + moduleName + '/**/*.ts'),
+    config: {
+      // TypeScript options (see typescript docs)
+      module: 'commonjs',
+      target: 'es5',
+      includeDeclarations: false,
+
+      // Output options (see typedoc docs)
+      out: PATHS.doc.out + moduleName,
+
+      // TypeDoc options (see typedoc docs)
+      name: package.name + ' - ' + moduleName,
+      theme: PATHS.doc.theme,
+      ignoreCompilerErrors: true
+    }
+  };
+}
+
+function getProtractorBinary(binaryName) {
+  var winExt = /^win/.test(process.platform) ? '.cmd' : '';
   var pkgPath = require.resolve('protractor');
   var protractorDir = path.resolve(path.join(path.dirname(pkgPath), '..', '..', '.bin'));
-  return path.join(protractorDir, '/'+binaryName+winExt);
+  return path.join(protractorDir, '/' + binaryName + winExt);
 }
 
 // convert path to absolute from root directory

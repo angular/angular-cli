@@ -33,6 +33,7 @@
     "update": "npm run remove-local-modules && npm install",
     "restart": "npm run update && gulp build && gulp server",
     "tsd": "tsd reinstall && tsd link",
+    "doc": "gulp doc",
     "postinstall": "npm run tsd && npm run remove-ng2-types && npm run build && npm run webdriver-update"
   },
   "repository": {
@@ -66,7 +67,9 @@
     "gulp-protractor": "^2.1.0",
     "gulp-size": "^2.0.0",
     "gulp-tslint": "^4.2.2",
+    "gulp-typedoc": "^1.2.1",
     "gulp-typescript": "^2.9.0",
+    "gulp-util": "3.0.7",
     "jasmine": "^2.3.1",
     "jasmine-reporters": "^2.0.7",
     "jasmine-spec-reporter": "^2.4.0",
