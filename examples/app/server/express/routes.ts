@@ -30,6 +30,7 @@ module.exports = function(ROOT) {
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
+        buildClientScripts: true,
         componentUrl: 'examples/app/universal/test_page/browser',
 
         directives: [appPage.App, appPage.MyApp],
@@ -63,6 +64,7 @@ module.exports = function(ROOT) {
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams , {
         // client url for systemjs
+        buildClientScripts: true,
         componentUrl: 'examples/app/universal/todo/browser',
 
         directives: [todoApp.TodoApp],
@@ -88,6 +90,7 @@ module.exports = function(ROOT) {
       let queryParams = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams , {
         // client url for systemjs
+        buildClientScripts: true,
         componentUrl: 'examples/app/universal/falcor_todo/client',
 
         directives: [todoApp.TodoApp],
@@ -114,6 +117,7 @@ module.exports = function(ROOT) {
 
     let options = Object.assign(queryParams , {
       // client url for systemjs
+      buildClientScripts: true,
       componentUrl: 'examples/app/universal/test_router/browser',
       // ensure that we test only server routes
       client: false,

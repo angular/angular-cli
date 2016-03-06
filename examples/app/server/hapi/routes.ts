@@ -2,7 +2,7 @@
 interface IHapiRoute {
   method?: string[] | string;
   path?: string;
-  handler?(request:any, reply:any): any | any;
+  handler?(request: any, reply: any): any | any;
 }
 
 
@@ -46,6 +46,7 @@ module.exports = function(ROOT) {
 
     let options = Object.assign(queryParams, {
       // client url for systemjs
+      buildClientScripts: true,
       componentUrl: 'examples/app/universal/test_router/browser',
       // ensure that we test only server routes
       client: false,
@@ -90,6 +91,7 @@ module.exports = function(ROOT) {
       let queryParams = queryParamsToBoolean(request.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
+        buildClientScripts: true,
         componentUrl: 'examples/app/universal/test_page/browser',
 
         directives: [appPage.App],
@@ -123,6 +125,7 @@ module.exports = function(ROOT) {
       let queryParams = queryParamsToBoolean(request.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
+        buildClientScripts: true,
         componentUrl: 'examples/app/universal/falcor_todo/client',
 
         directives: [todoApp.TodoApp],
@@ -147,6 +150,7 @@ module.exports = function(ROOT) {
       let queryParams = queryParamsToBoolean(request.query);
       let options = Object.assign(queryParams, {
         // client url for systemjs
+        buildClientScripts: true,
         componentUrl: 'examples/app/universal/todo/browser',
 
         directives: [todoApp.TodoApp],
