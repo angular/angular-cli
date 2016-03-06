@@ -93,7 +93,7 @@ export class Bootloader {
       })
       .then(({ injector, lastAppRef }) => {
         if ('preboot' in this._config) {
-          if (!this._config) { return injector; }
+          if (!this._config.preboot) { return injector; }
 
           let prebootCode = createPrebootCode(this._config.directives, this._config.preboot);
 
