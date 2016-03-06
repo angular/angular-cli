@@ -67,7 +67,7 @@ export class Bootloader {
     let component = Component || this._config.component;
     let providers = componentProviders || this._config.componentProviders;
     if (component) {
-      return this.appRef.boootstrap(component, providers);
+      return this.appRef.bootstrap(component, providers);
     } else {
       return this._bootstrapAll(component, providers);
     }
