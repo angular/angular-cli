@@ -106,6 +106,7 @@ function bootstrapFunction(appUrl: string): string {
 // to pay off this technical debt
 // currently checking for explicit values
 function buildClientScripts(html: string, options: any): string {
+  if (!options.buildClientScripts) { return html; }
   return html
     .replace(
       selectorRegExpFactory('preboot'),
