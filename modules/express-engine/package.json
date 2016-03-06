@@ -2,7 +2,7 @@
   "name": "angular2-express-engine",
   "main": "dist/index.js",
   "typings": "angular2-express-engine.d.ts",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -29,6 +29,6 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "angular2-universal-preview": "~0.60.0"
+    "angular2-universal-preview": "0.60.0 - 0.61.x"
   }
 }
