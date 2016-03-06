@@ -92,6 +92,8 @@ export class Bootloader {
       })
       .then(({ injector, lastAppRef }) => {
         if ('preboot' in this._config) {
+          if (this._config === false) { return injector; }
+
           let el = lastAppRef.location.nativeElement;
           let prebootCode = createPrebootCode(this._config.directives, this._config.preboot);
 

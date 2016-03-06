@@ -16,9 +16,8 @@ export function prebootConfigDefault(config = {}) {
 }
 
 export function createPrebootCode(componentType: any | Array<any>, prebootConfig: any = {}): Promise<string> {
-  if (typeof prebootConfig === 'boolean' && prebootConfig === false) {
-    return Promise.resolve('');
-  }
+  if (prebootConfig === false) { prebootConfig = {}; }
+  if (!prebootConfig) { return Promise.resolve(''); }
 
   let selector = null;
   if (!Array.isArray(componentType)) {
