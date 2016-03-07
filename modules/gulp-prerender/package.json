@@ -14,7 +14,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc || true",
-    "postpublish": "npm run remove-ng2-types"
+    "postpublish": "npm run build"
   },
   "repository": {
     "type": "git",
