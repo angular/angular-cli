@@ -36,6 +36,7 @@ import {isPresent, isBlank, CONST_EXPR} from 'angular2/src/facade/lang';
 
 // CJS
 import {XMLHttpRequest} from 'xhr2';
+// import XMLHttpRequest = require('xhr2');
 
 
 export const BASE_URL: OpaqueToken = CONST_EXPR(new OpaqueToken('baseUrl'));
@@ -124,7 +125,7 @@ export class NodeXhr {
     this._baseUrl = baseUrl;
 
   }
-  build() {
+  build(): XMLHttpRequest {
     let xhr = new XMLHttpRequest();
     xhr.nodejsSet({ baseUrl: this._baseUrl });
     return xhr;

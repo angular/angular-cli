@@ -39,8 +39,6 @@ export class NodeDomRootRenderer_ extends DomRootRenderer {
   }
 }
 
-export const ServerDomRootRenderer_ = NodeDomRootRenderer_;
-
 
 export class NodeDomRenderer extends DomRenderer {
   constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType) {
@@ -79,6 +77,3 @@ export class NodeDomRenderer extends DomRenderer {
   }
 
 }
-
-
-export const ServerDomRenderer = NodeDomRenderer;

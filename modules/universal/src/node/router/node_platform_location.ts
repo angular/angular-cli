@@ -4,13 +4,13 @@ import * as nodeUrl from 'url';
 
 export const REQUEST_URL = new OpaqueToken('requestUrl');
 
-interface LocationConfig {
+export interface LocationConfig {
   pathname?: string;
   search?: string;
   hash?: string;
 }
 
-interface NodeLocationConfig {
+export interface NodeLocationConfig {
   hash?: string;
   host?: string;
   hostname?: string;
@@ -21,7 +21,7 @@ interface NodeLocationConfig {
   search?: string;
 }
 
-class NodeLocation implements LocationConfig {
+export class NodeLocation implements LocationConfig {
   hash: string;
   host: string;
   hostname: string;
@@ -69,22 +69,31 @@ class NodeLocation implements LocationConfig {
 
 }
 
-// TODO(gdi2290): toJSON
-class State {
+export class State {
   constructor(
     public state: any,
     public title: string,
-    public url: string
-  ) {}
+    public url: string) {}
+
+  toJSON() {
+    return {
+      state: this.state,
+      title: this.title,
+      url: this.url
+    }
+  }
 }
 
-// TODO(gdi2290): toJSON
-class PopStateEvent {
+export class PopStateEvent {
   public type = 'popstate';
+  constructor(public state: any) {}
 
-  constructor(
-    public state: any
-  ) {}
+  toJSON() {
+    return {
+      state: this.state
+    }
+  }
+
 }
 
 @Injectable()
@@ -187,11 +196,7 @@ export class NodePlatformLocation extends PlatformLocation {
     // But right now I don't know what is better for a server side.
     this._popStateListeners.forEach(listener => listener(event));
   }
-
-  _init() {}
 }
-
-export const ServerPlatformLocation = NodePlatformLocation;
 
 
 export function joinWithSlash(start: string, end: string): string {
