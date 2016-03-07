@@ -25,13 +25,13 @@
   "devDependencies": {
     "angular2-universal-preview": "file:../universal",
     "rimraf": "^2.5.1",
-    "typescript": "^1.7.3"
+    "typescript": "^1.8.7"
   },
   "dependencies": {
     "gutil": "^1.6.4",
     "through2": "^2.0.0"
   },
   "peerDependencies": {
-    "angular2-universal-preview": "*"
+    "angular2-universal-preview": ">= 0.70.6"
   }
 }
