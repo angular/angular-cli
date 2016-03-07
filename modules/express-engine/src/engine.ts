@@ -14,7 +14,7 @@ import {
   Bootloader
 } from 'angular2-universal-preview';
 
-export interface engineOptions {
+export interface expressEngineOptions {
   directives: Array<any>;
   providers?: Array<any>;
   preboot?: Object | any;
@@ -131,9 +131,9 @@ function buildClientScripts(html: string, options: any): string {
     );
 }
 
-export function expressEngine(filePath: string, options: engineOptions, done: Function) {
+export function expressEngine(filePath: string, options: expressEngineOptions, done: Function) {
   // defaults
-  options = options || <engineOptions>{};
+  options = options || <expressEngineOptions>{};
   options.providers = options.providers || undefined;
   options.preboot   = options.preboot   || undefined;
 
@@ -189,23 +189,23 @@ export function expressEngine(filePath: string, options: engineOptions, done: Fu
   }
 };
 
-export function ng2engine(filePath: string, options: engineOptions, done: Function) {
+export function ng2engine(filePath: string, options: expressEngineOptions, done: Function) {
   console.warn('DEPRECATION WARNING: `ng2engine` is no longer supported and will be removed in next release. use `expressEngine`');
   return expressEngine(filePath, options, done);
 };
 
-export function ng2Engine(filePath: string, options: engineOptions, done: Function) {
+export function ng2Engine(filePath: string, options: expressEngineOptions, done: Function) {
   console.warn('DEPRECATION WARNING: `ng2Engine` is no longer supported and will be removed in next release. use `expressEngine`');
   return expressEngine(filePath, options, done);
 };
-export function ng2ExpressEngine(filePath: string, options: engineOptions, done: Function) {
+export function ng2ExpressEngine(filePath: string, options: expressEngineOptions, done: Function) {
   console.warn('DEPRECATION WARNING: `ng2ExpressEngine` is no longer supported and will be removed in next release. use `expressEngine`');
   return expressEngine(filePath, options, done);
 };
 
-export function simpleReplace(filePath: string, options: engineOptions, done: Function) {
+export function simpleReplace(filePath: string, options: expressEngineOptions, done: Function) {
   // defaults
-  options = options || <engineOptions>{};
+  options = options || <expressEngineOptions>{};
 
   // read file on disk
   try {
