@@ -1,7 +1,8 @@
-import { format, parse } from 'url';
-import { describe, it, expect, beforeEach } from 'angular2/testing';
-import { PlatformLocation } from 'angular2/router';
-import { NodePlatformLocation } from '../../src/router/node_platform_location';
+import {describe, it, expect, beforeEach} from 'angular2/testing';
+
+import {format, parse} from 'url';
+import {PlatformLocation} from 'angular2/router';
+import {NodePlatformLocation} from '../../router/node_platform_location';
 
 function normalizeProperties({ pathname, search, hash }) {
   pathname = pathname || '';
