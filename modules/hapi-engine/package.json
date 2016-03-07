@@ -30,6 +30,6 @@
     "hoek": "^3.0.4"
   },
   "peerDependencies": {
-    "angular2-universal-preview": "*"
+    "angular2-universal-preview": ">=0.70.2"
   }
 }
