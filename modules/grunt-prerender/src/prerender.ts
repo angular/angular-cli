@@ -1,37 +1,35 @@
 import universal = require('angular2-universal-preview');
 
-interface IUniversalConfig {
+export interface IUniversalConfig {
   preboot: boolean;
-  App: any;
+  bootloader: any;
+  componentProviders: any[];
+  platformProviders: any[];
+  directives: any[];
   providers: any[];
 }
 
 class Angular2Prerender {
-  constructor(private options) {}
+  constructor(private options: IUniversalConfig) {}
 
   render(file) {
+      let clientHtml: string = file.toString();
 
-    let str: string = file.toString();
+      // bootstrap and render component to string
+      var bootloader = this.options.bootloader;
+      if (!this.options.bootloader) {
+        this.options.bootloader = {
+          document: universal.parseDocument(clientHtml),
+          providers: this.options.providers,
+          componentProviders: this.options.componentProviders,
+          platformProviders: this.options.platformProviders,
+          directives: this.options.directives,
+          preboot: this.options.preboot
+        };
+      }
+      bootloader = universal.Bootloader.create(this.options.bootloader);
 
-    let renderPromise = universal.renderToString;
-    let args = [this.options.App, this.options.providers];
-
-    if (this.options.preboot) {
-      renderPromise = universal.renderToStringWithPreboot;
-      args.push(this.options.preboot);
-    }
-
-    return renderPromise.apply(null, args)
-      .then((serializedApp) => {
-        let html = str.replace(
-          // <selector></selector>
-          universal.selectorRegExpFactory(universal.selectorResolver(this.options.App)),
-          // <selector>{{ serializedCmp }}</selector>
-          serializedApp
-        );
-
-        return new Buffer(html);
-      });
+      return bootloader.serializeApplication().then(html => new Buffer(html));
   }
 }
 
@@ -91,5 +89,3 @@ module.exports = class GruntAngular2Prerender {
   }
 
 };
-
-

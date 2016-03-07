@@ -6,42 +6,43 @@ let PluginError = gutil.PluginError;
 
 export interface IUniversalConfig {
   preboot: boolean;
-  App: any;
+  bootloader: any;
+  componentProviders: any[];
+  platformProviders: any[];
+  directives: any[];
   providers: any[];
 }
 
 export class GulpAngular2Render {
 
-  constructor(config: IUniversalConfig) {
+  constructor(options: IUniversalConfig) {
 
     return through.obj((file: any, enc: string, cb: Function) => {
 
       if (file.isStream()) {
         return cb(new PluginError('angular2-gulp-prerender', 'Streaming is not supported'));
       }
-      let str: string = file.contents.toString();
 
-      let renderPromise = universal.renderToString;
-      let args = [config.App, config.providers];
+      let clientHtml: string = file.contents.toString();
 
-      if (config.preboot) {
-        renderPromise = universal.renderToStringWithPreboot;
-        args.push(config.preboot);
+      // bootstrap and render component to string
+      var bootloader = options.bootloader;
+      if (!options.bootloader) {
+        options.bootloader = {
+          document: universal.parseDocument(clientHtml),
+          providers: options.providers,
+          componentProviders: options.componentProviders,
+          platformProviders: options.platformProviders,
+          directives: options.directives,
+          preboot: options.preboot
+        };
       }
+      bootloader = universal.Bootloader.create(options.bootloader);
 
-      renderPromise.apply(null, args)
-        .then((serializedApp) => {
-          let html = str.replace(
-            // <selector></selector>
-            universal.selectorRegExpFactory(universal.selectorResolver(config.App)),
-            // <selector>{{ serializedCmp }}</selector>
-            serializedApp
-          );
-
-          file.contents = new Buffer(html);
-
-          cb(null, file);
-        });
+      return bootloader.serializeApplication().then(html => {
+        file.contents = new Buffer(html);
+        cb(null, file);
+      });
     });
   }
 }
