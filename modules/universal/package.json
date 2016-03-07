@@ -1,15 +1,16 @@
 {
   "name": "angular2-universal-preview",
-  "main": "dist/server/index.js",
+  "typings": "dist/node/index.d.ts",
+  "main": "dist/node/index.js",
   "browser": "dist/browser/index.js",
   "files": [
     "src",
-    "browser",
-    "server",
-    "universal.d.ts",
-    "dist"
+    "dist",
+    "parse5.d.ts",
+    "parse5.js",
+    "polyfills.js",
+    "global.js"
   ],
-  "typings": "universal.d.ts",
   "typescript": {
     "definition": "universal.d.ts"
   },
@@ -38,7 +39,7 @@
     "angular2-express-engine": "file:../express-engine",
     "angular2-hapi-engine": "file:../hapi-engine",
     "preboot": "file:../preboot",
-    "typescript": "^1.7.3"
+    "typescript": "^1.8.7"
   },
   "dependencies": {
     "angular2-express-engine": "*",
