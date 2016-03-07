@@ -9,7 +9,7 @@
     "PatrickJS <github@gdi2290.com>",
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
-  "typings": "dist/node/index.d.ts",
+  "typings": "dist/typings.d.ts",
   "main": "dist/node/index.js",
   "browser": "dist/browser/index.js",
   "files": [
