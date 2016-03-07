@@ -7,6 +7,3 @@ export * from './node_platform_location';
 export const NODE_LOCATION_PROVIDERS: Array<any> = [
   provide(PlatformLocation, { useClass: NodePlatformLocation })
 ];
-
-
-export const SERVER_LOCATION_PROVIDERS = NODE_LOCATION_PROVIDERS;
