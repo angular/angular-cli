@@ -12,8 +12,10 @@ module.exports = function(ROOT) {
   var todoApp = require(`${universalPath}/todo/app`);
   var routerApp = require(`${universalPath}/test_router/app`);
 
-  var {provide} = require('angular2/core');
+  var {enableProdMode, provide} = require('angular2/core');
   var {ROUTER_PROVIDERS, APP_BASE_HREF} = require('angular2/router');
+
+  enableProdMode();
 
   var {
     NODE_HTTP_PROVIDERS,
