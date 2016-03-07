@@ -1,5 +1,13 @@
 {
   "name": "angular2-universal-preview",
+  "description": "Universal (isomorphic) javascript support for Angular2",
+  "homepage": "https://github.com/angular/universal",
+  "license": "MIT",
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>"
+  ],
   "typings": "dist/node/index.d.ts",
   "main": "dist/node/index.js",
   "browser": "dist/browser/index.js",
@@ -9,31 +17,13 @@
     "parse5.d.ts",
     "parse5.js",
     "polyfills.js",
-    "global.js"
-  ],
-  "typescript": {
-    "definition": "universal.d.ts"
-  },
-  "version": "0.70.0",
-  "description": "Universal (isomorphic) javascript support for Angular2",
-  "homepage": "https://github.com/angular/universal",
-  "license": "MIT",
-  "contributors": [
-    "Tobias Bosch <tbosch@google.com>",
-    "PatrickJS <github@gdi2290.com>",
-    "Jeff Whelpley <jeff@gethuman.com>"
+    "global.js",
+    "node.js"
   ],
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc || true",
     "prepublish": "npm run build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/angular/universal"
-  },
-  "bugs": {
-    "url": "https://github.com/angular/universal/issues"
   },
   "devDependencies": {
     "angular2-express-engine": "file:../express-engine",
@@ -49,7 +39,7 @@
   "peerDependencies": {
     "es6-promise": "^3.0.2",
     "reflect-metadata": "0.1.2",
-    "preboot": "1.1.0 - 2.0.1",
+    "preboot": ">=1.1.0",
     "angular2-express-engine": "*",
     "angular2-hapi-engine": "*",
     "rxjs": "~5.0.0-beta.2",
@@ -58,5 +48,12 @@
     "zone.js": "~0.5.15",
     "css": "^2.2.1",
     "parse5": "^1.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
   }
 }
