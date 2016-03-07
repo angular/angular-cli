@@ -27,7 +27,9 @@
     "modules/webpack-prerender/dist",
     "modules/universal/dist",
     "modules/universal/node_modules",
+    "modules/universal/typings",
     "modules/preboot",
+    "modules/preboot/typings",
     "node_modules",
     "dist"
   ],
