@@ -177,6 +177,9 @@ let writableAttributes = [
   "onwaiting"
 ].map(beDefensive);
 
+declare var GLOBAL: any;
+
+(<any>global).window = win;
+(<any>GLOBAL).window = win;
+
 export var window = win;
-global.window = win;
-GLOBAL.window = win;
