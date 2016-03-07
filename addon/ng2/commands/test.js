@@ -12,17 +12,14 @@ var TestCommand = require('ember-cli/lib/commands/test');
 var win = require('ember-cli/lib/utilities/windows-admin');
 var path = require('path');
 
-// require dependencies within the target project
-function requireDependency (root, moduleName) {
-  var packageJson = require(path.join(root, 'node_modules', moduleName, 'package.json'));
-  var main = path.normalize(packageJson.main);
-  return require(path.join(root, 'node_modules', moduleName, main));
-}
+var BuildTask = require('ember-cli/lib/tasks/build');
+var BuildWatchTask = require('ember-cli/lib/tasks/build-watch');
+var TestTask = require('../tasks/test');
+
 
 module.exports = TestCommand.extend({
   availableOptions: [
-    { name: 'single-run', type: Boolean, default: true },
-    { name: 'auto-watch', type: Boolean },
+    { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
     { name: 'browsers', type: String },
     { name: 'colors', type: Boolean },
     { name: 'log-level', type: String },
@@ -31,40 +28,47 @@ module.exports = TestCommand.extend({
   ],
 
   run: function(commandOptions, rawArgs) {
-    var BuildTask = this.tasks.Build;
+    var buildWatchTask = new BuildWatchTask({
+      ui: this.ui,
+      analytics: this.analytics,
+      project: this.project
+    });
     var buildTask = new BuildTask({
       ui: this.ui,
       analytics: this.analytics,
       project: this.project
     });
+    var testTask = new TestTask({
+      ui: this.ui,
+      analytics: this.analytics,
+      project: this.project
+    });
 
-    var buildCommandOptions = {
+    var buildOptions = {
       environment: 'development',
-      outputPath: 'dist/',
-      watch: false
+      outputPath: 'dist/'
     };
-
-    var projectRoot = this.project.root;
-
-    return win.checkWindowsElevation(this.ui)
-      .then(function() {
-        return buildTask.run(buildCommandOptions);
-      })
-      .then(function(){
-        return new Promise(function(resolve, reject){
-          var karma = requireDependency(projectRoot, 'karma');
-          var karmaConfig = path.join(projectRoot, 'karma.conf');
-
-          // Convert browsers from a string to an array
-          if (commandOptions.browsers){
-            commandOptions.browsers = commandOptions.browsers.split(',');
-          }
-          commandOptions.configFile = karmaConfig;
-          var karmaServer = new karma.Server(commandOptions, resolve);
-
-          karmaServer.start();
+     
+    if (commandOptions.watch){
+      return win.checkWindowsElevation(this.ui)
+        .then(function() {
+          return Promise.all([
+            buildWatchTask.run(buildOptions),
+            testTask.run(commandOptions)
+          ]);
         });
-      });
+    } else {
+      // if not watching ensure karma is doing a single run
+      commandOptions.singleRun = true;
+      return win.checkWindowsElevation(this.ui)
+        .then(function() {
+          return buildTask.run(buildOptions);
+        })
+        .then(function(){
+          return testTask.run(commandOptions);
+        });
+    }
+
   }
 });
 

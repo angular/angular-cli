@@ -28,14 +28,16 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Generating Components, Directives, Pipes and Services](#generating-other-scaffolds)
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
-* [Installing a 3rd Party Library](#installing-a-3rd-party-library)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
+* [Support for offline applications](#support-for-offline-applications)
+* [Commands autocompletion](#commands-autocompletion)
 * [Known Issues](#known-issues)
 
 ## Installation
 
+**BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
 npm install -g angular-cli
 ```
@@ -55,6 +57,11 @@ ng serve
 ```
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
+You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
+
+```bash
+ng serve --port 4201 --live-reload-port 49153
+```
 
 ### Generating other scaffolds
 
@@ -126,15 +133,6 @@ ng build
 
 The build artifacts will be stored in the `dist/` directory.
 
-### Installing a 3rd party library
-
-```bash
-ng install ng2-cli-test-lib
-```
-
-[You can read more about this here.](https://github.com/angular/angular-cli/blob/master/docs/ng-install.md)
-
-
 ### Running unit tests
 
 ```bash
@@ -143,19 +141,19 @@ ng test
 
 Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html)
 
+If run with the watch argument `--watch` (shorthand `-w`) builds will run when source files have changed 
+and tests will run after each successful build
+
 
 ### Running end-to-end tests
 
-Before running the tests make sure that you have an updated webdriver and that
-the tests are built:
-
 ```bash
-$(npm bin)/webdriver-manager update
-$(npm bin)/tsc -p e2e/
+ng e2e
 ```
 
-Afterwards you only need to run `$(npm bin)/protractor` while serving via
-`ng serve`.
+Before running the tests make sure you are serving the app via `ng serve`.
+
+End-to-end tests are ran via [Protractor](https://angular.github.io/protractor/).
 
 
 ### Deploying the app via GitHub Pages
@@ -171,6 +169,61 @@ ng github-pages:deploy
 
 Checkout [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages) docs for more info.
 
+### Linting and formatting code
+
+You can lint or format your app code by running `ng lint` or `ng format` respectively.
+This will use the `lint`/`format` npm script that in generated projects uses `tslint`/`clang-format`.
+
+You can modify the these scripts in `package.json` to run whatever tool you prefer.
+
+
+### Formatting code
+
+You can format your app code by running `ng format`.
+This will use the `format` npm script that in generated projects uses `clang-format`.
+
+You can modify the `format` script in `package.json` to run whatever formatting tool
+you prefer and `ng format` will still run it.
+
+### Support for offline applications
+
+By default a file `manifest.appcache` will be generated which lists all files included in
+a project's output, along with SHA1 hashes of all file contents. This file can be used
+directly as an AppCache manifest (for now, `index.html` must be manually edited to set this up).
+
+The manifest is also annotated for use with `angular2-service-worker`. Some manual operations
+are currently required to enable this usage. The package must be installed, and `worker.js`
+manually copied into the project `src` directory:
+
+```bash
+npm install angular2-service-worker
+cp node_modules/angular2-service-worker/dist/worker.js src/
+```
+
+ Then, the commented snippet in `index.html` must be uncommented to register the worker script
+ as a service worker.
+
+### Commands autocompletion
+
+To turn on auto completion use the following commands:
+
+For bash:
+```bash
+ng completion >> ~/.bashrc
+source ~/.bashrc
+```
+
+For zsh:
+```bash
+ng completion >> ~/.zshrc
+source ~/.zshrc
+```
+
+Windows users using gitbash:
+```bash
+ng completion >> ~/.bash_profile
+source ~/.bash_profile
+```
 
 ## Known issues
 
@@ -181,6 +234,7 @@ This project is currently a prototype so there are many known issues. Just to me
 - [Protractor](https://angular.github.io/protractor/) integration is missing.
 - The initial installation as well as `ng new` take too long because of lots of npm dependencies.
 - Many existing ember addons are not compatible with Angular apps built via angular-cli.
+- When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
 
 
 ## Development Hints for hacking on angular-cli

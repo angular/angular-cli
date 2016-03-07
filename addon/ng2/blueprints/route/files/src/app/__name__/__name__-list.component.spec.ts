@@ -9,7 +9,7 @@ import {
   TestComponentBuilder,
   beforeEachProviders
 } from 'angular2/testing';
-import {bind} from 'angular2/core';
+import {provide} from 'angular2/core';
 import {<%= classifiedModuleName %>ListComponent} from './<%= dasherizedModuleName %>-list.component';
 import {<%= classifiedModuleName %>, <%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.service';
 
@@ -20,7 +20,7 @@ class Mock<%= classifiedModuleName %>Service {
 describe('<%= classifiedModuleName %>ListComponent', () => {
 
   beforeEachProviders(() => [
-    bind(<%= classifiedModuleName %>Service).toValue(new Mock<%= classifiedModuleName %>Service()),
+    provide(<%= classifiedModuleName %>Service, {useClass: Mock<%= classifiedModuleName %>Service}),
   ]);
 
   it('should ...', injectAsync([TestComponentBuilder], (tcb:TestComponentBuilder) => {

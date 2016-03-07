@@ -1,4 +1,3 @@
-import "angular2/testing";
 import { <%= jsComponentName %>Page } from './app.po';
 
 describe('<%= htmlComponentName %> App', function() {
@@ -9,7 +8,7 @@ describe('<%= htmlComponentName %> App', function() {
   })
 
   it('should display message saying app works', () => {
-    page.navigateTo()
+    page.navigateTo();
     expect(page.getParagraphText()).toEqual('<%= htmlComponentName %> Works!');
   });
 });

@@ -6,6 +6,7 @@ var path     = require('path');
 var pkg      = require('../package.json');
 var fs       = require('fs');
 var template = require('lodash/string/template');
+var Task     = require('ember-cli/lib/models/task');
 
 var gitEnvironmentVariables = {
   GIT_AUTHOR_NAME: 'angular-cli',
@@ -14,9 +15,7 @@ var gitEnvironmentVariables = {
   get GIT_COMMITTER_EMAIL(){ return this.GIT_AUTHOR_EMAIL; }
 };
 
-var GitInit = require('ember-cli/lib/tasks/git-init');
-
-module.exports = GitInit.extend({
+module.exports = Task.extend({
   run: function(commandOptions) {
     var chalk  = require('chalk');
     var ui     = this.ui;

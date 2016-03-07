@@ -1,7 +1,7 @@
 {
   "name": "angular-cli",
-  "version": "0.0.20",
-  "description": "",
+  "version": "0.0.24",
+  "description": "CLI tool for Angular2",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
   "bin": {
@@ -29,10 +29,10 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "broccoli": "^0.16.3",
+    "broccoli": "^0.16.9",
     "broccoli-concat": "0.0.13",
-    "broccoli-funnel": "^1.0.0",
-    "broccoli-merge-trees": "^1.0.0",
+    "broccoli-funnel": "^1.0.1",
+    "broccoli-merge-trees": "^1.0.1",
     "broccoli-writer": "^0.1.1",
     "chalk": "^1.1.0",
     "ember-cli": "1.13.15",
@@ -40,7 +40,6 @@
     "fs-extra": "^0.18.4",
     "leek": "0.0.19",
     "lodash": "^3.10.0",
-    "node-notifier": "^4.4.0",
     "resolve": "^1.0.0",
     "shelljs": "^0.5.3",
     "silent-error": "^1.0.0",
