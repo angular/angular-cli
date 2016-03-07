@@ -13,13 +13,14 @@
   },
   "private": true,
   "dependencies": {
-    "angular2": "2.0.0-beta.7",
+    "angular2": "2.0.0-beta.8",
     "clang-format": "^1.0.35",
     "es6-promise": "^3.0.2",
     "es6-shim": "^0.33.3",
     "reflect-metadata": "0.1.2",
     "rxjs": "5.0.0-beta.2",
-    "systemjs": "0.19.20"
+    "systemjs": "0.19.20",
+    "zone.js": "0.5.15"
   },
   "devDependencies": {
     "angular-cli": "0.0.*",
@@ -32,8 +33,9 @@
     "karma-chrome-launcher": "^0.2.1",
     "karma-jasmine": "^0.3.6",
     "protractor": "^3.0.0",
+    "silent-error": "^1.0.0",
     "tslint": "^3.3.0",
-    "typescript": "^1.8.2",
+    "typescript": "^1.8.7",
     "typings": "^0.6.6",
     "ts-node": "^0.5.5"
   }
