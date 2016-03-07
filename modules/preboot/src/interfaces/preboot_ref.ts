@@ -1,7 +1,7 @@
 import {PrebootOptions} from './preboot_options';
 import {Element} from './element';
 
-interface DomState {
+export interface DomState {
   window?: Element;
   document?: Element;
   body?: Element;
@@ -17,7 +17,7 @@ export interface CursorSelection {
 }
 
 // interface for the dom wrapper
-interface Dom {
+export interface Dom {
   state?: DomState;
   init?(opts: any);
   updateRoots?(appRoot: Element, serverRoot?: Element, clientRoot?: Element);

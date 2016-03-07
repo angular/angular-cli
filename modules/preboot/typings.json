@@ -12,5 +12,8 @@
     "uglify-js": "github:DefinitelyTyped/DefinitelyTyped/uglify-js/uglify-js.d.ts#51b587292f2ba85d68939d9c59cf7fa745a6173e",
     "vinyl-buffer": "github:DefinitelyTyped/DefinitelyTyped/vinyl-buffer/vinyl-buffer.d.ts#1a4b2f0ff98d7b1071474c4ab16f2626d9a62d31",
     "vinyl-source-stream": "github:DefinitelyTyped/DefinitelyTyped/vinyl-source-stream/vinyl-source-stream.d.ts#6be3aa6317135b9255b000924af9d7cebe3737bf"
+  },
+  "dependencies": {
+    "gulp-insert": "github:gdi2290/typed-gulp-insert#b3868ce895053b2f6e387f1168e2f4f00ab0c208"
   }
 }
