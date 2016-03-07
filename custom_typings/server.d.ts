@@ -4,3 +4,9 @@ declare module "xhr2" {
     nodejsSet(url: any): any;
   }
 }
+
+declare module NodeJS  {
+  interface Global {
+    window: any | Window;
+  }
+}
