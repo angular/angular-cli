@@ -86,10 +86,9 @@ class Runtime {
   }
   render(template: string, context, done: Function) {
     context = Hoek.applyToDefaults(context, this.options);
-    let args = [context.App, context.providers];
 
     // bootstrap and render component to string
-    var bootloader = options.bootloader;
+    var bootloader = context.bootloader;
     if (!context.bootloader) {
       context.bootloader = {
         document: parseDocument(template),
