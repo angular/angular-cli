@@ -1,2 +1,5 @@
 import * as universal from './node/node';
-(<any>Object).assign(global, universal);
+function __global(m) {
+  for (var p in m) if (!global.hasOwnProperty(p)) global[p] = m[p];
+}
+__global(universal);
