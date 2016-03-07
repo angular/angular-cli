@@ -1,5 +1,5 @@
 var SERVER_IP = '127.0.0.1';
-
+require('angular2-universal-preview/polyfills');
 var port = process.env.PORT || 3000;
 
 // Module dependencies
