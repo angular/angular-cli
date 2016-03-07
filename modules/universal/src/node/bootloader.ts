@@ -6,6 +6,7 @@ import {NgZone, platform, PlatformRef, ApplicationRef} from 'angular2/core';
 import {buildReflector, buildNodeProviders, buildNodeAppProviders} from './platform/node';
 import {parseDocument, parseFragment, serializeDocument} from './platform/document';
 import {createPrebootCode} from './ng_preboot';
+import {waitRouter} from './render';
 
 export interface BootloaderConfig {
   document?: any;
@@ -67,7 +68,7 @@ export class Bootloader {
     let component = Component || this._config.component;
     let providers = componentProviders || this._config.componentProviders;
     if (component) {
-      return this.appRef.bootstrap(component, providers);
+      return this.appRef.bootstrap(component, providers).then(waitRouter);
     } else {
       return this._bootstrapAll(component, providers);
     }
@@ -121,7 +122,7 @@ export class Bootloader {
   _bootstrapAll(Components?: Array<any>, componentProviders?: Array<any>) {
     let components = Components || this._config.directives;
     let providers = componentProviders || this._config.componentProviders;
-    let directives = components.map(component => this.appRef.bootstrap(component, providers));
+    let directives = components.map(component => this.appRef.bootstrap(component, providers).then(waitRouter));
     return Promise.all(directives);
   }
 
