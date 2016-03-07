@@ -13,7 +13,7 @@ import {
   Bootloader
 } from 'angular2-universal-preview';
 
-export interface engineOptions {
+export interface hapiEngineOptions {
   App: Function;
   providers?: Array<any>;
   preboot?: Object | any;
@@ -81,7 +81,7 @@ class Runtime {
     </script>
   `;
 
-  constructor(private options: engineOptions) {
+  constructor(private options: hapiEngineOptions) {
     this.renderPromise = renderToString;
   }
   render(template: string, context, done: Function) {
