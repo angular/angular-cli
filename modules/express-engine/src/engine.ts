@@ -105,7 +105,7 @@ function bootstrapFunction(appUrl: string): string {
 // to pay off this technical debt
 // currently checking for explicit values
 function buildClientScripts(html: string, options: any): string {
-  if (!options.buildClientScripts) { return html; }
+  if (!options || !options.buildClientScripts) { return html; }
   return html
     .replace(
       selectorRegExpFactory('preboot'),
@@ -179,7 +179,7 @@ export function expressEngine(filePath: string, options: engineOptions, done: Fu
       bootloader.serializeApplication()
         .then(html => done(null, buildClientScripts(html, options)))
         .catch(e => {
-          console.log(e.stack);
+          console.error(e.stack);
           // if server fail then return client html
           done(null, buildClientScripts(clientHtml, options));
         });
