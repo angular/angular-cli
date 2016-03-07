@@ -1,2 +1,2 @@
-export * from './src/ng_preload_cache';
-export * from './src/bootstrap';
+export * from './bootstrap';
+export * from './ng_preload_cache';
