@@ -3,9 +3,14 @@ var Hoek = require('hoek');
 
 import {
   renderToString,
+  applicationToString,
   selectorResolver,
   selectorRegExpFactory,
-  renderToStringWithPreboot
+  renderToStringWithPreboot,
+  serializeDocument,
+  parseDocument,
+  parseFragment,
+  Bootloader
 } from 'angular2-universal-preview';
 
 export interface engineOptions {
@@ -83,29 +88,22 @@ class Runtime {
     context = Hoek.applyToDefaults(context, this.options);
     let args = [context.App, context.providers];
 
-    if (context.preboot) {
-      this.renderPromise = renderToStringWithPreboot;
-      args.push(context.preboot);
+    // bootstrap and render component to string
+    var bootloader = options.bootloader;
+    if (!context.bootloader) {
+      context.bootloader = {
+        document: parseDocument(template),
+        providers: context.providers,
+        componentProviders: context.componentProviders,
+        platformProviders: context.platformProviders,
+        directives: context.directives,
+        preboot: context.preboot
+      };
     }
+    bootloader = Bootloader.create(context.bootloader);
 
-    return this.renderPromise(...args)
-      .then(serializedCmp => {
-
-        const selector: string = selectorResolver(context.App);
-
-        // selector replacer explained here
-        // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
-        // replace our component with serialized version
-        const rendered: string = template.replace(
-          // <selector></selector>
-          selectorRegExpFactory(selector),
-          // <selector>{{ serializedCmp }}</selector>
-          serializedCmp
-          // TODO: serializedData
-        );
-
-        done(null, this.buildClientScripts(rendered, context));
-      })
+    bootloader.serializeApplication()
+      .then(html => done(null, this.buildClientScripts(html, context)))
       .catch(e => {
         console.error(e.stack);
         // if server fail then return client html
@@ -138,6 +136,7 @@ class Runtime {
   // to pay off this technical debt
   // currently checking for explicit values
   private buildClientScripts(html: string, options: any): string {
+    if (!options || !options.buildClientScripts) { return html; }
     return html
       .replace(
         selectorRegExpFactory('preboot'),
