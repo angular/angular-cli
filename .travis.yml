@@ -1,16 +1,26 @@
 language: node_js
 node_js:
-  - '0.12'
   - '4'
+  - '5'
 
 cache:
   directories:
     - node_modules
-    - bower_components
-    - angular/node_modules
-    - angular/bower_components
-    - web_modules
-    - tsd_typings
+    - modules/express-engine/node_modules
+    - modules/express-engine/typings
+    - modules/preboot/node_modules
+    - modules/preboot/typings
+    - modules/grunt-prerender/node_modules
+    - modules/grunt-prerender/typings
+    - modules/gulp-prerender/node_modules
+    - modules/gulp-prerender/typings
+    - modules/hapi-engine/node_modules
+    - modules/hapi-engine/typings
+    - modules/universal/node_modules
+    - modules/universal/typings
+    - modules/webpack-prerender/node_modules
+    - modules/webpack-prerender/typings
+    - typings
 
 notifications:
   webhooks:
@@ -25,20 +35,9 @@ notifications:
 env:
   global:
   - SAUCE_ACCESS_KEY=''
-  # Token for tsd to increase github rate limit
-  # See https://github.com/DefinitelyTyped/tsd#tsdrc
-  # This does not use http://docs.travis-ci.com/user/environment-variables/#Secure-Variables
-  # because those are not visible for pull requests, and those should also be reliable.
-  # This SSO token belongs to github account angular-github-ratelimit-token which has no access
-  # (password is in Valentine)
-  - TSDRC='{"token":"ef474500309daea53d5991b3079159a29520a40b"}'
-  # GITHUB_TOKEN_ANGULAR
-  - secure: "fq/U7VDMWO8O8SnAQkdbkoSe2X92PVqg4d044HmRYVmcf6YbO48+xeGJ8yOk0pCBwl3ISO4Q2ot0x546kxfiYBuHkZetlngZxZCtQiFT9kyId8ZKcYdXaIW9OVdw3Gh3tQyUwDucfkVhqcs52D6NZjyE2aWZ4/d1V4kWRO/LMgo="
 
 before_install:
-  - echo ${TSDRC} > .tsdrc
-  # - npm install -g webpack
-  - npm install -g tsd
+  - npm install -g typings
 
 before_script:
   - npm install -g gulp
