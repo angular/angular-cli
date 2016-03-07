@@ -11,7 +11,6 @@ import {
   serializeDocument,
   parseDocument,
   parseFragment,
-  addPrebootHtml,
   Bootloader
 } from 'angular2-universal-preview';
 
