@@ -10,9 +10,12 @@
     "experimentalDecorators": true,
   	"sourceMap": true,
     "listFiles": false,
-  	"outDir": "dist"
+  	"outDir": "dist",
+    "rootDir": "src"
   },
   "exclude": [
+    "typings/main",
+    "typings/main.d.ts",
     "node_modules/angular2/ts",
     "node_modules/angular2/src/testing",
     "node_modules/angular2/src/test",
@@ -20,8 +23,8 @@
     "node_modules/reflect-metadata",
     "node_modules/preboot/test",
     "node_modules/preboot/src",
-    "browser/test",
-    "server/test"
+    "src/browser/test",
+    "src/node/test"
   ],
   "formatCodeOptions": {
     "indentSize": 2,
