@@ -8,6 +8,8 @@ export * from './directives/node_form';
 
 export * from './http/node_http';
 
+export * from './http/node_http';
+
 export * from './platform/index';
 
 export * from './router/index';
