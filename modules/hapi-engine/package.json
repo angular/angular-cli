@@ -12,6 +12,7 @@
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
   "scripts": {
+    "prebuild": "rimraf dist",
     "build": "tsc || true",
     "prepublish": "npm run build"
   },
