@@ -23,13 +23,14 @@
     "url": "https://github.com/angular/universal/issues"
   },
   "devDependencies": {
-    "typescript": "^1.8.7",
-    "angular2-universal-preview": "file:../universal"
+    "angular2-universal-preview": "file:../universal",
+    "rimraf": "^2.5.2",
+    "typescript": "^1.8.7"
   },
   "dependencies": {
     "hoek": "^3.0.4"
   },
   "peerDependencies": {
-    "angular2-universal-preview": ">=0.70.2"
+    "angular2-universal-preview": ">=0.70.6"
   }
 }
