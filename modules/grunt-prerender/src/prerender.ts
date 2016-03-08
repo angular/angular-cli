@@ -55,36 +55,32 @@ module.exports = class GruntPrerender {
       // don't use arrow function here. coz we need to get Grunt's "this" context!
 
       let options = this.options({
-        App: {},
-        providers: [],
-        preboot: true
+        directives: {},
+        providers: []
       });
 
       let prerender = new Prerender(options);
 
-
-      this.files.forEach((f) => {
-
+      function render(f) {
         let src = f.src.filter((filepath) => {
-
-          if (!grunt.file.exists(filepath)) {
-            grunt.log.warn('Source file "' + filepath + '" not found.');
-            return false;
-          } else {
+            if (!grunt.file.exists(filepath)) {
+              grunt.log.warn('Source file "' + filepath + '" not found.');
+              return false;
+            }
             return true;
-          }
-        })
+          })
           .map((filepath) => grunt.file.read(filepath))
           .join(grunt.util.normalizelf(options.separator));
 
         // Handle options.
         prerender
           .render(src)
-          .then((buffer) => src = buffer)
-          .then((_src) => grunt.file.write(f.dest, _src))
+          .then(buffer => src = buffer)
+          .then(_src => grunt.file.write(f.dest, _src))
           .then(_ => grunt.log.writeln('File "' + f.dest + '" created.'));
+      }
 
-      });
+      this.files.forEach(render);
     });
 
   }
