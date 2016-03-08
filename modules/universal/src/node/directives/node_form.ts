@@ -35,6 +35,3 @@ export class NodeForm {
     renderer.setElementAttribute(element.nativeElement, 'action', appLocation);
   }
 }
-
-
-export const ServerForm = NodeForm;

@@ -4,11 +4,9 @@ Parse5DomAdapter.makeCurrent();
 
 export {provide} from 'angular2/core';
 
-export * from './directives/node_form';
+export * from './directives/index';
 
-export * from './http/node_http';
-
-export * from './http/node_http';
+export * from './http/index';
 
 export * from './platform/index';
 
