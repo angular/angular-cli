@@ -1,6 +1,6 @@
 import universal = require('angular2-universal-preview');
 
-export interface IUniversalConfig {
+export interface GruntUniversalConfig {
   preboot: boolean;
   bootloader: any;
   componentProviders: any[];
@@ -9,8 +9,9 @@ export interface IUniversalConfig {
   providers: any[];
 }
 
-class Angular2Prerender {
-  constructor(private options: IUniversalConfig) {}
+
+export class Prerender {
+  constructor(private options: GruntUniversalConfig) {}
 
   render(file) {
       let clientHtml: string = file.toString();
@@ -43,7 +44,7 @@ class Angular2Prerender {
  */
 
 // needs to be written like this otherwise Grunt will fail to load this task
-module.exports = class GruntAngular2Prerender {
+module.exports = class GruntPrerender {
 
   constructor(grunt) {
 
@@ -59,7 +60,7 @@ module.exports = class GruntAngular2Prerender {
         preboot: true
       });
 
-      let angular2Prerender = new Angular2Prerender(options);
+      let prerender = new Prerender(options);
 
 
       this.files.forEach((f) => {
@@ -77,7 +78,7 @@ module.exports = class GruntAngular2Prerender {
           .join(grunt.util.normalizelf(options.separator));
 
         // Handle options.
-        angular2Prerender
+        prerender
           .render(src)
           .then((buffer) => src = buffer)
           .then((_src) => grunt.file.write(f.dest, _src))
