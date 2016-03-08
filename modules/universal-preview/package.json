@@ -1,0 +1,45 @@
+{
+  "name": "angular2-universal-preview",
+  "version": "0.80.0",
+  "description": "Universal (isomorphic) javascript support for Angular2",
+  "homepage": "https://github.com/angular/universal",
+  "license": "MIT",
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>"
+  ],
+  "typings": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "browser": "dist/index.js",
+  "files": [
+    "dist",
+    "parse5.d.ts",
+    "parse5.js",
+    "polyfills.js",
+    "global.js",
+    "mock.js"
+  ],
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc || true",
+    "prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "angular2-universal": "file:../universal",
+    "typescript": "^1.8.7"
+  },
+  "dependencies": {
+    "angular2-universal": "*"
+  },
+  "peerDependencies": {
+    "angular2-universal": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  }
+}

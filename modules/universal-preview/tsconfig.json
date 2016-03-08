@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+  	"target": "es5",
+  	"module": "commonjs",
+  	"declaration": true,
+    "noImplicitAny": false,
+    "removeComments": false,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+  	"sourceMap": true,
+    "listFiles": false,
+  	"outDir": "dist",
+    "rootDir": "src"
+  },
+  "exclude": [
+    "typings/main",
+    "typings/main.d.ts",
+    "node_modules/angular2-express-engine",
+    "node_modules/angular2-hapi-engine",
+    "node_modules/angular2/ts",
+    "node_modules/angular2/src/testing",
+    "node_modules/angular2/src/test",
+    "node_modules/typescript",
+    "node_modules/reflect-metadata",
+    "preboot",
+    "node_modules/preboot/dist/src/node/browser_code_generator.d.ts",
+    "node_modules/preboot/dist/src/node",
+    "node_modules/preboot/test",
+    "node_modules/preboot/src",
+    "src/browser/test",
+    "src/node/test"
+  ],
+  "formatCodeOptions": {
+    "indentSize": 2,
+    "tabSize": 2,
+    "newLineCharacter": "\r\n",
+    "convertTabsToSpaces": true,
+    "insertSpaceAfterCommaDelimiter": true,
+    "insertSpaceAfterSemicolonInForStatements": true,
+    "insertSpaceBeforeAndAfterBinaryOperators": true,
+    "insertSpaceAfterKeywordsInControlFlowStatements": true,
+    "insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+    "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+    "placeOpenBraceOnNewLineForFunctions": false,
+    "placeOpenBraceOnNewLineForControlBlocks": false
+  }
+}
