@@ -1,8 +1,8 @@
 {
   "name": "angular2-gulp-prerender",
   "main": "dist/index.js",
-  "version": "0.5.1",
   "typings": "dist/index.d.js",
+  "version": "0.5.2",
   "description": "Prerender your Universal (isomorphic) Angular 2 app",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
