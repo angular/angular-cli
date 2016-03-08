@@ -11,9 +11,9 @@
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
   "scripts": {
-    "remove-ng2-types": "rimraf node_modules/angular2/typings node_modules/angular2/bundles/typings node_modules/angular2/manual_typings",
+    "prebuild": "rimraf tasks",
     "build": "tsc || true",
-    "postpublish": "npm run remove-ng2-types"
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
