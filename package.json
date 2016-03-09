@@ -14,6 +14,7 @@
     "prestart": "gulp build",
     "build": "gulp build",
     "serve": "gulp serve",
+    "server": "gulp serve",
     "start": "gulp server",
     "watch": "gulp watch",
     "debug": "gulp debug",
@@ -26,7 +27,6 @@
     "webdriver-start": "gulp protractor.start",
     "preprotractor": "gulp protractor.update",
     "protractor": "gulp protractor",
-    "remove-ng2-types": "rimraf node_modules/angular2/typings node_modules/angular2/bundles/typings node_modules/angular2/manual_typings node_modules/angular2/ts/manual_typings node_modules/angular2/ts/typings",
     "remove-dist": "rimraf dist modules/**/dist !node_modules/**/*",
     "remove-tsd-typing": "rimraf ./tsd_typings",
     "remove-local-modules": "rimraf node_modules/angular2-universal node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-universal node_modules/angular2-express-engine node_modules/angular2-hapi-engine",
@@ -34,7 +34,7 @@
     "restart": "npm run update && gulp build && gulp server",
     "tsd": "tsd reinstall && tsd link",
     "doc": "gulp doc",
-    "postinstall": "npm run tsd && npm run remove-ng2-types && npm run build && npm run webdriver-update"
+    "postinstall": "npm run tsd && npm run build && npm run webdriver-update"
   },
   "repository": {
     "type": "git",
