@@ -10,7 +10,8 @@
   "keywords": [],
   "scripts": {
     "test": "node tests/runner",
-    "lint": "eslint -c eslint.json './**/*.js' "
+    "lint": "eslint -c eslint.json './**/*.js'",
+    "postinstall": "typings install"
   },
   "repository": {
     "type": "git",

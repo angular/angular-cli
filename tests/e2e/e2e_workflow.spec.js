@@ -76,12 +76,8 @@ describe('Basic end-to-end Workflow', function () {
   it('Produces a service worker manifest after initial build', function () {
     var manifestPath = path.join(process.cwd(), 'dist', 'manifest.appcache');
     expect(existsSync(manifestPath)).to.be.equal(true);
-    // Read the worker.
-    //TODO: Commenting this out because it makes eslint fail(need to figure out why this expect was commented out)
-    // var lines = fs.readFileSync(manifestPath, {encoding: 'utf8'}).trim().split('\n');
-
-    // Check that a few critical files have been detected.
-    // expect(lines).to.include(`${path.sep}index.html`);
+    var lines = fs.readFileSync(manifestPath, {encoding: 'utf8'}).trim();
+    expect(lines).to.include(`${path.sep}index.html`);
   });
 
   it('Perform `ng test` after initial build', function () {
