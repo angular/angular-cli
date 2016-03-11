@@ -1,16 +1,71 @@
-var stringUtils = require('ember-cli/lib/utilities/string');
+var fs = require('fs-extra');
+var path = require('path');
+var chalk = require('chalk');
+
+var imports, routeDefinitions;
 
 module.exports = {
-  description: ''
+  description: 'Generates a route and a template.',
 
-  //locals: function(options) {
-  //   // Return custom template variables here.
-  //   return {
-  //
-  //   };
-  //}
+  // TODO these options are not being used yet
+  availableOptions: [{
+    name: 'skip-router',
+    type: Boolean,
+    default: false
+  }, {
+    name: 'default',
+    type: Boolean,
+    default: false
+  }],
 
-  // afterInstall: function(options) {
-  //   // Perform extra work here.
-  // }
+  beforeInstall: function(options, locals) {
+    updateRouteConfig.call(this, 'add', options, locals);
+  },
+
+  afterInstall: function(options, locals) {
+    // TODO use skip-router
+    return this.lookupBlueprint('route-config')
+      .install(options);
+  },
+
+  beforeUninstall: function(options, locals) {
+    updateRouteConfig.call(this, 'remove', options, locals);
+  },
+
+  afterUninstall: function(options, locals) {
+    // TODO use skip-router
+    return this.lookupBlueprint('route-config')
+      .install(options);
+  }
 };
+
+function updateRouteConfig(action, options, locals) {
+  var entity = options.entity;
+  var actionColorMap = {
+    add: 'green',
+    remove: 'red'
+  };
+  var color = actionColorMap[action] || 'gray';
+
+  this._writeStatusToUI(chalk[color], action + ' route', entity.name);
+
+  var ngCliConfigPath = path.join(options.project.root, 'angular-cli.json');
+
+  // TODO use default option
+  var route = {
+    routePath: `/${locals.dasherizedModuleName}/...`,
+    component: `${locals.classifiedModuleName}Root`,
+    componentPath: `./${locals.dasherizedModuleName}/${locals.dasherizedModuleName}-root.component`
+  }
+
+  var ngCliConfig = JSON.parse(fs.readFileSync(ngCliConfigPath, 'utf-8'));
+
+  if (action === 'add') {
+    ngCliConfig.routes.push(route)
+  } else if (action === 'remove') {
+    var idx = ngCliConfig.routes.findIndex(el => el.routePath === route.routePath);
+    if (idx) ngCliConfig.routes.splice(idx, 1);
+  }
+
+  fs.writeFileSync(ngCliConfigPath, JSON.stringify(ngCliConfig, null, 2));
+}
