@@ -1,16 +1,15 @@
-'use strict';
+import * as Command from 'ember-cli/lib/models/command';
+import * as path from 'path';
 
-var Command = require('ember-cli/lib/models/command');
-var path    = require('path');
 
-module.exports = Command.extend({
+const VersionCommand = Command.extend({
   name: 'version',
   description: 'outputs angular-cli version',
   aliases: ['v', '--version', '-v'],
   works: 'everywhere',
 
   availableOptions: [
-    { name: 'verbose', type: Boolean, default: false }
+    { name: 'verbose', type: Boolean, 'default': false }
   ],
 
   run: function(options) {
@@ -35,4 +34,6 @@ module.exports = Command.extend({
   }
 });
 
+
+module.exports = VersionCommand;
 module.exports.overrideCore = true;
