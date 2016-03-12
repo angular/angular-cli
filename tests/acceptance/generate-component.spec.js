@@ -87,7 +87,6 @@ describe('Acceptance: ng generate component', function() {
       .then(_ => fs.mkdirsSync('./1'))
       .then(_ => process.chdir('./1'))
       .then(_ => {
-        process.env.CWD = process.cwd();
         return ng([
           'generate',
           'component',
@@ -109,7 +108,6 @@ describe('Acceptance: ng generate component', function() {
       .then(_ => fs.mkdirsSync('./1'))
       .then(_ => process.chdir('./1'))
       .then(_ => {
-        process.env.CWD = process.cwd();
         return ng([
           'generate',
           'component',
@@ -131,7 +129,6 @@ describe('Acceptance: ng generate component', function() {
       .then(_ => fs.mkdirsSync('./1'))
       .then(_ => process.chdir('./1'))
       .then(_ => {
-        process.env.CWD = process.cwd();
         return ng([
           'generate',
           'component',
@@ -153,7 +150,6 @@ describe('Acceptance: ng generate component', function() {
       .then(_ => fs.mkdirsSync('./1'))
       .then(_ => process.chdir('./1'))
       .then(_ => {
-        process.env.CWD = process.cwd();
         return ng([
           'generate',
           'component',

@@ -5,11 +5,7 @@ module.exports = {
   description: '',
 
   normalizeEntityName: function(entityName) {
-    var cwd = this.project.cli.testing
-      ? process.cwd()
-      : process.env.PWD;
-    
-    var parsedPath = dynamicPathParser(cwd, this.project.root, entityName);
+    var parsedPath = dynamicPathParser(this.project, entityName);
     
     this.dynamicPath = parsedPath;
     return parsedPath.name;

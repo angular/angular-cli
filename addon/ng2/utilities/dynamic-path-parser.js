@@ -1,7 +1,10 @@
 var path = require('path');
 var process = require('process');
 
-module.exports = function dynamicPathParser(cwd, projectRoot, entityName) {
+module.exports = function dynamicPathParser(project, entityName) {
+  var projectRoot = project.root;
+  var cwd = process.env.PWD;
+  
   var rootPath = path.join(projectRoot, 'src', 'app');
 
   var outputPath = path.join(rootPath, entityName);

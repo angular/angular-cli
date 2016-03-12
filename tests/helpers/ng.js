@@ -6,7 +6,9 @@ var Cli           = require('../../lib/cli');
 
 module.exports = function ng(args) {
     var cli;
-
+    
+    process.env.PWD = process.cwd();
+    
     cli = new Cli({
         inputStream:  [],
         outputStream: [],
