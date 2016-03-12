@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "broccoli": "^0.16.9",
-    "broccoli-concat": "2.2.0",
+    "broccoli": "^1.0.0-beta.6",
+    "broccoli-caching-writer": "^2.2.1",
     "broccoli-funnel": "^1.0.1",
     "broccoli-merge-trees": "^1.1.1",
     "broccoli-writer": "^0.1.1",
@@ -42,6 +42,7 @@
     "lodash": "^4.6.1",
     "resolve": "^1.1.7",
     "shelljs": "^0.6.0",
+    "multidep": "^2.0.0",
     "silent-error": "^1.0.0",
     "symlink-or-copy": "^1.0.1",
     "typescript": "^1.8.7",
@@ -53,7 +54,6 @@
     ]
   },
   "devDependencies": {
-    "broccoli-stew": "^1.2.0",
     "chai": "^3.5.0",
     "exists-sync": "0.0.3",
     "glob": "^7.0.3",
