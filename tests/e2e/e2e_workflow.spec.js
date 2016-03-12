@@ -79,7 +79,6 @@ describe('Basic end-to-end Workflow', function () {
 
     // Check that a few critical files have been detected.
     expect(lines).to.include(`${path.sep}index.html`);
-    expect(lines).to.include(`${path.sep}thirdparty${path.sep}libs.js`);
   });
 
   it('Perform `ng test` after initial build', function() {
