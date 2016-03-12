@@ -73,9 +73,13 @@ describe('Basic end-to-end Workflow', function () {
       'build',
       '--silent'
     ]).then(function() {
-      expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+<<<<<<< 1c80e44bb109b63ff1de6202f964251c694a4241
+      expect(fs.existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
     }).catch((err) => {
       throw new Error('Build failed.');
+=======
+      expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+>>>>>>> feat(builder): broccoli bump to 1.0
     });
   });
 
@@ -97,8 +101,12 @@ describe('Basic end-to-end Workflow', function () {
 
     return ng(testArgs)
     .then(function(result) {
+<<<<<<< 1c80e44bb109b63ff1de6202f964251c694a4241
       const exitCode = typeof result === 'object' ? result.exitCode : result;
       expect(exitCode).to.be.equal(0);
+=======
+      //expect(result.exitCode).to.be.equal(0);
+>>>>>>> feat(builder): broccoli bump to 1.0
     });
   });
 
@@ -208,6 +216,7 @@ describe('Basic end-to-end Workflow', function () {
   it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
     this.timeout(420000);
 
+<<<<<<< 1c80e44bb109b63ff1de6202f964251c694a4241
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
     let config = require(configFilePath);
 
@@ -220,7 +229,7 @@ describe('Basic end-to-end Workflow', function () {
         'build',
         '--silent'
       ]).then(function() {
-            expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+        expect(fs.existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
       }).catch((err) => {
         throw new Error('Build failed.');
       })
@@ -230,6 +239,32 @@ describe('Basic end-to-end Workflow', function () {
         sh.rm('-rf', './tmp'); // tmp.teardown takes too long
         done();
       });
+=======
+    var configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
+    fs.readFile(configFilePath, 'utf8', function(err, data){
+
+      var config = JSON.parse(data);
+      config.compilerOptions.noImplicitAny = true;
+
+      fs.writeFile(configFilePath, JSON.stringify(config), function(){
+        //clear the dist folder
+        sh.rm('-rf', path.join(process.cwd(), 'dist'));
+
+        return ng([
+            'build',
+            '--silent'
+          ]).then(function() {
+            expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+          })
+          .finally(function(){
+            // Clean `tmp` folder
+            process.chdir(path.resolve(root, '..'));
+            sh.rm('-rf', './tmp'); // tmp.teardown takes too long
+            done();
+          });
+        });
+    });
+>>>>>>> feat(builder): broccoli bump to 1.0
   });
 
 });
