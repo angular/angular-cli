@@ -40,8 +40,10 @@ var PATHS = {
   cleanable: rootDir([
     './dist/',
     './tsd_typings/',
+    './typings/',
     './node_modules/',
     './modules/**/node_modules',
+    './modules/**/typings',
     './modules/**/dist'
   ]),
 
