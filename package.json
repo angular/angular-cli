@@ -50,7 +50,7 @@
     "browser-sync": "^2.8.2",
     "connect-history-api-fallback": "^1.1.0",
     "connect-livereload": "^0.5.3",
-    "conventional-changelog": "^0.5.0",
+    "conventional-changelog": "^1.1.0",
     "del": "^2.0.2",
     "express": "^4.13.0",
     "falcor": "^0.1.15",
