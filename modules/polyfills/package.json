@@ -1,0 +1,53 @@
+{
+  "name": "angular2-universal-polyfills",
+  "version": "0.1.0",
+  "description": "Angular 2 Universal Polyfills",
+  "homepage": "https://github.com/angular/universal",
+  "license": "MIT",
+  "contributors": [
+    "PatrickJS <github@gdi2290.com>"
+  ],
+  "typings": "dist/polyfills.d.ts",
+  "main": "dist/polyfills.js",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "polyfills.d.ts",
+    "polyfills.js",
+    "dev.d.ts",
+    "dev.js",
+    "ie.d.ts",
+    "ie.js",
+    "node.d.ts",
+    "node.js",
+    "prod.d.ts",
+    "prod.js",
+    "test.d.ts",
+    "test.js"
+  ],
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc || true",
+    "prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.7"
+  },
+  "dependencies": {
+    "ie-shim": "^0.1.0"
+  },
+  "peerDependencies": {
+    "es6-promise": ">=3.0.2",
+    "es6-shim": ">=0.33.3",
+    "zone.js": ">=0.5.15",
+    "reflect-metadata": ">=0.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  }
+}
