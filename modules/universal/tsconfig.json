@@ -24,8 +24,6 @@
     "node_modules/typescript",
     "node_modules/reflect-metadata",
     "preboot",
-    "node_modules/preboot/dist/src/node/browser_code_generator.d.ts",
-    "node_modules/preboot/dist/src/node",
     "node_modules/preboot/test",
     "node_modules/preboot/src",
     "src/browser/test",
