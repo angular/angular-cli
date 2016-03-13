@@ -13,9 +13,7 @@
   	"outDir": "dist"
   },
   "files": [
-    "../../tsd_typings/tsd.d.ts",
-    "./typings/tsd.d.ts",
-    "../../custom_typings/_custom.d.ts",
+    "../../typings/browser.d.ts",
     "./src/prerender.ts",
     "./index.ts"
   ],

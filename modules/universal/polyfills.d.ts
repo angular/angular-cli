@@ -1,1 +1,1 @@
-export * from './dist/polyfills';
+import './dist/polyfills';

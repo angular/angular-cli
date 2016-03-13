@@ -1,2 +1,2 @@
-var window = require('./dist/src/node/mock/window');
+var window = require('./dist/node/mock/window');
 global.window = window;

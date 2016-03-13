@@ -1,1 +1,1 @@
-export * from './dist/mock';
+import './dist/node/mock/window';

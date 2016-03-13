@@ -13,8 +13,7 @@
   	"outDir": "tasks"
   },
   "files": [
-    "../../tsd_typings/tsd.d.ts",
-    "../../custom_typings/_custom.d.ts",
+    "../../typings/browser.d.ts",
     "./index.ts",
     "./src/prerender.ts"
   ],

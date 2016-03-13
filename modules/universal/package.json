@@ -13,13 +13,16 @@
   "main": "dist/node/index.js",
   "browser": "dist/browser/index.js",
   "files": [
-    "src",
     "dist",
+    "src",
     "parse5.d.ts",
     "parse5.js",
+    "polyfills.d.ts",
     "polyfills.js",
+    "global.d.ts",
     "global.js",
-    "node.js"
+    "mock.d.ts",
+    "mock.js"
   ],
   "scripts": {
     "prebuild": "rm -rf dist",

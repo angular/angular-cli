@@ -28,6 +28,7 @@
     "node_modules/preboot/dist/src/node",
     "node_modules/preboot/test",
     "node_modules/preboot/src",
+    "node_modules/angular2-universal",
     "src/browser/test",
     "src/node/test"
   ],
