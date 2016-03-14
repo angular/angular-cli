@@ -23,7 +23,7 @@
     "Rody Haddad <npm@rodyhaddad.com> (http://rodyhaddad.com/)",
     "Igor Minar <igor@angularjs.org>"
   ],
-  "license": "Apache-2.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },
