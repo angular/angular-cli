@@ -1,7 +1,7 @@
 {
   "name": "<%= htmlComponentName %>",
   "version": "0.0.0",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "angular-cli": {},
   "scripts": {
     "start": "ng server",
