@@ -92,7 +92,7 @@ export class Bootloader {
         }
         return { injector, lastAppRef };
       })
-      .then(({ injector, lastAppRef }) => {
+      .then(({ injector, lastAppRef }: any) => {
         if ('preboot' in this._config) {
           if (!this._config.preboot) { return injector; }
 
@@ -111,7 +111,7 @@ export class Bootloader {
         }
         return injector;
       })
-      .then(injector => {
+      .then((injector: any) => {
         let document = injector.get(DOCUMENT);
         let rendered = Bootloader.serializeDocument(document);
         return rendered;
