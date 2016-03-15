@@ -5,7 +5,7 @@ var exec     = Promise.denodeify(require('child_process').exec);
 var path     = require('path');
 var pkg      = require('../package.json');
 var fs       = require('fs');
-var template = require('lodash/string/template');
+var template = require('lodash/template');
 var Task     = require('ember-cli/lib/models/task');
 
 var gitEnvironmentVariables = {

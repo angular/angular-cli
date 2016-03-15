@@ -11,10 +11,10 @@ var root      = process.cwd();
 var util      = require('util');
 var conf      = require('ember-cli/tests/helpers/conf');
 var minimatch = require('minimatch');
-var intersect = require('lodash/array/intersection');
-var remove    = require('lodash/array/remove');
-var forEach   = require('lodash/collection/forEach');
-var any       = require('lodash/collection/some');
+var intersect = require('lodash/intersection');
+var remove    = require('lodash/remove');
+var forEach   = require('lodash/forEach');
+var any       = require('lodash/some');
 var EOL       = require('os').EOL;
 
 var defaultIgnoredFiles = Blueprint.ignoredFiles;
