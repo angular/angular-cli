@@ -18,7 +18,7 @@ describe('<%= classifiedModuleName %> Service', () => {
   beforeEachProviders(() => [<%= classifiedModuleName %>]);
 
 
-  it('should ...', inject([<%= classifiedModuleName %>], (service:<%= classifiedModuleName %>) => {
+  it('should ...', inject([<%= classifiedModuleName %>], (service: <%= classifiedModuleName %>) => {
 
   }));
 
