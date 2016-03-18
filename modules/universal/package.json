@@ -60,7 +60,7 @@
     "angular2-express-engine": ">=0.5.5",
     "angular2-hapi-engine": ">=0.5.1",
     "rxjs": "~5.0.0-beta.2",
-    "angular2": "2.0.0-beta.8 - 2.0.0-beta.10",
+    "angular2": "2.0.0-beta.8 - 2.0.0-beta.11",
     "es6-shim": "^0.33.3",
     "zone.js": "0.5.15 - 0.6.5",
     "css": "^2.2.1",
