@@ -18,7 +18,7 @@ module.exports = Command.extend({
     { name: 'verbose',    type: Boolean, default: false, aliases: ['v'] },
     { name: 'blueprint',  type: String,                  aliases: ['b'] },
     { name: 'skip-npm',   type: Boolean, default: false, aliases: ['sn'] },
-    { name: 'skip-bower', type: Boolean, default: false, aliases: ['sb'] },
+    { name: 'skip-bower', type: Boolean, default: true,  aliases: ['sb'] },
     { name: 'name',       type: String,  default: '',    aliases: ['n'] }
   ],
 
