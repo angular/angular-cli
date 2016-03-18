@@ -6,8 +6,7 @@
   "devDependencies": {},
   "ambientDependencies": {
     "browserify": "github:DefinitelyTyped/DefinitelyTyped/browserify/browserify.d.ts#abc2bcfb8524b1e027e6298d3348012b5b06eda5",
-    "es6-collections": "github:DefinitelyTyped/DefinitelyTyped/es6-collections/es6-collections.d.ts#4de74cb527395c13ba20b438c3a7a419ad931f1c",
-    "es6-promise": "github:DefinitelyTyped/DefinitelyTyped/es6-promise/es6-promise.d.ts#e1699c41087960df7678f413312213fb1f980307",
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160215162030",
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#48c1e3c1d6baefa4f1a126f188c27c4fefd36bff"
   }
 }
