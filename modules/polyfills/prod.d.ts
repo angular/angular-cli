@@ -1,1 +1,1 @@
-export * from './dist/prod';
+import './dist/prod';

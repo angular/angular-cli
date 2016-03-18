@@ -1,1 +1,1 @@
-export * from './dist/ie';
+import './dist/ie';
