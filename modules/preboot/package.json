@@ -7,7 +7,7 @@
   "typings": "dist/src/node/preboot_node.d.ts",
   "scripts": {
     "prebuild": "rm -rf dist",
-    "build": "tsc",
+    "build": "tsc || true",
     "prepublish": "npm run build"
   },
   "files": [

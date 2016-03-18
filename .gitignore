@@ -54,3 +54,5 @@ test/coverage
 
 
 /examples/dist
+
+examples/typings

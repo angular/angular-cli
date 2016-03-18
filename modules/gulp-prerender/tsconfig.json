@@ -13,7 +13,6 @@
   	"outDir": "dist"
   },
   "files": [
-    "../../typings/browser.d.ts",
     "./index.ts"
   ],
   "formatCodeOptions": {

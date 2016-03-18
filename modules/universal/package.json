@@ -30,10 +30,19 @@
     "prepublish": "npm run build"
   },
   "devDependencies": {
+    "angular2-universal-preview": "file:.",
     "angular2-express-engine": "file:../express-engine",
     "angular2-hapi-engine": "file:../hapi-engine",
+    "angular2": "2.0.0-beta.9",
     "preboot": "file:../preboot",
-    "typescript": "^1.8.7"
+    "zone.js": "~0.5.15",
+    "es6-shim": "^0.33.3",
+    "es6-promise": "^3.0.2",
+    "reflect-metadata": "0.1.2",
+    "typescript": "^1.8.7",
+    "rxjs": "~5.0.0-beta.2",
+    "css": "^2.2.1",
+    "parse5": "^1.5.0"
   },
   "dependencies": {
     "angular2-express-engine": "*",
@@ -47,7 +56,7 @@
     "angular2-express-engine": ">=0.5.5",
     "angular2-hapi-engine": ">=0.5.1",
     "rxjs": "~5.0.0-beta.2",
-    "angular2": "2.0.0-beta.8 - 2.0.0-beta.9",
+    "angular2": "2.0.0-beta.8 - 2.0.0-beta.10",
     "es6-shim": "^0.33.3",
     "zone.js": "~0.5.15",
     "css": "^2.2.1",
