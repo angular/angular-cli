@@ -7,8 +7,7 @@ import {
   BaseRequestOptions,
   BaseResponseOptions
 } from 'angular2/http';
-import {provide, PLATFORM_INITIALIZER} from 'angular2/core';
-;
+import {provide, NgZone, PLATFORM_INITIALIZER} from 'angular2/core';
 import * as nodeHttp from './node_http'
 import * as preloadCache from './preload_cache';
 
@@ -20,10 +19,10 @@ export var NODE_HTTP_PROVIDERS: Array<any> = [
   provide(ResponseOptions, {useClass: BaseResponseOptions}),
 
   provide(nodeHttp.NodeBackend, {
-    useFactory: (respOpt) => {
-      return new nodeHttp.NodeBackend(respOpt);
+    useFactory: (respOpt, ngZone) => {
+      return new nodeHttp.NodeBackend(respOpt, ngZone);
     },
-    deps: [ResponseOptions]
+    deps: [ResponseOptions, NgZone]
   }),
 
   provide(ConnectionBackend, {useClass: nodeHttp.NodeBackend}),
@@ -37,7 +36,8 @@ export var NODE_PRELOAD_CACHE_HTTP_PROVIDERS: Array<any> = [
   provide(ResponseOptions, {useClass: BaseResponseOptions}),
 
   provide(BrowserXhr, {useClass: preloadCache.NodeXhr}),
-  provide(ConnectionBackend, {useClass: preloadCache.NodeXhrBackend}),
+  // provide(ConnectionBackend, {useClass: preloadCache.NodeXhrBackend}),
+  provide(ConnectionBackend, {useClass: nodeHttp.NodeBackend}),
 
   provide(Http, {useClass: preloadCache.NgPreloadCacheHttp})
 ];
