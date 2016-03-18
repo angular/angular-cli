@@ -8,7 +8,7 @@ module.exports = function(ROOT) {
   var {expressEngine} = require('angular2-universal-preview');
   // rendering engine
   app.engine('ng2.html', expressEngine);
-  app.set('views', path.join(ROOT, 'examples'));
+  app.set('views', path.join(ROOT));
   app.set('view engine', 'ng2.html');
   app.set('view options', { doctype: 'html' });
 
@@ -16,8 +16,8 @@ module.exports = function(ROOT) {
   var api = require('./api');
   var graphApi = require('./graph_api');
 
-  app.use(serveStatic(`${ROOT}/dist`));
-  app.use(serveStatic(`${ROOT}/examples/app/public`));
+  app.use(serveStatic(path.join(ROOT, 'dist')));
+  app.use(serveStatic(path.join(ROOT, 'public')));
 
   app.use('/api', api(ROOT));
   app.use('/graph_api', api(ROOT));

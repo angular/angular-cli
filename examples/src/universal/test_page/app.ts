@@ -1,4 +1,7 @@
 import {Component} from 'angular2/core';
+import {Http} from 'angular2/http';
+
+const URL = 'http://127.0.0.1:3000';
 
 
 function transformData(data) {
@@ -95,7 +98,7 @@ export class MyApp {
 })
 export class App {
   static queries = {
-    todos: '/api/todos'
+    todos: URL + '/api/todos'
   };
 
   value: string        = 'value8';
@@ -109,22 +112,22 @@ export class App {
   //   .filter(res => res.status >= 200 && res.status < 300)
   //   .map(res => res.json())
   //   .map(data => transformData(data)); // ensure correct data prop types
-  // todosObs2$ = this.http.get(App.queries.todos)
-  //   .filter(res => res.status >= 200 && res.status < 300)
-  //   .map(res => res.json())
-  //   .map(data => transformData(data)); // ensure correct data prop types
+  todosObs2$ = this.http.get(App.queries.todos)
+    .filter(res => res.status >= 200 && res.status < 300)
+    .map(res => res.json())
+    .map(data => transformData(data)); // ensure correct data prop types
   // todosObs3$ = this.http.get(App.queries.todos)
   //   .map(res => res.json())
   //   .map(data => transformData(data));
 
-  constructor(/*private http: Http*/) {
+  constructor(private http: Http) {
 
   }
 
   ngOnInit() {
-    this.addItem();
-    this.addItem();
-    this.addItem();
+    // this.addItem();
+    // this.addItem();
+    // this.addItem();
 
     // this.todosObs1$.subscribe(
     //   // onValue
@@ -142,22 +145,22 @@ export class App {
     //     console.log('complete request1');
     //   });
 
-    // this.todosObs2$.subscribe(
-    //   // onValue
-    //   todos => {
-    //     console.log('another call 2', todos);
-    //     todos.map(todo => this.addItem(todo));
-    //     // this.anotherAjaxCall();
-    //   },
-    //   // onError
-    //   err => {
-    //     console.error('err', err);
-    //     throw err;
-    //   },
-    //   // onComplete
-    //   () => {
-    //     console.log('complete request2');
-    //   });
+    this.todosObs2$.subscribe(
+      // onValue
+      todos => {
+        console.log('another call 2', todos);
+        todos.map(todo => this.addItem(todo));
+        this.anotherAjaxCall();
+      },
+      // onError
+      err => {
+        console.error('err', err);
+        throw err;
+      },
+      // onComplete
+      () => {
+        console.log('complete request2');
+      });
 
   }
   anotherAjaxCall() {

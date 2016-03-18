@@ -1,0 +1,12 @@
+{
+  "name": "examples",
+  "version": false,
+  "dependencies": {},
+  "ambientDependencies": {
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160215162030",
+    "express": "registry:dt/express#4.0.0+20160208031452",
+    "mime": "registry:dt/mime#0.0.0+20151204023458",
+    "node": "registry:dt/node#4.0.0+20160311162451",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160104095738"
+  }
+}

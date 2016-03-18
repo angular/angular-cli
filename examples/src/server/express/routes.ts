@@ -6,11 +6,9 @@ var {Router} = require('express');
 module.exports = function(ROOT) {
   var router = Router();
 
-  var universalPath = `${ROOT}/dist/examples/app/universal`;
-
-  var appPage = require(`${universalPath}/test_page/app`);
-  var todoApp = require(`${universalPath}/todo/app`);
-  var routerApp = require(`${universalPath}/test_router/app`);
+  var appPage = require('../../universal/test_page/app');
+  var todoApp = require('../../universal/todo/app');
+  var routerApp = require('../../universal/test_router/app');
 
   var {enableProdMode, provide} = require('angular2/core');
   var {ROUTER_PROVIDERS, APP_BASE_HREF} = require('angular2/router');
@@ -20,8 +18,10 @@ module.exports = function(ROOT) {
   var {
     NODE_HTTP_PROVIDERS,
     NODE_LOCATION_PROVIDERS,
+    NODE_PRELOAD_CACHE_HTTP_PROVIDERS,
     REQUEST_URL,
     PRIME_CACHE,
+    BASE_URL,
     queryParamsToBoolean
   } = require('angular2-universal-preview');
   // require('angular2-universal')
@@ -33,16 +33,23 @@ module.exports = function(ROOT) {
       let options = Object.assign(queryParams, {
         // client url for systemjs
         buildClientScripts: true,
-        componentUrl: 'examples/app/universal/test_page/browser',
+        componentUrl: 'examples/src/universal/test_page/browser',
 
         directives: [appPage.App, appPage.MyApp],
         providers: [
+          NODE_LOCATION_PROVIDERS,
+          provide(REQUEST_URL, {useValue: req.originalUrl}),
+          provide(APP_BASE_HREF, {useValue: '/'}),
+
+          provide(BASE_URL, {useExisting: req.originalUrl}),
+          provide(PRIME_CACHE, {useExisting: true}),
+
           // NODE_HTTP_PROVIDERS,
-          // NODE_LOCATION_PROVIDERS,
-          // provide(BASE_URL, {useExisting: req.originalUrl}),
-          // provide(PRIME_CACHE, {useExisting: true})
+          NODE_PRELOAD_CACHE_HTTP_PROVIDERS,
         ],
         data: {},
+
+        precache: true,
 
         preboot: queryParams.preboot === false ? null : {
           start:    true,
@@ -56,7 +63,7 @@ module.exports = function(ROOT) {
 
       });
 
-      res.render('app/universal/test_page/index', options);
+      res.render('src/universal/test_page/index', options);
 
     });
 
@@ -67,7 +74,7 @@ module.exports = function(ROOT) {
       let options = Object.assign(queryParams , {
         // client url for systemjs
         buildClientScripts: true,
-        componentUrl: 'examples/app/universal/todo/browser',
+        componentUrl: 'examples/src/universal/todo/browser',
 
         directives: [todoApp.TodoApp],
         providers: [
@@ -78,11 +85,11 @@ module.exports = function(ROOT) {
         ],
         data: {},
 
-        preboot: queryParams.preboot === false ? null : true
+        preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
 
       });
 
-      res.render('app/universal/todo/index', options);
+      res.render('src/universal/todo/index', options);
 
     });
 
@@ -93,7 +100,7 @@ module.exports = function(ROOT) {
       let options = Object.assign(queryParams , {
         // client url for systemjs
         buildClientScripts: true,
-        componentUrl: 'examples/app/universal/falcor_todo/client',
+        componentUrl: 'examples/src/universal/falcor_todo/client',
 
         directives: [todoApp.TodoApp],
         providers: [
@@ -104,11 +111,11 @@ module.exports = function(ROOT) {
         ],
         data: {},
 
-        preboot: queryParams.preboot === false ? null : true
+        preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
 
       });
 
-      res.render('app/universal/falcor_todo/index', options);
+      res.render('src/universal/falcor_todo/index', options);
 
     });
 
@@ -120,7 +127,7 @@ module.exports = function(ROOT) {
     let options = Object.assign(queryParams , {
       // client url for systemjs
       buildClientScripts: true,
-      componentUrl: 'examples/app/universal/test_router/browser',
+      componentUrl: 'examples/src/universal/test_router/browser',
       // ensure that we test only server routes
       client: false,
 
@@ -134,11 +141,11 @@ module.exports = function(ROOT) {
       ],
       data: {},
 
-      preboot: queryParams.preboot === false ? null : true
+      preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
 
     });
 
-    res.render('app/universal/test_router/index', options);
+    res.render('src/universal/test_router/index', options);
 
   }
 
@@ -154,7 +161,7 @@ module.exports = function(ROOT) {
   router.use('/angular2', serveStatic(`${ROOT}/node_modules/angular2`));
   router.use('/rxjs', serveStatic(`${ROOT}/node_modules/rxjs`));
   router.use('/node_modules',  serveStatic(`${ROOT}/node_modules`));
-  router.use('/examples/app',  serveStatic(`${ROOT}/dist/examples/app`));
+  router.use('/examples/src',  serveStatic(`${ROOT}/dist`));
 
   router.use(historyApiFallback({
     // verbose: true

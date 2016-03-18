@@ -1,4 +1,3 @@
-/// <reference path="./tsd_typings/node/node.d.ts"/>
 var path = require('path');
 var http = require('http');
 var fs = require('fs');
