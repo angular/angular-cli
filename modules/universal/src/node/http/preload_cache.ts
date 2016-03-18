@@ -164,7 +164,7 @@ export class NgPreloadCacheHttp extends Http {
 
   preload(factory) {
 
-    var obs = new EventEmitter(true);
+    var obs = new EventEmitter(false);
 
     var currentNode = null;
 
@@ -177,7 +177,8 @@ export class NgPreloadCacheHttp extends Http {
     this._async += 1;
     var request = factory();
 
-    request.subscribe({
+    request
+    .subscribe({
         next: (response) => {
           let headers = {};
           response.headers.forEach((value, name) => {
@@ -189,21 +190,27 @@ export class NgPreloadCacheHttp extends Http {
           if (isPresent(currentNode)) {
             currentNode.res = res;
           }
-          obs.next(response);
+          // this._ngZone.run(() => {
+            obs.next(response);
+          // });
         },
         error: (e) => {
-          this._async -= 1;
-          obs.error(e);
+          // this._ngZone.run(() => {
+            obs.error(e)
+            this._async -= 1;
+          // });
         },
         complete: () => {
           this._activeNode = currentNode;
-          this._async -= 1;
           this._activeNode = null;
-          obs.complete();
+          // this._ngZone.run(() => {
+            obs.complete();
+            this._async -= 1;
+          // });
         }
     });
 
-    return request;
+    return obs;
   }
 
   request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
