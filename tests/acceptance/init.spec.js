@@ -53,7 +53,7 @@ describe('Acceptance: ng init', function() {
         });
 
         expected.forEach(function (file, index) {
-            expected[index] = file.replace(/__name__/g, 'angular-cli');
+            expected[index] = file.replace(/__name__/g, 'tmp');
         });
 
         removeIgnored(expected);
@@ -101,7 +101,7 @@ describe('Acceptance: ng init', function() {
         return ng([
             'init',
             '--skip-npm',
-            '--skip-bower',
+            '--skip-bower'
         ]).then(confirmBlueprinted);
     });
 
@@ -114,7 +114,9 @@ describe('Acceptance: ng init', function() {
                 return ng([
                     'init',
                     '--skip-npm',
-                    '--skip-bower'
+                    '--skip-bower',
+                    '--name',
+                    'tmp'
                 ]);
             })
             .then(confirmBlueprinted)
