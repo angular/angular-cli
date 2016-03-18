@@ -1,6 +1,7 @@
 import {DOCUMENT} from 'angular2/platform/common_dom';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 import {NgZone, platform, PlatformRef, ApplicationRef} from 'angular2/core';
+import {Http} from 'angular2/http';
 
 
 import {buildReflector, buildNodeProviders, buildNodeAppProviders} from './platform/node';
@@ -9,6 +10,7 @@ import {createPrebootCode} from './ng_preboot';
 import {waitRouter} from './render';
 
 export interface BootloaderConfig {
+  template?: any;
   document?: any;
   platformProviders?: Array<any>;
   providers?: Array<any>;
@@ -16,6 +18,26 @@ export interface BootloaderConfig {
   component?: any;
   directives?: Array<any>;
   preboot?: any;
+  precache?: boolean;
+}
+
+function checkProviders(providers) {
+  let lastProviders = [];
+  for (let i = 0; i < providers.length; ++i) {
+    let provide = providers[i];
+    if (!provide) {
+      console.log('undefined provider', providers);
+      // lastProviders.push(providers[i-1].name);
+    }
+    // else if (!provide.token) {
+    //   console.log('undefined token', provide);
+    //   lastProviders.push(providers[i-1].name);
+    // }
+  }
+  if (lastProviders.length) {
+    console.log('PROVIDERS ERRORS', lastProviders);
+  }
+  return providers;
 }
 
 export class Bootloader {
@@ -46,16 +68,16 @@ export class Bootloader {
   static serializeDocument(document) { return serializeDocument(document); }
 
   document(document = null) {
-    var doc = document || this._config.document;
+    var doc = document || this._config.template || this._config.document;
     if (typeof doc === 'string') {
-      return Bootloader.parseDocument(document);
+      return Bootloader.parseDocument(doc);
     }
     return doc;
   }
 
   platform(providers?: any): PlatformRef {
     let pro = providers || this._config.platformProviders;
-    return platform(buildNodeProviders(pro));
+    return platform(checkProviders(buildNodeProviders(pro)));
   }
 
   application(document?: any, providers?: any): ApplicationRef {
@@ -82,47 +104,94 @@ export class Bootloader {
   serializeApplication(Component?: any | Array<any>, componentProviders?: Array<any>): Promise<any> {
     let component = Component || this._config.component;
     let providers = componentProviders || this._config.componentProviders;
-    return this.bootstrap(component, providers)
-      .then(applicationRefs => {
-        let lastAppRef = applicationRefs;
-        let injector = applicationRefs.injector;
-        if (Array.isArray(applicationRefs)) {
-          lastAppRef = applicationRefs[applicationRefs.length - 1];
-          injector = lastAppRef.injector;
+
+    return this._applicationAll(component, providers)
+      .then((configRefs: any) => {
+        if ('precache' in this._config) {
+          if (!this._config.precache) {
+            return configRefs;
+          }
+
+          let apps = configRefs.map((config, i) => {
+            let ngZone = config.appRef.injector.get(NgZone);
+            let http = config.cmpRef.injector.getOptional(Http);
+
+            let promise = new Promise(resolve => {
+              if (http && http._async) {
+                ngZone.onEventDone.subscribe(() => {
+                  if (http && http._async <= 0) {
+                    resolve(config);
+                  }
+                });
+              } else {
+                resolve(config);
+              }
+            });
+            return promise;
+          });
+          return Promise.all(apps);
+
         }
-        return { injector, lastAppRef };
+        return configRefs
       })
-      .then(({ injector, lastAppRef }: any) => {
+      .catch(err => {
+        console.log('Precache Error:', err);
+        throw err;
+      })
+      .then((configRefs: any) => {
         if ('preboot' in this._config) {
-          if (!this._config.preboot) { return injector; }
+          if (!this._config.preboot) { return configRefs; }
 
           let prebootCode = createPrebootCode(this._config.directives, this._config.preboot);
 
           return prebootCode
             .then(code => {
               // TODO(gdi2290): manage the codegen better after preboot supports multiple appRoot
-              let el = lastAppRef.location.nativeElement;
+              let lastRef = configRefs[configRefs.length - 1];
+              let el = lastRef.cmpRef.location.nativeElement;
               let script = parseFragment(code);
               let prebootEl = DOM.createElement('div');
               DOM.setInnerHTML(prebootEl, code);
               DOM.insertAfter(el, prebootEl);
-              return injector;
+              return configRefs;
             });
         }
-        return injector;
+        return configRefs;
       })
-      .then((injector: any) => {
-        let document = injector.get(DOCUMENT);
+      .catch(err => {
+        console.log('preboot Error:', err);
+        throw err;
+      })
+      .then((configRefs: any) => {
+        let document = configRefs[0].appRef.injector.get(DOCUMENT);
         let rendered = Bootloader.serializeDocument(document);
         return rendered;
-      });
+      })
+      .catch(err => {
+        console.log('Rendering Document Error:', err);
+        throw err;
+      })
+
   }
 
 
-  _bootstrapAll(Components?: Array<any>, componentProviders?: Array<any>) {
+  _bootstrapAll(Components?: Array<any>, componentProviders?: Array<any>): Promise<Array<any>> {
     let components = Components || this._config.directives;
     let providers = componentProviders || this._config.componentProviders;
     let directives = components.map(component => this.appRef.bootstrap(component, providers).then(waitRouter));
+    return Promise.all(directives);
+  }
+
+  _applicationAll(Components?: Array<any>, componentProviders?: Array<any>): Promise<Array<any>> {
+    let components = Components || this._config.directives;
+    let providers = componentProviders || this._config.componentProviders || [];
+    let doc = this.document(this._config.template || this._config.document);
+
+    let directives = components.map(component => {
+      var appRef = this.application(doc);
+      let compRef = appRef.bootstrap(component, providers).then(waitRouter)
+      return compRef.then(cmpRef => ({ appRef, cmpRef }));
+    });
     return Promise.all(directives);
   }
 
