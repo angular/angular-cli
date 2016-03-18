@@ -16,6 +16,12 @@ export function parseFragment(el: string): Object {
 }
 
 export function parseDocument(documentHtml: string): Object {
+  if (!documentHtml) {
+    throw new Error('parseDocument requires a document string');
+  }
+  if (typeof documentHtml !== 'string') {
+    throw new Error('parseDocument needs to be a string to be parsed correctly');
+  }
   const doc = parser.parse(documentHtml);
   let rootNode;
   let bodyNode;
