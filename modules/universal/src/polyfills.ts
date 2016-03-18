@@ -4,4 +4,4 @@ import 'es6-shim';
 // typescript emit metadata
 import 'reflect-metadata';
 // zone.js to track promises
-import 'zone.js/lib/zone';
+import 'zone.js/dist/zone-node';
