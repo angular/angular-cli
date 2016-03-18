@@ -18,6 +18,7 @@ export interface expressEngineOptions {
   directives: Array<any>;
   providers?: Array<any>;
   preboot?: Object | any;
+  precache?: boolean;
   bootloader?: any;
   selector?: string;
   serializedCmp?: string;
@@ -166,12 +167,14 @@ export function expressEngine(filePath: string, options: expressEngineOptions, d
       var bootloader = options.bootloader;
       if (!options.bootloader) {
         options.bootloader = {
-          document: parseDocument(clientHtml),
+          template: clientHtml,
+          document: clientHtml,
           providers: options.providers,
           componentProviders: options.componentProviders,
           platformProviders: options.platformProviders,
           directives: options.directives,
-          preboot: options.preboot
+          preboot: options.preboot,
+          precache: options.precache
         };
       }
       bootloader = Bootloader.create(options.bootloader);
