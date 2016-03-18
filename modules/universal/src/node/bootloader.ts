@@ -118,6 +118,7 @@ export class Bootloader {
 
             let promise = new Promise(resolve => {
               if (http && http._async) {
+                let obs = ngZone.onStable || ngZone.onEventDone; // beta.10 change
                 ngZone.onEventDone.subscribe(() => {
                   if (http && http._async <= 0) {
                     resolve(config);
