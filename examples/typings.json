@@ -1,7 +1,9 @@
 {
   "name": "examples",
   "version": false,
-  "dependencies": {},
+  "dependencies": {
+    "zone.js": "github:gdi2290/typed-zone.js/lib/zone.d.ts#225aa313388bdf78b18ed9f0b29f93a395146229"
+  },
   "ambientDependencies": {
     "es6-shim": "registry:dt/es6-shim#0.31.2+20160215162030",
     "express": "registry:dt/express#4.0.0+20160208031452",
