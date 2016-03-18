@@ -148,9 +148,9 @@ export function buildNodeProviders(providers?: Array<any>): Array<any> {
 
 export function buildNodeAppProviders(document?: any, providers?: Array<any>): Array<any> {
   return [
-    ...NODE_APPLICATION_PROVIDERS,
-    ...(isPresent(document) ? [new Provider(DOCUMENT, {useFactory: () => document})] : []),
-    ...(isPresent(providers) ? providers : [])
+    NODE_APPLICATION_PROVIDERS,
+    (isPresent(document) && document) ? [new Provider(DOCUMENT, {useFactory: () => document})] : [],
+    (isPresent(providers) && providers) ? providers : []
   ];
 }
 
