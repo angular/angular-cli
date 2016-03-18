@@ -19,6 +19,8 @@
     "node_modules/angular2/bundles/typings",
     "modules/express-engine/dist",
     "modules/express-engine/node_modules",
+    "modules/hapi-engine/dist",
+    "modules/hapi-engine/node_modules",
     "modules/gulp-prerender/node_modules",
     "modules/gulp-prerender/dist",
     "modules/grunt-prerender/node_modules",
