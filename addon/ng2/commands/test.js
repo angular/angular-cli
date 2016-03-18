@@ -51,7 +51,11 @@ module.exports = TestCommand.extend({
      
     if (commandOptions.watch){
       return win.checkWindowsElevation(this.ui)
-        .then(function() {
+        .then(_ => {
+          // perform initial build to avoid race condition
+          return buildTask.run(buildOptions);
+        }, _ => { /* handle build error to allow watch mode to start */})
+        .then(_ => {
           return Promise.all([
             buildWatchTask.run(buildOptions),
             testTask.run(commandOptions)
@@ -61,10 +65,10 @@ module.exports = TestCommand.extend({
       // if not watching ensure karma is doing a single run
       commandOptions.singleRun = true;
       return win.checkWindowsElevation(this.ui)
-        .then(function() {
+        .then(_ =>  {
           return buildTask.run(buildOptions);
         })
-        .then(function(){
+        .then(_ => {
           return testTask.run(commandOptions);
         });
     }
