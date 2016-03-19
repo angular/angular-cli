@@ -33,7 +33,6 @@
     "protractor": "^3.0.0",
     "ts-node": "^0.5.5",
     "tslint": "^3.3.0",
-    "typescript": "^1.8.7",
     "typings": "^0.6.6"
   }
 }
