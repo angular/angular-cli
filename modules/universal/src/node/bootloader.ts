@@ -153,7 +153,7 @@ export class Bootloader {
           return Promise.all(apps);
 
         }
-        return configRefs
+        return configRefs;
       })
       .catch(err => {
         console.log('Precache Error:', err);
@@ -202,7 +202,7 @@ export class Bootloader {
       .catch(err => {
         console.log('Rendering Document Error:', err);
         throw err;
-      })
+      });
 
   }
 
@@ -221,7 +221,7 @@ export class Bootloader {
 
     let directives = components.map(component => {
       var appRef = this.application(doc);
-      let compRef = appRef.bootstrap(component, providers).then(waitRouter)
+      let compRef = appRef.bootstrap(component, providers).then(waitRouter);
       return compRef.then(cmpRef => ({ appRef, cmpRef }));
     });
     return Promise.all(directives);
