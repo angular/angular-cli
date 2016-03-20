@@ -7,14 +7,17 @@
   "contributors": [
     "PatrickJS <github@gdi2290.com>"
   ],
-  "typings": "dist/polyfills.d.ts",
-  "main": "dist/polyfills.js",
+  "typings": "dist/browser.d.ts",
+  "browser": "dist/browser.js",
+  "main": "dist/node.js",
   "files": [
     "src",
     "dist",
     "README.md",
-    "polyfills.d.ts",
-    "polyfills.js",
+    "browser.d.ts",
+    "browser.js",
+    "node.d.ts",
+    "node.js",
     "dev.d.ts",
     "dev.js",
     "ie.d.ts",
@@ -32,16 +35,16 @@
     "prepublish": "npm run build"
   },
   "devDependencies": {
-    "typescript": "^1.8.7"
+    "typescript": "^1.8.9"
   },
   "dependencies": {
-    "ie-shim": "^0.1.0"
+    "ie-shim": "^0.1.0",
+    "es6-promise": "~3.0.2",
+    "es6-shim": "~0.35.0",
+    "zone.js": "~0.6.4",
+    "reflect-metadata": "0.1.2"
   },
   "peerDependencies": {
-    "es6-promise": ">=3.0.2",
-    "es6-shim": ">=0.33.3",
-    "zone.js": ">=0.5.15",
-    "reflect-metadata": ">=0.1.2"
   },
   "repository": {
     "type": "git",

@@ -5,4 +5,4 @@ import 'ie-shim';
 // typescript emit metadata
 import 'reflect-metadata';
 // zone.js to track promises
-import 'zone.js/dist/zone-microtask';
+import './zone-node';
