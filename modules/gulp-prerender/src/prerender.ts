@@ -5,6 +5,8 @@ var gutil = require('gutil');
 let PluginError = gutil.PluginError;
 
 export interface GulpUniversalConfig {
+  document?: Object;
+  template?: string;
   directives: Array<any>;
   providers?: Array<any>;
   preboot?: Object | any;
@@ -17,7 +19,7 @@ export interface GulpUniversalConfig {
   platformProviders?: any;
 }
 
-export function prerender(options: GulpUniversalConfig) {
+export function prerender(options: GulpUniversalConfig | any) {
   function transform(file: any, enc: string, cb: Function) {
 
     if (file.isStream()) {
@@ -29,14 +31,10 @@ export function prerender(options: GulpUniversalConfig) {
     // bootstrap and render component to string
     var bootloader = options.bootloader;
     if (!options.bootloader) {
-      options.bootloader = {
-        document: universal.parseDocument(template),
-        providers: options.providers,
-        componentProviders: options.componentProviders,
-        platformProviders: options.platformProviders,
-        directives: options.directives,
-        preboot: options.preboot
-      };
+      let doc = universal.parseDocument(template);
+      options.document = doc;
+      options.template = options.template || template;
+      options.bootloader = options;
     }
     bootloader = universal.Bootloader.create(options.bootloader);
 
