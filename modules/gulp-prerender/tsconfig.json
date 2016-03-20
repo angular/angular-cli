@@ -10,7 +10,8 @@
     "experimentalDecorators": true,
   	"sourceMap": true,
     "listFiles": false,
-  	"outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "src"
   },
   "files": [
     "./typings/main.d.ts",
@@ -29,5 +30,8 @@
     "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
     "placeOpenBraceOnNewLineForFunctions": false,
     "placeOpenBraceOnNewLineForControlBlocks": false
-  }
+  },
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": { "rewriteTsconfig": false }
 }
