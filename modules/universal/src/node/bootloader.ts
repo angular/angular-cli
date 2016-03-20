@@ -19,6 +19,7 @@ export interface BootloaderConfig {
   directives?: Array<any>;
   preboot?: any;
   precache?: boolean;
+  ngOnInit?: Function;
   ngOnStable?: Function;
 }
 
@@ -110,6 +111,16 @@ export class Bootloader {
       .then((configRefs: any) => {
         if ('precache' in this._config) {
           if (!this._config.precache) {
+        if ('ngOnInit' in this._config) {
+          if (!this._config.ngOnInit) { return configRefs; }
+          return this._config.ngOnInit(configRefs);
+        }
+        return configRefs;
+      })
+      .catch(err => {
+        console.log('ngOnInit Error:', err);
+        throw err;
+      })
             return configRefs;
           }
 
