@@ -1,11 +1,11 @@
-import * as Q from 'q';
-import uglify = require('gulp-uglify');
-import insert = require('gulp-insert');
-import rename = require('gulp-rename');
-import eventStream = require('event-stream');
-import buffer = require('vinyl-buffer');
-import source = require('vinyl-source-stream');
-import * as browserify from 'browserify';
+const Q = require('q');
+const uglify = require('gulp-uglify');
+const insert = require('gulp-insert');
+const rename = require('gulp-rename');
+const eventStream = require('event-stream');
+const buffer = require('vinyl-buffer');
+const source = require('vinyl-source-stream');
+const browserify = require('browserify');
 import {normalize, listenStrategies, replayStrategies, freezeStrategies} from './normalize';
 import {stringifyWithFunctions} from './utils';
 import {PrebootOptions} from '../interfaces/preboot_options';
@@ -20,7 +20,7 @@ export let browserCodeCache = {};
  * attributes strategies will be stubbed out (meaing the refs will be {})
  */
 export function ignoreUnusedStrategies(
-  b: Browserify.BrowserifyObject,
+  b: any/*Browserify.BrowserifyObject*/,
   bOpts: Object,
   strategyOpts: any[],
   allStrategies: Object,
@@ -88,7 +88,7 @@ export function getBrowserCode(opts?: PrebootOptions, done?: Function): any {
   if (browserCodeCache[cacheKey]) {
     return Q.when(browserCodeCache[cacheKey]);
   }
-  
+
   // get the browser code
   getBrowserCodeStream(opts)
     .pipe(eventStream.map(function(file, cb) {
