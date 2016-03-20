@@ -168,7 +168,10 @@ export function expressEngine(filePath: string, options: expressEngineOptions, d
       if (!options.bootloader) {
         options.bootloader = {
           template: clientHtml,
-          document: clientHtml,
+          // don't use document
+          // parse only for legacy support
+          document: Bootloader.parseDocument(clientHtml),
+
           providers: options.providers,
           componentProviders: options.componentProviders,
           platformProviders: options.platformProviders,
