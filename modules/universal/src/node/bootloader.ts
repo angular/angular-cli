@@ -19,6 +19,7 @@ export interface BootloaderConfig {
   directives?: Array<any>;
   preboot?: any;
   precache?: boolean;
+  ngOnStable?: Function;
 }
 
 function checkProviders(providers) {
@@ -161,6 +162,17 @@ export class Bootloader {
       })
       .catch(err => {
         console.log('preboot Error:', err);
+        throw err;
+      })
+      .then((configRefs: any) => {
+        if ('ngOnStable' in this._config) {
+          if (!this._config.ngOnStable) { return configRefs; }
+          return this._config.ngOnStable(configRefs);
+        }
+        return configRefs;
+      })
+      .catch(err => {
+        console.log('ngOnStable Error:', err);
         throw err;
       })
       .then((configRefs: any) => {
