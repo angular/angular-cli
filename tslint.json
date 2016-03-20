@@ -14,8 +14,7 @@
     "no-bitwise": false,
     "no-console": [true,
       "debug",
-      "info",
-      "trace"
+      "info"
     ],
     "no-construct": true,
     "no-debugger": true,
