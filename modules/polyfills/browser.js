@@ -1,1 +1,1 @@
-require('./dist/polyfills');
+require('./dist/polyfills-browser');
