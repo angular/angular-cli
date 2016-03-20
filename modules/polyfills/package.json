@@ -8,8 +8,8 @@
     "PatrickJS <github@gdi2290.com>"
   ],
   "typings": "dist/browser.d.ts",
-  "browser": "dist/browser.js",
-  "main": "dist/node.js",
+  "browser": "browser.js",
+  "main": "node.js",
   "files": [
     "src",
     "dist",
