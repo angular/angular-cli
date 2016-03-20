@@ -73,6 +73,22 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
+  it('Supports production builds via `ng build --envinroment=production`', function() {
+    this.timeout(420000);
+
+    return ng(['build', '--environment=production', '--silent'])
+      .then(function () {
+        expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+      })
+      .then(function () {
+        // Also does not create new things in GIT.
+        expect(sh.exec('git status --porcelain').output).to.be.equal('');
+      })
+      .catch(() => {
+        throw new Error('Build failed.');
+      });
+  });
+
   it('Produces a service worker manifest after initial build', function () {
     var manifestPath = path.join(process.cwd(), 'dist', 'manifest.appcache');
     expect(existsSync(manifestPath)).to.be.equal(true);
