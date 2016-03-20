@@ -73,7 +73,7 @@ function smokeTest() {
       var body = Buffer.concat(bodyChunks);
       // console.log('GOOD' /*, body.toString()*/ );
       // ...and/or process the entire body here.
-    })
+    });
   });
 
   req.on('error', function(e) {

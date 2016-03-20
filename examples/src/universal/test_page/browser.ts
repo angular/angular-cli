@@ -5,6 +5,7 @@ console.timeEnd('angular2/core in client');
 import {BROWSER_PROVIDERS, BROWSER_APP_PROVIDERS} from 'angular2/platform/browser';
 import {Http, HTTP_PROVIDERS} from 'angular2/http';
 
+import 'rxjs/Rx';
 // import {
 //   NG_PRELOAD_CACHE_PROVIDERS,
 //   PRIME_CACHE
