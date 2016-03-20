@@ -31,7 +31,7 @@ export var NODE_HTTP_PROVIDERS: Array<any> = [
 
 export var NODE_PRELOAD_CACHE_HTTP_PROVIDERS: Array<any> = [
   provide(preloadCache.BASE_URL, {useValue: ''}),
-  provide(preloadCache.PRIME_CACHE, {useValue: false}),
+  provide(preloadCache.PRIME_CACHE, {useValue: true}),
   provide(RequestOptions, {useClass: BaseRequestOptions}),
   provide(ResponseOptions, {useClass: BaseResponseOptions}),
 
@@ -45,7 +45,9 @@ export var NODE_PRELOAD_CACHE_HTTP_PROVIDERS: Array<any> = [
 
 export const HTTP_PROVIDERS = NODE_HTTP_PROVIDERS.concat([
   provide(PLATFORM_INITIALIZER, {useValue: () => {
-    console.warn(
-      'DEPRECATION WARNING: `HTTP_PROVIDERS` is no longer supported for `angular2-universal` and will be removed in next release. Please use `NODE_HTTP_PROVIDERS`');
-  }, multi: true})
+    /* tslint:disable */
+    console.warn('DEPRECATION WARNING: `HTTP_PROVIDERS` is no longer supported for `angular2-universal` and will be removed in next release. Please use `NODE_HTTP_PROVIDERS`');
+    /* tslint:enable */
+  }, multi: true}),
+  NODE_PRELOAD_CACHE_HTTP_PROVIDERS
 ]);
