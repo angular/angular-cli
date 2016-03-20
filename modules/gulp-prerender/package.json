@@ -24,9 +24,13 @@
     "url": "https://github.com/angular/universal/issues"
   },
   "devDependencies": {
+    "preboot": "file:../preboot",
     "angular2-universal-preview": "file:../universal",
     "rimraf": "^2.5.1",
-    "typescript": "^1.8.7"
+    "angular2": "2.0.0-beta.11",
+    "rxjs": "~5.0.0-beta.2",
+    "zone.js": "~0.6.4",
+    "typescript": "^1.8.9"
   },
   "dependencies": {
     "gutil": "^1.6.4",
