@@ -65,6 +65,8 @@ describe('Basic end-to-end Workflow', function () {
       '--silent'
     ]).then(function() {
       expect(fs.existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+    }).catch((err) => {
+      throw new Error('Build failed.');
     });
   });
 
@@ -87,7 +89,8 @@ describe('Basic end-to-end Workflow', function () {
 
     return ng(testArgs)
     .then(function(result) {
-      expect(result.exitCode).to.be.equal(0);
+      const exitCode = typeof result === 'object' ? result.exitCode : result;
+      expect(exitCode).to.be.equal(0);
     });
   });
 
@@ -111,7 +114,8 @@ describe('Basic end-to-end Workflow', function () {
 
     return ng(testArgs)
     .then(function(result) {
-      expect(result.exitCode).to.be.equal(0);
+      const exitCode = typeof result === 'object' ? result.exitCode : result;
+      expect(exitCode).to.be.equal(0);
     });
   });
 
@@ -133,7 +137,8 @@ describe('Basic end-to-end Workflow', function () {
 
     return ng(testArgs)
     .then(function(result) {
-      expect(result.exitCode).to.be.equal(0);
+      const exitCode = typeof result === 'object' ? result.exitCode : result;
+      expect(exitCode).to.be.equal(0);
     });
   });
 
@@ -155,7 +160,8 @@ describe('Basic end-to-end Workflow', function () {
 
     return ng(testArgs)
     .then(function(result) {
-      expect(result.exitCode).to.be.equal(0);
+      const exitCode = typeof result === 'object' ? result.exitCode : result;
+      expect(exitCode).to.be.equal(0);
     });
   });
 
@@ -186,41 +192,36 @@ describe('Basic end-to-end Workflow', function () {
 
     return ng(testArgs)
     .then(function(result) {
-      expect(result.exitCode).to.be.equal(0);
-
-      // Clean `tmp` folder
-      // process.chdir(path.resolve(root, '..'));
-      // sh.rm('-rf', './tmp'); // tmp.teardown takes too long
+      const exitCode = typeof result === 'object' ? result.exitCode : result;
+      expect(exitCode).to.be.equal(0);
     });
   });
 
   it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
     this.timeout(420000);
 
-    var configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
-    fs.readFile(configFilePath, 'utf8', function(err, data){
+    const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
+    let config = require(configFilePath);
 
-      var config = JSON.parse(data);
-      config.compilerOptions.noImplicitAny = true;
+    config.compilerOptions.noImplicitAny = true;
+    fs.writeFileSync(configFilePath, JSON.stringify(config), 'utf8');
 
-      fs.writeFile(configFilePath, JSON.stringify(config), function(){
-        //clear the dist folder
-        sh.rm('-rf', path.join(process.cwd(), 'dist'));
+    sh.rm('-rf', path.join(process.cwd(), 'dist'));
 
-        return ng([
-            'build',
-            '--silent'
-          ]).then(function() {
-            expect(fs.existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-          })
-          .finally(function(){
-            // Clean `tmp` folder
-            process.chdir(path.resolve(root, '..'));
-            sh.rm('-rf', './tmp'); // tmp.teardown takes too long
-            done();
-          });
-        });
-    });
+    return ng([
+        'build',
+        '--silent'
+      ]).then(function() {
+        expect(fs.existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+      }).catch((err) => {
+        throw new Error('Build failed.');
+      })
+      .finally(function(){
+        // Clean `tmp` folder
+        process.chdir(path.resolve(root, '..'));
+        sh.rm('-rf', './tmp'); // tmp.teardown takes too long
+        done();
+      });
   });
 
 });
