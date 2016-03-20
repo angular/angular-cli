@@ -19,6 +19,9 @@ export interface BootloaderConfig {
   directives?: Array<any>;
   preboot?: any;
   precache?: boolean;
+  primeCache?: boolean;
+  async?: boolean;
+  prime?: boolean;
   ngOnInit?: Function;
   ngOnStable?: Function;
 }
@@ -109,8 +112,6 @@ export class Bootloader {
 
     return this._applicationAll(component, providers)
       .then((configRefs: any) => {
-        if ('precache' in this._config) {
-          if (!this._config.precache) {
         if ('ngOnInit' in this._config) {
           if (!this._config.ngOnInit) { return configRefs; }
           return this._config.ngOnInit(configRefs);
@@ -121,6 +122,13 @@ export class Bootloader {
         console.log('ngOnInit Error:', err);
         throw err;
       })
+      .then((configRefs: any) => {
+        if ('precache' in this._config && this._config.precache) {
+          console.log('Please set `async: true` rather than `precache: true`');
+          this._config.async = true;
+        }
+        if ('async' in this._config) {
+          if (!this._config.async) {
             return configRefs;
           }
 
