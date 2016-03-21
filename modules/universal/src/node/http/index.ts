@@ -8,7 +8,7 @@ import {
   BaseResponseOptions
 } from 'angular2/http';
 import {provide, NgZone, PLATFORM_INITIALIZER} from 'angular2/core';
-import * as nodeHttp from './node_http'
+import * as nodeHttp from './node_http';
 import * as preloadCache from './preload_cache';
 
 export * from './node_http'

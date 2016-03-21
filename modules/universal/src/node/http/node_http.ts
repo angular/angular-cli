@@ -15,6 +15,7 @@ import {Injectable, NgZone} from 'angular2/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import * as http from 'http';
+import * as https from 'https';
 import * as url from 'url';
 
 export class NodeConnection implements Connection {
@@ -36,8 +37,13 @@ export class NodeConnection implements Connection {
     this.response = new Observable(responseObserver => {
       let nodeReq;
       ngZome.run(() => {
+        // http or https
+        let xhrHttp: any = http;
+        if (reqInfo.protocol === 'https:') {
+          xhrHttp = https;
+        }
 
-        nodeReq = http.request(reqInfo, (res: http.IncomingMessage) => {
+        nodeReq = xhrHttp.request(reqInfo, (res: http.IncomingMessage) => {
           let body = '';
           res.on('data', (chunk) => body += chunk);
 
@@ -63,7 +69,7 @@ export class NodeConnection implements Connection {
             });
           });
         });
-      })
+      });
 
       let onError = (err) => {
         let responseOptions = new ResponseOptions({body: err, type: ResponseType.Error});

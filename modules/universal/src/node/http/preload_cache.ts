@@ -196,7 +196,7 @@ export class NgPreloadCacheHttp extends Http {
         },
         error: (e) => {
           // this._ngZone.run(() => {
-            obs.error(e)
+            obs.error(e);
             this._async -= 1;
           // });
         },
