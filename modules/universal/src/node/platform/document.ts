@@ -60,7 +60,7 @@ export function parseDocument(documentHtml: string): Object {
 
   if (!bodyNode) {
     bodyNode = treeAdapter.createElement('body', null, []);
-    DOM.appendChild(doc, headNode);
+    DOM.appendChild(doc, bodyNode);
   }
 
   for (let i = 0; i < headNode.children.length; ++i) {
