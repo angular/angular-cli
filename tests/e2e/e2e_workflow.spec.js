@@ -74,6 +74,9 @@ describe('Basic end-to-end Workflow', function () {
       '--silent'
     ]).then(function() {
       expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+    }).then(function() {
+      // Also does not create new things in GIT.
+      expect(sh.exec('git status --porcelain').output).to.be.equal('');
     }).catch((err) => {
       throw new Error('Build failed.');
     });

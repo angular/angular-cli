@@ -7,4 +7,4 @@ module.exports = function(defaults) {
     vendorNpmFiles: []
   });
   return app.toTree();
-}
+};
