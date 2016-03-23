@@ -29,5 +29,7 @@ module.exports = function dynamicPathParser(project, entityName) {
 
   var parsedPath = path.parse(adjustedPath);
   
+  parsedPath.dir = parsedPath.dir === path.sep ? '' : parsedPath.dir;
+  
   return parsedPath;
 } 
