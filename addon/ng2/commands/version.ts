@@ -8,11 +8,12 @@ const VersionCommand = Command.extend({
   aliases: ['v', '--version', '-v'],
   works: 'everywhere',
 
-  availableOptions: [
-    { name: 'verbose', type: Boolean, 'default': false }
-  ],
+  availableOptions: [{
+    name: 'verbose',
+    type: Boolean, 'default': false
+  }],
 
-  run: function(options) {
+  run: function (options) {
     var versions = process.versions;
     var pkg = require(path.resolve(__dirname, '..', '..', '..', 'package.json'));
 
@@ -29,7 +30,7 @@ const VersionCommand = Command.extend({
     }
   },
 
-  printVersion: function(module, version) {
+  printVersion: function (module, version) {
     this.ui.writeLine(module + ': ' + version);
   }
 });

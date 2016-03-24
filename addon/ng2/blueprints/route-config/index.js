@@ -15,6 +15,7 @@ module.exports = {
     try {
       fs.unlinkSync(routeConfigPath);
     } catch (e) {
+      //  doing nothing here
     }
   }
 };
@@ -23,17 +24,16 @@ function generateLocals(options) {
   var ngCliConfigPath = path.join(options.project.root, 'angular-cli.json');
   var ngCliConfig = JSON.parse(fs.readFileSync(ngCliConfigPath, 'utf-8'));
 
-  imports = ngCliConfig.routes.map(route =>
-      `import {${route.component}} from '${route.componentPath}';`)
-    .join('\n');
+  imports =
+    ngCliConfig.routes.map(route => `import {${route.component}} from '${route.componentPath}';`)
+      .join('\n');
 
-  routeDefinitions = ngCliConfig.routes.map(route =>
-      `{path: '${route.routePath}', name: '${route.component}', component: ${route.component}},`
-    )
-    .join('\n');
+  routeDefinitions =
+    ngCliConfig.routes
+      .map(
+        route =>
+          `{path: '${route.routePath}', name: '${route.component}', component: ${route.component}},`)
+      .join('\n');
 
-  return {
-    imports,
-    routeDefinitions
-  }
+  return { imports, routeDefinitions }
 }

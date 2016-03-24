@@ -13,10 +13,10 @@ function requireDependency(root, moduleName) {
 }
 
 module.exports = Task.extend({
-      
+
   run: function (options) {
     var projectRoot = this.project.root;
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
       var karma = requireDependency(projectRoot, 'karma');
       var karmaConfig = path.join(projectRoot, 'karma.conf');
 

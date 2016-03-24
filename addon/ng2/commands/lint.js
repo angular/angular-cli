@@ -8,7 +8,7 @@ module.exports = Command.extend({
   name: 'lint',
   description: 'Lints code in existing project',
   works: 'insideProject',
-  run: function() {
+  run: function () {
     var lintTask = new LintTask({
       ui: this.ui,
       analytics: this.analytics,

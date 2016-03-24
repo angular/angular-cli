@@ -1,9 +1,9 @@
-/* jshint node: true */
+/*eslint-disable no-console */
 'use strict';
 
 var Command = require('ember-cli/lib/models/command');
-var path    = require('path');
-var fs      = require('fs');
+var path = require('path');
+var fs = require('fs');
 
 module.exports = Command.extend({
   name: 'completion',

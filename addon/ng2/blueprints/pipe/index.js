@@ -1,29 +1,26 @@
-var stringUtils = require('ember-cli/lib/utilities/string');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 
 module.exports = {
   description: '',
 
-  normalizeEntityName: function(entityName) {
+  normalizeEntityName: function (entityName) {
     var parsedPath = dynamicPathParser(this.project, entityName);
-    
+
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
-  locals: function(options) {
-    return {
-      dynamicPath: this.dynamicPath.dir
-    };
+  locals: function () {
+    return { dynamicPath: this.dynamicPath.dir };
   },
 
-  fileMapTokens: function(options) {
+  fileMapTokens: function () {
     // Return custom template variables here.
     return {
-      __name__: (options) => {
+      __name__: () => {
         return this.dynamicPath.name;
       },
-      __path__: (options) => {
+      __path__: () => {
         return this.dynamicPath.dir;
       }
     };

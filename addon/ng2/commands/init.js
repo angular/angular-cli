@@ -1,11 +1,11 @@
 'use strict';
 
-var Command            = require('ember-cli/lib/models/command');
-var Promise            = require('ember-cli/lib/ext/promise');
-var SilentError        = require('silent-error');
-var validProjectName   = require('ember-cli/lib/utilities/valid-project-name');
+var Command = require('ember-cli/lib/models/command');
+var Promise = require('ember-cli/lib/ext/promise');
+var SilentError = require('silent-error');
+var validProjectName = require('ember-cli/lib/utilities/valid-project-name');
 var normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
-var GitInit            = require('../tasks/git-init');
+var GitInit = require('../tasks/git-init');
 
 module.exports = Command.extend({
   name: 'init',
@@ -14,19 +14,17 @@ module.exports = Command.extend({
   works: 'everywhere',
 
   availableOptions: [
-    { name: 'dry-run',    type: Boolean, default: false, aliases: ['d'] },
-    { name: 'verbose',    type: Boolean, default: false, aliases: ['v'] },
-    { name: 'blueprint',  type: String,                  aliases: ['b'] },
-    { name: 'skip-npm',   type: Boolean, default: false, aliases: ['sn'] },
-    { name: 'skip-bower', type: Boolean, default: true,  aliases: ['sb'] },
-    { name: 'name',       type: String,  default: '',    aliases: ['n'] }
+    { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
+    { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
+    { name: 'blueprint', type: String, aliases: ['b'] },
+    { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
+    { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
+    { name: 'name', type: String, default: '', aliases: ['n'] }
   ],
 
-  anonymousOptions: [
-    '<glob-pattern>'
-  ],
+  anonymousOptions: ['<glob-pattern>'],
 
-  _defaultBlueprint: function() {
+  _defaultBlueprint: function () {
     if (this.project.isEmberCLIAddon()) {
       return 'addon';
     } else {
@@ -34,7 +32,7 @@ module.exports = Command.extend({
     }
   },
 
-  run: function(commandOptions, rawArgs) {
+  run: function (commandOptions, rawArgs) {
     if (commandOptions.dryRun) {
       commandOptions.skipNpm = true;
       commandOptions.skipBower = true;
@@ -71,13 +69,13 @@ module.exports = Command.extend({
       });
     }
 
-    var project     = this.project;
+    var project = this.project;
     var packageName = commandOptions.name !== '.' && commandOptions.name || project.name();
 
     if (!packageName) {
       var message = 'The `ng ' + this.name + '` command requires a ' +
-                    'package.json in current folder with name attribute or a specified name via arguments. ' +
-                    'For more details, use `ng help`.';
+        'package.json in current folder with name attribute or a specified name via arguments. ' +
+        'For more details, use `ng help`.';
 
       return Promise.reject(new SilentError(message));
     }
@@ -91,30 +89,31 @@ module.exports = Command.extend({
     };
 
     if (!validProjectName(packageName)) {
-      return Promise.reject(new SilentError('We currently do not support a name of `' + packageName + '`.'));
+      return Promise.reject(
+        new SilentError('We currently do not support a name of `' + packageName + '`.'));
     }
 
     blueprintOpts.blueprint = normalizeBlueprint(blueprintOpts.blueprint);
 
     return installBlueprint.run(blueprintOpts)
-      .then(function() {
+      .then(function () {
         if (commandOptions.skipGit === false) {
           return gitInit.run(commandOptions, rawArgs);
         }
       }.bind(this))
-      .then(function() {
+      .then(function () {
         if (!commandOptions.skipNpm) {
           return npmInstall.run({
-              verbose: commandOptions.verbose,
-              optional: false
-            });
+            verbose: commandOptions.verbose,
+            optional: false
+          });
         }
       })
-      .then(function() {
+      .then(function () {
         if (!commandOptions.skipBower) {
           return bowerInstall.run({
-              verbose: commandOptions.verbose
-            });
+            verbose: commandOptions.verbose
+          });
         }
       });
   }

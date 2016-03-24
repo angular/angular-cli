@@ -1,8 +1,10 @@
+/*global jasmine, __karma__, window*/
 Error.stackTraceLimit = Infinity;
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
 
-__karma__.loaded = function() {};
+__karma__.loaded = function () {
+};
 
 System.config({
   packages: {
@@ -11,30 +13,30 @@ System.config({
       format: 'register',
       map: Object.keys(window.__karma__.files)
         .filter(onlyAppFiles)
-        .reduce(function(pathsMapping, appPath) {
+        .reduce(function (pathsMapping, appPath) {
           var moduleName = appPath.replace(/^\/base\/dist\/app\//, './').replace(/\.js$/, '');
-          pathsMapping[moduleName] = appPath + '?' + window.__karma__.files[appPath]
-        return pathsMapping;
-      }, {})
+          pathsMapping[moduleName] = appPath + '?' + window.__karma__.files[appPath];
+          return pathsMapping;
+        }, {})
     }
   }
 });
 
-System.import('angular2/testing').then(function(testing) {
-  return System.import('angular2/platform/testing/browser').then(function(providers) {
+System.import('angular2/testing').then(function (testing) {
+  return System.import('angular2/platform/testing/browser').then(function (providers) {
     testing.setBaseTestProviders(providers.TEST_BROWSER_PLATFORM_PROVIDERS,
-                                 providers.TEST_BROWSER_APPLICATION_PROVIDERS);
+      providers.TEST_BROWSER_APPLICATION_PROVIDERS);
   });
-}).then(function() {
+}).then(function () {
   return Promise.all(
     Object.keys(window.__karma__.files)
       .filter(onlySpecFiles)
-      .map(function(moduleName) {
+      .map(function (moduleName) {
         return System.import(moduleName);
       }));
-}).then(function() {
+}).then(function () {
   __karma__.start();
-}, function(error) {
+}, function (error) {
   __karma__.error(error.stack || error);
 });
 

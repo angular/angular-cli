@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "scripts": {
-    "test": "node tests/runner"
+    "test": "eslint -c eslint.json './**/*.js' "
   },
   "repository": {
     "type": "git",
@@ -56,12 +56,15 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "clang-format": "^1.0.37",
+    "eslint": "^2.4.0",
     "exists-sync": "0.0.3",
     "glob": "^7.0.3",
     "minimatch": "^3.0.0",
     "mocha": "^2.4.5",
     "rewire": "^2.5.1",
     "through": "^2.3.8",
+    "tslint": "^3.6.0",
     "walk-sync": "^0.2.6"
   }
 }

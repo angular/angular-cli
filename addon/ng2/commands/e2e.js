@@ -8,7 +8,7 @@ module.exports = Command.extend({
   name: 'e2e',
   description: 'Run e2e tests in existing project',
   works: 'insideProject',
-  run: function() {
+  run: function () {
     var e2eTask = new E2ETask({
       ui: this.ui,
       analytics: this.analytics,

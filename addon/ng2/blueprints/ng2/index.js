@@ -4,11 +4,11 @@ module.exports = {
   description: '',
 
   locals: function(options) {
-     // Return custom template variables here.
-     return {
-       htmlComponentName: stringUtils.dasherize(options.entity.name),
-       jsComponentName: stringUtils.classify(options.entity.name)
-     };
+    // Return custom template variables here.
+    return {
+      htmlComponentName: stringUtils.dasherize(options.entity.name),
+      jsComponentName: stringUtils.classify(options.entity.name)
+    };
   }
 
   // afterInstall: function(options) {
