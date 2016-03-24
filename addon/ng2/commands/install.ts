@@ -1,19 +1,11 @@
-/* jshint node: true, esnext: true */
-'use strict';
-
-const Command      = require('ember-cli/lib/models/command');
-const SilentError  = require('silent-error');
-const Promise      = require('ember-cli/lib/ext/promise');
-const InstallTask  = require('../tasks/install');
+import * as Command from 'ember-cli/lib/models/command';
+import * as SlientError from 'silent-error';
+import * as InstallTask from '../tasks/install';
 
 module.exports = Command.extend({
   name: 'install',
   description: 'Adds 3rd party library to existing project',
   works: 'insideProject',
-
-  availableOptions: [
-    { name: 'typings', type: String, aliases: ['t'], description: 'Installs specified typings' }
-  ],
 
   run: function (commandOptions, rawArgs) {
     if (!rawArgs.length) {
@@ -30,8 +22,7 @@ module.exports = Command.extend({
     });
 
     return installTask.run({
-      packages: rawArgs,
-      typings: commandOptions.typings || null
+      packages: rawArgs
     });
   }
 });

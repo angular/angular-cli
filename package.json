@@ -10,8 +10,7 @@
   "keywords": [],
   "scripts": {
     "test": "node tests/runner",
-    "lint": "eslint -c eslint.json './**/*.js'",
-    "postinstall": "typings install"
+    "lint": "eslint -c eslint.json './**/*.js'"
   },
   "repository": {
     "type": "git",
@@ -50,7 +49,8 @@
     "silent-error": "^1.0.0",
     "symlink-or-copy": "^1.0.1",
     "typescript": "^1.8.7",
-    "typings": "^0.7.9"
+    "typings": "^0.7.9",
+    "typings-core": "^0.2.14"
   },
   "ember-addon": {
     "paths": [

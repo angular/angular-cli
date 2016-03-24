@@ -9,7 +9,8 @@ export function loadSystemJson(systemPath: string): { [name: string]: any } {
 }
 
 export function saveSystemJson(systemPath: string, json: { [name: string]: any }) {
-  const writeContents: any = 'System.config(' + JSON.stringify(json, null, '\t') + ');';
+  const jsonContent: any = JSON.stringify(json, null, '\t');
+  const writeContents: any = 'System.config(' + jsonContent + ');';
   
   fs.writeFileSync(systemPath, writeContents, 'utf8');
 }
