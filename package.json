@@ -9,7 +9,8 @@
   },
   "keywords": [],
   "scripts": {
-    "test": "eslint -c eslint.json './**/*.js' "
+    "test": "node tests/runner",
+    "lint": "eslint -c eslint.json './**/*.js' "
   },
   "repository": {
     "type": "git",
