@@ -67,6 +67,7 @@
     "mocha": "^2.4.5",
     "object-assign": "^4.0.1",
     "rewire": "^2.5.1",
+    "sinon": "^1.17.3",
     "through": "^2.3.8",
     "tslint": "^3.6.0",
     "walk-sync": "^0.2.6"
