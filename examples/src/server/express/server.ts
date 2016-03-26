@@ -16,8 +16,8 @@ module.exports = function(ROOT) {
   var api = require('./api');
   var graphApi = require('./graph_api');
 
-  app.use(serveStatic(path.join(ROOT, 'dist')));
-  app.use(serveStatic(path.join(ROOT, 'public')));
+  app.use(serveStatic(path.join(ROOT, 'dist'), {index: false}));
+  app.use(serveStatic(path.join(ROOT, 'public'), {index: false}));
 
   app.use('/api', api(ROOT));
   app.use('/graph_api', api(ROOT));
