@@ -1,0 +1,10 @@
+{
+  "name": "angular2-express-engine",
+  "version": false,
+  "dependencies": {},
+  "ambientDependencies": {
+    "browserify": "registry:dt/browserify#12.0.1+20160317120654",
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
+    "node": "registry:dt/node#4.0.0+20160319033040"
+  }
+}

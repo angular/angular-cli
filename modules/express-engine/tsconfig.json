@@ -12,10 +12,10 @@
     "listFiles": false,
   	"outDir": "dist"
   },
-  "files": [
-    "../../typings/browser.d.ts",
-    "./src/engine.ts",
-    "./index.ts"
+  "exclude": [
+    "typings/browser.d.ts",
+    "typings/browser",
+    "node_modules"
   ],
   "formatCodeOptions": {
     "indentSize": 2,
