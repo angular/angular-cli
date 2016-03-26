@@ -1,5 +1,9 @@
 import {Component} from 'angular2/core';
 import {Http} from 'angular2/http';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/delay';
 
 const URL = 'http://127.0.0.1:3000';
 
@@ -69,6 +73,13 @@ export class MyApp {
     NgIf true
   </div>
 
+  <div>
+    <h2>|async</h2>
+    <pre *ngFor="var item of todosObs4$ | async">
+      {{ item | json }}
+    </pre>
+  </div>
+
   <ul>
     <li *ngFor="var item of items">
       <input
@@ -119,6 +130,11 @@ export class App {
   todosObs3$ = this.http.get(App.queries.todos)
     .map(res => res.json())
     .map(data => transformData(data));
+  todosObs4$ = this.http.get(App.queries.todos)
+    .map(res => res.json())
+    .map(data => transformData(data))
+    .delay(1000)
+    .do(res => this.fromAsyncCall(res));
 
   constructor(private http: Http) {
 
@@ -162,6 +178,10 @@ export class App {
         console.log('complete request2');
       });
 
+  }
+  fromAsyncCall(data) {
+    console.log('Another call 4 from async', data);
+    return data;
   }
   anotherAjaxCall() {
     this.todosObs3$.subscribe(
