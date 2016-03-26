@@ -12,6 +12,8 @@
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
   "scripts": {
+    "remove-modules": "rm -rf node_modules/angular2-universal-preview node_modules/angular2-universal node_modules/angular2-express-engine node_modules/preboot node_modules/angular2-hapi-engine node_modules/angular2-universal-polyfills",
+    "reload": "npm run remove-modules && npm install",
     "prebuild": "rm -rf dist",
     "build": "tsc || true",
     "prepublish": "npm run build"
@@ -24,6 +26,8 @@
     "url": "https://github.com/angular/universal/issues"
   },
   "devDependencies": {
+    "angular2": "2.0.0-beta.12",
+    "rxjs": "5.0.0-beta.2",
     "typescript": "^1.8.7",
     "angular2-universal-preview": "file:../universal",
     "preboot": "file:../preboot"
