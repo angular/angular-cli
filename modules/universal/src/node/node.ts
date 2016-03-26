@@ -8,6 +8,8 @@ export * from './directives/index';
 
 export * from './http/index';
 
+export * from './pipes/index';
+
 export * from './platform/index';
 
 export * from './router/index';

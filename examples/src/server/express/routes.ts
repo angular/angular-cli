@@ -19,6 +19,7 @@ module.exports = function(ROOT) {
     NODE_HTTP_PROVIDERS,
     NODE_LOCATION_PROVIDERS,
     NODE_PRELOAD_CACHE_HTTP_PROVIDERS,
+    NODE_PLATFORM_PIPES,
     REQUEST_URL,
     PRIME_CACHE,
     BASE_URL,
@@ -37,6 +38,7 @@ module.exports = function(ROOT) {
 
         directives: [appPage.App, appPage.MyApp],
         providers: [
+          NODE_PLATFORM_PIPES,
           NODE_LOCATION_PROVIDERS,
           provide(REQUEST_URL, {useValue: req.originalUrl}),
           provide(APP_BASE_HREF, {useValue: '/'}),
