@@ -14,13 +14,21 @@ import {
 } from 'angular2-universal-preview';
 
 export interface hapiEngineOptions {
-  App: Function;
+  document?: string | any;
+  template?: string;
+  directives: Array<any>;
   providers?: Array<any>;
+  async?: boolean;
   preboot?: Object | any;
+  precache?: boolean;
+  bootloader?: any;
   selector?: string;
   serializedCmp?: string;
   server?: boolean;
   client?: boolean;
+  componentProviders?: any;
+  platformProviders?: any;
+
 }
 
 
@@ -90,14 +98,10 @@ class Runtime {
     // bootstrap and render component to string
     var bootloader = context.bootloader;
     if (!context.bootloader) {
-      context.bootloader = {
-        document: parseDocument(template),
-        providers: context.providers,
-        componentProviders: context.componentProviders,
-        platformProviders: context.platformProviders,
-        directives: context.directives,
-        preboot: context.preboot
-      };
+      let doc = Bootloader.parseDocument(template);
+      context.document = doc;
+      context.template = context.template || template;
+      context.bootloader = context;
     }
     bootloader = Bootloader.create(context.bootloader);
 
