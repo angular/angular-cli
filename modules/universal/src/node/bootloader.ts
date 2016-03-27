@@ -114,7 +114,8 @@ export class Bootloader {
       .then((configRefs: any) => {
         if ('ngOnInit' in this._config) {
           if (!this._config.ngOnInit) { return configRefs; }
-          return this._config.ngOnInit(configRefs);
+          let document = configRefs[0].appRef.injector.get(DOCUMENT);
+          return this._config.ngOnInit(configRefs, document);
         }
         return configRefs;
       })
@@ -187,7 +188,8 @@ export class Bootloader {
       .then((configRefs: any) => {
         if ('ngOnStable' in this._config) {
           if (!this._config.ngOnStable) { return configRefs; }
-          return this._config.ngOnStable(configRefs);
+          let document = configRefs[0].appRef.injector.get(DOCUMENT);
+          return this._config.ngOnStable(configRefs, document);
         }
         return configRefs;
       })
