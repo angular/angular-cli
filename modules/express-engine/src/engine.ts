@@ -15,8 +15,11 @@ import {
 } from 'angular2-universal-preview';
 
 export interface expressEngineOptions {
+  document?: string | any;
+  template?: string;
   directives: Array<any>;
   providers?: Array<any>;
+  async?: boolean;
   preboot?: Object | any;
   precache?: boolean;
   bootloader?: any;
@@ -166,19 +169,10 @@ export function expressEngine(filePath: string, options: expressEngineOptions, d
       // bootstrap and render component to string
       var bootloader = options.bootloader;
       if (!options.bootloader) {
-        options.bootloader = {
-          template: clientHtml,
-          // don't use document
-          // parse only for legacy support
-          document: Bootloader.parseDocument(clientHtml),
-
-          providers: options.providers,
-          componentProviders: options.componentProviders,
-          platformProviders: options.platformProviders,
-          directives: options.directives,
-          preboot: options.preboot,
-          precache: options.precache
-        };
+        let doc = Bootloader.parseDocument(clientHtml);
+        options.document = doc;
+        options.template = options.template || clientHtml;
+        options.bootloader = options;
       }
       bootloader = Bootloader.create(options.bootloader);
 
