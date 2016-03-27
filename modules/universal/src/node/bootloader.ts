@@ -133,13 +133,14 @@ export class Bootloader {
           }
 
           let apps = configRefs.map((config, i) => {
+            // app injector
             let ngZone = config.appRef.injector.get(NgZone);
+            // component injector
             let http = config.cmpRef.injector.getOptional(Http);
 
             let promise = new Promise(resolve => {
               if (http && http._async) {
-                let obs = ngZone.onStable || ngZone.onEventDone; // beta.10 change
-                obs.subscribe(() => {
+                ngZone.onStable.subscribe(() => {
                   if (http && http._async <= 0) {
                     resolve(config);
                   }
