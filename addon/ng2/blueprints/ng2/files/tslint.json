@@ -1,4 +1,5 @@
 {
+  "rulesDirectory": ["node_modules/codelyzer/dist/src"],
   "rules": {
     "max-line-length": [true, 100],
     "no-inferrable-types": true,
@@ -58,6 +59,14 @@
       "check-operator",
       "check-separator",
       "check-type"
-    ]
+    ],
+    "component-selector-name": [true, "kebab-case"],
+    "component-selector-type": [true, "element"],
+    "host-parameter-decorator": true,
+    "input-parameter-decorator": true,
+    "output-parameter-decorator": true,
+    "attribute-parameter-decorator": true,
+    "input-property-directive": true,
+    "output-property-directive": true
   }
 }
