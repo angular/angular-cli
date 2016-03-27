@@ -221,19 +221,20 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
   visitElement(element: HtmlElementAst, component: Component): any {
     var nodeName = element.name;
     var preparsedElement = preparseElement(element);
-    if (preparsedElement.type === PreparsedElementType.SCRIPT ||
-        preparsedElement.type === PreparsedElementType.STYLE) {
-      // Skipping <script> for security reasons
-      // Skipping <style> as we already processed them
-      // in the StyleCompiler
-      return null;
-    }
-    if (preparsedElement.type === PreparsedElementType.STYLESHEET &&
-        isStyleUrlResolvable(preparsedElement.hrefAttr)) {
-      // Skipping stylesheets with either relative urls or package scheme as we already processed
-      // them in the StyleCompiler
-      return null;
-    }
+    // UNIVERSAL allow script and style
+    // if (preparsedElement.type === PreparsedElementType.SCRIPT ||
+    //     preparsedElement.type === PreparsedElementType.STYLE) {
+    //   // Skipping <script> for security reasons
+    //   // Skipping <style> as we already processed them
+    //   // in the StyleCompiler
+    //   return null;
+    // }
+    // if (preparsedElement.type === PreparsedElementType.STYLESHEET &&
+    //     isStyleUrlResolvable(preparsedElement.hrefAttr)) {
+    //   // Skipping stylesheets with either relative urls or package scheme as we already processed
+    //   // them in the StyleCompiler
+    //   return null;
+    // }
 
     var matchableAttrs: string[][] = [];
     var elementOrDirectiveProps: BoundElementOrDirectiveProperty[] = [];
