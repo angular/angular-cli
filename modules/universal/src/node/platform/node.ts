@@ -45,8 +45,12 @@ import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {DomRootRenderer} from 'angular2/src/platform/dom/dom_renderer';
 import {RootRenderer} from 'angular2/src/core/render/api';
 
+
+import {TemplateParser} from 'angular2/src/compiler/template_parser';
+
 import {NodeDomRootRenderer_} from './dom/node_dom_renderer';
 import {NodeXHRImpl} from './node_xhr_impl';
+import {NodeTemplateParser} from './node_template_parser';
 
 export function initNodeAdapter() {
   Parse5DomAdapter.makeCurrent();
@@ -94,6 +98,8 @@ export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
 export const NODE_APPLICATION_PROVIDERS: Array<any> = CONST_EXPR([
   ...NODE_APPLICATION_COMMON_PROVIDERS,
   ...COMPILER_PROVIDERS,
+
+  new Provider(TemplateParser, {useClass: NodeTemplateParser}),
   new Provider(XHR, {useClass: NodeXHRImpl}),
 ]);
 
