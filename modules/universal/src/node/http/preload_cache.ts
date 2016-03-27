@@ -159,7 +159,6 @@ export class NgPreloadCacheHttp extends Http {
     this._rootNode = _rootNode;
     this._activeNode = _rootNode;
 
-
   }
 
   preload(factory) {
@@ -168,9 +167,12 @@ export class NgPreloadCacheHttp extends Http {
 
     var currentNode = null;
 
-    if (isPresent(this._activeNode)) {
-      currentNode = { children: [], res: null };
-      this._activeNode.children.push(currentNode);
+    if (this.prime) {
+
+      if (isPresent(this._activeNode)) {
+        currentNode = { children: [], res: null };
+        this._activeNode.children.push(currentNode);
+      }
     }
 
     // We need this to ensure all ajax calls are done before rendering the app
@@ -180,33 +182,31 @@ export class NgPreloadCacheHttp extends Http {
     request
     .subscribe({
         next: (response) => {
-          let headers = {};
-          response.headers.forEach((value, name) => {
-            headers[name] = value;
-          });
+          if (this.prime) {
+            let headers = {};
+            response.headers.forEach((value, name) => {
+              headers[name] = value;
+            });
 
-          let res = (<any>Object).assign({}, response, { headers });
+            let res = (<any>Object).assign({}, response, { headers });
 
-          if (isPresent(currentNode)) {
-            currentNode.res = res;
+            if (isPresent(currentNode)) {
+              currentNode.res = res;
+            }
           }
-          // this._ngZone.run(() => {
-            obs.next(response);
-          // });
+          obs.next(response);
         },
         error: (e) => {
-          // this._ngZone.run(() => {
-            obs.error(e);
-            this._async -= 1;
-          // });
+          obs.error(e);
+          this._async -= 1;
         },
         complete: () => {
-          this._activeNode = currentNode;
-          this._activeNode = null;
-          // this._ngZone.run(() => {
-            obs.complete();
-            this._async -= 1;
-          // });
+          if (this.prime) {
+            this._activeNode = currentNode;
+            this._activeNode = null;
+          }
+          obs.complete();
+          this._async -= 1;
         }
     });
 
@@ -214,33 +214,33 @@ export class NgPreloadCacheHttp extends Http {
   }
 
   request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
-    return isBlank(this.prime) ? super.request(url, options) : this.preload(() => super.request(url, options));
+    return this.preload(() => super.request(url, options));
   }
 
   get(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return isBlank(this.prime) ? super.get(url, options) : this.preload(() => super.get(url, options));
+    return this.preload(() => super.get(url, options));
 
   }
 
   post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-    return isBlank(this.prime) ? super.post(url, body, options) : this.preload(() => super.post(url, body, options));
+    return this.preload(() => super.post(url, body, options));
   }
 
   put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-    return isBlank(this.prime) ? super.put(url, body, options) : this.preload(() => super.put(url, body, options));
+    return this.preload(() => super.put(url, body, options));
   }
 
   delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return isBlank(this.prime) ? super.delete(url, options) : this.preload(() => super.delete(url, options));
+    return this.preload(() => super.delete(url, options));
 
   }
 
   patch(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-    return isBlank(this.prime) ? super.patch(url, body, options) : this.preload(() => super.patch(url, body, options));
+    return this.preload(() => super.patch(url, body, options));
   }
 
   head(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return isBlank(this.prime) ? super.head(url, options) : this.preload(() => super.head(url, options));
+    return this.preload(() => super.head(url, options));
   }
 
 
