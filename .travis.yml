@@ -1,11 +1,18 @@
 sudo: false
 env:
-  - NODE_VERSION=4
-  - NODE_VERSION=5
+  - NODE_VERSION=4 SCRIPT=lint
+  - NODE_VERSION=4 SCRIPT=test
+  - NODE_VERSION=5 SCRIPT=test
 os:
   - linux
   - osx
-script: npm run-script lint && npm run-script test
+matrix:
+  exclude:
+    - os: osx
+      env: NODE_VERSION=4 SCRIPT=lint
+
+script:
+  - npm run-script $SCRIPT
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.30.1/install.sh | bash; fi
