@@ -1,6 +1,6 @@
 import * as Command from 'ember-cli/lib/models/command';
 import * as path from 'path';
-
+import * as child_process from 'child_process';
 
 const VersionCommand = Command.extend({
   name: 'version',
@@ -21,7 +21,19 @@ const VersionCommand = Command.extend({
 
     var alwaysPrint = ['node', 'os'];
 
-    this.printVersion('angular-cli', pkg.version);
+    var ngCliVersion = pkg.version;
+    if (!__dirname.match(/node_modules/)) {
+      var gitBranch = '??';
+      try {
+        var gitRefName = '' + child_process.execSync('git symbolic-ref HEAD', {cwd: __dirname});
+        gitBranch = path.basename(gitRefName.replace('\n', ''));
+      } catch (e) {
+      }
+
+      ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
+    }
+
+    this.printVersion('angular-cli', ngCliVersion);
 
     for (var module in versions) {
       if (options.verbose || alwaysPrint.indexOf(module) > -1) {
