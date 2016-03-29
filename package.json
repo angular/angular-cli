@@ -43,6 +43,7 @@
     "leek": "0.0.21",
     "lodash": "^4.6.1",
     "multidep": "^2.0.0",
+    "opn": "4.0.1",
     "resolve": "^1.1.7",
     "shelljs": "^0.6.0",
     "silent-error": "^1.0.0",
