@@ -15,7 +15,11 @@ module.exports = {
       'version': require('./commands/version'),
       'completion': require('./commands/completion'),
       'doc': require('./commands/doc'),
-      'github-pages-deploy': require('./commands/github-pages-deploy')
+      'github-pages-deploy': require('./commands/github-pages-deploy'),
+
+      // Configuration
+      'set': require('./commands/set'),
+      'get': require('./commands/get')
     };
   }
 };
