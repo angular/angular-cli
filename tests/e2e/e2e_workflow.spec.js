@@ -176,6 +176,22 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
+  it('moves all files that live inside `public` into `dist`', function () {
+    this.timeout(420000);
+
+    const tmpFile = path.join(process.cwd(), 'public', 'test.abc');
+    const tmpFileLocation = path.join(process.cwd(), 'dist', 'test.abc');
+    fs.writeFileSync(tmpFile, 'hello world');
+
+    return ng(['build', '--silent'])
+      .then(function () {
+        expect(existsSync(tmpFileLocation));
+      })
+      .catch(err => {
+        throw new Error(err)
+      });
+  });
+
   it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
     this.timeout(420000);
 
