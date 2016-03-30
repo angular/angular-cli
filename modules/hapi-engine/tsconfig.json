@@ -13,7 +13,8 @@
   	"outDir": "dist"
   },
   "files": [
-    "../../typings/browser.d.ts",
+    "./typings/main.d.ts",
+    "./src/applyToDefaults.ts",
     "./src/engine.ts",
     "./index.ts"
   ],
@@ -30,5 +31,8 @@
     "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
     "placeOpenBraceOnNewLineForFunctions": false,
     "placeOpenBraceOnNewLineForControlBlocks": false
-  }
+  },
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": { "rewriteTsconfig": false }
 }
