@@ -1,5 +1,5 @@
-var fs = require('fs');
-var Hoek = require('hoek');
+import * as fs from 'fs';
+import * as Hoek from './ts-hoek';
 
 import {
   renderToString,
