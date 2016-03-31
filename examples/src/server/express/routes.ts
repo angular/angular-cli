@@ -16,12 +16,10 @@ module.exports = function(ROOT) {
   enableProdMode();
 
   var {
+    NODE_ROUTER_PROVIDERS,
     NODE_HTTP_PROVIDERS,
-    NODE_LOCATION_PROVIDERS,
-    NODE_PRELOAD_CACHE_HTTP_PROVIDERS,
     NODE_PLATFORM_PIPES,
     REQUEST_URL,
-    PRIME_CACHE,
     BASE_URL,
     queryParamsToBoolean
   } = require('angular2-universal-preview');
@@ -39,15 +37,14 @@ module.exports = function(ROOT) {
         directives: [appPage.App, appPage.MyApp],
         providers: [
           NODE_PLATFORM_PIPES,
-          NODE_LOCATION_PROVIDERS,
+          NODE_ROUTER_PROVIDERS,
           provide(REQUEST_URL, {useValue: req.originalUrl}),
           provide(APP_BASE_HREF, {useValue: '/'}),
 
           provide(BASE_URL, {useExisting: req.originalUrl}),
-          provide(PRIME_CACHE, {useExisting: true}),
 
           // NODE_HTTP_PROVIDERS,
-          NODE_PRELOAD_CACHE_HTTP_PROVIDERS,
+          NODE_HTTP_PROVIDERS,
         ],
         data: {},
 
@@ -81,9 +78,8 @@ module.exports = function(ROOT) {
         directives: [todoApp.TodoApp],
         providers: [
           // NODE_HTTP_PROVIDERS,
-          // NODE_LOCATION_PROVIDERS,
+          // NODE_ROUTER_PROVIDERS,
           // provide(BASE_URL, {useExisting: req.originalUrl}),
-          // provide(PRIME_CACHE, {useExisting: true})
         ],
         data: {},
 
@@ -107,9 +103,8 @@ module.exports = function(ROOT) {
         directives: [todoApp.TodoApp],
         providers: [
           // NODE_HTTP_PROVIDERS,
-          // NODE_LOCATION_PROVIDERS,
+          // NODE_ROUTER_PROVIDERS,
           // provide(REQUEST_URL, {useExisting: req.originalUrl}),
-          // provide(PRIME_CACHE, {useExisting: true})
         ],
         data: {},
 
@@ -139,7 +134,7 @@ module.exports = function(ROOT) {
         provide(APP_BASE_HREF, {useValue: baseUrl}),
         provide(REQUEST_URL, {useValue: url}),
         ROUTER_PROVIDERS,
-        NODE_LOCATION_PROVIDERS,
+        NODE_ROUTER_PROVIDERS,
       ],
       data: {},
 
