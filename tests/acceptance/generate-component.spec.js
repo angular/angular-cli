@@ -32,14 +32,14 @@ describe('Acceptance: ng generate component', function () {
 
   it('ng generate component my-comp', function () {
     return ng(['generate', 'component', 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate component test' + path.sep + 'my-comp', function () {
     return ng(['generate', 'component', 'test' + path.sep + 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'test', 'my-comp', 'my-comp.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-comp', 'my-comp.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
@@ -47,7 +47,7 @@ describe('Acceptance: ng generate component', function () {
   it('ng generate component test' + path.sep + '..' + path.sep + 'my-comp', function () {
     return ng(['generate', 'component', 'test' + path.sep + '..' + path.sep + 'my-comp'])
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.ts');
         expect(existsSync(testPath)).to.equal(true);
       });
   });
@@ -57,6 +57,7 @@ describe('Acceptance: ng generate component', function () {
       process.chdir('./src');
       resolve();
     })
+      .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
       .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
@@ -64,7 +65,7 @@ describe('Acceptance: ng generate component', function () {
         return ng(['generate', 'component', 'my-comp'])
       })
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-comp', 'my-comp.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-comp', 'my-comp.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -74,6 +75,7 @@ describe('Acceptance: ng generate component', function () {
       process.chdir('./src');
       resolve();
     })
+      .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
       .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
@@ -82,7 +84,7 @@ describe('Acceptance: ng generate component', function () {
       })
       .then(() => {
         var testPath = path.join(
-          root, 'tmp', 'foo', 'src', 'app', '1', 'child-dir', 'my-comp', 'my-comp.ts');
+          root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir', 'my-comp', 'my-comp.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -93,6 +95,7 @@ describe('Acceptance: ng generate component', function () {
         process.chdir('./src');
         resolve();
       })
+        .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
         .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
@@ -103,18 +106,19 @@ describe('Acceptance: ng generate component', function () {
         })
         .then(() => {
           var testPath =
-            path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-comp', 'my-comp.ts');
+            path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-comp', 'my-comp.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
 
   it('ng generate component ' + path.sep + 'my-comp from a child dir, gens under ' +
-    path.join('src', 'app'),
+    path.join('src', 'client', 'app'),
     () => {
       return new Promise(function (resolve) {
         process.chdir('./src');
         resolve();
       })
+        .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
         .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
@@ -122,14 +126,14 @@ describe('Acceptance: ng generate component', function () {
           return ng(['generate', 'component', path.sep + 'my-comp'])
         })
         .then(() => {
-          var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.ts');
+          var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
 
   it('ng generate component ..' + path.sep + 'my-comp from root dir will fail', () => {
     return ng(['generate', 'component', '..' + path.sep + 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '..', 'my-comp', 'my-comp.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-comp', 'my-comp.ts');
       expect(existsSync(testPath)).to.equal(false);
     });
   });

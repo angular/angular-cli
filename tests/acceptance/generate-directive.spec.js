@@ -30,109 +30,113 @@ describe('Acceptance: ng generate directive', function () {
     return tmp.teardown('./tmp');
   });
 
-  it('ng generate directive my-comp', function () {
-    return ng(['generate', 'directive', 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.ts');
+  it('ng generate directive my-dir', function () {
+    return ng(['generate', 'directive', 'my-dir']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-dir', 'my-dir.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('ng generate directive test' + path.sep + 'my-comp', function () {
-    return ng(['generate', 'directive', 'test' + path.sep + 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'test', 'my-comp', 'my-comp.ts');
+  it('ng generate directive test' + path.sep + 'my-dir', function () {
+    return ng(['generate', 'directive', 'test' + path.sep + 'my-dir']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-dir', 'my-dir.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('ng generate directive test' + path.sep + '..' + path.sep + 'my-comp', function () {
-    return ng(['generate', 'directive', 'test' + path.sep + '..' + path.sep + 'my-comp'])
+  it('ng generate directive test' + path.sep + '..' + path.sep + 'my-dir', function () {
+    return ng(['generate', 'directive', 'test' + path.sep + '..' + path.sep + 'my-dir'])
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-dir', 'my-dir.ts');
         expect(existsSync(testPath)).to.equal(true);
       });
   });
 
-  it('ng generate directive my-comp from a child dir', () => {
+  it('ng generate directive my-dir from a child dir', () => {
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
+      .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
       .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
-        return ng(['generate', 'directive', 'my-comp'])
+        return ng(['generate', 'directive', 'my-dir'])
       })
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-comp', 'my-comp.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-dir', 'my-dir.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
 
-  it('ng generate directive child-dir' + path.sep + 'my-comp from a child dir', () => {
+  it('ng generate directive child-dir' + path.sep + 'my-dir from a child dir', () => {
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
+      .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
       .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
-        return ng(['generate', 'directive', 'child-dir' + path.sep + 'my-comp'])
+        return ng(['generate', 'directive', 'child-dir' + path.sep + 'my-dir'])
       })
       .then(() => {
         var testPath = path.join(
-          root, 'tmp', 'foo', 'src', 'app', '1', 'child-dir', 'my-comp', 'my-comp.ts');
+          root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir', 'my-dir', 'my-dir.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
 
-  it('ng generate directive child-dir' + path.sep + '..' + path.sep + 'my-comp from a child dir',
+  it('ng generate directive child-dir' + path.sep + '..' + path.sep + 'my-dir from a child dir',
     () => {
       return new Promise(function (resolve) {
         process.chdir('./src');
         resolve();
       })
+        .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
         .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
         .then(() => {
           process.env.CWD = process.cwd();
           return ng(
-            ['generate', 'directive', 'child-dir' + path.sep + '..' + path.sep + 'my-comp'])
+            ['generate', 'directive', 'child-dir' + path.sep + '..' + path.sep + 'my-dir'])
         })
         .then(() => {
           var testPath =
-            path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-comp', 'my-comp.ts');
+            path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-dir', 'my-dir.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
 
-  it('ng generate directive ' + path.sep + 'my-comp from a child dir, gens under ' +
-    path.join('src', 'app'),
+  it('ng generate directive ' + path.sep + 'my-dir from a child dir, gens under ' +
+    path.join('src', 'client', 'app'),
     () => {
       return new Promise(function (resolve) {
         process.chdir('./src');
         resolve();
       })
+        .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
         .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
         .then(() => {
           process.env.CWD = process.cwd();
-          return ng(['generate', 'directive', path.sep + 'my-comp'])
+          return ng(['generate', 'directive', path.sep + 'my-dir'])
         })
         .then(() => {
-          var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.ts');
+          var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-dir', 'my-dir.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
 
-  it('ng generate directive ..' + path.sep + 'my-comp from root dir will fail', () => {
-    return ng(['generate', 'directive', '..' + path.sep + 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '..', 'my-comp', 'my-comp.ts');
+  it('ng generate directive ..' + path.sep + 'my-dir from root dir will fail', () => {
+    return ng(['generate', 'directive', '..' + path.sep + 'my-dir']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-dir', 'my-dir.ts');
       expect(existsSync(testPath)).to.equal(false);
     });
   });

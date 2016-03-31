@@ -8,8 +8,8 @@ var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = process.cwd();
 var conf = require('ember-cli/tests/helpers/conf');
-var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-route');
-var appPath = path.join(root, 'tmp', 'foo', 'src', 'app');
+var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-route');
+var appPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app');
 var routeRegex = /name: 'MyRouteRoot'/g;
 var route = {
   routePath: '/my-route/...',
@@ -60,7 +60,7 @@ describe('Acceptance: ng generate route', function () {
       expect(routeConfigString.match(routeRegex).length).to.equal(1);
 
       fileExpectations(true);
-
+      
       expect(ngCliConfig.routes[0]).to.deep.equal(route);
     });
   });

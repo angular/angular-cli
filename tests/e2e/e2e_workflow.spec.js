@@ -112,7 +112,7 @@ describe('Basic end-to-end Workflow', function () {
   it('Can create a test component using `ng generate component test-component`', function () {
     this.timeout(10000);
     return ng(['generate', 'component', 'test-component']).then(function () {
-      var componentDir = path.join(process.cwd(), 'src', 'app', 'components', 'test-component');
+      var componentDir = path.join(process.cwd(), 'src', 'client', 'app', 'components', 'test-component');
       expect(existsSync(componentDir));
       expect(existsSync(path.join(componentDir, 'test-component.ts')));
       expect(existsSync(path.join(componentDir, 'test-component.html')));
@@ -131,7 +131,7 @@ describe('Basic end-to-end Workflow', function () {
 
   it('Can create a test service using `ng generate service test-service`', function () {
     return ng(['generate', 'service', 'test-service']).then(function () {
-      var serviceDir = path.join(process.cwd(), 'src', 'app', 'services', 'test-service');
+      var serviceDir = path.join(process.cwd(), 'src', 'client', 'app', 'services', 'test-service');
       expect(existsSync(serviceDir));
       expect(existsSync(path.join(serviceDir, 'test-service.ts')));
       expect(existsSync(path.join(serviceDir, 'test-service.spec.ts')));
@@ -149,7 +149,7 @@ describe('Basic end-to-end Workflow', function () {
 
   it('Can create a test pipe using `ng generate pipe test-pipe`', function () {
     return ng(['generate', 'pipe', 'test-pipe']).then(function () {
-      var pipeDir = path.join(process.cwd(), 'src', 'app', 'pipes', 'test-pipe');
+      var pipeDir = path.join(process.cwd(), 'src', 'client', 'app', 'pipes', 'test-pipe');
       expect(existsSync(pipeDir));
       expect(existsSync(path.join(pipeDir, 'test-pipe.ts')));
       expect(existsSync(path.join(pipeDir, 'test-pipe.spec.ts')));
@@ -167,7 +167,7 @@ describe('Basic end-to-end Workflow', function () {
 
   it('Can create a test route using `ng generate route test-route`', function () {
     return ng(['generate', 'route', 'test-route']).then(function () {
-      var routeDir = path.join(process.cwd(), 'src', 'app', 'test-route');
+      var routeDir = path.join(process.cwd(), 'src', 'client', 'app', 'test-route');
       expect(existsSync(routeDir));
       expect(existsSync(path.join(routeDir, 'test-pipe-detail.component.css')));
       expect(existsSync(path.join(routeDir, 'test-pipe-detail.component.html')));
@@ -211,7 +211,7 @@ describe('Basic end-to-end Workflow', function () {
   it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
     this.timeout(420000);
 
-    const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
+    const configFilePath = path.join(process.cwd(), 'src', 'client', 'tsconfig.json');
     let config = require(configFilePath);
 
     config.compilerOptions.noImplicitAny = true;

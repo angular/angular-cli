@@ -11,7 +11,7 @@ module.exports = {
   },
 
   beforeInstall: function (options) {
-    var routeConfigPath = path.join(options.project.root, 'src', 'app', 'route-config.ts');
+    var routeConfigPath = path.join(options.project.root, 'src', 'client', 'app', 'route-config.ts');
     try {
       fs.unlinkSync(routeConfigPath);
     } catch (e) {

@@ -25,30 +25,37 @@ describe('dynamic path parser', () => {
     expect(result.name).to.equal(entityName);
   });
 
-  it(`parse from proj src${path.sep}app dir`, () => {
-    process.env.PWD = path.join(process.cwd(), 'src', 'app');
+  it(`parse from proj src${path.sep}client dir`, () => {
+    process.env.PWD = path.join(process.cwd(), 'src', 'client');
     var result = dynamicPathParser(project, entityName);
     expect(result.dir).to.equal('');
     expect(result.name).to.equal(entityName);
   });
 
-  it(`parse from proj src${path.sep}app${path.sep}child-dir`, () => {
-    process.env.PWD = path.join(process.cwd(), 'src', 'app', 'child-dir');
+  it(`parse from proj src${path.sep}client${path.sep}app dir`, () => {
+    process.env.PWD = path.join(process.cwd(), 'src', 'client', 'app');
+    var result = dynamicPathParser(project, entityName);
+    expect(result.dir).to.equal('');
+    expect(result.name).to.equal(entityName);
+  });
+
+  it(`parse from proj src${path.sep}client${path.sep}app${path.sep}child-dir`, () => {
+    process.env.PWD = path.join(process.cwd(), 'src', 'client', 'app', 'child-dir');
     var result = dynamicPathParser(project, entityName);
     expect(result.dir).to.equal(`${path.sep}child-dir`);
     expect(result.name).to.equal(entityName);
   });
 
-  it(`parse from proj src${path.sep}app${path.sep}child-dir w/ ..${path.sep}`, () => {
-    process.env.PWD = path.join(process.cwd(), 'src', 'app', 'child-dir');
+  it(`parse from proj src${path.sep}client${path.sep}app${path.sep}child-dir w/ ..${path.sep}`, () => {
+    process.env.PWD = path.join(process.cwd(), 'src', 'client', 'app', 'child-dir');
     var result = dynamicPathParser(project, '..' + path.sep + entityName);
     expect(result.dir).to.equal('');
     expect(result.name).to.equal(entityName);
   });
 
-  it(`parse from proj src${path.sep}app${path.sep}child-dir${path.sep}grand-child-dir w/ ..${path.sep}`,
+  it(`parse from proj src${path.sep}client${path.sep}app${path.sep}child-dir${path.sep}grand-child-dir w/ ..${path.sep}`,
     () => {
-      process.env.PWD = path.join(process.cwd(), 'src', 'app', 'child-dir', 'grand-child-dir');
+      process.env.PWD = path.join(process.cwd(), 'src', 'client', 'app', 'child-dir', 'grand-child-dir');
       var result = dynamicPathParser(project, '..' + path.sep + entityName);
       expect(result.dir).to.equal(`${path.sep}child-dir`);
       expect(result.name).to.equal(entityName);
