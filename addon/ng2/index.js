@@ -14,7 +14,9 @@ module.exports = {
       'format': require('./commands/format'),
       'version': require('./commands/version'),
       'completion': require('./commands/completion'),
-      'doc': require('./commands/doc')
+      'doc': require('./commands/doc'),
+      'install': require('./commands/install'),
+      'uninstall': require('./commands/uninstall')
     };
   }
 };
