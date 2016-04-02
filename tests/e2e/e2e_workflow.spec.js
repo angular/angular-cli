@@ -43,7 +43,7 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Can create new project using `ng new test-project`', function () {
-    this.timeout(420000);
+    this.timeout(4200000);
 
     return ng(['new', 'test-project', '--silent']).then(function () {
       expect(existsSync(path.join(root, 'test-project')));
@@ -208,13 +208,13 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
-  it('Installs sass support successfully via `ng install sass`', function() {
+  it('Installs sass support successfully', function() {
     this.timeout(420000);
 
     sh.exec('npm install node-sass', { silent: true });
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
+      let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
       let cssFile = path.join(componentPath, 'test-component.css');
       let scssFile = path.join(componentPath, 'test-component.scss');
 
@@ -230,29 +230,26 @@ describe('Basic end-to-end Workflow', function () {
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
+
+      sh.rm('-f', destCss);
+      process.chdir('src');
+      sh.exec('ng build --silent');
+      expect(existsSync(destCss)).to.be.equal(true);
+      contents = fs.readFileSync(destCss, 'utf8');
+      expect(contents).to.include('.outer .inner');
+
+      process.chdir('..');
+      sh.exec('npm uninstall node-sass', { silent: true });
     });
   });
 
-  it('Uninstalls sass support successfully via `ng uninstall sass`', function(done) {
-    this.timeout(420000);
-
-    sh.exec('npm uninstall node-sass', { silent: true });
-    let sassPath = path.join(process.cwd(), 'node_modules', 'node-sass');
-    expect(existsSync(sassPath)).to.be.equal(false);
-    return ng(['destroy', 'component', 'test-component'])
-    .then(() => {
-      sh.rm('-rf', path.join(process.cwd(), 'src', 'app', 'test-component'));
-      done();
-    });
-  });
-
-  it('Installs less support successfully via `ng install less`', function() {
+  it('Installs less support successfully', function() {
     this.timeout(420000);
 
     sh.exec('npm install less', { silent: true });
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
+      let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
       let cssFile = path.join(componentPath, 'test-component.css');
       let lessFile = path.join(componentPath, 'test-component.less');
 
@@ -268,28 +265,26 @@ describe('Basic end-to-end Workflow', function () {
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
+
+      sh.rm('-f', destCss);
+      process.chdir('src');
+      sh.exec('ng build --silent');
+      expect(existsSync(destCss)).to.be.equal(true);
+      contents = fs.readFileSync(destCss, 'utf8');
+      expect(contents).to.include('.outer .inner');
+
+      process.chdir('..');
+      sh.exec('npm uninstall less', { silent: true });
     });
   });
 
-  it('Uninstalls less support successfully via `ng uninstall less`', function() {
-    this.timeout(420000);
-
-    sh.exec('npm uninstall less', { silent: true });
-    let lessPath = path.join(process.cwd(), 'node_modules', 'less');
-    expect(existsSync(lessPath)).to.be.equal(false);
-    return ng(['destroy', 'component', 'test-component'])
-    .then(() => {
-      sh.rm('-rf', path.join(process.cwd(), 'src', 'app', 'test-component'));
-    });
-  });
-
-  it('Installs stylus support successfully via `ng install stylus`', function() {
+  it('Installs stylus support successfully', function() {
     this.timeout(420000);
 
     sh.exec('npm install stylus', { silent: true });
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
+      let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
       let cssFile = path.join(componentPath, 'test-component.css');
       let stylusFile = path.join(componentPath, 'test-component.styl');
 
@@ -304,18 +299,16 @@ describe('Basic end-to-end Workflow', function () {
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
-    });
-  });
 
-  it('Uninstalls stylus support successfully via `ng uninstall stylus`', function() {
-    this.timeout(420000);
+      sh.rm('-f', destCss);
+      process.chdir('src');
+      sh.exec('ng build --silent');
+      expect(existsSync(destCss)).to.be.equal(true);
+      contents = fs.readFileSync(destCss, 'utf8');
+      expect(contents).to.include('.outer .inner');
 
-    sh.exec('npm uninstall stylus', { silent: true });
-    let stylusPath = path.join(process.cwd(), 'node_modules', 'stylus');
-    expect(existsSync(stylusPath)).to.be.equal(false);
-    return ng(['destroy', 'component', 'test-component'])
-    .then(() => {
-      sh.rm('-rf', path.join(process.cwd(), 'src', 'app', 'test-component'));
+      process.chdir('..');
+      sh.exec('npm uninstall stylus', { silent: true });
     });
   });
 

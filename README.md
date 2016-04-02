@@ -33,6 +33,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Support for offline applications](#support-for-offline-applications)
 * [Commands autocompletion](#commands-autocompletion)
+* [CSS preprocessor integration](#css-preprocessor-integration)
 * [Known Issues](#known-issues)
 
 ## Installation
@@ -248,6 +249,18 @@ Windows users using gitbash:
 ng completion >> ~/.bash_profile
 source ~/.bash_profile
 ```
+
+
+### CSS Preprocessor integration
+
+We support all major CSS preprocessors:
+- sass (node-sass)
+- less (less)
+- compass (compass-importer + node-sass)
+- stylus (stylus)
+
+To use one just install for example `npm install node-sass` and rename `.css` files in your project to `.scss` or `.sass`. They will be compiled automatically.
+
 
 ## Known issues
 
