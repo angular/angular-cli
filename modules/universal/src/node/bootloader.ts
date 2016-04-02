@@ -53,7 +53,7 @@ export class Bootloader {
   constructor(config: BootloaderConfig) {
     (<any>Object).assign(this._config, config || {});
     this.platformRef = this.platform();
-    this.appRef = this.application();
+    // this.applicationRef = this.application();
   }
 
   static create(config): Bootloader {
