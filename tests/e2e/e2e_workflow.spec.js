@@ -208,6 +208,117 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
+  it('Installs sass support successfully via `ng install sass`', function() {
+    this.timeout(420000);
+
+    sh.exec('npm install node-sass', { silent: true });
+    return ng(['generate', 'component', 'test-component'])
+    .then(() => {
+      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
+      let cssFile = path.join(componentPath, 'test-component.css');
+      let scssFile = path.join(componentPath, 'test-component.scss');
+
+      expect(existsSync(componentPath)).to.be.equal(true);
+      sh.mv(cssFile, scssFile);
+      expect(existsSync(scssFile)).to.be.equal(true);
+      expect(existsSync(cssFile)).to.be.equal(false);
+      let scssExample = '.outer {\n  .inner { background: #fff; }\n }';
+      fs.writeFileSync(scssFile, scssExample, 'utf8');
+      
+      sh.exec('ng build --silent');
+      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
+      expect(existsSync(destCss)).to.be.equal(true);
+      let contents = fs.readFileSync(destCss, 'utf8');
+      expect(contents).to.include('.outer .inner');
+    });
+  });
+
+  it('Uninstalls sass support successfully via `ng uninstall sass`', function(done) {
+    this.timeout(420000);
+
+    sh.exec('npm uninstall node-sass', { silent: true });
+    let sassPath = path.join(process.cwd(), 'node_modules', 'node-sass');
+    expect(existsSync(sassPath)).to.be.equal(false);
+    return ng(['destroy', 'component', 'test-component'])
+    .then(() => {
+      sh.rm('-rf', path.join(process.cwd(), 'src', 'app', 'test-component'));
+      done();
+    });
+  });
+
+  it('Installs less support successfully via `ng install less`', function() {
+    this.timeout(420000);
+
+    sh.exec('npm install less', { silent: true });
+    return ng(['generate', 'component', 'test-component'])
+    .then(() => {
+      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
+      let cssFile = path.join(componentPath, 'test-component.css');
+      let lessFile = path.join(componentPath, 'test-component.less');
+
+      expect(existsSync(componentPath)).to.be.equal(true);
+      sh.mv(cssFile, lessFile);
+      expect(existsSync(lessFile)).to.be.equal(true);
+      expect(existsSync(cssFile)).to.be.equal(false);
+      let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
+      fs.writeFileSync(lessFile, lessExample, 'utf8');
+      
+      sh.exec('ng build --silent');
+      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
+      expect(existsSync(destCss)).to.be.equal(true);
+      let contents = fs.readFileSync(destCss, 'utf8');
+      expect(contents).to.include('.outer .inner');
+    });
+  });
+
+  it('Uninstalls less support successfully via `ng uninstall less`', function() {
+    this.timeout(420000);
+
+    sh.exec('npm uninstall less', { silent: true });
+    let lessPath = path.join(process.cwd(), 'node_modules', 'less');
+    expect(existsSync(lessPath)).to.be.equal(false);
+    return ng(['destroy', 'component', 'test-component'])
+    .then(() => {
+      sh.rm('-rf', path.join(process.cwd(), 'src', 'app', 'test-component'));
+    });
+  });
+
+  it('Installs stylus support successfully via `ng install stylus`', function() {
+    this.timeout(420000);
+
+    sh.exec('npm install stylus', { silent: true });
+    return ng(['generate', 'component', 'test-component'])
+    .then(() => {
+      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
+      let cssFile = path.join(componentPath, 'test-component.css');
+      let stylusFile = path.join(componentPath, 'test-component.styl');
+
+      sh.mv(cssFile, stylusFile);
+      expect(existsSync(stylusFile)).to.be.equal(true);
+      expect(existsSync(cssFile)).to.be.equal(false);
+      let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
+      fs.writeFileSync(stylusFile, stylusExample, 'utf8');
+      
+      sh.exec('ng build --silent');
+      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
+      expect(existsSync(destCss)).to.be.equal(true);
+      let contents = fs.readFileSync(destCss, 'utf8');
+      expect(contents).to.include('.outer .inner');
+    });
+  });
+
+  it('Uninstalls stylus support successfully via `ng uninstall stylus`', function() {
+    this.timeout(420000);
+
+    sh.exec('npm uninstall stylus', { silent: true });
+    let stylusPath = path.join(process.cwd(), 'node_modules', 'stylus');
+    expect(existsSync(stylusPath)).to.be.equal(false);
+    return ng(['destroy', 'component', 'test-component'])
+    .then(() => {
+      sh.rm('-rf', path.join(process.cwd(), 'src', 'app', 'test-component'));
+    });
+  });
+
   it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
     this.timeout(420000);
 
