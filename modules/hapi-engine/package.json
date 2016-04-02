@@ -28,6 +28,7 @@
   "devDependencies": {
     "angular2-universal-preview": "file:../universal",
     "preboot": "file:../preboot",
+    "rxjs": "5.0.0-beta.2",
     "angular2": "2.0.0-beta.13",
     "rimraf": "^2.5.2",
     "typescript": "^1.8.9"
