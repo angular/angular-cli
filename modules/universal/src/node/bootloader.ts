@@ -49,7 +49,7 @@ function checkProviders(providers) {
 export class Bootloader {
   private _config: BootloaderConfig = {};
   platformRef: any;
-  appRef: any;
+  applicationRef: any;
   constructor(config: BootloaderConfig) {
     (<any>Object).assign(this._config, config || {});
     this.platformRef = this.platform();
@@ -60,7 +60,7 @@ export class Bootloader {
     if (config instanceof Bootloader) { return config; }
     return new Bootloader(config);
   }
-  static appRefToString(applicationRefs) {
+  static applicationRefToString(applicationRefs) {
     let injector = applicationRefs.injector;
     if (Array.isArray(applicationRefs)) {
       injector = applicationRefs[0].injector;
@@ -96,7 +96,7 @@ export class Bootloader {
     let component = Component || this._config.component;
     let providers = componentProviders || this._config.componentProviders;
     if (component) {
-      return this.appRef.bootstrap(component, providers).then(waitRouter);
+      return this.application().bootstrap(component, providers).then(waitRouter);
     } else {
       return this._bootstrapAll(component, providers);
     }
@@ -104,7 +104,7 @@ export class Bootloader {
 
   serialize(Component?: any | Array<any>, componentProviders?: Array<any>): Promise<any> {
     return this.bootstrap(Component, componentProviders)
-      .then(Bootloader.appRefToString);
+      .then(Bootloader.applicationRefToString);
   }
 
   serializeApplication(Component?: any | Array<any>, componentProviders?: Array<any>): Promise<any> {
@@ -136,9 +136,9 @@ export class Bootloader {
 
           let apps = configRefs.map((config, i) => {
             // app injector
-            let ngZone = config.appRef.injector.get(NgZone);
+            let ngZone = config.applicationRef.injector.get(NgZone);
             // component injector
-            let http = config.cmpRef.injector.getOptional(Http);
+            let http = config.componentRef.injector.getOptional(Http);
 
             let promise = new Promise(resolve => {
               if (http && http._async) {
@@ -172,7 +172,7 @@ export class Bootloader {
             .then(code => {
               // TODO(gdi2290): manage the codegen better after preboot supports multiple appRoot
               let lastRef = configRefs[configRefs.length - 1];
-              let el = lastRef.cmpRef.location.nativeElement;
+              let el = lastRef.componentRef.location.nativeElement;
               let script = parseFragment(code);
               let prebootEl = DOM.createElement('div');
               DOM.setInnerHTML(prebootEl, code);
@@ -214,7 +214,8 @@ export class Bootloader {
   _bootstrapAll(Components?: Array<any>, componentProviders?: Array<any>): Promise<Array<any>> {
     let components = Components || this._config.directives;
     let providers = componentProviders || this._config.componentProviders;
-    let directives = components.map(component => this.appRef.bootstrap(component, providers).then(waitRouter));
+    // .then(waitRouter)); // fixed by checkStable()
+    let directives = components.map(component => this.application().bootstrap(component, providers));
     return Promise.all(directives);
   }
 
