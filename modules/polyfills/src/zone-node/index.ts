@@ -12,8 +12,6 @@ patchTimer(timers, set, clear, 'Timeout');
 patchTimer(timers, set, clear, 'Interval');
 patchTimer(timers, set, clear, 'Immediate');
 
-console.log('NODETIMERS');
-
 patchTimer(_global, set, clear, 'Timeout');
 patchTimer(_global, set, clear, 'Interval');
 patchTimer(_global, set, clear, 'Immediate');
