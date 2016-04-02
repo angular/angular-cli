@@ -80,7 +80,7 @@ export class State {
       state: this.state,
       title: this.title,
       url: this.url
-    }
+    };
   }
 }
 
@@ -91,7 +91,7 @@ export class PopStateEvent {
   toJSON() {
     return {
       state: this.state
-    }
+    };
   }
 
 }
