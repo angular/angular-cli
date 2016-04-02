@@ -24,6 +24,7 @@ export interface BootloaderConfig {
   prime?: boolean;
   ngOnInit?: Function;
   ngOnStable?: Function;
+  ngOnRendered?: Function;
 }
 
 function checkProviders(providers) {
@@ -223,9 +224,10 @@ export class Bootloader {
     let doc = this.document(this._config.template || this._config.document);
 
     let directives = components.map(component => {
-      var appRef = this.application(doc);
-      let compRef = appRef.bootstrap(component, providers).then(waitRouter);
-      return compRef.then(cmpRef => ({ appRef, cmpRef }));
+      var applicationRef = this.application(doc);
+      // .then(waitRouter)); // fixed by checkStable()
+      let compRef = applicationRef.bootstrap(component, providers);
+      return compRef.then(componentRef => ({ applicationRef, componentRef }));
     });
     return Promise.all(directives);
   }
