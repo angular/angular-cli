@@ -48,7 +48,7 @@ module.exports = function(ROOT) {
         ],
         data: {},
 
-        precache: true,
+        async: true,
 
         preboot: queryParams.preboot === false ? null : {
           start:    true,
