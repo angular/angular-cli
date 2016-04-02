@@ -14,7 +14,7 @@
   },
   "files": [
     "./typings/main.d.ts",
-    "./src/applyToDefaults.ts",
+    "./src/ts-hoek.ts",
     "./src/engine.ts",
     "./index.ts"
   ],
