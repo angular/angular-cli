@@ -212,10 +212,13 @@ export class Bootloader {
         throw err;
       })
       .then((configRefs: any) => {
-        if ('ngOnStable' in this._config) {
-          if (!this._config.ngOnStable) { return configRefs; }
-          let document = configRefs[0].appRef.injector.get(DOCUMENT);
-          return this._config.ngOnStable(configRefs, document);
+        let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
+        let rendered = Bootloader.serializeDocument(document);
+        // dispose;
+        for (let i = 0; i < configRefs.length; i++) {
+          let config = configRefs[i];
+          config.componentRef.dispose();
+          config.applicationRef.dispose();
         }
         return rendered;
       })
@@ -261,10 +264,8 @@ export class Bootloader {
   }
 
   dispose(): void {
-    this.appRef.dispose();
     this.platformRef.dispose();
     this._config = null;
-    this.appRef = null;
     this.platformRef = null;
   }
 }
