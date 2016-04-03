@@ -2,7 +2,7 @@
   "name": "angular2-webpack-prerender",
   "main": "dist/index.js",
   "version": "0.3.0",
-  "description": "Prerender your Universal (isomorphic) Angular 2 app",
+  "description": "Prerender your Universal (isomorphic) Angular 2 app with Webpack",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
   "contributors": [
