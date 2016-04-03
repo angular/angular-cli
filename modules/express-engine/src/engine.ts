@@ -31,33 +31,41 @@ export interface expressEngineOptions {
   platformProviders?: any;
 }
 
-const prebootScript: string = `
+function prebootScript(config): string {
+  let baseUrl = (config && config.preboot && config.preboot.baseUrl) || '/preboot';
+  return `
   <preboot>
-    <link rel="stylesheet" type="text/css" href="/preboot/preboot.css">
-    <script src="/preboot/preboot.js"></script>
+    <link rel="stylesheet" type="text/css" href="${baseUrl}/preboot.css">
+    <script src="${baseUrl}/preboot.js"></script>
     <script>preboot.start()</script>
   </preboot>
-`;
+  `;
+}
 
-const angularScript: string = `
+function angularScript(config): string {
+  let systemConfig = (config && config.systemjs) || {};
+  let baseUrl = systemConfig.nodeModules || '/node_modules';
+  let newConfig = (<any>Object).assign({}, {
+      baseURL: '/',
+      defaultJSExtensions: true
+    }, systemConfig);
+  return `
   <!-- Browser polyfills -->
-  <script src="/node_modules/es6-shim/es6-shim.min.js"></script>
-  <script src="/node_modules/systemjs/dist/system-polyfills.js"></script>
-  <script src="/node_modules/angular2/bundles/angular2-polyfills.min.js"></script>
+  <script src="${baseUrl}/es6-shim/es6-shim.min.js"></script>
+  <script src="${baseUrl}/systemjs/dist/system-polyfills.js"></script>
+  <script src="${baseUrl}/angular2/bundles/angular2-polyfills.min.js"></script>
   <!-- SystemJS -->
-  <script src="/node_modules/systemjs/dist/system.js"></script>
+  <script src="${baseUrl}/systemjs/dist/system.js"></script>
   <!-- Angular2: Bundle -->
-  <script src="/node_modules/rxjs/bundles/Rx.js"></script>
-  <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
-  <script src="/node_modules/angular2/bundles/router.dev.js"></script>
-  <script src="/node_modules/angular2/bundles/http.dev.js"></script>
+  <script src="${baseUrl}/rxjs/bundles/Rx.js"></script>
+  <script src="${baseUrl}/angular2/bundles/angular2.dev.js"></script>
+  <script src="${baseUrl}/angular2/bundles/router.dev.js"></script>
+  <script src="${baseUrl}/angular2/bundles/http.dev.js"></script>
   <script type="text/javascript">
-    System.config({
-      "baseURL": "/",
-      "defaultJSExtensions": true
-    });
+  System.config(${ JSON.stringify(newConfig) });
   </script>
-`;
+  `;
+};
 
 const bootstrapButton: string = `
   <div id="bootstrapButton">
@@ -85,13 +93,15 @@ var bootstrapApp = `
   </script>
 `;
 
-function bootstrapFunction(appUrl: string): string {
+function bootstrapFunction(config: any): string {
+  let systemConfig = (config && config.systemjs) || {};
+  let url = systemConfig.componentUrl;
   return `
   <script>
     function bootstrap() {
       if (this.bootstraped) return;
       this.bootstraped = true;
-      System.import("${ appUrl }")
+      System.import("${ url }")
         .then(function(module) {
           return module.main();
         })
@@ -113,23 +123,23 @@ function buildClientScripts(html: string, options: any): string {
   return html
     .replace(
       selectorRegExpFactory('preboot'),
-      ((options.preboot === false) ? '' : prebootScript)
+      ((options.preboot === false) ? '' : prebootScript(options))
     )
     .replace(
       selectorRegExpFactory('angular'),
-      ((options.angular === false) ? '' : angularScript)
+      ((options.angular === false) ? '' : angularScript(options))
     )
     .replace(
       selectorRegExpFactory('bootstrap'),
       ((options.bootstrap === false) ? (
         bootstrapButton +
-        bootstrapFunction(options.componentUrl)
+        bootstrapFunction(options)
       ) : (
         (
           (options.client === undefined || options.server === undefined) ?
           '' : (options.client === false) ? '' : bootstrapButton
         ) +
-        bootstrapFunction(options.componentUrl) +
+        bootstrapFunction(options) +
         ((options.client === false) ? '' : bootstrapApp)
       ))
     );
