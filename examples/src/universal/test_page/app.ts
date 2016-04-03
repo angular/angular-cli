@@ -76,9 +76,9 @@ export class MyApp {
 
   <div>
     <h2>|async</h2>
-    <pre *ngFor="var item of todosObs4$ | async">
-      {{ item | json }}
-    </pre>
+    <span *ngFor="var item of todosObs4$ | async">
+      {{ item }}
+    </span>
   </div>
 
   <ul>
