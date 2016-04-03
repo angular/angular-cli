@@ -11,6 +11,7 @@ module.exports = function(ROOT) {
   app.set('views', path.join(ROOT));
   app.set('view engine', 'ng2.html');
   app.set('view options', { doctype: 'html' });
+  app.set('json spaces', 2);
 
   var routes = require('./routes');
   var api = require('./api');
@@ -28,6 +29,7 @@ module.exports = function(ROOT) {
 
   app.get('*', function(req, res) {
     res.json({
+      'url': req.originalUrl,
       'route': 'Sorry this page does not exist!'
     });
   });
