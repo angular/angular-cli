@@ -1,4 +1,4 @@
-import * as WebpackAngular2Prerender from './src/prerender';
+import * as prerender from './src/prerender';
 
 export * from './src/prerender';
-export default WebpackAngular2Prerender;
+export default prerender;
