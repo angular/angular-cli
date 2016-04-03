@@ -161,7 +161,7 @@ export class NgPreloadCacheHttp extends Http {
 
   }
 
-  preload(factory) {
+  preload(url, factory) {
 
     var obs = new EventEmitter(false);
 
@@ -189,6 +189,7 @@ export class NgPreloadCacheHttp extends Http {
             });
 
             let res = (<any>Object).assign({}, response, { headers });
+            let res = (<any>Object).assign({}, response, { headers, url });
 
             if (isPresent(currentNode)) {
               currentNode.res = res;
@@ -214,33 +215,33 @@ export class NgPreloadCacheHttp extends Http {
   }
 
   request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
-    return this.preload(() => super.request(url, options));
+    return this.preload(url, () => super.request(url, options));
   }
 
   get(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.preload(() => super.get(url, options));
+    return this.preload(url, () => super.get(url, options));
 
   }
 
   post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.preload(() => super.post(url, body, options));
+    return this.preload(url, () => super.post(url, body, options));
   }
 
   put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.preload(() => super.put(url, body, options));
+    return this.preload(url, () => super.put(url, body, options));
   }
 
   delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.preload(() => super.delete(url, options));
+    return this.preload(url, () => super.delete(url, options));
 
   }
 
   patch(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.preload(() => super.patch(url, body, options));
+    return this.preload(url, () => super.patch(url, body, options));
   }
 
   head(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.preload(() => super.head(url, options));
+    return this.preload(url, () => super.head(url, options));
   }
 
 
