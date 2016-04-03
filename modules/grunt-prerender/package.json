@@ -45,6 +45,6 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "angular2-universal-preview": "*"
+    "angular2-universal-preview": ">=0.85.1"
   }
 }
