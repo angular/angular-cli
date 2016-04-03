@@ -141,40 +141,18 @@ export class Bootloader {
             let http = config.componentRef.injector.getOptional(Http);
 
             let promise = new Promise(resolve => {
-                // let stable = false;
-                // ngZone.onStable.subscribe(() => {
-                //   console.log('onStable',  ngZone.hasPendingMicrotasks, ngZone.hasPendingMacrotasks, ngZone._isStable);
-                // });
-                // ngZone.onMicrotaskEmpty.subscribe(() => {
-                //   console.log('onMicrotaskEmpty',  ngZone.hasPendingMicrotasks, ngZone.hasPendingMacrotasks, ngZone._isStable);
-                // });
-                // ngZone.onUnstable.subscribe(() => {
-                //   console.log('onUnstable',  ngZone.hasPendingMicrotasks, ngZone.hasPendingMacrotasks, ngZone._isStable);
-                // });
-                // ngZone.onError.subscribe(() => {
-                //   console.log('onError',  ngZone.hasPendingMicrotasks, ngZone.hasPendingMacrotasks, ngZone._isStable);
-                // });
               ngZone.runOutsideAngular(() => {
                 function checkStable() {
                   setTimeout(() => {
                     if (ngZone.hasPendingMicrotasks) { return checkStable(); }
                     if (ngZone.hasPendingMacrotasks) { return checkStable(); }
+                    if (http && http._async > 0) { return checkStable(); }
                     if (ngZone._isStable) { return resolve(config); }
                     return checkStable();
                   });
                 }
                 checkStable();
               });
-              // if (http && http._async) {
-              //   ngZone.onStable.subscribe(() => {
-              //     console.log('HTTP', http._async);
-              //     if (http && http._async <= 0) {
-              //       console.log('HTTP done');
-              //     }
-              //   });
-              // } else {
-              //   resolve(config);
-              // }
             });
             return promise;
           });
