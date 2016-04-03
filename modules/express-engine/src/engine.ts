@@ -96,7 +96,7 @@ function bootstrapFunction(appUrl: string): string {
           return module.main();
         })
         .then(function() {
-          preboot.complete();
+          if ('preboot' in window) { preboot.complete(); }
           var $bootstrapButton = document.getElementById("bootstrapButton");
           if ($bootstrapButton) { $bootstrapButton.remove(); }
         });
