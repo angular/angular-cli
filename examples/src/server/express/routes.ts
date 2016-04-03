@@ -34,16 +34,15 @@ module.exports = function(ROOT) {
         buildClientScripts: true,
         componentUrl: 'examples/src/universal/test_page/browser',
 
+        // directives: [appPage.App],
         directives: [appPage.App, appPage.MyApp],
         providers: [
-          NODE_PLATFORM_PIPES,
-          NODE_ROUTER_PROVIDERS,
           provide(REQUEST_URL, {useValue: req.originalUrl}),
           provide(APP_BASE_HREF, {useValue: '/'}),
-
           provide(BASE_URL, {useExisting: req.originalUrl}),
 
-          // NODE_HTTP_PROVIDERS,
+          NODE_PLATFORM_PIPES,
+          NODE_ROUTER_PROVIDERS,
           NODE_HTTP_PROVIDERS,
         ],
         data: {},
@@ -58,6 +57,9 @@ module.exports = function(ROOT) {
           debug:    false,
           uglify:   true,
           presets:  ['keyPress', 'buttonPress', 'focus']
+        },
+        ngOnRendered: () => {
+          console.log('DONE');
         }
 
       });

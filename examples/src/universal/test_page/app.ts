@@ -36,6 +36,7 @@ export class MyApp {
     }
   `],
   template: `
+  <h1>{{ timerFromCallBack }}</h1>
   <h1 id="intro">Hello Server Renderer</h1>
   <h3>test binding {{ value }}</h3>
   <span>{{ value }}</span>
@@ -111,6 +112,7 @@ export class App {
   static queries = {
     todos: URL + '/api/todos'
   };
+  timerFromCallBack = 'pending';
 
   value: string        = 'value8';
   items: Array<any>    = [];
@@ -141,6 +143,10 @@ export class App {
   }
 
   ngOnInit() {
+    setTimeout(() => {
+      this.timerFromCallBack = 'done!';
+      console.log('Timer for 1000');
+    }, 1000);
     // this.addItem();
     // this.addItem();
     // this.addItem();
@@ -164,7 +170,8 @@ export class App {
     this.todosObs2$.subscribe(
       // onValue
       todos => {
-        console.log('another call 2', todos);
+        // console.log('another call 2', todos);
+        console.log('another call 2');
         todos.map(todo => this.addItem(todo));
         this.anotherAjaxCall();
       },
@@ -180,13 +187,19 @@ export class App {
 
   }
   fromAsyncCall(data) {
-    console.log('Another call 4 from async', data);
+    // console.log('Another call 4 from async', data);
+    console.log('Another call 4 from async');
+    setTimeout(() => {
+      this.timerFromCallBack += '!';
+      console.log('Timer for 1000 from Another call 4');
+    }, 1000);
     return data;
   }
   anotherAjaxCall() {
     this.todosObs3$.subscribe(
       todos => {
-        console.log('anotherAjaxCall data 3', todos);
+        // console.log('anotherAjaxCall data 3', todos);
+        console.log('anotherAjaxCall data 3');
       },
       err => {
         console.log('anotherAjaxCall err');
