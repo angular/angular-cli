@@ -49,7 +49,28 @@ module.exports = function(ROOT) {
 
         async: true,
 
+        systemjs: {
+          componentUrl: 'examples/src/universal/test_page/browser',
+          map: {
+            'angular2-universal-preview': 'node_modules/angular2-universal-preview'
+          },
+          packages: {
+            'angular2-universal-preview/polyfills': {
+              format: 'cjs',
+              main: 'dist/polyfills',
+              defaultExtension: 'js'
+            },
+            'angular2-universal-preview': {
+              format: 'cjs',
+              main: 'dist/browser/index',
+              defaultExtension: 'js'
+            }
+          }
+        },
+
         preboot: queryParams.preboot === false ? null : {
+          appRoot: 'app', // we need to manually include the root
+
           start:    true,
           freeze:   'spinner',     // show spinner w button click & freeze page
           replay:   'rerender',    // rerender replay strategy
@@ -75,8 +96,24 @@ module.exports = function(ROOT) {
       let options = Object.assign(queryParams , {
         // client url for systemjs
         buildClientScripts: true,
-        componentUrl: 'examples/src/universal/todo/browser',
-
+        systemjs: {
+          componentUrl: 'examples/src/universal/todo/browser',
+          map: {
+            'angular2-universal-preview': 'node_modules/angular2-universal-preview'
+          },
+          packages: {
+            'angular2-universal-preview/polyfills': {
+              format: 'cjs',
+              main: 'dist/polyfills',
+              defaultExtension: 'js'
+            },
+            'angular2-universal-preview': {
+              format: 'cjs',
+              main: 'dist/browser/index',
+              defaultExtension: 'js'
+            }
+          }
+        },
         directives: [todoApp.TodoApp],
         providers: [
           // NODE_HTTP_PROVIDERS,
@@ -100,7 +137,24 @@ module.exports = function(ROOT) {
       let options = Object.assign(queryParams , {
         // client url for systemjs
         buildClientScripts: true,
-        componentUrl: 'examples/src/universal/falcor_todo/client',
+        systemjs: {
+          componentUrl: 'examples/src/universal/falcor_todo/client',
+          map: {
+            'angular2-universal-preview': 'node_modules/angular2-universal-preview'
+          },
+          packages: {
+            'angular2-universal-preview/polyfills': {
+              format: 'cjs',
+              main: 'dist/polyfills',
+              defaultExtension: 'js'
+            },
+            'angular2-universal-preview': {
+              format: 'cjs',
+              main: 'dist/browser/index',
+              defaultExtension: 'js'
+            }
+          }
+        },
 
         directives: [todoApp.TodoApp],
         providers: [
@@ -126,7 +180,24 @@ module.exports = function(ROOT) {
     let options = Object.assign(queryParams , {
       // client url for systemjs
       buildClientScripts: true,
-      componentUrl: 'examples/src/universal/test_router/browser',
+      systemjs: {
+        componentUrl: 'examples/src/universal/test_router/browser',
+        map: {
+          'angular2-universal-preview': 'node_modules/angular2-universal-preview'
+        },
+        packages: {
+          'angular2-universal-preview/polyfills': {
+            format: 'cjs',
+            main: 'dist/polyfills',
+            defaultExtension: 'js'
+          },
+          'angular2-universal-preview': {
+            format: 'cjs',
+            main: 'dist/browser/index',
+            defaultExtension: 'js'
+          }
+        }
+      },
       // ensure that we test only server routes
       client: false,
 
