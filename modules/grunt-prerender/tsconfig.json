@@ -15,7 +15,7 @@
   "files": [
     "./typings/main.d.ts",
     "./src/prerender.ts",
-    "./index.ts",
+    "./index.ts"
   ],
   "formatCodeOptions": {
     "indentSize": 2,
