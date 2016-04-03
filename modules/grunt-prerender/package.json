@@ -26,7 +26,12 @@
     "url": "https://github.com/angular/universal/issues"
   },
   "keywords": [
-    "gruntplugin"
+    "gruntplugin",
+    "angular2 grunt",
+    "angular2 universal",
+    "angular 2",
+    "angular 2 prerender",
+    "angular 2 grunt prerender"
   ],
   "devDependencies": {
     "angular2-universal-preview": "file:../universal",
