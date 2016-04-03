@@ -1,12 +1,20 @@
 import universal = require('angular2-universal-preview');
 
 export interface GruntUniversalConfig {
-  preboot: boolean;
-  bootloader: any;
-  componentProviders: any[];
-  platformProviders: any[];
-  directives: any[];
-  providers: any[];
+  document?: string | any;
+  template?: string;
+  directives: Array<any>;
+  providers?: Array<any>;
+  async?: boolean;
+  preboot?: Object | any;
+  precache?: boolean;
+  bootloader?: any;
+  selector?: string;
+  serializedCmp?: string;
+  server?: boolean;
+  client?: boolean;
+  componentProviders?: any;
+  platformProviders?: any;
 }
 
 
@@ -19,14 +27,10 @@ export class Prerender {
       // bootstrap and render component to string
       var bootloader = this.options.bootloader;
       if (!this.options.bootloader) {
-        this.options.bootloader = {
-          document: universal.parseDocument(clientHtml),
-          providers: this.options.providers,
-          componentProviders: this.options.componentProviders,
-          platformProviders: this.options.platformProviders,
-          directives: this.options.directives,
-          preboot: this.options.preboot
-        };
+        let doc = universal.Bootloader.parseDocument(clientHtml);
+        this.options.document = doc;
+        this.options.template = this.options.template || clientHtml;
+        this.options.bootloader = this.options;
       }
       bootloader = universal.Bootloader.create(this.options.bootloader);
 
