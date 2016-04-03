@@ -13,8 +13,9 @@
   	"outDir": "tasks"
   },
   "files": [
-    "./index.ts",
+    "./typings/main.d.ts",
     "./src/prerender.ts"
+    "./index.ts",
   ],
   "formatCodeOptions": {
     "indentSize": 2,
