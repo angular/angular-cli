@@ -34,9 +34,13 @@
     "angular 2 grunt prerender"
   ],
   "devDependencies": {
+    "preboot": "file:../preboot",
     "angular2-universal-preview": "file:../universal",
-    "typescript": "^1.7.3",
-    "rimraf": "^2.5.1"
+    "rimraf": "^2.5.1",
+    "angular2": "2.0.0-beta.12",
+    "rxjs": "~5.0.0-beta.2",
+    "zone.js": "~0.6.4",
+    "typescript": "^1.8.9"
   },
   "dependencies": {
   },
