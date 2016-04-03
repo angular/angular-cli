@@ -217,19 +217,21 @@ export class Bootloader {
           let document = configRefs[0].appRef.injector.get(DOCUMENT);
           return this._config.ngOnStable(configRefs, document);
         }
-        return configRefs;
-      })
-      .catch(err => {
-        console.log('ngOnStable Error:', err);
-        throw err;
-      })
-      .then((configRefs: any) => {
-        let document = configRefs[0].appRef.injector.get(DOCUMENT);
-        let rendered = Bootloader.serializeDocument(document);
         return rendered;
       })
       .catch(err => {
         console.log('Rendering Document Error:', err);
+        throw err;
+      })
+      .then((rendered: any) => {
+        if ('ngOnRendered' in this._config) {
+          if (!this._config.ngOnRendered) { return rendered; }
+          return Promise.resolve(this._config.ngOnRendered(rendered)).then(() => rendered);
+        }
+        return rendered;
+      })
+      .catch(err => {
+        console.log('ngOnRendered Error:', err);
         throw err;
       });
 
