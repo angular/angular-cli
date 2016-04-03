@@ -115,8 +115,8 @@ export class Bootloader {
       .then((configRefs: any) => {
         if ('ngOnInit' in this._config) {
           if (!this._config.ngOnInit) { return configRefs; }
-          let document = configRefs[0].appRef.injector.get(DOCUMENT);
-          return this._config.ngOnInit(configRefs, document);
+          let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
+          return Promise.resolve(this._config.ngOnInit(configRefs, document)).then(() => configRefs);
         }
         return configRefs;
       })
@@ -184,7 +184,19 @@ export class Bootloader {
         return configRefs;
       })
       .catch(err => {
-        console.log('Precache Error:', err);
+        console.log('Async Error:', err);
+        throw err;
+      })
+      .then((configRefs: any) => {
+        if ('ngOnStable' in this._config) {
+          if (!this._config.ngOnStable) { return configRefs; }
+          let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
+          return Promise.resolve(this._config.ngOnStable(configRefs, document)).then(() => configRefs);
+        }
+        return configRefs;
+      })
+      .catch(err => {
+        console.log('ngOnStable Error:', err);
         throw err;
       })
       .then((configRefs: any) => {
