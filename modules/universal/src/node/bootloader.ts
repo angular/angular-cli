@@ -7,7 +7,8 @@ import {Http} from 'angular2/http';
 import {buildReflector, buildNodeProviders, buildNodeAppProviders} from './platform/node';
 import {parseDocument, parseFragment, serializeDocument} from './platform/document';
 import {createPrebootCode} from './ng_preboot';
-import {waitRouter} from './render';
+// import {waitRouter} from './render';
+import {arrayFlattenTree} from './helper';
 
 export interface BootloaderConfig {
   template?: any;
@@ -96,7 +97,8 @@ export class Bootloader {
     let component = Component || this._config.component;
     let providers = componentProviders || this._config.componentProviders;
     if (component) {
-      return this.application().bootstrap(component, providers).then(waitRouter);
+      // .then(waitRouter)); // fixed by checkStable()
+      return this.application().bootstrap(component, providers);
     } else {
       return this._bootstrapAll(component, providers);
     }
