@@ -14,7 +14,7 @@
   },
   "files": [
     "./typings/main.d.ts",
-    "./src/prerender.ts"
+    "./src/prerender.ts",
     "./index.ts",
   ],
   "formatCodeOptions": {
