@@ -51,29 +51,8 @@ Finally, once your client-side web app is "alive" it has to tell preboot that it
 to replay events.
 
 ```es6
-preboot.done();
+preboot.complete();
 ```
-
-## Examples
-
-Server-side integrations:
-
-* [Express](docs/examples.md#express)
-* [Hapi](docs/examples.md#hapi)
-* [Gulp](docs/examples.md#gulp)
-
-Client-side integrations:
-
-* [Angular 1.x](docs/examples.md#angular-1)
-* [Angular 2](docs/examples.md#angular-2)
-* [React](docs/examples.md#react)
-* [Ember](docs/examples.md#ember)
-
-Custom strategies:
-
-* [Listening for events](docs/examples.md#listen-strategy)
-* [Replaying events](docs/examples.md#replay-strategy)
-* [Freezing screen](docs/examples.md#freeze-strategy)
 
 ## Options
 
@@ -115,21 +94,3 @@ These are the names of global events that can affect the preboot workflow:
 
 * `uglify` - You can always uglify the output of the client code stream yourself, but if you set this
 option to true preboot will do it for you.
-
-## Play
-
-If you want to play with this library you can clone it locally:
-
-```sh
-git clone git@github.com:jeffwhelpley/preboot.git
-cd preboot
-gulp build
-gulp play
-```
-
-Open your browser to http://localhost:3000. Make modifications to the options in build/task.build.js
-to see how preboot can be changed.
-
-## Contributors
-
-We would welcome any and all contributions. Please see the [Contributors Guide](docs/contributors.md).

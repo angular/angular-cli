@@ -9,7 +9,7 @@ module.exports = function (opts) {
     var tsProject = typescript.createProject(tsConfig, {
       declaration: true
     });
-    // TODO(gdi2290): missing declaration file stream
+
     return tsProject.src().
       pipe(typescript(tsProject)).
       pipe(size()).

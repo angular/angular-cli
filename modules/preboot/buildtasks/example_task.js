@@ -8,13 +8,13 @@ module.exports = function (opts) {
     var exec = require('child_process').exec;
     var distExampleDir = 'dist/example';
 
-    // need to clear out preboot in require cache for when we are watching  
+    // need to clear out preboot in require cache for when we are watching
     for (var key in require.cache) {
-      if (key.indexOf(opts.distDir) >= 0) {
+      if (require.cache.hasOwnProperty(key) && key.indexOf(opts.distDir) >= 0) {
         delete require.cache[key];
       }
     }
- 
+
     // now pull in the latest preboot code
     var preboot = require(opts.prebootNode);
 

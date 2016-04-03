@@ -1,11 +1,11 @@
-const Q = require('q');
-const uglify = require('gulp-uglify');
-const insert = require('gulp-insert');
-const rename = require('gulp-rename');
-const eventStream = require('event-stream');
-const buffer = require('vinyl-buffer');
-const source = require('vinyl-source-stream');
-const browserify = require('browserify');
+import * as Q from 'q';
+import * as rename from 'gulp-rename';
+import * as uglify from 'gulp-uglify';
+import * as insert from 'gulp-insert';
+import * as eventStream from 'event-stream';
+import * as buffer from 'vinyl-buffer';
+import * as source from 'vinyl-source-stream';
+import * as browserify from 'browserify';
 import {normalize, listenStrategies, replayStrategies, freezeStrategies} from './normalize';
 import {stringifyWithFunctions} from './utils';
 import {PrebootOptions} from '../interfaces/preboot_options';
@@ -20,7 +20,7 @@ export let browserCodeCache = {};
  * attributes strategies will be stubbed out (meaing the refs will be {})
  */
 export function ignoreUnusedStrategies(
-  b: any/*Browserify.BrowserifyObject*/,
+  b: any,  /*Browserify.BrowserifyObject*/
   bOpts: Object,
   strategyOpts: any[],
   allStrategies: Object,

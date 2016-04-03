@@ -42,3 +42,4 @@ test/coverage
 /typings/browser.d.ts
 /typings/main.d.ts
 /tsd_typings
+/docs

@@ -96,7 +96,7 @@ export let normalizers = {
    * an array before passed into client side preboot.
    */
   replay: function (opts: PrebootOptions) {
-    opts.replay = opts.replay || [];
+    opts.replay = opts.replay || [{ name: 'rerender' }];  // default
 
     // if replay strategies are strings turn them into arrays
     if (typeof opts.replay === 'string') {

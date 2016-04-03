@@ -1,21 +1,21 @@
 <html>
-  
+
   <head>
     <link rel="stylesheet" href="preboot.css">
     <style>
       .frmelem {
         height: 50px; width: 50%; font-size: 24px; padding: 0 20px; margin: 20px 25%;
-      }  
+      }
       .frmbtn {
         height: 50px; width: 50%; font-size: 24px; margin: 20px 25%; text-align: center; z-index: 99999999999;
       }
     </style>
     <script src="preboot.js"></script>
   </head>
-  
+
   <body>
     <app>
-      <input class="frmelem" (keyup.enter)="enterEntered()" name="one">
+      <input class="frmelem" preboot-events="keypress,keyup,keydown,input,change" (keyup.enter)="enterEntered()" name="one">
       <input  class="frmelem" type="checkbox" name="blahCheck" value="foo">
       <input class="frmelem" type="radio" name="choo" value="val1">
       <input class="frmelem" type="radio" name="choo" value="val2">

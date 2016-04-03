@@ -8,11 +8,11 @@ var karma = require('karma');
 module.exports = function (opts) {
 
   gulp.task('test', [
-    'jasmine',
-    'karma'
+    'test.node',
+    'test.browser'
   ]);
 
-  gulp.task('jasmine', [ 'tsc' ], function () {
+  gulp.task('test.node', [ 'tsc' ], function () {
     return gulp.src(opts.testFiles).
       pipe(jasmine({
         verbose: true,
@@ -37,7 +37,7 @@ module.exports = function (opts) {
       pipe(gulp.dest(karmaDest));
   });
 
-  gulp.task('karma', ['karma.build'], function (done) {
+  gulp.task('test.browser', ['karma.build'], function (done) {
     var karmaCode = path.join(opts.distDir, 'karma/preboot_karma.js');
     var karmaConfig = {
       port: 9201,
@@ -61,7 +61,7 @@ module.exports = function (opts) {
       autoWatch: false,
       files: [karmaCode]
     };
-    
+
     var server = new karma.Server(karmaConfig, done);
     return server.start();
   });

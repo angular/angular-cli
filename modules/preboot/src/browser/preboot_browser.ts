@@ -33,7 +33,7 @@ let state = {
 };
 
 /**
- * Once bootstrap has compled, we replay events,
+ * Once bootstrap has completed, we replay events,
  * switch buffer and then cleanup
  */
 export function complete() {
@@ -80,7 +80,7 @@ function load() {
 
   // start listening to events
   eventManager.startListening(preboot, opts);
-};
+}
 
 /**
  * Resume the completion process; if complete already called,
@@ -120,7 +120,8 @@ export function start() {
   dom.init({ window: window });
 
   // if body there, then run load handler right away, otherwise register for onLoad
-  dom.state.body ? load() : dom.onLoad(load);
+  let bodyExists = dom.state.body && Object.keys(dom.state.body).length;
+  bodyExists ? load() : dom.onLoad(load);
 
   // set up other handlers
   dom.on(opts.pauseEvent, () => state.canComplete = false);
