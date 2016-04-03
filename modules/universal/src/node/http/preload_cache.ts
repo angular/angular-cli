@@ -183,12 +183,8 @@ export class NgPreloadCacheHttp extends Http {
     .subscribe({
         next: (response) => {
           if (this.prime) {
-            let headers = {};
-            response.headers.forEach((value, name) => {
-              headers[name] = value;
-            });
-
-            let res = (<any>Object).assign({}, response, { headers });
+            let headers = response.headers.toJSON();
+            // TODO(gdi2290): fix Http to include the url
             let res = (<any>Object).assign({}, response, { headers, url });
 
             if (isPresent(currentNode)) {
