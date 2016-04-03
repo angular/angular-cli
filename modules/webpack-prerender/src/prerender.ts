@@ -1,15 +1,21 @@
 import universal = require('angular2-universal-preview');
 
 export interface IUniversalConfig {
-  preboot: boolean;
-  bootloader: any;
-  componentProviders: any[];
-  platformProviders: any[];
-  directives: any[];
-  providers: any[];
+  document?: Object;
+  template?: string;
+  directives: Array<any>;
+  providers?: Array<any>;
+  preboot?: Object | any;
+  bootloader?: any;
+  selector?: string;
+  serializedCmp?: string;
+  server?: boolean;
+  client?: boolean;
+  componentProviders?: any;
+  platformProviders?: any;
 }
 
-class Angular2Prerender {
+class Prerender {
   constructor(private options: IUniversalConfig) {}
 
   render(file) {
@@ -18,28 +24,25 @@ class Angular2Prerender {
     // bootstrap and render component to string
     var bootloader = this.options.bootloader;
     if (!this.options.bootloader) {
-      this.options.bootloader = {
-        document: universal.parseDocument(clientHtml),
-        providers: this.options.providers,
-        componentProviders: this.options.componentProviders,
-        platformProviders: this.options.platformProviders,
-        directives: this.options.directives,
-        preboot: this.options.preboot
-      };
+      let doc = universal.parseDocument(clientHtml);
+      this.options.document = doc;
+      this.options.template = this.options.template || clientHtml;
+      this.options.bootloader = this.options;
     }
     bootloader = universal.Bootloader.create(this.options.bootloader);
 
-    return bootloader.serializeApplication().then(html => new Buffer(html));
+    return bootloader.serializeApplication()
+      .then(html => new Buffer(html));
   }
 }
 
 
-export class WebpackAngular2Prerender {
+export class Angular2Prerender {
 
   private prerender;
 
   constructor(private options: IUniversalConfig) {
-    this.prerender = new Angular2Prerender(options);
+    this.prerender = new Prerender(options);
   }
 
   apply(compiler) {
@@ -49,8 +52,8 @@ export class WebpackAngular2Prerender {
       for (var file in compilation.assets) {
         if (compilation.assets.hasOwnProperty(file)) {
           this.prerender
-              .render(file)
-              .then( (buffer) => compilation.assets[file] = buffer);
+            .render(file)
+            .then( (buffer) => compilation.assets[file] = buffer);
         }
       }
 
