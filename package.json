@@ -43,8 +43,10 @@
   "bugs": {
     "url": "https://github.com/angular/universal/issues"
   },
+  "engineStrict": true,
   "engines": {
-    "node": ">= 5.4.1 < 6"
+    "node": ">= 5.4.1 < 6",
+    "npm": ">= 3"
   },
   "devDependencies": {
     "brfs": "^1.4.0",
