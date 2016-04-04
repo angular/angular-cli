@@ -1,6 +1,14 @@
 {
+  "ecmaFeatures": {
+    "modules": true,
+    "module": true
+  },
+  "env": {
+    "mocha": true,
+    "node": true,
+    "es6": true
+  },
   "parser": "espree",
-  "ecmaFeatures": {},
   "rules": {
     "no-alert": "off",
     "no-array-constructor": "off",
@@ -196,7 +204,6 @@
     "id-blacklist": "off",
     "require-jsdoc": "off",
     "require-yield": "off",
-    "semi": "off",
     "semi-spacing": "off",
     "sort-vars": "off",
     "sort-imports": "off",
