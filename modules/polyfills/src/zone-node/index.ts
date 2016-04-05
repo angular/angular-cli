@@ -6,15 +6,20 @@ const set = 'set';
 const clear = 'clear';
 const _global = typeof window === 'undefined' ? global : window;
 
-// timers
+// Timers
 const timers = require('timers');
 patchTimer(timers, set, clear, 'Timeout');
 patchTimer(timers, set, clear, 'Interval');
 patchTimer(timers, set, clear, 'Immediate');
 
-patchTimer(_global, set, clear, 'Timeout');
-patchTimer(_global, set, clear, 'Interval');
-patchTimer(_global, set, clear, 'Immediate');
+var shouldPatchGlobalTimers = global.setTimeout !== timers.setTimeout;
+
+if (shouldPatchGlobalTimers) {
+  patchTimer(_global, set, clear, 'Timeout');
+  patchTimer(_global, set, clear, 'Interval');
+  patchTimer(_global, set, clear, 'Immediate');
+}
+
 
 // zone types
 interface TaskData {
