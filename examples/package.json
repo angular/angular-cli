@@ -8,7 +8,8 @@
     "remove-modules": "rm -rf node_modules/angular2-universal node_modules/angular2-universal-polyfills node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-express-engine node_modules/angular2-hapi-engine",
     "reload": "npm run remove-modules && npm install",
     "build": "tsc || true",
-    "start": "npm run build && node dist/index.js",
+    "server": "node dist/index.js",
+    "start": "npm run build && npm run server",
     "debug": "npm run build && node-debug dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "preinstall": "typings install"
