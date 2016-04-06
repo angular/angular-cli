@@ -3,8 +3,8 @@
 var Promise = require('ember-cli/lib/ext/promise');
 var TestCommand = require('ember-cli/lib/commands/test');
 var win = require('ember-cli/lib/utilities/windows-admin');
-var BuildTask = require('ember-cli/lib/tasks/build');
-var BuildWatchTask = require('ember-cli/lib/tasks/build-watch');
+var BuildTask = require('../tasks/build');
+var BuildWatchTask = require('../tasks/build-watch');
 var TestTask = require('../tasks/test');
 
 
