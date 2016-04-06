@@ -11,8 +11,8 @@ import {<%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.
   directives: [RouterOutlet]
 })
 @RouteConfig([
-  {path:'/', name: '<%= classifiedModuleName %>List', component: <%= classifiedModuleName %>ListComponent, useAsDefault: true},
-  {path:'/:id', name: '<%= classifiedModuleName %>Detail', component: <%= classifiedModuleName %>DetailComponent}
+  {path: '/', name: '<%= classifiedModuleName %>List', component: <%= classifiedModuleName %>ListComponent, useAsDefault: true},
+  {path: '/:id', name: '<%= classifiedModuleName %>Detail', component: <%= classifiedModuleName %>DetailComponent}
 ])
 export class <%= classifiedModuleName %>Root {
   constructor() {}

@@ -19,7 +19,7 @@ export class <%= classifiedModuleName %>DetailComponent implements OnInit, CanDe
     ) { }
 
   ngOnInit() {
-    let id = +this._routeParams.get('id');
+    let id = Number(this._routeParams.get('id'));
     this._service.get(id).then(<%= camelizedModuleName %> => {
       if (<%= camelizedModuleName %>) {
         this.editName = <%= camelizedModuleName %>.name;
