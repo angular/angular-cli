@@ -1,4 +1,4 @@
-import universal = require('angular2-universal-preview');
+import universal = require('angular2-universal');
 import through = require('through2');
 var gutil = require('gutil');
 
@@ -29,14 +29,19 @@ export function prerender(options: GulpUniversalConfig | any) {
     let template: string = file.contents.toString();
 
     // bootstrap and render component to string
-    var bootloader = options.bootloader;
-    if (!options.bootloader) {
-      let doc = universal.parseDocument(template);
-      options.document = doc;
-      options.template = options.template || template;
-      options.bootloader = options;
+    const _options = options;
+    const _template = template;
+    const _Bootloader = universal.Bootloader;
+    let bootloader = _options.bootloader;
+    if (_options.bootloader) {
+      bootloader = _Bootloader.create(_options.bootloader);
+    } else {
+      let doc = _Bootloader.parseDocument(_template);
+      _options.document = doc;
+      _options.template = _options.template || _template;
+      bootloader = _Bootloader.create(options);
     }
-    bootloader = universal.Bootloader.create(options.bootloader);
+    bootloader = _Bootloader.create(options.bootloader);
 
     return bootloader.serializeApplication()
       .then(html => {

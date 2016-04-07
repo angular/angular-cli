@@ -2,7 +2,7 @@
   "name": "angular2-gulp-prerender",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.6.1",
+  "version": "0.10.0",
   "description": "Prerender your Universal (isomorphic) Angular 2 app",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -27,11 +27,11 @@
   },
   "devDependencies": {
     "preboot": "file:../preboot",
-    "angular2-universal-preview": "file:../universal",
+    "angular2-universal": "file:../universal",
     "rimraf": "^2.5.1",
-    "angular2": "2.0.0-beta.12",
+    "angular2": "2.0.0-beta.13",
     "rxjs": "~5.0.0-beta.2",
-    "zone.js": "~0.6.4",
+    "zone.js": "~0.6.10",
     "typescript": "^1.8.9"
   },
   "dependencies": {
@@ -39,6 +39,6 @@
     "through2": "^2.0.0"
   },
   "peerDependencies": {
-    "angular2-universal-preview": ">=0.85.1"
+    "angular2-universal": ">=0.90.0"
   }
 }
