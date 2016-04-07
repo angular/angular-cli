@@ -1,67 +1,134 @@
 import * as fs from 'fs';
 import * as Hoek from './ts-hoek';
 
-import {
-  renderToString,
-  applicationToString,
-  selectorResolver,
-  selectorRegExpFactory,
-  renderToStringWithPreboot,
-  serializeDocument,
-  parseDocument,
-  parseFragment,
-  Bootloader
-} from 'angular2-universal-preview';
+import {renderToString, selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal-preview';
 
-export interface hapiEngineOptions {
-  document?: string | any;
-  template?: string;
-  directives: Array<any>;
-  providers?: Array<any>;
-  async?: boolean;
-  preboot?: Object | any;
-  precache?: boolean;
-  bootloader?: any;
-  selector?: string;
-  serializedCmp?: string;
+export interface HapiEngineConfig {
   server?: boolean;
   client?: boolean;
-  componentProviders?: any;
-  platformProviders?: any;
-
+  selector?: string;
+  serializedCmp?: string;
+  bootloader?: any;
 }
 
+export type HapiEngineOptions = BootloaderConfig & HapiEngineConfig;
 
 class Runtime {
-  private renderPromise: any;
+  constructor(private options: HapiEngineOptions) {
+    this.renderPromise = renderToString;
+  }
+  render(template: string, context, done: Function) {
+    context = Hoek.applyToDefaults(context, this.options);
 
-  private prebootScript: string = `
-    <preboot>
-      <link rel="stylesheet" type="text/css" href="/preboot/preboot.css">
-      <script src="/preboot/preboot.js"></script>
-      <script>preboot.start()</script>
-    </preboot>
-  `;
+    // bootstrap and render component to string
+    var bootloader = context.bootloader;
+    if (!context.bootloader) {
+      let doc = Bootloader.parseDocument(template);
+      context.document = doc;
+      context.template = context.template || template;
+      context.bootloader = context;
+    }
+    bootloader = Bootloader.create(context.bootloader);
 
-  private angularScript: string = `
-    <!-- Browser polyfills -->
-    <script src="/node_modules/es6-shim/es6-shim.min.js"></script>
-    <script src="/node_modules/systemjs/dist/system-polyfills.js"></script>
-    <script src="/node_modules/angular2/bundles/angular2-polyfills.min.js"></script>
-    <!-- SystemJS -->
-    <script src="/node_modules/systemjs/dist/system.js"></script>
-    <!-- Angular2: Bundle -->
-    <script src="/node_modules/rxjs/bundles/Rx.js"></script>
-    <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
-    <script src="/node_modules/angular2/bundles/router.dev.js"></script>
-    <script src="/node_modules/angular2/bundles/http.dev.js"></script>
-    <script type="text/javascript">
-      System.config({
-        "baseURL": "/",
-        "defaultJSExtensions": true
+    bootloader.serializeApplication()
+      .then(html => done(null, this.buildClientScripts(html, context)))
+      .catch(e => {
+        console.error(e.stack);
+        // if server fail then return client html
+        done(null, this.buildClientScripts(template, context));
       });
+  }
+
+  private bootstrapFunction(config: any): string {
+    let systemConfig = (config && config.systemjs) || {};
+    let url = systemConfig.componentUrl;
+    return `
+    <script>
+      function bootstrap() {
+        if (this.bootstraped) return;
+        this.bootstraped = true;
+        System.import("${ url }")
+          .then(function(module) {
+            return module.main();
+          })
+          .then(function() {
+            preboot.complete();
+            var $bootstrapButton = document.getElementById("bootstrapButton");
+            if ($bootstrapButton) { $bootstrapButton.remove(); }
+          });
+      }
     </script>
   `;
+  }
+
+
+  // TODO: find better ways to configure the App initial state
+  // to pay off this technical debt
+  // currently checking for explicit values
+  private buildClientScripts(html: string, options: any): string {
+    if (!options || !options.buildClientScripts) { return html; }
+    return html
+      .replace(
+        selectorRegExpFactory('preboot'),
+        ((options.preboot === false) ? '' : this.prebootScript(options))
+      )
+      .replace(
+        selectorRegExpFactory('angular'),
+        ((options.angular === false) ? '' : this.angularScript(options))
+      )
+      .replace(
+        selectorRegExpFactory('bootstrap'),
+        ((options.bootstrap === false) ? (
+          this.bootstrapButton +
+          this.bootstrapFunction(options)
+        ) : (
+          (
+            (options.client === undefined || options.server === undefined) ?
+            '' : (options.client === false) ? '' : this.bootstrapButton
+          ) +
+          this.bootstrapFunction(options.componentUrl) +
+          ((options.client === false) ? '' : this.bootstrapApp)
+        ))
+      );
+  }
+
+  private renderPromise: any;
+
+  private prebootScript(config: any): string {
+    let baseUrl = (config && config.preboot && config.preboot.baseUrl) || '/preboot';
+    return `
+    <preboot>
+      <link rel="stylesheet" type="text/css" href="${baseUrl}/preboot.css">
+      <script src="${baseUrl}/preboot.js"></script>
+      <script>preboot.start()</script>
+    </preboot>
+    `;
+  }
+
+  private angularScript(config: any): string {
+    let systemConfig = (config && config.systemjs) || {};
+    let baseUrl = systemConfig.nodeModules || '/node_modules';
+    let newConfig = (<any>Object).assign({}, {
+        baseURL: '/',
+        defaultJSExtensions: true
+      }, systemConfig);
+    return `
+    <!-- Browser polyfills -->
+    <script src="${baseUrl}/es6-shim/es6-shim.min.js"></script>
+    <script src="${baseUrl}/systemjs/dist/system-polyfills.js"></script>
+    <script src="${baseUrl}/angular2/bundles/angular2-polyfills.min.js"></script>
+    <!-- SystemJS -->
+    <script src="${baseUrl}/systemjs/dist/system.js"></script>
+    <!-- Angular2: Bundle -->
+    <script src="${baseUrl}/rxjs/bundles/Rx.js"></script>
+    <script src="${baseUrl}/angular2/bundles/angular2.dev.js"></script>
+    <script src="${baseUrl}/angular2/bundles/router.dev.js"></script>
+    <script src="${baseUrl}/angular2/bundles/http.dev.js"></script>
+    <script type="text/javascript">
+    System.config(${ JSON.stringify(newConfig) });
+    </script>
+    `;
+  }
 
   private bootstrapButton: string = `
     <div id="bootstrapButton">
@@ -88,83 +155,6 @@ class Runtime {
       });
     </script>
   `;
-
-  constructor(private options: hapiEngineOptions) {
-    this.renderPromise = renderToString;
-  }
-  render(template: string, context, done: Function) {
-    context = Hoek.applyToDefaults(context, this.options);
-
-    // bootstrap and render component to string
-    var bootloader = context.bootloader;
-    if (!context.bootloader) {
-      let doc = Bootloader.parseDocument(template);
-      context.document = doc;
-      context.template = context.template || template;
-      context.bootloader = context;
-    }
-    bootloader = Bootloader.create(context.bootloader);
-
-    bootloader.serializeApplication()
-      .then(html => done(null, this.buildClientScripts(html, context)))
-      .catch(e => {
-        console.error(e.stack);
-        // if server fail then return client html
-        done(null, this.buildClientScripts(template, context));
-      });
-  }
-
-  private bootstrapFunction(appUrl: string): string {
-    return `
-    <script>
-      function bootstrap() {
-        if (this.bootstraped) return;
-        this.bootstraped = true;
-        System.import("${ appUrl }")
-          .then(function(module) {
-            return module.main();
-          })
-          .then(function() {
-            preboot.complete();
-            var $bootstrapButton = document.getElementById("bootstrapButton");
-            if ($bootstrapButton) { $bootstrapButton.remove(); }
-          });
-      }
-    </script>
-  `;
-  }
-
-
-  // TODO: find better ways to configure the App initial state
-  // to pay off this technical debt
-  // currently checking for explicit values
-  private buildClientScripts(html: string, options: any): string {
-    if (!options || !options.buildClientScripts) { return html; }
-    return html
-      .replace(
-        selectorRegExpFactory('preboot'),
-        ((options.preboot === false) ? '' : this.prebootScript)
-      )
-      .replace(
-        selectorRegExpFactory('angular'),
-        ((options.angular === false) ? '' : this.angularScript)
-      )
-      .replace(
-        selectorRegExpFactory('bootstrap'),
-        ((options.bootstrap === false) ? (
-          this.bootstrapButton +
-          this.bootstrapFunction(options.componentUrl)
-        ) : (
-          (
-            (options.client === undefined || options.server === undefined) ?
-            '' : (options.client === false) ? '' : this.bootstrapButton
-          ) +
-          this.bootstrapFunction(options.componentUrl) +
-          ((options.client === false) ? '' : this.bootstrapApp)
-        ))
-      );
-  }
-
 }
 
 
@@ -194,4 +184,5 @@ export class hapiEngine {
       });
     });
   }
+
 }
