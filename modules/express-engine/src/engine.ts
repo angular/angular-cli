@@ -4,12 +4,15 @@ import {DOCUMENT} from 'angular2/platform/common_dom';
 import {selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal-preview';
 
 
+export interface ExpressEngineConfig {
   server?: boolean;
   client?: boolean;
-  componentProviders?: any;
-  platformProviders?: any;
+  selector?: string;
+  serializedCmp?: string;
+  bootloader?: any;
 }
 
+export type ExpressEngineOptions = BootloaderConfig & ExpressEngineConfig;
 function prebootScript(config): string {
   let baseUrl = (config && config.preboot && config.preboot.baseUrl) || '/preboot';
   return `
