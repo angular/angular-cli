@@ -1,38 +1,35 @@
-import universal = require('angular2-universal-preview');
+import {Bootloader, BootloaderConfig} from 'angular2-universal';
 
-export interface GruntUniversalConfig {
-  document?: string | any;
-  template?: string;
-  directives: Array<any>;
-  providers?: Array<any>;
-  async?: boolean;
-  preboot?: Object | any;
-  precache?: boolean;
-  bootloader?: any;
-  selector?: string;
-  serializedCmp?: string;
+export interface GulpUniversalConfig {
   server?: boolean;
   client?: boolean;
-  componentProviders?: any;
-  platformProviders?: any;
+  selector?: string;
+  serializedCmp?: string;
+  bootloader?: any;
 }
+
+export type GulpUniversalOptions = BootloaderConfig & GulpUniversalConfig;
 
 
 export class Prerender {
-  constructor(private options: GruntUniversalConfig) {}
+  constructor(private options: GulpUniversalOptions) {}
 
   render(file) {
       let clientHtml: string = file.toString();
 
       // bootstrap and render component to string
-      var bootloader = this.options.bootloader;
-      if (!this.options.bootloader) {
-        let doc = universal.Bootloader.parseDocument(clientHtml);
-        this.options.document = doc;
-        this.options.template = this.options.template || clientHtml;
-        this.options.bootloader = this.options;
+      const _options = this.options;
+      const _template = clientHtml;
+      const _Bootloader = Bootloader;
+      let bootloader = _options.bootloader;
+      if (_options.bootloader) {
+        bootloader = _Bootloader.create(_options.bootloader);
+      } else {
+        let doc = _Bootloader.parseDocument(_template);
+        _options.document = doc;
+        _options.template = _options.template || _template;
+        bootloader = _Bootloader.create(_options);
       }
-      bootloader = universal.Bootloader.create(this.options.bootloader);
 
       return bootloader.serializeApplication().then(html => new Buffer(html));
   }

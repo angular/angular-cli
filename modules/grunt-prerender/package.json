@@ -2,7 +2,7 @@
   "name": "angular2-grunt-prerender",
   "main": "tasks/index.js",
   "typings": "tasks/index.d.js",
-  "version": "0.6.0",
+  "version": "0.10.0",
   "description": "Prerender your Universal (isomorphic) Angular 2 app with Grunt",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -29,15 +29,16 @@
     "gruntplugin",
     "angular2 grunt",
     "angular2 universal",
+    "angular 2 universal",
     "angular 2",
     "angular 2 prerender",
     "angular 2 grunt prerender"
   ],
   "devDependencies": {
     "preboot": "file:../preboot",
-    "angular2-universal-preview": "file:../universal",
+    "angular2-universal": "file:../universal",
     "rimraf": "^2.5.1",
-    "angular2": "2.0.0-beta.12",
+    "angular2": "2.0.0-beta.13",
     "rxjs": "~5.0.0-beta.2",
     "zone.js": "~0.6.4",
     "typescript": "^1.8.9"
@@ -45,6 +46,6 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "angular2-universal-preview": ">=0.85.1"
+    "angular2-universal-preview": ">=0.90.0"
   }
 }
