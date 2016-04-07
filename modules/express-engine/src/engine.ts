@@ -56,7 +56,7 @@ export function expressEngine(filePath: string, options?: ExpressEngineOptions, 
         let doc = _Bootloader.parseDocument(_template);
         _options.document = doc;
         _options.template = _options.template || _template;
-        bootloader = _Bootloader.create(options);
+        bootloader = _Bootloader.create(_options);
       }
 
       bootloader.serializeApplication()
