@@ -1,30 +1,9 @@
 import * as fs from 'fs';
-import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
-import {DOM} from 'angular2/src/platform/dom/dom_adapter';
+import {DOCUMENT} from 'angular2/platform/common_dom';
 
-import {
-  renderToString,
-  applicationToString,
-  selectorResolver,
-  selectorRegExpFactory,
-  renderToStringWithPreboot,
-  serializeDocument,
-  parseDocument,
-  parseFragment,
-  Bootloader
-} from 'angular2-universal-preview';
+import {selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal-preview';
 
-export interface expressEngineOptions {
-  document?: string | any;
-  template?: string;
-  directives: Array<any>;
-  providers?: Array<any>;
-  async?: boolean;
-  preboot?: Object | any;
-  precache?: boolean;
-  bootloader?: any;
-  selector?: string;
-  serializedCmp?: string;
+
   server?: boolean;
   client?: boolean;
   componentProviders?: any;
