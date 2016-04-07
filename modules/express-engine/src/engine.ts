@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import {DOCUMENT} from 'angular2/platform/common_dom';
 
-import {selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal-preview';
+import {selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal';
 
 
 export interface ExpressEngineConfig {
@@ -47,14 +47,16 @@ export function expressEngine(filePath: string, options?: ExpressEngineOptions, 
 
       // bootstrap and render component to string
       const _options = options;
+      const _template = clientHtml;
+      const _Bootloader = Bootloader;
       let bootloader = _options.bootloader;
       if (_options.bootloader) {
-        bootloader = Bootloader.create(_options.bootloader);
+        bootloader = _Bootloader.create(_options.bootloader);
       } else {
-        let doc = Bootloader.parseDocument(clientHtml);
+        let doc = _Bootloader.parseDocument(_template);
         _options.document = doc;
-        _options.template = _options.template || clientHtml;
-        bootloader = Bootloader.create(options);
+        _options.template = _options.template || _template;
+        bootloader = _Bootloader.create(options);
       }
 
       bootloader.serializeApplication()
