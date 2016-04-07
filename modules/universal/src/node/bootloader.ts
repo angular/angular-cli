@@ -7,12 +7,12 @@ import {Http} from 'angular2/http';
 import {buildReflector, buildNodeProviders, buildNodeAppProviders} from './platform/node';
 import {parseDocument, parseFragment, serializeDocument} from './platform/document';
 import {createPrebootCode} from './ng_preboot';
-// import {waitRouter} from './render';
 import {arrayFlattenTree} from './helper';
 
 export interface BootloaderConfig {
   template?: any;
   document?: any;
+
   platformProviders?: Array<any>;
   providers?: Array<any>;
   componentProviders?: Array<any>;
@@ -23,28 +23,10 @@ export interface BootloaderConfig {
   primeCache?: boolean;
   async?: boolean;
   prime?: boolean;
+  bootloader?: Bootloader | any;
   ngOnInit?: Function;
   ngOnStable?: Function;
   ngOnRendered?: Function;
-}
-
-function checkProviders(providers) {
-  let lastProviders = [];
-  for (let i = 0; i < providers.length; ++i) {
-    let provide = providers[i];
-    if (!provide) {
-      console.log('undefined provider', providers);
-      // lastProviders.push(providers[i-1].name);
-    }
-    // else if (!provide.token) {
-    //   console.log('undefined token', provide);
-    //   lastProviders.push(providers[i-1].name);
-    // }
-  }
-  if (lastProviders.length) {
-    console.log('PROVIDERS ERRORS', lastProviders);
-  }
-  return providers;
 }
 
 export class Bootloader {
@@ -84,7 +66,7 @@ export class Bootloader {
 
   platform(providers?: any): PlatformRef {
     let pro = providers || this._config.platformProviders;
-    return platform(checkProviders(buildNodeProviders(pro)));
+    return platform(buildNodeProviders(pro));
   }
 
   application(document?: any, providers?: any): ApplicationRef {
