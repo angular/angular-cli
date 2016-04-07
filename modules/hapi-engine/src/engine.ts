@@ -1,7 +1,12 @@
 import * as fs from 'fs';
-import * as Hoek from './ts-hoek';
+import * as TsHoek from './ts-hoek';
 
-import {renderToString, selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal';
+import {
+  renderToString,
+  selectorRegExpFactory,
+  Bootloader,
+  BootloaderConfig
+} from 'angular2-universal';
 
 export interface HapiEngineConfig {
   server?: boolean;
@@ -18,17 +23,21 @@ class Runtime {
     this.renderPromise = renderToString;
   }
   render(template: string, context, done: Function) {
-    context = Hoek.applyToDefaults(context, this.options);
+    context = TsHoek.applyToDefaults(context, this.options);
 
     // bootstrap and render component to string
-    var bootloader = context.bootloader;
-    if (!context.bootloader) {
-      let doc = Bootloader.parseDocument(template);
-      context.document = doc;
-      context.template = context.template || template;
-      context.bootloader = context;
+    const _options = this.options;
+    const _template = template;
+    const _Bootloader = Bootloader;
+    let bootloader = _options.bootloader;
+    if (_options.bootloader) {
+      bootloader = _Bootloader.create(_options.bootloader);
+    } else {
+      let doc = _Bootloader.parseDocument(_template);
+      _options.document = doc;
+      _options.template = _options.template || _template;
+      bootloader = _Bootloader.create(_options);
     }
-    bootloader = Bootloader.create(context.bootloader);
 
     bootloader.serializeApplication()
       .then(html => done(null, this.buildClientScripts(html, context)))

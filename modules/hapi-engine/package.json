@@ -16,6 +16,7 @@
     "reload": "npm run remove-modules && npm install",
     "prebuild": "rm -rf dist",
     "build": "tsc || true",
+    "postbuild": "typings install",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -29,6 +30,7 @@
     "angular2-universal": "file:../universal",
     "preboot": "file:../preboot",
     "rxjs": "5.0.0-beta.2",
+    "zone.js": "~0.6.10",
     "angular2": "2.0.0-beta.13",
     "rimraf": "^2.5.2",
     "typescript": "^1.8.9"
