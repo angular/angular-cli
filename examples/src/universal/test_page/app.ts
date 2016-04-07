@@ -7,7 +7,6 @@ import 'rxjs/add/operator/delay';
 
 const URL = 'http://127.0.0.1:3000';
 
-
 function transformData(data) {
   if (data.hasOwnProperty('created_at')) {
     data.created_at = new Date(data.created_at);
@@ -17,11 +16,16 @@ function transformData(data) {
 
 @Component({
  selector: 'my-app',
- template: `<h1>HELLO WORLD</h1>`
+ template: `
+ <h1>HELLO WORLD</h1>
+ `
 
 })
 export class MyApp {
-
+  constructor() {
+  }
+  ngOnInit() {
+  }
 
 }
 
