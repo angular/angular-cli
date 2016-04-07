@@ -1,6 +1,6 @@
 {
-  "name": "angular2-universal-preview",
-  "version": "0.86.1",
+  "name": "angular2-universal",
+  "version": "0.90.0",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -32,7 +32,7 @@
     "prepublish": "npm run build"
   },
   "devDependencies": {
-    "angular2-universal-preview": "file:.",
+    "angular2-universal": "file:.",
     "angular2-universal-polyfills": "file:../polyfills",
     "angular2-express-engine": "file:../express-engine",
     "angular2-hapi-engine": "file:../hapi-engine",
@@ -58,8 +58,8 @@
   "peerDependencies": {
     "preboot": ">=2.0.4",
     "angular2-universal-polyfills": ">=0.3.2",
-    "angular2-express-engine": ">=0.9.0",
-    "angular2-hapi-engine": ">=0.7.2",
+    "angular2-express-engine": ">=0.10.0",
+    "angular2-hapi-engine": ">=0.10.0",
     "rxjs": "~5.0.0-beta.2",
     "angular2": "2.0.0-beta.12 - 2.0.0-beta.13",
     "zone.js": "~0.6.10",
