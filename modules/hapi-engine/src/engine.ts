@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as Hoek from './ts-hoek';
 
-import {renderToString, selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal-preview';
+import {renderToString, selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal';
 
 export interface HapiEngineConfig {
   server?: boolean;
