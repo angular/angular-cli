@@ -13,6 +13,116 @@ export interface ExpressEngineConfig {
 }
 
 export type ExpressEngineOptions = BootloaderConfig & ExpressEngineConfig;
+
+export function expressEngine(filePath: string, options?: ExpressEngineOptions, done?: Function) {
+  // defaults
+  options = options || <ExpressEngineOptions>{};
+  options.providers = options.providers || undefined;
+  options.preboot   = options.preboot   || undefined;
+
+  if ('App' in options) {
+    throw new Error('Please provide an `directives` property with your Angular 2 application rather than `App`');
+  }
+
+  if (!('directives' in options)) {
+    throw new Error('Please provide an `directives` property with your Angular 2 application');
+  }
+
+  // read file on disk
+  try {
+    fs.readFile(filePath, (err, content) => {
+
+      if (err) { return done(err); }
+
+      // convert to string
+      const clientHtml: string = content.toString();
+
+      // TODO: better build scripts abstraction
+      if (options.server === false && options.client === false) {
+        return done(null, clientHtml);
+      }
+      if (options.server === false && options.client !== false) {
+        return done(null, buildClientScripts(clientHtml, options));
+      }
+
+      // bootstrap and render component to string
+      const _options = options;
+      let bootloader = _options.bootloader;
+      if (_options.bootloader) {
+        bootloader = Bootloader.create(_options.bootloader);
+      } else {
+        let doc = Bootloader.parseDocument(clientHtml);
+        _options.document = doc;
+        _options.template = _options.template || clientHtml;
+        bootloader = Bootloader.create(options);
+      }
+
+      bootloader.serializeApplication()
+        .then(html => done(null, buildClientScripts(html, options)))
+        .catch(e => {
+          console.error(e.stack);
+          // if server fail then return client html
+          done(null, buildClientScripts(clientHtml, options));
+        });
+    });
+  } catch (e) {
+    done(e);
+  }
+};
+
+export function ng2engine(filePath: string, options: ExpressEngineOptions, done: Function) {
+  console.warn('DEPRECATION WARNING: `ng2engine` is no longer supported and will be removed in next release. use `expressEngine`');
+  return expressEngine(filePath, options, done);
+};
+
+export function ng2Engine(filePath: string, options: ExpressEngineOptions, done: Function) {
+  console.warn('DEPRECATION WARNING: `ng2Engine` is no longer supported and will be removed in next release. use `expressEngine`');
+  return expressEngine(filePath, options, done);
+};
+export function ng2ExpressEngine(filePath: string, options: ExpressEngineOptions, done: Function) {
+  console.warn('DEPRECATION WARNING: `ng2ExpressEngine` is no longer supported and will be removed in next release. use `expressEngine`');
+  return expressEngine(filePath, options, done);
+};
+
+export function simpleReplace(filePath: string, options: ExpressEngineOptions, done: Function) {
+  // defaults
+  options = options || <ExpressEngineOptions>{};
+
+  // read file on disk
+  try {
+    fs.readFile(filePath, (err, content) => {
+
+      if (err) { return done(err); }
+
+      // convert to string
+      var clientHtml: string = content.toString();
+
+      // TODO: better build scripts abstraction
+      if (options.server === false && options.client === false) {
+        return done(null, clientHtml);
+      }
+      if (options.server === false && options.client !== false) {
+        return done(null, buildClientScripts(clientHtml, options));
+      }
+      // selector replacer explained here
+      // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
+      // replace our component with serialized version
+
+      let rendered: string = clientHtml.replace(
+        // <selector></selector>
+        selectorRegExpFactory(options.selector),
+        // <selector>{{ serializedCmp }}</selector>
+        options.serializedCmp
+      );
+
+      done(null, buildClientScripts(rendered, options));
+    });
+  } catch (e) {
+    done(e);
+  }
+}
+
+
 function prebootScript(config): string {
   let baseUrl = (config && config.preboot && config.preboot.baseUrl) || '/preboot';
   return `
@@ -125,110 +235,4 @@ function buildClientScripts(html: string, options: any): string {
         ((options.client === false) ? '' : bootstrapApp)
       ))
     );
-}
-
-export function expressEngine(filePath: string, options: expressEngineOptions, done: Function) {
-  // defaults
-  options = options || <expressEngineOptions>{};
-  options.providers = options.providers || undefined;
-  options.preboot   = options.preboot   || undefined;
-
-  if ('App' in options) {
-    throw new Error('Please provide an `directives` property with your Angular 2 application rather than `App`');
-  }
-
-  if (!('directives' in options)) {
-    throw new Error('Please provide an `directives` property with your Angular 2 application');
-  }
-
-  // read file on disk
-  try {
-    fs.readFile(filePath, (err, content) => {
-
-      if (err) { return done(err); }
-
-      // convert to string
-      const clientHtml: string = content.toString();
-
-      // TODO: better build scripts abstraction
-      if (options.server === false && options.client === false) {
-        return done(null, clientHtml);
-      }
-      if (options.server === false && options.client !== false) {
-        return done(null, buildClientScripts(clientHtml, options));
-      }
-
-      // bootstrap and render component to string
-      var bootloader = options.bootloader;
-      if (!options.bootloader) {
-        let doc = Bootloader.parseDocument(clientHtml);
-        options.document = doc;
-        options.template = options.template || clientHtml;
-        options.bootloader = options;
-      }
-      bootloader = Bootloader.create(options.bootloader);
-
-      bootloader.serializeApplication()
-        .then(html => done(null, buildClientScripts(html, options)))
-        .catch(e => {
-          console.error(e.stack);
-          // if server fail then return client html
-          done(null, buildClientScripts(clientHtml, options));
-        });
-    });
-  } catch (e) {
-    done(e);
-  }
-};
-
-export function ng2engine(filePath: string, options: expressEngineOptions, done: Function) {
-  console.warn('DEPRECATION WARNING: `ng2engine` is no longer supported and will be removed in next release. use `expressEngine`');
-  return expressEngine(filePath, options, done);
-};
-
-export function ng2Engine(filePath: string, options: expressEngineOptions, done: Function) {
-  console.warn('DEPRECATION WARNING: `ng2Engine` is no longer supported and will be removed in next release. use `expressEngine`');
-  return expressEngine(filePath, options, done);
-};
-export function ng2ExpressEngine(filePath: string, options: expressEngineOptions, done: Function) {
-  console.warn('DEPRECATION WARNING: `ng2ExpressEngine` is no longer supported and will be removed in next release. use `expressEngine`');
-  return expressEngine(filePath, options, done);
-};
-
-export function simpleReplace(filePath: string, options: expressEngineOptions, done: Function) {
-  // defaults
-  options = options || <expressEngineOptions>{};
-
-  // read file on disk
-  try {
-    fs.readFile(filePath, (err, content) => {
-
-      if (err) { return done(err); }
-
-      // convert to string
-      var clientHtml: string = content.toString();
-
-      // TODO: better build scripts abstraction
-      if (options.server === false && options.client === false) {
-        return done(null, clientHtml);
-      }
-      if (options.server === false && options.client !== false) {
-        return done(null, buildClientScripts(clientHtml, options));
-      }
-      // selector replacer explained here
-      // https://gist.github.com/gdi2290/c74afd9898d2279fef9f
-      // replace our component with serialized version
-
-      let rendered: string = clientHtml.replace(
-        // <selector></selector>
-        selectorRegExpFactory(options.selector),
-        // <selector>{{ serializedCmp }}</selector>
-        options.serializedCmp
-      );
-
-      done(null, buildClientScripts(rendered, options));
-    });
-  } catch (e) {
-    done(e);
-  }
 }
