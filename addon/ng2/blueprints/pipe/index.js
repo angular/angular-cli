@@ -1,7 +1,12 @@
+var path = require('path');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 
 module.exports = {
   description: '',
+  
+  availableOptions: [
+    { name: 'flat', type: Boolean, default: false, aliases: ['f'] }
+  ],
 
   normalizeEntityName: function (entityName) {
     var parsedPath = dynamicPathParser(this.project, entityName);
@@ -10,18 +15,22 @@ module.exports = {
     return parsedPath.name;
   },
 
-  locals: function () {
-    return { dynamicPath: this.dynamicPath.dir };
+  locals: function (options) {
+    return { 
+      dynamicPath: this.dynamicPath.dir,
+      flat: options.flat
+    };
   },
 
-  fileMapTokens: function () {
+  fileMapTokens: function (options) {
     // Return custom template variables here.
     return {
-      __name__: () => {
-        return this.dynamicPath.name;
-      },
       __path__: () => {
-        return this.dynamicPath.dir;
+        var dir = this.dynamicPath.dir;
+        if (!options.locals.flat) {
+          dir += path.sep + options.dasherizedModuleName;
+        }
+        return dir;
       }
     };
   }

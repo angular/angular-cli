@@ -12,7 +12,6 @@ import {
 import {provide} from 'angular2/core';
 import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
 
-
 describe('<%= classifiedModuleName %> Component', () => {
 
   beforeEachProviders((): any[] => []);
