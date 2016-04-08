@@ -123,7 +123,7 @@ with two sub-routes. The file structure will be as follows:
 ...
 ```
 
-By default the cli will add the import statements for HeroList and HeroDetail to 
+By default the cli will add the import statements for HeroList and HeroDetail to
 `hero-root.component.ts`:
 
 ```
@@ -148,7 +148,7 @@ export const CliRouteConfig = [
 Visiting `http://localhost:4200/hero` will show the hero list.
 
 
-There is an optional flag for `skip-router-generation` which will not add the route to the `CliRouteConfig` for the application. 
+There is an optional flag for `skip-router-generation` which will not add the route to the `CliRouteConfig` for the application.
 
 ### Creating a build
 
@@ -166,7 +166,7 @@ ng test
 
 Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html)
 
-If run with the watch argument `--watch` (shorthand `-w`) builds will run when source files have changed 
+If run with the watch argument `--watch` (shorthand `-w`) builds will run when source files have changed
 and tests will run after each successful build
 
 
@@ -183,16 +183,25 @@ End-to-end tests are ran via [Protractor](https://angular.github.io/protractor/)
 
 ### Deploying the app via GitHub Pages
 
-The CLI currently comes bundled with [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages).
-
-This means that you can deploy your apps quickly via:
+You can deploy your apps quickly via:
 
 ```
-git commit -a -m "final tweaks before deployment - what could go wrong?"
-ng github-pages:deploy
+ng github-pages:deploy --message "Optional commit message"
 ```
 
-Checkout [angular-cli-github-pages addon](https://github.com/IgorMinar/angular-cli-github-pages) docs for more info.
+This will do the following:
+
+- creates GitHub repo for the current project if one doesn't exist
+- rebuilds the app at the current `HEAD`
+- creates a local `gh-pages` branch if one doesn't exist
+- moves your app to the `gh-pages` branch and creates a commit
+- edit the base tag in index.html to support github pages
+- pushes the `gh-pages` branch to github
+- returns back to the original `HEAD`
+
+Creating the repo requires a token from github, and the remaining functionality
+relies on ssh authentication for all git operations that communicate with github.com.
+To simplify the authentication, be sure to [setup your ssh keys](https://help.github.com/articles/generating-ssh-keys/).
 
 ### Linting and formatting code
 
@@ -200,15 +209,6 @@ You can lint or format your app code by running `ng lint` or `ng format` respect
 This will use the `lint`/`format` npm script that in generated projects uses `tslint`/`clang-format`.
 
 You can modify the these scripts in `package.json` to run whatever tool you prefer.
-
-
-### Formatting code
-
-You can format your app code by running `ng format`.
-This will use the `format` npm script that in generated projects uses `clang-format`.
-
-You can modify the `format` script in `package.json` to run whatever formatting tool
-you prefer and `ng format` will still run it.
 
 ### Support for offline applications
 
