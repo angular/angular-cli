@@ -28,7 +28,7 @@
   "devDependencies": {
     "angular2": "2.0.0-beta.13",
     "rxjs": "5.0.0-beta.2",
-    "typescript": "^1.8.7",
+    "typescript": "^1.8.9",
     "angular2-universal": "file:../universal",
     "preboot": "file:../preboot"
   },
