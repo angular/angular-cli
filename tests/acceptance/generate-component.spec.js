@@ -32,14 +32,14 @@ describe('Acceptance: ng generate component', function () {
 
   it('ng generate component my-comp', function () {
     return ng(['generate', 'component', 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate component test' + path.sep + 'my-comp', function () {
     return ng(['generate', 'component', 'test' + path.sep + 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-comp', 'my-comp.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-comp', 'my-comp.component.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
@@ -47,7 +47,7 @@ describe('Acceptance: ng generate component', function () {
   it('ng generate component test' + path.sep + '..' + path.sep + 'my-comp', function () {
     return ng(['generate', 'component', 'test' + path.sep + '..' + path.sep + 'my-comp'])
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.ts');
         expect(existsSync(testPath)).to.equal(true);
       });
   });
@@ -65,7 +65,7 @@ describe('Acceptance: ng generate component', function () {
         return ng(['generate', 'component', 'my-comp'])
       })
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-comp', 'my-comp.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-comp', 'my-comp.component.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -84,7 +84,7 @@ describe('Acceptance: ng generate component', function () {
       })
       .then(() => {
         var testPath = path.join(
-          root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir', 'my-comp', 'my-comp.ts');
+          root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir', 'my-comp', 'my-comp.component.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -106,7 +106,7 @@ describe('Acceptance: ng generate component', function () {
         })
         .then(() => {
           var testPath =
-            path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-comp', 'my-comp.ts');
+            path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-comp', 'my-comp.component.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
@@ -126,14 +126,14 @@ describe('Acceptance: ng generate component', function () {
           return ng(['generate', 'component', path.sep + 'my-comp'])
         })
         .then(() => {
-          var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.ts');
+          var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
 
   it('ng generate component ..' + path.sep + 'my-comp from root dir will fail', () => {
     return ng(['generate', 'component', '..' + path.sep + 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-comp', 'my-comp.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-comp', 'my-comp.component.ts');
       expect(existsSync(testPath)).to.equal(false);
     });
   });

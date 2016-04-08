@@ -1,11 +1,7 @@
 import {Directive} from 'angular2/core';
 
-
 @Directive({
-  selector: '<%= dasherizedModuleName %>',
-  providers: [],
-  host: {},
-  
+  selector: '<%= rawEntityName %>'
 })
 export class <%= classifiedModuleName %> {
 

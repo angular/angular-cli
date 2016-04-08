@@ -32,21 +32,21 @@ describe('Acceptance: ng generate service', function () {
 
   it('ng generate service my-svc', function () {
     return ng(['generate', 'service', 'my-svc']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-svc', 'my-svc.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-svc.service.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate service test' + path.sep + 'my-svc', function () {
     return ng(['generate', 'service', 'test' + path.sep + 'my-svc']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-svc', 'my-svc.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-svc.service.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate service test' + path.sep + '..' + path.sep + 'my-svc', function () {
     return ng(['generate', 'service', 'test' + path.sep + '..' + path.sep + 'my-svc']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-svc', 'my-svc.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-svc.service.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
@@ -65,7 +65,7 @@ describe('Acceptance: ng generate service', function () {
         return ng(['generate', 'service', 'my-svc'])
       })
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-svc', 'my-svc.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-svc.service.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -85,7 +85,7 @@ describe('Acceptance: ng generate service', function () {
       })
       .then(() => {
         var testPath = path.join(
-          root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir', 'my-svc', 'my-svc.ts');
+          root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir', 'my-svc.service.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -107,7 +107,7 @@ describe('Acceptance: ng generate service', function () {
         })
         .then(() => {
           var testPath =
-            path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-svc', 'my-svc.ts');
+            path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-svc.service.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
@@ -128,14 +128,14 @@ describe('Acceptance: ng generate service', function () {
           return ng(['generate', 'service', path.sep + 'my-svc'])
         })
         .then(() => {
-          var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-svc', 'my-svc.ts');
+          var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-svc.service.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
 
   it('ng generate service ..' + path.sep + 'my-svc from root dir will fail', () => {
     return ng(['generate', 'service', '..' + path.sep + 'my-svc']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-svc', 'my-svc.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-svc.service.ts');
       expect(existsSync(testPath)).to.equal(false);
     });
   });

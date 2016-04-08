@@ -4,14 +4,22 @@ module.exports = {
   description: '',
 
   locals: function(options) {
-    // Return custom template variables here.
+    //TODO: pull value from config
+    this.styleExt = 'css';
+    
     return {
       htmlComponentName: stringUtils.dasherize(options.entity.name),
-      jsComponentName: stringUtils.classify(options.entity.name)
+      jsComponentName: stringUtils.classify(options.entity.name),
+      styleExt: this.styleExt
+    };
+  },
+  
+  fileMapTokens: function (options) {
+    // Return custom template variables here.
+    return {
+      __styleext__: () => {
+        return options.locals.styleExt;
+      }
     };
   }
-
-  // afterInstall: function(options) {
-  //   // Perform extra work here.
-  // }
 };

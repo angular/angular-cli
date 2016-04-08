@@ -38,6 +38,10 @@ module.exports = function dynamicPathParser(project, entityName) {
   var adjustedPath = outputPath.replace(projectRoot, '');
 
   var parsedPath = path.parse(adjustedPath);
+  
+  if (parsedPath.dir.indexOf(path.sep) === 0) {
+    parsedPath.dir = parsedPath.dir.substr(1);
+  }
 
   parsedPath.dir = parsedPath.dir === path.sep ? '' : parsedPath.dir;
   parsedPath.appRoot = appRoot

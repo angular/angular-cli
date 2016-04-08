@@ -4,7 +4,7 @@ var expect = require('chai').expect;
 var path = require('path');
 var dynamicPathParser = require('../../addon/ng2/utilities/dynamic-path-parser');
 
-var appDir = `${path.sep}src${path.sep}client${path.sep}app`;
+var appDir = `src${path.sep}client${path.sep}app`;
 
 describe('dynamic path parser', () => {
   var project;

@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli/lib/utilities/string');
+const Blueprint = require('ember-cli/lib/models/blueprint');
 
 
 module.exports = {
@@ -11,8 +12,16 @@ module.exports = {
 
   availableOptions: [
     { name: 'skip-router-generation', type: Boolean, default: false, aliases: ['srg'] },
-    { name: 'default', type: Boolean, default: false }
+    { name: 'default', type: Boolean, default: false },
+    { name: 'lazy', type: Boolean, default: true }
   ],
+  
+  beforeInstall: function(options) {
+    if (options.lazy) {
+      options.isLazyRoute = true;
+    }
+    return Blueprint.load(path.join(__dirname, '..', 'component')).install(options);
+  },
 
   afterInstall: function (options) {
     if (!options.skipRouterGeneration) {
@@ -28,7 +37,9 @@ module.exports = {
     var parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
-    return parsedPath.name;
+    
+    //leave the entity name intact for component generation
+    return entityName;
   },
 
   locals: function () {
@@ -72,10 +83,9 @@ module.exports = {
 
     const jsComponentName = stringUtils.classify(options.entity.name);
     const base = parsedPath.base;
-    const name = parsedPath.name;
 
     let content = fs.readFileSync(parentFile, 'utf-8');
-    const importTemplate = `import {${jsComponentName}} from './${base}/${name}';\n`;
+    const importTemplate = `import {${jsComponentName}} from './+${base}`;
     if (content.indexOf(importTemplate) == -1) {
       // Not found, nothing to do.
       return;
@@ -99,11 +109,10 @@ module.exports = {
 
     const jsComponentName = stringUtils.classify(options.entity.name);
     const base = parsedPath.base;
-    const name = parsedPath.name;
 
     // Insert the import statement.
     let content = fs.readFileSync(parentFile, 'utf-8');
-    const importTemplate = `import {${jsComponentName}} from './${base}/${name}';`;
+    const importTemplate = `import {${jsComponentName}Component} from './+${base}';`;
 
     if (content.indexOf(importTemplate) != -1) {
       // Already there, do nothing.
@@ -115,7 +124,7 @@ module.exports = {
       return `${m1}\n${importTemplate}\n`;
     });
 
-    let route = `{path: '/${base}/...', name: '${jsComponentName}', component: ${jsComponentName}},`;
+    let route = `{path: '/${base}/...', name: '${jsComponentName}', component: ${jsComponentName}Component},`;
     content = content.replace(/(@RouteConfig\(\[\s*\n)([\s\S\n]*?)(^\s*\]\))/m, function(_, m1, m2, m3) {
       if (m2.length) {
         // Add a `,` if there's none.

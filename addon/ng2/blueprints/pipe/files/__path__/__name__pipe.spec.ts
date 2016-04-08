@@ -10,7 +10,7 @@ import {
   beforeEachProviders
 } from 'angular2/testing';
 import {provide} from 'angular2/core';
-import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>';
+import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.pipe';
 
 
 describe('<%= classifiedModuleName %> Pipe', () => {

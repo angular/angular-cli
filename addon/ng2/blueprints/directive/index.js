@@ -5,20 +5,22 @@ module.exports = {
   description: '',
   
   availableOptions: [
-    { name: 'flat', type: Boolean, default: false, aliases: ['f'] }
+    { name: 'flat', type: Boolean, default: false }
   ],
 
   normalizeEntityName: function (entityName) {
     var parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
+    this.rawEntityName = parsedPath.name;
     return parsedPath.name;
   },
 
   locals: function (options) {
     return {
       dynamicPath: this.dynamicPath.dir,
-      flat: options.flat
+      flat: options.flat,
+      rawEntityName: this.rawEntityName
     };
   },
 
