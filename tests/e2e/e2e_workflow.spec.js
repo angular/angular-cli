@@ -203,8 +203,8 @@ describe('Basic end-to-end Workflow', function () {
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
       let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.css');
-      let scssFile = path.join(componentPath, 'test-component.scss');
+      let cssFile = path.join(componentPath, 'test-component.component.css');
+      let scssFile = path.join(componentPath, 'test-component.component.scss');
 
       expect(existsSync(componentPath)).to.be.equal(true);
       sh.mv(cssFile, scssFile);
@@ -214,7 +214,7 @@ describe('Basic end-to-end Workflow', function () {
       fs.writeFileSync(scssFile, scssExample, 'utf8');
 
       sh.exec('ng build --silent');
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
+      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
@@ -238,8 +238,8 @@ describe('Basic end-to-end Workflow', function () {
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
       let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.css');
-      let lessFile = path.join(componentPath, 'test-component.less');
+      let cssFile = path.join(componentPath, 'test-component.component.css');
+      let lessFile = path.join(componentPath, 'test-component.component.less');
 
       expect(existsSync(componentPath)).to.be.equal(true);
       sh.mv(cssFile, lessFile);
@@ -249,7 +249,7 @@ describe('Basic end-to-end Workflow', function () {
       fs.writeFileSync(lessFile, lessExample, 'utf8');
 
       sh.exec('ng build --silent');
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
+      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
@@ -273,8 +273,8 @@ describe('Basic end-to-end Workflow', function () {
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
       let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.css');
-      let stylusFile = path.join(componentPath, 'test-component.styl');
+      let cssFile = path.join(componentPath, 'test-component.component.css');
+      let stylusFile = path.join(componentPath, 'test-component.component.styl');
 
       sh.mv(cssFile, stylusFile);
       expect(existsSync(stylusFile)).to.be.equal(true);
@@ -283,7 +283,7 @@ describe('Basic end-to-end Workflow', function () {
       fs.writeFileSync(stylusFile, stylusExample, 'utf8');
 
       sh.exec('ng build --silent');
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
+      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');

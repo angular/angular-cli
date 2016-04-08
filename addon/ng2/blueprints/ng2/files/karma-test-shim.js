@@ -1,49 +1,59 @@
 /*global jasmine, __karma__, window*/
 Error.stackTraceLimit = Infinity;
-
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
 
 __karma__.loaded = function () {
 };
 
-System.config({
-  packages: {
-    'base/dist/app': {
-      defaultExtension: false,
-      format: 'register',
-      map: Object.keys(window.__karma__.files)
-        .filter(onlyAppFiles)
-        .reduce(function (pathsMapping, appPath) {
-          var moduleName = appPath.replace(/^\/base\/dist\/app\//, './').replace(/\.js$/, '');
-          pathsMapping[moduleName] = appPath + '?' + window.__karma__.files[appPath];
-          return pathsMapping;
-        }, {})
+var distPath = '/base/dist/';
+var appPath = distPath + 'app/';
+
+function isJsFile(path) {
+  return path.slice(-3) == '.js';
+}
+
+function isSpecFile(path) {
+  return path.slice(-8) == '.spec.js';
+}
+
+function isAppFile(path) {
+  return isJsFile(path) && (path.substr(0, appPath.length) == appPath);
+}
+
+var allSpecFiles = Object.keys(window.__karma__.files)
+  .filter(isSpecFile)
+  .filter(isAppFile);
+
+// Load our SystemJS configuration.
+System.import('base/dist/system-config.js').then(function(systemJsConfig) {
+  // We need to add the distPrefix to our system config packages.
+  var config = systemJsConfig.config;
+  Object.keys(config.packages).forEach(function(pkgName) {
+    if (pkgName[0] != '/' && pkgName[0] != '.') {
+      var pkg = config.packages[pkgName];
+      delete config.packages[pkgName];
+      config.packages[distPath + pkgName] = pkg;
     }
-  }
-});
-
-System.import('angular2/testing').then(function (testing) {
-  return System.import('angular2/platform/testing/browser').then(function (providers) {
-    testing.setBaseTestProviders(providers.TEST_BROWSER_PLATFORM_PROVIDERS,
-      providers.TEST_BROWSER_APPLICATION_PROVIDERS);
   });
-}).then(function () {
+
+  System.config(config);
+}).then(function() {
+  // Load and configure the TestComponentBuilder.
+  return Promise.all([
+    System.import('angular2/testing'),
+    System.import('angular2/platform/testing/browser')
+  ]).then(function (providers) {
+    var testing = providers[0];
+    var testingBrowser = providers[1];
+
+    testing.setBaseTestProviders(testingBrowser.TEST_BROWSER_PLATFORM_PROVIDERS,
+      testingBrowser.TEST_BROWSER_APPLICATION_PROVIDERS);
+  });
+}).then(function() {
+  // Finally, load all spec files.
+  // This will run the tests directly.
   return Promise.all(
-    Object.keys(window.__karma__.files)
-      .filter(onlySpecFiles)
-      .map(function (moduleName) {
-        return System.import(moduleName);
-      }));
-}).then(function () {
-  __karma__.start();
-}, function (error) {
-  __karma__.error(error.stack || error);
-});
-
-function onlyAppFiles(filePath) {
-  return /^\/base\/dist\/app\/(?!.*\.spec\.js$)([a-z0-9-_\.\/]+)\.js$/.test(filePath);
-}
-
-function onlySpecFiles(path) {
-  return /\.spec\.js$/.test(path);
-}
+    allSpecFiles.map(function (moduleName) {
+      return System.import(moduleName);
+    }));
+}).then(__karma__.start, __karma__.error);

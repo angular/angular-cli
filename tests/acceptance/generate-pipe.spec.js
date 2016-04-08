@@ -32,21 +32,21 @@ describe('Acceptance: ng generate pipe', function () {
 
   it('ng generate pipe my-pipe', function () {
     return ng(['generate', 'pipe', 'my-pipe']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-pipe', 'my-pipe.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-pipe.pipe.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate pipe test' + path.sep + 'my-pipe', function () {
     return ng(['generate', 'pipe', 'test' + path.sep + 'my-pipe']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-pipe', 'my-pipe.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-pipe.pipe.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate pipe test' + path.sep + '..' + path.sep + 'my-pipe', function () {
     return ng(['generate', 'pipe', 'test' + path.sep + '..' + path.sep + 'my-pipe']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-pipe', 'my-pipe.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-pipe.pipe.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
@@ -65,7 +65,7 @@ describe('Acceptance: ng generate pipe', function () {
         return ng(['generate', 'pipe', 'my-pipe'])
       })
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-pipe', 'my-pipe.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-pipe.pipe.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -85,7 +85,7 @@ describe('Acceptance: ng generate pipe', function () {
       })
       .then(() => {
         var testPath = path.join(
-          root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir', 'my-pipe', 'my-pipe.ts');
+          root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir', 'my-pipe.pipe.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -104,7 +104,7 @@ describe('Acceptance: ng generate pipe', function () {
         return ng(['generate', 'pipe', 'child-dir' + path.sep + '..' + path.sep + 'my-pipe'])
       })
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-pipe', 'my-pipe.ts');
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-pipe.pipe.ts');
         expect(existsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
@@ -125,14 +125,14 @@ describe('Acceptance: ng generate pipe', function () {
           return ng(['generate', 'pipe', path.sep + 'my-pipe'])
         })
         .then(() => {
-          var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-pipe', 'my-pipe.ts');
+          var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-pipe.pipe.ts');
           expect(existsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
 
   it('ng generate pipe ..' + path.sep + 'my-pipe from root dir will fail', () => {
     return ng(['generate', 'pipe', '..' + path.sep + 'my-pipe']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-pipe', 'my-pipe.ts');
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-pipe.pipe.ts');
       expect(existsSync(testPath)).to.equal(false);
     });
   });

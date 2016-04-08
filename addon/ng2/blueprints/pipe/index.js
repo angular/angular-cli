@@ -5,7 +5,7 @@ module.exports = {
   description: '',
   
   availableOptions: [
-    { name: 'flat', type: Boolean, default: false, aliases: ['f'] }
+    { name: 'flat', type: Boolean, default: true }
   ],
 
   normalizeEntityName: function (entityName) {

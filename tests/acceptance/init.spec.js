@@ -53,6 +53,7 @@ describe('Acceptance: ng init', function () {
 
     expected.forEach(function (file, index) {
       expected[index] = file.replace(/__name__/g, 'tmp');
+      expected[index] = expected[index].replace(/__styleext__/g, 'css');
     });
 
     removeIgnored(expected);
