@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prebuild": "rm -rf dist",
-    "remove-modules": "rm -rf node_modules/angular2-universal node_modules/angular2-universal-polyfills node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-express-engine node_modules/angular2-hapi-engine",
+    "remove-modules": "rm -rf node_modules/angular2-universal node_modules/angular2-universal-polyfills node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-express-engine node_modules/angular2-hapi-engine node_modules/zone.js",
     "reload": "npm run remove-modules && npm install",
     "build": "tsc || true",
     "server": "node dist/index.js",
@@ -32,13 +32,14 @@
     "preboot": "file:../modules/preboot",
     "angular2-hapi-engine": "file:../modules/hapi-engine",
     "angular2-express-engine": "file:../modules/express-engine",
-    "angular2-universal-preview": "file:../modules/universal",
+    "angular2-universal": "file:../modules/universal",
     "angular2-universal-polyfills": "file:../modules/polyfills"
   },
   "dependencies": {
     "angular2": "2.0.0-beta.13",
     "express": "^4.13.3",
     "rxjs": "5.0.0-beta.2",
+    "zone.js": "~0.6.10",
     "systemjs": "^0.19.18"
   },
   "repository": {

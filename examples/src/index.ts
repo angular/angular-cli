@@ -1,6 +1,6 @@
 var SERVER_IP = '127.0.0.1';
 
-import 'angular2-universal-preview/polyfills';
+import 'angular2-universal/polyfills';
 
 var port = process.env.PORT || 3000;
 

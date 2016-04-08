@@ -25,8 +25,7 @@ module.exports = function(ROOT) {
     REQUEST_URL,
     PRIME_CACHE,
     queryParamsToBoolean
-  } = require('angular2-universal-preview');
-  // require('angular2-universal')
+  } = require('angular2-universal');
 
   function static(path, route) {
     // console.log(`${ROOT + route}`)

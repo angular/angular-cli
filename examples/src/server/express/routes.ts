@@ -22,8 +22,7 @@ module.exports = function(ROOT) {
     REQUEST_URL,
     BASE_URL,
     queryParamsToBoolean
-  } = require('angular2-universal-preview');
-  // require('angular2-universal')
+  } = require('angular2-universal');
 
   router
     .route('/')
@@ -52,15 +51,15 @@ module.exports = function(ROOT) {
         systemjs: {
           componentUrl: 'examples/src/universal/test_page/browser',
           map: {
-            'angular2-universal-preview': 'node_modules/angular2-universal-preview'
+            'angular2-universal': 'node_modules/angular2-universal'
           },
           packages: {
-            'angular2-universal-preview/polyfills': {
+            'angular2-universal/polyfills': {
               format: 'cjs',
               main: 'dist/polyfills',
               defaultExtension: 'js'
             },
-            'angular2-universal-preview': {
+            'angular2-universal': {
               format: 'cjs',
               main: 'dist/browser/index',
               defaultExtension: 'js'
@@ -99,15 +98,15 @@ module.exports = function(ROOT) {
         systemjs: {
           componentUrl: 'examples/src/universal/todo/browser',
           map: {
-            'angular2-universal-preview': 'node_modules/angular2-universal-preview'
+            'angular2-universal': 'node_modules/angular2-universal'
           },
           packages: {
-            'angular2-universal-preview/polyfills': {
+            'angular2-universal/polyfills': {
               format: 'cjs',
               main: 'dist/polyfills',
               defaultExtension: 'js'
             },
-            'angular2-universal-preview': {
+            'angular2-universal': {
               format: 'cjs',
               main: 'dist/browser/index',
               defaultExtension: 'js'
@@ -140,15 +139,15 @@ module.exports = function(ROOT) {
         systemjs: {
           componentUrl: 'examples/src/universal/falcor_todo/client',
           map: {
-            'angular2-universal-preview': 'node_modules/angular2-universal-preview'
+            'angular2-universal': 'node_modules/angular2-universal'
           },
           packages: {
-            'angular2-universal-preview/polyfills': {
+            'angular2-universal/polyfills': {
               format: 'cjs',
               main: 'dist/polyfills',
               defaultExtension: 'js'
             },
-            'angular2-universal-preview': {
+            'angular2-universal': {
               format: 'cjs',
               main: 'dist/browser/index',
               defaultExtension: 'js'
@@ -183,15 +182,15 @@ module.exports = function(ROOT) {
       systemjs: {
         componentUrl: 'examples/src/universal/test_router/browser',
         map: {
-          'angular2-universal-preview': 'node_modules/angular2-universal-preview'
+          'angular2-universal': 'node_modules/angular2-universal'
         },
         packages: {
-          'angular2-universal-preview/polyfills': {
+          'angular2-universal/polyfills': {
             format: 'cjs',
             main: 'dist/polyfills',
             defaultExtension: 'js'
           },
-          'angular2-universal-preview': {
+          'angular2-universal': {
             format: 'cjs',
             main: 'dist/browser/index',
             defaultExtension: 'js'
