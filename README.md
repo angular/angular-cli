@@ -34,6 +34,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Support for offline applications](#support-for-offline-applications)
 * [Commands autocompletion](#commands-autocompletion)
 * [CSS preprocessor integration](#css-preprocessor-integration)
+* [3rd Party Library Installation](#3rd-party-library-installation)
 * [Known Issues](#known-issues)
 
 ## Installation
@@ -262,6 +263,10 @@ We support all major CSS preprocessors:
 To use one just install for example `npm install node-sass` and rename `.css` files in your project to `.scss` or `.sass`. They will be compiled automatically.
 
 The `Angular2App`'s options argument has `sassCompiler`, `lessCompiler`, `stylusCompiler` and `compassCompiler` options that are passed directly to their respective CSS preprocessors.
+
+### 3rd Party Library Installation
+
+The installation of 3rd party libraries are well described at our [Wiki Page](https://github.com/angular/angular-cli/wiki/3rd-party-libs)
 
 ## Known issues
 
