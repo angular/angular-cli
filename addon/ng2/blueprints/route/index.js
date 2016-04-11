@@ -1,6 +1,10 @@
-var fs = require('fs-extra');
-var path = require('path');
-var chalk = require('chalk');
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const stringUtils = require('ember-cli/lib/utilities/string');
+
 
 module.exports = {
   description: 'Generates a route and a template.',
@@ -10,52 +14,118 @@ module.exports = {
     { name: 'default', type: Boolean, default: false }
   ],
 
-  beforeInstall: function (options, locals) {
-    if (!options.skipRouterGeneration) {
-      updateRouteConfig.call(this, 'add', options, locals);
-    }
-  },
-
   afterInstall: function (options) {
     if (!options.skipRouterGeneration) {
-      return this.lookupBlueprint('route-config').install(options);
+      this._addRouteToParent(options);
     }
-  },
-
-  beforeUninstall: function (options, locals) {
-    updateRouteConfig.call(this, 'remove', options, locals);
   },
 
   afterUninstall: function (options) {
-    return this.lookupBlueprint('route-config').install(options);
+    this._removeRouteFromParent(options);
+  },
+
+  normalizeEntityName: function (entityName) {
+    var parsedPath = dynamicPathParser(this.project, entityName);
+
+    this.dynamicPath = parsedPath;
+    return parsedPath.name;
+  },
+
+  locals: function () {
+    return {
+      dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, '')
+    };
+  },
+
+  fileMapTokens: function (options) {
+    // Return custom template variables here.
+    return {
+      __path__: () => {
+        var dir = this.dynamicPath.dir;
+        if (!options.locals.flat) {
+          dir += path.sep + options.dasherizedModuleName;
+        }
+        return dir;
+      }
+    };
+  },
+
+  _findParentRouteFile: function() {
+    const parentDir = path.join(this.project.root, this.dynamicPath.dir);
+    let parentFile = path.join(parentDir, `${path.basename(this.dynamicPath.dir)}.ts`);
+
+    if (parentDir == path.join(this.project.root, this.dynamicPath.appRoot)) {
+      parentFile = path.join(parentDir, this.project.name() + '.ts');
+    }
+
+    if (fs.existsSync(parentFile)) {
+      return parentFile;
+    }
+  },
+
+  _removeRouteFromParent: function(options) {
+    const parsedPath = this.dynamicPath;
+    const parentFile = this._findParentRouteFile(options);
+    if (!parentFile) {
+      return;
+    }
+
+    const jsComponentName = stringUtils.classify(options.entity.name);
+    const base = parsedPath.base;
+    const name = parsedPath.name;
+
+    let content = fs.readFileSync(parentFile, 'utf-8');
+    const importTemplate = `import {${jsComponentName}} from './${base}/${name}';\n`;
+    if (content.indexOf(importTemplate) == -1) {
+      // Not found, nothing to do.
+      return;
+    }
+
+    content = content.replace(importTemplate, '');
+
+    const route = new RegExp(`^\\s*\\{.*name: '${jsComponentName}'.*component: ${jsComponentName}.*`
+                           + '\\},?\\s*\\n?', 'm');
+    content = content.replace(route, '');
+
+    fs.writeFileSync(parentFile, content, 'utf-8');
+  },
+
+  _addRouteToParent: function(options) {
+    const parsedPath = this.dynamicPath;
+    const parentFile = this._findParentRouteFile();
+    if (!parentFile) {
+      return;
+    }
+
+    const jsComponentName = stringUtils.classify(options.entity.name);
+    const base = parsedPath.base;
+    const name = parsedPath.name;
+
+    // Insert the import statement.
+    let content = fs.readFileSync(parentFile, 'utf-8');
+    const importTemplate = `import {${jsComponentName}} from './${base}/${name}';`;
+
+    if (content.indexOf(importTemplate) != -1) {
+      // Already there, do nothing.
+      return;
+    }
+
+    // Find the last import and add an import to it.
+    content = content.replace(/(import.+)\n(?!import)/m, function (f, m1) {
+      return `${m1}\n${importTemplate}\n`;
+    });
+
+    let route = `{path: '/${base}/...', name: '${jsComponentName}', component: ${jsComponentName}},`;
+    content = content.replace(/(@RouteConfig\(\[\s*\n)([\s\S\n]*?)(^\s*\]\))/m, function(_, m1, m2, m3) {
+      if (m2.length) {
+        // Add a `,` if there's none.
+        m2 = m2.replace(/([^,])(\s*)\n$/, function (_, a1, a2) {
+          return a1 + ',' + a2;
+        });
+      }
+      return m1 + m2 + `  ${route}\n` + m3;
+    });
+
+    fs.writeFileSync(parentFile, content, 'utf-8');
   }
 };
-
-function updateRouteConfig(action, options, locals) {
-  var entity = options.entity;
-  var actionColorMap = { add: 'green', remove: 'red' };
-  var color = actionColorMap[action] || 'gray';
-
-  this._writeStatusToUI(chalk[color], action + ' route', entity.name);
-
-  var ngCliConfigPath = path.join(options.project.root, 'angular-cli.json');
-
-  // TODO use default option
-  var route = {
-    routePath: `/${locals.dasherizedModuleName}/...`,
-    component: `${locals.classifiedModuleName}Root`,
-    componentPath: `./${locals.dasherizedModuleName}/${locals.dasherizedModuleName}-root.component`
-  };
-
-  var ngCliConfig = JSON.parse(fs.readFileSync(ngCliConfigPath, 'utf-8'));
-  if (action === 'add' &&
-    ngCliConfig.routes.findIndex(el => el.routePath === route.routePath) === -1) {
-    ngCliConfig.routes.push(route)
-  } else if (action === 'remove') {
-    var idx = ngCliConfig.routes.findIndex(el => el.routePath === route.routePath);
-    if (idx > -1) {
-      ngCliConfig.routes.splice(idx, 1);
-    }
-  }
-  fs.writeFileSync(ngCliConfigPath, JSON.stringify(ngCliConfig, null, 2));
-}

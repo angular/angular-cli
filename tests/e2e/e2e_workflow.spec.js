@@ -94,7 +94,7 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(manifestPath)).to.be.equal(true);
     // Read the worker.
     //TODO: Commenting this out because it makes eslint fail(need to figure out why this expect was commented out)
-    // var lines = fs.readFileSync(manifestPath, {encoding: 'utf8'}).trim().split('\n');
+    // var lines = fse.readFileSync(manifestPath, {encoding: 'utf8'}).trim().split('\n');
 
     // Check that a few critical files have been detected.
     // expect(lines).to.include(`${path.sep}index.html`);
@@ -169,17 +169,7 @@ describe('Basic end-to-end Workflow', function () {
     return ng(['generate', 'route', 'test-route']).then(function () {
       var routeDir = path.join(process.cwd(), 'src', 'client', 'app', 'test-route');
       expect(existsSync(routeDir));
-      expect(existsSync(path.join(routeDir, 'test-pipe-detail.component.css')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-detail.component.html')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-detail.component.spec.ts')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-detail.component.ts')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-list.component.css')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-list.component.html')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-list.component.spec.ts')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-list.component.ts')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-root.component.ts')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-root.service.spec.ts')));
-      expect(existsSync(path.join(routeDir, 'test-pipe-root.service.ts')));
+      expect(existsSync(path.join(routeDir, 'test-route.ts')));
     });
   });
 

@@ -1,6 +1,5 @@
 import {Component} from 'angular2/core';
 import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router';
-import {CliRouteConfig} from './route-config';
 
 @Component({
   selector: '<%= htmlComponentName %>-app',
@@ -10,9 +9,7 @@ import {CliRouteConfig} from './route-config';
   pipes: []
 })
 @RouteConfig([
-
-].concat(CliRouteConfig))
-
+])
 export class <%= jsComponentName %>App {
   defaultMeaning: number = 42;
 
