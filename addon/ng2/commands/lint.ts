@@ -1,8 +1,5 @@
-/* jshint node: true */
-'use strict';
-
-var Command = require('ember-cli/lib/models/command');
-var LintTask = require('../tasks/lint');
+import * as Command from 'ember-cli/lib/models/command';
+import * as LintTask from '../tasks/lint';
 
 module.exports = Command.extend({
   name: 'lint',
