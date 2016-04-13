@@ -36,7 +36,7 @@ export function showDebug(options = {}): string {
   return info;
 }
 
-export function stringToBoolean(txt) {
+export function stringToBoolean(txt): boolean {
   if (typeof txt !== 'string') { return txt; }
   switch (txt.toLowerCase()) {
     case'false': case'\'false\'': case'"false"': case'0': case'no': return false;
@@ -45,7 +45,7 @@ export function stringToBoolean(txt) {
   }
 }
 
-export function queryParamsToBoolean(query) {
+export function queryParamsToBoolean(query): any {
   var obj = {};
   for (let prop in query) {
     if (query.hasOwnProperty(prop)) {
