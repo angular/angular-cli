@@ -43,7 +43,10 @@ module.exports = function (config) {
       // required for component assets fetched by Angular's compiler
       '/app/': '/base/dist/app/'
     },
-    exclude: [],
+    exclude: [
+      // Vendor packages might include spec files. We don't want to use those.
+      'dist/vendor/**/*.spec.js'
+    ],
     preprocessors: {},
     reporters: ['progress'],
     port: 9876,
