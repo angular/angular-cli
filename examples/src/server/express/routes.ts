@@ -2,39 +2,40 @@ var serveStatic = require('serve-static');
 var historyApiFallback = require('connect-history-api-fallback');
 var {Router} = require('express');
 
+var appPage = require('../../universal/test_page/app');
+var todoApp = require('../../universal/todo/app');
+var routerApp = require('../../universal/test_router/app');
+
+import {enableProdMode, provide} from 'angular2/core';
+import {Http} from 'angular2/http';
+import {ROUTER_PROVIDERS, APP_BASE_HREF} from 'angular2/router';
+
+enableProdMode();
+
+import {
+  NODE_ROUTER_PROVIDERS,
+  NODE_HTTP_PROVIDERS,
+  NODE_PLATFORM_PIPES,
+  REQUEST_URL,
+  BASE_URL,
+  queryParamsToBoolean,
+  BootloaderConfig
+} from 'angular2-universal';
 
 module.exports = function(ROOT) {
   var router = Router();
 
-  var appPage = require('../../universal/test_page/app');
-  var todoApp = require('../../universal/todo/app');
-  var routerApp = require('../../universal/test_router/app');
-
-  var {enableProdMode, provide} = require('angular2/core');
-  var {ROUTER_PROVIDERS, APP_BASE_HREF} = require('angular2/router');
-
-  enableProdMode();
-
-  var {
-    NODE_ROUTER_PROVIDERS,
-    NODE_HTTP_PROVIDERS,
-    NODE_PLATFORM_PIPES,
-    REQUEST_URL,
-    BASE_URL,
-    queryParamsToBoolean
-  } = require('angular2-universal');
-
   router
     .route('/')
     .get(function ngApp(req, res) {
-      let queryParams = queryParamsToBoolean(req.query);
-      let options = Object.assign(queryParams, {
+      let queryParams: any = queryParamsToBoolean(req.query);
+      let options: BootloaderConfig = Object.assign(queryParams, {
         // client url for systemjs
         buildClientScripts: true,
         componentUrl: 'examples/src/universal/test_page/browser',
 
-        // directives: [appPage.App],
-        directives: [appPage.App, appPage.MyApp],
+        directives: [appPage.App],
+        // directives: [appPage.App, appPage.MyApp],
         providers: [
           provide(REQUEST_URL, {useValue: req.originalUrl}),
           provide(APP_BASE_HREF, {useValue: '/'}),
@@ -94,8 +95,8 @@ module.exports = function(ROOT) {
   router
     .route('/examples/todo')
     .get(function ngTodo(req, res) {
-      let queryParams = queryParamsToBoolean(req.query);
-      let options = Object.assign(queryParams , {
+      let queryParams: any = queryParamsToBoolean(req.query);
+      let options: BootloaderConfig = Object.assign(queryParams , {
         // client url for systemjs
         buildClientScripts: true,
         systemjs: {
@@ -135,7 +136,7 @@ module.exports = function(ROOT) {
   router
     .route('/examples/falcor_todo')
     .get(function ngTodo(req, res) {
-      let queryParams = queryParamsToBoolean(req.query);
+      let queryParams: any = queryParamsToBoolean(req.query);
       let options = Object.assign(queryParams , {
         // client url for systemjs
         buildClientScripts: true,
@@ -177,9 +178,9 @@ module.exports = function(ROOT) {
   function ngRouter(req, res) {
     let baseUrl = '/examples/router';
     let url = req.originalUrl.replace(baseUrl, '') || '/';
-    let queryParams = queryParamsToBoolean(req.query);
+    let queryParams: any = queryParamsToBoolean(req.query);
 
-    let options = Object.assign(queryParams , {
+    let options: BootloaderConfig = Object.assign(queryParams , {
       // client url for systemjs
       buildClientScripts: true,
       systemjs: {
