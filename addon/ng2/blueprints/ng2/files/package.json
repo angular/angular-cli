@@ -5,7 +5,7 @@
   "angular-cli": {},
   "scripts": {
     "start": "ng server",
-    "postinstall": "typings install --ambient",
+    "postinstall": "typings install",
     "lint": "tslint \"src/**/*.ts\"",
     "format": "clang-format -i -style=file --glob=src/**/*.ts",
     "pree2e": "webdriver-manager update",
