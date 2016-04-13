@@ -25,7 +25,8 @@ import {
   platform,
   reflector,
   ExceptionHandler,
-  Renderer
+  Renderer,
+  NgZone
 } from 'angular2/core';
 
 // Common
@@ -100,7 +101,12 @@ export const NODE_APPLICATION_PROVIDERS: Array<any> = CONST_EXPR([
   ...COMPILER_PROVIDERS,
 
   new Provider(TemplateParser, {useClass: NodeTemplateParser}),
-  new Provider(XHR, {useClass: NodeXHRImpl}),
+  new Provider(XHR, {
+    useFactory: (ngZone) => {
+      return new NodeXHRImpl(ngZone);
+    },
+    deps: [NgZone]
+  }),
 ]);
 
 /**
