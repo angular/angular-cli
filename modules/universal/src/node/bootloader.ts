@@ -1,6 +1,6 @@
 import {DOCUMENT} from 'angular2/platform/common_dom';
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
-import {NgZone, platform, PlatformRef, ApplicationRef} from 'angular2/core';
+import {NgZone, platform, ComponentRef, PlatformRef, ApplicationRef} from 'angular2/core';
 import {Http} from 'angular2/http';
 
 
@@ -8,6 +8,8 @@ import {buildReflector, buildNodeProviders, buildNodeAppProviders} from './platf
 import {parseDocument, parseFragment, serializeDocument} from './platform/document';
 import {createPrebootCode} from './ng_preboot';
 import {arrayFlattenTree} from './helper';
+
+export type configRefs = {componentRef: ComponentRef, applicationRef: ApplicationRef};
 
 export interface BootloaderConfig {
   template?: any;
@@ -24,9 +26,10 @@ export interface BootloaderConfig {
   async?: boolean;
   prime?: boolean;
   bootloader?: Bootloader | any;
-  ngOnInit?: Function;
-  ngOnStable?: Function;
-  ngOnRendered?: Function;
+  ngOnInit?: (config: configRefs, document: any) => any;
+  ngOnStable?: (config: configRefs, document: any) => any;
+  ngOnRendered?: (rendered: string) => string;
+  ngDoCheck?: (config: configRefs) => boolean;
 }
 
 export class Bootloader {
@@ -94,6 +97,7 @@ export class Bootloader {
   serializeApplication(Component?: any | Array<any>, componentProviders?: Array<any>): Promise<any> {
     let component = Component || this._config.component;
     let providers = componentProviders || this._config.componentProviders;
+    let ngDoCheck = this._config.ngDoCheck || null;
 
     return this._applicationAll(component, providers)
       .then((configRefs: any) => {
@@ -126,16 +130,32 @@ export class Bootloader {
 
             let promise = new Promise(resolve => {
               ngZone.runOutsideAngular(() => {
+                let checkAmount = 0;
+                let checkCount = 0;
                 function checkStable() {
+                  // we setTimeout 10 after the first 20 turns
+                  checkCount++;
+                  if (checkCount === 20) { checkAmount = 10; }
+
                   setTimeout(() => {
                     if (ngZone.hasPendingMicrotasks) { return checkStable(); }
                     if (ngZone.hasPendingMacrotasks) { return checkStable(); }
                     if (http && http._async > 0) { return checkStable(); }
+                    if (ngZone._isStable && typeof ngDoCheck === 'function') {
+                      let isStable = ngDoCheck(config);
+                      if (isStable === true) {
+                        // return resolve(config);
+                      } else if (typeof isStable !== 'boolean') {
+                        console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
+                      } else {
+                        return checkStable();
+                      }
+                    }
                     if (ngZone._isStable) { return resolve(config); }
                     return checkStable();
-                  });
+                  }, checkAmount);
                 }
-                checkStable();
+                return checkStable();
               });
             });
             return promise;

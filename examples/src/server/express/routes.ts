@@ -80,6 +80,9 @@ module.exports = function(ROOT) {
         },
         ngOnRendered: () => {
           console.log('DONE');
+        },
+        ngDoCheck: () => {
+          // return true;
         }
 
       });
