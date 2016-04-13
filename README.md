@@ -159,6 +159,15 @@ ng build
 
 The build artifacts will be stored in the `dist/` directory.
 
+### Environments
+
+At build time, the `src/client/app/environment.ts` will be replaced by either
+`config/environment.dev.ts` or `config/environment.prod.ts`, depending on the
+current cli environment.
+
+Environment defaults to `dev`, but you can generate a production build via
+the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
+
 ### Running unit tests
 
 ```bash

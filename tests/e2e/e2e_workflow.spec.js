@@ -57,26 +57,24 @@ describe('Basic end-to-end Workflow', function () {
     expect(path.basename(process.cwd())).to.equal('test-project');
   });
 
+  it('Supports production builds via `ng build --environment=production`', function() {
+    this.timeout(420000);
+
+    // Can't user the `ng` helper because somewhere the environment gets
+    // stuck to the first build done
+    sh.exec('./node_modules/.bin/ng build --environment=production --silent');
+    expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+    var envPath = path.join(process.cwd(), 'dist', 'app', 'environment.js');
+    var envContent = fs.readFileSync(envPath, { encoding: 'utf8' });
+    expect(envContent).to.include('production:true');
+    // Also does not create new things in GIT.
+    expect(sh.exec('git status --porcelain').output).to.be.equal('');
+  });
+
   it('Can run `ng build` in created project', function () {
     this.timeout(420000);
 
     return ng(['build', '--silent'])
-      .then(function () {
-        expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-      })
-      .then(function () {
-        // Also does not create new things in GIT.
-        expect(sh.exec('git status --porcelain').output).to.be.equal('');
-      })
-      .catch(() => {
-        throw new Error('Build failed.');
-      });
-  });
-
-  it('Supports production builds via `ng build --envinroment=production`', function() {
-    this.timeout(420000);
-
-    return ng(['build', '--environment=production', '--silent'])
       .then(function () {
         expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
       })
@@ -214,7 +212,7 @@ describe('Basic end-to-end Workflow', function () {
       expect(existsSync(cssFile)).to.be.equal(false);
       let scssExample = '.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(scssFile, scssExample, 'utf8');
-      
+
       sh.exec('ng build --silent');
       let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
       expect(existsSync(destCss)).to.be.equal(true);
@@ -249,7 +247,7 @@ describe('Basic end-to-end Workflow', function () {
       expect(existsSync(cssFile)).to.be.equal(false);
       let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(lessFile, lessExample, 'utf8');
-      
+
       sh.exec('ng build --silent');
       let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
       expect(existsSync(destCss)).to.be.equal(true);
@@ -283,7 +281,7 @@ describe('Basic end-to-end Workflow', function () {
       expect(existsSync(cssFile)).to.be.equal(false);
       let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(stylusFile, stylusExample, 'utf8');
-      
+
       sh.exec('ng build --silent');
       let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.css');
       expect(existsSync(destCss)).to.be.equal(true);
