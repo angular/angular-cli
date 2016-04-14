@@ -12,6 +12,9 @@ const GenerateCommand = EmberGenerateCommand.extend({
       return;
     }
 
+    // map the blueprint name to allow for aliases
+    rawArgs[0] = mapBlueprintName(rawArgs[0]);
+
     if (!fs.existsSync(path.join(__dirname, '..', 'blueprints', rawArgs[0]))) {
       SilentError.debugOrThrow('angular-cli/commands/generate', `Invalid blueprint: ${rawArgs[0]}`);
     }
@@ -20,6 +23,18 @@ const GenerateCommand = EmberGenerateCommand.extend({
   }
 });
 
+function mapBlueprintName(name) {
+  let mappedName = aliasMap[name];
+  return mappedName ? mappedName : name;
+}
+
+const aliasMap = {
+  'c': 'component',
+  'd': 'directive',
+  'p': 'pipe',
+  'r': 'route',
+  's': 'service'
+};
 
 module.exports = GenerateCommand;
 module.exports.overrideCore = true;
