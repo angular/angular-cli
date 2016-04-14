@@ -1,6 +1,16 @@
 node_modules/
-.idea
-jsconfig.json
 npm-debug.log
+
+# IDEs
+.idea/
+jsconfig.json
+
+# Typings file.
 typings/
+
+# Misc
 tmp/
+
+# Mac OSX Finder files.
+**/.DS_Store
+.DS_Store
