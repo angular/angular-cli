@@ -55,6 +55,7 @@ import {TemplateParser} from 'angular2/src/compiler/template_parser';
 
 import {NodeDomRootRenderer_} from './dom/node_dom_renderer';
 import {NodeXHRImpl} from './node_xhr_impl';
+import {NodeSharedStylesHost} from './node_shared_styles_host';
 import {NodeTemplateParser} from './node_template_parser';
 
 export function initNodeAdapter() {
@@ -90,8 +91,9 @@ export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   new Provider(HAMMER_GESTURE_CONFIG, {useClass: HammerGestureConfig}),
   new Provider(DomRootRenderer, {useClass: NodeDomRootRenderer_}),
   new Provider(RootRenderer, {useExisting: DomRootRenderer}),
-  new Provider(SharedStylesHost, {useExisting: DomSharedStylesHost}),
-  DomSharedStylesHost,
+  new Provider(SharedStylesHost, {useExisting: NodeSharedStylesHost}),
+  new Provider(DomSharedStylesHost, {useExisting: NodeSharedStylesHost}),
+  NodeSharedStylesHost,
   Testability,
   BrowserDetails,
   AnimationBuilder,
@@ -129,15 +131,16 @@ export function bootstrap(
     ...NODE_APPLICATION_PROVIDERS,
 
     new Provider(DOCUMENT, {
-      useFactory: (directiveResolver) => {
+      useFactory: (directiveResolver, sharedStylesHost) => {
         // TODO(gdi2290): determine a better for document on the server
         let selector = directiveResolver.resolve(appComponentType).selector;
         let serverDocument = DOM.createHtmlDocument();
         let el = DOM.createElement(selector);
         DOM.appendChild(serverDocument.body, el);
+        sharedStylesHost.addHost(serverDocument.head);
         return serverDocument;
       },
-      deps: [DirectiveResolver]
+      deps: [DirectiveResolver, NodeSharedStylesHost]
     }),
 
     ...(isPresent(customAppProviders) ? customAppProviders : [])
@@ -167,7 +170,15 @@ export function buildNodeProviders(providers?: Array<any>): Array<any> {
 export function buildNodeAppProviders(document?: any, providers?: Array<any>): Array<any> {
   return [
     NODE_APPLICATION_PROVIDERS,
-    (isPresent(document) && document) ? [new Provider(DOCUMENT, {useFactory: () => document})] : [],
+    (isPresent(document) && document) ? [
+      new Provider(DOCUMENT, {
+        useFactory: (sharedStylesHost) => {
+          sharedStylesHost.addHost(document.head);
+          return document;
+        },
+        deps: [NodeSharedStylesHost]
+      })
+    ] : [],
     (isPresent(providers) && providers) ? providers : []
   ];
 }
