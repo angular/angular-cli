@@ -32,10 +32,9 @@ module.exports = function(ROOT) {
       let options: BootloaderConfig = Object.assign(queryParams, {
         // client url for systemjs
         buildClientScripts: true,
-        componentUrl: 'examples/src/universal/test_page/browser',
 
-        directives: [appPage.App],
-        // directives: [appPage.App, appPage.MyApp],
+        // directives: [appPage.App],
+        directives: [appPage.App, appPage.MyApp],
         providers: [
           provide(REQUEST_URL, {useValue: req.originalUrl}),
           provide(APP_BASE_HREF, {useValue: '/'}),
