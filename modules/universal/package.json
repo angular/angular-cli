@@ -37,8 +37,8 @@
     "angular2-express-engine": "file:../express-engine",
     "angular2-hapi-engine": "file:../hapi-engine",
     "preboot": "file:../preboot",
-    "angular2": "2.0.0-beta.14",
-    "zone.js": "~0.6.10",
+    "angular2": "2.0.0-beta.15",
+    "zone.js": "~0.6.11",
     "es6-shim": "^0.35.0",
     "es6-promise": "^3.0.2",
     "reflect-metadata": "0.1.2",
@@ -48,7 +48,7 @@
     "parse5": "^1.5.0"
   },
   "dependencies": {
-    "angular2-universal-polyfills": ">=0.3.2",
+    "angular2-universal-polyfills": ">=0.4.0",
     "angular2-express-engine": ">=0.10.0",
     "angular2-hapi-engine": ">=0.10.1",
     "xhr2": "^0.1.3",
