@@ -42,6 +42,11 @@ import {DomEventsPlugin} from 'angular2/src/platform/dom/events/dom_events';
 import {KeyEventsPlugin} from 'angular2/src/platform/dom/events/key_events';
 import {HammerGesturesPlugin} from 'angular2/src/platform/dom/events/hammer_gestures';
 import {DomSharedStylesHost, SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
+import {
+  HAMMER_GESTURE_CONFIG,
+  HammerGestureConfig
+} from 'angular2/src/platform/dom/events/hammer_gestures';
+import {ELEMENT_PROBE_PROVIDERS} from 'angular2/platform/common_dom';
 import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {DomRootRenderer} from 'angular2/src/platform/dom/dom_renderer';
 import {RootRenderer} from 'angular2/src/core/render/api';
@@ -83,6 +88,7 @@ export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: DomEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: KeyEventsPlugin, multi: true}),
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: HammerGesturesPlugin, multi: true}),
+  new Provider(HAMMER_GESTURE_CONFIG, {useClass: HammerGestureConfig}),
   new Provider(DomRootRenderer, {useClass: NodeDomRootRenderer_}),
   new Provider(RootRenderer, {useExisting: DomRootRenderer}),
   new Provider(SharedStylesHost, {useExisting: DomSharedStylesHost}),
@@ -90,7 +96,8 @@ export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   Testability,
   BrowserDetails,
   AnimationBuilder,
-  EventManager
+  EventManager,
+  ELEMENT_PROBE_PROVIDERS
 ]);
 
 /**
