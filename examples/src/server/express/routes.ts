@@ -5,10 +5,16 @@ var {Router} = require('express');
 var appPage = require('../../universal/test_page/app');
 var todoApp = require('../../universal/todo/app');
 var routerApp = require('../../universal/test_router/app');
+var htmlApp = require('../../universal/html/html');
 
 import {enableProdMode, provide} from 'angular2/core';
 import {Http} from 'angular2/http';
-import {ROUTER_PROVIDERS, APP_BASE_HREF} from 'angular2/router';
+import {
+  ROUTER_PROVIDERS,
+  APP_BASE_HREF,
+  LocationStrategy,
+  HashLocationStrategy
+} from 'angular2/router';
 
 enableProdMode();
 
@@ -131,7 +137,51 @@ module.exports = function(ROOT) {
       res.render('src/universal/todo/index', options);
 
     });
+    router
+      .route('/examples/html')
+      .get(function ngHtml(req, res) {
+        let queryParams: any = queryParamsToBoolean(req.query);
+        let options: BootloaderConfig = Object.assign(queryParams , {
+          // client url for systemjs
+          buildClientScripts: true,
+          systemjs: {
+            componentUrl: 'examples/src/universal/html/browser',
+            map: {
+              'angular2-universal': 'node_modules/angular2-universal'
+            },
+            packages: {
+              'angular2-universal/polyfills': {
+                format: 'cjs',
+                main: 'dist/polyfills',
+                defaultExtension: 'js'
+              },
+              'angular2-universal': {
+                format: 'cjs',
+                main: 'dist/browser/index',
+                defaultExtension: 'js'
+              }
+            }
+          },
+          directives: [htmlApp.Html],
+          providers: [
+            provide(APP_BASE_HREF, {useValue: '/examples/html'}),
+            provide(REQUEST_URL, {useValue: req.originalUrl}),
+            provide(BASE_URL, {useExisting: req.originalUrl}),
 
+            NODE_PLATFORM_PIPES,
+            NODE_ROUTER_PROVIDERS,
+            NODE_HTTP_PROVIDERS,
+            provide(LocationStrategy, { useClass: HashLocationStrategy })
+          ],
+          data: {},
+
+          preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
+
+        });
+
+        res.render('src/universal/html/index', options);
+
+      });
   router
     .route('/examples/falcor_todo')
     .get(function ngTodo(req, res) {
@@ -234,6 +284,7 @@ module.exports = function(ROOT) {
   router.use('/rxjs', serveStatic(`${ROOT}/node_modules/rxjs`));
   router.use('/node_modules',  serveStatic(`${ROOT}/node_modules`));
   router.use('/examples/src',  serveStatic(`${ROOT}/dist`));
+  router.use('/css',  serveStatic(`${ROOT}/src/server/universal`));
 
   router.use(historyApiFallback({
     // verbose: true
