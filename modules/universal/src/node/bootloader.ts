@@ -12,15 +12,15 @@ import {arrayFlattenTree} from './helper';
 export type configRefs = {componentRef: ComponentRef, applicationRef: ApplicationRef};
 
 export interface BootloaderConfig {
-  template?: any;
-  document?: any;
+  template?: string;
+  document?: string;
 
   platformProviders?: Array<any>;
   providers?: Array<any>;
   componentProviders?: Array<any>;
   component?: any;
   directives?: Array<any>;
-  preboot?: any;
+  preboot?: boolean | any;
   precache?: boolean;
   primeCache?: boolean;
   async?: boolean;
