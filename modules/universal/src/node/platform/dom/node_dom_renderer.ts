@@ -188,7 +188,7 @@ export const ATTRIBUTES = {
     'novalidate',
     'target'
   ]
-}
+};
 
 export class NodeDomRenderer extends DomRenderer {
   constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType) {

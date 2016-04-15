@@ -57,6 +57,7 @@ import {NodeDomRootRenderer_} from './dom/node_dom_renderer';
 import {NodeXHRImpl} from './node_xhr_impl';
 import {NodeSharedStylesHost} from './node_shared_styles_host';
 import {NodeTemplateParser} from './node_template_parser';
+import {NODE_PLATFORM_DIRECTIVES} from '../directives';
 
 export function initNodeAdapter() {
   Parse5DomAdapter.makeCurrent();
@@ -82,7 +83,7 @@ export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   new Provider(PLATFORM_PIPES, {useValue: COMMON_PIPES, multi: true}),
   new Provider(PLATFORM_DIRECTIVES, {useValue: COMMON_DIRECTIVES, multi: true}),
   new Provider(ExceptionHandler, {useFactory: _exceptionHandler, deps: []}),
-
+  ...NODE_PLATFORM_DIRECTIVES,
   new Provider(DOCUMENT, {useFactory: () => _document }),
 
   new Provider(EVENT_MANAGER_PLUGINS, {useClass: DomEventsPlugin, multi: true}),
