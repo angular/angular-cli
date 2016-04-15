@@ -61,8 +61,7 @@
     "angular2-express-engine": ">=0.10.0",
     "angular2-hapi-engine": ">=0.10.1",
     "rxjs": "~5.0.0-beta.2",
-    "angular2": "2.0.0-beta.12 - 2.0.0-beta.14",
-    "zone.js": "~0.6.10",
+    "angular2": "2.0.0-beta.12 - 2.0.0-beta.15",
     "zone.js": "~0.6.11",
     "css": "^2.2.1",
     "parse5": "^1.5.0"
