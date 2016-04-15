@@ -1,5 +1,5 @@
 import {NodeForm} from './node_form';
-import {NodeStyleHost} from './node_style_host';
+import {NodeUniversalStyles} from './node_universal_styles';
 import {provide, PLATFORM_DIRECTIVES} from 'angular2/core';
 
 export * from './node_form';
@@ -9,7 +9,7 @@ export const NODE_FORM_DIRECTIVES: Array<any> = [
 ];
 
 export const NODE_DIRECTIVES: Array<any> = [
-  NodeStyleHost
+  NodeUniversalStyles
 ];
 
 export const NODE_PLATFORM_DIRECTIVES: Array<any> = [

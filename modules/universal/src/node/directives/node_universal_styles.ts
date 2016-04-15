@@ -3,9 +3,9 @@ import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host'
 
 
 @Directive({
-  selector: 'ng-style-host'
+  selector: 'universal-styles'
 })
-export class NodeStyleHost {
+export class NodeUniversalStyles {
   constructor(
     public el: ElementRef,
     public domSharedStylesHost: DomSharedStylesHost) {

@@ -32,7 +32,9 @@ export class ServerOnlyApp {
     <meta name="keywords" content="Angular 2,Universal">
     <meta name="author" content="PatrickJS">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <ng-style-host></ng-style-host>
+
+    <universal-styles></universal-styles>
+
     <base [attr.href]="seo.baseUrl">
   </head>
   <body>
