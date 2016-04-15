@@ -51,7 +51,6 @@ import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
 import {DomRootRenderer} from 'angular2/src/platform/dom/dom_renderer';
 import {RootRenderer} from 'angular2/src/core/render/api';
 
-
 import {TemplateParser} from 'angular2/src/compiler/template_parser';
 
 import {NodeDomRootRenderer_} from './dom/node_dom_renderer';

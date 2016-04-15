@@ -5,7 +5,6 @@ import {CONST_EXPR} from 'angular2/src/facade/lang';
 import {BaseException} from 'angular2/src/facade/exceptions';
 import {Parser, AST, ASTWithSource} from 'angular2/src/core/change_detection/change_detection';
 import {TemplateBinding} from 'angular2/src/core/change_detection/parser/ast';
-
 import {CompileDirectiveMetadata, CompilePipeMetadata} from 'angular2/src/compiler/directive_metadata';
 import {HtmlParser} from 'angular2/src/compiler/html_parser';
 import {splitNsName, mergeNsAndName} from 'angular2/src/compiler/html_tags';
@@ -47,6 +46,7 @@ import {
 } from 'angular2/src/compiler/html_ast';
 
 import {splitAtColon} from 'angular2/src/compiler/util';
+/* tslint:disable */
 
 // Group 1 = "bind-"
 // Group 2 = "var-" or "#"
@@ -78,39 +78,53 @@ var TEXT_CSS_SELECTOR = CssSelector.parse('*')[0];
  *
  * This is currently an internal-only feature and not meant for general use.
  */
-export const TEMPLATE_TRANSFORMS = CONST_EXPR(new OpaqueToken('TemplateTransforms'));
+// UNIVERSAL
+import {
+  TEMPLATE_TRANSFORMS,
+  TemplateParseError,
+  TemplateParseResult
+} from 'angular2/src/compiler/template_parser';
+// export const TEMPLATE_TRANSFORMS = CONST_EXPR(new OpaqueToken('TemplateTransforms'));
 
-export class TemplateParseError extends ParseError {
-  constructor(message: string, span: ParseSourceSpan) { super(span, message); }
-}
+// export class TemplateParseError extends ParseError {
+//   constructor(message: string, span: ParseSourceSpan) { super(span, message); }
+// }
+//
+// export class TemplateParseResult {
+//   constructor(public templateAst?: TemplateAst[], public errors?: ParseError[]) {}
+// }
 
 @Injectable()
 export class NodeTemplateParser {
-  constructor(
-    private _exprParser: Parser,
-    private _schemaRegistry: ElementSchemaRegistry,
-    private _htmlParser: HtmlParser,
-    @Optional() @Inject(TEMPLATE_TRANSFORMS) public transforms: TemplateAstVisitor[]) {
-  }
+  constructor(private _exprParser: Parser, private _schemaRegistry: ElementSchemaRegistry,
+              private _htmlParser: HtmlParser,
+              @Optional() @Inject(TEMPLATE_TRANSFORMS) public transforms: TemplateAstVisitor[]) {}
 
   parse(template: string, directives: CompileDirectiveMetadata[], pipes: CompilePipeMetadata[],
         templateUrl: string): TemplateAst[] {
+    var result = this.tryParse(template, directives, pipes, templateUrl);
+    if (isPresent(result.errors)) {
+      var errorString = result.errors.join('\n');
+      throw new BaseException(`Template parse errors:\n${errorString}`);
+    }
+    return result.templateAst;
+  }
+
+  tryParse(template: string, directives: CompileDirectiveMetadata[], pipes: CompilePipeMetadata[],
+           templateUrl: string): TemplateParseResult {
     var parseVisitor =
         new NodeTemplateParseVisitor(directives, pipes, this._exprParser, this._schemaRegistry);
     var htmlAstWithErrors = this._htmlParser.parse(template, templateUrl);
-    /* tslint:disable */
     var result = htmlVisitAll(parseVisitor, htmlAstWithErrors.rootNodes, EMPTY_COMPONENT);
-    /* tslint:enable */
     var errors: ParseError[] = htmlAstWithErrors.errors.concat(parseVisitor.errors);
     if (errors.length > 0) {
-      var errorString = errors.join('\n');
-      throw new BaseException(`Template parse errors:\n${errorString}`);
+      return new TemplateParseResult(result, errors);
     }
     if (isPresent(this.transforms)) {
       this.transforms.forEach(
           (transform: TemplateAstVisitor) => { result = templateVisitAll(transform, result); });
     }
-    return result;
+    return new TemplateParseResult(result);
   }
 }
 
@@ -221,7 +235,7 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
   visitElement(element: HtmlElementAst, component: Component): any {
     var nodeName = element.name;
     var preparsedElement = preparseElement(element);
-    // UNIVERSAL allow script and style
+    // UNIVERSAL
     // if (preparsedElement.type === PreparsedElementType.SCRIPT ||
     //     preparsedElement.type === PreparsedElementType.STYLE) {
     //   // Skipping <script> for security reasons
@@ -262,23 +276,19 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
     });
 
     var lcElName = splitNsName(nodeName.toLowerCase())[1];
-    /* tslint:disable */
-    var isTemplateElement = lcElName == TEMPLATE_ELEMENT;
-    /* tslint:enable */
+    var isTemplateElement = lcElName === TEMPLATE_ELEMENT;
     var elementCssSelector = createElementCssSelector(nodeName, matchableAttrs);
     var directives = this._createDirectiveAsts(
         element.name, this._parseDirectives(this.selectorMatcher, elementCssSelector),
         elementOrDirectiveProps, isTemplateElement ? [] : vars, element.sourceSpan);
     var elementProps: BoundElementPropertyAst[] =
         this._createElementPropertyAsts(element.name, elementOrDirectiveProps, directives);
-    /* tslint:disable */
     var children = htmlVisitAll(preparsedElement.nonBindable ? NON_BINDABLE_VISITOR : this,
                                 element.children, Component.create(directives));
-    /* tslint:enable */
 
     // Override the actual selector when the `ngProjectAs` attribute is provided
-    var projectionSelector = isPresent( (<any>preparsedElement).projectAs ) ?
-                                 CssSelector.parse( (<any>preparsedElement).projectAs)[0] :
+    var projectionSelector = isPresent(preparsedElement.projectAs) ?
+                                 CssSelector.parse(preparsedElement.projectAs)[0] :
                                  elementCssSelector;
     var ngContentIndex = component.findNgContentIndex(projectionSelector);
     var parsedElement;
@@ -330,14 +340,12 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
                                       targetProps: BoundElementOrDirectiveProperty[],
                                       targetVars: VariableAst[]): boolean {
     var templateBindingsSource = null;
-    /* tslint:disable */
     if (attr.name == TEMPLATE_ATTR) {
       templateBindingsSource = attr.value;
     } else if (attr.name.startsWith(TEMPLATE_ATTR_PREFIX)) {
       var key = attr.name.substring(TEMPLATE_ATTR_PREFIX.length);  // remove the star
       templateBindingsSource = (attr.value.length == 0) ? key : key + ' ' + attr.value;
     }
-    /* tslint:enable */
     if (isPresent(templateBindingsSource)) {
       var bindings = this._parseTemplateBindings(templateBindingsSource, attr.sourceSpan);
       for (var i = 0; i < bindings.length; i++) {
@@ -510,10 +518,8 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
       this._createDirectivePropertyAsts(directive.inputs, props, directiveProperties);
       var exportAsVars = [];
       possibleExportAsVars.forEach((varAst) => {
-        /* tslint:disable */
         if ((varAst.value.length === 0 && directive.isComponent) ||
             (directive.exportAs == varAst.value)) {
-          /* tslint:enable */
           exportAsVars.push(varAst);
           matchedVariables.add(varAst.name);
         }
@@ -523,7 +529,8 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
     });
     possibleExportAsVars.forEach((varAst) => {
       if (varAst.value.length > 0 && !SetWrapper.has(matchedVariables, varAst.name)) {
-        this._reportError('There is no directive with "exportAs" set to ' + varAst.value + '"', varAst.sourceSpan);
+        this._reportError('There is no directive with "exportAs" set to "'+ varAst.value +'"',
+                          varAst.sourceSpan);
       }
     });
     return directiveAsts;
@@ -609,7 +616,6 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
             sourceSpan);
       }
     } else {
-      /* tslint:disable */
       if (parts[0] == ATTRIBUTE_PREFIX) {
         boundPropertyName = parts[1];
         let nsSeparatorIdx = boundPropertyName.indexOf(':');
@@ -630,7 +636,6 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
         this._reportError(`Invalid property name '${name}'`, sourceSpan);
         bindingType = null;
       }
-      /* tslint:enable */
     }
 
     return new BoundElementPropertyAst(boundPropertyName, bindingType, ast, unit, sourceSpan);
@@ -690,7 +695,7 @@ class NodeTemplateParseVisitor implements HtmlAstVisitor {
 class NonBindableVisitor implements HtmlAstVisitor {
   visitElement(ast: HtmlElementAst, component: Component): ElementAst {
     var preparsedElement = preparseElement(ast);
-    // UNIVERSAL allow script and style
+    // UNIVERSAL
     // if (preparsedElement.type === PreparsedElementType.SCRIPT ||
     //     preparsedElement.type === PreparsedElementType.STYLE ||
     //     preparsedElement.type === PreparsedElementType.STYLESHEET) {
@@ -703,9 +708,7 @@ class NonBindableVisitor implements HtmlAstVisitor {
     var attrNameAndValues = ast.attrs.map(attrAst => [attrAst.name, attrAst.value]);
     var selector = createElementCssSelector(ast.name, attrNameAndValues);
     var ngContentIndex = component.findNgContentIndex(selector);
-    /* tslint:disable */
     var children = htmlVisitAll(this, ast.children, EMPTY_COMPONENT);
-    /* tslint:enable */
     return new ElementAst(ast.name, htmlVisitAll(this, ast.attrs), [], [], [], [], children,
                           ngContentIndex, ast.sourceSpan);
   }
@@ -730,11 +733,9 @@ export function splitClasses(classAttrValue: string): string[] {
 
 class Component {
   static create(directives: DirectiveAst[]): Component {
-    /* tslint:disable */
     if (directives.length === 0 || !directives[0].directive.isComponent) {
       return EMPTY_COMPONENT;
     }
-    /* tslint:enable */
     var matcher = new SelectorMatcher();
     var ngContentSelectors = directives[0].directive.template.ngContentSelectors;
     var wildcardNgContentIndex = null;
@@ -775,9 +776,7 @@ function createElementCssSelector(elementName: string, matchableAttrs: string[][
     let attrValue = matchableAttrs[i][1];
 
     cssSelector.addAttribute(attrNameNoNs, attrValue);
-    /* tslint:disable */
     if (attrName.toLowerCase() == CLASS_ATTR) {
-      /* tslint:enable */
       var classes = splitClasses(attrValue);
       classes.forEach(className => cssSelector.addClassName(className));
     }
@@ -798,3 +797,4 @@ export class PipeCollector extends RecursiveAstVisitor {
     return null;
   }
 }
+/* tslint:enable */
