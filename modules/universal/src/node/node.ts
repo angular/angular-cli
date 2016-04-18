@@ -2,7 +2,7 @@
 import {Parse5DomAdapter} from 'angular2/src/platform/server/parse5_adapter';
 Parse5DomAdapter.makeCurrent();
 
-export {provide} from 'angular2/core';
+export {provide, Inject, Optional} from 'angular2/core';
 
 export * from './directives/index';
 
