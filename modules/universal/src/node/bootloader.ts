@@ -128,7 +128,7 @@ export class Bootloader {
 
             let promise = new Promise(resolve => {
               ngZone.runOutsideAngular(() => {
-                let checkAmount = 1;
+                let checkAmount = 0;
                 let checkCount = 0;
                 function checkStable() {
                   // we setTimeout 10 after the first 20 turns
