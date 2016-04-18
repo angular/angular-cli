@@ -11,7 +11,7 @@ import {
 } from 'angular2/http';
 import * as utils from 'angular2/src/http/http_utils';
 import {isPresent} from 'angular2/src/facade/lang';
-import {Injectable, NgZone} from 'angular2/core';
+import {Injectable, NgZone, Inject, Optional} from 'angular2/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import * as http from 'http';
@@ -25,15 +25,26 @@ export class NodeConnection implements Connection {
   public request: Request;
   public response: Observable<Response>;
 
-  constructor(req: Request, baseResponseOptions?: ResponseOptions, ngZome?: NgZone) {
-    this.request = req;
+  constructor(
+    req: Request,
+    baseResponseOptions: ResponseOptions,
+    ngZome: NgZone,
+    @Inject(ORIGIN_URL) originUrl: string = '',
+    @Optional() @Inject(BASE_URL) baseUrl?: string) {
 
-    let reqInfo: any = url.parse(req.url);
-    reqInfo.method = RequestMethod[req.method].toUpperCase();
+    this.request = req;
+    baseUrl = baseUrl || '/';
+
+    if (originUrl === null) {
+      throw new Error('ERROR: Please move ORIGIN_URL to platformProviders');
+    }
+
+    let _reqInfo: any = url.parse(url.resolve(url.resolve(originUrl, baseUrl), req.url));
+    _reqInfo.method = RequestMethod[req.method].toUpperCase();
 
     if (isPresent(req.headers)) {
-      reqInfo.headers = {};
-      req.headers.forEach((values, name) => reqInfo.headers[name] = values.join(','));
+      _reqInfo.headers = {};
+      req.headers.forEach((values, name) => _reqInfo.headers[name] = values.join(','));
     }
 
     this.response = new Observable(responseObserver => {
@@ -41,11 +52,11 @@ export class NodeConnection implements Connection {
       ngZome.run(() => {
         // http or https
         let xhrHttp: any = http;
-        if (reqInfo.protocol === 'https:') {
+        if (_reqInfo.protocol === 'https:') {
           xhrHttp = https;
         }
 
-        nodeReq = xhrHttp.request(reqInfo, (res: http.IncomingMessage) => {
+        nodeReq = xhrHttp.request(_reqInfo, (res: http.IncomingMessage) => {
           let body = '';
           res.on('data', (chunk) => body += chunk);
 
@@ -101,9 +112,11 @@ export class NodeConnection implements Connection {
 export class NodeBackend implements ConnectionBackend {
   constructor(
     private _baseResponseOptions: ResponseOptions,
-    private _ngZone: NgZone) {}
+    private _ngZone: NgZone,
+    @Inject(BASE_URL) private _baseUrl: string,
+    @Inject(ORIGIN_URL) private _originUrl: string) {}
 
   public createConnection(request: Request): NodeConnection {
-    return new NodeConnection(request, this._baseResponseOptions, this._ngZone);
+    return new NodeConnection(request, this._baseResponseOptions, this._ngZone, this._baseUrl, this._originUrl);
   }
 }
