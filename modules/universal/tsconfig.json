@@ -23,7 +23,13 @@
     "node_modules/preboot/test",
     "node_modules/preboot/src",
     "browser/test",
-    "node/test"
+    "node/test",
+    "browser.d.ts",
+    "common.d.ts",
+    "global.d.ts",
+    "mock.d.ts",
+    "node.d.ts",
+    "polyfills.d.ts"
   ],
   "formatCodeOptions": {
     "indentSize": 2,
