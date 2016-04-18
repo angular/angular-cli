@@ -14,6 +14,12 @@ export interface ExpressEngineExtraOptions {
 
 export type ExpressEngineConfig = BootloaderConfig & ExpressEngineExtraOptions;
 
+export var EXPRESS_PLATFORM = null;
+
+export function disposeExpressPlatform() {
+  EXPRESS_PLATFORM = null;
+}
+
 export function expressEngine(filePath: string, options?: ExpressEngineConfig, done?: Function) {
   // defaults
   options = options || <ExpressEngineConfig>{};
@@ -46,20 +52,23 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
       }
 
       // bootstrap and render component to string
-      const _options = options;
-      const _template = clientHtml;
-      const _Bootloader = Bootloader;
-      let bootloader = _options.bootloader;
-      if (_options.bootloader) {
-        bootloader = _Bootloader.create(_options.bootloader);
-      } else {
-        let doc = _Bootloader.parseDocument(_template);
-        _options.document = doc;
-        _options.template = _options.template || _template;
-        bootloader = _Bootloader.create(_options);
+      if (!EXPRESS_PLATFORM) {
+        const _options = options;
+        const _template = clientHtml;
+        const _Bootloader = Bootloader;
+        let bootloader = _options.bootloader;
+        if (_options.bootloader) {
+          bootloader = _Bootloader.create(_options.bootloader);
+        } else {
+          let doc = _Bootloader.parseDocument(_template);
+          _options.document = doc;
+          _options.template = _options.template || _template;
+          bootloader = _Bootloader.create(_options);
+        }
+        EXPRESS_PLATFORM = bootloader;
       }
 
-      bootloader.serializeApplication()
+      EXPRESS_PLATFORM.serializeApplication()
         .then(html => done(null, buildClientScripts(html, options)))
         .catch(e => {
           console.error(e.stack);
