@@ -38,6 +38,6 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "angular2-universal": ">=0.90.0"
+    "angular2-universal": ">=0.95.0"
   }
 }
