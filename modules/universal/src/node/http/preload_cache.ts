@@ -39,9 +39,8 @@ import {XMLHttpRequest} from 'xhr2';
 // import XMLHttpRequest = require('xhr2');
 
 
-export const BASE_URL: OpaqueToken = CONST_EXPR(new OpaqueToken('baseUrl'));
+import {ORIGIN_URL, BASE_URL, PRIME_CACHE} from '../../common';
 
-export const PRIME_CACHE: OpaqueToken = CONST_EXPR(new OpaqueToken('primeCache'));
 
 export function buildBaseUrl(url: string, existing?: boolean): any {
   let prop = existing ? 'useExisting' : 'useValue';

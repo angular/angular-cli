@@ -22,11 +22,7 @@ import {
   EventEmitter
 } from 'angular2/core';
 
-import {
-  Observable
-} from 'rxjs';
-
-export const PRIME_CACHE: OpaqueToken = CONST_EXPR(new OpaqueToken('primeCache'));
+import {Observable} from 'rxjs';
 
 
 @Injectable()

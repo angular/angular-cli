@@ -18,6 +18,8 @@ import * as http from 'http';
 import * as https from 'https';
 import * as url from 'url';
 
+import {ORIGIN_URL, BASE_URL} from '../../common';
+
 export class NodeConnection implements Connection {
   public readyState: ReadyState;
   public request: Request;

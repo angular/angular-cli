@@ -19,6 +19,8 @@
     "parse5.js",
     "polyfills.d.ts",
     "polyfills.js",
+    "common.d.ts",
+    "common.js",
     "global.d.ts",
     "global.js",
     "mock.d.ts",
