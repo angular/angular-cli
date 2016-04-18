@@ -13,11 +13,14 @@
   "scripts": {
     "clean:all": "rm -rf ./modules/*/dist ./modules/*/node_modules ./modules/*/typings */dist */node_modules */typings ./dist ./node_modules ./typings",
     
-    "install:all" : "npm run install-preboot && npm run install-universal && npm run loop-install && npm install && typings install",
+    "install:all"  : "npm run install-preboot && npm run install-universal && npm run loop-install && npm run loop-build && npm install && typings install && npm run install-examples",
 
     "loop-install" : "for dir in modules/[a-zA-Z0-9]* ; do printf \"=== Installing %s\\n\" \"$dir\" ; ( cd \"$dir\"; npm install && typings install; ) ;printf \"=== Installation exit code: %s for %s\\n\" $? \"$dir\" ; done",
-    "install-preboot"             : "cd ./modules/preboot && npm install",
-    "install-universal"           : "cd ./modules/universal && npm install",
+    "loop-build"   : "for dir in modules/[a-zA-Z0-9]* ; do printf \"=== Building %s\\n\" \"$dir\" ; ( cd \"$dir\"; npm run build; ) ;printf \"=== Building exit code: %s for %s\\n\" $? \"$dir\" ; done",
+
+    "install-preboot"   : "cd ./modules/preboot && npm install",
+    "install-universal" : "cd ./modules/universal && npm install",
+    "install-examples"  : "cd ./examples && npm run reload && npm run build && typings install",
     
     "prestart": "gulp build",
     "build": "gulp build",
