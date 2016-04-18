@@ -17,6 +17,9 @@
     "typings/browser",
     "node_modules"
   ],
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": { "rewriteTsconfig": false },
   "formatCodeOptions": {
     "indentSize": 2,
     "tabSize": 2,
