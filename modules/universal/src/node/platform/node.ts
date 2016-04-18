@@ -110,12 +110,7 @@ export const NODE_APPLICATION_PROVIDERS: Array<any> = CONST_EXPR([
   ...COMPILER_PROVIDERS,
 
   new Provider(TemplateParser, {useClass: NodeTemplateParser}),
-  new Provider(XHR, {
-    useFactory: (ngZone) => {
-      return new NodeXHRImpl(ngZone);
-    },
-    deps: [NgZone]
-  }),
+  new Provider(XHR, {useClass: NodeXHRImpl}),
 ]);
 
 /**
