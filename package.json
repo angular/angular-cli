@@ -12,6 +12,13 @@
   ],
   "scripts": {
     "clean:all": "rm -rf ./modules/*/dist ./modules/*/node_modules ./modules/*/typings */dist */node_modules */typings ./dist ./node_modules ./typings",
+    
+    "install:all" : "npm run install-preboot && npm run install-universal && npm run loop-install && npm install && typings install",
+
+    "loop-install" : "for dir in modules/[a-zA-Z0-9]* ; do printf \"=== Installing %s\\n\" \"$dir\" ; ( cd \"$dir\"; npm install && typings install; ) ;printf \"=== Installation exit code: %s for %s\\n\" $? \"$dir\" ; done",
+    "install-preboot"             : "cd ./modules/preboot && npm install",
+    "install-universal"           : "cd ./modules/universal && npm install",
+    
     "prestart": "gulp build",
     "build": "gulp build",
     "serve": "gulp serve",
