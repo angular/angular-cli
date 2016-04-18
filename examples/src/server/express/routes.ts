@@ -6,12 +6,12 @@ var appPage = require('../../universal/test_page/app');
 var todoApp = require('../../universal/todo/app');
 var routerApp = require('../../universal/test_router/app');
 var htmlApp = require('../../universal/html/html');
+var templateUrlApp = require('../../universal/template_url/app');
 
 import {enableProdMode, provide} from 'angular2/core';
 import {Http} from 'angular2/http';
 import {
   ROUTER_PROVIDERS,
-  APP_BASE_HREF,
   LocationStrategy,
   HashLocationStrategy
 } from 'angular2/router';
@@ -22,6 +22,7 @@ import {
   NODE_ROUTER_PROVIDERS,
   NODE_HTTP_PROVIDERS,
   NODE_PLATFORM_PIPES,
+  ORIGIN_URL,
   REQUEST_URL,
   BASE_URL,
   queryParamsToBoolean,
@@ -41,18 +42,18 @@ module.exports = function(ROOT) {
 
         // directives: [appPage.App],
         directives: [appPage.App, appPage.MyApp],
+        platformProviders: [
+          provide(ORIGIN_URL, {useValue: 'http://127.0.0.1:3000'}),
+          provide(BASE_URL, {useValue: '/'}),
+        ],
         providers: [
           provide(REQUEST_URL, {useValue: req.originalUrl}),
-          provide(APP_BASE_HREF, {useValue: '/'}),
-          provide(BASE_URL, {useExisting: req.originalUrl}),
 
           NODE_PLATFORM_PIPES,
           NODE_ROUTER_PROVIDERS,
           NODE_HTTP_PROVIDERS,
         ],
         data: {},
-
-        async: true,
 
         systemjs: {
           componentUrl: 'examples/src/universal/test_page/browser',
@@ -72,6 +73,8 @@ module.exports = function(ROOT) {
             }
           }
         },
+
+        async: queryParams.async === false ? false : true,
 
         preboot: queryParams.preboot === false ? null : {
           appRoot: 'app', // we need to manually include the root
@@ -123,13 +126,17 @@ module.exports = function(ROOT) {
           }
         },
         directives: [todoApp.TodoApp],
+        platformProviders: [
+          provide(ORIGIN_URL, {useValue: 'http://127.0.0.1:3000'}),
+          provide(BASE_URL, {useValue: '/examples/todo'}),
+        ],
         providers: [
+          provide(REQUEST_URL, {useValue: req.originalUrl}),
           // NODE_HTTP_PROVIDERS,
           // NODE_ROUTER_PROVIDERS,
-          // provide(BASE_URL, {useExisting: req.originalUrl}),
         ],
         data: {},
-
+        async: queryParams.async === false ? false : true,
         preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
 
       });
@@ -137,6 +144,60 @@ module.exports = function(ROOT) {
       res.render('src/universal/todo/index', options);
 
     });
+
+    router
+      .route('/examples/template_url')
+      .get(function ngTemplateUrl(req, res) {
+
+        let queryParams: any = queryParamsToBoolean(req.query);
+        let options: BootloaderConfig = Object.assign(queryParams , {
+          // client url for systemjs
+          buildClientScripts: true,
+          systemjs: {
+            componentUrl: 'examples/src/universal/template_url/browser',
+            map: {
+              'angular2-universal': 'node_modules/angular2-universal'
+            },
+            packages: {
+              'angular2-universal/polyfills': {
+                format: 'cjs',
+                main: 'dist/polyfills',
+                defaultExtension: 'js'
+              },
+              'angular2-universal': {
+                format: 'cjs',
+                main: 'dist/browser/index',
+                defaultExtension: 'js'
+              }
+            }
+          },
+          // ngOnStable: () => {
+          //   return new Promise(resolve => {
+          //     setTimeout(() => {
+          //       resolve();
+          //     }, 500);
+          //   });
+          // },
+          directives: [templateUrlApp.App],
+          platformProviders: [
+            provide(ORIGIN_URL, {useValue: 'http://127.0.0.1:3000'}),
+            provide(BASE_URL, {useValue: '/examples/template_url'}),
+          ],
+          providers: [
+            provide(REQUEST_URL, {useValue: req.originalUrl}),
+
+          ],
+          data: {},
+
+          async: queryParams.async === false ? false : true,
+          preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
+
+        });
+
+        res.render('src/universal/template_url/index', options);
+
+      });
+
     router
       .route('/examples/html')
       .get(function ngHtml(req, res) {
@@ -163,10 +224,12 @@ module.exports = function(ROOT) {
             }
           },
           directives: [htmlApp.Html],
+          platformProviders: [
+            provide(ORIGIN_URL, {useValue: 'http://127.0.0.1:3000'}),
+            provide(BASE_URL, {useValue: '/examples/html'})
+          ],
           providers: [
-            provide(APP_BASE_HREF, {useValue: '/examples/html'}),
             provide(REQUEST_URL, {useValue: req.originalUrl}),
-            provide(BASE_URL, {useExisting: req.originalUrl}),
 
             NODE_PLATFORM_PIPES,
             NODE_ROUTER_PROVIDERS,
@@ -256,7 +319,7 @@ module.exports = function(ROOT) {
       directives: [routerApp.App],
       providers: [
         // NODE_HTTP_PROVIDERS,
-        provide(APP_BASE_HREF, {useValue: baseUrl}),
+        provide(BASE_URL, {useValue: baseUrl}),
         provide(REQUEST_URL, {useValue: url}),
         ROUTER_PROVIDERS,
         NODE_ROUTER_PROVIDERS,
