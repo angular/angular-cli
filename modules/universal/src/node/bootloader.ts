@@ -99,7 +99,7 @@ export class Bootloader {
     let component = Component || this._config.component;
     let providers = componentProviders || this._config.componentProviders;
     let ngDoCheck = this._config.ngDoCheck || null;
-    let maxZoneTurns = (((Math.max(this._config.maxZoneTurns || 2000, 20)) - 10) / 10);
+    let maxZoneTurns = Math.max(this._config.maxZoneTurns || 2000, 1);
 
     return this._applicationAll(component, providers)
       .then((configRefs: any) => {
@@ -132,13 +132,13 @@ export class Bootloader {
 
             let promise = new Promise(resolve => {
               ngZone.runOutsideAngular(() => {
-                let checkAmount = 0;
+                let checkAmount = 1;
                 let checkCount = 0;
                 function checkStable() {
                   // we setTimeout 10 after the first 20 turns
                   checkCount++;
                   if (checkCount === maxZoneTurns) {
-                    console.warn('\nWARNING: your application is taking too long. \n');
+                    console.warn('\nWARNING: your application is taking longer than ' + maxZoneTurns + ' Zone turns. \n');
                     return resolve(config);
                   }
                   if (checkCount === 20) { checkAmount = 10; }
