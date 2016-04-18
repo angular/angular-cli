@@ -107,7 +107,7 @@ export class NodePlatformLocation extends PlatformLocation {
 
   constructor(
     @Inject(REQUEST_URL) requestUrl: string,
-    @Optional() @Inject(APP_BASE_HREF) baseUrl?: string) {
+    @Optional() @Inject(BASE_URL) baseUrl?: string) {
     super();
     this._baseHref = baseUrl || '/';
     this.pushState(null, null, joinWithSlash(this._baseHref, requestUrl));
