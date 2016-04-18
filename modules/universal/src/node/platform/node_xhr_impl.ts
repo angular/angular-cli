@@ -2,18 +2,24 @@ import * as http from 'http';
 import * as url from 'url';
 import * as fs from 'fs';
 
-import {NgZone} from 'angular2/core';
+import {ORIGIN_URL, BASE_URL} from '../../common';
+import {NgZone, Inject, Optional} from 'angular2/core';
 import {XHR} from 'angular2/compiler';
 import {PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/promise';
 
 export class NodeXHRImpl extends XHR {
-  constructor(public ngZone: NgZone) {
+  _baseUrl: string;
+  constructor(
+    public ngZone: NgZone,
+    @Inject(ORIGIN_URL) private _originUrl: string = '',
+    @Optional() @Inject(BASE_URL) _baseUrl?: string) {
     super();
+    this._baseUrl = _baseUrl || '/';
   }
 
   get(templateUrl: string): Promise<string> {
     const completer: PromiseCompleter<string> = PromiseWrapper.completer();
-    const parsedUrl = url.parse(templateUrl);
+    const parsedUrl = url.parse(url.resolve(url.resolve(this._originUrl, this._baseUrl), templateUrl));
 
     if (parsedUrl.protocol === 'file:') {
       this.ngZone.run(() => {
