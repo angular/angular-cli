@@ -1,5 +1,4 @@
 export * from './dom/node_dom_renderer';
-export * from './common';
 export * from './document';
 export * from './node_shared_styles_host';
 export * from './node_template_parser';
