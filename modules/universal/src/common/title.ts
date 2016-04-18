@@ -1,7 +1,7 @@
 /**
  * An abstract service that can be used to get and set the title of a current HTML document.
  */
-abstract class TitleAdapater {
+export abstract class Title {
 
   abstract getTitle(): string;
 

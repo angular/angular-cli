@@ -2,7 +2,7 @@
  * The Storage abstract class of the Web Storage API provides access to local storage for a particular
  * domain.
  */
-abstract class LocalStorageAdapater {
+export abstract class LocalStorage {
 
   static length: number;
 
