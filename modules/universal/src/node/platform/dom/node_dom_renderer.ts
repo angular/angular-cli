@@ -99,6 +99,19 @@ export const ATTRIBUTES = {
     'target',
     'type'
   ],
+  img: [
+    'alt',
+    'crossorigin',
+    'height',
+    'ismap',
+    'longdesc',
+    'referrerpolicy',
+    'sizesHTML5',
+    'src',
+    'srcsetHTML5',
+    'width',
+    'usemap'
+  ],
   input: [
     'id',
 
