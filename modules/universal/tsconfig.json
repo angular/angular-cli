@@ -16,10 +16,14 @@
   "exclude": [
     "typings/main",
     "typings/main.d.ts",
+    "typings/browser/amient/jasmine",
+    "typings/main/amient/jasmine",
     "node_modules",
     "preboot",
     "node_modules/preboot/test",
-    "node_modules/preboot/src"
+    "node_modules/preboot/src",
+    "browser/test",
+    "node/test"
   ],
   "formatCodeOptions": {
     "indentSize": 2,

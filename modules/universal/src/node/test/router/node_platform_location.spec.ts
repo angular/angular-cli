@@ -4,7 +4,7 @@ import {format, parse} from 'url';
 import {PlatformLocation} from 'angular2/router';
 import {NodePlatformLocation} from '../../router/node_platform_location';
 
-declare var jasmine;
+declare var jasmine: any;
 
 /* tslint:disable */
 function normalizeProperties({ pathname, search, hash }) {
@@ -118,7 +118,7 @@ describe('NodePlatformLocation', () => {
       it('should call "onPopState" listeners', () => {
         let index = states.length;
 
-        const popStateListener = jasmine.createSpy('popStateListener', (event) => {
+        const popStateListener = (<any>jasmine).createSpy('popStateListener', (event) => {
           (<any>expect)(event.type).toBe('popstate');
           (<any>expect)(event.state).toBe(index ? states[index - 1].state : null);
         });
@@ -134,7 +134,7 @@ describe('NodePlatformLocation', () => {
       it('should do nothing if the previous state doesn\'t exist', () => {
         back(spl, states.length);
 
-        const popStateListener = jasmine.createSpy('popStateListener');
+        const popStateListener = (<any>jasmine).createSpy('popStateListener');
         spl.onPopState(popStateListener);
 
         expectProperties(spl, requestUrl);
@@ -163,7 +163,7 @@ describe('NodePlatformLocation', () => {
       it('should call "onPopState" listeners', () => {
         let index = 0;
 
-        const popStateListener = jasmine.createSpy('popStateListener', (event) => {
+        const popStateListener = (<any>jasmine).createSpy('popStateListener', (event) => {
           (<any>expect)(event.type).toBe('popstate');
           (<any>expect)(event.state).toBe(index ? states[index - 1].state : null);
         });
@@ -181,7 +181,7 @@ describe('NodePlatformLocation', () => {
 
         const { url } = states[states.length - 1];
 
-        const popStateListener = jasmine.createSpy('popStateListener');
+        const popStateListener = (<any>jasmine).createSpy('popStateListener');
         spl.onPopState(popStateListener);
 
         expectProperties(spl, url);
