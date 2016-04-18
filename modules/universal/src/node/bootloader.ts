@@ -34,7 +34,7 @@ export interface BootloaderConfig {
 }
 
 export class Bootloader {
-  private _config: BootloaderConfig = {};
+  private _config: BootloaderConfig = { async: true, preboot: false };
   platformRef: any;
   applicationRef: any;
   constructor(config: BootloaderConfig) {
@@ -115,10 +115,6 @@ export class Bootloader {
         throw err;
       })
       .then((configRefs: any) => {
-        if ('precache' in this._config && this._config.precache) {
-          console.log('Please set `async: true` rather than `precache: true`');
-          this._config.async = true;
-        }
         if ('async' in this._config) {
           if (!this._config.async) {
             return configRefs;
