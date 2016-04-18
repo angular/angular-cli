@@ -25,6 +25,7 @@ export interface BootloaderConfig {
   primeCache?: boolean;
   async?: boolean;
   prime?: boolean;
+  maxZoneTurns?: number;
   bootloader?: Bootloader | any;
   ngOnInit?: (config: configRefs, document: any) => any;
   ngOnStable?: (config: configRefs, document: any) => any;
@@ -98,6 +99,7 @@ export class Bootloader {
     let component = Component || this._config.component;
     let providers = componentProviders || this._config.componentProviders;
     let ngDoCheck = this._config.ngDoCheck || null;
+    let maxZoneTurns = (((Math.max(this._config.maxZoneTurns || 2000, 20)) - 10) / 10);
 
     return this._applicationAll(component, providers)
       .then((configRefs: any) => {
@@ -135,6 +137,10 @@ export class Bootloader {
                 function checkStable() {
                   // we setTimeout 10 after the first 20 turns
                   checkCount++;
+                  if (checkCount === maxZoneTurns) {
+                    console.warn('\nWARNING: your application is taking too long. \n');
+                    return resolve(config);
+                  }
                   if (checkCount === 20) { checkAmount = 10; }
 
                   setTimeout(() => {
