@@ -43,7 +43,7 @@ module.exports = function(ROOT) {
         // directives: [appPage.App],
         directives: [appPage.App, appPage.MyApp],
         platformProviders: [
-          provide(ORIGIN_URL, {useValue: 'http://127.0.0.1:3000'}),
+          provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
           provide(BASE_URL, {useValue: '/'}),
         ],
         providers: [
@@ -127,7 +127,7 @@ module.exports = function(ROOT) {
         },
         directives: [todoApp.TodoApp],
         platformProviders: [
-          provide(ORIGIN_URL, {useValue: 'http://127.0.0.1:3000'}),
+          provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
           provide(BASE_URL, {useValue: '/examples/todo'}),
         ],
         providers: [
@@ -180,7 +180,7 @@ module.exports = function(ROOT) {
           // },
           directives: [templateUrlApp.App],
           platformProviders: [
-            provide(ORIGIN_URL, {useValue: 'http://127.0.0.1:3000'}),
+            provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
             provide(BASE_URL, {useValue: '/examples/template_url'}),
           ],
           providers: [
@@ -225,7 +225,7 @@ module.exports = function(ROOT) {
           },
           directives: [htmlApp.Html],
           platformProviders: [
-            provide(ORIGIN_URL, {useValue: 'http://127.0.0.1:3000'}),
+            provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
             provide(BASE_URL, {useValue: '/examples/html'})
           ],
           providers: [

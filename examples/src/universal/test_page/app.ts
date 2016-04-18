@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/delay';
 
-const URL = 'http://127.0.0.1:3000';
+const URL = 'http://localhost:3000';
 
 function transformData(data) {
   if (data.hasOwnProperty('created_at')) {

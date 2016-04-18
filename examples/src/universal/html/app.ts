@@ -81,7 +81,7 @@ export class App {
       this.server = 'Rendered on the Server';
     }, 10);
     // we need to use full urls for the server to work
-    this.http.get('http://localhost:3000/data.json')
+    this.http.get('/data.json')
       .subscribe(res => {
         this.data = res.json();
       });

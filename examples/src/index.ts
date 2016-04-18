@@ -1,4 +1,4 @@
-var SERVER_IP = '127.0.0.1';
+var SERVER_IP = 'localhost';
 
 import 'angular2-universal/polyfills';
 
