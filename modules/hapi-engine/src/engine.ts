@@ -8,7 +8,7 @@ import {
   BootloaderConfig
 } from 'angular2-universal';
 
-export interface HapiEngineConfig {
+export interface HapiEngineExtraOptions {
   server?: boolean;
   client?: boolean;
   selector?: string;
@@ -16,11 +16,18 @@ export interface HapiEngineConfig {
   bootloader?: any;
 }
 
-export type HapiEngineOptions = BootloaderConfig & HapiEngineConfig;
+export type HapiEngineConfig = BootloaderConfig & HapiEngineExtraOptions;
+
+
+export var HAPI_PLATFORM = null;
+
+export function disposeHapiPlatform() {
+  HAPI_PLATFORM = null;
+}
+
 
 class Runtime {
-  constructor(private options: HapiEngineOptions) {
-    this.renderPromise = renderToString;
+  constructor(private options: HapiEngineConfig) {
   }
   render(template: string, context, done: Function) {
     context = TsHoek.applyToDefaults(context, this.options);
@@ -30,16 +37,19 @@ class Runtime {
     const _template = template;
     const _Bootloader = Bootloader;
     let bootloader = _options.bootloader;
-    if (_options.bootloader) {
-      bootloader = _Bootloader.create(_options.bootloader);
-    } else {
-      let doc = _Bootloader.parseDocument(_template);
-      _options.document = doc;
-      _options.template = _options.template || _template;
-      bootloader = _Bootloader.create(_options);
+    if (!HAPI_PLATFORM) {
+      if (_options.bootloader) {
+        bootloader = _Bootloader.create(_options.bootloader);
+      } else {
+        let doc = _Bootloader.parseDocument(_template);
+        _options.document = doc;
+        _options.template = _options.template || _template;
+        bootloader = _Bootloader.create(_options);
+      }
+      HAPI_PLATFORM = bootloader;
     }
 
-    bootloader.serializeApplication()
+    HAPI_PLATFORM.serializeApplication()
       .then(html => done(null, this.buildClientScripts(html, context)))
       .catch(e => {
         console.error(e.stack);
@@ -100,8 +110,6 @@ class Runtime {
         ))
       );
   }
-
-  private renderPromise: any;
 
   private prebootScript(config: any): string {
     let baseUrl = (config && config.preboot && config.preboot.baseUrl) || '/preboot';
