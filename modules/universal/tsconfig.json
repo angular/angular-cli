@@ -19,9 +19,7 @@
     "node_modules",
     "preboot",
     "node_modules/preboot/test",
-    "node_modules/preboot/src",
-    "src/browser/test",
-    "src/node/test"
+    "node_modules/preboot/src"
   ],
   "formatCodeOptions": {
     "indentSize": 2,

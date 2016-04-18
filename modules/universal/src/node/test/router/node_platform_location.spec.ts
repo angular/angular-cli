@@ -4,6 +4,9 @@ import {format, parse} from 'url';
 import {PlatformLocation} from 'angular2/router';
 import {NodePlatformLocation} from '../../router/node_platform_location';
 
+declare var jasmine;
+
+/* tslint:disable */
 function normalizeProperties({ pathname, search, hash }) {
   pathname = pathname || '';
   search = search || '';
@@ -21,10 +24,9 @@ function expectProperties(spl: NodePlatformLocation, props) {
   }
 
   props = normalizeProperties(props);
-
-  expect(spl.pathname).toBe(props.pathname);
-  expect(spl.search).toBe(props.search);
-  expect(spl.hash).toBe(props.hash);
+  (<any>expect)(spl.pathname).toBe(props.pathname);
+  (<any>expect)(spl.search).toBe(props.search);
+  (<any>expect)(spl.hash).toBe(props.hash);
 }
 
 function back(spl: NodePlatformLocation, steps) {
@@ -56,14 +58,14 @@ describe('NodePlatformLocation', () => {
       const secondPathname = '/another/pathname';
       const spl = new NodePlatformLocation(format({ pathname: firstPathname }));
 
-      expect(spl.pathname).toBe(firstPathname);
+      (<any>expect)(spl.pathname).toBe(firstPathname);
       spl.pathname = secondPathname;
-      expect(spl.pathname).toBe(secondPathname);
+      (<any>expect)(spl.pathname).toBe(secondPathname);
     });
 
     it('should throw on trying to get base href from DOM', () => {
       const spl = new NodePlatformLocation('/');
-      expect(() => spl.getBaseHrefFromDOM()).toThrowError();
+      (<any>expect)(() => spl.getBaseHrefFromDOM()).toThrowError();
     });
   });
 
@@ -117,15 +119,15 @@ describe('NodePlatformLocation', () => {
         let index = states.length;
 
         const popStateListener = jasmine.createSpy('popStateListener', (event) => {
-          expect(event.type).toBe('popstate');
-          expect(event.state).toBe(index ? states[index - 1].state : null);
+          (<any>expect)(event.type).toBe('popstate');
+          (<any>expect)(event.state).toBe(index ? states[index - 1].state : null);
         });
 
         spl.onPopState(popStateListener);
 
         while (index--) {
           spl.back();
-          expect(popStateListener).toHaveBeenCalled();
+          (<any>expect)(popStateListener).toHaveBeenCalled();
         }
       });
 
@@ -138,7 +140,7 @@ describe('NodePlatformLocation', () => {
         expectProperties(spl, requestUrl);
         spl.back();
         expectProperties(spl, requestUrl);
-        expect(popStateListener).not.toHaveBeenCalled();
+        (<any>expect)(popStateListener).not.toHaveBeenCalled();
       });
     });
 
@@ -162,15 +164,15 @@ describe('NodePlatformLocation', () => {
         let index = 0;
 
         const popStateListener = jasmine.createSpy('popStateListener', (event) => {
-          expect(event.type).toBe('popstate');
-          expect(event.state).toBe(index ? states[index - 1].state : null);
+          (<any>expect)(event.type).toBe('popstate');
+          (<any>expect)(event.state).toBe(index ? states[index - 1].state : null);
         });
 
         spl.onPopState(popStateListener);
 
         while (++index < states.length) {
           spl.forward();
-          expect(popStateListener).toHaveBeenCalled();
+          (<any>expect)(popStateListener).toHaveBeenCalled();
         }
       });
 
@@ -185,7 +187,7 @@ describe('NodePlatformLocation', () => {
         expectProperties(spl, url);
         spl.forward();
         expectProperties(spl, url);
-        expect(popStateListener).not.toHaveBeenCalled();
+        (<any>expect)(popStateListener).not.toHaveBeenCalled();
       });
     });
 
@@ -235,3 +237,5 @@ describe('NodePlatformLocation', () => {
     });
   });
 });
+
+/* tslint:enable */
