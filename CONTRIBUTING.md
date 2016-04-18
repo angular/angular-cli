@@ -3,6 +3,7 @@
 We would love for you to contribute to Angular 2 and help make it even better than it is
 today! As a contributor, here are the guidelines we would like you to follow:
 
+ - [Getting Started with Universal](#gettingstarted)
  - [Code of Conduct](#coc)
  - [Question or Problem?](#question)
  - [Issues and Bugs](#issue)
@@ -11,6 +12,14 @@ today! As a contributor, here are the guidelines we would like you to follow:
  - [Coding Rules](#rules)
  - [Commit Message Guidelines](#commit)
  - [Signing the CLA](#cla)
+
+## <a name="gettingstarted"></a> Getting Started
+To start contributing, fork the Universal Repo & then clone it. CD into that newly created directory and run:
+    
+    npm run install:all (mac/linux use sudo)
+    
+This will take ~10 minutes to install/compile all the individual modules, and then get the examples section set up.
+Once this is complete you can CD into the examples folder (`cd examples`) and run `npm start` to fire up a working demo using the local modules.  Preboot / Universal / etc modules can be found in the top-level directory under the *modules* folder. (ie: `./modules/universal`)
 
 ## <a name="coc"></a> Code of Conduct
 Help us keep Angular open and inclusive. Please read and follow our [Code of Conduct][coc].
