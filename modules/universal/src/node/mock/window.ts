@@ -1,15 +1,8 @@
-import {DOM} from 'angular2/src/platform/dom/dom_adapter';
-import {provide} from 'angular2/core';
-
-// the overloaded "window" must extend node's "global"
-// see: https://github.com/angular/angular/blob/master/modules/angular2/src/facade/lang.ts#L38
-var win = Object.create(global);
-
 /**
  * Warn the developer about direct access to Window props
  * @param  {String} prop The property being accessed
  */
-function beDefensive(prop){
+export function beDefensive(win, prop) {
  return (<any>win).__defineGetter__(prop, () => {
    console.warn(`[WARNING] Property/method "${prop}" should not be called directly. Use DomAdapter instead.`);
 
@@ -20,14 +13,14 @@ function beDefensive(prop){
  });
 }
 
-let unforgeableAttributes = [
+export const unforgeableAttributes = [
   "window",
   "document",
   "location",
   "top"
-].map(beDefensive);
+];
 
-let replaceableAttributes = [
+export const replaceableAttributes = [
   "self",
   "locationbar",
   "menubar",
@@ -55,7 +48,7 @@ let replaceableAttributes = [
   "devicePixelRatio",
 ].map(beDefensive);
 
-let methods = [
+export const methods = [
   "close",
   "stop",
   "focus",
@@ -88,9 +81,9 @@ let methods = [
   "scroll",
   "scrollTo",
   "scrollBy"
-].map(beDefensive);
+];
 
-let readonlyAttributes = [
+export const readonlyAttributes = [
   "history",
   "frameElement",
   "navigator",
@@ -101,9 +94,9 @@ let readonlyAttributes = [
 
   // WindowLocalStorage
   "localStorage",
-].map(beDefensive);
+];
 
-let writableAttributes = [
+export const writableAttributes = [
   "name",
   "status",
   "opener",
@@ -175,9 +168,23 @@ let writableAttributes = [
   "onunload",
   "onvolumechange",
   "onwaiting"
-].map(beDefensive);
+];
 
 
-(<any>global).window = win;
+export function createWindow(fn: Function = beDefensive) {
+  // the overloaded "window" must extend node's "global"
+  // see: https://github.com/angular/angular/blob/master/modules/angular2/src/facade/lang.ts#L38
+  var win = Object.create(global);
 
-export var window = win;
+  unforgeableAttributes.map((name) => fn(win, name));
+  replaceableAttributes.map((name) => fn(win, name));
+  methods.map((name) => fn(win, name));
+  readonlyAttributes.map((name) => fn(win, name));
+  writableAttributes.map((name) => fn(win, name));
+
+  return win;
+}
+
+export function setGlobal(win = createWindow()) {
+  (<any>global).window = win;
+}
