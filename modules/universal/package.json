@@ -15,8 +15,6 @@
   "files": [
     "dist",
     "src",
-    "parse5.d.ts",
-    "parse5.js",
     "polyfills.d.ts",
     "polyfills.js",
     "common.d.ts",
