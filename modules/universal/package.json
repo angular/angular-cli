@@ -1,6 +1,6 @@
 {
   "name": "angular2-universal",
-  "version": "0.96.0",
+  "version": "0.96.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
