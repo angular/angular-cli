@@ -17,7 +17,10 @@ module.exports = {
       'doc': require('./commands/doc'),
       'github-pages-deploy': require('./commands/github-pages-deploy'),
 
-      // Configuration
+      // Easter eggs.
+      'make-this-awesome': require('./commands/easter-egg')('make-this-awesome'),
+
+      // Configuration.
       'set': require('./commands/set'),
       'get': require('./commands/get')
     };
