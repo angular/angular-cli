@@ -3,8 +3,10 @@ import {Provider} from 'angular2/core';
 import {bootstrap as bootstrapClient} from 'angular2/platform/browser';
 import {ComponentRef} from 'angular2/src/core/linker/dynamic_component_loader';
 
+var prebootCompleted = false;
+
 export function prebootComplete(value?: any) {
-  if ('preboot' in window) {
+  if ('preboot' in window && !prebootCompleted) {
     (<any>window).preboot.complete();
   }
   return value;
@@ -17,7 +19,3 @@ export function bootstrap(appComponentType: /*Type*/ any,
   return bootstrapClient(appComponentType, appProviders)
     .then(prebootComplete);
 }
-
-
-
-
