@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "scripts": {
-    "test": "node tests/runner",
+    "test": "node --harmony-proxies tests/runner",
     "lint": "eslint ."
   },
   "repository": {
@@ -42,6 +42,8 @@
     "exit": "^0.1.2",
     "fs-extra": "^0.26.6",
     "glob": "^7.0.3",
+    "harmony-proxy": "^1.0.1",
+    "harmony-reflect": "^1.4.5",
     "leek": "0.0.21",
     "lodash": "^4.6.1",
     "multidep": "^2.0.0",

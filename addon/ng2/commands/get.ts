@@ -1,29 +1,30 @@
 import * as chalk from 'chalk';
 import * as Command from 'ember-cli/lib/models/command';
-import {CliConfig} from '../models/config';
+import {Config} from '../models/config';
 
 
 const GetCommand = Command.extend({
   name: 'get',
-  description: 'Set a value in the configuration.',
-  works: 'outsideProject',
+  description: 'Get a value from the configuration.',
+  works: 'everywhere',
 
   availableOptions: [],
 
   run: function (commandOptions, rawArgs): Promise<void> {
     return new Promise(resolve => {
-      const value = new CliConfig().get(rawArgs[0]);
-      if (value === null) {
+      const config = new Config();
+      config.validatePath(rawArgs[0]);
+      const val = config.get(config.config, rawArgs[0]);
+
+      if (val === null) {
         console.error(chalk.red('Value cannot be found.'));
-      } else if (typeof value == 'object') {
-        console.log(JSON.stringify(value));
       } else {
-        console.log(value);
+        console.log(val);
       }
+
       resolve();
     });
   }
 });
 
 module.exports = GetCommand;
-module.exports.overrideCore = true;

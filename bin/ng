@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!node --harmony-proxies
 'use strict';
 
 // Provide a title to the process in `ps`
