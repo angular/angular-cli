@@ -17,7 +17,7 @@
   },
 
   "files": [
-    "app.ts",
+    "main.ts",
     "typings.d.ts"
   ]
 }
