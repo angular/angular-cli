@@ -17,6 +17,7 @@ module.exports = {
   ],
   
   beforeInstall: function(options) {
+    options.route = true;
     if (options.lazy) {
       options.isLazyRoute = true;
     }
