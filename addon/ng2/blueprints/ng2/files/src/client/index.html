@@ -6,7 +6,7 @@
   <base href="/">
   {{content-for 'head'}}
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  
+
   <!-- Service worker support is disabled by default.
        Install the worker script and uncomment to enable.
        Only enable service workers in production.
@@ -32,7 +32,6 @@
   <script src="vendor/angular2/bundles/http.dev.js"></script>
   <script src="vendor/angular2/bundles/router.dev.js"></script>
   
-  <script src="system-config.js"></script>
   <script>
     System.import('system-config.js').then(function(systemConfig) {
       System.config(systemConfig.config);
