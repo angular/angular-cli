@@ -1,7 +1,7 @@
 var path = require('path');
 var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
-
+var addBarrelRegistration = require('../../utilities/barrel-management');
 var getFiles = Blueprint.prototype.files;
 
 module.exports = {
@@ -35,10 +35,10 @@ module.exports = {
   files: function() {
     var fileList = getFiles.call(this);
     
-    if (this.options.flat) {
+    if (this.options && this.options.flat) {
       fileList = fileList.filter(p => p.indexOf('index.ts') <= 0);
     }
-    if (!this.options.route) {
+    if (this.options && !this.options.route) {
       fileList = fileList.filter(p => p.indexOf(path.join('shared', 'index.ts')) <= 0);
     }
 
@@ -60,6 +60,7 @@ module.exports = {
           }
         }
         this.appDir = dir.replace(`src${path.sep}client${path.sep}`, '');
+        this.generatePath = dir;
         return dir;
       },
       __styleext__: () => {
@@ -72,11 +73,20 @@ module.exports = {
     if (!options.flat) {
       var filePath = path.join('src', 'client', 'system-config.ts');
       var barrelUrl = this.appDir.replace(path.sep, '/');
-      return this.insertIntoFile(
-        filePath,
-        `  '${barrelUrl}',`,
-        { before: '  /** @cli-barrel */' }
-      );
+      
+      return addBarrelRegistration(this, this.generatePath)
+        .then(() => {
+          return this.insertIntoFile(
+            filePath,
+            `  '${barrelUrl}',`,
+            { before: '  /** @cli-barrel */' }
+          );
+        })
+    } else {
+      return addBarrelRegistration(
+        this, 
+        this.generatePath,
+        options.entity.name + '.component');
     }
   }
 };
