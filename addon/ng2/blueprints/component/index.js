@@ -42,6 +42,7 @@ module.exports = {
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
       flat: options.flat,
+      route: options.route,
       styleExt: this.styleExt,
       isLazyRoute: !!options.isLazyRoute,
       isAppComponent: !!options.isAppComponent
