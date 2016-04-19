@@ -8,7 +8,8 @@ module.exports = {
   description: '',
   
   availableOptions: [
-    { name: 'flat', type: Boolean, default: false }
+    { name: 'flat', type: Boolean, default: false },
+    { name: 'route', type: Boolean, default: false }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -36,6 +37,9 @@ module.exports = {
     
     if (this.options.flat) {
       fileList = fileList.filter(p => p.indexOf('index.ts') <= 0);
+    }
+    if (!this.options.route) {
+      fileList = fileList.filter(p => p.indexOf(path.join('shared', 'index.ts')) <= 0);
     }
 
     return fileList;
