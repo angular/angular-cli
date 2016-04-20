@@ -14,6 +14,7 @@ export interface HapiEngineExtraOptions {
   selector?: string;
   serializedCmp?: string;
   bootloader?: any;
+  reuseProviders?: boolean;
 }
 
 export type HapiEngineConfig = BootloaderConfig & HapiEngineExtraOptions;
@@ -49,7 +50,7 @@ class Runtime {
       HAPI_PLATFORM = bootloader;
     }
 
-    HAPI_PLATFORM.serializeApplication()
+    HAPI_PLATFORM.serializeApplication(null, (_options.reuseProviders === false) ? null : _options.providers)
       .then(html => done(null, this.buildClientScripts(html, context)))
       .catch(e => {
         console.error(e.stack);
