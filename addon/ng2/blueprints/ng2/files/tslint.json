@@ -1,5 +1,5 @@
 {
-  "rulesDirectory": ["node_modules/codelyzer/dist/src"],
+  "rulesDirectory": ["node_modules/codelyzer"],
   "rules": {
     "max-line-length": [true, 100],
     "no-inferrable-types": true,
