@@ -137,4 +137,26 @@ describe('Acceptance: ng generate component', function () {
       expect(existsSync(testPath)).to.equal(false);
     });
   });
+  
+  it('ng generate component mycomp will fail: no dashes in name', () => {
+    return ng(['generate', 'component', 'mycomp'])
+      .then((exitCode) => {
+        expect(exitCode).to.equal(1);
+      });
+  });
+  
+  it('ng generate component MYCOMP will fail: no dashes in name', () => {
+    return ng(['generate', 'component', 'MYCOMP'])
+      .then((exitCode) => {
+        expect(exitCode).to.equal(1);
+      });
+  });
+  
+  it('ng generate component myComp will succeed', () => {
+    return ng(['generate', 'component', 'myComp'])
+      .then(() => {
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.ts');
+        expect(existsSync(testPath)).to.equal(true);
+      });
+  });
 });
