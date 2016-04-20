@@ -26,16 +26,9 @@ var allSpecFiles = Object.keys(window.__karma__.files)
 
 // Load our SystemJS configuration.
 System.import('base/dist/system-config.js').then(function(systemJsConfig) {
-  // We need to add the distPrefix to our system config packages.
   var config = systemJsConfig.config;
-  Object.keys(config.packages).forEach(function(pkgName) {
-    if (pkgName[0] != '/' && pkgName[0] != '.') {
-      var pkg = config.packages[pkgName];
-      delete config.packages[pkgName];
-      config.packages[distPath + pkgName] = pkg;
-    }
-  });
-
+  // We need to add the distPath to our system config.
+  config.baseURL = distPath;
   System.config(config);
 }).then(function() {
   // Load and configure the TestComponentBuilder.
