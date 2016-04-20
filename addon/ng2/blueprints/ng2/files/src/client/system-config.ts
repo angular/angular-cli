@@ -3,8 +3,8 @@ const barrels: string[] = [
   /** @cli-barrel */
 ];
 
-function createPackageConfig(barrels: string[]): any {
-  return barrels.reduce((barrelConfig: any, barrelName: string) => {
+function createPackageConfig(barrelList: string[]): any {
+  return barrelList.reduce((barrelConfig: any, barrelName: string) => {
     barrelConfig[barrelName] = {
       format: 'register',
       defaultExtension: 'js',
