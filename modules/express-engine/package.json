@@ -2,7 +2,7 @@
   "name": "angular2-express-engine",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
