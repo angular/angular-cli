@@ -62,7 +62,7 @@ describe('Basic end-to-end Workflow', function () {
 
     // Can't user the `ng` helper because somewhere the environment gets
     // stuck to the first build done
-    sh.exec(`node_modules${path.sep}.bin${path.sep}ng build --environment=production --silent`);
+    sh.exec('ng build --environment=production --silent');
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
     var envPath = path.join(process.cwd(), 'dist', 'app', 'environment.js');
     var envContent = fs.readFileSync(envPath, { encoding: 'utf8' });
