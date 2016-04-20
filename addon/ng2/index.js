@@ -1,8 +1,15 @@
 /* jshint node: true */
 'use strict';
 
+var config = require('./models/config');
+
 module.exports = {
   name: 'ng2',
+  
+  config: function () {
+    this.project.ngConfig = this.project.ngConfig || config.CliConfig.fromProject();
+  },
+  
   includedCommands: function () {
     return {
       'new': require('./commands/new'),

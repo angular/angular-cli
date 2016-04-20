@@ -13,7 +13,7 @@ export interface CliConfigJson {
 
 function _findUp(name: string, from: string) {
   let currentDir = from;
-  while (currentDir && currentDir != '/') {
+  while (currentDir && currentDir !== path.parse(currentDir).root) {
     const p = path.join(currentDir, name);
     if (fs.existsSync(p)) {
       return p;
