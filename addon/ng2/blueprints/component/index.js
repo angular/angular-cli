@@ -4,6 +4,17 @@ var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 var addBarrelRegistration = require('../../utilities/barrel-management');
 var getFiles = Blueprint.prototype.files;
 
+function validateName(name) {
+  if (name.indexOf('-') >= 0) {
+    return true;
+  } else if (name === name.toUpperCase()) {
+    return false;
+  } else if (name === name.toLowerCase()) {
+    return false;
+  }
+  return true;
+}
+
 module.exports = {
   description: '',
   
@@ -16,6 +27,11 @@ module.exports = {
     var parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
+    
+    if (!validateName(parsedPath.name)) {
+      throw 'Names must contain a dash either include a dash or multiCase name. (i.e. multiCase -> multi-case)';
+    }
+    
     return parsedPath.name;
   },
 
