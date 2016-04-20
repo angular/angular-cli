@@ -10,6 +10,7 @@ export interface ExpressEngineExtraOptions {
   selector?: string;
   serializedCmp?: string;
   bootloader?: any;
+  reuseProviders?: boolean;
 }
 
 export type ExpressEngineConfig = BootloaderConfig & ExpressEngineExtraOptions;
@@ -52,8 +53,8 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
       }
 
       // bootstrap and render component to string
+      const _options = options;
       if (!EXPRESS_PLATFORM) {
-        const _options = options;
         const _template = clientHtml;
         const _Bootloader = Bootloader;
         let bootloader = _options.bootloader;
@@ -68,7 +69,7 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
         EXPRESS_PLATFORM = bootloader;
       }
 
-      EXPRESS_PLATFORM.serializeApplication()
+      EXPRESS_PLATFORM.serializeApplication(null, _options.reuseProviders === false ? null : _options.providers)
         .then(html => done(null, buildClientScripts(html, options)))
         .catch(e => {
           console.error(e.stack);
