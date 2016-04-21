@@ -41,7 +41,7 @@ module.exports = function (config) {
     ],
     proxies: {
       // required for component assets fetched by Angular's compiler
-      '/app/': '/base/dist/app/'
+      '/': '/base/dist/'
     },
     exclude: [
       // Vendor packages might include spec files. We don't want to use those.
