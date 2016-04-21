@@ -1,11 +1,11 @@
 import * as Command from 'ember-cli/lib/models/command';
-import {CliConfig} from '../models/config';
+import {Config} from '../models/config';
 
 
 const SetCommand = Command.extend({
   name: 'set',
   description: 'Set a value in the configuration.',
-  works: 'outsideProject',
+  works: 'everywhere',
 
   availableOptions: [
     { name: 'global', type: Boolean, default: false, aliases: ['g'] },
@@ -13,8 +13,14 @@ const SetCommand = Command.extend({
 
   run: function (commandOptions, rawArgs): Promise<void> {
     return new Promise(resolve => {
-      const config = new CliConfig();
-      config.set(rawArgs[0], rawArgs[1], commandOptions.force);
+      let config = new Config();
+
+      for (let arg of rawArgs) {
+        let [key, value] = arg.split('=');
+        config.validatePath(key);
+        config.set(key, value);
+      }
+
       config.save();
       resolve();
     });
@@ -22,4 +28,3 @@ const SetCommand = Command.extend({
 });
 
 module.exports = SetCommand;
-module.exports.overrideCore = true;

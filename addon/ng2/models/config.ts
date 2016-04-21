@@ -1,125 +1,186 @@
 import * as fs from 'fs';
 import * as path from 'path';
-
+import * as Proxy from 'harmony-proxy';
+import * as Reflect from 'harmony-reflect';
+import * as ObjectAssign from '../utilities/object-assign';
 
 export const CLI_CONFIG_FILE_NAME = 'angular-cli.json';
 
+export const ArrayMethods: Array<string> = ['pop', 'push', 'reverse', 'shift', 'sort', 'unshift'];
 
-export interface CliConfigJson {
+export const handler = {
+  get: function(target: any, key: any, receiver: any) {
+    if (key === 'toJSON') {
+      return () => target;
+    }
+
+    if (key === 'length') {
+      return;
+    }
+
+    if (key === 'inspect') {
+      return target;
+    }
+
+    if (target.type === 'array') {
+      const arr: Array<any> = [];
+      arr[key].call(target.enum);
+    }
+
+    if (ArrayMethods.indexOf(key) === -1) {
+      if (!(key in target)) {
+        target[key] = new Proxy({ type: 'object' }, handler);
+      }
+      return Reflect.get(target, key, receiver);
+    } else {
+      return Reflect.get([], key, receiver);
+    }
+  },
+  set: function(target: any, key: any, value: any) {
+    if (key === 'length') {
+      return;
+    }
+
+    if (!isNaN(key) && parseInt(key, 10) === 0) {
+      if (!target.enum) {
+        target.type = 'array';
+        target.enum = [];
+      }
+
+      if (value) {
+        target.enum.push(value);
+      }
+    } else {
+      if (target[key] && target[key].type) {
+        let type: string = target[key].type;
+        let assigningType: string;
+
+        if (!value && value === null) {
+          assigningType = 'null';
+        } else if (value && Array.isArray(value) && typeof value !== 'string') {
+          assigningType = 'array';
+        } else {
+          assigningType = typeof value;
+        }
+
+        if (type !== assigningType) {
+          throw new Error(`Cannot assign value of type '${assigningType}' to an property with type '${type}'.`);
+        }
+      }
+
+      if (!value && value === null) {
+        target[key] = { type: 'null', value: value };
+      } else if (value && Array.isArray(value) && typeof value !== 'string') {
+        target[key] = { type: 'array', enum: value };
+      } else {
+        if (typeof value === 'object' && Object.getOwnPropertyNames(value).length === 0) {
+          target[key] = { type: typeof value };
+        } else {
+          target[key] = { type: typeof value, value: value };
+        }
+      }
+    }
+  }
+};
+
+export interface ConfigJson {
   routes?: { [name: string]: any },
   packages?: { [name: string]: any }
 }
 
+export class Config {
+  path: ConfigJson;
+  config: Proxy;
 
-function _findUp(name: string, from: string) {
-  let currentDir = from;
-  while (currentDir && currentDir != '/') {
-    const p = path.join(currentDir, name);
-    if (fs.existsSync(p)) {
-      return p;
-    }
-
-    currentDir = path.resolve(currentDir, '..');
-  }
-
-  return null;
-}
-
-
-export class CliConfig {
-  constructor(private _config: CliConfigJson = CliConfig.fromProject()) {}
-
-  save(path: string = CliConfig.configFilePath()) {
-    if (!path) {
-      throw new Error('Could not find config path.');
-    }
-
-    fs.writeFileSync(path, JSON.stringify(this._config, null, 2), { encoding: 'utf-8' });
-  }
-
-  set(jsonPath: string, value: any, force: boolean = false): boolean {
-    let { parent, name, remaining } = this._findParent(jsonPath);
-    while (force && remaining) {
-      if (remaining.indexOf('.') != -1) {
-        // Create an empty map.
-        // TODO: create the object / array based on the Schema of the configuration.
-        parent[name] = {};
+  constructor(path?: string) {
+    if (path) {
+      try {
+        fs.accessSync(path);
+        this.path = path;
+        this.config = new Proxy({}, handler);
+      } catch (e) {
+        throw new Error(`${path} not found.`);
       }
-
-    }
-
-    parent[name] = value;
-    return true;
-  }
-
-  get(jsonPath: string): any {
-    let { parent, name, remaining } = this._findParent(jsonPath);
-    if (remaining || !(name in parent)) {
-      return null;
     } else {
-      return parent[name];
+      this.path = this._configFilePath();
+      this.config = new Proxy(this._fromProject(), handler);
     }
   }
 
-  private _validatePath(jsonPath: string) {
+  public save(): void {
+    try {
+      let config = ObjectAssign({}, JSON.parse(fs.readFileSync(this.path, 'utf8')), this.config.toJSON());
+      fs.writeFileSync(this.path, JSON.stringify(config, null, 2), 'utf8');
+    } catch (e) {
+      throw new Error(`Error while saving config.`);
+    }
+  }
+
+  public set(path: string, value: any): void {
+    const levels = path.split('.');
+    let current = this.config;
+    let i = 0;
+    while (i < levels.length - 1) {
+      delete current[levels[i]];
+      current = current[levels[i]];
+      i += 1;
+    }
+    
+    current[levels[levels.length - 1]] = value;
+  }
+
+  public get(obj: any, path: string): any {
+    const levels = path.split('.');
+    let current = obj;
+    let i = 0;
+    while (i < levels.length) {
+      if (current[levels[i]]) {
+        current = current[levels[i]];
+        i += 1;
+      } else {
+        return null;
+      }
+    }
+
+    if (current.type === 'array') {
+      return current.enum;
+    } else if (current.type === 'object') {
+      return current;
+    } else {
+      return current.value;
+    }
+  }
+
+  public validatePath(jsonPath: string) {
     if (!jsonPath.match(/^(?:[-_\w\d]+(?:\[\d+\])*\.)*(?:[-_\w\d]+(?:\[\d+\])*)$/)) {
       throw `Invalid JSON path: "${jsonPath}"`;
     }
   }
 
-  private _findParent(jsonPath: string): { parent: any, name: string | number, remaining?: string } {
-    this._validatePath(jsonPath);
-
-    let parent: any = null;
-    let current: any = this._config;
-
-    const splitPath = jsonPath.split('.');
-    let name: string | number = '';
-
-    while (splitPath.length > 0) {
-      const m = splitPath.shift().match(/^(.*?)(?:\[(\d+)\])*$/);
-
-      name = m[1];
-      const index: string = m[2];
-      parent = current;
-      current = current[name];
-
-      if (current === null || current === undefined) {
-        return {
-          parent,
-          name,
-          remaining: (!isNaN(index) ? `[${index}]` : '') + splitPath.join('.')
-        };
+  private _findUp(name: string, from: string): string {
+    let currentDir = from;
+    while (currentDir && currentDir != '/') {
+      const p = path.join(currentDir, name);
+      if (fs.existsSync(p)) {
+        return p;
       }
 
-      if (!isNaN(index)) {
-        name = index;
-        parent = current;
-        current = current[index];
-
-        if (current === null || current === undefined) {
-          return {
-            parent,
-            name,
-            remaining: splitPath.join('.')
-          };
-        }
-      }
+      currentDir = path.resolve(currentDir, '..');
     }
 
-    return { parent, name };
+    return null;
   }
 
-  static configFilePath(projectPath?: string): string {
+  private _configFilePath(projectPath?: string): string {
     // Find the configuration, either where specified, in the angular-cli project
     // (if it's in node_modules) or from the current process.
-    return (projectPath && _findUp(CLI_CONFIG_FILE_NAME, projectPath))
-        || _findUp(CLI_CONFIG_FILE_NAME, __dirname)
-        || _findUp(CLI_CONFIG_FILE_NAME, process.cwd());
+    return (projectPath && this._findUp(CLI_CONFIG_FILE_NAME, projectPath))
+        || this._findUp(CLI_CONFIG_FILE_NAME, __dirname)
+        || this._findUp(CLI_CONFIG_FILE_NAME, process.cwd());
   }
 
-  static fromProject(): CliConfigJson {
-    const configPath = this.configFilePath();
+  private _fromProject(): ConfigJson {
+    const configPath = this._configFilePath();
     return configPath ? require(configPath) : {};
   }
 }
