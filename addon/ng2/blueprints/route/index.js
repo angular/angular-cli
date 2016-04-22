@@ -13,7 +13,9 @@ module.exports = {
   availableOptions: [
     { name: 'skip-router-generation', type: Boolean, default: false, aliases: ['srg'] },
     { name: 'default', type: Boolean, default: false },
-    { name: 'lazy', type: Boolean, default: true }
+    { name: 'lazy', type: Boolean, default: true },
+    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
+    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] }
   ],
   
   beforeInstall: function(options) {

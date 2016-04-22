@@ -159,4 +159,18 @@ describe('Acceptance: ng generate component', function () {
         expect(existsSync(testPath)).to.equal(true);
       });
   });
+  
+  it('ng generate component my-comp --inline-template', function () {
+    return ng(['generate', 'component', 'my-comp', '--inline-template']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.html');
+      expect(existsSync(testPath)).to.equal(false);
+    });
+  });
+  
+  it('ng generate component my-comp --inline-style', function () {
+    return ng(['generate', 'component', 'my-comp', '--inline-style']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.css');
+      expect(existsSync(testPath)).to.equal(false);
+    });
+  });
 });

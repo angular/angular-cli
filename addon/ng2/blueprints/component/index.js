@@ -20,7 +20,9 @@ module.exports = {
   
   availableOptions: [
     { name: 'flat', type: Boolean, default: false },
-    { name: 'route', type: Boolean, default: false }
+    { name: 'route', type: Boolean, default: false },
+    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
+    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -42,6 +44,8 @@ module.exports = {
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
       flat: options.flat,
+      inlineTemplate: options.inlineTemplate,
+      inlineStyle: options.inlineStyle,
       route: options.route,
       styleExt: this.styleExt,
       isLazyRoute: !!options.isLazyRoute,
@@ -57,6 +61,12 @@ module.exports = {
     }
     if (this.options && !this.options.route) {
       fileList = fileList.filter(p => p.indexOf(path.join('shared', 'index.ts')) <= 0);
+    }
+    if (this.options && this.options.inlineTemplate) {
+      fileList = fileList.filter(p => p.indexOf('.html') < 0);
+    }
+    if (this.options && this.options.inlineStyle) {
+      fileList = fileList.filter(p => p.indexOf('.__styleext__') < 0);
     }
 
     return fileList;
