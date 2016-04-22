@@ -25,11 +25,12 @@ export interface BootloaderConfig {
   primeCache?: boolean;
   async?: boolean;
   prime?: boolean;
+  beautify?: boolean;
   maxZoneTurns?: number;
   bootloader?: Bootloader | any;
-  ngOnInit?: (config: configRefs, document: any) => any;
-  ngOnStable?: (config: configRefs, document: any) => any;
-  ngOnRendered?: (rendered: string) => string;
+  ngOnInit?: (config?: configRefs, document?: any) => any | Promise<any>;
+  ngOnStable?: (config?: configRefs, document?: any) => any | Promise<any>;
+  ngOnRendered?: (rendered?: string) => string | any | Promise<any>;
   ngDoCheck?: (config: configRefs) => boolean;
 }
 
@@ -221,6 +222,14 @@ export class Bootloader {
       .catch(err => {
         console.log('Rendering Document Error:', err);
         throw err;
+      })
+      .then((rendered: any) => {
+        if ('beautify' in this._config) {
+          if (!this._config.beautify) { return rendered; }
+          const beautify: any = require('js-beautify');
+          return beautify.html(rendered, {indent_size: 2});
+        }
+        return rendered;
       })
       .then((rendered: any) => {
         if ('ngOnRendered' in this._config) {

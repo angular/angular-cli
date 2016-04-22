@@ -75,6 +75,7 @@ module.exports = function(ROOT) {
         },
 
         async: queryParams.async === false ? false : true,
+        beautify: queryParams.beautify === false ? false : true,
 
         preboot: queryParams.preboot === false ? null : {
           appRoot: 'app', // we need to manually include the root
@@ -88,7 +89,7 @@ module.exports = function(ROOT) {
           presets:  ['keyPress', 'buttonPress', 'focus']
         },
         ngOnRendered: () => {
-          console.log('DONE');
+          console.log('DONE\n');
         },
         ngDoCheck: () => {
           // return true;
