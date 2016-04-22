@@ -1,7 +1,7 @@
 import {Injectable, Inject, Optional} from 'angular2/core';
 import {PlatformLocation} from 'angular2/router';
 import * as nodeUrl from 'url';
-import {REQUEST_URL, BASE_URL} from '../../common';
+import {REQUEST_URL, BASE_URL, ORIGIN_URL} from '../../common';
 
 
 
@@ -103,14 +103,17 @@ export class NodePlatformLocation extends PlatformLocation {
   private _stack: Array<State> = [];
   private _stackIndex = -1;
   private _popStateListeners: Array<Function> = [];
-  private _baseHref: string = '/';
+  private _baseUrl: string = '/';
+  private _originUrl: string;
 
   constructor(
+    @Inject(ORIGIN_URL) originUrl: string,
     @Inject(REQUEST_URL) requestUrl: string,
     @Optional() @Inject(BASE_URL) baseUrl?: string) {
     super();
-    this._baseHref = baseUrl || '/';
-    this.pushState(null, null, joinWithSlash(this._baseHref, requestUrl));
+    this._originUrl = originUrl;
+    this._baseUrl = baseUrl || '/';
+    this.pushState(null, null, joinWithSlash(this._baseUrl, requestUrl));
   }
 
   get search(): string { return this._loc.search; }
@@ -125,7 +128,7 @@ export class NodePlatformLocation extends PlatformLocation {
     `);
   }
 
-  getBaseHref(): string { return this._baseHref; }
+  getBaseHref(): string { return this._baseUrl; }
 
   path(): string { return this._loc.pathname; }
 
@@ -164,7 +167,7 @@ export class NodePlatformLocation extends PlatformLocation {
   }
 
   prepareExternalUrl(internal: string): string {
-    return joinWithSlash(this._baseHref, internal);
+    return joinWithSlash(this._baseUrl, internal);
   }
 
   toJSON(): any {
@@ -173,7 +176,7 @@ export class NodePlatformLocation extends PlatformLocation {
       stack: this._stack,
       stackIndex: this._stackIndex,
       popStateListeners: this._popStateListeners,
-      baseHref: this._baseHref
+      baseHref: this._baseUrl
     };
   }
 
@@ -185,7 +188,9 @@ export class NodePlatformLocation extends PlatformLocation {
   }
 
   private _setLocationByUrl(url: string): void {
-    const nodeLocation: NodeLocationConfig = nodeUrl.parse(url);
+    const resolvedOriginBase = nodeUrl.resolve(this._originUrl, this._baseUrl);
+    const resolvedWithUrl = nodeUrl.resolve(resolvedOriginBase, url);
+    const nodeLocation: NodeLocationConfig = nodeUrl.parse(resolvedWithUrl);
     this._loc = new NodeLocation(nodeLocation);
   }
 
