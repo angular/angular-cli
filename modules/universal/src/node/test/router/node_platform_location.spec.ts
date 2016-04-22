@@ -48,7 +48,7 @@ describe('NodePlatformLocation', () => {
       ];
 
       for (const urlParts of urls) {
-        const spl = new NodePlatformLocation(format(urlParts));
+        const spl = new NodePlatformLocation('', format(urlParts));
         expectProperties(spl, urlParts);
       }
     });
@@ -56,7 +56,7 @@ describe('NodePlatformLocation', () => {
     it('should set new "pathname"', () => {
       const firstPathname = '/some/pathname';
       const secondPathname = '/another/pathname';
-      const spl = new NodePlatformLocation(format({ pathname: firstPathname }));
+      const spl = new NodePlatformLocation('', format({ pathname: firstPathname }));
 
       (<any>expect)(spl.pathname).toBe(firstPathname);
       spl.pathname = secondPathname;
@@ -64,7 +64,7 @@ describe('NodePlatformLocation', () => {
     });
 
     it('should throw on trying to get base href from DOM', () => {
-      const spl = new NodePlatformLocation('/');
+      const spl = new NodePlatformLocation('', '/');
       (<any>expect)(() => spl.getBaseHrefFromDOM()).toThrowError();
     });
   });
@@ -85,7 +85,7 @@ describe('NodePlatformLocation', () => {
     ];
 
     beforeEach(() => {
-      spl = new NodePlatformLocation(requestUrl);
+      spl = new NodePlatformLocation('', requestUrl);
     });
 
     describe('pushState()', () => {
