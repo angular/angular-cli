@@ -95,7 +95,7 @@ module.exports = {
     }
 
     content = content.replace(importTemplate, '');
-
+    
     const route = new RegExp(`^\\s*\\{.*name: '${jsComponentName}'.*component: ${jsComponentName}.*`
                            + '\\},?\\s*\\n?', 'm');
     content = content.replace(route, '');
@@ -126,8 +126,8 @@ module.exports = {
     content = content.replace(/(import.+)\n(?!import)/m, function (f, m1) {
       return `${m1}\n${importTemplate}\n`;
     });
-
-    let route = `{path: '/${base}/...', name: '${jsComponentName}', component: ${jsComponentName}Component},`;
+    let defaultReg = options.default ? ', useAsDefault: true' : '';
+    let route = `{path: '/${base}/...', name: '${jsComponentName}', component: ${jsComponentName}Component${defaultReg}},`;
     content = content.replace(/(@RouteConfig\(\[\s*\n)([\s\S\n]*?)(^\s*\]\))/m, function(_, m1, m2, m3) {
       if (m2.length) {
         // Add a `,` if there's none.
