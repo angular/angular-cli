@@ -7,7 +7,7 @@
   "devDependencies": {},
   "ambientDependencies": {
     "browserify": "github:DefinitelyTyped/DefinitelyTyped/browserify/browserify.d.ts#abc2bcfb8524b1e027e6298d3348012b5b06eda5",
-    "es6-shim": "registry:dt/es6-shim#0.31.2+20160215162030",
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#48c1e3c1d6baefa4f1a126f188c27c4fefd36bff",
     "zone.js": "github:gdi2290/typed-zone.js/lib/zone.d.ts#225aa313388bdf78b18ed9f0b29f93a395146229"
   },
