@@ -17,7 +17,7 @@ module.exports = {
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] }
   ],
-  
+
   beforeInstall: function(options) {
     options.route = true;
     if (options.lazy) {
@@ -40,7 +40,7 @@ module.exports = {
     var parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
-    
+
     //leave the entity name intact for component generation
     return entityName;
   },
@@ -115,7 +115,7 @@ module.exports = {
 
     // Insert the import statement.
     let content = fs.readFileSync(parentFile, 'utf-8');
-    const importTemplate = `import {${jsComponentName}Component} from './+${base}';`;
+    const importTemplate = `import {${jsComponentName}Component} from './${options.isLazyRoute ? '+' , ''}${base}';`;
 
     if (content.indexOf(importTemplate) != -1) {
       // Already there, do nothing.
