@@ -115,7 +115,7 @@ module.exports = {
 
     // Insert the import statement.
     let content = fs.readFileSync(parentFile, 'utf-8');
-    const importTemplate = `import {${jsComponentName}Component} from './${options.isLazyRoute ? '+' , ''}${base}';`;
+    const importTemplate = `import {${jsComponentName}Component} from './${options.isLazyRoute ? '+' : ''}${base}';`;
 
     if (content.indexOf(importTemplate) != -1) {
       // Already there, do nothing.
