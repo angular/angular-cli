@@ -1,19 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+const schemaPath = path.resolve(process.env.CLI_ROOT, 'lib/config/schema.json');
+const schema = require(schemaPath);
 
 export const CLI_CONFIG_FILE_NAME = 'angular-cli.json';
-
-
-export interface CliConfigJson {
-  routes?: { [name: string]: any },
-  packages?: { [name: string]: any }
-}
+export const ARRAY_METHODS = ['push', 'splice', 'sort', 'reverse', 'pop', 'shift'];
 
 
 function _findUp(name: string, from: string) {
   let currentDir = from;
-  while (currentDir && currentDir != '/') {
+  while (currentDir && currentDir !== path.parse(currentDir).root) {
     const p = path.join(currentDir, name);
     if (fs.existsSync(p)) {
       return p;
@@ -27,9 +24,22 @@ function _findUp(name: string, from: string) {
 
 
 export class CliConfig {
-  constructor(private _config: CliConfigJson = CliConfig.fromProject()) {}
+  private _config: any;
 
-  save(path: string = CliConfig.configFilePath()) {
+  constructor(path?: string) {
+    if (path) {
+      try {
+        fs.accessSync(path);
+        this._config = require(path);
+      } catch (e) {
+        throw new Error(`Config file does not exits.`);
+      }
+    } else {
+      this._config = this._fromProject();
+    }
+  }
+
+  save(path: string = this._configFilePath()) {
     if (!path) {
       throw new Error('Could not find config path.');
     }
@@ -38,18 +48,55 @@ export class CliConfig {
   }
 
   set(jsonPath: string, value: any, force: boolean = false): boolean {
-    let { parent, name, remaining } = this._findParent(jsonPath);
-    while (force && remaining) {
-      if (remaining.indexOf('.') != -1) {
-        // Create an empty map.
-        // TODO: create the object / array based on the Schema of the configuration.
-        parent[name] = {};
-      }
-
+    let method: any = null;
+    let splittedPath = jsonPath.split('.');
+    if (ARRAY_METHODS.indexOf(splittedPath[splittedPath.length - 1]) != -1) {
+      method = splittedPath[splittedPath.length - 1];
+      splittedPath.splice(splittedPath.length - 1, 1);
+      jsonPath = splittedPath.join('.');
     }
 
-    parent[name] = value;
-    return true;
+    let { parent, name, remaining } = this._findParent(jsonPath);
+    let properties: any;
+    let additionalProperties: boolean;
+
+    const checkPath = jsonPath.split('.').reduce((o, i) => {
+      if (!o || !o.properties) {
+        throw new Error(`Invalid config path.`);
+      }
+      properties = o.properties;
+      additionalProperties = o.additionalProperties;
+
+      return o.properties[i];
+    }, schema);
+    const configPath = jsonPath.split('.').reduce((o, i) => o[i], this._config);
+
+    if (!properties[name] && !additionalProperties) {
+      throw new Error(`${name} is not a known property.`);
+    }
+
+    if (method) {
+      if (Array.isArray(configPath) && checkPath.type === 'array') {
+        [][method].call(configPath, value);
+        return true;
+      } else {
+        throw new Error(`Trying to use array method on non-array property type.`);
+      }
+    }
+
+    if (typeof checkPath.type === 'string' && isNaN(value)) {
+      parent[name] = value;
+      return true;
+    }
+
+    if (typeof checkPath.type === 'number' && !isNaN(value)) {
+      parent[name] = value;
+      return true;
+    }
+
+    if (typeof value != checkPath.type) {
+      throw new Error(`Invalid value type. Trying to set ${typeof value} to ${path.type}`);
+    }
   }
 
   get(jsonPath: string): any {
@@ -110,7 +157,7 @@ export class CliConfig {
     return { parent, name };
   }
 
-  static configFilePath(projectPath?: string): string {
+  private _configFilePath(projectPath?: string): string {
     // Find the configuration, either where specified, in the angular-cli project
     // (if it's in node_modules) or from the current process.
     return (projectPath && _findUp(CLI_CONFIG_FILE_NAME, projectPath))
@@ -118,8 +165,8 @@ export class CliConfig {
         || _findUp(CLI_CONFIG_FILE_NAME, process.cwd());
   }
 
-  static fromProject(): CliConfigJson {
-    const configPath = this.configFilePath();
+  private _fromProject(): any {
+    const configPath = this._configFilePath();
     return configPath ? require(configPath) : {};
   }
 }

@@ -6,7 +6,7 @@ import {CliConfig} from '../models/config';
 const GetCommand = Command.extend({
   name: 'get',
   description: 'Set a value in the configuration.',
-  works: 'outsideProject',
+  works: 'everywhere',
 
   availableOptions: [],
 
@@ -26,4 +26,3 @@ const GetCommand = Command.extend({
 });
 
 module.exports = GetCommand;
-module.exports.overrideCore = true;

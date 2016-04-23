@@ -1,3 +1,21 @@
 {
-  "routes": []
+  "project": {
+    "version": "<%= version %>",
+    "name": "<%= htmlComponentName %>"
+  },
+  "apps": [
+    {"main": "src/client/main.ts", "tsconfig": "src/client/tsconfig.json"}
+  ],
+  "addons": [],
+  "packages": [],
+  "e2e": {
+    "protractor": {
+      "config": "protractor.conf.js"
+    }
+  },
+  "test": {
+    "karma": {
+      "config": "karma.conf.js"
+    }
+  }
 }

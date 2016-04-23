@@ -22,7 +22,7 @@
       "items": {
         "type": "object",
         "properties": {
-          "root": "string",
+          "main": "string",
           "tsconfig": "string"
         },
         "additionalProperties": false
