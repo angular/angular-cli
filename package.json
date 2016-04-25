@@ -65,6 +65,7 @@
     "exists-sync": "0.0.3",
     "minimatch": "^3.0.0",
     "mocha": "^2.4.5",
+    "mock-fs": "^3.8.0",
     "object-assign": "^4.0.1",
     "rewire": "^2.5.1",
     "sinon": "^1.17.3",

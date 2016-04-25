@@ -38,6 +38,7 @@ describe('Acceptance: ng generate component', function () {
   });
 
   it('ng generate component test' + path.sep + 'my-comp', function () {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test'));
     return ng(['generate', 'component', 'test' + path.sep + 'my-comp']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-comp', 'my-comp.component.ts');
       expect(existsSync(testPath)).to.equal(true);
@@ -53,13 +54,13 @@ describe('Acceptance: ng generate component', function () {
   });
 
   it('ng generate component my-comp from a child dir', () => {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
       .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
-      .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         return ng(['generate', 'component', 'my-comp'])
@@ -71,13 +72,13 @@ describe('Acceptance: ng generate component', function () {
   });
 
   it('ng generate component child-dir' + path.sep + 'my-comp from a child dir', () => {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir'));
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
       .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
-      .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         return ng(['generate', 'component', 'child-dir' + path.sep + 'my-comp'])
@@ -91,13 +92,13 @@ describe('Acceptance: ng generate component', function () {
 
   it('ng generate component child-dir' + path.sep + '..' + path.sep + 'my-comp from a child dir',
     () => {
+      fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
       return new Promise(function (resolve) {
         process.chdir('./src');
         resolve();
       })
         .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
-        .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
         .then(() => {
           return ng([
@@ -114,13 +115,13 @@ describe('Acceptance: ng generate component', function () {
   it('ng generate component ' + path.sep + 'my-comp from a child dir, gens under ' +
     path.join('src', 'client', 'app'),
     () => {
+      fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
       return new Promise(function (resolve) {
         process.chdir('./src');
         resolve();
       })
         .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
-        .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
         .then(() => {
           return ng(['generate', 'component', path.sep + 'my-comp'])

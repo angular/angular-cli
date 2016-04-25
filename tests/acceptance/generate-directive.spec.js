@@ -45,6 +45,7 @@ describe('Acceptance: ng generate directive', function () {
   });
 
   it('ng generate directive test' + path.sep + 'my-dir', function () {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test'));
     return ng(['generate', 'directive', 'test' + path.sep + 'my-dir', '--flat', 'false']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-dir', 'my-dir.directive.ts');
       expect(existsSync(testPath)).to.equal(true);
@@ -60,13 +61,13 @@ describe('Acceptance: ng generate directive', function () {
   });
 
   it('ng generate directive my-dir from a child dir', () => {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
       .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
-      .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
@@ -79,13 +80,13 @@ describe('Acceptance: ng generate directive', function () {
   });
 
   it('ng generate directive child-dir' + path.sep + 'my-dir from a child dir', () => {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir'));
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
       .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
-      .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
@@ -100,13 +101,13 @@ describe('Acceptance: ng generate directive', function () {
 
   it('ng generate directive child-dir' + path.sep + '..' + path.sep + 'my-dir from a child dir',
     () => {
+      fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
       return new Promise(function (resolve) {
         process.chdir('./src');
         resolve();
       })
         .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
-        .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
         .then(() => {
           process.env.CWD = process.cwd();
@@ -123,13 +124,13 @@ describe('Acceptance: ng generate directive', function () {
   it('ng generate directive ' + path.sep + 'my-dir from a child dir, gens under ' +
     path.join('src', 'client', 'app'),
     () => {
+      fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
       return new Promise(function (resolve) {
         process.chdir('./src');
         resolve();
       })
         .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
-        .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
         .then(() => {
           process.env.CWD = process.cwd();

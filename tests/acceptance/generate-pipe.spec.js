@@ -38,6 +38,7 @@ describe('Acceptance: ng generate pipe', function () {
   });
 
   it('ng generate pipe test' + path.sep + 'my-pipe', function () {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test'));
     return ng(['generate', 'pipe', 'test' + path.sep + 'my-pipe']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-pipe.pipe.ts');
       expect(existsSync(testPath)).to.equal(true);
@@ -52,13 +53,13 @@ describe('Acceptance: ng generate pipe', function () {
   });
 
   it('ng generate pipe my-pipe from a child dir', () => {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
       .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
-      .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
@@ -71,13 +72,13 @@ describe('Acceptance: ng generate pipe', function () {
   });
 
   it('ng generate pipe child-dir' + path.sep + 'my-pipe from a child dir', () => {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'child-dir'));
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
       .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
-      .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
@@ -91,13 +92,13 @@ describe('Acceptance: ng generate pipe', function () {
   });
 
   it('ng generate pipe child-dir' + path.sep + '..' + path.sep + 'my-pipe from a child dir', () => {
+    fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
     return new Promise(function (resolve) {
       process.chdir('./src');
       resolve();
     })
       .then(() => process.chdir('./client'))
       .then(() => process.chdir('./app'))
-      .then(() => fs.mkdirsSync('./1'))
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
@@ -112,13 +113,13 @@ describe('Acceptance: ng generate pipe', function () {
   it('ng generate pipe ' + path.sep + 'my-pipe from a child dir, gens under ' +
     path.join('src', 'client', 'app'),
     () => {
+      fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1'));
       return new Promise(function (resolve) {
         process.chdir('./src');
         resolve();
       })
         .then(() => process.chdir('./client'))
         .then(() => process.chdir('./app'))
-        .then(() => fs.mkdirsSync('./1'))
         .then(() => process.chdir('./1'))
         .then(() => {
           process.env.CWD = process.cwd();
