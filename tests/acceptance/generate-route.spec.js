@@ -45,4 +45,10 @@ describe('Acceptance: ng generate route', function () {
       fileExpectations(false, true);
     });
   });
+  
+  it('ng generate route +my-route', function () {
+    return ng(['generate', 'route', '+my-route']).then(() => {
+      fileExpectations(true, true);
+    });
+  });
 });
