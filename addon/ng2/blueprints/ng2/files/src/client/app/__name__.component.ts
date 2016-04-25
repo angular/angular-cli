@@ -5,8 +5,8 @@ import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router'
   moduleId: __moduleName,
   selector: '<%= htmlComponentName %>-app',
   providers: [ROUTER_PROVIDERS],
-  templateUrl: '<%= htmlComponentName %>.html',
-  styleUrls: ['<%= dasherizedModuleName %>.<%= styleExt %>'],
+  templateUrl: '<%= htmlComponentName %>.component.html',
+  styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>'],
   directives: [ROUTER_DIRECTIVES],
   pipes: []
 })
