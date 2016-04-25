@@ -11,7 +11,6 @@ import {
 import {provide} from 'angular2/core';
 import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.service';
 
-
 describe('<%= classifiedModuleName %> Service', () => {
 
   beforeEachProviders(() => [<%= classifiedModuleName %>]);

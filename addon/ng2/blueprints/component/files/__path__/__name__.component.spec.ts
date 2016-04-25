@@ -12,8 +12,7 @@ import {
 } from 'angular2/testing';
 import {provide} from 'angular2/core';<% if (route) { %>
 import {Router, RouteParams} from 'angular2/router';<% } %>
-import {<%= classifiedModuleName %>Component} from './<%= dasherizedModuleName %>.component';
-<% if (route) { %>
+import {<%= classifiedModuleName %>Component} from './<%= dasherizedModuleName %>.component';<% if (route) { %>
 class MockRouter {
   registerPrimaryOutlet() { }
 }

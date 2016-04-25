@@ -13,7 +13,6 @@ import {
 import {provide, Component} from 'angular2/core';
 import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.directive';
 
-
 @Component({
   selector: 'test-component',
   template: `<div <%= dasherizedModuleName %>></div>`
