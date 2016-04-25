@@ -6,9 +6,9 @@ var getFiles = Blueprint.prototype.files;
 
 module.exports = {
   description: '',
-  
+
   availableOptions: [
-    { name: 'flat', type: Boolean, default: false }
+    { name: 'flat', type: Boolean, default: true }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -26,10 +26,10 @@ module.exports = {
       rawEntityName: this.rawEntityName
     };
   },
-  
+
   files: function() {
     var fileList = getFiles.call(this);
-    
+
     if (this.options && this.options.flat) {
       fileList = fileList.filter(p => p.indexOf('index.ts') <= 0);
     }
@@ -50,7 +50,7 @@ module.exports = {
       }
     };
   },
-  
+
   afterInstall: function(options) {
     if (!options.flat) {
       return addBarrelRegistration(
@@ -58,7 +58,7 @@ module.exports = {
         this.generatePath);
     } else {
       return addBarrelRegistration(
-        this, 
+        this,
         this.generatePath,
         options.entity.name + '.directive');
     }

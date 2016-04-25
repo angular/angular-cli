@@ -31,21 +31,21 @@ describe('Acceptance: ng generate directive', function () {
   });
 
   it('ng generate directive my-dir', function () {
-    return ng(['generate', 'directive', 'my-dir']).then(() => {
+    return ng(['generate', 'directive', 'my-dir', '--flat', 'false']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-dir', 'my-dir.directive.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate directive test' + path.sep + 'my-dir', function () {
-    return ng(['generate', 'directive', 'test' + path.sep + 'my-dir']).then(() => {
+    return ng(['generate', 'directive', 'test' + path.sep + 'my-dir', '--flat', 'false']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'test', 'my-dir', 'my-dir.directive.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate directive test' + path.sep + '..' + path.sep + 'my-dir', function () {
-    return ng(['generate', 'directive', 'test' + path.sep + '..' + path.sep + 'my-dir'])
+    return ng(['generate', 'directive', 'test' + path.sep + '..' + path.sep + 'my-dir', '--flat', 'false'])
       .then(() => {
         var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-dir', 'my-dir.directive.ts');
         expect(existsSync(testPath)).to.equal(true);
@@ -63,7 +63,7 @@ describe('Acceptance: ng generate directive', function () {
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
-        return ng(['generate', 'directive', 'my-dir'])
+        return ng(['generate', 'directive', 'my-dir', '--flat', 'false'])
       })
       .then(() => {
         var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '1', 'my-dir', 'my-dir.directive.ts');
@@ -82,7 +82,7 @@ describe('Acceptance: ng generate directive', function () {
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
-        return ng(['generate', 'directive', 'child-dir' + path.sep + 'my-dir'])
+        return ng(['generate', 'directive', 'child-dir' + path.sep + 'my-dir', '--flat', 'false'])
       })
       .then(() => {
         var testPath = path.join(
@@ -104,7 +104,7 @@ describe('Acceptance: ng generate directive', function () {
         .then(() => {
           process.env.CWD = process.cwd();
           return ng(
-            ['generate', 'directive', 'child-dir' + path.sep + '..' + path.sep + 'my-dir'])
+            ['generate', 'directive', 'child-dir' + path.sep + '..' + path.sep + 'my-dir', '--flat', 'false'])
         })
         .then(() => {
           var testPath =
@@ -126,7 +126,7 @@ describe('Acceptance: ng generate directive', function () {
         .then(() => process.chdir('./1'))
         .then(() => {
           process.env.CWD = process.cwd();
-          return ng(['generate', 'directive', path.sep + 'my-dir'])
+          return ng(['generate', 'directive', path.sep + 'my-dir', '--flat', 'false'])
         })
         .then(() => {
           var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-dir', 'my-dir.directive.ts');
