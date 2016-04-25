@@ -8,7 +8,7 @@ module.exports = {
   description: '',
   
   availableOptions: [
-    { name: 'flat', type: Boolean, default: false }
+    { name: 'flat', type: Boolean, default: true }
   ],
 
   normalizeEntityName: function (entityName) {
