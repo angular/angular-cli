@@ -19,6 +19,7 @@
     * [preboot.js](#prebootjs)
 * [Best Practices](#best-practices)
 * [What's in a name?](#whats-in-a-name)
+* [Getting Started](#getting-started)
 * [License](#license)
 
 # Modules
@@ -58,6 +59,9 @@ constructor(element: ElementRef, renderer: Renderer) {
 
 # What's in a name?
 We believe that using the word "universal" is correct when referring to a JavaScript Application that runs in more environments than the browser. (inspired by [Universal JavaScript](https://medium.com/@mjackson/universal-javascript-4761051b7ae9))
+
+# Getting Started
+Check out the [Universal Starter repo](https://github.com/angular/universal-starter) to see Universal in action!
 
 # License
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](/LICENSE)
