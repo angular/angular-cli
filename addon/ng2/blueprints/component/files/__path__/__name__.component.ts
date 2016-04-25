@@ -14,9 +14,7 @@ import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router'
   styles: []<% } else { %>
   styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']<% } if (route) { %>,
   directives: [ROUTER_DIRECTIVES]<% } %>
-})<% if (route) { %>
-@RouteConfig([
-])<% } %>
+})
 export class <%= classifiedModuleName %>Component implements OnInit {
 
   constructor() {}
