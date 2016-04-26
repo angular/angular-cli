@@ -129,13 +129,13 @@ module.exports = {
 
   normalizeEntityName: function (entityName) {
     var parsedPath = dynamicPathParser(this.project, entityName);
-    
+
     // If a specified route starts with `+` remove it as it'd break convention.
     if (parsedPath.name[0] === '+') {
       var index = entityName.lastIndexOf(parsedPath.name);
       entityName = entityName.substr(0, index) + entityName.substr(index + 1);
     }
-    
+
     this.dynamicPath = parsedPath;
 
     //leave the entity name intact for component generation
