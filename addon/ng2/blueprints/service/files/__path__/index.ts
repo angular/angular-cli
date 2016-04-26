@@ -1,1 +1,1 @@
-export {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.service';
+export {<%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.service';

@@ -9,13 +9,13 @@ import {
   injectAsync
 } from 'angular2/testing';
 import {provide} from 'angular2/core';
-import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.service';
+import {<%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.service';
 
 describe('<%= classifiedModuleName %> Service', () => {
 
-  beforeEachProviders(() => [<%= classifiedModuleName %>]);
+  beforeEachProviders(() => [<%= classifiedModuleName %>Service]);
   
-  it('should ...', inject([<%= classifiedModuleName %>], (service: <%= classifiedModuleName %>) => {
+  it('should ...', inject([<%= classifiedModuleName %>Service], (service: <%= classifiedModuleName %>Service) => {
 
   }));
 
