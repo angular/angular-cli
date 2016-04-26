@@ -5,7 +5,7 @@ import {CliConfig} from '../models/config';
 const SetCommand = Command.extend({
   name: 'set',
   description: 'Set a value in the configuration.',
-  works: 'outsideProject',
+  works: 'everywhere',
 
   availableOptions: [
     { name: 'global', type: Boolean, default: false, aliases: ['g'] },
@@ -22,4 +22,3 @@ const SetCommand = Command.extend({
 });
 
 module.exports = SetCommand;
-module.exports.overrideCore = true;

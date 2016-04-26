@@ -1,4 +1,5 @@
-var stringUtils = require('ember-cli/lib/utilities/string');
+const path        = require('path');
+const stringUtils = require('ember-cli/lib/utilities/string');
 
 module.exports = {
   description: '',
@@ -6,11 +7,13 @@ module.exports = {
   locals: function(options) {
     //TODO: pull value from config
     this.styleExt = 'css';
+    this.version = require(path.resolve(__dirname, '..', '..', '..', '..', 'package.json')).version;
     
     return {
       htmlComponentName: stringUtils.dasherize(options.entity.name),
       jsComponentName: stringUtils.classify(options.entity.name),
-      styleExt: this.styleExt
+      styleExt: this.styleExt,
+      version: this.version
     };
   },
   
