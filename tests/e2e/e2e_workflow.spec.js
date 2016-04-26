@@ -64,11 +64,23 @@ describe('Basic end-to-end Workflow', function () {
     // stuck to the first build done
     sh.exec('ng build --environment=production --silent');
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-    var envPath = path.join(process.cwd(), 'dist', 'app', 'environment.js');
-    var envContent = fs.readFileSync(envPath, { encoding: 'utf8' });
-    expect(envContent).to.include('production:true');
+    var appBundlePath = path.join(process.cwd(), 'dist', 'app', 'index.js');
+    var appBundleContent = fs.readFileSync(appBundlePath, { encoding: 'utf8' });
+    // production: true minimized turns into production:!0
+    expect(appBundleContent).to.include('production:!0');
     // Also does not create new things in GIT.
     expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
+  });
+
+  it('Produces a service worker manifest after production build', function () {
+    var manifestPath = path.join(process.cwd(), 'dist', 'manifest.appcache');
+    expect(existsSync(manifestPath)).to.be.equal(true);
+    // Read the worker.
+    //TODO: Commenting this out because it makes eslint fail(need to figure out why this expect was commented out)
+    // var lines = fse.readFileSync(manifestPath, {encoding: 'utf8'}).trim().split('\n');
+
+    // Check that a few critical files have been detected.
+    // expect(lines).to.include(`${path.sep}index.html`);
   });
 
   it('Can run `ng build` in created project', function () {
@@ -85,17 +97,6 @@ describe('Basic end-to-end Workflow', function () {
       .catch(() => {
         throw new Error('Build failed.');
       });
-  });
-
-  it('Produces a service worker manifest after initial build', function () {
-    var manifestPath = path.join(process.cwd(), 'dist', 'manifest.appcache');
-    expect(existsSync(manifestPath)).to.be.equal(true);
-    // Read the worker.
-    //TODO: Commenting this out because it makes eslint fail(need to figure out why this expect was commented out)
-    // var lines = fse.readFileSync(manifestPath, {encoding: 'utf8'}).trim().split('\n');
-
-    // Check that a few critical files have been detected.
-    // expect(lines).to.include(`${path.sep}index.html`);
   });
 
   it('Perform `ng test` after initial build', function () {
