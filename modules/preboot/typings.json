@@ -2,7 +2,7 @@
   "ambientDependencies": {
     "browserify": "github:DefinitelyTyped/DefinitelyTyped/browserify/browserify.d.ts#abc2bcfb8524b1e027e6298d3348012b5b06eda5",
     "event-stream": "github:DefinitelyTyped/DefinitelyTyped/event-stream/event-stream.d.ts#14ba891ee5f5bf86d76c0dee99cbafc892febaf8",
-    "gulp-rename": "github:DefinitelyTyped/DefinitelyTyped/gulp-rename/gulp-rename.d.ts#03f12b0f667d29fe8e15c2e5c56f3ed7e10c8eb9",
+    "gulp-rename": "registry:dt/gulp-rename#0.0.0+20160316155526",
     "gulp-uglify": "github:DefinitelyTyped/DefinitelyTyped/gulp-uglify/gulp-uglify.d.ts#ba956a3e6e8ebb82d33548209f793234efac44a2",
     "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#dd638012d63e069f2c99d06ef4dcc9616a943ee4",
     "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash-3.10.d.ts#86dbea8fc37d9473fee465da4f0a21bea4f8cbd9",

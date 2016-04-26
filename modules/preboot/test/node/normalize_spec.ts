@@ -86,7 +86,7 @@ describe('normalize', function () {
     it('should verify default', function () {
       let opts = { replay: null };
       normalizers.replay(opts);
-      expect(opts.replay).toEqual([]);
+      expect(opts.replay).toEqual([{ name: 'rerender' }]);
     });
 
     it('should throw an error if string not valid replay strategy', function () {

@@ -1,5 +1,5 @@
 import * as Q from 'q';
-import * as rename from 'gulp-rename';
+import rename = require('gulp-rename');  // hack to get working
 import * as uglify from 'gulp-uglify';
 import * as insert from 'gulp-insert';
 import * as eventStream from 'event-stream';

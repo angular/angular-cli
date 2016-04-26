@@ -1,6 +1,6 @@
 {
   "name": "preboot",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Record and play back browser events",
   "main": "dist/src/node/preboot_node.js",
   "browser": "dist/src/browser/preboot_browser.js",
@@ -8,7 +8,8 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc || true",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "preinstall": "typings install"
   },
   "files": [
     "src",

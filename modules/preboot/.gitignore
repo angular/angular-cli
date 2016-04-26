@@ -37,9 +37,9 @@ test/coverage
 /web_modules/
 
 # Typings
-/typings/browser
 /typings/main
-/typings/browser.d.ts
+/typings/browser
 /typings/main.d.ts
+/typings/browser.d.ts
 /tsd_typings
 /docs
