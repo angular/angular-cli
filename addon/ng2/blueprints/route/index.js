@@ -7,6 +7,96 @@ const stringUtils = require('ember-cli/lib/utilities/string');
 const Blueprint = require('ember-cli/lib/models/blueprint');
 
 
+function _regexEscape(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+}
+
+
+function _insertImport(content, symbolName, fileName) {
+  // Check if an import from the same file is there.
+  const importRegex = new RegExp('' +
+      /^(import\s+\{)/.source +  // 1. prefix
+      /(.*?)/.source +  // 2. current imports
+      `(\\} from '${_regexEscape(fileName)}';)` +  // 3. suffix
+      '\\n', 'm'
+  );
+
+  const m = content.match(importRegex);
+  if (m) {
+    // console.log(m[2], symbolName, m[2].);
+    if (m[2].match(new RegExp(`\\b${_regexEscape(symbolName)}\\b`))) {
+      // Already in the symbol list.
+      return content;
+    }
+
+    return content.substr(0, m.index) + m[1] + m[2] + ', ' + symbolName + m[3] + '\n'
+          + content.substr(m.index + m[0].length);
+  }
+
+  const importTemplate = `import {${symbolName}} from '${fileName}';`;
+  // Find the last import and add an import to it.
+  content = content.replace(/(import.+)\n(?!import)/m, function (f, m1) {
+    return `${m1}\n${importTemplate}\n`;
+  });
+
+  return content;
+}
+
+function _removeImport(content, symbolName, fileName) {
+  const importRegex = new RegExp('' +
+      /^(import\s+\{)/.source +  // prefix
+      /(.*?),?/.source +  // symbolsPre
+      '\\b' + _regexEscape(symbolName) + '\\b' +  // symbol
+      ',?' + '(.*?)' +  // symbolsPost
+      `(} from '${_regexEscape(fileName)}'\\s*;)` +  // suffix
+      '\\n', 'm'
+  );
+
+  return content.replace(importRegex, function(_, prefix, symbolsPre, symbol, symbolsPost, suffix) {
+    if (symbolsPre == '' && symbolsPost == '') {
+      // Nothing before or after, remove the line.
+      return '';
+    }
+    if (symbolsPre == '') {
+      // Nothing before.
+      return prefix + symbolsPost + suffix;
+    }
+    if (symbolsPost == '') {
+      // Nothing after.
+      return prefix + symbolsPre + suffix;
+    }
+    // Something before and after, add a `,`.
+    return prefix + symbolsPre + ',' + symbolsPost + suffix;
+  });
+}
+
+function _addRouteConfig(content) {
+  // If an annotation is already there, just ignore this.
+  if (content.indexOf('@RouteConfig') !== -1) {
+    return content;
+  }
+
+  // Add the imports.
+  content = _insertImport(content, 'RouteConfig', 'angular2/router');
+  content = _insertImport(content, 'ROUTER_DIRECTIVES', 'angular2/router');
+  content = _insertImport(content, 'ROUTER_PROVIDERS', 'angular2/router');
+
+  // Add the router config.
+  const m = content.match(/(@Component\(\{[\s\S\n]*?}\)\n)(\s*export class)/m);
+  if (!m) {
+    // No component.
+    // eslint-disable-next-line no-console
+    console.warn('No component annotation was found...');
+    return content;
+  }
+
+  content = content.substr(0, m.index) + m[1] + '@RouteConfig([\n])\n'
+          + m[2] + content.substr(m.index + m[0].length);
+
+  return content;
+}
+
+
 module.exports = {
   description: 'Generates a route and a template.',
 
@@ -29,6 +119,7 @@ module.exports = {
   afterInstall: function (options) {
     if (!options.skipRouterGeneration) {
       this._addRouteToParent(options);
+      this._verifyParentRoute(options);
     }
   },
 
@@ -70,22 +161,32 @@ module.exports = {
     };
   },
 
-  _findParentRouteFile: function() {
-    const parentDir = path.join(this.project.root, this.dynamicPath.dir);
-    let parentFile = path.join(parentDir, `${path.basename(this.dynamicPath.dir)}.ts`);
+  _findParentRouteFile: function(dir) {
+    const parentDir = path.isAbsolute(dir) ? dir : path.join(this.project.root, dir);
+    // Remove the `+` if it's the first character.
+    const routeName = path.basename(dir).substr(path.basename(dir)[0] == '+' ? 1 : 0);
+    let parentFile = path.join(parentDir, `${routeName}.component.ts`);
 
     if (parentDir == path.join(this.project.root, this.dynamicPath.appRoot)) {
-      parentFile = path.join(parentDir, this.project.name() + '.ts');
+      parentFile = path.join(parentDir, this.project.name() + '.component.ts');
     }
 
     if (fs.existsSync(parentFile)) {
       return parentFile;
     }
+
+    // Try without the .component.  Old routes won't have it, or users might rename it.
+    parentFile = path.join(parentDir, `${path.basename(dir)}.ts`);
+    if (fs.existsSync(parentFile)) {
+      return parentFile;
+    }
+
+    return null;
   },
 
   _removeRouteFromParent: function(options) {
     const parsedPath = this.dynamicPath;
-    const parentFile = this._findParentRouteFile(options);
+    const parentFile = this._findParentRouteFile(this.dynamicPath.dir);
     if (!parentFile) {
       return;
     }
@@ -94,14 +195,9 @@ module.exports = {
     const base = parsedPath.base;
 
     let content = fs.readFileSync(parentFile, 'utf-8');
-    const importTemplate = `import {${jsComponentName}} from './+${base}`;
-    if (content.indexOf(importTemplate) == -1) {
-      // Not found, nothing to do.
-      return;
-    }
+    content = _removeImport(content, `${jsComponentName}Component`,
+                            `./${options.isLazyRoute ? '+' : ''}${base}`);
 
-    content = content.replace(importTemplate, '');
-    
     const route = new RegExp(`^\\s*\\{.*name: '${jsComponentName}'.*component: ${jsComponentName}.*`
                            + '\\},?\\s*\\n?', 'm');
     content = content.replace(route, '');
@@ -111,7 +207,7 @@ module.exports = {
 
   _addRouteToParent: function(options) {
     const parsedPath = this.dynamicPath;
-    const parentFile = this._findParentRouteFile();
+    const parentFile = this._findParentRouteFile(this.dynamicPath.dir);
     if (!parentFile) {
       return;
     }
@@ -121,29 +217,145 @@ module.exports = {
 
     // Insert the import statement.
     let content = fs.readFileSync(parentFile, 'utf-8');
-    const importTemplate = `import {${jsComponentName}Component} from './${options.isLazyRoute ? '+' : ''}${base}';`;
+    content = _insertImport(content, `${jsComponentName}Component`,
+                            `./${options.isLazyRoute ? '+' : ''}${base}`);
 
-    if (content.indexOf(importTemplate) != -1) {
-      // Already there, do nothing.
-      return;
-    }
-
-    // Find the last import and add an import to it.
-    content = content.replace(/(import.+)\n(?!import)/m, function (f, m1) {
-      return `${m1}\n${importTemplate}\n`;
-    });
     let defaultReg = options.default ? ', useAsDefault: true' : '';
-    let route = `{path: '/${base}/...', name: '${jsComponentName}', component: ${jsComponentName}Component${defaultReg}},`;
+    let route = '{'
+              +   `path: '/${base}', `
+              +   `name: '${jsComponentName}', `
+              +   `component: ${jsComponentName}Component`
+              +   defaultReg
+              + '}';
+
+    // Add the route configuration.
+    content = _addRouteConfig(content);
     content = content.replace(/(@RouteConfig\(\[\s*\n)([\s\S\n]*?)(^\s*\]\))/m, function(_, m1, m2, m3) {
       if (m2.length) {
         // Add a `,` if there's none.
         m2 = m2.replace(/([^,])(\s*)\n$/, function (_, a1, a2) {
-          return a1 + ',' + a2;
+          return a1 + ',\n' + a2;
         });
       }
       return m1 + m2 + `  ${route}\n` + m3;
     });
 
+    // Add the directive.
+    content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\n\}\))/m, function(_, prefix, json, suffix) {
+      const m = json.match(/(^\s+directives:\s*\[)([\s\S\n]*)(\]\s*,?.*$)/m);
+      if (m) {
+        if (m[2].indexOf('ROUTER_DIRECTIVES') != -1) {
+          // Already there.
+          return _;
+        }
+
+        // There's a directive already, but no ROUTER_DIRECTIVES.
+        return prefix +
+          json.replace(/(^\s+directives:\s*\[)([\s\S\n]*)(^\]\s*,?.*$)/m, function(_, prefix, d, suffix) {
+            return prefix + d + (d ? ',' : '') + 'ROUTER_DIRECTIVES' + suffix;
+          }) + suffix;
+      } else {
+        // There's no directive already.
+        return prefix + json + ',\n  directives: [ROUTER_DIRECTIVES]' + suffix;
+      }
+    });
+
+    // Add the provider.
+    content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\n\}\))/m, function(_, prefix, json, suffix) {
+      const m = json.match(/(^\s+providers:\s*\[)([\s\S\n]*)(\]\s*,?.*$)/m);
+      if (m) {
+        if (m[2].indexOf('ROUTER_PROVIDERS') != -1) {
+          // Already there.
+          return _;
+        }
+
+        // There's a directive already, but no ROUTER_PROVIDERS.
+        return prefix +
+          json.replace(/(^\s+providers:\s*\[)([\s\S\n]*)(^\]\s*,?.*$)/m, function(_, prefix, d, suffix) {
+            return prefix + d + (d ? ',' : '') + 'ROUTER_PROVIDERS' + suffix;
+          }) + suffix;
+      } else {
+        // There's no directive already.
+        return prefix + json + ',\n  providers: [ROUTER_PROVIDERS]' + suffix;
+      }
+    });
+
+    // Change the template.
+    content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\}\))/m, function(_, prefix, json, suffix) {
+      const m = json.match(/(^\s+template:\s*\[)([\s\S\n]*)(\]\s*,?.*$)/m);
+
+      if (m) {
+        if (m[2].indexOf('<router-outlet></router-outlet>') != -1) {
+          // Already there.
+          return _;
+        }
+
+        // There's a template already, but no <router-outlet>.
+        return prefix +
+          json.replace(/(^\s+template:\s*`)([\s\S\n]*?)(`,?.*$)/m, function(_, prefix, t, suffix) {
+            return prefix + t + '<router-outlet></router-outlet>' + suffix;
+          }) + suffix;
+      } else {
+        // There's no template, look for the HTML file.
+        const htmlFile = parentFile.replace(/\.ts$/, '.html');
+        if (!fs.existsSync(htmlFile)) {
+          // eslint-disable-next-line no-console
+          console.log('Cannot find HTML: ' + htmlFile);
+
+          // Can't be found, exit early.
+          return _;
+        }
+
+        let html = fs.readFileSync(htmlFile, 'utf-8');
+        if (html.indexOf('<router-outlet></router-outlet>') == -1) {
+          html += '\n<router-outlet></router-outlet>';
+
+          fs.writeFileSync(htmlFile, html, 'utf-8');
+        }
+        return _;
+      }
+    });
+
     fs.writeFileSync(parentFile, content, 'utf-8');
+  },
+
+  _verifyParentRoute: function() {
+    const parsedPath = this.dynamicPath;
+    const parentFile = this._findParentRouteFile(parsedPath.dir);
+    if (!parentFile) {
+      return;
+    }
+
+    const gParentDir = path.dirname(path.dirname(parentFile));
+    const gParentFile = this._findParentRouteFile(gParentDir);
+
+    if (!gParentFile) {
+      return;
+    }
+
+    let parentComponentName = path.basename(parsedPath.dir);
+    if (parentComponentName[0] == '+') parentComponentName = parentComponentName.substr(1);
+    const jsComponentName = stringUtils.classify(parentComponentName);
+    const routeRegex = new RegExp(`^\\s*\\{.*name: '${jsComponentName}'.*component: ${jsComponentName}.*`
+      + '\\},?\\s*\\n?', 'm');
+
+    let content = fs.readFileSync(gParentFile, 'utf-8');
+    const m = content.match(routeRegex);
+    if (m) {
+      // Replace `path: '/blah'` with the proper `path: '/blah/...'`.
+      let json = m[0].replace(/(path:\s*['"])([^'"]+?)(['"])/, function(m, prefix, value, suffix) {
+        // If the path isn't ending with `...`, add it (with a URL separator).
+        if (!value.match(/\.\.\.$/)) {
+          if (!value.match(/\/$/)) {
+            value += '/';
+          }
+          value += '...';
+        }
+        return prefix + value + suffix;
+      });
+      content = content.substr(0, m.index) + json + content.substr(m.index + m[0].length);
+    }
+
+    fs.writeFileSync(gParentFile, content, 'utf-8');
   }
 };
