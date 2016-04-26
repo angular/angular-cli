@@ -19,6 +19,9 @@ function existsSync(path) {
   }
 }
 
+const bin = path.normalize('./node_modules/angular-cli/bin/ng');
+
+
 describe('Basic end-to-end Workflow', function () {
   before(conf.setup);
 
@@ -62,7 +65,7 @@ describe('Basic end-to-end Workflow', function () {
 
     // Can't user the `ng` helper because somewhere the environment gets
     // stuck to the first build done
-    sh.exec('ng build --environment=production --silent');
+    sh.exec(`${bin} build --environment=production --silent`);
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
     var envPath = path.join(process.cwd(), 'dist', 'app', 'environment.js');
     var envContent = fs.readFileSync(envPath, { encoding: 'utf8' });
@@ -77,13 +80,9 @@ describe('Basic end-to-end Workflow', function () {
     return ng(['build', '--silent'])
       .then(function () {
         expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-      })
-      .then(function () {
+
         // Also does not create new things in GIT.
         expect(sh.exec('git status --porcelain').output).to.be.equal('');
-      })
-      .catch(() => {
-        throw new Error('Build failed.');
       });
   });
 
@@ -190,9 +189,6 @@ describe('Basic end-to-end Workflow', function () {
     return ng(['build', '--silent'])
       .then(function () {
         expect(existsSync(tmpFileLocation));
-      })
-      .catch(err => {
-        throw new Error(err)
       });
   });
 
@@ -200,35 +196,34 @@ describe('Basic end-to-end Workflow', function () {
     this.timeout(420000);
 
     sh.exec('npm install node-sass', { silent: true });
-    return ng(['generate', 'component', 'test-component'])
-    .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.component.css');
-      let scssFile = path.join(componentPath, 'test-component.component.scss');
+    sh.exec(`${bin} generate component test-component`);
 
-      expect(existsSync(componentPath)).to.be.equal(true);
-      sh.mv(cssFile, scssFile);
-      expect(existsSync(scssFile)).to.be.equal(true);
-      expect(existsSync(cssFile)).to.be.equal(false);
-      let scssExample = '.outer {\n  .inner { background: #fff; }\n }';
-      fs.writeFileSync(scssFile, scssExample, 'utf8');
+    let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
+    let cssFile = path.join(componentPath, 'test-component.component.css');
+    let scssFile = path.join(componentPath, 'test-component.component.scss');
 
-      sh.exec('ng build --silent');
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
-      expect(existsSync(destCss)).to.be.equal(true);
-      let contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
+    expect(existsSync(componentPath)).to.be.equal(true);
+    sh.mv(cssFile, scssFile);
+    expect(existsSync(scssFile)).to.be.equal(true);
+    expect(existsSync(cssFile)).to.be.equal(false);
+    let scssExample = '.outer {\n  .inner { background: #fff; }\n }';
+    fs.writeFileSync(scssFile, scssExample, 'utf8');
 
-      sh.rm('-f', destCss);
-      process.chdir('src');
-      sh.exec('ng build --silent');
-      expect(existsSync(destCss)).to.be.equal(true);
-      contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
+    sh.exec(`${bin} build --silent`);
+    let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
+    expect(existsSync(destCss)).to.be.equal(true);
+    let contents = fs.readFileSync(destCss, 'utf8');
+    expect(contents).to.include('.outer .inner');
 
-      process.chdir('..');
-      sh.exec('npm uninstall node-sass', { silent: true });
-    });
+    sh.rm('-f', destCss);
+    process.chdir('src');
+    sh.exec(`../${bin} build --silent`);
+    expect(existsSync(destCss)).to.be.equal(true);
+    contents = fs.readFileSync(destCss, 'utf8');
+    expect(contents).to.include('.outer .inner');
+
+    process.chdir('..');
+    sh.exec('npm uninstall node-sass', { silent: true });
   });
 
   it('Installs less support successfully', function() {
@@ -248,7 +243,7 @@ describe('Basic end-to-end Workflow', function () {
       let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(lessFile, lessExample, 'utf8');
 
-      sh.exec('ng build --silent');
+      sh.exec(`${bin} build --silent`);
       let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
@@ -256,7 +251,7 @@ describe('Basic end-to-end Workflow', function () {
 
       sh.rm('-f', destCss);
       process.chdir('src');
-      sh.exec('ng build --silent');
+      sh.exec(`../${bin} build --silent`);
       expect(existsSync(destCss)).to.be.equal(true);
       contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
@@ -282,7 +277,7 @@ describe('Basic end-to-end Workflow', function () {
       let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(stylusFile, stylusExample, 'utf8');
 
-      sh.exec('ng build --silent');
+      sh.exec(`${bin} build --silent`);
       let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
@@ -290,7 +285,7 @@ describe('Basic end-to-end Workflow', function () {
 
       sh.rm('-f', destCss);
       process.chdir('src');
-      sh.exec('ng build --silent');
+      sh.exec(`../${bin} build --silent`);
       expect(existsSync(destCss)).to.be.equal(true);
       contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
@@ -314,11 +309,7 @@ describe('Basic end-to-end Workflow', function () {
     return ng(['build', '--silent'])
       .then(function () {
         expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-      })
-      .catch(() => {
-        throw new Error('Build failed.');
-      })
-      .finally(function () {
+
         // Clean `tmp` folder
         process.chdir(path.resolve(root, '..'));
         sh.rm('-rf', './tmp');  // tmp.teardown takes too long
