@@ -13,27 +13,27 @@
   },
   "private": true,
   "dependencies": {
-    "angular2": "2.0.0-beta.15",
+    "angular2": "2.0.0-beta.16",
     "es6-shim": "^0.35.0",
     "reflect-metadata": "0.1.2",
     "rxjs": "5.0.0-beta.2",
     "systemjs": "0.19.20",
-    "zone.js": "^0.6.11"
+    "zone.js": "^0.6.12"
   },
   "devDependencies": {
     "angular-cli": "0.0.*",
     "clang-format": "^1.0.35",
     "codelyzer": "0.0.14",
     "ember-cli-inject-live-reload": "^1.4.0",
-    "jasmine-core": "^2.3.4",
+    "jasmine-core": "^2.4.1",
     "jasmine-spec-reporter": "^2.4.0",
     "karma": "^0.13.15",
-    "karma-chrome-launcher": "^0.2.1",
-    "karma-jasmine": "^0.3.6",
-    "protractor": "^3.0.0",
+    "karma-chrome-launcher": "^0.2.3",
+    "karma-jasmine": "^0.3.8",
+    "protractor": "^3.3.0",
     "ts-node": "^0.5.5",
     "tslint": "^3.6.0",
-    "typescript": "^1.8.7",
-    "typings": "^0.7.12"
+    "typescript": "^1.8.10",
+    "typings": "^0.8.1"
   }
 }

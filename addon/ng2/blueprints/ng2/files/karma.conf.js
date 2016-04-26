@@ -18,6 +18,8 @@ module.exports = function (config) {
       { pattern: 'node_modules/systemjs/dist/system.src.js', included: true, watched: true },
       { pattern: 'node_modules/es6-shim/es6-shim.js', included: true, watched: true },
       { pattern: 'node_modules/angular2/bundles/angular2-polyfills.js', included: true, watched: true },
+      { pattern: 'node_modules/zone.js/dist/async-test.js', included: true, watched: true },
+      { pattern: 'node_modules/zone.js/dist/fake-async-test.js', included: true, watched: true },
       { pattern: 'node_modules/rxjs/bundles/Rx.js', included: true, watched: true },
       { pattern: 'node_modules/angular2/bundles/angular2.js', included: true, watched: true },
       { pattern: 'node_modules/angular2/bundles/http.dev.js', included: true, watched: true },
