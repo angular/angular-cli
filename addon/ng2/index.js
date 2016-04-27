@@ -7,7 +7,7 @@ module.exports = {
   name: 'ng2',
 
   config: function () {
-    this.project.config = this.project.config || config.CliConfig.fromProject();
+    this.project.ngConfig = this.project.ngConfig || config.CliConfig.fromProject();
   },
 
   includedCommands: function () {

@@ -35,11 +35,11 @@ export class CliConfig {
         throw new Error(`Config file does not exits.`);
       }
     } else {
-      this._config = this._fromProject();
+      this._config = CliConfig.fromProject();
     }
   }
 
-  save(path: string = this._configFilePath()) {
+  save(path: string = CliConfig._configFilePath()) {
     if (!path) {
       throw new Error('Could not find config path.');
     }
@@ -157,7 +157,7 @@ export class CliConfig {
     return { parent, name };
   }
 
-  private _configFilePath(projectPath?: string): string {
+  private static _configFilePath(projectPath?: string): string {
     // Find the configuration, either where specified, in the angular-cli project
     // (if it's in node_modules) or from the current process.
     return (projectPath && _findUp(CLI_CONFIG_FILE_NAME, projectPath))
@@ -165,8 +165,8 @@ export class CliConfig {
         || _findUp(CLI_CONFIG_FILE_NAME, process.cwd());
   }
 
-  private _fromProject(): any {
-    const configPath = this._configFilePath();
+  public static fromProject(): any {
+    const configPath = CliConfig._configFilePath();
     return configPath ? require(configPath) : {};
   }
 }
