@@ -76,6 +76,15 @@
         }
       },
       "additionalProperties": false
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "prefix": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

@@ -139,17 +139,23 @@ describe('Acceptance: ng generate component', function () {
     });
   });
   
-  it('ng generate component mycomp will fail: no dashes in name', () => {
+  it('ng generate component mycomp will prefix selector', () => {
     return ng(['generate', 'component', 'mycomp'])
-      .then((exitCode) => {
-        expect(exitCode).to.equal(1);
+      .then(() => {
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'mycomp', 'mycomp.component.ts');
+        expect(existsSync(testPath)).to.equal(true);
+        var contents = fs.readFileSync(testPath, 'utf8');
+        expect(contents.indexOf('selector: \'app-mycomp\'') === -1).to.equal(false);
       });
   });
   
-  it('ng generate component MYCOMP will fail: no dashes in name', () => {
-    return ng(['generate', 'component', 'MYCOMP'])
-      .then((exitCode) => {
-        expect(exitCode).to.equal(1);
+  it('ng generate component mycomp --no-prefix will not prefix selector', () => {
+    return ng(['generate', 'component', 'mycomp', '--no-prefix'])
+      .then(() => {
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'mycomp', 'mycomp.component.ts');
+        expect(existsSync(testPath)).to.equal(true);
+        var contents = fs.readFileSync(testPath, 'utf8');
+        expect(contents.indexOf('selector: \'mycomp\'') === -1).to.equal(false);
       });
   });
   
@@ -173,5 +179,8 @@ describe('Acceptance: ng generate component', function () {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.css');
       expect(existsSync(testPath)).to.equal(false);
     });
+  });
+  
+  it('should ', () => {
   });
 });

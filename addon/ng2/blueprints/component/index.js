@@ -1,19 +1,10 @@
 var path = require('path');
+var stringUtils = require('ember-cli-string-utils');
+var chalk = require('chalk');
 var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 var addBarrelRegistration = require('../../utilities/barrel-management');
 var getFiles = Blueprint.prototype.files;
-
-function validateName(name) {
-  if (name.indexOf('-') >= 0) {
-    return true;
-  } else if (name === name.toUpperCase()) {
-    return false;
-  } else if (name === name.toLowerCase()) {
-    return false;
-  }
-  return true;
-}
 
 module.exports = {
   description: '',
@@ -22,7 +13,8 @@ module.exports = {
     { name: 'flat', type: Boolean, default: false },
     { name: 'route', type: Boolean, default: false },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
-    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] }
+    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
+    { name: 'prefix', type: Boolean, default: true }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -30,8 +22,17 @@ module.exports = {
 
     this.dynamicPath = parsedPath;
     
-    if (!validateName(parsedPath.name)) {
-      throw 'Names must contain a dash either include a dash or multiCase name. (i.e. multiCase -> multi-case)';
+    var defaultPrefix = '';
+    if (this.project.ngConfig && 
+        this.project.ngConfig.defaults &&
+        this.project.ngConfig.defaults.prefix) {
+      defaultPrefix = this.project.ngConfig.defaults.prefix + '-';
+    }
+    var prefix = this.options.prefix ? defaultPrefix : '';
+    this.selector = stringUtils.dasherize(prefix + parsedPath.name);
+    
+    if (this.selector.indexOf('-') === -1) {
+      this._writeStatusToUI(chalk.yellow, 'WARNING', 'selectors should contain a dash');
     }
     
     return parsedPath.name;
@@ -49,7 +50,8 @@ module.exports = {
       route: options.route,
       styleExt: this.styleExt,
       isLazyRoute: !!options.isLazyRoute,
-      isAppComponent: !!options.isAppComponent
+      isAppComponent: !!options.isAppComponent,
+      selector: this.selector
     };
   },
   

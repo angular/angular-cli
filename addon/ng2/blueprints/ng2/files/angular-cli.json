@@ -17,5 +17,8 @@
     "karma": {
       "config": "karma.conf.js"
     }
+  },
+  "defaults": {
+    "prefix": "app"
   }
 }

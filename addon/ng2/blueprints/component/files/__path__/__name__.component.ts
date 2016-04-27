@@ -3,7 +3,7 @@ import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router'
 
 @Component({
   moduleId: __moduleName,
-  selector: '<%= dasherizedModuleName %>',<% if(inlineTemplate) { %>
+  selector: '<%= selector %>',<% if(inlineTemplate) { %>
   template: `
     <p>
       <%= dasherizedModuleName %> Works!

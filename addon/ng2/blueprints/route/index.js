@@ -105,7 +105,8 @@ module.exports = {
     { name: 'default', type: Boolean, default: false },
     { name: 'lazy', type: Boolean, default: true },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
-    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] }
+    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
+    { name: 'prefix', type: Boolean, default: true }
   ],
 
   beforeInstall: function(options) {
