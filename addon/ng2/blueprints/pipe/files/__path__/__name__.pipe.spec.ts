@@ -8,7 +8,6 @@ import {
   beforeEachProviders
 } from '@angular/core/testing';
 import { TestComponentBuilder } from '@angular/compiler/testing';
-import { provide } from '@angular/core';
 import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.pipe';
 
 describe('<%= classifiedModuleName %> Pipe', () => {
