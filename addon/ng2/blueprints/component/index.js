@@ -1,14 +1,14 @@
 var path = require('path');
-var stringUtils = require('ember-cli-string-utils');
 var chalk = require('chalk');
 var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 var addBarrelRegistration = require('../../utilities/barrel-management');
 var getFiles = Blueprint.prototype.files;
+const stringUtils = require('ember-cli/lib/utilities/string');
 
 module.exports = {
   description: '',
-  
+
   availableOptions: [
     { name: 'flat', type: Boolean, default: false },
     { name: 'route', type: Boolean, default: false },
@@ -21,27 +21,27 @@ module.exports = {
     var parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
-    
+
     var defaultPrefix = '';
-    if (this.project.ngConfig && 
+    if (this.project.ngConfig &&
         this.project.ngConfig.defaults &&
         this.project.ngConfig.defaults.prefix) {
       defaultPrefix = this.project.ngConfig.defaults.prefix + '-';
     }
     var prefix = this.options.prefix ? defaultPrefix : '';
     this.selector = stringUtils.dasherize(prefix + parsedPath.name);
-    
+
     if (this.selector.indexOf('-') === -1) {
       this._writeStatusToUI(chalk.yellow, 'WARNING', 'selectors should contain a dash');
     }
-    
+
     return parsedPath.name;
   },
 
   locals: function (options) {
     //TODO: pull value from config
     this.styleExt = 'css';
-    
+
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
       flat: options.flat,
@@ -54,10 +54,10 @@ module.exports = {
       selector: this.selector
     };
   },
-  
+
   files: function() {
     var fileList = getFiles.call(this);
-    
+
     if (this.options && this.options.flat) {
       fileList = fileList.filter(p => p.indexOf('index.ts') <= 0);
     }
@@ -73,7 +73,7 @@ module.exports = {
 
     return fileList;
   },
-  
+
   fileMapTokens: function (options) {
     // Return custom template variables here.
     return {
@@ -81,7 +81,7 @@ module.exports = {
         var dir = this.dynamicPath.dir;
         if (!options.locals.flat) {
           dir += path.sep + options.dasherizedModuleName;
-          
+
           if (options.locals.isLazyRoute) {
             var dirParts = dir.split(path.sep);
             dirParts[dirParts.length - 1] = `+${dirParts[dirParts.length - 1]}`;
@@ -97,12 +97,12 @@ module.exports = {
       }
     };
   },
-  
+
   afterInstall: function(options) {
     if (!options.flat) {
       var filePath = path.join('src', 'client', 'system-config.ts');
       var barrelUrl = this.appDir.replace(path.sep, '/');
-      
+
       return addBarrelRegistration(this, this.generatePath)
         .then(() => {
           return this.insertIntoFile(
@@ -113,7 +113,7 @@ module.exports = {
         })
     } else {
       return addBarrelRegistration(
-        this, 
+        this,
         this.generatePath,
         options.entity.name + '.component');
     }

@@ -138,7 +138,7 @@ describe('Acceptance: ng generate component', function () {
       expect(existsSync(testPath)).to.equal(false);
     });
   });
-  
+
   it('ng generate component mycomp will prefix selector', () => {
     return ng(['generate', 'component', 'mycomp'])
       .then(() => {
@@ -148,7 +148,7 @@ describe('Acceptance: ng generate component', function () {
         expect(contents.indexOf('selector: \'app-mycomp\'') === -1).to.equal(false);
       });
   });
-  
+
   it('ng generate component mycomp --no-prefix will not prefix selector', () => {
     return ng(['generate', 'component', 'mycomp', '--no-prefix'])
       .then(() => {
@@ -158,7 +158,7 @@ describe('Acceptance: ng generate component', function () {
         expect(contents.indexOf('selector: \'mycomp\'') === -1).to.equal(false);
       });
   });
-  
+
   it('ng generate component myComp will succeed', () => {
     return ng(['generate', 'component', 'myComp'])
       .then(() => {
@@ -166,21 +166,19 @@ describe('Acceptance: ng generate component', function () {
         expect(existsSync(testPath)).to.equal(true);
       });
   });
-  
+
   it('ng generate component my-comp --inline-template', function () {
     return ng(['generate', 'component', 'my-comp', '--inline-template']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.html');
       expect(existsSync(testPath)).to.equal(false);
     });
   });
-  
+
   it('ng generate component my-comp --inline-style', function () {
     return ng(['generate', 'component', 'my-comp', '--inline-style']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', 'my-comp', 'my-comp.component.css');
       expect(existsSync(testPath)).to.equal(false);
     });
   });
-  
-  it('should ', () => {
-  });
+
 });
