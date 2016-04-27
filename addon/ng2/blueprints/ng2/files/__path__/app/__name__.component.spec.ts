@@ -6,10 +6,9 @@ import {
   expect,
   iit,
   it,
-  inject,
-  ComponentFixture,
-  TestComponentBuilder
-} from 'angular2/testing';
+  inject
+} from '@angular/core/testing';
+import { ComponentFixture, TestComponentBuilder } from '@angular/compiler/testing';
 import { <%= jsComponentName %>AppComponent } from '../app/<%= htmlComponentName %>.component';
 
 beforeEachProviders(() => [<%= jsComponentName %>AppComponent]);

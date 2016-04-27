@@ -1,24 +1,44 @@
+/** Only use System here. */
+declare var System: any;
+
 const barrels: string[] = [
+  // Angular specific barrels.
+  '@angular/core',
+  '@angular/common',
+  '@angular/compiler',
+  '@angular/http',
+  '@angular/router',
+  '@angular/platform-browser',
+  '@angular/platform-browser-dynamic',
+
+  'rxjs',
+
+  // App specific barrels.
   'app',
   'app/shared',
   /** @cli-barrel */
 ];
 
-function createPackageConfig(barrelList: string[]): any {
-  return barrelList.reduce((barrelConfig: any, barrelName: string) => {
+
+// Angular CLI SystemJS configuration.
+System.config({
+  map: {
+    '@angular': 'vendor/@angular',
+    'rxjs': 'vendor/rxjs',
+    'main': 'main.js'
+  },
+  packages: barrels.reduce((barrelConfig: any, barrelName: string) => {
     barrelConfig[barrelName] = {
-      format: 'register',
-      defaultExtension: 'js',
       main: 'index'
     };
     return barrelConfig;
-  }, {});
-}
+  }, {})
+});
 
 
 // Add your custom SystemJS configuration here.
-export const config: any = {
-  packages: Object.assign({
+System.config({
+  packages: {
     // Add your custom SystemJS packages here.
-  }, createPackageConfig(barrels))
-};
+  }
+});

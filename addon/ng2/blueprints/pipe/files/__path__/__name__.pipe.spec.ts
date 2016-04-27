@@ -5,10 +5,10 @@ import {
   ddescribe,
   expect,
   inject,
-  TestComponentBuilder,
   beforeEachProviders
-} from 'angular2/testing';
-import { provide } from 'angular2/core';
+} from '@angular/core/testing';
+import { TestComponentBuilder } from '@angular/compiler/testing';
+import { provide } from '@angular/core';
 import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.pipe';
 
 describe('<%= classifiedModuleName %> Pipe', () => {

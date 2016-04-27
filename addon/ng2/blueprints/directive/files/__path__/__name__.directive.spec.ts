@@ -6,11 +6,10 @@ import {
   expect,
   iit,
   it,
-  inject,
-  ComponentFixture,
-  TestComponentBuilder
-} from 'angular2/testing';
-import { provide, Component } from 'angular2/core';
+  inject
+} from '@angular/core/testing';
+import {ComponentFixture, TestComponentBuilder} from '@angular/compiler/testing';
+import { provide, Component } from '@angular/core';
 import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.directive';
 
 @Component({

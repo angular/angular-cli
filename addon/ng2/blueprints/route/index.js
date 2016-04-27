@@ -70,15 +70,15 @@ function _removeImport(content, symbolName, fileName) {
   });
 }
 
-function _addRouteConfig(content) {
+function _addRoutes(content) {
   // If an annotation is already there, just ignore this.
-  if (content.indexOf('@RouteConfig') !== -1) {
+  if (content.indexOf('@Routes') !== -1) {
     return content;
   }
 
   // Add the imports.
-  content = _insertImport(content, 'RouteConfig', 'angular2/router');
-  content = _insertImport(content, 'ROUTER_DIRECTIVES', 'angular2/router');
+  content = _insertImport(content, 'Routes', '@angular/router');
+  content = _insertImport(content, 'ROUTER_DIRECTIVES', '@angular/router');
 
   // Add the router config.
   const m = content.match(/(@Component\(\{[\s\S\n]*?}\)\n)(\s*export class)/m);
@@ -89,7 +89,7 @@ function _addRouteConfig(content) {
     return content;
   }
 
-  content = content.substr(0, m.index) + m[1] + '@RouteConfig([\n])\n'
+  content = content.substr(0, m.index) + m[1] + '@Routes([\n])\n'
           + m[2] + content.substr(m.index + m[0].length);
 
   return content;
@@ -230,14 +230,13 @@ module.exports = {
     let routePath = options.path || `/${base}`;
     let route = '{'
               +   `path: '${routePath}', `
-              +   `name: '${jsComponentName}', `
               +   `component: ${jsComponentName}Component`
               +   defaultReg
               + '}';
 
     // Add the route configuration.
-    content = _addRouteConfig(content);
-    content = content.replace(/(@RouteConfig\(\[\s*\n)([\s\S\n]*?)(^\s*\]\))/m, function(_, m1, m2, m3) {
+    content = _addRoutes(content);
+    content = content.replace(/(@Routes\(\[\s*\n)([\s\S\n]*?)(^\s*\]\))/m, function(_, m1, m2, m3) {
       if (m2.length) {
         // Add a `,` if there's none.
         m2 = m2.replace(/([^,])(\s*)\n$/, function (_, a1, a2) {
@@ -269,7 +268,7 @@ module.exports = {
 
     // Add the provider, only on the APP itself.
     if (isAppComponent) {
-      content = _insertImport(content, 'ROUTER_DIRECTIVES', 'angular2/router');
+      content = _insertImport(content, 'ROUTER_DIRECTIVES', '@angular/router');
       content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\n\}\))/m, function (_, prefix, json, suffix) {
         const m = json.match(/(^\s+providers:\s*\[)([\s\S\n]*)(\]\s*,?.*$)/m);
         if (m) {
@@ -346,7 +345,7 @@ module.exports = {
     let parentComponentName = path.basename(parsedPath.dir);
     if (parentComponentName[0] == '+') parentComponentName = parentComponentName.substr(1);
     const jsComponentName = stringUtils.classify(parentComponentName);
-    const routeRegex = new RegExp(`^\\s*\\{.*name: '${jsComponentName}'.*component: ${jsComponentName}.*`
+    const routeRegex = new RegExp(`^\\s*\\{.*component: ${jsComponentName}.*`
       + '\\},?\\s*\\n?', 'm');
 
     let content = fs.readFileSync(gParentFile, 'utf-8');
