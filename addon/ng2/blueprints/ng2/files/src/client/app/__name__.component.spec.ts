@@ -1,4 +1,4 @@
-import {describe, it, expect, beforeEachProviders, inject} from 'angular2/testing';
+import {describe, it, expect, beforeEachProviders, inject} from '@angular/testing';
 import {<%= jsComponentName %>App} from '../app/<%= htmlComponentName %>.component';
 
 beforeEachProviders(() => [<%= jsComponentName %>App]);

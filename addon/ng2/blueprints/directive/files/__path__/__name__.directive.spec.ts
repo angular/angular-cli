@@ -9,8 +9,8 @@ import {
   inject,
   ComponentFixture,
   TestComponentBuilder
-} from 'angular2/testing';
-import {provide, Component} from 'angular2/core';
+} from '@angular/tesing';
+import {provide, Component} from '@angular/core';
 import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.directive';
 
 @Component({

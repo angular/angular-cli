@@ -25,23 +25,17 @@ var allSpecFiles = Object.keys(window.__karma__.files)
   .filter(isAppFile);
 
 // Load our SystemJS configuration.
-System.import('base/dist/system-config.js').then(function(systemJsConfig) {
-  // We need to add the distPrefix to our system config packages.
-  var config = systemJsConfig.config;
-  Object.keys(config.packages).forEach(function(pkgName) {
-    if (pkgName[0] != '/' && pkgName[0] != '.') {
-      var pkg = config.packages[pkgName];
-      delete config.packages[pkgName];
-      config.packages[distPath + pkgName] = pkg;
-    }
-  });
+System.config({
+  baseURL: '/base/dist'
+});
 
-  System.config(config);
+System.import('system-config.js').then(function(systemJsConfig) {
+  System.config(systemJsConfig.config);
 }).then(function() {
   // Load and configure the TestComponentBuilder.
   return Promise.all([
-    System.import('angular2/testing'),
-    System.import('angular2/platform/testing/browser')
+    System.import('@angular/platform-testing'),
+    System.import('@angular/platform-testing/browser')
   ]).then(function (providers) {
     var testing = providers[0];
     var testingBrowser = providers[1];

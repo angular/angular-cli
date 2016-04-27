@@ -23,19 +23,13 @@
   <<%= htmlComponentName %>-app>Loading...</<%= htmlComponentName %>-app>
 
   <script src="vendor/es6-shim/es6-shim.js"></script>
-  <script src="vendor/systemjs/dist/system-polyfills.js"></script>
-  <script src="vendor/angular2/bundles/angular2-polyfills.js"></script>
-  <script src="vendor/systemjs/dist/system.src.js"></script>
-  <script src="vendor/rxjs/bundles/Rx.js"></script>
+  <script src="vendor/reflect-metadata/Reflect.js"></script>
+  <script src="vendor/zone.js/dist/zone.js"></script>
+  <script src="https://code.angularjs.org/tools/system.js"></script>
+  <script src="https://code.angularjs.org/2.0.0-beta.16/Rx.js"></script>
 
-  <script src="vendor/angular2/bundles/angular2.dev.js"></script>
-  <script src="vendor/angular2/bundles/http.dev.js"></script>
-  <script src="vendor/angular2/bundles/router.dev.js"></script>
-  
   <script>
-    System.import('system-config.js').then(function(systemConfig) {
-      System.config(systemConfig.config);
-    }).then(function () {
+    System.import('system-config.js').then(function () {
       System.import('main.js')
     }).catch(console.error.bind(console));
   </script>
