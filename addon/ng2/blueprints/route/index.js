@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
-const stringUtils = require('ember-cli/lib/utilities/string');
+const stringUtils = require('ember-cli-string-utils');
 const Blueprint = require('ember-cli/lib/models/blueprint');
 
 

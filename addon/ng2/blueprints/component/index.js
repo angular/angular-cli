@@ -4,7 +4,7 @@ var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 var addBarrelRegistration = require('../../utilities/barrel-management');
 var getFiles = Blueprint.prototype.files;
-const stringUtils = require('ember-cli/lib/utilities/string');
+const stringUtils = require('ember-cli-string-utils');
 
 module.exports = {
   description: '',
