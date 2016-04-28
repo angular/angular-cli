@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "broccoli": "^1.0.0-beta.6",
+    "broccoli": "^1.0.0-beta.7",
     "broccoli-caching-writer": "^2.2.1",
     "broccoli-concat": "^2.2.0",
     "broccoli-funnel": "^1.0.1",
@@ -44,7 +44,6 @@
     "glob": "^7.0.3",
     "leek": "0.0.21",
     "lodash": "^4.6.1",
-    "multidep": "^2.0.0",
     "opn": "4.0.1",
     "resolve": "^1.1.7",
     "shelljs": "^0.6.0",
