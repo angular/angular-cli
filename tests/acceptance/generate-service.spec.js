@@ -10,6 +10,7 @@ var tmp = require('../helpers/tmp');
 var root = process.cwd();
 var conf = require('ember-cli/tests/helpers/conf');
 var Promise = require('ember-cli/lib/ext/promise');
+var SilentError = require('silent-error');
 
 describe('Acceptance: ng generate service', function () {
   before(conf.setup);
@@ -136,8 +137,9 @@ describe('Acceptance: ng generate service', function () {
 
   it('ng generate service ..' + path.sep + 'my-svc from root dir will fail', () => {
     return ng(['generate', 'service', '..' + path.sep + 'my-svc']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-svc.service.ts');
-      expect(existsSync(testPath)).to.equal(false);
+      throw new SilentError(`ng generate service ..${path.sep}my-svc from root dir should fail.`);
+    }, (err) => {
+      expect(err).to.equal(`Invalid path: "..${path.sep}my-svc" cannot be above the "src${path.sep}client${path.sep}app" directory`);
     });
   });
 });

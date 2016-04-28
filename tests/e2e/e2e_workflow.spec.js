@@ -68,7 +68,7 @@ describe('Basic end-to-end Workflow', function () {
     var envContent = fs.readFileSync(envPath, { encoding: 'utf8' });
     expect(envContent).to.include('production:true');
     // Also does not create new things in GIT.
-    expect(sh.exec('git status --porcelain').output).to.be.equal('');
+    expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
   });
 
   it('Can run `ng build` in created project', function () {
@@ -80,7 +80,7 @@ describe('Basic end-to-end Workflow', function () {
       })
       .then(function () {
         // Also does not create new things in GIT.
-        expect(sh.exec('git status --porcelain').output).to.be.equal('');
+        expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
       })
       .catch(() => {
         throw new Error('Build failed.');

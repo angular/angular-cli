@@ -13,6 +13,7 @@ var root = process.cwd();
 var util = require('util');
 var conf = require('ember-cli/tests/helpers/conf');
 var EOL = require('os').EOL;
+var SilentError = require('silent-error');
 
 describe('Acceptance: ng new', function () {
   before(conf.setup);
@@ -64,12 +65,12 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(confirmBlueprinted);
   });
 
-  it('ng new with empty app name doesnt throw exception', function () {
-    return ng(['new', '']);
+  it('ng new with empty app does throw exception', function () {
+    expect(ng(['new', ''])).to.throw;
   });
 
-  it('ng new without app name doesnt throw exception', function () {
-    return ng(['new']);
+  it('ng new without app name does throw exception', function () {
+    expect(ng(['new', ''])).to.throw;
   });
 
   it('ng new with app name creates new directory and has a dasherized package name', function () {
@@ -84,9 +85,11 @@ describe('Acceptance: ng new', function () {
   it('Cannot run ng new, inside of ember-cli project', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git'])
       .then(function () {
-        return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
+        return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git']).then(() => {
+          throw new SilentError('Cannot run ng new, inside of ember-cli project should fail.');
+        }, () => {
           expect(!existsSync('foo'));
-        });
+        })
       })
       .then(confirmBlueprinted);
   });

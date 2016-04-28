@@ -10,6 +10,7 @@ var tmp = require('../helpers/tmp');
 var root = process.cwd();
 var conf = require('ember-cli/tests/helpers/conf');
 var Promise = require('ember-cli/lib/ext/promise');
+var SilentError = require('silent-error');
 
 describe('Acceptance: ng generate directive', function () {
   before(conf.setup);
@@ -144,8 +145,9 @@ describe('Acceptance: ng generate directive', function () {
 
   it('ng generate directive ..' + path.sep + 'my-dir from root dir will fail', () => {
     return ng(['generate', 'directive', '..' + path.sep + 'my-dir']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-dir', 'my-dir.directive.ts');
-      expect(existsSync(testPath)).to.equal(false);
+      throw new SilentError(`ng generate directive ..${path.sep}my-dir from root dir should fail.`);
+    }, (err) => {
+      expect(err).to.equal(`Invalid path: "..${path.sep}my-dir" cannot be above the "src${path.sep}client${path.sep}app" directory`);
     });
   });
 });

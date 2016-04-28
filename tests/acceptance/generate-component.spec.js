@@ -10,6 +10,7 @@ var tmp = require('../helpers/tmp');
 var root = process.cwd();
 var conf = require('ember-cli/tests/helpers/conf');
 var Promise = require('ember-cli/lib/ext/promise');
+var SilentError = require('silent-error');
 
 describe('Acceptance: ng generate component', function () {
   before(conf.setup);
@@ -134,8 +135,9 @@ describe('Acceptance: ng generate component', function () {
 
   it('ng generate component ..' + path.sep + 'my-comp from root dir will fail', () => {
     return ng(['generate', 'component', '..' + path.sep + 'my-comp']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-comp', 'my-comp.component.ts');
-      expect(existsSync(testPath)).to.equal(false);
+      throw new SilentError(`ng generate component ..${path.sep}my-comp from root dir should fail.`);
+    }, (err) => {
+      expect(err).to.equal(`Invalid path: "..${path.sep}my-comp" cannot be above the "src${path.sep}client${path.sep}app" directory`);
     });
   });
 

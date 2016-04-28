@@ -11,6 +11,7 @@ var chai = require('chai');
 var sinon = require('sinon');
 var ExecStub = require('../helpers/exec-stub');
 var https = require('https');
+var SilentError = require('silent-error');
 
 const expect = chai.expect;
 const fsReadFile = Promise.denodeify(fs.readFile);
@@ -58,7 +59,12 @@ describe('Acceptance: ng github-pages:deploy', function() {
   it('should fail with uncommited changes', function() {
     execStub.addExecSuccess('git status --porcelain', 'M dir/file.ext');
     return ng(['github-pages:deploy', '--skip-build'])
-      .then((ret) => expect(ret).to.equal(1))
+      .then(() => {
+        throw new SilentError('Should fail with uncommited changes but passing.');
+      }, (ret) => {
+        expect(ret.name).to.equal('SilentError');
+        expect(ret.isSilentError).to.equal(true);
+      });
   });
 
   it('should deploy with defaults to existing remote', function() {
@@ -226,7 +232,12 @@ describe('Acceptance: ng github-pages:deploy', function() {
 
     return ng(['github-pages:deploy', '--skip-build', `--gh-token=${token}`,
       `--gh-username=${username}`])
-      .then((ret) => expect(ret).to.equal(1))
+      .then(() => {
+        throw new SilentError('Should not pass the deploy.');
+      }, (ret) => {
+        expect(ret.name).to.equal('SilentError');
+        expect(ret.isSilentError).to.equal(true);
+      })
       .then(() => httpsStub.restore());
   });
 });

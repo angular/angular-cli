@@ -10,6 +10,7 @@ var tmp = require('../helpers/tmp');
 var root = process.cwd();
 var conf = require('ember-cli/tests/helpers/conf');
 var Promise = require('ember-cli/lib/ext/promise');
+var SilentError = require('silent-error');
 
 describe('Acceptance: ng generate pipe', function () {
   before(conf.setup);
@@ -133,8 +134,9 @@ describe('Acceptance: ng generate pipe', function () {
 
   it('ng generate pipe ..' + path.sep + 'my-pipe from root dir will fail', () => {
     return ng(['generate', 'pipe', '..' + path.sep + 'my-pipe']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app', '..', 'my-pipe.pipe.ts');
-      expect(existsSync(testPath)).to.equal(false);
+      throw new SilentError(`ng generate pipe ..${path.sep}my-pipe from root dir should fail.`);
+    }, (err) => {
+      expect(err).to.equal(`Invalid path: "..${path.sep}my-pipe" cannot be above the "src${path.sep}client${path.sep}app" directory`);
     });
   });
 });
