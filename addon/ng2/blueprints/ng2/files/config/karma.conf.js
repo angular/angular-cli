@@ -1,6 +1,6 @@
 module.exports = function (config) {
   config.set({
-    basePath: '',
+    basePath: '..',
     frameworks: ['jasmine'],
     plugins: [
       require('karma-jasmine'),
@@ -26,8 +26,7 @@ module.exports = function (config) {
       { pattern: 'node_modules/angular2/bundles/router.dev.js', included: true, watched: true },
       { pattern: 'node_modules/angular2/bundles/testing.dev.js', included: true, watched: true },
 
-
-      { pattern: 'karma-test-shim.js', included: true, watched: true },
+      { pattern: 'config/karma-test-shim.js', included: true, watched: true },
 
       // paths loaded via module imports
       { pattern: 'dist/**/*.js', included: false, watched: true },

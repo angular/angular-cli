@@ -7,6 +7,6 @@ var exec = Promise.denodeify(require('shelljs').exec);
 
 module.exports = Task.extend({
   run: function () {
-    return exec('npm run e2e');
+    return exec(`npm run e2e -- ${this.project.ngConfig.e2e.protractor.config}`);
   }
 });
