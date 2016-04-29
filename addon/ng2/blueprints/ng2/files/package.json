@@ -13,11 +13,17 @@
   },
   "private": true,
   "dependencies": {
-    "angular2": "2.0.0-beta.16",
+    "@angular/common": "0.0.0-0",
+    "@angular/compiler": "0.0.0-0",
+    "@angular/core": "0.0.0-0",
+    "@angular/platform-browser": "0.0.0-0",
+    "@angular/platform-browser-dynamic": "0.0.0-0",
+    "@angular/router": "0.0.0-0",
+    "@angular/testing": "0.0.0-0",
     "es6-shim": "^0.35.0",
-    "reflect-metadata": "0.1.2",
+    "reflect-metadata": "0.1.3",
     "rxjs": "5.0.0-beta.2",
-    "systemjs": "0.19.20",
+    "systemjs": "0.19.26",
     "zone.js": "^0.6.12"
   },
   "devDependencies": {

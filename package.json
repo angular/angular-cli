@@ -1,7 +1,7 @@
 {
   "name": "angular-cli",
   "version": "0.0.34",
-  "description": "CLI tool for Angular2",
+  "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
   "bin": {

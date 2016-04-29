@@ -9,9 +9,9 @@ import {
   inject,
   ComponentFixture,
   TestComponentBuilder
-} from 'angular2/testing';
-import {provide} from 'angular2/core';<% if (route) { %>
-import {Router, RouteParams} from 'angular2/router';<% } %>
+} from '@angular/testing';
+import {provide} from '@angular/core';<% if (route) { %>
+import {Router, RouteParams} from '@angular/router';<% } %>
 import {<%= classifiedModuleName %>Component} from './<%= dasherizedModuleName %>.component';<% if (route) { %>
 class MockRouter {
   registerPrimaryOutlet() { }

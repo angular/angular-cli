@@ -7,8 +7,8 @@ import {
   ddescribe,
   expect,
   inject
-} from 'angular2/testing';
-import {provide} from 'angular2/core';
+} from '@angular/tesing';
+import {provide} from '@angular/core';
 import {<%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.service';
 
 describe('<%= classifiedModuleName %> Service', () => {
