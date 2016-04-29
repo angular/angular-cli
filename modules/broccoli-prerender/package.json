@@ -1,0 +1,45 @@
+{
+  "name": "angular2-broccoli-prerender",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "version": "0.10.1",
+  "description": "Prerender your Universal (isomorphic) Angular 2 app",
+  "homepage": "https://github.com/angular/universal",
+  "license": "MIT",
+  "contributors": [
+    "Tobias Bosch <tbosch@google.com>",
+    "PatrickJS <github@gdi2290.com>",
+    "Jeff Whelpley <jeff@gethuman.com>",
+    "Jeff Cross <crossj@google.com>"
+  ],
+  "scripts": {
+    "remove-modules": "rm -rf dist node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-universal",
+    "reload": "npm run remove-modules && npm install",
+    "prebuild": "rm -rf dist",
+    "build": "tsc || true",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
+  "devDependencies": {
+    "angular2": "2.0.0-beta.15",
+    "angular2-universal": "file:../universal",
+    "angular2-universal-polyfills": "file:../polyfills",
+    "preboot": "file:../preboot",
+    "rimraf": "^2.5.1",
+    "rxjs": "~5.0.0-beta.2",
+    "typescript": "^1.8.9",
+    "zone.js": "~0.6.10"
+  },
+  "dependencies": {
+    "broccoli-caching-writer": "^2.2.1"
+  },
+  "peerDependencies": {
+    "angular2-universal": ">=0.98.3"
+  }
+}
