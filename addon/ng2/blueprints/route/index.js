@@ -106,7 +106,8 @@ module.exports = {
     { name: 'lazy', type: Boolean, default: true },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
-    { name: 'prefix', type: Boolean, default: true }
+    { name: 'prefix', type: Boolean, default: true },
+    { name: 'path', type: String }
   ],
 
   beforeInstall: function(options) {
@@ -222,8 +223,9 @@ module.exports = {
                             `./${options.isLazyRoute ? '+' : ''}${base}`);
 
     let defaultReg = options.default ? ', useAsDefault: true' : '';
+    let path = options.path || `/${base}`;
     let route = '{'
-              +   `path: '/${base}', `
+              +   `path: '${path}', `
               +   `name: '${jsComponentName}', `
               +   `component: ${jsComponentName}Component`
               +   defaultReg

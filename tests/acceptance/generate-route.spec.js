@@ -81,4 +81,12 @@ describe('Acceptance: ng generate route', function () {
         expect(myThirdRouteContent).to.not.include('@RouteConfig');
       });
   });
+  
+  it('ng generate route details --path /details/:id', () => {
+    return ng(['generate', 'route', 'details', '--path', '/details/:id'])
+      .then(() => {
+        const appContent = fs.readFileSync(path.join(testPath, 'foo.component.ts'), 'utf-8');
+        expect(appContent).to.match(/path: '\/details\/:id'/m);
+      });
+  });
 });
