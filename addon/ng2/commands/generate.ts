@@ -29,6 +29,7 @@ function mapBlueprintName(name) {
 }
 
 const aliasMap = {
+  'cl': 'class',
   'c': 'component',
   'd': 'directive',
   'p': 'pipe',
