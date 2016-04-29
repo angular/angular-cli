@@ -5,6 +5,7 @@ var TestCommand = require('ember-cli/lib/commands/test');
 var win = require('ember-cli/lib/utilities/windows-admin');
 var BuildTask = require('ember-cli/lib/tasks/build');
 var BuildWatchTask = require('ember-cli/lib/tasks/build-watch');
+const config = require('../models/config');
 var TestTask = require('../tasks/test');
 
 
@@ -19,6 +20,8 @@ module.exports = TestCommand.extend({
   ],
 
   run: function (commandOptions) {
+    this.project.ngConfig = this.project.ngConfig || config.CliConfig.fromProject();
+
     var buildWatchTask =
       new BuildWatchTask({
         ui: this.ui,

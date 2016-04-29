@@ -16,9 +16,9 @@ module.exports = Task.extend({
 
   run: function (options) {
     var projectRoot = this.project.root;
-    return new Promise(function (resolve) {
+    return new Promise((resolve) => {
       var karma = requireDependency(projectRoot, 'karma');
-      var karmaConfig = path.join(projectRoot, 'karma.conf');
+      var karmaConfig = path.join(projectRoot, this.project.ngConfig.test.karma.config);
 
       // Convert browsers from a string to an array
       if (options.browsers) {
