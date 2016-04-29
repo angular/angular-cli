@@ -14,18 +14,12 @@ module.exports = function (config) {
       }
     },
     files: [
-      { pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: true, watched: true },
-      { pattern: 'node_modules/systemjs/dist/system.src.js', included: true, watched: true },
-      { pattern: 'node_modules/es6-shim/es6-shim.js', included: true, watched: true },
-      { pattern: 'node_modules/angular2/bundles/angular2-polyfills.js', included: true, watched: true },
+      { pattern: 'node_modules/es6-shim/es6-shim.js', included: true, watched: false },
+      { pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: true, watched: false },
+      { pattern: 'node_modules/systemjs/dist/system.src.js', included: true, watched: false },
+      { pattern: 'node_modules/angular2/bundles/angular2-polyfills.js', included: true, watched: false },
       { pattern: 'node_modules/zone.js/dist/async-test.js', included: true, watched: true },
       { pattern: 'node_modules/zone.js/dist/fake-async-test.js', included: true, watched: true },
-      { pattern: 'node_modules/rxjs/bundles/Rx.js', included: true, watched: true },
-      { pattern: 'node_modules/angular2/bundles/angular2.js', included: true, watched: true },
-      { pattern: 'node_modules/angular2/bundles/http.dev.js', included: true, watched: true },
-      { pattern: 'node_modules/angular2/bundles/router.dev.js', included: true, watched: true },
-      { pattern: 'node_modules/angular2/bundles/testing.dev.js', included: true, watched: true },
-
 
       { pattern: 'karma-test-shim.js', included: true, watched: true },
 
@@ -41,10 +35,6 @@ module.exports = function (config) {
       { pattern: 'dist/**/*.ts', included: false, watched: false },
       { pattern: 'dist/**/*.js.map', included: false, watched: false }
     ],
-    proxies: {
-      // required for component assets fetched by Angular's compiler
-      '/': '/base/dist/'
-    },
     exclude: [
       // Vendor packages might include spec files. We don't want to use those.
       'dist/vendor/**/*.spec.js'

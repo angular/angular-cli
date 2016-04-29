@@ -7,8 +7,6 @@ const barrels: string[] = [
 function createPackageConfig(barrelList: string[]): any {
   return barrelList.reduce((barrelConfig: any, barrelName: string) => {
     barrelConfig[barrelName] = {
-      format: 'register',
-      defaultExtension: 'js',
       main: 'index'
     };
     return barrelConfig;
@@ -18,7 +16,14 @@ function createPackageConfig(barrelList: string[]): any {
 
 // Add your custom SystemJS configuration here.
 export const config: any = {
+  map: {
+    main: 'main.js',
+    angular2: 'vendor/angular2',
+    rxjs: 'vendor/rxjs'
+  },
   packages: Object.assign({
     // Add your custom SystemJS packages here.
+    angular2: {},
+    rxjs: {},
   }, createPackageConfig(barrels))
 };

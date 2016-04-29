@@ -24,19 +24,14 @@
 
   <script src="vendor/es6-shim/es6-shim.js"></script>
   <script src="vendor/systemjs/dist/system-polyfills.js"></script>
-  <script src="vendor/angular2/bundles/angular2-polyfills.js"></script>
   <script src="vendor/systemjs/dist/system.src.js"></script>
-  <script src="vendor/rxjs/bundles/Rx.js"></script>
+  <script src="vendor/angular2/bundles/angular2-polyfills.js"></script>
 
-  <script src="vendor/angular2/bundles/angular2.dev.js"></script>
-  <script src="vendor/angular2/bundles/http.dev.js"></script>
-  <script src="vendor/angular2/bundles/router.dev.js"></script>
-  
   <script>
     System.import('system-config.js').then(function(systemConfig) {
       System.config(systemConfig.config);
     }).then(function () {
-      System.import('main.js')
+      System.import('main')
     }).catch(console.error.bind(console));
   </script>
 </body>

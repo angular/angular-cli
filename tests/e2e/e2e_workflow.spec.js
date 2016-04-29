@@ -71,6 +71,17 @@ describe('Basic end-to-end Workflow', function () {
     expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
   });
 
+  it('Produces a service worker manifest after production build', function () {
+    var manifestPath = path.join(process.cwd(), 'dist', 'manifest.appcache');
+    expect(existsSync(manifestPath)).to.be.equal(true);
+    // Read the worker.
+    //TODO: Commenting this out because it makes eslint fail(need to figure out why this expect was commented out)
+    // var lines = fse.readFileSync(manifestPath, {encoding: 'utf8'}).trim().split('\n');
+
+    // Check that a few critical files have been detected.
+    // expect(lines).to.include(`${path.sep}index.html`);
+  });
+
   it('Can run `ng build` in created project', function () {
     this.timeout(420000);
 
@@ -85,17 +96,6 @@ describe('Basic end-to-end Workflow', function () {
       .catch(() => {
         throw new Error('Build failed.');
       });
-  });
-
-  it('Produces a service worker manifest after initial build', function () {
-    var manifestPath = path.join(process.cwd(), 'dist', 'manifest.appcache');
-    expect(existsSync(manifestPath)).to.be.equal(true);
-    // Read the worker.
-    //TODO: Commenting this out because it makes eslint fail(need to figure out why this expect was commented out)
-    // var lines = fse.readFileSync(manifestPath, {encoding: 'utf8'}).trim().split('\n');
-
-    // Check that a few critical files have been detected.
-    // expect(lines).to.include(`${path.sep}index.html`);
   });
 
   it('Perform `ng test` after initial build', function () {
