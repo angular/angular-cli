@@ -10,30 +10,13 @@ import {
   ComponentFixture,
   TestComponentBuilder
 } from 'angular2/testing';
-import {provide} from 'angular2/core';<% if (route) { %>
-import {Router, RouteParams} from 'angular2/router';<% } %>
-import {<%= classifiedModuleName %>Component} from './<%= dasherizedModuleName %>.component';<% if (route) { %>
-class MockRouter {
-  registerPrimaryOutlet() { }
-}
+import {<%= classifiedModuleName %>Component} from './<%= dasherizedModuleName %>.component';
 
-class MockRouteParams {
-  get() { return 1; }
-}<% } %>
-
-describe('<%= classifiedModuleName %> Component', () => {
-<% if (route) { %>
-  beforeEachProviders(() => [
-    provide(Router, { useClass: MockRouter }),
-    provide(RouteParams, { useClass: MockRouteParams }),
-  ]);
-<% } else { %>
-  beforeEachProviders((): any[] => []);
-<% } %>
-  it('should ...', async(inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
-    return tcb.createAsync(<%= classifiedModuleName %>Component).then((fixture: ComponentFixture) => {
-      fixture.detectChanges();
-    });
-  })));
+describe('Component: <%= classifiedModuleName %>', () => {
+  beforeEachProviders(() => [<%= classifiedModuleName %>Component]);
+  
+  it('should create the component', inject([<%= classifiedModuleName %>Component], (component: <%= classifiedModuleName %>Component) => { 
+    expect(component).toBeTruthy(); 
+  })); 
 
 });
