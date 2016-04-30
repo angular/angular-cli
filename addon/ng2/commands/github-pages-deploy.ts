@@ -100,7 +100,8 @@ module.exports = Command.extend({
       .then(addAndCommit)
       .then(returnStartingBranch)
       .then(pushToGitRepo)
-      .then(printProjectUrl);
+      .then(printProjectUrl)
+      .catch(failGracefully);
 
     function checkForPendingChanges() {
       return execPromise('git status --porcelain')
@@ -120,7 +121,7 @@ module.exports = Command.extend({
 
     function saveStartingBranchName() {
       return execPromise('git rev-parse --abbrev-ref HEAD')
-        .then((stdout) => initialBranch = stdout);
+        .then((stdout) => initialBranch = stdout.replace(/\s/g, ''));
     }
 
     function createGitHubRepoIfNeeded() {
@@ -179,6 +180,16 @@ module.exports = Command.extend({
           ui.writeLine(chalk.green(`Deployed! Visit https://${userName}.github.io/${projectName}/`));
           ui.writeLine('Github pages might take a few minutes to show the deployed site.');
         });
+    }
+
+    function failGracefully(error) {
+      if (error && (/git clean/.test(error.message) || /Permission denied/.test(error.message))) {
+        let msg = 'There was a permissions error during git file operations, please close any open project files/folders and try again.';
+        msg += `\nYou might also need to return to the ${initialBranch} branch manually.`;
+        return Promise.reject(new SilentError(msg));
+      } else {
+        return Promise.reject(error);
+      }
     }
   }
 });

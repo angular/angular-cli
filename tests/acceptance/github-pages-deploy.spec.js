@@ -240,4 +240,23 @@ describe('Acceptance: ng github-pages:deploy', function() {
       })
       .then(() => httpsStub.restore());
   });
+
+  it('should fail gracefully when checkout has permissions failure', function() {
+    execStub.addExecSuccess('git status --porcelain')
+      .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
+      .addExecSuccess('git remote -v', remote)
+      .addExecSuccess(`git checkout ${branch}`)
+      .addExecSuccess('git add .')
+      .addExecSuccess(`git commit -m "${message}"`)
+      .addExecError(`git checkout ${initialBranch}`, 'error: cannot stat \'src/client\': Permission denied');
+
+    return ng(['github-pages:deploy', '--skip-build'])
+      .then(() => {
+        throw new SilentError('Should not pass the deploy.');
+      }, (ret) => {
+        expect(ret.name).to.equal('SilentError');
+        expect(ret.isSilentError).to.equal(true);
+        expect(ret.message).to.contain('There was a permissions error');
+      });
+  });
 });
