@@ -79,7 +79,6 @@ function _addRouteConfig(content) {
   // Add the imports.
   content = _insertImport(content, 'RouteConfig', 'angular2/router');
   content = _insertImport(content, 'ROUTER_DIRECTIVES', 'angular2/router');
-  content = _insertImport(content, 'ROUTER_PROVIDERS', 'angular2/router');
 
   // Add the router config.
   const m = content.match(/(@Component\(\{[\s\S\n]*?}\)\n)(\s*export class)/m);
@@ -214,6 +213,11 @@ module.exports = {
       return;
     }
 
+    let isAppComponent = false;
+    if (parentFile == path.join(this.dynamicPath.dir, this.project.name() + '.component.ts')) {
+      isAppComponent = true;
+    }
+
     const jsComponentName = stringUtils.classify(options.entity.name);
     const base = parsedPath.base;
 
@@ -223,9 +227,9 @@ module.exports = {
                             `./${options.isLazyRoute ? '+' : ''}${base}`);
 
     let defaultReg = options.default ? ', useAsDefault: true' : '';
-    let path = options.path || `/${base}`;
+    let routePath = options.path || `/${base}`;
     let route = '{'
-              +   `path: '${path}', `
+              +   `path: '${routePath}', `
               +   `name: '${jsComponentName}', `
               +   `component: ${jsComponentName}Component`
               +   defaultReg
@@ -263,25 +267,28 @@ module.exports = {
       }
     });
 
-    // Add the provider.
-    content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\n\}\))/m, function(_, prefix, json, suffix) {
-      const m = json.match(/(^\s+providers:\s*\[)([\s\S\n]*)(\]\s*,?.*$)/m);
-      if (m) {
-        if (m[2].indexOf('ROUTER_PROVIDERS') != -1) {
-          // Already there.
-          return _;
-        }
+    // Add the provider, only on the APP itself.
+    if (isAppComponent) {
+      content = _insertImport(content, 'ROUTER_DIRECTIVES', 'angular2/router');
+      content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\n\}\))/m, function (_, prefix, json, suffix) {
+        const m = json.match(/(^\s+providers:\s*\[)([\s\S\n]*)(\]\s*,?.*$)/m);
+        if (m) {
+          if (m[2].indexOf('ROUTER_PROVIDERS') != -1) {
+            // Already there.
+            return _;
+          }
 
-        // There's a directive already, but no ROUTER_PROVIDERS.
-        return prefix +
-          json.replace(/(^\s+providers:\s*\[)([\s\S\n]*)(^\]\s*,?.*$)/m, function(_, prefix, d, suffix) {
-            return prefix + d + (d ? ',' : '') + 'ROUTER_PROVIDERS' + suffix;
-          }) + suffix;
-      } else {
-        // There's no directive already.
-        return prefix + json + ',\n  providers: [ROUTER_PROVIDERS]' + suffix;
-      }
-    });
+          // There's a directive already, but no ROUTER_PROVIDERS.
+          return prefix +
+            json.replace(/(^\s+providers:\s*\[)([\s\S\n]*)(^\]\s*,?.*$)/m, function (_, prefix, d, suffix) {
+              return prefix + d + (d ? ',' : '') + 'ROUTER_PROVIDERS' + suffix;
+            }) + suffix;
+        } else {
+          // There's no directive already.
+          return prefix + json + ',\n  providers: [ROUTER_PROVIDERS]' + suffix;
+        }
+      });
+    }
 
     // Change the template.
     content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\}\))/m, function(_, prefix, json, suffix) {
