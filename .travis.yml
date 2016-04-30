@@ -2,6 +2,7 @@ sudo: false
 env:
   - NODE_VERSION=5 SCRIPT=lint
   - NODE_VERSION=5 SCRIPT=test
+  - NODE_VERSION=6 SCRIPT=test
 os:
   - linux
   - osx
@@ -14,7 +15,7 @@ script:
   - npm run-script $SCRIPT
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.30.1/install.sh | bash; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ~/.nvm/nvm-exec; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask; fi
