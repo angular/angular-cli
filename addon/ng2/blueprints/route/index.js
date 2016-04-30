@@ -224,7 +224,7 @@ module.exports = {
     // Insert the import statement.
     let content = fs.readFileSync(parentFile, 'utf-8');
     content = _insertImport(content, `${jsComponentName}Component`,
-                            `./${options.isLazyRoute ? '+' : ''}${base}`);
+                            `./${options.isLazyRoute ? '+' : ''}${stringUtils.dasherize(base)}`);
 
     let defaultReg = options.default ? ', useAsDefault: true' : '';
     let routePath = options.path || `/${base}`;
