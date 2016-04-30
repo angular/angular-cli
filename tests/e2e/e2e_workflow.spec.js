@@ -110,11 +110,11 @@ describe('Basic end-to-end Workflow', function () {
   it('Can create a test component using `ng generate component test-component`', function () {
     this.timeout(10000);
     return ng(['generate', 'component', 'test-component']).then(function () {
-      var componentDir = path.join(process.cwd(), 'src', 'client', 'app', 'components', 'test-component');
-      expect(existsSync(componentDir));
-      expect(existsSync(path.join(componentDir, 'test-component.ts')));
-      expect(existsSync(path.join(componentDir, 'test-component.html')));
-      expect(existsSync(path.join(componentDir, 'test-component.css')));
+      var componentDir = path.join(process.cwd(), 'src', 'app', 'test-component');
+      expect(existsSync(componentDir)).to.be.equal(true);
+      expect(existsSync(path.join(componentDir, 'test-component.component.ts'))).to.be.equal(true);
+      expect(existsSync(path.join(componentDir, 'test-component.component.html'))).to.be.equal(true);
+      expect(existsSync(path.join(componentDir, 'test-component.component.css'))).to.be.equal(true);
     });
   });
 
@@ -129,10 +129,10 @@ describe('Basic end-to-end Workflow', function () {
 
   it('Can create a test service using `ng generate service test-service`', function () {
     return ng(['generate', 'service', 'test-service']).then(function () {
-      var serviceDir = path.join(process.cwd(), 'src', 'client', 'app', 'services', 'test-service');
-      expect(existsSync(serviceDir));
-      expect(existsSync(path.join(serviceDir, 'test-service.ts')));
-      expect(existsSync(path.join(serviceDir, 'test-service.spec.ts')));
+      var serviceDir = path.join(process.cwd(), 'src', 'app');
+      expect(existsSync(serviceDir)).to.be.equal(true);
+      expect(existsSync(path.join(serviceDir, 'test-service.service.ts'))).to.be.equal(true);
+      expect(existsSync(path.join(serviceDir, 'test-service.service.spec.ts'))).to.be.equal(true);
     });
   });
 
@@ -147,10 +147,10 @@ describe('Basic end-to-end Workflow', function () {
 
   it('Can create a test pipe using `ng generate pipe test-pipe`', function () {
     return ng(['generate', 'pipe', 'test-pipe']).then(function () {
-      var pipeDir = path.join(process.cwd(), 'src', 'client', 'app', 'pipes', 'test-pipe');
-      expect(existsSync(pipeDir));
-      expect(existsSync(path.join(pipeDir, 'test-pipe.ts')));
-      expect(existsSync(path.join(pipeDir, 'test-pipe.spec.ts')));
+      var pipeDir = path.join(process.cwd(), 'src', 'app');
+      expect(existsSync(pipeDir)).to.be.equal(true);
+      expect(existsSync(path.join(pipeDir, 'test-pipe.pipe.ts'))).to.be.equal(true);
+      expect(existsSync(path.join(pipeDir, 'test-pipe.pipe.spec.ts'))).to.be.equal(true);
     });
   });
 
@@ -165,9 +165,9 @@ describe('Basic end-to-end Workflow', function () {
 
   it('Can create a test route using `ng generate route test-route`', function () {
     return ng(['generate', 'route', 'test-route']).then(function () {
-      var routeDir = path.join(process.cwd(), 'src', 'client', 'app', 'test-route');
-      expect(existsSync(routeDir));
-      expect(existsSync(path.join(routeDir, 'test-route.ts')));
+      var routeDir = path.join(process.cwd(), 'src', 'app', '+test-route');
+      expect(existsSync(routeDir)).to.be.equal(true);
+      expect(existsSync(path.join(routeDir, 'test-route.component.ts'))).to.be.equal(true);
     });
   });
 
@@ -189,7 +189,7 @@ describe('Basic end-to-end Workflow', function () {
 
     return ng(['build', '--silent'])
       .then(function () {
-        expect(existsSync(tmpFileLocation));
+        expect(existsSync(tmpFileLocation)).to.be.equal(true);
       })
       .catch(err => {
         throw new Error(err)
@@ -202,7 +202,7 @@ describe('Basic end-to-end Workflow', function () {
     sh.exec('npm install node-sass', { silent: true });
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
+      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
       let cssFile = path.join(componentPath, 'test-component.component.css');
       let scssFile = path.join(componentPath, 'test-component.component.scss');
 
@@ -237,7 +237,7 @@ describe('Basic end-to-end Workflow', function () {
     sh.exec('npm install less', { silent: true });
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
+      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
       let cssFile = path.join(componentPath, 'test-component.component.css');
       let lessFile = path.join(componentPath, 'test-component.component.less');
 
@@ -272,7 +272,7 @@ describe('Basic end-to-end Workflow', function () {
     sh.exec('npm install stylus', { silent: true });
     return ng(['generate', 'component', 'test-component'])
     .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'client', 'app', 'test-component');
+      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
       let cssFile = path.join(componentPath, 'test-component.component.css');
       let stylusFile = path.join(componentPath, 'test-component.component.styl');
 
@@ -303,7 +303,7 @@ describe('Basic end-to-end Workflow', function () {
   it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
     this.timeout(420000);
 
-    const configFilePath = path.join(process.cwd(), 'src', 'client', 'tsconfig.json');
+    const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
     let config = require(configFilePath);
 
     config.compilerOptions.noImplicitAny = true;
@@ -321,7 +321,7 @@ describe('Basic end-to-end Workflow', function () {
       .finally(function () {
         // Clean `tmp` folder
         process.chdir(path.resolve(root, '..'));
-        sh.rm('-rf', './tmp');  // tmp.teardown takes too long
+        // sh.rm('-rf', './tmp');  // tmp.teardown takes too long
         done();
       });
   });

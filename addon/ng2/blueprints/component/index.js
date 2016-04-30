@@ -88,7 +88,8 @@ module.exports = {
             dir = dirParts.join(path.sep);
           }
         }
-        this.appDir = dir.replace(`src${path.sep}client${path.sep}`, '');
+        var srcDir = this.project.ngConfig.defaults.sourceDir;
+        this.appDir = dir.substr(dir.indexOf(srcDir) + srcDir.length);
         this.generatePath = dir;
         return dir;
       },
@@ -100,8 +101,11 @@ module.exports = {
 
   afterInstall: function(options) {
     if (!options.flat) {
-      var filePath = path.join('src', 'client', 'system-config.ts');
-      var barrelUrl = this.appDir.replace(path.sep, '/');
+      var filePath = path.join(this.project.ngConfig.defaults.sourceDir, 'system-config.ts');
+      var barrelUrl = this.appDir.replace(/\\/g, '/');
+      if (barrelUrl[0] === '/') {
+        barrelUrl = barrelUrl.substr(1);
+      }
 
       return addBarrelRegistration(this, this.generatePath)
         .then(() => {
@@ -110,7 +114,7 @@ module.exports = {
             `  '${barrelUrl}',`,
             { before: '  /** @cli-barrel */' }
           );
-        })
+        });
     } else {
       return addBarrelRegistration(
         this,

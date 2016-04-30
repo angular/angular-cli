@@ -9,7 +9,7 @@ const expect = require('chai').expect;
 const path = require('path');
 const root = process.cwd();
 
-const testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app');
+const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
 describe('Acceptance: ng generate class', function () {
   before(conf.setup);

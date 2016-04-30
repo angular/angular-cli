@@ -4,7 +4,7 @@
     "name": "<%= htmlComponentName %>"
   },
   "apps": [
-    {"main": "src/client/main.ts", "tsconfig": "src/client/tsconfig.json"}
+    {"main": "<%= sourceDir %>/main.ts", "tsconfig": "<%= sourceDir %>/tsconfig.json"}
   ],
   "addons": [],
   "packages": [],
@@ -19,6 +19,7 @@
     }
   },
   "defaults": {
-    "prefix": "app"
+    "prefix": "<%= prefix %>",
+    "sourceDir": "<%= sourceDir %>"
   }
 }

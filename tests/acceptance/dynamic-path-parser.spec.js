@@ -5,22 +5,28 @@ var path = require('path');
 var dynamicPathParser = require('../../addon/ng2/utilities/dynamic-path-parser');
 var mockFs = require('mock-fs');
 
-var appDir = `src${path.sep}client${path.sep}app`;
+var appDir = `src${path.sep}app`;
 
 describe('dynamic path parser', () => {
   var project;
   var entityName = 'temp-name';
   var rootName = path.parse(process.cwd()).root + 'project';
+  var sourceDir = 'src';
   beforeEach(() => {
-    project = { root: rootName };
+    project = {
+      root: rootName, 
+      ngConfig: {
+        defaults: {
+          sourceDir: sourceDir
+        }
+      } 
+    };
     var mockFolder = {};
     mockFolder[rootName] = {
       src: {
-        client: {
-          app: {
-            'index.html': '<html></html>',
-            'temp-name': {}
-          }
+        app: {
+          'index.html': '<html></html>',
+          'temp-name': {}
         }
       }
     };
@@ -63,18 +69,16 @@ describe('dynamic path parser', () => {
     var mockFolder = {};
     mockFolder[rootName] = {
       src: {
-        client: {
-          app: {
-            'index.html': '<html></html>',
-            'child-dir': {
-              'temp-name': {}
-            }
+        app: {
+          'index.html': '<html></html>',
+          'child-dir': {
+            'temp-name': {}
           }
         }
       }
     };
     mockFs(mockFolder);
-    process.env.PWD = path.join(project.root, 'src', 'client', 'app', 'child-dir');
+    process.env.PWD = path.join(project.root, 'src', 'app', 'child-dir');
     var result = dynamicPathParser(project, entityName);
     expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
     expect(result.name).to.equal(entityName);
@@ -84,17 +88,15 @@ describe('dynamic path parser', () => {
     var mockFolder = {};
     mockFolder[rootName] = {
       src: {
-        client: {
-          app: {
-            'index.html': '<html></html>',
-            'child-dir': {},
-            'temp-name': {}
-          }
+        app: {
+          'index.html': '<html></html>',
+          'child-dir': {},
+          'temp-name': {}
         }
       }
     };
     mockFs(mockFolder);
-    process.env.PWD = path.join(project.root, 'src', 'client', 'app', 'child-dir');
+    process.env.PWD = path.join(project.root, 'src', 'app', 'child-dir');
     var result = dynamicPathParser(project, '..' + path.sep + entityName);
     expect(result.dir).to.equal(appDir);
     expect(result.name).to.equal(entityName);
@@ -105,19 +107,17 @@ describe('dynamic path parser', () => {
       var mockFolder = {};
       mockFolder[rootName] = {
         src: {
-          client: {
-            app: {
-              'index.html': '<html></html>',
-              'child-dir': {
-                'grand-child-dir': {},
-                'temp-name': {}
-              }
+          app: {
+            'index.html': '<html></html>',
+            'child-dir': {
+              'grand-child-dir': {},
+              'temp-name': {}
             }
           }
         }
       };
       mockFs(mockFolder);
-      process.env.PWD = path.join(project.root, 'src', 'client', 'app', 'child-dir', 'grand-child-dir');
+      process.env.PWD = path.join(project.root, 'src', 'app', 'child-dir', 'grand-child-dir');
       var result = dynamicPathParser(project, '..' + path.sep + entityName);
       expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
       expect(result.name).to.equal(entityName);
@@ -127,15 +127,13 @@ describe('dynamic path parser', () => {
     var mockFolder = {};
     mockFolder[rootName] = {
       src: {
-        client: {
-          app: {
-            '+my-route': {}
-          }
+        app: {
+          '+my-route': {}
         }
       }
     };
     mockFs(mockFolder);
-    process.env.PWD = path.join(project.root, 'src', 'client', 'app', 'my-route');
+    process.env.PWD = path.join(project.root, 'src', 'app', 'my-route');
     var result = dynamicPathParser(project, entityName);
     expect(result.dir).to.equal(`${appDir}${path.sep}+my-route`);
     expect(result.name).to.equal(entityName);

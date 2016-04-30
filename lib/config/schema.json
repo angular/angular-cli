@@ -82,6 +82,9 @@
       "properties": {
         "prefix": {
           "type": "string"
+        },
+        "sourceDir": {
+          "type": "string"
         }
       },
       "additionalProperties": false

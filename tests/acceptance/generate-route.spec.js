@@ -10,16 +10,13 @@ const fs = require('fs');
 const path = require('path');
 const root = process.cwd();
 
-
-const testPath = path.join(root, 'tmp', 'foo', 'src', 'client', 'app');
-
+const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
 function fileExpectations(lazy, expectation) {
   const lazyPrefix = lazy ? '+' : '';
   const dir = `${lazyPrefix}my-route`;
   expect(existsSync(path.join(testPath, dir, 'my-route.component.ts'))).to.equal(expectation);
 }
-
 
 describe('Acceptance: ng generate route', function () {
   before(conf.setup);
