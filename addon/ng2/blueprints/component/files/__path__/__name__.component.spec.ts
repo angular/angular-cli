@@ -18,5 +18,4 @@ describe('Component: <%= classifiedModuleName %>', () => {
   it('should create the component', inject([<%= classifiedModuleName %>Component], (component: <%= classifiedModuleName %>Component) => { 
     expect(component).toBeTruthy(); 
   })); 
-
 });

@@ -20,14 +20,11 @@ import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.directi
 class TestComponent {}
 
 describe('<%= classifiedModuleName %> Directive', () => {
-
   beforeEachProviders((): any[] => []);
-
 
   it('should ...', async(inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
     return tcb.createAsync(TestComponent).then((fixture: ComponentFixture) => {
       fixture.detectChanges();
     });
   })));
-
 });
