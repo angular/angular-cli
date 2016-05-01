@@ -10,8 +10,8 @@ import {
   ComponentFixture,
   TestComponentBuilder
 } from 'angular2/testing';
-import {provide, Component} from 'angular2/core';
-import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.directive';
+import { provide, Component } from 'angular2/core';
+import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.directive';
 
 @Component({
   selector: 'test-component',

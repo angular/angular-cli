@@ -10,7 +10,7 @@ import {
   ComponentFixture,
   TestComponentBuilder
 } from 'angular2/testing';
-import {<%= classifiedModuleName %>Component} from './<%= dasherizedModuleName %>.component';
+import { <%= classifiedModuleName %>Component } from './<%= dasherizedModuleName %>.component';
 
 describe('Component: <%= classifiedModuleName %>', () => {
   beforeEachProviders(() => [<%= classifiedModuleName %>Component]);

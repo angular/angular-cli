@@ -8,8 +8,8 @@ import {
   expect,
   inject
 } from 'angular2/testing';
-import {provide} from 'angular2/core';
-import {<%= classifiedModuleName %>Service} from './<%= dasherizedModuleName %>.service';
+import { provide } from 'angular2/core';
+import { <%= classifiedModuleName %>Service } from './<%= dasherizedModuleName %>.service';
 
 describe('<%= classifiedModuleName %> Service', () => {
 

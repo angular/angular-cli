@@ -1,4 +1,4 @@
-import {Directive} from 'angular2/core';
+import { Directive } from 'angular2/core';
 
 @Directive({
   selector: '[<%= rawEntityName %>]'

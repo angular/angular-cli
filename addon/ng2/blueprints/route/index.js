@@ -33,7 +33,7 @@ function _insertImport(content, symbolName, fileName) {
           + content.substr(m.index + m[0].length);
   }
 
-  const importTemplate = `import {${symbolName}} from '${fileName}';`;
+  const importTemplate = `import { ${symbolName} } from '${fileName}';`;
   // Find the last import and add an import to it.
   content = content.replace(/(import.+)\n(?!import)/m, function (f, m1) {
     return `${m1}\n${importTemplate}\n`;

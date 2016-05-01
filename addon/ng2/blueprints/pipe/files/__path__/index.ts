@@ -1,1 +1,1 @@
-export {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.pipe';
+export { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.pipe';

@@ -1,2 +1,1 @@
-export {<%= classifiedModuleName %>Component} from './<%= dasherizedModuleName %>.component';
-
+export { <%= classifiedModuleName %>Component } from './<%= dasherizedModuleName %>.component';

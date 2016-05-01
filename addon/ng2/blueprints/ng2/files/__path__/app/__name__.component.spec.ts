@@ -10,7 +10,7 @@ import {
   ComponentFixture,
   TestComponentBuilder
 } from 'angular2/testing';
-import {<%= jsComponentName %>AppComponent} from '../app/<%= htmlComponentName %>.component';
+import { <%= jsComponentName %>AppComponent } from '../app/<%= htmlComponentName %>.component';
 
 beforeEachProviders(() => [<%= jsComponentName %>AppComponent]);
 

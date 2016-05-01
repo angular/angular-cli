@@ -8,8 +8,8 @@ import {
   TestComponentBuilder,
   beforeEachProviders
 } from 'angular2/testing';
-import {provide} from 'angular2/core';
-import {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.pipe';
+import { provide } from 'angular2/core';
+import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.pipe';
 
 describe('<%= classifiedModuleName %> Pipe', () => {
   beforeEachProviders(() => [<%= classifiedModuleName%>]);
