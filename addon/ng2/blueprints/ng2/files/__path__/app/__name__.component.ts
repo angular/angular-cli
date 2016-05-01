@@ -6,5 +6,5 @@ import {Component} from 'angular2/core';
   templateUrl: '<%= htmlComponentName %>.component.html',
   styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']
 })
-export class <%= jsComponentName %>App {
+export class <%= jsComponentName %>AppComponent {
 }

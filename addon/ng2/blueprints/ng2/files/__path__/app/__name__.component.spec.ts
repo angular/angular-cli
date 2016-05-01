@@ -10,12 +10,12 @@ import {
   ComponentFixture,
   TestComponentBuilder
 } from 'angular2/testing';
-import {<%= jsComponentName %>App} from '../app/<%= htmlComponentName %>.component';
+import {<%= jsComponentName %>AppComponent} from '../app/<%= htmlComponentName %>.component';
 
-beforeEachProviders(() => [<%= jsComponentName %>App]);
+beforeEachProviders(() => [<%= jsComponentName %>AppComponent]);
 
 describe('App: <%= jsComponentName %>', () => {  
-  it('should create the app', inject([<%= jsComponentName %>App], (app: <%= jsComponentName %>App) => { 
+  it('should create the app', inject([<%= jsComponentName %>AppComponent], (app: <%= jsComponentName %>AppComponent) => { 
     expect(app).toBeTruthy(); 
   })); 
 });
