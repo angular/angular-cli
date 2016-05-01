@@ -16,7 +16,8 @@ module.exports = TestCommand.extend({
     { name: 'colors', type: Boolean },
     { name: 'log-level', type: String },
     { name: 'port', type: Number },
-    { name: 'reporters', type: String }
+    { name: 'reporters', type: String },
+    { name: 'build', type: Boolean, default: true }
   ],
 
   run: function (commandOptions) {
@@ -43,7 +44,17 @@ module.exports = TestCommand.extend({
       environment: 'development',
       outputPath: 'dist/'
     };
-
+    
+    // If not building, mock/suppress build tasks.
+    if (!commandOptions.build) {
+      buildTask = {
+        run: () => {
+          return;
+        }
+      };
+      buildWatchTask = buildTask;
+    }
+    
     if (commandOptions.watch) {
       return win.checkWindowsElevation(this.ui)
         .then(
