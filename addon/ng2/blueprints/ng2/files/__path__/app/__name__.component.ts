@@ -7,4 +7,5 @@ import { Component } from 'angular2/core';
   styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']
 })
 export class <%= jsComponentName %>AppComponent {
+  title = '<%= htmlComponentName %> works!';
 }
