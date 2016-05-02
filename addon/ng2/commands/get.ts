@@ -5,7 +5,7 @@ import {CliConfig} from '../models/config';
 
 const GetCommand = Command.extend({
   name: 'get',
-  description: 'Set a value in the configuration.',
+  description: 'Get a value from the configuration.',
   works: 'everywhere',
 
   availableOptions: [],
