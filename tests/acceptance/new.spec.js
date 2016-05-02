@@ -82,6 +82,15 @@ describe('Acceptance: ng new', function () {
     });
   });
 
+  it('ng new has a .editorconfig file', function () {
+    return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
+      expect(!existsSync('FooApp'));
+
+      var editorConfig = fs.readFileSync('.editorconfig', 'utf8');
+      expect(editorConfig).to.exist;
+    });
+  });
+
   it('Cannot run ng new, inside of ember-cli project', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git'])
       .then(function () {
