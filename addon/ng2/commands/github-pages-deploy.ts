@@ -128,7 +128,8 @@ module.exports = Command.extend({
       return execPromise('git remote -v')
         .then(function(stdout) {
           if (!/origin\s+(https:\/\/|git@)github\.com/m.test(stdout)) {
-            return createGithubRepoTask.run(createGithubRepoOptions);
+            return createGithubRepoTask.run(createGithubRepoOptions)
+              .then(() => execPromise(`git push -u origin ${initialBranch}`));
           }
         });
     }
@@ -175,7 +176,6 @@ module.exports = Command.extend({
     function printProjectUrl() {
       return execPromise('git remote -v')
         .then((stdout) => {
-
           let userName = stdout.match(/origin\s+(?:https:\/\/|git@)github\.com(?:\:|\/)([^\/]+)/m)[1].toLowerCase();
           ui.writeLine(chalk.green(`Deployed! Visit https://${userName}.github.io/${projectName}/`));
           ui.writeLine('Github pages might take a few minutes to show the deployed site.');
@@ -184,6 +184,7 @@ module.exports = Command.extend({
 
     function failGracefully(error) {
       if (error && (/git clean/.test(error.message) || /Permission denied/.test(error.message))) {
+        ui.writeLine(error.message);
         let msg = 'There was a permissions error during git file operations, please close any open project files/folders and try again.';
         msg += `\nYou might also need to return to the ${initialBranch} branch manually.`;
         return Promise.reject(new SilentError(msg));

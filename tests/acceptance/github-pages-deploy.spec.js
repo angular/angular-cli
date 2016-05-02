@@ -142,6 +142,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', noRemote)
       .addExecSuccess(`git remote add origin git@github.com:${username}/${project}.git`)
+      .addExecSuccess(`git push -u origin ${initialBranch}`)
       .addExecSuccess(`git checkout ${branch}`)
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
