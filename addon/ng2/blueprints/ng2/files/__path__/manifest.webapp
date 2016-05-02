@@ -1,0 +1,13 @@
+{
+  "name": "<%= fullAppName %>",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait"
+}

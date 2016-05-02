@@ -13,6 +13,7 @@ var conf = require('ember-cli/tests/helpers/conf');
 var minimatch = require('minimatch');
 var intersect = require('lodash/intersection');
 var remove = require('lodash/remove');
+var pull = require('lodash/pull');
 var forEach = require('lodash/forEach');
 var any = require('lodash/some');
 var EOL = require('os').EOL;
@@ -31,7 +32,12 @@ describe('Acceptance: ng init', function () {
   });
 
   beforeEach(function () {
-    Blueprint.ignoredFiles = defaultIgnoredFiles;
+    // Make a copy of defaultIgnoredFiles.
+    Blueprint.ignoredFiles = defaultIgnoredFiles.splice(0);
+
+    // Add the mobile ones.
+    Blueprint.ignoredFiles.push('manifest.webapp');
+    Blueprint.ignoredFiles.push('icon.png');
 
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
@@ -100,6 +106,18 @@ describe('Acceptance: ng init', function () {
       'init',
       '--skip-npm',
       '--skip-bower'
+    ]).then(confirmBlueprinted);
+  });
+
+  it('ng init --mobile', () => {
+    // Add the mobile ones.
+    pull(Blueprint.ignoredFiles, 'manifest.webapp');
+    pull(Blueprint.ignoredFiles, 'icon.png');
+    return ng([
+      'init',
+      '--skip-npm',
+      '--skip-bower',
+      '--mobile'
     ]).then(confirmBlueprinted);
   });
 
@@ -183,5 +201,4 @@ describe('Acceptance: ng init', function () {
       })
       .then(confirmBlueprinted);
   });
-
 });
