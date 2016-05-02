@@ -4,6 +4,6 @@ export class <%= jsComponentName %>Page {
   }
 
   getParagraphText() {
-    return element(by.css('<%= htmlComponentName %>-app p')).getText();
+    return element(by.css('<%= htmlComponentName %>-app h1')).getText();
   }
 }
