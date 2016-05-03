@@ -80,13 +80,13 @@ export class MyApp {
 
   <div>
     <h2>|async</h2>
-    <span *ngFor="var item of todosObs4$ | async">
+    <span *ngFor="let item of todosObs4$ | async">
       {{ item }}
     </span>
   </div>
 
   <ul>
-    <li *ngFor="var item of items">
+    <li *ngFor="let item of items">
       <input
         type="checkbox"
         [checked]="item.completed"

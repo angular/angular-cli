@@ -1,7 +1,7 @@
 import {describe, it, expect, beforeEach} from 'angular2/testing';
 
 import {format, parse} from 'url';
-import {PlatformLocation} from 'angular2/router';
+import {PlatformLocation} from 'angular2/platform/common';
 import {NodePlatformLocation} from '../../router/node_platform_location';
 
 declare var jasmine: any;

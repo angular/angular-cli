@@ -32,7 +32,7 @@ import {Router} from 'angular2/router';
 
 export function waitRouter(appRef: ComponentRef): Promise<ComponentRef> {
   let injector = appRef.injector;
-  let router = injector.getOptional(Router);
+  let router = injector.get(Router, Router);
 
   return Promise.resolve(router && router._currentNavigation)
     .then(() => new Promise(resolve => setTimeout(() => resolve(appRef))));
@@ -101,7 +101,7 @@ export function appRefSyncRender(appRef: any): string {
 
 export function applicationToString(appRef: ComponentRef): string {
   let html = appRefSyncRender(appRef);
-  appRef.dispose();
+  appRef.destroy();
   return html;
 }
 

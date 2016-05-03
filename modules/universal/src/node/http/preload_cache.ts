@@ -209,33 +209,33 @@ export class NgPreloadCacheHttp extends Http {
     return obs;
   }
 
-  request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
+  request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> | EventEmitter<any> {
     return this.preload(url, () => super.request(url, options));
   }
 
-  get(url: string, options?: RequestOptionsArgs): Observable<Response> {
+  get(url: string, options?: RequestOptionsArgs): Observable<Response> | EventEmitter<any> {
     return this.preload(url, () => super.get(url, options));
 
   }
 
-  post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
+  post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> | EventEmitter<any> {
     return this.preload(url, () => super.post(url, body, options));
   }
 
-  put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
+  put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> | EventEmitter<any> {
     return this.preload(url, () => super.put(url, body, options));
   }
 
-  delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
+  delete(url: string, options?: RequestOptionsArgs): Observable<Response> | EventEmitter<any> {
     return this.preload(url, () => super.delete(url, options));
 
   }
 
-  patch(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
+  patch(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> | EventEmitter<any> {
     return this.preload(url, () => super.patch(url, body, options));
   }
 
-  head(url: string, options?: RequestOptionsArgs): Observable<Response> {
+  head(url: string, options?: RequestOptionsArgs): Observable<Response> | EventEmitter<any> {
     return this.preload(url, () => super.head(url, options));
   }
 

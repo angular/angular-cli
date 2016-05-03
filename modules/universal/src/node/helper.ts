@@ -1,5 +1,5 @@
-import {DirectiveResolver} from 'angular2/core';
-var directiveResolver: any = new DirectiveResolver();
+import {DirectiveResolver} from 'angular2/src/compiler/directive_resolver';
+let directiveResolver = new DirectiveResolver();
 
 export function serverDirectiveResolver(componentType: any): any {
   return directiveResolver.resolve(componentType);
@@ -36,7 +36,7 @@ export function showDebug(options = {}): string {
   return info;
 }
 
-export function stringToBoolean(txt): boolean {
+export function stringToBoolean(txt): boolean | string {
   if (typeof txt !== 'string') { return txt; }
   switch (txt.toLowerCase()) {
     case'false': case'\'false\'': case'"false"': case'0': case'no': return false;

@@ -23,7 +23,7 @@ import {ORIGIN_URL, BASE_URL} from '../../common';
 export class NodeConnection implements Connection {
   public readyState: ReadyState;
   public request: Request;
-  public response: Observable<Response>;
+  public response: Observable<Response> | Observable<any>;
 
   constructor(
     req: Request,

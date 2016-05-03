@@ -41,7 +41,7 @@
     "ie-shim": "^0.1.0",
     "es6-promise": "~3.0.2",
     "es6-shim": "~0.35.0",
-    "zone.js": "~0.6.11",
+    "zone.js": "~0.6.12",
     "reflect-metadata": "0.1.2"
   },
   "peerDependencies": {

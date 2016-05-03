@@ -10,11 +10,7 @@ var templateUrlApp = require('../../universal/template_url/app');
 
 import {enableProdMode, provide} from 'angular2/core';
 import {Http} from 'angular2/http';
-import {
-  ROUTER_PROVIDERS,
-  LocationStrategy,
-  HashLocationStrategy
-} from 'angular2/router';
+import {LocationStrategy, HashLocationStrategy} from 'angular2/platform/common';
 
 enableProdMode();
 
@@ -49,9 +45,9 @@ module.exports = function(ROOT) {
         providers: [
           provide(REQUEST_URL, {useValue: req.originalUrl}),
 
-          NODE_PLATFORM_PIPES,
-          NODE_ROUTER_PROVIDERS,
-          NODE_HTTP_PROVIDERS,
+          ...NODE_PLATFORM_PIPES,
+          ...NODE_ROUTER_PROVIDERS,
+          ...NODE_HTTP_PROVIDERS,
         ],
         data: {},
 
@@ -322,7 +318,6 @@ module.exports = function(ROOT) {
         // NODE_HTTP_PROVIDERS,
         provide(BASE_URL, {useValue: baseUrl}),
         provide(REQUEST_URL, {useValue: url}),
-        ROUTER_PROVIDERS,
         NODE_ROUTER_PROVIDERS,
       ],
       data: {},

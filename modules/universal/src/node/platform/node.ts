@@ -11,22 +11,24 @@ import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 // Core
 import {Testability} from 'angular2/src/core/testability/testability';
 import {ReflectionCapabilities} from 'angular2/src/core/reflection/reflection_capabilities';
-import {DirectiveResolver} from 'angular2/src/core/linker/directive_resolver';
-import {APP_COMPONENT} from 'angular2/src/core/application_tokens';
+import {DirectiveResolver} from 'angular2/src/compiler/directive_resolver';
 import {
   provide,
   Provider,
+  coreLoadAndBootstrap,
+  ReflectiveInjector,
   PLATFORM_INITIALIZER,
   PLATFORM_COMMON_PROVIDERS,
   PLATFORM_DIRECTIVES,
   PLATFORM_PIPES,
   APPLICATION_COMMON_PROVIDERS,
   ComponentRef,
-  platform,
+  createPlatform,
   reflector,
   ExceptionHandler,
   Renderer,
-  NgZone
+  NgZone,
+  OpaqueToken
 } from 'angular2/core';
 
 // Common
@@ -63,9 +65,11 @@ export function initNodeAdapter() {
   Parse5DomAdapter.makeCurrent();
 }
 
+export const NODE_APP_PLATFORM_MARKER = new OpaqueToken('NodeAppPlatformMarker');
 
-export const NODE_PROVIDERS: Array<any> = CONST_EXPR([
+export const NODE_APP_PLATFORM: Array<any> = CONST_EXPR([
   ...PLATFORM_COMMON_PROVIDERS,
+  new Provider(NODE_APP_PLATFORM_MARKER, {useValue: true}),
   new Provider(PLATFORM_INITIALIZER, {useValue: initNodeAdapter, multi: true}),
 ]);
 
@@ -77,7 +81,7 @@ function _document(): any {
   return DOM.createHtmlDocument();
 }
 
-export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
+export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   ...APPLICATION_COMMON_PROVIDERS,
   ...FORM_PROVIDERS,
   new Provider(PLATFORM_PIPES, {useValue: COMMON_PIPES, multi: true}),
@@ -99,14 +103,14 @@ export const NODE_APPLICATION_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   BrowserDetails,
   AnimationBuilder,
   EventManager,
-  ELEMENT_PROBE_PROVIDERS
+  ...ELEMENT_PROBE_PROVIDERS
 ]);
 
 /**
  * An array of providers that should be passed into `application()` when bootstrapping a component.
  */
-export const NODE_APPLICATION_PROVIDERS: Array<any> = CONST_EXPR([
-  ...NODE_APPLICATION_COMMON_PROVIDERS,
+export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
+  ...NODE_APP_COMMON_PROVIDERS,
   ...COMPILER_PROVIDERS,
 
   new Provider(TemplateParser, {useClass: NodeTemplateParser}),
@@ -124,12 +128,12 @@ export function bootstrap(
   reflector.reflectionCapabilities = new ReflectionCapabilities();
 
   let appProviders: Array<any> = [
-    ...NODE_APPLICATION_PROVIDERS,
+    ...NODE_APP_PROVIDERS,
 
     new Provider(DOCUMENT, {
       useFactory: (directiveResolver, sharedStylesHost) => {
         // TODO(gdi2290): determine a better for document on the server
-        let selector = directiveResolver.resolve(appComponentType).selector;
+        let selector = directiveResolver.resolve(appComponentType);
         let serverDocument = DOM.createHtmlDocument();
         let el = DOM.createElement(selector);
         DOM.appendChild(serverDocument.body, el);
@@ -146,9 +150,8 @@ export function bootstrap(
     ...(isPresent(customComponentProviders) ? customComponentProviders : [])
   ];
 
-  return platform(NODE_PROVIDERS)
-    .application(appProviders)
-    .bootstrap(appComponentType, componentProviders);
+  let platform = createPlatform(ReflectiveInjector.resolveAndCreate(NODE_APP_PLATFORM));
+  return coreLoadAndBootstrap(platform.injector, appComponentType);
 }
 
 
@@ -158,14 +161,14 @@ export function buildReflector(): void {
 
 export function buildNodeProviders(providers?: Array<any>): Array<any> {
   return [
-    ...NODE_PROVIDERS,
+    ...NODE_APP_PLATFORM,
     ...(isPresent(providers) ? providers : [])
   ];
 }
 
 export function buildNodeAppProviders(document?: any, providers?: Array<any>): Array<any> {
   return [
-    NODE_APPLICATION_PROVIDERS,
+    ...NODE_APP_PROVIDERS,
     (isPresent(document) && document) ? [
       new Provider(DOCUMENT, {
         useFactory: (sharedStylesHost) => {
@@ -175,7 +178,7 @@ export function buildNodeAppProviders(document?: any, providers?: Array<any>): A
         deps: [NodeSharedStylesHost]
       })
     ] : [],
-    (isPresent(providers) && providers) ? providers : []
+    ...(isPresent(providers) && providers) ? providers : []
   ];
 }
 
@@ -184,7 +187,7 @@ export function buildNodePlatformProviders(
   providers?: Array<any>): Array<any> {
 
   return [
-    ...NODE_PROVIDERS,
+    ...NODE_APP_PLATFORM,
     ...(isPresent(providers) ? providers : [])
   ];
 }

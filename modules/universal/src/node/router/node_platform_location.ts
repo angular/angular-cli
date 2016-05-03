@@ -1,5 +1,5 @@
-import {Injectable, Inject, Optional} from 'angular2/core';
-import {PlatformLocation} from 'angular2/router';
+import {Injectable, Inject, Optional, Provider} from 'angular2/core';
+import {PlatformLocation} from 'angular2/platform/common';
 import * as nodeUrl from 'url';
 import {REQUEST_URL, BASE_URL, ORIGIN_URL} from '../../common';
 

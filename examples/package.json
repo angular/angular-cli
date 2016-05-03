@@ -36,10 +36,10 @@
     "angular2-universal-polyfills": "file:../modules/polyfills"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.15",
+    "angular2": "2.0.0-beta.17",
     "express": "^4.13.3",
-    "rxjs": "5.0.0-beta.2",
-    "zone.js": "~0.6.11",
+    "rxjs": "5.0.0-beta.6",
+    "zone.js": "0.6.12",
     "systemjs": "^0.19.18"
   },
   "repository": {
