@@ -32,7 +32,7 @@ const barrels: string[] = [
   /** @cli-barrel */
 ];
 
-const _cliSystemConfig = {};
+const _cliSystemConfig: any = {};
 barrels.forEach((barrelName: string) => {
   _cliSystemConfig[barrelName] = { main: 'index' };
 });
