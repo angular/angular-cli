@@ -88,6 +88,16 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
+  it('lints', () => {
+    this.timeout(420000);
+
+    return ng(['lint']).then(() => {
+    })
+    .catch(err => {
+      throw new Error('Linting failed: ' + err);
+    });
+  });
+
   it('Perform `ng test` after initial build', function () {
     this.timeout(420000);
 

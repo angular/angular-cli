@@ -7,15 +7,16 @@ module.exports = Task.extend({
   run: function () {
     var ui = this.ui;
 
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
       exec('npm run lint', (err, stdout) => {
         ui.writeLine(stdout);
         if (err) {
           ui.writeLine(chalk.red('Lint errors found in the listed files.'));
+          reject();
         } else {
           ui.writeLine(chalk.green('All files pass linting.'));
+          resolve();
         }
-        resolve();
       });
     });
   }
