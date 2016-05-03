@@ -13,7 +13,7 @@ const packages: any = {
 /***********************************************************************************************
  * Everything underneath this line is managed by the CLI.
  **********************************************************************************************/
-const barrels = [
+const barrels: string[] = [
   // Angular specific barrels.
   '@angular/core',
   '@angular/common',
