@@ -25,29 +25,21 @@ var allSpecFiles = Object.keys(window.__karma__.files)
   .filter(isAppFile);
 
 // Load our SystemJS configuration.
-System.import('base/dist/system-config.js').then(function(systemJsConfig) {
-  // We need to add the distPrefix to our system config packages.
-  var config = systemJsConfig.config;
-  Object.keys(config.packages).forEach(function(pkgName) {
-    if (pkgName[0] != '/' && pkgName[0] != '.') {
-      var pkg = config.packages[pkgName];
-      delete config.packages[pkgName];
-      config.packages[distPath + pkgName] = pkg;
-    }
-  });
+System.config({
+  baseURL: distPath
+});
 
-  System.config(config);
-}).then(function() {
+System.import('system-config.js').then(function() {
   // Load and configure the TestComponentBuilder.
   return Promise.all([
-    System.import('angular2/testing'),
-    System.import('angular2/platform/testing/browser')
+    System.import('@angular/core/testing'),
+    System.import('@angular/platform-browser-dynamic/testing')
   ]).then(function (providers) {
     var testing = providers[0];
     var testingBrowser = providers[1];
 
-    testing.setBaseTestProviders(testingBrowser.TEST_BROWSER_PLATFORM_PROVIDERS,
-      testingBrowser.TEST_BROWSER_APPLICATION_PROVIDERS);
+    testing.setBaseTestProviders(testingBrowser.TEST_BROWSER_DYNAMIC_PLATFORM_PROVIDERS,
+      testingBrowser.TEST_BROWSER_DYNAMIC_APPLICATION_PROVIDERS);
   });
 }).then(function() {
   // Finally, load all spec files.

@@ -1,7 +1,7 @@
-import { Component } from 'angular2/core';
+import { Component } from '@angular/core';
 
 @Component({
-  moduleId: __moduleName,
+  moduleId: module.id,
   selector: '<%= htmlComponentName %>-app',
   templateUrl: '<%= htmlComponentName %>.component.html',
   styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']
