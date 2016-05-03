@@ -1,6 +1,6 @@
 {
   "name": "angular2-universal",
-  "version": "0.98.4",
+  "version": "0.99.0",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -63,7 +63,7 @@
     "xhr2": "^0.1.3"
   },
   "peerDependencies": {
-    "preboot": ">=2.0.4",
+    "preboot": ">=2.0.8",
     "angular2-universal-polyfills": ">=0.4.1",
     "angular2-express-engine": ">=0.11.1",
     "angular2-hapi-engine": ">=0.11.1",
