@@ -183,21 +183,7 @@ You can modify the these scripts in `package.json` to run whatever tool you pref
 
 ### Support for offline applications
 
-By default a file `manifest.appcache` will be generated which lists all files included in
-a project's output, along with SHA1 hashes of all file contents. This file can be used
-directly as an AppCache manifest (for now, `index.html` must be manually edited to set this up).
-
-The manifest is also annotated for use with `angular2-service-worker`. Some manual operations
-are currently required to enable this usage. The package must be installed, and `worker.js`
-manually copied into the project `src` directory:
-
-```bash
-npm install angular2-service-worker
-cp node_modules/angular2-service-worker/dist/worker.js src/
-```
-
- Then, the commented snippet in `index.html` must be uncommented to register the worker script
- as a service worker.
+The index.html file includes a commented-out code snippet for installing the angular2-service-worker. This support is experimental, please see the angular/mobile-toolkit project for documentation on how to make use of this functionality.
 
 ### Commands autocompletion
 
