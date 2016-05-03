@@ -6,10 +6,10 @@
   "browser": "dist/src/browser/preboot_browser.js",
   "typings": "dist/src/node/preboot_node.d.ts",
   "scripts": {
-    "prebuild": "rm -rf dist",
-    "build": "tsc || true",
+    "prebuild": "./node_modules/.bin/del -rf dist",
+    "build": "./node_modules/.bin/tsc || true",
     "prepublish": "npm run build",
-    "preinstall": "typings install"
+    "postinstall": "./node_modules/.bin/typings install"
   },
   "files": [
     "src",
@@ -56,7 +56,9 @@
     "lodash": "^4.7.0",
     "q": "^1.4.1",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "typings": "^0.8.1",
+    "del-cli": "0.2.0"
   },
   "repository": {
     "type": "git",
