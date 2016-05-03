@@ -8,8 +8,7 @@
   "scripts": {
     "prebuild": "./node_modules/.bin/rimraf dist",
     "build": "./node_modules/.bin/tsc || true",
-    "prepublish": "npm run build",
-    "postinstall": "./node_modules/.bin/typings install"
+    "prepublish": "npm run build"
   },
   "files": [
     "src",

@@ -66,8 +66,8 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
 
     // when tracking focus keep a ref to the last active node
     if (strategy.trackFocus) {
-      
-      // if no caret, then no active node; else set the node and node key  
+
+      // if no caret, then no active node; else set the node and node key
       if (caretPositionEvents.indexOf(eventName) < 0) {
         preboot.activeNode = null;
       } else {
@@ -89,7 +89,7 @@ export function getEventHandler(preboot: PrebootRef, strategy: ListenStrategy, n
     if (eventName === 'keyup' && event.which === 13 && node.attributes['(keyup.enter)']) {
       preboot.dom.dispatchGlobalEvent('PrebootFreeze');
     }
-    
+
     // we will record events for later replay unless explicitly marked as doNotReplay
     if (!strategy.doNotReplay) {
       let eventObj: PrebootEvent = {
@@ -175,12 +175,18 @@ export function cleanup(preboot: PrebootRef, opts: PrebootOptions) {
 
   // if there is an active node set, it means focus was tracked in one or more of the listen strategies
   if (activeNode) {
-    let activeClientNode = preboot.dom.findClientNode(activeNode.node, activeNode.nodeKey);
-    if (activeClientNode) {
-      preboot.dom.setSelection(activeClientNode, preboot.selection);
-    } else {
-      preboot.log(6, activeNode);
-    }
+
+    // add small delay here so we are sure buffer switch is done
+    setTimeout(function () {
+
+      // find the client node in the new client view
+      let activeClientNode = preboot.dom.findClientNode(activeNode.node, activeNode.nodeKey);
+      if (activeClientNode) {
+        preboot.dom.setSelection(activeClientNode, preboot.selection);
+      } else {
+        preboot.log(6, activeNode);
+      }
+    }, 100);
   }
 
   // cleanup the event listeners
