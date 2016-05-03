@@ -1,7 +1,19 @@
-/** Only use System here. */
-declare var System: any;
+/***********************************************************************************************
+ * User Configuration.
+ **********************************************************************************************/
+/** Map relative paths to URLs. */
+const map: any = {
+};
 
-const barrels: string[] = [
+/** User packages configuration. */
+const packages: any = {
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************************
+ * Everything underneath this line is managed by the CLI.
+ **********************************************************************************************/
+const barrels = [
   // Angular specific barrels.
   '@angular/core',
   '@angular/common',
@@ -11,6 +23,7 @@ const barrels: string[] = [
   '@angular/platform-browser',
   '@angular/platform-browser-dynamic',
 
+  // Thirdparty barrels.
   'rxjs',
 
   // App specific barrels.
@@ -19,26 +32,23 @@ const barrels: string[] = [
   /** @cli-barrel */
 ];
 
+const _cliSystemConfig = {};
+barrels.forEach((barrelName: string) => {
+  _cliSystemConfig[barrelName] = { main: 'index' };
+});
 
-// Angular CLI SystemJS configuration.
+/** Type declaration for ambient System. */
+declare var System: any;
+
+// Apply the CLI SystemJS configuration.
 System.config({
   map: {
     '@angular': 'vendor/@angular',
     'rxjs': 'vendor/rxjs',
     'main': 'main.js'
   },
-  packages: barrels.reduce((barrelConfig: any, barrelName: string) => {
-    barrelConfig[barrelName] = {
-      main: 'index'
-    };
-    return barrelConfig;
-  }, {})
+  packages: _cliSystemConfig
 });
 
-
-// Add your custom SystemJS configuration here.
-System.config({
-  packages: {
-    // Add your custom SystemJS packages here.
-  }
-});
+// Apply the user's configuration.
+System.config({ map, packages });
