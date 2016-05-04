@@ -251,6 +251,9 @@ To use one just install for example `npm install node-sass` and rename `.css` fi
 
 The `Angular2App`'s options argument has `sassCompiler`, `lessCompiler`, `stylusCompiler` and `compassCompiler` options that are passed directly to their respective CSS preprocessors.
 
+### Additional Support
+- pug (jade)
+
 ### 3rd Party Library Installation
 
 The installation of 3rd party libraries are well described at our [Wiki Page](https://github.com/angular/angular-cli/wiki/3rd-party-libs)
