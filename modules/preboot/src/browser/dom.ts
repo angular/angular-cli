@@ -143,7 +143,7 @@ export function getSelection(node: Element): CursorSelection {
   };
 
   // if browser support selectionStart on node (Chrome, FireFox, IE9+)
-  if (node && node.hasOwnProperty('selectionStart') && (node.selectionStart || node.selectionStart === 0)) {
+  if (node  && (node.selectionStart || node.selectionStart === 0)) {
     selection.start = node.selectionStart;
     selection.end = node.selectionEnd;
     selection.direction = node.selectionDirection;
@@ -167,7 +167,7 @@ export function setSelection(node: Element, selection: CursorSelection) {
   }
 
   // set selection if a modern browser (i.e. IE9+, etc.)
-  if (node && node.hasOwnProperty('setSelectionRange') && node.setSelectionRange && selection) {
+  if (node && node.setSelectionRange && selection) {
     node.setSelectionRange(selection.start, selection.end, selection.direction);
   }
 }

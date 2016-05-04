@@ -186,7 +186,7 @@ export function cleanup(preboot: PrebootRef, opts: PrebootOptions) {
       } else {
         preboot.log(6, activeNode);
       }
-    }, 100);
+    }, 1);
   }
 
   // cleanup the event listeners
