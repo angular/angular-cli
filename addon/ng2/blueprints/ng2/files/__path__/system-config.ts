@@ -32,9 +32,9 @@ const barrels: string[] = [
   /** @cli-barrel */
 ];
 
-const _cliSystemConfig: any = {};
+const cliSystemConfigPackages: any = {};
 barrels.forEach((barrelName: string) => {
-  _cliSystemConfig[barrelName] = { main: 'index' };
+  cliSystemConfigPackages[barrelName] = { main: 'index' };
 });
 
 /** Type declaration for ambient System. */
@@ -47,7 +47,7 @@ System.config({
     'rxjs': 'vendor/rxjs',
     'main': 'main.js'
   },
-  packages: _cliSystemConfig
+  packages: cliSystemConfigPackages
 });
 
 // Apply the user's configuration.
