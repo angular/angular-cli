@@ -1,10 +1,10 @@
-console.time('angular2/core in client');
-import * as angular from 'angular2/core';
-console.timeEnd('angular2/core in client');
+console.time('@angular/core in client');
+import * as angular from '@angular/core';
+console.timeEnd('@angular/core in client');
 
-import {bootstrap} from 'angular2/platform/browser';
-import {HTTP_PROVIDERS} from 'angular2/http';
-import {ROUTER_PROVIDERS} from 'angular2/router';
+import {bootstrap} from '@angular/platform-browser-dynamic';
+import {HTTP_PROVIDERS} from '@angular/http';
+import {ROUTER_PROVIDERS} from '@angular/router-deprecated';
 
 import 'rxjs/Rx';
 // import {

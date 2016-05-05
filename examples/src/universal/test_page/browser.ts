@@ -1,9 +1,9 @@
-console.time('angular2/core in client');
-import {createPlatform, coreLoadAndBootstrap, ReflectiveInjector} from 'angular2/core';
-console.timeEnd('angular2/core in client');
+console.time('@angular/core in client');
+import {createPlatform, coreLoadAndBootstrap, ReflectiveInjector} from '@angular/core';
+console.timeEnd('@angular/core in client');
 
-import {BROWSER_PROVIDERS, BROWSER_APP_PROVIDERS, bootstrap} from 'angular2/platform/browser';
-import {Http, HTTP_PROVIDERS} from 'angular2/http';
+import {bootstrap} from '@angular/platform-browser-dynamic';
+import {HTTP_PROVIDERS} from '@angular/http';
 
 import 'rxjs/Rx';
 // import {

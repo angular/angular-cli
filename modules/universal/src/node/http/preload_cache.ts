@@ -6,7 +6,7 @@ import {
   Inject,
   EventEmitter,
   NgZone
-} from 'angular2/core';
+} from '@angular/core';
 
 import {Observable} from 'rxjs';
 
@@ -28,11 +28,11 @@ import {
   ReadyState,
   BrowserXhr,
   RequestMethod
-} from 'angular2/http';
-import {MockBackend} from 'angular2/src/http/backends/mock_backend';
+} from '@angular/http';
+import {MockBackend} from '@angular/http/testing';
 
 
-import {isPresent, isBlank, CONST_EXPR} from 'angular2/src/facade/lang';
+import {isPresent, isBlank} from '@angular/core/src/facade/lang';
 
 // CJS
 import {XMLHttpRequest} from 'xhr2';
@@ -41,6 +41,7 @@ import {XMLHttpRequest} from 'xhr2';
 
 import {ORIGIN_URL, BASE_URL, PRIME_CACHE} from '../../common';
 
+const CONST_EXPR = v => v;
 
 export function buildBaseUrl(url: string, existing?: boolean): any {
   let prop = existing ? 'useExisting' : 'useValue';

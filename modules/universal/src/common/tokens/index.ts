@@ -1,5 +1,5 @@
-import {OpaqueToken} from 'angular2/core';
-import {APP_BASE_HREF} from 'angular2/platform/common';
+import {OpaqueToken} from '@angular/core';
+import {APP_BASE_HREF} from '@angular/common';
 
 export const ORIGIN_URL: OpaqueToken = new OpaqueToken('originUrl');
 

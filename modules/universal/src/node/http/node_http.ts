@@ -8,10 +8,10 @@ import {
   Response,
   ResponseOptions,
   ResponseType
-} from 'angular2/http';
-import * as utils from 'angular2/src/http/http_utils';
-import {isPresent} from 'angular2/src/facade/lang';
-import {Injectable, NgZone, Inject, Optional} from 'angular2/core';
+} from '@angular/http';
+import * as utils from '@angular/http/src/http_utils';
+import {isPresent} from '@angular/core/src/facade/lang';
+import {Injectable, NgZone, Inject, Optional} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import * as http from 'http';

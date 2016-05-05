@@ -1,6 +1,6 @@
-import {Component, Directive, ElementRef, Renderer} from 'angular2/core';
-import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
-import {Http} from 'angular2/http';
+import {Component, Directive, ElementRef, Renderer} from '@angular/core';
+import {RouteConfig, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
+import {Http} from '@angular/http';
 
 
 @Directive({

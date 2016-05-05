@@ -1,5 +1,5 @@
-import {DirectiveResolver} from 'angular2/src/compiler/directive_resolver';
-let directiveResolver = new DirectiveResolver();
+import {DirectiveResolver} from '@angular/compiler';
+var directiveResolver: any = new DirectiveResolver();
 
 export function serverDirectiveResolver(componentType: any): any {
   return directiveResolver.resolve(componentType);

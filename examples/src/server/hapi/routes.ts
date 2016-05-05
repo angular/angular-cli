@@ -14,8 +14,8 @@ module.exports = function(ROOT) {
   var todoApp = require(`${universalPath}/todo/app`);
   var routerApp = require(`${universalPath}/test_router/app`);
 
-  var {enableProdMode, provide} = require('angular2/core');
-  var {ROUTER_PROVIDERS, APP_BASE_HREF} = require('angular2/router');
+  var {enableProdMode, provide} = require('@angular/core');
+  var {ROUTER_PROVIDERS, APP_BASE_HREF} = require('@angular/router-deprecated');
 
   enableProdMode();
 
@@ -181,7 +181,7 @@ module.exports = function(ROOT) {
 
   var staticRoutes = [
     static('/src/{param*}', '/src'),
-    static('/angular2/{param*}', '/node_modules/angular2'),
+    static('/@angular/{param*}', '/node_modules/@angular'),
     static('/rxjs/{param*}', '/node_modules/rxjs'),
     static('/node_modules/{param*}', '/node_modules'),
     static('/examples/app/{param*}', '/dist/examples/app'),

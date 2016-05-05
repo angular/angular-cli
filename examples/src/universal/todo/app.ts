@@ -1,8 +1,8 @@
-import {ViewEncapsulation, Component} from 'angular2/core';
+import {ViewEncapsulation, Component} from '@angular/core';
 
-import {ROUTER_DIRECTIVES} from 'angular2/router';
+import {ROUTER_DIRECTIVES} from '@angular/router-deprecated';
 
-import {Http} from 'angular2/http';
+import {Http} from '@angular/http';
 
 
 import {Store, Todo, TodoFactory} from './services/TodoStore';

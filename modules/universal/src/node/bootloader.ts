@@ -1,5 +1,4 @@
-import {DOCUMENT} from 'angular2/platform/common_dom';
-import {DOM} from 'angular2/src/platform/dom/dom_adapter';
+import {DOCUMENT} from '@angular/platform-browser';
 import {
   NgZone,
   Injector,
@@ -9,8 +8,8 @@ import {
   ComponentRef,
   PlatformRef,
   ApplicationRef
-} from 'angular2/core';
-import {Http} from 'angular2/http';
+} from '@angular/core';
+import {Http} from '@angular/http';
 
 
 import {buildReflector, buildNodeProviders, buildNodeAppProviders} from './platform/node';
@@ -18,7 +17,13 @@ import {parseDocument, parseFragment, serializeDocument} from './platform/docume
 import {createPrebootCode} from './ng_preboot';
 import {arrayFlattenTree} from './helper';
 
-export type configRefs = {componentRef: ComponentRef, applicationRef: ApplicationRef};
+import {Parse5DomAdapter} from '@angular/platform-server';
+Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
+import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
+var DOM: any = getDOM();
+
+
+export type configRefs = {componentRef: ComponentRef<any>, applicationRef: ApplicationRef};
 
 export interface BootloaderConfig {
   template?: string;

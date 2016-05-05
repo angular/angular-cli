@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import {DOCUMENT} from 'angular2/platform/common_dom';
+import {DOCUMENT} from '@angular/platform-browser';
 
 import {selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal';
 
@@ -155,16 +155,15 @@ function angularScript(config): string {
     }, systemConfig);
   return `
   <!-- Browser polyfills -->
-  <script src="${baseUrl}/es6-shim/es6-shim.min.js"></script>
-  <script src="${baseUrl}/systemjs/dist/system-polyfills.js"></script>
-  <script src="${baseUrl}/angular2/bundles/angular2-polyfills.min.js"></script>
+  <script src="${baseUrl}/zone.js/dist/zone.js"></script>
+  <script src="${baseUrl}/reflect-metadata/Reflect.js"></script>
   <!-- SystemJS -->
   <script src="${baseUrl}/systemjs/dist/system.js"></script>
   <!-- Angular2: Bundle -->
   <script src="${baseUrl}/rxjs/bundles/Rx.js"></script>
-  <script src="${baseUrl}/angular2/bundles/angular2.dev.js"></script>
-  <script src="${baseUrl}/angular2/bundles/router.dev.js"></script>
-  <script src="${baseUrl}/angular2/bundles/http.dev.js"></script>
+  <script src="${baseUrl}/@angular/core/core.umd.js"></script>
+  <script src="${baseUrl}/@angular/router-deprecated/router-deprecated.umd.js"></script>
+  <script src="${baseUrl}/@angular/http/http.umd.js"></script>
   <script type="text/javascript">
   System.config(${ JSON.stringify(newConfig) });
   </script>

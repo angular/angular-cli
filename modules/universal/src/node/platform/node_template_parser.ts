@@ -1,21 +1,16 @@
 /* tslint:disable */
+import {Injectable, Inject, OpaqueToken, Optional} from '@angular/core';
+import {__core_private__} from '@angular/core/private_export';
+
+var {MAX_INTERPOLATION_VALUES, Console, SecurityContext} = __core_private__;
+
 import {
   ListWrapper,
   StringMapWrapper,
   SetWrapper,
-  MapWrapper
-} from 'angular2/src/facade/collection';
-import {
-  CONST_EXPR,
-  RegExpWrapper,
-  isPresent,
-  StringWrapper,
-  isBlank,
-  isArray
-} from 'angular2/src/facade/lang';
-import {Injectable, Inject, OpaqueToken, Optional} from 'angular2/core';
-import {Console} from 'angular2/src/core/console';
-import {BaseException} from 'angular2/src/facade/exceptions';
+} from '@angular/core/src/facade/collection';
+import {RegExpWrapper, isPresent, StringWrapper, isBlank, isArray} from '@angular/core/src/facade/lang';
+import {BaseException} from '@angular/core/src/facade/exceptions';
 import {
   AST,
   Interpolation,
@@ -23,21 +18,16 @@ import {
   TemplateBinding,
   RecursiveAstVisitor,
   BindingPipe
-} from 'angular2/src/compiler/expression_parser/ast';
-import {Parser} from 'angular2/src/compiler/expression_parser/parser';
+} from '@angular/compiler/src/expression_parser/ast';
+import {Parser} from '@angular/compiler/src/expression_parser/parser';
 import {
-  CompileTokenMap,
   CompileDirectiveMetadata,
   CompilePipeMetadata,
   CompileMetadataWithType,
-  CompileProviderMetadata,
-  CompileTokenMetadata,
-  CompileTypeMetadata
-} from 'angular2/src/compiler/compile_metadata';
-import {HtmlParser} from 'angular2/src/compiler/html_parser';
-import {splitNsName, mergeNsAndName} from 'angular2/src/compiler/html_tags';
-import {ParseSourceSpan, ParseError, ParseLocation, ParseErrorLevel} from 'angular2/src/compiler/parse_util';
-import {MAX_INTERPOLATION_VALUES} from 'angular2/src/core/linker/view_utils';
+} from '@angular/compiler/src/compile_metadata';
+import {HtmlParser} from '@angular/compiler/src/html_parser';
+import {splitNsName, mergeNsAndName} from '@angular/compiler/src/html_tags';
+import {ParseSourceSpan, ParseError, ParseLocation, ParseErrorLevel} from '@angular/compiler/src/parse_util';
 
 import {
   ElementAst,
@@ -58,17 +48,16 @@ import {
   ProviderAst,
   ProviderAstType,
   VariableAst
-} from 'angular2/src/compiler/template_ast';
-import {CssSelector, SelectorMatcher} from 'angular2/src/compiler/selector';
+} from '@angular/compiler/src/template_ast';
+import {CssSelector, SelectorMatcher} from '@angular/compiler/src/selector';
 
-import {ElementSchemaRegistry} from 'angular2/src/compiler/schema/element_schema_registry';
-import {preparseElement, PreparsedElement, PreparsedElementType} from 'angular2/src/compiler/template_preparser';
+import {ElementSchemaRegistry} from '@angular/compiler/src/schema/element_schema_registry';
+import {preparseElement, PreparsedElementType} from '@angular/compiler/src/template_preparser';
 
-import {isStyleUrlResolvable} from 'angular2/src/compiler/style_url_resolver';
+import {isStyleUrlResolvable} from '@angular/compiler/src/style_url_resolver';
 
 import {
   HtmlAstVisitor,
-  HtmlAst,
   HtmlElementAst,
   HtmlAttrAst,
   HtmlTextAst,
@@ -76,12 +65,12 @@ import {
   HtmlExpansionAst,
   HtmlExpansionCaseAst,
   htmlVisitAll
-} from 'angular2/src/compiler/html_ast';
+} from '@angular/compiler/src/html_ast';
 
-import {splitAtColon} from 'angular2/src/compiler/util';
-import {identifierToken, Identifiers} from 'angular2/src/compiler/identifiers';
+import {splitAtColon} from '@angular/compiler/src/util';
+import {identifierToken, Identifiers} from '@angular/compiler/src/identifiers';
 
-import {ProviderElementContext, ProviderViewContext} from 'angular2/src/compiler/provider_parser';
+import {ProviderElementContext, ProviderViewContext} from '@angular/compiler/src/provider_parser';
 
 // Group 1 = "bind-"
 // Group 2 = "var-"
@@ -119,7 +108,7 @@ var TEXT_CSS_SELECTOR = CssSelector.parse('*')[0];
    TEMPLATE_TRANSFORMS,
    TemplateParseError,
    TemplateParseResult
- } from 'angular2/src/compiler/template_parser';
+ } from '@angular/compiler/src/template_parser';
 
 @Injectable()
 export class NodeTemplateParser {
@@ -293,19 +282,19 @@ class TemplateParseVisitor implements HtmlAstVisitor {
   visitElement(element: HtmlElementAst, parent: ElementContext): any {
     var nodeName = element.name;
     var preparsedElement = preparseElement(element);
-    // if (preparsedElement.type === PreparsedElementType.SCRIPT ||
-    //     preparsedElement.type === PreparsedElementType.STYLE) {
-    //   // Skipping <script> for security reasons
-    //   // Skipping <style> as we already processed them
-    //   // in the StyleCompiler
-    //   return null;
-    // }
-    // if (preparsedElement.type === PreparsedElementType.STYLESHEET &&
-    //     isStyleUrlResolvable(preparsedElement.hrefAttr)) {
-    //   // Skipping stylesheets with either relative urls or package scheme as we already processed
-    //   // them in the StyleCompiler
-    //   return null;
-    // }
+    if (preparsedElement.type === PreparsedElementType.SCRIPT ||
+        preparsedElement.type === PreparsedElementType.STYLE) {
+      // Skipping <script> for security reasons
+      // Skipping <style> as we already processed them
+      // in the StyleCompiler
+      return null;
+    }
+    if (preparsedElement.type === PreparsedElementType.STYLESHEET &&
+        isStyleUrlResolvable(preparsedElement.hrefAttr)) {
+      // Skipping stylesheets with either relative urls or package scheme as we already processed
+      // them in the StyleCompiler
+      return null;
+    }
 
     var matchableAttrs: string[][] = [];
     var elementOrDirectiveProps: BoundElementOrDirectiveProperty[] = [];
@@ -640,7 +629,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
         }
         targetReferences.push(new ReferenceAst(elOrDirRef.name, refToken, elOrDirRef.sourceSpan));
       }
-    });
+    });  // fix syntax highlighting issue: `
     return directiveAsts;
   }
 
@@ -713,10 +702,12 @@ class TemplateParseVisitor implements HtmlAstVisitor {
                                     sourceSpan: ParseSourceSpan): BoundElementPropertyAst {
     var unit = null;
     var bindingType;
-    var boundPropertyName;
+    var boundPropertyName: string;
     var parts = name.split(PROPERTY_PARTS_SEPARATOR);
+    let securityContext: any;
     if (parts.length === 1) {
       boundPropertyName = this._schemaRegistry.getMappedPropName(parts[0]);
+      securityContext = this._schemaRegistry.securityContext(elementName, boundPropertyName);
       bindingType = PropertyBindingType.Property;
       if (!this._schemaRegistry.hasProperty(elementName, boundPropertyName)) {
         this._reportError(
@@ -726,27 +717,41 @@ class TemplateParseVisitor implements HtmlAstVisitor {
     } else {
       if (parts[0] == ATTRIBUTE_PREFIX) {
         boundPropertyName = parts[1];
+        if (boundPropertyName.toLowerCase().startsWith('on')) {
+          this._reportError(
+              `Binding to event attribute '${boundPropertyName}' is disallowed ` +
+                  `for security reasons, please use (${boundPropertyName.slice(2)})=...`,
+              sourceSpan);
+        }
+        // NB: For security purposes, use the mapped property name, not the attribute name.
+        securityContext = this._schemaRegistry.securityContext(
+            elementName, this._schemaRegistry.getMappedPropName(boundPropertyName));
         let nsSeparatorIdx = boundPropertyName.indexOf(':');
         if (nsSeparatorIdx > -1) {
           let ns = boundPropertyName.substring(0, nsSeparatorIdx);
           let name = boundPropertyName.substring(nsSeparatorIdx + 1);
           boundPropertyName = mergeNsAndName(ns, name);
         }
+
         bindingType = PropertyBindingType.Attribute;
       } else if (parts[0] == CLASS_PREFIX) {
         boundPropertyName = parts[1];
         bindingType = PropertyBindingType.Class;
+        securityContext = SecurityContext.NONE;
       } else if (parts[0] == STYLE_PREFIX) {
         unit = parts.length > 2 ? parts[2] : null;
         boundPropertyName = parts[1];
         bindingType = PropertyBindingType.Style;
+        securityContext = SecurityContext.STYLE;
       } else {
         this._reportError(`Invalid property name '${name}'`, sourceSpan);
         bindingType = null;
+        securityContext = null;
       }
     }
 
-    return new BoundElementPropertyAst(boundPropertyName, bindingType, ast, unit, sourceSpan);
+    return new BoundElementPropertyAst(boundPropertyName, bindingType, securityContext, ast, unit,
+                                       sourceSpan);
   }
 
 
@@ -803,14 +808,14 @@ class TemplateParseVisitor implements HtmlAstVisitor {
 class NonBindableVisitor implements HtmlAstVisitor {
   visitElement(ast: HtmlElementAst, parent: ElementContext): ElementAst {
     var preparsedElement = preparseElement(ast);
-    // if (preparsedElement.type === PreparsedElementType.SCRIPT ||
-    //     preparsedElement.type === PreparsedElementType.STYLE ||
-    //     preparsedElement.type === PreparsedElementType.STYLESHEET) {
-    //   // Skipping <script> for security reasons
-    //   // Skipping <style> and stylesheets as we already processed them
-    //   // in the StyleCompiler
-    //   return null;
-    // }
+    if (preparsedElement.type === PreparsedElementType.SCRIPT ||
+        preparsedElement.type === PreparsedElementType.STYLE ||
+        preparsedElement.type === PreparsedElementType.STYLESHEET) {
+      // Skipping <script> for security reasons
+      // Skipping <style> and stylesheets as we already processed them
+      // in the StyleCompiler
+      return null;
+    }
 
     var attrNameAndValues = ast.attrs.map(attrAst => [attrAst.name, attrAst.value]);
     var selector = createElementCssSelector(ast.name, attrNameAndValues);
@@ -849,8 +854,9 @@ class ElementContext {
                 providerContext: ProviderElementContext): ElementContext {
     var matcher = new SelectorMatcher();
     var wildcardNgContentIndex = null;
-    if (directives.length > 0 && directives[0].directive.isComponent) {
-      var ngContentSelectors = directives[0].directive.template.ngContentSelectors;
+    var component = directives.find(directive => directive.directive.isComponent);
+    if (isPresent(component)) {
+      var ngContentSelectors = component.directive.template.ngContentSelectors;
       for (var i = 0; i < ngContentSelectors.length; i++) {
         var selector = ngContentSelectors[i];
         if (StringWrapper.equals(selector, '*')) {
@@ -925,4 +931,3 @@ function removeDuplicates(items: CompileMetadataWithType[]): CompileMetadataWith
   });
   return res;
 }
-/* tslint:enable */

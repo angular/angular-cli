@@ -1,11 +1,11 @@
-import {provide} from 'angular2/core';
+import {provide} from '@angular/core';
 
-import {bootstrap} from 'angular2/platform/browser';
+import {bootstrap} from '@angular/platform-browser-dynamic';
 
 
-import {ROUTER_PROVIDERS} from 'angular2/router';
+import {ROUTER_PROVIDERS} from '@angular/router-deprecated';
 
-import {HTTP_PROVIDERS} from 'angular2/http';
+import {HTTP_PROVIDERS} from '@angular/http';
 
 // import {
 //   NG_PRELOAD_CACHE_PROVIDERS,

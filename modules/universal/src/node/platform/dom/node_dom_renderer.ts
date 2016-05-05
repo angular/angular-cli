@@ -2,26 +2,31 @@ import {
   isPresent,
   isBlank,
   stringify
-} from 'angular2/src/facade/lang';
-import {ListWrapper} from 'angular2/src/facade/collection';
+} from '@angular/core/src/facade/lang';
+import {ListWrapper} from '@angular/core/src/facade/collection';
 import {
   provide,
   Inject,
   Injectable,
   Renderer,
   RenderComponentType
-} from 'angular2/core';
+} from '@angular/core';
 
-import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
-import {DomRenderer, DomRootRenderer, DomRootRenderer_} from 'angular2/src/platform/dom/dom_renderer';
+import {DOCUMENT} from '@angular/platform-browser';
+import {DomRenderer, DomRootRenderer, DomRootRenderer_} from '@angular/platform-browser/src/dom/dom_renderer';
 
-import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
-import {EventManager} from 'angular2/src/platform/dom/events/event_manager';
-import {DomSharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
-import {DOM} from 'angular2/src/platform/dom/dom_adapter';
-import {ViewEncapsulation} from 'angular2/src/core/metadata';
+import {AnimationBuilder} from '@angular/platform-browser/src/animate/animation_builder';
+import {EventManager} from '@angular/platform-browser/src/dom/events/event_manager';
+import {DomSharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
+import {ViewEncapsulation} from '@angular/core';
 
 import {cssHyphenate} from '../../helper';
+
+import {Parse5DomAdapter} from '@angular/platform-server';
+Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
+import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
+var DOM: any = getDOM();
+
 
 @Injectable()
 export class NodeDomRootRenderer_ extends DomRootRenderer {

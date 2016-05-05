@@ -1,4 +1,4 @@
-import {Provider, PLATFORM_PIPES} from 'angular2/core';
+import {Provider, PLATFORM_PIPES} from '@angular/core';
 
 // import {NodeAsyncPipe} from './node-async-pipe';
 

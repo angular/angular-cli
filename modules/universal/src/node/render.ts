@@ -4,7 +4,7 @@ import {
   buildNodeProviders,
   buildNodeAppProviders
 } from './platform/node';
-import {DOCUMENT} from 'angular2/platform/common_dom';
+import {DOCUMENT} from '@angular/platform-browser';
 import {parseDocument, serializeDocument} from './platform/document';
 
 import {
@@ -20,17 +20,17 @@ import {
   createPrebootCode
 } from './ng_preboot';
 
-import {isBlank, isPresent} from 'angular2/src/facade/lang';
+import {isBlank, isPresent} from '@angular/core/src/facade/lang';
 
-import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
+import {SharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
 
-import {NgZone, ComponentRef, Provider, Type} from 'angular2/core';
-import {Http} from 'angular2/http';
-import {Router} from 'angular2/router';
+import {NgZone, ComponentRef, Provider, Type} from '@angular/core';
+import {Http} from '@angular/http';
+import {Router} from '@angular/router-deprecated';
 
 
 
-export function waitRouter(appRef: ComponentRef): Promise<ComponentRef> {
+export function waitRouter(appRef: ComponentRef<any>): Promise<ComponentRef<any>> {
   let injector = appRef.injector;
   let router = injector.get(Router, Router);
 
@@ -48,7 +48,7 @@ export function renderDocument(
     new Provider(DOCUMENT, { useValue: parseDocument(documentHtml) })
   ])
   .then(waitRouter)
-  .then((appRef: ComponentRef) => {
+  .then((appRef: ComponentRef<any>) => {
     let injector = appRef.injector;
     let document = injector.get(DOCUMENT);
 
@@ -99,7 +99,7 @@ export function appRefSyncRender(appRef: any): string {
 }
 
 
-export function applicationToString(appRef: ComponentRef): string {
+export function applicationToString(appRef: ComponentRef<any>): string {
   let html = appRefSyncRender(appRef);
   appRef.destroy();
   return html;

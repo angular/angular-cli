@@ -14,9 +14,6 @@
   	"outDir": "dist"
   },
   "exclude": [
-    "node_modules/angular2/typings",
-    "node_modules/angular2/manual_typings",
-    "node_modules/angular2/bundles/typings",
     "modules/express-engine/dist",
     "modules/express-engine/node_modules",
     "modules/hapi-engine/dist",

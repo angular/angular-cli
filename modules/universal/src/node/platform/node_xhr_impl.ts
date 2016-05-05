@@ -3,9 +3,9 @@ import * as url from 'url';
 import * as fs from 'fs';
 
 import {ORIGIN_URL, BASE_URL} from '../../common';
-import {NgZone, Inject, Optional} from 'angular2/core';
-import {XHR} from 'angular2/compiler';
-import {PromiseWrapper, PromiseCompleter} from 'angular2/src/facade/promise';
+import {NgZone, Inject, Optional} from '@angular/core';
+import {XHR} from '@angular/compiler';
+import {PromiseWrapper, PromiseCompleter} from '@angular/core/src/facade/promise';
 
 export class NodeXHRImpl extends XHR {
   _baseUrl: string;

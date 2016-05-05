@@ -3,12 +3,11 @@
   "version": false,
   "dependencies": {},
   "ambientDependencies": {
-    "es6-shim": "github:DefinitelyTyped/DefinitelyTyped/es6-shim/es6-shim.d.ts#7de6c3dd94feaeb21f20054b9f30d5dabc5efabd",
-    "express": "github:DefinitelyTyped/DefinitelyTyped/express/express.d.ts#7de6c3dd94feaeb21f20054b9f30d5dabc5efabd",
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
+    "express": "registry:dt/express#4.0.0+20160317120654",
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160322035842",
-    "mime": "github:DefinitelyTyped/DefinitelyTyped/mime/mime.d.ts#56295f5058cac7ae458540423c50ac2dcf9fc711",
-    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#292e56b5acdb2157c3f53d70a77d34d64ba5fe2f",
-    "serve-static": "github:DefinitelyTyped/DefinitelyTyped/serve-static/serve-static.d.ts#7de6c3dd94feaeb21f20054b9f30d5dabc5efabd",
-    "zone.js": "github:DefinitelyTyped/DefinitelyTyped/zone.js/zone.js.d.ts#56295f5058cac7ae458540423c50ac2dcf9fc711"
+    "node": "registry:dt/node#4.0.0+20160505172921",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160501131543",
+    "zone.js": "registry:dt/zone.js#0.0.0+20160316155526"
   }
 }

@@ -1,6 +1,6 @@
 import {NodeForm} from './node_form';
 import {NodeUniversalStyles} from './node_universal_styles';
-import {provide, PLATFORM_DIRECTIVES} from 'angular2/core';
+import {provide, PLATFORM_DIRECTIVES} from '@angular/core';
 
 export * from './node_form';
 

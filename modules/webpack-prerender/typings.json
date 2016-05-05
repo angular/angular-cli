@@ -1,5 +1,5 @@
 {
-  "name": "angular2-gulp-prerender",
+  "name": "angular2-webpack-prerender",
   "version": false,
   "dependencies": {},
   "ambientDependencies": {

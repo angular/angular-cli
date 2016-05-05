@@ -1,5 +1,5 @@
-import {Pipe, ChangeDetectorRef} from 'angular2/core';
-import {AsyncPipe} from 'angular2/common';
+import {Pipe, ChangeDetectorRef} from '@angular/core';
+import {AsyncPipe} from '@angular/common';
 
 @Pipe({
   name: 'async',

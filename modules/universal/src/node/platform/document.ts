@@ -1,7 +1,8 @@
-import {OpaqueToken} from 'angular2/core';
+import {OpaqueToken} from '@angular/core';
 import {Parser, Serializer, TreeAdapters} from 'parse5';
-import {DOM} from 'angular2/src/platform/dom/dom_adapter';
+import {Parse5DomAdapter} from '@angular/platform-server';
 
+const DOM:any = Parse5DomAdapter;
 const parser = new Parser(TreeAdapters.htmlparser2);
 // TODO(gdi2290): fix encodeHtmlEntities: true
 const serializer = new Serializer(TreeAdapters.htmlparser2, { encodeHtmlEntities: false });

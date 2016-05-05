@@ -6,12 +6,11 @@ import {
   ResponseOptions,
   ConnectionBackend,
   XHRBackend
-} from 'angular2/http';
+} from '@angular/http';
 import {
   isPresent,
-  isBlank,
-  CONST_EXPR
-} from 'angular2/src/facade/lang';
+  isBlank
+} from '@angular/core/src/facade/lang';
 
 import {
   provide,
@@ -20,7 +19,7 @@ import {
   Optional,
   Inject,
   EventEmitter
-} from 'angular2/core';
+} from '@angular/core';
 
 import {Observable} from 'rxjs/Observable';
 

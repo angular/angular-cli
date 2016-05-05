@@ -1,1 +1,1 @@
-export {enableProdMode} from 'angular2/core';
+export {enableProdMode} from '@angular/core';

@@ -1,1 +1,1 @@
-export {Http} from 'angular2/http';
+export {Http} from '@angular/http';

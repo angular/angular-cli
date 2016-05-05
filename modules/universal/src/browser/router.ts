@@ -1,3 +1,3 @@
-import {ROUTER_PROVIDERS} from 'angular2/router';
+import {ROUTER_PROVIDERS} from '@angular/router-deprecated';
 
 export const BROWSER_ROUTER_PROVIDERS = ROUTER_PROVIDERS;

@@ -1,8 +1,12 @@
-import {DOM} from 'angular2/src/platform/dom/dom_adapter';
-import {Inject, Injectable} from 'angular2/src/core/di';
-import {SetWrapper} from 'angular2/src/facade/collection';
-import {DOCUMENT} from 'angular2/src/platform/dom/dom_tokens';
-import {SharedStylesHost} from 'angular2/src/platform/dom/shared_styles_host';
+import {Inject, Injectable} from '@angular/core';
+import {SetWrapper} from '@angular/core/src/facade/collection';
+import {DOCUMENT} from '@angular/platform-browser/src/dom/dom_tokens';
+import {SharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
+
+import {Parse5DomAdapter} from '@angular/platform-server';
+Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
+import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
+var DOM: any = getDOM();
 
 @Injectable()
 export class NodeSharedStylesHost extends SharedStylesHost {
