@@ -214,7 +214,11 @@ module.exports = {
     }
 
     let isAppComponent = false;
-    if (parentFile == path.join(this.dynamicPath.dir, this.project.name() + '.component.ts')) {
+    let appComponentFile = 
+      path.join(this.project.root, 
+        this.dynamicPath.dir, 
+        this.project.name() + '.component.ts');
+    if (parentFile == appComponentFile) {
       isAppComponent = true;
     }
 
@@ -269,6 +273,7 @@ module.exports = {
     // Add the provider, only on the APP itself.
     if (isAppComponent) {
       content = _insertImport(content, 'ROUTER_DIRECTIVES', '@angular/router');
+      content = _insertImport(content, 'ROUTER_PROVIDERS', '@angular/router');
       content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\n\}\))/m, function (_, prefix, json, suffix) {
         const m = json.match(/(^\s+providers:\s*\[)([\s\S\n]*)(\]\s*,?.*$)/m);
         if (m) {
