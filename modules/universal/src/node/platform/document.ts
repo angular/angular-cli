@@ -1,8 +1,11 @@
 import {OpaqueToken} from '@angular/core';
 import {Parser, Serializer, TreeAdapters} from 'parse5';
 import {Parse5DomAdapter} from '@angular/platform-server';
+Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
+import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
+var DOM: any = getDOM();
 
-const DOM:any = Parse5DomAdapter;
+
 const parser = new Parser(TreeAdapters.htmlparser2);
 // TODO(gdi2290): fix encodeHtmlEntities: true
 const serializer = new Serializer(TreeAdapters.htmlparser2, { encodeHtmlEntities: false });
