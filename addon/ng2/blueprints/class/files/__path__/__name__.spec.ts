@@ -4,7 +4,7 @@ import {
   expect,
   iit,
   it
-} from '@angular/testing';
+} from '@angular/core/testing';
 import {<%= classifiedModuleName %>} from './<%= fileName %>';
 
 describe('<%= classifiedModuleName %>', () => {
