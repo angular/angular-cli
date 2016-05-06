@@ -22,7 +22,7 @@ describe('<%= classifiedModuleName %> Directive', () => {
   beforeEachProviders((): any[] => []);
 
   it('should ...', async(inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
-    return tcb.createAsync(TestComponent).then((fixture: ComponentFixture) => {
+    return tcb.createAsync(TestComponent).then((fixture: ComponentFixture<any>) => {
       fixture.detectChanges();
     });
   })));
