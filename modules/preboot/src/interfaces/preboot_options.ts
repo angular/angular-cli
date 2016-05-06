@@ -22,4 +22,5 @@ export interface PrebootOptions {
     uglify?: boolean;             // if true, client code generated will be uglified
     buffer?: boolean;             // if true, attempt to buffer client rendering to hidden div
     debug?: boolean;              // if true, output console logs on the client with runtime info about preboot
+    disableCodeCache?: boolean;   // if true, preboot won't cache the generated code
 }

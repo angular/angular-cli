@@ -83,9 +83,9 @@ export function getBrowserCode(opts?: PrebootOptions, done?: Function): any {
   let deferred = Q.defer();
   let clientCode = '';
 
-  // check cache first
+  // check cache first (as long as it wasn't disabled)
   let cacheKey = JSON.stringify(opts);
-  if (browserCodeCache[cacheKey]) {
+  if (!opts.disableCodeCache && browserCodeCache[cacheKey]) {
     return Q.when(browserCodeCache[cacheKey]);
   }
 
