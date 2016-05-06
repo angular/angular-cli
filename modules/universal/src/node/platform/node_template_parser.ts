@@ -282,19 +282,22 @@ class TemplateParseVisitor implements HtmlAstVisitor {
   visitElement(element: HtmlElementAst, parent: ElementContext): any {
     var nodeName = element.name;
     var preparsedElement = preparseElement(element);
-    if (preparsedElement.type === PreparsedElementType.SCRIPT ||
-        preparsedElement.type === PreparsedElementType.STYLE) {
-      // Skipping <script> for security reasons
-      // Skipping <style> as we already processed them
-      // in the StyleCompiler
-      return null;
-    }
-    if (preparsedElement.type === PreparsedElementType.STYLESHEET &&
-        isStyleUrlResolvable(preparsedElement.hrefAttr)) {
-      // Skipping stylesheets with either relative urls or package scheme as we already processed
-      // them in the StyleCompiler
-      return null;
-    }
+
+    // UNIVERSAL
+
+    // if (preparsedElement.type === PreparsedElementType.SCRIPT ||
+    //     preparsedElement.type === PreparsedElementType.STYLE) {
+    //   // Skipping <script> for security reasons
+    //   // Skipping <style> as we already processed them
+    //   // in the StyleCompiler
+    //   return null;
+    // }
+    // if (preparsedElement.type === PreparsedElementType.STYLESHEET &&
+    //     isStyleUrlResolvable(preparsedElement.hrefAttr)) {
+    //   // Skipping stylesheets with either relative urls or package scheme as we already processed
+    //   // them in the StyleCompiler
+    //   return null;
+    // }
 
     var matchableAttrs: string[][] = [];
     var elementOrDirectiveProps: BoundElementOrDirectiveProperty[] = [];
@@ -808,14 +811,14 @@ class TemplateParseVisitor implements HtmlAstVisitor {
 class NonBindableVisitor implements HtmlAstVisitor {
   visitElement(ast: HtmlElementAst, parent: ElementContext): ElementAst {
     var preparsedElement = preparseElement(ast);
-    if (preparsedElement.type === PreparsedElementType.SCRIPT ||
-        preparsedElement.type === PreparsedElementType.STYLE ||
-        preparsedElement.type === PreparsedElementType.STYLESHEET) {
-      // Skipping <script> for security reasons
-      // Skipping <style> and stylesheets as we already processed them
-      // in the StyleCompiler
-      return null;
-    }
+    // if (preparsedElement.type === PreparsedElementType.SCRIPT ||
+    //     preparsedElement.type === PreparsedElementType.STYLE ||
+    //     preparsedElement.type === PreparsedElementType.STYLESHEET) {
+    //   // Skipping <script> for security reasons
+    //   // Skipping <style> and stylesheets as we already processed them
+    //   // in the StyleCompiler
+    //   return null;
+    // }
 
     var attrNameAndValues = ast.attrs.map(attrAst => [attrAst.name, attrAst.value]);
     var selector = createElementCssSelector(ast.name, attrNameAndValues);
