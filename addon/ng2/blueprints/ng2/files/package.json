@@ -6,8 +6,8 @@
   "scripts": {
     "start": "ng server",
     "postinstall": "typings install",
-    "lint": "tslint \"src/**/*.ts\"",
-    "format": "clang-format -i -style=file --glob=src/**/*.ts",
+    "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
+    "format": "clang-format -i -style=file --glob=<%= sourceDir %>/**/*.ts",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor"
   },
