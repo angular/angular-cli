@@ -8,6 +8,7 @@
     "postinstall": "typings install",
     "lint": "tslint \"src/**/*.ts\"",
     "format": "clang-format -i -style=file --glob=src/**/*.ts",
+    "test": "ng test",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor"
   },
