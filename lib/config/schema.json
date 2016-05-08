@@ -85,6 +85,9 @@
         },
         "sourceDir": {
           "type": "string"
+        },
+        "outputPath": {
+          "type": "string"
         }
       },
       "additionalProperties": false
