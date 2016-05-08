@@ -7,6 +7,7 @@ var BuildTask = require('ember-cli/lib/tasks/build');
 var BuildWatchTask = require('ember-cli/lib/tasks/build-watch');
 const config = require('../models/config');
 var TestTask = require('../tasks/test');
+var merge = require('lodash/merge');
 
 
 module.exports = TestCommand.extend({
@@ -18,7 +19,7 @@ module.exports = TestCommand.extend({
     { name: 'port', type: Number },
     { name: 'reporters', type: String },
     { name: 'build', type: Boolean, default: true },
-    { name: 'output-path', type: Path, default: 'dist/' }
+    { name: 'output-path', type: String, default: 'dist/' }
   ],
 
   run: function (commandOptions) {
