@@ -46,11 +46,11 @@ module.exports = TestCommand.extend({
     var defaultSettings = {
       outputPath: commandOptions.outputPath
     };
-  
+    
     // not sure if path would be correct
-    if(this.project.ngConfig.get('defaults')) {
+    if(this.project.ngConfig && this.project.ngConfig.defaults) {
       // load settings from .angular-cli if any exist
-      settings = merge(defaultSettings, this.project.ngConfig.get('defaults'))
+      settings = merge(defaultSettings, this.project.ngConfig.defaults)
     } else {
       settings = defaultSettings;
     }
