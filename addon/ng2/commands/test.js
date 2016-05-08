@@ -17,7 +17,8 @@ module.exports = TestCommand.extend({
     { name: 'log-level', type: String },
     { name: 'port', type: Number },
     { name: 'reporters', type: String },
-    { name: 'build', type: Boolean, default: true }
+    { name: 'build', type: Boolean, default: true },
+    { name: 'output-path', type: Path, default: 'dist/' }
   ],
 
   run: function (commandOptions) {
@@ -39,10 +40,23 @@ module.exports = TestCommand.extend({
       analytics: this.analytics,
       project: this.project
     });
+    
+    var settings;
+    var defaultSettings = {
+      outputPath: commandOptions.outputPath
+    };
+  
+    // not sure if path would be correct
+    if(this.project.ngConfig.get('defaults')) {
+      // load settings from .angular-cli if any exist
+      settings = merge(defaultSettings, this.project.ngConfig.get('defaults'))
+    } else {
+      settings = defaultSettings;
+    }
 
     var buildOptions = {
       environment: 'development',
-      outputPath: 'dist/'
+      outputPath: settings.outputPath // schema would need to be updated to support this
     };
     
     // If not building, mock/suppress build tasks.
