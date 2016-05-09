@@ -27,16 +27,20 @@
     "url": "https://github.com/angular/universal/issues"
   },
   "devDependencies": {
-    "angular2": "2.0.0-beta.15",
     "angular2-universal": "file:../universal",
     "angular2-universal-polyfills": "file:../polyfills",
     "preboot": "file:../preboot",
     "rimraf": "^2.5.1",
-    "rxjs": "~5.0.0-beta.2",
+    "rxjs": "^5.0.0-beta.6",
     "typescript": "^1.8.9",
     "zone.js": "~0.6.10"
   },
   "dependencies": {
+    "@angular/common": "2.0.0-rc.1",
+    "@angular/compiler": "2.0.0-rc.1",
+    "@angular/core": "2.0.0-rc.1",
+    "@angular/http": "2.0.0-rc.1",
+    "@angular/platform-browser": "2.0.0-rc.1",
     "broccoli-caching-writer": "^2.2.1"
   },
   "peerDependencies": {
