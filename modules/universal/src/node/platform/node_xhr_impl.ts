@@ -11,7 +11,7 @@ export class NodeXHRImpl extends XHR {
   _baseUrl: string;
   constructor(
     public ngZone: NgZone,
-    @Inject(ORIGIN_URL) private _originUrl: string = '',
+    @Optional() @Inject(ORIGIN_URL) private _originUrl: string = '',
     @Optional() @Inject(BASE_URL) _baseUrl?: string) {
     super();
     this._baseUrl = _baseUrl || '/';
