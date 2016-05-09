@@ -25,7 +25,7 @@ export class AppShellPlugin extends BroccoliPlugin {
       document: Bootloader.parseDocument(sourceHtml),
     });
     var bootloader = Bootloader.create(options);
-    return bootloader.serializeApplication()
+    return bootloader.serializeApplication(null, options.providers)
       .then(html =>  fs.writeFileSync(path.resolve(this.outputPath, this.indexPath), html, 'utf-8'));
   }
 }
