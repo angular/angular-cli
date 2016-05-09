@@ -51,4 +51,4 @@ System.config({
 });
 
 // Apply the user's configuration.
-System.config({ map, packages });
+System.config({ map: map, packages: packages });
