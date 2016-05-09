@@ -3,18 +3,18 @@ import {Bootloader} from 'angular2-universal';
 
 const fs = require('fs');
 const path = require('path');
-const BroccoliPlugin:BroccoliPluginConstructor = require('broccoli-caching-writer');
+const BroccoliPlugin: BroccoliPluginConstructor = require('broccoli-caching-writer');
 
 export interface BroccoliPlugin {}
 
 interface BroccoliPluginConstructor {
-  new(inputNodes:any[], options?:any): BroccoliPluginConstructor;
+  new(inputNodes: any[], options?: any): BroccoliPluginConstructor;
   inputPaths: string[];
   outputPath: string;
 }
 
 export class AppShellPlugin extends BroccoliPlugin {
-  constructor (inputNodes, private indexPath:string, private appShellPath:string) {
+  constructor (inputNodes, private indexPath: string, private appShellPath: string) {
     super([inputNodes]);
   }
 
