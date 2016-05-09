@@ -27,7 +27,7 @@
     "zone.js": "^0.6.12"
   },
   "devDependencies": {
-    "angular-cli": "^1.0.0-beta.0",
+    "angular-cli": "^<%= version %>",
     "clang-format": "^1.0.35",
     "codelyzer": "0.0.14",
     "ember-cli-inject-live-reload": "^1.4.0",
