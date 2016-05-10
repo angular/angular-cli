@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <title><%= jsComponentName %></title>
   <base href="/">
-  {{content-for 'head'}}
+
+  {{#unless environment.production}}
+  <script src="/angular-cli-live-reload.js" type="text/javascript"></script>
+  {{/unless}}
   <link rel="icon" type="image/x-icon" href="favicon.ico"><% if (isMobile) { %>
   <link rel="manifest" href="/manifest.webapp"><% } %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,10 +27,7 @@
 <body>
   <<%= htmlComponentName %>-app>Loading...</<%= htmlComponentName %>-app>
 
-  <script src="vendor/es6-shim/es6-shim.js"></script>
-  <script src="vendor/reflect-metadata/Reflect.js"></script>
-  <script src="vendor/systemjs/dist/system.src.js"></script>
-  <script src="vendor/zone.js/dist/zone.js"></script>
+  {{#each scripts.polyfills}}<script src="{{.}}"></script>{{/each}}
 
   <script>
     System.import('system-config.js').then(function () {

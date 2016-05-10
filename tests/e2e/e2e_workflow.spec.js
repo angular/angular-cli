@@ -76,15 +76,20 @@ describe('Basic end-to-end Workflow', function () {
     this.timeout(420000);
 
     return ng(['build', '--silent'])
+      .catch(() => {
+        throw new Error('Build failed.');
+      })
       .then(function () {
         expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+
+        // Check the index.html to have no handlebar tokens in it.
+        const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+        expect(indexHtml).to.not.include('{{');
+        expect(indexHtml).to.include('vendor/es6-shim/es6-shim.js');
       })
       .then(function () {
         // Also does not create new things in GIT.
         expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
-      })
-      .catch(() => {
-        throw new Error('Build failed.');
       });
   });
 
