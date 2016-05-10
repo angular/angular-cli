@@ -23,7 +23,8 @@
         "type": "object",
         "properties": {
           "main": "string",
-          "tsconfig": "string"
+          "tsconfig": "string",
+          "mobile": "boolean"
         },
         "additionalProperties": false
       },

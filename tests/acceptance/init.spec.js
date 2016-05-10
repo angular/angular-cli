@@ -13,7 +13,7 @@ var conf = require('ember-cli/tests/helpers/conf');
 var minimatch = require('minimatch');
 var intersect = require('lodash/intersection');
 var remove = require('lodash/remove');
-var pull = require('lodash/pull');
+var unique = require('lodash/uniq');
 var forEach = require('lodash/forEach');
 var any = require('lodash/some');
 var EOL = require('os').EOL;
@@ -35,10 +35,6 @@ describe('Acceptance: ng init', function () {
     // Make a copy of defaultIgnoredFiles.
     Blueprint.ignoredFiles = defaultIgnoredFiles.splice(0);
 
-    // Add the mobile ones.
-    Blueprint.ignoredFiles.push('manifest.webapp');
-    Blueprint.ignoredFiles.push('icon.png');
-
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     });
@@ -48,9 +44,10 @@ describe('Acceptance: ng init', function () {
     return tmp.teardown('./tmp');
   });
 
-  function confirmBlueprinted() {
+  function confirmBlueprinted(isMobile) {
     var blueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'ng2', 'files');
-    var expected = walkSync(blueprintPath).sort();
+    var mobileBlueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'mobile', 'files');
+    var expected = unique(walkSync(blueprintPath).concat(isMobile ? walkSync(mobileBlueprintPath) : []).sort());
     var actual = walkSync('.').sort();
 
     forEach(Blueprint.renamedFiles, function (destFile, srcFile) {
@@ -110,15 +107,12 @@ describe('Acceptance: ng init', function () {
   });
 
   it('ng init --mobile', () => {
-    // Add the mobile ones.
-    pull(Blueprint.ignoredFiles, 'manifest.webapp');
-    pull(Blueprint.ignoredFiles, 'icon.png');
     return ng([
       'init',
       '--skip-npm',
       '--skip-bower',
       '--mobile'
-    ]).then(confirmBlueprinted);
+    ]).then(() => confirmBlueprinted(true));
   });
 
   it('ng init can run in created folder', function () {

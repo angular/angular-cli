@@ -4,7 +4,11 @@
     "name": "<%= htmlComponentName %>"
   },
   "apps": [
-    {"main": "<%= sourceDir %>/main.ts", "tsconfig": "<%= sourceDir %>/tsconfig.json"}
+    {
+      "main": "<%= sourceDir %>/main.ts",
+      "tsconfig": "<%= sourceDir %>/tsconfig.json",
+      "mobile": <%= isMobile %>
+    }
   ],
   "addons": [],
   "packages": [],
