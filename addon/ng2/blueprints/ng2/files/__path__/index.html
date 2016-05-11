@@ -17,9 +17,7 @@
     <link rel="{{rel}}" {{#if sizes}}sizes="{{sizes}}" {{/if}}href="{{href}}">
   {{/each}}
 
-  <!-- Service worker support is disabled by default.
-       Install the worker script and uncomment to enable.
-       Only enable service workers in production.
+  {{#if environment.production}}
   <script type="text/javascript">
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/worker.js').catch(function(err) {
@@ -27,7 +25,7 @@
       });
     }
   </script>
-  -->
+  {{/if}}
   <% } %>
 </head>
 <body>
