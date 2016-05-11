@@ -1,7 +1,7 @@
 {
   "project": {
     "version": "<%= version %>",
-    "name": "<%= htmlComponentName %>"
+    "name": "<%= packageName %>"
   },
   "apps": [
     {"main": "<%= sourceDir %>/main.ts", "tsconfig": "<%= sourceDir %>/tsconfig.json"}

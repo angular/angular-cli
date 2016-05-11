@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   moduleId: module.id,
   selector: '<%= htmlComponentName %>-app',
   templateUrl: '<%= htmlComponentName %>.component.html',
-  styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']
+  styleUrls: ['<%= htmlComponentName %>.component.<%= styleExt %>']
 })
 export class <%= jsComponentName %>AppComponent {
   title = '<%= htmlComponentName %> works!';

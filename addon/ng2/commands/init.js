@@ -22,7 +22,8 @@ module.exports = Command.extend({
     { name: 'name', type: String, default: '', aliases: ['n'] },
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'mobile', type: Boolean, default: false }
+    { name: 'mobile', type: Boolean, default: false },
+    { name: 'component-name', type: String, default: '', aliases: ['cn'] }
   ],
 
   anonymousOptions: ['<glob-pattern>'],
@@ -91,7 +92,8 @@ module.exports = Command.extend({
       rawArgs: rawArgs.toString(),
       sourceDir: commandOptions.sourceDir,
       prefix: commandOptions.prefix,
-      mobile: commandOptions.mobile
+      mobile: commandOptions.mobile,
+      componentName: commandOptions.componentName
     };
 
     if (!validProjectName(packageName)) {
