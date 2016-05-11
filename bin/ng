@@ -7,12 +7,24 @@ process.title = 'angular-cli';
 const resolve = require('resolve');
 const exit = require('exit');
 const packageJson = require('../package.json');
+const path = require('path');
 const Leek = require('leek');
 
 resolve('angular-cli', { basedir: process.cwd() },
   function (error, projectLocalCli) {
     var cli;
     if (error) {
+      const nodeModulePath = path.join(__dirname, '../..');
+      // Add the global ourselves to the NODE_PATH.
+      if (!process.env['NODE_PATH'] || process.env['NODE_PATH'].split(path.delimiter).indexOf(nodeModulePath) == -1) {
+        process.env['NODE_PATH'] = (process.env['NODE_PATH'] ? process.env['NODE_PATH'].split(path.delimiter) : [])
+          .concat([nodeModulePath])
+          .join(path.delimiter);
+
+        require('shelljs').exec(process.argv.join(' '));
+        return;
+      }
+
       // If there is an error, resolve could not find the ember-cli
       // library from a package.json. Instead, include it from a relative
       // path to this script file (which is likely a globally installed

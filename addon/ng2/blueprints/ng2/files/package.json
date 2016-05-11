@@ -2,7 +2,6 @@
   "name": "<%= htmlComponentName %>",
   "version": "0.0.0",
   "license": "MIT",
-  "angular-cli": {},
   "scripts": {
     "start": "ng server",
     "postinstall": "typings install",
@@ -28,7 +27,6 @@
     "zone.js": "^0.6.12"
   },
   "devDependencies": {
-    "angular-cli": "^<%= version %>",
     "clang-format": "^1.0.35",
     "codelyzer": "0.0.14",
     "ember-cli-inject-live-reload": "^1.4.0",
