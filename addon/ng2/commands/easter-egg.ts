@@ -1,5 +1,6 @@
 import * as Command from 'ember-cli/lib/models/command';
 import * as Promise from 'ember-cli/lib/ext/promise';
+import * as stringUtils from 'ember-cli-string-utils';
 import * as chalk from 'chalk';
 
 
@@ -14,7 +15,6 @@ module.exports = function(name) {
     works: 'insideProject',
 
     run: function (commandOptions, rawArgs): Promise<void> {
-      var stringUtils = require('ember-cli/lib/utilities/string');
       this[stringUtils.camelize(this.name)](commandOptions, rawArgs);
 
       return Promise.resolve();
