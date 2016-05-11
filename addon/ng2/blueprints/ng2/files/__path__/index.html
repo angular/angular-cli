@@ -33,12 +33,31 @@
 <body>
   <<%= htmlComponentName %>-app>Loading...</<%= htmlComponentName %>-app>
 
-  {{#each scripts.polyfills}}<script src="{{.}}"></script>{{/each}}
+  <% if (isMobile) { %>
 
-  <script>
-    System.import('system-config.js').then(function () {
-      System.import('main');
-    }).catch(console.error.bind(console));
-  </script>
+    {{#if environment.production}}
+      <script src="/app-concat.js" async></script>
+    {{else}}
+      {{#each scripts.polyfills}}<script src="{{.}}"></script>{{/each}}
+      <script>
+        System.import('system-config.js').then(function () {
+          System.import('main');
+        }).catch(console.error.bind(console));
+      </script>
+    {{/if}}
+
+  <% } else { %>
+
+    {{#each scripts.polyfills}}<script src="{{.}}"></script>{{/each}}
+    <script>
+      System.import('system-config.js').then(function () {
+        System.import('main');
+      }).catch(console.error.bind(console));
+    </script>
+
+  <% } %>
+
+
+
 </body>
 </html>
