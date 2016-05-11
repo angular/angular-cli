@@ -27,7 +27,11 @@
     "systemjs": "0.19.26",
     "zone.js": "^0.6.12"
   },
-  "devDependencies": {
+  "devDependencies": {<% if(isMobile) { %>
+    "@angular/platform-server": "2.0.0-rc.1",
+    "angular2-universal":"^0.100.3",
+    "angular2-universal-polyfills": "^0.4.1",
+    "preboot": "^2.0.10",<% } %>
     "angular-cli": "^<%= version %>",
     "clang-format": "^1.0.35",
     "codelyzer": "0.0.14",
