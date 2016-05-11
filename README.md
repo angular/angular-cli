@@ -106,7 +106,7 @@ The generated route will also be registered with the parent component's `@RouteC
 By default the route will be designated as a **lazy** route which means that it will be loaded into the browser when needed, not upfront as part of a bundle.
 
 In order to visually distinguish lazy routes from other routes the folder for the route will be prefixed with a `+` per the above example the folder will be named `+hero`.
-This is done in accordance with the style guide.
+This is done in accordance with the [style guide](https://angular.io/styleguide#!#prefix-lazy-loaded-folders-with-).
 
 The default lazy nature of routes can be turned off via the lazy flag (`--lazy false`)
 
