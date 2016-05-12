@@ -28,7 +28,7 @@ export class NodeConnection implements Connection {
   constructor(
     req: Request,
     baseResponseOptions: ResponseOptions,
-    ngZome: NgZone,
+    ngZone: NgZone,
     @Inject(ORIGIN_URL) originUrl: string = '',
     @Optional() @Inject(BASE_URL) baseUrl?: string) {
 
@@ -49,7 +49,7 @@ export class NodeConnection implements Connection {
 
     this.response = new Observable(responseObserver => {
       let nodeReq;
-      ngZome.run(() => {
+      ngZone.run(() => {
         // http or https
         let xhrHttp: any = http;
         if (_reqInfo.protocol === 'https:') {
@@ -69,15 +69,15 @@ export class NodeConnection implements Connection {
             let response = new Response(responseOptions);
 
             if (utils.isSuccess(status)) {
-              ngZome.run(() => {
+              ngZone.run(() => {
                 responseObserver.next(response);
               });
-              ngZome.run(() => {
+              ngZone.run(() => {
                 responseObserver.complete();
               });
               return;
             }
-            ngZome.run(() => {
+            ngZone.run(() => {
               responseObserver.error(response);
             });
           });
@@ -89,7 +89,7 @@ export class NodeConnection implements Connection {
         if (isPresent(baseResponseOptions)) {
           responseOptions = baseResponseOptions.merge(responseOptions);
         }
-        ngZome.run(() => {
+        ngZone.run(() => {
           responseObserver.error(new Response(responseOptions));
         });
       };
