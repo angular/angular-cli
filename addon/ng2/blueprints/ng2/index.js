@@ -8,7 +8,8 @@ module.exports = {
   availableOptions: [
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'mobile', type: Boolean, default: false }
+    { name: 'mobile', type: Boolean, default: false },
+    { name: 'component-name', type: String, default: '', aliases: ['cn'] }
   ],
 
   locals: function(options) {
@@ -22,9 +23,12 @@ module.exports = {
       .replace(/-(.)/g, (_, l) => ' ' + l.toUpperCase())
       .replace(/^./, (l) => l.toUpperCase());
 
+    const packageName = stringUtils.dasherize(options.entity.name);
+
     return {
-      htmlComponentName: stringUtils.dasherize(options.entity.name),
-      jsComponentName: stringUtils.classify(options.entity.name),
+      packageName: packageName,
+      htmlComponentName: stringUtils.dasherize(options.componentName) || packageName,
+      jsComponentName: stringUtils.classify(options.componentName) || stringUtils.classify(options.entity.name),
       fullAppName: fullAppName,
       styleExt: this.styleExt,
       version: this.version,
@@ -56,6 +60,9 @@ module.exports = {
       },
       __styleext__: () => {
         return options.locals.styleExt;
+      },
+      __name__: () => {
+        return options.locals.htmlComponentName;
       }
     };
   }
