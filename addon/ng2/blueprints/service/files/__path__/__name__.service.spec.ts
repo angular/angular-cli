@@ -1,18 +1,16 @@
 /* tslint:disable:no-unused-variable */
 
-import {
-  beforeEach, beforeEachProviders,
-  describe, xdescribe,
-  expect, it, xit,
-  async, inject
-} from '@angular/core/testing';
+import { addProviders, async, inject } from '@angular/core/testing';
 import { <%= classifiedModuleName %>Service } from './<%= dasherizedModuleName %>.service';
 
-describe('<%= classifiedModuleName %> Service', () => {
-  beforeEachProviders(() => [<%= classifiedModuleName %>Service]);
+describe('Service: <%= classifiedModuleName %>', () => {
+  beforeEach(() => {
+    addProviders([<%= classifiedModuleName %>Service]);
+  });
 
   it('should ...',
-      inject([<%= classifiedModuleName %>Service], (service: <%= classifiedModuleName %>Service) => {
-    expect(service).toBeTruthy();
-  }));
+    inject([<%= classifiedModuleName %>Service],
+      (service: <%= classifiedModuleName %>Service) => {
+        expect(service).toBeTruthy();
+      }));
 });
