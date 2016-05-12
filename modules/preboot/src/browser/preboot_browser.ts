@@ -119,9 +119,8 @@ export function start() {
   // initialize the window
   dom.init({ window: window });
 
-  // if body there, then run load handler right away, otherwise register for onLoad
-  let bodyExists = dom.state.body && Object.keys(dom.state.body).length;
-  bodyExists ? load() : dom.onLoad(load);
+  // load once the document ready
+  dom.onLoad(load);
 
   // set up other handlers
   dom.on(opts.pauseEvent, () => state.canComplete = false);

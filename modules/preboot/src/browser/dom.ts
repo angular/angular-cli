@@ -70,7 +70,11 @@ export function getClientNodes(selector: string): Element[] {
  * Add event listener at window level
  */
 export function onLoad(handler: Function) {
-  state.window.addEventListener('load', handler);
+  if (state.document && state.document.readyState === 'interactive') {
+    handler();
+  } else {
+    state.document.addEventListener('DOMContentLoaded', handler);
+  }
 }
 
 /**

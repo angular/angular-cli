@@ -1,6 +1,6 @@
 {
   "name": "preboot",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "description": "Record and play back browser events",
   "main": "dist/src/node/preboot_node.js",
   "browser": "dist/src/browser/preboot_browser.js",
