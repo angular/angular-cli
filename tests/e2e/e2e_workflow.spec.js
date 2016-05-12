@@ -19,7 +19,7 @@ function existsSync(path) {
   }
 }
 
-const ngBin = path.join(process.cwd(), 'bin', 'ng');
+const ngBin = `node ${path.join(process.cwd(), 'bin', 'ng')}`;
 
 describe('Basic end-to-end Workflow', function () {
   before(conf.setup);
@@ -47,7 +47,7 @@ describe('Basic end-to-end Workflow', function () {
   it('Can create new project using `ng new test-project`', function () {
     this.timeout(4200000);
 
-    return ng(['new', 'test-project']).then(function () {
+    return ng(['new', 'test-project', '--skip-npm']).then(function () {
       expect(existsSync(path.join(root, 'test-project')));
     });
   });
@@ -57,6 +57,7 @@ describe('Basic end-to-end Workflow', function () {
     process.chdir(path.join(root, 'test-project'));
     sh.exec('npm link angular-cli', { silent: true });
     expect(path.basename(process.cwd())).to.equal('test-project');
+    sh.exec('npm install');
   });
 
   it('Supports production builds via `ng build --environment=production`', function() {
