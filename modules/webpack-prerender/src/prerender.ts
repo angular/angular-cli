@@ -1,4 +1,4 @@
-import universal = require('angular2-universal-preview');
+import universal = require('angular2-universal');
 
 export interface IUniversalConfig {
   document?: Object;
@@ -31,7 +31,7 @@ class Prerender {
     }
     bootloader = universal.Bootloader.create(this.options.bootloader);
 
-    return bootloader.serializeApplication()
+    return bootloader.serializeApplication(null, this.options.providers)
       .then(html => new Buffer(html));
   }
 }
