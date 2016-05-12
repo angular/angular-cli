@@ -13,9 +13,9 @@
     "Jeff Cross <crossj@google.com>"
   ],
   "scripts": {
-    "remove-modules": "rm -rf dist node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-universal",
+    "remove-modules": "rimraf dist node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-universal",
     "reload": "npm run remove-modules && npm install",
-    "prebuild": "rm -rf dist",
+    "prebuild": "rimraf dist",
     "build": "tsc || true",
     "prepublish": "npm run build"
   },

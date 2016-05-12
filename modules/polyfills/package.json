@@ -30,11 +30,12 @@
     "test.js"
   ],
   "scripts": {
-    "prebuild": "rm -rf dist",
+    "prebuild": "rimraf dist",
     "build": "tsc || true",
     "prepublish": "npm run build"
   },
   "devDependencies": {
+    "rimraf": "^2.5.2",
     "typescript": "^1.8.9"
   },
   "dependencies": {

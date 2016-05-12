@@ -12,9 +12,9 @@
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
   "scripts": {
-    "remove-modules": "rm -rf node_modules/angular2-universal-preview node_modules/angular2-universal node_modules/angular2-express-engine node_modules/preboot node_modules/angular2-hapi-engine node_modules/angular2-universal-polyfills node_modules/zone.js",
+    "remove-modules": "rimraf node_modules/angular2-universal-preview node_modules/angular2-universal node_modules/angular2-express-engine node_modules/preboot node_modules/angular2-hapi-engine node_modules/angular2-universal-polyfills node_modules/zone.js",
     "reload": "npm run remove-modules && npm install",
-    "prebuild": "rm -rf dist",
+    "prebuild": "rimraf dist",
     "build": "tsc || true",
     "prepublish": "npm run build"
   },

@@ -6,8 +6,8 @@
   "browser": "dist/src/browser/preboot_browser.js",
   "typings": "dist/src/node/preboot_node.d.ts",
   "scripts": {
-    "prebuild": "./node_modules/.bin/rimraf dist",
-    "build": "./node_modules/.bin/tsc || true",
+    "prebuild": "rimraf dist",
+    "build": "tsc || true",
     "prepublish": "npm run build"
   },
   "files": [
@@ -43,6 +43,7 @@
     "serve-static": "^1.10.2",
     "tslint": "^3.6.0",
     "typescript": "^1.8.9",
+    "rimraf": "^2.5.2",
     "watchify": "^3.7.0"
   },
   "dependencies": {
