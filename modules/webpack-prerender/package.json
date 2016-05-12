@@ -11,7 +11,7 @@
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
   "scripts": {
-    "remove-modules": "rimraf dist node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-universal",
+    "remove-modules": "rimraf node_modules/angular2-universal-preview node_modules/angular2-universal node_modules/angular2-express-engine node_modules/preboot node_modules/angular2-hapi-engine node_modules/angular2-universal-polyfills",
     "reload": "npm run remove-modules && npm install",
     "prebuild": "rimraf dist",
     "build": "tsc || true",
@@ -36,13 +36,13 @@
     "preboot": "file:../preboot",
     "angular2-universal": "file:../universal",
     "rimraf": "^2.5.1",
-    "rxjs": "~5.0.0-beta.6",
+    "rxjs": "5.0.0-beta.6",
     "zone.js": "~0.6.12",
     "typescript": "^1.8.9"
   },
   "dependencies": {
   },
   "peerDependencies": {
-    "angular2-universal-preview": ">=0.85.1"
+    "angular2-universal": ">=0.100.3"
   }
 }
