@@ -19,6 +19,8 @@ function existsSync(path) {
   }
 }
 
+const ngBin = path.join(process.cwd(), 'bin', 'ng');
+
 describe('Basic end-to-end Workflow', function () {
   before(conf.setup);
 
@@ -45,7 +47,7 @@ describe('Basic end-to-end Workflow', function () {
   it('Can create new project using `ng new test-project`', function () {
     this.timeout(4200000);
 
-    return ng(['new', 'test-project', '--silent']).then(function () {
+    return ng(['new', 'test-project']).then(function () {
       expect(existsSync(path.join(root, 'test-project')));
     });
   });
@@ -62,7 +64,7 @@ describe('Basic end-to-end Workflow', function () {
 
     // Can't user the `ng` helper because somewhere the environment gets
     // stuck to the first build done
-    sh.exec('ng build --environment=production --silent');
+    sh.exec(`${ngBin} build --environment=production`);
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
     var appBundlePath = path.join(process.cwd(), 'dist', 'app', 'index.js');
     var appBundleContent = fs.readFileSync(appBundlePath, { encoding: 'utf8' });
@@ -75,7 +77,7 @@ describe('Basic end-to-end Workflow', function () {
   it('Can run `ng build` in created project', function () {
     this.timeout(420000);
 
-    return ng(['build', '--silent'])
+    return ng(['build'])
       .catch(() => {
         throw new Error('Build failed.');
       })
@@ -192,7 +194,7 @@ describe('Basic end-to-end Workflow', function () {
     const tmpFileLocation = path.join(process.cwd(), 'dist', 'test.abc');
     fs.writeFileSync(tmpFile, 'hello world');
 
-    return ng(['build', '--silent'])
+    return ng(['build'])
       .then(function () {
         expect(existsSync(tmpFileLocation)).to.be.equal(true);
       })
@@ -201,7 +203,7 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
-  it('Installs sass support successfully', function() {
+  it.skip('Installs sass support successfully', function() {
     this.timeout(420000);
 
     sh.exec('npm install node-sass', { silent: true });
@@ -218,7 +220,7 @@ describe('Basic end-to-end Workflow', function () {
       let scssExample = '.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(scssFile, scssExample, 'utf8');
 
-      sh.exec('ng build --silent');
+      sh.exec(`${ngBin} build`);
       let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
@@ -226,7 +228,7 @@ describe('Basic end-to-end Workflow', function () {
 
       sh.rm('-f', destCss);
       process.chdir('src');
-      sh.exec('ng build --silent');
+      sh.exec(`${ngBin} build`);
       expect(existsSync(destCss)).to.be.equal(true);
       contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
@@ -236,7 +238,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Installs less support successfully', function() {
+  it.skip('Installs less support successfully', function() {
     this.timeout(420000);
 
     sh.exec('npm install less', { silent: true });
@@ -253,7 +255,7 @@ describe('Basic end-to-end Workflow', function () {
       let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(lessFile, lessExample, 'utf8');
 
-      sh.exec('ng build --silent');
+      sh.exec(`${ngBin} build`);
       let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
@@ -261,7 +263,7 @@ describe('Basic end-to-end Workflow', function () {
 
       sh.rm('-f', destCss);
       process.chdir('src');
-      sh.exec('ng build --silent');
+      sh.exec(`${ngBin} build`);
       expect(existsSync(destCss)).to.be.equal(true);
       contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
@@ -271,7 +273,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Installs stylus support successfully', function() {
+  it.skip('Installs stylus support successfully', function() {
     this.timeout(420000);
 
     sh.exec('npm install stylus', { silent: true });
@@ -287,7 +289,7 @@ describe('Basic end-to-end Workflow', function () {
       let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(stylusFile, stylusExample, 'utf8');
 
-      sh.exec('ng build --silent');
+      sh.exec(`${ngBin} build`);
       let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
@@ -295,7 +297,7 @@ describe('Basic end-to-end Workflow', function () {
 
       sh.rm('-f', destCss);
       process.chdir('src');
-      sh.exec('ng build --silent');
+      sh.exec(`${ngBin} build`);
       expect(existsSync(destCss)).to.be.equal(true);
       contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
@@ -316,7 +318,7 @@ describe('Basic end-to-end Workflow', function () {
 
     sh.rm('-rf', path.join(process.cwd(), 'dist'));
 
-    return ng(['build', '--silent'])
+    return ng(['build'])
       .then(function () {
         expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
       })
