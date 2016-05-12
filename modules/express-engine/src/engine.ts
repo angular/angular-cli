@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import {DOCUMENT} from '@angular/platform-browser';
 
 import {selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal';
 
