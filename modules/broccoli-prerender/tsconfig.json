@@ -15,7 +15,8 @@
   },
   "files": [
     "./typings/main.d.ts",
-    "./src/index.ts"
+    "./src/index.ts",
+    "./src/child_proc.ts"
   ],
   "formatCodeOptions": {
     "indentSize": 2,
