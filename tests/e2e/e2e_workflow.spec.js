@@ -188,6 +188,23 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
+  it('Can create a test interface using `ng generate interface test-interface model`', function () {
+    return ng(['generate', 'interface', 'test-interface', 'model']).then(function () {
+      var interfaceDir = path.join(process.cwd(), 'src', 'app');
+      expect(existsSync(interfaceDir)).to.be.equal(true);
+      expect(existsSync(path.join(interfaceDir, 'test-interface.model.ts'))).to.be.equal(true);
+    });
+  });
+
+  it('Perform `ng test` after adding a interface', function () {
+    this.timeout(420000);
+
+    return ng(testArgs).then(function (result) {
+      const exitCode = typeof result === 'object' ? result.exitCode : result;
+      expect(exitCode).to.be.equal(0);
+    });
+  });
+
   it('moves all files that live inside `public` into `dist`', function () {
     this.timeout(420000);
 
