@@ -21,6 +21,7 @@ module.exports = Command.extend({
     { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
     { name: 'name', type: String, default: '', aliases: ['n'] },
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
+    { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'mobile', type: Boolean, default: false }
   ],
@@ -90,6 +91,7 @@ module.exports = Command.extend({
       targetFiles: rawArgs || '',
       rawArgs: rawArgs.toString(),
       sourceDir: commandOptions.sourceDir,
+      style: commandOptions.style,
       prefix: commandOptions.prefix,
       mobile: commandOptions.mobile
     };

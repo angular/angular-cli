@@ -86,6 +86,9 @@
         },
         "sourceDir": {
           "type": "string"
+        },
+        "styleExt": {
+          "type": "string"
         }
       },
       "additionalProperties": false

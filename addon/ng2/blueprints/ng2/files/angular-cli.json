@@ -24,6 +24,7 @@
   },
   "defaults": {
     "prefix": "<%= prefix %>",
-    "sourceDir": "<%= sourceDir %>"
+    "sourceDir": "<%= sourceDir %>",
+    "styleExt": "css"
   }
 }
