@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
   `,<% } else { %>
   templateUrl: '<%= dasherizedModuleName %>.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']<% } %>
+  styleUrls: ['<%= dasherizedModuleName %>.component.css']<% } %>
 })
 export class <%= classifiedModuleName %>Component implements OnInit {
 

@@ -9,7 +9,7 @@ import { Component } from '@angular/core';
   </h1>
   `,
   styles: []<% } else { %>templateUrl: '<%= htmlComponentName %>.component.html',
-  styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']<% } %>
+  styleUrls: ['<%= dasherizedModuleName %>.component.css']<% } %>
 })
 export class <%= jsComponentName %>AppComponent {
   title = '<%= htmlComponentName %> works!';

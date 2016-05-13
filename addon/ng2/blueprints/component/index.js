@@ -39,8 +39,12 @@ module.exports = {
   },
 
   locals: function (options) {
-    //TODO: pull value from config
     this.styleExt = 'css';
+    if (this.project.ngConfig &&
+        this.project.ngConfig.defaults &&
+        this.project.ngConfig.defaults.styleExt) {
+      this.styleExt = this.project.ngConfig.defaults.styleExt;
+    }
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
@@ -48,7 +52,6 @@ module.exports = {
       inlineTemplate: options.inlineTemplate,
       inlineStyle: options.inlineStyle,
       route: options.route,
-      styleExt: this.styleExt,
       isLazyRoute: !!options.isLazyRoute,
       isAppComponent: !!options.isAppComponent,
       selector: this.selector
@@ -94,7 +97,7 @@ module.exports = {
         return dir;
       },
       __styleext__: () => {
-        return options.locals.styleExt;
+        return this.styleExt;
       }
     };
   },

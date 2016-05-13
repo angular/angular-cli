@@ -21,6 +21,7 @@ const NewCommand = Command.extend({
     { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
     { name: 'directory', type: String, aliases: ['dir'] },
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
+    { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'mobile', type: Boolean, default: false }
   ],
