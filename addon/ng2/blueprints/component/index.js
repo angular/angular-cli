@@ -103,6 +103,10 @@ module.exports = {
   },
 
   afterInstall: function(options) {
+    if (options.dryRun) {
+      return;
+    }
+
     if (!options.flat) {
       var filePath = path.join(this.project.ngConfig.defaults.sourceDir, 'system-config.ts');
       var barrelUrl = this.appDir.replace(/\\/g, '/');
