@@ -118,10 +118,12 @@ module.exports = {
   },
 
   afterInstall: function (options) {
-    if (!options.skipRouterGeneration) {
-      this._addRouteToParent(options);
-      this._verifyParentRoute(options);
+    if (options.dryRun || options.skipRouterGeneration) {
+      return;
     }
+
+    this._addRouteToParent(options);
+    this._verifyParentRoute(options);
   },
 
   afterUninstall: function (options) {
@@ -214,9 +216,9 @@ module.exports = {
     }
 
     let isAppComponent = false;
-    let appComponentFile = 
-      path.join(this.project.root, 
-        this.dynamicPath.dir, 
+    let appComponentFile =
+      path.join(this.project.root,
+        this.dynamicPath.dir,
         this.project.name() + '.component.ts');
     if (parentFile == appComponentFile) {
       isAppComponent = true;

@@ -179,4 +179,14 @@ describe('Acceptance: ng generate component', function () {
     });
   });
 
+  it('ng generate component my-comp --dry-run does not register a barrel in system-config.ts', () => {
+    var configPath = path.join(root, 'tmp', 'foo', 'src', 'system-config.ts');
+    var unmodifiedFile = fs.readFileSync(configPath, 'utf8');
+
+    return ng(['generate', 'component', 'my-comp', '--dry-run']).then(() => {
+      var afterGenerateFile = fs.readFileSync(configPath, 'utf8');
+
+      expect(afterGenerateFile).to.equal(unmodifiedFile);
+    });
+  });
 });
