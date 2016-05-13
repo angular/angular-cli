@@ -36,7 +36,9 @@
     {{#if environment.production}}
       <script src="/app-concat.js" async></script>
     {{else}}
-      {{#each scripts.polyfills}}<script src="{{.}}"></script>{{/each}}
+      {{#each scripts.polyfills}}
+      <script src="{{.}}"></script>
+      {{/each}}
       <script>
         System.import('system-config.js').then(function () {
           System.import('main');
@@ -46,7 +48,9 @@
 
   <% } else { %>
 
-    {{#each scripts.polyfills}}<script src="{{.}}"></script>{{/each}}
+    {{#each scripts.polyfills}}
+    <script src="{{.}}"></script>
+    {{/each}}
     <script>
       System.import('system-config.js').then(function () {
         System.import('main');
