@@ -2,7 +2,7 @@
   "name": "angular2-broccoli-prerender",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "description": "Prerender your Universal (isomorphic) Angular 2 app",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -37,8 +37,6 @@
     "@angular/router-deprecated": "2.0.0-rc.1",
     "angular2-universal": "file:../universal",
     "angular2-universal-polyfills": "file:../polyfills",
-    "child-process-promise": "^2.0.2",
-    "optimist": "^0.6.1",
     "preboot": "file:../preboot",
     "rimraf": "^2.5.1",
     "rxjs": "5.0.0-beta.6",
@@ -46,7 +44,9 @@
     "zone.js": "~0.6.12"
   },
   "dependencies": {
-    "broccoli-caching-writer": "^2.2.1"
+    "broccoli-caching-writer": "^2.2.1",
+    "child-process-promise": "^2.0.2",
+    "optimist": "^0.6.1"
   },
   "peerDependencies": {
     "angular2-universal": ">=0.98.3"
