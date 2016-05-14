@@ -23,7 +23,7 @@ import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
 
 
-export type configRefs = {componentRef: ComponentRef<any>, applicationRef: ApplicationRef};
+export type configRefs = Array<{componentRef: ComponentRef<any>, applicationRef: ApplicationRef}>;
 
 export interface BootloaderConfig {
   template?: string;
