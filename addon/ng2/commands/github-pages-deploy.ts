@@ -149,13 +149,19 @@ module.exports = Command.extend({
 
     function copyFiles() {
       return fsReadDir('dist')
-        .then((files) => Promise.all(files.map((file) => fsCopy(path.join('dist', file), path.join('.', file)))))
+        .then((files) => Promise.all(files.map((file) => {
+          if (file === '.gitignore'){
+            // don't overwrite the .gitignore file
+            return Promise.resolve();
+          } 
+          return fsCopy(path.join('dist', file), path.join('.', file))
+        })));
     }
 
     function updateBaseHref() {
       let indexHtml = path.join(root, 'index.html');
       return fsReadFile(indexHtml, 'utf8')
-        .then((data) => data.replace(/<base href="\/">/g, `<base href="/${projectName}/>"`))
+        .then((data) => data.replace(/<base href="\/">/g, `<base href="/${projectName}/">`))
         .then((data) => fsWriteFile(indexHtml, data, 'utf8'));
     }
 

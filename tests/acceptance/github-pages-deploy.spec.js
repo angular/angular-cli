@@ -83,7 +83,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
         let indexHtml = path.join(process.cwd(), 'index.html');
         return fsReadFile(indexHtml, 'utf8');
       })
-      .then((data) => expect(data.search(`<base href="/${project}/>"`)).to.not.equal(-1));
+      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1));
   });
 
   it('should deploy with changed defaults', function() {
@@ -106,7 +106,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
         let indexHtml = path.join(process.cwd(), 'index.html');
         return fsReadFile(indexHtml, 'utf8');
       })
-      .then((data) => expect(data.search(`<base href="/${project}/>"`)).to.not.equal(-1));
+      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1));
   });
 
   it('should create branch if needed', function() {
@@ -130,7 +130,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
         let indexHtml = path.join(process.cwd(), 'index.html');
         return fsReadFile(indexHtml, 'utf8');
       })
-      .then((data) => expect(data.search(`<base href="/${project}/>"`)).to.not.equal(-1));
+      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1));
   });
 
   it('should create repo if needed', function() {
@@ -187,7 +187,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
         let indexHtml = path.join(process.cwd(), 'index.html');
         return fsReadFile(indexHtml, 'utf8');
       })
-      .then((data) => expect(data.search(`<base href="/${project}/>"`)).to.not.equal(-1))
+      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1))
       .then(() => httpsStub.restore());
   });
 
