@@ -308,30 +308,52 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function (done) {
+  it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function () {
     this.timeout(420000);
 
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
     let config = require(configFilePath);
 
     config.compilerOptions.noImplicitAny = true;
-    fs.writeFileSync(configFilePath, JSON.stringify(config), 'utf8');
+    fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
 
     sh.rm('-rf', path.join(process.cwd(), 'dist'));
 
     return ng(['build'])
-      .then(function () {
+      .then(() => {
         expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-      })
-      .catch(() => {
-        throw new Error('Build failed.');
-      })
-      .finally(function () {
-        // Clean `tmp` folder
-        process.chdir(path.resolve(root, '..'));
-        // sh.rm('-rf', './tmp');  // tmp.teardown takes too long
-        done();
       });
   });
 
+  it('Turn on path mapping in tsconfig.json and rebuild', function () {
+    this.timeout(420000);
+
+    const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
+    let config = require(configFilePath);
+
+    config.compilerOptions.baseUrl = '';
+
+    // This should fail.
+    config.compilerOptions.paths = { '@angular/*': [] };
+    fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
+
+    return ng(['build'])
+      .catch(() => {
+        return true;
+      })
+      .then((passed) => {
+        expect(passed).to.equal(true);
+      })
+      .then(() => {
+        // This should succeed.
+        config.compilerOptions.paths = {
+          '@angular/*': [ '*' ]
+        };
+        fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
+      })
+      .then(() => ng(['build']))
+      .catch(() => {
+        expect('build failed where it should have succeeded').to.equal('');
+      });
+  });
 });
