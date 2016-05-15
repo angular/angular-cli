@@ -4,7 +4,7 @@
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
-    "start": "ng server",
+    "start": "ng serve",
     "postinstall": "typings install",
     "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
     "format": "clang-format -i -style=file --glob=<%= sourceDir %>/**/*.ts",
