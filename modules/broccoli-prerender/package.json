@@ -2,7 +2,7 @@
   "name": "angular2-broccoli-prerender",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "description": "Prerender your Universal (isomorphic) Angular 2 app",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -45,7 +45,6 @@
   },
   "dependencies": {
     "broccoli-caching-writer": "^2.2.1",
-    "child-process-promise": "^2.0.2",
     "optimist": "^0.6.1"
   },
   "peerDependencies": {

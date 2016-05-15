@@ -5,7 +5,7 @@ import { disposePlatform } from '@angular/core';
 const fs = require('fs');
 const path = require('path');
 const BroccoliPlugin: BroccoliPluginConstructor = require('broccoli-caching-writer');
-var spawn = require('child-process-promise').spawn;
+var exec = require('child_process').exec;
 
 export interface BroccoliPlugin {}
 
@@ -21,11 +21,21 @@ export class AppShellPlugin extends BroccoliPlugin {
   }
 
   build() {
-    return spawn('node', [
-      `${path.resolve(__dirname, 'child_proc.js')}`,
-      `--sourceHtml=${path.resolve(this.inputPaths[0], this.indexPath)}`,
-      `--optionsPath=${path.resolve(this.inputPaths[0], this.appShellPath)}`,
-      `--outputIndexPath=${path.resolve(this.outputPath, this.indexPath)}`
-    ]);
+    return new Promise((resolve, reject) => {
+      var command =`node ${path.resolve(__dirname, 'child_proc.js')}  ${[
+        `--sourceHtml=${path.resolve(this.inputPaths[0], this.indexPath)}`,
+        `--optionsPath=${path.resolve(this.inputPaths[0], this.appShellPath)}`,
+        `--outputIndexPath=${path.resolve(this.outputPath, this.indexPath)}`
+      ].join(' ')}`;
+      exec(command, {
+        timeout: 5000
+      }, (err, stdin) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 }

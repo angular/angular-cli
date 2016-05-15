@@ -15,4 +15,9 @@ var bootloader = Bootloader.create(options);
 // Make sure to get all providers and platformProviders
 var providers = [].concat(options.providers || []).concat(options.platformProviders || []);
 bootloader.serializeApplication(null, providers)
-  .then(html =>  fs.writeFileSync(args.outputIndexPath, html, 'utf-8'));
+  .then(html =>  fs.writeFileSync(args.outputIndexPath, html, 'utf-8'))
+  .then(() => process.exit(0))
+  .catch(e => {
+    if (e) console.error(e);
+    process.exit(1);
+  });
