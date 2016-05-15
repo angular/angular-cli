@@ -33,10 +33,10 @@ module.exports = Command.extend({
       default: 'production',
       description: 'The Angular environment to create a build for'
     }, {
-      name: 'branch',
-      type: String,
-      default: 'gh-pages',
-      description: 'The git branch to push your pages to'
+      name: 'user-page',
+      type: Boolean,
+      default: false,
+      description: 'Deploy as a user/org page'
     }, {
       name: 'skip-build',
       type: Boolean,
@@ -62,6 +62,8 @@ module.exports = Command.extend({
     };
     var projectName = this.project.pkg.name;
 
+    let ghPagesBranch = 'gh-pages';
+    let destinationBranch = options.userPage ? 'master' : ghPagesBranch;
     let initialBranch;
 
     // declared here so that tests can stub exec
@@ -129,33 +131,46 @@ module.exports = Command.extend({
         .then(function(stdout) {
           if (!/origin\s+(https:\/\/|git@)github\.com/m.test(stdout)) {
             return createGithubRepoTask.run(createGithubRepoOptions)
-              .then(() => execPromise(`git push -u origin ${initialBranch}`));
+              .then(() => {
+                // only push starting branch if it's not the destinationBranch
+                // this happens commonly when using github user pages, since
+                // they require the destination branch to be 'master'
+                if (destinationBranch !== initialBranch) {
+                  execPromise(`git push -u origin ${initialBranch}`);
+                }
+              });
           }
         });
     }
 
     function checkoutGhPages() {
-      return execPromise(`git checkout ${options.branch}`)
+      return execPromise(`git checkout ${ghPagesBranch}`)
         .catch(createGhPagesBranch)
     }
 
     function createGhPagesBranch() {
-      return execPromise(`git checkout --orphan ${options.branch}`)
+      return execPromise(`git checkout --orphan ${ghPagesBranch}`)
         .then(() => execPromise('git rm --cached -r .', execOptions))
         .then(() => execPromise('git add .gitignore', execOptions))
         .then(() => execPromise('git clean -f -d', execOptions))
-        .then(() => execPromise(`git commit -m \"initial ${options.branch} commit\"`));
+        .then(() => execPromise(`git commit -m \"initial ${ghPagesBranch} commit\"`));
     }
 
     function copyFiles() {
       return fsReadDir('dist')
-        .then((files) => Promise.all(files.map((file) => fsCopy(path.join('dist', file), path.join('.', file)))))
+        .then((files) => Promise.all(files.map((file) => {
+          if (file === '.gitignore'){
+            // don't overwrite the .gitignore file
+            return Promise.resolve();
+          } 
+          return fsCopy(path.join('dist', file), path.join('.', file))
+        })));
     }
 
     function updateBaseHref() {
       let indexHtml = path.join(root, 'index.html');
       return fsReadFile(indexHtml, 'utf8')
-        .then((data) => data.replace(/<base href="\/">/g, `<base href="/${projectName}/>"`))
+        .then((data) => data.replace(/<base href="\/">/g, `<base href="/${projectName}/">`))
         .then((data) => fsWriteFile(indexHtml, data, 'utf8'));
     }
 
@@ -169,8 +184,8 @@ module.exports = Command.extend({
       return execPromise(`git checkout ${initialBranch}`);
     }
 
-    function pushToGitRepo(committed) {
-      return execPromise(`git push origin ${options.branch}`);
+    function pushToGitRepo() {
+      return execPromise(`git push origin ${ghPagesBranch}:${destinationBranch}`);
     }
 
     function printProjectUrl() {

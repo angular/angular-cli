@@ -22,7 +22,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
   let execStub;
   let project = 'foo',
     initialBranch = 'master',
-    branch = 'gh-pages',
+    ghPagesBranch = 'gh-pages',
     message = 'new gh-pages version',
     remote = 'origin  git@github.com:username/project.git (fetch)';
 
@@ -71,11 +71,11 @@ describe('Acceptance: ng github-pages:deploy', function() {
     execStub.addExecSuccess('git status --porcelain')
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', remote)
-      .addExecSuccess(`git checkout ${branch}`)
+      .addExecSuccess(`git checkout ${ghPagesBranch}`)
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecSuccess(`git checkout ${initialBranch}`)
-      .addExecSuccess(`git push origin ${branch}`)
+      .addExecSuccess(`git push origin ${ghPagesBranch}:${ghPagesBranch}`)
       .addExecSuccess('git remote -v', remote);
 
     return ng(['github-pages:deploy', '--skip-build'])
@@ -83,46 +83,46 @@ describe('Acceptance: ng github-pages:deploy', function() {
         let indexHtml = path.join(process.cwd(), 'index.html');
         return fsReadFile(indexHtml, 'utf8');
       })
-      .then((data) => expect(data.search(`<base href="/${project}/>"`)).to.not.equal(-1));
+      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1));
   });
 
   it('should deploy with changed defaults', function() {
-    let branch = 'not-gh-pages',
+    let userPageBranch = 'master',
       message = 'not new gh-pages version';
 
     execStub.addExecSuccess('git status --porcelain')
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', remote)
-      .addExecSuccess(`git checkout ${branch}`)
+      .addExecSuccess(`git checkout ${ghPagesBranch}`)
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecSuccess(`git checkout ${initialBranch}`)
-      .addExecSuccess(`git push origin ${branch}`)
+      .addExecSuccess(`git push origin ${ghPagesBranch}:${userPageBranch}`)
       .addExecSuccess('git remote -v', remote);
 
     return ng(['github-pages:deploy', '--skip-build', `--message=${message}`,
-                `--branch=${branch}`])
+                '--user-page'])
       .then(() => {
         let indexHtml = path.join(process.cwd(), 'index.html');
         return fsReadFile(indexHtml, 'utf8');
       })
-      .then((data) => expect(data.search(`<base href="/${project}/>"`)).to.not.equal(-1));
+      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1));
   });
 
   it('should create branch if needed', function() {
     execStub.addExecSuccess('git status --porcelain')
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', remote)
-      .addExecError(`git checkout ${branch}`)
-      .addExecSuccess(`git checkout --orphan ${branch}`)
+      .addExecError(`git checkout ${ghPagesBranch}`)
+      .addExecSuccess(`git checkout --orphan ${ghPagesBranch}`)
       .addExecSuccess('git rm --cached -r .')
       .addExecSuccess('git add .gitignore')
       .addExecSuccess('git clean -f -d')
-      .addExecSuccess(`git commit -m \"initial ${branch} commit\"`)
+      .addExecSuccess(`git commit -m \"initial ${ghPagesBranch} commit\"`)
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecSuccess(`git checkout ${initialBranch}`)
-      .addExecSuccess(`git push origin ${branch}`)
+      .addExecSuccess(`git push origin ${ghPagesBranch}:${ghPagesBranch}`)
       .addExecSuccess('git remote -v', remote);
 
     return ng(['github-pages:deploy', '--skip-build'])
@@ -130,7 +130,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
         let indexHtml = path.join(process.cwd(), 'index.html');
         return fsReadFile(indexHtml, 'utf8');
       })
-      .then((data) => expect(data.search(`<base href="/${project}/>"`)).to.not.equal(-1));
+      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1));
   });
 
   it('should create repo if needed', function() {
@@ -143,11 +143,11 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess('git remote -v', noRemote)
       .addExecSuccess(`git remote add origin git@github.com:${username}/${project}.git`)
       .addExecSuccess(`git push -u origin ${initialBranch}`)
-      .addExecSuccess(`git checkout ${branch}`)
+      .addExecSuccess(`git checkout ${ghPagesBranch}`)
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecSuccess(`git checkout ${initialBranch}`)
-      .addExecSuccess(`git push origin ${branch}`)
+      .addExecSuccess(`git push origin ${ghPagesBranch}:${ghPagesBranch}`)
       .addExecSuccess('git remote -v', remote);
 
     var httpsStub = sinon.stub(https, 'request', httpsRequestStubFunc);
@@ -187,7 +187,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
         let indexHtml = path.join(process.cwd(), 'index.html');
         return fsReadFile(indexHtml, 'utf8');
       })
-      .then((data) => expect(data.search(`<base href="/${project}/>"`)).to.not.equal(-1))
+      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1))
       .then(() => httpsStub.restore());
   });
 
@@ -246,7 +246,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
     execStub.addExecSuccess('git status --porcelain')
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', remote)
-      .addExecSuccess(`git checkout ${branch}`)
+      .addExecSuccess(`git checkout ${ghPagesBranch}`)
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecError(`git checkout ${initialBranch}`, 'error: cannot stat \'src/client\': Permission denied');
