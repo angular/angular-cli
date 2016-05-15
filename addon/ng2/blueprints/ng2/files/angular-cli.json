@@ -25,7 +25,7 @@
   "defaults": {
     "prefix": "<%= prefix %>",
     "sourceDir": "<%= sourceDir %>",
-    "styleExt": "css",
+    "styleExt": "<%= styleExt %>",
     "prefixInterfaces": false
   }
 }
