@@ -118,7 +118,7 @@ module.exports = {
   },
 
   afterInstall: function (options) {
-    if (!options.skipRouterGeneration) {
+    if (!options.skipRouterGeneration && !options.dryRun) {
       this._addRouteToParent(options);
       this._verifyParentRoute(options);
     }
@@ -214,9 +214,9 @@ module.exports = {
     }
 
     let isAppComponent = false;
-    let appComponentFile = 
-      path.join(this.project.root, 
-        this.dynamicPath.dir, 
+    let appComponentFile =
+      path.join(this.project.root,
+        this.dynamicPath.dir,
         this.project.name() + '.component.ts');
     if (parentFile == appComponentFile) {
       isAppComponent = true;

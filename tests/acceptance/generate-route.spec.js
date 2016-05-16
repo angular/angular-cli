@@ -86,4 +86,19 @@ describe('Acceptance: ng generate route', function () {
         expect(appContent).to.match(/path: '\/details\/:id'/m);
       });
   });
+
+  it('ng generate route details --dry-run does not modify top level compoent', () => {
+    var componentPath = path.join(testPath, 'foo.component.ts');
+    var htmlPath = path.join(testPath, "foo.component.html")
+    var unmodifiedComponent = fs.readFileSync(componentPath, 'utf8');
+    var unmodifiedHtml = fs.readFileSync(htmlPath, 'utf8');
+
+    return ng(['generate', 'route', 'details', '--dry-run']).then(() => {
+      var afterGenerateComponent = fs.readFileSync(componentPath, 'utf8');
+      var afterGenerateHtml = fs.readFileSync(htmlPath, 'utf8');
+
+      expect(afterGenerateComponent).to.equal(unmodifiedComponent);
+      expect(afterGenerateHtml).to.equal(unmodifiedHtml);
+    });
+  });
 });
