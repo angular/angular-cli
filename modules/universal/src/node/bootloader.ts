@@ -27,7 +27,6 @@ export type configRefs = Array<{componentRef: ComponentRef<any>, applicationRef:
 
 export interface BootloaderConfig {
   template?: string;
-  document?: string;
 
   platformProviders?: Array<any>;
   providers?: Array<any>;
@@ -46,6 +45,13 @@ export interface BootloaderConfig {
   ngOnStable?: (config?: configRefs, document?: any) => any | Promise<any>;
   ngOnRendered?: (rendered?: string) => string | any | Promise<any>;
   ngDoCheck?: (config: configRefs) => boolean;
+}
+
+export interface AppConfig {
+  template?: string;
+  directives?: Array<any>;
+  providers?: Array<any>;
+
 }
 
 export class Bootloader {
@@ -76,7 +82,7 @@ export class Bootloader {
   static serializeDocument(document: Object) { return serializeDocument(document); }
 
   document(document: string | Object = null): Object {
-    var doc = document || this._config.template || this._config.document;
+    var doc = document || this._config.template;
     if (typeof doc === 'string') {
       return Bootloader.parseDocument(doc);
     }
@@ -115,7 +121,7 @@ export class Bootloader {
       .then(Bootloader.applicationRefToString);
   }
 
-  serializeApplication(config?: any): Promise<any> {
+  serializeApplication(config?: AppConfig): Promise<any> {
     let ngDoCheck = this._config.ngDoCheck || null;
     let maxZoneTurns = Math.max(this._config.maxZoneTurns || 2000, 1);
 
@@ -271,7 +277,7 @@ export class Bootloader {
     return Promise.all(directives);
   }
 
-  _applicationAll(config: any = {}): Promise<Array<any>> {
+  _applicationAll(config: AppConfig = {}): Promise<Array<any>> {
     let components = config.directives || this._config.directives;
     let providers = config.providers || this._config.providers;
     let doc = this.document(config.template || this._config.template);
