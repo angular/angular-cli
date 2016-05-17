@@ -16,8 +16,25 @@ export type ExpressEngineConfig = BootloaderConfig & ExpressEngineExtraOptions;
 
 export var EXPRESS_PLATFORM = null;
 
+export var EXPRESS_ANGULAR_APP = {
+  template: null,
+  directives: null,
+  providers: null
+};
+
 export function disposeExpressPlatform() {
+  if (EXPRESS_PLATFORM && EXPRESS_PLATFORM.dispose) {
+    EXPRESS_PLATFORM.dispose();
+  }
   EXPRESS_PLATFORM = null;
+}
+
+export function disposeExpressAngularApp() {
+  EXPRESS_ANGULAR_APP = {
+    template: null,
+    directives: null,
+    providers: null
+  };
 }
 
 export function expressEngine(filePath: string, options?: ExpressEngineConfig, done?: Function) {
@@ -53,22 +70,31 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
 
       // bootstrap and render component to string
       const _options = options;
-      if (!EXPRESS_PLATFORM) {
-        const _template = clientHtml;
+      const _template = _options.template || clientHtml;
+      if (EXPRESS_ANGULAR_APP.template !== _template) {
+        disposeExpressPlatform();
+
+        const _directives = _options.directives;
         const _Bootloader = Bootloader;
-        let bootloader = _options.bootloader;
+        let _bootloader = _options.bootloader;
         if (_options.bootloader) {
-          bootloader = _Bootloader.create(_options.bootloader);
+          _bootloader = _Bootloader.create(_options.bootloader);
         } else {
           _options.template = _options.template || _template;
-          bootloader = _Bootloader.create(_options);
+          _bootloader = _Bootloader.create(_options);
         }
-        EXPRESS_PLATFORM = bootloader;
+        EXPRESS_PLATFORM = _bootloader;
+        EXPRESS_ANGULAR_APP.directives = _directives;
+        EXPRESS_ANGULAR_APP.providers = _options.providers;
+        EXPRESS_ANGULAR_APP.template = _template;
       }
 
-      EXPRESS_PLATFORM.serializeApplication(null, _options.reuseProviders === false ? null : _options.providers)
+      EXPRESS_PLATFORM.serializeApplication(EXPRESS_ANGULAR_APP)
         .then(html => done(null, buildClientScripts(html, options)))
         .catch(e => {
+
+          disposeExpressPlatform();
+
           console.error(e.stack);
           // if server fail then return client html
           done(null, buildClientScripts(clientHtml, options));
