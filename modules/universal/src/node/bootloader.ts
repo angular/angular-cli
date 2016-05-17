@@ -115,14 +115,11 @@ export class Bootloader {
       .then(Bootloader.applicationRefToString);
   }
 
-  serializeApplication(Component?: any | Array<any>, componentProviders?: Array<any>): Promise<any> {
-    let component = Component || this._config.component;
-    let providers = componentProviders || this._config.componentProviders || [];
-    // let customProviders = ReflectiveInjector.resolveAndCreate(providers);
+  serializeApplication(config?: any): Promise<any> {
     let ngDoCheck = this._config.ngDoCheck || null;
     let maxZoneTurns = Math.max(this._config.maxZoneTurns || 2000, 1);
 
-    return this._applicationAll(component, providers)
+    return this._applicationAll(config)
       .then((configRefs: any) => {
         if ('ngOnInit' in this._config) {
           if (!this._config.ngOnInit) { return configRefs; }
@@ -274,9 +271,10 @@ export class Bootloader {
     return Promise.all(directives);
   }
 
-  _applicationAll(Components?: Array<any>, providers?: any): Promise<Array<any>> {
-    let components = Components || this._config.directives;
-    let doc = this.document(this._config.template || this._config.document);
+  _applicationAll(config: any = {}): Promise<Array<any>> {
+    let components = config.directives || this._config.directives;
+    let providers = config.providers || this._config.providers;
+    let doc = this.document(config.template || this._config.template);
 
     let directives = components.map(component => {
       // var applicationRef = this.application(doc, providers);
