@@ -17,6 +17,7 @@ enableProdMode();
 import {
   NODE_ROUTER_PROVIDERS,
   NODE_HTTP_PROVIDERS,
+  NODE_JSONP_PROVIDERS,
   NODE_PLATFORM_PIPES,
   ORIGIN_URL,
   REQUEST_URL,
@@ -250,6 +251,46 @@ module.exports = function(ROOT) {
         res.render('src/universal/html/index', options);
 
       });
+
+      router
+        .route('/examples/jsonp')
+        .get(function ngJsonp(req, res) {
+          let queryParams: any = queryParamsToBoolean(req.query);
+          let options: BootloaderConfig = Object.assign(queryParams , {
+            // client url for systemjs
+            buildClientScripts: true,
+            systemjs: {
+              componentUrl: 'examples/src/universal/test_jsonp/browser',
+              map: {
+                'angular2-universal': 'node_modules/angular2-universal',
+                '@angular': 'node_modules/@angular'
+              },
+              packages: PACKAGES
+            },
+            directives: [htmlApp.Html],
+            platformProviders: [
+              provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
+              provide(BASE_URL, {useValue: '/examples/jsonp'})
+            ],
+            providers: [
+              provide(REQUEST_URL, {useValue: req.originalUrl}),
+
+              NODE_PLATFORM_PIPES,
+              NODE_ROUTER_PROVIDERS,
+              NODE_JSONP_PROVIDERS,
+              provide(LocationStrategy, { useClass: HashLocationStrategy })
+            ],
+            data: {},
+
+            preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
+
+          });
+
+          res.render('src/universal/test_jsonp/index', options);
+
+        });
+
+
   router
     .route('/examples/falcor_todo')
     .get(function ngTodo(req, res) {
