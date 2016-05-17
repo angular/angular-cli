@@ -38,7 +38,7 @@ import {Store, Todo, TodoFactory} from './services/TodoStore';
     <ul id="todo-list">
 
       <li
-        *ngFor="var todo of todoStore.list"
+        *ngFor="let todo of todoStore.list"
         [class.editing]="todoEdit == todo"
         [class.completed]="todo.completed == true">
 
@@ -170,4 +170,3 @@ export class TodoApp {
     return this.todoStore.list.filter((todo: Todo) => !todo.completed).length;
   }
 }
-
