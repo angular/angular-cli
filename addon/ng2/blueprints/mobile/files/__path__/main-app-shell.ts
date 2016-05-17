@@ -21,7 +21,7 @@ export const options = {
     provide(APP_BASE_HREF, {useValue: '/'}),
     provide(REQUEST_URL, {useValue: '/'})
   ],
-  async: true,
+  async: false,
   preboot: false
 };
 
