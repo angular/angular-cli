@@ -71,11 +71,11 @@ export class Bootloader {
     let rendered = Bootloader.serializeDocument(document);
     return rendered;
   }
-  static parseFragment(document) { return parseFragment(document); }
-  static parseDocument(document) { return parseDocument(document); }
-  static serializeDocument(document) { return serializeDocument(document); }
+  static parseFragment(document: string) { return parseFragment(document); }
+  static parseDocument(document: string) { return parseDocument(document); }
+  static serializeDocument(document: Object) { return serializeDocument(document); }
 
-  document(document = null) {
+  document(document: string | Object = null): Object {
     var doc = document || this._config.template || this._config.document;
     if (typeof doc === 'string') {
       return Bootloader.parseDocument(doc);
