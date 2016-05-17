@@ -5,7 +5,8 @@ import {
   BrowserXhr,
   Http,
   BaseRequestOptions,
-  BaseResponseOptions
+  BaseResponseOptions,
+  Jsonp
 } from '@angular/http';
 import {provide, NgZone, PLATFORM_INITIALIZER} from '@angular/core';
 import * as nodeHttp from './node_http';
@@ -28,10 +29,13 @@ export * from './preload_cache';
 //   provide(ConnectionBackend, {useClass: nodeHttp.NodeBackend}),
 //   provide(Http, {useClass: Http})
 // ];
-
-export var NODE_HTTP_PROVIDERS: Array<any> = [
+export const NODE_HTTP_PROVIDERS_COMMON: Array<any> = [
   provide(RequestOptions, {useClass: BaseRequestOptions}),
-  provide(ResponseOptions, {useClass: BaseResponseOptions}),
+  provide(ResponseOptions, {useClass: BaseResponseOptions})
+];
+
+export const NODE_HTTP_PROVIDERS: Array<any> = [
+  ...NODE_HTTP_PROVIDERS_COMMON,
 
   provide(BrowserXhr, {useClass: preloadCache.NodeXhr}),
   // provide(ConnectionBackend, {useClass: preloadCache.NodeXhrBackend}),
@@ -41,7 +45,15 @@ export var NODE_HTTP_PROVIDERS: Array<any> = [
 ];
 
 
+export const NODE_JSONP_PROVIDERS: Array<any> = [
+  ...NODE_HTTP_PROVIDERS_COMMON,
 
+  provide(BrowserXhr, {useClass: preloadCache.NodeXhr}),
+  // provide(ConnectionBackend, {useClass: preloadCache.NodeXhrBackend}),
+  provide(ConnectionBackend, {useClass: nodeHttp.NodeJsonpBackend}),
+
+  provide(Jsonp, {useClass: preloadCache.NgPreloadCacheHttp})
+];
 
 
 
