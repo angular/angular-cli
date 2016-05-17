@@ -122,10 +122,14 @@ export class Bootloader {
       .then(Bootloader.applicationRefToString);
   }
 
-  serializeApplication(config?: AppConfig): Promise<any> {
+  serializeApplication(config?: AppConfig | any, providers?: Array<any>): Promise<any> | any {
+    // TODO(gdi2290): remove legacy api
+    if (config === null && providers) {
+      config = { providers, directives: this._config.directives, template: this._config.template };
+    }
 
     return this._applicationAll(config)
-      .then((configRefs: any) => {
+      .then((configRefs: ConfigRefs | any) => {
         if ('ngOnInit' in this._config) {
           if (!this._config.ngOnInit) { return configRefs; }
           let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
@@ -193,10 +197,10 @@ export class Bootloader {
     return Promise.all(directives);
   }
 
-  _applicationAll(config: AppConfig = {}): Promise<Array<any>> {
-    let components = config.directives || this._config.directives;
-    let providers = config.providers || this._config.providers;
-    let doc = this.document(config.template || this._config.template);
+  _applicationAll(config: AppConfig = {}): Promise<any> | any {
+    let components: Array<any> = config.directives || this._config.directives;
+    let providers: Array<any> = config.providers || this._config.providers;
+    let doc: Object = this.document(config.template || this._config.template);
 
     let directives = components.map(component => {
       // var applicationRef = this.application(doc, providers);
@@ -213,7 +217,7 @@ export class Bootloader {
   }
 
 
-  _async(configRefs: ConfigRefs): ConfigRefs | Promise<ConfigRefs>  {
+  _async(configRefs: ConfigRefs): ConfigRefs | Promise<ConfigRefs> | Promise<Array<ConfigRefs>>  {
     if ('async' in this._config) {
       if (!this._config.async) {
         return configRefs;
@@ -227,7 +231,7 @@ export class Bootloader {
         // component injector
         let http = config.componentRef.injector.get(Http, Http);
 
-        let promise = new Promise(resolve => {
+        let promise: Promise<ConfigRef> = new Promise(resolve => {
           ngZone.runOutsideAngular(() => {
             let checkAmount = 0;
             let checkCount = 0;
