@@ -22,10 +22,26 @@ export type HapiEngineConfig = BootloaderConfig & HapiEngineExtraOptions;
 
 export var HAPI_PLATFORM = null;
 
+export var HAPI_ANGULAR_APP = {
+  template: null,
+  directives: null,
+  providers: null
+};
+
 export function disposeHapiPlatform() {
+  if (HAPI_PLATFORM && HAPI_PLATFORM.dispose) {
+    HAPI_PLATFORM.dispose();
+  }
   HAPI_PLATFORM = null;
 }
 
+export function disposeHapiAngularApp() {
+  HAPI_ANGULAR_APP = {
+    template: null,
+    directives: null,
+    providers: null
+  };
+}
 
 class Runtime {
   constructor(private options: HapiEngineConfig) {
@@ -35,25 +51,30 @@ class Runtime {
 
     // bootstrap and render component to string
     const _options = this.options;
-    const _template = template;
-    const _Bootloader = Bootloader;
-    let bootloader = _options.bootloader;
-    if (!HAPI_PLATFORM) {
+    const _template = _options.template || template;
+    if (HAPI_ANGULAR_APP.template !== _template) {
+      disposeHapiPlatform();
+
+      const _directives = _options.directives;
+      const _Bootloader = Bootloader;
+      let _bootloader = _options.bootloader;
       if (_options.bootloader) {
-        bootloader = _Bootloader.create(_options.bootloader);
+        _bootloader = _Bootloader.create(_options.bootloader);
       } else {
-        let doc = _Bootloader.parseDocument(_template);
-        _options.document = doc;
         _options.template = _options.template || _template;
-        bootloader = _Bootloader.create(_options);
+        _bootloader = _Bootloader.create(_options);
       }
-      HAPI_PLATFORM = bootloader;
+      HAPI_PLATFORM = _bootloader;
+      HAPI_ANGULAR_APP.directives = _directives;
+      HAPI_ANGULAR_APP.providers = _options.providers;
+      HAPI_ANGULAR_APP.template = _template;
     }
 
-    HAPI_PLATFORM.serializeApplication(null, (_options.reuseProviders === false) ? null : _options.providers)
+    HAPI_PLATFORM.serializeApplication(HAPI_ANGULAR_APP)
       .then(html => done(null, this.buildClientScripts(html, context)))
       .catch(e => {
         console.error(e.stack);
+        disposeHapiPlatform();
         // if server fail then return client html
         done(null, this.buildClientScripts(template, context));
       });
@@ -134,12 +155,15 @@ class Runtime {
     <!-- Browser polyfills -->
     <script src="${baseUrl}/zone.js/dist/zone.js"></script>
     <script src="${baseUrl}/reflect-metadata/Reflect.js"></script>
-
     <!-- SystemJS -->
     <script src="${baseUrl}/systemjs/dist/system.js"></script>
     <!-- Angular2: Bundle -->
-    <script src="${baseUrl}/rxjs/bundles/Rx.js"></script>
+    <script src="${baseUrl}/rxjs/bundles/Rx.umd.js"></script>
     <script src="${baseUrl}/@angular/core/core.umd.js"></script>
+    <script src="${baseUrl}/@angular/common/common.umd.js"></script>
+    <script src="${baseUrl}/@angular/compiler/compiler.umd.js"></script>
+    <script src="${baseUrl}/@angular/platform-browser/platform-browser.umd.js"></script>
+    <script src="${baseUrl}/@angular/platform-browser-dynamic/platform-browser-dynamic.umd.js"></script>
     <script src="${baseUrl}/@angular/router-deprecated/router-deprecated.umd.js"></script>
     <script src="${baseUrl}/@angular/http/http.umd.js"></script>
     <script type="text/javascript">
