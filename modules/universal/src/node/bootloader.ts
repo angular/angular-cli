@@ -42,8 +42,8 @@ export interface BootloaderConfig {
   beautify?: boolean;
   maxZoneTurns?: number;
   bootloader?: Bootloader | any;
-  ngOnInit?: (config?: ConfigRefs, document?: any) => any | Promise<any>;
-  ngOnStable?: (config?: ConfigRefs, document?: any) => any | Promise<any>;
+  ngOnInit?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
+  ngOnStable?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
   ngOnRendered?: (rendered?: string) => string | any | Promise<any>;
   ngDoCheck?: (config: ConfigRef) => boolean;
 }
