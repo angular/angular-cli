@@ -30,6 +30,19 @@ module.exports = Task.extend({
 
     return exec('git --version')
       .then(function () {
+        // check if we're inside a git repo
+        return exec('git rev-parse --is-inside-work-tree')
+          .then(function () {
+            return true;
+          })
+          .catch(function() {
+            return false;
+          })
+      })    
+      .then(function (insideGitRepo) {
+        if (insideGitRepo) {
+          return ui.writeLine('Directory is already under version control. Skipping initialization of git.');
+        }  
         return exec('git init')
           .then(function () {
             return exec('git add .');
