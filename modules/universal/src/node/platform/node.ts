@@ -56,6 +56,7 @@ import {NodeDomRootRenderer_} from './dom/node_dom_renderer';
 import {NodeXHRImpl} from './node_xhr_impl';
 import {NodeSharedStylesHost} from './node_shared_styles_host';
 import {NodeTemplateParser} from './node_template_parser';
+import {NodeTemplateParserRc0} from './node_template_parser-rc.0';
 import {NODE_PLATFORM_DIRECTIVES} from '../directives';
 
 var CONST_EXPR = v => v;
@@ -63,6 +64,8 @@ import {Parse5DomAdapter} from '@angular/platform-server';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
+var isRc0 = require('@angular/core/package.json').version.indexOf('-rc.0') !== -1;
+
 
 export function initNodeAdapter() {
   Parse5DomAdapter.makeCurrent();
@@ -87,7 +90,7 @@ function _document(): any {
 export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   ...APPLICATION_COMMON_PROVIDERS,
   ...FORM_PROVIDERS,
-  ...BROWSER_SANITIZATION_PROVIDERS,
+  ...(BROWSER_SANITIZATION_PROVIDERS || []),
   new Provider(PLATFORM_PIPES, {useValue: COMMON_PIPES, multi: true}),
   new Provider(PLATFORM_DIRECTIVES, {useValue: COMMON_DIRECTIVES, multi: true}),
   new Provider(ExceptionHandler, {useFactory: _exceptionHandler, deps: []}),
@@ -110,14 +113,15 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   ...ELEMENT_PROBE_PROVIDERS
 ]);
 
+
 /**
  * An array of providers that should be passed into `application()` when bootstrapping a component.
  */
+ const templateParser = isRc0 ? NodeTemplateParserRc0 : NodeTemplateParser;
 export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
   ...NODE_APP_COMMON_PROVIDERS,
   ...COMPILER_PROVIDERS,
-
-  new Provider(TemplateParser, {useClass: NodeTemplateParser}),
+  new Provider(TemplateParser, {useClass: templateParser}),
   new Provider(XHR, {useClass: NodeXHRImpl}),
 ]);
 
