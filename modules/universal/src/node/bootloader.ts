@@ -23,7 +23,8 @@ import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
 
 
-export type configRefs = Array<{componentRef: ComponentRef<any>, applicationRef: ApplicationRef}>;
+export type ConfigRef = {componentRef: ComponentRef<any>, applicationRef: ApplicationRef};
+export type ConfigRefs = Array<ConfigRef>;
 
 export interface BootloaderConfig {
   template?: string;
@@ -41,10 +42,10 @@ export interface BootloaderConfig {
   beautify?: boolean;
   maxZoneTurns?: number;
   bootloader?: Bootloader | any;
-  ngOnInit?: (config?: configRefs, document?: any) => any | Promise<any>;
-  ngOnStable?: (config?: configRefs, document?: any) => any | Promise<any>;
+  ngOnInit?: (config?: ConfigRefs, document?: any) => any | Promise<any>;
+  ngOnStable?: (config?: ConfigRefs, document?: any) => any | Promise<any>;
   ngOnRendered?: (rendered?: string) => string | any | Promise<any>;
-  ngDoCheck?: (config: configRefs) => boolean;
+  ngDoCheck?: (config: ConfigRef) => boolean;
 }
 
 export interface AppConfig {
@@ -122,8 +123,6 @@ export class Bootloader {
   }
 
   serializeApplication(config?: AppConfig): Promise<any> {
-    let ngDoCheck = this._config.ngDoCheck || null;
-    let maxZoneTurns = Math.max(this._config.maxZoneTurns || 2000, 1);
 
     return this._applicationAll(config)
       .then((configRefs: any) => {
@@ -136,64 +135,10 @@ export class Bootloader {
       })
       .catch(err => {
         console.log('ngOnInit Error:', err);
-        throw err;
       })
-      .then((configRefs: any) => {
-        if ('async' in this._config) {
-          if (!this._config.async) {
-            return configRefs;
-          }
-
-          let apps = configRefs.map((config, i) => {
-            // app injector
-            let ngZone = config.applicationRef.injector.get(NgZone);
-            // component injector
-            let http = config.componentRef.injector.get(Http, Http);
-
-            let promise = new Promise(resolve => {
-              ngZone.runOutsideAngular(() => {
-                let checkAmount = 0;
-                let checkCount = 0;
-                function checkStable() {
-                  // we setTimeout 10 after the first 20 turns
-                  checkCount++;
-                  if (checkCount === maxZoneTurns) {
-                    console.warn('\nWARNING: your application is taking longer than ' + maxZoneTurns + ' Zone turns. \n');
-                    return resolve(config);
-                  }
-                  if (checkCount === 20) { checkAmount = 10; }
-
-                  setTimeout(() => {
-                    if (ngZone.hasPendingMicrotasks) { return checkStable(); }
-                    if (ngZone.hasPendingMacrotasks) { return checkStable(); }
-                    if (http && http._async > 0) { return checkStable(); }
-                    if (ngZone._isStable && typeof ngDoCheck === 'function') {
-                      let isStable = ngDoCheck(config);
-                      if (isStable === true) {
-                        // return resolve(config);
-                      } else if (typeof isStable !== 'boolean') {
-                        console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
-                      } else {
-                        return checkStable();
-                      }
-                    }
-                    if (ngZone._isStable) { return resolve(config); }
-                    return checkStable();
-                  }, checkAmount);
-                }
-                return checkStable();
-              });
-            });
-            return promise;
-          });
-          return Promise.all(apps);
-
-        }
-        return configRefs;
-      })
+      .then((configRefs: ConfigRefs) => this._async(configRefs))
       .catch(err => {
         console.log('Async Error:', err);
-        throw err;
       })
       .then((configRefs: any) => {
         if ('ngOnStable' in this._config) {
@@ -205,33 +150,12 @@ export class Bootloader {
       })
       .catch(err => {
         console.log('ngOnStable Error:', err);
-        throw err;
       })
-      .then((configRefs: any) => {
-        if ('preboot' in this._config) {
-          if (!this._config.preboot) { return configRefs; }
-
-          let prebootCode = createPrebootCode(this._config.directives, this._config.preboot);
-
-          return prebootCode
-            .then(code => {
-              // TODO(gdi2290): manage the codegen better after preboot supports multiple appRoot
-              let lastRef = configRefs[configRefs.length - 1];
-              let el = lastRef.componentRef.location.nativeElement;
-              let script = parseFragment(code);
-              let prebootEl = DOM.createElement('div');
-              DOM.setInnerHTML(prebootEl, code);
-              DOM.insertAfter(el, prebootEl);
-              return configRefs;
-            });
-        }
-        return configRefs;
-      })
+      .then((configRefs: ConfigRefs) => this._preboot(configRefs))
       .catch(err => {
         console.log('preboot Error:', err);
-        throw err;
       })
-      .then((configRefs: any) => {
+      .then((configRefs: ConfigRefs) => {
         let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
         let rendered = Bootloader.serializeDocument(document);
         // dispose;
@@ -244,9 +168,8 @@ export class Bootloader {
       })
       .catch(err => {
         console.log('Rendering Document Error:', err);
-        throw err;
       })
-      .then((rendered: any) => {
+      .then((rendered: string) => {
         if ('beautify' in this._config) {
           if (!this._config.beautify) { return rendered; }
           const beautify: any = require('js-beautify');
@@ -254,16 +177,9 @@ export class Bootloader {
         }
         return rendered;
       })
-      .then((rendered: any) => {
-        if ('ngOnRendered' in this._config) {
-          if (!this._config.ngOnRendered) { return rendered; }
-          return Promise.resolve(this._config.ngOnRendered(rendered)).then(() => rendered);
-        }
-        return rendered;
-      })
+      .then()
       .catch(err => {
         console.log('ngOnRendered Error:', err);
-        throw err;
       });
 
   }
@@ -294,6 +210,85 @@ export class Bootloader {
       }));
     });
     return Promise.all(directives);
+  }
+
+
+  _async(configRefs: ConfigRefs): ConfigRefs | Promise<ConfigRefs>  {
+    if ('async' in this._config) {
+      if (!this._config.async) {
+        return configRefs;
+      }
+      let ngDoCheck = this._config.ngDoCheck || null;
+      let maxZoneTurns = Math.max(this._config.maxZoneTurns || 2000, 1);
+
+      let apps = configRefs.map((config: ConfigRef, i: number) => {
+        // app injector
+        let ngZone = config.applicationRef.injector.get(NgZone);
+        // component injector
+        let http = config.componentRef.injector.get(Http, Http);
+
+        let promise = new Promise(resolve => {
+          ngZone.runOutsideAngular(() => {
+            let checkAmount = 0;
+            let checkCount = 0;
+            function checkStable() {
+              // we setTimeout 10 after the first 20 turns
+              checkCount++;
+              if (checkCount === maxZoneTurns) {
+                console.warn('\nWARNING: your application is taking longer than ' + maxZoneTurns + ' Zone turns. \n');
+                return resolve(config);
+              }
+              if (checkCount === 20) { checkAmount = 10; }
+
+              setTimeout(() => {
+                if (ngZone.hasPendingMicrotasks) { return checkStable(); }
+                if (ngZone.hasPendingMacrotasks) { return checkStable(); }
+                if (http && http._async > 0) { return checkStable(); }
+                if (ngZone._isStable && typeof ngDoCheck === 'function') {
+                  let isStable = ngDoCheck(config);
+                  if (isStable === true) {
+                    // return resolve(config);
+                  } else if (typeof isStable !== 'boolean') {
+                    console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
+                  } else {
+                    return checkStable();
+                  }
+                }
+                if (ngZone._isStable) { return resolve(config); }
+                return checkStable();
+              }, checkAmount);
+            }
+            return checkStable();
+          });
+        });
+        return promise;
+      });
+
+      return Promise.all(apps);
+
+    }
+    return configRefs;
+  }
+
+  _preboot(configRefs: ConfigRefs): ConfigRefs | Promise<ConfigRefs> {
+    if ('preboot' in this._config) {
+      if (!this._config.preboot) { return configRefs; }
+
+      let prebootCode = createPrebootCode(this._config.directives, this._config.preboot);
+
+      return prebootCode
+        .then(code => {
+          // TODO(gdi2290): manage the codegen better after preboot supports multiple appRoot
+          let lastRef = configRefs[configRefs.length - 1];
+          let el = lastRef.componentRef.location.nativeElement;
+          let script = parseFragment(code);
+          let prebootEl = DOM.createElement('div');
+          DOM.setInnerHTML(prebootEl, code);
+          DOM.insertAfter(el, prebootEl);
+          return configRefs;
+        });
+    }
+    return configRefs;
   }
 
   dispose(): void {
