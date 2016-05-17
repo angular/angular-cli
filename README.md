@@ -187,8 +187,8 @@ of pushing to `gh-pages`, since user and organization pages require this.
 
 ### Linting and formatting code
 
-You can lint or format your app code by running `ng lint` or `ng format` respectively.
-This will use the `lint`/`format` npm script that in generated projects uses `tslint`/`clang-format`.
+You can lint your app code by running `ng lint`.
+This will use the `lint` npm script that in generated projects uses `tslint`.
 
 You can modify the these scripts in `package.json` to run whatever tool you prefer.
 

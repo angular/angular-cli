@@ -63,7 +63,6 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "clang-format": "^1.0.38",
     "eslint": "^2.8.0",
     "exists-sync": "0.0.3",
     "minimatch": "^3.0.0",

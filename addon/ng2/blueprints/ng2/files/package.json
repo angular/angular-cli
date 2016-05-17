@@ -7,7 +7,6 @@
     "start": "ng server",
     "postinstall": "typings install",
     "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
-    "format": "clang-format -i -style=file --glob=<%= sourceDir %>/**/*.ts",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor"
@@ -36,7 +35,6 @@
     "angular2-universal-polyfills": "^0.4.1",
     "preboot": "^2.0.10",<% } %>
     "angular-cli": "^<%= version %>",
-    "clang-format": "^1.0.35",
     "codelyzer": "0.0.14",
     "ember-cli-inject-live-reload": "^1.4.0",
     "jasmine-core": "^2.4.1",
