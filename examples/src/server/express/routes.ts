@@ -25,6 +25,54 @@ import {
   BootloaderConfig
 } from 'angular2-universal';
 
+const PACKAGES = {
+  'angular2-universal/polyfills': {
+    format: 'cjs',
+    main: 'dist/polyfills',
+    defaultExtension: 'js'
+  },
+  'angular2-universal': {
+    format: 'cjs',
+    main: 'dist/browser/index',
+    defaultExtension: 'js'
+  },
+  '@angular/core': {
+    format: 'cjs',
+    main: 'index',
+    defaultExtension: 'js'
+  },
+  '@angular/router-deprecated': {
+    format: 'cjs',
+    main: 'index',
+    defaultExtension: 'js'
+  },
+  '@angular/platform-browser': {
+    format: 'cjs',
+    main: 'index',
+    defaultExtension: 'js'
+  },
+  '@angular/platform-browser-dynamic': {
+    format: 'cjs',
+    main: 'index',
+    defaultExtension: 'js'
+  },
+  '@angular/http': {
+    format: 'cjs',
+    main: 'index',
+    defaultExtension: 'js'
+  },
+  '@angular/common': {
+    format: 'cjs',
+    main: 'index',
+    defaultExtension: 'js'
+  },
+  '@angular/compiler': {
+    format: 'cjs',
+    main: 'index',
+    defaultExtension: 'js'
+  }
+};
+
 module.exports = function(ROOT) {
   var router = Router();
 
@@ -54,20 +102,10 @@ module.exports = function(ROOT) {
         systemjs: {
           componentUrl: 'examples/src/universal/test_page/browser',
           map: {
-            'angular2-universal': 'node_modules/angular2-universal'
+            'angular2-universal': 'node_modules/angular2-universal',
+            '@angular': 'node_modules/@angular'
           },
-          packages: {
-            'angular2-universal/polyfills': {
-              format: 'cjs',
-              main: 'dist/polyfills',
-              defaultExtension: 'js'
-            },
-            'angular2-universal': {
-              format: 'cjs',
-              main: 'dist/browser/index',
-              defaultExtension: 'js'
-            }
-          }
+          packages: PACKAGES,
         },
 
         async: queryParams.async === false ? false : true,
@@ -107,20 +145,10 @@ module.exports = function(ROOT) {
         systemjs: {
           componentUrl: 'examples/src/universal/todo/browser',
           map: {
-            'angular2-universal': 'node_modules/angular2-universal'
+            'angular2-universal': 'node_modules/angular2-universal',
+            '@angular': 'node_modules/@angular'
           },
-          packages: {
-            'angular2-universal/polyfills': {
-              format: 'cjs',
-              main: 'dist/polyfills',
-              defaultExtension: 'js'
-            },
-            'angular2-universal': {
-              format: 'cjs',
-              main: 'dist/browser/index',
-              defaultExtension: 'js'
-            }
-          }
+          packages: PACKAGES
         },
         directives: [todoApp.TodoApp],
         platformProviders: [
@@ -153,20 +181,10 @@ module.exports = function(ROOT) {
           systemjs: {
             componentUrl: 'examples/src/universal/template_url/browser',
             map: {
-              'angular2-universal': 'node_modules/angular2-universal'
+              'angular2-universal': 'node_modules/angular2-universal',
+              '@angular': 'node_modules/@angular'
             },
-            packages: {
-              'angular2-universal/polyfills': {
-                format: 'cjs',
-                main: 'dist/polyfills',
-                defaultExtension: 'js'
-              },
-              'angular2-universal': {
-                format: 'cjs',
-                main: 'dist/browser/index',
-                defaultExtension: 'js'
-              }
-            }
+            packages: PACKAGES
           },
           // ngOnStable: () => {
           //   return new Promise(resolve => {
@@ -205,20 +223,10 @@ module.exports = function(ROOT) {
           systemjs: {
             componentUrl: 'examples/src/universal/html/browser',
             map: {
-              'angular2-universal': 'node_modules/angular2-universal'
+              'angular2-universal': 'node_modules/angular2-universal',
+              '@angular': 'node_modules/@angular'
             },
-            packages: {
-              'angular2-universal/polyfills': {
-                format: 'cjs',
-                main: 'dist/polyfills',
-                defaultExtension: 'js'
-              },
-              'angular2-universal': {
-                format: 'cjs',
-                main: 'dist/browser/index',
-                defaultExtension: 'js'
-              }
-            }
+            packages: PACKAGES
           },
           directives: [htmlApp.Html],
           platformProviders: [
@@ -252,20 +260,10 @@ module.exports = function(ROOT) {
         systemjs: {
           componentUrl: 'examples/src/universal/falcor_todo/client',
           map: {
-            'angular2-universal': 'node_modules/angular2-universal'
+            'angular2-universal': 'node_modules/angular2-universal',
+            '@angular': 'node_modules/@angular'
           },
-          packages: {
-            'angular2-universal/polyfills': {
-              format: 'cjs',
-              main: 'dist/polyfills',
-              defaultExtension: 'js'
-            },
-            'angular2-universal': {
-              format: 'cjs',
-              main: 'dist/browser/index',
-              defaultExtension: 'js'
-            }
-          }
+          packages: PACKAGES
         },
 
         directives: [todoApp.TodoApp],
@@ -295,20 +293,10 @@ module.exports = function(ROOT) {
       systemjs: {
         componentUrl: 'examples/src/universal/test_router/browser',
         map: {
-          'angular2-universal': 'node_modules/angular2-universal'
+          'angular2-universal': 'node_modules/angular2-universal',
+          '@angular': 'node_modules/@angular'
         },
-        packages: {
-          'angular2-universal/polyfills': {
-            format: 'cjs',
-            main: 'dist/polyfills',
-            defaultExtension: 'js'
-          },
-          'angular2-universal': {
-            format: 'cjs',
-            main: 'dist/browser/index',
-            defaultExtension: 'js'
-          }
-        }
+        packages: PACKAGES
       },
       // ensure that we test only server routes
       client: false,
@@ -339,7 +327,7 @@ module.exports = function(ROOT) {
   // needed for sourcemaps
 
   router.use('/src', serveStatic(`${ROOT}/src`));
-  router.use('/angular2', serveStatic(`${ROOT}/node_modules/angular2`));
+  router.use('/@angular', serveStatic(`${ROOT}/node_modules/@angular`));
   router.use('/rxjs', serveStatic(`${ROOT}/node_modules/rxjs`));
   router.use('/node_modules',  serveStatic(`${ROOT}/node_modules`));
   router.use('/examples/src',  serveStatic(`${ROOT}/dist`));
