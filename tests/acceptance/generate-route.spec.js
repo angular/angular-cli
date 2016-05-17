@@ -89,7 +89,7 @@ describe('Acceptance: ng generate route', function () {
 
   it('ng generate route details --dry-run does not modify top level compoent', () => {
     var componentPath = path.join(testPath, 'foo.component.ts');
-    var htmlPath = path.join(testPath, "foo.component.html")
+    var htmlPath = path.join(testPath, 'foo.component.html')
     var unmodifiedComponent = fs.readFileSync(componentPath, 'utf8');
     var unmodifiedHtml = fs.readFileSync(htmlPath, 'utf8');
 
