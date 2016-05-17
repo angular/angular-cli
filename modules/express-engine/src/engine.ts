@@ -159,8 +159,12 @@ function angularScript(config): string {
   <!-- SystemJS -->
   <script src="${baseUrl}/systemjs/dist/system.js"></script>
   <!-- Angular2: Bundle -->
-  <script src="${baseUrl}/rxjs/bundles/Rx.js"></script>
+  <script src="${baseUrl}/rxjs/bundles/Rx.umd.js"></script>
   <script src="${baseUrl}/@angular/core/core.umd.js"></script>
+  <script src="${baseUrl}/@angular/common/common.umd.js"></script>
+  <script src="${baseUrl}/@angular/compiler/compiler.umd.js"></script>
+  <script src="${baseUrl}/@angular/platform-browser/platform-browser.umd.js"></script>
+  <script src="${baseUrl}/@angular/platform-browser-dynamic/platform-browser-dynamic.umd.js"></script>
   <script src="${baseUrl}/@angular/router-deprecated/router-deprecated.umd.js"></script>
   <script src="${baseUrl}/@angular/http/http.umd.js"></script>
   <script type="text/javascript">
