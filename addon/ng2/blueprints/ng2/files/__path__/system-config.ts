@@ -22,7 +22,7 @@ const barrels: string[] = [
   '@angular/router',
   '@angular/platform-browser',
   '@angular/platform-browser-dynamic',<% if(isMobile) { %>
-  '@angular/app-shell', <% } %>
+  '@angular/app-shell',<% } %>
 
   // Thirdparty barrels.
   'rxjs',
