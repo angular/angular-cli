@@ -129,7 +129,7 @@ export class Bootloader {
     }
 
     return this._applicationAll(config)
-      .then((configRefs: ConfigRefs | any) => {
+      .then((configRefs: ConfigRefs) => {
         if ('ngOnInit' in this._config) {
           if (!this._config.ngOnInit) { return configRefs; }
           let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
@@ -140,11 +140,21 @@ export class Bootloader {
       .catch(err => {
         console.log('ngOnInit Error:', err);
       })
-      .then((configRefs: ConfigRefs) => this._async(configRefs))
+      .then((configRefs: ConfigRefs) => {
+        if ('async' in this._config) {
+          if (!this._config.async) {
+            return configRefs;
+          }
+          let promise = this._async(configRefs);
+          return promise;
+        } else {
+          return configRefs;
+        }
+      })
       .catch(err => {
         console.log('Async Error:', err);
       })
-      .then((configRefs: any) => {
+      .then((configRefs: ConfigRefs) => {
         if ('ngOnStable' in this._config) {
           if (!this._config.ngOnStable) { return configRefs; }
           let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
@@ -155,7 +165,14 @@ export class Bootloader {
       .catch(err => {
         console.log('ngOnStable Error:', err);
       })
-      .then((configRefs: ConfigRefs) => this._preboot(configRefs))
+      .then((configRefs: ConfigRefs) => {
+        if ('preboot' in this._config && !this._config.preboot) {
+          let promise: any = this._preboot(configRefs);
+          return promise;
+        } else {
+          return configRefs;
+        }
+      })
       .catch(err => {
         console.log('preboot Error:', err);
       })
@@ -197,7 +214,7 @@ export class Bootloader {
     return Promise.all(directives);
   }
 
-  _applicationAll(config: AppConfig = {}): Promise<any> | any {
+  _applicationAll(config: AppConfig = {}): Promise<ConfigRefs> {
     let components: Array<any> = config.directives || this._config.directives;
     let providers: Array<any> = config.providers || this._config.providers;
     let doc: Object = this.document(config.template || this._config.template);
@@ -208,91 +225,91 @@ export class Bootloader {
       let appInjector = this.application(doc, providers);
       let compRef = coreLoadAndBootstrap(appInjector, component);
       // let compRef = Promise.resolve(applicationRef.bootstrap(component));
-      return compRef.then(componentRef => ({
-        applicationRef: appInjector.get(ApplicationRef),
-        componentRef
-      }));
+      return compRef.then(componentRef => {
+        let configRef: ConfigRef = {
+          applicationRef: appInjector.get(ApplicationRef),
+          componentRef
+        };
+        return configRef;
+      });
     });
-    return Promise.all(directives);
+
+    return Promise.all<ConfigRef>(directives);
   }
 
 
-  _async(configRefs: ConfigRefs): ConfigRefs | Promise<ConfigRefs> | Promise<Array<ConfigRefs>>  {
-    if ('async' in this._config) {
-      if (!this._config.async) {
-        return configRefs;
-      }
-      let ngDoCheck = this._config.ngDoCheck || null;
-      let maxZoneTurns = Math.max(this._config.maxZoneTurns || 2000, 1);
+  _async(configRefs: ConfigRefs): Promise<ConfigRefs>  {
+    let ngDoCheck = this._config.ngDoCheck || null;
+    let maxZoneTurns = Math.max(this._config.maxZoneTurns || 2000, 1);
+    function configMap(config: ConfigRef, i: number): Promise<ConfigRef> {
+      // app injector
+      let ngZone = config.applicationRef.injector.get(NgZone);
+      // component injector
+      let http = config.componentRef.injector.get(Http, Http);
 
-      let apps = configRefs.map((config: ConfigRef, i: number) => {
-        // app injector
-        let ngZone = config.applicationRef.injector.get(NgZone);
-        // component injector
-        let http = config.componentRef.injector.get(Http, Http);
+      let promise: Promise<ConfigRef> = new Promise(resolve => {
 
-        let promise: Promise<ConfigRef> = new Promise(resolve => {
-          ngZone.runOutsideAngular(() => {
-            let checkAmount = 0;
-            let checkCount = 0;
-            function checkStable() {
-              // we setTimeout 10 after the first 20 turns
-              checkCount++;
-              if (checkCount === maxZoneTurns) {
-                console.warn('\nWARNING: your application is taking longer than ' + maxZoneTurns + ' Zone turns. \n');
-                return resolve(config);
-              }
-              if (checkCount === 20) { checkAmount = 10; }
-
-              setTimeout(() => {
-                if (ngZone.hasPendingMicrotasks) { return checkStable(); }
-                if (ngZone.hasPendingMacrotasks) { return checkStable(); }
-                if (http && http._async > 0) { return checkStable(); }
-                if (ngZone._isStable && typeof ngDoCheck === 'function') {
-                  let isStable = ngDoCheck(config);
-                  if (isStable === true) {
-                    // return resolve(config);
-                  } else if (typeof isStable !== 'boolean') {
-                    console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
-                  } else {
-                    return checkStable();
-                  }
-                }
-                if (ngZone._isStable) { return resolve(config); }
-                return checkStable();
-              }, checkAmount);
+        function outsideNg(): void {
+          let checkAmount: number = 0;
+          let checkCount: number = 0;
+          function checkStable(value: ConfigRef): void {
+            // we setTimeout 10 after the first 20 turns
+            checkCount++;
+            if (checkCount === maxZoneTurns) {
+              console.warn('\nWARNING: your application is taking longer than ' + maxZoneTurns + ' Zone turns. \n');
+              return resolve(config);
             }
-            return checkStable();
-          });
-        });
-        return promise;
+            if (checkCount === 20) { checkAmount = 10; }
+
+            function stable(): void {
+              if (ngZone.hasPendingMicrotasks) { return checkStable(value); }
+              if (ngZone.hasPendingMacrotasks) { return checkStable(value); }
+              if (http && http._async > 0) { return checkStable(value); }
+              if (ngZone._isStable && typeof ngDoCheck === 'function') {
+                let isStable = ngDoCheck(value);
+                if (isStable === true) {
+                  // return resolve(config);
+                } else if (typeof isStable !== 'boolean') {
+                  console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
+                } else {
+                  return checkStable(value);
+                }
+              }
+              if (ngZone._isStable) { return resolve(value); }
+              return checkStable(value);
+            }
+
+            setTimeout(stable, checkAmount);
+          }
+          return checkStable(config);
+        }
+        ngZone.runOutsideAngular(outsideNg);
       });
 
-      return Promise.all(apps);
-
+      return promise;
     }
-    return configRefs;
+
+    let apps = configRefs.map(configMap);
+
+    return Promise.all<ConfigRef>(apps);
   }
 
-  _preboot(configRefs: ConfigRefs): ConfigRefs | Promise<ConfigRefs> {
-    if ('preboot' in this._config) {
-      if (!this._config.preboot) { return configRefs; }
+  _preboot(configRefs: ConfigRefs): Promise<ConfigRefs> {
 
-      let prebootCode = createPrebootCode(this._config.directives, this._config.preboot);
+    let prebootCode = createPrebootCode(this._config.directives, this._config.preboot);
 
-      return prebootCode
-        .then(code => {
-          // TODO(gdi2290): manage the codegen better after preboot supports multiple appRoot
-          let lastRef = configRefs[configRefs.length - 1];
-          let el = lastRef.componentRef.location.nativeElement;
-          let script = parseFragment(code);
-          let prebootEl = DOM.createElement('div');
-          DOM.setInnerHTML(prebootEl, code);
-          DOM.insertAfter(el, prebootEl);
-          return configRefs;
-        });
-    }
-    return configRefs;
+    return prebootCode
+      .then(code => {
+        // TODO(gdi2290): manage the codegen better after preboot supports multiple appRoot
+        let lastRef = configRefs[configRefs.length - 1];
+        let el = lastRef.componentRef.location.nativeElement;
+        let script = parseFragment(code);
+        let prebootEl = DOM.createElement('div');
+        DOM.setInnerHTML(prebootEl, code);
+        DOM.insertAfter(el, prebootEl);
+
+        return configRefs;
+      });
   }
 
   dispose(): void {
