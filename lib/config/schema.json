@@ -89,6 +89,9 @@
         },
         "styleExt": {
           "type": "string"
+        },
+        "prefixInterfaces": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false
