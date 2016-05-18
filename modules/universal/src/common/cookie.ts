@@ -16,4 +16,6 @@ export abstract class Cookie {
 
   abstract remove(key: string, attributes?: CookieAttributes);
 
+  abstract toJSON(): Object;
+
 }

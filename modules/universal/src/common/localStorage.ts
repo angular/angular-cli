@@ -16,4 +16,6 @@ export abstract class LocalStorage {
 
   abstract clear(): void;
 
+  abstract toJSON(): Object;
+
 }

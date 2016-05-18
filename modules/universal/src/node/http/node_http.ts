@@ -19,9 +19,8 @@ import * as http from 'http';
 import * as https from 'https';
 import * as url from 'url';
 
-import {ORIGIN_URL, BASE_URL, REQUEST_COOKIE, Cookie} from '../../common';
+import {ORIGIN_URL, BASE_URL, COOKIE_KEY, Cookie} from '../../common';
 
-const JSONP_ERR_NO_CALLBACK = 'JSONP injected script did not invoke callback.';
 const JSONP_ERR_WRONG_METHOD = 'JSONP requests must use GET request method.';
 
 
@@ -36,9 +35,11 @@ export class NodeConnection implements Connection {
     ngZone: NgZone,
     @Inject(ORIGIN_URL) originUrl: string = '',
     @Optional() @Inject(BASE_URL) baseUrl?: string,
-    @Optional() @Inject(REQUEST_COOKIE) requestCookie?: Cookie) {
+    @Optional() @Inject(Cookie) cookie?: Cookie,
+    @Optional() @Inject(COOKIE_KEY) cookieKey?: any) {
 
     this.request = req;
+    cookieKey = cookieKey || 'universal_angular2';
     baseUrl = baseUrl || '/';
 
     if (originUrl === null) {
@@ -48,12 +49,18 @@ export class NodeConnection implements Connection {
     let _reqInfo: any = url.parse(url.resolve(url.resolve(originUrl, baseUrl), req.url));
     _reqInfo.method = RequestMethod[req.method].toUpperCase();
 
-    if (isPresent(requestCookie)){
-      if (!isPresent(req.headers)){
+    if (isPresent(cookie)) {
+      if (!isPresent(req.headers)) {
         req.headers = new Headers();
       }
 
-      req.headers.append('Cookie', requestCookie.get());
+      let cookieValue;
+      try {
+        cookieValue = cookie.get(cookieKey);
+      } catch (e) {}
+      if (cookieValue) {
+        req.headers.append('Cookie', cookieValue);
+      }
     }
 
     if (isPresent(req.headers)) {
