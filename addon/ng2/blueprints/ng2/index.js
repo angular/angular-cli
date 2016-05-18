@@ -1,6 +1,7 @@
 const Blueprint   = require('ember-cli/lib/models/blueprint');
 const path        = require('path');
 const stringUtils = require('ember-cli-string-utils');
+const getFiles = Blueprint.prototype.files;
 
 module.exports = {
   description: '',
@@ -39,6 +40,17 @@ module.exports = {
       refToTypings: refToTypings,
       isMobile: options.mobile
     };
+  },
+
+  files: function() {
+    var fileList = getFiles.call(this);
+    
+    if (this.options && this.options.mobile) {
+      fileList = fileList.filter(p => p.indexOf('__name__.component.html') < 0);
+      fileList = fileList.filter(p => p.indexOf('__name__.component.__styleext__') < 0);
+    }
+    
+    return fileList;
   },
 
   fileMapTokens: function (options) {
