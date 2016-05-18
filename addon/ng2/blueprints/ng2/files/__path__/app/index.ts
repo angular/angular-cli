@@ -1,2 +1,2 @@
-export {environment} from './environment';
-export {<%= jsComponentName %>AppComponent} from './<%= htmlComponentName %>.component';
+export * from './environment';
+export * from './<%= htmlComponentName %>.component';
