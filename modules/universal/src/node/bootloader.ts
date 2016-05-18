@@ -198,7 +198,13 @@ export class Bootloader {
         }
         return rendered;
       })
-      .then()
+      .then((rendered: string) => {
+        if ('ngOnRendered' in this._config) {
+          if (!this._config.ngOnRendered) { return rendered; }
+          return Promise.resolve(this._config.ngOnRendered(rendered)).then(() => rendered);
+        }
+        return rendered;
+      })
       .catch(err => {
         console.log('ngOnRendered Error:', err);
       });
