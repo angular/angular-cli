@@ -1,6 +1,7 @@
-import {provide} from '@angular/core';
-import {APP_BASE_HREF} from '@angular/common';
-import {<%= jsComponentName %>AppComponent} from './app/';
+import { provide } from '@angular/core';
+import { APP_BASE_HREF } from '@angular/common';
+import { APP_SHELL_BUILD_PROVIDERS } from '@angular/app-shell';
+import { <%= jsComponentName %>AppComponent } from './app/';
 import {
   REQUEST_URL,
   ORIGIN_URL
@@ -12,6 +13,7 @@ export const options = {
     <%= jsComponentName %>AppComponent
   ],
   platformProviders: [
+    APP_SHELL_BUILD_PROVIDERS,
     provide(ORIGIN_URL, {
       useValue: ''
     })
