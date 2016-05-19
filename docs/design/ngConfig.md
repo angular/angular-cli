@@ -16,7 +16,7 @@ Since the data is static, we only need to keep it in a static store somewhere.
 
 One solution would be to keep the data in the `package.json`. Unfortunately, the metadata contains too much data and the `package.json` file would become unmanageable.
 
-Instead of polluting the package file, a `angular-cli.json` file will be created that contains all the values. Access to that file will be allowed to the user if he knows the structure of the file (unknown keys will be kept but ignored), and it's easy to read and write. We can also keep the file formatted.
+Instead of polluting the package file, a `angular-cli.json` file will be created that contains all the values. Access to that file will be allowed to the user if he knows the structure of the file (unknown keys will be kept but ignored), and it's easy to read and write.
 
 
 ## Fallback

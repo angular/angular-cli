@@ -1,6 +1,6 @@
 {
   "name": "angular-cli",
-  "version": "1.0.0-beta.2-mobile.3",
+  "version": "1.0.0-beta.4",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -63,7 +63,6 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "clang-format": "^1.0.38",
     "eslint": "^2.8.0",
     "exists-sync": "0.0.3",
     "minimatch": "^3.0.0",

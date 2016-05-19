@@ -18,7 +18,6 @@ module.exports = {
       'test': require('./commands/test'),
       'e2e': require('./commands/e2e'),
       'lint': require('./commands/lint'),
-      'format': require('./commands/format'),
       'version': require('./commands/version'),
       'completion': require('./commands/completion'),
       'doc': require('./commands/doc'),

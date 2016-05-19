@@ -5,7 +5,7 @@
 # Installation: ng completion >> ~/.bashrc (or ~/.zshrc)
 #
 
-ng_opts='new init build serve generate autocomplete e2e format lint test version'
+ng_opts='new init build serve generate autocomplete e2e lint test version'
 init_opts='--dry-run --verbose --blueprint --skip-npm --skip-bower --name'
 new_opts='--dry-run --verbose --blueprint --skip-npm --skip-bower --skip-git --directory'
 build_opts='--environment --output-path --watch --watcher'
