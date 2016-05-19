@@ -47,17 +47,14 @@ describe('Basic end-to-end Workflow', function () {
   it('Can create new project using `ng new test-project`', function () {
     this.timeout(4200000);
 
-    return ng(['new', 'test-project', '--skip-npm']).then(function () {
+    return ng(['new', 'test-project', '--link-cli=true']).then(function () {
       expect(existsSync(path.join(root, 'test-project')));
     });
   });
 
   it('Can change current working directory to `test-project`', function () {
-    this.timeout(420000);
     process.chdir(path.join(root, 'test-project'));
-    sh.exec('npm link angular-cli', { silent: true });
     expect(path.basename(process.cwd())).to.equal('test-project');
-    sh.exec('npm install');
   });
 
   it('Supports production builds via `ng build --environment=production`', function() {
