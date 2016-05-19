@@ -88,7 +88,7 @@ describe('Basic end-to-end Workflow', function () {
         // Check the index.html to have no handlebar tokens in it.
         const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
         expect(indexHtml).to.not.include('{{');
-        expect(indexHtml).to.include('vendor/es6-shim/es6-shim.js');
+        expect(indexHtml).to.include('vendor/core-js/client/shim.min.js');
       })
       .then(function () {
         // Also does not create new things in GIT.
