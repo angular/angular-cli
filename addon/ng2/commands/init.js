@@ -6,6 +6,7 @@ var SilentError = require('silent-error');
 var validProjectName = require('ember-cli/lib/utilities/valid-project-name');
 var normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
 var GitInit = require('../tasks/git-init');
+var LinkCli = require('../tasks/link-cli');
 
 module.exports = Command.extend({
   name: 'init',
@@ -17,6 +18,7 @@ module.exports = Command.extend({
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
     { name: 'blueprint', type: String, aliases: ['b'] },
+    { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
     { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
     { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
     { name: 'name', type: String, default: '', aliases: ['n'] },
@@ -53,6 +55,14 @@ module.exports = Command.extend({
     if (commandOptions.skipGit === false) {
       var gitInit = new GitInit({
         ui: this.ui,
+        project: this.project
+      });
+    }
+
+    if (commandOptions.linkCli) {
+      var linkCli = new LinkCli({
+        ui: this.ui,
+        analytics: this.analytics,
         project: this.project
       });
     }
@@ -109,6 +119,14 @@ module.exports = Command.extend({
           return gitInit.run(commandOptions, rawArgs);
         }
       }.bind(this))
+      .then(function () {
+        if (commandOptions.linkCli) {
+          return linkCli.run({
+            verbose: commandOptions.verbose,
+            optional: false
+          });
+        }
+      })
       .then(function () {
         if (!commandOptions.skipNpm) {
           return npmInstall.run({
