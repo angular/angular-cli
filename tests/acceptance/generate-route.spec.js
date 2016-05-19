@@ -102,4 +102,14 @@ describe('Acceptance: ng generate route', function () {
       expect(afterGenerateParentHtml).to.equal(unmodifiedParentComponentHtml);
     });
   });
+  
+  it('lazy route prefix', () => {
+    return ng(['set', 'defaults.lazyRoutePrefix', 'myprefix'])
+      .then(() => ng(['generate', 'route', 'prefix-test']))
+      .then(() => {
+        var folderPath = path.join(testPath, 'myprefixprefix-test', 'prefix-test.component.ts');
+        expect(existsSync(folderPath))
+          .to.equal(true);
+      });
+  });
 });

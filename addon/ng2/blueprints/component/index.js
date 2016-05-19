@@ -86,8 +86,14 @@ module.exports = {
           dir += path.sep + options.dasherizedModuleName;
 
           if (options.locals.isLazyRoute) {
+            var lazyRoutePrefix = '+';
+            if (this.project.ngConfig &&
+                this.project.ngConfig.defaults &&
+                this.project.ngConfig.defaults.lazyRoutePrefix !== undefined) {
+              lazyRoutePrefix = this.project.ngConfig.defaults.lazyRoutePrefix;
+            }
             var dirParts = dir.split(path.sep);
-            dirParts[dirParts.length - 1] = `+${dirParts[dirParts.length - 1]}`;
+            dirParts[dirParts.length - 1] = `${lazyRoutePrefix}${dirParts[dirParts.length - 1]}`;
             dir = dirParts.join(path.sep);
           }
         }
