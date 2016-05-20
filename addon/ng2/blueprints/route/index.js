@@ -6,11 +6,9 @@ const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const Blueprint = require('ember-cli/lib/models/blueprint');
 
-
 function _regexEscape(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
-
 
 function _insertImport(content, symbolName, fileName) {
   // Check if an import from the same file is there.
@@ -350,26 +348,19 @@ module.exports = {
     }
 
     let parentComponentName = path.basename(parsedPath.dir);
-    if (parentComponentName[0] == '+') parentComponentName = parentComponentName.substr(1);
+    
+    if (parentComponentName[0] === '+') {
+      parentComponentName = parentComponentName.substr(1);
+    }
+    
     const jsComponentName = stringUtils.classify(parentComponentName);
-    const routeRegex = new RegExp(`^\\s*\\{.*component: ${jsComponentName}.*`
-      + '\\},?\\s*\\n?', 'm');
+    const routeRegex = new RegExp(`^\\s*\\{.*component: ${jsComponentName}.*` + '\\},?\\s*\\n?', 'm');
 
     let content = fs.readFileSync(gParentFile, 'utf-8');
     const m = content.match(routeRegex);
+    
     if (m) {
-      // Replace `path: '/blah'` with the proper `path: '/blah/...'`.
-      let json = m[0].replace(/(path:\s*['"])([^'"]+?)(['"])/, function(m, prefix, value, suffix) {
-        // If the path isn't ending with `...`, add it (with a URL separator).
-        if (!value.match(/\.\.\.$/)) {
-          if (!value.match(/\/$/)) {
-            value += '/';
-          }
-          value += '...';
-        }
-        return prefix + value + suffix;
-      });
-      content = content.substr(0, m.index) + json + content.substr(m.index + m[0].length);
+      content = content.substr(0, m.index) + m[0] + content.substr(m.index + m[0].length);
     }
 
     fs.writeFileSync(gParentFile, content, 'utf-8');
