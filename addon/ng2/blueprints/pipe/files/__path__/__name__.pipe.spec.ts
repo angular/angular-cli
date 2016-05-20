@@ -1,16 +1,16 @@
 import {
-  it,
+  beforeEachProviders,
   describe,
   expect,
   inject,
-  beforeEachProviders
+  it
 } from '@angular/core/testing';
-import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.pipe';
+import { <%= classifiedModuleName %>Pipe } from './<%= dasherizedModuleName %>.pipe';
 
-describe('<%= classifiedModuleName %> Pipe', () => {
-  beforeEachProviders(() => [<%= classifiedModuleName%>]);
+describe('Pipe: <%= classifiedModuleName %>', () => {
+  beforeEachProviders(() => [<%= classifiedModuleName%>Pipe]);
 
-  it('should transform the input', inject([<%= classifiedModuleName %>], (pipe: <%= classifiedModuleName %>) => {
+  it('should transform the input', inject([<%= classifiedModuleName %>Pipe], (pipe: <%= classifiedModuleName %>Pipe) => {
       expect(pipe.transform(true)).toBe(null);
   }));
 });
