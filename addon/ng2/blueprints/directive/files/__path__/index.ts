@@ -1,1 +1,1 @@
-export {<%= classifiedModuleName %>} from './<%= dasherizedModuleName %>.directive';
+export * from './<%= dasherizedModuleName %>.directive';
