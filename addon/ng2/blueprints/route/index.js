@@ -353,7 +353,7 @@ module.exports = {
     
     if (parentComponentName[0] == '+') {
       parentComponentName = parentComponentName.substr(1);
-      }
+    }
     
     const jsComponentName = stringUtils.classify(parentComponentName);
     const routeRegex = new RegExp(`^\\s*\\{.*component: ${jsComponentName}.*` + '\\},?\\s*\\n?', 'm');
