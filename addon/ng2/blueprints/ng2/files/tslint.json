@@ -62,11 +62,11 @@
     ],
     "component-selector-name": [true, "kebab-case"],
     "component-selector-type": [true, "element"],
-    "host-parameter-decorator": true,
-    "input-parameter-decorator": true,
-    "output-parameter-decorator": true,
-    "attribute-parameter-decorator": true,
-    "input-property-directive": true,
-    "output-property-directive": true
+    "use-host-property-decorator": true,
+    "use-input-property-decorator": true,
+    "use-output-property-decorator": true,
+    "no-attribute-parameter-decorator": true,
+    "no-input-rename": true,
+    "no-output-rename": true
   }
 }
