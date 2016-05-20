@@ -7,6 +7,8 @@ var chai = require('chai');
 var expect = chai.expect;
 var conf = require('ember-cli/tests/helpers/conf');
 var sh = require('shelljs');
+var treeKill = require('tree-kill');
+var child_process = require('child_process');
 var ng = require('../helpers/ng');
 var root = path.join(process.cwd(), 'tmp');
 
@@ -57,12 +59,12 @@ describe('Basic end-to-end Workflow', function () {
     expect(path.basename(process.cwd())).to.equal('test-project');
   });
 
-  it('Supports production builds via `ng build --environment=production`', function() {
+  it('Supports production builds via `ng build -prod`', function() {
     this.timeout(420000);
 
-    // Can't user the `ng` helper because somewhere the environment gets
+    // Can't use the `ng` helper because somewhere the environment gets
     // stuck to the first build done
-    sh.exec(`${ngBin} build --environment=production`);
+    sh.exec(`${ngBin} build -prod`);
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
     var appBundlePath = path.join(process.cwd(), 'dist', 'app', 'index.js');
     var appBundleContent = fs.readFileSync(appBundlePath, { encoding: 'utf8' });
@@ -110,6 +112,49 @@ describe('Basic end-to-end Workflow', function () {
       const exitCode = typeof result === 'object' ? result.exitCode : result;
       expect(exitCode).to.be.equal(0);
     });
+  });
+
+  it('Serve and run e2e tests after initial build', function () {
+    this.timeout(240000);
+
+    var ngServePid;
+
+    function executor(resolve, reject) {
+      var serveProcess = child_process.exec(`${ngBin} serve`);
+      var startedProtractor = false;
+      ngServePid = serveProcess.pid;
+
+      serveProcess.stdout.on('data', (data) => {
+        if (/Build successful/.test(data) && !startedProtractor) {
+          startedProtractor = true;
+          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
+            if (error !== null) {
+              reject(stderr)
+            } else {
+              resolve();
+            }
+          });
+        } else if (/ failed with:/.test(data)) {
+          reject(data);
+        }
+      });
+
+      serveProcess.stderr.on('data', (data) => {
+        reject(data);
+      });
+      serveProcess.on('close', (code) => {
+        code === 0 ? resolve() : reject('ng serve command closed with error')
+      });
+    }
+
+    return new Promise(executor)
+      .then(() => {
+        if (ngServePid) treeKill(ngServePid);
+      })
+      .catch((msg) => {
+        if (ngServePid) treeKill(ngServePid);
+        throw new Error(msg);
+      });
   });
 
   it('Can create a test component using `ng generate component test-component`', function () {
@@ -368,6 +413,49 @@ describe('Basic end-to-end Workflow', function () {
       .then(() => ng(['build']))
       .catch(() => {
         expect('build failed where it should have succeeded').to.equal('');
+      });
+  });
+  
+  it('Serve and run e2e tests after all other commands', function () {
+    this.timeout(240000);
+
+    var ngServePid;
+
+    function executor(resolve, reject) {
+      var serveProcess = child_process.exec(`${ngBin} serve`);
+      var startedProtractor = false;
+      ngServePid = serveProcess.pid;
+
+      serveProcess.stdout.on('data', (data) => {
+        if (/Build successful/.test(data) && !startedProtractor) {
+          startedProtractor = true;
+          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
+            if (error !== null) {
+              reject(stderr)
+            } else {
+              resolve();
+            }
+          });
+        } else if (/ failed with:/.test(data)) {
+          reject(data);
+        }
+      });
+
+      serveProcess.stderr.on('data', (data) => {
+        reject(data);
+      });
+      serveProcess.on('close', (code) => {
+        code === 0 ? resolve() : reject('ng serve command closed with error')
+      });
+    }
+
+    return new Promise(executor)
+      .then(() => {
+        if (ngServePid) treeKill(ngServePid);
+      })
+      .catch((msg) => {
+        if (ngServePid) treeKill(ngServePid);
+        throw new Error(msg);
       });
   });
 });
