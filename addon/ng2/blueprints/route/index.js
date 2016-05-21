@@ -6,11 +6,9 @@ const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const Blueprint = require('ember-cli/lib/models/blueprint');
 
-
 function _regexEscape(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
-
 
 function _insertImport(content, symbolName, fileName) {
   // Check if an import from the same file is there.
@@ -123,7 +121,6 @@ module.exports = {
     }
 
     this._addRouteToParent(options);
-    this._verifyParentRoute(options);
   },
 
   afterUninstall: function (options) {
@@ -229,16 +226,15 @@ module.exports = {
 
     // Insert the import statement.
     let content = fs.readFileSync(parentFile, 'utf-8');
-    content = _insertImport(content, `${jsComponentName}Component`,
-                            `./${options.isLazyRoute ? '+' : ''}${stringUtils.dasherize(base)}`);
+    content = _insertImport(content, `${jsComponentName}Component`, `./${options.isLazyRoute ? '+' : ''}${stringUtils.dasherize(base)}`);
 
     let defaultReg = options.default ? ', useAsDefault: true' : '';
     let routePath = options.path || `/${base}`;
-    let route = '{'
+    let route = '{ '
               +   `path: '${routePath}', `
               +   `component: ${jsComponentName}Component`
               +   defaultReg
-              + '}';
+              + ' }';
 
     // Add the route configuration.
     content = _addRoutes(content);
@@ -256,7 +252,7 @@ module.exports = {
     content = content.replace(/(@Component\(\{)([\s\S\n]*?)(\n\}\))/m, function(_, prefix, json, suffix) {
       const m = json.match(/(^\s+directives:\s*\[)([\s\S\n]*)(\]\s*,?.*$)/m);
       if (m) {
-        if (m[2].indexOf('ROUTER_DIRECTIVES') != -1) {
+        if (m[2].indexOf('ROUTER_DIRECTIVES') !== -1) {
           // Already there.
           return _;
         }
@@ -314,6 +310,7 @@ module.exports = {
       } else {
         // There's no template, look for the HTML file.
         const htmlFile = parentFile.replace(/\.ts$/, '.html');
+        
         if (!fs.existsSync(htmlFile)) {
           // eslint-disable-next-line no-console
           console.log('Cannot find HTML: ' + htmlFile);
@@ -333,38 +330,5 @@ module.exports = {
     });
 
     fs.writeFileSync(parentFile, content, 'utf-8');
-  },
-
-  _verifyParentRoute: function() {
-    const parsedPath = this.dynamicPath;
-    const parentFile = this._findParentRouteFile(parsedPath.dir);
-    if (!parentFile) {
-      return;
-    }
-
-    const gParentDir = path.dirname(path.dirname(parentFile));
-    const gParentFile = this._findParentRouteFile(gParentDir);
-
-    if (!gParentFile) {
-      return;
-    }
-
-    let parentComponentName = path.basename(parsedPath.dir);
-    
-    if (parentComponentName[0] === '+') {
-      parentComponentName = parentComponentName.substr(1);
-    }
-    
-    const jsComponentName = stringUtils.classify(parentComponentName);
-    const routeRegex = new RegExp(`^\\s*\\{.*component: ${jsComponentName}.*` + '\\},?\\s*\\n?', 'm');
-
-    let content = fs.readFileSync(gParentFile, 'utf-8');
-    const m = content.match(routeRegex);
-    
-    if (m) {
-      content = content.substr(0, m.index) + m[0] + content.substr(m.index + m[0].length);
-    }
-
-    fs.writeFileSync(gParentFile, content, 'utf-8');
   }
 };
