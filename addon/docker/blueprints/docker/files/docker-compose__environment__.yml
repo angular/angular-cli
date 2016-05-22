@@ -1,0 +1,10 @@
+version: "2"
+services:
+  <%= serviceName %>:
+    <% if (useImage) {
+      %>image: ${NG_APP_IMAGE}<%
+    } else {
+      %>build: .
+    image: <%= imageName %><% } %>
+    ports:
+      - "<%= servicePort %>:<%= containerPort %>"
