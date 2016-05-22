@@ -11,7 +11,7 @@
     "Jeff Whelpley <jeff@gethuman.com>"
   ],
   "scripts": {
-    "clean:all": "rm -rf ./modules/*/dist ./modules/*/node_modules ./modules/*/typings */dist */node_modules */typings ./dist ./node_modules ./typings",
+    "clean:all": "rimraf ./modules/*/dist ./modules/*/node_modules ./modules/*/typings */dist */node_modules */typings ./dist ./node_modules ./typings",
     
     "install:all"  : "npm run install-preboot && npm run install-universal && npm run loop-install && npm run loop-build && npm install && typings install && npm run install-examples",
 
@@ -43,8 +43,7 @@
     "update": "npm run remove-local-modules && npm install",
     "restart": "npm run update && gulp build && gulp server",
     "typings": "typings install",
-    "doc": "gulp doc",
-    "preinstall": "npm run typings"
+    "doc": "gulp doc"
   },
   "repository": {
     "type": "git",
@@ -96,7 +95,7 @@
     "opn": "^3.0.2",
     "phantomjs": "^1.9.17",
     "protractor": "^3.0.0",
-    "rimraf": "^2.4.3",
+    "rimraf": "^2.5.2",
     "selenium-webdriver": "^2.46.1",
     "serve-index": "^1.7.0",
     "serve-static": "^1.10.0",
