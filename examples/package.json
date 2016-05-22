@@ -4,8 +4,8 @@
   "description": "Universal (isomorphic) javascript support for Angular2",
   "main": "index.js",
   "scripts": {
-    "prebuild": "rm -rf dist",
-    "remove-modules": "rm -rf node_modules/angular2-universal node_modules/angular2-universal-polyfills node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-express-engine node_modules/angular2-hapi-engine node_modules/zone.js",
+    "prebuild": "rimraf dist",
+    "remove-modules": "rimraf node_modules/angular2-universal node_modules/angular2-universal-polyfills node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-express-engine node_modules/angular2-hapi-engine node_modules/zone.js",
     "reload": "npm run remove-modules && npm install",
     "build": "tsc || true",
     "server": "node dist/index.js",
@@ -29,6 +29,7 @@
     "gulp-insert": "^0.5.0",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.5.3",
+    "rimraf": "^2.5.2",
     "morgan": "^1.7.0",
     "preboot": "file:../modules/preboot",
     "ts-node": "^0.6.1",
