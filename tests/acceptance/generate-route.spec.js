@@ -72,8 +72,8 @@ describe('Acceptance: ng generate route', function () {
         const myOtherRouteContent = fs.readFileSync(path.join(testPath, '+my-route/+my-other/my-other.component.ts'), 'utf-8');
         const myThirdRouteContent = fs.readFileSync(path.join(testPath, '+my-route/+my-other/+my-third/my-third.component.ts'), 'utf-8');
 
-        expect(appContent).to.match(/@Routes\(\[[\s\S]+\/\+my-route\/\.\.\.[\s\S]+\]\)/m);
-        expect(myRouteContent).to.match(/@Routes\(\[[\s\S]+\/my-other\/\.\.\.[\s\S]+\]\)/m);
+        expect(appContent).to.match(/@Routes\(\[[\s\S]+\/\+my-route[\s\S]+\]\)/m);
+        expect(myRouteContent).to.match(/@Routes\(\[[\s\S]+\/my-other[\s\S]+\]\)/m);
         expect(myOtherRouteContent).to.match(/@Routes\(\[[\s\S]+\/my-third[^\.][\s\S]+\]\)/m);
         expect(myThirdRouteContent).to.not.include('@Routes');
       });
