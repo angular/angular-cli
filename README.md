@@ -93,7 +93,7 @@ Service   | `ng g service my-new-service`
 
 ### Generating a route
 
-You can generate a new route by with the following command (note the singular
+You can generate a new route with the following command (note the singular
 used in `hero`):
 
 ```bash
