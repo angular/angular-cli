@@ -1,0 +1,32 @@
+{
+  "project": {
+    "version": "<%= version %>",
+    "name": "<%= htmlComponentName %>"
+  },
+  "apps": [
+    {
+      "main": "<%= sourceDir %>/main.ts",
+      "tsconfig": "<%= sourceDir %>/tsconfig.json",
+      "mobile": <%= isMobile %>
+    }
+  ],
+  "addons": [],
+  "packages": [],
+  "e2e": {
+    "protractor": {
+      "config": "config/protractor.conf.js"
+    }
+  },
+  "test": {
+    "karma": {
+      "config": "config/karma.conf.js"
+    }
+  },
+  "defaults": {
+    "prefix": "<%= prefix %>",
+    "sourceDir": "<%= sourceDir %>",
+    "styleExt": "<%= styleExt %>",
+    "prefixInterfaces": false,
+    "lazyRoutePrefix": "+"
+  }
+}
