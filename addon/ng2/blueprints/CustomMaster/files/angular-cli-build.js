@@ -1,9 +1,9 @@
 /* global require, module */
 
-var Angular2App = require('angular-cli/lib/broccoli/angular2-app');
+var Angular2SharePointApp = require('angular-cli/lib/broccoli/angular2-sharepoint-app');
 
 module.exports = function(defaults) {
-  return new Angular2App(defaults, {
+  return new Angular2SharePointApp(defaults, {
     vendorNpmFiles: [
       'systemjs/dist/system-polyfills.js',
       'systemjs/dist/system.src.js',
