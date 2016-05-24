@@ -12,17 +12,48 @@ module.exports = Command.extend({
   works: 'insideProject',
 
   availableOptions: [
-     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
-     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
-     { name: 'tag', type: String, aliases: ['t'] },
-     { name: 'services', type: Array, aliases: ['s'] },
-     { name: 'skip-build', type: Boolean, default: false },
-     { name: 'config-env', type: String, default: 'prod' },
-     { name: 'no-cache', type: Boolean, default: false },
-     { name: 'force-rm', type: Boolean, default: false },
-     { name: 'pull', type: Boolean, default: false },
-     { name: 'force-recreate', type: Boolean, default: false },
-     { name: 'no-recreate', type: Boolean, default: false }
+    { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
+    { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
+    {
+      name: 'tag', type: String, aliases: ['t'],
+      description: 'The Docker tag to use for deploying images.'
+    },
+    {
+      name: 'machine', type: String, aliases: ['m'],
+      description: 'The Docker Machine name to use as the deploy destination.'
+    },
+    {
+      name: 'services', type: Array, aliases: ['s'],
+      description: 'The specific service name(s) to deploy from the compose file.'
+    },
+    {
+      name: 'config-env', type: String, default: 'prod', aliases: ['ce', 'cfg'],
+      description: 'The Angular configuration environment file to include in the build.'
+    },
+    {
+      name: 'skip-build', type: Boolean, default: false, aliases: ['sb'],
+      description: 'Do not build the Angular application. Use current contents of "dist/".'
+    },
+    {
+      name: 'no-cache', type: Boolean, default: false, aliases: ['nc'],
+      description: 'Do not use cache when building the image.'
+    },
+    {
+      name: 'force-rm', type: Boolean, default: false, aliases: ['rm'],
+      description: 'Always remove intermediate containers.'
+    },
+    {
+      name: 'pull', type: Boolean, default: false,
+      description: 'Always attempt to pull a newer version of the image.'
+    },
+    {
+      name: 'force-recreate', type: Boolean, default: false, aliases: ['fr'],
+      description: 'Recreate containers even if their configuration and image haven\'t changed.'
+    },
+    {
+      name: 'no-recreate', type: Boolean, default: false, aliases: ['nr'],
+      description: 'If containers already exist, don\'t recreate them.'
+    }
   ],
 
   anonymousOptions: ['<environment>'],
