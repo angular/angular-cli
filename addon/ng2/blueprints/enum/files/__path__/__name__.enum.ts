@@ -1,3 +1,1 @@
-export enum <%= classifiedModuleName %> {
-
-}
+export enum <%= classifiedModuleName %> { }

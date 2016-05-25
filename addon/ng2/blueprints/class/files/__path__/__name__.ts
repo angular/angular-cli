@@ -1,2 +1,1 @@
-export class <%= classifiedModuleName %> {
-}
+export class <%= classifiedModuleName %> { }

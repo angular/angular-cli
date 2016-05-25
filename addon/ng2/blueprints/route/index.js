@@ -15,9 +15,9 @@ function _regexEscape(str) {
 function _insertImport(content, symbolName, fileName) {
   // Check if an import from the same file is there.
   const importRegex = new RegExp('' +
-      /^(import\s+\{)/.source +  // 1. prefix
+      /^(import\s+\{\s+)/.source + // 1. prefix
       /(.*?)/.source +  // 2. current imports
-      `(\\} from '${_regexEscape(fileName)}';)` +  // 3. suffix
+      `(\\s+\\} from '${_regexEscape(fileName)}';)` +  // 3. suffix
       '\\n', 'm'
   );
 
@@ -240,11 +240,11 @@ module.exports = {
 
     let defaultReg = options.default ? ', useAsDefault: true' : '';
     let routePath = options.path || `/${base}`;
-    let route = '{'
+    let route = '{ '
               +   `path: '${routePath}', `
               +   `component: ${jsComponentName}Component`
               +   defaultReg
-              + '}';
+              + ' }';
 
     // Add the route configuration.
     content = _addRoutes(content);
