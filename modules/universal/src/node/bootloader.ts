@@ -166,7 +166,7 @@ export class Bootloader {
         console.log('ngOnStable Error:', err);
       })
       .then((configRefs: ConfigRefs) => {
-        if ('preboot' in this._config && !this._config.preboot) {
+        if ('preboot' in this._config && this._config.preboot) {
           let promise: any = this._preboot(configRefs);
           return promise;
         } else {
