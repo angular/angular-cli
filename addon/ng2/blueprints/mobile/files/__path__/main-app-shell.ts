@@ -25,6 +25,5 @@ export const options = {
     provide(REQUEST_URL, {useValue: '/'})
   ],
   async: false,
-  preboot: false
+  preboot: false,
 };
-

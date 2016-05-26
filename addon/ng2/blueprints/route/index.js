@@ -23,7 +23,7 @@ function _insertImport(content, symbolName, fileName) {
 
   const m = content.match(importRegex);
   if (m) {
-    // console.log(m[2], symbolName, m[2].);
+    // console.log(m[2], '--', symbolName);
     if (m[2].match(new RegExp(`\\b${_regexEscape(symbolName)}\\b`))) {
       // Already in the symbol list.
       return content;
@@ -244,7 +244,7 @@ module.exports = {
               +   `path: '${routePath}', `
               +   `component: ${jsComponentName}Component`
               +   defaultReg
-              + ' }';
+              + ' },';
 
     // Add the route configuration.
     content = _addRoutes(content);
@@ -274,7 +274,7 @@ module.exports = {
           }) + suffix;
       } else {
         // There's no directive already.
-        return prefix + json + ',\n  directives: [ROUTER_DIRECTIVES]' + suffix;
+        return prefix + json + (json.match(/,\s*$/) ? '' : ',') + '\n  directives: [ROUTER_DIRECTIVES],' + suffix;
       }
     });
 
@@ -297,7 +297,7 @@ module.exports = {
             }) + suffix;
         } else {
           // There's no directive already.
-          return prefix + json + ',\n  providers: [ROUTER_PROVIDERS]' + suffix;
+          return prefix + json + (json.match(/,\s*$/) ? '' : ',') + '\n  providers: [ROUTER_PROVIDERS],' + suffix;
         }
       });
     }
