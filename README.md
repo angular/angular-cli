@@ -14,13 +14,22 @@
 > Universal (isomorphic) JavaScript support for Angular 2.
 
 # Table of Contents
+* [Getting Started with Universal](#getting-started)
+    * w/ NodeJS Server
+    * w/ ASP.NET Core Server
 * [Modules](#modules)
     * [Universal](#universal)
     * [preboot.js](#prebootjs)
 * [Best Practices](#best-practices)
 * [What's in a name?](#whats-in-a-name)
-* [Getting Started](#getting-started)
 * [License](#license)
+
+# Getting Started
+
+[* NodeJS :: Universal Starter repo](https://github.com/angular/universal-starter)
+
+[* ASP.NET Core :: Universal Starter repo](https://github.com/aspnet/JavaScriptServices/tree/master/templates/Angular2Spa)
+
 
 # Modules
 
@@ -31,23 +40,25 @@
 [Design Doc](https://docs.google.com/document/d/1q6g9UlmEZDXgrkY88AJZ6MUrUxcnwhBGS0EXbVlYicY)
 
 ### Videos
+Angular 2 Universal Patterns - ng-conf, May 2016  
+[![Angular 2 Universal Patterns](http://img.youtube.com/vi/TCj_oC3m6_U/0.jpg)](https://www.youtube.com/watch?v=TCj_oC3m6_U)
+
+Angular Universal Source Code - ReadTheSource, January 2016  
+[![Angular Universal Source Code](http://img.youtube.com/vi/qOjtFjXoebY/0.jpg)](https://www.youtube.com/watch?v=qOjtFjXoebY)
+
 Full Stack Angular 2 - AngularConnect, Oct 2015  
 [![Full Stack Angular 2](https://img.youtube.com/vi/MtoHFDfi8FM/0.jpg)](https://www.youtube.com/watch?v=MtoHFDfi8FM)
 
 Angular 2 Server Rendering - Angular U, July 2015  
 [![Angular 2 Server Rendering](http://img.youtube.com/vi/0wvZ7gakqV4/0.jpg)](http://www.youtube.com/watch?v=0wvZ7gakqV4)
 
-Angular Universal Source Code - ReadTheSource, January 2016  
-[![Angular Universal Source Code](http://img.youtube.com/vi/qOjtFjXoebY/0.jpg)](https://www.youtube.com/watch?v=qOjtFjXoebY)
-
-Angular 2 Universal Patterns - ng-conf, May 2016  
-[![Angular 2 Universal Patterns](http://img.youtube.com/vi/TCj_oC3m6_U/0.jpg)](https://www.youtube.com/watch?v=TCj_oC3m6_U)
-
 ## [preboot.js](/modules/preboot)
 > Control server-rendered page and transfer state before client-side web app loads to the client-side-app.
 
 # Best Practices
 > When building Universal components in Angular 2 there are a few things to keep in mind.
+
+> Note: Universal currently only works with `router-deprecated`
 
 * Know the difference between attributes and properties in relation to the DOM.
 * Don't manipulate the `nativeElement` directly. Use the `Renderer`. We do this to ensure that in any environment we're able to change our view.
@@ -61,9 +72,6 @@ constructor(element: ElementRef, renderer: Renderer) {
 
 # What's in a name?
 We believe that using the word "universal" is correct when referring to a JavaScript Application that runs in more environments than the browser. (inspired by [Universal JavaScript](https://medium.com/@mjackson/universal-javascript-4761051b7ae9))
-
-# Getting Started
-Check out the [Universal Starter repo](https://github.com/angular/universal-starter) to see Universal in action!
 
 # License
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](/LICENSE)
