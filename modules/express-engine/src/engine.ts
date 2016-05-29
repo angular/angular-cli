@@ -71,6 +71,9 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
       // bootstrap and render component to string
       const _options = options;
       const _template = _options.template || clientHtml;
+      const _providers = _options.providers;
+      const _directives = _options.directives;
+
       if (EXPRESS_ANGULAR_APP.template !== _template) {
         disposeExpressPlatform();
 
@@ -85,13 +88,8 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
         EXPRESS_PLATFORM = _bootloader;
       }
 
-      if (!!_options.reuseProviders === false || EXPRESS_ANGULAR_APP.template !== _template) {
-        const _directives = _options.directives;
-       
-        EXPRESS_ANGULAR_APP.directives = _directives;
-        EXPRESS_ANGULAR_APP.providers = _options.providers;
-        EXPRESS_ANGULAR_APP.template = _template;
-      }
+      EXPRESS_ANGULAR_APP.directives = _directives;
+      EXPRESS_ANGULAR_APP.providers = _options.reuseProviders !== true ? _providers : EXPRESS_ANGULAR_APP.providers;
 
       EXPRESS_PLATFORM.serializeApplication(EXPRESS_ANGULAR_APP)
         .then(html => done(null, buildClientScripts(html, options)))
