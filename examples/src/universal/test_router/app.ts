@@ -26,9 +26,14 @@ export class About {
   selector: 'app',
   providers: [  ],
   directives: [ ...ROUTER_DIRECTIVES ],
-  styles: [],
+  styles: [`
+    .router-link-active {
+      background-color: red;
+    }
+  `],
   template: `
     <nav>
+      <a [routerLink]=" ['./Index'] ">Index</a>
       <a [routerLink]=" ['./Home'] ">Home</a>
       <a [routerLink]=" ['./About'] ">About</a>
     </nav>
@@ -38,7 +43,8 @@ export class About {
   `
 })
 @RouteConfig([
-  { path: '/', component: Home, name: 'Home' },
+  { path: '/', component: Home, name: 'Index' },
+  { path: '/home', component: Home, name: 'Home' },
   { path: '/about', component: About, name: 'About' }
 ])
 export class App {
@@ -48,5 +54,3 @@ export class App {
 
 
 }
-
-
