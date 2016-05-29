@@ -220,19 +220,10 @@ module.exports = function(ROOT) {
         let queryParams: any = queryParamsToBoolean(req.query);
         let options: BootloaderConfig = Object.assign(queryParams , {
           // client url for systemjs
-          buildClientScripts: true,
-          systemjs: {
-            componentUrl: 'examples/src/universal/html/browser',
-            map: {
-              'angular2-universal': 'node_modules/angular2-universal',
-              '@angular': 'node_modules/@angular'
-            },
-            packages: PACKAGES
-          },
           directives: [htmlApp.Html],
           platformProviders: [
             provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
-            provide(BASE_URL, {useValue: '/examples/html'})
+            provide(BASE_URL, {useValue: '/'})
           ],
           providers: [
             provide(REQUEST_URL, {useValue: req.originalUrl}),
@@ -244,7 +235,7 @@ module.exports = function(ROOT) {
           ],
           data: {},
 
-          preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
+          preboot: false // queryParams.preboot === false ? null : {debug: true, uglify: false}
 
         });
 
@@ -343,15 +334,18 @@ module.exports = function(ROOT) {
       client: false,
 
       directives: [routerApp.App],
+      platformProviders: [
+        provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
+        provide(BASE_URL, {useValue: '/examples/router'})
+      ],
       providers: [
-        // NODE_HTTP_PROVIDERS,
-        provide(BASE_URL, {useValue: baseUrl}),
+        NODE_HTTP_PROVIDERS,
         provide(REQUEST_URL, {useValue: url}),
         NODE_ROUTER_PROVIDERS,
       ],
       data: {},
 
-      preboot: queryParams.preboot === false ? null : {debug: true, uglify: false}
+      preboot: false // queryParams.preboot === false ? null : {debug: true, uglify: false}
 
     });
 
