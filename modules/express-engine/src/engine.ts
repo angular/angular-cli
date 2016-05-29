@@ -74,7 +74,6 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
       if (EXPRESS_ANGULAR_APP.template !== _template) {
         disposeExpressPlatform();
 
-        const _directives = _options.directives;
         const _Bootloader = Bootloader;
         let _bootloader = _options.bootloader;
         if (_options.bootloader) {
@@ -84,6 +83,11 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
           _bootloader = _Bootloader.create(_options);
         }
         EXPRESS_PLATFORM = _bootloader;
+      }
+
+      if (!!_options.reuseProviders === false || EXPRESS_ANGULAR_APP.template !== _template) {
+        const _directives = _options.directives;
+       
         EXPRESS_ANGULAR_APP.directives = _directives;
         EXPRESS_ANGULAR_APP.providers = _options.providers;
         EXPRESS_ANGULAR_APP.template = _template;
