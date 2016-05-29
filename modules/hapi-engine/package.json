@@ -2,7 +2,7 @@
   "name": "angular2-hapi-engine",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -44,6 +44,6 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "angular2-universal": ">=0.100.3"
+    "angular2-universal": "^0.101.4"
   }
 }
