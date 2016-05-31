@@ -9,7 +9,7 @@ import {
   PlatformRef,
   ApplicationRef
 } from '@angular/core';
-import {Http} from '@angular/http';
+import {Http, Jsonp} from '@angular/http';
 
 
 import {buildReflector, buildNodeProviders, buildNodeAppProviders} from './platform/node';
@@ -252,6 +252,7 @@ export class Bootloader {
       let ngZone = config.applicationRef.injector.get(NgZone);
       // component injector
       let http = config.componentRef.injector.get(Http, Http);
+      let jsonp = config.componentRef.injector.get(Jsonp, Jsonp);
 
       let promise: Promise<ConfigRef> = new Promise(resolve => {
 
@@ -271,6 +272,7 @@ export class Bootloader {
               if (ngZone.hasPendingMicrotasks) { return checkStable(value); }
               if (ngZone.hasPendingMacrotasks) { return checkStable(value); }
               if (http && http._async > 0) { return checkStable(value); }
+              if (jsonp && jsonp._async > 0) { return checkStable(value); }
               if (ngZone._isStable && typeof ngDoCheck === 'function') {
                 let isStable = ngDoCheck(value);
                 if (isStable === true) {

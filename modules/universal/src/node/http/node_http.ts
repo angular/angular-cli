@@ -67,6 +67,9 @@ export class NodeConnection implements Connection {
       _reqInfo.headers = {};
       req.headers.forEach((values, name) => _reqInfo.headers[name] = values.join(','));
     }
+    _reqInfo.headers = _reqInfo.headers || {};
+    // needed for node xhrs
+    _reqInfo.headers['User-Agent'] = 'Angular 2 Universal';
 
     this.response = new Observable(responseObserver => {
       let nodeReq;
@@ -144,12 +147,7 @@ class NodeJSONPConnection {
     if (req.method !== RequestMethod.Get) {
       throw makeTypeError(JSONP_ERR_WRONG_METHOD);
     }
-    let rawUrl: string = req.url;
-    if (rawUrl.indexOf('=JSONP_CALLBACK&') > -1) {
-      rawUrl = StringWrapper.replace(rawUrl, '=JSONP_CALLBACK&', `=callback&`);
-    } else if (rawUrl.lastIndexOf('=JSONP_CALLBACK') === rawUrl.length - '=JSONP_CALLBACK'.length) {
-      rawUrl = rawUrl.substring(0, rawUrl.length - '=JSONP_CALLBACK'.length) + `=callback`;
-    }
+
 
     this.request = req;
     baseUrl = baseUrl || '/';
@@ -158,13 +156,17 @@ class NodeJSONPConnection {
       throw new Error('ERROR: Please move ORIGIN_URL to platformProviders');
     }
 
-    let _reqInfo: any = url.parse(url.resolve(url.resolve(originUrl, baseUrl), rawUrl));
+    let _reqInfo: any = url.parse(url.resolve(url.resolve(originUrl, baseUrl), req.url));
     _reqInfo.method = RequestMethod[req.method].toUpperCase();
 
     if (isPresent(req.headers)) {
       _reqInfo.headers = {};
       req.headers.forEach((values, name) => _reqInfo.headers[name] = values.join(','));
     }
+    _reqInfo.headers = _reqInfo.headers || {};
+    // needed for node jsonp xhrs
+    _reqInfo.headers['User-Agent'] = 'Angular 2 Universal';
+
 
     this.response = new Observable(responseObserver => {
       let nodeReq;
@@ -186,9 +188,12 @@ class NodeJSONPConnection {
           res.on('end', () => {
             var responseJson;
             try {
-              var responseFactory = new Function('', 'function callback(json) { return json } \n return ' + body);
-              responseJson = responseFactory();
+              var responseFactory = new Function('JSON_CALLBACK', body);
+              responseFactory(json => {
+                responseJson = json;
+              });
             } catch (e) {
+              console.log('JSONP Error:', e);
               throw e;
             }
 
