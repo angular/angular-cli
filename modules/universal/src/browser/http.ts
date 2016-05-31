@@ -1,3 +1,4 @@
-import {HTTP_PROVIDERS} from '@angular/http';
+import {HTTP_PROVIDERS, JSONP_PROVIDERS} from '@angular/http';
 
 export const BROWSER_HTTP_PROVIDERS = HTTP_PROVIDERS;
+export const BROWSER_JSONP_PROVIDERS = JSONP_PROVIDERS;
