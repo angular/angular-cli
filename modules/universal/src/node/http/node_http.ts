@@ -69,7 +69,7 @@ export class NodeConnection implements Connection {
     }
     _reqInfo.headers = _reqInfo.headers || {};
     // needed for node xhrs
-    _reqInfo.headers['User-Agent'] = 'Angular 2 Universal';
+    _reqInfo.headers['User-Agent'] = _reqInfo.headers['User-Agent'] || 'Angular 2 Universal';
 
     this.response = new Observable(responseObserver => {
       let nodeReq;
@@ -165,7 +165,7 @@ class NodeJSONPConnection {
     }
     _reqInfo.headers = _reqInfo.headers || {};
     // needed for node jsonp xhrs
-    _reqInfo.headers['User-Agent'] = 'Angular 2 Universal';
+    _reqInfo.headers['User-Agent'] = _reqInfo.headers['User-Agent'] || 'Angular 2 Universal';
 
 
     this.response = new Observable(responseObserver => {
