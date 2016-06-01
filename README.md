@@ -13,7 +13,7 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 
 This project is very much still a work in progress.
 
-We still have a long way before getting out of our alpha stage.
+We still have a long way before reaching RC.
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
 ## Prerequisites
