@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ng serve",
     "postinstall": "typings install",
-    "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
+    "lint": "tslint \"<%= sourceDir %>/**/*.ts\" --force",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor"
