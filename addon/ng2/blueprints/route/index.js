@@ -15,15 +15,15 @@ function _regexEscape(str) {
 function _insertImport(content, symbolName, fileName) {
   // Check if an import from the same file is there.
   const importRegex = new RegExp('' +
-      /^(import\s+\{)/.source +  // 1. prefix
+      /^(import\s+\{\s+)/.source + // 1. prefix
       /(.*?)/.source +  // 2. current imports
-      `(\\} from '${_regexEscape(fileName)}';)` +  // 3. suffix
+      `(\\s+\\} from '${_regexEscape(fileName)}';)` +  // 3. suffix
       '\\n', 'm'
   );
 
   const m = content.match(importRegex);
   if (m) {
-    // console.log(m[2], symbolName, m[2].);
+    // console.log(m[2], '--', symbolName);
     if (m[2].match(new RegExp(`\\b${_regexEscape(symbolName)}\\b`))) {
       // Already in the symbol list.
       return content;
@@ -240,11 +240,11 @@ module.exports = {
 
     let defaultReg = options.default ? ', useAsDefault: true' : '';
     let routePath = options.path || `/${base}`;
-    let route = '{'
+    let route = '{ '
               +   `path: '${routePath}', `
               +   `component: ${jsComponentName}Component`
               +   defaultReg
-              + '}';
+              + ' },';
 
     // Add the route configuration.
     content = _addRoutes(content);
@@ -274,7 +274,7 @@ module.exports = {
           }) + suffix;
       } else {
         // There's no directive already.
-        return prefix + json + ',\n  directives: [ROUTER_DIRECTIVES]' + suffix;
+        return prefix + json + (json.match(/,\s*$/) ? '' : ',') + '\n  directives: [ROUTER_DIRECTIVES],' + suffix;
       }
     });
 
@@ -297,7 +297,7 @@ module.exports = {
             }) + suffix;
         } else {
           // There's no directive already.
-          return prefix + json + ',\n  providers: [ROUTER_PROVIDERS]' + suffix;
+          return prefix + json + (json.match(/,\s*$/) ? '' : ',') + '\n  providers: [ROUTER_PROVIDERS],' + suffix;
         }
       });
     }

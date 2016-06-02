@@ -1,2 +1,1 @@
-export interface <%= prefix %><%= classifiedModuleName %> {
-}
+export interface <%= prefix %><%= classifiedModuleName %> { }

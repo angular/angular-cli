@@ -10,8 +10,8 @@ import { APP_SHELL_DIRECTIVES } from '@angular/app-shell';<% } %>
   </h1>
   `,
   styles: [],
-  directives: [APP_SHELL_DIRECTIVES]<% } else { %>templateUrl: '<%= htmlComponentName %>.component.html',
-  styleUrls: ['<%= dasherizedModuleName %>.component.css']<% } %>
+  directives: [APP_SHELL_DIRECTIVES],<% } else { %>templateUrl: '<%= htmlComponentName %>.component.html',
+  styleUrls: ['<%= dasherizedModuleName %>.component.css'],<% } %>
 })
 export class <%= jsComponentName %>AppComponent {
   title = '<%= htmlComponentName %> works!';

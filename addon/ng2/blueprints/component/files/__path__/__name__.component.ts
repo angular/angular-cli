@@ -9,14 +9,12 @@ import { Component, OnInit } from '@angular/core';
     </p>
   `,<% } else { %>
   templateUrl: '<%= dasherizedModuleName %>.component.html',<% } if(inlineStyle) { %>
-  styles: []<% } else { %>
-  styleUrls: ['<%= dasherizedModuleName %>.component.css']<% } %>
+  styles: [],<% } else { %>
+  styleUrls: ['<%= dasherizedModuleName %>.component.css'],<% } %>
 })
 export class <%= classifiedModuleName %>Component implements OnInit {
 
-  constructor() {}
+  constructor() { }
 
-  ngOnInit() {
-  }
-
+  ngOnInit() { }
 }

@@ -1,6 +1,7 @@
 import { provide } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
 import { APP_SHELL_BUILD_PROVIDERS } from '@angular/app-shell';
+
 import { <%= jsComponentName %>AppComponent } from './app/';
 import {
   REQUEST_URL,
@@ -24,6 +25,5 @@ export const options = {
     provide(REQUEST_URL, {useValue: '/'})
   ],
   async: false,
-  preboot: false
+  preboot: false,
 };
-
