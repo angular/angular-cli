@@ -136,10 +136,9 @@ the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
 ng test
 ```
 
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html)
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes.
 
-If run with the watch argument `--watch` (shorthand `-w`) builds will run when source files have changed
-and tests will run after each successful build
+You can run tests a single time via `--watch=false`, and turn off building of the app via `--build=false` (useful for running it at the same time as `ng serve`).
 
 
 ### Running end-to-end tests
