@@ -393,7 +393,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Installs pug support successfully', function() {
+  it.skip('Installs pug support successfully', function() {
     this.timeout(420000);
 
     sh.exec('npm install pug', { silent: true });
@@ -408,7 +408,7 @@ describe('Basic end-to-end Workflow', function () {
       let pugExample = 'h1 Test works!';
       fs.writeFileSync(pugFile, pugExample, 'utf8');
 
-      sh.exec('ng build --silent');
+      sh.exec(`${ngBin} build`);
       let destHtml = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component-pug.component.html');
       expect(existsSync(destHtml)).to.be.equal(true);
       let contents = fs.readFileSync(destHtml, 'utf8');
@@ -416,7 +416,7 @@ describe('Basic end-to-end Workflow', function () {
 
       sh.rm('-f', destHtml);
       process.chdir('src');
-      sh.exec('ng build --silent');
+      sh.exec(`${ngBin} build`);
       expect(existsSync(destHtml)).to.be.equal(true);
       contents = fs.readFileSync(destHtml, 'utf8');
       expect(contents).to.include('<h1>Test works!</h1>');
