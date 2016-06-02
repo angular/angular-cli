@@ -162,12 +162,13 @@ module.exports = Command.extend({
           if (file === '.gitignore'){
             // don't overwrite the .gitignore file
             return Promise.resolve();
-          } 
+          }
           return fsCopy(path.join('dist', file), path.join('.', file))
         })));
     }
 
     function updateBaseHref() {
+      if (options.userPage) return Promise.resolve();
       let indexHtml = path.join(root, 'index.html');
       return fsReadFile(indexHtml, 'utf8')
         .then((data) => data.replace(/<base href="\/">/g, `<base href="/${projectName}/">`))
@@ -192,7 +193,8 @@ module.exports = Command.extend({
       return execPromise('git remote -v')
         .then((stdout) => {
           let userName = stdout.match(/origin\s+(?:https:\/\/|git@)github\.com(?:\:|\/)([^\/]+)/m)[1].toLowerCase();
-          ui.writeLine(chalk.green(`Deployed! Visit https://${userName}.github.io/${projectName}/`));
+          let url = `https://${userName}.github.io/${options.userPage ? '' : (projectName + '/')}`;
+          ui.writeLine(chalk.green(`Deployed! Visit ${url}`));
           ui.writeLine('Github pages might take a few minutes to show the deployed site.');
         });
     }

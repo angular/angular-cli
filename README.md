@@ -241,7 +241,6 @@ This project is currently a prototype so there are many known issues. Just to me
 
 - All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
 - On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
-- [Protractor](https://angular.github.io/protractor/) integration is missing.
 - The initial installation as well as `ng new` take too long because of lots of npm dependencies.
 - Many existing ember addons are not compatible with Angular apps built via angular-cli.
 - When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
