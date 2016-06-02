@@ -141,6 +141,9 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 If run with the watch argument `--watch` (shorthand `-w`) builds will run when source files have changed
 and tests will run after each successful build
 
+**WARNING:** On Windows, `ng test` is hitting a file descriptor limit (see https://github.com/angular/angular-cli/issues/977).
+The solution for now is to instead run `ng serve` and `ng test --build=false` in separate console windows. 
+
 
 ### Running end-to-end tests
 
