@@ -267,7 +267,7 @@ Now you can use `angular-cli` via the command line:
 ng new foo
 cd foo
 npm link angular-cli
-ng server
+ng serve
 ```
 
 `npm link angular-cli` is needed because by default the globally installed `angular-cli` just loads
