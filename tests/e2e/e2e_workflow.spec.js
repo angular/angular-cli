@@ -213,7 +213,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Can create a test route using `ng generate route test-route`', function () {
+  xit('Can create a test route using `ng generate route test-route`', function () {
     return ng(['generate', 'route', 'test-route']).then(function () {
       var routeDir = path.join(process.cwd(), 'src', 'app', '+test-route');
       expect(existsSync(routeDir)).to.be.equal(true);
@@ -221,7 +221,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test` after adding a route', function () {
+  xit('Perform `ng test` after adding a route', function () {
     this.timeout(420000);
 
     return ng(testArgs).then(function (result) {
