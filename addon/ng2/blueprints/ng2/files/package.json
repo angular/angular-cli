@@ -32,7 +32,7 @@
     "@angular/service-worker": "^0.2.0",
     "@angular/app-shell": "^0.0.0",
     "angular2-broccoli-prerender": "^0.11.0",
-    "angular2-universal":"^0.100.3",
+    "angular2-universal":"0.101.5",
     "angular2-universal-polyfills": "^0.4.1",
     "preboot": "^2.0.10",<% } %>
     "angular-cli": "^<%= version %>",
