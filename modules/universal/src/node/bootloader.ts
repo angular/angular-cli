@@ -45,7 +45,7 @@ export interface BootloaderConfig {
   ngOnInit?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
   ngOnStable?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
   ngOnRendered?: (rendered?: string) => string | any | Promise<any>;
-  ngDoCheck?: (config: ConfigRef) => boolean;
+  ngDoCheck?: (config: ConfigRef, ngZone: NgZone) => boolean;
 }
 
 export interface AppConfig {
@@ -260,7 +260,7 @@ export class Bootloader {
         function outsideNg(): void {
           let checkAmount: number = 0;
           let checkCount: number = 0;
-          function checkStable(value: ConfigRef): void {
+          function checkStable(): void {
             // we setTimeout 10 after the first 20 turns
             checkCount++;
             if (checkCount === maxZoneTurns) {
@@ -270,27 +270,27 @@ export class Bootloader {
             if (checkCount === 20) { checkAmount = 10; }
 
             function stable(): void {
-              if (ngZone.hasPendingMicrotasks) { return checkStable(value); }
-              if (ngZone.hasPendingMacrotasks) { return checkStable(value); }
-              if (http && http._async > 0) { return checkStable(value); }
-              if (jsonp && jsonp._async > 0) { return checkStable(value); }
+              if (ngZone.hasPendingMicrotasks) { return checkStable(); }
+              if (ngZone.hasPendingMacrotasks) { return checkStable(); }
+              if (http && http._async > 0) { return checkStable(); }
+              if (jsonp && jsonp._async > 0) { return checkStable(); }
               if (ngZone._isStable && typeof ngDoCheck === 'function') {
-                let isStable = ngDoCheck(value);
+                let isStable = ngDoCheck(config, ngZone);
                 if (isStable === true) {
                   // return resolve(config);
                 } else if (typeof isStable !== 'boolean') {
                   console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
                 } else {
-                  return checkStable(value);
+                  return checkStable();
                 }
               }
-              if (ngZone._isStable) { return resolve(value); }
-              return checkStable(value);
+              if (ngZone._isStable) { return resolve(config); }
+              return checkStable();
             }
 
             setTimeout(stable, checkAmount);
           }
-          return checkStable(config);
+          return checkStable();
         }
         ngZone.runOutsideAngular(outsideNg);
       });
