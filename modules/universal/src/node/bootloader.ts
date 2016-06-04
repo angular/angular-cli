@@ -59,6 +59,7 @@ export class Bootloader {
   private _config: BootloaderConfig = { async: true, preboot: false };
   platformRef: any;
   applicationRef: any;
+  disposed: boolean;
   constructor(config: BootloaderConfig) {
     (<any>Object).assign(this._config, config || {});
     this.platformRef = this.platform();
@@ -130,7 +131,7 @@ export class Bootloader {
 
     return this._applicationAll(config)
       .then((configRefs: ConfigRefs) => {
-        if ('ngOnInit' in this._config) {
+        if (!this.disposed && 'ngOnInit' in this._config) {
           if (!this._config.ngOnInit) { return configRefs; }
           let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
           return Promise.resolve(this._config.ngOnInit(configRefs, document)).then(() => configRefs);
@@ -141,7 +142,7 @@ export class Bootloader {
         console.log('ngOnInit Error:', err);
       })
       .then((configRefs: ConfigRefs) => {
-        if ('async' in this._config) {
+        if (!this.disposed && 'async' in this._config) {
           if (!this._config.async) {
             return configRefs;
           }
@@ -155,7 +156,7 @@ export class Bootloader {
         console.log('Async Error:', err);
       })
       .then((configRefs: ConfigRefs) => {
-        if ('ngOnStable' in this._config) {
+        if (!this.disposed && 'ngOnStable' in this._config) {
           if (!this._config.ngOnStable) { return configRefs; }
           let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
           return Promise.resolve(this._config.ngOnStable(configRefs, document)).then(() => configRefs);
@@ -166,7 +167,7 @@ export class Bootloader {
         console.log('ngOnStable Error:', err);
       })
       .then((configRefs: ConfigRefs) => {
-        if ('preboot' in this._config && this._config.preboot) {
+        if (!this.disposed && 'preboot' in this._config && this._config.preboot) {
           let promise: any = this._preboot(configRefs);
           return promise;
         } else {
@@ -191,7 +192,7 @@ export class Bootloader {
         console.log('Rendering Document Error:', err);
       })
       .then((rendered: string) => {
-        if ('beautify' in this._config) {
+        if (!this.disposed && 'beautify' in this._config) {
           if (!this._config.beautify) { return rendered; }
           const beautify: any = require('js-beautify');
           return beautify.html(rendered, {indent_size: 2});
@@ -199,7 +200,7 @@ export class Bootloader {
         return rendered;
       })
       .then((rendered: string) => {
-        if ('ngOnRendered' in this._config) {
+        if (!this.disposed && 'ngOnRendered' in this._config) {
           if (!this._config.ngOnRendered) { return rendered; }
           return Promise.resolve(this._config.ngOnRendered(rendered)).then(() => rendered);
         }
@@ -324,6 +325,7 @@ export class Bootloader {
     this.platformRef.dispose();
     this._config = null;
     this.platformRef = null;
+    this.disposed = true;
   }
 }
 
