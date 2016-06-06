@@ -8,4 +8,3 @@ if (environment.production) {
 }
 
 bootstrap(<%= jsComponentName %>AppComponent<% if(isMobile) { %>, [ APP_SHELL_RUNTIME_PROVIDERS ]<% } %>);
-
