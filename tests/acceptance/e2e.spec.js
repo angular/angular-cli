@@ -12,7 +12,12 @@ const ngBin = `node ${path.join(process.cwd(), 'bin', 'ng')}`;
 describe('Acceptance: ng e2e', function () {
   before(conf.setup);
 
-  after(conf.restore);
+  after(function() {
+    this.timeout(4200000);
+         
+    conf.restore;
+    return tmp.teardown('./tmp');
+  });
 
   beforeEach(function () {
     this.timeout(4200000);
@@ -56,7 +61,7 @@ describe('Acceptance: ng e2e', function () {
       });
     }
 
-    return ng(['new', 'foo', '--link-cli=true'])
+    return ng(['new', 'test-project'])
       .then(new Promise(executor)
         .then(() => {
           if (ngServePid) treeKill(ngServePid);
