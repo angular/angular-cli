@@ -27,7 +27,6 @@ describe('Acceptance: ng e2e', function () {
 
     var ngServePid;
     var ngE2ePid;
-    var e2eProcess;
 
     function executor(resolve, reject) {
       var serveProcess = child_process.exec(`${ngBin} serve`);
