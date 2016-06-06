@@ -23,7 +23,7 @@ module.exports = function (opts) {
     exec('mkdir -p ./' + distExampleDir);
     exec('cp -fR example/. ' + distExampleDir);
 
-    return preboot.getBrowserCodeStream({
+    return preboot.getBrowserCodeStream('app', {
       appRoot:  'app',         // selector for root element
       freeze:   'spinner',     // show spinner w button click & freeze page
       replay:   'rerender',    // rerender replay strategy

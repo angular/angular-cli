@@ -1,7 +1,7 @@
 {
   "name": "angular2-universal",
   "version": false,
-  "ambientDependencies": {
+  "globalDependencies": {
     "browserify": "registry:dt/browserify#12.0.1+20160317120654",
     "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
     "jasmine": "registry:dt/jasmine#2.2.0+20160412134438",

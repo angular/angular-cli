@@ -1,79 +1,66 @@
-/**
- * This is a wrapper for the DOM that is used by preboot. We do this
- * for a few reasons. It makes the other preboot code more simple,
- * makes things easier to test (i.e. just mock out the DOM) and it
- * centralizes our DOM related interactions so we can more easily
- * add fixes for different browser quirks
- */
-import {Element} from '../interfaces/element';
-import {CursorSelection} from '../interfaces/preboot_ref';
+import { Element } from '../interfaces/element';
+import { PrebootOptions } from '../interfaces/preboot_options';
+import { PrebootState } from './preboot_state';
+import { App, AppState } from '../interfaces/app';
+import { CursorSelection } from '../interfaces/preboot_ref';
 
+
+let state = PrebootState;
 export let nodeCache = {};
-export let state = {
-  window: null,
-  document: null,
-  body: null,
-  appRoot: null,
-  serverRoot: null,
-  clientRoot: null
-};
 
-/**
- * Initialize the DOM state based on input
- */
-export function init(opts: any) {
-  state.window = opts.window || state.window || {};
-  state.document = opts.document || (state.window && state.window.document) || {};
-  state.body = opts.body || (state.document && state.document.body);
-  state.appRoot = opts.appRoot || state.body;
-  state.serverRoot = state.clientRoot = state.appRoot;
+export function initAppRoot(app: AppState, options: any) : any {
+    if (!app) return;
+  
+    app.window = options.window || app.window || {};
+    app.document = options.document || (app.window && app.window.document) || {};
+    app.body = options.body || (app.document && app.document.body);
+    app.appRoot = options.appRoot || app.body;
+    app.serverRoot = app.clientRoot = app.appRoot;
+     
+}
+export function updateAppRoots(app: AppState, appRoot: any, serverRoot?: any, clientRoot?: any) {
+    if (!app) return;
+    
+    app.appRoot = appRoot;
+    app.clientRoot = clientRoot;
+    app.serverRoot = serverRoot;
 }
 
-/**
- * Setter for app root
- */
-export function updateRoots(appRoot: Element, serverRoot?: Element, clientRoot?: Element) {
-  state.appRoot = appRoot;
-  state.serverRoot = serverRoot;
-  state.clientRoot = clientRoot;
+export function addApp(appRoot: string, options: PrebootOptions) {
+   var app = { 
+       freeze: null,
+       appRootName: appRoot, 
+       opts: options, 
+       canComplete: true, 
+       completeCalled: false, 
+       started: false, 
+       window: null, 
+       document: null, 
+       body: null, 
+       appRoot: null, 
+       clientRoot: null, 
+       serverRoot: null};
+   state.apps.push(app);
+   return app;    
 }
-
-/**
- * Get a node in the document
- */
-export function getDocumentNode(selector: string): Element {
-  return state.document.querySelector(selector);
-}
-
-/**
- * Get one app node
- */
-export function getAppNode(selector: string): Element {
-  return state.appRoot.querySelector(selector);
-}
-
-/**
- * Get all app nodes for a given selector
- */
-export function getAllAppNodes(selector: string): Element[] {
-  return state.appRoot.querySelectorAll(selector);
-}
-
-/**
- * Get all nodes under the client root
- */
-export function getClientNodes(selector: string): Element[] {
-  return state.clientRoot.querySelectorAll(selector);
+export function getApp(appRoot: string): AppState {
+    var retval = undefined;
+    state.apps.forEach(state => {
+      if (state.appRootName === appRoot) { 
+        retval = state; 
+      } 
+    });
+    return retval;
 }
 
 /**
  * Add event listener at window level
  */
-export function onLoad(handler: Function) {
-  if (state.document && state.document.readyState === 'interactive') {
-    handler();
+export function onLoad(app: AppState, handler: Function) {
+  if (app.document && app.document.readyState === 'interactive') {
+    handler(app.appRootName);
   } else {
-    state.document.addEventListener('DOMContentLoaded', handler);
+    app.document.addEventListener('DOMContentLoaded', () =>  handler(app.appRootName));
   }
 }
 
@@ -81,36 +68,65 @@ export function onLoad(handler: Function) {
  * These are global events that get passed around. Currently
  * we use the document to do this.
  */
-export function on(eventName: string, handler: Function) {
-  state.document.addEventListener(eventName, handler);
+export function on(app: AppState, eventName: string, handler: Function) {
+  app.document.addEventListener(eventName, () => handler(app.appRootName));
 }
+
+/**
+ * Get a node in the document
+ */
+export function getDocumentNode(app: AppState): Element {
+  return app.document.querySelector(app.appRootName);
+}
+
+/**
+ * Get one app node
+ */
+export function getAppNode(app: AppState, selector: string): Element {
+  return app.appRoot.querySelector(selector);
+}
+
+/**
+ * Get all app nodes for a given selector
+ */
+export function getAllAppNodes(app: AppState, selector: string): Element[] {
+  return app.appRoot.querySelectorAll(selector);
+}
+
+/**
+ * Get all nodes under the client root
+ */
+export function getClientNodes(app: AppState, selector: string): Element[] {
+  return app.clientRoot.querySelectorAll(selector);
+}
+
 
 /**
  * Dispatch an event on the document
  */
-export function dispatchGlobalEvent(eventName: string) {
-  state.document.dispatchEvent(new state.window.Event(eventName));
+export function dispatchGlobalEvent(app: AppState, eventName: string) {
+  app.document.dispatchEvent(new app.window.Event(eventName));
 }
 
 /**
  * Dispatch an event on a specific node
  */
-export function dispatchNodeEvent(node: Element, eventName: string) {
-  node.dispatchEvent(new state.window.Event(eventName));
+export function dispatchNodeEvent(app: AppState, node: Element, eventName: string) {
+  node.dispatchEvent(new app.window.Event(eventName));
 }
 
 /**
  * Check to see if the app contains a particular node
  */
-export function appContains(node: Element) {
-  return state.appRoot.contains(node);
+export function appContains(app: AppState, node: Element) {
+  return app.appRoot.contains(node);
 }
 
 /**
  * Create a new element
  */
-export function addNodeToBody(type: string, className: string, styles: Object): Element {
-  let elem = state.document.createElement(type);
+export function addNodeToBody(app: AppState, type: string, className: string, styles: Object): Element {
+  let elem = app.document.createElement(type);
   elem.className = className;
 
   if (styles) {
@@ -121,7 +137,7 @@ export function addNodeToBody(type: string, className: string, styles: Object): 
     }
   }
 
-  return state.body.appendChild(elem);
+  return app.body.appendChild(elem);
 }
 
 /**
@@ -131,7 +147,7 @@ export function removeNode(node: Element) {
   if (!node) { return; }
 
   node.remove ?
-    node.remove() :
+    node.remove() : 
     node.style.display = 'none';
 }
 
@@ -179,7 +195,7 @@ export function setSelection(node: Element, selection: CursorSelection) {
 /**
  * Get a unique key for a node in the DOM
  */
-export function getNodeKey(node: Element, rootNode: Element): string {
+export function getNodeKey(appstate: AppState, node: Element, rootNode: Element): string {
   let ancestors = [];
   let temp = node;
   while (temp && temp !== rootNode) {
@@ -192,8 +208,8 @@ export function getNodeKey(node: Element, rootNode: Element): string {
     ancestors.push(temp);
   }
 
-  // now go backwards starting from the root
-  let key = node.nodeName;
+  // now go backwards starting from the root, appending the appName to unique identify the node later..
+  let key = node.nodeName + '_' + appstate.appRootName;
   let len = ancestors.length;
 
   for (let i = (len - 1); i >= 0; i--) {
@@ -216,13 +232,13 @@ export function getNodeKey(node: Element, rootNode: Element): string {
  * Given a node from the server rendered view, find the equivalent
  * node in the client rendered view.
  */
-export function findClientNode(serverNode: Element, nodeKey?: any): Element {
+export function findClientNode(app: AppState, serverNode: Element, nodeKey?: any): Element {
 
   // if nothing passed in, then no client node
   if (!serverNode) { return null; }
 
   // we use the string of the node to compare to the client node & as key in cache
-  let serverNodeKey = nodeKey || getNodeKey(serverNode, state.serverRoot);
+  let serverNodeKey = nodeKey || getNodeKey(app, serverNode, app.serverRoot);
 
   // first check to see if we already mapped this node
   let nodes = nodeCache[serverNodeKey] || [];
@@ -243,11 +259,11 @@ export function findClientNode(serverNode: Element, nodeKey?: any): Element {
     selector += '.' + className.replace(/ /g, '.');
   }
 
-  let clientNodes = getClientNodes(selector);
+  let clientNodes = getClientNodes(app, selector);
   for (let clientNode of clientNodes) {
 
     // todo: this assumes a perfect match which isn't necessarily true
-    if (getNodeKey(clientNode, state.clientRoot) === serverNodeKey) {
+    if (getNodeKey(app, clientNode, app.clientRoot) === serverNodeKey) {
 
       // add the client/server node pair to the cache
       nodeCache[serverNodeKey] = nodeCache[serverNodeKey] || [];
@@ -263,3 +279,4 @@ export function findClientNode(serverNode: Element, nodeKey?: any): Element {
   // if we get here it means we couldn't find the client node
   return null;
 }
+

@@ -1,4 +1,4 @@
-import {PrebootRef} from './preboot_ref';
+import {AppState} from './app';
 import {Element} from './element';
 import {DomEvent} from './event';
 
@@ -10,7 +10,7 @@ export interface ListenStrategy {
   trackFocus?: boolean;
   doNotReplay?: boolean;
   dispatchEvent?: string;
-  action?(preboot: PrebootRef, node: Element, event: DomEvent);
+  action?(appstate: AppState, node: Element, event: DomEvent);
 }
 
 export interface ReplayStrategy {

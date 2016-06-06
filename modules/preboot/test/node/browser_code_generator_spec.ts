@@ -25,7 +25,7 @@ describe('clientCodeGenerator', function () {
   describe('getBrowserCode()', function () {    
     it('should get client code with a listen strategy', function (done) {
       let opts = { listen: [{ name: 'selectors' }], replay: [] };
-      getBrowserCode(opts, function (err, clientCode) {
+      getBrowserCode('app', opts, function (err, clientCode) {
         expect(err).toBeNull();
         expect(clientCode).toMatch(/function getNodeEvents/);
         done();

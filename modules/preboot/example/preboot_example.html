@@ -4,47 +4,126 @@
     <link rel="stylesheet" href="preboot.css">
     <style>
       .frmelem {
-        height: 50px; width: 50%; font-size: 24px; padding: 0 20px; margin: 20px 25%;
+        height: 25px; width: 80%; font-size: 14px; padding: 0 10px; margin: 10px 10%;
       }
       .frmbtn {
-        height: 50px; width: 50%; font-size: 24px; margin: 20px 25%; text-align: center; z-index: 99999999999;
+        height: 25px; width: 80%; font-size: 14px; margin: 10px 10%; text-align: center; z-index: 99999999999;
+      }
+      
+      #container {
+        position:relative;margin-left:50%;
+      }
+      #controlpanel {
+        position:absolute;left:0px;top:0px;width:46%;height:100%;background-color:#b9b9b9;border-right:1px solid black;padding:10px;
       }
     </style>
     <script src="preboot.js"></script>
   </head>
 
   <body>
-    <app>
-      <input class="frmelem" preboot-events="keypress,keyup,keydown,input,change" (keyup.enter)="enterEntered()" name="one">
-      <input  class="frmelem" type="checkbox" name="blahCheck" value="foo">
-      <input class="frmelem" type="radio" name="choo" value="val1">
-      <input class="frmelem" type="radio" name="choo" value="val2">
+    <div id="container">
+      <h2>Application 1</h2>
+      <app>
+        <input class="frmelem" preboot-events="keypress,keyup,keydown,input,change" (keyup.enter)="enterEntered('app')" name="one">
+        <input  class="frmelem" type="checkbox" name="blahCheck" value="foo">
+        <input class="frmelem" type="radio" name="choo" value="val1">
+        <input class="frmelem" type="radio" name="choo" value="val2">
+        <select class="frmelem"><option>op1</option><option>op2</option></select>
+        <button  class="frmelem" preboot-events="click">Server View</button>
+      </app>
+      <div class="client" style="display: none">
+        <input  class="frmelem" type="text" (keyup.enter)="enterEntered('app')" name="one">
+        <input  class="frmelem" type="checkbox" name="blahCheck" value="foo">
+        <input class="frmelem" type="radio" name="choo" value="val1">
+        <input class="frmelem" type="radio" name="choo" value="val2">
+        <select class="frmelem"><option>op1</option><option>op2</option></select>
+        <button  class="frmelem" onclick="clientClick('app')">Client View</button>
+      </div>
+    </div>
+    
+    <div id="container">
+      <h2>Application 2</h2>
+     <app2>
+      <input class="frmelem" preboot-events="keypress,keyup,keydown,input,change" (keyup.enter)="enterEntered('app2')" name="two">
+      <input  class="frmelem" type="checkbox" name="blahCheck2" value="foo">
+      <input class="frmelem" type="radio" name="choo2" value="val1">
+      <input class="frmelem" type="radio" name="choo2" value="val2">
       <select class="frmelem"><option>op1</option><option>op2</option></select>
       <button  class="frmelem" preboot-events="click">Server View</button>
-    </app>
-    <div class="client" style="display: none">
-      <input  class="frmelem" type="text" (keyup.enter)="enterEntered()" name="one">
-      <input  class="frmelem" type="checkbox" name="blahCheck" value="foo">
-      <input class="frmelem" type="radio" name="choo" value="val1">
-      <input class="frmelem" type="radio" name="choo" value="val2">
+    </app2>
+    <div class="client2" style="display: none">
+      <input  class="frmelem" type="text" (keyup.enter)="enterEntered('app2')" name="two">
+      <input  class="frmelem" type="checkbox" name="blahCheck2" value="foo">
+      <input class="frmelem" type="radio" name="choo2" value="val1">
+      <input class="frmelem" type="radio" name="choo2" value="val2">
       <select class="frmelem"><option>op1</option><option>op2</option></select>
-      <button  class="frmelem" onclick="clientClick()">Client View</button>
+      <button  class="frmelem" onclick="clientClick('app2')">Client View</button>
     </div>
-    <button class="frmbtn" onclick="fireBootstrapComplete()">
-      Fire Bootstrap complete yo
-    </button>
+    </div>
+    
+    <div id="controlpanel">
+      <button class="frmbtn" onclick="fireBootstrapComplete('app')" id="btnCompleteApp" disabled>
+        Fire Bootstrap complete for first app
+      </button>
+      <button class="frmbtn" onclick="fireBootstrapComplete('app2')" id="btnCompleteApp2" disabled>
+        Fire Bootstrap complete for second app
+      </button>
+      <button class="frmbtn" onclick="reloadPageWithAutoBootstrap()">
+        Reload this page and use auto bootstrapping after 5sec timeout..
+      </button>
+      <h3>App status</h3>
+      <div id="status">Uninitialised application</div><br/>
+      <h3>Log console</h3>
+      <code id="logconsole">
+      </code>
+    </div>
+    
     <script>
+      
       preboot.start();
 
+        function reloadPageWithAutoBootstrap(){
+            window.location.href="preboot_example.html?auto=true";  
+        }
+        
         // fire bootstrap complete manually
-        function fireBootstrapComplete() {
-            preboot.complete();
+        function fireBootstrapComplete(appName) {
+            if (appName !== undefined)
+              preboot.complete(appName);
+            else
+              preboot.complete();
         }
 
         // this is our "client app"
         setTimeout(function () {
-            var clientTemplate = document.querySelector('div.client');
-            var clientRoot = document.querySelector('app');
+            processClientTemplate("app", "div.client");
+            processClientTemplate("app2", "div.client2");
+            
+            if (/[?&]auto=/.test(location.search)) {
+              setTimeout(function () {
+                  fireBootstrapComplete();
+              }, 1000);
+            } else {
+              // enable the buttons
+              document.getElementById("btnCompleteApp").disabled = false;
+              document.getElementById("btnCompleteApp2").disabled = false;
+            }
+            
+        }, 6000);
+        
+        var counter = 5;
+        var interval = setInterval(function(){
+          if (counter > 0)
+            document.getElementById("status").innerText = "Simulating apploading, wait for " + (counter--)  + " seconds of apploading..."
+          else {
+            document.getElementById("status").innerText = "App loaded!"
+            clearInterval(interval);
+          }
+        }, 1000); 
+        
+        function processClientTemplate(serverRoot, clientRoot) {
+            var clientTemplate = document.querySelector(clientRoot);
+            var clientRoot = document.querySelector(serverRoot);
 
             var tempNode;
             for (var i = 0; i < clientTemplate.childNodes.length; i++) {
@@ -52,20 +131,26 @@
                 clientRoot.appendChild(tempNode);
             }
 
-            setTimeout(function () {
-                fireBootstrapComplete();
-            }, 1000);
-        }, 3000);
-
-        // see that client was clicked
-        function clientClick() {
-            console.log('client clicked');
         }
 
         // see that client was clicked
-        function enterEntered() {
-            console.log('enter entered');
+        function clientClick(app) {
+            console.log(app + ': client clicked');
         }
+
+        // see that client was clicked
+        function enterEntered(app) {
+            console.log(app + ': enter entered');
+        }
+        // capture the log
+        (function(){
+          var oldLog = console.log;
+          console.log = function (message) {
+            document.getElementById("logconsole").innerText += (message + "\r\n")
+            oldLog.apply(console, arguments);
+        };
+        })();
+
     </script>
   </body>
 

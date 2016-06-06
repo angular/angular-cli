@@ -1,4 +1,4 @@
-import {PrebootRef} from '../../interfaces/preboot_ref';
+import {App, AppState} from '../../interfaces/app';
 import {ListenStrategy} from '../../interfaces/strategy';
 import {NodeEvent} from '../../interfaces/event';
 
@@ -6,9 +6,9 @@ import {NodeEvent} from '../../interfaces/event';
  * This listen strategy will look for a specific attribute which contains all the elements
  * that a given element is listening to. For ex. <div preboot-events="click,focus,touch">
  */
-export function getNodeEvents(preboot: PrebootRef, strategy: ListenStrategy): NodeEvent[] {
+export function getNodeEvents(app: App, appState: AppState, strategy: ListenStrategy): NodeEvent[] {
   let attributeName = strategy.attributeName || 'preboot-events';
-  let elems = preboot.dom.getAllAppNodes('[' + attributeName + ']');
+  let elems = app.getAllAppNodes(appState, '[' + attributeName + ']');
 
   // if no elements found, return empty array since no node events
   if (!elems) { return []; }

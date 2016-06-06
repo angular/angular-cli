@@ -14,7 +14,7 @@ export interface PrebootOptions {
     listen?: any;                 // can be string (name of strategy), object (custom) or array of either
     replay?: any;                 // same as listen
     freeze?: any;                 // same as listen
-    appRoot?: string;             // a selector for the root of the application
+    appRoot?: [string];             // a selector for the root of the application
     pauseEvent?: string;          // name of event that when dispatched on document will cause preboot to pause
     resumeEvent?: string;         // when this event dispatched on document, preboot will resume
     completeEvent?: string;       // instead of calling complete(), can just raise this event

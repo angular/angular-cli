@@ -1,5 +1,5 @@
 {
-  "ambientDependencies": {
+  "globalDependencies": {
     "browserify": "github:DefinitelyTyped/DefinitelyTyped/browserify/browserify.d.ts#abc2bcfb8524b1e027e6298d3348012b5b06eda5",
     "event-stream": "github:DefinitelyTyped/DefinitelyTyped/event-stream/event-stream.d.ts#14ba891ee5f5bf86d76c0dee99cbafc892febaf8",
     "gulp-rename": "registry:dt/gulp-rename#0.0.0+20160316155526",

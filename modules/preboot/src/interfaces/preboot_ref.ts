@@ -1,14 +1,6 @@
 import {PrebootOptions} from './preboot_options';
 import {Element} from './element';
-
-export interface DomState {
-  window?: Element;
-  document?: Element;
-  body?: Element;
-  appRoot?: Element;
-  serverRoot?: Element;
-  clientRoot?: Element;
-}
+import { AppState } from './app';
 
 export interface CursorSelection {
   start?: number;
@@ -18,26 +10,24 @@ export interface CursorSelection {
 
 // interface for the dom wrapper
 export interface Dom {
-  state?: DomState;
-  init?(opts: any);
-  updateRoots?(appRoot: Element, serverRoot?: Element, clientRoot?: Element);
-  getDocumentNode?(selector: string): Element;
-  getAppNode?(selector: string): Element;
+  getDocumentNode?(app: AppState): Element;
+  getAppNode?(app: AppState, selector: string): Element;
   getNodeKey?(node: Element, rootNode: Element): string;
-  getAllAppNodes?(selector: string): Element[];
-  getClientNodes?(selector: string): Element[];
+  getAllAppNodes?(app: AppState, selector: string): Element[];
+  getClientNodes?(app: AppState, selector: string): Element[];
   onLoad?(handler: Function);
   on?(eventName: string, handler: Function);
-  dispatchGlobalEvent?(eventName: string);
-  dispatchNodeEvent?(node: Element, eventName: string);
-  appContains?(node: Element): Boolean;
-  addNodeToBody?(type: string, className: string, styles: Object);
+  dispatchGlobalEvent(app: AppState, eventName: string);
+  dispatchNodeEvent(app: AppState, node: Element, eventName: string);
+  appContains(app: AppState, node: Element): Boolean;
+  addNodeToBody(app: AppState, type: string, className: string, styles: Object): Element;
   removeNode?(node: Element);
-  findClientNode?(serverNode: Element, nodeKey?: any): Element;
+  findClientNode(app: AppState, serverNode: Element, nodeKey?: any): Element ;
   getSelection?(node: Element): CursorSelection;
   setSelection?(node: Element, selection: CursorSelection);
 }
 
+/*
 // interface for preboot modules available to strategies
 export interface PrebootRef {
   dom: Dom;
@@ -46,3 +36,4 @@ export interface PrebootRef {
   time?: number;
   selection?: CursorSelection;
 }
+*/

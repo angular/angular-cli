@@ -1,5 +1,6 @@
-import {PrebootRef} from '../../interfaces/preboot_ref';
-import {PrebootOptions} from '../../interfaces/preboot_options';
+import { App, AppState } from '../../interfaces/app';
+import { PrebootOptions } from '../../interfaces/preboot_options';
+import * as app from '../app';
 
 // overlay and spinner nodes stored in memory in between prep and cleanup
 export let state = {
@@ -10,9 +11,9 @@ export let state = {
 /**
  * Clean up the freeze elements from the DOM
  */
-export function cleanup(preboot: PrebootRef) {
-  preboot.dom.removeNode(state.overlay);
-  preboot.dom.removeNode(state.spinner);
+export function cleanup(app: App, appState: AppState) {
+  app.removeNode(state.overlay);
+  app.removeNode(state.spinner);
 
   state.overlay = null;
   state.spinner = null;
@@ -21,21 +22,21 @@ export function cleanup(preboot: PrebootRef) {
 /**
  * Prepare for freeze by adding elements to the DOM and adding an event handler
  */
-export function prep(preboot: PrebootRef, opts: PrebootOptions) {
-  let freezeOpts = opts.freeze || {};
+export function prep(app, appState: AppState) {
+  let freezeOpts = appState.freeze || {};
   let freezeStyles = freezeOpts.styles || {};
   let overlayStyles = freezeStyles.overlay || {};
   let spinnerStyles = freezeStyles.spinner || {};
 
   // add the overlay and spinner to the end of the body
-  state.overlay = preboot.dom.addNodeToBody('div', overlayStyles.className, overlayStyles.style);
-  state.spinner = preboot.dom.addNodeToBody('div', spinnerStyles.className, spinnerStyles.style);
+  state.overlay = app.addNodeToBody(appState, 'div', overlayStyles.className, overlayStyles.style);
+  state.spinner = app.addNodeToBody(appState, 'div', spinnerStyles.className, spinnerStyles.style);
 
   // when a freeze event occurs, show the overlay and spinner
-  preboot.dom.on(freezeOpts.eventName, function () {
+  app.on(appState, freezeOpts.eventName, function () {
 
     // if there is an active node, position spinner on top of it and blur the focus
-    let activeNode = preboot.activeNode;
+    let activeNode = appState.activeNode;
     if (activeNode) {
       state.spinner.style.top = activeNode.offsetTop;
       state.spinner.style.left = activeNode.offsetLeft;
@@ -50,6 +51,6 @@ export function prep(preboot: PrebootRef, opts: PrebootOptions) {
     state.spinner.style.display = 'block';
 
     // preboot should end in under 5 seconds, but if it doesn't unfreeze just in case  
-    setTimeout(() => cleanup(preboot), freezeOpts.timeout);
+    setTimeout(() => cleanup(app, appState), freezeOpts.timeout);
   });
 }
