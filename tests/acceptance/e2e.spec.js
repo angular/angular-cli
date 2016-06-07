@@ -41,9 +41,12 @@ describe('Acceptance: ng e2e', function () {
       serveProcess.stdout.on('data', (data) => {
         if (/Build successful/.test(data) && !startedProtractor) {
           startedProtractor = true;
-          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
+          var e2eProcess = child_process.exec(`${ngBin} e2e`);
+          ngE2ePid = e2eProcess.pid;
+
+          e2eProcess.then((error, stdout, stderr) => {
             if (error !== null) {
-              reject(stderr)
+              reject(stderr);
             } else {
               resolve();
             }
@@ -64,12 +67,12 @@ describe('Acceptance: ng e2e', function () {
     return ng(['new', 'test-project'])
       .then(new Promise(executor)
         .then(() => {
-          if (ngServePid) treeKill(ngServePid);
-          if (ngE2ePid) treeKill(ngE2ePid);
+          if (ngServePid) { treeKill(ngServePid); }
+          if (ngE2ePid) { treeKill(ngE2ePid); }
         })
         .catch((msg) => {
           if (ngServePid) treeKill(ngServePid);
-          if (ngE2ePid) treeKill(ngE2ePid);
+          if (ngE2ePid) { treeKill(ngE2ePid); }          
           throw new Error(msg);
         }));
   });
@@ -82,6 +85,7 @@ describe('Acceptance: ng e2e', function () {
 
     function executor(resolve, reject) {
       e2eProcess = child_process.exec(`${ngBin} e2e`);
+      ngE2ePid = e2eProcess.pid;
 
       e2eProcess.stderr.on('data', (data) => {
         reject(data);
