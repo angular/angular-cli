@@ -254,7 +254,7 @@ The `Angular2App`'s options argument has `sassCompiler`, `lessCompiler`, `stylus
 ### Additional Preprocessor integration
 - pug (pug)
 
-To use just run `npm install pug` and rename `.html` files in your project to `.pug`. They will be compiled automatically.
+To use just run `npm install pug` and put your `.pug` files into your project. They will be compiled automatically.
 
 ### 3rd Party Library Installation
 
