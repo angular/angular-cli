@@ -13,7 +13,7 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 
 This project is very much still a work in progress.
 
-We still have a long way before getting out of our alpha stage.
+The CLI is now in beta. 
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
 ## Prerequisites
@@ -102,7 +102,7 @@ ng generate route hero
 
 This will create a folder which will contain the hero component and related test and style files.
 
-The generated route will also be registered with the parent component's `@RouteConfig` decorator. 
+The generated route will also be registered with the parent component's `@RouteConfig` decorator.
 
 By default the route will be designated as a **lazy** route which means that it will be loaded into the browser when needed, not upfront as part of a bundle.
 
@@ -136,10 +136,12 @@ the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
 ng test
 ```
 
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html)
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes.
 
-If run with the watch argument `--watch` (shorthand `-w`) builds will run when source files have changed
-and tests will run after each successful build
+You can run tests a single time via `--watch=false`, and turn off building of the app via `--build=false` (useful for running it at the same time as `ng serve`).
+
+**WARNING:** On Windows, `ng test` is hitting a file descriptor limit (see https://github.com/angular/angular-cli/issues/977).
+The solution for now is to instead run `ng serve` and `ng test --build=false` in separate console windows. 
 
 
 ### Running end-to-end tests

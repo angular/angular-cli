@@ -18,7 +18,7 @@ function fileExpectations(lazy, expectation) {
   expect(existsSync(path.join(testPath, dir, 'my-route.component.ts'))).to.equal(expectation);
 }
 
-describe('Acceptance: ng generate route', function () {
+xdescribe('Acceptance: ng generate route', function () {
   before(conf.setup);
 
   after(conf.restore);
