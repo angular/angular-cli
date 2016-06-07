@@ -152,7 +152,6 @@ describe('Basic end-to-end Workflow', function () {
         if (ngServePid) treeKill(ngServePid);
       })
       .catch((msg) => {
-        console.log(msg);
         if (ngServePid) treeKill(ngServePid);
         throw new Error(msg);
       });
