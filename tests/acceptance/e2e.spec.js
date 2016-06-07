@@ -27,83 +27,83 @@ describe('Acceptance: ng e2e', function () {
     });
   });
 
-  it('ng e2e completes successfully after serving project', function () {
-    this.timeout(240000);
+  // it('ng e2e completes successfully after serving project', function () {
+  //   this.timeout(240000);
 
-    var ngServePid;
-    var ngE2ePid;
+  //   var ngServePid;
+  //   var ngE2ePid;
 
-    function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`);
-      var startedProtractor = false;
-      ngServePid = serveProcess.pid;
+  //   function executor(resolve, reject) {
+  //     var serveProcess = child_process.exec(`${ngBin} serve`);
+  //     var startedProtractor = false;
+  //     ngServePid = serveProcess.pid;
 
-      serveProcess.stdout.on('data', (data) => {
-        if (/Build successful/.test(data) && !startedProtractor) {
-          startedProtractor = true;
-          var e2eProcess = child_process.exec(`${ngBin} e2e`);
-          ngE2ePid = e2eProcess.pid;
+  //     serveProcess.stdout.on('data', (data) => {
+  //       if (/Build successful/.test(data) && !startedProtractor) {
+  //         startedProtractor = true;
+  //         var e2eProcess = child_process.exec(`${ngBin} e2e`);
+  //         ngE2ePid = e2eProcess.pid;
 
-          e2eProcess.then((error, stdout, stderr) => {
-            if (error !== null) {
-              reject(stderr);
-            } else {
-              resolve();
-            }
-          });
-        } else if (/ failed with:/.test(data)) {
-          reject(data);
-        }
-      });
+  //         e2eProcess.then((error, stdout, stderr) => {
+  //           if (error !== null) {
+  //             reject(stderr);
+  //           } else {
+  //             resolve();
+  //           }
+  //         });
+  //       } else if (/ failed with:/.test(data)) {
+  //         reject(data);
+  //       }
+  //     });
 
-      serveProcess.stderr.on('data', (data) => {
-        reject(data);
-      });
-      serveProcess.on('close', (code) => {
-        code === 0 ? resolve() : reject('ng serve command closed with error')
-      });
-    }
+  //     serveProcess.stderr.on('data', (data) => {
+  //       reject(data);
+  //     });
+  //     serveProcess.on('close', (code) => {
+  //       code === 0 ? resolve() : reject('ng serve command closed with error')
+  //     });
+  //   }
 
-    return ng(['new', 'test-project'])
-      .then(new Promise(executor)
-        .then(() => {
-          if (ngServePid) { treeKill(ngServePid); }
-          if (ngE2ePid) { treeKill(ngE2ePid); }
-        })
-        .catch((msg) => {
-          if (ngServePid) treeKill(ngServePid);
-          if (ngE2ePid) { treeKill(ngE2ePid); }          
-          throw new Error(msg);
-        }));
-  });
+  //   return ng(['new', 'test-project'])
+  //     .then(new Promise(executor)
+  //       .then(() => {
+  //         if (ngServePid) treeKill(ngServePid);
+  //         if (ngE2ePid) treeKill(ngE2ePid);
+  //       })
+  //       .catch((msg) => {
+  //         if (ngServePid) treeKill(ngServePid);
+  //         if (ngE2ePid) treeKill(ngE2ePid);        
+  //         throw new Error(msg);
+  //       }));
+  // });
 
-  it('ng e2e fails with exit code', function () {
-    this.timeout(240000);
+  // it('ng e2e fails with exit code', function () {
+  //   this.timeout(240000);
 
-    var ngE2ePid;
-    var e2eProcess;
+  //   var ngE2ePid;
+  //   var e2eProcess;
 
-    function executor(resolve, reject) {
-      e2eProcess = child_process.exec(`${ngBin} e2e`);
-      ngE2ePid = e2eProcess.pid;
+  //   function executor(resolve, reject) {
+  //     e2eProcess = child_process.exec(`${ngBin} e2e`);
+  //     ngE2ePid = e2eProcess.pid;
 
-      e2eProcess.stderr.on('data', (data) => {
-        reject(data);
-      })
+  //     e2eProcess.stderr.on('data', (data) => {
+  //       reject(data);
+  //     })
 
-      e2eProcess.on('close', (code) => {
-        code !== 0 ? resolve() : reject('ng e2e command closed with error')
-      });
+  //     e2eProcess.on('close', (code) => {
+  //       code !== 0 ? resolve() : reject('ng e2e command closed with error')
+  //     });
 
-    }
+  //   }
 
-    return new Promise(executor)
-      .then(() => {
-        if (ngE2ePid) treeKill(ngE2ePid);
-      })
-      .catch((msg) => {
-        if (ngE2ePid) treeKill(ngE2ePid);
-        throw new Error(msg);
-      });
-  });
+  //   return new Promise(executor)
+  //     .then(() => {
+  //       if (ngE2ePid) treeKill(ngE2ePid);
+  //     })
+  //     .catch((msg) => {
+  //       if (ngE2ePid) treeKill(ngE2ePid);
+  //       throw new Error(msg);
+  //     });
+  // });
 });
