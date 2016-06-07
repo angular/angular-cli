@@ -10,8 +10,6 @@ const GenerateCommand = EmberGenerateCommand.extend({
   name: 'generate',
 
   beforeRun: function(rawArgs) {
-    this.ui.writeLine(chalk.green(`The raw arguments are now ${rawArgs}`));
-    this.ui.writeLine(chalk.green(`The current path is ${process.cwd()}`));
     if (!rawArgs.length) {
       return;
     }
