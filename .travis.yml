@@ -10,9 +10,7 @@ matrix:
   exclude:
     - os: osx
       env: NODE_VERSION=5 SCRIPT=lint
-branches:
-  only:
-    - e2e-exit-code  
+      
 script:
   - npm run-script $SCRIPT
 
