@@ -24,7 +24,8 @@
         "properties": {
           "main": "string",
           "tsconfig": "string",
-          "mobile": "boolean"
+          "mobile": "boolean",
+          "material": "boolean"
         },
         "additionalProperties": false
       },
