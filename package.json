@@ -54,7 +54,7 @@
     "symlink-or-copy": "^1.0.3",
     "systemjs-builder": "0.15.17",
     "typescript": "^1.8.10",
-    "typings": "^0.8.1"
+    "typings": "^1.0.4"
   },
   "ember-addon": {
     "paths": [
