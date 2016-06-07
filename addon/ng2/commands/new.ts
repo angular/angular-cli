@@ -31,8 +31,7 @@ const NewCommand = Command.extend({
 
   run: function (commandOptions, rawArgs) {
     const packageName = rawArgs.shift();
-    this.ui.writeLine(chalk.cyan(`The raw arguments are ${rawArgs}`));
-    this.ui.writeLine(chalk.red(`The packageName is ${packageName}`));
+
     if (!packageName) {
       return Promise.reject(new SilentError(
         `The "ng ${this.name}" command requires a name argument to be specified. ` +
