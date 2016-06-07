@@ -1,3 +1,5 @@
+/// <reference path="../../../typings/index.d.ts" />
+
 import * as chalk from 'chalk';
 import * as Command from 'ember-cli/lib/models/command';
 import * as Project from 'ember-cli/lib/models/project';
@@ -29,7 +31,8 @@ const NewCommand = Command.extend({
 
   run: function (commandOptions, rawArgs) {
     const packageName = rawArgs.shift();
-
+    this.ui.writeLine(chalk.cyan(`The raw arguments are ${rawArgs}`));
+    this.ui.writeLine(chalk.red(`The packageName is ${packageName}`));
     if (!packageName) {
       return Promise.reject(new SilentError(
         `The "ng ${this.name}" command requires a name argument to be specified. ` +
