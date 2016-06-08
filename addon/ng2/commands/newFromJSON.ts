@@ -126,7 +126,7 @@ const NewFromJSONCommand = Command.extend({
           commandstring += ' --skip-router-generation';
         }
         if (item.lazy === false) {
-          commandstring += ' --lazy';
+          commandstring += ' --lazy=false';
         }
         if (item.route) {
           commandstring += ` --route=${item.route}`;
