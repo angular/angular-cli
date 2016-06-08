@@ -172,7 +172,10 @@ module.exports = Command.extend({
       let indexHtml = path.join(root, 'index.html');
       return fsReadFile(indexHtml, 'utf8')
         .then((data) => data.replace(/<base href="\/">/g, `<base href="/${projectName}/">`))
-        .then((data) => fsWriteFile(indexHtml, data, 'utf8'));
+        .then((data) => {
+          fsWriteFile(indexHtml, data, 'utf8');
+          fsWriteFile(path.join(root, '404.html'), data, 'utf8');
+        });
     }
 
     function addAndCommit() {
