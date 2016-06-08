@@ -6,7 +6,7 @@ __karma__.loaded = function () {
 };
 
 var distPath = '/base/dist/';
-var appPath = distPath + 'app/';
+var appPaths = ['app']; //Add all valid source code folders here
 
 function isJsFile(path) {
   return path.slice(-3) == '.js';
@@ -17,7 +17,10 @@ function isSpecFile(path) {
 }
 
 function isAppFile(path) {
-  return isJsFile(path) && (path.substr(0, appPath.length) == appPath);
+  return isJsFile(path) && appPaths.some(function(appPath) {
+    var fullAppPath = distPath + appPath + '/';
+    return path.substr(0, fullAppPath.length) == fullAppPath;
+  });
 }
 
 var allSpecFiles = Object.keys(window.__karma__.files)
