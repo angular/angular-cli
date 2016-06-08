@@ -29,13 +29,13 @@ describe('Acceptance ng e2e: ', function () {
     return tmp.teardown('./tmp');
   });
 
-  it('Fails to execute outside of project', function () {
+  it('ng e2e fails outside of angular-cli project', function () {
     this.timeout(100000);
       
     expect(ng(['e2e'])).to.throw;
   });
 
-  it('Fails to execute without running project', function () {
+  it('ng e2e fails without a locally running angular-cli project', function () {
     this.timeout(240000);
 
     var ngE2ePid;
