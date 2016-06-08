@@ -1,2 +1,2 @@
 export * from './environment';
-export * from './<%= htmlComponentName %>.component';
+export * from './app.component';

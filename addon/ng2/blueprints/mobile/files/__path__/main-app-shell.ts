@@ -1,7 +1,7 @@
 import { provide } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
 import { APP_SHELL_BUILD_PROVIDERS } from '@angular/app-shell';
-import { <%= jsComponentName %>AppComponent } from './app/';
+import { AppComponent } from './app/';
 import {
   REQUEST_URL,
   ORIGIN_URL
@@ -10,7 +10,7 @@ import {
 export const options = {
   directives: [
     // The component that will become the main App Shell
-    <%= jsComponentName %>AppComponent
+    AppComponent
   ],
   platformProviders: [
     APP_SHELL_BUILD_PROVIDERS,
