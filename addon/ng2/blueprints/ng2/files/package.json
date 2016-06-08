@@ -32,11 +32,11 @@
     "@angular/service-worker": "^0.2.0",
     "@angular/app-shell": "^0.0.0",
     "angular2-broccoli-prerender": "^0.11.0",
-    "angular2-universal":"^0.100.3",
+    "angular2-universal":"0.101.5",
     "angular2-universal-polyfills": "^0.4.1",
     "preboot": "^2.0.10",<% } %>
     "angular-cli": "^<%= version %>",
-    "codelyzer": "0.0.19",
+    "codelyzer": "0.0.20",
     "ember-cli-inject-live-reload": "^1.4.0",
     "jasmine-core": "^2.4.1",
     "jasmine-spec-reporter": "^2.4.0",
