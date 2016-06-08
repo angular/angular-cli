@@ -16,8 +16,8 @@ module.exports = Task.extend({
           reject();
         } else {
           ui.writeLine(chalk.green('All end-to-end tests pass.'));
+          resolve();
         }
-        resolve();        
       });
     });
   }

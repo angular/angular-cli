@@ -38,32 +38,21 @@ describe('Acceptance ng e2e: ', function () {
   it('ng e2e fails without a locally running angular-cli project', function () {
     this.timeout(240000);
 
-    var ngE2ePid;
-    var e2eProcess;
-
     function executor(resolve, reject) {
       ng(['new', 'test-project', '--skip-npm', '--skip-bower']).then(function () {
         process.chdir(path.join(root, 'test-project'));
       }).then(function () {
-        e2eProcess = child_process.exec(`${ngBin} e2e`);
-        ngE2ePid = e2eProcess.pid;
-
-        e2eProcess.stderr.on('data', (data) => {
-          reject(data);
-        });
-
-        e2eProcess.on('close', (code) => {
-          code !== 0 ? resolve() : reject('ng e2e command closed with error')
-        });
+          ng(['e2e']).then(function(code) {
+            const exitCode = typeof code === 'number' ? code : 0;
+            exitCode !== 0 ? resolve() : reject('ng e2e command closed with error');
+          })
       });
     }
 
     return new Promise(executor)
       .then(() => {
-        if (ngE2ePid) treeKill(ngE2ePid);
       })
       .catch((msg) => {
-        if (ngE2ePid) treeKill(ngE2ePid);
         throw new Error(msg);
       });
   });
