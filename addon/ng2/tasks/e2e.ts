@@ -11,10 +11,12 @@ module.exports = Task.extend({
       exec(`npm run e2e -- ${this.project.ngConfig.e2e.protractor.config}`, (err, stdout, stderr) => {
         ui.writeLine(stdout);
         if (err) {
+          ui.writeLine(err.name);
+          ui.writeLine(err.message);          
           ui.writeLine(stderr);
           ui.writeLine(chalk.red('Some end-to-end tests failed, see above.'));
           const exitCode = typeof err.code === 'number' ? err.code : 1;
-          resolve(exitCode);
+          reject();
         } else {
           ui.writeLine(chalk.green('All end-to-end tests pass.'));
           resolve();
