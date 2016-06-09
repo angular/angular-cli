@@ -46,6 +46,24 @@ matrix:
     - node_js: "6"
       os: osx
       env: NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "4"
+      os: osx
+      env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "5"
+      os: osx
+      env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "6"
+      os: osx
+      env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "4"
+      os: linux
+      env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "5"
+      os: linux
+      env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "6"
+      os: linux
+      env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi

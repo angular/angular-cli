@@ -1,6 +1,6 @@
-import {ng, killAllProcesses} from '../../utils/process';
-import {expectToFail} from '../../utils/utils';
-import {ngServe} from '../../utils/project';
+import { ng, killAllProcesses } from '../../utils/process';
+import { expectToFail, isUniversalTest } from '../../utils/utils';
+import { ngServe } from '../../utils/project';
 
 
 function _runServeAndE2e(...args: string[]) {
@@ -12,10 +12,14 @@ function _runServeAndE2e(...args: string[]) {
     });
 }
 
-export default function() {
+export default function () {
+  /** Serve test disabled for universal */
+  if (isUniversalTest()) {
+    return expectToFail(() => ng('e2e'));
+  }
   // This is supposed to fail without serving first...
   return expectToFail(() => ng('e2e'))
-    // These should work.
+  // These should work.
     .then(() => _runServeAndE2e())
     .then(() => _runServeAndE2e('--prod'))
     .then(() => _runServeAndE2e('--aot'))

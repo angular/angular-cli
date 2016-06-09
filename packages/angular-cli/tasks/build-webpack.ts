@@ -17,21 +17,23 @@ export default <any>Task.extend({
 
     const outputDir = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
     rimraf.sync(path.resolve(project.root, outputDir));
-    const config = new NgCliWebpackConfig(
+
+    const configs = new NgCliWebpackConfig(
       project,
       runTaskOptions.target,
       runTaskOptions.environment,
       outputDir,
       runTaskOptions.baseHref,
       runTaskOptions.aot
-    ).config;
+    ).configs;
 
-    // fail on build error
-    config.bail = true;
+    configs.forEach((cfg: any) => {
+      cfg.bail = true;
+    });
 
-    const webpackCompiler: any = webpack(config);
+    const webpackCompiler: any = webpack(configs);
 
-    const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
+    const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 
     webpackCompiler.apply(new ProgressPlugin({
       profile: true

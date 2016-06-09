@@ -1,13 +1,23 @@
-import {ng} from '../../utils/process';
-import {expectFileToMatch} from '../../utils/fs';
-import {expectGitToBeClean} from '../../utils/git';
-import {expectToFail} from '../../utils/utils';
+import { ng } from '../../utils/process';
+import { expectFileToMatch } from '../../utils/fs';
+import { expectGitToBeClean } from '../../utils/git';
+import { expectToFail, getAppMain, isUniversalTest } from '../../utils/utils';
 
 
-export default function() {
+export default function () {
   // Try a prod build.
   return ng('build', '--env=prod')
-    .then(() => expectFileToMatch('dist/main.bundle.js', 'production: true'))
+    .then(() => expectFileToMatch(`dist/${getAppMain()}.bundle.js`, 'production: true'))
+    .then(() => {
+      if (!isUniversalTest()) {
+        return;
+      }
+
+      return Promise.resolve()
+        .then(() => {
+          expectFileToMatch('dist/server.bundle.js', 'production: true');
+        });
+    })
     .then(() => expectGitToBeClean())
 
     // Build fails on invalid build target
