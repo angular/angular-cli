@@ -102,7 +102,7 @@ ng generate route hero
 
 This will create a folder which will contain the hero component and related test and style files.
 
-The generated route will also be registered with the parent component's `@RouteConfig` decorator.
+The generated route will also be registered with the parent component's `@Routes` decorator.
 
 By default the route will be designated as a **lazy** route which means that it will be loaded into the browser when needed, not upfront as part of a bundle.
 
@@ -111,7 +111,7 @@ This is done in accordance with the [style guide](https://angular.io/styleguide#
 
 The default lazy nature of routes can be turned off via the lazy flag (`--lazy false`)
 
-There is an optional flag for `skip-router-generation` which will not add the route to the parent component's `@RouteConfig` decorator.
+There is an optional flag for `skip-router-generation` which will not add the route to the parent component's `@Routes` decorator.
 
 ### Creating a build
 
