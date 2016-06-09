@@ -44,6 +44,6 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "angular2-universal": "^0.101.4"
+    "angular2-universal": "^0.101.9"
   }
 }
