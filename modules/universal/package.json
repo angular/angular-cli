@@ -50,7 +50,7 @@
     "angular2-universal-polyfills": "file:../polyfills",
     "angular2-express-engine": "file:../express-engine",
     "angular2-hapi-engine": "file:../hapi-engine",
-    "preboot": "file:../preboot",
+    "preboot": "^2.1.2",
     "zone.js": "0.6.12",
     "es6-shim": "^0.35.0",
     "es6-promise": "^3.0.2",
