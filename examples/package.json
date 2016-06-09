@@ -31,7 +31,7 @@
     "gulp-uglify": "^1.5.3",
     "rimraf": "^2.5.2",
     "morgan": "^1.7.0",
-    "preboot": "file:../modules/preboot",
+    "preboot": "^2.1.2",
     "ts-node": "^0.6.1",
     "typings": "^0.8.1",
     "vinyl-buffer": "^1.0.0",
