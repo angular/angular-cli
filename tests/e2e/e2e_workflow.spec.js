@@ -127,21 +127,25 @@ describe('Basic end-to-end Workflow', function () {
       serveProcess.stdout.on('data', (data) => {
         if (/Build successful/.test(data) && !startedProtractor) {
           startedProtractor = true;
-          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
-            console.log('stdout:');
-            console.log(stdout);
-
-            console.log('stderr:');
-            console.log(stderr);
-            
-            console.log('error:');
-            console.log(error);
-            if (error !== null) {
-              reject(stderr)
-            } else {
-              resolve();
-            }
+          ng(['e2e']).then(function(code) {
+            const exitCode = typeof code === 'number' ? code : 1;
+            exitCode === 0 ? resolve() : reject();
           });
+          // child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
+          //   console.log('stdout:');
+          //   console.log(stdout);
+
+          //   console.log('stderr:');
+          //   console.log(stderr);
+            
+          //   console.log('error:');
+          //   console.log(error);
+          //   if (error !== null) {
+          //     reject(stderr)
+          //   } else {
+          //     resolve();
+          //   }
+          // });
         } else if (/ failed with:/.test(data)) {
           reject(data);
         }

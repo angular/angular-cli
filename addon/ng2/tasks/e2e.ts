@@ -16,10 +16,11 @@ module.exports = Task.extend({
           ui.writeLine(stderr);
           ui.writeLine(chalk.red('Some end-to-end tests failed, see above.'));
           const exitCode = typeof err.code === 'number' ? err.code : 1;
+          reject(exitCode);
         } else {
           ui.writeLine(chalk.green('All end-to-end tests pass.'));
+          resolve();
         }
-        resolve();
       });
     });
   }
