@@ -19,9 +19,9 @@ module.exports = {
     { name: 'spec', type: Boolean }
   ],
 
-  beforeInstall: function() {
+  beforeInstall: function () {
     try {
-      this.pathToModule = findParentModule(this.project, this.dynamicPath.dir);
+      this.modulePaths = findParentModule(this.project, this.dynamicPath.dir);
     } catch(e) {
       throw `Error locating module for declaration\n\t${e}`;
     }
@@ -116,7 +116,7 @@ module.exports = {
     };
   },
 
-  afterInstall: function(options) {
+  afterInstall: function (options) {
     if (options.dryRun) {
       return;
     }
@@ -124,14 +124,17 @@ module.exports = {
     const returns = [];
     const className = stringUtils.classify(`${options.entity.name}Component`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.component`);
-    const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
-    const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
-    if (!options['skip-import']) {
-      returns.push(
-        astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
-          .then(change => change.apply(NodeHost)));
-    }
+    this.modulePaths.forEach((pathToModule) => {
+      const componentDir = path.relative(path.dirname(pathToModule), this.generatePath);
+      const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
+
+      if (!options['skip-import']) {
+        returns.push(
+          astUtils.addDeclarationToModule(pathToModule, className, importPath)
+            .then(change => change.apply(NodeHost)));
+      }
+    });
 
     return Promise.all(returns);
   }

@@ -15,10 +15,12 @@ export interface CliConfig {
         assets?: string;
         index?: string;
         main?: string;
+        nodeMain?: string;
         test?: string;
         tsconfig?: string;
         prefix?: string;
         mobile?: boolean;
+        universal?: boolean;
         /**
          * Global styles to be included in the build.
          */

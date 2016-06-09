@@ -11,30 +11,35 @@ import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
+import { UniversalDevServer } from './server/universal-dev-server';
 import * as url from 'url';
 const opn = require('opn');
 
 export default Task.extend({
-  run: function(commandOptions: ServeTaskOptions) {
+  run: function (commandOptions: ServeTaskOptions) {
     const ui = this.ui;
 
     let webpackCompiler: any;
 
-    let config = new NgCliWebpackConfig(
+    let configs = new NgCliWebpackConfig(
       this.project,
       commandOptions.target,
       commandOptions.environment,
       undefined,
       undefined,
       commandOptions.aot
-    ).config;
+    ).configs;
+
+    const appConfig = CliConfig.fromProject().config.apps[0];
 
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
-    config.entry.main.unshift(
-      `webpack-dev-server/client?http://${commandOptions.host}:${commandOptions.port}/`
-    );
-    webpackCompiler = webpack(config);
+    if (appConfig.universal === false) {
+      configs[0].entry['main']
+        .unshift(`webpack-dev-server/client?http://${commandOptions.host}:${commandOptions.port}/`);
+    }
+
+    webpackCompiler = webpack(configs);
 
     webpackCompiler.apply(new ProgressPlugin({
       profile: true,
@@ -55,7 +60,7 @@ export default Task.extend({
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
       contentBase: path.resolve(
         this.project.root,
-        `./${CliConfig.fromProject().config.apps[0].root}`
+        `./${appConfig.root}`
       ),
       historyApiFallback: {
         disableDotRule: true,
@@ -69,16 +74,29 @@ export default Task.extend({
       }
     };
 
-    ui.writeLine(chalk.green(oneLine`
+
+    let server: any;
+    if (appConfig.universal === true) {
+      ui.writeLine(chalk.green(oneLine`
+      **
+      NG Universal Development Server is running on
+      http://${commandOptions.host}:${commandOptions.port}.
+      **
+    `));
+      webpackDevServerConfiguration.filename = appConfig.nodeMain;
+      server = new UniversalDevServer(webpackCompiler, webpackDevServerConfiguration);
+    } else {
+      ui.writeLine(chalk.green(oneLine`
       **
       NG Live Development Server is running on
       http://${commandOptions.host}:${commandOptions.port}.
       **
     `));
+      server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
+    }
 
-    const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
     return new Promise((resolve, reject) => {
-      server.listen(commandOptions.port, `${commandOptions.host}`, function(err: any, stats: any) {
+      server.listen(commandOptions.port, `${commandOptions.host}`, function (err: any, stats: any) {
         if (err) {
           console.error(err.stack || err);
           if (err.details) { console.error(err.details); }

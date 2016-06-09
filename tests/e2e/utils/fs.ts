@@ -138,6 +138,21 @@ export function expectFileToMatch(fileName: string, regEx: RegExp | string) {
     });
 }
 
+export function expectFileToNotMatch(fileName: string, regEx: RegExp | string) {
+  return readFile(fileName)
+    .then(content => {
+      if (typeof regEx == 'string') {
+        if (content.indexOf(regEx) > -1) {
+          throw new Error(`File "${fileName}" did contain "${regEx}"...`);
+        }
+      } else {
+        if (content.match(regEx)) {
+          throw new Error(`File "${fileName}" did match regex ${regEx}...`);
+        }
+      }
+    });
+}
+
 export function expectFileSizeToBeUnder(fileName: string, sizeInBytes: number) {
   return readFile(fileName)
     .then(content => {
