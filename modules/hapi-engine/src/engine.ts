@@ -50,10 +50,10 @@ class Runtime {
 
     // bootstrap and render component to string
     const _options = this.options;
-    const _template = _options.template || template;
+    const _template = template || _options.template;
     const _directives = _options.directives;
     const _providers = _options.providers;
-    if (HAPI_ANGULAR_APP.template !== _template) {
+    if (!HAPI_PLATFORM) {
       disposeHapiPlatform();
 
 
@@ -66,14 +66,19 @@ class Runtime {
         _bootloader = _Bootloader.create(_options);
       }
       HAPI_PLATFORM = _bootloader;
-      HAPI_ANGULAR_APP.template = _template;
     }
+    HAPI_ANGULAR_APP.directives = _template;
     HAPI_ANGULAR_APP.directives = _directives;
     HAPI_ANGULAR_APP.providers = _options.reuseProviders !== true ? _providers : HAPI_ANGULAR_APP.providers;
 
 
     HAPI_PLATFORM.serializeApplication(HAPI_ANGULAR_APP)
-      .then(html => done(null, this.buildClientScripts(html, context)))
+      .then(html => {
+        if (HAPI_PLATFORM.pendingDisposed) {
+          disposeHapiPlatform();
+        }
+        done(null, this.buildClientScripts(html, context));
+      })
       .catch(e => {
         console.error(e.stack);
         disposeHapiPlatform();
