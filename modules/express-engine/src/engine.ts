@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+const fs = require('graceful-fs');
 
 import {selectorRegExpFactory, Bootloader, BootloaderConfig} from 'angular2-universal';
 

@@ -42,6 +42,7 @@
     "rimraf": "^2.5.1"
   },
   "dependencies": {
+    "graceful-fs": "^4.1.4"
   },
   "peerDependencies": {
     "angular2-universal": "^0.101.4"
