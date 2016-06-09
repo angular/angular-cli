@@ -6,7 +6,7 @@ import {exec} from 'child_process';
 module.exports = Task.extend({
   run: function () {
     var ui = this.ui;
-    var exitCode = 0;
+    var exitCode;
 
     return new Promise((resolve, reject) => {
       exec(`npm run e2e -- ${this.project.ngConfig.e2e.protractor.config}`, (err, stdout, stderr) => {
@@ -15,10 +15,11 @@ module.exports = Task.extend({
           ui.writeLine(stderr);
           ui.writeLine(chalk.red('Some end-to-end tests failed, see above.'));
           exitCode = typeof err.code === 'number' ? err.code : 1;
+          reject(exitCode);
         } else {
           ui.writeLine(chalk.green('All end-to-end tests pass.'));
+          resolve(exitCode);
         }
-        resolve(exitCode);
       });
     });
   }

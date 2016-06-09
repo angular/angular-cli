@@ -128,14 +128,6 @@ describe('Basic end-to-end Workflow', function () {
         if (/Build successful/.test(data) && !startedProtractor) {
           startedProtractor = true;
           child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
-            console.log('stdout:');
-            console.log(stdout);
-
-            console.log('stderr:');
-            console.log(stderr);
-            
-            console.log('error:');
-            console.log(error);
             if (error !== null) {
               reject(stderr)
             } else {
@@ -438,15 +430,6 @@ describe('Basic end-to-end Workflow', function () {
         if (/Build successful/.test(data) && !startedProtractor) {
           startedProtractor = true;
           child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
-            console.log('stdout:');
-            console.log(stdout);
-            
-            console.log('stderr:');
-            console.log(stderr);
-            
-            console.log('error:');
-            console.log(error);
-            
             if (error !== null) {
               reject(stderr)
             } else {
