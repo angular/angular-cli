@@ -2,7 +2,6 @@ import * as fs from 'fs';
 import * as TsHoek from './ts-hoek';
 
 import {
-  renderToString,
   selectorRegExpFactory,
   Bootloader,
   BootloaderConfig
@@ -53,6 +52,7 @@ class Runtime {
     const _options = this.options;
     const _template = _options.template || template;
     const _directives = _options.directives;
+    const _providers = _options.providers;
     if (HAPI_ANGULAR_APP.template !== _template) {
       disposeHapiPlatform();
 
@@ -69,7 +69,7 @@ class Runtime {
       HAPI_ANGULAR_APP.template = _template;
     }
     HAPI_ANGULAR_APP.directives = _directives;
-    HAPI_ANGULAR_APP.providers = _options.providers;
+    HAPI_ANGULAR_APP.providers = _options.reuseProviders !== true ? _providers : HAPI_ANGULAR_APP.providers;
 
 
     HAPI_PLATFORM.serializeApplication(HAPI_ANGULAR_APP)
