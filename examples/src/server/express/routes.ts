@@ -87,7 +87,7 @@ module.exports = function(ROOT) {
         buildClientScripts: true,
 
         // directives: [appPage.App],
-        directives: [appPage.App, appPage.MyApp],
+        directives: [ appPage.App, appPage.MyApp ],
         platformProviders: [
           provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
           provide(BASE_URL, {useValue: '/'}),
