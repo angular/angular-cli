@@ -19,7 +19,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ~/.nvm/nvm-exec; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome --force; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
