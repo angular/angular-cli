@@ -40,7 +40,7 @@ export interface BootloaderConfig {
   async?: boolean;
   prime?: boolean;
   beautify?: boolean;
-  asyncTimeout?: number;
+  maxZoneTurns?: number;
   bootloader?: Bootloader | any;
   ngOnInit?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
   ngOnStable?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
@@ -339,11 +339,6 @@ export class Bootloader {
   }
 
   private _deprecated(config: any) {
-    if (config.maxZoneTurns !== undefined) {
-      let text = 'DEPRECATION WARNING: `maxZoneTurns` is no longer supported';
-      console.warn(text + ' and will be removed in next release. Please use `asyncTimeout`');
-      config.asyncTimeout = config.maxZoneTurns;
-    }
     if (config.document !== undefined) {
       let text = 'DEPRECATION WARNING: `document` is no longer supported';
       console.warn(text + ' and will be removed in next release. Please use `template`');
