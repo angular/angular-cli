@@ -10,6 +10,14 @@ export function isMobileTest() {
   return !!process.env['MOBILE_TEST'];
 }
 
+export function isUniversalTest() {
+  return !!process.env['UNIVERSAL'];
+}
+
+export function getAppMain() {
+  return isUniversalTest() ? 'client' : 'main';
+}
+
 export function wait(msecs: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, msecs);

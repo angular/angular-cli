@@ -5,18 +5,18 @@ import {
   moveFile,
   replaceInFile
 } from '../../../utils/fs';
-import {ng} from '../../../utils/process';
-import {stripIndents} from 'common-tags';
-import {isMobileTest} from '../../../utils/utils';
+import { ng } from '../../../utils/process';
+import { stripIndents } from 'common-tags';
+import { isMobileTest, getAppMain } from '../../../utils/utils';
 
 
-export default function() {
+export default function () {
   if (isMobileTest()) {
     return;
   }
 
   return writeMultipleFiles({
-      'src/app/app.component.scss': stripIndents`
+    'src/app/app.component.scss': stripIndents`
         @import "app.component.partial";
         
         .outer {
@@ -25,17 +25,19 @@ export default function() {
           }
         }
       `,
-      'src/app/app.component.partial.scss': stripIndents`
+    'src/app/app.component.partial.scss': stripIndents`
         .partial {
           @extend .outer;
         }
       `
-    })
+  })
     .then(() => deleteFile('src/app/app.component.css'))
     .then(() => replaceInFile('src/app/app.component.ts',
-                              './app.component.css', './app.component.scss'))
+      './app.component.css', './app.component.scss'))
     .then(() => ng('build'))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /\.outer.*\.inner.*background.*#def/))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /\.partial.*\.inner.*background.*#def/))
+    .then(() => expectFileToMatch(`dist/${getAppMain()}.bundle.js`,
+      /\.outer.*\.inner.*background.*#def/))
+    .then(() => expectFileToMatch(`dist/${getAppMain()}.bundle.js`,
+      /\.partial.*\.inner.*background.*#def/))
     .then(() => moveFile('src/app/app.component.scss', 'src/app/app.component.css'));
 }

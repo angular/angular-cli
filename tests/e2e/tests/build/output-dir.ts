@@ -1,14 +1,14 @@
-import {ng} from '../../utils/process';
-import {expectFileToExist} from '../../utils/fs';
-import {expectToFail} from '../../utils/utils';
-import {expectGitToBeClean} from '../../utils/git';
-import {updateJsonFile} from '../../utils/project';
+import { ng } from '../../utils/process';
+import { expectFileToExist } from '../../utils/fs';
+import { expectToFail, getAppMain } from '../../utils/utils';
+import { expectGitToBeClean } from '../../utils/git';
+import { updateJsonFile } from '../../utils/project';
 
 
 export default function() {
   return ng('build', '-o', './build-output')
     .then(() => expectFileToExist('./build-output/index.html'))
-    .then(() => expectFileToExist('./build-output/main.bundle.js'))
+    .then(() => expectFileToExist(`./build-output/${getAppMain()}.bundle.js`))
     .then(() => expectToFail(expectGitToBeClean))
     .then(() => updateJsonFile('angular-cli.json', configJson => {
       const app = configJson['apps'][0];
@@ -16,6 +16,6 @@ export default function() {
     }))
     .then(() => ng('build'))
     .then(() => expectFileToExist('./config-build-output/index.html'))
-    .then(() => expectFileToExist('./config-build-output/main.bundle.js'))
+    .then(() => expectFileToExist(`./config-build-output/${getAppMain()}.bundle.js`))
     .then(() => expectToFail(expectGitToBeClean));
 }

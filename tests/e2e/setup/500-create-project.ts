@@ -1,6 +1,6 @@
 import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
-import {isMobileTest} from '../utils/utils';
+import {isMobileTest, isUniversalTest} from '../utils/utils';
 import {expectFileToExist} from '../utils/fs';
 import {updateTsConfig, updateJsonFile} from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
@@ -20,7 +20,8 @@ export default function(argv: any) {
   } else {
     // Otherwise create a project from scratch.
     createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--skip-npm', isMobileTest() ? '--mobile' : undefined))
+      .then(() => ng('new', 'test-project', '--skip-npm', isMobileTest() ? '--mobile' : undefined,
+        isUniversalTest() ? '--universal' : undefined))
       .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
       .then(() => process.chdir('./test-project'));
   }
