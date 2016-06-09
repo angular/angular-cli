@@ -59,7 +59,9 @@ export class Bootloader {
   private _config: BootloaderConfig = { async: true, preboot: false };
   platformRef: any;
   applicationRef: any;
-  disposed: boolean;
+  disposed = false;
+  pending = false;
+  pendingDisposed = false;
   constructor(config: BootloaderConfig) {
     (<any>Object).assign(this._config, this._deprecated(config) || {});
     this.platformRef = this.platform();
@@ -129,6 +131,8 @@ export class Bootloader {
     if (config === null && providers) {
       config = { providers, directives: this._config.directives, template: this._config.template };
     }
+    let errorType = null;
+    this.pending = true;
 
     return this._applicationAll(config)
       .then((configRefs: ConfigRefs) => {
@@ -140,7 +144,8 @@ export class Bootloader {
         return configRefs;
       })
       .catch(err => {
-        console.log('ngOnInit Error:', err);
+        errorType = errorType || 'ngOnInit Error:';
+        return Promise.reject(err);
       })
       .then((configRefs: ConfigRefs) => {
         if (!this.disposed && 'async' in this._config) {
@@ -154,7 +159,8 @@ export class Bootloader {
         }
       })
       .catch(err => {
-        console.log('Async Error:', err);
+        errorType = errorType || 'Async Error:';
+        return Promise.reject(err);
       })
       .then((configRefs: ConfigRefs) => {
         if (!this.disposed && 'ngOnStable' in this._config) {
@@ -165,7 +171,8 @@ export class Bootloader {
         return configRefs;
       })
       .catch(err => {
-        console.log('ngOnStable Error:', err);
+        errorType = errorType || 'ngOnStable Error:';
+        return Promise.reject(err);
       })
       .then((configRefs: ConfigRefs) => {
         if (!this.disposed && 'preboot' in this._config && this._config.preboot) {
@@ -176,21 +183,25 @@ export class Bootloader {
         }
       })
       .catch(err => {
-        console.log('preboot Error:', err);
+        errorType = errorType || 'preboot Error:';
+        return Promise.reject(err);
       })
       .then((configRefs: ConfigRefs) => {
-        let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
-        let rendered = Bootloader.serializeDocument(document);
-        // dispose;
-        for (let i = 0; i < configRefs.length; i++) {
-          let config = configRefs[i];
-          config.componentRef.destroy();
-          config.applicationRef.dispose();
+        if (!this.disposed && configRefs && configRefs.length) {
+          let document = configRefs[0].applicationRef.injector.get(DOCUMENT);
+          let rendered = Bootloader.serializeDocument(document);
+          // dispose;
+          for (let i = 0; i < configRefs.length; i++) {
+            let config = configRefs[i];
+            config.componentRef.destroy();
+            config.applicationRef.dispose();
+          }
+          return rendered;
         }
-        return rendered;
       })
       .catch(err => {
-        console.log('Rendering Document Error:', err);
+        errorType = errorType || 'Rendering Document Error:';
+        return Promise.reject(err);
       })
       .then((rendered: string) => {
         if (!this.disposed && 'beautify' in this._config) {
@@ -205,10 +216,14 @@ export class Bootloader {
           if (!this._config.ngOnRendered) { return rendered; }
           return Promise.resolve(this._config.ngOnRendered(rendered)).then(() => rendered);
         }
+        this.pending = false;
         return rendered;
       })
       .catch(err => {
-        console.log('ngOnRendered Error:', err);
+        this.pending = false;
+        errorType = errorType || 'ngOnRendered Error:';
+        console.log(errorType, err);
+        throw err;
       });
 
   }
@@ -328,10 +343,16 @@ export class Bootloader {
         DOM.insertAfter(el, prebootEl);
 
         return configRefs;
+      })
+      .catch(err => {
+        console.log('preboot Error: ', err);
+        return configRefs;
       });
   }
 
   dispose(): void {
+    this.pendingDisposed = true;
+    if (this.pending === true) { return; }
     this.platformRef.dispose();
     this._config = null;
     this.platformRef = null;
