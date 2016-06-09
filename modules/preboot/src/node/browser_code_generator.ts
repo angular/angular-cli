@@ -86,7 +86,8 @@ export function getBrowserCode(appName: string, opts?: PrebootOptions, done?: Fu
 
   // check cache first (as long as it wasn't disabled)
   let cacheKey = JSON.stringify(opts);
-  if (!opts.disableCodeCache && browserCodeCache[cacheKey]) {
+  // opts can be undefined
+  if (opts && !opts.disableCodeCache && browserCodeCache[cacheKey]) {
     return Q.when(browserCodeCache[cacheKey]);
   }
 
