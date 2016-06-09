@@ -38,13 +38,19 @@ barrels.forEach((barrelName: string) => {
   cliSystemConfigPackages[barrelName] = { main: 'index' };
 });
 
+<% if(isMaterial) { %>
+cliSystemConfigPackages['@angular2-material/core']
+  = { format: 'cjs', defaultExtenstion: 'js', main: 'core.js' };
+<% } %> 
+
 /** Type declaration for ambient System. */
 declare var System: any;
 
 // Apply the CLI SystemJS configuration.
 System.config({
   map: {
-    '@angular': 'vendor/@angular',
+    '@angular': 'vendor/@angular', <% if(isMaterial) { %>
+    '@angular2-material': 'vendor/@angular2-material', <% } %>
     'rxjs': 'vendor/rxjs',
     'main': 'main.js'
   },
