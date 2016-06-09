@@ -40,7 +40,7 @@ export interface BootloaderConfig {
   async?: boolean;
   prime?: boolean;
   beautify?: boolean;
-  maxZoneTurns?: number;
+  asyncTimeout?: number;
   bootloader?: Bootloader | any;
   ngOnInit?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
   ngOnStable?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
@@ -61,7 +61,7 @@ export class Bootloader {
   applicationRef: any;
   disposed: boolean;
   constructor(config: BootloaderConfig) {
-    (<any>Object).assign(this._config, config || {});
+    (<any>Object).assign(this._config, this._deprecated(config) || {});
     this.platformRef = this.platform();
     // this.applicationRef = this.application();
   }
@@ -82,6 +82,7 @@ export class Bootloader {
   static parseFragment(document: string) { return parseFragment(document); }
   static parseDocument(document: string) { return parseDocument(document); }
   static serializeDocument(document: Object) { return serializeDocument(document); }
+
 
   document(document: string | Object = null): Object {
     var doc = document || this._config.template;
@@ -215,6 +216,9 @@ export class Bootloader {
 
   _bootstrapAll(Components?: Array<any>, componentProviders?: Array<any>): Promise<Array<any>> {
     let components = Components || this._config.directives;
+    if (components.length <= 0) {
+      throw new Error('Error Universal: Please provide a component in the directives: []');
+    }
     let providers = componentProviders || this._config.componentProviders;
     // .then(waitRouter)); // fixed by checkStable()
     let directives = components.map(component => this.application().bootstrap(component));
@@ -226,6 +230,12 @@ export class Bootloader {
     let providers: Array<any> = config.providers || this._config.providers;
     let doc: Object = this.document(config.template || this._config.template);
 
+    if (!Array.isArray(components)) {
+      throw new Error('Error Universal: directives: must be an array with components');
+    }
+    if (components.length <= 0) {
+      throw new Error('Error Universal: Please provide a component in the directives: []');
+    }
     let directives = components.map(component => {
       // var applicationRef = this.application(doc, providers);
       // .then(waitRouter)); // fixed by checkStable()
@@ -326,6 +336,26 @@ export class Bootloader {
     this._config = null;
     this.platformRef = null;
     this.disposed = true;
+  }
+
+  private _deprecated(config: any) {
+    if (config.maxZoneTurns !== undefined) {
+      let text = 'DEPRECATION WARNING: `maxZoneTurns` is no longer supported';
+      console.warn(text + ' and will be removed in next release. Please use `asyncTimeout`');
+      config.asyncTimeout = config.maxZoneTurns;
+    }
+    if (config.document !== undefined) {
+      let text = 'DEPRECATION WARNING: `document` is no longer supported';
+      console.warn(text + ' and will be removed in next release. Please use `template`');
+      config.templtae = config.document;
+    }
+    if (config.App !== undefined) {
+      let text = 'DEPRECATION WARNING: `App` is no longer supported';
+      console.warn(text + ' and will be removed in next release. Please use `directives: [ App ]`');
+      config.directives = [config.App];
+    }
+
+    return config;
   }
 }
 
