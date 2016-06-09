@@ -114,6 +114,25 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
+  it('ng e2e fails with error exit code', function () {
+    this.timeout(240000);
+
+    function executor(resolve, reject) {
+      child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
+        if (error !== null) {
+          resolve(stderr);
+        } else {
+          reject(stdout);
+        }
+      });
+    }
+
+    return new Promise(executor)
+      .catch((msg) => {
+        throw new Error(msg);
+      });
+  });
+
   it('Serve and run e2e tests after initial build', function () {
     this.timeout(240000);
 
