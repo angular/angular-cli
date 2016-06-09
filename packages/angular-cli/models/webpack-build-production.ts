@@ -2,6 +2,7 @@ import * as path from 'path';
 const WebpackMd5Hash = require('webpack-md5-hash');
 const CompressionPlugin = require('compression-webpack-plugin');
 import * as webpack from 'webpack';
+const webpackMerge = require('webpack-merge');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 declare module 'webpack' {
@@ -17,10 +18,28 @@ declare module 'webpack' {
 export const getWebpackProdConfigPartial = function(projectRoot: string, appConfig: any) {
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const styles = appConfig.styles
-               ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
-               : [];
+    ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
+    : [];
   const cssLoaders = ['css-loader?sourcemap&minimize', 'postcss-loader'];
-  return {
+
+  let universalPartial: any = {};
+
+  if (appConfig.universal === true) {
+    universalPartial.module = {
+      rules: [
+        {
+          test: /index\.html$/,
+          loader: 'string-replace',
+          query: {
+            search: '<script src="http://localhost:35729/livereload.js?snipver=1"></script>',
+            replace: ''
+          }
+        }
+      ]
+    };
+  }
+
+  const baseConfig: any = {
     devtool: 'source-map',
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
@@ -31,7 +50,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
     module: {
       rules: [
         // outside of main, load it via extract-text-plugin for production builds
-        {
+        {
           include: styles,
           test: /\.css$/,
           loaders: ExtractTextPlugin.extract(cssLoaders)
@@ -62,11 +81,11 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
         sourceMap: true
       }),
       new CompressionPlugin({
-          asset: '[path].gz[query]',
-          algorithm: 'gzip',
-          test: /\.js$|\.html$/,
-          threshold: 10240,
-          minRatio: 0.8
+        asset: '[path].gz[query]',
+        algorithm: 'gzip',
+        test: /\.js$|\.html$/,
+        threshold: 10240,
+        minRatio: 0.8
       }),
       new webpack.LoaderOptionsPlugin({
         options: {
@@ -77,4 +96,6 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
       })
     ]
   };
+
+  return webpackMerge(baseConfig, universalPartial);
 };

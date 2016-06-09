@@ -18,15 +18,15 @@ export default Task.extend({
     const outputDir = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
     rimraf.sync(path.resolve(project.root, outputDir));
 
-    const config = new NgCliWebpackConfig(
+    const configs = new NgCliWebpackConfig(
       project,
       runTaskOptions.target,
       runTaskOptions.environment,
       outputDir,
       runTaskOptions.baseHref,
       runTaskOptions.aot
-    ).config;
-    const webpackCompiler: any = webpack(config);
+    ).configs;
+    const webpackCompiler: any = webpack(configs);
 
     webpackCompiler.apply(new ProgressPlugin({
       profile: true

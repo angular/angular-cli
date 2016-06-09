@@ -1,8 +1,8 @@
-import {readFile, writeFile} from './fs';
-import {silentExecAndWaitForOutputToMatch} from './process';
+import { readFile, writeFile } from './fs';
+import { silentExecAndWaitForOutputToMatch } from './process';
+
 
 const tsConfigPath = 'src/tsconfig.json';
-
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
   return readFile(filePath)
@@ -14,11 +14,9 @@ export function updateJsonFile(filePath: string, fn: (json: any) => any | void) 
     });
 }
 
-
 export function updateTsConfig(fn: (json: any) => any | void) {
   return updateJsonFile(tsConfigPath, fn);
 }
-
 
 export function ngServe(...args: string[]) {
   return silentExecAndWaitForOutputToMatch('ng',

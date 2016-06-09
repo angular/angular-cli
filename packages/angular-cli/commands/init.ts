@@ -26,6 +26,7 @@ const InitCommand: any = Command.extend({
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'mobile', type: Boolean, default: false },
+    { name: 'universal', type: Boolean, default: false },
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
@@ -103,6 +104,7 @@ const InitCommand: any = Command.extend({
       style: commandOptions.style,
       prefix: commandOptions.prefix,
       mobile: commandOptions.mobile,
+      universal: commandOptions.universal,
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,

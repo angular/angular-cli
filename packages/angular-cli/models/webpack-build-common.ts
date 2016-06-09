@@ -22,10 +22,10 @@ export function getWebpackCommonConfig(
   const scripts = appConfig.scripts
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
+  const entryName: string = path.basename(appMain).replace('.ts', '');
 
-  let entry: { [key: string]: string[] } = {
-    main: [appMain]
-  };
+  let entry: { [key: string]: string[] } = {};
+  entry[entryName] = [appMain];
 
   // Only add styles/scripts if there's actually entries there
   if (appConfig.styles.length > 0) { entry['styles'] = styles; }

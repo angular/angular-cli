@@ -1,11 +1,11 @@
 import * as glob from 'glob';
 
-import {writeMultipleFiles, expectFileToMatch} from '../../../utils/fs';
-import {ng} from '../../../utils/process';
-import {updateJsonFile} from '../../../utils/project';
+import { writeMultipleFiles, expectFileToMatch } from '../../../utils/fs';
+import { ng } from '../../../utils/process';
+import { updateJsonFile } from '../../../utils/project';
 
 
-export default function() {
+export default function () {
   return writeMultipleFiles({
     'src/styles.css': `
       @import './imported-styles.css';
@@ -51,7 +51,7 @@ export default function() {
     .then((styles) =>
       expectFileToMatch(styles, /body\s*\{\s*background-color:\s*blue\s*\}/)
         .then(() => expectFileToMatch(styles, /p\s*\{\s*background-color:\s*red\s*\}/)
-        .then(() => expectFileToMatch(styles, /.outer.*.inner.*background:\s*#[fF]+/))
-        .then(() => expectFileToMatch(styles, /.upper.*.lower.*background.*#def/)))
+          .then(() => expectFileToMatch(styles, /.outer.*.inner.*background:\s*#[fF]+/))
+          .then(() => expectFileToMatch(styles, /.upper.*.lower.*background.*#def/)))
     );
 }

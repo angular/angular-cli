@@ -36,12 +36,19 @@ describe('Acceptance: ng init', function () {
     return tmp.teardown('./tmp');
   });
 
-  function confirmBlueprinted(isMobile, routing) {
+  function confirmBlueprinted(additionalFolders, routing) {
     routing = !!routing;
-    var blueprintPath = path.join(root,  'blueprints', 'ng2', 'files');
-    var mobileBlueprintPath = path.join(root, 'blueprints', 'mobile', 'files');
-    var expected = unique(walkSync(blueprintPath).concat(isMobile ? walkSync(mobileBlueprintPath) : []).sort());
+    var blueprintPath = path.join(root, 'blueprints', 'ng2', 'files');
+    var expected = walkSync(blueprintPath);
     var actual = walkSync('.').sort();
+
+    additionalFolders = additionalFolders || [];
+
+    additionalFolders.forEach((folder) => {
+      expected = expected.concat(walkSync(path.join(root, 'blueprints', folder, 'files')));
+    });
+
+    expected = unique(expected.sort());
 
     forEach(Blueprint.renamedFiles, function (destFile, srcFile) {
       expected[expected.indexOf(srcFile)] = destFile;
@@ -53,9 +60,13 @@ describe('Acceptance: ng init', function () {
       expected[index] = expected[index].replace(/__path__/g, 'src');
     });
 
-    if (isMobile) {
+    if (additionalFolders.indexOf('mobile') > -1) {
       expected = expected.filter(p => p.indexOf('app.component.html') < 0);
       expected = expected.filter(p => p.indexOf('app.component.css') < 0);
+    }
+    if (additionalFolders.indexOf('universal') > -1) {
+      expected = expected.filter(p => p.indexOf('main.ts') < 0);
+      expected = expected.filter(p => p.indexOf('app.module.ts') < 0);
     }
 
     if (!routing) {
@@ -110,6 +121,15 @@ describe('Acceptance: ng init', function () {
 
   it('ng init with mobile flag does throw exception', function () {
     expect(ng(['init', '--mobile'])).to.throw;
+  });
+
+  it('ng init --universal', () => {
+    return ng([
+      'init',
+      '--skip-npm',
+      '--skip-bower',
+      '--universal'
+    ]).then(() => confirmBlueprinted(['universal']));
   });
 
   it('ng init can run in created folder', function () {

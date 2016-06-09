@@ -1,9 +1,9 @@
 {
-  "name": "angular-cli",
-  "version": "1.0.0-beta.19-3",
-  "description": "CLI tool for Angular",
+  "name": "universal-cli",
+  "version": "1.0.0-beta.1",
+  "description": "CLI tool for Angular with Angular Universal support",
   "main": "packages/angular-cli/lib/cli/index.js",
-  "trackingCode": "UA-8594346-19",
+  "trackingCode": "xx-xxxxxxx-xx",
   "bin": {
     "ng": "./bin/ng"
   },
@@ -20,6 +20,7 @@
     "test:cli": "node tests/runner",
     "test:inspect": "node --inspect --debug-brk tests/runner",
     "test:packages": "node scripts/run-packages-spec.js",
+    "test:universal": "UNIVERSAL=true node tests/e2e_runner.js",
     "build-config-interface": "dtsgen packages/angular-cli/lib/config/schema.json --out packages/angular-cli/lib/config/schema.d.ts",
     "eslint": "eslint .",
     "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
@@ -27,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/angular-cli.git"
+    "url": "https://github.com/devCrossNet/angular-cli.git"
   },
   "engines": {
     "node": ">= 4.1.0",
@@ -36,13 +37,14 @@
   "author": "Angular Authors",
   "contributors": [
     "Rody Haddad <npm@rodyhaddad.com> (http://rodyhaddad.com/)",
-    "Igor Minar <igor@angularjs.org>"
+    "Igor Minar <igor@angularjs.org>",
+    "Johannes Werner <johannes.werner86@gmail.com>"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/angular/angular-cli/issues"
+    "url": "https://github.com/devCrossNet/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/angular-cli",
+  "homepage": "https://github.com/devCrossNet/angular-cli",
   "dependencies": {
     "@angular-cli/ast-tools": "^1.0.0",
     "@angular/common": "~2.1.0",
@@ -95,6 +97,7 @@
     "node-sass": "^3.10.1",
     "node-uuid": "^1.4.3",
     "nopt": "^3.0.1",
+    "nodemon": "^1.11.0",
     "npm-run-all": "^3.0.0",
     "offline-plugin": "^3.4.1",
     "opn": "4.0.1",

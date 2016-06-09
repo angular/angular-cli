@@ -1,10 +1,11 @@
-import {npm, ng} from '../../utils/process';
-import {updateJsonFile} from '../../utils/project';
-import {expectFileToMatch} from '../../utils/fs';
-import {oneLineTrim} from 'common-tags';
+import { npm, ng } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
+import { expectFileToMatch } from '../../utils/fs';
+import { oneLineTrim } from 'common-tags';
+import { getAppMain } from '../../utils/utils';
 
 
-export default function() {
+export default function () {
   return Promise.resolve()
     .then(() => npm('install', 'bootstrap@next'))
     .then(() => updateJsonFile('angular-cli.json', configJson => {
@@ -25,6 +26,6 @@ export default function() {
       <script type="text/javascript" src="inline.bundle.js"></script>
       <script type="text/javascript" src="styles.bundle.js"></script>
       <script type="text/javascript" src="scripts.bundle.js"></script>
-      <script type="text/javascript" src="main.bundle.js"></script>
+      <script type="text/javascript" src="${getAppMain()}.bundle.js"></script>
     `));
 }
