@@ -8,7 +8,7 @@ module.exports = Task.extend({
     var ui = this.ui;
     var exitCode = 0;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       exec(`npm run e2e -- ${this.project.ngConfig.e2e.protractor.config}`, (err, stdout, stderr) => {
         ui.writeLine(stdout);
         if (err) {        
