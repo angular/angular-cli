@@ -37,6 +37,9 @@ export function disposeExpressAngularApp() {
   };
 }
 
+// readfile workaround
+export var cache = {};
+
 export function expressEngine(filePath: string, options?: ExpressEngineConfig, done?: Function) {
   // defaults
   options = options || <ExpressEngineConfig>{};
@@ -51,58 +54,75 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
     throw new Error('Please provide an `directives` property with your Angular 2 application');
   }
 
-  // read file on disk
-  try {
-    fs.readFile(filePath, (err, content) => {
+  function readContent(content) {
 
-      if (err) { return done(err); }
 
-      // convert to string
-      const clientHtml: string = content.toString();
+    // convert to string
+    const clientHtml: string = content.toString();
 
-      // TODO: better build scripts abstraction
-      if (options.server === false && options.client === false) {
-        return done(null, clientHtml);
+    // TODO: better build scripts abstraction
+    if (options.server === false && options.client === false) {
+      return done(null, clientHtml);
+    }
+    if (options.server === false && options.client !== false) {
+      return done(null, buildClientScripts(clientHtml, options));
+    }
+
+    // bootstrap and render component to string
+    const _options = options;
+    const _template = clientHtml || _options.template;
+    const _providers = _options.providers;
+    const _directives = _options.directives;
+
+    if (!EXPRESS_PLATFORM) {
+      const _Bootloader = Bootloader;
+      let _bootloader = _options.bootloader;
+      if (_options.bootloader) {
+        _bootloader = _Bootloader.create(_options.bootloader);
+      } else {
+        _bootloader = _Bootloader.create(_options);
       }
-      if (options.server === false && options.client !== false) {
-        return done(null, buildClientScripts(clientHtml, options));
-      }
+      EXPRESS_PLATFORM = _bootloader;
+    }
 
-      // bootstrap and render component to string
-      const _options = options;
-      const _template = _options.template || clientHtml;
-      const _providers = _options.providers;
-      const _directives = _options.directives;
+    EXPRESS_ANGULAR_APP.template = _template;
+    EXPRESS_ANGULAR_APP.directives = _directives;
+    EXPRESS_ANGULAR_APP.providers = _options.reuseProviders !== true ? _providers : EXPRESS_ANGULAR_APP.providers;
 
-      if (EXPRESS_ANGULAR_APP.template !== _template) {
+    return EXPRESS_PLATFORM.serializeApplication(EXPRESS_ANGULAR_APP)
+      .then(html => {
+        if (EXPRESS_PLATFORM.pendingDisposed) {
+          disposeExpressPlatform();
+        }
+        done(null, buildClientScripts(html, options));
+      })
+      .catch(e => {
+
         disposeExpressPlatform();
 
-        const _Bootloader = Bootloader;
-        let _bootloader = _options.bootloader;
-        if (_options.bootloader) {
-          _bootloader = _Bootloader.create(_options.bootloader);
-        } else {
-          _options.template = _options.template || _template;
-          _bootloader = _Bootloader.create(_options);
-        }
-        EXPRESS_PLATFORM = _bootloader;
+        console.error(e.stack);
+        // if server fail then return client html
+        done(null, buildClientScripts(clientHtml, options));
+      });
+  }
+
+  // read file on disk
+  try {
+
+    if (cache[filePath]) {
+      return readContent(cache[filePath]);
+    }
+    fs.readFile(filePath, (err, content) => {
+      if (err) {
+        disposeExpressPlatform();
+        return done(err);
       }
-
-      EXPRESS_ANGULAR_APP.directives = _directives;
-      EXPRESS_ANGULAR_APP.providers = _options.reuseProviders !== true ? _providers : EXPRESS_ANGULAR_APP.providers;
-
-      EXPRESS_PLATFORM.serializeApplication(EXPRESS_ANGULAR_APP)
-        .then(html => done(null, buildClientScripts(html, options)))
-        .catch(e => {
-
-          disposeExpressPlatform();
-
-          console.error(e.stack);
-          // if server fail then return client html
-          done(null, buildClientScripts(clientHtml, options));
-        });
+      cache[filePath] = content;
+      return readContent(content);
     });
+
   } catch (e) {
+    disposeExpressPlatform();
     done(e);
   }
 };
