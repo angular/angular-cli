@@ -130,6 +130,8 @@ current cli environment.
 Environment defaults to `dev`, but you can generate a production build via
 the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
 
+Read more about the [Production Build](#production-build)
+
 ### Running unit tests
 
 ```bash
@@ -143,6 +145,28 @@ You can run tests a single time via `--watch=false`, and turn off building of th
 **WARNING:** On Windows, `ng test` is hitting a file descriptor limit (see https://github.com/angular/angular-cli/issues/977).
 The solution for now is to instead run `ng serve` and `ng test --build=false` in separate console windows. 
 
+
+### Production Build
+
+When using the `-prod` flag for the `ng build` command, you will generate a single distribution file, which includes all your compiled code and the associated vendors.
+
+The Angular CLI uses the [systemjs-builder](https://github.com/systemjs/builder), to generate the bundle file.
+
+By default the bundler will minify your files and fetch the given source maps.
+You are able to overwrite the default `bundler` options, by passing the `bundleOptions` property on the `Angular2App` object.
+
+```js
+module.exports = function(defaults) {
+  return new Angular2App(defaults, {
+    bundleOptions: {
+      minify: false,
+      sourceMaps: false
+    }
+  });
+}
+```
+
+After the production build is ready, the CLI will additionally compress all your files.
 
 ### Running end-to-end tests
 
