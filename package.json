@@ -52,7 +52,7 @@
     "shelljs": "^0.7.0",
     "silent-error": "^1.0.0",
     "symlink-or-copy": "^1.0.3",
-    "systemjs-builder": "0.15.17",
+    "systemjs-builder": "0.15.20",
     "typescript": "^1.8.10",
     "typings": "^0.8.1"
   },
