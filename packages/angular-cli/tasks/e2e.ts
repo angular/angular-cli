@@ -4,12 +4,16 @@ import {exec} from 'child_process';
 
 
 export const E2eTask = Task.extend({
-  run: function () {
+  run: function (options: any) {
     const ui = this.ui;
     let exitCode = 0;
 
+    let protractorConfig = (options.config) ?
+      this.project.ngConfig.config.e2e.protractor[options.config] :
+      this.project.ngConfig.config.e2e.protractor.config;
+
     return new Promise((resolve) => {
-      exec(`npm run e2e -- ${this.project.ngConfig.config.e2e.protractor.config}`,
+      exec(`npm run e2e -- ${protractorConfig}`,
         (err: NodeJS.ErrnoException, stdout: string, stderr: string) => {
           ui.writeLine(stdout);
           if (err) {
