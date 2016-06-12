@@ -226,6 +226,8 @@ export class NodeDomRenderer extends DomRenderer {
       if (booleanAttr) {
         if (propertyName === 'autocomplete') {
           return this._setOnOffAttribute(renderElement, propertyName, propertyValue);
+        } else if (propertyName === 'checked') {
+          return this._setCheckedAttribute(renderElement, propertyName, propertyValue);
         } else {
           return this._setBooleanAttribute(renderElement, propertyName, propertyValue);
         }
@@ -248,6 +250,16 @@ export class NodeDomRenderer extends DomRenderer {
 
     }
     return super.invokeElementMethod(location, methodName, args);
+  }
+  
+  _setCheckedAttribute(renderElement, propertyName, propertyValue) {
+    if (isPresent(propertyValue)) {
+      if (propertyValue === true) {
+        return super.setElementAttribute(renderElement, propertyValue, 'checked');
+      } else if (propertyValue = false) {
+        return super.setElementAttribute(renderElement, propertyValue, '');
+      }
+    }
   }
 
   _setOnOffAttribute(renderElement, propertyName, propertyValue) {
