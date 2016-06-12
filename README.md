@@ -186,6 +186,8 @@ ng github-pages:deploy --user-page --message "Optional commit message"
 This command pushes the app to the `master` branch on the github repo instead
 of pushing to `gh-pages`, since user and organization pages require this.
 
+By design the repository for development and hosting of `gh-pages` are the same.
+You might want to evaluate the [angular-cli-ghpages](https://github.com/Angular2Buch/angular-cli-ghpages) addon if you want to deploy to a completely different github repository. 
 
 ### Linting and formatting code
 
