@@ -229,7 +229,7 @@ We support all major CSS preprocessors:
 - compass (compass-importer + node-sass)
 - stylus (stylus)
 
-To use one just install for example `npm install node-sass` and rename `.css` files in your project to `.scss` or `.sass`. They will be compiled automatically.
+To use one just install for example `npm install node-sass` and rename `.css` files in your project to `.scss` or `.sass`, include in the file `package.json` as `devDependencies` the module `"node-sass": "3.7.0"` and restart `ng serve`. They will be compiled automatically.
 
 The `Angular2App`'s options argument has `sassCompiler`, `lessCompiler`, `stylusCompiler` and `compassCompiler` options that are passed directly to their respective CSS preprocessors.
 
