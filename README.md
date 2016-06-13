@@ -25,9 +25,10 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Installation](#installation)
 * [Usage](#usage)
 * [Generating a New Project](#generating-and-serving-an-angular2-project-via-a-development-server)
-* [Generating Components, Directives, Pipes and Services](#generating-other-scaffolds)
+* [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
+* [Environments](#environments)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
@@ -36,7 +37,9 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Commands autocompletion](#commands-autocompletion)
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
+* [Updating angular-cli](#updating-angular-cli)
 * [Known Issues](#known-issues)
+* [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
 
 ## Installation
 
@@ -66,7 +69,7 @@ You can configure the default HTTP port and the one used by the LiveReload serve
 ng serve --port 4201 --live-reload-port 49153
 ```
 
-### Generating other scaffolds
+### Generating Components, Directives, Pipes and Services
 
 You can use the `ng generate` (or just `ng g`) command to generate Angular components:
 
@@ -90,6 +93,9 @@ Component | `ng g component my-new-component`
 Directive | `ng g directive my-new-directive`
 Pipe      | `ng g pipe my-new-pipe`
 Service   | `ng g service my-new-service`
+Class     | `ng g class my-new-class`
+Interface | `ng g interface my-new-interface`
+Enum      | `ng g enum my-new-enum`
 
 ### Generating a route
 
@@ -129,6 +135,10 @@ current cli environment.
 
 Environment defaults to `dev`, but you can generate a production build via
 the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
+
+You can also add your own env files other than `dev` and `prod` by creating a 
+`src/client/app/environment.{NAME}.ts` and use them by using the `--env=NAME` 
+flag on the build/serve commands. 
 
 ### Running unit tests
 
@@ -236,6 +246,33 @@ The `Angular2App`'s options argument has `sassCompiler`, `lessCompiler`, `stylus
 ### 3rd Party Library Installation
 
 The installation of 3rd party libraries are well described at our [Wiki Page](https://github.com/angular/angular-cli/wiki/3rd-party-libs)
+
+### Updating angular-cli
+
+To update `angular-cli` to a new version, you must update both the global package and your project's local package.
+
+Global package:
+```
+npm uninstall -g angular-cli
+npm cache clean
+npm install -g angular-cli@latest
+```
+
+Local project package:
+```
+rm -rf node_modules dist tmp
+npm install --save-dev angular-cli@latest
+ng init
+```
+
+Running `ng init` will check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
+
+Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng init` finishes.
+
+**The main cause of errors after an update is failing to incorporate these updates into your code**. 
+
+You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
+
 
 ## Known issues
 
