@@ -13,6 +13,7 @@ module.exports = {
   includedCommands: function () {
     return {
       'new': require('./commands/new'),
+      'newfromjson': require('./commands/newFromJSON'),
       'generate': require('./commands/generate'),
       'init': require('./commands/init'),
       'test': require('./commands/test'),

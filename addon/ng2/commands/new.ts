@@ -1,3 +1,5 @@
+/// <reference path="../../../typings/index.d.ts" />
+
 import * as chalk from 'chalk';
 import * as Command from 'ember-cli/lib/models/command';
 import * as Project from 'ember-cli/lib/models/project';

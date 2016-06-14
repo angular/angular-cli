@@ -16,7 +16,7 @@ const GenerateCommand = EmberGenerateCommand.extend({
 
     // map the blueprint name to allow for aliases
     rawArgs[0] = mapBlueprintName(rawArgs[0]);
-
+    this.ui.writeLine(chalk.green(`The blueprint is now ${rawArgs[0]}`));
     if (rawArgs[0] !== '--help' &&
       !fs.existsSync(path.join(__dirname, '..', 'blueprints', rawArgs[0]))) {
       SilentError.debugOrThrow('angular-cli/commands/generate', `Invalid blueprint: ${rawArgs[0]}`);
@@ -38,7 +38,7 @@ const GenerateCommand = EmberGenerateCommand.extend({
       this.ui.writeLine(chalk.cyan('  Available blueprints'));
       this.ui.writeLine(output);
     };
-    
+    this.ui.writeLine(chalk.green(`The raw arguments are now ${arguments}`));
     return EmberGenerateCommand.prototype.beforeRun.apply(this, arguments);
   }
 });
