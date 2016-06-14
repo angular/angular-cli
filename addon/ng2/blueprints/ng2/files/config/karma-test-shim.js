@@ -1,3 +1,5 @@
+// Test shim for Karma, needed to load files via SystemJS
+
 /*global jasmine, __karma__, window*/
 Error.stackTraceLimit = Infinity;
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
