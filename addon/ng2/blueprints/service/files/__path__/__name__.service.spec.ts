@@ -2,8 +2,8 @@
 
 import {
   beforeEach, beforeEachProviders,
-  describe, ddescribe, xdescribe,
-  expect, it, iit, xit,
+  describe, xdescribe,
+  expect, it, xit,
   async, inject
 } from '@angular/core/testing';
 import { <%= classifiedModuleName %>Service } from './<%= dasherizedModuleName %>.service';
