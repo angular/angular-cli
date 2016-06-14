@@ -293,6 +293,7 @@ gulp.task('serve.nodemon', ['watch'], function() {
 // Documentation
 
 var availableModules = [
+  'broccoli-prerender',
   'express-engine',
   'grunt-prerender',
   'gulp-prerender',
