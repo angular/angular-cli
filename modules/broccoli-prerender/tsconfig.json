@@ -14,7 +14,7 @@
     "rootDir": "src"
   },
   "files": [
-    "./typings/main.d.ts",
+    "./typings/index.d.ts",
     "./src/index.ts",
     "./src/child_proc.ts"
   ],

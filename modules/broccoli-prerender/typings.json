@@ -2,8 +2,8 @@
   "name": "angular2-gulp-prerender",
   "version": false,
   "dependencies": {},
-  "ambientDependencies": {
-    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
+  "globalDependencies": {
+    "core-js": "registry:dt/core-js#0.0.0+20160602141332",
     "node": "registry:dt/node#4.0.0+20160319033040"
   }
 }

@@ -14,14 +14,14 @@
     "rootDir": "src"
   },
   "exclude": [
-    "typings/main",
-    "typings/main.d.ts",
-    "typings/browser/amient/jasmine",
-    "typings/main/amient/jasmine",
+    "dist/*",
+    "typings/globals/jasmine",
     "node_modules",
     "preboot",
     "node_modules/preboot/test",
     "node_modules/preboot/src",
+    "node_modules/angular2-universal/*.*",
+    "node_modules/typescript/lib/lib.es6.d.ts",
     "browser/test",
     "node/test",
     "browser.d.ts",

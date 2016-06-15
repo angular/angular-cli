@@ -14,8 +14,6 @@
   	"outDir": "dist"
   },
   "exclude": [
-    "typings/main",
-    "typings/main.d.ts",
     "node_modules/angular2-express-engine",
     "node_modules/angular2-hapi-engine",
     "node_modules/typescript",

@@ -6,6 +6,7 @@ export interface GulpUniversalConfig {
   selector?: string;
   serializedCmp?: string;
   bootloader?: any;
+  document?: any;
 }
 
 export type GulpUniversalOptions = BootloaderConfig & GulpUniversalConfig;

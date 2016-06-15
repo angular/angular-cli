@@ -13,22 +13,31 @@
   "scripts": {
     "clean:all": "rimraf ./modules/*/dist ./modules/*/node_modules ./modules/*/typings */dist */node_modules */typings ./dist ./node_modules ./typings",
     
-    "install:all"  : "npm run install-preboot && npm run install-universal && npm run loop-install && npm run loop-build && typings install && npm run install-examples",
+    "install:all"  : "npm run install-preboot && npm run install-universal && npm run install-broccoli-pre && npm run install-engine && npm run install-grunt-pre && npm run install-gulp-pre && npm run install-hapi-engine && npm run install-polyfills && npm run install-webpack-pre && typings install && npm run install-examples",
+
+    "dev:reload:universal" : "npm run reload:universal && npm run reload:examples",
+    "reload:universal" : "cd ./modules/universal && npm run reload && npm run build",
+    "reload:examples"  : "cd ./examples && npm run reload && npm run build",
 
     "preinstall": "npm run typings",
     "postinstall" : "npm run install:all",
 
-    "loop-install" : "for dir in modules/[a-zA-Z0-9]* ; do printf \"=== Installing %s\\n\" \"$dir\" ; ( cd \"$dir\"; npm install && typings install; ) ;printf \"=== Installation exit code: %s for %s\\n\" $? \"$dir\" ; done",
-    "loop-build"   : "for dir in modules/[a-zA-Z0-9]* ; do printf \"=== Building %s\\n\" \"$dir\" ; ( cd \"$dir\"; npm run build; ) ;printf \"=== Building exit code: %s for %s\\n\" $? \"$dir\" ; done",
-
-    "install-preboot"   : "cd ./modules/preboot && npm install",
-    "install-universal" : "cd ./modules/universal && npm install",
-    "install-examples"  : "cd ./examples && npm run reload && npm run build && typings install",
+    "install-preboot"     : "cd ./modules/preboot && typings install && npm install --ignore-scripts && npm run build",
+    "install-universal"   : "cd ./modules/universal && typings install && npm install --ignore-scripts && npm run build",
+    "install-broccoli-pre": "cd ./modules/broccoli-prerender && typings install && npm install --ignore-scripts && npm run build",
+    "install-engine"      : "cd ./modules/express-engine && typings install && npm install --ignore-scripts && npm run build",
+    "install-grunt-pre"   : "cd ./modules/grunt-prerender && typings install && npm install --ignore-scripts && npm run build",
+    "install-gulp-pre"    : "cd ./modules/gulp-prerender && typings install && npm install --ignore-scripts && npm run build",
+    "install-hapi-engine" : "cd ./modules/hapi-engine && typings install && npm install --ignore-scripts && npm run build",
+    "install-polyfills"   : "cd ./modules/polyfills && typings install && npm install --ignore-scripts && npm run build",
+    "install-webpack-pre" : "cd ./modules/webpack-prerender && typings install && npm install --ignore-scripts && npm run build",
+    "install-examples"    : "cd ./examples && typings install && npm run reload && npm run build",
+    
+    "start": "cd ./examples && npm run start",
     
     "build": "gulp build",
     "serve": "gulp serve",
     "server": "gulp serve",
-    "start": "cd ./examples && npm run start",
     "watch": "gulp watch",
     "debug": "gulp debug",
     "clean": "gulp clean",
@@ -45,7 +54,11 @@
     "update": "npm run remove-local-modules && npm install",
     "restart": "npm run update && gulp build && gulp server",
     "typings": "typings install",
-    "doc": "gulp doc"
+    "doc": "gulp doc",
+
+    "loop-install" : "for dir in modules/[a-zA-Z0-9]* ; do printf \"=== Installing %s\\n\" \"$dir\" ; ( cd \"$dir\"; npm install && typings install; ) ;printf \"=== Installation exit code: %s for %s\\n\" $? \"$dir\" ; done",
+    "loop-build"   : "for dir in modules/[a-zA-Z0-9]* ; do printf \"=== Building %s\\n\" \"$dir\" ; ( cd \"$dir\"; npm run build; ) ;printf \"=== Building exit code: %s for %s\\n\" $? \"$dir\" ; done"
+
   },
   "repository": {
     "type": "git",
@@ -104,7 +117,7 @@
     "ts-node": "^0.6.1",
     "tslint": "^3.2.1",
     "typescript": "^1.8.7",
-    "typings": "^0.7.8",
+    "typings": "^1.0.5",
     "yargs": "^3.14.0"
   },
   "dependencies": {

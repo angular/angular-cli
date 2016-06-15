@@ -1,4 +1,4 @@
-/// <reference path="../typings/main/ambient/node/index.d.ts" />
+
 import 'angular2-universal-polyfills';
 import {Bootloader} from 'angular2-universal';
 import { disposePlatform } from '@angular/core';

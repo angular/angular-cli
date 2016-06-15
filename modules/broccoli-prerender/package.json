@@ -16,7 +16,7 @@
     "remove-modules": "rimraf dist node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-universal",
     "reload": "npm run remove-modules && npm install",
     "prebuild": "rimraf dist",
-    "build": "tsc || true",
+    "build": "tsc && echo tsc-passed || echo tsc-errors",
     "prepublish": "npm run build"
   },
   "repository": {

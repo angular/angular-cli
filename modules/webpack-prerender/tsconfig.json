@@ -13,7 +13,7 @@
   	"outDir": "dist"
   },
   "files": [
-    "./typings/main.d.ts",
+    "./typings/index.d.ts",
     "./src/prerender.ts",
     "./index.ts"
   ],

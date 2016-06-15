@@ -1,4 +1,4 @@
-import * as app from '../../src/browser/app';
+import * as app from '../../src/browser/app_manager';
 import { App, AppState } from '../../src/interfaces/app';
 
 describe('app', function () {

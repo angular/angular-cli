@@ -1,7 +1,7 @@
 import {AppState} from '../../interfaces/app';
 import {ListenStrategy} from '../../interfaces/strategy';
 import {NodeEvent} from '../../interfaces/event';
-import * as app from '../app';
+import * as app from '../app_manager';
 
 // regex for how events defined in Angular 2 templates; for example: 
 //    <div on-click="blah()">

@@ -35,8 +35,6 @@
     "modules/polyfills/typings",
     "modules/preboot",
     "modules/preboot/typings",
-    "typings/main.d.ts",
-    "typings/main",
     "node_modules",
     "dist"
   ],

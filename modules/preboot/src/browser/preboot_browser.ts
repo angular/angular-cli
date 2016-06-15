@@ -10,7 +10,7 @@ import * as eventManager from './event_manager';
 import * as bufferManager from './buffer_manager';
 import * as logManager from './log';
 import * as freezeSpin from './freeze/freeze_with_spinner';
-import *  as app from './app';
+import *  as app from './app_manager';
 import { Element } from '../interfaces/element';
 import { PrebootOptions } from '../interfaces/preboot_options';
 import { PrebootState } from './preboot_state';

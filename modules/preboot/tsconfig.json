@@ -14,8 +14,6 @@
   	"outDir": "dist"
   },
   "exclude": [
-    "typings/browser",
-    "typings/browser.d.ts",
     "node_modules",
     "dist"
   ],

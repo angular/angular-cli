@@ -7,7 +7,7 @@
     "prebuild": "rimraf dist",
     "remove-modules": "rimraf node_modules/angular2-universal node_modules/angular2-universal-polyfills node_modules/preboot node_modules/angular2-universal-preview node_modules/angular2-express-engine node_modules/angular2-hapi-engine node_modules/zone.js",
     "reload": "npm run remove-modules && npm install",
-    "build": "tsc || true",
+    "build": "tsc && echo tsc-passed || echo tsc-errors",
     "server": "node dist/index.js",
     "start": "npm run build && npm run server",
     "debug": "npm run build && node-debug dist/index.js",

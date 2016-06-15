@@ -1,6 +1,6 @@
 import { App, AppState } from '../../interfaces/app';
 import { PrebootOptions } from '../../interfaces/preboot_options';
-import * as app from '../app';
+import * as app from '../app_manager';
 
 // overlay and spinner nodes stored in memory in between prep and cleanup
 export let state = {

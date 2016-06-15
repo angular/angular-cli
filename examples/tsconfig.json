@@ -13,8 +13,6 @@
     "rootDir": "src"
   },
   "exclude": [
-    "typings/main.d.ts",
-    "typings/main",
     "node_modules",
     "dist"
   ]
