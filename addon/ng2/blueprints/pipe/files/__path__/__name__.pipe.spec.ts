@@ -1,16 +1,16 @@
+/* tslint:disable:no-unused-variable */
+
 import {
-  beforeEachProviders,
-  describe,
-  expect,
-  inject,
-  it
+  beforeEach, beforeEachProviders,
+  describe, xdescribe,
+  expect, it, xit,
+  async, inject
 } from '@angular/core/testing';
 import { <%= classifiedModuleName %>Pipe } from './<%= dasherizedModuleName %>.pipe';
 
 describe('Pipe: <%= classifiedModuleName %>', () => {
-  beforeEachProviders(() => [<%= classifiedModuleName%>Pipe]);
-
-  it('should transform the input', inject([<%= classifiedModuleName %>Pipe], (pipe: <%= classifiedModuleName %>Pipe) => {
-      expect(pipe.transform(true)).toBe(null);
-  }));
+  it('create an instance', () => {
+    let pipe = new <%= classifiedModuleName %>Pipe();
+    expect(pipe).toBeTruthy();
+  });
 });

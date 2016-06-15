@@ -1,9 +1,10 @@
+/* tslint:disable:no-unused-variable */
+
 import {
-  beforeEachProviders,
-  it,
-  describe,
-  expect,
-  inject
+  beforeEach, beforeEachProviders,
+  describe, xdescribe,
+  expect, it, xit,
+  async, inject
 } from '@angular/core/testing';
 import { <%= classifiedModuleName %>Service } from './<%= dasherizedModuleName %>.service';
 

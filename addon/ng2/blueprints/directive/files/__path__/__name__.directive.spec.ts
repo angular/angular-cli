@@ -1,29 +1,16 @@
+/* tslint:disable:no-unused-variable */
+
 import {
-  async,
-  beforeEachProviders,
-  describe,
-  ddescribe,
-  expect,
-  iit,
-  it,
-  inject
+  beforeEach, beforeEachProviders,
+  describe, xdescribe,
+  expect, it, xit,
+  async, inject
 } from '@angular/core/testing';
-import { ComponentFixture, TestComponentBuilder } from '@angular/compiler/testing';
-import { provide, Component } from '@angular/core';
 import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.directive';
 
-@Component({
-  selector: 'test-component',
-  template: `<div <%= dasherizedModuleName %>></div>`
-})
-class TestComponent {}
-
 describe('<%= classifiedModuleName %> Directive', () => {
-  beforeEachProviders((): any[] => []);
-
-  it('should ...', async(inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
-    return tcb.createAsync(TestComponent).then((fixture: ComponentFixture<any>) => {
-      fixture.detectChanges();
-    });
-  })));
+  it('should create an instance', () => {
+    let directive = new <%= classifiedModuleName %>();
+    expect(directive).toBeTruthy();
+  });
 });
