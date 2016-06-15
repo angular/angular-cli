@@ -12,7 +12,7 @@ build_opts='--environment --output-path --watch --watcher'
 serve_opts='--port --host --proxy --insecure-proxy --watcher --live-reload --live-reload-host
             --live-reload-port --environment --output-path --ssl --ssl-key --ssl-cert'
 generate_opts='component directive pipe route service'
-test_opts='--watch --browsers --colors --log-level --port --reporters'
+test_opts='--watch --browsers --colors --log-level --port --reporters --output-path'
 
 if type complete &>/dev/null; then
   _ng_completion() {

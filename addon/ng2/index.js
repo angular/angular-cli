@@ -22,6 +22,7 @@ module.exports = {
       'completion': require('./commands/completion'),
       'doc': require('./commands/doc'),
       'github-pages-deploy': require('./commands/github-pages-deploy'),
+      'build': require('./commands/build'),
 
       // Easter eggs.
       'make-this-awesome': require('./commands/easter-egg')('make-this-awesome'),
