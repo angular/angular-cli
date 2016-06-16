@@ -13,7 +13,7 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 
 This project is very much still a work in progress.
 
-The CLI is now in beta. 
+The CLI is now in beta.
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
 ## Prerequisites
@@ -136,9 +136,9 @@ current cli environment.
 Environment defaults to `dev`, but you can generate a production build via
 the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
 
-You can also add your own env files other than `dev` and `prod` by creating a 
-`src/client/app/environment.{NAME}.ts` and use them by using the `--env=NAME` 
-flag on the build/serve commands. 
+You can also add your own env files other than `dev` and `prod` by creating a
+`src/client/app/environment.{NAME}.ts` and use them by using the `--env=NAME`
+flag on the build/serve commands.
 
 ### Running unit tests
 
@@ -151,7 +151,7 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 You can run tests a single time via `--watch=false`, and turn off building of the app via `--build=false` (useful for running it at the same time as `ng serve`).
 
 **WARNING:** On Windows, `ng test` is hitting a file descriptor limit (see https://github.com/angular/angular-cli/issues/977).
-The solution for now is to instead run `ng serve` and `ng test --build=false` in separate console windows. 
+The solution for now is to instead run `ng serve` and `ng test --build=false` in separate console windows.
 
 
 ### Running end-to-end tests
@@ -269,7 +269,7 @@ Running `ng init` will check for changes in all the auto-generated files created
 
 Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng init` finishes.
 
-**The main cause of errors after an update is failing to incorporate these updates into your code**. 
+**The main cause of errors after an update is failing to incorporate these updates into your code**.
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
 
@@ -279,7 +279,6 @@ You can find more details about changes between versions in [CHANGELOG.md](https
 This project is currently a prototype so there are many known issues. Just to mention a few:
 
 - All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
-- On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
 - The initial installation as well as `ng new` take too long because of lots of npm dependencies.
 - Many existing ember addons are not compatible with Angular apps built via angular-cli.
 - When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
