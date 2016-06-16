@@ -17,6 +17,7 @@ var unique = require('lodash/uniq');
 var forEach = require('lodash/forEach');
 var any = require('lodash/some');
 var EOL = require('os').EOL;
+var fs = require('fs');
 
 var defaultIgnoredFiles = Blueprint.ignoredFiles;
 
@@ -108,7 +109,10 @@ describe('Acceptance: ng init', function () {
       'init',
       '--skip-npm',
       '--skip-bower'
-    ]).then(confirmBlueprinted);
+    ]).then(confirmBlueprinted).then(() => {      
+        const indexHtml = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
+        expect(indexHtml).to.include('"outputPath": "dist/"');
+    });
   });
 
   it('ng init --mobile', () => {
@@ -199,5 +203,20 @@ describe('Acceptance: ng init', function () {
         return ng(['init', 'src/**', 'package.json', '--skip-npm', '--skip-bower']);
       })
       .then(confirmBlueprinted);
+  });
+
+  it('ng init --output-path not-dist/', function () {
+    var customOutputPath = 'not-dist/'
+    return ng([
+      'init',
+      '--skip-npm',
+      '--skip-bower',
+      '--output-path',
+      customOutputPath
+    ]).then(confirmBlueprinted)
+      .then(() => {      
+        const settings = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
+        expect(settings).to.include('"outputPath": "'+customOutputPath+'"');
+    });
   });
 });

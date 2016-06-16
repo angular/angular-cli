@@ -25,6 +25,7 @@ const NewCommand = Command.extend({
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'mobile', type: Boolean, default: false }
+    { name: 'output-path', type: String, default: 'dist/', aliases: ['o'] },
   ],
 
   run: function (commandOptions, rawArgs) {

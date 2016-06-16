@@ -6,8 +6,8 @@
 #
 
 ng_opts='new init build serve generate autocomplete e2e lint test version'
-init_opts='--dry-run --verbose --blueprint --skip-npm --skip-bower --name'
-new_opts='--dry-run --verbose --blueprint --skip-npm --skip-bower --skip-git --directory'
+init_opts='--dry-run --verbose --blueprint --skip-npm --skip-bower --name --output-path'
+new_opts='--dry-run --verbose --blueprint --skip-npm --skip-bower --skip-git --directory --output-path'
 build_opts='--environment --output-path --watch --watcher'
 serve_opts='--port --host --proxy --insecure-proxy --watcher --live-reload --live-reload-host
             --live-reload-port --environment --output-path --ssl --ssl-key --ssl-cert'

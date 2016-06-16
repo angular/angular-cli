@@ -51,7 +51,8 @@ module.exports = {
       styleExt: this.styleExt,
       refToTypings: refToTypings,
       isMobile: options.mobile,
-      stylePackage: stylePackage
+      stylePackage: stylePackage,
+      outputPath: options.outputPath
     };
   },
 
