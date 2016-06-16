@@ -88,8 +88,10 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
     EXPRESS_ANGULAR_APP.template = _template;
     EXPRESS_ANGULAR_APP.directives = _directives;
     EXPRESS_ANGULAR_APP.providers = _options.reuseProviders !== true ? _providers : EXPRESS_ANGULAR_APP.providers;
+    // legacy api
+    var __providers = EXPRESS_ANGULAR_APP.providers;
 
-    return EXPRESS_PLATFORM.serializeApplication(EXPRESS_ANGULAR_APP)
+    return EXPRESS_PLATFORM.serializeApplication(EXPRESS_ANGULAR_APP, __providers)
       .then(html => {
         if (EXPRESS_PLATFORM.pendingDisposed) {
           disposeExpressPlatform();
