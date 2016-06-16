@@ -40,7 +40,6 @@ export interface BootloaderConfig {
   async?: boolean;
   prime?: boolean;
   beautify?: boolean;
-  maxZoneTurns?: number;
   bootloader?: Bootloader | any;
   ngOnInit?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
   ngOnStable?: (config?: ConfigRefs, document?: any) => any | Promise<any> | ConfigRefs;
@@ -73,6 +72,9 @@ export class Bootloader {
     return new Bootloader(config);
   }
   static applicationRefToString(applicationRefs) {
+    let text = 'DEPRECATION WARNING: `Bootloader.applicationRefToString` will be removed.';
+    console.warn(text + 'Please use open an issue at https://github.com/angular/universal/issues/new');
+
     let injector = applicationRefs.injector;
     if (Array.isArray(applicationRefs)) {
       injector = applicationRefs[0].injector;
@@ -112,6 +114,10 @@ export class Bootloader {
   }
 
   bootstrap(Component?: any | Array<any>): Promise<any> {
+    let text = 'DEPRECATION WARNING: `Bootloader#bootstrap` will be removed.';
+    console.warn(text + 'Please use open an issue at https://github.com/angular/universal/issues/new');
+
+
     let component = Component || this._config.component;
     if (component) {
       // .then(waitRouter)); // fixed by checkStable()
@@ -122,13 +128,19 @@ export class Bootloader {
   }
 
   serialize(Component?: any | Array<any>): Promise<any> {
+    let text = 'DEPRECATION WARNING: `Bootloader#serialize` will be removed.';
+    console.warn(text + 'Please use open an issue at https://github.com/angular/universal/issues/new');
+
     return this.bootstrap(Component)
       .then(Bootloader.applicationRefToString);
   }
 
   serializeApplication(config?: AppConfig | any, providers?: Array<any>): Promise<any> | any {
     // TODO(gdi2290): remove legacy api
-    if (config === null && providers) {
+    if ((config === null || config === undefined) && providers) {
+      let text = 'DEPRECATION WARNING: `Bootloader#serializeApplication` arguments has changed.';
+      console.warn(text + 'Please use an `AppConfig` object {providers: Array<any>, directives: Array<any>, template: string}');
+
       config = { providers, directives: this._config.directives, template: this._config.template };
     }
     let errorType = null;
@@ -271,26 +283,26 @@ export class Bootloader {
 
 
   _async(configRefs: ConfigRefs): Promise<ConfigRefs>  {
-    let ngDoCheck = this._config.ngDoCheck || null;
-    let maxZoneTurns = Math.max(this._config.maxZoneTurns || 2000, 1);
+    let ngDoCheck = this._config.ngDoCheck || function returnTrue() { return true; };
     function configMap(config: ConfigRef, i: number): Promise<ConfigRef> {
+      let appInjector = config.applicationRef.injector;
+      let cmpInjector = config.componentRef.injector;
       // app injector
-      let ngZone = config.applicationRef.injector.get(NgZone);
+      let ngZone = appInjector.get(NgZone);
       // component injector
-      let http = config.componentRef.injector.get(Http, Http);
-      let jsonp = config.componentRef.injector.get(Jsonp, Jsonp);
+      let http = cmpInjector.get(Http, Http);
+      let jsonp = cmpInjector.get(Jsonp, Jsonp);
 
       let promise: Promise<ConfigRef> = new Promise(resolve => {
 
-        function outsideNg(): void {
+        ngZone.runOutsideAngular(function outsideNg(): void {
           let checkAmount: number = 0;
           let checkCount: number = 0;
           function checkStable(): void {
             // we setTimeout 10 after the first 20 turns
             checkCount++;
-            if (checkCount === maxZoneTurns) {
-              console.warn('\nWARNING: your application is taking longer than ' + maxZoneTurns + ' Zone turns. \n');
-              return resolve(config);
+            if (checkCount === 2000) {
+              console.warn('\nWARNING: your application is taking a long time to render the application\n');
             }
             if (checkCount === 20) { checkAmount = 10; }
 
@@ -299,7 +311,7 @@ export class Bootloader {
               if (ngZone.hasPendingMacrotasks) { return checkStable(); }
               if (http && http._async > 0) { return checkStable(); }
               if (jsonp && jsonp._async > 0) { return checkStable(); }
-              if (ngZone._isStable && typeof ngDoCheck === 'function') {
+              if (ngZone._isStable) {
                 let isStable = ngDoCheck(config, ngZone);
                 if (isStable === true) {
                   // return resolve(config);
@@ -316,8 +328,7 @@ export class Bootloader {
             setTimeout(stable, checkAmount);
           }
           return checkStable();
-        }
-        ngZone.runOutsideAngular(outsideNg);
+        });
       });
 
       return promise;
@@ -369,6 +380,10 @@ export class Bootloader {
       let text = 'DEPRECATION WARNING: `App` is no longer supported';
       console.warn(text + ' and will be removed in next release. Please use `directives: [ App ]`');
       config.directives = [config.App];
+    }
+    if (config.maxZoneTurns !== undefined) {
+      let text = 'DEPRECATION WARNING: `maxZoneTurns` is no longer supported';
+      console.warn(text + ' and is removed.`');
     }
 
     return config;
