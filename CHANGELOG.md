@@ -1,4 +1,4 @@
-## Always follow the [upgrade guide](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md#updating-angular-cli) when upgrading to a new version. The changelog does not list breaking changes that are fixed via the update procedure.
+## Always follow the [upgrade guide](https://github.com/angular/angular-cli#updating-angular-cli) when upgrading to a new version. The changelog does not list breaking changes that are fixed via the update procedure.
 
 <a name="1.0.0-beta.6"></a>
 # 1.0.0-beta.6 (2016-06-13)
