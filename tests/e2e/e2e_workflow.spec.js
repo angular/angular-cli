@@ -286,17 +286,16 @@ describe('Basic end-to-end Workflow', function () {
     this.timeout(10000);
 
     const customOutputPath = 'not-dist/';
-    const distFolder = path.join(process.cwd(), customOutputPath);
 
     var setArgs = [
-      'set', 
+      'set',
       'defaults.outputPath',
       customOutputPath
     ];
 
-    return ng(setArgs).then(() => {      
-        const indexHtml = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
-        expect(indexHtml).to.include('"outputPath": "'+customOutputPath+'"');
+    return ng(setArgs).then(() => {
+      const settings = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
+      expect(settings).to.include('"outputPath": "'+customOutputPath+'"');
     })
     .catch(err => {
       throw new Error(err)
@@ -339,7 +338,7 @@ describe('Basic end-to-end Workflow', function () {
       throw new Error(err)
     })
   });
-  
+
 
   it.skip('Installs sass support successfully', function() {
     this.timeout(420000);

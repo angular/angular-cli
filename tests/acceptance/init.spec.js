@@ -60,7 +60,7 @@ describe('Acceptance: ng init', function () {
       expected[index] = expected[index].replace(/__styleext__/g, 'css');
       expected[index] = expected[index].replace(/__path__/g, 'src');
     });
-    
+
     if (isMobile) {
       expected = expected.filter(p => p.indexOf('tmp.component.html') < 0);
       expected = expected.filter(p => p.indexOf('tmp.component.css') < 0);
@@ -109,9 +109,9 @@ describe('Acceptance: ng init', function () {
       'init',
       '--skip-npm',
       '--skip-bower'
-    ]).then(confirmBlueprinted).then(() => {      
-        const indexHtml = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
-        expect(indexHtml).to.include('"outputPath": "dist/"');
+    ]).then(confirmBlueprinted).then(() => {
+      const settings = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
+      expect(settings).to.include('"outputPath": "dist/"');
     });
   });
 
@@ -214,9 +214,9 @@ describe('Acceptance: ng init', function () {
       '--output-path',
       customOutputPath
     ]).then(confirmBlueprinted)
-      .then(() => {      
+      .then(() => {
         const settings = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
         expect(settings).to.include('"outputPath": "'+customOutputPath+'"');
-    });
+      });
   });
 });

@@ -53,13 +53,9 @@ module.exports = Command.extend({
       type: String,
       default: '',
       description: 'Github username'
-    }, {
-      name: 'output-path',
-      type: String,
-      default: 'dist/',
     }],
 
-  beforeRun: function() {      
+  beforeRun: function() {
     CommandHelper.loadDefaults(this);
   },
 

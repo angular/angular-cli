@@ -17,8 +17,7 @@ module.exports = TestCommand.extend({
     { name: 'log-level', type: String },
     { name: 'port', type: Number },
     { name: 'reporters', type: String },
-    { name: 'build', type: Boolean, default: true },
-    { name: 'output-path', type: String, default: 'dist/', aliases: ['o'] }
+    { name: 'build', type: Boolean, default: true }
   ],
 
   beforeRun: function() {
@@ -27,7 +26,7 @@ module.exports = TestCommand.extend({
 
   run: function (commandOptions) {
     this.project.ngConfig = this.project.ngConfig || config.CliConfig.fromProject();
-      
+
     var buildWatchTask =
       new BuildWatchTask({
         ui: this.ui,
@@ -49,7 +48,7 @@ module.exports = TestCommand.extend({
       environment: 'development',
       outputPath: commandOptions.outputPath
     };
-    
+
     // If not building, mock/suppress build tasks.
     if (!commandOptions.build) {
       buildTask = {
@@ -59,7 +58,7 @@ module.exports = TestCommand.extend({
       };
       buildWatchTask = buildTask;
     }
-    
+
     if (commandOptions.watch) {
       return win.checkWindowsElevation(this.ui)
         .then(
