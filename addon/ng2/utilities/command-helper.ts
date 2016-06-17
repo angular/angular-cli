@@ -1,4 +1,4 @@
-import * as config from '../models/config'
+import * as config from '../models/config';
 
 export function loadDefaults(command) {
     command.project.ngConfig = command.project.ngConfig || config.CliConfig.fromProject();
@@ -9,7 +9,7 @@ export function loadDefaults(command) {
     // some commands use it but its not an available flag
     let outputPathKey = 'outputPath';
     if (!command.settings[outputPathKey]) {
-        command.settings[outputPathKey] = 'dist/';
+        command.settings[outputPathKey] = defaultSettings[outputPathKey] || 'dist/';
     }
 
     let commandOptions = command.availableOptions.map(option => option.key);

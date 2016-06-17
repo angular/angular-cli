@@ -305,40 +305,21 @@ describe('Basic end-to-end Workflow', function () {
   it('`ng test` will build files in outputPath when default is set', function () {
     this.timeout(420000);
 
-    const customOutputPath = 'not-dist/';
-    const tmpFileLocation = path.join(process.cwd(), customOutputPath, 'test.abc');
+    const tmpFileLocation = path.join(process.cwd(), 'not-dist/', 'test.abc');
 
     return ng(testArgs).then(result => {
       const exitCode = typeof result === 'object' ? result.exitCode : result;
       expect(exitCode).to.be.equal(0);
     }).then(() => {
+      console.log('--------------------');
+      console.log('tmpFileLocation',tmpFileLocation);
+      console.log('existsSync(tmpFileLocation)',existsSync(tmpFileLocation));
       expect(existsSync(tmpFileLocation)).to.be.equal(true);
     })
     .catch(err => {
       throw new Error(err)
     })
   });
-
-  it('`ng test` will build files in `other-dist/` when output-path flag is used', function () {
-    this.timeout(420000);
-
-    const customOutputPath = 'other-dist/';
-    const tmpFileLocation = path.join(process.cwd(), customOutputPath, 'test.abc');
-
-    testArgs.push('--output-path');
-    testArgs.push(customOutputPath);
-
-    return ng(testArgs).then(result => {
-      const exitCode = typeof result === 'object' ? result.exitCode : result;
-      expect(exitCode).to.be.equal(0);
-    }).then(() => {
-      expect(existsSync(tmpFileLocation)).to.be.equal(true);
-    })
-    .catch(err => {
-      throw new Error(err)
-    })
-  });
-
 
   it.skip('Installs sass support successfully', function() {
     this.timeout(420000);
