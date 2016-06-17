@@ -311,9 +311,6 @@ describe('Basic end-to-end Workflow', function () {
       const exitCode = typeof result === 'object' ? result.exitCode : result;
       expect(exitCode).to.be.equal(0);
     }).then(() => {
-      console.log('--------------------');
-      console.log('tmpFileLocation',tmpFileLocation);
-      console.log('existsSync(tmpFileLocation)',existsSync(tmpFileLocation));
       expect(existsSync(tmpFileLocation)).to.be.equal(true);
     })
     .catch(err => {
