@@ -1,11 +1,13 @@
-var path = require('path');
+'use strict';
+
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const addBarrelRegistration = require('../../utilities/barrel-management');
+const path = require('path');
 var Blueprint = require('ember-cli/lib/models/blueprint');
-var dynamicPathParser = require('../../utilities/dynamic-path-parser');
-var addBarrelRegistration = require('../../utilities/barrel-management');
 var getFiles = Blueprint.prototype.files;
 
 module.exports = {
-  description: '',
+  description: 'Generates a guard to be used in routing.',
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: true }
@@ -58,7 +60,7 @@ module.exports = {
       return addBarrelRegistration(
         this,
         this.generatePath,
-        options.entity.name + '.service');
+        options.entity.name + '.guard');
     }
   }
 };
