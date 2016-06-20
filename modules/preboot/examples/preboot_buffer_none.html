@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Preboot with No Buffering</title>
+  <style>
+    body {
+      color: #555; font-family: Helvetica;
+    }
+    .wrapper {
+      width:100%; max-width:500px; margin:10px auto; padding:10px;
+    }
+    h1 {
+      font-size:30px; text-align:center;
+    }
+    h2 {
+      font-size:20px;
+    }
+    .frmelem {
+      width: 100%; font-size: 14px; padding: 10px; margin: 10px 0;
+    }
+  </style>
+  <script>
+
+    //prebootInlineHere
+
+  </script>
+</head>
+<body>
+
+<div class="wrapper">
+  <h1>Preboot with No Buffering</h1>
+
+  <app>
+    <h2 style="color:blue;text-align:center">Server View</h2>
+    <input  class="frmelem" type="text" name="myText" autofocus>
+    <input  class="frmelem" type="checkbox" name="myCheckbox" value="foo">
+    <input class="frmelem" type="radio" name="myRadio" value="val1">
+    <input class="frmelem" type="radio" name="myRadio" value="val2">
+    <select class="frmelem">
+      <option></option>
+      <option>op1</option>
+      <option>op2</option>
+    </select>
+    <button class="frmelem">Server Click</button>
+  </app>
+
+  <button id="clientBootBtn" class="frmelem" onclick="runClientBootstrap()">Client Bootstrap</button>
+
+</div>
+<script src="preboot_browser.js"></script>
+<script>
+
+  // get a copy of the server view
+  var appViews = document.querySelectorAll('app');
+  var serverView = appViews[appViews.length - 1];
+  var serverClone = serverView.cloneNode(true);
+
+
+  function runClientBootstrap() {
+    serverView.innerHTML = serverClone.innerHTML;
+
+    var h2 = serverView.querySelector('h2');
+    h2.innerHTML = 'Client View';
+    h2.style.color = 'green';
+
+    var btn = serverView.querySelector('button');
+    btn.innerHTML = 'Client Click';
+    btn.addEventListener('click', function () {
+      alert('client clicked');
+    });
+
+    preboot.complete();
+
+    var clientBootBtn = document.querySelector('#clientBootBtn');
+    clientBootBtn.style.display = 'none';
+  }
+
+  setTimeout(runClientBootstrap, 5000);
+
+
+</script>
+</body>
+</html>
