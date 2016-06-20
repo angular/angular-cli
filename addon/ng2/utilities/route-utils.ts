@@ -21,12 +21,13 @@ export function bootstrapItem(mainFile, imports: {[key: string]: [string, boolea
   // get ExpressionStatements from the top level syntaxList of the sourceFile
   let bootstrapNodes = rootNode.getChildAt(0).getChildren().filter(node => {
     // get bootstrap expressions
-    return node.kind === ts.SyntaxKind.ExpressionStatement &&
-          node.getChildAt(0).getChildAt(0).text.toLowerCase() === 'bootstrap';
+    return node.kind === ts.SyntaxKind.ExpressionStatement && node.getChildAt(0) &&
+          node.getChildAt(0).getChildAt(0) && node.getChildAt(0).getChildAt(0).text
+          &&  node.getChildAt(0).getChildAt(0).text.toLowerCase() === 'bootstrap';
   });
   if (bootstrapNodes.length !== 1) {
     throw new Error(`Did not bootstrap provideRouter in ${mainFile}` +
-                                    ' because of multiple or no bootstrap calls');
+                    ' because of multiple or no traditional bootstrap calls');
   }
   let bootstrapNode = bootstrapNodes[0].getChildAt(0);
   let isBootstraped = findNodes(bootstrapNode, ts.SyntaxKind.SyntaxList) // get bootstrapped items
@@ -519,4 +520,11 @@ function getValueForKey(objectLiteralNode: ts.TypeNode.ObjectLiteralExpression, 
  */
 function getRootNode(file: string) {
   return ts.createSourceFile(file, fs.readFileSync(file).toString(), ts.ScriptTarget.ES6, true);
+}
+
+function printAll(node, d = 0) {
+  let text = node.text ? `-----> ${node.text}` : '';
+  console.log(new Array(d).join('####'), ts.SyntaxKind[node.kind], text);
+  d++;
+  node.getChildren().forEach(_ => printAll(_, d));
 }

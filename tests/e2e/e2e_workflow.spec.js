@@ -257,6 +257,22 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
+  it('creates routes.ts, configures main.ts, and adds routes', function() {
+    return ng(['generate', 'component', 'test-route']).then(function() {
+      return ng(['generate', 'routes', `${path.sep}test-route`]).then(function () {
+        var routesFile = path.join(process.cwd(), 'src', 'routes.ts');
+        var mainFile = path.join(process.cwd(), 'src', 'main.ts');
+        expect(existsSync(routesFile)).to.be.truthy;
+        var mainFileContent = fs.readFileSync(mainFile, 'utf8');
+        var routesFileContent = fs.readFileSync(routesFile, 'utf8');
+
+        expect(mainFileContent).to.contain('import routes from \'./routes\';');
+        expect(routesFileContent).to.contain('import { TestRouteComponent } from \'./app/test-route/test-route.component\';');
+        expect(routesFileContent).to.contain('[\n  { path: \'test-route\', component: TestRouteComponent }\n]');
+      });
+    });
+  });
+
   xit('Perform `ng test` after adding a route', function () {
     this.timeout(420000);
 
