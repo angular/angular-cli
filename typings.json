@@ -1,5 +1,7 @@
 {
-  "dependencies": {},
+  "dependencies": {
+    "es6-promise": "registry:npm/es6-promise#3.0.0+20160211003958"
+  },
   "devDependencies": {
     "chalk": "github:typings/typed-chalk#a7e422c5455e70292e5675a727d43a7b05fc3e58"
   },
