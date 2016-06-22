@@ -17,13 +17,13 @@ export const options = {
     provide(ORIGIN_URL, {
       useValue: ''
     })
-  ],
-  providers: [
     // What URL should Angular be treating the app as if navigating
     provide(APP_BASE_HREF, {useValue: '/'}),
+  ],
+  providers: [
     provide(REQUEST_URL, {useValue: '/'})
   ],
-  async: false,
+  async: true,
   preboot: false
 };
 
