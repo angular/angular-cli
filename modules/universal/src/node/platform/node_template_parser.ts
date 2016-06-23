@@ -2,7 +2,7 @@
 import {Injectable, Inject, OpaqueToken, Optional} from '@angular/core';
 import {__core_private__} from '@angular/core/private_export';
 
-var {MAX_INTERPOLATION_VALUES, SecurityContext} = __core_private__;
+var {Console, MAX_INTERPOLATION_VALUES, SecurityContext} = __core_private__;
 
 import {
   AST,

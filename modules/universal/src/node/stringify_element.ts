@@ -1,5 +1,5 @@
 // dom closure
-import {Parse5DomAdapter} from '@angular/platform-server';
+import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 import {isPresent, listContains} from '../common';

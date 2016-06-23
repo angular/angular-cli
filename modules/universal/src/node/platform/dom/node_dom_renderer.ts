@@ -22,7 +22,7 @@ import {
   listContains
 } from '../../../common';
 
-import {Parse5DomAdapter} from '@angular/platform-server';
+import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
@@ -36,10 +36,10 @@ export class NodeDomRootRenderer_ extends DomRootRenderer {
   }
   renderComponent(componentProto: RenderComponentType): Renderer {
     // TODO(gdi2290): see PR https://github.com/angular/angular/pull/6584
-    var renderer = (<any>this)._registeredComponents.get(componentProto.id);
+    var renderer = (<any>this).registeredComponents.get(componentProto.id);
     if (isBlank(renderer)) {
       renderer = new NodeDomRenderer(this, componentProto);
-      (<any>this)._registeredComponents.set(componentProto.id, renderer);
+      (<any>this).registeredComponents.set(componentProto.id, renderer);
     }
     return renderer;
   }

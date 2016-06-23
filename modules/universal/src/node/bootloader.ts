@@ -17,7 +17,7 @@ import {parseDocument, parseFragment, serializeDocument} from './platform/docume
 import {createPrebootCode} from './ng_preboot';
 import {arrayFlattenTree} from './helper';
 
-import {Parse5DomAdapter} from '@angular/platform-server';
+import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
@@ -267,7 +267,10 @@ export class Bootloader {
       // var applicationRef = this.application(doc, providers);
       // .then(waitRouter)); // fixed by checkStable()
       let appInjector = this.application(doc, providers);
-      let compRef = coreLoadAndBootstrap(appInjector, component);
+
+      buildReflector();
+
+      let compRef = coreLoadAndBootstrap(component, appInjector);
       // let compRef = Promise.resolve(applicationRef.bootstrap(component));
       return compRef.then(componentRef => {
         let configRef: ConfigRef = {

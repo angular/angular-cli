@@ -1,5 +1,5 @@
 // dom closure
-import {Parse5DomAdapter} from '@angular/platform-server';
+import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
 Parse5DomAdapter.makeCurrent();
 
 export {provide, Inject, Optional, enableProdMode} from '@angular/core';
