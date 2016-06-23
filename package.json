@@ -10,6 +10,7 @@
   "keywords": [],
   "scripts": {
     "test": "node tests/runner",
+    "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
     "lint": "eslint ."
   },
   "repository": {

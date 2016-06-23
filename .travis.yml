@@ -6,6 +6,7 @@ env:
   matrix:
     - NODE_VERSION=5 SCRIPT=lint
     - NODE_VERSION=5 SCRIPT=test
+    - NODE_VERSION=5 TARGET=mobile SCRIPT=mobile_test
 os:
   - linux
   - osx
@@ -13,6 +14,8 @@ matrix:
   exclude:
     - os: osx
       env: NODE_VERSION=5 SCRIPT=lint
+    - os: osx
+      env: NODE_VERSION=5 TARGET=mobile SCRIPT=mobile_test
 
 script:
   - npm run-script $SCRIPT
@@ -26,6 +29,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
+  - if [[ "$TARGET" == "mobile" ]]; then export MOBILE_TEST=true; fi
   - nvm install $NODE_VERSION
   - npm config set spin false
   - npm config set progress false

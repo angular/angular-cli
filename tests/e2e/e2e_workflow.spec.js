@@ -11,6 +11,7 @@ var treeKill = require('tree-kill');
 var child_process = require('child_process');
 var ng = require('../helpers/ng');
 var root = path.join(process.cwd(), 'tmp');
+var repoPkgJson = require('../../package.json');
 
 function existsSync(path) {
   try {
@@ -22,6 +23,8 @@ function existsSync(path) {
 }
 
 const ngBin = `node ${path.join(process.cwd(), 'bin', 'ng')}`;
+const it_mobile = isMobileTest() ? it : function() {};
+const it_not_mobile = isMobileTest() ? function() {} : it;
 
 describe('Basic end-to-end Workflow', function () {
   before(conf.setup);
@@ -36,20 +39,35 @@ describe('Basic end-to-end Workflow', function () {
     testArgs.push('Chrome_travis_ci');
   }
 
+
+  // We don't want to use npm link because then npm dependencies
+  // that only exist in the project will not be accessible to CLI
+  // This is particularly problematic for --mobile, which uses Universal
+  // libs as part of the build process.
+  // Instead, we'll pack CLI as a tarball
   it('Installs angular-cli correctly', function () {
     this.timeout(300000);
 
-    sh.exec('npm link', { silent: true });
+    sh.exec('npm pack', { silent: true });
+    expect(existsSync(path.join(process.cwd(), `angular-cli-${repoPkgJson.version}.tgz`)));
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
-      expect(existsSync(path.join(process.cwd(), 'bin', 'ng')));
     });
   });
 
+
   it('Can create new project using `ng new test-project`', function () {
     this.timeout(4200000);
-
-    return ng(['new', 'test-project', '--link-cli=true']).then(function () {
+    let args = ['--skip-npm'];
+    // If testing in the mobile matrix on Travis, create project with mobile flag
+    if (isMobileTest()) {
+      args = args.concat(['--mobile']);
+    }
+    return ng(['new', 'test-project'].concat(args)).then(function () {
+      // Install Angular CLI from packed version
+      let tarball = path.resolve(root, `../angular-cli-${repoPkgJson.version}.tgz`);
+      sh.exec(`npm install && npm install ${tarball}`);
+      sh.exec(`rm ${tarball}`);
       expect(existsSync(path.join(root, 'test-project')));
     });
   });
@@ -66,12 +84,30 @@ describe('Basic end-to-end Workflow', function () {
     // stuck to the first build done
     sh.exec(`${ngBin} build -prod`);
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.js');
-    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
-    // production: true minimized turns into production:!0
-    expect(mainBundleContent).to.include('production:!0');
+    if (!isMobileTest()) {
+      var mainBundlePath = path.join(process.cwd(), 'dist', 'main.js');
+      var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+      // production: true minimized turns into production:!0
+      expect(mainBundleContent).to.include('production:!0');
+    }
+
     // Also does not create new things in GIT.
     expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
+  });
+
+  it_mobile('Enables mobile-specific production features', () => {
+    let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+    // Service Worker
+    expect(index.includes('if (\'serviceWorker\' in navigator) {')).to.be.equal(true);
+    expect(existsSync(path.join(process.cwd(), 'dist/worker.js'))).to.be.equal(true);
+
+    // Asynchronous bundle
+    expect(index.includes('<script src="/app-concat.js" async=""></script>')).to.be.equal(true);
+    expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(true);
+
+    // App Manifest
+    expect(index.includes('<link rel="manifest" href="/manifest.webapp">')).to.be.equal(true);
+    expect(existsSync(path.join(process.cwd(), 'dist/manifest.webapp'))).to.be.equal(true);
   });
 
   it('Can run `ng build` in created project', function () {
@@ -93,6 +129,17 @@ describe('Basic end-to-end Workflow', function () {
         // Also does not create new things in GIT.
         expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
       });
+  });
+
+  it_mobile('Does not include mobile prod features', () => {
+    let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+    // Service Worker
+    expect(index.includes('if (\'serviceWorker\' in navigator) {')).to.be.equal(false);
+    expect(existsSync(path.join(process.cwd(), 'dist/worker.js'))).to.be.equal(false);
+
+    // Asynchronous bundle
+    expect(index.includes('<script src="/app-concat.js" async></script>')).to.be.equal(false);
+    expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(false);
   });
 
   it('lints', () => {
@@ -393,7 +440,9 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function () {
+  // This test causes complications with path resolution in TS broccoli plugin,
+  // and isn't mobile specific
+  it_not_mobile('Turn on `noImplicitAny` in tsconfig.json and rebuild', function () {
     this.timeout(420000);
 
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
@@ -410,7 +459,7 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
-  it('Turn on path mapping in tsconfig.json and rebuild', function () {
+  it_not_mobile('Turn on path mapping in tsconfig.json and rebuild', function () {
     this.timeout(420000);
 
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
@@ -485,3 +534,7 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 });
+
+function isMobileTest() {
+  return !!process.env['MOBILE_TEST'];
+}
