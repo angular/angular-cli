@@ -62,8 +62,8 @@
     "parse5": "^1.5.0"
   },
   "dependencies": {
-    "angular2-express-engine": "^0.14.0",
-    "angular2-hapi-engine": "^0.14.0",
+    "angular2-express-engine": "^0.14.2",
+    "angular2-hapi-engine": "^0.14.2",
     "angular2-universal-polyfills": "^0.4.1",
     "css": "^2.2.1",
     "js-beautify": "^1.6.2",
@@ -73,8 +73,8 @@
   "peerDependencies": {
     "preboot": ">=2.0.10",
     "angular2-universal-polyfills": "^0.4.1",
-    "angular2-express-engine": "^0.14.0",
-    "angular2-hapi-engine": "^0.14.0",
+    "angular2-express-engine": "^0.14.2",
+    "angular2-hapi-engine": "^0.14.2",
     "rxjs": "~5.0.0-beta.6",
     "zone.js": "^0.6.12",
     "css": "^2.2.1",
