@@ -29,7 +29,8 @@ test/coverage
 .lock-wscript
 
 # Server
-/dist/
+/dist/src/
+/dist/test/
 
 # Static files
 

@@ -1,19 +1,9 @@
 {
   "globalDependencies": {
     "jasmine" : "registry:dt/jasmine#2.2.0+20160412134438",
-    "browserify": "github:DefinitelyTyped/DefinitelyTyped/browserify/browserify.d.ts#abc2bcfb8524b1e027e6298d3348012b5b06eda5",
-    "event-stream": "github:DefinitelyTyped/DefinitelyTyped/event-stream/event-stream.d.ts#14ba891ee5f5bf86d76c0dee99cbafc892febaf8",
-    "gulp-rename": "registry:dt/gulp-rename#0.0.0+20160316155526",
-    "gulp-uglify": "github:DefinitelyTyped/DefinitelyTyped/gulp-uglify/gulp-uglify.d.ts#ba956a3e6e8ebb82d33548209f793234efac44a2",
-    "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash-3.10.d.ts#86dbea8fc37d9473fee465da4f0a21bea4f8cbd9",
-    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#48c1e3c1d6baefa4f1a126f188c27c4fefd36bff",
-    "q": "github:DefinitelyTyped/DefinitelyTyped/q/Q.d.ts#4de74cb527395c13ba20b438c3a7a419ad931f1c",
-    "source-map": "github:DefinitelyTyped/DefinitelyTyped/source-map/source-map.d.ts#1c572762b93d4b059d89339867edf54946176361",
-    "uglify-js": "github:DefinitelyTyped/DefinitelyTyped/uglify-js/uglify-js.d.ts#51b587292f2ba85d68939d9c59cf7fa745a6173e",
-    "vinyl-buffer": "github:DefinitelyTyped/DefinitelyTyped/vinyl-buffer/vinyl-buffer.d.ts#1a4b2f0ff98d7b1071474c4ab16f2626d9a62d31",
-    "vinyl-source-stream": "github:DefinitelyTyped/DefinitelyTyped/vinyl-source-stream/vinyl-source-stream.d.ts#6be3aa6317135b9255b000924af9d7cebe3737bf"
+    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#48c1e3c1d6baefa4f1a126f188c27c4fefd36bff"
   },
   "dependencies": {
-    "gulp-insert": "github:gdi2290/typed-gulp-insert#b3868ce895053b2f6e387f1168e2f4f00ab0c208"
+
   }
 }

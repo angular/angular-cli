@@ -15,7 +15,7 @@ import {
 import {DOCUMENT} from '@angular/platform-browser';
 import {DomRenderer, DomRootRenderer, DomRootRenderer_} from '@angular/platform-browser/src/dom/dom_renderer';
 
-import {AnimationBuilder} from '@angular/platform-browser/src/animate/animation_builder';
+import {WebAnimationsDriver} from '@angular/platform-browser/src/dom/web_animations_driver';
 import {EventManager} from '@angular/platform-browser/src/dom/events/event_manager';
 import {DomSharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
 import {ViewEncapsulation} from '@angular/core';
@@ -31,7 +31,7 @@ var DOM: any = getDOM();
 @Injectable()
 export class NodeDomRootRenderer_ extends DomRootRenderer {
   constructor(@Inject(DOCUMENT) _document: any, _eventManager: EventManager,
-              sharedStylesHost: DomSharedStylesHost, animate: AnimationBuilder) {
+              sharedStylesHost: DomSharedStylesHost, animate: WebAnimationsDriver) {
     super(_document, _eventManager, sharedStylesHost, animate);
   }
   renderComponent(componentProto: RenderComponentType): Renderer {

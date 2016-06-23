@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Preboot with Manual Buffering</title>
+  <style>
+    body {
+      color: #555; font-family: Helvetica;
+    }
+    .wrapper {
+      width:100%; max-width:500px; margin:10px auto; padding:10px;
+    }
+    h1 {
+      font-size:30px; text-align:center;
+    }
+    h2 {
+      font-size:20px;
+    }
+    .frmelem {
+      width: 100%; font-size: 14px; padding: 10px; margin: 10px 0;
+    }
+    .second {
+      padding: 10px; text-align: center; color: white;
+    }
+  </style>
+  <script>
+
+    //prebootInlineHere
+
+  </script>
+</head>
+<body>
+
+<div class="wrapper">
+  <h1>Preboot with Manual Buffering</h1>
+
+  <app class="viewMainClient" style="display:none">
+    <h2 style="color:blue;text-align:center">Client View</h2>
+    <input  class="frmelem" type="text" name="myText" autofocus>
+    <input  class="frmelem" type="checkbox" name="myCheckbox" value="foo">
+    <input class="frmelem" type="radio" name="myRadio" value="val1">
+    <input class="frmelem" type="radio" name="myRadio" value="val2">
+    <select class="frmelem">
+      <option></option>
+      <option>op1</option>
+      <option>op2</option>
+    </select>
+    <button class="frmelem" onclick="alert('client clicked')">Client Click</button>
+  </app>
+
+  <app class="viewMainServer">
+    <h2 style="color:blue;text-align:center">Server View</h2>
+    <input  class="frmelem" type="text" name="myText" autofocus>
+    <input  class="frmelem" type="checkbox" name="myCheckbox" value="foo">
+    <input class="frmelem" type="radio" name="myRadio" value="val1">
+    <input class="frmelem" type="radio" name="myRadio" value="val2">
+    <select class="frmelem">
+      <option></option>
+      <option>op1</option>
+      <option>op2</option>
+    </select>
+    <button class="frmelem">Server Click</button>
+  </app>
+
+  <app id="viewSideClient" style="display:none">
+    <div class="second" style="background-color:green">2nd app - client</div>
+  </app>
+
+  <app id="viewSideServer">
+    <div class="second" style="background-color:blue">2nd app - server</div>
+  </app>
+
+  <button id="clientBootBtn" class="frmelem" onclick="runPrebootComplete()">Preboot Complete</button>
+
+</div>
+<script src="preboot_browser.js"></script>
+<script>
+
+  function runPrebootComplete() {
+    preboot.complete();
+
+    var clientBootBtn = document.querySelector('#clientBootBtn');
+    clientBootBtn.style.display = 'none';
+  }
+
+  setTimeout(runPrebootComplete, 5000);
+
+</script>
+</body>
+</html>
