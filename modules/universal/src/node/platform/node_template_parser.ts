@@ -2,15 +2,8 @@
 import {Injectable, Inject, OpaqueToken, Optional} from '@angular/core';
 import {__core_private__} from '@angular/core/private_export';
 
-var {MAX_INTERPOLATION_VALUES, Console, SecurityContext} = __core_private__;
+var {MAX_INTERPOLATION_VALUES, SecurityContext} = __core_private__;
 
-import {
-  ListWrapper,
-  StringMapWrapper,
-  SetWrapper,
-} from '@angular/core/src/facade/collection';
-import {RegExpWrapper, isPresent, StringWrapper, isBlank, isArray} from '@angular/core/src/facade/lang';
-import {BaseException} from '@angular/core/src/facade/exceptions';
 import {
   AST,
   Interpolation,
@@ -24,7 +17,7 @@ import {
   CompileDirectiveMetadata,
   CompilePipeMetadata,
   CompileMetadataWithType,
-} from '@angular/compiler/src/compile_metadata';
+} from '@angular/compiler';
 import {HtmlParser} from '@angular/compiler/src/html_parser';
 import {splitNsName, mergeNsAndName} from '@angular/compiler/src/html_tags';
 import {ParseSourceSpan, ParseError, ParseLocation, ParseErrorLevel} from '@angular/compiler/src/parse_util';
@@ -71,6 +64,13 @@ import {splitAtColon} from '@angular/compiler/src/util';
 import {identifierToken, Identifiers} from '@angular/compiler/src/identifiers';
 
 import {ProviderElementContext, ProviderViewContext} from '@angular/compiler/src/provider_parser';
+
+import {
+  isBlank,
+  isPresent,
+  stringMapForEach,
+  regExFirstMatch
+} from '../../common';
 
 // Group 1 = "bind-"
 // Group 2 = "var-"
@@ -127,7 +127,7 @@ export class NodeTemplateParser {
     }
     if (errors.length > 0) {
       var errorString = errors.join('\n');
-      throw new BaseException(`Template parse errors:\n${errorString}`);
+      throw new Error(`Template parse errors:\n${errorString}`);
     }
     return result.templateAst;
   }
@@ -173,8 +173,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
               directives: CompileDirectiveMetadata[], pipes: CompilePipeMetadata[],
               private _exprParser: Parser, private _schemaRegistry: ElementSchemaRegistry) {
     this.selectorMatcher = new SelectorMatcher();
-    ListWrapper.forEachWithIndex(directives,
-                                 (directive: CompileDirectiveMetadata, index: number) => {
+    directives.forEach((directive: CompileDirectiveMetadata, index: number) => {
                                    var selector = CssSelector.parse(directive.selector);
                                    this.selectorMatcher.addSelectables(selector, directive);
                                    this.directivesIndex.set(directive, index);
@@ -195,7 +194,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
       this._checkPipes(ast, sourceSpan);
       if (isPresent(ast) &&
           (<Interpolation>ast.ast).expressions.length > MAX_INTERPOLATION_VALUES) {
-        throw new BaseException(
+        throw new Error(
             `Only support at most ${MAX_INTERPOLATION_VALUES} interpolation values!`);
       }
       return ast;
@@ -441,7 +440,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
                      targetRefs: ElementOrDirectiveRef[], targetVars: VariableAst[]): boolean {
     var attrName = this._normalizeAttributeName(attr.name);
     var attrValue = attr.value;
-    var bindParts = RegExpWrapper.firstMatch(BIND_NAME_REGEXP, attrName);
+    var bindParts = regExFirstMatch(BIND_NAME_REGEXP, attrName);
     var hasBinding = false;
     if (isPresent(bindParts)) {
       hasBinding = true;
@@ -582,7 +581,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
     // Need to sort the directives so that we get consistent results throughout,
     // as selectorMatcher uses Maps inside.
     // Also dedupe directives as they might match more than one time!
-    var directives = ListWrapper.createFixedSize(this.directivesIndex.size);
+    var directives = new Array(this.directivesIndex.size);
     selectorMatcher.match(elementCssSelector, (selector, directive) => {
       directives[this.directivesIndex.get(directive)] = directive;
     });
@@ -621,7 +620,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
     });
     elementOrDirectiveRefs.forEach((elOrDirRef) => {
       if (elOrDirRef.value.length > 0) {
-        if (!SetWrapper.has(matchedReferences, elOrDirRef.name)) {
+        if (!matchedReferences.has(elOrDirRef.name)) {
           this._reportError(`There is no directive with "exportAs" set to "${elOrDirRef.value}"`,
                             elOrDirRef.sourceSpan);
         };
@@ -640,7 +639,8 @@ class TemplateParseVisitor implements HtmlAstVisitor {
                                            sourceSpan: ParseSourceSpan,
                                            targetPropertyAsts: BoundElementPropertyAst[]) {
     if (isPresent(hostProps)) {
-      StringMapWrapper.forEach(hostProps, (expression: string, propName: string) => {
+      Object.keys(hostProps)
+      stringMapForEach(hostProps, (expression: string, propName: string) => {
         var exprAst = this._parseBinding(expression, sourceSpan);
         targetPropertyAsts.push(
             this._createElementPropertyAst(elementName, propName, exprAst, sourceSpan));
@@ -652,7 +652,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
                                         sourceSpan: ParseSourceSpan,
                                         targetEventAsts: BoundEventAst[]) {
     if (isPresent(hostListeners)) {
-      StringMapWrapper.forEach(hostListeners, (expression: string, propName: string) => {
+      stringMapForEach(hostListeners, (expression: string, propName: string) => {
         this._parseEvent(propName, expression, sourceSpan, [], targetEventAsts);
       });
     }
@@ -671,7 +671,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
         }
       });
 
-      StringMapWrapper.forEach(directiveProperties, (elProp: string, dirProp: string) => {
+      stringMapForEach(directiveProperties, (elProp: string, dirProp: string) => {
         var boundProp = boundPropsByName.get(elProp);
 
         // Bindings are optional, so this binding only needs to be set up if an expression is given.
@@ -795,11 +795,11 @@ class TemplateParseVisitor implements HtmlAstVisitor {
                                                 events: BoundEventAst[]) {
     var allDirectiveEvents = new Set<string>();
     directives.forEach(directive => {
-      StringMapWrapper.forEach(directive.directive.outputs,
+      stringMapForEach(directive.directive.outputs,
                                (eventName: string, _) => { allDirectiveEvents.add(eventName); });
     });
     events.forEach(event => {
-      if (isPresent(event.target) || !SetWrapper.has(allDirectiveEvents, event.name)) {
+      if (isPresent(event.target) || !allDirectiveEvents.has(event.name)) {
         this._reportError(
             `Event binding ${event.fullName} not emitted by any directive on an embedded template`,
             event.sourceSpan);
@@ -849,7 +849,7 @@ class ElementOrDirectiveRef {
 }
 
 export function splitClasses(classAttrValue: string): string[] {
-  return StringWrapper.split(classAttrValue.trim(), /\s+/g);
+  return classAttrValue.trim().split(/\s+/g);
 }
 
 class ElementContext {
@@ -862,7 +862,7 @@ class ElementContext {
       var ngContentSelectors = component.directive.template.ngContentSelectors;
       for (var i = 0; i < ngContentSelectors.length; i++) {
         var selector = ngContentSelectors[i];
-        if (StringWrapper.equals(selector, '*')) {
+        if (selector === '*') {
           wildcardNgContentIndex = i;
         } else {
           matcher.addSelectables(CssSelector.parse(ngContentSelectors[i]), i);
@@ -879,7 +879,7 @@ class ElementContext {
     var ngContentIndices = [];
     this._ngContentIndexMatcher.match(
         selector, (selector, ngContentIndex) => { ngContentIndices.push(ngContentIndex); });
-    ListWrapper.sort(ngContentIndices);
+    ngContentIndices.sort()
     if (isPresent(this._wildcardNgContentIndex)) {
       ngContentIndices.push(this._wildcardNgContentIndex);
     }

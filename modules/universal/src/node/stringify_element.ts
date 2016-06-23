@@ -1,11 +1,8 @@
 // dom closure
-
-import {ListWrapper, MapWrapper} from '@angular/core/src/facade/collection';
-import {isPresent, isString, StringWrapper} from '@angular/core/src/facade/lang';
-
 import {Parse5DomAdapter} from '@angular/platform-server';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
+import {isPresent, listContains} from '../common';
 var DOM: any = getDOM();
 
 var _singleTagWhitelist = ['br', 'hr', 'input'];
@@ -23,7 +20,7 @@ export function stringifyElement(el): string {
     for (let i = 0; i < keys.length; i++) {
       var key = keys[i];
       var attValue = attributeMap.get(key);
-      if (!isString(attValue)) {
+      if (!(typeof attValue === 'string')) {
         result += ` ${key}`;
       } else {
         result += ` ${key}="${attValue}"`;
@@ -36,7 +33,7 @@ export function stringifyElement(el): string {
       result += stringifyElement(children[j]);
     }
     // Closing tag
-    if (!ListWrapper.contains(_singleTagWhitelist, tagName)) {
+    if (!listContains(_singleTagWhitelist, tagName)) {
       result += `</${tagName}>`;
     }
   } else if (DOM.isCommentNode(el)) {

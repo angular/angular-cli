@@ -7,10 +7,6 @@ import {
   ConnectionBackend,
   XHRBackend
 } from '@angular/http';
-import {
-  isPresent,
-  isBlank
-} from '@angular/core/src/facade/lang';
 
 import {
   provide,
@@ -23,6 +19,10 @@ import {
 
 import {Observable} from 'rxjs/Observable';
 
+import {
+  isPresent,
+  isBlank
+} from '../common';
 
 @Injectable()
 export class NgPreloadCacheHttp extends Http {

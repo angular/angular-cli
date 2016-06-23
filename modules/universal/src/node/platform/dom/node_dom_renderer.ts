@@ -1,10 +1,4 @@
 import {
-  isPresent,
-  isBlank,
-  stringify
-} from '@angular/core/src/facade/lang';
-import {ListWrapper} from '@angular/core/src/facade/collection';
-import {
   provide,
   Inject,
   Injectable,
@@ -21,6 +15,12 @@ import {DomSharedStylesHost} from '@angular/platform-browser/src/dom/shared_styl
 import {ViewEncapsulation} from '@angular/core';
 
 import {cssHyphenate} from '../../helper';
+
+import {
+  isPresent,
+  isBlank,
+  listContains
+} from '../../../common';
 
 import {Parse5DomAdapter} from '@angular/platform-server';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
@@ -222,7 +222,7 @@ export class NodeDomRenderer extends DomRenderer {
     let el = DOM.nodeName(renderElement);
     let attrList = ATTRIBUTES[el];
     if (attrList) {
-      let booleanAttr = ListWrapper.contains(attrList, propertyName);
+      let booleanAttr = listContains(attrList, propertyName);
       if (booleanAttr) {
         if (propertyName === 'autocomplete') {
           return this._setOnOffAttribute(renderElement, propertyName, propertyValue);
@@ -251,7 +251,7 @@ export class NodeDomRenderer extends DomRenderer {
     }
     return super.invokeElementMethod(location, methodName, args);
   }
-  
+
   _setCheckedAttribute(renderElement, propertyName, propertyValue) {
     if (isPresent(propertyValue)) {
       if (propertyValue === true) {

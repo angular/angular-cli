@@ -20,14 +20,13 @@ import {
   createPrebootCode
 } from './ng_preboot';
 
-import {isBlank, isPresent} from '@angular/core/src/facade/lang';
-
 import {SharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
 
 import {NgZone, ComponentRef, Provider, Type} from '@angular/core';
 import {Http} from '@angular/http';
 import {Router} from '@angular/router-deprecated';
 
+import {isBlank, isPresent} from '../common';
 
 
 export function waitRouter(appRef: ComponentRef<any>): Promise<ComponentRef<any>> {

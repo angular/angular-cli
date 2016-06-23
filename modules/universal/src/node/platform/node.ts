@@ -1,6 +1,3 @@
-// Facade
-import {Type, isPresent} from '@angular/core/src/facade/lang';
-
 // Compiler
 import {COMPILER_PROVIDERS, XHR} from '@angular/compiler';
 
@@ -28,7 +25,8 @@ import {
   ExceptionHandler,
   Renderer,
   NgZone,
-  OpaqueToken
+  OpaqueToken,
+  Type
 } from '@angular/core';
 
 // Common
@@ -61,8 +59,9 @@ import {NODE_PLATFORM_DIRECTIVES} from '../directives';
 
 var CONST_EXPR = v => v;
 import {Parse5DomAdapter} from '@angular/platform-server';
-Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
+import {isPresent} from '../../common';
+Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 var DOM: any = getDOM();
 var isRc0 = require('@angular/core/package.json').version.indexOf('-rc.0') !== -1;
 
