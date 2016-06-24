@@ -5,6 +5,7 @@ var {Router} = require('express');
 var appPage = require('../../universal/test_page/app');
 var todoApp = require('../../universal/todo/app');
 var routerApp = require('../../universal/test_router/app');
+var newRouterApp = require('../../universal/test_new_router/app');
 var htmlApp = require('../../universal/html/html');
 var jsonpApp = require('../../universal/test_jsonp/app');
 var templateUrlApp = require('../../universal/template_url/app');
@@ -12,11 +13,13 @@ var templateUrlApp = require('../../universal/template_url/app');
 import {enableProdMode, provide} from '@angular/core';
 import {Http} from '@angular/http';
 import {LocationStrategy, HashLocationStrategy} from '@angular/common';
+import {provideRouter} from '@angular/router';
 
 enableProdMode();
 
 import {
   NODE_ROUTER_PROVIDERS,
+  NODE_LOCATION_PROVIDERS,
   NODE_HTTP_PROVIDERS,
   NODE_JSONP_PROVIDERS,
   NODE_PLATFORM_PIPES,
@@ -44,6 +47,11 @@ const PACKAGES = {
     defaultExtension: 'js'
   },
   '@angular/router-deprecated': {
+    format: 'cjs',
+    main: 'index',
+    defaultExtension: 'js'
+  },
+  '@angular/router': {
     format: 'cjs',
     main: 'index',
     defaultExtension: 'js'
@@ -359,6 +367,53 @@ module.exports = function(ROOT) {
     .get('/examples/router', ngRouter)
     .get('/examples/router/home', ngRouter)
     .get('/examples/router/about', ngRouter);
+
+
+      function ngNewRouter(req, res) {
+        let baseUrl = '/examples/new_router';
+        let url = req.originalUrl.replace(baseUrl, '') || '/';
+        let queryParams: any = queryParamsToBoolean(req.query);
+
+        let options: BootloaderConfig = Object.assign(queryParams , {
+          // client url for systemjs
+          buildClientScripts: true,
+          systemjs: {
+            componentUrl: 'examples/src/universal/test_router/browser',
+            map: {
+              'angular2-universal': 'node_modules/angular2-universal',
+              '@angular': 'node_modules/@angular'
+            },
+            packages: PACKAGES
+          },
+          // ensure that we test only server routes
+          client: false,
+
+          directives: [newRouterApp.App],
+          platformProviders: [
+            provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
+            provide(BASE_URL, {useValue: '/examples/new_router'})
+          ],
+          providers: [
+            NODE_HTTP_PROVIDERS,
+            provide(REQUEST_URL, {useValue: url}),
+            provideRouter(newRouterApp.routes),
+            NODE_LOCATION_PROVIDERS
+          ],
+          data: {},
+
+          preboot: false // queryParams.preboot === false ? null : {debug: true, uglify: false}
+
+        });
+
+        res.render('src/universal/test_new_router/index', options);
+
+      }
+
+      router
+        .get('/examples/new_router', ngNewRouter)
+        .get('/examples/new_router/index', ngNewRouter)
+        .get('/examples/new_router/home', ngNewRouter)
+        .get('/examples/new_router/about', ngNewRouter);
 
 
   // needed for sourcemaps

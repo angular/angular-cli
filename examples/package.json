@@ -46,6 +46,7 @@
     "@angular/platform-browser-dynamic": "2.0.0-rc.3",
     "@angular/platform-server": "2.0.0-rc.3",
     "@angular/router-deprecated": "2.0.0-rc.2",
+    "@angular/router": "3.0.0-alpha.7",
     "express": "^4.13.3",
     "rxjs": "5.0.0-beta.6",
     "systemjs": "^0.19.18",
