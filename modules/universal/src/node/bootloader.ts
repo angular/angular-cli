@@ -377,7 +377,7 @@ export class Bootloader {
     if (config.document !== undefined) {
       let text = 'DEPRECATION WARNING: `document` is no longer supported';
       console.warn(text + ' and will be removed in next release. Please use `template`');
-      config.templtae = config.document;
+      config.template = config['document'];
     }
     if (config.App !== undefined) {
       let text = 'DEPRECATION WARNING: `App` is no longer supported';
