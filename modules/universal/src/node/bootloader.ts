@@ -314,7 +314,7 @@ export class Bootloader {
               if (ngZone.hasPendingMacrotasks) { return checkStable(); }
               if (http && http._async > 0) { return checkStable(); }
               if (jsonp && jsonp._async > 0) { return checkStable(); }
-              if (ngZone._isStable) {
+              if (ngZone.isStable) {
                 let isStable = ngDoCheck(config, ngZone);
                 if (isStable === true) {
                   // return resolve(config);
@@ -324,7 +324,7 @@ export class Bootloader {
                   return checkStable();
                 }
               }
-              if (ngZone._isStable) { return resolve(config); }
+              if (ngZone.isStable) { return resolve(config); }
               return checkStable();
             }
 
