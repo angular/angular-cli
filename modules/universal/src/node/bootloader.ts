@@ -139,7 +139,7 @@ export class Bootloader {
     // TODO(gdi2290): remove legacy api
     if ((config === null || config === undefined) && providers) {
       let text = 'DEPRECATION WARNING: `Bootloader#serializeApplication` arguments has changed.';
-      console.warn(text + 'Please use an `AppConfig` object {providers: Array<any>, directives: Array<any>, template: string}');
+      console.warn(text + 'Please use an `AppConfig` interface {providers: Array<any>, directives: Array<any>, template?: string}');
 
       config = { providers, directives: this._config.directives, template: this._config.template };
     }
@@ -373,18 +373,18 @@ export class Bootloader {
     this.disposed = true;
   }
 
-  private _deprecated(config: any) {
-    if (config.document !== undefined) {
+  private _deprecated(config: BootloaderConfig) {
+    if (config['document'] !== undefined) {
       let text = 'DEPRECATION WARNING: `document` is no longer supported';
       console.warn(text + ' and will be removed in next release. Please use `template`');
       config.template = config['document'];
     }
-    if (config.App !== undefined) {
+    if (config['App'] !== undefined) {
       let text = 'DEPRECATION WARNING: `App` is no longer supported';
       console.warn(text + ' and will be removed in next release. Please use `directives: [ App ]`');
-      config.directives = [config.App];
+      config.directives = [config['App']];
     }
-    if (config.maxZoneTurns !== undefined) {
+    if (config['maxZoneTurns'] !== undefined) {
       let text = 'DEPRECATION WARNING: `maxZoneTurns` is no longer supported';
       console.warn(text + ' and is removed.`');
     }
