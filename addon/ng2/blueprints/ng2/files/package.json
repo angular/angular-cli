@@ -47,6 +47,6 @@
     "ts-node": "0.5.5",
     "tslint": "3.11.0",
     "typescript": "1.8.10",
-    "typings": "0.8.1"<%= stylePackage %>
+    "typings": "1.3.0"<%= stylePackage %>
   }
 }
