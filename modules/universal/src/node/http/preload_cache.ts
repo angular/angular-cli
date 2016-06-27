@@ -31,15 +31,12 @@ import {
 } from '@angular/http';
 import {MockBackend} from '@angular/http/testing';
 
-
-import {isPresent, isBlank} from '@angular/core/src/facade/lang';
-
 // CJS
 import {XMLHttpRequest} from 'xhr2';
 // import XMLHttpRequest = require('xhr2');
 
 
-import {ORIGIN_URL, BASE_URL, PRIME_CACHE} from '../../common';
+import {ORIGIN_URL, BASE_URL, PRIME_CACHE, isPresent, isBlank} from '../../common';
 
 const CONST_EXPR = v => v;
 

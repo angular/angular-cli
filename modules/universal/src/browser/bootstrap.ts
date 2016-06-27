@@ -1,7 +1,5 @@
-import {Type} from '@angular/core/src/facade/lang';
-import {Provider} from '@angular/core';
+import { ComponentRef, Type, Provider } from '@angular/core';
 import {bootstrap as bootstrapClient} from '@angular/platform-browser-dynamic';
-import {ComponentRef} from '@angular/core/src/linker/component_factory';
 
 var prebootCompleted = false;
 

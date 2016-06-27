@@ -17,7 +17,7 @@ import {parseDocument, parseFragment, serializeDocument} from './platform/docume
 import {createPrebootCode} from './ng_preboot';
 import {arrayFlattenTree} from './helper';
 
-import {Parse5DomAdapter} from '@angular/platform-server';
+import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
@@ -139,7 +139,7 @@ export class Bootloader {
     // TODO(gdi2290): remove legacy api
     if ((config === null || config === undefined) && providers) {
       let text = 'DEPRECATION WARNING: `Bootloader#serializeApplication` arguments has changed.';
-      console.warn(text + 'Please use an `AppConfig` object {providers: Array<any>, directives: Array<any>, template: string}');
+      console.warn(text + 'Please use an `AppConfig` interface {providers: Array<any>, directives: Array<any>, template?: string}');
 
       config = { providers, directives: this._config.directives, template: this._config.template };
     }
@@ -267,7 +267,10 @@ export class Bootloader {
       // var applicationRef = this.application(doc, providers);
       // .then(waitRouter)); // fixed by checkStable()
       let appInjector = this.application(doc, providers);
-      let compRef = coreLoadAndBootstrap(appInjector, component);
+
+      buildReflector();
+
+      let compRef = coreLoadAndBootstrap(component, appInjector);
       // let compRef = Promise.resolve(applicationRef.bootstrap(component));
       return compRef.then(componentRef => {
         let configRef: ConfigRef = {
@@ -311,7 +314,7 @@ export class Bootloader {
               if (ngZone.hasPendingMacrotasks) { return checkStable(); }
               if (http && http._async > 0) { return checkStable(); }
               if (jsonp && jsonp._async > 0) { return checkStable(); }
-              if (ngZone._isStable) {
+              if (ngZone.isStable) {
                 let isStable = ngDoCheck(config, ngZone);
                 if (isStable === true) {
                   // return resolve(config);
@@ -321,7 +324,7 @@ export class Bootloader {
                   return checkStable();
                 }
               }
-              if (ngZone._isStable) { return resolve(config); }
+              if (ngZone.isStable) { return resolve(config); }
               return checkStable();
             }
 
@@ -370,18 +373,18 @@ export class Bootloader {
     this.disposed = true;
   }
 
-  private _deprecated(config: any) {
-    if (config.document !== undefined) {
+  private _deprecated(config: BootloaderConfig) {
+    if (config['document'] !== undefined) {
       let text = 'DEPRECATION WARNING: `document` is no longer supported';
       console.warn(text + ' and will be removed in next release. Please use `template`');
-      config.templtae = config.document;
+      config.template = config['document'];
     }
-    if (config.App !== undefined) {
+    if (config['App'] !== undefined) {
       let text = 'DEPRECATION WARNING: `App` is no longer supported';
       console.warn(text + ' and will be removed in next release. Please use `directives: [ App ]`');
-      config.directives = [config.App];
+      config.directives = [config['App']];
     }
-    if (config.maxZoneTurns !== undefined) {
+    if (config['maxZoneTurns'] !== undefined) {
       let text = 'DEPRECATION WARNING: `maxZoneTurns` is no longer supported';
       console.warn(text + ' and is removed.`');
     }

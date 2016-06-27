@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 
 import {Renderer} from '@angular/core';
-import {isPresent} from '@angular/core/src/facade/lang';
+import {isPresent} from '../../common';
 
 const CONST_EXPR = v => v;
 export const APP_LOCATION: OpaqueToken = CONST_EXPR(new OpaqueToken('appLocation'));

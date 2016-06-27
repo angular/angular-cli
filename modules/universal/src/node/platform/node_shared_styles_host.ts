@@ -1,9 +1,7 @@
 import {Inject, Injectable} from '@angular/core';
-import {SetWrapper} from '@angular/core/src/facade/collection';
-import {DOCUMENT} from '@angular/platform-browser/src/dom/dom_tokens';
 import {SharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
 
-import {Parse5DomAdapter} from '@angular/platform-server';
+import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
 Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
@@ -26,7 +24,7 @@ export class NodeSharedStylesHost extends SharedStylesHost {
     this._hostNodes.add(hostNode);
   }
   removeHost(hostNode: Node) {
-    SetWrapper.delete(this._hostNodes, hostNode);
+    this._hostNodes.delete(hostNode);
   }
 
   onStylesAdded(additions: string[]) {

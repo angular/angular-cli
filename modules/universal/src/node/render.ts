@@ -20,34 +20,35 @@ import {
   createPrebootCode
 } from './ng_preboot';
 
-import {isBlank, isPresent} from '@angular/core/src/facade/lang';
-
 import {SharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
 
 import {NgZone, ComponentRef, Provider, Type} from '@angular/core';
 import {Http} from '@angular/http';
-import {Router} from '@angular/router-deprecated';
+// import {Router} from '@angular/router-deprecated';
+
+import {isBlank, isPresent} from '../common';
 
 
-
-export function waitRouter(appRef: ComponentRef<any>): Promise<ComponentRef<any>> {
-  let injector = appRef.injector;
-  let router = injector.get(Router, Router);
-
-  return Promise.resolve(router && router._currentNavigation)
-    .then(() => new Promise(resolve => setTimeout(() => resolve(appRef))));
-}
+// export function waitRouter(appRef: ComponentRef<any>): Promise<ComponentRef<any>> {
+//   let injector = appRef.injector;
+//   let router = injector.get(Router, Router);
+//
+//   return Promise.resolve(router && router._currentNavigation)
+//     .then(() => new Promise(resolve => setTimeout(() => resolve(appRef))));
+// }
 
 export function renderDocument(
     documentHtml: string,
     componentType: Type,
     nodeProviders?: any): Promise<string> {
 
+  console.warn('DEPRECATION WARNING: `renderDocument` is no longer supported and will be removed in next release.');
+
   return bootstrap(componentType, [
     ...nodeProviders,
     new Provider(DOCUMENT, { useValue: parseDocument(documentHtml) })
   ])
-  .then(waitRouter)
+  // .then(waitRouter)
   .then((appRef: ComponentRef<any>) => {
     let injector = appRef.injector;
     let document = injector.get(DOCUMENT);
@@ -62,12 +63,15 @@ export function renderDocumentWithPreboot(
   nodeProviders?: any,
   prebootConfig: any = {}): Promise<string> {
 
+  console.warn('DEPRECATION WARNING: `renderDocumentWithPreboot` is no longer supported and will be removed in next release.');
+
   return renderDocument(documentHtml, componentType, nodeProviders)
     .then(html => createPrebootCode(componentType, prebootConfig).then(code => html + code));
 }
 
 
 export function serializeApplication(element: any, styles: string[], cache?: any): string {
+  console.warn('DEPRECATION WARNING: `serializeApplication` is no longer supported and will be removed in next release.');
   // serialize all style hosts
   let serializedStyleHosts: string = styles.length >= 1 ? '<style>' + styles.join('\n') + '</style>' : '';
 
@@ -86,6 +90,7 @@ export function serializeApplication(element: any, styles: string[], cache?: any
 
 
 export function appRefSyncRender(appRef: any): string {
+  console.warn('DEPRECATION WARNING: `appRefSyncRender` is no longer supported and will be removed in next release.');
   // grab parse5 html element
   let element = appRef.location.nativeElement;
 
@@ -100,6 +105,7 @@ export function appRefSyncRender(appRef: any): string {
 
 
 export function applicationToString(appRef: ComponentRef<any>): string {
+  console.warn('DEPRECATION WARNING: `applicationToString` is no longer supported and will be removed in next release.');
   let html = appRefSyncRender(appRef);
   appRef.destroy();
   return html;
