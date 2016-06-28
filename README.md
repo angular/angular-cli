@@ -58,7 +58,7 @@ Angular 2 Server Rendering - Angular U, July 2015
 # Best Practices
 > When building Universal components in Angular 2 there are a few things to keep in mind.
 
-> Note: Universal currently only works with `router-deprecated`
+> Note: Universal versions 0.103.3 (or higher) work with the new alpha `router-3.0.0-alpha`. Prior versions work only with router-deprecated.
 
 * Know the difference between attributes and properties in relation to the DOM.
 * Don't manipulate the `nativeElement` directly. Use the `Renderer`. We do this to ensure that in any environment we're able to change our view.
