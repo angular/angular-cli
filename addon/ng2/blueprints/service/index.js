@@ -1,3 +1,6 @@
+// Copyright Google Inc. All Rights Reserved.
+// Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+// at https://angular.io/license
 var path = require('path');
 var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');

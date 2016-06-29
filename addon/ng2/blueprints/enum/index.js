@@ -1,3 +1,6 @@
+// Copyright Google Inc. All Rights Reserved.
+// Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+// at https://angular.io/license
 const stringUtils = require('ember-cli-string-utils');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 var addBarrelRegistration = require('../../utilities/barrel-management');
