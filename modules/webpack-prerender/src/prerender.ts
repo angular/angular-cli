@@ -1,63 +1,37 @@
-import universal = require('angular2-universal');
+import {Bootloader, BootloaderConfig, AppConfig} from 'angular2-universal';
 
-export interface IUniversalConfig {
-  document?: Object;
-  template?: string;
-  directives: Array<any>;
-  providers?: Array<any>;
-  preboot?: Object | any;
-  bootloader?: any;
-  selector?: string;
-  serializedCmp?: string;
-  server?: boolean;
-  client?: boolean;
-  componentProviders?: any;
-  platformProviders?: any;
+export interface IWebpackPrerender {
+  templatePath: string;
+  bootloaderConfig: BootloaderConfig;
+  appConfig: AppConfig;
 }
-
-class Prerender {
-  constructor(private options: IUniversalConfig) {}
-
-  render(file) {
-    let clientHtml: string = file.toString();
-
-    // bootstrap and render component to string
-    var bootloader = this.options.bootloader;
-    if (!this.options.bootloader) {
-      let doc = universal.parseDocument(clientHtml);
-      this.options.document = doc;
-      this.options.template = this.options.template || clientHtml;
-      this.options.bootloader = this.options;
-    }
-    bootloader = universal.Bootloader.create(this.options.bootloader);
-
-    return bootloader.serializeApplication(null, this.options.providers)
-      .then(html => new Buffer(html));
-  }
-}
-
 
 export class Angular2Prerender {
 
-  private prerender;
+  private bootloader: Bootloader;
 
-  constructor(private options: IUniversalConfig) {
-    this.prerender = new Prerender(options);
+  constructor(private options: IWebpackPrerender) {
+    // maintain your platform instance
+    this.bootloader = new Bootloader(this.options.bootloaderConfig);
   }
 
   apply(compiler) {
-
     compiler.plugin('emit', (compilation, callback) => {
-
-      for (var file in compilation.assets) {
-        if (compilation.assets.hasOwnProperty(file)) {
-          this.prerender
-            .render(file)
-            .then( (buffer) => compilation.assets[file] = buffer);
-        }
-      }
-
-      callback();
+      if (compilation.assets.hasOwnProperty(this.options.templatePath)) {
+        this.bootloader.serializeApplication({
+          // or provide template in config.template
+          template: compilation.assets[this.options.templatePath].source(), 
+          directives: this.options.appConfig.directives,
+          providers: this.options.appConfig.providers
+        })
+        .then(html => {
+          compilation.assets[this.options.templatePath] = {
+            source: () => html,
+            size: () => html.length
+          };
+          callback();
+        });
+      }      
     });
   }
 }
