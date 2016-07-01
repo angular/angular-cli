@@ -7,6 +7,7 @@ var validProjectName = require('ember-cli/lib/utilities/valid-project-name');
 var normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
 var GitInit = require('../tasks/git-init');
 var LinkCli = require('../tasks/link-cli');
+var NpmInstall = require('../tasks/npm-install');
 
 module.exports = Command.extend({
   name: 'init',
@@ -68,7 +69,7 @@ module.exports = Command.extend({
     }
 
     if (!commandOptions.skipNpm) {
-      var npmInstall = new this.tasks.NpmInstall({
+      var npmInstall = new NpmInstall({
         ui: this.ui,
         analytics: this.analytics,
         project: this.project

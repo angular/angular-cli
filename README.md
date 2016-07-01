@@ -18,7 +18,9 @@ If you wish to collaborate while the project is still young, check out [our issu
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4 or greater**.
+The generated project has dependencies that require 
+* **Node 4 or greater**.
+* **Typings v1 or greater**.
 
 ## Table of Contents
 
