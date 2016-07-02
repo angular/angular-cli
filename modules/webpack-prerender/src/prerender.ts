@@ -20,7 +20,7 @@ export class Angular2Prerender {
       if (compilation.assets.hasOwnProperty(this.options.templatePath)) {
         this.bootloader.serializeApplication({
           // or provide template in config.template
-          template: compilation.assets[this.options.templatePath].source(), 
+          template: compilation.assets[this.options.templatePath].source(),
           directives: this.options.appConfig.directives,
           providers: this.options.appConfig.providers
         })
@@ -31,7 +31,7 @@ export class Angular2Prerender {
           };
           callback();
         });
-      }      
+      }
     });
   }
 }
