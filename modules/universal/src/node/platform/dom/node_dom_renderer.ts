@@ -207,6 +207,11 @@ export const ATTRIBUTES = {
   ]
 };
 
+// TODO(gdi2290): provide better whitelist above to alias setting props as attrs
+export const IGNORE_ATTRIBUTES = {
+  'innerHTML': true
+};
+
 export class NodeDomRenderer extends DomRenderer {
   constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType) {
     if (_componentProto.encapsulation === ViewEncapsulation.Native) {
@@ -216,7 +221,10 @@ export class NodeDomRenderer extends DomRenderer {
   }
 
   setElementProperty(renderElement: any, propertyName: string, propertyValue: any) {
-    super.setElementProperty(renderElement, propertyName, propertyValue);
+    let setProp = super.setElementProperty(renderElement, propertyName, propertyValue);
+    if (IGNORE_ATTRIBUTES[propertyName]) {
+      return setProp;
+    }
 
     let el = DOM.nodeName(renderElement);
     let attrList = ATTRIBUTES[el];
