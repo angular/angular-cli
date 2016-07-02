@@ -7,23 +7,23 @@ const parser = new Parser(TreeAdapters.htmlparser2);
 const serializer = new Serializer(TreeAdapters.htmlparser2, { encodeHtmlEntities: true });
 const treeAdapter = parser.treeAdapter;
 
-export function isTag(tagName, node): boolean {
+export function isTag (tagName, node): boolean {
   return node.type === 'tag' && node.name === tagName;
 }
 
-export function parseFragment(el: string): Object {
+export function parseFragment (el: string): any {
   return parser.parseFragment(el);
 }
 
-export function parseDocument(documentHtml: string): Object {
-  if (!documentHtml) {
+export function parseDocument (documentHtml: string): any {
+  if (documentHtml === undefined) {
     throw new Error('parseDocument requires a document string');
   }
   if (typeof documentHtml !== 'string') {
     throw new Error('parseDocument needs to be a string to be parsed correctly');
   }
 
-  const doc = parser.parse(documentHtml);
+  const doc: any = parser.parse(documentHtml);
 
   /*
   // Build entire doc <!doctype><html> etc
@@ -34,12 +34,12 @@ export function parseDocument(documentHtml: string): Object {
   const doc = parser.parseFragment(documentHtml);
   */
 
-  let rootNode;
-  let bodyNode;
-  let headNode;
-  let titleNode;
+  let rootNode = undefined;
+  let bodyNode = undefined;
+  let headNode = undefined;
+  let titleNode = undefined;
 
-  for (let i = 0; i < doc.children.length; ++i) {
+  for (let i: number = 0; i < doc.children.length; ++i) {
     const child = doc.children[i];
 
     if (isTag('html', child)) {
@@ -52,7 +52,7 @@ export function parseDocument(documentHtml: string): Object {
     rootNode = doc;
   }
 
-  for (let i = 0; i < rootNode.children.length; ++i) {
+  for (let i: number = 0; i < rootNode.children.length; ++i) {
     const child = rootNode.children[i];
 
     if (isTag('head', child)) {
@@ -99,6 +99,7 @@ export function parseDocument(documentHtml: string): Object {
 
   return doc;
 }
+
 
 export function serializeDocument(document: Object, pretty?: boolean): string {
   const doc = serializer.serialize(document);
