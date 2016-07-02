@@ -14,7 +14,15 @@ const document = `
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Universal</title>
+    <title>Angular Universal</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Angular 2 Universal">
+    <meta name="keywords" content="Angular 2,Universal">
+    <meta name="author" content="PatrickJS">
+
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <base href="/">
   </head>
   <body>
 
