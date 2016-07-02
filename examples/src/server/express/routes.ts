@@ -12,23 +12,30 @@ var templateUrlApp = require('../../universal/template_url/app');
 
 import {enableProdMode, provide} from '@angular/core';
 import {Http} from '@angular/http';
-import {LocationStrategy, HashLocationStrategy} from '@angular/common';
+import {LocationStrategy, HashLocationStrategy, APP_BASE_HREF} from '@angular/common';
 import {provideRouter} from '@angular/router';
+import {ROUTER_PROVIDERS} from '@angular/router-deprecated';
 
 enableProdMode();
 
+
+
 import {
-  NODE_ROUTER_PROVIDERS,
   NODE_LOCATION_PROVIDERS,
   NODE_HTTP_PROVIDERS,
   NODE_JSONP_PROVIDERS,
   NODE_PLATFORM_PIPES,
   ORIGIN_URL,
   REQUEST_URL,
-  BASE_URL,
   queryParamsToBoolean,
   BootloaderConfig
 } from 'angular2-universal';
+
+const BASE_URL = APP_BASE_HREF;
+const NODE_ROUTER_PROVIDERS = [
+  ROUTER_PROVIDERS,
+  NODE_LOCATION_PROVIDERS
+]
 
 const PACKAGES = {
   'angular2-universal/polyfills': {
@@ -349,8 +356,8 @@ module.exports = function(ROOT) {
         provide(BASE_URL, {useValue: '/examples/router'})
       ],
       providers: [
-        NODE_HTTP_PROVIDERS,
         provide(REQUEST_URL, {useValue: url}),
+        NODE_HTTP_PROVIDERS,
         NODE_ROUTER_PROVIDERS,
       ],
       data: {},
