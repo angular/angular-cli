@@ -13,7 +13,9 @@
     "lib": ["es6", "dom"],
     "baseUrl": ".",
     "paths": {
-      "@angular/platform-node": ["./src/platform-node"]
+      "@angular/platform-node": ["./src/platform-node"],
+      "@angular/platform-node-dynamic": ["./src/platform-node-dynamic"],
+      "@angular/universal": ["./src/universal"]
     }
   },
   "exclude": [
