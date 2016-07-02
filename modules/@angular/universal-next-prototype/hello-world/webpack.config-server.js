@@ -22,7 +22,7 @@ module.exports = function(config) {
 }
 
 
-function ignoreAlias (config) {
+function ignoreAlias (config, log) {
   var aliass = []
   if (config && config.resolve && config.resolve.alias) {
     aliass = Object.keys(config.resolve.alias);
@@ -30,7 +30,9 @@ function ignoreAlias (config) {
 
   return function(context, request, cb) {
     if (aliass.includes(request)) {
-      console.log('resolve.alias', request)
+      if (log) {
+        console.log('resolve.alias', request);
+      }
       return cb();
     }
     return checkNodeImport(context, request, cb);

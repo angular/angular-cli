@@ -5,17 +5,9 @@ import './polyfills.node';
 
 import {ComponentRef} from '@angular/core';
 
-import {DomSharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
-
-import {DOCUMENT} from '@angular/platform-browser/src/dom/dom_tokens';
 import {bootstrap} from '@angular/platform-node-dynamic';
 
-
-import {
-  serializeDocument,
-  parseDocument,
-} from '@angular/platform-node';
-
+import {provideDocument, serializeDocument, DOCUMENT} from '@angular/universal';
 
 import {App} from './app';
 
@@ -39,15 +31,7 @@ const document = `
 
 export function main() {
   return bootstrap(App, [
-      {
-        provide: DOCUMENT,
-        useFactory: (domSharedStylesHost: DomSharedStylesHost) => {
-          var doc: any = parseDocument(document);
-          domSharedStylesHost.addHost(doc.head);
-          return doc;
-        },
-        deps: [DomSharedStylesHost]
-      }
+      provideDocument(document)
     ])
     .then((cmpRef: ComponentRef<App>) => {
       let document = cmpRef.injector.get(DOCUMENT);
