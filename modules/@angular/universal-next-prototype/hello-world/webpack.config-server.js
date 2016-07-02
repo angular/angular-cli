@@ -3,8 +3,11 @@ var path = require('path');
 
 module.exports = function(config) {
   config.target = 'node';
-  config.entry =  './src/server.ts',
-  config.output.filename = 'server-bundle.js';
+  config.entry =  {
+    server: './src/server.ts',
+    express: './src/server-express.ts'
+  },
+  config.output.filename = '[name]-bundle.js';
   config.output.library = 'universal';
   config.output.libraryTarget = 'commonjs2';
 

@@ -3,7 +3,8 @@ import {
   Inject,
   Injectable,
   Renderer,
-  RenderComponentType
+  RenderComponentType,
+  Injector
 } from '@angular/core';
 
 import {DOCUMENT} from '@angular/platform-browser';
@@ -20,18 +21,22 @@ import {
   cssHyphenate,
   isPresent,
   isBlank,
-  listContains
+  listContains,
+  PROXY_DOCUMENT
 } from './helper';
+export {PROXY_DOCUMENT} from './helper';
 
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
-var DOM: any = getDOM();
 
+import {parseFragment} from './node-document'
 
 @Injectable()
 export class NodeDomRootRenderer_ extends DomRootRenderer {
-  constructor(@Inject(DOCUMENT) _document: any, _eventManager: EventManager,
+  doc;
+  constructor(@Inject(DOCUMENT) document: any = null, _eventManager: EventManager,
               sharedStylesHost: DomSharedStylesHost, animationDriver: AnimationDriver) {
-    super(_document, _eventManager, sharedStylesHost, animationDriver);
+    super(null, _eventManager, sharedStylesHost, animationDriver);
+    console.log('NodeDomRootRenderer_NodeDomRootRenderer_')
   }
   renderComponent(componentProto: RenderComponentType): Renderer {
     // TODO(gdi2290): see PR https://github.com/angular/angular/pull/6584
@@ -41,6 +46,14 @@ export class NodeDomRootRenderer_ extends DomRootRenderer {
       this.registeredComponents.set(componentProto.id, renderer);
     }
     return renderer;
+  }
+  setDoc(doc) {
+    console.log('setDocsetDocsetDoc')
+    this.doc = doc
+  }
+  getDoc(doc) {
+    console.log('getDocgetDocgetDocgetDoc')
+    return this.doc;
   }
 }
 
@@ -208,6 +221,7 @@ export const ATTRIBUTES = {
 };
 
 export class NodeDomRenderer extends DomRenderer implements Renderer {
+  __rootRenderer;
   constructor(
     _rootRenderer: DomRootRenderer,
     _componentProto: RenderComponentType,
@@ -218,12 +232,32 @@ export class NodeDomRenderer extends DomRenderer implements Renderer {
     }
 
     super(_rootRenderer, _componentProto, _animationDriver);
+    this.__rootRenderer = _rootRenderer;
+    console.log('NodeDomRenderer')
+  }
+
+  selectRootElement(selectorOrNode: string|any, debugInfo: any): Element {
+    console.log('selectRootElement');
+    var el: any /** TODO #9100 */;
+    if (typeof selectorOrNode === 'string') {
+      console.log('SELEELCTOR ROOT', selectorOrNode);
+      el = parseFragment(`<${selectorOrNode}></${selectorOrNode}>`);
+      this.__rootRenderer.setDoc(el);
+      // el = getDOM().querySelector(this.__rootRenderer.getDoc(), selectorOrNode);
+      if (isBlank(el)) {
+        throw new Error(`The selector "${selectorOrNode}" did not match any elements`);
+      }
+    } else {
+      el = selectorOrNode;
+    }
+    getDOM().clearNodes(el);
+    return el;
   }
 
   setElementProperty(renderElement: any, propertyName: string, propertyValue: any) {
     super.setElementProperty(renderElement, propertyName, propertyValue);
 
-    let el = DOM.nodeName(renderElement);
+    let el = getDOM().nodeName(renderElement);
     let attrList = ATTRIBUTES[el];
     if (attrList) {
       let booleanAttr = listContains(attrList, propertyName);
@@ -248,7 +282,7 @@ export class NodeDomRenderer extends DomRenderer implements Renderer {
 
   invokeElementMethod(renderElement: any, methodName: string, args: any[]) {
     if (methodName === 'focus') {
-      if (DOM.nodeName(renderElement) === 'input') {
+      if (getDOM().nodeName(renderElement) === 'input') {
         return super.setElementAttribute(renderElement, 'autofocus', '');
       }
 

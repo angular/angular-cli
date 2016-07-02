@@ -35,13 +35,16 @@ const document = `
 `;
 
 
-export function main() {
+export function main(providers = []) {
   return bootstrap(App, [
-      provideDocument(document)
-    ])
-    .then((cmpRef: ComponentRef<App>) => {
-      let document = cmpRef.injector.get(DOCUMENT);
-      return serializeDocument(document, true);
+      ...providers
+    ], document)
+    .then((componentRef: ComponentRef<App>) => {
+      let document = componentRef.injector.get(DOCUMENT);
+      return {
+        componentRef,
+        html: serializeDocument(document, true)
+      };
     });
 };
 

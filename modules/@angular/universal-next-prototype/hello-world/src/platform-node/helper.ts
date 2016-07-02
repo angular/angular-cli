@@ -1,3 +1,8 @@
+import {OpaqueToken} from '@angular/core';
+
+export const PROXY_DOCUMENT = new OpaqueToken('PROXY_DOCUMENT');
+
+
 export function cssHyphenate(propertyName: string): string {
   return propertyName.replace(/([A-Z])/g, '-$1')
     .replace(/^ms-/, '-ms-') // Internet Explorer vendor prefix.

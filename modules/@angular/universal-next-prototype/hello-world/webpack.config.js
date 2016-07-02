@@ -10,6 +10,7 @@ var webpackConfig = setTypeScriptAlias({
   devtool: 'source-map',
 
   output: {
+    filename: '[name]-bundle.js',
     path: './dist',
   },
 
