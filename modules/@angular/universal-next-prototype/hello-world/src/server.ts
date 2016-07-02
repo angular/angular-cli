@@ -1,4 +1,4 @@
-import './polyfills';
+import './polyfills.node';
 
 // import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
 // Parse5DomAdapter.makeCurrent();
@@ -24,7 +24,8 @@ import {
   parseDocument,
   NodeDomRootRenderer_,
   NodeSharedStylesHost
-} from './platform-node';
+} from '@angular/platform-node';
+
 
 import {App} from './app';
 

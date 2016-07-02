@@ -1,1 +1,1 @@
-import './polyfills';
+import './polyfills.browser';

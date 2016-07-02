@@ -8,7 +8,7 @@ module.exports = function(config) {
   config.output.library = 'universal';
   config.output.libraryTarget = 'commonjs2';
 
-  config.externals = checkNodeImport;
+  config.externals = ignoreAlias(config);
   config.node = {
     global: true,
     __dirname: true,
@@ -22,9 +22,24 @@ module.exports = function(config) {
 }
 
 
+function ignoreAlias (config) {
+  var aliass = []
+  if (config && config.resolve && config.resolve.alias) {
+    aliass = Object.keys(config.resolve.alias);
+  }
+
+  return function(context, request, cb) {
+    if (aliass.includes(request)) {
+      console.log('resolve.alias', request)
+      return cb();
+    }
+    return checkNodeImport(context, request, cb);
+  }
+}
+
 function checkNodeImport(context, request, cb) {
   if (!path.isAbsolute(request) && request.charAt(0) !== '.') {
-    cb(null, 'commonjs ' + request); return;
+    return cb(null, 'commonjs ' + request);
   }
-  cb();
+  return cb();
 }
