@@ -3,16 +3,23 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": ["es6", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
     "sourceRoot": "src",
-    "target": "es5"
+    "target": "es5",
+    "lib": ["es6", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@angular/platform-node": ["./src/platform-node"]
+    }
   },
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": { "rewriteTsconfig": false }
 }
