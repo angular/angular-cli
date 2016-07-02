@@ -1,0 +1,46 @@
+{
+  "name": "hello-world",
+  "version": "1.0.0",
+  "description": "wat",
+  "scripts": {
+    "watch": "npm run build --watch",
+    "build": "npm run copy:index && webpack",
+    "copy:index": "cpy 'index.html' '../dist' --cwd=src --parents",
+    "server:universal": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "patrick <patrick@angularclass.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "devDependencies": {
+    "@types/node": "^4.0.25-alpha",
+    "core-js": "^2.4.0",
+    "cpy-cli": "^1.0.1",
+    "js-beautify": "^1.6.3",
+    "js.clone": "0.0.3",
+    "ts-helpers": "^1.1.1",
+    "ts-loader": "^0.8.2",
+    "typescript": "^2.0.0-dev.20160701",
+    "webpack": "2.1.0-beta.15"
+  },
+  "dependencies": {
+    "@angular/http": "2.0.0-rc.4",
+    "@angular/common": "2.0.0-rc.4",
+    "@angular/compiler": "2.0.0-rc.4",
+    "@angular/core": "2.0.0-rc.4",
+    "@angular/forms": "^0.2.0",
+    "@angular/platform-browser": "2.0.0-rc.4",
+    "@angular/platform-browser-dynamic": "2.0.0-rc.4",
+    "@angular/platform-server": "2.0.0-rc.4",
+    "parse5": "^1.5.0",
+    "@angular/router": "3.0.0-beta.2",
+    "ie-shim": "^0.1.0",
+    "core-js": "^2.4.0",
+    "rxjs-es": "5.0.0-beta.6",
+    "rxjs": "5.0.0-beta.6",
+    "zone.js": "~0.6.12"
+  }
+}
