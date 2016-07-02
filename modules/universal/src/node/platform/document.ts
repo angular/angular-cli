@@ -7,7 +7,7 @@ var DOM: any = getDOM();
 
 const parser = new Parser(TreeAdapters.htmlparser2);
 // TODO(gdi2290): fix encodeHtmlEntities: true
-const serializer = new Serializer(TreeAdapters.htmlparser2, { encodeHtmlEntities: false });
+const serializer = new Serializer(TreeAdapters.htmlparser2, { encodeHtmlEntities: true });
 const treeAdapter = parser.treeAdapter;
 
 export function isTag(tagName, node): boolean {
