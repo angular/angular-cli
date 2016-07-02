@@ -4,6 +4,7 @@
   "description": "wat",
   "scripts": {
     "watch": "npm run build --watch",
+    "prebuild": "rimraf dist",
     "build": "npm run copy:index && webpack",
     "copy:index": "cpy 'index.html' '../dist' --cwd=src --parents",
     "server:universal": "npm run build",
@@ -23,6 +24,7 @@
     "js-beautify": "^1.6.3",
     "js.clone": "0.0.3",
     "json-loader": "^0.5.4",
+    "rimraf": "^2.5.2",
     "ts-helpers": "^1.1.1",
     "ts-loader": "^0.8.2",
     "tslint": "^3.13.0-dev.0",
