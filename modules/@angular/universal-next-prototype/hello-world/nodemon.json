@@ -1,5 +1,6 @@
 {
   "watch": [
+    "dist/express-bundle.js",
     "dist/server-bundle.js",
     "src/index.html"
   ],
