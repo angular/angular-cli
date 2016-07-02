@@ -1,7 +1,6 @@
 import {OpaqueToken} from '@angular/core';
 import {Parser, Serializer, TreeAdapters} from 'parse5';
-import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
-Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
+import '../make_parse5_current'; // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
 
