@@ -33,7 +33,7 @@
     "@angular/platform-browser-dynamic": "2.0.0-rc.3",
     "@angular/platform-server": "2.0.0-rc.3",
     "@angular/router-deprecated": "2.0.0-rc.2",
-    "preboot": "file:../preboot",
+    "preboot": ">=2.1.2",
     "angular2-universal": "file:../universal",
     "rimraf": "^2.5.1",
     "rxjs": "5.0.0-beta.6",
@@ -43,6 +43,6 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "angular2-universal": "^0.104.0"
+    "angular2-universal": "^0.104.2"
   }
 }
