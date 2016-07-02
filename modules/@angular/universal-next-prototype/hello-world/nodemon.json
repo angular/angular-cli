@@ -1,0 +1,7 @@
+{
+  "watch": [
+    "dist/server-bundle.js",
+    "src/index.html"
+  ],
+  "ext" : "js ts json html"
+}
