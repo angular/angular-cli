@@ -17,8 +17,10 @@ var webpackConfig = setTypeScriptAlias({
   module: {
     loaders: [
       // .ts files for TypeScript
-      { test: /\.ts$/, loader: 'ts-loader' },
-      { test: /\.json$/, loader: 'json-loader' }
+      { test: /\.ts$/, loaders: ['ts-loader', 'angular2-template-loader'] },
+      { test: /\.json$/, loader: 'json-loader' },
+      { test: /\.html$/, loader: 'raw-loader' },
+      { test: /\.css$/, loader: 'raw-loader' }
     ]
   },
 
