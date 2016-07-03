@@ -18,7 +18,9 @@ If you wish to collaborate while the project is still young, check out [our issu
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4 or greater**.
+The generated project has dependencies that require 
+* **Node 4 or greater**.
+* **Typings v1 or greater**.
 
 ## Table of Contents
 
@@ -212,7 +214,7 @@ You can modify the these scripts in `package.json` to run whatever tool you pref
 
 ### Support for offline applications
 
-The index.html file includes a commented-out code snippet for installing the angular2-service-worker. This support is experimental, please see the angular/mobile-toolkit project for documentation on how to make use of this functionality.
+The index.html file includes a commented-out code snippet for installing the angular2-service-worker. This support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.
 
 ### Commands autocompletion
 
