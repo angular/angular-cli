@@ -1,6 +1,8 @@
 var webpack = require('webpack');
 var path = require('path');
 
+var UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+
 module.exports = function(config) {
   config.target = 'node';
   config.entry =  {
@@ -12,6 +14,10 @@ module.exports = function(config) {
   config.output.libraryTarget = 'commonjs2';
 
   config.externals = ignoreAlias(config);
+
+  config.plugins.push(
+    new UglifyJsPlugin()
+  )
   config.node = {
     global: true,
     __dirname: true,

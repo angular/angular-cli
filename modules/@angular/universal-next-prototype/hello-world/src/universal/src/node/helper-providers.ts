@@ -8,7 +8,6 @@ export function provideDocument (document: string): Array<any> {
   const DOC: any = {
     provide: DOCUMENT,
     useFactory: (domSharedStylesHost: DomSharedStylesHost) => {
-      console.log('NEW DOCUMENT')
       var doc: any = parseDocument(document);
       domSharedStylesHost.addHost(doc.head);
       return doc;

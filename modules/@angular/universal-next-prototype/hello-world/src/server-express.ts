@@ -5,7 +5,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 
 // Angular 2
-import { enableProdMode, ApplicationRef } from '@angular/core';
+import { enableProdMode, ApplicationRef, PlatformRef } from '@angular/core';
 // Angular 2 Universal
 import { expressEngine } from '@angular/express-engine';
 
@@ -31,7 +31,8 @@ var cache = null;
 app.use('/', function (req, res, next) {
 
   // if (cache) {
-  //   res.send(cache);
+  //   res.setHeader('Cache-Control', 'public, max-age=300');
+  //   res.status(200).send(cache);
   //   return next();
   // }
 
@@ -43,7 +44,8 @@ app.use('/', function (req, res, next) {
     })
     .then(html => {
       // cache = html;
-      res.send(html);
+      res.setHeader('Cache-Control', 'public, max-age=300');
+      res.status(200).send(html);
       next();
     });
 
