@@ -1,8 +1,11 @@
 {
   "watch": [
     "dist/express-bundle.js",
+    "dist/server/express-bundle.js",
+    "dist/server/server-bundle.js",
+    "dist/public/index.html",
     "dist/server-bundle.js",
-    "src/index.html"
+    "dist/index.html"
   ],
   "ext" : "js ts json html"
 }
