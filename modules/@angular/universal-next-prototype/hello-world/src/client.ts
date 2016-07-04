@@ -1,1 +1,3 @@
-import './polyfills.browser';
+// import './polyfills.browser';
+
+import './main.browser';

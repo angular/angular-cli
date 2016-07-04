@@ -1,11 +1,16 @@
 import { Component } from '@angular/core';
+import {APP_PROVIDERS as GITHUB_APP_PROVIDERS, Github} from './github';
 
 @Component({
   selector: 'wat',
+  directives: [
+    Github
+  ],
   template: `
     <div>
       Hello World
     </div>
+    <github></github>
   `
 })
 export class Wat {
@@ -17,6 +22,11 @@ export class Wat {
 @Component({
   selector: 'app',
   directives: [Wat],
+  styles: [`
+  div {
+    background-color: red;
+  }
+  `],
   template: `
     <div>
       Hello World
@@ -27,14 +37,18 @@ export class Wat {
   `
 })
 export class App {
-  wat;
+  wat = '';
   constructor () {
 
   }
   ngOnInit() {
     setTimeout(() => {
       this.wat = 'yolo' + Math.random();
-    }, 10)
+    })
   }
 
 }
+
+export const APP_PROVIDERS = [
+  ...GITHUB_APP_PROVIDERS
+];
