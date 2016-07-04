@@ -18,13 +18,14 @@ const exec = require('child_process').exec;
 var changelogStream = fs.createWriteStream('CHANGELOG-delta.md');
 
 if (process.argv.length < 3) {
+  // eslint-disable-next-line no-console
   console.log('Usage: ./scripts/publish/changelog.js <start-tag>');
   process.exit(-1);
 }
 
 var config = {
   preset: 'angular',
-  releaseCount: 1,
+  releaseCount: 1
 };
 
 var prependDelta = function() {
@@ -35,6 +36,7 @@ var prependDelta = function() {
 
 cl(config, null, { from: process.argv[2] })
     .on('error', function(err) {
+      // eslint-disable-next-line no-console
       console.error('Failed to generate changelog: ' + err);
     })
     .pipe(changelogStream)
