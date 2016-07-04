@@ -25,6 +25,7 @@ export function parseDocument (documentHtml: string): any {
 
   const doc: any = parser.parse(documentHtml);
 
+
   /*
   // Build entire doc <!doctype><html> etc
   if (documentHtml.indexOf('<html>') > -1 && documentHtml.indexOf('</html>') > -1) {
@@ -52,6 +53,7 @@ export function parseDocument (documentHtml: string): any {
     rootNode = doc;
   }
 
+
   for (let i: number = 0; i < rootNode.children.length; ++i) {
     const child = rootNode.children[i];
 
@@ -68,6 +70,7 @@ export function parseDocument (documentHtml: string): any {
     headNode = treeAdapter.createElement('head', null, []);
     getDOM().appendChild(doc, headNode);
   }
+
 
   if (!bodyNode) {
     bodyNode = treeAdapter.createElement('body', null, []);
@@ -89,6 +92,7 @@ export function parseDocument (documentHtml: string): any {
   doc._window = {};
   doc.head = headNode;
   doc.body = bodyNode;
+
 
   const titleNodeText = titleNode.children[0];
 

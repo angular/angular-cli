@@ -1,7 +1,11 @@
 import {OpaqueToken} from '@angular/core';
+import {APP_BASE_HREF} from '@angular/common';
 
-export const PROXY_DOCUMENT = new OpaqueToken('PROXY_DOCUMENT');
-
+export const BASE_URL: OpaqueToken = APP_BASE_HREF;
+export const ORIGIN_URL: OpaqueToken = new OpaqueToken('ORIGIN_URL');
+export const REQUEST_URL: OpaqueToken = new OpaqueToken('REQUEST_URL');
+export const PRIME_CACHE: OpaqueToken = new OpaqueToken('PRIME_CACHE');
+export const COOKIE_KEY: OpaqueToken = new OpaqueToken('COOKIE_KEY');
 
 export function cssHyphenate(propertyName: string): string {
   return propertyName.replace(/([A-Z])/g, '-$1')
@@ -36,4 +40,12 @@ export function stringMapForEach(map: {[key: string]: any}, callback: (V, K) => 
 }
 
 // Copied from @angular/http/src/http_utils.ts
-export const isSuccess = (status: number): boolean => (status >= 200 && status < 300);
+export const isSuccess = ((status: number): boolean => (status >= 200 && status < 300));
+
+export function _randomChar() {
+  return String.fromCharCode(97 + Math.floor(Math.random() * 25));
+}
+
+export function _appIdRandomProviderFactory() {
+  return `${_randomChar()}${_randomChar()}${_randomChar()}`;
+}

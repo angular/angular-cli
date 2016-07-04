@@ -22,9 +22,7 @@ import {
   isPresent,
   isBlank,
   listContains,
-  PROXY_DOCUMENT
 } from './helper';
-export {PROXY_DOCUMENT} from './helper';
 
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 
