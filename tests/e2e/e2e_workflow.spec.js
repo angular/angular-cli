@@ -291,12 +291,17 @@ describe('Basic end-to-end Workflow', function () {
       let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
       let cssFile = path.join(componentPath, 'test-component.component.css');
       let scssFile = path.join(componentPath, 'test-component.component.scss');
+      let scssPartialFile = path.join(componentPath, '_test-component.component.partial.scss');
+
+      let scssPartialExample = '.partial {\n @extend .outer;\n }';
+      fs.writeFileSync(scssPartialFile, scssPartialExample, 'utf8');
+      expect(existsSync(scssPartialFile)).to.be.equal(true);
 
       expect(existsSync(componentPath)).to.be.equal(true);
       sh.mv(cssFile, scssFile);
       expect(existsSync(scssFile)).to.be.equal(true);
       expect(existsSync(cssFile)).to.be.equal(false);
-      let scssExample = '.outer {\n  .inner { background: #fff; }\n }';
+      let scssExample = '@import "test-component.component.partial";\n\n.outer {\n  .inner { background: #fff; }\n }';
       fs.writeFileSync(scssFile, scssExample, 'utf8');
 
       sh.exec(`${ngBin} build`);
@@ -304,6 +309,7 @@ describe('Basic end-to-end Workflow', function () {
       expect(existsSync(destCss)).to.be.equal(true);
       let contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
+      expect(contents).to.include('.partial .inner');
 
       sh.rm('-f', destCss);
       process.chdir('src');
@@ -311,6 +317,7 @@ describe('Basic end-to-end Workflow', function () {
       expect(existsSync(destCss)).to.be.equal(true);
       contents = fs.readFileSync(destCss, 'utf8');
       expect(contents).to.include('.outer .inner');
+      expect(contents).to.include('.partial .inner');
 
       process.chdir('..');
       sh.exec('npm uninstall node-sass', { silent: true });
