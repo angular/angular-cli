@@ -5,12 +5,13 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 
 // Angular 2
-import { enableProdMode, ApplicationRef, PlatformRef } from '@angular/core';
+import { enableProdMode, ApplicationRef, PlatformRef, NgZone, APP_ID } from '@angular/core';
+enableProdMode();
+
 // Angular 2 Universal
 import { expressEngine } from '@angular/express-engine';
 
 // enable prod for faster renders
-enableProdMode();
 
 const app = express();
 const ROOT = path.join(path.resolve(__dirname, '..'));
