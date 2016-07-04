@@ -2,6 +2,17 @@
 
 ---
 
+<a name="1.0.0-beta.9"></a>
+# [1.0.0-beta.9](https://github.com/angular/angular-cli/compare/v1.0.0-beta.6...v1.0.0-beta.9) (2016-07-04)
+
+
+### Bug Fixes
+
+* **npm:** update to npm 3.10.2 ([#1250](https://github.com/angular/angular-cli/issues/1250)) ([6f0ebfb](https://github.com/angular/angular-cli/commit/6f0ebfb)), closes [#1186](https://github.com/angular/angular-cli/issues/1186) [#1191](https://github.com/angular/angular-cli/issues/1191) [#1201](https://github.com/angular/angular-cli/issues/1201) [#1209](https://github.com/angular/angular-cli/issues/1209) [#1207](https://github.com/angular/angular-cli/issues/1207) [#1248](https://github.com/angular/angular-cli/issues/1248)
+* **sass:** don't compile partials ([af9a4f9](https://github.com/angular/angular-cli/commit/af9a4f9))
+
+
+
 <a name="1.0.0-beta.7"></a>
 # 1.0.0-beta.7 (2016-06-23)
 

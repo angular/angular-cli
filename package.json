@@ -1,6 +1,6 @@
 {
   "name": "angular-cli",
-  "version": "1.0.0-beta.8",
+  "version": "1.0.0-beta.9",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "conventional-changelog": "^1.1.0",
     "eslint": "^2.8.0",
     "exists-sync": "0.0.3",
     "minimatch": "^3.0.0",
@@ -73,8 +74,8 @@
     "rewire": "^2.5.1",
     "sinon": "^1.17.3",
     "through": "^2.3.8",
-    "tslint": "^3.8.1",
     "tree-kill": "^1.0.0",
+    "tslint": "^3.8.1",
     "walk-sync": "^0.2.6"
   }
 }
