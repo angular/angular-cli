@@ -13,15 +13,37 @@
     "lib": ["es6", "dom"],
     "baseUrl": ".",
     "paths": {
-      "@angular/express-engine": ["./src/express-engine"],
-      "@angular/platform-node": ["./src/platform-node"],
-      "@angular/platform-node-dynamic": ["./src/platform-node-dynamic"],
-      "@angular/universal": ["./src/universal"]
+      "@angular/express-engine": [
+        "./src/universal_modules/express-engine"
+      ],
+      "@angular/platform-node": [
+        "./src/universal_modules/platform-node"
+      ],
+      "@angular/platform-node-dynamic": [
+        "./src/universal_modules/platform-node-dynamic"
+      ],
+      "@angular/universal": [
+        "./src/universal_modules/universal"
+      ],
+      "@angular/universal/browser": [
+        "./src/universal_modules/universal/browser.ts"
+      ],
+      "@angular/universal/node": [
+        "./src/universal_modules/universal/node.ts"
+      ],
+      "rxjs/*": [
+        "./node_modules/rxjs-es/*"
+      ]
     }
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ],
+  "awesomeTypescriptLoaderOptions": {
+    "useWebpackText": true,
+    "forkChecker": true
+  },
   "compileOnSave": false,
   "buildOnSave": false,
   "atom": { "rewriteTsconfig": false }
