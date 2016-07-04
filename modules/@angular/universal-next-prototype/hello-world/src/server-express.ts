@@ -10,6 +10,8 @@ enableProdMode();
 
 // Angular 2 Universal
 import { expressEngine } from '@angular/express-engine';
+import { replaceUniversalAppIf, transformDocument, UNIVERSAL_APP_ID, nodePlatform } from '@angular/universal';
+nodePlatform();
 
 // enable prod for faster renders
 
