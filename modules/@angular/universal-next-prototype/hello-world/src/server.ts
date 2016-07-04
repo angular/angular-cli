@@ -4,7 +4,7 @@ import {main} from './main.node';
 
 
 main()
-  .then(({html}) => {
-    console.log('\nPRERENDER HTML\n\n' + html + '\n');
+  .then(({serializeDocument}) => {
+    console.log('\nPRERENDER HTML\n\n' + serializeDocument() + '\n');
   });
 
