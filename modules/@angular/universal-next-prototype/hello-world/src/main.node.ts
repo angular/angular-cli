@@ -1,13 +1,15 @@
-import {ComponentRef} from '@angular/core';
+import {ComponentRef, ApplicationRef} from '@angular/core';
 
 import {
   bootstrap,
   serializeDocument,
   DOCUMENT,
-  provideDocument
+  provideDocument,
+  ORIGIN_URL,
+  REQUEST_URL,
+  BASE_URL
 } from '@angular/universal';
-
-import {App} from './app';
+import {App, APP_PROVIDERS} from './app';
 
 
 // const document = ;
@@ -27,25 +29,46 @@ export function main(providers = []) {
           <meta name="author" content="PatrickJS">
 
           <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+          <link rel="stylesheet" src="yolo.css">
+          <style>
+            #wat {
+
+            }
+          </style>
 
           <base href="/">
         </head>
         <body>
-          ${Math.random()}
+          <h1 id="wat">${Math.random()}</h1>
+
           <app>
             Loading...
-          <app>
+          </app>
+
+          <script src="dist/public/browser-bundle.js"></script>
 
         </body>
       </html>
       `),
-      ...providers
+      ...providers,
+      {provide: ORIGIN_URL, useValue: 'http://127.0.0.1:3000/'},
+      {provide: REQUEST_URL, useValue: '/'},
+      {provide: BASE_URL, useValue: '/'},
+      ...APP_PROVIDERS
+
     ])
     .then((componentRef: ComponentRef<App>) => {
+      let applicationRef = componentRef.injector.get(ApplicationRef);
       let document = componentRef.injector.get(DOCUMENT);
       return {
         componentRef,
-        html: serializeDocument(document, true)
+        applicationRef,
+        serializeDocument() {
+          let doc = serializeDocument(document, true);
+          applicationRef = null;
+          document = null
+          return doc;
+        }
       };
     });
 };
