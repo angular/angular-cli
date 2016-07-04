@@ -13,6 +13,7 @@ import { expressEngine } from '@angular/express-engine';
 import { replaceUniversalAppIf, transformDocument, UNIVERSAL_APP_ID, nodePlatform } from '@angular/universal';
 nodePlatform();
 
+import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 // enable prod for faster renders
 
 const app = express();
@@ -40,14 +41,58 @@ app.use('/', function (req, res, next) {
   // }
 
   return ngApp()
-    .then(({componentRef, html}) => {
-      var applicationRef = componentRef.injector.get(ApplicationRef, {dispose: () => {}});
-      applicationRef.dispose();
-      return html;
+    .then((nodeRef) => {
+      let appInjector = nodeRef.applicationRef.injector;
+      let cmpInjector = nodeRef.componentRef.injector;
+      // app injector
+      let ngZone = appInjector.get(NgZone);
+      // component injector
+      // let http = cmpInjector.get(Http, Http);
+      // let jsonp = cmpInjector.get(Jsonp, Jsonp);
+      // if (ngZone.isStable) { return nodeRef }
+
+      return ngZone.runOutsideAngular(function outsideNg() {
+        function checkStable(done, ref) {
+          setTimeout(function stable() {
+            if (ngZone.hasPendingMicrotasks) { return checkStable(done, ref); }
+            if (ngZone.hasPendingMacrotasks) { return checkStable(done, ref); }
+            // if (http && http._async > 0) { return next(); }
+            // if (jsonp && jsonp._async > 0) { return next(); }
+            if (ngZone.isStable) { return done(ref); }
+            return checkStable(done, ref);
+          }, 1);
+        }
+        return new Promise<any>(function (resolve) {
+          checkStable(resolve, nodeRef);
+        }); // promise
+      });// run outside
+
+    })
+    .then((nodeRef) => {
+      let _appId = nodeRef.componentRef.injector.get(APP_ID, null);
+      let appId = nodeRef.componentRef.injector.get(UNIVERSAL_APP_ID, null);
+      let DOM = getDOM();
+      DOM.setAttribute(nodeRef.componentRef.location.nativeElement, 'data-ng-app-id', appId);
+
+      let html = nodeRef.serializeDocument();
+      nodeRef.componentRef.destroy();
+      nodeRef.applicationRef.dispose();
+
+      nodeRef.componentRef = null;
+      nodeRef.applicationRef = null;
+
+      return replaceUniversalAppIf(transformDocument(html), _appId, appId)
+        .replace(/<\/body>/, `
+  <script type="application/angular">
+    window.ngUniversal = {
+      appId: "${ appId }" || null
+    };
+  </script>
+</body>`);
     })
     .then(html => {
       // cache = html;
-      res.setHeader('Cache-Control', 'public, max-age=300');
+      // res.setHeader('Cache-Control', 'public, max-age=300');
       res.status(200).send(html);
       next();
     });
