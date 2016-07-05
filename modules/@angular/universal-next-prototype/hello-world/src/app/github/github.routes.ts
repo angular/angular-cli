@@ -1,4 +1,3 @@
-import {NODE_LOCATION_PROVIDERS} from '@angular/universal';
 import { provideRouter, RouterConfig } from '@angular/router';
 
 import {About} from './components/about/about';
@@ -22,5 +21,4 @@ const routes: RouterConfig = [
 
 export const APP_ROUTER_PROVIDERS = [
   provideRouter(routes),
-  NODE_LOCATION_PROVIDERS
 ];

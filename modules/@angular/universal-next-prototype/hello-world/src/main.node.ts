@@ -7,7 +7,8 @@ import {
   provideDocument,
   ORIGIN_URL,
   REQUEST_URL,
-  BASE_URL
+  BASE_URL,
+  NODE_LOCATION_PROVIDERS
 } from '@angular/universal';
 import {App, APP_PROVIDERS} from './app';
 
@@ -54,7 +55,8 @@ export function main(providers = []) {
       {provide: ORIGIN_URL, useValue: 'http://127.0.0.1:3000/'},
       {provide: REQUEST_URL, useValue: '/'},
       {provide: BASE_URL, useValue: '/'},
-      ...APP_PROVIDERS
+      ...APP_PROVIDERS,
+      ...NODE_LOCATION_PROVIDERS
 
     ])
     .then((componentRef: ComponentRef<App>) => {
