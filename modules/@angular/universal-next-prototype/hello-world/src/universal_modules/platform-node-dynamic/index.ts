@@ -50,19 +50,7 @@ import {ViewUtils} from '@angular/core/src/linker/view_utils';
 import {PLATFORM_CORE_PROVIDERS, ApplicationRef_} from '@angular/core/src/application_ref';
 import {SanitizationService} from '@angular/core/src/security';
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
-function _document(): any {
-  return {};
-}
 // private
-
-@Injectable()
-class WatViewUtils {
-  constructor() {
-  }
-  renderComponent() {
-
-  }
-}
 
 export const NODE_PLATFORM_MARKER = new OpaqueToken('NODE_PLATFORM_MARKER');
 
@@ -72,14 +60,12 @@ export const NODE_PLATFORM_PROVIDERS = arrayFlattenTree([
   {provide: NgZone, useFactory: () => new NgZone({enableLongStackTrace: true}), deps: []},
   {provide: NODE_PLATFORM_MARKER, useValue: true},
   ...SERVER_PLATFORM_PROVIDERS,
-  // ...BROWSER_APP_PROVIDERS,
   ...BROWSER_APP_COMPILER_PROVIDERS,
   {provide: AnimationDriver, useFactory: NoOpAnimationDriver},
   {provide: WebAnimationsDriver, useExisting: AnimationDriver},
+].filter(provider => provider !== APPLICATION_COMMON_PROVIDERS), [])
 
-
-].filter(wat => wat !== APPLICATION_COMMON_PROVIDERS), [])
-
+// debug providers
 console.log('\nNODE_PLATFORM_PROVIDERS\n', NODE_PLATFORM_PROVIDERS.map((provider, id) => {
   let token = provider.provide || provider;
   return (token.id || id) + ': ' + (token.name || token._desc);
@@ -89,11 +75,11 @@ export function nodePlatform(nodeProviders = []) {
   if (!getPlatform()) {
     var nodeInjector = ReflectiveInjector.resolveAndCreate(NODE_PLATFORM_PROVIDERS.concat(nodeProviders));
     createPlatform(nodeInjector);
+    reflector.reflectionCapabilities = new ReflectionCapabilities();
   }
   return assertPlatform(NODE_PLATFORM_MARKER)
 }
 
-reflector.reflectionCapabilities = new ReflectionCapabilities();
 
 export function bootstrap(
   component: any,
@@ -104,7 +90,7 @@ export function bootstrap(
   const appProviders = arrayFlattenTree([
 
     // ...PLATFORM_CORE_PROVIDERS,
-    ...BROWSER_APP_PROVIDERS,//.filter(wat => wat !== APPLICATION_COMMON_PROVIDERS),
+    ...BROWSER_APP_PROVIDERS,
     // ...APPLICATION_COMMON_PROVIDERS,
 
     provideUniversalAppId(),
@@ -128,14 +114,14 @@ export function bootstrap(
     {provide: ComponentResolver, useExisting: RuntimeCompiler},
 
     ...providers
-  ], []).filter(wat => (wat !== NgZone && wat !== APP_ID_RANDOM_PROVIDER));
+  ], []).filter(provider => (provider !== NgZone && provider !== APP_ID_RANDOM_PROVIDER));
 
+  // debug providers
   console.log('\nNODE_APP_PROVIDERS\n', appProviders.map((provider, id) => {
     let token = provider.provide || provider;
     return (token.id || NODE_PLATFORM_PROVIDERS.length + id) + ': ' + (token.name || token._desc);
   }))
 
-  const appInjector = ReflectiveInjector.resolveAndCreate(appProviders, nodePlatform().injector)
-
+  const appInjector = ReflectiveInjector.resolveAndCreate(appProviders, nodePlatform().injector);
   return coreLoadAndBootstrap(component, appInjector);
 }
