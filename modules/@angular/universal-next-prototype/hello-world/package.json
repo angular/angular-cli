@@ -5,7 +5,7 @@
   "scripts": {
     "watch": "npm run build -- --watch",
     "prebuild": "rimraf dist",
-    "build": "npm run copy:index && webpack",
+    "build": "npm run copy:index && webpack --progress",
     "copy:index": "cpy 'index.html' '../dist/public' --cwd=src --parents",
     "start": "npm run server",
     "server": "npm run server:dev",
