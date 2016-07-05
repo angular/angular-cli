@@ -1,3 +1,6 @@
 import {isBrowser} from '@angular/universal/browser';
 
-console.log('isBrowser', isBrowser);
+export function main() {
+  console.log('isBrowser', isBrowser);
+
+}
