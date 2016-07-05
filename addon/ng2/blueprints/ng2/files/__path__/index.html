@@ -48,9 +48,16 @@
 
   <% } else { %>
 
-    {{#each scripts.polyfills}}
+    {{#if environment.production}}
+      {{#each scripts.prodPolyfills}}
     <script src="{{.}}"></script>
-    {{/each}}
+      {{/each}}
+    {{/if}}
+    {{#unless environment.production}}
+      {{#each scripts.polyfills}}
+    <script src="{{.}}"></script>
+      {{/each}}
+    {{/unless}}
     <script>
       System.import('system-config.js').then(function () {
         System.import('main');
