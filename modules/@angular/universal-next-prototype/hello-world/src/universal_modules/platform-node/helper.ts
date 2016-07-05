@@ -49,3 +49,15 @@ export function _randomChar() {
 export function _appIdRandomProviderFactory() {
   return `${_randomChar()}${_randomChar()}${_randomChar()}`;
 }
+
+
+export function arrayFlattenTree(children: any[], arr: any[]): any[] {
+  for (let child of children) {
+    if (Array.isArray(child)) {
+      arrayFlattenTree(child, arr);
+    } else {
+      arr.push(child);
+    }
+  }
+  return arr;
+}

@@ -35,6 +35,7 @@ import {serverBootstrap, SERVER_PLATFORM_PROVIDERS} from '@angular/platform-serv
 
 import {
   parseDocument,
+  arrayFlattenTree,
   NodeDomRootRenderer_,
   NodeSharedStylesHost,
   NODE_LOCATION_PROVIDERS
@@ -66,16 +67,6 @@ class WatViewUtils {
 export const NODE_PLATFORM_MARKER = new OpaqueToken('NODE_PLATFORM_MARKER');
 
 
-export function arrayFlattenTree(children: any[], arr: any[]): any[] {
-  for (let child of children) {
-    if (Array.isArray(child)) {
-      arrayFlattenTree(child, arr);
-    } else {
-      arr.push(child);
-    }
-  }
-  return arr;
-}
 
 export const NODE_PLATFORM_PROVIDERS = arrayFlattenTree([
   {provide: NgZone, useFactory: () => new NgZone({enableLongStackTrace: true}), deps: []},
