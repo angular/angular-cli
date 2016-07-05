@@ -41,9 +41,9 @@ export function provideDocument (document: string): Array<any> {
     provide: DOCUMENT,
     useFactory: (domSharedStylesHost: DomSharedStylesHost) => {
       let newDoc = document
-      newDoc = replaceElementTag(newDoc, 'script', 'UNIVERSAL-SCRIPT');
-      newDoc = replaceElementTag(newDoc, 'style', 'UNIVERSAL-STYLE');
-      newDoc = replaceVoidElementTag(newDoc, 'link', 'UNIVERSAL-LINK', 'meta ');
+      // newDoc = replaceElementTag(newDoc, 'script', 'UNIVERSAL-SCRIPT');
+      // newDoc = replaceElementTag(newDoc, 'style', 'UNIVERSAL-STYLE');
+      // newDoc = replaceVoidElementTag(newDoc, 'link', 'UNIVERSAL-LINK', 'meta ');
       var doc: any = parseDocument(newDoc);
       domSharedStylesHost.addHost(doc.head);
       return doc;
