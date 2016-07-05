@@ -7,6 +7,7 @@
     "prebuild": "rimraf dist",
     "build": "npm run copy:index && webpack",
     "copy:index": "cpy 'index.html' '../dist/public' --cwd=src --parents",
+    "start": "npm run server",
     "server": "npm run server:dev",
     "server:dev": "nodemon ./dist/server/express-bundle.js",
     "server:prod": "http-server ./dist/server/express-bundle.js -p 3000 --cors",
