@@ -6,9 +6,10 @@
     "watch": "npm run build -- --watch",
     "prebuild": "rimraf dist",
     "build": "npm run copy:index && webpack",
-    "copy:index": "cpy 'index.html' '../dist' --cwd=src --parents",
-    "server": "nodemon ./dist/express-bundle.js -p 3000 --cors",
-    "server:prod": "http-server ./dist/express-bundle.js -p 3000 --cors",
+    "copy:index": "cpy 'index.html' '../dist/public' --cwd=src --parents",
+    "server": "npm run server:dev",
+    "server:dev": "nodemon ./dist/server/express-bundle.js",
+    "server:prod": "http-server ./dist/server/express-bundle.js -p 3000 --cors",
     "server:universal": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
