@@ -1,6 +1,7 @@
 import {bootstrap} from '@angular/platform-browser-dynamic';
 import {HTTP_PROVIDERS} from '@angular/http';
 import {isBrowser} from '@angular/universal/browser';
+import {prebootClient} from 'preboot';
 
 import {App, APP_PROVIDERS} from './app';
 export function main() {
@@ -8,5 +9,9 @@ export function main() {
   return bootstrap(App, [
     ...APP_PROVIDERS,
     ...HTTP_PROVIDERS
-  ]);
+  ])
+    .then(() => {
+      let preboot = prebootClient();
+      preboot.complete();
+    });
 }

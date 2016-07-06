@@ -31,6 +31,9 @@
       "@angular/universal/node": [
         "./src/universal_modules/universal/node.ts"
       ],
+      "preboot": [
+        "./src/universal_modules/preboot"
+      ],
       "rxjs/*": [
         "./node_modules/rxjs-es/*"
       ]

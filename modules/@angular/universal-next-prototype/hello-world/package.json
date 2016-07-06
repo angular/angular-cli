@@ -55,6 +55,7 @@
     "@angular/platform-server": "2.0.0-rc.4",
     "@angular/router": "3.0.0-beta.2",
     "core-js": "^2.4.0",
+    "express": "^4.14.0",
     "ie-shim": "^0.1.0",
     "parse5": "^1.5.0",
     "rxjs": "5.0.0-beta.6",
