@@ -6,12 +6,16 @@ import {prebootClient} from 'preboot';
 import {App, APP_PROVIDERS} from './app';
 export function main() {
   console.log('isBrowser', isBrowser);
-  return bootstrap(App, [
-    ...APP_PROVIDERS,
-    ...HTTP_PROVIDERS
-  ])
-    .then(() => {
-      let preboot = prebootClient();
-      preboot.complete();
-    });
+
+  // timeout to test preboot
+  setTimeout(function () {
+    return bootstrap(App, [
+      ...APP_PROVIDERS,
+      ...HTTP_PROVIDERS
+    ])
+      .then(() => {
+        let preboot = prebootClient();
+        preboot.complete();
+      });
+  }, 3000);
 }

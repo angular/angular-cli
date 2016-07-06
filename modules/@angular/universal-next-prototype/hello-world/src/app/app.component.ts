@@ -29,6 +29,7 @@ export class Wat {
   `],
   template: `
     <div>
+      <input id="myInput">
       Hello World
       {{ wat }}
       <wat>

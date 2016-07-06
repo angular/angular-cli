@@ -2,7 +2,7 @@ import './polyfills.node';
 
 import * as path from 'path';
 import * as express from 'express';
-import * as bodyParser from 'body-parser';
+// import * as bodyParser from 'body-parser';
 
 import * as preboot from 'preboot';
 

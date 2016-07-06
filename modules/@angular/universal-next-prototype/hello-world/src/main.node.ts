@@ -12,12 +12,21 @@ import {
 } from '@angular/universal';
 import {App, APP_PROVIDERS} from './app';
 
+import * as preboot from 'preboot';
+
+console.log(preboot);
 
 // const document = ;
 // enableProdMode();
 
 
 export function main(providers = []) {
+
+  let prebootInline = preboot.getInlineCode({
+    appRoot: 'app',
+    buffer: true
+  });
+
   return bootstrap(App, [
       ...provideDocument(`
       <!doctype html>
@@ -36,6 +45,10 @@ export function main(providers = []) {
 
             }
           </style>
+
+          <script>
+            ${prebootInline}
+          </script>
 
           <base href="/">
         </head>
