@@ -52,7 +52,3 @@ test/coverage
 /modules/angular2-grunt-prerender/tasks
 /modules/grunt-prerender/tasks
 
-
-/examples/dist
-
-examples/typings
