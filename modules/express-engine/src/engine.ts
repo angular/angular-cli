@@ -208,13 +208,13 @@ function angularScript(config): string {
   <script src="${baseUrl}/systemjs/dist/system.js"></script>
   <!-- Angular2: Bundle -->
   <script src="${baseUrl}/rxjs/bundles/Rx.umd.js"></script>
-  <script src="${baseUrl}/@angular/core/core.umd.js"></script>
-  <script src="${baseUrl}/@angular/common/common.umd.js"></script>
-  <script src="${baseUrl}/@angular/compiler/compiler.umd.js"></script>
-  <script src="${baseUrl}/@angular/platform-browser/platform-browser.umd.js"></script>
-  <script src="${baseUrl}/@angular/platform-browser-dynamic/platform-browser-dynamic.umd.js"></script>
-  <script src="${baseUrl}/@angular/router-deprecated/router-deprecated.umd.js"></script>
-  <script src="${baseUrl}/@angular/http/http.umd.js"></script>
+  <script src="${baseUrl}/@angular/core/bundles/core.umd.js"></script>
+  <script src="${baseUrl}/@angular/common/bundles/common.umd.js"></script>
+  <script src="${baseUrl}/@angular/compiler/bundles/compiler.umd.js"></script>
+  <script src="${baseUrl}/@angular/platform-browser/bundles/platform-browser.umd.js"></script>
+  <script src="${baseUrl}/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js"></script>
+  <script src="${baseUrl}/@angular/router-deprecated/bundles/router-deprecated.umd.js"></script>
+  <script src="${baseUrl}/@angular/http/bundles/http.umd.js"></script>
   <script type="text/javascript">
   System.config(${ JSON.stringify(newConfig) });
   </script>
