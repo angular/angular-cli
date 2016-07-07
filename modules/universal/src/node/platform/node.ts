@@ -88,8 +88,8 @@ export const NODE_APP_PLATFORM_MARKER = new OpaqueToken('NodeAppPlatformMarker')
 
 export const NODE_APP_PLATFORM: Array<any> = CONST_EXPR([
   ...PLATFORM_COMMON_PROVIDERS,
-  new Provider(NODE_APP_PLATFORM_MARKER, {useValue: true}),
-  new Provider(PLATFORM_INITIALIZER, {useValue: initNodeAdapter, multi: true}),
+  {provide: NODE_APP_PLATFORM_MARKER, useValue: true},
+  {provide: PLATFORM_INITIALIZER, useValue: initNodeAdapter, multi: true},
 ]);
 
 function _exceptionHandler(): ExceptionHandler {
@@ -126,14 +126,14 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   ...(ELEMENT_PROBE_PROVIDERS || [])
 ]);
 
-console.log('\n NODE_APP_COMMON_PROVIDERS \n', arrayFlattenTree(NODE_APP_COMMON_PROVIDERS).map((provider, id, collection) => {
-  if (provider === undefined) {
-    console.log('provider undefined: ', collection[id-1], collection[id], collection[id+1])
-    return [];
-  }
-  let token = provider.provide || provider;
-  return (token.id || id) + ': ' + (token.name || token._desc);
-}));
+// console.log('\n NODE_APP_COMMON_PROVIDERS \n', arrayFlattenTree(NODE_APP_COMMON_PROVIDERS).map((provider, id, collection) => {
+//   if (provider === undefined) {
+//     console.log('provider undefined: ', collection[id-1], collection[id], collection[id+1])
+//     return undefined;
+//   }
+//   let token = provider.provide || provider;
+//   return (token.id || id) + ': ' + (token.name || token._desc);
+// }));
 
 /**
  * An array of providers that should be passed into `application()` when bootstrapping a component.
@@ -153,18 +153,18 @@ export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
   ...(XHR ? [{provide: XHR, useClass: NodeXHRImpl}] : []),
 ]);
 
-console.log('\n NODE_APP_PROVIDERS \n', arrayFlattenTree(NODE_APP_PROVIDERS).map((provider, id, collection) => {
-  if (provider === undefined) {
-    console.log('provider undefined: ', collection[id-1], collection[id], collection[id+1])
-    return [];
-  }
-  let token = provider.provide || provider;
-  if (token === undefined) {
-    console.log('provider token undefined: ', collection[id-1], collection[id], collection[id+1])
-    return [];
-  }
-  return (token.id || id) + ': ' + (token.name || token._desc);
-}));
+// console.log('\n NODE_APP_PROVIDERS \n', arrayFlattenTree(NODE_APP_PROVIDERS).map((provider, id, collection) => {
+//   if (provider === undefined) {
+//     console.log('provider undefined: ', collection[id-1], collection[id], collection[id+1])
+//     return undefined;
+//   }
+//   let token = provider.provide || provider;
+//   if (token === undefined) {
+//     console.log('provider token undefined: ', collection[id-1], collection[id], collection[id+1])
+//     return undefined;
+//   }
+//   return (token.id || id) + ': ' + (token.name || token._desc);
+// }));
 
 /**
  *
