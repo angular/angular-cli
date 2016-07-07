@@ -32,7 +32,7 @@ import {preparseElement, PreparsedElementType} from '@angular/compiler/src/templ
 
 import {isStyleUrlResolvable} from '@angular/compiler/src/style_url_resolver';
 
-import {HtmlAstVisitor, HtmlElementAst, HtmlAttrAst, HtmlTextAst, HtmlCommentAst, HtmlExpansionAst, HtmlExpansionCaseAst, htmlVisitAll} from './html_ast';
+import {HtmlAstVisitor, HtmlElementAst, HtmlAttrAst, HtmlTextAst, HtmlCommentAst, HtmlExpansionAst, HtmlExpansionCaseAst, htmlVisitAll} from '@angular/compiler/src/html_ast';
 
 import {splitAtColon} from '@angular/compiler/src/util';
 import {identifierToken, Identifiers} from '@angular/compiler/src/identifiers';
