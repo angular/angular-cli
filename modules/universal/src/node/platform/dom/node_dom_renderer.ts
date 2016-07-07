@@ -30,14 +30,14 @@ var DOM: any = getDOM();
 @Injectable()
 export class NodeDomRootRenderer_ extends DomRootRenderer {
   constructor(@Inject(DOCUMENT) _document: any, _eventManager: EventManager,
-              sharedStylesHost: DomSharedStylesHost, animate: WebAnimationsDriver) {
-    super(_document, _eventManager, sharedStylesHost, animate);
+              sharedStylesHost: DomSharedStylesHost, private _animate: WebAnimationsDriver) {
+    super(_document, _eventManager, sharedStylesHost, _animate);
   }
   renderComponent(componentProto: RenderComponentType): Renderer {
     // TODO(gdi2290): see PR https://github.com/angular/angular/pull/6584
     var renderer = (<any>this).registeredComponents.get(componentProto.id);
     if (isBlank(renderer)) {
-      renderer = new NodeDomRenderer(this, componentProto);
+      renderer = new NodeDomRenderer(this, componentProto, this._animate);
       (<any>this).registeredComponents.set(componentProto.id, renderer);
     }
     return renderer;
@@ -213,11 +213,11 @@ export const IGNORE_ATTRIBUTES = {
 };
 
 export class NodeDomRenderer extends DomRenderer {
-  constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType) {
+  constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType, _animate: WebAnimationsDriver) {
     if (_componentProto.encapsulation === ViewEncapsulation.Native) {
       _componentProto.encapsulation = ViewEncapsulation.Emulated;
     }
-    super(_rootRenderer, _componentProto);
+    super(_rootRenderer, _componentProto, _animate);
   }
 
   setElementProperty(renderElement: any, propertyName: string, propertyValue: any) {
