@@ -273,6 +273,9 @@ function bootstrapFunction(config: any): string {
 // to pay off this technical debt
 // currently checking for explicit values
 function buildClientScripts(html: string, options: any): string {
+  let text = 'DEPRECATION WARNING: `buildClientScripts` is no longer supported';
+  console.warn(text + ' and will be removed in next release.');
+
   if (!options || !options.buildClientScripts) { return html; }
   return html
     .replace(
