@@ -111,7 +111,7 @@ var TEXT_CSS_SELECTOR = CssSelector.parse('*')[0];
  } from '@angular/compiler/src/template_parser';
 
 @Injectable()
-export class NodeTemplateParser {
+export class NodeTemplateParserRc13 {
   constructor(private _exprParser: Parser, private _schemaRegistry: ElementSchemaRegistry,
               private _htmlParser: HtmlParser, private _console: Console,
               @Optional() @Inject(TEMPLATE_TRANSFORMS) public transforms: TemplateAstVisitor[]) {}

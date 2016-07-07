@@ -53,7 +53,8 @@ import {TemplateParser} from '@angular/compiler/src/template_parser';
 import {NodeDomRootRenderer_} from './dom/node_dom_renderer';
 import {NodeXHRImpl} from './node_xhr_impl';
 import {NodeSharedStylesHost} from './node_shared_styles_host';
-import {NodeTemplateParser} from './node_template_parser';
+import {NodeTemplateParser} from './node_template_parser-rc4';
+import {NodeTemplateParserRc13} from './node_template_parser-rc1-3';
 import {NodeTemplateParserRc0} from './node_template_parser-rc.0';
 import {NODE_PLATFORM_DIRECTIVES} from '../directives';
 
@@ -68,6 +69,7 @@ import {isPresent} from '../../common';
 const {ELEMENT_PROBE_PROVIDERS, BROWSER_SANITIZATION_PROVIDERS} = require('@angular/platform-browser');
 var DOM: any = getDOM();
 var isRc0 = require('@angular/core/package.json').version.indexOf('-rc.0') !== -1;
+var isRc4 = require('@angular/core/package.json').version.indexOf('-rc.4') !== -1;
 function arrayFlattenTree(children: any[], arr: any[] = []): any[] {
   for (let child of children) {
     if (Array.isArray(child)) {
@@ -136,7 +138,7 @@ console.log('\n NODE_APP_COMMON_PROVIDERS \n', arrayFlattenTree(NODE_APP_COMMON_
 /**
  * An array of providers that should be passed into `application()` when bootstrapping a component.
  */
- const templateParser = isRc0 ? NodeTemplateParserRc0 : NodeTemplateParser;
+ const templateParser = isRc0 ? NodeTemplateParserRc0 : isRc4 ? NodeTemplateParser : NodeTemplateParserRc13;
 export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
   ...NODE_APP_COMMON_PROVIDERS,
   ...COMPILER_PROVIDERS,
