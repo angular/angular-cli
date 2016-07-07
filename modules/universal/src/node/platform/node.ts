@@ -29,7 +29,7 @@ import {
 } from '@angular/core';
 
 // Common
-import {COMMON_DIRECTIVES, COMMON_PIPES} from '@angular/common';
+import {COMMON_DIRECTIVES, COMMON_PIPES, FORM_PROVIDERS, PlatformLocation} from '@angular/common';
 
 
 // Platform.Dom
@@ -57,7 +57,7 @@ import {NodeTemplateParser} from './node_template_parser-rc4';
 import {NodeTemplateParserRc13} from './node_template_parser-rc1-3';
 import {NodeTemplateParserRc0} from './node_template_parser-rc.0';
 import {NODE_PLATFORM_DIRECTIVES} from '../directives';
-
+import {NodePlatformLocation} from '../router/node_platform_location';
 // should be Private
 import {WebAnimationsDriver} from '@angular/platform-browser/src/dom/web_animations_driver';
 import {reflector} from '@angular/core/src/reflection/reflection';
@@ -66,7 +66,10 @@ var CONST_EXPR = v => v;
 import '../make_parse5_current'; // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 import {isPresent} from '../../common';
-const {ELEMENT_PROBE_PROVIDERS, BROWSER_SANITIZATION_PROVIDERS} = require('@angular/platform-browser');
+var {ELEMENT_PROBE_PROVIDERS, BROWSER_SANITIZATION_PROVIDERS} = require('@angular/platform-browser');
+if (!ELEMENT_PROBE_PROVIDERS) {
+  ELEMENT_PROBE_PROVIDERS = require('@angular/platform-browser/src/dom/debug/ng_probe').ELEMENT_PROBE_PROVIDERS;
+}
 var DOM: any = getDOM();
 var isRc0 = require('@angular/core/package.json').version.indexOf('-rc.0') !== -1;
 var isRc4 = require('@angular/core/package.json').version.indexOf('-rc.4') !== -1;
@@ -90,6 +93,7 @@ export const NODE_APP_PLATFORM: Array<any> = CONST_EXPR([
   ...PLATFORM_COMMON_PROVIDERS,
   {provide: NODE_APP_PLATFORM_MARKER, useValue: true},
   {provide: PLATFORM_INITIALIZER, useValue: initNodeAdapter, multi: true},
+  {provide: PlatformLocation, useClass: NodePlatformLocation}
 ]);
 
 function _exceptionHandler(): ExceptionHandler {
@@ -102,10 +106,11 @@ function _document(): any {
 
 export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   ...APPLICATION_COMMON_PROVIDERS,
+  ...FORM_PROVIDERS,
   ...BROWSER_SANITIZATION_PROVIDERS,
+  {provide: ExceptionHandler, useFactory: _exceptionHandler, deps: []},
   {provide: PLATFORM_PIPES, useValue: COMMON_PIPES, multi: true},
   {provide: PLATFORM_DIRECTIVES, useValue: COMMON_DIRECTIVES, multi: true},
-  {provide: ExceptionHandler, useFactory: _exceptionHandler, deps: []},
   ...NODE_PLATFORM_DIRECTIVES,
   {provide: DOCUMENT, useFactory: () => _document },
   {provide: EVENT_MANAGER_PLUGINS, useClass: DomEventsPlugin, multi: true},
