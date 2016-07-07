@@ -398,12 +398,12 @@ module.exports = function(ROOT) {
 
           directives: [newRouterApp.App],
           platformProviders: [
-            provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
-            provide(BASE_URL, {useValue: '/examples/new_router'})
+            {provide: ORIGIN_URL, useValue: 'http://localhost:3000'},
+            {provide: BASE_URL, useValue: '/examples/new_router'}
           ],
           providers: [
             NODE_HTTP_PROVIDERS,
-            provide(REQUEST_URL, {useValue: url}),
+            {provide: REQUEST_URL, useValue: url},
             provideRouter(newRouterApp.routes),
             NODE_LOCATION_PROVIDERS
           ],

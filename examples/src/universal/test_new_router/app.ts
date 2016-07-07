@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {ROUTER_DIRECTIVES, RouterConfig} from '@angular/router';
+import {ROUTER_DIRECTIVES, RouterConfig, Route} from '@angular/router';
 
 @Component({
   selector: 'home',
@@ -51,8 +51,17 @@ export class App {
 }
 
 
+interface NewRoute extends Route {
+  pathMatch?: 'full'|'prefix';
+}
+
 export const routes: RouterConfig = [
-  { path: '', component: Home },
+  (<NewRoute>{ path: '', component: Home,
+    // new api
+    pathMatch: 'full',
+    // old api
+    terminal: true
+  }),
   { path: 'home', component: Home },
   { path: 'about', component: About }
 ];
