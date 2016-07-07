@@ -352,13 +352,14 @@ module.exports = function(ROOT) {
 
       directives: [routerApp.App],
       platformProviders: [
-        provide(ORIGIN_URL, {useValue: 'http://localhost:3000'}),
-        provide(BASE_URL, {useValue: '/examples/router'})
+        {provide: ORIGIN_URL, useValue: 'http://localhost:3000'},
+        {provide: BASE_URL, useValue: '/examples/router'}
       ],
       providers: [
-        provide(REQUEST_URL, {useValue: url}),
+        {provide: REQUEST_URL, useValue: url},
         NODE_HTTP_PROVIDERS,
-        NODE_ROUTER_PROVIDERS,
+        ROUTER_PROVIDERS,
+        NODE_LOCATION_PROVIDERS
       ],
       data: {},
 
