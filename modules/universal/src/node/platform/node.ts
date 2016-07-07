@@ -37,12 +37,13 @@ import {EventManager, EVENT_MANAGER_PLUGINS} from '@angular/platform-browser/src
 import {DomEventsPlugin} from '@angular/platform-browser/src/dom/events/dom_events';
 import {KeyEventsPlugin} from '@angular/platform-browser/src/dom/events/key_events';
 import {HammerGesturesPlugin} from '@angular/platform-browser/src/dom/events/hammer_gestures';
+// import {BROWSER_SANITIZATION_PROVIDERS} from'@angular/platform-browser'; // see provate below
 import {DomSharedStylesHost, SharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
 import {
   HAMMER_GESTURE_CONFIG,
   HammerGestureConfig
 } from '@angular/platform-browser/src/dom/events/hammer_gestures';
-import {ELEMENT_PROBE_PROVIDERS, BROWSER_SANITIZATION_PROVIDERS} from '@angular/platform-browser';
+
 import {DOCUMENT} from '@angular/platform-browser/src/dom/dom_tokens';
 import {DomRootRenderer} from '@angular/platform-browser/src/dom/dom_renderer';
 import {RootRenderer} from '@angular/core/src/render/api';
@@ -64,9 +65,19 @@ var CONST_EXPR = v => v;
 import '../make_parse5_current'; // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 import {isPresent} from '../../common';
+const {ELEMENT_PROBE_PROVIDERS, BROWSER_SANITIZATION_PROVIDERS} = require('@angular/platform-browser');
 var DOM: any = getDOM();
 var isRc0 = require('@angular/core/package.json').version.indexOf('-rc.0') !== -1;
-
+function arrayFlattenTree(children: any[], arr: any[] = []): any[] {
+  for (let child of children) {
+    if (Array.isArray(child)) {
+      arrayFlattenTree(child, arr);
+    } else {
+      arr.push(child);
+    }
+  }
+  return arr;
+}
 
 export function initNodeAdapter() {
 }
@@ -110,9 +121,17 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   // BrowserDetails,
   // AnimationBuilder,
   EventManager,
-  ...ELEMENT_PROBE_PROVIDERS
+  ...(ELEMENT_PROBE_PROVIDERS || [])
 ]);
 
+console.log('\n NODE_APP_COMMON_PROVIDERS \n', arrayFlattenTree(NODE_APP_COMMON_PROVIDERS).map((provider, id, collection) => {
+  if (provider === undefined) {
+    console.log('provider undefined: ', collection[id-1], collection[id], collection[id+1])
+    return [];
+  }
+  let token = provider.provide || provider;
+  return (token.id || id) + ': ' + (token.name || token._desc);
+}));
 
 /**
  * An array of providers that should be passed into `application()` when bootstrapping a component.
@@ -128,9 +147,22 @@ export const NODE_APP_PROVIDERS: Array<any> = CONST_EXPR([
     },
     deps: [PLATFORM_DIRECTIVES, PLATFORM_PIPES]
   },
-  new Provider(TemplateParser, {useClass: templateParser}),
-  new Provider(XHR, {useClass: NodeXHRImpl}),
+  ...(TemplateParser ? [{provide: TemplateParser, useClass: templateParser}] : []),
+  ...(XHR ? [{provide: XHR, useClass: NodeXHRImpl}] : []),
 ]);
+
+console.log('\n NODE_APP_PROVIDERS \n', arrayFlattenTree(NODE_APP_PROVIDERS).map((provider, id, collection) => {
+  if (provider === undefined) {
+    console.log('provider undefined: ', collection[id-1], collection[id], collection[id+1])
+    return [];
+  }
+  let token = provider.provide || provider;
+  if (token === undefined) {
+    console.log('provider token undefined: ', collection[id-1], collection[id], collection[id+1])
+    return [];
+  }
+  return (token.id || id) + ': ' + (token.name || token._desc);
+}));
 
 /**
  *
