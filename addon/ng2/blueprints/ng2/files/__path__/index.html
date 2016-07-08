@@ -30,9 +30,7 @@
 </head>
 <body>
   <<%= prefix %>-root>Loading...</<%= prefix %>-root>
-
   <% if (isMobile) { %>
-
     {{#if environment.production}}
       <script src="/app-concat.js" async></script>
     {{else}}
@@ -45,9 +43,7 @@
         }).catch(console.error.bind(console));
       </script>
     {{/if}}
-
   <% } else { %>
-
     {{#each scripts.polyfills}}
     <script src="{{.}}"></script>
     {{/each}}
@@ -56,8 +52,6 @@
         System.import('main');
       }).catch(console.error.bind(console));
     </script>
-
   <% } %>
-
 </body>
 </html>
