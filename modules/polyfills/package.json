@@ -46,7 +46,7 @@
     "reflect-metadata": "0.1.2"
   },
   "peerDependencies": {
-    "zone.js": "0.6.11 - 0.6.100"
+    "zone.js": "~0.6.11"
   },
   "repository": {
     "type": "git",
