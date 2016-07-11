@@ -19,7 +19,6 @@
     * w/ ASP.NET Core Server
 * [Modules](#modules)
     * [Universal](#universal)
-    * [preboot.js](#prebootjs)
 * [Best Practices](#best-practices)
 * [What's in a name?](#whats-in-a-name)
 * [License](#license)
@@ -52,7 +51,7 @@ Full Stack Angular 2 - AngularConnect, Oct 2015
 Angular 2 Server Rendering - Angular U, July 2015  
 [![Angular 2 Server Rendering](http://img.youtube.com/vi/0wvZ7gakqV4/0.jpg)](http://www.youtube.com/watch?v=0wvZ7gakqV4)
 
-## [preboot.js](/modules/preboot)
+## [preboot.js](https://github.com/angular/preboot)
 > Control server-rendered page and transfer state before client-side web app loads to the client-side-app.
 
 # Best Practices

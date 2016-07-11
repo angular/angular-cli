@@ -10,7 +10,6 @@
 - [ ] grunt-prerender
 - [ ] gulp-prerender
 - [ ] hapi-engine
-- [ ] preboot
 - [ ] universal-preview
 - [ ] universal
 - [ ] webpack-prerender
