@@ -1,8 +1,0 @@
-{
-  "dependencies": {},
-  "devDependencies": {},
-  "globalDependencies": {
-    "core-js": "registry:dt/core-js#0.0.0+20160317120654",
-    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#48c1e3c1d6baefa4f1a126f188c27c4fefd36bff"
-  }
-}

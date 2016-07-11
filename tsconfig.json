@@ -2,56 +2,53 @@
   "compilerOptions": {
   	"target": "es5",
   	"module": "commonjs",
-  	"declaration": false,
+  	"declaration": true,
     "noImplicitAny": false,
-    "removeComments": false,
+    "removeComments": true,
     "noLib": false,
-    "moduleResolution": "node",
+    "baseUrl": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
   	"sourceMap": true,
-    "listFiles": false,
-  	"outDir": "dist"
+    "inlineSources": true,
+  	"outDir": "dist",
+    "traceResolution": false,
+    "paths": {
+      "angular2-universal": [
+        "./modules/universal/src/node/index.ts"
+      ],
+      "angular2-express-engine": [
+        "./modules/express-engine/src/index.ts"
+      ],
+      "angular2-hapi-engine": [
+        "./modules/hapi-engine/src/index.ts"
+      ]
+    }
   },
-  "exclude": [
-    "modules/express-engine/dist",
-    "modules/express-engine/node_modules",
-    "modules/hapi-engine/dist",
-    "modules/hapi-engine/node_modules",
-    "modules/gulp-prerender/node_modules",
-    "modules/gulp-prerender/dist",
-    "modules/grunt-prerender/node_modules",
-    "modules/grunt-prerender/tasks",
-    "modules/webpack-prerender/node_modules",
-    "modules/webpack-prerender/dist",
-    "modules/universal/dist",
-    "modules/universal/node_modules",
-    "modules/universal/typings",
-    "modules/universal-preview/dist",
-    "modules/universal-preview/node_modules",
-    "modules/universal-preview/typings",
-    "modules/polyfills/dist",
-    "modules/polyfills/node_modules",
-    "modules/polyfills/typings",
-    "modules/preboot",
-    "modules/preboot/typings",
-    "node_modules",
-    "dist"
+
+  "files": [
+    "modules/broccoli-prerender/src/index.ts",
+    "modules/broccoli-prerender/src/child_proc.ts",
+    "modules/express-engine/src/index.ts",
+    "modules/grunt-prerender/tasks/index.ts",
+    "modules/gulp-prerender/src/index.ts",
+    "modules/hapi-engine/src/index.ts",
+    "modules/universal-polyfills/src/zone-node/index.ts",
+    "modules/universal-polyfills/src/dev.ts",
+    "modules/universal-polyfills/src/ie.ts",
+    "modules/universal-polyfills/src/browser.ts",
+    "modules/universal-polyfills/src/node.ts",
+    "modules/universal-polyfills/src/prod.ts",
+    "modules/universal-polyfills/src/test.ts",
+    "modules/universal-polyfills/src/zone-browser.ts",
+    "modules/universal/src/node/index.ts",
+    "modules/universal/src/browser/index.ts",
+    "modules/universal/src/global.ts",
+    "modules/universal/src/polyfills.ts",
+    "modules/universal/src/typings.ts",
+    "modules/webpack-prerender/src/index.ts",
+    "typings/index.d.ts"
   ],
-  "formatCodeOptions": {
-    "indentSize": 2,
-    "tabSize": 2,
-    "newLineCharacter": "\r\n",
-    "convertTabsToSpaces": true,
-    "insertSpaceAfterCommaDelimiter": true,
-    "insertSpaceAfterSemicolonInForStatements": true,
-    "insertSpaceBeforeAndAfterBinaryOperators": true,
-    "insertSpaceAfterKeywordsInControlFlowStatements": true,
-    "insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
-    "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
-    "placeOpenBraceOnNewLineForFunctions": false,
-    "placeOpenBraceOnNewLineForControlBlocks": false
-  },
   "compileOnSave": false,
   "buildOnSave": false,
   "atom": { "rewriteTsconfig": false }
