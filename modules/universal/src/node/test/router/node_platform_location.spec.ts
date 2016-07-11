@@ -44,7 +44,7 @@ describe('NodePlatformLocation', () => {
       const urls = [
         { pathname: '/some/path', search: 'first=value1&second=value2', hash: 'somehash' },
         { pathname: '/', search: 'somevalue', hash: '' },
-        { pathname: '', search: '', hash: '' }
+        { pathname: '/', search: '', hash: '' }
       ];
 
       for (const urlParts of urls) {

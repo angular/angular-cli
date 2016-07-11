@@ -742,7 +742,7 @@ class TemplateParseVisitor implements HtmlAstVisitor {
     var bindingType: any /** TODO #???? */;
     var boundPropertyName: string;
     var parts = name.split(PROPERTY_PARTS_SEPARATOR);
-    let securityContext: SecurityContext;
+    let securityContext: number // SecurityContext;
     if (parts.length === 1) {
       boundPropertyName = this._schemaRegistry.getMappedPropName(parts[0]);
       securityContext = this._schemaRegistry.securityContext(elementName, boundPropertyName);

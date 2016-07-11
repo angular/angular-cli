@@ -22,6 +22,7 @@ import {
   listContains
 } from '../../../common';
 
+import {AnimationDriver} from '@angular/core/src/animation/animation_driver';
 import '../../make_parse5_current'; // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();

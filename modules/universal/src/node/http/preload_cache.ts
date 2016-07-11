@@ -32,8 +32,7 @@ import {
 import {MockBackend} from '@angular/http/testing';
 
 // CJS
-import {XMLHttpRequest} from 'xhr2';
-// import XMLHttpRequest = require('xhr2');
+const XMLHttpRequest = require('xhr2');
 
 
 import {ORIGIN_URL, BASE_URL, PRIME_CACHE, isPresent, isBlank} from '../../common';
@@ -148,7 +147,7 @@ export class NgPreloadCacheHttp extends Http {
     protected _backend: ConnectionBackend,
     protected _defaultOptions: RequestOptions,
     @Inject(NgZone) protected _ngZone: NgZone,
-    @Optional() @Inject(PRIME_CACHE) protected prime?: boolean) {
+    @Optional() @Inject(PRIME_CACHE) protected prime: boolean = false) {
 
     super(_backend, _defaultOptions);
 
