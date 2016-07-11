@@ -27,4 +27,4 @@ before_script:
   - ./node_modules/.bin/tsc # build once with just tsc to make sure no TS errors, since build.js suppresses
 
 script:
-  - npm test
+  - ./node_modules/.bin/gulp test
