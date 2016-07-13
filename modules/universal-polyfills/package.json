@@ -4,23 +4,6 @@
   "typings": "browser.d.ts",
   "browser": "browser.js",
   "main": "node.js",
-  "files": [
-    "README.md",
-    "browser.d.ts",
-    "browser.js",
-    "node.d.ts",
-    "node.js",
-    "dev.d.ts",
-    "dev.js",
-    "ie.d.ts",
-    "ie.js",
-    "node.d.ts",
-    "node.js",
-    "prod.d.ts",
-    "prod.js",
-    "test.d.ts",
-    "test.js"
-  ],
   "dependencies": {
     "ie-shim": "<INHERIT>",
     "es6-promise": "<INHERIT>",

@@ -106,7 +106,9 @@ gulp.task('clean', () => {
   rimraf.sync('dist');
 });
 
-gulp.task('pre-publish', ['build', 'rewrite_packages', 'changelog']);
+gulp.task('pre-publish', ['build', 'rewrite_packages', 'changelog', 'copy_license']);
+
+gulp.task('copy_license', () => buildUtils.getAllModules().reduce((stream, mod: string) => stream.pipe(gulp.dest(`dist/${mod}`)), gulp.src('LICENSE')));
 
 gulp.task('changelog', () => {
   return gulp.src('CHANGELOG.md')
