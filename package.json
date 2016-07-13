@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
+    "@types/chalk": "^0.4.27-alpha",
     "broccoli": "^1.0.0-beta.7",
     "broccoli-caching-writer": "^2.2.1",
     "broccoli-concat": "^2.2.0",
@@ -54,8 +55,7 @@
     "silent-error": "^1.0.0",
     "symlink-or-copy": "^1.0.3",
     "systemjs-builder": "0.15.20",
-    "typescript": "^1.8.10",
-    "typings": "^0.8.1"
+    "typescript": "^2.0.0"
   },
   "ember-addon": {
     "paths": [
@@ -63,6 +63,13 @@
     ]
   },
   "devDependencies": {
+    "@types/assertion-error": "^1.0.28-alpha",
+    "@types/chai": "^3.4.27-alpha",
+    "@types/glob": "^5.0.28-alpha",
+    "@types/minimatch": "^2.0.27-alpha",
+    "@types/node": "^4.0.27-alpha",
+    "@types/shelljs": "^0.3.26-alpha",
+    "@types/through": "0.0.26-alpha",
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
     "eslint": "^2.8.0",
