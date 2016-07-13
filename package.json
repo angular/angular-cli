@@ -30,14 +30,14 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "broccoli": "^1.0.0-beta.7",
-    "broccoli-caching-writer": "^2.2.1",
-    "broccoli-concat": "^2.2.0",
-    "broccoli-funnel": "^1.0.1",
-    "broccoli-merge-trees": "^1.1.1",
-    "broccoli-source": "^1.1.0",
-    "broccoli-uglify-js": "^0.1.3",
-    "broccoli-writer": "^0.1.1",
+    "broccoli": "1.0.0-beta.7",
+    "broccoli-caching-writer": "2.2.1",
+    "broccoli-concat": "2.2.0",
+    "broccoli-funnel": "1.0.2",
+    "broccoli-merge-trees": "1.1.1",
+    "broccoli-source": "1.1.0",
+    "broccoli-uglify-js": "0.1.3",
+    "broccoli-writer": "0.1.1",
     "chalk": "^1.1.3",
     "ember-cli": "2.5.0",
     "ember-cli-string-utils": "^1.0.0",
@@ -76,6 +76,6 @@
     "through": "^2.3.8",
     "tree-kill": "^1.0.0",
     "tslint": "^3.8.1",
-    "walk-sync": "^0.2.6"
+    "walk-sync": "0.2.6"
   }
 }
