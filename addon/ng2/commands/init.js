@@ -9,6 +9,7 @@ var GitInit = require('../tasks/git-init');
 var LinkCli = require('../tasks/link-cli');
 var NpmInstall = require('../tasks/npm-install');
 
+
 module.exports = Command.extend({
   name: 'init',
   description: 'Creates a new angular-cli project in the current folder.',
@@ -94,7 +95,7 @@ module.exports = Command.extend({
 
       return Promise.reject(new SilentError(message));
     }
-    
+
     var blueprintOpts = {
       dryRun: commandOptions.dryRun,
       blueprint: commandOptions.blueprint || this._defaultBlueprint(),

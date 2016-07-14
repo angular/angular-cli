@@ -12,6 +12,8 @@ module.exports = {
 
   includedCommands: function () {
     return {
+      'build': require('./commands/build'),
+      'serve': require('./commands/serve'),
       'new': require('./commands/new'),
       'generate': require('./commands/generate'),
       'init': require('./commands/init'),
