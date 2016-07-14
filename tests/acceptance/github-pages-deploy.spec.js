@@ -45,7 +45,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .then(() => process.chdir('./tmp'))
       .then(() => ng(['new', project, '--skip-npm', '--skip-bower']))
       .then(() => setupDist())
-      .then(() => execStub = new ExecStub());
+      .finally(() => execStub = new ExecStub());
   });
 
   afterEach(function() {
@@ -53,7 +53,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
     return tmp.teardown('./tmp')
       .then(() => expect(execStub.hasFailed()).to.be.false)
       .then(() => expect(execStub.hasEmptyStack()).to.be.true)
-      .then(() => execStub.restore());
+      .finally(() => execStub.restore());
   });
 
   it('should fail with uncommited changes', function() {
