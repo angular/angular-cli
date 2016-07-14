@@ -91,7 +91,7 @@ describe('Basic end-to-end Workflow', function () {
     expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
   });
 
-  xit('Supports production builds config file replacement', function() {   
+  xit('Supports production builds config file replacement', function() {
     var mainBundlePath = path.join(process.cwd(), 'dist', 'main.js');
     var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
     // production: true minimized turns into production:!0
@@ -187,7 +187,7 @@ describe('Basic end-to-end Workflow', function () {
     var ngServePid;
 
     function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`, {maxBuffer: 500*1024});
+      var serveProcess = child_process.exec(`${ngBin} serve`, { maxBuffer: 500*1024 });
       var startedProtractor = false;
       ngServePid = serveProcess.pid;
 
@@ -496,7 +496,7 @@ describe('Basic end-to-end Workflow', function () {
     var ngServePid;
 
     function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`, {maxBuffer: 500*1024});
+      var serveProcess = child_process.exec(`${ngBin} serve`, { maxBuffer: 500*1024 });
       var startedProtractor = false;
       ngServePid = serveProcess.pid;
 

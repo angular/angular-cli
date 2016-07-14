@@ -71,7 +71,7 @@ export const getWebpackCommonConfig = function(projectRoot: string) {
         chunksSortMode: 'dependency'
       }),
       new webpack.optimize.CommonsChunkPlugin({
-        name: ['polyfills', 'vendor'].reverse()
+        name: ['vendor', 'polyfills']
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,

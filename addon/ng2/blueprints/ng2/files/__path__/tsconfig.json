@@ -5,11 +5,11 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "module": "es6",
-    "target": "es5",
     "moduleResolution": "node",
     "outDir": "./dist/",
     "rootDir": ".",
-    "sourceMap": true
+    "sourceMap": true,
+    "target": "es5"
   },
   "compileOnSave": false,
   "buildOnSave": false,

@@ -4,9 +4,7 @@
 var Promise = require('ember-cli/lib/ext/promise');
 var Task = require('ember-cli/lib/models/task');
 var path = require('path');
-var ngAppResolve = require('../models').ngAppResolve;
 var webpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
-var displayOptions = require('../models/webpack-build-utils').webpackOutputOptions;
 
 // require dependencies within the target project
 function requireDependency(root, moduleName) {
@@ -24,12 +22,12 @@ module.exports = Task.extend({
       var karmaConfig = path.join(projectRoot, this.project.ngConfig.test.karma.config);
 
       options.plugins = [
-        require("karma-webpack"),
-        require("karma-jasmine"),
-        require("karma-chrome-launcher"),
-        require("karma-coverage"),
-        require("karma-mocha-reporter"),
-        require("karma-sourcemap-loader"),
+        require('karma-webpack'),
+        require('karma-jasmine'),
+        require('karma-chrome-launcher'),
+        require('karma-coverage'),
+        require('karma-mocha-reporter'),
+        require('karma-sourcemap-loader')
       ];
       options.reporters = ['coverage', 'mocha', 'progress'];
 
