@@ -1,61 +1,43 @@
 /// <reference path="../../../typings/index.d.ts" />
 
-import * as chalk from 'chalk';
 import * as Command from 'ember-cli/lib/models/command';
-import * as Project from 'ember-cli/lib/models/project';
 import * as SilentError from 'silent-error';
+import { execSync, exec } from 'child_process';
+import * as Promise from 'ember-cli/lib/ext/promise';
+import * as chalk from 'chalk';
+import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import * as validProjectName from 'ember-cli/lib/utilities/valid-project-name';
 import * as GenerateCommand from './generate';
 import {NgAppStructure} from '../models/newFromJSON.model';
 
 const normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
-const fs = require('fs');
-const exec = require('child_process').execSync;
-const async = require('async');
-const NewCommand = require('./new');
-const InitCommand = require('./init');
+const fsReadFile = Promise.denodeify(fs.readFile);
+const fsWriteFile = Promise.denodeify(fs.writeFile);
+const fsReadDir = Promise.denodeify(fs.readdir);
+const fsCopy = Promise.denodeify(fse.copy);
+const fileStats = Promise.denodeify(fs.stat);
+const execPromise = Promise.denodeify(exec);
 
-const projectJSON: NgAppStructure = <NgAppStructure>JSON.parse(fs.readFileSync('ng-project.json', 'utf8'));
-let generatedItemCount: number = 0;
 
 const NewFromJSONCommand = Command.extend({
   name: 'newfromjson',
   works: 'outsideProject',
 
   availableOptions: [
-    { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
-    { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
-    { name: 'blueprint', type: String, default: 'ng2', aliases: ['b'] },
-    { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
-    { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
-    { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
-    { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
-    { name: 'directory', type: String, aliases: ['dir'] },
-    { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
-    { name: 'style', type: String, default: 'css' },
-    { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'mobile', type: Boolean, default: false }
   ],
-
+  
   run: function (commandOptions, rawArgs) {
 
-    if (!projectJSON) {
-      return Promise.reject(new SilentError(
-        `The "ng ${this.name}" command requires a ng-project.json file. ` +
-        `For more details, use "ng help".`));
-    }
+    let projectJSON: NgAppStructure;
 
-    this.ui.writeLine(chalk.cyan(`The raw arguments are ${rawArgs}`));
-
-    const packageName = projectJSON.package.name;
-    const packageOptions = {
-      'blueprint': projectJSON.package.blueprint || commandOptions.blueprint || undefined,
-      'dryRun': projectJSON.package.dryRun || commandOptions.dryRun,
-      'directory': projectJSON.package.directory || commandOptions.directory || undefined,
-      'verbose': projectJSON.package.verbose || commandOptions.verbose,
-      'skipNpm': projectJSON.package.skipNpm || commandOptions.skipNpm,
-      'skipGit': projectJSON.package.skipGit || commandOptions.skipGit
-    }
+    const ui = this.ui;
+    const chDir = process.chdir;
+    const execOptions = {
+      cwd: process.cwd(),
+      maxBuffer: 2000 * 1024,
+      stdio: [0, 1, 2]
+    };
     const commandAliases = {
       'classes': 'cl',
       'components': 'c',
@@ -65,155 +47,157 @@ const NewFromJSONCommand = Command.extend({
       'routes': 'r',
       'services': 's'
     };
+    
     const createAndStepIntoDirectory =
       new this.tasks.CreateAndStepIntoDirectory({ ui: this.ui, analytics: this.analytics });
 
-    let executeCommand = (
-      data: {
-        command: string,
-        options?: {}
-      }) => {
-      let child = exec(data.command, data.options);
+    let checkForExisting = (path: string) => {
+      return fileStats(path);
     };
 
-    let generatePackage = (options: {}) => {
-      let commandstring = `ng new ${options.name}`;
-      if (options.dryRun) {
-        commandstring += ' --dry-run';
-      }
-      if (options.verbose) {
-        commandstring += ' --verbose';
-      }
-      if (options.skipNpm) {
-        commandstring += ' --skip-npm';
-      }
-      if (options.skipGit) {
-        commandstring += ' --skip-git';
-      }
-      if (options.directory) {
-        commandstring += ` --directory=${options.directory}`;
-      }
-      if (options.blueprint) {
-        commandstring += ` --blueprint=${options.blueprint}`;
-      }
-      let packageGenerator = executeCommand({
-        command: commandstring,
-        options: {
-          cwd: process.cwd(),
-          maxBuffer: 2000 * 1024,
-          stdio: [0, 1, 2]
-        }
-      })
+    let checkForPackage = (packageName: string) => {
+      return checkForExisting(`${packageName}/angular-cli.json`)
+    };
+
+    let checkForItem = (typeOfItem: string, itemName: string) => {
+      return checkForExisting(`${typeOfItem}/${itemName}`)
+    };
+
+    let newPackage = (packageObject: {
+      name: string, blueprint?: string, dryRun?: boolean, verbose?: boolean, skipNpm?: boolean, skipGit?: boolean, directory?: string, flat?: boolean, default?: boolean, lazy?: boolean, skipRouterGeneration?: boolean, route?: string
+    }) => {
+      return checkForPackage(packageObject.name)
+        .then(() => {
+          let msg = `${packageObject.name} already exists, changing directories.`
+          ui.writeLine(chalk.yellow(msg));
+          Promise.resolve();
+        })
+        .catch(() => {
+          let commandString = execCommandString('package', packageObject);
+          //return execSync(commandString, execOptions);
+          //p_list.push({ process: packageChildProcess, content: "" });
+          return execPromise(commandString, execOptions);
+        })
+    };
+
+    let generateItem = (typeOfItem: string, itemObject: {
+      name: string, blueprint?: string, dryRun?: boolean, verbose?: boolean, skipNpm?: boolean, skipGit?: boolean, directory?: string, flat?: boolean, default?: boolean, lazy?: boolean, skipRouterGeneration?: boolean, route?: string
+    }) => {
+      let itemObjectName = itemObject.lazy === false ? itemObject.name : `+${itemObject.name}`;
+      return checkForItem(typeOfItem, itemObjectName)
+        .then(() => {
+          let msg = `${itemObject.name} already exists, moving on.`;
+          ui.writeLine(chalk.yellow(msg));
+          Promise.resolve();
+        })
+        .catch(() => {
+          let commandString = execCommandString(typeOfItem, itemObject);
+          //return execSync(commandString, execOptions);
+          return execPromise(commandString, execOptions);
+        });
+    };
+    const itemTypes = ['routes', 'components', 'pipes', 'services', 'directives', 'classes', 'enums'];
+
+    return getJSONFile()
+      .then(newProject)
+      .then(changeToProjectDirectory)
+      .then(makeItemDirectories)
+      .then(generateProjectItems)
+      .then(ui.writeLine(chalk.blue(`This should only happen when I'm finished.`)))
+      .catch((err) => {
+        ui.writeLine(chalk.red(`This command requires a file named ng-project.json`));
+      });
+
+    function getJSONFile() {
+      return fsReadFile('ng-project.json', 'utf8')
+        .then((data: string) => {
+          projectJSON = <NgAppStructure>JSON.parse(data);
+        })
     }
 
-    let generateItems = (
-      data: {
-        projectJSONProperty: string[],
-        directoryName: string
-      }) => {
+    function newProject() {
+      return newPackage(projectJSON.package)
+        .then(() => {
+          ui.writeLine(chalk.green(`${projectJSON.package.name} project complete.`));
+        });
+    }
 
-      this.ui.writeLine(chalk.red(`The current directory is ${process.cwd()}`));
-      data.projectJSONProperty.forEach((item: {}, index: number) => {
-        this.ui.writeLine(chalk.green(`The ${data.directoryName} name is ${item.name}`));
-        let commandstring = `ng generate ${commandAliases[data.directoryName]} /${data.directoryName}/${item.name}`;
-        if (item.flat) {
-          commandstring += ' --flat';
-        }
-        if (item.default) {
-          commandstring += ' --default';
-        }
-        if (item.skipRouterGeneration) {
-          commandstring += ' --skip-router-generation';
-        }
-        if (item.lazy === false) {
-          commandstring += ' --lazy=false';
-        }
-        if (item.route) {
-          commandstring += ` --route=${item.route}`;
-        }
-        let itemGenerator = executeCommand(
-          {
-            command: commandstring,
-            options: {
-              cwd: process.cwd(),
-              maxBuffer: 2000 * 1024,
-              stdio: [0, 1, 2]
-            }
-          });
-      });
-    };
-    const generateItemsFromJSON = (obj: NgAppStructure) => {
-      let itemsToGenerateExist = false;
-      for (let prop in obj) {
-        let objProp = obj[prop];
-        if (prop !== 'package' && objProp.length > 0) {
-          itemsToGenerateExist = true;
-          createAndStepIntoDirectory
-            .run({
-              directoryName: prop,
-              dryRun: commandOptions.dryRun
-            })
+    function changeToProjectDirectory() {
+      return (() => {
+        chDir(`${projectJSON.package.name}/src/app`)
+        ui.writeLine(chalk.cyan(`Now in "${projectJSON.package.name}/src/app"...`));
+      })();
+    }
+
+    function createProjectDirectories(directoryName: string) {
+      return createAndStepIntoDirectory
+        .run({
+          directoryName: directoryName,
+          dryRun: projectJSON.package.dryRun
+        })
+    }
+
+    function createEachItem(typeOfItem: string, item: {}) {
+      return generateItem(typeOfItem, item)
+        //.then(() => {
+        //  ui.writeLine(chalk.green(`${item.name} has been created`));
+        //});
+    }
+
+    function makeItemDirectories() {
+      return itemTypes.forEach((type: string) => {
+        if (projectJSON[type] && projectJSON[type].length) {
+          return createProjectDirectories(type)
             .then((dirName: string) => {
-              this.ui.writeLine(chalk.green(`The ${prop} name is ${dirName}`));
-              generateItems(
-                {
-                  projectJSONProperty: objProp,
-                  directoryName: prop
-                });
+              chDir('..');
+              ui.writeLine(chalk.cyan(`Now in "${process.cwd()}"...`));
             })
             .catch(() => {
-              generateItems(
-                {
-                  projectJSONProperty: objProp,
-                  directoryName: prop
-                });
+              ui.writeLine(chalk.magenta(`Directory "${type}" already exists.`));
+              Promise.resolve();
             });
         }
-      }
-      if (!itemsToGenerateExist) {
-        return;
-      }
+        else { return; }
+      });
     }
 
-    if (packageOptions) {
-      if (packageOptions.dryRun) {
-        commandOptions.dryRun = true;
-      }
+    function generateProjectItems() {
+      return itemTypes.forEach((type: string) => {
+        let items: {}[] = projectJSON[type] && projectJSON[type].length ? projectJSON[type] : null;
 
-      if (packageOptions.blueprint) {
-        commandOptions.blueprint = packageOptions.blueprint;
-      }
-
-      if (packageOptions.directory) {
-        commandOptions.directory = packageOptions.directory;
-      }
+        if (!!items) {
+          return items.forEach((item) => {
+            return generateItem(type, item)
+              .then(() => {
+                ui.writeLine(chalk.green(`${item.name} has been created`));
+              })
+              .catch((err) => {
+                ui.writeLine(chalk.red(`${item.name} creation has failed with ${err.message}`));
+              });
+           });
+        }
+        else { return; }
+      });
     }
 
-    this.ui.writeLine(chalk.cyan(`The raw arguments are ${rawArgs}`));
-    this.ui.writeLine(chalk.red(`The packageName is ${packageName}`));
-    if (!packageName) {
-      return Promise.reject(new SilentError(
-        `The "ng ${this.name}" command requires a name argument to be specified. ` +
-        `For more details, use "ng help".`));
+    function execCommandString(property: string, objectToCreate: {
+      name: string, blueprint?: string, dryRun?: boolean, verbose?: boolean, skipNpm?: boolean, skipGit?: boolean, directory?: string, flat?: boolean, default?: boolean, lazy?: boolean, skipRouterGeneration?: boolean, route?: string
+    }) {
+      let commandstring = property === 'package' ? `ng new ${objectToCreate.name}` : `ng generate ${commandAliases[property]} /${property}/${objectToCreate.name}`;
+      if (objectToCreate.dryRun) { commandstring += ' --dry-run'; }
+      if (objectToCreate.verbose) { commandstring += ' --verbose'; }
+      if (objectToCreate.skipNpm) { commandstring += ' --skip-npm'; }
+      if (objectToCreate.skipGit) { commandstring += ' --skip-git'; }
+      if (objectToCreate.directory) { commandstring += ` --directory=${objectToCreate.directory}`; }
+      if (objectToCreate.blueprint) { commandstring += ` --blueprint=${objectToCreate.blueprint}`; }
+      if (objectToCreate.flat) { commandstring += ' --flat'; }
+      if (objectToCreate.default) { commandstring += ' --default'; }
+      if (objectToCreate.skipRouterGeneration) { commandstring += ' --skip-router-generation'; }
+      if (objectToCreate.lazy === false) { commandstring += ' --lazy=false'; }
+      if (objectToCreate.route) { commandstring += ` --route=${objectToCreate.route}`; }
+
+      return commandstring;
     }
-
-    commandOptions.name = packageName;
-    if (commandOptions.dryRun) {
-      commandOptions.skipGit = true;
-    }
-
-    commandOptions.blueprint = normalizeBlueprint(commandOptions.blueprint);
-
-    const runCommand = (options: {}, ngAppObj:NgAppStructure, callback) => {
-      generatePackage(options);
-      process.chdir(`${packageName}/src/app`);
-      generateItemsFromJSON(ngAppObj);
-      callback('Items Generated!');
-    }
-
-    return runCommand(commandOptions, projectJSON, (result: string) => {
-      this.ui.writeLine(chalk.green(result));
-    });
   }
 });
 
