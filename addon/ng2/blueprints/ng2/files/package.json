@@ -31,8 +31,8 @@
     "@angular/platform-server": "2.0.0-rc.4",
     "@angular/service-worker": "0.2.0",
     "@angular/app-shell": "0.0.0",
-    "angular2-broccoli-prerender": "0.11.0",
-    "angular2-universal":"0.100.5",
+    "angular2-broccoli-prerender": "0.11.5",
+    "angular2-universal":"0.104.5",
     "angular2-universal-polyfills": "0.4.1",
     "preboot": "2.0.10",<% } %>
     "angular-cli": "<%= version %>",
