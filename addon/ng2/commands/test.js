@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise = require('ember-cli/lib/ext/promise');
 var TestCommand = require('ember-cli/lib/commands/test');
 var win = require('ember-cli/lib/utilities/windows-admin');
 
