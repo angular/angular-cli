@@ -89,19 +89,21 @@ describe('Basic end-to-end Workflow', function () {
     expect(mainBundleContent).to.include('production:!0');
   });
 
-  it_mobile('Enables mobile-specific production features', () => {
-    let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+  it_mobile('Enables mobile-specific production features in prod builds', () => {
+    let indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
     // Service Worker
-    expect(index.includes('if (\'serviceWorker\' in navigator) {')).to.be.equal(true);
-    expect(existsSync(path.join(process.cwd(), 'dist/worker.js'))).to.be.equal(true);
-
-    // Asynchronous bundle
-    expect(index.includes('<script src="/app-concat.js" async=""></script>')).to.be.equal(true);
-    expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(true);
+    expect(indexHtml).to.match(/sw-install\.[0-9a-f]{20}\.bundle\.js/);
+    expect(existsSync(path.join(process.cwd(), 'dist/sw.js' ))).to.be.equal(true);
 
     // App Manifest
-    expect(index.includes('<link rel="manifest" href="/manifest.webapp">')).to.be.equal(true);
+    expect(indexHtml.includes('<link rel="manifest" href="/manifest.webapp">')).to.be.equal(true);
     expect(existsSync(path.join(process.cwd(), 'dist/manifest.webapp'))).to.be.equal(true);
+
+    // Icons folder
+    expect(existsSync(path.join(process.cwd(), 'dist/icons'))).to.be.equal(true);
+
+    // Prerender content
+    expect(indexHtml).to.match(/app works!/);
   });
 
   it('Can run `ng build` in created project', function () {

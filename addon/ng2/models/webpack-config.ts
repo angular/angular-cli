@@ -30,7 +30,7 @@ export class NgCliWebpackConfig {
     if (CliConfig.fromProject().apps[0].mobile){
       this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root);
       this.webpackMobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root);
-      this.webpackDevConfigPartial = webpackMerge(this.webpackDevConfigPartial, this.webpackMobileConfigPartial);
+      this.webpackBaseConfig = webpackMerge(this.webpackBaseConfig, this.webpackMobileConfigPartial);
       this.webpackProdConfigPartial = webpackMerge(this.webpackProdConfigPartial, this.webpackMobileProdConfigPartial);
     }
 
