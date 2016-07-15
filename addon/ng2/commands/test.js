@@ -36,9 +36,7 @@ module.exports = TestCommand.extend({
           () => {
             /* handle build error to allow watch mode to start */
           })
-        .then(() => {
-          return Promise.all([testTask.run(commandOptions)]);
-        });
+        .then(() => testTask.run(commandOptions));
     } else {
       // if not watching ensure karma is doing a single run
       commandOptions.singleRun = true;
