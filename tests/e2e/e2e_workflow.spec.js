@@ -11,7 +11,6 @@ var treeKill = require('tree-kill');
 var child_process = require('child_process');
 var ng = require('../helpers/ng');
 var root = path.join(process.cwd(), 'tmp');
-var repoPkgJson = require('../../package.json');
 
 function existsSync(path) {
   try {
@@ -40,34 +39,26 @@ describe('Basic end-to-end Workflow', function () {
   }
 
 
-  // We don't want to use npm link because then npm dependencies
-  // that only exist in the project will not be accessible to CLI
-  // This is particularly problematic for --mobile, which uses Universal
-  // libs as part of the build process.
-  // Instead, we'll pack CLI as a tarball
   it('Installs angular-cli correctly', function () {
     this.timeout(300000);
 
-    sh.exec('npm pack', { silent: true });
-    expect(existsSync(path.join(process.cwd(), `angular-cli-${repoPkgJson.version}.tgz`)));
+    sh.exec('npm link', { silent: true });
+    
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
+      expect(existsSync(path.join(process.cwd(), 'bin', 'ng')));
     });
   });
 
 
   it('Can create new project using `ng new test-project`', function () {
     this.timeout(4200000);
-    let args = ['--skip-npm'];
+    let args = ['--link-cli'];
     // If testing in the mobile matrix on Travis, create project with mobile flag
     if (isMobileTest()) {
       args = args.concat(['--mobile']);
     }
     return ng(['new', 'test-project'].concat(args)).then(function () {
-      // Install Angular CLI from packed version
-      let tarball = path.resolve(root, `../angular-cli-${repoPkgJson.version}.tgz`);
-      sh.exec(`npm install && npm install ${tarball}`);
-      sh.exec(`rm ${tarball}`);
       expect(existsSync(path.join(root, 'test-project')));
     });
   });
