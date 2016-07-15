@@ -10,7 +10,7 @@
     "rootDir": ".",
     "sourceMap": true,
     "target": "es5",
-    "maproot": "/",
+    "mapRoot": "/",
     "inlinesource": true
   },
   "compileOnSave": false,
