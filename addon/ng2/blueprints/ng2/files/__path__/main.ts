@@ -7,4 +7,8 @@ if (environment.production) {
   enableProdMode();
 }
 
-bootstrap(AppComponent<% if(isMobile) { %>, [ APP_SHELL_RUNTIME_PROVIDERS ]<% } %>);
+export function main() {
+  return bootstrap(AppComponent<% if(isMobile) { %>, [ APP_SHELL_RUNTIME_PROVIDERS ]<% } %>);
+}
+
+document.addEventListener('DOMContentLoaded', () => main());
