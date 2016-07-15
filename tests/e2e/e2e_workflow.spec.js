@@ -312,13 +312,8 @@ describe('Basic end-to-end Workflow', function () {
     const tmpFileLocation = path.join(process.cwd(), 'dist', 'test.abc');
     fs.writeFileSync(tmpFile, 'hello world');
 
-    return ng(['build'])
-      .then(function () {
-        expect(existsSync(tmpFileLocation)).to.be.equal(true);
-      })
-      .catch(err => {
-        throw new Error(err)
-      });
+    sh.exec(`${ngBin} build`);
+    expect(existsSync(tmpFileLocation)).to.be.equal(true);
   });
 
   it.skip('Installs sass support successfully', function() {
