@@ -4,7 +4,7 @@ import {ServeTaskOptions} from '../commands/serve';
 import * as rimraf from 'rimraf';
 import * as path from 'path';
 
-var Task              = require('ember-cli/lib/models/task');
+const Task            = require('ember-cli/lib/models/task');
 const webpack         = require('webpack');
 const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 
@@ -14,7 +14,7 @@ let lastHash: any = null;
 module.exports = Task.extend({
   run: function(runTaskOptions: ServeTaskOptions) {
 
-    var project = this.cliProject;
+    const project = this.cliProject;
 
     rimraf.sync(path.resolve(project.root, runTaskOptions.outputPath));
 

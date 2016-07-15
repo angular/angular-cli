@@ -6,7 +6,7 @@ const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-export const getWebpackCommonConfig = function(projectRoot: string) {
+export function getWebpackCommonConfig(projectRoot: string) {
   const awesomeTypescriptLoaderConfig: LoaderConfig | any = {
     useWebpackText: true,
     useForkChecker: true,

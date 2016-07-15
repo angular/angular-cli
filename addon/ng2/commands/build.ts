@@ -48,8 +48,6 @@ module.exports = Command.extend({
         environment: commandOptions.environment
       });
 
-    console.log(buildTask);
-
     return buildTask.run(commandOptions);
   }
 });

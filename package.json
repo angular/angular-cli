@@ -56,7 +56,6 @@
     "html-webpack-plugin": "^2.19.0",
     "istanbul-instrumenter-loader": "^0.2.0",
     "json-loader": "^0.5.4",
-    "karma": "^0.13.22",
     "karma-chrome-launcher": "^1.0.1",
     "karma-coverage": "^1.0.0",
     "karma-jasmine": "^1.0.2",
@@ -99,7 +98,7 @@
     "typings": "^0.8.1",
     "url-loader": "^0.5.7",
     "webpack": "2.1.0-beta.17",
-    "webpack-dev-server": "^1.14.1",
+    "webpack-dev-server": "2.1.0-beta.0",
     "webpack-md5-hash": "0.0.5",
     "webpack-merge": "^0.14.0"
   },

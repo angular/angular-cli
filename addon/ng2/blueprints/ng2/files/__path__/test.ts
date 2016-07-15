@@ -1,20 +1,20 @@
 
 /*global jasmine, __karma__, window*/
-require('core-js/es6');
-require('core-js/es7/reflect');
+import 'core-js/es6'
+import 'core-js/es7/reflect'
 
 // Typescript emit helpers polyfill
-require('ts-helpers');
+import 'ts-helpers'
 
-require('zone.js/dist/zone');
-require('zone.js/dist/long-stack-trace-zone');
-require('zone.js/dist/jasmine-patch');
-require('zone.js/dist/async-test');
-require('zone.js/dist/fake-async-test');
-require('zone.js/dist/sync-test');
+import 'zone.js/dist/zone'
+import 'zone.js/dist/long-stack-trace-zone'
+import 'zone.js/dist/jasmine-patch'
+import 'zone.js/dist/async-test'
+import 'zone.js/dist/fake-async-test'
+import 'zone.js/dist/sync-test'
 
 // RxJS
-require('rxjs/Rx');
+import 'rxjs/Rx'
 
 Promise.all([
     System.import('@angular/core/testing'),

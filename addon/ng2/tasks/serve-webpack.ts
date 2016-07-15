@@ -21,8 +21,10 @@ module.exports = Task.extend({
     let webpackCompiler: any;
 
     var config: NgCliWebpackConfig = new NgCliWebpackConfig(this.project, commandOptions.environment).config;
+    // This allows for live reload of page when changes are made to repo.
+    // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
+    config.entry.main.unshift(`webpack-dev-server/client?http://localhost:${commandOptions.port}/`);
     webpackCompiler = webpack(config);
-
 
     webpackCompiler.apply(new ProgressPlugin({
       profile: true,
@@ -33,7 +35,8 @@ module.exports = Task.extend({
       contentBase: path.resolve(this.project.root, './src'),
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
-      inline: true
+      inline: true,
+      hot: true
     };
 
     const serveMessage:string = chalk.green(`\n*\n*\n NG Live Development Server is running on http://localhost:${commandOptions.port}.\n*\n*`);

@@ -3,7 +3,6 @@ import * as webpack from 'webpack';
 const path = require('path');
 const webpackMerge = require('webpack-merge'); // used to merge webpack configs
 const WebpackMd5Hash = require('webpack-md5-hash');
-const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin'); //TODO WP2 Typings
 const CompressionPlugin = require("compression-webpack-plugin");
 
 export const getWebpackProdConfigPartial = function(projectRoot: string) {
@@ -18,14 +17,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string) {
     },
     plugins: [
       new WebpackMd5Hash(),
-      new webpack.optimize.DedupePlugin()
-      // ~400kb (Doesn't do anything different (yet?))
-      // new LoaderOptionsPlugin({
-      //   test: /\.js/,
-      //   minimize: true,
-      //   optimize: true,
-      //   debug: false
-      // }),
+      new webpack.optimize.DedupePlugin(),
       // ~107kb
       new webpack.optimize.UglifyJsPlugin({
         beautify: false, //prod
