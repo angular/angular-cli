@@ -4,14 +4,12 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "mapRoot": "",
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": false,
     "rootDir": ".",
     "sourceMap": true,
-    "sourceRoot": "/",
     "target": "es5"
   }
 }

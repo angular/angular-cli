@@ -12,6 +12,10 @@
     "rootDir": ".",
     "sourceMap": true,
     "sourceRoot": "/",
-    "target": "es5"
-  }
+    "target": "es5",
+    "lib": ["es6"]
+  },
+  "includes": [
+    "./custom-typings.d.ts"
+  ]
 }

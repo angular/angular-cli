@@ -1,11 +1,10 @@
 {
-  "ambientDevDependencies": {
+  "globalDevDependencies": {
     "angular-protractor": "registry:dt/angular-protractor#1.5.0+20160425143459",
     "jasmine": "registry:dt/jasmine#2.2.0+20160412134438",
     "selenium-webdriver": "registry:dt/selenium-webdriver#2.44.0+20160317120654"
   },
-  "ambientDependencies": {
-    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654"<% if (isMobile) {%>,
-    "node": "registry:dt/node#4.0.0+20160509154515" <% } %>
+  "globalDependencies": {
+    <% if (isMobile) {%>"node": "registry:dt/node#6.0.0+20160621231320" <% } %>
   }
 }

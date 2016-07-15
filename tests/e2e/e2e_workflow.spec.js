@@ -11,7 +11,6 @@ var treeKill = require('tree-kill');
 var child_process = require('child_process');
 var ng = require('../helpers/ng');
 var root = path.join(process.cwd(), 'tmp');
-var repoPkgJson = require('../../package.json');
 
 function existsSync(path) {
   try {
@@ -40,34 +39,26 @@ describe('Basic end-to-end Workflow', function () {
   }
 
 
-  // We don't want to use npm link because then npm dependencies
-  // that only exist in the project will not be accessible to CLI
-  // This is particularly problematic for --mobile, which uses Universal
-  // libs as part of the build process.
-  // Instead, we'll pack CLI as a tarball
   it('Installs angular-cli correctly', function () {
     this.timeout(300000);
 
-    sh.exec('npm pack', { silent: true });
-    expect(existsSync(path.join(process.cwd(), `angular-cli-${repoPkgJson.version}.tgz`)));
+    sh.exec('npm link', { silent: true });
+    
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
+      expect(existsSync(path.join(process.cwd(), 'bin', 'ng')));
     });
   });
 
 
   it('Can create new project using `ng new test-project`', function () {
     this.timeout(4200000);
-    let args = ['--skip-npm'];
+    let args = ['--link-cli'];
     // If testing in the mobile matrix on Travis, create project with mobile flag
     if (isMobileTest()) {
       args = args.concat(['--mobile']);
     }
     return ng(['new', 'test-project'].concat(args)).then(function () {
-      // Install Angular CLI from packed version
-      let tarball = path.resolve(root, `../angular-cli-${repoPkgJson.version}.tgz`);
-      sh.exec(`npm install && npm install ${tarball}`);
-      sh.exec(`rm ${tarball}`);
       expect(existsSync(path.join(root, 'test-project')));
     });
   });
@@ -84,30 +75,35 @@ describe('Basic end-to-end Workflow', function () {
     // stuck to the first build done
     sh.exec(`${ngBin} build -prod`);
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-    if (!isMobileTest()) {
-      var mainBundlePath = path.join(process.cwd(), 'dist', 'main.js');
-      var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
-      // production: true minimized turns into production:!0
-      expect(mainBundleContent).to.include('production:!0');
-    }
-
+    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+    // Check for cache busting hash script src
+    expect(indexHtml).to.match(/main\.[0-9a-f]{20}\.bundle\.js/);
     // Also does not create new things in GIT.
     expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
   });
 
-  it_mobile('Enables mobile-specific production features', () => {
-    let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-    // Service Worker
-    expect(index.includes('if (\'serviceWorker\' in navigator) {')).to.be.equal(true);
-    expect(existsSync(path.join(process.cwd(), 'dist/worker.js'))).to.be.equal(true);
+  xit('Supports production builds config file replacement', function() {
+    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.js');
+    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+    // production: true minimized turns into production:!0
+    expect(mainBundleContent).to.include('production:!0');
+  });
 
-    // Asynchronous bundle
-    expect(index.includes('<script src="/app-concat.js" async=""></script>')).to.be.equal(true);
-    expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(true);
+  it_mobile('Enables mobile-specific production features in prod builds', () => {
+    let indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+    // Service Worker
+    expect(indexHtml).to.match(/sw-install\.[0-9a-f]{20}\.bundle\.js/);
+    expect(existsSync(path.join(process.cwd(), 'dist/sw.js' ))).to.be.equal(true);
 
     // App Manifest
-    expect(index.includes('<link rel="manifest" href="/manifest.webapp">')).to.be.equal(true);
+    expect(indexHtml.includes('<link rel="manifest" href="/manifest.webapp">')).to.be.equal(true);
     expect(existsSync(path.join(process.cwd(), 'dist/manifest.webapp'))).to.be.equal(true);
+
+    // Icons folder
+    expect(existsSync(path.join(process.cwd(), 'dist/icons'))).to.be.equal(true);
+
+    // Prerender content
+    expect(indexHtml).to.match(/app works!/);
   });
 
   it('Can run `ng build` in created project', function () {
@@ -119,11 +115,9 @@ describe('Basic end-to-end Workflow', function () {
       })
       .then(function () {
         expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-
         // Check the index.html to have no handlebar tokens in it.
         const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-        expect(indexHtml).to.not.include('{{');
-        expect(indexHtml).to.include('vendor/es6-shim/es6-shim.js');
+        expect(indexHtml).to.include('main.bundle.js');
       })
       .then(function () {
         // Also does not create new things in GIT.
@@ -186,12 +180,12 @@ describe('Basic end-to-end Workflow', function () {
     var ngServePid;
 
     function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`);
+      var serveProcess = child_process.exec(`${ngBin} serve`, { maxBuffer: 500*1024 });
       var startedProtractor = false;
       ngServePid = serveProcess.pid;
 
       serveProcess.stdout.on('data', (data) => {
-        if (/Build successful/.test(data) && !startedProtractor) {
+        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
           startedProtractor = true;
           child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
             if (error !== null) {
@@ -200,8 +194,6 @@ describe('Basic end-to-end Workflow', function () {
               resolve();
             }
           });
-        } else if (/ failed with:/.test(data)) {
-          reject(data);
         }
       });
 
@@ -320,13 +312,8 @@ describe('Basic end-to-end Workflow', function () {
     const tmpFileLocation = path.join(process.cwd(), 'dist', 'test.abc');
     fs.writeFileSync(tmpFile, 'hello world');
 
-    return ng(['build'])
-      .then(function () {
-        expect(existsSync(tmpFileLocation)).to.be.equal(true);
-      })
-      .catch(err => {
-        throw new Error(err)
-      });
+    sh.exec(`${ngBin} build`);
+    expect(existsSync(tmpFileLocation)).to.be.equal(true);
   });
 
   it.skip('Installs sass support successfully', function() {
@@ -459,7 +446,7 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
-  it_not_mobile('Turn on path mapping in tsconfig.json and rebuild', function () {
+  xit('Turn on path mapping in tsconfig.json and rebuild', function () {
     this.timeout(420000);
 
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
@@ -497,12 +484,12 @@ describe('Basic end-to-end Workflow', function () {
     var ngServePid;
 
     function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`);
+      var serveProcess = child_process.exec(`${ngBin} serve`, { maxBuffer: 500*1024 });
       var startedProtractor = false;
       ngServePid = serveProcess.pid;
 
       serveProcess.stdout.on('data', (data) => {
-        if (/Build successful/.test(data) && !startedProtractor) {
+        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
           startedProtractor = true;
           child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
             if (error !== null) {
@@ -511,8 +498,6 @@ describe('Basic end-to-end Workflow', function () {
               resolve();
             }
           });
-        } else if (/ failed with:/.test(data)) {
-          reject(data);
         }
       });
 
