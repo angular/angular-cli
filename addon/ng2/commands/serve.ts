@@ -60,7 +60,7 @@ module.exports = Command.extend({
 
     return this._checkExpressPort(commandOptions)
       .then(this._autoFindLiveReloadPort.bind(this))
-      .then(function(commandOptions: ServeTaskOptions) {
+      .then((commandOptions: ServeTaskOptions) => {
         commandOptions = assign({}, commandOptions, {
           baseURL: this.project.config(commandOptions.environment).baseURL || '/'
         });
@@ -84,12 +84,12 @@ module.exports = Command.extend({
         return win.checkWindowsElevation(this.ui).then(function() {
           return serve.run(commandOptions);
         });
-      }.bind(this));
+      });
   },
 
   _checkExpressPort: function(commandOptions: ServeTaskOptions) {
     return getPort({ port: commandOptions.port, host: commandOptions.host })
-      .then(function(foundPort: number) {
+      .then((foundPort: number) => {
 
         if (commandOptions.port !== foundPort && commandOptions.port !== 0) {
           var message = 'Port ' + commandOptions.port + ' is already in use.';
@@ -100,12 +100,12 @@ module.exports = Command.extend({
         commandOptions.port = foundPort;
         return commandOptions;
 
-      }.bind(this));
+      });
   },
 
   _autoFindLiveReloadPort: function(commandOptions: ServeTaskOptions) {
     return getPort({ port: commandOptions.liveReloadPort, host: commandOptions.liveReloadHost })
-      .then(function(foundPort: number) {
+      .then((foundPort: number) => {
 
         // if live reload port matches express port, try one higher
         if (foundPort === commandOptions.port) {
@@ -122,7 +122,7 @@ module.exports = Command.extend({
         commandOptions.liveReloadPort = foundPort;
         return commandOptions;
 
-      }.bind(this));
+      });
   }
 });
 
