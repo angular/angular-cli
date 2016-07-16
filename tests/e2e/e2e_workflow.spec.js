@@ -458,7 +458,7 @@ describe('Basic end-to-end Workflow', function () {
     config.compilerOptions.paths = { '@angular/*': [] };
     fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
 
-    return ng(['build'])
+    return exec(`${ngBin} build`)
       // #TODO: Uncomment these lines when https://github.com/Microsoft/TypeScript/issues/9772 is fixed.
       // .catch(() => {
       //   return true;
@@ -473,7 +473,7 @@ describe('Basic end-to-end Workflow', function () {
         };
         fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
       })
-      .then(() => ng(['build']))
+      .then(() => exec(`${ngBin} build`)
       .catch(() => {
         expect('build failed where it should have succeeded').to.equal('');
       });
