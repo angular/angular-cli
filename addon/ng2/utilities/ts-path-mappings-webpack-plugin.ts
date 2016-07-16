@@ -183,9 +183,6 @@ export class PathsPlugin implements ResolverPlugin {
             this.baseUrl
         );
 
-        console.log("CONFIG FILE AND BASE URL");
-        console.log(this.configFilePath, this.absoluteBaseUrl);
-
         this.mappings = [];
         let paths = this.options.paths || {};
         Object.keys(paths).forEach(alias => {

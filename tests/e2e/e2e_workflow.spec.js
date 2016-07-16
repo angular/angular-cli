@@ -458,25 +458,25 @@ describe('Basic end-to-end Workflow', function () {
     config.compilerOptions.paths = { '@angular/*': [] };
     fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
 
-    return ng(['build'])
-      // #TODO: Uncomment these lines when https://github.com/Microsoft/TypeScript/issues/9772 is fixed.
-      // .catch(() => {
-      //   return true;
-      // })
-      // .then((passed) => {
-      //   expect(passed).to.equal(true);
-      // })
-      .then(() => {
-        // This should succeed.
-        config.compilerOptions.paths = {
-          '@angular/*': [ '../node_modules/@angular/*' ]
-        };
-        fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
-      })
-      .then(() => ng(['build']))
-      .catch(() => {
-        expect('build failed where it should have succeeded').to.equal('');
-      });
+    sh.exec(`${ngBin} build`);
+    // #TODO: Uncomment these lines when https://github.com/Microsoft/TypeScript/issues/9772 is fixed.
+    // .catch(() => {
+    //   return true;
+    // })
+    // .then((passed) => {
+    //   expect(passed).to.equal(true);
+    // })
+
+    // This should succeed.
+    config.compilerOptions.paths = {
+      '@angular/*': [ '../node_modules/@angular/*' ]
+    };
+    fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
+    sh.exec(`${ngBin} build`);
+
+    expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+    expect(indexHtml).to.include('main.bundle.js');
   });
 
   it('Serve and run e2e tests after all other commands', function () {
