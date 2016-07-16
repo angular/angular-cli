@@ -43,7 +43,7 @@ describe('Basic end-to-end Workflow', function () {
     this.timeout(300000);
 
     sh.exec('npm link', { silent: true });
-    
+
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
       expect(existsSync(path.join(process.cwd(), 'bin', 'ng')));
@@ -446,7 +446,7 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
-  xit('Turn on path mapping in tsconfig.json and rebuild', function () {
+  it('Turn on path mapping in tsconfig.json and rebuild', function () {
     this.timeout(420000);
 
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
@@ -454,21 +454,22 @@ describe('Basic end-to-end Workflow', function () {
 
     config.compilerOptions.baseUrl = '';
 
-    // This should fail.
+    // #TODO: When https://github.com/Microsoft/TypeScript/issues/9772 is fixed this should fail.
     config.compilerOptions.paths = { '@angular/*': [] };
     fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
 
     return ng(['build'])
-      .catch(() => {
-        return true;
-      })
-      .then((passed) => {
-        expect(passed).to.equal(true);
-      })
+      // #TODO: Uncomment these lines when https://github.com/Microsoft/TypeScript/issues/9772 is fixed.
+      // .catch(() => {
+      //   return true;
+      // })
+      // .then((passed) => {
+      //   expect(passed).to.equal(true);
+      // })
       .then(() => {
         // This should succeed.
         config.compilerOptions.paths = {
-          '@angular/*': [ '*' ]
+          '@angular/*': [ '../node_modules/@angular/*' ]
         };
         fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
       })

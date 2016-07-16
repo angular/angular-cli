@@ -36,7 +36,7 @@ module.exports = Task.extend({
 
       // Single test entry file. Will run the test.ts bundle and track it.
       options.files = [{ pattern: './src/test.ts', watched: false }];
-      options.preprocessors = { './src/test.ts': ['coverage','webpack','sourcemap'] };
+      options.preprocessors = { './src/test.ts': ['webpack','sourcemap'] };
       options.webpack = webpackTestConfig(projectRoot);
       options.webpackMiddleware = {
         noInfo: true, // Hide webpack output because its noisy.

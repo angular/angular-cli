@@ -10,15 +10,10 @@
     "rootDir": ".",
     "sourceMap": true,
     "target": "es5",
-    "mapRoot": "/",
-    "inlinesource": true
+    "mapRoot": "/"
   },
   "compileOnSave": false,
   "buildOnSave": false,
-  "exclude": [
-    "node_modules",
-    "bower_components"
-  ],
   "includes": [
     "**.d.ts"
   ]

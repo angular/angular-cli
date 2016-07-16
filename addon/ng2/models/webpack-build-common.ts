@@ -1,5 +1,5 @@
 import * as webpack from 'webpack';
-import {LoaderConfig} from '../utilities/ts-path-mappings-webpack-plugin';
+import {LoaderConfig, PathsPlugin} from '../utilities/ts-path-mappings-webpack-plugin';
 
 const path = require('path');
 const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
@@ -18,7 +18,10 @@ export function getWebpackCommonConfig(projectRoot: string) {
     resolve: {
       extensions: ['', '.ts', '.js'],
       root: path.resolve(projectRoot, './src'),
-      moduleDirectories: ['node_modules']
+      moduleDirectories: ['node_modules'],
+      plugins: [
+        new PathsPlugin(awesomeTypescriptLoaderConfig);
+      ]
     },
     context: path.resolve(__dirname, './'),
     entry: {
