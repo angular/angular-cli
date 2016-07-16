@@ -473,7 +473,7 @@ describe('Basic end-to-end Workflow', function () {
         };
         fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
       })
-      .then(() => exec(`${ngBin} build`)
+      .then(() => exec(`${ngBin} build`))
       .catch(() => {
         expect('build failed where it should have succeeded').to.equal('');
       });
