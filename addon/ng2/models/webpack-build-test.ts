@@ -44,7 +44,6 @@ export const getWebpackTestConfig = function(projectRoot: string) {
               query: {
                 useWebpackText: true,
                 tsconfig: path.resolve(projectRoot, './src/tsconfig.json'),
-                // resolveGlobs: false,
                 module: "commonjs",
                 target: "es5",
                 useForkChecker: true,
@@ -67,7 +66,7 @@ export const getWebpackTestConfig = function(projectRoot: string) {
       ],
       postLoaders: [
         {
-          test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
+          test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
           exclude: [
             /\.(e2e|spec)\.ts$/,
             /node_modules/
