@@ -1,4 +1,5 @@
 import { CliConfig } from './config';
+import { NgCliEnvironmentPlugin } from '../utilities/environment-plugin';
 import {
   getWebpackCommonConfig,
   getWebpackDevConfigPartial,
@@ -35,6 +36,7 @@ export class NgCliWebpackConfig {
     }
 
     this.generateConfig();
+    this.config.plugins.unshift(new NgCliEnvironmentPlugin({env: this.environment}));
   }
 
   generateConfig(): void {
@@ -59,4 +61,3 @@ export class NgCliWebpackConfig {
     }
   }
 }
-

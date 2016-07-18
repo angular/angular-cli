@@ -82,11 +82,14 @@ describe('Basic end-to-end Workflow', function () {
     expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
   });
 
-  xit('Supports production builds config file replacement', function() {
-    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.js');
+  it('Supports production builds config file replacement', function() {
+    this.timeout(420000);
+
+    sh.exec(`${ngBin} build --dev`);
+    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
     var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
-    // production: true minimized turns into production:!0
-    expect(mainBundleContent).to.include('production:!0');
+    // production: true minimized turns into production:!1
+    expect(mainBundleContent).to.include('production: false');
   });
 
   it_mobile('Enables mobile-specific production features in prod builds', () => {
