@@ -54,51 +54,51 @@ npm install -g angular-cli
 ## Usage
 
 ```bash
-ng --help
+ntng --help
 ```
 
 ### Generating and serving an Angular2 project via a development server
 
 ```bash
-ng new PROJECT_NAME
+ntng new PROJECT_NAME
 cd PROJECT_NAME
-ng serve
+ntng serve
 ```
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
 
 ```bash
-ng serve --port 4201 --live-reload-port 49153
+ntng serve --port 4201 --live-reload-port 49153
 ```
 
 ### Generating Components, Directives, Pipes and Services
 
-You can use the `ng generate` (or just `ng g`) command to generate Angular components:
+You can use the `ntng generate` (or just `ntng g`) command to generate Angular components:
 
 ```bash
-ng generate component my-new-component
-ng g component my-new-component # using the alias
+ntng generate component my-new-component
+ntng g component my-new-component # using the alias
 
 # components support relative path generation
 # if in the directory src/app/feature/ and you run
-ng g component new-cmp
+ntng g component new-cmp
 # your component will be generated in src/app/feature/new-cmp
 # but if you were to run
-ng g component ../newer-cmp
+ntng g component ../newer-cmp
 # your component will be generated in src/app/newer-cmp
 ```
 You can find all possible blueprints in the table below:
 
 Scaffold  | Usage
 ---       | ---
-Component | `ng g component my-new-component`
-Directive | `ng g directive my-new-directive`
-Pipe      | `ng g pipe my-new-pipe`
-Service   | `ng g service my-new-service`
-Class     | `ng g class my-new-class`
-Interface | `ng g interface my-new-interface`
-Enum      | `ng g enum my-new-enum`
+Component | `ntng g component my-new-component`
+Directive | `ntng g directive my-new-directive`
+Pipe      | `ntng g pipe my-new-pipe`
+Service   | `ntng g service my-new-service`
+Class     | `ntng g class my-new-class`
+Interface | `ntng g interface my-new-interface`
+Enum      | `ntng g enum my-new-enum`
 
 ### Generating a route
 
@@ -106,7 +106,7 @@ You can generate a new route with the following command (note the singular
 used in `hero`):
 
 ```bash
-ng generate route hero
+ntng generate route hero
 ```
 
 This will create a folder which will contain the hero component and related test and style files.
@@ -125,7 +125,7 @@ There is an optional flag for `skip-router-generation` which will not add the ro
 ### Creating a build
 
 ```bash
-ng build
+ntng build
 ```
 
 The build artifacts will be stored in the `dist/` directory.
@@ -137,7 +137,7 @@ At build time, the `src/app/environment.ts` will be replaced by either
 current cli environment. The resulting file will be `dist/app/environment.ts`.
 
 Environment defaults to `dev`, but you can generate a production build via
-the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
+the `-prod` flag in either `ntng build -prod` or `ntng serve -prod`.
 
 You can also add your own env files other than `dev` and `prod` by creating a
 `config/environment.{NAME}.ts` and use them by using the `--env=NAME`
@@ -145,30 +145,30 @@ flag on the build/serve commands.
 
 ### Bundling
 
-Builds created with the `-prod` flag via `ng build -prod` or `ng serve -prod` bundle
+Builds created with the `-prod` flag via `ntng build -prod` or `ntng serve -prod` bundle
 all dependencies into a single file, and make use of tree-shaking techniques.
 
 ### Running unit tests
 
 ```bash
-ng test
+ntng test
 ```
 
 Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes.
 
-You can run tests a single time via `--watch=false`, and turn off building of the app via `--build=false` (useful for running it at the same time as `ng serve`).
+You can run tests a single time via `--watch=false`, and turn off building of the app via `--build=false` (useful for running it at the same time as `ntng serve`).
 
-**WARNING:** On Windows, `ng test` is hitting a file descriptor limit (see https://github.com/angular/angular-cli/issues/977).
-The solution for now is to instead run `ng serve` and `ng test --build=false` in separate console windows. 
+**WARNING:** On Windows, `ntng test` is hitting a file descriptor limit (see https://github.com/angular/angular-cli/issues/977).
+The solution for now is to instead run `ntng serve` and `ntng test --build=false` in separate console windows. 
 
 
 ### Running end-to-end tests
 
 ```bash
-ng e2e
+ntng e2e
 ```
 
-Before running the tests make sure you are serving the app via `ng serve`.
+Before running the tests make sure you are serving the app via `ntng serve`.
 
 End-to-end tests are ran via [Protractor](https://angular.github.io/protractor/).
 
@@ -178,7 +178,7 @@ End-to-end tests are ran via [Protractor](https://angular.github.io/protractor/)
 You can deploy your apps quickly via:
 
 ```
-ng github-pages:deploy --message "Optional commit message"
+ntng github-pages:deploy --message "Optional commit message"
 ```
 
 This will do the following:
@@ -198,7 +198,7 @@ To simplify the authentication, be sure to [setup your ssh keys](https://help.gi
 If you are deploying a [user or organization page](https://help.github.com/articles/user-organization-and-project-pages/), you can instead use the following command:
 
 ```
-ng github-pages:deploy --user-page --message "Optional commit message"
+ntng github-pages:deploy --user-page --message "Optional commit message"
 ```
 
 This command pushes the app to the `master` branch on the github repo instead
@@ -207,7 +207,7 @@ of pushing to `gh-pages`, since user and organization pages require this.
 
 ### Linting and formatting code
 
-You can lint your app code by running `ng lint`.
+You can lint your app code by running `ntng lint`.
 This will use the `lint` npm script that in generated projects uses `tslint`.
 
 You can modify the these scripts in `package.json` to run whatever tool you prefer.
@@ -222,19 +222,19 @@ To turn on auto completion use the following commands:
 
 For bash:
 ```bash
-ng completion >> ~/.bashrc
+ntng completion >> ~/.bashrc
 source ~/.bashrc
 ```
 
 For zsh:
 ```bash
-ng completion >> ~/.zshrc
+ntng completion >> ~/.zshrc
 source ~/.zshrc
 ```
 
 Windows users using gitbash:
 ```bash
-ng completion >> ~/.bash_profile
+ntng completion >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
@@ -270,12 +270,12 @@ Local project package:
 ```
 rm -rf node_modules dist tmp
 npm install --save-dev angular-cli@latest
-ng init
+ntng init
 ```
 
-Running `ng init` will check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
+Running `ntng init` will check for changes in all the auto-generated files created by `ntng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
 
-Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng init` finishes.
+Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ntng init` finishes.
 
 **The main cause of errors after an update is failing to incorporate these updates into your code**. 
 
@@ -288,9 +288,9 @@ This project is currently a prototype so there are many known issues. Just to me
 
 - All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
 - On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
-- The initial installation as well as `ng new` take too long because of lots of npm dependencies.
+- The initial installation as well as `ntng new` take too long because of lots of npm dependencies.
 - Many existing ember addons are not compatible with Angular apps built via angular-cli.
-- When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
+- When you `ntng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
 
 
 ## Development Hints for hacking on angular-cli
@@ -311,10 +311,10 @@ allowing you to quickly test any changes you make to the cli project.
 Now you can use `angular-cli` via the command line:
 
 ```bash
-ng new foo
+ntng new foo
 cd foo
 npm link angular-cli
-ng serve
+ntng serve
 ```
 
 `npm link angular-cli` is needed because by default the globally installed `angular-cli` just loads

@@ -12,7 +12,7 @@ var conf = require('ember-cli/tests/helpers/conf');
 var Promise = require('ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
 
-describe('Acceptance: ng generate directive', function () {
+describe('Acceptance: ntng generate directive', function () {
   before(conf.setup);
 
   after(conf.restore);
@@ -31,21 +31,21 @@ describe('Acceptance: ng generate directive', function () {
     return tmp.teardown('./tmp');
   });
 
-  it('ng generate flat directive', function () {
+  it('ntng generate flat directive', function () {
     return ng(['generate', 'directive', 'flat']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'flat.directive.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('ng generate directive my-dir', function () {
+  it('ntng generate directive my-dir', function () {
     return ng(['generate', 'directive', 'my-dir', '--flat', 'false']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-dir', 'my-dir.directive.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('ng generate directive test' + path.sep + 'my-dir', function () {
+  it('ntng generate directive test' + path.sep + 'my-dir', function () {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', 'test'));
     return ng(['generate', 'directive', 'test' + path.sep + 'my-dir', '--flat', 'false']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'test', 'my-dir', 'my-dir.directive.ts');
@@ -53,7 +53,7 @@ describe('Acceptance: ng generate directive', function () {
     });
   });
 
-  it('ng generate directive test' + path.sep + '..' + path.sep + 'my-dir', function () {
+  it('ntng generate directive test' + path.sep + '..' + path.sep + 'my-dir', function () {
     return ng(['generate', 'directive', 'test' + path.sep + '..' + path.sep + 'my-dir', '--flat', 'false'])
       .then(() => {
         var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-dir', 'my-dir.directive.ts');
@@ -61,7 +61,7 @@ describe('Acceptance: ng generate directive', function () {
       });
   });
 
-  it('ng generate directive my-dir from a child dir', () => {
+  it('ntng generate directive my-dir from a child dir', () => {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1'));
     return new Promise(function (resolve) {
       process.chdir('./src');
@@ -79,7 +79,7 @@ describe('Acceptance: ng generate directive', function () {
       }, err => console.log('ERR: ', err));
   });
 
-  it('ng generate directive child-dir' + path.sep + 'my-dir from a child dir', () => {
+  it('ntng generate directive child-dir' + path.sep + 'my-dir from a child dir', () => {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'child-dir'));
     return new Promise(function (resolve) {
       process.chdir('./src');
@@ -98,7 +98,7 @@ describe('Acceptance: ng generate directive', function () {
       }, err => console.log('ERR: ', err));
   });
 
-  it('ng generate directive child-dir' + path.sep + '..' + path.sep + 'my-dir from a child dir',
+  it('ntng generate directive child-dir' + path.sep + '..' + path.sep + 'my-dir from a child dir',
     () => {
       fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1'));
       return new Promise(function (resolve) {
@@ -119,7 +119,7 @@ describe('Acceptance: ng generate directive', function () {
         }, err => console.log('ERR: ', err));
     });
 
-  it('ng generate directive ' + path.sep + 'my-dir from a child dir, gens under ' +
+  it('ntng generate directive ' + path.sep + 'my-dir from a child dir, gens under ' +
     path.join('src', 'app'),
     () => {
       fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1'));
@@ -139,7 +139,7 @@ describe('Acceptance: ng generate directive', function () {
         }, err => console.log('ERR: ', err));
     });
 
-  it('ng generate directive ..' + path.sep + 'my-dir from root dir will fail', () => {
+  it('ntng generate directive ..' + path.sep + 'my-dir from root dir will fail', () => {
     return ng(['generate', 'directive', '..' + path.sep + 'my-dir']).then(() => {
       throw new SilentError(`ng generate directive ..${path.sep}my-dir from root dir should fail.`);
     }, (err) => {

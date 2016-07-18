@@ -8,7 +8,7 @@ Currently, a project scaffolded with the CLI have no way of specifying options a
 * What is my firebase database URL?
 * Where is my client code?
 * How can I use a different lazy-loading boundary prefix (or none at all)?
-* Any other backend I want to run prior to `ng serve`?
+* Any other backend I want to run prior to `ntng serve`?
 
 # Proposed Solution
 

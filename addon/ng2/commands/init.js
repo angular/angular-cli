@@ -88,13 +88,13 @@ module.exports = Command.extend({
     var packageName = commandOptions.name !== '.' && commandOptions.name || project.name();
 
     if (!packageName) {
-      var message = 'The `ng ' + this.name + '` command requires a ' +
+      var message = 'The `ntng ' + this.name + '` command requires a ' +
         'package.json in current folder with name attribute or a specified name via arguments. ' +
-        'For more details, use `ng help`.';
+        'For more details, use `ntng help`.';
 
       return Promise.reject(new SilentError(message));
     }
-    
+
     var blueprintOpts = {
       dryRun: commandOptions.dryRun,
       blueprint: commandOptions.blueprint || this._defaultBlueprint(),

@@ -56,7 +56,7 @@ describe('Basic end-to-end Workflow', function () {
   });
 
 
-  it('Can create new project using `ng new test-project`', function () {
+  it('Can create new project using `ntng new test-project`', function () {
     this.timeout(4200000);
     let args = ['--skip-npm'];
     // If testing in the mobile matrix on Travis, create project with mobile flag
@@ -77,10 +77,10 @@ describe('Basic end-to-end Workflow', function () {
     expect(path.basename(process.cwd())).to.equal('test-project');
   });
 
-  it('Supports production builds via `ng build -prod`', function() {
+  it('Supports production builds via `ntng build -prod`', function() {
     this.timeout(420000);
 
-    // Can't use the `ng` helper because somewhere the environment gets
+    // Can't use the `ntng` helper because somewhere the environment gets
     // stuck to the first build done
     sh.exec(`${ngBin} build -prod`);
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
@@ -110,7 +110,7 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(path.join(process.cwd(), 'dist/manifest.webapp'))).to.be.equal(true);
   });
 
-  it('Can run `ng build` in created project', function () {
+  it('Can run `ntng build` in created project', function () {
     this.timeout(420000);
 
     return ng(['build'])
@@ -152,7 +152,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test` after initial build', function () {
+  it('Perform `ntng test` after initial build', function () {
     this.timeout(420000);
 
     return ng(testArgs).then(function (result) {
@@ -161,7 +161,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('ng e2e fails with error exit code', function () {
+  it('ntng e2e fails with error exit code', function () {
     this.timeout(240000);
 
     function executor(resolve, reject) {
@@ -209,7 +209,7 @@ describe('Basic end-to-end Workflow', function () {
         reject(data);
       });
       serveProcess.on('close', (code) => {
-        code === 0 ? resolve() : reject('ng serve command closed with error')
+        code === 0 ? resolve() : reject('ntng serve command closed with error')
       });
     }
 
@@ -223,7 +223,7 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
-  it('Can create a test component using `ng generate component test-component`', function () {
+  it('Can create a test component using `ntng generate component test-component`', function () {
     this.timeout(10000);
     return ng(['generate', 'component', 'test-component']).then(function () {
       var componentDir = path.join(process.cwd(), 'src', 'app', 'test-component');
@@ -234,7 +234,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test` after adding a component', function () {
+  it('Perform `ntng test` after adding a component', function () {
     this.timeout(420000);
 
     return ng(testArgs).then(function (result) {
@@ -243,7 +243,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Can create a test service using `ng generate service test-service`', function () {
+  it('Can create a test service using `ntng generate service test-service`', function () {
     return ng(['generate', 'service', 'test-service']).then(function () {
       var serviceDir = path.join(process.cwd(), 'src', 'app');
       expect(existsSync(serviceDir)).to.be.equal(true);
@@ -252,7 +252,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test` after adding a service', function () {
+  it('Perform `ntng test` after adding a service', function () {
     this.timeout(420000);
 
     return ng(testArgs).then(function (result) {
@@ -261,7 +261,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Can create a test pipe using `ng generate pipe test-pipe`', function () {
+  it('Can create a test pipe using `ntng generate pipe test-pipe`', function () {
     return ng(['generate', 'pipe', 'test-pipe']).then(function () {
       var pipeDir = path.join(process.cwd(), 'src', 'app');
       expect(existsSync(pipeDir)).to.be.equal(true);
@@ -270,7 +270,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test` after adding a pipe', function () {
+  it('Perform `ntng test` after adding a pipe', function () {
     this.timeout(420000);
 
     return ng(testArgs).then(function (result) {
@@ -279,7 +279,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  xit('Can create a test route using `ng generate route test-route`', function () {
+  xit('Can create a test route using `ntng generate route test-route`', function () {
     return ng(['generate', 'route', 'test-route']).then(function () {
       var routeDir = path.join(process.cwd(), 'src', 'app', '+test-route');
       expect(existsSync(routeDir)).to.be.equal(true);
@@ -287,7 +287,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  xit('Perform `ng test` after adding a route', function () {
+  xit('Perform `ntng test` after adding a route', function () {
     this.timeout(420000);
 
     return ng(testArgs).then(function (result) {
@@ -296,7 +296,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Can create a test interface using `ng generate interface test-interface model`', function () {
+  it('Can create a test interface using `ntng generate interface test-interface model`', function () {
     return ng(['generate', 'interface', 'test-interface', 'model']).then(function () {
       var interfaceDir = path.join(process.cwd(), 'src', 'app');
       expect(existsSync(interfaceDir)).to.be.equal(true);
@@ -304,7 +304,7 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
-  it('Perform `ng test` after adding a interface', function () {
+  it('Perform `ntng test` after adding a interface', function () {
     this.timeout(420000);
 
     return ng(testArgs).then(function (result) {
@@ -520,7 +520,7 @@ describe('Basic end-to-end Workflow', function () {
         reject(data);
       });
       serveProcess.on('close', (code) => {
-        code === 0 ? resolve() : reject('ng serve command closed with error')
+        code === 0 ? resolve() : reject('ntng serve command closed with error')
       });
     }
 

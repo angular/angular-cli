@@ -18,7 +18,7 @@ const fsReadFile = Promise.denodeify(fs.readFile);
 const fsWriteFile = Promise.denodeify(fs.writeFile);
 const fsMkdir = Promise.denodeify(fs.mkdir);
 
-describe('Acceptance: ng github-pages:deploy', function() {
+describe('Acceptance: ntng github-pages:deploy', function() {
   let execStub;
   let project = 'foo',
     initialBranch = 'master',

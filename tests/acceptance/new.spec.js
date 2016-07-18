@@ -15,7 +15,7 @@ var conf = require('ember-cli/tests/helpers/conf');
 var EOL = require('os').EOL;
 var SilentError = require('silent-error');
 
-describe('Acceptance: ng new', function () {
+describe('Acceptance: ntng new', function () {
   before(conf.setup);
 
   after(conf.restore);
@@ -61,19 +61,19 @@ describe('Acceptance: ng new', function () {
     return confirmBlueprintedForDir('addon/ng2/blueprints/ng2');
   }
 
-  it('ng new foo, where foo does not yet exist, works', function () {
+  it('ntng new foo, where foo does not yet exist, works', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(confirmBlueprinted);
   });
 
-  it('ng new with empty app does throw exception', function () {
+  it('ntng new with empty app does throw exception', function () {
     expect(ng(['new', ''])).to.throw;
   });
 
-  it('ng new without app name does throw exception', function () {
+  it('ntng new without app name does throw exception', function () {
     expect(ng(['new', ''])).to.throw;
   });
 
-  it('ng new with app name creates new directory and has a dasherized package name', function () {
+  it('ntng new with app name creates new directory and has a dasherized package name', function () {
     return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
       expect(!existsSync('FooApp'));
 
@@ -82,7 +82,7 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('ng new has a .editorconfig file', function () {
+  it('ntng new has a .editorconfig file', function () {
     return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
       expect(!existsSync('FooApp'));
 
@@ -91,11 +91,11 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('Cannot run ng new, inside of ember-cli project', function () {
+  it('Cannot run ntng new, inside of ember-cli project', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git'])
       .then(function () {
         return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git']).then(() => {
-          throw new SilentError('Cannot run ng new, inside of ember-cli project should fail.');
+          throw new SilentError('Cannot run ntng new, inside of ember-cli project should fail.');
         }, () => {
           expect(!existsSync('foo'));
         })
@@ -103,7 +103,7 @@ describe('Acceptance: ng new', function () {
       .then(confirmBlueprinted);
   });
 
-  it('ng new with blueprint uses the specified blueprint directory with a relative path',
+  it('ntng new with blueprint uses the specified blueprint directory with a relative path',
     function () {
       return tmp.setup('./tmp/my_blueprint')
         .then(function () {
@@ -121,7 +121,7 @@ describe('Acceptance: ng new', function () {
         .then(confirmBlueprintedForDir('tmp/my_blueprint'));
     });
 
-  it('ng new with blueprint uses the specified blueprint directory with an absolute path',
+  it('ntng new with blueprint uses the specified blueprint directory with an absolute path',
     function () {
       return tmp.setup('./tmp/my_blueprint')
         .then(function () {
@@ -139,13 +139,13 @@ describe('Acceptance: ng new', function () {
         .then(confirmBlueprintedForDir('tmp/my_blueprint'));
     });
 
-  it('ng new without skip-git flag creates .git dir', function () {
+  it('ntng new without skip-git flag creates .git dir', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(function () {
       expect(existsSync('.git'));
     });
   });
 
-  it('ng new with --dry-run does not create new directory', function () {
+  it('ntng new with --dry-run does not create new directory', function () {
     return ng(['new', 'foo', '--dry-run']).then(function () {
       var cwd = process.cwd();
       expect(cwd).to.not.match(/foo/, 'does not change cwd to foo in a dry run');
@@ -154,7 +154,7 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('ng new with --directory uses given directory name and has correct package name', function () {
+  it('ntng new with --directory uses given directory name and has correct package name', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git', '--directory=bar'])
       .then(function () {
         var cwd = process.cwd();

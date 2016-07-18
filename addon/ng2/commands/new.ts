@@ -9,7 +9,7 @@ const InitCommand = require('./init');
 
 const NewCommand = Command.extend({
   name: 'new',
-  description: `Creates a new directory and runs ${chalk.green('ng init')} in it.`,
+  description: `Creates a new directory and runs ${chalk.green('ntng init')} in it.`,
   works: 'outsideProject',
 
   availableOptions: [

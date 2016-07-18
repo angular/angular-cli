@@ -18,7 +18,7 @@ function fileExpectations(lazy, expectation) {
   expect(existsSync(path.join(testPath, dir, 'my-route.component.ts'))).to.equal(expectation);
 }
 
-xdescribe('Acceptance: ng generate route', function () {
+xdescribe('Acceptance: ntng generate route', function () {
   before(conf.setup);
 
   after(conf.restore);
@@ -37,25 +37,25 @@ xdescribe('Acceptance: ng generate route', function () {
     return tmp.teardown('./tmp');
   });
 
-  it('ng generate route my-route', function () {
+  it('ntng generate route my-route', function () {
     return ng(['generate', 'route', 'my-route']).then(() => {
       fileExpectations(true, true);
     });
   });
 
-  it('ng generate route my-route --lazy false', function () {
+  it('ntng generate route my-route --lazy false', function () {
     return ng(['generate', 'route', 'my-route', '--lazy', 'false']).then(() => {
       fileExpectations(false, true);
     });
   });
 
-  it('ng generate route +my-route', function () {
+  it('ntng generate route +my-route', function () {
     return ng(['generate', 'route', '+my-route']).then(() => {
       fileExpectations(true, true);
     });
   });
 
-  it('ng generate route +my-route/my-other', () => {
+  it('ntng generate route +my-route/my-other', () => {
     return ng(['generate', 'route', '+my-route'])
       .then(() => ng(['generate', 'route', '+my-route/my-other', '--default']))
       .then(() => ng(['generate', 'route', '+my-route/+my-other/my-third', '--default']))
@@ -79,7 +79,7 @@ xdescribe('Acceptance: ng generate route', function () {
       });
   });
 
-  it('ng generate route details --path /details/:id', () => {
+  it('ntng generate route details --path /details/:id', () => {
     return ng(['generate', 'route', 'details', '--path', '/details/:id'])
       .then(() => {
         const appContent = fs.readFileSync(path.join(testPath, 'foo.component.ts'), 'utf-8');
@@ -87,7 +87,7 @@ xdescribe('Acceptance: ng generate route', function () {
       });
   });
 
-  it('ng generate route my-route --dry-run does not modify files', () => {
+  it('ntng generate route my-route --dry-run does not modify files', () => {
     var parentComponentPath = path.join(testPath, 'foo.component.ts');
     var parentComponentHtmlPath = path.join(testPath, 'foo.component.html')
 
@@ -102,7 +102,7 @@ xdescribe('Acceptance: ng generate route', function () {
       expect(afterGenerateParentHtml).to.equal(unmodifiedParentComponentHtml);
     });
   });
-  
+
   it('lazy route prefix', () => {
     return ng(['set', 'defaults.lazyRoutePrefix', 'myprefix'])
       .then(() => ng(['generate', 'route', 'prefix-test']))

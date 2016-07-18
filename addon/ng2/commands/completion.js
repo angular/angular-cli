@@ -7,7 +7,7 @@ var fs = require('fs');
 
 module.exports = Command.extend({
   name: 'completion',
-  description: 'Adds autocomplete functionality to `ng` commands and subcommands',
+  description: 'Adds autocomplete functionality to `ntng` commands and subcommands',
   works: 'everywhere',
   run: function() {
     var scriptPath = path.resolve(__dirname, '..', 'utilities', 'completion.sh');
