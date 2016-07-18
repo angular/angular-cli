@@ -45,7 +45,6 @@ export class NgCliEnvironmentPlugin implements WebpackPlugin {
   }
 
   replaceFile(file: string): any {
-    debugger;
     return file
       .replace(this._file, this._file + '.' + this._env);
   }
@@ -67,7 +66,6 @@ export class NgCliEnvironmentPlugin implements WebpackPlugin {
           if (!this.isEnvFile(_resource)) {
             return callback(null, result);
           }
-          debugger;
           var envFile = this.replaceFile(_resource);
 
           fs.stat(envFile, (err, stats) => {
