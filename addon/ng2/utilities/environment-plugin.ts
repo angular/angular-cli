@@ -4,12 +4,6 @@ interface WebpackPlugin {
   apply(compiler: any): void;
 }
 
-interface NgCliEnvrionmentConfig {
-  env?: string;
-  file?: string;
-  alias?: string;
-}
-
 export class NgCliEnvironmentPlugin implements WebpackPlugin {
   _file: string;
   _alias: string;
