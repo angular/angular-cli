@@ -6,7 +6,7 @@ const ts = require('typescript');
 const old = require.extensions['.ts'];
 
 require.extensions['.ts'] = function(m, filename) {
-  if (!filename.match(/angular-cli/) && filename.match(/node_modules/)) {
+  if (!filename.match(/nashtech-angular-cli/) && filename.match(/node_modules/)) {
     if (old) {
       return old(m, filename);
     }

@@ -3,7 +3,7 @@
 1. OS?  Windows 7, 8 or 10. Linux (which distribution). Mac OSX (Yosemite? El Capitan?)
 
 
-2. Versions. Please run `ng --version`. If there's nothing outputted, please
+2. Versions. Please run `ntng --version`. If there's nothing outputted, please
    run in a Terminal: 
         node --version
    And paste the result here.

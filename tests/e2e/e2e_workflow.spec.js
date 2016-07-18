@@ -49,7 +49,7 @@ describe('Basic end-to-end Workflow', function () {
     this.timeout(300000);
 
     sh.exec('npm pack', { silent: true });
-    expect(existsSync(path.join(process.cwd(), `angular-cli-${repoPkgJson.version}.tgz`)));
+    expect(existsSync(path.join(process.cwd(), `nashtech-angular-cli-${repoPkgJson.version}.tgz`)));
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     });
@@ -65,7 +65,7 @@ describe('Basic end-to-end Workflow', function () {
     }
     return ng(['new', 'test-project'].concat(args)).then(function () {
       // Install Angular CLI from packed version
-      let tarball = path.resolve(root, `../angular-cli-${repoPkgJson.version}.tgz`);
+      let tarball = path.resolve(root, `../nashtech-angular-cli-${repoPkgJson.version}.tgz`);
       sh.exec(`npm install && npm install ${tarball}`);
       sh.exec(`rm ${tarball}`);
       expect(existsSync(path.join(root, 'test-project')));

@@ -1,4 +1,4 @@
-###-begin-ng-completion### 
+###-begin-ng-completion###
 #
 # ng command completion script
 #
@@ -53,7 +53,7 @@ elif type compctl &>/dev/null; then
       g|generate) opts=$generate_opts ;;
       test) opts=$test_opts ;;
     esac
-    
+
     setopt shwordsplit
     reply=($opts)
     unset shwordsplit

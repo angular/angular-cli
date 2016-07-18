@@ -4,7 +4,7 @@ import * as child_process from 'child_process';
 
 const VersionCommand = Command.extend({
   name: 'version',
-  description: 'outputs angular-cli version',
+  description: 'outputs nashtech-angular-cli version',
   aliases: ['v', '--version', '-v'],
   works: 'everywhere',
 
@@ -33,7 +33,7 @@ const VersionCommand = Command.extend({
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
     }
 
-    this.printVersion('angular-cli', ngCliVersion);
+    this.printVersion('nashtech-angular-cli', ngCliVersion);
 
     for (var module in versions) {
       if (options.verbose || alwaysPrint.indexOf(module) > -1) {

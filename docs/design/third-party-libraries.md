@@ -91,7 +91,7 @@ The third party library can implement hooks into the scaffolding, and the build 
 CLI's tasks will look for the proper hooks prior to running and execute them.
 
 The order of execution of these hooks is breadth first, going through all node packages and
-checking for the `package['angular-cli']['hooks']['${hookName}']`. The hooks are then
+checking for the `package['nashtech-angular-cli']['hooks']['${hookName}']`. The hooks are then
 `require()`'d as is, from within the app root folder. Within the same level of the dependency
 tree, there is no guarantee for the order of execution.
 
