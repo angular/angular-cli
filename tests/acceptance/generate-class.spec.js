@@ -11,7 +11,7 @@ const root = process.cwd();
 
 const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
-describe('Acceptance: ntng generate class', function () {
+describe('Acceptance: ng generate class', function () {
   before(conf.setup);
 
   after(conf.restore);
@@ -30,13 +30,13 @@ describe('Acceptance: ntng generate class', function () {
     return tmp.teardown('./tmp');
   });
 
-  it('ntng generate class my-class', function () {
+  it('ng generate class my-class', function () {
     return ng(['generate', 'class', 'my-class']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
     });
   });
 
-  it('ntng generate class my-class model', function () {
+  it('ng generate class my-class model', function () {
     return ng(['generate', 'class', 'my-class', 'model']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.model.ts'))).to.equal(true);
     });

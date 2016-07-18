@@ -83,7 +83,7 @@
 
 ### Performance Improvements
 
-* **ntng new:** command to link to `angular-cli` (#778) ([9b8334f](https://github.com/angular/angular-cli/commit/9b8334f))
+* **ng new:** command to link to `angular-cli` (#778) ([9b8334f](https://github.com/angular/angular-cli/commit/9b8334f))
 
 
 
@@ -93,7 +93,7 @@
 
 ### Bug Fixes
 
-* **build:** fix infinite loop on ntng serve (#775) ([285db13](https://github.com/angular/angular-cli/commit/285db13)), closes [(#775](https://github.com/(/issues/775)
+* **build:** fix infinite loop on ng serve (#775) ([285db13](https://github.com/angular/angular-cli/commit/285db13)), closes [(#775](https://github.com/(/issues/775)
 * **deploy:** fix file copy, index tag rewrite (#772) ([a34aca8](https://github.com/angular/angular-cli/commit/a34aca8)), closes [(#772](https://github.com/(/issues/772)
 * **index:** fix live reload file path (#774) ([be718cb](https://github.com/angular/angular-cli/commit/be718cb)), closes [(#774](https://github.com/(/issues/774)
 * **mobile:** don't import system-config in system-import.js (#794) ([7ab7d72](https://github.com/angular/angular-cli/commit/7ab7d72))

@@ -20,7 +20,7 @@ var EOL = require('os').EOL;
 
 var defaultIgnoredFiles = Blueprint.ignoredFiles;
 
-describe('Acceptance: ntng init', function () {
+describe('Acceptance: ng init', function () {
   this.timeout(20000);
 
   before(function () {
@@ -103,7 +103,7 @@ describe('Acceptance: ntng init', function () {
     });
   }
 
-  it('ntng init', function () {
+  it('ng init', function () {
     return ng([
       'init',
       '--skip-npm',
@@ -111,7 +111,7 @@ describe('Acceptance: ntng init', function () {
     ]).then(confirmBlueprinted);
   });
 
-  it('ntng init --mobile', () => {
+  it('ng init --mobile', () => {
     return ng([
       'init',
       '--skip-npm',
@@ -120,7 +120,7 @@ describe('Acceptance: ntng init', function () {
     ]).then(() => confirmBlueprinted(true));
   });
 
-  it('ntng init can run in created folder', function () {
+  it('ng init can run in created folder', function () {
     return tmp.setup('./tmp/foo')
       .then(function () {
         process.chdir('./tmp/foo');

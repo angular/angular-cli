@@ -1,8 +1,8 @@
-###-begin-ntng-completion###
+###-begin-ng-completion###
 #
-# ntng command completion script
+# ng command completion script
 #
-# Installation: ntng completion >> ~/.bashrc (or ~/.zshrc)
+# Installation: ng completion >> ~/.bashrc (or ~/.zshrc)
 #
 
 ng_opts='new init build serve generate autocomplete e2e lint test version'
@@ -23,7 +23,7 @@ if type complete &>/dev/null; then
     pword=${COMP_WORDS[COMP_CWORD - 1]}
 
     case ${pword} in
-      ntng) opts=$ng_opts ;;
+      ng) opts=$ng_opts ;;
       i|init) opts=$init_opts ;;
       new) opts=$new_opts ;;
       b|build) opts=$build_opts ;;
@@ -36,7 +36,7 @@ if type complete &>/dev/null; then
 
     return 0
   }
-  complete -o default -F _ng_completion ntng
+  complete -o default -F _ng_completion ng
 elif type compctl &>/dev/null; then
   _ng_completion () {
     local words cword opts
@@ -45,7 +45,7 @@ elif type compctl &>/dev/null; then
     let cword-=1
 
     case $words[cword] in
-      ntng) opts=$ng_opts ;;
+      ng) opts=$ng_opts ;;
       i|init) opts=$init_opts ;;
       new) opts=$new_opts ;;
       b|build) opts=$build_opts ;;
@@ -58,6 +58,6 @@ elif type compctl &>/dev/null; then
     reply=($opts)
     unset shwordsplit
   }
-  compctl -K _ng_completion ntng
+  compctl -K _ng_completion ng
 fi
-###-end-ntng-completion###
+###-end-ng-completion###

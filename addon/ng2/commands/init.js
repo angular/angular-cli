@@ -88,9 +88,9 @@ module.exports = Command.extend({
     var packageName = commandOptions.name !== '.' && commandOptions.name || project.name();
 
     if (!packageName) {
-      var message = 'The `ntng ' + this.name + '` command requires a ' +
+      var message = 'The `ng ' + this.name + '` command requires a ' +
         'package.json in current folder with name attribute or a specified name via arguments. ' +
-        'For more details, use `ntng help`.';
+        'For more details, use `ng help`.';
 
       return Promise.reject(new SilentError(message));
     }

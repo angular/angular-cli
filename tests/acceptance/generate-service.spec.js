@@ -12,7 +12,7 @@ var conf = require('ember-cli/tests/helpers/conf');
 var Promise = require('ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
 
-describe('Acceptance: ntng generate service', function () {
+describe('Acceptance: ng generate service', function () {
   before(conf.setup);
 
   after(conf.restore);
@@ -31,14 +31,14 @@ describe('Acceptance: ntng generate service', function () {
     return tmp.teardown('./tmp');
   });
 
-  it('ntng generate service my-svc', function () {
+  it('ng generate service my-svc', function () {
     return ng(['generate', 'service', 'my-svc']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-svc.service.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('ntng generate service test' + path.sep + 'my-svc', function () {
+  it('ng generate service test' + path.sep + 'my-svc', function () {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', 'test'));
     return ng(['generate', 'service', 'test' + path.sep + 'my-svc']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'test', 'my-svc.service.ts');
@@ -46,14 +46,14 @@ describe('Acceptance: ntng generate service', function () {
     });
   });
 
-  it('ntng generate service test' + path.sep + '..' + path.sep + 'my-svc', function () {
+  it('ng generate service test' + path.sep + '..' + path.sep + 'my-svc', function () {
     return ng(['generate', 'service', 'test' + path.sep + '..' + path.sep + 'my-svc']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-svc.service.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('ntng generate service my-svc from a child dir', () => {
+  it('ng generate service my-svc from a child dir', () => {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1'));
     return new Promise(function (resolve) {
       process.chdir('./src');
@@ -71,7 +71,7 @@ describe('Acceptance: ntng generate service', function () {
       }, err => console.log('ERR: ', err));
   });
 
-  it('ntng generate service child-dir' + path.sep + 'my-svc from a child dir', () => {
+  it('ng generate service child-dir' + path.sep + 'my-svc from a child dir', () => {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'child-dir'));
     return new Promise(function (resolve) {
       process.chdir('./src');
@@ -90,7 +90,7 @@ describe('Acceptance: ntng generate service', function () {
       }, err => console.log('ERR: ', err));
   });
 
-  it('ntng generate service child-dir' + path.sep + '..' + path.sep + 'my-svc from a child dir',
+  it('ng generate service child-dir' + path.sep + '..' + path.sep + 'my-svc from a child dir',
     () => {
       fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1'));
       return new Promise(function (resolve) {
@@ -111,7 +111,7 @@ describe('Acceptance: ntng generate service', function () {
         }, err => console.log('ERR: ', err));
     });
 
-  it('ntng generate service ' + path.sep + 'my-svc from a child dir, gens under ' +
+  it('ng generate service ' + path.sep + 'my-svc from a child dir, gens under ' +
     path.join('src', 'app'),
     () => {
       fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1'));
@@ -131,7 +131,7 @@ describe('Acceptance: ntng generate service', function () {
         }, err => console.log('ERR: ', err));
     });
 
-  it('ntng generate service ..' + path.sep + 'my-svc from root dir will fail', () => {
+  it('ng generate service ..' + path.sep + 'my-svc from root dir will fail', () => {
     return ng(['generate', 'service', '..' + path.sep + 'my-svc']).then(() => {
       throw new SilentError(`ng generate service ..${path.sep}my-svc from root dir should fail.`);
     }, (err) => {

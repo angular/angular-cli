@@ -2,12 +2,12 @@
 
 # Abstract
 
-The current `ntng install` process is faulty; third parties have to add a `bundles/` directory
+The current `ng install` process is faulty; third parties have to add a `bundles/` directory
 with metadata that we expect. This document explores ways to improve on the process.
 
 # Requirements
 
-The following use cases need to be supported by `ntng install`:
+The following use cases need to be supported by `ng install`:
 
 1. Support for _any_ thirdparties, ultimately falling back to running `npm install` only and
 doing nothing else, if necessary.
@@ -31,29 +31,29 @@ to proper map the imports and move them to `tmp` before compiling, then to `dist
 Here's a few stories that should work right off:
 
 ```sh
-$ ntng new my-app && cd my-app/
-$ ntng install jquery
+$ ng new my-app && cd my-app/
+$ ng install jquery
 ```
 ^(this makes jQuery available in the index)
 
 ```sh
-$ ntng install angularfire2
+$ ng install angularfire2
 > Please specify your Firebase database URL [my-app.firebaseio.com]: _
 ```
 ^(makes firebase available and provided to the App)
 
 ```sh
-$ ntng install angularfire2 --dbUrl=my-firebase-db.example.com
+$ ng install angularfire2 --dbUrl=my-firebase-db.example.com
 ```
 ^(skip prompts for values passed on the command line)
 
 ```sh
-$ ntng install angularfire2 --quiet
+$ ng install angularfire2 --quiet
 ```
 ^(using `--quiet` to skip all prompts and use default values)
 
 ```sh
-$ ntng install less
+$ ng install less
 ```
 ^(now compiles CSS files with less for the appropriate extensions)
 
@@ -75,7 +75,7 @@ The `install` task will perform the following subtasks:
 1. **Run `package["angular-cli"].scripts["install"]` if it exists.** If the script fails,
    run `npm uninstall ${libName}` and fail the install process.
 1. **Detect if a package named `angular/cli-wrapper-${libName}` exist in the angular
-   organization.** If so, run the steps above as if ntng install angular/angular-${libName}. If
+   organization.** If so, run the steps above as if ng install angular/angular-${libName}. If
    this install fails, ignore the failure.
   
    These packages can be used to wrap libraries that we want to support but can't update
@@ -151,13 +151,13 @@ needs to exist for toolings to be able to understand dependencies. These provide
 to the application.
 
 In order to blacklist providers from being global, the user can use the `--no-global-providers`
-flag during installation, or can change the dependencies by using `ntng providers`. As an example:
+flag during installation, or can change the dependencies by using `ng providers`. As an example:
 
 ```bash
-ntng new my-todo-app
-ntng generate component database
-ntng install --no-global-providers angularfirebase2
-ntng providers database angularfirebase2
+ng new my-todo-app
+ng generate component database
+ng install --no-global-providers angularfirebase2
+ng providers database angularfirebase2
 ```
 
 Or, alternatively, the user can add its own providers and dependencies to its components.
@@ -186,7 +186,7 @@ to leave the liberty to the user to change the SystemJS configuration so that it
 
 We will not use SystemJS bundles in development. This is for better debugging, future proofing
 (when moving the build system) and better CDN support, as many of the loaded files will end up
-being pulled from a CDN in production. During the `ntng build` process for production, the
+being pulled from a CDN in production. During the `ng build` process for production, the
 SystemJS configuration script will be rebuilt to fetch from the CDN.
 
 # Upgrade Strategy
