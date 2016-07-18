@@ -44,7 +44,7 @@ describe('Acceptance: ng new', function () {
       });
 
       expected.forEach(function (file, index) {
-        expected[index] = file.replace(/__name__/g, 'angular-cli');
+        expected[index] = file.replace(/__name__/g, 'nashtech-angular-cli');
       });
 
       expected.sort();

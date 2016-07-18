@@ -35,7 +35,7 @@
     "angular2-universal":"0.104.5",
     "angular2-universal-polyfills": "0.4.1",
     "preboot": "2.0.10",<% } %>
-    "angular-cli": "<%= version %>",
+    "nashtech-angular-cli": "<%= version %>",
     "codelyzer": "0.0.20",
     "ember-cli-inject-live-reload": "1.4.0",
     "jasmine-core": "2.4.1",

@@ -19,9 +19,9 @@ const GenerateCommand = EmberGenerateCommand.extend({
 
     if (rawArgs[0] !== '--help' &&
       !fs.existsSync(path.join(__dirname, '..', 'blueprints', rawArgs[0]))) {
-      SilentError.debugOrThrow('angular-cli/commands/generate', `Invalid blueprint: ${rawArgs[0]}`);
+      SilentError.debugOrThrow('nashtech-angular-cli/commands/generate', `Invalid blueprint: ${rawArgs[0]}`);
     }
-    
+
     // Override default help to hide ember blueprints
     EmberGenerateCommand.prototype.printDetailedHelp = function (options) {
       var blueprintList = fs.readdirSync(path.join(__dirname, '..', 'blueprints'));
@@ -29,7 +29,7 @@ const GenerateCommand = EmberGenerateCommand.extend({
         .filter(bp => bp.indexOf('-test') === -1)
         .filter(bp => bp !== 'ng2')
         .map(bp => Blueprint.load(path.join(__dirname, '..', 'blueprints', bp)));
-      
+
       var output = '';
       blueprints
         .forEach(function (bp) {
@@ -38,7 +38,7 @@ const GenerateCommand = EmberGenerateCommand.extend({
       this.ui.writeLine(chalk.cyan('  Available blueprints'));
       this.ui.writeLine(output);
     };
-    
+
     return EmberGenerateCommand.prototype.beforeRun.apply(this, arguments);
   }
 });
