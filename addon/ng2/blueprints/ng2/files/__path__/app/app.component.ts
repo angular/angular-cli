@@ -11,7 +11,7 @@ import { APP_SHELL_DIRECTIVES } from '@angular/app-shell';<% } %>
   `,
   styles: [],
   directives: [APP_SHELL_DIRECTIVES]<% } else { %>templateUrl: 'app.component.html',
-  styleUrls: ['app.component.css']<% } %>
+  styleUrls: ['app.component.<%= styleExt %>']<% } %>
 })
 export class AppComponent {
   title = 'app works!';
