@@ -102,25 +102,9 @@ Enum      | `ng g enum my-new-enum`
 
 ### Generating a route
 
-You can generate a new route with the following command (note the singular
-used in `hero`):
+Generating routes in the CLI has been disabled for the time being. A new router and new route generation blueprints are coming.
 
-```bash
-ng generate route hero
-```
-
-This will create a folder which will contain the hero component and related test and style files.
-
-The generated route will also be registered with the parent component's `@RouteConfig` decorator.
-
-By default the route will be designated as a **lazy** route which means that it will be loaded into the browser when needed, not upfront as part of a bundle.
-
-In order to visually distinguish lazy routes from other routes the folder for the route will be prefixed with a `+` per the above example the folder will be named `+hero`.
-This is done in accordance with the [style guide](https://angular.io/styleguide#!#prefix-lazy-loaded-folders-with-).
-
-The default lazy nature of routes can be turned off via the lazy flag (`--lazy false`)
-
-There is an optional flag for `skip-router-generation` which will not add the route to the parent component's `@RouteConfig` decorator.
+You can read the official documentation for the new Router here: https://angular.io/docs/ts/latest/guide/router.html. Please note that even though route generation is disabled, building your projects with routing is still fully supported.
 
 ### Creating a build
 
