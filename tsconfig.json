@@ -27,6 +27,7 @@
   },
 
   "files": [
+    "custom_typings/xhr2.d.ts",
     "modules/broccoli-prerender/src/index.ts",
     "modules/broccoli-prerender/src/child_proc.ts",
     "modules/express-engine/src/index.ts",
@@ -46,8 +47,7 @@
     "modules/universal/src/global.ts",
     "modules/universal/src/polyfills.ts",
     "modules/universal/src/typings.ts",
-    "modules/webpack-prerender/src/index.ts",
-    "typings/index.d.ts"
+    "modules/webpack-prerender/src/index.ts"
   ],
   "compileOnSave": false,
   "buildOnSave": false,
