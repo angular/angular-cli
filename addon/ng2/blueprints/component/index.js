@@ -115,20 +115,7 @@ module.exports = {
     }
 
     if (!options.flat) {
-      var filePath = path.join(this.project.ngConfig.defaults.sourceDir, 'system-config.ts');
-      var barrelUrl = this.appDir.replace(/\\/g, '/');
-      if (barrelUrl[0] === '/') {
-        barrelUrl = barrelUrl.substr(1);
-      }
-
-      return addBarrelRegistration(this, this.generatePath)
-        .then(() => {
-          return this.insertIntoFile(
-            filePath,
-            `  '${barrelUrl}',`,
-            { before: '  /** @cli-barrel */' }
-          );
-        });
+      return addBarrelRegistration(this, this.generatePath);
     } else {
       return addBarrelRegistration(
         this,
