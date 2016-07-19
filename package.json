@@ -89,7 +89,6 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^2.1.0",
     "symlink-or-copy": "^1.0.3",
-    "systemjs-builder": "0.15.17",
     "ts-helpers": "^1.1.1",
     "ts-loader": "^0.8.2",
     "tslint": "^3.11.0",
