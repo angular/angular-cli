@@ -1,11 +1,12 @@
 import * as webpack from 'webpack';
+import { CliConfig } from './config';
 
 const path = require('path');
 const webpackMerge = require('webpack-merge'); // used to merge webpack configs
 const WebpackMd5Hash = require('webpack-md5-hash');
 const CompressionPlugin = require("compression-webpack-plugin");
 
-export const getWebpackProdConfigPartial = function(projectRoot: string) {
+export const getWebpackProdConfigPartial = function(projectRoot: string, sourceDir: string) {
   return {
     debug: false,
     devtool: 'source-map',
@@ -36,7 +37,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string) {
     tslint: {
       emitErrors: true,
       failOnHint: true,
-      resourcePath: path.resolve(projectRoot, './src')
+      resourcePath: path.resolve(projectRoot, `./${sourceDir}`)
     },
     htmlLoader: {
       minimize: true,

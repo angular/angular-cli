@@ -1,17 +1,18 @@
 import * as webpack from 'webpack';
+import { CliConfig } from './config';
 
 const path = require('path');
 
-export const getWebpackTestConfig = function(projectRoot: string) {
+export const getWebpackTestConfig = function(projectRoot: string, sourceDir: string) {
   return {
     devtool: 'inline-source-map',
     context: path.resolve(__dirname, './'),
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: path.resolve(projectRoot, './src')
+      root: path.resolve(projectRoot, `./${sourceDir}`)
     },
     entry: {
-      test: path.resolve(projectRoot, './src/test.ts')
+      test: path.resolve(projectRoot, `./${sourceDir}/test.ts`)
     },
     output: {
       path: './dist.test',
@@ -43,7 +44,7 @@ export const getWebpackTestConfig = function(projectRoot: string) {
               loader: 'awesome-typescript-loader',
               query: {
                 useWebpackText: true,
-                tsconfig: path.resolve(projectRoot, './src/tsconfig.json'),
+                tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`),
                 module: "commonjs",
                 target: "es5",
                 useForkChecker: true,
@@ -62,7 +63,7 @@ export const getWebpackTestConfig = function(projectRoot: string) {
         { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
         { test: /\.scss$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000'},
-        { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(projectRoot, 'src/index.html')] }
+        { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(projectRoot, `./${sourceDir}/index.html`)] }
       ],
       postLoaders: [
         {
@@ -77,7 +78,7 @@ export const getWebpackTestConfig = function(projectRoot: string) {
     tslint: {
       emitErrors: false,
       failOnHint: false,
-      resourcePath: 'src'
+      resourcePath: `./${sourceDir}`
     },
     node: {
       global: 'window',
