@@ -25,10 +25,7 @@ module.exports = Command.extend({
     { name: 'output-path',    type: 'Path',  default: 'dist/',       aliases: ['o'] },
     { name: 'watch',          type: Boolean, default: false,         aliases: ['w'] },
     { name: 'watcher',        type: String },
-    { name: 'suppress-sizes', type: Boolean, default: false },
-
-    // Experimental webpack build for material team
-    { name: 'm2', type: Boolean, default: false}
+    { name: 'suppress-sizes', type: Boolean, default: false }
   ],
 
   run: function (commandOptions: BuildOptions) {
