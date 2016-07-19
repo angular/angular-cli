@@ -14,10 +14,6 @@ module.exports = function (config) {
       }
     },
     files: [],
-    exclude: [
-      // Vendor packages might include spec files. We don't want to use those.
-      'dist/vendor/**/*.spec.js'
-    ],
     preprocessors: {},
     reporters: ['progress'],
     port: 9876,
