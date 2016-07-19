@@ -54,7 +54,8 @@ module.exports = {
       route: options.route,
       isLazyRoute: !!options.isLazyRoute,
       isAppComponent: !!options.isAppComponent,
-      selector: this.selector
+      selector: this.selector,
+      styleExt: this.styleExt
     };
   },
 

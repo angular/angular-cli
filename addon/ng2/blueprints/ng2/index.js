@@ -2,7 +2,6 @@ const Blueprint   = require('ember-cli/lib/models/blueprint');
 const path        = require('path');
 const stringUtils = require('ember-cli-string-utils');
 const getFiles = Blueprint.prototype.files;
-const EOL = require('os').EOL;
 
 module.exports = {
   description: '',
@@ -29,17 +28,6 @@ module.exports = {
     const fullAppName = stringUtils.dasherize(options.entity.name)
       .replace(/-(.)/g, (_, l) => ' ' + l.toUpperCase())
       .replace(/^./, (l) => l.toUpperCase());
-    
-    var stylePackage = '';
-    switch(options.style.toLowerCase()) {
-    case 'sass':
-    case 'scss':
-      stylePackage = `,${EOL}    "node-sass": "3.7.0"`;
-      break;
-    case 'styl':
-      stylePackage = `,${EOL}    "stylus": "0.54.5"`;
-      break; 
-    }
 
     return {
       htmlComponentName: stringUtils.dasherize(options.entity.name),
@@ -50,8 +38,7 @@ module.exports = {
       prefix: options.prefix,
       styleExt: this.styleExt,
       refToTypings: refToTypings,
-      isMobile: options.mobile,
-      stylePackage: stylePackage
+      isMobile: options.mobile
     };
   },
 

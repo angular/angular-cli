@@ -319,120 +319,93 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(tmpFileLocation)).to.be.equal(true);
   });
 
-  it.skip('Installs sass support successfully', function() {
+  // Mobile mode doesn't have styles
+  it_not_mobile('Supports scss in styleUrls', function() {
     this.timeout(420000);
 
-    sh.exec('npm install node-sass', { silent: true });
-    return ng(['generate', 'component', 'test-component'])
-    .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.component.css');
-      let scssFile = path.join(componentPath, 'test-component.component.scss');
-      let scssPartialFile = path.join(componentPath, '_test-component.component.partial.scss');
+    let cssFilename = 'app.component.css';
+    let scssFilename = 'app.component.scss';
+    let componentPath = path.join(process.cwd(), 'src', 'app');
+    let componentFile = path.join(componentPath, 'app.component.ts');
+    let cssFile = path.join(componentPath, cssFilename);
+    let scssFile = path.join(componentPath, scssFilename);
+    let scssExample = '@import "app.component.partial";\n\n.outer {\n  .inner { background: #fff; }\n }';
+    let scssPartialFile = path.join(componentPath, '_app.component.partial.scss');
+    let scssPartialExample = '.partial {\n @extend .outer;\n }';
+    let componentContents = fs.readFileSync(componentFile, 'utf8');
 
-      let scssPartialExample = '.partial {\n @extend .outer;\n }';
-      fs.writeFileSync(scssPartialFile, scssPartialExample, 'utf8');
-      expect(existsSync(scssPartialFile)).to.be.equal(true);
+    sh.mv(cssFile, scssFile);
+    fs.writeFileSync(scssFile, scssExample, 'utf8');
+    fs.writeFileSync(scssPartialFile, scssPartialExample, 'utf8');
+    fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), scssFilename), 'utf8');
 
-      expect(existsSync(componentPath)).to.be.equal(true);
-      sh.mv(cssFile, scssFile);
-      expect(existsSync(scssFile)).to.be.equal(true);
-      expect(existsSync(cssFile)).to.be.equal(false);
-      let scssExample = '@import "test-component.component.partial";\n\n.outer {\n  .inner { background: #fff; }\n }';
-      fs.writeFileSync(scssFile, scssExample, 'utf8');
+    sh.exec(`${ngBin} build`);
+    let destCssBundle = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    let contents = fs.readFileSync(destCssBundle, 'utf8');
+    expect(contents).to.include('.outer .inner');
+    expect(contents).to.include('.partial .inner');
 
-      sh.exec(`${ngBin} build`);
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
-      expect(existsSync(destCss)).to.be.equal(true);
-      let contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-      expect(contents).to.include('.partial .inner');
-
-      sh.rm('-f', destCss);
-      process.chdir('src');
-      sh.exec(`${ngBin} build`);
-      expect(existsSync(destCss)).to.be.equal(true);
-      contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-      expect(contents).to.include('.partial .inner');
-
-      process.chdir('..');
-      sh.exec('npm uninstall node-sass', { silent: true });
-    });
+    sh.mv(scssFile, cssFile);
+    fs.writeFileSync(cssFile, '', 'utf8');
+    fs.writeFileSync(componentFile, componentContents, 'utf8');
+    sh.rm('-f', scssPartialFile);
   });
 
-  it.skip('Installs less support successfully', function() {
+  // Mobile mode doesn't have styles
+  it_not_mobile('Supports less in styleUrls', function() {
     this.timeout(420000);
 
-    sh.exec('npm install less', { silent: true });
-    return ng(['generate', 'component', 'test-component'])
-    .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.component.css');
-      let lessFile = path.join(componentPath, 'test-component.component.less');
+    let cssFilename = 'app.component.css';
+    let lessFilename = 'app.component.less';
+    let componentPath = path.join(process.cwd(), 'src', 'app');
+    let componentFile = path.join(componentPath, 'app.component.ts');
+    let cssFile = path.join(componentPath, cssFilename);
+    let lessFile = path.join(componentPath, lessFilename);
+    let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
+    let componentContents = fs.readFileSync(componentFile, 'utf8');
+    
+    sh.mv(cssFile, lessFile);      
+    fs.writeFileSync(lessFile, lessExample, 'utf8');
+    fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), lessFilename), 'utf8');
 
-      expect(existsSync(componentPath)).to.be.equal(true);
-      sh.mv(cssFile, lessFile);
-      expect(existsSync(lessFile)).to.be.equal(true);
-      expect(existsSync(cssFile)).to.be.equal(false);
-      let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
-      fs.writeFileSync(lessFile, lessExample, 'utf8');
+    sh.exec(`${ngBin} build`);
+    let destCssBundle = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    let contents = fs.readFileSync(destCssBundle, 'utf8');
+    expect(contents).to.include('.outer .inner');
 
-      sh.exec(`${ngBin} build`);
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
-      expect(existsSync(destCss)).to.be.equal(true);
-      let contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-
-      sh.rm('-f', destCss);
-      process.chdir('src');
-      sh.exec(`${ngBin} build`);
-      expect(existsSync(destCss)).to.be.equal(true);
-      contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-
-      process.chdir('..');
-      sh.exec('npm uninstall less', { silent: true });
-    });
+    fs.writeFileSync(lessFile, '', 'utf8');
+    sh.mv(lessFile, cssFile);
+    fs.writeFileSync(componentFile, componentContents, 'utf8');
   });
 
-  it.skip('Installs stylus support successfully', function() {
+  // Mobile mode doesn't have styles
+  it_not_mobile('Supports stylus in styleUrls', function() {
     this.timeout(420000);
 
-    sh.exec('npm install stylus', { silent: true });
-    return ng(['generate', 'component', 'test-component'])
-    .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.component.css');
-      let stylusFile = path.join(componentPath, 'test-component.component.styl');
+    let cssFilename = 'app.component.css';
+    let stylusFilename = 'app.component.scss';
+    let componentPath = path.join(process.cwd(), 'src', 'app');
+    let componentFile = path.join(componentPath, 'app.component.ts');
+    let cssFile = path.join(componentPath, cssFilename);
+    let stylusFile = path.join(componentPath, stylusFilename);
+    let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
+    let componentContents = fs.readFileSync(componentFile, 'utf8');
+    
+    sh.mv(cssFile, stylusFile);      
+    fs.writeFileSync(stylusFile, stylusExample, 'utf8');
+    fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), stylusFilename), 'utf8');
 
-      sh.mv(cssFile, stylusFile);
-      expect(existsSync(stylusFile)).to.be.equal(true);
-      expect(existsSync(cssFile)).to.be.equal(false);
-      let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
-      fs.writeFileSync(stylusFile, stylusExample, 'utf8');
+    sh.exec(`${ngBin} build`);
+    let destCssBundle = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    let contents = fs.readFileSync(destCssBundle, 'utf8');
+    expect(contents).to.include('.outer .inner');
 
-      sh.exec(`${ngBin} build`);
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
-      expect(existsSync(destCss)).to.be.equal(true);
-      let contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-
-      sh.rm('-f', destCss);
-      process.chdir('src');
-      sh.exec(`${ngBin} build`);
-      expect(existsSync(destCss)).to.be.equal(true);
-      contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-
-      process.chdir('..');
-      sh.exec('npm uninstall stylus', { silent: true });
-    });
+    fs.writeFileSync(stylusFile, '', 'utf8');
+    sh.mv(stylusFile, cssFile);
+    fs.writeFileSync(componentFile, componentContents, 'utf8');
   });
 
-  // This test causes complications with path resolution in TS broccoli plugin,
-  // and isn't mobile specific
-  it_not_mobile('Turn on `noImplicitAny` in tsconfig.json and rebuild', function () {
+  it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function () {
     this.timeout(420000);
 
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
@@ -443,10 +416,8 @@ describe('Basic end-to-end Workflow', function () {
 
     sh.rm('-rf', path.join(process.cwd(), 'dist'));
 
-    return ng(['build'])
-      .then(() => {
-        expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-      });
+    sh.exec(`${ngBin} build`);
+    expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
   });
 
   it('Turn on path mapping in tsconfig.json and rebuild', function () {
