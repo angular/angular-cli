@@ -1104,6 +1104,10 @@
       "version": "1.0.0",
       "from": "delegates@1.0.0"
     },
+    "denodeify": {
+      "version": "1.2.1",
+      "from": "denodeify@>=1.2.1 <2.0.0"
+    },
     "depd": {
       "version": "1.1.0",
       "from": "depd@1.1.0"
@@ -2345,6 +2349,10 @@
     "es6-map": {
       "version": "0.1.4",
       "from": "es6-map@0.1.4"
+    },
+    "es6-promise": {
+      "version": "3.2.1",
+      "from": "es6-promise@>=3.2.1 <4.0.0"
     },
     "es6-set": {
       "version": "0.1.4",
