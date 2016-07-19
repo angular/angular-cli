@@ -26,7 +26,6 @@ export function getWebpackCommonConfig(projectRoot: string) {
     context: path.resolve(__dirname, './'),
     entry: {
       main: [path.resolve(projectRoot, './src/main.ts')],
-      vendor: path.resolve(projectRoot, './src/vendor.ts'),
       polyfills: path.resolve(projectRoot, './src/polyfills.ts')
     },
     output: {
@@ -74,7 +73,7 @@ export function getWebpackCommonConfig(projectRoot: string) {
         chunksSortMode: 'dependency'
       }),
       new webpack.optimize.CommonsChunkPlugin({
-        name: ['vendor', 'polyfills']
+        name: ['polyfills']
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
