@@ -1,5 +1,6 @@
 import * as webpack from 'webpack';
 import {LoaderConfig, PathsPlugin} from '../utilities/ts-path-mappings-webpack-plugin';
+import { CliConfig.fromProject().defaults.sourceDir as sourceDir } from './config';
 
 const path = require('path');
 const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
@@ -10,14 +11,14 @@ export function getWebpackCommonConfig(projectRoot: string) {
   const awesomeTypescriptLoaderConfig: LoaderConfig | any = {
     useWebpackText: true,
     useForkChecker: true,
-    tsconfig: path.resolve(projectRoot, './src/tsconfig.json')
+    tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`)
   }
 
   return {
     devtool: 'inline-source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: path.resolve(projectRoot, './src'),
+      root: path.resolve(projectRoot, `./${sourceDir}`),
       moduleDirectories: ['node_modules'],
       plugins: [
         new PathsPlugin(awesomeTypescriptLoaderConfig);
@@ -25,9 +26,9 @@ export function getWebpackCommonConfig(projectRoot: string) {
     },
     context: path.resolve(__dirname, './'),
     entry: {
-      main: [path.resolve(projectRoot, './src/main.ts')],
-      vendor: path.resolve(projectRoot, './src/vendor.ts'),
-      polyfills: path.resolve(projectRoot, './src/polyfills.ts')
+      main: [path.resolve(projectRoot, `./${sourceDir}/main.ts`)],
+      vendor: path.resolve(projectRoot, `./${sourceDir}/vendor.ts`),
+      polyfills: path.resolve(projectRoot, `./${sourceDir}/polyfills.ts`)
     },
     output: {
       path: path.resolve(projectRoot, './dist'),
