@@ -1,7 +1,6 @@
 import * as webpack from 'webpack';
+import * as path from 'path';
 import { CliConfig } from './config';
-
-const path = require('path');
 
 export const getWebpackTestConfig = function(projectRoot: string, sourceDir: string) {
   return {

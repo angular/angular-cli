@@ -1,11 +1,10 @@
+import * as path from 'path';
+import * as CopyWebpackPlugin from 'copy-webpack-plugin';
+import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as webpack from 'webpack';
-import {LoaderConfig, PathsPlugin} from '../utilities/ts-path-mappings-webpack-plugin';
+import { ForkCheckerPlugin } from 'awesome-typescript-loader';
+import { LoaderConfig, PathsPlugin } from '../utilities/ts-path-mappings-webpack-plugin';
 import { CliConfig } from './config';
-
-const path = require('path');
-const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
   const awesomeTypescriptLoaderConfig: LoaderConfig | any = {

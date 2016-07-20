@@ -1,24 +1,18 @@
-import {webpackDevServerOutputOptions} from '../models/';
-import {NgCliWebpackConfig} from '../models/webpack-config';
-import {ServeTaskOptions} from '../commands/serve';
+import * as path from 'path';
+import * as chalk from 'chalk';
+import * as Task from 'ember-cli/lib/models/task';
+import * as webpack from 'webpack';
+import * as WebpackDevServer from 'webpack-dev-server';
+import * as ProgressPlugin from 'webpack/lib/ProgressPlugin';
+import { webpackDevServerOutputOptions } from '../models/';
+import { NgCliWebpackConfig } from '../models/webpack-config';
+import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
-
-const path = require('path');
-const chalk = require('chalk');
-
-
-const Task              = require('ember-cli/lib/models/task');
-const webpack           = require('webpack');
-const WebpackDevServer  = require('webpack-dev-server');
-const ProgressPlugin    = require('webpack/lib/ProgressPlugin');
-
-
-
-let lastHash = null;
 
 module.exports = Task.extend({
   run: function(commandOptions: ServeTaskOptions) {
-
+    
+    let lastHash = null;
     let webpackCompiler: any;
 
     var config: NgCliWebpackConfig = new NgCliWebpackConfig(this.project, commandOptions.environment).config;
@@ -44,7 +38,7 @@ module.exports = Task.extend({
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
 
     return new Promise((resolve, reject) => {
-      server.listen(commandOptions.port, "localhost", function(err, stats) {
+      server.listen(commandOptions.port, 'localhost', function(err, stats) {
         if(err) {
           lastHash = null;
           console.error(err.stack || err);
@@ -54,7 +48,7 @@ module.exports = Task.extend({
 
         if(stats && stats.hash && stats.hash !== lastHash) {
           lastHash = stats.hash;
-          process.stdout.write(stats.toString(webpackOutputOptions) + "\n" + serveMessage + "\n");
+          process.stdout.write(stats.toString(webpackOutputOptions) + '\n' + serveMessage + '\n');
         }
 
         process.stdout.write(serveMessage);

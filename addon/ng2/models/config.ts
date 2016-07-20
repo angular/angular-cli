@@ -7,7 +7,6 @@ const schema = require(schemaPath);
 export const CLI_CONFIG_FILE_NAME = 'angular-cli.json';
 export const ARRAY_METHODS = ['push', 'splice', 'sort', 'reverse', 'pop', 'shift'];
 
-
 function _findUp(name: string, from: string) {
   let currentDir = from;
   while (currentDir && currentDir !== path.parse(currentDir).root) {

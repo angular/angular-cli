@@ -1,4 +1,4 @@
-const path = require('path');
+import * as path from 'path';
 
 export const ngAppResolve = (resolvePath: string): string => {
   return path.resolve(process.cwd(), resolvePath);

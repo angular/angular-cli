@@ -1,6 +1,6 @@
-const Command = require('ember-cli/lib/models/command');
-const WebpackBuild = require('../tasks/build-webpack');
-const WebpackBuildWatch = require('../tasks/build-webpack-watch');
+import * as Command from 'ember-cli/lib/models/command';
+import * as WebpackBuild from '../tasks/build-webpack';
+import * as WebpackBuildWatch from '../tasks/build-webpack-watch';
 
 interface BuildOptions {
   environment?: string;

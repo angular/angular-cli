@@ -4,13 +4,11 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "mapRoot": "./",
     "module": "es6",
     "moduleResolution": "node",
-    "outDir": "./dist/",
-    "rootDir": ".",
     "sourceMap": true,
-    "target": "es5",
-    "mapRoot": "/"
+    "target": "es5"
   },
   "compileOnSave": false,
   "buildOnSave": false,
