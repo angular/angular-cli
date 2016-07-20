@@ -1,6 +1,7 @@
 import {webpackDevServerOutputOptions} from '../models/';
 import {NgCliWebpackConfig} from '../models/webpack-config';
 import {ServeTaskOptions} from '../commands/serve';
+import { CliConfig } from '../models/config';
 
 const path = require('path');
 const chalk = require('chalk');
@@ -32,7 +33,7 @@ module.exports = Task.extend({
     }));
 
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
-      contentBase: path.resolve(this.project.root, './src'),
+      contentBase: path.resolve(this.project.root, `./${CliConfig.fromProject().defaults.sourceDir}`),
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
       inline: true,
