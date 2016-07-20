@@ -12,14 +12,16 @@ describe('dynamic path parser', () => {
   var entityName = 'temp-name';
   var rootName = path.parse(process.cwd()).root + 'project';
   var sourceDir = 'src';
+  var prefix = 'app';
   beforeEach(() => {
     project = {
-      root: rootName, 
+      root: rootName,
       ngConfig: {
         defaults: {
-          sourceDir: sourceDir
+          sourceDir: sourceDir,
+          prefix: prefix
         }
-      } 
+      }
     };
     var mockFolder = {};
     mockFolder[rootName] = {
@@ -32,7 +34,7 @@ describe('dynamic path parser', () => {
     };
     mockFs(mockFolder);
   });
-  
+
   afterEach(() => {
     mockFs.restore();
   });
@@ -122,7 +124,7 @@ describe('dynamic path parser', () => {
       expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
       expect(result.name).to.equal(entityName);
     });
-    
+
   it('auto look for dirs with a "+" when not specified', () => {
     var mockFolder = {};
     mockFolder[rootName] = {
