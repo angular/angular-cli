@@ -21,7 +21,7 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, sour
   }
 };
 
-export const getWebpackMobileProdConfigPartial = function (projectRoot: string) {
+export const getWebpackMobileProdConfigPartial = function (projectRoot: string, sourceDir: string) {
   return {
     entry: {
       'sw-install': path.resolve(__dirname, '../utilities/sw-install.js')
