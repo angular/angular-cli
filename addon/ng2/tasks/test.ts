@@ -34,7 +34,7 @@ module.exports = Task.extend({
       // Single test entry file. Will run the test.ts bundle and track it.
       options.files = [{ pattern: testFile, watched: false }];
       options.preprocessors = { [testFile]: ['webpack','sourcemap'] };
-      options.webpack = webpackTestConfig(projectRoot);
+      options.webpack = webpackTestConfig(projectRoot, this.project.ngConfig.defaults.sourceDir);
       options.webpackMiddleware = {
         noInfo: true, // Hide webpack output because its noisy.
         stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.
