@@ -177,47 +177,6 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
-  it('Serve and run e2e tests after initial build', function () {
-    this.timeout(240000);
-
-    var ngServePid;
-
-    function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`, { maxBuffer: 500*1024 });
-      var startedProtractor = false;
-      ngServePid = serveProcess.pid;
-
-      serveProcess.stdout.on('data', (data) => {
-        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
-          startedProtractor = true;
-          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
-            if (error !== null) {
-              reject(stderr)
-            } else {
-              resolve();
-            }
-          });
-        }
-      });
-
-      serveProcess.stderr.on('data', (data) => {
-        reject(data);
-      });
-      serveProcess.on('close', (code) => {
-        code === 0 ? resolve() : reject('ng serve command closed with error')
-      });
-    }
-
-    return new Promise(executor)
-      .then(() => {
-        if (ngServePid) treeKill(ngServePid);
-      })
-      .catch((msg) => {
-        if (ngServePid) treeKill(ngServePid);
-        throw new Error(msg);
-      });
-  });
-
   it('Can create a test component using `ng generate component test-component`', function () {
     this.timeout(10000);
     return ng(['generate', 'component', 'test-component']).then(function () {
@@ -453,13 +412,54 @@ describe('Basic end-to-end Workflow', function () {
     expect(indexHtml).to.include('main.bundle.js');
   });
 
-  it('Serve and run e2e tests after all other commands', function () {
+  it('Serve and run e2e tests on dev environment', function () {
     this.timeout(240000);
 
     var ngServePid;
 
     function executor(resolve, reject) {
       var serveProcess = child_process.exec(`${ngBin} serve`, { maxBuffer: 500*1024 });
+      var startedProtractor = false;
+      ngServePid = serveProcess.pid;
+
+      serveProcess.stdout.on('data', (data) => {
+        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
+          startedProtractor = true;
+          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
+            if (error !== null) {
+              reject(stderr)
+            } else {
+              resolve();
+            }
+          });
+        }
+      });
+
+      serveProcess.stderr.on('data', (data) => {
+        reject(data);
+      });
+      serveProcess.on('close', (code) => {
+        code === 0 ? resolve() : reject('ng serve command closed with error')
+      });
+    }
+
+    return new Promise(executor)
+      .then(() => {
+        if (ngServePid) treeKill(ngServePid);
+      })
+      .catch((msg) => {
+        if (ngServePid) treeKill(ngServePid);
+        throw new Error(msg);
+      });
+  });
+
+  it('Serve and run e2e tests on prod environment', function () {
+    this.timeout(240000);
+
+    var ngServePid;
+
+    function executor(resolve, reject) {
+      var serveProcess = child_process.exec(`${ngBin} serve -e=prod`, { maxBuffer: 500*1024 });
       var startedProtractor = false;
       ngServePid = serveProcess.pid;
 
