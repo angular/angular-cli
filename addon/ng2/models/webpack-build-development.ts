@@ -1,6 +1,7 @@
+import { CliConfig } from './config';
 const path = require('path')
 
-export const getWebpackDevConfigPartial = function(projectRoot: string) {
+export const getWebpackDevConfigPartial = function(projectRoot: string, sourceDir: string) {
   return {
     debug: true,
     devtool: 'cheap-module-source-map',
@@ -13,7 +14,7 @@ export const getWebpackDevConfigPartial = function(projectRoot: string) {
     tslint: {
       emitErrors: false,
       failOnHint: false,
-      resourcePath: path.resolve(projectRoot, './src')
+      resourcePath: path.resolve(projectRoot, `./${sourceDir}`)
     },
     node: {
       global: 'window',

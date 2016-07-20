@@ -1,25 +1,22 @@
-/* jshint node: true */
-'use strict';
-
-var Promise = require('ember-cli/lib/ext/promise');
-var Task = require('ember-cli/lib/models/task');
-var path = require('path');
-var webpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
+const Promise = require('ember-cli/lib/ext/promise');
+const Task = require('ember-cli/lib/models/task');
+const path = require('path');
+const webpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
 
 // require dependencies within the target project
 function requireDependency(root, moduleName) {
-  var packageJson = require(path.join(root, 'node_modules', moduleName, 'package.json'));
-  var main = path.normalize(packageJson.main);
+  const packageJson = require(path.join(root, 'node_modules', moduleName, 'package.json'));
+  const main = path.normalize(packageJson.main);
   return require(path.join(root, 'node_modules', moduleName, main));
 }
 
-module.exports = Task.extend({
+module.exports = Task.extend({ 
   run: function (options) {
-    var projectRoot = this.project.root;
+    const projectRoot = this.project.root;
     return new Promise((resolve) => {
-
-      var karma = requireDependency(projectRoot, 'karma');
-      var karmaConfig = path.join(projectRoot, this.project.ngConfig.test.karma.config);
+      const karma = requireDependency(projectRoot, 'karma');
+      const karmaConfig = path.join(projectRoot, this.project.ngConfig.test.karma.config);
+      const testFile = `./${this.project.ngConfig.defaults.sourceDir}/test.ts`;
 
       options.plugins = [
         require('karma-webpack'),
@@ -35,8 +32,8 @@ module.exports = Task.extend({
       // Add those details here.
 
       // Single test entry file. Will run the test.ts bundle and track it.
-      options.files = [{ pattern: './src/test.ts', watched: false }];
-      options.preprocessors = { './src/test.ts': ['webpack','sourcemap'] };
+      options.files = [{ pattern: testFile, watched: false }];
+      options.preprocessors = { [testFile]: ['webpack','sourcemap'] };
       options.webpack = webpackTestConfig(projectRoot);
       options.webpackMiddleware = {
         noInfo: true, // Hide webpack output because its noisy.
@@ -60,7 +57,7 @@ module.exports = Task.extend({
       options.configFile = karmaConfig;
 
       // :shipit:
-      var karmaServer = new karma.Server(options, resolve);
+      const karmaServer = new karma.Server(options, resolve);
       karmaServer.start();
     });
   }

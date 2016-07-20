@@ -29,7 +29,7 @@ Promise.all([
     );
 });
 
-let testContext: any = require.context('../src', true, /\.spec\.ts/);
+let testContext: any = require.context('./', true, /\.spec\.ts/);
 function requireAll(requireContext: any) {
   return requireContext.keys().map(requireContext);
 }
