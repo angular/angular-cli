@@ -1,23 +1,24 @@
 import * as webpack from 'webpack';
 import {LoaderConfig, PathsPlugin} from '../utilities/ts-path-mappings-webpack-plugin';
+import { CliConfig } from './config';
 
 const path = require('path');
 const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-export function getWebpackCommonConfig(projectRoot: string) {
+export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
   const awesomeTypescriptLoaderConfig: LoaderConfig | any = {
     useWebpackText: true,
     useForkChecker: true,
-    tsconfig: path.resolve(projectRoot, './src/tsconfig.json')
+    tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`)
   }
 
   return {
     devtool: 'inline-source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: path.resolve(projectRoot, './src'),
+      root: path.resolve(projectRoot, `./${sourceDir}`),
       moduleDirectories: ['node_modules'],
       plugins: [
         new PathsPlugin(awesomeTypescriptLoaderConfig);
@@ -25,9 +26,8 @@ export function getWebpackCommonConfig(projectRoot: string) {
     },
     context: path.resolve(__dirname, './'),
     entry: {
-      main: [path.resolve(projectRoot, './src/main.ts')],
-      vendor: path.resolve(projectRoot, './src/vendor.ts'),
-      polyfills: path.resolve(projectRoot, './src/polyfills.ts')
+      main: [path.resolve(projectRoot, `./${sourceDir}/main.ts`)],
+      polyfills: path.resolve(projectRoot, `./${sourceDir}/polyfills.ts`)
     },
     output: {
       path: path.resolve(projectRoot, './dist'),
@@ -70,11 +70,11 @@ export function getWebpackCommonConfig(projectRoot: string) {
     plugins: [
       new ForkCheckerPlugin(),
       new HtmlWebpackPlugin({
-        template: path.resolve(projectRoot, 'src/index.html'),
+        template: path.resolve(projectRoot, `./${sourceDir}/index.html`),
         chunksSortMode: 'dependency'
       }),
       new webpack.optimize.CommonsChunkPlugin({
-        name: ['vendor', 'polyfills']
+        name: ['polyfills']
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
