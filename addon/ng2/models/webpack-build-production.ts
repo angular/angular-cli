@@ -52,7 +52,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, sourceD
     node: {
       global: 'window',
       crypto: 'empty',
-      process: false,
+      process: true,
       module: false,
       clearImmediate: false,
       setImmediate: false
