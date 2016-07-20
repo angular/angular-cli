@@ -1,11 +1,6 @@
 const Command = require('ember-cli/lib/models/command');
-const win = require('ember-cli/lib/utilities/windows-admin');
-
-// const Build = require('../tasks/build');
-// const BuildWatch = require('../tasks/build-watch');
-
-var WebpackBuild = require('../tasks/build-webpack');
-var WebpackBuildWatch = require('../tasks/build-webpack-watch');
+const WebpackBuild = require('../tasks/build-webpack');
+const WebpackBuildWatch = require('../tasks/build-webpack-watch');
 
 interface BuildOptions {
   environment?: string;

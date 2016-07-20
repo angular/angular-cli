@@ -3,9 +3,7 @@ const Command     = require('ember-cli/lib/models/command');
 const Promise     = require('ember-cli/lib/ext/promise');
 const SilentError = require('silent-error');
 const PortFinder  = require('portfinder');
-const win         = require('ember-cli/lib/utilities/windows-admin');
 const EOL         = require('os').EOL;
-
 
 PortFinder.basePort = 49152;
 
@@ -81,9 +79,7 @@ module.exports = Command.extend({
           project: this.project,
         });
 
-        return win.checkWindowsElevation(this.ui).then(function() {
-          return serve.run(commandOptions);
-        });
+        return serve.run(commandOptions);
       });
   },
 

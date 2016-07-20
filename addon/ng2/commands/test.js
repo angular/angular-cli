@@ -1,11 +1,8 @@
 'use strict';
 
-var TestCommand = require('ember-cli/lib/commands/test');
-var win = require('ember-cli/lib/utilities/windows-admin');
-
+const TestCommand = require('ember-cli/lib/commands/test');
 const config = require('../models/config');
 const TestTask = require('../tasks/test');
-
 
 module.exports = TestCommand.extend({
   availableOptions: [
@@ -27,23 +24,11 @@ module.exports = TestCommand.extend({
       project: this.project
     });
 
-    if (commandOptions.watch) {
-      return win.checkWindowsElevation(this.ui)
-        .then(
-          () => {
-          },
-          () => {
-            /* handle build error to allow watch mode to start */
-          })
-        .then(() => testTask.run(commandOptions));
-    } else {
+    if (!commandOptions.watch) {
       // if not watching ensure karma is doing a single run
       commandOptions.singleRun = true;
-      return win.checkWindowsElevation(this.ui)
-        .then(() => {
-          return testTask.run(commandOptions);
-        });
-    }
+    } 
+    return testTask.run(commandOptions);
   }
 });
 
