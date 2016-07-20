@@ -6,9 +6,6 @@
     "experimentalDecorators": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": false,
-    "rootDir": ".",
     "sourceMap": true,
     "target": "es5"
   }

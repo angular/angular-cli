@@ -1,7 +1,7 @@
-const Promise = require('ember-cli/lib/ext/promise');
-const Task = require('ember-cli/lib/models/task');
-const path = require('path');
-const webpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
+import * as Promise from 'ember-cli/lib/ext/promise';
+import * as Task from 'ember-cli/lib/models/task';
+import * as path from 'path';
+import { getWebpackTestConfig } from '../models/webpack-build-test';
 
 // require dependencies within the target project
 function requireDependency(root, moduleName) {
@@ -34,7 +34,7 @@ module.exports = Task.extend({
       // Single test entry file. Will run the test.ts bundle and track it.
       options.files = [{ pattern: testFile, watched: false }];
       options.preprocessors = { [testFile]: ['webpack','sourcemap'] };
-      options.webpack = webpackTestConfig(projectRoot, this.project.ngConfig.defaults.sourceDir);
+      options.webpack = getWebpackTestConfig(projectRoot, this.project.ngConfig.defaults.sourceDir);
       options.webpackMiddleware = {
         noInfo: true, // Hide webpack output because its noisy.
         stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.

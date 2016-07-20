@@ -1,8 +1,6 @@
-'use strict';
-
-const TestCommand = require('ember-cli/lib/commands/test');
-const config = require('../models/config');
-const TestTask = require('../tasks/test');
+import * as TestCommand from 'ember-cli/lib/commands/test';
+import * as config from '../models/config';
+import * as TestTask from '../tasks/test';
 
 module.exports = TestCommand.extend({
   availableOptions: [
@@ -27,7 +25,7 @@ module.exports = TestCommand.extend({
     if (!commandOptions.watch) {
       // if not watching ensure karma is doing a single run
       commandOptions.singleRun = true;
-    } 
+    }
     return testTask.run(commandOptions);
   }
 });

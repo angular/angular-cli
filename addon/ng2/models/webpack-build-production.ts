@@ -1,10 +1,9 @@
+import * as path from 'path';
+import * as webpackMerge from 'webpack-merge'; // used to merge webpack configs
+import * as WebpackMd5Hash from 'webpack-md5-hash';
+import * as CompressionPlugin from 'compression-webpack-plugin';
 import * as webpack from 'webpack';
 import { CliConfig } from './config';
-
-const path = require('path');
-const webpackMerge = require('webpack-merge'); // used to merge webpack configs
-const WebpackMd5Hash = require('webpack-md5-hash');
-const CompressionPlugin = require("compression-webpack-plugin");
 
 export const getWebpackProdConfigPartial = function(projectRoot: string, sourceDir: string) {
   return {
@@ -27,8 +26,8 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, sourceD
         comments: false //prod
       }),
       new CompressionPlugin({
-          asset: "[path].gz[query]",
-          algorithm: "gzip",
+          asset: '[path].gz[query]',
+          algorithm: 'gzip',
           test: /\.js$|\.html$/,
           threshold: 10240,
           minRatio: 0.8

@@ -1,9 +1,10 @@
-const assign      = require('lodash/assign');
-const Command     = require('ember-cli/lib/models/command');
-const Promise     = require('ember-cli/lib/ext/promise');
-const SilentError = require('silent-error');
-const PortFinder  = require('portfinder');
-const EOL         = require('os').EOL;
+import * as assign from 'lodash/assign';
+import * as Command from 'ember-cli/lib/models/command';
+import * as Promise from 'ember-cli/lib/ext/promise';
+import * as SilentError from 'silent-error';
+import * as PortFinder from 'portfinder';
+import * as EOL from 'os';
+import * as ServeWebpackTask from '../tasks/serve-webpack.ts';
 
 PortFinder.basePort = 49152;
 
@@ -53,7 +54,6 @@ module.exports = Command.extend({
 
   run: function(commandOptions: ServeTaskOptions) {
 
-
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
 
     return this._checkExpressPort(commandOptions)
@@ -70,8 +70,6 @@ module.exports = Command.extend({
             return Promise.reject(new SilentError(message));
           }
         }
-
-        const ServeWebpackTask = (require('../tasks/serve-webpack.ts'))
 
         var serve = new ServeWebpackTask({
           ui: this.ui,

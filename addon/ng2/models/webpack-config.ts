@@ -1,3 +1,5 @@
+import * as path from 'path';
+import * as webpackMerge from 'webpack-merge';
 import { CliConfig } from './config';
 import { NgCliEnvironmentPlugin } from '../utilities/environment-plugin';
 import {
@@ -7,9 +9,6 @@ import {
   getWebpackMobileConfigPartial,
   getWebpackMobileProdConfigPartial
 } from './';
-
-const webpackMerge = require('webpack-merge');
-const path = require('path');
 
 export class NgCliWebpackConfig {
   // TODO: When webpack2 types are finished lets replace all these any types
@@ -58,7 +57,7 @@ export class NgCliWebpackConfig {
 
       default:
         //TODO: Not sure what to put here. We have a default env passed anyways.
-        this.ngCliProject.ui.writeLine("Envrionment could not be determined while configuring your build system.", 3)
+        this.ngCliProject.ui.writeLine("Environment could not be determined while configuring your build system.", 3)
         break;
     }
   }
