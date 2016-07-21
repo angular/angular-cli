@@ -18,9 +18,7 @@ If you wish to collaborate while the project is still young, check out [our issu
 
 ## Prerequisites
 
-The generated project has dependencies that require 
-* **Node 4 or greater**.
-* **Typings v1 or greater**.
+The generated project has dependencies that require **Node 4 or greater**.
 
 ## Table of Contents
 
@@ -154,13 +152,7 @@ all dependencies into a single file, and make use of tree-shaking techniques.
 ng test
 ```
 
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes.
-
-You can run tests a single time via `--watch=false`, and turn off building of the app via `--build=false` (useful for running it at the same time as `ng serve`).
-
-**WARNING:** On Windows, `ng test` is hitting a file descriptor limit (see https://github.com/angular/angular-cli/issues/977).
-The solution for now is to instead run `ng serve` and `ng test --build=false` in separate console windows. 
-
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false`.
 
 ### Running end-to-end tests
 
@@ -214,7 +206,7 @@ You can modify the these scripts in `package.json` to run whatever tool you pref
 
 ### Support for offline applications
 
-The index.html file includes a commented-out code snippet for installing the angular2-service-worker. This support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.
+Angular-CLI includes support for offline applications via the `--mobile` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.
 
 ### Commands autocompletion
 
@@ -241,19 +233,47 @@ source ~/.bash_profile
 
 ### CSS Preprocessor integration
 
-We support all major CSS preprocessors:
+Angular-CLI supports all major CSS preprocessors:
 - sass (node-sass)
 - less (less)
 - compass (compass-importer + node-sass)
 - stylus (stylus)
 
-To use one just install for example `npm install node-sass` and rename `.css` files in your project to `.scss` or `.sass`. They will be compiled automatically.
+To use these prepocessors simply add the file to your component's `styreUrl`:
 
-The `Angular2App`'s options argument has `sassCompiler`, `lessCompiler`, `stylusCompiler` and `compassCompiler` options that are passed directly to their respective CSS preprocessors.
+```
+@Component({
+  moduleId: module.id,
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss']
+})
+export class AppComponent {
+  title = 'app works!';
+}
+```
+
+When generating a new project you can also define which extention you want for
+style files:
+
+```bash
+ng new sassy-project --style=sass
+
+```
 
 ### 3rd Party Library Installation
 
-The installation of 3rd party libraries are well described at our [Wiki Page](https://github.com/angular/angular-cli/wiki/3rd-party-libs)
+Simply install your library via `npm install lib-name` and import it in your code.
+
+If the library does not include typings, you can search and install them using `npm run typings` npm script provided:
+
+```bash
+npm install moment
+npm run typings -- search moment
+npm run typings -- install dt~moment --global
+```
+
+See https://github.com/typings/typings for more information about the `typings` tool.
 
 ### Updating angular-cli
 
@@ -322,6 +342,8 @@ the local `angular-cli` from the project which was fetched remotely from npm.
 `npm link angular-cli` symlinks the global `angular-cli` package to the local `angular-cli` package.
 Now the `angular-cli` you cloned before is in three places:
 The folder you cloned it into, npm's folder where it stores global packages and the `angular-cli` project you just created.
+
+You can also use `ng new foo --link-cli` to automatically link the `angular-cli` package.
 
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
