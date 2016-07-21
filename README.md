@@ -28,7 +28,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
-* [Environments](#environments)
+* [Build Targets and Environment Files](#build-targets-and-environment-files)
 * [Bundling](#bundling)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
@@ -128,17 +128,33 @@ ng build
 
 The build artifacts will be stored in the `dist/` directory.
 
-### Environments
+### Build Targets and Environment Files
 
-At build time, the `src/app/environment.ts` will be replaced by either
-`config/environment.dev.ts` or `config/environment.prod.ts`, depending on the
-current cli environment. The resulting file will be `dist/app/environment.ts`.
+A build can specify both a build target (`development` or `production`) and an 
+environment file to be used with that build. By default, the development build 
+target is used.
 
-Environment defaults to `dev`, but you can generate a production build via
-the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
+At build time, `src/app/environments/environment.ts` will be replaced by
+`src/app/environments/environment.{NAME}.ts` where `NAME` is the argument 
+provided to the `--environment` flag.
+
+These options also apply to the serve command. If you do not pass a value for `environment`,
+it will default to `dev` for `development` and `prod` for `production`.
+
+```bash
+# these are equivalent
+ng build --target=production --environment=prod
+ng build --prod --env=prod
+ng build --prod
+# and so are these
+ng build --target=development --environment=dev
+ng build --dev --e=dev
+ng build --dev
+ng build
+```
 
 You can also add your own env files other than `dev` and `prod` by creating a
-`config/environment.{NAME}.ts` and use them by using the `--env=NAME`
+`src/app/environments/environment.{NAME}.ts` and use them by using the `--env=NAME`
 flag on the build/serve commands.
 
 ### Bundling

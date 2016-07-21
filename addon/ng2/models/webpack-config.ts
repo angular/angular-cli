@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import * as webpackMerge from 'webpack-merge';
 import { CliConfig } from './config';
 import { NgCliEnvironmentPlugin } from '../utilities/environment-plugin';
@@ -22,8 +23,10 @@ export class NgCliWebpackConfig {
   private webpackMobileConfigPartial: any;
   private webpackMobileProdConfigPartial: any;
 
-  constructor(public ngCliProject: any, public environment: string) {
+  constructor(public ngCliProject: any, public target: string, public environment: string) {
     const sourceDir = CliConfig.fromProject().defaults.sourceDir;
+
+    const environmentPath = `./${sourceDir}/app/environments/environment.${environment}.ts`;
 
     this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, sourceDir);
     this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, sourceDir);
@@ -37,27 +40,23 @@ export class NgCliWebpackConfig {
     }
 
     this.generateConfig();
-    this.config.plugins.unshift(new NgCliEnvironmentPlugin({env: this.environment}));
+    this.config.plugins.unshift(new NgCliEnvironmentPlugin({
+      path: path.resolve(this.ngCliProject.root, `./${sourceDir}/app/environments/`),
+      src: 'environment.ts',
+      dest: `environment.${this.environment}.ts`
+    }));
   }
 
   generateConfig(): void {
-    switch (this.environment) {
-      case "d":
-      case "dev":
+    switch (this.target) {
       case "development":
-      case "develop":
         this.config = webpackMerge(this.webpackBaseConfig, this.webpackDevConfigPartial);
         break;
-
-      case "p":
-      case "prod":
       case "production":
         this.config = webpackMerge(this.webpackBaseConfig, this.webpackProdConfigPartial);
         break;
-
       default:
-        //TODO: Not sure what to put here. We have a default env passed anyways.
-        this.ngCliProject.ui.writeLine("Environment could not be determined while configuring your build system.", 3)
+        throw new Error("Invalid build target. Only 'development' and 'production' are available.");
         break;
     }
   }

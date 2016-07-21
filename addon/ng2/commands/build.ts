@@ -3,6 +3,7 @@ import * as WebpackBuild from '../tasks/build-webpack';
 import * as WebpackBuildWatch from '../tasks/build-webpack-watch';
 
 interface BuildOptions {
+  target?: string;
   environment?: string;
   outputPath?: string;
   watch?: boolean;
@@ -16,7 +17,8 @@ module.exports = Command.extend({
   aliases: ['b'],
 
   availableOptions: [
-    { name: 'environment',    type: String,  default: 'development', aliases: ['e', { 'dev': 'development' }, { 'prod': 'production' }] },
+    { name: 'target',         type: String,  default: 'development', aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }] },
+    { name: 'environment',    type: String,  default: '', aliases: ['e'] },
     { name: 'output-path',    type: 'Path',  default: 'dist/',       aliases: ['o'] },
     { name: 'watch',          type: Boolean, default: false,         aliases: ['w'] },
     { name: 'watcher',        type: String },
@@ -24,6 +26,15 @@ module.exports = Command.extend({
   ],
 
   run: function (commandOptions: BuildOptions) {
+    if (commandOptions.environment === ''){
+      if (commandOptions.target === 'development') {
+        commandOptions.environment = 'dev';
+      }
+      if (commandOptions.target === 'production') {
+        commandOptions.environment = 'prod';
+      } 
+    }
+
     var project = this.project;
     var ui = this.ui;
     var buildTask = commandOptions.watch ?
@@ -31,13 +42,15 @@ module.exports = Command.extend({
         cliProject: project,
         ui: ui,
         outputPath: commandOptions.outputPath,
+        target: commandOptions.target,
         environment: commandOptions.environment
       }) :
       new WebpackBuild({
         cliProject: project,
         ui: ui,
         outputPath: commandOptions.outputPath,
-        environment: commandOptions.environment
+        target: commandOptions.target,
+        environment: commandOptions.environment,
       });
 
     return buildTask.run(commandOptions);

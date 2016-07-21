@@ -1,46 +1,27 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 interface WebpackPlugin {
   apply(compiler: any): void;
 }
 
+interface EnvOptions {
+  path: string;
+  src: string;
+  dest: string;
+}
+
 export class NgCliEnvironmentPlugin implements WebpackPlugin {
-  _file: string;
-  _alias: string;
-  _env: string;
+  config: EnvOptions;
 
-  constructor(config: any) {
-    if (typeof config === 'string') {
-      config = {env: config};
-    }
-    if (typeof config.env !== 'string') {
-      throw new Error('must provide env')
-    }
-    const ALIAS = {
-      '"dev"':         'dev',
-      'development':   'dev',
-      '"development"': 'dev',
-      '"prod"':        'prod',
-      'production':    'prod',
-      '"production"':  'prod',
-      '"test"':        'test',
-      'testing':       'test',
-      '"testing"':     'test',
-    };
-    const ENV = config.env.toLowerCase();
-
-    this._file = config.file || 'environment';
-    this._alias = config.alias || ALIAS;
-    this._env =  this._alias[ENV] || ENV;
-  }
+  constructor(public config: EnvOptions) {}
 
   isEnvFile(file: string): boolean {
-    return file.indexOf(this._file + '.') !== -1;
+    return file === path.resolve(this.config.path, this.config.src);
   }
 
   replaceFile(file: string): any {
-    return file
-      .replace(this._file, this._file + '.' + this._env);
+    return path.resolve(this.config.path, this.config.dest);
   }
 
   updateResult(result: any): any {
@@ -64,9 +45,9 @@ export class NgCliEnvironmentPlugin implements WebpackPlugin {
 
           fs.stat(envFile, (err, stats) => {
             if (err || !stats.isFile()) {
-              var errorText = (!err && stats.isFile()) ? 'Is not a file.' : 'Does not exist.';
-              console.log('\nWARNING:\n' + envFile + '\n' + errorText + ' ' + 'Using file\n' + _resource + '\n');
-              return callback(null, result);
+              const destPath = path.resolve(this.config.path, this.config.dest);
+              const errorText = (!err && stats.isFile()) ? 'is not a file.' : 'does not exist.';
+              throw new Error(`${destPath} ${errorText}`);
             }
             // mutate result
             var newResult = this.updateResult(result);
