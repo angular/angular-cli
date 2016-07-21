@@ -30,8 +30,7 @@ module.exports = Task.extend({
       contentBase: path.resolve(this.project.root, `./${CliConfig.fromProject().defaults.sourceDir}`),
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
-      inline: true,
-      hot: true
+      inline: true
     };
 
     const serveMessage:string = chalk.green(`\n*\n*\n NG Live Development Server is running on http://localhost:${commandOptions.port}.\n*\n*`);
