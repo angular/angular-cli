@@ -9,7 +9,8 @@
     "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
-    "e2e": "protractor"
+    "e2e": "protractor",
+    "typings": "typings"
   },
   "private": true,
   "dependencies": {
