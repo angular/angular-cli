@@ -1,5 +1,7 @@
 environment:
-  nodejs_version: "5.0"
+  matrix:
+  - nodejs_version: "5.0"
+  - nodejs_version: "6.0"
 
 install:
   - ps: Install-Product node $env:nodejs_version

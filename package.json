@@ -1,6 +1,6 @@
 {
   "name": "angular-cli",
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.10",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -10,6 +10,7 @@
   "keywords": [],
   "scripts": {
     "test": "node tests/runner",
+    "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
     "lint": "eslint ."
   },
   "repository": {
@@ -39,8 +40,10 @@
     "broccoli-uglify-js": "^0.1.3",
     "broccoli-writer": "^0.1.1",
     "chalk": "^1.1.3",
+    "denodeify": "^1.2.1",
     "ember-cli": "2.5.0",
     "ember-cli-string-utils": "^1.0.0",
+    "es6-promise": "^3.2.1",
     "exit": "^0.1.2",
     "fs-extra": "^0.30.0",
     "glob": "^7.0.3",
