@@ -110,6 +110,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
+    "denodeify": "^1.2.1",
     "eslint": "^2.8.0",
     "exists-sync": "0.0.3",
     "minimatch": "^3.0.0",
