@@ -2,7 +2,6 @@ import { Component } from '@angular/core';<% if (isMobile) { %>
 import { APP_SHELL_DIRECTIVES } from '@angular/app-shell';<% } %>
 
 @Component({
-  moduleId: module.id,
   selector: '<%= prefix %>-root',
   <% if (isMobile) { %>template: `
   <h1>
