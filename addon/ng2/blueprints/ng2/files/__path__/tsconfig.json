@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl":"./",
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -9,10 +8,5 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "target": "es5"
-  },
-  "compileOnSave": false,
-  "buildOnSave": false,
-  "includes": [
-    "**.d.ts"
-  ]
+  }
 }
