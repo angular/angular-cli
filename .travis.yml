@@ -7,6 +7,8 @@ env:
     - NODE_VERSION=5 SCRIPT=lint
     - NODE_VERSION=5 SCRIPT=test
     - NODE_VERSION=5 TARGET=mobile SCRIPT=mobile_test
+    - NODE_VERSION=6 SCRIPT=test
+    - NODE_VERSION=6 TARGET=mobile SCRIPT=mobile_test
 os:
   - linux
   - osx
@@ -16,6 +18,8 @@ matrix:
       env: NODE_VERSION=5 SCRIPT=lint
     - os: osx
       env: NODE_VERSION=5 TARGET=mobile SCRIPT=mobile_test
+    - os: osx
+      env: NODE_VERSION=6 TARGET=mobile SCRIPT=mobile_test
 
 script:
   - npm run-script $SCRIPT

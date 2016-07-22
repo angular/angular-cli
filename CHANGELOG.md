@@ -1,3 +1,22 @@
+<a name="1.0.0-beta.10"></a>
+# [1.0.0-beta.10](https://github.com/angular/angular-cli/compare/1.0.0-beta.9...v1.0.0-beta.10) (2016-07-19)
+
+
+### Bug Fixes
+
+* **build:** don't ignore js in public ([#1129](https://github.com/angular/angular-cli/issues/1129)) ([00e111a](https://github.com/angular/angular-cli/commit/00e111a)), closes [#540](https://github.com/angular/angular-cli/issues/540)
+* **mobile:** remove app/index.js from concatenated bundle ([#1267](https://github.com/angular/angular-cli/issues/1267)) ([03fd4c4](https://github.com/angular/angular-cli/commit/03fd4c4))
+* Fix all versions of dependencies to Angular-CLI ([#1331](https://github.com/angular/angular-cli/issues/1331)) ([022e7f9](https://github.com/angular/angular-cli/commit/022e7f9)), closes [#1331](https://github.com/angular/angular-cli/issues/1331)
+* fix versions in the shrinkwrap instead of using ranges ([#1350](https://github.com/angular/angular-cli/issues/1350)) ([72bc9d9](https://github.com/angular/angular-cli/commit/72bc9d9)), closes [#1350](https://github.com/angular/angular-cli/issues/1350)
+
+
+### Features
+
+* **router:** upgrade the router version ([#1288](https://github.com/angular/angular-cli/issues/1288)) ([2c9a371](https://github.com/angular/angular-cli/commit/2c9a371))
+* add get-dependent-fils utils ([6590743](https://github.com/angular/angular-cli/commit/6590743))
+
+
+
 **Always follow the [update guide](https://github.com/angular/angular-cli/blob/master/README.md#updating-angular-cli) when updating to a new version. The changelog does not list breaking changes that are fixed via the update procedure.**
 
 ---
