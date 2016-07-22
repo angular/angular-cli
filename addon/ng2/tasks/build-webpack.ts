@@ -1,13 +1,12 @@
-import {ServeTaskOptions} from '../commands/serve';
-import {NgCliWebpackConfig} from '../models/webpack-config'
-import {webpackOutputOptions} from '../models/'
 import * as rimraf from 'rimraf';
 import * as path from 'path';
+import * as Task from 'ember-cli/lib/models/task';
+import * as webpack from 'webpack';
+import { ServeTaskOptions } from '../commands/serve';
+import { NgCliWebpackConfig } from '../models/webpack-config';
+import { webpackOutputOptions } from '../models/';
 
 // Configure build and output;
-var Task            = require('ember-cli/lib/models/task');
-const webpack       = require('webpack');
-
 let lastHash: any = null;
 
 module.exports = Task.extend({
@@ -17,7 +16,7 @@ module.exports = Task.extend({
     var project = this.cliProject;
 
     rimraf.sync(path.resolve(project.root, runTaskOptions.outputPath));
-    var config = new NgCliWebpackConfig(project, runTaskOptions.environment).config;
+    var config = new NgCliWebpackConfig(project, runTaskOptions.target, runTaskOptions.environment).config;
     const webpackCompiler = webpack(config);
 
     const ProgressPlugin  = require('webpack/lib/ProgressPlugin');

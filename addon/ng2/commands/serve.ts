@@ -22,6 +22,7 @@ export interface ServeTaskOptions {
   liveReloadPort?: number;
   liveReloadBaseUrl?: string;
   liveReloadLiveCss?: boolean;
+  target?: string;
   environment?: string;
   outputPath?: string;
   ssl?: boolean;
@@ -45,7 +46,8 @@ module.exports = Command.extend({
     { name: 'live-reload-base-url', type: String,                          aliases: ['lrbu'],  description: 'Defaults to baseURL' },
     { name: 'live-reload-port',     type: Number,                          aliases: ['lrp'],   description: '(Defaults to port number within [49152...65535])' },
     { name: 'live-reload-live-css', type: Boolean, default: true,                              description: 'Whether to live reload CSS (default true)' },
-    { name: 'environment',          type: String,  default: 'development', aliases: ['e', { 'dev': 'development' }, { 'mat': 'material'},  { 'prod': 'production' }] },
+    { name: 'target',               type: String,  default: 'development', aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }] },
+    { name: 'environment',          type: String,  default: '', aliases: ['e'] },
     { name: 'output-path',          type: 'Path',  default: 'dist/',       aliases: ['op', 'out'] },
     { name: 'ssl',                  type: Boolean, default: false },
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
@@ -53,6 +55,14 @@ module.exports = Command.extend({
   ],
 
   run: function(commandOptions: ServeTaskOptions) {
+    if (commandOptions.environment === ''){
+      if (commandOptions.target === 'development') {
+        commandOptions.environment = 'dev';
+      }
+      if (commandOptions.target === 'production') {
+        commandOptions.environment = 'prod';
+      } 
+    }
 
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
 
@@ -60,7 +70,7 @@ module.exports = Command.extend({
       .then(this._autoFindLiveReloadPort.bind(this))
       .then((commandOptions: ServeTaskOptions) => {
         commandOptions = assign({}, commandOptions, {
-          baseURL: this.project.config(commandOptions.environment).baseURL || '/'
+          baseURL: this.project.config(commandOptions.target).baseURL || '/'
         });
 
         if (commandOptions.proxy) {

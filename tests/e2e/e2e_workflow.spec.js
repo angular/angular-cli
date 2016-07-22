@@ -102,11 +102,27 @@ describe('Basic end-to-end Workflow', function () {
   it('Supports build config file replacement', function() {
     this.timeout(420000);
 
-    sh.exec(`${ngBin} build --dev`);
+    sh.exec(`${ngBin} build --env=prod`);
     var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
     var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
 
-    expect(mainBundleContent).to.include('production: false');
+    expect(mainBundleContent).to.include('production: true');
+  });
+
+  it('Build fails on invalid build target', function (done) {
+    this.timeout(420000);
+    sh.exec(`${ngBin} build --target=potato`, (code) => {
+      expect(code).to.not.equal(0);
+      done();
+    });
+  });
+
+  it('Build fails on invalid environment file', function (done) {
+    this.timeout(420000);
+    sh.exec(`${ngBin} build --environment=potato`, (code) => {
+      expect(code).to.not.equal(0);
+      done();
+    });
   });
 
   it('Can run `ng build` in created project', function () {
