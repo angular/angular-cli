@@ -114,6 +114,14 @@ ng build
 
 The build artifacts will be stored in the `dist/` directory.
 
+You can change the build directory by including --output-path=/not-dist flag with the build command or by creating a .ember-cli file in the project root directory with `output-path` value.  This is an easy way to integrate angular in an existing web application.
+
+```bash
+{
+   "output-path": "../../../../build/webapp/myapp"
+}
+```
+
 ### Environments
 
 At build time, the `src/app/environment.ts` will be replaced by either
