@@ -243,6 +243,14 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
+  it('Can generate coverage report after test run', function () {
+    var coverageFilePath = path.join(process.cwd(), 'coverage', 'coverage-final.json');
+    var resultsRemapFolderPath = path.join(process.cwd(), 'coverage', 'report');
+
+    expect(existsSync(coverageFilePath)).to.equal(true);
+    expect(existsSync(resultsRemapFolderPath)).to.equal(true);
+  });
+
   it('Can create a test service using `ng generate service test-service`', function () {
     return ng(['generate', 'service', 'test-service']).then(function () {
       var serviceDir = path.join(process.cwd(), 'src', 'app');
