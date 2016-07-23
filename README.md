@@ -38,6 +38,7 @@ The generated project has dependencies that require
 * [Linting and formatting code](#linting-and-formatting-code)
 * [Support for offline applications](#support-for-offline-applications)
 * [Commands autocompletion](#commands-autocompletion)
+* [HTML template engine integration](#html-template-engine-integration)
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
 * [Updating angular-cli](#updating-angular-cli)
@@ -222,6 +223,12 @@ ng completion >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
+### HTML Template Engine integration
+
+We currently support `Pug` (ex `Jade`) HTML template engine.
+To use `Pug` install `npm install pug --save` in your project and rename `.html` template extensions to `.pug`. Templates will be compiled automatically. 
+
+If you already have `pug` installed globally the plugin will be instatinated automatically and the templates will be compiled to HTML. 
 
 ### CSS Preprocessor integration
 
