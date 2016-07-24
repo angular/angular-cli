@@ -1,8 +1,8 @@
-import * as webpack from 'webpack';
-import * as path from 'path';
-import { CliConfig } from './config';
+// this config must be JS so that the karma plugin can load it
 
-export const getWebpackTestConfig = function(projectRoot: string, sourceDir: string) {
+const path = require('path');
+
+const getWebpackTestConfig = function(projectRoot, sourceDir) {
   return {
     devtool: 'inline-source-map',
     context: path.resolve(__dirname, './'),
@@ -44,8 +44,8 @@ export const getWebpackTestConfig = function(projectRoot: string, sourceDir: str
               query: {
                 useWebpackText: true,
                 tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`),
-                module: "commonjs",
-                target: "es5",
+                module: 'commonjs',
+                target: 'es5',
                 useForkChecker: true,
                 removeComments: true
               }
@@ -56,12 +56,12 @@ export const getWebpackTestConfig = function(projectRoot: string, sourceDir: str
           ],
           exclude: [/\.e2e\.ts$/]
         },
-        { test: /\.json$/, loader: 'json-loader'},
+        { test: /\.json$/, loader: 'json-loader' },
         { test: /\.css$/,  loaders: ['raw-loader', 'postcss-loader'] },
         { test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
         { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
         { test: /\.scss$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
-        { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000'},
+        { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000' },
         { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(projectRoot, `./${sourceDir}/index.html`)] }
       ],
       postLoaders: [
@@ -89,3 +89,5 @@ export const getWebpackTestConfig = function(projectRoot: string, sourceDir: str
     }
   };
 }
+
+module.exports.getWebpackTestConfig = getWebpackTestConfig;

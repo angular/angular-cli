@@ -1,10 +1,12 @@
 module.exports = function (config) {
   config.set({
     basePath: '..',
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'angular-cli'],
     plugins: [
       require('karma-jasmine'),
-      require('karma-chrome-launcher')
+      require('karma-chrome-launcher'),
+      require('karma-coverage'),
+      require('angular-cli/plugins/karma')
     ],
     customLaunchers: {
       // chrome setup for travis CI using chromium
@@ -13,8 +15,13 @@ module.exports = function (config) {
         flags: ['--no-sandbox']
       }
     },
-    files: [],
-    preprocessors: {},
+    files: [
+      { pattern: './src/test.ts', watched: false }
+    ],
+    preprocessors: {
+      './src/test.ts': ['angular-cli']
+    },
+    angularCliConfig: './angular-cli.json',
     reporters: ['progress'],
     port: 9876,
     colors: true,

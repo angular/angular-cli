@@ -16,37 +16,6 @@ module.exports = Task.extend({
     return new Promise((resolve) => {
       const karma = requireDependency(projectRoot, 'karma');
       const karmaConfig = path.join(projectRoot, this.project.ngConfig.test.karma.config);
-      const testFile = `./${this.project.ngConfig.defaults.sourceDir}/test.ts`;
-
-      options.plugins = [
-        require('karma-webpack'),
-        require('karma-jasmine'),
-        require('karma-chrome-launcher'),
-        require('karma-coverage'),
-        require('karma-mocha-reporter'),
-        require('karma-sourcemap-loader')
-      ];
-      options.reporters = ['coverage', 'mocha', 'progress'];
-
-      // Abstract the webpack concepts from the local karma config.
-      // Add those details here.
-
-      // Single test entry file. Will run the test.ts bundle and track it.
-      options.files = [{ pattern: testFile, watched: false }];
-      options.preprocessors = { [testFile]: ['webpack','sourcemap'] };
-      options.webpack = getWebpackTestConfig(projectRoot, this.project.ngConfig.defaults.sourceDir);
-      options.webpackMiddleware = {
-        noInfo: true, // Hide webpack output because its noisy.
-        stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.
-          assets: false,
-          colors: true,
-          version: false,
-          hash: false,
-          timings: false,
-          chunks: false,
-          chunkModules: false
-        }
-      };
 
       // Convert browsers from a string to an array
       if (options.browsers) {
