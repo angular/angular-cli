@@ -9,6 +9,7 @@ import * as path from 'path';
 import * as BuildTask from 'ember-cli/lib/tasks/build';
 import * as win from 'ember-cli/lib/utilities/windows-admin';
 import * as CreateGithubRepo from '../tasks/create-github-repo';
+import * as CommandHelper from '../utilities/command-helper';
 
 const fsReadFile = Promise.denodeify(fs.readFile);
 const fsWriteFile = Promise.denodeify(fs.writeFile);
@@ -54,6 +55,10 @@ module.exports = Command.extend({
       description: 'Github username'
     }],
 
+  beforeRun: function() {
+    CommandHelper.loadDefaults(this);
+  },
+
   run: function(options, rawArgs) {
     var ui = this.ui;
     var root = this.project.root;
@@ -77,7 +82,7 @@ module.exports = Command.extend({
 
     var buildOptions = {
       environment: options.environment,
-      outputPath: 'dist/'
+      outputPath: options.outputPath
     };
 
     var createGithubRepoTask = new CreateGithubRepo({
@@ -97,7 +102,7 @@ module.exports = Command.extend({
       .then(saveStartingBranchName)
       .then(createGitHubRepoIfNeeded)
       .then(checkoutGhPages)
-      .then(copyFiles)
+      .then(() => copyFiles(options.outputPath))
       .then(updateBaseHref)
       .then(addAndCommit)
       .then(returnStartingBranch)
@@ -156,14 +161,14 @@ module.exports = Command.extend({
         .then(() => execPromise(`git commit -m \"initial ${ghPagesBranch} commit\"`));
     }
 
-    function copyFiles() {
-      return fsReadDir('dist')
+    function copyFiles(outputPath) {
+      return fsReadDir(outputPath)
         .then((files) => Promise.all(files.map((file) => {
           if (file === '.gitignore'){
             // don't overwrite the .gitignore file
             return Promise.resolve();
           }
-          return fsCopy(path.join('dist', file), path.join('.', file))
+          return fsCopy(path.join(outputPath, file), path.join('.', file))
         })));
     }
 

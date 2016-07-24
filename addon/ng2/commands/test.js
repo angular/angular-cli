@@ -7,7 +7,7 @@ var BuildTask = require('ember-cli/lib/tasks/build');
 var BuildWatchTask = require('ember-cli/lib/tasks/build-watch');
 const config = require('../models/config');
 var TestTask = require('../tasks/test');
-
+var CommandHelper = require('../utilities/command-helper');
 
 module.exports = TestCommand.extend({
   availableOptions: [
@@ -19,6 +19,10 @@ module.exports = TestCommand.extend({
     { name: 'reporters', type: String },
     { name: 'build', type: Boolean, default: true }
   ],
+
+  beforeRun: function() {
+    CommandHelper.loadDefaults(this);
+  },
 
   run: function (commandOptions) {
     this.project.ngConfig = this.project.ngConfig || config.CliConfig.fromProject();
@@ -42,9 +46,9 @@ module.exports = TestCommand.extend({
 
     var buildOptions = {
       environment: 'development',
-      outputPath: 'dist/'
+      outputPath: commandOptions.outputPath
     };
-    
+
     // If not building, mock/suppress build tasks.
     if (!commandOptions.build) {
       buildTask = {
@@ -54,7 +58,7 @@ module.exports = TestCommand.extend({
       };
       buildWatchTask = buildTask;
     }
-    
+
     if (commandOptions.watch) {
       return win.checkWindowsElevation(this.ui)
         .then(

@@ -329,6 +329,60 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
+  it('Can set the default output path', function () {
+    this.timeout(10000);
+
+    const customOutputPath = 'not-dist/';
+
+    var setArgs = [
+      'set',
+      'defaults.outputPath',
+      customOutputPath
+    ];
+
+    return ng(setArgs).then(() => {
+      const settings = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
+      expect(settings).to.include('"outputPath": "'+customOutputPath+'"');
+    })
+    .catch(err => {
+      throw new Error(err)
+    });
+  });
+
+  it('`ng test` will build files in outputPath when default is set', function () {
+    this.timeout(420000);
+
+    const tmpFileLocation = path.join(process.cwd(), 'not-dist/', 'test.abc');
+
+    return ng(testArgs).then(result => {
+      const exitCode = typeof result === 'object' ? result.exitCode : result;
+      expect(exitCode).to.be.equal(0);
+    }).then(() => {
+      expect(existsSync(tmpFileLocation)).to.be.equal(true);
+    })
+    .catch(err => {
+      throw new Error(err)
+    })
+  });
+
+  it('Can remove the default output path', function () {
+    this.timeout(10000);
+
+    var setArgs = [
+      'set',
+      'defaults.outputPath',
+      '--remove'
+    ];
+
+    return ng(setArgs).then(() => {
+      const settings = fs.readFileSync(path.join(process.cwd(), 'angular-cli.json'), 'utf-8');
+      expect(settings).to.not.include('"outputPath":');
+    })
+    .catch(err => {
+      throw new Error(err)
+    });
+  });
+
   it.skip('Installs sass support successfully', function() {
     this.timeout(420000);
 

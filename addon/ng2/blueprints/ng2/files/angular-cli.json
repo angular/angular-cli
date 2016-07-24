@@ -27,6 +27,7 @@
     "sourceDir": "<%= sourceDir %>",
     "styleExt": "<%= styleExt %>",
     "prefixInterfaces": false,
-    "lazyRoutePrefix": "+"
+    "lazyRoutePrefix": "+",    
+    "outputPath": "<%= outputPath %>"
   }
 }

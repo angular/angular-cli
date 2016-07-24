@@ -26,7 +26,8 @@ module.exports = Command.extend({
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'mobile', type: Boolean, default: false }
+    { name: 'mobile', type: Boolean, default: false },
+    { name: 'output-path', type: String, default: 'dist/', aliases: ['o'] }
   ],
 
   anonymousOptions: ['<glob-pattern>'],
@@ -94,7 +95,7 @@ module.exports = Command.extend({
 
       return Promise.reject(new SilentError(message));
     }
-    
+
     var blueprintOpts = {
       dryRun: commandOptions.dryRun,
       blueprint: commandOptions.blueprint || this._defaultBlueprint(),
@@ -104,7 +105,8 @@ module.exports = Command.extend({
       sourceDir: commandOptions.sourceDir,
       style: commandOptions.style,
       prefix: commandOptions.prefix,
-      mobile: commandOptions.mobile
+      mobile: commandOptions.mobile,
+      outputPath: commandOptions.outputPath
     };
 
     if (!validProjectName(packageName)) {
