@@ -43,9 +43,6 @@
     "tbosch",
     "bnjjj"
   ],
-  "scripts": {
-    "postinstall": "typings install"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/universal"
