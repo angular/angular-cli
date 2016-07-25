@@ -1,6 +1,7 @@
 // this config must be JS so that the karma plugin can load it
 
 const path = require('path');
+const webpack = require('webpack');
 
 const getWebpackTestConfig = function(projectRoot, sourceDir) {
   return {
@@ -74,6 +75,12 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
         }
       ]
     },
+    plugins: [
+      new webpack.SourceMapDevToolPlugin({
+        filename: null, // if no value is provided the sourcemap is inlined
+        test: /\.(ts|js)($|\?)/i // process .js and .ts files only
+      })
+    ],
     tslint: {
       emitErrors: false,
       failOnHint: false,
