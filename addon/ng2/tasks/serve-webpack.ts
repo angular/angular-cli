@@ -11,14 +11,14 @@ import { CliConfig } from '../models/config';
 
 module.exports = Task.extend({
   run: function(commandOptions: ServeTaskOptions) {
-    
+
     let lastHash = null;
     let webpackCompiler: any;
 
     var config: NgCliWebpackConfig = new NgCliWebpackConfig(this.project, commandOptions.target, commandOptions.environment).config;
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
-    config.entry.main.unshift(`webpack-dev-server/client?http://localhost:${commandOptions.port}/`);
+    config.entry.main.unshift(`webpack-dev-server/client?http://${commandOptions.host}:${commandOptions.port}/`);
     webpackCompiler = webpack(config);
 
     webpackCompiler.apply(new ProgressPlugin({
@@ -33,11 +33,11 @@ module.exports = Task.extend({
       inline: true
     };
 
-    const serveMessage:string = chalk.green(`\n*\n*\n NG Live Development Server is running on http://localhost:${commandOptions.port}.\n*\n*`);
+    const serveMessage:string = chalk.green(`\n*\n*\n NG Live Development Server is running on http://${commandOptions.host}:${commandOptions.port}.\n*\n*`);
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
 
     return new Promise((resolve, reject) => {
-      server.listen(commandOptions.port, 'localhost', function(err, stats) {
+      server.listen(commandOptions.port, `${commandOptions.host}`, function(err, stats) {
         if(err) {
           lastHash = null;
           console.error(err.stack || err);
