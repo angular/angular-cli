@@ -121,7 +121,7 @@ export const NODE_APP_COMMON_PROVIDERS: Array<any> = CONST_EXPR([
   {provide: RootRenderer, useExisting: DomRootRenderer},
   {provide: SharedStylesHost, useExisting: NodeSharedStylesHost},
   {provide: DomSharedStylesHost, useExisting: NodeSharedStylesHost},
-  {provide: AnimationDriver, useFactory: NoOpAnimationDriver},
+  {provide: AnimationDriver, useClass: NoOpAnimationDriver},
   {provide: WebAnimationsDriver, useExisting: AnimationDriver},
   NodeSharedStylesHost,
   Testability,
