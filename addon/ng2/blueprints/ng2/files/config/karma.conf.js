@@ -1,3 +1,6 @@
+// Karma configuration file, see link for more information		
+// https://karma-runner.github.io/0.13/config/configuration-file.html
+
 module.exports = function (config) {
   config.set({
     basePath: '..',
@@ -22,7 +25,7 @@ module.exports = function (config) {
       './src/test.ts': ['angular-cli']
     },
     angularCliConfig: './angular-cli.json',
-    reporters: ['progress'],
+    reporters: ['coverage', 'progress'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
