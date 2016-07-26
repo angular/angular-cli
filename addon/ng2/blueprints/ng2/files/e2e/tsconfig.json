@@ -8,6 +8,9 @@
     "moduleResolution": "node",
     "outDir": "../dist/out-tsc-e2e",
     "sourceMap": true,
-    "target": "es5"
+    "target": "es5",
+    "typeRoots": [
+      "../node_modules/@types"
+    ]
   }
 }

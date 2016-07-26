@@ -42,7 +42,6 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
             {
               loader: 'awesome-typescript-loader',
               query: {
-                useWebpackText: true,
                 tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`),
                 module: 'commonjs',
                 target: 'es5',
