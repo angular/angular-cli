@@ -56,3 +56,4 @@ module.exports = function dynamicPathParser(project, entityName) {
 
   return parsedPath;
 };
+
