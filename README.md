@@ -265,15 +265,12 @@ ng new sassy-project --style=sass
 
 Simply install your library via `npm install lib-name` and import it in your code.
 
-If the library does not include typings, you can search and install them using `npm run typings` npm script provided:
+If the library does not include typings, you can install them using npm:
 
 ```bash
 npm install moment
-npm run typings -- search moment
-npm run typings -- install dt~moment --global
+npm install @types/moment
 ```
-
-See https://github.com/typings/typings for more information about the `typings` tool.
 
 ### Updating angular-cli
 
