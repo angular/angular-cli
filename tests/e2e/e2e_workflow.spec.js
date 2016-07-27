@@ -155,10 +155,11 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(false);
   });
 
-  it('lints', () => {
+  it('lints', function () {
     this.timeout(420000);
 
-    return ng(['lint']).then(() => {
+    return ng(['lint']).then((result) => {
+      expect(typeof result === 'object' ? result.exitCode : result).to.be.equal(0);
     })
     .catch(err => {
       throw new Error('Linting failed: ' + err);

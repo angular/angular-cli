@@ -1,20 +1,19 @@
-/* tslint:disable:no-unused-variable */
-
-import { addProviders, async, inject } from '@angular/core/testing';
+import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 
-describe('App: <%= jsComponentName %>', () => {
-  beforeEach(() => {
-    addProviders([AppComponent]);
+describe('App: TestProject', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({ declarations: [AppComponent] });
+    TestBed.compileComponents();
+  }));
+
+  it('should create the app', () => {
+    const compFixture = TestBed.createComponent(AppComponent);
+    expect(compFixture).toBeTruthy();
   });
 
-  it('should create the app',
-    inject([AppComponent], (app: AppComponent) => {
-      expect(app).toBeTruthy();
-    }));
-
-  it('should have as title \'app works!\'',
-    inject([AppComponent], (app: AppComponent) => {
-      expect(app.title).toEqual('app works!');
-    }));
+  it('should have a title `app works!`', () => {
+    const compFixture = TestBed.createComponent(AppComponent);
+    expect(compFixture.componentInstance.title).toBe('app works!');
+  });
 });
