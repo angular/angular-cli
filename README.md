@@ -162,7 +162,7 @@ ng e2e
 
 Before running the tests make sure you are serving the app via `ng serve`.
 
-End-to-end tests are ran via [Protractor](https://angular.github.io/protractor/).
+End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
 
 ### Deploying the app via GitHub Pages
@@ -239,7 +239,7 @@ Angular-CLI supports all major CSS preprocessors:
 - compass ([http://compass-style.org/](http://compass-style.org/))
 - stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
 
-To use these prepocessors simply add the file to your component's `styreUrl`:
+To use these prepocessors simply add the file to your component's `styleUrls`:
 
 ```
 @Component({
