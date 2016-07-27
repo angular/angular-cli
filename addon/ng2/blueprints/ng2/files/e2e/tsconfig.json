@@ -4,14 +4,13 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "mapRoot": "",
     "module": "commonjs",
     "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": false,
-    "rootDir": ".",
+    "outDir": "../dist/out-tsc-e2e",
     "sourceMap": true,
-    "sourceRoot": "/",
-    "target": "es5"
+    "target": "es5",
+    "typeRoots": [
+      "../node_modules/@types"
+    ]
   }
 }

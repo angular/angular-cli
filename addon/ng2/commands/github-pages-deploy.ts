@@ -7,7 +7,6 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as BuildTask from 'ember-cli/lib/tasks/build';
-import * as win from 'ember-cli/lib/utilities/windows-admin';
 import * as CreateGithubRepo from '../tasks/create-github-repo';
 
 const fsReadFile = Promise.denodeify(fs.readFile);
@@ -117,8 +116,7 @@ module.exports = Command.extend({
 
     function build() {
       if (options.skipBuild) return Promise.resolve();
-      return win.checkWindowsElevation(ui)
-        .then(() => buildTask.run(buildOptions));
+      return buildTask.run(buildOptions);
     }
 
     function saveStartingBranchName() {

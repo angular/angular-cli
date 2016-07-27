@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  moduleId: module.id,
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
   template: `
     <p>
@@ -10,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
   `,<% } else { %>
   templateUrl: '<%= dasherizedModuleName %>.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['<%= dasherizedModuleName %>.component.css']<% } %>
+  styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']<% } %>
 })
 export class <%= classifiedModuleName %>Component implements OnInit {
 

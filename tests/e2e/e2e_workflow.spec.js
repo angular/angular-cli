@@ -11,7 +11,6 @@ var treeKill = require('tree-kill');
 var child_process = require('child_process');
 var ng = require('../helpers/ng');
 var root = path.join(process.cwd(), 'tmp');
-var repoPkgJson = require('../../package.json');
 
 function existsSync(path) {
   try {
@@ -40,34 +39,26 @@ describe('Basic end-to-end Workflow', function () {
   }
 
 
-  // We don't want to use npm link because then npm dependencies
-  // that only exist in the project will not be accessible to CLI
-  // This is particularly problematic for --mobile, which uses Universal
-  // libs as part of the build process.
-  // Instead, we'll pack CLI as a tarball
   it('Installs angular-cli correctly', function () {
     this.timeout(300000);
 
-    sh.exec('npm pack', { silent: true });
-    expect(existsSync(path.join(process.cwd(), `angular-cli-${repoPkgJson.version}.tgz`)));
+    sh.exec('npm link', { silent: true });
+
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
+      expect(existsSync(path.join(process.cwd(), 'bin', 'ng')));
     });
   });
 
 
   it('Can create new project using `ng new test-project`', function () {
     this.timeout(4200000);
-    let args = ['--skip-npm'];
+    let args = ['--link-cli'];
     // If testing in the mobile matrix on Travis, create project with mobile flag
     if (isMobileTest()) {
       args = args.concat(['--mobile']);
     }
     return ng(['new', 'test-project'].concat(args)).then(function () {
-      // Install Angular CLI from packed version
-      let tarball = path.resolve(root, `../angular-cli-${repoPkgJson.version}.tgz`);
-      sh.exec(`npm install && npm install ${tarball}`);
-      sh.exec(`rm ${tarball}`);
       expect(existsSync(path.join(root, 'test-project')));
     });
   });
@@ -84,30 +75,54 @@ describe('Basic end-to-end Workflow', function () {
     // stuck to the first build done
     sh.exec(`${ngBin} build -prod`);
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-    if (!isMobileTest()) {
-      var mainBundlePath = path.join(process.cwd(), 'dist', 'main.js');
-      var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
-      // production: true minimized turns into production:!0
-      expect(mainBundleContent).to.include('production:!0');
-    }
-
+    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+    // Check for cache busting hash script src
+    expect(indexHtml).to.match(/main\.[0-9a-f]{20}\.bundle\.js/);
     // Also does not create new things in GIT.
     expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
   });
 
-  it_mobile('Enables mobile-specific production features', () => {
-    let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+  it_mobile('Enables mobile-specific production features in prod builds', () => {
+    let indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
     // Service Worker
-    expect(index.includes('if (\'serviceWorker\' in navigator) {')).to.be.equal(true);
-    expect(existsSync(path.join(process.cwd(), 'dist/worker.js'))).to.be.equal(true);
-
-    // Asynchronous bundle
-    expect(index.includes('<script src="/app-concat.js" async=""></script>')).to.be.equal(true);
-    expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(true);
+    expect(indexHtml).to.match(/sw-install\.[0-9a-f]{20}\.bundle\.js/);
+    expect(existsSync(path.join(process.cwd(), 'dist/sw.js' ))).to.be.equal(true);
 
     // App Manifest
-    expect(index.includes('<link rel="manifest" href="/manifest.webapp">')).to.be.equal(true);
+    expect(indexHtml.includes('<link rel="manifest" href="/manifest.webapp">')).to.be.equal(true);
     expect(existsSync(path.join(process.cwd(), 'dist/manifest.webapp'))).to.be.equal(true);
+
+    // Icons folder
+    expect(existsSync(path.join(process.cwd(), 'dist/icons'))).to.be.equal(true);
+
+    // Prerender content
+    expect(indexHtml).to.match(/app works!/);
+  });
+
+  it('Supports build config file replacement', function() {
+    this.timeout(420000);
+
+    sh.exec(`${ngBin} build --env=prod`);
+    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+
+    expect(mainBundleContent).to.include('production: true');
+  });
+
+  it('Build fails on invalid build target', function (done) {
+    this.timeout(420000);
+    sh.exec(`${ngBin} build --target=potato`, (code) => {
+      expect(code).to.not.equal(0);
+      done();
+    });
+  });
+
+  it('Build fails on invalid environment file', function (done) {
+    this.timeout(420000);
+    sh.exec(`${ngBin} build --environment=potato`, (code) => {
+      expect(code).to.not.equal(0);
+      done();
+    });
   });
 
   it('Can run `ng build` in created project', function () {
@@ -119,11 +134,9 @@ describe('Basic end-to-end Workflow', function () {
       })
       .then(function () {
         expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-
         // Check the index.html to have no handlebar tokens in it.
         const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-        expect(indexHtml).to.not.include('{{');
-        expect(indexHtml).to.include('vendor/es6-shim/es6-shim.js');
+        expect(indexHtml).to.include('main.bundle.js');
       })
       .then(function () {
         // Also does not create new things in GIT.
@@ -176,49 +189,6 @@ describe('Basic end-to-end Workflow', function () {
 
     return new Promise(executor)
       .catch((msg) => {
-        throw new Error(msg);
-      });
-  });
-
-  it('Serve and run e2e tests after initial build', function () {
-    this.timeout(240000);
-
-    var ngServePid;
-
-    function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`);
-      var startedProtractor = false;
-      ngServePid = serveProcess.pid;
-
-      serveProcess.stdout.on('data', (data) => {
-        if (/Build successful/.test(data) && !startedProtractor) {
-          startedProtractor = true;
-          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
-            if (error !== null) {
-              reject(stderr)
-            } else {
-              resolve();
-            }
-          });
-        } else if (/ failed with:/.test(data)) {
-          reject(data);
-        }
-      });
-
-      serveProcess.stderr.on('data', (data) => {
-        reject(data);
-      });
-      serveProcess.on('close', (code) => {
-        code === 0 ? resolve() : reject('ng serve command closed with error')
-      });
-    }
-
-    return new Promise(executor)
-      .then(() => {
-        if (ngServePid) treeKill(ngServePid);
-      })
-      .catch((msg) => {
-        if (ngServePid) treeKill(ngServePid);
         throw new Error(msg);
       });
   });
@@ -320,129 +290,97 @@ describe('Basic end-to-end Workflow', function () {
     const tmpFileLocation = path.join(process.cwd(), 'dist', 'test.abc');
     fs.writeFileSync(tmpFile, 'hello world');
 
-    return ng(['build'])
-      .then(function () {
-        expect(existsSync(tmpFileLocation)).to.be.equal(true);
-      })
-      .catch(err => {
-        throw new Error(err)
-      });
+    sh.exec(`${ngBin} build`);
+    expect(existsSync(tmpFileLocation)).to.be.equal(true);
   });
 
-  it.skip('Installs sass support successfully', function() {
+  // Mobile mode doesn't have styles
+  it_not_mobile('Supports scss in styleUrls', function() {
     this.timeout(420000);
 
-    sh.exec('npm install node-sass', { silent: true });
-    return ng(['generate', 'component', 'test-component'])
-    .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.component.css');
-      let scssFile = path.join(componentPath, 'test-component.component.scss');
-      let scssPartialFile = path.join(componentPath, '_test-component.component.partial.scss');
+    let cssFilename = 'app.component.css';
+    let scssFilename = 'app.component.scss';
+    let componentPath = path.join(process.cwd(), 'src', 'app');
+    let componentFile = path.join(componentPath, 'app.component.ts');
+    let cssFile = path.join(componentPath, cssFilename);
+    let scssFile = path.join(componentPath, scssFilename);
+    let scssExample = '@import "app.component.partial";\n\n.outer {\n  .inner { background: #fff; }\n }';
+    let scssPartialFile = path.join(componentPath, '_app.component.partial.scss');
+    let scssPartialExample = '.partial {\n @extend .outer;\n }';
+    let componentContents = fs.readFileSync(componentFile, 'utf8');
 
-      let scssPartialExample = '.partial {\n @extend .outer;\n }';
-      fs.writeFileSync(scssPartialFile, scssPartialExample, 'utf8');
-      expect(existsSync(scssPartialFile)).to.be.equal(true);
+    sh.mv(cssFile, scssFile);
+    fs.writeFileSync(scssFile, scssExample, 'utf8');
+    fs.writeFileSync(scssPartialFile, scssPartialExample, 'utf8');
+    fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), scssFilename), 'utf8');
 
-      expect(existsSync(componentPath)).to.be.equal(true);
-      sh.mv(cssFile, scssFile);
-      expect(existsSync(scssFile)).to.be.equal(true);
-      expect(existsSync(cssFile)).to.be.equal(false);
-      let scssExample = '@import "test-component.component.partial";\n\n.outer {\n  .inner { background: #fff; }\n }';
-      fs.writeFileSync(scssFile, scssExample, 'utf8');
+    sh.exec(`${ngBin} build`);
+    let destCssBundle = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    let contents = fs.readFileSync(destCssBundle, 'utf8');
+    expect(contents).to.include('.outer .inner');
+    expect(contents).to.include('.partial .inner');
 
-      sh.exec(`${ngBin} build`);
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
-      expect(existsSync(destCss)).to.be.equal(true);
-      let contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-      expect(contents).to.include('.partial .inner');
-
-      sh.rm('-f', destCss);
-      process.chdir('src');
-      sh.exec(`${ngBin} build`);
-      expect(existsSync(destCss)).to.be.equal(true);
-      contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-      expect(contents).to.include('.partial .inner');
-
-      process.chdir('..');
-      sh.exec('npm uninstall node-sass', { silent: true });
-    });
+    sh.mv(scssFile, cssFile);
+    fs.writeFileSync(cssFile, '', 'utf8');
+    fs.writeFileSync(componentFile, componentContents, 'utf8');
+    sh.rm('-f', scssPartialFile);
   });
 
-  it.skip('Installs less support successfully', function() {
+  // Mobile mode doesn't have styles
+  it_not_mobile('Supports less in styleUrls', function() {
     this.timeout(420000);
 
-    sh.exec('npm install less', { silent: true });
-    return ng(['generate', 'component', 'test-component'])
-    .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.component.css');
-      let lessFile = path.join(componentPath, 'test-component.component.less');
+    let cssFilename = 'app.component.css';
+    let lessFilename = 'app.component.less';
+    let componentPath = path.join(process.cwd(), 'src', 'app');
+    let componentFile = path.join(componentPath, 'app.component.ts');
+    let cssFile = path.join(componentPath, cssFilename);
+    let lessFile = path.join(componentPath, lessFilename);
+    let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
+    let componentContents = fs.readFileSync(componentFile, 'utf8');
+    
+    sh.mv(cssFile, lessFile);      
+    fs.writeFileSync(lessFile, lessExample, 'utf8');
+    fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), lessFilename), 'utf8');
 
-      expect(existsSync(componentPath)).to.be.equal(true);
-      sh.mv(cssFile, lessFile);
-      expect(existsSync(lessFile)).to.be.equal(true);
-      expect(existsSync(cssFile)).to.be.equal(false);
-      let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
-      fs.writeFileSync(lessFile, lessExample, 'utf8');
+    sh.exec(`${ngBin} build`);
+    let destCssBundle = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    let contents = fs.readFileSync(destCssBundle, 'utf8');
+    expect(contents).to.include('.outer .inner');
 
-      sh.exec(`${ngBin} build`);
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
-      expect(existsSync(destCss)).to.be.equal(true);
-      let contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-
-      sh.rm('-f', destCss);
-      process.chdir('src');
-      sh.exec(`${ngBin} build`);
-      expect(existsSync(destCss)).to.be.equal(true);
-      contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-
-      process.chdir('..');
-      sh.exec('npm uninstall less', { silent: true });
-    });
+    fs.writeFileSync(lessFile, '', 'utf8');
+    sh.mv(lessFile, cssFile);
+    fs.writeFileSync(componentFile, componentContents, 'utf8');
   });
 
-  it.skip('Installs stylus support successfully', function() {
+  // Mobile mode doesn't have styles
+  it_not_mobile('Supports stylus in styleUrls', function() {
     this.timeout(420000);
 
-    sh.exec('npm install stylus', { silent: true });
-    return ng(['generate', 'component', 'test-component'])
-    .then(() => {
-      let componentPath = path.join(process.cwd(), 'src', 'app', 'test-component');
-      let cssFile = path.join(componentPath, 'test-component.component.css');
-      let stylusFile = path.join(componentPath, 'test-component.component.styl');
+    let cssFilename = 'app.component.css';
+    let stylusFilename = 'app.component.scss';
+    let componentPath = path.join(process.cwd(), 'src', 'app');
+    let componentFile = path.join(componentPath, 'app.component.ts');
+    let cssFile = path.join(componentPath, cssFilename);
+    let stylusFile = path.join(componentPath, stylusFilename);
+    let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
+    let componentContents = fs.readFileSync(componentFile, 'utf8');
+    
+    sh.mv(cssFile, stylusFile);      
+    fs.writeFileSync(stylusFile, stylusExample, 'utf8');
+    fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), stylusFilename), 'utf8');
 
-      sh.mv(cssFile, stylusFile);
-      expect(existsSync(stylusFile)).to.be.equal(true);
-      expect(existsSync(cssFile)).to.be.equal(false);
-      let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
-      fs.writeFileSync(stylusFile, stylusExample, 'utf8');
+    sh.exec(`${ngBin} build`);
+    let destCssBundle = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    let contents = fs.readFileSync(destCssBundle, 'utf8');
+    expect(contents).to.include('.outer .inner');
 
-      sh.exec(`${ngBin} build`);
-      let destCss = path.join(process.cwd(), 'dist', 'app', 'test-component', 'test-component.component.css');
-      expect(existsSync(destCss)).to.be.equal(true);
-      let contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-
-      sh.rm('-f', destCss);
-      process.chdir('src');
-      sh.exec(`${ngBin} build`);
-      expect(existsSync(destCss)).to.be.equal(true);
-      contents = fs.readFileSync(destCss, 'utf8');
-      expect(contents).to.include('.outer .inner');
-
-      process.chdir('..');
-      sh.exec('npm uninstall stylus', { silent: true });
-    });
+    fs.writeFileSync(stylusFile, '', 'utf8');
+    sh.mv(stylusFile, cssFile);
+    fs.writeFileSync(componentFile, componentContents, 'utf8');
   });
 
-  // This test causes complications with path resolution in TS broccoli plugin,
-  // and isn't mobile specific
-  it_not_mobile('Turn on `noImplicitAny` in tsconfig.json and rebuild', function () {
+  it('Turn on `noImplicitAny` in tsconfig.json and rebuild', function () {
     this.timeout(420000);
 
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
@@ -453,13 +391,11 @@ describe('Basic end-to-end Workflow', function () {
 
     sh.rm('-rf', path.join(process.cwd(), 'dist'));
 
-    return ng(['build'])
-      .then(() => {
-        expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-      });
+    sh.exec(`${ngBin} build`);
+    expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
   });
 
-  it_not_mobile('Turn on path mapping in tsconfig.json and rebuild', function () {
+  it('Turn on path mapping in tsconfig.json and rebuild', function () {
     this.timeout(420000);
 
     const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
@@ -467,42 +403,43 @@ describe('Basic end-to-end Workflow', function () {
 
     config.compilerOptions.baseUrl = '';
 
-    // This should fail.
+    // #TODO: When https://github.com/Microsoft/TypeScript/issues/9772 is fixed this should fail.
     config.compilerOptions.paths = { '@angular/*': [] };
     fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
 
-    return ng(['build'])
-      .catch(() => {
-        return true;
-      })
-      .then((passed) => {
-        expect(passed).to.equal(true);
-      })
-      .then(() => {
-        // This should succeed.
-        config.compilerOptions.paths = {
-          '@angular/*': [ '*' ]
-        };
-        fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
-      })
-      .then(() => ng(['build']))
-      .catch(() => {
-        expect('build failed where it should have succeeded').to.equal('');
-      });
+    sh.exec(`${ngBin} build`);
+    // #TODO: Uncomment these lines when https://github.com/Microsoft/TypeScript/issues/9772 is fixed.
+    // .catch(() => {
+    //   return true;
+    // })
+    // .then((passed) => {
+    //   expect(passed).to.equal(true);
+    // })
+
+    // This should succeed.
+    config.compilerOptions.paths = {
+      '@angular/*': [ '../node_modules/@angular/*' ]
+    };
+    fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
+    sh.exec(`${ngBin} build`);
+
+    expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+    expect(indexHtml).to.include('main.bundle.js');
   });
 
-  it('Serve and run e2e tests after all other commands', function () {
+  it('Serve and run e2e tests on dev environment', function () {
     this.timeout(240000);
 
     var ngServePid;
 
     function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`);
+      var serveProcess = child_process.exec(`${ngBin} serve`, { maxBuffer: 500*1024 });
       var startedProtractor = false;
       ngServePid = serveProcess.pid;
 
       serveProcess.stdout.on('data', (data) => {
-        if (/Build successful/.test(data) && !startedProtractor) {
+        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
           startedProtractor = true;
           child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
             if (error !== null) {
@@ -511,8 +448,47 @@ describe('Basic end-to-end Workflow', function () {
               resolve();
             }
           });
-        } else if (/ failed with:/.test(data)) {
-          reject(data);
+        }
+      });
+
+      serveProcess.stderr.on('data', (data) => {
+        reject(data);
+      });
+      serveProcess.on('close', (code) => {
+        code === 0 ? resolve() : reject('ng serve command closed with error')
+      });
+    }
+
+    return new Promise(executor)
+      .then(() => {
+        if (ngServePid) treeKill(ngServePid);
+      })
+      .catch((msg) => {
+        if (ngServePid) treeKill(ngServePid);
+        throw new Error(msg);
+      });
+  });
+
+  it('Serve and run e2e tests on prod environment', function () {
+    this.timeout(240000);
+
+    var ngServePid;
+
+    function executor(resolve, reject) {
+      var serveProcess = child_process.exec(`${ngBin} serve -e=prod`, { maxBuffer: 500*1024 });
+      var startedProtractor = false;
+      ngServePid = serveProcess.pid;
+
+      serveProcess.stdout.on('data', (data) => {
+        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
+          startedProtractor = true;
+          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
+            if (error !== null) {
+              reject(stderr)
+            } else {
+              resolve();
+            }
+          });
         }
       });
 

@@ -18,9 +18,7 @@ If you wish to collaborate while the project is still young, check out [our issu
 
 ## Prerequisites
 
-The generated project has dependencies that require 
-* **Node 4 or greater**.
-* **Typings v1 or greater**.
+The generated project has dependencies that require **Node 4 or greater**.
 
 ## Table of Contents
 
@@ -30,7 +28,7 @@ The generated project has dependencies that require
 * [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
-* [Environments](#environments)
+* [Build Targets and Environment Files](#build-targets-and-environment-files)
 * [Bundling](#bundling)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
@@ -114,17 +112,33 @@ ng build
 
 The build artifacts will be stored in the `dist/` directory.
 
-### Environments
+### Build Targets and Environment Files
 
-At build time, the `src/app/environment.ts` will be replaced by either
-`config/environment.dev.ts` or `config/environment.prod.ts`, depending on the
-current cli environment. The resulting file will be `dist/app/environment.ts`.
+A build can specify both a build target (`development` or `production`) and an 
+environment file to be used with that build. By default, the development build 
+target is used.
 
-Environment defaults to `dev`, but you can generate a production build via
-the `-prod` flag in either `ng build -prod` or `ng serve -prod`.
+At build time, `src/app/environments/environment.ts` will be replaced by
+`src/app/environments/environment.{NAME}.ts` where `NAME` is the argument 
+provided to the `--environment` flag.
+
+These options also apply to the serve command. If you do not pass a value for `environment`,
+it will default to `dev` for `development` and `prod` for `production`.
+
+```bash
+# these are equivalent
+ng build --target=production --environment=prod
+ng build --prod --env=prod
+ng build --prod
+# and so are these
+ng build --target=development --environment=dev
+ng build --dev --e=dev
+ng build --dev
+ng build
+```
 
 You can also add your own env files other than `dev` and `prod` by creating a
-`config/environment.{NAME}.ts` and use them by using the `--env=NAME`
+`src/app/environments/environment.{NAME}.ts` and use them by using the `--env=NAME`
 flag on the build/serve commands.
 
 ### Bundling
@@ -138,13 +152,7 @@ all dependencies into a single file, and make use of tree-shaking techniques.
 ng test
 ```
 
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes.
-
-You can run tests a single time via `--watch=false`, and turn off building of the app via `--build=false` (useful for running it at the same time as `ng serve`).
-
-**WARNING:** On Windows, `ng test` is hitting a file descriptor limit (see https://github.com/angular/angular-cli/issues/977).
-The solution for now is to instead run `ng serve` and `ng test --build=false` in separate console windows. 
-
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false`.
 
 ### Running end-to-end tests
 
@@ -198,7 +206,7 @@ You can modify the these scripts in `package.json` to run whatever tool you pref
 
 ### Support for offline applications
 
-The index.html file includes a commented-out code snippet for installing the angular2-service-worker. This support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.
+Angular-CLI includes support for offline applications via the `--mobile` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.
 
 ### Commands autocompletion
 
@@ -225,19 +233,44 @@ source ~/.bash_profile
 
 ### CSS Preprocessor integration
 
-We support all major CSS preprocessors:
+Angular-CLI supports all major CSS preprocessors:
 - sass (node-sass)
 - less (less)
 - compass (compass-importer + node-sass)
 - stylus (stylus)
 
-To use one just install for example `npm install node-sass` and rename `.css` files in your project to `.scss` or `.sass`. They will be compiled automatically.
+To use these prepocessors simply add the file to your component's `styreUrl`:
 
-The `Angular2App`'s options argument has `sassCompiler`, `lessCompiler`, `stylusCompiler` and `compassCompiler` options that are passed directly to their respective CSS preprocessors.
+```
+@Component({
+  moduleId: module.id,
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss']
+})
+export class AppComponent {
+  title = 'app works!';
+}
+```
+
+When generating a new project you can also define which extention you want for
+style files:
+
+```bash
+ng new sassy-project --style=sass
+
+```
 
 ### 3rd Party Library Installation
 
-The installation of 3rd party libraries are well described at our [Wiki Page](https://github.com/angular/angular-cli/wiki/3rd-party-libs)
+Simply install your library via `npm install lib-name` and import it in your code.
+
+If the library does not include typings, you can install them using npm:
+
+```bash
+npm install moment
+npm install @types/moment
+```
 
 ### Updating angular-cli
 
@@ -306,6 +339,8 @@ the local `angular-cli` from the project which was fetched remotely from npm.
 `npm link angular-cli` symlinks the global `angular-cli` package to the local `angular-cli` package.
 Now the `angular-cli` you cloned before is in three places:
 The folder you cloned it into, npm's folder where it stores global packages and the `angular-cli` project you just created.
+
+You can also use `ng new foo --link-cli` to automatically link the `angular-cli` package.
 
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.

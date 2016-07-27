@@ -2,5 +2,7 @@
 // https://github.com/typings/typings
 // https://www.typescriptlang.org/docs/handbook/writing-declaration-files.html
 
-/// <reference path="<%= refToTypings %>/typings/index.d.ts" />
-<% if(!isMobile) { %>declare var module: { id: string };<% } %>
+declare var System: any;
+declare var module: { id: string };
+declare var require: any;
+
