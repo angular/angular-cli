@@ -22,11 +22,17 @@ const init = (config) => {
     }
   };
 
-  // replace the angular-cli preprocessor with webpack+sourcemap
+  // replace the angular-cli preprocessor with webpack
   Object.keys(config.preprocessors)
     .filter((file) => config.preprocessors[file].indexOf('angular-cli') !== -1)
     .map((file) => config.preprocessors[file])
-    .map((arr) => arr.splice(arr.indexOf('angular-cli'), 1, 'webpack', 'sourcemap'));
+    .map((arr) => arr.splice(arr.indexOf('angular-cli'), 1, 'webpack'));
+
+  // replace the angular-cli preprocessor with webpack + sourcemap + coverage
+  Object.keys(config.preprocessors)
+    .filter((file) => config.preprocessors[file].indexOf('angular-cli-coverage') !== -1)
+    .map((file) => config.preprocessors[file])
+    .map((arr) => arr.splice(arr.indexOf('angular-cli-coverage'), 1, 'webpack', 'sourcemap', 'coverage'));
 }
 
 init.$inject = ['config']
