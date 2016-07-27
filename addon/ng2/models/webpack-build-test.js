@@ -46,6 +46,9 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
                 tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`),
                 module: 'commonjs',
                 target: 'es5',
+                mapRoot: false,
+                sourceMap: false,
+                inlineSourceMap: true,
                 useForkChecker: true,
                 removeComments: true
               }
