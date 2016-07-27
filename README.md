@@ -234,10 +234,10 @@ source ~/.bash_profile
 ### CSS Preprocessor integration
 
 Angular-CLI supports all major CSS preprocessors:
-- sass (node-sass)
-- less (less)
-- compass (compass-importer + node-sass)
-- stylus (stylus)
+- sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
+- less ([http://lesscss.org/](http://lesscss.org/))
+- compass ([http://compass-style.org/](http://compass-style.org/))
+- stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
 
 To use these prepocessors simply add the file to your component's `styreUrl`:
 
@@ -258,18 +258,23 @@ style files:
 
 ```bash
 ng new sassy-project --style=sass
+```
 
+Or set the default style on an existing project:
+
+```bash
+ng set defaults.styleExt scss
 ```
 
 ### 3rd Party Library Installation
 
-Simply install your library via `npm install lib-name` and import it in your code.
+Simply install your library via `npm install lib-name --save` and import it in your code.
 
 If the library does not include typings, you can install them using npm:
 
 ```bash
-npm install moment
-npm install @types/moment
+npm install moment --save
+npm install @types/moment --save-dev
 ```
 
 ### Updating angular-cli
