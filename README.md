@@ -239,7 +239,7 @@ Angular-CLI supports all major CSS preprocessors:
 - compass (compass-importer + node-sass)
 - stylus (stylus)
 
-To use these prepocessors simply add the file to your component's `styreUrl`:
+To use these prepocessors simply add the file to your component's `styleUrl`:
 
 ```
 @Component({
