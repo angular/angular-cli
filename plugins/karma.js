@@ -45,5 +45,5 @@ preprocessor.$inject = []
 module.exports = Object.assign({
   'framework:angular-cli': ['factory', init],
   'preprocessor:angular-cli': ['factory', preprocessor],
-  'preprocessor:angular-cli-coverage': ['factory', preprocessor],
+  'preprocessor:angular-cli-coverage': ['factory', preprocessor]
 }, require('karma-webpack'), require('karma-sourcemap-loader'));
