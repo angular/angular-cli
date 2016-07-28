@@ -9,6 +9,7 @@ interface BuildOptions {
   watch?: boolean;
   watcher?: string;
   supressSizes: boolean;
+  baseHref?: string;
 }
 
 module.exports = Command.extend({
@@ -27,7 +28,8 @@ module.exports = Command.extend({
     { name: 'output-path',    type: 'Path',  default: 'dist/',       aliases: ['o'] },
     { name: 'watch',          type: Boolean, default: false,         aliases: ['w'] },
     { name: 'watcher',        type: String },
-    { name: 'suppress-sizes', type: Boolean, default: false }
+    { name: 'suppress-sizes', type: Boolean, default: false },
+    { name: 'base-href',      type: String,  default: null, aliases: ['bh'] },
   ],
 
   run: function (commandOptions: BuildOptions) {

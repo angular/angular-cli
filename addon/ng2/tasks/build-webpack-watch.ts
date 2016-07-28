@@ -20,7 +20,8 @@ module.exports = Task.extend({
       project,
       runTaskOptions.target,
       runTaskOptions.environment,
-      runTaskOptions.outputPath
+      runTaskOptions.outputPath,
+      runTaskOptions.baseHref
     ).config;
     const webpackCompiler = webpack(config);
 

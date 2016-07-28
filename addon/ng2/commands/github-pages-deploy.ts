@@ -16,6 +16,17 @@ const fsWriteFile = Promise.denodeify(fs.writeFile);
 const fsReadDir = Promise.denodeify(fs.readdir);
 const fsCopy = Promise.denodeify(fse.copy);
 
+interface GithubPagesDeployOptions {
+  message?: string;
+  target?: string;
+  environment?: string;
+  userPage?: boolean;
+  skipBuild?: boolean;
+  ghToken?: string;
+  ghUsername?: string;
+  baseHref?: string;
+}
+
 module.exports = Command.extend({
   name: 'github-pages:deploy',
   aliases: ['gh-pages:deploy'],
@@ -61,9 +72,14 @@ module.exports = Command.extend({
       type: String,
       default: '',
       description: 'Github username'
+    }, {
+      name: 'base-href',
+      type: String,
+      default: null,
+      aliases: ['bh']
     }],
 
-  run: function(options, rawArgs) {
+  run: function(options: GithubPagesDeployOptions, rawArgs) {
     const ui = this.ui;
     const root = this.project.root;
     const execOptions = {
@@ -102,7 +118,8 @@ module.exports = Command.extend({
     const buildOptions = {
       target: options.target,
       environment: options.environment,
-      outputPath: outDir
+      outputPath: outDir,
+      baseHref: options.baseHref,
     };
 
     const createGithubRepoTask = new CreateGithubRepo({

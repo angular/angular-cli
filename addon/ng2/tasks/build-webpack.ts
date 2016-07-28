@@ -11,7 +11,7 @@ let lastHash: any = null;
 
 module.exports = Task.extend({
   // Options: String outputPath
-  run: function(runTaskOptions: ServeTaskOptions) {
+  run: function (runTaskOptions: ServeTaskOptions) {
 
     const project = this.cliProject;
 
@@ -20,7 +20,8 @@ module.exports = Task.extend({
       project,
       runTaskOptions.target,
       runTaskOptions.environment,
-      runTaskOptions.outputPath
+      runTaskOptions.outputPath,
+      runTaskOptions.baseHref
     ).config;
 
     const webpackCompiler = webpack(config);
