@@ -326,6 +326,37 @@ describe('Basic end-to-end Workflow', function () {
     sh.rm('-f', scssPartialFile);
   });
 
+  it_not_mobile('Supports sass in styleUrls', function() {
+    this.timeout(420000);
+
+    let cssFilename = 'app.component.css';
+    let sassFilename = 'app.component.sass';
+    let componentPath = path.join(process.cwd(), 'src', 'app');
+    let componentFile = path.join(componentPath, 'app.component.ts');
+    let cssFile = path.join(componentPath, cssFilename);
+    let sassFile = path.join(componentPath, sassFilename);
+    let sassExample = '@import "app.component.partial";\n\n.outer\n  .inner\n    background: #fff';
+    let sassPartialFile = path.join(componentPath, '_app.component.partial.sass');
+    let sassPartialExample = '.partial\n  @extend .outer';
+    let componentContents = fs.readFileSync(componentFile, 'utf8');
+
+    sh.mv(cssFile, sassFile);
+    fs.writeFileSync(sassFile, sassExample, 'utf8');
+    fs.writeFileSync(sassPartialFile, sassPartialExample, 'utf8');
+    fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), sassFilename), 'utf8');
+
+    sh.exec(`${ngBin} build`);
+    let destCssBundle = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    let contents = fs.readFileSync(destCssBundle, 'utf8');
+    expect(contents).to.include('.outer .inner');
+    expect(contents).to.include('.partial .inner');
+
+    sh.mv(sassFile, cssFile);
+    fs.writeFileSync(cssFile, '', 'utf8');
+    fs.writeFileSync(componentFile, componentContents, 'utf8');
+    sh.rm('-f', sassPartialFile);
+  });
+
   // Mobile mode doesn't have styles
   it_not_mobile('Supports less in styleUrls', function() {
     this.timeout(420000);
