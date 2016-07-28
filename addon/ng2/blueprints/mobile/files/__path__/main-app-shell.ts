@@ -34,10 +34,13 @@ const appConfig: AppConfig = {
   ]
 }
 
+// The build system will call this function to get a bootloader
 export function getBootloader() : Bootloader  {
   return new Bootloader(bootloaderConfig);
 }
 
+// The build system will call this function with the bootloader from 
+// getBootloader and the contents of the index page
 export function serialize(bootloader: Bootloader, template: string) : string {
   appConfig.template = template;
   return bootloader.serializeApplication(appConfig);
