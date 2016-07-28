@@ -121,6 +121,16 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
+  it('Supports base tag modifications via `ng build --base-href`', function() {
+    this.timeout(420000);
+
+    sh.exec(`${ngBin} build --base-href /myUrl/`);
+    const indexHtmlPath = path.join(process.cwd(), 'dist/index.html'); 
+    const indexHtml = fs.readFileSync(indexHtmlPath, { encoding: 'utf8' });
+
+    expect(indexHtml).to.match(/<base href="\/myUrl\/"/);
+  });
+
   it('Can run `ng build` in created project', function () {
     this.timeout(420000);
 

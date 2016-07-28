@@ -5,8 +5,14 @@ import * as webpack from 'webpack';
 import * as atl from 'awesome-typescript-loader';
 
 import { findLazyModules } from './find-lazy-modules';
+import { BaseHrefWebpackPlugin } from '../utilities/base-href-webpack-plugin';
 
-export function getWebpackCommonConfig(projectRoot: string, environment: string, appConfig: any) {
+export function getWebpackCommonConfig(
+  projectRoot: string,
+  environment: string,
+  appConfig: any,
+  baseHref: string
+) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);
@@ -117,6 +123,9 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         chunksSortMode: 'dependency'
+      }),
+      new BaseHrefWebpackPlugin({
+        baseHref: baseHref
       }),
       new webpack.NormalModuleReplacementPlugin(
         // This plugin is responsible for swapping the environment files.

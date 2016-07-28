@@ -37,6 +37,7 @@ The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
 * [Build Targets and Environment Files](#build-targets-and-environment-files)
+* [Base tag handling in index.html](#base-tag-handling-in-indexhtml)
 * [Adding extra files to the build](#adding-extra-files-to-the-build)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
@@ -151,6 +152,16 @@ You can also add your own env files other than `dev` and `prod` by doing the fol
 - create a `src/environments/environment.NAME.ts`
 - add `{ NAME: 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json` 
 - use them by using the `--env=NAME` flag on the build/serve commands.
+
+### Base tag handling in index.html
+
+When building you can modify base tag (`<base href="/">`) in your index.html with `--base-href your-url` option.
+
+```bash
+# Sets base tag href to /myUrl/ in your index.html
+ng build --base-href /myUrl/
+ng build --bh /myUrl/
+```
 
 ### Bundling
 

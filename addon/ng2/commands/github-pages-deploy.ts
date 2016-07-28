@@ -11,10 +11,19 @@ import * as CreateGithubRepo from '../tasks/create-github-repo';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
-const fsReadFile = Promise.denodeify(fs.readFile);
-const fsWriteFile = Promise.denodeify(fs.writeFile);
 const fsReadDir = Promise.denodeify(fs.readdir);
 const fsCopy = Promise.denodeify(fse.copy);
+
+interface GithubPagesDeployOptions {
+  message?: string;
+  target?: string;
+  environment?: string;
+  userPage?: boolean;
+  skipBuild?: boolean;
+  ghToken?: string;
+  ghUsername?: string;
+  baseHref?: string;
+}
 
 module.exports = Command.extend({
   name: 'github-pages:deploy',
@@ -61,9 +70,14 @@ module.exports = Command.extend({
       type: String,
       default: '',
       description: 'Github username'
+    }, {
+      name: 'base-href',
+      type: String,
+      default: null,
+      aliases: ['bh']
     }],
 
-  run: function(options, rawArgs) {
+  run: function(options: GithubPagesDeployOptions, rawArgs) {
     const ui = this.ui;
     const root = this.project.root;
     const execOptions = {
@@ -99,10 +113,19 @@ module.exports = Command.extend({
       outputPath: outDir
     });
 
+    /**
+     * BaseHref tag setting logic:
+     * First, use --base-href flag value if provided.
+     * Else if --user-page is true, then keep baseHref default as declared in index.html.
+     * Otherwise auto-replace with `/${projectName}/`.
+     */
+    const baseHref = options.baseHref || (options.userPage ? null : `/${projectName}/`);
+
     const buildOptions = {
       target: options.target,
       environment: options.environment,
-      outputPath: outDir
+      outputPath: outDir,
+      baseHref: baseHref,
     };
 
     const createGithubRepoTask = new CreateGithubRepo({
@@ -123,7 +146,7 @@ module.exports = Command.extend({
       .then(createGitHubRepoIfNeeded)
       .then(checkoutGhPages)
       .then(copyFiles)
-      .then(updateBaseHref)
+      .then(createNotFoundPage)
       .then(addAndCommit)
       .then(returnStartingBranch)
       .then(pushToGitRepo)
@@ -191,15 +214,10 @@ module.exports = Command.extend({
         })));
     }
 
-    function updateBaseHref() {
-      if (options.userPage) { return Promise.resolve(); }
-      let indexHtml = path.join(root, 'index.html');
-      return fsReadFile(indexHtml, 'utf8')
-        .then((data) => data.replace(/<base href="\/">/g, `<base href="/${projectName}/">`))
-        .then((data) => {
-          fsWriteFile(indexHtml, data, 'utf8');
-          fsWriteFile(path.join(root, '404.html'), data, 'utf8');
-        });
+    function createNotFoundPage() {
+      const indexHtml = path.join(root, 'index.html');
+      const notFoundPage = path.join(root, '404.html');
+      return fsCopy(indexHtml, notFoundPage);
     }
 
     function addAndCommit() {

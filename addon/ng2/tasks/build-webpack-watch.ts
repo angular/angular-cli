@@ -5,12 +5,12 @@ import * as webpack from 'webpack';
 import * as ProgressPlugin from 'webpack/lib/ProgressPlugin';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { webpackOutputOptions } from '../models/';
-import { ServeTaskOptions } from '../commands/serve';
+import { BuildOptions } from '../commands/build';
 
 let lastHash: any = null;
 
 module.exports = Task.extend({
-  run: function(runTaskOptions: ServeTaskOptions) {
+  run: function(runTaskOptions: BuildOptions) {
 
     const project = this.cliProject;
 
@@ -20,7 +20,8 @@ module.exports = Task.extend({
       project,
       runTaskOptions.target,
       runTaskOptions.environment,
-      runTaskOptions.outputPath
+      runTaskOptions.outputPath,
+      runTaskOptions.baseHref
     ).config;
     const webpackCompiler = webpack(config);
 
