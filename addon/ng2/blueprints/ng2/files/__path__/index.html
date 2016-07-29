@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <title><%= jsComponentName %></title>
   <base href="/">
-
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico"><% if (isMobile) { %>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,9 +21,15 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png">
   <link rel="apple-touch-startup-image" href="/icons/apple-touch-icon-180x180.png">
   <% } %>
-  
+  <% if (!arguments[0].files) { 
+    print (`<## _.forEach(files.css, css => { ##><link rel="stylesheet" type="text/css" href="<##- css ##>"><## }) ##>`); 
+  } %>
 </head>
 <body>
   <<%= prefix %>-root>Loading...</<%= prefix %>-root>
+  
+  <% if (!arguments[0].files) { 
+    print (`<## _.forEach(files.js, js => { ##><script src="<##- js ##>"></script><## }) ##>`); 
+  } %>
 </body>
 </html>

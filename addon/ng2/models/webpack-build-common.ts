@@ -1,12 +1,12 @@
 import * as path from 'path';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
-import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as webpack from 'webpack';
 import { ForkCheckerPlugin } from 'awesome-typescript-loader';
 import { CliConfig } from './config';
 
 export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
   return {
+    name: 'main',
     devtool: 'inline-source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
@@ -60,10 +60,6 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
     },
     plugins: [
       new ForkCheckerPlugin(),
-      new HtmlWebpackPlugin({
-        template: path.resolve(projectRoot, `./${sourceDir}/index.html`),
-        chunksSortMode: 'dependency'
-      }),
       new webpack.optimize.CommonsChunkPlugin({
         name: ['polyfills']
       }),
@@ -73,7 +69,10 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
         filename: 'inline.js',
         sourceMapFilename: 'inline.map'
       }),
-      new CopyWebpackPlugin([{from: path.resolve(projectRoot, './public'), to: path.resolve(projectRoot, './dist')}])
+      new CopyWebpackPlugin([{
+        from: path.resolve(projectRoot, './public'), 
+        to: path.resolve(projectRoot, './dist')
+      }])
     ],
     node: {
       global: 'window',
