@@ -11,6 +11,9 @@ var treeKill = require('tree-kill');
 var child_process = require('child_process');
 var ng = require('../helpers/ng');
 var root = path.join(process.cwd(), 'tmp');
+var express = require('express');
+var http = require('http');
+var request = require('request');
 
 function existsSync(path) {
   try {
@@ -369,8 +372,8 @@ describe('Basic end-to-end Workflow', function () {
     let lessFile = path.join(componentPath, lessFilename);
     let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
     let componentContents = fs.readFileSync(componentFile, 'utf8');
-    
-    sh.mv(cssFile, lessFile);      
+
+    sh.mv(cssFile, lessFile);
     fs.writeFileSync(lessFile, lessExample, 'utf8');
     fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), lessFilename), 'utf8');
 
@@ -396,8 +399,8 @@ describe('Basic end-to-end Workflow', function () {
     let stylusFile = path.join(componentPath, stylusFilename);
     let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
     let componentContents = fs.readFileSync(componentFile, 'utf8');
-    
-    sh.mv(cssFile, stylusFile);      
+
+    sh.mv(cssFile, stylusFile);
     fs.writeFileSync(stylusFile, stylusExample, 'utf8');
     fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), stylusFilename), 'utf8');
 
@@ -540,6 +543,81 @@ describe('Basic end-to-end Workflow', function () {
         throw new Error(msg);
       });
   });
+
+  it('Serve with proxy config', function () {
+    this.timeout(240000);
+    var ngServePid;
+    var server;
+
+    function executor(resolve, reject) {
+      var startedProtractor = false;
+      var app = express();
+      server = http.createServer(app);
+      server.listen();
+      app.set('port', server.address().port);
+
+      app.get('/api/test', function (req, res) {
+        res.send('TEST_API_RETURN');
+      });
+      var backendHost = 'localhost';
+      var backendPort = server.address().port
+
+      var proxyServerUrl = `http://${backendHost}:${backendPort}`;
+      const proxyConfigFile = path.join(process.cwd(), 'proxy.config.json');
+      const proxyConfig = {
+        '/api/*': {
+          target: proxyServerUrl
+        }
+      };
+      fs.writeFileSync(proxyConfigFile, JSON.stringify(proxyConfig, null, 2), 'utf8');
+      var serveProcess = child_process.exec(`${ngBin} serve --proxy-config proxy.config.json`, { maxBuffer: 500 * 1024 });
+      ngServePid = serveProcess.pid;
+
+      serveProcess.stdout.on('data', (data) => {
+        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
+
+          // How to get the url with out hardcoding here?
+          request( 'http://localhost:4200/api/test', function(err, response, body) {
+            expect(response.statusCode).to.be.equal(200);
+            expect(body).to.be.equal('TEST_API_RETURN');
+            resolve();
+          });
+        }
+      });
+
+      serveProcess.stderr.on('data', (data) => {
+        reject(data);
+      });
+      serveProcess.on('close', (code) => {
+        code === 0 ? resolve() : reject('ng serve command closed with error')
+      });
+    }
+
+    // Need a way to close the express server
+    return new Promise(executor)
+      .then(() => {
+        if (ngServePid) treeKill(ngServePid);
+        if(server){
+          server.close();
+        }
+      })
+      .catch((msg) => {
+        if (ngServePid) treeKill(ngServePid);
+        if(server){
+          server.close();
+        }
+        throw new Error(msg);
+      });
+  });
+
+  it('Serve fails on invalid proxy config file', function (done) {
+    this.timeout(420000);
+    sh.exec(`${ngBin} serve --proxy-config proxy.config.does_not_exist.json`, (code) => {
+      expect(code).to.not.equal(0);
+      done();
+    });
+  });
+
 });
 
 function isMobileTest() {

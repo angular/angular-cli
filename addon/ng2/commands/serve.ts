@@ -14,6 +14,7 @@ const defaultPort = process.env.PORT || 4200;
 export interface ServeTaskOptions {
   port?: number;
   host?: string;
+  proxyConfig?: string;
   proxy?: string;
   insecureProxy?: boolean;
   watcher?: string;
@@ -38,7 +39,8 @@ module.exports = Command.extend({
   availableOptions: [
     { name: 'port',                 type: Number,  default: defaultPort,   aliases: ['p'] },
     { name: 'host',                 type: String,  default: 'localhost',   aliases: ['H'],     description: 'Listens on all interfaces by default' },
-    { name: 'proxy',                type: String,                          aliases: ['pr', 'pxy'] },
+    { name: 'proxy-config',         type: 'Path',                          aliases: ['pc'] },
+    { name: 'proxy', type: String, aliases: ['pr', 'pxy'] },
     { name: 'insecure-proxy',       type: Boolean, default: false,         aliases: ['inspr'], description: 'Set false to proxy self-signed SSL certificates' },
     { name: 'watcher',              type: String,  default: 'events',      aliases: ['w'] },
     { name: 'live-reload',          type: Boolean, default: true,          aliases: ['lr'] },
