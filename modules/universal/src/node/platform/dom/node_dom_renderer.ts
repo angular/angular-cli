@@ -264,7 +264,7 @@ export class NodeDomRenderer extends DomRenderer {
     if (isPresent(propertyValue)) {
       if (propertyValue === true) {
         return super.setElementAttribute(renderElement, propertyValue, 'checked');
-      } else if (propertyValue = false) {
+      } else if (propertyValue === false) {
         return super.setElementAttribute(renderElement, propertyValue, '');
       }
     }
