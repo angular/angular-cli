@@ -75,6 +75,7 @@
     "resolve": "^1.1.7",
     "rimraf": "^2.5.3",
     "sass-loader": "^3.2.0",
+    "schematics": "github:hansl/schematics",
     "shelljs": "^0.7.0",
     "silent-error": "^1.0.0",
     "source-map-loader": "^0.1.5",
