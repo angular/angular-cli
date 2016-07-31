@@ -5,18 +5,18 @@ var fs = require('fs');
 module.exports = function dynamicPathParser(project, entityName) {
   var projectRoot = project.root;
   var appRoot = path.join(project.ngConfig.defaults.sourceDir, 'app');
-  var cwd = process.env.PWD;
+  var cwd = process.cwd();
 
   var rootPath = path.join(projectRoot, appRoot);
 
   var outputPath = path.join(rootPath, entityName);
-  
+
   if (entityName.indexOf(path.sep) === 0) {
     outputPath = path.join(rootPath, entityName.substr(1));
   } else if (cwd.indexOf(rootPath) >= 0) {
     outputPath = path.join(cwd, entityName);
   }
-  
+
   if (!fs.existsSync(outputPath)) {
     // Verify the path exists on disk.
     var parsedOutputPath = path.parse(outputPath);
@@ -32,12 +32,12 @@ module.exports = function dynamicPathParser(project, entityName) {
       } else if (fs.existsSync(withPlus)) {
         return withPlus;
       }
-      
+
       throw `Invalid path: "${withoutPlus}"" is not a valid path.`
     }, parsedOutputPath.root);
     outputPath = path.join(newPath, parsedOutputPath.name);
   }
-  
+
   if (outputPath.indexOf(rootPath) < 0) {
     throw `Invalid path: "${entityName}" cannot be ` +
         `above the "${appRoot}" directory`;
@@ -46,7 +46,7 @@ module.exports = function dynamicPathParser(project, entityName) {
   var adjustedPath = outputPath.replace(projectRoot, '');
 
   var parsedPath = path.parse(adjustedPath);
-  
+
   if (parsedPath.dir.indexOf(path.sep) === 0) {
     parsedPath.dir = parsedPath.dir.substr(1);
   }

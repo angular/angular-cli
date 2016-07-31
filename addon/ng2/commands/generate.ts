@@ -9,10 +9,11 @@ const dynamicPathParser = require('../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const config = require('../models/config');
 
-import {FileSource, LodashCompiler, PathRemapper} from 'schematics/src';
+import {FileSource, LodashCompiler, PathRemapper, PrependRoot, OnOverwriteDo, WriteFile} from 'schematics/src';
 
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/let';
+import Entry = webpack.Entry;
 
 
 const GenerateCommand = EmberGenerateCommand.extend({
@@ -64,10 +65,19 @@ const GenerateCommand = EmberGenerateCommand.extend({
         fileName: stringUtils.dasherize(entityName)
       };
 
+      function _promptUserForOverwrite(entry: Entry) {
+        console.log(entry.path);
+        return {
+          action: 'overwrite'
+        };
+      }
+
       return FileSource(path.join(__dirname, `../blueprints/${rawArgs[0]}/files`))
         .let(PathRemapper(options))
         .let(LodashCompiler(options))
-        .do((x) => console.log(x))
+        .let(PrependRoot(process.cwd()))
+        .let(OnOverwriteDo(_promptUserForOverwrite))
+        .let(WriteFile())
         .toPromise();
     } else {
       return EmberGenerateCommand.prototype.run.apply(this, arguments);
