@@ -14,7 +14,8 @@ module.exports = {
     { name: 'route', type: Boolean, default: false },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
-    { name: 'prefix', type: Boolean, default: true }
+    { name: 'prefix', type: Boolean, default: true },
+    { name: 'nospec', type: Boolean, default: false }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -49,6 +50,7 @@ module.exports = {
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
       flat: options.flat,
+      nospec: options.nospec,
       inlineTemplate: options.inlineTemplate,
       inlineStyle: options.inlineStyle,
       route: options.route,
@@ -73,6 +75,9 @@ module.exports = {
     }
     if (this.options && this.options.inlineStyle) {
       fileList = fileList.filter(p => p.indexOf('.__styleext__') < 0);
+    }
+    if (this.options && this.options.nospec) {
+      fileList = fileList.filter(p => p.indexOf('__name__.component.spec.ts') < 0);
     }
 
     return fileList;

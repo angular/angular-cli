@@ -178,4 +178,11 @@ describe('Acceptance: ng generate component', function () {
       expect(existsSync(testPath)).to.equal(false);
     });
   });
+
+  it('ng generate component my-comp --nospec', function() {
+    return ng(['generate', 'component', 'my-comp', '--nospec']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.component.spec.ts');
+      expect(existsSync(testPath)).to.equal(false);
+    });
+  })
 });
