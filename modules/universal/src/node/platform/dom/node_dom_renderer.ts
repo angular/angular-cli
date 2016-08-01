@@ -246,6 +246,8 @@ export class NodeDomRenderer extends DomRenderer {
           return this._setOnOffAttribute(renderElement, propertyName, propertyValue);
         } else if (propertyName === 'checked') {
           return this._setCheckedAttribute(renderElement, propertyName, propertyValue);
+        } else if (propertyName === 'disabled') {
+          return this._setDisabledAttribute(renderElement, propertyName, propertyValue);
         } else {
           return this._setBooleanAttribute(renderElement, propertyName, propertyValue);
         }
@@ -268,6 +270,14 @@ export class NodeDomRenderer extends DomRenderer {
 
     }
     return super.invokeElementMethod(location, methodName, args);
+  }
+
+  _setDisabledAttribute(renderElement, propertyName, propertyValue) {
+    if (isPresent(propertyValue)) {
+      if (propertyValue === true || propertyValue.toString() !== 'false') {
+        return super.setElementAttribute(renderElement, 'disabled', 'disabled');
+      }
+    }
   }
 
   _setCheckedAttribute(renderElement, propertyName, propertyValue) {
