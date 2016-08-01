@@ -210,7 +210,8 @@ export const ATTRIBUTES = {
 
 // TODO(gdi2290): provide better whitelist above to alias setting props as attrs
 export const IGNORE_ATTRIBUTES = {
-  'innerHTML': true
+  'innerHTML': true,
+  'hidden' : true
 };
 
 export class NodeDomRenderer extends DomRenderer {
@@ -222,6 +223,15 @@ export class NodeDomRenderer extends DomRenderer {
   }
 
   setElementProperty(renderElement: any, propertyName: string, propertyValue: any) {
+
+    // Fix for issues caused by null passed in
+    if (propertyValue === null || propertyValue === undefined) {
+        propertyValue = false;
+        if (propertyName === 'innerHTML') {
+            propertyValue = '';
+        }
+    }
+
     let setProp = super.setElementProperty(renderElement, propertyName, propertyValue);
     if (IGNORE_ATTRIBUTES[propertyName]) {
       return setProp;
