@@ -1,0 +1,3 @@
+body <% if (styleExt !== 'sass') { %>{<% } %>
+  background: #F9F9F9;
+<% if (styleExt !== 'sass') { %>}<% } %>

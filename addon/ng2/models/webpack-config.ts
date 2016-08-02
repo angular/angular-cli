@@ -1,6 +1,8 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as webpackMerge from 'webpack-merge';
+import * as AssetsPlugin from 'assets-webpack-plugin';
+import { HtmlCliPlugin } from '../utilities/html-cli-plugin';
 import { CliConfig } from './config';
 import { NgCliEnvironmentPlugin } from '../utilities/environment-plugin';
 import {
@@ -9,6 +11,7 @@ import {
   getWebpackProdConfigPartial,
   getWebpackMobileConfigPartial,
   getWebpackMobileProdConfigPartial
+  getWebpackCSSConfig
 } from './';
 
 export class NgCliWebpackConfig {
@@ -22,6 +25,7 @@ export class NgCliWebpackConfig {
   private webpackMaterialE2EConfig: any;
   private webpackMobileConfigPartial: any;
   private webpackMobileProdConfigPartial: any;
+  private webpackCSSConfig: any;
 
   constructor(public ngCliProject: any, public target: string, public environment: string) {
     const sourceDir = CliConfig.fromProject().defaults.sourceDir;
@@ -31,6 +35,7 @@ export class NgCliWebpackConfig {
     this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, sourceDir);
     this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, sourceDir);
     this.webpackProdConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, sourceDir);
+    this.webpackCSSConfig = getWebpackCSSConfig(this.ngCliProject.root, sourceDir);
 
     if (CliConfig.fromProject().apps[0].mobile){
       this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, sourceDir);
@@ -40,20 +45,34 @@ export class NgCliWebpackConfig {
     }
 
     this.generateConfig();
-    this.config.plugins.unshift(new NgCliEnvironmentPlugin({
+    this.config[0].plugins.unshift(new NgCliEnvironmentPlugin({
       path: path.resolve(this.ngCliProject.root, `./${sourceDir}/app/environments/`),
       src: 'environment.ts',
       dest: `environment.${this.environment}.ts`
     }));
+
+    const assetsPluginInstance = new AssetsPlugin({ filename: 'cli.assets.json' });
+    const htmlCliPlugin = new HtmlCliPlugin();
+
+    this.config.forEach(conf => {
+      conf.plugins.unshift(assetsPluginInstance);
+      conf.plugins.unshift(htmlCliPlugin);
+    });
   }
 
   generateConfig(): void {
     switch (this.target) {
       case "development":
-        this.config = webpackMerge(this.webpackBaseConfig, this.webpackDevConfigPartial);
+        this.config = [
+          webpackMerge(this.webpackBaseConfig, this.webpackDevConfigPartial),
+          this.webpackCSSConfig
+        ];
         break;
       case "production":
-        this.config = webpackMerge(this.webpackBaseConfig, this.webpackProdConfigPartial);
+        this.config = [
+          webpackMerge(this.webpackBaseConfig, this.webpackProdConfigPartial),
+          this.webpackCSSConfig
+        ];
         break;
       default:
         throw new Error("Invalid build target. Only 'development' and 'production' are available.");

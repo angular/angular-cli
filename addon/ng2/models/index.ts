@@ -4,3 +4,4 @@ export * from './webpack-build-production';
 export * from './webpack-build-development';
 export * from './webpack-build-mobile';
 export * from './webpack-build-utils';
+export * from './webpack-build-css';
