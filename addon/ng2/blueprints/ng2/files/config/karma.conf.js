@@ -1,4 +1,4 @@
-// Karma configuration file, see link for more information		
+// Karma configuration file, see link for more information
 // https://karma-runner.github.io/0.13/config/configuration-file.html
 
 module.exports = function (config) {
@@ -9,6 +9,7 @@ module.exports = function (config) {
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
       require('karma-coverage'),
+      require('karma-remap-istanbul'),
       require('angular-cli/plugins/karma')
     ],
     customLaunchers: {
@@ -22,10 +23,16 @@ module.exports = function (config) {
       { pattern: './src/test.ts', watched: false }
     ],
     preprocessors: {
+      './src/app/**/**/*.ts': ['angular-cli-coverage'],
       './src/test.ts': ['angular-cli']
     },
+    remapIstanbulReporter: {
+      reports: {
+        html: 'coverage'
+      }
+    },
     angularCliConfig: './angular-cli.json',
-    reporters: ['coverage', 'progress'],
+    reporters: ['coverage', 'progress', 'karma-remap-istanbul'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
