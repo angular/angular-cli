@@ -1,3 +1,38 @@
+<a name="1.0.0-beta.11-webpack"></a>
+# [1.0.0-beta.11-webpack](https://github.com/angular/angular-cli/compare/v1.0.0-beta.10...v1.0.0-beta.11-webpack) (2016-08-02)
+
+Hey you! Yes, you! Angular-CLI team here. You know us, but we don't know you enough. And we like to hear about you too. That's why we did this release, so that you could check out for us, as we're looking out for you.
+
+Anyway, here goes...
+
+### Features
+
+🎺 **We moved the build system from SystemJS to Webpack.** 🎉
+
+🎊 Yeah! 🎊 \^_\^
+
+This is kind of a big deal, really. This will mean less thinking about the internals of the CLI and SystemJS, less time spent configuring a new npm package and karma, your life is going to be much easier! More coding where it actually matters, faster builds, more time spent with your loved ones, and lots of other goodies. Just for you. You'll love it!
+
+We want to make sure it's ready. That's why we need your help. Basically, things _should_ work. Build and Serve should work. Also, testing and E2E should too. To put it short, everything should work as it was before. But we're not certain! Test every commands you can think of. Use your normal work flows. We need you to test your projects and file issues about it.
+
+If you have a special build file that requires shuffling files around in Broccoli, give it a try without that. Note that TypeScript 2.0 path mapping is supported by the CLI so that might help you find out files.
+
+There's a migration document to move your project over. It's not complete yet, but we're working on it. Here's the PR: https://github.com/angular/angular-cli/pull/1456. The main take away is that most build configuration and system configuration should not be needed anymore.
+
+Please note that this is a really alpha release of this, and we want to tighten every nut and bolt before making it an official beta.
+
+Which we will release. Shortly after we tighten it up. Because we love you, our users, very much. And we want to help you make your apps awesome. With webpack.
+
+\- The Angular-CLI team
+
+Oh, almost forgot. Also:
+
+* **tests:** allow to create component without a spec file ([a85a507](https://github.com/angular/angular-cli/commit/a85a507)), closes [#1256](https://github.com/angular/angular-cli/issues/1256)
+* add module-resolver utils ([b8ddeec](https://github.com/angular/angular-cli/commit/b8ddeec))
+* add utilities for typescript ast ([#1159](https://github.com/angular/angular-cli/issues/1159)) ([0cfc2bf](https://github.com/angular/angular-cli/commit/0cfc2bf))
+
+
+
 <a name="1.0.0-beta.10"></a>
 # [1.0.0-beta.10](https://github.com/angular/angular-cli/compare/1.0.0-beta.9...v1.0.0-beta.10) (2016-07-19)
 
