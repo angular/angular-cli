@@ -24,10 +24,12 @@ describe('Get Dependent Files: ', () => {
             'baz.html': '<h1> Hello </h1>'
           },
           'bar.component.ts': `import * from './baz/baz.component'
-                               import * from '../foo'`
+                               import * from '../foo'`,
+          'bar.component.spec.ts': ''
         },
         'foo-baz': {
-          'no-module.component.ts': ''
+          'no-module.component.ts': '',
+          'no-module.component.spec.ts': 'import * from "../bar/bar.component";'
         },
         'empty-dir': {}
       }
@@ -109,6 +111,7 @@ describe('Get Dependent Files: ', () => {
         .then((contents: dependentFilesUtils.ModuleMap) => {
           let bazFile = path.join(rootPath, 'bar/baz/baz.component.ts');
           let fooFile = path.join(rootPath, 'foo/foo.component.ts');
+          let noModuleSpecFile = path.join(rootPath, 'foo-baz/no-module.component.spec.ts');
           let expectedContents: dependentFilesUtils.ModuleMap = {};
           expectedContents[bazFile] = [{
               specifierText: '../bar.component',
@@ -119,6 +122,11 @@ describe('Get Dependent Files: ', () => {
             specifierText: '../bar/bar.component',
             pos: 85,
             end: 108
+          }];
+          expectedContents[noModuleSpecFile] = [{
+            specifierText: '../bar/bar.component',
+            pos: 13,
+            end: 36
           }];
           assert.deepEqual(contents, expectedContents);
         });
