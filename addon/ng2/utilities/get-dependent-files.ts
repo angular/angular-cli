@@ -75,8 +75,36 @@ export function hasIndexFile(dirPath: string): Promise<Boolean> {
 }
 
 /**
+ * Function to get all the templates, stylesheets, and spec files of a given component unit
+ * Assumption: When any component/service/pipe unit is generated, Angular CLI has a blueprint for
+ *   creating associated files with the name of the generated unit. So, there are two
+ *   assumptions made:
+ *   a. the function only returns associated files that have names matching to the given unit.
+ *   b. the function only looks for the associated files in the directory where the given unit 
+ *      exists.
+ *  
+ * @todo read the metadata to look for the associated files of a given file.
+ * 
+ * @param fileName 
+ * 
+ * @return absolute paths of '.html/.css/.sass/.spec.ts' files associated with the given file.
+ *
+ */
+export function getAllAssociatedFiles(fileName: string): Promise<string[]> {
+  let fileDirName = path.dirname(fileName);
+  let componentName = path.basename(fileName, '.ts');
+  const globSearch = denodeify(glob);
+  return globSearch(path.join(fileDirName, `${componentName}.*`), { nodir: true })
+    .then((files: string[]) => {
+      return files.filter((file) => {
+        return (path.basename(file) !== 'index.ts');
+      });
+    });
+}
+
+/**
  * Returns a map of all dependent file/s' path with their moduleSpecifier object
- * (specifierText, pos, end)
+ * (specifierText, pos, end).
  * 
  * @param fileName file upon which other files depend 
  * @param rootPath root of the project
@@ -86,7 +114,7 @@ export function hasIndexFile(dirPath: string): Promise<Boolean> {
  */
 export function getDependentFiles(fileName: string, rootPath: string): Promise<ModuleMap> {
   const globSearch = denodeify(glob);
-  return globSearch(path.join(rootPath, '**/*.*.ts'), { nodir: true })
+  return globSearch(path.join(rootPath, '**/*.ts'), { nodir: true })
     .then((files: string[]) => Promise.all(files.map(file => createTsSourceFile(file)))
     .then((tsFiles: ts.SourceFile[]) => tsFiles.map(file => getImportClauses(file)))
     .then((moduleSpecifiers: ModuleImport[][]) => {

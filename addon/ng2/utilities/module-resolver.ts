@@ -7,16 +7,13 @@ import * as dependentFilesUtils from './get-dependent-files';
 import { Promise } from 'es6-promise';
 import { Change, ReplaceChange } from './change';
 
-// The root directory of Angular Project.
-const ROOT_PATH = path.resolve('src/app');
-
 /** 
  * Rewrites import module of dependent files when the file is moved. 
  * Also, rewrites export module of related index file of the given file.
  */
 export class ModuleResolver {
 
-  constructor(public oldFilePath: string, public newFilePath: string) {}
+  constructor(public oldFilePath: string, public newFilePath: string, public rootPath: string) {}
 
   /**
    * Changes are applied from the bottom of a file to the top.
@@ -54,10 +51,19 @@ export class ModuleResolver {
    * @return {Promise<Change[]>} 
    */
   resolveDependentFiles(): Promise<Change[]> {
-    return dependentFilesUtils.getDependentFiles(this.oldFilePath, ROOT_PATH)
+    return dependentFilesUtils.getDependentFiles(this.oldFilePath, this.rootPath)
       .then((files:  dependentFilesUtils.ModuleMap) => {
         let changes: Change[] = [];
-        Object.keys(files).forEach(file => {
+        let fileBaseName = path.basename(this.oldFilePath, '.ts');
+        // Filter out the spec file associated with to-be-promoted component unit.
+        let relavantFiles = Object.keys(files).filter((file) => {
+          if (path.extname(path.basename(file, '.ts')) === '.spec') {
+            return path.basename(path.basename(file, '.ts'), '.spec') !== fileBaseName;
+          } else {
+            return true;
+          }
+        });
+        relavantFiles.forEach(file => {
           let tempChanges: ReplaceChange[] = files[file]
             .map(specifier => {
               let componentName = path.basename(this.oldFilePath, '.ts');
