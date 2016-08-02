@@ -27,12 +27,6 @@ const init = (config) => {
     .filter((file) => config.preprocessors[file].indexOf('angular-cli') !== -1)
     .map((file) => config.preprocessors[file])
     .map((arr) => arr.splice(arr.indexOf('angular-cli'), 1, 'webpack', 'sourcemap'));
-
-  // replace the angular-cli preprocessor with webpack+sourcemap
-  Object.keys(config.preprocessors)
-    .filter((file) => config.preprocessors[file].indexOf('angular-cli') !== -1)
-    .map((file) => config.preprocessors[file])
-    .map((arr) => arr.splice(arr.indexOf('angular-cli-coverage'), 1, 'webpack', 'sourcemap', 'coverage'));
 }
 
 init.$inject = ['config']
@@ -45,5 +39,4 @@ preprocessor.$inject = []
 module.exports = Object.assign({
   'framework:angular-cli': ['factory', init],
   'preprocessor:angular-cli': ['factory', preprocessor],
-  'preprocessor:angular-cli-coverage': ['factory', preprocessor]
 }, require('karma-webpack'), require('karma-sourcemap-loader'));

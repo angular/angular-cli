@@ -23,12 +23,17 @@ module.exports = function (config) {
       { pattern: './src/test.ts', watched: false }
     ],
     preprocessors: {
-      './src/app/**/**/*.ts': ['angular-cli-coverage'],
       './src/test.ts': ['angular-cli']
+    },
+    coverageReporter: {
+      dir: 'coverage',
+      reporters: [
+        { type : 'json', subdir: '.', file: 'coverage-final.json'}
+      ]
     },
     remapIstanbulReporter: {
       reports: {
-        html: 'coverage'
+        html: 'coverage/report'
       }
     },
     angularCliConfig: './angular-cli.json',
