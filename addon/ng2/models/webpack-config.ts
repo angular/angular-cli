@@ -24,7 +24,12 @@ export class NgCliWebpackConfig {
   private webpackMobileProdConfigPartial: any;
 
   constructor(public ngCliProject: any, public target: string, public environment: string) {
-    const sourceDir = CliConfig.fromProject().defaults.sourceDir;
+    const cliConfig = new CliConfig();
+
+    console.log(cliConfig);
+
+    const sourceDir = cliConfig.project.defaults.sourceDir;
+    const isMobile = cliConfig.project.apps[0].mobile;
 
     const environmentPath = `./${sourceDir}/app/environments/environment.${environment}.ts`;
 
@@ -32,7 +37,7 @@ export class NgCliWebpackConfig {
     this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, sourceDir);
     this.webpackProdConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, sourceDir);
 
-    if (CliConfig.fromProject().apps[0].mobile){
+    if (isMobile){
       this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, sourceDir);
       this.webpackMobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root, sourceDir);
       this.webpackBaseConfig = webpackMerge(this.webpackBaseConfig, this.webpackMobileConfigPartial);

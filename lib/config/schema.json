@@ -24,7 +24,19 @@
         "properties": {
           "main": "string",
           "tsconfig": "string",
-          "mobile": "boolean"
+          "mobile": "boolean",
+          "styles": {
+            "type": "object",
+            "properties": {
+              "output": {
+                "type": "string"
+              },
+              "autoImported": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
         },
         "additionalProperties": false
       },

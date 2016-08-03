@@ -1,17 +1,17 @@
 import {CliConfig} from '../../addon/ng2/models/config';
 import * as fs from 'fs';
 import * as path from 'path';
+import { expect } from 'chai';
 
-const expect = require('chai').expect;
-const config = path.resolve(process.cwd(), 'addon/ng2/blueprints/ng2/files/angular-cli.json');
-const configCopy = path.resolve(process.cwd(), 'angular-cli.json');
+const config = path.resolve(process.cwd(), 'angular-cli.json');
+const configCopy = path.resolve(process.cwd(), 'angular-cli-tmp.json');
 
 function getContents() {
-  return require(configCopy);
+  return JSON.parse(fs.readFileSync(configCopy, 'utf8'));
 }
 
 // TODO: revisit this test to make non-valid-JSON-friendly.
-describe.skip('Config Tests', () => {
+describe('Config Tests', () => {
   before(() => {
     process.chdir(process.cwd());
   });
@@ -41,7 +41,7 @@ describe.skip('Config Tests', () => {
   it('Updates property of type `string` successfully', () => {
     let c = new CliConfig(configCopy);
     c.set('project.name', 'new-project-name');
-    c.save();
+    c.save(configCopy);
 
     let contents = getContents();
 
@@ -55,7 +55,7 @@ describe.skip('Config Tests', () => {
 
     let fn = () => {
       c.set('project.foo', 'bar');
-      c.save();
+      c.save(configCopy);
     }
 
     expect(fn).to.throw(Error);
@@ -66,7 +66,7 @@ describe.skip('Config Tests', () => {
 
     let fn = () => {
       c.set('project.name.push', 'new-project-name');
-      c.save();
+      c.save(configCopy);
     }
 
     expect(fn).to.throw(Error);

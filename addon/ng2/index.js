@@ -1,14 +1,10 @@
 /* jshint node: true */
 'use strict';
 
-const config = require('./models/config');
+const NgConfig = require('./models/config');
 
 module.exports = {
   name: 'ng2',
-
-  config: function () {
-    this.project.ngConfig = this.project.ngConfig || config.CliConfig.fromProject();
-  },
 
   includedCommands: function () {
     return {
