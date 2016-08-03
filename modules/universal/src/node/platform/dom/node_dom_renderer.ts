@@ -210,7 +210,8 @@ export const ATTRIBUTES = {
 
 // TODO(gdi2290): provide better whitelist above to alias setting props as attrs
 export const IGNORE_ATTRIBUTES = {
-  'innerHTML': true
+  'innerHTML': true,
+  'hidden' : true
 };
 
 export class NodeDomRenderer extends DomRenderer {
@@ -222,6 +223,15 @@ export class NodeDomRenderer extends DomRenderer {
   }
 
   setElementProperty(renderElement: any, propertyName: string, propertyValue: any) {
+
+    // Fix for issues caused by null passed in
+    if (propertyValue === null || propertyValue === undefined) {
+        propertyValue = false;
+        if (propertyName === 'innerHTML') {
+            propertyValue = '';
+        }
+    }
+
     let setProp = super.setElementProperty(renderElement, propertyName, propertyValue);
     if (IGNORE_ATTRIBUTES[propertyName]) {
       return setProp;
@@ -236,6 +246,8 @@ export class NodeDomRenderer extends DomRenderer {
           return this._setOnOffAttribute(renderElement, propertyName, propertyValue);
         } else if (propertyName === 'checked') {
           return this._setCheckedAttribute(renderElement, propertyName, propertyValue);
+        } else if (propertyName === 'disabled') {
+          return this._setDisabledAttribute(renderElement, propertyName, propertyValue);
         } else {
           return this._setBooleanAttribute(renderElement, propertyName, propertyValue);
         }
@@ -260,11 +272,19 @@ export class NodeDomRenderer extends DomRenderer {
     return super.invokeElementMethod(location, methodName, args);
   }
 
+  _setDisabledAttribute(renderElement, propertyName, propertyValue) {
+    if (isPresent(propertyValue)) {
+      if (propertyValue === true || propertyValue.toString() !== 'false') {
+        return super.setElementAttribute(renderElement, 'disabled', 'disabled');
+      }
+    }
+  }
+
   _setCheckedAttribute(renderElement, propertyName, propertyValue) {
     if (isPresent(propertyValue)) {
       if (propertyValue === true) {
         return super.setElementAttribute(renderElement, propertyValue, 'checked');
-      } else if (propertyValue = false) {
+      } else if (propertyValue === false) {
         return super.setElementAttribute(renderElement, propertyValue, '');
       }
     }
