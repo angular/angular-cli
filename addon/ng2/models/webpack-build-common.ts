@@ -73,7 +73,11 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
         filename: 'inline.js',
         sourceMapFilename: 'inline.map'
       }),
-      new CopyWebpackPlugin([{from: path.resolve(projectRoot, './public'), to: path.resolve(projectRoot, './dist')}])
+      new CopyWebpackPlugin([{
+        context: path.resolve(projectRoot, './public'),
+        from: '**/*', 
+        to: path.resolve(projectRoot, './dist')
+      }])
     ],
     node: {
       global: 'window',
