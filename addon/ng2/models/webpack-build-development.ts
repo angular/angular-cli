@@ -18,7 +18,6 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, sourceDi
     },
     node: {
       global: 'window',
-      crypto: 'empty',
       process: true,
       module: false,
       clearImmediate: false,

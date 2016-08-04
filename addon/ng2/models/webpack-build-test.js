@@ -88,7 +88,6 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
     node: {
       global: 'window',
       process: false,
-      crypto: 'empty',
       module: false,
       clearImmediate: false,
       setImmediate: false
