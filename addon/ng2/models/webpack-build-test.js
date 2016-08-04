@@ -46,8 +46,7 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
                 tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`),
                 module: 'commonjs',
                 target: 'es5',
-                useForkChecker: true,
-                removeComments: true
+                useForkChecker: true
               }
             },
             {
@@ -70,7 +69,8 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
           exclude: [
             /\.(e2e|spec)\.ts$/,
             /node_modules/
-          ]
+          ],
+          query: { 'force-sourcemap': true }
         }
       ]
     },

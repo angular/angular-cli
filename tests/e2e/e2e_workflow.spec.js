@@ -283,6 +283,12 @@ describe('Basic end-to-end Workflow', function () {
     });
   });
 
+  it('Make sure the correct coverage folder is created', function () {
+    const coverageReport = path.join(process.cwd(), 'coverage', 'src', 'app');
+
+    expect(existsSync(coverageReport)).to.be.equal(true);
+  });
+
   it('moves all files that live inside `public` into `dist`', function () {
     this.timeout(420000);
 
