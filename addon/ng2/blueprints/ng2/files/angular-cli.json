@@ -6,6 +6,7 @@
   "apps": [
     {
       "main": "<%= sourceDir %>/main.ts",
+      "appmodule": "app.module.ts",
       "tsconfig": "<%= sourceDir %>/tsconfig.json",
       "mobile": <%= isMobile %>
     }

@@ -20,6 +20,26 @@ export function findNodes(node: ts.Node, kind: ts.SyntaxKind): ts.Node[] {
 }
 
 /**
+* Find all nodes from the AST in the subtree of node based on text.
+* @param node 
+* @param name
+* @return all nodes of that match given name, or [] if none is found
+*/
+export function findNodesByText(node: ts.Node, name: string): ts.Node[] {
+  if (!node) {
+    return [];
+  }
+  let nodes: ts.Node[] = [];
+  if (node.getText() === name) {
+    nodes.push(node);
+  }
+
+  return node.getChildren().reduce((foundNodes, child) => {
+    return foundNodes.concat(findNodesByText(child, name));
+  }, nodes);
+}
+
+/**
  * Helper for sorting nodes.
  * @return function to sort nodes in increasing order of position in sourceFile
  */

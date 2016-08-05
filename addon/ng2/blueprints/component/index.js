@@ -4,7 +4,8 @@ var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 var addBarrelRegistration = require('../../utilities/barrel-management');
 var getFiles = Blueprint.prototype.files;
-const stringUtils = require('ember-cli-string-utils');
+var stringUtils = require('ember-cli-string-utils');
+const ngModuleUtils = require('../../utilities/ng-module-utils');
 
 module.exports = {
   description: '',
@@ -115,17 +116,26 @@ module.exports = {
   },
 
   afterInstall: function(options) {
+    const _this = this;
+
     if (options.dryRun) {
       return;
     }
 
-    if (!options.flat) {
-      return addBarrelRegistration(this, this.generatePath);
-    } else {
-      return addBarrelRegistration(
-        this,
-        this.generatePath,
-        options.entity.name + '.component');
+    function addBarrels() {
+      if (!options.flat) {
+        return addBarrelRegistration(_this, _this.generatePath);
+      } else {
+        return addBarrelRegistration(
+          _this,
+          _this.generatePath,
+          options.entity.name + '.component');
+      }
     }
+
+    return Promise.all([
+      addBarrels(),
+      ngModuleUtils.importIntoModule(options, _this.dynamicPath.appRoot, _this.project.root)
+    ]);
   }
 };

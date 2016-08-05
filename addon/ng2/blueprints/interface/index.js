@@ -1,6 +1,7 @@
 const stringUtils = require('ember-cli-string-utils');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 var addBarrelRegistration = require('../../utilities/barrel-management');
+const ngModuleUtils = require('../../utilities/ng-module-utils');
 
 module.exports = {
   description: '',
@@ -50,9 +51,16 @@ module.exports = {
   },
   
   afterInstall: function() {
-    return addBarrelRegistration(
-      this, 
-      this.generatePath,
-      this.fileName);
+    function addBarrels() {
+      return addBarrelRegistration(
+        this, 
+        this.generatePath,
+        this.fileName);
+    }
+  
+    return Promise.all([
+      addBarrels(),
+      ngModuleUtils.importIntoModule(options, _this.dynamicPath.appRoot, _this.project.root)
+    ]);
   }
 };
