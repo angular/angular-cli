@@ -53,6 +53,7 @@
     "glob": "^7.0.3",
     "handlebars": "^4.0.5",
     "html-webpack-plugin": "^2.19.0",
+    "htmlhint-loader": "^0.1.0",
     "istanbul-instrumenter-loader": "^0.2.0",
     "json-loader": "^0.5.4",
     "karma-sourcemap-loader": "^0.3.7",

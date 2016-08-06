@@ -30,6 +30,11 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
             path.resolve(projectRoot, 'node_modules/rxjs'),
             path.resolve(projectRoot, 'node_modules/@angular'),
           ]
+        },
+        {
+          test: /\.html$/,
+          loader: 'htmlhint-loader',
+          exclude: /node_modules/
         }
       ],
       loaders: [
