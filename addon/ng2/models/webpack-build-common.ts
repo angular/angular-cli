@@ -75,11 +75,12 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       }),
       new CopyWebpackPlugin([{
         context: path.resolve(projectRoot, './public'),
-        from: '**/*', 
+        from: '**/*',
         to: path.resolve(projectRoot, './dist')
       }])
     ],
     node: {
+      fs: 'empty',
       global: 'window',
       crypto: 'empty',
       module: false,
