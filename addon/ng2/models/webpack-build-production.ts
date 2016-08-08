@@ -50,6 +50,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, sourceD
       customAttrAssign: [/\)?\]?=/]
     },
     node: {
+      fs: 'empty',
       global: 'window',
       crypto: 'empty',
       process: true,
