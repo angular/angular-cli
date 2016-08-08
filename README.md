@@ -254,7 +254,7 @@ To use these prepocessors simply add the file to your component's `styleUrls`:
   moduleId: module.id,
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  styleUrls: ['app.component.css']
 })
 export class AppComponent {
   title = 'app works!';
