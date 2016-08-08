@@ -1,20 +1,20 @@
+import {DOCUMENT} from '@angular/platform-browser';
+import {APP_BASE_HREF} from '@angular/common';
 import {ComponentRef, ApplicationRef} from '@angular/core';
 
 import {
   bootstrap,
   serializeDocument,
-  DOCUMENT,
   provideDocument,
   ORIGIN_URL,
   REQUEST_URL,
-  BASE_URL,
   NODE_LOCATION_PROVIDERS
 } from '@angular/universal';
 import {App, APP_PROVIDERS} from './app';
 
-import * as preboot from 'preboot';
+// import * as preboot from 'preboot';
 
-console.log(preboot);
+// console.log(preboot);
 
 // const document = ;
 // enableProdMode();
@@ -22,10 +22,11 @@ console.log(preboot);
 
 export function main(providers = []) {
 
-  let prebootInline = preboot.getInlineCode({
-    appRoot: 'app',
-    buffer: true
-  });
+  let prebootInline = '';
+  // let prebootInline = preboot.getInlineCode({
+  //   appRoot: 'app',
+  //   buffer: true
+  // });
 
   return bootstrap(App, [
       ...provideDocument(`
@@ -67,7 +68,7 @@ export function main(providers = []) {
       ...providers,
       {provide: ORIGIN_URL, useValue: 'http://127.0.0.1:3000/'},
       {provide: REQUEST_URL, useValue: '/'},
-      {provide: BASE_URL, useValue: '/'},
+      {provide: APP_BASE_HREF, useValue: '/'},
       ...APP_PROVIDERS,
       ...NODE_LOCATION_PROVIDERS
 

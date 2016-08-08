@@ -45,14 +45,7 @@ export class NodeDomRootRenderer_ extends DomRootRenderer {
     }
     return renderer;
   }
-  // setDoc(doc) {
-  //   console.log('setDocsetDocsetDoc')
-  //   this.doc = doc
-  // }
-  // getDoc(doc) {
-  //   console.log('getDocgetDocgetDocgetDoc')
-  //   return this.doc;
-  // }
+
 }
 
 export const ATTRIBUTES = {

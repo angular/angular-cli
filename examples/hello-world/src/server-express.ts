@@ -4,9 +4,9 @@ import * as path from 'path';
 import * as express from 'express';
 // import * as bodyParser from 'body-parser';
 
-import * as preboot from 'preboot';
+// import * as preboot from 'preboot';
 
-console.log(preboot);
+// console.log(preboot);
 
 // Angular 2
 import { enableProdMode, ApplicationRef, PlatformRef, NgZone, APP_ID } from '@angular/core';
@@ -85,9 +85,10 @@ app.use('/', function (req, res, next) {
       nodeRef.componentRef = null;
       nodeRef.applicationRef = null;
 
-      let prebootInline = preboot.getInlineCode({
-        appRoot: 'app'
-      });
+      let prebootInline = '';
+      // let prebootInline = preboot.getInlineCode({
+      //   appRoot: 'app'
+      // });
 
       return replaceUniversalAppIf(transformDocument(html), _appId, appId)
         .replace(/<\/body>/, `
