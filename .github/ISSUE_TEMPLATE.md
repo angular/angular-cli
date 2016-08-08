@@ -1,16 +1,16 @@
-**Note: for support questions, please use one of these channels:** https://github.com/angular/universal/blob/master/CONTRIBUTING.md#question. This repository's issues are reserved for feature requests and bug reports.
+**Note: for support questions, please use one of these channels:** https://github.com/angular/universal/blob/master/CONTRIBUTING.md#question. This repository's issues are reserved for feature requests and bug reports. Also, **Preboot has moved** to https://github.com/angular/preboot - please make preboot-related issues there.
 
 * **I'm submitting a ...**
 - [ ] bug report
 - [ ] feature request
 - [ ] support request => Please do not submit support request here, see note at the top of this template.
 
-* **What modules are related to this pull-request**
+* **What modules are related to this Issue?**
 - [ ] express-engine
 - [ ] grunt-prerender
 - [ ] gulp-prerender
 - [ ] hapi-engine
-- [ ] universal-preview
+- [ ] universal-next
 - [ ] universal
 - [ ] webpack-prerender
 
@@ -37,11 +37,11 @@
 
 * **Please tell us about your environment:**
 
-- Angular version: 2.0.0-beta.X
+- Angular version: 2.0.0-rc.X
 - Browser: [all | Chrome XX | Firefox XX | IE XX | Safari XX ]
 - Language: [all | TypeScript X.X | ES6/7 | ES5 ]
 - OS:  [all | Mac OS X | Windows | Linux ]
-- Platform: [all | NodeJs | Java | PHP | .Net | Ruby]
+- Platform: [all | NodeJs | Java | PHP | .NET | Ruby]
 
 
 
