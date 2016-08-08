@@ -10,7 +10,7 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, sour
   return {
     plugins: [
       new CopyWebpackPlugin([
-        {from: path.resolve(projectRoot, `./${sourceDir}/icons`), to: path.resolve(outputPath, '/icons')},
+        {from: path.resolve(projectRoot, `./${sourceDir}/icons`), to: path.resolve(outputPath, './icons')},
         {from: path.resolve(projectRoot, `./${sourceDir}/manifest.webapp`), to: outputPath}
       ]),
       new PrerenderWebpackPlugin({
