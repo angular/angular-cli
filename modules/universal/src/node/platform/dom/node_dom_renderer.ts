@@ -222,7 +222,21 @@ export class NodeDomRenderer extends DomRenderer {
     super(_rootRenderer, _componentProto, _animate);
   }
 
+  isObject(val) {
+    if (val === null) {
+      return false;
+    }
+    return ( (typeof val === 'function') || (typeof val === 'object') );
+  }
+
   setElementProperty(renderElement: any, propertyName: string, propertyValue: any) {
+
+    // Fix for passing in custom Object
+    if (this.isObject(propertyValue)) {
+      propertyValue = JSON.stringify(propertyValue);
+    }else if(typeof propertyValue === 'number'){
+      propertyValue.toString()
+    }
 
     // Fix for issues caused by null passed in
     if (propertyValue === null || propertyValue === undefined) {
