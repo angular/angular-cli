@@ -212,7 +212,9 @@ You can modify the these scripts in `package.json` to run whatever tool you pref
 
 ### Support for offline applications
 
-Angular-CLI includes support for offline applications via the `--mobile` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.
+**The `--mobile` flag has been disabled temporarily. Sorry for the inconvenience.**
+
+~~Angular-CLI includes support for offline applications via the `--` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.~~
 
 ### Commands autocompletion
 
