@@ -4,8 +4,12 @@ import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as webpack from 'webpack';
 import { ForkCheckerPlugin } from 'awesome-typescript-loader';
 import { CliConfig } from './config';
+import { ServeTaskOptions } from '../commands/serve';
 
-export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
+export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, outputDir: string) {
+
+  let outputPath: string = path.resolve(projectRoot, outputDir);
+
   return {
     devtool: 'inline-source-map',
     resolve: {
@@ -18,7 +22,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       polyfills: path.resolve(projectRoot, `./${sourceDir}/polyfills.ts`)
     },
     output: {
-      path: path.resolve(projectRoot, './dist'),
+      path: outputPath,
       filename: '[name].bundle.js'
     },
     module: {
@@ -53,7 +57,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
         { test: /\.css$/,  loaders: ['raw-loader', 'postcss-loader'] },
         { test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
         { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
-        { test: /\.scss$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
+        { test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000'},
         { test: /\.html$/, loader: 'raw-loader' }
       ]
@@ -73,7 +77,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
         filename: 'inline.js',
         sourceMapFilename: 'inline.map'
       }),
-      new CopyWebpackPlugin([{from: path.resolve(projectRoot, './public'), to: path.resolve(projectRoot, './dist')}])
+      new CopyWebpackPlugin([{from: path.resolve(projectRoot, './public'), to: outputPath}])
     ],
     node: {
       global: 'window',
