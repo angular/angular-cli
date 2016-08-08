@@ -13,7 +13,7 @@ env:
   matrix:
     - SCRIPT=lint
     - SCRIPT=test
-    - TARGET=mobile SCRIPT=mobile_test
+#    - TARGET=mobile SCRIPT=mobile_test
 matrix:
   exclude:
     - node_js: "6"
@@ -21,8 +21,8 @@ matrix:
     - os: osx
       node_js: "5"
       env: SCRIPT=lint
-    - os: osx
-      env: TARGET=mobile SCRIPT=mobile_test
+#    - os: osx
+#      env: TARGET=mobile SCRIPT=mobile_test
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
