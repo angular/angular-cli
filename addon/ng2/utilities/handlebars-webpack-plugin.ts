@@ -23,6 +23,7 @@ export class HandlebarsWebpackPlugin {
 
     compiler.plugin("emit", function(compilation:any, callback:Function) {
       let asset = compilation.assets[assetName];
+      // This will be undefined if there is a build error
       if(asset != undefined) {
         let templateContent = compilation.assets[assetName].source();
         let template = Handlebars.compile(templateContent);
