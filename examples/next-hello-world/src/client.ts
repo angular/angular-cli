@@ -1,6 +1,11 @@
+console.time('boot');
 import './polyfills.browser';
 
 import {main} from './main.browser';
 
 
-main();
+// setTimeout(function () {
+  main().then(() => {
+    console.timeEnd('boot');
+  });
+// }, 3000);

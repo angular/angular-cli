@@ -19,9 +19,6 @@
       "@angular/platform-node": [
         "./src/universal_modules/platform-node"
       ],
-      "@angular/platform-node-dynamic": [
-        "./src/universal_modules/platform-node-dynamic"
-      ],
       "@angular/universal": [
         "./src/universal_modules/universal"
       ],
