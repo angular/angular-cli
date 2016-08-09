@@ -26,9 +26,10 @@ export class NgCliWebpackConfig {
   constructor(public ngCliProject: any, public target: string, public environment: string) {
     const sourceDir = CliConfig.fromProject().defaults.sourceDir;
 
-    const environmentPath = `./${sourceDir}/app/environments/environment.${environment}.ts`;
+    const environmentPath = path.resolve(this.ngCliProject.root, `./${sourceDir}/app/environments/environment.${environment}.ts`);
+    const environmentData = require(environmentPath);
 
-    this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, sourceDir);
+    this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, sourceDir, environmentData);
     this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, sourceDir);
     this.webpackProdConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, sourceDir);
 
