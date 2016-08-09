@@ -26,7 +26,7 @@ export class NgCliWebpackConfig {
   constructor(public ngCliProject: any, public target: string, public environment: string) {
     const sourceDir = CliConfig.fromProject().defaults.sourceDir;
 
-    const environmentPath = `./${sourceDir}/app/environment.${environment}.ts`;
+    const environmentPath = `./${sourceDir}/environments/environment.${environment}.ts`;
 
     this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, sourceDir);
     this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, sourceDir);
@@ -41,7 +41,7 @@ export class NgCliWebpackConfig {
 
     this.generateConfig();
     this.config.plugins.unshift(new NgCliEnvironmentPlugin({
-      path: path.resolve(this.ngCliProject.root, `./${sourceDir}/app`),
+      path: path.resolve(this.ngCliProject.root, `./${sourceDir}/environments`),
       src: 'environment.ts',
       dest: `environment.${this.environment}.ts`
     }));
