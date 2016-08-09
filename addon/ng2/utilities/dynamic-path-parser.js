@@ -4,7 +4,8 @@ var fs = require('fs');
 
 module.exports = function dynamicPathParser(project, entityName) {
   var projectRoot = project.root;
-  var appRoot = path.join(project.ngConfig.defaults.sourceDir, 'app');
+  var sourceDir = project.ngConfig.defaults.sourceDir;
+  var appRoot = path.join(sourceDir, 'app');
   var cwd = process.env.PWD;
 
   var rootPath = path.join(projectRoot, appRoot);
@@ -52,7 +53,8 @@ module.exports = function dynamicPathParser(project, entityName) {
   }
 
   parsedPath.dir = parsedPath.dir === path.sep ? '' : parsedPath.dir;
-  parsedPath.appRoot = appRoot
+  parsedPath.appRoot = appRoot;
+  parsedPath.sourceDir = sourceDir;
 
   return parsedPath;
 };
