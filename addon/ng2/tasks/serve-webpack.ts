@@ -15,7 +15,8 @@ module.exports = Task.extend({
     let lastHash = null;
     let webpackCompiler: any;
 
-    var config: NgCliWebpackConfig = new NgCliWebpackConfig(this.project, commandOptions.target, commandOptions.environment).config;
+    var config: NgCliWebpackConfig = new NgCliWebpackConfig(this.project, commandOptions.target, commandOptions.environment, commandOptions.outputPath).config;
+
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
     config.entry.main.unshift(`webpack-dev-server/client?http://${commandOptions.host}:${commandOptions.port}/`);
