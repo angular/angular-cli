@@ -83,7 +83,6 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       fs: 'empty',
       global: 'window',
       crypto: 'empty',
-      process: true,
       module: false,
       clearImmediate: false,
       setImmediate: false
