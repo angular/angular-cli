@@ -2,6 +2,7 @@ language: node_js
 node_js:
   - '4'
   - '5'
+  - '6'
 
 cache:
   directories:
@@ -24,6 +25,7 @@ env:
 
 before_script:
   - npm install
+  - ./node_modules/.bin/tsc --version # build once with just tsc to make sure no TS errors, since build.js suppresses
   - ./node_modules/.bin/tsc # build once with just tsc to make sure no TS errors, since build.js suppresses
 
 script:

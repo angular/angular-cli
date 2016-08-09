@@ -73,7 +73,6 @@
     "@types/express": "^4.0.30",
     "@types/jasmine": "^2.2.31",
     "@types/node": "^6.0.32",
-    "@types/serve-static": "^1.7.28",
     "@types/through2": "0.0.28",
     "broccoli-caching-writer": "^2.2.1",
     "conventional-changelog": "^1.1.0",
