@@ -17,6 +17,7 @@ import {
 // PRIVATE
 import { DomRenderer, DomRootRenderer } from '@angular/platform-browser/src/dom/dom_renderer';
 import { DomSharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
+import { getDOM } from '@angular/platform-browser/src/dom/dom_adapter';
 // PRIVATE
 
 
@@ -27,17 +28,18 @@ import {
   listContains,
 } from './helper';
 
-import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
-
-import {parseFragment} from '@angular/universal'
 
 @Injectable()
 export class NodeDomRootRenderer_ extends DomRootRenderer {
-  __document;
-  constructor(@Inject(DOCUMENT) document: any, _eventManager: EventManager,
-              sharedStylesHost: DomSharedStylesHost, animationDriver: AnimationDriver) {
+  __document: Document;
+  constructor(
+    @Inject(DOCUMENT) _document: any,
+    _eventManager: EventManager,
+    sharedStylesHost: DomSharedStylesHost,
+    animationDriver: AnimationDriver) {
+
     super(null, _eventManager, sharedStylesHost, animationDriver);
-    this.__document = document;
+    this.__document = _document;
   }
   renderComponent(componentProto: RenderComponentType): Renderer {
     // TODO(gdi2290): see PR https://github.com/angular/angular/pull/6584
@@ -221,7 +223,7 @@ export const IGNORE_ATTRIBUTES = {
 };
 
 export class NodeDomRenderer extends DomRenderer {
-  __rootRenderer;
+  __rootRenderer: any;
   constructor(
     _rootRenderer: DomRootRenderer,
     _componentProto: RenderComponentType,
@@ -236,7 +238,7 @@ export class NodeDomRenderer extends DomRenderer {
   }
 
   selectRootElement(selectorOrNode: string|any, debugInfo: any): Element {
-    var el: any /** TODO #9100 */;
+    var el: any;
     if (typeof selectorOrNode === 'string') {
       // el = parseFragment(`<${selectorOrNode}></${selectorOrNode}>`);
       el = getDOM().querySelector(this.__rootRenderer.__document, selectorOrNode);
@@ -262,16 +264,16 @@ export class NodeDomRenderer extends DomRenderer {
     // Fix for passing in custom Object
     if (this._isObject(propertyValue)) {
       propertyValue = JSON.stringify(propertyValue);
-    }else if(typeof propertyValue === 'number'){
+    } else if(typeof propertyValue === 'number'){
       propertyValue.toString()
     }
 
     // Fix for issues caused by null passed in
     if (propertyValue === null || propertyValue === undefined) {
-        propertyValue = false;
-        if (propertyName === 'innerHTML') {
-            propertyValue = '';
-        }
+      propertyValue = false;
+      if (propertyName === 'innerHTML') {
+        propertyValue = '';
+      }
     }
 
     let setProp = super.setElementProperty(renderElement, propertyName, propertyValue);
