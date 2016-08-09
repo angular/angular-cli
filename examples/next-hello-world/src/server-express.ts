@@ -36,7 +36,29 @@ import { main as ngApp } from './main.node';
 // Routes with html5pushstate
 
 app.get('/', function (req, res, next) {
-  return ngApp().then(html => {
+  var doc =`<!doctype>
+<html lang="en">
+<head>
+  <title>Angular 2 Universal Starter</title>
+  <meta charset="UTF-8">
+  <meta name="description" content="Angular 2 Universal">
+  <meta name="keywords" content="Angular 2,Universal">
+  <meta name="author" content="PatrickJS">
+
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+  <base href="/">
+<body>
+
+  <app>
+    Loading...
+  </app>
+
+  <script src="dist/public/browser-bundle.js"></script>
+</body>
+</html>
+`;
+  return ngApp(doc).then(html => {
     // console.log(html);
     res.status(200).send(html);
     next();
