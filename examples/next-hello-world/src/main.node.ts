@@ -51,18 +51,18 @@ import {
 } from '@angular/common';
 
 import {
-  // bootstrap,
   parseDocument,
   serializeDocument,
   provideDocument,
+  NodeDomRootRenderer_,
+  NodeSharedStylesHost,
+  NodePlatformLocation
   // ORIGIN_URL,
   // REQUEST_URL,
   // NODE_LOCATION_PROVIDERS
 } from '@angular/universal';
 
 import { getDOM } from '@angular/platform-browser/src/dom/dom_adapter';
-
-import { NodeDomRootRenderer_ } from './node-renderer';
 
 import { App } from './app';
 
@@ -106,19 +106,22 @@ export function _resolveDefaultAnimationDriver(): AnimationDriver {
 @NgModule({
   providers: [
     BROWSER_SANITIZATION_PROVIDERS,
-    {provide: ExceptionHandler, useFactory: _exceptionHandler, deps: []},
-    {provide: DOCUMENT, useFactory: _document, deps: []},
-    {provide: EVENT_MANAGER_PLUGINS, useClass: DomEventsPlugin, multi: true},
-    {provide: EVENT_MANAGER_PLUGINS, useClass: KeyEventsPlugin, multi: true},
-    {provide: EVENT_MANAGER_PLUGINS, useClass: HammerGesturesPlugin, multi: true},
-    {provide: HAMMER_GESTURE_CONFIG, useClass: HammerGestureConfig},
+    { provide: ExceptionHandler, useFactory: _exceptionHandler, deps: [] },
+    { provide: DOCUMENT, useFactory: _document, deps: [] },
+    { provide: EVENT_MANAGER_PLUGINS, useClass: DomEventsPlugin, multi: true },
+    { provide: EVENT_MANAGER_PLUGINS, useClass: KeyEventsPlugin, multi: true },
+    { provide: EVENT_MANAGER_PLUGINS, useClass: HammerGesturesPlugin, multi: true },
+    { provide: HAMMER_GESTURE_CONFIG, useClass: HammerGestureConfig },
 
-    {provide: DomRootRenderer, useClass: NodeDomRootRenderer_},
-    {provide: RootRenderer, useExisting: DomRootRenderer},
-    {provide: SharedStylesHost, useExisting: DomSharedStylesHost},
+    { provide: DomRootRenderer, useClass: NodeDomRootRenderer_ },
+    { provide: RootRenderer, useExisting: DomRootRenderer },
 
-    {provide: AnimationDriver, useFactory: _resolveDefaultAnimationDriver},
-    DomSharedStylesHost,
+    NodeSharedStylesHost,
+    {provide: SharedStylesHost, useExisting: NodeSharedStylesHost},
+    {provide: DomSharedStylesHost, useExisting: NodeSharedStylesHost},
+
+
+    { provide: AnimationDriver, useFactory: _resolveDefaultAnimationDriver },
     Testability,
     EventManager,
     // ELEMENT_PROBE_PROVIDERS
@@ -132,22 +135,6 @@ export class NodeModule {
 function initParse5Adapter() {
   Parse5DomAdapter.makeCurrent();
   wtfInit();
-}
-
-function notSupported(feature: string): Error {
-  throw new Error(`platform-node does not support '${feature}'.`);
-}
-export class NodePlatformLocation extends PlatformLocation {
-  getBaseHrefFromDOM(): string { throw notSupported('getBaseHrefFromDOM'); };
-  onPopState(fn: any): void { notSupported('onPopState'); };
-  onHashChange(fn: any): void { notSupported('onHashChange'); };
-  get pathname(): string { throw notSupported('pathname'); }
-  get search(): string { throw notSupported('search'); }
-  get hash(): string { throw notSupported('hash'); }
-  replaceState(state: any, title: string, url: string): void { notSupported('replaceState'); };
-  pushState(state: any, title: string, url: string): void { notSupported('pushState'); };
-  forward(): void { notSupported('forward'); };
-  back(): void { notSupported('back'); };
 }
 
 

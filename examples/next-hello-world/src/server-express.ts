@@ -37,7 +37,7 @@ import { main as ngApp } from './main.node';
 
 app.get('/', function (req, res, next) {
   return ngApp().then(html => {
-    console.log(html);
+    // console.log(html);
     res.status(200).send(html);
     next();
     return html;
