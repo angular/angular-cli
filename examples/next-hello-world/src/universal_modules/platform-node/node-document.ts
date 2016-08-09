@@ -1,5 +1,8 @@
-import {Parser, Serializer, TreeAdapters} from 'parse5';
-import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
+import { Parser, Serializer, TreeAdapters } from 'parse5';
+
+// PRIVATE
+import { getDOM } from '@angular/platform-browser/src/dom/dom_adapter';
+// PRIVATE
 
 
 const parser = new Parser(TreeAdapters.htmlparser2);

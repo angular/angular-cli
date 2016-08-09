@@ -1,6 +1,7 @@
 import { Injectable, Inject, Optional } from '@angular/core';
 import { PlatformLocation, APP_BASE_HREF } from '@angular/common';
 import { REQUEST_URL, BASE_URL, ORIGIN_URL } from './helper';
+
 import * as nodeUrl from 'url';
 
 

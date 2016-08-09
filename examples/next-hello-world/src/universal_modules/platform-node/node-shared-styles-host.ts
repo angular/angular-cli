@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { SharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
 
+// PRIVATE
 import { getDOM } from '@angular/platform-browser/src/dom/dom_adapter';
+// PRIVATE
 
 @Injectable()
 export class NodeSharedStylesHost extends SharedStylesHost {

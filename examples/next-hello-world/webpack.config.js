@@ -26,7 +26,7 @@ var sharedPlugins = [
 ];
 
 var webpackConfig = setTypeScriptAlias(require('./tsconfig.json'), {
-  cache: false,
+  cache: true,
 
   devtool: 'source-map',
 
