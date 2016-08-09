@@ -4,7 +4,6 @@ import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as webpack from 'webpack';
 import { ForkCheckerPlugin } from 'awesome-typescript-loader';
 import { CliConfig } from './config';
-import { ServeTaskOptions } from '../commands/serve';
 
 export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, outputDir: string) {
 
@@ -57,7 +56,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
         { test: /\.css$/,  loaders: ['raw-loader', 'postcss-loader'] },
         { test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
         { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
-        { test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
+        { test: /\.scss$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000'},
         { test: /\.html$/, loader: 'raw-loader' }
       ]
