@@ -10,6 +10,7 @@
     "start": "npm run server",
     "server": "npm run server:dev",
     "server:dev": "nodemon ./dist/server/express-bundle.js",
+    "debug:server:dev": "node-nightly --inspect --debug-brk ./dist/server/express-bundle.js",
     "server:prod": "pm2 start dist/server/express-bundle.js --name=\"universal\" -i max --max-memory-restart 500 --no-daemon",
     "ab": "ab -t 10 -c 10 -k http://localhost:3000/",
     "server:universal": "npm run build",
