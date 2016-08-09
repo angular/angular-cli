@@ -4,7 +4,14 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app',
-  template: 'hello world!!!'
+  styles: [`
+    div {
+      background-color: red;
+    }
+  `],
+  template: `
+  <div>hello world!!!</div>
+  `
 })
 export class App {
 
