@@ -61,7 +61,7 @@ module.exports = {
     const className = stringUtils.classify(`${options.entity.name}Pipe`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.pipe`);
     const componentDir = path.relative(this.dynamicPath.appRoot, this.generatePath);
-    const importPath = `./${componentDir}/${fileName}`;
+    const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
     if (!options.flat) {
       returns.push(addBarrelRegistration(this, componentDir));

@@ -11,6 +11,10 @@ var root = process.cwd();
 var conf = require('ember-cli/tests/helpers/conf');
 var Promise = require('ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
+const denodeify = require('denodeify');
+
+const readFile = denodeify(fs.readFile);
+
 
 describe('Acceptance: ng generate pipe', function () {
   before(conf.setup);
@@ -32,10 +36,16 @@ describe('Acceptance: ng generate pipe', function () {
   });
 
   it('ng generate pipe my-pipe', function () {
-    return ng(['generate', 'pipe', 'my-pipe']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-pipe.pipe.ts');
-      expect(existsSync(testPath)).to.equal(true);
-    });
+    const appRoot = path.join(root, 'tmp/foo');
+    const testPath = path.join(appRoot, 'src/app/my-pipe.pipe.ts');
+    const appModulePath = path.join(appRoot, 'src/app/app.module.ts');
+    return ng(['generate', 'pipe', 'my-pipe'])
+      .then(() => expect(existsSync(testPath)).to.equal(true))
+      .then(() => readFile(appModulePath, 'utf-8'))
+      .then(content => {
+        expect(content).matches(/import.*\bMyPipePipe\b.*from '.\/my-pipe.pipe';/);
+        expect(content).matches(/declarations:\s*\[[^\]]+?,\n\s+MyPipePipe\n/m);
+      });
   });
 
   it('ng generate pipe test' + path.sep + 'my-pipe', function () {

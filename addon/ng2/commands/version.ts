@@ -14,7 +14,6 @@ const VersionCommand = Command.extend({
   }],
 
   run: function (options) {
-    console.log(123);
     var versions = process.versions;
     var pkg = require(path.resolve(__dirname, '..', '..', '..', 'package.json'));
 
