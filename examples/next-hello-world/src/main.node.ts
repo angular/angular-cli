@@ -23,7 +23,7 @@ export function main(document) {
     bootstrap: [ App, AnotherComponent ],
     declarations: [ App, AnotherComponent ],
     imports: [
-      NodeModule.forDocument(document, {
+      NodeModule.forRoot(document, {
         originUrl: 'http://localhost:3000',
         baseUrl: '/',
         requestUrl: '/'
