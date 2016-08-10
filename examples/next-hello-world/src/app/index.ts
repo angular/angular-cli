@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-
+import { Http, Jsonp } from '@angular/http';
+import 'rxjs/Rx';
 
 
 @Component({
@@ -11,9 +12,22 @@ import { Component } from '@angular/core';
   `],
   template: `
   <div>hello world!!!</div>
+  <pre>{{ response | json }}</pre>
   `
 })
 export class App {
+  response = {};
+  constructor(public jsonp: Jsonp) {
+
+  }
+
+  ngOninit() {
+   this.jsonp.request('https://api.github.com?callback=JSON_CALLBACK')
+      .subscribe(res => {
+        var json = res.json();
+        this.response = json;
+      });
+    }
 
 }
 
