@@ -120,28 +120,23 @@ module.exports = {
       return;
     }
 
-    var returns = [];
-    var modulePath = path.resolve(process.env.PWD, this.dynamicPath.appRoot, 'app.module.ts');
-    var classifiedName = 
-      stringUtils.classify(`${options.entity.name}-${options.originBlueprintName}`);
-    var importPath = `'./${options.entity.name}/` + 
-      stringUtils.dasherize(`${options.entity.name}.component';`);
+    const returns = [];
+    const modulePath = path.join(this.project.root, this.dynamicPath.appRoot, 'app.module.ts');
+    const className = stringUtils.classify(`${options.entity.name}Component`);
+    const fileName = stringUtils.dasherize(`${options.entity.name}.component`);
+    const componentDir = path.relative(this.dynamicPath.appRoot, this.generatePath);
+    const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
     if (!options.flat) {
-      returns.push(function() { 
-        return addBarrelRegistration(this, this.generatePath) 
-      });
+      returns.push(addBarrelRegistration(this, componentDir));
     } else {
-      returns.push(function() { 
-        return addBarrelRegistration(
-          this,
-          this.generatePath,
-          options.entity.name + '.component')
-      });
+      returns.push(addBarrelRegistration(this, componentDir, fileName));
     }
 
     if (!options['skip-import']) {
-      returns.push(astUtils.importComponent(modulePath, classifiedName, importPath));
+      returns.push(
+        astUtils.addComponentToModule(modulePath, className, importPath)
+          .then(change => change.apply()));
     }
 
     return Promise.all(returns);
