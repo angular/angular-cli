@@ -183,6 +183,9 @@ export function jsonpFactory(jsonpBackend: JSONPBackend, requestOptions: Request
   providers: NODE_HTTP_PROVIDERS
 })
 export class NodeHttpModule {
+  static forRoot(config: any = {}) {
+    return NodeHttpModule.withConfig(config);
+  }
   static withConfig(config: any = {}) {
     var providers = [];
     if (config.baseUrl) {
@@ -195,7 +198,7 @@ export class NodeHttpModule {
       providers.push({ provide: ORIGIN_URL, useValue: config.originUrl });
     }
     return {
-      ngModule: NodeJsonpModule,
+      ngModule: NodeHttpModule,
       providers
     }
 
@@ -206,6 +209,9 @@ export class NodeHttpModule {
   providers: NODE_JSONP_PROVIDERS
 })
 export class NodeJsonpModule {
+  static forRoot(config: any = {}) {
+    return NodeJsonpModule.withConfig(config);
+  }
   static withConfig(config: any = {}) {
     var providers = [];
     if (config.baseUrl) {

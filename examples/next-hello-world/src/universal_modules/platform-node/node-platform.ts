@@ -109,10 +109,10 @@ export class NodePlatform implements PlatformRef {
 
         let _appId = moduleRef.injector.get(APP_ID, null);
         let appId = moduleRef.injector.get(NODE_APP_ID, _appId);
-        let DOM = getDOM();
-        appRef.components.map((compRef: ComponentRef<any>) => {
-          DOM.setAttribute(compRef.location.nativeElement, 'data-universal-app-id', appId);
-        });
+        // let DOM = getDOM();
+        // appRef.components.map((compRef: ComponentRef<any>) => {
+        //   DOM.setAttribute(compRef.location.nativeElement, 'data-universal-app-id', appId);
+        // });
 
         let html = serializeDocument(document);
         document = null;
@@ -124,7 +124,7 @@ export class NodePlatform implements PlatformRef {
         moduleRef = null;
 
         return html
-          .replace(new RegExp(_COMPONENT_ID, 'gi'), appId)
+          .replace(new RegExp(_appId, 'gi'), appId)
       });
   }
 
@@ -195,8 +195,8 @@ export class NodePlatform implements PlatformRef {
   exports: [  CommonModule, ApplicationModule  ]
 })
 export class NodeModule {
-  static forDocument(doc, config: any = {}) {
-    var _config = Object.assign({}, {document: doc}, config);
+  static forRoot(document: string, config: any = {}) {
+    var _config = Object.assign({}, { document }, config);
     return NodeModule.withConfig(_config);
   }
   static withConfig(config: any = {}) {
