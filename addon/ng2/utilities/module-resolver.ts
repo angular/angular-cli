@@ -69,8 +69,9 @@ export class ModuleResolver {
               let componentName = path.basename(this.oldFilePath, '.ts');
               let fileDir = path.dirname(file);
               let changeText = path.relative(fileDir, path.join(this.newFilePath, componentName));
+              changeText = changeText.split(path.sep).join('/');
               if (changeText.length > 0 && changeText.charAt(0) !== '.') {
-                changeText = `.${path.sep}${changeText}`;
+                changeText = `./${changeText}`;
               };
               let position = specifier.end - specifier.specifierText.length;
               return new ReplaceChange(file, position - 1, specifier.specifierText, changeText);
@@ -96,8 +97,9 @@ export class ModuleResolver {
           let specifierText = specifier.specifierText;
           let moduleAbsolutePath = path.resolve(path.dirname(this.oldFilePath), specifierText);
           let changeText = path.relative(this.newFilePath, moduleAbsolutePath);
+          changeText = changeText.split(path.sep).join('/');
           if (changeText.length > 0 && changeText.charAt(0) !== '.') {
-            changeText = `.${path.sep}${changeText}`;
+            changeText = `./${changeText}`;
           }
           let position = specifier.end - specifier.specifierText.length;
           return new ReplaceChange(this.oldFilePath, position - 1, specifierText, changeText);
