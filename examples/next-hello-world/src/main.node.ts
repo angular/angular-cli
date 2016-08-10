@@ -1,33 +1,38 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import {
   NodeModule,
   NodeHttpModule,
   NodeJsonpModule,
   platformDynamicNode,
-  ORIGIN_URL
 } from '@angular/universal';
 
 import { App } from './app';
-import { APP_BASE_HREF } from '@angular/common';
 
 
-export const platform = platformDynamicNode([
+@Component({
+  selector: 'another-component',
+  template: 'SERVER-RENDERED'
+})
+class AnotherComponent {}
 
-]);
+export const platform = platformDynamicNode();
 
-export function main(doc) {
+export function main(document) {
 
   @NgModule({
-    bootstrap: [ App ],
-    declarations: [ App ],
+    bootstrap: [ App, AnotherComponent ],
+    declarations: [ App, AnotherComponent ],
     imports: [
-      NodeModule.forDocument(doc),
+      NodeModule.withConfig({
+        document,
+        originUrl: 'http://localhost:3000',
+        baseUrl: '/',
+        requestUrl: '/'
+      }),
       NodeHttpModule,
       NodeJsonpModule
     ],
     providers: [
-      { provide: APP_BASE_HREF, useValue: '/' },
-      { provide: ORIGIN_URL, useValue: 'http://localhost:3000' }
     ]
   })
   class MainModule {}
