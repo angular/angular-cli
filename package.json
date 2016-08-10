@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
+    "@angular/tsc-wrapped": "^0.2.2",
     "@types/lodash": "^4.0.25-alpha",
     "@types/rimraf": "0.0.25-alpha",
     "@types/webpack": "^1.12.22-alpha",
@@ -74,6 +75,7 @@
     "remap-istanbul": "^0.6.4",
     "resolve": "^1.1.7",
     "rimraf": "^2.5.3",
+    "rxjs": "^5.0.0-beta.11",
     "sass-loader": "^3.2.0",
     "shelljs": "^0.7.0",
     "silent-error": "^1.0.0",
