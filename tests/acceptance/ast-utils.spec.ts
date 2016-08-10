@@ -6,7 +6,8 @@ import { InsertChange, RemoveChange } from '../../addon/ng2/utilities/change';
 import * as Promise from 'ember-cli/lib/ext/promise';
 import {
   findNodes,
-  insertAfterLastOccurrence
+  insertAfterLastOccurrence,
+  addComponentToModule
 } from '../../addon/ng2/utilities/ast-utils';
 
 const readFile = Promise.denodeify(fs.readFile);
@@ -161,6 +162,122 @@ describe('ast-utils: insertAfterLastOccurrence', () => {
     }).then(newContent => {
       expect(newContent).to.equal(`import { bar } from 'foo'`);
     });
+  });
+});
+
+
+describe('addComponentToModule', () => {
+  beforeEach(() => {
+    mockFs( {
+      '1.ts': `
+import {NgModule} from '@angular/core';
+
+@NgModule({
+  declarations: []
+})
+class Module {}`,
+      '2.ts': `
+import {NgModule} from '@angular/core';
+
+@NgModule({
+  declarations: [
+    Other
+  ]
+})
+class Module {}`,
+      '3.ts': `
+import {NgModule} from '@angular/core';
+
+@NgModule({
+})
+class Module {}`,
+      '4.ts': `
+import {NgModule} from '@angular/core';
+
+@NgModule({
+  field1: [],
+  field2: {}
+})
+class Module {}`
+    });
+  });
+  afterEach(() => mockFs.restore());
+
+  it('works with empty array', () => {
+    return addComponentToModule('1.ts', 'MyClass', 'MyImportPath')
+      .then(change => change.apply())
+      .then(() => readFile('1.ts', 'utf-8'))
+      .then(content => {
+        expect(content).to.equal(
+          '\n' +
+          'import {NgModule} from \'@angular/core\';\n' +
+          'import { MyClass } from \'MyImportPath\';\n' +
+          '\n' +
+          '@NgModule({\n' +
+          '  declarations: [MyClass]\n' +
+          '})\n' +
+          'class Module {}'
+        );
+      })
+  });
+
+  it('works with array with declarations', () => {
+    return addComponentToModule('2.ts', 'MyClass', 'MyImportPath')
+      .then(change => change.apply())
+      .then(() => readFile('2.ts', 'utf-8'))
+      .then(content => {
+        expect(content).to.equal(
+          '\n' +
+          'import {NgModule} from \'@angular/core\';\n' +
+          'import { MyClass } from \'MyImportPath\';\n' +
+          '\n' +
+          '@NgModule({\n' +
+          '  declarations: [\n' +
+          '    Other,\n' +
+          '    MyClass\n' +
+          '  ]\n' +
+          '})\n' +
+          'class Module {}'
+        );
+      })
+  });
+
+  it('works without any declarations', () => {
+    return addComponentToModule('3.ts', 'MyClass', 'MyImportPath')
+      .then(change => change.apply())
+      .then(() => readFile('3.ts', 'utf-8'))
+      .then(content => {
+        expect(content).to.equal(
+          '\n' +
+          'import {NgModule} from \'@angular/core\';\n' +
+          'import { MyClass } from \'MyImportPath\';\n' +
+          '\n' +
+          '@NgModule({\n' +
+          '  declarations: [MyClass]\n' +
+          '})\n' +
+          'class Module {}'
+        );
+      })
+  });
+
+  it('works without a declaration field', () => {
+    return addComponentToModule('4.ts', 'MyClass', 'MyImportPath')
+      .then(change => change.apply())
+      .then(() => readFile('4.ts', 'utf-8'))
+      .then(content => {
+        expect(content).to.equal(
+          '\n' +
+          'import {NgModule} from \'@angular/core\';\n' +
+          'import { MyClass } from \'MyImportPath\';\n' +
+          '\n' +
+          '@NgModule({\n' +
+          '  field1: [],\n' +
+          '  field2: {},\n' +
+          '  declarations: [MyClass]\n' +
+          '})\n' +
+          'class Module {}'
+        );
+      })
   });
 });
 

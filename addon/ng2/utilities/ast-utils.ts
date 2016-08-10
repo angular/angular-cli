@@ -153,8 +153,6 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
 function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: string,
                                       symbolName: string, importPath: string) {
   const source: ts.SourceFile = getSource(ngModulePath);
-
-  let foundOne = false;
   let metadata = getDecoratorMetadata(source, 'NgModule', '@angular/core');
 
   // Find the decorator declaration.
@@ -188,8 +186,7 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
       }
       if (matchingProperties.length == 0) {
         return metadata
-          .toPromise()
-          .then();
+          .toPromise();
       }
 
       const assignment = <ts.PropertyAssignment>matchingProperties[0];
@@ -221,14 +218,19 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
         // We haven't found the field in the metadata declaration. Insert a new
         // field.
         let expr = <ts.ObjectLiteralExpression>node;
-        node = expr.properties[expr.properties.length - 1];
-        position = node.getEnd();
-        // Get the indentation of the last element, if any.
-        const text = node.getFullText(source);
-        if (text.startsWith('\n')) {
-          toInsert = `,${text.match(/^\n(\r?)\s+/)[0]}${metadataField}: [${symbolName}]`;
+        if (expr.properties.length == 0) {
+          position = expr.getEnd() - 1;
+          toInsert = `  ${metadataField}: [${symbolName}]\n`;
         } else {
-          toInsert = `, ${metadataField}: [${symbolName}]`;
+          node = expr.properties[expr.properties.length - 1];
+          position = node.getEnd();
+          // Get the indentation of the last element, if any.
+          const text = node.getFullText(source);
+          if (text.startsWith('\n')) {
+            toInsert = `,${text.match(/^\n(\r?)\s+/)[0]}${metadataField}: [${symbolName}]`;
+          } else {
+            toInsert = `, ${metadataField}: [${symbolName}]`;
+          }
         }
       } else if (node.kind == ts.SyntaxKind.ArrayLiteralExpression) {
         // We found the field but it's empty. Insert it just before the `]`.

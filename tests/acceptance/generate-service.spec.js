@@ -43,10 +43,10 @@ describe('Acceptance: ng generate service', function () {
       .then(() => expect(existsSync(testPath)).to.equal(true))
       .then(() => readFile(appModulePath, 'utf-8'))
       .then(content => {
-        expect(content).matches(/import.*\bMySvc\b.*from '.\/my-svc.service';/);
-        expect(content).matches(/providers:\s*\[MySvc\]/m);
+        expect(content).matches(/import.*\MySvcService\b.*from '.\/my-svc.service';/);
+        expect(content).matches(/providers:\s*\[MySvcService\]/m);
       });
-});
+  });
 
   it('ng generate service test' + path.sep + 'my-svc', function () {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', 'test'));

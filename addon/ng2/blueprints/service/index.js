@@ -57,7 +57,7 @@ module.exports = {
     const modulePath = path.join(this.project.root, this.dynamicPath.appRoot, 'app.module.ts');
     const componentDir = path.relative(this.dynamicPath.appRoot, this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
-    const className = stringUtils.classify(`${options.entity.name}`);
+    const className = stringUtils.classify(`${options.entity.name}Service`);
 
     if (!options.flat) {
       returns.push(addBarrelRegistration(this, this.generatePath));
