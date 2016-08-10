@@ -33,7 +33,7 @@ import * as https from 'https';
 import * as url from 'url';
 
 
-import { BASE_URL, ORIGIN_URL } from './tokens';
+import { BASE_URL, ORIGIN_URL, REQUEST_URL } from './tokens';
 import { isPresent, isSuccess } from './helper';
 
 const JSONP_ERR_WRONG_METHOD = 'JSONP requests must use GET request method.';
@@ -183,10 +183,44 @@ export function jsonpFactory(jsonpBackend: JSONPBackend, requestOptions: Request
   providers: NODE_HTTP_PROVIDERS
 })
 export class NodeHttpModule {
+  static withConfig(config: any = {}) {
+    var providers = [];
+    if (config.baseUrl) {
+      providers.push({ provide: BASE_URL, useValue: config.baseUrl });
+    }
+    if (config.requestUrl) {
+      providers.push({ provide: REQUEST_URL, useValue: config.requestUrl });
+    }
+    if (config.originUrl) {
+      providers.push({ provide: ORIGIN_URL, useValue: config.originUrl });
+    }
+    return {
+      ngModule: NodeJsonpModule,
+      providers
+    }
+
+  }
 }
 
 @NgModule({
   providers: NODE_JSONP_PROVIDERS
 })
 export class NodeJsonpModule {
+  static withConfig(config: any = {}) {
+    var providers = [];
+    if (config.baseUrl) {
+      providers.push({ provide: BASE_URL, useValue: config.baseUrl });
+    }
+    if (config.requestUrl) {
+      providers.push({ provide: REQUEST_URL, useValue: config.requestUrl });
+    }
+    if (config.originUrl) {
+      providers.push({ provide: ORIGIN_URL, useValue: config.originUrl });
+    }
+    return {
+      ngModule: NodeJsonpModule,
+      providers
+    }
+
+  }
 }

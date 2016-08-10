@@ -53,6 +53,7 @@ app.get('/', function (req, res, next) {
   <app>
     Loading...
   </app>
+  <another-component></another-component>
 
   <script src="dist/public/browser-bundle.js"></script>
 </body>

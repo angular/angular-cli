@@ -64,7 +64,13 @@ import {
   _COMPONENT_ID
 } from './providers';
 
-import { NODE_APP_ID } from './tokens';
+import {
+  NODE_APP_ID,
+
+  ORIGIN_URL,
+  REQUEST_URL,
+  BASE_URL,
+} from './tokens';
 
 
 export function _exceptionHandler(): ExceptionHandler {
@@ -190,20 +196,32 @@ export class NodePlatform implements PlatformRef {
 })
 export class NodeModule {
   static forDocument(doc, config: any = {}) {
-    let document = doc;
+    var _config = Object.assign({}, {document: doc}, config);
+    return NodeModule.withConfig(_config);
+  }
+  static withConfig(config: any = {}) {
+    let doc = config.document;
+    let providers = [];
     if (typeof doc === 'string') {
-      document = parseDocument(doc);
+      config.document = parseDocument(doc);
+    }
+    if (config.baseUrl) {
+      providers.push({ provide: BASE_URL, useValue: config.baseUrl });
+    }
+    if (config.requestUrl) {
+      providers.push({ provide: REQUEST_URL, useValue: config.requestUrl });
+    }
+    if (config.originUrl) {
+      providers.push({ provide: ORIGIN_URL, useValue: config.originUrl });
     }
     return {
       ngModule: NodeModule,
       providers: [
         provideDocument(doc),
         provideUniversalAppId(config.appId),
+        ...providers
       ]
     };
-  }
-  static withConfig(config) {
-
   }
 
 }
