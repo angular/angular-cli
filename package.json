@@ -56,7 +56,7 @@
     "istanbul-instrumenter-loader": "^0.2.0",
     "json-loader": "^0.5.4",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^1.7.0",
+    "karma-webpack": "^1.8.0",
     "leek": "0.0.21",
     "less": "^2.7.1",
     "less-loader": "^2.2.3",

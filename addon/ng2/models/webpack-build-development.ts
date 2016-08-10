@@ -17,6 +17,7 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, sourceDi
       resourcePath: path.resolve(projectRoot, `./${sourceDir}`)
     },
     node: {
+      fs: 'empty',
       global: 'window',
       crypto: 'empty',
       process: true,
