@@ -4,11 +4,10 @@ var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 var addBarrelRegistration = require('../../utilities/barrel-management');
 var getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
-const astUtils = require('../../utilities/ast-utils');
 
 module.exports = {
   description: '',
-  
+
   availableOptions: [
     { name: 'flat', type: Boolean, default: true }
   ],
@@ -26,10 +25,10 @@ module.exports = {
       flat: options.flat
     };
   },
-  
+
   files: function() {
     var fileList = getFiles.call(this);
-    
+
     if (this.options && this.options.flat) {
       fileList = fileList.filter(p => p.indexOf('index.ts') <= 0);
     }
@@ -50,25 +49,16 @@ module.exports = {
       }
     };
   },
-  
+
   afterInstall: function(options) {
     const returns = [];
     const fileName = stringUtils.dasherize(`${options.entity.name}.service`);
-    const modulePath = path.join(this.project.root, this.dynamicPath.appRoot, 'app.module.ts');
-    const componentDir = path.relative(this.dynamicPath.appRoot, this.generatePath);
-    const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
-    const className = stringUtils.classify(`${options.entity.name}Service`);
 
     if (!options.flat) {
       returns.push(addBarrelRegistration(this, this.generatePath));
     } else {
       returns.push(addBarrelRegistration(this, this.generatePath, fileName));
     }
-
-    returns.push(
-      astUtils.addProviderToModule(modulePath, className, importPath)
-        .then(change => change.apply()));
-
 
     return Promise.all(returns);
   }

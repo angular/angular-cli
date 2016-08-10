@@ -43,8 +43,8 @@ describe('Acceptance: ng generate service', function () {
       .then(() => expect(existsSync(testPath)).to.equal(true))
       .then(() => readFile(appModulePath, 'utf-8'))
       .then(content => {
-        expect(content).matches(/import.*\MySvcService\b.*from '.\/my-svc.service';/);
-        expect(content).matches(/providers:\s*\[MySvcService\]/m);
+        expect(content).not.to.matches(/import.*\MySvcService\b.*from '.\/my-svc.service';/);
+        expect(content).not.to.matches(/providers:\s*\[MySvcService\]/m);
       });
   });
 
