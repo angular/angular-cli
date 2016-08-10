@@ -16,6 +16,7 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/last';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
 
 
@@ -149,63 +150,121 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
 }
 
 
-/**
-* Custom function to insert component (component, pipe, directive)
-* into NgModule declarations. It also imports the component. 
-*/
-export function addComponentToModule(modulePath: string, classifiedName: string,
-    importPath: string): Promise<Change> {
-  const source: ts.SourceFile = getSource(modulePath);
+function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: string,
+                                      symbolName: string, importPath: string) {
+  const source: ts.SourceFile = getSource(ngModulePath);
 
-  // Find the declaration.
-  return getDecoratorMetadata(source, 'NgModule', '@angular/core')
-    // Get all the children property assignment of object literals.
-    .mergeMap((node: ts.ObjectLiteralExpression) => Observable.of(
-      ...node.properties
-        .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
-    ))
-    // Filter out every fields that's not "declarations". Also handles string literals
-    // (but not expression).
-    .filter(prop => {
-      switch (prop.name.kind) {
-        case ts.SyntaxKind.Identifier:
-          return prop.name.getText(source) == 'declarations';
-        case ts.SyntaxKind.StringLiteral:
-          return prop.name.text == 'declarations';
+  let foundOne = false;
+  let metadata = getDecoratorMetadata(source, 'NgModule', '@angular/core');
+
+  // Find the decorator declaration.
+  return metadata
+    .toPromise()
+    .then((node: ts.ObjectLiteralExpression) => {
+      if (!node) {
+        return null;
       }
-      return false;
+
+      // Get all the children property assignment of object literals.
+      return node.properties
+        .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
+        // Filter out every fields that's not "metadataField". Also handles string literals
+        // (but not expressions).
+        .filter(prop => {
+          switch (prop.name.kind) {
+            case ts.SyntaxKind.Identifier:
+              return prop.name.getText(source) == metadataField;
+            case ts.SyntaxKind.StringLiteral:
+              return prop.name.text == metadataField;
+          }
+
+          return false;
+        });
     })
     // Get the last node of the array literal.
-    .mergeMap(prop => {
-      const assignment = <ts.PropertyAssignment>prop;
+    .then(matchingProperties => {
+      if (!matchingProperties) {
+        return;
+      }
+      if (matchingProperties.length == 0) {
+        return metadata
+          .toPromise()
+          .then();
+      }
+
+      const assignment = <ts.PropertyAssignment>matchingProperties[0];
 
       // If it's not an array, nothing we can do really.
       if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
         return Observable.empty();
       }
-      return Observable.of(...(<ts.ArrayLiteralExpression>assignment.initializer).elements);
+
+      const arrLiteral = <ts.ArrayLiteralExpression>assignment.initializer;
+      if (arrLiteral.elements.length == 0) {
+        // Forward the property.
+        return arrLiteral;
+      }
+      return arrLiteral.elements;
     })
-    .toPromise()
-    .then((node: ts.Expression) => {
+    .then((node: ts.Node) => {
       if (!node) {
         console.log('No app module found. Please add your new class to your component.');
-        return;
+        return new NoopChange();
       }
-
-      // Get the indentation of the last element, if any.
-      const text = node.getFullText(source);
+      if (Array.isArray(node)) {
+        node = node[node.length - 1];
+      }
 
       let toInsert;
-      if (text.startsWith('\n')) {
-        toInsert = `,${text.match(/^\n(\r?)\s+/)[0]}${classifiedName}`;
+      let position = node.getEnd();
+      if (node.kind == ts.SyntaxKind.ObjectLiteralExpression) {
+        // We haven't found the field in the metadata declaration. Insert a new
+        // field.
+        let expr = <ts.ObjectLiteralExpression>node;
+        node = expr.properties[expr.properties.length - 1];
+        position = node.getEnd();
+        // Get the indentation of the last element, if any.
+        const text = node.getFullText(source);
+        if (text.startsWith('\n')) {
+          toInsert = `,${text.match(/^\n(\r?)\s+/)[0]}${metadataField}: [${symbolName}]`;
+        } else {
+          toInsert = `, ${metadataField}: [${symbolName}]`;
+        }
+      } else if (node.kind == ts.SyntaxKind.ArrayLiteralExpression) {
+        // We found the field but it's empty. Insert it just before the `]`.
+        position--;
+        toInsert = `${symbolName}`;
       } else {
-        toInsert = `, ${classifiedName}`;
+        // Get the indentation of the last element, if any.
+        const text = node.getFullText(source);
+        if (text.startsWith('\n')) {
+          toInsert = `,${text.match(/^\n(\r?)\s+/)[0]}${symbolName}`;
+        } else {
+          toInsert = `, ${symbolName}`;
+        }
       }
 
-      const insert = new InsertChange(modulePath, node.getEnd(), toInsert);
-      const importInsert: Change = insertImport(modulePath, classifiedName, importPath);
+      const insert = new InsertChange(ngModulePath, position, toInsert);
+      const importInsert: Change = insertImport(ngModulePath, symbolName, importPath);
       return new MultiChange([insert, importInsert]);
     });
-  }
+}
+
+/**
+* Custom function to insert a declaration (component, pipe, directive)
+* into NgModule declarations. It also imports the component. 
+*/
+export function addComponentToModule(modulePath: string, classifiedName: string,
+    importPath: string): Promise<Change> {
+
+  return _addSymbolToNgModuleMetadata(modulePath, 'declarations', classifiedName, importPath);
+}
+
+/**
+ * Custom function to insert a provider into NgModule. It also imports it.
+ */
+export function addProviderToModule(modulePath: string, classifiedName: string,
+                                    importPath: string): Promise<Change> {
+  return _addSymbolToNgModuleMetadata(modulePath, 'providers', classifiedName, importPath);
 }
 

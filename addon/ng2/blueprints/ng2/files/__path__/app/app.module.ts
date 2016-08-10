@@ -13,6 +13,7 @@ import { AppComponent } from './app.component';
     CommonModule,
     FormsModule
   ],
+  providers: [],
   entryComponents: [AppComponent],
   bootstrap: [AppComponent]
 })
