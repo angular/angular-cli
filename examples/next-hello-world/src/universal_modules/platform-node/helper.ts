@@ -1,11 +1,3 @@
-import {OpaqueToken} from '@angular/core';
-import {APP_BASE_HREF} from '@angular/common';
-
-export const BASE_URL: OpaqueToken = APP_BASE_HREF;
-export const ORIGIN_URL: OpaqueToken = new OpaqueToken('ORIGIN_URL');
-export const REQUEST_URL: OpaqueToken = new OpaqueToken('REQUEST_URL');
-export const PRIME_CACHE: OpaqueToken = new OpaqueToken('PRIME_CACHE');
-export const COOKIE_KEY: OpaqueToken = new OpaqueToken('COOKIE_KEY');
 
 export function cssHyphenate(propertyName: string): string {
   return propertyName.replace(/([A-Z])/g, '-$1')

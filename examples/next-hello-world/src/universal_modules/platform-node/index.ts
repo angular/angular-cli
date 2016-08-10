@@ -6,3 +6,4 @@ export * from './node-renderer';
 export * from './node-location';
 export * from './node-platform';
 export * from './node-shared-styles-host';
+export * from './tokens';
