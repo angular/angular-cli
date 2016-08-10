@@ -11,6 +11,8 @@ var treeKill = require('tree-kill');
 var child_process = require('child_process');
 var ng = require('../helpers/ng');
 var root = path.join(process.cwd(), 'tmp');
+var InsertChange = require('../../addon/ng2/utilities/change').InsertChange;
+var dependentFilesUtils = require('../../addon/ng2/utilities/get-dependent-files');
 
 function existsSync(path) {
   try {
@@ -241,6 +243,50 @@ describe('Basic end-to-end Workflow', function () {
   });
 
   it('Perform `ng test` after adding a pipe', function () {
+    this.timeout(420000);
+
+    return ng(testArgs).then(function (result) {
+      const exitCode = typeof result === 'object' ? result.exitCode : result;
+      expect(exitCode).to.be.equal(0);
+    });
+  });
+
+  it('Can promote a component file using `ng promote <oldPath> <newPath>`', () => {
+    // Create two new component and then make test-foo depend on test-bar.
+    const fooComponentDir = path.join(process.cwd(), 'src', 'app', 'test-foo');
+    const barComponentDir = path.join(process.cwd(), 'src', 'app', 'test-bar');
+    const testFooFile = path.join(fooComponentDir, 'test-foo.component.ts');
+    const testBarFile = path.join(barComponentDir, 'test-bar.component.ts');
+    const promotionComponentDir = path.join(process.cwd(), 'src', 'app', 'test-promotion');
+    return ng(['generate', 'component', 'test-foo'])
+      .then(() => ng(['generate', 'component', 'test-bar']))
+      .then(() => {
+        // Remove index file to handle base cases only (for now).
+        sh.rm(path.join(fooComponentDir, 'index.ts'));
+        sh.rm(path.join(barComponentDir, 'index.ts'));
+        // Create an empty directory to promote a component into.
+        sh.mkdir(promotionComponentDir);
+        // Insert import statement reflecting the dependence of test-foo on test-bar.
+        let addText = `import { TestBarComponent } from '../test-bar/test-bar.component';\n`;
+        let addChange = new InsertChange(testFooFile, 0, addText);
+        return addChange.apply();
+      })
+      .then(() => ng(['promote', testBarFile, promotionComponentDir]))
+      .then(() => dependentFilesUtils.createTsSourceFile(testFooFile))
+      .then((tsFooFile) => dependentFilesUtils.getImportClauses(tsFooFile))
+      .then((specifiers) => {
+        // Check if the specifiers reflect the change of component unit in application structure.
+        let expectedTestBarContent = path.normalize('../test-promotion/test-bar.component');
+        expect(specifiers[0].specifierText).to.equal(expectedTestBarContent);
+        // Check if all the related files of the promoted component exist in new path.
+        expect(existsSync(path.join(promotionComponentDir, 'test-bar.component.ts'))).to.equal(true);
+        expect(existsSync(path.join(promotionComponentDir, 'test-bar.component.html'))).to.equal(true);
+        expect(existsSync(path.join(promotionComponentDir, 'test-bar.component.css'))).to.equal(true);
+        expect(existsSync(path.join(promotionComponentDir, 'test-bar.component.spec.ts'))).to.equal(true);
+      });
+  });
+
+  it('Perform `ng test` after promoting a compilation unit', function () {
     this.timeout(420000);
 
     return ng(testArgs).then(function (result) {

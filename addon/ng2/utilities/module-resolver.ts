@@ -67,7 +67,7 @@ export class ModuleResolver {
           let tempChanges: ReplaceChange[] = files[file]
             .map(specifier => {
               let componentName = path.basename(this.oldFilePath, '.ts');
-              let fileDir = path.dirname(file);
+              let fileDir = path.dirname(path.normalize(file));
               let changeText = path.relative(fileDir, path.join(this.newFilePath, componentName));
               if (changeText.length > 0 && changeText.charAt(0) !== '.') {
                 changeText = `.${path.sep}${changeText}`;
