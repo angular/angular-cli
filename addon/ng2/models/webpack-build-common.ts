@@ -13,12 +13,6 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
   let outputPath: string = path.resolve(projectRoot, outputDir);
   const lazyModules = findLazyModules(path.resolve(projectRoot, sourceDir));
 
-  const entries = Object.assign({
-    main: [path.join(sourceRoot, 'main.ts')],
-    polyfills: path.join(sourceRoot, 'polyfills.ts')
-  }, lazyModules);
-
-
   return {
     devtool: 'source-map',
     resolve: {
@@ -26,31 +20,15 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       root: path.resolve(projectRoot, `./${sourceDir}`)
     },
     context: path.resolve(__dirname, './'),
-    entry: entries,
+    entry: {
+      main: [path.join(sourceRoot, 'main.ts')],
+      polyfills: path.join(sourceRoot, 'polyfills.ts')
+    },
     output: {
       path: outputPath,
       filename: '[name].bundle.js'
     },
     module: {
-      preLoaders: [
-        {
-          test: /\.js$/,
-          loader: 'source-map-loader',
-          exclude: [
-            path.resolve(projectRoot, 'node_modules/rxjs'),
-            path.resolve(projectRoot, 'node_modules/@angular'),
-          ]
-        },
-        {
-          test: /(systemjs_component_resolver|system_js_ng_module_factory_loader)\.js$/,
-          loader: 'string-replace-loader',
-          query: {
-            search: '(lang_1(.*[\\n\\r]+\\s*\\.|\\.))?(global(.*[\\n\\r]+\\s*\\.|\\.))?(System|SystemJS)(.*[\\n\\r]+\\s*\\.|\\.)import\\(',
-            replace: 'System.import("" + ',
-            flags: 'g'
-          }
-        },
-      ],
       loaders: [
         {
           test: /\.ts$/,
@@ -77,13 +55,14 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       ]
     },
     plugins: [
+      new webpack.ContextReplacementPlugin(/.*/, sourceRoot, lazyModules),
       new atl.ForkCheckerPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(projectRoot, `./${sourceDir}/index.html`),
         chunksSortMode: 'dependency'
       }),
       new webpack.optimize.CommonsChunkPlugin({
-        name: 'polyfills'
+        name: ['polyfills']
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
