@@ -4,7 +4,7 @@ var fs = require('fs');
 
 module.exports = function dynamicPathParser(project, entityName) {
   var projectRoot = project.root;
-  var sourceDir = project.ngConfig.defaults.sourceDir;
+  var sourceDir = project.ngConfig.apps[0].root;
   var appRoot = path.join(sourceDir, 'app');
   var cwd = process.env.PWD;
 

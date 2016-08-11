@@ -22,9 +22,62 @@
       "items": {
         "type": "object",
         "properties": {
-          "main": "string",
-          "tsconfig": "string",
-          "mobile": "boolean"
+          "root": {
+            "type": "string"
+          },
+          "outDir": {
+            "type": "string"
+          },
+          "assets": {
+            "type": "string"
+          },
+          "index": {
+            "type": "string"
+          },
+          "main": {
+            "type": "string"
+          },
+          "test": {
+            "type": "string"
+          },
+          "tsconfig": {
+            "type": "string"
+          },
+          "prefix": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "boolean"
+          },
+          "additionalEntries": {
+            "description": "Additional files to be included in the build.",
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "additionalProperties": false
+          },
+          "environments": {
+            "description": "Name and corresponding file for environment config.",
+            "type": "object",
+            "additionalProperties": true
+          }
         },
         "additionalProperties": false
       },
@@ -81,12 +134,6 @@
     "defaults": {
       "type": "object",
       "properties": {
-        "prefix": {
-          "type": "string"
-        },
-        "sourceDir": {
-          "type": "string"
-        },
         "styleExt": {
           "type": "string"
         },
