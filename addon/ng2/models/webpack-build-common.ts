@@ -5,11 +5,19 @@ import * as webpack from 'webpack';
 import * as atl from 'awesome-typescript-loader';
 import { CliConfig } from './config';
 
-import {SystemJSRegisterPublicModules} from './webpack-plugin-systemjs-registry';
 import {findLazyModules} from './find-lazy-modules';
 
 export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
+  const sourceRoot = path.resolve(projectRoot, `./${sourceDir}`);
+
   let outputPath: string = path.resolve(projectRoot, outputDir);
+  const lazyModules = findLazyModules(path.resolve(projectRoot, sourceDir));
+
+  const entries = Object.assign({
+    main: [path.join(sourceRoot, 'main.ts')],
+    polyfills: path.join(sourceRoot, 'polyfills.ts')
+  }, lazyModules);
+
 
   return {
     devtool: 'source-map',
@@ -29,9 +37,19 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
           test: /\.js$/,
           loader: 'source-map-loader',
           exclude: [
-            /node_modules/
+            path.resolve(projectRoot, 'node_modules/rxjs'),
+            path.resolve(projectRoot, 'node_modules/@angular'),
           ]
-        }
+        },
+        {
+          test: /(systemjs_component_resolver|system_js_ng_module_factory_loader)\.js$/,
+          loader: 'string-replace-loader',
+          query: {
+            search: '(lang_1(.*[\\n\\r]+\\s*\\.|\\.))?(global(.*[\\n\\r]+\\s*\\.|\\.))?(System|SystemJS)(.*[\\n\\r]+\\s*\\.|\\.)import',
+            replace: 'System.import',
+            flags: 'g'
+          }
+        },
       ],
       loaders: [
         {
@@ -78,34 +96,6 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
         from: '**/*',
         to: outputPath
       }]),
-      // new SystemJSRegisterPublicModules({
-      //   // automatically configure SystemJS to load webpack chunks (defaults to true)
-      //   bundlesConfigForChunks: true,
-      //
-      //   // select which modules to expose as public modules
-      //   registerModules: [
-      //     // "default" filters provided are "local" and "public"
-      //     { filter: 'public' },
-      //     //
-      //     // // keyname allows a custom naming system for public modules
-      //     // {
-      //     //   filter: 'local',
-      //     //   keyname: 'app/[relPath]'
-      //     // },
-      //     //
-      //     // // keyname can be a function
-      //     // {
-      //     //   filter: 'public',
-      //     //   keyname: (module) => 'publicModule-' + module.id
-      //     // },
-      //     //
-      //     // // filter can also be a function
-      //     // {
-      //     //   filter: (m) => m.relPath.match(/src/),
-      //     //   keyname: 'random-naming-system-[id]'
-      //     // }
-      //   ]
-      // })
     ],
     node: {
       fs: 'empty',
