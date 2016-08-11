@@ -2,11 +2,13 @@ import * as path from 'path';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as webpack from 'webpack';
-import { ForkCheckerPlugin } from 'awesome-typescript-loader';
+import * as atl from 'awesome-typescript-loader';
 import { CliConfig } from './config';
 
-export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, outputDir: string) {
+import {SystemJSRegisterPublicModules} from './webpack-plugin-systemjs-registry';
+import {findLazyModules} from './find-lazy-modules';
 
+export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
   let outputPath: string = path.resolve(projectRoot, outputDir);
 
   return {
@@ -16,10 +18,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
       root: path.resolve(projectRoot, `./${sourceDir}`)
     },
     context: path.resolve(__dirname, './'),
-    entry: {
-      main: [path.resolve(projectRoot, `./${sourceDir}/main.ts`)],
-      polyfills: path.resolve(projectRoot, `./${sourceDir}/polyfills.ts`)
-    },
+    entry: entries,
     output: {
       path: outputPath,
       filename: '[name].bundle.js'
@@ -44,8 +43,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
                 useForkChecker: true,
                 tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`)
               }
-            },
-            {
+            }, {
               loader: 'angular2-template-loader'
             }
           ],
@@ -61,13 +59,13 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
       ]
     },
     plugins: [
-      new ForkCheckerPlugin(),
+      new atl.ForkCheckerPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(projectRoot, `./${sourceDir}/index.html`),
         chunksSortMode: 'dependency'
       }),
       new webpack.optimize.CommonsChunkPlugin({
-        name: ['polyfills']
+        name: 'polyfills'
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
@@ -79,7 +77,35 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
         context: path.resolve(projectRoot, './public'),
         from: '**/*',
         to: outputPath
-      }])
+      }]),
+      // new SystemJSRegisterPublicModules({
+      //   // automatically configure SystemJS to load webpack chunks (defaults to true)
+      //   bundlesConfigForChunks: true,
+      //
+      //   // select which modules to expose as public modules
+      //   registerModules: [
+      //     // "default" filters provided are "local" and "public"
+      //     { filter: 'public' },
+      //     //
+      //     // // keyname allows a custom naming system for public modules
+      //     // {
+      //     //   filter: 'local',
+      //     //   keyname: 'app/[relPath]'
+      //     // },
+      //     //
+      //     // // keyname can be a function
+      //     // {
+      //     //   filter: 'public',
+      //     //   keyname: (module) => 'publicModule-' + module.id
+      //     // },
+      //     //
+      //     // // filter can also be a function
+      //     // {
+      //     //   filter: (m) => m.relPath.match(/src/),
+      //     //   keyname: 'random-naming-system-[id]'
+      //     // }
+      //   ]
+      // })
     ],
     node: {
       fs: 'empty',
@@ -90,4 +116,4 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
       setImmediate: false
     }
   }
-};
+}
