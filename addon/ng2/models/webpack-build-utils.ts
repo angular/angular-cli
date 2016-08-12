@@ -20,5 +20,5 @@ export const webpackDevServerOutputOptions = {
   timings: true,
   chunks: false,
   chunkModules: false,
-  warning: false
+  warnings: false
 }
