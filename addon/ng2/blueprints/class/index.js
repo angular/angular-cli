@@ -1,6 +1,5 @@
 const stringUtils = require('ember-cli-string-utils');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
-var addBarrelRegistration = require('../../utilities/barrel-management');
 
 module.exports = {
   description: '',
@@ -40,12 +39,5 @@ module.exports = {
         return this.fileName;
       }
     };
-  },
-  
-  afterInstall: function() {
-    return addBarrelRegistration(
-      this, 
-      this.generatePath,
-      this.fileName);
   }
 };
