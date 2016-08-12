@@ -21,7 +21,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, sourceD
       // ~107kb
       new webpack.optimize.UglifyJsPlugin({
         beautify: false, //prod
-        mangle: { screw_ie8 : true }, //prod
+        mangle: { screw_ie8 : true, keep_fnames: true }, //prod
         compress: { screw_ie8: true }, //prod
         comments: false //prod
       }),
