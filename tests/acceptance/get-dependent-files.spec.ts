@@ -16,6 +16,10 @@ describe('Get Dependent Files: ', () => {
         'foo': {
           'foo.component.ts': `import * from '../bar/baz/baz.component'
                                import * from '../bar/bar.component'`,
+          'foo.component.html': '',
+          'foo.component.css': '',
+          'foo.component.spec.ts': '',
+          'foo.ts': '',
           'index.ts': `export * from './foo.component'`
         },
         'bar': {
@@ -24,12 +28,23 @@ describe('Get Dependent Files: ', () => {
             'baz.html': '<h1> Hello </h1>'
           },
           'bar.component.ts': `import * from './baz/baz.component'
-                               import * from '../foo'`
+                               import * from '../foo'`,
+          'bar.component.spec.ts': ''
         },
         'foo-baz': {
-          'no-module.component.ts': ''
+          'no-module.component.ts': '',
+          'no-module.component.spec.ts': 'import * from "../bar/bar.component";'
         },
-        'empty-dir': {}
+        'quux': {
+          'quux.ts': '',
+          'quux.html': '',
+          'quux.css': '',
+          'quux.spec.ts': ''
+        },
+        'noAngular.tag.ts': '',
+        'noAngular.tag.html': '',
+        'noAngular.tag.sass': '',
+        'noAngular.tag.spec.ts': '',
       }
     };
     mockFs(mockDrive);
@@ -102,6 +117,48 @@ describe('Get Dependent Files: ', () => {
     });
   });
 
+  describe('returns an array of all the associated files of a given component unit.', () => {
+    it('when the component name has a special Angular tag(component/pipe/service)', () => {
+      let sourceFile = path.join(rootPath, 'foo/foo.component.ts');
+      return dependentFilesUtils.getAllAssociatedFiles(sourceFile)
+        .then((files: string[]) => {
+          let expectedContents = [
+            'src/app/foo/foo.component.css',
+            'src/app/foo/foo.component.html',
+            'src/app/foo/foo.component.spec.ts',
+            'src/app/foo/foo.component.ts'
+          ];
+        assert.deepEqual(files, expectedContents);
+        });
+    });
+    it('when the component name has non-Angular tag', () => {
+      let sourceFile = path.join(rootPath, 'noAngular.tag.ts');
+      return dependentFilesUtils.getAllAssociatedFiles(sourceFile)
+        .then((files: string[]) => {
+          let expectedContents = [
+            'src/app/noAngular.tag.html',
+            'src/app/noAngular.tag.sass',
+            'src/app/noAngular.tag.spec.ts',
+            'src/app/noAngular.tag.ts'
+            ];
+          assert.deepEqual(files, expectedContents);
+        });
+    });
+    it('when the component name has no tag after the unique file name', () => {
+      let sourceFile = path.join(rootPath, 'quux/quux.ts');
+      return dependentFilesUtils.getAllAssociatedFiles(sourceFile)
+        .then((files: string[]) => {
+          let expectedContents = [
+            'src/app/quux/quux.css',
+            'src/app/quux/quux.html',
+            'src/app/quux/quux.spec.ts',
+            'src/app/quux/quux.ts'
+            ];
+          assert.deepEqual(files, expectedContents);
+        });
+    });
+  });
+
   describe('returns a map of all files which depend on a given file ', () => {
     it('when the given component unit has no index file', () => {
       let sourceFile = path.join(rootPath, 'bar/bar.component.ts');
@@ -109,6 +166,7 @@ describe('Get Dependent Files: ', () => {
         .then((contents: dependentFilesUtils.ModuleMap) => {
           let bazFile = path.join(rootPath, 'bar/baz/baz.component.ts');
           let fooFile = path.join(rootPath, 'foo/foo.component.ts');
+          let noModuleSpecFile = path.join(rootPath, 'foo-baz/no-module.component.spec.ts');
           let expectedContents: dependentFilesUtils.ModuleMap = {};
           expectedContents[bazFile] = [{
               specifierText: '../bar.component',
@@ -119,6 +177,11 @@ describe('Get Dependent Files: ', () => {
             specifierText: '../bar/bar.component',
             pos: 85,
             end: 108
+          }];
+          expectedContents[noModuleSpecFile] = [{
+            specifierText: '../bar/bar.component',
+            pos: 13,
+            end: 36
           }];
           assert.deepEqual(contents, expectedContents);
         });
