@@ -1,13 +1,15 @@
 import * as mockFs from 'mock-fs';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import * as ts from 'typescript';
 import * as fs from 'fs';
 import { InsertChange, RemoveChange } from '../../addon/ng2/utilities/change';
 import * as Promise from 'ember-cli/lib/ext/promise';
 import {
+  getSource,
   findNodes,
   insertAfterLastOccurrence,
-  addComponentToModule
+  addComponentToModule,
+  getExportedSymbols
 } from '../../addon/ng2/utilities/ast-utils';
 
 const readFile = Promise.denodeify(fs.readFile);
@@ -281,7 +283,45 @@ class Module {}`
   });
 });
 
-  /**
+describe('getExportedSymbols', () => {
+  beforeEach(() => {
+    mockFs({
+      'foo.ts': `
+        export class Foo {}
+        export enum B {}
+        export let variableValue = 4;
+        export function fooFunction() {}`,
+      'bar.ts': '',
+      'baz.ts': `
+        export class Baz {}`
+    });
+  });
+  afterEach(() => mockFs.restore());
+
+  it('works there are multiple exported symbols', () => {
+    let tsSourceFile = getSource('foo.ts');
+    let contents =  getExportedSymbols(tsSourceFile);
+    let expectedContents = [
+      'Foo',
+      'B',
+      'variableValue',
+      'fooFunction'
+    ];
+    assert.deepEqual(contents, expectedContents);
+  });
+  it('works there are no exported symbols', () => {
+    let tsSourceFile = getSource('bar.ts');
+    let contents =  getExportedSymbols(tsSourceFile);
+    assert.deepEqual(contents, []);
+  });
+  it('works there are one exported symbol', () => {
+    let tsSourceFile = getSource('baz.ts');
+    let contents =  getExportedSymbols(tsSourceFile);
+    assert.deepEqual(contents, ['Baz']);
+  });
+});
+
+/**
  * Gets node of kind kind from sourceFile
  */
 function getNodesOfKind(kind: ts.SyntaxKind, sourceFile: string) {

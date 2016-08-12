@@ -270,3 +270,31 @@ export function addProviderToModule(modulePath: string, classifiedName: string,
   return _addSymbolToNgModuleMetadata(modulePath, 'providers', classifiedName, importPath);
 }
 
+/** 
+ * Function to get all the symbols from a file that are being exported.
+ * Example: If a file has exported class A and enum B, then the function return [A, B].
+ * 
+ * @param {ts.SourceFile} node
+ * 
+ * @return an array of symbols that are being exported from a TypeScript file.
+ */
+export function getExportedSymbols(node: ts.SourceFile): string[] {
+    return node.statements
+      .filter((node) => node.kind !== ts.SyntaxKind.ImportDeclaration)
+      .filter((node) => node.kind !== ts.SyntaxKind.EmptyStatement)
+      .reduce((allSymbolsArray, node) => {
+        let tempSymbolsArray = [];
+        if (node.kind !== ts.SyntaxKind.VariableStatement) {
+          tempSymbolsArray.push(node.name.getText());
+        } else {
+          tempSymbolsArray = node.getChildren()
+            .filter((node) => node.kind === ts.SyntaxKind.VariableDeclarationList)
+            .reduce((initialArray, node) => {
+              let varDeclarationsArray = node.declarations.map((node) => node.name.getText());
+              return initialArray.concat(varDeclarationsArray);
+            }, []);
+        }
+        return allSymbolsArray.concat(tempSymbolsArray);
+      }, []);
+  }
+
