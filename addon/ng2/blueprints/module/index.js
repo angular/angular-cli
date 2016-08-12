@@ -1,11 +1,12 @@
-const stringUtils = require('ember-cli-string-utils');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+var Blueprint = require('ember-cli/lib/models/blueprint');
+var getFiles = Blueprint.prototype.files;
 
 module.exports = {
   description: '',
-  
-  anonymousOptions: [
-    '<class-type>'
+
+  availableOptions: [
+    { name: 'spec', type: Boolean, default: false }
   ],
   
   normalizeEntityName: function (entityName) {
@@ -16,16 +17,20 @@ module.exports = {
   },
 
   locals: function (options) {
-    var classType = options.args [2]
-    this.fileName = stringUtils.dasherize(options.entity.name);
-    if (classType) {
-      this.fileName += '.' + classType; 
-    }
     return { 
       dynamicPath: this.dynamicPath.dir,
-      flat: options.flat,
-      fileName: this.fileName
+      spec: options.spec
     };
+  },
+
+  files: function() {
+    var fileList = getFiles.call(this);
+
+    if (!this.options || !this.options.spec) {
+      fileList = fileList.filter(p => p.indexOf('__name__.module.spec.ts') < 0);
+    }
+
+    return fileList;
   },
 
   fileMapTokens: function () {
@@ -34,9 +39,6 @@ module.exports = {
       __path__: () => {
         this.generatePath = this.dynamicPath.dir;
         return this.generatePath;
-      },
-      __name__: () => {
-        return this.fileName;
       }
     };
   }

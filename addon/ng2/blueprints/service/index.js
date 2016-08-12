@@ -1,9 +1,5 @@
 var path = require('path');
-var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
-var addBarrelRegistration = require('../../utilities/barrel-management');
-var getFiles = Blueprint.prototype.files;
-const stringUtils = require('ember-cli-string-utils');
 
 module.exports = {
   description: '',
@@ -26,16 +22,6 @@ module.exports = {
     };
   },
 
-  files: function() {
-    var fileList = getFiles.call(this);
-
-    if (this.options && this.options.flat) {
-      fileList = fileList.filter(p => p.indexOf('index.ts') <= 0);
-    }
-
-    return fileList;
-  },
-
   fileMapTokens: function (options) {
     // Return custom template variables here.
     return {
@@ -48,18 +34,5 @@ module.exports = {
         return dir;
       }
     };
-  },
-
-  afterInstall: function(options) {
-    const returns = [];
-    const fileName = stringUtils.dasherize(`${options.entity.name}.service`);
-
-    if (!options.flat) {
-      returns.push(addBarrelRegistration(this, this.generatePath));
-    } else {
-      returns.push(addBarrelRegistration(this, this.generatePath, fileName));
-    }
-
-    return Promise.all(returns);
   }
 };
