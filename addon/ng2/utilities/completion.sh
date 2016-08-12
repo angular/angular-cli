@@ -1,4 +1,4 @@
-###-begin-ng-completion### 
+###-begin-ng-completion###
 #
 # ng command completion script
 #
@@ -9,8 +9,7 @@ ng_opts='new init build serve generate autocomplete e2e lint test version'
 init_opts='--dry-run --verbose --blueprint --skip-npm --skip-bower --name'
 new_opts='--dry-run --verbose --blueprint --skip-npm --skip-bower --skip-git --directory'
 build_opts='--environment --output-path --watch --watcher'
-serve_opts='--port --host --proxy --insecure-proxy --watcher --live-reload --live-reload-host
-            --live-reload-port --environment --output-path --ssl --ssl-key --ssl-cert'
+serve_opts='--port --host --proxy --insecure-proxy --watcher --live-reload --live-reload-host --live-reload-port --environment --output-path --ssl --ssl-key --ssl-cert'
 generate_opts='component directive pipe route service'
 test_opts='--watch --browsers --colors --log-level --port --reporters'
 
@@ -53,7 +52,7 @@ elif type compctl &>/dev/null; then
       g|generate) opts=$generate_opts ;;
       test) opts=$test_opts ;;
     esac
-    
+
     setopt shwordsplit
     reply=($opts)
     unset shwordsplit
