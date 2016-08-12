@@ -12,6 +12,9 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       extensions: ['', '.ts', '.js'],
       root: path.resolve(projectRoot, `./${sourceDir}`)
     },
+    resolveLoader: {
+      modules: [path.resolve(__dirname, '../../../node_modules')],
+    },
     context: path.resolve(__dirname, './'),
     entry: {
       main: [path.resolve(projectRoot, `./${sourceDir}/main.ts`)],
