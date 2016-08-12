@@ -289,6 +289,12 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(coverageReport)).to.be.equal(true);
   });
 
+  it('Make sure that LCOV file is generated inside coverage folder', function() {
+    const lcovReport = path.join(process.cwd(), 'coverage', 'coverage.lcov');
+
+    expect(existsSync(lcovReport)).to.be.equal(true);
+  });
+
   it('moves all files that live inside `public` into `dist`', function () {
     this.timeout(420000);
 
@@ -375,8 +381,8 @@ describe('Basic end-to-end Workflow', function () {
     let lessFile = path.join(componentPath, lessFilename);
     let lessExample = '.outer {\n  .inner { background: #fff; }\n }';
     let componentContents = fs.readFileSync(componentFile, 'utf8');
-    
-    sh.mv(cssFile, lessFile);      
+
+    sh.mv(cssFile, lessFile);
     fs.writeFileSync(lessFile, lessExample, 'utf8');
     fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), lessFilename), 'utf8');
 
@@ -402,8 +408,8 @@ describe('Basic end-to-end Workflow', function () {
     let stylusFile = path.join(componentPath, stylusFilename);
     let stylusExample = '.outer {\n  .inner { background: #fff; }\n }';
     let componentContents = fs.readFileSync(componentFile, 'utf8');
-    
-    sh.mv(cssFile, stylusFile);      
+
+    sh.mv(cssFile, stylusFile);
     fs.writeFileSync(stylusFile, stylusExample, 'utf8');
     fs.writeFileSync(componentFile, componentContents.replace(new RegExp(cssFilename, 'g'), stylusFilename), 'utf8');
 
