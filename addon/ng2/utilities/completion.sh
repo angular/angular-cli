@@ -64,7 +64,6 @@ elif type compctl &>/dev/null; then
       addon) opts=$addon_opts ;;
       asset-sizes) opts=$asset_sizes_opts ;;
       b|build) opts=$build_opts ;;
-      completion|e2e|i|install|lint|make-this-awesome) opts='' ;;
       d|destroy) opts=$destroy_opts ;;
       g|generate) opts=$generate_opts ;;
       h|help|-h|--help) opts=$help_opts ;;
