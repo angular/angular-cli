@@ -292,6 +292,12 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(coverageReport)).to.be.equal(true);
   });
 
+  it('Make sure that LCOV file is generated inside coverage folder', function() {
+    const lcovReport = path.join(process.cwd(), 'coverage', 'coverage.lcov');
+
+    expect(existsSync(lcovReport)).to.be.equal(true);
+  });
+
   it('moves all files that live inside `public` into `dist`', function () {
     this.timeout(420000);
 

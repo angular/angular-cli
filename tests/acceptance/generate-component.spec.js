@@ -176,8 +176,8 @@ describe('Acceptance: ng generate component', function () {
     });
   });
 
-  it('my-comp --nospec', function() {
-    return ng(['generate', 'component', 'my-comp', '--nospec']).then(() => {
+  it('my-comp --no-spec', function() {
+    return ng(['generate', 'component', 'my-comp', '--no-spec']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.component.spec.ts');
       expect(existsSync(testPath)).to.equal(false);
     });

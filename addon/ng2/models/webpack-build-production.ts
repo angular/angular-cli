@@ -15,13 +15,24 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, sourceD
       sourceMapFilename: '[name].[chunkhash].bundle.map',
       chunkFilename: '[id].[chunkhash].chunk.js'
     },
+    module: {
+      preLoaders: [
+        {
+          test: /\.js$/,
+          loader: 'source-map-loader',
+          exclude: [
+            /node_modules/ // don't pull in vendor sourcemaps for production builds, increased speed for build
+          ]
+        }
+      ]
+    },
     plugins: [
       new WebpackMd5Hash(),
       new webpack.optimize.DedupePlugin(),
       // ~107kb
       new webpack.optimize.UglifyJsPlugin({
         beautify: false, //prod
-        mangle: { screw_ie8 : true }, //prod
+        mangle: { screw_ie8 : true, keep_fnames: true }, //prod
         compress: { screw_ie8: true }, //prod
         comments: false //prod
       }),
