@@ -19,5 +19,6 @@ export const webpackDevServerOutputOptions = {
   hash: true,
   timings: true,
   chunks: false,
-  chunkModules: false
+  chunkModules: false,
+  warnings: false
 }

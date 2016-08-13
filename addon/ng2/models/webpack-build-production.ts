@@ -15,6 +15,17 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, sourceD
       sourceMapFilename: '[name].[chunkhash].bundle.map',
       chunkFilename: '[id].[chunkhash].chunk.js'
     },
+    module: {
+      preLoaders: [
+        {
+          test: /\.js$/,
+          loader: 'source-map-loader',
+          exclude: [
+            /node_modules/ // don't pull in vendor sourcemaps for production builds, increased speed for build
+          ]
+        }
+      ]
+    },
     plugins: [
       new WebpackMd5Hash(),
       new webpack.optimize.DedupePlugin(),
