@@ -11,6 +11,14 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, sourceDi
       sourceMapFilename: '[name].map',
       chunkFilename: '[id].chunk.js'
     },
+    module: {
+      preLoaders: [
+        {
+          test: /\.js$/,
+          loader: 'source-map-loader'
+        }
+      ]
+    },
     tslint: {
       emitErrors: false,
       failOnHint: false,
