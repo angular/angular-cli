@@ -12,6 +12,9 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       extensions: ['', '.ts', '.js'],
       root: path.resolve(projectRoot, `./${sourceDir}`)
     },
+    resolveLoader: {
+      modules: [path.resolve(__dirname, '../../../node_modules')],
+    },
     context: path.resolve(__dirname, './'),
     entry: {
       main: [path.resolve(projectRoot, `./${sourceDir}/main.ts`)],
@@ -44,7 +47,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
         { test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
         { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
         { test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
-        { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000'},
+        { test: /\.(svg|gif|jpg|jpeg|png)$/, loader: 'url-loader?limit=128000'},
         { test: /\.html$/, loader: 'raw-loader' }
       ]
     },
