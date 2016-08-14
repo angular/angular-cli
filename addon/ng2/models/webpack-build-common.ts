@@ -4,8 +4,9 @@ import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as webpack from 'webpack';
 import { ForkCheckerPlugin } from 'awesome-typescript-loader';
 import { CliConfig } from './config';
+import {HandlebarsWebpackPlugin} from '../utilities/handlebars-webpack-plugin';
 
-export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
+export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, environment: any) {
   return {
     devtool: 'source-map',
     resolve: {
@@ -53,6 +54,10 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       new HtmlWebpackPlugin({
         template: path.resolve(projectRoot, `./${sourceDir}/index.html`),
         chunksSortMode: 'dependency'
+      }),
+      new HandlebarsWebpackPlugin({
+        assetName: 'index.html',
+        data: environment,
       }),
       new webpack.optimize.CommonsChunkPlugin({
         name: ['polyfills']
