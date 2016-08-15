@@ -22,6 +22,8 @@ We're updating the build system in Angular-CLI to use webpack instead of Broccol
 
 You can install and update your projects using [these instructions](https://github.com/angular/angular-cli/blob/master/WEBPACK_UPDATE.md).
 
+**The current instructions on this file reflect usage for the `webpack` version.**
+
 ## Prerequisites
 
 The generated project has dependencies that require **Node 4 or greater**.
