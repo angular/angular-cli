@@ -28,7 +28,7 @@ module.exports = Task.extend({
     }));
 
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
-      contentBase: path.resolve(this.project.root, `./${CliConfig.fromProject().defaults.sourceDir}`),
+      contentBase: config.output.path,
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
       inline: true
