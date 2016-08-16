@@ -54,6 +54,7 @@ Here is a summary of the file changes:
 
 Lastly, you can delete these files as they are not needed anymore.
   * `./config/karma-test-shim.js`
+  * `./config/environment.js`
   * `./src/system-config.ts`
   * `./angular-cli-build.js`
   * `./typings.json`

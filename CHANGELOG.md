@@ -1,3 +1,21 @@
+<a name="1.0.0-beta.11-webpack.2"></a>
+# [1.0.0-beta.11-webpack.2](https://github.com/angular/angular-cli/compare/v1.0.0-beta.10-webpack...v1.0.0-beta.11-webpack.2) (2016-08-10)
+
+
+### Bug Fixes
+
+* **webpack-copy:** copies files from public/ directory to dist/ and preserves references ([b11bc94](https://github.com/angular/angular-cli/commit/b11bc94))
+* Set fs building/polyfill empty for better package support ([#1599](https://github.com/angular/angular-cli/issues/1599)) ([560ae8f](https://github.com/angular/angular-cli/commit/560ae8f))
+* Updated webpack-karma which has proper peer deps settings ([#1597](https://github.com/angular/angular-cli/issues/1597)) ([ace720b](https://github.com/angular/angular-cli/commit/ace720b))
+
+
+### Features
+
+* add utility functions for route generation ([#1330](https://github.com/angular/angular-cli/issues/1330)) ([4fd8e9c](https://github.com/angular/angular-cli/commit/4fd8e9c))
+* ngmodules and insert components based on the AST ([#1616](https://github.com/angular/angular-cli/issues/1616)) ([5bcb7be](https://github.com/angular/angular-cli/commit/5bcb7be))
+
+
+
 <a name="1.0.0-beta.11-webpack"></a>
 # [1.0.0-beta.11-webpack](https://github.com/angular/angular-cli/compare/v1.0.0-beta.10...v1.0.0-beta.11-webpack) (2016-08-02)
 

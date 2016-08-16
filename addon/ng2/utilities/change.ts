@@ -22,6 +22,58 @@ export interface Change {
   description: string;
 }
 
+
+/**
+ * An operation that does nothing.
+ */
+export class NoopChange implements Change {
+  get description() { return 'No operation.'; }
+  get order() { return Infinity; }
+  get path() { return null; }
+  apply() { return Promise.resolve(); }
+}
+
+/**
+ * An operation that mixes two or more changes, and merge them (in order).
+ * Can only apply to a single file. Use a ChangeManager to apply changes to multiple
+ * files.
+ */
+export class MultiChange implements Change {
+  private _path: string;
+  private _changes: Change[];
+
+  constructor(...changes: Array<Change[], Change>) {
+    this._changes = [];
+    [].concat(...changes).forEach(change => this.appendChange(change));
+  }
+
+  appendChange(change: Change) {
+    // Validate that the path is the same for everyone of those.
+    if (this._path === undefined) {
+      this._path = change.path;
+    } else if (change.path !== this._path) {
+      throw new Error('Cannot apply a change to a different path.');
+    }
+    this._changes.push(change);
+  }
+
+  get description() {
+    return `Changes:\n   ${this._changes.map(x => x.description).join('\n   ')}`;
+  }
+  // Always apply as early as the highest change.
+  get order() { return Math.max(...this._changes); }
+  get path() { return this._path; }
+
+  apply() {
+    return this._changes
+      .sort((a: Change, b: Change) => b.order - a.order)
+      .reduce((promise, change) => {
+        return promise.then(() => change.apply())
+      }, Promise.resolve());
+  }
+}
+
+
 /**
  * Will add text to the source code.
  */

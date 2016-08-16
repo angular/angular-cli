@@ -1,4 +1,3 @@
-/*eslint-disable no-console */
 'use strict';
 
 var fs = require('fs-extra');
@@ -11,6 +10,10 @@ var root = process.cwd();
 var conf = require('ember-cli/tests/helpers/conf');
 var Promise = require('ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
+const denodeify = require('denodeify');
+
+const readFile = denodeify(fs.readFile);
+
 
 describe('Acceptance: ng generate service', function () {
   before(conf.setup);
@@ -32,10 +35,17 @@ describe('Acceptance: ng generate service', function () {
   });
 
   it('ng generate service my-svc', function () {
-    return ng(['generate', 'service', 'my-svc']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-svc.service.ts');
-      expect(existsSync(testPath)).to.equal(true);
-    });
+    const appRoot = path.join(root, 'tmp/foo');
+    const testPath = path.join(appRoot, 'src/app/my-svc.service.ts');
+    const appModulePath = path.join(appRoot, 'src/app/app.module.ts');
+
+    return ng(['generate', 'service', 'my-svc'])
+      .then(() => expect(existsSync(testPath)).to.equal(true))
+      .then(() => readFile(appModulePath, 'utf-8'))
+      .then(content => {
+        expect(content).not.to.matches(/import.*\MySvcService\b.*from '.\/my-svc.service';/);
+        expect(content).not.to.matches(/providers:\s*\[MySvcService\]/m);
+      });
   });
 
   it('ng generate service test' + path.sep + 'my-svc', function () {
@@ -68,7 +78,7 @@ describe('Acceptance: ng generate service', function () {
       .then(() => {
         var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-svc.service.ts');
         expect(existsSync(testPath)).to.equal(true);
-      }, err => console.log('ERR: ', err));
+      });
   });
 
   it('ng generate service child-dir' + path.sep + 'my-svc from a child dir', () => {
@@ -87,7 +97,7 @@ describe('Acceptance: ng generate service', function () {
         var testPath = path.join(
           root, 'tmp', 'foo', 'src', 'app', '1', 'child-dir', 'my-svc.service.ts');
         expect(existsSync(testPath)).to.equal(true);
-      }, err => console.log('ERR: ', err));
+      });
   });
 
   it('ng generate service child-dir' + path.sep + '..' + path.sep + 'my-svc from a child dir',
@@ -108,7 +118,7 @@ describe('Acceptance: ng generate service', function () {
           var testPath =
             path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-svc.service.ts');
           expect(existsSync(testPath)).to.equal(true);
-        }, err => console.log('ERR: ', err));
+        });
     });
 
   it('ng generate service ' + path.sep + 'my-svc from a child dir, gens under ' +
@@ -128,7 +138,7 @@ describe('Acceptance: ng generate service', function () {
         .then(() => {
           var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-svc.service.ts');
           expect(existsSync(testPath)).to.equal(true);
-        }, err => console.log('ERR: ', err));
+        });
     });
 
   it('ng generate service ..' + path.sep + 'my-svc from root dir will fail', () => {
