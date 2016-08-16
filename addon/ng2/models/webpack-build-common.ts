@@ -7,7 +7,7 @@ import { CliConfig } from './config';
 
 export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
   return {
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
       root: path.resolve(projectRoot, `./${sourceDir}`)
@@ -22,16 +22,6 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       filename: '[name].bundle.js'
     },
     module: {
-      preLoaders: [
-        {
-          test: /\.js$/,
-          loader: 'source-map-loader',
-          exclude: [
-            path.resolve(projectRoot, 'node_modules/rxjs'),
-            path.resolve(projectRoot, 'node_modules/@angular'),
-          ]
-        }
-      ],
       loaders: [
         {
           test: /\.ts$/,

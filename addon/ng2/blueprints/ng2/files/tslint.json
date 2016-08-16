@@ -93,6 +93,8 @@
       "check-type"
     ],
 
+    "directive-selector-prefix": [true, "<%= prefix %>"],
+    "component-selector-prefix": [true, "<%= prefix %>"],
     "directive-selector-name": [true, "camelCase"],
     "component-selector-name": [true, "kebab-case"],
     "directive-selector-type": [true, "attribute"],

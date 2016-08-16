@@ -1,8 +1,5 @@
 var path = require('path');
-var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
-var addBarrelRegistration = require('../../utilities/barrel-management');
-var getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 
@@ -27,16 +24,6 @@ module.exports = {
       flat: options.flat,
       rawEntityName: this.rawEntityName
     };
-  },
-
-  files: function() {
-    var fileList = getFiles.call(this);
-
-    if (this.options && this.options.flat) {
-      fileList = fileList.filter(p => p.indexOf('index.ts') <= 0);
-    }
-
-    return fileList;
   },
 
   fileMapTokens: function (options) {
@@ -64,12 +51,6 @@ module.exports = {
     const fileName = stringUtils.dasherize(`${options.entity.name}.directive`);
     const componentDir = path.relative(this.dynamicPath.appRoot, this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
-
-    if (!options.flat) {
-      returns.push(addBarrelRegistration(this, componentDir));
-    } else {
-      returns.push(addBarrelRegistration(this, componentDir, fileName));
-    }
 
     if (!options['skip-import']) {
       returns.push(
