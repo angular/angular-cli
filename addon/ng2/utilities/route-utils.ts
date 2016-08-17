@@ -70,6 +70,9 @@ export function bootstrapItem(mainFile, imports: {[key: string]: [string, boolea
 
 export function insertImport(fileToEdit: string, symbolName: string,
                                   fileName: string, isDefault = false): Change {
+        
+  fileName = fileName.replace(/\\/, '/'); // correction in windows           
+  
   let rootNode = getRootNode(fileToEdit);
   let allImports = findNodes(rootNode, ts.SyntaxKind.ImportDeclaration);
 
