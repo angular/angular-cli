@@ -147,6 +147,18 @@ describe('Basic end-to-end Workflow', function () {
       });
   });
 
+  it('Build pack output files into a different folder', function () {
+    this.timeout(420000);
+
+    return ng(['build', '-o', './build-output'])
+      .catch(() => {
+        throw new Error('Build failed.');
+      })
+      .then(function () {
+        expect(existsSync(path.join(process.cwd(), './build-output'))).to.be.equal(true);
+      });
+  });
+
   it_mobile('Does not include mobile prod features', () => {
     let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
     // Service Worker

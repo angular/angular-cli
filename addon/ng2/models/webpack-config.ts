@@ -23,17 +23,17 @@ export class NgCliWebpackConfig {
   private webpackMobileConfigPartial: any;
   private webpackMobileProdConfigPartial: any;
 
-  constructor(public ngCliProject: any, public target: string, public environment: string) {
+  constructor(public ngCliProject: any, public target: string, public environment: string, outputDir: string) {
     const sourceDir = CliConfig.fromProject().defaults.sourceDir;
 
     const environmentPath = `./${sourceDir}/app/environments/environment.${environment}.ts`;
 
-    this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, sourceDir);
-    this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, sourceDir);
-    this.webpackProdConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, sourceDir);
+    this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, sourceDir, outputDir);
+    this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, sourceDir, outputDir);
+    this.webpackProdConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, sourceDir, outputDir);
 
     if (CliConfig.fromProject().apps[0].mobile){
-      this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, sourceDir);
+      this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, sourceDir, outputDir);
       this.webpackMobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root, sourceDir);
       this.webpackBaseConfig = webpackMerge(this.webpackBaseConfig, this.webpackMobileConfigPartial);
       this.webpackProdConfigPartial = webpackMerge(this.webpackProdConfigPartial, this.webpackMobileProdConfigPartial);
