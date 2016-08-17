@@ -7,7 +7,6 @@ import { CliConfig } from './config';
 
 export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
   return {
-    bail: true,
     devtool: 'source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
