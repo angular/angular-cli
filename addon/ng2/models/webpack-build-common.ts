@@ -7,6 +7,7 @@ import { CliConfig } from './config';
 
 export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
   return {
+    bail: true,
     devtool: 'source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
@@ -22,6 +23,15 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       filename: '[name].bundle.js'
     },
     module: {
+      preLoaders: [
+        {
+          test: /\.js$/,
+          loader: 'source-map-loader',
+          exclude: [
+            /node_modules/
+          ]
+        }
+      ],
       loaders: [
         {
           test: /\.ts$/,

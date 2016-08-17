@@ -8,6 +8,11 @@ import { webpackDevServerOutputOptions } from '../models/';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
+var heapdump = require('heapdump');
+
+heapdump.writeSnapshot(Date.now() + '-initial.heapsnapshot', function(err, filename) {
+  console.log('HEAPSHOT DUMP!!!!!', filename);
+});
 
 module.exports = Task.extend({
   run: function(commandOptions: ServeTaskOptions) {
@@ -38,6 +43,10 @@ module.exports = Task.extend({
 
     return new Promise((resolve, reject) => {
       server.listen(commandOptions.port, `${commandOptions.host}`, function(err, stats) {
+        heapdump.writeSnapshot(Date.now() + '.heapsnapshot', function(err, filename) {
+          console.log('HEAPSHOT DUMP!!!!!', filename);
+        });
+
         if(err) {
           lastHash = null;
           console.error(err.stack || err);
