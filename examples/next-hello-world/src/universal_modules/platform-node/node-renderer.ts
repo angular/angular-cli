@@ -1,5 +1,4 @@
 import {
-  provide,
   Inject,
   Injectable,
   Renderer,
