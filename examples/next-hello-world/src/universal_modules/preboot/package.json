@@ -1,4 +1,0 @@
-{
-  "main": "src/node/preboot_node.ts",
-  "browser": "src/browser/preboot_browser.ts"
-}
