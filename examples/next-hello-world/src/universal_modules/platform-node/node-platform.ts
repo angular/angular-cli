@@ -101,11 +101,24 @@ export class NodePlatform implements PlatformRef {
     this._platformRef = __PLATFORM_REF || (__PLATFORM_REF = platformRef);
   }
 
+
   serializeModule<T>(moduleType: any, config: any = {}) {
+    // TODO(gdi2290): make stateless. allow for many instances of modules
+    const lifecycle = new WeakMap<string, any>();
+
     return this.platformRef.bootstrapModule<T>(moduleType, config.compilerOptions)
       .then((moduleRef: NgModuleRef<T>) => {
         let document = moduleRef.injector.get(DOCUMENT);
         let appRef = moduleRef.injector.get(ApplicationRef);
+        let modInjector = moduleRef.injector;
+        let instance: any = moduleRef.instance;
+        lifecycle.set('ngOnInit', instance.ngOnInit || NodePlatform._noop);
+        lifecycle.set('ngDoCheck', instance.ngDoCheck || NodePlatform._noop);
+        lifecycle.set('ngOnStable', instance.ngOnStable || NodePlatform._noop);
+        lifecycle.set('ngOnRendered', instance.ngOnRendered || NodePlatform._noop);
+        return moduleRef;
+      })
+      .then((moduleRef: NgModuleRef<T>) => {
 
         let _appId = moduleRef.injector.get(APP_ID, null);
         let appId = moduleRef.injector.get(NODE_APP_ID, _appId);

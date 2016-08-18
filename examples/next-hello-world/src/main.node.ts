@@ -34,12 +34,25 @@ export function main(document) {
     providers: [
     ]
   })
-  class MainModule {}
+  class MainModule {
+    ngOnInit() {
+      console.log('ngOnInit');
+    }
+    ngDoCheck() {
+      console.log('ngDoCheck');
+    }
+    ngOnStable() {
+      console.log('ngOnStable');
+    }
+    ngOnRendered() {
+      console.log('ngOnRendered');
+    }
+  }
 
   return platform
     .serializeModule(MainModule)
     .then((html) => {
-      console.log('done')
+      console.log('done\n'+ html)
       return html
     });
 };
