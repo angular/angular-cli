@@ -56,6 +56,7 @@
     "@angular/platform-browser": "github:angular/platform-browser-builds",
     "@angular/platform-browser-dynamic": "github:angular/platform-browser-dynamic-builds",
     "@angular/platform-server": "github:angular/platform-server-builds",
+    "preboot": "^4.5.1",
     "core-js": "^2.4.0",
     "express": "^4.14.0",
     "ie-shim": "^0.1.0",

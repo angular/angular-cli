@@ -49,10 +49,12 @@ import {
   CommonModule,
   PlatformLocation
 } from '@angular/common';
+import { getInlineCode } from 'preboot';
+
 
 
 import { NodePlatformLocation } from './node-location';
-import { parseDocument, serializeDocument } from './node-document';
+import { parseFragment, parseDocument, serializeDocument } from './node-document';
 import { NodeDomRootRenderer_ } from './node-renderer';
 import { NodeSharedStylesHost } from './node-shared-styles-host';
 
@@ -121,6 +123,29 @@ export class NodePlatform implements PlatformRef {
         let _appId = moduleRef.injector.get(APP_ID, null);
         let appId = moduleRef.injector.get(NODE_APP_ID, _appId);
       .then((moduleRef: NgModuleRef<T>) => {
+        // parseFragment used
+        // getInlineCode used
+        let _config = config;
+        let modInjector = moduleRef.injector;
+        let appRef: ApplicationRef = modInjector.get(ApplicationRef);
+        let components = appRef.components;
+        let prebootCode = getInlineCode(_config.preboot);
+        let DOM = getDOM();
+
+        // assume last component is the last component selector
+        // TODO(gdi2290): provide a better way to determine last component position
+        let lastRef = components[components.length - 1];
+        let el = lastRef.location.nativeElement;
+        let script = parseFragment(prebootCode);
+        let prebootEl = DOM.createElement('div');
+
+        // inject preboot code in the document
+        DOM.setInnerHTML(prebootEl, script);
+        DOM.insertAfter(el, prebootEl);
+
+        return moduleRef
+      })
+      .then((moduleRef: NgModuleRef<T>) => {
         let injector = moduleRef.injector;
         let document = injector.get(DOCUMENT);
         let appRef = injector.get(ApplicationRef);
@@ -145,6 +170,10 @@ export class NodePlatform implements PlatformRef {
           .replace(new RegExp(_appId, 'gi'), appId)
       });
   }
+
+
+
+
 
 
   // PlatformRef api
