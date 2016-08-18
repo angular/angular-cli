@@ -96,7 +96,7 @@
     "opn": "^3.0.2",
     "optimist": "^0.6.1",
     "parse5": "^1.5.0",
-    "preboot": "2.1.2",
+    "preboot": "4.5.1",
     "reflect-metadata": "0.1.2",
     "rimraf": "^2.5.2",
     "run-sequence": "^1.1.2",
