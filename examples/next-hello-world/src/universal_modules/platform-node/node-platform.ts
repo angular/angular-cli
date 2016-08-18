@@ -40,15 +40,17 @@ import {
   ComponentRef,
   ApplicationRef,
   PlatformRef,
-  NgModuleRef
+  NgModuleRef,
+  NgZone
 } from '@angular/core';
 
 import { PlatformRef_ } from '@angular/core/src/application_ref';
 
-import {
-  CommonModule,
-  PlatformLocation
-} from '@angular/common';
+import { CommonModule, PlatformLocation } from '@angular/common';
+
+
+// TODO(gdi2290): allow removal of modules that are not used for AoT
+import { Jsonp, Http } from '@angular/http';
 import { getInlineCode } from 'preboot';
 
 
@@ -120,8 +122,52 @@ export class NodePlatform implements PlatformRef {
       })
       .then((moduleRef: NgModuleRef<T>) => {
 
-        let _appId = moduleRef.injector.get(APP_ID, null);
-        let appId = moduleRef.injector.get(NODE_APP_ID, _appId);
+        let _config = config;
+        let modInjector = moduleRef.injector;
+        let appRef = modInjector.get(ApplicationRef);
+        let components = appRef.components;
+        let rootNgZone = modInjector.get(NgZone);
+
+        // lifecycle hooks
+        let ngDoCheck = lifecycle.get('ngDoCheck');
+
+        function outsideNg(compRef, ngZone, config, http, jsonp) {
+          function checkStable(done, ref) {
+            setTimeout(function stable() {
+              if (ngZone.hasPendingMicrotasks === true) { return checkStable(done, ref); }
+              if (ngZone.hasPendingMacrotasks === true) { return checkStable(done, ref); }
+              if (http && http._async > 0) { return checkStable(done, ref); }
+              if (jsonp && jsonp._async > 0) { return checkStable(done, ref); }
+              if (ngZone.isStable === true) {
+                let isStable = ngDoCheck(ref, ngZone, config);
+                if (typeof isStable !== 'boolean') {
+                  console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
+                } else if (isStable !== true) {
+                  return checkStable(done, ref);
+                }
+              }
+              if (ngZone.isStable === true) { return done(ref); }
+              return checkStable(done, ref);
+            }, 1);
+          }
+          return new Promise(function (resolve) {
+            checkStable(resolve, compRef);
+          }); // promise
+        }
+
+        // check if all components are stable
+        let stableComponents = components.map((compRef, i) => {
+          // _config used
+          let cmpInjector = compRef.injector;
+          let ngZone: NgZone = cmpInjector.get(NgZone);
+          // TODO(gdi2290): remove when zone.js tracks http and https
+          let http = cmpInjector.get(Http);
+          let jsonp = cmpInjector.get(Jsonp);
+          ngZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, _config, http, jsonp));
+        })
+        return Promise.all<Promise<ComponentRef<any>>>(stableComponents)
+          .then(() => moduleRef);
+      })
       .then((moduleRef: NgModuleRef<T>) => {
         // parseFragment used
         // getInlineCode used
