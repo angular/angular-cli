@@ -39,6 +39,7 @@ import { isPresent, isSuccess } from './helper';
 const JSONP_ERR_WRONG_METHOD = 'JSONP requests must use GET request method.';
 
 
+declare var Zone: any;
 
 export class NodeJSONPConnection {
   public readyState: ReadyState;
@@ -78,48 +79,47 @@ export class NodeJSONPConnection {
 
     this.response = new Observable(responseObserver => {
       let nodeReq;
-      ngZone.run(() => {
-        // http or https
-        let xhrHttp: any = http;
-        if (_reqInfo.protocol === 'https:') {
-          xhrHttp = https;
-        }
+      // http or https
+      let xhrHttp: any = http;
+      function DONE(response) {
+        responseObserver.next(response);
+        responseObserver.complete();
+      }
+      var __done = Zone.current.wrap(DONE, 'jsonp');
 
-        nodeReq = xhrHttp.request(_reqInfo, (res: http.IncomingMessage) => {
-          let body = '';
-          res.on('data', (chunk) => body += chunk);
+      if (_reqInfo.protocol === 'https:') {
+        xhrHttp = https;
+      }
 
-          let status = res.statusCode;
-          let headers = new Headers(res.headers);
-          let url = res.url;
+      nodeReq = xhrHttp.request(_reqInfo, (res: http.IncomingMessage) => {
+        let body = '';
+        res.on('data', (chunk) => body += chunk);
 
-          res.on('end', () => {
-            var responseJson;
-            try {
-              var responseFactory = new Function('JSON_CALLBACK', body);
-              responseFactory(json => {
-                responseJson = json;
-              });
-            } catch (e) {
-              console.log('JSONP Error:', e);
-              throw e;
-            }
+        let status = res.statusCode;
+        let headers = new Headers(res.headers);
+        let url = res.url;
 
-            let responseOptions = new ResponseOptions({body: responseJson, status, headers, url});
-            let response = new Response(responseOptions);
-
-            if (isSuccess(status)) {
-              ngZone.run(() => {
-                responseObserver.next(response);
-              });
-              ngZone.run(() => {
-                responseObserver.complete();
-              });
-              return;
-            }
-            ngZone.run(() => {
-              responseObserver.error(response);
+        res.on('end', () => {
+          var responseJson;
+          try {
+            var responseFactory = new Function('JSON_CALLBACK', body);
+            responseFactory(json => {
+              responseJson = json;
             });
+          } catch (e) {
+            console.log('JSONP Error:', e);
+            throw e;
+          }
+
+          let responseOptions = new ResponseOptions({body: responseJson, status, headers, url});
+          let response = new Response(responseOptions);
+
+          if (isSuccess(status)) {
+            __done(response)
+            return;
+          }
+          ngZone.run(() => {
+            responseObserver.error(response);
           });
         });
       });
@@ -136,7 +136,7 @@ export class NodeJSONPConnection {
 
       nodeReq.on('error', onError);
 
-      nodeReq.write(req.text());
+      // nodeReq.write(req.text());
       nodeReq.end();
 
       return () => {
