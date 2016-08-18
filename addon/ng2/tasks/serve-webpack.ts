@@ -38,7 +38,6 @@ module.exports = Task.extend({
 
     return new Promise((resolve, reject) => {
       server.listen(commandOptions.port, `${commandOptions.host}`, function(err, stats) {
-
         if(err) {
           lastHash = null;
           console.error(err.stack || err);
