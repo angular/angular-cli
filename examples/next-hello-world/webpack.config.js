@@ -3,6 +3,7 @@ var path = require('path');
 var clone = require('js.clone');
 
 var UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+var ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 var TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
@@ -19,12 +20,16 @@ var sharedPlugins = [
   //   },
   //   comments: true,
   // }),
+  new ContextReplacementPlugin(
+    // The (\\|\/) piece accounts for path separators in *nix and Windows
+    /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
+    root('./src')
+  ),
   new TsConfigPathsPlugin({
     tsconfig: 'tsconfig.json'
   }),
   new ForkCheckerPlugin()
 ];
-
 var webpackConfig = setTypeScriptAlias(require('./tsconfig.json'), {
   cache: true,
 
@@ -36,6 +41,28 @@ var webpackConfig = setTypeScriptAlias(require('./tsconfig.json'), {
   },
 
   module: {
+    preLoaders: [
+      // fix angular2
+      {
+        test: /(systemjs_component_resolver|system_js_ng_module_factory_loader)\.js$/,
+        loader: 'string-replace-loader',
+        query: {
+          search: '(lang_1(.*[\\n\\r]\\s*\\.|\\.))?(global(.*[\\n\\r]\\s*\\.|\\.))?(System|SystemJS)(.*[\\n\\r]\\s*\\.|\\.)import',
+          replace: 'System.import',
+          flags: 'g'
+        }
+      },
+      {
+        test: /.js$/,
+        loader: 'string-replace-loader',
+        query: {
+          search: 'moduleId: module.id,',
+          replace: '',
+          flags: 'g'
+        }
+      }
+      // end angular2 fix
+    ],
     loaders: [
       // .ts files for TypeScript
       { test: /\.(ts)$/, loaders: ['awesome-typescript-loader', 'angular2-template-loader'], exclude: [/node_modules/] },
@@ -46,7 +73,7 @@ var webpackConfig = setTypeScriptAlias(require('./tsconfig.json'), {
   },
 
   plugins: [
-    // don't define plugins here
+    // don't define plugins here. define them above in shared plugins
   ],
 
   resolve: {
