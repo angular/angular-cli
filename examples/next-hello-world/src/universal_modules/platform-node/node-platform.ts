@@ -111,8 +111,8 @@ export class NodePlatform implements PlatformRef {
     // TODO(gdi2290): refactor to ZoneLocalStore
     var _map = new Map<any, any>()
     var di = {
-      set(key, value) {
-        _map.set(key, value);
+      set(key, value, defaultValue?: any) {
+        _map.set(key, value || defaultValue);
       },
       get(key, defaultValue?: any) {
         return _map.has(key) ? _map.get(key) : defaultValue;
@@ -128,26 +128,26 @@ export class NodePlatform implements PlatformRef {
         let modInjector = moduleRef.injector;
         let instance: any = moduleRef.instance;
         // lifecycle hooks
-        di.set('ngOnInit', instance.ngOnInit || NodePlatform._noop);
-        di.set('ngDoCheck', instance.ngDoCheck || NodePlatform._noop);
-        di.set('ngOnStable', instance.ngOnStable || NodePlatform._noop);
-        di.set('ngOnRendered', instance.ngOnRendered || NodePlatform._noop);
+        di.set('ngOnInit', instance.ngOnInit, NodePlatform._noop);
+        di.set('ngDoCheck', instance.ngDoCheck, NodePlatform._noop);
+        di.set('ngOnStable', instance.ngOnStable, NodePlatform._noop);
+        di.set('ngOnRendered', instance.ngOnRendered, NodePlatform._noop);
         // global config
         di.set('config', modInjector.get(UNIVERSAL_CONFIG, {}));
-        di.set(ApplicationRef, modInjector.get(ApplicationRef));
-        di.set(NgZone, modInjector.get(NgZone));
-        di.set(NODE_APP_ID, modInjector.get(NODE_APP_ID));
-        di.set(APP_ID, modInjector.get(APP_ID));
-        di.set(DOCUMENT, modInjector.get(DOCUMENT));
-
+        di.set('ApplicationRef', modInjector.get(ApplicationRef));
+        di.set('NgZone', modInjector.get(NgZone));
+        di.set('NODE_APP_ID', modInjector.get(NODE_APP_ID, null));
+        di.set('APP_ID', modInjector.get(APP_ID, null));
+        di.set('DOCUMENT', modInjector.get(DOCUMENT));
+        di.set('DOM', getDOM());
         return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
 
         let _config = di.get('config');
         let ngDoCheck = di.get('ngDoCheck');
-        let rootNgZone = di.get(NgZone);
-        let appRef = di.get(ApplicationRef);
+        let rootNgZone = di.get('NgZone');
+        let appRef = di.get('ApplicationRef');
         let components = appRef.components;
 
         // lifecycle hooks
@@ -192,16 +192,18 @@ export class NodePlatform implements PlatformRef {
       .then((moduleRef: NgModuleRef<T>) => {
         // parseFragment used
         // getInlineCode used
+        let DOM = di.get('DOM');
         let _config = di.get('config');
-        let appRef: ApplicationRef = di.get(ApplicationRef);
+        let appRef: ApplicationRef = di.get('ApplicationRef');
         let components = appRef.components;
         let prebootCode = ''
         try {
           prebootCode = getInlineCode(_config.preboot);
         } catch(e) {
           console.log(e);
+          // if there's an error don't inject preboot
+          return moduleRef;
         }
-        let DOM = getDOM();
 
         // assume last component is the last component selector
         // TODO(gdi2290): provide a better way to determine last component position
@@ -211,23 +213,24 @@ export class NodePlatform implements PlatformRef {
         let prebootEl = DOM.createElement('div');
 
         // inject preboot code in the document
-        DOM.setInnerHTML(prebootEl, prebootCode);
+        // TODO(gdi2290): recreate ngPreboot or UniversalPreboot to hide this behavior
+        DOM.setInnerHTML(prebootEl, '<script>\n'+ prebootCode +';\nvar preboot = preboot || prebootstrap()</script>');
         DOM.insertAfter(el, prebootEl);
 
         return moduleRef
       })
       .then((moduleRef: NgModuleRef<T>) => {
-        let document = di.get(DOCUMENT);
-        let appRef = di.get(ApplicationRef);
-
-        let _appId = di.get(APP_ID, null);
-        let appId = di.get(NODE_APP_ID, _appId);
+        // serializeDocument used
+        let document = di.get('DOCUMENT');
+        let appRef = di.get('ApplicationRef');
+        let _appId = di.get('APP_ID', null);
+        let appId = di.get('NODE_APP_ID', _appId);
+        let html = serializeDocument(document);
         // let DOM = getDOM();
         // appRef.components.map((compRef: ComponentRef<any>) => {
         //   DOM.setAttribute(compRef.location.nativeElement, 'data-universal-app-id', appId);
         // });
 
-        let html = serializeDocument(document);
         document = null;
 
         appRef.ngOnDestroy();
@@ -235,6 +238,7 @@ export class NodePlatform implements PlatformRef {
 
         appRef = null;
         moduleRef = null;
+        di.clear();
 
         return html
           .replace(new RegExp(_appId, 'gi'), appId)
