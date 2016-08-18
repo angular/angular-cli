@@ -5,7 +5,10 @@ import * as webpack from 'webpack';
 import { ForkCheckerPlugin } from 'awesome-typescript-loader';
 import { CliConfig } from './config';
 
-export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
+export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, outputDir: string) {
+
+  let outputPath: string = path.resolve(projectRoot, outputDir);
+
   return {
     devtool: 'source-map',
     resolve: {
@@ -18,7 +21,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       polyfills: path.resolve(projectRoot, `./${sourceDir}/polyfills.ts`)
     },
     output: {
-      path: path.resolve(projectRoot, './dist'),
+      path: outputPath,
       filename: '[name].bundle.js'
     },
     module: {
@@ -66,7 +69,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string) {
       new CopyWebpackPlugin([{
         context: path.resolve(projectRoot, './public'),
         from: '**/*',
-        to: path.resolve(projectRoot, './dist')
+        to: outputPath
       }])
     ],
     node: {

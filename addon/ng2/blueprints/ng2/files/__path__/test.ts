@@ -32,9 +32,9 @@ Promise.all([
 ])
   // First, initialize the Angular testing environment.
   .then(([testing, testingBrowser]) => {
-    testing.setBaseTestProviders(
-      testingBrowser.TEST_BROWSER_DYNAMIC_PLATFORM_PROVIDERS,
-      testingBrowser.TEST_BROWSER_DYNAMIC_APPLICATION_PROVIDERS
+    testing.getTestBed().initTestEnvironment(
+      testingBrowser.BrowserDynamicTestingModule,
+      testingBrowser.platformBrowserDynamicTesting()
     );
   })
   // Then we find all the tests.
