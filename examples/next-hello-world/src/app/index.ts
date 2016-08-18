@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Http, Jsonp } from '@angular/http';
 import 'rxjs/Rx';
 
@@ -15,17 +15,18 @@ import 'rxjs/Rx';
   <pre>{{ response | json }}</pre>
   `
 })
-export class App {
+export class App implements OnInit {
   response = {};
   constructor(public jsonp: Jsonp) {
 
   }
 
-  ngOninit() {
+  ngOnInit() {
    this.jsonp.request('https://api.github.com?callback=JSON_CALLBACK')
-      .subscribe(res => {
+      .subscribe((res) => {
         var json = res.json();
         this.response = json;
+        // console.log('doneeeee')
       });
     }
 
