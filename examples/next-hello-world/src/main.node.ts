@@ -26,7 +26,11 @@ export function main(document) {
       NodeModule.forRoot(document, {
         originUrl: 'http://localhost:3000',
         baseUrl: '/',
-        requestUrl: '/'
+        requestUrl: '/',
+        preboot: {
+          appRoot: ['app'],
+          uglify: true
+        }
       }),
       NodeHttpModule,
       NodeJsonpModule
@@ -52,7 +56,7 @@ export function main(document) {
   return platform
     .serializeModule(MainModule)
     .then((html) => {
-      console.log('done\n'+ html)
+      console.log('done')
       return html
     });
 };
