@@ -56,8 +56,6 @@ import { parseDocument, serializeDocument } from './node-document';
 import { NodeDomRootRenderer_ } from './node-renderer';
 import { NodeSharedStylesHost } from './node-shared-styles-host';
 
-
-
 import {
   provideDocument,
   provideUniversalAppId,
@@ -92,6 +90,7 @@ export function _resolveDefaultAnimationDriver(): AnimationDriver {
 export var __PLATFORM_REF: PlatformRef = null;
 
 export class NodePlatform implements PlatformRef {
+  static _noop = () => {};
   _platformRef;
   get platformRef() {
     return __PLATFORM_REF;
@@ -108,10 +107,9 @@ export class NodePlatform implements PlatformRef {
 
     return this.platformRef.bootstrapModule<T>(moduleType, config.compilerOptions)
       .then((moduleRef: NgModuleRef<T>) => {
-        let document = moduleRef.injector.get(DOCUMENT);
-        let appRef = moduleRef.injector.get(ApplicationRef);
         let modInjector = moduleRef.injector;
         let instance: any = moduleRef.instance;
+        // lifecycle hooks
         lifecycle.set('ngOnInit', instance.ngOnInit || NodePlatform._noop);
         lifecycle.set('ngDoCheck', instance.ngDoCheck || NodePlatform._noop);
         lifecycle.set('ngOnStable', instance.ngOnStable || NodePlatform._noop);
@@ -122,6 +120,13 @@ export class NodePlatform implements PlatformRef {
 
         let _appId = moduleRef.injector.get(APP_ID, null);
         let appId = moduleRef.injector.get(NODE_APP_ID, _appId);
+      .then((moduleRef: NgModuleRef<T>) => {
+        let injector = moduleRef.injector;
+        let document = injector.get(DOCUMENT);
+        let appRef = injector.get(ApplicationRef);
+
+        let _appId = injector.get(APP_ID, null);
+        let appId = injector.get(NODE_APP_ID, _appId);
         // let DOM = getDOM();
         // appRef.components.map((compRef: ComponentRef<any>) => {
         //   DOM.setAttribute(compRef.location.nativeElement, 'data-universal-app-id', appId);
