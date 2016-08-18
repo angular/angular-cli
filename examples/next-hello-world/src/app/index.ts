@@ -22,13 +22,13 @@ export class App implements OnInit {
   }
 
   ngOnInit() {
-   this.jsonp.request('https://api.github.com?callback=JSON_CALLBACK')
-      .subscribe((res) => {
-        var json = res.json();
-        this.response = json;
-        // console.log('doneeeee')
-      });
-    }
+   // this.jsonp.request('https://api.github.com?callback=JSON_CALLBACK')
+   //    .subscribe((res) => {
+   //      var json = res.json();
+   //      this.response = json;
+   //      // console.log('doneeeee')
+   //    });
+  }
 
 }
 

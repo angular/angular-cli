@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpModule, JsonpModule } from '@angular/http';
 
-// import { isBrowser } from '@angular/universal/browser';
+import { isBrowser } from '@angular/universal/browser';
 
 
 import { App } from './app';
@@ -22,6 +22,6 @@ export class MainModule {}
 export const platform = platformBrowserDynamic();
 
 export function main() {
-  // console.log('isBrowser', isBrowser);
+  console.log('isBrowser', isBrowser);
   return platform.bootstrapModule(MainModule)
 }
