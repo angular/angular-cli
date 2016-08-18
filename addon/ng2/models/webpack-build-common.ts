@@ -25,6 +25,15 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
       filename: '[name].bundle.js'
     },
     module: {
+      preLoaders: [
+        {
+          test: /\.js$/,
+          loader: 'source-map-loader',
+          exclude: [
+            /node_modules/
+          ]
+        }
+      ],
       loaders: [
         {
           test: /\.ts$/,
