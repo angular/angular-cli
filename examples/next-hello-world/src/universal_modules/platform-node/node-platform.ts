@@ -46,7 +46,7 @@ import {
 
 import { PlatformRef_ } from '@angular/core/src/application_ref';
 
-import { CommonModule, PlatformLocation } from '@angular/common';
+import { CommonModule, PlatformLocation, APP_BASE_HREF } from '@angular/common';
 
 
 // TODO(gdi2290): allow removal of modules that are not used for AoT
@@ -68,6 +68,7 @@ import {
 
 import {
   NODE_APP_ID,
+  UNIVERSAL_CONFIG,
 
   ORIGIN_URL,
   REQUEST_URL,
@@ -107,29 +108,49 @@ export class NodePlatform implements PlatformRef {
 
   serializeModule<T>(moduleType: any, config: any = {}) {
     // TODO(gdi2290): make stateless. allow for many instances of modules
-    const lifecycle = new WeakMap<string, any>();
+    // TODO(gdi2290): refactor to ZoneLocalStore
+    var _map = new Map<any, any>()
+    var di = {
+      set(key, value) {
+        _map.set(key, value);
+      },
+      get(key, defaultValue?: any) {
+        return _map.has(key) ? _map.get(key) : defaultValue;
+      },
+      clear() {
+        _map.clear();
+        di = null;
+      }
+    };
 
     return this.platformRef.bootstrapModule<T>(moduleType, config.compilerOptions)
       .then((moduleRef: NgModuleRef<T>) => {
         let modInjector = moduleRef.injector;
         let instance: any = moduleRef.instance;
         // lifecycle hooks
-        lifecycle.set('ngOnInit', instance.ngOnInit || NodePlatform._noop);
-        lifecycle.set('ngDoCheck', instance.ngDoCheck || NodePlatform._noop);
-        lifecycle.set('ngOnStable', instance.ngOnStable || NodePlatform._noop);
-        lifecycle.set('ngOnRendered', instance.ngOnRendered || NodePlatform._noop);
+        di.set('ngOnInit', instance.ngOnInit || NodePlatform._noop);
+        di.set('ngDoCheck', instance.ngDoCheck || NodePlatform._noop);
+        di.set('ngOnStable', instance.ngOnStable || NodePlatform._noop);
+        di.set('ngOnRendered', instance.ngOnRendered || NodePlatform._noop);
+        // global config
+        di.set('config', modInjector.get(UNIVERSAL_CONFIG, {}));
+        di.set(ApplicationRef, modInjector.get(ApplicationRef));
+        di.set(NgZone, modInjector.get(NgZone));
+        di.set(NODE_APP_ID, modInjector.get(NODE_APP_ID));
+        di.set(APP_ID, modInjector.get(APP_ID));
+        di.set(DOCUMENT, modInjector.get(DOCUMENT));
+
         return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
 
-        let _config = config;
-        let modInjector = moduleRef.injector;
-        let appRef = modInjector.get(ApplicationRef);
+        let _config = di.get('config');
+        let ngDoCheck = di.get('ngDoCheck');
+        let rootNgZone = di.get(NgZone);
+        let appRef = di.get(ApplicationRef);
         let components = appRef.components;
-        let rootNgZone = modInjector.get(NgZone);
 
         // lifecycle hooks
-        let ngDoCheck = lifecycle.get('ngDoCheck');
 
         function outsideNg(compRef, ngZone, config, http, jsonp) {
           function checkStable(done, ref) {
@@ -161,8 +182,8 @@ export class NodePlatform implements PlatformRef {
           let cmpInjector = compRef.injector;
           let ngZone: NgZone = cmpInjector.get(NgZone);
           // TODO(gdi2290): remove when zone.js tracks http and https
-          let http = cmpInjector.get(Http);
-          let jsonp = cmpInjector.get(Jsonp);
+          let http = cmpInjector.get(Http, null);
+          let jsonp = cmpInjector.get(Jsonp, null);
           ngZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, _config, http, jsonp));
         })
         return Promise.all<Promise<ComponentRef<any>>>(stableComponents)
@@ -171,33 +192,36 @@ export class NodePlatform implements PlatformRef {
       .then((moduleRef: NgModuleRef<T>) => {
         // parseFragment used
         // getInlineCode used
-        let _config = config;
-        let modInjector = moduleRef.injector;
-        let appRef: ApplicationRef = modInjector.get(ApplicationRef);
+        let _config = di.get('config');
+        let appRef: ApplicationRef = di.get(ApplicationRef);
         let components = appRef.components;
-        let prebootCode = getInlineCode(_config.preboot);
+        let prebootCode = ''
+        try {
+          prebootCode = getInlineCode(_config.preboot);
+        } catch(e) {
+          console.log(e);
+        }
         let DOM = getDOM();
 
         // assume last component is the last component selector
         // TODO(gdi2290): provide a better way to determine last component position
         let lastRef = components[components.length - 1];
         let el = lastRef.location.nativeElement;
-        let script = parseFragment(prebootCode);
+        // let script = parseFragment(prebootCode);
         let prebootEl = DOM.createElement('div');
 
         // inject preboot code in the document
-        DOM.setInnerHTML(prebootEl, script);
+        DOM.setInnerHTML(prebootEl, prebootCode);
         DOM.insertAfter(el, prebootEl);
 
         return moduleRef
       })
       .then((moduleRef: NgModuleRef<T>) => {
-        let injector = moduleRef.injector;
-        let document = injector.get(DOCUMENT);
-        let appRef = injector.get(ApplicationRef);
+        let document = di.get(DOCUMENT);
+        let appRef = di.get(ApplicationRef);
 
-        let _appId = injector.get(APP_ID, null);
-        let appId = injector.get(NODE_APP_ID, _appId);
+        let _appId = di.get(APP_ID, null);
+        let appId = di.get(NODE_APP_ID, _appId);
         // let DOM = getDOM();
         // appRef.components.map((compRef: ComponentRef<any>) => {
         //   DOM.setAttribute(compRef.location.nativeElement, 'data-universal-app-id', appId);
@@ -288,11 +312,28 @@ export class NodePlatform implements PlatformRef {
   exports: [  CommonModule, ApplicationModule  ]
 })
 export class NodeModule {
-  static dynamicConfig = [
+  static __dynamicConfig = [
     { provide: BASE_URL, useValue: 'baseUrl' },
+    { provide: APP_BASE_HREF, useValue: 'baseUrl' },
     { provide: REQUEST_URL, useValue: 'requestUrl' },
     { provide: ORIGIN_URL, useValue: 'originUrl' }
-  ];
+  ]
+  static __clone(obj) {
+    return obj.slice(0).map(obj => {
+      var newObj = {};
+      Object.keys(obj).forEach(key => {
+        newObj[key] = obj[key];
+      });
+      return newObj;
+    });
+  }
+  static get dynamicConfig() {
+    return NodeModule.__clone(NodeModule.__dynamicConfig);
+  };
+  static set dynamicConfig(value) {
+    NodeModule.__dynamicConfig = value;
+  };
+
   static forRoot(document: string, config: any = {}) {
     var _config = Object.assign({}, { document }, config);
     return NodeModule.withConfig(_config);
@@ -301,7 +342,6 @@ export class NodeModule {
     let doc = config.document;
     let providers = NodeModule
       .dynamicConfig
-      .slice(0)
       .reduce((memo, provider) => {
         let key = provider.useValue;
         if (key in config) {
@@ -310,9 +350,11 @@ export class NodeModule {
         }
         return memo;
       }, []);
+    console.log('providers', providers);
     return {
       ngModule: NodeModule,
       providers: [
+        {provide: UNIVERSAL_CONFIG, useValue: config},
         provideDocument(doc),
         provideUniversalAppId(config.appId),
         ...providers
