@@ -242,25 +242,28 @@ export class NodePlatform implements PlatformRef {
   exports: [  CommonModule, ApplicationModule  ]
 })
 export class NodeModule {
+  static dynamicConfig = [
+    { provide: BASE_URL, useValue: 'baseUrl' },
+    { provide: REQUEST_URL, useValue: 'requestUrl' },
+    { provide: ORIGIN_URL, useValue: 'originUrl' }
+  ];
   static forRoot(document: string, config: any = {}) {
     var _config = Object.assign({}, { document }, config);
     return NodeModule.withConfig(_config);
   }
   static withConfig(config: any = {}) {
     let doc = config.document;
-    let providers = [];
-    if (typeof doc === 'string') {
-      config.document = parseDocument(doc);
-    }
-    if (config.baseUrl) {
-      providers.push({ provide: BASE_URL, useValue: config.baseUrl });
-    }
-    if (config.requestUrl) {
-      providers.push({ provide: REQUEST_URL, useValue: config.requestUrl });
-    }
-    if (config.originUrl) {
-      providers.push({ provide: ORIGIN_URL, useValue: config.originUrl });
-    }
+    let providers = NodeModule
+      .dynamicConfig
+      .slice(0)
+      .reduce((memo, provider) => {
+        let key = provider.useValue;
+        if (key in config) {
+          provider.useValue = config[key];
+          memo.push(provider)
+        }
+        return memo;
+      }, []);
     return {
       ngModule: NodeModule,
       providers: [
