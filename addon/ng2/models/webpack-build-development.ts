@@ -1,11 +1,12 @@
 import { CliConfig } from './config';
 const path = require('path')
 
-export const getWebpackDevConfigPartial = function(projectRoot: string, sourceDir: string) {
+export const getWebpackDevConfigPartial = function(projectRoot: string, sourceDir: string, outputDir: string) {
+  
   return {
     devtool: 'source-map',
     output: {
-      path: path.resolve(projectRoot, './dist'),
+      path: path.resolve(projectRoot, outputDir),
       filename: '[name].bundle.js',
       sourceMapFilename: '[name].map',
       chunkFilename: '[id].chunk.js'

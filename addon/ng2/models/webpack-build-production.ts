@@ -5,12 +5,13 @@ import * as CompressionPlugin from 'compression-webpack-plugin';
 import * as webpack from 'webpack';
 import { CliConfig } from './config';
 
-export const getWebpackProdConfigPartial = function(projectRoot: string, sourceDir: string) {
+export const getWebpackProdConfigPartial = function(projectRoot: string, sourceDir: string, outputDir: string) {
+
   return {
     debug: false,
     devtool: 'source-map',
     output: {
-      path: path.resolve(projectRoot, './dist'),
+      path: path.resolve(projectRoot, outputDir),
       filename: '[name].[chunkhash].bundle.js',
       sourceMapFilename: '[name].[chunkhash].bundle.map',
       chunkFilename: '[id].[chunkhash].chunk.js'
