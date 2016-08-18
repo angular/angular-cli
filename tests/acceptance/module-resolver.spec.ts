@@ -71,23 +71,20 @@ describe('ModuleResolver', () => {
         .then(() => dependentFilesUtils.createTsSourceFile(barFile))
         .then((tsFileBar: ts.SourceFile) => {
           let contentsBar = dependentFilesUtils.getImportClauses(tsFileBar);
-          let bazExpectedContent = path.normalize('../foo/baz.component');
-          expect(contentsBar[0].specifierText).to.equal(bazExpectedContent);
+          expect(contentsBar[0].specifierText).to.equal('../foo/baz.component');
         })
         .then(() => dependentFilesUtils.createTsSourceFile(fooFile))
         .then((tsFileFoo: ts.SourceFile) => {
           let contentsFoo = dependentFilesUtils.getImportClauses(tsFileFoo);
-          let bazExpectedContent = './baz.component'.replace('/', path.sep);
-          expect(contentsFoo[0].specifierText).to.equal(bazExpectedContent);
+          expect(contentsFoo[0].specifierText).to.equal('./baz.component');
         })
         .then(() => resolver.resolveOwnImports())
         .then((changes) => resolver.applySortedChangePromise(changes))
         .then(() => dependentFilesUtils.createTsSourceFile(bazFile))
         .then((tsFileBaz: ts.SourceFile) => {
           let contentsBaz = dependentFilesUtils.getImportClauses(tsFileBaz);
-          let barExpectedContent = path.normalize('../bar/bar.component');
-          let fooBarExpectedContent = path.normalize('../foo-baz/qux/quux/foobar/foobar.component');
-          expect(contentsBaz[0].specifierText).to.equal(barExpectedContent);
+          let fooBarExpectedContent = '../foo-baz/qux/quux/foobar/foobar.component';
+          expect(contentsBaz[0].specifierText).to.equal('../bar/bar.component');
           expect(contentsBaz[1].specifierText).to.equal(fooBarExpectedContent);
         });
     });
@@ -102,8 +99,7 @@ describe('ModuleResolver', () => {
         .then(() => dependentFilesUtils.createTsSourceFile(fooBazFile))
         .then((tsFile: ts.SourceFile) => {
           let contents = dependentFilesUtils.getImportClauses(tsFile);
-          let fooExpectedContent = path.normalize('../foo/foo.component');
-          expect(contents[0].specifierText).to.equal(fooExpectedContent);
+          expect(contents[0].specifierText).to.equal('../foo/foo.component');
         });
     });
     it('when oldPath and newPath both do not have index.ts', () => {
@@ -115,24 +111,20 @@ describe('ModuleResolver', () => {
         .then(() => dependentFilesUtils.createTsSourceFile(barFile))
         .then((tsFileBar: ts.SourceFile) => {
           let contentsBar = dependentFilesUtils.getImportClauses(tsFileBar);
-          let bazExpectedContent = path.normalize('../foo-baz/baz.component');
-          expect(contentsBar[0].specifierText).to.equal(bazExpectedContent);
+          expect(contentsBar[0].specifierText).to.equal('../foo-baz/baz.component');
         })
         .then(() => dependentFilesUtils.createTsSourceFile(fooFile))
         .then((tsFileFoo: ts.SourceFile) => {
           let contentsFoo = dependentFilesUtils.getImportClauses(tsFileFoo);
-          let bazExpectedContent = path.normalize('../foo-baz/baz.component');
-          expect(contentsFoo[0].specifierText).to.equal(bazExpectedContent);
+          expect(contentsFoo[0].specifierText).to.equal('../foo-baz/baz.component');
         })
         .then(() => resolver.resolveOwnImports())
         .then((changes) => resolver.applySortedChangePromise(changes))
         .then(() => dependentFilesUtils.createTsSourceFile(bazFile))
         .then((tsFile: ts.SourceFile) => {
           let contentsBaz = dependentFilesUtils.getImportClauses(tsFile);
-          let barExpectedContent = path.normalize('../bar/bar.component');
-          let fooBarExpectedContent = `.${path.sep}qux${path.sep}quux${path.sep}foobar${path.sep}foobar.component`;
-          expect(contentsBaz[0].specifierText).to.equal(barExpectedContent);
-          expect(contentsBaz[1].specifierText).to.equal(fooBarExpectedContent);
+          expect(contentsBaz[0].specifierText).to.equal('../bar/bar.component');
+          expect(contentsBaz[1].specifierText).to.equal('./qux/quux/foobar/foobar.component');
         });
     });
     it('when there are multiple spaces between symbols and specifier', () => {
@@ -144,24 +136,20 @@ describe('ModuleResolver', () => {
         .then(() => dependentFilesUtils.createTsSourceFile(fooQuxFile))
         .then((tsFileFooQux: ts.SourceFile) => {
           let contentsFooQux = dependentFilesUtils.getImportClauses(tsFileFooQux);
-          let fooQuxExpectedContent = path.normalize('../../../../foo/foobar.component');
-          expect(contentsFooQux[0].specifierText).to.equal(fooQuxExpectedContent);
+          expect(contentsFooQux[0].specifierText).to.equal('../../../../foo/foobar.component');
         })
         .then(() => dependentFilesUtils.createTsSourceFile(bazFile))
         .then((tsFileBaz: ts.SourceFile) => {
           let contentsBaz = dependentFilesUtils.getImportClauses(tsFileBaz);
-          let bazExpectedContent = path.normalize('../../foo/foobar.component');
-          expect(contentsBaz[1].specifierText).to.equal(bazExpectedContent);
+          expect(contentsBaz[1].specifierText).to.equal('../../foo/foobar.component');
         })
         .then(() => resolver.resolveOwnImports())
         .then((changes) => resolver.applySortedChangePromise(changes))
         .then(() => dependentFilesUtils.createTsSourceFile(fooBarFile))
         .then((tsFileFooBar: ts.SourceFile) => {
           let contentsFooBar = dependentFilesUtils.getImportClauses(tsFileFooBar);
-          let fooExpectedContent = `.${path.sep}foo.component`;
-          let fooQuxExpectedContent = path.normalize('../foo-baz/qux/quux/fooqux.component');
-          expect(contentsFooBar[0].specifierText).to.equal(fooExpectedContent);
-          expect(contentsFooBar[1].specifierText).to.equal(fooQuxExpectedContent);
+          expect(contentsFooBar[0].specifierText).to.equal('./foo.component');
+          expect(contentsFooBar[1].specifierText).to.equal('../foo-baz/qux/quux/fooqux.component');
         });
     });
   });
