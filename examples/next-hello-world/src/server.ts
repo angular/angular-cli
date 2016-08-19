@@ -27,19 +27,19 @@ var doc =`<!doctype>
 </body>
 </html>
 `
-debugger
-main(doc, {id: 0}).then(html => {
-  return Promise.all([
-    main(doc, {id: 1}),
-    main(doc, {id: 2}),
-    main(doc, {id: 3}),
-    main(doc, {id: 4}),
-    main(doc, {id: 5}),
-    main(doc, {id: 6}),
-    main(doc, {id: 7}),
-  ])
-})
+var arr = new Array(7).fill(null);
+function createApp(num) {
+  return main(doc, {id: num});
+}
+var promises = arr.reduce((memo, wat, num) => {
+  return memo.then(() => {
+    return createApp(num);
+  });
+}, Promise.resolve());
+
+promises
 .then(html => {
   console.log('done');
+  process.exit();
   return html;
 });

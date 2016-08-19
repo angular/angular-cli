@@ -56,7 +56,7 @@ export function main(document, config?: any) {
   return platform
     .serializeModule(MainModule, config)
     .then((html) => {
-      // console.log('done')
+      console.log('\n-----------\n')
       return html
     });
 };
