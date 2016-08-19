@@ -12,7 +12,8 @@
     "test": "node tests/runner",
     "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
     "test:inspect": "node --inspect --debug-brk tests/runner",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build-config-interface": "dtsgen lib/config/schema.json --out lib/config/schema.d.ts"
   },
   "repository": {
     "type": "git",
@@ -105,9 +106,11 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^6.0.36",
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
     "denodeify": "^1.2.1",
+    "dtsgenerator": "^0.7.1",
     "eslint": "^2.8.0",
     "exists-sync": "0.0.3",
     "minimatch": "^3.0.0",
@@ -118,6 +121,7 @@
     "sinon": "^1.17.3",
     "through": "^2.3.8",
     "tree-kill": "^1.0.0",
+    "ts-node": "^1.2.3",
     "tslint": "^3.8.1",
     "walk-sync": "^0.2.6"
   }

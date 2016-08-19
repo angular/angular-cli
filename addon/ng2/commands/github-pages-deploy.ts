@@ -27,12 +27,12 @@ module.exports = Command.extend({
       type: String,
       default: 'new gh-pages version',
       description: 'The commit message to include with the build, must be wrapped in quotes.'
-    }, { 
+    }, {
       name: 'target',
       type: String,
-      default: 'production', 
+      default: 'production',
       aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }]
-    }, { 
+    }, {
       name: 'environment',
       type: String,
       default: '',
@@ -72,12 +72,12 @@ module.exports = Command.extend({
       }
       if (options.target === 'production') {
         options.environment = 'prod';
-      } 
+      }
     }
 
     var projectName = this.project.pkg.name;
 
-    const outDir = CliConfig.fromProject().apps[0].outDir;
+    const outDir = CliConfig.fromProject().config.apps[0].outDir;
 
     let ghPagesBranch = 'gh-pages';
     let destinationBranch = options.userPage ? 'master' : ghPagesBranch;

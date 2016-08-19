@@ -1,5 +1,7 @@
 {
+  "$comment": "Please run `npm run build-config-interface` after changing this file. Thanks!",
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "CliConfig",
   "title": "Angular CLI Config Schema",
   "type": "object",
   "properties": {
@@ -26,13 +28,15 @@
             "type": "string"
           },
           "outDir": {
-            "type": "string"
+            "type": "string",
+            "default": "dist/"
           },
           "assets": {
             "type": "string"
           },
           "index": {
-            "type": "string"
+            "type": "string",
+            "default": "index.html"
           },
           "main": {
             "type": "string"

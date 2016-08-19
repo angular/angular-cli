@@ -21,15 +21,16 @@ export class NgCliWebpackConfig {
   private webpackMobileProdConfigPartial: any;
 
   constructor(public ngCliProject: any, public target: string, public environment: string, outputDir?: string) {
-    const appConfig = CliConfig.fromProject().apps[0];
+    const config: CliConfig = CliConfig.fromProject();
+    const appConfig = config.config.apps[0];
 
-    appConfig.outDir = outputDir || appConfig.outDir; 
+    appConfig.outDir = outputDir || appConfig.outDir;
 
     this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, environment, appConfig);
     this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, appConfig);
     this.webpackProdConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, appConfig);
 
-    if (CliConfig.fromProject().apps[0].mobile){
+    if (CliConfig.fromProject().config.apps[0].mobile){
       this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig);
       this.webpackMobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root, appConfig);
       this.webpackBaseConfig = webpackMerge(this.webpackBaseConfig, this.webpackMobileConfigPartial);
