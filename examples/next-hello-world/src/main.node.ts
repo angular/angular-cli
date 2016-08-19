@@ -23,7 +23,8 @@ export function main(document, config?: any) {
     bootstrap: [ App, AnotherComponent ],
     declarations: [ App, AnotherComponent ],
     imports: [
-      NodeModule.forRoot(document, {
+      NodeModule.withConfig({
+        document: document,
         originUrl: 'http://localhost:3000',
         baseUrl: '/',
         requestUrl: '/',
