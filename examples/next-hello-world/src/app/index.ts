@@ -25,7 +25,7 @@ export class App implements OnInit {
    this.jsonp.request('https://api.github.com?callback=JSON_CALLBACK')
       .subscribe((res) => {
         var json = res.json();
-        console.log('wat', json);
+        // console.log('wat', json);
         this.response = json;
         // console.log('doneeeee')
       });

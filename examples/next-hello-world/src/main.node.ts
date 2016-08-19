@@ -42,13 +42,11 @@ export function main(document, config?: any) {
     }
     // ngDoCheck() {
     //   console.log('ngDoCheck');
+    //   return true;
     // }
-    // ngOnStable() {
-    //   console.log('ngOnStable');
-    // }
-    // ngOnRendered() {
-    //   console.log('ngOnRendered');
-    // }
+    ngOnStable() {
+      console.log('ngOnStable');
+    }
     ngOnRendered() {
       console.log('ngOnRendered');
     }
