@@ -262,6 +262,7 @@ export class NodePlatform implements PlatformRef {
       .then((moduleRef: NgModuleRef<T>) => {
         config.time && console.time('serialize: ' + config.id);
         // serializeDocument used
+        let ngOnRendered = di.get('ngOnRendered');
         let document = di.get('DOCUMENT');
         let appRef = di.get('ApplicationRef');
         let _appId = di.get('APP_ID', null);
@@ -281,8 +282,11 @@ export class NodePlatform implements PlatformRef {
         moduleRef = null;
         di.clear();
         config.time && console.timeEnd('serialize: ' + config.id);
-        return html
-          .replace(new RegExp(_appId, 'gi'), appId)
+        html = html.replace(new RegExp(_appId, 'gi'), appId)
+
+        ngOnRendered(html);
+
+        return html;
       });
   }
 

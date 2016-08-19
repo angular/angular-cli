@@ -49,6 +49,9 @@ export function main(document, config?: any) {
     // ngOnRendered() {
     //   console.log('ngOnRendered');
     // }
+    ngOnRendered() {
+      console.log('ngOnRendered');
+    }
   }
 
   return platform
