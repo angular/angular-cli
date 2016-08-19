@@ -57,7 +57,12 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
         { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
         { test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000'},
-        { test: /\.html$/, loader: 'raw-loader' }
+        { test: /\.html$/, loader: 'raw-loader' },
+        { test: /\.svg$/, loader: 'url-loader?limit=65000&mimetype=image/svg+xml&name=svg/[name].[ext]' },
+        { test: /\.woff$/, loader: 'url-loader?limit=65000&mimetype=application/font-woff&name=fonts/[name].[ext]' },
+        { test: /\.woff2$/, loader: 'url-loader?limit=65000&mimetype=application/font-woff2&name=fonts/[name].[ext]' },
+        { test: /\.[ot]tf$/, loader: 'url-loader?limit=65000&mimetype=application/octet-stream&name=fonts/[name].[ext]' },
+        { test: /\.eot$/, loader: 'url-loader?limit=65000&mimetype=application/vnd.ms-fontobject&name=fonts/[name].[ext]' }
       ]
     },
     plugins: [
