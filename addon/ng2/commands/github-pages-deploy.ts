@@ -6,8 +6,9 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as BuildTask from 'ember-cli/lib/tasks/build';
+import * as WebpackBuild from '../tasks/build-webpack';
 import * as CreateGithubRepo from '../tasks/create-github-repo';
+import { CliConfig } from '../models/config';
 
 const fsReadFile = Promise.denodeify(fs.readFile);
 const fsWriteFile = Promise.denodeify(fs.writeFile);
@@ -26,11 +27,16 @@ module.exports = Command.extend({
       type: String,
       default: 'new gh-pages version',
       description: 'The commit message to include with the build, must be wrapped in quotes.'
-    }, {
+    }, { 
+      name: 'target',
+      type: String,
+      default: 'production', 
+      aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }]
+    }, { 
       name: 'environment',
       type: String,
-      default: 'production',
-      description: 'The Angular environment to create a build for'
+      default: '',
+      aliases: ['e']
     }, {
       name: 'user-page',
       type: Boolean,
@@ -59,7 +65,19 @@ module.exports = Command.extend({
     var execOptions = {
       cwd: root
     };
+
+    if (options.environment === ''){
+      if (options.target === 'development') {
+        options.environment = 'dev';
+      }
+      if (options.target === 'production') {
+        options.environment = 'prod';
+      } 
+    }
+
     var projectName = this.project.pkg.name;
+
+    const outDir = CliConfig.fromProject().apps[0].outDir;
 
     let ghPagesBranch = 'gh-pages';
     let destinationBranch = options.userPage ? 'master' : ghPagesBranch;
@@ -68,15 +86,19 @@ module.exports = Command.extend({
     // declared here so that tests can stub exec
     const execPromise = Promise.denodeify(exec);
 
-    var buildTask = new BuildTask({
+    var buildTask = new WebpackBuild({
       ui: this.ui,
       analytics: this.analytics,
-      project: this.project
+      cliProject: this.project,
+      target: options.target,
+      environment: options.environment,
+      outputPath: outDir
     });
 
     var buildOptions = {
+      target: options.target,
       environment: options.environment,
-      outputPath: 'dist/'
+      outputPath: outDir
     };
 
     var createGithubRepoTask = new CreateGithubRepo({
@@ -155,13 +177,13 @@ module.exports = Command.extend({
     }
 
     function copyFiles() {
-      return fsReadDir('dist')
+      return fsReadDir(outDir)
         .then((files) => Promise.all(files.map((file) => {
           if (file === '.gitignore'){
             // don't overwrite the .gitignore file
             return Promise.resolve();
           }
-          return fsCopy(path.join('dist', file), path.join('.', file))
+          return fsCopy(path.join(outDir, file), path.join('.', file))
         })));
     }
 

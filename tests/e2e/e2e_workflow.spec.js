@@ -109,7 +109,7 @@ describe('Basic end-to-end Workflow', function () {
     var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
     var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
 
-    expect(mainBundleContent).to.include('production: true');
+    expect(mainBundleContent.includes('production: true')).to.be.equal(true);
   });
 
   it('Build fails on invalid build target', function (done) {
@@ -310,11 +310,11 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(lcovReport)).to.be.equal(true);
   });
 
-  it('moves all files that live inside `public` into `dist`', function () {
+  it('moves all files that live inside `assets` into `dist`', function () {
     this.timeout(420000);
 
-    const tmpFile = path.join(process.cwd(), 'public', 'test.abc');
-    const tmpFileLocation = path.join(process.cwd(), 'dist', 'test.abc');
+    const tmpFile = path.join(process.cwd(), 'src', 'assets', 'test.abc');
+    const tmpFileLocation = path.join(process.cwd(), 'dist', 'assets', 'test.abc');
     fs.writeFileSync(tmpFile, 'hello world');
 
     sh.exec(`${ngBin} build`);
@@ -484,6 +484,40 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
     const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
     expect(indexHtml).to.include('main.bundle.js');
+  });
+
+  it('styles.css is added to main bundle', function() {
+    this.timeout(420000);
+
+    let stylesPath = path.join(process.cwd(), 'src', 'styles.css');
+    let testStyle = 'body { background-color: blue; }';
+    fs.writeFileSync(stylesPath, testStyle, 'utf8');
+    
+    sh.exec(`${ngBin} build`);
+
+    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+
+    expect(mainBundleContent.includes(testStyle)).to.be.equal(true);
+  });
+
+  it('styles.css supports css imports', function() {
+    this.timeout(420000);
+
+    let importedStylePath = path.join(process.cwd(), 'src', 'imported-styles.css');
+    let testStyle = 'body { background-color: blue; }';
+    fs.writeFileSync(importedStylePath, testStyle, 'utf8');
+
+    let stylesPath = path.join(process.cwd(), 'src', 'style.css');
+    let importStyle = '@import \'./imported-style.css\';';
+    fs.writeFileSync(stylesPath, importStyle, 'utf8');
+
+    sh.exec(`${ngBin} build`);
+
+    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+
+    expect(mainBundleContent.includes(testStyle)).to.be.equal(true);
   });
 
   it('Serve and run e2e tests on dev environment', function () {

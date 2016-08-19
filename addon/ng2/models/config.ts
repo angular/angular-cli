@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as chalk from 'chalk';
 
 const schemaPath = path.resolve(process.env.CLI_ROOT, 'lib/config/schema.json');
 const schema = require(schemaPath);
@@ -166,6 +167,24 @@ export class CliConfig {
 
   public static fromProject(): any {
     const configPath = CliConfig._configFilePath();
-    return configPath ? require(configPath) : {};
+
+    if (!configPath) {
+      return {};
+    }
+
+    let config = require(configPath);
+
+    if (config.defaults.sourceDir || config.defaults.prefix) {
+      config.apps[0].root = config.apps[0].root || config.defaults.sourceDir;
+      config.apps[0].prefix = config.apps[0].prefix || config.defaults.prefix;
+      
+      console.error(chalk.yellow(
+          'The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json '
+        + 'are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n'
+        + 'Please update in order to avoid errors in future versions of angular-cli.'
+      ));
+    }
+    
+    return config;
   }
 }
