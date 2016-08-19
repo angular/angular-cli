@@ -28,7 +28,18 @@ var doc =`<!doctype>
 </html>
 `
 debugger
-main(doc).then(html => {
-  console.log('done\n'+ html);
+main(doc, {id: 0}).then(html => {
+  return Promise.all([
+    main(doc, {id: 1}),
+    main(doc, {id: 2}),
+    main(doc, {id: 3}),
+    main(doc, {id: 4}),
+    main(doc, {id: 5}),
+    main(doc, {id: 6}),
+    main(doc, {id: 7}),
+  ])
+})
+.then(html => {
+  console.log('done');
   return html;
 });

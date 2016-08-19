@@ -143,7 +143,7 @@ export class NodePlatform implements PlatformRef {
         return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
-
+        console.time('stable' + config.id);
         let _config = di.get('config');
         let ngDoCheck = di.get('ngDoCheck');
         let rootNgZone = di.get('NgZone');
@@ -177,6 +177,7 @@ export class NodePlatform implements PlatformRef {
         }
 
         // check if all components are stable
+
         let stableComponents = components.map((compRef, i) => {
           // _config used
           let cmpInjector = compRef.injector;
@@ -185,11 +186,15 @@ export class NodePlatform implements PlatformRef {
           let http = cmpInjector.get(Http, null);
           let jsonp = cmpInjector.get(Jsonp, null);
           ngZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, _config, http, jsonp));
-        })
+        });
+        console.timeEnd('stable' + config.id);
         return Promise.all<Promise<ComponentRef<any>>>(stableComponents)
-          .then(() => moduleRef);
+          .then(() => {
+            return moduleRef
+          });
       })
       .then((moduleRef: NgModuleRef<T>) => {
+        console.time('preboot' + config.id);
         // parseFragment used
         // getInlineCode used
         let DOM = di.get('DOM');
@@ -216,10 +221,11 @@ export class NodePlatform implements PlatformRef {
         // TODO(gdi2290): recreate ngPreboot or UniversalPreboot to hide this behavior
         DOM.setInnerHTML(prebootEl, '<script>\n'+ prebootCode +';\nvar preboot = preboot || prebootstrap()</script>');
         DOM.insertAfter(el, prebootEl);
-
+        console.timeEnd('preboot' + config.id);
         return moduleRef
       })
       .then((moduleRef: NgModuleRef<T>) => {
+        console.time('serialize' + config.id);
         // serializeDocument used
         let document = di.get('DOCUMENT');
         let appRef = di.get('ApplicationRef');
@@ -239,7 +245,7 @@ export class NodePlatform implements PlatformRef {
         appRef = null;
         moduleRef = null;
         di.clear();
-
+        console.timeEnd('serialize' + config.id);
         return html
           .replace(new RegExp(_appId, 'gi'), appId)
       });
@@ -354,7 +360,6 @@ export class NodeModule {
         }
         return memo;
       }, []);
-    console.log('providers', providers);
     return {
       ngModule: NodeModule,
       providers: [

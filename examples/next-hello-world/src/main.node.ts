@@ -17,7 +17,7 @@ class AnotherComponent {}
 
 export const platform = platformDynamicNode();
 
-export function main(document) {
+export function main(document, config?: any) {
 
   @NgModule({
     bootstrap: [ App, AnotherComponent ],
@@ -39,24 +39,24 @@ export function main(document) {
     ]
   })
   class MainModule {
-    ngOnInit() {
-      console.log('ngOnInit');
-    }
-    ngDoCheck() {
-      console.log('ngDoCheck');
-    }
-    ngOnStable() {
-      console.log('ngOnStable');
-    }
-    ngOnRendered() {
-      console.log('ngOnRendered');
-    }
+    // ngOnInit() {
+    //   console.log('ngOnInit');
+    // }
+    // ngDoCheck() {
+    //   console.log('ngDoCheck');
+    // }
+    // ngOnStable() {
+    //   console.log('ngOnStable');
+    // }
+    // ngOnRendered() {
+    //   console.log('ngOnRendered');
+    // }
   }
 
   return platform
-    .serializeModule(MainModule)
+    .serializeModule(MainModule, config)
     .then((html) => {
-      console.log('done')
+      // console.log('done')
       return html
     });
 };
