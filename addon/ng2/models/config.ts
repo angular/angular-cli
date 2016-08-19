@@ -60,14 +60,21 @@ export class CliConfig {
     let properties: any;
     let additionalProperties: boolean;
 
+    jsonPath = jsonPath.replace(/\[(\d+)\]/g, '.$1');
     const checkPath = jsonPath.split('.').reduce((o, i) => {
-      if (!o || !o.properties) {
+      if (!o || (o.type === 'array' && !o.items) || (o.type === 'object' && !o.properties)) {
         throw new Error(`Invalid config path.`);
       }
-      properties = o.properties;
+
       additionalProperties = o.additionalProperties;
 
-      return o.properties[i];
+      if (o.type === 'array') {
+        return o.items;
+      }
+
+      properties = o.properties;
+
+      return properties[i];
     }, schema);
     const configPath = jsonPath.split('.').reduce((o, i) => o[i], this._config);
 
@@ -84,18 +91,18 @@ export class CliConfig {
       }
     }
 
-    if (typeof checkPath.type === 'string' && isNaN(value)) {
+    if (checkPath.type === 'string' && isNaN(value)) {
       parent[name] = value;
       return true;
     }
 
-    if (typeof checkPath.type === 'number' && !isNaN(value)) {
+    if (checkPath.type === 'number' && !isNaN(value)) {
       parent[name] = value;
       return true;
     }
 
     if (typeof value != checkPath.type) {
-      throw new Error(`Invalid value type. Trying to set ${typeof value} to ${path.type}`);
+      throw new Error(`Invalid value type. Trying to set ${typeof value} to ${checkPath.type}`);
     }
   }
 

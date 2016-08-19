@@ -50,6 +50,18 @@ describe.skip('Config Tests', () => {
     expect(contents.project.name).to.be.equal('new-project-name');
   });
 
+  it('Updates properties of array items successfully', () => {
+    let c = new CliConfig(configCopy);
+    c.set('apps.0.main', 'new-main.ts');
+    c.set('apps[0].test', 'new-test.ts');
+    c.save();
+
+    let contents = getContents();
+
+    expect(contents.apps[0].main).to.be.equal('new-main.ts');
+    expect(contents.apps[0].test).to.be.equal('new-test.ts');
+  });
+
   it('Throws an error if try to assign property that does not exists', () => {
     let c = new CliConfig(configCopy);
 
