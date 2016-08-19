@@ -1,5 +1,5 @@
 import {Bootloader, BootloaderConfig} from 'angular2-universal';
-import through = require('through2');
+import * as through from 'through2';
 var gutil = require('gutil');
 
 let PluginError = gutil.PluginError;

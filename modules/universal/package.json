@@ -1,90 +1,21 @@
 {
   "name": "angular2-universal",
-  "version": "0.104.1",
   "description": "Universal (isomorphic) javascript support for Angular2",
-  "homepage": "https://github.com/angular/universal",
-  "license": "MIT",
-  "contributors": [
-    "Tobias Bosch <tbosch@google.com>",
-    "PatrickJS <github@gdi2290.com>",
-    "Jeff Whelpley <jeff@gethuman.com>"
-  ],
-  "typings": "dist/typings.d.ts",
-  "main": "dist/node/index.js",
-  "browser": "dist/browser/index.js",
-  "files": [
-    "dist",
-    "src",
-    "browser.d.ts",
-    "browser.js",
-    "node.d.ts",
-    "node.js",
-    "polyfills.d.ts",
-    "polyfills.js",
-    "mock.d.ts",
-    "mock.js",
-    "common.d.ts",
-    "common.js",
-    "global.d.ts",
-    "global.js",
-    "mock.d.ts",
-    "mock.js"
-  ],
-  "scripts": {
-    "remove-modules": "rimraf node_modules/angular2-universal-preview node_modules/angular2-universal node_modules/angular2-express-engine node_modules/preboot node_modules/angular2-hapi-engine node_modules/angular2-universal-polyfills",
-    "reload": "npm run remove-modules && npm install && npm install",
-    "prebuild": "rimraf dist",
-    "build": "tsc && echo tsc-passed || echo tsc-errors",
-    "prepublish": "npm run build"
-  },
-  "devDependencies": {
-    "@angular/common": "2.0.0-rc.3",
-    "@angular/compiler": "2.0.0-rc.3",
-    "@angular/core": "2.0.0-rc.3",
-    "@angular/http": "2.0.0-rc.3",
-    "@angular/platform-browser": "2.0.0-rc.3",
-    "@angular/platform-browser-dynamic": "2.0.0-rc.3",
-    "@angular/platform-server": "2.0.0-rc.3",
-    "@angular/router": "3.0.0-alpha.8",
-    "angular2-universal": "file:.",
-    "angular2-universal-polyfills": "file:../polyfills",
-    "angular2-express-engine": "file:../express-engine",
-    "angular2-hapi-engine": "file:../hapi-engine",
-    "preboot": "^2.1.2",
-    "zone.js": "0.6.12",
-    "es6-shim": "^0.35.1",
-    "es6-promise": "^3.2.1",
-    "reflect-metadata": "0.1.2",
-    "typescript": "~1.8.10",
-    "rxjs": "5.0.0-beta.6",
-    "css": "^2.2.1",
-    "rimraf": "^2.5.2",
-    "parse5": "^1.5.0"
-  },
+  "typings": "typings.d.ts",
+  "main": "node/index.js",
+  "browser": "browser/index.js",
   "dependencies": {
-    "angular2-express-engine": "^0.15.0",
-    "angular2-hapi-engine": "^0.15.0",
-    "angular2-universal-polyfills": "^0.4.1",
-    "css": "^2.2.1",
-    "js-beautify": "^1.6.2",
-    "parse5": "^1.5.0",
-    "xhr2": "^0.1.3"
+    "angular2-express-engine": "<INHERIT>",
+    "angular2-hapi-engine": "<INHERIT>",
+    "angular2-universal-polyfills": "<INHERIT>",
+    "css": "<INHERIT>",
+    "js-beautify": "<INHERIT>",
+    "parse5": "<INHERIT>",
+    "xhr2": "<INHERIT>"
   },
   "peerDependencies": {
-    "preboot": ">=2.1.2",
-    "angular2-universal-polyfills": "^0.4.1",
-    "angular2-express-engine": "^0.15.0",
-    "angular2-hapi-engine": "^0.15.0",
-    "rxjs": "~5.0.0-beta.6",
-    "zone.js": "^0.6.12",
-    "css": "^2.2.1",
-    "parse5": "^1.5.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/angular/universal"
-  },
-  "bugs": {
-    "url": "https://github.com/angular/universal/issues"
+    "preboot": "<INHERIT>",
+    "rxjs": "<INHERIT>",
+    "zone.js": "<INHERIT>"
   }
 }

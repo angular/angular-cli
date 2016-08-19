@@ -1,8 +1,11 @@
 // dom closure
-import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
-Parse5DomAdapter.makeCurrent();
+import './make_parse5_current'; // ensure Parse5DomAdapter is used
 
-export {provide, Inject, Optional, enableProdMode} from '@angular/core';
+export {Inject, Optional, enableProdMode} from '@angular/core';
+export function provide(token, object) {
+  object.provide = token;
+  return object;
+}
 
 export * from './directives/index';
 

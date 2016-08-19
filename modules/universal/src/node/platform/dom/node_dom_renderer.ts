@@ -22,8 +22,8 @@ import {
   listContains
 } from '../../../common';
 
-import {Parse5DomAdapter} from '@angular/platform-server/src/parse5_adapter';
-Parse5DomAdapter.makeCurrent(); // ensure Parse5DomAdapter is used
+import {AnimationDriver} from '@angular/core/src/animation/animation_driver';
+import '../../make_parse5_current'; // ensure Parse5DomAdapter is used
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 var DOM: any = getDOM();
 
@@ -31,14 +31,14 @@ var DOM: any = getDOM();
 @Injectable()
 export class NodeDomRootRenderer_ extends DomRootRenderer {
   constructor(@Inject(DOCUMENT) _document: any, _eventManager: EventManager,
-              sharedStylesHost: DomSharedStylesHost, animate: WebAnimationsDriver) {
-    super(_document, _eventManager, sharedStylesHost, animate);
+              sharedStylesHost: DomSharedStylesHost, private _animate: WebAnimationsDriver) {
+    super(_document, _eventManager, sharedStylesHost, _animate);
   }
   renderComponent(componentProto: RenderComponentType): Renderer {
     // TODO(gdi2290): see PR https://github.com/angular/angular/pull/6584
     var renderer = (<any>this).registeredComponents.get(componentProto.id);
     if (isBlank(renderer)) {
-      renderer = new NodeDomRenderer(this, componentProto);
+      renderer = new NodeDomRenderer(this, componentProto, this._animate);
       (<any>this).registeredComponents.set(componentProto.id, renderer);
     }
     return renderer;
@@ -208,16 +208,48 @@ export const ATTRIBUTES = {
   ]
 };
 
+// TODO(gdi2290): provide better whitelist above to alias setting props as attrs
+export const IGNORE_ATTRIBUTES = {
+  'innerHTML': true,
+  'hidden' : true
+};
+
 export class NodeDomRenderer extends DomRenderer {
-  constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType) {
+  constructor(_rootRenderer: DomRootRenderer | any, _componentProto: RenderComponentType, _animate: WebAnimationsDriver) {
     if (_componentProto.encapsulation === ViewEncapsulation.Native) {
       _componentProto.encapsulation = ViewEncapsulation.Emulated;
     }
-    super(_rootRenderer, _componentProto);
+    super(_rootRenderer, _componentProto, _animate);
+  }
+
+  isObject(val) {
+    if (val === null) {
+      return false;
+    }
+    return ( (typeof val === 'function') || (typeof val === 'object') );
   }
 
   setElementProperty(renderElement: any, propertyName: string, propertyValue: any) {
-    super.setElementProperty(renderElement, propertyName, propertyValue);
+
+    // Fix for passing in custom Object
+    if (this.isObject(propertyValue)) {
+      propertyValue = JSON.stringify(propertyValue);
+    }else if(typeof propertyValue === 'number'){
+      propertyValue.toString()
+    }
+
+    // Fix for issues caused by null passed in
+    if (propertyValue === null || propertyValue === undefined) {
+        propertyValue = false;
+        if (propertyName === 'innerHTML') {
+            propertyValue = '';
+        }
+    }
+
+    let setProp = super.setElementProperty(renderElement, propertyName, propertyValue);
+    if (IGNORE_ATTRIBUTES[propertyName]) {
+      return setProp;
+    }
 
     let el = DOM.nodeName(renderElement);
     let attrList = ATTRIBUTES[el];
@@ -228,6 +260,8 @@ export class NodeDomRenderer extends DomRenderer {
           return this._setOnOffAttribute(renderElement, propertyName, propertyValue);
         } else if (propertyName === 'checked') {
           return this._setCheckedAttribute(renderElement, propertyName, propertyValue);
+        } else if (propertyName === 'disabled') {
+          return this._setDisabledAttribute(renderElement, propertyName, propertyValue);
         } else {
           return this._setBooleanAttribute(renderElement, propertyName, propertyValue);
         }
@@ -252,11 +286,19 @@ export class NodeDomRenderer extends DomRenderer {
     return super.invokeElementMethod(location, methodName, args);
   }
 
+  _setDisabledAttribute(renderElement, propertyName, propertyValue) {
+    if (isPresent(propertyValue)) {
+      if (propertyValue === true || propertyValue.toString() !== 'false') {
+        return super.setElementAttribute(renderElement, 'disabled', 'disabled');
+      }
+    }
+  }
+
   _setCheckedAttribute(renderElement, propertyName, propertyValue) {
     if (isPresent(propertyValue)) {
       if (propertyValue === true) {
         return super.setElementAttribute(renderElement, propertyValue, 'checked');
-      } else if (propertyValue = false) {
+      } else if (propertyValue === false) {
         return super.setElementAttribute(renderElement, propertyValue, '');
       }
     }

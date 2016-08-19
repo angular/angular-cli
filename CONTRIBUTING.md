@@ -3,7 +3,6 @@
 We would love for you to contribute to Angular 2 and help make it even better than it is
 today! As a contributor, here are the guidelines we would like you to follow:
 
- - [Getting Started with Universal](#gettingstarted)
  - [Code of Conduct](#coc)
  - [Question or Problem?](#question)
  - [Issues and Bugs](#issue)
@@ -13,39 +12,12 @@ today! As a contributor, here are the guidelines we would like you to follow:
  - [Commit Message Guidelines](#commit)
  - [Signing the CLA](#cla)
 
-## <a name="gettingstarted"></a> Getting Started
-To start contributing, fork the Universal Repo & then clone it. CD into that newly created directory and run:
-    
-    fork the repo
-    clone the forked repo
-    cd into it (cd universal)
-    
-    npm install   (This will run loop installs to install/build all the modules - may take a while!)
-    
-    npm start     (This will run the base example in /examples - Look there for other examples)
-    
-This will take ~10 minutes to install/compile all the individual modules, and then get the examples section set up.
-Once this is complete you can run `npm start` to fire up the basic example. Preboot / Universal / etc modules can be found in the top-level directory under the *modules* folder. (ie: `./modules/universal`)
-
-There are several other examples found within the `./examples` folder. 
-
-Once you have the project running just go to other URLs such as:
-
-    localhost:3000/                       [ Base demo ]
-    localhost:3000/examples/todo    
-    localhost:3000/examples/template_url    
-    localhost:3000/examples/html  
-    localhost:3000/examples/jsonp  
-    localhost:3000/examples/falcor_todo  
-    
-Sometimes when getting latest and trying to rebuild everything you may get errors. Try cleaning out the entire repo (and all it's modules) with `npm run clean:all` (from the BASE directory). After that try a clean `npm install` to get everything reloaded correctly.
-
 ## <a name="coc"></a> Code of Conduct
 Help us keep Angular open and inclusive. Please read and follow our [Code of Conduct][coc].
 
 ## <a name="question"></a> Got a Question or Problem?
 
-If you have questions about how to *use* Angular 2 Universal, please direct them to [Gitter][gitter]. 
+If you have questions about how to *use* Angular 2 Universal, please direct them to [Gitter][gitter].
 There is also a [Slack](https://angular-universal.slack.com) ground that we would be hapy to invite you to. Just ping [@jeffwhelpley](https://twitter.com/jeffwhelpley)
 or [@gdi2290](https://twitter.com/gdi2290) on [Twitter](https://twitter.com) or [Gitter][gitter].
 

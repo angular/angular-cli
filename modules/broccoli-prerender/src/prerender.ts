@@ -4,19 +4,19 @@ import { disposePlatform } from '@angular/core';
 
 const fs = require('fs');
 const path = require('path');
-const BroccoliPlugin: BroccoliPluginConstructor = require('broccoli-caching-writer');
+export const BroccoliPlugin: BroccoliPluginConstructor = require('broccoli-caching-writer');
 var exec = require('child_process').exec;
 
 export interface BroccoliPlugin {}
 
-interface BroccoliPluginConstructor {
+export interface BroccoliPluginConstructor {
   new(inputNodes: any[], options?: any): BroccoliPluginConstructor;
   inputPaths: string[];
   outputPath: string;
 }
 
 export class AppShellPlugin extends BroccoliPlugin {
-  constructor (inputNodes, private indexPath: string, private appShellPath: string) {
+  constructor (inputNodes: string, private indexPath: string, private appShellPath: string) {
     super([inputNodes]);
   }
 
@@ -29,7 +29,7 @@ export class AppShellPlugin extends BroccoliPlugin {
       ].join(' ')}`;
       exec(command, {
         timeout: 5000
-      }, (err, stdin) => {
+      }, (err: any) => {
         if (err) {
           reject(err);
         } else {

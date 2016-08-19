@@ -8,8 +8,7 @@
 - [ ] grunt-prerender
 - [ ] gulp-prerender
 - [ ] hapi-engine
-- [ ] preboot
-- [ ] universal-preview
+- [ ] universal-next
 - [ ] universal
 - [ ] webpack-prerender
 

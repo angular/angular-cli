@@ -2,24 +2,11 @@ language: node_js
 node_js:
   - '4'
   - '5'
+  - '6'
 
 cache:
   directories:
     - node_modules
-    - modules/express-engine/node_modules
-    - modules/express-engine/typings
-    - modules/preboot/node_modules
-    - modules/preboot/typings
-    - modules/grunt-prerender/node_modules
-    - modules/grunt-prerender/typings
-    - modules/gulp-prerender/node_modules
-    - modules/gulp-prerender/typings
-    - modules/hapi-engine/node_modules
-    - modules/hapi-engine/typings
-    - modules/universal/node_modules
-    - modules/universal/typings
-    - modules/webpack-prerender/node_modules
-    - modules/webpack-prerender/typings
     - typings
 
 notifications:
@@ -36,11 +23,10 @@ env:
   global:
   - SAUCE_ACCESS_KEY=''
 
-before_install:
-  - npm install -g typings
-
 before_script:
-  - npm install -g gulp
+  - npm install
+  - ./node_modules/.bin/tsc --version # build once with just tsc to make sure no TS errors, since build.js suppresses
+  - ./node_modules/.bin/tsc # build once with just tsc to make sure no TS errors, since build.js suppresses
 
 script:
-  - npm run ci
+  - ./node_modules/.bin/gulp test

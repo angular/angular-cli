@@ -1,0 +1,11 @@
+{
+  "main": "src/node/index.ts",
+  "browser": "src/browser/index.ts",
+  "files": [
+    "lib",
+    "src",
+    "browser.ts",
+    "node.ts",
+    "index.ts"
+  ]
+}

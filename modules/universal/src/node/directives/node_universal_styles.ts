@@ -1,5 +1,5 @@
 import {Directive, ElementRef} from '@angular/core';
-import {DomSharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
+import { DomSharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
 
 
 @Directive({

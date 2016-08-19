@@ -34,6 +34,10 @@ export class NodeLocation implements LocationConfig {
   get origin(): string {
     return this.protocol + '//' + this.hostname + ':' + this.port;
   }
+  set origin(val) {
+    // TODO: remove this error one TS 2.0 is supported.
+    throw new Error('origin is a readonly property.');
+  }
   constructor(config: NodeLocationConfig & LocationConfig) {
     this.assign(config);
   }
@@ -113,11 +117,14 @@ export class NodePlatformLocation extends PlatformLocation {
     super();
     this._originUrl = originUrl;
     this._baseUrl = baseUrl || '/';
-    this.pushState(null, null, joinWithSlash(this._baseUrl, requestUrl));
+    // this.pushState(null, null, joinWithSlash(this._baseUrl, requestUrl));
+    this.pushState(null, null, requestUrl);
   }
 
   get search(): string { return this._loc.search; }
+  set search(val) { throw new Error('Cannot set readonly property "search"') }
   get hash(): string { return this._loc.hash; }
+  set hash(val) { throw new Error('Cannot set readonly property "hash"') }
   get pathname(): string { return this._loc.pathname; }
   set pathname(newPathname: string) { this._loc.pathname = newPathname; }
 
