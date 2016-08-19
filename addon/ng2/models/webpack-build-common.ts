@@ -2,23 +2,26 @@ import * as path from 'path';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as webpack from 'webpack';
-import { ForkCheckerPlugin } from 'awesome-typescript-loader';
-import { CliConfig } from './config';
+import * as atl from 'awesome-typescript-loader';
+
+import {findLazyModules} from './find-lazy-modules';
+
 
 export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, outputDir: string) {
-
-  let outputPath: string = path.resolve(projectRoot, outputDir);
+  const sourceRoot = path.resolve(projectRoot, sourceDir);
+  const outputPath = path.resolve(projectRoot, outputDir);
+  const lazyModules = findLazyModules(path.resolve(projectRoot, sourceDir));
 
   return {
     devtool: 'source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: path.resolve(projectRoot, `./${sourceDir}`)
+      root: sourceRoot
     },
     context: path.resolve(__dirname, './'),
     entry: {
-      main: [path.resolve(projectRoot, `./${sourceDir}/main.ts`)],
-      polyfills: path.resolve(projectRoot, `./${sourceDir}/polyfills.ts`)
+      main: [path.join(sourceRoot, 'main.ts')],
+      polyfills: path.join(sourceRoot, 'polyfills.ts')
     },
     output: {
       path: outputPath,
@@ -42,10 +45,9 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
               loader: 'awesome-typescript-loader',
               query: {
                 useForkChecker: true,
-                tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`)
+                tsconfig: path.resolve(sourceRoot, 'tsconfig.json')
               }
-            },
-            {
+            }, {
               loader: 'angular2-template-loader'
             }
           ],
@@ -61,9 +63,10 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
       ]
     },
     plugins: [
-      new ForkCheckerPlugin(),
+      new webpack.ContextReplacementPlugin(/.*/, sourceRoot, lazyModules),
+      new atl.ForkCheckerPlugin(),
       new HtmlWebpackPlugin({
-        template: path.resolve(projectRoot, `./${sourceDir}/index.html`),
+        template: path.resolve(sourceRoot, 'index.html'),
         chunksSortMode: 'dependency'
       }),
       new webpack.optimize.CommonsChunkPlugin({
@@ -79,7 +82,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
         context: path.resolve(projectRoot, './public'),
         from: '**/*',
         to: outputPath
-      }])
+      }]),
     ],
     node: {
       fs: 'empty',
@@ -90,4 +93,4 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
       setImmediate: false
     }
   }
-};
+}
