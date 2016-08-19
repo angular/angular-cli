@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Http, Jsonp } from '@angular/http';
-import 'rxjs/Rx';
+// import 'rxjs/Rx';
 
 
 @Component({
@@ -17,7 +17,8 @@ import 'rxjs/Rx';
 })
 export class App implements OnInit {
   response = {};
-  constructor(public jsonp: Jsonp) {
+  constructor() {
+  // constructor(public jsonp: Jsonp) {
 
   }
 

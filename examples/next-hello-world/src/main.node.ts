@@ -32,8 +32,8 @@ export function main(document, config?: any) {
           uglify: true
         }
       }),
-      NodeHttpModule,
-      NodeJsonpModule
+      // NodeHttpModule,
+      // NodeJsonpModule
     ],
     providers: [
     ]
