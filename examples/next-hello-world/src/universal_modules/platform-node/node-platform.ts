@@ -124,10 +124,10 @@ export class NodePlatform implements PlatformRef {
       }
     };
 
-    config.time && console.time('bootstrapModule' + config.id);
+    config.time && console.time('bootstrapModule: ' + config.id);
     return this.platformRef.bootstrapModule<T>(moduleType, config.compilerOptions)
       .then((moduleRef: NgModuleRef<T>) => {
-        config.time && console.timeEnd('bootstrapModule' + config.id);
+        config.time && console.timeEnd('bootstrapModule: ' + config.id);
         let modInjector = moduleRef.injector;
         let instance: any = moduleRef.instance;
         // lifecycle hooks
@@ -146,7 +146,7 @@ export class NodePlatform implements PlatformRef {
         return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
-        config.time && console.time('stable' + config.id);
+        config.time && console.time('stable: ' + config.id);
         let _config = di.get('config');
         let ngDoCheck = di.get('ngDoCheck');
         let ngOnInit = di.get('ngOnInit');
@@ -208,7 +208,7 @@ export class NodePlatform implements PlatformRef {
           });
       })
       .then((moduleRef: NgModuleRef<T>) => {
-        config.time && console.time('preboot' + config.id);
+        config.time && console.time('preboot: ' + config.id);
         // parseFragment used
         // getInlineCode used
         let DOM = di.get('DOM');
@@ -226,7 +226,7 @@ export class NodePlatform implements PlatformRef {
             prebootEl = NodePlatform._cache.get(key).prebootEl;
             // prebootCode = NodePlatform._cache.get(key);
           } else if (key && !prebootEl) {
-            config.time && console.time('preboot insert' + config.id);
+            config.time && console.time('preboot insert: ' + config.id);
             prebootCode = parseFragment(''+
               '<script>\n'+
               getInlineCode(_config.preboot) +
@@ -238,7 +238,7 @@ export class NodePlatform implements PlatformRef {
               DOM.appendChild(prebootEl, prebootCode.childNodes[i]);
             }
             NodePlatform._cache.set(key, {prebootCode, prebootEl});
-            config.time && console.timeEnd('preboot insert' + config.id);
+            config.time && console.timeEnd('preboot insert: ' + config.id);
           }
           //  else {
           //   prebootCode = getInlineCode(_config.preboot);
@@ -252,15 +252,15 @@ export class NodePlatform implements PlatformRef {
         } catch(e) {
           console.log(e);
           // if there's an error don't inject preboot
-          config.time && console.timeEnd('preboot' + config.id);
+          config.time && console.timeEnd('preboot: ' + config.id);
           return moduleRef;
         }
 
-        config.time && console.timeEnd('preboot' + config.id);
+        config.time && console.timeEnd('preboot: ' + config.id);
         return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
-        config.time && console.time('serialize' + config.id);
+        config.time && console.time('serialize: ' + config.id);
         // serializeDocument used
         let document = di.get('DOCUMENT');
         let appRef = di.get('ApplicationRef');
@@ -280,7 +280,7 @@ export class NodePlatform implements PlatformRef {
         appRef = null;
         moduleRef = null;
         di.clear();
-        config.time && console.timeEnd('serialize' + config.id);
+        config.time && console.timeEnd('serialize: ' + config.id);
         return html
           .replace(new RegExp(_appId, 'gi'), appId)
       });
