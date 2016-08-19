@@ -27,9 +27,10 @@ var doc =`<!doctype>
 </body>
 </html>
 `
-var arr = new Array(20).fill(null);
+var arr = new Array(3).fill(null);
+// var arr = new Array(20).fill(null);
 function createApp(num) {
-  return main(doc, {id: num});
+  return main(doc, {id: num, time: true});
 }
 var promises = arr.reduce((memo, wat, num) => {
   return memo.then(() => {
