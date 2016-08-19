@@ -162,8 +162,8 @@ export class NodePlatform implements PlatformRef {
                 // hot code path
                 if (ngZone.hasPendingMicrotasks === true) { return checkStable(done, ref); }
                 if (ngZone.hasPendingMacrotasks === true) { return checkStable(done, ref); }
-                // if (http && http._async > 0) { return checkStable(done, ref); }
-                // if (jsonp && jsonp._async > 0) { return checkStable(done, ref); }
+                if (http && http._async > 0) { return checkStable(done, ref); }
+                if (jsonp && jsonp._async > 0) { return checkStable(done, ref); }
                 if (ngZone.isStable === true) {
                   let isStable = ngDoCheck(ref, ngZone, config);
                   if (ngDoCheck !== NodePlatform._noop) {

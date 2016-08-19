@@ -1,7 +1,7 @@
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-// import { HttpModule, JsonpModule } from '@angular/http';
+import { HttpModule, JsonpModule } from '@angular/http';
 
 import { isBrowser } from '@angular/universal/browser';
 
@@ -13,8 +13,8 @@ import { App } from './app';
   declarations: [ App ],
   imports: [
     BrowserModule,
-    // HttpModule,
-    // JsonpModule
+    HttpModule,
+    JsonpModule
   ]
 })
 export class MainModule {}

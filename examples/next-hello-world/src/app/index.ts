@@ -17,18 +17,18 @@ import { Http, Jsonp } from '@angular/http';
 })
 export class App implements OnInit {
   response = {};
-  constructor() {
-  // constructor(public jsonp: Jsonp) {
+  constructor(public jsonp: Jsonp) {
 
   }
 
   ngOnInit() {
-   // this.jsonp.request('https://api.github.com?callback=JSON_CALLBACK')
-   //    .subscribe((res) => {
-   //      var json = res.json();
-   //      this.response = json;
-   //      // console.log('doneeeee')
-   //    });
+   this.jsonp.request('https://api.github.com?callback=JSON_CALLBACK')
+      .subscribe((res) => {
+        var json = res.json();
+        console.log('wat', json);
+        this.response = json;
+        // console.log('doneeeee')
+      });
   }
 
 }
