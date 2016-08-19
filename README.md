@@ -26,7 +26,7 @@ You can install and update your projects using [these instructions](https://gith
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4 or greater**.
+The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**.
 
 ## Table of Contents
 
