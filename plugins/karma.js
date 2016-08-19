@@ -5,10 +5,11 @@ const init = (config) => {
 
   // load Angular CLI config
   if (!config.angularCliConfig) throw new Error('Missing \'angularCliConfig\' entry in Karma config');
-  const angularCliConfig = require(path.join(config.basePath, config.angularCliConfig))
+  const angularCliConfig = require(path.join(config.basePath, config.angularCliConfig));
+  const appConfig = angularCliConfig.apps[0];
 
   // add webpack config
-  config.webpack = getWebpackTestConfig(config.basePath, angularCliConfig.defaults.sourceDir);
+  config.webpack = getWebpackTestConfig(config.basePath, appConfig);
   config.webpackMiddleware = {
     noInfo: true, // Hide webpack output because its noisy.
     stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.

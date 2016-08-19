@@ -46,7 +46,6 @@ module.exports = Command.extend({
     { name: 'live-reload-live-css', type: Boolean, default: true,                              description: 'Whether to live reload CSS (default true)' },
     { name: 'target',               type: String,  default: 'development', aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }] },
     { name: 'environment',          type: String,  default: '', aliases: ['e'] },
-    { name: 'output-path',          type: 'Path',  default: 'dist/',       aliases: ['op', 'out'] },
     { name: 'ssl',                  type: Boolean, default: false },
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
     { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' }

@@ -25,9 +25,9 @@ module.exports = {
 
     var defaultPrefix = '';
     if (this.project.ngConfig &&
-        this.project.ngConfig.defaults &&
-        this.project.ngConfig.defaults.prefix) {
-      defaultPrefix = this.project.ngConfig.defaults.prefix + '-';
+        this.project.ngConfig.apps[0] &&
+        this.project.ngConfig.apps[0].prefix) {
+      defaultPrefix = this.project.ngConfig.apps[0].prefix + '-';
     }
     var prefix = this.options.prefix ? defaultPrefix : '';
     this.selector = stringUtils.dasherize(prefix + parsedPath.name);
@@ -97,7 +97,7 @@ module.exports = {
             dir = dirParts.join(path.sep);
           }
         }
-        var srcDir = this.project.ngConfig.defaults.sourceDir;
+        var srcDir = this.project.ngConfig.apps[0].root;
         this.appDir = dir.substr(dir.indexOf(srcDir) + srcDir.length);
         this.generatePath = dir;
         return dir;

@@ -6,25 +6,25 @@ import * as atl from 'awesome-typescript-loader';
 
 import {findLazyModules} from './find-lazy-modules';
 
+export function getWebpackCommonConfig(projectRoot: string, environment: string, appConfig: any) {
 
-export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, outputDir: string) {
-  const sourceRoot = path.resolve(projectRoot, sourceDir);
-  const outputPath = path.resolve(projectRoot, outputDir);
-  const lazyModules = findLazyModules(path.resolve(projectRoot, sourceDir));
+  const appRoot = path.resolve(projectRoot, appConfig.root);
+  const appMain = path.resolve(appRoot, appConfig.main);
+  const styles = path.resolve(appRoot, appConfig.styles);
+  const lazyModules = findLazyModules(appRoot);
 
   return {
     devtool: 'source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: sourceRoot
+      root: appRoot
     },
     context: path.resolve(__dirname, './'),
-    entry: {
-      main: [path.join(sourceRoot, 'main.ts')],
-      polyfills: path.join(sourceRoot, 'polyfills.ts')
+    entry: { 
+      main: [appMain, styles]
     },
     output: {
-      path: outputPath,
+      path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].bundle.js'
     },
     module: {
@@ -45,7 +45,7 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
               loader: 'awesome-typescript-loader',
               query: {
                 useForkChecker: true,
-                tsconfig: path.resolve(sourceRoot, 'tsconfig.json')
+                tsconfig: path.resolve(appRoot, appConfig.tsconfig)
               }
             }, {
               loader: 'angular2-template-loader'
@@ -53,25 +53,43 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
           ],
           exclude: [/\.(spec|e2e)\.ts$/]
         },
-        { test: /\.json$/, loader: 'json-loader'},
-        { test: /\.css$/,  loaders: ['raw-loader', 'postcss-loader'] },
-        { test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
-        { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
-        { test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
-        { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000'},
-        { test: /\.html$/, loader: 'raw-loader' }
+
+        // in main, load css as raw text
+        { exclude: styles, test: /\.css$/, loaders: ['raw-loader', 'postcss-loader'] },
+        { exclude: styles, test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
+        { exclude: styles, test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
+        { exclude: styles, test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
+
+        // outside of main, load it via style-loader
+        { include: styles, test: /\.css$/, loaders: ['style-loader', 'css-loader', 'postcss-loader'] },
+        { include: styles, test: /\.styl$/, loaders: ['style-loader', 'css-loader', 'postcss-loader', 'stylus-loader'] },
+        { include: styles, test: /\.less$/, loaders: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader'] },
+        { include: styles, test: /\.scss$|\.sass$/, loaders: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'] },
+
+        { test: /\.json$/, loader: 'json-loader' },
+        { test: /\.(jpg|png)$/, loader: 'url-loader?limit=10000' },
+        { test: /\.html$/, loader: 'raw-loader' },
+
+        { test: /\.(woff|ttf|svg)$/, loader: 'url?limit=10000' },
+        { test: /\.woff2$/, loader: 'url?limit=10000&mimetype=font/woff2' },
+        { test: /\.eot$/, loader: 'file' }
       ]
     },
     plugins: [
-      new webpack.ContextReplacementPlugin(/.*/, sourceRoot, lazyModules),
+      new webpack.ContextReplacementPlugin(/.*/, appRoot, lazyModules),
       new atl.ForkCheckerPlugin(),
       new HtmlWebpackPlugin({
-        template: path.resolve(sourceRoot, 'index.html'),
+        template: path.resolve(appRoot, appConfig.index),
         chunksSortMode: 'dependency'
       }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: ['polyfills']
-      }),
+      new webpack.NormalModuleReplacementPlugin(
+        // This plugin is responsible for swapping the environment files.
+        // Since it takes a RegExp as first parameter, we need to escape the path.
+        // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
+        new RegExp(path.resolve(appRoot, appConfig.environments.source)
+          .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")),
+        path.resolve(appRoot, appConfig.environments[environment])
+      ),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
         name: 'inline',
@@ -79,10 +97,10 @@ export function getWebpackCommonConfig(projectRoot: string, sourceDir: string, o
         sourceMapFilename: 'inline.map'
       }),
       new CopyWebpackPlugin([{
-        context: path.resolve(projectRoot, './public'),
+        context: path.resolve(appRoot, appConfig.assets),
         from: '**/*',
-        to: outputPath
-      }]),
+        to: path.resolve(projectRoot, appConfig.outDir, appConfig.assets)
+      }])
     ],
     node: {
       fs: 'empty',

@@ -37,13 +37,14 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
 * [Build Targets and Environment Files](#build-targets-and-environment-files)
-* [Bundling](#bundling)
+* [Adding extra files to the build](#adding-extra-files-to-the-build)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Linting and formatting code](#linting-and-formatting-code)
 * [Support for offline applications](#support-for-offline-applications)
 * [Commands autocompletion](#commands-autocompletion)
+* [Global styles](#global-styles)
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
 * [Updating angular-cli](#updating-angular-cli)
@@ -126,8 +127,8 @@ A build can specify both a build target (`development` or `production`) and an
 environment file to be used with that build. By default, the development build 
 target is used.
 
-At build time, `src/app/environments/environment.ts` will be replaced by
-`src/app/environments/environment.{NAME}.ts` where `NAME` is the argument 
+At build time, `src/environments/environment.ts` will be replaced by
+`src/environments/environment.NAME.ts` where `NAME` is the argument 
 provided to the `--environment` flag.
 
 These options also apply to the serve command. If you do not pass a value for `environment`,
@@ -145,14 +146,15 @@ ng build --dev
 ng build
 ```
 
-You can also add your own env files other than `dev` and `prod` by creating a
-`src/app/environments/environment.{NAME}.ts` and use them by using the `--env=NAME`
-flag on the build/serve commands.
+You can also add your own env files other than `dev` and `prod` by doing the following:
+- create a `src/environments/environment.NAME.ts`
+- add `{ NAME: 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json` 
+- use them by using the `--env=NAME` flag on the build/serve commands.
 
 ### Bundling
 
-Builds created with the `-prod` flag via `ng build -prod` or `ng serve -prod` bundle
-all dependencies into a single file, and make use of tree-shaking techniques.
+All builds make use of bundling, and using the `--prod` flag in  `ng build --prod` 
+or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ### Running unit tests
 
@@ -240,6 +242,13 @@ ng completion >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
+### Global styles
+
+The `styles.css` file allows users to add global styles and supports 
+[CSS imports](https://developer.mozilla.org/en/docs/Web/CSS/@import). 
+
+If the project is created with the `--style=sass` option, this will be a `.sass` 
+file instead, and the same applies to `scss/less/styl`. 
 
 ### CSS Preprocessor integration
 
