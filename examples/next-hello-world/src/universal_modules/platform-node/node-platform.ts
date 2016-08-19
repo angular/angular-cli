@@ -96,6 +96,7 @@ export var __PLATFORM_REF: PlatformRef = null;
 
 export class NodePlatform implements PlatformRef {
   static _noop = () => {};
+  static _cache = new Map<any, any>();
   _platformRef;
   get platformRef() {
     return __PLATFORM_REF;
@@ -201,24 +202,34 @@ export class NodePlatform implements PlatformRef {
         let _config = di.get('config');
         let appRef: ApplicationRef = di.get('ApplicationRef');
         let components = appRef.components;
-        let prebootCode = ''
+        let prebootCode;
+        // TODO(gdi2290): hide cache in (ngPreboot|UniversalPreboot)
+        let key = (typeof _config.preboot === 'object') && JSON.stringify(_config.preboot) || null;
+        let prebootEl;
+        let el;
+        let lastRef;
         try {
-          prebootCode = getInlineCode(_config.preboot);
+          if (key && NodePlatform._cache.has(key)) {
+            prebootCode = NodePlatform._cache.get(key);
+          } else if (key) {
+            prebootCode = getInlineCode(_config.preboot);
+            NodePlatform._cache.set(key, prebootCode)
+          } else {
+            prebootCode = getInlineCode(_config.preboot);
+          }
+          // assume last component is the last component selector
+          // TODO(gdi2290): provide a better way to determine last component position
+          lastRef = components[components.length - 1];
+          el = lastRef.location.nativeElement;
+          // let script = parseFragment(prebootCode);
+          prebootEl = DOM.createElement('div');
         } catch(e) {
           console.log(e);
           // if there's an error don't inject preboot
           return moduleRef;
         }
-
-        // assume last component is the last component selector
-        // TODO(gdi2290): provide a better way to determine last component position
-        let lastRef = components[components.length - 1];
-        let el = lastRef.location.nativeElement;
-        // let script = parseFragment(prebootCode);
-        let prebootEl = DOM.createElement('div');
-
         // inject preboot code in the document
-        // TODO(gdi2290): recreate ngPreboot or UniversalPreboot to hide this behavior
+        // TODO(gdi2290): recreate (ngPreboot|UniversalPreboot) to hide this behavior
         DOM.setInnerHTML(prebootEl, '<script>\n'+ prebootCode +';\nvar preboot = preboot || prebootstrap()</script>');
         DOM.insertAfter(el, prebootEl);
         console.timeEnd('preboot' + config.id);
