@@ -1,4 +1,4 @@
-import { NgModule, Component } from '@angular/core';
+import { NgModule, Component, Injectable } from '@angular/core';
 import {
   NodeModule,
   NodeHttpModule,
@@ -30,18 +30,16 @@ export function main(document, config?: any) {
         preboot: {
           appRoot: ['app'],
           uglify: true
-        }
+        },
       }),
-      // NodeHttpModule,
-      // NodeJsonpModule
-    ],
-    providers: [
+      NodeHttpModule,
+      NodeJsonpModule
     ]
   })
   class MainModule {
-    // ngOnInit() {
-    //   console.log('ngOnInit');
-    // }
+    ngOnInit() {
+      console.log('ngOnInit');
+    }
     // ngDoCheck() {
     //   console.log('ngDoCheck');
     // }
@@ -56,7 +54,7 @@ export function main(document, config?: any) {
   return platform
     .serializeModule(MainModule, config)
     .then((html) => {
-
+      console.log('done');
       return html
     });
 };

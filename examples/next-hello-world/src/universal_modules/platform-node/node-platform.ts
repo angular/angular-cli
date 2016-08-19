@@ -154,6 +154,8 @@ export class NodePlatform implements PlatformRef {
         let appRef = di.get('ApplicationRef');
         let components = appRef.components;
 
+        ngOnInit();
+
         // lifecycle hooks
         function outsideNg(compRef, ngZone, config, http, jsonp) {
           function checkStable(done, ref) {
