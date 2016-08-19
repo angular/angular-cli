@@ -49,27 +49,19 @@
           "mobile": {
             "type": "boolean"
           },
-          "additionalEntries": {
-            "description": "Additional files to be included in the build.",
+          "styles": {
+            "description": "Global styles to be included in the build.",
             "type": "array",
             "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "input": {
-                      "type": "string"
-                    },
-                    "output": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                }
-              ]
+              "type": "string"
+            },
+            "additionalProperties": false
+          },
+          "scripts": {
+            "description": "Global scripts to be included in the build.",
+            "type": "array",
+            "items": {
+              "type": "string"
             },
             "additionalProperties": false
           },

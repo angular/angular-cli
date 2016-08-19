@@ -10,8 +10,17 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);
-  const styles = path.resolve(appRoot, appConfig.styles);
+  const styles = appConfig.styles.map(style => path.resolve(appRoot, style));
+  const scripts = appConfig.scripts.map(script => path.resolve(appRoot, script));
   const lazyModules = findLazyModules(appRoot);
+
+  let entry = { 
+    main: [appMain]
+  };
+
+  // Only add styles/scripts if there's actually entries there
+  if (appConfig.styles.length > 0) entry.styles = styles;
+  if (appConfig.scripts.length > 0) entry.scripts = scripts;
 
   return {
     devtool: 'source-map',
@@ -20,9 +29,7 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
       root: appRoot
     },
     context: path.resolve(__dirname, './'),
-    entry: { 
-      main: [appMain, styles]
-    },
+    entry: entry,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].bundle.js'
@@ -66,6 +73,9 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
         { include: styles, test: /\.less$/, loaders: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader'] },
         { include: styles, test: /\.scss$|\.sass$/, loaders: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'] },
 
+        // load global scripts using script-loader
+        { include: scripts, test: /\.js$/, loader: 'script-loader' },
+
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=10000' },
         { test: /\.html$/, loader: 'raw-loader' },
@@ -90,6 +100,10 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
           .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")),
         path.resolve(appRoot, appConfig.environments[environment])
       ),
+      new webpack.optimize.CommonsChunkPlugin({
+        // Optimizing ensures loading order in index.html
+        name: ['styles', 'scripts', 'main'].reverse();
+      }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
         name: 'inline',
