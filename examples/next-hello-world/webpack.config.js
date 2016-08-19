@@ -3,22 +3,25 @@ var path = require('path');
 var clone = require('js.clone');
 
 var UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+var DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
 var ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 var TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
 var sharedPlugins = [
-  //  new UglifyJsPlugin({
-  //   beautify: true, //debug
-  //   mangle: false, //debug
+  // new DedupePlugin(),
+  // new UglifyJsPlugin({
+  //   // beautify: true, //debug
+  //   // mangle: false, //debug
+  //   // mangle: true, //prod
   //   compress: {
   //     screw_ie8: true,
   //     keep_fnames: true,
-  //     drop_debugger: false,
-  //     dead_code: true,
-  //     unused: true
+  //     // drop_debugger: false,
+  //     // dead_code: true,
+  //     // unused: true
   //   },
-  //   comments: true,
+  //   comments: false,
   // }),
   new ContextReplacementPlugin(
     // The (\\|\/) piece accounts for path separators in *nix and Windows
