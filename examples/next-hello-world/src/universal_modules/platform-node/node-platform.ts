@@ -199,11 +199,11 @@ export class NodePlatform implements PlatformRef {
           let jsonp = cmpInjector.get(Jsonp, null);
           return rootNgZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, _config, http, jsonp));
         });
-        config.time && console.timeEnd('stable' + config.id);
         return rootNgZone.runOutsideAngular(() => {
           return Promise.all<Promise<ComponentRef<any>>>(stableComponents)
         })
           .then(() => {
+            config.time && console.timeEnd('stable: ' + config.id);
             return moduleRef
           });
       })
