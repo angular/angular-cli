@@ -161,7 +161,7 @@ export class NodePlatform implements PlatformRef {
               if (jsonp && jsonp._async > 0) { return checkStable(done, ref); }
               if (ngZone.isStable === true) {
                 let isStable = ngDoCheck(ref, ngZone, config);
-                if (typeof isStable !== 'boolean') {
+                if (typeof isStable !== 'boolean' && ngDoCheck !== NodePlatform._noop) {
                   console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
                 } else if (isStable !== true) {
                   return checkStable(done, ref);
