@@ -246,7 +246,6 @@ source ~/.bash_profile
 Angular-CLI supports all major CSS preprocessors:
 - sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
 - less ([http://lesscss.org/](http://lesscss.org/))
-- compass ([http://compass-style.org/](http://compass-style.org/))
 - stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
 
 To use these prepocessors simply add the file to your component's `styleUrls`:
