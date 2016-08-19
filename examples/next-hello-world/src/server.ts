@@ -1,5 +1,5 @@
 import './polyfills.node';
-import { enableProdMode, ApplicationRef, PlatformRef, NgZone, APP_ID } from '@angular/core';
+import { enableProdMode } from '@angular/core';
 enableProdMode();
 
 import {main} from './main.node';
@@ -27,19 +27,23 @@ var doc =`<!doctype>
 </body>
 </html>
 `
-var arr = new Array(7).fill(null);
+var arr = new Array(20).fill(null);
 function createApp(num) {
   return main(doc, {id: num});
 }
 var promises = arr.reduce((memo, wat, num) => {
   return memo.then(() => {
-    return createApp(num);
+    console.time('app'+num)
+    return createApp(num).then(() => {
+      console.timeEnd('app'+num);
+      console.log('\n-----------\n')
+    });
   });
 }, Promise.resolve());
 
 promises
 .then(html => {
   console.log('done');
-  process.exit();
+  // process.exit();
   return html;
 });

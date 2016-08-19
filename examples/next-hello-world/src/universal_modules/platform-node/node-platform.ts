@@ -124,8 +124,10 @@ export class NodePlatform implements PlatformRef {
       }
     };
 
+    console.time('bootstrapModule' + config.id);
     return this.platformRef.bootstrapModule<T>(moduleType, config.compilerOptions)
       .then((moduleRef: NgModuleRef<T>) => {
+        console.timeEnd('bootstrapModule' + config.id);
         let modInjector = moduleRef.injector;
         let instance: any = moduleRef.instance;
         // lifecycle hooks
@@ -152,29 +154,35 @@ export class NodePlatform implements PlatformRef {
         let components = appRef.components;
 
         // lifecycle hooks
-
         function outsideNg(compRef, ngZone, config, http, jsonp) {
           function checkStable(done, ref) {
-            setTimeout(function stable() {
-              if (ngZone.hasPendingMicrotasks === true) { return checkStable(done, ref); }
-              if (ngZone.hasPendingMacrotasks === true) { return checkStable(done, ref); }
-              if (http && http._async > 0) { return checkStable(done, ref); }
-              if (jsonp && jsonp._async > 0) { return checkStable(done, ref); }
-              if (ngZone.isStable === true) {
-                let isStable = ngDoCheck(ref, ngZone, config);
-                if (typeof isStable !== 'boolean' && ngDoCheck !== NodePlatform._noop) {
-                  console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
-                } else if (isStable !== true) {
-                  return checkStable(done, ref);
+            ngZone.runOutsideAngular(() => {
+              setTimeout(function stable() {
+                // hot code path
+                if (ngZone.hasPendingMicrotasks === true) { return checkStable(done, ref); }
+                if (ngZone.hasPendingMacrotasks === true) { return checkStable(done, ref); }
+                // if (http && http._async > 0) { return checkStable(done, ref); }
+                // if (jsonp && jsonp._async > 0) { return checkStable(done, ref); }
+                if (ngZone.isStable === true) {
+                  let isStable = ngDoCheck(ref, ngZone, config);
+                  if (ngDoCheck !== NodePlatform._noop) {
+                    if (typeof isStable !== 'boolean') {
+                      console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
+                    } else if (isStable !== true) {
+                      return checkStable(done, ref);
+                    }
+                  }
                 }
-              }
-              if (ngZone.isStable === true) { return done(ref); }
-              return checkStable(done, ref);
-            }, 1);
+                if (ngZone.isStable === true) { return done(ref); }
+                return checkStable(done, ref);
+              }, 0);
+            })
           }
-          return new Promise(function (resolve) {
-            checkStable(resolve, compRef);
-          }); // promise
+          return ngZone.runOutsideAngular(() => {
+            return new Promise(function (resolve) {
+              checkStable(resolve, compRef);
+            }); // promise
+          });
         }
 
         // check if all components are stable
@@ -186,10 +194,12 @@ export class NodePlatform implements PlatformRef {
           // TODO(gdi2290): remove when zone.js tracks http and https
           let http = cmpInjector.get(Http, null);
           let jsonp = cmpInjector.get(Jsonp, null);
-          ngZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, _config, http, jsonp));
+          return rootNgZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, _config, http, jsonp));
         });
         console.timeEnd('stable' + config.id);
-        return Promise.all<Promise<ComponentRef<any>>>(stableComponents)
+        return rootNgZone.runOutsideAngular(() => {
+          return Promise.all<Promise<ComponentRef<any>>>(stableComponents)
+        })
           .then(() => {
             return moduleRef
           });
