@@ -210,30 +210,41 @@ export class NodePlatform implements PlatformRef {
         let lastRef;
         try {
           if (key && NodePlatform._cache.has(key)) {
-            prebootCode = NodePlatform._cache.get(key);
-          } else if (key) {
-            prebootCode = getInlineCode(_config.preboot);
-            NodePlatform._cache.set(key, prebootCode)
-          } else {
-            prebootCode = getInlineCode(_config.preboot);
+            prebootEl = NodePlatform._cache.get(key).prebootEl;
+            // prebootCode = NodePlatform._cache.get(key);
+          } else if (key && !prebootEl) {
+            console.time('preboot insert' + config.id);
+            prebootCode = parseFragment(''+
+              '<script>\n'+
+              getInlineCode(_config.preboot) +
+              ';\nvar preboot = preboot || prebootstrap()</script>' +
+            '');
+            prebootEl = DOM.createElement('div');
+
+            for (let i = 0; i < prebootCode.childNodes.length; i++) {
+              DOM.appendChild(prebootEl, prebootCode.childNodes[i]);
+            }
+            NodePlatform._cache.set(key, {prebootCode, prebootEl});
+            console.timeEnd('preboot insert' + config.id);
           }
+          //  else {
+          //   prebootCode = getInlineCode(_config.preboot);
+          // }
           // assume last component is the last component selector
           // TODO(gdi2290): provide a better way to determine last component position
           lastRef = components[components.length - 1];
           el = lastRef.location.nativeElement;
+          DOM.insertAfter(el, prebootEl);
           // let script = parseFragment(prebootCode);
-          prebootEl = DOM.createElement('div');
         } catch(e) {
           console.log(e);
           // if there's an error don't inject preboot
+          console.timeEnd('preboot' + config.id);
           return moduleRef;
         }
-        // inject preboot code in the document
-        // TODO(gdi2290): recreate (ngPreboot|UniversalPreboot) to hide this behavior
-        DOM.setInnerHTML(prebootEl, '<script>\n'+ prebootCode +';\nvar preboot = preboot || prebootstrap()</script>');
-        DOM.insertAfter(el, prebootEl);
+
         console.timeEnd('preboot' + config.id);
-        return moduleRef
+        return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
         console.time('serialize' + config.id);
