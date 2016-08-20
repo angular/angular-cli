@@ -1,4 +1,4 @@
-import "./polyfills.ts";
+import './polyfills.ts';
 
 import 'zone.js/dist/long-stack-trace-zone';
 import 'zone.js/dist/jasmine-patch';
