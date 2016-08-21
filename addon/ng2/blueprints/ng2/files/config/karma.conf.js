@@ -39,4 +39,10 @@ module.exports = function (config) {
     browsers: ['Chrome'],
     singleRun: false
   });
+
+  if(process.env.TRAVIS) {
+    config.browsers = ['Chrome_travis_ci'];
+    config.autoWatch = false;
+    config.singleRun = true;
+  }
 };
