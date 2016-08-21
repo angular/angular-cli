@@ -5,7 +5,7 @@ import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.direc
 
 describe('Directive: <%= classifiedModuleName %>', () => {
   it('should create an instance', () => {
-    let directive = new <%= classifiedModuleName %>();
+    let directive = new <%= classifiedModuleName %>Directive();
     expect(directive).toBeTruthy();
   });
 });
