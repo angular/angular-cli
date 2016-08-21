@@ -262,7 +262,6 @@ To use these prepocessors simply add the file to your component's `styleUrls`:
 
 ```
 @Component({
-  moduleId: module.id,
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
