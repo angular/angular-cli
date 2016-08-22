@@ -486,7 +486,7 @@ describe('Basic end-to-end Workflow', function () {
     expect(indexHtml).to.include('main.bundle.js');
   });
 
-  it('styles.css is added to main bundle', function() {
+  it('styles.css is added to styles bundle', function() {
     this.timeout(420000);
 
     let stylesPath = path.join(process.cwd(), 'src', 'styles.css');
@@ -495,10 +495,10 @@ describe('Basic end-to-end Workflow', function () {
     
     sh.exec(`${ngBin} build`);
 
-    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
-    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+    var stylesBundlePath = path.join(process.cwd(), 'dist', 'styles.bundle.js');
+    var stylesBundleContent = fs.readFileSync(stylesBundlePath, { encoding: 'utf8' });
 
-    expect(mainBundleContent.includes(testStyle)).to.be.equal(true);
+    expect(stylesBundleContent.includes(testStyle)).to.be.equal(true);
   });
 
   it('styles.css supports css imports', function() {
@@ -508,16 +508,62 @@ describe('Basic end-to-end Workflow', function () {
     let testStyle = 'body { background-color: blue; }';
     fs.writeFileSync(importedStylePath, testStyle, 'utf8');
 
-    let stylesPath = path.join(process.cwd(), 'src', 'style.css');
-    let importStyle = '@import \'./imported-style.css\';';
+    let stylesPath = path.join(process.cwd(), 'src', 'styles.css');
+    let importStyle = '@import \'./imported-styles.css\';';
     fs.writeFileSync(stylesPath, importStyle, 'utf8');
 
     sh.exec(`${ngBin} build`);
 
-    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
-    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+    var stylesBundlePath = path.join(process.cwd(), 'dist', 'styles.bundle.js');
+    var stylesBundleContent = fs.readFileSync(stylesBundlePath, { encoding: 'utf8' });
 
-    expect(mainBundleContent.includes(testStyle)).to.be.equal(true);
+    expect(stylesBundleContent).to.include(testStyle);
+  });
+
+  it('build supports global styles and scripts', function() {
+    this.timeout(420000);
+
+    sh.exec('npm install bootstrap@next', { silent: true });
+
+    const configFile = path.join(process.cwd(), 'angular-cli.json');
+    let originalConfigContent = fs.readFileSync(configFile, { encoding: 'utf8' });
+    let configContent = originalConfigContent.replace('"styles.css"', `
+      "styles.css",
+      "../node_modules/bootstrap/dist/css/bootstrap.css"
+    `).replace('"scripts": [],',`
+      "scripts": [
+        "../node_modules/jquery/dist/jquery.js",
+        "../node_modules/tether/dist/js/tether.js",
+        "../node_modules/bootstrap/dist/js/bootstrap.js"
+      ],
+    `);
+
+    fs.writeFileSync(configFile, configContent, 'utf8');
+
+    sh.exec(`${ngBin} build`);
+
+    // checking for strings that are part of the included files
+    const stylesBundlePath = path.join(process.cwd(), 'dist', 'styles.bundle.js');
+    const stylesBundleContent = fs.readFileSync(stylesBundlePath, { encoding: 'utf8' });
+    expect(stylesBundleContent).to.include('* Bootstrap ');
+
+    const scriptsBundlePath = path.join(process.cwd(), 'dist', 'scripts.bundle.js');
+    const scriptsBundleContent = fs.readFileSync(scriptsBundlePath, { encoding: 'utf8' });    
+    expect(scriptsBundleContent).to.include('* jQuery JavaScript');
+    expect(scriptsBundleContent).to.include('/*! tether ');
+    expect(scriptsBundleContent).to.include('* Bootstrap ');
+
+    // check the scripts are loaded in the correct order
+    const indexPath = path.join(process.cwd(), 'dist', 'index.html');
+    const indexContent = fs.readFileSync(indexPath, { encoding: 'utf8' });
+    let scriptTags = '<script type="text/javascript" src="inline.js"></script>' + 
+                    '<script type="text/javascript" src="styles.bundle.js"></script>' +
+                    '<script type="text/javascript" src="scripts.bundle.js"></script>' +
+                    '<script type="text/javascript" src="main.bundle.js"></script>'
+    expect(indexContent).to.include(scriptTags);
+
+    // restore config
+    fs.writeFileSync(configFile, originalConfigContent, 'utf8');
   });
 
   it('Serve and run e2e tests on dev environment', function () {

@@ -78,6 +78,7 @@
     "rimraf": "^2.5.3",
     "rxjs": "^5.0.0-beta.11",
     "sass-loader": "^3.2.0",
+    "script-loader": "^0.7.0",
     "shelljs": "^0.7.0",
     "silent-error": "^1.0.0",
     "source-map-loader": "^0.1.5",

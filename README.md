@@ -47,6 +47,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Global styles](#global-styles)
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
+* [Global Library Installation](#global-library-installation)
 * [Updating angular-cli](#updating-angular-cli)
 * [Known Issues](#known-issues)
 * [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
@@ -250,6 +251,8 @@ The `styles.css` file allows users to add global styles and supports
 If the project is created with the `--style=sass` option, this will be a `.sass` 
 file instead, and the same applies to `scss/less/styl`. 
 
+You can add more global styles via the `apps[0].styles` property in `angular-cli.json`.
+
 ### CSS Preprocessor integration
 
 Angular-CLI supports all major CSS preprocessors:
@@ -294,6 +297,42 @@ If the library does not include typings, you can install them using npm:
 npm install moment --save
 npm install @types/moment --save-dev
 ```
+
+### Global Library Installation
+
+Some javascript libraries need to be added to the global scope, and loaded as if 
+they were in a script tag. We can do this using the `apps[0].scripts` and 
+`apps[0].styles` properties of `angular-cli.json`.
+
+As an example, to use [Boostrap 4](http://v4-alpha.getbootstrap.com/) this is 
+what you need to do:
+
+First install Bootstrap from `npm`:
+
+```bash
+npm install bootstrap@next
+```
+
+Then add the needed script files to to `apps[0].scripts`.
+
+```
+"scripts": [
+  "../node_modules/jquery/dist/jquery.js",
+  "../node_modules/tether/dist/js/tether.js",
+  "../node_modules/bootstrap/dist/js/bootstrap.js"
+],
+```
+
+Finally add the Bootstrap CSS to the `apps[0].styles` array:
+```
+"styles": [
+  "styles.css",
+  "../node_modules/bootstrap/dist/css/bootstrap.css"
+],
+```
+
+Restart `ng serve` if you're running it, and Bootstrap 4 should be working on 
+your app.
 
 ### Updating angular-cli
 
