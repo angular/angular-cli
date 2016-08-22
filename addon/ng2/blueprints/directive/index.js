@@ -47,7 +47,7 @@ module.exports = {
 
     const returns = [];
     const modulePath = path.join(this.project.root, this.dynamicPath.appRoot, 'app.module.ts');
-    const className = stringUtils.classify(`${options.entity.name}`);
+    const className = stringUtils.classify(`${options.entity.name}Directive`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.directive`);
     const componentDir = path.relative(this.dynamicPath.appRoot, this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;

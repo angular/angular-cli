@@ -50,8 +50,8 @@ describe('Acceptance: ng generate directive', function () {
       .then(() => expect(existsSync(testPath)).to.equal(true))
       .then(() => readFile(appModulePath, 'utf-8'))
       .then(content => {
-        expect(content).matches(/import.*\bMyDir\b.*from '.\/my-dir\/my-dir.directive';/);
-        expect(content).matches(/declarations:\s*\[[^\]]+?,\n\s+MyDir\n/m);
+        expect(content).matches(/import.*\bMyDirDirective\b.*from '.\/my-dir\/my-dir.directive';/);
+        expect(content).matches(/declarations:\s*\[[^\]]+?,\n\s+MyDirDirective\n/m);
       });
   });
 
