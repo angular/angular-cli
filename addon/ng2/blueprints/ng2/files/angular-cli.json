@@ -14,7 +14,10 @@
       "tsconfig": "tsconfig.json",
       "prefix": "<%= prefix %>",
       "mobile": <%= isMobile %>,
-      "styles": "styles.<%= styleExt %>",
+      "styles": [
+        "styles.<%= styleExt %>"
+      ],
+      "scripts": [],
       "environments": {
         "source": "environments/environment.ts",
         "prod": "environments/environment.prod.ts",
