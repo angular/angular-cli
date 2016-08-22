@@ -3,9 +3,10 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const getWebpackTestConfig = function(projectRoot, appConfig, debug=false) {
+const getWebpackTestConfig = function(projectRoot, appConfig, debug) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
+  var debug = typeof debug !== 'undefined' ?  debug : false;
 
   return {
     devtool: 'inline-source-map',
