@@ -3,8 +3,8 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const getWebpackTestConfig = function(projectRoot, appConfig) {
-  
+const getWebpackTestConfig = function(projectRoot, appConfig, debug=false) {
+
   const appRoot = path.resolve(projectRoot, appConfig.root);
 
   return {
@@ -66,7 +66,7 @@ const getWebpackTestConfig = function(projectRoot, appConfig) {
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000' },
         { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(appRoot, appConfig.index)] }
       ],
-      postLoaders: [
+      postLoaders: debug ? [] : [
         {
           test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
           exclude: [

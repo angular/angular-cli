@@ -31,7 +31,7 @@ module.exports = function (config) {
       }
     },
     angularCliConfig: './angular-cli.json',
-    reporters: ['progress', 'karma-remap-istanbul'],
+    reporters: config.debug ? ['progress'] : ['progress', 'karma-remap-istanbul'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
