@@ -3,15 +3,13 @@ import * as webpackMerge from 'webpack-merge'; // used to merge webpack configs
 import * as WebpackMd5Hash from 'webpack-md5-hash';
 import * as CompressionPlugin from 'compression-webpack-plugin';
 import * as webpack from 'webpack';
-import { CliConfig } from './config';
 
-export const getWebpackProdConfigPartial = function(projectRoot: string, sourceDir: string, outputDir: string) {
-
+export const getWebpackProdConfigPartial = function(projectRoot: string, appConfig: any) {
   return {
     debug: false,
     devtool: 'source-map',
     output: {
-      path: path.resolve(projectRoot, outputDir),
+      path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].[chunkhash].bundle.js',
       sourceMapFilename: '[name].[chunkhash].bundle.map',
       chunkFilename: '[id].[chunkhash].chunk.js'
@@ -37,7 +35,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, sourceD
     tslint: {
       emitErrors: true,
       failOnHint: true,
-      resourcePath: path.resolve(projectRoot, `./${sourceDir}`)
+      resourcePath: path.resolve(projectRoot, appConfig.root)
     },
     htmlLoader: {
       minimize: true,

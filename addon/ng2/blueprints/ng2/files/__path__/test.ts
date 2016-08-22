@@ -1,10 +1,5 @@
-import 'core-js/es6';
-import 'core-js/es7/reflect';
+import './polyfills.ts';
 
-// Typescript emit helpers polyfill
-import 'ts-helpers';
-
-import 'zone.js/dist/zone';
 import 'zone.js/dist/long-stack-trace-zone';
 import 'zone.js/dist/jasmine-patch';
 import 'zone.js/dist/async-test';
