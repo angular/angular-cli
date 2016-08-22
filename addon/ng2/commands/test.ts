@@ -5,6 +5,7 @@ import * as TestTask from '../tasks/test';
 module.exports = TestCommand.extend({
   availableOptions: [
     { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
+    { name: 'debug', type: Boolean, default: false, aliases: ['d'] },
     { name: 'browsers', type: String },
     { name: 'colors', type: Boolean },
     { name: 'log-level', type: String },

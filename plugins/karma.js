@@ -9,7 +9,7 @@ const init = (config) => {
   const appConfig = angularCliConfig.apps[0];
 
   // add webpack config
-  config.webpack = getWebpackTestConfig(config.basePath, appConfig);
+  config.webpack = getWebpackTestConfig(config.basePath, appConfig, config.debug);
   config.webpackMiddleware = {
     noInfo: true, // Hide webpack output because its noisy.
     stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.
