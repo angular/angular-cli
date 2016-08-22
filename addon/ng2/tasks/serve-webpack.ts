@@ -1,5 +1,7 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
+import * as SilentError from 'silent-error';
 import * as Task from 'ember-cli/lib/models/task';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
@@ -16,6 +18,7 @@ module.exports = Task.extend({
     let webpackCompiler: any;
 
     var config: NgCliWebpackConfig = new NgCliWebpackConfig(this.project, commandOptions.target, commandOptions.environment).config;
+
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
     config.entry.main.unshift(`webpack-dev-server/client?http://${commandOptions.host}:${commandOptions.port}/`);
@@ -26,11 +29,23 @@ module.exports = Task.extend({
       colors: true
     }));
 
+    let proxyConfig = {};
+    if (commandOptions.proxyConfig) {
+      const proxyPath = path.resolve(this.project.root, commandOptions.proxyConfig);
+      if (fs.existsSync(proxyPath)) {
+        proxyConfig = require(proxyPath);
+      } else {
+         var message = 'Proxy config file ' + proxyPath + ' does not exist.';
+         return Promise.reject(new SilentError(message));
+      }
+    }
+
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
-      contentBase: path.resolve(this.project.root, `./${CliConfig.fromProject().defaults.sourceDir}`),
+      contentBase: path.resolve(this.project.root, `./${CliConfig.fromProject().apps[0].root}`),
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
-      inline: true
+      inline: true,
+      proxy: proxyConfig
     };
 
     const serveMessage:string = chalk.green(`\n*\n*\n NG Live Development Server is running on http://${commandOptions.host}:${commandOptions.port}.\n*\n*`);

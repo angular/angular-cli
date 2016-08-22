@@ -3,7 +3,7 @@
 
 module.exports = function (config) {
   config.set({
-    basePath: '..',
+    basePath: './',
     frameworks: ['jasmine', 'angular-cli'],
     plugins: [
       require('karma-jasmine'),
@@ -19,10 +19,10 @@ module.exports = function (config) {
       }
     },
     files: [
-      { pattern: './src/test.ts', watched: false }
+      { pattern: './<%= sourceDir %>/test.ts', watched: false }
     ],
     preprocessors: {
-      './src/test.ts': ['angular-cli']
+      './<%= sourceDir %>/test.ts': ['angular-cli']
     },
     remapIstanbulReporter: {
       reports: {

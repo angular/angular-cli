@@ -3,25 +3,26 @@ import * as path from 'path';
 import * as OfflinePlugin from 'offline-plugin';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import { PrerenderWebpackPlugin } from '../utilities/prerender-webpack-plugin.ts';
-import { CliConfig } from './config';
 
-export const getWebpackMobileConfigPartial = function (projectRoot: string, sourceDir: string) {
+export const getWebpackMobileConfigPartial = function (projectRoot: string, appConfig: any) {
+  // Hardcoded files and paths here should be part of appConfig when
+  // reworking the mobile app functionality
   return {
     plugins: [
       new CopyWebpackPlugin([
-        {from: path.resolve(projectRoot, `./${sourceDir}/icons`), to: path.resolve(projectRoot, './dist/icons')},
-        {from: path.resolve(projectRoot, `./${sourceDir}/manifest.webapp`), to: path.resolve(projectRoot, './dist')}
+        {from: path.resolve(projectRoot, appConfig.root, 'icons'), to: path.resolve(projectRoot, appConfig.outDir, 'icons')},
+        {from: path.resolve(projectRoot, appConfig.root, 'manifest.webapp'), to: path.resolve(projectRoot, appConfig.outDir)}
       ]),
       new PrerenderWebpackPlugin({
         templatePath: 'index.html',
-        configPath: path.resolve(projectRoot, `./${sourceDir}/main-app-shell.ts`),
-        appPath: path.resolve(projectRoot, `./${sourceDir}`)
+        configPath: path.resolve(projectRoot, appConfig.root, 'main-app-shell.ts'),
+        appPath: path.resolve(projectRoot, appConfig.root)
       })
     ]
   }
 };
 
-export const getWebpackMobileProdConfigPartial = function (projectRoot: string, sourceDir: string) {
+export const getWebpackMobileProdConfigPartial = function (projectRoot: string, appConfig: any) {
   return {
     entry: {
       'sw-install': path.resolve(__dirname, '../utilities/sw-install.js')

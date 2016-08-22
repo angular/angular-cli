@@ -11,6 +11,9 @@ var treeKill = require('tree-kill');
 var child_process = require('child_process');
 var ng = require('../helpers/ng');
 var root = path.join(process.cwd(), 'tmp');
+var express = require('express');
+var http = require('http');
+var request = require('request');
 
 function existsSync(path) {
   try {
@@ -106,7 +109,7 @@ describe('Basic end-to-end Workflow', function () {
     var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
     var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
 
-    expect(mainBundleContent).to.include('production: true');
+    expect(mainBundleContent.includes('production: true')).to.be.equal(true);
   });
 
   it('Build fails on invalid build target', function (done) {
@@ -141,6 +144,18 @@ describe('Basic end-to-end Workflow', function () {
       .then(function () {
         // Also does not create new things in GIT.
         expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
+      });
+  });
+
+  it('Build pack output files into a different folder', function () {
+    this.timeout(420000);
+
+    return ng(['build', '-o', './build-output'])
+      .catch(() => {
+        throw new Error('Build failed.');
+      })
+      .then(function () {
+        expect(existsSync(path.join(process.cwd(), './build-output'))).to.be.equal(true);
       });
   });
 
@@ -295,11 +310,11 @@ describe('Basic end-to-end Workflow', function () {
     expect(existsSync(lcovReport)).to.be.equal(true);
   });
 
-  it('moves all files that live inside `public` into `dist`', function () {
+  it('moves all files that live inside `assets` into `dist`', function () {
     this.timeout(420000);
 
-    const tmpFile = path.join(process.cwd(), 'public', 'test.abc');
-    const tmpFileLocation = path.join(process.cwd(), 'dist', 'test.abc');
+    const tmpFile = path.join(process.cwd(), 'src', 'assets', 'test.abc');
+    const tmpFileLocation = path.join(process.cwd(), 'dist', 'assets', 'test.abc');
     fs.writeFileSync(tmpFile, 'hello world');
 
     sh.exec(`${ngBin} build`);
@@ -471,6 +486,40 @@ describe('Basic end-to-end Workflow', function () {
     expect(indexHtml).to.include('main.bundle.js');
   });
 
+  it('styles.css is added to main bundle', function() {
+    this.timeout(420000);
+
+    let stylesPath = path.join(process.cwd(), 'src', 'styles.css');
+    let testStyle = 'body { background-color: blue; }';
+    fs.writeFileSync(stylesPath, testStyle, 'utf8');
+    
+    sh.exec(`${ngBin} build`);
+
+    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+
+    expect(mainBundleContent.includes(testStyle)).to.be.equal(true);
+  });
+
+  it('styles.css supports css imports', function() {
+    this.timeout(420000);
+
+    let importedStylePath = path.join(process.cwd(), 'src', 'imported-styles.css');
+    let testStyle = 'body { background-color: blue; }';
+    fs.writeFileSync(importedStylePath, testStyle, 'utf8');
+
+    let stylesPath = path.join(process.cwd(), 'src', 'style.css');
+    let importStyle = '@import \'./imported-style.css\';';
+    fs.writeFileSync(stylesPath, importStyle, 'utf8');
+
+    sh.exec(`${ngBin} build`);
+
+    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
+    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+
+    expect(mainBundleContent.includes(testStyle)).to.be.equal(true);
+  });
+
   it('Serve and run e2e tests on dev environment', function () {
     this.timeout(240000);
 
@@ -552,6 +601,81 @@ describe('Basic end-to-end Workflow', function () {
         throw new Error(msg);
       });
   });
+
+  it('Serve with proxy config', function () {
+    this.timeout(240000);
+    var ngServePid;
+    var server;
+
+    function executor(resolve, reject) {
+      var startedProtractor = false;
+      var app = express();
+      server = http.createServer(app);
+      server.listen();
+      app.set('port', server.address().port);
+
+      app.get('/api/test', function (req, res) {
+        res.send('TEST_API_RETURN');
+      });
+      var backendHost = 'localhost';
+      var backendPort = server.address().port
+
+      var proxyServerUrl = `http://${backendHost}:${backendPort}`;
+      const proxyConfigFile = path.join(process.cwd(), 'proxy.config.json');
+      const proxyConfig = {
+        '/api/*': {
+          target: proxyServerUrl
+        }
+      };
+      fs.writeFileSync(proxyConfigFile, JSON.stringify(proxyConfig, null, 2), 'utf8');
+      var serveProcess = child_process.exec(`${ngBin} serve --proxy-config proxy.config.json`, { maxBuffer: 500 * 1024 });
+      ngServePid = serveProcess.pid;
+
+      serveProcess.stdout.on('data', (data) => {
+        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
+
+          // How to get the url with out hardcoding here?
+          request( 'http://localhost:4200/api/test', function(err, response, body) {
+            expect(response.statusCode).to.be.equal(200);
+            expect(body).to.be.equal('TEST_API_RETURN');
+            resolve();
+          });
+        }
+      });
+
+      serveProcess.stderr.on('data', (data) => {
+        reject(data);
+      });
+      serveProcess.on('close', (code) => {
+        code === 0 ? resolve() : reject('ng serve command closed with error')
+      });
+    }
+
+    // Need a way to close the express server
+    return new Promise(executor)
+      .then(() => {
+        if (ngServePid) treeKill(ngServePid);
+        if(server){
+          server.close();
+        }
+      })
+      .catch((msg) => {
+        if (ngServePid) treeKill(ngServePid);
+        if(server){
+          server.close();
+        }
+        throw new Error(msg);
+      });
+  });
+
+  it('Serve fails on invalid proxy config file', function (done) {
+    this.timeout(420000);
+    sh.exec(`${ngBin} serve --proxy-config proxy.config.does_not_exist.json`, (code) => {
+      expect(code).to.not.equal(0);
+      done();
+    });
+  });
+
 });
 
 function isMobileTest() {

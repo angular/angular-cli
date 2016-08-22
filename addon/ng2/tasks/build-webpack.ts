@@ -16,7 +16,8 @@ module.exports = Task.extend({
     var project = this.cliProject;
 
     rimraf.sync(path.resolve(project.root, runTaskOptions.outputPath));
-    var config = new NgCliWebpackConfig(project, runTaskOptions.target, runTaskOptions.environment).config;
+    var config = new NgCliWebpackConfig(project, runTaskOptions.target, runTaskOptions.environment, runTaskOptions.outputPath).config;
+    
     const webpackCompiler = webpack(config);
 
     const ProgressPlugin  = require('webpack/lib/ProgressPlugin');

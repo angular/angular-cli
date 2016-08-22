@@ -11,14 +11,14 @@ describe('dynamic path parser', () => {
   var project;
   var entityName = 'temp-name';
   var rootName = path.parse(process.cwd()).root + 'project';
-  var sourceDir = 'src';
+  var root = 'src';
   beforeEach(() => {
     project = {
       root: rootName, 
       ngConfig: {
-        defaults: {
-          sourceDir: sourceDir
-        }
+        apps: [{
+          root: root
+        }]
       } 
     };
     var mockFolder = {};
