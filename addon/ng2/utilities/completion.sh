@@ -5,12 +5,9 @@
 # Installation: ng completion >> ~/.bashrc (or ~/.zshrc)
 #
 
-ng_opts='addon asset-sizes b build completion d destroy doc e2e g generate get github-pages:deploy gh-pages:deploy h help i init install lint make-this-awesome new s serve server set t test v version -h --help'
+ng_opts='b build completion doc e2e g generate get github-pages:deploy gh-pages:deploy h help i init install lint make-this-awesome new s serve server set t test v version -h --help'
 
-addon_opts='-b --blueprint -d -dir --directory --dry-run -sb --skip-bower -sg --skip-git -sn --skip-npm -v --verbose'
-asset_sizes_opts='-o --output-path'
 build_opts='--environment --output-path --suppress-sizes --target --watch --watcher -dev -e -prod'
-destroy_opts='--dry-run --verbose --pod --classic --dummy --in-repo --in-repo-addon -d -v -p -c -dum -id -i'
 generate_opts='class component directive enum module pipe route service --generate -d --dry-run --verbose -v --pod -p --classic -c --dummy -dum -id --in-repo --in-repo-addon -ir'
 github_pages_deploy_opts='--environment --gh-token --gh-username --skip-build --user-page --message'
 help_opts='--json --verbose -v'
@@ -31,10 +28,7 @@ if type complete &>/dev/null; then
 
     case ${pword} in
       ng) opts=$ng_opts ;;
-      addon) opts=$addon_opts ;;
-      asset-sizes) opts=$asset_sizes_opts ;;
       b|build) opts=$build_opts ;;
-      d|destroy) opts=$destroy_opts ;;
       g|generate) opts=$generate_opts ;;
       h|help|-h|--help) opts=$help_opts ;;
       init) opts=$init_opts ;;
@@ -61,10 +55,7 @@ elif type compctl &>/dev/null; then
 
     case $words[cword] in
       ng) opts=$ng_opts ;;
-      addon) opts=$addon_opts ;;
-      asset-sizes) opts=$asset_sizes_opts ;;
       b|build) opts=$build_opts ;;
-      d|destroy) opts=$destroy_opts ;;
       g|generate) opts=$generate_opts ;;
       h|help|-h|--help) opts=$help_opts ;;
       init) opts=$init_opts ;;
