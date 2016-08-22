@@ -17,7 +17,7 @@ help_opts='--json --verbose -v'
 init_opts='--blueprint --dry-run --link-cli --mobile --name --prefix --skip-bower --skip-npm --source-dir --style --verbose -b -d -lc -n -p -sb -sd -sn -v'
 new_opts='--blueprint --directory --dry-run --link-cli --mobile --prefix --skip-bower --skip-git --skip-npm --source-dir --style --verbose -b -d -dir -lc -p -sb -sd -sg -sn -v'
 serve_opts='--environment --host --insecure-proxy --inspr --live-reload --live-reload-base-url --live-reload-host --live-reload-live-css --live-reload-port --output-path --port --proxy --ssl --ssl-cert --ssl-key --target --watcher -H -dev -e -lr -lrbu -lrh -lrp -op -out -p -pr -prod -pxy -t -w'
-set_opts='==global -g'
+set_opts='--global -g'
 test_opts='--browsers --colors --config-file --environment --filter --host --launch --log-level --module --path --port --query --reporter --server --silent --test-page --test-port --watch -H -c -cf -e -f -m -r -s -tp -w'
 version_opts='--verbose'
 
