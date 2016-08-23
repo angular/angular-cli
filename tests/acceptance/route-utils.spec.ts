@@ -193,7 +193,7 @@ describe('route utils', () => {
       .then(() => nru.bootstrapItem(mainFile, routes, toBootstrap))
       .catch(e =>
         expect(e.message).to.equal('Did not bootstrap provideRouter in' +
-                                  ' tmp/main.ts because of multiple or no bootstrap calls')
+                                  ' tmp/main.ts because of multiple or no traditional bootstrap calls')
       );
     });
     it('configures correctly if bootstrap or provide router is not at top level', () => {
