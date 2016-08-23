@@ -5,26 +5,39 @@
   },
   "apps": [
     {
-      "main": "<%= sourceDir %>/main.ts",
-      "tsconfig": "<%= sourceDir %>/tsconfig.json",
-      "mobile": <%= isMobile %>
+      "root": "<%= sourceDir %>",
+      "outDir": "dist",
+      "assets": "assets",
+      "index": "index.html",
+      "main": "main.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.json",
+      "prefix": "<%= prefix %>",
+      "mobile": <%= isMobile %>,
+      "styles": [
+        "styles.<%= styleExt %>"
+      ],
+      "scripts": [],
+      "environments": {
+        "source": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts",
+        "dev": "environments/environment.dev.ts"
+      }
     }
   ],
   "addons": [],
   "packages": [],
   "e2e": {
     "protractor": {
-      "config": "config/protractor.conf.js"
+      "config": "./protractor.conf.js"
     }
   },
   "test": {
     "karma": {
-      "config": "config/karma.conf.js"
+      "config": "./karma.conf.js"
     }
   },
   "defaults": {
-    "prefix": "<%= prefix %>",
-    "sourceDir": "<%= sourceDir %>",
     "styleExt": "<%= styleExt %>",
     "prefixInterfaces": false,
     "lazyRoutePrefix": "+"
