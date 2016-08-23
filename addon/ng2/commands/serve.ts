@@ -14,8 +14,7 @@ const defaultPort = process.env.PORT || 4200;
 export interface ServeTaskOptions {
   port?: number;
   host?: string;
-  proxy?: string;
-  insecureProxy?: boolean;
+  proxyConfig?: string;
   watcher?: string;
   liveReload?: boolean;
   liveReloadHost?: string;
@@ -37,9 +36,8 @@ module.exports = Command.extend({
 
   availableOptions: [
     { name: 'port',                 type: Number,  default: defaultPort,   aliases: ['p'] },
-    { name: 'host',                 type: String,  default: 'localhost',   aliases: ['H'],     description: 'Listens on localhost by default' },
-    { name: 'proxy',                type: String,                          aliases: ['pr', 'pxy'] },
-    { name: 'insecure-proxy',       type: Boolean, default: false,         aliases: ['inspr'], description: 'Set false to proxy self-signed SSL certificates' },
+    { name: 'host',                 type: String,  default: 'localhost',   aliases: ['H'],     description: 'Listens on all interfaces by default' },
+    { name: 'proxy-config',         type: 'Path',                          aliases: ['pc'] },
     { name: 'watcher',              type: String,  default: 'events',      aliases: ['w'] },
     { name: 'live-reload',          type: Boolean, default: true,          aliases: ['lr'] },
     { name: 'live-reload-host',     type: String,                          aliases: ['lrh'],   description: 'Defaults to host' },
@@ -48,7 +46,6 @@ module.exports = Command.extend({
     { name: 'live-reload-live-css', type: Boolean, default: true,                              description: 'Whether to live reload CSS (default true)' },
     { name: 'target',               type: String,  default: 'development', aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }] },
     { name: 'environment',          type: String,  default: '', aliases: ['e'] },
-    { name: 'output-path',          type: 'Path',  default: 'dist/',       aliases: ['op', 'out'] },
     { name: 'ssl',                  type: Boolean, default: false },
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
     { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' }

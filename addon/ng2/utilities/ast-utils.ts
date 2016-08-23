@@ -57,21 +57,37 @@ export function getSourceNodes(sourceFile: ts.SourceFile): Observable<ts.Node> {
 
 
 /**
-* Find all nodes from the AST in the subtree of node of SyntaxKind kind.
-* @param node 
-* @param kind
-* @return all nodes of kind, or [] if none is found
+ * Find all nodes from the AST in the subtree of node of SyntaxKind kind.
+ * @param node
+ * @param kind
+ * @param max The maximum number of items to return.
+ * @return all nodes of kind, or [] if none is found
 */
-export function findNodes(node: ts.Node, kind: ts.SyntaxKind): ts.Node[] {
-  if (!node) {
+export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max: number = Infinity): ts.Node[] {
+  if (!node || max == 0) {
     return [];
   }
+
   let arr: ts.Node[] = [];
   if (node.kind === kind) {
     arr.push(node);
+    max--;
   }
-  return node.getChildren().reduce((foundNodes, child) =>
-                                    foundNodes.concat(findNodes(child, kind)), arr);
+  if (max > 0) {
+    for (const child of node.getChildren()) {
+      findNodes(child, kind, max).forEach(node => {
+        if (max > 0) {
+          arr.push(node);
+        }
+        max--;
+      });
+
+      if (max <= 0) {
+        break;
+      }
+    }
+  }
+  return arr;
 }
 
 
@@ -111,9 +127,25 @@ export function insertAfterLastOccurrence(nodes: ts.Node[], toInsert: string,
 }
 
 
+export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
+  if (node.kind == ts.SyntaxKind.Identifier) {
+    return (<ts.Identifier>node).text;
+  } else if (node.kind == ts.SyntaxKind.StringLiteral) {
+    try {
+      return JSON.parse(node.getFullText(source))
+    } catch (e) {
+      return null;
+    }
+  } else {
+    return null;
+  }
+}
+
+
 export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
                                      module: string): Observable<ts.Node> {
   const symbols = new Symbols(source);
+
   return getSourceNodes(source)
     .filter(node => {
       return node.kind == ts.SyntaxKind.Decorator
