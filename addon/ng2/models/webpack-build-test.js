@@ -3,16 +3,19 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const getWebpackTestConfig = function(projectRoot, sourceDir) {
+const getWebpackTestConfig = function(projectRoot, appConfig) {
+  
+  const appRoot = path.resolve(projectRoot, appConfig.root);
+
   return {
     devtool: 'inline-source-map',
     context: path.resolve(__dirname, './'),
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: path.resolve(projectRoot, `./${sourceDir}`)
+      root: appRoot
     },
     entry: {
-      test: path.resolve(projectRoot, `./${sourceDir}/test.ts`)
+      test: path.resolve(appRoot, appConfig.test)
     },
     output: {
       path: './dist.test',
@@ -43,7 +46,7 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
             {
               loader: 'awesome-typescript-loader',
               query: {
-                tsconfig: path.resolve(projectRoot, `./${sourceDir}/tsconfig.json`),
+                tsconfig: path.resolve(appRoot, appConfig.tsconfig),
                 module: 'commonjs',
                 target: 'es5',
                 useForkChecker: true
@@ -61,7 +64,7 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
         { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
         { test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000' },
-        { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(projectRoot, `./${sourceDir}/index.html`)] }
+        { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(appRoot, appConfig.index)] }
       ],
       postLoaders: [
         {
@@ -83,7 +86,7 @@ const getWebpackTestConfig = function(projectRoot, sourceDir) {
     tslint: {
       emitErrors: false,
       failOnHint: false,
-      resourcePath: `./${sourceDir}`
+      resourcePath: `./${appConfig.root}`
     },
     node: {
       fs: 'empty',
