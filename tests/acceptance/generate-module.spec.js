@@ -32,29 +32,29 @@ describe('Acceptance: ng generate module', function () {
 
   it('ng generate module my-module', function () {
     return ng(['generate', 'module', 'my-module']).then(() => {
-      expect(existsSync(path.join(testPath, 'my-module.module.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-module.module.spec.ts'))).to.equal(false);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
     });
   });
 
   it('ng generate module my-module --spec', function () {
     return ng(['generate', 'module', 'my-module', '--spec']).then(() => {
-      expect(existsSync(path.join(testPath, 'my-module.module.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-module.module.spec.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(true);
     });
   });
 
   it(`ng generate module shared${path.sep}my-module`, function () {
     return ng(['generate', 'module', 'shared/my-module']).then(() => {
-      expect(existsSync(path.join(testPath, 'shared', 'my-module.module.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'shared', 'my-module.module.spec.ts'))).to.equal(false);
+      expect(existsSync(path.join(testPath, 'shared', 'my-module', 'my-module.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'shared', 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
     });
   });
 
   it(`ng generate module shared${path.sep}my-module --spec`, function () {
     return ng(['generate', 'module', 'shared/my-module', '--spec']).then(() => {
-      expect(existsSync(path.join(testPath, 'shared', 'my-module.module.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'shared', 'my-module.module.spec.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'shared', 'my-module', 'my-module.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'shared', 'my-module', 'my-module.module.spec.ts'))).to.equal(true);
     });
   });
 });
