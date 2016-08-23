@@ -109,6 +109,9 @@ export class CliConfig {
   }
 
   private _validatePath(jsonPath: string) {
+    if (!jsonPath) {
+      throw 'Config path is missing.';
+    }
     if (!jsonPath.match(/^(?:[-_\w\d]+(?:\[\d+\])*\.)*(?:[-_\w\d]+(?:\[\d+\])*)$/)) {
       throw `Invalid JSON path: "${jsonPath}"`;
     }
