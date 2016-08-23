@@ -293,8 +293,8 @@ Simply install your library via `npm install lib-name --save` and import it in y
 If the library does not include typings, you can install them using npm:
 
 ```bash
-npm install moment --save
-npm install @types/moment --save-dev
+npm install d3 --save
+npm install @types/d3 --save-dev
 ```
 
 ### Global Library Installation
