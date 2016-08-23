@@ -80,9 +80,8 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=10000' },
         { test: /\.html$/, loader: 'raw-loader' },
 
-        { test: /\.(woff|ttf|svg)$/, loader: 'url?limit=10000' },
-        { test: /\.woff2$/, loader: 'url?limit=10000&mimetype=font/woff2' },
-        { test: /\.eot$/, loader: 'file' }
+        { test: /\.(woff|ttf|woff2)$/, loader: 'url?limit=10000' },
+        { test: /\.(eot|svg)$/, loader: 'file' }
       ]
     },
     plugins: [
