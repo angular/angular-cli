@@ -12,7 +12,9 @@ const GetCommand = Command.extend({
 
   run: function (commandOptions, rawArgs): Promise<void> {
     return new Promise(resolve => {
-      const value = new CliConfig().get(rawArgs[0]);
+      const config = CliConfig.fromProject();
+      const value = config.get(rawArgs[0]);
+
       if (value === null) {
         console.error(chalk.red('Value cannot be found.'));
       } else if (typeof value == 'object') {
