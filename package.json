@@ -106,6 +106,7 @@
     ]
   },
   "devDependencies": {
+    "@types/denodeify": "^1.2.29",
     "@types/node": "^6.0.36",
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",

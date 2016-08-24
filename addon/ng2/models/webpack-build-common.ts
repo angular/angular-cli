@@ -6,6 +6,7 @@ import * as atl from 'awesome-typescript-loader';
 
 import {findLazyModules} from './find-lazy-modules';
 
+
 export function getWebpackCommonConfig(projectRoot: string, environment: string, appConfig: any) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -14,7 +15,7 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
   const scripts = appConfig.scripts.map(script => path.resolve(appRoot, script));
   const lazyModules = findLazyModules(appRoot);
 
-  let entry = { 
+  let entry = {
     main: [appMain]
   };
 
@@ -27,6 +28,9 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
     resolve: {
       extensions: ['', '.ts', '.js'],
       root: appRoot
+    },
+    resolveLoader: {
+      extensions: ['.js', '.ts']
     },
     context: path.resolve(__dirname, './'),
     entry: entry,
@@ -56,6 +60,8 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
               }
             }, {
               loader: 'angular2-template-loader'
+            }, {
+              loader: 'ng2-webpack'
             }
           ],
           exclude: [/\.(spec|e2e)\.ts$/]
