@@ -7,14 +7,24 @@ module.exports = {
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean, default: true }
+    { name: 'flat', type: Boolean, default: true },
+    { name: 'prefix', type: Boolean, default: true }
   ],
 
   normalizeEntityName: function (entityName) {
     var parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
-    this.rawEntityName = parsedPath.name;
+    
+    var defaultPrefix = '';
+    if (this.project.ngConfig &&
+        this.project.ngConfig.apps[0] &&
+        this.project.ngConfig.apps[0].prefix) {
+      defaultPrefix = this.project.ngConfig.apps[0].prefix;
+    }
+    var prefix = this.options.prefix ? defaultPrefix : '';
+
+    this.rawEntityName = prefix + parsedPath.name;
     return parsedPath.name;
   },
 
