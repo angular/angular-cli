@@ -3,11 +3,7 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as ts from 'typescript';
 
-import {Observable} from 'rxjs/Observable';
 import {getSource, findNodes, getContentOfKeyLiteral} from '../utilities/ast-utils';
-
-
-const loadChildrenRegex = /(\{[^{}]+?(loadChildren|['"]loadChildren['"])\s*:\s*)('[^']+'|"[^"]+")/gm;
 
 
 interface Array<T> {
@@ -37,15 +33,15 @@ export function findLoadChildren(tsFilePath: string): string[] {
         // key is an expression, can't do anything.
         return false;
       }
-      return key == 'loadChildren'
+      return key == 'loadChildren';
     })
     // Remove initializers that are not files.
     .filter((node: ts.PropertyAssignment) => {
       return node.initializer.kind === ts.SyntaxKind.StringLiteral;
     })
-    // Get the full text of the initiliazer.
+    // Get the full text of the initializer.
     .map((node: ts.PropertyAssignment) => {
-      return eval(node.initializer.getText(source));
+      return eval(node.initializer.getText(source)); // tslint:disable-line
     })
     .flatMap((value: string) => unique[value] ? undefined : unique[value] = value)
     .map((moduleName: string) => moduleName.split('#')[0]);

@@ -9,7 +9,7 @@ module.exports = Command.extend({
   run: function () {
     this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();
 
-    var e2eTask = new E2ETask({
+    const e2eTask = new E2ETask({
       ui: this.ui,
       analytics: this.analytics,
       project: this.project

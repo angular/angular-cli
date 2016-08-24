@@ -42,7 +42,7 @@ export function getSourceNodes(sourceFile: ts.SourceFile): Observable<ts.Node> {
   const subject = new ReplaySubject<ts.Node>();
   let nodes: ts.Node[] = [sourceFile];
 
-  while(nodes.length > 0) {
+  while (nodes.length > 0) {
     const node = nodes.shift();
 
     if (node) {
@@ -82,7 +82,7 @@ function nodesByPosition(first: ts.Node, second: ts.Node): number {
  */
 export function insertAfterLastOccurrence(nodes: ts.Node[], toInsert: string,
     file: string, fallbackPos?: number, syntaxKind?: ts.SyntaxKind): Change {
-  var lastItem = nodes.sort(nodesByPosition).pop();
+  let lastItem = nodes.sort(nodesByPosition).pop();
   if (syntaxKind) {
     lastItem = findNodes(lastItem, syntaxKind).sort(nodesByPosition).pop();
   }
@@ -99,7 +99,7 @@ export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): st
     return (<ts.Identifier>node).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
     try {
-      return JSON.parse(node.getFullText(source))
+      return JSON.parse(node.getFullText(source));
     } catch (e) {
       return null;
     }

@@ -5,7 +5,7 @@ import {exec} from 'child_process';
 
 module.exports = Task.extend({
   run: function () {
-    var ui = this.ui;
+    const ui = this.ui;
 
     return new Promise(function(resolve, reject) {
       exec('npm run lint', (err, stdout) => {

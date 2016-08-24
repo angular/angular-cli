@@ -14,18 +14,18 @@ const VersionCommand = Command.extend({
   }],
 
   run: function (options) {
-    var versions = process.versions;
-    var pkg = require(path.resolve(__dirname, '..', '..', '..', 'package.json'));
+    const versions = process.versions;
+    const pkg = require(path.resolve(__dirname, '..', '..', '..', 'package.json'));
 
     versions['os'] = process.platform + ' ' + process.arch;
 
-    var alwaysPrint = ['node', 'os'];
+    const alwaysPrint = ['node', 'os'];
 
-    var ngCliVersion = pkg.version;
+    let ngCliVersion = pkg.version;
     if (!__dirname.match(/node_modules/)) {
-      var gitBranch = '??';
+      let gitBranch = '??';
       try {
-        var gitRefName = '' + child_process.execSync('git symbolic-ref HEAD', {cwd: __dirname});
+        const gitRefName = '' + child_process.execSync('git symbolic-ref HEAD', {cwd: __dirname});
         gitBranch = path.basename(gitRefName.replace('\n', ''));
       } catch (e) {
       }
@@ -35,7 +35,7 @@ const VersionCommand = Command.extend({
 
     this.printVersion('angular-cli', ngCliVersion);
 
-    for (var module in versions) {
+    for (const module in versions) {
       if (options.verbose || alwaysPrint.indexOf(module) > -1) {
         this.printVersion(module, versions[module]);
       }

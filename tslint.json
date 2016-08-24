@@ -18,9 +18,9 @@
     "no-internal-module": true,
     "no-trailing-whitespace": true,
     "no-bitwise": true,
-    "no-shadowed-variable": true,
     "no-unused-expression": true,
     "no-unused-variable": true,
+    "no-var-keyword": true,
     "one-line": [
       true,
       "check-catch",
@@ -49,7 +49,8 @@
       true,
       "ban-keywords",
       "check-format",
-      "allow-trailing-underscore"
+      "allow-leading-underscore",
+      "allow-pascal-case"
     ],
     "whitespace": [
       true,

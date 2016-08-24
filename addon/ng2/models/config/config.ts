@@ -17,7 +17,7 @@ export class InvalidConfigError extends Error {
 export class CliConfig<Config> {
   private _config: SchemaClass<Config>;
 
-  private constructor(private _configPath: string,
+  constructor(private _configPath: string,
                       schema: Object,
                       configJson: Config,
                       fallbacks: Config[] = []) {
@@ -29,7 +29,7 @@ export class CliConfig<Config> {
   save(path: string = this._configPath) {
     return fs.writeFileSync(path, this.serialize(), 'utf-8');
   }
-  serialize(mimetype: string = 'application/json'): string {
+  serialize(mimetype = 'application/json'): string {
     return this._config.$$serialize(mimetype);
   }
 
@@ -73,7 +73,7 @@ export class CliConfig<Config> {
     try {
       content = JSON.parse(configContent);
       schema = JSON.parse(schemaContent);
-      others = otherContents.map(content => JSON.parse(content));
+      others = otherContents.map(content => JSON.parse(otherContent));
     } catch (err) {
       throw new InvalidConfigError(err);
     }

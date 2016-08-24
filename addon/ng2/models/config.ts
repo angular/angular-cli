@@ -1,11 +1,9 @@
 import {CliConfig as CliConfigBase} from './config/config';
 import {CliConfig as ConfigInterface} from '../../../lib/config/schema';
+import { oneLine } from 'common-tags';
 import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
-
-const schemaPath = path.resolve(process.env.CLI_ROOT, 'lib/config/schema.json');
-const schema = require(schemaPath);
 
 export const CLI_CONFIG_FILE_NAME = 'angular-cli.json';
 
@@ -51,11 +49,11 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     const cliConfig = CliConfigBase.fromConfigPath(CliConfig._configFilePath(), [globalConfigPath]);
     if (cliConfig.alias('apps.0.root', 'defaults.sourceDir')
         + cliConfig.alias('apps.0.prefix', 'defaults.prefix')) {
-      console.error(chalk.yellow(
-          'The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json\n'
-        + 'are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n'
-        + 'Please update in order to avoid errors in future versions of angular-cli.'
-      ));
+      console.error(chalk.yellow(oneLine`
+        The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
+        are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
+        Please update in order to avoid errors in future versions of angular-cli.
+      `));
     }
 
     return cliConfig as CliConfig;

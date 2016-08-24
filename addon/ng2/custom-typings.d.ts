@@ -3,7 +3,7 @@ interface IWebpackDevServerConfigurationOptions {
   hot?: boolean;
   historyApiFallback?: boolean;
   compress?: boolean;
-  proxy?: {[key: string] : string};
+  proxy?: {[key: string]: string};
   staticOptions?: any;
   quiet?: boolean;
   noInfo?: boolean;
@@ -14,8 +14,8 @@ interface IWebpackDevServerConfigurationOptions {
     poll?: number;
   };
   publicPath?: string;
-  headers?: { [key:string]: string };
-  stats?: { [key:string]: boolean };
+  headers?: { [key: string]: string };
+  stats?: { [key: string]: boolean };
   inline: boolean;
 }
 

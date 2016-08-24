@@ -65,7 +65,7 @@ export class MultiChange implements Change {
     return this._changes
       .sort((a: Change, b: Change) => b.order - a.order)
       .reduce((promise, change) => {
-        return promise.then(() => change.apply())
+        return promise.then(() => change.apply());
       }, Promise.resolve());
   }
 }

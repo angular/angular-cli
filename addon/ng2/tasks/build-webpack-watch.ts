@@ -16,7 +16,12 @@ module.exports = Task.extend({
 
     rimraf.sync(path.resolve(project.root, runTaskOptions.outputPath));
 
-    const config = new NgCliWebpackConfig(project, runTaskOptions.target, runTaskOptions.environment, runTaskOptions.outputPath).config;
+    const config = new NgCliWebpackConfig(
+      project,
+      runTaskOptions.target,
+      runTaskOptions.environment,
+      runTaskOptions.outputPath
+    ).config;
     const webpackCompiler = webpack(config);
 
     webpackCompiler.apply(new ProgressPlugin({
@@ -28,15 +33,15 @@ module.exports = Task.extend({
         if (err) {
           lastHash = null;
           console.error(err.stack || err);
-          if(err.details) console.error(err.details);
+          if (err.details) { console.error(err.details); }
             reject(err.details);
         }
 
-        if(stats.hash !== lastHash) {
+        if (stats.hash !== lastHash) {
           lastHash = stats.hash;
-          process.stdout.write(stats.toString(webpackOutputOptions) + "\n");
+          process.stdout.write(stats.toString(webpackOutputOptions) + '\n');
         }
-      })
-    })
+      });
+    });
   }
 });
