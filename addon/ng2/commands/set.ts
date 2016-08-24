@@ -32,8 +32,8 @@ const SetCommand = Command.extend({
     return new Promise(resolve => {
       const [jsonPath, rawValue] = rawArgs;
       const config = CliConfig.fromProject();
-      const type = config.typeOf(rawArgs[0]);
-      let value = rawValue;
+      const type = config.typeOf(jsonPath);
+      let value: any = rawValue;
 
       switch (type) {
         case 'boolean': value = this.asBoolean(rawValue); break;
