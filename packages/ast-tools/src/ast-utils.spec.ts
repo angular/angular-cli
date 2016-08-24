@@ -8,7 +8,7 @@ import {insertAfterLastOccurrence, addComponentToModule} from './ast-utils';
 import {findNodes} from './node';
 import {it} from './spec-utils';
 
-const readFile = denodeify(fs.readFile);
+const readFile = <any>denodeify(fs.readFile);
 
 
 describe('ast-utils: findNodes', () => {

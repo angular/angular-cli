@@ -1,8 +1,8 @@
 import fs = require('fs');
 import denodeify = require('denodeify');
 
-const readFile = denodeify(fs.readFile);
-const writeFile = denodeify(fs.writeFile);
+const readFile = (denodeify(fs.readFile) as (...args: any[]) => Promise<string>);
+const writeFile = (denodeify(fs.writeFile) as (...args: any[]) => Promise<string>);
 
 export interface Change {
   apply(): Promise<void>;
@@ -26,7 +26,7 @@ export interface Change {
 export class NoopChange implements Change {
   description = 'No operation.';
   order = Infinity;
-  path = null;
+  path: string = null;
   apply() { return Promise.resolve(); }
 }
 
@@ -39,7 +39,7 @@ export class MultiChange implements Change {
   private _path: string;
   private _changes: Change[];
 
-  constructor(...changes: Array<Change[], Change>) {
+  constructor(...changes: (Change[] | Change)[]) {
     this._changes = [];
     [].concat(...changes).forEach(change => this.appendChange(change));
   }
@@ -58,7 +58,7 @@ export class MultiChange implements Change {
     return `Changes:\n   ${this._changes.map(x => x.description).join('\n   ')}`;
   }
   // Always apply as early as the highest change.
-  get order() { return Math.max(...this._changes); }
+  get order() { return Math.max(...this._changes.map(c => c.order)); }
   get path() { return this._path; }
 
   apply() {

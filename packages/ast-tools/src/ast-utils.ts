@@ -11,6 +11,7 @@ import {insertImport} from './route-utils';
 
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
+import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
@@ -166,32 +167,32 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
         .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
         // Filter out every fields that's not "metadataField". Also handles string literals
         // (but not expressions).
-        .filter(prop => {
-          switch (prop.name.kind) {
+        .filter((prop: ts.PropertyAssignment) => {
+          const name = prop.name;
+          switch (name.kind) {
             case ts.SyntaxKind.Identifier:
-              return prop.name.getText(source) == metadataField;
+              return (name as ts.Identifier).getText(source) == metadataField;
             case ts.SyntaxKind.StringLiteral:
-              return prop.name.text == metadataField;
+              return (name as ts.StringLiteral).text == metadataField;
           }
 
           return false;
         });
     })
     // Get the last node of the array literal.
-    .then(matchingProperties => {
+    .then((matchingProperties: ts.ObjectLiteralElement[]): any => {
       if (!matchingProperties) {
-        return;
+        return null;
       }
       if (matchingProperties.length == 0) {
-        return metadata
-          .toPromise();
+        return metadata.toPromise();
       }
 
       const assignment = <ts.PropertyAssignment>matchingProperties[0];
 
       // If it's not an array, nothing we can do really.
       if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
-        return Observable.empty();
+        return null;
       }
 
       const arrLiteral = <ts.ArrayLiteralExpression>assignment.initializer;
@@ -210,7 +211,7 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
         node = node[node.length - 1];
       }
 
-      let toInsert;
+      let toInsert: string;
       let position = node.getEnd();
       if (node.kind == ts.SyntaxKind.ObjectLiteralExpression) {
         // We haven't found the field in the metadata declaration. Insert a new

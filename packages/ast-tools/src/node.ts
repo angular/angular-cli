@@ -1,4 +1,4 @@
-import ts = require('ts');
+import ts = require('typescript');
 import {RemoveChange, Change} from './change';
 
 
@@ -42,6 +42,6 @@ export function removeAstNode(node: ts.Node): Change {
   return new RemoveChange(
     source.path,
     node.getStart(source),
-    node.getFullText(node.getStart(source), node.getEnd())
+    node.getFullText(source)
   );
 }

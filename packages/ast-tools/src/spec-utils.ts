@@ -7,7 +7,7 @@ function async(fn: () => PromiseLike<any> | void) {
       result = fn();
 
       if (result && 'then' in result) {
-        (result as Promise).then(done, done.fail);
+        (result as Promise<any>).then(done, done.fail);
       } else {
         done();
       }
@@ -19,7 +19,7 @@ function async(fn: () => PromiseLike<any> | void) {
 
 
 function newIt(description: string, fn: () => PromiseLike<any> | void) {
-  return global['it'](description, async(fn));
+  return (global as any)['it'](description, async(fn));
 }
 
 
