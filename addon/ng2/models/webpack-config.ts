@@ -1,5 +1,3 @@
-import * as path from 'path';
-import * as fs from 'fs';
 import * as webpackMerge from 'webpack-merge';
 import { CliConfig } from './config';
 import {
