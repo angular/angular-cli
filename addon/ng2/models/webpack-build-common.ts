@@ -95,13 +95,13 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
         // This plugin is responsible for swapping the environment files.
         // Since it takes a RegExp as first parameter, we need to escape the path.
         // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
-        new RegExp(path.resolve(appRoot, appConfig.environments.source)
+        new RegExp(path.resolve(appRoot, appConfig.environments['source'])
           .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")),
         path.resolve(appRoot, appConfig.environments[environment])
       ),
       new webpack.optimize.CommonsChunkPlugin({
         // Optimizing ensures loading order in index.html
-        name: ['styles', 'scripts', 'main'].reverse();
+        name: ['styles', 'scripts', 'main'].reverse()
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
