@@ -9,9 +9,11 @@
   },
   "keywords": [],
   "scripts": {
-    "test": "node tests/runner",
+    "test": "npm run test:packages && npm run test:cli",
     "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
+    "test:cli": "node tests/runner",
     "test:inspect": "node --inspect --debug-brk tests/runner",
+    "test:packages": "node scripts/run-packages-spec.js",
     "lint": "eslint .",
     "build-config-interface": "dtsgen lib/config/schema.json --out lib/config/schema.d.ts"
   },
@@ -107,6 +109,7 @@
   },
   "devDependencies": {
     "@types/denodeify": "^1.2.29",
+    "@types/jasmine": "^2.2.32",
     "@types/node": "^6.0.36",
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
@@ -114,6 +117,8 @@
     "dtsgenerator": "^0.7.1",
     "eslint": "^2.8.0",
     "exists-sync": "0.0.3",
+    "jasmine": "^2.4.1",
+    "jasmine-spec-reporter": "^2.7.0",
     "minimatch": "^3.0.0",
     "mocha": "^2.4.5",
     "mock-fs": "3.10.0",

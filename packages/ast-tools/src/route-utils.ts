@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Change, InsertChange } from './change';
+import {Change, InsertChange, NoopChange} from './change';
 import {findNodes} from './node';
 import {insertAfterLastOccurrence} from './ast-utils';
 
@@ -106,7 +106,7 @@ export function insertImport(fileToEdit: string, symbolName: string,
                         findNodes(relevantImports[0], ts.SyntaxKind.FromKeyword)[0].pos;
       return insertAfterLastOccurrence(imports, `, ${symbolName}`, fileToEdit, fallbackPos);
     }
-    return;
+    return new NoopChange();
   }
 
   // no such import declaration exists

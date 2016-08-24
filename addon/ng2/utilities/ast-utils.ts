@@ -9,4 +9,4 @@ export {
   getDecoratorMetadata,
   addComponentToModule,
   addProviderToModule
-} from 'ast-tools';
+} from '@angular-cli/ast-tools';

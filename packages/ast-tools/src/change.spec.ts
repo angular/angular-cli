@@ -3,8 +3,8 @@
 // This needs to be first so fs module can be mocked correctly.
 let mockFs = require('mock-fs');
 
-import {expect} from 'chai';
-import {InsertChange, RemoveChange, ReplaceChange} from '../../addon/ng2/utilities/change';
+import {it} from './spec-utils';
+import {InsertChange, RemoveChange, ReplaceChange} from './change';
 import fs = require('fs');
 
 let path = require('path');
@@ -38,11 +38,11 @@ describe('Change', () => {
         .apply()
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
-          expect(contents).to.equal('hello world!');
+          expect(contents).toEqual('hello world!');
         });
     });
     it('fails for negative position', () => {
-      expect(() => new InsertChange(sourceFile, -6, ' world!')).to.throw(Error);
+      expect(() => new InsertChange(sourceFile, -6, ' world!')).toThrowError();
     });
     it('adds nothing in the source code if empty string is inserted', () => {
       let changeInstance = new InsertChange(sourceFile, 6, '');
@@ -50,7 +50,7 @@ describe('Change', () => {
         .apply()
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
-          expect(contents).to.equal('hello');
+          expect(contents).toEqual('hello');
         });
     });
   });
@@ -64,11 +64,11 @@ describe('Change', () => {
         .apply()
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
-          expect(contents).to.equal('import *  from "./bar"');
+          expect(contents).toEqual('import *  from "./bar"');
         });
     });
     it('fails for negative position', () => {
-      expect(() => new RemoveChange(sourceFile, -6, ' world!')).to.throw(Error);
+      expect(() => new RemoveChange(sourceFile, -6, ' world!')).toThrow();
     });
     it('does not change the file if told to remove empty string', () => {
       let changeInstance = new RemoveChange(sourceFile, 9, '');
@@ -76,7 +76,7 @@ describe('Change', () => {
         .apply()
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
-          expect(contents).to.equal('import * as foo from "./bar"');
+          expect(contents).toEqual('import * as foo from "./bar"');
         });
     });
   });
@@ -89,12 +89,12 @@ describe('Change', () => {
         .apply()
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
-          expect(contents).to.equal('import { fooComponent } from "./bar"');
+          expect(contents).toEqual('import { fooComponent } from "./bar"');
         });
     });
     it('fails for negative position', () => {
       let sourceFile = path.join(sourcePath, 'remove-replace-file.txt');
-      expect(() => new ReplaceChange(sourceFile, -6, 'hello', ' world!')).to.throw(Error);
+      expect(() => new ReplaceChange(sourceFile, -6, 'hello', ' world!')).toThrow();
     });
     it('adds string to the position of an empty string', () => {
       let sourceFile = path.join(sourcePath, 'replace-file.txt');
@@ -103,7 +103,7 @@ describe('Change', () => {
         .apply()
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
-          expect(contents).to.equal('import { BarComponent, FooComponent } from "./baz"');
+          expect(contents).toEqual('import { BarComponent, FooComponent } from "./baz"');
         });
     });
     it('removes the given string only if an empty string to add is given', () => {
@@ -113,7 +113,7 @@ describe('Change', () => {
         .apply()
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
-          expect(contents).to.equal('import * from "./bar"');
+          expect(contents).toEqual('import * from "./bar"');
         });
     });
   });

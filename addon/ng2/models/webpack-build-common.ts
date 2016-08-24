@@ -60,8 +60,6 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
               }
             }, {
               loader: 'angular2-template-loader'
-            }, {
-              loader: 'ng2-webpack'
             }
           ],
           exclude: [/\.(spec|e2e)\.ts$/]
