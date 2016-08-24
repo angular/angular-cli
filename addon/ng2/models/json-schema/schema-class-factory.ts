@@ -132,9 +132,8 @@ abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   }
 
   // Helper function to create a child based on its schema.
-  protected _createChildProperty<T>(
-      name: string, value: T, forward: SchemaTreeNode<T>, schema: Object,
-                                 define = true): SchemaTreeNode<T> {
+  protected _createChildProperty<T>(name: string, value: T, forward: SchemaTreeNode<T>,
+                                    schema: Object, define = true): SchemaTreeNode<T> {
     const type = schema['type'];
     let Klass: TreeNodeConstructor = null;
 
@@ -174,7 +173,6 @@ class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<Object> {
     }
     this._children = Object.create(null);
     this._value = Object.create(null);
-    this._value[kSchemaNode] = this;
 
     if (schema['properties']) {
       for (const name of Object.keys(schema['properties'])) {
@@ -238,7 +236,6 @@ class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array> {
     }
     this._items = [];
     this._value = [];
-    this._value[kSchemaNode] = this;
 
     for (let index = 0; index < value.length; index++) {
       this._items[index] = this._createChildProperty(

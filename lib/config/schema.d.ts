@@ -20,12 +20,13 @@ export interface CliConfig {
         prefix?: string;
         mobile?: boolean;
         /**
-         * Additional files to be included in the build.
+         * Global styles to be included in the build.
          */
-        additionalEntries?: (string | {
-            input?: string;
-            output?: string;
-        })[];
+        styles?: string[];
+        /**
+         * Global scripts to be included in the build.
+         */
+        scripts?: string[];
         /**
          * Name and corresponding file for environment config.
          */
