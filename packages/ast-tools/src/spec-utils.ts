@@ -1,3 +1,6 @@
+// This file exports a version of the Jasmine `it` that understands promises.
+// To use this, simply `import {it} from './spec-utils`.
+// TODO(hansl): move this to its own Jasmine-TypeScript package.
 
 function async(fn: () => PromiseLike<any> | void) {
   return (done: DoneFn) => {
@@ -18,9 +21,6 @@ function async(fn: () => PromiseLike<any> | void) {
 }
 
 
-function newIt(description: string, fn: () => PromiseLike<any> | void) {
+export function it(description: string, fn: () => PromiseLike<any> | void) {
   return (global as any)['it'](description, async(fn));
 }
-
-
-export const it = newIt;

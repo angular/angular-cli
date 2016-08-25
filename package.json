@@ -37,9 +37,6 @@
   "dependencies": {
     "@angular/core": "^2.0.0-rc.5",
     "@angular/tsc-wrapped": "^0.2.2",
-    "@types/lodash": "^4.0.25-alpha",
-    "@types/rimraf": "0.0.25-alpha",
-    "@types/webpack": "^1.12.22-alpha",
     "angular2-template-loader": "^0.5.0",
     "awesome-typescript-loader": "^2.2.1",
     "chalk": "^1.1.3",
@@ -92,7 +89,6 @@
     "stylus-loader": "^2.1.0",
     "symlink-or-copy": "^1.0.3",
     "ts-loader": "^0.8.2",
-    "tslint": "^3.11.0",
     "tslint-loader": "^2.1.4",
     "typedoc": "^0.4.2",
     "typescript": "^2.0.0",
@@ -110,7 +106,11 @@
   "devDependencies": {
     "@types/denodeify": "^1.2.29",
     "@types/jasmine": "^2.2.32",
+    "@types/lodash": "^4.0.25-alpha",
+    "@types/mock-fs": "3.6.28",
     "@types/node": "^6.0.36",
+    "@types/rimraf": "0.0.25-alpha",
+    "@types/webpack": "^1.12.22-alpha",
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
     "denodeify": "^1.2.1",
@@ -127,7 +127,7 @@
     "sinon": "^1.17.3",
     "through": "^2.3.8",
     "tree-kill": "^1.0.0",
-    "tslint": "^3.8.1",
+    "tslint": "^3.11.0",
     "walk-sync": "^0.2.6"
   }
 }

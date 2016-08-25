@@ -111,7 +111,7 @@ export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): st
 
 export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
                                      module: string): Observable<ts.Node> {
-  const symbols = new Symbols(source);
+  const symbols = new Symbols(source as any);
 
   return getSourceNodes(source)
     .filter(node => {
