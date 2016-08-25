@@ -18,7 +18,8 @@ export class NgCliWebpackConfig {
   private webpackMobileConfigPartial: any;
   private webpackMobileProdConfigPartial: any;
 
-  constructor(public ngCliProject: any, public target: string, public environment: string, outputDir?: string) {
+  constructor(public ngCliProject: any, public target: string, public environment: string,
+    outputDir?: string) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
 
@@ -28,11 +29,15 @@ export class NgCliWebpackConfig {
     this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, appConfig);
     this.webpackProdConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, appConfig);
 
-    if (appConfig.mobile){
-      this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig);
-      this.webpackMobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root, appConfig);
-      this.webpackBaseConfig = webpackMerge(this.webpackBaseConfig, this.webpackMobileConfigPartial);
-      this.webpackProdConfigPartial = webpackMerge(this.webpackProdConfigPartial, this.webpackMobileProdConfigPartial);
+    if (appConfig.mobile) {
+      this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root,
+        appConfig);
+      this.webpackMobileProdConfigPartial = getWebpackMobileProdConfigPartial(
+        this.ngCliProject.root, appConfig);
+      this.webpackBaseConfig = webpackMerge(this.webpackBaseConfig,
+        this.webpackMobileConfigPartial);
+      this.webpackProdConfigPartial = webpackMerge(this.webpackProdConfigPartial,
+        this.webpackMobileProdConfigPartial);
     }
 
     this.generateConfig();
@@ -40,15 +45,14 @@ export class NgCliWebpackConfig {
 
   generateConfig(): void {
     switch (this.target) {
-      case "development":
+      case 'development':
         this.config = webpackMerge(this.webpackBaseConfig, this.webpackDevConfigPartial);
         break;
-      case "production":
+      case 'production':
         this.config = webpackMerge(this.webpackBaseConfig, this.webpackProdConfigPartial);
         break;
       default:
         throw new Error("Invalid build target. Only 'development' and 'production' are available.");
-        break;
     }
   }
 }

@@ -4,8 +4,8 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const schemaPath = path.resolve(process.env.CLI_ROOT, 'lib/config/schema.json');
-const schema = require(schemaPath);
+// const schemaPath = path.resolve(process.env.CLI_ROOT, 'lib/config/schema.json');
+// const schema = require(schemaPath);
 
 export const CLI_CONFIG_FILE_NAME = 'angular-cli.json';
 

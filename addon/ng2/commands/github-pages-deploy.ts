@@ -18,7 +18,8 @@ const fsCopy = Promise.denodeify(fse.copy);
 module.exports = Command.extend({
   name: 'github-pages:deploy',
   aliases: ['gh-pages:deploy'],
-  description: 'Build the test app for production, commit it into a git branch, setup GitHub repo and push to it',
+  description: 'Build the test app for production, \
+  commit it into a git branch, setup GitHub repo and push to it',
   works: 'insideProject',
 
   availableOptions: [
@@ -66,7 +67,7 @@ module.exports = Command.extend({
       cwd: root
     };
 
-    if (options.environment === ''){
+    if (options.environment === '') {
       if (options.target === 'development') {
         options.environment = 'dev';
       }
@@ -137,7 +138,9 @@ module.exports = Command.extend({
     }
 
     function build() {
-      if (options.skipBuild) return Promise.resolve();
+      if (options.skipBuild) {
+        return Promise.resolve();
+      }
       return buildTask.run(buildOptions);
     }
 
@@ -165,7 +168,7 @@ module.exports = Command.extend({
 
     function checkoutGhPages() {
       return execPromise(`git checkout ${ghPagesBranch}`)
-        .catch(createGhPagesBranch)
+        .catch(createGhPagesBranch);
     }
 
     function createGhPagesBranch() {
@@ -179,16 +182,18 @@ module.exports = Command.extend({
     function copyFiles() {
       return fsReadDir(outDir)
         .then((files) => Promise.all(files.map((file) => {
-          if (file === '.gitignore'){
+          if (file === '.gitignore') {
             // don't overwrite the .gitignore file
             return Promise.resolve();
           }
-          return fsCopy(path.join(outDir, file), path.join('.', file))
+          return fsCopy(path.join(outDir, file), path.join('.', file));
         })));
     }
 
     function updateBaseHref() {
-      if (options.userPage) return Promise.resolve();
+      if (options.userPage) {
+        return Promise.resolve();
+      }
       let indexHtml = path.join(root, 'index.html');
       return fsReadFile(indexHtml, 'utf8')
         .then((data) => data.replace(/<base href="\/">/g, `<base href="/${projectName}/">`))
@@ -215,7 +220,8 @@ module.exports = Command.extend({
     function printProjectUrl() {
       return execPromise('git remote -v')
         .then((stdout) => {
-          let userName = stdout.match(/origin\s+(?:https:\/\/|git@)github\.com(?:\:|\/)([^\/]+)/m)[1].toLowerCase();
+          let userName = stdout.match(/origin\s+(?:https:\/\/|git@)github\.com(?:\:|\/)([^\/]+)/m)
+            [1].toLowerCase();
           let url = `https://${userName}.github.io/${options.userPage ? '' : (projectName + '/')}`;
           ui.writeLine(chalk.green(`Deployed! Visit ${url}`));
           ui.writeLine('Github pages might take a few minutes to show the deployed site.');
@@ -225,7 +231,8 @@ module.exports = Command.extend({
     function failGracefully(error) {
       if (error && (/git clean/.test(error.message) || /Permission denied/.test(error.message))) {
         ui.writeLine(error.message);
-        let msg = 'There was a permissions error during git file operations, please close any open project files/folders and try again.';
+        let msg = 'There was a permissions error during git file operations, \
+ please close any open project files/folders and try again.';
         msg += `\nYou might also need to return to the ${initialBranch} branch manually.`;
         return Promise.reject(new SilentError(msg));
       } else {

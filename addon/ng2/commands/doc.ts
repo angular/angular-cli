@@ -10,9 +10,9 @@ const DocCommand = Command.extend({
     '<keyword>'
   ],
 
-  run: function(commandOptions, rawArgs:Array<string>) {
+  run: function(commandOptions, rawArgs: Array<string>) {
     var keyword = rawArgs[0];
-    
+
     var docTask = new DocTask({
       ui: this.ui,
       analytics: this.analytics,

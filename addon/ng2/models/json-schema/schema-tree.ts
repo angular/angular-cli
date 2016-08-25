@@ -75,7 +75,7 @@ export abstract class SchemaTreeNode<T> {
   get parent<ParentType>(): SchemaTreeNode<ParentType> { return this._parent; }
   get children<ChildType>(): { [key: string]: SchemaTreeNode<ChildType>} { return null; }
 
-  abstract get() : T;
+  abstract get(): T;
   set(v: T) {
     if (!this.readOnly) {
       throw new MissingImplementationError();
@@ -130,22 +130,22 @@ abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   protected _createChildProperty<T>(name: string, value: T, forward: SchemaTreeNode<T>,
                                     schema: Object, define = true): SchemaTreeNode<T> {
     const type = schema['type'];
-    let Klass: TreeNodeConstructor = null;
+    let klass: TreeNodeConstructor = null;
 
-    switch(type) {
-      case 'object': Klass = ObjectSchemaTreeNode; break;
-      case 'array': Klass = ArraySchemaTreeNode; break;
-      case 'string': Klass = StringSchemaTreeNode; break;
-      case 'boolean': Klass = BooleanSchemaTreeNode; break;
-      case 'number': Klass = NumberSchemaTreeNode; break;
-      case 'integer': Klass = IntegerSchemaTreeNode; break;
+    switch (type) {
+      case 'object': klass = ObjectSchemaTreeNode; break;
+      case 'array': klass = ArraySchemaTreeNode; break;
+      case 'string': klass = StringSchemaTreeNode; break;
+      case 'boolean': klass = BooleanSchemaTreeNode; break;
+      case 'number': klass = NumberSchemaTreeNode; break;
+      case 'integer': klass = IntegerSchemaTreeNode; break;
 
       default:
         console.error('Type ' + type + ' not understood by SchemaClassFactory.');
         return null;
     }
 
-    const metaData = new Klass({ parent: this, forward, value, schema, name });
+    const metaData = new klass({ parent: this, forward, value, schema, name });
     if (define) {
       SchemaTreeNode._defineProperty(this._value, metaData);
     }
