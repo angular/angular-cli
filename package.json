@@ -9,6 +9,7 @@
   },
   "keywords": [],
   "scripts": {
+    "build": "for PKG in packages/*; do echo Building $PKG...; tsc -P $PKG; done",
     "test": "npm run test:packages && npm run test:cli",
     "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
     "test:cli": "node tests/runner",
