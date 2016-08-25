@@ -1,24 +1,24 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "mapRoot": "",
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "outDir": "../dist/",
+    "outDir": "../../dist/ast-tools",
     "rootDir": ".",
     "sourceMap": true,
     "sourceRoot": "/",
     "target": "es5",
     "lib": ["es6"],
-    "paths": {
-      "@angular-cli/ast-tools": [ "../../packages/ast-tools/src" ]
-    }
-  },
-  "includes": [
-    "./custom-typings.d.ts"
-  ]
+    "typeRoots": [
+      "../../node_modules/@types"
+    ],
+    "types": [
+      "jasmine",
+      "node"
+    ]
+  }
 }

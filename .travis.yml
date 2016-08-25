@@ -12,6 +12,7 @@ env:
     - DBUS_SESSION_BUS_ADDRESS=/dev/null
   matrix:
     - SCRIPT=lint
+#    - SCRIPT=build
     - SCRIPT=test
 #    - TARGET=mobile SCRIPT=mobile_test
 matrix:
@@ -21,8 +22,13 @@ matrix:
     - os: osx
       node_js: "5"
       env: SCRIPT=lint
-#    - os: osx
-#      env: TARGET=mobile SCRIPT=mobile_test
+    - node_js: "6"
+      env: SCRIPT=build
+    - os: osx
+      node_js: "5"
+      env: SCRIPT=build
+    - os: osx
+      env: TARGET=mobile SCRIPT=mobile_test
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
