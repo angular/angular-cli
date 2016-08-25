@@ -1,4 +1,4 @@
-import * as webpack from 'webpack';
+// import * as webpack from 'webpack';
 import * as path from 'path';
 import * as OfflinePlugin from 'offline-plugin';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
@@ -10,8 +10,10 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, appC
   return {
     plugins: [
       new CopyWebpackPlugin([
-        {from: path.resolve(projectRoot, appConfig.root, 'icons'), to: path.resolve(projectRoot, appConfig.outDir, 'icons')},
-        {from: path.resolve(projectRoot, appConfig.root, 'manifest.webapp'), to: path.resolve(projectRoot, appConfig.outDir)}
+        {from: path.resolve(projectRoot, appConfig.root, 'icons'), to: path.resolve(projectRoot,
+          appConfig.outDir, 'icons')},
+        {from: path.resolve(projectRoot, appConfig.root, 'manifest.webapp'), to: path.resolve(
+          projectRoot, appConfig.outDir)}
       ]),
       new PrerenderWebpackPlugin({
         templatePath: 'index.html',
@@ -19,7 +21,7 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, appC
         appPath: path.resolve(projectRoot, appConfig.root)
       })
     ]
-  }
+  };
 };
 
 export const getWebpackMobileProdConfigPartial = function (projectRoot: string, appConfig: any) {
@@ -30,5 +32,5 @@ export const getWebpackMobileProdConfigPartial = function (projectRoot: string, 
     plugins: [
       new OfflinePlugin()
     ]
-  }
+  };
 };
