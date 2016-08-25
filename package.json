@@ -16,6 +16,7 @@
     "test:inspect": "node --inspect --debug-brk tests/runner",
     "test:packages": "node scripts/run-packages-spec.js",
     "lint": "eslint .",
+    "tslint": "node_modules/.bin/tslint addon/**/*.ts -e 'addon/ng2/blueprints/**/*' -t verbose",
     "build-config-interface": "dtsgen lib/config/schema.json --out lib/config/schema.d.ts"
   },
   "repository": {
