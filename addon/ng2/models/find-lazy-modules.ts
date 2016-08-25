@@ -3,11 +3,12 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as ts from 'typescript';
 
-import {Observable} from 'rxjs/Observable';
+// import {Observable} from 'rxjs/Observable';
 import {getSource, findNodes, getContentOfKeyLiteral} from '../utilities/ast-utils';
 
 
-const loadChildrenRegex = /(\{[^{}]+?(loadChildren|['"]loadChildren['"])\s*:\s*)('[^']+'|"[^"]+")/gm;
+// const loadChildrenRegex =
+//  /(\{[^{}]+?(loadChildren|['"]loadChildren['"])\s*:\s*)('[^']+'|"[^"]+")/gm;
 
 
 interface Array<T> {
@@ -37,7 +38,7 @@ export function findLoadChildren(tsFilePath: string): string[] {
         // key is an expression, can't do anything.
         return false;
       }
-      return key == 'loadChildren'
+      return key == 'loadChildren';
     })
     // Remove initializers that are not files.
     .filter((node: ts.PropertyAssignment) => {
