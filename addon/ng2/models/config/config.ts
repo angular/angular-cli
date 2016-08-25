@@ -29,7 +29,7 @@ export class CliConfig<Config> {
   save(path: string = this._configPath) {
     return fs.writeFileSync(path, this.serialize(), 'utf-8');
   }
-  serialize(mimetype: string = 'application/json'): string {
+  serialize(mimetype = 'application/json'): string {
     return this._config.$$serialize(mimetype);
   }
 
@@ -73,7 +73,7 @@ export class CliConfig<Config> {
     try {
       content = JSON.parse(configContent);
       schema = JSON.parse(schemaContent);
-      others = otherContents.map(content => JSON.parse(content));
+      others = otherContents.map(content_ => JSON.parse(content_));
     } catch (err) {
       throw new InvalidConfigError(err);
     }
