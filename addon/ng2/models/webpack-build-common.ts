@@ -14,13 +14,17 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
   const scripts = appConfig.scripts.map(script => path.resolve(appRoot, script));
   const lazyModules = findLazyModules(appRoot);
 
-  let entry = { 
+  let entry = {
     main: [appMain]
   };
 
   // Only add styles/scripts if there's actually entries there
-  if (appConfig.styles.length > 0) entry.styles = styles;
-  if (appConfig.scripts.length > 0) entry.scripts = scripts;
+  if (appConfig.styles.length > 0) {
+    entry.styles = styles;
+  }
+  if (appConfig.scripts.length > 0) {
+    entry.scripts = scripts;
+  }
 
   return {
     devtool: 'source-map',
@@ -63,15 +67,22 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
 
         // in main, load css as raw text
         { exclude: styles, test: /\.css$/, loaders: ['raw-loader', 'postcss-loader'] },
-        { exclude: styles, test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
-        { exclude: styles, test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
-        { exclude: styles, test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
+        { exclude: styles, test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader',
+          'stylus-loader'] },
+        { exclude: styles, test: /\.less$/, loaders: ['raw-loader', 'postcss-loader',
+          'less-loader'] },
+        { exclude: styles, test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader',
+          'sass-loader'] },
 
         // outside of main, load it via style-loader
-        { include: styles, test: /\.css$/, loaders: ['style-loader', 'css-loader', 'postcss-loader'] },
-        { include: styles, test: /\.styl$/, loaders: ['style-loader', 'css-loader', 'postcss-loader', 'stylus-loader'] },
-        { include: styles, test: /\.less$/, loaders: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader'] },
-        { include: styles, test: /\.scss$|\.sass$/, loaders: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'] },
+        { include: styles, test: /\.css$/, loaders: ['style-loader', 'css-loader',
+          'postcss-loader'] },
+        { include: styles, test: /\.styl$/, loaders: ['style-loader', 'css-loader',
+          'postcss-loader', 'stylus-loader'] },
+        { include: styles, test: /\.less$/, loaders: ['style-loader', 'css-loader',
+          'postcss-loader', 'less-loader'] },
+        { include: styles, test: /\.scss$|\.sass$/, loaders: ['style-loader', 'css-loader',
+          'postcss-loader', 'sass-loader'] },
 
         // load global scripts using script-loader
         { include: scripts, test: /\.js$/, loader: 'script-loader' },
@@ -97,7 +108,7 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
         // Since it takes a RegExp as first parameter, we need to escape the path.
         // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
         new RegExp(path.resolve(appRoot, appConfig.environments['source'])
-          .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")),
+          .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
         path.resolve(appRoot, appConfig.environments[environment])
       ),
       new webpack.optimize.CommonsChunkPlugin({
@@ -124,5 +135,5 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
       clearImmediate: false,
       setImmediate: false
     }
-  }
+  };
 }
