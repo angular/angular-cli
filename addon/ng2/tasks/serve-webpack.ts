@@ -17,11 +17,13 @@ module.exports = Task.extend({
     let lastHash = null;
     let webpackCompiler: any;
 
-    var config = new NgCliWebpackConfig(this.project, commandOptions.target, commandOptions.environment).config;
+    var config = new NgCliWebpackConfig(this.project, commandOptions.target,
+      commandOptions.environment).config;
 
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
-    config.entry.main.unshift(`webpack-dev-server/client?http://${commandOptions.host}:${commandOptions.port}/`);
+    config.entry.main.unshift(
+      `webpack-dev-server/client?http://${commandOptions.host}:${commandOptions.port}/`);
     webpackCompiler = webpack(config);
 
     webpackCompiler.apply(new ProgressPlugin({
@@ -41,36 +43,36 @@ module.exports = Task.extend({
     }
 
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
-      contentBase: path.resolve(this.project.root, `./${CliConfig.fromProject().config.apps[0].root}`),
+      contentBase: path.resolve(this.project.root,
+        `./${CliConfig.fromProject().config.apps[0].root}`),
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
       inline: true,
       proxy: proxyConfig
     };
 
-    const serveMessage:string = chalk.green(`\n*\n*\n NG Live Development Server is running on http://${commandOptions.host}:${commandOptions.port}.\n*\n*`);
+    const serveMessage: string = chalk.green(`\n*\n*\n NG Live Development Server is running on\
+ http://${commandOptions.host}:${commandOptions.port}.\n*\n*`);
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
 
     return new Promise((resolve, reject) => {
       server.listen(commandOptions.port, `${commandOptions.host}`, function(err, stats) {
-        if(err) {
+        if (err) {
           lastHash = null;
           console.error(err.stack || err);
-          if(err.details) console.error(err.details);
-            reject(err.details);
+          if (err.details) {
+            console.error(err.details);
+          }
+          reject(err.details);
         }
 
-        if(stats && stats.hash && stats.hash !== lastHash) {
+        if (stats && stats.hash && stats.hash !== lastHash) {
           lastHash = stats.hash;
           process.stdout.write(stats.toString(webpackOutputOptions) + '\n' + serveMessage + '\n');
         }
 
         process.stdout.write(serveMessage);
       });
-    })
+    });
   }
 });
-
-
-
-
