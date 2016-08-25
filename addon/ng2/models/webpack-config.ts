@@ -28,7 +28,12 @@ export class NgCliWebpackConfig {
 
     appConfig.outDir = outputDir || appConfig.outDir;
 
-    this.baseConfig = getWebpackCommonConfig(this.ngCliProject.root, environment, appConfig, baseHref);
+    this.baseConfig = getWebpackCommonConfig(
+      this.ngCliProject.root,
+      environment,
+      appConfig,
+      baseHref
+    );
     this.devConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, appConfig);
     this.prodConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, appConfig);
 

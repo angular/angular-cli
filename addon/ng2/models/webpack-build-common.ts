@@ -7,7 +7,12 @@ import * as atl from 'awesome-typescript-loader';
 import { findLazyModules } from './find-lazy-modules';
 import { BaseHrefWebpackPlugin } from '../utilities/base-href-webpack-plugin';
 
-export function getWebpackCommonConfig(projectRoot: string, environment: string, appConfig: any, baseHref: string) {
+export function getWebpackCommonConfig(
+  projectRoot: string,
+  environment: string,
+  appConfig: any,
+  baseHref: string
+) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);

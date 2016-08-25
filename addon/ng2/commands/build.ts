@@ -2,7 +2,7 @@ import * as Command from 'ember-cli/lib/models/command';
 import * as WebpackBuild from '../tasks/build-webpack';
 import * as WebpackBuildWatch from '../tasks/build-webpack-watch';
 
-interface BuildOptions {
+export interface BuildOptions {
   target?: string;
   environment?: string;
   outputPath?: string;

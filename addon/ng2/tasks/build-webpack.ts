@@ -2,7 +2,7 @@ import * as rimraf from 'rimraf';
 import * as path from 'path';
 import * as Task from 'ember-cli/lib/models/task';
 import * as webpack from 'webpack';
-import { ServeTaskOptions } from '../commands/serve';
+import { BuildOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { webpackOutputOptions } from '../models/';
 
@@ -11,7 +11,7 @@ let lastHash: any = null;
 
 module.exports = Task.extend({
   // Options: String outputPath
-  run: function (runTaskOptions: ServeTaskOptions) {
+  run: function (runTaskOptions: BuildOptions) {
 
     const project = this.cliProject;
 
