@@ -117,7 +117,8 @@ export class NodePlatformLocation extends PlatformLocation {
     super();
     this._originUrl = originUrl;
     this._baseUrl = baseUrl || '/';
-    this.pushState(null, null, joinWithSlash(this._baseUrl, requestUrl));
+    // this.pushState(null, null, joinWithSlash(this._baseUrl, requestUrl));
+    this.pushState(null, null, requestUrl);
   }
 
   get search(): string { return this._loc.search; }

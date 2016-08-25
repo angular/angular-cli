@@ -1,0 +1,10 @@
+<h3>Repo list</h3>
+<ul>
+	<li *ngFor="let repo of repos | async">
+    <a [routerLink]="['/github', repo.owner.login, repo.name]">
+      {{ repo.name }}
+    </a>
+  </li>
+</ul>
+
+<router-outlet></router-outlet>
