@@ -7,9 +7,9 @@ import { Component, OnInit } from '@angular/core';
       <%= dasherizedModuleName %> Works!
     </p>
   `,<% } else { %>
-  templateUrl: '<%= dasherizedModuleName %>.component.html',<% } if(inlineStyle) { %>
+  templateUrl: './<%= dasherizedModuleName %>.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['<%= dasherizedModuleName %>.component.<%= styleExt %>']<% } %>
+  styleUrls: ['./<%= dasherizedModuleName %>.component.<%= styleExt %>']<% } %>
 })
 export class <%= classifiedModuleName %>Component implements OnInit {
 
