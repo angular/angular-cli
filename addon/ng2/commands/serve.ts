@@ -3,7 +3,6 @@ import * as Command from 'ember-cli/lib/models/command';
 import * as Promise from 'ember-cli/lib/ext/promise';
 import * as SilentError from 'silent-error';
 import * as PortFinder from 'portfinder';
-import * as EOL from 'os';
 import * as ServeWebpackTask from '../tasks/serve-webpack.ts';
 
 PortFinder.basePort = 49152;
@@ -36,15 +35,46 @@ module.exports = Command.extend({
 
   availableOptions: [
     { name: 'port',                 type: Number,  default: defaultPort,   aliases: ['p'] },
-    { name: 'host',                 type: String,  default: 'localhost',   aliases: ['H'],     description: 'Listens on all interfaces by default' },
+    {
+      name: 'host',
+      type: String,
+      default: 'localhost',
+      aliases: ['H'],
+      description: 'Listens on all interfaces by default'
+    },
     { name: 'proxy-config',         type: 'Path',                          aliases: ['pc'] },
     { name: 'watcher',              type: String,  default: 'events',      aliases: ['w'] },
     { name: 'live-reload',          type: Boolean, default: true,          aliases: ['lr'] },
-    { name: 'live-reload-host',     type: String,                          aliases: ['lrh'],   description: 'Defaults to host' },
-    { name: 'live-reload-base-url', type: String,                          aliases: ['lrbu'],  description: 'Defaults to baseURL' },
-    { name: 'live-reload-port',     type: Number,                          aliases: ['lrp'],   description: '(Defaults to port number within [49152...65535])' },
-    { name: 'live-reload-live-css', type: Boolean, default: true,                              description: 'Whether to live reload CSS (default true)' },
-    { name: 'target',               type: String,  default: 'development', aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }] },
+    {
+      name: 'live-reload-host',
+      type: String,
+      aliases: ['lrh'],
+      description: 'Defaults to host'
+    },
+    {
+      name: 'live-reload-base-url',
+      type: String,
+      aliases: ['lrbu'],
+      description: 'Defaults to baseURL'
+    },
+    {
+      name: 'live-reload-port',
+      type: Number,
+      aliases: ['lrp'],
+      description: '(Defaults to port number within [49152...65535])'
+    },
+    {
+      name: 'live-reload-live-css',
+      type: Boolean,
+      default: true,
+      description: 'Whether to live reload CSS (default true)'
+    },
+    {
+      name: 'target',
+      type: String,
+      default: 'development',
+      aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }]
+    },
     { name: 'environment',          type: String,  default: '', aliases: ['e'] },
     { name: 'ssl',                  type: Boolean, default: false },
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
@@ -52,7 +82,7 @@ module.exports = Command.extend({
   ],
 
   run: function(commandOptions: ServeTaskOptions) {
-    if (commandOptions.environment === ''){
+    if (commandOptions.environment === '') {
       if (commandOptions.target === 'development') {
         commandOptions.environment = 'dev';
       }
@@ -65,20 +95,12 @@ module.exports = Command.extend({
 
     return this._checkExpressPort(commandOptions)
       .then(this._autoFindLiveReloadPort.bind(this))
-      .then((commandOptions: ServeTaskOptions) => {
-        commandOptions = assign({}, commandOptions, {
+      .then((opts: ServeTaskOptions) => {
+        commandOptions = assign({}, opts, {
           baseURL: this.project.config(commandOptions.target).baseURL || '/'
         });
 
-        if (commandOptions.proxy) {
-          if (!commandOptions.proxy.match(/^(http:|https:)/)) {
-            var message = 'You need to include a protocol with the proxy URL.' + EOL + 'Try --proxy http://' + commandOptions.proxy;
-
-            return Promise.reject(new SilentError(message));
-          }
-        }
-
-        var serve = new ServeWebpackTask({
+        const serve = new ServeWebpackTask({
           ui: this.ui,
           analytics: this.analytics,
           project: this.project,
@@ -93,7 +115,7 @@ module.exports = Command.extend({
       .then((foundPort: number) => {
 
         if (commandOptions.port !== foundPort && commandOptions.port !== 0) {
-          var message = 'Port ' + commandOptions.port + ' is already in use.';
+          const message = 'Port ' + commandOptions.port + ' is already in use.';
           return Promise.reject(new SilentError(message));
         }
 

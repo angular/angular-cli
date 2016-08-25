@@ -17,7 +17,12 @@ module.exports = Command.extend({
   aliases: ['b'],
 
   availableOptions: [
-    { name: 'target',         type: String,  default: 'development', aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }] },
+    {
+      name: 'target',
+      type: String,
+      default: 'development',
+      aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }]
+    },
     { name: 'environment',    type: String,  default: '', aliases: ['e'] },
     { name: 'output-path',    type: 'Path',  default: 'dist/',       aliases: ['o'] },
     { name: 'watch',          type: Boolean, default: false,         aliases: ['w'] },
@@ -26,18 +31,18 @@ module.exports = Command.extend({
   ],
 
   run: function (commandOptions: BuildOptions) {
-    if (commandOptions.environment === ''){
+    if (commandOptions.environment === '') {
       if (commandOptions.target === 'development') {
         commandOptions.environment = 'dev';
       }
       if (commandOptions.target === 'production') {
         commandOptions.environment = 'prod';
-      } 
+      }
     }
 
-    var project = this.project;
-    var ui = this.ui;
-    var buildTask = commandOptions.watch ?
+    const project = this.project;
+    const ui = this.ui;
+    const buildTask = commandOptions.watch ?
       new WebpackBuildWatch({
         cliProject: project,
         ui: ui,

@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require('path');
 
 export const getWebpackDevConfigPartial = function(projectRoot: string, appConfig: any) {
   return {
@@ -24,4 +24,4 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, appConfi
       setImmediate: false
     }
   };
-}
+};

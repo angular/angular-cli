@@ -130,7 +130,8 @@ describe('ModuleResolver', () => {
         .then((tsFile: ts.SourceFile) => {
           let contentsBaz = dependentFilesUtils.getImportClauses(tsFile);
           let barExpectedContent = path.normalize('../bar/bar.component');
-          let fooBarExpectedContent = `.${path.sep}qux${path.sep}quux${path.sep}foobar${path.sep}foobar.component`;
+          let fooBarExpectedContent =
+            `.${path.sep}qux${path.sep}quux${path.sep}foobar${path.sep}foobar.component`;
           expect(contentsBaz[0].specifierText).to.equal(barExpectedContent);
           expect(contentsBaz[1].specifierText).to.equal(fooBarExpectedContent);
         });

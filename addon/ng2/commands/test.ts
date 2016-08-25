@@ -16,7 +16,7 @@ module.exports = TestCommand.extend({
   run: function (commandOptions) {
     this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();
 
-    var testTask = new TestTask({
+    const testTask = new TestTask({
       ui: this.ui,
       analytics: this.analytics,
       project: this.project

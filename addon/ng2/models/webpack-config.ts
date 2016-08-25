@@ -12,27 +12,31 @@ export class NgCliWebpackConfig {
   // TODO: When webpack2 types are finished lets replace all these any types
   // so this is more maintainable in the future for devs
   public config: any;
-  private webpackDevConfigPartial: any;
-  private webpackProdConfigPartial: any;
-  private webpackBaseConfig: any;
-  private webpackMobileConfigPartial: any;
-  private webpackMobileProdConfigPartial: any;
+  private devConfigPartial: any;
+  private prodConfigPartial: any;
+  private baseConfig: any;
 
-  constructor(public ngCliProject: any, public target: string, public environment: string, outputDir?: string) {
+  constructor(
+    public ngCliProject: any,
+    public target: string,
+    public environment: string,
+    outputDir?: string
+  ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
 
     appConfig.outDir = outputDir || appConfig.outDir;
 
-    this.webpackBaseConfig = getWebpackCommonConfig(this.ngCliProject.root, environment, appConfig);
-    this.webpackDevConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, appConfig);
-    this.webpackProdConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, appConfig);
+    this.baseConfig = getWebpackCommonConfig(this.ngCliProject.root, environment, appConfig);
+    this.devConfigPartial = getWebpackDevConfigPartial(this.ngCliProject.root, appConfig);
+    this.prodConfigPartial = getWebpackProdConfigPartial(this.ngCliProject.root, appConfig);
 
-    if (appConfig.mobile){
-      this.webpackMobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig);
-      this.webpackMobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root, appConfig);
-      this.webpackBaseConfig = webpackMerge(this.webpackBaseConfig, this.webpackMobileConfigPartial);
-      this.webpackProdConfigPartial = webpackMerge(this.webpackProdConfigPartial, this.webpackMobileProdConfigPartial);
+    if (appConfig.mobile) {
+      let mobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig);
+      let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root,
+                                                                      appConfig);
+      this.baseConfig = webpackMerge(this.baseConfig, mobileConfigPartial);
+      this.prodConfigPartial = webpackMerge(this.prodConfigPartial, mobileProdConfigPartial);
     }
 
     this.generateConfig();
@@ -40,15 +44,14 @@ export class NgCliWebpackConfig {
 
   generateConfig(): void {
     switch (this.target) {
-      case "development":
-        this.config = webpackMerge(this.webpackBaseConfig, this.webpackDevConfigPartial);
+      case 'development':
+        this.config = webpackMerge(this.baseConfig, this.devConfigPartial);
         break;
-      case "production":
-        this.config = webpackMerge(this.webpackBaseConfig, this.webpackProdConfigPartial);
+      case 'production':
+        this.config = webpackMerge(this.baseConfig, this.prodConfigPartial);
         break;
       default:
         throw new Error("Invalid build target. Only 'development' and 'production' are available.");
-        break;
     }
   }
 }

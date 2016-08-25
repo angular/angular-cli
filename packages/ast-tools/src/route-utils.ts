@@ -12,9 +12,13 @@ import {insertAfterLastOccurrence} from './ast-utils';
  * @param imports Object { importedClass: ['path/to/import/from', defaultStyleImport?] }
  * @param toBootstrap
  */
-export function bootstrapItem(mainFile: string, imports: {[key: string]: (string | boolean)[]}, toBootstrap: string ) {
+export function bootstrapItem(
+  mainFile: string,
+  imports: {[key: string]: (string | boolean)[]},
+  toBootstrap: string
+) {
   let changes = Object.keys(imports).map(importedClass => {
-    var defaultStyleImport = imports[importedClass].length === 2 && !!imports[importedClass][1];
+    let defaultStyleImport = imports[importedClass].length === 2 && !!imports[importedClass][1];
     return insertImport(
       mainFile,
       importedClass,
@@ -43,8 +47,8 @@ export function bootstrapItem(mainFile: string, imports: {[key: string]: (string
   }
   // if bracket exitst already, add configuration template,
   // otherwise, insert into bootstrap parens
-  var fallBackPos: number, configurePathsTemplate: string, separator: string;
-  var syntaxListNodes: any;
+  let fallBackPos: number, configurePathsTemplate: string, separator: string;
+  let syntaxListNodes: any;
   let bootstrapProviders = bootstrapNode.getChildAt(2).getChildAt(2); // array of providers
 
   if ( bootstrapProviders ) {
@@ -88,7 +92,7 @@ export function insertImport(fileToEdit: string, symbolName: string,
 
   if (relevantImports.length > 0) {
 
-    var importsAsterisk = false;
+    let importsAsterisk = false;
     // imports from import file
     let imports: ts.Node[] = [];
     relevantImports.forEach(n => {
@@ -128,7 +132,13 @@ export function insertImport(fileToEdit: string, symbolName: string,
   let separator = insertAtBeginning ? '' : ';\n';
   let toInsert = `${separator}import ${open}${symbolName}${close}` +
     ` from '${fileName}'${insertAtBeginning ? ';\n' : ''}`;
-  return insertAfterLastOccurrence(allImports, toInsert, fileToEdit, fallbackPos, ts.SyntaxKind.StringLiteral);
+  return insertAfterLastOccurrence(
+    allImports,
+    toInsert,
+    fileToEdit,
+    fallbackPos,
+    ts.SyntaxKind.StringLiteral
+  );
 };
 
 /**
@@ -149,9 +159,13 @@ export function addPathToRoutes(routesFile: string, pathOptions: any): Change[] 
   let routePath = route.replace(positionalRoutes, '');
   routePath = `./app/${routePath}/${pathOptions.dasherizedName}.component`;
   let originalComponent = pathOptions.component;
-  pathOptions.component = resolveImportName(pathOptions.component, routePath, pathOptions.routesFile);
+  pathOptions.component = resolveImportName(
+    pathOptions.component,
+    routePath,
+    pathOptions.routesFile
+  );
 
-  var content = `{ path: '${route}', component: ${pathOptions.component}${isDefault}${outlet} }`;
+  let content = `{ path: '${route}', component: ${pathOptions.component}${isDefault}${outlet} }`;
   let rootNode = getRootNode(routesFile);
   let routesNode = rootNode.getChildAt(0).getChildren().filter(n => {
     // get export statement
@@ -162,7 +176,7 @@ export function addPathToRoutes(routesFile: string, pathOptions: any): Change[] 
     throw new Error('Did not insert path in routes.ts because ' +
                           `there were multiple or no 'export default' statements`);
   }
-  var pos = routesNode[0].getChildAt(2).getChildAt(0).end; // openBracketLiteral
+  let pos = routesNode[0].getChildAt(2).getChildAt(0).end; // openBracketLiteral
   // all routes in export route array
   let routesArray = routesNode[0].getChildAt(2).getChildAt(1)
                     .getChildren()
@@ -172,14 +186,16 @@ export function addPathToRoutes(routesFile: string, pathOptions: any): Change[] 
     // don't duplicate routes
     throw new Error('Route was not added since it is a duplicate');
   }
-  var isChild = false;
+  let isChild = false;
   // get parent to insert under
   let parent: ts.Node;
   if (pathOptions.parent) {
     // append '_' to route to find the actual parent (not parent of the parent)
     parent = getParent(routesArray, `${pathOptions.parent}/_`);
     if (!parent) {
-      throw new Error(`You specified parent '${pathOptions.parent}'' which was not found in routes.ts`);
+      throw new Error(
+        `You specified parent '${pathOptions.parent}'' which was not found in routes.ts`
+      );
     }
     if (route.indexOf(pathOptions.parent) === 0) {
       route = route.substring(pathOptions.parent.length);
@@ -296,8 +312,8 @@ function resolveImportName (importName: string, importPath: string, fileName: st
     return importName;
   }
   const baseName = importNames[index].split('_')[0];
-  var newName = baseName;
-  var resolutionNumber = 1;
+  let newName = baseName;
+  let resolutionNumber = 1;
   while (importNames.indexOf(newName) !== -1) {
     newName = `${baseName}_${resolutionNumber}`;
     resolutionNumber++;
@@ -328,8 +344,9 @@ export function resolveComponentPath(projectRoot: string, currentDir: string, fi
     // only component file name is given
     filePath = componentName;
   }
-  var directory = filePath[0] === path.sep ?
-    path.resolve(path.join(projectRoot, 'src', 'app', filePath)) : path.resolve(currentDir, filePath);
+  let directory = filePath[0] === path.sep ?
+    path.resolve(path.join(projectRoot, 'src', 'app', filePath)) :
+    path.resolve(currentDir, filePath);
 
   if (!fs.existsSync(directory)) {
     throw new Error(`path '${filePath}' must be relative to current directory` +
@@ -364,13 +381,14 @@ function addChildPath (parentObject: ts.Node, pathOptions: any, route: string) {
   if (!parentObject) {
     return;
   }
-  var pos: number;
-  var newContent: string;
+  let pos: number;
+  let newContent: string;
 
   // get object with 'children' property
   let childrenNode = parentObject.getChildAt(1).getChildren()
-                    .filter(n => n.kind === ts.SyntaxKind.PropertyAssignment
-                                 && ((n as ts.PropertyAssignment).name as ts.Identifier).text === 'children');
+                    .filter(n =>
+                      n.kind === ts.SyntaxKind.PropertyAssignment
+                      && ((n as ts.PropertyAssignment).name as ts.Identifier).text === 'children');
   // find number of spaces to pad nested paths
   let nestingLevel = 1; // for indenting route object in the `children` array
   let n = parentObject;
@@ -417,7 +435,7 @@ function getParent(routesArray: ts.Node[], route: string, parent?: ts.Node): ts.
   if (route.length === 0) {
     return; // route has been completely matched
   }
-  var splitRoute = route.split('/');
+  let splitRoute = route.split('/');
   // don't treat positional parameters separately
   if (splitRoute.length > 1 && splitRoute[1].indexOf(':') !== -1) {
     let actualRoute = splitRoute.shift();
@@ -442,13 +460,18 @@ function getParent(routesArray: ts.Node[], route: string, parent?: ts.Node): ts.
  * Helper for addPathToRoutes.
  * @return whether path with same route and component exists
  */
-function pathExists(routesArray: ts.Node[], route: string, component: string, fullRoute?: string): boolean {
+function pathExists(
+  routesArray: ts.Node[],
+  route: string,
+  component: string,
+  fullRoute?: string
+): boolean {
   if (routesArray.length === 0) {
     return false;
   }
   fullRoute = fullRoute ? fullRoute : route;
-  var sameRoute = false;
-  var splitRoute = route.split('/');
+  let sameRoute = false;
+  let splitRoute = route.split('/');
   // don't treat positional parameters separately
   if (splitRoute.length > 1 && splitRoute[1].indexOf(':') !== -1) {
     let actualRoute = splitRoute.shift();
@@ -461,7 +484,7 @@ function pathExists(routesArray: ts.Node[], route: string, component: string, fu
     sameRoute = currentRoute === splitRoute[0];
     // Confirm that it's parents are the same
     if (sameRoute && sameComponent) {
-      var path = currentRoute;
+      let path = currentRoute;
       let objExp = n.parent;
       while (objExp) {
         if (objExp.kind === ts.SyntaxKind.ObjectLiteralExpression) {

@@ -2,15 +2,15 @@ import * as path from 'path';
 
 export const ngAppResolve = (resolvePath: string): string => {
   return path.resolve(process.cwd(), resolvePath);
-}
+};
 
-export const webpackOutputOptions: WebpackProgressPluginOutputOptions = {
+export const webpackOutputOptions = {
   colors: true,
   chunks: true,
   modules: false,
   reasons: false,
   chunkModules: false
-}
+};
 
 export const webpackDevServerOutputOptions = {
   assets: true,
@@ -20,4 +20,4 @@ export const webpackDevServerOutputOptions = {
   timings: true,
   chunks: false,
   chunkModules: false
-}
+};

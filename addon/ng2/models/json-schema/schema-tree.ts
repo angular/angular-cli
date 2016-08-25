@@ -75,7 +75,7 @@ export abstract class SchemaTreeNode<T> {
   get parent<ParentType>(): SchemaTreeNode<ParentType> { return this._parent; }
   get children<ChildType>(): { [key: string]: SchemaTreeNode<ChildType>} { return null; }
 
-  abstract get() : T;
+  abstract get(): T;
   set(v: T) {
     if (!this.readOnly) {
       throw new MissingImplementationError();
@@ -105,7 +105,7 @@ export abstract class SchemaTreeNode<T> {
 /** Base Class used for Non-Leaves TreeNode. Meaning they can have children. */
 abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   dispose() {
-    for (const key of Object.keys(this.children) {
+    for (const key of Object.keys(this.children)) {
       this.children[key].dispose();
     }
     super.dispose();
@@ -132,7 +132,7 @@ abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
     const type = schema['type'];
     let Klass: TreeNodeConstructor = null;
 
-    switch(type) {
+    switch (type) {
       case 'object': Klass = ObjectSchemaTreeNode; break;
       case 'array': Klass = ArraySchemaTreeNode; break;
       case 'string': Klass = StringSchemaTreeNode; break;

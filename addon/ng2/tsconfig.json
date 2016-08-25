@@ -14,6 +14,9 @@
     "sourceRoot": "/",
     "target": "es5",
     "lib": ["es6"],
+    "typeRoots": [
+      "../../node_modules/@types"
+    ],
     "paths": {
       "@angular-cli/ast-tools": [ "../../packages/ast-tools/src" ]
     }

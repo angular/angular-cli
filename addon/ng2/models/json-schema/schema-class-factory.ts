@@ -108,7 +108,7 @@ class SchemaClassBase<T> implements SchemaClass<T> {
   $$set(path: string, value: any) {
     const node = _getSchemaNodeForPath(this[kSchemaNode], path);
     if (node) {
-      node.set(value)
+      node.set(value);
     } else {
       // This might be inside an object that can have additionalProperties, so
       // a TreeNode would not exist.
@@ -137,7 +137,7 @@ class SchemaClassBase<T> implements SchemaClass<T> {
     return node ? node.defined : false;
   }
 
-  $$delete(path: string){
+  $$delete(path: string) {
     const node = _getSchemaNodeForPath(this[kSchemaNode], path);
     if (node) {
       node.destroy();
@@ -145,7 +145,7 @@ class SchemaClassBase<T> implements SchemaClass<T> {
   }
 
   /** Serialize into a string. */
-  $$serialize(mimetype: string = 'application/json', ...options: any[]): string {
+  $$serialize(mimetype = 'application/json', ...options: any[]): string {
     let str = '';
     const serializer = Serializer.fromMimetype(mimetype, (s) => str += s, ...options);
 

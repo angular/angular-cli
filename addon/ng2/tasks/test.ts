@@ -1,7 +1,6 @@
 import * as Promise from 'ember-cli/lib/ext/promise';
 import * as Task from 'ember-cli/lib/models/task';
 import * as path from 'path';
-import { getWebpackTestConfig } from '../models/webpack-build-test';
 
 // require dependencies within the target project
 function requireDependency(root, moduleName) {
@@ -10,7 +9,7 @@ function requireDependency(root, moduleName) {
   return require(path.join(root, 'node_modules', moduleName, main));
 }
 
-module.exports = Task.extend({ 
+module.exports = Task.extend({
   run: function (options) {
     const projectRoot = this.project.root;
     return new Promise((resolve) => {

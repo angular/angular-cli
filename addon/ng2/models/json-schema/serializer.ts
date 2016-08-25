@@ -60,9 +60,6 @@ class JsonSerializer implements Serializer {
   private _top() {
     return this._state[this._state.length - 1] || {};
   }
-  private _topIsArray() {
-    return this._top().type == 'array';
-  }
 
   private _indent(): string {
     if (this._indentDelta == 0) {

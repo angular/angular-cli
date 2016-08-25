@@ -10,7 +10,7 @@ interface IWebpackPrerender {
 export class PrerenderWebpackPlugin {
 
   private bootloader: any;
-  private cachedTemplate: string
+  private cachedTemplate: string;
 
   constructor(private options: IWebpackPrerender) {
     // maintain your platform instance
@@ -53,4 +53,4 @@ export class PrerenderWebpackPlugin {
         delete require.cache[key];
       });
   }
-}
+};

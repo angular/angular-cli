@@ -168,7 +168,9 @@ describe('route utils', () => {
         });
     });
     it('does not add provideRouter to bootstrap if present', () => {
-      let editedFile = new InsertChange(mainFile, 124, ', [ HTTP_PROVIDERS, provideRouter(routes) ]');
+      let editedFile = new InsertChange(mainFile,
+                                        124,
+                                        ', [ HTTP_PROVIDERS, provideRouter(routes) ]');
       return editedFile.apply()
         .then(() => nru.applyChanges(nru.bootstrapItem(mainFile, routes, toBootstrap)))
         .then(() => readFile(mainFile, 'utf8'))
@@ -203,14 +205,14 @@ describe('route utils', () => {
         .then(() => readFile(mainFile, 'utf8'))
         .then(content => {
           expect(content).toEqual(prefix + routerImport +
-            'bootstrap(AppComponent, [ provideRouter(routes) ]);\n if(e){bootstrap, provideRouter});');
+            'bootstrap(AppComponent, [ provideRouter(routes) ]);\n if(e){bootstrap, provideRouter});'); // tslint:disable-line
         });
     });
   });
 
   describe('addPathToRoutes', () => {
     const routesFile = 'src/routes.ts';
-    var options = {dir: 'src/app', appRoot: 'src/app', routesFile: routesFile,
+    let options = {dir: 'src/app', appRoot: 'src/app', routesFile: routesFile,
       component: 'NewRouteComponent', dasherizedName: 'new-route'};
     const nestedRoutes = `\n  { path: 'home', component: HomeComponent,
     children: [
@@ -235,7 +237,8 @@ describe('route utils', () => {
     });
 
     it('adds import to new route component if absent', () => {
-      return nru.applyChanges(nru.addPathToRoutes(routesFile, _.merge({route: 'new-route'}, options)))
+      return nru.applyChanges(nru.addPathToRoutes(routesFile,
+                                                  _.merge({route: 'new-route'}, options)))
         .then(() => readFile(routesFile, 'utf8'))
         .then(content => {
           expect(content).toEqual(
@@ -289,6 +292,7 @@ export default [\n  { path: 'new-route', component: NewRouteComponent }\n];`);
           nru.addPathToRoutes(routesFile, _.merge({route: 'home/about/details'}, options))); })
         .then(() => readFile(routesFile, 'utf8'))
         .then(content => {
+          // tslint:disable-next-line
           let expected =   `import { DetailsComponent } from './app/home/about/details/details.component';
 export default [
   { path: 'home', component: HomeComponent,
@@ -310,9 +314,11 @@ export default [
         options.dasherizedName = 'sections';
         options.component = 'SectionsComponent';
         return nru.applyChanges(
-          nru.addPathToRoutes(routesFile, _.merge({route: 'home/about/more/sections'}, options))); })
+          nru.addPathToRoutes(routesFile,
+                              _.merge({route: 'home/about/more/sections'}, options))); })
         .then(() => readFile(routesFile, 'utf8'))
         .then(content => {
+          // tslint:disable-next-line
           let expected = `import { SectionsComponent } from './app/home/about/more/sections/sections.component';
 export default [
   { path: 'home', component: HomeComponent,
@@ -347,6 +353,7 @@ export default [
           nru.addPathToRoutes(routesFile, _.merge({route: 'home/about/:id'}, options))); })
         .then(() => readFile(routesFile, 'utf8'))
         .then(content => {
+          // tslint:disable-next-line
           expect(content).toEqual(`import { AboutComponent_1 } from './app/home/about/about.component';
 export default [
   { path: 'main', component: MainComponent }
@@ -435,6 +442,7 @@ export default [
       })
       .then(() => readFile(routesFile, 'utf8'))
       .then(content => {
+        // tslint:disable-next-line
         let expected = `import { TrapQueenComponent } from './app/home/trap-queen/trap-queen.component';
 export default [
   { path: 'home', component: HomeComponent,
@@ -489,7 +497,7 @@ export default [
         let editedFile = new InsertChange(routesFile, 0,
           `import { AboutComponent } from './app/about/about.component';
 import { DetailsComponent } from './app/about/details/details.component';
-import { DetailsComponent as DetailsComponent_1 } from './app/about/description/details.component;\n`);
+import { DetailsComponent as DetailsComponent_1 } from './app/about/description/details.component;\n`); // tslint:disable-line
         return editedFile.apply();
       }).then(() => {
         options.dasherizedName = 'details';
