@@ -21,9 +21,9 @@ export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max: number = Infi
   }
   if (max > 0) {
     for (const child of node.getChildren()) {
-      findNodes(child, kind, max).forEach(node => {
+      findNodes(child, kind, max).forEach(aNode => {
         if (max > 0) {
-          arr.push(node);
+          arr.push(aNode);
         }
         max--;
       });
