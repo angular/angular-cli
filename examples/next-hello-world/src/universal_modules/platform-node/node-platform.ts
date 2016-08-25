@@ -23,6 +23,7 @@ import { ViewUtils } from '@angular/core/src/linker/view_utils';
 import { APP_ID_RANDOM_PROVIDER } from '@angular/core/src/application_tokens';
 import { SanitizationService } from '@angular/core/src/security';
 import { getDOM } from '@angular/platform-browser/src/dom/dom_adapter';
+import { PlatformRef_ } from '@angular/core/src/application_ref';
 // PRIVATE
 
 
@@ -34,6 +35,7 @@ import {
   PLATFORM_INITIALIZER,
   APP_ID,
   Injector,
+  createPlatformFactory,
 
 
   NgModule,
@@ -44,15 +46,13 @@ import {
   NgZone
 } from '@angular/core';
 
-import { PlatformRef_ } from '@angular/core/src/application_ref';
 
 import { CommonModule, PlatformLocation, APP_BASE_HREF } from '@angular/common';
-
+import { platformCoreDynamic } from '@angular/compiler';
 
 // TODO(gdi2290): allow removal of modules that are not used for AoT
 import { Jsonp, Http } from '@angular/http';
 import { getInlineCode } from 'preboot';
-
 
 
 import { NodePlatformLocation } from './node-location';
@@ -423,5 +423,16 @@ export const INTERNAL_NODE_PLATFORM_PROVIDERS: Array<any /*Type | Provider | any
   { provide: PLATFORM_INITIALIZER, useValue: initParse5Adapter, multi: true },
   // { provide: PlatformLocation, useClass: NodePlatformLocation },
 ];
+
+
+/**
+ * The node platform that supports the runtime compiler.
+ *
+ * @experimental
+ */
+export const platformDynamicNode = (extraProviders?: any[]) => {
+  const platform = __PLATFORM_REF || createPlatformFactory(platformCoreDynamic, 'nodeDynamic', INTERNAL_NODE_PLATFORM_PROVIDERS)(extraProviders);
+  return new NodePlatform(platform);
+}
 
 
