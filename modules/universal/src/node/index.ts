@@ -1,4 +1,5 @@
-import * as universal from './node';
-export * from '../common';
+import * as universalNode from './node';
+
 export * from './node';
-export default universal;
+
+export default universalNode;

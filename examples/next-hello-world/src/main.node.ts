@@ -3,7 +3,7 @@ import {
   NodeModule,
   NodeHttpModule,
   NodeJsonpModule,
-  platformDynamicNode,
+  platformDynamicNode
 } from '@angular/universal';
 
 import { App } from './app';

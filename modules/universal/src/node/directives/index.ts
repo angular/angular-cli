@@ -1,17 +1,25 @@
-import {NodeForm} from './node_form';
-import {NodeUniversalStyles} from './node_universal_styles';
-import {PLATFORM_DIRECTIVES} from '@angular/core';
+import { Directive, ElementRef, NgModule, OnInit } from '@angular/core';
 
-export * from './node_form';
+// PRIVATE
+import { DomSharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
+// PRIVATE
 
-export const NODE_FORM_DIRECTIVES: Array<any> = [
-  NodeForm
+@Directive({
+  selector: 'universal-styles-host'
+})
+export class NodeUniversalStylesHost implements OnInit {
+  constructor(public el: ElementRef, public domSharedStylesHost: DomSharedStylesHost) {}
+  ngOnInit() {
+    this.domSharedStylesHost.addHost(this.el.nativeElement);
+  }
+
+}
+
+
+
+export const UNIVERSAL_DIRECTIVES  = [
+  NodeUniversalStylesHost
 ];
 
-export const NODE_DIRECTIVES: Array<any> = [
-  NodeUniversalStyles
-];
 
-export const NODE_PLATFORM_DIRECTIVES: Array<any> = [
-  ...(PLATFORM_DIRECTIVES ? [{provide: PLATFORM_DIRECTIVES, multi: true, useValue: NODE_DIRECTIVES }] : [])
-];
+
