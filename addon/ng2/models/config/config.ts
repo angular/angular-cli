@@ -73,7 +73,7 @@ export class CliConfig<Config> {
     try {
       content = JSON.parse(configContent);
       schema = JSON.parse(schemaContent);
-      others = otherContents.map(content => JSON.parse(otherContent));
+      others = otherContents.map(otherContent => JSON.parse(otherContent));
     } catch (err) {
       throw new InvalidConfigError(err);
     }
