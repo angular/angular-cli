@@ -313,12 +313,18 @@ describe('Basic end-to-end Workflow', function () {
   it('moves all files that live inside `assets` into `dist`', function () {
     this.timeout(420000);
 
-    const tmpFile = path.join(process.cwd(), 'src', 'assets', 'test.abc');
-    const tmpFileLocation = path.join(process.cwd(), 'dist', 'assets', 'test.abc');
-    fs.writeFileSync(tmpFile, 'hello world');
+    const dotFile = path.join(process.cwd(), 'src', 'assets', '.file');
+    const distDotFile = path.join(process.cwd(), 'dist', 'assets', '.file');
+    fs.writeFileSync(dotFile, '');
+    const testFile = path.join(process.cwd(), 'src', 'assets', 'test.abc');
+    const distTestFile = path.join(process.cwd(), 'dist', 'assets', 'test.abc');
+    fs.writeFileSync(testFile, 'hello world');
+    const distDotGitIgnore = path.join(process.cwd(), 'dist', 'assets', '.gitignore');
 
     sh.exec(`${ngBin} build`);
-    expect(existsSync(tmpFileLocation)).to.be.equal(true);
+    expect(existsSync(distDotFile)).to.be.equal(true);
+    expect(existsSync(distTestFile)).to.be.equal(true);
+    expect(existsSync(distDotGitIgnore)).to.be.equal(false);
   });
 
   // Mobile mode doesn't have styles

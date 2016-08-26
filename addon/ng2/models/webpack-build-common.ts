@@ -138,7 +138,8 @@ export function getWebpackCommonConfig(projectRoot: string, environment: string,
       }),
       new CopyWebpackPlugin([{
         context: path.resolve(appRoot, appConfig.assets),
-        from: '**/*',
+        from: { glob: '**/*', dot: true },
+        ignore: [ '.gitignore' ],
         to: path.resolve(projectRoot, appConfig.outDir, appConfig.assets)
       }])
     ],
