@@ -16,6 +16,9 @@ env:
     - SCRIPT=test
 #    - TARGET=mobile SCRIPT=mobile_test
 matrix:
+  fast_finish: true
+  allow_failures:
+    - os: osx
   exclude:
     - node_js: "6"
       env: SCRIPT=lint
