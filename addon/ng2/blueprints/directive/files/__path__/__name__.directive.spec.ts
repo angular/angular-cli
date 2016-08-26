@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import { addProviders, async, inject } from '@angular/core/testing';
+import { TestBed, async } from '@angular/core/testing';
 import { <%= classifiedModuleName %> } from './<%= dasherizedModuleName %>.directive';
 
 describe('Directive: <%= classifiedModuleName %>', () => {
