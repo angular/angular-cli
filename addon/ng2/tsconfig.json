@@ -18,7 +18,8 @@
       "../../node_modules/@types"
     ],
     "paths": {
-      "@angular-cli/ast-tools": [ "../../packages/ast-tools/src" ]
+      "@angular-cli/ast-tools": [ "../../packages/ast-tools/src" ],
+      "@angular-cli/webpack": [ "../../packages/webpack/src" ]
     }
   },
   "includes": [

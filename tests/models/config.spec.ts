@@ -10,7 +10,7 @@ describe('Config', () => {
   let schema = JSON.parse(fs.readFileSync(path.join(__dirname, 'spec-schema.json'), 'utf-8'));
 
   it('works', () => {
-    const cliConfig = CliConfig.fromJson(schema, <ConfigInterface>{
+    const cliConfig = new CliConfig(null, schema, <ConfigInterface>{
       requiredKey: 1,
       stringKey: 'stringValue'
     });
@@ -31,7 +31,7 @@ describe('Config', () => {
 
   describe('Get', () => {
     it('works', () => {
-      const config = CliConfig.fromJson(schema, <ConfigInterface>{
+      const config = new CliConfig(null, schema, <ConfigInterface>{
         requiredKey: 1,
         stringKey: 'stringValue'
       });
@@ -42,7 +42,7 @@ describe('Config', () => {
     });
 
     it('will never throw', () => {
-      const config = CliConfig.fromJson(schema, <ConfigInterface>{
+      const config = new CliConfig(null, schema, <ConfigInterface>{
         requiredKey: 1
       });
 
@@ -54,10 +54,12 @@ describe('Config', () => {
   });
 
   it('handles fallback values', () => {
-    const cliConfig = CliConfig.fromJson(schema,
+    const cliConfig = new CliConfig(null, schema,
       <ConfigInterface>{ requiredKey: 1 },
-      <ConfigInterface>{ requiredKey: 1, stringKey: 'stringValue' },
-      <ConfigInterface>{ requiredKey: 1, numberKey: 1 }
+      [
+        <ConfigInterface>{ requiredKey: 1, stringKey: 'stringValue' },
+        <ConfigInterface>{ requiredKey: 1, numberKey: 1 }
+      ]
     );
 
     // Check on string.
@@ -91,10 +93,11 @@ describe('Config', () => {
       arrayKey2: [{ stringKey: 'value1' }, { stringKey: 'value2' }]
     };
 
-    const cliConfig = CliConfig.fromJson(schema,
-      <ConfigInterface>jsonObject,
-      <ConfigInterface>{ requiredKey: 1, stringKey: 'stringValue' },
-      <ConfigInterface>{ requiredKey: 1, numberKey: 1 }
+    const cliConfig = new CliConfig(null, schema,
+      <ConfigInterface>jsonObject, [
+        <ConfigInterface>{ requiredKey: 1, stringKey: 'stringValue' },
+        <ConfigInterface>{ requiredKey: 1, numberKey: 1 }
+      ]
     );
 
     expect(cliConfig.config.arrayKey2[0].stringKey).to.equal('value1');

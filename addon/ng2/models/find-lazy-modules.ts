@@ -6,27 +6,20 @@ import * as ts from 'typescript';
 import {getSource, findNodes, getContentOfKeyLiteral} from '../utilities/ast-utils';
 
 
-interface Array<T> {
-  flatMap: <R>(mapFn: (item: T) => Array<R>) => Array<R>;
-}
-Array.prototype.flatMap = function<T, R>(mapFn: (item: T) => Array<R>): Array<R> {
-  if (!mapFn) {
-    return [];
-  }
-
-  return this.reduce((arr, current) => {
+function flatMap<T, R>(obj: Array<T>, mapFn: (item: T) => Array<R>): Array<R> {
+  return obj.reduce((arr: R[], current: T) => {
     const result = mapFn.call(null, current);
     return result !== undefined ? arr.concat(result) : arr;
-  }, []);
-};
+  }, <R[]>[]);
+}
 
 
 export function findLoadChildren(tsFilePath: string): string[] {
   const source = getSource(tsFilePath);
   const unique = {};
 
-  return findNodes(source, ts.SyntaxKind.ObjectLiteralExpression)
-    .flatMap(node => findNodes(node, ts.SyntaxKind.PropertyAssignment))
+  let nodes = findNodes(source, ts.SyntaxKind.ObjectLiteralExpression);
+  nodes = flatMap(nodes, node => findNodes(node, ts.SyntaxKind.PropertyAssignment))
     .filter((node: ts.PropertyAssignment) => {
       const key = getContentOfKeyLiteral(source, node.name);
       if (!key) {
@@ -42,8 +35,9 @@ export function findLoadChildren(tsFilePath: string): string[] {
     // Get the full text of the initializer.
     .map((node: ts.PropertyAssignment) => {
       return eval(node.initializer.getText(source)); // tslint:disable-line
-    })
-    .flatMap((value: string) => unique[value] ? undefined : unique[value] = value)
+    });
+
+  return flatMap(nodes, (value: string) => unique[value] ? undefined : unique[value] = value)
     .map((moduleName: string) => moduleName.split('#')[0]);
 }
 

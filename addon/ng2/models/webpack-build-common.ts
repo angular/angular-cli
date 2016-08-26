@@ -1,11 +1,21 @@
 import * as path from 'path';
-import * as CopyWebpackPlugin from 'copy-webpack-plugin';
-import * as HtmlWebpackPlugin from 'html-webpack-plugin';
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 import * as webpack from 'webpack';
-import * as atl from 'awesome-typescript-loader';
+const atl = require('awesome-typescript-loader');
 
 import { findLazyModules } from './find-lazy-modules';
+
+
 import { BaseHrefWebpackPlugin } from '../utilities/base-href-webpack-plugin';
+if (__dirname.indexOf('/node_modules/') == -1) {
+  const packages = require('../../../lib/packages');
+
+  Object.keys(packages).forEach(packageName => {
+    aliases[packageName] = packages[packageName].main;
+  });
+}
+
 
 export function getWebpackCommonConfig(
   projectRoot: string,
@@ -16,11 +26,15 @@ export function getWebpackCommonConfig(
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);
-  const styles = appConfig.styles.map(style => path.resolve(appRoot, style));
-  const scripts = appConfig.scripts.map(script => path.resolve(appRoot, script));
+  const styles = appConfig.styles
+               ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
+               : [];
+  const scripts = appConfig.scripts
+                ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
+                : [];
   const lazyModules = findLazyModules(appRoot);
 
-  let entry = {
+  let entry: { [key: string]: string[] } = {
     main: [appMain]
   };
 
@@ -33,6 +47,9 @@ export function getWebpackCommonConfig(
     resolve: {
       extensions: ['', '.ts', '.js'],
       root: appRoot
+    },
+    resolveLoader: {
+      alias: aliases
     },
     context: path.resolve(__dirname, './'),
     entry: entry,

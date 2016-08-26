@@ -1,4 +1,4 @@
-import * as webpackMerge from 'webpack-merge';
+const webpackMerge = require('webpack-merge');
 import { CliConfig } from './config';
 import {
   getWebpackCommonConfig,

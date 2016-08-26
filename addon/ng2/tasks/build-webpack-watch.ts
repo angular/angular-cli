@@ -9,8 +9,8 @@ import { BuildOptions } from '../commands/build';
 
 let lastHash: any = null;
 
-module.exports = Task.extend({
-  run: function(runTaskOptions: BuildOptions) {
+export default Task.extend({
+  run: function(runTaskOptions: ServeTaskOptions) {
 
     const project = this.cliProject;
 
