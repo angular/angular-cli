@@ -25,7 +25,7 @@ export interface ModuleMap {
 /**
  * Create a SourceFile as defined by Typescript Compiler API.
  * Generate a AST structure from a source file.
- * 
+ *
  * @param fileName source file for which AST is to be extracted
  */
 export function createTsSourceFile(fileName: string): Promise<ts.SourceFile> {
@@ -38,18 +38,18 @@ export function createTsSourceFile(fileName: string): Promise<ts.SourceFile> {
 
 /**
  * Traverses through AST of a given file of kind 'ts.SourceFile', filters out child
- * nodes of the kind 'ts.SyntaxKind.ImportDeclaration' and returns import clauses as 
+ * nodes of the kind 'ts.SyntaxKind.ImportDeclaration' and returns import clauses as
  * ModuleImport[]
- * 
+ *
  * @param {ts.SourceFile} node: Typescript Node of whose AST is being traversed
- * 
+ *
  * @return {ModuleImport[]} traverses through ts.Node and returns an array of moduleSpecifiers.
  */
 export function getImportClauses(node: ts.SourceFile): ModuleImport[] {
   return node.statements
-    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)  // Only Imports.
-    .map((node: ts.ImportDeclaration) => {
-      let moduleSpecifier = node.moduleSpecifier;
+    .filter(aNode => aNode.kind === ts.SyntaxKind.ImportDeclaration)  // Only Imports.
+    .map((aNode: ts.ImportDeclaration) => {
+      let moduleSpecifier = aNode.moduleSpecifier;
       return {
         specifierText: moduleSpecifier.getText().slice(1, -1),
         pos: moduleSpecifier.pos,
@@ -58,12 +58,12 @@ export function getImportClauses(node: ts.SourceFile): ModuleImport[] {
     });
 }
 
-/** 
+/**
  * Find the file, 'index.ts' given the directory name and return boolean value
  * based on its findings.
- * 
+ *
  * @param dirPath
- * 
+ *
  * @return a boolean value after it searches for a barrel (index.ts by convention) in a given path
  */
 export function hasIndexFile(dirPath: string): Promise<Boolean> {
@@ -80,13 +80,13 @@ export function hasIndexFile(dirPath: string): Promise<Boolean> {
  *   creating associated files with the name of the generated unit. So, there are two
  *   assumptions made:
  *   a. the function only returns associated files that have names matching to the given unit.
- *   b. the function only looks for the associated files in the directory where the given unit 
+ *   b. the function only looks for the associated files in the directory where the given unit
  *      exists.
- *  
+ *
  * @todo read the metadata to look for the associated files of a given file.
- * 
- * @param fileName 
- * 
+ *
+ * @param fileName
+ *
  * @return absolute paths of '.html/.css/.sass/.spec.ts' files associated with the given file.
  *
  */
@@ -105,12 +105,12 @@ export function getAllAssociatedFiles(fileName: string): Promise<string[]> {
 /**
  * Returns a map of all dependent file/s' path with their moduleSpecifier object
  * (specifierText, pos, end).
- * 
- * @param fileName file upon which other files depend 
+ *
+ * @param fileName file upon which other files depend
  * @param rootPath root of the project
- * 
+ *
  * @return {Promise<ModuleMap>} ModuleMap of all dependent file/s (specifierText, pos, end)
- * 
+ *
  */
 export function getDependentFiles(fileName: string, rootPath: string): Promise<ModuleMap> {
   const globSearch = denodeify(glob);

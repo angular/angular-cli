@@ -124,7 +124,7 @@ describe('route utils', () => {
         .then(content => {
           expect(content).toEqual(
             `import routes from './routes';
-  import { provideRouter } from '@angular/router'; 
+  import { provideRouter } from '@angular/router';
   bootstrap(AppComponent, [ provideRouter(routes) ]);`);
         });
     });
@@ -299,7 +299,7 @@ export default [
     children: [
       { path: 'about', component: AboutComponent,
         children: [
-          { path: 'details', component: DetailsComponent }, 
+          { path: 'details', component: DetailsComponent },
           { path: 'more', component: MoreComponent }
         ]
       }
@@ -327,7 +327,7 @@ export default [
         children: [
           { path: 'more', component: MoreComponent,
             children: [
-              { path: 'sections', component: SectionsComponent } 
+              { path: 'sections', component: SectionsComponent }
             ]
           }
         ]
@@ -359,7 +359,7 @@ export default [
   { path: 'main', component: MainComponent }
   { path: 'home', component: HomeComponent,
     children: [
-      { path: 'about/:id', component: AboutComponent_1 }, 
+      { path: 'about/:id', component: AboutComponent_1 },
       { path: 'about', component: AboutComponent }
     ]
   }
@@ -447,7 +447,7 @@ export default [
 export default [
   { path: 'home', component: HomeComponent,
     children: [
-      { path: 'trap-queen', component: TrapQueenComponent }, 
+      { path: 'trap-queen', component: TrapQueenComponent },
       { path: 'about', component: AboutComponent,
         children: [
           { path: 'more', component: MoreComponent }
@@ -462,9 +462,9 @@ export default [
       let editedFile = new InsertChange(routesFile, 16,
         `\n  { path: 'home', component: HomeComponent }\n`);
       return editedFile.apply().then(() => {
-        let editedFile = new InsertChange(routesFile, 0,
+        let editedFile2 = new InsertChange(routesFile, 0,
           `import { HomeComponent } from './app/home/home.component';\n`);
-        return editedFile.apply();
+        return editedFile2.apply();
       })
         .then(() => {
           options.dasherizedName = 'home';
@@ -478,7 +478,7 @@ import { HomeComponent as HomeComponent_1 } from './app/home/home/home.component
 export default [
   { path: 'home', component: HomeComponent,
     children: [
-      { path: 'home', component: HomeComponent_1 } 
+      { path: 'home', component: HomeComponent_1 }
     ]
   }
 ];`;
@@ -487,18 +487,18 @@ export default [
     });
     it('throws error if components collide and there is repitition', () => {
       let editedFile = new InsertChange(routesFile, 16,
-        `\n  { path: 'about', component: AboutComponent, 
+        `\n  { path: 'about', component: AboutComponent,
     children: [
       { path: 'details/:id', component: DetailsComponent_1 },
       { path: 'details', component: DetailsComponent }
     ]
   }`);
       return editedFile.apply().then(() => {
-        let editedFile = new InsertChange(routesFile, 0,
+        let editedFile3 = new InsertChange(routesFile, 0,
           `import { AboutComponent } from './app/about/about.component';
 import { DetailsComponent } from './app/about/details/details.component';
 import { DetailsComponent as DetailsComponent_1 } from './app/about/description/details.component;\n`); // tslint:disable-line
-        return editedFile.apply();
+        return editedFile3.apply();
       }).then(() => {
         options.dasherizedName = 'details';
         options.component = 'DetailsComponent';
@@ -543,7 +543,7 @@ import { DetailsComponent as DetailsComponent_1 } from './app/about/description/
 export default [
   { path: 'home', component: HomeComponent,
     children: [
-      { path: 'more', component: MoreComponent, canDeactivate: [ MyGuard ], useAsDefault: true } 
+      { path: 'more', component: MoreComponent, canDeactivate: [ MyGuard ], useAsDefault: true }
     ]
   }
 ];`
