@@ -35,13 +35,6 @@ describe('Basic end-to-end Workflow', function () {
 
   var testArgs = ['test', '--watch', 'false'];
 
-  // In travis CI only run tests in Chrome_travis_ci
-  if (process.env.TRAVIS) {
-    testArgs.push('--browsers');
-    testArgs.push('Chrome_travis_ci');
-  }
-
-
   it('Installs angular-cli correctly', function () {
     this.timeout(300000);
 
@@ -492,7 +485,7 @@ describe('Basic end-to-end Workflow', function () {
     let stylesPath = path.join(process.cwd(), 'src', 'styles.css');
     let testStyle = 'body { background-color: blue; }';
     fs.writeFileSync(stylesPath, testStyle, 'utf8');
-    
+
     sh.exec(`${ngBin} build`);
 
     var stylesBundlePath = path.join(process.cwd(), 'dist', 'styles.bundle.js');
@@ -548,7 +541,7 @@ describe('Basic end-to-end Workflow', function () {
     expect(stylesBundleContent).to.include('* Bootstrap ');
 
     const scriptsBundlePath = path.join(process.cwd(), 'dist', 'scripts.bundle.js');
-    const scriptsBundleContent = fs.readFileSync(scriptsBundlePath, { encoding: 'utf8' });    
+    const scriptsBundleContent = fs.readFileSync(scriptsBundlePath, { encoding: 'utf8' });
     expect(scriptsBundleContent).to.include('* jQuery JavaScript');
     expect(scriptsBundleContent).to.include('/*! tether ');
     expect(scriptsBundleContent).to.include('* Bootstrap ');
@@ -556,7 +549,7 @@ describe('Basic end-to-end Workflow', function () {
     // check the scripts are loaded in the correct order
     const indexPath = path.join(process.cwd(), 'dist', 'index.html');
     const indexContent = fs.readFileSync(indexPath, { encoding: 'utf8' });
-    let scriptTags = '<script type="text/javascript" src="inline.js"></script>' + 
+    let scriptTags = '<script type="text/javascript" src="inline.js"></script>' +
                     '<script type="text/javascript" src="styles.bundle.js"></script>' +
                     '<script type="text/javascript" src="scripts.bundle.js"></script>' +
                     '<script type="text/javascript" src="main.bundle.js"></script>'
