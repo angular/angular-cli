@@ -322,12 +322,12 @@ describe('Basic end-to-end Workflow', function () {
     const testFile = path.join(process.cwd(), 'src', 'assets', 'test.abc');
     const distTestFile = path.join(process.cwd(), 'dist', 'assets', 'test.abc');
     fs.writeFileSync(testFile, 'hello world');
-    const distDotGitIgnore = path.join(process.cwd(), 'dist', 'assets', '.gitignore');
+    const distDotGitkeep = path.join(process.cwd(), 'dist', 'assets', '.gitkeep');
 
     sh.exec(`${ngBin} build`);
     expect(existsSync(distDotFile)).to.be.equal(true);
     expect(existsSync(distTestFile)).to.be.equal(true);
-    expect(existsSync(distDotGitIgnore)).to.be.equal(false);
+    expect(existsSync(distDotGitkeep)).to.be.equal(false);
   });
 
   // Mobile mode doesn't have styles
