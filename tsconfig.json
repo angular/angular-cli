@@ -44,9 +44,8 @@
     "modules/universal-polyfills/src/zone-browser.ts",
     "modules/universal/src/node/index.ts",
     "modules/universal/src/browser/index.ts",
-    "modules/universal/src/global.ts",
-    "modules/universal/src/polyfills.ts",
-    "modules/universal/src/typings.ts",
+    "modules/universal/src/browser.ts",
+    "modules/universal/src/node.ts",
     "modules/webpack-prerender/src/index.ts"
   ],
   "compileOnSave": false,
