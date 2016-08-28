@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "mapRoot": "",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "outDir": "./dist/",
+    "rootDir": ".",
+    "sourceMap": true,
+    "sourceRoot": "",
+    "target": "es5",
+    "lib": ["es6"],
+    "baseUrl": "",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": [
+      "jasmine",
+      "node"
+    ],
+    "paths": {
+      "@angular-cli/ast-tools": [ "./packages/ast-tools/src" ],
+      "@angular-cli/webpack": [ "./packages/webpack/src" ]
+    }
+  },
+  "exclude": [
+    "dist/**/*",
+    "tmp/**/*"
+  ]
+}

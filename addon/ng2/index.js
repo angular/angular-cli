@@ -12,25 +12,25 @@ module.exports = {
 
   includedCommands: function () {
     return {
-      'build': require('./commands/build'),
-      'serve': require('./commands/serve'),
-      'new': require('./commands/new'),
-      'generate': require('./commands/generate'),
-      'init': require('./commands/init'),
-      'test': require('./commands/test'),
-      'e2e': require('./commands/e2e'),
-      'lint': require('./commands/lint'),
-      'version': require('./commands/version'),
-      'completion': require('./commands/completion'),
-      'doc': require('./commands/doc'),
-      'github-pages-deploy': require('./commands/github-pages-deploy'),
+      'build': require('./commands/build').default,
+      'serve': require('./commands/serve').default,
+      'new': require('./commands/new').default,
+      'generate': require('./commands/generate').default,
+      'init': require('./commands/init').default,
+      'test': require('./commands/test').default,
+      'e2e': require('./commands/e2e').default,
+      'lint': require('./commands/lint').default,
+      'version': require('./commands/version').default,
+      'completion': require('./commands/completion').default,
+      'doc': require('./commands/doc').default,
+      'github-pages-deploy': require('./commands/github-pages-deploy').default,
 
       // Easter eggs.
-      'make-this-awesome': require('./commands/easter-egg')('make-this-awesome'),
+      'make-this-awesome': require('./commands/easter-egg').default,
 
       // Configuration.
-      'set': require('./commands/set'),
-      'get': require('./commands/get')
+      'set': require('./commands/set').default,
+      'get': require('./commands/get').default
     };
   }
 };

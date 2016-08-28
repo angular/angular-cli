@@ -8,8 +8,8 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "outDir": "../dist/",
-    "rootDir": ".",
+    "outDir": "../../dist/",
+    "rootDir": "../..",
     "sourceMap": true,
     "sourceRoot": "/",
     "target": "es5",
@@ -17,10 +17,15 @@
     "typeRoots": [
       "../../node_modules/@types"
     ],
+    "baseUrl": "",
     "paths": {
-      "@angular-cli/ast-tools": [ "../../packages/ast-tools/src" ]
+      "@angular-cli/ast-tools": [ "../../packages/ast-tools/src" ],
+      "@angular-cli/webpack": [ "../../packages/webpack/src" ]
     }
   },
+  "exclude": [
+    "blueprints/*/files/**/*"
+  ],
   "includes": [
     "./custom-typings.d.ts"
   ]

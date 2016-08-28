@@ -8,23 +8,23 @@ export interface WriterFn {
 }
 
 export abstract class Serializer {
-  abstract start();
-  abstract end();
+  abstract start(): void;
+  abstract end(): void;
 
-  abstract object(callback: () => void);
-  abstract property(name: string, callback: () => void);
-  abstract array(callback: () => void);
+  abstract object(callback: () => void): void;
+  abstract property(name: string, callback: () => void): void;
+  abstract array(callback: () => void): void;
 
-  abstract outputString(value: string);
-  abstract outputNumber(value: number);
-  abstract outputBoolean(value: boolean);
+  abstract outputString(value: string): void;
+  abstract outputNumber(value: number): void;
+  abstract outputBoolean(value: boolean): void;
 
   // Fallback when the value does not have metadata.
-  abstract outputValue(value: any);
+  abstract outputValue(value: any): void;
 
 
-  static fromMimetype(mimetype: string, writer: WriterFn, ...opts: any[]) {
-    let Klass = null;
+  static fromMimetype(mimetype: string, writer: WriterFn, ...opts: any[]): Serializer {
+    let Klass: { new(writer: WriterFn, ...args: any[]): Serializer } = null;
     switch (mimetype) {
       case 'application/json': Klass = JsonSerializer; break;
 
@@ -36,8 +36,14 @@ export abstract class Serializer {
 }
 
 
+interface JsonSerializerState {
+  empty?: boolean;
+  type?: string;
+  property?: boolean;
+}
+
 class JsonSerializer implements Serializer {
-  private _state: { empty: boolean, type: string, property: boolean }[] = [];
+  private _state: JsonSerializerState[] = [];
 
   constructor(private _writer: WriterFn, private _indentDelta = 2) {}
 
@@ -57,7 +63,7 @@ class JsonSerializer implements Serializer {
     }
   }
 
-  private _top() {
+  private _top(): JsonSerializerState {
     return this._state[this._state.length - 1] || {};
   }
 

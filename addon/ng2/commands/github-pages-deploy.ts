@@ -1,18 +1,19 @@
-import * as Command from 'ember-cli/lib/models/command';
-import * as SilentError from 'silent-error';
+const Command = require('ember-cli/lib/models/command');
+const SilentError = require('silent-error');
+import denodeify = require('denodeify');
+
 import { exec } from 'child_process';
-import * as Promise from 'ember-cli/lib/ext/promise';
 import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as WebpackBuild from '../tasks/build-webpack';
-import * as CreateGithubRepo from '../tasks/create-github-repo';
+import WebpackBuild from '../tasks/build-webpack';
+import CreateGithubRepo from '../tasks/create-github-repo';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
-const fsReadDir = Promise.denodeify(fs.readdir);
-const fsCopy = Promise.denodeify(fse.copy);
+const fsReadDir = <any>denodeify(fs.readdir);
+const fsCopy = <any>denodeify(fse.copy);
 
 interface GithubPagesDeployOptions {
   message?: string;
@@ -25,7 +26,7 @@ interface GithubPagesDeployOptions {
   baseHref?: string;
 }
 
-module.exports = Command.extend({
+const githubPagesDeployCommand = Command.extend({
   name: 'github-pages:deploy',
   aliases: ['gh-pages:deploy'],
   description: oneLine`
@@ -77,7 +78,7 @@ module.exports = Command.extend({
       aliases: ['bh']
     }],
 
-  run: function(options: GithubPagesDeployOptions, rawArgs) {
+  run: function(options: GithubPagesDeployOptions, rawArgs: string[]) {
     const ui = this.ui;
     const root = this.project.root;
     const execOptions = {
@@ -99,10 +100,10 @@ module.exports = Command.extend({
 
     let ghPagesBranch = 'gh-pages';
     let destinationBranch = options.userPage ? 'master' : ghPagesBranch;
-    let initialBranch;
+    let initialBranch: string;
 
     // declared here so that tests can stub exec
-    const execPromise = Promise.denodeify(exec);
+    const execPromise = <(cmd: string, options?: any) => Promise<string>>denodeify(exec);
 
     const buildTask = new WebpackBuild({
       ui: this.ui,
@@ -155,7 +156,7 @@ module.exports = Command.extend({
 
     function checkForPendingChanges() {
       return execPromise('git status --porcelain')
-        .then(stdout => {
+        .then((stdout: string) => {
           if (/\w+/m.test(stdout)) {
             let msg = 'Uncommitted file changes found! Please commit all changes before deploying.';
             return Promise.reject(new SilentError(msg));
@@ -170,7 +171,7 @@ module.exports = Command.extend({
 
     function saveStartingBranchName() {
       return execPromise('git rev-parse --abbrev-ref HEAD')
-        .then((stdout) => initialBranch = stdout.replace(/\s/g, ''));
+        .then((stdout: string) => initialBranch = stdout.replace(/\s/g, ''));
     }
 
     function createGitHubRepoIfNeeded() {
@@ -205,7 +206,7 @@ module.exports = Command.extend({
 
     function copyFiles() {
       return fsReadDir(outDir)
-        .then((files) => Promise.all(files.map((file) => {
+        .then((files: string[]) => Promise.all(files.map((file) => {
           if (file === '.gitignore') {
             // don't overwrite the .gitignore file
             return Promise.resolve();
@@ -245,7 +246,7 @@ module.exports = Command.extend({
         });
     }
 
-    function failGracefully(error) {
+    function failGracefully(error: Error) {
       if (error && (/git clean/.test(error.message) || /Permission denied/.test(error.message))) {
         ui.writeLine(error.message);
         let msg = 'There was a permissions error during git file operations, ' +
@@ -258,3 +259,6 @@ module.exports = Command.extend({
     }
   }
 });
+
+
+export default githubPagesDeployCommand;

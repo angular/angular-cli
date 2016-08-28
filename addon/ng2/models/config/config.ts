@@ -14,17 +14,17 @@ export class InvalidConfigError extends Error {
 }
 
 
-export class CliConfig<Config> {
-  private _config: SchemaClass<Config>;
+export class CliConfig<JsonType> {
+  private _config: SchemaClass<JsonType>;
 
   constructor(private _configPath: string,
                       schema: Object,
-                      configJson: Config,
-                      fallbacks: Config[] = []) {
-    this._config = new (SchemaClassFactory<Config>(schema))(configJson, ...fallbacks);
+                      configJson: JsonType,
+                      fallbacks: JsonType[] = []) {
+    this._config = new (SchemaClassFactory<JsonType>(schema))(configJson, ...fallbacks);
   }
 
-  get config(): Config { return this._config; }
+  get config(): JsonType { return <any>this._config; }
 
   save(path: string = this._configPath) {
     return fs.writeFileSync(path, this.serialize(), 'utf-8');
@@ -55,20 +55,28 @@ export class CliConfig<Config> {
     this._config.$$set(jsonPath, value);
   }
 
-  static fromJson(schema: Object, content: Config, ...global: Config[]) {
-    return new CliConfig(null, schema, content, global);
+  static fromJson<ConfigType>(content: ConfigType, ...global: ConfigType[]) {
+    const schemaContent = fs.readFileSync(DEFAULT_CONFIG_SCHEMA_PATH, 'utf-8');
+    let schema: Object;
+    try {
+      schema = JSON.parse(schemaContent);
+    } catch (err) {
+      throw new InvalidConfigError(err);
+    }
+
+    return new CliConfig<ConfigType>(null, schema, content, global);
   }
 
-  static fromConfigPath(configPath: string, otherPath: string[] = []): CliConfig {
+  static fromConfigPath<T>(configPath: string, otherPath: string[] = []): CliConfig<T> {
     const configContent = fs.readFileSync(configPath, 'utf-8');
     const schemaContent = fs.readFileSync(DEFAULT_CONFIG_SCHEMA_PATH, 'utf-8');
     const otherContents = otherPath
       .map(path => fs.existsSync(path) && fs.readFileSync(path, 'utf-8'))
       .filter(content => !!content);
 
-    let content;
-    let schema;
-    let others;
+    let content: T;
+    let schema: Object;
+    let others: T[];
 
     try {
       content = JSON.parse(configContent);
@@ -78,6 +86,6 @@ export class CliConfig<Config> {
       throw new InvalidConfigError(err);
     }
 
-    return new CliConfig(configPath, schema, content, others);
+    return new CliConfig<T>(configPath, schema, content, others);
   }
 }

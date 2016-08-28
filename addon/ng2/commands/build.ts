@@ -1,6 +1,6 @@
-import * as Command from 'ember-cli/lib/models/command';
-import * as WebpackBuild from '../tasks/build-webpack';
-import * as WebpackBuildWatch from '../tasks/build-webpack-watch';
+const Command = require('ember-cli/lib/models/command');
+import WebpackBuild from '../tasks/build-webpack';
+import WebpackBuildWatch from '../tasks/build-webpack-watch';
 
 export interface BuildOptions {
   target?: string;
@@ -12,7 +12,7 @@ export interface BuildOptions {
   baseHref?: string;
 }
 
-module.exports = Command.extend({
+const BuildCommand = Command.extend({
   name: 'build',
   description: 'Builds your app and places it into the output path (dist/ by default).',
   aliases: ['b'],
@@ -64,4 +64,6 @@ module.exports = Command.extend({
   }
 });
 
-module.exports.overrideCore = true;
+
+BuildCommand.overrideCore = true;
+export default BuildCommand;

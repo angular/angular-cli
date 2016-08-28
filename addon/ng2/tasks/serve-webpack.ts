@@ -1,18 +1,18 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
-import * as SilentError from 'silent-error';
-import * as Task from 'ember-cli/lib/models/task';
+const SilentError = require('silent-error');
+const Task = require('ember-cli/lib/models/task');
 import * as webpack from 'webpack';
-import * as WebpackDevServer from 'webpack-dev-server';
-import * as ProgressPlugin from 'webpack/lib/ProgressPlugin';
+const WebpackDevServer = require('webpack-dev-server');
+const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 import { webpackDevServerOutputOptions } from '../models/';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
-module.exports = Task.extend({
+export default Task.extend({
   run: function(commandOptions: ServeTaskOptions) {
     const ui = this.ui;
 
@@ -66,7 +66,7 @@ module.exports = Task.extend({
 
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
     return new Promise((resolve, reject) => {
-      server.listen(commandOptions.port, `${commandOptions.host}`, function(err, stats) {
+      server.listen(commandOptions.port, `${commandOptions.host}`, function(err: any, stats: any) {
         if (err) {
           console.error(err.stack || err);
           if (err.details) { console.error(err.details); }
@@ -76,7 +76,3 @@ module.exports = Task.extend({
     });
   }
 });
-
-
-
-

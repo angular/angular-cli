@@ -1,6 +1,6 @@
 import * as path from 'path';
-import * as WebpackMd5Hash from 'webpack-md5-hash';
-import * as CompressionPlugin from 'compression-webpack-plugin';
+const WebpackMd5Hash = require('webpack-md5-hash');
+const CompressionPlugin = require('compression-webpack-plugin');
 import * as webpack from 'webpack';
 
 export const getWebpackProdConfigPartial = function(projectRoot: string, appConfig: any) {
@@ -16,11 +16,9 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
     plugins: [
       new WebpackMd5Hash(),
       new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.UglifyJsPlugin({
-        beautify: false,
+      new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8 : true, keep_fnames: true },
-        compress: { screw_ie8: true },
-        comments: false
+        compress: { screw_ie8: true }
       }),
       new CompressionPlugin({
           asset: '[path].gz[query]',

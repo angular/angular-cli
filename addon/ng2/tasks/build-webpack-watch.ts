@@ -1,15 +1,15 @@
 import * as rimraf from 'rimraf';
 import * as path from 'path';
-import * as Task from 'ember-cli/lib/models/task';
+const Task = require('ember-cli/lib/models/task');
 import * as webpack from 'webpack';
-import * as ProgressPlugin from 'webpack/lib/ProgressPlugin';
+const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { webpackOutputOptions } from '../models/';
 import { BuildOptions } from '../commands/build';
 
 let lastHash: any = null;
 
-module.exports = Task.extend({
+export default Task.extend({
   run: function(runTaskOptions: BuildOptions) {
 
     const project = this.cliProject;
@@ -23,14 +23,14 @@ module.exports = Task.extend({
       runTaskOptions.outputPath,
       runTaskOptions.baseHref
     ).config;
-    const webpackCompiler = webpack(config);
+    const webpackCompiler: any = webpack(config);
 
     webpackCompiler.apply(new ProgressPlugin({
       profile: true
     }));
 
-    return new Promise( (resolve, reject) => {
-      webpackCompiler.watch({}, (err, stats) => {
+    return new Promise((resolve, reject) => {
+      webpackCompiler.watch({}, (err: any, stats: any) => {
         if (err) {
           lastHash = null;
           console.error(err.stack || err);

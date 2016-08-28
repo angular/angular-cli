@@ -9,7 +9,9 @@
   },
   "keywords": [],
   "scripts": {
-    "build": "for PKG in packages/*; do echo Building $PKG...; tsc -P $PKG; done",
+    "build": "npm-run-all -c build:main build:packages",
+    "build:main": "tsc -p addon/ng2",
+    "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -P $PKG; done",
     "test": "npm run test:packages && npm run test:cli",
     "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
     "test:cli": "node tests/runner",
@@ -17,7 +19,7 @@
     "test:packages": "node scripts/run-packages-spec.js",
     "build-config-interface": "dtsgen lib/config/schema.json --out lib/config/schema.d.ts",
     "eslint": "eslint .",
-    "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\"",
+    "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
     "lint": "npm-run-all -c eslint tslint"
   },
   "repository": {
@@ -38,6 +40,8 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
+    "@angular/compiler": "^2.0.0-rc.5",
+    "@angular/compiler-cli": "^0.5.0",
     "@angular/core": "^2.0.0-rc.5",
     "@angular/tsc-wrapped": "^0.2.2",
     "angular2-template-loader": "^0.5.0",
@@ -109,7 +113,11 @@
     ]
   },
   "devDependencies": {
+    "@types/chalk": "^0.4.28",
+    "@types/common-tags": "^1.2.3",
     "@types/denodeify": "^1.2.29",
+    "@types/fs-extra": "^0.0.31",
+    "@types/glob": "^5.0.29",
     "@types/jasmine": "^2.2.32",
     "@types/lodash": "^4.0.25-alpha",
     "@types/mock-fs": "3.6.28",
@@ -132,6 +140,7 @@
     "sinon": "^1.17.3",
     "through": "^2.3.8",
     "tree-kill": "^1.0.0",
+    "ts-node": "^1.3.0",
     "tslint": "^3.11.0",
     "walk-sync": "^0.2.6"
   }

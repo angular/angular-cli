@@ -43,12 +43,19 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     const globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
 
     if (!configPath) {
-      return {};
+      return CliConfigBase.fromJson<ConfigInterface>({});
     }
 
-    const cliConfig = CliConfigBase.fromConfigPath(CliConfig._configFilePath(), [globalConfigPath]);
-    if (cliConfig.alias('apps.0.root', 'defaults.sourceDir')
-        + cliConfig.alias('apps.0.prefix', 'defaults.prefix')) {
+    const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(
+      CliConfig._configFilePath(), [globalConfigPath]);
+
+    const aliases = [
+      cliConfig.alias('apps.0.root', 'defaults.sourceDir'),
+      cliConfig.alias('apps.0.prefix', 'defaults.prefix')
+    ];
+
+    // If any of them returned true, output a deprecation warning.
+    if (aliases.some(x => !!x)) {
       console.error(chalk.yellow(oneLine`
         The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
         are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n

@@ -1,17 +1,18 @@
-import * as Promise from 'ember-cli/lib/ext/promise';
-import * as Task from 'ember-cli/lib/models/task';
-import * as SilentError from 'silent-error';
+import * as denodeify from 'denodeify';
+const Task = require('ember-cli/lib/models/task');
+const SilentError = require('silent-error');
 import { exec } from 'child_process';
 import * as https from 'https';
 import { oneLine } from 'common-tags';
 
-module.exports = Task.extend({
-  run: function(commandOptions) {
+
+export default Task.extend({
+  run: function(commandOptions: any) {
     const ui = this.ui;
-    let promise;
+    let promise: Promise<any>;
 
     // declared here so that tests can stub exec
-    const execPromise = Promise.denodeify(exec);
+    const execPromise = denodeify(exec);
 
     if (/.+/.test(commandOptions.ghToken) && /\w+/.test(commandOptions.ghUsername)) {
       promise = Promise.resolve({
@@ -37,14 +38,14 @@ module.exports = Task.extend({
             Please enter GitHub token you just created
             (used only once to create the repo):
           `,
-          validate: function(token) {
+          validate: function(token: string) {
             return /.+/.test(token);
           }
         }, {
           name: 'ghUsername',
           type: 'input',
           message: 'and your GitHub user name:',
-          validate: function(userName) {
+          validate: function(userName: string) {
             return /\w+/.test(userName);
           }
         }]);
@@ -70,7 +71,7 @@ module.exports = Task.extend({
           }
         });
 
-        req.on('response', function(response) {
+        req.on('response', function(response: any) {
           if (response.statusCode === 201) {
             resolve(execPromise(oneLine`
               git remote add origin 

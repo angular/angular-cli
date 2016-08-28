@@ -21,7 +21,7 @@ const kOriginalRoot = Symbol('schema-value');
  */
 function _parseJsonPath(path: string): string[] {
   const fragments = (path || '').split(/\./g);
-  const result = [];
+  const result: string[] = [];
 
   while (fragments.length > 0) {
     const fragment = fragments.shift();
@@ -53,9 +53,8 @@ function _getSchemaNodeForPath<T>(rootMetaData: SchemaTreeNode<T>,
 
 
 /** The interface the SchemaClassFactory returned class implements. */
-export interface SchemaClass<ConfigType> extends ConfigType {
-  new (config: ConfigType): SchemaClass<ConfigType>;
-
+export interface SchemaClass<JsonType> extends Object {
+  $$root(): JsonType;
   $$get(path: string): any;
   $$set(path: string, value: any): void;
   $$alias(source: string, destination: string): boolean;
@@ -64,27 +63,37 @@ export interface SchemaClass<ConfigType> extends ConfigType {
   // Metadata of the schema.
   $$typeOf(path: string): string;
   $$defined(path: string): boolean;
-  $$delete(path: string);
+  $$delete(path: string): void;
 
   $$serialize(mimetype?: string): string;
 }
 
 
 class SchemaClassBase<T> implements SchemaClass<T> {
-  private [kSchemaNode]: SchemaTreeNode<T>;
-
-  constructor(value: T) {
-    this[kOriginalRoot] = value;
+  constructor(schema: Object, value: T, ...fallbacks: T[]) {
+    (this as any)[kOriginalRoot] = value;
+    const forward = fallbacks.length > 0
+                  ? (new SchemaClassBase<T>(schema, fallbacks.pop(), ...fallbacks).$$schema())
+                  : null;
+    (this as any)[kSchemaNode] = new RootSchemaTreeNode(this, {
+      forward,
+      value,
+      schema
+    });
   }
+
+  $$root(): T { return this as any; }
+  $$schema(): RootSchemaTreeNode { return (this as any)[kSchemaNode] as RootSchemaTreeNode; }
+  $$originalRoot(): T { return (this as any)[kOriginalRoot] as T; }
 
   /** Sets the value of a destination if the value is currently undefined. */
   $$alias(source: string, destination: string) {
-    let sourceSchemaTreeNode = _getSchemaNodeForPath(this[kSchemaNode], source);
+    let sourceSchemaTreeNode = _getSchemaNodeForPath(this.$$schema(), source);
 
     const fragments = _parseJsonPath(destination);
     const maybeValue = fragments.reduce((value: any, current: string) => {
       return value && value[current];
-    }, this[kOriginalRoot]);
+    }, this.$$originalRoot());
 
     if (maybeValue !== undefined) {
       sourceSchemaTreeNode.set(maybeValue);
@@ -95,18 +104,18 @@ class SchemaClassBase<T> implements SchemaClass<T> {
 
   /** Destroy all links between schemas to allow for GC. */
   $$dispose() {
-    this[kSchemaNode].dispose();
+    this.$$schema().dispose();
   }
 
   /** Get a value from a JSON path. */
   $$get(path: string): any {
-    const node = _getSchemaNodeForPath(this[kSchemaNode], path);
+    const node = _getSchemaNodeForPath(this.$$schema(), path);
     return node ? node.get() : undefined;
   }
 
   /** Set a value from a JSON path. */
-  $$set(path: string, value: any) {
-    const node = _getSchemaNodeForPath(this[kSchemaNode], path);
+  $$set(path: string, value: any): void {
+    const node = _getSchemaNodeForPath(this.$$schema(), path);
     if (node) {
       node.set(value);
     } else {
@@ -116,9 +125,9 @@ class SchemaClassBase<T> implements SchemaClass<T> {
       if (!splitPath) {
         return undefined;
       }
-      const parent = splitPath
+      const parent: any = splitPath
         .slice(0, -1)
-        .reduce((parent, curr) => parent && parent[curr], this);
+        .reduce((parent: any, curr: string) => parent && parent[curr], this);
 
       if (parent) {
         parent[splitPath[splitPath.length - 1]] = value;
@@ -128,17 +137,17 @@ class SchemaClassBase<T> implements SchemaClass<T> {
 
   /** Get the Schema associated with a path. */
   $$typeOf(path: string): string {
-    const node = _getSchemaNodeForPath(this[kSchemaNode], path);
+    const node = _getSchemaNodeForPath(this.$$schema(), path);
     return node ? node.type : null;
   }
 
   $$defined(path: string): boolean {
-    const node = _getSchemaNodeForPath(this[kSchemaNode], path);
+    const node = _getSchemaNodeForPath(this.$$schema(), path);
     return node ? node.defined : false;
   }
 
   $$delete(path: string) {
-    const node = _getSchemaNodeForPath(this[kSchemaNode], path);
+    const node = _getSchemaNodeForPath(this.$$schema(), path);
     if (node) {
       node.destroy();
     }
@@ -150,13 +159,15 @@ class SchemaClassBase<T> implements SchemaClass<T> {
     const serializer = Serializer.fromMimetype(mimetype, (s) => str += s, ...options);
 
     serializer.start();
-    this[kSchemaNode].serialize(serializer);
+    this.$$schema().serialize(serializer);
     serializer.end();
 
     return str;
   }
 }
-
+export interface SchemaClassFactoryReturn<T> {
+  new (value: T, ...fallbacks: T[]): SchemaClass<T>;
+}
 
 /**
  * Create a class from a JSON SCHEMA object. Instanciating that class with an object
@@ -166,16 +177,10 @@ class SchemaClassBase<T> implements SchemaClass<T> {
  * @returns {GeneratedSchemaClass}
  * @constructor
  */
-export function SchemaClassFactory<T>(schema: Object): SchemaClassBase<T> {
+export function SchemaClassFactory<T>(schema: Object): SchemaClassFactoryReturn<T> {
   class GeneratedSchemaClass extends SchemaClassBase<T> {
     constructor(value: T, ...fallbacks: T[]) {
-      super(value);
-
-      this[kSchemaNode] = new RootSchemaTreeNode(this, {
-        forward: fallbacks.length > 0 ? (new this.constructor(...fallbacks)[kSchemaNode]) : null,
-        value,
-        schema
-      });
+      super(schema, value, ...fallbacks);
     }
   }
 

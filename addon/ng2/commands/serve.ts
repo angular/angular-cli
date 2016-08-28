@@ -1,13 +1,13 @@
 import * as assign from 'lodash/assign';
-import * as Command from 'ember-cli/lib/models/command';
-import * as Promise from 'ember-cli/lib/ext/promise';
-import * as SilentError from 'silent-error';
-import * as PortFinder from 'portfinder';
-import * as ServeWebpackTask from '../tasks/serve-webpack.ts';
+import * as denodeify from 'denodeify';
+const Command = require('ember-cli/lib/models/command');
+const SilentError = require('silent-error');
+const PortFinder = require('portfinder');
+import ServeWebpackTask from '../tasks/serve-webpack.ts';
 
 PortFinder.basePort = 49152;
 
-const getPort = Promise.denodeify(PortFinder.getPort);
+const getPort = <any>denodeify(PortFinder.getPort);
 const defaultPort = process.env.PORT || 4200;
 
 export interface ServeTaskOptions {
@@ -28,7 +28,7 @@ export interface ServeTaskOptions {
   sslCert?: string;
 }
 
-module.exports = Command.extend({
+const ServeCommand = Command.extend({
   name: 'serve',
   description: 'Builds and serves your app, rebuilding on file changes.',
   aliases: ['server', 's'],
@@ -115,8 +115,7 @@ module.exports = Command.extend({
       .then((foundPort: number) => {
 
         if (commandOptions.port !== foundPort && commandOptions.port !== 0) {
-          const message = 'Port ' + commandOptions.port + ' is already in use.';
-          return Promise.reject(new SilentError(message));
+          throw new SilentError(`Port ${commandOptions.port} is already in use.`);
         }
 
         // otherwise, our found port is good
@@ -149,4 +148,5 @@ module.exports = Command.extend({
   }
 });
 
-module.exports.overrideCore = true;
+ServeCommand.overrideCore = true;
+export default ServeCommand;

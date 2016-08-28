@@ -1,11 +1,11 @@
 import * as chalk from 'chalk';
-import * as Command from 'ember-cli/lib/models/command';
-import * as Project from 'ember-cli/lib/models/project';
-import * as SilentError from 'silent-error';
-import * as validProjectName from 'ember-cli/lib/utilities/valid-project-name';
+const Command = require('ember-cli/lib/models/command');
+const Project = require('ember-cli/lib/models/project');
+const SilentError = require('silent-error');
+const validProjectName = require('ember-cli/lib/utilities/valid-project-name');
 
 const normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
-const InitCommand = require('./init');
+import InitCommand from './init';
 
 const NewCommand = Command.extend({
   name: 'new',
@@ -27,7 +27,7 @@ const NewCommand = Command.extend({
     { name: 'mobile', type: Boolean, default: false }
   ],
 
-  run: function (commandOptions, rawArgs) {
+  run: function (commandOptions: any, rawArgs: string[]) {
     const packageName = rawArgs.shift();
 
     if (!packageName) {
@@ -84,5 +84,6 @@ const NewCommand = Command.extend({
   }
 });
 
-module.exports = NewCommand;
-module.exports.overrideCore = true;
+
+NewCommand.overrideCore = true;
+export default NewCommand;

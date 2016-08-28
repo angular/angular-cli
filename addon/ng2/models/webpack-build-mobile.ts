@@ -1,6 +1,6 @@
 import * as path from 'path';
-import * as OfflinePlugin from 'offline-plugin';
-import * as CopyWebpackPlugin from 'copy-webpack-plugin';
+const OfflinePlugin = require('offline-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 import { PrerenderWebpackPlugin } from '../utilities/prerender-webpack-plugin.ts';
 
 export const getWebpackMobileConfigPartial = function (projectRoot: string, appConfig: any) {

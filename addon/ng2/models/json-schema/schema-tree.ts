@@ -8,19 +8,18 @@ export class MissingImplementationError extends NgToolkitError {}
 export class SettingReadOnlyPropertyError extends NgToolkitError {}
 
 
+export interface Schema {
+  [key: string]: any;
+}
+
+
 /** This interface is defined to simplify the arguments passed in to the SchemaTreeNode. */
-interface TreeNodeConstructorArgument<T> {
+export type TreeNodeConstructorArgument<T> = {
   parent?: SchemaTreeNode<T>;
   name?: string;
   value: T;
   forward: SchemaTreeNode<any>;
-  schema: Object;
-}
-
-
-/** A constructor for a SchemaTreeNode. */
-interface TreeNodeConstructor {
-  new (x: TreeNodeConstructorArgument): SchemaTreeNode<any>;
+  schema: Schema;
 }
 
 
@@ -34,7 +33,7 @@ export abstract class SchemaTreeNode<T> {
   protected _defined: boolean = false;
   protected _dirty: boolean = false;
 
-  protected _schema: Object;
+  protected _schema: Schema;
   protected _name: string;
 
   protected _value: T;
@@ -72,8 +71,8 @@ export abstract class SchemaTreeNode<T> {
   abstract destroy(): void;
   get name() { return this._name; }
   get readOnly(): boolean { return this._schema['readOnly']; }
-  get parent<ParentType>(): SchemaTreeNode<ParentType> { return this._parent; }
-  get children<ChildType>(): { [key: string]: SchemaTreeNode<ChildType>} { return null; }
+  get parent(): SchemaTreeNode<any> { return this._parent; }
+  get children(): { [key: string]: SchemaTreeNode<any>} { return null; }
 
   abstract get(): T;
   set(v: T) {
@@ -83,7 +82,7 @@ export abstract class SchemaTreeNode<T> {
     throw new SettingReadOnlyPropertyError();
   };
 
-  abstract serialize(serializer: Serializer, value?: T = this.get());
+  abstract serialize(serializer: Serializer, value?: T): void;
 
   protected static _defineProperty<T>(proto: any, treeNode: SchemaTreeNode<T>): void {
     if (treeNode.readOnly) {
@@ -103,7 +102,7 @@ export abstract class SchemaTreeNode<T> {
 
 
 /** Base Class used for Non-Leaves TreeNode. Meaning they can have children. */
-abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
+export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   dispose() {
     for (const key of Object.keys(this.children)) {
       this.children[key].dispose();
@@ -128,9 +127,9 @@ abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
 
   // Helper function to create a child based on its schema.
   protected _createChildProperty<T>(name: string, value: T, forward: SchemaTreeNode<T>,
-                                    schema: Object, define = true): SchemaTreeNode<T> {
+                                    schema: Schema, define = true): SchemaTreeNode<T> {
     const type = schema['type'];
-    let Klass: TreeNodeConstructor = null;
+    let Klass: any = null;
 
     switch (type) {
       case 'object': Klass = ObjectSchemaTreeNode; break;
@@ -155,11 +154,11 @@ abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
 
 
 /** A Schema Tree Node that represents an object. */
-class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<Object> {
+export class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: any}> {
   // The map of all children metadata.
   protected _children: { [key: string]: SchemaTreeNode<any> };
 
-  constructor(metaData: TreeNodeConstructorArgument) {
+  constructor(metaData: TreeNodeConstructorArgument<any>) {
     super(metaData);
 
     let { value, forward, schema } = metaData;
@@ -174,8 +173,8 @@ class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<Object> {
         const propertySchema = schema['properties'][name];
         this._children[name] = this._createChildProperty(
           name,
-          value && value[name],
-          forward && (forward as NonLeafSchemaTreeNode).children[name],
+          value ? value[name] : null,
+          forward ? (forward as ObjectSchemaTreeNode).children[name] : null,
           propertySchema);
       }
     } else if (!schema['additionalProperties']) {
@@ -216,11 +215,11 @@ class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<Object> {
 
 
 /** A Schema Tree Node that represents an array. */
-class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array> {
+export class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array<any>> {
   // The map of all items metadata.
   protected _items: SchemaTreeNode<any>[];
 
-  constructor(metaData: TreeNodeConstructorArgument) {
+  constructor(metaData: TreeNodeConstructorArgument<Array<any>>) {
     super(metaData);
 
     let { value, forward, schema } = metaData;
@@ -236,7 +235,7 @@ class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array> {
       this._items[index] = this._createChildProperty(
         '' + index,
         value && value[index],
-        forward && (forward as NonLeafSchemaTreeNode).children[index],
+        forward && (forward as ArraySchemaTreeNode).children[index],
         schema['items']
       );
     }
@@ -246,7 +245,7 @@ class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array> {
     }
   }
 
-  get children() { return this._items; }
+  get children() { return this._items as {[key: string]: any}; }
   get type() { return 'array'; }
 
   serialize(serializer: Serializer, value = this._value) {
@@ -264,7 +263,7 @@ class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array> {
  * properties of the Schema root.
  */
 export class RootSchemaTreeNode extends ObjectSchemaTreeNode {
-  constructor(proto: SchemaClassBase<any>, metaData: TreeNodeConstructorArgument) {
+  constructor(proto: any, metaData: TreeNodeConstructorArgument<Object>) {
     super(metaData);
 
     for (const key of Object.keys(this._children)) {
@@ -277,10 +276,10 @@ export class RootSchemaTreeNode extends ObjectSchemaTreeNode {
 
 
 /** A leaf in the schema tree. Must contain a single primitive value. */
-abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
+export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   private _default: T;
 
-  constructor(metaData: TreeNodeConstructorArgument) {
+  constructor(metaData: TreeNodeConstructorArgument<T>) {
     super(metaData);
     this._defined = metaData.value !== undefined;
     if ('default' in metaData.schema) {
@@ -297,7 +296,7 @@ abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
     }
     return this._value === undefined ? undefined : this.convert(this._value);
   }
-  set(v) { this.dirty = true; this._value = this.convert(v); }
+  set(v: T) { this.dirty = true; this._value = this.convert(v); }
 
   destroy() {
     this._defined = false;
@@ -306,7 +305,7 @@ abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
 
   abstract convert(v: any): T;
 
-  serialize(serializer: Serializer, value?: T = this.get()) {
+  serialize(serializer: Serializer, value: T = this.get()) {
     if (this.defined) {
       serializer.outputValue(value);
     }
@@ -316,7 +315,7 @@ abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
 
 /** Basic primitives for JSON Schema. */
 class StringSchemaTreeNode extends LeafSchemaTreeNode<string> {
-  serialize(serializer: Serializer, value?: string = this.get()) {
+  serialize(serializer: Serializer, value: string = this.get()) {
     if (this.defined) {
       serializer.outputString(value);
     }
@@ -328,7 +327,7 @@ class StringSchemaTreeNode extends LeafSchemaTreeNode<string> {
 
 
 class BooleanSchemaTreeNode extends LeafSchemaTreeNode<boolean> {
-  serialize(serializer: Serializer, value?: boolean = this.get()) {
+  serialize(serializer: Serializer, value: boolean = this.get()) {
     if (this.defined) {
       serializer.outputBoolean(value);
     }
@@ -340,7 +339,7 @@ class BooleanSchemaTreeNode extends LeafSchemaTreeNode<boolean> {
 
 
 class NumberSchemaTreeNode extends LeafSchemaTreeNode<number> {
-  serialize(serializer: Serializer, value?: number = this.get()) {
+  serialize(serializer: Serializer, value: number = this.get()) {
     if (this.defined) {
       serializer.outputNumber(value);
     }

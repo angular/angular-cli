@@ -1,5 +1,5 @@
-import * as SilentError from 'silent-error';
-import * as Command from 'ember-cli/lib/models/command';
+const SilentError = require('silent-error');
+const Command = require('ember-cli/lib/models/command');
 import {CliConfig} from '../models/config';
 
 
@@ -28,7 +28,7 @@ const SetCommand = Command.extend({
     return +raw;
   },
 
-  run: function (commandOptions, rawArgs): Promise<void> {
+  run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
     return new Promise(resolve => {
       const [jsonPath, rawValue] = rawArgs;
       const config = CliConfig.fromProject();
@@ -50,4 +50,4 @@ const SetCommand = Command.extend({
   }
 });
 
-module.exports = SetCommand;
+export default SetCommand;

@@ -204,6 +204,7 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
     })
     .then((node: ts.Node) => {
       if (!node) {
+        /* eslint-disable no-console */
         console.log('No app module found. Please add your new class to your component.');
         return new NoopChange();
       }
