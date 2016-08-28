@@ -1,15 +1,17 @@
 'use strict';
 
-var Command = require('ember-cli/lib/models/command');
-var Promise = require('ember-cli/lib/ext/promise');
-var SilentError = require('silent-error');
-var validProjectName = require('ember-cli/lib/utilities/valid-project-name');
-var normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
-var GitInit = require('../tasks/git-init');
-var LinkCli = require('../tasks/link-cli');
-var NpmInstall = require('../tasks/npm-install');
+import LinkCli from '../tasks/link-cli';
 
-module.exports = Command.extend({
+const Command = require('ember-cli/lib/models/command');
+const Promise = require('ember-cli/lib/ext/promise');
+const SilentError = require('silent-error');
+const validProjectName = require('ember-cli/lib/utilities/valid-project-name');
+const normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
+const GitInit = require('../tasks/git-init');
+const NpmInstall = require('../tasks/npm-install');
+
+
+const InitCommand: any = Command.extend({
   name: 'init',
   description: 'Creates a new angular-cli project in the current folder.',
   aliases: ['i'],
@@ -39,7 +41,7 @@ module.exports = Command.extend({
     }
   },
 
-  run: function (commandOptions, rawArgs) {
+  run: function (commandOptions: any, rawArgs: string[]) {
     if (commandOptions.dryRun) {
       commandOptions.skipNpm = true;
       commandOptions.skipBower = true;
@@ -94,7 +96,7 @@ module.exports = Command.extend({
 
       return Promise.reject(new SilentError(message));
     }
-    
+
     var blueprintOpts = {
       dryRun: commandOptions.dryRun,
       blueprint: commandOptions.blueprint || this._defaultBlueprint(),
@@ -146,4 +148,5 @@ module.exports = Command.extend({
   }
 });
 
-module.exports.overrideCore = true;
+InitCommand.overrideCore = true;
+export default InitCommand;

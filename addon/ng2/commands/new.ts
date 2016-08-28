@@ -5,7 +5,7 @@ const SilentError = require('silent-error');
 const validProjectName = require('ember-cli/lib/utilities/valid-project-name');
 
 const normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
-const InitCommand = require('./init');
+import InitCommand from './init';
 
 const NewCommand = Command.extend({
   name: 'new',
