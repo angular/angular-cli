@@ -1,7 +1,7 @@
 // replace with the real thing when PR is merged
 // https://github.com/angular/universal/pull/464
 
-interface IWebpackPrerender {
+export interface IWebpackPrerender {
   templatePath: string;
   configPath: string;
   appPath: string;
@@ -17,8 +17,8 @@ export class PrerenderWebpackPlugin {
     this.bootloader = require(this.options.configPath).getBootloader();
   }
 
-  apply(compiler) {
-    compiler.plugin('emit', (compilation, callback) => {
+  apply(compiler: any) {
+    compiler.plugin('emit', (compilation: any, callback: Function) => {
       if (compilation.assets.hasOwnProperty(this.options.templatePath)) {
         // we need to cache the template file to be able to re-serialize it
         // even when it is not being emitted
@@ -28,7 +28,7 @@ export class PrerenderWebpackPlugin {
       if (this.cachedTemplate) {
         this.decacheAppFiles();
         require(this.options.configPath).serialize(this.bootloader, this.cachedTemplate)
-          .then((html) => {
+          .then((html: string) => {
             compilation.assets[this.options.templatePath] = {
               source: () => html,
               size: () => html.length

@@ -4,11 +4,11 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import * as dependentFilesUtils from './get-dependent-files';
 
-import { Promise } from 'es6-promise';
+
 import { Change, ReplaceChange } from './change';
 
-/** 
- * Rewrites import module of dependent files when the file is moved. 
+/**
+ * Rewrites import module of dependent files when the file is moved.
  * Also, rewrites export module of related index file of the given file.
  */
 export class ModuleResolver {
@@ -17,11 +17,11 @@ export class ModuleResolver {
 
   /**
    * Changes are applied from the bottom of a file to the top.
-   * An array of Change instances are sorted based upon the order, 
+   * An array of Change instances are sorted based upon the order,
    * then apply() method is called sequentially.
-   * 
-   * @param changes {Change []} 
-   * @return Promise after all apply() method of Change class is called 
+   *
+   * @param changes {Change []}
+   * @return Promise after all apply() method of Change class is called
    *         to all Change instances sequentially.
    */
   applySortedChangePromise(changes: Change[]): Promise<void> {
@@ -30,9 +30,9 @@ export class ModuleResolver {
       .reduce((newChange, change) => newChange.then(() => change.apply()), Promise.resolve());
   }
 
-  /** 
+  /**
    * Assesses the import specifier and determines if it is a relative import.
-   * 
+   *
    * @return {boolean} boolean value if the import specifier is a relative import.
    */
   isRelativeImport(importClause: dependentFilesUtils.ModuleImport): boolean {
@@ -42,13 +42,13 @@ export class ModuleResolver {
     return singleSlash || currentDirSyntax || parentDirSyntax;
   }
 
-  /** 
+  /**
    * Rewrites the import specifiers of all the dependent files (cases for no index file).
-   * 
+   *
    * @todo Implement the logic for rewriting imports of the dependent files when the file
    *       being moved has index file in its old path and/or in its new path.
-   * 
-   * @return {Promise<Change[]>} 
+   *
+   * @return {Promise<Change[]>}
    */
   resolveDependentFiles(): Promise<Change[]> {
     return dependentFilesUtils.getDependentFiles(this.oldFilePath, this.rootPath)
@@ -83,7 +83,7 @@ export class ModuleResolver {
 
   /**
    * Rewrites the file's own relative imports after it has been moved to new path.
-   * 
+   *
    * @return {Promise<Change[]>}
    */
   resolveOwnImports(): Promise<Change[]> {

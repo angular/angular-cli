@@ -163,7 +163,7 @@ class SchemaClassBase<T> implements SchemaClass<T> {
   }
 }
 export interface SchemaClassFactoryReturn<T> {
-  new (value: T, ...fallbacks: T[]): SchemaClassBase<T>;
+  new (value: T, ...fallbacks: T[]): SchemaClass<T>;
 }
 
 /**

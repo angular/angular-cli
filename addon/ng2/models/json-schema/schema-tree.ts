@@ -8,13 +8,13 @@ export class MissingImplementationError extends NgToolkitError {}
 export class SettingReadOnlyPropertyError extends NgToolkitError {}
 
 
-interface Schema {
+export interface Schema {
   [key: string]: any;
 }
 
 
 /** This interface is defined to simplify the arguments passed in to the SchemaTreeNode. */
-interface TreeNodeConstructorArgument<T> {
+export type TreeNodeConstructorArgument<T> = {
   parent?: SchemaTreeNode<T>;
   name?: string;
   value: T;
@@ -102,7 +102,7 @@ export abstract class SchemaTreeNode<T> {
 
 
 /** Base Class used for Non-Leaves TreeNode. Meaning they can have children. */
-abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
+export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   dispose() {
     for (const key of Object.keys(this.children)) {
       this.children[key].dispose();
@@ -154,7 +154,7 @@ abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
 
 
 /** A Schema Tree Node that represents an object. */
-class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: any}> {
+export class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: any}> {
   // The map of all children metadata.
   protected _children: { [key: string]: SchemaTreeNode<any> };
 
@@ -215,7 +215,7 @@ class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: any}> {
 
 
 /** A Schema Tree Node that represents an array. */
-class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array<any>> {
+export class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array<any>> {
   // The map of all items metadata.
   protected _items: SchemaTreeNode<any>[];
 
@@ -276,7 +276,7 @@ export class RootSchemaTreeNode extends ObjectSchemaTreeNode {
 
 
 /** A leaf in the schema tree. Must contain a single primitive value. */
-abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
+export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   private _default: T;
 
   constructor(metaData: TreeNodeConstructorArgument<T>) {

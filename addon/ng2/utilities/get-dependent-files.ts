@@ -1,12 +1,13 @@
-'use strict';
-
 import * as fs from 'fs';
 import * as ts from 'typescript';
 import * as glob from 'glob';
 import * as path from 'path';
 import * as denodeify from 'denodeify';
 
-import { Promise } from 'es6-promise';
+
+const readFile = <any>denodeify(fs.readFile);
+const globSearch = <any>denodeify(glob);
+
 
 /**
  * Interface that represents a module specifier and its position in the source file.
@@ -16,7 +17,7 @@ export interface ModuleImport {
   specifierText: string;
   pos: number;
   end: number;
-};
+}
 
 export interface ModuleMap {
   [key: string]: ModuleImport[];
@@ -25,11 +26,10 @@ export interface ModuleMap {
 /**
  * Create a SourceFile as defined by Typescript Compiler API.
  * Generate a AST structure from a source file.
- * 
+ *
  * @param fileName source file for which AST is to be extracted
  */
 export function createTsSourceFile(fileName: string): Promise<ts.SourceFile> {
-  const readFile = denodeify(fs.readFile);
   return readFile(fileName, 'utf8')
     .then((contents: string) => {
       return ts.createSourceFile(fileName, contents, ts.ScriptTarget.ES6, true);
@@ -38,11 +38,11 @@ export function createTsSourceFile(fileName: string): Promise<ts.SourceFile> {
 
 /**
  * Traverses through AST of a given file of kind 'ts.SourceFile', filters out child
- * nodes of the kind 'ts.SyntaxKind.ImportDeclaration' and returns import clauses as 
+ * nodes of the kind 'ts.SyntaxKind.ImportDeclaration' and returns import clauses as
  * ModuleImport[]
- * 
+ *
  * @param {ts.SourceFile} node: Typescript Node of whose AST is being traversed
- * 
+ *
  * @return {ModuleImport[]} traverses through ts.Node and returns an array of moduleSpecifiers.
  */
 export function getImportClauses(node: ts.SourceFile): ModuleImport[] {
@@ -58,16 +58,15 @@ export function getImportClauses(node: ts.SourceFile): ModuleImport[] {
     });
 }
 
-/** 
+/**
  * Find the file, 'index.ts' given the directory name and return boolean value
  * based on its findings.
- * 
+ *
  * @param dirPath
- * 
+ *
  * @return a boolean value after it searches for a barrel (index.ts by convention) in a given path
  */
 export function hasIndexFile(dirPath: string): Promise<Boolean> {
-  const globSearch = denodeify(glob);
   return globSearch(path.join(dirPath, 'index.ts'), { nodir: true })
     .then((indexFile: string[]) => {
       return indexFile.length > 0;
@@ -80,20 +79,19 @@ export function hasIndexFile(dirPath: string): Promise<Boolean> {
  *   creating associated files with the name of the generated unit. So, there are two
  *   assumptions made:
  *   a. the function only returns associated files that have names matching to the given unit.
- *   b. the function only looks for the associated files in the directory where the given unit 
+ *   b. the function only looks for the associated files in the directory where the given unit
  *      exists.
- *  
+ *
  * @todo read the metadata to look for the associated files of a given file.
- * 
- * @param fileName 
- * 
+ *
+ * @param fileName
+ *
  * @return absolute paths of '.html/.css/.sass/.spec.ts' files associated with the given file.
  *
  */
 export function getAllAssociatedFiles(fileName: string): Promise<string[]> {
   let fileDirName = path.dirname(fileName);
   let componentName = path.basename(fileName, '.ts');
-  const globSearch = denodeify(glob);
   return globSearch(path.join(fileDirName, `${componentName}.*`), { nodir: true })
     .then((files: string[]) => {
       return files.filter((file) => {
@@ -105,15 +103,14 @@ export function getAllAssociatedFiles(fileName: string): Promise<string[]> {
 /**
  * Returns a map of all dependent file/s' path with their moduleSpecifier object
  * (specifierText, pos, end).
- * 
- * @param fileName file upon which other files depend 
+ *
+ * @param fileName file upon which other files depend
  * @param rootPath root of the project
- * 
+ *
  * @return {Promise<ModuleMap>} ModuleMap of all dependent file/s (specifierText, pos, end)
- * 
+ *
  */
 export function getDependentFiles(fileName: string, rootPath: string): Promise<ModuleMap> {
-  const globSearch = denodeify(glob);
   return globSearch(path.join(rootPath, '**/*.ts'), { nodir: true })
     .then((files: string[]) => Promise.all(files.map(file => createTsSourceFile(file)))
     .then((tsFiles: ts.SourceFile[]) => tsFiles.map(file => getImportClauses(file)))

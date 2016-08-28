@@ -9,7 +9,9 @@
   },
   "keywords": [],
   "scripts": {
-    "build": "for PKG in packages/*; do echo Building $PKG...; tsc -P $PKG; done",
+    "build": "npm-run-all -c build:main build:packages",
+    "build:main": "tsc -p addon/ng2",
+    "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -P $PKG; done",
     "test": "npm run test:packages && npm run test:cli",
     "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
     "test:cli": "node tests/runner",
@@ -114,6 +116,7 @@
     "@types/chalk": "^0.4.28",
     "@types/common-tags": "^1.2.3",
     "@types/denodeify": "^1.2.29",
+    "@types/fs-extra": "^0.0.31",
     "@types/glob": "^5.0.29",
     "@types/jasmine": "^2.2.32",
     "@types/lodash": "^4.0.25-alpha",

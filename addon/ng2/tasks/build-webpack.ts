@@ -9,7 +9,7 @@ import { webpackOutputOptions } from '../models/';
 // Configure build and output;
 let lastHash: any = null;
 
-export default Task.extend({
+export default <any>Task.extend({
   // Options: String outputPath
   run: function (runTaskOptions: BuildOptions) {
 

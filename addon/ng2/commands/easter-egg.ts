@@ -1,6 +1,5 @@
-import * as Command from 'ember-cli/lib/models/command';
-import * as Promise from 'ember-cli/lib/ext/promise';
-import * as stringUtils from 'ember-cli-string-utils';
+const Command = require('ember-cli/lib/models/command');
+const stringUtils = require('ember-cli-string-utils');
 import * as chalk from 'chalk';
 
 
@@ -9,13 +8,13 @@ function pickOne(of: string[]): string {
 }
 
 
-module.exports = function(name) {
+export default function(name: string) {
   return Command.extend({
     name: name,
     works: 'insideProject',
 
-    run: function (commandOptions, rawArgs): Promise<void> {
-      this[stringUtils.camelize(this.name)](commandOptions, rawArgs);
+    run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
+      (this as any)[stringUtils.camelize(this.name)](commandOptions, rawArgs);
 
       return Promise.resolve();
     },

@@ -1,7 +1,7 @@
 import * as chalk from 'chalk';
-import * as Command from 'ember-cli/lib/models/command';
 import {CliConfig} from '../models/config';
 
+const Command = require('ember-cli/lib/models/command');
 
 const GetCommand = Command.extend({
   name: 'get',
@@ -10,7 +10,7 @@ const GetCommand = Command.extend({
 
   availableOptions: [],
 
-  run: function (commandOptions, rawArgs): Promise<void> {
+  run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
     return new Promise(resolve => {
       const config = CliConfig.fromProject();
       const value = config.get(rawArgs[0]);
@@ -27,4 +27,4 @@ const GetCommand = Command.extend({
   }
 });
 
-module.exports = GetCommand;
+export default GetCommand;

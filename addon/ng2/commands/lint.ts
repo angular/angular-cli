@@ -1,7 +1,7 @@
-import * as Command from 'ember-cli/lib/models/command';
-import * as LintTask from '../tasks/lint';
+const Command = require('ember-cli/lib/models/command');
+import LintTask from '../tasks/lint';
 
-module.exports = Command.extend({
+export default Command.extend({
   name: 'lint',
   description: 'Lints code in existing project',
   works: 'insideProject',
