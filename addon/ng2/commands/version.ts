@@ -48,5 +48,5 @@ const VersionCommand = Command.extend({
 });
 
 
-module.exports = VersionCommand;
-module.exports.overrideCore = true;
+VersionCommand.overrideCore = true;
+export default VersionCommand;

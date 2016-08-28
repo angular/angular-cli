@@ -12,7 +12,7 @@ export interface BuildOptions {
   baseHref?: string;
 }
 
-const command = Command.extend({
+const BuildCommand = Command.extend({
   name: 'build',
   description: 'Builds your app and places it into the output path (dist/ by default).',
   aliases: ['b'],
@@ -64,6 +64,6 @@ const command = Command.extend({
   }
 });
 
-command.overrideCore = true;
 
-export default command;
+BuildCommand.overrideCore = true;
+export default BuildCommand;

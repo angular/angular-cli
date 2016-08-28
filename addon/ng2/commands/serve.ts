@@ -28,7 +28,7 @@ export interface ServeTaskOptions {
   sslCert?: string;
 }
 
-module.exports = Command.extend({
+const ServeCommand = Command.extend({
   name: 'serve',
   description: 'Builds and serves your app, rebuilding on file changes.',
   aliases: ['server', 's'],
@@ -148,4 +148,5 @@ module.exports = Command.extend({
   }
 });
 
-module.exports.overrideCore = true;
+ServeCommand.overrideCore = true;
+export default ServeCommand;
