@@ -12,8 +12,6 @@ import CreateGithubRepo from '../tasks/create-github-repo';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
-const fsReadFile = <any>denodeify(fs.readFile);
-const fsWriteFile = <any>denodeify(fs.writeFile);
 const fsReadDir = <any>denodeify(fs.readdir);
 const fsCopy = <any>denodeify(fse.copy);
 

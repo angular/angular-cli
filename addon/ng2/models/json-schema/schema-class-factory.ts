@@ -72,8 +72,11 @@ export interface SchemaClass<JsonType> extends Object {
 class SchemaClassBase<T> implements SchemaClass<T> {
   constructor(schema: Object, value: T, ...fallbacks: T[]) {
     (this as any)[kOriginalRoot] = value;
+    const forward = fallbacks.length > 0
+                  ? (new SchemaClassBase<T>(schema, fallbacks.pop(), ...fallbacks).$$schema())
+                  : null;
     (this as any)[kSchemaNode] = new RootSchemaTreeNode(this, {
-      forward: fallbacks.length > 0 ? (new SchemaClassBase<T>(schema, fallbacks.pop(), ...fallbacks).$$schema()) : null,
+      forward,
       value,
       schema
     });

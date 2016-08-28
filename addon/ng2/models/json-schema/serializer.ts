@@ -37,9 +37,9 @@ export abstract class Serializer {
 
 
 interface JsonSerializerState {
-  empty?: boolean,
-  type?: string,
-  property?: boolean
+  empty?: boolean;
+  type?: string;
+  property?: boolean;
 }
 
 class JsonSerializer implements Serializer {

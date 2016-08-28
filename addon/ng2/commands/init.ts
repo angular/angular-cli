@@ -47,7 +47,7 @@ const InitCommand: any = Command.extend({
       commandOptions.skipBower = true;
     }
 
-    var installBlueprint = new this.tasks.InstallBlueprint({
+    const installBlueprint = new this.tasks.InstallBlueprint({
       ui: this.ui,
       analytics: this.analytics,
       project: this.project
@@ -55,49 +55,53 @@ const InitCommand: any = Command.extend({
 
     // needs an explicit check in case it's just 'undefined'
     // due to passing of options from 'new' and 'addon'
+    let gitInit;
     if (commandOptions.skipGit === false) {
-      var gitInit = new GitInit({
+      gitInit = new GitInit({
         ui: this.ui,
         project: this.project
       });
     }
 
+    let linkCli;
     if (commandOptions.linkCli) {
-      var linkCli = new LinkCli({
+      linkCli = new LinkCli({
         ui: this.ui,
         analytics: this.analytics,
         project: this.project
       });
     }
 
+    let npmInstall;
     if (!commandOptions.skipNpm) {
-      var npmInstall = new NpmInstall({
+      npmInstall = new NpmInstall({
         ui: this.ui,
         analytics: this.analytics,
         project: this.project
       });
     }
 
+    let bowerInstall;
     if (!commandOptions.skipBower) {
-      var bowerInstall = new this.tasks.BowerInstall({
+      bowerInstall = new this.tasks.BowerInstall({
         ui: this.ui,
         analytics: this.analytics,
         project: this.project
       });
     }
 
-    var project = this.project;
-    var packageName = commandOptions.name !== '.' && commandOptions.name || project.name();
+    const project = this.project;
+    const packageName = commandOptions.name !== '.' && commandOptions.name || project.name();
 
     if (!packageName) {
-      var message = 'The `ng ' + this.name + '` command requires a ' +
+      const message = 'The `ng ' + this.name + '` command requires a ' +
         'package.json in current folder with name attribute or a specified name via arguments. ' +
         'For more details, use `ng help`.';
 
       return Promise.reject(new SilentError(message));
     }
 
-    var blueprintOpts = {
+    const blueprintOpts = {
       dryRun: commandOptions.dryRun,
       blueprint: commandOptions.blueprint || this._defaultBlueprint(),
       rawName: packageName,

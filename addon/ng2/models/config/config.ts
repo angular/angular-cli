@@ -76,7 +76,7 @@ export class CliConfig<JsonType> {
 
     let content: T;
     let schema: Object;
-    let others : T[];
+    let others: T[];
 
     try {
       content = JSON.parse(configContent);
