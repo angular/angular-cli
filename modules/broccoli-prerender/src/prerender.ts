@@ -1,5 +1,5 @@
 import 'angular2-universal-polyfills';
-import {Bootloader} from 'angular2-universal';
+import { serializeDocument } from '@angular/universal';
 import { disposePlatform } from '@angular/core';
 
 const fs = require('fs');
@@ -22,7 +22,7 @@ export class AppShellPlugin extends BroccoliPlugin {
 
   build() {
     return new Promise((resolve, reject) => {
-      var command =`node ${path.resolve(__dirname, 'child_proc.js')}  ${[
+      var command = `node ${path.resolve(__dirname, 'child_proc.js')}  ${[
         `--sourceHtml=${path.resolve(this.inputPaths[0], this.indexPath)}`,
         `--optionsPath=${path.resolve(this.inputPaths[0], this.appShellPath)}`,
         `--outputIndexPath=${path.resolve(this.outputPath, this.indexPath)}`

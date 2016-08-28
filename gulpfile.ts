@@ -77,13 +77,15 @@ function build(path: string[]): Promise<any> {
     output.dts
       .pipe(rename(buildUtils.stripSrcFromPath))
       .pipe(gulp.dest('dist'))
-      .on('end', maybeDone)
+      .on('end', maybeDone);
 
     function maybeDone() {
       doneCount++;
-      if (doneCount == 2) resolve();
+      if (doneCount === 2) { 
+        resolve();
+      }
     }
-  })
+  });
 
 }
 
@@ -98,7 +100,7 @@ gulp.task('rewrite_packages', () => {
         .forEach(k => {
           data = Object.assign({}, data, {
             [k]: buildUtils.getRootDependencyVersion(Object.keys(data[k]), rootDependencies)
-          })
+          });
         });
       return buildUtils.addMetadataToPackage(data, rootPkg);
     }, 2))
@@ -118,7 +120,7 @@ gulp.task('changelog', () => {
     .pipe(gulpChangelog({
       preset: 'angular',
       releaseCount: 1
-    },{
+    }, {
       // Conventional Changelog Context
       // We have to manually set version number so it doesn't get prefixed with `v`
       // See https://github.com/conventional-changelog/conventional-changelog-core/issues/10

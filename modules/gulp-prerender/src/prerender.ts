@@ -1,4 +1,7 @@
-import {Bootloader, BootloaderConfig} from 'angular2-universal';
+/* 
+  --OLD_UNIVERSAL-- Removing to test [MP]
+
+import {Bootloader, BootloaderConfig} from '@angular/universal';
 import * as through from 'through2';
 var gutil = require('gutil');
 
@@ -59,3 +62,4 @@ export function Prerender(options: GulpUniversalConfig) {
   console.warn('DEPRECATION WARNING: `Prerender` is no longer supported and will be removed in next release. use `prerender`');
   return prerender(options);
 }
+*/

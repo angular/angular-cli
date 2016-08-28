@@ -26,7 +26,7 @@ export function provideDocument (document: string): Array<any> {
       return doc;
     },
     deps: [ DomSharedStylesHost ]
-  }
+  };
 
   return [
     DOC

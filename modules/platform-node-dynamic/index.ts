@@ -23,7 +23,7 @@ import {DomSharedStylesHost, SharedStylesHost} from '@angular/platform-browser/s
 import {DomRootRenderer} from '@angular/platform-browser/src/dom/dom_renderer';
 import {RootRenderer} from '@angular/core/src/render/api';
 
-import {AnimationDriver, NoOpAnimationDriver} from '@angular/platform-browser';
+import {AnimationDriver, _NoOpAnimationDriver} from '@angular/platform-browser';
 import {WebAnimationsDriver} from '@angular/platform-browser/src/dom/web_animations_driver';
 
 import {DOCUMENT} from '@angular/platform-browser/src/dom/dom_tokens';

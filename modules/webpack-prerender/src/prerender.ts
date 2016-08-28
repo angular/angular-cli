@@ -1,4 +1,8 @@
-import {Bootloader, BootloaderConfig, AppConfig} from 'angular2-universal';
+/*
+
+  --OLD_UNIVERSAL-- Removing to Test [MP]
+
+import {Bootloader, BootloaderConfig, AppConfig} from '@angular/universal';
 
 export interface IWebpackPrerender {
   templatePath: string;
@@ -35,3 +39,6 @@ export class Angular2Prerender {
     });
   }
 }
+
+
+*/

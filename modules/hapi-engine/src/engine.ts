@@ -1,11 +1,14 @@
 import * as fs from 'fs';
 import * as TsHoek from './ts-hoek';
+/*
+
+  --OLD_UNIVERSAL-- Removing to Test [MP]
 
 import {
   selectorRegExpFactory,
   Bootloader,
   BootloaderConfig
-} from 'angular2-universal';
+} from '@angular/universal';
 
 export interface HapiEngineExtraOptions {
   server?: boolean;
@@ -235,3 +238,4 @@ export class hapiEngine {
   }
 
 }
+*/

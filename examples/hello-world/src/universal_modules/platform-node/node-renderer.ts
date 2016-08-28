@@ -10,7 +10,7 @@ import {
 import {DOCUMENT} from '@angular/platform-browser';
 import {DomRenderer, DomRootRenderer, DomRootRenderer_} from '@angular/platform-browser/src/dom/dom_renderer';
 
-import {AnimationDriver} from '@angular/core/src/animation/animation_driver';
+import {AnimationDriver} from '@angular/platform-browser';
 
 import {WebAnimationsDriver} from '@angular/platform-browser/src/dom/web_animations_driver';
 import {EventManager} from '@angular/platform-browser/src/dom/events/event_manager';

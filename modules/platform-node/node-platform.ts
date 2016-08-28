@@ -9,13 +9,13 @@ import {
 
 // PRIVATE
 import { Parse5DomAdapter } from '@angular/platform-server/src/parse5_adapter';
-import { DomEventsPlugin } from '@angular/platform-browser/src/dom/events/dom_events'
-import { KeyEventsPlugin } from '@angular/platform-browser/src/dom/events/key_events'
+import { DomEventsPlugin } from '@angular/platform-browser/src/dom/events/dom_events';
+import { KeyEventsPlugin } from '@angular/platform-browser/src/dom/events/key_events';
 import {
   HammerGesturesPlugin,
   HAMMER_GESTURE_CONFIG,
   HammerGestureConfig
-} from '@angular/platform-browser/src/dom/events/hammer_gestures'
+} from '@angular/platform-browser/src/dom/events/hammer_gestures';
 import { DomSharedStylesHost, SharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
 import { DomRootRenderer } from '@angular/platform-browser/src/dom/dom_renderer';
 import { wtfInit } from '@angular/core/src/profile/wtf_init';
@@ -110,7 +110,7 @@ export class NodePlatform implements PlatformRef {
   serializeModule<T>(moduleType: any, config: any = {}) {
     // TODO(gdi2290): make stateless. allow for many instances of modules
     // TODO(gdi2290): refactor to ZoneLocalStore
-    var _map = new Map<any, any>()
+    var _map = new Map<any, any>();
     var di = {
       set(key, value, defaultValue?: any) {
         _map.set(key, value || defaultValue);
@@ -179,7 +179,7 @@ export class NodePlatform implements PlatformRef {
                 if (ngZone.isStable === true) { return done(ref); }
                 return checkStable(done, ref);
               }, 0);
-            })
+            });
           }
           return ngZone.runOutsideAngular(() => {
             return new Promise(function (resolve) {
@@ -200,11 +200,11 @@ export class NodePlatform implements PlatformRef {
           return rootNgZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, _config, http, jsonp));
         });
         return rootNgZone.runOutsideAngular(() => {
-          return Promise.all<Promise<ComponentRef<any>>>(stableComponents)
+          return Promise.all<Promise<ComponentRef<any>>>(stableComponents);
         })
           .then(() => {
             config.time && console.timeEnd('stable: ' + config.id);
-            return moduleRef
+            return moduleRef;
           });
       })
       .then((moduleRef: NgModuleRef<T>) => {
@@ -227,8 +227,8 @@ export class NodePlatform implements PlatformRef {
             // prebootCode = NodePlatform._cache.get(key);
           } else if (key && !prebootEl) {
             config.time && console.time('preboot insert: ' + config.id);
-            prebootCode = parseFragment(''+
-              '<script>\n'+
+            prebootCode = parseFragment('' +
+              '<script>\n' +
               getInlineCode(_config.preboot) +
               ';\nvar preboot = preboot || prebootstrap()</script>' +
             '');
@@ -249,7 +249,7 @@ export class NodePlatform implements PlatformRef {
           el = lastRef.location.nativeElement;
           DOM.insertAfter(el, prebootEl);
           // let script = parseFragment(prebootCode);
-        } catch(e) {
+        } catch (e) {
           console.log(e);
           // if there's an error don't inject preboot
           config.time && console.timeEnd('preboot: ' + config.id);
@@ -282,7 +282,7 @@ export class NodePlatform implements PlatformRef {
         moduleRef = null;
         di.clear();
         config.time && console.timeEnd('serialize: ' + config.id);
-        html = html.replace(new RegExp(_appId, 'gi'), appId)
+        html = html.replace(new RegExp(_appId, 'gi'), appId);
 
         ngOnRendered(html);
 
@@ -303,7 +303,7 @@ export class NodePlatform implements PlatformRef {
     return this.platformRef.bootstrapModule(moduleType, compilerOptions);
   }
   bootstrapModuleFactory(moduleFactory) {
-    return this.platformRef.bootstrapModuleFactory(moduleFactory)
+    return this.platformRef.bootstrapModuleFactory(moduleFactory);
   }
   /**
    * @deprecated
@@ -366,7 +366,7 @@ export class NodeModule {
     { provide: APP_BASE_HREF, useValue: 'baseUrl' },
     { provide: REQUEST_URL, useValue: 'requestUrl' },
     { provide: ORIGIN_URL, useValue: 'originUrl' }
-  ]
+  ];
   static __clone(obj) {
     return obj.slice(0).map(obj => {
       var newObj = {};
@@ -395,7 +395,7 @@ export class NodeModule {
         let key = provider.useValue;
         if (key in config) {
           provider.useValue = config[key];
-          memo.push(provider)
+          memo.push(provider);
         }
         return memo;
       }, []);
@@ -433,6 +433,6 @@ export const INTERNAL_NODE_PLATFORM_PROVIDERS: Array<any /*Type | Provider | any
 export const platformDynamicNode = (extraProviders?: any[]) => {
   const platform = __PLATFORM_REF || createPlatformFactory(platformCoreDynamic, 'nodeDynamic', INTERNAL_NODE_PLATFORM_PROVIDERS)(extraProviders);
   return new NodePlatform(platform);
-}
+};
 
 

@@ -1,4 +1,4 @@
-import {Bootloader, BootloaderConfig} from 'angular2-universal';
+import { parseDocument, serializeDocument, NodePlatform } from '@angular/universal';
 
 export interface GulpUniversalConfig {
   server?: boolean;
@@ -7,10 +7,12 @@ export interface GulpUniversalConfig {
   serializedCmp?: string;
   bootloader?: any;
   document?: any;
+  // Temporarily added - MP
+  template?: string;
 }
 
-export type GulpUniversalOptions = BootloaderConfig & GulpUniversalConfig;
-
+// export type GulpUniversalOptions = BootloaderConfig & GulpUniversalConfig;
+export type GulpUniversalOptions = GulpUniversalConfig;
 
 export class Prerender {
   constructor(private options: GulpUniversalOptions) {}
@@ -18,7 +20,27 @@ export class Prerender {
   render(file) {
       let clientHtml: string = file.toString();
 
+      // None of this will probably work, just trying to remove errors for now...
+
+      const _options = this.options;
+      const _template = clientHtml;
+      let _NodePlatform : NodePlatform;
+
+      if (_options.bootloader) {
+        _NodePlatform = new NodePlatform(_options.bootloader);
+      } else {
+        let doc = parseDocument(_template);
+        _NodePlatform = new NodePlatform(doc);
+      }
+
+      return _NodePlatform.serializeModule(null, _options).then(html => new Buffer(html));
+
+
       // bootstrap and render component to string
+      /*
+
+       --OLD_UNIVERSAL-- code
+
       const _options = this.options;
       const _template = clientHtml;
       const _Bootloader = Bootloader;
@@ -33,6 +55,9 @@ export class Prerender {
       }
 
       return bootloader.serializeApplication().then(html => new Buffer(html));
+      */
+
+      
   }
 }
 

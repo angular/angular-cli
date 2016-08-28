@@ -14,6 +14,25 @@
   	"outDir": "dist",
     "traceResolution": false,
     "paths": {
+      "@angular/express-engine": [
+        "./modules/express-engine"
+      ],
+      "@angular/platform-node": [
+        "./modules/platform-node"
+      ],
+      "@angular/platform-node-dynamic": [
+        "./modules/platform-node-dynamic"
+      ],
+      "@angular/universal/browser": [
+        "./modules/universal/browser.ts"
+      ],
+      "@angular/universal/node": [
+        "./modules/universal/node.ts"
+      ],
+      "@angular/universal": [
+        "./modules/universal"
+      ],
+
       "angular2-universal": [
         "./modules/universal/src/node/index.ts"
       ],
@@ -44,6 +63,7 @@
     "modules/universal-polyfills/src/zone-browser.ts",
     "modules/universal/src/node/index.ts",
     "modules/universal/src/browser/index.ts",
+    "modules/platform-node/parse5.d.ts",
     "modules/universal/browser.ts",
     "modules/universal/node.ts",
     "modules/webpack-prerender/src/index.ts"

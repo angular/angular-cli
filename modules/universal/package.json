@@ -9,7 +9,7 @@
     "index.ts"
   ],
   "dependencies": {
-    "angular2-express-engine": "<INHERIT>",
+    "@angular/express-engine": "<INHERIT>",
     "angular2-hapi-engine": "<INHERIT>",
     "angular2-universal-polyfills": "<INHERIT>",
     "css": "<INHERIT>",

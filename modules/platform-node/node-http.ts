@@ -332,7 +332,7 @@ export class NodeJSONPConnection {
           let response = new Response(responseOptions);
 
           if (isSuccess(status)) {
-            __done(response)
+            __done(response);
             return;
           }
           ngZone.run(() => {
@@ -373,7 +373,7 @@ export class NodeJsonpBackend_ extends NodeJsonpBackend {
     private _ngZone: NgZone,
     @Inject(BASE_URL) private _baseUrl: string,
     @Inject(ORIGIN_URL) private _originUrl: string) {
-    super()
+    super();
   }
 
   public createConnection(request: Request) {
@@ -426,7 +426,7 @@ export class NodeHttpModule {
     return {
       ngModule: NodeHttpModule,
       providers
-    }
+    };
 
   }
 }
@@ -452,7 +452,7 @@ export class NodeJsonpModule {
     return {
       ngModule: NodeJsonpModule,
       providers
-    }
+    };
 
   }
 }
