@@ -10,7 +10,7 @@ import { BuildOptions } from '../commands/build';
 let lastHash: any = null;
 
 export default Task.extend({
-  run: function(runTaskOptions: ServeTaskOptions) {
+  run: function(runTaskOptions: BuildOptions) {
 
     const project = this.cliProject;
 

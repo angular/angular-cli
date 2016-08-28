@@ -80,7 +80,7 @@ const githubPagesDeployCommand = Command.extend({
       aliases: ['bh']
     }],
 
-  run: function(options: GithubPagesDeployOptions, rawArgs) {
+  run: function(options: GithubPagesDeployOptions, rawArgs: string[]) {
     const ui = this.ui;
     const root = this.project.root;
     const execOptions = {

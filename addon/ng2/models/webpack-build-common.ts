@@ -8,13 +8,6 @@ import { findLazyModules } from './find-lazy-modules';
 
 
 import { BaseHrefWebpackPlugin } from '../utilities/base-href-webpack-plugin';
-if (__dirname.indexOf('/node_modules/') == -1) {
-  const packages = require('../../../lib/packages');
-
-  Object.keys(packages).forEach(packageName => {
-    aliases[packageName] = packages[packageName].main;
-  });
-}
 
 
 export function getWebpackCommonConfig(
@@ -47,9 +40,6 @@ export function getWebpackCommonConfig(
     resolve: {
       extensions: ['', '.ts', '.js'],
       root: appRoot
-    },
-    resolveLoader: {
-      alias: aliases
     },
     context: path.resolve(__dirname, './'),
     entry: entry,

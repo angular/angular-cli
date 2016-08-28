@@ -1,20 +1,20 @@
-interface BaseHrefWebpackPluginOptions {
+export interface BaseHrefWebpackPluginOptions {
   baseHref: string;
 }
 
 export class BaseHrefWebpackPlugin {
   constructor(private options: BaseHrefWebpackPluginOptions) { }
 
-  apply(compiler): void {
+  apply(compiler: any): void {
     // Ignore if baseHref is not passed
     if (!this.options.baseHref) {
       return;
     }
 
-    compiler.plugin('compilation', (compilation) => {
+    compiler.plugin('compilation', (compilation: any) => {
       compilation.plugin(
         'html-webpack-plugin-before-html-processing',
-        (htmlPluginData, callback) => {
+        (htmlPluginData: any, callback: Function) => {
           // Check if base tag already exists
           const baseTagRegex = /<base.*?>/i;
           const baseTagMatches = htmlPluginData.html.match(baseTagRegex);
