@@ -1,3 +1,5 @@
+export class Fake {}
+
 /*
 
   --OLD_UNIVERSAL-- Removing to Test [MP]

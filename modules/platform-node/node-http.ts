@@ -44,7 +44,7 @@ const JSONP_ERR_WRONG_METHOD = 'JSONP requests must use GET request method.';
 
 
 declare var Zone: any;
-class PreloadHttp extends Http {
+export class PreloadHttp extends Http {
   _async: number = 0;
   // _rootNode;
   // _activeNode;
