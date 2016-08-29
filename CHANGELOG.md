@@ -1,3 +1,39 @@
+<a name="1.0.0-beta.11-webpack.3"></a>
+# [1.0.0-beta.11-webpack.3](https://github.com/angular/angular-cli/compare/v1.0.0-beta.11-webpack.2...v1.0.0-beta.11-webpack.3) (2016-08-29)
+
+
+### Bug Fixes
+
+* **lint:** change " to ' ([#1779](https://github.com/angular/angular-cli/issues/1779)) ([e572bb4](https://github.com/angular/angular-cli/commit/e572bb4))
+* change inline-source-map to source-map for dev and common, prod already supports ([#1659](https://github.com/angular/angular-cli/issues/1659)) ([e0454e3](https://github.com/angular/angular-cli/commit/e0454e3))
+* **test:** use updated ngModules in blueprint ([#1680](https://github.com/angular/angular-cli/issues/1680)) ([cb67d25](https://github.com/angular/angular-cli/commit/cb67d25))
+* denodeify is needed in prod now too ([#1879](https://github.com/angular/angular-cli/issues/1879)) ([5e68151](https://github.com/angular/angular-cli/commit/5e68151))
+* **build:** copy dot files in assets ([8c566ca](https://github.com/angular/angular-cli/commit/8c566ca)), closes [#1758](https://github.com/angular/angular-cli/issues/1758) [#1847](https://github.com/angular/angular-cli/issues/1847)
+* fix compilation errors for the whole project ([#1864](https://github.com/angular/angular-cli/issues/1864)) ([8be7096](https://github.com/angular/angular-cli/commit/8be7096))
+* **config:** misnamed variable causing errors. ([e9ea554](https://github.com/angular/angular-cli/commit/e9ea554))
+* **generate:** use canonical paths for template and style URLs ([339af33](https://github.com/angular/angular-cli/commit/339af33)), closes [#1840](https://github.com/angular/angular-cli/issues/1840)
+* **init:** karma paths reflect sourceDir config ([#1686](https://github.com/angular/angular-cli/issues/1686)) ([504a497](https://github.com/angular/angular-cli/commit/504a497)), closes [#1683](https://github.com/angular/angular-cli/issues/1683)
+* **mobile:** add `icons/` path in front of icon `src` values ([cc5e9ad](https://github.com/angular/angular-cli/commit/cc5e9ad)), closes [#1179](https://github.com/angular/angular-cli/issues/1179) [#1181](https://github.com/angular/angular-cli/issues/1181)
+* **mobile:** remove icon `density` field from manifest ([382487b](https://github.com/angular/angular-cli/commit/382487b)), closes [#1178](https://github.com/angular/angular-cli/issues/1178) [#1180](https://github.com/angular/angular-cli/issues/1180)
+* **prod:** fix function name mangling ([9188ea2](https://github.com/angular/angular-cli/commit/9188ea2)), closes [#1644](https://github.com/angular/angular-cli/issues/1644) [#1644](https://github.com/angular/angular-cli/issues/1644) [#1662](https://github.com/angular/angular-cli/issues/1662)
+* improve 'ember'->'ng' replacement ([80512ba](https://github.com/angular/angular-cli/commit/80512ba)), closes [#1405](https://github.com/angular/angular-cli/issues/1405) [#1829](https://github.com/angular/angular-cli/issues/1829)
+* removed travis-specific configuration from karma ([#1815](https://github.com/angular/angular-cli/issues/1815)) ([f03f275](https://github.com/angular/angular-cli/commit/f03f275))
+
+
+### Features
+
+* add features in get-dependent-files.ts ([#1525](https://github.com/angular/angular-cli/issues/1525)) ([7565f2d](https://github.com/angular/angular-cli/commit/7565f2d))
+* Add LCOV reporting by default in karma remap instanbul reporter ([#1657](https://github.com/angular/angular-cli/issues/1657)) ([10dd465](https://github.com/angular/angular-cli/commit/10dd465))
+* **build:** implement --base-href argument ([74b29b3](https://github.com/angular/angular-cli/commit/74b29b3)), closes [#1064](https://github.com/angular/angular-cli/issues/1064) [#1506](https://github.com/angular/angular-cli/issues/1506)
+* **build:** silence sourcemap warnings for vendors ([#1673](https://github.com/angular/angular-cli/issues/1673)) ([67098e0](https://github.com/angular/angular-cli/commit/67098e0))
+* **build:** update angular-cli.json ([#1633](https://github.com/angular/angular-cli/issues/1633)) ([3dcd49b](https://github.com/angular/angular-cli/commit/3dcd49b))
+* **feature:** add ability to generate feature modules ([#1867](https://github.com/angular/angular-cli/issues/1867)) ([1f4c6fe](https://github.com/angular/angular-cli/commit/1f4c6fe))
+* **module:** add generation of modules ([f40e6f1](https://github.com/angular/angular-cli/commit/f40e6f1)), closes [#1650](https://github.com/angular/angular-cli/issues/1650)
+* **serve:** add proxy support ([9d69748](https://github.com/angular/angular-cli/commit/9d69748))
+* **tslint:** add validation for selector prefix ([9ff8c09](https://github.com/angular/angular-cli/commit/9ff8c09)), closes [#1565](https://github.com/angular/angular-cli/issues/1565)
+
+
+
 <a name="1.0.0-beta.11-webpack.2"></a>
 # [1.0.0-beta.11-webpack.2](https://github.com/angular/angular-cli/compare/v1.0.0-beta.10-webpack...v1.0.0-beta.11-webpack.2) (2016-08-10)
 
