@@ -7,14 +7,16 @@ const path = require('path');
 const Jasmine = require('jasmine');
 const JasmineSpecReporter = require('jasmine-spec-reporter');
 
-const projectBaseDir = path.join(__dirname, '../packages');
+const packages = require('../lib/packages');
 
-// Create a Jasmine runner and configure it.
-const jasmine = new Jasmine({ projectBaseDir: projectBaseDir });
-jasmine.loadConfig({
-  spec_dir: projectBaseDir
-});
-jasmine.addReporter(new JasmineSpecReporter());
+for (const pkgName of Object.keys(packages)) {
+  const projectBaseDir = packages[pkgName].root;
 
-// Run the tests.
-jasmine.execute(['**/*.spec.ts']);
+  // Create a Jasmine runner and configure it.
+  const jasmine = new Jasmine({projectBaseDir: projectBaseDir});
+  jasmine.loadConfig({ spec_dir: projectBaseDir });
+  jasmine.addReporter(new JasmineSpecReporter());
+
+  // Run the tests.
+  jasmine.execute(['**/*.spec.ts']);
+}
