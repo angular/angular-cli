@@ -4,10 +4,10 @@ const mockFs = require('mock-fs');
 
 import * as ts from 'typescript';
 import * as path from 'path';
-import * as dependentFilesUtils from '../../addon/ng2/utilities/get-dependent-files';
+import * as dependentFilesUtils from '../../packages/angular-cli/addon/ng2/utilities/get-dependent-files';
 
 import { expect } from 'chai';
-import { ModuleResolver } from '../../addon/ng2/utilities/module-resolver';
+import { ModuleResolver } from '../../packages/angular-cli/addon/ng2/utilities/module-resolver';
 
 describe('ModuleResolver', () => {
   let rootPath = 'src/app';

@@ -4,7 +4,6 @@
 const cli = require('ember-cli/lib/cli');
 const path = require('path');
 
-
 module.exports = function(options) {
   const oldStdoutWrite = process.stdout.write;
   process.stdout.write = function (line) {
@@ -31,7 +30,7 @@ module.exports = function(options) {
 
   options.cli = {
     name: 'ng',
-    root: path.join(__dirname, '..', '..'),
+    root: path.join(__dirname, '../..'),
     npmPackage: 'angular-cli'
   };
 
