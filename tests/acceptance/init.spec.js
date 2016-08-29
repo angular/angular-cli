@@ -45,9 +45,12 @@ describe('Acceptance: ng init', function () {
   });
 
   function confirmBlueprinted(isMobile) {
-    var blueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'ng2', 'files');
-    var mobileBlueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'mobile', 'files');
-    var expected = unique(walkSync(blueprintPath).concat(isMobile ? walkSync(mobileBlueprintPath) : []).sort());
+    var blueprintPath = path.join(root, 'packages/angular-cli/addon/ng2/blueprints/ng2/files');
+    var mobileBlueprintPath = path.join(root,
+        'packages/angular-cli/addon/ng2/blueprints/mobile/files');
+    var expected = unique(walkSync(blueprintPath)
+      .concat(isMobile ? walkSync(mobileBlueprintPath) : [])
+      .sort());
     var actual = walkSync('.').sort();
 
     forEach(Blueprint.renamedFiles, function (destFile, srcFile) {
@@ -59,7 +62,7 @@ describe('Acceptance: ng init', function () {
       expected[index] = expected[index].replace(/__styleext__/g, 'css');
       expected[index] = expected[index].replace(/__path__/g, 'src');
     });
-    
+
     if (isMobile) {
       expected = expected.filter(p => p.indexOf('tmp.component.html') < 0);
       expected = expected.filter(p => p.indexOf('tmp.component.css') < 0);
@@ -76,7 +79,7 @@ describe('Acceptance: ng init', function () {
   }
 
   function confirmGlobBlueprinted(pattern) {
-    var blueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'ng2', 'files');
+    var blueprintPath = path.join(root, 'packages/angular-cli/addon/ng2/blueprints/ng2/files');
     var actual = pickSync('.', pattern);
     var expected = intersect(pickSync(blueprintPath, pattern), actual);
 

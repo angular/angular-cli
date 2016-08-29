@@ -1,19 +1,23 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var tmp = require('../helpers/tmp');
-var chai = require('chai');
-var expect = chai.expect;
-var conf = require('ember-cli/tests/helpers/conf');
-var sh = require('shelljs');
-var treeKill = require('tree-kill');
-var child_process = require('child_process');
-var ng = require('../helpers/ng');
-var root = path.join(process.cwd(), 'tmp');
-var express = require('express');
-var http = require('http');
-var request = require('request');
+const path = require('path');
+const temp = require('temp');
+
+// temp.track();
+const root = path.join(temp.mkdirSync('angular-cli-e2e'), 'test-project');
+
+const fs = require('fs');
+const tmp = require('../helpers/tmp');
+const chai = require('chai');
+const expect = chai.expect;
+const conf = require('ember-cli/tests/helpers/conf');
+const sh = require('shelljs');
+const treeKill = require('tree-kill');
+const child_process = require('child_process');
+const ng = require('../helpers/ng');
+const express = require('express');
+const http = require('http');
+const request = require('request');
 
 function existsSync(path) {
   try {
@@ -24,13 +28,14 @@ function existsSync(path) {
   }
 }
 
-const ngBin = `node ${path.join(process.cwd(), 'bin', 'ng')}`;
+const ngBin = `node ${path.join(__dirname, '../../bin/ng')}`;
 const it_mobile = isMobileTest() ? it : function() {};
 const it_not_mobile = isMobileTest() ? function() {} : it;
+console.log(1, ngBin);
+console.log(2, root);
 
-describe('Basic end-to-end Workflow', function () {
+describe.only('Basic end-to-end Workflow', function () {
   before(conf.setup);
-
   after(conf.restore);
 
   var testArgs = ['test', '--watch', 'false'];
@@ -38,11 +43,12 @@ describe('Basic end-to-end Workflow', function () {
   it('Installs angular-cli correctly', function () {
     this.timeout(300000);
 
+    process.chdir(path.join(__dirname, '../..'));
     sh.exec('npm link', { silent: true });
 
-    return tmp.setup('./tmp').then(function () {
-      process.chdir('./tmp');
-      expect(existsSync(path.join(process.cwd(), 'bin', 'ng')));
+    return tmp.setup(root).then(function () {
+      process.chdir(root);
+      expect(sh.which('ng')).to.not.be.null;
     });
   });
 
@@ -69,13 +75,15 @@ describe('Basic end-to-end Workflow', function () {
 
     // Can't use the `ng` helper because somewhere the environment gets
     // stuck to the first build done
-    sh.exec(`${ngBin} build -prod`);
-    expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-    // Check for cache busting hash script src
-    expect(indexHtml).to.match(/main\.[0-9a-f]{20}\.bundle\.js/);
-    // Also does not create new things in GIT.
-    expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
+    return ng(['build', '-prod'])
+      .then(() => {
+        expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
+        const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+        // Check for cache busting hash script src
+        expect(indexHtml).to.match(/main\.[0-9a-f]{20}\.bundle\.js/);
+        // Also does not create new things in GIT.
+        expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
+      });
   });
 
   it_mobile('Enables mobile-specific production features in prod builds', () => {
@@ -98,11 +106,13 @@ describe('Basic end-to-end Workflow', function () {
   it('Supports build config file replacement', function() {
     this.timeout(420000);
 
-    sh.exec(`${ngBin} build --env=prod`);
-    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
-    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
+    return ng(['build', '--env=prod'])
+      .then(() => {
+        var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
+        var mainBundleContent = fs.readFileSync(mainBundlePath, {encoding: 'utf8'});
 
-    expect(mainBundleContent.includes('production: true')).to.be.equal(true);
+        expect(mainBundleContent.includes('production: true')).to.be.equal(true);
+      });
   });
 
   it('Build fails on invalid build target', function (done) {
@@ -125,7 +135,7 @@ describe('Basic end-to-end Workflow', function () {
     this.timeout(420000);
 
     sh.exec(`${ngBin} build --base-href /myUrl/`);
-    const indexHtmlPath = path.join(process.cwd(), 'dist/index.html'); 
+    const indexHtmlPath = path.join(process.cwd(), 'dist/index.html');
     const indexHtml = fs.readFileSync(indexHtmlPath, { encoding: 'utf8' });
 
     expect(indexHtml).to.match(/<base href="\/myUrl\/"/);
@@ -176,11 +186,7 @@ describe('Basic end-to-end Workflow', function () {
   it('lints', () => {
     this.timeout(420000);
 
-    return ng(['lint']).then(() => {
-    })
-    .catch(err => {
-      throw new Error('Linting failed: ' + err);
-    });
+    return ng(['lint']);
   });
 
   it('Perform `ng test` after initial build', function () {
