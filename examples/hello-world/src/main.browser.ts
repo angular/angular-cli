@@ -1,7 +1,10 @@
-import {bootstrap} from '@angular/platform-browser-dynamic';
-import {HTTP_PROVIDERS} from '@angular/http';
-import {isBrowser} from '@angular/universal/browser';
-import {prebootClient} from 'preboot';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpModule, JsonpModule } from '@angular/http';
+
+import { isBrowser } from '@angular/universal/browser';
+
 
 import {App, APP_PROVIDERS} from './app';
 export function main() {
@@ -18,4 +21,5 @@ export function main() {
         preboot.complete();
       });
   }, 3000);
+  return platform.bootstrapModule(MainModule);
 }

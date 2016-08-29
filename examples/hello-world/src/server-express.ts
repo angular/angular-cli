@@ -2,10 +2,9 @@ import './polyfills.node';
 
 import * as path from 'path';
 import * as express from 'express';
+
 // import * as bodyParser from 'body-parser';
-
 // import * as preboot from 'preboot';
-
 // console.log(preboot);
 
 // Angular 2
@@ -13,9 +12,9 @@ import { enableProdMode, ApplicationRef, PlatformRef, NgZone, APP_ID } from '@an
 enableProdMode();
 
 // Angular 2 Universal
-import { expressEngine } from '@angular/express-engine';
-import { replaceUniversalAppIf, transformDocument, UNIVERSAL_APP_ID, nodePlatform } from '@angular/universal';
-nodePlatform();
+// import { expressEngine } from '@angular/express-engine';
+// import { replaceUniversalAppIf, transformDocument, UNIVERSAL_APP_ID, nodePlatform } from '@angular/universal';
+// nodePlatform();
 
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 // enable prod for faster renders
@@ -24,90 +23,61 @@ const app = express();
 const ROOT = path.join(path.resolve(__dirname, '..'));
 
 // Express View
-app.engine('.html', expressEngine);
-app.set('views', __dirname);
-app.set('view engine', 'html');
+// app.engine('.html', expressEngine);
+// app.set('views', __dirname);
+// app.set('view engine', 'html');
 
 // Serve static files
-app.use(express.static(ROOT, {index: false}));
+app.use(express.static(ROOT, { index: false }));
 
 
 import { main as ngApp } from './main.node';
 // Routes with html5pushstate
 
-var cache = null;
-app.use('/', function (req, res, next) {
+app.get('/', function (req, res, next) {
 
-  // if (cache) {
-  //   res.setHeader('Cache-Control', 'public, max-age=300');
-  //   res.status(200).send(cache);
-  //   return next();
-  // }
+  var documentHtml = `
+    <!doctype>
+    <html lang="en">
+    <head>
+      <title>Angular 2 Universal Starter</title>
+      <meta charset="UTF-8">
+      <meta name="description" content="Angular 2 Universal">
+      <meta name="keywords" content="Angular 2,Universal">
+      <meta name="author" content="PatrickJS">
 
-  return ngApp()
-    .then((nodeRef) => {
-      let appInjector = nodeRef.applicationRef.injector;
-      let cmpInjector = nodeRef.componentRef.injector;
-      // app injector
-      let ngZone = appInjector.get(NgZone);
-      // component injector
-      // let http = cmpInjector.get(Http, Http);
-      // let jsonp = cmpInjector.get(Jsonp, Jsonp);
-      // if (ngZone.isStable) { return nodeRef }
+      <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
-      return ngZone.runOutsideAngular(function outsideNg() {
-        function checkStable(done, ref) {
-          setTimeout(function stable() {
-            if (ngZone.hasPendingMicrotasks) { return checkStable(done, ref); }
-            if (ngZone.hasPendingMacrotasks) { return checkStable(done, ref); }
-            // if (http && http._async > 0) { return next(); }
-            // if (jsonp && jsonp._async > 0) { return next(); }
-            if (ngZone.isStable) { return done(ref); }
-            return checkStable(done, ref);
-          }, 1);
-        }
-        return new Promise<any>(function (resolve) {
-          checkStable(resolve, nodeRef);
-        }); // promise
-      });// run outside
+      <base href="/">
+    <body>
 
-    })
-    .then((nodeRef) => {
-      let _appId = nodeRef.componentRef.injector.get(APP_ID, null);
-      let appId = nodeRef.componentRef.injector.get(UNIVERSAL_APP_ID, null);
-      let DOM = getDOM();
-      DOM.setAttribute(nodeRef.componentRef.location.nativeElement, 'data-ng-app-id', appId);
+      <app>
+        Loading...
+      </app>
+      <another-component></another-component>
 
-      let html = nodeRef.serializeDocument();
-      nodeRef.componentRef.destroy();
-      nodeRef.applicationRef.dispose();
+      <script src="dist/public/browser-bundle.js"></script>
+    </body>
+    </html>
+  `;
 
-      nodeRef.componentRef = null;
-      nodeRef.applicationRef = null;
-
-      let prebootInline = '';
-      // let prebootInline = preboot.getInlineCode({
-      //   appRoot: 'app'
-      // });
-
-      return replaceUniversalAppIf(transformDocument(html), _appId, appId)
-        .replace(/<\/body>/, `
-  <script type="application/angular">
-    ${prebootInline}
-    window.ngUniversal = {
-      appId: "${ appId }" || null
-    };
-  </script>
-</body>`);
-    })
-    .then(html => {
-      // cache = html;
-      // res.setHeader('Cache-Control', 'public, max-age=300');
-      res.status(200).send(html);
-      next();
-    });
+  return ngApp(documentHtml).then(html => {
+    // console.log(html);
+    res.status(200).send(html);
+    next();
+    return html;
+  });
 
 });
+
+// use indexFile over ngApp only when there is too much load on the server
+// app.get('/', indexFile);
+function indexFile(req, res) {
+  // when there is too much load on the server just send
+  // the index.html without prerendering for client-only
+  res.sendFile('/index.html', {root: __dirname});
+}
+
 
 // Server
 app.listen(3000, () => {

@@ -14,25 +14,22 @@
     "baseUrl": ".",
     "paths": {
       "@angular/express-engine": [
-        "./src/universal_modules/express-engine"
+        "../../modules/express-engine"
       ],
       "@angular/platform-node": [
-        "./src/universal_modules/platform-node"
+        "../../modules/platform-node"
       ],
       "@angular/platform-node-dynamic": [
-        "./src/universal_modules/platform-node-dynamic"
+        "../../modules/platform-node-dynamic"
       ],
       "@angular/universal": [
-        "./src/universal_modules/universal"
+        "../../modules/universal"
       ],
       "@angular/universal/browser": [
-        "./src/universal_modules/universal/browser.ts"
+        "../../modules/universal/browser.ts"
       ],
       "@angular/universal/node": [
-        "./src/universal_modules/universal/node.ts"
-      ],
-      "preboot": [
-        "./src/universal_modules/preboot"
+        "../../modules/universal/node.ts"
       ],
       "rxjs/*": [
         "./node_modules/rxjs-es/*"
