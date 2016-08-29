@@ -5,21 +5,23 @@ import { HttpModule, JsonpModule } from '@angular/http';
 
 import { isBrowser } from '@angular/universal/browser';
 
+import { App } from './app';
 
-import {App, APP_PROVIDERS} from './app';
+@NgModule({
+  bootstrap: [ App ],
+  declarations: [ App ],
+  imports: [
+    BrowserModule,
+    HttpModule,
+    JsonpModule
+  ]
+})
+export class MainModule {}
+
+export const platform = platformBrowserDynamic();
+
 export function main() {
   console.log('isBrowser', isBrowser);
-
-  // timeout to test preboot
-  setTimeout(function () {
-    return bootstrap(App, [
-      ...APP_PROVIDERS,
-      ...HTTP_PROVIDERS
-    ])
-      .then(() => {
-        let preboot = prebootClient();
-        preboot.complete();
-      });
-  }, 3000);
+  // browserPlatform bootstrap
   return platform.bootstrapModule(MainModule);
 }
