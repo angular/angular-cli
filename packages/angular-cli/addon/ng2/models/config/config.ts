@@ -21,7 +21,8 @@ export class CliConfig<JsonType> {
                       schema: Object,
                       configJson: JsonType,
                       fallbacks: JsonType[] = []) {
-    this._config = new (SchemaClassFactory<JsonType>(schema))(configJson, ...fallbacks);
+    const Klass = SchemaClassFactory<JsonType>(schema);
+    this._config = new Klass(configJson, ...fallbacks);
   }
 
   get config(): JsonType { return <any>this._config; }
