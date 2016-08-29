@@ -9,8 +9,6 @@ const exit = require('exit');
 const packageJson = require('../package.json');
 const Leek = require('leek');
 
-require('../lib/bootstrap-local');
-
 
 resolve('angular-cli', { basedir: process.cwd() },
   function (error, projectLocalCli) {
