@@ -10,7 +10,7 @@
   "keywords": [],
   "scripts": {
     "build": "npm-run-all -c build:main build:packages",
-    "build:main": "tsc -p addon/ng2",
+    "build:main": "tsc -p packages/angular-cli/addon/ng2",
     "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -P $PKG; done",
     "test": "npm run test:packages && npm run test:cli",
     "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
@@ -106,11 +106,6 @@
     "webpack-dev-server": "2.1.0-beta.0",
     "webpack-md5-hash": "0.0.5",
     "webpack-merge": "^0.14.0"
-  },
-  "ember-addon": {
-    "paths": [
-      "./addon/ng2/"
-    ]
   },
   "devDependencies": {
     "@types/chalk": "^0.4.28",

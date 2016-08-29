@@ -5,7 +5,8 @@ let mockFs = require('mock-fs');
 import { expect, assert } from 'chai';
 import * as path from 'path';
 import * as ts from 'typescript';
-import * as dependentFilesUtils from '../../packages/angular-cli/addon/ng2/utilities/get-dependent-files';
+import * as dependentFilesUtils
+    from '../../packages/angular-cli/addon/ng2/utilities/get-dependent-files';
 
 describe('Get Dependent Files: ', () => {
   let rootPath = 'src/app';
