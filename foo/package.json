@@ -1,0 +1,43 @@
+{
+  "name": "foo",
+  "version": "0.0.0",
+  "license": "MIT",
+  "angular-cli": {},
+  "scripts": {
+    "start": "ng serve",
+    "lint": "tslint \"src/**/*.ts\"",
+    "test": "ng test",
+    "pree2e": "webdriver-manager update",
+    "e2e": "protractor"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "2.0.0-rc.5",
+    "@angular/compiler": "2.0.0-rc.5",
+    "@angular/core": "2.0.0-rc.5",
+    "@angular/forms": "0.3.0",
+    "@angular/http": "2.0.0-rc.5",
+    "@angular/platform-browser": "2.0.0-rc.5",
+    "@angular/platform-browser-dynamic": "2.0.0-rc.5",
+    "@angular/router": "3.0.0-rc.1",
+    "core-js": "^2.4.0",
+    "rxjs": "5.0.0-beta.11",
+    "ts-helpers": "^1.1.1",
+    "zone.js": "0.6.12"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.2.30",
+    "angular-cli": "1.0.0-beta.11-webpack.2",
+    "codelyzer": "~0.0.26",
+    "jasmine-core": "2.4.1",
+    "jasmine-spec-reporter": "2.5.0",
+    "karma": "0.13.22",
+    "karma-chrome-launcher": "0.2.3",
+    "karma-jasmine": "0.3.8",
+    "karma-remap-istanbul": "^0.2.1",
+    "protractor": "4.0.3",
+    "ts-node": "1.2.1",
+    "tslint": "3.13.0",
+    "typescript": "^2.0.0"
+  }
+}

@@ -2,7 +2,8 @@
 
 var expect = require('chai').expect;
 var path = require('path');
-var dynamicPathParser = require('../../addon/ng2/utilities/dynamic-path-parser');
+var dynamicPathParser
+    = require('../../packages/angular-cli/addon/ng2/utilities/dynamic-path-parser');
 var mockFs = require('mock-fs');
 
 var appDir = `src${path.sep}app`;
@@ -14,12 +15,12 @@ describe('dynamic path parser', () => {
   var root = 'src';
   beforeEach(() => {
     project = {
-      root: rootName, 
+      root: rootName,
       ngConfig: {
         apps: [{
           root: root
         }]
-      } 
+      }
     };
     var mockFolder = {};
     mockFolder[rootName] = {
@@ -32,7 +33,7 @@ describe('dynamic path parser', () => {
     };
     mockFs(mockFolder);
   });
-  
+
   afterEach(() => {
     mockFs.restore();
   });
@@ -122,7 +123,7 @@ describe('dynamic path parser', () => {
       expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
       expect(result.name).to.equal(entityName);
     });
-    
+
   it('auto look for dirs with a "+" when not specified', () => {
     var mockFolder = {};
     mockFolder[rootName] = {

@@ -2,7 +2,9 @@
 'use strict';
 
 var expect = require('chai').expect;
-var BaseHrefWebpackPlugin = require('../../addon/ng2/utilities/base-href-webpack-plugin').BaseHrefWebpackPlugin;
+var BaseHrefWebpackPlugin
+    = require('../../packages/angular-cli/addon/ng2/utilities/base-href-webpack-plugin')
+        .BaseHrefWebpackPlugin;
 
 function mockCompiler(indexHtml, callback) {
   return {
