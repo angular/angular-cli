@@ -230,3 +230,8 @@ export function joinWithSlash(start: string, end: string): string {
   }
   return start + '/' + end;
 }
+
+export const NODE_LOCATION_PROVIDERS: Array<any> = [
+  // NodePlatformLocation,
+  { provide: PlatformLocation, useClass: NodePlatformLocation }
+];

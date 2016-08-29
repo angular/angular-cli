@@ -36,7 +36,7 @@ import {
   APP_ID,
   Injector,
   createPlatformFactory,
-
+  OpaqueToken,
 
   NgModule,
   ComponentRef,

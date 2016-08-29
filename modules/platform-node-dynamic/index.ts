@@ -23,7 +23,7 @@ import {DomSharedStylesHost, SharedStylesHost} from '@angular/platform-browser/s
 import {DomRootRenderer} from '@angular/platform-browser/src/dom/dom_renderer';
 import {RootRenderer} from '@angular/core/src/render/api';
 
-import {AnimationDriver, _NoOpAnimationDriver} from '@angular/platform-browser';
+import {AnimationDriver/*, NoOpAnimationDriver*/} from '@angular/platform-browser';
 import {WebAnimationsDriver} from '@angular/platform-browser/src/dom/web_animations_driver';
 
 import {DOCUMENT} from '@angular/platform-browser/src/dom/dom_tokens';
@@ -47,7 +47,7 @@ import {APP_ID_RANDOM_PROVIDER} from '@angular/core/src/application_tokens';
 import {ReflectionCapabilities} from '@angular/core/src/reflection/reflection_capabilities';
 import {reflector} from '@angular/core/src/reflection/reflection';
 import {ViewUtils} from '@angular/core/src/linker/view_utils';
-import {PLATFORM_CORE_PROVIDERS, ApplicationRef_} from '@angular/core/src/application_ref';
+import {/*PLATFORM_CORE_PROVIDERS,*/ ApplicationRef_} from '@angular/core/src/application_ref';
 import {SanitizationService} from '@angular/core/src/security';
 import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 // private
@@ -61,7 +61,7 @@ export const NODE_PLATFORM_PROVIDERS = arrayFlattenTree([
   {provide: NODE_PLATFORM_MARKER, useValue: true},
   ...SERVER_PLATFORM_PROVIDERS,
   ...BROWSER_APP_COMPILER_PROVIDERS,
-  {provide: AnimationDriver, useFactory: NoOpAnimationDriver},
+  /*{provide: AnimationDriver, useFactory: NoOpAnimationDriver},*/
   {provide: WebAnimationsDriver, useExisting: AnimationDriver},
 ].filter(provider => provider !== APPLICATION_COMMON_PROVIDERS), []);
 
