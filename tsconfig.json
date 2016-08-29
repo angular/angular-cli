@@ -20,9 +20,6 @@
       "@angular/platform-node": [
         "./modules/platform-node"
       ],
-      "@angular/platform-node-dynamic": [
-        "./modules/platform-node-dynamic"
-      ],
       "@angular/universal/browser": [
         "./modules/universal/browser.ts"
       ],
