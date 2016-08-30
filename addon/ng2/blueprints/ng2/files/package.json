@@ -33,7 +33,6 @@
     "angular2-universal-polyfills": "0.4.1",
     "preboot": "2.1.2",
     "parse5": "1.5.1",<% } %>
-    "@angular-cli/ast-tools": "<%= version %>",
     "@types/jasmine": "^2.2.30",
     "angular-cli": "<%= version %>",
     "codelyzer": "~0.0.26",
