@@ -11,9 +11,7 @@ const projectBaseDir = path.join(__dirname, '../packages');
 
 // Create a Jasmine runner and configure it.
 const jasmine = new Jasmine({ projectBaseDir: projectBaseDir });
-jasmine.loadConfig({
-  spec_dir: projectBaseDir
-});
+jasmine.loadConfig({});
 jasmine.addReporter(new JasmineSpecReporter());
 
 // Run the tests.

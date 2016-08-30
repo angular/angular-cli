@@ -7,6 +7,6 @@ export {
   insertAfterLastOccurrence,
   getContentOfKeyLiteral,
   getDecoratorMetadata,
-  addComponentToModule,
+  addDeclarationToModule,
   addProviderToModule
 } from '@angular-cli/ast-tools';

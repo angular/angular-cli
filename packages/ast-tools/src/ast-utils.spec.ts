@@ -4,7 +4,7 @@ import ts = require('typescript');
 import fs = require('fs');
 
 import {InsertChange, RemoveChange} from './change';
-import {insertAfterLastOccurrence, addComponentToModule} from './ast-utils';
+import {insertAfterLastOccurrence, addDeclarationToModule} from './ast-utils';
 import {findNodes} from './node';
 import {it} from './spec-utils';
 
@@ -172,7 +172,7 @@ describe('ast-utils: insertAfterLastOccurrence', () => {
 });
 
 
-describe('addComponentToModule', () => {
+describe('addDeclarationToModule', () => {
   beforeEach(() => {
     mockFs({
       '1.ts': `
@@ -210,7 +210,7 @@ class Module {}`
   afterEach(() => mockFs.restore());
 
   it('works with empty array', () => {
-    return addComponentToModule('1.ts', 'MyClass', 'MyImportPath')
+    return addDeclarationToModule('1.ts', 'MyClass', 'MyImportPath')
       .then(change => change.apply())
       .then(() => readFile('1.ts', 'utf-8'))
       .then(content => {
@@ -228,7 +228,7 @@ class Module {}`
   });
 
   it('works with array with declarations', () => {
-    return addComponentToModule('2.ts', 'MyClass', 'MyImportPath')
+    return addDeclarationToModule('2.ts', 'MyClass', 'MyImportPath')
       .then(change => change.apply())
       .then(() => readFile('2.ts', 'utf-8'))
       .then(content => {
@@ -249,7 +249,7 @@ class Module {}`
   });
 
   it('works without any declarations', () => {
-    return addComponentToModule('3.ts', 'MyClass', 'MyImportPath')
+    return addDeclarationToModule('3.ts', 'MyClass', 'MyImportPath')
       .then(change => change.apply())
       .then(() => readFile('3.ts', 'utf-8'))
       .then(content => {
@@ -267,7 +267,7 @@ class Module {}`
   });
 
   it('works without a declaration field', () => {
-    return addComponentToModule('4.ts', 'MyClass', 'MyImportPath')
+    return addDeclarationToModule('4.ts', 'MyClass', 'MyImportPath')
       .then(change => change.apply())
       .then(() => readFile('4.ts', 'utf-8'))
       .then(content => {

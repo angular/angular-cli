@@ -1,4 +1,5 @@
 var path = require('path');
+const chalk = require('chalk');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 
 module.exports = {
@@ -34,5 +35,10 @@ module.exports = {
         return dir;
       }
     };
+  },
+
+  afterInstall() {
+    const warningMessage = 'Service is generated but not provided, it must be provided to be used';
+    this._writeStatusToUI(chalk.yellow, 'WARNING', warningMessage);
   }
 };
