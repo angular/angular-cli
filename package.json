@@ -44,6 +44,7 @@
     "@angular/compiler-cli": "^0.5.0",
     "@angular/core": "^2.0.0-rc.5",
     "@angular/tsc-wrapped": "^0.2.2",
+    "@angular-cli/ast-tools": "1.0.0-beta.11-webpack.5",
     "angular2-template-loader": "^0.5.0",
     "awesome-typescript-loader": "^2.2.1",
     "chalk": "^1.1.3",
