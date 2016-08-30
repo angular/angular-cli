@@ -41,6 +41,7 @@ The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**
 * [Adding extra files to the build](#adding-extra-files-to-the-build)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
+* [Proxy To Backend](#proxy-to-backend)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Linting and formatting code](#linting-and-formatting-code)
 * [Support for offline applications](#support-for-offline-applications)
@@ -192,6 +193,33 @@ Before running the tests make sure you are serving the app via `ng serve`.
 
 End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
+### Proxy To Backend
+Using the proxying support in webpack's dev server we can highjack certain urls and send them to a backend server.
+We do this by passing a file to `--proxy-config`
+
+Say we have a server running on `http://localhost:3000/api` and we want all calls th `http://localhost:4200/api` to go to that server.
+
+We create a file next to projects `package.json` called `proxy.conf.json`
+with the content
+
+```
+{
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false
+  }
+}
+```
+
+You can read more about what options are available here [webpack-dev-server proxy settings](https://webpack.github.io/docs/webpack-dev-server.html#proxy)
+
+and then we edit the `package.json` file's start script to be
+
+```
+"start": "ng serve --proxy-config proxy.conf.json",
+```
+
+now run it with `npm start`
 
 ### Deploying the app via GitHub Pages
 
