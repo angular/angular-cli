@@ -44,8 +44,6 @@
 
   "files": [
     "custom_typings/xhr2.d.ts",
-    "modules/broccoli-prerender/src/index.ts",
-    "modules/broccoli-prerender/src/child_proc.ts",
     "modules/express-engine/src/index.ts",
     "modules/grunt-prerender/tasks/index.ts",
     "modules/gulp-prerender/src/index.ts",
