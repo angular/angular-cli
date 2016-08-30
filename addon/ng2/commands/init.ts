@@ -1,5 +1,3 @@
-'use strict';
-
 import LinkCli from '../tasks/link-cli';
 
 const Command = require('ember-cli/lib/models/command');
@@ -119,6 +117,7 @@ const InitCommand: any = Command.extend({
     }
 
     blueprintOpts.blueprint = normalizeBlueprint(blueprintOpts.blueprint);
+    process.stdout.write('\n' + blueprintOpts.blueprint + '\n\n');
 
     return installBlueprint.run(blueprintOpts)
       .then(function () {

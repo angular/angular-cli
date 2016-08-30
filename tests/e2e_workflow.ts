@@ -1,19 +1,122 @@
-'use strict';
+/**
+ * This file is ran using the command line, not using Jasmine / Mocha.
+ */
 
-var fs = require('fs');
-var path = require('path');
-var tmp = require('../helpers/tmp');
-var chai = require('chai');
-var expect = chai.expect;
-var conf = require('ember-cli/tests/helpers/conf');
-var sh = require('shelljs');
-var treeKill = require('tree-kill');
-var child_process = require('child_process');
-var ng = require('../helpers/ng');
-var root = path.join(process.cwd(), 'tmp');
-var express = require('express');
-var http = require('http');
-var request = require('request');
+import * as fs from 'fs';
+import * as path from 'path';
+import {spawn} from 'child_process';
+import * as chalk from 'chalk';
+import {oneLine, stripIndents} from 'common-tags';
+
+const shelljs = require('shelljs');
+const temp = require('temp');
+const treeKill = require('tree-kill');
+const express = require('express');
+const http = require('http');
+const request = require('request');
+
+
+function isMobileTest() {
+  return !!process.env['MOBILE_TEST'];
+}
+
+
+function execOrFail(cmd: string, ...args: string[]): Promise<string> {
+  let stdout = '';
+  const cwd = process.cwd();
+  console.log(chalk.yellow(stripIndents`
+    Running "${cmd} ${args.join(' ')}"...
+    CWD: ${cwd}
+  `));
+
+  const npmProcess = spawn(cmd, args, { cwd, detached: true });
+  npmProcess.stdout.on('data', (data: Buffer) => {
+    const str = data.toString('utf-8');
+    stdout += str;
+    process.stdout.write(chalk.reset('   ' + str.split(/\n/g).join('\n   ').replace(/ +$/, '')));
+  });
+  // npmProcess.stderr.on('data', (data: Buffer) => {
+    // process.stderr.write(chalk.red('   ' + data.toString().split(/\n/g).join('\n   ')));
+  // });
+
+  return new Promise((resolve, reject) => {
+    npmProcess.on('close', (code: number) => {
+      if (code == 0) {
+        resolve(stdout);
+      } else {
+        reject(new Error(oneLine`
+          Running "${cmd} ${args.join(' ')}" returned error code ${code}.
+        `));
+      }
+    });
+  });
+}
+
+
+function ng(...args: string[]) {
+  return execOrFail('ng', ...args)
+}
+
+
+function npm(...args: string[]) {
+  return execOrFail('npm', ...args);
+}
+
+
+Promise.resolve()
+  .then(() => {
+    // Setup to use the local angular-cli copy.
+    process.chdir(path.join(__dirname, '..'));
+    return npm('link');
+  })
+  // Validate it's linked properly.
+  .then(() => execOrFail('which', 'ng'))
+  .then(() => {
+    // Get to a temporary directory.
+    const tempRoot = temp.mkdirSync('angular-cli-e2e');
+    console.log(chalk.green(`Using "${tempRoot}" as temporary directory for a new project.`));
+    process.chdir(tempRoot);
+
+    // Setup a new project.
+    return ng('new', 'test-project', '--link-cli', isMobileTest() ? '--mobile' : '');
+  })
+  .then(() => {
+    if (!fs.existsSync(path.join(process.cwd(), 'test-project'))) {
+      throw new Error('Project was not created properly.');
+    }
+    process.chdir(path.join(process.cwd(), 'test-project'));
+  })
+  .then(() => ng('build', '--prod'))
+  .then(() => {
+    if (!fs.existsSync(path.join(process.cwd(), 'dist'))) {
+      throw new Error('Project was not built properly.');
+    }
+
+    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
+
+    // Check for cache busting hash script src
+    if (!indexHtml.match(/main\.[0-9a-f]{20}\.bundle\.js/)) {
+      throw new Error('index.html does not refer to main.bundle.js');
+    }
+
+    // Also does not create new things in GIT.
+    return execOrFail('git', 'status', '--porcelain')
+      .then((stdout: string) => {
+        if (stdout != '') {
+          throw new Error('The project was changed.');
+        }
+      })
+  })
+  .then(
+    () => process.exit(0),
+    (err: Error) => {
+      console.error(err);
+      console.error(err.stack);
+      process.exit(1);
+    });
+
+
+/**
 
 function existsSync(path) {
   try {
@@ -29,10 +132,6 @@ const it_mobile = isMobileTest() ? it : function() {};
 const it_not_mobile = isMobileTest() ? function() {} : it;
 
 describe('Basic end-to-end Workflow', function () {
-  before(conf.setup);
-
-  after(conf.restore);
-
   var testArgs = ['test', '--watch', 'false'];
 
   it('Installs angular-cli correctly', function () {
@@ -125,7 +224,7 @@ describe('Basic end-to-end Workflow', function () {
     this.timeout(420000);
 
     sh.exec(`${ngBin} build --base-href /myUrl/`);
-    const indexHtmlPath = path.join(process.cwd(), 'dist/index.html'); 
+    const indexHtmlPath = path.join(process.cwd(), 'dist/index.html');
     const indexHtml = fs.readFileSync(indexHtmlPath, { encoding: 'utf8' });
 
     expect(indexHtml).to.match(/<base href="\/myUrl\/"/);
@@ -736,3 +835,5 @@ describe('Basic end-to-end Workflow', function () {
 function isMobileTest() {
   return !!process.env['MOBILE_TEST'];
 }
+
+**/
