@@ -55,7 +55,6 @@ const InitCommand: any = Command.extend({
 
     // needs an explicit check in case it's just 'undefined'
     // due to passing of options from 'new' and 'addon'
-    debugger;
     let gitInit: any;
     if (commandOptions.skipGit === false) {
       gitInit = new GitInit({
