@@ -1,6 +1,6 @@
 {
-  "name": "angular-cli",
-  "version": "1.0.0-beta.11-webpack.2",
+  "name": "@angular-cli/ast-tools",
+  "version": "1.0.0-beta.11-webpack.4",
   "description": "CLI tool for Angular",
   "main": "./index.js",
   "keywords": [
