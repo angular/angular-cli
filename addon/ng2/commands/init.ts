@@ -55,7 +55,7 @@ const InitCommand: any = Command.extend({
 
     // needs an explicit check in case it's just 'undefined'
     // due to passing of options from 'new' and 'addon'
-    let gitInit;
+    let gitInit: any;
     if (commandOptions.skipGit === false) {
       gitInit = new GitInit({
         ui: this.ui,
@@ -63,7 +63,7 @@ const InitCommand: any = Command.extend({
       });
     }
 
-    let linkCli;
+    let linkCli: any;
     if (commandOptions.linkCli) {
       linkCli = new LinkCli({
         ui: this.ui,
@@ -72,7 +72,7 @@ const InitCommand: any = Command.extend({
       });
     }
 
-    let npmInstall;
+    let npmInstall: any;
     if (!commandOptions.skipNpm) {
       npmInstall = new NpmInstall({
         ui: this.ui,
@@ -81,7 +81,7 @@ const InitCommand: any = Command.extend({
       });
     }
 
-    let bowerInstall;
+    let bowerInstall: any;
     if (!commandOptions.skipBower) {
       bowerInstall = new this.tasks.BowerInstall({
         ui: this.ui,
