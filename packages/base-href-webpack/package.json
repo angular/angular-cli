@@ -1,12 +1,13 @@
 {
-  "name": "@angular-cli/ast-tools",
-  "version": "1.0.0-beta.11-webpack.5",
-  "description": "CLI tool for Angular",
+  "name": "@angular-cli/base-href-webpack",
+  "version": "1.0.0",
+  "description": "Base HREF Webpack plugin",
   "main": "./src/index.js",
   "keywords": [
     "angular",
     "cli",
-    "ast",
+    "webpack",
+    "plugin",
     "tool"
   ],
   "repository": {
@@ -20,8 +21,5 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "rxjs": "^5.0.0-beta.11",
-    "denodeify": "^1.2.1",
-    "typescript": "2.0.0"
   }
 }
