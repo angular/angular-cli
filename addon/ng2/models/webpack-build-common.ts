@@ -4,10 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 import * as webpack from 'webpack';
 const atl = require('awesome-typescript-loader');
 
+import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
 import { findLazyModules } from './find-lazy-modules';
-
-
-import { BaseHrefWebpackPlugin } from '../utilities/base-href-webpack-plugin';
 
 
 export function getWebpackCommonConfig(

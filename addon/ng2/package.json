@@ -2,7 +2,6 @@
   "name": "ng2",
   "version": "0.0.0",
   "description": "An addon to generate an ng2 project",
-  "author": "rodyhaddad",
   "license": "MIT",
   "keywords": [
     "ember-addon"

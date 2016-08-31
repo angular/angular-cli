@@ -1,7 +1,7 @@
 {
-  "name": "@angular-cli/ast-tools",
-  "version": "1.0.0-beta.11-webpack.5",
-  "description": "CLI tool for Angular",
+  "name": "@angular-cli/base-href-webpack",
+  "version": "1.0.0",
+  "description": "Base HREF Webpack plugin",
   "main": "./src/index.js",
   "keywords": [
     "angular",

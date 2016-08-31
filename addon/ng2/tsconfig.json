@@ -20,6 +20,7 @@
     "baseUrl": "",
     "paths": {
       "@angular-cli/ast-tools": [ "../../packages/ast-tools/src" ],
+      "@angular-cli/base-href-webpack": [ "../../packages/base-href-webpack/src" ],
       "@angular-cli/webpack": [ "../../packages/webpack/src" ]
     }
   },
