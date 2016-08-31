@@ -73,25 +73,20 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
 
         options.UniversalConfiguration.document = clientHtml;
 
-         @NgModule({
-            bootstrap : options.bootstrap || [],
-            imports : [
+        @NgModule({
+            bootstrap       : options.bootstrap || [],
+            imports         : [
                 ...options.imports,
                 NodeModule.withConfig(options.UniversalConfiguration)
             ],
-            providers : options.providers,
-            declarations : options.declarations,
+            providers       : options.providers,
+            declarations    : options.declarations,
 
-            schemas : options.schemas || [],
+            schemas         : options.schemas || [],
             entryComponents : options.entryComponents || [],
-            exports : options.exports || []
-
-         })
-         class CreatedModule { }
-
-        
-
-        // Inject document : clientHtml inside withConfig
+            exports         : options.exports || []
+        })
+        class CreatedModule { }
 
         return platformDynamicNode().serializeModule(CreatedModule).then(html => {
             // tada?
