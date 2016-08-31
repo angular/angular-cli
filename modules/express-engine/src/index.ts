@@ -1,6 +1,6 @@
 const fs = require('graceful-fs');
 
-//import {selectorRegExpFactory, Bootloader, BootloaderConfig} from '@angular/universal';
+// import {selectorRegExpFactory, Bootloader, BootloaderConfig} from '@angular/universal';
 import { NgModuleMetadataType, NgModule } from '@angular/core';
 import { platformDynamicNode, NodeModule } from '@angular/universal';
 
@@ -18,27 +18,29 @@ export interface UniversalConfig {
 export type ExpressEngineConfig = NgModuleMetadataType & UniversalConfig;
 
 
-// WORK IN PROGRESS
-res.render('./index.html', {
-    imports : [],
-    providers : [],
-    bootstrap : [],
-    declarations : [],
+// WORK IN PROGRESS 
+// basic idea on how to use ?
 
-    schemas : [],
-    entryComponents : [],
-    exports : [],
+// res.render('./index.html', {
+//     imports : [],
+//     providers : [],
+//     bootstrap : [],
+//     declarations : [],
 
-    UniversalConfiguration : {
-        originUrl: 'http://localhost:3000',
-        baseUrl: '/',
-        requestUrl: '/',
-        preboot: {
-          appRoot: ['app'],
-          uglify: true
-        },
-    }
-});
+//     schemas : [],
+//     entryComponents : [],
+//     exports : [],
+
+//     UniversalConfiguration : {
+//         originUrl: 'http://localhost:3000',
+//         baseUrl: '/',
+//         requestUrl: '/',
+//         preboot: {
+//           appRoot: ['app'],
+//           uglify: true
+//         },
+//     }
+// });
 
 let cache : Object = {};
 
