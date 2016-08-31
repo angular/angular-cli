@@ -205,6 +205,8 @@ with the content
 }
 ```
 
+You can read more about what options are available here [webpack-dev-server proxy settings](https://webpack.github.io/docs/webpack-dev-server.html#proxy)
+
 and then we edit the `package.json` file's start script to be
 
 ```
