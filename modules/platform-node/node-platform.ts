@@ -94,6 +94,10 @@ export function _resolveDefaultAnimationDriver(): AnimationDriver {
 // Hold Reference
 export var __PLATFORM_REF: PlatformRef = null;
 
+function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+}
+
 export class NodePlatform implements PlatformRef {
   static _noop = () => {};
   static _cache = new Map<any, any>();
@@ -108,6 +112,10 @@ export class NodePlatform implements PlatformRef {
 
 
   serializeModule<T>(moduleType: any, config: any = {}) {
+    if (config && !config.id) {
+      config.id = s4();
+    }
+
     // TODO(gdi2290): make stateless. allow for many instances of modules
     // TODO(gdi2290): refactor to ZoneLocalStore
     var _map = new Map<any, any>();
@@ -124,17 +132,17 @@ export class NodePlatform implements PlatformRef {
       }
     };
 
-    config.time && console.time('bootstrapModule: ' + config.id);
+    config.time && console.time('id: ' + config.id + ' bootstrapModule: ');
     return this.platformRef.bootstrapModule<T>(moduleType, config.compilerOptions)
       .then((moduleRef: NgModuleRef<T>) => {
-        config.time && console.timeEnd('bootstrapModule: ' + config.id);
+        config.time && console.timeEnd('id: ' + config.id + ' bootstrapModule: ');
         let modInjector = moduleRef.injector;
         let instance: any = moduleRef.instance;
         // lifecycle hooks
-        di.set('ngOnInit', instance.ngOnInit, NodePlatform._noop);
-        di.set('ngDoCheck', instance.ngDoCheck, NodePlatform._noop);
-        di.set('ngOnStable', instance.ngOnStable, NodePlatform._noop);
-        di.set('ngOnRendered', instance.ngOnRendered, NodePlatform._noop);
+        di.set('universalOnInit', instance.universalOnInit, NodePlatform._noop);
+        di.set('universalDoCheck', instance.universalDoCheck, NodePlatform._noop);
+        di.set('universalOnStable', instance.universalOnStable, NodePlatform._noop);
+        di.set('universalOnRendered', instance.universalOnRendered, NodePlatform._noop);
         // global config
         di.set('config', modInjector.get(UNIVERSAL_CONFIG, {}));
         di.set('ApplicationRef', modInjector.get(ApplicationRef));
@@ -146,15 +154,15 @@ export class NodePlatform implements PlatformRef {
         return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
-        config.time && console.time('stable: ' + config.id);
+        config.time && console.time('id: ' + config.id + ' stable: ');
         let _config = di.get('config');
-        let ngDoCheck = di.get('ngDoCheck');
-        let ngOnInit = di.get('ngOnInit');
+        let universalDoCheck = di.get('universalDoCheck');
+        let universalOnInit = di.get('universalOnInit');
         let rootNgZone = di.get('NgZone');
         let appRef = di.get('ApplicationRef');
         let components = appRef.components;
 
-        ngOnInit();
+        universalOnInit();
 
         // lifecycle hooks
         function outsideNg(compRef, ngZone, config, http, jsonp) {
@@ -167,10 +175,10 @@ export class NodePlatform implements PlatformRef {
                 if (http && http._async > 0) { return checkStable(done, ref); }
                 if (jsonp && jsonp._async > 0) { return checkStable(done, ref); }
                 if (ngZone.isStable === true) {
-                  let isStable = ngDoCheck(ref, ngZone, config);
-                  if (ngDoCheck !== NodePlatform._noop) {
+                  let isStable = universalDoCheck(ref, ngZone, config);
+                  if (universalDoCheck !== NodePlatform._noop) {
                     if (typeof isStable !== 'boolean') {
-                      console.warn('\nWARNING: ngDoCheck must return a boolean value of either true or false\n');
+                      console.warn('\nWARNING: universalDoCheck must return a boolean value of either true or false\n');
                     } else if (isStable !== true) {
                       return checkStable(done, ref);
                     }
@@ -203,12 +211,12 @@ export class NodePlatform implements PlatformRef {
           return Promise.all<Promise<ComponentRef<any>>>(stableComponents);
         })
           .then(() => {
-            config.time && console.timeEnd('stable: ' + config.id);
+            config.time && console.timeEnd('id: ' + config.id + ' stable: ');
             return moduleRef;
           });
       })
       .then((moduleRef: NgModuleRef<T>) => {
-        config.time && console.time('preboot: ' + config.id);
+        config.time && console.time('id: ' + config.id + ' preboot: ');
         // parseFragment used
         // getInlineCode used
         let DOM = di.get('DOM');
@@ -226,7 +234,7 @@ export class NodePlatform implements PlatformRef {
             prebootEl = NodePlatform._cache.get(key).prebootEl;
             // prebootCode = NodePlatform._cache.get(key);
           } else if (key && !prebootEl) {
-            config.time && console.time('preboot insert: ' + config.id);
+            config.time && console.time('id: ' + config.id + ' preboot insert: ');
             prebootCode = parseFragment('' +
               '<script>\n' +
               getInlineCode(_config.preboot) +
@@ -238,7 +246,7 @@ export class NodePlatform implements PlatformRef {
               DOM.appendChild(prebootEl, prebootCode.childNodes[i]);
             }
             NodePlatform._cache.set(key, {prebootCode, prebootEl});
-            config.time && console.timeEnd('preboot insert: ' + config.id);
+            config.time && console.timeEnd('id: ' + config.id + ' preboot insert: ');
           }
           //  else {
           //   prebootCode = getInlineCode(_config.preboot);
@@ -252,17 +260,17 @@ export class NodePlatform implements PlatformRef {
         } catch (e) {
           console.log(e);
           // if there's an error don't inject preboot
-          config.time && console.timeEnd('preboot: ' + config.id);
+          config.time && console.timeEnd('id: ' + config.id + ' preboot: ');
           return moduleRef;
         }
 
-        config.time && console.timeEnd('preboot: ' + config.id);
+        config.time && console.timeEnd('id: ' + config.id + ' preboot: ');
         return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
-        config.time && console.time('serialize: ' + config.id);
+        config.time && console.time('id: ' + config.id + ' serialize: ');
         // serializeDocument used
-        let ngOnRendered = di.get('ngOnRendered');
+        let universalOnRendered = di.get('universalOnRendered');
         let document = di.get('DOCUMENT');
         let appRef = di.get('ApplicationRef');
         let _appId = di.get('APP_ID', null);
@@ -281,10 +289,10 @@ export class NodePlatform implements PlatformRef {
         appRef = null;
         moduleRef = null;
         di.clear();
-        config.time && console.timeEnd('serialize: ' + config.id);
+        config.time && console.timeEnd('id: ' + config.id + ' serialize: ');
         html = html.replace(new RegExp(_appId, 'gi'), appId);
 
-        ngOnRendered(html);
+        universalOnRendered(html);
 
         return html;
       });

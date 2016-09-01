@@ -17,7 +17,10 @@ class AnotherComponent {}
 
 export const platform = platformDynamicNode();
 
+var count = 0;
 export function main(document, config?: any) {
+  count++
+  console.time('ngApp '+ count)
 
   @NgModule({
     bootstrap: [ App, AnotherComponent ],
@@ -57,6 +60,7 @@ export function main(document, config?: any) {
   return platform
     .serializeModule(MainModule, config)
     .then((html) => {
+      console.timeEnd('ngApp ' + count)
       console.log('\n -- serializeModule FINISHED --');
       return html;
     });

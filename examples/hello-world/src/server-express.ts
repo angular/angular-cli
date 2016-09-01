@@ -61,8 +61,7 @@ app.get('/', function (req, res, next) {
     </html>
   `;
 
-  return ngApp(documentHtml).then(html => {
-    // console.log(html);
+  return ngApp(documentHtml, {time: true}).then(html => {
     res.status(200).send(html);
     next();
     return html;
