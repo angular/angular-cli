@@ -24,7 +24,7 @@ const crisisCenterRoutes: Routes = [
   },
   {
     path: 'crisis-center',
-    loadChildren: () => System.import('app/crisis-center/crisis-center.module')
+    loadChildren: () => System.import('./crisis-center/crisis-center.module').then(mod => mod && mod.default || mod)
   }
 ];
 

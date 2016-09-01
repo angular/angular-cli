@@ -13,6 +13,11 @@
     "target": "es5",
     "lib": ["es6", "dom"],
     "baseUrl": ".",
+    "types": [
+      "node",
+      "body-parser",
+      "express"
+    ],
     "paths": {
       "@angular/express-engine": [
         "../../modules/express-engine"
