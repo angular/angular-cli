@@ -1,8 +1,14 @@
-import {DomSharedStylesHost} from '@angular/platform-browser/src/dom/shared_styles_host';
-import {DOCUMENT} from '@angular/platform-browser/src/dom/dom_tokens';
-import {APP_ID} from '@angular/core';
-import {_appIdRandomProviderFactory, parseDocument} from '@angular/platform-node';
+// PRIVATE
+import { getDOM } from './__private_imports__';
+// PRIVATE
+
+
+import { DOCUMENT } from '@angular/platform-browser';
+import { APP_ID } from '@angular/core';
+import { parseDocument } from './node-document';
+import { NodeSharedStylesHost } from './node-shared-styles-host'
 import { NODE_APP_ID } from './tokens';
+import { _appIdRandomProviderFactory } from './helper';
 
 export const _COMPONENT_ID = '%COMP%';
 
@@ -20,12 +26,12 @@ export function provideUniversalAppId (id?: string): Array<any> {
 export function provideDocument (document: string): Array<any> {
   const DOC: any = {
     provide: DOCUMENT,
-    useFactory: (domSharedStylesHost: DomSharedStylesHost) => {
+    useFactory: (domSharedStylesHost: NodeSharedStylesHost) => {
       var doc: any = parseDocument(document);
       domSharedStylesHost.addHost(doc.head);
       return doc;
     },
-    deps: [ DomSharedStylesHost ]
+    deps: [ NodeSharedStylesHost ]
   };
 
   return [
