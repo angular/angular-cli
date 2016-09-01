@@ -135,9 +135,6 @@
         },
         "prefixInterfaces": {
           "type": "boolean"
-        },
-        "lazyRoutePrefix": {
-          "type": "string"
         }
       },
       "additionalProperties": false

@@ -11,7 +11,6 @@ module.exports = {
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: false },
-    { name: 'route', type: Boolean, default: false },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'prefix', type: Boolean, default: true },
@@ -54,7 +53,6 @@ module.exports = {
       inlineTemplate: options.inlineTemplate,
       inlineStyle: options.inlineStyle,
       route: options.route,
-      isLazyRoute: !!options.isLazyRoute,
       isAppComponent: !!options.isAppComponent,
       selector: this.selector,
       styleExt: this.styleExt
@@ -84,18 +82,6 @@ module.exports = {
         var dir = this.dynamicPath.dir;
         if (!options.locals.flat) {
           dir += path.sep + options.dasherizedModuleName;
-
-          if (options.locals.isLazyRoute) {
-            var lazyRoutePrefix = '+';
-            if (this.project.ngConfig &&
-                this.project.ngConfig.defaults &&
-                this.project.ngConfig.defaults.lazyRoutePrefix !== undefined) {
-              lazyRoutePrefix = this.project.ngConfig.defaults.lazyRoutePrefix;
-            }
-            var dirParts = dir.split(path.sep);
-            dirParts[dirParts.length - 1] = `${lazyRoutePrefix}${dirParts[dirParts.length - 1]}`;
-            dir = dirParts.join(path.sep);
-          }
         }
         var srcDir = this.project.ngConfig.apps[0].root;
         this.appDir = dir.substr(dir.indexOf(srcDir) + srcDir.length);
