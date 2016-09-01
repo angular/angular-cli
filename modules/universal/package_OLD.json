@@ -1,0 +1,21 @@
+{
+  "name": "angular2-universal",
+  "description": "Universal (isomorphic) javascript support for Angular2",
+  "typings": "typings.d.ts",
+  "main": "node/index.js",
+  "browser": "browser/index.js",
+  "dependencies": {
+    "angular2-express-engine": "<INHERIT>",
+    "angular2-hapi-engine": "<INHERIT>",
+    "angular2-universal-polyfills": "<INHERIT>",
+    "css": "<INHERIT>",
+    "js-beautify": "<INHERIT>",
+    "parse5": "<INHERIT>",
+    "xhr2": "<INHERIT>"
+  },
+  "peerDependencies": {
+    "preboot": "<INHERIT>",
+    "rxjs": "<INHERIT>",
+    "zone.js": "<INHERIT>"
+  }
+}

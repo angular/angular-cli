@@ -5,7 +5,6 @@
   	"declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
-    "noLib": false,
     "baseUrl": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -13,7 +12,24 @@
     "inlineSources": true,
   	"outDir": "dist",
     "traceResolution": false,
+    "lib": ["es5", "dom"],
     "paths": {
+      "@angular/express-engine": [
+        "./modules/express-engine"
+      ],
+      "@angular/platform-node": [
+        "./modules/platform-node"
+      ],
+      "@angular/universal/browser": [
+        "./modules/universal/browser.ts"
+      ],
+      "@angular/universal/node": [
+        "./modules/universal/node.ts"
+      ],
+      "@angular/universal": [
+        "./modules/universal"
+      ],
+
       "angular2-universal": [
         "./modules/universal/src/node/index.ts"
       ],
@@ -28,8 +44,6 @@
 
   "files": [
     "custom_typings/xhr2.d.ts",
-    "modules/broccoli-prerender/src/index.ts",
-    "modules/broccoli-prerender/src/child_proc.ts",
     "modules/express-engine/src/index.ts",
     "modules/grunt-prerender/tasks/index.ts",
     "modules/gulp-prerender/src/index.ts",
@@ -44,9 +58,9 @@
     "modules/universal-polyfills/src/zone-browser.ts",
     "modules/universal/src/node/index.ts",
     "modules/universal/src/browser/index.ts",
-    "modules/universal/src/global.ts",
-    "modules/universal/src/polyfills.ts",
-    "modules/universal/src/typings.ts",
+    "modules/platform-node/parse5.d.ts",
+    "modules/universal/browser.ts",
+    "modules/universal/node.ts",
     "modules/webpack-prerender/src/index.ts"
   ],
   "compileOnSave": false,

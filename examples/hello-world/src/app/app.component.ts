@@ -7,7 +7,7 @@ import {APP_PROVIDERS as GITHUB_APP_PROVIDERS, Github} from './github';
     Github
   ],
   template: `
-    <div>
+    <div> 
       Hello World
     </div>
     <github></github>
@@ -45,7 +45,7 @@ export class App {
   ngOnInit() {
     setTimeout(() => {
       this.wat = 'yolo' + Math.random();
-    })
+    });
   }
 
 }

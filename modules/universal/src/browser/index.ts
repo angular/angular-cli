@@ -1,4 +1,5 @@
-import * as universal from './browser';
-export * from '../common';
+import * as browserUniversal from './browser';
+
 export * from './browser';
-export default universal;
+
+export default browserUniversal;

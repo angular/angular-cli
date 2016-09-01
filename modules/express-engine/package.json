@@ -7,6 +7,6 @@
     "graceful-fs": "<INHERIT>"
   },
   "peerDependencies": {
-    "angular2-universal": "<INHERIT>"
+    "@angular/universal": "<INHERIT>"
   }
 }

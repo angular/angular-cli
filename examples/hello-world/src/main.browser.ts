@@ -1,21 +1,27 @@
-import {bootstrap} from '@angular/platform-browser-dynamic';
-import {HTTP_PROVIDERS} from '@angular/http';
-import {isBrowser} from '@angular/universal/browser';
-import {prebootClient} from 'preboot';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpModule, JsonpModule } from '@angular/http';
 
-import {App, APP_PROVIDERS} from './app';
+import { isBrowser } from '@angular/universal/browser';
+
+import { App } from './app';
+
+@NgModule({
+  bootstrap: [ App ],
+  declarations: [ App ],
+  imports: [
+    BrowserModule,
+    HttpModule,
+    JsonpModule
+  ]
+})
+export class MainModule {}
+
+export const platform = platformBrowserDynamic();
+
 export function main() {
   console.log('isBrowser', isBrowser);
-
-  // timeout to test preboot
-  setTimeout(function () {
-    return bootstrap(App, [
-      ...APP_PROVIDERS,
-      ...HTTP_PROVIDERS
-    ])
-      .then(() => {
-        let preboot = prebootClient();
-        preboot.complete();
-      });
-  }, 3000);
+  // browserPlatform bootstrap
+  return platform.bootstrapModule(MainModule);
 }

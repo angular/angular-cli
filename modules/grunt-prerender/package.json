@@ -13,6 +13,6 @@
     "angular 2 grunt prerender"
   ],
   "peerDependencies": {
-    "angular2-universal": "<INHERIT>"
+    "@angular/universal": "<INHERIT>"
   }
 }
