@@ -319,7 +319,7 @@ export class NodeJSONPConnection {
         res.on('end', () => {
           var responseJson;
           try {
-            var responseFactory = new Function('JSON_CALLBACK', body);
+            var responseFactory = new Function('JSONP_CALLBACK', body);
             responseFactory(json => {
               responseJson = json;
             });
