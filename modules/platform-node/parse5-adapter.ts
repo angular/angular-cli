@@ -472,7 +472,7 @@ export class Parse5DomAdapter extends DomAdapter {
     return element.attribs && element.attribs.hasOwnProperty(attribute);
   }
   hasAttributeNS(element: any, ns: string, attribute: string): boolean {
-    throw 'not implemented';
+    throw _notImplemented('hasAttributeNS');
   }
   getAttribute(element: any, attribute: string): string {
     return element.attribs && element.attribs.hasOwnProperty(attribute) ?
@@ -480,7 +480,7 @@ export class Parse5DomAdapter extends DomAdapter {
         null;
   }
   getAttributeNS(element: any, ns: string, attribute: string): string {
-    throw 'not implemented';
+    throw _notImplemented('getAttributeNS');
   }
   setAttribute(element: any, attribute: string, value: string) {
     if (attribute) {
@@ -491,7 +491,7 @@ export class Parse5DomAdapter extends DomAdapter {
     }
   }
   setAttributeNS(element: any, ns: string, attribute: string, value: string) {
-    throw 'not implemented';
+    throw _notImplemented('setAttributeNS');
   }
   removeAttribute(element: any, attribute: string) {
     if (attribute) {
@@ -499,7 +499,7 @@ export class Parse5DomAdapter extends DomAdapter {
     }
   }
   removeAttributeNS(element: any, ns: string, name: string) {
-    throw 'not implemented';
+    throw _notImplemented('removeAttributeNS');
   }
   templateAwareRoot(el: any): any {
     return this.isTemplateElement(el) ? this.content(el) : el;
@@ -597,16 +597,18 @@ export class Parse5DomAdapter extends DomAdapter {
   getBaseHref(): string { throw 'not implemented'; }
   resetBaseElement(): void { throw 'not implemented'; }
   getHistory(): any {  /* History */
-    throw 'not implemented';
+    throw _notImplemented('getHistory');
   }
   getLocation(): any { /* Location */
-    throw 'not implemented';
+    throw _notImplemented('getLocation');
   }
   getUserAgent(): string { return 'Fake user agent'; }
   getData(el: any, name: string): string {
     return this.getAttribute(el, 'data-' + name);
   }
-  getComputedStyle(el: any): any { throw 'not implemented'; }
+  getComputedStyle(el: any): any {
+    throw _notImplemented('getComputedStyle');
+  }
   setData(el: any, name: string, value: string) {
     this.setAttribute(el, 'data-' + name, value);
   }
@@ -626,16 +628,27 @@ export class Parse5DomAdapter extends DomAdapter {
   supportsAnimation(): boolean { return true; }
 
   replaceChild(el: any, newNode: any, oldNode: any) {
-    throw new Error('not implemented');
+    throw _notImplemented('replaceChild');
   }
-  parse(templateHtml: string) { throw new Error('not implemented'); }
-  invoke(el: any /*Element*/, methodName: string, args: any[]): any { throw new Error('not implemented'); }
-  getEventKey(event: any): string { throw new Error('not implemented'); }
-
+  parse(templateHtml: string) {
+    throw _notImplemented('Parse5DomAdapter#parse');
+  }
+  invoke(el: any /*Element*/, methodName: string, args: any[]): any {
+    throw _notImplemented('Parse5DomAdapter#invoke');
+  }
+  getEventKey(event: any): string {
+    throw _notImplemented('Parse5DomAdapter#getEventKey');
+  }
   supportsCookies(): boolean { return false; }
-  getCookie(name: string): string { throw new Error('not implemented'); }
-  setCookie(name: string, value: string) { throw new Error('not implemented'); }
-  animate(element: any, keyframes: any[], options: any): any { throw new Error('not implemented'); }
+  getCookie(name: string): string {
+    throw _notImplemented('Parse5DomAdapter#getCookie');
+  }
+  setCookie(name: string, value: string) {
+    throw _notImplemented('Parse5DomAdapter#setCookie');
+  }
+  animate(element: any, keyframes: any[], options: any): any {
+    throw _notImplemented('Parse5DomAdapter#animate');
+  }
 }
 
 // TODO: build a proper list, this one is all the keys of a HTMLInputElement
