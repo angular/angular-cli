@@ -1,6 +1,17 @@
+// PRIVATE
+import {
+  BROWSER_SANITIZATION_PROVIDERS,
+  SharedStylesHost,
+  DomSharedStylesHost,
+  DomRootRenderer,
+  DomEventsPlugin,
+  KeyEventsPlugin,
+  getDOM,
+  HammerGesturesPlugin
+} from './__private_imports__';
+
 import {
   DOCUMENT,
-  BROWSER_SANITIZATION_PROVIDERS,
   EVENT_MANAGER_PLUGINS,
   AnimationDriver,
   EventManager,
@@ -8,27 +19,24 @@ import {
 
 
 // PRIVATE
-import { Parse5DomAdapter } from '@angular/platform-server/src/parse5_adapter';
-import { DomEventsPlugin } from '@angular/platform-browser/src/dom/events/dom_events';
-import { KeyEventsPlugin } from '@angular/platform-browser/src/dom/events/key_events';
-import {
-  HammerGesturesPlugin,
-  HAMMER_GESTURE_CONFIG,
-  HammerGestureConfig
-} from '@angular/platform-browser/src/dom/events/hammer_gestures';
-import { DomSharedStylesHost, SharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
-import { DomRootRenderer } from '@angular/platform-browser/src/dom/dom_renderer';
-import { wtfInit } from '@angular/core/src/profile/wtf_init';
-import { ViewUtils } from '@angular/core/src/linker/view_utils';
-import { APP_ID_RANDOM_PROVIDER } from '@angular/core/src/application_tokens';
-import { SanitizationService } from '@angular/core/src/security';
-import { getDOM } from '@angular/platform-browser/src/dom/dom_adapter';
-import { PlatformRef_ } from '@angular/core/src/application_ref';
+
+// import { DomEventsPlugin } from '@angular/platform-browser/src/dom/events/dom_events';
+// import { KeyEventsPlugin } from '@angular/platform-browser/src/dom/events/key_events';
+// import {
+//   HAMMER_GESTURE_CONFIG,
+//   HammerGestureConfig
+// } from '@angular/platform-browser/src/dom/events/hammer_gestures';
+// import { DomSharedStylesHost, SharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
+// import { DomRootRenderer } from '@angular/platform-browser/src/dom/dom_renderer';
+// import { wtfInit } from '@angular/core/src/profile/wtf_init';
+// import { ViewUtils } from '@angular/core/src/linker/view_utils';
+// import { APP_ID_RANDOM_PROVIDER } from '@angular/core/src/application_tokens';
+// import { PlatformRef_ } from '@angular/core/src/application_ref';
 // PRIVATE
 
 
 import {
-  ExceptionHandler,
+  ErrorHandler,
   RootRenderer,
   Testability,
   ApplicationModule,
@@ -39,13 +47,14 @@ import {
   OpaqueToken,
 
   NgModule,
+  Optional,
+  SkipSelf,
   ComponentRef,
   ApplicationRef,
   PlatformRef,
   NgModuleRef,
-  NgZone
+  NgZone,
 } from '@angular/core';
-
 
 import { CommonModule, PlatformLocation, APP_BASE_HREF } from '@angular/common';
 import { platformCoreDynamic } from '@angular/compiler';
@@ -57,8 +66,9 @@ import { getInlineCode } from 'preboot';
 
 import { NodePlatformLocation } from './node-location';
 import { parseFragment, parseDocument, serializeDocument } from './node-document';
-import { NodeDomRootRenderer_ } from './node-renderer';
+import { NodeDomRootRenderer } from './node-renderer';
 import { NodeSharedStylesHost } from './node-shared-styles-host';
+import { Parse5DomAdapter } from './parse5-adapter';
 
 import {
   provideDocument,
@@ -75,14 +85,9 @@ import {
   BASE_URL,
 } from './tokens';
 
-
-export function _exceptionHandler(): ExceptionHandler {
-  return new ExceptionHandler(getDOM());
+export function _errorHandler(): ErrorHandler {
+  return new ErrorHandler();
 }
-
-// export function _document(): any {
-//   return parseDocument()
-// }
 
 export function _resolveDefaultAnimationDriver(): AnimationDriver {
   if (getDOM().supportsWebAnimation()) {
@@ -341,12 +346,12 @@ export class NodePlatform implements PlatformRef {
 @NgModule({
   providers: [
     BROWSER_SANITIZATION_PROVIDERS,
-    { provide: ExceptionHandler, useFactory: _exceptionHandler, deps: [] },
+    { provide: ErrorHandler, useFactory: _errorHandler, deps: [] },
     // { provide: DOCUMENT, useFactory: _document, deps: [] },
     { provide: EVENT_MANAGER_PLUGINS, useClass: DomEventsPlugin, multi: true },
     { provide: EVENT_MANAGER_PLUGINS, useClass: KeyEventsPlugin, multi: true },
-    { provide: EVENT_MANAGER_PLUGINS, useClass: HammerGesturesPlugin, multi: true },
-    { provide: HAMMER_GESTURE_CONFIG, useClass: HammerGestureConfig },
+    // { provide: EVENT_MANAGER_PLUGINS, useClass: HammerGesturesPlugin, multi: true },
+    // { provide: HAMMER_GESTURE_CONFIG, useClass: HammerGestureConfig },
 
 
     { provide: AnimationDriver, useFactory: _resolveDefaultAnimationDriver },
@@ -354,9 +359,8 @@ export class NodePlatform implements PlatformRef {
     EventManager,
     // ELEMENT_PROBE_PROVIDERS,
 
-
-
-    { provide: DomRootRenderer, useClass: NodeDomRootRenderer_ },
+    NodeDomRootRenderer,
+    { provide: DomRootRenderer, useExisting: NodeDomRootRenderer },
     { provide: RootRenderer, useExisting: DomRootRenderer },
 
     NodeSharedStylesHost,
@@ -417,13 +421,18 @@ export class NodeModule {
       ]
     };
   }
-
+  constructor(@Optional() @SkipSelf() parentModule: NodeModule) {
+    if (parentModule) {
+      throw new Error(
+          `NodeModule has already been loaded. If you need access to common directives such as NgIf and NgFor from a lazy loaded module, import CommonModule instead.`);
+    }
+  }
 }
 
 
 function initParse5Adapter() {
   Parse5DomAdapter.makeCurrent();
-  wtfInit();
+  // wtfInit();
 }
 
 
