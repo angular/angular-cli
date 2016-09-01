@@ -12,7 +12,7 @@
     "inlineSources": true,
   	"outDir": "dist",
     "traceResolution": false,
-    "lib": ["es6", "dom"],
+    "lib": ["es5", "dom"],
     "paths": {
       "@angular/express-engine": [
         "./modules/express-engine"
