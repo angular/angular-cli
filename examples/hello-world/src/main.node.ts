@@ -6,12 +6,19 @@ import {
   platformDynamicNode
 } from '@angular/universal';
 
-import { App } from './app';
+import { App, Wat } from './app';
 
 
 @Component({
   selector: 'another-component',
-  template: 'SERVER-RENDERED'
+  styles: [`
+    h1 {
+      background-color: red;
+    }
+  `],
+  template: `
+    <h1>SERVER-RENDERED</h1>
+  `
 })
 class AnotherComponent {}
 
@@ -28,17 +35,15 @@ export function main(document, config?: any) {
 
   @NgModule({
     bootstrap: [ App, AnotherComponent ],
-    declarations: [ App, AnotherComponent ],
+    declarations: [ App, Wat, AnotherComponent ],
     imports: [
       NodeModule.withConfig({
         document: document,
         originUrl: 'http://localhost:3000',
         baseUrl: '/',
         requestUrl: '/',
-        preboot: {
-          appRoot: ['app'],
-          uglify: true
-        },
+        preboot: false,
+        // preboot: { appRoot: ['app'], uglify: true },
       }),
       NodeHttpModule,
       NodeJsonpModule

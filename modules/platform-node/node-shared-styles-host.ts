@@ -6,8 +6,8 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class SharedStylesHost {
-  protected _styles: string[] = [];
-  protected _stylesSet = new Set<string>();
+  _styles: string[] = [];
+  _stylesSet = new Set<string>();
 
   constructor() {}
 
@@ -30,7 +30,7 @@ export class SharedStylesHost {
 
 @Injectable()
 export class NodeSharedStylesHost extends SharedStylesHost {
-  private _hostNodes = new Set<Node>();
+  _hostNodes = new Set<Node>();
   constructor() {
     super();
   }

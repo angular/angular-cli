@@ -7,7 +7,8 @@ import {
   DomEventsPlugin,
   KeyEventsPlugin,
   getDOM,
-  HammerGesturesPlugin
+  HammerGesturesPlugin,
+  ViewUtils
 } from './__private_imports__';
 
 import {
@@ -152,10 +153,11 @@ export class NodePlatform implements PlatformRef {
         di.set('config', modInjector.get(UNIVERSAL_CONFIG, {}));
         di.set('ApplicationRef', modInjector.get(ApplicationRef));
         di.set('NgZone', modInjector.get(NgZone));
-        di.set('NODE_APP_ID', modInjector.get(NODE_APP_ID, null));
+        // di.set('NODE_APP_ID', modInjector.get(NODE_APP_ID, null));
         di.set('APP_ID', modInjector.get(APP_ID, null));
         di.set('DOCUMENT', modInjector.get(DOCUMENT));
         di.set('DOM', getDOM());
+        di.set('CACHE', {});
         return moduleRef;
       })
       .then((moduleRef: NgModuleRef<T>) => {
@@ -221,11 +223,15 @@ export class NodePlatform implements PlatformRef {
           });
       })
       .then((moduleRef: NgModuleRef<T>) => {
+        let _config = di.get('config');
+        if (typeof _config.preboot === 'boolean' && !_config.preboot) {
+          return moduleRef;
+        }
+
         config.time && console.time('id: ' + config.id + ' preboot: ');
         // parseFragment used
         // getInlineCode used
         let DOM = di.get('DOM');
-        let _config = di.get('config');
         let appRef: ApplicationRef = di.get('ApplicationRef');
         let components = appRef.components;
         let prebootCode;
@@ -275,27 +281,43 @@ export class NodePlatform implements PlatformRef {
       .then((moduleRef: NgModuleRef<T>) => {
         config.time && console.time('id: ' + config.id + ' serialize: ');
         // serializeDocument used
+        // parseFragment used
         let universalOnRendered = di.get('universalOnRendered');
         let document = di.get('DOCUMENT');
         let appRef = di.get('ApplicationRef');
-        let _appId = di.get('APP_ID', null);
-        let appId = di.get('NODE_APP_ID', _appId);
+        let appId = di.get('APP_ID', null);
+        let DOM = di.get('DOM');
+        let CACHE = di.get('CACHE');
+        CACHE.APP_ID = appId;
+
+        let script = parseFragment(''+
+        '<script>\n'+
+        ' try {'+
+          'window.UNIVERSAL_CACHE = (' + JSON.stringify(CACHE) + ') || {}' +
+        '} catch(e) {'+
+        '  console.warn("Angular Universal: There was a problem parsing data from the server")' +
+        '}\n' +
+        '</script>'+
+        '');
+        let el = DOM.createElement('universal-script');
+        for (let i = 0; i < script.childNodes.length; i++) {
+          DOM.appendChild(el, script.childNodes[i]);
+        }
+        DOM.appendChild(document, el);
+
         let html = serializeDocument(document);
-        // let DOM = getDOM();
-        // appRef.components.map((compRef: ComponentRef<any>) => {
-        //   DOM.setAttribute(compRef.location.nativeElement, 'data-universal-app-id', appId);
-        // });
 
         document = null;
+        di.clear();
 
         appRef.ngOnDestroy();
-        moduleRef.destroy();
-
         appRef = null;
+
+        moduleRef.destroy();
         moduleRef = null;
-        di.clear();
+
         config.time && console.timeEnd('id: ' + config.id + ' serialize: ');
-        html = html.replace(new RegExp(_appId, 'gi'), appId);
+        // html = html.replace(new RegExp(_appId, 'gi'), appId);
 
         universalOnRendered(html);
 
@@ -343,11 +365,44 @@ export class NodePlatform implements PlatformRef {
 
 }
 
+
+
+// @NgModule({
+//   providers: [
+//     ApplicationRef_,
+//     {provide: ApplicationRef, useExisting: ApplicationRef_},
+//     ApplicationInitStatus,
+//     Compiler,
+//     APP_ID_RANDOM_PROVIDER,
+//     ViewUtils,
+//     {provide: IterableDiffers, useFactory: _iterableDiffersFactory},
+//     {provide: KeyValueDiffers, useFactory: _keyValueDiffersFactory},
+//     {provide: LOCALE_ID, useValue: 'en-US'},
+//   ]
+// })
+// export class UniversalApplicationModule {
+// }
+
+// export class UniversalViewUtils extends ViewUtils {
+//   constructor() {
+
+//   }
+//   createRenderComponentType(
+//       templateUrl: string, slotCount: number, encapsulation: ViewEncapsulation,
+//       styles: Array<string|any[]>, animations: {[key: string]: Function}): RenderComponentType {
+//     return new RenderComponentType(
+//         `${this._appId}-${this._nextCompTypeId++}`, templateUrl, slotCount, encapsulation, styles,
+//         animations);
+//   }
+// }
+
 @NgModule({
   providers: [
     BROWSER_SANITIZATION_PROVIDERS,
     { provide: ErrorHandler, useFactory: _errorHandler, deps: [] },
     // { provide: DOCUMENT, useFactory: _document, deps: [] },
+
+    // TOdO(gdi2290): NodeDomEventsPlugin
     { provide: EVENT_MANAGER_PLUGINS, useClass: DomEventsPlugin, multi: true },
     { provide: EVENT_MANAGER_PLUGINS, useClass: KeyEventsPlugin, multi: true },
     // { provide: EVENT_MANAGER_PLUGINS, useClass: HammerGesturesPlugin, multi: true },
@@ -369,6 +424,8 @@ export class NodePlatform implements PlatformRef {
 
 
     { provide: PlatformLocation, useClass: NodePlatformLocation },
+
+    // { provide: ViewUtils, useClass: },
   ],
   exports: [  CommonModule, ApplicationModule  ]
 })
@@ -416,7 +473,7 @@ export class NodeModule {
       providers: [
         {provide: UNIVERSAL_CONFIG, useValue: config},
         provideDocument(doc),
-        provideUniversalAppId(config.appId),
+        // provideUniversalAppId(config.appId),
         ...providers,
       ]
     };
