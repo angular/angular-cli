@@ -31,7 +31,7 @@ var documentHtml = `
   </html>
 `;
 
-var arr = new Array(3).fill(null); // var arr = new Array(20).fill(null);
+var arr = new Array(100).fill(null); // var arr = new Array(20).fill(null);
 
 function createApp(num) {
   return main(documentHtml, {id: num, time: true});

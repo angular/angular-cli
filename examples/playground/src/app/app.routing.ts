@@ -16,7 +16,7 @@ interface SystemJS {
 // Temporary placeholder ^
 
 
-const crisisCenterRoutes: Routes = [
+const crisisCenterRoutes = [
   {
     path: '',
     redirectTo: '/heroes',
@@ -28,7 +28,7 @@ const crisisCenterRoutes: Routes = [
   }
 ];
 
-const appRoutes: Routes = [
+const appRoutes = [
   ...loginRoutes,
   ...crisisCenterRoutes
 ];
@@ -38,4 +38,4 @@ export const appRoutingProviders: any[] = [
   CanDeactivateGuard
 ];
 
-export const routing: ModuleWithProviders = RouterModule.forRoot(appRoutes);
+export const routing = RouterModule.forRoot(appRoutes);
