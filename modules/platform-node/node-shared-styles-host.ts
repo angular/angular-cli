@@ -1,14 +1,36 @@
-import { Injectable } from '@angular/core';
-import { SharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
+// PRIVATE
+import { getDOM } from './__private_imports__';
+// PRIVATE
 
-// PRIVATE
-import { getDOM } from '@angular/platform-browser/src/dom/dom_adapter';
-// PRIVATE
+import { Injectable } from '@angular/core';
+
+@Injectable()
+export class SharedStylesHost {
+  protected _styles: string[] = [];
+  protected _stylesSet = new Set<string>();
+
+  constructor() {}
+
+  addStyles(styles: string[]) {
+    var additions: any[] /** TODO #9100 */ = [];
+    styles.forEach(style => {
+      if (!this._stylesSet.has(style)) {
+        this._stylesSet.add(style);
+        this._styles.push(style);
+        additions.push(style);
+      }
+    });
+    this.onStylesAdded(additions);
+  }
+
+  onStylesAdded(additions: string[]) {}
+
+  getAllStyles(): string[] { return this._styles; }
+}
 
 @Injectable()
 export class NodeSharedStylesHost extends SharedStylesHost {
   private _hostNodes = new Set<Node>();
-  private _styles: any;
   constructor() {
     super();
   }
@@ -27,8 +49,8 @@ export class NodeSharedStylesHost extends SharedStylesHost {
   }
 
   private _addStylesToHost(styles: string[], host: Node) {
-    for (var i = 0; i < styles.length; i++) {
-      var style = styles[i];
+    for (let i = 0; i < styles.length; i++) {
+      let style = styles[i];
       getDOM().appendChild(host, getDOM().createStyleElement(style));
     }
   }
