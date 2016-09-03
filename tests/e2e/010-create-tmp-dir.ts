@@ -1,7 +1,8 @@
 import {existsSync} from 'fs';
 import {join} from 'path';
 
-import {isMobileTest, ng} from './utils';
+import {isMobileTest, ng, existsOrFail} from './utils';
+import {oneLine} from 'common-tags';
 
 
 const temp = require('temp');
@@ -9,15 +10,23 @@ const temp = require('temp');
 
 export default function() {
   // Get to a temporary directory.
-  const tempRoot = temp.mkdirSync('angular-cli-e2e');
+  let tempRoot = temp.mkdirSync('angular-cli-e2e');
   console.log(`  Using "${tempRoot}" as temporary directory for a new project.`);
   process.chdir(tempRoot);
+  // Update tempRoot in case of symlinks
+  tempRoot = process.cwd();
 
   // Setup a new project.
-  return ng('new', 'test-project', '--link-cli', isMobileTest() ? '--mobile' : '')
+  return ng('new', 'test-project', '--link-cli', isMobileTest() ? '--mobile' : undefined)
+    .then(() => existsOrFail(join(process.cwd(), 'test-project')))
     .then(() => {
-      if (!existsSync(join(process.cwd(), 'test-project'))) {
-        throw new Error('Project was not created properly.');
+      process.chdir('./test-project');
+
+      if (process.cwd() != join(tempRoot, 'test-project')) {
+        throw new Error(oneLine`
+          Path isn't properly set. Expected "${join(tempRoot, 'test-project')}", got
+          "${process.cwd()}".
+        `);
       }
     });
 }

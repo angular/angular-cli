@@ -1,3 +1,4 @@
+"use strict";
 /**
  * This file is ran using the command line, not using Jasmine / Mocha.
  */
@@ -5,159 +6,51 @@
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
-
+const {blue, bold, green, red} = chalk;
 
 
 require('../lib/bootstrap-local');
 
-/** Load all the files from the e2e, filter and sort them and build a promise of their default export. */
+
+let currentFileName = null;
+/**
+ * Load all the files from the e2e, filter and sort them and build a promise of their default
+ * export.
+ */
 fs.readdirSync(path.join(__dirname, 'e2e'))
   .filter(name => name.match(/^\d\d\d/))
   .sort()
   .reduce((previous, fileName) => {
       return previous.then(() => {
         const source = fileName.replace(/\.ts$/, '');
-        console.log(chalk.green('Running "') + chalk.bold(chalk.blue(fileName)) + chalk.green('"...'));
-        const fn = require(`./e2e/${source}`);
+        currentFileName = source;
+        console.log('\n');
+        console.log(green(`Running "${bold(blue(fileName))}"...`));
 
+        const fn = require(`./e2e/${source}`);
         return (fn.default || fn)();
       });
     },
     Promise.resolve())
   .then(
-    () => console.log(chalk.green('Done.')),
-    (err) => console.error(chalk.red(err.message))
+    () => console.log(green('Done.')),
+    (err) => {
+      console.log('\n');
+      console.error(red(`Test "${currentFileName}" failed...`));
+      console.error(red(err.message));
+      console.error(red(err.stack));
+      process.exit(1);
+    }
   );
 
-/*
-  })
-  .then(() => {
-    process.chdir(path.join(process.cwd(), 'test-project'));
-  })
-  .then(() => ng('build', '--prod'))
-  .then(() => {
-    if (!fs.existsSync(path.join(process.cwd(), 'dist'))) {
-      throw new Error('Project was not built properly.');
-    }
-
-    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-
-    // Check for cache busting hash script src
-    if (!indexHtml.match(/main\.[0-9a-f]{20}\.bundle\.js/)) {
-      throw new Error('index.html does not refer to main.bundle.js');
-    }
-
-    // Also does not create new things in GIT.
-    return execOrFail('git', 'status', '--porcelain')
-      .then((stdout: string) => {
-        if (stdout != '') {
-          throw new Error('The project was changed.');
-        }
-      })
-  })
-  .then(
-    () => process.exit(0),
-    (err: Error) => {
-      console.error(err);
-      console.error(err.stack);
-      process.exit(1);
-    });
-
-
 /**
-
-function existsSync(path) {
-  try {
-    fs.accessSync(path);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
+ *
 const ngBin = `node ${path.join(process.cwd(), 'bin', 'ng')}`;
 const it_mobile = isMobileTest() ? it : function() {};
 const it_not_mobile = isMobileTest() ? function() {} : it;
 
-describe('Basic end-to-end Workflow', function () {
-  var testArgs = ['test', '--watch', 'false'];
-
-  it('Installs angular-cli correctly', function () {
-    this.timeout(300000);
-
-    sh.exec('npm link', { silent: true });
-
-    return tmp.setup('./tmp').then(function () {
-      process.chdir('./tmp');
-      expect(existsSync(path.join(process.cwd(), 'bin', 'ng')));
-    });
-  });
-
-
-  it('Can create new project using `ng new test-project`', function () {
-    this.timeout(4200000);
-    let args = ['--link-cli'];
-    // If testing in the mobile matrix on Travis, create project with mobile flag
-    if (isMobileTest()) {
-      args = args.concat(['--mobile']);
-    }
-    return ng(['new', 'test-project'].concat(args)).then(function () {
-      expect(existsSync(path.join(root, 'test-project')));
-    });
-  });
-
-  it('Can change current working directory to `test-project`', function () {
-    process.chdir(path.join(root, 'test-project'));
-    expect(path.basename(process.cwd())).to.equal('test-project');
-  });
-
-  it('Supports production builds via `ng build -prod`', function() {
-    this.timeout(420000);
-
-    // Can't use the `ng` helper because somewhere the environment gets
-    // stuck to the first build done
-    sh.exec(`${ngBin} build -prod`);
-    expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-    // Check for cache busting hash script src
-    expect(indexHtml).to.match(/main\.[0-9a-f]{20}\.bundle\.js/);
-    // Also does not create new things in GIT.
-    expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
-  });
-
-  it_mobile('Enables mobile-specific production features in prod builds', () => {
-    let indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-    // Service Worker
-    expect(indexHtml).to.match(/sw-install\.[0-9a-f]{20}\.bundle\.js/);
-    expect(existsSync(path.join(process.cwd(), 'dist/sw.js' ))).to.be.equal(true);
-
-    // App Manifest
-    expect(indexHtml.includes('<link rel="manifest" href="/manifest.webapp">')).to.be.equal(true);
-    expect(existsSync(path.join(process.cwd(), 'dist/manifest.webapp'))).to.be.equal(true);
-
-    // Icons folder
-    expect(existsSync(path.join(process.cwd(), 'dist/icons'))).to.be.equal(true);
-
-    // Prerender content
-    expect(indexHtml).to.match(/app works!/);
-  });
-
-  it('Supports build config file replacement', function() {
-    this.timeout(420000);
-
-    sh.exec(`${ngBin} build --env=prod`);
-    var mainBundlePath = path.join(process.cwd(), 'dist', 'main.bundle.js');
-    var mainBundleContent = fs.readFileSync(mainBundlePath, { encoding: 'utf8' });
-
-    expect(mainBundleContent.includes('production: true')).to.be.equal(true);
-  });
-
   it('Build fails on invalid build target', function (done) {
     this.timeout(420000);
-    sh.exec(`${ngBin} build --target=potato`, (code) => {
-      expect(code).to.not.equal(0);
-      done();
-    });
   });
 
   it('Build fails on invalid environment file', function (done) {
