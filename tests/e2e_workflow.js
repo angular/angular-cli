@@ -2,54 +2,36 @@
  * This file is ran using the command line, not using Jasmine / Mocha.
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import {spawn} from 'child_process';
-import * as chalk from 'chalk';
-import {oneLine, stripIndents} from 'common-tags';
+const fs = require('fs');
+const path = require('path');
+const chalk = require('chalk');
 
-const shelljs = require('shelljs');
-const temp = require('temp');
-const treeKill = require('tree-kill');
-const express = require('express');
-const http = require('http');
-const request = require('request');
 
+
+require('../lib/bootstrap-local');
 
 /** Load all the files from the e2e, filter and sort them and build a promise of their default export. */
 fs.readdirSync(path.join(__dirname, 'e2e'))
-    .filter(name => name.match(/^\d\d\d/))
-    .sort()
-    .reduce((previous: Promise<void>, fileName: string) => {
-        return previous.then(() => {
-          console.log(chalk.green(`Running "${fileName}"...`));
-          return require(`./e2e/${fileName.replace(/\.ts$/)}`);
-        });
-      },
-      Promise.resolve());
+  .filter(name => name.match(/^\d\d\d/))
+  .sort()
+  .reduce((previous, fileName) => {
+      return previous.then(() => {
+        const source = fileName.replace(/\.ts$/, '');
+        console.log(chalk.green('Running "') + chalk.bold(chalk.blue(fileName)) + chalk.green('"...'));
+        const fn = require(`./e2e/${source}`);
+
+        return (fn.default || fn)();
+      });
+    },
+    Promise.resolve())
+  .then(
+    () => console.log(chalk.green('Done.')),
+    (err) => console.error(chalk.red(err.message))
+  );
 
 /*
-Promise.resolve()
-  .then(() => {
-    // Setup to use the local angular-cli copy.
-    process.chdir(path.join(__dirname, '..'));
-    return npm('link');
-  })
-  // Validate it's linked properly.
-  .then(() => execOrFail('which', 'ng'))
-  .then(() => {
-    // Get to a temporary directory.
-    const tempRoot = temp.mkdirSync('angular-cli-e2e');
-    console.log(chalk.green(`Using "${tempRoot}" as temporary directory for a new project.`));
-    process.chdir(tempRoot);
-
-    // Setup a new project.
-    return ng('new', 'test-project', '--link-cli', isMobileTest() ? '--mobile' : '');
   })
   .then(() => {
-    if (!fs.existsSync(path.join(process.cwd(), 'test-project'))) {
-      throw new Error('Project was not created properly.');
-    }
     process.chdir(path.join(process.cwd(), 'test-project'));
   })
   .then(() => ng('build', '--prod'))

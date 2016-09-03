@@ -1,11 +1,8 @@
 import {spawn} from 'child_process';
-import * as chalk from 'chalk';
-import {oneLine, stripIndents} from 'common-tags';
+import {blue, white, yellow} from 'chalk';
+
 
 const temp = require('temp');
-const express = require('express');
-const http = require('http');
-const request = require('request');
 
 
 export function isMobileTest() {
@@ -16,19 +13,22 @@ export function isMobileTest() {
 export function execOrFail(cmd: string, ...args: string[]): Promise<string> {
   let stdout = '';
   const cwd = process.cwd();
-  console.log(chalk.yellow(stripIndents`
-    Running "${cmd} ${args.join(' ')}"...
-    CWD: ${cwd}
-  `));
+  console.log(white(
+    `  ==========================================================================================`
+  ));
+  console.log(blue(`  Running "${cmd} ${args.join(' ')}"...`));
+  console.log(blue(`  CWD: ${cwd}`));
 
   const npmProcess = spawn(cmd, args, {cwd, detached: true});
   npmProcess.stdout.on('data', (data: Buffer) => {
-    const str = data.toString('utf-8');
-    stdout += str;
-    process.stdout.write(chalk.reset('   ' + str.split(/\n/g).join('\n   ').replace(/ +$/, '')));
+    data.toString('utf-8')
+      .split(/[\n\r]+/)
+      .forEach(line => console.log(white('  ' + line)));
   });
   npmProcess.stderr.on('data', (data: Buffer) => {
-    process.stderr.write(chalk.red('   ' + data.toString().split(/\n/g).join('\n   ')));
+    data.toString('utf-8')
+      .split(/[\n\r]+/)
+      .forEach(line => console.error(yellow('  ' + line)));
   });
 
   return new Promise((resolve, reject) => {
@@ -36,9 +36,7 @@ export function execOrFail(cmd: string, ...args: string[]): Promise<string> {
       if (code == 0) {
         resolve(stdout);
       } else {
-        reject(new Error(oneLine`
-          Running "${cmd} ${args.join(' ')}" returned error code ${code}.
-        `));
+        reject(new Error(`Running "${cmd} ${args.join(' ')}" returned error code ${code}.`));
       }
     });
   });
@@ -53,4 +51,3 @@ export function ng(...args: string[]) {
 export function npm(...args: string[]) {
   return execOrFail('npm', ...args);
 }
-
