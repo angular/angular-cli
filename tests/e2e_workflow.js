@@ -13,6 +13,7 @@ require('../lib/bootstrap-local');
 
 
 let currentFileName = null;
+let lastStart = null;
 /**
  * Load all the files from the e2e, filter and sort them and build a promise of their default
  * export.
@@ -24,9 +25,16 @@ fs.readdirSync(path.join(__dirname, 'e2e'))
       return previous.then(() => {
         const source = fileName.replace(/\.ts$/, '');
         currentFileName = source;
-        console.log('\n');
-        console.log(green(`Running "${bold(blue(fileName))}"...`));
 
+        if (lastStart) {
+          // Round to hundredth of a second.
+          const t = Math.round((Date.now() - lastStart) / 10) / 100;
+          console.log('');
+          console.log(green('Last step took "') + bold(blue(t)) + green('s...'));
+        }
+        console.log(green('Running "' + bold(blue(fileName)) + '"...'));
+
+        lastStart = +new Date();
         const fn = require(`./e2e/${source}`);
         return (fn.default || fn)();
       });
@@ -45,22 +53,6 @@ fs.readdirSync(path.join(__dirname, 'e2e'))
 
 /**
  *
-const ngBin = `node ${path.join(process.cwd(), 'bin', 'ng')}`;
-const it_mobile = isMobileTest() ? it : function() {};
-const it_not_mobile = isMobileTest() ? function() {} : it;
-
-  it('Build fails on invalid build target', function (done) {
-    this.timeout(420000);
-  });
-
-  it('Build fails on invalid environment file', function (done) {
-    this.timeout(420000);
-    sh.exec(`${ngBin} build --environment=potato`, (code) => {
-      expect(code).to.not.equal(0);
-      done();
-    });
-  });
-
   it('Supports base tag modifications via `ng build --base-href`', function() {
     this.timeout(420000);
 
