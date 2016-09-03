@@ -7,7 +7,8 @@ module.exports = {
   description: '',
 
   availableOptions: [
-    { name: 'spec', type: Boolean, default: false }
+    { name: 'spec', type: Boolean, default: false },
+    { name: 'routing', type: Boolean, default: false }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -21,7 +22,8 @@ module.exports = {
   locals: function (options) {
     return {
       dynamicPath: this.dynamicPath.dir,
-      spec: options.spec
+      spec: options.spec,
+      routing: options.routing
     };
   },
 
@@ -30,6 +32,9 @@ module.exports = {
 
     if (!this.options || !this.options.spec) {
       fileList = fileList.filter(p => p.indexOf('__name__.module.spec.ts') < 0);
+    }
+    if (this.options && !this.options.routing) {
+      fileList = fileList.filter(p => p.indexOf('__name__.routing.ts') < 0);
     }
 
     return fileList;
