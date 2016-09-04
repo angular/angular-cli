@@ -2,13 +2,22 @@ var path = require('path');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
+const findParentModule = require('../../utilities/find-parent-module');
 
 module.exports = {
   description: '',
-  
+
   availableOptions: [
     { name: 'flat', type: Boolean, default: true }
   ],
+
+  beforeInstall: function() {
+    try {
+      this.pathToModule = findParentModule(this.project, this.dynamicPath.dir);
+    } catch(e) {
+      throw `Error locating module for declaration\n\t${e}`;
+    }
+  },
 
   normalizeEntityName: function (entityName) {
     var parsedPath = dynamicPathParser(this.project, entityName);
@@ -18,7 +27,7 @@ module.exports = {
   },
 
   locals: function (options) {
-    return { 
+    return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat
     };
@@ -37,14 +46,13 @@ module.exports = {
       }
     };
   },
-  
+
   afterInstall: function(options) {
     if (options.dryRun) {
       return;
     }
 
     const returns = [];
-    const modulePath = path.join(this.project.root, this.dynamicPath.appRoot, 'app.module.ts');
     const className = stringUtils.classify(`${options.entity.name}Pipe`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.pipe`);
     const componentDir = path.relative(this.dynamicPath.appRoot, this.generatePath);
@@ -52,7 +60,7 @@ module.exports = {
 
     if (!options['skip-import']) {
       returns.push(
-        astUtils.addComponentToModule(modulePath, className, importPath)
+        astUtils.addComponentToModule(this.pathToModule, className, importPath)
           .then(change => change.apply()));
     }
 
