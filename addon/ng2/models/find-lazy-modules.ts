@@ -35,7 +35,8 @@ export function findLoadChildren(tsFilePath: string): string[] {
       })
       // Get the full text of the initializer.
       .map((node: ts.PropertyAssignment) => {
-        return JSON.parse(node.initializer.getText(source)); // tslint:disable-line
+        let text = node.initializer.getText(source).replace(/'/g, '"');
+        return JSON.parse(text);
       });
 
   return nodes
