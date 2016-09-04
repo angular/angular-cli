@@ -9,7 +9,7 @@ module.exports = {
   availableOptions: [
     { name: 'spec', type: Boolean, default: false }
   ],
-  
+
   normalizeEntityName: function (entityName) {
     this.entityName = entityName;
     var parsedPath = dynamicPathParser(this.project, entityName);
@@ -19,7 +19,7 @@ module.exports = {
   },
 
   locals: function (options) {
-    return { 
+    return {
       dynamicPath: this.dynamicPath.dir,
       spec: options.spec
     };
@@ -40,8 +40,8 @@ module.exports = {
     this.dasherizedModuleName = options.dasherizedModuleName;
     return {
       __path__: () => {
-        this.generatePath = this.dynamicPath.dir 
-          + path.sep 
+        this.generatePath = this.dynamicPath.dir
+          + path.sep
           + options.dasherizedModuleName;
         return this.generatePath;
       }
@@ -49,8 +49,8 @@ module.exports = {
   },
 
   afterInstall: function (options) {
-    options.entity.name = this.entityName;
-    options.flat = false;
+    options.entity.name = path.join(this.entityName, this.dasherizedModuleName);
+    options.flat = true;
     options.route = false;
     options.inlineTemplate = false;
     options.inlineStyle = false;

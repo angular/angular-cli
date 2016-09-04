@@ -59,6 +59,5 @@ export interface CliConfig {
     defaults?: {
         styleExt?: string;
         prefixInterfaces?: boolean;
-        lazyRoutePrefix?: string;
     };
 }

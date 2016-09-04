@@ -39,7 +39,6 @@
   },
   "defaults": {
     "styleExt": "<%= styleExt %>",
-    "prefixInterfaces": false,
-    "lazyRoutePrefix": "+"
+    "prefixInterfaces": false
   }
 }
