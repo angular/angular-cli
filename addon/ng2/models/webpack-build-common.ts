@@ -37,6 +37,7 @@ export function getWebpackCommonConfig(
     devtool: 'source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
+      mainFields: ['browser', 'main'],
       root: appRoot
     },
     context: path.resolve(__dirname, './'),
