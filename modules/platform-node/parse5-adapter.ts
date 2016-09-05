@@ -516,17 +516,29 @@ export class Parse5DomAdapter extends DomAdapter {
     newDoc['_window'] = StringMapWrapper.create();
     return newDoc;
   }
+  // UNIVERSAL FIX
   defaultDoc(): any { /* Document */
-    if (defDoc === null) {
-      defDoc = this.createHtmlDocument();
-    }
-    return defDoc;
+    // if (defDoc === null) {
+    //   defDoc = this.createHtmlDocument();
+    // }
+    return {documentMode: false};
   }
+  // UNIVERSAL FIX
   getBoundingClientRect(el: any): any {
     return {left: 0, top: 0, width: 0, height: 0};
   }
-  getTitle(): string { return this.defaultDoc().title || ''; }
-  setTitle(newTitle: string) { this.defaultDoc().title = newTitle; }
+  // UNIVERSAL FIX
+  getTitle(): string {
+    throw _notImplemented('getTitle');
+    // return this.defaultDoc().title || '';
+  }
+  // UNIVERSAL FIX
+  // UNIVERSAL FIX
+  setTitle(newTitle: string) {
+    throw _notImplemented('setTitle');
+    // this.defaultDoc().title = newTitle;
+  }
+  // UNIVERSAL FIX
   isTemplateElement(el: any): boolean {
     return this.isElementNode(el) && this.tagName(el) === 'template';
   }
@@ -585,17 +597,24 @@ export class Parse5DomAdapter extends DomAdapter {
   }
   supportsDOMEvents(): boolean { return false; }
   supportsNativeShadowDOM(): boolean { return false; }
-  getGlobalEventTarget(target: string): any {
-    if (target == 'window') {
-      return (<any>this.defaultDoc())._window;
-    } else if (target == 'document') {
-      return this.defaultDoc();
-    } else if (target == 'body') {
-      return this.defaultDoc().body;
+  // UNIVERSAL FIX
+  getGlobalEventTargetWithDocument(target: string, window; any, document: any, body; any) {
+    switch(target) {
+      case 'window': return window;
+      case 'document': return document;
+      case 'body': return body;
     }
   }
-  getBaseHref(): string { throw 'not implemented'; }
-  resetBaseElement(): void { throw 'not implemented'; }
+  // UNIVERSAL FIX
+  getGlobalEventTarget(target: string): any {
+    throw _notImplemented('getGlobalEventTarget');
+  }
+  getBaseHref(): string {
+    throw _notImplemented('getBaseHref');
+  }
+  resetBaseElement(): void {
+    throw _notImplemented('resetBaseElement');
+  }
   getHistory(): any {  /* History */
     throw _notImplemented('getHistory');
   }
