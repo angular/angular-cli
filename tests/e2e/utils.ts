@@ -127,7 +127,7 @@ export function ng(...args: string[]) {
   return _exec({}, 'ng', args)
 }
 export function silentNg(...args: string[]) {
-  return _exec({ silent: false }, 'ng', args);
+  return _exec({ silent: true }, 'ng', args);
 }
 
 

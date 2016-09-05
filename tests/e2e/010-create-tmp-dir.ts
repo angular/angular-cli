@@ -1,4 +1,3 @@
-import {existsSync} from 'fs';
 import {join} from 'path';
 
 import {isMobileTest, ng, existsOrFail} from './utils';

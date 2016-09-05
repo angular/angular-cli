@@ -2,14 +2,20 @@
 /**
  * This file is ran using the command line, not using Jasmine / Mocha.
  */
-
-const fs = require('fs');
-const path = require('path');
 const chalk = require('chalk');
-const {blue, bold, green, red} = chalk;
+const fs = require('fs');
+const minimist = require('minimist');
+const path = require('path');
+const blue = chalk.blue;
+const bold = chalk.bold;
+const green = chalk.green;
+const red = chalk.red;
 
 
 require('../lib/bootstrap-local');
+
+
+const argv = minimist(process.argv.slice(2));
 
 
 let currentFileName = null;
@@ -30,7 +36,7 @@ fs.readdirSync(path.join(__dirname, 'e2e'))
           // Round to hundredth of a second.
           const t = Math.round((Date.now() - lastStart) / 10) / 100;
           console.log('');
-          console.log(green('Last step took "') + bold(blue(t)) + green('s...'));
+          console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
         }
         console.log(green('Running "' + bold(blue(fileName)) + '"...'));
 
@@ -47,6 +53,14 @@ fs.readdirSync(path.join(__dirname, 'e2e'))
       console.error(red(`Test "${currentFileName}" failed...`));
       console.error(red(err.message));
       console.error(red(err.stack));
+
+      if (argv.debug) {
+        console.log('Will loop forever while you debug... CTRL-C to quit.');
+        while (1) {
+          // That's right!
+        }
+      }
+
       process.exit(1);
     }
   );
