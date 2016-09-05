@@ -33,12 +33,11 @@ describe('find-lazy-module', () => {
         'moduleD.ts': '',
         'app': { '+workspace': { '+settings': { 'settings.module.ts': '' } } }
       }
-    })
+    });
   });
   afterEach(() => mockFs.restore());
 
   it('works', () => {
-    debugger;
     expect(findLazyModules('project-root')).to.eql([
       'moduleA',
       'moduleB',
