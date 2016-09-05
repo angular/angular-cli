@@ -95,14 +95,12 @@ export function insertAfterLastOccurrence(nodes: ts.Node[], toInsert: string,
 
 
 export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
+  console.log(10, node.kind, (node as any).text);
   if (node.kind == ts.SyntaxKind.Identifier) {
-    return (<ts.Identifier>node).text;
+    return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
-    try {
-      return JSON.parse(node.getFullText(source));
-    } catch (e) {
-      return null;
-    }
+    const literal = node as ts.StringLiteral;
+    return literal.text;
   } else {
     return null;
   }
