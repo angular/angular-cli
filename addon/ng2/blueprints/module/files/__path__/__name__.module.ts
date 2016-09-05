@@ -1,15 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { routing } from './<%= dasherizedModuleName %>.routes';
-import { <%= classifiedModuleName %>Component } from './<%= dasherizedModuleName %>.component';
 
 @NgModule({
   imports: [
-    CommonModule,
-    routing
+    CommonModule
   ],
-  declarations: [
-    <%= classifiedModuleName %>Component
-  ]
+  declarations: []
 })
 export class <%= classifiedModuleName %>Module { }
