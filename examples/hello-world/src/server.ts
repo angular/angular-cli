@@ -20,6 +20,7 @@ var documentHtml = `
 
     <base href="/">
   <body>
+    <button onclick="bootstrap()">Bootstrap Client</button>
 
     <app>
       Loading...

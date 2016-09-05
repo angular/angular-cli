@@ -51,6 +51,8 @@ app.get('/', function (req, res, next) {
       <base href="/">
     <body>
 
+      <button onclick="bootstrap()">Bootstrap Client</button>
+
       <app>
         Loading...
       </app>

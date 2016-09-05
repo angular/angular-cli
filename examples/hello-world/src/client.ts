@@ -7,7 +7,7 @@ import {main} from './main.browser';
 
 
 // setTimeout(function () {
-(<any>window).boot = function() {
+(<any>window).bootstrap = function() {
 // document.addEventListener('DOMContentLoaded', () => {
   main().then(() => {
     console.timeEnd('boot');
