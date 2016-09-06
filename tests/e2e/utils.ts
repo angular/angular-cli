@@ -16,6 +16,19 @@ export function readFile(fileName: string) {
 }
 
 
+export function writeFile(fileName: string, content: string) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(fileName, content, (err: any) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+
 export function expectFileToExist(fileName: string) {
   return new Promise((resolve, reject) => {
     fs.exists(fileName, (exist) => {
@@ -46,7 +59,9 @@ export function fileMatchesOrFail(fileName: string, regEx: RegExp | string) {
 
 
 export function gitClean() {
-  return git('clean', '-df');
+  return git('clean', '-df')
+    .then(() => git('reset', '--hard'))
+    .then(() => expectGitToBeClean());
 }
 
 
@@ -72,10 +87,18 @@ export function isMobileTest() {
   return !!process.env['MOBILE_TEST'];
 }
 
+export function wait(msecs: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, msecs);
+  });
+}
+
 
 interface ExecOptions {
   silent?: boolean;
 }
+
+let processes = [];
 
 function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<string> {
   let stdout = '';
@@ -109,10 +132,14 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
       .forEach(line => console.error(yellow('  ' + line)));
   });
 
+  processes.push(npmProcess);
+
   // Create the error here so the stack shows who called this function.
   const err = new Error(`Running "${cmd} ${args.join(' ')}" returned error code `);
   return new Promise((resolve, reject) => {
     npmProcess.on('close', (code: number) => {
+      processes = processes.filter(p => p !== npmProcess);
+
       if (code == 0) {
         resolve(stdout);
       } else {
@@ -123,6 +150,10 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   });
 }
 
+export function killAllProcesses() {
+  processes.forEach(process => process.kill());
+  processes = [];
+}
 
 export function execOrFail(cmd: string, ...args: string[]) {
   return _exec({}, cmd, args);

@@ -77,14 +77,6 @@ allTests.reduce((previous, relativeName) => {
 /**
  *
   it_mobile('Does not include mobile prod features', () => {
-    let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-    // Service Worker
-    expect(index.includes('if (\'serviceWorker\' in navigator) {')).to.be.equal(false);
-    expect(existsSync(path.join(process.cwd(), 'dist/worker.js'))).to.be.equal(false);
-
-    // Asynchronous bundle
-    expect(index.includes('<script src="/app-concat.js" async></script>')).to.be.equal(false);
-    expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(false);
   });
 
   it('Make sure the correct coverage folder is created', function () {
@@ -359,88 +351,6 @@ allTests.reduce((previous, relativeName) => {
 
     // restore config
     fs.writeFileSync(configFile, originalConfigContent, 'utf8');
-  });
-
-  it('Serve and run e2e tests on dev environment', function () {
-    this.timeout(240000);
-
-    var ngServePid;
-
-    function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve`, { maxBuffer: 500*1024 });
-      var startedProtractor = false;
-      ngServePid = serveProcess.pid;
-
-      serveProcess.stdout.on('data', (data) => {
-        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
-          startedProtractor = true;
-          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
-            if (error !== null) {
-              reject(stderr)
-            } else {
-              resolve();
-            }
-          });
-        }
-      });
-
-      serveProcess.stderr.on('data', (data) => {
-        reject(data);
-      });
-      serveProcess.on('close', (code) => {
-        code === 0 ? resolve() : reject('ng serve command closed with error')
-      });
-    }
-
-    return new Promise(executor)
-      .then(() => {
-        if (ngServePid) treeKill(ngServePid);
-      })
-      .catch((msg) => {
-        if (ngServePid) treeKill(ngServePid);
-        throw new Error(msg);
-      });
-  });
-
-  it('Serve and run e2e tests on prod environment', function () {
-    this.timeout(240000);
-
-    var ngServePid;
-
-    function executor(resolve, reject) {
-      var serveProcess = child_process.exec(`${ngBin} serve -e=prod`, { maxBuffer: 500*1024 });
-      var startedProtractor = false;
-      ngServePid = serveProcess.pid;
-
-      serveProcess.stdout.on('data', (data) => {
-        if (/webpack: bundle is now VALID/.test(data.toString('utf-8')) && !startedProtractor) {
-          startedProtractor = true;
-          child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
-            if (error !== null) {
-              reject(stderr)
-            } else {
-              resolve();
-            }
-          });
-        }
-      });
-
-      serveProcess.stderr.on('data', (data) => {
-        reject(data);
-      });
-      serveProcess.on('close', (code) => {
-        code === 0 ? resolve() : reject('ng serve command closed with error')
-      });
-    }
-
-    return new Promise(executor)
-      .then(() => {
-        if (ngServePid) treeKill(ngServePid);
-      })
-      .catch((msg) => {
-        if (ngServePid) treeKill(ngServePid);
-        throw new Error(msg);
-      });
   });
 
   it('Serve with proxy config', function () {

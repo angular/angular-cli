@@ -2,5 +2,5 @@ import {ng} from '../utils';
 
 
 export default function() {
-  return ng('test');
+  return ng('test', '--watch=false');
 }

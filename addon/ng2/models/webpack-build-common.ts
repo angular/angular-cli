@@ -65,8 +65,8 @@ export function getWebpackCommonConfig(
                 useForkChecker: true,
                 tsconfig: path.resolve(appRoot, appConfig.tsconfig)
               }
-            // }, {
-            //   loader: 'angular2-template-loader'
+            }, {
+              loader: 'angular2-template-loader'
             }
           ],
           exclude: [/\.(spec|e2e)\.ts$/]
