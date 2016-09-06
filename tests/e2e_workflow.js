@@ -1,9 +1,10 @@
-"use strict";
+/*eslint-disable no-console */
+'use strict';
+
 /**
  * This file is ran using the command line, not using Jasmine / Mocha.
  */
 const chalk = require('chalk');
-const fs = require('fs');
 const glob = require('glob');
 const minimist = require('minimist');
 const path = require('path');
@@ -33,49 +34,45 @@ const allTests = glob.sync(path.join(e2eRoot, '**/*'), { nodir: true })
  * Load all the files from the e2e, filter and sort them and build a promise of their default
  * export.
  */
-allTests
-  .reduce((previous, relativeName) => {
-    const absoluteName = path.join(e2eRoot, relativeName);
-    if (fs.statSync(absoluteName).isDirectory()) {
-      return previous.then(() => loadAndRun(path.join(p, relativeName), root));
+allTests.reduce((previous, relativeName) => {
+  const absoluteName = path.join(e2eRoot, relativeName);
+  return previous.then(() => {
+    currentFileName = relativeName.replace(/\.ts$/, '');
+
+    if (lastStart) {
+      // Round to hundredth of a second.
+      const t = Math.round((Date.now() - lastStart) / 10) / 100;
+      console.log('');
+      console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
     }
 
-    return previous.then(() => {
-      currentFileName = relativeName.replace(/\.ts$/, '');
+    const testName = currentFileName.replace(/\d\d\d-/g, '');
+    console.log(green('Running "' + bold(blue(testName)) + '"...'));
 
-      if (lastStart) {
-        // Round to hundredth of a second.
-        const t = Math.round((Date.now() - lastStart) / 10) / 100;
-        console.log('');
-        console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
+    lastStart = +new Date();
+    const fn = require(absoluteName);
+    return (fn.default || fn)();
+  });
+}, Promise.resolve())
+.then(
+  () => console.log(green('Done.')),
+  (err) => {
+    console.log('\n');
+    console.error(red(`Test "${currentFileName}" failed...`));
+    console.error(red(err.message));
+    console.error(red(err.stack));
+
+    if (argv.debug) {
+      console.log('Will loop forever while you debug... CTRL-C to quit.');
+      /*eslint-disable no-constant-condition*/
+      while (1) {
+        // That's right!
       }
-
-      const testName = currentFileName.replace(/\d\d\d\-/g, '');
-      console.log(green('Running "' + bold(blue(testName)) + '"...'));
-
-      lastStart = +new Date();
-      const fn = require(absoluteName);
-      return (fn.default || fn)();
-    });
-  }, Promise.resolve())
-  .then(
-    () => console.log(green('Done.')),
-    (err) => {
-      console.log('\n');
-      console.error(red(`Test "${currentFileName}" failed...`));
-      console.error(red(err.message));
-      console.error(red(err.stack));
-
-      if (argv.debug) {
-        console.log('Will loop forever while you debug... CTRL-C to quit.');
-        while (1) {
-          // That's right!
-        }
-      }
-
-      process.exit(1);
     }
-  );
+
+    process.exit(1);
+  }
+);
 
 /**
  *

@@ -22,10 +22,10 @@ export function expectFileToExist(fileName: string) {
       if (exist) {
         resolve();
       } else {
-        reject(new Error(`File ${fileName} was expected to exist but not found...`))
+        reject(new Error(`File ${fileName} was expected to exist but not found...`));
       }
-    })
-  })
+    });
+  });
 }
 
 
@@ -41,7 +41,7 @@ export function fileMatchesOrFail(fileName: string, regEx: RegExp | string) {
           throw new Error(`File "${fileName}" did not match regex ${regEx}...`);
         }
       }
-    })
+    });
 }
 
 
@@ -64,7 +64,7 @@ export function expectToFail(fn: () => Promise<any>): Promise<void> {
   return fn()
     .then(() => {
       throw new Error(`Function ${fn.source} was expected to fail, but succeeded.`);
-    }, () => {})
+    }, () => {});
 }
 
 
@@ -133,8 +133,9 @@ export function silentExecOrFail(cmd: string, ...args: string[]) {
 }
 
 export function ng(...args: string[]) {
-  return _exec({}, 'ng', args)
+  return _exec({}, 'ng', args);
 }
+
 export function silentNg(...args: string[]) {
   return _exec({ silent: true }, 'ng', args);
 }
