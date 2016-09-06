@@ -383,10 +383,12 @@ class NodeEventManager {
     @Inject(EVENT_MANAGER_PLUGINS) plugins: EventManagerPlugin[],
     @Inject(DOCUMENT) private _document: any,
     private _zone: NgZone) {
-    this._plugins = plugins.map(p => p.manager = this).reverse();
+    plugins.forEach(p => p.manager = this);
+    this._plugins = plugins.slice().reverse();
   }
   getWindow() { return this._document._window; }
   getDocument() { return this._document; }
+  getZone(): NgZone { return this._zone; }
 
   addEventListener(element: any /*HTMLElement*/, eventName: string, handler: Function): Function {
     var plugin = this._findPluginFor(eventName);
@@ -398,7 +400,6 @@ class NodeEventManager {
     return plugin.addGlobalEventListener(target, eventName, handler);
   }
 
-  getZone(): NgZone { return this._zone; }
 
   /** @internal */
   _findPluginFor(eventName: string): EventManagerPlugin {
@@ -562,7 +563,7 @@ export const INTERNAL_NODE_PLATFORM_PROVIDERS: Array<any /*Type | Provider | any
  *
  * @experimental
  */
-export const platformDynamicNode = (extraProviders?: any[]) => {
+export const platformNodeDynamic = (extraProviders?: any[]) => {
   const platform = __PLATFORM_REF || createPlatformFactory(platformCoreDynamic, 'nodeDynamic', INTERNAL_NODE_PLATFORM_PROVIDERS)(extraProviders);
   return new NodePlatform(platform);
 };

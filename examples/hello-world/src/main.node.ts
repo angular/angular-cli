@@ -3,7 +3,7 @@ import {
   NodeModule,
   NodeHttpModule,
   NodeJsonpModule,
-  platformDynamicNode
+  platformNodeDynamic
 } from '@angular/universal';
 
 import { App, Wat } from './app';
@@ -22,7 +22,7 @@ import { App, Wat } from './app';
 })
 class AnotherComponent {}
 
-export const platform = platformDynamicNode();
+export const platform = platformNodeDynamic();
 
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000)
