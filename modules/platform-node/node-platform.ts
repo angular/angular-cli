@@ -86,6 +86,8 @@ import {
   ORIGIN_URL,
   REQUEST_URL,
   BASE_URL,
+
+  createUrlProviders,
 } from './tokens';
 
 export function _errorHandler(): ErrorHandler {
@@ -101,6 +103,16 @@ export function _resolveDefaultAnimationDriver(): AnimationDriver {
 
 // Hold Reference
 export var __PLATFORM_REF: PlatformRef = null;
+export function removePlatformRef() {
+  __PLATFORM_REF = null;
+}
+export function getPlatformRef(platformRef) {
+  return __PLATFORM_REF || platformRef;
+}
+export function setPlatformRef(platformRef) {
+  __PLATFORM_REF = platformRef;
+}
+// End platform Reference
 
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
@@ -111,11 +123,10 @@ export class NodePlatform implements PlatformRef {
   static _cache = new Map<any, any>();
   _platformRef;
   get platformRef() {
-    return __PLATFORM_REF;
+    return this._platformRef;
   }
-  constructor(platformRef: PlatformRef) {
-    // Reuse reference
-    this._platformRef = __PLATFORM_REF || (__PLATFORM_REF = platformRef);
+  constructor(platform) {
+    this._platformRef = platform;
   }
 
 
@@ -484,7 +495,6 @@ class NodeDomEventsPlugin {
 
     { provide: PlatformLocation, useClass: NodePlatformLocation },
 
-    // { provide: ViewUtils, useClass: },
   ],
   exports: [  CommonModule, ApplicationModule  ]
 })
@@ -563,8 +573,15 @@ export const INTERNAL_NODE_PLATFORM_PROVIDERS: Array<any /*Type | Provider | any
  *
  * @experimental
  */
-export const platformNodeDynamic = (extraProviders?: any[]) => {
-  const platform = __PLATFORM_REF || createPlatformFactory(platformCoreDynamic, 'nodeDynamic', INTERNAL_NODE_PLATFORM_PROVIDERS)(extraProviders);
+export const platformNodeDynamic = (extraProviders?: any[], platform?: boolean) => {
+  if (!platform) {
+    if (!getPlatformRef()) {
+      platform = createPlatformFactory(platformCoreDynamic, 'nodeDynamic', INTERNAL_NODE_PLATFORM_PROVIDERS)(extraProviders);
+      setPlatformRef(platform);
+    } else {
+      platform = getPlatformRef();
+    }
+  }
   return new NodePlatform(platform);
 };
 
