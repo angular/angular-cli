@@ -1,11 +1,7 @@
 import { Component } from '@angular/core';
-import { ROUTER_DIRECTIVES } from '@angular/router';
 
 @Component({
   selector: 'github',
-  pipes: [],
-  providers: [],
-  directives: [ ROUTER_DIRECTIVES ],
   template: `
 <h3>
   Angular 2 Seed

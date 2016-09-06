@@ -1,13 +1,10 @@
 import {Component} from '@angular/core';
 import {GithubService} from '../../services';
 import {Observable} from 'rxjs/Observable';
-import {ROUTER_DIRECTIVES, ActivatedRoute} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'repo-list',
-  pipes: [],
-  providers: [],
-  directives: [ ROUTER_DIRECTIVES ],
   styleUrls: ['./repo-list.css'],
   templateUrl: './repo-list.html',
 })

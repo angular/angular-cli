@@ -53,11 +53,11 @@ export class App implements OnInit {
   }
 
   ngOnInit() {
-    this.jsonp.request('https://api.github.com?callback=JSONP_CALLBACK')
-      .subscribe((res) => {
-        var json = res.json();
-        this.response = json;
-      });
+    // this.jsonp.request('https://api.github.com?callback=JSONP_CALLBACK')
+    //   .subscribe((res) => {
+    //     var json = res.json();
+    //     this.response = json;
+    //   });
   }
 }
 

@@ -7,6 +7,8 @@
     "rimraf": "../../node_modules/.bin/rimraf",
     "pm2": "../../node_modules/.bin/pm2",
     "cpy": "../../node_modules/.bin/cpy",
+    "ngc": "../../node_modules/.bin/ngc -p ./ngconfig.json",
+    "debug:ngc": "node-nightly --inspect --debug-brk ../../node_modules/@angular/compiler-cli/src/main.js -p ./ngconfig.json",
     "nodemon": "../../node_modules/.bin/nodemon",
     "watch": "npm run build -- --watch",
     "prebuild": "npm run rimraf -- dist",
