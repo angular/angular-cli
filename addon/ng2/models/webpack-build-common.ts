@@ -17,16 +17,19 @@ export function getWebpackCommonConfig(
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);
+  const appVendor = path.resolve(appRoot, appConfig.vendor);
   const styles = appConfig.styles
                ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
                : [];
   const scripts = appConfig.scripts
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
+
   const lazyModules = findLazyModules(appRoot);
 
   let entry: { [key: string]: string[] } = {
     main: [appMain]
+    vendor: [appVendor]
   };
 
   // Only add styles/scripts if there's actually entries there
@@ -142,7 +145,7 @@ export function getWebpackCommonConfig(
       ),
       new webpack.optimize.CommonsChunkPlugin({
         // Optimizing ensures loading order in index.html
-        name: ['styles', 'scripts', 'main'].reverse()
+        name: ['styles', 'vendor', 'scripts', 'main'].reverse()
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,

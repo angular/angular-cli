@@ -15,6 +15,7 @@ export interface CliConfig {
         assets?: string;
         index?: string;
         main?: string;
+        vendor?: string;
         test?: string;
         tsconfig?: string;
         prefix?: string;
