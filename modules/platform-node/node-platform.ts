@@ -74,12 +74,6 @@ import { NodeSharedStylesHost } from './node-shared-styles-host';
 import { Parse5DomAdapter } from './parse5-adapter';
 
 import {
-  provideDocument,
-  provideUniversalAppId,
-  _COMPONENT_ID
-} from './providers';
-
-import {
   NODE_APP_ID,
   UNIVERSAL_CONFIG,
 
@@ -499,58 +493,33 @@ class NodeDomEventsPlugin {
   exports: [  CommonModule, ApplicationModule  ]
 })
 export class NodeModule {
-  static __dynamicConfig = [
-    { provide: BASE_URL, useValue: 'baseUrl' },
-    { provide: APP_BASE_HREF, useValue: 'baseUrl' },
-    { provide: REQUEST_URL, useValue: 'requestUrl' },
-    { provide: ORIGIN_URL, useValue: 'originUrl' }
-  ];
-  static __clone(obj) {
-    return obj.slice(0).map(obj => {
-      var newObj = {};
-      Object.keys(obj).forEach(key => {
-        newObj[key] = obj[key];
-      });
-      return newObj;
-    });
-  }
-  static get dynamicConfig() {
-    return NodeModule.__clone(NodeModule.__dynamicConfig);
-  };
-  static set dynamicConfig(value) {
-    NodeModule.__dynamicConfig = value;
-  };
-
   static forRoot(document: string, config: any = {}) {
     var _config = Object.assign({}, { document }, config);
     return NodeModule.withConfig(_config);
   }
   static withConfig(config: any = {}) {
-    let doc = config.document;
-    let providers = NodeModule
-      .dynamicConfig
-      .reduce((memo, provider) => {
-        let key = provider.useValue;
-        if (key in config) {
-          provider.useValue = config[key];
-          memo.push(provider);
-        }
-        return memo;
-      }, []);
+    let document = config.document;
+    let providers = createUrlProviders(config);
     return {
       ngModule: NodeModule,
       providers: [
         {provide: UNIVERSAL_CONFIG, useValue: config},
-        provideDocument(doc),
-        // provideUniversalAppId(config.appId),
+        {
+          provide: DOCUMENT,
+          useFactory: (domSharedStylesHost: NodeSharedStylesHost) => {
+            var doc: any = parseDocument(document);
+            domSharedStylesHost.addHost(doc.head);
+            return doc;
+          },
+          deps: [ NodeSharedStylesHost ]
+        },
         ...providers,
       ]
     };
   }
   constructor(@Optional() @SkipSelf() parentModule: NodeModule) {
     if (parentModule) {
-      throw new Error(
-          `NodeModule has already been loaded. If you need access to common directives such as NgIf and NgFor from a lazy loaded module, import CommonModule instead.`);
+      throw new Error(`NodeModule has already been loaded.`);
     }
   }
 }
