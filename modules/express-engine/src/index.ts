@@ -2,7 +2,7 @@ const fs = require('graceful-fs');
 
 // import {selectorRegExpFactory, Bootloader, BootloaderConfig} from '@angular/universal';
 import { NgModuleMetadataType, NgModule } from '@angular/core';
-import { platformDynamicNode, NodeModule } from '@angular/universal';
+import { platformNodeDynamic, NodeModule } from '@angular/universal';
 
 
 export interface UniversalConfig {
@@ -18,7 +18,7 @@ export interface UniversalConfig {
 export type ExpressEngineConfig = NgModuleMetadataType & UniversalConfig;
 
 
-// WORK IN PROGRESS 
+// WORK IN PROGRESS
 // basic idea on how to use ?
 
 // res.render('./index.html', {
@@ -90,7 +90,7 @@ export function expressEngine(filePath: string, options?: ExpressEngineConfig, d
         })
         class CreatedModule { }
 
-        return platformDynamicNode().serializeModule(CreatedModule).then(html => {
+        return platformNodeDynamic().serializeModule(CreatedModule).then(html => {
             // tada?
             done(null, html);
         }).catch(e => {
