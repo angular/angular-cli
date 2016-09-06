@@ -96,13 +96,9 @@ export function insertAfterLastOccurrence(nodes: ts.Node[], toInsert: string,
 
 export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
   if (node.kind == ts.SyntaxKind.Identifier) {
-    return (<ts.Identifier>node).text;
+    return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
-    try {
-      return JSON.parse(node.getFullText(source));
-    } catch (e) {
-      return null;
-    }
+    return (node as ts.StringLiteral).text;
   } else {
     return null;
   }
