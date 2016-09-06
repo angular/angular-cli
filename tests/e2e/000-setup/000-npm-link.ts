@@ -1,11 +1,11 @@
 import {join} from 'path';
 
-import {npm, execOrFail} from './utils';
+import {npm, exec} from '../utils/process';
 
 
 export default function () {
   // Setup to use the local angular-cli copy.
   process.chdir(join(__dirname, '../..'));
   return npm('link')
-    .then(() => execOrFail('which', 'ng'));
+    .then(() => exec('which', 'ng'));
 }

@@ -1,18 +1,20 @@
-import {isMobileTest} from '../utils';
+import {isMobileTest, expectToFail} from '../utils/utils';
+import {expectFileToMatch, expectFileToExist} from '../utils/fs';
 
 
-export function() {
+export default function() {
   if (!isMobileTest()) {
     return;
   }
 
+  return Promise.resolve()
+    // Service Worker
+    .then(() => expectToFail(() => expectFileToMatch('dist/index.html',
+                                                     'if (\'serviceWorker\' in navigator) {')))
+    .then(() => expectToFail(() => expectFileToExist('dist/worker.js')))
 
-  let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-  // Service Worker
-  expect(index.includes('if (\'serviceWorker\' in navigator) {')).to.be.equal(false);
-  expect(existsSync(path.join(process.cwd(), 'dist/worker.js'))).to.be.equal(false);
-
-  // Asynchronous bundle
-  expect(index.includes('<script src="/app-concat.js" async></script>')).to.be.equal(false);
-  expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(false);
+    // Asynchronous bundle
+    .then(() => expectToFail(() => expectFileToMatch('dist/index.html',
+                                                   '<script src="/app-concat.js" async></script>')))
+    .then(() => expectToFail(() => expectFileToExist('dist/app-concat.js')));
 }

@@ -1,8 +1,10 @@
-import {silentNg, fileMatchesOrFail, expectGitToBeClean} from '../utils';
+import {silentNg} from '../utils/process';
+import {expectFileToMatch} from '../utils/fs';
+import {expectGitToBeClean} from '../utils/git';
 
 
 export default function() {
   return silentNg('build')
-    .then(() => fileMatchesOrFail('dist/index.html', 'main.bundle.js'))
+    .then(() => expectFileToMatch('dist/index.html', 'main.bundle.js'))
     .then(() => expectGitToBeClean());
 }

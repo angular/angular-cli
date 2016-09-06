@@ -1,4 +1,4 @@
-import {ng} from '../utils';
+import {ng} from '../utils/process';
 
 
 export default function() {

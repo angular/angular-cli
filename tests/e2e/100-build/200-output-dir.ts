@@ -1,6 +1,7 @@
-import {
-  silentNg, expectFileToExist, silentExecOrFail, expectGitToBeClean, expectToFail
-} from '../utils';
+import {silentNg, silentExecOrFail} from '../utils/process';
+import {expectFileToExist} from '../utils/fs';
+import {expectToFail} from '../utils/utils';
+import {expectGitToBeClean} from '../utils/git';
 
 
 export default function() {

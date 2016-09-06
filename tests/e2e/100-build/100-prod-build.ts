@@ -1,8 +1,9 @@
 import {join} from 'path';
+import {isMobileTest} from '../utils/utils';
+import {expectFileToExist, expectFileToMatch} from '../utils/fs';
+import {silentNg} from '../utils/process';
+import {expectGitToBeClean} from '../utils/git';
 
-import {
-  silentNg, expectFileToExist, fileMatchesOrFail, isMobileTest, expectGitToBeClean
-} from '../utils';
 
 
 function mobileOnlyChecks() {
@@ -14,11 +15,11 @@ function mobileOnlyChecks() {
   return Promise.resolve()
     // Service Worker
     .then(() => expectFileToExist('dist/sw.js'))
-    .then(() => fileMatchesOrFail('dist/index.html', /sw-install\.[0-9a-f]{20}\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /sw-install\.[0-9a-f]{20}\.bundle\.js/))
 
     // App Manifest
     .then(() => expectFileToExist('dist/manifest.webapp'))
-    .then(() => fileMatchesOrFail('dist/index.html',
+    .then(() => expectFileToMatch('dist/index.html',
                                   '<link rel="manifest" href="/manifest.webapp">'))
 
     // Icons folder
@@ -32,7 +33,7 @@ export default function() {
   return silentNg('build', '--prod')
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     // Check for cache busting hash script src
-    .then(() => fileMatchesOrFail('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
 
     // Check that the process didn't change local files.
     .then(() => expectGitToBeClean())

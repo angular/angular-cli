@@ -1,7 +1,8 @@
-import {ng, isMobileTest, expectFileToExist, git, readFile, writeFile} from './utils';
 import {oneLine} from 'common-tags';
-import {writeFileSync} from 'fs';
 import {join} from 'path';
+import {ng, git} from '../utils/process';
+import {isMobileTest} from '../utils/utils';
+import {expectFileToExist, readFile, writeFile} from '../utils/fs';
 
 
 export default function() {

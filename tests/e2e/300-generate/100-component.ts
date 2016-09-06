@@ -1,5 +1,7 @@
 import {join} from 'path';
-import {ng, expectFileToExist, gitClean} from '../utils';
+import {ng} from '../utils/process';
+import {expectFileToExist} from '../utils/fs';
+import {gitClean} from '../utils/git';
 
 
 export default function() {

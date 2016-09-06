@@ -1,4 +1,5 @@
-import {ng, expectToFail, wait, killAllProcesses} from '../utils';
+import {ng, killAllProcesses} from '../utils/process';
+import {wait, expectToFail} from '../utils/utils';
 
 
 function _runServeAndE2e(...args: string[]) {
