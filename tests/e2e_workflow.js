@@ -4,6 +4,7 @@
  */
 const chalk = require('chalk');
 const fs = require('fs');
+const glob = require('glob');
 const minimist = require('minimist');
 const path = require('path');
 const blue = chalk.blue;
@@ -20,32 +21,43 @@ const argv = minimist(process.argv.slice(2));
 
 let currentFileName = null;
 let lastStart = null;
+
+const e2eRoot = path.join(__dirname, 'e2e');
+const allTests = glob.sync(path.join(e2eRoot, '**/*'), { nodir: true })
+  .map(name => path.relative(e2eRoot, name))
+  .filter(name => name.match(/^\d\d\d/))
+  .sort();
+
+
 /**
  * Load all the files from the e2e, filter and sort them and build a promise of their default
  * export.
  */
-fs.readdirSync(path.join(__dirname, 'e2e'))
-  .filter(name => name.match(/^\d\d\d/))
-  .sort()
-  .reduce((previous, fileName) => {
-      return previous.then(() => {
-        const source = fileName.replace(/\.ts$/, '');
-        currentFileName = source;
+allTests
+  .reduce((previous, relativeName) => {
+    const absoluteName = path.join(e2eRoot, relativeName);
+    if (fs.statSync(absoluteName).isDirectory()) {
+      return previous.then(() => loadAndRun(path.join(p, relativeName), root));
+    }
 
-        if (lastStart) {
-          // Round to hundredth of a second.
-          const t = Math.round((Date.now() - lastStart) / 10) / 100;
-          console.log('');
-          console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
-        }
-        console.log(green('Running "' + bold(blue(fileName)) + '"...'));
+    return previous.then(() => {
+      currentFileName = relativeName.replace(/\.ts$/, '');
 
-        lastStart = +new Date();
-        const fn = require(`./e2e/${source}`);
-        return (fn.default || fn)();
-      });
-    },
-    Promise.resolve())
+      if (lastStart) {
+        // Round to hundredth of a second.
+        const t = Math.round((Date.now() - lastStart) / 10) / 100;
+        console.log('');
+        console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
+      }
+
+      const testName = currentFileName.replace(/\d\d\d\-/g, '');
+      console.log(green('Running "' + bold(blue(testName)) + '"...'));
+
+      lastStart = +new Date();
+      const fn = require(absoluteName);
+      return (fn.default || fn)();
+    });
+  }, Promise.resolve())
   .then(
     () => console.log(green('Done.')),
     (err) => {
@@ -67,46 +79,8 @@ fs.readdirSync(path.join(__dirname, 'e2e'))
 
 /**
  *
-  it('Supports base tag modifications via `ng build --base-href`', function() {
-    this.timeout(420000);
 
-    sh.exec(`${ngBin} build --base-href /myUrl/`);
-    const indexHtmlPath = path.join(process.cwd(), 'dist/index.html');
-    const indexHtml = fs.readFileSync(indexHtmlPath, { encoding: 'utf8' });
 
-    expect(indexHtml).to.match(/<base href="\/myUrl\/"/);
-  });
-
-  it('Can run `ng build` in created project', function () {
-    this.timeout(420000);
-
-    return ng(['build'])
-      .catch(() => {
-        throw new Error('Build failed.');
-      })
-      .then(function () {
-        expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-        // Check the index.html to have no handlebar tokens in it.
-        const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-        expect(indexHtml).to.include('main.bundle.js');
-      })
-      .then(function () {
-        // Also does not create new things in GIT.
-        expect(sh.exec('git status --porcelain').output).to.be.equal(undefined);
-      });
-  });
-
-  it('Build pack output files into a different folder', function () {
-    this.timeout(420000);
-
-    return ng(['build', '-o', './build-output'])
-      .catch(() => {
-        throw new Error('Build failed.');
-      })
-      .then(function () {
-        expect(existsSync(path.join(process.cwd(), './build-output'))).to.be.equal(true);
-      });
-  });
 
   it_mobile('Does not include mobile prod features', () => {
     let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
@@ -117,64 +91,6 @@ fs.readdirSync(path.join(__dirname, 'e2e'))
     // Asynchronous bundle
     expect(index.includes('<script src="/app-concat.js" async></script>')).to.be.equal(false);
     expect(existsSync(path.join(process.cwd(), 'dist/app-concat.js'))).to.be.equal(false);
-  });
-
-  it('lints', () => {
-    this.timeout(420000);
-
-    return ng(['lint']).then(() => {
-    })
-    .catch(err => {
-      throw new Error('Linting failed: ' + err);
-    });
-  });
-
-  it('Perform `ng test` after initial build', function () {
-    this.timeout(420000);
-
-    return ng(testArgs).then(function (result) {
-      const exitCode = typeof result === 'object' ? result.exitCode : result;
-      expect(exitCode).to.be.equal(0);
-    });
-  });
-
-  it('ng e2e fails with error exit code', function () {
-    this.timeout(240000);
-
-    function executor(resolve, reject) {
-      child_process.exec(`${ngBin} e2e`, (error, stdout, stderr) => {
-        if (error !== null) {
-          resolve(stderr);
-        } else {
-          reject(stdout);
-        }
-      });
-    }
-
-    return new Promise(executor)
-      .catch((msg) => {
-        throw new Error(msg);
-      });
-  });
-
-  it('Can create a test component using `ng generate component test-component`', function () {
-    this.timeout(10000);
-    return ng(['generate', 'component', 'test-component']).then(function () {
-      var componentDir = path.join(process.cwd(), 'src', 'app', 'test-component');
-      expect(existsSync(componentDir)).to.be.equal(true);
-      expect(existsSync(path.join(componentDir, 'test-component.component.ts'))).to.be.equal(true);
-      expect(existsSync(path.join(componentDir, 'test-component.component.html'))).to.be.equal(true);
-      expect(existsSync(path.join(componentDir, 'test-component.component.css'))).to.be.equal(true);
-    });
-  });
-
-  it('Perform `ng test` after adding a component', function () {
-    this.timeout(420000);
-
-    return ng(testArgs).then(function (result) {
-      const exitCode = typeof result === 'object' ? result.exitCode : result;
-      expect(exitCode).to.be.equal(0);
-    });
   });
 
   it('Can create a test service using `ng generate service test-service`', function () {

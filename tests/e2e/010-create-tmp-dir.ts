@@ -1,6 +1,6 @@
 import {join} from 'path';
 
-import {isMobileTest, ng, existsOrFail} from './utils';
+import {isMobileTest, ng, expectFileToExist} from './utils';
 import {oneLine} from 'common-tags';
 
 
@@ -17,7 +17,7 @@ export default function() {
 
   // Setup a new project.
   return ng('new', 'test-project', '--link-cli', isMobileTest() ? '--mobile' : undefined)
-    .then(() => existsOrFail(join(process.cwd(), 'test-project')))
+    .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
     .then(() => {
       process.chdir('./test-project');
 

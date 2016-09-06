@@ -1,4 +1,4 @@
-import {silentNg, fileMatchesOrFail, expectGitToBeClean, expectToFail} from './utils';
+import {silentNg, fileMatchesOrFail, expectGitToBeClean, expectToFail, ng} from '../utils';
 
 
 export default function() {
@@ -8,6 +8,8 @@ export default function() {
     .then(() => expectGitToBeClean())
 
     // Build fails on invalid build target
-    .then(() => expectToFail(() => silentNg('build', '--target=potato')))
-    .then(() => expectToFail(() => silentNg('build', '--target=prod')));
+    .then(() => expectToFail(() => ng('build', '--target=potato')))
+
+    // This is a valid target.
+    .then(() => silentNg('build', '--target=production'));
 }

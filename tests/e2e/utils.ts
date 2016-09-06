@@ -16,7 +16,7 @@ export function readFile(fileName: string) {
 }
 
 
-export function existsOrFail(fileName: string) {
+export function expectFileToExist(fileName: string) {
   return new Promise((resolve, reject) => {
     fs.exists(fileName, (exist) => {
       if (exist) {
@@ -121,6 +121,10 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
 
 export function execOrFail(cmd: string, ...args: string[]) {
   return _exec({}, cmd, args);
+}
+
+export function silentExecOrFail(cmd: string, ...args: string[]) {
+  return _exec({ silent: true }, cmd, args);
 }
 
 export function ng(...args: string[]) {

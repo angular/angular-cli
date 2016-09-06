@@ -1,8 +1,8 @@
 import {join} from 'path';
 
 import {
-  silentNg, existsOrFail, fileMatchesOrFail, isMobileTest, expectGitToBeClean
-} from './utils';
+  silentNg, expectFileToExist, fileMatchesOrFail, isMobileTest, expectGitToBeClean
+} from '../utils';
 
 
 function mobileOnlyChecks() {
@@ -13,16 +13,16 @@ function mobileOnlyChecks() {
   // Check for mobile-specific features in prod builds.
   return Promise.resolve()
     // Service Worker
-    .then(() => existsOrFail('dist/sw.js'))
+    .then(() => expectFileToExist('dist/sw.js'))
     .then(() => fileMatchesOrFail('dist/index.html', /sw-install\.[0-9a-f]{20}\.bundle\.js/))
 
     // App Manifest
-    .then(() => existsOrFail('dist/manifest.webapp'))
+    .then(() => expectFileToExist('dist/manifest.webapp'))
     .then(() => fileMatchesOrFail('dist/index.html',
                                   '<link rel="manifest" href="/manifest.webapp">'))
 
     // Icons folder
-    .then(() => existsOrFail('dist/icons'));
+    .then(() => expectFileToExist('dist/icons'));
 }
 
 
@@ -30,7 +30,7 @@ export default function() {
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
   return silentNg('build', '--prod')
-    .then(() => existsOrFail(join(process.cwd(), 'dist')))
+    .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     // Check for cache busting hash script src
     .then(() => fileMatchesOrFail('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
 
