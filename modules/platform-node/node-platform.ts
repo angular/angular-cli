@@ -84,10 +84,12 @@ import {
   createUrlProviders,
 } from './tokens';
 
+// @internal
 export function _errorHandler(): ErrorHandler {
   return new ErrorHandler();
 }
 
+// @internal
 export function _resolveDefaultAnimationDriver(): AnimationDriver {
   if (getDOM().supportsWebAnimation()) {
     return AnimationDriver.NOOP;
@@ -96,6 +98,7 @@ export function _resolveDefaultAnimationDriver(): AnimationDriver {
 }
 
 // Hold Reference
+// @internal
 export var __PLATFORM_REF: PlatformRef = null;
 export function removePlatformRef() {
   __PLATFORM_REF = null;
@@ -108,6 +111,7 @@ export function setPlatformRef(platformRef) {
 }
 // End platform Reference
 
+// @internal
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 }
@@ -431,6 +435,7 @@ export class NodePlatform  {
 
 }
 
+// @internal
 function asyncPromiseSeries(store, modRef, middleware, timer = 1) {
   return middleware.reduce((promise, cb) => {
     return promise.then((ref) => {
@@ -439,7 +444,8 @@ function asyncPromiseSeries(store, modRef, middleware, timer = 1) {
   }, Promise.resolve(modRef))
 }
 
-interface EventManagerPlugin {
+// @internal
+export interface EventManagerPlugin {
   manager: EventManager | NodeEventManager;
   supports(eventName: string): boolean;
   addEventListener(element: any/*HTMLElement*/, eventName: string, handler: Function): any;
@@ -563,7 +569,7 @@ export class NodeModule {
     var _config = Object.assign({}, { document }, config);
     return NodeModule.withConfig(_config);
   }
-  static withConfig(config: any = {}) {
+  static withConfig (config: any = {}) {
     let providers = createUrlProviders(config);
     return {
       ngModule: NodeModule,
@@ -589,27 +595,7 @@ export class NodeModule {
   }
 }
 
-export function withConfig(config: any = {}) {
-  let providers = createUrlProviders(config);
-  return {
-    ngModule: NodeModule,
-    providers: [
-      { provide: UNIVERSAL_CONFIG, useValue: config },
-      {
-        provide: DOCUMENT,
-        useFactory: (domSharedStylesHost: NodeSharedStylesHost, config: any) => {
-          var doc: any = parseDocument(config.document);
-          domSharedStylesHost.addHost(doc.head);
-          return doc;
-        },
-        deps: [ NodeSharedStylesHost, UNIVERSAL_CONFIG ]
-      },
-      ...providers,
-    ]
-  };
-}
-
-
+// @internal
 function initParse5Adapter() {
   Parse5DomAdapter.makeCurrent();
   // wtfInit();

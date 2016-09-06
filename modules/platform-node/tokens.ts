@@ -9,6 +9,7 @@ export const COOKIE_KEY: OpaqueToken = new OpaqueToken('COOKIE_KEY');
 export const NODE_APP_ID = new OpaqueToken('NODE_APP_ID');
 export const UNIVERSAL_CONFIG = new OpaqueToken('UNIVERSAL_CONFIG');
 
+// @internal
 export function getUrlConfig() {
   return [
     { provide: BASE_URL, useValue: 'baseUrl' },
@@ -18,7 +19,7 @@ export function getUrlConfig() {
   ]
 }
 
-
+// @internal
 export function createUrlProviders(config) {
   let providers = getUrlConfig()
   .reduce((memo, provider) => {

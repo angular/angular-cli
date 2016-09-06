@@ -5,8 +5,6 @@ import { REQUEST_URL, BASE_URL, ORIGIN_URL } from './tokens';
 
 import * as nodeUrl from 'url';
 
-
-
 export interface LocationConfig {
   pathname?: string;
   search?: string;
@@ -211,7 +209,7 @@ export class NodePlatformLocation extends PlatformLocation {
   }
 }
 
-
+// @internal
 export function joinWithSlash(start: string, end: string): string {
   if (start.length === 0) {
     return end;
