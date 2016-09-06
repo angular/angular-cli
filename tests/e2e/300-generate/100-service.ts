@@ -1,16 +1,17 @@
 import {join} from 'path';
-import {ng, expectFileToExist} from '../utils';
+import {ng, expectFileToExist, gitClean} from '../utils';
 
 
 export default function() {
-  const componentDir = join(process.cwd(), 'src', 'app', 'test-component');
+  // Does not create a sub directory.
+  const serviceDir = join(process.cwd(), 'src', 'app');
 
   return ng('generate', 'service', 'test-service')
-    .then(() => expectFileToExist(componentDir))
-    .then(() => expectFileToExist(join(componentDir, 'test-component.component.ts')))
-    .then(() => expectFileToExist(join(componentDir, 'test-component.component.html')))
-    .then(() => expectFileToExist(join(componentDir, 'test-component.component.css')))
+    .then(() => expectFileToExist(serviceDir))
+    .then(() => expectFileToExist(join(serviceDir, 'test-service.service.ts')))
+    .then(() => expectFileToExist(join(serviceDir, 'test-service.service.spec.ts')))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--watch=false'));
+    .then(() => ng('test', '--watch=false'))
+    .then(() => gitClean());
 }

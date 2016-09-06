@@ -45,8 +45,8 @@ export function fileMatchesOrFail(fileName: string, regEx: RegExp | string) {
 }
 
 
-export function gitReset() {
-  return git('clean', '-df')
+export function gitClean() {
+  return git('clean', '-df');
 }
 
 

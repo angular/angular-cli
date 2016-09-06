@@ -1,5 +1,5 @@
 import {join} from 'path';
-import {ng, expectFileToExist} from '../utils';
+import {ng, expectFileToExist, gitClean} from '../utils';
 
 
 export default function() {
@@ -8,10 +8,11 @@ export default function() {
   return ng('generate', 'component', 'test-component')
     .then(() => expectFileToExist(componentDir))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.ts')))
+    .then(() => expectFileToExist(join(componentDir, 'test-component.component.spec.ts')))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.html')))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.css')))
 
     // Try to run the unit tests.
     .then(() => ng('test', '--watch=false'))
-    .then(() => gitReset());
+    .then(() => gitClean());
 }
