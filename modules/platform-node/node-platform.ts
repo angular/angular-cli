@@ -50,6 +50,8 @@ import {
   NgModule,
   Optional,
   SkipSelf,
+  Injectable,
+  Inject,
   ComponentRef,
   ApplicationRef,
   PlatformRef,
@@ -365,53 +367,109 @@ export class NodePlatform implements PlatformRef {
 
 }
 
+interface EventManagerPlugin {
+  manager: EventManager | NodeEventManager;
+  supports(eventName: string): boolean;
+  addEventListener(element: any/*HTMLElement*/, eventName: string, handler: Function): any;
+  addGlobalEventListener(element: string, eventName: string, handler: Function): any;
+}
 
+// TODO(gdi2290): refactor into a new file
+@Injectable()
+class NodeEventManager {
+  private _plugins: EventManagerPlugin[];
 
-// @NgModule({
-//   providers: [
-//     ApplicationRef_,
-//     {provide: ApplicationRef, useExisting: ApplicationRef_},
-//     ApplicationInitStatus,
-//     Compiler,
-//     APP_ID_RANDOM_PROVIDER,
-//     ViewUtils,
-//     {provide: IterableDiffers, useFactory: _iterableDiffersFactory},
-//     {provide: KeyValueDiffers, useFactory: _keyValueDiffersFactory},
-//     {provide: LOCALE_ID, useValue: 'en-US'},
-//   ]
-// })
-// export class UniversalApplicationModule {
-// }
+  constructor(
+    @Inject(EVENT_MANAGER_PLUGINS) plugins: EventManagerPlugin[],
+    @Inject(DOCUMENT) private _document: any,
+    private _zone: NgZone) {
+    this._plugins = plugins.map(p => p.manager = this).reverse();
+  }
+  getWindow() { return this._document._window; }
+  getDocument() { return this._document; }
 
-// export class UniversalViewUtils extends ViewUtils {
-//   constructor() {
+  addEventListener(element: any /*HTMLElement*/, eventName: string, handler: Function): Function {
+    var plugin = this._findPluginFor(eventName);
+    return plugin.addEventListener(element, eventName, handler);
+  }
 
-//   }
-//   createRenderComponentType(
-//       templateUrl: string, slotCount: number, encapsulation: ViewEncapsulation,
-//       styles: Array<string|any[]>, animations: {[key: string]: Function}): RenderComponentType {
-//     return new RenderComponentType(
-//         `${this._appId}-${this._nextCompTypeId++}`, templateUrl, slotCount, encapsulation, styles,
-//         animations);
-//   }
-// }
+  addGlobalEventListener(target: string, eventName: string, handler: Function): Function {
+    var plugin = this._findPluginFor(eventName);
+    return plugin.addGlobalEventListener(target, eventName, handler);
+  }
+
+  getZone(): NgZone { return this._zone; }
+
+  /** @internal */
+  _findPluginFor(eventName: string): EventManagerPlugin {
+    var plugins = this._plugins;
+    for (var i = 0; i < plugins.length; i++) {
+      var plugin = plugins[i];
+      if (plugin.supports(eventName)) {
+        return plugin;
+      }
+    }
+    throw new Error(`No event manager plugin found for event ${eventName}`);
+  }
+}
+
+// TODO(gdi2290): refactor into a new file
+@Injectable()
+class NodeDomEventsPlugin {
+  manager: NodeEventManager;
+  // This plugin should come last in the list of plugins, because it accepts all
+  // events.
+  supports(eventName: string): boolean { return true; }
+
+  addEventListener(element: HTMLElement, eventName: string, handler: Function): Function {
+    var zone = this.manager.getZone();
+    var outsideHandler = (event: any /** TODO #9100 */) => zone.runGuarded(() => handler(event));
+    return this.manager.getZone().runOutsideAngular(() => {
+      return getDOM().onAndCancel(element, eventName, outsideHandler)
+    });
+  }
+
+  addGlobalEventListener(target: string, eventName: string, handler: Function): Function {
+    var window = this.manager.getWindow();
+    var document = this.manager.getDocument();
+    var zone = this.manager.getZone();
+    var element;// = getDOM().getGlobalEventTargetWithDocument(target, window, document, document.body);
+    switch(target) {
+      case 'window':
+        element = document._window;
+        break;
+      case 'document':
+        element = document;
+        break;
+      case 'body':
+        element = document.body;
+        break;
+    }
+    var outsideHandler = (event: any /** TODO #9100 */) => zone.runGuarded(() => handler(event));
+    return this.manager.getZone().runOutsideAngular(() => {
+      return getDOM().onAndCancel(element, eventName, outsideHandler)
+    });
+  }
+}
 
 @NgModule({
   providers: [
     BROWSER_SANITIZATION_PROVIDERS,
     { provide: ErrorHandler, useFactory: _errorHandler, deps: [] },
     // { provide: DOCUMENT, useFactory: _document, deps: [] },
-
-    // TOdO(gdi2290): NodeDomEventsPlugin
-    { provide: EVENT_MANAGER_PLUGINS, useClass: DomEventsPlugin, multi: true },
+    NodeDomEventsPlugin,
+    { provide: DomEventsPlugin, useExisting: NodeDomEventsPlugin, multi: true },
+    { provide: EVENT_MANAGER_PLUGINS, useExisting: NodeDomEventsPlugin, multi: true },
     { provide: EVENT_MANAGER_PLUGINS, useClass: KeyEventsPlugin, multi: true },
     // { provide: EVENT_MANAGER_PLUGINS, useClass: HammerGesturesPlugin, multi: true },
     // { provide: HAMMER_GESTURE_CONFIG, useClass: HammerGestureConfig },
 
+    NodeEventManager,
+    { provide: EventManager, useExisting: NodeEventManager },
+
 
     { provide: AnimationDriver, useFactory: _resolveDefaultAnimationDriver },
     Testability,
-    EventManager,
     // ELEMENT_PROBE_PROVIDERS,
 
     NodeDomRootRenderer,

@@ -505,6 +505,7 @@ export class Parse5DomAdapter extends DomAdapter {
     return this.isTemplateElement(el) ? this.content(el) : el;
   }
   createHtmlDocument(): any { /* Document */
+    // TODO(gdi2290): move node-document to here
     var newDoc = treeAdapter.createDocument();
     newDoc.title = 'fake title';
     var head = treeAdapter.createElement('head', null, []);
@@ -521,6 +522,7 @@ export class Parse5DomAdapter extends DomAdapter {
     // if (defDoc === null) {
     //   defDoc = this.createHtmlDocument();
     // }
+    // TODO()
     return {documentMode: false};
   }
   // UNIVERSAL FIX
@@ -533,6 +535,7 @@ export class Parse5DomAdapter extends DomAdapter {
     // return this.defaultDoc().title || '';
   }
   // UNIVERSAL FIX
+
   // UNIVERSAL FIX
   setTitle(newTitle: string) {
     throw _notImplemented('setTitle');
@@ -598,14 +601,6 @@ export class Parse5DomAdapter extends DomAdapter {
   supportsDOMEvents(): boolean { return false; }
   supportsNativeShadowDOM(): boolean { return false; }
   // UNIVERSAL FIX
-  getGlobalEventTargetWithDocument(target: string, window; any, document: any, body; any) {
-    switch(target) {
-      case 'window': return window;
-      case 'document': return document;
-      case 'body': return body;
-    }
-  }
-  // UNIVERSAL FIX
   getGlobalEventTarget(target: string): any {
     throw _notImplemented('getGlobalEventTarget');
   }
@@ -649,6 +644,7 @@ export class Parse5DomAdapter extends DomAdapter {
   replaceChild(el: any, newNode: any, oldNode: any) {
     throw _notImplemented('replaceChild');
   }
+  // TODO(gdi2290): move node-document to here
   parse(templateHtml: string) {
     throw _notImplemented('Parse5DomAdapter#parse');
   }
