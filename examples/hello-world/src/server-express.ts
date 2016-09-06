@@ -63,7 +63,7 @@ app.get('/', function (req, res, next) {
     </html>
   `;
 
-  return ngApp(documentHtml, {time: true}).then(html => {
+  return ngApp(documentHtml, { time: true, asyncDestroy: true }).then(html => {
     res.status(200).send(html);
     next();
     return html;

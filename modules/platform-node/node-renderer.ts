@@ -27,7 +27,6 @@ import {
   stringify,
   listContains,
   camelCaseToDashCase,
-  _appIdRandomProviderFactory
 } from './helper';
 
 import {
@@ -232,6 +231,7 @@ export const IGNORE_ATTRIBUTES = {
   'hidden' : true
 };
 
+// TODO(gdi2290): combine both renderers
 export class DomRenderer implements Renderer {
   private _contentAttr: string;
   private _hostAttr: string;
@@ -497,7 +497,6 @@ export class NodeDomRenderer extends DomRenderer {
     }
     return super.setElementAttribute(renderElement, propertyName, propertyValue);
   }
-
 
   setElementStyle(renderElement: any, styleName: string, styleValue: string): void {
     let styleNameCased = cssHyphenate(styleName);

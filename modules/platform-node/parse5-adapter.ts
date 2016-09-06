@@ -28,7 +28,6 @@ var _attrToPropMap: {[key: string]: string} = {
   'tabindex': 'tabIndex',
 };
 var defDoc: any = null;
-var __parse5 = null;
 
 var mapProps = ['attribs', 'x-attribsNamespace', 'x-attribsPrefix'];
 

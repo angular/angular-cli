@@ -35,7 +35,7 @@ var documentHtml = `
 var arr = new Array(100).fill(null); // var arr = new Array(20).fill(null);
 
 function createApp(num) {
-  return main(documentHtml, {id: num, time: true});
+  return main(documentHtml, {id: num, time: true, asyncDestroy: true});
 }
 
 var promises = arr.reduce((memo, wat, num) => {
