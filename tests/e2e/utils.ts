@@ -45,6 +45,11 @@ export function fileMatchesOrFail(fileName: string, regEx: RegExp | string) {
 }
 
 
+export function gitReset() {
+  return git('clean', '-df')
+}
+
+
 export function expectGitToBeClean() {
   return git('status', '--porcelain')
     .then(output => {

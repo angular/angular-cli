@@ -79,9 +79,6 @@ allTests
 
 /**
  *
-
-
-
   it_mobile('Does not include mobile prod features', () => {
     let index = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
     // Service Worker
