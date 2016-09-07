@@ -13,6 +13,7 @@ env:
   matrix:
     - SCRIPT=lint
 #    - SCRIPT=build
+    - SCRIPT=e2e
     - SCRIPT=test
 #    - TARGET=mobile SCRIPT=mobile_test
 matrix:

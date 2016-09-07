@@ -35,7 +35,7 @@ export function deleteFile(path: string) {
       } else {
         resolve();
       }
-    })
+    });
   });
 }
 

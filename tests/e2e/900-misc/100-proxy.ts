@@ -35,7 +35,7 @@ export default function() {
     .then(() => request('http://localhost:4200/api/test'))
     .then(response => {
       if (!response.body.match(/TEST_API_RETURN/)) {
-        throw new Error('Response does not match expected value.')
+        throw new Error('Response does not match expected value.');
       }
     })
     .then(() => server.close(), (err) => { server.close(); throw err; })

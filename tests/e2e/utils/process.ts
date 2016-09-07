@@ -68,7 +68,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   });
 }
 
-export function killAllProcesses(signal: string = 'SIGKILL') {
+export function killAllProcesses(signal = 'SIGKILL') {
   _processes.forEach(process => process.kill(signal));
   _processes = [];
 }
