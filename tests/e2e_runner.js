@@ -114,7 +114,8 @@ function isTravis() {
 }
 
 function printHeader(testName) {
-  console.log(green(`Running "${bold(blue(testName))}" (${bold(white(++index))})...`));
+  const text = `${index++} of ${testsToRun.length}`;
+  console.log(green(`Running "${bold(blue(testName))}" (${bold(white(text))})...`));
 
   if (isTravis()) {
     console.log(`travis_fold:start:${encode(testName)}`);
