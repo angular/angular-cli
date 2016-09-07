@@ -72,7 +72,7 @@ module.exports = {
 
     if (!options['skip-import']) {
       returns.push(
-        astUtils.addComponentToModule(this.pathToModule, className, importPath)
+        astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply()));
     }
 
