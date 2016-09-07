@@ -5,7 +5,7 @@ npm-debug.log*
 # IDEs
 .idea/
 jsconfig.json
-.vscode/launch.json
+.vscode/
 
 # Typings file.
 typings/
