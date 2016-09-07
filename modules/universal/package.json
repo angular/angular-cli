@@ -1,4 +1,6 @@
 {
+  "name": "angular2-universal",
+  "description": "Universal (isomorphic) javascript support for Angular2",
   "main": "src/node/index.ts",
   "browser": "src/browser/index.ts",
   "files": [
