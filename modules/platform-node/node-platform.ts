@@ -10,6 +10,7 @@ import {
   HammerGesturesPlugin,
   ViewUtils
 } from './__private_imports__';
+// PRIVATE
 
 import {
   DOCUMENT,
@@ -17,24 +18,6 @@ import {
   AnimationDriver,
   EventManager,
 } from '@angular/platform-browser';
-
-
-// PRIVATE
-
-// import { DomEventsPlugin } from '@angular/platform-browser/src/dom/events/dom_events';
-// import { KeyEventsPlugin } from '@angular/platform-browser/src/dom/events/key_events';
-// import {
-//   HAMMER_GESTURE_CONFIG,
-//   HammerGestureConfig
-// } from '@angular/platform-browser/src/dom/events/hammer_gestures';
-// import { DomSharedStylesHost, SharedStylesHost } from '@angular/platform-browser/src/dom/shared_styles_host';
-// import { DomRootRenderer } from '@angular/platform-browser/src/dom/dom_renderer';
-// import { wtfInit } from '@angular/core/src/profile/wtf_init';
-// import { ViewUtils } from '@angular/core/src/linker/view_utils';
-// import { APP_ID_RANDOM_PROVIDER } from '@angular/core/src/application_tokens';
-// import { PlatformRef_ } from '@angular/core/src/application_ref';
-// PRIVATE
-
 
 import {
   ErrorHandler,
