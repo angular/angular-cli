@@ -52,6 +52,7 @@ app.get('/', function (req, res, next) {
     <body>
 
       <button onclick="bootstrap()">Bootstrap Client</button>
+      <button onclick="location.reload()">Reload Client</button>
 
       <app>
         Loading...

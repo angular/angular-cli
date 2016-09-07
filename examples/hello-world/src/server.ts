@@ -20,7 +20,9 @@ var documentHtml = `
 
     <base href="/">
   <body>
+
     <button onclick="bootstrap()">Bootstrap Client</button>
+    <button onclick="location.reload()">Reload Client</button>
 
     <app>
       Loading...

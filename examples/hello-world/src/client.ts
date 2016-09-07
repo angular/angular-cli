@@ -5,13 +5,12 @@ enableProdMode();
 import {main} from './main.browser';
 
 
-// setTimeout(function () {
-(<any>window).bootstrap = function() {
+let bootOnce = false;
+(<any>window).bootstrap = function bootstrap() {
+  if (bootOnce) return;
+  bootOnce = true;
   console.time('boot');
-// document.addEventListener('DOMContentLoaded', () => {
   main().then(() => {
     console.timeEnd('boot');
   });
-// });
-// }, 3000);
 }

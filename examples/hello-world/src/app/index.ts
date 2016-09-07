@@ -45,7 +45,7 @@ export class Wat {
 export class App implements OnInit {
 
   response = {};
-  toggle = true;
+  toggle = false;
   onWat() {
     this.toggle = !this.toggle;
   }
