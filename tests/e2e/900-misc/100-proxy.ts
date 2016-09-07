@@ -12,7 +12,7 @@ export default function() {
   // Create an express app that serves as a proxy.
   const app = express();
   const server = http.createServer(app);
-  server.listen({});
+  server.listen(0);
 
   app.set('port', server.address().port);
   app.get('/api/test', function (req, res) {

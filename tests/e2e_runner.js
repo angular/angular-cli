@@ -21,13 +21,39 @@ const argv = minimist(process.argv.slice(2));
 
 
 let currentFileName = null;
-let lastStart = null;
 
 const e2eRoot = path.join(__dirname, 'e2e');
 const allTests = glob.sync(path.join(e2eRoot, '**/*'), { nodir: true })
   .map(name => path.relative(e2eRoot, name))
   .filter(name => name.match(/^\d\d\d/))
   .sort();
+
+function encode(str) {
+  return str.replace(/[^A-Za-z\d]+/g, '-').replace(/-$/, '');
+}
+
+function isTravis() {
+  return process.env['TRAVIS'];
+}
+
+function printHeader(testName) {
+  console.log(green('Running "' + bold(blue(testName)) + '"...'));
+
+  if (isTravis()) {
+    console.log(`travis_fold:start:${encode(testName)}`);
+  }
+}
+
+function printFooter(testName, startTime) {
+  if (isTravis()) {
+    console.log(`travis_fold:end:${encode(testName)}`);
+  }
+
+  // Round to hundredth of a second.
+  const t = Math.round((Date.now() - startTime) / 10) / 100;
+  console.log('');
+  console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
+}
 
 
 /**
@@ -38,20 +64,20 @@ allTests.reduce((previous, relativeName) => {
   const absoluteName = path.join(e2eRoot, relativeName);
   return previous.then(() => {
     currentFileName = relativeName.replace(/\.ts$/, '');
+    const start = +new Date();
 
-    if (lastStart) {
-      // Round to hundredth of a second.
-      const t = Math.round((Date.now() - lastStart) / 10) / 100;
-      console.log('');
-      console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
-    }
+    const module = require(absoluteName);
+    const fn = (typeof module == 'function') ? module
+      : (typeof module.default == 'function') ? module.default
+      : function() { throw new Error('Invalid test module.'); };
 
     const testName = currentFileName.replace(/\d\d\d-/g, '');
-    console.log(green('Running "' + bold(blue(testName)) + '"...'));
 
-    lastStart = +new Date();
-    const fn = require(absoluteName);
-    return (fn.default || fn)();
+    return Promise.resolve()
+      .then(() => printHeader(testName))
+      .then(() => fn())
+      .then(() => printFooter(testName, start),
+            (err) => { printFooter(testName, start); throw err; });
   });
 }, Promise.resolve())
 .then(
