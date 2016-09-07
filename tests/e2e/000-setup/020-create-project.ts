@@ -1,13 +1,13 @@
 import {oneLine} from 'common-tags';
 import {join} from 'path';
-import {ng, git} from '../utils/process';
+import {ng} from '../utils/process';
 import {isMobileTest} from '../utils/utils';
-import {expectFileToExist, readFile, writeFile} from '../utils/fs';
+import {expectFileToExist} from '../utils/fs';
+import {updateTsConfig, gitCommit} from '../utils/project';
 
 
 export default function() {
   const tempRoot = process.cwd();
-  const tsConfigPath = 'src/tsconfig.json';
 
   // Setup a new project.
   return ng('new', 'test-project', '--link-cli', isMobileTest() ? '--mobile' : undefined)
@@ -23,13 +23,9 @@ export default function() {
       }
     })
 
-    .then(() => readFile(tsConfigPath))
-    .then(tsConfigJson => {
-      // Force sourcemaps to be from the root of the filesystem.
-      const tsConfig = JSON.parse(tsConfigJson);
-      tsConfig['compilerOptions']['sourceRoot'] = '/';
-
-      return writeFile(tsConfigPath, JSON.stringify(tsConfig, null, 2));
-    })
-    .then(() => git('commit', '-a', '-m', 'tsconfig-e2e-update');
+    // Force sourcemaps to be from the root of the filesystem.
+    .then(() => updateTsConfig(json => {
+      json['compilerOptions']['sourceRoot'] = '/';
+    }))
+   .then(() => gitCommit('tsconfig-e2e-update');
 }

@@ -4,6 +4,7 @@ import {blue, white, yellow} from 'chalk';
 
 interface ExecOptions {
   silent?: boolean;
+  waitForMatch?: RegExp;
 }
 
 
@@ -56,6 +57,14 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
         reject(err);
       }
     });
+
+    if (options.waitForMatch) {
+      npmProcess.stdout.on('data', (data: Buffer) => {
+        if (data.toString().match(options.waitForMatch)) {
+          resolve(stdout);
+        }
+      });
+    }
   });
 }
 
@@ -66,6 +75,10 @@ export function killAllProcesses(signal: string = 'SIGKILL') {
 
 export function exec(cmd: string, ...args: string[]) {
   return _exec({}, cmd, args);
+}
+
+export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
+  return _exec({ waitForMatch: match }, cmd, args);
 }
 
 export function silentExecOrFail(cmd: string, ...args: string[]) {

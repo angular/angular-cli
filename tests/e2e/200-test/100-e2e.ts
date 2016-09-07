@@ -1,16 +1,15 @@
 import {ng, killAllProcesses} from '../utils/process';
-import {wait, expectToFail} from '../utils/utils';
+import {expectToFail} from '../utils/utils';
+import {ngServe} from '../utils/project';
 
 
 function _runServeAndE2e(...args: string[]) {
-  const promise = ng('serve', ...args);
-  return wait(5000)
+  return ngServe(...args)
     .then(() => ng('e2e'))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();
       throw err;
-    })
-    .then(promise);
+    });
 }
 
 export default function() {

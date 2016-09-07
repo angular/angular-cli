@@ -1,8 +1,9 @@
 import * as fs from 'fs';
+import {exec} from './process';
 
 
 export function readFile(fileName: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     fs.readFile(fileName, 'utf-8', (err: any, data: string) => {
       if (err) {
         reject(err);
@@ -14,7 +15,7 @@ export function readFile(fileName: string) {
 }
 
 export function writeFile(fileName: string, content: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     fs.writeFile(fileName, content, (err: any) => {
       if (err) {
         reject(err);
@@ -24,6 +25,41 @@ export function writeFile(fileName: string, content: string) {
     });
   });
 }
+
+
+export function deleteFile(path: string) {
+  return new Promise<void>((resolve, reject) => {
+    fs.unlink(path, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    })
+  });
+}
+
+
+export function moveFile(from: string, to: string) {
+  return exec('mv', from, to);
+}
+
+
+export function createFiles(fs: any) {
+  return Object.keys(fs)
+    .reduce((previous, curr) => {
+      return previous.then(() => writeFile(curr, fs[curr]));
+    }, Promise.resolve());
+}
+
+
+export function replaceInFile(filePath: string, match: string, replacement: string);
+export function replaceInFile(filePath: string, match: RegExp, replacement: string) {
+  return readFile(filePath)
+    .then((content: string) => writeFile(filePath, content.replace(match, replacement)));
+}
+
+
 
 export function expectFileToExist(fileName: string) {
   return new Promise((resolve, reject) => {
