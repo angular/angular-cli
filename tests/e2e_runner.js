@@ -12,17 +12,20 @@ const blue = chalk.blue;
 const bold = chalk.bold;
 const green = chalk.green;
 const red = chalk.red;
+const white = chalk.white;
 
 
 require('../lib/bootstrap-local');
 
 
 const argv = minimist(process.argv.slice(2), {
-  'boolean': ['debug', 'nolink']
+  'boolean': ['debug', 'nolink', 'nightly'],
+  'string': ['reuse']
 });
 
 
 let currentFileName = null;
+let index = 0;
 
 const e2eRoot = path.join(__dirname, 'e2e');
 const allTests = glob.sync(path.join(e2eRoot, '**/*'), { nodir: true })
@@ -103,7 +106,7 @@ testsToRun.reduce((previous, relativeName) => {
 
 
 function encode(str) {
-  return str.replace(/[^A-Za-z\d]+/g, '-').replace(/-$/, '');
+  return str.replace(/[^A-Za-z\d\/]+/g, '-').replace(/\//g, '.').replace(/[\/-]$/, '');
 }
 
 function isTravis() {
@@ -111,7 +114,7 @@ function isTravis() {
 }
 
 function printHeader(testName) {
-  console.log(green('Running "' + bold(blue(testName)) + '"...'));
+  console.log(green(`Running "${bold(blue(testName))}" (${bold(white(++index))})...`));
 
   if (isTravis()) {
     console.log(`travis_fold:start:${encode(testName)}`);
@@ -125,6 +128,6 @@ function printFooter(testName, startTime) {
 
   // Round to hundredth of a second.
   const t = Math.round((Date.now() - startTime) / 10) / 100;
-  console.log('');
   console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
+  console.log('');
 }

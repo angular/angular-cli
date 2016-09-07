@@ -14,6 +14,7 @@ env:
     - SCRIPT=lint
 #    - SCRIPT=build
     - SCRIPT=e2e
+    - SCRIPT=e2e:nightly
     - SCRIPT=test
 #    - TARGET=mobile SCRIPT=mobile_test
 matrix:
@@ -23,11 +24,18 @@ matrix:
   exclude:
     - node_js: "6"
       env: SCRIPT=lint
+    - node_js: "6"
+      env: SCRIPT=build
+    - node_js: "5"
+      env: SCRIPT=e2e:nightly
+    - os: osx
+      env: SCRIPT=e2e:nightly
+    - os: osx
+      node_js: "5"
+      env: SCRIPT=e2e
     - os: osx
       node_js: "5"
       env: SCRIPT=lint
-    - node_js: "6"
-      env: SCRIPT=build
     - os: osx
       node_js: "5"
       env: SCRIPT=build

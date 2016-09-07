@@ -5,9 +5,11 @@ import {
 
 
 export function insertImport(file: string, symbol: string, module: string) {
-  return _insertImport(file, symbol, module).apply();
+  return _insertImport(file, symbol, module)
+    .then(change => change.apply());
 }
 
 export function addImportToModule(file: string, symbol: string, module: string) {
-  return _addImportToModule(file, symbol, module);
+  return _addImportToModule(file, symbol, module)
+    .then(change => change.apply());
 }

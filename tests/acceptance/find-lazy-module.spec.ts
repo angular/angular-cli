@@ -39,10 +39,10 @@ describe('find-lazy-module', () => {
 
   it('works', () => {
     expect(findLazyModules('project-root')).to.eql([
-      'moduleA',
-      'moduleB',
-      'moduleC',
-      'app/+workspace/+settings/settings.module'
+      './moduleA.ts',
+      './moduleB.ts',
+      './moduleC.ts',
+      './app/+workspace/+settings/settings.module.ts'
     ]);
   });
 });

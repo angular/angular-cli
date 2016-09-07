@@ -5,12 +5,27 @@ import {ng} from '../utils/process';
 import {addImportToModule} from '../utils/ast';
 
 
-export default function() {
-  let currentNumberOfDist = 0;
-  return ng('build')
-    .then(() => currentNumberOfDist = readdirSync('dist'))
+export default function(argv: any) {
+  /** This test is disabled when not on nightly. */
+  if (!argv.nightly) {
+    return Promise.resolve();
+  }
+
+  let oldNumberOfFiles = 0;
+  let currentNumberOfDistFiles = 0;
+
+  return Promise.resolve()
+    .then(() => ng('build'))
+    .then(() => oldNumberOfFiles = readdirSync('dist').length)
     .then(() => ng('generate', 'module', 'lazy'))
     .then(() => addImportToModule('src/app/app.module.ts', oneLine`
-      RouteModule.forRoot({ loadChildren: "lazy/lazy.module#LazyModule" })
-      `, '@angular/core'));
+      RouterModule.forRoot([{ path: "/lazy", loadChildren: "./lazy/lazy.module#LazyModule" }])
+      `, '@angular/router'))
+    .then(() => ng('build'))
+    .then(() => currentNumberOfDistFiles = readdirSync('dist').length)
+    .then(() => {
+      if (oldNumberOfFiles >= currentNumberOfDistFiles) {
+        throw new Error('A bundle for the lazy module was not created.');
+      }
+    });
 }

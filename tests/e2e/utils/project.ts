@@ -1,5 +1,5 @@
 import {readFile, writeFile} from './fs';
-import {git, execAndWaitForOutputToMatch} from './process';
+import {execAndWaitForOutputToMatch} from './process';
 
 const tsConfigPath = 'src/tsconfig.json';
 
@@ -17,12 +17,6 @@ export function updateJsonFile(filePath: string, fn: (json: any) => any | void) 
 
 export function updateTsConfig(fn: (json: any) => any | void) {
   return updateJsonFile(tsConfigPath, fn);
-}
-
-
-export function gitCommit(message: string) {
-  return git('add', '-A')
-    .then(() => git('commit', '-am', message));
 }
 
 

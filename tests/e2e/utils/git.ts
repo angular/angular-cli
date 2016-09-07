@@ -15,3 +15,14 @@ export function expectGitToBeClean() {
       }
     });
 }
+
+
+export function gitCommit(message: string) {
+  return git('add', '-A')
+    .then(() => git('status', '--porcelain'))
+    .then(output => {
+      if (output != '') {
+        return git('commit', '-am', message);
+      }
+    });
+}
