@@ -31,18 +31,76 @@ const allTests = glob.sync(path.join(e2eRoot, '**/*'), { nodir: true })
   .sort();
 
 const testsToRun = allTests.filter(name => {
-    // Check for naming tests on command line.
-    if (argv._.length == 0) {
-      return true;
+  // Check for naming tests on command line.
+  if (argv._.length == 0) {
+    return true;
+  }
+
+  return name.match(/000-setup/) || argv._.some(argName => {
+    return path.join(process.cwd(), argName) == path.join(__dirname, name)
+      || argName == name
+      || argName == name.replace(/\d\d\d-/g, '')
+      || argName == name.replace(/\.ts$/, '').replace(/\d\d\d-/g, '');
+  });
+});
+
+
+/**
+ * Load all the files from the e2e, filter and sort them and build a promise of their default
+ * export.
+ */
+if (testsToRun.length == allTests.length) {
+  console.log(`Running ${testsToRun.length} tests`);
+} else {
+  console.log(`Running ${testsToRun.length} tests (${allTests.length} total)`);
+}
+
+testsToRun.reduce((previous, relativeName) => {
+  const absoluteName = path.join(e2eRoot, relativeName);
+  return previous.then(() => {
+    currentFileName = relativeName.replace(/\.ts$/, '');
+    const start = +new Date();
+
+    const module = require(absoluteName);
+    const fn = (typeof module == 'function') ? module
+      : (typeof module.default == 'function') ? module.default
+      : function() {
+        throw new Error('Invalid test module.');
+      };
+
+    const testName = currentFileName.replace(/\d\d\d-/g, '');
+
+    return Promise.resolve()
+      .then(() => printHeader(testName))
+      .then(() => fn(argv))
+      .then(() => printFooter(testName, start),
+            (err) => {
+              printFooter(testName, start); throw err;
+            });
+  });
+}, Promise.resolve())
+.then(
+  () => console.log(green('Done.')),
+  (err) => {
+    console.log('\n');
+    console.error(red(`Test "${currentFileName}" failed...`));
+    console.error(red(err.message));
+    console.error(red(err.stack));
+
+    if (argv.debug) {
+      console.log(`Current Directory: ${process.cwd()}`);
+      console.log('Will loop forever while you debug... CTRL-C to quit.');
+
+      /* eslint-disable no-constant-condition */
+      while (1) {
+        // That's right!
+      }
     }
 
-    return name.match(/000-setup/) || argv._.some(argName => {
-        return path.join(process.cwd(), argName) == path.join(__dirname, name)
-            || argName == name
-            || argName == name.replace(/\d\d\d-/g, '')
-            || argName == name.replace(/\.ts$/, '').replace(/\d\d\d-/g, '');
-      });
-  });
+    process.exit(1);
+  }
+);
+
 
 function encode(str) {
   return str.replace(/[^A-Za-z\d]+/g, '-').replace(/-$/, '');
@@ -70,142 +128,3 @@ function printFooter(testName, startTime) {
   console.log('');
   console.log(green('Last step took ') + bold(blue(t)) + green('s...'));
 }
-
-
-/**
- * Load all the files from the e2e, filter and sort them and build a promise of their default
- * export.
- */
-if (testsToRun.length == allTests.length) {
-  console.log(`Running ${testsToRun.length} tests`);
-} else {
-  console.log(`Running ${testsToRun.length} tests (${allTests.length} total)`);
-}
-
-testsToRun.reduce((previous, relativeName) => {
-  const absoluteName = path.join(e2eRoot, relativeName);
-  return previous.then(() => {
-    currentFileName = relativeName.replace(/\.ts$/, '');
-    const start = +new Date();
-
-    const module = require(absoluteName);
-    const fn = (typeof module == 'function') ? module
-      : (typeof module.default == 'function') ? module.default
-      : function() { throw new Error('Invalid test module.'); };
-
-    const testName = currentFileName.replace(/\d\d\d-/g, '');
-
-    return Promise.resolve()
-      .then(() => printHeader(testName))
-      .then(() => fn(argv))
-      .then(() => printFooter(testName, start),
-            (err) => { printFooter(testName, start); throw err; });
-  });
-}, Promise.resolve())
-.then(
-  () => console.log(green('Done.')),
-  (err) => {
-    console.log('\n');
-    console.error(red(`Test "${currentFileName}" failed...`));
-    console.error(red(err.message));
-    console.error(red(err.stack));
-
-    if (argv.debug) {
-      console.log('Will loop forever while you debug... CTRL-C to quit.');
-      /*eslint-disable no-constant-condition*/
-      while (1) {
-        // That's right!
-      }
-    }
-
-    process.exit(1);
-  }
-);
-
-/**
- *
-
-
-
-  it('styles.css is added to styles bundle', function() {
-    this.timeout(420000);
-
-    let stylesPath = path.join(process.cwd(), 'src', 'styles.css');
-    let testStyle = 'body { background-color: blue; }';
-    fs.writeFileSync(stylesPath, testStyle, 'utf8');
-
-    sh.exec(`${ngBin} build`);
-
-    var stylesBundlePath = path.join(process.cwd(), 'dist', 'styles.bundle.js');
-    var stylesBundleContent = fs.readFileSync(stylesBundlePath, { encoding: 'utf8' });
-
-    expect(stylesBundleContent.includes(testStyle)).to.be.equal(true);
-  });
-
-  it('styles.css supports css imports', function() {
-    this.timeout(420000);
-
-    let importedStylePath = path.join(process.cwd(), 'src', 'imported-styles.css');
-    let testStyle = 'body { background-color: blue; }';
-    fs.writeFileSync(importedStylePath, testStyle, 'utf8');
-
-    let stylesPath = path.join(process.cwd(), 'src', 'styles.css');
-    let importStyle = '@import \'./imported-styles.css\';';
-    fs.writeFileSync(stylesPath, importStyle, 'utf8');
-
-    sh.exec(`${ngBin} build`);
-
-    var stylesBundlePath = path.join(process.cwd(), 'dist', 'styles.bundle.js');
-    var stylesBundleContent = fs.readFileSync(stylesBundlePath, { encoding: 'utf8' });
-
-    expect(stylesBundleContent).to.include(testStyle);
-  });
-
-  it('build supports global styles and scripts', function() {
-    this.timeout(420000);
-
-    sh.exec('npm install bootstrap@next', { silent: true });
-
-    const configFile = path.join(process.cwd(), 'angular-cli.json');
-    let originalConfigContent = fs.readFileSync(configFile, { encoding: 'utf8' });
-    let configContent = originalConfigContent.replace('"styles.css"', `
-      "styles.css",
-      "../node_modules/bootstrap/dist/css/bootstrap.css"
-    `).replace('"scripts": [],',`
-      "scripts": [
-        "../node_modules/jquery/dist/jquery.js",
-        "../node_modules/tether/dist/js/tether.js",
-        "../node_modules/bootstrap/dist/js/bootstrap.js"
-      ],
-    `);
-
-    fs.writeFileSync(configFile, configContent, 'utf8');
-
-    sh.exec(`${ngBin} build`);
-
-    // checking for strings that are part of the included files
-    const stylesBundlePath = path.join(process.cwd(), 'dist', 'styles.bundle.js');
-    const stylesBundleContent = fs.readFileSync(stylesBundlePath, { encoding: 'utf8' });
-    expect(stylesBundleContent).to.include('* Bootstrap ');
-
-    const scriptsBundlePath = path.join(process.cwd(), 'dist', 'scripts.bundle.js');
-    const scriptsBundleContent = fs.readFileSync(scriptsBundlePath, { encoding: 'utf8' });
-    expect(scriptsBundleContent).to.include('* jQuery JavaScript');
-    expect(scriptsBundleContent).to.include('/*! tether ');
-    expect(scriptsBundleContent).to.include('* Bootstrap ');
-
-    // check the scripts are loaded in the correct order
-    const indexPath = path.join(process.cwd(), 'dist', 'index.html');
-    const indexContent = fs.readFileSync(indexPath, { encoding: 'utf8' });
-    let scriptTags = '<script type="text/javascript" src="inline.js"></script>' +
-                    '<script type="text/javascript" src="styles.bundle.js"></script>' +
-                    '<script type="text/javascript" src="scripts.bundle.js"></script>' +
-                    '<script type="text/javascript" src="main.bundle.js"></script>'
-    expect(indexContent).to.include(scriptTags);
-
-    // restore config
-    fs.writeFileSync(configFile, originalConfigContent, 'utf8');
-  });
-
-});
-**/

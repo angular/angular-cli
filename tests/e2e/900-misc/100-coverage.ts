@@ -1,9 +1,9 @@
 import {expectFileToExist} from '../utils/fs';
-import {silentNg} from '../utils/process';
+import {ng} from '../utils/process';
 
 
 export default function() {
-  return silentNg('test', '--watch=false')
+  return ng('test', '--watch=false')
     .then(() => expectFileToExist('coverage/src/app'))
     .then(() => expectFileToExist('coverage/coverage.lcov'));
 }

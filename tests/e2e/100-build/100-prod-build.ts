@@ -1,7 +1,7 @@
 import {join} from 'path';
 import {isMobileTest} from '../utils/utils';
 import {expectFileToExist, expectFileToMatch} from '../utils/fs';
-import {silentNg} from '../utils/process';
+import {ng} from '../utils/process';
 import {expectGitToBeClean} from '../utils/git';
 
 
@@ -30,7 +30,7 @@ function mobileOnlyChecks() {
 export default function() {
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  return silentNg('build', '--prod')
+  return ng('build', '--prod')
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     // Check for cache busting hash script src
     .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))

@@ -45,7 +45,7 @@ export function moveFile(from: string, to: string) {
 }
 
 
-export function createFiles(fs: any) {
+export function writeMultipleFiles(fs: any) {
   return Object.keys(fs)
     .reduce((previous, curr) => {
       return previous.then(() => writeFile(curr, fs[curr]));

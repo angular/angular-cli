@@ -81,16 +81,8 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
   return _exec({ waitForMatch: match }, cmd, args);
 }
 
-export function silentExecOrFail(cmd: string, ...args: string[]) {
-  return _exec({ silent: true }, cmd, args);
-}
-
 export function ng(...args: string[]) {
   return _exec({}, 'ng', args);
-}
-
-export function silentNg(...args: string[]) {
-  return _exec({ silent: true }, 'ng', args);
 }
 
 export function npm(...args: string[]) {
