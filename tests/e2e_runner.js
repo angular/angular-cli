@@ -17,7 +17,9 @@ const red = chalk.red;
 require('../lib/bootstrap-local');
 
 
-const argv = minimist(process.argv.slice(2));
+const argv = minimist(process.argv.slice(2), {
+  'boolean': ['debug', 'nolink']
+});
 
 
 let currentFileName = null;
@@ -27,6 +29,20 @@ const allTests = glob.sync(path.join(e2eRoot, '**/*'), { nodir: true })
   .map(name => path.relative(e2eRoot, name))
   .filter(name => name.match(/^\d\d\d/))
   .sort();
+
+const testsToRun = allTests.filter(name => {
+    // Check for naming tests on command line.
+    if (argv._.length == 0) {
+      return true;
+    }
+
+    return name.match(/000-setup/) || argv._.some(argName => {
+        return path.join(process.cwd(), argName) == path.join(__dirname, name)
+            || argName == name
+            || argName == name.replace(/\d\d\d-/g, '')
+            || argName == name.replace(/\.ts$/, '').replace(/\d\d\d-/g, '');
+      });
+  });
 
 function encode(str) {
   return str.replace(/[^A-Za-z\d]+/g, '-').replace(/-$/, '');
@@ -60,7 +76,13 @@ function printFooter(testName, startTime) {
  * Load all the files from the e2e, filter and sort them and build a promise of their default
  * export.
  */
-allTests.reduce((previous, relativeName) => {
+if (testsToRun.length == allTests.length) {
+  console.log(`Running ${testsToRun.length} tests`);
+} else {
+  console.log(`Running ${testsToRun.length} tests (${allTests.length} total)`);
+}
+
+testsToRun.reduce((previous, relativeName) => {
   const absoluteName = path.join(e2eRoot, relativeName);
   return previous.then(() => {
     currentFileName = relativeName.replace(/\.ts$/, '');
@@ -75,7 +97,7 @@ allTests.reduce((previous, relativeName) => {
 
     return Promise.resolve()
       .then(() => printHeader(testName))
-      .then(() => fn())
+      .then(() => fn(argv))
       .then(() => printFooter(testName, start),
             (err) => { printFooter(testName, start); throw err; });
   });
@@ -104,39 +126,6 @@ allTests.reduce((previous, relativeName) => {
  *
 
 
-
-  it('Turn on path mapping in tsconfig.json and rebuild', function () {
-    this.timeout(420000);
-
-    const configFilePath = path.join(process.cwd(), 'src', 'tsconfig.json');
-    let config = require(configFilePath);
-
-    config.compilerOptions.baseUrl = '';
-
-    // #TODO: When https://github.com/Microsoft/TypeScript/issues/9772 is fixed this should fail.
-    config.compilerOptions.paths = { '@angular/*': [] };
-    fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
-
-    sh.exec(`${ngBin} build`);
-    // #TODO: Uncomment these lines when https://github.com/Microsoft/TypeScript/issues/9772 is fixed.
-    // .catch(() => {
-    //   return true;
-    // })
-    // .then((passed) => {
-    //   expect(passed).to.equal(true);
-    // })
-
-    // This should succeed.
-    config.compilerOptions.paths = {
-      '@angular/*': [ '../node_modules/@angular/*' ]
-    };
-    fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2), 'utf8');
-    sh.exec(`${ngBin} build`);
-
-    expect(existsSync(path.join(process.cwd(), 'dist'))).to.be.equal(true);
-    const indexHtml = fs.readFileSync(path.join(process.cwd(), 'dist/index.html'), 'utf-8');
-    expect(indexHtml).to.include('main.bundle.js');
-  });
 
   it('styles.css is added to styles bundle', function() {
     this.timeout(420000);

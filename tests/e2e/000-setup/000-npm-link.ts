@@ -3,9 +3,11 @@ import {join} from 'path';
 import {npm, exec} from '../utils/process';
 
 
-export default function () {
+export default function (argv: any) {
   // Setup to use the local angular-cli copy.
   process.chdir(join(__dirname, '../..'));
-  return npm('link')
+
+  return Promise.resolve()
+    .then(() => argv.nolink || npm('link'))
     .then(() => exec('which', 'ng'));
 }

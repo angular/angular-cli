@@ -1,16 +1,16 @@
 import {IncomingMessage} from 'http';
-import * as request from 'request';
+import * as _request from 'request';
 
 
-export function request(url: string) {
+export function request(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    request(url, (error: any, response: IncomingMessage, _: any) => {
+    _request(url, (error: any, response: IncomingMessage, body: string) => {
       if (error) {
         reject(error);
       } else if (response.statusCode >= 400) {
         reject(new Error(`Requesting "${url}" returned status code ${response.statusCode}.`);
       } else {
-        resolve(response);
+        resolve(body);
       }
     });
   });
