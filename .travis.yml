@@ -21,24 +21,21 @@ matrix:
   fast_finish: true
   allow_failures:
     - os: osx
-  exclude:
-    - node_js: "6"
+    - env: SCRIPT=e2e:nightly
+  include:
+    - os: linux
       env: SCRIPT=lint
-    - node_js: "6"
+    - os: linux
+      env: SCRIPT=e2e:nightly
+    - os: linux
       env: SCRIPT=build
-    - node_js: "5"
-      env: SCRIPT=e2e:nightly
-    - os: osx
-      env: SCRIPT=e2e:nightly
+  exclude:
+    - env: SCRIPT=lint
+    - env: SCRIPT=e2e:nightly
+    - env: SCRIPT=build
     - os: osx
       node_js: "5"
       env: SCRIPT=e2e
-    - os: osx
-      node_js: "5"
-      env: SCRIPT=lint
-    - os: osx
-      node_js: "5"
-      env: SCRIPT=build
     - os: osx
       env: TARGET=mobile SCRIPT=mobile_test
 
