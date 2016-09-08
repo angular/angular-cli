@@ -27,7 +27,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   if (process.platform.startsWith('win')) {
     args.unshift('/s', '/c', cmd);
     cmd = 'cmd.exe';
-    options['stdio'] = 'inherit';
+    options['stdio'] = 'pipe';
     options['windowsVerbatimArguments'] = true;
   }
 
