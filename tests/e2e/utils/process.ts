@@ -57,7 +57,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
     npmProcess.on('close', (code: number) => {
       _processes = _processes.filter(p => p !== npmProcess);
 
-      if (code == 0) {
+      if (!code) {
         resolve(stdout);
       } else {
         err.message += `${code}...`;
