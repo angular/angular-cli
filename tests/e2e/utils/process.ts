@@ -91,11 +91,11 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
 }
 
 export function ng(...args: string[]) {
-  // if (args[0] == 'build') {
-    // return _exec({silent: true}, 'ng', args);
-  // } else {
+  if (args[0] == 'build') {
+    return _exec({silent: true}, 'ng', args);
+  } else {
     return _exec({}, 'ng', args);
-  // }
+  }
 }
 
 export function npm(...args: string[]) {
