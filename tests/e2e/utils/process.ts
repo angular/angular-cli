@@ -1,5 +1,6 @@
 import * as child_process from 'child_process';
 import {blue, white, yellow} from 'chalk';
+const treeKill = require('tree-kill');
 
 
 interface ExecOptions {
@@ -19,7 +20,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
 
   args = args.filter(x => x !== undefined);
   cmd += ' ' + args.map(x => {
-    if (/[^-\w_.\/\\@~']/.test(x)) {
+    if (/[^-\w_.\\@=']/.test(x)) {
       return `"${x}"`;
     } else {
       return x;
@@ -28,7 +29,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   console.log(blue(`  Running \`${cmd}\`...`));
   console.log(blue(`  CWD: ${cwd}`));
 
-  const npmProcess = child_process.exec(cmd, {cwd});
+  const npmProcess = child_process.exec(cmd, {cwd, async: true});
   npmProcess.stdout.on('data', (data: Buffer) => {
     stdout += data.toString('utf-8');
     if (options.silent) {
@@ -75,8 +76,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   });
 }
 
-export function killAllProcesses(signal = 'SIGKILL') {
-  _processes.forEach(process => process.kill(signal));
+export function killAllProcesses(signal = 'SIGTERM') {
+  _processes.forEach(process => treeKill(process.pid, signal));
   _processes = [];
 }
 
