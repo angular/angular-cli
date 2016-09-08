@@ -59,8 +59,10 @@ export function findLazyModules(projectRoot: any): string[] {
         if (fs.existsSync(fileName)) {
           // Put the moduleName as relative to the main.ts.
           const posix = path.posix;
-          const name =
-            `./${posix.relative(projectRoot, posix.resolve(posix.dirname(tsPath), moduleName))}.ts`;
+          const normalizedPath = posix.normalize(tsPath);
+          const nomalizedModuleName = posix.normalize(moduleName);
+          const fullPath = posix.resolve(posix.dirname(normalizedPath), nomalizedModuleName);
+          const name = `./${posix.relative(projectRoot, fullPath)}.ts`;
           result[name] = true;
         }
       });
