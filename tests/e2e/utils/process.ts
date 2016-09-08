@@ -25,10 +25,9 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   const options: any = {cwd};
 
   if (process.platform.startsWith('win')) {
-    args.unshift('/s', '/c', cmd);
+    args.unshift('/c', cmd);
     cmd = 'cmd.exe';
     options['stdio'] = 'pipe';
-    options['windowsVerbatimArguments'] = true;
   }
 
   const npmProcess = child_process.spawn(cmd, args, options);
@@ -57,13 +56,13 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   // Create the error here so the stack shows who called this function.
   const err = new Error(`Running "${cmd} ${args.join(' ')}" returned error code `);
   return new Promise((resolve, reject) => {
-    npmProcess.on('close', (error: any) => {
+    npmProcess.on('exit', (error: any) => {
       _processes = _processes.filter(p => p !== npmProcess);
 
       if (!error) {
         resolve(stdout);
       } else {
-        err.message += `${error.code}...`;
+        err.message += `${error}...`;
         reject(err);
       }
     });
