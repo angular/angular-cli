@@ -3,10 +3,6 @@ environment:
   - nodejs_version: "5.0"
   - nodejs_version: "6.0"
 
-artifacts:
-  - name: TestProject.zip
-    path: C:\Users\appveyor\AppData\Local\Temp\1\angular-cli-*\test-project.zip
-
 install:
   - ps: Install-Product node $env:nodejs_version
   - npm install
@@ -16,6 +12,5 @@ test_script:
   - npm --version
   - npm test
   - npm run test:e2e
-  - 7z a test-project.zip %TEMP%\angular-cli-e2e-*\*
 
 build: off
