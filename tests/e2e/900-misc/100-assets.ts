@@ -1,5 +1,4 @@
 import {writeFile, expectFileToExist, expectFileToMatch} from '../utils/fs';
-import {gitClean} from '../utils/git';
 import {ng} from '../utils/process';
 import {expectToFail} from '../utils/utils';
 
@@ -10,6 +9,5 @@ export default function() {
     .then(() => ng('build'))
     .then(() => expectFileToExist('dist/assets/.file'))
     .then(() => expectFileToMatch('dist/assets/test.abc', 'hello world'))
-    .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
-    .then(() => gitClean());
+    .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')));
 }

@@ -1,6 +1,5 @@
 import {npm, ng} from '../utils/process';
 import {updateJsonFile} from '../utils/project';
-import {gitClean} from '../utils/git';
 import {expectFileToMatch} from '../utils/fs';
 import {oneLineTrim} from 'common-tags';
 
@@ -27,6 +26,5 @@ export default function() {
       <script type="text/javascript" src="styles.bundle.js"></script>
       <script type="text/javascript" src="scripts.bundle.js"></script>
       <script type="text/javascript" src="main.bundle.js"></script>
-    `))
-    .then(() => gitClean());
+    `));
 }

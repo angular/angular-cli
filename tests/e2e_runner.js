@@ -5,6 +5,7 @@
  * This file is ran using the command line, not using Jasmine / Mocha.
  */
 const chalk = require('chalk');
+const gitClean = require('./e2e/utils/git').gitClean;
 const glob = require('glob');
 const minimist = require('minimist');
 const path = require('path');
@@ -18,6 +19,15 @@ const white = chalk.white;
 require('../lib/bootstrap-local');
 
 
+/**
+ * Here's a short description of those flags:
+ *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
+ *   --nolink         Skip linking your local angular-cli directory. Can save a few seconds.
+ *   --nightly        Install angular nightly builds over the test project.
+ *   --reuse=/path    Use a path instead of create a new project. That project should have been
+ *                    created, and npm installed. Ideally you want a project created by a previous
+ *                    run of e2e.
+ */
 const argv = minimist(process.argv.slice(2), {
   'boolean': ['debug', 'nolink', 'nightly'],
   'string': ['reuse']
@@ -76,6 +86,7 @@ testsToRun.reduce((previous, relativeName) => {
     return Promise.resolve()
       .then(() => printHeader(testName))
       .then(() => fn(argv))
+      .then(() => gitClean())
       .then(() => printFooter(testName, start),
             (err) => {
               printFooter(testName, start); throw err;

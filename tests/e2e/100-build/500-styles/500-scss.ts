@@ -7,7 +7,6 @@ import {
 } from '../../utils/fs';
 import {ng} from '../../utils/process';
 import {stripIndents} from 'common-tags';
-import {gitClean} from '../../utils/git';
 import {isMobileTest} from '../../utils/utils';
 
 
@@ -38,6 +37,5 @@ export default function() {
     .then(() => ng('build'))
     .then(() => expectFileToMatch('dist/main.bundle.js', '.outer .inner'))
     .then(() => expectFileToMatch('dist/main.bundle.js', '.partial .inner'))
-    .then(() => moveFile('src/app/app.component.scss', 'src/app/app.component.css'))
-    .then(() => gitClean());
+    .then(() => moveFile('src/app/app.component.scss', 'src/app/app.component.css'));
 }

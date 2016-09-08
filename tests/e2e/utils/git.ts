@@ -4,6 +4,15 @@ import {git} from './process';
 export function gitClean() {
   return git('clean', '-df')
     .then(() => git('reset', '--hard'))
+    .then(() => {
+      // Checkout missing files
+      return git('status', '--porcelain')
+        .then(output => output
+          .split(/[\n\r]+/g)
+          .filter(line => line.match(/^ D/))
+          .map(line => line.replace(/^\s*\S+\s+/, '')))
+        .then(files => git('checkout', ...files));
+    })
     .then(() => expectGitToBeClean());
 }
 
