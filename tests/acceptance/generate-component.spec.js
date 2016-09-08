@@ -21,6 +21,7 @@ describe('Acceptance: ng generate component', function () {
   after(conf.restore);
 
   beforeEach(function () {
+    this.timeout(10000);
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {

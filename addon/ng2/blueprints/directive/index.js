@@ -2,7 +2,7 @@ var path = require('path');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
-const findParentModule = require('../../utilities/find-parent-module');
+const findParentModule = require('../../utilities/find-parent-module').default;
 
 module.exports = {
   description: '',
@@ -72,7 +72,7 @@ module.exports = {
 
     if (!options['skip-import']) {
       returns.push(
-        astUtils.addComponentToModule(this.pathToModule, className, importPath)
+        astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply()));
     }
 

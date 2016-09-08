@@ -2,8 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 const SilentError = require('silent-error');
 
-module.exports = function findParentModule(project: any, currentDir: string): string {
-
+export default function findParentModule(project: any, currentDir: string): string {
   const sourceRoot = path.join(project.root, project.ngConfig.apps[0].root, 'app');
 
   // trim currentDir
