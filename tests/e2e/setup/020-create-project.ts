@@ -1,5 +1,5 @@
 import {join} from 'path';
-import {ng, npm} from '../utils/process';
+import {git, ng, npm} from '../utils/process';
 import {isMobileTest} from '../utils/utils';
 import {expectFileToExist} from '../utils/fs';
 import {updateTsConfig} from '../utils/project';
@@ -44,5 +44,7 @@ export default function(argv: any) {
     .then(() => updateTsConfig(json => {
       json['compilerOptions']['sourceRoot'] = '/';
     }))
-   .then(() => gitCommit('tsconfig-e2e-update'));
+    .then(() => git('config', 'user.email', 'angular-core+e2e@google.com'))
+    .then(() => git('config', 'user.name', 'Angular CLI E2e'))
+    .then(() => gitCommit('tsconfig-e2e-update'));
 }

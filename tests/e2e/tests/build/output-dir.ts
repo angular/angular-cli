@@ -8,6 +8,5 @@ export default function() {
   return ng('build', '-o', './build-output')
     .then(() => expectFileToExist('./build-output/index.html'))
     .then(() => expectFileToExist('./build-output/main.bundle.js'))
-    .then(() => expectToFail(expectGitToBeClean))
-    .then(() => exec('rm', '-rf', './build-output'));
+    .then(() => expectToFail(expectGitToBeClean));
 }

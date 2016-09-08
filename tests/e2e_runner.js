@@ -25,6 +25,7 @@ const white = chalk.white;
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
  *                    created, and npm installed. Ideally you want a project created by a previous
  *                    run of e2e.
+ * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = minimist(process.argv.slice(2), {
   'boolean': ['debug', 'nolink', 'nightly'],

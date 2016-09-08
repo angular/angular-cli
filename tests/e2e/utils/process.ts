@@ -1,4 +1,4 @@
-import {ChildProcess, spawn} from 'child_process';
+import * as child_process from 'child_process';
 import {blue, white, yellow} from 'chalk';
 
 
@@ -8,7 +8,7 @@ interface ExecOptions {
 }
 
 
-let _processes: ChildProcess[] = [];
+let _processes: child_process.ChildProcess[] = [];
 
 function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<string> {
   let stdout = '';
@@ -18,10 +18,17 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   ));
 
   args = args.filter(x => x !== undefined);
-  console.log(blue(`  Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`...`));
+  cmd += ' ' + args.map(x => {
+    if (/[\W]/.test(x)) {
+      return `"${x}"`;
+    } else {
+      return x;
+    }
+  }).join(' ');
+  console.log(blue(`  Running \`${cmd}\`...`));
   console.log(blue(`  CWD: ${cwd}`));
 
-  const npmProcess = spawn(cmd, args, {cwd, detached: true});
+  const npmProcess = child_process.exec(cmd, {cwd});
   npmProcess.stdout.on('data', (data: Buffer) => {
     stdout += data.toString('utf-8');
     if (options.silent) {
