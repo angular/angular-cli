@@ -96,3 +96,7 @@ export function npm(...args: string[]) {
 export function git(...args: string[]) {
   return _exec({}, 'git', args);
 }
+
+export function silentGit(...args: string[]) {
+  return _exec({silent: true}, 'git', args);
+}

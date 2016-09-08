@@ -1,17 +1,18 @@
-import {git} from './process';
+import {git, silentGit} from './process';
 
 
 export function gitClean() {
-  return git('clean', '-df')
-    .then(() => git('reset', '--hard'))
+  console.log('  Cleaning git...');
+  return silentGit('clean', '-df')
+    .then(() => silentGit('reset', '--hard'))
     .then(() => {
       // Checkout missing files
-      return git('status', '--porcelain')
+      return silentGit('status', '--porcelain')
         .then(output => output
           .split(/[\n\r]+/g)
           .filter(line => line.match(/^ D/))
           .map(line => line.replace(/^\s*\S+\s+/, '')))
-        .then(files => git('checkout', ...files));
+        .then(files => silentGit('checkout', ...files));
     })
     .then(() => expectGitToBeClean());
 }
