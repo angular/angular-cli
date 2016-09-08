@@ -26,7 +26,6 @@ export function expectGitToBeClean() {
     });
 }
 
-
 export function gitCommit(message: string) {
   return git('add', '-A')
     .then(() => git('status', '--porcelain'))
