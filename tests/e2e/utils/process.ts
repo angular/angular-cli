@@ -29,7 +29,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   console.log(blue(`  Running \`${cmd}\`...`));
   console.log(blue(`  CWD: ${cwd}`));
 
-  const npmProcess = child_process.exec(cmd, {cwd, async: true});
+  const npmProcess = child_process.exec(cmd, {cwd});
   npmProcess.stdout.on('data', (data: Buffer) => {
     stdout += data.toString('utf-8');
     if (options.silent) {
