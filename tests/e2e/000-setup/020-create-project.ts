@@ -28,6 +28,7 @@ export default function(argv: any) {
       'core',
       'common',
       'compiler',
+      'forms',
       'http',
       'router',
       'platform-browser',

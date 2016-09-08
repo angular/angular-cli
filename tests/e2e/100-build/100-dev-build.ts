@@ -4,7 +4,7 @@ import {expectGitToBeClean} from '../utils/git';
 
 
 export default function() {
-  return ng('build')
+  return ng('build', '--env=dev')
     .then(() => expectFileToMatch('dist/index.html', 'main.bundle.js'))
     .then(() => expectGitToBeClean());
 }

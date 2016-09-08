@@ -13,7 +13,7 @@ function _runServeAndE2e(...args: string[]) {
 }
 
 export default function() {
-  // This is supposed to fail with serving first...
+  // This is supposed to fail without serving first...
   return expectToFail(() => ng('e2e'))
     // These should work.
     .then(() => _runServeAndE2e())
