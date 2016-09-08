@@ -22,20 +22,21 @@ matrix:
   allow_failures:
     - os: osx
     - env: SCRIPT=e2e:nightly
-  include:
-    - os: linux
-      env: SCRIPT=lint
-    - os: linux
-      env: SCRIPT=e2e:nightly
-    - os: linux
-      env: SCRIPT=build
   exclude:
-    - env: SCRIPT=lint
-    - env: SCRIPT=e2e:nightly
-    - env: SCRIPT=build
+    - node_js: "6"
+      env: SCRIPT=lint
+    - os: osx
+      env: SCRIPT=e2e:nightly
+    - node_js: "6"
+      env: SCRIPT=e2e:nightly
     - os: osx
       node_js: "5"
-      env: SCRIPT=e2e
+      env: SCRIPT=lint
+    - node_js: "6"
+      env: SCRIPT=build
+    - os: osx
+      node_js: "5"
+      env: SCRIPT=build
     - os: osx
       env: TARGET=mobile SCRIPT=mobile_test
 

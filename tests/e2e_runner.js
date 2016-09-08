@@ -71,8 +71,10 @@ if (testsToRun.length == allTests.length) {
 
 testsToRun.reduce((previous, relativeName) => {
   // Make sure this is a windows compatible path.
-  const absoluteName = path.join(e2eRoot, relativeName)
-      .replace(new RegExp(path.sep, 'g'), path.posix.sep);
+  let absoluteName = path.join(e2eRoot, relativeName);
+  if (/^win/.test(process.platform)) {
+    absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
+  }
 
   return previous.then(() => {
     currentFileName = relativeName.replace(/\.ts$/, '');
