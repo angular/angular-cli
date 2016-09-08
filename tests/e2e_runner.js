@@ -70,7 +70,10 @@ if (testsToRun.length == allTests.length) {
 }
 
 testsToRun.reduce((previous, relativeName) => {
-  const absoluteName = path.join(e2eRoot, relativeName);
+  // Make sure this is a windows compatible path.
+  const absoluteName = path.join(e2eRoot, relativeName)
+      .replace(new RegExp(path.sep, 'g'), path.posix.sep);
+
   return previous.then(() => {
     currentFileName = relativeName.replace(/\.ts$/, '');
     const start = +new Date();
