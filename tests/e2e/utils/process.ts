@@ -55,13 +55,13 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   // Create the error here so the stack shows who called this function.
   const err = new Error(`Running "${cmd} ${args.join(' ')}" returned error code `);
   return new Promise((resolve, reject) => {
-    npmProcess.on('close', (code: number) => {
+    npmProcess.on('close', (error: any) => {
       _processes = _processes.filter(p => p !== npmProcess);
 
-      if (!code) {
+      if (!error) {
         resolve(stdout);
       } else {
-        err.message += `${code}...`;
+        err.message += `${error.code}...`;
         reject(err);
       }
     });
