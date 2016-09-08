@@ -1,6 +1,6 @@
-import {npm, ng} from '../utils/process';
-import {updateJsonFile} from '../utils/project';
-import {expectFileToMatch} from '../utils/fs';
+import {npm, ng} from '../../utils/process';
+import {updateJsonFile} from '../../utils/project';
+import {expectFileToMatch} from '../../utils/fs';
 import {oneLineTrim} from 'common-tags';
 
 

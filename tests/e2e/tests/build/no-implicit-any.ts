@@ -1,5 +1,5 @@
-import {updateTsConfig} from '../utils/project';
-import {ng} from '../utils/process';
+import {updateTsConfig} from '../../utils/project';
+import {ng} from '../../utils/process';
 
 
 export default function() {

@@ -1,8 +1,8 @@
 import {readdirSync} from 'fs';
 import {oneLine} from 'common-tags';
 
-import {ng} from '../utils/process';
-import {addImportToModule} from '../utils/ast';
+import {ng} from '../../utils/process';
+import {addImportToModule} from '../../utils/ast';
 
 
 export default function(argv: any) {

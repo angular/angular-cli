@@ -1,8 +1,8 @@
 import {join} from 'path';
-import {isMobileTest} from '../utils/utils';
-import {expectFileToExist, expectFileToMatch} from '../utils/fs';
-import {ng} from '../utils/process';
-import {expectGitToBeClean} from '../utils/git';
+import {isMobileTest} from '../../utils/utils';
+import {expectFileToExist, expectFileToMatch} from '../../utils/fs';
+import {ng} from '../../utils/process';
+import {expectGitToBeClean} from '../../utils/git';
 
 
 

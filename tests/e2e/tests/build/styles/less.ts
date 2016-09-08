@@ -4,10 +4,10 @@ import {
   expectFileToMatch,
   moveFile,
   replaceInFile
-} from '../../utils/fs';
-import {ng} from '../../utils/process';
+} from '../../../utils/fs';
+import {ng} from '../../../utils/process';
 import {stripIndents} from 'common-tags';
-import {isMobileTest} from '../../utils/utils';
+import {isMobileTest} from '../../../utils/utils';
 
 
 export default function() {

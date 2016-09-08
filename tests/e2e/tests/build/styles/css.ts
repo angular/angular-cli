@@ -1,5 +1,5 @@
-import {writeMultipleFiles, expectFileToMatch} from '../../utils/fs';
-import {ng} from '../../utils/process';
+import {writeMultipleFiles, expectFileToMatch} from '../../../utils/fs';
+import {ng} from '../../../utils/process';
 
 
 export default function() {

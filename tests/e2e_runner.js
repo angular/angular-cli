@@ -36,24 +36,27 @@ let currentFileName = null;
 let index = 0;
 
 const e2eRoot = path.join(__dirname, 'e2e');
-const allTests = glob.sync(path.join(e2eRoot, '**/*'), { nodir: true })
+const allSetups = glob.sync(path.join(e2eRoot, 'setup/**/*'), { nodir: true })
   .map(name => path.relative(e2eRoot, name))
-  .filter(name => name.match(/^\d\d\d/))
+  .sort();
+const allTests = glob.sync(path.join(e2eRoot, 'tests/**/*'), { nodir: true })
+  .map(name => path.relative(e2eRoot, name))
   .sort();
 
-const testsToRun = allTests.filter(name => {
-  // Check for naming tests on command line.
-  if (argv._.length == 0) {
-    return true;
-  }
+const testsToRun = allSetups
+  .concat(allTests
+    .filter(name => {
+      // Check for naming tests on command line.
+      if (argv._.length == 0) {
+        return true;
+      }
 
-  return name.match(/000-setup/) || argv._.some(argName => {
-    return path.join(process.cwd(), argName) == path.join(__dirname, name)
-      || argName == name
-      || argName == name.replace(/\d\d\d-/g, '')
-      || argName == name.replace(/\.ts$/, '').replace(/\d\d\d-/g, '');
-  });
-});
+      return argv._.some(argName => {
+        return path.join(process.cwd(), argName) == path.join(__dirname, name)
+          || argName == name
+          || argName == name.replace(/\.ts$/, '');
+      });
+    }));
 
 
 /**
@@ -63,7 +66,7 @@ const testsToRun = allTests.filter(name => {
 if (testsToRun.length == allTests.length) {
   console.log(`Running ${testsToRun.length} tests`);
 } else {
-  console.log(`Running ${testsToRun.length} tests (${allTests.length} total)`);
+  console.log(`Running ${testsToRun.length} tests (${allTests.length + allSetups.length} total)`);
 }
 
 testsToRun.reduce((previous, relativeName) => {
@@ -79,15 +82,18 @@ testsToRun.reduce((previous, relativeName) => {
         throw new Error('Invalid test module.');
       };
 
-    const testName = currentFileName.replace(/\d\d\d-/g, '');
-
     return Promise.resolve()
-      .then(() => printHeader(testName))
+      .then(() => printHeader(currentFileName))
       .then(() => fn(argv))
-      .then(() => gitClean())
-      .then(() => printFooter(testName, start),
+      .then(() => {
+        // Only clean after a real test, not a setup step.
+        if (allSetups.indexOf(relativeName) == -1) {
+          return gitClean();
+        }
+      })
+      .then(() => printFooter(currentFileName, start),
             (err) => {
-              printFooter(testName, start); throw err;
+              printFooter(currentFileName, start); throw err;
             });
   });
 }, Promise.resolve())
@@ -123,7 +129,7 @@ function isTravis() {
 }
 
 function printHeader(testName) {
-  const text = `${index++} of ${testsToRun.length}`;
+  const text = `${++index} of ${testsToRun.length}`;
   console.log(green(`Running "${bold(blue(testName))}" (${bold(white(text))})...`));
 
   if (isTravis()) {

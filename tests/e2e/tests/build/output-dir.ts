@@ -1,7 +1,7 @@
-import {ng, exec} from '../utils/process';
-import {expectFileToExist} from '../utils/fs';
-import {expectToFail} from '../utils/utils';
-import {expectGitToBeClean} from '../utils/git';
+import {ng, exec} from '../../utils/process';
+import {expectFileToExist} from '../../utils/fs';
+import {expectToFail} from '../../utils/utils';
+import {expectGitToBeClean} from '../../utils/git';
 
 
 export default function() {

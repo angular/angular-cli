@@ -1,5 +1,5 @@
-import {isMobileTest, expectToFail} from '../utils/utils';
-import {expectFileToMatch, expectFileToExist} from '../utils/fs';
+import {isMobileTest, expectToFail} from '../../utils/utils';
+import {expectFileToMatch, expectFileToExist} from '../../utils/fs';
 
 
 export default function() {

@@ -1,6 +1,6 @@
-import {writeFile, expectFileToExist, expectFileToMatch} from '../utils/fs';
-import {ng} from '../utils/process';
-import {expectToFail} from '../utils/utils';
+import {writeFile, expectFileToExist, expectFileToMatch} from '../../utils/fs';
+import {ng} from '../../utils/process';
+import {expectToFail} from '../../utils/utils';
 
 
 export default function() {

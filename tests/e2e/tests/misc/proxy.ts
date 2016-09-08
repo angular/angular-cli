@@ -1,11 +1,11 @@
 import * as express from 'express';
 import * as http from 'http';
 
-import {writeFile} from '../utils/fs';
-import {request} from '../utils/http';
-import {killAllProcesses, ng} from '../utils/process';
-import {ngServe} from '../utils/project';
-import {expectToFail} from '../utils/utils';
+import {writeFile} from '../../utils/fs';
+import {request} from '../../utils/http';
+import {killAllProcesses, ng} from '../../utils/process';
+import {ngServe} from '../../utils/project';
+import {expectToFail} from '../../utils/utils';
 
 
 export default function() {
