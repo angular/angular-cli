@@ -19,7 +19,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
 
   args = args.filter(x => x !== undefined);
   cmd += ' ' + args.map(x => {
-    if (/[\W]/.test(x)) {
+    if (/[^-\w_.\/\\@~']/.test(x)) {
       return `"${x}"`;
     } else {
       return x;

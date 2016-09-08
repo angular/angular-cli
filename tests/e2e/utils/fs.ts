@@ -41,7 +41,15 @@ export function deleteFile(path: string) {
 
 
 export function moveFile(from: string, to: string) {
-  return exec('mv', from, to);
+  return new Promise<void>((resolve, reject) => {
+    fs.rename(from, to, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
 
 
