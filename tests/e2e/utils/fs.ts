@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import {exec} from './process';
 
 
 export function readFile(fileName: string) {

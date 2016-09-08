@@ -1,4 +1,4 @@
-import {ng, exec} from '../../utils/process';
+import {ng} from '../../utils/process';
 import {expectFileToExist} from '../../utils/fs';
 import {expectToFail} from '../../utils/utils';
 import {expectGitToBeClean} from '../../utils/git';
