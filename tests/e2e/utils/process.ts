@@ -19,17 +19,19 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   ));
 
   args = args.filter(x => x !== undefined);
-  cmd += ' ' + args.map(x => {
-    if (/[^-\w_.\\@=']/.test(x)) {
-      return `"${x}"`;
-    } else {
-      return x;
-    }
-  }).join(' ');
-  console.log(blue(`  Running \`${cmd}\`...`));
-  console.log(blue(`  CWD: ${cwd}`));
 
-  const npmProcess = child_process.exec(cmd, {cwd});
+  console.log(blue(`  Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`...`));
+  console.log(blue(`  CWD: ${cwd}`));
+  const options: any = {cwd};
+
+  if (process.platform.startsWith('win')) {
+    args.unshift('/s', '/c', cmd);
+    cmd = 'cmd.exe';
+    options['stdio'] = 'inherit';
+    options['windowsVerbatimArguments'] = true;
+  }
+
+  const npmProcess = child_process.spawn(cmd, args, options);
   npmProcess.stdout.on('data', (data: Buffer) => {
     stdout += data.toString('utf-8');
     if (options.silent) {
