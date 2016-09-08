@@ -1,5 +1,6 @@
 /*eslint-disable no-console */
 'use strict';
+require('../lib/bootstrap-local');
 
 /**
  * This file is ran using the command line, not using Jasmine / Mocha.
@@ -14,9 +15,6 @@ const bold = chalk.bold;
 const green = chalk.green;
 const red = chalk.red;
 const white = chalk.white;
-
-
-require('../lib/bootstrap-local');
 
 
 /**
