@@ -22,15 +22,15 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
 
   console.log(blue(`  Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`...`));
   console.log(blue(`  CWD: ${cwd}`));
-  const options: any = {cwd};
+  const spawnOptions: any = {cwd};
 
   if (process.platform.startsWith('win')) {
     args.unshift('/c', cmd);
     cmd = 'cmd.exe';
-    options['stdio'] = 'pipe';
+    spawnOptions['stdio'] = 'pipe';
   }
 
-  const npmProcess = child_process.spawn(cmd, args, options);
+  const npmProcess = child_process.spawn(cmd, args, spawnOptions);
   npmProcess.stdout.on('data', (data: Buffer) => {
     stdout += data.toString('utf-8');
     if (options.silent) {
