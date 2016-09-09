@@ -32,7 +32,7 @@ export class Wat {
     <div>hello world!!!</div>
     <pre>{{ response | json }}</pre>
     <div>
-      <input id="myInput">
+      <input id="myInput" [(ngModel)]="wat">
       Hello World
       {{ wat }}
       <div *ngIf="toggle">
@@ -43,7 +43,7 @@ export class Wat {
   `
 })
 export class App implements OnInit {
-
+  wat = '';
   response = {};
   toggle = false;
   onWat() {

@@ -1,10 +1,12 @@
 import { NgModule, Component, Injectable } from '@angular/core';
 import {
-  NodeModule,
+  UniversalModule,
   NodeHttpModule,
   NodeJsonpModule,
   platformNodeDynamic
 } from '@angular/universal';
+
+import { FormsModule } from '@angular/forms';
 
 import { App, Wat } from './app';
 
@@ -36,7 +38,7 @@ export function main(document, config?: any) {
     bootstrap: [ App, AnotherComponent ],
     declarations: [ App, Wat, AnotherComponent ],
     imports: [
-      NodeModule.withConfig({
+      UniversalModule.withConfig({
         document: document,
         originUrl: 'http://localhost:3000',
         baseUrl: '/',
@@ -44,8 +46,7 @@ export function main(document, config?: any) {
         preboot: false,
         // preboot: { appRoot: ['app'], uglify: true },
       }),
-      NodeHttpModule,
-      NodeJsonpModule
+      FormsModule
     ]
   })
   class MainModule {

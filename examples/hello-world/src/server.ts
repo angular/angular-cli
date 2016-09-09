@@ -21,8 +21,10 @@ var documentHtml = `
     <base href="/">
   <body>
 
-    <button onclick="bootstrap()">Bootstrap Client</button>
-    <button onclick="location.reload()">Reload Client</button>
+    <div style="position: absolute;z-index: 1000000;bottom: 9px">
+      <button onclick="bootstrap()">Bootstrap Client</button>
+      <button onclick="location.reload()">Reload Client</button>
+    </div>
 
     <app>
       Loading...
