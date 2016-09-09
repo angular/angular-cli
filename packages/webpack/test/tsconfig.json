@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "es2015",
+    "target": "es5",
+    "noImplicitAny": false,
+    "sourceMap": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "rootDir": "app",
+    "paths": {
+      "ngfactory/*": ["app/ngfactory"]
+    }
+  },
+  "files": [
+    "app/main.aot.ts"
+  ],
+  "angularCompilerOptions": {
+    "genDir": "ngfactory",
+    "entryModule": "app/app.module#AppModule"
+  }
+}
