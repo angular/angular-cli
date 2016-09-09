@@ -1,35 +1,32 @@
-import { NgModule } from '@angular/core';
+import { NgModule, PlatformRef } from '@angular/core';
 import {
   NodeModule,
   NodeHttpModule,
   NodeJsonpModule,
+  NodePlatform,
   platformNodeDynamic
 } from '../lib';
 
-export const platformUniversalDynamic = platformNodeDynamic;
+// @internal
+export type NodePlatformRef = PlatformRef & NodePlatform;
+
+export function platformUniversalDynamic (extraProviders?: any[]): NodePlatformRef {
+  const platform: NodePlatformRef = platformNodeDynamic(extraProviders);
+  return platform;
+};
 
 @NgModule({
-  imports: [],
-  exports: [,
+  exports: [
+    NodeModule,
     NodeHttpModule,
     NodeJsonpModule
-  ],
-  providers: []
+  ]
 })
 export class UniversalModule {
   static withConfig(config = {}) {
-    var {ngModule, providers} = NodeModule.withConfig(config);
-    var nodeNgModules = [
-      ngModule,
-      NodeHttpModule,
-      NodeJsonpModule
-    ];
-
-    @NgModule({ exports: nodeNgModules })
-    class UniversalModuleDynamic {}
-
+    var {providers} = NodeModule.withConfig(config);
     return {
-      ngModule: UniversalModuleDynamic,
+      ngModule: UniversalModule,
       providers: providers || []
     };
   }

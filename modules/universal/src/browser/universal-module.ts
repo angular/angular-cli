@@ -8,7 +8,8 @@ import {
   Self,
   Injectable,
   Optional,
-  createPlatformFactory
+  createPlatformFactory,
+  PlatformRef
 } from '@angular/core';
 import { HttpModule, JsonpModule } from '@angular/http';
 
@@ -106,4 +107,7 @@ export class UniversalModule {
   }
 }
 
-export const platformUniversalDynamic = createPlatformFactory(platformBrowserDynamic, 'universalBrowserDynamic', []);
+export function platformUniversalDynamic (extraProviders?: any[]): PlatformRef {
+  const platform: PlatformRef = createPlatformFactory(platformBrowserDynamic, 'universalBrowserDynamic', [])(extraProviders);
+  return platform;
+};
