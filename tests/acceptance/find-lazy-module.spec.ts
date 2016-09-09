@@ -1,7 +1,7 @@
 import * as mockFs from 'mock-fs';
 import {stripIndents} from 'common-tags';
 import {expect} from 'chai';
-import {join, sep} from 'path';
+import {join} from 'path';
 
 import {findLazyModules} from '../../addon/ng2/models/find-lazy-modules';
 
