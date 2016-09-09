@@ -1,12 +1,11 @@
 {
-  "name": "angular2-express-engine",
+  "name": "angular2-platform-node",
   "main": "index.js",
   "typings": "index.d.ts",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "dependencies": {
-    "graceful-fs": "<INHERIT>"
-  },
-  "peerDependencies": {
-    "angular2-universal": "<INHERIT>"
+    "preboot": "<INHERIT>",
+    "parse5": "<INHERIT>",
+    "css": "<INHERIT>"
   }
 }

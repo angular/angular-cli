@@ -8,6 +8,6 @@
     "through2": "<INHERIT>"
   },
   "peerDependencies": {
-    "@angular/universal": "<INHERIT>"
+    "angular2-universal": "<INHERIT>"
   }
 }

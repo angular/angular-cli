@@ -4,6 +4,6 @@
   "typings": "index.d.ts",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "peerDependencies": {
-    "@angular/universal": "<INHERIT>"
+    "angular2-universal": "<INHERIT>"
   }
 }
