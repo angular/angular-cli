@@ -81,7 +81,7 @@ function build(path: string[]): Promise<any> {
 
     function maybeDone() {
       doneCount++;
-      if (doneCount === 2) { 
+      if (doneCount === 2) {
         resolve();
       }
     }
@@ -113,7 +113,11 @@ gulp.task('clean', () => {
 
 gulp.task('pre-publish', ['build', 'rewrite_packages', 'changelog', 'copy_license']);
 
-gulp.task('copy_license', () => buildUtils.getAllModules().reduce((stream, mod: string) => stream.pipe(gulp.dest(`dist/${mod}`)), gulp.src('LICENSE')));
+gulp.task('copy_license', () => {
+  return buildUtils.getAllModules().reduce((stream, mod: string) => {
+    return stream.pipe(gulp.dest(`dist/${mod}`));
+  }, gulp.src('LICENSE'));
+});
 
 gulp.task('changelog', () => {
   return gulp.src('CHANGELOG.md')
