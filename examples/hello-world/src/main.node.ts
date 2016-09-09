@@ -43,8 +43,8 @@ export function main(document, config?: any) {
         originUrl: 'http://localhost:3000',
         baseUrl: '/',
         requestUrl: '/',
-        preboot: false,
-        // preboot: { appRoot: ['app'], uglify: true },
+        // preboot: false,
+        preboot: { appRoot: ['app'], uglify: true },
       }),
       FormsModule
     ]

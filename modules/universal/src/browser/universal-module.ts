@@ -20,6 +20,12 @@ import {
   __platform_browser_private__
 } from '@angular/platform-browser';
 
+var prebootClient;
+try {
+  prebootClient = require('preboot/__build/src/browser/preboot_browser');
+  prebootClient = (prebootClient && prebootClient.prebootClient) || prebootClient;
+} catch (e) {}
+
 // @internal
 function _randomChar() {
   return String.fromCharCode(97 + Math.floor(Math.random() * 25));
@@ -79,8 +85,8 @@ export const UNIVERSAL_CACHE = new OpaqueToken('UNIVERSAL_CACHE');
       provide: APP_BOOTSTRAP_LISTENER,
       useValue: () => {
         let _win: any = window;
-        if (_win && _win.preboot && _win.preboot.complete) {
-          _win.preboot.complete();
+        if (_win && _win.preboot && prebootClient) {
+          prebootClient().complete();
         }
       }
     }
