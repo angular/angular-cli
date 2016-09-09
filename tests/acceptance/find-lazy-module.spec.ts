@@ -1,7 +1,7 @@
 import * as mockFs from 'mock-fs';
 import {stripIndents} from 'common-tags';
 import {expect} from 'chai';
-import {join} from 'path';
+import {join, sep} from 'path';
 
 import {findLazyModules} from '../../addon/ng2/models/find-lazy-modules';
 
@@ -39,11 +39,12 @@ describe('find-lazy-module', () => {
   afterEach(() => mockFs.restore());
 
   it('works', () => {
-    expect(findLazyModules('project-root')).to.eql([
-      './' + join('.', 'moduleA.ts'),
-      './' + join('.', 'moduleB.ts'),
-      './' + join('.', 'moduleC.ts'),
-      './' + join('.', 'app/+workspace/+settings/settings.module.ts')
-    ]);
+    expect(findLazyModules('project-root')).to.eql({
+      'moduleA': join(process.cwd(), 'project-root', 'moduleA.ts'),
+      'moduleB': join(process.cwd(), 'project-root', 'moduleB.ts'),
+      'moduleC': join(process.cwd(), 'project-root', 'moduleC.ts'),
+      'app/+workspace/+settings/settings.module':
+          join(process.cwd(), 'project-root', 'app/+workspace/+settings/settings.module.ts'),
+    });
   });
 });
