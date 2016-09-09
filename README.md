@@ -15,6 +15,7 @@
 
 # Table of Contents
 * [Getting Started with Universal](#getting-started)
+    * Universal Documentation & Migration Guide (Angular <= rc4)
     * w/ NodeJS Server
     * w/ ASP.NET Core Server
 * [Modules](#modules)
@@ -24,6 +25,8 @@
 * [License](#license)
 
 # Getting Started
+
+[* Universal Documentation & Migration Guide](https://github.com/angular/universal/blob/master/DOCUMENTATION.md)
 
 [* NodeJS :: Universal Starter repo](https://github.com/angular/universal-starter)
 
