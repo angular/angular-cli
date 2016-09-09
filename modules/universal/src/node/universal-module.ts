@@ -2,8 +2,11 @@ import { NgModule } from '@angular/core';
 import {
   NodeModule,
   NodeHttpModule,
-  NodeJsonpModule
+  NodeJsonpModule,
+  platformNodeDynamic
 } from '../lib';
+
+export const platformUniversalDynamic = platformNodeDynamic;
 
 @NgModule({
   imports: [],
@@ -23,11 +26,11 @@ export class UniversalModule {
     ];
 
     @NgModule({ exports: nodeNgModules })
-    class _UniversalModule {}
+    class UniversalModuleDynamic {}
 
     return {
-      ngModule: _UniversalModule,
+      ngModule: UniversalModuleDynamic,
       providers: providers || []
-    }
+    };
   }
 }

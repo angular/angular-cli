@@ -1,5 +1,18 @@
-import { NgModule, APP_ID, Inject } from '@angular/core';
+import {
+  NgModule,
+  APP_ID,
+  Inject,
+  APP_BOOTSTRAP_LISTENER,
+  NgZone,
+  NgModuleRef,
+  Self,
+  Injectable,
+  Optional,
+  createPlatformFactory
+} from '@angular/core';
 import { HttpModule, JsonpModule } from '@angular/http';
+
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import {
   BrowserModule,
@@ -15,7 +28,18 @@ function _appIdRandomProviderFactory() {
   return `${_randomChar()}${_randomChar()}${_randomChar()}`;
 }
 // PRIVATE
+
+@Injectable()  // so that metadata is gathered for this class
+export class OpaqueToken {
+  constructor(private _desc: string) {}
+
+  toString(): string { return `Token ${this._desc}`; }
+}
+
 const SharedStylesHost: any = __platform_browser_private__.SharedStylesHost;
+
+export const UNIVERSAL_CACHE = new OpaqueToken('UNIVERSAL_CACHE');
+
 @NgModule({
   imports: [
   ],
@@ -26,19 +50,39 @@ const SharedStylesHost: any = __platform_browser_private__.SharedStylesHost;
   ],
   providers: [
     {
+      provide: UNIVERSAL_CACHE,
+      useFactory: () => {
+        let _win: any = window;
+        let CACHE = Object.assign({}, _win.UNIVERSAL_CACHE || {});
+        delete _win.UNIVERSAL_CACHE;
+        return CACHE;
+      }
+    },
+    {
       provide: APP_ID,
       useFactory: () => {
-        let appId = null;
         let _win: any = window;
-        let CACHE = _win.UNIVERSAL_CACHE;
+        let CACHE = _win.UNIVERSAL_CACHE || {};
+        let appId = null;
         if (CACHE.APP_ID) {
           appId = CACHE.APP_ID;
         } else {
           appId = _appIdRandomProviderFactory();
         }
         return appId;
-      }
+      },
+      deps: []
     },
+    {
+      multi: true,
+      provide: APP_BOOTSTRAP_LISTENER,
+      useValue: () => {
+        let _win: any = window;
+        if (_win && _win.preboot && _win.preboot.complete) {
+          _win.preboot.complete();
+        }
+      }
+    }
   ]
 })
 export class UniversalModule {
@@ -57,8 +101,9 @@ export class UniversalModule {
     return {
       ngModule: UniversalModule,
       providers: [
-
       ]
-    }
-  }z
+    };
+  }
 }
+
+export const platformUniversalDynamic = createPlatformFactory(platformBrowserDynamic, 'universalBrowserDynamic', []);

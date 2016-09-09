@@ -1,13 +1,16 @@
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { isBrowser, UniversalModule } from '@angular/universal/browser';
+import {
+  isBrowser,
+  UniversalModule,
+  platformUniversalDynamic
+} from '@angular/universal/browser';
 
 import { App, Wat } from './app';
 
 
-export const platform = platformBrowserDynamic();
+export const platform = platformUniversalDynamic();
 
 export function main() {
   @NgModule({
@@ -22,7 +25,6 @@ export function main() {
     ]
   })
   class MainModule {
-
   }
 
   console.log('isBrowser', isBrowser);
