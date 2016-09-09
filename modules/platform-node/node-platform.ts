@@ -316,14 +316,14 @@ export class NodePlatform  {
           config.time && console.time('id: ' + config.id + ' dehydrate: ');
           el = DOM.createElement('universal-script');
 
-          script = parseFragment(''+
-          '<script>\n'+
-          ' try {'+
+          script = parseFragment('' +
+          '<script>\n' +
+          ' try {' +
             'window.UNIVERSAL_CACHE = (' + JSON.stringify(UNIVERSAL_CACHE) + ') || {};' +
-          '} catch(e) {'+
+          '} catch(e) {' +
           '  console.warn("Angular Universal: There was a problem parsing data from the server")' +
           '}\n' +
-          '</script>'+
+          '</script>' +
           '');
           DOM.appendChild(el, script.childNodes[0]);
           DOM.appendChild(document, el);
@@ -357,12 +357,12 @@ export class NodePlatform  {
           appRef.ngOnDestroy();
           appRef = null;
           destroyApp = null;
-        }
+        };
         destroyModule = () => {
           moduleRef.destroy();
           moduleRef = null;
           destroyModule = null;
-        }
+        };
         if (config.asyncDestroy) {
           setTimeout(() => destroyApp() && setTimeout(destroyModule, 1), 1);
         } else {
@@ -375,7 +375,7 @@ export class NodePlatform  {
         return html;
       },
 
-    ]) // end asyncPromiseSeries
+    ]); // end asyncPromiseSeries
   }
 
 
@@ -423,8 +423,8 @@ function asyncPromiseSeries(store, modRef, middleware, timer = 1) {
   return middleware.reduce((promise, cb) => {
     return promise.then((ref) => {
       return new Promise(resolve => setTimeout(() => resolve(cb(store, ref)), timer));
-    })
-  }, Promise.resolve(modRef))
+    });
+  }, Promise.resolve(modRef));
 }
 
 // @internal
@@ -487,7 +487,7 @@ export class NodeDomEventsPlugin {
     var zone = this.manager.getZone();
     var outsideHandler = (event: any) => zone.runGuarded(() => handler(event));
     return this.manager.getZone().runOutsideAngular(() => {
-      return getDOM().onAndCancel(element, eventName, outsideHandler)
+      return getDOM().onAndCancel(element, eventName, outsideHandler);
     });
   }
 
@@ -496,7 +496,7 @@ export class NodeDomEventsPlugin {
     var document = this.manager.getDocument();
     var zone = this.manager.getZone();
     var element; // = getDOM().getGlobalEventTargetWithDocument(target, window, document, document.body);
-    switch(target) {
+    switch (target) {
       case 'window':
         element = document._window;
         break;
@@ -509,7 +509,7 @@ export class NodeDomEventsPlugin {
     }
     var outsideHandler = (event: any) => zone.runGuarded(() => handler(event));
     return this.manager.getZone().runOutsideAngular(() => {
-      return getDOM().onAndCancel(element, eventName, outsideHandler)
+      return getDOM().onAndCancel(element, eventName, outsideHandler);
     });
   }
 }
@@ -608,5 +608,3 @@ export const platformNodeDynamic = (extraProviders?: any[], platform?: any) => {
   }
   return new NodePlatform(platform);
 };
-
-
