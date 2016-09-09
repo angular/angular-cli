@@ -41,6 +41,9 @@
           "main": {
             "type": "string"
           },
+          "vendor": {
+            "type": "string"
+          },
           "test": {
             "type": "string"
           },

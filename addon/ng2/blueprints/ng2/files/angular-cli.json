@@ -11,6 +11,7 @@
       "index": "index.html",
       "main": "main.ts",
       "test": "test.ts",
+      "vendor": "vendor.ts",
       "tsconfig": "tsconfig.json",
       "prefix": "<%= prefix %>",
       "mobile": <%= isMobile %>,
