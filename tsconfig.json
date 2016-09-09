@@ -11,7 +11,6 @@
   	"sourceMap": true,
     "inlineSources": true,
   	"outDir": "dist",
-    "traceResolution": false,
     "pretty": true,
     "stripInternal": true,
     "lib": ["es5", "dom"],
