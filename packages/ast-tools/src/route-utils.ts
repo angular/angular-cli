@@ -4,6 +4,7 @@ import * as path from 'path';
 import {Change, InsertChange, NoopChange} from './change';
 import {findNodes} from './node';
 import {insertAfterLastOccurrence} from './ast-utils';
+import {NodeHost, Host} from './change';
 
 /**
  * Adds imports to mainFile and adds toBootstrap to the array of providers
@@ -368,13 +369,14 @@ export function resolveComponentPath(projectRoot: string, currentDir: string, fi
 /**
  * Sort changes in decreasing order and apply them.
  * @param changes
+ * @param host
  * @return Promise
  */
-export function applyChanges(changes: Change[]): Promise<void> {
+export function applyChanges(changes: Change[], host: Host = NodeHost): Promise<void> {
   return changes
     .filter(change => !!change)
     .sort((curr, next) => next.order - curr.order)
-    .reduce((newChange, change) => newChange.then(() => change.apply()), Promise.resolve());
+    .reduce((newChange, change) => newChange.then(() => change.apply(host)), Promise.resolve());
 }
 /**
  * Helper for addPathToRoutes. Adds child array to the appropriate position in the routes.ts file

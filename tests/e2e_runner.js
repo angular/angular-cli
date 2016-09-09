@@ -2,6 +2,8 @@
 'use strict';
 require('../lib/bootstrap-local');
 
+Error.stackTraceLimit = Infinity;
+
 /**
  * This file is ran using the command line, not using Jasmine / Mocha.
  */
@@ -20,6 +22,7 @@ const white = chalk.white;
 /**
  * Here's a short description of those flags:
  *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
+ *   --noproject      Skip creating a project or using one.
  *   --nolink         Skip linking your local angular-cli directory. Can save a few seconds.
  *   --nightly        Install angular nightly builds over the test project.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
@@ -28,7 +31,7 @@ const white = chalk.white;
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = minimist(process.argv.slice(2), {
-  'boolean': ['debug', 'nolink', 'nightly'],
+  'boolean': ['debug', 'nolink', 'nightly', 'noproject'],
   'string': ['reuse']
 });
 
@@ -53,9 +56,9 @@ const testsToRun = allSetups
       }
 
       return argv._.some(argName => {
-        return path.join(process.cwd(), argName) == path.join(__dirname, name)
-          || argName == name
-          || argName == name.replace(/\.ts$/, '');
+        return path.join(process.cwd(), argName) == path.join(__dirname, 'e2e', name)
+            || argName == name
+            || argName == name.replace(/\.ts$/, '');
       });
     }));
 
@@ -88,12 +91,14 @@ testsToRun.reduce((previous, relativeName) => {
         throw new Error('Invalid test module.');
       };
 
+    let clean = true;
     return Promise.resolve()
       .then(() => printHeader(currentFileName))
-      .then(() => fn(argv))
+      .then(() => fn(argv, () => clean = false))
       .then(() => {
-        // Only clean after a real test, not a setup step.
-        if (allSetups.indexOf(relativeName) == -1) {
+        // Only clean after a real test, not a setup step. Also skip cleaning if the test
+        // requested an exception.
+        if (allSetups.indexOf(relativeName) == -1 && clean) {
           return gitClean();
         }
       })
