@@ -86,7 +86,7 @@ export function insertImport(fileToEdit: string, symbolName: string,
   let relevantImports = allImports.filter(node => {
     // StringLiteral of the ImportDeclaration is the import file (fileName in this case).
     let importFiles = node.getChildren().filter(child => child.kind === ts.SyntaxKind.StringLiteral)
-                      .map(n => (<ts.StringLiteralTypeNode>n).text);
+                      .map(n => (<ts.StringLiteral>n).text);
     return importFiles.filter(file => file === fileName).length === 1;
   });
 
