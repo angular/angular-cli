@@ -3,7 +3,7 @@ import * as denodeify from 'denodeify';
 const Command = require('ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
-import ServeWebpackTask from '../tasks/serve-webpack.ts';
+import ServeWebpackTask from '../tasks/serve-webpack';
 
 PortFinder.basePort = 49152;
 

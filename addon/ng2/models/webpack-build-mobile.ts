@@ -1,7 +1,7 @@
 import * as path from 'path';
 const OfflinePlugin = require('offline-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-import { PrerenderWebpackPlugin } from '../utilities/prerender-webpack-plugin.ts';
+import { PrerenderWebpackPlugin } from '../utilities/prerender-webpack-plugin';
 
 export const getWebpackMobileConfigPartial = function (projectRoot: string, appConfig: any) {
   // Hardcoded files and paths here should be part of appConfig when
