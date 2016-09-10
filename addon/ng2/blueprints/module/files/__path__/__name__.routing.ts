@@ -1,10 +1,6 @@
-import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-const routes: Routes = [];
+export const <%= camelizedModuleName %>Routes: Routes = [];
 
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-})
-export class <%= classifiedModuleName %>RoutingModule { }
+export const <%= camelizedModuleName %>Routing = RouterModule.forChild(<%= camelizedModuleName %>˝Routes);
+
