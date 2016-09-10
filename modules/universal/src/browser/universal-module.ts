@@ -85,7 +85,7 @@ export const UNIVERSAL_CACHE = new OpaqueToken('UNIVERSAL_CACHE');
       provide: APP_BOOTSTRAP_LISTENER,
       useValue: () => {
         let _win: any = window;
-        if (_win && _win.preboot && prebootClient) {
+        if (_win && prebootClient) {
           prebootClient().complete();
         }
       }
