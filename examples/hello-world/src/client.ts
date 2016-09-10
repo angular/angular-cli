@@ -6,7 +6,10 @@ import {main} from './main.browser';
 
 var _win: any = window;
 let bootOnce = false;
+let bootTimer = null;
+
 _win.bootstrap = function bootstrap() {
+  clearTimeout(bootTimer);
   if (bootOnce) { return; }
   bootOnce = true;
   console.time('boot');
@@ -15,10 +18,10 @@ _win.bootstrap = function bootstrap() {
   });
 };
 
-setTimeout(() => {
-  
+bootTimer = setTimeout(() => {
   _win.bootstrap();
 }, 5000);
+
 // if (document.readyState === 'complete') {
 //   _win.bootstrap();
 // } else {
