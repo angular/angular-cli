@@ -258,8 +258,7 @@ export class NodePlatform  {
             config.time && console.time('id: ' + config.id + ' preboot insert: ');
             prebootCode = parseFragment('' +
               '<script>\n' +
-              getInlineCode(UNIVERSAL_CONFIG.preboot) +
-              ';\nvar preboot = preboot || prebootstrap();' +
+              ' ' + getInlineCode(UNIVERSAL_CONFIG.preboot) +
               '</script>' +
             '');
             prebootEl = DOM.createElement('div');
