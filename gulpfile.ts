@@ -126,6 +126,11 @@ gulp.task('copy_license', () => {
   }, gulp.src('LICENSE'));
 });
 
+gulp.task('copy_files', () => {
+  return gulp.src('modules/universal/typings.d.ts')
+    .pipe(gulp.dest(`dist/universal`));
+});
+
 gulp.task('changelog', () => {
   return gulp.src('CHANGELOG.md')
     .pipe(gulpChangelog({

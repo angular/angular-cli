@@ -3,12 +3,14 @@
   "description": "Universal (isomorphic) javascript support for Angular2",
   "main": "src/node/index.ts",
   "browser": "src/browser/index.ts",
+  "typings": "typings.d.ts",
   "files": [
     "lib",
     "src",
-    "browser.ts",
-    "node.ts",
-    "index.ts"
+    "typings.d.ts",
+    "browser.js",
+    "node.js",
+    "index.js"
   ],
   "dependencies": {
     "angular2-platform-node": "<INHERIT>",
