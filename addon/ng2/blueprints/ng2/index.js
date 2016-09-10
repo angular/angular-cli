@@ -21,7 +21,7 @@ module.exports = {
 
   locals: function(options) {
     this.styleExt = options.style;
-    this.version = require(path.resolve(__dirname, '..', '..', '..', '..', 'package.json')).version;
+    this.version = require(path.resolve(__dirname, '../../../../package.json')).version;
 
     // Join with / not path.sep as reference to typings require forward slashes.
     const relativeRootPath = options.sourceDir.split(path.sep).map(() => '..').join('/');
@@ -44,12 +44,11 @@ module.exports = {
 
   files: function() {
     var fileList = getFiles.call(this);
-    
     if (this.options && this.options.mobile) {
       fileList = fileList.filter(p => p.indexOf('__name__.component.html') < 0);
       fileList = fileList.filter(p => p.indexOf('__name__.component.__styleext__') < 0);
     }
-    
+
     return fileList;
   },
 

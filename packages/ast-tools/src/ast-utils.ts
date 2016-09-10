@@ -96,13 +96,9 @@ export function insertAfterLastOccurrence(nodes: ts.Node[], toInsert: string,
 
 export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
   if (node.kind == ts.SyntaxKind.Identifier) {
-    return (<ts.Identifier>node).text;
+    return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
-    try {
-      return JSON.parse(node.getFullText(source));
-    } catch (e) {
-      return null;
-    }
+    return (node as ts.StringLiteral).text;
   } else {
     return null;
   }
@@ -247,7 +243,8 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
       }
 
       const insert = new InsertChange(ngModulePath, position, toInsert);
-      const importInsert: Change = insertImport(ngModulePath, symbolName, importPath);
+      const importInsert: Change = insertImport(
+        ngModulePath, symbolName.replace(/\..*$/, ''), importPath);
       return new MultiChange([insert, importInsert]);
     });
 }
@@ -256,10 +253,20 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
 * Custom function to insert a declaration (component, pipe, directive)
 * into NgModule declarations. It also imports the component.
 */
-export function addComponentToModule(modulePath: string, classifiedName: string,
-    importPath: string): Promise<Change> {
+export function addDeclarationToModule(modulePath: string, classifiedName: string,
+                                       importPath: string): Promise<Change> {
 
   return _addSymbolToNgModuleMetadata(modulePath, 'declarations', classifiedName, importPath);
+}
+
+/**
+ * Custom function to insert a declaration (component, pipe, directive)
+ * into NgModule declarations. It also imports the component.
+ */
+export function addImportToModule(modulePath: string, classifiedName: string,
+                                  importPath: string): Promise<Change> {
+
+  return _addSymbolToNgModuleMetadata(modulePath, 'imports', classifiedName, importPath);
 }
 
 /**

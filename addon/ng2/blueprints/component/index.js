@@ -2,6 +2,7 @@ var path = require('path');
 var chalk = require('chalk');
 var Blueprint = require('ember-cli/lib/models/blueprint');
 var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const findParentModule = require('../../utilities/find-parent-module').default;
 var getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
@@ -16,6 +17,14 @@ module.exports = {
     { name: 'prefix', type: Boolean, default: true },
     { name: 'spec', type: Boolean, default: true }
   ],
+
+  beforeInstall: function() {
+    try {
+      this.pathToModule = findParentModule(this.project, this.dynamicPath.dir);
+    } catch(e) {
+      throw `Error locating module for declaration\n\t${e}`;
+    }
+  },
 
   normalizeEntityName: function (entityName) {
     var parsedPath = dynamicPathParser(this.project, entityName);
@@ -100,15 +109,14 @@ module.exports = {
     }
 
     const returns = [];
-    const modulePath = path.join(this.project.root, this.dynamicPath.appRoot, 'app.module.ts');
     const className = stringUtils.classify(`${options.entity.name}Component`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.component`);
-    const componentDir = path.relative(this.dynamicPath.appRoot, this.generatePath);
+    const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
     if (!options['skip-import']) {
       returns.push(
-        astUtils.addComponentToModule(modulePath, className, importPath)
+        astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply()));
     }
 

@@ -7,9 +7,10 @@ module.exports = {
   description: '',
 
   availableOptions: [
-    { name: 'spec', type: Boolean, default: false }
+    { name: 'spec', type: Boolean, default: false },
+    { name: 'routing', type: Boolean, default: false }
   ],
-  
+
   normalizeEntityName: function (entityName) {
     this.entityName = entityName;
     var parsedPath = dynamicPathParser(this.project, entityName);
@@ -19,9 +20,10 @@ module.exports = {
   },
 
   locals: function (options) {
-    return { 
+    return {
       dynamicPath: this.dynamicPath.dir,
-      spec: options.spec
+      spec: options.spec,
+      routing: options.routing
     };
   },
 
@@ -30,6 +32,9 @@ module.exports = {
 
     if (!this.options || !this.options.spec) {
       fileList = fileList.filter(p => p.indexOf('__name__.module.spec.ts') < 0);
+    }
+    if (this.options && !this.options.routing) {
+      fileList = fileList.filter(p => p.indexOf('__name__.routing.ts') < 0);
     }
 
     return fileList;
@@ -40,8 +45,8 @@ module.exports = {
     this.dasherizedModuleName = options.dasherizedModuleName;
     return {
       __path__: () => {
-        this.generatePath = this.dynamicPath.dir 
-          + path.sep 
+        this.generatePath = this.dynamicPath.dir
+          + path.sep
           + options.dasherizedModuleName;
         return this.generatePath;
       }
@@ -49,8 +54,8 @@ module.exports = {
   },
 
   afterInstall: function (options) {
-    options.entity.name = this.entityName;
-    options.flat = false;
+    options.entity.name = path.join(this.entityName, this.dasherizedModuleName);
+    options.flat = true;
     options.route = false;
     options.inlineTemplate = false;
     options.inlineStyle = false;
