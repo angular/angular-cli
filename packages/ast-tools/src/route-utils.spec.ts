@@ -90,9 +90,11 @@ describe('route utils', () => {
         .then(() => readFile(sourceFile, 'utf8'))
         .then(newContent => {
           if (process.platform.startsWith('win')) {
-            expect(newContent).toEqual(`import { level2 } from './level1/level2/level2.component';\n`);
-          }else{
-            expect(newContent).toEqual(`import { level2 } from './level1\\level2/level2.component';\n`);
+            expect(newContent).toEqual(
+            `import { level2 } from './level1/level2/level2.component';\n`);
+          } else {
+            expect(newContent).toEqual(
+            `import { level2 } from './level1\\level2/level2.component';\n`);
           }
         });
     });
