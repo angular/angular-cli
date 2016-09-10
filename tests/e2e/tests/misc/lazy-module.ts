@@ -17,9 +17,9 @@ export default function(argv: any) {
   return Promise.resolve()
     .then(() => ng('build'))
     .then(() => oldNumberOfFiles = readdirSync('dist').length)
-    .then(() => ng('generate', 'module', 'lazy'))
+    .then(() => ng('generate', 'module', 'lazy', '--routing'))
     .then(() => addImportToModule('src/app/app.module.ts', oneLine`
-      RouterModule.forRoot([{ path: "/lazy", loadChildren: "./lazy/lazy.module#LazyModule" }])
+      RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }])
       `, '@angular/router'))
     .then(() => ng('build'))
     .then(() => currentNumberOfDistFiles = readdirSync('dist').length)
