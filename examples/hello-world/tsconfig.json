@@ -12,22 +12,22 @@
     "lib": ["es6", "dom"],
     "baseUrl": ".",
     "paths": {
-      "@angular/express-engine": [
+      "angular2-express-engine": [
         "../../modules/express-engine"
       ],
-      "@angular/platform-node": [
+      "angular2-platform-node": [
         "../../modules/platform-node"
       ],
-      "@angular/platform-node-dynamic": [
+      "angular2-platform-node-dynamic": [
         "../../modules/platform-node-dynamic"
       ],
-      "@angular/universal": [
+      "angular2-universal": [
         "../../modules/universal"
       ],
-      "@angular/universal/browser": [
+      "angular2-universal/browser": [
         "../../modules/universal/browser.ts"
       ],
-      "@angular/universal/node": [
+      "angular2-universal/node": [
         "../../modules/universal/node.ts"
       ],
       "rxjs/*": [

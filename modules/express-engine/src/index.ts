@@ -2,7 +2,7 @@ const fs = require('graceful-fs');
 
 // import {selectorRegExpFactory, Bootloader, BootloaderConfig} from '@angular/universal';
 import { NgModuleMetadataType, NgModule } from '@angular/core';
-import { platformNodeDynamic, NodeModule } from '@angular/universal';
+import { platformNodeDynamic, NodeModule } from 'angular2-universal';
 
 
 export interface UniversalConfig {

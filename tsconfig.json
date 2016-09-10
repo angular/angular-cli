@@ -13,29 +13,28 @@
   	"outDir": "dist",
     "pretty": true,
     "stripInternal": true,
-    "lib": ["es5", "dom"],
+    "lib": ["es6", "dom"],
+    "types": [
+      "node"
+    ],
     "paths": {
-      "@angular/express-engine": [
+      "angular2-express-engine": [
         "./modules/express-engine"
       ],
-      "@angular/platform-node": [
+      "angular2-platform-node": [
         "./modules/platform-node"
       ],
-      "@angular/universal/browser": [
+      "angular2-universal/browser": [
         "./modules/universal/browser.ts"
       ],
-      "@angular/universal/node": [
+      "angular2-universal/node": [
         "./modules/universal/node.ts"
       ],
-      "@angular/universal": [
+      "angular2-universal": [
         "./modules/universal"
       ],
-
       "angular2-universal": [
         "./modules/universal/src/node/index.ts"
-      ],
-      "angular2-express-engine": [
-        "./modules/express-engine/src/index.ts"
       ],
       "angular2-hapi-engine": [
         "./modules/hapi-engine/src/index.ts"
@@ -44,6 +43,7 @@
   },
 
   "files": [
+    "gulpfile.ts",
     "custom_typings/xhr2.d.ts",
     "modules/express-engine/src/index.ts",
     "modules/grunt-prerender/tasks/index.ts",
@@ -61,6 +61,7 @@
     "modules/universal/src/browser/index.ts",
     "modules/platform-node/parse5.d.ts",
     "modules/universal/browser.ts",
+    "modules/universal/typings.d.ts",
     "modules/universal/node.ts",
     "modules/webpack-prerender/src/index.ts"
   ],

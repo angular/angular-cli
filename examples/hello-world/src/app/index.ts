@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Http, Jsonp } from '@angular/http';
-// import 'rxjs/Rx';
 
 @Component({
   selector: 'wat',

@@ -5,7 +5,7 @@ import {
   isBrowser,
   UniversalModule,
   platformUniversalDynamic
-} from '@angular/universal/browser';
+} from 'angular2-universal/browser';
 
 import { App, Wat } from './app';
 

@@ -1,1 +1,1 @@
-export * from '@angular/platform-node';
+export * from 'angular2-platform-node';

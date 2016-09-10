@@ -4,7 +4,7 @@ import {
   NodeHttpModule,
   NodeJsonpModule,
   platformUniversalDynamic
-} from '@angular/universal/node';
+} from 'angular2-universal/node';
 
 import { FormsModule } from '@angular/forms';
 
