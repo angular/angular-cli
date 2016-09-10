@@ -1,4 +1,3 @@
-/// <reference path="typings/index.d.ts" />
 import * as utils from './build-utils';
 import * as ts from 'typescript';
 
@@ -36,8 +35,8 @@ const sampleRootPackage = {
 };
 
 const flattenedDeps = {
-  '@angular/compiler': '2.0.0-rc.4',
-  '@angular/core': '2.0.0-rc.4',
+  '@angular/compiler': '2.0.0-rc.6',
+  '@angular/core': '2.0.0-rc.6',
   'jasmine': '2.0.0',
   'angular2-broccoli-prerender': '~1.0.0',
   'angular2-express-engine': '~1.0.0',
@@ -94,8 +93,10 @@ describe('build-utils', () => {
 
   describe('getSrcFromPath', () => {
     it('should strip /src/ from the path', () => {
-      expect(utils.stripSrcFromPath({dirname: 'modules/universal/src/index.js'})).toEqual({dirname: 'modules/universal/index.js'});
-      expect(utils.stripSrcFromPath({dirname: 'modules/grunt-prerender/tasks/index.js'})).toEqual({dirname: 'modules/grunt-prerender/tasks/index.js'});
+      expect(utils.stripSrcFromPath({dirname: 'modules/universal/src/index.js'}))
+        .toEqual({dirname: 'modules/universal/index.js'});
+      expect(utils.stripSrcFromPath({dirname: 'modules/grunt-prerender/tasks/index.js'}))
+        .toEqual({dirname: 'modules/grunt-prerender/tasks/index.js'});
     });
   });
 });
