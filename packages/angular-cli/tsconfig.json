@@ -9,7 +9,7 @@
     "noEmitOnError": true,
     "noImplicitAny": true,
     "outDir": "../../dist/",
-    "rootDir": "../..",
+    "rootDir": "..",
     "sourceMap": true,
     "sourceRoot": "/",
     "target": "es5",
@@ -26,8 +26,5 @@
   },
   "exclude": [
     "blueprints/*/files/**/*"
-  ],
-  "includes": [
-    "./custom-typings.d.ts"
   ]
 }
