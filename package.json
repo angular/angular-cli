@@ -113,7 +113,8 @@
   },
   "ember-addon": {
     "paths": [
-      "./addon/ng2/"
+      "./addon/ng2/",
+      "./addon/docker/"
     ]
   },
   "devDependencies": {
