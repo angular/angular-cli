@@ -25,7 +25,7 @@
     }
   },
   "exclude": [
-    "../../blueprints/*/files/**/*"
+    "blueprints/*/files/**/*"
   ],
   "includes": [
     "./custom-typings.d.ts"
