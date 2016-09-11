@@ -2,15 +2,14 @@
   "name": "angular-cli",
   "version": "0.0.0",
   "description": "CLI tool for Angular",
-  "main": "lib/cli/index.js",
+  "main": "packages/angular-cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
   "bin": {
     "ng": "./bin/ng"
   },
   "keywords": [],
   "scripts": {
-    "build": "npm-run-all -c build:main build:packages",
-    "build:main": "tsc -p addon/ng2",
+    "build": "npm-run-all -c build:packages",
     "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -P $PKG; done",
     "test": "npm run test:packages && npm run test:cli",
     "e2e": "npm run test:e2e",
@@ -113,7 +112,7 @@
   },
   "ember-addon": {
     "paths": [
-      "./addon/ng2/"
+      "./packages/angular-cli/lib/addon"
     ]
   },
   "devDependencies": {

@@ -32,11 +32,7 @@ const InitCommand: any = Command.extend({
   anonymousOptions: ['<glob-pattern>'],
 
   _defaultBlueprint: function () {
-    if (this.project.isEmberCLIAddon()) {
-      return 'addon';
-    } else {
-      return 'ng2';
-    }
+    return 'ng2';
   },
 
   run: function (commandOptions: any, rawArgs: string[]) {

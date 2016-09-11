@@ -1,5 +1,5 @@
 const path = require('path');
-const getWebpackTestConfig = require('../addon/ng2/models/webpack-build-test').getWebpackTestConfig;
+const getWebpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
 
 const init = (config) => {
 

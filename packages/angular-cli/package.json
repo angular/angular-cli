@@ -94,7 +94,8 @@
   },
   "ember-addon": {
     "paths": [
-      "./addon/ng2/"
-    ]
+      "./"
+    ],
+    "main": "./addon/index.js"
   }
 }
