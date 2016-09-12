@@ -9,7 +9,8 @@
   },
   "keywords": [],
   "scripts": {
-    "build": "npm-run-all -c build:packages",
+    "build": "rm -rf dist/ && npm-run-all build:packages build:angular-cli",
+    "build:angular-cli": "./scripts/publish/build.js",
     "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -p $PKG; done",
     "test": "npm run test:packages && npm run test:cli",
     "e2e": "npm run test:e2e",

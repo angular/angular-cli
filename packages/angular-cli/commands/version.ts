@@ -15,12 +15,12 @@ const VersionCommand = Command.extend({
 
   run: function (options: any) {
     const versions: any = process.versions;
-    const pkg = require(path.resolve(__dirname, '..', '..', '..', 'package.json'));
+    const pkg = require(path.resolve(__dirname, '..', 'package.json'));
 
     versions['os'] = process.platform + ' ' + process.arch;
 
     const alwaysPrint = ['node', 'os'];
-console.log(pkg);
+
     let ngCliVersion = pkg.version;
     if (!__dirname.match(/node_modules/)) {
       let gitBranch = '??';

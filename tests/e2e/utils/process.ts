@@ -98,6 +98,10 @@ export function ng(...args: string[]) {
   }
 }
 
+export function silentNpm(...args: string[]) {
+  return _exec({silent: true}, 'npm', args);
+}
+
 export function npm(...args: string[]) {
   return _exec({}, 'npm', args);
 }
