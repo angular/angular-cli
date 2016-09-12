@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
-/*eslint-disable no-console */
 
+/*eslint-disable no-console */
 const denodeify = require('denodeify');
 const fs = require('fs');
 const glob = denodeify(require('glob'));
