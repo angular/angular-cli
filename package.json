@@ -9,8 +9,9 @@
   },
   "keywords": [],
   "scripts": {
-    "build": "rm -rf dist/ && npm-run-all build:packages build:angular-cli",
+    "build": "rm -rf dist/ && npm-run-all build:patch build:packages build:angular-cli",
     "build:angular-cli": "./scripts/publish/build.js",
+    "build:patch": "sed -i '' 's|literals: string\\[\\]|literals: TemplateStringsArray|' node_modules/@types/common-tags/common-tags.d.ts",
     "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -p $PKG; done",
     "test": "npm run test:packages && npm run test:cli",
     "e2e": "npm run test:e2e",
