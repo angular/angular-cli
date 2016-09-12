@@ -44,7 +44,7 @@ export function main(document, config?: any) {
         baseUrl: '/',
         requestUrl: '/',
         // preboot: false,
-        preboot: { uglify: true },
+        preboot: { appRoot: ['app'], uglify: true },
       }),
       FormsModule
     ]
