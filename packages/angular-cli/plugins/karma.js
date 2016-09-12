@@ -4,10 +4,10 @@ const getWebpackTestConfig = require('../models/webpack-build-test').getWebpackT
 const init = (config) => {
 
   // load Angular CLI config
-  if (!config.angularCli && !config.angularCli.config) {
-    throw new Error('Missing \'angularCliConfig\' entry in Karma config');
+  if (!config.angularCli || !config.angularCli.config) {
+    throw new Error('Missing \'angularCli.config\' entry in Karma config');
   }
-  const angularCliConfig = require(path.join(config.basePath, config.config.angularCli.config));
+  const angularCliConfig = require(path.join(config.basePath, config.angularCli.config));
   const appConfig = angularCliConfig.apps[0];
   const environment = config.angularCli.environment || 'dev';
 

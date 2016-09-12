@@ -89,7 +89,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
         new RegExp(path.resolve(appRoot, appConfig.environments['source'])
           .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
         path.resolve(appRoot, appConfig.environments[environment])
-      ),
+      )
     ],
     tslint: {
       emitErrors: false,
