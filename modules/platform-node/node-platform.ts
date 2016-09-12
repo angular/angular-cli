@@ -479,17 +479,39 @@ export class NodePlatform  {
 
 }
 
+/*
+ * Ensure async resolve of promises that resolve in series. This is mostly to prevent blocking
+ * the event loop and better management of refernces in task. This also allows for ZoneLocalStore.
+ * We can also introduce sagas or serverless
+ */
 // @internal
-function asyncPromiseSeries(store, modRef, middleware, timer = 1) {
-  return middleware.reduce((promise, cb) => {
-    return promise.then((ref) => {
-      return new Promise(resolve => setTimeout(() => resolve(cb(store, ref)), timer));
+function asyncPromiseSeries(store, modRef, errorHandler, cancelHandler, config, middleware, timer = 1) {
+  let errorCalled = false;
   config.time && console.time('id: ' + config.id + ' asyncPromiseSeries: ');
+  return middleware.reduce(function reduceAsyncPromiseSeries (promise, cb, currentIndex, currentArray) {
+    // skip the rest of the promise middleware
+    if (errorCalled || cancelHandler()) { return promise; }
+    return promise.then(function reduceAsyncPromiseSeriesChain (ref) {
+      // skip the rest of the promise middleware
+      if (errorCalled || cancelHandler()) { return ref; }
+      return new Promise(function reduceAsyncPromiseSeriesPromiseChain(resolve, reject) {
+        setTimeout(() => {
+          if (errorCalled || cancelHandler()) { return resolve(ref); }
+          try {
+            resolve(cb(store, ref));
+          } catch (e) {
+            reject(e);
+          }
+        }, timer);
+      });
+    }).catch(err => {
       errorCalled = true;
       return errorHandler(err, store, modRef, currentIndex, currentArray);
     });
-  }, Promise.resolve(modRef));
+  }, Promise.resolve(modRef)).then((val) => {
     config.time && console.timeEnd('id: ' + config.id + ' asyncPromiseSeries: ');
+    return val;
+  });
 }
 
 // @internal
