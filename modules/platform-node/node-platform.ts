@@ -239,7 +239,7 @@ export class NodePlatform  {
                 }
                 if (ngZone.isStable === true) { return done(ref); }
                 return checkStable(done, ref);
-              }, 0);
+              }, 1);
             });
           }
           return ngZone.runOutsideAngular(() => {
