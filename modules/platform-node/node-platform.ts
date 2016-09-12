@@ -129,6 +129,10 @@ export class NodePlatform  {
   }
 
   serialize<T>(moduleRef: NgModuleRef<T>, config: any = {}): Promise<T> {
+    var cancelHandler = () => false;
+    if (config && ('cancelHandler' in config)) {
+      cancelHandler = config.cancelHandler;
+    }
     // TODO(gdi2290): make stateless. allow for many instances of modules
     // TODO(gdi2290): refactor to ZoneLocalStore
     var _map = new Map<any, any>();

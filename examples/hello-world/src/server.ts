@@ -45,9 +45,10 @@ function createApp(num) {
 var promises = arr.reduce((memo, wat, num) => {
   return memo.then(() => {
     console.time('app' + num);
-    return createApp(num).then(() => {
+    return createApp(num).then((html) => {
       console.timeEnd('app' + num);
       console.log('\n-----------\n');
+      return html;
     });
   });
 }, Promise.resolve());
@@ -55,6 +56,9 @@ var promises = arr.reduce((memo, wat, num) => {
 promises
 .then(html => {
   console.log('done');
+  if (arr.length === 1) {
+    console.log('\n' + html);
+  }
   // process.exit();
   return html;
 });

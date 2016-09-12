@@ -29,15 +29,19 @@ export const platform = platformUniversalDynamic();
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 }
-
 export function main(document, config?: any) {
-  var id = s4();
-  console.time('id: ' + id + ' ngApp: ');
+  var id = config && config.id || s4();
+  var cancelHandler = () => false;
+  if (config && ('cancelHandler' in config)) {
+    cancelHandler = config.cancelHandler;
+  }
+  if (cancelHandler()) { return Promise.resolve(document); }
 
   @NgModule({
     bootstrap: [ App, AnotherComponent ],
     declarations: [ App, Wat, AnotherComponent ],
     imports: [
+      // UniversalModule,
       UniversalModule.withConfig({
         document: document,
         originUrl: 'http://localhost:3000',
@@ -69,8 +73,11 @@ export function main(document, config?: any) {
   return platform
     .serializeModule(MainModule, config)
     .then((html) => {
-      console.timeEnd('id: ' + id + ' ngApp: ');
-      console.log('\n -- serializeModule FINISHED --');
+      // console.log('\n -- serializeModule FINISHED --');
       return html;
+    })
+    .catch(err => {
+      console.error(err);
+      return document;
     });
 };

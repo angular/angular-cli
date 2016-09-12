@@ -31,9 +31,18 @@ app.use(express.static(ROOT, { index: false }));
 
 import { main as ngApp } from './main.node';
 // Routes with html5pushstate
+function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+}
 
 app.get('/', function (req, res, next) {
-
+  var id = s4();
+  var cancel = false;
+  req.on('close', function() {
+    console.log('Client closed the connection ', id);
+    cancel = true;
+  });
+  if (cancel) { return next(); }
   var documentHtml = `
     <!doctype>
     <html lang="en">
@@ -64,10 +73,17 @@ app.get('/', function (req, res, next) {
     </html>
   `;
 
-  return ngApp(documentHtml, { time: true, asyncDestroy: true }).then(html => {
+
+  return ngApp(documentHtml, { id, time: true, asyncDestroy: true, cancelHandler: () => cancel }).then(html => {
+    // console.log('\nexpress route\n');
     res.status(200).send(html);
     next();
     return html;
+  }).catch(err => {
+    // console.log('\nexpress route error\n');
+    res.status(200).send(documentHtml);
+    next();
+    return documentHtml;
   });
 
 });
