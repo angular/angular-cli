@@ -7,6 +7,18 @@ const atl = require('awesome-typescript-loader');
 import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
 import { findLazyModules } from './find-lazy-modules';
 
+// Resolves the alias with the root folder
+const getWebpackAlias = function (appRoot: string, alias: any) {
+  if (! alias) {
+    return {};
+  }
+  // resolve the appRoot path into the aliases
+  Object.keys(alias).map(item =>
+    alias[item] = path.resolve(appRoot, alias[item])
+  );
+
+  return alias;
+};
 
 export function getWebpackCommonConfig(
   projectRoot: string,
@@ -37,7 +49,8 @@ export function getWebpackCommonConfig(
     devtool: 'source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: appRoot
+      root: appRoot,
+      alias: getWebpackAlias(appRoot, appConfig.alias)
     },
     context: path.resolve(__dirname, './'),
     entry: entry,
