@@ -279,7 +279,10 @@ export class NodePlatform  {
         // parseFragment used
         // getInlineCode used
         let DOM = store.get('DOM');
+        let DOCUMENT = store.get('DOCUMENT');
         let appRef: ApplicationRef = store.get('ApplicationRef');
+        let selectorsList = (<any>moduleRef).bootstrapFactories.map((factory) => factory.selector);
+        let bodyList = DOCUMENT.body.children.filter(el => Boolean(el.tagName)).map(el => el.tagName.toLowerCase()).join(',');
         let components = appRef.components;
         let prebootCode = null;
         // TODO(gdi2290): hide cache in (ngPreboot|UniversalPreboot)
@@ -293,11 +296,19 @@ export class NodePlatform  {
             prebootEl = NodePlatform._cache.get(key).prebootEl;
             // prebootCode = NodePlatform._cache.get(key);
           } else if (key && !prebootEl) {
-            prebootConfig = JSON.parse(key);
-            if (!prebootConfig.appRoot) {
-              prebootConfig.appRoot = (<any>moduleRef).bootstrapFactories.map(factory => factory.selector);
+            try {
+              prebootConfig = JSON.parse(key);
+            } catch (e) {
+              prebootConfig = UNIVERSAL_CONFIG.preboot;
             }
-            config.time && console.time('id: ' + config.id + ' preboot insert: ');
+            if (!prebootConfig.appRoot) {
+              // TODO(gdi2290): missing public NgModuleInjector type
+              prebootConfig.appRoot = selectorsList;
+            }
+            if (!selectorsList) {
+              selectorsList = (<any>moduleRef).bootstrapFactories.map((factory) => factory.selector);
+            }
+            config.time && console.time('id: ' + config.id + ' preboot insert dom: ');
             prebootCode = parseFragment('' +
               '<script>\n' +
               ' ' + getInlineCode(prebootConfig) +
@@ -306,15 +317,19 @@ export class NodePlatform  {
             prebootEl = DOM.createElement('div');
             DOM.appendChild(prebootEl, prebootCode.childNodes[0]);
             NodePlatform._cache.set(key, {prebootCode, prebootEl});
-            config.time && console.timeEnd('id: ' + config.id + ' preboot insert: ');
+            config.time && console.timeEnd('id: ' + config.id + ' preboot insert dom: ');
           }
-          //  else {
-          //   prebootCode = getInlineCode(_config.preboot);
-          // }
-          // assume last component is the last component selector
-          // TODO(gdi2290): provide a better way to determine last component position
-          lastRef = components[components.length - 1];
-          el = lastRef.location.nativeElement;
+
+          lastRef = {cmp: null, strIndex: -1, index: -1};
+          selectorsList.forEach((select, i) => {
+            let lastValue = bodyList.indexOf(select);
+             if (lastValue >= lastRef.strIndex) {
+               lastRef.strIndex = lastValue;
+               lastRef.cmp = components[i];
+             }
+          });
+          el = lastRef.cmp.location.nativeElement;
+          lastRef = null;
           DOM.insertAfter(el, prebootEl);
           // let script = parseFragment(prebootCode);
         } catch (e) {
