@@ -176,7 +176,14 @@ export class NodePlatform  {
       }
     };
 
-    return asyncPromiseSeries(_store, moduleRef, [
+    function errorHandler(err, store, modRef, currentIndex, currentArray) {
+      const document = store.get('UNIVERSAL_CONFIG').document;
+      _store && _store.clear();
+      // console.log('\n\nError in', currentArray[currentIndex].name, '\n\n', document);
+      return document;
+    }
+
+    return asyncPromiseSeries(_store, moduleRef, errorHandler, cancelHandler, config,  [
       // create di store
       (store: any, moduleRef: NgModuleRef<T>) => {
         let modInjector = moduleRef.injector;
@@ -457,6 +464,8 @@ function asyncPromiseSeries(store, modRef, middleware, timer = 1) {
   return middleware.reduce((promise, cb) => {
     return promise.then((ref) => {
       return new Promise(resolve => setTimeout(() => resolve(cb(store, ref)), timer));
+      errorCalled = true;
+      return errorHandler(err, store, modRef, currentIndex, currentArray);
     });
   }, Promise.resolve(modRef));
 }
