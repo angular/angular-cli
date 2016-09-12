@@ -3,6 +3,18 @@
 const path = require('path');
 const webpack = require('webpack');
 
+const getWebpackAlias = function (appRoot, alias) {
+  if (! alias) {
+    return {};
+  }
+  // resolve the appRoot path into the aliases
+  Object.keys(alias).map(item =>
+    alias[item] = path.resolve(appRoot, alias[item])
+  );
+
+  return alias;
+};
+
 const getWebpackTestConfig = function(projectRoot, appConfig) {
   
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -12,7 +24,8 @@ const getWebpackTestConfig = function(projectRoot, appConfig) {
     context: path.resolve(__dirname, './'),
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: appRoot
+      root: appRoot,
+      alias: getWebpackAlias(appRoot, appConfig.alias)
     },
     entry: {
       test: path.resolve(appRoot, appConfig.test)
