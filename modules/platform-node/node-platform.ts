@@ -356,6 +356,7 @@ export class NodePlatform  {
         Object.assign(UNIVERSAL_CACHE, cache);
         cache = null;
 
+        config.time && console.timeEnd('id: ' + config.id + ' universal cache: ');
         return moduleRef;
       },
       // Inject Cache in Document
@@ -371,7 +372,7 @@ export class NodePlatform  {
 
         // TODO(gdi2290): move and find a better way to inject script
         try {
-          config.time && console.time('id: ' + config.id + ' dehydrate: ');
+          config.time && console.time('id: ' + config.id + ' dehydrate insert dom: ');
           el = DOM.createElement('universal-script');
 
           script = parseFragment('' +
@@ -388,11 +389,13 @@ export class NodePlatform  {
           el = null;
 
           universalAfterDehydrate();
+          config.time && console.timeEnd('id: ' + config.id + ' dehydrate insert dom: ');
 
-          config.time && console.timeEnd('id: ' + config.id + ' dehydrate: ');
         } catch (e) {
+          config.time && console.timeEnd('id: ' + config.id + ' dehydrate: ');
           return moduleRef;
         }
+        config.time && console.timeEnd('id: ' + config.id + ' dehydrate: ');
         return moduleRef;
       },
       // Destroy
@@ -481,10 +484,12 @@ function asyncPromiseSeries(store, modRef, middleware, timer = 1) {
   return middleware.reduce((promise, cb) => {
     return promise.then((ref) => {
       return new Promise(resolve => setTimeout(() => resolve(cb(store, ref)), timer));
+  config.time && console.time('id: ' + config.id + ' asyncPromiseSeries: ');
       errorCalled = true;
       return errorHandler(err, store, modRef, currentIndex, currentArray);
     });
   }, Promise.resolve(modRef));
+    config.time && console.timeEnd('id: ' + config.id + ' asyncPromiseSeries: ');
 }
 
 // @internal
