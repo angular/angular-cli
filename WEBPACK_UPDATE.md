@@ -16,9 +16,6 @@ rm -rf node_modules dist tmp typings
 npm install --save-dev angular-cli@webpack
 ```
 
-IMPORTANT NOTE: 
-Currently project generated with `ng new` will use a wrong local CLI version (see https://github.com/angular/angular-cli/issues/1528). After initializing your project, run `npm install --save-dev angular-cli@webpack` to set the correct version.
-
 ## Project files
 
 You will need to run `ng init` to check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).

@@ -16,6 +16,7 @@ module.exports = {
       'serve': require('./commands/serve').default,
       'new': require('./commands/new').default,
       'generate': require('./commands/generate').default,
+      'help': require('./commands/help').default,
       'init': require('./commands/init').default,
       'test': require('./commands/test').default,
       'e2e': require('./commands/e2e').default,

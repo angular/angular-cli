@@ -3,6 +3,9 @@ environment:
   - nodejs_version: "5.0"
   - nodejs_version: "6.0"
 
+matrix:
+  fast_finish: true
+
 install:
   - ps: Install-Product node $env:nodejs_version
   - npm install
@@ -11,5 +14,6 @@ test_script:
   - node --version
   - npm --version
   - npm test
+  - npm run test:e2e
 
 build: off

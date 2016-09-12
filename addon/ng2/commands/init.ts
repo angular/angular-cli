@@ -1,5 +1,3 @@
-'use strict';
-
 import LinkCli from '../tasks/link-cli';
 
 const Command = require('ember-cli/lib/models/command');
