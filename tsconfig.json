@@ -28,7 +28,7 @@
     }
   },
   "exclude": [
-    "addon/ng2/blueprints/*/files/**/*",
+    "packages/angular-cli/blueprints/*/files/**/*",
     "dist/**/*",
     "node_modules/**/*",
     "tmp/**/*"
