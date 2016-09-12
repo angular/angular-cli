@@ -15,8 +15,6 @@ enableProdMode();
 // import { expressEngine } from '@angular/express-engine';
 // import { replaceUniversalAppIf, transformDocument, UNIVERSAL_APP_ID, nodePlatform } from '@angular/universal';
 // nodePlatform();
-
-import {getDOM} from '@angular/platform-browser/src/dom/dom_adapter';
 // enable prod for faster renders
 
 const app = express();
