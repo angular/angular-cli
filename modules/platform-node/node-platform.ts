@@ -246,6 +246,7 @@ export class NodePlatform  {
         let components = appRef.components;
         let prebootCode = null;
         // TODO(gdi2290): hide cache in (ngPreboot|UniversalPreboot)
+        let prebootConfig = null;
         let key = (typeof UNIVERSAL_CONFIG.preboot === 'object') && JSON.stringify(UNIVERSAL_CONFIG.preboot) || null;
         let prebootEl = null;
         let el = null;
@@ -255,10 +256,14 @@ export class NodePlatform  {
             prebootEl = NodePlatform._cache.get(key).prebootEl;
             // prebootCode = NodePlatform._cache.get(key);
           } else if (key && !prebootEl) {
+            prebootConfig = JSON.parse(key);
+            if (!prebootConfig.appRoot) {
+              prebootConfig.appRoot = (<any>moduleRef).bootstrapFactories.map(factory => factory.selector);
+            }
             config.time && console.time('id: ' + config.id + ' preboot insert: ');
             prebootCode = parseFragment('' +
               '<script>\n' +
-              ' ' + getInlineCode(UNIVERSAL_CONFIG.preboot) +
+              ' ' + getInlineCode(prebootConfig) +
               '</script>' +
             '');
             prebootEl = DOM.createElement('div');
