@@ -67,7 +67,6 @@ glob.sync(path.join(packagesRoot, '**/*'))
   .forEach((fileName) => {
     const source = path.join(packagesRoot, fileName);
     const dest = path.join(dist, fileName);
-    console.log(source, '=>', dest);
 
     if (fs.statSync(source).isDirectory()) {
       try {
