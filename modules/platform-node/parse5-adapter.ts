@@ -525,7 +525,7 @@ export class Parse5DomAdapter extends DomAdapter {
     // if (defDoc === null) {
     //   defDoc = this.createHtmlDocument();
     // }
-    // TODO()
+    // TODO(gdi2290): needed for BROWSER_SANITIZATION_PROVIDERS
     return {documentMode: false};
   }
   // UNIVERSAL FIX
