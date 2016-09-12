@@ -7,7 +7,7 @@ const denodeify = require('denodeify');
 const fs = require('fs');
 const glob = denodeify(require('glob'));
 const path = require('path');
-const resolveBin = denodeify(require('resolve-bin'));
+const npmRun = require('npm-run');
 const rimraf = denodeify(require('rimraf'));
 
 
@@ -38,30 +38,6 @@ function patch() {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
-
-function tsc() {
-  const args = Array.prototype.slice.call(arguments);
-  return resolveBin('typescript', { executable: 'tsc' })
-    .then(tscBin => {
-      const child = child_process.spawn(tscBin, args);
-
-      child.stdout.on('data', data => console.log(data.toString()));
-      child.stderr.on('data', data => console.error(data.toString()));
-
-      return new Promise((resolve, reject) => {
-        child.on('error', (err) => reject(err));
-        child.on('close', (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      })
-    });
-}
-
-
 // First delete the dist folder.
 Promise.resolve()
   .then(() => console.log('Deleting dist folder...'))
@@ -78,7 +54,7 @@ Promise.resolve()
 
         return promise.then(() => {
           console.log(`  ${name}`);
-          return tsc('-p', pkg.root)
+          return npmRun.execSync(`tsc -p ${path.relative(process.cwd(), pkg.root)}`);
         });
       }, Promise.resolve());
   })
