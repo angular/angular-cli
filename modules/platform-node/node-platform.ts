@@ -579,6 +579,7 @@ export class NodeDomEventsPlugin {
   }
 
   addGlobalEventListener(target: string, eventName: string, handler: Function): Function {
+    // we need to ensure that events are created in the fake document created for the current app
     var window = this.manager.getWindow();
     var document = this.manager.getDocument();
     var zone = this.manager.getZone();
