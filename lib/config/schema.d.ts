@@ -33,6 +33,12 @@ export interface CliConfig {
         environments?: {
             [name: string]: any;
         };
+        /**
+         * Alias to resolve by webpack.
+         */
+        alias?: {
+            [name: string]: any;
+        };
     }[];
     /**
      * Configuration reserved for installed third party addons.

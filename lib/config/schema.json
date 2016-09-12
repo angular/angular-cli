@@ -73,6 +73,11 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "alias": {
+            "description": "Paths to be resolved by webpack in the build.",
+            "type": "object",
+            "additionalProperties": true
           }
         },
         "additionalProperties": false
