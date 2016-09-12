@@ -9,8 +9,7 @@
   },
   "keywords": [],
   "scripts": {
-    "build": "rm -rf dist/ && npm-run-all build:patch build:packages build:angular-cli",
-    "build:angular-cli": "./scripts/publish/build.js",
+    "build": "node ./scripts/publish/build.js",
     "build:patch": "node ./scripts/patch.js",
     "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -p $PKG; done",
     "test": "npm run test:packages && npm run test:cli",
@@ -146,6 +145,7 @@
     "mock-fs": "3.10.0",
     "object-assign": "^4.0.1",
     "request": "^2.74.0",
+    "resolve-bin": "^0.4.0",
     "rewire": "^2.5.1",
     "sinon": "^1.17.3",
     "through": "^2.3.8",
