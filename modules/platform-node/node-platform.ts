@@ -124,19 +124,29 @@ export class NodePlatform  {
   serializeModule<T>(ModuleType: any, config: any = {}): Promise<T> {
     if (config && !config.id) { config.id = s4(); }
     config.time && console.time('id: ' + config.id + ' bootstrapModule: ');
+    config.time && console.time('id: ' + config.id + ' ngApp: ');
     return this.platformRef.bootstrapModule<T>(ModuleType, config.compilerOptions)
       .then((moduleRef: NgModuleRef<T>) => {
         config.time && console.timeEnd('id: ' + config.id + ' bootstrapModule: ');
         return this.serialize<T>(moduleRef, config);
+      })
+      .then(html => {
+        config.time && console.timeEnd('id: ' + config.id + ' ngApp: ');
+        return html;
       });
   }
   serializeModuleFactory<T>(ModuleType: any, config: any = {}): Promise<T> | T {
     if (config && !config.id) { config.id = s4(); }
     config.time && console.time('id: ' + config.id + ' bootstrapModuleFactory: ');
+    config.time && console.time('id: ' + config.id + ' ngApp: ');
     return this.platformRef.bootstrapModuleFactory<T>(ModuleType)
       .then((moduleRef: NgModuleRef<T>) => {
         config.time && console.timeEnd('id: ' + config.id + ' bootstrapModuleFactory: ');
         return this.serialize<T>(moduleRef, config);
+      })
+      .then(html => {
+        config.time && console.timeEnd('id: ' + config.id + ' ngApp: ');
+        return html;
       });
   }
 
