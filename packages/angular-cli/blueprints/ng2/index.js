@@ -21,7 +21,7 @@ module.exports = {
 
   locals: function(options) {
     this.styleExt = options.style;
-    this.version = require(path.resolve(__dirname, '../../../../package.json')).version;
+    this.version = require(path.resolve(__dirname, '../../package.json')).version;
 
     // Join with / not path.sep as reference to typings require forward slashes.
     const relativeRootPath = options.sourceDir.split(path.sep).map(() => '..').join('/');

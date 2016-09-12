@@ -2,6 +2,7 @@
 'use strict';
 
 require('../lib/bootstrap-local');
+const glob = require('glob');
 
 const path = require('path');
 const Jasmine = require('jasmine');
@@ -15,4 +16,9 @@ jasmine.loadConfig({});
 jasmine.addReporter(new JasmineSpecReporter());
 
 // Run the tests.
-jasmine.execute(['**/*.spec.ts']);
+const allTests =
+  glob.sync('packages/**/*.spec.ts')
+    .map(p => path.relative(projectBaseDir, p))
+    .filter(p => !/blueprints/.test(p));
+
+jasmine.execute(allTests);

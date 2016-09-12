@@ -50,7 +50,7 @@ export function findLoadChildren(tsFilePath: string): string[] {
 }
 
 
-export function findLazyModules(projectRoot: any): string[] {
+export function findLazyModules(projectRoot: any): {[key: string]: string} {
   const result: {[key: string]: string} = {};
   glob.sync(path.join(projectRoot, '/**/*.ts'))
     .forEach(tsPath => {

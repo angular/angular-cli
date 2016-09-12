@@ -1,5 +1,5 @@
 import {CliConfig as CliConfigBase} from './config/config';
-import {CliConfig as ConfigInterface} from '../../../lib/config/schema';
+import {CliConfig as ConfigInterface} from '../lib/config/schema';
 import { oneLine } from 'common-tags';
 import * as chalk from 'chalk';
 import * as fs from 'fs';

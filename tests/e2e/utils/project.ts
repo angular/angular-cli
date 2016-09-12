@@ -1,5 +1,5 @@
 import {readFile, writeFile} from './fs';
-import {execAndWaitForOutputToMatch} from './process';
+import {silentExecAndWaitForOutputToMatch} from './process';
 
 const tsConfigPath = 'src/tsconfig.json';
 
@@ -21,5 +21,6 @@ export function updateTsConfig(fn: (json: any) => any | void) {
 
 
 export function ngServe(...args: string[]) {
-  return execAndWaitForOutputToMatch('ng', ['serve', ...args], /webpack: bundle is now VALID/);
+  return silentExecAndWaitForOutputToMatch('ng',
+    ['serve', ...args], /webpack: bundle is now VALID/);
 }

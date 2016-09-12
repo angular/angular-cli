@@ -1,4 +1,4 @@
-import {CliConfig} from '../../addon/ng2/models/config/config';
+import {CliConfig} from 'angular-cli/models/config/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import {CliConfig as ConfigInterface} from './spec-schema';

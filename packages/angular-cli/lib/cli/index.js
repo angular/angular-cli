@@ -4,6 +4,7 @@
 const cli = require('ember-cli/lib/cli');
 const path = require('path');
 
+Error.stackTraceLimit = Infinity;
 
 module.exports = function(options) {
   const oldStdoutWrite = process.stdout.write;

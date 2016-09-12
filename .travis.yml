@@ -12,7 +12,7 @@ env:
     - DBUS_SESSION_BUS_ADDRESS=/dev/null
   matrix:
     - SCRIPT=lint
-#    - SCRIPT=build
+    - SCRIPT=build
     - SCRIPT=e2e
     - SCRIPT=e2e:nightly
     - SCRIPT=test

@@ -4,7 +4,7 @@ import * as path from 'path';
 import {SchemaClass, SchemaClassFactory} from '../json-schema/schema-class-factory';
 
 
-const DEFAULT_CONFIG_SCHEMA_PATH = path.join(__dirname, '../../../../lib/config/schema.json');
+const DEFAULT_CONFIG_SCHEMA_PATH = path.join(__dirname, '../../lib/config/schema.json');
 
 
 export class InvalidConfigError extends Error {

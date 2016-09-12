@@ -2,7 +2,7 @@
 
 var MockUI = require('./mock-ui');
 var MockAnalytics = require('./mock-analytics');
-var Cli = require('../../lib/cli');
+var Cli = require('angular-cli/lib/cli');
 
 module.exports = function ng(args) {
   var cli;
