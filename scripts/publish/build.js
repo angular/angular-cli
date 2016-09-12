@@ -61,7 +61,7 @@ Promise.resolve()
   .then(() => glob(path.join(packagesRoot, '**/*')))
   .then(files => {
     console.log(`  Found ${files.length} files...`);
-    files
+    return files
       .map((fileName) => path.relative(packagesRoot, fileName))
       .filter((fileName) => {
         if (/^angular-cli.blueprints/.test(fileName)) {
@@ -94,7 +94,7 @@ Promise.resolve()
           && !(/\.spec\./.test(fileName))
           && !(/[\/\\]tests[\/\\]/.test(fileName));
       })
-      .forEach((fileName) => {
+      .map((fileName) => {
         const source = path.join(packagesRoot, fileName);
         const dest = path.join(dist, fileName);
 
@@ -107,9 +107,12 @@ Promise.resolve()
             }
           }
         } else {
-          copy(source, dest);
+          return copy(source, dest);
         }
-      });
+      })
+      .reduce((promise, current) => {
+        return promise.then(() => current);
+      }, Promise.resolve());
   })
   .then(() => process.exit(0), (err) => {
     console.error(err);
