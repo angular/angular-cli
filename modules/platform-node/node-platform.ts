@@ -121,6 +121,7 @@ export class NodePlatform  {
   constructor(private _platformRef: PlatformRef) {
   }
 
+  // TODO(gdi2290): refactor into bootloader
   serializeModule<T>(ModuleType: any, config: any = {}): Promise<T> {
     if (config && !config.id) { config.id = s4(); }
     config.time && console.time('id: ' + config.id + ' bootstrapModule: ');
@@ -134,7 +135,9 @@ export class NodePlatform  {
         config.time && console.timeEnd('id: ' + config.id + ' ngApp: ');
         return html;
       });
+
   }
+  // TODO(gdi2290): refactor into bootloader
   serializeModuleFactory<T>(ModuleType: any, config: any = {}): Promise<T> | T {
     if (config && !config.id) { config.id = s4(); }
     config.time && console.time('id: ' + config.id + ' bootstrapModuleFactory: ');
@@ -150,6 +153,7 @@ export class NodePlatform  {
       });
   }
 
+  // TODO(gdi2290): refactor into bootloader
   serialize<T>(moduleRef: NgModuleRef<T>, config: any = {}): Promise<T> {
     var cancelHandler = () => false;
     if (config && ('cancelHandler' in config)) {
