@@ -3,8 +3,8 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const getWebpackTestConfig = function(projectRoot, appConfig) {
-  
+const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
+
   const appRoot = path.resolve(projectRoot, appConfig.root);
 
   return {
@@ -81,7 +81,15 @@ const getWebpackTestConfig = function(projectRoot, appConfig) {
       new webpack.SourceMapDevToolPlugin({
         filename: null, // if no value is provided the sourcemap is inlined
         test: /\.(ts|js)($|\?)/i // process .js and .ts files only
-      })
+      }),
+      new webpack.NormalModuleReplacementPlugin(
+        // This plugin is responsible for swapping the environment files.
+        // Since it takes a RegExp as first parameter, we need to escape the path.
+        // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
+        new RegExp(path.resolve(appRoot, appConfig.environments['source'])
+          .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
+        path.resolve(appRoot, appConfig.environments[environment])
+      ),
     ],
     tslint: {
       emitErrors: false,
