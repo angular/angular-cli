@@ -68,8 +68,20 @@ import {
 } from './tokens';
 
 // @internal
+
 export function _errorHandler(): ErrorHandler {
   return new ErrorHandler();
+}
+
+// @internal
+const _documentDeps = [ NodeSharedStylesHost, UNIVERSAL_CONFIG ];
+export function _document(domSharedStylesHost: NodeSharedStylesHost, config: any): any {
+  if (!config.document) {
+    throw new Error('Please provide a document in the universal config');
+  }
+  var doc: any = parseDocument(config.document);
+  domSharedStylesHost.addHost(doc.head);
+  return doc;
 }
 
 // @internal
@@ -522,27 +534,31 @@ export class NodeDomEventsPlugin {
   }
 }
 
+
 @NgModule({
   providers: [
+    // default config value
+    { provide: UNIVERSAL_CONFIG, useValue: {} },
     // normally in platform provides but there is url state in NodePlatformLocation
     { provide: PlatformLocation, useClass: NodePlatformLocation },
 
     BROWSER_SANITIZATION_PROVIDERS,
     { provide: ErrorHandler, useFactory: _errorHandler, deps: [] },
-    // { provide: DOCUMENT, useFactory: _document, deps: [] },
+
+    { provide: DOCUMENT, useFactory: _document, deps: _documentDeps },
+
     NodeDomEventsPlugin,
     { provide: DomEventsPlugin, useExisting: NodeDomEventsPlugin, multi: true },
     { provide: EVENT_MANAGER_PLUGINS, useExisting: NodeDomEventsPlugin, multi: true },
     { provide: EVENT_MANAGER_PLUGINS, useClass: KeyEventsPlugin, multi: true },
-    // { provide: EVENT_MANAGER_PLUGINS, useClass: HammerGesturesPlugin, multi: true },
-    // { provide: HAMMER_GESTURE_CONFIG, useClass: HammerGestureConfig },
 
     NodeEventManager,
     { provide: EventManager, useExisting: NodeEventManager },
 
 
-    { provide: AnimationDriver, useFactory: _resolveDefaultAnimationDriver },
+    { provide: AnimationDriver, useFactory: _resolveDefaultAnimationDriver, deps: [] },
     Testability,
+    // TODO(gdi2290): provide concurrent NodeDebugDomRender
     // ELEMENT_PROBE_PROVIDERS,
 
     NodeDomRootRenderer,
@@ -552,6 +568,7 @@ export class NodeDomEventsPlugin {
     NodeSharedStylesHost,
     { provide: SharedStylesHost, useExisting: NodeSharedStylesHost },
     { provide: DomSharedStylesHost, useExisting: NodeSharedStylesHost },
+
   ],
   exports: [  CommonModule, ApplicationModule  ]
 })
@@ -566,15 +583,6 @@ export class NodeModule {
       ngModule: NodeModule,
       providers: [
         { provide: UNIVERSAL_CONFIG, useValue: config },
-        {
-          provide: DOCUMENT,
-          useFactory: (domSharedStylesHost: NodeSharedStylesHost, config: any) => {
-            var doc: any = parseDocument(config.document);
-            domSharedStylesHost.addHost(doc.head);
-            return doc;
-          },
-          deps: [ NodeSharedStylesHost, UNIVERSAL_CONFIG ]
-        },
         ...providers,
       ]
     };
