@@ -495,7 +495,9 @@ export class NodeDomRenderer extends DomRenderer {
         }
       }
     }
-    return super.setElementAttribute(renderElement, propertyName, propertyValue);
+    if (typeof propertyValue === 'string') {
+        return super.setElementAttribute(renderElement, propertyName, propertyValue);
+    }
   }
 
   setElementStyle(renderElement: any, styleName: string, styleValue: string): void {
