@@ -2,5 +2,5 @@ import {npm} from '../utils/process';
 
 
 export default function() {
-  return npm('build');
+  return npm('run', 'build');
 }
