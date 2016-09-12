@@ -3,19 +3,10 @@ import './polyfills.node';
 import * as path from 'path';
 import * as express from 'express';
 
-// import * as bodyParser from 'body-parser';
-// import * as preboot from 'preboot';
-// console.log(preboot);
-
-// Angular 2
-import { enableProdMode, ApplicationRef, PlatformRef, NgZone, APP_ID } from '@angular/core';
+import { enableProdMode } from '@angular/core';
+// Angular 2 Universal
 enableProdMode();
 
-// Angular 2 Universal
-// import { expressEngine } from '@angular/express-engine';
-// import { replaceUniversalAppIf, transformDocument, UNIVERSAL_APP_ID, nodePlatform } from '@angular/universal';
-// nodePlatform();
-// enable prod for faster renders
 
 const app = express();
 const ROOT = path.join(path.resolve(__dirname, '..'));
