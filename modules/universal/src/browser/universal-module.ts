@@ -86,7 +86,7 @@ export const UNIVERSAL_CACHE = new OpaqueToken('UNIVERSAL_CACHE');
       useValue: () => {
         let _win: any = window;
         if (_win && prebootClient) {
-          prebootClient().complete();
+          setTimeout(() => prebootClient().complete());
         }
       }
     }

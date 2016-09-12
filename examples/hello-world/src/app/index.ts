@@ -42,7 +42,7 @@ export class Wat {
   `
 })
 export class App implements OnInit {
-  wat = '';
+  wat = 'yolo';
   response = {};
   toggle = false;
   onWat() {
