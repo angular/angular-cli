@@ -2,7 +2,6 @@
 'use strict';
 /*eslint-disable no-console */
 
-const child_process = require('child_process');
 const denodeify = require('denodeify');
 const fs = require('fs');
 const glob = denodeify(require('glob'));
