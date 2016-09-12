@@ -7,6 +7,7 @@ const atl = require('awesome-typescript-loader');
 import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
 import { findLazyModules } from './find-lazy-modules';
 
+// Resolves the alias with the root folder
 const getWebpackAlias = function (appRoot: string, alias: any) {
   if (! alias) {
     return {};
