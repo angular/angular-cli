@@ -198,7 +198,7 @@ with the content
 
 ```
 {
-  "api/*": {
+  "/api": {
     "target": "http://localhost:3000",
     "secure": false
   }
