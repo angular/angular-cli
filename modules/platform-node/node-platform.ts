@@ -185,7 +185,7 @@ export class NodePlatform  {
 
     return asyncPromiseSeries(_store, moduleRef, errorHandler, cancelHandler, config,  [
       // create di store
-      (store: any, moduleRef: NgModuleRef<T>) => {
+      function createDiStore(store: any, moduleRef: NgModuleRef<T>) {
         let modInjector = moduleRef.injector;
         let instance: any = moduleRef.instance;
         // lifecycle hooks
@@ -206,7 +206,7 @@ export class NodePlatform  {
         return moduleRef;
       },
       // Check Stable
-      (store: any, moduleRef: NgModuleRef<T>) => {
+      function checkStable(store: any, moduleRef: NgModuleRef<T>) {
         config.time && console.time('id: ' + config.id + ' stable: ');
         let UNIVERSAL_CONFIG = store.get('UNIVERSAL_CONFIG');
         let universalDoCheck = store.get('universalDoCheck');
@@ -270,7 +270,7 @@ export class NodePlatform  {
           });
       },
       // Inject preboot
-      (store: any, moduleRef: NgModuleRef<T>) => {
+      function injectPreboot(store: any, moduleRef: NgModuleRef<T>) {
         let UNIVERSAL_CONFIG = store.get('UNIVERSAL_CONFIG');
         if (typeof UNIVERSAL_CONFIG.preboot === 'boolean' && !UNIVERSAL_CONFIG.preboot) {
           return moduleRef;
@@ -328,7 +328,8 @@ export class NodePlatform  {
         return moduleRef;
       },
       // Dehydrate Cache
-      (store: any, moduleRef: NgModuleRef<T>) => {
+      function dehydrateCache(store: any, moduleRef: NgModuleRef<T>) {
+        config.time && console.time('id: ' + config.id + ' universal cache: ');
         let appId = store.get('APP_ID', null);
         let UNIVERSAL_CACHE = store.get('UNIVERSAL_CACHE');
         let universalDoDehydrate = store.get('universalDoDehydrate');
@@ -343,7 +344,8 @@ export class NodePlatform  {
         return moduleRef;
       },
       // Inject Cache in Document
-      (store: any, moduleRef: NgModuleRef<T>) => {
+      function injectCacheInDocument(store: any, moduleRef: NgModuleRef<T>) {
+        config.time && console.time('id: ' + config.id + ' dehydrate: ');
         // parseFragment used
         let universalAfterDehydrate = store.get('universalAfterDehydrate');
         let DOM = store.get('DOM');
@@ -379,7 +381,7 @@ export class NodePlatform  {
         return moduleRef;
       },
       // Destroy
-      (store: any, moduleRef: NgModuleRef<T>) => {
+      function destroyAppAndSerializeDocument(store: any, moduleRef: NgModuleRef<T>) {
         config.time && console.time('id: ' + config.id + ' serialize: ');
         // serializeDocument used
         let universalOnRendered = store.get('universalOnRendered');
