@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es5", "dom"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "ngfactory",
+    "baseUrl": ".",
+    "paths": {
+      "@angular/express-engine": [
+        "../../modules/express-engine"
+      ],
+      "@angular/platform-node": [
+        "../../modules/platform-node"
+      ],
+      "@angular/platform-node-dynamic": [
+        "../../modules/platform-node-dynamic"
+      ],
+      "@angular/universal": [
+        "../../modules/universal"
+      ],
+      "@angular/universal/browser": [
+        "../../modules/universal/browser.ts"
+      ],
+      "@angular/universal/node": [
+        "../../modules/universal/node.ts"
+      ],
+      "rxjs/*": [
+        "./node_modules/rxjs-es/*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "src/app/github/**/*",
+    "src/app/app.component.ts"
+  ],
+  "angularCompilerOptions": {
+    "basePath": ".",
+    "genDir": "ngfactory",
+    "skipMetadataEmit": false
+  },
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": { "rewriteTsconfig": false }
+}
