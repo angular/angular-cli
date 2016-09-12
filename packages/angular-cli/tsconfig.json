@@ -25,7 +25,6 @@
     }
   },
   "exclude": [
-    "blueprints/*/files/**/*",
-    "**/*.spec.ts"
+    "blueprints/*/files/**/*"
   ]
 }

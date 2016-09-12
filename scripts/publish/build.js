@@ -30,19 +30,10 @@ function copy(from, to) {
 }
 
 
-function patch() {
-  const filePath = path.join(__dirname, '../../node_modules/@types/common-tags/common-tags.d.ts');
-  const content = fs.readFileSync(filePath, 'utf8')
-    .replace(/literals: string\[\]/, 'literals: TemplateStringsArray');
-  fs.writeFileSync(filePath, content, 'utf8');
-}
-
 // First delete the dist folder.
 Promise.resolve()
   .then(() => console.log('Deleting dist folder...'))
   .then(() => rimraf(dist))
-  .then(() => console.log('Patching node_modules typings...'))
-  .then(() => patch())
   .then(() => console.log('Compiling packages...'))
   .then(() => {
     const packages = require('../../lib/packages');
@@ -64,7 +55,7 @@ Promise.resolve()
     return files
       .map((fileName) => path.relative(packagesRoot, fileName))
       .filter((fileName) => {
-        if (/^angular-cli.blueprints/.test(fileName)) {
+        if (/^angular-cli[\\\/]blueprints/.test(fileName)) {
           return true;
         }
         if (/\.d\.ts$/.test(fileName)) {

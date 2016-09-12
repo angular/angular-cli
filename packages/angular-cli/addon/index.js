@@ -24,6 +24,7 @@ module.exports = {
       'init': require('../commands/init').default,
       'test': require('../commands/test').default,
       'e2e': require('../commands/e2e').default,
+      'help': require('../commands/help').default,
       'lint': require('../commands/lint').default,
       'version': require('../commands/version').default,
       'completion': require('../commands/completion').default,
