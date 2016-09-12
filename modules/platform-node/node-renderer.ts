@@ -31,7 +31,7 @@ import {
 
 import {
   NodeSharedStylesHost
-} from './node-shared-styles-host'
+} from './node-shared-styles-host';
 
 const NAMESPACE_URIS = {
   'xlink': 'http://www.w3.org/1999/xlink',
@@ -316,7 +316,7 @@ export class DomRenderer implements Renderer {
   }
 
   projectNodes(parentElement: any, nodes: any[]) {
-    if (isBlank(parentElement)) return;
+    if (isBlank(parentElement)) { return; }
     appendNodes(parentElement, nodes);
   }
 
@@ -620,7 +620,7 @@ function _flattenStyles(compId: string, styles: Array<any|any[]>, target: string
 const NS_PREFIX_RE = /^:([^:]+):(.+)$/;
 
 function splitNamespace(name: string): string[] {
-  if (name[0] != ':') {
+  if (name[0] !== ':') {
     return [null, name];
   }
   const match = name.match(NS_PREFIX_RE);
