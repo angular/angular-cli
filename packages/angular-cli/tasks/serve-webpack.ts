@@ -46,6 +46,19 @@ export default Task.extend({
       }
     }
 
+    let sslKey = null;
+    let sslCert = null;
+    if (commandOptions.ssl) {
+      const keyPath = path.resolve(this.project.root, commandOptions.sslKey);
+      if (fs.existsSync(keyPath)) {
+        sslKey = fs.readFileSync(keyPath, 'utf-8');
+      }
+      const certPath = path.resolve(this.project.root, commandOptions.sslCert);
+      if (fs.existsSync(certPath)) {
+        sslCert = fs.readFileSync(certPath, 'utf-8');
+      }
+    }
+
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
       contentBase: path.resolve(
         this.project.root,
@@ -54,13 +67,19 @@ export default Task.extend({
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
       inline: true,
-      proxy: proxyConfig
+      proxy: proxyConfig,
+      https: commandOptions.ssl
     };
+
+    if (sslKey != null && sslCert != null) {
+      webpackDevServerConfiguration.key = sslKey;
+      webpackDevServerConfiguration.cert = sslCert;
+    }
 
     ui.writeLine(chalk.green(oneLine`
       **
       NG Live Development Server is running on
-      http://${commandOptions.host}:${commandOptions.port}.
+      http${commandOptions.ssl?'s':''}://${commandOptions.host}:${commandOptions.port}.
       **
     `));
 
