@@ -7,7 +7,6 @@ import {
   platformNodeDynamic
 } from '../lib';
 
-// @internal
 export type NodePlatformRef = PlatformRef & NodePlatform;
 
 export function platformUniversalDynamic (extraProviders?: any[]): NodePlatformRef {

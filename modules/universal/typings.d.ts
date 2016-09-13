@@ -1,5 +1,4 @@
-export * from './src/browser';
-export * from './src/node';
+export * from './src/browser/browser';
 
 // fix conflict with ts
 export {
@@ -7,4 +6,6 @@ export {
   isBrowser,
   isNode,
   platformUniversalDynamic
-} from './src/node';
+} from './src/browser/browser';
+
+export * from './src/node/node';
