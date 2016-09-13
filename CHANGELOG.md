@@ -363,9 +363,12 @@
 
 ### BREAKING CHANGES
 
-*  NodeUniversalStylesHost to NodeUniversalStylesHost
+* universal: NodeUniversalStylesHost to NodeUniversalStylesHost
 * universal: Bootloader#serializeApplication takes a config object
-* universal: 
+* universal: remove Bootloader
+* express-engine: replace expressEngine to createEngine
+* universal: convert bootloader config to UniversalModule.withConfig
+* *: remove all deprecated APIs
 
 
 
