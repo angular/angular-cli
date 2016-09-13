@@ -46,8 +46,8 @@ export default Task.extend({
       }
     }
 
-    let sslKey = null;
-    let sslCert = null;
+    let sslKey: string = null;
+    let sslCert: string = null;
     if (commandOptions.ssl) {
       const keyPath = path.resolve(this.project.root, commandOptions.sslKey);
       if (fs.existsSync(keyPath)) {
