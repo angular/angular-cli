@@ -1,76 +1,33 @@
-import { NgModule, Component, Injectable } from '@angular/core';
-import {
-  UniversalModule,
-  NodeHttpModule,
-  NodeJsonpModule,
-  platformUniversalDynamic
-} from 'angular2-universal/node';
-
+import { NgModule, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-import { App, Wat } from './app';
-
+import { UniversalModule } from 'angular2-universal/node';
 
 @Component({
-  selector: 'another-component',
-  styles: [`
-    h1 {
-      background-color: red;
-    }
-  `],
-  template: `
-    <h1>SERVER-RENDERED</h1>
-  `
+  selector: 'app',
+  template: 'Hello Universal App'
 })
-class AnotherComponent {}
+class App {
 
-export const platform = platformUniversalDynamic();
-
-function s4() {
-  return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 }
 
-export function main(document, config?: any) {
-  var id = s4();
-  console.time('id: ' + id + ' ngApp: ');
+export function main(config) {
 
   @NgModule({
-    bootstrap: [ App, AnotherComponent ],
-    declarations: [ App, Wat, AnotherComponent ],
+    bootstrap: [ App ],
+    declarations: [ App ],
     imports: [
       UniversalModule.withConfig({
-        document: document,
+        document: config.document,
         originUrl: 'http://localhost:3000',
         baseUrl: '/',
         requestUrl: '/',
         // preboot: false,
-        preboot: { uglify: true },
+        preboot: { appRoot: ['app'], uglify: true },
       }),
       FormsModule
     ]
   })
-  class MainModule {
-    ngOnInit() {
-      console.log('ngOnInit');
-    }
-    // ngDoCheck() {
-    //   console.log('ngDoCheck');
-    //   return true;
-    // }
-    ngOnStable() {
-      console.log('ngOnStable');
-    }
-    ngOnRendered() {
-      console.log('ngOnRendered');
-    }
-  }
+  class MainModule {}
 
-  // nodePlatform serialize
-  return platform
-    .serializeModule(MainModule, config)
-    .then((html) => {
-      console.timeEnd('id: ' + id + ' ngApp: ');
-      console.log('\n -- serializeModule FINISHED --');
-      return html;
-    });
+  return MainModule
 };

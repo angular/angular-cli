@@ -72,7 +72,19 @@ var webpackConfig = setTypeScriptAlias(require('./tsconfig.json'), {
       { test: /\.json$/, loader: 'json-loader' },
       { test: /\.html$/, loader: 'raw-loader' },
       { test: /\.css$/, loader: 'raw-loader' }
+    ],
+    postLoaders: [
+      {
+        test: /\.js$/,
+        loader: 'string-replace-loader',
+        query: {
+          search: 'var sourceMappingUrl = extractSourceMappingUrl\\(cssText\\);',
+          replace: 'var sourceMappingUrl = "";',
+          flags: 'g'
+        }
+      }
     ]
+
   },
 
   plugins: [

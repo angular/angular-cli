@@ -4,7 +4,6 @@ var path = require('path');
 module.exports = function(config) {
   config.target = 'node';
   config.entry =  {
-    server: './src/server.ts',
     express: './src/server-express.ts'
   },
   config.output.filename = 'server/[name]-bundle.js';
