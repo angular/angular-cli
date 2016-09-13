@@ -14,6 +14,7 @@ const root = path.join(__dirname, '../..');
 const dist = path.join(root, 'dist');
 const packagesRoot = path.join(root, 'packages');
 
+
 function copy(from, to) {
   from = path.relative(process.cwd(), from);
   to = path.relative(process.cwd(), to);
@@ -104,6 +105,15 @@ Promise.resolve()
       .reduce((promise, current) => {
         return promise.then(() => current);
       }, Promise.resolve());
+  })
+  .then(() => {
+    // Copy all resources that might have been missed.
+    return Promise.all([
+      'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE', 'README.md'
+    ].map(fileName => {
+      console.log(`Copying ${fileName}...`);
+      return copy(fileName, path.join('dist/angular-cli', fileName));
+    }));
   })
   .then(() => process.exit(0), (err) => {
     console.error(err);
