@@ -128,6 +128,7 @@ gulp.task('copy_license', () => {
 
 gulp.task('copy_files', () => {
   return gulp.src('modules/universal/typings.d.ts')
+  .pipe(replace(/\.\/src\//g, './'))
     .pipe(gulp.dest(`dist/universal`));
 });
 
