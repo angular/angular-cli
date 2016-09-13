@@ -5,11 +5,16 @@
   "browser": "src/browser/index.ts",
   "typings": "typings.d.ts",
   "files": [
+    "node",
+    "browser",
     "lib",
     "src",
     "typings.d.ts",
     "browser.js",
+    "browser.d.ts",
     "node.js",
+    "node.d.ts",
+    "LICENSE",
     "index.js"
   ],
   "dependencies": {
