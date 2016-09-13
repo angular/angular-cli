@@ -1,7 +1,6 @@
 {
   "name": "angular2-express-engine",
-  "main": "./src/index.js",
-  "typings": "./src/index.d.ts",
+  "main": "./index.ts",
   "description": "Universal (isomorphic) javascript support for Angular2",
   "dependencies": {
     "graceful-fs": "<INHERIT>"
