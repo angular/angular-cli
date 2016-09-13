@@ -1,4 +1,5 @@
 import LinkCli from '../tasks/link-cli';
+import NpmInstall from '../tasks/npm-install';
 
 const Command = require('ember-cli/lib/models/command');
 const Promise = require('ember-cli/lib/ext/promise');
@@ -6,7 +7,6 @@ const SilentError = require('silent-error');
 const validProjectName = require('ember-cli/lib/utilities/valid-project-name');
 const normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
 const GitInit = require('../tasks/git-init');
-const NpmInstall = require('../tasks/npm-install');
 
 
 const InitCommand: any = Command.extend({
@@ -57,18 +57,18 @@ const InitCommand: any = Command.extend({
       });
     }
 
-    let linkCli: any;
-    if (commandOptions.linkCli) {
-      linkCli = new LinkCli({
+    let npmInstall: any;
+    if (!commandOptions.skipNpm) {
+      npmInstall = new NpmInstall({
         ui: this.ui,
         analytics: this.analytics,
         project: this.project
       });
     }
 
-    let npmInstall: any;
-    if (!commandOptions.skipNpm) {
-      npmInstall = new NpmInstall({
+    let linkCli: any;
+    if (commandOptions.linkCli) {
+      linkCli = new LinkCli({
         ui: this.ui,
         analytics: this.analytics,
         project: this.project
@@ -121,19 +121,13 @@ const InitCommand: any = Command.extend({
         }
       }.bind(this))
       .then(function () {
-        if (commandOptions.linkCli) {
-          return linkCli.run({
-            verbose: commandOptions.verbose,
-            optional: false
-          });
+        if (!commandOptions.skipNpm) {
+          return npmInstall.run();
         }
       })
       .then(function () {
-        if (!commandOptions.skipNpm) {
-          return npmInstall.run({
-            verbose: commandOptions.verbose,
-            optional: false
-          });
+        if (commandOptions.linkCli) {
+          return linkCli.run();
         }
       })
       .then(function () {
