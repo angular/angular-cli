@@ -1,3 +1,5 @@
+
+
 // @internal
 export function cssHyphenate(propertyName: string): string {
   return propertyName.replace(/([A-Z])/g, '-$1')
@@ -206,3 +208,6 @@ export function arrayFlattenTree(children: any[], arr: any[]): any[] {
   }
   return arr;
 }
+
+var __empty = null;
+export default __empty;

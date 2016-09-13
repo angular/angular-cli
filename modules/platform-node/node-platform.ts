@@ -514,7 +514,6 @@ function asyncPromiseSeries(store, modRef, errorHandler, cancelHandler, config, 
   });
 }
 
-// @internal
 export interface EventManagerPlugin {
   manager: EventManager | NodeEventManager;
   supports(eventName: string): boolean;

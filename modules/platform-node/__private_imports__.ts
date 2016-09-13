@@ -58,3 +58,7 @@ export {
   RenderDebugInfo,
 
 }
+
+var __empty = null;
+
+export default __empty;
