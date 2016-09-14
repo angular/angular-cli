@@ -86,6 +86,7 @@
     "stylus-loader": "^2.1.0",
     "symlink-or-copy": "^1.0.3",
     "ts-loader": "^0.8.2",
+    "tslint": "^3.15.1",
     "tslint-loader": "^2.1.4",
     "typedoc": "^0.4.2",
     "typescript": "2.0.2",
