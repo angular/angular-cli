@@ -1,3 +1,4 @@
+import {Version} from '../upgrade/version';
 const Command = require('ember-cli/lib/models/command');
 import WebpackBuild from '../tasks/build-webpack';
 import WebpackBuildWatch from '../tasks/build-webpack-watch';
@@ -41,6 +42,8 @@ const BuildCommand = Command.extend({
         commandOptions.environment = 'prod';
       }
     }
+
+    Version.assertPostWebpackVersion();
 
     const project = this.project;
     const ui = this.ui;

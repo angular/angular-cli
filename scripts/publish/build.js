@@ -2,6 +2,7 @@
 'use strict';
 
 /*eslint-disable no-console */
+const chalk = require('chalk');
 const denodeify = require('denodeify');
 const fs = require('fs');
 const glob = denodeify(require('glob'));
@@ -45,7 +46,11 @@ Promise.resolve()
 
         return promise.then(() => {
           console.log(`  ${name}`);
-          return npmRun.execSync(`tsc -p ${path.relative(process.cwd(), pkg.root)}`);
+          try {
+            return npmRun.execSync(`tsc -p ${path.relative(process.cwd(), pkg.root)}`);
+          } catch (err) {
+            throw new Error(`Compilation error.\n${err.stdout}`);
+          }
         });
       }, Promise.resolve());
   })
@@ -116,6 +121,6 @@ Promise.resolve()
     }));
   })
   .then(() => process.exit(0), (err) => {
-    console.error(err);
+    console.error(chalk.red(err.message));
     process.exit(1);
   });
