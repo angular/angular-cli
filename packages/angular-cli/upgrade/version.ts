@@ -55,18 +55,23 @@ export class Version {
 
   static fromProject(): Version {
     let packageJson: any = null;
-    const angularCliPath = resolve.sync('angular-cli', {
-      basedir: process.cwd(),
-      packageFilter: (pkg: any, pkgFile: string) => {
-        packageJson = pkg;
+
+    try {
+      const angularCliPath = resolve.sync('angular-cli', {
+        basedir: process.cwd(),
+        packageFilter: (pkg: any, pkgFile: string) => {
+          packageJson = pkg;
+        }
+      });
+      if (angularCliPath && packageJson) {
+        try {
+          return new Version(packageJson.version);
+        } catch (e) {
+          return new Version(null);
+        }
       }
-    });
-    if (angularCliPath && packageJson) {
-      try {
-        return new Version(packageJson.version);
-      } catch (e) {
-        return new Version(null);
-      }
+    } catch (e) {
+      // Fallback to reading config.
     }
 
 
