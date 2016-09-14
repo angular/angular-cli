@@ -79,7 +79,7 @@ export default Task.extend({
     ui.writeLine(chalk.green(oneLine`
       **
       NG Live Development Server is running on
-      http${commandOptions.ssl?'s':''}://${commandOptions.host}:${commandOptions.port}.
+      http${commandOptions.ssl ? 's' : ''}://${commandOptions.host}:${commandOptions.port}.
       **
     `));
 
