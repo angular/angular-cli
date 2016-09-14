@@ -14,6 +14,6 @@ test_script:
   - node --version
   - npm --version
   - npm test
-  - npm run test:e2e
+  - node tests\e2e_runner.js
 
 build: off

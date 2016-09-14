@@ -13,22 +13,22 @@ env:
   matrix:
     - SCRIPT=lint
     - SCRIPT=build
-    - SCRIPT=e2e
-    - SCRIPT=e2e:nightly
     - SCRIPT=test
+    - NODE_SCRIPT=tests/e2e_runner.js
+    - NODE_SCRIPT="tests/e2e_runner.js --nightly"
 #    - TARGET=mobile SCRIPT=mobile_test
 matrix:
   fast_finish: true
   allow_failures:
     - os: osx
-    - env: SCRIPT=e2e:nightly
+    - env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
   exclude:
     - node_js: "6"
       env: SCRIPT=lint
     - os: osx
-      env: SCRIPT=e2e:nightly
+      env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
     - node_js: "6"
-      env: SCRIPT=e2e:nightly
+      env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
     - os: osx
       node_js: "5"
       env: SCRIPT=lint
@@ -57,4 +57,5 @@ install:
   - npm install --no-optional
 
 script:
-  - npm run-script $SCRIPT
+  - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
+  - if [[ "$NODE_SCRIPT" ]]; then node $NODE_SCRIPT; fi

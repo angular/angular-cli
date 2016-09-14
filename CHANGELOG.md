@@ -1,3 +1,25 @@
+<a name="1.0.0-beta.11-webpack.9"></a>
+# [1.0.0-beta.11-webpack.9](https://github.com/angular/angular-cli/compare/v1.0.0-beta.11-webpack.2...v1.0.0-beta.11-webpack.9) (2016-09-13)
+
+
+### Bug Fixes
+
+* add ast-tools as a direct dependency to angular-cli ([bf18f4d](https://github.com/angular/angular-cli/commit/bf18f4d))
+* **bootstrap:** fix windows node_modules path ([#2037](https://github.com/angular/angular-cli/issues/2037)) ([c41600a](https://github.com/angular/angular-cli/commit/c41600a))
+* **find-lazy-modules:** Allow for any valid keys/value to be used ([#1987](https://github.com/angular/angular-cli/issues/1987)) ([caa3142](https://github.com/angular/angular-cli/commit/caa3142)), closes [#1891](https://github.com/angular/angular-cli/issues/1891) [#1960](https://github.com/angular/angular-cli/issues/1960)
+* **lint:** Updated the main.ts's blueprint to fix the ng lint failure ([#1903](https://github.com/angular/angular-cli/issues/1903)) ([#1904](https://github.com/angular/angular-cli/issues/1904)) ([0d9d646](https://github.com/angular/angular-cli/commit/0d9d646))
+* add loader for gif ([#2066](https://github.com/angular/angular-cli/issues/2066)) ([126c82b](https://github.com/angular/angular-cli/commit/126c82b)), closes [#1878](https://github.com/angular/angular-cli/issues/1878)
+* lazy loading now works as expected with latest webpack ([#2038](https://github.com/angular/angular-cli/issues/2038)) ([33c9c73](https://github.com/angular/angular-cli/commit/33c9c73))
+* **test:** add build environment to karma ([#2074](https://github.com/angular/angular-cli/issues/2074)) ([b6a2165](https://github.com/angular/angular-cli/commit/b6a2165))
+
+
+### Features
+
+* **module:** add ability to generate a routing file for new modules ([#1971](https://github.com/angular/angular-cli/issues/1971)) ([9ddba69](https://github.com/angular/angular-cli/commit/9ddba69))
+* **module:** select module to add generations to for declaration ([#1966](https://github.com/angular/angular-cli/issues/1966)) ([a647e51](https://github.com/angular/angular-cli/commit/a647e51))
+
+
+
 <a name="1.0.0-beta.11-webpack.3"></a>
 # [1.0.0-beta.11-webpack.3](https://github.com/angular/angular-cli/compare/v1.0.0-beta.11-webpack.2...v1.0.0-beta.11-webpack.3) (2016-08-29)
 
