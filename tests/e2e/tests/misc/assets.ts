@@ -7,7 +7,7 @@ export default function() {
   return writeFile('src/assets/.file', '')
     .then(() => writeFile('src/assets/test.abc', 'hello world'))
     .then(() => ng('build'))
-    .then(() => expectFileToExist('dist/assets/.file'))
-    .then(() => expectFileToMatch('dist/assets/test.abc', 'hello world'))
-    .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')));
+    .then(() => expectFileToExist('dist/.file'))
+    .then(() => expectFileToMatch('dist/test.abc', 'hello world'))
+    .then(() => expectToFail(() => expectFileToExist('dist/.gitkeep')));
 }
