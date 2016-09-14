@@ -167,7 +167,7 @@ export class NodePlatform  {
     var _map = new Map<any, any>();
     var _store = {
       set(key, value, defaultValue?: any) {
-        _map.set(key, value || defaultValue);
+        _map.set(key, (value !== undefined) ? value : defaultValue);
       },
       get(key, defaultValue?: any) {
         return _map.has(key) ? _map.get(key) : defaultValue;
@@ -180,7 +180,7 @@ export class NodePlatform  {
     };
 
     function errorHandler(err, store, modRef, currentIndex, currentArray) {
-      const document = store.get('UNIVERSAL_CONFIG').document;
+      const document = store.get('DOCUMENT');
       _store && _store.clear();
       // console.log('\n\nError in', currentArray[currentIndex].name, '\n\n', document);
       return document;
@@ -201,7 +201,7 @@ export class NodePlatform  {
         // global config
         store.set('ApplicationRef', modInjector.get(ApplicationRef));
         store.set('NgZone', modInjector.get(NgZone));
-        store.set('UNIVERSAL_CONFIG', modInjector.get(UNIVERSAL_CONFIG, {}));
+        store.set('preboot', config.preboot, false);
         store.set('APP_ID', modInjector.get(APP_ID, null));
         store.set('DOCUMENT', modInjector.get(DOCUMENT));
         store.set('DOM', getDOM());
@@ -211,7 +211,6 @@ export class NodePlatform  {
       // Check Stable
       function checkStable(store: any, moduleRef: NgModuleRef<T>) {
         config.time && console.time('id: ' + config.id + ' stable: ');
-        let UNIVERSAL_CONFIG = store.get('UNIVERSAL_CONFIG');
         let universalDoCheck = store.get('universalDoCheck');
         let universalOnInit = store.get('universalOnInit');
         let rootNgZone: NgZone = store.get('NgZone');
@@ -221,7 +220,7 @@ export class NodePlatform  {
         universalOnInit();
 
         // lifecycle hooks
-        function outsideNg(compRef, ngZone, config, http, jsonp) {
+        function outsideNg(compRef, ngZone, http, jsonp) {
           function checkStable(done, ref) {
             ngZone.runOutsideAngular(() => {
               setTimeout(function stable() {
@@ -231,7 +230,7 @@ export class NodePlatform  {
                 if (http && http._async > 0) { return checkStable(done, ref); }
                 if (jsonp && jsonp._async > 0) { return checkStable(done, ref); }
                 if (ngZone.isStable === true) {
-                  let isStable = universalDoCheck(ref, ngZone, config);
+                  let isStable = universalDoCheck(ref, ngZone);
                   if (universalDoCheck !== NodePlatform._noop) {
                     if (typeof isStable !== 'boolean') {
                       console.warn('\nWARNING: universalDoCheck must return a boolean value of either true or false\n');
@@ -255,13 +254,12 @@ export class NodePlatform  {
         // check if all components are stable
 
         let stableComponents = components.map((compRef, i) => {
-          // UNIVERSAL_CONFIG used
           let cmpInjector = compRef.injector;
           let ngZone: NgZone = cmpInjector.get(NgZone);
           // TODO(gdi2290): remove when zone.js tracks http and https
           let http = cmpInjector.get(Http, null);
           let jsonp = cmpInjector.get(Jsonp, null);
-          return rootNgZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, UNIVERSAL_CONFIG, http, jsonp));
+          return rootNgZone.runOutsideAngular(outsideNg.bind(null, compRef, ngZone, http, jsonp));
         });
 
         return rootNgZone.runOutsideAngular(() => {
@@ -274,8 +272,8 @@ export class NodePlatform  {
       },
       // Inject preboot
       function injectPreboot(store: any, moduleRef: NgModuleRef<T>) {
-        let UNIVERSAL_CONFIG = store.get('UNIVERSAL_CONFIG');
-        if (typeof UNIVERSAL_CONFIG.preboot === 'boolean' && !UNIVERSAL_CONFIG.preboot) {
+        let preboot = store.get('preboot');
+        if (typeof preboot === 'boolean' && !preboot) {
           return moduleRef;
         }
         config.time && console.time('id: ' + config.id + ' preboot: ');
@@ -290,7 +288,7 @@ export class NodePlatform  {
         let prebootCode = null;
         // TODO(gdi2290): hide cache in (ngPreboot|UniversalPreboot)
         let prebootConfig = null;
-        let key = (typeof UNIVERSAL_CONFIG.preboot === 'object') && JSON.stringify(UNIVERSAL_CONFIG.preboot) || null;
+        let key = (typeof preboot === 'object') && JSON.stringify(preboot) || null;
         let prebootEl = null;
         let el = null;
         let lastRef = null;
@@ -302,7 +300,7 @@ export class NodePlatform  {
             try {
               prebootConfig = JSON.parse(key);
             } catch (e) {
-              prebootConfig = UNIVERSAL_CONFIG.preboot;
+              prebootConfig = preboot;
             }
             if (!prebootConfig.appRoot) {
               // TODO(gdi2290): missing public NgModuleInjector type
