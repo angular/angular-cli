@@ -8,6 +8,7 @@ const resolve = require('resolve');
 const exit = require('exit');
 const packageJson = require('../package.json');
 const Leek = require('leek');
+const Version = require('../upgrade/version').Version;
 
 
 resolve('angular-cli', { basedir: process.cwd() },
@@ -20,6 +21,9 @@ resolve('angular-cli', { basedir: process.cwd() },
       // npm package). Most common cause for hitting this is `ng new`
       cli = require('../lib/cli');
     } else {
+      // Verify that package's version.
+      Version.assertPostWebpackVersion();
+
       // No error implies a projectLocalCli, which will load whatever
       // version of ng-cli you have installed in a local package.json
       cli = require(projectLocalCli);
