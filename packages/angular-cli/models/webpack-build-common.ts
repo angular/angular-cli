@@ -154,7 +154,7 @@ export function getWebpackCommonConfig(
         context: path.resolve(appRoot, appConfig.assets),
         from: { glob: '**/*', dot: true },
         ignore: [ '.gitkeep' ],
-        to: path.resolve(projectRoot, appConfig.outDir, appConfig.assets)
+        to: path.resolve(projectRoot, appConfig.outDir)
       }])
     ],
     node: {
