@@ -3,6 +3,7 @@ import {readFileSync, existsSync} from 'fs';
 import {stripIndents} from 'common-tags';
 import {bold, red, yellow} from 'chalk';
 import * as path from 'path';
+const resolve = require('resolve');
 
 
 function _findUp(name: string, from: string) {
@@ -31,9 +32,7 @@ function _hasOldCliBuildFile() {
 
 
 export class Version {
-  constructor(private _version: string) {
-
-  }
+  constructor(private _version: string) {}
 
   private _parse() {
     return this.isKnown()
@@ -55,6 +54,22 @@ export class Version {
   toString() { return this._version; }
 
   static fromProject(): Version {
+    let packageJson;
+    const angularCliPath = resolve.sync('angular-cli', {
+      basedir: process.cwd(),
+      packageFilter: (pkg, pkgFile) => {
+        packageJson = pkg;
+      }
+    });
+    if (angularCliPath && packageJson) {
+      try {
+        return new Version(packageJson.version);
+      } catch (e) {
+        return new Version(null);
+      }
+    }
+
+
     const configPath = CliConfig.configFilePath();
     const configJson = readFileSync(configPath, 'utf8');
 
