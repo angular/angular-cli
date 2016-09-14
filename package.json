@@ -44,9 +44,12 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-cli/ast-tools": "^1.0.0",
+    "@angular/common": "^2.0.0-rc.7",
     "@angular/compiler": "^2.0.0-rc.7",
     "@angular/compiler-cli": "^0.6.0",
     "@angular/core": "^2.0.0-rc.7",
+    "@angular/platform-browser": "^2.0.0-rc.7",
+    "@angular/platform-server": "^2.0.0-rc.7",
     "@angular/tsc-wrapped": "^0.3.0",
     "angular2-template-loader": "^0.5.0",
     "awesome-typescript-loader": "^2.2.3",
@@ -101,6 +104,7 @@
     "stylus-loader": "^2.1.0",
     "symlink-or-copy": "^1.0.3",
     "ts-loader": "^0.8.2",
+    "tslint": "^3.15.1",
     "tslint-loader": "^2.1.4",
     "typedoc": "^0.4.2",
     "typescript": "2.0.2",
@@ -108,7 +112,8 @@
     "webpack": "^2.1.0-beta.22",
     "webpack-dev-server": "^2.1.0-beta.3",
     "webpack-md5-hash": "0.0.5",
-    "webpack-merge": "^0.14.0"
+    "webpack-merge": "^0.14.0",
+    "zone.js": "^0.6.21"
   },
   "ember-addon": {
     "paths": [
