@@ -5,7 +5,8 @@ export {
   UniversalModule,
   isBrowser,
   isNode,
-  platformUniversalDynamic
+  platformUniversalDynamic,
+  ZoneStore
 } from './src/browser/browser';
 
 export * from './src/node/node';

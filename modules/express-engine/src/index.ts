@@ -1,7 +1,7 @@
 const fs = require('graceful-fs');
 
 import { platformUniversalDynamic, NodePlatformRef } from 'angular2-universal';
-
+declare var Zone: any;
 // @internal
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
@@ -16,48 +16,46 @@ export function createEngine(options) {
     asyncDestroy: true,
     id: () => s4(),
     platform: (providers) => platformUniversalDynamic(providers),
-    main: (config) => { throw new Error('Please provide a main function that returns ')},
-    mainFactory: (config) => { throw new Error('Please provide a mainFactory function that returns ')},
-    providers: []
+    providers: [],
+    ngModule: null
   };
   _options.precompile = ('precompile' in options) ?  options.precompile : _options.precompile;
   _options.time = ('time' in options) ?  options.time : _options.time;
   _options.asyncDestroy = ('asyncDestroy' in options) ?  options.asyncDestroy : _options.asyncDestroy;
   _options.id = options.id || _options.id;
-  _options.platform = options.platform || _options.platform
-  _options.main = options.main || _options.main;
-  _options.mainFactory = options.mainFactory || _options.mainFactory;
-  _options.providers = options.providers || _options.providers;
+  _options.ngModule =  options.ngModule || _options.ngModule;
+  var __platform = options.platform || _options.platform
+  var __providers = options.providers || _options.providers;
+  delete _options.providers;
+  delete _options.platform;
 
-  const platformRef: any = _options.platform(_options.providers);
+  const platformRef: any = __platform(__providers);
 
   return function expressEngine(filePath: string, data: any = {}, done?: Function) {
     // defaults
-    data = data || {};
     var cancel = false;
-    const resConfig = Object.assign(data, {
-      platformRef,
-      cancelHandler: () => cancel,
-      time: _options.time,
-      asyncDestroy: _options.asyncDestroy,
-      id: _options.id()
-    });
+    const _data = Object.assign({
 
-    var req: any = (data.req && data.req.on && data.req) ||
-    (data.request && data.request.on && data.request);
-
-    req.on('close', () => cancel = true);
-
+      get cancel() { return cancel; }
+    }, data);
 
     function readContent(content) {
       const document: string = content.toString();
-      resConfig.document = document;
+      _data.document = document;
+      _data.cancelHandler = () => Zone.current.get('cancel')
+      var req: any = (_data.req && _data.req.on && _data.req) ||
+      (_data.request && _data.request.on && _data.request);
+
+      const zone = Zone.current.fork({
+        name: 'UNIVERSAL request',
+        properties: _data
+      });
+      req.on('close', () => cancel = true);
 
       // convert to string
-
-      return (_options.precompile ?
-        platformRef.serializeModule(_options.main(resConfig), resConfig) :
-        platformRef.serializeModuleFactory(_options.mainFactory(resConfig), resConfig)
+      return zone.run(() => (_options.precompile ?
+        platformRef.serializeModule(_options.ngModule, _data) :
+        platformRef.serializeModuleFactory(_options.ngModule, _data)
       )
         .then(html => {
           done(null, html);
@@ -66,7 +64,7 @@ export function createEngine(options) {
           console.error(e.stack);
           // if server fail then return client html
           done(null, document);
-        });
+        }));
     }
 
     // read file on disk

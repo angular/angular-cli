@@ -62,8 +62,8 @@ import {
 
   ORIGIN_URL,
   REQUEST_URL,
-  BASE_URL,
 
+  getUrlConfig,
   createUrlProviders,
 } from './tokens';
 
@@ -73,13 +73,16 @@ export function _errorHandler(): ErrorHandler {
   return new ErrorHandler();
 }
 
+declare var Zone: any;
+
 // @internal
-const _documentDeps = [ NodeSharedStylesHost, UNIVERSAL_CONFIG ];
-export function _document(domSharedStylesHost: NodeSharedStylesHost, config: any): any {
-  if (!config.document) {
+const _documentDeps = [ NodeSharedStylesHost, NgZone ];
+export function _document(domSharedStylesHost: NodeSharedStylesHost, zone: any): any {
+  let document = Zone.current.get('document')
+  if (!document) {
     throw new Error('Please provide a document in the universal config');
   }
-  var doc: any = parseDocument(config.document);
+  var doc: any = parseDocument(document);
   domSharedStylesHost.addHost(doc.head);
   return doc;
 }
@@ -602,10 +605,22 @@ export class NodeDomEventsPlugin {
 }
 
 
+export function _APP_BASE_HREF(zone) {
+  return Zone.current.get('baseUrl');
+}
+
+export function _REQUEST_URL(zone) {
+  return Zone.current.get('requestUrl');
+}
+
+export function _ORIGIN_URL(zone) {
+  return Zone.current.get('originUrl');
+}
+
+
 @NgModule({
   providers: [
     // default config value
-    { provide: UNIVERSAL_CONFIG, useValue: {} },
     // normally in platform provides but there is url state in NodePlatformLocation
     { provide: PlatformLocation, useClass: NodePlatformLocation },
 
@@ -636,6 +651,10 @@ export class NodeDomEventsPlugin {
     { provide: SharedStylesHost, useExisting: NodeSharedStylesHost },
     { provide: DomSharedStylesHost, useExisting: NodeSharedStylesHost },
 
+    { provide: APP_BASE_HREF, useFactory: _APP_BASE_HREF, deps: [ NgZone ] },
+    { provide: REQUEST_URL, useFactory: _REQUEST_URL, deps: [ NgZone ] },
+    { provide: ORIGIN_URL, useFactory: _ORIGIN_URL, deps: [ NgZone ] }
+
   ],
   exports: [  CommonModule, ApplicationModule  ]
 })
@@ -649,7 +668,7 @@ export class NodeModule {
     return {
       ngModule: NodeModule,
       providers: [
-        { provide: UNIVERSAL_CONFIG, useValue: config },
+        { provide: UNIVERSAL_CONFIG, useFactory: () => config },
         ...providers,
       ]
     };

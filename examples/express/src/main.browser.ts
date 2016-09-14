@@ -12,20 +12,21 @@ import { App, Wat } from './app';
 
 export const platform = platformUniversalDynamic();
 
-export function main() {
-  @NgModule({
-    bootstrap: [ App ],
-    declarations: [ App, Wat ],
-    imports: [
-      UniversalModule,
-      FormsModule
-    ],
-    providers: [
+@NgModule({
+  bootstrap: [ App ],
+  declarations: [ App, Wat ],
+  imports: [
+    UniversalModule,
+    FormsModule
+  ],
+  providers: [
 
-    ]
-  })
-  class MainModule {
-  }
+  ]
+})
+export class MainModule {
+}
+
+export function main() {
 
   console.log('isBrowser', isBrowser);
   // browserPlatform bootstrap

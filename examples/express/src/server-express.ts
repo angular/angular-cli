@@ -8,13 +8,13 @@ import { createEngine } from 'angular2-express-engine';
 // Angular 2 Universal
 enableProdMode();
 
-import { main } from './main.node';
+import { MainModule } from './main.node';
 
 const app = express();
 const ROOT = path.join(path.resolve(__dirname, '..'));
 
 // Express View
-app.engine('.html', createEngine({ main, time: true }));
+app.engine('.html', createEngine({ ngModule: MainModule, time: true }));
 app.set('views', __dirname);
 app.set('view engine', 'html');
 
@@ -22,7 +22,15 @@ app.set('view engine', 'html');
 app.use(express.static(ROOT, { index: false }));
 
 app.get('/', function (req, res, next) {
-  res.render('index', { req, res });
+  res.render('index', {
+    req,
+    res,
+    originUrl: 'http://localhost:3000',
+    baseUrl: '/',
+    requestUrl: '/',
+    // preboot: false,
+    preboot: { appRoot: ['app'], uglify: true },
+  });
 });
 
 

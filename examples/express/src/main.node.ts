@@ -10,24 +10,12 @@ class App {
 
 }
 
-export function main(config) {
-
-  @NgModule({
-    bootstrap: [ App ],
-    declarations: [ App ],
-    imports: [
-      UniversalModule.withConfig({
-        document: config.document,
-        originUrl: 'http://localhost:3000',
-        baseUrl: '/',
-        requestUrl: '/',
-        // preboot: false,
-        preboot: { appRoot: ['app'], uglify: true },
-      }),
-      FormsModule
-    ]
-  })
-  class MainModule {}
-
-  return MainModule
-};
+@NgModule({
+  bootstrap: [ App ],
+  declarations: [ App ],
+  imports: [
+    UniversalModule,
+    FormsModule
+  ]
+})
+export class MainModule {}

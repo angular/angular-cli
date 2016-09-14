@@ -37,7 +37,7 @@ import * as https from 'https';
 import * as url from 'url';
 
 
-import { BASE_URL, ORIGIN_URL, REQUEST_URL } from './tokens';
+import { APP_BASE_HREF, ORIGIN_URL, REQUEST_URL } from './tokens';
 import { isPresent, isSuccess } from './helper';
 
 const JSONP_ERR_WRONG_METHOD = 'JSONP requests must use GET request method.';
@@ -145,7 +145,7 @@ export class NodeConnection implements Connection {
     baseResponseOptions: ResponseOptions,
     // ngZone: NgZone,
     @Inject(ORIGIN_URL) originUrl: string = '',
-    @Optional() @Inject(BASE_URL) baseUrl?: string,
+    @Optional() @Inject(APP_BASE_HREF) baseUrl?: string,
     // @Optional() @Inject(Cookie) cookie?: Cookie,
     // @Optional() @Inject(COOKIE_KEY) cookieKey?: any
     ) {
@@ -249,7 +249,7 @@ export class NodeBackend implements ConnectionBackend {
   constructor(
     private _baseResponseOptions: ResponseOptions,
     private _ngZone: NgZone,
-    @Inject(BASE_URL) private _baseUrl: string,
+    @Inject(APP_BASE_HREF) private _baseUrl: string,
     @Inject(ORIGIN_URL) private _originUrl: string) {}
 
   public createConnection(request: Request): NodeConnection {
@@ -268,7 +268,7 @@ export class NodeJSONPConnection {
     baseResponseOptions: ResponseOptions,
     ngZone: NgZone,
     @Optional() @Inject(ORIGIN_URL) originUrl: string = '',
-    @Optional() @Inject(BASE_URL) baseUrl?: string) {
+    @Optional() @Inject(APP_BASE_HREF) baseUrl?: string) {
 
     if (req.method !== RequestMethod.Get) {
       throw new TypeError(JSONP_ERR_WRONG_METHOD);
@@ -371,7 +371,7 @@ export class NodeJsonpBackend_ extends NodeJsonpBackend {
   constructor(
     private _baseResponseOptions: ResponseOptions,
     private _ngZone: NgZone,
-    @Inject(BASE_URL) private _baseUrl: string,
+    @Inject(APP_BASE_HREF) private _baseUrl: string,
     @Inject(ORIGIN_URL) private _originUrl: string) {
     super();
   }
@@ -415,7 +415,7 @@ export class NodeHttpModule {
   static withConfig(config: any = {}) {
     var providers = [];
     if (config.baseUrl) {
-      providers.push({ provide: BASE_URL, useValue: config.baseUrl });
+      providers.push({ provide: APP_BASE_HREF, useValue: config.baseUrl });
     }
     if (config.requestUrl) {
       providers.push({ provide: REQUEST_URL, useValue: config.requestUrl });
@@ -441,7 +441,7 @@ export class NodeJsonpModule {
   static withConfig(config: any = {}) {
     var providers = [];
     if (config.baseUrl) {
-      providers.push({ provide: BASE_URL, useValue: config.baseUrl });
+      providers.push({ provide: APP_BASE_HREF, useValue: config.baseUrl });
     }
     if (config.requestUrl) {
       providers.push({ provide: REQUEST_URL, useValue: config.requestUrl });
