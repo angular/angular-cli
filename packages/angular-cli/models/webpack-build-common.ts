@@ -75,7 +75,7 @@ export function getWebpackCommonConfig(
         // in main, load css as raw text
         {
           exclude: styles,
-          test: /\.css/,
+          test: /\.css$/,
           loaders: ['raw-loader', 'postcss-loader']
         }, {
           exclude: styles,
