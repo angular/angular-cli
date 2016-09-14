@@ -54,10 +54,10 @@ export class Version {
   toString() { return this._version; }
 
   static fromProject(): Version {
-    let packageJson;
+    let packageJson: any = null;
     const angularCliPath = resolve.sync('angular-cli', {
       basedir: process.cwd(),
-      packageFilter: (pkg, pkgFile) => {
+      packageFilter: (pkg: any, pkgFile: string) => {
         packageJson = pkg;
       }
     });
