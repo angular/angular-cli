@@ -58,7 +58,6 @@ import { Parse5DomAdapter } from './parse5-adapter';
 
 import {
   NODE_APP_ID,
-  UNIVERSAL_CONFIG,
 
   ORIGIN_URL,
   REQUEST_URL,
@@ -666,7 +665,6 @@ export class NodeModule {
     return {
       ngModule: NodeModule,
       providers: [
-        { provide: UNIVERSAL_CONFIG, useFactory: () => config },
         ...providers,
       ]
     };
