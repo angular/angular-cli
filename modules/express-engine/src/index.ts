@@ -7,6 +7,18 @@ function s4() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 }
 
+export interface ExpressEngineConfig {
+  document?: string;
+  cancelHandler?: () => boolean;
+  req?: any;
+  res?: any;
+  time?: boolean;
+  id?: string;
+  ngModule?: any;
+  precompile?: boolean;
+  cancel?: boolean;
+}
+
 export function createEngine(options) {
   var cache = {
   };
