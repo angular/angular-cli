@@ -2,7 +2,7 @@
 
 var expect = require('chai').expect;
 var path = require('path');
-var dynamicPathParser = require('../../addon/ng2/utilities/dynamic-path-parser');
+var dynamicPathParser = require('../../packages/angular-cli/utilities/dynamic-path-parser');
 var mockFs = require('mock-fs');
 
 var appDir = `src${path.sep}app`;

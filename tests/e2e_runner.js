@@ -104,7 +104,10 @@ testsToRun.reduce((previous, relativeName) => {
   });
 }, Promise.resolve())
 .then(
-  () => console.log(green('Done.')),
+  () => {
+    console.log(green('Done.'));
+    process.exit(0);
+  },
   (err) => {
     console.log('\n');
     console.error(red(`Test "${currentFileName}" failed...`));

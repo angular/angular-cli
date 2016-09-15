@@ -90,12 +90,20 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
   return _exec({ waitForMatch: match }, cmd, args);
 }
 
+export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
+  return _exec({ silent: true, waitForMatch: match }, cmd, args);
+}
+
 export function ng(...args: string[]) {
   if (args[0] == 'build') {
     return _exec({silent: true}, 'ng', args);
   } else {
     return _exec({}, 'ng', args);
   }
+}
+
+export function silentNpm(...args: string[]) {
+  return _exec({silent: true}, 'npm', args);
 }
 
 export function npm(...args: string[]) {
