@@ -43,7 +43,11 @@ export function createEngine(options) {
 
   const platformRef: any = __platform(__providers);
 
-  return function expressEngine(filePath: string, data: any = {}, done?: Function) {
+  return function expressEngine(filePath: string, data: ExpressEngineConfig = {ngModule: _options.ngModule}, done?: Function) {
+    const ngModule = data.ngModule || _options.ngModule;
+    if (ngModule) {
+      throw new Error('Please provide your main module as ngModule for example res.render("index", {ngModule: MainModule}) or in the engine as createEngine({ ngModule: MainModule })')
+    }
     // defaults
     var cancel = false;
     const _data = Object.assign({
