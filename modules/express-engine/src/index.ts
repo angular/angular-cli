@@ -20,6 +20,7 @@ export interface ExpressEngineConfig {
 }
 
 export function createEngine(options?: any) {
+  options = options || {};
   var cache = {
   };
   var _options = {
