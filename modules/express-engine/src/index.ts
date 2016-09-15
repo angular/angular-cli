@@ -19,7 +19,7 @@ export interface ExpressEngineConfig {
   cancel?: boolean;
 }
 
-export function createEngine(options) {
+export function createEngine(options?: any) {
   var cache = {
   };
   var _options = {
