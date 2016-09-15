@@ -51,7 +51,6 @@ export function createEngine(options) {
     // defaults
     var cancel = false;
     const _data = Object.assign({
-
       get cancel() { return cancel; }
     }, data);
 
@@ -59,14 +58,16 @@ export function createEngine(options) {
       const document: string = content.toString();
       _data.document = document;
       _data.cancelHandler = () => Zone.current.get('cancel')
-      var req: any = (_data.req && _data.req.on && _data.req) ||
-      (_data.request && _data.request.on && _data.request);
 
       const zone = Zone.current.fork({
         name: 'UNIVERSAL request',
         properties: _data
       });
-      req.on('close', () => cancel = true);
+
+      var req: any = _data.req && _data.req.on && _data.req;
+      if (req) {
+        req.on('close', () => cancel = true);
+      }
 
       // convert to string
       return zone.run(() => (_options.precompile ?
