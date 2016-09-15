@@ -1,3 +1,11 @@
+<a name="1.0.6"></a>
+## 1.0.6 (2016-09-15)
+
+
+### Bug Fixes
+* **parse5-usage:** Fixed usage of the Parse5 serializer ([#532](https://github.com/angular/universal/issues/532)) ([13f8f17](https://github.com/angular/universal/commit/13f8f17))
+
+
 <a name="1.0.5"></a>
 ## 1.0.5 (2016-09-13)
 
