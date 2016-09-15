@@ -17,6 +17,9 @@ export interface ExpressEngineConfig {
   ngModule?: any;
   precompile?: boolean;
   cancel?: boolean;
+  requestUrl?: string;
+  originUrl?: string;
+  baseUrl?: string;
 }
 
 export function createEngine(options?: any) {
@@ -49,6 +52,9 @@ export function createEngine(options?: any) {
     if (!ngModule) {
       throw new Error('Please provide your main module as ngModule for example res.render("index", {ngModule: MainModule}) or in the engine as createEngine({ ngModule: MainModule })')
     }
+    if (!data.req || !data.res) {
+      throw new Error('Please provide the req, res arguments (request and response objects from express) in res.render("index", { req, res })');
+    }
     // defaults
     var cancel = false;
     const _data = Object.assign({
@@ -68,6 +74,9 @@ export function createEngine(options?: any) {
       var req: any = _data.req && _data.req.on && _data.req;
       if (req) {
         req.on('close', () => cancel = true);
+        _data.requestUrl = _data.requestUrl || req.originalUrl;
+        _data.originUrl = _data.originUrl || req.hostname;
+        _data.baseUrl = _data.baseUrl || '/';
       }
 
       // convert to string
