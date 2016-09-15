@@ -104,7 +104,7 @@ export class UniversalModule {
       sharedStylesHost._styles.push(style);
     });
   }
-  static withConfig(config = {}) {
+  static withConfig(config = {}): {ngModule: UniversalModule, providers: any[]} {
     return {
       ngModule: UniversalModule,
       providers: [

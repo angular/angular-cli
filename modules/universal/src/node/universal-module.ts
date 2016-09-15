@@ -22,7 +22,7 @@ export function platformUniversalDynamic (extraProviders?: any[]): NodePlatformR
   ]
 })
 export class UniversalModule {
-  static withConfig(config = {}): any {
+  static withConfig(config = {}): {ngModule: UniversalModule, providers: any[]} {
     var {providers} = NodeModule.withConfig(config);
     return {
       ngModule: UniversalModule,
