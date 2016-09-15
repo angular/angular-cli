@@ -71,8 +71,8 @@ export function createEngine(options?: any) {
 
       // convert to string
       return zone.run(() => (_options.precompile ?
-        platformRef.serializeModule(_options.ngModule, _data) :
-        platformRef.serializeModuleFactory(_options.ngModule, _data)
+        platformRef.serializeModule(ngModule, _data) :
+        platformRef.serializeModuleFactory(ngModule, _data)
       )
         .then(html => {
           done(null, html);
