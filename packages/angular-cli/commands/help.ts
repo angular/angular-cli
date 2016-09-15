@@ -15,12 +15,14 @@ const commandsToIgnore = [
 const HelpCommand = Command.extend({
   name: 'help',
   description: 'Shows help for the CLI',
-  works: 'outsideProject',
+  works: 'everywhere',
 
   availableOptions: [],
 
   run: function (commandOptions: any) {
     let commandFiles = fs.readdirSync(__dirname)
+      // Remove files that are not JavaScript
+      .filter(file => file.match(/\.js$/))
       .map(file => path.parse(file).name)
       .map(file => file.toLowerCase());
 

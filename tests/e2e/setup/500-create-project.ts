@@ -25,11 +25,10 @@ export default function(argv: any) {
   return Promise.resolve()
     .then(() => createProject)
     .then(() => updateJsonFile('package.json', json => {
-      const dist = '../../../dist/';
-      json['devDependencies']['angular-cli'] = join(__dirname, dist, 'angular-cli');
-      json['devDependencies']['@angular-cli/ast-tools'] = join(__dirname, dist, 'ast-tools');
-      json['devDependencies']['@angular-cli/base-href-webpack'] =
-        join(__dirname, dist, 'base-href-webpack');
+      const dist = join(__dirname, '../../../dist/');
+      json['devDependencies']['angular-cli'] = join(dist, 'angular-cli');
+      json['devDependencies']['@angular-cli/ast-tools'] = join(dist, 'ast-tools');
+      json['devDependencies']['@angular-cli/base-href-webpack'] = join(dist, 'base-href-webpack');
     }))
     .then(() => {
       if (argv.nightly) {
