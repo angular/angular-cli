@@ -20,7 +20,6 @@ const HelpCommand = Command.extend({
   availableOptions: [],
 
   run: function (commandOptions: any) {
-    const uniques = {};
     let commandFiles = fs.readdirSync(__dirname)
       // Remove files that are not JavaScript
       .filter(file => file.match(/\.js$/))

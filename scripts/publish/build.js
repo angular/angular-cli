@@ -55,7 +55,7 @@ Promise.resolve()
       }, Promise.resolve());
   })
   .then(() => console.log('Copying uncompiled resources...'))
-  .then(() => glob(path.join(packagesRoot, '**/*')))
+  .then(() => glob(path.join(packagesRoot, '**/*'), { dot: true }))
   .then(files => {
     console.log(`  Found ${files.length} files...`);
     return files
@@ -88,8 +88,8 @@ Promise.resolve()
 
         // The only remaining file we want to ignore is tsconfig and spec files.
         return !(/tsconfig\.json$/.test(fileName))
-          && !(/\.spec\./.test(fileName))
-          && !(/[\/\\]tests[\/\\]/.test(fileName));
+            && !(/\.spec\./.test(fileName))
+            && !(/[\/\\]tests[\/\\]/.test(fileName));
       })
       .map((fileName) => {
         const source = path.join(packagesRoot, fileName);
