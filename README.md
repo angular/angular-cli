@@ -22,7 +22,7 @@ We changed the build system between beta.10 and beta.12, from SystemJS to Webpac
 And with it comes a lot of benefits. 
 To take advantage of these, your app built with the old beta will need to migrate.
 
-You can update your `beta.10` projects to `beta.12` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.12).
+You can update your `beta.10` projects to `beta.12` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
 
 ## Prerequisites
 
