@@ -76,6 +76,11 @@ export class Version {
 
 
     const configPath = CliConfig.configFilePath();
+
+    if (configPath === null) {
+      return new Version(null);
+    }
+
     const configJson = readFileSync(configPath, 'utf8');
 
     try {
