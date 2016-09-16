@@ -28,6 +28,11 @@ export interface CliConfig {
          */
         scripts?: string[];
         /**
+         * Global scripts to be used internally.
+         * See https://webpack.github.io/docs/library-and-externals.html
+         */
+        externals: {[name: string]: string};
+        /**
          * Name and corresponding file for environment config.
          */
         environments?: {
