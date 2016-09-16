@@ -86,7 +86,7 @@
     "opn": "4.0.1",
     "parse5": "^2.1.5",
     "postcss-loader": "^0.9.1",
-    "protractor": "^3.3.0",
+    "protractor": "^4.0.4",
     "raw-loader": "^0.5.1",
     "remap-istanbul": "^0.6.4",
     "resolve": "^1.1.7",
