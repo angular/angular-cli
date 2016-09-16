@@ -147,6 +147,7 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
 
 function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: string,
                                       symbolName: string, importPath: string) {
+  importPath = importPath.replace(/\\/g, '/');
   const source: ts.SourceFile = getSource(ngModulePath);
   let metadata = getDecoratorMetadata(source, 'NgModule', '@angular/core');
 
