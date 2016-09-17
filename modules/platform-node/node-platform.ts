@@ -225,6 +225,7 @@ export class NodePlatform  {
           function checkStable(done, ref) {
             ngZone.runOutsideAngular(() => {
               setTimeout(function stable() {
+                if (cancelHandler()) { return done(ref); }
                 // hot code path
                 if (ngZone.hasPendingMicrotasks === true) { return checkStable(done, ref); }
                 if (ngZone.hasPendingMacrotasks === true) { return checkStable(done, ref); }
