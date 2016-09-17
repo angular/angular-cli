@@ -370,8 +370,8 @@ Then add the needed script files to `apps[0].scripts`:
 Finally add the Bootstrap CSS to the `apps[0].styles` array:
 ```
 "styles": [
-  "styles.css",
-  "../node_modules/bootstrap/dist/css/bootstrap.css"
+  "../node_modules/bootstrap/dist/css/bootstrap.css",
+  "styles.css"
 ],
 ```
 
