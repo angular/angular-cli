@@ -17,6 +17,8 @@ import {
   EVENT_MANAGER_PLUGINS,
   AnimationDriver,
   EventManager,
+  HAMMER_GESTURE_CONFIG,
+  HammerGestureConfig
 } from '@angular/platform-browser';
 
 import {
@@ -630,6 +632,8 @@ export function _ORIGIN_URL(zone) {
     { provide: DomEventsPlugin, useExisting: NodeDomEventsPlugin, multi: true },
     { provide: EVENT_MANAGER_PLUGINS, useExisting: NodeDomEventsPlugin, multi: true },
     { provide: EVENT_MANAGER_PLUGINS, useClass: KeyEventsPlugin, multi: true },
+    { provide: EVENT_MANAGER_PLUGINS, useClass: HammerGesturesPlugin, multi: true },
+    { provide: HAMMER_GESTURE_CONFIG, useClass: HammerGestureConfig },
 
     NodeEventManager,
     { provide: EventManager, useExisting: NodeEventManager },
