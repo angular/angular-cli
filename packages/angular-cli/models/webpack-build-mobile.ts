@@ -18,7 +18,7 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, appC
         }
       ]),
       new PrerenderWebpackPlugin({
-        templatePath: 'index.html',
+        templatePath: path.resolve(projectRoot, appConfig.root, 'index.html'),
         configPath: path.resolve(projectRoot, appConfig.root, 'main-app-shell.ts'),
         appPath: path.resolve(projectRoot, appConfig.root)
       })

@@ -15,7 +15,6 @@
     "test": "npm-run-all -c test:packages test:cli",
     "e2e": "npm run test:e2e",
     "e2e:nightly": "node tests/e2e_runner.js --nightly",
-    "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
     "test:e2e": "node tests/e2e_runner.js",
     "test:cli": "node tests/runner",
     "test:inspect": "node --inspect --debug-brk tests/runner",

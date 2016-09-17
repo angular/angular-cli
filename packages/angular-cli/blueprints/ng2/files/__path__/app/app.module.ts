@@ -2,7 +2,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';<% if (routing) { %>
-import { AppRoutingModule } from './app-routing.module';<% } %>
+import { AppRoutingModule } from './app-routing.module';<% } if(isMobile) { %>
+import { AppShellModule } from '@angular/app-shell'; <% } %>
 
 import { AppComponent } from './app.component';
 
@@ -14,7 +15,8 @@ import { AppComponent } from './app.component';
     BrowserModule,
     FormsModule,
     HttpModule<% if (routing) { %>,
-    AppRoutingModule<% } %>
+    AppRoutingModule<% } if(isMobile) { %>,
+    AppShellModule.runtime()<% } %>
   ],
   providers: [],
   bootstrap: [AppComponent]
