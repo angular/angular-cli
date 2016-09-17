@@ -8,6 +8,7 @@ function s4() {
 }
 
 export interface ExpressEngineConfig {
+  DOCUMENT?: string
   document?: string;
   cancelHandler?: () => boolean;
   req?: any;
