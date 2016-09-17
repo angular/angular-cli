@@ -3,8 +3,8 @@
 const path = require('path');
 const webpack = require('webpack');
 
-  
 const getWebpackTestConfig = function (projectRoot, environment, appConfig, debug) {
+
   const appRoot = path.resolve(projectRoot, appConfig.root);
 
   return {
