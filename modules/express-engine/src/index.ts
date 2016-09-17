@@ -40,7 +40,7 @@ export function createEngine(options?: any) {
   _options.asyncDestroy = ('asyncDestroy' in options) ?  options.asyncDestroy : _options.asyncDestroy;
   _options.id = options.id || _options.id;
   _options.ngModule =  options.ngModule || _options.ngModule;
-  var __platform = options.platform || _options.platform
+  var __platform = options.platform || _options.platform;
   var __providers = options.providers || _options.providers;
   delete _options.providers;
   delete _options.platform;
@@ -62,9 +62,12 @@ export function createEngine(options?: any) {
     }, data);
 
     function readContent(content) {
-      const document: string = content.toString();
-      _data.document = document;
-      _data.cancelHandler = () => Zone.current.get('cancel')
+      const DOCUMENT: string = content.toString();
+      // TODO(gdi2290): breaking change for context globals
+      // _data.document = parseDocument(document);
+      _data.document = DOCUMENT;
+      _data.DOCUMENT = DOCUMENT;
+      _data.cancelHandler = () => Zone.current.get('cancel');
 
       const zone = Zone.current.fork({
         name: 'UNIVERSAL request',
@@ -85,12 +88,15 @@ export function createEngine(options?: any) {
         platformRef.serializeModuleFactory(ngModule, _data)
       )
         .then(html => {
+          if (typeof html !== 'string' || cancel) {
+            return done(null, DOCUMENT);
+          }
           done(null, html);
         })
         .catch(e => {
-          console.error(e.stack);
+          console.log(e.stack);
           // if server fail then return client html
-          done(null, document);
+          done(null, DOCUMENT);
         }));
     }
 
@@ -115,5 +121,3 @@ export function createEngine(options?: any) {
     }
   };
 }
-
-
