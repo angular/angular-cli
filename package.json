@@ -57,6 +57,9 @@
     "node": ">= 5.4.1 <= 7",
     "npm": ">= 3"
   },
+  "scripts": {
+    "test": "gulp test"
+  },
   "devDependencies": {
     "@angular/common": "2.0.0",
     "@angular/compiler": "2.0.0",
