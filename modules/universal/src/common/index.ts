@@ -1,3 +1,7 @@
+
+// export function getDOM() {
+//   return require('@angular/platform-browser').__platform_browser_private__.getDOM();
+// }
 declare var Zone: any;
 
 export const zoneProps = new WeakMap();
@@ -7,17 +11,17 @@ export class ZoneStore {
   constructor(props = Object.create(null)) {
     let store = new Map();
     try {
-      Object.keys(props).forEach(prop => {
-        store.set(prop, props[prop])
+      Object.keys(props).forEach((prop) => {
+        store.set(prop, props[prop]);
       });
     } catch (e) {
-      console.log('e', e)
+      console.log('e', e);
     }
     zoneProps.set(this, store);
     this.zone = Zone.current.fork({
       name: 'ZoneStore',
       properties: {'ZoneStore': this}
-    })
+    });
   }
   clear() {
     zoneProps.get(this).clear();

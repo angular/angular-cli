@@ -1,6 +1,6 @@
 import { NgModule, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UniversalModule } from 'angular2-universal/node';
+import { UniversalModule, createGlobalProxy } from 'angular2-universal/node';
 
 import { App, Wat } from './app';
 
@@ -20,4 +20,8 @@ import { App, Wat } from './app';
     FormsModule
   ]
 })
-export class MainModule {}
+export class MainModule {
+  constructor() {
+    createGlobalProxy();
+  }
+}

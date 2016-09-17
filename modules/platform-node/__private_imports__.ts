@@ -30,8 +30,8 @@ const {
 } = __compiler_private__;
 
 
+// popoppinternal
 
-// @internal
 export {
   // platform-browser
   BROWSER_SANITIZATION_PROVIDERS,

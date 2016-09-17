@@ -1,6 +1,6 @@
 const fs = require('graceful-fs');
 
-import { platformUniversalDynamic, NodePlatformRef } from 'angular2-universal';
+import { platformUniversalDynamic, NodePlatformRef, parseDocument } from 'angular2-universal';
 declare var Zone: any;
 // @internal
 function s4() {

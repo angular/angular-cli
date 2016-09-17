@@ -1,3 +1,5 @@
+export {getDOM} from './__private_imports__';
+
 export * from './helper';
 
 export * from './node-document';

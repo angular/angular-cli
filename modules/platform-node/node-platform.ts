@@ -79,13 +79,15 @@ declare var Zone: any;
 // @internal
 const _documentDeps = [ NodeSharedStylesHost, NgZone ];
 export function _document(domSharedStylesHost: NodeSharedStylesHost, zone: any): any {
-  let document = Zone.current.get('document');
+  let document: any = Zone.current.get('document');
   if (!document) {
     throw new Error('Please provide a document in the universal config');
   }
-  var doc: any = parseDocument(document);
-  domSharedStylesHost.addHost(doc.head);
-  return doc;
+  if (typeof document === 'string') {
+    document = parseDocument(document);
+  }
+  domSharedStylesHost.addHost(document.head);
+  return document;
 }
 
 // @internal
