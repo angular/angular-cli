@@ -16,17 +16,17 @@ This project is very much still a work in progress.
 The CLI is now in beta. 
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
-## Webpack preview release update
+## Webpack update
 
-We're updating the build system in Angular-CLI to use webpack instead of Broccoli.
+We changed the build system between beta.10 and beta.12, from SystemJS to Webpack. 
+And with it comes a lot of benefits. 
+To take advantage of these, your app built with the old beta will need to migrate.
 
-You can install and update your projects using [these instructions](https://github.com/angular/angular-cli/blob/master/WEBPACK_UPDATE.md).
-
-**The current instructions on this file reflect usage for the `webpack` version.**
+You can update your `beta.10` projects to `beta.12` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4 or greater**.
+The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**.
 
 ## Table of Contents
 
@@ -37,6 +37,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
 * [Build Targets and Environment Files](#build-targets-and-environment-files)
+* [Base tag handling in index.html](#base-tag-handling-in-indexhtml)
 * [Adding extra files to the build](#adding-extra-files-to-the-build)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
@@ -47,6 +48,7 @@ The generated project has dependencies that require **Node 4 or greater**.
 * [Global styles](#global-styles)
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
+* [Global Library Installation](#global-library-installation)
 * [Updating angular-cli](#updating-angular-cli)
 * [Known Issues](#known-issues)
 * [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
@@ -76,7 +78,7 @@ Navigate to `http://localhost:4200/`. The app will automatically reload if you c
 You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
 
 ```bash
-ng serve --port 4201 --live-reload-port 49153
+ng serve --host 0.0.0.0 --port 4201 --live-reload-port 49153
 ```
 
 ### Generating Components, Directives, Pipes and Services
@@ -123,13 +125,19 @@ The build artifacts will be stored in the `dist/` directory.
 
 ### Build Targets and Environment Files
 
-A build can specify both a build target (`development` or `production`) and an 
-environment file to be used with that build. By default, the development build 
-target is used.
+`ng build` can specify both a build target (`--target=production` or `--target=development`) and an 
+environment file to be used with that build (`--environment=dev` or `--environment=prod`). 
+By default, the development build target and environment are used.
 
-At build time, `src/environments/environment.ts` will be replaced by
-`src/environments/environment.NAME.ts` where `NAME` is the argument 
-provided to the `--environment` flag.
+The mapping used to determine which environment file is used can be found in `angular-cli.json`:
+
+```
+"environments": {
+  "source": "environments/environment.ts",
+  "dev": "environments/environment.ts",
+  "prod": "environments/environment.prod.ts"
+}
+```
 
 These options also apply to the serve command. If you do not pass a value for `environment`,
 it will default to `dev` for `development` and `prod` for `production`.
@@ -148,8 +156,18 @@ ng build
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
-- add `{ NAME: 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json` 
-- use them by using the `--env=NAME` flag on the build/serve commands.
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json` 
+- use them via the `--env=NAME` flag on the build/serve commands.
+
+### Base tag handling in index.html
+
+When building you can modify base tag (`<base href="/">`) in your index.html with `--base-href your-url` option.
+
+```bash
+# Sets base tag href to /myUrl/ in your index.html
+ng build --base-href /myUrl/
+ng build --bh /myUrl/
+```
 
 ### Bundling
 
@@ -250,12 +268,13 @@ The `styles.css` file allows users to add global styles and supports
 If the project is created with the `--style=sass` option, this will be a `.sass` 
 file instead, and the same applies to `scss/less/styl`. 
 
+You can add more global styles via the `apps[0].styles` property in `angular-cli.json`.
+
 ### CSS Preprocessor integration
 
 Angular-CLI supports all major CSS preprocessors:
 - sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
 - less ([http://lesscss.org/](http://lesscss.org/))
-- compass ([http://compass-style.org/](http://compass-style.org/))
 - stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
 
 To use these prepocessors simply add the file to your component's `styleUrls`:
@@ -291,9 +310,45 @@ Simply install your library via `npm install lib-name --save` and import it in y
 If the library does not include typings, you can install them using npm:
 
 ```bash
-npm install moment --save
-npm install @types/moment --save-dev
+npm install d3 --save
+npm install @types/d3 --save-dev
 ```
+
+### Global Library Installation
+
+Some javascript libraries need to be added to the global scope, and loaded as if 
+they were in a script tag. We can do this using the `apps[0].scripts` and 
+`apps[0].styles` properties of `angular-cli.json`.
+
+As an example, to use [Boostrap 4](http://v4-alpha.getbootstrap.com/) this is 
+what you need to do:
+
+First install Bootstrap from `npm`:
+
+```bash
+npm install bootstrap@next
+```
+
+Then add the needed script files to to `apps[0].scripts`.
+
+```
+"scripts": [
+  "../node_modules/jquery/dist/jquery.js",
+  "../node_modules/tether/dist/js/tether.js",
+  "../node_modules/bootstrap/dist/js/bootstrap.js"
+],
+```
+
+Finally add the Bootstrap CSS to the `apps[0].styles` array:
+```
+"styles": [
+  "styles.css",
+  "../node_modules/bootstrap/dist/css/bootstrap.css"
+],
+```
+
+Restart `ng serve` if you're running it, and Bootstrap 4 should be working on 
+your app.
 
 ### Updating angular-cli
 

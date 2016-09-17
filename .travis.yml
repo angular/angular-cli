@@ -12,25 +12,43 @@ env:
     - DBUS_SESSION_BUS_ADDRESS=/dev/null
   matrix:
     - SCRIPT=lint
+    - SCRIPT=build
     - SCRIPT=test
+    - NODE_SCRIPT=tests/e2e_runner.js
+    - NODE_SCRIPT="tests/e2e_runner.js --nightly"
 #    - TARGET=mobile SCRIPT=mobile_test
 matrix:
+  fast_finish: true
+  allow_failures:
+    - os: osx
+    - env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
   exclude:
     - node_js: "6"
       env: SCRIPT=lint
     - os: osx
+      env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+    - node_js: "6"
+      env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+    - os: osx
       node_js: "5"
       env: SCRIPT=lint
-#    - os: osx
-#      env: TARGET=mobile SCRIPT=mobile_test
+    - node_js: "6"
+      env: SCRIPT=build
+    - os: osx
+      node_js: "5"
+      env: SCRIPT=build
+    - os: osx
+      env: TARGET=mobile SCRIPT=mobile_test
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome --force; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkdir ~/.config && echo "--no-sandbox" > ~/.config/chrome-flags.conf; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "--no-sandbox" > ~/.config/chromium-flags.conf; fi
   - if [[ "$TARGET" == "mobile" ]]; then export MOBILE_TEST=true; fi
   - npm config set spin false
   - npm config set progress false
@@ -39,4 +57,5 @@ install:
   - npm install --no-optional
 
 script:
-  - npm run-script $SCRIPT
+  - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
+  - if [[ "$NODE_SCRIPT" ]]; then node $NODE_SCRIPT; fi

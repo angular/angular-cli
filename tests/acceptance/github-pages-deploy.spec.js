@@ -14,7 +14,6 @@ var https = require('https');
 var SilentError = require('silent-error');
 
 const expect = chai.expect;
-const fsReadFile = Promise.denodeify(fs.readFile);
 const fsWriteFile = Promise.denodeify(fs.writeFile);
 const fsMkdir = Promise.denodeify(fs.mkdir);
 
@@ -67,7 +66,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
       });
   });
 
-  it('should deploy with defaults to existing remote', function() {
+  it('should deploy with defaults to existing remote', function () {
     execStub.addExecSuccess('git status --porcelain')
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', remote)
@@ -78,12 +77,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess(`git push origin ${ghPagesBranch}:${ghPagesBranch}`)
       .addExecSuccess('git remote -v', remote);
 
-    return ng(['github-pages:deploy', '--skip-build'])
-      .then(() => {
-        let indexHtml = path.join(process.cwd(), 'index.html');
-        return fsReadFile(indexHtml, 'utf8');
-      })
-      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1));
+    return ng(['github-pages:deploy', '--skip-build']);
   });
 
   it('should deploy with changed defaults', function() {
@@ -100,13 +94,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess(`git push origin ${ghPagesBranch}:${userPageBranch}`)
       .addExecSuccess('git remote -v', remote);
 
-    return ng(['github-pages:deploy', '--skip-build', `--message=${message}`,
-                '--user-page'])
-      .then(() => {
-        let indexHtml = path.join(process.cwd(), 'index.html');
-        return fsReadFile(indexHtml, 'utf8');
-      })
-      .then((data) => expect(data.search('<base href="/">')).to.not.equal(-1));
+    return ng(['github-pages:deploy', '--skip-build', `--message=${message}`, '--user-page']);
   });
 
   it('should create branch if needed', function() {
@@ -125,12 +113,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess(`git push origin ${ghPagesBranch}:${ghPagesBranch}`)
       .addExecSuccess('git remote -v', remote);
 
-    return ng(['github-pages:deploy', '--skip-build'])
-      .then(() => {
-        let indexHtml = path.join(process.cwd(), 'index.html');
-        return fsReadFile(indexHtml, 'utf8');
-      })
-      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1));
+    return ng(['github-pages:deploy', '--skip-build']);
   });
 
   it('should create repo if needed', function() {
@@ -183,11 +166,6 @@ describe('Acceptance: ng github-pages:deploy', function() {
 
     return ng(['github-pages:deploy', '--skip-build', `--gh-token=${token}`,
       `--gh-username=${username}`])
-      .then(() => {
-        let indexHtml = path.join(process.cwd(), 'index.html');
-        return fsReadFile(indexHtml, 'utf8');
-      })
-      .then((data) => expect(data.search(`<base href="/${project}/">`)).to.not.equal(-1))
       .then(() => httpsStub.restore());
   });
 

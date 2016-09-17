@@ -58,7 +58,7 @@ describe('Acceptance: ng new', function () {
   }
 
   function confirmBlueprinted() {
-    return confirmBlueprintedForDir('addon/ng2/blueprints/ng2');
+    return confirmBlueprintedForDir('blueprints/ng2');
   }
 
   it('ng new foo, where foo does not yet exist, works', function () {

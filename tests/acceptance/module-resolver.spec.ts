@@ -4,10 +4,10 @@ const mockFs = require('mock-fs');
 
 import * as ts from 'typescript';
 import * as path from 'path';
-import * as dependentFilesUtils from '../../addon/ng2/utilities/get-dependent-files';
+import * as dependentFilesUtils from 'angular-cli/utilities/get-dependent-files';
 
 import { expect } from 'chai';
-import { ModuleResolver } from '../../addon/ng2/utilities/module-resolver';
+import { ModuleResolver } from 'angular-cli/utilities/module-resolver';
 
 describe('ModuleResolver', () => {
   let rootPath = 'src/app';
@@ -130,7 +130,8 @@ describe('ModuleResolver', () => {
         .then((tsFile: ts.SourceFile) => {
           let contentsBaz = dependentFilesUtils.getImportClauses(tsFile);
           let barExpectedContent = path.normalize('../bar/bar.component');
-          let fooBarExpectedContent = `.${path.sep}qux${path.sep}quux${path.sep}foobar${path.sep}foobar.component`;
+          let fooBarExpectedContent =
+            `.${path.sep}qux${path.sep}quux${path.sep}foobar${path.sep}foobar.component`;
           expect(contentsBaz[0].specifierText).to.equal(barExpectedContent);
           expect(contentsBaz[1].specifierText).to.equal(fooBarExpectedContent);
         });
