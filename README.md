@@ -329,7 +329,7 @@ First install Bootstrap from `npm`:
 npm install bootstrap@next
 ```
 
-Then add the needed script files to to `apps[0].scripts`.
+Then add the needed script files to `apps[0].scripts`:
 
 ```
 "scripts": [
