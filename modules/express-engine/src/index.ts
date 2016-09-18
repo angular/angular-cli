@@ -62,6 +62,10 @@ export function createEngine(options?: any) {
   delete _options.platform;
 
   const platformRef: any = __platform(__providers);
+  var prom;
+  if (_options.ngModule) {
+    prom = platformRef.cacheModuleFactory(_options.ngModule)
+  }
 
   return function expressEngine(filePath: string, data: ExpressEngineConfig = {ngModule: _options.ngModule}, done?: Function) {
     const ngModule = data.ngModule || _options.ngModule;
