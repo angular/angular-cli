@@ -319,13 +319,16 @@ export class NodeJSONPConnection {
         res.on('end', () => {
           var responseJson;
           try {
+            if (body.indexOf('JSONP_CALLBACK') === -1) {
+              throw new Error('Http request ' + req.url + ' did not return the response with JSONP_CALLBACK()')
+            }
             var responseFactory = new Function('JSONP_CALLBACK', body);
             responseFactory(json => {
               responseJson = json;
             });
           } catch (e) {
             console.log('JSONP Error:', e);
-            throw e;
+            return onError(e);
           }
 
           let responseOptions = new ResponseOptions({body: responseJson, status, headers, url});
@@ -341,14 +344,12 @@ export class NodeJSONPConnection {
         });
       });
 
-      let onError = (err) => {
+      function onError (err) {
         let responseOptions = new ResponseOptions({body: err, type: ResponseType.Error});
         if (isPresent(baseResponseOptions)) {
           responseOptions = baseResponseOptions.merge(responseOptions);
         }
-        ngZone.run(() => {
-          responseObserver.error(new Response(responseOptions));
-        });
+        responseObserver.error(new Response(responseOptions));
       };
 
       nodeReq.on('error', onError);
