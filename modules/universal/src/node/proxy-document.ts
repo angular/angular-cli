@@ -98,7 +98,7 @@ export class ProxyDocument {
     return el.tagName;
   }
   get cookie() {
-    const el = this._zone.get('document');
+    const el = this._zone.get('cookie');
     return el.cookie;
   }
 
@@ -146,7 +146,7 @@ function querySelector(query) {
   var element = DOM.querySelector(parentElement, query);
   var zone = Zone.current.fork({
     name: 'querySelector',
-    properties: { parentElement, element, DOM }
+    properties: { parentElement, element }
   });
   return new ProxyElement(zone);
 }
@@ -157,7 +157,7 @@ function querySelectorAll(query) {
   var element = DOM.querySelectorAll(parentElement, query);
   var zone = Zone.current.fork({
     name: 'querySelector',
-    properties: { parentElement, element, DOM }
+    properties: { parentElement, element }
   });
   return new ProxyElement(zone);
 }
