@@ -8,19 +8,34 @@ function s4() {
 }
 
 export interface ExpressEngineConfig {
+<<<<<<< 4c5ef4705fecc2144be8b2f270e901cd8b75b634
   DOCUMENT?: string
+=======
+  DOCUMENT?: string;
+>>>>>>> refactor(express-engine): update config
   document?: string;
   cancelHandler?: () => boolean;
+  CANCEL_HANDLER?: () => boolean;
   req?: any;
+  REQ?: any;
   res?: any;
+  RES?: any;
   time?: boolean;
+  TIME?: boolean;
   id?: string;
+  ID?: string;
   ngModule?: any;
   precompile?: boolean;
   cancel?: boolean;
+  CANCEL?: boolean;
   requestUrl?: string;
+  REQUEST_URL?: string;
   originUrl?: string;
+  ORIGIN_URL?: string;
   baseUrl?: string;
+  BASE_URL?: string;
+  cookie?: string;
+  COOKIE?: string;
 }
 
 export function createEngine(options?: any) {
@@ -56,10 +71,26 @@ export function createEngine(options?: any) {
     if (!data.req || !data.res) {
       throw new Error('Please provide the req, res arguments (request and response objects from express) in res.render("index", { req, res })');
     }
-    // defaults
     var cancel = false;
+    if (data.req) {
+      data.req.on('close', () => cancel = true);
+    }
+    // defaults
     const _data = Object.assign({
-      get cancel() { return cancel; }
+      get cancel() { return cancel; },
+      set cancel(val) { cancel = val; },
+
+      get requestUrl() { return data.requestUrl || data.req.originalUrl },
+      set requestUrl(val) {  },
+
+      get originUrl() { return data.originUrl || data.req.hostname },
+      set originUrl(val) {  },
+
+      get baseUrl() { return data.baseUrl || '/' },
+      set baseUrl(val) {  },
+
+      get cookie() { return data.cookie || data.req.headers.cookie },
+      set cookie(val) {  },
     }, data);
 
     function readContent(content) {
@@ -75,13 +106,7 @@ export function createEngine(options?: any) {
         properties: _data
       });
 
-      var req: any = _data.req && _data.req.on && _data.req;
-      if (req) {
-        req.on('close', () => cancel = true);
-        _data.requestUrl = _data.requestUrl || req.originalUrl;
-        _data.originUrl = _data.originUrl || req.hostname;
-        _data.baseUrl = _data.baseUrl || '/';
-      }
+
 
       // convert to string
       return zone.run(() => (_options.precompile ?
