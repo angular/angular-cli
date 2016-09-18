@@ -30,10 +30,12 @@ export class ProxyElement {
     return el.value;
   }
   get nodeName() {
-    return node.tagName;
+    const el = this._zone.get('element');
+    return el.tagName;
   }
   get nodeValue() {
-    return node.nodeValue;
+    const el = this._zone.get('element');
+    return el.nodeValue;
   }
   get firstChild(): any {
     const DOM = getDOM();
