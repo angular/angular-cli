@@ -79,6 +79,9 @@ export function bootstrapItem(
 
 export function insertImport(fileToEdit: string, symbolName: string,
                                   fileName: string, isDefault = false): Change {
+  if (process.platform.startsWith('win')) {
+    fileName = fileName.replace(/\\/g, '/'); // correction in windows
+  }
   let rootNode = getRootNode(fileToEdit);
   let allImports = findNodes(rootNode, ts.SyntaxKind.ImportDeclaration);
 
