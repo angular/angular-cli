@@ -84,6 +84,20 @@ describe('route utils', () => {
           expect(newContent).toEqual(`import { Router } from '@angular/router';\n`);
         });
     });
+    it('inserts subcomponent in win32 environment', () => {
+      let content = './level1\\level2/level2.component';
+      return nru.insertImport(sourceFile, 'level2', content).apply()
+        .then(() => readFile(sourceFile, 'utf8'))
+        .then(newContent => {
+          if (process.platform.startsWith('win')) {
+            expect(newContent).toEqual(
+            `import { level2 } from './level1/level2/level2.component';\n`);
+          } else {
+            expect(newContent).toEqual(
+            `import { level2 } from './level1\\level2/level2.component';\n`);
+          }
+        });
+    });
   });
 
   describe('bootstrapItem', () => {
@@ -124,7 +138,7 @@ describe('route utils', () => {
         .then(content => {
           expect(content).toEqual(
             `import routes from './routes';
-  import { provideRouter } from '@angular/router'; 
+  import { provideRouter } from '@angular/router';
   bootstrap(AppComponent, [ provideRouter(routes) ]);`);
         });
     });
@@ -299,7 +313,7 @@ export default [
     children: [
       { path: 'about', component: AboutComponent,
         children: [
-          { path: 'details', component: DetailsComponent }, 
+          { path: 'details', component: DetailsComponent },
           { path: 'more', component: MoreComponent }
         ]
       }
@@ -327,7 +341,7 @@ export default [
         children: [
           { path: 'more', component: MoreComponent,
             children: [
-              { path: 'sections', component: SectionsComponent } 
+              { path: 'sections', component: SectionsComponent }
             ]
           }
         ]
@@ -359,7 +373,7 @@ export default [
   { path: 'main', component: MainComponent }
   { path: 'home', component: HomeComponent,
     children: [
-      { path: 'about/:id', component: AboutComponent_1 }, 
+      { path: 'about/:id', component: AboutComponent_1 },
       { path: 'about', component: AboutComponent }
     ]
   }
@@ -447,7 +461,7 @@ export default [
 export default [
   { path: 'home', component: HomeComponent,
     children: [
-      { path: 'trap-queen', component: TrapQueenComponent }, 
+      { path: 'trap-queen', component: TrapQueenComponent },
       { path: 'about', component: AboutComponent,
         children: [
           { path: 'more', component: MoreComponent }
@@ -478,7 +492,7 @@ import { HomeComponent as HomeComponent_1 } from './app/home/home/home.component
 export default [
   { path: 'home', component: HomeComponent,
     children: [
-      { path: 'home', component: HomeComponent_1 } 
+      { path: 'home', component: HomeComponent_1 }
     ]
   }
 ];`;
@@ -487,7 +501,7 @@ export default [
     });
     it('throws error if components collide and there is repitition', () => {
       let editedFile = new InsertChange(routesFile, 16,
-        `\n  { path: 'about', component: AboutComponent, 
+        `\n  { path: 'about', component: AboutComponent,
     children: [
       { path: 'details/:id', component: DetailsComponent_1 },
       { path: 'details', component: DetailsComponent }
@@ -543,7 +557,7 @@ import { DetailsComponent as DetailsComponent_1 } from './app/about/description/
 export default [
   { path: 'home', component: HomeComponent,
     children: [
-      { path: 'more', component: MoreComponent, canDeactivate: [ MyGuard ], useAsDefault: true } 
+      { path: 'more', component: MoreComponent, canDeactivate: [ MyGuard ], useAsDefault: true }
     ]
   }
 ];`
