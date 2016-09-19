@@ -301,8 +301,12 @@ export class NodePlatform  {
       // Inject preboot
       function injectPreboot(store: any, moduleRef: NgModuleRef<T>) {
         let preboot = store.get('preboot');
-        if (typeof preboot === 'boolean' && !preboot) {
-          return moduleRef;
+        if (typeof preboot === 'boolean') {
+          if (!preboot) {
+            return moduleRef;
+          } else {
+            preboot = {};
+          }
         }
         config.time && console.time('id: ' + config.id + ' preboot: ');
         // parseFragment used
