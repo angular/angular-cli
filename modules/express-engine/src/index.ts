@@ -8,12 +8,8 @@ function s4() {
 }
 
 export interface ExpressEngineConfig {
-<<<<<<< 4c5ef4705fecc2144be8b2f270e901cd8b75b634
-  DOCUMENT?: string
-=======
-  DOCUMENT?: string;
->>>>>>> refactor(express-engine): update config
   document?: string;
+  DOCUMENT?: string;
   cancelHandler?: () => boolean;
   CANCEL_HANDLER?: () => boolean;
   req?: any;
