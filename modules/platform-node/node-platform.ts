@@ -1,3 +1,4 @@
+import { getDOM } from './get-dom';
 // PRIVATE
 import {
   BROWSER_SANITIZATION_PROVIDERS,
@@ -6,7 +7,6 @@ import {
   DomRootRenderer,
   DomEventsPlugin,
   KeyEventsPlugin,
-  getDOM,
   HammerGesturesPlugin,
   ViewUtils
 } from './__private_imports__';

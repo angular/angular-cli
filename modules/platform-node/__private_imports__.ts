@@ -30,8 +30,8 @@ const {
 } = __compiler_private__;
 
 
-// popoppinternal
 
+// @internal
 export {
   // platform-browser
   BROWSER_SANITIZATION_PROVIDERS,
@@ -42,7 +42,6 @@ export {
   DomAdapter,
   setRootDomAdapter,
   KeyEventsPlugin,
-  getDOM,
   HammerGesturesPlugin,
 
   // compiler

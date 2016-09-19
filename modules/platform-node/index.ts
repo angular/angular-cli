@@ -1,4 +1,4 @@
-export {getDOM} from './__private_imports__';
+export {getDOM} from './get-dom';
 
 export * from './helper';
 

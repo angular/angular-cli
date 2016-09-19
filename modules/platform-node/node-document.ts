@@ -1,5 +1,5 @@
 // PRIVATE
-import { getDOM } from './__private_imports__';
+import { getDOM } from './get-dom';
 // PRIVATE
 
 const parse5: any = require('parse5');

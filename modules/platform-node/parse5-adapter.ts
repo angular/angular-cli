@@ -1,5 +1,5 @@
+import { getDOM } from './get-dom';
 import {
-  getDOM,
   DomAdapter,
   setRootDomAdapter,
   SelectorMatcher,
