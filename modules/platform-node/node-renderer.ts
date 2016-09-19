@@ -473,6 +473,10 @@ export class NodeDomRenderer extends DomRenderer {
         propertyValue = '';
       }
     }
+    // ignore boolean prop values for parse5 serialize
+    if ((propertyName === 'autofocus' || propertyName === 'spellcheck') && propertyValue === false) {
+        return;
+    }
 
     let setProp = super.setElementProperty(renderElement, propertyName, propertyValue);
     if (IGNORE_ATTRIBUTES[propertyName]) {
