@@ -78,10 +78,7 @@ export class Parse5DomAdapter extends DomAdapter {
 
   query(selector: any) { throw _notImplemented('query'); }
   querySelector(el: any, selector: string): any {
-    console.time('querySelector' + selector);
-    var $el = this.querySelectorAll(el, selector)[0];
-    console.timeEnd('querySelector' + selector);
-    return $el;
+    return this.querySelectorAll(el, selector)[0];
   }
   querySelectorAll(el: any, selector: string): any[] {
     var res: any[] = [];
