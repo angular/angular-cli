@@ -207,14 +207,15 @@ export class NodePlatform  {
     };
 
     function errorHandler(err, store, modRef, currentIndex, currentArray) {
-      var document = store.get('DOCUMENT');
-      if (typeof document !== 'string') {
-        document = Zone.current.get('document')
-      }
-      if (typeof document !== 'string') {
-        document = Zone.current.get('DOCUMENT')
-      }
+      var document = '';
       try {
+        document = store.get('DOCUMENT');
+        if (typeof document !== 'string') {
+          document = Zone.current.get('document')
+        }
+        if (typeof document !== 'string') {
+          document = Zone.current.get('DOCUMENT')
+        }
         let appRef = store.get('ApplicationRef');
         if (appRef && appRef.ngOnDestroy) {
           appRef.ngOnDestroy();
