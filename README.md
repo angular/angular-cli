@@ -26,7 +26,7 @@ You can update your `beta.10` projects to `beta.12` by following [these instruct
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**.
+The generated project has dependencies that require **Node.js 6.x.x and NPM 3.x.x**.
 
 ## Table of Contents
 
@@ -385,7 +385,7 @@ This project is currently a prototype so there are many known issues. Just to me
 - On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
 - The initial installation as well as `ng new` take too long because of lots of npm dependencies.
 - Many existing ember addons are not compatible with Angular apps built via angular-cli.
-- When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
+- When you `ng serve` remember that the generated project has dependencies that require **Node.js 6 or greater**.
 
 
 ## Development Hints for hacking on angular-cli
