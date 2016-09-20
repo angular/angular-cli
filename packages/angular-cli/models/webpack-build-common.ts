@@ -36,8 +36,7 @@ export function getWebpackCommonConfig(
   return {
     devtool: 'source-map',
     resolve: {
-      extensions: ['', '.ts', '.js'],
-      root: appRoot
+      extensions: ['.ts', '.js']
     },
     context: path.resolve(__dirname, './'),
     entry: entry,
@@ -46,16 +45,15 @@ export function getWebpackCommonConfig(
       filename: '[name].bundle.js'
     },
     module: {
-      preLoaders: [
+      loaders: [
         {
+          enforce: "left",
           test: /\.js$/,
           loader: 'source-map-loader',
           exclude: [
             /node_modules/
           ]
-        }
-      ],
-      loaders: [
+        },
         {
           test: /\.ts$/,
           loaders: [
@@ -159,7 +157,7 @@ export function getWebpackCommonConfig(
     ],
     node: {
       fs: 'empty',
-      global: 'window',
+      global: true,
       crypto: 'empty',
       module: false,
       clearImmediate: false,
