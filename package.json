@@ -12,7 +12,7 @@
     "build": "node ./scripts/publish/build.js",
     "build:patch": "node ./scripts/patch.js",
     "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -p $PKG; done",
-    "test": "npm run test:packages && npm run test:cli",
+    "test": "npm-run-all -c test:packages test:cli",
     "e2e": "npm run test:e2e",
     "e2e:nightly": "node tests/e2e_runner.js --nightly",
     "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
