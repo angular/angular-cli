@@ -17,7 +17,11 @@ interface IWebpackDevServerConfigurationOptions {
   headers?: { [key: string]: string };
   stats?: { [key: string]: boolean };
   inline: boolean;
+<<<<<<< HEAD
   https?: boolean;
+=======
+  https?:boolean;
+>>>>>>> Fixed the ssl command not working anymore
   key?: string;
   cert?: string;
 }
