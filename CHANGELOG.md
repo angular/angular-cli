@@ -1,3 +1,14 @@
+<a name="1.0.0-beta.15"></a>
+# [1.0.0-beta.15](https://github.com/angular/angular-cli/compare/v1.0.0-beta.14...v1.0.0-beta.15) (2016-09-20)
+
+
+### Bug Fixes
+
+* **help:** fix a bug where help was not available inside a project. ([#2146](https://github.com/angular/angular-cli/issues/2146)) ([5b880b2](https://github.com/angular/angular-cli/commit/5b880b2))
+* pin beta package versions ([#2236](https://github.com/angular/angular-cli/issues/2236)) ([638a54b](https://github.com/angular/angular-cli/commit/638a54b)), closes [#2234](https://github.com/angular/angular-cli/issues/2234)
+
+
+
 <a name="1.0.0-beta.14"></a>
 # [1.0.0-beta.14](https://github.com/angular/angular-cli/compare/v1.0.0-beta.11-webpack.2...v1.0.0-beta.14) (2016-09-15)
 
