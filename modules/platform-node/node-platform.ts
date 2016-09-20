@@ -42,7 +42,8 @@ import {
   PlatformRef,
   NgModuleRef,
   NgZone,
-  CompilerFactory
+  CompilerFactory,
+  TestabilityRegistry
 } from '@angular/core';
 
 import { CommonModule, PlatformLocation, APP_BASE_HREF } from '@angular/common';
@@ -705,6 +706,7 @@ export function _ORIGIN_URL(zone) {
     { provide: ORIGIN_URL, useFactory: _ORIGIN_URL, deps: [ NgZone ] },
 
     { provide: APP_ID, useValue: '%cmp%' },
+    { provide: TestabilityRegistry, useValue: {registerApplication: () => null} }
   ],
   exports: [  CommonModule, ApplicationModule  ]
 })
