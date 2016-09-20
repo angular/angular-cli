@@ -45,7 +45,7 @@ export function getWebpackCommonConfig(
       filename: '[name].bundle.js'
     },
     module: {
-      loaders: [
+      rules: [
         {
           enforce: "right",
           test: /\.js$/,

@@ -21,7 +21,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
       filename: '[name].bundle.js'
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.ts$/,
           enforce: 'right',
