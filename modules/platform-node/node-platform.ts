@@ -207,9 +207,23 @@ export class NodePlatform  {
     };
 
     function errorHandler(err, store, modRef, currentIndex, currentArray) {
-      const document = store.get('DOCUMENT');
-      _store && _store.clear();
-      // console.log('\n\nError in', currentArray[currentIndex].name, '\n\n', document);
+      var document = store.get('DOCUMENT');
+      if (typeof document !== 'string') {
+        document = Zone.current.get('document')
+      }
+      if (typeof document !== 'string') {
+        document = Zone.current.get('DOCUMENT')
+      }
+      try {
+        let appRef = store.get('ApplicationRef');
+        if (appRef && appRef.ngOnDestroy) {
+          appRef.ngOnDestroy();
+        }
+        if (modRef && modRef.destroy) {
+          modRef.destroy();
+        }
+        _store && _store.clear();
+      } catch (e) {}
       return document;
     }
 
@@ -561,6 +575,9 @@ function asyncPromiseSeries(store, modRef, errorHandler, cancelHandler, config, 
     });
   }, Promise.resolve(modRef)).then((val) => {
     config.time && console.timeEnd('id: ' + config.id + ' asyncPromiseSeries: ');
+    if (cancelHandler()) {
+      return errorHandler(null, store, modRef, null, null);
+    }
     return val;
   });
 }
