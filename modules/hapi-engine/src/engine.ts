@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as TsHoek from './ts-hoek';
-
 export var HAPI_PLATFORM = null;
 
 export var HAPI_ANGULAR_APP = {
@@ -24,15 +21,6 @@ export function disposeHapiAngularApp() {
   };
 }
 
-class Runtime {
-  constructor(private options: any) {
-  }
-  render(template: string, context, done: Function) {
-    return '';
-  }
-}
-
-
 export class hapiEngine {
 
   helpers: any;
@@ -43,15 +31,15 @@ export class hapiEngine {
     this.partials = {};
   }
 
-  registerHelper(name, helper) {
+  registerHelper(_name, _helper) {
 
   }
 
-  registerPartial(name, partial) {
+  registerPartial(_name, _partial) {
 
   }
 
-  compile(template, options, next) {
+  compile(_template, _options, _next) {
     
   }
 

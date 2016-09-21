@@ -40,6 +40,7 @@ export class ZoneStore {
     if (this.has(key)) {
       return props.get(key);
     }
+    return null;
   }
   set(key, value) {
     const props = zoneProps.get(this);
@@ -47,6 +48,7 @@ export class ZoneStore {
       props.set(key, value);
       return this;
     }
+    return null;
   }
   has(key) {
     const props = zoneProps.get(this);

@@ -4,7 +4,6 @@ import * as ts from 'typescript';
 const glob = require('glob');
 
 const MODULES_PATH = 'modules';
-const DIST_PATH = 'dist';
 const NPM_PREFIX = 'angular2';
 
 export function getAllModules(): string[] {

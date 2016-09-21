@@ -8,7 +8,6 @@ import {
   DomEventsPlugin,
   KeyEventsPlugin,
   HammerGesturesPlugin,
-  ViewUtils
 } from './__private_imports__';
 // PRIVATE
 
@@ -30,9 +29,9 @@ import {
   APP_ID,
   Injector,
   createPlatformFactory,
-  OpaqueToken,
 
   NgModule,
+  ModuleWithProviders,
   Optional,
   SkipSelf,
   Injectable,
@@ -61,12 +60,9 @@ import { NodeSharedStylesHost } from './node-shared-styles-host';
 import { Parse5DomAdapter } from './parse5-adapter';
 
 import {
-  NODE_APP_ID,
-
   ORIGIN_URL,
   REQUEST_URL,
 
-  getUrlConfig,
   createUrlProviders,
 } from './tokens';
 
@@ -80,7 +76,7 @@ declare var Zone: any;
 
 // @internal
 const _documentDeps = [ NodeSharedStylesHost, NgZone ];
-export function _document(domSharedStylesHost: NodeSharedStylesHost, zone: any): any {
+export function _document(domSharedStylesHost: NodeSharedStylesHost, _zone: any): any {
   let document: any = Zone.current.get('document');
   if (!document) {
     throw new Error('Please provide a document in the universal config');
@@ -206,7 +202,7 @@ export class NodePlatform  {
       }
     };
 
-    function errorHandler(err, store, modRef, currentIndex, currentArray) {
+    function errorHandler(_err, store, modRef, _currentIndex, _currentArray) {
       var document = '';
       try {
         document = store.get('DOCUMENT');
@@ -297,7 +293,7 @@ export class NodePlatform  {
 
         // check if all components are stable
 
-        let stableComponents = components.map((compRef, i) => {
+        let stableComponents = components.map(compRef => {
           let cmpInjector = compRef.injector;
           let ngZone: NgZone = cmpInjector.get(NgZone);
           // TODO(gdi2290): remove when zone.js tracks http and https
@@ -551,7 +547,7 @@ export class NodePlatform  {
  * We can also introduce sagas or serverless
  */
 // @internal
-function asyncPromiseSeries(store, modRef, errorHandler, cancelHandler, config, middleware, timer = 1) {
+function asyncPromiseSeries(store, modRef, errorHandler, cancelHandler, config, middleware, _timer = 1) {
   let errorCalled = false;
   config.time && console.time('id: ' + config.id + ' asyncPromiseSeries: ');
   return middleware.reduce(function reduceAsyncPromiseSeries (promise, cb, currentIndex, currentArray) {
@@ -636,7 +632,7 @@ export class NodeDomEventsPlugin {
   manager: NodeEventManager;
   // This plugin should come last in the list of plugins, because it accepts all
   // events.
-  supports(eventName: string): boolean { return true; }
+  supports(_eventName: string): boolean { return true; }
 
   addEventListener(element: any/*HTMLElement*/, eventName: string, handler: Function): Function {
     var zone = this.manager.getZone();
@@ -648,7 +644,6 @@ export class NodeDomEventsPlugin {
 
   addGlobalEventListener(target: string, eventName: string, handler: Function): Function {
     // we need to ensure that events are created in the fake document created for the current app
-    var window = this.manager.getWindow();
     var document = this.manager.getDocument();
     var zone = this.manager.getZone();
     var element; // = getDOM().getGlobalEventTargetWithDocument(target, window, document, document.body);
@@ -671,15 +666,15 @@ export class NodeDomEventsPlugin {
 }
 
 
-export function _APP_BASE_HREF(zone) {
+export function _APP_BASE_HREF(_zone) {
   return Zone.current.get('baseUrl');
 }
 
-export function _REQUEST_URL(zone) {
+export function _REQUEST_URL(_zone) {
   return Zone.current.get('requestUrl');
 }
 
-export function _ORIGIN_URL(zone) {
+export function _ORIGIN_URL(_zone) {
   return Zone.current.get('originUrl');
 }
 
@@ -729,11 +724,11 @@ export function _ORIGIN_URL(zone) {
   exports: [  CommonModule, ApplicationModule  ]
 })
 export class NodeModule {
-  static forRoot(document: string, config: any = {}) {
+  static forRoot(document: string, config: any = {}): ModuleWithProviders {
     var _config = Object.assign({}, { document }, config);
     return NodeModule.withConfig(_config);
   }
-  static withConfig (config: any = {}) {
+  static withConfig (config: any = {}): ModuleWithProviders {
     let providers = createUrlProviders(config);
     return {
       ngModule: NodeModule,

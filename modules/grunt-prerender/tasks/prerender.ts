@@ -1,9 +1,9 @@
 
 
 export class Prerender {
-  constructor(private options) {}
+  constructor(_options) {}
 
-  render(file) {
+  render(_file) {
       return Promise.resolve('');
   }
 }

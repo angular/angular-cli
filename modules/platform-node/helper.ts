@@ -83,12 +83,13 @@ export class StringMapWrapper {
   }
   static isEmpty(map: {[key: string]: any}): boolean {
     for (var prop in map) {
+      !prop; // suppress error
       return false;
     }
     return true;
   }
   static delete (map: {[key: string]: any}, key: string) { delete map[key]; }
-  static forEach<K, V>(map: {[key: string]: V}, callback: (v: V, K: string) => void) {
+  static forEach<V>(map: {[key: string]: V}, callback: (v: V, key: string) => void) {
     for (let k of Object.keys(map)) {
       callback(map[k], k);
     }

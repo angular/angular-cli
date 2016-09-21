@@ -149,7 +149,7 @@ export class NodePlatformLocation extends PlatformLocation {
   }
 
   onPopState(fn): void { this._popStateListeners.push(fn); }
-  onHashChange(fn): void { /*TODO*/}
+  onHashChange(_fn): void { /*TODO*/}
 
   back(): void {
     if (this._stackIndex === 0) {

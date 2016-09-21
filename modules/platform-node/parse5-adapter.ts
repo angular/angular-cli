@@ -1,4 +1,3 @@
-import { getDOM } from './get-dom';
 import {
   DomAdapter,
   setRootDomAdapter,
@@ -29,7 +28,6 @@ var _attrToPropMap: {[key: string]: string} = {
   'readonly': 'readOnly',
   'tabindex': 'tabIndex',
 };
-var defDoc: any = null;
 
 var mapProps = ['attribs', 'x-attribsNamespace', 'x-attribsPrefix'];
 
@@ -46,7 +44,7 @@ export class Parse5DomAdapter extends DomAdapter {
     setRootDomAdapter(new Parse5DomAdapter());
   }
 
-  hasProperty(element: any, name: string): boolean {
+  hasProperty(_element: any, name: string): boolean {
     /* tslint:disable */
     return _HTMLElementPropertyList.indexOf(name) > -1;
     /* tslint:enable */
@@ -76,7 +74,7 @@ export class Parse5DomAdapter extends DomAdapter {
 
   get attrToPropMap() { return _attrToPropMap; }
 
-  query(selector: any) { throw _notImplemented('query'); }
+  query(_selector: any) { throw _notImplemented('query'); }
   querySelector(el: any, selector: string): any {
     return this.querySelectorAll(el, selector)[0];
   }
@@ -128,7 +126,7 @@ export class Parse5DomAdapter extends DomAdapter {
 
       matcher.match(
           cssSelector,
-          function(selector: any, cb: any) { result = true; });
+          (_selector: any, _cb: any) => { result = true; });
     }
     return result;
   }
@@ -190,7 +188,7 @@ export class Parse5DomAdapter extends DomAdapter {
   getInnerHTML(el: any): string {
     return serializer(this.templateAwareRoot(el), parse5.treeAdapters.htmlparse2);
   }
-  getTemplateContent(el: any): any {  /* Node */
+  getTemplateContent(_el: any): any {  /* Node */
     return null;  // no <template> support in parse5.
   }
   getOuterHTML(el: any): string {
@@ -200,7 +198,7 @@ export class Parse5DomAdapter extends DomAdapter {
   }
   nodeName(node: any): string { return node.tagName; }
   nodeValue(node: any): string { return node.nodeValue; }
-  type(node: any): string { throw _notImplemented('type'); }
+  type(_node: any): string { throw _notImplemented('type'); }
   content(node: any): string { return node.childNodes[0]; }
   firstChild(el: any): any { /*Node*/
     return el.firstChild;
@@ -343,7 +341,7 @@ export class Parse5DomAdapter extends DomAdapter {
     return el.shadowRoot;
   }
   getHost(el: any): string { return el.host; }
-  getDistributedNodes(el: any): any[] { throw _notImplemented('getDistributedNodes'); }
+  getDistributedNodes(_el: any): any[] { throw _notImplemented('getDistributedNodes'); }
   clone(node: any): any { /* Node */
     var _recursive = (node: any) => {
       var nodeClone = Object.create(Object.getPrototypeOf(node));
@@ -388,7 +386,7 @@ export class Parse5DomAdapter extends DomAdapter {
   getElementsByClassName(element: any, name: string): any[] { /* HTMLElement */
     return this.querySelectorAll(element, '.' + name);
   }
-  getElementsByTagName(element: any, name: string): any[] { /* HTMLElement */
+  getElementsByTagName(_element: any, _name: string): any[] { /* HTMLElement */
     throw _notImplemented('getElementsByTagName');
   }
   classList(element: any): string[] {
@@ -476,7 +474,7 @@ export class Parse5DomAdapter extends DomAdapter {
   hasAttribute(element: any, attribute: string): boolean {
     return element.attribs && element.attribs.hasOwnProperty(attribute);
   }
-  hasAttributeNS(element: any, ns: string, attribute: string): boolean {
+  hasAttributeNS(_element: any, _ns: string, _attribute: string): boolean {
     throw _notImplemented('hasAttributeNS');
   }
   getAttribute(element: any, attribute: string): string {
@@ -484,7 +482,7 @@ export class Parse5DomAdapter extends DomAdapter {
         element.attribs[attribute] :
         null;
   }
-  getAttributeNS(element: any, ns: string, attribute: string): string {
+  getAttributeNS(_element: any, _ns: string, _attribute: string): string {
     throw _notImplemented('getAttributeNS');
   }
   setAttribute(element: any, attribute: string, value: string) {
@@ -495,7 +493,7 @@ export class Parse5DomAdapter extends DomAdapter {
       }
     }
   }
-  setAttributeNS(element: any, ns: string, attribute: string, value: string) {
+  setAttributeNS(_element: any, _ns: string, _attribute: string, _value: string) {
     throw _notImplemented('setAttributeNS');
   }
   removeAttribute(element: any, attribute: string) {
@@ -503,7 +501,7 @@ export class Parse5DomAdapter extends DomAdapter {
       delete element.attribs[attribute];
     }
   }
-  removeAttributeNS(element: any, ns: string, name: string) {
+  removeAttributeNS(_element: any, _ns: string, _name: string) {
     throw _notImplemented('removeAttributeNS');
   }
   templateAwareRoot(el: any): any {
@@ -535,7 +533,7 @@ export class Parse5DomAdapter extends DomAdapter {
     return {documentMode: false};
   }
   // UNIVERSAL FIX
-  getBoundingClientRect(el: any): any {
+  getBoundingClientRect(_el: any): any {
     return {left: 0, top: 0, width: 0, height: 0};
   }
   // UNIVERSAL FIX
@@ -620,7 +618,7 @@ export class Parse5DomAdapter extends DomAdapter {
   supportsDOMEvents(): boolean { return false; }
   supportsNativeShadowDOM(): boolean { return false; }
   // UNIVERSAL FIX
-  getGlobalEventTarget(target: string): any {
+  getGlobalEventTarget(_target: string): any {
     throw _notImplemented('getGlobalEventTarget');
   }
   getBaseHref(): string {
@@ -639,7 +637,7 @@ export class Parse5DomAdapter extends DomAdapter {
   getData(el: any, name: string): string {
     return this.getAttribute(el, 'data-' + name);
   }
-  getComputedStyle(el: any): any {
+  getComputedStyle(_el: any): any {
     throw _notImplemented('getComputedStyle');
   }
   setData(el: any, name: string, value: string) {
@@ -660,21 +658,21 @@ export class Parse5DomAdapter extends DomAdapter {
   getTransitionEnd(): string { return 'transitionend'; }
   supportsAnimation(): boolean { return true; }
 
-  replaceChild(el: any, newNode: any, oldNode: any) {
+  replaceChild(_el: any, _newNode: any, _oldNode: any) {
     throw _notImplemented('replaceChild');
   }
   // TODO(gdi2290): move node-document to here
-  parse(templateHtml: string) {
+  parse(_templateHtml: string) {
     throw _notImplemented('Parse5DomAdapter#parse');
   }
-  invoke(el: any /*Element*/, methodName: string, args: any[]): any {
+  invoke(_el: any /*Element*/, _methodName: string, _args: any[]): any {
     throw _notImplemented('Parse5DomAdapter#invoke');
   }
-  getEventKey(event: any): string {
+  getEventKey(_event: any): string {
     throw _notImplemented('Parse5DomAdapter#getEventKey');
   }
   supportsCookies(): boolean { return false; }
-  getCookie(name: string): string {
+  getCookie(_name: string): string {
     const document = Zone.current.get('document');
     if (document && document.cookie) {
       return document.cookie;
@@ -688,7 +686,7 @@ export class Parse5DomAdapter extends DomAdapter {
     }
     throw _notImplemented('Parse5DomAdapter#setCookie');
   }
-  animate(element: any, keyframes: any[], options: any): any {
+  animate(_element: any, _keyframes: any[], _options: any): any {
     throw _notImplemented('Parse5DomAdapter#animate');
   }
 }

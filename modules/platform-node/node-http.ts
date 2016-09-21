@@ -60,7 +60,7 @@ export class PreloadHttp extends Http {
     // this._activeNode = _rootNode;
 
   }
-  preload(url, factory) {
+  preload(_url, factory) {
 
     var obs = new EventEmitter(false);
 
@@ -248,7 +248,7 @@ export class NodeConnection implements Connection {
 export class NodeBackend implements ConnectionBackend {
   constructor(
     private _baseResponseOptions: ResponseOptions,
-    private _ngZone: NgZone,
+    _ngZone: NgZone,
     @Inject(APP_BASE_HREF) private _baseUrl: string,
     @Inject(ORIGIN_URL) private _originUrl: string) {}
 

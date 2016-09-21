@@ -131,7 +131,7 @@ export function createGlobalProxy() {
       }
       return originalDocumentRef;
     },
-    set: function(newValue) {
+    set: function(_newValue) {
 
     }
   });

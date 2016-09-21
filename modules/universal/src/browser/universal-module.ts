@@ -3,11 +3,7 @@ import {
   APP_ID,
   Inject,
   APP_BOOTSTRAP_LISTENER,
-  NgZone,
-  NgModuleRef,
-  Self,
   Injectable,
-  Optional,
   createPlatformFactory,
   PlatformRef
 } from '@angular/core';
@@ -104,7 +100,7 @@ export class UniversalModule {
       sharedStylesHost._styles.push(style);
     });
   }
-  static withConfig(config = {}): {ngModule: UniversalModule, providers: any[]} {
+  static withConfig(_config: any = {}): {ngModule: UniversalModule, providers: any[]} {
     return {
       ngModule: UniversalModule,
       providers: [

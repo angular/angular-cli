@@ -8,15 +8,13 @@ export interface IWebpackPrerender {
 
 export class Angular2Prerender {
 
-  private bootloader;
-
-  constructor(private options: IWebpackPrerender) {
+  constructor(_options: IWebpackPrerender) {
     // maintain your platform instance
     // this.bootloader = new Bootloader(this.options.bootloaderConfig);
   }
 
   apply(compiler) {
-    compiler.plugin('emit', (compilation, callback) => {
+    compiler.plugin('emit', (_compilation, _callback) => {
       return '';
     });
   }

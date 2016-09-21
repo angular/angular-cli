@@ -1,11 +1,7 @@
-
 import * as through from 'through2';
-var gutil = require('gutil');
 
-let PluginError = gutil.PluginError;
-
-export function prerender(options) {
-  function transform(file: any, enc: string, cb: Function) {
+export function prerender(_options) {
+  function transform(_file: any, _enc: string, _cb: Function) {
 
     return '';
   }

@@ -5,7 +5,6 @@
  * For example, `build` and `test` can accept --module=universal,grunt-prerender
  * to build or test only those modules.
  */
-import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as buildUtils from './build-utils';
 import * as ts from 'typescript';
@@ -13,14 +12,12 @@ import * as gulpTs from 'gulp-typescript';
 
 const gulp = require('gulp');
 const gulpChangelog = require('gulp-conventional-changelog');
-const gulpJasmine = require('gulp-jasmine');
 const jsonTransform = require('gulp-json-transform');
 const rimraf = require('rimraf');
 const rename = require('gulp-rename');
 const args = require('minimist')(process.argv);
 const tsConfig = require('./tsconfig.json');
 const rootPkg = require('./package.json');
-const jasmineConfig = require('./spec/support/jasmine.json');
 const runSequence = require('run-sequence');
 const replace = require('gulp-replace');
 
@@ -95,7 +92,7 @@ gulp.task('rewrite_packages', () => {
   const publishedModuleNames = buildUtils.getPublishedModuleNames(allModules);
   const rootDependencies = buildUtils.getRootDependencies(rootPkg, publishedModuleNames);
   gulp.src('modules/**/package.json')
-    .pipe(jsonTransform((data, file) => {
+    .pipe(jsonTransform((data, _file) => {
       if (data.main) {
         data.main = data.main.replace('src/', '').replace('.ts', '.js');
       }
