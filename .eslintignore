@@ -5,4 +5,4 @@ tmp/
 typings/
 
 # Ignore all blueprint files. We e2e tests those later on.
-addon/ng2/blueprints/*/files/
+packages/angular-cli/blueprints/*/files/

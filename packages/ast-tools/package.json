@@ -1,6 +1,6 @@
 {
   "name": "@angular-cli/ast-tools",
-  "version": "1.0.0-beta.11-webpack.5",
+  "version": "1.0.1",
   "description": "CLI tool for Angular",
   "main": "./src/index.js",
   "keywords": [
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "rxjs": "^5.0.0-beta.11",
+    "rxjs": "5.0.0-beta.11",
     "denodeify": "^1.2.1",
     "typescript": "2.0.0"
   }

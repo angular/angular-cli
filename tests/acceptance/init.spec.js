@@ -7,7 +7,7 @@ var glob = require('glob');
 var Blueprint = require('ember-cli/lib/models/blueprint');
 var path = require('path');
 var tmp = require('../helpers/tmp');
-var root = process.cwd();
+var root = path.join(__dirname, '../../packages/angular-cli');
 var util = require('util');
 var conf = require('ember-cli/tests/helpers/conf');
 var minimatch = require('minimatch');
@@ -45,8 +45,8 @@ describe('Acceptance: ng init', function () {
   });
 
   function confirmBlueprinted(isMobile) {
-    var blueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'ng2', 'files');
-    var mobileBlueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'mobile', 'files');
+    var blueprintPath = path.join(root,  'blueprints', 'ng2', 'files');
+    var mobileBlueprintPath = path.join(root, 'blueprints', 'mobile', 'files');
     var expected = unique(walkSync(blueprintPath).concat(isMobile ? walkSync(mobileBlueprintPath) : []).sort());
     var actual = walkSync('.').sort();
 
@@ -76,7 +76,7 @@ describe('Acceptance: ng init', function () {
   }
 
   function confirmGlobBlueprinted(pattern) {
-    var blueprintPath = path.join(root, 'addon', 'ng2', 'blueprints', 'ng2', 'files');
+    var blueprintPath = path.join(root, 'blueprints', 'ng2', 'files');
     var actual = pickSync('.', pattern);
     var expected = intersect(pickSync(blueprintPath, pattern), actual);
 

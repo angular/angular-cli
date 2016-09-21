@@ -1,0 +1,44 @@
+{
+  "project": {
+    "version": "<%= version %>",
+    "name": "<%= htmlComponentName %>"
+  },
+  "apps": [
+    {
+      "root": "<%= sourceDir %>",
+      "outDir": "dist",
+      "assets": "assets",
+      "index": "index.html",
+      "main": "main.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.json",
+      "prefix": "<%= prefix %>",
+      "mobile": <%= isMobile %>,
+      "styles": [
+        "styles.<%= styleExt %>"
+      ],
+      "scripts": [],
+      "environments": {
+        "source": "environments/environment.ts",
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    }
+  ],
+  "addons": [],
+  "packages": [],
+  "e2e": {
+    "protractor": {
+      "config": "./protractor.conf.js"
+    }
+  },
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
+  },
+  "defaults": {
+    "styleExt": "<%= styleExt %>",
+    "prefixInterfaces": false
+  }
+}
