@@ -22,11 +22,16 @@ function _readConfig(tsConfigPath){
     return config;
   }
 
-export function createCodeGenerator({ngcOptions, i18nOptions, resourceLoader, compilerHost}){
+export function createCodeGenerator({ngcOptions, i18nOptions, resourceLoader, compilerHost, reflectorHostContext}){
 
-  return program => new Observable<{fileName:string, sourceText: string}>(codegenOutput => {
+
+
+  return (program:ts.Program) => new Observable<{fileName:string, sourceText: string}>(codegenOutput => {
     //emit files from observable monkeypatch
     const writeFile = compilerHost.writeFile;
+
+    program.getSourceFiles().forEach(f => console.log(f.fileName))
+    console.log(program.getCompilerOptions())
 
     compilerHost.writeFile = (fileName, sourceText) => {
       writeFile(fileName, sourceText);
@@ -38,8 +43,8 @@ export function createCodeGenerator({ngcOptions, i18nOptions, resourceLoader, co
       i18nOptions,
       program,
       compilerHost,
-      undefined, //TODO: hook in reflector host
-      resourceLoader
+      reflectorHostContext, //TODO: hook in reflector host
+      undefined
     );
 
     codeGenerator

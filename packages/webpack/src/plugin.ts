@@ -1,4 +1,5 @@
 //@angular/webpack plugin main
+import 'reflect-metadata'
 import {ReflectiveInjector, OpaqueToken} from '@angular/core'
 import * as ts from 'typescript'
 import * as ngCompiler from '@angular/compiler-cli'
@@ -16,6 +17,7 @@ import * as _ from 'lodash'
 function debug(...args){
   console.log.apply(console, ['ngc:', ...args]);
 }
+
 
 /**
  * Option Constants
@@ -49,7 +51,7 @@ export class NgcWebpackPlugin {
     const tsConfig = this._readConfig(options.project);
        const plugin = this;
 
-    const ngcConfig = tsConfig.angularCompilerOptions;
+    const ngcConfig = tsConfig.raw.angularCompilerOptions;
     if(!ngcConfig){
       throw new Error(`"angularCompilerOptions" is not set in your tsconfig file!`);
     }
@@ -60,14 +62,18 @@ export class NgcWebpackPlugin {
 
     const compilerHost = createCompilerHost(tsConfig);
 
+
+
     //create a program that references the main JIT entry point (eg the main AppModule), as we need that reference for codegen
-    this.program = ts.createProgram([this.rootModule], tsConfig.compilerOptions, compilerHost);
+    this.program = ts.createProgram([path.resolve('./app/main.jit.ts')], tsConfig.options, compilerHost);
+
+    this.program.getSourceFiles().forEach(f => console.log(f.fileName))
 
     //options for codegen
     const ngcOptions:ngCompiler.AngularCompilerOptions = {
-			genDir: path.resolve(plugin.options.appRoot, '@@ngfactory'),
-			rootDir: tsConfig.compilerOptions.rootDir,
-			basePath: plugin.options.appRoot,
+			genDir: tsConfig.options.rootDir + './ngfactory',
+			rootDir: tsConfig.options.rootDir,
+			basePath: process.cwd(),
 			skipMetadataEmit: true,
 			skipDefaultLibCheck: true,
 			skipTemplateCodegen: false,
@@ -83,10 +89,12 @@ export class NgcWebpackPlugin {
       basePath: plugin.options.appRoot
     }
 
-     this.reflectorHost = new ngCompiler.ReflectorHost(this.program, compilerHost, ngcOptions);
-     this.reflector = new ngCompiler.StaticReflector(this.reflectorHost);
+    const context = new ngCompiler.NodeReflectorHostContext(compilerHost);
 
-     this.codeGeneratorFactory = createCodeGenerator({ngcOptions, i18nOptions, compilerHost, resourceLoader: undefined});
+    // this.reflector = new ngCompiler.StaticReflector(this.reflectorHost);
+    this.reflectorHost = new ngCompiler.ReflectorHost(this.program, compilerHost, ngcOptions, context);
+
+     this.codeGeneratorFactory = createCodeGenerator({ngcOptions, i18nOptions, compilerHost, resourceLoader: undefined, reflectorHostContext: context});
 
   }
 
@@ -101,15 +109,15 @@ export class NgcWebpackPlugin {
 
   private _make(compilation, cb){
 
-    const entryModule = this.reflectorHost.findDeclaration(this.rootModule, this.rootModuleName, undefined);
-    const entryNgModuleMetadata = this.reflector.annotations(entryModule).pop();
+  //  const entryModule = this.reflectorHost.findDeclaration(this.rootModule, this.rootModuleName, undefined);
+ //   const entryNgModuleMetadata = this.reflector.annotations(entryModule).pop();
 
-    const entryModules = entryNgModuleMetadata.imports
-      .filter(importRec => importRec.ngModule && importRec.ngModule.name === 'RouterModule')
-      .map(routerModule => routerModule.providers)
+    // const entryModules = entryNgModuleMetadata.imports
+    //   .filter(importRec => importRec.ngModule && importRec.ngModule.name === 'RouterModule')
+    //   .map(routerModule => routerModule.providers)
 
 
-    debug(`ngc: building from ${entryModule.name}`)
+    // debug(`ngc: building from ${entryModule.name}`)
 
     this.codeGeneratorFactory(this.program)
       .forEach(v => console.log(v.fileName))
@@ -137,10 +145,16 @@ export class NgcWebpackPlugin {
 
   private _readConfig(tsConfigPath){
     let {config, error} = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+    let content = ts.parseJsonConfigFileContent(config, {
+      useCaseSensitiveFileNames: true,
+      fileExists: ts.sys.fileExists,
+      readDirectory: ts.sys.readDirectory
+    }, process.cwd())
+
     if(error){
       throw error;
     }
-    return config;
+    return content;
   }
 
 	private _compile(params){

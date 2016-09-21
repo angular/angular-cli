@@ -17,6 +17,6 @@ export class NgcWebpackCompilerHost extends tscWrapped.DelegatingHost {
 }
 
 export function createCompilerHost(tsConfig){
-  const delegateHost = ts.createCompilerHost(tsConfig.compilerOptions);
+  const delegateHost = ts.createCompilerHost(tsConfig.options);
   return new NgcWebpackCompilerHost(delegateHost);
 }
