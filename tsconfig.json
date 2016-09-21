@@ -19,7 +19,7 @@
     "stripInternal": true,
     "lib": ["es6", "dom"],
     "types": [
-      "node"
+      "node", "jasmine"
     ],
     "paths": {
       "angular2-express-engine": [
@@ -36,9 +36,6 @@
       ],
       "angular2-universal": [
         "./modules/universal"
-      ],
-      "angular2-universal": [
-        "./modules/universal/src/node/index.ts"
       ],
       "angular2-hapi-engine": [
         "./modules/hapi-engine/src/index.ts"
