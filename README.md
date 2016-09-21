@@ -16,13 +16,13 @@ This project is very much still a work in progress.
 The CLI is now in beta. 
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
-## Webpack preview release update
+## Webpack update
 
-We're updating the build system in Angular-CLI to use webpack instead of Broccoli.
+We changed the build system between beta.10 and beta.12, from SystemJS to Webpack. 
+And with it comes a lot of benefits. 
+To take advantage of these, your app built with the old beta will need to migrate.
 
-You can install and update your projects using [these instructions](https://github.com/angular/angular-cli/blob/master/WEBPACK_UPDATE.md).
-
-**The current instructions on this file reflect usage for the `webpack` version.**
+You can update your `beta.10` projects to `beta.12` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
 
 ## Prerequisites
 

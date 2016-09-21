@@ -13,6 +13,7 @@ let _processes: child_process.ChildProcess[] = [];
 
 function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<string> {
   let stdout = '';
+  let stderr = '';
   const cwd = process.cwd();
   console.log(white(
     `  ==========================================================================================`
@@ -42,9 +43,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
       .forEach(line => console.log('  ' + line));
   });
   npmProcess.stderr.on('data', (data: Buffer) => {
-    if (options.silent) {
-      return;
-    }
+    stderr += data.toString('utf-8');
     data.toString('utf-8')
       .split(/[\n\r]+/)
       .filter(line => line !== '')
@@ -62,7 +61,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
       if (!error) {
         resolve(stdout);
       } else {
-        err.message += `${error}...`;
+        err.message += `${error}...\n\nSTDOUT:\n${stdout}\n`;
         reject(err);
       }
     });
@@ -96,10 +95,14 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
 
 export function ng(...args: string[]) {
   if (args[0] == 'build') {
-    return _exec({silent: true}, 'ng', args);
+    return silentNg(...args);
   } else {
     return _exec({}, 'ng', args);
   }
+}
+
+export function silentNg(...args: string[]) {
+  return _exec({silent: true}, 'ng', args);
 }
 
 export function silentNpm(...args: string[]) {

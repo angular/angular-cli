@@ -2,6 +2,7 @@
 'use strict';
 
 /*eslint-disable no-console */
+const chalk = require('chalk');
 const denodeify = require('denodeify');
 const fs = require('fs');
 const glob = denodeify(require('glob'));
@@ -45,12 +46,16 @@ Promise.resolve()
 
         return promise.then(() => {
           console.log(`  ${name}`);
-          return npmRun.execSync(`tsc -p ${path.relative(process.cwd(), pkg.root)}`);
+          try {
+            return npmRun.execSync(`tsc -p ${path.relative(process.cwd(), pkg.root)}`);
+          } catch (err) {
+            throw new Error(`Compilation error.\n${err.stdout}`);
+          }
         });
       }, Promise.resolve());
   })
   .then(() => console.log('Copying uncompiled resources...'))
-  .then(() => glob(path.join(packagesRoot, '**/*')))
+  .then(() => glob(path.join(packagesRoot, '**/*'), { dot: true }))
   .then(files => {
     console.log(`  Found ${files.length} files...`);
     return files
@@ -83,8 +88,8 @@ Promise.resolve()
 
         // The only remaining file we want to ignore is tsconfig and spec files.
         return !(/tsconfig\.json$/.test(fileName))
-          && !(/\.spec\./.test(fileName))
-          && !(/[\/\\]tests[\/\\]/.test(fileName));
+            && !(/\.spec\./.test(fileName))
+            && !(/[\/\\]tests[\/\\]/.test(fileName));
       })
       .map((fileName) => {
         const source = path.join(packagesRoot, fileName);
@@ -116,6 +121,6 @@ Promise.resolve()
     }));
   })
   .then(() => process.exit(0), (err) => {
-    console.error(err);
+    console.error(chalk.red(err.message));
     process.exit(1);
   });

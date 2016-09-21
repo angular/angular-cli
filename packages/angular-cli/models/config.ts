@@ -29,7 +29,7 @@ function getUserHome() {
 
 
 export class CliConfig extends CliConfigBase<ConfigInterface> {
-  private static _configFilePath(projectPath?: string): string {
+  static configFilePath(projectPath?: string): string {
     // Find the configuration, either where specified, in the angular-cli project
     // (if it's in node_modules) or from the current process.
     return (projectPath && _findUp(CLI_CONFIG_FILE_NAME, projectPath))
@@ -39,7 +39,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
 
 
   static fromProject(): CliConfig {
-    const configPath = this._configFilePath();
+    const configPath = this.configFilePath();
     const globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
 
     if (!configPath) {
@@ -47,7 +47,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     }
 
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(
-      CliConfig._configFilePath(), [globalConfigPath]);
+      CliConfig.configFilePath(), [globalConfigPath]);
 
     const aliases = [
       cliConfig.alias('apps.0.root', 'defaults.sourceDir'),
