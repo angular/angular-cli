@@ -14,8 +14,8 @@
 > Universal (isomorphic) JavaScript support for Angular 2.
 
 # Table of Contents
+* [Documentation](#documentation)
 * [Getting Started with Universal](#getting-started)
-    * Universal Documentation & Migration Guide (Angular <= rc4)
     * w/ NodeJS Server
     * w/ ASP.NET Core Server
 * [Modules](#modules)
@@ -24,9 +24,17 @@
 * [What's in a name?](#whats-in-a-name)
 * [License](#license)
 
-# Getting Started
+---
 
-[* Universal Documentation & Migration Guide](https://github.com/angular/universal/blob/master/DOCUMENTATION.md)
+# Documentation
+
+**[Universal Documentation & Guide](https://github.com/angular/universal/blob/master/DOCUMENTATION.md)**
+
+ - Featuring an overview, installation process, and key concepts for creating Universal Angular applications.
+ - For those intersted in how it all got started, and the goals of Universal check out the [Original Design Doc (from 2015)](https://docs.google.com/document/d/1q6g9UlmEZDXgrkY88AJZ6MUrUxcnwhBGS0EXbVlYicY)
+
+
+# Getting Started
 
 [* **NodeJS** :: **Universal Starter** repo](https://github.com/angular/universal-starter)
 
@@ -38,8 +46,6 @@
 ## [Universal](/modules/universal)
 > Manage your application lifecycle and serialize changes while on the server to be sent to the client.
 
-### Documentation
-[Design Doc](https://docs.google.com/document/d/1q6g9UlmEZDXgrkY88AJZ6MUrUxcnwhBGS0EXbVlYicY)
 
 ### Videos
 Angular 2 Universal Patterns - ng-conf, May 2016  
@@ -59,8 +65,6 @@ Angular 2 Server Rendering - Angular U, July 2015
 
 # Best Practices
 > When building Universal components in Angular 2 there are a few things to keep in mind.
-
-> Note: Universal versions 0.103.3 (or higher) work with the new alpha `router-3.0.0-alpha`. Prior versions work only with router-deprecated.
 
 * Know the difference between attributes and properties in relation to the DOM.
 * Don't manipulate the `nativeElement` directly. Use the `Renderer`. We do this to ensure that in any environment we're able to change our view.
