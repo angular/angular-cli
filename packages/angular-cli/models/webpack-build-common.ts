@@ -47,7 +47,7 @@ export function getWebpackCommonConfig(
     module: {
       rules: [
         {
-          enforce: "right",
+          enforce: "pre",
           test: /\.js$/,
           loader: 'source-map-loader',
           exclude: [

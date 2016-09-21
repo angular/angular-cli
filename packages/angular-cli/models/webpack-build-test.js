@@ -24,7 +24,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
       rules: [
         {
           test: /\.ts$/,
-          enforce: 'right',
+          enforce: 'pre',
           loader: 'tslint-loader',
           exclude: [
             path.resolve(projectRoot, 'node_modules')
@@ -32,7 +32,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
         },
         {
           test: /\.js$/,
-          enforce: 'right',
+          enforce: 'pre',
           loader: 'source-map-loader',
           exclude: [
             path.resolve(projectRoot, 'node_modules/rxjs'),
@@ -59,7 +59,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
         },
         {
           test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
-          enforce: 'left',
+          enforce: 'post',
           exclude: [
             /\.(e2e|spec)\.ts$/,
             /node_modules/
