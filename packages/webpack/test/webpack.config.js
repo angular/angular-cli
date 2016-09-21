@@ -6,7 +6,7 @@ module.exports = {
     extensions: ['', '.scss', '.ts', '.js'],
  //   mainFields: [ 'browser', 'module', 'main']
   },
-  entry: './app/app.module.ts',
+  entry: './app/main.jit.ts',
   output: {
     path: "./dist",
     publicPath: 'dist/',

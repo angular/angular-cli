@@ -10,7 +10,8 @@ import { AppComponent }   from './app.component';
     AppComponent
   ],
   imports: [
-    RouterModule.forRoot([{path: "lazy", loadChildren: "./lazy.module#LazyModule"}])
+    BrowserModule,
+    //RouterModule.forRoot([{path: "lazy", loadChildren: "./lazy.module#LazyModule"}])
   ],
   bootstrap: [AppComponent]
 })

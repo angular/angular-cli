@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "es2015",
+    "moduleResolution": "node",
     "target": "es5",
     "noImplicitAny": false,
     "sourceMap": false,
@@ -12,13 +13,10 @@
     ],
     "outDir": "dist",
     "skipLibCheck": true,
-    "rootDir": "app",
-    "paths": {
-      "ngfactory/*": ["app/ngfactory"]
-    }
+    "rootDir": "."
   },
   "files": [
-    "app/main.aot.ts"
+    "app/main.jit.ts"
   ],
   "angularCompilerOptions": {
     "genDir": "ngfactory",
