@@ -18,7 +18,7 @@ set_opts='--global -g'
 test_opts='--browsers --colors --config-file --environment --filter --host --launch --log-level --module --path --port --query --reporter --server --silent --test-page --test-port --watch -H -c -cf -e -f -m -r -s -tp -w'
 version_opts='--verbose'
 
-if type complete &>/dev/null; then
+if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then
   _ng_completion() {
     local cword pword opts
 
@@ -46,7 +46,7 @@ if type complete &>/dev/null; then
   }
 
   complete -o default -F _ng_completion ng
-elif type compctl &>/dev/null; then
+elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then
   _ng_completion () {
     local words cword opts
     read -Ac words
