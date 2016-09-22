@@ -136,6 +136,7 @@ export function createGlobalProxy() {
     }
   });
 
+  return document;
 }
 
 

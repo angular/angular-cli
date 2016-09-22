@@ -42,6 +42,7 @@ export class OpaqueToken {
 const SharedStylesHost: any = __platform_browser_private__.SharedStylesHost;
 
 export const UNIVERSAL_CACHE = new OpaqueToken('UNIVERSAL_CACHE');
+export const AUTO_PREBOOT = new OpaqueToken('AUTO_PREBOOT');
 
 @NgModule({
   imports: [
@@ -77,15 +78,22 @@ export const UNIVERSAL_CACHE = new OpaqueToken('UNIVERSAL_CACHE');
       deps: []
     },
     {
+      provide: AUTO_PREBOOT,
+      useValue: true
+    },
+    {
       multi: true,
       provide: APP_BOOTSTRAP_LISTENER,
-      useValue: () => {
-        let _win: any = window;
-        if (_win && prebootClient) {
-          setTimeout(() => prebootClient().complete());
-        }
-      }
-    }
+      useFactory: (autoPreboot: boolean) => {
+        return () => {
+          let _win: any = window;
+          if (_win && prebootClient && autoPreboot) {
+            setTimeout(() => prebootClient().complete());
+          }
+        };
+      },
+      deps: [ AUTO_PREBOOT ],
+    },
   ]
 })
 export class UniversalModule {
@@ -101,10 +109,18 @@ export class UniversalModule {
     });
   }
   static withConfig(_config: any = {}): {ngModule: UniversalModule, providers: any[]} {
+    const providers = [];
+
+    if (typeof _config.autoPreboot === 'boolean') {
+      providers.push({
+        provide: AUTO_PREBOOT,
+        useValue: _config.autoPreboot,
+      });
+    }
+
     return {
       ngModule: UniversalModule,
-      providers: [
-      ]
+      providers: providers,
     };
   }
 }
