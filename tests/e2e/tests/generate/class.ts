@@ -5,12 +5,12 @@ import {expectFileToExist} from '../../utils/fs';
 
 export default function() {
   // Create the pipe in the same directory.
-  const pipeDir = join('src', 'app');
+  const classDir = join('src', 'app');
 
   return ng('generate', 'class', 'test-class')
-    .then(() => expectFileToExist(pipeDir))
-    .then(() => expectFileToExist(join(pipeDir, 'test-class.ts')))
-    .then(() => expectFileToExist(join(pipeDir, 'test-class.spec.ts')))
+    .then(() => expectFileToExist(classDir))
+    .then(() => expectFileToExist(join(classDir, 'test-class.ts')))
+    .then(() => expectFileToExist(join(classDir, 'test-class.spec.ts')))
 
     // Try to run the unit tests.
     .then(() => ng('test', '--watch=false'));
