@@ -25,7 +25,6 @@ const init = (config) => {
       chunkModules: false
     }
   };
-  config.webpack = Object.assign(webpackConfig, config.webpack);
   config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
 
   // replace the angular-cli preprocessor with webpack+sourcemap
