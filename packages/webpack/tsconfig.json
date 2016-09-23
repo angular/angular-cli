@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "module": "commonjs",
+    "target": "es5",
+    "outDir": "lib",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "declaration": true
+  },
+  "files": [
+<<<<<<< HEAD
+    "src/index.ts"
+=======
+    "src/index.ts",
+    "src/replacer.ts"
+>>>>>>> take3
+  ]
+}
