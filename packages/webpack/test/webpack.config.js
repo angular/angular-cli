@@ -1,23 +1,21 @@
-var NgcWebpackPlugin = require('@angular-cli/webpack').NgcWebpackPlugin;
+var NgcWebpackPlugin = require('../lib/plugin').NgcWebpackPlugin;
 var path = require('path');
-
 module.exports = {
   resolve: {
-    extensions: ['', '.scss', '.ts', '.js'],
+    extensions: ['.scss', '.ts', '.js']
  //   mainFields: [ 'browser', 'module', 'main']
   },
-  entry: './app/main.jit.ts',
+  entry: './app/main.aot.ts',
   output: {
     path: "./dist",
     publicPath: 'dist/',
-    filename: "app.js"
+    filename: "app.main.js"
   },
   plugins: [
     new NgcWebpackPlugin({
       project: './tsconfig.json',
-      appRoot: path.resolve(__dirname, 'app'),
-      entryModule: './app.module#AppModule'
-    })
+      baseDir: path.resolve(__dirname, '')
+    }),
   ],
   module: {
     loaders: [
@@ -28,10 +26,7 @@ module.exports = {
     ]
 
   },
-  ngc: {
-    compilerMode: 'jit',
-    'main.jit': './app/main.jit.ts',
-    'main.aot': './app/main.aot.ts',
-    'main.module': './app/app.module.ts'
+  devServer: {
+    historyApiFallback: true
   }
 }

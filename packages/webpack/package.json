@@ -10,16 +10,12 @@
   "author": "Rob Wormald <robwormald@google.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^6.0.39",
     "node-sass": "^3.8.0",
     "sass-loader": "^4.0.1",
-    "webpack": "^2.1.0-beta.21"
-  },
-  "dependencies": {
-    "@angular/common": "^2.0.0",
-    "@angular/compiler": "^2.0.0",
-    "@angular/core": "^2.0.0",
-    "@angular/platform-browser": "^2.0.0",
-    "@angular/platform-browser-dynamic": "^2.0.0",
-    "@angular/router": "^3.0.0"
+    "typescript": "2.0.2",
+    "webpack": "^2.1.0-beta.21",
+    "@angular/compiler-cli": "^0.6.0",
+    "@angular/core": "^2.0.0"
   }
 }

@@ -11,15 +11,16 @@
       "es2015",
       "dom"
     ],
-    "outDir": "dist",
+    "outDir": "lib",
     "skipLibCheck": true,
     "rootDir": "."
   },
-  "files": [
-    "app/main.jit.ts"
+
+  "include": [
+    "app/**/*.ts"
   ],
   "angularCompilerOptions": {
-    "genDir": "ngfactory",
+    "genDir": "./app/ngfactory",
     "entryModule": "app/app.module#AppModule"
   }
 }

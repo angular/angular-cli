@@ -13,6 +13,11 @@
     "declaration": true
   },
   "files": [
+<<<<<<< HEAD
     "src/index.ts"
+=======
+    "src/index.ts",
+    "src/replacer.ts"
+>>>>>>> take3
   ]
 }
