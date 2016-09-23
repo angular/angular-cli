@@ -40,7 +40,8 @@ var sharedPlugins = [
   new ForkCheckerPlugin(),
   new UniversalPrerender({
     ngModule: MainModule,
-    documentPath: `
+    documentPath: 'index.html',
+    document: `
 <!doctype>
 <html lang="en">
 <head>
@@ -71,8 +72,8 @@ var sharedPlugins = [
     originUrl: 'http://localhost:3000',
     baseUrl: '/',
     requestUrl: '/',
-    // preboot: false,
-    preboot: { appRoot: ['app'], uglify: true },
+    preboot: false,
+    // preboot: { appRoot: ['app'], uglify: true },
   })
 ];
 var webpackConfig = setTypeScriptAlias(require('./tsconfig.json'), {
