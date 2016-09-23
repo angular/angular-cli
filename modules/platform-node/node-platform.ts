@@ -430,7 +430,7 @@ export class NodePlatform  {
           '</script>' +
           '');
           DOM.appendChild(el, script.childNodes[0]);
-          DOM.appendChild(document, el);
+          DOM.appendChild(document.body, el);
           el = null;
 
           universalAfterDehydrate();
