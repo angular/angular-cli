@@ -15,9 +15,6 @@
       "angular2-express-engine": [
         "../../modules/express-engine"
       ],
-      "angular2-universal-webpack-plugin": [
-        "../../modules/webpack-prerender"
-      ],
       "angular2-platform-node": [
         "../../modules/platform-node"
       ],

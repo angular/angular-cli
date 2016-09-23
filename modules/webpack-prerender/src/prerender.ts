@@ -1,16 +1,10 @@
 
 
-export interface IWebpackPrerender {
-  templatePath: string;
-  bootloaderConfig;
-  appConfig;
+export interface IUniversalPrerender {
 }
 
-export class Angular2Prerender {
-
+export class UniversalPrerender {
   constructor(_options: IWebpackPrerender) {
-    // maintain your platform instance
-    // this.bootloader = new Bootloader(this.options.bootloaderConfig);
   }
 
   apply(compiler) {

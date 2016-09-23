@@ -1,0 +1,37 @@
+{
+  "name": "hello-world",
+  "version": "1.0.0",
+  "description": "wat",
+  "scripts": {
+    "webpack": "../../node_modules/.bin/webpack",
+    "rimraf": "../../node_modules/.bin/rimraf",
+    "pm2": "../../node_modules/.bin/pm2",
+    "cpy": "../../node_modules/.bin/cpy",
+    "ngc": "../../node_modules/.bin/ngc -p ./ngconfig.json",
+    "debug:ngc": "node-nightly --inspect --debug-brk ../../node_modules/@angular/compiler-cli/src/main.js -p ./ngconfig.json",
+    "nodemon": "../../node_modules/.bin/nodemon",
+    "watch": "npm run build -- --watch",
+    "prebuild": "npm run rimraf -- dist",
+    "build": "npm run copy:index && npm run webpack -- --progress",
+    "predebug:build": "npm run build",
+    "prebuild:inline": "npm run build",
+    "build:inline": "node ./dist/server/server-bundle.js",
+    "predebug:build:inline": "npm run build",
+    "debug:build:inline": "node-nightly --inspect --debug-brk ./dist/server/server-bundle.js",
+    "copy:index": "npm run cpy -- 'index.html' '../dist/public' --cwd=src --parents",
+    "start": "npm run build && npm run server",
+    "server": "npm run server:dev",
+    "server:dev": "npm run nodemon -- ./dist/server/express-bundle.js",
+    "debug:server:dev": "node-nightly --inspect --debug-brk ./dist/server/express-bundle.js",
+    "server:prod": "npm run pm2 -- start dist/server/express-bundle.js --name=\"universal\" -i max --max-memory-restart 500 --no-daemon",
+    "ab": "ab -t 10 -c 10 -k http://localhost:3000/",
+    "server:universal": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "patrick <patrick@angularclass.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  }
+}

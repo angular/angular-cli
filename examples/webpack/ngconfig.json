@@ -1,36 +1,29 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es5", "dom"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "dist",
-    "sourceMap": true,
-    "sourceRoot": "src",
-    "target": "es5",
-    "lib": ["es6", "dom"],
+    "outDir": "ngfactory",
     "baseUrl": ".",
     "paths": {
-      "angular2-express-engine": [
+      "@angular/express-engine": [
         "../../modules/express-engine"
       ],
-      "angular2-universal-webpack-plugin": [
-        "../../modules/webpack-prerender"
-      ],
-      "angular2-platform-node": [
+      "@angular/platform-node": [
         "../../modules/platform-node"
       ],
-      "angular2-platform-node-dynamic": [
+      "@angular/platform-node-dynamic": [
         "../../modules/platform-node-dynamic"
       ],
-      "angular2-universal": [
+      "@angular/universal": [
         "../../modules/universal"
       ],
-      "angular2-universal/browser": [
+      "@angular/universal/browser": [
         "../../modules/universal/browser.ts"
       ],
-      "angular2-universal/node": [
+      "@angular/universal/node": [
         "../../modules/universal/node.ts"
       ],
       "rxjs/*": [
@@ -40,11 +33,13 @@
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "src/app/github/**/*",
+    "src/app/app.component.ts"
   ],
-  "awesomeTypescriptLoaderOptions": {
-    "useWebpackText": true,
-    "forkChecker": true
+  "angularCompilerOptions": {
+    "basePath": ".",
+    "genDir": "ngfactory",
+    "skipMetadataEmit": false
   },
   "compileOnSave": false,
   "buildOnSave": false,

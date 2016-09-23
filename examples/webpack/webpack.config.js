@@ -8,6 +8,8 @@ var ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 var TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
+var UniversalPrerender = require('../../modules').UniversalPrerender;
+
 var sharedPlugins = [
   // new DedupePlugin(),
   // new UglifyJsPlugin({

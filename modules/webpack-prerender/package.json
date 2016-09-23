@@ -1,6 +1,6 @@
 {
   "name": "angular2-webpack-prerender",
-  "main": "index.js",
+  "main": "./index.ts",
   "description": "Prerender your Universal (isomorphic) Angular 2 app with Webpack",
   "peerDependencies": {
     "angular2-universal": "<INHERIT>"
