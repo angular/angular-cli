@@ -8,8 +8,6 @@ var ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 var TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
-import { UniversalPrerender } from 'angular2-universal-webpack-plugin';
-
 var sharedPlugins = [
   // new DedupePlugin(),
   // new UglifyJsPlugin({
@@ -33,42 +31,7 @@ var sharedPlugins = [
   new TsConfigPathsPlugin({
     tsconfig: 'tsconfig.json'
   }),
-  new ForkCheckerPlugin(),
-  new UniversalPrerender({
-    document: `
-<!doctype>
-<html lang="en">
-<head>
-  <title>Angular 2 Universal Starter</title>
-  <meta charset="UTF-8">
-  <meta name="description" content="Angular 2 Universal">
-  <meta name="keywords" content="Angular 2,Universal">
-  <meta name="author" content="PatrickJS">
-
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-
-  <base href="/">
-<body>
-  <div style="position: absolute;z-index: 1000000;bottom: 9px">
-    <button onclick="bootstrap()">Bootstrap Client</button>
-    <button onclick="location.reload()">Reload Client</button>
-  </div>
-
-  <app>
-    Loading...
-  </app>
-
-  <script src="dist/public/browser-bundle.js"></script>
-</body>
-</html>
-    `,
-    time: true,
-    originUrl: 'http://localhost:3000',
-    baseUrl: '/',
-    requestUrl: '/',
-    // preboot: false,
-    preboot: { appRoot: ['app'], uglify: true },
-  })
+  new ForkCheckerPlugin()
 ];
 var webpackConfig = setTypeScriptAlias(require('./tsconfig.json'), {
   cache: true,

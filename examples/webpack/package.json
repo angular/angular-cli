@@ -13,6 +13,7 @@
     "watch": "npm run build -- --watch",
     "prebuild": "npm run rimraf -- dist",
     "build": "npm run copy:index && npm run webpack -- --progress",
+    "debug:build": "npm run copy:index && ../../node_modules/webpack/bin/webpack.js --progress",
     "predebug:build": "npm run build",
     "prebuild:inline": "npm run build",
     "build:inline": "node ./dist/server/server-bundle.js",

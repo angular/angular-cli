@@ -12,14 +12,20 @@
     "lib": ["es6", "dom"],
     "baseUrl": ".",
     "paths": {
+      "angular2-universal-polyfills": [
+        "../../modules/universal-polyfills"
+      ],
+      "angular2-universal-webpack-plugin": [
+        "../../modules/webpack-prerender"
+      ],
+      "angular2-platform-node-dynamic": [
+        "../../modules/platform-node-dynamic"
+      ],
       "angular2-express-engine": [
         "../../modules/express-engine"
       ],
       "angular2-platform-node": [
         "../../modules/platform-node"
-      ],
-      "angular2-platform-node-dynamic": [
-        "../../modules/platform-node-dynamic"
       ],
       "angular2-universal": [
         "../../modules/universal"

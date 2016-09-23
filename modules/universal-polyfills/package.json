@@ -1,9 +1,9 @@
 {
   "name": "angular2-universal-polyfills",
   "description": "Angular 2 Universal Polyfills",
-  "typings": "browser.d.ts",
-  "browser": "browser.js",
-  "main": "node.js",
+  "typings": "./browser.d.ts",
+  "browser": "./browser.ts",
+  "main": "./src/node.ts",
   "dependencies": {
     "ie-shim": "<INHERIT>",
     "es6-promise": "<INHERIT>",

@@ -1,3 +1,5 @@
+import '../../modules/universal-polyfills';
+
 var webpack = require('webpack');
 var path = require('path');
 var clone = require('js.clone');
@@ -8,7 +10,9 @@ var ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 var TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
-var UniversalPrerender = require('../../modules').UniversalPrerender;
+import { UniversalPrerender } from '../../modules/webpack-prerender';
+import { MainModule } from './src/main.node';
+
 
 var sharedPlugins = [
   // new DedupePlugin(),
@@ -33,7 +37,43 @@ var sharedPlugins = [
   new TsConfigPathsPlugin({
     tsconfig: 'tsconfig.json'
   }),
-  new ForkCheckerPlugin()
+  new ForkCheckerPlugin(),
+  new UniversalPrerender({
+    ngModule: MainModule,
+    document: `
+<!doctype>
+<html lang="en">
+<head>
+  <title>Angular 2 Universal Starter</title>
+  <meta charset="UTF-8">
+  <meta name="description" content="Angular 2 Universal">
+  <meta name="keywords" content="Angular 2,Universal">
+  <meta name="author" content="PatrickJS">
+
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+  <base href="/">
+<body>
+  <div style="position: absolute;z-index: 1000000;bottom: 9px">
+    <button onclick="bootstrap()">Bootstrap Client</button>
+    <button onclick="location.reload()">Reload Client</button>
+  </div>
+
+  <app>
+    Loading...
+  </app>
+
+  <script src="dist/public/browser-bundle.js"></script>
+</body>
+</html>
+    `,
+    time: true,
+    originUrl: 'http://localhost:3000',
+    baseUrl: '/',
+    requestUrl: '/',
+    // preboot: false,
+    preboot: { appRoot: ['app'], uglify: true },
+  })
 ];
 var webpackConfig = setTypeScriptAlias(require('./tsconfig.json'), {
   cache: true,
