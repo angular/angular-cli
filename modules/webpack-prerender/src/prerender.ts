@@ -1,8 +1,7 @@
-// import { platformUniversalDynamic } from 'angular2-universal';
-// import { PrebootOptions } from 'preboot';
+import { platformUniversalDynamic } from '../../universal';
+import { PrebootOptions } from 'preboot';
 
 declare var Zone: any;
-
 
 export interface IUniversalPrerender {
   document?: string;
@@ -33,10 +32,10 @@ export interface IUniversalPrerender {
 }
 
 export class UniversalPrerender {
-  platformRef = platformUniversalDynamic();
-  constructor(private _options: IWebpackPrerender) {
-    if (_options.ngModule) {
-      this.platformRef.cacheModuleFactory(_options.ngModule);
+  platformRef: any = platformUniversalDynamic();
+  constructor(private _options: IUniversalPrerender) {
+    if (this._options.ngModule) {
+      this.platformRef.cacheModuleFactory(this._options.ngModule);
     }
   }
 
@@ -46,21 +45,13 @@ export class UniversalPrerender {
         name: 'UNIVERSAL prerender',
         properties: this._options
       });
-      return zone.run(() => (_options.precompile ?
-        platformRef.serializeModule(_options.ngModule, _options) :
-        platformRef.serializeModuleFactory(_options.ngModule, _options)
-      )
-        .then(html => {
-          if (typeof html !== 'string' || cancel) {
-            return done(null, _options.document);
+      zone.run(() => (this.platformRef.serializeModule(this._options.ngModule, this._options))
+        .then((html) => {
+          if (typeof html !== 'string' || this._options.cancel) {
+            return _callback(null, this._options.document);
           }
-          done(null, html);
-        })
-        .catch(e => {
-          console.log(e.stack);
-          // if server fail then return client html
-          done(null, _options.document);
-        });
-    });
-  }
+          _callback(null, html);
+        })); // zone.run
+    }); // compiler.plugin
+  } // apply
 }
