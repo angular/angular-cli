@@ -13,5 +13,5 @@ import { APP_SHELL_DIRECTIVES } from '@angular/app-shell';<% } %>
   styleUrls: ['./app.component.<%= styleExt %>']<% } %>
 })
 export class AppComponent {
-  title = 'app works!';
+  title = '<%= prefix %> works!';
 }
