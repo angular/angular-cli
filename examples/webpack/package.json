@@ -34,5 +34,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/universal"
+  },
+  "dependencies": {
+    "angular2-universal": "file:../../dist/universal",
+    "angular2-platform-node": "file:../../dist/platform-node",
+    "angular2-universal-polyfills": "file:../../dist/universal-polyfills",
+    "angular2-webpack-prerender": "file:../../dist/webpack-prerender"
   }
 }

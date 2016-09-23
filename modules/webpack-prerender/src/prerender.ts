@@ -1,4 +1,4 @@
-import { platformUniversalDynamic } from '../../universal';
+import { platformUniversalDynamic } from 'angular2-universal';
 import { PrebootOptions } from 'preboot';
 
 declare var Zone: any;

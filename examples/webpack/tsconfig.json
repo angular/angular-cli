@@ -15,7 +15,7 @@
       "angular2-universal-polyfills": [
         "../../modules/universal-polyfills"
       ],
-      "angular2-universal-webpack-plugin": [
+      "angular2-webpack-prerender": [
         "../../modules/webpack-prerender"
       ],
       "angular2-platform-node-dynamic": [

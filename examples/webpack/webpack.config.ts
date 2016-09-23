@@ -1,4 +1,4 @@
-import '../../modules/universal-polyfills';
+import 'angular2-universal-polyfills';
 
 var webpack = require('webpack');
 var path = require('path');
@@ -10,9 +10,9 @@ var ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 var TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
-import { UniversalPrerender } from '../../modules/webpack-prerender';
+import { UniversalPrerender } from 'angular2-webpack-prerender';
 import { MainModule } from './src/main.node';
-
+debugger
 
 var sharedPlugins = [
   // new DedupePlugin(),
