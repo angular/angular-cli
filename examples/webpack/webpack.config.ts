@@ -40,7 +40,7 @@ var sharedPlugins = [
   new ForkCheckerPlugin(),
   new UniversalPrerender({
     ngModule: MainModule,
-    document: `
+    documentPath: `
 <!doctype>
 <html lang="en">
 <head>
