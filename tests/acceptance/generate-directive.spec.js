@@ -156,4 +156,15 @@ describe('Acceptance: ng generate directive', function () {
       expect(err).to.equal(`Invalid path: "..${path.sep}my-dir" cannot be above the "src${path.sep}app" directory`);
     });
   });
+
+  it('converts dash-cased-name to a camelCasedSelector', () => {
+    const appRoot = path.join(root, 'tmp/foo');
+    const directivePath = path.join(appRoot, 'src/app/my-dir.directive.ts');
+    return ng(['generate', 'directive', 'my-dir'])
+      .then(() => readFile(directivePath, 'utf-8'))
+      .then(content => {
+        // expect(content).matches(/selector: [app-my-dir]/m);
+        expect(content).matches(/selector: '\[appMyDir\]'/);
+      });
+  });
 });
