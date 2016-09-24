@@ -31,9 +31,9 @@ module.exports = {
         this.project.ngConfig.apps[0].prefix) {
       defaultPrefix = this.project.ngConfig.apps[0].prefix;
     }
-    var prefix = this.options.prefix ? defaultPrefix : '';
+    var prefix = this.options.prefix ? `${defaultPrefix}-` : '';
 
-    this.rawEntityName = prefix + parsedPath.name;
+    this.selector = stringUtils.camelize(prefix + parsedPath.name);
     return parsedPath.name;
   },
 
@@ -41,7 +41,7 @@ module.exports = {
     return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat,
-      rawEntityName: this.rawEntityName
+      selector: this.selector
     };
   },
 
