@@ -37,7 +37,12 @@ export function getWebpackCommonConfig(
     devtool: 'source-map',
     resolve: {
       extensions: ['', '.ts', '.js'],
-      root: appRoot
+       root: appRoot,
+       plugins: [
+         new atl.TsConfigPathsPlugin({
+           tsconfig: path.resolve(appRoot, appConfig.tsconfig)
+         })
+       ]
     },
     context: path.resolve(__dirname, './'),
     entry: entry,
