@@ -54,7 +54,10 @@ export default Task.extend({
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
       inline: true,
-      proxy: proxyConfig
+      proxy: proxyConfig,
+      watchOptions: {
+        poll: CliConfig.fromProject().config.defaults.poll
+      }
     };
 
     ui.writeLine(chalk.green(oneLine`
