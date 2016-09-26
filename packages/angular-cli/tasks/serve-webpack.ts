@@ -13,7 +13,7 @@ import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
 export default Task.extend({
-  run: function(commandOptions: ServeTaskOptions) {
+  run: function (commandOptions: ServeTaskOptions) {
     const ui = this.ui;
 
     let webpackCompiler: any;
@@ -46,6 +46,20 @@ export default Task.extend({
       }
     }
 
+    let sslKey: string = null;
+    let sslCert: string = null;
+
+    if (commandOptions.ssl) {
+      const keyPath = path.resolve(this.project.root, commandOptions.sslKey);
+      if (fs.existsSync(keyPath)) {
+        sslKey = fs.readFileSync(keyPath, 'utf-8');
+      }
+      const certPath = path.resolve(this.project.root, commandOptions.sslCert);
+      if (fs.existsSync(certPath)) {
+        sslCert = fs.readFileSync(certPath, 'utf-8');
+      }
+    }
+
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
       contentBase: path.resolve(
         this.project.root,
@@ -54,19 +68,25 @@ export default Task.extend({
       historyApiFallback: true,
       stats: webpackDevServerOutputOptions,
       inline: true,
+      https: commandOptions.ssl,
       proxy: proxyConfig
     };
+
+    if (sslKey != null && sslCert != null) {
+      webpackDevServerConfiguration.key = sslKey;
+      webpackDevServerConfiguration.cert = sslCert;
+    }
 
     ui.writeLine(chalk.green(oneLine`
       **
       NG Live Development Server is running on
-      http://${commandOptions.host}:${commandOptions.port}.
+      http${commandOptions.ssl ? 's' : ''}://${commandOptions.host}:${commandOptions.port}.
       **
     `));
 
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
     return new Promise((resolve, reject) => {
-      server.listen(commandOptions.port, `${commandOptions.host}`, function(err: any, stats: any) {
+      server.listen(commandOptions.port, `${commandOptions.host}`, function (err: any, stats: any) {
         if (err) {
           console.error(err.stack || err);
           if (err.details) { console.error(err.details); }
