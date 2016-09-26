@@ -2,16 +2,15 @@ const path = require('path');
 
 import * as webpack from 'webpack';
 
-declare module "webpack" {
-      export interface LoaderOptionsPlugin {
-    }
+declare module 'webpack' {
+    export interface LoaderOptionsPlugin {}
     export interface LoaderOptionsPluginStatic {
-        new (optionsObject: any): LoaderOptionsPlugin
+        new (optionsObject: any): LoaderOptionsPlugin;
     }
     interface Webpack {
         LoaderOptionsPlugin: LoaderOptionsPluginStatic;
     }
-}
+};
 
 export const getWebpackDevConfigPartial = function(projectRoot: string, appConfig: any) {
   return {
