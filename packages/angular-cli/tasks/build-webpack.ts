@@ -24,6 +24,9 @@ export default <any>Task.extend({
       runTaskOptions.baseHref
     ).config;
 
+    // fail on build error
+    config.bail = true;
+
     const webpackCompiler: any = webpack(config);
 
     const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
