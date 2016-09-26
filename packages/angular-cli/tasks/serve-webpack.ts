@@ -69,7 +69,10 @@ export default Task.extend({
       stats: webpackDevServerOutputOptions,
       inline: true,
       https: commandOptions.ssl,
-      proxy: proxyConfig
+      proxy: proxyConfig,
+      watchOptions: {
+        poll: CliConfig.fromProject().config.defaults.poll
+      }
     };
 
     if (sslKey != null && sslCert != null) {
