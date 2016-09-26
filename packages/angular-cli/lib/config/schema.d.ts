@@ -59,5 +59,6 @@ export interface CliConfig {
     defaults?: {
         styleExt?: string;
         prefixInterfaces?: boolean;
+        poll?: number;
     };
 }

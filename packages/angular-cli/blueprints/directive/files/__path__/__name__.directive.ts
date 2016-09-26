@@ -1,7 +1,7 @@
 import { Directive } from '@angular/core';
 
 @Directive({
-  selector: '[<%= rawEntityName %>]'
+  selector: '[<%= selector %>]'
 })
 export class <%= classifiedModuleName %>Directive {
 

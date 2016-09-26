@@ -18,11 +18,11 @@ If you wish to collaborate while the project is still young, check out [our issu
 
 ## Webpack update
 
-We changed the build system between beta.10 and beta.12, from SystemJS to Webpack. 
+We changed the build system between beta.10 and beta.14, from SystemJS to Webpack. 
 And with it comes a lot of benefits. 
 To take advantage of these, your app built with the old beta will need to migrate.
 
-You can update your `beta.10` projects to `beta.12` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
+You can update your `beta.10` projects to `beta.14` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
 
 ## Prerequisites
 
@@ -41,6 +41,7 @@ The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**
 * [Adding extra files to the build](#adding-extra-files-to-the-build)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
+* [Proxy To Backend](#proxy-to-backend)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Linting and formatting code](#linting-and-formatting-code)
 * [Support for offline applications](#support-for-offline-applications)
@@ -192,6 +193,33 @@ Before running the tests make sure you are serving the app via `ng serve`.
 
 End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
+### Proxy To Backend
+Using the proxying support in webpack's dev server we can highjack certain urls and send them to a backend server.
+We do this by passing a file to `--proxy-config`
+
+Say we have a server running on `http://localhost:3000/api` and we want all calls th `http://localhost:4200/api` to go to that server.
+
+We create a file next to projects `package.json` called `proxy.conf.json`
+with the content
+
+```
+{
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false
+  }
+}
+```
+
+You can read more about what options are available here [webpack-dev-server proxy settings](https://webpack.github.io/docs/webpack-dev-server.html#proxy)
+
+and then we edit the `package.json` file's start script to be
+
+```
+"start": "ng serve --proxy-config proxy.conf.json",
+```
+
+now run it with `npm start`
 
 ### Deploying the app via GitHub Pages
 
@@ -329,7 +357,7 @@ First install Bootstrap from `npm`:
 npm install bootstrap@next
 ```
 
-Then add the needed script files to to `apps[0].scripts`.
+Then add the needed script files to `apps[0].scripts`:
 
 ```
 "scripts": [
@@ -342,8 +370,8 @@ Then add the needed script files to to `apps[0].scripts`.
 Finally add the Bootstrap CSS to the `apps[0].styles` array:
 ```
 "styles": [
-  "styles.css",
-  "../node_modules/bootstrap/dist/css/bootstrap.css"
+  "../node_modules/bootstrap/dist/css/bootstrap.css",
+  "styles.css"
 ],
 ```
 
