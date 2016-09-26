@@ -44,6 +44,7 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-cli/ast-tools": "^1.0.0",
+    "@angular-cli/base-href-webpack": "^1.0.0",
     "@angular/common": "^2.0.0",
     "@angular/compiler": "^2.0.0",
     "@angular/compiler-cli": "^0.6.0",
