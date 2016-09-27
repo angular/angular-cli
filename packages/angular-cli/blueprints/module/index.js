@@ -34,7 +34,7 @@ module.exports = {
       fileList = fileList.filter(p => p.indexOf('__name__.module.spec.ts') < 0);
     }
     if (this.options && !this.options.routing) {
-      fileList = fileList.filter(p => p.indexOf('__name__.routing.ts') < 0);
+      fileList = fileList.filter(p => p.indexOf('__name__-routing.module.ts') < 0);
     }
 
     return fileList;
