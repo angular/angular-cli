@@ -1,0 +1,21 @@
+{
+  "name": "@angular-cli/webpack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "build:main": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "author": "Rob Wormald <robwormald@google.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^6.0.39",
+    "node-sass": "^3.8.0",
+    "sass-loader": "^4.0.1",
+    "typescript": "2.0.2",
+    "webpack": "^2.1.0-beta.21",
+    "@angular/compiler-cli": "^0.6.0",
+    "@angular/core": "^2.0.0"
+  }
+}
