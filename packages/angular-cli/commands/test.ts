@@ -5,6 +5,7 @@ import {CliConfig} from '../models/config';
 const NgCliTestCommand = TestCommand.extend({
   availableOptions: [
     { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
+    { name: 'debug', type: Boolean, default: false, aliases: ['d'] },
     { name: 'browsers', type: String },
     { name: 'colors', type: Boolean },
     { name: 'log-level', type: String },

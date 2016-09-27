@@ -3,9 +3,10 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
+const getWebpackTestConfig = function (projectRoot, environment, appConfig, debug) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
+  var debug = typeof debug !== 'undefined' ?  debug : false;
 
   return {
     devtool: 'inline-source-map',
@@ -66,7 +67,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000' },
         { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(appRoot, appConfig.index)] }
       ],
-      postLoaders: [
+      postLoaders: debug ? [] : [
         {
           test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
           exclude: [
