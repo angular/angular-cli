@@ -9,7 +9,7 @@ export default function() {
   return ng('generate', 'module', 'test-module', '--routing')
     .then(() => expectFileToExist(moduleDir))
     .then(() => expectFileToExist(join(moduleDir, 'test-module.module.ts')))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.routing.ts')))
+    .then(() => expectFileToExist(join(moduleDir, 'test-module-routing.module.ts')))
     .then(() => expectFileToExist(join(moduleDir, 'test-module.component.ts')))
     .then(() => expectFileToExist(join(moduleDir, 'test-module.component.spec.ts')))
     .then(() => expectFileToExist(join(moduleDir, 'test-module.component.html')))
