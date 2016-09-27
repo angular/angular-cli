@@ -13,13 +13,13 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 
 This project is very much still a work in progress.
 
-The CLI is now in beta. 
+The CLI is now in beta.
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
 ## Webpack update
 
-We changed the build system between beta.10 and beta.14, from SystemJS to Webpack. 
-And with it comes a lot of benefits. 
+We changed the build system between beta.10 and beta.14, from SystemJS to Webpack.
+And with it comes a lot of benefits.
 To take advantage of these, your app built with the old beta will need to migrate.
 
 You can update your `beta.10` projects to `beta.14` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
@@ -109,6 +109,7 @@ Service   | `ng g service my-new-service`
 Class     | `ng g class my-new-class`
 Interface | `ng g interface my-new-interface`
 Enum      | `ng g enum my-new-enum`
+Module    | `ng g module my-module`
 
 ### Generating a route
 
@@ -126,8 +127,8 @@ The build artifacts will be stored in the `dist/` directory.
 
 ### Build Targets and Environment Files
 
-`ng build` can specify both a build target (`--target=production` or `--target=development`) and an 
-environment file to be used with that build (`--environment=dev` or `--environment=prod`). 
+`ng build` can specify both a build target (`--target=production` or `--target=development`) and an
+environment file to be used with that build (`--environment=dev` or `--environment=prod`).
 By default, the development build target and environment are used.
 
 The mapping used to determine which environment file is used can be found in `angular-cli.json`:
@@ -157,7 +158,7 @@ ng build
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
-- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json` 
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json`
 - use them via the `--env=NAME` flag on the build/serve commands.
 
 ### Base tag handling in index.html
@@ -172,7 +173,7 @@ ng build --bh /myUrl/
 
 ### Bundling
 
-All builds make use of bundling, and using the `--prod` flag in  `ng build --prod` 
+All builds make use of bundling, and using the `--prod` flag in  `ng build --prod`
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ### Running unit tests
@@ -290,11 +291,11 @@ source ~/.bash_profile
 
 ### Global styles
 
-The `styles.css` file allows users to add global styles and supports 
-[CSS imports](https://developer.mozilla.org/en/docs/Web/CSS/@import). 
+The `styles.css` file allows users to add global styles and supports
+[CSS imports](https://developer.mozilla.org/en/docs/Web/CSS/@import).
 
-If the project is created with the `--style=sass` option, this will be a `.sass` 
-file instead, and the same applies to `scss/less/styl`. 
+If the project is created with the `--style=sass` option, this will be a `.sass`
+file instead, and the same applies to `scss/less/styl`.
 
 You can add more global styles via the `apps[0].styles` property in `angular-cli.json`.
 
@@ -344,11 +345,11 @@ npm install @types/d3 --save-dev
 
 ### Global Library Installation
 
-Some javascript libraries need to be added to the global scope, and loaded as if 
-they were in a script tag. We can do this using the `apps[0].scripts` and 
+Some javascript libraries need to be added to the global scope, and loaded as if
+they were in a script tag. We can do this using the `apps[0].scripts` and
 `apps[0].styles` properties of `angular-cli.json`.
 
-As an example, to use [Boostrap 4](http://v4-alpha.getbootstrap.com/) this is 
+As an example, to use [Boostrap 4](http://v4-alpha.getbootstrap.com/) this is
 what you need to do:
 
 First install Bootstrap from `npm`:
@@ -375,7 +376,7 @@ Finally add the Bootstrap CSS to the `apps[0].styles` array:
 ],
 ```
 
-Restart `ng serve` if you're running it, and Bootstrap 4 should be working on 
+Restart `ng serve` if you're running it, and Bootstrap 4 should be working on
 your app.
 
 ### Updating angular-cli
@@ -400,7 +401,7 @@ Running `ng init` will check for changes in all the auto-generated files created
 
 Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng init` finishes.
 
-**The main cause of errors after an update is failing to incorporate these updates into your code**. 
+**The main cause of errors after an update is failing to incorporate these updates into your code**.
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
 
