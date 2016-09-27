@@ -293,7 +293,7 @@ export default [\n  { path: 'new-route', component: NewRouteComponent }\n];`);
             `\nexport default [\n` +
             `  { path: 'home', component: HomeComponent,\n` +
             `    children: [\n` +
-            `      { path: 'about/:id', component: AboutComponent } ` +
+            `      { path: 'about/:id', component: AboutComponent }` +
             `\n    ]\n  }\n];`);
         });
     });
