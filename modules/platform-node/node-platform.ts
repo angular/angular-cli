@@ -118,7 +118,7 @@ function s4() {
               /*implements PlatformRef*/
 export class NodePlatform  {
   static _noop = () => {};
-  static _cache = new Map<any, any>();
+  static _cache = new WeakMap<any, any>();
   get platformRef() {
     return this._platformRef;
   }
@@ -332,7 +332,7 @@ export class NodePlatform  {
         let prebootCode = null;
         // TODO(gdi2290): hide cache in (ngPreboot|UniversalPreboot)
         let prebootConfig = null;
-        let key = (typeof preboot === 'object') && JSON.stringify(preboot) || null;
+        let key = (typeof preboot === 'object') && preboot || null;
         let prebootEl = null;
         let el = null;
         let lastRef = null;
