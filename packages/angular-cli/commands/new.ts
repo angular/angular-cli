@@ -24,7 +24,8 @@ const NewCommand = Command.extend({
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'mobile', type: Boolean, default: false }
+    { name: 'mobile', type: Boolean, default: false },
+    { name: 'routing', type: Boolean, default: false }
   ],
 
   run: function (commandOptions: any, rawArgs: string[]) {
