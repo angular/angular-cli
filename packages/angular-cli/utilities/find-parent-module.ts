@@ -11,10 +11,9 @@ export default function findParentModule(project: any, currentDir: string): stri
   let pathToCheck = path.join(sourceRoot, currentDir);
 
   while (pathToCheck.length >= sourceRoot.length) {
-    // let files: string[] = fs.readdirSync(pathToCheck);
-
-    // files = files.filter(file => file.indexOf('.module.ts') > 0);
+    // TODO: refactor to not be based upon file name
     const files = fs.readdirSync(pathToCheck)
+      .filter(fileName => !fileName.endsWith('routing.module.ts'))
       .filter(fileName => fileName.endsWith('.module.ts'))
       .filter(fileName => fs.statSync(path.join(pathToCheck, fileName)).isFile());
 
