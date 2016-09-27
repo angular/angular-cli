@@ -14,6 +14,8 @@ const projectBaseDir = path.join(__dirname, '../packages');
 const jasmine = new Jasmine({ projectBaseDir: projectBaseDir });
 jasmine.loadConfig({});
 jasmine.addReporter(new JasmineSpecReporter());
+// Manually set exit code (needed with custom reporters)
+jasmine.onComplete((success) => process.exitCode = !success);
 
 // Run the tests.
 const allTests =
