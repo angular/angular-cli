@@ -22,7 +22,6 @@ export interface ServeTaskOptions {
   liveReloadLiveCss?: boolean;
   target?: string;
   environment?: string;
-  outputPath?: string;
   ssl?: boolean;
   sslKey?: string;
   sslCert?: string;

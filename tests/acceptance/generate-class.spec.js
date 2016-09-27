@@ -17,6 +17,7 @@ describe('Acceptance: ng generate class', function () {
   after(conf.restore);
 
   beforeEach(function () {
+    this.timeout(10000);
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
@@ -25,8 +26,6 @@ describe('Acceptance: ng generate class', function () {
   });
 
   afterEach(function () {
-    this.timeout(10000);
-
     return tmp.teardown('./tmp');
   });
 

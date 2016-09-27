@@ -10,7 +10,8 @@ module.exports = {
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'style', type: String, default: 'css' },
-    { name: 'mobile', type: Boolean, default: false }
+    { name: 'mobile', type: Boolean, default: false },
+    { name: 'routing', type: Boolean, default: false }
   ],
 
   afterInstall: function (options) {
@@ -38,7 +39,8 @@ module.exports = {
       prefix: options.prefix,
       styleExt: this.styleExt,
       relativeRootPath: relativeRootPath,
-      isMobile: options.mobile
+      isMobile: options.mobile,
+      routing: options.routing
     };
   },
 
@@ -47,6 +49,9 @@ module.exports = {
     if (this.options && this.options.mobile) {
       fileList = fileList.filter(p => p.indexOf('__name__.component.html') < 0);
       fileList = fileList.filter(p => p.indexOf('__name__.component.__styleext__') < 0);
+    }
+    if (this.options && !this.options.routing) {
+      fileList = fileList.filter(p => p.indexOf('__name__-routing.module.ts') < 0);
     }
 
     return fileList;
