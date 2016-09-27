@@ -135,6 +135,9 @@
         },
         "prefixInterfaces": {
           "type": "boolean"
+        },
+        "poll": {
+          "type": "number"
         }
       },
       "additionalProperties": false
