@@ -3,6 +3,7 @@ var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const findParentModule = require('../../utilities/find-parent-module').default;
+const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 
 module.exports = {
   description: '',
@@ -73,7 +74,7 @@ module.exports = {
     if (!options['skip-import']) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
-          .then(change => change.apply()));
+          .then(change => change.apply(NodeHost)));
     }
 
     return Promise.all(returns);

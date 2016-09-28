@@ -8,22 +8,26 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "outDir": "../../dist/",
-    "rootDir": "..",
+    "outDir": "../../dist/angular-cli",
+    "rootDir": ".",
     "sourceMap": true,
     "sourceRoot": "/",
     "target": "es5",
     "lib": ["es6"],
+    "skipLibCheck": true,
     "typeRoots": [
       "../../node_modules/@types"
     ],
     "baseUrl": "",
     "paths": {
-      "@angular-cli/ast-tools": [ "../../packages/ast-tools/src" ],
-      "@angular-cli/base-href-webpack": [ "../../packages/base-href-webpack/src" ],
-      "@angular-cli/webpack": [ "../../packages/webpack/src" ]
+      "@angular-cli/ast-tools": [ "../../dist/ast-tools/src" ],
+      "@angular-cli/base-href-webpack": [ "../../dist/base-href-webpack/src" ],
+      "@ngtools/webpack": [ "../../dist/webpack/src" ]
     }
   },
+  "include": [
+    "**/*"
+  ],
   "exclude": [
     "blueprints/*/files/**/*"
   ]

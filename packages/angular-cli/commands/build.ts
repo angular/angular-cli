@@ -10,6 +10,7 @@ export interface BuildOptions {
   watcher?: string;
   supressSizes: boolean;
   baseHref?: string;
+  aot?: boolean;
 }
 
 const BuildCommand = Command.extend({
@@ -30,6 +31,7 @@ const BuildCommand = Command.extend({
     { name: 'watcher',        type: String },
     { name: 'suppress-sizes', type: Boolean, default: false },
     { name: 'base-href',      type: String,  default: null, aliases: ['bh'] },
+    { name: 'aot',            type: Boolean, default: false }
   ],
 
   run: function (commandOptions: BuildOptions) {
