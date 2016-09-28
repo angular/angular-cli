@@ -319,7 +319,7 @@ export class AppComponent {
 }
 ```
 
-When generating a new project you can also define which extention you want for
+When generating a new project you can also define which extension you want for
 style files:
 
 ```bash
