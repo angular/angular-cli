@@ -416,11 +416,11 @@ function addChildPath (parentObject: ts.Node, pathOptions: any, route: string) {
   if (childrenNode.length !== 0) {
     // add to beginning of children array
     pos = childrenNode[0].getChildAt(2).getChildAt(1).pos; // open bracket
-    newContent = `\n${spaces}${content}, `;
+    newContent = `\n${spaces}${content},`;
   } else {
     // no children array, add one
     pos = parentObject.getChildAt(2).pos; // close brace
-    newContent = `,\n${spaces.substring(2)}children: [\n${spaces}${content} ` +
+    newContent = `,\n${spaces.substring(2)}children: [\n${spaces}${content}` +
                  `\n${spaces.substring(2)}]\n${spaces.substring(5)}`;
   }
   return {newContent: newContent, pos: pos};
