@@ -15,7 +15,6 @@ const NewCommand = Command.extend({
   availableOptions: [
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
-    { name: 'blueprint', type: String, default: 'ng2', aliases: ['b'] },
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
     { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
     { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
@@ -61,8 +60,6 @@ const NewCommand = Command.extend({
         'angular-universal for supporting NgModule. Sorry for the inconvenience.'
       ));
     }
-
-    commandOptions.blueprint = normalizeBlueprint(commandOptions.blueprint);
 
     if (!commandOptions.directory) {
       commandOptions.directory = packageName;
