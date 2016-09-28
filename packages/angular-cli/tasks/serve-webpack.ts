@@ -19,8 +19,12 @@ export default Task.extend({
     let webpackCompiler: any;
 
     let config = new NgCliWebpackConfig(
-      this.project, commandOptions.target,
-      commandOptions.environment
+      this.project,
+      commandOptions.target,
+      commandOptions.environment,
+      undefined,
+      undefined,
+      commandOptions.aot
     ).config;
 
     // This allows for live reload of page when changes are made to repo.
@@ -68,6 +72,9 @@ export default Task.extend({
       stats: webpackDevServerOutputOptions,
       inline: true,
       proxy: proxyConfig,
+      watchOptions: {
+        poll: CliConfig.fromProject().config.defaults.poll
+      },
       https: commandOptions.ssl
     };
 
