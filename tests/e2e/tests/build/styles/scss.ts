@@ -35,7 +35,7 @@ export default function() {
     .then(() => replaceInFile('src/app/app.component.ts',
                               './app.component.css', './app.component.scss'))
     .then(() => ng('build'))
-    .then(() => expectFileToMatch('dist/main.bundle.js', '.outer .inner'))
-    .then(() => expectFileToMatch('dist/main.bundle.js', '.partial .inner'))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /\.outer.*\.inner.*background.*#def/))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /\.partial.*\.inner.*background.*#def/))
     .then(() => moveFile('src/app/app.component.scss', 'src/app/app.component.css'));
 }

@@ -28,6 +28,6 @@ export default function() {
     .then(() => replaceInFile('src/app/app.component.ts',
                               './app.component.css', './app.component.less'))
     .then(() => ng('build'))
-    .then(() => expectFileToMatch('dist/main.bundle.js', '.outer .inner'))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /.outer.*.inner.*background:\s*#[fF]+/))
     .then(() => moveFile('src/app/app.component.less', 'src/app/app.component.css'));
 }

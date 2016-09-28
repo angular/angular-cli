@@ -4,8 +4,19 @@ import denodeify = require('denodeify');
 const readFile = (denodeify(fs.readFile) as (...args: any[]) => Promise<string>);
 const writeFile = (denodeify(fs.writeFile) as (...args: any[]) => Promise<string>);
 
+export interface Host {
+  write(path: string, content: string): Promise<void>;
+  read(path: string): Promise<string>;
+}
+
+export const NodeHost: Host = {
+  write: (path: string, content: string) => writeFile(path, content, 'utf8'),
+  read: (path: string) => readFile(path, 'utf8')
+};
+
+
 export interface Change {
-  apply(): Promise<void>;
+  apply(host: Host): Promise<void>;
 
   // The file this change should be applied to. Some changes might not apply to
   // a file (maybe the config).
@@ -61,11 +72,11 @@ export class MultiChange implements Change {
   get order() { return Math.max(...this._changes.map(c => c.order)); }
   get path() { return this._path; }
 
-  apply() {
+  apply(host: Host) {
     return this._changes
       .sort((a: Change, b: Change) => b.order - a.order)
       .reduce((promise, change) => {
-        return promise.then(() => change.apply());
+        return promise.then(() => change.apply(host));
       }, Promise.resolve());
   }
 }
@@ -90,11 +101,11 @@ export class InsertChange implements Change {
   /**
    * This method does not insert spaces if there is none in the original string.
    */
-  apply(): Promise<any> {
-    return readFile(this.path, 'utf8').then(content => {
+  apply(host: Host): Promise<any> {
+    return host.read(this.path).then(content => {
       let prefix = content.substring(0, this.pos);
       let suffix = content.substring(this.pos);
-      return writeFile(this.path, `${prefix}${this.toAdd}${suffix}`);
+      return host.write(this.path, `${prefix}${this.toAdd}${suffix}`);
     });
   }
 }
@@ -115,12 +126,12 @@ export class RemoveChange implements Change {
     this.order = pos;
   }
 
-  apply(): Promise<any> {
-    return readFile(this.path, 'utf8').then(content => {
+  apply(host: Host): Promise<any> {
+    return host.read(this.path).then(content => {
       let prefix = content.substring(0, this.pos);
       let suffix = content.substring(this.pos + this.toRemove.length);
       // TODO: throw error if toRemove doesn't match removed string.
-      return writeFile(this.path, `${prefix}${suffix}`);
+      return host.write(this.path, `${prefix}${suffix}`);
     });
   }
 }
@@ -141,12 +152,17 @@ export class ReplaceChange implements Change {
     this.order = pos;
   }
 
-  apply(): Promise<any> {
-    return readFile(this.path, 'utf8').then(content => {
-      let prefix = content.substring(0, this.pos);
-      let suffix = content.substring(this.pos + this.oldText.length);
+  apply(host: Host): Promise<any> {
+    return host.read(this.path).then(content => {
+      const prefix = content.substring(0, this.pos);
+      const suffix = content.substring(this.pos + this.oldText.length);
+      const text = content.substring(this.pos, this.pos + this.oldText.length);
+
+      if (text !== this.oldText) {
+        return Promise.reject(new Error(`Invalid replace: "${text}" != "${this.oldText}".`));
+      }
       // TODO: throw error if oldText doesn't match removed string.
-      return writeFile(this.path, `${prefix}${this.newText}${suffix}`);
+      return host.write(this.path, `${prefix}${this.newText}${suffix}`);
     });
   }
 }

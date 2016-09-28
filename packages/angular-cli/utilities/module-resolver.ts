@@ -5,7 +5,8 @@ import * as ts from 'typescript';
 import * as dependentFilesUtils from './get-dependent-files';
 
 
-import { Change, ReplaceChange } from './change';
+import {Change, ReplaceChange} from './change';
+import {NodeHost, Host} from '@angular-cli/ast-tools';
 
 /**
  * Rewrites import module of dependent files when the file is moved.
@@ -21,13 +22,14 @@ export class ModuleResolver {
    * then apply() method is called sequentially.
    *
    * @param changes {Change []}
+   * @param host {Host}
    * @return Promise after all apply() method of Change class is called
    *         to all Change instances sequentially.
    */
-  applySortedChangePromise(changes: Change[]): Promise<void> {
+  applySortedChangePromise(changes: Change[], host: Host = NodeHost): Promise<void> {
     return changes
       .sort((currentChange, nextChange) => nextChange.order - currentChange.order)
-      .reduce((newChange, change) => newChange.then(() => change.apply()), Promise.resolve());
+      .reduce((newChange, change) => newChange.then(() => change.apply(host)), Promise.resolve());
   }
 
   /**

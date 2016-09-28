@@ -11,8 +11,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
     devtool: 'inline-source-map',
     context: path.resolve(__dirname, './'),
     resolve: {
-      extensions: ['', '.ts', '.js'],
-      root: appRoot
+      extensions: ['.ts', '.js']
     },
     entry: {
       test: path.resolve(appRoot, appConfig.test)
@@ -22,9 +21,10 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
       filename: '[name].bundle.js'
     },
     module: {
-      preLoaders: [
+      rules: [
         {
           test: /\.ts$/,
+          enforce: 'pre',
           loader: 'tslint-loader',
           exclude: [
             path.resolve(projectRoot, 'node_modules')
@@ -32,14 +32,13 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
         },
         {
           test: /\.js$/,
+          enforce: 'pre',
           loader: 'source-map-loader',
           exclude: [
             path.resolve(projectRoot, 'node_modules/rxjs'),
             path.resolve(projectRoot, 'node_modules/@angular')
           ]
-        }
-      ],
-      loaders: [
+        },
         {
           test: /\.ts$/,
           loaders: [
@@ -58,6 +57,15 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
           ],
           exclude: [/\.e2e\.ts$/]
         },
+        {
+          test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
+          enforce: 'post',
+          exclude: [
+            /\.(e2e|spec)\.ts$/,
+            /node_modules/
+          ],
+          query: { 'force-sourcemap': true }
+        },
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.css$/,  loaders: ['raw-loader', 'postcss-loader'] },
         { test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
@@ -65,16 +73,6 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
         { test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000' },
         { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(appRoot, appConfig.index)] }
-      ],
-      postLoaders: [
-        {
-          test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
-          exclude: [
-            /\.(e2e|spec)\.ts$/,
-            /node_modules/
-          ],
-          query: { 'force-sourcemap': true }
-        }
       ]
     },
     plugins: [
@@ -89,16 +87,20 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
         new RegExp(path.resolve(appRoot, appConfig.environments['source'])
           .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
         path.resolve(appRoot, appConfig.environments[environment])
-      )
+      ),
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          tslint: {
+            emitErrors: false,
+            failOnHint: false,
+            resourcePath: `./${appConfig.root}`
+          }
+        }
+      })
     ],
-    tslint: {
-      emitErrors: false,
-      failOnHint: false,
-      resourcePath: `./${appConfig.root}`
-    },
     node: {
       fs: 'empty',
-      global: 'window',
+      global: true,
       process: false,
       crypto: 'empty',
       module: false,
