@@ -1,4 +1,5 @@
 // this config must be JS so that the karma plugin can load it
+const getAliases = require('./get-aliases').getAliases;
 
 const path = require('path');
 const webpack = require('webpack');
@@ -6,12 +7,14 @@ const webpack = require('webpack');
 const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
+  const aliases = getAliases(projectRoot, appConfig);
 
   return {
     devtool: 'inline-source-map',
     context: path.resolve(__dirname, './'),
     resolve: {
-      extensions: ['.ts', '.js']
+      extensions: ['.ts', '.js'],
+      alias: aliases
     },
     entry: {
       test: path.resolve(appRoot, appConfig.test)

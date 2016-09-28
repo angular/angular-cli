@@ -33,6 +33,12 @@ export interface CliConfig {
         environments?: {
             [name: string]: any;
         };
+        /**
+         * Name and corresponding path.
+         */
+        alias?: {
+            [name: string]: string;
+        };
     }[];
     /**
      * Configuration reserved for installed third party addons.
