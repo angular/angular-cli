@@ -1,11 +1,9 @@
+import * as webpack from 'webpack';
 import * as path from 'path';
+import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
+
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-import * as webpack from 'webpack';
-const atl = require('awesome-typescript-loader');
-
-import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
-import { findLazyModules } from './find-lazy-modules';
 
 
 export function getWebpackCommonConfig(
@@ -23,7 +21,6 @@ export function getWebpackCommonConfig(
   const scripts = appConfig.scripts
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
-  const lazyModules = findLazyModules(appRoot);
 
   let entry: { [key: string]: string[] } = {
     main: [appMain]
@@ -56,21 +53,7 @@ export function getWebpackCommonConfig(
         }
       ],
       loaders: [
-        {
-          test: /\.ts$/,
-          loaders: [
-            {
-              loader: 'awesome-typescript-loader',
-              query: {
-                useForkChecker: true,
-                tsconfig: path.resolve(appRoot, appConfig.tsconfig)
-              }
-            }, {
-              loader: 'angular2-template-loader'
-            }
-          ],
-          exclude: [/\.(spec|e2e)\.ts$/]
-        },
+        // TypeScript loaders are separated into webpack-build-typescript.
 
         // in main, load css as raw text
         {
@@ -115,7 +98,7 @@ export function getWebpackCommonConfig(
 
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
-        { test: /\.html$/, loader: 'raw-loader' },
+        { test: /\.html$/, loader: 'html-loader' },
 
         { test: /\.(otf|woff|ttf|svg)$/, loader: 'url?limit=10000' },
         { test: /\.woff2$/, loader: 'url?limit=10000&mimetype=font/woff2' },
@@ -123,8 +106,6 @@ export function getWebpackCommonConfig(
       ]
     },
     plugins: [
-      new webpack.ContextReplacementPlugin(/.*/, appRoot, lazyModules),
-      new atl.ForkCheckerPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         chunksSortMode: 'dependency'

@@ -9,8 +9,11 @@ import {gitClean, gitCommit} from '../utils/git';
 export default function(argv: any) {
   let createProject = null;
 
-  // If we're set to reuse an existing project, just chdir to it and clean it.
-  if (argv.reuse) {
+  // This is a dangerous flag, but is useful for testing packages only.
+  if (argv.noproject) {
+    return Promise.resolve();
+  } else if (argv.reuse) {
+    // If we're set to reuse an existing project, just chdir to it and clean it.
     createProject = Promise.resolve()
       .then(() => process.chdir(argv.reuse))
       .then(() => gitClean());
@@ -29,6 +32,7 @@ export default function(argv: any) {
       json['devDependencies']['angular-cli'] = join(dist, 'angular-cli');
       json['devDependencies']['@angular-cli/ast-tools'] = join(dist, 'ast-tools');
       json['devDependencies']['@angular-cli/base-href-webpack'] = join(dist, 'base-href-webpack');
+      json['devDependencies']['@ngtools/webpack'] = join(dist, 'webpack');
     }))
     .then(() => {
       if (argv.nightly) {
@@ -57,5 +61,6 @@ export default function(argv: any) {
     }))
     .then(() => git('config', 'user.email', 'angular-core+e2e@google.com'))
     .then(() => git('config', 'user.name', 'Angular CLI E2e'))
+    .then(() => git('config', 'commit.gpgSign', 'false'))
     .then(() => gitCommit('tsconfig-e2e-update'));
 }

@@ -4,7 +4,7 @@
 let mockFs = require('mock-fs');
 
 import {it} from './spec-utils';
-import {InsertChange, RemoveChange, ReplaceChange} from './change';
+import {InsertChange, NodeHost, RemoveChange, ReplaceChange} from './change';
 import fs = require('fs');
 
 let path = require('path');
@@ -35,7 +35,7 @@ describe('Change', () => {
     it('adds text to the source code', () => {
       let changeInstance = new InsertChange(sourceFile, 6, ' world!');
       return changeInstance
-        .apply()
+        .apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
           expect(contents).toEqual('hello world!');
@@ -47,7 +47,7 @@ describe('Change', () => {
     it('adds nothing in the source code if empty string is inserted', () => {
       let changeInstance = new InsertChange(sourceFile, 6, '');
       return changeInstance
-        .apply()
+        .apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
           expect(contents).toEqual('hello');
@@ -61,7 +61,7 @@ describe('Change', () => {
     it('removes given text from the source code', () => {
       let changeInstance = new RemoveChange(sourceFile, 9, 'as foo');
       return changeInstance
-        .apply()
+        .apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
           expect(contents).toEqual('import *  from "./bar"');
@@ -73,7 +73,7 @@ describe('Change', () => {
     it('does not change the file if told to remove empty string', () => {
       let changeInstance = new RemoveChange(sourceFile, 9, '');
       return changeInstance
-        .apply()
+        .apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
           expect(contents).toEqual('import * as foo from "./bar"');
@@ -86,7 +86,7 @@ describe('Change', () => {
       let sourceFile = path.join(sourcePath, 'remove-replace-file.txt');
       let changeInstance = new ReplaceChange(sourceFile, 7, '* as foo', '{ fooComponent }');
       return changeInstance
-        .apply()
+        .apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
           expect(contents).toEqual('import { fooComponent } from "./bar"');
@@ -96,11 +96,22 @@ describe('Change', () => {
       let sourceFile = path.join(sourcePath, 'remove-replace-file.txt');
       expect(() => new ReplaceChange(sourceFile, -6, 'hello', ' world!')).toThrow();
     });
+    it('fails for invalid replacement', () => {
+      let sourceFile = path.join(sourcePath, 'replace-file.txt');
+      let changeInstance = new ReplaceChange(sourceFile, 0, 'foobar', '');
+      return changeInstance
+        .apply(NodeHost)
+        .then(() => expect(false).toBe(true), err => {
+          // Check that the message contains the string to replace and the string from the file.
+          expect(err.message).toContain('foobar');
+          expect(err.message).toContain('import');
+        });
+    });
     it('adds string to the position of an empty string', () => {
       let sourceFile = path.join(sourcePath, 'replace-file.txt');
       let changeInstance = new ReplaceChange(sourceFile, 9, '', 'BarComponent, ');
       return changeInstance
-        .apply()
+        .apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
           expect(contents).toEqual('import { BarComponent, FooComponent } from "./baz"');
@@ -108,9 +119,9 @@ describe('Change', () => {
     });
     it('removes the given string only if an empty string to add is given', () => {
       let sourceFile = path.join(sourcePath, 'remove-replace-file.txt');
-      let changeInstance = new ReplaceChange(sourceFile, 9, ' as foo', '');
+      let changeInstance = new ReplaceChange(sourceFile, 8, ' as foo', '');
       return changeInstance
-        .apply()
+        .apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(contents => {
           expect(contents).toEqual('import * from "./bar"');

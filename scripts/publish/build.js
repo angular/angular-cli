@@ -40,6 +40,18 @@ Promise.resolve()
   .then(() => {
     const packages = require('../../lib/packages');
     return Object.keys(packages)
+      // Order packages in order of dependency.
+      .sort((a, b) => {
+        const aPackageJson = require(packages[a].packageJson);
+        const bPackageJson = require(packages[b].packageJson);
+        if (Object.keys(aPackageJson['dependencies'] || {}).indexOf(b) == -1) {
+          return 0;
+        } else if (Object.keys(bPackageJson['dependencies'] || {}).indexOf(a) == -1) {
+          return 1;
+        } else {
+          return -1;
+        }
+      })
       .reduce((promise, packageName) => {
         const pkg = packages[packageName];
         const name = path.relative(packagesRoot, pkg.root);
