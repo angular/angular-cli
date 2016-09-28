@@ -17,7 +17,7 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
 
   return {
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.ts$/,
           loaders: [{
@@ -43,7 +43,7 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
 export const getWebpackAotConfigPartial = function(projectRoot: string, appConfig: any) {
   return {
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.ts$/,
           loader: webpackLoader,
