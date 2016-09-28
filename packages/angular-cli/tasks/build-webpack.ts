@@ -17,13 +17,13 @@ export default <any>Task.extend({
 
     const outputDir = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
     rimraf.sync(path.resolve(project.root, outputDir));
-
     const config = new NgCliWebpackConfig(
       project,
       runTaskOptions.target,
       runTaskOptions.environment,
       outputDir,
-      runTaskOptions.baseHref
+      runTaskOptions.baseHref,
+      runTaskOptions.aot
     ).config;
 
     // fail on build error
