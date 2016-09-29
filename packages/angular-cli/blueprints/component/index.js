@@ -1,11 +1,12 @@
-var path = require('path');
-var chalk = require('chalk');
-var Blueprint = require('ember-cli/lib/models/blueprint');
-var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const path = require('path');
+const chalk = require('chalk');
+const Blueprint = require('ember-cli/lib/models/blueprint');
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const findParentModule = require('../../utilities/find-parent-module').default;
-var getFiles = Blueprint.prototype.files;
+const getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
+const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 
 module.exports = {
   description: '',
@@ -117,7 +118,7 @@ module.exports = {
     if (!options['skip-import']) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
-          .then(change => change.apply()));
+          .then(change => change.apply(NodeHost)));
     }
 
     return Promise.all(returns);

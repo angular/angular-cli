@@ -3,6 +3,7 @@ var dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const findParentModule = require('../../utilities/find-parent-module').default;
+const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 
 module.exports = {
   description: '',
@@ -31,9 +32,9 @@ module.exports = {
         this.project.ngConfig.apps[0].prefix) {
       defaultPrefix = this.project.ngConfig.apps[0].prefix;
     }
-    var prefix = this.options.prefix ? defaultPrefix : '';
+    var prefix = this.options.prefix ? `${defaultPrefix}-` : '';
 
-    this.rawEntityName = prefix + parsedPath.name;
+    this.selector = stringUtils.camelize(prefix + parsedPath.name);
     return parsedPath.name;
   },
 
@@ -41,7 +42,7 @@ module.exports = {
     return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat,
-      rawEntityName: this.rawEntityName
+      selector: this.selector
     };
   },
 
@@ -73,7 +74,7 @@ module.exports = {
     if (!options['skip-import']) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
-          .then(change => change.apply()));
+          .then(change => change.apply(NodeHost)));
     }
 
     return Promise.all(returns);

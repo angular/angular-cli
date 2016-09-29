@@ -44,7 +44,7 @@ describe('Acceptance: ng generate pipe', function () {
       .then(() => readFile(appModulePath, 'utf-8'))
       .then(content => {
         expect(content).matches(/import.*\bMyPipePipe\b.*from '.\/my-pipe.pipe';/);
-        expect(content).matches(/declarations:\s*\[[^\]]+?,\n\s+MyPipePipe\n/m);
+        expect(content).matches(/declarations:\s*\[[^\]]+?,\r?\n\s+MyPipePipe\r?\n/m);
       });
   });
 

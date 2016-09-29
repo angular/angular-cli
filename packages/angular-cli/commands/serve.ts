@@ -22,10 +22,10 @@ export interface ServeTaskOptions {
   liveReloadLiveCss?: boolean;
   target?: string;
   environment?: string;
-  outputPath?: string;
   ssl?: boolean;
   sslKey?: string;
   sslCert?: string;
+  aot?: boolean;
 }
 
 const ServeCommand = Command.extend({
@@ -78,7 +78,8 @@ const ServeCommand = Command.extend({
     { name: 'environment',          type: String,  default: '', aliases: ['e'] },
     { name: 'ssl',                  type: Boolean, default: false },
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
-    { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' }
+    { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' },
+    { name: 'aot',                  type: Boolean, default: false }
   ],
 
   run: function(commandOptions: ServeTaskOptions) {

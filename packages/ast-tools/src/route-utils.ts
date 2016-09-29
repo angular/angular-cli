@@ -4,6 +4,7 @@ import * as path from 'path';
 import {Change, InsertChange, NoopChange} from './change';
 import {findNodes} from './node';
 import {insertAfterLastOccurrence} from './ast-utils';
+import {NodeHost, Host} from './change';
 
 /**
  * Adds imports to mainFile and adds toBootstrap to the array of providers
@@ -368,13 +369,14 @@ export function resolveComponentPath(projectRoot: string, currentDir: string, fi
 /**
  * Sort changes in decreasing order and apply them.
  * @param changes
+ * @param host
  * @return Promise
  */
-export function applyChanges(changes: Change[]): Promise<void> {
+export function applyChanges(changes: Change[], host: Host = NodeHost): Promise<void> {
   return changes
     .filter(change => !!change)
     .sort((curr, next) => next.order - curr.order)
-    .reduce((newChange, change) => newChange.then(() => change.apply()), Promise.resolve());
+    .reduce((newChange, change) => newChange.then(() => change.apply(host)), Promise.resolve());
 }
 /**
  * Helper for addPathToRoutes. Adds child array to the appropriate position in the routes.ts file
@@ -416,11 +418,11 @@ function addChildPath (parentObject: ts.Node, pathOptions: any, route: string) {
   if (childrenNode.length !== 0) {
     // add to beginning of children array
     pos = childrenNode[0].getChildAt(2).getChildAt(1).pos; // open bracket
-    newContent = `\n${spaces}${content}, `;
+    newContent = `\n${spaces}${content},`;
   } else {
     // no children array, add one
     pos = parentObject.getChildAt(2).pos; // close brace
-    newContent = `,\n${spaces.substring(2)}children: [\n${spaces}${content} ` +
+    newContent = `,\n${spaces.substring(2)}children: [\n${spaces}${content}` +
                  `\n${spaces.substring(2)}]\n${spaces.substring(5)}`;
   }
   return {newContent: newContent, pos: pos};

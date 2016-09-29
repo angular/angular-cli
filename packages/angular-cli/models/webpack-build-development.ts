@@ -1,5 +1,17 @@
 const path = require('path');
 
+import * as webpack from 'webpack';
+
+declare module 'webpack' {
+    export interface LoaderOptionsPlugin {}
+    export interface LoaderOptionsPluginStatic {
+        new (optionsObject: any): LoaderOptionsPlugin;
+    }
+    interface Webpack {
+        LoaderOptionsPlugin: LoaderOptionsPluginStatic;
+    }
+};
+
 export const getWebpackDevConfigPartial = function(projectRoot: string, appConfig: any) {
   return {
     devtool: 'source-map',
@@ -9,14 +21,20 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, appConfi
       sourceMapFilename: '[name].map',
       chunkFilename: '[id].chunk.js'
     },
-    tslint: {
-      emitErrors: false,
-      failOnHint: false,
-      resourcePath: path.resolve(projectRoot, appConfig.root)
-    },
+    plugins: [
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          tslint: {
+            emitErrors: false,
+            failOnHint: false,
+            resourcePath: path.resolve(projectRoot, appConfig.root)
+          },
+        }
+      })
+    ],
     node: {
       fs: 'empty',
-      global: 'window',
+      global: true,
       crypto: 'empty',
       process: true,
       module: false,

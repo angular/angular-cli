@@ -51,7 +51,7 @@ describe('Acceptance: ng generate directive', function () {
       .then(() => readFile(appModulePath, 'utf-8'))
       .then(content => {
         expect(content).matches(/import.*\bMyDirDirective\b.*from '.\/my-dir\/my-dir.directive';/);
-        expect(content).matches(/declarations:\s*\[[^\]]+?,\n\s+MyDirDirective\n/m);
+        expect(content).matches(/declarations:\s*\[[^\]]+?,\r?\n\s+MyDirDirective\r?\n/m);
       });
   });
 
@@ -155,5 +155,16 @@ describe('Acceptance: ng generate directive', function () {
     }, (err) => {
       expect(err).to.equal(`Invalid path: "..${path.sep}my-dir" cannot be above the "src${path.sep}app" directory`);
     });
+  });
+
+  it('converts dash-cased-name to a camelCasedSelector', () => {
+    const appRoot = path.join(root, 'tmp/foo');
+    const directivePath = path.join(appRoot, 'src/app/my-dir.directive.ts');
+    return ng(['generate', 'directive', 'my-dir'])
+      .then(() => readFile(directivePath, 'utf-8'))
+      .then(content => {
+        // expect(content).matches(/selector: [app-my-dir]/m);
+        expect(content).matches(/selector: '\[appMyDir\]'/);
+      });
   });
 });
