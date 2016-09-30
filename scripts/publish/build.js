@@ -32,6 +32,20 @@ function copy(from, to) {
 }
 
 
+function rm(p) {
+  path.relative(process.cwd(), p);
+  return new Promise((resolve, reject) => {
+    fs.unlink(p, err => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+
 function getDeps(pkg) {
   const packageJson = require(pkg.packageJson);
   return Object.assign({}, packageJson['dependencies'], packageJson['devDependencies']);
@@ -76,7 +90,7 @@ Promise.resolve()
   .then(() => console.log('Copying uncompiled resources...'))
   .then(() => glob(path.join(packagesRoot, '**/*'), { dot: true }))
   .then(files => {
-    console.log(`  Found ${files.length} files...`);
+    console.log(`Found ${files.length} files...`);
     return files
       .map((fileName) => path.relative(packagesRoot, fileName))
       .filter((fileName) => {
@@ -129,6 +143,14 @@ Promise.resolve()
       .reduce((promise, current) => {
         return promise.then(() => current);
       }, Promise.resolve());
+  })
+  .then(() => glob(path.join(dist, '**/*.spec.*')))
+  .then(specFiles => specFiles.filter(fileName => {
+    return !/[\\\/]angular-cli[\\\/]blueprints/.test(fileName);
+  }))
+  .then(specFiles => {
+    console.log(`Found ${specFiles.length} spec files...`);
+    return Promise.all(specFiles.map(rm));
   })
   .then(() => {
     // Copy all resources that might have been missed.
