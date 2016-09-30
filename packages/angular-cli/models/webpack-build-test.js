@@ -9,12 +9,12 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
 
   return {
     devtool: 'inline-source-map',
-    context: path.resolve(projectRoot, 'src'),
+    context: path.resolve(projectRoot, appConfig.root),
     resolve: {
       extensions: ['.ts', '.js'],
       modules: [
-        path.resolve(projectRoot, 'src'),
-        path.resolve(projectRoot, 'node_modules')
+        path.resolve(projectRoot, appConfig.root),
+        'node_modules'
       ]
     },
     entry: {

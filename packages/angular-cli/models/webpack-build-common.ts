@@ -35,11 +35,11 @@ export function getWebpackCommonConfig(
     resolve: {
       extensions: ['.ts', '.js'],
       modules: [
-        path.resolve(projectRoot, 'src'),
-        path.resolve(projectRoot, 'node_modules')
+        path.resolve(projectRoot, appConfig.root),
+        'node_modules'
       ]
     },
-    context: path.resolve(projectRoot, 'src'),
+    context: path.resolve(projectRoot, appConfig.root),
     entry: entry,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
