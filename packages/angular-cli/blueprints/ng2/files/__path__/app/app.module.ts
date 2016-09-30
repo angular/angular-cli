@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';<% if (routing) { %>
-import { <%= classifiedModuleName %>RoutingModule } from './<%= dasherizedModuleName %>-routing.module';<% } %>
+import { AppRoutingModule } from './app-routing.module';<% } %>
 
 import { AppComponent } from './app.component';
 
@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
     BrowserModule,
     FormsModule,
     HttpModule<% if (routing) { %>,
-    <%= classifiedModuleName %>RoutingModule<% } %>
+    AppRoutingModule<% } %>
   ],
   providers: [],
   bootstrap: [AppComponent]
