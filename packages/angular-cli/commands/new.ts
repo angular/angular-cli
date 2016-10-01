@@ -25,7 +25,9 @@ const NewCommand = Command.extend({
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'mobile', type: Boolean, default: false },
-    { name: 'routing', type: Boolean, default: false }
+    { name: 'routing', type: Boolean, default: false },
+    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
+    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
   ],
 
   run: function (commandOptions: any, rawArgs: string[]) {

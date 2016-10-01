@@ -168,4 +168,20 @@ describe('Acceptance: ng new', function () {
         expect(pkgJson.name).to.equal('foo', 'uses app name for package name');
       });
   });
+
+  it('ng new --inline-template does not generate a template file', () => {
+    return ng(['new', 'foo', '--skip-npm', '--skip-git', '--inline-template'])
+      .then(() => {
+        const templateFile = path.join('src', 'app', 'app.component.html');
+        expect(existsSync(templateFile)).to.equal(false);
+      });
+  });
+
+  it('ng new --inline-style does not gener a style file', () => {
+    return ng(['new', 'foo', '--skip-npm', '--skip-git', '--inline-style'])
+      .then(() => {
+        const styleFile = path.join('src', 'app', 'app.component.css');
+        expect(existsSync(styleFile)).to.equal(false);
+      });
+  });
 });
