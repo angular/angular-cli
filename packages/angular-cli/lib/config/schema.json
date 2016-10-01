@@ -138,6 +138,19 @@
         },
         "poll": {
           "type": "number"
+        },
+        "inline": {
+          "type": "object",
+          "properties": {
+            "style": {
+              "type": "boolean",
+              "default": false
+            },
+            "template": {
+              "type": "boolean",
+              "default": false
+            }
+          }
         }
       },
       "additionalProperties": false
