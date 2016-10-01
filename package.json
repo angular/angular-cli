@@ -20,7 +20,7 @@
     "test:cli": "node tests/runner",
     "test:inspect": "node --inspect --debug-brk tests/runner",
     "test:packages": "node scripts/run-packages-spec.js",
-    "build-config-interface": "dtsgen lib/config/schema.json --out lib/config/schema.d.ts",
+    "build-config-interface": "dtsgen packages/angular-cli/lib/config/schema.json --out packages/angular-cli/lib/config/schema.d.ts",
     "eslint": "eslint .",
     "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
     "lint": "npm-run-all -c eslint tslint"
