@@ -60,5 +60,9 @@ export interface CliConfig {
         styleExt?: string;
         prefixInterfaces?: boolean;
         poll?: number;
+        inline?: {
+            style?: boolean;
+            template?: boolean;
+        };
     };
 }
