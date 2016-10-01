@@ -13,8 +13,8 @@ module.exports = {
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: false },
-    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
-    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
+    { name: 'inline-template', type: Boolean, aliases: ['it'] },
+    { name: 'inline-style', type: Boolean, aliases: ['is'] },
     { name: 'prefix', type: Boolean, default: true },
     { name: 'spec', type: Boolean, default: true }
   ],
@@ -55,6 +55,14 @@ module.exports = {
         this.project.ngConfig.defaults.styleExt) {
       this.styleExt = this.project.ngConfig.defaults.styleExt;
     }
+
+    options.inlineStyle = options.inlineStyle !== undefined ?
+      options.inlineStyle :
+      this.project.ngConfigObj.get('defaults.inline.style');
+
+    options.inlineTemplate = options.inlineTemplate !== undefined ?
+      options.inlineTemplate :
+      this.project.ngConfigObj.get('defaults.inline.template');
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
