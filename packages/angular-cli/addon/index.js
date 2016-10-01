@@ -8,7 +8,8 @@ module.exports = {
   name: 'ng2',
 
   config: function () {
-    this.project.ngConfig = this.project.ngConfig || config.CliConfig.fromProject().config;
+    this.project.ngConfigObj = this.project.ngConfigObj || config.CliConfig.fromProject();
+    this.project.ngConfig = this.project.ngConfig || this.project.ngConfigObj.config;
   },
 
   blueprintsPath: function () {
