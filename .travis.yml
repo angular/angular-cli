@@ -2,11 +2,9 @@ dist: trusty
 sudo: required
 language: node_js
 node_js:
-  - "5"
-  - "6"
+  - "4"
 os:
   - linux
-  - osx
 env:
   global:
     - DBUS_SESSION_BUS_ADDRESS=/dev/null
@@ -20,25 +18,34 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
+    - node_js: "5"
     - os: osx
     - env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
-  exclude:
+  include:
+    - node_js: "5"
+      os: linux
+      env: SCRIPT=test
+    - node_js: "5"
+      os: linux
+      env: NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "6"
-      env: SCRIPT=lint
-    - os: osx
-      env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+      os: linux
+      env: SCRIPT=test
     - node_js: "6"
-      env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
-    - os: osx
-      node_js: "5"
-      env: SCRIPT=lint
+      os: linux
+      env: NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "4"
+      os: osx
+      env: SCRIPT=test
+    - node_js: "4"
+      os: osx
+      env: NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "6"
-      env: SCRIPT=build
-    - os: osx
-      node_js: "5"
-      env: SCRIPT=build
-    - os: osx
-      env: TARGET=mobile SCRIPT=mobile_test
+      os: osx
+      env: SCRIPT=test
+    - node_js: "6"
+      os: osx
+      env: NODE_SCRIPT=tests/e2e_runner.js
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
@@ -50,6 +57,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "--no-sandbox" > ~/.config/chromium-flags.conf; fi
   - if [[ "$TARGET" == "mobile" ]]; then export MOBILE_TEST=true; fi
+  - npm install -g npm
   - npm config set spin false
   - npm config set progress false
 
