@@ -103,42 +103,6 @@ describe('Acceptance: ng new', function () {
       .then(confirmBlueprinted);
   });
 
-  it('ng new with blueprint uses the specified blueprint directory with a relative path',
-    function () {
-      return tmp.setup('./tmp/my_blueprint')
-        .then(function () {
-          return tmp.setup('./tmp/my_blueprint/files');
-        })
-        .then(function () {
-          fs.writeFileSync('./tmp/my_blueprint/files/gitignore');
-          process.chdir('./tmp');
-
-          return ng([
-            'new', 'foo', '--skip-npm', '--skip-bower', '--skip-git',
-            '--blueprint=./my_blueprint'
-          ]);
-        })
-        .then(confirmBlueprintedForDir('tmp/my_blueprint'));
-    });
-
-  it('ng new with blueprint uses the specified blueprint directory with an absolute path',
-    function () {
-      return tmp.setup('./tmp/my_blueprint')
-        .then(function () {
-          return tmp.setup('./tmp/my_blueprint/files');
-        })
-        .then(function () {
-          fs.writeFileSync('./tmp/my_blueprint/files/gitignore');
-          process.chdir('./tmp');
-
-          return ng([
-            'new', 'foo', '--skip-npm', '--skip-bower', '--skip-git',
-            '--blueprint=' + path.resolve(process.cwd(), './my_blueprint')
-          ]);
-        })
-        .then(confirmBlueprintedForDir('tmp/my_blueprint'));
-    });
-
   it('ng new without skip-git flag creates .git dir', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(function () {
       expect(existsSync('.git'));
