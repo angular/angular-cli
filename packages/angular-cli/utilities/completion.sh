@@ -73,6 +73,9 @@ elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then
   }
 
   compctl -K _ng_completion ng
+else
+  echo "Sorry mate, can't find working builtin shell command complete / compctl.'"
+  return 1
 fi
 
 ###-end-ng-completion###
