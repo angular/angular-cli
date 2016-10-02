@@ -93,6 +93,11 @@ export function replaceInFile(filePath: string, match: RegExp, replacement: stri
 }
 
 
+export function appendToFile(filePath: string, text: string) {
+  return readFile(filePath)
+    .then((content: string) => writeFile(filePath, content.concat(text)));
+}
+
 
 export function expectFileToExist(fileName: string) {
   return new Promise((resolve, reject) => {
