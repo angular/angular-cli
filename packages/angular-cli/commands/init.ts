@@ -18,7 +18,6 @@ const InitCommand: any = Command.extend({
   availableOptions: [
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
-    { name: 'blueprint', type: String, aliases: ['b'] },
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
     { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
     { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
@@ -33,10 +32,6 @@ const InitCommand: any = Command.extend({
   ],
 
   anonymousOptions: ['<glob-pattern>'],
-
-  _defaultBlueprint: function () {
-    return 'ng2';
-  },
 
   run: function (commandOptions: any, rawArgs: string[]) {
     if (commandOptions.dryRun) {
@@ -100,7 +95,7 @@ const InitCommand: any = Command.extend({
 
     const blueprintOpts = {
       dryRun: commandOptions.dryRun,
-      blueprint: commandOptions.blueprint || this._defaultBlueprint(),
+      blueprint: 'ng2',
       rawName: packageName,
       targetFiles: rawArgs || '',
       rawArgs: rawArgs.toString(),
