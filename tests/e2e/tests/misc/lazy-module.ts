@@ -12,8 +12,6 @@ export default function(argv: any) {
   }
 
   let oldNumberOfFiles = 0;
-  let currentNumberOfDistFiles = 0;
-
   return Promise.resolve()
     .then(() => ng('build'))
     .then(() => oldNumberOfFiles = readdirSync('dist').length)
@@ -22,8 +20,16 @@ export default function(argv: any) {
       RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }])
       `, '@angular/router'))
     .then(() => ng('build'))
-    .then(() => currentNumberOfDistFiles = readdirSync('dist').length)
-    .then(() => {
+    .then(() => readdirSync('dist').length)
+    .then(currentNumberOfDistFiles => {
+      if (oldNumberOfFiles >= currentNumberOfDistFiles) {
+        throw new Error('A bundle for the lazy module was not created.');
+      }
+    })
+    // Check for AoT and lazy routes.
+    .then(() => ng('build', '--aot'))
+    .then(() => readdirSync('dist').length)
+    .then(currentNumberOfDistFiles => {
       if (oldNumberOfFiles >= currentNumberOfDistFiles) {
         throw new Error('A bundle for the lazy module was not created.');
       }

@@ -9,6 +9,8 @@ import {patchReflectorHost} from './reflector_host';
 import {WebpackResourceLoader} from './resource_loader';
 import {createResolveDependenciesFromContextMap} from './utils';
 import { AngularCompilerOptions } from '@angular/tsc-wrapped';
+import {WebpackCompilerHost} from './compiler_host';
+import {resolveEntryModuleFromMain} from './entry_resolver';
 
 
 /**
@@ -22,6 +24,7 @@ export interface AngularWebpackPluginOptions {
   baseDir: string;
   basePath?: string;
   genDir?: string;
+  main?: string;
 }
 
 
@@ -32,7 +35,7 @@ export class NgcWebpackPlugin {
   reflector: ngCompiler.StaticReflector;
   reflectorHost: ngCompiler.ReflectorHost;
   program: ts.Program;
-  compilerHost: ts.CompilerHost;
+  compilerHost: WebpackCompilerHost;
   compilerOptions: ts.CompilerOptions;
   angularCompilerOptions: AngularCompilerOptions;
   files: any[];
@@ -58,13 +61,16 @@ export class NgcWebpackPlugin {
     this.genDir = this.options.genDir
                || path.resolve(process.cwd(), this.angularCompilerOptions.genDir + '/app');
     this.entryModule = options.entryModule || (this.angularCompilerOptions as any).entryModule;
+    if (!options.entryModule && options.main) {
+      this.entryModule = resolveEntryModuleFromMain(options.main);
+    }
 
     const entryModule = this.entryModule;
     const [rootModule, rootNgModule] = entryModule.split('#');
     this.projectPath = options.project;
     this.rootModule = rootModule;
     this.rootModuleName = rootNgModule;
-    this.compilerHost = ts.createCompilerHost(this.compilerOptions, true);
+    this.compilerHost = new WebpackCompilerHost(this.compilerOptions);
     this.program = ts.createProgram(this.files, this.compilerOptions, this.compilerHost);
     this.reflectorHost = new ngCompiler.ReflectorHost(
       this.program, this.compilerHost, this.angularCompilerOptions);
@@ -109,6 +115,15 @@ export class NgcWebpackPlugin {
       this.compilation = null;
       compilation._ngToolsWebpackPluginInstance = null;
       cb();
+    });
+
+    // Virtual file system.
+    compiler.resolvers.normal.plugin('resolve', (request: any, cb?: () => void) => {
+      // populate the file system cache with the virtual module
+      this.compilerHost.populateWebpackResolver(compiler.resolvers.normal);
+      if (cb) {
+        cb();
+      }
     });
   }
 
