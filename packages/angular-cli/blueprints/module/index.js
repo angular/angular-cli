@@ -7,7 +7,7 @@ module.exports = {
   description: '',
 
   availableOptions: [
-    { name: 'spec', type: Boolean, default: false },
+    { name: 'spec', type: Boolean },
     { name: 'routing', type: Boolean, default: false }
   ],
 
@@ -20,6 +20,10 @@ module.exports = {
   },
 
   locals: function (options) {
+    options.spec = options.spec !== undefined ?
+      options.spec :
+      this.project.ngConfigObj.get('defaults.spec.module');
+
     return {
       dynamicPath: this.dynamicPath.dir,
       spec: options.spec,
