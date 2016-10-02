@@ -16,6 +16,13 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
   const lazyModules = findLazyModules(appRoot);
 
   return {
+    resolve: {
+      plugins: [
+        new atl.TsConfigPathsPlugin({
+          tsconfig: path.resolve(appRoot, appConfig.tsconfig)
+        })
+      ]
+    },
     module: {
       rules: [
         {

@@ -45,11 +45,8 @@ export default <any>Task.extend({
 
         if (err) {
           lastHash = null;
-          console.error(err.stack || err);
-          if (err.details) {
-            console.error(err.details);
-          }
-          reject(err.details);
+          console.error(err.details || err);
+          reject(err.details || err);
         }
 
         if (stats.hash !== lastHash) {
