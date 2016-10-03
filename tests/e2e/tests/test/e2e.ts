@@ -17,5 +17,7 @@ export default function() {
   return expectToFail(() => ng('e2e'))
     // These should work.
     .then(() => _runServeAndE2e())
-    .then(() => _runServeAndE2e('--prod'));
+    .then(() => _runServeAndE2e('--prod'))
+    .then(() => _runServeAndE2e('--aot'))
+    .then(() => _runServeAndE2e('--aot', '--prod'));
 }
