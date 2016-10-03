@@ -1,12 +1,15 @@
-var path = require('path');
+const path = require('path');
 const chalk = require('chalk');
-var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const Blueprint = require('ember-cli/lib/models/blueprint');
+const getFiles = Blueprint.prototype.files;
 
 module.exports = {
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean, default: true }
+    { name: 'flat', type: Boolean, default: true },
+    { name: 'spec', type: Boolean, default: true }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -21,6 +24,16 @@ module.exports = {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat
     };
+  },
+
+  files: function() {
+    var fileList = getFiles.call(this);
+
+    if (this.options && !this.options.spec) {
+      fileList = fileList.filter(p => p.indexOf('__name__.service.spec.ts') < 0);
+    }
+
+    return fileList;
   },
 
   fileMapTokens: function (options) {
