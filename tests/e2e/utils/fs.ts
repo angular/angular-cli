@@ -1,4 +1,6 @@
 import * as fs from 'fs';
+import {dirname} from 'path';
+import {stripIndents} from 'common-tags';
 
 
 export function readFile(fileName: string) {
@@ -52,6 +54,30 @@ export function moveFile(from: string, to: string) {
 }
 
 
+function _recursiveMkDir(path: string) {
+  if (fs.existsSync(path)) {
+    return Promise.resolve();
+  } else {
+    return _recursiveMkDir(dirname(path))
+      .then(() => fs.mkdirSync(path));
+  }
+}
+
+export function copyFile(from: string, to: string) {
+  return _recursiveMkDir(dirname(to))
+    .then(() => new Promise((resolve, reject) => {
+      const rd = fs.createReadStream(from);
+      rd.on('error', (err) => reject(err));
+
+      const wr = fs.createWriteStream(to);
+      wr.on('error', (err) => reject(err));
+      wr.on('close', (ex) => resolve());
+
+      rd.pipe(wr);
+    }));
+}
+
+
 export function writeMultipleFiles(fs: any) {
   return Object.keys(fs)
     .reduce((previous, curr) => {
@@ -66,6 +92,11 @@ export function replaceInFile(filePath: string, match: RegExp, replacement: stri
     .then((content: string) => writeFile(filePath, content.replace(match, replacement)));
 }
 
+
+export function appendToFile(filePath: string, text: string) {
+  return readFile(filePath)
+    .then((content: string) => writeFile(filePath, content.concat(text)));
+}
 
 
 export function expectFileToExist(fileName: string) {
@@ -85,12 +116,29 @@ export function expectFileToMatch(fileName: string, regEx: RegExp | string) {
     .then(content => {
       if (typeof regEx == 'string') {
         if (content.indexOf(regEx) == -1) {
-          throw new Error(`File "${fileName}" did not contain "${regEx}"...`);
+          throw new Error(stripIndents`File "${fileName}" did not contain "${regEx}"...
+            Content:
+            ${content}
+            ------
+          `);
         }
       } else {
         if (!content.match(regEx)) {
-          throw new Error(`File "${fileName}" did not match regex ${regEx}...`);
+          throw new Error(stripIndents`File "${fileName}" did not contain "${regEx}"...
+            Content:
+            ${content}
+            ------
+          `);
         }
+      }
+    });
+}
+
+export function expectFileSizeToBeUnder(fileName: string, sizeInBytes: number) {
+  return readFile(fileName)
+    .then(content => {
+      if (content.length > sizeInBytes) {
+        throw new Error(`File "${fileName}" exceeded file size of "${sizeInBytes}".`);
       }
     });
 }

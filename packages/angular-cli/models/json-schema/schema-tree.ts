@@ -281,7 +281,7 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
 
   constructor(metaData: TreeNodeConstructorArgument<T>) {
     super(metaData);
-    this._defined = metaData.value !== undefined;
+    this._defined = !(metaData.value === undefined || metaData.value === null);
     if ('default' in metaData.schema) {
       this._default = metaData.schema['default'];
     }

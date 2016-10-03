@@ -1,3 +1,22 @@
+<a name="1.0.0-beta.16"></a>
+# [1.0.0-beta.16](https://github.com/angular/angular-cli/compare/v1.0.0-beta.15...v1.0.0-beta.16) (2016-09-28)
+
+
+### Bug Fixes
+
+* **build:** fail ng build on error ([#2360](https://github.com/angular/angular-cli/issues/2360)) ([aa48c30](https://github.com/angular/angular-cli/commit/aa48c30)), closes [#2014](https://github.com/angular/angular-cli/issues/2014)
+* **build:** use config output path as default ([#2158](https://github.com/angular/angular-cli/issues/2158)) ([49a120b](https://github.com/angular/angular-cli/commit/49a120b))
+* **generate:** Update directive.spec.ts blueprint to fix incorret import ([#1940](https://github.com/angular/angular-cli/issues/1940)) ([93da512](https://github.com/angular/angular-cli/commit/93da512))
+* **karma:** set defaults for karma.conf.js ([#1837](https://github.com/angular/angular-cli/issues/1837)) ([e2e94a5](https://github.com/angular/angular-cli/commit/e2e94a5))
+* **test:** correctly report packages spec failures ([#2238](https://github.com/angular/angular-cli/issues/2238)) ([3102453](https://github.com/angular/angular-cli/commit/3102453))
+
+
+### Features
+
+* **webpackDevServer:** Add watchOptions for webpackDevServer ([#1814](https://github.com/angular/angular-cli/issues/1814)) ([ce03088](https://github.com/angular/angular-cli/commit/ce03088))
+
+
+
 <a name="1.0.0-beta.15"></a>
 # [1.0.0-beta.15](https://github.com/angular/angular-cli/compare/v1.0.0-beta.14...v1.0.0-beta.15) (2016-09-20)
 

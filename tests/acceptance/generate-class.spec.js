@@ -17,6 +17,7 @@ describe('Acceptance: ng generate class', function () {
   after(conf.restore);
 
   beforeEach(function () {
+    this.timeout(10000);
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
@@ -25,17 +26,23 @@ describe('Acceptance: ng generate class', function () {
   });
 
   afterEach(function () {
-    this.timeout(10000);
-
     return tmp.teardown('./tmp');
   });
 
   it('ng generate class my-class', function () {
     return ng(['generate', 'class', 'my-class']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
     });
   });
-  
+
+  it('ng generate class my-class --no-spec', function () {
+    return ng(['generate', 'class', 'my-class', '--no-spec']).then(() => {
+      expect(existsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
+    });
+  });
+
   it('ng generate class my-class model', function () {
     return ng(['generate', 'class', 'my-class', 'model']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.model.ts'))).to.equal(true);
@@ -47,7 +54,7 @@ describe('Acceptance: ng generate class', function () {
       expect(existsSync(path.join(testPath, 'shared', 'my-class.ts'))).to.equal(true);
     });
   });
-  
+
   it(`ng generate class shared${path.sep}my-class model`, function () {
     return ng(['generate', 'class', 'shared/my-class', 'model']).then(() => {
       expect(existsSync(path.join(testPath, 'shared', 'my-class.model.ts'))).to.equal(true);

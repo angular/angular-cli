@@ -5,24 +5,29 @@ import * as webpack from 'webpack';
 import { BuildOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { webpackOutputOptions } from '../models/';
+import { CliConfig } from '../models/config';
 
 // Configure build and output;
 let lastHash: any = null;
 
 export default <any>Task.extend({
-  // Options: String outputPath
   run: function (runTaskOptions: BuildOptions) {
 
     const project = this.cliProject;
 
-    rimraf.sync(path.resolve(project.root, runTaskOptions.outputPath));
+    const outputDir = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
+    rimraf.sync(path.resolve(project.root, outputDir));
     const config = new NgCliWebpackConfig(
       project,
       runTaskOptions.target,
       runTaskOptions.environment,
-      runTaskOptions.outputPath,
-      runTaskOptions.baseHref
+      outputDir,
+      runTaskOptions.baseHref,
+      runTaskOptions.aot
     ).config;
+
+    // fail on build error
+    config.bail = true;
 
     const webpackCompiler: any = webpack(config);
 
@@ -40,11 +45,8 @@ export default <any>Task.extend({
 
         if (err) {
           lastHash = null;
-          console.error(err.stack || err);
-          if (err.details) {
-            console.error(err.details);
-          }
-          reject(err.details);
+          console.error(err.details || err);
+          reject(err.details || err);
         }
 
         if (stats.hash !== lastHash) {

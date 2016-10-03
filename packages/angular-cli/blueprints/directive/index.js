@@ -1,15 +1,19 @@
-var path = require('path');
-var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const path = require('path');
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const findParentModule = require('../../utilities/find-parent-module').default;
+const NodeHost = require('@angular-cli/ast-tools').NodeHost;
+const Blueprint = require('ember-cli/lib/models/blueprint');
+const getFiles = Blueprint.prototype.files;
 
 module.exports = {
   description: '',
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: true },
-    { name: 'prefix', type: Boolean, default: true }
+    { name: 'prefix', type: Boolean, default: true },
+    { name: 'spec', type: Boolean }
   ],
 
   beforeInstall: function() {
@@ -31,18 +35,32 @@ module.exports = {
         this.project.ngConfig.apps[0].prefix) {
       defaultPrefix = this.project.ngConfig.apps[0].prefix;
     }
-    var prefix = this.options.prefix ? defaultPrefix : '';
+    var prefix = this.options.prefix ? `${defaultPrefix}-` : '';
 
-    this.rawEntityName = prefix + parsedPath.name;
+    this.selector = stringUtils.camelize(prefix + parsedPath.name);
     return parsedPath.name;
   },
 
   locals: function (options) {
+    options.spec = options.spec !== undefined ?
+      options.spec :
+      this.project.ngConfigObj.get('defaults.spec.directive');
+
     return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat,
-      rawEntityName: this.rawEntityName
+      selector: this.selector
     };
+  },
+
+  files: function() {
+    var fileList = getFiles.call(this);
+
+    if (this.options && !this.options.spec) {
+      fileList = fileList.filter(p => p.indexOf('__name__.directive.spec.ts') < 0);
+    }
+
+    return fileList;
   },
 
   fileMapTokens: function (options) {
@@ -73,7 +91,7 @@ module.exports = {
     if (!options['skip-import']) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
-          .then(change => change.apply()));
+          .then(change => change.apply(NodeHost)));
     }
 
     return Promise.all(returns);
