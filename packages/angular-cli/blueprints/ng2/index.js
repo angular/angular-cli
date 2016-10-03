@@ -32,6 +32,12 @@ module.exports = {
       .replace(/-(.)/g, (_, l) => ' ' + l.toUpperCase())
       .replace(/^./, (l) => l.toUpperCase());
 
+    // For mobile projects, force inline styles and templates.
+    if (options.mobile) {
+      options.inlineStyle = true;
+      options.inlineTemplate = true;
+    }
+
     return {
       htmlComponentName: stringUtils.dasherize(options.entity.name),
       jsComponentName: stringUtils.classify(options.entity.name),
@@ -50,10 +56,7 @@ module.exports = {
 
   files: function() {
     var fileList = getFiles.call(this);
-    if (this.options && this.options.mobile) {
-      fileList = fileList.filter(p => p.indexOf('app.component.html') < 0);
-      fileList = fileList.filter(p => p.indexOf('app.component.__styleext__') < 0);
-    }
+
     if (this.options && !this.options.routing) {
       fileList = fileList.filter(p => p.indexOf('app-routing.module.ts') < 0);
     }
