@@ -31,6 +31,7 @@ module.exports = {
       'completion': require('../commands/completion').default,
       'doc': require('../commands/doc').default,
       'github-pages-deploy': require('../commands/github-pages-deploy').default,
+      'deps': require('../commands/deps').default,
 
       // Easter eggs.
       'make-this-awesome': require('../commands/easter-egg').default,
