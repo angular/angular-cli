@@ -16,6 +16,13 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
   const lazyModules = findLazyModules(appRoot);
 
   return {
+    resolve: {
+      plugins: [
+        new atl.TsConfigPathsPlugin({
+          tsconfig: path.resolve(appRoot, appConfig.tsconfig)
+        })
+      ]
+    },
     module: {
       rules: [
         {
@@ -55,8 +62,8 @@ export const getWebpackAotConfigPartial = function(projectRoot: string, appConfi
       new NgcWebpackPlugin({
         project: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
         baseDir: path.resolve(projectRoot, ''),
-        entryModule: path.join(projectRoot, appConfig.root, 'app/app.module#AppModule'),
-        genDir: path.join(projectRoot, appConfig.outDir, 'ngfactory')
+        main: path.join(projectRoot, appConfig.root, appConfig.main),
+        genDir: path.resolve(projectRoot, '')
       }),
     ]
   };
