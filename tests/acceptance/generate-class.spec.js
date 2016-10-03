@@ -32,7 +32,7 @@ describe('Acceptance: ng generate class', function () {
   it('ng generate class my-class', function () {
     return ng(['generate', 'class', 'my-class']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
     });
   });
 
