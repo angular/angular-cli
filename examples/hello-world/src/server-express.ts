@@ -20,7 +20,7 @@ const ROOT = path.join(path.resolve(__dirname, '..'));
 app.use(express.static(ROOT, { index: false }));
 
 
-import { main as ngApp } from './main.node';
+import { main as ngApp } from './app.node.module';
 // Routes with html5pushstate
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);

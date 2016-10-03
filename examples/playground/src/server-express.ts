@@ -18,7 +18,7 @@ app.use(express.static(ROOT, { index: false }));
 
 // main contains the NgModule container/module for Universal
 // returns a serialized document string
-import { main as ngApp } from './main.node';
+import { main as ngApp } from './app.node.module';
 
 // Routes with html5pushstate
 app.get('/', function (req, res, next) {
@@ -50,7 +50,7 @@ app.get('/', function (req, res, next) {
 
   return ngApp(documentHtml).then(html => {
     // html === serialized document string after being ran through Universal
-    
+
     // Send the html as a response
     res.status(200).send(html);
     next();
@@ -87,7 +87,7 @@ app.get('/crisis-center/admin', function (req, res, next) {
 
   return ngApp(documentHtml).then(html => {
     // html === serialized document string after being ran through Universal
-    
+
     // Send the html as a response
     res.status(200).send(html);
     next();

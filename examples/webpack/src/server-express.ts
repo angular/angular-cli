@@ -8,7 +8,7 @@ import { createEngine } from 'angular2-express-engine';
 // Angular 2 Universal
 enableProdMode();
 
-import { MainModule } from './main.node';
+import { MainModule } from './app.node.module';
 
 const app = express();
 const ROOT = path.join(path.resolve(__dirname, '..'));

@@ -1,13 +1,13 @@
 // Angular Core Modules
 import { NgModule } from '@angular/core';
 
-// Universal imports 
+// Universal imports
 import {
   NodeModule,
   NodeHttpModule,
   NodeJsonpModule,
   // Node "platform" (think "platformBrowserDynamic" on the browser)
-  platformDynamicNode 
+  platformDynamicNode
 } from '@angular/universal';
 
 // Our Root Component
@@ -24,12 +24,12 @@ export function main(document, config?: any) {
 
   // Universal Container (aka Module)
   @NgModule({
-    // These are identical to the Browser NgModule (in main.browser.ts)
+    // These are identical to the Browser NgModule (in app.browser.module.ts)
     bootstrap    : [ AppComponent ],
     declarations : [ AppComponent, LoginComponent ],
 
     // As opposed to the normal "BrowserModule, HttpModule, JsonpModule" imports
-    // in our Browser NgModule (found in main.browser.ts)
+    // in our Browser NgModule (found in app.browser.module.ts)
     // Here we need to import Node specific modules for Universal
     imports: [
 
@@ -38,10 +38,10 @@ export function main(document, config?: any) {
 
       // NodeModule from "@angular/universal" allows us to provide a config object
       NodeModule.withConfig({
-        // Our "document" which we need to pass in from Node 
+        // Our "document" which we need to pass in from Node
         // (first param of this main function)
         document: document,
-        
+
         originUrl: 'http://localhost:3000',
         baseUrl: '/',
         requestUrl: '/',
@@ -54,8 +54,8 @@ export function main(document, config?: any) {
       }),
 
       // Other important Modules for Universal
-      NodeHttpModule, // Universal Http 
-      NodeJsonpModule // Universal JSONP 
+      NodeHttpModule, // Universal Http
+      NodeJsonpModule // Universal JSONP
 
     ],
 
@@ -72,9 +72,9 @@ export function main(document, config?: any) {
   // But in Node, we don't "bootstrap" our application, we want to Serialize it!
 
   return platformDynamicNode().serializeModule(MainModule, config);
-  // serializeModule returns a promise 
+  // serializeModule returns a promise
   // (just like bootstrapModule on the browser does)
-  
+
 };
 
 

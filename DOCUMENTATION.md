@@ -129,7 +129,7 @@ but there are really just two key parts to be aware of:
 // polyfills have to be first
 import 'angular2-universal-polyfills';
 import { createEngine, ExpressEngineConfig } from 'angular2-express-engine';
-import { MainModule } from './main.node';  // will change depending on your app
+import { MainModule } from './app.node.module';  // will change depending on your app
 
 // 1. set up Angular Universal to be the rendering engine for Express
 app.engine('.html', createEngine({}));
@@ -156,9 +156,9 @@ app.get('/*', (req, res) => {
 
 ``` 
 
-* Create your top level NgModule on the server side in the src/main.node.ts file 
-([like this](https://github.com/angular/universal-starter/blob/master/src/main.node.ts))
-  * Note that in the starter repo main.node.ts and main.browser.ts are exactly the same, but in
+* Create your top level NgModule on the server side in the src/app.node.module.ts file 
+([like this](https://github.com/angular/universal-starter/blob/master/src/app.node.module.ts))
+  * Note that in the starter repo app.node.module.ts and app.browser.module.ts are exactly the same, but in
 your app they will almost certainly be different as you specify node-only or browser-only
 providers in the imports section as appropriate for each specific platform. 
   * Also note that this is where you set your root App component and top level routes. 
@@ -172,7 +172,7 @@ side app.
 // important for this to be first in your client.ts file so polyfills can be properly applied
 import 'angular2-universal-polyfills';
 import { platformUniversalDynamic } from 'angular2-universal';
-import { MainModule } from './main.browser';  // this will change depending on your app
+import { MainModule } from './app.browser.module';  // this will change depending on your app
 
 const platformRef = platformUniversalDynamic();
 
@@ -182,12 +182,12 @@ platformRef.bootstrapModule(MainModule);
 
 This replaces the normal Angular `bootstrap()` that you would normally use
 for client-only Angular apps. Note that the MainModule you pass in here can and
-should be different (see [main.browser.ts](https://github.com/angular/universal-starter/blob/master/src/main.browser.ts) in starter repo) 
+should be different (see [app.browser.module.ts](https://github.com/angular/universal-starter/blob/master/src/app.browser.module.ts) in starter repo) 
 than the MainModule you reference from the server side
 start (i.e. src/server.ts). This is due to the fact that your imports
 for each side may be slightly different. In many cases, as you build out your
 Universal app, you will have some browser-only or node-only dependencies and
-that is when main.node.ts and main.browser.ts would be different.
+that is when app.node.module.ts and app.browser.module.ts would be different.
 
 Final note is that in your imports for your Universal app on both the browser
 and node NgModule, you need to add UniversalModule:

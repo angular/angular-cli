@@ -4,7 +4,7 @@ import { enableProdMode } from '@angular/core';
 // Enable production mode
 enableProdMode();
 
-import { main } from './main.node';
+import { main } from './app.node.module';
 
 var documentHtml = `
 <!doctype>
