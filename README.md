@@ -347,7 +347,7 @@ If the library doesn't have typings available at `@types/`, you can still use it
 manually adding typings for it:
 ```
 // in src/typings.d.ts
-declare module "typeless-package";
+declare module 'typeless-package';
 
 // in src/app/app.component.ts
 import * as typelessPackage from 'typeless-package';
