@@ -8,7 +8,8 @@
     "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
-    "e2e": "protractor"
+    "e2e": "protractor",
+    "deps": "ngd -f src/main.ts -d ./documentation/dependencies/"
   },
   "private": true,
   "dependencies": {
@@ -46,6 +47,7 @@
     "protractor": "4.0.9",
     "ts-node": "1.2.1",
     "tslint": "3.13.0",
-    "typescript": "2.0.2"
+    "typescript": "2.0.2",
+    "angular2-dependencies-graph": "1.0.0-alpha.1"
   }
 }
