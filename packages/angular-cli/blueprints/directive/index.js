@@ -1,16 +1,19 @@
-var path = require('path');
-var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const path = require('path');
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const findParentModule = require('../../utilities/find-parent-module').default;
 const NodeHost = require('@angular-cli/ast-tools').NodeHost;
+const Blueprint = require('ember-cli/lib/models/blueprint');
+const getFiles = Blueprint.prototype.files;
 
 module.exports = {
   description: '',
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: true },
-    { name: 'prefix', type: Boolean, default: true }
+    { name: 'prefix', type: Boolean, default: true },
+    { name: 'spec', type: Boolean, default: true }
   ],
 
   beforeInstall: function() {
@@ -44,6 +47,16 @@ module.exports = {
       flat: options.flat,
       selector: this.selector
     };
+  },
+
+  files: function() {
+    var fileList = getFiles.call(this);
+
+    if (this.options && !this.options.spec) {
+      fileList = fileList.filter(p => p.indexOf('__name__.directive.spec.ts') < 0);
+    }
+
+    return fileList;
   },
 
   fileMapTokens: function (options) {
