@@ -9,7 +9,7 @@ module.exports = {
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: true },
-    { name: 'spec', type: Boolean, default: true }
+    { name: 'spec', type: Boolean }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -20,6 +20,10 @@ module.exports = {
   },
 
   locals: function (options) {
+    options.spec = options.spec !== undefined ?
+      options.spec :
+      this.project.ngConfigObj.get('defaults.spec.service');
+
     return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat
