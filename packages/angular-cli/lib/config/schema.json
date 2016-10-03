@@ -151,6 +151,35 @@
               "default": false
             }
           }
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "boolean",
+              "default": false
+            },
+            "component": {
+              "type": "boolean",
+              "default": true
+            },
+            "directive": {
+              "type": "boolean",
+              "default": true
+            },
+            "module": {
+              "type": "boolean",
+              "default": false
+            },
+            "pipe": {
+              "type": "boolean",
+              "default": true
+            },
+            "service": {
+              "type": "boolean",
+              "default": true
+            }
+          }
         }
       },
       "additionalProperties": false

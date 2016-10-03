@@ -11,7 +11,7 @@ module.exports = {
   ],
 
   availableOptions: [
-    { name: 'spec', type: Boolean, default: true }
+    { name: 'spec', type: Boolean }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -27,6 +27,11 @@ module.exports = {
     if (classType) {
       this.fileName += '.' + classType;
     }
+
+    options.spec = options.spec !== undefined ?
+      options.spec :
+      this.project.ngConfigObj.get('defaults.spec.class');
+
     return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat,
