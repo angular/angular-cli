@@ -1,11 +1,11 @@
 import * as chalk from 'chalk';
+import InitCommand from './init';
+
 const Command = require('ember-cli/lib/models/command');
 const Project = require('ember-cli/lib/models/project');
 const SilentError = require('silent-error');
 const validProjectName = require('ember-cli/lib/utilities/valid-project-name');
 
-const normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
-import InitCommand from './init';
 
 const NewCommand = Command.extend({
   name: 'new',
@@ -15,7 +15,6 @@ const NewCommand = Command.extend({
   availableOptions: [
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
-    { name: 'blueprint', type: String, default: 'ng2', aliases: ['b'] },
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
     { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
     { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
@@ -25,7 +24,9 @@ const NewCommand = Command.extend({
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'mobile', type: Boolean, default: false },
-    { name: 'routing', type: Boolean, default: false }
+    { name: 'routing', type: Boolean, default: false },
+    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
+    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
   ],
 
   run: function (commandOptions: any, rawArgs: string[]) {
@@ -59,8 +60,6 @@ const NewCommand = Command.extend({
         'angular-universal for supporting NgModule. Sorry for the inconvenience.'
       ));
     }
-
-    commandOptions.blueprint = normalizeBlueprint(commandOptions.blueprint);
 
     if (!commandOptions.directory) {
       commandOptions.directory = packageName;
