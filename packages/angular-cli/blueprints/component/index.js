@@ -16,7 +16,7 @@ module.exports = {
     { name: 'inline-template', type: Boolean, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, aliases: ['is'] },
     { name: 'prefix', type: Boolean, default: true },
-    { name: 'spec', type: Boolean, default: true }
+    { name: 'spec', type: Boolean }
   ],
 
   beforeInstall: function() {
@@ -63,6 +63,10 @@ module.exports = {
     options.inlineTemplate = options.inlineTemplate !== undefined ?
       options.inlineTemplate :
       this.project.ngConfigObj.get('defaults.inline.template');
+
+    options.spec = options.spec !== undefined ?
+      options.spec :
+      this.project.ngConfigObj.get('defaults.spec.component');
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),

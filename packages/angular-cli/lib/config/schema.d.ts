@@ -64,5 +64,13 @@ export interface CliConfig {
             style?: boolean;
             template?: boolean;
         };
+        spec?: {
+            class?: boolean;
+            component?: boolean;
+            directive?: boolean;
+            module?: boolean;
+            pipe?: boolean;
+            service?: boolean;
+        };
     };
 }
