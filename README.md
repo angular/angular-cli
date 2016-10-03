@@ -343,6 +343,17 @@ npm install d3 --save
 npm install @types/d3 --save-dev
 ```
 
+If the library doesn't have typings available at `@types/`, you can still use it by 
+manually adding typings for it:
+```
+// in src/typings.d.ts
+declare module 'typeless-package';
+
+// in src/app/app.component.ts
+import * as typelessPackage from 'typeless-package';
+typelessPackage.method();
+```
+
 ### Global Library Installation
 
 Some javascript libraries need to be added to the global scope, and loaded as if
