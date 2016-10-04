@@ -16,7 +16,8 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
       new WebpackMd5Hash(),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8 : true },
-        compress: { screw_ie8: true }
+        compress: { screw_ie8: true },
+        sourceMap: true
       }),
       new CompressionPlugin({
           asset: '[path].gz[query]',
