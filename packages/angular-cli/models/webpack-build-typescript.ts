@@ -61,9 +61,9 @@ export const getWebpackAotConfigPartial = function(projectRoot: string, appConfi
     plugins: [
       new NgcWebpackPlugin({
         project: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
-        baseDir: path.resolve(projectRoot, ''),
+        baseDir: path.resolve(projectRoot, appConfig.root),
         main: path.join(projectRoot, appConfig.root, appConfig.main),
-        genDir: path.resolve(projectRoot, '')
+        genDir: path.resolve(projectRoot, appConfig.root)
       }),
     ]
   };

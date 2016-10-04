@@ -98,14 +98,15 @@ export class NgcWebpackPlugin {
           return callback();
         }
 
-        result.resource = this.genDir;
-        result.recursive = true;
-        result.dependencies.forEach((d: any) => d.critical = false);
-        result.resolveDependencies = createResolveDependenciesFromContextMap((_: any, cb: any) => {
-          return cb(null, this.lazyRoutes);
-        });
+        this.done.then(() => {
+          result.resource = this.genDir;
+          result.recursive = true;
+          result.dependencies.forEach((d: any) => d.critical = false);
+          result.resolveDependencies = createResolveDependenciesFromContextMap(
+            (_: any, cb: any) => cb(null, this.lazyRoutes));
 
-        return callback(null, result);
+          return callback(null, result);
+        });
       });
     });
 
@@ -119,7 +120,7 @@ export class NgcWebpackPlugin {
 
     // Virtual file system.
     compiler.resolvers.normal.plugin('resolve', (request: any, cb?: () => void) => {
-      // populate the file system cache with the virtual module
+      // Populate the file system cache with the virtual module.
       this.compilerHost.populateWebpackResolver(compiler.resolvers.normal);
       if (cb) {
         cb();
