@@ -42,9 +42,9 @@ export class NgCliWebpackConfig {
       : getWebpackNonAotConfigPartial(this.ngCliProject.root, appConfig);
 
     if (appConfig.mobile) {
-      let mobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig);
+      let mobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig, baseHref);
       let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root,
-                                                                      appConfig);
+                                                                      appConfig, baseHref);
       baseConfig = webpackMerge(baseConfig, mobileConfigPartial);
       if (this.target == 'production') {
         targetConfigPartial = webpackMerge(targetConfigPartial, mobileProdConfigPartial);

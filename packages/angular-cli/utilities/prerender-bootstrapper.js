@@ -10,8 +10,7 @@ const path = require('path');
 const ts = require('typescript');
 
 const projectRoot = process.argv[2];
-const templatePath = process.argv[3];
-const appShellConfig = process.argv[4];
+const appShellConfig = process.argv[3];
 const projectNodeModulesDir = path.resolve(projectRoot, '../node_modules');
 
 // Require from absolute path to prevent looking up inside of angular-cli
@@ -38,23 +37,25 @@ const pathToTranspiledConfig = path.resolve(tmpDir, path.relative(projectRoot, a
 
 var platformRef =  universal.platformUniversalDynamic();
 
-var platformConfig = {
-  ngModule: require(pathToTranspiledConfig).Module,
-  document: fs.readFileSync(templatePath, 'utf-8'),
-  preboot: false,
-  baseUrl: '/',
-  requestUrl: '/',
-  originUrl: 'localhost:3000'
-};
+process.stdin.on('data', (template) => {
+  var platformConfig = {
+    ngModule: require(pathToTranspiledConfig).Module,
+    document: template.toString(),
+    preboot: false,
+    baseUrl: '/',
+    requestUrl: '/',
+    originUrl: 'localhost:3000'
+  };
 
 
-const zone = Zone.current.fork({
-  name: 'UNIVERSAL prerender',
-  properties: platformConfig
-});
-zone.run(() => (platformRef.serializeModule(platformConfig.ngModule, platformConfig))
-  .then((html) => {
-    process.stdout.write(html);
-  }, (err) => {
-    process.stderr.write(err);
-  }));
+  const zone = Zone.current.fork({
+    name: 'UNIVERSAL prerender',
+    properties: platformConfig
+  });
+  zone.run(() => (platformRef.serializeModule(platformConfig.ngModule, platformConfig))
+    .then((html) => {
+      process.stdout.write(html);
+    }, (err) => {
+      process.stderr.write(err);
+    }));
+})

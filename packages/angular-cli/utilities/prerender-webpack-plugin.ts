@@ -1,5 +1,5 @@
 const path = require('path');
-import { spawn } from 'child_process';
+import { spawnSync } from 'child_process';
 
 export interface IWebpackPrerender {
   templatePath: string;
@@ -12,25 +12,25 @@ export class PrerenderWebpackPlugin {
 
   apply(compiler: any) {
     compiler.plugin('emit', (compilation: any, callback: Function) => {
-      let proc = spawn('node', [
+      let relativeTemplatePath = path.relative(this.options.appPath, this.options.templatePath);
+      let proc = spawnSync('node', [
           `${path.resolve(__dirname, 'prerender-bootstrapper.js')}`,
           this.options.appPath,
-          this.options.templatePath,
           this.options.configPath],
         {
-          cwd: this.options.appPath
+          cwd: this.options.appPath,
+          input: compilation.assets[relativeTemplatePath].source()
         });
-      proc.stderr.on('data', (e: any) => {
-        console.error('error in app shell', e.toString());
-        callback();
-      });
-      proc.stdout.on('data', (data: string | Buffer) => {
-        compilation.assets[path.relative(this.options.appPath, this.options.templatePath)] = {
-          source: () => data.toString(),
-          size: () => data.toString().length
-        };
-        callback();
-      });
+      if (process.stderr.toString()) {
+        console.error('error in app shell', process.stderr.toString());
+        return callback();
+      }
+
+      compilation.assets[relativeTemplatePath] = {
+        source: () => proc.stdout.toString(),
+        size: () => proc.stdout.toString().length
+      };
+      callback();
     });
   }
 };
