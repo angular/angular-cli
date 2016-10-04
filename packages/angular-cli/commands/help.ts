@@ -6,10 +6,8 @@ const stringUtils = require('ember-cli-string-utils');
 const lookupCommand = require('ember-cli/lib/cli/lookup-command');
 
 const commandsToIgnore = [
-  'help',
   'easter-egg',
-  'completion',
-  'github-pages-deploy'
+  'github-pages-deploy' // errors because there is no base github-pages command
 ];
 
 const HelpCommand = Command.extend({
@@ -21,8 +19,8 @@ const HelpCommand = Command.extend({
 
   run: function (commandOptions: any) {
     let commandFiles = fs.readdirSync(__dirname)
-      // Remove files that are not JavaScript
-      .filter(file => file.match(/\.js$/))
+      // Remove files that are not JavaScript or Typescript
+      .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
       .map(file => path.parse(file).name)
       .map(file => file.toLowerCase());
 
