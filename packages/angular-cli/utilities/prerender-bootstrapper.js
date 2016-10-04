@@ -12,7 +12,6 @@ const ts = require('typescript');
 const projectRoot = process.argv[2];
 const appShellConfig = process.argv[3];
 const projectNodeModulesDir = path.resolve(projectRoot, '../node_modules');
-
 // Require from absolute path to prevent looking up inside of angular-cli
 require(`${projectNodeModulesDir}/angular2-universal-polyfills`);
 const universal = require(`${projectNodeModulesDir}/angular2-universal`);
@@ -20,7 +19,6 @@ const universal = require(`${projectNodeModulesDir}/angular2-universal`);
 // Manually transpile the TS sources to a temp directory
 const tsConfigPath = path.join(projectRoot, 'tsconfig.json');
 const compilerOptions = JSON.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
-
 const tmpDir = fs.mkdtempSync('/tmp/cli-app-shell');
 const parsedCompilerOpts = ts.convertCompilerOptionsFromJson(Object.assign({}, compilerOptions['compilerOptions'], {
   module: 'commonjs',
@@ -28,7 +26,6 @@ const parsedCompilerOpts = ts.convertCompilerOptionsFromJson(Object.assign({}, c
 }));
 const tsProgram = ts.createProgram([appShellConfig], parsedCompilerOpts.options);
 tsProgram.emit();
-
 // Symlink temp directory node_modules to project's node_modules
 fs.symlinkSync(path.join(projectRoot, '../node_modules/'), path.join(tmpDir, 'node_modules'), 'dir');
 
@@ -58,4 +55,4 @@ process.stdin.on('data', (template) => {
     }, (err) => {
       process.stderr.write(err);
     }));
-})
+});

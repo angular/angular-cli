@@ -42,7 +42,8 @@ export class NgCliWebpackConfig {
       : getWebpackNonAotConfigPartial(this.ngCliProject.root, appConfig);
 
     if (appConfig.mobile) {
-      let mobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig, baseHref);
+      let mobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig,
+          baseHref);
       let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root,
                                                                       appConfig, baseHref);
       baseConfig = webpackMerge(baseConfig, mobileConfigPartial);

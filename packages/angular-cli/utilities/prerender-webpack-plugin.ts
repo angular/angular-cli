@@ -21,11 +21,9 @@ export class PrerenderWebpackPlugin {
           cwd: this.options.appPath,
           input: compilation.assets[relativeTemplatePath].source()
         });
-      if (process.stderr.toString()) {
-        console.error('error in app shell', process.stderr.toString());
-        return callback();
+      if (proc.stderr.toString()) {
+        return callback(proc.stderr.toString());
       }
-
       compilation.assets[relativeTemplatePath] = {
         source: () => proc.stdout.toString(),
         size: () => proc.stdout.toString().length
