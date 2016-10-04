@@ -4,11 +4,11 @@ import * as _request from 'request';
 
 export function request(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    _request(url, (error: any, response: IncomingMessage, body: string) => {
+    _request({ url: url, agentOptions: { rejectUnauthorized: false }}, (error: any, response: IncomingMessage, body: string) => {
       if (error) {
         reject(error);
       } else if (response.statusCode >= 400) {
-        reject(new Error(`Requesting "${url}" returned status code ${response.statusCode}.`);
+        reject(new Error(`Requesting "${url}" returned status code ${response.statusCode}.`));
       } else {
         resolve(body);
       }
