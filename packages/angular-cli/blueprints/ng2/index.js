@@ -10,7 +10,10 @@ module.exports = {
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'style', type: String, default: 'css' },
-    { name: 'mobile', type: Boolean, default: false }
+    { name: 'mobile', type: Boolean, default: false },
+    { name: 'routing', type: Boolean, default: false },
+    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
+    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
   ],
 
   afterInstall: function (options) {
@@ -29,6 +32,12 @@ module.exports = {
       .replace(/-(.)/g, (_, l) => ' ' + l.toUpperCase())
       .replace(/^./, (l) => l.toUpperCase());
 
+    // For mobile projects, force inline styles and templates.
+    if (options.mobile) {
+      options.inlineStyle = true;
+      options.inlineTemplate = true;
+    }
+
     return {
       htmlComponentName: stringUtils.dasherize(options.entity.name),
       jsComponentName: stringUtils.classify(options.entity.name),
@@ -38,15 +47,24 @@ module.exports = {
       prefix: options.prefix,
       styleExt: this.styleExt,
       relativeRootPath: relativeRootPath,
-      isMobile: options.mobile
+      isMobile: options.mobile,
+      routing: options.routing,
+      inlineStyle: options.inlineStyle,
+      inlineTemplate: options.inlineTemplate
     };
   },
 
   files: function() {
     var fileList = getFiles.call(this);
-    if (this.options && this.options.mobile) {
-      fileList = fileList.filter(p => p.indexOf('__name__.component.html') < 0);
-      fileList = fileList.filter(p => p.indexOf('__name__.component.__styleext__') < 0);
+
+    if (this.options && !this.options.routing) {
+      fileList = fileList.filter(p => p.indexOf('app-routing.module.ts') < 0);
+    }
+    if (this.options && this.options.inlineTemplate) {
+      fileList = fileList.filter(p => p.indexOf('app.component.html') < 0);
+    }
+    if (this.options && this.options.inlineStyle) {
+      fileList = fileList.filter(p => p.indexOf('app.component.__styleext__') < 0);
     }
 
     return fileList;
