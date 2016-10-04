@@ -4,7 +4,8 @@ import * as _request from 'request';
 
 export function request(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    _request({ url: url, agentOptions: { rejectUnauthorized: false }}, (error: any, response: IncomingMessage, body: string) => {
+    let options = { url: url, agentOptions: { rejectUnauthorized: false }};
+    _request(options, (error: any, response: IncomingMessage, body: string) => {
       if (error) {
         reject(error);
       } else if (response.statusCode >= 400) {
