@@ -91,6 +91,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _delegate: ts.CompilerHost;
   private _files: {[path: string]: VirtualFileStats} = Object.create(null);
   private _directories: {[path: string]: VirtualDirStats} = Object.create(null);
+  private _changed = false;
 
   constructor(private _options: ts.CompilerOptions, private _setParentNodes = true) {
     this._delegate = ts.createCompilerHost(this._options, this._setParentNodes);
@@ -104,10 +105,15 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       this._directories[p] = new VirtualDirStats(p);
       p = dirname(p);
     }
+
+    this._changed = true;
   }
 
   populateWebpackResolver(resolver: any) {
     const fs = resolver.fileSystem;
+    if (!this._changed) {
+      return;
+    }
 
     for (const fileName of Object.keys(this._files)) {
       const stats = this._files[fileName];
@@ -121,6 +127,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       fs._statStorage.data[path] = [null, stats];
       fs._readdirStorage.data[path] = [null, files.concat(dirs)];
     }
+
+    this._changed = false;
   }
 
   fileExists(fileName: string): boolean {
