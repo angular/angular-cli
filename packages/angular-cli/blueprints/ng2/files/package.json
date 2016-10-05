@@ -34,6 +34,7 @@
     "preboot": "2.1.2",
     "parse5": "1.5.1",<% } %>
     "@types/jasmine": "^2.2.30",
+    "@types/node": "^6.0.42",
     "angular-cli": "<%= version %>",
     "codelyzer": "~0.0.26",
     "jasmine-core": "2.4.1",
