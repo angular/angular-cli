@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as webpack from 'webpack';
 import {findLazyModules} from './find-lazy-modules';
-import {NgcWebpackPlugin} from '@ngtools/webpack';
+import {AotPlugin} from '@ngtools/webpack';
 
 const atl = require('awesome-typescript-loader');
 
@@ -59,11 +59,9 @@ export const getWebpackAotConfigPartial = function(projectRoot: string, appConfi
       ]
     },
     plugins: [
-      new NgcWebpackPlugin({
-        project: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
-        baseDir: path.resolve(projectRoot, appConfig.root),
-        main: path.join(projectRoot, appConfig.root, appConfig.main),
-        genDir: path.resolve(projectRoot, appConfig.root)
+      new AotPlugin({
+        tsConfigPath: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
+        mainPath: path.join(projectRoot, appConfig.root, appConfig.main)
       }),
     ]
   };
