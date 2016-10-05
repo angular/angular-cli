@@ -3,7 +3,6 @@ const OfflinePlugin = require('offline-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 import { PrerenderWebpackPlugin } from '../utilities/prerender-webpack-plugin';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
-import { htmlWebpackTagRewriter } from '../utilities/html-webpack-tag-rewriter';
 
 export const getWebpackMobileConfigPartial = function (projectRoot: string, appConfig: any,
     baseHref: string) {
@@ -27,8 +26,7 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, appC
         templatePath: path.resolve(projectRoot, appConfig.root, 'index.html'),
         configPath: path.resolve(projectRoot, appConfig.root, 'main-app-shell.ts'),
         appPath: path.resolve(projectRoot, appConfig.root)
-      }),
-      htmlWebpackTagRewriter
+      })
     ]
   };
 };

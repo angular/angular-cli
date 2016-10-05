@@ -4,6 +4,7 @@ import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 
 
 export function getWebpackCommonConfig(
@@ -105,6 +106,10 @@ export function getWebpackCommonConfig(
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         chunksSortMode: 'dependency'
+      }),
+      new ScriptExtHtmlWebpackPlugin({
+        inline: ['inline.js'],
+        defaultAttribute: 'async'
       }),
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
