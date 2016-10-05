@@ -14,9 +14,10 @@
     "experimentalDecorators": true,
   	"sourceMap": true,
     "inlineSources": true,
-  	"outDir": "dist",
+    "rootDir": ".",
+  	"outDir": "compiled/ngc",
     "pretty": true,
-    "stripInternal": true,
+    "stripInternal": false,
     "lib": ["es6", "dom"],
     "types": [
       "node", "jasmine"
@@ -29,10 +30,10 @@
         "./modules/platform-node"
       ],
       "angular2-universal/browser": [
-        "./modules/universal/browser.ts"
+        "./modules/universal/browser"
       ],
       "angular2-universal/node": [
-        "./modules/universal/node.ts"
+        "./modules/universal/node"
       ],
       "angular2-universal": [
         "./modules/universal"
@@ -68,5 +69,8 @@
   ],
   "compileOnSave": false,
   "buildOnSave": false,
-  "atom": { "rewriteTsconfig": false }
+  "atom": { "rewriteTsconfig": false },
+  "angularCompilerOptions": {
+    "genDir": "compiled/ngfactory"
+  }
 }

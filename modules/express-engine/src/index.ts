@@ -1,6 +1,7 @@
 const fs = require('graceful-fs');
 
-import { platformUniversalDynamic } from 'angular2-universal';
+import { platformUniversalDynamic } from 'angular2-universal/node';
+
 import { PrebootOptions } from 'preboot';
 
 declare var Zone: any;

@@ -8,18 +8,17 @@
 import * as child_process from 'child_process';
 import * as buildUtils from './build-utils';
 import * as ts from 'typescript';
-import * as gulpTs from 'gulp-typescript';
 
 const gulp = require('gulp');
 const gulpChangelog = require('gulp-conventional-changelog');
 const jsonTransform = require('gulp-json-transform');
 const rimraf = require('rimraf');
-const rename = require('gulp-rename');
 const args = require('minimist')(process.argv);
 const tsConfig = require('./tsconfig.json');
 const rootPkg = require('./package.json');
 const runSequence = require('run-sequence');
 const replace = require('gulp-replace');
+const rename = require('gulp-rename');
 
 // For any task that contains "test" or if --test arg is passed, include spec files
 const isTest = process.argv[2] && process.argv[2].indexOf('test') > -1 || args['test'] ? true : false;
@@ -30,15 +29,12 @@ const program = ts.createProgram(files, compilerOptions, host);
 const sourceFiles = program.getSourceFiles().map(f => f.path);
 
 gulp.task('watch', () => {
-  return gulp.watch(sourceFiles, ({path}) => build([path]));
+  return gulp.watch(sourceFiles, build);
 });
 
 gulp.task('test:watch', ['test'], () => {
-  gulp.watch(sourceFiles, ({path}) => {
-    build([path])
-      .then(() => {
-        runSequence(['_test']);
-      });
+  gulp.watch(sourceFiles, () => {
+    runSequence('build', '_test');
   });
 });
 
@@ -51,40 +47,48 @@ gulp.task('_test', () => {
   child_process.spawnSync(`./node_modules/.bin/jasmine`, [], {stdio: 'inherit'});
 });
 
-gulp.task('build', ['clean'], () => build(sourceFiles));
+gulp.task('build', ['clean'], build);
 gulp.task('default', ['build']);
 
-function build(path: string[]): Promise<any> {
-  // TODO: remove this if it every works in watch mode without needing to re-create.
-  let project = gulpTs.createProject('tsconfig.json', {
-    typescript: require('typescript'),
-    rootDir: 'modules'
-  });
-  let output = gulp.src(path)
-    .pipe(gulpTs(project));
-  // Using a promise instead of merging streams since end
-  // event on streams seems not to be propagated when merged.
-  return new Promise((resolve) => {
-    var doneCount = 0;
-    output.js
-      .pipe(rename(buildUtils.stripSrcFromPath))
-      .pipe(replace(/\.\/src\//g, './'))
-      .pipe(gulp.dest('dist'))
-      .on('end', maybeDone),
-    output.dts
-      .pipe(rename(buildUtils.stripSrcFromPath))
-      .pipe(replace(/\.\/src\//g, './'))
-      .pipe(gulp.dest('dist'))
-      .on('end', maybeDone);
+// This is handy when using npm link from dist/modules to test universal
+// updates. If you use the normal buid with `clean` your npm link symlinks
+// get wiped out and need recreating with each build which can be difficult
+// for development and testing
+gulp.task('build:no-clean', build);
 
-    function maybeDone() {
-      doneCount++;
-      if (doneCount === 2) {
-        resolve();
+function build() {
+  return new Promise((resolve, reject) => {
+    child_process.exec('node_modules/.bin/ngc', (err, stdout, stderr) => {
+      if (err) {
+        reject(err);
+        return;
       }
-    }
-  });
 
+      if (stdout) {
+        console.log(stdout);
+        resolve(stdout);
+        return;
+      }
+
+      if (stderr) {
+        console.warn(stderr);
+        reject(stderr);
+        return;
+      }
+
+      resolve();
+    });
+  }).then(() => {
+    return new Promise((resolve, reject) => {
+      gulp
+        .src('compiled/ngc/modules/**/*')
+        .pipe(rename(buildUtils.stripSrcFromPath))
+        .pipe(replace(/\.\/src\//g, './'))
+        .pipe(gulp.dest('dist'))
+        .on('error', reject)
+        .on('end', resolve);
+    });
+  });
 }
 
 gulp.task('rewrite_packages', () => {
@@ -125,7 +129,7 @@ gulp.task('copy_license', () => {
 
 gulp.task('copy_files', () => {
   return gulp.src('modules/universal/typings.d.ts')
-  .pipe(replace(/\.\/src\//g, './'))
+    .pipe(replace(/\.\/src\//g, './'))
     .pipe(gulp.dest(`dist/universal`));
 });
 

@@ -16,3 +16,6 @@ logs
 typings
 dist
 node_modules
+
+/compiled
+*.metadata.json

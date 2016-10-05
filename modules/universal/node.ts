@@ -1,1 +1,1 @@
-export * from './src/node';
+export * from './src/node/index';

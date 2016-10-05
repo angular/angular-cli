@@ -9,7 +9,7 @@ import {
 
 import {
   Http,
-  Connection,
+  XHRConnection,
   ConnectionBackend,
   XHRBackend,
   Headers,
@@ -21,12 +21,13 @@ import {
   ResponseOptions,
   RequestOptionsArgs,
   ResponseType,
+  BrowserXhr,
+  XSRFStrategy,
 
   Jsonp,
   JSONPBackend,
   BaseResponseOptions,
-  BaseRequestOptions
-
+  BaseRequestOptions,
 } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
@@ -135,7 +136,7 @@ export class PreloadHttp extends Http {
 
 
 @Injectable()
-export class NodeConnection implements Connection {
+export class NodeConnection implements XHRConnection {
   public readyState: ReadyState;
   public request: Request;
   public response: Observable<Response> | Observable<any>;
@@ -241,19 +242,26 @@ export class NodeConnection implements Connection {
       };
     });
   }
+
+  // This method can be reeused as it should be compatible
+  setDetectedContentType = XHRConnection.prototype.setDetectedContentType;
 }
 
 
 @Injectable()
-export class NodeBackend implements ConnectionBackend {
+export class NodeBackend extends XHRBackend {
   constructor(
-    private _baseResponseOptions: ResponseOptions,
+    private baseResponseOptions: ResponseOptions,
+    _browserXHR: BrowserXhr,
+    _xsrfStrategy: XSRFStrategy,
     _ngZone: NgZone,
     @Inject(APP_BASE_HREF) private _baseUrl: string,
-    @Inject(ORIGIN_URL) private _originUrl: string) {}
+    @Inject(ORIGIN_URL) private _originUrl: string) {
+      super(_browserXHR, baseResponseOptions, _xsrfStrategy);
+    }
 
   public createConnection(request: Request): NodeConnection {
-    return new NodeConnection(request, this._baseResponseOptions, /*this._ngZone,*/ this._baseUrl, this._originUrl);
+    return new NodeConnection(request, this.baseResponseOptions, /*this._ngZone,*/ this._baseUrl, this._originUrl);
   }
 }
 
@@ -368,7 +376,7 @@ export class NodeJSONPConnection {
 export abstract class NodeJsonpBackend extends ConnectionBackend {}
 
 @Injectable()
-export class NodeJsonpBackend_ extends NodeJsonpBackend {
+export class NodeJsonpBackend_ extends NodeJsonpBackend implements JSONPBackend {
   constructor(
     private _baseResponseOptions: ResponseOptions,
     private _ngZone: NgZone,
@@ -399,10 +407,10 @@ export const NODE_JSONP_PROVIDERS = [
   { provide: JSONPBackend, useClass: NodeJsonpBackend_ },
 ];
 
-export function jsonpFactory(xhrBackend: XHRBackend, requestOptions: RequestOptions) {
+export function httpFactory(xhrBackend: XHRBackend, requestOptions: RequestOptions) {
   return new PreloadHttp(xhrBackend, requestOptions);
 }
-export function httpFactory(jsonpBackend: JSONPBackend, requestOptions: RequestOptions) {
+export function jsonpFactory(jsonpBackend: JSONPBackend, requestOptions: RequestOptions) {
   return new PreloadHttp(jsonpBackend, requestOptions);
 }
 

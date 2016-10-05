@@ -1,15 +1,4 @@
 import { getDOM } from './get-dom';
-// PRIVATE
-import {
-  BROWSER_SANITIZATION_PROVIDERS,
-  SharedStylesHost,
-  DomSharedStylesHost,
-  DomRootRenderer,
-  DomEventsPlugin,
-  KeyEventsPlugin,
-  HammerGesturesPlugin,
-} from './__private_imports__';
-// PRIVATE
 
 import {
   DOCUMENT,
@@ -17,8 +6,18 @@ import {
   AnimationDriver,
   EventManager,
   HAMMER_GESTURE_CONFIG,
-  HammerGestureConfig
+  HammerGestureConfig,
 } from '@angular/platform-browser';
+
+import {
+  KeyEventsPlugin,
+  DomEventsPlugin,
+  HammerGesturesPlugin,
+  BROWSER_SANITIZATION_PROVIDERS,
+  DomRootRenderer,
+  SharedStylesHost,
+  DomSharedStylesHost,
+} from './__private_imports__';
 
 import {
   ErrorHandler,
@@ -138,7 +137,7 @@ export class NodePlatform  {
     }
     return compiler.compileModuleAsync(moduleType)
         .then((moduleFactory) => {
-          NodePlatform._cache.set(moduleType, moduleFactory)
+          NodePlatform._cache.set(moduleType, moduleFactory);
           return moduleFactory;
         });
   }
@@ -207,10 +206,10 @@ export class NodePlatform  {
       try {
         document = store.get('DOCUMENT');
         if (typeof document !== 'string') {
-          document = Zone.current.get('document')
+          document = Zone.current.get('document');
         }
         if (typeof document !== 'string') {
-          document = Zone.current.get('DOCUMENT')
+          document = Zone.current.get('DOCUMENT');
         }
         let appRef = store.get('ApplicationRef');
         if (appRef && appRef.ngOnDestroy) {
@@ -507,8 +506,8 @@ export class NodePlatform  {
     }
     return compiler.compileModuleAsync(moduleType)
         .then((moduleFactory) => {
-          NodePlatform._cache.set(moduleType, moduleFactory)
-          return this.platformRef.bootstrapModuleFactory(moduleFactory)
+          NodePlatform._cache.set(moduleType, moduleFactory);
+          return this.platformRef.bootstrapModuleFactory(moduleFactory);
         });
   }
   bootstrapModuleFactory<T>(moduleFactory): Promise<NgModuleRef<T>> {
@@ -546,7 +545,6 @@ export class NodePlatform  {
  * the event loop and better management of refernces in task. This also allows for ZoneLocalStore.
  * We can also introduce sagas or serverless
  */
-// @internal
 function asyncPromiseSeries(store, modRef, errorHandler, cancelHandler, config, middleware, _timer = 1) {
   let errorCalled = false;
   config.time && console.time('id: ' + config.id + ' asyncPromiseSeries: ');
@@ -678,6 +676,12 @@ export function _ORIGIN_URL(_zone) {
   return Zone.current.get('originUrl');
 }
 
+export class MockTestabilityRegistry extends TestabilityRegistry {
+  registerApplication() {
+    return null;
+  }
+}
+
 
 @NgModule({
   providers: [
@@ -686,6 +690,7 @@ export function _ORIGIN_URL(_zone) {
     { provide: PlatformLocation, useClass: NodePlatformLocation },
 
     BROWSER_SANITIZATION_PROVIDERS,
+
     { provide: ErrorHandler, useFactory: _errorHandler, deps: [] },
 
     { provide: DOCUMENT, useFactory: _document, deps: _documentDeps },
@@ -719,7 +724,7 @@ export function _ORIGIN_URL(_zone) {
     { provide: ORIGIN_URL, useFactory: _ORIGIN_URL, deps: [ NgZone ] },
 
     { provide: APP_ID, useValue: '%cmp%' },
-    { provide: TestabilityRegistry, useValue: {registerApplication: () => null} }
+    { provide: TestabilityRegistry, useClass: MockTestabilityRegistry }
   ],
   exports: [  CommonModule, ApplicationModule  ]
 })

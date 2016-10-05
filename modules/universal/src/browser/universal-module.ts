@@ -3,9 +3,9 @@ import {
   APP_ID,
   Inject,
   APP_BOOTSTRAP_LISTENER,
-  Injectable,
   createPlatformFactory,
-  PlatformRef
+  PlatformRef,
+  OpaqueToken,
 } from '@angular/core';
 import { HttpModule, JsonpModule } from '@angular/http';
 
@@ -32,17 +32,38 @@ function _appIdRandomProviderFactory() {
 }
 // PRIVATE
 
-@Injectable()  // so that metadata is gathered for this class
-export class OpaqueToken {
-  constructor(private _desc: string) {}
-
-  toString(): string { return `Token ${this._desc}`; }
-}
-
 const SharedStylesHost: any = __platform_browser_private__.SharedStylesHost;
 
 export const UNIVERSAL_CACHE = new OpaqueToken('UNIVERSAL_CACHE');
 export const AUTO_PREBOOT = new OpaqueToken('AUTO_PREBOOT');
+
+export function universalCacheFactory() {
+  let _win: any = window;
+  let CACHE = Object.assign({}, _win.UNIVERSAL_CACHE || {});
+  delete _win.UNIVERSAL_CACHE;
+  return CACHE;
+}
+
+export function appIdFactory() {
+  let _win: any = window;
+  let CACHE = _win.UNIVERSAL_CACHE || {};
+  let appId = null;
+  if (CACHE.APP_ID) {
+    appId = CACHE.APP_ID;
+  } else {
+    appId = _appIdRandomProviderFactory();
+  }
+  return appId;
+}
+
+export function appBootstrapListenerFactory(autoPreboot: boolean) {
+  return () => {
+    let _win: any = window;
+    if (_win && prebootClient && autoPreboot) {
+      setTimeout(() => prebootClient().complete());
+    }
+  };
+}
 
 @NgModule({
   imports: [
@@ -55,26 +76,11 @@ export const AUTO_PREBOOT = new OpaqueToken('AUTO_PREBOOT');
   providers: [
     {
       provide: UNIVERSAL_CACHE,
-      useFactory: () => {
-        let _win: any = window;
-        let CACHE = Object.assign({}, _win.UNIVERSAL_CACHE || {});
-        delete _win.UNIVERSAL_CACHE;
-        return CACHE;
-      }
+      useFactory: universalCacheFactory,
     },
     {
       provide: APP_ID,
-      useFactory: () => {
-        let _win: any = window;
-        let CACHE = _win.UNIVERSAL_CACHE || {};
-        let appId = null;
-        if (CACHE.APP_ID) {
-          appId = CACHE.APP_ID;
-        } else {
-          appId = _appIdRandomProviderFactory();
-        }
-        return appId;
-      },
+      useFactory: appIdFactory,
       deps: []
     },
     {
@@ -84,14 +90,7 @@ export const AUTO_PREBOOT = new OpaqueToken('AUTO_PREBOOT');
     {
       multi: true,
       provide: APP_BOOTSTRAP_LISTENER,
-      useFactory: (autoPreboot: boolean) => {
-        return () => {
-          let _win: any = window;
-          if (_win && prebootClient && autoPreboot) {
-            setTimeout(() => prebootClient().complete());
-          }
-        };
-      },
+      useFactory: appBootstrapListenerFactory,
       deps: [ AUTO_PREBOOT ],
     },
   ]
