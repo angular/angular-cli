@@ -35,21 +35,21 @@ matrix:
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT=tests/e2e_runner.js
-    - node_js: "4"
-      os: osx
-      env: SCRIPT=test
-    - node_js: "4"
-      os: osx
-      env: NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "6"
-      os: osx
-      env: SCRIPT=test
-    - node_js: "6"
-      os: osx
-      env: NODE_SCRIPT=tests/e2e_runner.js
-    - node_js: "6"
-      os: osx
+      os: linux
       env: TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js"
+    - node_js: "4"
+      os: osx
+      env: SCRIPT=test
+    - node_js: "4"
+      os: osx
+      env: NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "6"
+      os: osx
+      env: SCRIPT=test
+    - node_js: "6"
+      os: osx
+      env: NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "6"
       os: osx
       env: TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js --nightly"

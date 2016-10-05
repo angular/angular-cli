@@ -13,5 +13,8 @@
     "typeRoots": [
       "../node_modules/@types"
     ]
-  }
+  }<% if (isMobile) { %>,
+  "exclude": [
+    "main-app-shell.ts"
+  ]<% } %>
 }
