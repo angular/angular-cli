@@ -1,4 +1,4 @@
-import {isMobileTest, expectToFail} from '../../utils/utils';
+import {isMobileTest} from '../../utils/utils';
 import {expectFileToMatch, expectFileToExist} from '../../utils/fs';
 
 
@@ -13,5 +13,5 @@ export default function() {
     app works!
   </h1>
   </app-root>`))
-    .then(() => expectFileToExist('dist/manifest.webapp'))
+    .then(() => expectFileToExist('dist/manifest.webapp'));
 }
