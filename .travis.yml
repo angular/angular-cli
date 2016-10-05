@@ -21,6 +21,7 @@ matrix:
     - node_js: "5"
     - os: osx
     - env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+    - env: TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js --nightly"
   include:
     - node_js: "5"
       os: linux
@@ -46,6 +47,9 @@ matrix:
     - node_js: "6"
       os: osx
       env: NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "6"
+      os: osx
+      env: TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js"
     - node_js: "6"
       os: osx
       env: TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js --nightly"
