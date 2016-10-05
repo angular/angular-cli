@@ -8,13 +8,10 @@ export default function() {
   }
 
   return Promise.resolve()
-    // Service Worker
-    .then(() => expectToFail(() => expectFileToMatch('dist/index.html',
-                                                     'if (\'serviceWorker\' in navigator) {')))
-    .then(() => expectToFail(() => expectFileToExist('dist/worker.js')))
-
-    // Asynchronous bundle
-    .then(() => expectToFail(() => expectFileToMatch('dist/index.html',
-                                                   '<script src="/app-concat.js" async></script>')))
-    .then(() => expectToFail(() => expectFileToExist('dist/app-concat.js')));
+    .then(() => expectFileToMatch('dist/index.html', `<app-root>
+  <h1>
+    app works!
+  </h1>
+  </app-root>`))
+    .then(() => expectFileToExist('dist/manifest.webapp'))
 }

@@ -22,9 +22,8 @@ export default function() {
     .then(() => expectFileToMatch('dist/scripts.bundle.js', '/*!\\n * Bootstrap'))
     .then(() => expectFileToMatch('dist/styles.bundle.js', '/*!\\n * Bootstrap'))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <script type="text/javascript" src="inline.js"></script>
-      <script type="text/javascript" src="styles.bundle.js"></script>
-      <script type="text/javascript" src="scripts.bundle.js"></script>
-      <script type="text/javascript" src="main.bundle.js"></script>
+      <script src="styles.bundle.js" type="text/javascript" async></script>
+      <script src="scripts.bundle.js" type="text/javascript" async></script>
+      <script src="main.bundle.js" type="text/javascript" async></script>
     `));
 }
