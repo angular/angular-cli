@@ -12,7 +12,8 @@ export class LazyComponent {}
   imports: [
     RouterModule.forChild([
      {path: '', component: LazyComponent, pathMatch: 'full'},
-     {path: 'feature', loadChildren: './feature/feature.module#FeatureModule'}
+     {path: 'feature', loadChildren: './feature/feature.module#FeatureModule'},
+     {path: 'lazy-feature', loadChildren: './feature/lazy-feature.module#LazyFeatureModule'}
     ]),
     HttpModule
   ],

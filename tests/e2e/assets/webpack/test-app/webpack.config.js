@@ -1,5 +1,4 @@
-const NgcWebpackPlugin = require('@ngtools/webpack').NgcWebpackPlugin;
-const path = require('path');
+const ngToolsWebpack = require('@ngtools/webpack');
 
 module.exports = {
   resolve: {
@@ -12,9 +11,8 @@ module.exports = {
     filename: 'app.main.js'
   },
   plugins: [
-    new NgcWebpackPlugin({
-      project: './tsconfig.json',
-      baseDir: path.resolve(__dirname, '')
+    new ngToolsWebpack.AotPlugin({
+      tsConfigPath: './tsconfig.json'
     })
   ],
   module: {
