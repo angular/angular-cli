@@ -14,13 +14,14 @@ env:
     - SCRIPT=test
     - NODE_SCRIPT=tests/e2e_runner.js
     - NODE_SCRIPT="tests/e2e_runner.js --nightly"
-#    - TARGET=mobile SCRIPT=mobile_test
+    - TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js --nightly"
 matrix:
   fast_finish: true
   allow_failures:
     - node_js: "5"
     - os: osx
     - env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+    - env: TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js --nightly"
   include:
     - node_js: "5"
       os: linux
@@ -34,6 +35,9 @@ matrix:
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "6"
+      os: linux
+      env: TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js"
     - node_js: "4"
       os: osx
       env: SCRIPT=test
@@ -46,6 +50,9 @@ matrix:
     - node_js: "6"
       os: osx
       env: NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "6"
+      os: osx
+      env: TARGET=mobile NODE_SCRIPT="tests/e2e_runner.js --nightly"
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi

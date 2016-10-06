@@ -2,8 +2,10 @@ import * as path from 'path';
 const OfflinePlugin = require('offline-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 import { PrerenderWebpackPlugin } from '../utilities/prerender-webpack-plugin';
+import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
-export const getWebpackMobileConfigPartial = function (projectRoot: string, appConfig: any) {
+export const getWebpackMobileConfigPartial = function (projectRoot: string, appConfig: any,
+    baseHref: string) {
   // Hardcoded files and paths here should be part of appConfig when
   // reworking the mobile app functionality
   return {
@@ -17,8 +19,11 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, appC
           to: path.resolve(projectRoot, appConfig.outDir)
         }
       ]),
+      new BaseHrefWebpackPlugin({
+        baseHref: baseHref
+      }),
       new PrerenderWebpackPlugin({
-        templatePath: 'index.html',
+        templatePath: path.resolve(projectRoot, appConfig.root, 'index.html'),
         configPath: path.resolve(projectRoot, appConfig.root, 'main-app-shell.ts'),
         appPath: path.resolve(projectRoot, appConfig.root)
       })
@@ -26,7 +31,8 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, appC
   };
 };
 
-export const getWebpackMobileProdConfigPartial = function (projectRoot: string, appConfig: any) {
+export const getWebpackMobileProdConfigPartial = function (projectRoot: string, appConfig: any,
+    baseHref: string) {
   return {
     entry: {
       'sw-install': path.resolve(__dirname, '../utilities/sw-install.js')
