@@ -54,7 +54,6 @@
     "fs.realpath": "^1.0.0",
     "glob": "^7.0.3",
     "handlebars": "^4.0.5",
-    "html-loader": "^0.4.4",
     "html-webpack-plugin": "^2.19.0",
     "istanbul-instrumenter-loader": "^0.2.0",
     "json-loader": "^0.5.4",
