@@ -1,6 +1,6 @@
 {
   "name": "angular-cli",
-  "version": "1.0.0-beta.16",
+  "version": "1.0.0-beta.17",
   "description": "CLI tool for Angular",
   "main": "packages/angular-cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",

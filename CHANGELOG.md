@@ -1,3 +1,27 @@
+<a name="1.0.0-beta.17"></a>
+# [1.0.0-beta.17](https://github.com/angular/angular-cli/compare/v1.0.0-beta.16...v1.0.0-beta.17) (2016-10-07)
+
+
+### Bug Fixes
+
+* **build:** remove html-loader ([#2537](https://github.com/angular/angular-cli/issues/2537)) ([afb36e8](https://github.com/angular/angular-cli/commit/afb36e8))
+* **build:** use baseUrl and paths from tsconfig ([#2470](https://github.com/angular/angular-cli/issues/2470)) ([32e60b7](https://github.com/angular/angular-cli/commit/32e60b7))
+* **cli:** fix `completion` and `make-this-awesome` command invalid problem([#1889](https://github.com/angular/angular-cli/issues/1889)) ([4b36ecf](https://github.com/angular/angular-cli/commit/4b36ecf)), closes [#1890](https://github.com/angular/angular-cli/issues/1890)
+* **generate:** use prefix when initializing app ([#2046](https://github.com/angular/angular-cli/issues/2046)) ([#2367](https://github.com/angular/angular-cli/issues/2367)) ([06976f4](https://github.com/angular/angular-cli/commit/06976f4))
+* **typo:** fixed typo in README ([#2383](https://github.com/angular/angular-cli/issues/2383)) ([f6a39b2](https://github.com/angular/angular-cli/commit/f6a39b2))
+* **webpack:** Added ContextReplacementPlugin to remove ng test warning ([c2f4b37](https://github.com/angular/angular-cli/commit/c2f4b37)), closes [#2362](https://github.com/angular/angular-cli/issues/2362)
+* check for old version of the CLI on empty project ([2b6bfe7](https://github.com/angular/angular-cli/commit/2b6bfe7)), closes [#2135](https://github.com/angular/angular-cli/issues/2135) [#2178](https://github.com/angular/angular-cli/issues/2178)
+
+
+### Features
+
+* **aot:** adding README and type checking. ([8a5b265](https://github.com/angular/angular-cli/commit/8a5b265)), closes [#2527](https://github.com/angular/angular-cli/issues/2527)
+* **aot:** creating files in a virtual fs. ([#2464](https://github.com/angular/angular-cli/issues/2464)) ([790a1b4](https://github.com/angular/angular-cli/commit/790a1b4))
+* **aot:** do not populate the whole filesystem if nothing changed ([#2490](https://github.com/angular/angular-cli/issues/2490)) ([b5771df](https://github.com/angular/angular-cli/commit/b5771df))
+* **template:** issue template look better ([#2384](https://github.com/angular/angular-cli/issues/2384)) ([398cfb3](https://github.com/angular/angular-cli/commit/398cfb3))
+
+
+
 <a name="1.0.0-beta.16"></a>
 # [1.0.0-beta.16](https://github.com/angular/angular-cli/compare/v1.0.0-beta.15...v1.0.0-beta.16) (2016-09-28)
 
