@@ -32,7 +32,12 @@
             "default": "dist/"
           },
           "assets": {
-            "type": "string"
+            "fixme": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [] 
           },
           "index": {
             "type": "string",
