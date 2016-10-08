@@ -1,8 +1,8 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
+import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
@@ -127,12 +127,10 @@ export function getWebpackCommonConfig(
         filename: 'inline.js',
         sourceMapFilename: 'inline.map'
       }),
-      new CopyWebpackPlugin([{
-        context: path.resolve(appRoot, appConfig.assets),
-        from: { glob: '**/*', dot: true },
-        ignore: [ '.gitkeep' ],
-        to: path.resolve(projectRoot, appConfig.outDir, appConfig.assets)
-      }])
+      new GlobCopyWebpackPlugin({
+        patterns: appConfig.assets,
+        globOptions: {cwd: appRoot, dot: true, ignore: '**/.gitkeep'}
+      })
     ],
     node: {
       fs: 'empty',
