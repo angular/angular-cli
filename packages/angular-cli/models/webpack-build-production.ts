@@ -45,7 +45,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
           },
           postcss: [
             require('postcss-discard-comments')
-          ],
+          ]
         }
       })
     ],
