@@ -7,7 +7,10 @@
     {
       "root": "<%= sourceDir %>",
       "outDir": "dist",
-      "assets": "assets",
+      "assets": [
+        "assets",
+        "favicon.ico"
+      ],
       "index": "index.html",
       "main": "main.ts",
       "test": "test.ts",

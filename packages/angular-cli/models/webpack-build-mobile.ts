@@ -1,6 +1,6 @@
 import * as path from 'path';
 const OfflinePlugin = require('offline-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+import { GlobCopyWebpackPlugin } from '../plugins/glob-copy-webpack-plugin';
 import { PrerenderWebpackPlugin } from '../utilities/prerender-webpack-plugin';
 
 export const getWebpackMobileConfigPartial = function (projectRoot: string, appConfig: any) {
@@ -8,15 +8,10 @@ export const getWebpackMobileConfigPartial = function (projectRoot: string, appC
   // reworking the mobile app functionality
   return {
     plugins: [
-      new CopyWebpackPlugin([
-        {
-          from: path.resolve(projectRoot, appConfig.root, 'icons'),
-          to: path.resolve(projectRoot, appConfig.outDir, 'icons')
-        }, {
-          from: path.resolve(projectRoot, appConfig.root, 'manifest.webapp'),
-          to: path.resolve(projectRoot, appConfig.outDir)
-        }
-      ]),
+      new GlobCopyWebpackPlugin({
+        patterns: [ 'icons', 'manifest.webapp'],
+        globOptions: {cwd: appConfig.root, dot: true, ignore: '**/.gitkeep'}
+      }),
       new PrerenderWebpackPlugin({
         templatePath: 'index.html',
         configPath: path.resolve(projectRoot, appConfig.root, 'main-app-shell.ts'),
