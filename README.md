@@ -16,6 +16,8 @@ This project is very much still a work in progress.
 The CLI is now in beta.
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
+Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
+
 ## Webpack update
 
 We changed the build system between beta.10 and beta.14, from SystemJS to Webpack.
@@ -39,7 +41,7 @@ with NPM 3 or higher.
 * [Creating a Build](#creating-a-build)
 * [Build Targets and Environment Files](#build-targets-and-environment-files)
 * [Base tag handling in index.html](#base-tag-handling-in-indexhtml)
-* [Adding extra files to the build](#adding-extra-files-to-the-build)
+* [Bundling](#bundling)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Proxy To Backend](#proxy-to-backend)
@@ -47,12 +49,12 @@ with NPM 3 or higher.
 * [Linting and formatting code](#linting-and-formatting-code)
 * [Support for offline applications](#support-for-offline-applications)
 * [Commands autocompletion](#commands-autocompletion)
+* [Project assets](#project-assets)
 * [Global styles](#global-styles)
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
 * [Global Library Installation](#global-library-installation)
 * [Updating angular-cli](#updating-angular-cli)
-* [Known Issues](#known-issues)
 * [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
 
 ## Installation
@@ -290,6 +292,10 @@ ng completion >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
+### Project assets
+
+You can add any files you want copied as-is to `src/assets/`. 
+
 ### Global styles
 
 The `styles.css` file allows users to add global styles and supports
@@ -416,17 +422,6 @@ Carefully read the diffs for each code file, and either accept the changes or in
 **The main cause of errors after an update is failing to incorporate these updates into your code**.
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
-
-
-## Known issues
-
-This project is currently a prototype so there are many known issues. Just to mention a few:
-
-- All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
-- On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
-- The initial installation as well as `ng new` take too long because of lots of npm dependencies.
-- Many existing ember addons are not compatible with Angular apps built via angular-cli.
-- When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
 
 
 ## Development Hints for hacking on angular-cli
