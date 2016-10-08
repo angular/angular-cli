@@ -43,7 +43,10 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
               [/\[?\(?/, /(?:)/]
             ],
             customAttrAssign: [/\)?\]?=/]
-          }
+          },
+          postcss: [
+            require('postcss-discard-comments')
+          ]
         }
       })
     ],
