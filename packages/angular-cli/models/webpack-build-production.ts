@@ -3,6 +3,16 @@ const WebpackMd5Hash = require('webpack-md5-hash');
 const CompressionPlugin = require('compression-webpack-plugin');
 import * as webpack from 'webpack';
 
+declare module 'webpack' {
+  export interface LoaderOptionsPlugin {}
+  export interface LoaderOptionsPluginStatic {
+    new (optionsObject: any): LoaderOptionsPlugin;
+  }
+  interface Webpack {
+    LoaderOptionsPlugin: LoaderOptionsPluginStatic;
+  }
+}
+
 export const getWebpackProdConfigPartial = function(projectRoot: string, appConfig: any) {
   return {
     devtool: 'source-map',
@@ -28,11 +38,6 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
       }),
       new webpack.LoaderOptionsPlugin({
         options: {
-          tslint: {
-            emitErrors: true,
-            failOnHint: true,
-            resourcePath: path.resolve(projectRoot, appConfig.root)
-          },
           htmlLoader: {
             minimize: true,
             removeAttributeQuotes: false,
