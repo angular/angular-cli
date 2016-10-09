@@ -20,8 +20,9 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
+    "@angular/tsc-wrapped": "^0.3.0",
     "rxjs": "5.0.0-beta.11",
     "denodeify": "^1.2.1",
-    "typescript": "2.0.0"
+    "typescript": "2.0.2"
   }
 }
