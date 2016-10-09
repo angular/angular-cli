@@ -6,6 +6,7 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { webpackOutputOptions } from '../models/';
 import { BuildOptions } from '../commands/build';
+import { CliConfig } from '../models/config';
 
 let lastHash: any = null;
 
@@ -14,13 +15,14 @@ export default Task.extend({
 
     const project = this.cliProject;
 
-    rimraf.sync(path.resolve(project.root, runTaskOptions.outputPath));
+    const outputDir = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
+    rimraf.sync(path.resolve(project.root, outputDir));
 
     const config = new NgCliWebpackConfig(
       project,
       runTaskOptions.target,
       runTaskOptions.environment,
-      runTaskOptions.outputPath,
+      outputDir,
       runTaskOptions.baseHref,
       runTaskOptions.aot
     ).config;
