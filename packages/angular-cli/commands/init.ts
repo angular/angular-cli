@@ -105,7 +105,8 @@ const InitCommand: any = Command.extend({
       mobile: commandOptions.mobile,
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
-      inlineTemplate: commandOptions.inlineTemplate
+      inlineTemplate: commandOptions.inlineTemplate,
+      ignoredUpdateFiles: ['favicon.ico']
     };
 
     if (!validProjectName(packageName)) {
