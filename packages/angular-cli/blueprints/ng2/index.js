@@ -16,6 +16,12 @@ module.exports = {
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
   ],
 
+  beforeInstall: function(options) {
+    if (options.ignoredUpdateFiles && options.ignoredUpdateFiles.length > 0) {
+      return Blueprint.ignoredUpdateFiles = Blueprint.ignoredUpdateFiles.concat(options.ignoredUpdateFiles);
+    }
+  },
+
   afterInstall: function (options) {
     if (options.mobile) {
       return Blueprint.load(path.join(__dirname, '../mobile')).install(options);
