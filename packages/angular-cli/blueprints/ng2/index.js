@@ -26,8 +26,8 @@ module.exports = {
     this.styleExt = options.style;
     this.version = require(path.resolve(__dirname, '../../package.json')).version;
 
-    // Join with / not path.sep as reference to typings require forward slashes.
-    const relativeRootPath = options.sourceDir.split(path.sep).map(() => '..').join('/');
+    // Split/join with / not path.sep as reference to typings require forward slashes.
+    const relativeRootPath = options.sourceDir.split('/').map(() => '..').join('/');
     const fullAppName = stringUtils.dasherize(options.entity.name)
       .replace(/-(.)/g, (_, l) => ' ' + l.toUpperCase())
       .replace(/^./, (l) => l.toUpperCase());
