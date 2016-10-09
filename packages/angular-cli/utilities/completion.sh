@@ -30,7 +30,7 @@ if type complete &>/dev/null; then
       ng) opts=$ng_opts ;;
       b|build) opts=$build_opts ;;
       g|generate) opts=$generate_opts ;;
-      gh-pages:deploy|github-pages:deploy) opts=$github_pages_deploy_opts
+      gh-pages:deploy|github-pages:deploy) opts=$github_pages_deploy_opts ;;
       h|help|-h|--help) opts=$help_opts ;;
       init) opts=$init_opts ;;
       new) opts=$new_opts ;;
@@ -58,7 +58,7 @@ elif type compctl &>/dev/null; then
       ng) opts=$ng_opts ;;
       b|build) opts=$build_opts ;;
       g|generate) opts=$generate_opts ;;
-      gh-pages:deploy|github-pages:deploy) opts=$github_pages_deploy_opts
+      gh-pages:deploy|github-pages:deploy) opts=$github_pages_deploy_opts ;;
       h|help|-h|--help) opts=$help_opts ;;
       init) opts=$init_opts ;;
       new) opts=$new_opts ;;
