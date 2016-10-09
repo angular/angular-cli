@@ -149,11 +149,6 @@ describe('Acceptance: ng init', function () {
   it('init an already init\'d folder', function () {
     return ng(['init', '--skip-npm', '--skip-bower'])
       .then(function () {
-        // ignore the favicon file for the the unit test since it breaks at ember-cli level
-        // when trying to re-init
-        Blueprint.ignoredFiles.push('favicon.ico');
-      })
-      .then(function () {
         return ng(['init', '--skip-npm', '--skip-bower']);
       })
       .then(confirmBlueprinted);
