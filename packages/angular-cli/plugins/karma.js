@@ -1,5 +1,6 @@
 const path = require('path');
 const getWebpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
+const CliConfig = require('../models/config').CliConfig;
 
 const init = (config) => {
 
@@ -23,8 +24,12 @@ const init = (config) => {
       timings: false,
       chunks: false,
       chunkModules: false
+    },
+    watchOptions: {
+      poll: CliConfig.fromProject().config.defaults.poll
     }
   };
+
   config.webpack = Object.assign(webpackConfig, config.webpack);
   config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
 
