@@ -1,6 +1,11 @@
 import * as child_process from 'child_process';
 import {blue, white, yellow} from 'chalk';
 const treeKill = require('tree-kill');
+const minimist = require('minimist');
+
+const argv = minimist(process.argv.slice(2), {
+  'boolean': ['aot'],
+});
 
 
 interface ExecOptions {
@@ -102,6 +107,10 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
 
 export function ng(...args: string[]) {
   if (args[0] == 'build') {
+    // force --aot if flag is passed to test runner
+    if (argv.aot && !args.find((el) => el === '--aot')) {
+      args.push('--aot');
+    }
     return silentNg(...args);
   } else {
     return _exec({}, 'ng', args);
