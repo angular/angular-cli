@@ -137,6 +137,8 @@ export function getWebpackCommonConfig(
       fs: 'empty',
       global: true,
       crypto: 'empty',
+      tls: 'empty',
+      net: 'empty',
       module: false,
       clearImmediate: false,
       setImmediate: false
