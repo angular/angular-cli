@@ -276,19 +276,19 @@ To turn on auto completion use the following commands:
 
 For bash:
 ```bash
-ng completion >> ~/.bashrc
+ng completion 1>> ~/.bashrc 2>>&1
 source ~/.bashrc
 ```
 
 For zsh:
 ```bash
-ng completion >> ~/.zshrc
+ng completion 1>> ~/.zshrc 2>>&1
 source ~/.zshrc
 ```
 
 Windows users using gitbash:
 ```bash
-ng completion >> ~/.bash_profile
+ng completion 1>> ~/.bash_profile 2>>&1
 source ~/.bash_profile
 ```
 
@@ -350,7 +350,7 @@ npm install d3 --save
 npm install @types/d3 --save-dev
 ```
 
-If the library doesn't have typings available at `@types/`, you can still use it by 
+If the library doesn't have typings available at `@types/`, you can still use it by
 manually adding typings for it:
 ```
 // in src/typings.d.ts
