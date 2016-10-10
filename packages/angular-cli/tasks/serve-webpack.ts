@@ -63,6 +63,7 @@ export default Task.extend({
       stats: webpackDevServerOutputOptions,
       inline: true,
       proxy: proxyConfig,
+      compress: commandOptions.target === 'production',
       watchOptions: {
         poll: CliConfig.fromProject().config.defaults.poll
       }
