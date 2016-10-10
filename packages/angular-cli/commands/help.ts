@@ -17,7 +17,7 @@ const HelpCommand = Command.extend({
 
   availableOptions: [],
 
-  run: function (commandOptions: any) {
+  run: function (commandOptions: any, rawArgs: any) {
     let commandFiles = fs.readdirSync(__dirname)
       // Remove files that are not JavaScript or Typescript
       .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
@@ -47,7 +47,14 @@ const HelpCommand = Command.extend({
         tasks: this.tasks
       });
 
-      this.ui.writeLine(command.printBasicHelp(commandOptions));
+      if (rawArgs.length > 0) {
+        if (cmd === rawArgs[0]) {
+          this.ui.writeLine(command.printDetailedHelp(commandOptions));
+        }
+      } else {
+        this.ui.writeLine(command.printBasicHelp(commandOptions));
+      }
+
     });
   }
 });
