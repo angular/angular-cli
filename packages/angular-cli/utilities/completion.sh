@@ -2,7 +2,8 @@
 #
 # ng command completion script
 #
-# Installation: ng completion >> ~/.bashrc (or ~/.zshrc)
+# Installation: ng completion 1>> ~/.bashrc 2>>&1
+#           or  ng completion 1>> ~/.zshrc 2>>&1
 #
 
 ng_opts='b build completion doc e2e g generate get github-pages:deploy gh-pages:deploy h help i init install lint make-this-awesome new s serve server set t test v version -h --help'
