@@ -14,7 +14,7 @@ declare module 'webpack' {
 
 export const getWebpackDevConfigPartial = function(projectRoot: string, appConfig: any) {
   return {
-    devtool: 'source-map',
+    devtool: 'cheap-module-source-map',
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].bundle.js',
