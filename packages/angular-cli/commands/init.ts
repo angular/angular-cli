@@ -133,8 +133,12 @@ const InitCommand: any = Command.extend({
         }
       }.bind(this))
       .then(function () {
-        if (!commandOptions.skipNpm) {
-          return npmInstall.run();
+        if (!commandOptions.useYarn) {
+          if (!commandOptions.skipNpm) {
+            return npmInstall.run();
+          }
+        } else {
+          return yarn.run();
         }
       })
       .then(function () {
