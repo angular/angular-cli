@@ -4,8 +4,18 @@ import { TestBed, async } from '@angular/core/testing';
 import { <%= classifiedModuleName %>Component } from './<%= dasherizedModuleName %>.component';
 
 describe('Component: <%= classifiedModuleName %>', () => {
-  it('should create an instance', () => {
-    let component = new <%= classifiedModuleName %>Component();
-    expect(component).toBeTruthy();
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        <%= classifiedModuleName %>Component
+      ],
+    });
   });
+
+  it('should create an instance', async(() => {
+    let fixture = TestBed.createComponent(<%= classifiedModuleName %>Component);
+    let cmp = fixture.debugElement.componentInstance;
+    expect(cmp).toBeTruthy();
+  }));
 });
