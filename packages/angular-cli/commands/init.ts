@@ -1,5 +1,6 @@
 import LinkCli from '../tasks/link-cli';
 import NpmInstall from '../tasks/npm-install';
+import Yarn from '../tasks/yarn';
 
 const Command = require('ember-cli/lib/models/command');
 const Promise = require('ember-cli/lib/ext/promise');
@@ -19,6 +20,7 @@ const InitCommand: any = Command.extend({
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
+    { name: 'use-yarn', type: Boolean, default: false, aliases: ['uy'] },
     { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
     { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
     { name: 'name', type: String, default: '', aliases: ['n'] },
@@ -56,8 +58,17 @@ const InitCommand: any = Command.extend({
     }
 
     let npmInstall: any;
-    if (!commandOptions.skipNpm) {
-      npmInstall = new NpmInstall({
+    let yarn: any;
+    if (!commandOptions.useYarn) {
+      if (!commandOptions.skipNpm) {
+        npmInstall = new NpmInstall({
+          ui: this.ui,
+          analytics: this.analytics,
+          project: this.project
+        });
+      }
+    } else {
+      yarn = new Yarn({
         ui: this.ui,
         analytics: this.analytics,
         project: this.project
