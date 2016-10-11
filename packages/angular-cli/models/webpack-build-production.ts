@@ -5,7 +5,6 @@ import * as webpack from 'webpack';
 
 export const getWebpackProdConfigPartial = function(projectRoot: string, appConfig: any) {
   return {
-    debug: false,
     devtool: 'source-map',
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
@@ -25,27 +24,31 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
           test: /\.js$|\.html$/,
           threshold: 10240,
           minRatio: 0.8
+      }),
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          tslint: {
+            emitErrors: true,
+            failOnHint: true,
+            resourcePath: path.resolve(projectRoot, appConfig.root)
+          },
+          htmlLoader: {
+            minimize: true,
+            removeAttributeQuotes: false,
+            caseSensitive: true,
+            customAttrSurround: [
+              [/#/, /(?:)/],
+              [/\*/, /(?:)/],
+              [/\[?\(?/, /(?:)/]
+            ],
+            customAttrAssign: [/\)?\]?=/]
+          }
+        }
       })
     ],
-    tslint: {
-      emitErrors: true,
-      failOnHint: true,
-      resourcePath: path.resolve(projectRoot, appConfig.root)
-    },
-    htmlLoader: {
-      minimize: true,
-      removeAttributeQuotes: false,
-      caseSensitive: true,
-      customAttrSurround: [
-        [/#/, /(?:)/],
-        [/\*/, /(?:)/],
-        [/\[?\(?/, /(?:)/]
-      ],
-      customAttrAssign: [/\)?\]?=/]
-    },
     node: {
       fs: 'empty',
-      global: 'window',
+      global: true,
       crypto: 'empty',
       process: true,
       module: false,

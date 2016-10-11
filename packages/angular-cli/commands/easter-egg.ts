@@ -8,27 +8,27 @@ function pickOne(of: string[]): string {
 }
 
 
-export default function(name: string) {
-  return Command.extend({
-    name: name,
-    works: 'insideProject',
+const MakeThisAwesomeCommand = Command.extend({
+  name: 'make-this-awesome',
+  works: 'insideProject',
 
-    run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
-      (this as any)[stringUtils.camelize(this.name)](commandOptions, rawArgs);
+  run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
+    (this as any)[stringUtils.camelize(this.name)](commandOptions, rawArgs);
 
-      return Promise.resolve();
-    },
+    return Promise.resolve();
+  },
 
-    makeThisAwesome: function() {
-      const phrase = pickOne([
-        `You're on it, there's nothing for me to do!`,
-        `Let's take a look... nope, it's all good!`,
-        `You're doing fine.`,
-        `You're already doing great.`,
-        `Nothing to do; already awesome. Exiting.`,
-        `Error 418: As Awesome As Can Get.`
-      ]);
-      console.log(chalk.green(phrase));
-    }
-  });
-};
+  makeThisAwesome: function() {
+    const phrase = pickOne([
+      `You're on it, there's nothing for me to do!`,
+      `Let's take a look... nope, it's all good!`,
+      `You're doing fine.`,
+      `You're already doing great.`,
+      `Nothing to do; already awesome. Exiting.`,
+      `Error 418: As Awesome As Can Get.`
+    ]);
+    console.log(chalk.green(phrase));
+  }
+});
+
+export default MakeThisAwesomeCommand;

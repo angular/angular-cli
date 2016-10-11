@@ -26,7 +26,8 @@ You can update your `beta.10` projects to `beta.14` by following [these instruct
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**.
+Both the CLI and generated project have dependencies that require Node 4 or higher, together
+with NPM 3 or higher.
 
 ## Table of Contents
 
@@ -319,7 +320,7 @@ export class AppComponent {
 }
 ```
 
-When generating a new project you can also define which extention you want for
+When generating a new project you can also define which extension you want for
 style files:
 
 ```bash
@@ -341,6 +342,17 @@ If the library does not include typings, you can install them using npm:
 ```bash
 npm install d3 --save
 npm install @types/d3 --save-dev
+```
+
+If the library doesn't have typings available at `@types/`, you can still use it by 
+manually adding typings for it:
+```
+// in src/typings.d.ts
+declare module 'typeless-package';
+
+// in src/app/app.component.ts
+import * as typelessPackage from 'typeless-package';
+typelessPackage.method();
 ```
 
 ### Global Library Installation

@@ -33,8 +33,7 @@ export function getWebpackCommonConfig(
   return {
     devtool: 'source-map',
     resolve: {
-      extensions: ['', '.ts', '.js'],
-      root: appRoot
+      extensions: ['.ts', '.js']
     },
     context: path.resolve(__dirname, './'),
     entry: entry,
@@ -43,18 +42,15 @@ export function getWebpackCommonConfig(
       filename: '[name].bundle.js'
     },
     module: {
-      preLoaders: [
+      rules: [
         {
+          enforce: 'pre',
           test: /\.js$/,
           loader: 'source-map-loader',
           exclude: [
             /node_modules/
           ]
-        }
-      ],
-      loaders: [
-        // TypeScript loaders are separated into webpack-build-typescript.
-
+        },
         // in main, load css as raw text
         {
           exclude: styles,
@@ -98,7 +94,7 @@ export function getWebpackCommonConfig(
 
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
-        { test: /\.html$/, loader: 'html-loader' },
+        { test: /\.html$/, loader: 'raw-loader' },
 
         { test: /\.(otf|woff|ttf|svg)$/, loader: 'url?limit=10000' },
         { test: /\.woff2$/, loader: 'url?limit=10000&mimetype=font/woff2' },
@@ -140,7 +136,7 @@ export function getWebpackCommonConfig(
     ],
     node: {
       fs: 'empty',
-      global: 'window',
+      global: true,
       crypto: 'empty',
       module: false,
       clearImmediate: false,
