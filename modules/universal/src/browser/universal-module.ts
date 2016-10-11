@@ -99,8 +99,8 @@ export class UniversalModule {
   constructor(@Inject(SharedStylesHost) sharedStylesHost: any) {
     const domStyles = document.head.querySelectorAll('style');
     const styles = Array.prototype.slice.call(domStyles)
-      .filter((style) => style.innerText.indexOf('_ng') !== -1)
-      .map((style) => style.innerText);
+      .filter((style) => (style.innerText || style.textContent).indexOf('_ng') !== -1)
+      .map((style) => (style.innerText || style.textContent));
 
     styles.forEach(style => {
       sharedStylesHost._stylesSet.add(style);
