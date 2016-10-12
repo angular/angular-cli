@@ -471,6 +471,9 @@ export class NodeDomRenderer extends DomRenderer {
         propertyValue = '';
       }
     }
+    if (propertyName === 'innerHTML') {
+      return super.setElementProperty(renderElement, propertyName, propertyValue);
+    }
     // ignore boolean prop values for parse5 serialize
     if ((propertyName === 'autofocus' || propertyName === 'spellcheck') && propertyValue === false) {
         return;
