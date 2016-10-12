@@ -8,41 +8,47 @@ const parse5: any = require('parse5');
 
 import {
   ListWrapper,
-  StringMapWrapper,
   isPresent,
   isBlank,
   setValueOnPath,
 } from './helper';
 
-declare var Zone: any;
-
 // **** ^ All replaced ****
 
-var parser: any = null;
-var serializer: any = null;
-var treeAdapter: any = null;
+declare var Zone: any;
 
-var _attrToPropMap: {[key: string]: string} = {
+let treeAdapter: any = null;
+
+const _attrToPropMap: {[key: string]: string} = {
   'class': 'className',
   'innerHtml': 'innerHTML',
   'readonly': 'readOnly',
   'tabindex': 'tabIndex',
 };
 
-var mapProps = ['attribs', 'x-attribsNamespace', 'x-attribsPrefix'];
+// let defDoc: any = null;
 
-function _notImplemented(methodName: any) {
+const mapProps = ['attribs', 'x-attribsNamespace', 'x-attribsPrefix'];
+
+function _notImplemented(methodName: string) {
   return new Error('This method is not implemented in Parse5DomAdapter: ' + methodName);
 }
 
 /* tslint:disable:requireParameterType */
+/**
+ * A `DomAdapter` powered by the `parse5` NodeJS module.
+ *
+ * @security Tread carefully! Interacting with the DOM directly is dangerous and
+ * can introduce XSS risks.
+ */
 export class Parse5DomAdapter extends DomAdapter {
+
   static makeCurrent() {
-    parser = parse5;
-    serializer = parse5.serialize;
     treeAdapter = parse5.treeAdapters.htmlparser2;
     setRootDomAdapter(new Parse5DomAdapter());
   }
+
+  parse(_templateHtml: string) { throw _notImplemented('parse'); }
 
   hasProperty(_element: any, name: string): boolean {
     /* tslint:disable */
@@ -64,36 +70,48 @@ export class Parse5DomAdapter extends DomAdapter {
   // by not using the DomRenderer in tests. Keeping this for now to make tests happy...
   getProperty(el: /*element*/ any, name: string): any { return el[name]; }
 
-  logError(error: any) { console.error(error); }
-
-  log(error: any) { console.log(error); }
-
-  logGroup(error: any) { console.error(error); }
-
+  invoke(_el: any /* Element */, _methodName: string, _args: any[]): any {
+    
+    switch (_methodName) {
+      case 'createElement': return this.createElement(_args[0]);
+      case 'query': return this.query(_args[0]);
+      case 'querySelector': return this.querySelector(_el, _args[0]);
+      case 'querySelectorAll': return this.querySelectorAll(_el, _args[0]);
+      default:
+        throw _notImplemented('invoke'); 
+    }
+  }
+  
+  logError(error: string) { console.error(error); }
+  log(error: string) { console.log(error); }
+  logGroup(error: string) { console.error(error); }
   logGroupEnd() {}
 
   get attrToPropMap() { return _attrToPropMap; }
 
-  query(_selector: any) { throw _notImplemented('query'); }
-  querySelector(el: any, selector: string): any {
-    return this.querySelectorAll(el, selector)[0];
+  query(_selector: any) {
+    const document = Zone.current.get('document');
+    if (document) {
+      return this.querySelector(document, _selector);
+    }
+    throw _notImplemented('query');
   }
+  querySelector(el: any, selector: string): any { return this.querySelectorAll(el, selector)[0]; }
   querySelectorAll(el: any, selector: string): any[] {
-    var res: any[] = [];
-    var self = this;
-    function _recursive(result: any, node: any, selector: any, matcher: any) {
-      var cNodes = node.childNodes;
+    const res: any[] = [];
+    const _recursive = (result: any, node: any, selector: any, matcher: any) => {
+      let cNodes = node.childNodes;
       if (cNodes && cNodes.length > 0) {
-        for (var i = 0; i < cNodes.length; i++) {
-          var childNode = cNodes[i];
-          if (self.elementMatches(childNode, selector, matcher)) {
+        for (let i = 0; i < cNodes.length; i++) {
+          const childNode = cNodes[i];
+          if (this.elementMatches(childNode, selector, matcher)) {
             result.push(childNode);
           }
           _recursive(result, childNode, selector, matcher);
         }
       }
     };
-    var matcher = new SelectorMatcher();
+    const matcher = new SelectorMatcher();
     matcher.addSelectables(CssSelector.parse(selector));
     _recursive(res, el, selector, matcher);
     return res;
@@ -102,120 +120,97 @@ export class Parse5DomAdapter extends DomAdapter {
     if (this.isElementNode(node) && selector === '*') {
       return true;
     }
-    var result = false;
-    if (selector && selector.charAt(0) === '#') {
-      result = this.getAttribute(node, 'id') === selector.substring(1);
+    let result = false;
+    if (selector && selector.charAt(0) == '#') {
+      result = this.getAttribute(node, 'id') == selector.substring(1);
     } else if (selector) {
-      var result = false;
-      if (matcher == null) {
+      if (!matcher) {
         matcher = new SelectorMatcher();
         matcher.addSelectables(CssSelector.parse(selector));
       }
 
-      var cssSelector = new CssSelector();
+      const cssSelector = new CssSelector();
       cssSelector.setElement(this.tagName(node));
       if (node.attribs) {
-        Object.keys(node.attribs).forEach(attrName => {
+        for (const attrName in node.attribs) {
+          if (node.attribs.hasOwnProperty(attrName)) {
           cssSelector.addAttribute(attrName, node.attribs[attrName]);
-        });
+          }
+        }
       }
-      var classList = this.classList(node);
-      for (var i = 0; i < classList.length; i++) {
+      const classList = this.classList(node);
+      for (let i = 0; i < classList.length; i++) {
         cssSelector.addClassName(classList[i]);
       }
 
-      matcher.match(
-          cssSelector,
-          (_selector: any, _cb: any) => { result = true; });
+      matcher.match(cssSelector, function(_selector: any, _cb: any) { result = true; });
     }
     return result;
   }
   on(el: any, evt: any, listener: any) {
-    var listenersMap: {[k: /*any*/ string]: any} = el._eventListenersMap;
-    if (isBlank(listenersMap)) {
-      var listenersMap: {[k: /*any*/ string]: any} = StringMapWrapper.create();
+    let listenersMap: {[k: string]: any} = el._eventListenersMap;
+    if (!listenersMap) {
+      listenersMap = {};
       el._eventListenersMap = listenersMap;
     }
-    var listeners = StringMapWrapper.get(listenersMap, evt);
-    if (isBlank(listeners)) {
-      listeners = [];
-    }
-    listeners.push(listener);
-    StringMapWrapper.set(listenersMap, evt, listeners);
+    const listeners = listenersMap[evt] || [];
+    listenersMap[evt] = [...listeners, listener];
   }
-  onAndCancel(
-      el: any, evt: any,
-      listener: any): Function {
+  onAndCancel(el: any, evt: any, listener: any): Function {
     this.on(el, evt, listener);
-    return () => {
-      ListWrapper.remove(StringMapWrapper.get<any[]>(el._eventListenersMap, evt), listener);
-    };
+    return () => { ListWrapper.remove(<any[]>(el._eventListenersMap[evt]), listener); };
   }
   dispatchEvent(el: any, evt: any) {
-    if (isBlank(evt.target)) {
+    if (!evt.target) {
       evt.target = el;
     }
-    if (isPresent(el._eventListenersMap)) {
-      var listeners: any = StringMapWrapper.get(el._eventListenersMap, evt.type);
-      if (isPresent(listeners)) {
-        for (var i = 0; i < listeners.length; i++) {
+    if (el._eventListenersMap) {
+      const listeners: any = el._eventListenersMap[evt.type];
+      if (listeners) {
+        for (let i = 0; i < listeners.length; i++) {
           listeners[i](evt);
         }
       }
     }
-    if (isPresent(el.parent)) {
+    if (el.parent) {
       this.dispatchEvent(el.parent, evt);
     }
-    if (isPresent(el._window)) {
+    if (el._window) {
       this.dispatchEvent(el._window, evt);
     }
   }
-  createMouseEvent(eventType: any): any { /*Event*/
-    return this.createEvent(eventType);
-  }
-  createEvent(eventType: string): any { /* Event */
-    var evt = {
+  createMouseEvent(eventType: any): any /* Event */ { return this.createEvent(eventType); }
+  createEvent(eventType: string): any /* Event */ {
+    let event = /* <Event> */{
       type: eventType,
       defaultPrevented: false,
-      preventDefault: () => { (<any>evt).defaultPrevented = true; }
+      preventDefault: () => { (<any>event).defaultPrevented = true; }
     };
-    return evt;
+    return event;
   }
-  preventDefault(evt: any) { evt.returnValue = false; }
-  isPrevented(evt: any): boolean {
-    return isPresent(evt.returnValue) && !evt.returnValue;
-  }
+  preventDefault(event: any) { event.returnValue = false; }
+  isPrevented(event: any): boolean { return isPresent(event.returnValue) && !event.returnValue; }
   getInnerHTML(el: any): string {
-    return serializer(this.templateAwareRoot(el), parse5.treeAdapters.htmlparser2);
+    return parse5.serialize(this.templateAwareRoot(el), {treeAdapter});
   }
-  getTemplateContent(_el: any): any {  /* Node */
-    return null;  // no <template> support in parse5.
-  }
+  getTemplateContent(_el: any): any /* Node */ { return null; }
   getOuterHTML(el: any): string {
-    serializer.html = '';
-    serializer._serializeElement(el);
-    return serializer.html;
+    const fragment = treeAdapter.createDocumentFragment();
+    this.appendChild(fragment, el);
+    return parse5.serialize(fragment, {treeAdapter});
   }
   nodeName(node: any): string { return node.tagName; }
   nodeValue(node: any): string { return node.nodeValue; }
   type(_node: any): string { throw _notImplemented('type'); }
   content(node: any): string { return node.childNodes[0]; }
-  firstChild(el: any): any { /*Node*/
-    return el.firstChild;
-  }
-  nextSibling(el: any): any {  /*Node*/
-    return el.nextSibling;
-  }
-  parentElement(el: any): any {  /*Node*/
-    return el.parent;
-  }
-  childNodes(el: any): any[] {  /*Node[]*/
-    return el.childNodes;
-  }
+  firstChild(el: any): any /* Node */ { return el.firstChild; }
+  nextSibling(el: any): any /* Node */ { return el.nextSibling; }
+  parentElement(el: any): any /* Node */ { return el.parent; }
+  childNodes(el: any): any[] /* Node */ { return el.childNodes; }
   childNodesAsList(el: any): any[] {
-    var childNodes = el.childNodes;
-    var res = new Array(childNodes.length);
-    for (var i = 0; i < childNodes.length; i++) {
+    const childNodes = el.childNodes;
+    const res = new Array(childNodes.length);
+    for (let i = 0; i < childNodes.length; i++) {
       res[i] = childNodes[i];
     }
     return res;
@@ -230,18 +225,20 @@ export class Parse5DomAdapter extends DomAdapter {
     treeAdapter.appendChild(this.templateAwareRoot(el), node);
   }
   removeChild(el: any, node: any) {
-    if (ListWrapper.contains(el.childNodes, node)) {
+    if (el.childNodes.indexOf(node) > -1) {
       this.remove(node);
     }
   }
-  remove(el: any): any { /* HTMLElement */
-    var parent = el.parent;
+  replaceChild(_el: any, _newNode: any, _oldNode: any) { throw _notImplemented('replaceChild'); }
+  
+  remove(el: any): any /* HTMLElement */ {
+    const parent = el.parent;
     if (parent) {
-      var index = parent.childNodes.indexOf(el);
+      const index = parent.childNodes.indexOf(el);
       parent.childNodes.splice(index, 1);
     }
-    var prev = el.previousSibling;
-    var next = el.nextSibling;
+    const prev = el.previousSibling;
+    const next = el.nextSibling;
     if (prev) {
       prev.next = next;
     }
@@ -257,9 +254,7 @@ export class Parse5DomAdapter extends DomAdapter {
     this.remove(node);
     treeAdapter.insertBefore(el.parent, node, el);
   }
-  insertAllBefore(el: any, nodes: any) {
-    nodes.forEach((n: any) => this.insertBefore(el, n));
-  }
+  insertAllBefore(el: any, nodes: any) { nodes.forEach((n: any) => this.insertBefore(el, n)); }
   insertAfter(el: any, node: any) {
     if (el.nextSibling) {
       this.insertBefore(el.nextSibling, node);
@@ -269,28 +264,33 @@ export class Parse5DomAdapter extends DomAdapter {
   }
   setInnerHTML(el: any, value: any) {
     this.clearNodes(el);
-    var content = parser.parseFragment(value, treeAdapter);
-    for (var i = 0; i < content.childNodes.length; i++) {
+    const content = parse5.parseFragment(value, {treeAdapter});
+    for (let i = 0; i < content.childNodes.length; i++) {
       treeAdapter.appendChild(el, content.childNodes[i]);
     }
   }
   getText(el: any, isRecursive?: boolean): string {
     if (this.isTextNode(el)) {
       return el.data;
-    } else if (this.isCommentNode(el)) {
+    }
+
+    if (this.isCommentNode(el)) {
       // In the DOM, comments within an element return an empty string for textContent
       // However, comment node instances return the comment content for textContent getter
       return isRecursive ? '' : el.data;
-    } else if (isBlank(el.childNodes) || el.childNodes.length === 0) {
-      return '';
-    } else {
-      var textContent = '';
-      for (var i = 0; i < el.childNodes.length; i++) {
-        textContent += this.getText(el.childNodes[i], true);
-      }
-      return textContent;
     }
+
+    if (!el.childNodes || el.childNodes.length == 0) {
+      return '';
+    }
+
+    let textContent = '';
+    for (let i = 0; i < el.childNodes.length; i++) {
+      textContent += this.getText(el.childNodes[i], true);
+    }
+    return textContent;
   }
+
   setText(el: any, value: string) {
     if (this.isTextNode(el) || this.isCommentNode(el)) {
       el.data = value;
@@ -301,56 +301,58 @@ export class Parse5DomAdapter extends DomAdapter {
       }
     }
   }
+
   getValue(el: any): string { return el.value; }
   setValue(el: any, value: string) { el.value = value; }
   getChecked(el: any): boolean { return el.checked; }
   setChecked(el: any, value: boolean) { el.checked = value; }
-  createComment(text: string): Comment { return treeAdapter.createCommentNode(text); }
-  createTemplate(html: any): any { /* HTMLElement */
-    var template = treeAdapter.createElement('template', 'http://www.w3.org/1999/xhtml', []);
-    var content = parser.parseFragment(html, treeAdapter);
-    treeAdapter.appendChild(template, content);
+
+  createComment(text: string): any /* Comment */ { return treeAdapter.createCommentNode(text); }
+  createTemplate(html: any): any /* HTMLElement */ {
+    const template = treeAdapter.createElement('template', 'http://www.w3.org/1999/xhtml', []);
+    const content = parse5.parseFragment(html, {treeAdapter});
+    treeAdapter.setTemplateContent(template, content);
     return template;
   }
-  createElement(tagName: any): any { /* HTMLElement */
+  createElement(tagName: any): any /* HTMLElement */ {
     return treeAdapter.createElement(tagName, 'http://www.w3.org/1999/xhtml', []);
   }
-  createElementNS(ns: any, tagName: any): any { /* HTMLElement */
+  createElementNS(ns: any, tagName: any): any /* HTMLElement */ {
     return treeAdapter.createElement(tagName, ns, []);
   }
-  createTextNode(text: string): Text {
-    var t = <any>this.createComment(text);
+  createTextNode(text: string): any /* Text */ {
+    const t = <any>this.createComment(text);
     t.type = 'text';
     return t;
   }
-  createScriptTag(attrName: string, attrValue: string): any { /* HTMLElement */
+  createScriptTag(attrName: string, attrValue: string): any /* HTMLElement */ {
     return treeAdapter.createElement(
-        'script', 'http://www.w3.org/1999/xhtml', [{name: attrName, value: attrValue}]);
+      'script', 'http://www.w3.org/1999/xhtml', [{name: attrName, value: attrValue}]);
   }
-  createStyleElement(css: string): any { /* HTMLStyleElement */
-    var style = this.createElement('style');
+  createStyleElement(css: string): any /* HTMLStyleElement */ {
+    const style = this.createElement('style');
     this.setText(style, css);
-    return style;
+    return /*<HTMLStyleElement>*/style;
   }
-  createShadowRoot(el: any): any { /* HTMLElement */
+  createShadowRoot(el: any): any /* HTMLElement */ {
     el.shadowRoot = treeAdapter.createDocumentFragment();
     el.shadowRoot.parent = el;
     return el.shadowRoot;
   }
-  getShadowRoot(el: any): any {/* shadowRoot */
-    return el.shadowRoot;
-  }
+  getShadowRoot(el: any): any /* Element */ { return el.shadowRoot; }
   getHost(el: any): string { return el.host; }
-  getDistributedNodes(_el: any): any[] { throw _notImplemented('getDistributedNodes'); }
-  clone(node: any): any { /* Node */
-    var _recursive = (node: any) => {
-      var nodeClone = Object.create(Object.getPrototypeOf(node));
-      Object.keys(node).forEach(prop => {
-        var desc = Object.getOwnPropertyDescriptor(node, prop);
-        if (desc && 'value' in desc && typeof desc.value !== 'object') {
-          nodeClone[prop] = node[prop];
+  getDistributedNodes(_el: any): any /* Node */[] { throw _notImplemented('getDistributedNodes'); }
+  clone(node: any /* Node */): any /* Node */ {
+    const _recursive = (node: any) => {
+      const nodeClone = Object.create(Object.getPrototypeOf(node));
+      for (const prop in node) {
+        if (node.hasOwnProperty(prop)) {
+          const desc = Object.getOwnPropertyDescriptor(node, prop);
+          if (desc && 'value' in desc && typeof desc.value !== 'object') {
+            nodeClone[prop] = node[prop];
+          }
         }
-      });
+      }
       nodeClone.parent = null;
       nodeClone.prev = null;
       nodeClone.next = null;
@@ -359,17 +361,19 @@ export class Parse5DomAdapter extends DomAdapter {
       mapProps.forEach(mapName => {
         if (isPresent(node[mapName])) {
           nodeClone[mapName] = {};
-          Object.keys(node[mapName]).forEach(prop => {
-            nodeClone[mapName][prop] = node[mapName][prop];
-          });
+          for (const prop in node[mapName]) {
+            if (node[mapName].hasOwnProperty(prop)) {
+              nodeClone[mapName][prop] = node[mapName][prop];
+            }
+          }
         }
       });
-      var cNodes = node.children;
+      const cNodes = node.children;
       if (cNodes) {
-        var cNodesClone = new Array(cNodes.length);
-        for (var i = 0; i < cNodes.length; i++) {
-          var childNode = cNodes[i];
-          var childNodeClone = _recursive(childNode);
+        const cNodesClone = new Array(cNodes.length);
+        for (let i = 0; i < cNodes.length; i++) {
+          const childNode = cNodes[i];
+          const childNodeClone = _recursive(childNode);
           cNodesClone[i] = childNodeClone;
           if (i > 0) {
             childNodeClone.prev = cNodesClone[i - 1];
@@ -383,31 +387,31 @@ export class Parse5DomAdapter extends DomAdapter {
     };
     return _recursive(node);
   }
-  getElementsByClassName(element: any, name: string): any[] { /* HTMLElement */
+  getElementsByClassName(element: any, name: string): any /* HTMLElement */[] {
     return this.querySelectorAll(element, '.' + name);
   }
-  getElementsByTagName(_element: any, _name: string): any[] { /* HTMLElement */
+  getElementsByTagName(_element: any, _name: string): any /* HTMLElement */[] {
     throw _notImplemented('getElementsByTagName');
   }
   classList(element: any): string[] {
-    var classAttrValue: any = null;
-    var attributes = element.attribs;
+    let classAttrValue: any = null;
+    const attributes = element.attribs;
     if (attributes && attributes.hasOwnProperty('class')) {
       classAttrValue = attributes['class'];
     }
     return classAttrValue ? classAttrValue.trim().split(/\s+/g) : [];
   }
   addClass(element: any, className: string) {
-    var classList = this.classList(element);
-    var index = classList.indexOf(className);
-    if (index === -1) {
+    const classList = this.classList(element);
+    let index = classList.indexOf(className);
+    if (index == -1) {
       classList.push(className);
       element.attribs['class'] = element.className = classList.join(' ');
     }
   }
   removeClass(element: any, className: string) {
-    var classList = this.classList(element);
-    var index = classList.indexOf(className);
+    const classList = this.classList(element);
+    let index = classList.indexOf(className);
     if (index > -1) {
       classList.splice(index, 1);
       element.attribs['class'] = element.className = classList.join(' ');
@@ -417,19 +421,19 @@ export class Parse5DomAdapter extends DomAdapter {
     return ListWrapper.contains(this.classList(element), className);
   }
   hasStyle(element: any, styleName: string, styleValue: string = null): boolean {
-    var value = this.getStyle(element, styleName) || '';
-    return styleValue ? value === styleValue : value.length > 0;
+    const value = this.getStyle(element, styleName) || '';
+    return styleValue ? value == styleValue : value.length > 0;
   }
   /** @internal */
   _readStyleAttribute(element: any) {
-    var styleMap = {};
-    var attributes = element.attribs;
+    const styleMap = {};
+    const attributes = element.attribs;
     if (attributes && attributes.hasOwnProperty('style')) {
-      var styleAttrValue = attributes['style'];
-      var styleList = styleAttrValue.split(/;+/g);
-      for (var i = 0; i < styleList.length; i++) {
+      const styleAttrValue = attributes['style'];
+      const styleList = styleAttrValue.split(/;+/g);
+      for (let i = 0; i < styleList.length; i++) {
         if (styleList[i].length > 0) {
-          var elems = styleList[i].split(/:+/g);
+          const elems = styleList[i].split(/:+/g);
           (styleMap as any)[elems[0].trim()] = elems[1].trim();
         }
       }
@@ -438,35 +442,33 @@ export class Parse5DomAdapter extends DomAdapter {
   }
   /** @internal */
   _writeStyleAttribute(element: any, styleMap: any) {
-    var styleAttrValue = '';
-    Object.keys(styleMap).forEach(key => {
-      var newValue = styleMap[key];
-      if (newValue && newValue.length > 0) {
-        styleAttrValue += key + ':' + styleMap[key] + ';';
+    let styleAttrValue = '';
+    for (const key in styleMap) {
+      if (styleMap.hasOwnProperty(key)) {
+        const newValue = styleMap[key];
+        if (newValue) {
+          styleAttrValue += key + ':' + styleMap[key] + ';';
+        }
       }
-    });
+    }
     element.attribs['style'] = styleAttrValue;
   }
   setStyle(element: any, styleName: string, styleValue: string) {
-    var styleMap = this._readStyleAttribute(element);
+    const styleMap = this._readStyleAttribute(element);
     (styleMap as any)[styleName] = styleValue;
     this._writeStyleAttribute(element, styleMap);
   }
-  removeStyle(element: any, styleName: string) {
-    this.setStyle(element, styleName, null);
-  }
+  removeStyle(element: any, styleName: string) { this.setStyle(element, styleName, null); }
   getStyle(element: any, styleName: string): string {
-    var styleMap = this._readStyleAttribute(element);
+    const styleMap = this._readStyleAttribute(element);
     return styleMap.hasOwnProperty(styleName) ? (styleMap as any)[styleName] : '';
   }
-  tagName(element: any): string {
-    return element.tagName === 'style' ? 'STYLE' : element.tagName;
-  }
+  tagName(element: any): string { return element.tagName == 'style' ? 'STYLE' : element.tagName; }
   attributeMap(element: any): Map<string, string> {
-    var res = new Map<string, string>();
-    var elAttrs = treeAdapter.getAttrList(element);
-    for (var i = 0; i < elAttrs.length; i++) {
-      var attrib = elAttrs[i];
+    const res = new Map<string, string>();
+    const elAttrs = treeAdapter.getAttrList(element);
+    for (let i = 0; i < elAttrs.length; i++) {
+      const attrib = elAttrs[i];
       res.set(attrib.name, attrib.value);
     }
     return res;
@@ -474,17 +476,13 @@ export class Parse5DomAdapter extends DomAdapter {
   hasAttribute(element: any, attribute: string): boolean {
     return element.attribs && element.attribs.hasOwnProperty(attribute);
   }
-  hasAttributeNS(_element: any, _ns: string, _attribute: string): boolean {
-    throw _notImplemented('hasAttributeNS');
-  }
+  hasAttributeNS(_element: any, _ns: string, _attribute: string): boolean { throw _notImplemented('hasAttributeNS'); }
   getAttribute(element: any, attribute: string): string {
     return element.attribs && element.attribs.hasOwnProperty(attribute) ?
         element.attribs[attribute] :
         null;
   }
-  getAttributeNS(_element: any, _ns: string, _attribute: string): string {
-    throw _notImplemented('getAttributeNS');
-  }
+  getAttributeNS(_element: any, _ns: string, _attribute: string): string { throw _notImplemented('getAttributeNS'); }
   setAttribute(element: any, attribute: string, value: string) {
     if (attribute) {
       element.attribs[attribute] = value;
@@ -501,77 +499,56 @@ export class Parse5DomAdapter extends DomAdapter {
       delete element.attribs[attribute];
     }
   }
-  removeAttributeNS(_element: any, _ns: string, _name: string) {
-    throw _notImplemented('removeAttributeNS');
-  }
+  removeAttributeNS(_element: any, _ns: string, _name: string) { throw _notImplemented('removeAttributeNS'); }
   templateAwareRoot(el: any): any {
-    return this.isTemplateElement(el) ? this.content(el) : el;
+    return this.isTemplateElement(el) ? treeAdapter.getTemplateContent(el) : el;
   }
-  createHtmlDocument(): any { /* Document */
-    // TODO(gdi2290): move node-document to here
-    var newDoc = treeAdapter.createDocument();
+  createHtmlDocument(): any /* Document */ {
+    const newDoc = treeAdapter.createDocument();
     newDoc.title = 'fake title';
-    var head = treeAdapter.createElement('head', null, []);
-    var body = treeAdapter.createElement('body', 'http://www.w3.org/1999/xhtml', []);
+    const head = treeAdapter.createElement('head', null, []);
+    const body = treeAdapter.createElement('body', 'http://www.w3.org/1999/xhtml', []);
     this.appendChild(newDoc, head);
     this.appendChild(newDoc, body);
     newDoc['head'] = head;
     newDoc['body'] = body;
-    newDoc['_window'] = StringMapWrapper.create();
+    newDoc['_window'] = {};
     return newDoc;
   }
-  // UNIVERSAL FIX
-  defaultDoc(): any { /* Document */
-    // if (defDoc === null) {
-    //   defDoc = this.createHtmlDocument();
-    // }
-    // TODO(gdi2290): needed for BROWSER_SANITIZATION_PROVIDERS
+  // Universal Fix
+  defaultDoc(): any /* Document */ { 
+
     const document = Zone.current.get('document');
     if (document) {
       return document;
     }
     return {documentMode: false};
   }
-  // UNIVERSAL FIX
-  getBoundingClientRect(_el: any): any {
-    return {left: 0, top: 0, width: 0, height: 0};
-  }
-  // UNIVERSAL FIX
-  getTitle(): string {
+
+  getBoundingClientRect(_el: any): any { return {left: 0, top: 0, width: 0, height: 0}; }
+
+  // Universal Fix
+  getTitle(): string { 
     const document = Zone.current.get('document');
     if (document && document.title) {
       return document.title;
     }
-
     throw _notImplemented('getTitle');
-    // return this.defaultDoc().title || '';
   }
-  // UNIVERSAL FIX
 
-  // UNIVERSAL FIX
-  setTitle(newTitle: string) {
-    const document = Zone.current.get('document');
-    if (document && document.title) {
-      return document.title = newTitle;
-    }
-
-    throw _notImplemented('setTitle');
-    // this.defaultDoc().title = newTitle;
-  }
-  // UNIVERSAL FIX
+  setTitle(newTitle: string) { this.defaultDoc().title = newTitle; }
   isTemplateElement(el: any): boolean {
     return this.isElementNode(el) && this.tagName(el) === 'template';
   }
   isTextNode(node: any): boolean { return treeAdapter.isTextNode(node); }
   isCommentNode(node: any): boolean { return treeAdapter.isCommentNode(node); }
-  isElementNode(node: any): boolean {
-    return node ? treeAdapter.isElementNode(node) : false;
-  }
+  isElementNode(node: any): boolean { return node ? treeAdapter.isElementNode(node) : false; }
   hasShadowRoot(node: any): boolean { return isPresent(node.shadowRoot); }
-  isShadowRoot(node: any): boolean { return this.getShadowRoot(node) === node; }
+  isShadowRoot(node: any): boolean { return this.getShadowRoot(node) == node; }
   importIntoDoc(node: any): any { return this.clone(node); }
   adoptNode(node: any): any { return node; }
-  getHref(el: any): string { return el.href; }
+  getHref(el: any): string { return el.href || this.getAttribute(el, 'href'); }
+  getEventKey(_event: any): string { throw _notImplemented('getEventKey'); }
   resolveAndSetHref(el: any, baseUrl: string, href: string) {
     if (href == null) {
       el.href = baseUrl;
@@ -581,32 +558,32 @@ export class Parse5DomAdapter extends DomAdapter {
   }
   /** @internal */
   _buildRules(parsedRules: any, css?: any) {
-    var rules: any[] = [];
-    for (var i = 0; i < parsedRules.length; i++) {
-      var parsedRule = parsedRules[i];
-      var rule: {[key: string]: any} = {};
+    const rules: any[] = [];
+    for (let i = 0; i < parsedRules.length; i++) {
+      const parsedRule = parsedRules[i];
+      const rule: {[key: string]: any} = {};
       rule['cssText'] = css;
       rule['style'] = {content: '', cssText: ''};
-      if (parsedRule.type === 'rule') {
+      if (parsedRule.type == 'rule') {
         rule['type'] = 1;
-        rule['selectorText'] = (parsedRule.selectors
-          .join(', ')
-          .replace(/\s{2,}/g, ' ')
-          .replace(/\s*~\s*/g, ' ~ ')
-          .replace(/\s*\+\s*/g, ' + ')
-          .replace(/\s*>\s*/g, ' > ')
-          .replace(/\[(\w+)=(\w+)\]/g, '[$1="$2"]'));
+
+        rule['selectorText'] =
+            parsedRule.selectors.join(', '.replace(/\s{2,}/g, ' ')
+                                          .replace(/\s*~\s*/g, ' ~ ')
+                                          .replace(/\s*\+\s*/g, ' + ')
+                                          .replace(/\s*>\s*/g, ' > ')
+                                          .replace(/\[(\w+)=(\w+)\]/g, '[$1="$2"]'));
         if (isBlank(parsedRule.declarations)) {
           continue;
         }
         for (let j = 0; j < parsedRule.declarations.length; j++) {
-          var declaration = parsedRule.declarations[j];
-          rule['style'][declaration.property] = declaration.value;
+          const declaration = parsedRule.declarations[j];
+          rule['style'] = declaration.property[declaration.value];
           rule['style'].cssText += declaration.property + ': ' + declaration.value + ';';
         }
-      } else if (parsedRule.type === 'media') {
+      } else if (parsedRule.type == 'media') {
         rule['type'] = 4;
-        rule['media'] = { mediaText: parsedRule.media };
+        rule['media'] = {mediaText: parsedRule.media};
         if (parsedRule.rules) {
           rule['cssRules'] = this._buildRules(parsedRule.rules);
         }
@@ -617,83 +594,71 @@ export class Parse5DomAdapter extends DomAdapter {
   }
   supportsDOMEvents(): boolean { return false; }
   supportsNativeShadowDOM(): boolean { return false; }
-  // UNIVERSAL FIX
-  getGlobalEventTarget(_target: string): any {
-    throw _notImplemented('getGlobalEventTarget');
+  // Universal Fix
+  getGlobalEventTarget(target: string): any {
+    if (target == 'window') {
+      return (<any>this.defaultDoc())._window;
+    } else if (target == 'document') {
+      return this.defaultDoc();
+    } else if (target == 'body') {
+      return this.defaultDoc().body;
+    }
   }
-  getBaseHref(): string {
-    throw _notImplemented('getBaseHref');
+  getBaseHref(): string { 
+    const document = Zone.current.get('document');
+    if (document) {
+      const base = this.querySelector(document, 'base');
+      if (base) {
+        const href = this.getHref(base);
+        if (href) {
+          return href;
+        }
+      }
+    }
+    throw _notImplemented('getBaseHref'); 
   }
-  resetBaseElement(): void {
-    throw _notImplemented('resetBaseElement');
-  }
-  getHistory(): any {  /* History */
+  resetBaseElement(): void { throw _notImplemented('resetBaseElement'); }
+  getHistory() : any /* History */ { 
+    const history = Zone.current.get('history');
+    if (history) {
+      return history;
+    } 
     throw _notImplemented('getHistory');
   }
-  getLocation(): any { /* Location */
-    throw _notImplemented('getLocation');
+  getLocation(): any /* Location */ { 
+    const location = Zone.current.get('location'); 
+    if (location) {
+      return location;
+    } 
+    throw _notImplemented('getLocation');   
   }
-  getUserAgent(): string { return 'Fake user agent'; }
-  getData(el: any, name: string): string {
-    return this.getAttribute(el, 'data-' + name);
-  }
-  getComputedStyle(_el: any): any {
-    throw _notImplemented('getComputedStyle');
-  }
-  setData(el: any, name: string, value: string) {
-    this.setAttribute(el, 'data-' + name, value);
-  }
-  // TODO(tbosch): move this into a separate environment class once we have it
-  setGlobalVar(path: string, value: any) {
-    setValueOnPath(global, path, value);
-  }
-  supportsWebAnimation(): boolean { return false; }
-  performanceNow(): number {
-    if (typeof performance === 'object') {
-      return performance.now();
+  getUserAgent(): string { 
+    const navigator = Zone.current.get('navigator');
+
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent;
     }
-    return (new Date()).getTime();
+    throw _notImplemented('getUserAgent');
   }
+  getData(el: any, name: string): string { return this.getAttribute(el, 'data-' + name); }
+  getComputedStyle(_el: any): any { throw _notImplemented('getComputedStyle'); }
+  setData(el: any, name: string, value: string) { this.setAttribute(el, 'data-' + name, value); }
+  // TODO(tbosch): move this into a separate environment class once we have it
+  setGlobalVar(path: string, value: any) { setValueOnPath(global, path, value); }
+  supportsWebAnimation(): boolean { return false; }
+  performanceNow(): number { return Date.now(); }
   getAnimationPrefix(): string { return ''; }
   getTransitionEnd(): string { return 'transitionend'; }
   supportsAnimation(): boolean { return true; }
 
-  replaceChild(_el: any, _newNode: any, _oldNode: any) {
-    throw _notImplemented('replaceChild');
-  }
-  // TODO(gdi2290): move node-document to here
-  parse(_templateHtml: string) {
-    throw _notImplemented('Parse5DomAdapter#parse');
-  }
-  invoke(_el: any /*Element*/, _methodName: string, _args: any[]): any {
-    throw _notImplemented('Parse5DomAdapter#invoke');
-  }
-  getEventKey(_event: any): string {
-    throw _notImplemented('Parse5DomAdapter#getEventKey');
-  }
   supportsCookies(): boolean { return false; }
-  getCookie(_name: string): string {
-    const document = Zone.current.get('document');
-    if (document && document.cookie) {
-      return document.cookie;
-    }
-    throw _notImplemented('Parse5DomAdapter#getCookie');
-  }
-  setCookie(name: string, value: string) {
-    const document = Zone.current.get('document');
-    if (document && document.cookie) {
-      return document.cookie[name] = value;
-    }
-    throw _notImplemented('Parse5DomAdapter#setCookie');
-  }
-  animate(_element: any, _keyframes: any[], _options: any): any {
-    throw _notImplemented('Parse5DomAdapter#animate');
-  }
+  getCookie(_name: string): string { throw _notImplemented('getCookie'); }
+  setCookie(_name: string, _value: string) { throw _notImplemented('setCookie'); }
+  animate(_element: any, _keyframes: any[], _options: any): any { throw _notImplemented('animate'); }
 }
 
-// TODO(gdi2290): require json file
 // TODO: build a proper list, this one is all the keys of a HTMLInputElement
-var _HTMLElementPropertyList = [
+const _HTMLElementPropertyList = [
   'webkitEntries',
   'incremental',
   'webkitdirectory',
@@ -875,5 +840,5 @@ var _HTMLElementPropertyList = [
   'nodeValue',
   'nodeName',
   'closure_lm_714617',
-  '__jsaction'
+  '__jsaction',
 ];
