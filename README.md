@@ -201,7 +201,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 Using the proxying support in webpack's dev server we can highjack certain urls and send them to a backend server.
 We do this by passing a file to `--proxy-config`
 
-Say we have a server running on `http://localhost:3000/api` and we want all calls th `http://localhost:4200/api` to go to that server.
+Say we have a server running on `http://localhost:3000/api` and we want all calls to `http://localhost:4200/api` to go to that server.
 
 We create a file next to projects `package.json` called `proxy.conf.json`
 with the content
@@ -294,7 +294,7 @@ source ~/.bash_profile
 
 ### Project assets
 
-You can add any files you want copied as-is to `src/assets/`. 
+You can add any files you want copied as-is to `src/assets/`.
 
 ### Global styles
 
