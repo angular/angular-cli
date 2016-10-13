@@ -30,6 +30,12 @@ describe('Acceptance: ng generate module', function () {
     return tmp.teardown('./tmp');
   });
 
+  it('will fail if no name is specified', function () {
+    return ng(['generate', 'module']).catch((error) => {
+      expect(error).to.equal('The `ng generate module` command requires a name to be specified.');
+    });
+  });
+
   it('ng generate module my-module', function () {
     return ng(['generate', 'module', 'my-module']).then(() => {
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
