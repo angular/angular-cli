@@ -45,6 +45,7 @@ The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Linting and formatting code](#linting-and-formatting-code)
 * [Support for offline applications](#support-for-offline-applications)
+* [Support for server side rendering](#support-for-server-side-rendering)
 * [Commands autocompletion](#commands-autocompletion)
 * [Global styles](#global-styles)
 * [CSS preprocessor integration](#css-preprocessor-integration)
@@ -265,7 +266,21 @@ You can modify the these scripts in `package.json` to run whatever tool you pref
 
 **The `--mobile` flag has been disabled temporarily. Sorry for the inconvenience.**
 
-~~Angular-CLI includes support for offline applications via the `--` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.~~
+~~Angular-CLI includes support for offline applications via the `--mobile` flag on `ng new`. Support is experimental, 
+please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.~~
+
+### Support for server side rendering
+
+**Angular-CLI includes Angular Universal via the `--universal` flag on `ng new` and `ng init`.**
+
+**Angular Universal** helps you to seo optimize your application and offers a better user experience through server side rendering.
+Please see the **angular/universal** project and https://universal.angular.io/ for documentation on how to make use of this functionality.
+
+#### Update an existing Project
+
+`cd path/to/project` and init your project with the universal option `ng init --universal`. Take every Pipe, Directive, Component, Module and Routes from `./src/app/app.module.ts`
+and move them to `./src/app.browser.module.ts` and `./src/app.node.module.ts`. Try `ng serve`, if your application looks like before, then you can delete the files
+`./src/app/app.module.ts` and `./src/main.ts`. **Have fun with Angular Universal!**
 
 ### Commands autocompletion
 

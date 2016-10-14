@@ -5,10 +5,15 @@ import {writeFile} from '../../utils/fs';
 import {request} from '../../utils/http';
 import {killAllProcesses, ng} from '../../utils/process';
 import {ngServe} from '../../utils/project';
-import {expectToFail} from '../../utils/utils';
+import {expectToFail, isUniversalTest} from '../../utils/utils';
 
 
 export default function() {
+  /** This test is disabled for universal */
+  if (isUniversalTest()) {
+    return Promise.resolve();
+  }
+
   // Create an express app that serves as a proxy.
   const app = express();
   const server = http.createServer(app);

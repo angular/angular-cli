@@ -12,6 +12,7 @@
     "target": "es5",
     "typeRoots": [
       "../node_modules/@types"
-    ]
+    ]<% if(universal) { %>,
+    "types": [ "node" ]<% } %>
   }
 }

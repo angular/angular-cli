@@ -41,6 +41,9 @@
           "main": {
             "type": "string"
           },
+          "nodeMain": {
+            "type": "string"
+          },
           "test": {
             "type": "string"
           },
@@ -51,6 +54,9 @@
             "type": "string"
           },
           "mobile": {
+            "type": "boolean"
+          },
+          "universal": {
             "type": "boolean"
           },
           "styles": {

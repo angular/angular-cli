@@ -8,12 +8,15 @@
       "root": "<%= sourceDir %>",
       "outDir": "dist",
       "assets": "assets",
-      "index": "index.html",
-      "main": "main.ts",
+      "index": "index.html",<% if(!universal) { %>
+      "main": "main.ts",<% } %><% if(universal) { %>
+      "main": "client.ts",
+      "nodeMain": "server.ts",<% } %>
       "test": "test.ts",
       "tsconfig": "tsconfig.json",
       "prefix": "<%= prefix %>",
       "mobile": <%= isMobile %>,
+      "universal": <%= universal %>,
       "styles": [
         "styles.<%= styleExt %>"
       ],
