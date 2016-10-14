@@ -209,7 +209,8 @@ export class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: 
             serializer.property(key, () => this._children[key].serialize(serializer, value[key]));
           }
         } else if (this._schema['additionalProperties']) {
-          serializer.property(key, () => this._children[key].serialize(serializer, value[key]));
+          // Fallback to direct value output for additional properties
+          serializer.property(key, () => serializer.outputValue(value[key]));
         }
       }
     });

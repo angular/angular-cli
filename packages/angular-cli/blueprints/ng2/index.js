@@ -16,6 +16,12 @@ module.exports = {
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
   ],
 
+  beforeInstall: function(options) {
+    if (options.ignoredUpdateFiles && options.ignoredUpdateFiles.length > 0) {
+      return Blueprint.ignoredUpdateFiles = Blueprint.ignoredUpdateFiles.concat(options.ignoredUpdateFiles);
+    }
+  },
+
   afterInstall: function (options) {
     if (options.mobile) {
       return Blueprint.load(path.join(__dirname, '../mobile')).install(options);
@@ -26,8 +32,8 @@ module.exports = {
     this.styleExt = options.style;
     this.version = require(path.resolve(__dirname, '../../package.json')).version;
 
-    // Join with / not path.sep as reference to typings require forward slashes.
-    const relativeRootPath = options.sourceDir.split(path.sep).map(() => '..').join('/');
+    // Split/join with / not path.sep as reference to typings require forward slashes.
+    const relativeRootPath = options.sourceDir.split('/').map(() => '..').join('/');
     const fullAppName = stringUtils.dasherize(options.entity.name)
       .replace(/-(.)/g, (_, l) => ' ' + l.toUpperCase())
       .replace(/^./, (l) => l.toUpperCase());
