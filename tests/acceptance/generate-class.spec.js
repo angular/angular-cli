@@ -43,8 +43,8 @@ describe('Acceptance: ng generate class', function () {
     });
   });
 
-  it('ng generate class my-class model', function () {
-    return ng(['generate', 'class', 'my-class', 'model']).then(() => {
+  it('ng generate class my-class.model', function () {
+    return ng(['generate', 'class', 'my-class.model']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.model.ts'))).to.equal(true);
     });
   });
@@ -55,8 +55,8 @@ describe('Acceptance: ng generate class', function () {
     });
   });
 
-  it(`ng generate class shared${path.sep}my-class model`, function () {
-    return ng(['generate', 'class', 'shared/my-class', 'model']).then(() => {
+  it(`ng generate class shared${path.sep}my-class.model`, function () {
+    return ng(['generate', 'class', 'shared/my-class.model']).then(() => {
       expect(existsSync(path.join(testPath, 'shared', 'my-class.model.ts'))).to.equal(true);
     });
   });
