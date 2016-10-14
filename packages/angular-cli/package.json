@@ -62,7 +62,7 @@
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "lodash": "^4.11.1",
-    "node-sass": "^3.7.0",
+    "node-sass": "^3.10.1",
     "npm-run-all": "^3.0.0",
     "offline-plugin": "^3.4.1",
     "opn": "4.0.1",
