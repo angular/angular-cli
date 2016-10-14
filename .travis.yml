@@ -21,19 +21,27 @@ matrix:
     - node_js: "5"
     - os: osx
     - env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+    - env: NODE_SCRIPT="tests/e2e_runner.js --aot"
   include:
+    # forced aot test
+    - node_js: "4"
+      os: linux
+      env: NODE_SCRIPT="tests/e2e_runner.js --aot"
+    # node 5 tests
     - node_js: "5"
       os: linux
       env: SCRIPT=test
     - node_js: "5"
       os: linux
       env: NODE_SCRIPT=tests/e2e_runner.js
+    # node 6 tests 
     - node_js: "6"
       os: linux
       env: SCRIPT=test
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT=tests/e2e_runner.js
+    # osx tests
     - node_js: "4"
       os: osx
       env: SCRIPT=test
