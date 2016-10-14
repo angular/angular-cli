@@ -104,7 +104,7 @@ export function getWebpackCommonConfig(
       ]
     },
     plugins: [
-      new BundleTracker({path: __dirname, filename: './webpack-stats.json'})
+      new BundleTracker({path: __dirname, filename: './webpack-stats.json'}),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         chunksSortMode: 'dependency'
