@@ -6,26 +6,26 @@ const getFiles = Blueprint.prototype.files;
 module.exports = {
   description: '',
 
-  anonymousOptions: [
-    '<class-type>'
-  ],
-
   availableOptions: [
     { name: 'spec', type: Boolean }
   ],
 
   normalizeEntityName: function (entityName) {
-    var parsedPath = dynamicPathParser(this.project, entityName);
+    var parsedPath = dynamicPathParser(this.project, entityName.split('.')[0]);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
   locals: function (options) {
-    var classType = options.args [2]
+    const rawName = options.args[1];
+    const nameParts = rawName.split('.')
+      .filter(part => part.length !== 0);
+
+    const classType = nameParts[1];
     this.fileName = stringUtils.dasherize(options.entity.name);
     if (classType) {
-      this.fileName += '.' + classType;
+      this.fileName += '.' + classType.toLowerCase();
     }
 
     options.spec = options.spec !== undefined ?
