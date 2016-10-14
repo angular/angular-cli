@@ -113,6 +113,7 @@
     "webpack-dev-server": "2.1.0-beta.3",
     "webpack-md5-hash": "0.0.5",
     "webpack-merge": "^0.14.0",
+    "webpack-bundle-tracker": "0.0.93",
     "zone.js": "^0.6.23"
   },
   "ember-addon": {

@@ -4,6 +4,7 @@ import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const BundleTracker  = require('webpack-bundle-tracker');
 
 
 export function getWebpackCommonConfig(
@@ -103,6 +104,7 @@ export function getWebpackCommonConfig(
       ]
     },
     plugins: [
+      new BundleTracker({path: __dirname, filename: './webpack-stats.json'}),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         chunksSortMode: 'dependency'
