@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 import * as ts from 'typescript';
+const resolve = require('resolve');
 
 import {getSource, findNodes, getContentOfKeyLiteral} from '../utilities/ast-utils';
 
@@ -49,21 +50,26 @@ export function findLoadChildren(tsFilePath: string): string[] {
     }));
 }
 
-
 export function findLazyModules(projectRoot: any): {[key: string]: string} {
   const result: {[key: string]: string} = {};
   glob.sync(path.join(projectRoot, '/**/*.ts'))
     .forEach(tsPath => {
       findLoadChildren(tsPath).forEach(moduleName => {
-        let fileName = path.resolve(projectRoot, moduleName) + '.ts';
-        // If path is a relative path
-        if (moduleName.startsWith('.')) {
-          const tsPathInfo = path.parse(tsPath);
-          fileName = path.resolve(tsPathInfo.dir, moduleName) + '.ts';
-        }
+        let fileName = moduleName.startsWith('.')
+          ? path.resolve(path.dirname(tsPath), moduleName) + '.ts'
+          : path.resolve(projectRoot, moduleName) + '.ts';
+
         if (fs.existsSync(fileName)) {
           // Put the moduleName as relative to the main.ts.
           result[moduleName] = fileName;
+        } else {
+          try {
+            let res = resolve.sync(moduleName, { basedir: projectRoot });
+            if (res) {
+              result[moduleName] = res;
+            }
+          } catch (e) {
+          }
         }
       });
     });
