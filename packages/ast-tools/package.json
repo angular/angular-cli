@@ -19,6 +19,10 @@
     "url": "https://github.com/angular/angular-cli/issues"
   },
   "homepage": "https://github.com/angular/angular-cli",
+  "engines": {
+    "node": ">= 4.1.0",
+    "npm": ">= 3.0.0"
+  },
   "dependencies": {
     "@angular/tsc-wrapped": "^0.3.0",
     "rxjs": "5.0.0-beta.11",
