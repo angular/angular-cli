@@ -5,7 +5,7 @@ import <%= classifiedModuleName %>Module from './<%= dasherizedModuleName %>.mod
 
 describe('<%= classifiedModuleName %>Module', () => {
   let <%= camelizedModuleName %>Module;
-  
+
   beforeEach(() => {
     <%= camelizedModuleName %>Module = new <%= classifiedModuleName %>Module();
   });
