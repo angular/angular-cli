@@ -57,13 +57,16 @@ export default Task.extend({
         this.project.root,
         `./${CliConfig.fromProject().config.apps[0].root}`
       ),
-      historyApiFallback: true,
+      historyApiFallback: {
+        index: commandOptions.path
+      },
       stats: webpackDevServerOutputOptions,
       inline: true,
       proxy: proxyConfig,
       watchOptions: {
         poll: CliConfig.fromProject().config.defaults.poll
-      }
+      },
+      publicPath: commandOptions.path,
     };
 
     ui.writeLine(chalk.green(oneLine`

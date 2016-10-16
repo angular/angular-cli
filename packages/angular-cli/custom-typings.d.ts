@@ -1,7 +1,7 @@
 interface IWebpackDevServerConfigurationOptions {
   contentBase?: string;
   hot?: boolean;
-  historyApiFallback?: boolean;
+  historyApiFallback?: boolean | {[key:string]: string};
   compress?: boolean;
   proxy?: {[key: string]: string};
   staticOptions?: any;

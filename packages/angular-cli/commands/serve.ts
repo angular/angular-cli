@@ -27,6 +27,7 @@ export interface ServeTaskOptions {
   sslCert?: string;
   aot?: boolean;
   open?: boolean;
+  path?: string;
 }
 
 const ServeCommand = Command.extend({
@@ -87,6 +88,12 @@ const ServeCommand = Command.extend({
       default: false,
       aliases: ['o'],
       description: 'Opens the url in default browser',
+    },
+    {
+      name: 'path',
+      type: String,
+      default: '/',
+      description: 'makes the content available on path e.g. http://host:port/path'
     },
   ],
 
