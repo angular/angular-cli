@@ -58,7 +58,7 @@ describe('Acceptance: ng new', function () {
   }
 
   function confirmBlueprinted() {
-    return confirmBlueprintedForDir('addon/ng2/blueprints/ng2');
+    return confirmBlueprintedForDir('blueprints/ng2');
   }
 
   it('ng new foo, where foo does not yet exist, works', function () {
@@ -103,42 +103,6 @@ describe('Acceptance: ng new', function () {
       .then(confirmBlueprinted);
   });
 
-  it('ng new with blueprint uses the specified blueprint directory with a relative path',
-    function () {
-      return tmp.setup('./tmp/my_blueprint')
-        .then(function () {
-          return tmp.setup('./tmp/my_blueprint/files');
-        })
-        .then(function () {
-          fs.writeFileSync('./tmp/my_blueprint/files/gitignore');
-          process.chdir('./tmp');
-
-          return ng([
-            'new', 'foo', '--skip-npm', '--skip-bower', '--skip-git',
-            '--blueprint=./my_blueprint'
-          ]);
-        })
-        .then(confirmBlueprintedForDir('tmp/my_blueprint'));
-    });
-
-  it('ng new with blueprint uses the specified blueprint directory with an absolute path',
-    function () {
-      return tmp.setup('./tmp/my_blueprint')
-        .then(function () {
-          return tmp.setup('./tmp/my_blueprint/files');
-        })
-        .then(function () {
-          fs.writeFileSync('./tmp/my_blueprint/files/gitignore');
-          process.chdir('./tmp');
-
-          return ng([
-            'new', 'foo', '--skip-npm', '--skip-bower', '--skip-git',
-            '--blueprint=' + path.resolve(process.cwd(), './my_blueprint')
-          ]);
-        })
-        .then(confirmBlueprintedForDir('tmp/my_blueprint'));
-    });
-
   it('ng new without skip-git flag creates .git dir', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(function () {
       expect(existsSync('.git'));
@@ -166,6 +130,22 @@ describe('Acceptance: ng new', function () {
 
         var pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
         expect(pkgJson.name).to.equal('foo', 'uses app name for package name');
+      });
+  });
+
+  it('ng new --inline-template does not generate a template file', () => {
+    return ng(['new', 'foo', '--skip-npm', '--skip-git', '--inline-template'])
+      .then(() => {
+        const templateFile = path.join('src', 'app', 'app.component.html');
+        expect(existsSync(templateFile)).to.equal(false);
+      });
+  });
+
+  it('ng new --inline-style does not gener a style file', () => {
+    return ng(['new', 'foo', '--skip-npm', '--skip-git', '--inline-style'])
+      .then(() => {
+        const styleFile = path.join('src', 'app', 'app.component.css');
+        expect(existsSync(styleFile)).to.equal(false);
       });
   });
 });

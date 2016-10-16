@@ -13,20 +13,23 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 
 This project is very much still a work in progress.
 
-The CLI is now in beta. 
+The CLI is now in beta.
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
-## Webpack preview release update
+Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
 
-We're updating the build system in Angular-CLI to use webpack instead of Broccoli.
+## Webpack update
 
-You can install and update your projects using [these instructions](https://github.com/angular/angular-cli/blob/master/WEBPACK_UPDATE.md).
+We changed the build system between beta.10 and beta.14, from SystemJS to Webpack.
+And with it comes a lot of benefits.
+To take advantage of these, your app built with the old beta will need to migrate.
 
-**The current instructions on this file reflect usage for the `webpack` version.**
+You can update your `beta.10` projects to `beta.14` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**.
+Both the CLI and generated project have dependencies that require Node 4 or higher, together
+with NPM 3 or higher.
 
 ## Table of Contents
 
@@ -37,19 +40,21 @@ The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
 * [Build Targets and Environment Files](#build-targets-and-environment-files)
-* [Adding extra files to the build](#adding-extra-files-to-the-build)
+* [Base tag handling in index.html](#base-tag-handling-in-indexhtml)
+* [Bundling](#bundling)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
+* [Proxy To Backend](#proxy-to-backend)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Linting and formatting code](#linting-and-formatting-code)
 * [Support for offline applications](#support-for-offline-applications)
 * [Commands autocompletion](#commands-autocompletion)
+* [Project assets](#project-assets)
 * [Global styles](#global-styles)
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
 * [Global Library Installation](#global-library-installation)
 * [Updating angular-cli](#updating-angular-cli)
-* [Known Issues](#known-issues)
 * [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
 
 ## Installation
@@ -77,7 +82,7 @@ Navigate to `http://localhost:4200/`. The app will automatically reload if you c
 You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
 
 ```bash
-ng serve --port 4201 --live-reload-port 49153
+ng serve --host 0.0.0.0 --port 4201 --live-reload-port 49153
 ```
 
 ### Generating Components, Directives, Pipes and Services
@@ -107,6 +112,7 @@ Service   | `ng g service my-new-service`
 Class     | `ng g class my-new-class`
 Interface | `ng g interface my-new-interface`
 Enum      | `ng g enum my-new-enum`
+Module    | `ng g module my-module`
 
 ### Generating a route
 
@@ -124,13 +130,19 @@ The build artifacts will be stored in the `dist/` directory.
 
 ### Build Targets and Environment Files
 
-A build can specify both a build target (`development` or `production`) and an 
-environment file to be used with that build. By default, the development build 
-target is used.
+`ng build` can specify both a build target (`--target=production` or `--target=development`) and an
+environment file to be used with that build (`--environment=dev` or `--environment=prod`).
+By default, the development build target and environment are used.
 
-At build time, `src/environments/environment.ts` will be replaced by
-`src/environments/environment.NAME.ts` where `NAME` is the argument 
-provided to the `--environment` flag.
+The mapping used to determine which environment file is used can be found in `angular-cli.json`:
+
+```
+"environments": {
+  "source": "environments/environment.ts",
+  "dev": "environments/environment.ts",
+  "prod": "environments/environment.prod.ts"
+}
+```
 
 These options also apply to the serve command. If you do not pass a value for `environment`,
 it will default to `dev` for `development` and `prod` for `production`.
@@ -149,12 +161,22 @@ ng build
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
-- add `{ NAME: 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json` 
-- use them by using the `--env=NAME` flag on the build/serve commands.
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json`
+- use them via the `--env=NAME` flag on the build/serve commands.
+
+### Base tag handling in index.html
+
+When building you can modify base tag (`<base href="/">`) in your index.html with `--base-href your-url` option.
+
+```bash
+# Sets base tag href to /myUrl/ in your index.html
+ng build --base-href /myUrl/
+ng build --bh /myUrl/
+```
 
 ### Bundling
 
-All builds make use of bundling, and using the `--prod` flag in  `ng build --prod` 
+All builds make use of bundling, and using the `--prod` flag in  `ng build --prod`
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ### Running unit tests
@@ -175,6 +197,33 @@ Before running the tests make sure you are serving the app via `ng serve`.
 
 End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
+### Proxy To Backend
+Using the proxying support in webpack's dev server we can highjack certain urls and send them to a backend server.
+We do this by passing a file to `--proxy-config`
+
+Say we have a server running on `http://localhost:3000/api` and we want all calls th `http://localhost:4200/api` to go to that server.
+
+We create a file next to projects `package.json` called `proxy.conf.json`
+with the content
+
+```
+{
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false
+  }
+}
+```
+
+You can read more about what options are available here [webpack-dev-server proxy settings](https://webpack.github.io/docs/webpack-dev-server.html#proxy)
+
+and then we edit the `package.json` file's start script to be
+
+```
+"start": "ng serve --proxy-config proxy.conf.json",
+```
+
+now run it with `npm start`
 
 ### Deploying the app via GitHub Pages
 
@@ -227,29 +276,33 @@ To turn on auto completion use the following commands:
 
 For bash:
 ```bash
-ng completion >> ~/.bashrc
+ng completion 1>> ~/.bashrc 2>>&1
 source ~/.bashrc
 ```
 
 For zsh:
 ```bash
-ng completion >> ~/.zshrc
+ng completion 1>> ~/.zshrc 2>>&1
 source ~/.zshrc
 ```
 
 Windows users using gitbash:
 ```bash
-ng completion >> ~/.bash_profile
+ng completion 1>> ~/.bash_profile 2>>&1
 source ~/.bash_profile
 ```
 
+### Project assets
+
+You can add any files you want copied as-is to `src/assets/`. 
+
 ### Global styles
 
-The `styles.css` file allows users to add global styles and supports 
-[CSS imports](https://developer.mozilla.org/en/docs/Web/CSS/@import). 
+The `styles.css` file allows users to add global styles and supports
+[CSS imports](https://developer.mozilla.org/en/docs/Web/CSS/@import).
 
-If the project is created with the `--style=sass` option, this will be a `.sass` 
-file instead, and the same applies to `scss/less/styl`. 
+If the project is created with the `--style=sass` option, this will be a `.sass`
+file instead, and the same applies to `scss/less/styl`.
 
 You can add more global styles via the `apps[0].styles` property in `angular-cli.json`.
 
@@ -273,7 +326,7 @@ export class AppComponent {
 }
 ```
 
-When generating a new project you can also define which extention you want for
+When generating a new project you can also define which extension you want for
 style files:
 
 ```bash
@@ -297,13 +350,24 @@ npm install d3 --save
 npm install @types/d3 --save-dev
 ```
 
+If the library doesn't have typings available at `@types/`, you can still use it by
+manually adding typings for it:
+```
+// in src/typings.d.ts
+declare module 'typeless-package';
+
+// in src/app/app.component.ts
+import * as typelessPackage from 'typeless-package';
+typelessPackage.method();
+```
+
 ### Global Library Installation
 
-Some javascript libraries need to be added to the global scope, and loaded as if 
-they were in a script tag. We can do this using the `apps[0].scripts` and 
+Some javascript libraries need to be added to the global scope, and loaded as if
+they were in a script tag. We can do this using the `apps[0].scripts` and
 `apps[0].styles` properties of `angular-cli.json`.
 
-As an example, to use [Boostrap 4](http://v4-alpha.getbootstrap.com/) this is 
+As an example, to use [Boostrap 4](http://v4-alpha.getbootstrap.com/) this is
 what you need to do:
 
 First install Bootstrap from `npm`:
@@ -312,7 +376,7 @@ First install Bootstrap from `npm`:
 npm install bootstrap@next
 ```
 
-Then add the needed script files to to `apps[0].scripts`.
+Then add the needed script files to `apps[0].scripts`:
 
 ```
 "scripts": [
@@ -325,12 +389,12 @@ Then add the needed script files to to `apps[0].scripts`.
 Finally add the Bootstrap CSS to the `apps[0].styles` array:
 ```
 "styles": [
-  "styles.css",
-  "../node_modules/bootstrap/dist/css/bootstrap.css"
+  "../node_modules/bootstrap/dist/css/bootstrap.css",
+  "styles.css"
 ],
 ```
 
-Restart `ng serve` if you're running it, and Bootstrap 4 should be working on 
+Restart `ng serve` if you're running it, and Bootstrap 4 should be working on
 your app.
 
 ### Updating angular-cli
@@ -355,20 +419,9 @@ Running `ng init` will check for changes in all the auto-generated files created
 
 Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng init` finishes.
 
-**The main cause of errors after an update is failing to incorporate these updates into your code**. 
+**The main cause of errors after an update is failing to incorporate these updates into your code**.
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
-
-
-## Known issues
-
-This project is currently a prototype so there are many known issues. Just to mention a few:
-
-- All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
-- On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
-- The initial installation as well as `ng new` take too long because of lots of npm dependencies.
-- Many existing ember addons are not compatible with Angular apps built via angular-cli.
-- When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
 
 
 ## Development Hints for hacking on angular-cli

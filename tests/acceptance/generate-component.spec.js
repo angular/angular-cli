@@ -21,6 +21,7 @@ describe('Acceptance: ng generate component', function () {
   after(conf.restore);
 
   beforeEach(function () {
+    this.timeout(10000);
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
@@ -42,7 +43,7 @@ describe('Acceptance: ng generate component', function () {
       .then(content => {
         // Expect that the app.module contains a reference to my-comp and its import.
         expect(content).matches(/import.*MyCompComponent.*from '.\/my-comp\/my-comp.component';/);
-        expect(content).matches(/declarations:\s*\[[^\]]+?,\n\s+MyCompComponent\n/m);
+        expect(content).matches(/declarations:\s*\[[^\]]+?,\r?\n\s+MyCompComponent\r?\n/m);
       });
   });
 

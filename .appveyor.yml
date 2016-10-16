@@ -1,15 +1,20 @@
 environment:
   matrix:
-  - nodejs_version: "5.0"
+  - nodejs_version: "4.0"
   - nodejs_version: "6.0"
+
+matrix:
+  fast_finish: true
 
 install:
   - ps: Install-Product node $env:nodejs_version
+  - npm install -g npm
   - npm install
 
 test_script:
   - node --version
   - npm --version
   - npm test
+  - node tests\e2e_runner.js
 
 build: off
