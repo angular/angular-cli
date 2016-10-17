@@ -117,13 +117,8 @@ describe('Acceptance: ng init', function () {
     ]).then(confirmBlueprinted);
   });
 
-  it('ng init --mobile', () => {
-    return ng([
-      'init',
-      '--skip-npm',
-      '--skip-bower',
-      '--mobile'
-    ]).then(() => confirmBlueprinted(true));
+  it('ng init with mobile flag does throw exception', function () {
+    expect(ng(['init', '--mobile'])).to.throw;
   });
 
   it('ng init can run in created folder', function () {
