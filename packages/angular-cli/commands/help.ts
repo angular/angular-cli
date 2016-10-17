@@ -7,6 +7,7 @@ const lookupCommand = require('ember-cli/lib/cli/lookup-command');
 
 const commandsToIgnore = [
   'easter-egg',
+  'destroy',
   'github-pages-deploy' // errors because there is no base github-pages command
 ];
 
