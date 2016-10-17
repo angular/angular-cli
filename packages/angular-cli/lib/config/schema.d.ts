@@ -24,6 +24,10 @@ export interface CliConfig {
          */
         styles?: string[];
         /**
+         * includePaths array for sass import.
+         */
+        sassPaths?: string[];
+        /**
          * Global scripts to be included in the build.
          */
         scripts?: string[];

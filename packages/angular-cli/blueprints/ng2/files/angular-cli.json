@@ -20,6 +20,7 @@
       "styles": [
         "styles.<%= styleExt %>"
       ],
+      <% if(styleExt==='sass') { %>"sassPaths": [],<% } %>
       "scripts": [],
       "environments": {
         "source": "environments/environment.ts",
