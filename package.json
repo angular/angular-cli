@@ -110,7 +110,7 @@
     "typescript": "2.0.2",
     "url-loader": "^0.5.7",
     "webpack": "2.1.0-beta.25",
-    "webpack-dev-server": "2.1.0-beta.3",
+    "webpack-dev-server": "2.1.0-beta.9",
     "webpack-md5-hash": "0.0.5",
     "webpack-merge": "^0.14.0",
     "zone.js": "^0.6.23"
