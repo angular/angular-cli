@@ -49,4 +49,11 @@ describe('Acceptance: ng generate module', function () {
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(true);
     });
   });
+
+  it('ng generate module TwoWord', function () {
+    return ng(['generate', 'module', 'TwoWord']).then(() => {
+      expect(existsSync(path.join(testPath, 'two-word', 'two-word.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'two-word', 'two-word.module.spec.ts'))).to.equal(false);
+    });
+  });
 });
