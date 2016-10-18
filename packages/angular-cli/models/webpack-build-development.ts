@@ -8,15 +8,6 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, appConfi
       filename: '[name].bundle.js',
       sourceMapFilename: '[name].map',
       chunkFilename: '[id].chunk.js'
-    },
-    node: {
-      fs: 'empty',
-      global: true,
-      crypto: 'empty',
-      process: true,
-      module: false,
-      clearImmediate: false,
-      setImmediate: false
     }
   };
 };
