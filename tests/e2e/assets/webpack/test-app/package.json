@@ -20,7 +20,7 @@
     "performance-now": "^0.2.0",
     "raw-loader": "^0.5.1",
     "sass-loader": "^3.2.0",
-    "typescript": "2.0.2",
+    "typescript": "~2.0.3",
     "webpack": "2.1.0-beta.22"
   }
 }
