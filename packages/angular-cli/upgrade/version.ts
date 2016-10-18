@@ -95,8 +95,8 @@ export class Version {
     if (this.isPreWebpack()) {
       console.error(bold(red('\n' + stripIndents`
         It seems like you're using a project generated using an old version of the Angular CLI.
-        The latest CLI now uses webpack and includes a lot of improvements, include a simpler
-        workflow, a faster build and smaller bundles.
+        The latest CLI now uses webpack and has a lot of improvements including a simpler
+        workflow, a faster build, and smaller bundles.
         
         To get more info, including a step-by-step guide to upgrade the CLI, follow this link:
         https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14
