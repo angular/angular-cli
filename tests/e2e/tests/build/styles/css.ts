@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as glob from 'glob';
 
 import {writeMultipleFiles, expectFileToMatch} from '../../../utils/fs';
 import {ng} from '../../../utils/process';
@@ -42,16 +43,8 @@ export default function() {
     .then(() => expectFileToMatch('dist/styles.bundle.js', /.upper.*.lower.*background.*#def/))
 
     .then(() => ng('build', '--prod'))
-    .then(() => new Promise<string>((resolve, reject) => {
-      fs.readdir('dist', (err, files) => {
-        if (err) {
-          reject(err);
-        } else {
-          const styles = files.find(file => /styles\.[0-9a-f]{20}\.bundle\.css/.test(file));
-          resolve(styles);
-        }
-      });
-    }))
+    .then(() => new Promise<string>(() =>
+      glob.sync('dist/styles.*.bundle.css').find(file => !!file)))
     .then((styles) =>
       expectFileToMatch(styles, 'body { background-color: blue; }')
         .then(() => expectFileToMatch(styles, 'p { background-color: red; }')
