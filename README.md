@@ -136,7 +136,7 @@ By default, the development build target and environment are used.
 
 The mapping used to determine which environment file is used can be found in `angular-cli.json`:
 
-```
+```json
 "environments": {
   "source": "environments/environment.ts",
   "dev": "environments/environment.ts",
@@ -201,12 +201,12 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 Using the proxying support in webpack's dev server we can highjack certain urls and send them to a backend server.
 We do this by passing a file to `--proxy-config`
 
-Say we have a server running on `http://localhost:3000/api` and we want all calls th `http://localhost:4200/api` to go to that server.
+Say we have a server running on `http://localhost:3000/api` and we want all calls to `http://localhost:4200/api` to go to that server.
 
 We create a file next to projects `package.json` called `proxy.conf.json`
 with the content
 
-```
+```json
 {
   "/api": {
     "target": "http://localhost:3000",
@@ -219,7 +219,7 @@ You can read more about what options are available here [webpack-dev-server prox
 
 and then we edit the `package.json` file's start script to be
 
-```
+```json
 "start": "ng serve --proxy-config proxy.conf.json",
 ```
 
@@ -229,7 +229,7 @@ now run it with `npm start`
 
 You can deploy your apps quickly via:
 
-```
+```bash
 ng github-pages:deploy --message "Optional commit message"
 ```
 
@@ -249,7 +249,7 @@ To simplify the authentication, be sure to [setup your ssh keys](https://help.gi
 
 If you are deploying a [user or organization page](https://help.github.com/articles/user-organization-and-project-pages/), you can instead use the following command:
 
-```
+```bash
 ng github-pages:deploy --user-page --message "Optional commit message"
 ```
 
@@ -294,7 +294,7 @@ source ~/.bash_profile
 
 ### Project assets
 
-You can add any files you want copied as-is to `src/assets/`. 
+You can add any files you want copied as-is to `src/assets/`.
 
 ### Global styles
 
@@ -315,7 +315,7 @@ Angular-CLI supports all major CSS preprocessors:
 
 To use these prepocessors simply add the file to your component's `styleUrls`:
 
-```
+```javascript
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -378,7 +378,7 @@ npm install bootstrap@next
 
 Then add the needed script files to `apps[0].scripts`:
 
-```
+```json
 "scripts": [
   "../node_modules/jquery/dist/jquery.js",
   "../node_modules/tether/dist/js/tether.js",
@@ -387,7 +387,7 @@ Then add the needed script files to `apps[0].scripts`:
 ```
 
 Finally add the Bootstrap CSS to the `apps[0].styles` array:
-```
+```json
 "styles": [
   "../node_modules/bootstrap/dist/css/bootstrap.css",
   "styles.css"
@@ -402,14 +402,14 @@ your app.
 To update `angular-cli` to a new version, you must update both the global package and your project's local package.
 
 Global package:
-```
+```bash
 npm uninstall -g angular-cli
 npm cache clean
 npm install -g angular-cli@latest
 ```
 
 Local project package:
-```
+```bash
 rm -rf node_modules dist tmp
 npm install --save-dev angular-cli@latest
 ng init
