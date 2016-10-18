@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as glob from 'glob';
 
 import {writeMultipleFiles, expectFileToMatch} from '../../../utils/fs';
