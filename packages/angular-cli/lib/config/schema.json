@@ -66,6 +66,14 @@
             },
             "additionalProperties": false
           },
+          "sassPaths": {
+            "description": "includePaths array for sass import.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "additionalProperties": false
+          },
           "scripts": {
             "description": "Global scripts to be included in the build.",
             "type": "array",

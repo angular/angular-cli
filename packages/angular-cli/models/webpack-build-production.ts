@@ -14,6 +14,10 @@ declare module 'webpack' {
 }
 
 export const getWebpackProdConfigPartial = function(projectRoot: string, appConfig: any) {
+  const appRoot = path.resolve(projectRoot, appConfig.root);
+  const sass = appConfig.sassPaths
+             ? appConfig.sassPaths.map((includePath: string) => path.resolve(appRoot, includePath))
+             : [];
   return {
     devtool: 'source-map',
     output: {
@@ -51,7 +55,10 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
           },
           postcss: [
             require('postcss-discard-comments')
-          ]
+          ],
+          sassLoader: {
+            includePaths: sass
+          }
         }
       })
     ],

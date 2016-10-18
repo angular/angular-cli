@@ -1,6 +1,12 @@
 const path = require('path');
 
+import * as webpack from 'webpack';
+
 export const getWebpackDevConfigPartial = function(projectRoot: string, appConfig: any) {
+  const appRoot = path.resolve(projectRoot, appConfig.root);
+  const sass = appConfig.sassPaths
+             ? appConfig.sassPaths.map((includePath: string) => path.resolve(appRoot, includePath))
+             : [];
   return {
     devtool: 'cheap-module-source-map',
     output: {
@@ -9,6 +15,15 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, appConfi
       sourceMapFilename: '[name].map',
       chunkFilename: '[id].chunk.js'
     },
+    plugins: [
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          sassLoader: {
+            includePaths: sass
+          }
+        }
+      })
+    ],
     node: {
       fs: 'empty',
       global: true,
