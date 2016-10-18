@@ -41,7 +41,7 @@ const ServeCommand = Command.extend({
       type: String,
       default: 'localhost',
       aliases: ['H'],
-      description: 'Listens on all interfaces by default'
+      description: 'Listens only on localhost by default'
     },
     { name: 'proxy-config',         type: 'Path',                          aliases: ['pc'] },
     { name: 'watcher',              type: String,  default: 'events',      aliases: ['w'] },

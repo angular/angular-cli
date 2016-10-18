@@ -57,10 +57,13 @@ export default Task.extend({
         this.project.root,
         `./${CliConfig.fromProject().config.apps[0].root}`
       ),
-      historyApiFallback: true,
+      historyApiFallback: {
+        disableDotRule: true,
+      },
       stats: webpackDevServerOutputOptions,
       inline: true,
       proxy: proxyConfig,
+      compress: commandOptions.target === 'production',
       watchOptions: {
         poll: CliConfig.fromProject().config.defaults.poll
       }
