@@ -111,8 +111,10 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
     node: {
       fs: 'empty',
       global: true,
-      process: false,
       crypto: 'empty',
+      tls: 'empty',
+      net: 'empty',
+      process: true,
       module: false,
       clearImmediate: false,
       setImmediate: false
