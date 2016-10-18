@@ -24,6 +24,9 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
     },
     plugins: [
       new WebpackMd5Hash(),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify('production')
+      }),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8 : true },
         compress: { screw_ie8: true },
@@ -54,15 +57,6 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
           ]
         }
       })
-    ],
-    node: {
-      fs: 'empty',
-      global: true,
-      crypto: 'empty',
-      process: true,
-      module: false,
-      clearImmediate: false,
-      setImmediate: false
-    }
+    ]
   };
 };
