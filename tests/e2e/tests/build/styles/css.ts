@@ -32,8 +32,8 @@ export default function() {
   })
     .then(() => updateJsonFile('angular-cli.json', configJson => {
       const app = configJson['apps'][0];
-      app['styles'].push('src/styles.less');
-      app['styles'].push('src/styles.scss');
+      app['styles'].push('styles.less');
+      app['styles'].push('styles.scss');
     }))
     .then(() => ng('build'))
     .then(() => expectFileToMatch('dist/styles.bundle.js', 'body { background-color: blue; }'))
