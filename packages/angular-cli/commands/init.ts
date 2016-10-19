@@ -105,12 +105,20 @@ const InitCommand: any = Command.extend({
       mobile: commandOptions.mobile,
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
-      inlineTemplate: commandOptions.inlineTemplate
+      inlineTemplate: commandOptions.inlineTemplate,
+      ignoredUpdateFiles: ['favicon.ico']
     };
 
     if (!validProjectName(packageName)) {
       return Promise.reject(
         new SilentError('We currently do not support a name of `' + packageName + '`.'));
+    }
+
+    if (commandOptions.mobile) {
+      return Promise.reject(new SilentError(
+        'The --mobile flag has been disabled temporarily while we await an update of ' +
+        'angular-universal for supporting NgModule. Sorry for the inconvenience.'
+      ));
     }
 
     blueprintOpts.blueprint = normalizeBlueprint(blueprintOpts.blueprint);

@@ -53,6 +53,10 @@ export function moveFile(from: string, to: string) {
   });
 }
 
+export function createDir(path: string) {
+  _recursiveMkDir(path);
+}
+
 
 function _recursiveMkDir(path: string) {
   if (fs.existsSync(path)) {

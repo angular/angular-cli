@@ -11,6 +11,8 @@ import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
+import * as url from 'url';
+const opn = require('opn');
 
 export default Task.extend({
   run: function(commandOptions: ServeTaskOptions) {
@@ -68,10 +70,13 @@ export default Task.extend({
         this.project.root,
         `./${CliConfig.fromProject().config.apps[0].root}`
       ),
-      historyApiFallback: true,
+      historyApiFallback: {
+        disableDotRule: true,
+      },
       stats: webpackDevServerOutputOptions,
       inline: true,
       proxy: proxyConfig,
+      compress: commandOptions.target === 'production',
       watchOptions: {
         poll: CliConfig.fromProject().config.defaults.poll
       },
@@ -97,6 +102,11 @@ export default Task.extend({
           console.error(err.stack || err);
           if (err.details) { console.error(err.details); }
           reject(err.details);
+        } else {
+          const { open, host, port } = commandOptions;
+          if (open) {
+            opn(url.format({ protocol: 'http', hostname: host, port: port.toString() }));
+          }
         }
       });
     });

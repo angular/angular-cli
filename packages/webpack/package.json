@@ -3,13 +3,26 @@
   "version": "1.1.0",
   "description": "",
   "main": "./src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "author": "angular",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli/tree/master/packages/webpack",
+  "engines": {
+    "node": ">= 4.1.0",
+    "npm": ">= 3.0.0"
+  },
   "dependencies": {
     "@angular-cli/ast-tools": "^1.0.0"
   },
   "peerDependencies": {
-    "typescript": "2.0.2",
-    "@angular/compiler-cli": "^0.6.0",
+    "typescript": "^2.0.2",
+    "@angular/compiler-cli": "^2.1.0",
     "@angular/core": "^2.0.0"
   }
 }
