@@ -2,7 +2,7 @@ import * as mockFs from 'mock-fs';
 import * as fs from 'fs';
 import * as nru from './route-utils';
 import * as path from 'path';
-import { InsertChange, RemoveChange } from './change';
+import { NodeHost, InsertChange, RemoveChange } from './change';
 import denodeify = require('denodeify');
 import * as _ from 'lodash';
 import {it} from './spec-utils';
@@ -29,8 +29,8 @@ describe('route utils', () => {
     it('inserts as last import if not present', () => {
       let content = `'use strict'\n import {foo} from 'bar'\n import * as fz from 'fizz';`;
       let editedFile = new InsertChange(sourceFile, 0, content);
-      return editedFile.apply()
-        .then(() => nru.insertImport(sourceFile, 'Router', '@angular/router').apply())
+      return editedFile.apply(NodeHost)
+        .then(() => nru.insertImport(sourceFile, 'Router', '@angular/router').apply(NodeHost))
         .then(() => readFile(sourceFile, 'utf8'))
         .then(newContent => {
           expect(newContent).toEqual(content + `\nimport { Router } from '@angular/router';`);
@@ -39,7 +39,7 @@ describe('route utils', () => {
     it('does not insert if present', () => {
       let content = `'use strict'\n import {Router} from '@angular/router'`;
       let editedFile = new InsertChange(sourceFile, 0, content);
-      return editedFile.apply()
+      return editedFile.apply(NodeHost)
         .then(() => nru.insertImport(sourceFile, 'Router', '@angular/router'))
         .then(() => readFile(sourceFile, 'utf8'))
         .then(newContent => {
@@ -49,8 +49,8 @@ describe('route utils', () => {
     it('inserts into existing import clause if import file is already cited', () => {
       let content = `'use strict'\n import { foo, bar } from 'fizz'`;
       let editedFile = new InsertChange(sourceFile, 0, content);
-      return editedFile.apply()
-        .then(() => nru.insertImport(sourceFile, 'baz', 'fizz').apply())
+      return editedFile.apply(NodeHost)
+        .then(() => nru.insertImport(sourceFile, 'baz', 'fizz').apply(NodeHost))
         .then(() => readFile(sourceFile, 'utf8'))
         .then(newContent => {
           expect(newContent).toEqual(`'use strict'\n import { foo, bar, baz } from 'fizz'`);
@@ -59,7 +59,7 @@ describe('route utils', () => {
     it('understands * imports', () => {
       let content = `\nimport * as myTest from 'tests' \n`;
       let editedFile = new InsertChange(sourceFile, 0, content);
-      return editedFile.apply()
+      return editedFile.apply(NodeHost)
         .then(() => nru.insertImport(sourceFile, 'Test', 'tests'))
         .then(() => readFile(sourceFile, 'utf8'))
         .then(newContent => {
@@ -69,8 +69,8 @@ describe('route utils', () => {
     it('inserts after use-strict', () => {
       let content = `'use strict';\n hello`;
       let editedFile = new InsertChange(sourceFile, 0, content);
-      return editedFile.apply()
-        .then(() => nru.insertImport(sourceFile, 'Router', '@angular/router').apply())
+      return editedFile.apply(NodeHost)
+        .then(() => nru.insertImport(sourceFile, 'Router', '@angular/router').apply(NodeHost))
         .then(() => readFile(sourceFile, 'utf8'))
         .then(newContent => {
           expect(newContent).toEqual(
@@ -78,7 +78,7 @@ describe('route utils', () => {
         });
     });
     it('inserts inserts at beginning of file if no imports exist', () => {
-      return nru.insertImport(sourceFile, 'Router', '@angular/router').apply()
+      return nru.insertImport(sourceFile, 'Router', '@angular/router').apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(newContent => {
           expect(newContent).toEqual(`import { Router } from '@angular/router';\n`);
@@ -86,7 +86,7 @@ describe('route utils', () => {
     });
     it('inserts subcomponent in win32 environment', () => {
       let content = './level1\\level2/level2.component';
-      return nru.insertImport(sourceFile, 'level2', content).apply()
+      return nru.insertImport(sourceFile, 'level2', content).apply(NodeHost)
         .then(() => readFile(sourceFile, 'utf8'))
         .then(newContent => {
           if (process.platform.startsWith('win')) {
@@ -132,7 +132,7 @@ describe('route utils', () => {
         });
     });
     xit('does not add a provideRouter import if it exits already', () => {
-      return nru.insertImport(mainFile, 'provideRouter', '@angular/router').apply()
+      return nru.insertImport(mainFile, 'provideRouter', '@angular/router').apply(NodeHost)
         .then(() => nru.applyChanges(nru.bootstrapItem(mainFile, routes, toBootstrap)))
         .then(() => readFile(mainFile, 'utf8'))
         .then(content => {
@@ -145,7 +145,7 @@ describe('route utils', () => {
     xit('does not duplicate import to route.ts ', () => {
       let editedFile = new InsertChange(mainFile, 100, `\nimport routes from './routes';`);
       return editedFile
-        .apply()
+        .apply(NodeHost)
         .then(() => nru.applyChanges(nru.bootstrapItem(mainFile, routes, toBootstrap)))
         .then(() => readFile(mainFile, 'utf8'))
         .then(content => {
@@ -163,7 +163,7 @@ describe('route utils', () => {
     });
     it('adds provideRouter to bootstrap if absent and empty providers array', () => {
       let editFile = new InsertChange(mainFile, 124, ', []');
-      return editFile.apply()
+      return editFile.apply(NodeHost)
         .then(() => nru.applyChanges(nru.bootstrapItem(mainFile, routes, toBootstrap)))
         .then(() => readFile(mainFile, 'utf8'))
         .then(content => {
@@ -173,7 +173,7 @@ describe('route utils', () => {
     });
     it('adds provideRouter to bootstrap if absent and non-empty providers array', () => {
       let editedFile = new InsertChange(mainFile, 124, ', [ HTTP_PROVIDERS ]');
-      return editedFile.apply()
+      return editedFile.apply(NodeHost)
         .then(() => nru.applyChanges(nru.bootstrapItem(mainFile, routes, toBootstrap)))
         .then(() => readFile(mainFile, 'utf8'))
         .then(content => {
@@ -185,7 +185,7 @@ describe('route utils', () => {
       let editedFile = new InsertChange(mainFile,
                                         124,
                                         ', [ HTTP_PROVIDERS, provideRouter(routes) ]');
-      return editedFile.apply()
+      return editedFile.apply(NodeHost)
         .then(() => nru.applyChanges(nru.bootstrapItem(mainFile, routes, toBootstrap)))
         .then(() => readFile(mainFile, 'utf8'))
         .then(content => {
@@ -195,7 +195,7 @@ describe('route utils', () => {
     });
     it('inserts into the correct array', () => {
       let editedFile = new InsertChange(mainFile, 124, ', [ HTTP_PROVIDERS, {provide: [BAR]}]');
-      return editedFile.apply()
+      return editedFile.apply(NodeHost)
         .then(() => nru.applyChanges(nru.bootstrapItem(mainFile, routes, toBootstrap)))
         .then(() => readFile(mainFile, 'utf8'))
         .then(content => {
@@ -205,7 +205,7 @@ describe('route utils', () => {
     });
     it('throws an error if there is no or multiple bootstrap expressions', () => {
       let editedFile = new InsertChange(mainFile, 126, '\n bootstrap(moreStuff);');
-      return editedFile.apply()
+      return editedFile.apply(NodeHost)
         .then(() => nru.bootstrapItem(mainFile, routes, toBootstrap))
         .catch(e =>
           expect(e.message).toEqual('Did not bootstrap provideRouter in' +
@@ -214,7 +214,7 @@ describe('route utils', () => {
     });
     it('configures correctly if bootstrap or provide router is not at top level', () => {
       let editedFile = new InsertChange(mainFile, 126, '\n if(e){bootstrap, provideRouter});');
-      return editedFile.apply()
+      return editedFile.apply(NodeHost)
         .then(() => nru.applyChanges(nru.bootstrapItem(mainFile, routes, toBootstrap)))
         .then(() => readFile(mainFile, 'utf8'))
         .then(content => {
@@ -262,7 +262,7 @@ export default [\n  { path: 'new-route', component: NewRouteComponent }\n];`);
     });
     it('throws error if multiple export defaults exist', () => {
       let editedFile = new InsertChange(routesFile, 20, 'export default {}');
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         return nru.addPathToRoutes(routesFile, _.merge({route: 'new-route'}, options));
       }).catch(e => {
         expect(e.message).toEqual('Did not insert path in routes.ts because '
@@ -271,7 +271,7 @@ export default [\n  { path: 'new-route', component: NewRouteComponent }\n];`);
     });
     it('throws error if no export defaults exists', () => {
       let editedFile = new RemoveChange(routesFile, 0, 'export default []');
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         return nru.addPathToRoutes(routesFile, _.merge({route: 'new-route'}, options));
       }).catch(e => {
         expect(e.message).toEqual('Did not insert path in routes.ts because '
@@ -281,7 +281,7 @@ export default [\n  { path: 'new-route', component: NewRouteComponent }\n];`);
     it('treats positional params correctly', () => {
       let editedFile = new InsertChange(routesFile, 16,
         `\n  { path: 'home', component: HomeComponent }\n`);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'about';
         options.component = 'AboutComponent';
         return nru.applyChanges(
@@ -293,13 +293,13 @@ export default [\n  { path: 'new-route', component: NewRouteComponent }\n];`);
             `\nexport default [\n` +
             `  { path: 'home', component: HomeComponent,\n` +
             `    children: [\n` +
-            `      { path: 'about/:id', component: AboutComponent } ` +
+            `      { path: 'about/:id', component: AboutComponent }` +
             `\n    ]\n  }\n];`);
         });
     });
     it('inserts under parent, mid', () => {
       let editedFile = new InsertChange(routesFile, 16, nestedRoutes);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'details';
         options.component = 'DetailsComponent';
         return nru.applyChanges(
@@ -324,7 +324,7 @@ export default [
     });
     it('inserts under parent, deep', () => {
       let editedFile = new InsertChange(routesFile, 16, nestedRoutes);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'sections';
         options.component = 'SectionsComponent';
         return nru.applyChanges(
@@ -360,7 +360,7 @@ export default [
     ]
   }\n`;
       let editedFile = new InsertChange(routesFile, 16, paths);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'about';
         options.component = 'AboutComponent_1';
         return nru.applyChanges(
@@ -383,7 +383,7 @@ export default [
     });
     it('throws error if repeating child, shallow', () => {
       let editedFile = new InsertChange(routesFile, 16, nestedRoutes);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'home';
         options.component = 'HomeComponent';
         return nru.addPathToRoutes(routesFile, _.merge({route: '/home'}, options));
@@ -393,7 +393,7 @@ export default [
     });
     it('throws error if repeating child, mid', () => {
       let editedFile = new InsertChange(routesFile, 16, nestedRoutes);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'about';
         options.component = 'AboutComponent';
         return nru.addPathToRoutes(routesFile, _.merge({route: 'home/about/'}, options));
@@ -403,7 +403,7 @@ export default [
     });
     it('throws error if repeating child, deep', () => {
       let editedFile = new InsertChange(routesFile, 16, nestedRoutes);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'more';
         options.component = 'MoreComponent';
         return nru.addPathToRoutes(routesFile, _.merge({route: 'home/about/more'}, options));
@@ -413,7 +413,7 @@ export default [
     });
     it('does not report false repeat', () => {
       let editedFile = new InsertChange(routesFile, 16, nestedRoutes);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'more';
         options.component = 'MoreComponent';
         return nru.applyChanges(nru.addPathToRoutes(routesFile, _.merge({route: 'more'}, options)));
@@ -448,7 +448,7 @@ export default [
   },\n  { path: 'trap-queen', component: TrapQueenComponent}\n`;
 
       let editedFile = new InsertChange(routesFile, 16, routes);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'trap-queen';
         options.component = 'TrapQueenComponent';
         return nru.applyChanges(
@@ -475,10 +475,10 @@ export default [
     it('resolves imports correctly', () => {
       let editedFile = new InsertChange(routesFile, 16,
         `\n  { path: 'home', component: HomeComponent }\n`);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         let editedFile = new InsertChange(routesFile, 0,
           `import { HomeComponent } from './app/home/home.component';\n`);
-        return editedFile.apply();
+        return editedFile.apply(NodeHost);
       })
         .then(() => {
           options.dasherizedName = 'home';
@@ -507,12 +507,12 @@ export default [
       { path: 'details', component: DetailsComponent }
     ]
   }`);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         let editedFile = new InsertChange(routesFile, 0,
           `import { AboutComponent } from './app/about/about.component';
 import { DetailsComponent } from './app/about/details/details.component';
 import { DetailsComponent as DetailsComponent_1 } from './app/about/description/details.component;\n`); // tslint:disable-line
-        return editedFile.apply();
+        return editedFile.apply(NodeHost);
       }).then(() => {
         options.dasherizedName = 'details';
         options.component = 'DetailsComponent';
@@ -524,7 +524,7 @@ import { DetailsComponent as DetailsComponent_1 } from './app/about/description/
     it('adds guard to parent route: addItemsToRouteProperties', () => {
       let path = `\n  { path: 'home', component: HomeComponent }\n`;
       let editedFile = new InsertChange(routesFile, 16, path);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         let toInsert = {'home': ['canActivate', '[ MyGuard ]'] };
         return nru.applyChanges(nru.addItemsToRouteProperties(routesFile, toInsert));
       })
@@ -539,7 +539,7 @@ import { DetailsComponent as DetailsComponent_1 } from './app/about/description/
     it('adds guard to child route: addItemsToRouteProperties', () => {
       let path = `\n  { path: 'home', component: HomeComponent }\n`;
       let editedFile = new InsertChange(routesFile, 16, path);
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         options.dasherizedName = 'more';
         options.component = 'MoreComponent';
         return nru.applyChanges(
@@ -609,14 +609,14 @@ export default [
     });
     it('finds component in the presence of decorators: confirmComponentExport', () => {
       let editedFile = new InsertChange(componentFile, 0, '@Component{}\n');
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         let exportExists = nru.confirmComponentExport(componentFile, 'AboutComponent');
         expect(exportExists).toBeTruthy();
       });
     });
     it('report absence of component name: confirmComponentExport', () => {
       let editedFile = new RemoveChange(componentFile, 21, 'onent');
-      return editedFile.apply().then(() => {
+      return editedFile.apply(NodeHost).then(() => {
         let exportExists = nru.confirmComponentExport(componentFile, 'AboutComponent');
         expect(exportExists).not.toBeTruthy();
       });

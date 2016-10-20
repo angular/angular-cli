@@ -32,7 +32,12 @@
             "default": "dist/"
           },
           "assets": {
-            "type": "string"
+            "fixme": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [] 
           },
           "index": {
             "type": "string",
@@ -135,6 +140,51 @@
         },
         "prefixInterfaces": {
           "type": "boolean"
+        },
+        "poll": {
+          "type": "number"
+        },
+        "inline": {
+          "type": "object",
+          "properties": {
+            "style": {
+              "type": "boolean",
+              "default": false
+            },
+            "template": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "boolean",
+              "default": false
+            },
+            "component": {
+              "type": "boolean",
+              "default": true
+            },
+            "directive": {
+              "type": "boolean",
+              "default": true
+            },
+            "module": {
+              "type": "boolean",
+              "default": false
+            },
+            "pipe": {
+              "type": "boolean",
+              "default": true
+            },
+            "service": {
+              "type": "boolean",
+              "default": true
+            }
+          }
         }
       },
       "additionalProperties": false

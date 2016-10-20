@@ -10,6 +10,7 @@ export interface BuildOptions {
   watcher?: string;
   supressSizes: boolean;
   baseHref?: string;
+  aot?: boolean;
 }
 
 const BuildCommand = Command.extend({
@@ -25,11 +26,12 @@ const BuildCommand = Command.extend({
       aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }]
     },
     { name: 'environment',    type: String,  default: '', aliases: ['e'] },
-    { name: 'output-path',    type: 'Path',  default: 'dist/',       aliases: ['o'] },
-    { name: 'watch',          type: Boolean, default: false,         aliases: ['w'] },
+    { name: 'output-path',    type: 'Path',  default: null, aliases: ['o'] },
+    { name: 'watch',          type: Boolean, default: false, aliases: ['w'] },
     { name: 'watcher',        type: String },
     { name: 'suppress-sizes', type: Boolean, default: false },
     { name: 'base-href',      type: String,  default: null, aliases: ['bh'] },
+    { name: 'aot',            type: Boolean, default: false }
   ],
 
   run: function (commandOptions: BuildOptions) {

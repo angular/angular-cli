@@ -7,7 +7,7 @@ module.exports = {
   description: '',
 
   availableOptions: [
-    { name: 'spec', type: Boolean, default: false },
+    { name: 'spec', type: Boolean },
     { name: 'routing', type: Boolean, default: false }
   ],
 
@@ -20,6 +20,10 @@ module.exports = {
   },
 
   locals: function (options) {
+    options.spec = options.spec !== undefined ?
+      options.spec :
+      this.project.ngConfigObj.get('defaults.spec.module');
+
     return {
       dynamicPath: this.dynamicPath.dir,
       spec: options.spec,
@@ -34,7 +38,7 @@ module.exports = {
       fileList = fileList.filter(p => p.indexOf('__name__.module.spec.ts') < 0);
     }
     if (this.options && !this.options.routing) {
-      fileList = fileList.filter(p => p.indexOf('__name__.routing.ts') < 0);
+      fileList = fileList.filter(p => p.indexOf('__name__-routing.module.ts') < 0);
     }
 
     return fileList;
@@ -54,7 +58,7 @@ module.exports = {
   },
 
   afterInstall: function (options) {
-    options.entity.name = path.join(this.entityName, this.dasherizedModuleName);
+    options.entity.name = path.join(this.dasherizedModuleName, this.dasherizedModuleName);
     options.flat = true;
     options.route = false;
     options.inlineTemplate = false;

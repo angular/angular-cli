@@ -1,11 +1,9 @@
-import * as path from 'path';
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 import * as webpack from 'webpack';
-const atl = require('awesome-typescript-loader');
+import * as path from 'path';
+import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
+import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
-import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
-import { findLazyModules } from './find-lazy-modules';
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 export function getWebpackCommonConfig(
@@ -23,7 +21,6 @@ export function getWebpackCommonConfig(
   const scripts = appConfig.scripts
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
-  const lazyModules = findLazyModules(appRoot);
 
   let entry: { [key: string]: string[] } = {
     main: [appMain]
@@ -36,8 +33,8 @@ export function getWebpackCommonConfig(
   return {
     devtool: 'source-map',
     resolve: {
-      extensions: ['', '.ts', '.js'],
-      root: appRoot
+      extensions: ['.ts', '.js'],
+      modules: [path.resolve(projectRoot, 'node_modules')]
     },
     context: path.resolve(__dirname, './'),
     entry: entry,
@@ -46,32 +43,15 @@ export function getWebpackCommonConfig(
       filename: '[name].bundle.js'
     },
     module: {
-      preLoaders: [
+      rules: [
         {
+          enforce: 'pre',
           test: /\.js$/,
           loader: 'source-map-loader',
           exclude: [
             /node_modules/
           ]
-        }
-      ],
-      loaders: [
-        {
-          test: /\.ts$/,
-          loaders: [
-            {
-              loader: 'awesome-typescript-loader',
-              query: {
-                useForkChecker: true,
-                tsconfig: path.resolve(appRoot, appConfig.tsconfig)
-              }
-            }, {
-              loader: 'angular2-template-loader'
-            }
-          ],
-          exclude: [/\.(spec|e2e)\.ts$/]
         },
-
         // in main, load css as raw text
         {
           exclude: styles,
@@ -123,8 +103,6 @@ export function getWebpackCommonConfig(
       ]
     },
     plugins: [
-      new webpack.ContextReplacementPlugin(/.*/, appRoot, lazyModules),
-      new atl.ForkCheckerPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         chunksSortMode: 'dependency'
@@ -150,17 +128,18 @@ export function getWebpackCommonConfig(
         filename: 'inline.js',
         sourceMapFilename: 'inline.map'
       }),
-      new CopyWebpackPlugin([{
-        context: path.resolve(appRoot, appConfig.assets),
-        from: { glob: '**/*', dot: true },
-        ignore: [ '.gitkeep' ],
-        to: path.resolve(projectRoot, appConfig.outDir, appConfig.assets)
-      }])
+      new GlobCopyWebpackPlugin({
+        patterns: appConfig.assets,
+        globOptions: {cwd: appRoot, dot: true, ignore: '**/.gitkeep'}
+      })
     ],
     node: {
       fs: 'empty',
-      global: 'window',
+      global: true,
       crypto: 'empty',
+      tls: 'empty',
+      net: 'empty',
+      process: true,
       module: false,
       clearImmediate: false,
       setImmediate: false

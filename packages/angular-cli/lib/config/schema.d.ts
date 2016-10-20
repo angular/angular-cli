@@ -59,5 +59,18 @@ export interface CliConfig {
     defaults?: {
         styleExt?: string;
         prefixInterfaces?: boolean;
+        poll?: number;
+        inline?: {
+            style?: boolean;
+            template?: boolean;
+        };
+        spec?: {
+            class?: boolean;
+            component?: boolean;
+            directive?: boolean;
+            module?: boolean;
+            pipe?: boolean;
+            service?: boolean;
+        };
     };
 }

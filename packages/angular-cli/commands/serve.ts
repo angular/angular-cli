@@ -22,10 +22,11 @@ export interface ServeTaskOptions {
   liveReloadLiveCss?: boolean;
   target?: string;
   environment?: string;
-  outputPath?: string;
   ssl?: boolean;
   sslKey?: string;
   sslCert?: string;
+  aot?: boolean;
+  open?: boolean;
 }
 
 const ServeCommand = Command.extend({
@@ -40,7 +41,7 @@ const ServeCommand = Command.extend({
       type: String,
       default: 'localhost',
       aliases: ['H'],
-      description: 'Listens on all interfaces by default'
+      description: 'Listens only on localhost by default'
     },
     { name: 'proxy-config',         type: 'Path',                          aliases: ['pc'] },
     { name: 'watcher',              type: String,  default: 'events',      aliases: ['w'] },
@@ -78,7 +79,15 @@ const ServeCommand = Command.extend({
     { name: 'environment',          type: String,  default: '', aliases: ['e'] },
     { name: 'ssl',                  type: Boolean, default: false },
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
-    { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' }
+    { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' },
+    { name: 'aot',                  type: Boolean, default: false },
+    {
+      name: 'open',
+      type: Boolean,
+      default: false,
+      aliases: ['o'],
+      description: 'Opens the url in default browser',
+    },
   ],
 
   run: function(commandOptions: ServeTaskOptions) {

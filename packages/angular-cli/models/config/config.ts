@@ -6,10 +6,11 @@ import {SchemaClass, SchemaClassFactory} from '../json-schema/schema-class-facto
 
 const DEFAULT_CONFIG_SCHEMA_PATH = path.join(__dirname, '../../lib/config/schema.json');
 
-
-export class InvalidConfigError extends Error {
-  constructor(err: Error) {
-    super(err.message);
+class InvalidConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.message = message;
+    this.name = 'InvalidConfigError';
   }
 }
 
@@ -61,7 +62,7 @@ export class CliConfig<JsonType> {
     try {
       schema = JSON.parse(schemaContent);
     } catch (err) {
-      throw new InvalidConfigError(err);
+      throw new InvalidConfigError(err.message);
     }
 
     return new CliConfig<ConfigType>(null, schema, content, global);
@@ -80,10 +81,20 @@ export class CliConfig<JsonType> {
 
     try {
       content = JSON.parse(configContent);
+    } catch (err) {
+      throw new InvalidConfigError(
+        'Parsing angular-cli.json failed. Please make sure your angular-cli.json'
+        + ' is valid JSON. Error:\n' + err
+      );
+    }
+
+    try {
       schema = JSON.parse(schemaContent);
       others = otherContents.map(otherContent => JSON.parse(otherContent));
     } catch (err) {
-      throw new InvalidConfigError(err);
+      throw new InvalidConfigError(
+        `Parsing Angular CLI schema or other configuration files failed. Error:\n${err}`
+      );
     }
 
     return new CliConfig<T>(configPath, schema, content, others);

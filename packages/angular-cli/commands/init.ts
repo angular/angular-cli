@@ -18,7 +18,6 @@ const InitCommand: any = Command.extend({
   availableOptions: [
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
-    { name: 'blueprint', type: String, aliases: ['b'] },
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
     { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
     { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
@@ -26,14 +25,13 @@ const InitCommand: any = Command.extend({
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'mobile', type: Boolean, default: false }
+    { name: 'mobile', type: Boolean, default: false },
+    { name: 'routing', type: Boolean, default: false },
+    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
+    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
   ],
 
   anonymousOptions: ['<glob-pattern>'],
-
-  _defaultBlueprint: function () {
-    return 'ng2';
-  },
 
   run: function (commandOptions: any, rawArgs: string[]) {
     if (commandOptions.dryRun) {
@@ -97,19 +95,30 @@ const InitCommand: any = Command.extend({
 
     const blueprintOpts = {
       dryRun: commandOptions.dryRun,
-      blueprint: commandOptions.blueprint || this._defaultBlueprint(),
+      blueprint: 'ng2',
       rawName: packageName,
       targetFiles: rawArgs || '',
       rawArgs: rawArgs.toString(),
       sourceDir: commandOptions.sourceDir,
       style: commandOptions.style,
       prefix: commandOptions.prefix,
-      mobile: commandOptions.mobile
+      mobile: commandOptions.mobile,
+      routing: commandOptions.routing,
+      inlineStyle: commandOptions.inlineStyle,
+      inlineTemplate: commandOptions.inlineTemplate,
+      ignoredUpdateFiles: ['favicon.ico']
     };
 
     if (!validProjectName(packageName)) {
       return Promise.reject(
         new SilentError('We currently do not support a name of `' + packageName + '`.'));
+    }
+
+    if (commandOptions.mobile) {
+      return Promise.reject(new SilentError(
+        'The --mobile flag has been disabled temporarily while we await an update of ' +
+        'angular-universal for supporting NgModule. Sorry for the inconvenience.'
+      ));
     }
 
     blueprintOpts.blueprint = normalizeBlueprint(blueprintOpts.blueprint);

@@ -1,21 +1,22 @@
-var path = require('path');
-var chalk = require('chalk');
-var Blueprint = require('ember-cli/lib/models/blueprint');
-var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const path = require('path');
+const chalk = require('chalk');
+const Blueprint = require('ember-cli/lib/models/blueprint');
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const findParentModule = require('../../utilities/find-parent-module').default;
-var getFiles = Blueprint.prototype.files;
+const getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
+const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 
 module.exports = {
   description: '',
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: false },
-    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
-    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
+    { name: 'inline-template', type: Boolean, aliases: ['it'] },
+    { name: 'inline-style', type: Boolean, aliases: ['is'] },
     { name: 'prefix', type: Boolean, default: true },
-    { name: 'spec', type: Boolean, default: true }
+    { name: 'spec', type: Boolean }
   ],
 
   beforeInstall: function() {
@@ -54,6 +55,18 @@ module.exports = {
         this.project.ngConfig.defaults.styleExt) {
       this.styleExt = this.project.ngConfig.defaults.styleExt;
     }
+
+    options.inlineStyle = options.inlineStyle !== undefined ?
+      options.inlineStyle :
+      this.project.ngConfigObj.get('defaults.inline.style');
+
+    options.inlineTemplate = options.inlineTemplate !== undefined ?
+      options.inlineTemplate :
+      this.project.ngConfigObj.get('defaults.inline.template');
+
+    options.spec = options.spec !== undefined ?
+      options.spec :
+      this.project.ngConfigObj.get('defaults.spec.component');
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
@@ -117,7 +130,7 @@ module.exports = {
     if (!options['skip-import']) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
-          .then(change => change.apply()));
+          .then(change => change.apply(NodeHost)));
     }
 
     return Promise.all(returns);

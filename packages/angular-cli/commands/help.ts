@@ -6,10 +6,9 @@ const stringUtils = require('ember-cli-string-utils');
 const lookupCommand = require('ember-cli/lib/cli/lookup-command');
 
 const commandsToIgnore = [
-  'help',
   'easter-egg',
-  'completion',
-  'github-pages-deploy'
+  'destroy',
+  'github-pages-deploy' // errors because there is no base github-pages command
 ];
 
 const HelpCommand = Command.extend({
@@ -19,10 +18,10 @@ const HelpCommand = Command.extend({
 
   availableOptions: [],
 
-  run: function (commandOptions: any) {
+  run: function (commandOptions: any, rawArgs: any) {
     let commandFiles = fs.readdirSync(__dirname)
-      // Remove files that are not JavaScript
-      .filter(file => file.match(/\.js$/))
+      // Remove files that are not JavaScript or Typescript
+      .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
       .map(file => path.parse(file).name)
       .map(file => file.toLowerCase());
 
@@ -49,7 +48,14 @@ const HelpCommand = Command.extend({
         tasks: this.tasks
       });
 
-      this.ui.writeLine(command.printBasicHelp(commandOptions));
+      if (rawArgs.length > 0) {
+        if (cmd === rawArgs[0]) {
+          this.ui.writeLine(command.printDetailedHelp(commandOptions));
+        }
+      } else {
+        this.ui.writeLine(command.printBasicHelp(commandOptions));
+      }
+
     });
   }
 });
