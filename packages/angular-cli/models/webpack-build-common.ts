@@ -96,6 +96,11 @@ export function getWebpackCommonConfig(
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
         { test: /\.html$/, loader: 'raw-loader' },
+        {
+          test: /\.pug$/,
+          loader: 'pug-html', 
+          query: { doctype: 'html', plugins: [require('pug-plugin-ng')] },
+        },
 
         { test: /\.(otf|woff|ttf|svg)$/, loader: 'url?limit=10000' },
         { test: /\.woff2$/, loader: 'url?limit=10000&mimetype=font/woff2' },
