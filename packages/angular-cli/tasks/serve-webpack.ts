@@ -5,7 +5,6 @@ const SilentError = require('silent-error');
 const Task = require('ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 const WebpackDevServer = require('webpack-dev-server');
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 import { webpackDevServerOutputOptions } from '../models/';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
@@ -36,10 +35,14 @@ export default Task.extend({
     );
     webpackCompiler = webpack(config);
 
-    webpackCompiler.apply(new ProgressPlugin({
-      profile: true,
-      colors: true
-    }));
+    if (commandOptions.progress) {
+      const ProgressPlugin = require('webpack/lib/ProgressPlugin');
+
+      webpackCompiler.apply(new ProgressPlugin({
+        profile: true,
+        colors: true
+      }));
+    }
 
     let proxyConfig = {};
     if (commandOptions.proxyConfig) {
