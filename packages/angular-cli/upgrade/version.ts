@@ -76,6 +76,11 @@ export class Version {
 
 
     const configPath = CliConfig.configFilePath();
+
+    if (configPath === null) {
+      return new Version(null);
+    }
+
     const configJson = readFileSync(configPath, 'utf8');
 
     try {
@@ -94,7 +99,7 @@ export class Version {
         workflow, a faster build and smaller bundles.
         
         To get more info, including a step-by-step guide to upgrade the CLI, follow this link:
-        https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.12
+        https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14
       ` + '\n')));
       process.exit(1);
     } else {

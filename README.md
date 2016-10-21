@@ -16,6 +16,8 @@ This project is very much still a work in progress.
 The CLI is now in beta.
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
+Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
+
 ## Webpack update
 
 We changed the build system between beta.10 and beta.14, from SystemJS to Webpack.
@@ -26,7 +28,8 @@ You can update your `beta.10` projects to `beta.14` by following [these instruct
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**.
+Both the CLI and generated project have dependencies that require Node 4 or higher, together
+with NPM 3 or higher.
 
 ## Table of Contents
 
@@ -38,7 +41,7 @@ The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**
 * [Creating a Build](#creating-a-build)
 * [Build Targets and Environment Files](#build-targets-and-environment-files)
 * [Base tag handling in index.html](#base-tag-handling-in-indexhtml)
-* [Adding extra files to the build](#adding-extra-files-to-the-build)
+* [Bundling](#bundling)
 * [Running Unit Tests](#running-unit-tests)
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Proxy To Backend](#proxy-to-backend)
@@ -46,12 +49,12 @@ The generated project has dependencies that require **Node 4.x.x and NPM 3.x.x**
 * [Linting and formatting code](#linting-and-formatting-code)
 * [Support for offline applications](#support-for-offline-applications)
 * [Commands autocompletion](#commands-autocompletion)
+* [Project assets](#project-assets)
 * [Global styles](#global-styles)
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
 * [Global Library Installation](#global-library-installation)
 * [Updating angular-cli](#updating-angular-cli)
-* [Known Issues](#known-issues)
 * [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
 
 ## Installation
@@ -133,7 +136,7 @@ By default, the development build target and environment are used.
 
 The mapping used to determine which environment file is used can be found in `angular-cli.json`:
 
-```
+```json
 "environments": {
   "source": "environments/environment.ts",
   "dev": "environments/environment.ts",
@@ -198,12 +201,12 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 Using the proxying support in webpack's dev server we can highjack certain urls and send them to a backend server.
 We do this by passing a file to `--proxy-config`
 
-Say we have a server running on `http://localhost:3000/api` and we want all calls th `http://localhost:4200/api` to go to that server.
+Say we have a server running on `http://localhost:3000/api` and we want all calls to `http://localhost:4200/api` to go to that server.
 
 We create a file next to projects `package.json` called `proxy.conf.json`
 with the content
 
-```
+```json
 {
   "/api": {
     "target": "http://localhost:3000",
@@ -216,7 +219,7 @@ You can read more about what options are available here [webpack-dev-server prox
 
 and then we edit the `package.json` file's start script to be
 
-```
+```json
 "start": "ng serve --proxy-config proxy.conf.json",
 ```
 
@@ -226,7 +229,7 @@ now run it with `npm start`
 
 You can deploy your apps quickly via:
 
-```
+```bash
 ng github-pages:deploy --message "Optional commit message"
 ```
 
@@ -246,7 +249,7 @@ To simplify the authentication, be sure to [setup your ssh keys](https://help.gi
 
 If you are deploying a [user or organization page](https://help.github.com/articles/user-organization-and-project-pages/), you can instead use the following command:
 
-```
+```bash
 ng github-pages:deploy --user-page --message "Optional commit message"
 ```
 
@@ -273,21 +276,25 @@ To turn on auto completion use the following commands:
 
 For bash:
 ```bash
-ng completion >> ~/.bashrc
+ng completion 1>> ~/.bashrc 2>>&1
 source ~/.bashrc
 ```
 
 For zsh:
 ```bash
-ng completion >> ~/.zshrc
+ng completion 1>> ~/.zshrc 2>>&1
 source ~/.zshrc
 ```
 
 Windows users using gitbash:
 ```bash
-ng completion >> ~/.bash_profile
+ng completion 1>> ~/.bash_profile 2>>&1
 source ~/.bash_profile
 ```
+
+### Project assets
+
+You can add any files you want copied as-is to `src/assets/`.
 
 ### Global styles
 
@@ -308,7 +315,7 @@ Angular-CLI supports all major CSS preprocessors:
 
 To use these prepocessors simply add the file to your component's `styleUrls`:
 
-```
+```javascript
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -343,7 +350,7 @@ npm install d3 --save
 npm install @types/d3 --save-dev
 ```
 
-If the library doesn't have typings available at `@types/`, you can still use it by 
+If the library doesn't have typings available at `@types/`, you can still use it by
 manually adding typings for it:
 ```
 // in src/typings.d.ts
@@ -371,7 +378,7 @@ npm install bootstrap@next
 
 Then add the needed script files to `apps[0].scripts`:
 
-```
+```json
 "scripts": [
   "../node_modules/jquery/dist/jquery.js",
   "../node_modules/tether/dist/js/tether.js",
@@ -380,7 +387,7 @@ Then add the needed script files to `apps[0].scripts`:
 ```
 
 Finally add the Bootstrap CSS to the `apps[0].styles` array:
-```
+```json
 "styles": [
   "../node_modules/bootstrap/dist/css/bootstrap.css",
   "styles.css"
@@ -395,14 +402,14 @@ your app.
 To update `angular-cli` to a new version, you must update both the global package and your project's local package.
 
 Global package:
-```
+```bash
 npm uninstall -g angular-cli
 npm cache clean
 npm install -g angular-cli@latest
 ```
 
 Local project package:
-```
+```bash
 rm -rf node_modules dist tmp
 npm install --save-dev angular-cli@latest
 ng init
@@ -415,17 +422,6 @@ Carefully read the diffs for each code file, and either accept the changes or in
 **The main cause of errors after an update is failing to incorporate these updates into your code**.
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
-
-
-## Known issues
-
-This project is currently a prototype so there are many known issues. Just to mention a few:
-
-- All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
-- On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
-- The initial installation as well as `ng new` take too long because of lots of npm dependencies.
-- Many existing ember addons are not compatible with Angular apps built via angular-cli.
-- When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
 
 
 ## Development Hints for hacking on angular-cli

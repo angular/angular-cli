@@ -18,7 +18,7 @@ describe('App: <%= jsComponentName %>', () => {
     expect(app).toBeTruthy();
   }));
 
-  it(`should have as title 'app works!'`, async(() => {
+  it(`should have as title '<%= prefix %> works!'`, async(() => {
     let fixture = TestBed.createComponent(AppComponent);
     let app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual('<%= prefix %> works!');

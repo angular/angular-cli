@@ -24,12 +24,18 @@ const GenerateCommand = EmberGenerateCommand.extend({
       SilentError.debugOrThrow('angular-cli/commands/generate', `Invalid blueprint: ${rawArgs[0]}`);
     }
 
+    if (!rawArgs[1]) {
+      SilentError.debugOrThrow('angular-cli/commands/generate',
+        `The \`ng generate ${rawArgs[0]}\` command requires a name to be specified.`);
+    }
+
     // Override default help to hide ember blueprints
     EmberGenerateCommand.prototype.printDetailedHelp = function() {
       const blueprintList = fs.readdirSync(path.join(__dirname, '..', 'blueprints'));
       const blueprints = blueprintList
         .filter(bp => bp.indexOf('-test') === -1)
         .filter(bp => bp !== 'ng2')
+        .filter(bp => bp !== 'mobile')
         .map(bp => Blueprint.load(path.join(__dirname, '..', 'blueprints', bp)));
 
       let output = '';

@@ -1,8 +1,8 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
+import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
@@ -33,7 +33,8 @@ export function getWebpackCommonConfig(
   return {
     devtool: 'source-map',
     resolve: {
-      extensions: ['.ts', '.js']
+      extensions: ['.ts', '.js'],
+      modules: [path.resolve(projectRoot, 'node_modules')]
     },
     context: path.resolve(__dirname, './'),
     entry: entry,
@@ -94,7 +95,7 @@ export function getWebpackCommonConfig(
 
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
-        { test: /\.html$/, loader: 'html-loader' },
+        { test: /\.html$/, loader: 'raw-loader' },
 
         { test: /\.(otf|woff|ttf|svg)$/, loader: 'url?limit=10000' },
         { test: /\.woff2$/, loader: 'url?limit=10000&mimetype=font/woff2' },
@@ -127,17 +128,18 @@ export function getWebpackCommonConfig(
         filename: 'inline.js',
         sourceMapFilename: 'inline.map'
       }),
-      new CopyWebpackPlugin([{
-        context: path.resolve(appRoot, appConfig.assets),
-        from: { glob: '**/*', dot: true },
-        ignore: [ '.gitkeep' ],
-        to: path.resolve(projectRoot, appConfig.outDir, appConfig.assets)
-      }])
+      new GlobCopyWebpackPlugin({
+        patterns: appConfig.assets,
+        globOptions: {cwd: appRoot, dot: true, ignore: '**/.gitkeep'}
+      })
     ],
     node: {
       fs: 'empty',
       global: true,
       crypto: 'empty',
+      tls: 'empty',
+      net: 'empty',
+      process: true,
       module: false,
       clearImmediate: false,
       setImmediate: false

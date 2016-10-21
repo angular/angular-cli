@@ -102,13 +102,19 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
             resourcePath: `./${appConfig.root}`
           }
         }
-      })
+      }),
+      new webpack.ContextReplacementPlugin(
+        /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
+        appRoot
+      )
     ],
     node: {
       fs: 'empty',
       global: true,
-      process: false,
       crypto: 'empty',
+      tls: 'empty',
+      net: 'empty',
+      process: true,
       module: false,
       clearImmediate: false,
       setImmediate: false

@@ -117,13 +117,8 @@ describe('Acceptance: ng init', function () {
     ]).then(confirmBlueprinted);
   });
 
-  it('ng init --mobile', () => {
-    return ng([
-      'init',
-      '--skip-npm',
-      '--skip-bower',
-      '--mobile'
-    ]).then(() => confirmBlueprinted(true));
+  it('ng init with mobile flag does throw exception', function () {
+    expect(ng(['init', '--mobile'])).to.throw;
   });
 
   it('ng init can run in created folder', function () {
@@ -148,11 +143,6 @@ describe('Acceptance: ng init', function () {
 
   it('init an already init\'d folder', function () {
     return ng(['init', '--skip-npm', '--skip-bower'])
-      .then(function () {
-        // ignore the favicon file for the the unit test since it breaks at ember-cli level
-        // when trying to re-init
-        Blueprint.ignoredFiles.push('favicon.ico');
-      })
       .then(function () {
         return ng(['init', '--skip-npm', '--skip-bower']);
       })

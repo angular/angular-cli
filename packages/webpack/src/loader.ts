@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as ts from 'typescript';
-import {NgcWebpackPlugin} from './plugin';
+import {AotPlugin} from './plugin';
 import {MultiChange, ReplaceChange, insertImport} from '@angular-cli/ast-tools';
 
 // TODO: move all this to ast-tools.
@@ -31,7 +31,7 @@ function _removeDecorators(fileName: string, source: string): string {
 
 function _replaceBootstrap(fileName: string,
                            source: string,
-                           plugin: NgcWebpackPlugin): Promise<string> {
+                           plugin: AotPlugin): Promise<string> {
   // If bootstrapModule can't be found, bail out early.
   if (!source.match(/\bbootstrapModule\b/)) {
     return Promise.resolve(source);
@@ -40,11 +40,11 @@ function _replaceBootstrap(fileName: string,
   let changes = new MultiChange();
 
   // Calculate the base path.
-  const basePath = path.normalize(plugin.angularCompilerOptions.basePath);
+  const basePath = path.normalize(plugin.basePath);
   const genDir = path.normalize(plugin.genDir);
   const dirName = path.normalize(path.dirname(fileName));
-  const [entryModulePath, entryModuleName] = plugin.entryModule.split('#');
-  const entryModuleFileName = path.normalize(entryModulePath + '.ngfactory');
+  const entryModule = plugin.entryModule;
+  const entryModuleFileName = path.normalize(entryModule.path + '.ngfactory');
   const relativeEntryModulePath = path.relative(basePath, entryModuleFileName);
   const fullEntryModulePath = path.resolve(genDir, relativeEntryModulePath);
   const relativeNgFactoryPath = path.relative(dirName, fullEntryModulePath);
@@ -82,7 +82,7 @@ function _replaceBootstrap(fileName: string,
     .filter(call => bootstraps.some(bs => bs == call.expression))
     .forEach((call: ts.CallExpression) => {
       changes.appendChange(new ReplaceChange(fileName, call.arguments[0].getStart(sourceFile),
-        entryModuleName, entryModuleName + 'NgFactory'));
+        entryModule.className, entryModule.className + 'NgFactory'));
     });
 
   calls
@@ -98,7 +98,7 @@ function _replaceBootstrap(fileName: string,
         'bootstrapModule', 'bootstrapModuleFactory'));
     });
   changes.appendChange(insertImport(fileName, 'platformBrowser', '@angular/platform-browser'));
-  changes.appendChange(insertImport(fileName, entryModuleName + 'NgFactory', ngFactoryPath));
+  changes.appendChange(insertImport(fileName, entryModule.className + 'NgFactory', ngFactoryPath));
 
   let sourceText = source;
   return changes.apply({
@@ -107,35 +107,52 @@ function _replaceBootstrap(fileName: string,
   }).then(() => sourceText);
 }
 
+function _transpile(plugin: AotPlugin, filePath: string, sourceText: string) {
+  const program = plugin.program;
+  if (plugin.typeCheck) {
+    const sourceFile = program.getSourceFile(filePath);
+    const diagnostics = program.getSyntacticDiagnostics(sourceFile)
+                .concat(program.getSemanticDiagnostics(sourceFile))
+                .concat(program.getDeclarationDiagnostics(sourceFile));
+
+    if (diagnostics.length > 0) {
+      const message = diagnostics
+        .map(diagnostic => {
+          const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+          const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+          return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
+        })
+        .join('\n');
+      throw new Error(message);
+    }
+  }
+
+  const result = ts.transpileModule(sourceText, {
+    compilerOptions: plugin.compilerOptions,
+    fileName: filePath
+  });
+
+  return {
+    outputText: result.outputText,
+    sourceMap: JSON.parse(result.sourceMapText)
+  };
+}
 
 // Super simple TS transpiler loader for testing / isolated usage. does not type check!
 export function ngcLoader(source: string) {
   this.cacheable();
 
-  const plugin = this._compilation._ngToolsWebpackPluginInstance as NgcWebpackPlugin;
-  if (plugin && plugin instanceof NgcWebpackPlugin) {
+  const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
+  // We must verify that AotPlugin is an instance of the right class.
+  if (plugin && plugin instanceof AotPlugin) {
     const cb: any = this.async();
 
     plugin.done
       .then(() => _removeDecorators(this.resource, source))
       .then(sourceText => _replaceBootstrap(this.resource, sourceText, plugin))
       .then(sourceText => {
-        const result = ts.transpileModule(sourceText, {
-          compilerOptions: {
-            target: ts.ScriptTarget.ES5,
-            module: ts.ModuleKind.ES2015,
-          }
-        });
-
-        if (result.diagnostics && result.diagnostics.length) {
-          let message = '';
-          result.diagnostics.forEach(d => {
-            message += d.messageText + '\n';
-          });
-          cb(new Error(message));
-        }
-
-        cb(null, result.outputText, result.sourceMapText ? JSON.parse(result.sourceMapText) : null);
+        const result = _transpile(plugin, this.resource, sourceText);
+        cb(null, result.outputText, result.sourceMap);
       })
       .catch(err => cb(err));
   } else {

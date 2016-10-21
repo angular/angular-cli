@@ -128,6 +128,12 @@ export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   // Helper function to create a child based on its schema.
   protected _createChildProperty<T>(name: string, value: T, forward: SchemaTreeNode<T>,
                                     schema: Schema, define = true): SchemaTreeNode<T> {
+
+    // TODO: fix this
+    if (schema['fixme'] && typeof value === 'string') {
+      value = <T>(<any>[ value ]);
+    }
+
     const type = schema['type'];
     let Klass: any = null;
 
@@ -203,7 +209,8 @@ export class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: 
             serializer.property(key, () => this._children[key].serialize(serializer, value[key]));
           }
         } else if (this._schema['additionalProperties']) {
-          serializer.property(key, () => this._children[key].serialize(serializer, value[key]));
+          // Fallback to direct value output for additional properties
+          serializer.property(key, () => serializer.outputValue(value[key]));
         }
       }
     });
