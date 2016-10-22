@@ -412,6 +412,7 @@ Local project package:
 ```bash
 rm -rf node_modules dist tmp
 npm install --save-dev angular-cli@latest
+npm install
 ng init
 ```
 
