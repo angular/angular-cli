@@ -85,6 +85,7 @@
     "offline-plugin": "^3.4.1",
     "opn": "4.0.1",
     "parse5": "^2.1.5",
+    "portfinder": "1.0.9",
     "postcss-discard-comments": "^2.0.4",
     "postcss-loader": "^0.9.1",
     "protractor": "^3.3.0",
