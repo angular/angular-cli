@@ -41,17 +41,6 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
       }),
       new webpack.LoaderOptionsPlugin({
         options: {
-          htmlLoader: {
-            minimize: true,
-            removeAttributeQuotes: false,
-            caseSensitive: true,
-            customAttrSurround: [
-              [/#/, /(?:)/],
-              [/\*/, /(?:)/],
-              [/\[?\(?/, /(?:)/]
-            ],
-            customAttrAssign: [/\)?\]?=/]
-          },
           postcss: [
             require('postcss-discard-comments')
           ]
