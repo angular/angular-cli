@@ -7,7 +7,7 @@ matrix:
   fast_finish: true
 
 install:
-  - ps: Install-Product node $env:nodejs_version x64
+  - ps: Install-Product node $env:nodejs_version
   - npm install -g npm
   - npm install
 
