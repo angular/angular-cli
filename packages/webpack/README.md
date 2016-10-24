@@ -37,3 +37,16 @@ The loader works with the webpack plugin to compile your TypeScript. It's import
 * `mainPath`. Optional if `entryModule` is specified. The `main.ts` file containing the bootstrap code. The plugin will use AST to determine the `entryModule`.
 * `genDir`. Optional. The output directory of the offline compiler. The files created by the offline compiler will be in a virtual file system, but the import paths might change. This can also be specified in `angularCompilerOptions`, and by default will be the same as `basePath`.
 * `typeChecking`. Optional, defaults to true. Enable type checking through your application. This will slow down compilation, but show syntactic and semantic errors in webpack.
+
+## Features
+The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ngtools) standalone from the Angular CLI as presented in [Stephen Fluin's Angular CLI talk](https://youtu.be/uBRK6cTr4Vk?t=6m45s) at Angular Connect 2016:
+
+* Compiles SCSS/LESS
+* TypeScript transpilation
+* Bundles JavaScript, CSS
+* Asset optimiation
+* Virtual filesystem for assets
+ * For serving local assets and compile versions.
+* Live-reload via websockets
+* Code splitting
+ * Recognizing the use of `loadChildren` in the router, and bundling those modules separately so that any dependencies of those modules are not going to be loaded as part of your main bundle. These separate bundles will be pulled out of the critical path of your application, making your total application bundle much smaller and loading it much more performant.
