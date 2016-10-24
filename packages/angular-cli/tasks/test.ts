@@ -20,6 +20,11 @@ export default Task.extend({
         options.browsers = options.browsers.split(',');
       }
 
+      options.angularCli = {
+        codeCoverage: options.codeCoverage,
+        lint: options.lint,
+      };
+
       // Assign additional karmaConfig options to the local ngapp config
       options.configFile = karmaConfig;
 
