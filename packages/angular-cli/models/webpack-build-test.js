@@ -10,12 +10,13 @@ const webpackLoader = g['angularCliIsLocal']
   ? g.angularCliPackages['@ngtools/webpack'].main
   : '@ngtools/webpack';
 
+const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 
 const getWebpackTestConfig = function (projectRoot, environment, appConfig, testConfig) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
-  const extraRules = [];
-  const extraPlugins = [];
+  var extraRules = [];
+  var extraPlugins = [];
 
   if (testConfig.codeCoverage) {
     extraRules.push({
@@ -47,6 +48,10 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
         }
       }
     }))
+  }
+
+  if (testConfig.progress) {
+    extraPlugins.push(new ProgressPlugin({ colors: true }));
   }
 
   return {

@@ -2,9 +2,10 @@ import * as rimraf from 'rimraf';
 import * as path from 'path';
 const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
+const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 import { BuildOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
-import { webpackOutputOptions } from '../models/';
+import { webpackOutputOptions, verboseWebpackOutputOptions } from '../models/';
 import { CliConfig } from '../models/config';
 
 // Configure build and output;
@@ -25,16 +26,22 @@ export default <any>Task.extend({
       runTaskOptions.baseHref,
       runTaskOptions.aot,
       runTaskOptions.sourcemap,
-      runTaskOptions.vendorChunk
+      runTaskOptions.vendorChunk,
+      runTaskOptions.verbose
     ).config;
 
     const webpackCompiler: any = webpack(config);
 
-    const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
+    const statsOptions = runTaskOptions.verbose
+                        ? Object.assign(webpackOutputOptions, verboseWebpackOutputOptions)
+                        : webpackOutputOptions;
 
-    webpackCompiler.apply(new ProgressPlugin({
-      profile: true
-    }));
+    if (runTaskOptions.progress) {
+      webpackCompiler.apply(new ProgressPlugin({
+        profile: runTaskOptions.verbose,
+        colors: true
+      }));
+    }
 
     return new Promise((resolve, reject) => {
       webpackCompiler.run((err: any, stats: any) => {
@@ -46,7 +53,7 @@ export default <any>Task.extend({
 
         if (stats.hash !== lastHash) {
           lastHash = stats.hash;
-          process.stdout.write(stats.toString(webpackOutputOptions) + '\n');
+          process.stdout.write(stats.toString(statsOptions) + '\n');
         }
 
         return stats.hasErrors() ? reject() : resolve();
