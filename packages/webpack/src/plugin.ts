@@ -20,7 +20,6 @@ export interface AotPluginOptions {
   tsConfigPath: string;
   basePath?: string;
   entryModule?: string;
-  genDir?: string;
   mainPath?: string;
   typeChecking?: boolean;
 }
@@ -57,18 +56,19 @@ export class AotPlugin {
   private _compilation: any = null;
 
   private _typeCheck: boolean = true;
+  private _basePath: string;
 
 
   constructor(options: AotPluginOptions) {
     this._setupOptions(options);
   }
 
-  get basePath() { return this._angularCompilerOptions.basePath; }
+  get basePath() { return this._basePath; }
   get compilation() { return this._compilation; }
   get compilerOptions() { return this._compilerOptions; }
   get done() { return this._donePromise; }
   get entryModule() { return this._entryModule; }
-  get genDir() { return this._angularCompilerOptions.genDir; }
+  get genDir() { return this._basePath; }
   get program() { return this._program; }
   get typeCheck() { return this._typeCheck; }
 
@@ -76,7 +76,7 @@ export class AotPlugin {
     // Fill in the missing options.
     if (!options.hasOwnProperty('tsConfigPath')) {
       throw new Error('Must specify "tsConfigPath" in the configuration of @ngtools/webpack.');
-}
+    }
 
     // Check the base path.
     let basePath = path.resolve(process.cwd(), path.dirname(options.tsConfigPath));
@@ -92,9 +92,7 @@ export class AotPlugin {
 
     // Check the genDir.
     let genDir = basePath;
-    if (options.hasOwnProperty('genDir')) {
-      genDir = options.genDir;
-    } else if (tsConfig.ngOptions.hasOwnProperty('genDir')) {
+    if (tsConfig.ngOptions.hasOwnProperty('genDir')) {
       genDir = tsConfig.ngOptions.genDir;
     }
 
@@ -114,6 +112,7 @@ export class AotPlugin {
       entryModule: this._entryModule.toString(),
       genDir
     });
+    this._basePath = basePath;
 
     if (options.hasOwnProperty('typeChecking')) {
       this._typeCheck = options.typeChecking;
