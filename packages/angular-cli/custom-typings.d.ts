@@ -1,7 +1,7 @@
 interface IWebpackDevServerConfigurationOptions {
   contentBase?: string;
   hot?: boolean;
-  historyApiFallback?: boolean | { [key: string]: string };
+  historyApiFallback?: boolean | { [key: string]: string | boolean };
   compress?: boolean;
   proxy?: {[key: string]: string};
   staticOptions?: any;
@@ -17,6 +17,9 @@ interface IWebpackDevServerConfigurationOptions {
   headers?: { [key: string]: string };
   stats?: { [key: string]: boolean };
   inline: boolean;
+  https?: boolean;
+  key?: string;
+  cert?: string;
 }
 
 interface WebpackProgressPluginOutputOptions {

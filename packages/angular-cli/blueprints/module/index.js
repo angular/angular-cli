@@ -58,7 +58,7 @@ module.exports = {
   },
 
   afterInstall: function (options) {
-    options.entity.name = path.join(this.entityName, this.dasherizedModuleName);
+    options.entity.name = path.join(this.dasherizedModuleName, this.dasherizedModuleName);
     options.flat = true;
     options.route = false;
     options.inlineTemplate = false;

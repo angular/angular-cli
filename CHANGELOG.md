@@ -1,3 +1,44 @@
+<a name="1.0.0-beta.18"></a>
+# [1.0.0-beta.18](https://github.com/angular/angular-cli/compare/v1.0.0-beta.17...v1.0.0-beta.18) (2016-10-20)
+
+
+### Bug Fixes
+
+* **#1875:** Support npm linked libraries ([#2291](https://github.com/angular/angular-cli/issues/2291)) ([8bf69d9](https://github.com/angular/angular-cli/commit/8bf69d9))
+* **aot-tools:** add missing tsc-wrapped dep ([1587c1b](https://github.com/angular/angular-cli/commit/1587c1b)), closes [#2498](https://github.com/angular/angular-cli/issues/2498) [#2598](https://github.com/angular/angular-cli/issues/2598)
+* **build:** add react minification support ([e23e0fe](https://github.com/angular/angular-cli/commit/e23e0fe)), closes [#2110](https://github.com/angular/angular-cli/issues/2110) [#2754](https://github.com/angular/angular-cli/issues/2754)
+* **build:** fix sourcemap in prod ([d292eac](https://github.com/angular/angular-cli/commit/d292eac)), closes [#2533](https://github.com/angular/angular-cli/issues/2533) [#2519](https://github.com/angular/angular-cli/issues/2519)
+* **build:** set tls and net node builtins to empty ([7424795](https://github.com/angular/angular-cli/commit/7424795)), closes [#1696](https://github.com/angular/angular-cli/issues/1696) [#2626](https://github.com/angular/angular-cli/issues/2626)
+* **build:** use outputPath from config ([ec0cdb5](https://github.com/angular/angular-cli/commit/ec0cdb5)), closes [#2511](https://github.com/angular/angular-cli/issues/2511) [#2611](https://github.com/angular/angular-cli/issues/2611)
+* **doc:** update invalid link ([e17d4a8](https://github.com/angular/angular-cli/commit/e17d4a8)), closes [#2553](https://github.com/angular/angular-cli/issues/2553)
+* **docs:** Correct the usage of redirecting the output from `ng completion`. ([2225027](https://github.com/angular/angular-cli/commit/2225027)), closes [#2635](https://github.com/angular/angular-cli/issues/2635)
+* **generate:** show error when no name is specified ([249ccf7](https://github.com/angular/angular-cli/commit/249ccf7)), closes [#2684](https://github.com/angular/angular-cli/issues/2684)
+* **init:** ignore favicon ([699ebba](https://github.com/angular/angular-cli/commit/699ebba)), closes [#2274](https://github.com/angular/angular-cli/issues/2274) [#2617](https://github.com/angular/angular-cli/issues/2617)
+* override ui write level ([4608445](https://github.com/angular/angular-cli/commit/4608445)), closes [#2540](https://github.com/angular/angular-cli/issues/2540) [#2627](https://github.com/angular/angular-cli/issues/2627)
+* **init:** throw when called with mobile flag ([#2753](https://github.com/angular/angular-cli/issues/2753)) ([9b1c3e0](https://github.com/angular/angular-cli/commit/9b1c3e0)), closes [#2679](https://github.com/angular/angular-cli/issues/2679)
+* **karma:** Add cli config poll option to karma default config ([#2486](https://github.com/angular/angular-cli/issues/2486)) ([63023ae](https://github.com/angular/angular-cli/commit/63023ae))
+* **new:** add prefix to spec name ([1307dc8](https://github.com/angular/angular-cli/commit/1307dc8)), closes [/github.com/angular/angular-cli/commit/06976f4f07a6d6065124a819b95634bddaac4598#commitcomment-19241601](https://github.com//github.com/angular/angular-cli/commit/06976f4f07a6d6065124a819b95634bddaac4598/issues/commitcomment-19241601) [#2595](https://github.com/angular/angular-cli/issues/2595)
+* **new:** fix relativeRootPath for typeRoots ([eb2f939](https://github.com/angular/angular-cli/commit/eb2f939)), closes [#2206](https://github.com/angular/angular-cli/issues/2206) [#2597](https://github.com/angular/angular-cli/issues/2597)
+* **serve:** enable routes with dots ([#2535](https://github.com/angular/angular-cli/issues/2535)) ([6f8b1b5](https://github.com/angular/angular-cli/commit/6f8b1b5)), closes [#2168](https://github.com/angular/angular-cli/issues/2168)
+* **set:** output value for additional props ([f7bf0aa](https://github.com/angular/angular-cli/commit/f7bf0aa)), closes [#1900](https://github.com/angular/angular-cli/issues/1900) [#2614](https://github.com/angular/angular-cli/issues/2614)
+
+
+### Features
+
+* **build:** add gzip to serve --prod ([7c13cc5](https://github.com/angular/angular-cli/commit/7c13cc5)), closes [#2028](https://github.com/angular/angular-cli/issues/2028) [#2621](https://github.com/angular/angular-cli/issues/2621)
+* **build:** add support for assets array ([#2570](https://github.com/angular/angular-cli/issues/2570)) ([de3c275](https://github.com/angular/angular-cli/commit/de3c275))
+* **build:** added postcss-discard-comments ([883fe46](https://github.com/angular/angular-cli/commit/883fe46)), closes [#2593](https://github.com/angular/angular-cli/issues/2593)
+* **generate:** specify class type via dot notation ([#2707](https://github.com/angular/angular-cli/issues/2707)) ([c2dd94c](https://github.com/angular/angular-cli/commit/c2dd94c)), closes [#2155](https://github.com/angular/angular-cli/issues/2155)
+* **serve:** implement open browser option ([8bddabe](https://github.com/angular/angular-cli/commit/8bddabe)), closes [#1081](https://github.com/angular/angular-cli/issues/1081) [#2489](https://github.com/angular/angular-cli/issues/2489)
+* **ssl:** add support for the ssl options of the ng serve task: --ssl, --ssl-cert, and --ssl-key ([#2792](https://github.com/angular/angular-cli/issues/2792)) ([ba414ab](https://github.com/angular/angular-cli/commit/ba414ab))
+
+
+### BREAKING CHANGES
+
+* generate: The ability to specify a class type via an additional arg has been replaced by combining the name and type args separated by a dot
+
+
+
 <a name="1.0.0-beta.17"></a>
 # [1.0.0-beta.17](https://github.com/angular/angular-cli/compare/v1.0.0-beta.16...v1.0.0-beta.17) (2016-10-07)
 
