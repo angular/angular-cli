@@ -15,20 +15,6 @@ function _findNodes(sourceFile: ts.SourceFile, node: ts.Node, kind: ts.SyntaxKin
   }, node.kind == kind ? [node] : []);
 }
 
-function _removeDecorators(fileName: string, source: string): string {
-  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest);
-  // Find all decorators.
-  const decorators = _findNodes(sourceFile, sourceFile, ts.SyntaxKind.Decorator);
-  decorators.sort((a, b) => b.pos - a.pos);
-
-  decorators.forEach(d => {
-    source = source.slice(0, d.pos) + source.slice(d.end);
-  });
-
-  return source;
-}
-
-
 function _replaceBootstrap(fileName: string,
                            source: string,
                            plugin: AotPlugin): Promise<string> {
@@ -148,8 +134,7 @@ export function ngcLoader(source: string) {
     const cb: any = this.async();
 
     plugin.done
-      .then(() => _removeDecorators(this.resource, source))
-      .then(sourceText => _replaceBootstrap(this.resource, sourceText, plugin))
+      .then(() => _replaceBootstrap(this.resource, source, plugin))
       .then(sourceText => {
         const result = _transpile(plugin, this.resource, sourceText);
         cb(null, result.outputText, result.sourceMap);
