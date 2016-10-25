@@ -16,7 +16,8 @@ init_opts='--dry-run inline-style inline-template --link-cli --mobile --name --p
 new_opts='--directory --dry-run inline-style inline-template --link-cli --mobile --prefix --routing --skip-bower --skip-git --skip-npm --source-dir --style --verbose -d -dir -is -it -lc -p -sb -sd -sg -sn -v'
 serve_opts='--aot --environment --host --live-reload --live-reload-base-url --live-reload-host --live-reload-live-css --live-reload-port --open --port --proxy-config --ssl --ssl-cert --ssl-key --target --watcher -H -e -lr -lrbu -lrh -lrp -o -p -pc -t -w'
 set_opts='--global -g'
-test_opts='--browsers --build --colors --log-level --port --reporters --watch -w'
+test_opts='--browsers --build --code-coverage --colors --lint --log-level --port --reporters --watch -cc -l -w'
+
 version_opts='--verbose'
 
 if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then
