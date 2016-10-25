@@ -25,7 +25,7 @@ export default Task.extend({
       commandOptions.target,
       commandOptions.environment,
       undefined,
-      undefined,
+      commandOptions.baseHref,
       commandOptions.aot
     ).config;
 
@@ -71,7 +71,7 @@ export default Task.extend({
         `./${CliConfig.fromProject().config.apps[0].root}`
       ),
       historyApiFallback: {
-        index: commandOptions.path,
+        index: commandOptions.baseHref,
         disableDotRule: true
       },
       stats: webpackDevServerOutputOptions,
@@ -82,7 +82,7 @@ export default Task.extend({
         poll: CliConfig.fromProject().config.defaults.poll
       },
       https: commandOptions.ssl,
-      publicPath: commandOptions.path
+      publicPath: commandOptions.baseHref
     };
 
     if (sslKey != null && sslCert != null) {
