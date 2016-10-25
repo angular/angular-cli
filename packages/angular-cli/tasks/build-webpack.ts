@@ -31,11 +31,13 @@ export default <any>Task.extend({
 
     const webpackCompiler: any = webpack(config);
 
-    const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
+    if (runTaskOptions.progress) {
+      const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 
-    webpackCompiler.apply(new ProgressPlugin({
-      profile: true
-    }));
+      webpackCompiler.apply(new ProgressPlugin({
+        profile: true
+      }));
+    }
 
     return new Promise((resolve, reject) => {
       webpackCompiler.run((err: any, stats: any) => {

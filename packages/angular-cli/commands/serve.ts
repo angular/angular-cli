@@ -27,6 +27,7 @@ export interface ServeTaskOptions {
   sslCert?: string;
   aot?: boolean;
   open?: boolean;
+  progress?: boolean;
 }
 
 const ServeCommand = Command.extend({
@@ -88,6 +89,7 @@ const ServeCommand = Command.extend({
       aliases: ['o'],
       description: 'Opens the url in default browser',
     },
+    { name: 'progress',             type: Boolean, default: true },
   ],
 
   run: function(commandOptions: ServeTaskOptions) {
