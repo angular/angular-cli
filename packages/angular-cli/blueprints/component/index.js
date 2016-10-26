@@ -16,7 +16,9 @@ module.exports = {
     { name: 'inline-template', type: Boolean, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, aliases: ['is'] },
     { name: 'prefix', type: Boolean, default: true },
-    { name: 'spec', type: Boolean }
+    { name: 'spec', type: Boolean },
+    { name: 'view-encapsulation', type: String, aliases: ['ve'] },
+    { name: 'change-detection', type: String, aliases: ['cd'] }
   ],
 
   beforeInstall: function() {
@@ -68,6 +70,14 @@ module.exports = {
       options.spec :
       this.project.ngConfigObj.get('defaults.spec.component');
 
+    options.viewEncapsulation = options.viewEncapsulation !== undefined ?
+      options.viewEncapsulation :
+      this.project.ngConfigObj.get('defaults.viewEncapsulation');
+
+    options.changeDetection = options.changeDetection !== undefined ?
+      options.changeDetection :
+      this.project.ngConfigObj.get('defaults.changeDetection');
+
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
       flat: options.flat,
@@ -77,7 +87,9 @@ module.exports = {
       route: options.route,
       isAppComponent: !!options.isAppComponent,
       selector: this.selector,
-      styleExt: this.styleExt
+      styleExt: this.styleExt,
+      viewEncapsulation: options.viewEncapsulation,
+      changeDetection: options.changeDetection
     };
   },
 

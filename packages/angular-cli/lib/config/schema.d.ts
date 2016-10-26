@@ -60,6 +60,8 @@ export interface CliConfig {
         styleExt?: string;
         prefixInterfaces?: boolean;
         poll?: number;
+        viewEncapsulation?: string;
+        changeDetection?: string;
         inline?: {
             style?: boolean;
             template?: boolean;
