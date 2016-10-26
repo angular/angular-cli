@@ -107,9 +107,7 @@ export function getWebpackCommonConfig(
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
-        name: 'inline',
-        filename: 'inline.js',
-        sourceMapFilename: 'inline.map'
+        name: 'inline'
       }),
       new GlobCopyWebpackPlugin({
         patterns: appConfig.assets,
