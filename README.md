@@ -294,7 +294,13 @@ source ~/.bash_profile
 
 ### Project assets
 
-You can add any files you want copied as-is to `src/assets/`.
+You can add any files you want copied as-is to `dist/`:
+```json
+"assets": [
+  "assets",
+  "favicon.ico"
+]
+```
 
 ### Global styles
 
