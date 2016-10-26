@@ -102,7 +102,8 @@ export class AotPlugin {
     }
 
     const tsConfig = tsc.readConfiguration(options.tsConfigPath, basePath);
-    this._rootFilePath = tsConfig.parsed.fileNames;
+    this._rootFilePath = tsConfig.parsed.fileNames
+      .filter(fileName => !/\.spec\.ts$/.test(fileName));
 
     // Check the genDir.
     let genDir = basePath;
