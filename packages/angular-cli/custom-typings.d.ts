@@ -17,6 +17,9 @@ interface IWebpackDevServerConfigurationOptions {
   headers?: { [key: string]: string };
   stats?: { [key: string]: boolean };
   inline: boolean;
+  https?: boolean;
+  key?: string;
+  cert?: string;
 }
 
 interface WebpackProgressPluginOutputOptions {

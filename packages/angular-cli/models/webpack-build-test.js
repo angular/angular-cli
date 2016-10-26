@@ -4,9 +4,43 @@ const path = require('path');
 const webpack = require('webpack');
 const atl = require('awesome-typescript-loader');
 
-const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
+const getWebpackTestConfig = function (projectRoot, environment, appConfig, testConfig) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
+  const extraRules = [];
+  const extraPlugins = [];
+
+  if (testConfig.codeCoverage) {
+    extraRules.push({
+      test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
+      enforce: 'post',
+      exclude: [
+        /\.(e2e|spec)\.ts$/,
+        /node_modules/
+      ],
+      query: { 'force-sourcemap': true }
+    });
+  }
+
+  if (testConfig.lint) {
+    extraRules.push({
+      test: /\.ts$/,
+      enforce: 'pre',
+      loader: 'tslint-loader',
+      exclude: [
+        path.resolve(projectRoot, 'node_modules')
+      ]
+    });
+    extraPlugins.push(new webpack.LoaderOptionsPlugin({
+      options: {
+        tslint: {
+          emitErrors: false,
+          failOnHint: false,
+          resourcePath: `./${appConfig.root}`
+        }
+      }
+    }))
+  }
 
   return {
     devtool: 'inline-source-map',
@@ -29,20 +63,11 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
     module: {
       rules: [
         {
-          test: /\.ts$/,
-          enforce: 'pre',
-          loader: 'tslint-loader',
-          exclude: [
-            path.resolve(projectRoot, 'node_modules')
-          ]
-        },
-        {
           test: /\.js$/,
           enforce: 'pre',
           loader: 'source-map-loader',
           exclude: [
-            path.resolve(projectRoot, 'node_modules/rxjs'),
-            path.resolve(projectRoot, 'node_modules/@angular')
+            /node_modules/
           ]
         },
         {
@@ -63,23 +88,14 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
           ],
           exclude: [/\.e2e\.ts$/]
         },
-        {
-          test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
-          enforce: 'post',
-          exclude: [
-            /\.(e2e|spec)\.ts$/,
-            /node_modules/
-          ],
-          query: { 'force-sourcemap': true }
-        },
         { test: /\.json$/, loader: 'json-loader' },
-        { test: /\.css$/,  loaders: ['raw-loader', 'postcss-loader'] },
+        { test: /\.css$/, loaders: ['raw-loader', 'postcss-loader'] },
         { test: /\.styl$/, loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
         { test: /\.less$/, loaders: ['raw-loader', 'postcss-loader', 'less-loader'] },
         { test: /\.scss$|\.sass$/, loaders: ['raw-loader', 'postcss-loader', 'sass-loader'] },
         { test: /\.(jpg|png)$/, loader: 'url-loader?limit=128000' },
         { test: /\.html$/, loader: 'raw-loader', exclude: [path.resolve(appRoot, appConfig.index)] }
-      ]
+      ].concat(extraRules)
     },
     plugins: [
       new webpack.SourceMapDevToolPlugin({
@@ -94,20 +110,11 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig) {
           .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
         path.resolve(appRoot, appConfig.environments[environment])
       ),
-      new webpack.LoaderOptionsPlugin({
-        options: {
-          tslint: {
-            emitErrors: false,
-            failOnHint: false,
-            resourcePath: `./${appConfig.root}`
-          }
-        }
-      }),
       new webpack.ContextReplacementPlugin(
         /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
         appRoot
       )
-    ],
+    ].concat(extraPlugins),
     node: {
       fs: 'empty',
       global: true,
