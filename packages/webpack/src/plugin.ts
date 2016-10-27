@@ -207,7 +207,7 @@ export class AotPlugin {
     // We need to temporarily patch the CodeGenerator until either it's patched or allows us
     // to pass in our own ReflectorHost.
     patchReflectorHost(codeGenerator);
-    this._donePromise = codeGenerator.codegen()
+    this._donePromise = codeGenerator.codegen({transitiveModules: true})
       .then(() => {
         // Create a new Program, based on the old one. This will trigger a resolution of all
         // transitive modules, which include files that might just have been generated.
@@ -239,7 +239,7 @@ export class AotPlugin {
           return lazyRoutes;
         }, {});
       })
-      .then(() => cb(), (err) => cb(err));
+      .then(() => cb(), (err:any) => cb(err));
   }
 
   private _resolveModule(module: ModuleRoute, containingFile: string) {
