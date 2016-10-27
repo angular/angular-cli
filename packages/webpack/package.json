@@ -1,8 +1,16 @@
 {
   "name": "@ngtools/webpack",
   "version": "1.1.2",
-  "description": "",
+  "description": "Webpack plugin that AoT compiles your Angular components and modules.",
   "main": "./src/index.js",
+  "typings": "src/index.d.ts",
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "webpack",
+    "plugin",
+    "aot"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
