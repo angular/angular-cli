@@ -1,0 +1,17 @@
+verbose: false
+instrumentation:
+    root: .
+    extensions:
+        - .js
+    default-excludes: true
+    excludes:
+      - dist/**
+      - plugins/**
+      - scripts/**
+    preserve-comments: true
+    include-all-sources: true
+reporting:
+    print: summary
+    reports:
+        - lcov
+    dir: ./coverage/packages
