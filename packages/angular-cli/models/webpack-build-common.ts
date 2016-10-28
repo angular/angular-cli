@@ -4,6 +4,7 @@ import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const autoprefixer = require('autoprefixer');
 
 
 export function getWebpackCommonConfig(
@@ -71,24 +72,6 @@ export function getWebpackCommonConfig(
           loaders: ['raw-loader', 'postcss-loader', 'sass-loader']
         },
 
-        // outside of main, load it via style-loader
-        {
-          include: styles,
-          test: /\.css$/,
-          loaders: ['style-loader', 'css-loader', 'postcss-loader']
-        }, {
-          include: styles,
-          test: /\.styl$/,
-          loaders: ['style-loader', 'css-loader', 'postcss-loader', 'stylus-loader']
-        }, {
-          include: styles,
-          test: /\.less$/,
-          loaders: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader']
-        }, {
-          include: styles,
-          test: /\.scss$|\.sass$/,
-          loaders: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader']
-        },
 
         // load global scripts using script-loader
         { include: scripts, test: /\.js$/, loader: 'script-loader' },
@@ -97,14 +80,14 @@ export function getWebpackCommonConfig(
         { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
         { test: /\.html$/, loader: 'raw-loader' },
 
-        { test: /\.(otf|woff|ttf|svg)$/, loader: 'url?limit=10000' },
-        { test: /\.woff2$/, loader: 'url?limit=10000&mimetype=font/woff2' },
-        { test: /\.eot$/, loader: 'file' }
+        { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url?limit=10000' },
+        { test: /\.(eot|svg)$/, loader: 'file' }
       ]
     },
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
+        filename: path.resolve(appConfig.outDir, appConfig.index),
         chunksSortMode: 'dependency'
       }),
       new BaseHrefWebpackPlugin({
@@ -124,14 +107,18 @@ export function getWebpackCommonConfig(
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
-        name: 'inline',
-        filename: 'inline.js',
-        sourceMapFilename: 'inline.map'
+        name: 'inline'
       }),
       new GlobCopyWebpackPlugin({
         patterns: appConfig.assets,
         globOptions: {cwd: appRoot, dot: true, ignore: '**/.gitkeep'}
-      })
+      }),
+      new webpack.LoaderOptionsPlugin({
+        test: /\.(css|scss|sass|less|styl)$/,
+        options: {
+          postcss: [ autoprefixer() ]
+        },
+      }),
     ],
     node: {
       fs: 'empty',
