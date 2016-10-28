@@ -71,24 +71,6 @@ export function getWebpackCommonConfig(
           loaders: ['raw-loader', 'postcss-loader', 'sass-loader']
         },
 
-        // outside of main, load it via style-loader
-        {
-          include: styles,
-          test: /\.css$/,
-          loaders: ['style-loader', 'css-loader', 'postcss-loader']
-        }, {
-          include: styles,
-          test: /\.styl$/,
-          loaders: ['style-loader', 'css-loader', 'postcss-loader', 'stylus-loader']
-        }, {
-          include: styles,
-          test: /\.less$/,
-          loaders: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader']
-        }, {
-          include: styles,
-          test: /\.scss$|\.sass$/,
-          loaders: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader']
-        },
 
         // load global scripts using script-loader
         { include: scripts, test: /\.js$/, loader: 'script-loader' },
