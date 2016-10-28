@@ -239,7 +239,7 @@ export class AotPlugin {
           return lazyRoutes;
         }, {});
       })
-      .then(() => cb(), (err:any) => cb(err));
+      .then(() => cb(), (err: any) => cb(err));
   }
 
   private _resolveModule(module: ModuleRoute, containingFile: string) {
