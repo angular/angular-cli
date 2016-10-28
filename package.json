@@ -10,7 +10,6 @@
   "keywords": [],
   "scripts": {
     "build": "node ./scripts/publish/build.js",
-    "build:patch": "node ./scripts/patch.js",
     "build:packages": "for PKG in packages/*; do echo Building $PKG...; tsc -p $PKG; done",
     "test": "npm-run-all -c test:packages test:cli",
     "e2e": "npm run test:e2e",
@@ -23,7 +22,10 @@
     "build-config-interface": "dtsgen packages/angular-cli/lib/config/schema.json --out packages/angular-cli/lib/config/schema.d.ts",
     "eslint": "eslint .",
     "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
-    "lint": "npm-run-all -c eslint tslint"
+    "lint": "npm-run-all -c eslint tslint",
+    "preversion": "npm run test",
+    "prepublish": "npm-run-all -c build build:packages",
+    "prepare": "npm-run-all -c build build:packages"
   },
   "repository": {
     "type": "git",
