@@ -161,7 +161,7 @@ ng build
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
-- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json`
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json` ([JSON Schema](http://json-schema.org/) description [here](https://github.com/angular/angular-cli/blob/master/packages/angular-cli/lib/config/schema.json))
 - use them via the `--env=NAME` flag on the build/serve commands.
 
 ### Base tag handling in index.html
