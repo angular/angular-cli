@@ -34,6 +34,7 @@ export default function() {
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     // Check for cache busting hash script src
     .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{32}\.bundle\.css/))
 
     // Check that the process didn't change local files.
     .then(() => expectGitToBeClean())

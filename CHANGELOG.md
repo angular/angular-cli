@@ -1,3 +1,20 @@
+<a name="1.0.0-beta.19"></a>
+# [1.0.0-beta.19](https://github.com/angular/angular-cli/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2016-10-28)
+
+
+### Bug Fixes
+
+* **appveyor:** add workaround for webdriver bug ([#2862](https://github.com/angular/angular-cli/issues/2862)) ([2b17b46](https://github.com/angular/angular-cli/commit/2b17b46))
+* **compiler:** update codegen API ([#2919](https://github.com/angular/angular-cli/issues/2919)) ([b50c121](https://github.com/angular/angular-cli/commit/b50c121)), closes [#2917](https://github.com/angular/angular-cli/issues/2917)
+* **e2e:** fix travis e2e ([#2914](https://github.com/angular/angular-cli/issues/2914)) ([b62b996](https://github.com/angular/angular-cli/commit/b62b996))
+
+
+### Features
+
+* **test:** make code coverage and lint optional ([#2840](https://github.com/angular/angular-cli/issues/2840)) ([8944d04](https://github.com/angular/angular-cli/commit/8944d04)), closes [#1799](https://github.com/angular/angular-cli/issues/1799)
+
+
+
 <a name="1.0.0-beta.18"></a>
 # [1.0.0-beta.18](https://github.com/angular/angular-cli/compare/v1.0.0-beta.17...v1.0.0-beta.18) (2016-10-20)
 
