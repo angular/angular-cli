@@ -176,7 +176,7 @@ export function stringify(token: any): string {
 export const listContains = (list: any[], el: any): boolean => list.indexOf(el) !== -1;
 
 // @internal
-export function stringMapForEach(map: {[key: string]: any}, callback: (V, K) => void) {
+export function stringMapForEach(map: {[key: string]: any}, callback: (V: any, K: string) => void) {
   for (var prop in map) {
       if (map.hasOwnProperty(prop)) {
         callback(map[prop], prop);
