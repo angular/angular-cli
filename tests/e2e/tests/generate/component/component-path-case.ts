@@ -1,12 +1,14 @@
 import {join} from 'path';
-import {ng} from '../../utils/process';
-import {expectFileToExist} from '../../utils/fs';
+import {ng} from '../../../utils/process';
+import {expectFileToExist, createDir} from '../../../utils/fs';
 
 
 export default function() {
-  const componentDir = join('src', 'app', 'test-component');
+  const rootDir = join('src', 'app', 'upper-dir');
+  const componentDir = join(rootDir.toLowerCase(), 'test-component');
+  createDir(rootDir);
 
-  return ng('generate', 'component', 'test-component')
+  return ng('generate', 'component', 'Upper-Dir', 'test-component')
     .then(() => expectFileToExist(componentDir))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.ts')))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.spec.ts')))
