@@ -75,7 +75,7 @@ module.exports = {
     const fileName = stringUtils.dasherize(`${options.entity.name}.pipe`);
     const fullGeneratePath = path.join(this.project.root, this.generatePath);
     const moduleDir = path.parse(this.pathToModule).dir;
-    const relativeDir = path.relative(moduleDir, fullGeneratePath);
+    const relativeDir = path.relative(moduleDir, fullGeneratePath).toLowerCase();
     const importPath = relativeDir ? `./${relativeDir}/${fileName}` : `./${fileName}`;
 
     if (!options['skip-import']) {
