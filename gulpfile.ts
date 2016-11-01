@@ -44,7 +44,7 @@ gulp.task('test', ['build'], (done) => {
 
 gulp.task('_test', () => {
   // Gulp Jasmine had weird behavior where it would run 0 specs on subsequent runs
-  child_process.spawnSync(`./node_modules/.bin/jasmine`, [], {stdio: 'inherit'});
+  child_process.spawnSync('npm run jasmine', [], {stdio: 'inherit'});
 });
 
 gulp.task('build', ['clean'], build);
@@ -58,7 +58,7 @@ gulp.task('build:no-clean', build);
 
 function build() {
   return new Promise((resolve, reject) => {
-    child_process.exec('node_modules/.bin/ngc', (err, stdout, stderr) => {
+    child_process.exec('npm run ngc', (err, stdout, stderr) => {
       if (err) {
         reject(err);
         return;
