@@ -72,6 +72,7 @@ export default Task.extend({
       ),
       historyApiFallback: {
         disableDotRule: true,
+        htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
       },
       stats: webpackDevServerOutputOptions,
       inline: true,
