@@ -412,6 +412,7 @@ Local project package:
 ```bash
 rm -rf node_modules dist tmp
 npm install --save-dev angular-cli@latest
+npm install
 ng init
 ```
 
@@ -470,6 +471,6 @@ MIT
 [david-badge]: https://david-dm.org/angular/angular-cli.svg
 [david-badge-url]: https://david-dm.org/angular/angular-cli
 [david-dev-badge]: https://david-dm.org/angular/angular-cli/dev-status.svg
-[david-dev-badge-url]: https://david-dm.org/angular/angular-cli#info=devDependencies
+[david-dev-badge-url]: https://david-dm.org/angular/angular-cli?type=dev
 [npm-badge]: https://img.shields.io/npm/v/angular-cli.svg
 [npm-badge-url]: https://www.npmjs.com/package/angular-cli
