@@ -147,7 +147,7 @@ export function ngcLoader(source: string) {
   if (plugin && plugin instanceof AotPlugin) {
     const cb: any = this.async();
 
-    plugin.done
+    Promise.resolve()
       .then(() => _removeDecorators(this.resource, source))
       .then(sourceText => _replaceBootstrap(this.resource, sourceText, plugin))
       .then(sourceText => {
