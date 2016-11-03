@@ -30,7 +30,7 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
           loaders: [{
             loader: 'awesome-typescript-loader',
             query: {
-              useForkChecker: true,
+              forkChecker: true,
               tsconfig: path.resolve(appRoot, appConfig.tsconfig)
             }
           }, {
