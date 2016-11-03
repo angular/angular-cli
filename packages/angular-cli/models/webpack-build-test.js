@@ -79,7 +79,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
                 tsconfig: path.resolve(appRoot, appConfig.tsconfig),
                 module: 'commonjs',
                 target: 'es5',
-                useForkChecker: true
+                forkChecker: true
               }
             },
             {
