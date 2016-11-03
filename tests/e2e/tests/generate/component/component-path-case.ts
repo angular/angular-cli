@@ -8,7 +8,7 @@ export default function() {
   const componentDir = join(rootDir.toLowerCase(), 'test-component');
   createDir(rootDir);
 
-  return ng('generate', 'component', 'Upper-Dir', 'test-component')
+  return ng('generate', 'component', join('Upper-Dir', 'test-component'))
     .then(() => expectFileToExist(componentDir))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.ts')))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.spec.ts')))
