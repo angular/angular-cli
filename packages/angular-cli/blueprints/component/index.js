@@ -124,7 +124,7 @@ module.exports = {
     const returns = [];
     const className = stringUtils.classify(`${options.entity.name}Component`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.component`);
-    const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath).toLowerCase();
+    const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
     if (!options['skip-import']) {
