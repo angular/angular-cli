@@ -32,7 +32,7 @@ function _hasOldCliBuildFile() {
 
 
 export class Version {
-  constructor(private _version: string) {}
+  constructor(private _version: string = null) {}
 
   private _parse() {
     return this.isKnown()

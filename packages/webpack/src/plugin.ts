@@ -11,6 +11,7 @@ import {WebpackResourceLoader} from './resource_loader';
 import {createResolveDependenciesFromContextMap} from './utils';
 import {WebpackCompilerHost} from './compiler_host';
 import {resolveEntryModuleFromMain} from './entry_resolver';
+import {StaticSymbol} from '@angular/compiler-cli';
 
 
 /**
@@ -22,6 +23,18 @@ export interface AotPluginOptions {
   entryModule?: string;
   mainPath?: string;
   typeChecking?: boolean;
+}
+
+
+export interface LazyRoute {
+  moduleRoute: ModuleRoute;
+  moduleRelativePath: string;
+  moduleAbsolutePath: string;
+}
+
+
+export interface LazyRouteMap {
+  [path: string]: LazyRoute;
 }
 
 
@@ -57,6 +70,7 @@ export class AotPlugin {
 
   private _typeCheck: boolean = true;
   private _basePath: string;
+  private _genDir: string;
 
 
   constructor(options: AotPluginOptions) {
@@ -68,7 +82,7 @@ export class AotPlugin {
   get compilerOptions() { return this._compilerOptions; }
   get done() { return this._donePromise; }
   get entryModule() { return this._entryModule; }
-  get genDir() { return this._basePath; }
+  get genDir() { return this._genDir; }
   get program() { return this._program; }
   get typeCheck() { return this._typeCheck; }
 
@@ -113,6 +127,7 @@ export class AotPlugin {
       genDir
     });
     this._basePath = basePath;
+    this._genDir = genDir;
 
     if (options.hasOwnProperty('typeChecking')) {
       this._typeCheck = options.typeChecking;
@@ -168,9 +183,9 @@ export class AotPlugin {
 
     // Virtual file system.
     compiler.resolvers.normal.plugin('resolve', (request: any, cb?: () => void) => {
-      // Populate the file system cache with the virtual module.
-      this._compilerHost.populateWebpackResolver(compiler.resolvers.normal);
-      if (cb) {
+      if (request.request.match(/\.ts$/)) {
+        this.done.then(() => cb());
+      } else {
         cb();
       }
     });
@@ -228,48 +243,84 @@ export class AotPlugin {
         }
       })
       .then(() => {
-        // Process the lazy routes
-        this._lazyRoutes =
-          this._processNgModule(this._entryModule, null)
-            .map(module => ModuleRoute.fromString(module))
-            .reduce((lazyRoutes: any, module: ModuleRoute) => {
-              lazyRoutes[`${module.path}.ngfactory`] = path.join(
-                this.genDir, module.path + '.ngfactory.ts');
-          return lazyRoutes;
-        }, {});
+        // Populate the file system cache with the virtual module.
+        this._compilerHost.populateWebpackResolver(this._compiler.resolvers.normal);
       })
-      .then(() => cb(), (err: any) => cb(err));
+      .then(() => {
+        // Process the lazy routes
+        this._lazyRoutes = {};
+        const allLazyRoutes = this._processNgModule(this._entryModule, null);
+        Object.keys(allLazyRoutes)
+          .forEach(k => {
+            const lazyRoute = allLazyRoutes[k];
+            this._lazyRoutes[k + '.ngfactory'] = lazyRoute.moduleAbsolutePath + '.ngfactory.ts';
+          });
+      })
+      .then(() => cb(), (err: any) => { cb(err); });
   }
 
-  private _resolveModule(module: ModuleRoute, containingFile: string) {
+  private _resolveModulePath(module: ModuleRoute, containingFile: string) {
     if (module.path.startsWith('.')) {
       return path.join(path.dirname(containingFile), module.path);
     }
     return module.path;
   }
 
-  private _processNgModule(module: ModuleRoute, containingFile: string | null): string[] {
+  private _processNgModule(module: ModuleRoute, containingFile: string | null): LazyRouteMap {
     const modulePath = containingFile ? module.path : ('./' + path.basename(module.path));
     if (containingFile === null) {
       containingFile = module.path + '.ts';
     }
+    const relativeModulePath = this._resolveModulePath(module, containingFile);
 
-    const resolvedModulePath = this._resolveModule(module, containingFile);
     const staticSymbol = this._reflectorHost
       .findDeclaration(modulePath, module.className, containingFile);
     const entryNgModuleMetadata = this.getNgModuleMetadata(staticSymbol);
-    const loadChildren = this.extractLoadChildren(entryNgModuleMetadata);
-    const result = loadChildren.map(route => {
-      return this._resolveModule(new ModuleRoute(route), resolvedModulePath);
-    });
+    const loadChildrenRoute: LazyRoute[] = this.extractLoadChildren(entryNgModuleMetadata)
+      .map(route => {
+        const mr = ModuleRoute.fromString(route);
+        const relativePath = this._resolveModulePath(mr, relativeModulePath);
+        const absolutePath = path.join(this.genDir, relativePath);
+        return {
+          moduleRoute: mr,
+          moduleRelativePath: relativePath,
+          moduleAbsolutePath: absolutePath
+        };
+      });
+    const resultMap: LazyRouteMap = loadChildrenRoute
+      .reduce((acc: LazyRouteMap, curr: LazyRoute) => {
+        const key = curr.moduleRoute.path;
+        if (acc[key]) {
+          if (acc[key].moduleAbsolutePath != curr.moduleAbsolutePath) {
+            throw new Error(`Duplicated path in loadChildren detected: "${key}" is used in 2 ` +
+              'loadChildren, but they point to different modules. Webpack cannot distinguish ' +
+              'between the two based on context and would fail to load the proper one.');
+          }
+        } else {
+          acc[key] = curr;
+        }
+        return acc;
+      }, {});
 
     // Also concatenate every child of child modules.
-    for (const route of loadChildren) {
-      const childModule = ModuleRoute.fromString(route);
-      const children = this._processNgModule(childModule, resolvedModulePath + '.ts');
-      result.push(...children);
+    for (const lazyRoute of loadChildrenRoute) {
+      const mr = lazyRoute.moduleRoute;
+      const children = this._processNgModule(mr, relativeModulePath);
+      Object.keys(children).forEach(p => {
+        const child = children[p];
+        const key = child.moduleRoute.path;
+        if (resultMap[key]) {
+          if (resultMap[key].moduleAbsolutePath != child.moduleAbsolutePath) {
+            throw new Error(`Duplicated path in loadChildren detected: "${key}" is used in 2 ` +
+              'loadChildren, but they point to different modules. Webpack cannot distinguish ' +
+              'between the two based on context and would fail to load the proper one.');
+          }
+        } else {
+          resultMap[key] = child;
+        }
+      });
     }
-    return result;
+    return resultMap;
   }
 
   private getNgModuleMetadata(staticSymbol: ngCompiler.StaticSymbol) {
@@ -281,10 +332,23 @@ export class AotPlugin {
   }
 
   private extractLoadChildren(ngModuleDecorator: any): any[] {
-    const routes = ngModuleDecorator.imports.reduce((mem: any[], m: any) => {
+    const routes = (ngModuleDecorator.imports || []).reduce((mem: any[], m: any) => {
       return mem.concat(this.collectRoutes(m.providers));
     }, this.collectRoutes(ngModuleDecorator.providers));
-    return this.collectLoadChildren(routes);
+    return this.collectLoadChildren(routes)
+      .concat((ngModuleDecorator.imports || [])
+        // Also recursively extractLoadChildren of modules we import.
+        .map((staticSymbol: any) => {
+          if (staticSymbol instanceof StaticSymbol) {
+            const entryNgModuleMetadata = this.getNgModuleMetadata(staticSymbol);
+            return this.extractLoadChildren(entryNgModuleMetadata);
+          } else {
+            return [];
+          }
+        })
+        // Poor man's flat map.
+        .reduce((acc: any[], i: any) => acc.concat(i), []))
+      .filter(x => !!x);
   }
 
   private collectRoutes(providers: any[]): any[] {
