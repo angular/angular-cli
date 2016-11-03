@@ -70,6 +70,7 @@ export default Task.extend({
         this.project.root,
         `./${CliConfig.fromProject().config.apps[0].root}`
       ),
+      headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
