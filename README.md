@@ -1,3 +1,6 @@
+npm uninstall -g ng-cli
+npm i -g https://github.com/tycho01/angular-cli.git#pug-html
+
 ## Angular-CLI
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
