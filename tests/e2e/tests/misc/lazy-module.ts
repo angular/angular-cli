@@ -16,8 +16,12 @@ export default function(argv: any) {
     .then(() => ng('build'))
     .then(() => oldNumberOfFiles = readdirSync('dist').length)
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
+    // Add 2 lazy routes but they point to the same module so we should have only 1 more module.
     .then(() => addImportToModule('src/app/app.module.ts', oneLine`
-      RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }])
+      RouterModule.forRoot([
+        { path: "lazy1", loadChildren: "app/lazy/lazy.module#LazyModule" },
+        { path: "lazy2", loadChildren: "./lazy/lazy.module#LazyModule" }
+      ])
       `, '@angular/router'))
     .then(() => ng('build'))
     .then(() => readdirSync('dist').length)
