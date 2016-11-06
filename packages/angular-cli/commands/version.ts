@@ -33,7 +33,8 @@ const VersionCommand = Command.extend({
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
     }
 
-    this.printVersion('angular-cli', ngCliVersion);
+    this.printVersion('universal-cli', ngCliVersion);
+    this.printVersion('angular-cli', pkg.cliVersion);
 
     for (const module of Object.keys(versions)) {
       if (options.verbose || alwaysPrint.indexOf(module) > -1) {

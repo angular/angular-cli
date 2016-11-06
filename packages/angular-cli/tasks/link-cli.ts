@@ -7,12 +7,12 @@ export default Task.extend({
     const ui = this.ui;
 
     return new Promise(function(resolve, reject) {
-      exec('npm link angular-cli', (err) => {
+      exec('npm link universal-cli', (err) => {
         if (err) {
-          ui.writeLine(chalk.red('Couldn\'t do \'npm link angular-cli\'.'));
+          ui.writeLine(chalk.red('Couldn\'t do \'npm link universal-cli\'.'));
           reject();
         } else {
-          ui.writeLine(chalk.green('Successfully linked to angular-cli.'));
+          ui.writeLine(chalk.green('Successfully linked to universal-cli.'));
           resolve();
         }
       });

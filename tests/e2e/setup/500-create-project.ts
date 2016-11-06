@@ -51,6 +51,13 @@ export default function(argv: any) {
             'platform-browser-dynamic'
           ];
           angularPackages.forEach(pkgName => {
+            /**
+             * change package name to angular-cli because
+             * there is no universal-cli package at /angular
+             */
+            if (pkgName === 'universal-cli') {
+              pkgName = 'angular-cli';
+            }
             json['dependencies'][`@angular/${pkgName}`] = `github:angular/${pkgName}-builds`;
           });
         });

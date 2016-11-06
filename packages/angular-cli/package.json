@@ -1,9 +1,10 @@
 {
   "name": "universal-cli",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-alpha.universal.1",
+  "cliVersion": "1.0.0-beta.19-3",
   "description": "CLI tool for Angular with Angular Universal support",
   "main": "lib/cli/index.js",
-  "trackingCode": "",
+  "trackingCode": "xx-xxxxxxx-xx",
   "bin": {
     "ng": "./bin/ng"
   },

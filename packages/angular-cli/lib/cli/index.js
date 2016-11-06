@@ -43,7 +43,7 @@ module.exports = function(options) {
   options.cli = {
     name: 'ng',
     root: path.join(__dirname, '..', '..'),
-    npmPackage: 'angular-cli'
+    npmPackage: 'universal-cli'
   };
 
   // ensure the environemnt variable for dynamic paths

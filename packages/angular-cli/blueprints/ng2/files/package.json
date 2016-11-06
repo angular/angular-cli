@@ -48,7 +48,7 @@
     "@types/mime": "0.0.28",
     "@types/node": "^4.0.30",
     "@types/serve-static": "^1.7.27",<% } %>
-    "angular-cli": "<%= version %>",
+    "universal-cli": "<%= version %>",
     "codelyzer": "~1.0.0-beta.3",
     "jasmine-core": "2.4.1",
     "jasmine-spec-reporter": "2.5.0",

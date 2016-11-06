@@ -40,7 +40,7 @@ export class UniversalDevServer {
               files: ['LiveReload files']
             }
           });
-        }, 500);
+        }, 800);
       })
       .on('stdout', (stdout: any) => {
         console.log(stdout.toString().trim());
