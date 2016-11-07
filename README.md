@@ -37,9 +37,34 @@
 # Getting Started
 
 [* **NodeJS** :: **Universal Starter** repo](https://github.com/angular/universal-starter)
+  - Minimal webpack angular2 & universal starter
+  - **Installation**: Clone the above repo, `npm i && npm start` to fire it up.
 
-[* ASP.NET Core :: Universal Starter repo](https://github.com/aspnet/JavaScriptServices/tree/master/templates/Angular2Spa)
+[* ASP.NET Core :: Universal Starter repo](https://github.com/MarkPieszak/aspnetcore-angular2-universal)
+  - **Installation**: Clone the above repo, `npm i && dotnet restore` *(VStudio will run these automatically when opening the project)*
+  - Launch files included for both VSCode & VStudio to run/debug automatically (press F5).
 
+---- 
+
+# Universal "Gotchas"
+
+> When building Universal components in Angular 2 there are a few things to keep in mind.
+
+ - To use `templateUrl` or `stylesUrl` you must use **`angular2-template-loader`** in your TS loaders.
+    - This is already setup within this starter repo. Look at the webpack.config file [here](https://github.com/angular/universal-starter/blob/master/webpack.config.ts) for details & implementation.
+ - **`window`**, **`document`**, **`navigator`**, and other browser types - _do not exist on the server_ - so using them, or any library that uses them (jQuery for example) will not work. You do have some options, if you truly need some of this functionality:
+    - If you need to use them, consider limiting them to only your main.client and wrapping them situationally with the imported *isBrowser / isNode* features from Universal.  `import { isBrowser, isNode } from 'angular2-universal'`;
+    - Another option is using `DOM` from ["@angular/platform-browser"](https://github.com/angular/angular/blob/e3687706c71beb7c9dbdae1bbb5fbbcea588c476/modules/%40angular/platform-browser/src/dom/dom_adapter.ts#L34)
+ - **Don't manipulate the nativeElement directly**. Use the _Renderer_. We do this to ensure that in any environment we're able to change our view.
+```
+constructor(element: ElementRef, renderer: Renderer) {
+  renderer.setElementStyle(element.nativeElement, 'font-size', 'x-large');
+}
+```
+ - The application runs XHR requests on the server & once again on the Client-side (when the application bootstraps)
+    - Use a [UniversalCache](https://github.com/angular/universal-starter/blob/master/src/app/universal-cache.ts) to save certain requests so they aren't re-ran again on the Client.
+ - Know the difference between attributes and properties in relation to the DOM.
+ - Keep your directives stateless as much as possible. For stateful directives, you may need to provide an attribute that reflects the corresponding property with an initial string value such as url in img tag. For our native <img src=""> element the src attribute is reflected as the src property of the element type HTMLImageElement.
 
 # Modules
 
@@ -63,18 +88,7 @@ Angular 2 Server Rendering - Angular U, July 2015
 ## [preboot.js](https://github.com/angular/preboot)
 > Control server-rendered page and transfer state before client-side web app loads to the client-side-app.
 
-# Best Practices
-> When building Universal components in Angular 2 there are a few things to keep in mind.
 
-* Know the difference between attributes and properties in relation to the DOM.
-* Don't manipulate the `nativeElement` directly. Use the `Renderer`. We do this to ensure that in any environment we're able to change our view.
-```typescript
-constructor(element: ElementRef, renderer: Renderer) {
-  renderer.setElementStyle(element.nativeElement, 'font-size', 'x-large');
-}
-```
-* Don't use any of the browser types provided in the global namespace such as `navigator` or `document`. Anything outside of Angular will not be detected when serializing your application into html. If you need access to these types please consider using `DOM` from `"angular2/src/platform/dom/dom_adapter"`
-* Keep your directives stateless as much as possible. For stateful directives, you may need to provide an attribute that reflects the corresponding property with an initial string value such as `url` in `img` tag. For our native `<img src="">` element the `src` attribute is reflected as the `src` property of the element type `HTMLImageElement`. 
 
 # What's in a name?
 We believe that using the word "universal" is correct when referring to a JavaScript Application that runs in more environments than the browser. (inspired by [Universal JavaScript](https://medium.com/@mjackson/universal-javascript-4761051b7ae9))
