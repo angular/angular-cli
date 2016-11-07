@@ -298,7 +298,13 @@ source ~/.bash_profile
 
 ### Project assets
 
-You can add any files you want copied as-is to `src/assets/`.
+You use the `assets` array in `angular-cli.json` to list files or folders you want to copy as-is when building your project:
+```json
+"assets": [
+  "assets",
+  "favicon.ico"
+]
+```
 
 ### Global styles
 
