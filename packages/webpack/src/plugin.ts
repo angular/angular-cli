@@ -23,6 +23,7 @@ export interface AotPluginOptions {
   entryModule?: string;
   mainPath?: string;
   typeChecking?: boolean;
+  i18nOptions?: ngCompiler.NgcCliOptions
 }
 
 
@@ -71,7 +72,7 @@ export class AotPlugin {
   private _typeCheck: boolean = true;
   private _basePath: string;
   private _genDir: string;
-
+  private _i18nOptions: ngCompiler.NgcCliOptions;
 
   constructor(options: AotPluginOptions) {
     this._setupOptions(options);
@@ -110,6 +111,7 @@ export class AotPlugin {
       genDir = tsConfig.ngOptions.genDir;
     }
 
+    this._i18nOptions = options.i18nOptions;
     this._compilerOptions = tsConfig.parsed.options;
 
     if (options.entryModule) {
@@ -201,12 +203,13 @@ export class AotPlugin {
 
     this._resourceLoader = new WebpackResourceLoader(compilation);
 
-    const i18nOptions: ngCompiler.NgcCliOptions = {
+    const i18nOptions: ngCompiler.NgcCliOptions = this._i18nOptions || {
       i18nFile: undefined,
       i18nFormat: undefined,
-      locale: undefined,
-      basePath: this.basePath
+      locale: undefined
     };
+
+    i18nOptions.basePath = this.basePath;
 
     // Create the Code Generator.
     const codeGenerator = ngCompiler.CodeGenerator.create(
