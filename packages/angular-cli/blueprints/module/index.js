@@ -58,8 +58,8 @@ module.exports = {
   },
 
   afterInstall: function (options) {
-    options.entity.name = path.join(this.dasherizedModuleName, this.dasherizedModuleName);
-    options.flat = true;
+    options.entity.name = path.relative(this.dynamicPath.appRoot, this.generatePath);
+    options.flat = false;
     options.route = false;
     options.inlineTemplate = false;
     options.inlineStyle = false;
