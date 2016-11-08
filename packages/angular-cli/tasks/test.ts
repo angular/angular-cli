@@ -21,7 +21,8 @@ export default Task.extend({
       }
 
       options.angularCli = {
-        codeCoverage: options.codeCoverage,
+        codeCoverage: options.codeCoverage || options.fullCodeCoverage,
+        fullCodeCoverage: options.fullCodeCoverage,
         lint: options.lint,
       };
 
