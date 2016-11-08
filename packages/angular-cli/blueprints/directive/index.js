@@ -4,7 +4,7 @@ const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const findParentModule = require('../../utilities/find-parent-module').default;
 const NodeHost = require('@angular-cli/ast-tools').NodeHost;
-const Blueprint = require('ember-cli/lib/models/blueprint');
+const Blueprint = require('@angular-cli/ember-cli/lib/models/blueprint');
 const getFiles = Blueprint.prototype.files;
 
 module.exports = {

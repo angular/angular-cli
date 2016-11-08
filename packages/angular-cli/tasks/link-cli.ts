@@ -1,4 +1,4 @@
-const Task = require('ember-cli/lib/models/task');
+const Task = require('@angular-cli/ember-cli/lib/models/task');
 import * as chalk from 'chalk';
 import {exec} from 'child_process';
 

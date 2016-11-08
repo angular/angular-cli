@@ -1,6 +1,6 @@
 import * as assign from 'lodash/assign';
 import * as denodeify from 'denodeify';
-const Command = require('ember-cli/lib/models/command');
+const Command = require('@angular-cli/ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
 import ServeWebpackTask from '../tasks/serve-webpack';
@@ -157,5 +157,4 @@ const ServeCommand = Command.extend({
   }
 });
 
-ServeCommand.overrideCore = true;
 export default ServeCommand;
