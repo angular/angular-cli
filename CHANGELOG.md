@@ -1,3 +1,37 @@
+<a name="1.0.0-alpha.universal.1"></a>
+# [1.0.0-alpha.universal.1](https://github.com/devCrossNet/angular-cli/compare/v1.0.0-beta.19...v1.0.0-alpha.universal.1) (2016-11-08)
+
+
+### Bug Fixes
+
+* **aot:** remove the genDir plugin option. ([0e91dfe](https://github.com/devCrossNet/angular-cli/commit/0e91dfe)), closes [#2849](https://github.com/devCrossNet/angular-cli/issues/2849) [#2876](https://github.com/devCrossNet/angular-cli/issues/2876)
+* **aot:** Use the proper path when statically analyzing lazy routes. ([#2992](https://github.com/devCrossNet/angular-cli/issues/2992)) ([88131a0](https://github.com/devCrossNet/angular-cli/commit/88131a0)), closes [#2452](https://github.com/devCrossNet/angular-cli/issues/2452) [#2735](https://github.com/devCrossNet/angular-cli/issues/2735) [#2900](https://github.com/devCrossNet/angular-cli/issues/2900)
+* **build:** correct forkChecker option for ATS. ([#3011](https://github.com/devCrossNet/angular-cli/issues/3011)) ([a987cf5](https://github.com/devCrossNet/angular-cli/commit/a987cf5))
+* **build:** enable chunkhash in inline.js ([30cc482](https://github.com/devCrossNet/angular-cli/commit/30cc482)), closes [#2899](https://github.com/devCrossNet/angular-cli/issues/2899)
+* **build:** show full error stats ([#2879](https://github.com/devCrossNet/angular-cli/issues/2879)) ([d59fa1f](https://github.com/devCrossNet/angular-cli/commit/d59fa1f))
+* **e2e:** fix broken test pipeline ([#2999](https://github.com/devCrossNet/angular-cli/issues/2999)) ([37a1225](https://github.com/devCrossNet/angular-cli/commit/37a1225))
+* **generate:** stop default browser error from ng new --routing ([a45a1f2](https://github.com/devCrossNet/angular-cli/commit/a45a1f2)), closes [#2794](https://github.com/devCrossNet/angular-cli/issues/2794)
+* **package:** add some more metadata to webpack package.json ([c2dbf88](https://github.com/devCrossNet/angular-cli/commit/c2dbf88)), closes [#2854](https://github.com/devCrossNet/angular-cli/issues/2854)
+* **serve:** added accept html headers option to webpack-dev-server ([#2990](https://github.com/devCrossNet/angular-cli/issues/2990)) ([86f2a1b](https://github.com/devCrossNet/angular-cli/commit/86f2a1b)), closes [#2989](https://github.com/devCrossNet/angular-cli/issues/2989)
+* **test:** catches module loading errors ([f09439c](https://github.com/devCrossNet/angular-cli/commit/f09439c)), closes [#2640](https://github.com/devCrossNet/angular-cli/issues/2640) [#2785](https://github.com/devCrossNet/angular-cli/issues/2785)
+* bypass Watchman check ([#2846](https://github.com/devCrossNet/angular-cli/issues/2846)) ([9aa1099](https://github.com/devCrossNet/angular-cli/commit/9aa1099)), closes [#2791](https://github.com/devCrossNet/angular-cli/issues/2791)
+
+
+### Features
+
+* **build:** add loaders for fonts ([3497373](https://github.com/devCrossNet/angular-cli/commit/3497373)), closes [#1765](https://github.com/devCrossNet/angular-cli/issues/1765)
+* **build:** use appConfig.index to set output index file ([d3fd8b0](https://github.com/devCrossNet/angular-cli/commit/d3fd8b0)), closes [#2241](https://github.com/devCrossNet/angular-cli/issues/2241) [#2767](https://github.com/devCrossNet/angular-cli/issues/2767)
+* **build:** use static files for css ([a6415cc](https://github.com/devCrossNet/angular-cli/commit/a6415cc)), closes [#2148](https://github.com/devCrossNet/angular-cli/issues/2148) [#2020](https://github.com/devCrossNet/angular-cli/issues/2020) [#2826](https://github.com/devCrossNet/angular-cli/issues/2826) [#2646](https://github.com/devCrossNet/angular-cli/issues/2646)
+* **universal:** add support for Angular Universal ([1ee46ed](https://github.com/devCrossNet/angular-cli/commit/1ee46ed))
+
+
+### BREAKING CHANGES
+
+* aot: Using relative paths might lead to path clashing. We
+now properly output an error in this case.
+
+
+
 <a name="1.0.0-beta.19"></a>
 # [1.0.0-beta.19](https://github.com/angular/angular-cli/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2016-10-28)
 
