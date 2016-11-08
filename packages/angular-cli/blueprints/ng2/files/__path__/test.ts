@@ -14,6 +14,8 @@ declare var require: any;
 // Prevent Karma from running prematurely.
 __karma__.loaded = function () {};
 
+// Flag for loading all files to include them in code coverage.
+declare var FULL_CODE_COVERAGE: boolean;
 
 Promise.all([
   System.import('@angular/core/testing'),
@@ -26,8 +28,15 @@ Promise.all([
       testingBrowser.platformBrowserDynamicTesting()
     );
   })
-  // Then we find all the tests.
-  .then(() => require.context('./', true, /\.spec\.ts/))
+  .then(() => {
+    if (FULL_CODE_COVERAGE) {
+      // Then require all files in ./app for code coverage including unused files.
+      return require.context('./', true, /\/app\/.*\.ts/)
+    } else {
+      // Then we find all the tests.
+      return require.context('./', true, /\.spec\.ts/)
+    }
+  })
   // And load the modules.
   .then(context => {
     try {

@@ -113,7 +113,10 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
       new webpack.ContextReplacementPlugin(
         /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
         appRoot
-      )
+      ),
+      new webpack.DefinePlugin({
+        FULL_CODE_COVERAGE: testConfig.fullCodeCoverage
+      })
     ].concat(extraPlugins),
     node: {
       fs: 'empty',
