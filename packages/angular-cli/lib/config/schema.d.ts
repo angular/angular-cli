@@ -12,7 +12,7 @@ export interface CliConfig {
     apps?: {
         root?: string;
         outDir?: string;
-        assets?: string;
+        assets?: string[];
         index?: string;
         main?: string;
         nodeMain?: string;
@@ -34,6 +34,13 @@ export interface CliConfig {
          */
         environments?: {
             [name: string]: any;
+        };
+        /**
+         * Name and corresponding file for custom webpack config.
+         */
+        webpackCustom?: {
+            client?: string;
+            server?: string;
         };
     }[];
     /**

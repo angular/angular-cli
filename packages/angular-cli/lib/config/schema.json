@@ -84,6 +84,19 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "webpackCustom": {
+            "description": "Name and corresponding file for custom webpack config.",
+            "type": "object",
+            "properties": {
+              "client": {
+                "type": "string"
+              },
+              "server": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
           }
         },
         "additionalProperties": false

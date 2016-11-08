@@ -28,7 +28,11 @@
         "source": "environments/environment.ts",
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
-      }
+      }<% if(universal) { %>,
+      "webpackCustom": {
+        "client": "webpack.client.ts",
+        "server": "webpack.server.ts"
+      }<% } %>
     }
   ],
   "addons": [],
