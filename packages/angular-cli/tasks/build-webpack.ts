@@ -26,9 +26,6 @@ export default <any>Task.extend({
       runTaskOptions.aot
     ).config;
 
-    // fail on build error
-    config.bail = true;
-
     const webpackCompiler: any = webpack(config);
 
     const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
@@ -39,21 +36,18 @@ export default <any>Task.extend({
 
     return new Promise((resolve, reject) => {
       webpackCompiler.run((err: any, stats: any) => {
+        if (err) { return reject(err); }
+
         // Don't keep cache
         // TODO: Make conditional if using --watch
         webpackCompiler.purgeInputFileSystem();
-
-        if (err) {
-          lastHash = null;
-          console.error(err.details || err);
-          reject(err.details || err);
-        }
 
         if (stats.hash !== lastHash) {
           lastHash = stats.hash;
           process.stdout.write(stats.toString(webpackOutputOptions) + '\n');
         }
-        resolve();
+
+        return stats.hasErrors() ? reject() : resolve();
       });
     });
   }
