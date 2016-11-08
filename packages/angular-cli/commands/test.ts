@@ -6,6 +6,7 @@ const NgCliTestCommand = TestCommand.extend({
   availableOptions: [
     { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
     { name: 'code-coverage', type: Boolean, default: false, aliases: ['cc'] },
+    { name: 'full-code-coverage', type: Boolean, default: false, aliases: ['fcc'] },
     { name: 'lint', type: Boolean, default: false, aliases: ['l'] },
     { name: 'browsers', type: String },
     { name: 'colors', type: Boolean },
