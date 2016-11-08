@@ -185,7 +185,11 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 ng test
 ```
 
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false`.
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false`. 
+
+You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
+
+Linting during tests is also available via the `--lint` flag. See [Linting and formatting code](#linting-and-formatting-code) chapter for more informations.
 
 ### Running end-to-end tests
 
