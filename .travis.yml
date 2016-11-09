@@ -46,6 +46,9 @@ matrix:
     - node_js: "6"
       os: osx
       env: NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "6"
+      os: linux
+      env: SCRIPT=test:cover
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
