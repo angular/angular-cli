@@ -7,6 +7,7 @@ const NgCliTestCommand = TestCommand.extend({
     { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
     { name: 'code-coverage', type: Boolean, default: false, aliases: ['cc'] },
     { name: 'lint', type: Boolean, default: false, aliases: ['l'] },
+    { name: 'single-run', type: Boolean, default: false, aliases: ['sr'] },
     { name: 'browsers', type: String },
     { name: 'colors', type: Boolean },
     { name: 'log-level', type: String },
