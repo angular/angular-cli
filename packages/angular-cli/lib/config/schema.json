@@ -37,7 +37,7 @@
             "items": {
               "type": "string"
             },
-            "default": [] 
+            "default": []
           },
           "index": {
             "type": "string",
@@ -143,6 +143,12 @@
         },
         "poll": {
           "type": "number"
+        },
+        "viewEncapsulation": {
+          "type": "string"
+        },
+        "changeDetection": {
+          "type": "string"
         },
         "inline": {
           "type": "object",
