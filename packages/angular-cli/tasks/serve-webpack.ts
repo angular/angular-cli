@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
 const SilentError = require('silent-error');
-const Task = require('@angular-cli/ember-cli/lib/models/task');
+const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 const WebpackDevServer = require('webpack-dev-server');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');

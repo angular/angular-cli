@@ -8,4 +8,4 @@ typings/
 packages/angular-cli/blueprints/*/files/
 
 # Ignore ember cli.
-packages/ember-cli/
+packages/angular-cli/ember-cli/

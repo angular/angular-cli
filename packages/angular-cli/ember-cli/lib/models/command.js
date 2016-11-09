@@ -293,7 +293,7 @@ Command.prototype.parseAlias = function(option, alias) {
       try {
         aliasValue = JSON.parse(alias);
       } catch (e) {
-        var debug = require('debug')('@angular-cli/ember-cli/models/command');
+        var debug = require('debug')('angular-cli/ember-cli/models/command');
         debug(e);
       }
     }

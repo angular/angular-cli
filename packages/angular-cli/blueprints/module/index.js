@@ -1,5 +1,5 @@
 const path = require('path');
-const Blueprint   = require('@angular-cli/ember-cli/lib/models/blueprint');
+const Blueprint   = require('../../ember-cli/lib/models/blueprint');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const getFiles = Blueprint.prototype.files;
 

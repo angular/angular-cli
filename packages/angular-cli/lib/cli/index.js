@@ -1,9 +1,9 @@
 /*eslint-disable no-console */
 
 // This file hooks up on require calls to transpile TypeScript.
-const cli = require('@angular-cli/ember-cli/lib/cli');
-const UI = require('@angular-cli/ember-cli/lib/ui');
-const Watcher = require('@angular-cli/ember-cli/lib/models/watcher');
+const cli = require('../../ember-cli/lib/cli');
+const UI = require('../../ember-cli/lib/ui');
+const Watcher = require('../../ember-cli/lib/models/watcher');
 const path = require('path');
 
 Error.stackTraceLimit = Infinity;

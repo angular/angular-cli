@@ -1,4 +1,4 @@
-const TestCommand = require('@angular-cli/ember-cli/lib/commands/test');
+const TestCommand = require('../ember-cli/lib/commands/test');
 import TestTask from '../tasks/test';
 import {CliConfig} from '../models/config';
 
