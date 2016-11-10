@@ -26,7 +26,10 @@ export default Task.extend({
       commandOptions.environment,
       undefined,
       undefined,
-      commandOptions.aot
+      commandOptions.aot,
+      commandOptions.i18nFile,
+      commandOptions.i18nFormat,
+      commandOptions.locale
     ).config;
 
     // This allows for live reload of page when changes are made to repo.

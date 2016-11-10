@@ -27,6 +27,9 @@ export interface ServeTaskOptions {
   sslCert?: string;
   aot?: boolean;
   open?: boolean;
+  i18nFile?: string;
+  i18nFormat?: string;
+  locale?: string;
 }
 
 const ServeCommand = Command.extend({
@@ -88,6 +91,9 @@ const ServeCommand = Command.extend({
       aliases: ['o'],
       description: 'Opens the url in default browser',
     },
+    { name: 'i18n-file',       type: String, default: null },
+    { name: 'i18n-format',     type: String, default: null },
+    { name: 'locale',         type: String, default: null }
   ],
 
   run: function(commandOptions: ServeTaskOptions) {

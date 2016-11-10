@@ -23,7 +23,10 @@ export class NgCliWebpackConfig {
     public environment: string,
     outputDir?: string,
     baseHref?: string,
-    isAoT = false
+    isAoT = false,
+    i18nFile?: string,
+    i18nFormat?: string,
+    locale?: string
   ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
@@ -38,7 +41,7 @@ export class NgCliWebpackConfig {
     );
     let targetConfigPartial = this.getTargetConfig(this.ngCliProject.root, appConfig);
     const typescriptConfigPartial = isAoT
-      ? getWebpackAotConfigPartial(this.ngCliProject.root, appConfig)
+      ? getWebpackAotConfigPartial(this.ngCliProject.root, appConfig, i18nFile, i18nFormat, locale)
       : getWebpackNonAotConfigPartial(this.ngCliProject.root, appConfig);
 
     if (appConfig.mobile) {

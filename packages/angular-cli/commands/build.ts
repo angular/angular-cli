@@ -11,6 +11,9 @@ export interface BuildOptions {
   supressSizes: boolean;
   baseHref?: string;
   aot?: boolean;
+  i18nFile?: string;
+  i18nFormat?: string;
+  locale?: string;
 }
 
 const BuildCommand = Command.extend({
@@ -31,7 +34,10 @@ const BuildCommand = Command.extend({
     { name: 'watcher',        type: String },
     { name: 'suppress-sizes', type: Boolean, default: false },
     { name: 'base-href',      type: String,  default: null, aliases: ['bh'] },
-    { name: 'aot',            type: Boolean, default: false }
+    { name: 'aot',            type: Boolean, default: false },
+    { name: 'i18n-file',       type: String, default: null },
+    { name: 'i18n-format',     type: String, default: null },
+    { name: 'locale',         type: String, default: null }
   ],
 
   run: function (commandOptions: BuildOptions) {

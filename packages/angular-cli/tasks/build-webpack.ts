@@ -23,7 +23,10 @@ export default <any>Task.extend({
       runTaskOptions.environment,
       outputDir,
       runTaskOptions.baseHref,
-      runTaskOptions.aot
+      runTaskOptions.aot,
+      runTaskOptions.i18nFile,
+      runTaskOptions.i18nFormat,
+      runTaskOptions.locale
     ).config;
 
     const webpackCompiler: any = webpack(config);
