@@ -32,6 +32,12 @@ function copy(from, to) {
 }
 
 
+function getDeps(pkg) {
+  const packageJson = require(pkg.packageJson);
+  return Object.assign({}, packageJson['dependencies'], packageJson['devDependencies']);
+}
+
+
 // First delete the dist folder.
 Promise.resolve()
   .then(() => console.log('Deleting dist folder...'))
@@ -42,11 +48,12 @@ Promise.resolve()
     return Object.keys(packages)
       // Order packages in order of dependency.
       .sort((a, b) => {
-        const aPackageJson = require(packages[a].packageJson);
-        const bPackageJson = require(packages[b].packageJson);
-        if (Object.keys(aPackageJson['dependencies'] || {}).indexOf(b) == -1) {
+        const aDependsOnB = Object.keys(getDeps(packages[a])).indexOf(b) != -1;
+        const bDependsOnA = Object.keys(getDeps(packages[b])).indexOf(a) != -1;
+
+        if (!aDependsOnB && !bDependsOnA) {
           return 0;
-        } else if (Object.keys(bPackageJson['dependencies'] || {}).indexOf(a) == -1) {
+        } else if (aDependsOnB) {
           return 1;
         } else {
           return -1;

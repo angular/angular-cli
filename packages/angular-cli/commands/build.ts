@@ -1,4 +1,4 @@
-const Command = require('ember-cli/lib/models/command');
+const Command = require('../ember-cli/lib/models/command');
 import WebpackBuild from '../tasks/build-webpack';
 import WebpackBuildWatch from '../tasks/build-webpack-watch';
 

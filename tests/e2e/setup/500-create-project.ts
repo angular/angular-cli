@@ -6,6 +6,9 @@ import {updateTsConfig, updateJsonFile} from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
 
 
+let packages = require('../../../lib/packages');
+
+
 export default function(argv: any) {
   let createProject = null;
 
@@ -28,11 +31,9 @@ export default function(argv: any) {
   return Promise.resolve()
     .then(() => createProject)
     .then(() => updateJsonFile('package.json', json => {
-      const dist = join(__dirname, '../../../dist/');
-      json['devDependencies']['angular-cli'] = join(dist, 'angular-cli');
-      json['devDependencies']['@angular-cli/ast-tools'] = join(dist, 'ast-tools');
-      json['devDependencies']['@angular-cli/base-href-webpack'] = join(dist, 'base-href-webpack');
-      json['devDependencies']['@ngtools/webpack'] = join(dist, 'webpack');
+      Object.keys(packages).forEach(pkgName => {
+        json['dependencies'][pkgName] = packages[pkgName].dist;
+      });
     }))
     .then(() => {
       if (argv.nightly) {

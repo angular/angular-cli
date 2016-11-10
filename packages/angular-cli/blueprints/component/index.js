@@ -1,6 +1,6 @@
 const path = require('path');
 const chalk = require('chalk');
-const Blueprint = require('ember-cli/lib/models/blueprint');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const findParentModule = require('../../utilities/find-parent-module').default;
 const getFiles = Blueprint.prototype.files;

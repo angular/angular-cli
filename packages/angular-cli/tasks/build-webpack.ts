@@ -1,6 +1,6 @@
 import * as rimraf from 'rimraf';
 import * as path from 'path';
-const Task = require('ember-cli/lib/models/task');
+const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 import { BuildOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';

@@ -1,5 +1,5 @@
 import * as denodeify from 'denodeify';
-const Task = require('ember-cli/lib/models/task');
+const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
 import { exec } from 'child_process';
 import * as https from 'https';

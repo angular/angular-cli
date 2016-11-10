@@ -3,8 +3,7 @@
 
 var ng = require('../helpers/ng');
 var tmp = require('../helpers/tmp');
-var conf = require('ember-cli/tests/helpers/conf');
-var Promise = require('ember-cli/lib/ext/promise');
+var Promise = require('angular-cli/ember-cli/lib/ext/promise');
 var fs = require('fs');
 var path = require('path');
 var chai = require('chai');
@@ -33,10 +32,6 @@ describe('Acceptance: ng github-pages:deploy', function() {
         return fsWriteFile(indexHtml, indexData, 'utf8');
       });
   }
-
-  before(conf.setup);
-
-  after(conf.restore);
 
   beforeEach(function() {
     this.timeout(10000);

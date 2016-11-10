@@ -7,8 +7,7 @@ var expect = require('chai').expect;
 var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = process.cwd();
-var conf = require('ember-cli/tests/helpers/conf');
-var Promise = require('ember-cli/lib/ext/promise');
+var Promise = require('angular-cli/ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
 const denodeify = require('denodeify');
 
@@ -16,10 +15,6 @@ const readFile = denodeify(fs.readFile);
 
 
 describe('Acceptance: ng generate component', function () {
-  before(conf.setup);
-
-  after(conf.restore);
-
   beforeEach(function () {
     this.timeout(10000);
     return tmp.setup('./tmp').then(function () {

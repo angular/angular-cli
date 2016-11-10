@@ -3,7 +3,6 @@
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
 
-const conf = require('ember-cli/tests/helpers/conf');
 const existsSync = require('exists-sync');
 const expect = require('chai').expect;
 const fs = require('fs');
@@ -18,10 +17,6 @@ function fileExpectations(expectation) {
 }
 
 xdescribe('Acceptance: ng generate route', function () {
-  before(conf.setup);
-
-  after(conf.restore);
-
   beforeEach(function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
