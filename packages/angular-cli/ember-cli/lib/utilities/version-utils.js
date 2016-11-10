@@ -7,7 +7,7 @@ var getRepoInfo = require('git-repo-info');
 module.exports = {
   emberCLIVersion: function emberCLIVersion() {
     var gitPath = path.join(__dirname, '..','..','.git');
-    var output  = [require('../../package.json').version];
+    var output  = [require('../../../package.json').version];
 
     if (existsSync(gitPath)) {
       var repoInfo = getRepoInfo(gitPath);

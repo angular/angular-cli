@@ -4,7 +4,7 @@ var Promise  = require('../../lib/ext/promise');
 var Task     = require('../models/task');
 var exec     = Promise.denodeify(require('child_process').exec);
 var path     = require('path');
-var pkg      = require('../../package.json');
+var pkg      = require('../../../package.json');
 var fs       = require('fs');
 var template = require('lodash/template');
 
