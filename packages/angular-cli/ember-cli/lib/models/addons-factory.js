@@ -4,7 +4,7 @@
 @module ember-cli
 */
 
-var CoreObject = require('core-object');
+var CoreObject = require('../ext/core-object');
 var DAG        = require('../utilities/DAG');
 var debug      = require('debug')('ember-cli:addons-factory');
 

@@ -8,7 +8,7 @@ var assign     = require('lodash/assign');
 var debug      = require('debug')('ember-cli:addon-discovery');
 var existsSync = require('exists-sync');
 var path       = require('path');
-var CoreObject = require('core-object');
+var CoreObject = require('../ext/core-object');
 var resolve    = require('resolve');
 var findup     = require('findup');
 

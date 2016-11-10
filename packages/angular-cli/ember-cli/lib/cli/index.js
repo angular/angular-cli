@@ -1,17 +1,17 @@
 'use strict';
+var path          = require('path');
 
 // Main entry point
 var Project       = require('../models/project');
 var requireAsHash = require('../utilities/require-as-hash');
 var Command       = require('../models/command');
-var commands      = requireAsHash('../commands/*.js', Command);
+var commands      = requireAsHash(path.join(__dirname, '../commands/*.js'), Command);
 var Task          = require('../models/task');
-var tasks         = requireAsHash('../tasks/*.js', Task);
+var tasks         = requireAsHash(path.join(__dirname, '../tasks/*.js'), Task);
 var CLI           = require('./cli');
 var packageConfig = require('../../../package.json');
 var debug         = require('debug')('ember-cli:cli/index');
 var merge         = require('lodash/merge');
-var path          = require('path');
 
 var version      = packageConfig.version;
 var name         = packageConfig.name;
