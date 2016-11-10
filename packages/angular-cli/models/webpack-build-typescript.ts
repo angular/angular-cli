@@ -48,7 +48,7 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
 };
 
 export const getWebpackAotConfigPartial = function(projectRoot: string, appConfig: any,
-  i18nFile: string, i18nFormat: string, locale:string) {
+  i18nFile: string, i18nFormat: string, locale: string) {
   return {
     module: {
       rules: [

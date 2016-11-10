@@ -18,7 +18,9 @@ export default function() {
            </body>
          </file>
         </xliff>`))
-    .then(() => appendToFile('src/app/app.component.html', '<h1 i18n="User welcome|An introduction header for this sample">Hello i18n!</h1>'))
-    .then(() => ng('build', '--aot', '--i18n-file', 'src/locale/messages.fr.xlf' ,'--i18n-format', 'xlf', '--locale', 'fr'))
+    .then(() => appendToFile('src/app/app.component.html',
+      '<h1 i18n="User welcome|An introduction header for this sample">Hello i18n!</h1>'))
+    .then(() => ng('build', '--aot', '--i18n-file', 'src/locale/messages.fr.xlf', '--i18n-format',
+      'xlf', '--locale', 'fr'))
     .then(() => expectFileToMatch('dist/main.bundle.js', /Bonjour i18n!/));
 }
