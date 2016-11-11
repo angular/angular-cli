@@ -43,7 +43,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
   }
 
   return {
-    devtool: 'inline-source-map',
+    devtool: testConfig.sourcemap ? 'inline-source-map' : 'eval',
     context: path.resolve(__dirname, './'),
     resolve: {
       extensions: ['.ts', '.js'],

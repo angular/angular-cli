@@ -12,7 +12,8 @@ const init = (config) => {
   const environment = config.angularCli.environment || 'dev';
   const testConfig = {
     codeCoverage: config.angularCli.codeCoverage || false,
-    lint: config.angularCli.lint || false
+    lint: config.angularCli.lint || false,
+    sourcemap: config.angularCli.sourcemap
   }
 
   // add webpack config
