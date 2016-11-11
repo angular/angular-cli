@@ -3,6 +3,7 @@ import {
   getWebpackNonAotConfigPartial
 } from './webpack-build-typescript';
 const webpackMerge = require('webpack-merge');
+const path = require('path');
 import { CliConfig } from './config';
 import {
   getWebpackCommonConfig,
@@ -56,6 +57,22 @@ export class NgCliWebpackConfig {
       targetConfigPartial,
       typescriptConfigPartial
     );
+
+    if (config.config.build) {
+      const webpackConfig = config.config.build.webpack;
+      if (webpackConfig) {
+        if (webpackConfig.config) {
+          const extConfig = require(path.join(this.ngCliProject.root, webpackConfig.config));
+          this.config = webpackMerge(this.config, extConfig);
+        }
+
+        if (webpackConfig.extender) {
+          const extender = require(path.join(this.ngCliProject.root, webpackConfig.extender));
+          this.config = extender(this.config, {target, environment, isAoT});
+        }
+      }
+
+    }
   }
 
   getTargetConfig(projectRoot: string, appConfig: any): any {

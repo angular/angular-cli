@@ -132,6 +132,24 @@
       },
       "additionalProperties": false
     },
+    "build": {
+      "type": "object",
+      "properties": {
+        "webpack": {
+          "type": "object",
+          "properties": {
+            "extender": {
+              "type": "string"
+            },
+            "config": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
     "defaults": {
       "type": "object",
       "properties": {
