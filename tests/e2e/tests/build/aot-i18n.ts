@@ -1,5 +1,6 @@
 import {ng} from '../../utils/process';
 import {expectFileToMatch, writeFile, createDir, appendToFile} from '../../utils/fs';
+import {expectToFail} from '../../utils/utils';
 
 export default function() {
   return Promise.resolve()
@@ -21,5 +22,8 @@ export default function() {
       '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>'))
     .then(() => ng('build', '--aot', '--i18n-file', 'src/locale/messages.fr.xlf', '--i18n-format',
       'xlf', '--locale', 'fr'))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /Bonjour i18n!/));
+    .then(() => expectFileToMatch('dist/main.bundle.js', /Bonjour i18n!/))
+    .then(() => ng('build', '--aot'))
+    .then(() => expectToFail(() => expectFileToMatch('dist/main.bundle.js', /Bonjour i18n!/)))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /Hello i18n!/));
 }
