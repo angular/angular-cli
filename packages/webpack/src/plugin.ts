@@ -28,7 +28,6 @@ export interface AotPluginOptions {
 
 export interface LazyRoute {
   moduleRoute: ModuleRoute;
-  moduleRelativePath: string;
   moduleAbsolutePath: string;
 }
 
@@ -262,10 +261,8 @@ export class AotPlugin {
   }
 
   private _resolveModulePath(module: ModuleRoute, containingFile: string) {
-    if (module.path.startsWith('.')) {
-      return path.join(path.dirname(containingFile), module.path);
-    }
-    return module.path;
+    return this._reflectorHost.findDeclaration(module.path, module.className, containingFile)
+      .filePath;
   }
 
   private _processNgModule(module: ModuleRoute, containingFile: string | null): LazyRouteMap {
@@ -280,14 +277,9 @@ export class AotPlugin {
     const entryNgModuleMetadata = this.getNgModuleMetadata(staticSymbol);
     const loadChildrenRoute: LazyRoute[] = this.extractLoadChildren(entryNgModuleMetadata)
       .map(route => {
-        const mr = ModuleRoute.fromString(route);
-        const relativePath = this._resolveModulePath(mr, relativeModulePath);
-        const absolutePath = path.join(this.genDir, relativePath);
-        return {
-          moduleRoute: mr,
-          moduleRelativePath: relativePath,
-          moduleAbsolutePath: absolutePath
-        };
+        const moduleRoute = ModuleRoute.fromString(route);
+        const moduleAbsolutePath = this._resolveModulePath(moduleRoute, relativeModulePath);
+        return { moduleRoute, moduleAbsolutePath };
       });
     const resultMap: LazyRouteMap = loadChildrenRoute
       .reduce((acc: LazyRouteMap, curr: LazyRoute) => {
@@ -349,7 +341,8 @@ export class AotPlugin {
           }
         })
         // Poor man's flat map.
-        .reduce((acc: any[], i: any) => acc.concat(i), []))
+        .reduce((acc: any[], i: any) => acc.concat(i), [])
+      )
       .filter(x => !!x);
   }
 
