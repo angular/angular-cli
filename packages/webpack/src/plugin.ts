@@ -282,7 +282,7 @@ export class AotPlugin {
       .map(route => {
         const mr = ModuleRoute.fromString(route);
         const relativePath = this._resolveModulePath(mr, relativeModulePath);
-        const absolutePath = path.join(this.genDir, relativePath);
+        const absolutePath = path.resolve(this.genDir, relativePath);
         return {
           moduleRoute: mr,
           moduleRelativePath: relativePath,
