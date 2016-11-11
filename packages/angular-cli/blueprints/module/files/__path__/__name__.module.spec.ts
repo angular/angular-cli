@@ -10,7 +10,9 @@ describe('<%= classifiedModuleName %>Module', () => {
     <%= camelizedModuleName %>Module = new <%= classifiedModuleName %>Module();
   });
 
-  it('should create an instance', () => {
-    expect(<%= camelizedModuleName %>Module).toBeTruthy();
-  })
+  describe('.constructor()', () => {
+    it('should create an instance', () => {
+      expect(<%= camelizedModuleName %>Module).toBeTruthy();
+    });
+  });
 });

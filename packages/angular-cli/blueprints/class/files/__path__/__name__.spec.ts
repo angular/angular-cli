@@ -1,7 +1,9 @@
 import {<%= classifiedModuleName %>} from './<%= fileName %>';
 
 describe('<%= classifiedModuleName %>', () => {
-  it('should create an instance', () => {
-    expect(new <%= classifiedModuleName %>()).toBeTruthy();
+  describe('.constructor()', () => {
+    it('should create an instance', () => {
+      expect(new <%= classifiedModuleName %>()).toBeTruthy();
+    });
   });
 });
