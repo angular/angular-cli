@@ -113,19 +113,20 @@ export default function githubPagesDeployRun(options: GithubPagesDeployOptions, 
 
   function createGitHubRepoIfNeeded() {
     return execPromise('git remote -v')
-      .then(function (stdout) {
-        if (!/origin\s+(https:\/\/|git@)github\.com/m.test(stdout)) {
-          return createGithubRepoTask.run(createGithubRepoOptions)
-            .then(() => {
-              // only push starting branch if it's not the destinationBranch
-              // this happens commonly when using github user pages, since
-              // they require the destination branch to be 'master'
-              if (destinationBranch !== initialBranch) {
-                execPromise(`git push -u origin ${initialBranch}`);
-              }
-            });
-        }
-      });
+        .then(function(stdout) {
+          if (!/origin\s+(https:\/\/|git@)github\.com/m.test(stdout)) {
+            return createGithubRepoTask.run(createGithubRepoOptions)
+                .then(() => generateRemoteUrl())
+                .then((upstream: string) => {
+                  // only push starting branch if it's not the destinationBranch
+                  // this happens commonly when using github user pages, since
+                  // they require the destination branch to be 'master'
+                  if (destinationBranch !== initialBranch) {
+                    execPromise(`git push -u ${upstream} ${initialBranch}`);
+                  }
+                });
+          }
+        });
   }
 
   function checkoutGhPages() {
@@ -191,30 +192,57 @@ export default function githubPagesDeployRun(options: GithubPagesDeployOptions, 
   }
 
   function pushToGitRepo() {
-    return execPromise(`git push origin ${ghPagesBranch}:${destinationBranch}`)
-      .catch((err) => returnStartingBranch()
-        .catch(() => Promise.reject(err)));
+    return generateRemoteUrl()
+        .then(upstream => {
+          return execPromise(`git push ${upstream} ${ghPagesBranch}:${destinationBranch}`);
+        })
+        .catch((err) => returnStartingBranch()
+            .catch(() => Promise.reject(err) ));
   }
 
   function printProjectUrl() {
-    return execPromise('git remote -v')
-      .then((stdout) => {
-        let match = stdout.match(/origin\s+(?:https:\/\/|git@)github\.com(?:\:|\/)([^\/]+)/m);
-        let userName = match[1].toLowerCase();
-        let url = `https://${userName}.github.io/${options.userPage ? '' : (baseHref + '/')}`;
-        ui.writeLine(chalk.green(`Deployed! Visit ${url}`));
-        ui.writeLine('Github pages might take a few minutes to show the deployed site.');
-      });
+    return getUsernameFromGitOrigin()
+        .then((userName) => {
+          let url = `https://${userName}.github.io/${options.userPage ? '' : (baseHref + '/')}`;
+          ui.writeLine(chalk.green(`Deployed! Visit ${url}`));
+          ui.writeLine('Github pages might take a few minutes to show the deployed site.');
+        });
   }
 
   function failGracefully(error: Error) {
     if (error && (/git clean/.test(error.message) || /Permission denied/.test(error.message))) {
       ui.writeLine(error.message);
       let msg = 'There was a permissions error during git file operations, ' +
-        'please close any open project files/folders and try again.';
+          'please close any open project files/folders and try again.';
+      msg += `\nYou might also need to return to the ${initialBranch} branch manually.`;
       return Promise.reject(new SilentError(msg.concat(branchErrMsg)));
     } else {
       return Promise.reject(error);
     }
+  }
+
+  function generateRemoteUrl(): Promise<String> {
+    if (createGithubRepoOptions.ghToken && createGithubRepoOptions.ghUsername) {
+      return Promise.resolve(`https://${createGithubRepoOptions.ghToken}@github.com/` +
+          `${createGithubRepoOptions.ghUsername}/${createGithubRepoOptions.projectName}.git`);
+    }
+
+    if (createGithubRepoOptions.ghToken && !createGithubRepoOptions.ghUsername) {
+      return getUsernameFromGitOrigin()
+          .then(username => {
+            return Promise.resolve(`https://${createGithubRepoOptions.ghToken}@github.com/` +
+                `${username}/${createGithubRepoOptions.projectName}.git`);
+          });
+    }
+
+    return Promise.resolve('origin');
+  }
+
+  function getUsernameFromGitOrigin(): Promise<String> {
+    return execPromise('git remote -v')
+        .then((stdout) => {
+          let match = stdout.match(/origin\s+(?:https:\/\/|git@)github\.com(?:\:|\/)([^\/]+)/m);
+          return match[1].toLowerCase();
+        });
   }
 }
