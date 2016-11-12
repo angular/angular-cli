@@ -19,7 +19,7 @@ var preprocessTemplates = p.preprocessTemplates;
 
 var AddonDiscovery  = require('../models/addon-discovery');
 var AddonsFactory   = require('../models/addons-factory');
-var CoreObject = require('core-object');
+var CoreObject = require('../ext/core-object');
 var Project = require('./project');
 
 var upstreamMergeTrees = require('broccoli-merge-trees');

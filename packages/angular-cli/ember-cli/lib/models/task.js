@@ -1,6 +1,6 @@
 'use strict';
 
-var CoreObject = require('core-object');
+var CoreObject = require('../ext/core-object');
 
 function Task() {
   CoreObject.apply(this, arguments);

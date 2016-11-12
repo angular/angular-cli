@@ -79,6 +79,7 @@ export class AotPlugin {
 
   get basePath() { return this._basePath; }
   get compilation() { return this._compilation; }
+  get compilerHost() { return this._compilerHost; }
   get compilerOptions() { return this._compilerOptions; }
   get done() { return this._donePromise; }
   get entryModule() { return this._entryModule; }
