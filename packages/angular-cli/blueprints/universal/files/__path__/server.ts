@@ -2,6 +2,7 @@
  * the polyfills must be the first thing imported
  */
 import 'angular2-universal-polyfills';
+import './polyfills.ts';
 import * as path from 'path';
 import * as express from 'express';
 import { enableProdMode } from '@angular/core';
