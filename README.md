@@ -1,4 +1,8 @@
-## Angular-CLI
+## Universal-CLI
+Universal-CLI is fork from Angular-CLI. It supports Angular Universal see: [Support for server side rendering](#support-for-server-side-rendering).
+It is a separate package because the Core-CLI team is not able to maintain non-core functionality.
+
+I am looking for maintainers, please let me know if you're interested in supporting `universal-cli`.
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -13,7 +17,7 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 
 This project is very much still a work in progress.
 
-The CLI is now in beta.
+The CLI is now in alpha.
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
 Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
@@ -62,7 +66,7 @@ with NPM 3 or higher.
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
-npm install -g angular-cli
+npm install -g universal-cli
 ```
 
 ## Usage
