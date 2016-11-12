@@ -1,4 +1,4 @@
-const Blueprint = require('ember-cli/lib/models/blueprint');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const path = require('path');
 const stringUtils = require('ember-cli-string-utils');
 const getFiles = Blueprint.prototype.files;

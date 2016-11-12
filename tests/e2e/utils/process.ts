@@ -104,30 +104,30 @@ export function ng(...args: string[]) {
   if (args[0] == 'build') {
     return silentNg(...args);
   } else {
-    return _exec({}, 'ng', args);
+    return _exec({}, '/usr/local/bin/ng', args);
   }
 }
 
 export function silentNg(...args: string[]) {
-  return _exec({silent: true}, 'ng', args);
+  return _exec({silent: true}, '/usr/local/bin/ng', args);
 }
 
 export function silentNpm(...args: string[]) {
-  return _exec({silent: true}, 'npm', args);
+  return _exec({silent: true}, '/usr/local/bin/npm', args);
 }
 
 export function npm(...args: string[]) {
-  return _exec({}, 'npm', args);
+  return _exec({}, '/usr/local/bin/npm', args);
 }
 
 export function node(...args: string[]) {
-  return _exec({}, 'node', args);
+  return _exec({}, '/usr/local/bin/node', args);
 }
 
 export function git(...args: string[]) {
-  return _exec({}, 'git', args);
+  return _exec({}, '/usr/bin/git', args);
 }
 
 export function silentGit(...args: string[]) {
-  return _exec({silent: true}, 'git', args);
+  return _exec({silent: true}, '/usr/bin/git', args);
 }

@@ -1,15 +1,15 @@
-import {join} from 'path';
-import {git, ng, silentNpm} from '../utils/process';
-import {isMobileTest, isUniversalTest} from '../utils/utils';
-import {expectFileToExist} from '../utils/fs';
-import {updateTsConfig, updateJsonFile} from '../utils/project';
-import {gitClean, gitCommit} from '../utils/git';
+import { join } from 'path';
+import { git, ng, silentNpm } from '../utils/process';
+import { isMobileTest, isUniversalTest } from '../utils/utils';
+import { expectFileToExist } from '../utils/fs';
+import { updateTsConfig, updateJsonFile } from '../utils/project';
+import { gitClean, gitCommit } from '../utils/git';
 
 
 let packages = require('../../../lib/packages');
 
 
-export default function(argv: any) {
+export default function (argv: any) {
   let createProject = null;
 
   // This is a dangerous flag, but is useful for testing packages only.

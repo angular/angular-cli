@@ -125,6 +125,7 @@
     "style-loader": "^0.13.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^2.1.0",
+    "tiny-lr": "^0.2.1",
     "temp": "0.8.3",
     "through": "^2.3.6",
     "ts-loader": "^0.8.2",
