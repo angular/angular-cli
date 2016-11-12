@@ -13,7 +13,7 @@ const init = (config) => {
   const testConfig = {
     codeCoverage: config.angularCli.codeCoverage || false,
     lint: config.angularCli.lint || false
-  }
+  };
 
   // add webpack config
   const webpackConfig = getWebpackTestConfig(config.basePath, environment, appConfig, testConfig);
@@ -35,6 +35,19 @@ const init = (config) => {
 
   config.webpack = Object.assign(webpackConfig, config.webpack);
   config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
+  // if scripts exist, we should add them to Karma files
+  if (appConfig.scripts.length){
+    // add each script to the files array
+    config.files.push.apply(config.files, appConfig.scripts.map((script) => {
+      // if script has node modules in it, we assume it is something local and add the base path to
+      // it, otherwise we just take it as a URL
+      if (script.indexOf('node_modules') > -1){
+        script = script.replace('..', '');
+        script = path.join(config.basePath, script);
+      }
+      return { pattern: script, watched: false };
+    }));
+  }
 
   // replace the angular-cli preprocessor with webpack+sourcemap
   Object.keys(config.preprocessors)
