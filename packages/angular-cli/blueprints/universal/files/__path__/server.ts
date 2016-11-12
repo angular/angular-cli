@@ -8,6 +8,7 @@ import * as express from 'express';
 import { enableProdMode } from '@angular/core';
 import { createEngine } from 'angular2-express-engine';
 import { AppModule } from './app/app.node.module';
+import * as compression from 'compression';
 import { environment } from './environments/environment';
 
 const app = express();
@@ -27,6 +28,11 @@ if (environment.production) {
 app.engine('.html', createEngine({}));
 app.set('views', __dirname);
 app.set('view engine', 'html');
+
+/**
+ * Enable compression
+ */
+app.use(compression());
 
 /**
  * serve static files
@@ -74,4 +80,6 @@ app.get('*', function(req: any, res: any) {
   res.status(404).send(json);
 });
 
-app.listen(port);
+app.listen(port, () => {
+  console.log(`Listening on port {port}`);
+});
