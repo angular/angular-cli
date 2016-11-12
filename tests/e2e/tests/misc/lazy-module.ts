@@ -6,18 +6,14 @@ import {addImportToModule} from '../../utils/ast';
 
 
 export default function(argv: any) {
-  /** This test is disabled when not on nightly. */
-  if (!argv.nightly) {
-    return Promise.resolve();
-  }
-
   let oldNumberOfFiles = 0;
   return Promise.resolve()
     .then(() => ng('build'))
     .then(() => oldNumberOfFiles = readdirSync('dist').length)
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
     .then(() => addImportToModule('src/app/app.module.ts', oneLine`
-      RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }])
+      RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }]),
+      RouterModule.forRoot([{ path: "lazy1", loadChildren: "./lazy/lazy.module#LazyModule" }])
       `, '@angular/router'))
     .then(() => ng('build'))
     .then(() => readdirSync('dist').length)
