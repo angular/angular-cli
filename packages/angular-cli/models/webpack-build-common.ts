@@ -22,6 +22,7 @@ export function getWebpackCommonConfig(
   const scripts = appConfig.scripts
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
+  const externals = appConfig.externals || {};
 
   let entry: { [key: string]: string[] } = {
     main: [appMain]
@@ -43,6 +44,7 @@ export function getWebpackCommonConfig(
       path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].bundle.js'
     },
+    externals: externals,
     module: {
       rules: [
         {

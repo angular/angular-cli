@@ -74,6 +74,11 @@
             },
             "additionalProperties": false
           },
+          "externals": {
+            "description": "Global scripts to be used internally.",
+            "type": "object",
+            "additionalProperties": true
+          },
           "environments": {
             "description": "Name and corresponding file for environment config.",
             "type": "object",
