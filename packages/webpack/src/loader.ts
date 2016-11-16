@@ -15,6 +15,16 @@ function _findNodes(sourceFile: ts.SourceFile, node: ts.Node, kind: ts.SyntaxKin
   }, node.kind == kind ? [node] : []);
 }
 
+function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
+  if (node.kind == ts.SyntaxKind.Identifier) {
+    return (node as ts.Identifier).text;
+  } else if (node.kind == ts.SyntaxKind.StringLiteral) {
+    return (node as ts.StringLiteral).text;
+  } else {
+    return null;
+  }
+}
+
 function _removeDecorators(fileName: string, source: string): string {
   const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest);
   // Find all decorators.
@@ -107,6 +117,58 @@ function _replaceBootstrap(fileName: string,
   }).then(() => sourceText);
 }
 
+function _replaceResources(fileName: string, source: string) {
+  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest);
+
+  const changes = new MultiChange();
+
+  // Find all object literals.
+  _findNodes(sourceFile, sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
+  // Get all their property assignments.
+  .map(node => _findNodes(sourceFile, node, ts.SyntaxKind.PropertyAssignment))
+  // Flatten into a single array (from an array of array<property assignments>).
+  .reduce((prev, curr) => curr ? prev.concat(curr) : prev, [])
+  // Remove every property assignment that aren't 'loadChildren'.
+  .filter((node: ts.PropertyAssignment) => {
+    const key = _getContentOfKeyLiteral(sourceFile, node.name);
+    if (!key) {
+      // key is an expression, can't do anything.
+      return false;
+    }
+    return key == 'templateUrl' || key == 'styleUrls';
+  })
+  // Get the full text of the initializer.
+  .forEach((node: ts.PropertyAssignment) => {
+    const key = _getContentOfKeyLiteral(sourceFile, node.name);
+    // changes.appendChange(new ReplaceChange(fileName, call.arguments[0].getStart(sourceFile),
+    //   entryModule.className, entryModule.className + 'NgFactory'));
+    if (key == 'templateUrl') {
+      changes.appendChange(new ReplaceChange(fileName, node.getFullStart(),
+        node.getFullText(sourceFile),
+        `template: require(${node.initializer.getFullText(sourceFile)})`));
+    } else if (key == 'styleUrls') {
+      const arr: ts.ArrayLiteralExpression[] =
+        <ts.ArrayLiteralExpression[]>_findNodes(sourceFile, node,
+            ts.SyntaxKind.ArrayLiteralExpression, false);
+      if (!arr || arr.length == 0 || arr[0].elements.length == 0) {
+        return;
+      }
+
+      const initializer = arr[0].elements.map((element: ts.Expression) => {
+        return element.getFullText(sourceFile);
+      });
+      changes.appendChange(new ReplaceChange(fileName, node.getFullStart(),
+        node.getFullText(sourceFile),
+        `styles: [require(${initializer.join('), require(')})]`));
+    }
+  });
+
+  return changes.apply({
+    read: (path: string) => Promise.resolve(source),
+    write: (path: string, content: string) => Promise.resolve(source = content)
+  }).then(() => source);
+}
+
 function _transpile(plugin: AotPlugin, fileName: string, sourceText: string) {
   const program = plugin.program;
   if (plugin.typeCheck) {
@@ -151,8 +213,15 @@ export function ngcLoader(source: string) {
     const cb: any = this.async();
 
     Promise.resolve()
-      .then(() => _removeDecorators(this.resource, source))
-      .then(sourceText => _replaceBootstrap(this.resource, sourceText, plugin))
+      .then(() => {
+        if (!plugin.skipCodeGeneration) {
+          return Promise.resolve()
+            .then(() => _removeDecorators(this.resource, source))
+            .then(sourceText => _replaceBootstrap(this.resource, sourceText, plugin));
+        } else {
+          return _replaceResources(this.resource, source);
+        }
+      })
       .then(sourceText => {
         const result = _transpile(plugin, this.resourcePath, sourceText);
         cb(null, result.outputText, result.sourceMap);

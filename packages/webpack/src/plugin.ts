@@ -23,6 +23,8 @@ export interface AotPluginOptions {
   entryModule?: string;
   mainPath?: string;
   typeChecking?: boolean;
+
+  skipCodeGeneration?: boolean;
 }
 
 
@@ -69,6 +71,7 @@ export class AotPlugin {
   private _compilation: any = null;
 
   private _typeCheck: boolean = true;
+  private _skipCodeGeneration: boolean = false;
   private _basePath: string;
   private _genDir: string;
 
@@ -85,6 +88,7 @@ export class AotPlugin {
   get entryModule() { return this._entryModule; }
   get genDir() { return this._genDir; }
   get program() { return this._program; }
+  get skipCodeGeneration() { return this._skipCodeGeneration; }
   get typeCheck() { return this._typeCheck; }
 
   private _setupOptions(options: AotPluginOptions) {
@@ -133,6 +137,9 @@ export class AotPlugin {
 
     if (options.hasOwnProperty('typeChecking')) {
       this._typeCheck = options.typeChecking;
+    }
+    if (options.hasOwnProperty('skipCodeGeneration')) {
+      this._skipCodeGeneration = options.skipCodeGeneration;
     }
 
     this._compilerHost = new WebpackCompilerHost(this._compilerOptions);
@@ -220,16 +227,20 @@ export class AotPlugin {
       this._resourceLoader
     );
 
+    // Create a new Program, based on the old one. This will trigger a resolution of all
+    // transitive modules, which include files that might just have been generated.
+    this._program = ts.createProgram(
+      this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
+
     // We need to temporarily patch the CodeGenerator until either it's patched or allows us
     // to pass in our own ReflectorHost.
     patchReflectorHost(codeGenerator);
-    this._donePromise = codeGenerator.codegen({transitiveModules: true})
+    let promise = Promise.resolve();
+    if (!this._skipCodeGeneration) {
+      promise = codeGenerator.codegen({transitiveModules: true});
+    }
+    this._donePromise = promise
       .then(() => {
-        // Create a new Program, based on the old one. This will trigger a resolution of all
-        // transitive modules, which include files that might just have been generated.
-        this._program = ts.createProgram(
-          this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
-
         const diagnostics = this._program.getGlobalDiagnostics();
         if (diagnostics.length > 0) {
           const message = diagnostics
