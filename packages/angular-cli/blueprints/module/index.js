@@ -58,11 +58,7 @@ module.exports = {
   },
 
   afterInstall: function (options) {
-    // Note that `this.generatePath` already contains `this.dasherizedModuleName`
-    // So, the path will end like `name/name`, 
-    //  which is correct for `name.component.ts` created in module `name`
-    var componentPath = path.join(this.generatePath, this.dasherizedModuleName);
-    options.entity.name = path.relative(this.dynamicPath.appRoot, componentPath);
+    options.entity.name = path.join(this.entityName, options.entity.name);
     options.flat = true;
     options.route = false;
     options.inlineTemplate = false;
