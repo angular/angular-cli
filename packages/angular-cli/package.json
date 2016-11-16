@@ -27,6 +27,8 @@
   "dependencies": {
     "@angular-cli/ast-tools": "^1.0.1",
     "@angular-cli/base-href-webpack": "^1.0.0",
+    "@angular/compiler-cli": "^2.1.0",
+    "@angular/core": "^2.1.0",
     "@ngtools/webpack": "latest",
     "angular2-template-loader": "^0.5.0",
     "awesome-typescript-loader": "^2.2.3",
@@ -82,6 +84,7 @@
     "quick-temp": "0.1.5",
     "raw-loader": "^0.5.1",
     "readline2": "0.1.1",
+    "reflect-metadata": "^0.1.8",
     "remap-istanbul": "^0.6.4",
     "resolve": "^1.1.7",
     "rimraf": "^2.5.3",

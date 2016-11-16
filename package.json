@@ -34,10 +34,6 @@
     "npm": ">= 3.0.0"
   },
   "author": "Angular Authors",
-  "contributors": [
-    "Rody Haddad <npm@rodyhaddad.com> (http://rodyhaddad.com/)",
-    "Igor Minar <igor@angularjs.org>"
-  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
