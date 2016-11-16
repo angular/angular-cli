@@ -16,7 +16,7 @@ This project is very much still a work in progress.
 The CLI is now in beta.
 If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
-Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
+Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).
 
 ## Webpack update
 
@@ -67,7 +67,7 @@ npm install -g angular-cli
 ## Usage
 
 ```bash
-ng --help
+ng help
 ```
 
 ### Generating and serving an Angular2 project via a development server
