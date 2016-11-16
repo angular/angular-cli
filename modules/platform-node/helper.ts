@@ -210,5 +210,5 @@ export function arrayFlattenTree(children: any[], arr: any[]): any[] {
   return arr;
 }
 
-var __empty = null;
+var __empty: {} = null;
 export default __empty;

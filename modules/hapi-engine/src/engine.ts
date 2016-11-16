@@ -1,9 +1,9 @@
-export var HAPI_PLATFORM = null;
+export var HAPI_PLATFORM: any = null;
 
 export var HAPI_ANGULAR_APP = {
-  template: null,
-  directives: null,
-  providers: null
+  template: null as any,
+  directives: null as any,
+  providers: null as any
 };
 
 export function disposeHapiPlatform() {
@@ -31,15 +31,15 @@ export class hapiEngine {
     this.partials = {};
   }
 
-  registerHelper(_name, _helper) {
+  registerHelper(_name: any, _helper: any) {
 
   }
 
-  registerPartial(_name, _partial) {
+  registerPartial(_name: any, _partial: any) {
 
   }
 
-  compile(_template, _options, _next) {
+  compile(_template: any, _options: any, _next: any) {
     
   }
 

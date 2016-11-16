@@ -16,7 +16,7 @@
     "inlineSources": true,
     "rootDir": ".",
   	"outDir": "compiled/ngc",
-    "pretty": true,
+    "pretty": false,
     "stripInternal": false,
     "lib": ["es6", "dom"],
     "types": [

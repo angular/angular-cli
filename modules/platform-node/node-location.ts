@@ -116,7 +116,7 @@ export class NodePlatformLocation extends PlatformLocation {
     // this.pushState(null, null, joinWithSlash(this._baseUrl, requestUrl));
     this.pushState(null, null, requestUrl);
   }
-  updateUrl(originUrl, baseUrl = '/') {
+  updateUrl(originUrl: string, baseUrl = '/') {
     this._originUrl = originUrl;
     this._baseUrl = baseUrl || '/';
   }
@@ -148,8 +148,8 @@ export class NodePlatformLocation extends PlatformLocation {
     this._updateLocation();
   }
 
-  onPopState(fn): void { this._popStateListeners.push(fn); }
-  onHashChange(_fn): void { /*TODO*/}
+  onPopState(fn: Function): void { this._popStateListeners.push(fn); }
+  onHashChange(_fn: any): void { /*TODO*/}
 
   back(): void {
     if (this._stackIndex === 0) {

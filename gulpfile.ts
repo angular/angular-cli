@@ -38,7 +38,7 @@ gulp.task('test:watch', ['test'], () => {
   });
 });
 
-gulp.task('test', ['build'], (done) => {
+gulp.task('test', ['build'], (done: () => void) => {
   runSequence('_test', done);
 });
 
@@ -96,7 +96,7 @@ gulp.task('rewrite_packages', () => {
   const publishedModuleNames = buildUtils.getPublishedModuleNames(allModules);
   const rootDependencies = buildUtils.getRootDependencies(rootPkg, publishedModuleNames);
   gulp.src('modules/**/package.json')
-    .pipe(jsonTransform((data, _file) => {
+    .pipe(jsonTransform((data: any, _file: any) => {
       if (data.main) {
         data.main = data.main.replace('src/', '').replace('.ts', '.js');
       }
@@ -122,7 +122,7 @@ gulp.task('clean', () => {
 gulp.task('pre-publish', ['build', 'rewrite_packages', 'changelog', 'copy_license', 'copy_files']);
 
 gulp.task('copy_license', () => {
-  return buildUtils.getAllModules().reduce((stream, mod: string) => {
+  return buildUtils.getAllModules().reduce((stream: any, mod: string) => {
     return stream.pipe(gulp.dest(`dist/${mod}`));
   }, gulp.src('LICENSE'));
 });

@@ -1,9 +1,9 @@
 
 
 export class Prerender {
-  constructor(_options) {}
+  constructor(_options: any) {}
 
-  render(_file) {
+  render(_file: any) {
       return Promise.resolve('');
   }
 }
@@ -20,7 +20,7 @@ export class Prerender {
 // needs to be written like this otherwise Grunt will fail to load this task
 module.exports = class GruntPrerender {
 
-  constructor(grunt) {
+  constructor(grunt: any) {
 
     // Please see the Grunt documentation for more information regarding task
     // creation: http://gruntjs.com/creating-tasks

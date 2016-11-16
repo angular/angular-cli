@@ -10,7 +10,7 @@ declare module 'parse5' {
   export var serialize : Function;
   export var treeAdapters: any;
 
-  export var ParserStream;
-  export var SerializerStream;
-  export var SAXParser;
+  export var ParserStream: any;
+  export var SerializerStream: any;
+  export var SAXParser: any;
 }

@@ -15,11 +15,11 @@ export function getUrlConfig() {
     { provide: APP_BASE_HREF, useValue: 'baseUrl' },
     { provide: REQUEST_URL, useValue: 'requestUrl' },
     { provide: ORIGIN_URL, useValue: 'originUrl' }
-  ]
+  ];
 }
 
 // @internal
-export function createUrlProviders(config) {
+export function createUrlProviders(config: any) {
   return getUrlConfig()
     .filter((provider) => (provider.useValue in config))
     .map((provider) => {

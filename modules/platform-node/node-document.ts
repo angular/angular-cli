@@ -10,7 +10,7 @@ const parse5: any = require('parse5');
 // const treeAdapter = parser.treeAdapter;
 const treeAdapter = parse5.treeAdapters.htmlparser2;
 
-export function isTag(tagName, node): boolean {
+export function isTag(tagName: string, node: any): boolean {
   return node.type === 'tag' && node.name === tagName;
 }
 
@@ -38,10 +38,10 @@ export function parseDocument (documentHtml: string): any {
   const doc = parser.parseFragment(documentHtml);
   */
 
-  let rootNode = undefined;
-  let bodyNode = undefined;
-  let headNode = undefined;
-  let titleNode = undefined;
+  let rootNode: any = undefined;
+  let bodyNode: any = undefined;
+  let headNode: any = undefined;
+  let titleNode: any = undefined;
 
   for (let i: number = 0; i < doc.childNodes.length; ++i) {
     const child = doc.childNodes[i];

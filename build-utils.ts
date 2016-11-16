@@ -42,7 +42,7 @@ export function getRootDependencies(rootPackage: PackageLike, publishedModuleNam
     }), {}));
 }
 
-export function buildTs(files, compilerOptions: ts.CompilerOptions) {
+export function buildTs(files: string[], compilerOptions: ts.CompilerOptions) {
   let host = ts.createCompilerHost(compilerOptions);
   let program = ts.createProgram(files, compilerOptions, host);
   program.emit();
@@ -77,7 +77,7 @@ export function addMetadataToPackage(pkg: PackageLike, rootPackage: PackageLike)
   return Object.assign({}, pkg, {contributors, version, homepage, license, repository, bugs, config, engines});
 }
 
-export function stripSrcFromPath(path) {
+export function stripSrcFromPath(path: { dirname: string; }) {
   if (/\/src(\/.*|$)/.test(path.dirname)) {
     path.dirname = path.dirname.replace('/src', '');
   }

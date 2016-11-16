@@ -7,7 +7,7 @@ declare var Zone: any;
 export const zoneProps = new WeakMap();
 
 export class ZoneStore {
-  zone;
+  zone: any;
   constructor(props = Object.create(null)) {
     let store = new Map();
     try {
@@ -27,14 +27,14 @@ export class ZoneStore {
     zoneProps.get(this).clear();
   }
 
-  setMap(obj) {
+  setMap(obj: any) {
     const props = zoneProps.get(this);
     for (let prop of obj) {
       props.set(prop, obj);
     }
   }
 
-  get(key) {
+  get(key: any) {
     const props = zoneProps.get(this);
 
     if (this.has(key)) {
@@ -42,7 +42,7 @@ export class ZoneStore {
     }
     return null;
   }
-  set(key, value) {
+  set(key: any, value: any) {
     const props = zoneProps.get(this);
     if (this.has(key)) {
       props.set(key, value);
@@ -50,7 +50,7 @@ export class ZoneStore {
     }
     return null;
   }
-  has(key) {
+  has(key: any) {
     const props = zoneProps.get(this);
     return props.has && props.has(key);
   }

@@ -1,6 +1,7 @@
 const fs = require('graceful-fs');
 
-import { platformUniversalDynamic } from 'angular2-universal/node';
+import { Type, NgModuleRef } from '@angular/core';
+import { platformUniversalDynamic, NodePlatformRef } from 'angular2-universal/node';
 
 import { PrebootOptions } from 'preboot';
 
@@ -38,11 +39,21 @@ export interface ExpressEngineConfig {
   COOKIE?: string;
 }
 
-export function createEngine(options?: any) {
+export interface EngineCreateOptions {
+  precompile?: boolean;
+  time?: boolean;
+  asyncDestroy?: boolean;
+  id?: () => string;
+  platform?: (providers: any) => NodePlatformRef;
+  providers?: any[];
+  ngModule?: Type<any>;
+}
+
+export function createEngine(options?: EngineCreateOptions) {
   options = options || {};
-  var cache = {
+  var cache: { [key: string]: Buffer; } = {
   };
-  var _options = {
+  var _options: EngineCreateOptions = {
     precompile: true,
     time: false,
     asyncDestroy: true,
@@ -61,16 +72,16 @@ export function createEngine(options?: any) {
   delete _options.providers;
   delete _options.platform;
 
-  const platformRef: any = __platform(__providers);
-  var prom;
+  const platformRef: NodePlatformRef = __platform(__providers);
+  var prom: Promise<NgModuleRef<any>>;
   if (_options.ngModule) {
-    prom = platformRef.cacheModuleFactory(_options.ngModule)
+    prom = platformRef.cacheModuleFactory(_options.ngModule);
   }
 
   return function expressEngine(filePath: string, data: ExpressEngineConfig = {ngModule: _options.ngModule}, done?: Function) {
     const ngModule = data.ngModule || _options.ngModule;
     if (!ngModule) {
-      throw new Error('Please provide your main module as ngModule for example res.render("index", {ngModule: MainModule}) or in the engine as createEngine({ ngModule: MainModule })')
+      throw new Error('Please provide your main module as ngModule for example res.render("index", {ngModule: MainModule}) or in the engine as createEngine({ ngModule: MainModule })');
     }
     if (!data.req || !data.res) {
       throw new Error('Please provide the req, res arguments (request and response objects from express) in res.render("index", { req, res })');
@@ -84,20 +95,20 @@ export function createEngine(options?: any) {
       get cancel() { return cancel; },
       set cancel(val) { cancel = val; },
 
-      get requestUrl() { return data.requestUrl || data.req.originalUrl },
+      get requestUrl() { return data.requestUrl || data.req.originalUrl; },
       set requestUrl(_val) {  },
 
-      get originUrl() { return data.originUrl || data.req.hostname },
+      get originUrl() { return data.originUrl || data.req.hostname; },
       set originUrl(_val) {  },
 
-      get baseUrl() { return data.baseUrl || '/' },
+      get baseUrl() { return data.baseUrl || '/'; },
       set baseUrl(_val) {  },
 
-      get cookie() { return data.cookie || data.req.headers.cookie },
+      get cookie() { return data.cookie || data.req.headers.cookie; },
       set cookie(_val) {  },
     }, data);
 
-    function readContent(content) {
+    function readContent(content: Buffer) {
       const DOCUMENT: string = content.toString();
       // TODO(gdi2290): breaking change for context globals
       // _data.document = parseDocument(document);
@@ -116,18 +127,18 @@ export function createEngine(options?: any) {
       return zone.run(() => (_options.precompile ?
         platformRef.serializeModule(ngModule, _data) :
         platformRef.serializeModuleFactory(ngModule, _data)
-      )
-        .then(html => {
+      ))
+        .then((html: any) => {
           if (typeof html !== 'string' || cancel) {
             return done(null, DOCUMENT);
           }
           done(null, html);
         })
-        .catch(e => {
+        .catch((e: Error) => {
           console.log(e.stack);
           // if server fail then return client html
           done(null, DOCUMENT);
-        }));
+        });
     }
 
     // read file on disk
@@ -136,7 +147,7 @@ export function createEngine(options?: any) {
       if (cache[filePath]) {
         return readContent(cache[filePath]);
       }
-      fs.readFile(filePath, (err, content) => {
+      fs.readFile(filePath, (err: any, content: Buffer) => {
         if (err) {
           cancel = true;
           return done(err);

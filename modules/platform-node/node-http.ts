@@ -61,7 +61,7 @@ export class PreloadHttp extends Http {
     // this._activeNode = _rootNode;
 
   }
-  preload(_url, factory) {
+  preload(_url: any, factory: any) {
 
     var obs = new EventEmitter(false);
 
@@ -81,7 +81,7 @@ export class PreloadHttp extends Http {
 
     request
     .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           // if (this.prime) {
           //   let headers = response.headers.toJSON();
           //   // TODO(gdi2290): fix Http to include the url
@@ -93,7 +93,7 @@ export class PreloadHttp extends Http {
           // }
           obs.next(response);
         },
-        error: (e) => {
+        error: (e: any) => {
           obs.error(e);
           this._async -= 1;
         },
@@ -184,8 +184,8 @@ export class NodeConnection implements XHRConnection {
     // needed for node xhrs
     _reqInfo.headers['user-agent'] = _reqInfo.headers['user-agent'] || 'Angular 2 Universal';
 
-    this.response = new Observable(responseObserver => {
-      let nodeReq;
+    this.response = new Observable((responseObserver: any) => {
+      let nodeReq: any;
       // ngZone.run(() => {
         // http or https
         let xhrHttp: any = http;
@@ -221,7 +221,7 @@ export class NodeConnection implements XHRConnection {
         });
       // });
 
-      let onError = (err) => {
+      let onError = (err: any) => {
         let responseOptions = new ResponseOptions({body: err, type: ResponseType.Error});
         if (isPresent(baseResponseOptions)) {
           responseOptions = baseResponseOptions.merge(responseOptions);
@@ -302,11 +302,11 @@ export class NodeJSONPConnection {
     _reqInfo.headers['user-agent'] = _reqInfo.headers['user-agent'] || 'Angular 2 Universal';
 
 
-    this.response = new Observable(responseObserver => {
-      let nodeReq;
+    this.response = new Observable((responseObserver: any) => {
+      let nodeReq: any;
       // http or https
       let xhrHttp: any = http;
-      function DONE(response) {
+      function DONE(response: any) {
         responseObserver.next(response);
         responseObserver.complete();
       }
@@ -325,13 +325,13 @@ export class NodeJSONPConnection {
         let url = res.url;
 
         res.on('end', () => {
-          var responseJson;
+          var responseJson: any;
           try {
             if (body.indexOf('JSONP_CALLBACK') === -1) {
               throw new Error('Http request ' + req.url + ' did not return the response with JSONP_CALLBACK()')
             }
             var responseFactory = new Function('JSONP_CALLBACK', body);
-            responseFactory(json => {
+            responseFactory((json: any) => {
               responseJson = json;
             });
           } catch (e) {
@@ -352,7 +352,7 @@ export class NodeJSONPConnection {
         });
       });
 
-      function onError (err) {
+      function onError (err: any) {
         let responseOptions = new ResponseOptions({body: err, type: ResponseType.Error});
         if (isPresent(baseResponseOptions)) {
           responseOptions = baseResponseOptions.merge(responseOptions);
@@ -422,7 +422,7 @@ export class NodeHttpModule {
     return NodeHttpModule.withConfig(config);
   }
   static withConfig(config: any = {}) {
-    var providers = [];
+    var providers: any[] = [];
     if (config.baseUrl) {
       providers.push({ provide: APP_BASE_HREF, useValue: config.baseUrl });
     }
@@ -448,7 +448,7 @@ export class NodeJsonpModule {
     return NodeJsonpModule.withConfig(config);
   }
   static withConfig(config: any = {}) {
-    var providers = [];
+    var providers: any[] = [];
     if (config.baseUrl) {
       providers.push({ provide: APP_BASE_HREF, useValue: config.baseUrl });
     }

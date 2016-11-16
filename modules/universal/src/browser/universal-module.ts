@@ -16,7 +16,7 @@ import {
   __platform_browser_private__
 } from '@angular/platform-browser';
 
-var prebootClient;
+var prebootClient: any;
 try {
   prebootClient = require('preboot/__build/src/browser/preboot_browser');
   prebootClient = (prebootClient && prebootClient.prebootClient) || prebootClient;
@@ -47,7 +47,7 @@ export function universalCacheFactory() {
 export function appIdFactory() {
   let _win: any = window;
   let CACHE = _win.UNIVERSAL_CACHE || {};
-  let appId = null;
+  let appId: any = null;
   if (CACHE.APP_ID) {
     appId = CACHE.APP_ID;
   } else {
@@ -99,16 +99,16 @@ export class UniversalModule {
   constructor(@Inject(SharedStylesHost) sharedStylesHost: any) {
     const domStyles = document.head.querySelectorAll('style');
     const styles = Array.prototype.slice.call(domStyles)
-      .filter((style) => (style.innerText || style.textContent).indexOf('_ng') !== -1)
-      .map((style) => (style.innerText || style.textContent));
+      .filter((style: any) => (style.innerText || style.textContent).indexOf('_ng') !== -1)
+      .map((style: any) => (style.innerText || style.textContent));
 
-    styles.forEach(style => {
+    styles.forEach((style: any) => {
       sharedStylesHost._stylesSet.add(style);
       sharedStylesHost._styles.push(style);
     });
   }
   static withConfig(_config: any = {}): {ngModule: UniversalModule, providers: any[]} {
-    const providers = [];
+    const providers: any[] = [];
 
     if (typeof _config.autoPreboot === 'boolean') {
       providers.push({

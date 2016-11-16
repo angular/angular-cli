@@ -141,7 +141,7 @@ export function createGlobalProxy() {
 
 
 
-function querySelector(query) {
+function querySelector(query: any) {
   const DOM = getDOM();
   var parentElement = Zone.current.get('parentElement');
   var element = DOM.querySelector(parentElement, query);
@@ -152,7 +152,7 @@ function querySelector(query) {
   return new ProxyElement(zone);
 }
 
-function querySelectorAll(query) {
+function querySelectorAll(query: any) {
   const DOM = getDOM();
   var parentElement = Zone.current.get('parentElement');
   var element = DOM.querySelectorAll(parentElement, query);

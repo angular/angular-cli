@@ -40,6 +40,7 @@ import {
   PlatformRef,
   NgModuleRef,
   NgZone,
+  Compiler,
   CompilerFactory,
   TestabilityRegistry
 } from '@angular/core';
@@ -104,7 +105,7 @@ export function removePlatformRef() {
 export function getPlatformRef(): PlatformRef {
   return __PLATFORM_REF;
 }
-export function setPlatformRef(platformRef) {
+export function setPlatformRef(platformRef: PlatformRef) {
   __PLATFORM_REF = platformRef;
 }
 // End platform Reference
@@ -123,12 +124,12 @@ export class NodePlatform  {
   }
   constructor(private _platformRef: PlatformRef) {
   }
-  cacheModuleFactory<T>(moduleType, compilerOptions?: any): Promise<NgModuleRef<T>> {
+  cacheModuleFactory<T>(moduleType: any, compilerOptions?: any): Promise<NgModuleRef<T>> {
     if (NodePlatform._cache.has(moduleType)) {
       return Promise.resolve(NodePlatform._cache.get(moduleType));
     }
     const compilerFactory: CompilerFactory = this._platformRef.injector.get(CompilerFactory);
-    var compiler;
+    var compiler: Compiler;
     if (compilerOptions) {
       compiler = compilerFactory.createCompiler(
       compilerOptions instanceof Array ? compilerOptions : [compilerOptions]);
@@ -188,10 +189,10 @@ export class NodePlatform  {
     // TODO(gdi2290): refactor to ZoneLocalStore
     var _map = new Map<any, any>();
     var _store = {
-      set(key, value, defaultValue?: any) {
+      set(key: any, value: any, defaultValue?: any) {
         _map.set(key, (value !== undefined) ? value : defaultValue);
       },
-      get(key, defaultValue?: any) {
+      get(key: any, defaultValue?: any) {
         return _map.has(key) ? _map.get(key) : defaultValue;
       },
       clear() {
@@ -201,7 +202,7 @@ export class NodePlatform  {
       }
     };
 
-    function errorHandler(_err, store, modRef, _currentIndex, _currentArray) {
+    function errorHandler(_err: any, store: any, modRef: any, _currentIndex: any, _currentArray: any) {
       var document = '';
       try {
         document = store.get('DOCUMENT');
@@ -258,8 +259,8 @@ export class NodePlatform  {
         universalOnInit();
 
         // lifecycle hooks
-        function outsideNg(compRef, ngZone, http, jsonp) {
-          function checkStable(done, ref) {
+        function outsideNg(compRef: any, ngZone: any, http: any, jsonp: any) {
+          function checkStable(done: any, ref: any) {
             ngZone.runOutsideAngular(() => {
               setTimeout(function stable() {
                 if (cancelHandler()) { return done(ref); }
@@ -325,16 +326,16 @@ export class NodePlatform  {
         let DOM = store.get('DOM');
         let DOCUMENT = store.get('DOCUMENT');
         let appRef: ApplicationRef = store.get('ApplicationRef');
-        let selectorsList = (<any>moduleRef).bootstrapFactories.map((factory) => factory.selector);
-        let bodyList = DOCUMENT.body.children.filter(el => Boolean(el.tagName)).map(el => el.tagName.toLowerCase()).join(',');
+        let selectorsList = (<any>moduleRef).bootstrapFactories.map((factory: any) => factory.selector);
+        let bodyList = DOCUMENT.body.children.filter((el: any) => Boolean(el.tagName)).map((el: any) => el.tagName.toLowerCase()).join(',');
         let components = appRef.components;
-        let prebootCode = null;
+        let prebootCode: any = null;
         // TODO(gdi2290): hide cache in (ngPreboot|UniversalPreboot)
-        let prebootConfig = null;
+        let prebootConfig: any = null;
         let key = (typeof preboot === 'object') && preboot || null;
-        let prebootEl = null;
-        let el = null;
-        let lastRef = null;
+        let prebootEl: any = null;
+        let el: any = null;
+        let lastRef: any = null;
         try {
           if (key && NodePlatform._cache.has(key)) {
             prebootEl = NodePlatform._cache.get(key).prebootEl;
@@ -350,7 +351,7 @@ export class NodePlatform  {
               prebootConfig.appRoot = selectorsList;
             }
             if (!selectorsList) {
-              selectorsList = (<any>moduleRef).bootstrapFactories.map((factory) => factory.selector);
+              selectorsList = (<any>moduleRef).bootstrapFactories.map((factory: any) => factory.selector);
             }
             config.time && console.time('id: ' + config.id + ' preboot insert dom: ');
             prebootCode = parseFragment('' +
@@ -365,7 +366,7 @@ export class NodePlatform  {
           }
 
           lastRef = {cmp: null, strIndex: -1, index: -1};
-          selectorsList.forEach((select, i) => {
+          selectorsList.forEach((select: any, i: number) => {
             let lastValue = bodyList.indexOf(select);
              if (lastValue >= lastRef.strIndex) {
                lastRef.strIndex = lastValue;
@@ -411,8 +412,8 @@ export class NodePlatform  {
         let DOM = store.get('DOM');
         let UNIVERSAL_CACHE = store.get('UNIVERSAL_CACHE');
         let document = store.get('DOCUMENT');
-        let script = null;
-        let el = null;
+        let script: any = null;
+        let el: any = null;
 
         // TODO(gdi2290): move and find a better way to inject script
         try {
@@ -450,9 +451,9 @@ export class NodePlatform  {
         let document = store.get('DOCUMENT');
         let appId = store.get('NODE_APP_ID');
         let appRef = store.get('ApplicationRef');
-        let html = null;
-        let destroyApp = null;
-        let destroyModule = null;
+        let html: any = null;
+        let destroyApp: any = null;
+        let destroyModule: any = null;
 
         html = serializeDocument(document).replace(/%cmp%/g, appId);
         universalOnRendered(html);
@@ -492,12 +493,12 @@ export class NodePlatform  {
   get injector(): Injector {
     return this.platformRef.injector;
   }
-  bootstrapModule<T>(moduleType, compilerOptions?: any): Promise<NgModuleRef<T>> {
+  bootstrapModule<T>(moduleType: any, compilerOptions?: any): Promise<NgModuleRef<T>> {
     if (NodePlatform._cache.has(moduleType)) {
       return this.platformRef.bootstrapModuleFactory(NodePlatform._cache.get(moduleType));
     }
     const compilerFactory: CompilerFactory = this._platformRef.injector.get(CompilerFactory);
-    var compiler;
+    var compiler: Compiler;
     if (compilerOptions) {
       compiler = compilerFactory.createCompiler(
       compilerOptions instanceof Array ? compilerOptions : [compilerOptions]);
@@ -510,7 +511,7 @@ export class NodePlatform  {
           return this.platformRef.bootstrapModuleFactory(moduleFactory);
         });
   }
-  bootstrapModuleFactory<T>(moduleFactory): Promise<NgModuleRef<T>> {
+  bootstrapModuleFactory<T>(moduleFactory: any): Promise<NgModuleRef<T>> {
     return this.platformRef.bootstrapModuleFactory(moduleFactory);
   }
 
@@ -545,13 +546,13 @@ export class NodePlatform  {
  * the event loop and better management of refernces in task. This also allows for ZoneLocalStore.
  * We can also introduce sagas or serverless
  */
-function asyncPromiseSeries(store, modRef, errorHandler, cancelHandler, config, middleware, _timer = 1) {
+function asyncPromiseSeries(store: any, modRef: any, errorHandler: any, cancelHandler: any, config: any, middleware: any, _timer = 1) {
   let errorCalled = false;
   config.time && console.time('id: ' + config.id + ' asyncPromiseSeries: ');
-  return middleware.reduce(function reduceAsyncPromiseSeries (promise, cb, currentIndex, currentArray) {
+  return middleware.reduce(function reduceAsyncPromiseSeries (promise: any, cb: any, currentIndex: any, currentArray: any) {
     // skip the rest of the promise middleware
     if (errorCalled || cancelHandler()) { return promise; }
-    return promise.then(function reduceAsyncPromiseSeriesChain (ref) {
+    return promise.then(function reduceAsyncPromiseSeriesChain (ref: any) {
       // skip the rest of the promise middleware
       if (errorCalled || cancelHandler()) { return ref; }
       return new Promise(function reduceAsyncPromiseSeriesPromiseChain(resolve, reject) {
@@ -564,11 +565,11 @@ function asyncPromiseSeries(store, modRef, errorHandler, cancelHandler, config, 
           }
         }, 0);
       });
-    }).catch(err => {
+    }).catch((err: any) => {
       errorCalled = true;
       return errorHandler(err, store, modRef, currentIndex, currentArray);
     });
-  }, Promise.resolve(modRef)).then((val) => {
+  }, Promise.resolve(modRef)).then((val: any) => {
     config.time && console.timeEnd('id: ' + config.id + ' asyncPromiseSeries: ');
     if (cancelHandler()) {
       return errorHandler(null, store, modRef, null, null);
@@ -644,7 +645,7 @@ export class NodeDomEventsPlugin {
     // we need to ensure that events are created in the fake document created for the current app
     var document = this.manager.getDocument();
     var zone = this.manager.getZone();
-    var element; // = getDOM().getGlobalEventTargetWithDocument(target, window, document, document.body);
+    var element: any; // = getDOM().getGlobalEventTargetWithDocument(target, window, document, document.body);
     switch (target) {
       case 'window':
         element = document._window;
@@ -664,20 +665,20 @@ export class NodeDomEventsPlugin {
 }
 
 
-export function _APP_BASE_HREF(_zone) {
+export function _APP_BASE_HREF(_zone: any) {
   return Zone.current.get('baseUrl');
 }
 
-export function _REQUEST_URL(_zone) {
+export function _REQUEST_URL(_zone: any) {
   return Zone.current.get('requestUrl');
 }
 
-export function _ORIGIN_URL(_zone) {
+export function _ORIGIN_URL(_zone: any) {
   return Zone.current.get('originUrl');
 }
 
 export class MockTestabilityRegistry extends TestabilityRegistry {
-  registerApplication() {
+  registerApplication(): any {
     return null;
   }
 }

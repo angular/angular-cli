@@ -57,6 +57,6 @@ export {
 
 }
 
-var __empty = null;
+var __empty: {} = null;
 
 export default __empty;
