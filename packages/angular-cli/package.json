@@ -27,6 +27,7 @@
   "dependencies": {
     "@angular-cli/ast-tools": "^1.0.1",
     "@angular-cli/base-href-webpack": "^1.0.0",
+    "@angular/compiler": "^2.1.0",
     "@angular/compiler-cli": "^2.1.0",
     "@angular/core": "^2.1.0",
     "@ngtools/webpack": "latest",
