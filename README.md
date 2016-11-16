@@ -18,9 +18,9 @@
 * [Getting Started with Universal](#getting-started)
     * w/ NodeJS Server
     * w/ ASP.NET Core Server
+* [Universal "Gotchas"](#universal-gotchas)
 * [Modules](#modules)
     * [Universal](#universal)
-* [Best Practices](#best-practices)
 * [What's in a name?](#whats-in-a-name)
 * [License](#license)
 
@@ -50,11 +50,13 @@
 
 > When building Universal components in Angular 2 there are a few things to keep in mind.
 
- - To use `templateUrl` or `stylesUrl` you must use **`angular2-template-loader`** in your TS loaders.
+ - To use `templateUrl` or `styleUrls` you must use **`angular2-template-loader`** in your TS loaders.
     - This is already setup within this starter repo. Look at the webpack.config file [here](https://github.com/angular/universal-starter/blob/master/webpack.config.ts) for details & implementation.
  - **`window`**, **`document`**, **`navigator`**, and other browser types - _do not exist on the server_ - so using them, or any library that uses them (jQuery for example) will not work. You do have some options, if you truly need some of this functionality:
     - If you need to use them, consider limiting them to only your main.client and wrapping them situationally with the imported *isBrowser / isNode* features from Universal.  `import { isBrowser, isNode } from 'angular2-universal'`;
     - Another option is using `DOM` from ["@angular/platform-browser"](https://github.com/angular/angular/blob/e3687706c71beb7c9dbdae1bbb5fbbcea588c476/modules/%40angular/platform-browser/src/dom/dom_adapter.ts#L34)
+ - Try to *limit or* **avoid** using **`setTimeout`**. It will slow down the server-side rendering process. Make sure to remove them [`ondestroy`](https://angular.io/docs/ts/latest/api/core/index/OnDestroy-class.html) in Components.
+   - Also for RxJs timeouts, make sure to _cancel_ their stream on success, for they can slow down rendering as well.
  - **Don't manipulate the nativeElement directly**. Use the _Renderer_. We do this to ensure that in any environment we're able to change our view.
 ```
 constructor(element: ElementRef, renderer: Renderer) {
