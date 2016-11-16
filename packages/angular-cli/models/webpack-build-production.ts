@@ -71,8 +71,10 @@ export const getWebpackProdConfigPartial = function(projectRoot: string,
           threshold: 10240
       }),
       new webpack.LoaderOptionsPlugin({
+        test: /\.(css|scss|sass|less|styl)$/,
         options: {
           postcss: [
+            require('autoprefixer'),
             require('postcss-discard-comments')
           ]
         }
