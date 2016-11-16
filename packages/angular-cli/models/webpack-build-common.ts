@@ -4,8 +4,6 @@ import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const autoprefixer = require('autoprefixer');
-
 
 export function getWebpackCommonConfig(
   projectRoot: string,
@@ -116,7 +114,9 @@ export function getWebpackCommonConfig(
       new webpack.LoaderOptionsPlugin({
         test: /\.(css|scss|sass|less|styl)$/,
         options: {
-          postcss: [ autoprefixer() ]
+          postcss: [
+            require('autoprefixer')
+          ]
         },
       }),
     ],
