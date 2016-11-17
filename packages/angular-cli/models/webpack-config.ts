@@ -23,7 +23,8 @@ export class NgCliWebpackConfig {
     public environment: string,
     outputDir?: string,
     baseHref?: string,
-    isAoT = false
+    isAoT = false,
+    sourcemap = true,
   ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
@@ -34,7 +35,8 @@ export class NgCliWebpackConfig {
       this.ngCliProject.root,
       environment,
       appConfig,
-      baseHref
+      baseHref,
+      sourcemap
     );
     let targetConfigPartial = this.getTargetConfig(this.ngCliProject.root, appConfig);
     const typescriptConfigPartial = isAoT
