@@ -13,7 +13,8 @@ const NgCliTestCommand = TestCommand.extend({
     { name: 'log-level', type: String },
     { name: 'port', type: Number },
     { name: 'reporters', type: String },
-    { name: 'build', type: Boolean, default: true }
+    { name: 'build', type: Boolean, default: true },
+    { name: 'config', type: String, default: 'config'}
   ],
 
   run: function(commandOptions: any) {
