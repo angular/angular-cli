@@ -3,7 +3,7 @@
 import { TestBed, async, inject } from '@angular/core/testing';
 import { <%= classifiedModuleName %>Service } from './<%= dasherizedModuleName %>.service';
 
-describe('Service: <%= classifiedModuleName %>', () => {
+describe('<%= classifiedModuleName %>Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [<%= classifiedModuleName %>Service]

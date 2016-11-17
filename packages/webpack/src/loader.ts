@@ -107,10 +107,10 @@ function _replaceBootstrap(fileName: string,
   }).then(() => sourceText);
 }
 
-function _transpile(plugin: AotPlugin, filePath: string, sourceText: string) {
+function _transpile(plugin: AotPlugin, fileName: string, sourceText: string) {
   const program = plugin.program;
   if (plugin.typeCheck) {
-    const sourceFile = program.getSourceFile(filePath);
+    const sourceFile = program.getSourceFile(fileName);
     const diagnostics = program.getSyntacticDiagnostics(sourceFile)
                 .concat(program.getSemanticDiagnostics(sourceFile))
                 .concat(program.getDeclarationDiagnostics(sourceFile));
@@ -127,11 +127,14 @@ function _transpile(plugin: AotPlugin, filePath: string, sourceText: string) {
     }
   }
 
-  const result = ts.transpileModule(sourceText, {
-    compilerOptions: plugin.compilerOptions,
-    fileName: filePath
+  // Force a few compiler options to make sure we get the result we want.
+  const compilerOptions: ts.CompilerOptions = Object.assign({}, plugin.compilerOptions, {
+    inlineSources: true,
+    inlineSourceMap: false,
+    sourceRoot: plugin.basePath
   });
 
+  const result = ts.transpileModule(sourceText, { compilerOptions, fileName });
   return {
     outputText: result.outputText,
     sourceMap: JSON.parse(result.sourceMapText)
@@ -151,7 +154,7 @@ export function ngcLoader(source: string) {
       .then(() => _removeDecorators(this.resource, source))
       .then(sourceText => _replaceBootstrap(this.resource, sourceText, plugin))
       .then(sourceText => {
-        const result = _transpile(plugin, this.resource, sourceText);
+        const result = _transpile(plugin, this.resourcePath, sourceText);
         cb(null, result.outputText, result.sourceMap);
       })
       .catch(err => cb(err));
