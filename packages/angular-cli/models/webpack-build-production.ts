@@ -21,7 +21,6 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
                : [];
   const cssLoaders = ['css-loader?sourcemap&minimize', 'postcss-loader'];
   return {
-    devtool: 'source-map',
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].[chunkhash].bundle.js',
