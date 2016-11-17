@@ -3,6 +3,7 @@ import * as denodeify from 'denodeify';
 const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
+const chalk = require('chalk');
 import ServeWebpackTask from '../tasks/serve-webpack';
 
 PortFinder.basePort = 49152;
@@ -125,11 +126,20 @@ const ServeCommand = Command.extend({
     return getPort({ port: commandOptions.port, host: commandOptions.host })
       .then((foundPort: number) => {
 
-        if (commandOptions.port !== foundPort && commandOptions.port !== 0) {
-          throw new SilentError(`Port ${commandOptions.port} is already in use.`);
+        let chosenPort = commandOptions.port;
+
+        // user specified the port
+        if (chosenPort !== defaultPort && chosenPort !== foundPort && chosenPort !== 0) {
+          throw new SilentError(`Port ${chosenPort} is already in use.`);
         }
 
-        // otherwise, our found port is good
+        // default port was already in use
+        if (chosenPort !== foundPort ) {
+          let line = `Port ${chosenPort} is already in use. Using port ${foundPort} instead.`;
+          this.ui.writeLine(chalk.yellow(line));
+        }
+
+        // use found port
         commandOptions.port = foundPort;
         return commandOptions;
 
