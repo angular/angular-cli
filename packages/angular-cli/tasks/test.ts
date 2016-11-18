@@ -1,4 +1,5 @@
 const Task = require('../ember-cli/lib/models/task');
+import { TestOptions } from '../commands/test';
 import * as path from 'path';
 
 // require dependencies within the target project
@@ -9,27 +10,30 @@ function requireDependency(root: string, moduleName: string) {
 }
 
 export default Task.extend({
-  run: function (options: any) {
+  run: function (options: TestOptions) {
     const projectRoot = this.project.root;
     return new Promise((resolve) => {
       const karma = requireDependency(projectRoot, 'karma');
       const karmaConfig = path.join(projectRoot, this.project.ngConfig.config.test.karma.config);
 
+      let karmaOptions: any = Object.assign({}, options);
+
       // Convert browsers from a string to an array
       if (options.browsers) {
-        options.browsers = options.browsers.split(',');
+        karmaOptions.browsers = options.browsers.split(',');
       }
 
-      options.angularCli = {
+      karmaOptions.angularCli = {
         codeCoverage: options.codeCoverage,
         lint: options.lint,
+        sourcemap: options.sourcemap
       };
 
       // Assign additional karmaConfig options to the local ngapp config
-      options.configFile = karmaConfig;
+      karmaOptions.configFile = karmaConfig;
 
       // :shipit:
-      const karmaServer = new karma.Server(options, resolve);
+      const karmaServer = new karma.Server(karmaOptions, resolve);
       karmaServer.start();
     });
   }
