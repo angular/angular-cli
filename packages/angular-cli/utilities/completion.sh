@@ -8,7 +8,7 @@
 
 ng_opts='b build completion doc e2e g generate get github-pages:deploy gh-pages:deploy h help i init install lint make-this-awesome new s serve server set t test v version -h --help'
 
-build_opts='--aot --base-href --environment --output-path --suppress-sizes --target --watch --watcher -bh -dev -e -o -prod -t -w'
+build_opts='--aot --base-href --environment --output-path --sourcemap --suppress-sizes --target --watch --watcher -bh -dev -e -o -prod -sm -t -w'
 generate_opts='class component directive enum module pipe route service c cl d e m p r s --help'
 github_pages_deploy_opts='--base-href --environment --gh-token --gh-username --message --skip-build --target --user-page -bh -e -t'
 help_opts='--json --verbose -v'
