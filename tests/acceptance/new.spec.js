@@ -6,20 +6,15 @@ var existsSync = require('exists-sync');
 var expect = require('chai').expect;
 var forEach = require('lodash/forEach');
 var walkSync = require('walk-sync');
-var Blueprint = require('ember-cli/lib/models/blueprint');
+var Blueprint = require('angular-cli/ember-cli/lib/models/blueprint');
 var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = process.cwd();
 var util = require('util');
-var conf = require('ember-cli/tests/helpers/conf');
 var EOL = require('os').EOL;
 var SilentError = require('silent-error');
 
 describe('Acceptance: ng new', function () {
-  before(conf.setup);
-
-  after(conf.restore);
-
   beforeEach(function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
@@ -91,7 +86,7 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('Cannot run ng new, inside of ember-cli project', function () {
+  it('Cannot run ng new, inside of angular-cli project', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git'])
       .then(function () {
         return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git']).then(() => {

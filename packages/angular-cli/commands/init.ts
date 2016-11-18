@@ -1,11 +1,11 @@
 import LinkCli from '../tasks/link-cli';
 import NpmInstall from '../tasks/npm-install';
 
-const Command = require('ember-cli/lib/models/command');
-const Promise = require('ember-cli/lib/ext/promise');
+const Command = require('../ember-cli/lib/models/command');
+const Promise = require('../ember-cli/lib/ext/promise');
 const SilentError = require('silent-error');
-const validProjectName = require('ember-cli/lib/utilities/valid-project-name');
-const normalizeBlueprint = require('ember-cli/lib/utilities/normalize-blueprint-option');
+const validProjectName = require('../ember-cli/lib/utilities/valid-project-name');
+const normalizeBlueprint = require('../ember-cli/lib/utilities/normalize-blueprint-option');
 const GitInit = require('../tasks/git-init');
 
 

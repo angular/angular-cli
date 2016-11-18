@@ -1,4 +1,4 @@
-const Command = require('ember-cli/lib/models/command');
+const Command = require('../ember-cli/lib/models/command');
 import {E2eTask} from '../tasks/e2e';
 import {CliConfig} from '../models/config';
 

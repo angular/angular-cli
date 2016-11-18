@@ -1,6 +1,6 @@
 const stringUtils = require('ember-cli-string-utils');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
-const Blueprint = require('ember-cli/lib/models/blueprint');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const getFiles = Blueprint.prototype.files;
 
 module.exports = {

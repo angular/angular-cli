@@ -1,4 +1,4 @@
-const Command = require('ember-cli/lib/models/command');
+const Command = require('../ember-cli/lib/models/command');
 const stringUtils = require('ember-cli-string-utils');
 import * as chalk from 'chalk';
 

@@ -79,6 +79,7 @@ export class AotPlugin {
 
   get basePath() { return this._basePath; }
   get compilation() { return this._compilation; }
+  get compilerHost() { return this._compilerHost; }
   get compilerOptions() { return this._compilerOptions; }
   get done() { return this._donePromise; }
   get entryModule() { return this._entryModule; }
@@ -102,7 +103,8 @@ export class AotPlugin {
     }
 
     const tsConfig = tsc.readConfiguration(options.tsConfigPath, basePath);
-    this._rootFilePath = tsConfig.parsed.fileNames;
+    this._rootFilePath = tsConfig.parsed.fileNames
+      .filter(fileName => !/\.spec\.ts$/.test(fileName));
 
     // Check the genDir.
     let genDir = basePath;
@@ -280,7 +282,7 @@ export class AotPlugin {
       .map(route => {
         const mr = ModuleRoute.fromString(route);
         const relativePath = this._resolveModulePath(mr, relativeModulePath);
-        const absolutePath = path.join(this.genDir, relativePath);
+        const absolutePath = path.resolve(this.genDir, relativePath);
         return {
           moduleRoute: mr,
           moduleRelativePath: relativePath,

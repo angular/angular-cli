@@ -1,6 +1,6 @@
 import * as assign from 'lodash/assign';
 import * as denodeify from 'denodeify';
-const Command = require('ember-cli/lib/models/command');
+const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
 import ServeWebpackTask from '../tasks/serve-webpack';
@@ -26,6 +26,7 @@ export interface ServeTaskOptions {
   sslKey?: string;
   sslCert?: string;
   aot?: boolean;
+  sourcemap?: boolean;
   open?: boolean;
 }
 
@@ -81,6 +82,7 @@ const ServeCommand = Command.extend({
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
     { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' },
     { name: 'aot',                  type: Boolean, default: false },
+    { name: 'sourcemap',            type: Boolean, default: true, aliases: ['sm'] },
     {
       name: 'open',
       type: Boolean,
@@ -157,5 +159,4 @@ const ServeCommand = Command.extend({
   }
 });
 
-ServeCommand.overrideCore = true;
 export default ServeCommand;

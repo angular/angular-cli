@@ -1,7 +1,7 @@
 const path = require('path');
 const chalk = require('chalk');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
-const Blueprint = require('ember-cli/lib/models/blueprint');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const getFiles = Blueprint.prototype.files;
 
 module.exports = {

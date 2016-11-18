@@ -1,4 +1,4 @@
-const Task = require('ember-cli/lib/models/task');
+const Task = require('../ember-cli/lib/models/task');
 const opn = require('opn');
 
 export const DocTask: any = Task.extend({

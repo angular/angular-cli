@@ -1,7 +1,7 @@
 import * as chalk from 'chalk';
 import {CliConfig} from '../models/config';
 
-const Command = require('ember-cli/lib/models/command');
+const Command = require('../ember-cli/lib/models/command');
 
 const GetCommand = Command.extend({
   name: 'get',

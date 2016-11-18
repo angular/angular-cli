@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const Command = require('ember-cli/lib/models/command');
+const Command = require('../ember-cli/lib/models/command');
 const stringUtils = require('ember-cli-string-utils');
-const lookupCommand = require('ember-cli/lib/cli/lookup-command');
+const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
 
 const commandsToIgnore = [
   'easter-egg',

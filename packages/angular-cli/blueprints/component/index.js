@@ -1,6 +1,6 @@
 const path = require('path');
 const chalk = require('chalk');
-const Blueprint = require('ember-cli/lib/models/blueprint');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const findParentModule = require('../../utilities/find-parent-module').default;
 const getFiles = Blueprint.prototype.files;
@@ -18,14 +18,17 @@ module.exports = {
     { name: 'prefix', type: Boolean, default: true },
     { name: 'spec', type: Boolean },
     { name: 'view-encapsulation', type: String, aliases: ['ve'] },
-    { name: 'change-detection', type: String, aliases: ['cd'] }
+    { name: 'change-detection', type: String, aliases: ['cd'] },
+    { name: 'skip-import', type: Boolean, default: false }
   ],
 
-  beforeInstall: function() {
+  beforeInstall: function(options) {
     try {
       this.pathToModule = findParentModule(this.project, this.dynamicPath.dir);
     } catch(e) {
-      throw `Error locating module for declaration\n\t${e}`;
+      if (!options.skipImport) {
+        throw `Error locating module for declaration\n\t${e}`;
+      }
     }
   },
 
@@ -139,7 +142,7 @@ module.exports = {
     const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
-    if (!options['skip-import']) {
+    if (!options.skipImport) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply(NodeHost)));
