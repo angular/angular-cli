@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
 const SilentError = require('silent-error');
-const Task = require('ember-cli/lib/models/task');
+const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 const WebpackDevServer = require('webpack-dev-server');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -26,7 +26,8 @@ export default Task.extend({
       commandOptions.environment,
       undefined,
       commandOptions.baseHref,
-      commandOptions.aot
+      commandOptions.aot,
+      commandOptions.sourcemap
     ).config;
 
     // This allows for live reload of page when changes are made to repo.
@@ -70,9 +71,11 @@ export default Task.extend({
         this.project.root,
         `./${CliConfig.fromProject().config.apps[0].root}`
       ),
+      headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
         index: commandOptions.baseHref,
-        disableDotRule: true
+        disableDotRule: true,
+        htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
       },
       stats: webpackDevServerOutputOptions,
       inline: true,

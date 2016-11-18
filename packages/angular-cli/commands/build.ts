@@ -1,4 +1,4 @@
-const Command = require('ember-cli/lib/models/command');
+const Command = require('../ember-cli/lib/models/command');
 import WebpackBuild from '../tasks/build-webpack';
 import WebpackBuildWatch from '../tasks/build-webpack-watch';
 
@@ -11,6 +11,7 @@ export interface BuildOptions {
   supressSizes: boolean;
   baseHref?: string;
   aot?: boolean;
+  sourcemap?: boolean;
 }
 
 const BuildCommand = Command.extend({
@@ -31,7 +32,8 @@ const BuildCommand = Command.extend({
     { name: 'watcher',        type: String },
     { name: 'suppress-sizes', type: Boolean, default: false },
     { name: 'base-href',      type: String,  default: null, aliases: ['bh'] },
-    { name: 'aot',            type: Boolean, default: false }
+    { name: 'aot',            type: Boolean, default: false },
+    { name: 'sourcemap',      type: Boolean, default: true, aliases: ['sm'] }
   ],
 
   run: function (commandOptions: BuildOptions) {

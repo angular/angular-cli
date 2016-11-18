@@ -5,7 +5,6 @@
 process.title = 'angular-cli';
 
 const resolve = require('resolve');
-const exit = require('exit');
 const packageJson = require('../package.json');
 const Leek = require('leek');
 const Version = require('../upgrade/version').Version;
@@ -40,7 +39,7 @@ resolve('angular-cli', { basedir: process.cwd() },
       Leek: CustomLeek
     }).then(function (result) {
       var exitCode = typeof result === 'object' ? result.exitCode : result;
-      exit(exitCode);
+      process.exit(exitCode);
     });
 
     function CustomLeek(options) {

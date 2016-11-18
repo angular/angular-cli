@@ -1,10 +1,10 @@
 import * as chalk from 'chalk';
 import InitCommand from './init';
 
-const Command = require('ember-cli/lib/models/command');
-const Project = require('ember-cli/lib/models/project');
+const Command = require('../ember-cli/lib/models/command');
+const Project = require('../ember-cli/lib/models/project');
 const SilentError = require('silent-error');
-const validProjectName = require('ember-cli/lib/utilities/valid-project-name');
+const validProjectName = require('../ember-cli/lib/utilities/valid-project-name');
 
 
 const NewCommand = Command.extend({

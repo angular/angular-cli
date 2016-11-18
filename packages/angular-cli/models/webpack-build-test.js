@@ -43,7 +43,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
   }
 
   return {
-    devtool: 'inline-source-map',
+    devtool: testConfig.sourcemap ? 'inline-source-map' : 'eval',
     context: path.resolve(__dirname, './'),
     resolve: {
       extensions: ['.ts', '.js'],
@@ -79,7 +79,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
                 tsconfig: path.resolve(appRoot, appConfig.tsconfig),
                 module: 'commonjs',
                 target: 'es5',
-                useForkChecker: true
+                forkChecker: true
               }
             },
             {

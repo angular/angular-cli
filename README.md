@@ -185,7 +185,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 ng test
 ```
 
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false`.
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false` or `--single-run`.
 
 ### Running end-to-end tests
 
@@ -294,7 +294,13 @@ source ~/.bash_profile
 
 ### Project assets
 
-You can add any files you want copied as-is to `src/assets/`.
+You use the `assets` array in `angular-cli.json` to list files or folders you want to copy as-is when building your project:
+```json
+"assets": [
+  "assets",
+  "favicon.ico"
+]
+```
 
 ### Global styles
 

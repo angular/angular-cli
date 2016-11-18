@@ -1,6 +1,6 @@
 const path = require('path');
 const chalk = require('chalk');
-const Blueprint = require('ember-cli/lib/models/blueprint');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const findParentModule = require('../../utilities/find-parent-module').default;
 const getFiles = Blueprint.prototype.files;
@@ -16,14 +16,19 @@ module.exports = {
     { name: 'inline-template', type: Boolean, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, aliases: ['is'] },
     { name: 'prefix', type: Boolean, default: true },
-    { name: 'spec', type: Boolean }
+    { name: 'spec', type: Boolean },
+    { name: 'view-encapsulation', type: String, aliases: ['ve'] },
+    { name: 'change-detection', type: String, aliases: ['cd'] },
+    { name: 'skip-import', type: Boolean, default: false }
   ],
 
-  beforeInstall: function() {
+  beforeInstall: function(options) {
     try {
       this.pathToModule = findParentModule(this.project, this.dynamicPath.dir);
     } catch(e) {
-      throw `Error locating module for declaration\n\t${e}`;
+      if (!options.skipImport) {
+        throw `Error locating module for declaration\n\t${e}`;
+      }
     }
   },
 
@@ -68,6 +73,14 @@ module.exports = {
       options.spec :
       this.project.ngConfigObj.get('defaults.spec.component');
 
+    options.viewEncapsulation = options.viewEncapsulation !== undefined ?
+      options.viewEncapsulation :
+      this.project.ngConfigObj.get('defaults.viewEncapsulation');
+
+    options.changeDetection = options.changeDetection !== undefined ?
+      options.changeDetection :
+      this.project.ngConfigObj.get('defaults.changeDetection');
+
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
       flat: options.flat,
@@ -77,7 +90,9 @@ module.exports = {
       route: options.route,
       isAppComponent: !!options.isAppComponent,
       selector: this.selector,
-      styleExt: this.styleExt
+      styleExt: this.styleExt,
+      viewEncapsulation: options.viewEncapsulation,
+      changeDetection: options.changeDetection
     };
   },
 
@@ -124,10 +139,10 @@ module.exports = {
     const returns = [];
     const className = stringUtils.classify(`${options.entity.name}Component`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.component`);
-    const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath).toLowerCase();
+    const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
-    if (!options['skip-import']) {
+    if (!options.skipImport) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply(NodeHost)));

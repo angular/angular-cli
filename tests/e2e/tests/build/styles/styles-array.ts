@@ -47,11 +47,10 @@ export default function() {
     .then(() => expectFileToMatch('dist/styles.bundle.js', /.upper.*.lower.*background.*#def/))
 
     .then(() => ng('build', '--prod'))
-    .then(() => new Promise<string>(() =>
-      glob.sync('dist/styles.*.bundle.css').find(file => !!file)))
+    .then(() => glob.sync('dist/styles.*.bundle.css').find(file => !!file))
     .then((styles) =>
-      expectFileToMatch(styles, 'body { background-color: blue; }')
-        .then(() => expectFileToMatch(styles, 'p { background-color: red; }')
+      expectFileToMatch(styles, /body\s*\{\s*background-color:\s*blue\s*\}/)
+        .then(() => expectFileToMatch(styles, /p\s*\{\s*background-color:\s*red\s*\}/)
         .then(() => expectFileToMatch(styles, /.outer.*.inner.*background:\s*#[fF]+/))
         .then(() => expectFileToMatch(styles, /.upper.*.lower.*background.*#def/)))
     );

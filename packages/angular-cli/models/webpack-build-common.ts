@@ -11,7 +11,8 @@ export function getWebpackCommonConfig(
   projectRoot: string,
   environment: string,
   appConfig: any,
-  baseHref: string
+  baseHref: string,
+  sourcemap: boolean
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -32,7 +33,7 @@ export function getWebpackCommonConfig(
   if (appConfig.scripts.length > 0) { entry['scripts'] = scripts; }
 
   return {
-    devtool: 'source-map',
+    devtool: sourcemap ? 'source-map' : 'eval',
     resolve: {
       extensions: ['.ts', '.js'],
       modules: [path.resolve(projectRoot, 'node_modules')]
@@ -41,7 +42,9 @@ export function getWebpackCommonConfig(
     entry: entry,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
-      filename: '[name].bundle.js'
+      filename: '[name].bundle.js',
+      sourceMapFilename: '[name].bundle.map',
+      chunkFilename: '[id].chunk.js'
     },
     module: {
       rules: [
@@ -81,7 +84,7 @@ export function getWebpackCommonConfig(
         { test: /\.html$/, loader: 'raw-loader' },
 
         { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url?limit=10000' },
-        { test: /\.(eot|svg)$/, loader: 'file' }
+        { test: /\.(eot|svg)$/, loader: 'file-loader' }
       ]
     },
     plugins: [

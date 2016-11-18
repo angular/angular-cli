@@ -4,12 +4,11 @@ var ng = require('../helpers/ng');
 var expect = require('chai').expect;
 var walkSync = require('walk-sync');
 var glob = require('glob');
-var Blueprint = require('ember-cli/lib/models/blueprint');
+var Blueprint = require('angular-cli/ember-cli/lib/models/blueprint');
 var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = path.join(__dirname, '../../packages/angular-cli');
 var util = require('util');
-var conf = require('ember-cli/tests/helpers/conf');
 var minimatch = require('minimatch');
 var intersect = require('lodash/intersection');
 var remove = require('lodash/remove');
@@ -23,14 +22,6 @@ var defaultIgnoredFiles = Blueprint.ignoredFiles;
 
 describe('Acceptance: ng init', function () {
   this.timeout(20000);
-
-  before(function () {
-    conf.setup();
-  });
-
-  after(function () {
-    conf.restore();
-  });
 
   beforeEach(function () {
     // Make a copy of defaultIgnoredFiles.

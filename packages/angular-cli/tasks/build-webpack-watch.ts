@@ -1,6 +1,6 @@
 import * as rimraf from 'rimraf';
 import * as path from 'path';
-const Task = require('ember-cli/lib/models/task');
+const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 import { NgCliWebpackConfig } from '../models/webpack-config';
@@ -24,7 +24,8 @@ export default Task.extend({
       runTaskOptions.environment,
       outputDir,
       runTaskOptions.baseHref,
-      runTaskOptions.aot
+      runTaskOptions.aot,
+      runTaskOptions.sourcemap
     ).config;
     const webpackCompiler: any = webpack(config);
 

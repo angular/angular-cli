@@ -3,7 +3,6 @@
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
 
-const conf = require('ember-cli/tests/helpers/conf');
 const existsSync = require('exists-sync');
 const expect = require('chai').expect;
 const path = require('path');
@@ -12,10 +11,6 @@ const root = process.cwd();
 const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
 describe('Acceptance: ng generate class', function () {
-  before(conf.setup);
-
-  after(conf.restore);
-
   beforeEach(function () {
     this.timeout(10000);
     return tmp.setup('./tmp').then(function () {

@@ -1,12 +1,12 @@
 'use strict';
 
-var Promise = require('ember-cli/lib/ext/promise');
+var Promise = require('../ember-cli/lib/ext/promise');
 var exec = Promise.denodeify(require('child_process').exec);
 var path = require('path');
 var pkg = require('../package.json');
 var fs = require('fs');
 var template = require('lodash/template');
-var Task = require('ember-cli/lib/models/task');
+var Task = require('../ember-cli/lib/models/task');
 
 var gitEnvironmentVariables = {
   GIT_AUTHOR_NAME: 'angular-cli',
