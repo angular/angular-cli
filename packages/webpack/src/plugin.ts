@@ -266,7 +266,11 @@ export class AotPlugin {
         Object.keys(allLazyRoutes)
           .forEach(k => {
             const lazyRoute = allLazyRoutes[k];
-            this._lazyRoutes[k + '.ngfactory'] = lazyRoute.moduleAbsolutePath + '.ngfactory.ts';
+            if (this.skipCodeGeneration) {
+              this._lazyRoutes[k] = lazyRoute.moduleAbsolutePath;
+            } else {
+              this._lazyRoutes[k + '.ngfactory'] = lazyRoute.moduleAbsolutePath + '.ngfactory.ts';
+            }
           });
       })
       .then(() => cb(), (err: any) => { cb(err); });

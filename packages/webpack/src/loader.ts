@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import {AotPlugin} from './plugin';
-import {MultiChange, ReplaceChange, insertImport} from '@angular-cli/ast-tools';
+import {TypeScriptFileRefactor} from './refactor';
 
 // TODO: move all this to ast-tools.
 function _findNodes(sourceFile: ts.SourceFile, node: ts.Node, kind: ts.SyntaxKind,
@@ -25,34 +25,23 @@ function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
   }
 }
 
-function _removeDecorators(fileName: string, source: string): string {
-  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest);
+function _removeDecorators(refactor: TypeScriptFileRefactor) {
   // Find all decorators.
-  const decorators = _findNodes(sourceFile, sourceFile, ts.SyntaxKind.Decorator);
-  decorators.sort((a, b) => b.pos - a.pos);
-
-  decorators.forEach(d => {
-    source = source.slice(0, d.pos) + source.slice(d.end);
-  });
-
-  return source;
+  _findNodes(refactor.sourceFile, refactor.sourceFile, ts.SyntaxKind.Decorator, false)
+    .forEach(d => refactor.removeNode(d));
 }
 
 
-function _replaceBootstrap(fileName: string,
-                           source: string,
-                           plugin: AotPlugin): Promise<string> {
+function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) {
   // If bootstrapModule can't be found, bail out early.
-  if (!source.match(/\bbootstrapModule\b/)) {
-    return Promise.resolve(source);
+  if (!refactor.sourceMatch(/\bbootstrapModule\b/)) {
+    return;
   }
-
-  let changes = new MultiChange();
 
   // Calculate the base path.
   const basePath = path.normalize(plugin.basePath);
   const genDir = path.normalize(plugin.genDir);
-  const dirName = path.normalize(path.dirname(fileName));
+  const dirName = path.normalize(path.dirname(refactor.fileName));
   const entryModule = plugin.entryModule;
   const entryModuleFileName = path.normalize(entryModule.path + '.ngfactory');
   const relativeEntryModulePath = path.relative(basePath, entryModuleFileName);
@@ -60,10 +49,8 @@ function _replaceBootstrap(fileName: string,
   const relativeNgFactoryPath = path.relative(dirName, fullEntryModulePath);
   const ngFactoryPath = './' + relativeNgFactoryPath.replace(/\\/g, '/');
 
-  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest);
-
-  const allCalls = _findNodes(
-    sourceFile, sourceFile, ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
+  const allCalls = _findNodes(refactor.sourceFile, refactor.sourceFile,
+    ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
 
   const bootstraps = allCalls
     .filter(call => call.expression.kind == ts.SyntaxKind.PropertyAccessExpression)
@@ -73,9 +60,10 @@ function _replaceBootstrap(fileName: string,
           && access.name.text == 'bootstrapModule';
     });
 
-  const calls: ts.Node[] = bootstraps
+  const calls: ts.CallExpression[] = bootstraps
     .reduce((previous, access) => {
-      return previous.concat(_findNodes(sourceFile, access, ts.SyntaxKind.CallExpression, true));
+      return previous.concat(
+        _findNodes(refactor.sourceFile, access, ts.SyntaxKind.CallExpression, true));
     }, [])
     .filter(call => {
       return call.expression.kind == ts.SyntaxKind.Identifier
@@ -84,43 +72,30 @@ function _replaceBootstrap(fileName: string,
 
   if (calls.length == 0) {
     // Didn't find any dynamic bootstrapping going on.
-    return Promise.resolve(source);
+    return;
   }
 
   // Create the changes we need.
   allCalls
     .filter(call => bootstraps.some(bs => bs == call.expression))
     .forEach((call: ts.CallExpression) => {
-      changes.appendChange(new ReplaceChange(fileName, call.arguments[0].getStart(sourceFile),
-        entryModule.className, entryModule.className + 'NgFactory'));
+      refactor.replaceNode(call.arguments[0], entryModule.className + 'NgFactory', true);
     });
 
-  calls
-    .forEach(call => {
-      changes.appendChange(new ReplaceChange(fileName, call.getStart(sourceFile),
-        'platformBrowserDynamic', 'platformBrowser'));
-    });
+  calls.forEach(call => refactor.replaceNode(call.expression, 'platformBrowser', true));
 
   bootstraps
     .forEach((bs: ts.PropertyAccessExpression) => {
       // This changes the call.
-      changes.appendChange(new ReplaceChange(fileName, bs.name.getStart(sourceFile),
-        'bootstrapModule', 'bootstrapModuleFactory'));
+      refactor.replaceNode(bs.name, 'bootstrapModuleFactory', true);
     });
-  changes.appendChange(insertImport(fileName, 'platformBrowser', '@angular/platform-browser'));
-  changes.appendChange(insertImport(fileName, entryModule.className + 'NgFactory', ngFactoryPath));
 
-  let sourceText = source;
-  return changes.apply({
-    read: (path: string) => Promise.resolve(sourceText),
-    write: (path: string, content: string) => Promise.resolve(sourceText = content)
-  }).then(() => sourceText);
+  refactor.insertImport('platformBrowser', '@angular/platform-browser');
+  refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
 }
 
-function _replaceResources(fileName: string, source: string) {
-  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest);
-
-  const changes = new MultiChange();
+function _replaceResources(refactor: TypeScriptFileRefactor) {
+  const sourceFile = refactor.sourceFile;
 
   // Find all object literals.
   _findNodes(sourceFile, sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
@@ -140,12 +115,9 @@ function _replaceResources(fileName: string, source: string) {
   // Get the full text of the initializer.
   .forEach((node: ts.PropertyAssignment) => {
     const key = _getContentOfKeyLiteral(sourceFile, node.name);
-    // changes.appendChange(new ReplaceChange(fileName, call.arguments[0].getStart(sourceFile),
-    //   entryModule.className, entryModule.className + 'NgFactory'));
+
     if (key == 'templateUrl') {
-      changes.appendChange(new ReplaceChange(fileName, node.getFullStart(),
-        node.getFullText(sourceFile),
-        `template: require(${node.initializer.getFullText(sourceFile)})`));
+      refactor.replaceNode(node, `template: require(${node.initializer.getFullText(sourceFile)})`);
     } else if (key == 'styleUrls') {
       const arr: ts.ArrayLiteralExpression[] =
         <ts.ArrayLiteralExpression[]>_findNodes(sourceFile, node,
@@ -157,51 +129,27 @@ function _replaceResources(fileName: string, source: string) {
       const initializer = arr[0].elements.map((element: ts.Expression) => {
         return element.getFullText(sourceFile);
       });
-      changes.appendChange(new ReplaceChange(fileName, node.getFullStart(),
-        node.getFullText(sourceFile),
-        `styles: [require(${initializer.join('), require(')})]`));
+      refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
     }
   });
-
-  return changes.apply({
-    read: (path: string) => Promise.resolve(source),
-    write: (path: string, content: string) => Promise.resolve(source = content)
-  }).then(() => source);
 }
 
-function _transpile(plugin: AotPlugin, fileName: string, sourceText: string) {
-  const program = plugin.program;
-  if (plugin.typeCheck) {
-    const sourceFile = program.getSourceFile(fileName);
-    const diagnostics = program.getSyntacticDiagnostics(sourceFile)
-                .concat(program.getSemanticDiagnostics(sourceFile))
-                .concat(program.getDeclarationDiagnostics(sourceFile));
 
-    if (diagnostics.length > 0) {
-      const message = diagnostics
-        .map(diagnostic => {
-          const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-          const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-          return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
-        })
-        .join('\n');
-      throw new Error(message);
-    }
+function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
+  const diagnostics = refactor.getDiagnostics();
+
+  if (diagnostics.length > 0) {
+    const message = diagnostics
+      .map(diagnostic => {
+        const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+        const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+        return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
+      })
+      .join('\n');
+    throw new Error(message);
   }
-
-  // Force a few compiler options to make sure we get the result we want.
-  const compilerOptions: ts.CompilerOptions = Object.assign({}, plugin.compilerOptions, {
-    inlineSources: true,
-    inlineSourceMap: false,
-    sourceRoot: plugin.basePath
-  });
-
-  const result = ts.transpileModule(sourceText, { compilerOptions, fileName });
-  return {
-    outputText: result.outputText,
-    sourceMap: JSON.parse(result.sourceMapText)
-  };
 }
+
 
 // Super simple TS transpiler loader for testing / isolated usage. does not type check!
 export function ngcLoader(source: string) {
@@ -212,18 +160,33 @@ export function ngcLoader(source: string) {
   if (plugin && plugin instanceof AotPlugin) {
     const cb: any = this.async();
 
+    const refactor = new TypeScriptFileRefactor(
+      this.resourcePath, plugin.compilerHost, plugin.program);
+
     Promise.resolve()
       .then(() => {
         if (!plugin.skipCodeGeneration) {
           return Promise.resolve()
-            .then(() => _removeDecorators(this.resource, source))
-            .then(sourceText => _replaceBootstrap(this.resource, sourceText, plugin));
+            .then(() => _removeDecorators(refactor))
+            .then(() => _replaceBootstrap(plugin, refactor));
         } else {
-          return _replaceResources(this.resource, source);
+          return _replaceResources(refactor);
         }
       })
-      .then(sourceText => {
-        const result = _transpile(plugin, this.resourcePath, sourceText);
+      .then(() => {
+        if (plugin.typeCheck) {
+          _checkDiagnostics(refactor);
+        }
+      })
+      .then(() => {
+        // Force a few compiler options to make sure we get the result we want.
+        const compilerOptions: ts.CompilerOptions = Object.assign({}, plugin.compilerOptions, {
+          inlineSources: true,
+          inlineSourceMap: false,
+          sourceRoot: plugin.basePath
+        });
+
+        const result = refactor.transpile(compilerOptions);
         cb(null, result.outputText, result.sourceMap);
       })
       .catch(err => cb(err));
