@@ -33,7 +33,7 @@ function _findNodes(node: ts.Node, kind: ts.SyntaxKind,
   }
   if (max > 0) {
     for (const child of node.getChildren()) {
-      _findNodes(child, kind, max).forEach(node => {
+      _findNodes(child, kind, recursive, max).forEach((node: ts.Node) => {
         if (max > 0) {
           arr.push(node);
         }
@@ -160,7 +160,8 @@ export class TypeScriptFileRefactor {
       fileName: this._fileName
     });
 
-    const map = SourceMapGenerator.fromSourceMap(new SourceMapConsumer(result.sourceMapText));
+    const consumer = new SourceMapConsumer(JSON.parse(result.sourceMapText));
+    const map = SourceMapGenerator.fromSourceMap(consumer);
     if (this._changed) {
       const sourceMap = this._sourceString.generateMap({
         file: this._fileName.replace(/\.ts$/, '.js'),
