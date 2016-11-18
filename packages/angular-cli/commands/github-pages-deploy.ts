@@ -216,7 +216,7 @@ const githubPagesDeployCommand = Command.extend({
     }
 
     function createNotFoundPage() {
-      const indexHtml = path.join(root, 'index.html');
+      const indexHtml = path.join(root, this.project.index);
       const notFoundPage = path.join(root, '404.html');
       return fsCopy(indexHtml, notFoundPage);
     }
