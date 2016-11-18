@@ -217,16 +217,6 @@ export class AotPlugin {
       basePath: this.basePath
     };
 
-    // Create the Code Generator.
-    const codeGenerator = ngCompiler.CodeGenerator.create(
-      this._angularCompilerOptions,
-      i18nOptions,
-      this._program,
-      this._compilerHost,
-      new ngCompiler.NodeReflectorHostContext(this._compilerHost),
-      this._resourceLoader
-    );
-
     // Create a new Program, based on the old one. This will trigger a resolution of all
     // transitive modules, which include files that might just have been generated.
     this._program = ts.createProgram(
@@ -234,9 +224,19 @@ export class AotPlugin {
 
     // We need to temporarily patch the CodeGenerator until either it's patched or allows us
     // to pass in our own ReflectorHost.
-    patchReflectorHost(codeGenerator);
     let promise = Promise.resolve();
     if (!this._skipCodeGeneration) {
+      // Create the Code Generator.
+      const codeGenerator = ngCompiler.CodeGenerator.create(
+        this._angularCompilerOptions,
+        i18nOptions,
+        this._program,
+        this._compilerHost,
+        new ngCompiler.NodeReflectorHostContext(this._compilerHost),
+        this._resourceLoader
+      );
+
+      patchReflectorHost(codeGenerator);
       promise = codeGenerator.codegen({transitiveModules: true});
     }
     this._donePromise = promise
