@@ -240,7 +240,7 @@ const githubPagesDeployCommand = Command.extend({
         .then((stdout) => {
           let match = stdout.match(/origin\s+(?:https:\/\/|git@)github\.com(?:\:|\/)([^\/]+)/m);
           let userName = match[1].toLowerCase();
-          let url = `https://${userName}.github.io/${options.userPage ? '' : (projectName + '/')}`;
+          let url = `https://${userName}.github.io/${options.userPage ? '' : (baseHref + '/')}`;
           ui.writeLine(chalk.green(`Deployed! Visit ${url}`));
           ui.writeLine('Github pages might take a few minutes to show the deployed site.');
         });
