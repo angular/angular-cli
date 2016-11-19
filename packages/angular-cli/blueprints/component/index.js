@@ -18,14 +18,17 @@ module.exports = {
     { name: 'prefix', type: Boolean, default: true },
     { name: 'spec', type: Boolean },
     { name: 'view-encapsulation', type: String, aliases: ['ve'] },
-    { name: 'change-detection', type: String, aliases: ['cd'] }
+    { name: 'change-detection', type: String, aliases: ['cd'] },
+    { name: 'skip-import', type: Boolean, default: false }
   ],
 
-  beforeInstall: function () {
+  beforeInstall: function(options) {
     try {
       this.modulePaths = findParentModule(this.project, this.dynamicPath.dir);
     } catch(e) {
-      throw `Error locating module for declaration\n\t${e}`;
+      if (!options.skipImport) {
+        throw `Error locating module for declaration\n\t${e}`;
+      }
     }
   },
 
@@ -141,7 +144,7 @@ module.exports = {
       const componentDir = path.relative(path.dirname(pathToModule), this.generatePath);
       const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
-      if (!options['skip-import']) {
+      if (!options.skipImport) {
         returns.push(
           astUtils.addDeclarationToModule(pathToModule, className, importPath)
             .then(change => change.apply(NodeHost)));

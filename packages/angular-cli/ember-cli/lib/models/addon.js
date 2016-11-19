@@ -22,8 +22,8 @@ var AddonsFactory   = require('../models/addons-factory');
 var CoreObject = require('../ext/core-object');
 var Project = require('./project');
 
-var upstreamMergeTrees = require('broccoli-merge-trees');
-var Funnel     = require('broccoli-funnel');
+// var upstreamMergeTrees = require('broccoli-merge-trees');
+// var Funnel     = require('broccoli-funnel');
 var walkSync   = require('walk-sync');
 
 
@@ -79,31 +79,6 @@ function Addon(parent, project) {
   }
   this.nodeModulesPath = nodeModulesPath(this.root);
 
-  this.treePaths = {
-    app:               'app',
-    styles:            'app/styles',
-    templates:         'app/templates',
-    addon:             'addon',
-    'addon-styles':    'addon/styles',
-    'addon-templates': 'addon/templates',
-    vendor:            'vendor',
-    'test-support':    'test-support',
-    'addon-test-support': 'addon-test-support',
-    public:            'public'
-  };
-
-  this.treeForMethods = {
-    app:               'treeForApp',
-    styles:            'treeForStyles',
-    templates:         'treeForTemplates',
-    'addon-templates': 'treeForAddonTemplates',
-    addon:             'treeForAddon',
-    vendor:            'treeForVendor',
-    'test-support':    'treeForTestSupport',
-    'addon-test-support': 'treeForAddonTestSupport',
-    public:            'treeForPublic'
-  };
-
   p.setupRegistry(this);
 
   if (!this.name) {
@@ -148,7 +123,7 @@ Addon.prototype._requireBuildPackages = function() {
     return new Funnel(tree, options);
   });
 
-  this.mergeTrees = deprecatedAddonFilters(this, 'this.mergeTrees', 'broccoli-merge-trees', mergeTrees);
+  // this.mergeTrees = deprecatedAddonFilters(this, 'this.mergeTrees', 'broccoli-merge-trees', mergeTrees);
   this.walkSync = deprecatedAddonFilters(this, 'this.walkSync', 'node-walk-sync', walkSync);
 };
 
@@ -278,33 +253,33 @@ Addon.prototype.treeFor = function treeFor(name) {
     trees.push(this.jshintAddonTree());
   }
 
-  return mergeTrees(trees.filter(Boolean), {
-    overwrite: true,
-    annotation: 'Addon#treeFor (' + this.name + ' - ' + name + ')'
-  });
+  // return mergeTrees(trees.filter(Boolean), {
+  //   overwrite: true,
+  //   annotation: 'Addon#treeFor (' + this.name + ' - ' + name + ')'
+  // });
 };
-
-/**
-  @private
-  @param {String} name
-  @method _treeFor
-  @return {tree}
-*/
-Addon.prototype._treeFor = function _treeFor(name) {
-  var treePath = path.resolve(this.root, this.treePaths[name]);
-  var treeForMethod = this.treeForMethods[name];
-  var tree;
-
-  // if (existsSync(treePath)) {
-  //   tree = this.treeGenerator(treePath);
-  // }
-
-  if (this[treeForMethod]) {
-    tree = this[treeForMethod](tree);
-  }
-
-  return tree;
-};
+//
+// /**
+//   @private
+//   @param {String} name
+//   @method _treeFor
+//   @return {tree}
+// */
+// Addon.prototype._treeFor = function _treeFor(name) {
+//   var treePath = path.resolve(this.root, this.treePaths[name]);
+//   var treeForMethod = this.treeForMethods[name];
+//   var tree;
+//
+//   // if (existsSync(treePath)) {
+//   //   tree = this.treeGenerator(treePath);
+//   // }
+//
+//   if (this[treeForMethod]) {
+//     tree = this[treeForMethod](tree);
+//   }
+//
+//   return tree;
+// };
 
 /**
   This method is called when the addon is included in a build. You

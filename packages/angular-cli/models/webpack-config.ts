@@ -19,12 +19,15 @@ export class NgCliWebpackConfig {
   // so this is more maintainable in the future for devs
   public configs: any[] = [];
 
-  constructor(public ngCliProject: any,
-              public target: string,
-              public environment: string,
-              outputDir?: string,
-              baseHref?: string,
-              isAoT = false) {
+  constructor(
+    public ngCliProject: any,
+    public target: string,
+    public environment: string,
+    outputDir?: string,
+    baseHref?: string,
+    isAoT = false,
+    sourcemap = true,
+  ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
 
@@ -38,7 +41,8 @@ export class NgCliWebpackConfig {
       this.ngCliProject.root,
       environment,
       appConfig,
-      baseHref
+      baseHref,
+      sourcemap
     );
     let targetConfigPartial = this.getTargetConfig(this.ngCliProject.root, appConfig);
     const typescriptConfigPartial = isAoT

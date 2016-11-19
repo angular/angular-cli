@@ -27,7 +27,8 @@ export default Task.extend({
       commandOptions.environment,
       undefined,
       undefined,
-      commandOptions.aot
+      commandOptions.aot,
+      commandOptions.sourcemap
     ).configs;
 
     const appConfig = CliConfig.fromProject().config.apps[0];
