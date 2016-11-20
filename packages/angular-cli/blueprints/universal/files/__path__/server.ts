@@ -4,13 +4,16 @@
 import './polyfills.ts';
 import * as path from 'path';
 import * as express from 'express';
-import { enableProdMode } from '@angular/core';
-import { createEngine } from 'angular2-express-engine';
-import { AppModule } from './app/app.node.module';
 import * as compression from 'compression';
+import { createEngine } from 'angular2-express-engine';
+import { enableProdMode } from '@angular/core';
+import { AppModule } from './app/app.node.module';
 import { environment } from './environments/environment';
+import { routes } from './server.routes';
 
-const app = express();
+// App
+
+const app  = express();
 const ROOT = path.join(path.resolve(__dirname, '..'));
 const port = process.env.PORT || 4200;
 
@@ -64,17 +67,18 @@ function ngApp(req: any, res: any) {
  * use universal for specific routes
  */
 app.get('/', ngApp);
-app.get('/about', ngApp);
-app.get('/about/*', ngApp);
+routes.forEach(route => {
+  app.get(`/${route}`, ngApp);
+  app.get(`/${route}/*`, ngApp);
+});
 
 /**
  * if you want to use universal for all routes, you can use the '*' wildcard
  */
-// app.get('*', ngApp);
 
-app.get('*', function(req: any, res: any) {
+app.get('*', function (req: any, res: any) {
   res.setHeader('Content-Type', 'application/json');
-  const pojo = { status: 404, message: 'No Content' };
+  const pojo = {status: 404, message: 'No Content'};
   const json = JSON.stringify(pojo, null, 2);
   res.status(404).send(json);
 });
