@@ -22,3 +22,8 @@ export function ngServe(...args: string[]) {
   return silentExecAndWaitForOutputToMatch('ng',
     ['serve', ...args], /webpack: bundle is now VALID/);
 }
+
+export function ngUniversalServe(...args: string[]) {
+  return silentExecAndWaitForOutputToMatch('ng',
+    ['serve', ...args], /Listening on port 4200/);
+}

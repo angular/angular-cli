@@ -1,5 +1,5 @@
 import * as child_process from 'child_process';
-import {blue, white, yellow} from 'chalk';
+import { blue, white, yellow } from 'chalk';
 const treeKill = require('tree-kill');
 
 
@@ -74,6 +74,10 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
     });
 
     if (options.waitForMatch) {
+      setTimeout(() => {
+        reject({message: 'timed out after 60 seconds.'});
+      }, 60000);
+
       childProcess.stdout.on('data', (data: Buffer) => {
         if (data.toString().match(options.waitForMatch)) {
           resolve(stdout);
