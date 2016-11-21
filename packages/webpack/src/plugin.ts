@@ -12,6 +12,8 @@ import {createResolveDependenciesFromContextMap} from './utils';
 import {WebpackCompilerHost} from './compiler_host';
 import {resolveEntryModuleFromMain} from './entry_resolver';
 import {StaticSymbol} from '@angular/compiler-cli';
+import {Tapable} from './webpack';
+import {PathsPlugin} from './paths-plugin';
 
 
 /**
@@ -54,7 +56,7 @@ export class ModuleRoute {
 }
 
 
-export class AotPlugin {
+export class AotPlugin implements Tapable {
   private _entryModule: ModuleRoute;
   private _compilerOptions: ts.CompilerOptions;
   private _angularCompilerOptions: ngCompiler.AngularCompilerOptions;
@@ -65,6 +67,7 @@ export class AotPlugin {
   private _compilerHost: WebpackCompilerHost;
   private _resourceLoader: WebpackResourceLoader;
   private _lazyRoutes: { [route: string]: string };
+  private _tsConfigPath: string;
 
   private _donePromise: Promise<void>;
   private _compiler: any = null;
@@ -96,17 +99,18 @@ export class AotPlugin {
     if (!options.hasOwnProperty('tsConfigPath')) {
       throw new Error('Must specify "tsConfigPath" in the configuration of @ngtools/webpack.');
     }
+    this._tsConfigPath = options.tsConfigPath;
 
     // Check the base path.
-    let basePath = path.resolve(process.cwd(), path.dirname(options.tsConfigPath));
-    if (fs.statSync(options.tsConfigPath).isDirectory()) {
-      basePath = options.tsConfigPath;
+    let basePath = path.resolve(process.cwd(), path.dirname(this._tsConfigPath));
+    if (fs.statSync(this._tsConfigPath).isDirectory()) {
+      basePath = this._tsConfigPath;
     }
     if (options.hasOwnProperty('basePath')) {
       basePath = options.basePath;
     }
 
-    const tsConfig = tsc.readConfiguration(options.tsConfigPath, basePath);
+    const tsConfig = tsc.readConfiguration(this._tsConfigPath, basePath);
     this._rootFilePath = tsConfig.parsed.fileNames
       .filter(fileName => !/\.spec\.ts$/.test(fileName));
 
@@ -155,13 +159,19 @@ export class AotPlugin {
     this._compiler = compiler;
 
     compiler.plugin('context-module-factory', (cmf: any) => {
+      cmf.resolvers.normal.apply(new PathsPlugin({
+        tsConfigPath: this._tsConfigPath,
+        compilerOptions: this._compilerOptions,
+        compilerHost: this._compilerHost
+      }));
+
       cmf.plugin('before-resolve', (request: any, callback: (err?: any, request?: any) => void) => {
         if (!request) {
           return callback();
         }
 
         request.request = this.genDir;
-        request.recursive =  true;
+        request.recursive = true;
         request.dependencies.forEach((d: any) => d.critical = false);
         return callback(null, request);
       });
@@ -237,8 +247,11 @@ export class AotPlugin {
       );
 
       patchReflectorHost(codeGenerator);
-      promise = codeGenerator.codegen({transitiveModules: true});
+      promise = promise.then(() => codeGenerator.codegen({
+        transitiveModules: true
+      }));
     }
+
     this._donePromise = promise
       .then(() => {
         const diagnostics = this._program.getGlobalDiagnostics();

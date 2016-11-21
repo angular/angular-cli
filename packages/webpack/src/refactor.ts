@@ -152,9 +152,6 @@ export class TypeScriptFileRefactor {
 
   transpile(compilerOptions: ts.CompilerOptions): TranspileOutput {
     const source = this._sourceString.toString();
-    console.log(0, this._fileName);
-    console.log(source);
-    console.log('---');
     const result = ts.transpileModule(source, {
       compilerOptions,
       fileName: this._fileName
