@@ -42,9 +42,15 @@ export class PathsPlugin implements Tapable {
 
   private _absoluteBaseUrl: string;
 
-  private static _loadOptionsFromTsConfig(tsConfigPath: string, host: ts.CompilerHost):
+  private static _loadOptionsFromTsConfig(tsConfigPath: string, host?: ts.CompilerHost):
       ts.CompilerOptions {
-    const tsConfig = ts.readConfigFile(tsConfigPath, (path: string) => host.readFile(path));
+    const tsConfig = ts.readConfigFile(tsConfigPath, (path: string) => {
+      if (host) {
+        return host.readFile(path);
+      } else {
+        return ts.sys.readFile(path);
+      }
+    });
     if (tsConfig.error) {
       throw tsConfig.error;
     }
@@ -58,16 +64,16 @@ export class PathsPlugin implements Tapable {
     }
     this._tsConfigPath = options.tsConfigPath;
 
+    if (options.hasOwnProperty('compilerOptions')) {
+      this._compilerOptions = Object.assign({}, options.compilerOptions);
+    } else {
+      this._compilerOptions = PathsPlugin._loadOptionsFromTsConfig(this._tsConfigPath, null);
+    }
+
     if (options.hasOwnProperty('compilerHost')) {
       this._host = options.compilerHost;
     } else {
       this._host = ts.createCompilerHost(this._compilerOptions, false);
-    }
-
-    if (options.hasOwnProperty('compilerOptions')) {
-      this._compilerOptions = Object.assign({}, options.compilerOptions);
-    } else {
-      this._compilerOptions = PathsPlugin._loadOptionsFromTsConfig(this._tsConfigPath, this._host);
     }
 
     this.source = 'described-resolve';
