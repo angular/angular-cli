@@ -5,51 +5,6 @@ import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
 const MagicString = require('magic-string');
 
 
-
-/**
- * Find all nodes from the AST in the subtree of node of SyntaxKind kind.
- * @param node
- * @param kind
- * @param recursive Whether to go in matched nodes to keep matching.
- * @param max The maximum number of items to return.
- * @return all nodes of kind, or [] if none is found
- */
-function _findNodes(node: ts.Node, kind: ts.SyntaxKind,
-                    recursive = false,
-                    max: number = Infinity): ts.Node[] {
-  if (!node || max == 0) {
-    return [];
-  }
-
-  let arr: ts.Node[] = [];
-  if (node.kind === kind) {
-    // If we're not recursively looking for children, stop here.
-    if (!recursive) {
-      return [node];
-    }
-
-    arr.push(node);
-    max--;
-  }
-  if (max > 0) {
-    for (const child of node.getChildren()) {
-      _findNodes(child, kind, recursive, max).forEach((node: ts.Node) => {
-        if (max > 0) {
-          arr.push(node);
-        }
-        max--;
-      });
-
-      if (max <= 0) {
-        break;
-      }
-    }
-  }
-  return arr;
-}
-
-
-
 export interface TranspileOutput {
   outputText: string;
   sourceMap: any;
@@ -89,13 +44,58 @@ export class TypeScriptFileRefactor {
       .concat(this._program.getDeclarationDiagnostics(this._sourceFile));
   }
 
-  appendAfter(node: ts.Node, text: string) {
+  /**
+   * Find all nodes from the AST in the subtree of node of SyntaxKind kind.
+   * @param node
+   * @param kind
+   * @param recursive Whether to go in matched nodes to keep matching.
+   * @param max The maximum number of items to return.
+   * @return all nodes of kind, or [] if none is found
+   */
+  findAstNodes(node: ts.Node,
+               kind: ts.SyntaxKind,
+               recursive = false,
+               max: number = Infinity): ts.Node[] {
+    if (!node || max == 0) {
+      return [];
+    }
+
+    let arr: ts.Node[] = [];
+    if (node.kind === kind) {
+      // If we're not recursively looking for children, stop here.
+      if (!recursive) {
+        return [node];
+      }
+
+      arr.push(node);
+      max--;
+    }
+
+    if (max > 0) {
+      for (const child of node.getChildren(this._sourceFile)) {
+        this.findAstNodes(child, kind, recursive, max)
+          .forEach((node: ts.Node) => {
+            if (max > 0) {
+              arr.push(node);
+            }
+            max--;
+          });
+
+        if (max <= 0) {
+          break;
+        }
+      }
+    }
+    return arr;
+  }
+
+  appendAfter(node: ts.Node, text: string): void {
     this._sourceString.insertRight(node.getEnd(), text);
   }
 
-  insertImport(symbolName: string, modulePath: string) {
+  insertImport(symbolName: string, modulePath: string): void {
     // Find all imports.
-    const allImports = _findNodes(this._sourceFile, ts.SyntaxKind.ImportDeclaration);
+    const allImports = this.findAstNodes(this._sourceFile, ts.SyntaxKind.ImportDeclaration);
     const maybeImports = allImports
       .filter((node: ts.ImportDeclaration) => {
         // Filter all imports that do not match the modulePath.

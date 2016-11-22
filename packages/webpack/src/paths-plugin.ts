@@ -103,7 +103,7 @@ export class PathsPlugin implements Tapable {
     });
   }
 
-  apply(resolver: ResolverPlugin) {
+  apply(resolver: ResolverPlugin): void {
     let { baseUrl } = this._compilerOptions;
 
     if (baseUrl) {
@@ -115,7 +115,7 @@ export class PathsPlugin implements Tapable {
     });
   }
 
-  resolve(resolver: ResolverPlugin, mapping: any, request: any, callback: Callback<any>) {
+  resolve(resolver: ResolverPlugin, mapping: any, request: any, callback: Callback<any>): any {
     let innerRequest = getInnerRequest(resolver, request);
     if (!innerRequest) {
       return callback();
@@ -125,7 +125,6 @@ export class PathsPlugin implements Tapable {
     if (!match) {
       return callback();
     }
-    console.log(3, innerRequest);
 
     let newRequestStr = mapping.target;
     if (!mapping.onlyModule) {
@@ -157,7 +156,7 @@ export class PathsPlugin implements Tapable {
     );
   }
 
-  createPlugin(resolver: ResolverPlugin, mapping: any) {
+  createPlugin(resolver: ResolverPlugin, mapping: any): any {
     return (request: any, callback: Callback<any>) => {
       try {
         this.resolve(resolver, mapping, request, callback);

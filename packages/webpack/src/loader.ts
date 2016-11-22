@@ -3,18 +3,6 @@ import * as ts from 'typescript';
 import {AotPlugin} from './plugin';
 import {TypeScriptFileRefactor} from './refactor';
 
-// TODO: move all this to ast-tools.
-function _findNodes(sourceFile: ts.SourceFile, node: ts.Node, kind: ts.SyntaxKind,
-                    keepGoing = false): ts.Node[] {
-  if (node.kind == kind && !keepGoing) {
-    return [node];
-  }
-
-  return node.getChildren(sourceFile).reduce((result, n) => {
-    return result.concat(_findNodes(sourceFile, n, kind, keepGoing));
-  }, node.kind == kind ? [node] : []);
-}
-
 function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
   if (node.kind == ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
@@ -27,7 +15,7 @@ function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
 
 function _removeDecorators(refactor: TypeScriptFileRefactor) {
   // Find all decorators.
-  _findNodes(refactor.sourceFile, refactor.sourceFile, ts.SyntaxKind.Decorator, false)
+  refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
     .forEach(d => refactor.removeNode(d));
 }
 
@@ -49,7 +37,7 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
   const relativeNgFactoryPath = path.relative(dirName, fullEntryModulePath);
   const ngFactoryPath = './' + relativeNgFactoryPath.replace(/\\/g, '/');
 
-  const allCalls = _findNodes(refactor.sourceFile, refactor.sourceFile,
+  const allCalls = refactor.findAstNodes(refactor.sourceFile,
     ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
 
   const bootstraps = allCalls
@@ -62,12 +50,13 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
 
   const calls: ts.CallExpression[] = bootstraps
     .reduce((previous, access) => {
-      return previous.concat(
-        _findNodes(refactor.sourceFile, access, ts.SyntaxKind.CallExpression, true));
+      const expressions
+        = refactor.findAstNodes(access, ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
+      return previous.concat(expressions);
     }, [])
-    .filter(call => {
+    .filter((call: ts.CallExpression) => {
       return call.expression.kind == ts.SyntaxKind.Identifier
-          && call.expression.text == 'platformBrowserDynamic';
+          && (call.expression as ts.Identifier).text == 'platformBrowserDynamic';
     });
 
   if (calls.length == 0) {
@@ -98,40 +87,40 @@ function _replaceResources(refactor: TypeScriptFileRefactor) {
   const sourceFile = refactor.sourceFile;
 
   // Find all object literals.
-  _findNodes(sourceFile, sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
-  // Get all their property assignments.
-  .map(node => _findNodes(sourceFile, node, ts.SyntaxKind.PropertyAssignment))
-  // Flatten into a single array (from an array of array<property assignments>).
-  .reduce((prev, curr) => curr ? prev.concat(curr) : prev, [])
-  // Remove every property assignment that aren't 'loadChildren'.
-  .filter((node: ts.PropertyAssignment) => {
-    const key = _getContentOfKeyLiteral(sourceFile, node.name);
-    if (!key) {
-      // key is an expression, can't do anything.
-      return false;
-    }
-    return key == 'templateUrl' || key == 'styleUrls';
-  })
-  // Get the full text of the initializer.
-  .forEach((node: ts.PropertyAssignment) => {
-    const key = _getContentOfKeyLiteral(sourceFile, node.name);
-
-    if (key == 'templateUrl') {
-      refactor.replaceNode(node, `template: require(${node.initializer.getFullText(sourceFile)})`);
-    } else if (key == 'styleUrls') {
-      const arr: ts.ArrayLiteralExpression[] =
-        <ts.ArrayLiteralExpression[]>_findNodes(sourceFile, node,
-            ts.SyntaxKind.ArrayLiteralExpression, false);
-      if (!arr || arr.length == 0 || arr[0].elements.length == 0) {
-        return;
+  refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
+    // Get all their property assignments.
+    .map(node => refactor.findAstNodes(node, ts.SyntaxKind.PropertyAssignment))
+    // Flatten into a single array (from an array of array<property assignments>).
+    .reduce((prev, curr) => curr ? prev.concat(curr) : prev, [])
+    // Remove every property assignment that aren't 'loadChildren'.
+    .filter((node: ts.PropertyAssignment) => {
+      const key = _getContentOfKeyLiteral(sourceFile, node.name);
+      if (!key) {
+        // key is an expression, can't do anything.
+        return false;
       }
+      return key == 'templateUrl' || key == 'styleUrls';
+    })
+    // Get the full text of the initializer.
+    .forEach((node: ts.PropertyAssignment) => {
+      const key = _getContentOfKeyLiteral(sourceFile, node.name);
 
-      const initializer = arr[0].elements.map((element: ts.Expression) => {
-        return element.getFullText(sourceFile);
-      });
-      refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
-    }
-  });
+      if (key == 'templateUrl') {
+        refactor.replaceNode(node,
+          `template: require(${node.initializer.getFullText(sourceFile)})`);
+      } else if (key == 'styleUrls') {
+        const arr = <ts.ArrayLiteralExpression[]>(
+          refactor.findAstNodes(node, ts.SyntaxKind.ArrayLiteralExpression, false));
+        if (!arr || arr.length == 0 || arr[0].elements.length == 0) {
+          return;
+        }
+
+        const initializer = arr[0].elements.map((element: ts.Expression) => {
+          return element.getFullText(sourceFile);
+        });
+        refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
+      }
+    });
 }
 
 
