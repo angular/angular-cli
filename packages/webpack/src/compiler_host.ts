@@ -116,6 +116,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     }
 
     for (const fileName of Object.keys(this._files)) {
+      console.log(1, fileName);
       const stats = this._files[fileName];
       fs._statStorage.data[fileName] = [null, stats];
       fs._readFileStorage.data[fileName] = [null, stats.content];

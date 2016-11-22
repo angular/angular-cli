@@ -1,3 +1,5 @@
+// Declarations for (some) Webpack types. Only what's needed.
+
 export interface Request {
   request?: Request;
   relativePath: string;

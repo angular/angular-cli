@@ -188,7 +188,7 @@ export class AotPlugin implements Tapable {
             (_: any, cb: any) => cb(null, this._lazyRoutes));
 
           return callback(null, result);
-        });
+        }).catch((err) => callback(err));
       });
     });
 
@@ -227,11 +227,6 @@ export class AotPlugin implements Tapable {
       basePath: this.basePath
     };
 
-    // Create a new Program, based on the old one. This will trigger a resolution of all
-    // transitive modules, which include files that might just have been generated.
-    this._program = ts.createProgram(
-      this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
-
     // We need to temporarily patch the CodeGenerator until either it's patched or allows us
     // to pass in our own ReflectorHost.
     let promise = Promise.resolve();
@@ -253,6 +248,14 @@ export class AotPlugin implements Tapable {
     }
 
     this._donePromise = promise
+      .then(() => {
+        // Create a new Program, based on the old one. This will trigger a resolution of all
+        // transitive modules, which include files that might just have been generated.
+        // This needs to happen after the code generator has been created for generated files
+        // to be properly resolved.
+        this._program = ts.createProgram(
+          this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
+      })
       .then(() => {
         const diagnostics = this._program.getGlobalDiagnostics();
         if (diagnostics.length > 0) {

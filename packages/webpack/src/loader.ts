@@ -79,15 +79,15 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
   allCalls
     .filter(call => bootstraps.some(bs => bs == call.expression))
     .forEach((call: ts.CallExpression) => {
-      refactor.replaceNode(call.arguments[0], entryModule.className + 'NgFactory', true);
+      refactor.replaceNode(call.arguments[0], entryModule.className + 'NgFactory');
     });
 
-  calls.forEach(call => refactor.replaceNode(call.expression, 'platformBrowser', true));
+  calls.forEach(call => refactor.replaceNode(call.expression, 'platformBrowser'));
 
   bootstraps
     .forEach((bs: ts.PropertyAccessExpression) => {
       // This changes the call.
-      refactor.replaceNode(bs.name, 'bootstrapModuleFactory', true);
+      refactor.replaceNode(bs.name, 'bootstrapModuleFactory');
     });
 
   refactor.insertImport('platformBrowser', '@angular/platform-browser');
