@@ -227,8 +227,6 @@ export class AotPlugin implements Tapable {
       basePath: this.basePath
     };
 
-    // We need to temporarily patch the CodeGenerator until either it's patched or allows us
-    // to pass in our own ReflectorHost.
     let promise = Promise.resolve();
     if (!this._skipCodeGeneration) {
       // Create the Code Generator.
@@ -241,6 +239,9 @@ export class AotPlugin implements Tapable {
         this._resourceLoader
       );
 
+      // We need to temporarily patch the CodeGenerator until either it's patched or allows us
+      // to pass in our own ReflectorHost.
+      // TODO: remove this.
       patchReflectorHost(codeGenerator);
       promise = promise.then(() => codeGenerator.codegen({
         transitiveModules: true
