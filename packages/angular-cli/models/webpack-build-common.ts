@@ -83,7 +83,7 @@ export function getWebpackCommonConfig(
         { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
         { test: /\.html$/, loader: 'raw-loader' },
 
-        { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url?limit=10000' },
+        { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url-loader?limit=10000' },
         { test: /\.(eot|svg)$/, loader: 'file-loader' }
       ]
     },
