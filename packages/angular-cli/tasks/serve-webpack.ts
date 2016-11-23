@@ -25,7 +25,7 @@ export default Task.extend({
       commandOptions.target,
       commandOptions.environment,
       undefined,
-      undefined,
+      commandOptions.baseHref,
       commandOptions.aot,
       commandOptions.sourcemap
     ).config;
@@ -73,6 +73,7 @@ export default Task.extend({
       ),
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
+        index: commandOptions.baseHref,
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
       },
@@ -83,7 +84,8 @@ export default Task.extend({
       watchOptions: {
         poll: CliConfig.fromProject().config.defaults.poll
       },
-      https: commandOptions.ssl
+      https: commandOptions.ssl,
+      publicPath: commandOptions.baseHref
     };
 
     if (sslKey != null && sslCert != null) {
