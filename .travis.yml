@@ -49,10 +49,14 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome --force; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkdir ~/.config && echo "--no-sandbox" > ~/.config/chrome-flags.conf; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then CHROME_BIN=/usr/bin/google-chrome; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "--no-sandbox" > ~/.config/chromium-flags.conf; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libappindicator1 fonts-liberation; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo dpkg -i google-chrome*.deb; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "--no-sandbox" > ~/.config/chrome-flags.conf; fi
   - if [[ "$TARGET" == "mobile" ]]; then export MOBILE_TEST=true; fi
   - npm install -g npm
   - npm config set spin false
