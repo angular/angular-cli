@@ -88,7 +88,7 @@
     "mkdirp": "^0.5.1",
     "node-modules-path": "^1.0.0",
     "node-sass": "^3.10.1",
-    "node-uuid": "^1.4.3",
+    "uuid": "^3.0.0",
     "nopt": "^3.0.1",
     "npm-run-all": "^3.0.0",
     "offline-plugin": "^3.4.1",
