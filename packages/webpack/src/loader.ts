@@ -147,12 +147,13 @@ function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
 export function ngcLoader(source: string) {
   this.cacheable();
   const cb: any = this.async();
+  const sourceFileName: string = this.resourcePath;
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
   // We must verify that AotPlugin is an instance of the right class.
   if (plugin && plugin instanceof AotPlugin) {
     const refactor = new TypeScriptFileRefactor(
-      this.resourcePath, plugin.compilerHost, plugin.program);
+      sourceFileName, plugin.compilerHost, plugin.program);
 
     Promise.resolve()
       .then(() => {
@@ -190,7 +191,7 @@ export function ngcLoader(source: string) {
       throw tsConfig.error;
     }
 
-    const compilerOptions = tsConfig.config.compilerOptions as ts.CompilerOptions;
+    const compilerOptions: ts.CompilerOptions = tsConfig.config.compilerOptions;
     for (const key of Object.keys(options)) {
       if (key == 'tsConfigPath') {
         continue;
@@ -198,10 +199,12 @@ export function ngcLoader(source: string) {
       compilerOptions[key] = options[key];
     }
     const compilerHost = ts.createCompilerHost(compilerOptions);
-    const refactor = new TypeScriptFileRefactor(this.resourcePath, compilerHost);
+    const refactor = new TypeScriptFileRefactor(sourceFileName, compilerHost);
     _replaceResources(refactor);
 
     const result = refactor.transpile(compilerOptions);
+    // Webpack is going to take care of this.
+    result.outputText = result.outputText.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
     cb(null, result.outputText, result.sourceMap);
   }
 }

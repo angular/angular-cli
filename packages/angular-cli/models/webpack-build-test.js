@@ -84,9 +84,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
               loader: webpackLoader,
               query: {
                 tsConfigPath: path.resolve(appRoot, appConfig.tsconfig),
-                module: 'commonjs',
-                inlineSourceMap: true,
-                sourceRoot: appRoot
+                module: 'commonjs'
               }
             }
           ],

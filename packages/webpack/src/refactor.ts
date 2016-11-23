@@ -1,4 +1,5 @@
 // TODO: move this in its own package.
+import * as path from 'path';
 import * as ts from 'typescript';
 import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
 
@@ -7,7 +8,7 @@ const MagicString = require('magic-string');
 
 export interface TranspileOutput {
   outputText: string;
-  sourceMap?: any;
+  sourceMap: any | null;
 }
 
 export class TypeScriptFileRefactor {
@@ -18,6 +19,7 @@ export class TypeScriptFileRefactor {
 
   get fileName() { return this._fileName; }
   get sourceFile() { return this._sourceFile; }
+  get sourceText() { return this._sourceString.toString(); }
 
   constructor(private _fileName: string,
               private _host: ts.CompilerHost,
@@ -155,32 +157,46 @@ export class TypeScriptFileRefactor {
   }
 
   transpile(compilerOptions: ts.CompilerOptions): TranspileOutput {
-    const source = this._sourceString.toString();
+    // const basePath = path.resolve(path.dirname(tsConfigPath),
+    //   tsConfig.config.compilerOptions.baseUrl || '.');
+    compilerOptions = Object.assign({}, compilerOptions, {
+      sourceMap: true,
+      inlineSources: false,
+      inlineSourceMap: false,
+      sourceRoot: ''
+    });
+
+    const source = this.sourceText;
     const result = ts.transpileModule(source, {
       compilerOptions,
       fileName: this._fileName
     });
 
     if (result.sourceMapText) {
-      const consumer = new SourceMapConsumer(JSON.parse(result.sourceMapText));
+      const sourceMapJson = JSON.parse(result.sourceMapText);
+      sourceMapJson.sources = [ this._fileName ];
+
+      const consumer = new SourceMapConsumer(sourceMapJson);
       const map = SourceMapGenerator.fromSourceMap(consumer);
       if (this._changed) {
         const sourceMap = this._sourceString.generateMap({
-          file: this._fileName.replace(/\.ts$/, '.js'),
+          file: path.basename(this._fileName.replace(/\.ts$/, '.js')),
           source: this._fileName,
           hires: true,
-          includeContent: true,
         });
-        map.applySourceMap(new SourceMapConsumer(sourceMap));
+        map.applySourceMap(new SourceMapConsumer(sourceMap), this._fileName);
       }
 
-      return {
-        outputText: result.outputText,
-        sourceMap: map.toJSON()
-      };
+      const sourceMap = map.toJSON();
+      sourceMap.sources = [ this._fileName ];
+      sourceMap.file = path.basename(this._fileName, '.ts') + '.js';
+      sourceMap.sourcesContent = [ this._sourceText ];
+
+      return { outputText: result.outputText, sourceMap };
     } else {
       return {
-        outputText: result.outputText
+        outputText: result.outputText,
+        sourceMap: null
       };
     }
   }
