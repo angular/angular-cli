@@ -97,6 +97,7 @@ const githubPagesDeployCommand = Command.extend({
     const projectName = this.project.pkg.name;
 
     const outDir = CliConfig.fromProject().config.apps[0].outDir;
+    const indexFilename = CliConfig.fromProject().config.apps[0].index;
 
     let ghPagesBranch = 'gh-pages';
     let destinationBranch = options.userPage ? 'master' : ghPagesBranch;
@@ -216,7 +217,7 @@ const githubPagesDeployCommand = Command.extend({
     }
 
     function createNotFoundPage() {
-      const indexHtml = path.join(root, 'index.html');
+      const indexHtml = path.join(root, indexFilename);
       const notFoundPage = path.join(root, '404.html');
       return fsCopy(indexHtml, notFoundPage);
     }

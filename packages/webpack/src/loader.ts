@@ -1,48 +1,38 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import {AotPlugin} from './plugin';
-import {MultiChange, ReplaceChange, insertImport} from '@angular-cli/ast-tools';
+import {TypeScriptFileRefactor} from './refactor';
 
-// TODO: move all this to ast-tools.
-function _findNodes(sourceFile: ts.SourceFile, node: ts.Node, kind: ts.SyntaxKind,
-                    keepGoing = false): ts.Node[] {
-  if (node.kind == kind && !keepGoing) {
-    return [node];
+const loaderUtils = require('loader-utils');
+
+
+function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
+  if (node.kind == ts.SyntaxKind.Identifier) {
+    return (node as ts.Identifier).text;
+  } else if (node.kind == ts.SyntaxKind.StringLiteral) {
+    return (node as ts.StringLiteral).text;
+  } else {
+    return null;
   }
-
-  return node.getChildren(sourceFile).reduce((result, n) => {
-    return result.concat(_findNodes(sourceFile, n, kind, keepGoing));
-  }, node.kind == kind ? [node] : []);
 }
 
-function _removeDecorators(fileName: string, source: string): string {
-  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest);
+function _removeDecorators(refactor: TypeScriptFileRefactor) {
   // Find all decorators.
-  const decorators = _findNodes(sourceFile, sourceFile, ts.SyntaxKind.Decorator);
-  decorators.sort((a, b) => b.pos - a.pos);
-
-  decorators.forEach(d => {
-    source = source.slice(0, d.pos) + source.slice(d.end);
-  });
-
-  return source;
+  refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
+    .forEach(d => refactor.removeNode(d));
 }
 
 
-function _replaceBootstrap(fileName: string,
-                           source: string,
-                           plugin: AotPlugin): Promise<string> {
+function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) {
   // If bootstrapModule can't be found, bail out early.
-  if (!source.match(/\bbootstrapModule\b/)) {
-    return Promise.resolve(source);
+  if (!refactor.sourceMatch(/\bbootstrapModule\b/)) {
+    return;
   }
-
-  let changes = new MultiChange();
 
   // Calculate the base path.
   const basePath = path.normalize(plugin.basePath);
   const genDir = path.normalize(plugin.genDir);
-  const dirName = path.normalize(path.dirname(fileName));
+  const dirName = path.normalize(path.dirname(refactor.fileName));
   const entryModule = plugin.entryModule;
   const entryModuleFileName = path.normalize(entryModule.path + '.ngfactory');
   const relativeEntryModulePath = path.relative(basePath, entryModuleFileName);
@@ -50,10 +40,8 @@ function _replaceBootstrap(fileName: string,
   const relativeNgFactoryPath = path.relative(dirName, fullEntryModulePath);
   const ngFactoryPath = './' + relativeNgFactoryPath.replace(/\\/g, '/');
 
-  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest);
-
-  const allCalls = _findNodes(
-    sourceFile, sourceFile, ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
+  const allCalls = refactor.findAstNodes(refactor.sourceFile,
+    ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
 
   const bootstraps = allCalls
     .filter(call => call.expression.kind == ts.SyntaxKind.PropertyAccessExpression)
@@ -63,107 +51,160 @@ function _replaceBootstrap(fileName: string,
           && access.name.text == 'bootstrapModule';
     });
 
-  const calls: ts.Node[] = bootstraps
+  const calls: ts.CallExpression[] = bootstraps
     .reduce((previous, access) => {
-      return previous.concat(_findNodes(sourceFile, access, ts.SyntaxKind.CallExpression, true));
+      const expressions
+        = refactor.findAstNodes(access, ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
+      return previous.concat(expressions);
     }, [])
-    .filter(call => {
+    .filter((call: ts.CallExpression) => {
       return call.expression.kind == ts.SyntaxKind.Identifier
-          && call.expression.text == 'platformBrowserDynamic';
+          && (call.expression as ts.Identifier).text == 'platformBrowserDynamic';
     });
 
   if (calls.length == 0) {
     // Didn't find any dynamic bootstrapping going on.
-    return Promise.resolve(source);
+    return;
   }
 
   // Create the changes we need.
   allCalls
     .filter(call => bootstraps.some(bs => bs == call.expression))
     .forEach((call: ts.CallExpression) => {
-      changes.appendChange(new ReplaceChange(fileName, call.arguments[0].getStart(sourceFile),
-        entryModule.className, entryModule.className + 'NgFactory'));
+      refactor.replaceNode(call.arguments[0], entryModule.className + 'NgFactory');
     });
 
-  calls
-    .forEach(call => {
-      changes.appendChange(new ReplaceChange(fileName, call.getStart(sourceFile),
-        'platformBrowserDynamic', 'platformBrowser'));
-    });
+  calls.forEach(call => refactor.replaceNode(call.expression, 'platformBrowser'));
 
   bootstraps
     .forEach((bs: ts.PropertyAccessExpression) => {
       // This changes the call.
-      changes.appendChange(new ReplaceChange(fileName, bs.name.getStart(sourceFile),
-        'bootstrapModule', 'bootstrapModuleFactory'));
+      refactor.replaceNode(bs.name, 'bootstrapModuleFactory');
     });
-  changes.appendChange(insertImport(fileName, 'platformBrowser', '@angular/platform-browser'));
-  changes.appendChange(insertImport(fileName, entryModule.className + 'NgFactory', ngFactoryPath));
 
-  let sourceText = source;
-  return changes.apply({
-    read: (path: string) => Promise.resolve(sourceText),
-    write: (path: string, content: string) => Promise.resolve(sourceText = content)
-  }).then(() => sourceText);
+  refactor.insertImport('platformBrowser', '@angular/platform-browser');
+  refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
 }
 
-function _transpile(plugin: AotPlugin, fileName: string, sourceText: string) {
-  const program = plugin.program;
-  if (plugin.typeCheck) {
-    const sourceFile = program.getSourceFile(fileName);
-    const diagnostics = program.getSyntacticDiagnostics(sourceFile)
-                .concat(program.getSemanticDiagnostics(sourceFile))
-                .concat(program.getDeclarationDiagnostics(sourceFile));
+function _replaceResources(refactor: TypeScriptFileRefactor): void {
+  const sourceFile = refactor.sourceFile;
 
-    if (diagnostics.length > 0) {
-      const message = diagnostics
-        .map(diagnostic => {
-          const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-          const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-          return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
-        })
-        .join('\n');
-      throw new Error(message);
-    }
+  // Find all object literals.
+  refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
+    // Get all their property assignments.
+    .map(node => refactor.findAstNodes(node, ts.SyntaxKind.PropertyAssignment))
+    // Flatten into a single array (from an array of array<property assignments>).
+    .reduce((prev, curr) => curr ? prev.concat(curr) : prev, [])
+    // Remove every property assignment that aren't 'loadChildren'.
+    .filter((node: ts.PropertyAssignment) => {
+      const key = _getContentOfKeyLiteral(sourceFile, node.name);
+      if (!key) {
+        // key is an expression, can't do anything.
+        return false;
+      }
+      return key == 'templateUrl' || key == 'styleUrls';
+    })
+    // Get the full text of the initializer.
+    .forEach((node: ts.PropertyAssignment) => {
+      const key = _getContentOfKeyLiteral(sourceFile, node.name);
+
+      if (key == 'templateUrl') {
+        refactor.replaceNode(node,
+          `template: require(${node.initializer.getFullText(sourceFile)})`);
+      } else if (key == 'styleUrls') {
+        const arr = <ts.ArrayLiteralExpression[]>(
+          refactor.findAstNodes(node, ts.SyntaxKind.ArrayLiteralExpression, false));
+        if (!arr || arr.length == 0 || arr[0].elements.length == 0) {
+          return;
+        }
+
+        const initializer = arr[0].elements.map((element: ts.Expression) => {
+          return element.getFullText(sourceFile);
+        });
+        refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
+      }
+    });
+}
+
+
+function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
+  const diagnostics = refactor.getDiagnostics();
+
+  if (diagnostics.length > 0) {
+    const message = diagnostics
+      .map(diagnostic => {
+        const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+        const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+        return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
+      })
+      .join('\n');
+    throw new Error(message);
   }
-
-  // Force a few compiler options to make sure we get the result we want.
-  const compilerOptions: ts.CompilerOptions = Object.assign({}, plugin.compilerOptions, {
-    inlineSources: true,
-    inlineSourceMap: false,
-    sourceRoot: plugin.basePath
-  });
-
-  const result = ts.transpileModule(sourceText, { compilerOptions, fileName });
-  return {
-    outputText: result.outputText,
-    sourceMap: JSON.parse(result.sourceMapText)
-  };
 }
+
 
 // Super simple TS transpiler loader for testing / isolated usage. does not type check!
 export function ngcLoader(source: string) {
   this.cacheable();
+  const cb: any = this.async();
+  const sourceFileName: string = this.resourcePath;
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
   // We must verify that AotPlugin is an instance of the right class.
   if (plugin && plugin instanceof AotPlugin) {
-    const cb: any = this.async();
+    const refactor = new TypeScriptFileRefactor(
+      sourceFileName, plugin.compilerHost, plugin.program);
 
     Promise.resolve()
-      .then(() => _removeDecorators(this.resource, source))
-      .then(sourceText => _replaceBootstrap(this.resource, sourceText, plugin))
-      .then(sourceText => {
-        const result = _transpile(plugin, this.resourcePath, sourceText);
+      .then(() => {
+        if (!plugin.skipCodeGeneration) {
+          return Promise.resolve()
+            .then(() => _removeDecorators(refactor))
+            .then(() => _replaceBootstrap(plugin, refactor));
+        } else {
+          return _replaceResources(refactor);
+        }
+      })
+      .then(() => {
+        if (plugin.typeCheck) {
+          _checkDiagnostics(refactor);
+        }
+      })
+      .then(() => {
+        // Force a few compiler options to make sure we get the result we want.
+        const compilerOptions: ts.CompilerOptions = Object.assign({}, plugin.compilerOptions, {
+          inlineSources: true,
+          inlineSourceMap: false,
+          sourceRoot: plugin.basePath
+        });
+
+        const result = refactor.transpile(compilerOptions);
         cb(null, result.outputText, result.sourceMap);
       })
       .catch(err => cb(err));
   } else {
-    return ts.transpileModule(source, {
-      compilerOptions: {
-        target: ts.ScriptTarget.ES5,
-        module: ts.ModuleKind.ES2015,
+    const options = loaderUtils.parseQuery(this.query);
+    const tsConfigPath = options.tsConfigPath;
+    const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+
+    if (tsConfig.error) {
+      throw tsConfig.error;
+    }
+
+    const compilerOptions: ts.CompilerOptions = tsConfig.config.compilerOptions;
+    for (const key of Object.keys(options)) {
+      if (key == 'tsConfigPath') {
+        continue;
       }
-    }).outputText;
+      compilerOptions[key] = options[key];
+    }
+    const compilerHost = ts.createCompilerHost(compilerOptions);
+    const refactor = new TypeScriptFileRefactor(sourceFileName, compilerHost);
+    _replaceResources(refactor);
+
+    const result = refactor.transpile(compilerOptions);
+    // Webpack is going to take care of this.
+    result.outputText = result.outputText.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+    cb(null, result.outputText, result.sourceMap);
   }
 }
