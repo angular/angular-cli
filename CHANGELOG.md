@@ -1,3 +1,24 @@
+<a name="1.0.0-beta.21"></a>
+# [1.0.0-beta.21](https://github.com/angular/angular-cli/compare/v1.0.0-beta.20-1...v1.0.0-beta.21) (2016-11-23)
+
+
+### Bug Fixes
+
+* **angular-cli:** add necessary dependencies. ([#3152](https://github.com/angular/angular-cli/issues/3152)) ([8f574e4](https://github.com/angular/angular-cli/commit/8f574e4)), closes [#3148](https://github.com/angular/angular-cli/issues/3148)
+* **angular-cli:** add necessary dependency. ([f7704b0](https://github.com/angular/angular-cli/commit/f7704b0))
+* **angular-cli:** change version of webpack plugin. ([07e96ea](https://github.com/angular/angular-cli/commit/07e96ea))
+* **aot:** lock the angular version to 2.2.1. ([#3242](https://github.com/angular/angular-cli/issues/3242)) ([6e8a848](https://github.com/angular/angular-cli/commit/6e8a848))
+* **editorconfig:** use off instead of 0 for max line length ([#3186](https://github.com/angular/angular-cli/issues/3186)) ([f833d25](https://github.com/angular/angular-cli/commit/f833d25))
+* **generate:** revert change to component dir in generate module, as it caused component declaration to go to parent module ([#3158](https://github.com/angular/angular-cli/issues/3158)) ([71bf855](https://github.com/angular/angular-cli/commit/71bf855))
+* **github-pages-deploy:** Show more accurate url ([#3160](https://github.com/angular/angular-cli/issues/3160)) ([a431389](https://github.com/angular/angular-cli/commit/a431389))
+
+
+### Features
+
+* **build:** add sourcemap option ([#3113](https://github.com/angular/angular-cli/issues/3113)) ([6f9d2c1](https://github.com/angular/angular-cli/commit/6f9d2c1))
+
+
+
 <a name="1.0.0-beta.20"></a>
 # [1.0.0-beta.20](https://github.com/angular/angular-cli/compare/v1.0.0-beta.19...v1.0.0-beta.20-1) (2016-11-16)
 
