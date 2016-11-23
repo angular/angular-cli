@@ -1,6 +1,6 @@
 {
   "name": "@angular-cli/base-href-webpack",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Base HREF Webpack plugin",
   "main": "./src/index.js",
   "keywords": [
