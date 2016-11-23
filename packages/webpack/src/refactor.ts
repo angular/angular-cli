@@ -7,7 +7,7 @@ const MagicString = require('magic-string');
 
 export interface TranspileOutput {
   outputText: string;
-  sourceMap: any;
+  sourceMap?: any;
 }
 
 export class TypeScriptFileRefactor {
@@ -161,21 +161,27 @@ export class TypeScriptFileRefactor {
       fileName: this._fileName
     });
 
-    const consumer = new SourceMapConsumer(JSON.parse(result.sourceMapText));
-    const map = SourceMapGenerator.fromSourceMap(consumer);
-    if (this._changed) {
-      const sourceMap = this._sourceString.generateMap({
-        file: this._fileName.replace(/\.ts$/, '.js'),
-        source: this._fileName,
-        hires: true,
-        includeContent: true,
-      });
-      map.applySourceMap(new SourceMapConsumer(sourceMap));
-    }
+    if (result.sourceMapText) {
+      const consumer = new SourceMapConsumer(JSON.parse(result.sourceMapText));
+      const map = SourceMapGenerator.fromSourceMap(consumer);
+      if (this._changed) {
+        const sourceMap = this._sourceString.generateMap({
+          file: this._fileName.replace(/\.ts$/, '.js'),
+          source: this._fileName,
+          hires: true,
+          includeContent: true,
+        });
+        map.applySourceMap(new SourceMapConsumer(sourceMap));
+      }
 
-    return {
-      outputText: result.outputText,
-      sourceMap: map.toJSON()
-    };
+      return {
+        outputText: result.outputText,
+        sourceMap: map.toJSON()
+      };
+    } else {
+      return {
+        outputText: result.outputText
+      };
+    }
   }
 }

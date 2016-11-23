@@ -3,6 +3,9 @@ import * as ts from 'typescript';
 import {AotPlugin} from './plugin';
 import {TypeScriptFileRefactor} from './refactor';
 
+const loaderUtils = require('loader-utils');
+
+
 function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
   if (node.kind == ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
@@ -83,7 +86,7 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
   refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
 }
 
-function _replaceResources(refactor: TypeScriptFileRefactor) {
+function _replaceResources(refactor: TypeScriptFileRefactor): void {
   const sourceFile = refactor.sourceFile;
 
   // Find all object literals.
@@ -143,12 +146,11 @@ function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
 // Super simple TS transpiler loader for testing / isolated usage. does not type check!
 export function ngcLoader(source: string) {
   this.cacheable();
+  const cb: any = this.async();
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
   // We must verify that AotPlugin is an instance of the right class.
   if (plugin && plugin instanceof AotPlugin) {
-    const cb: any = this.async();
-
     const refactor = new TypeScriptFileRefactor(
       this.resourcePath, plugin.compilerHost, plugin.program);
 
@@ -180,11 +182,26 @@ export function ngcLoader(source: string) {
       })
       .catch(err => cb(err));
   } else {
-    return ts.transpileModule(source, {
-      compilerOptions: {
-        target: ts.ScriptTarget.ES5,
-        module: ts.ModuleKind.ES2015,
+    const options = loaderUtils.parseQuery(this.query);
+    const tsConfigPath = options.tsConfigPath;
+    const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+
+    if (tsConfig.error) {
+      throw tsConfig.error;
+    }
+
+    const compilerOptions = tsConfig.config.compilerOptions as ts.CompilerOptions;
+    for (const key of Object.keys(options)) {
+      if (key == 'tsConfigPath') {
+        continue;
       }
-    }).outputText;
+      compilerOptions[key] = options[key];
+    }
+    const compilerHost = ts.createCompilerHost(compilerOptions);
+    const refactor = new TypeScriptFileRefactor(this.resourcePath, compilerHost);
+    _replaceResources(refactor);
+
+    const result = refactor.transpile(compilerOptions);
+    cb(null, result.outputText, result.sourceMap);
   }
 }

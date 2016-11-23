@@ -83,14 +83,11 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
             {
               loader: webpackLoader,
               query: {
-                tsconfig: path.resolve(appRoot, appConfig.tsconfig),
+                tsConfigPath: path.resolve(appRoot, appConfig.tsconfig),
                 module: 'commonjs',
-                target: 'es5',
-                forkChecker: true
+                inlineSourceMap: true,
+                sourceRoot: appRoot
               }
-            },
-            {
-              loader: 'angular2-template-loader'
             }
           ],
           exclude: [/\.e2e\.ts$/]
