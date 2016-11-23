@@ -35,5 +35,5 @@ The loader works with the webpack plugin to compile your TypeScript. It's import
 * `basePath`. Optional. The root to use by the compiler to resolve file paths. By default, use the `tsConfigPath` root.
 * `entryModule`. Optional if specified in `angularCompilerOptions`. The path and classname of the main application module. This follows the format `path/to/file#ClassName`.
 * `mainPath`. Optional if `entryModule` is specified. The `main.ts` file containing the bootstrap code. The plugin will use AST to determine the `entryModule`.
-* `genDir`. Optional. The output directory of the offline compiler. The files created by the offline compiler will be in a virtual file system, but the import paths might change. This can also be specified in `angularCompilerOptions`, and by default will be the same as `basePath`.
+* `skipCodeGeneration`. Optional, defaults to false. Disable code generation and do not refactor the code to bootstrap. This replaces `templateUrl: "string"` with `template: require("string")` (and similar for styles) to allow for webpack to properly link the resources.
 * `typeChecking`. Optional, defaults to true. Enable type checking through your application. This will slow down compilation, but show syntactic and semantic errors in webpack.

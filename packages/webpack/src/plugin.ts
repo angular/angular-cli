@@ -12,6 +12,8 @@ import {createResolveDependenciesFromContextMap} from './utils';
 import {WebpackCompilerHost} from './compiler_host';
 import {resolveEntryModuleFromMain} from './entry_resolver';
 import {StaticSymbol} from '@angular/compiler-cli';
+import {Tapable} from './webpack';
+import {PathsPlugin} from './paths-plugin';
 
 
 /**
@@ -23,6 +25,8 @@ export interface AotPluginOptions {
   entryModule?: string;
   mainPath?: string;
   typeChecking?: boolean;
+
+  skipCodeGeneration?: boolean;
 }
 
 
@@ -52,7 +56,7 @@ export class ModuleRoute {
 }
 
 
-export class AotPlugin {
+export class AotPlugin implements Tapable {
   private _entryModule: ModuleRoute;
   private _compilerOptions: ts.CompilerOptions;
   private _angularCompilerOptions: ngCompiler.AngularCompilerOptions;
@@ -63,12 +67,14 @@ export class AotPlugin {
   private _compilerHost: WebpackCompilerHost;
   private _resourceLoader: WebpackResourceLoader;
   private _lazyRoutes: { [route: string]: string };
+  private _tsConfigPath: string;
 
   private _donePromise: Promise<void>;
   private _compiler: any = null;
   private _compilation: any = null;
 
   private _typeCheck: boolean = true;
+  private _skipCodeGeneration: boolean = false;
   private _basePath: string;
   private _genDir: string;
 
@@ -85,6 +91,7 @@ export class AotPlugin {
   get entryModule() { return this._entryModule; }
   get genDir() { return this._genDir; }
   get program() { return this._program; }
+  get skipCodeGeneration() { return this._skipCodeGeneration; }
   get typeCheck() { return this._typeCheck; }
 
   private _setupOptions(options: AotPluginOptions) {
@@ -92,17 +99,18 @@ export class AotPlugin {
     if (!options.hasOwnProperty('tsConfigPath')) {
       throw new Error('Must specify "tsConfigPath" in the configuration of @ngtools/webpack.');
     }
+    this._tsConfigPath = options.tsConfigPath;
 
     // Check the base path.
-    let basePath = path.resolve(process.cwd(), path.dirname(options.tsConfigPath));
-    if (fs.statSync(options.tsConfigPath).isDirectory()) {
-      basePath = options.tsConfigPath;
+    let basePath = path.resolve(process.cwd(), path.dirname(this._tsConfigPath));
+    if (fs.statSync(this._tsConfigPath).isDirectory()) {
+      basePath = this._tsConfigPath;
     }
     if (options.hasOwnProperty('basePath')) {
       basePath = options.basePath;
     }
 
-    const tsConfig = tsc.readConfiguration(options.tsConfigPath, basePath);
+    const tsConfig = tsc.readConfiguration(this._tsConfigPath, basePath);
     this._rootFilePath = tsConfig.parsed.fileNames
       .filter(fileName => !/\.spec\.ts$/.test(fileName));
 
@@ -134,6 +142,9 @@ export class AotPlugin {
     if (options.hasOwnProperty('typeChecking')) {
       this._typeCheck = options.typeChecking;
     }
+    if (options.hasOwnProperty('skipCodeGeneration')) {
+      this._skipCodeGeneration = options.skipCodeGeneration;
+    }
 
     this._compilerHost = new WebpackCompilerHost(this._compilerOptions);
     this._program = ts.createProgram(
@@ -148,13 +159,19 @@ export class AotPlugin {
     this._compiler = compiler;
 
     compiler.plugin('context-module-factory', (cmf: any) => {
+      cmf.resolvers.normal.apply(new PathsPlugin({
+        tsConfigPath: this._tsConfigPath,
+        compilerOptions: this._compilerOptions,
+        compilerHost: this._compilerHost
+      }));
+
       cmf.plugin('before-resolve', (request: any, callback: (err?: any, request?: any) => void) => {
         if (!request) {
           return callback();
         }
 
         request.request = this.genDir;
-        request.recursive =  true;
+        request.recursive = true;
         request.dependencies.forEach((d: any) => d.critical = false);
         return callback(null, request);
       });
@@ -171,7 +188,7 @@ export class AotPlugin {
             (_: any, cb: any) => cb(null, this._lazyRoutes));
 
           return callback(null, result);
-        });
+        }).catch((err) => callback(err));
       });
     });
 
@@ -210,26 +227,37 @@ export class AotPlugin {
       basePath: this.basePath
     };
 
-    // Create the Code Generator.
-    const codeGenerator = ngCompiler.CodeGenerator.create(
-      this._angularCompilerOptions,
-      i18nOptions,
-      this._program,
-      this._compilerHost,
-      new ngCompiler.NodeReflectorHostContext(this._compilerHost),
-      this._resourceLoader
-    );
+    let promise = Promise.resolve();
+    if (!this._skipCodeGeneration) {
+      // Create the Code Generator.
+      const codeGenerator = ngCompiler.CodeGenerator.create(
+        this._angularCompilerOptions,
+        i18nOptions,
+        this._program,
+        this._compilerHost,
+        new ngCompiler.NodeReflectorHostContext(this._compilerHost),
+        this._resourceLoader
+      );
 
-    // We need to temporarily patch the CodeGenerator until either it's patched or allows us
-    // to pass in our own ReflectorHost.
-    patchReflectorHost(codeGenerator);
-    this._donePromise = codeGenerator.codegen({transitiveModules: true})
+      // We need to temporarily patch the CodeGenerator until either it's patched or allows us
+      // to pass in our own ReflectorHost.
+      // TODO: remove this.
+      patchReflectorHost(codeGenerator);
+      promise = promise.then(() => codeGenerator.codegen({
+        transitiveModules: true
+      }));
+    }
+
+    this._donePromise = promise
       .then(() => {
         // Create a new Program, based on the old one. This will trigger a resolution of all
         // transitive modules, which include files that might just have been generated.
+        // This needs to happen after the code generator has been created for generated files
+        // to be properly resolved.
         this._program = ts.createProgram(
           this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
-
+      })
+      .then(() => {
         const diagnostics = this._program.getGlobalDiagnostics();
         if (diagnostics.length > 0) {
           const message = diagnostics
@@ -255,7 +283,11 @@ export class AotPlugin {
         Object.keys(allLazyRoutes)
           .forEach(k => {
             const lazyRoute = allLazyRoutes[k];
-            this._lazyRoutes[k + '.ngfactory'] = lazyRoute.moduleAbsolutePath + '.ngfactory.ts';
+            if (this.skipCodeGeneration) {
+              this._lazyRoutes[k] = lazyRoute.moduleAbsolutePath;
+            } else {
+              this._lazyRoutes[k + '.ngfactory'] = lazyRoute.moduleAbsolutePath + '.ngfactory.ts';
+            }
           });
       })
       .then(() => cb(), (err: any) => { cb(err); });
