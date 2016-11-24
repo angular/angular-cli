@@ -1,0 +1,15 @@
+#Change versions
+- There is a main `package.json` which should keep with the latest angular-cli version (e.g. `1.0.0-beta.17`).
+- There is one `package.json` per packages. Update the version of every packages independently.
+- Run the CHANGELOG script.
+  - `node ./scripts/publish/changelog.js OLD_VERSION_TAG`
+  - (for example, `v1.0.0-beta.17`)
+- Create a commit. The commit message should be only the version number starting with a v.
+- Create a tag. The tag should be only the version number starting with a v.
+- Push to upstream with tags.
+  - `git push master`
+  - `git push --tags`
+- Publish to npm
+  - `cd ./dist/angular-cli`
+  - `npm publish --tag experimental` (install it with `npm install -g universal-cli@experimental` and test it)
+  - `npm publish` (the new version is now available at npm)
