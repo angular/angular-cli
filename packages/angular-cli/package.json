@@ -6,7 +6,7 @@
   "main": "lib/cli/index.js",
   "trackingCode": "xx-xxxxxxx-xx",
   "bin": {
-    "ng": "./bin/ng"
+    "ung": "./bin/ung"
   },
   "keywords": [
     "ember-addon"

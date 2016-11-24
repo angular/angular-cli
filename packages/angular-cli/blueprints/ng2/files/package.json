@@ -4,9 +4,9 @@
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
-    "start": "ng serve",
+    "start": "ung serve",
     "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
-    "test": "ng test",
+    "test": "ung test",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor"
   },

@@ -20,7 +20,7 @@ var existsSync = require('exists-sync');
 
 var defaultIgnoredFiles = Blueprint.ignoredFiles;
 
-describe('Acceptance: ng init', function () {
+describe('Acceptance: ung init', function () {
   this.timeout(20000);
 
   beforeEach(function () {
@@ -111,7 +111,7 @@ describe('Acceptance: ng init', function () {
     });
   }
 
-  it('ng init', function () {
+  it('ung init', function () {
     return ng([
       'init',
       '--skip-npm',
@@ -119,11 +119,11 @@ describe('Acceptance: ng init', function () {
     ]).then(confirmBlueprinted);
   });
 
-  it('ng init with mobile flag does throw exception', function () {
+  it('ung init with mobile flag does throw exception', function () {
     expect(ng(['init', '--mobile'])).to.throw;
   });
 
-  it('ng init --universal', () => {
+  it('ung init --universal', () => {
     return ng([
       'init',
       '--skip-npm',
@@ -132,7 +132,7 @@ describe('Acceptance: ng init', function () {
     ]).then(() => confirmBlueprinted(['universal']));
   });
 
-  it('ng init can run in created folder', function () {
+  it('ung init can run in created folder', function () {
     return tmp.setup('./tmp/foo')
       .then(function () {
         process.chdir('./tmp/foo');
@@ -208,7 +208,7 @@ describe('Acceptance: ng init', function () {
       .then(confirmBlueprinted);
   });
 
-  it('ng init --inline-template does not generate a template file', () => {
+  it('ung init --inline-template does not generate a template file', () => {
     return ng(['init', '--skip-npm', '--skip-git', '--inline-template'])
       .then(() => {
         const templateFile = path.join('src', 'app', 'app.component.html');
@@ -216,7 +216,7 @@ describe('Acceptance: ng init', function () {
       });
   });
 
-  it('ng init --inline-style does not gener a style file', () => {
+  it('ung init --inline-style does not gener a style file', () => {
     return ng(['init', '--skip-npm', '--skip-git', '--inline-style'])
       .then(() => {
         const styleFile = path.join('src', 'app', 'app.component.css');

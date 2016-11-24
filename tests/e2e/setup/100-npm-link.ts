@@ -34,5 +34,5 @@ export default function (argv: any) {
       .then(() => npm('link'))
       .then(() => process.chdir(oldCwd));
     })
-    .then(() => exec(process.platform.startsWith('win') ? 'where' : 'which', 'ng'));
+    .then(() => exec(process.platform.startsWith('win') ? 'where' : 'which', 'ung'));
 }

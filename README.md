@@ -75,52 +75,52 @@ npm install -g universal-cli
 ## Usage
 
 ```bash
-ng --help
+ung --help
 ```
 
 ### Generating and serving an Angular2 project via a development server
 
 ```bash
-ng new PROJECT_NAME
+ung new PROJECT_NAME
 cd PROJECT_NAME
-ng serve
+ung serve
 ```
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
 
 ```bash
-ng serve --host 0.0.0.0 --port 4201 --live-reload-port 49153
+ung serve --host 0.0.0.0 --port 4201 --live-reload-port 49153
 ```
 
 ### Generating Components, Directives, Pipes and Services
 
-You can use the `ng generate` (or just `ng g`) command to generate Angular components:
+You can use the `ung generate` (or just `ung g`) command to generate Angular components:
 
 ```bash
-ng generate component my-new-component
-ng g component my-new-component # using the alias
+ung generate component my-new-component
+ung g component my-new-component # using the alias
 
 # components support relative path generation
 # if in the directory src/app/feature/ and you run
-ng g component new-cmp
+ung g component new-cmp
 # your component will be generated in src/app/feature/new-cmp
 # but if you were to run
-ng g component ../newer-cmp
+ung g component ../newer-cmp
 # your component will be generated in src/app/newer-cmp
 ```
 You can find all possible blueprints in the table below:
 
 Scaffold  | Usage
 ---       | ---
-Component | `ng g component my-new-component`
-Directive | `ng g directive my-new-directive`
-Pipe      | `ng g pipe my-new-pipe`
-Service   | `ng g service my-new-service`
-Class     | `ng g class my-new-class`
-Interface | `ng g interface my-new-interface`
-Enum      | `ng g enum my-new-enum`
-Module    | `ng g module my-module`
+Component | `ung g component my-new-component`
+Directive | `ung g directive my-new-directive`
+Pipe      | `ung g pipe my-new-pipe`
+Service   | `ung g service my-new-service`
+Class     | `ung g class my-new-class`
+Interface | `ung g interface my-new-interface`
+Enum      | `ung g enum my-new-enum`
+Module    | `ung g module my-module`
 
 ### Generating a route
 
@@ -131,14 +131,14 @@ You can read the official documentation for the new Router here: https://angular
 ### Creating a build
 
 ```bash
-ng build
+ung build
 ```
 
 The build artifacts will be stored in the `dist/` directory.
 
 ### Build Targets and Environment Files
 
-`ng build` can specify both a build target (`--target=production` or `--target=development`) and an
+`ung build` can specify both a build target (`--target=production` or `--target=development`) and an
 environment file to be used with that build (`--environment=dev` or `--environment=prod`).
 By default, the development build target and environment are used.
 
@@ -157,14 +157,14 @@ it will default to `dev` for `development` and `prod` for `production`.
 
 ```bash
 # these are equivalent
-ng build --target=production --environment=prod
-ng build --prod --env=prod
-ng build --prod
+ung build --target=production --environment=prod
+ung build --prod --env=prod
+ung build --prod
 # and so are these
-ng build --target=development --environment=dev
-ng build --dev --e=dev
-ng build --dev
-ng build
+ung build --target=development --environment=dev
+ung build --dev --e=dev
+ung build --dev
+ung build
 ```
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
@@ -178,19 +178,19 @@ When building you can modify base tag (`<base href="/">`) in your index.html wit
 
 ```bash
 # Sets base tag href to /myUrl/ in your index.html
-ng build --base-href /myUrl/
-ng build --bh /myUrl/
+ung build --base-href /myUrl/
+ung build --bh /myUrl/
 ```
 
 ### Bundling
 
-All builds make use of bundling, and using the `--prod` flag in  `ng build --prod`
-or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
+All builds make use of bundling, and using the `--prod` flag in  `ung build --prod`
+or `ung serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ### Running unit tests
 
 ```bash
-ng test
+ung test
 ```
 
 Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false` or `--single-run`.
@@ -198,10 +198,10 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 ### Running end-to-end tests
 
 ```bash
-ng e2e
+ung e2e
 ```
 
-Before running the tests make sure you are serving the app via `ng serve`.
+Before running the tests make sure you are serving the app via `ung serve`.
 
 End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
@@ -238,7 +238,7 @@ now run it with `npm start`
 You can deploy your apps quickly via:
 
 ```bash
-ng github-pages:deploy --message "Optional commit message"
+ung github-pages:deploy --message "Optional commit message"
 ```
 
 This will do the following:
@@ -258,7 +258,7 @@ To simplify the authentication, be sure to [setup your ssh keys](https://help.gi
 If you are deploying a [user or organization page](https://help.github.com/articles/user-organization-and-project-pages/), you can instead use the following command:
 
 ```bash
-ng github-pages:deploy --user-page --message "Optional commit message"
+ung github-pages:deploy --user-page --message "Optional commit message"
 ```
 
 This command pushes the app to the `master` branch on the github repo instead
@@ -267,7 +267,7 @@ of pushing to `gh-pages`, since user and organization pages require this.
 
 ### Linting and formatting code
 
-You can lint your app code by running `ng lint`.
+You can lint your app code by running `ung lint`.
 This will use the `lint` npm script that in generated projects uses `tslint`.
 
 You can modify the these scripts in `package.json` to run whatever tool you prefer.
@@ -276,20 +276,20 @@ You can modify the these scripts in `package.json` to run whatever tool you pref
 
 **The `--mobile` flag has been disabled temporarily. Sorry for the inconvenience.**
 
-~~Angular-CLI includes support for offline applications via the `--mobile` flag on `ng new`. Support is experimental, 
+~~Angular-CLI includes support for offline applications via the `--mobile` flag on `ung new`. Support is experimental, 
 please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.~~
 
 ### Support for server side rendering
 
-**Angular-CLI includes Angular Universal via the `--universal` flag on `ng new` and `ng init`.**
+**Angular-CLI includes Angular Universal via the `--universal` flag on `ung new` and `ung init`.**
 
 **Angular Universal** helps you to seo optimize your application and offers a better user experience through server side rendering.
 Please see the **angular/universal** project and https://universal.angular.io/ for documentation on how to make use of this functionality.
 
 #### Update an existing Project
 
-`cd path/to/project` and init your project with the universal option `ng init --universal`. Take every Pipe, Directive, Component, Module and Routes from `./src/app/app.module.ts`
-and move them to `./src/app/app.browser.module.ts` and `./src/app/app.node.module.ts`. Try `ng serve`, if your application looks like before, then you can delete the files
+`cd path/to/project` and init your project with the universal option `ung init --universal`. Take every Pipe, Directive, Component, Module and Routes from `./src/app/app.module.ts`
+and move them to `./src/app/app.browser.module.ts` and `./src/app/app.node.module.ts`. Try `ung serve`, if your application looks like before, then you can delete the files
 `./src/app/app.module.ts` and `./src/main.ts`. **Have fun with Angular Universal!**
 
 ### Commands autocompletion
@@ -298,19 +298,19 @@ To turn on auto completion use the following commands:
 
 For bash:
 ```bash
-ng completion 1>> ~/.bashrc 2>>&1
+ung completion 1>> ~/.bashrc 2>>&1
 source ~/.bashrc
 ```
 
 For zsh:
 ```bash
-ng completion 1>> ~/.zshrc 2>>&1
+ung completion 1>> ~/.zshrc 2>>&1
 source ~/.zshrc
 ```
 
 Windows users using gitbash:
 ```bash
-ng completion 1>> ~/.bash_profile 2>>&1
+ung completion 1>> ~/.bash_profile 2>>&1
 source ~/.bash_profile
 ```
 
@@ -358,13 +358,13 @@ When generating a new project you can also define which extension you want for
 style files:
 
 ```bash
-ng new sassy-project --style=sass
+ung new sassy-project --style=sass
 ```
 
 Or set the default style on an existing project:
 
 ```bash
-ng set defaults.styleExt scss
+ung set defaults.styleExt scss
 ```
 
 ### 3rd Party Library Installation
@@ -422,7 +422,7 @@ Finally add the Bootstrap CSS to the `apps[0].styles` array:
 ],
 ```
 
-Restart `ng serve` if you're running it, and Bootstrap 4 should be working on
+Restart `ung serve` if you're running it, and Bootstrap 4 should be working on
 your app.
 
 ### Updating angular-cli
@@ -441,12 +441,12 @@ Local project package:
 rm -rf node_modules dist tmp
 npm install --save-dev angular-cli@latest
 npm install
-ng init
+ung init
 ```
 
-Running `ng init` will check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
+Running `ung init` will check for changes in all the auto-generated files created by `ung new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
 
-Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng init` finishes.
+Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ung init` finishes.
 
 **The main cause of errors after an update is failing to incorporate these updates into your code**.
 
@@ -471,10 +471,10 @@ allowing you to quickly test any changes you make to the cli project.
 Now you can use `angular-cli` via the command line:
 
 ```bash
-ng new foo
+ung new foo
 cd foo
 npm link angular-cli
-ng serve
+ung serve
 ```
 
 `npm link angular-cli` is needed because by default the globally installed `angular-cli` just loads
@@ -483,7 +483,7 @@ the local `angular-cli` from the project which was fetched remotely from npm.
 Now the `angular-cli` you cloned before is in three places:
 The folder you cloned it into, npm's folder where it stores global packages and the `angular-cli` project you just created.
 
-You can also use `ng new foo --link-cli` to automatically link the `angular-cli` package.
+You can also use `ung new foo --link-cli` to automatically link the `angular-cli` package.
 
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.

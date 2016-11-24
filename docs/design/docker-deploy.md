@@ -15,11 +15,11 @@ Provide tasks for common Docker workflows:
 
 1. Requires user to have Docker CLI tools installed.
    (See also: ["Implementation Approaches"](#implementation-approaches))
-1. User is free to use the Angular CLI without Docker (and vice versa). By default, do not generate Docker files upon creation of a new project (`ng new`, `ng init`).
+1. User is free to use the Angular CLI without Docker (and vice versa). By default, do not generate Docker files upon creation of a new project (`ung new`, `ung init`).
 1. Don't recreate the wheel. Docker CLI tools are very full featured on their own. Implement the common Docker use cases that make it convenient for Angular applications.
 1. Don't inhibit users from using the standalone Docker CLI tools for other use cases.
 1. Assumes 1:1 Dockerfile with the Angular project. Support for multiple services under the same project is outside the scope of this initial design.
-1. Generated starter Dockerfile will use an Nginx base image for the default server. The built ng app and Nginx configuration for HTML5 Fallback will be copied into the image.
+1. Generated starter Dockerfile will use an Nginx base image for the default server. The built ung app and Nginx configuration for HTML5 Fallback will be copied into the image.
 1. User is free to modify and customize all generated files directly without involvement by the Angular CLI.
 1. Image builds will support all Docker build options.
 1. Container deploys will support all Docker run options.
@@ -37,22 +37,22 @@ Provide tasks for common Docker workflows:
 
 Initialize the project for Docker builds and deploys:
 ```
-$ ng docker init [--environment env]
+$ ung docker init [--environment env]
 ```
 
 Build and push a Docker image of the Angular app to the registry:
 ```
-$ ng docker push [--registry url]
+$ ung docker push [--registry url]
 ```
 
 Deploy and run the Angular app on a Docker Machine:
 ```
-$ ng docker deploy [--environment env]
+$ ung docker deploy [--environment env]
 ```
 
 ### Command - Docker Init
 
-The command `ng docker init` generates starter `Dockerfile`, `.dockerignore`, and `docker-compose.yml` files for builds and and deploys.
+The command `ung docker init` generates starter `Dockerfile`, `.dockerignore`, and `docker-compose.yml` files for builds and and deploys.
 
 Most users will start with one local 'default' Docker Machine (Mac/Win), or a local native Docker environment on Linux, where they will perform builds and run containers for development testing. Without additional arguments, this command prepares the Angular project for working with that default environment.
 
@@ -70,7 +70,7 @@ Most users will start with one local 'default' Docker Machine (Mac/Win), or a lo
 **Example - Init default environment:**
 
 ```bash
-$ ng docker:init --image-org my-username
+$ ung docker:init --image-org my-username
 
 Generated 'Dockerfile'
 Generated '.dockerignore'
@@ -79,10 +79,10 @@ Generated 'docker-compose.yml'
 Docker is ready!
 
 You can build and push a Docker image of your application to a docker registry using:
-  $ ng docker push
+  $ ung docker push
 
 Build and run your application using:
-  $ ng docker deploy
+  $ ung docker deploy
 ```
 
 **Other requirements:**
@@ -153,16 +153,16 @@ services:
 
 The `\${NG_APP_IMAGE}` is a Compose variable, not an Angilar CLI var. It will be substituted during a `docker deploy` command with an environment variable of the desired tag. (See [Compose Variable Substitution](https://docs.docker.com/compose/compose-file/#variable-substitution) for more info)
 
-Separate `docker-compose-{environment}.yml` files are used to deploy to different [environments](https://docs.docker.com/compose/extends/#example-use-case), for use with the `ng docker deploy` command.
+Separate `docker-compose-{environment}.yml` files are used to deploy to different [environments](https://docs.docker.com/compose/extends/#example-use-case), for use with the `ung docker deploy` command.
 
 
 ### Command - Docker Push
 
-The command `ng docker push` builds a Docker image of the Angular app from the `Dockerfile`, and pushes the image with a new tag to a registry address.
+The command `ung docker push` builds a Docker image of the Angular app from the `Dockerfile`, and pushes the image with a new tag to a registry address.
 
 Example - Build and push (with auth):
 ```bash
-$ ng docker push --tag 1.0.0 --tag-latest
+$ ung docker push --tag 1.0.0 --tag-latest
 Building image...
 Tagging "1.0.0"...
 Tagging "latest"
@@ -194,7 +194,7 @@ The `--no-cache`, `--force-rm`, and `--pull` are [compose build options](https:/
 
 Try an initial push. If an authentication failure occurs, attempt to login via `docker login`, or with `aws ecr get-login` (if the registry address matches `/\.dkr\.ecr\./`). Proxy the CLI input to the login commands. Avoid storing any authentication values in ngConfig.
 
-The `serviceName`, `registryAddress`, `orgName`, and `imageName` defaults will first be retrieved from ngConfig, which were saved during the initial `ng docker init` command. If any of these values do not exist, warn the user with instructions to add via `ng docker init` or `ng set name=value`.
+The `serviceName`, `registryAddress`, `orgName`, and `imageName` defaults will first be retrieved from ngConfig, which were saved during the initial `ung docker init` command. If any of these values do not exist, warn the user with instructions to add via `ung docker init` or `ung set name=value`.
 
 #### Internal Steps
 
@@ -210,13 +210,13 @@ The `serviceName`, `registryAddress`, `orgName`, and `imageName` defaults will f
 
 ### Command - Docker Deploy
 
-The command `ng docker deploy` will deploy an environment's compose configuration to a Docker Machine. It starts the containers in the background and leaves them running.
+The command `ung docker deploy` will deploy an environment's compose configuration to a Docker Machine. It starts the containers in the background and leaves them running.
 
-Consider a command alias: `ng docker run`.
+Consider a command alias: `ung docker run`.
 
 Example - Default environment deploy:
 ```bash
-$ ng docker deploy
+$ ung docker deploy
 Building...
 Deploying to default environment...
 Deploy complete!
@@ -224,13 +224,13 @@ Deploy complete!
 
 Example - Deploying to a named environment, without builds:
 ```bash
-$ ng docker:deploy --environment stage
-$ ng docker:deploy --environment prod --tag 1.0.1
+$ ung docker:deploy --environment stage
+$ ung docker:deploy --environment prod --tag 1.0.1
 ```
 
 Example - Deploying a specific service from the compose file:
 ```bash
-$ ng docker deploy --services my-ng-app
+$ ung docker deploy --services my-ng-app
 ```
 
 #### Options
@@ -299,7 +299,7 @@ Example ngConfig model for saved docker command state (per project):
 ## Other Enhancements
 
 * Ability to list the configured deploy environments.
-* Autocomplete environment names for `ng docker deploy`.
+* Autocomplete environment names for `ung docker deploy`.
 * New command wrappers for `docker-compose logs`, and `docker exec` commands.
 * Create an Angular development environment image with everything packaged inside. Users can run the container with local volume mounts, and toolset will watch/rebuild for local file changes. Only requires Docker to be installed to get started with Angular development. There are some Node.js complexities to solve when adding new package.json dependencies, and many users report issues with file watchers and docker volume mounts.
 * Deployment support to other container scheduling systems: Kubernetes, Marathon/Mesos, AWS ECS and Beanstalk, Azure Service Fabric, etc.

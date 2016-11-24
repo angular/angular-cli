@@ -14,7 +14,7 @@ const denodeify = require('denodeify');
 const readFile = denodeify(fs.readFile);
 
 
-describe('Acceptance: ng generate directive', function () {
+describe('Acceptance: ung generate directive', function () {
   beforeEach(function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
@@ -162,7 +162,7 @@ describe('Acceptance: ng generate directive', function () {
 
   it('..' + path.sep + 'my-dir from root dir will fail', () => {
     return ng(['generate', 'directive', '..' + path.sep + 'my-dir']).then(() => {
-      throw new SilentError(`ng generate directive ..${path.sep}my-dir from root dir should fail.`);
+      throw new SilentError(`ung generate directive ..${path.sep}my-dir from root dir should fail.`);
     }, (err) => {
       expect(err).to.equal(`Invalid path: "..${path.sep}my-dir" cannot be above the "src${path.sep}app" directory`);
     });

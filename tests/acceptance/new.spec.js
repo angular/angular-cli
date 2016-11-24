@@ -14,7 +14,7 @@ var util = require('util');
 var EOL = require('os').EOL;
 var SilentError = require('silent-error');
 
-describe('Acceptance: ng new', function () {
+describe('Acceptance: ung new', function () {
   beforeEach(function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
@@ -56,19 +56,19 @@ describe('Acceptance: ng new', function () {
     return confirmBlueprintedForDir('blueprints/ng2');
   }
 
-  it('ng new foo, where foo does not yet exist, works', function () {
+  it('ung new foo, where foo does not yet exist, works', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(confirmBlueprinted);
   });
 
-  it('ng new with empty app does throw exception', function () {
+  it('ung new with empty app does throw exception', function () {
     expect(ng(['new', ''])).to.throw;
   });
 
-  it('ng new without app name does throw exception', function () {
+  it('ung new without app name does throw exception', function () {
     expect(ng(['new', ''])).to.throw;
   });
 
-  it('ng new with app name creates new directory and has a dasherized package name', function () {
+  it('ung new with app name creates new directory and has a dasherized package name', function () {
     return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
       expect(!existsSync('FooApp'));
 
@@ -77,7 +77,7 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('ng new has a .editorconfig file', function () {
+  it('ung new has a .editorconfig file', function () {
     return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
       expect(!existsSync('FooApp'));
 
@@ -86,11 +86,11 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('Cannot run ng new, inside of angular-cli project', function () {
+  it('Cannot run ung new, inside of angular-cli project', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git'])
       .then(function () {
         return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git']).then(() => {
-          throw new SilentError('Cannot run ng new, inside of ember-cli project should fail.');
+          throw new SilentError('Cannot run ung new, inside of ember-cli project should fail.');
         }, () => {
           expect(!existsSync('foo'));
         })
@@ -98,13 +98,13 @@ describe('Acceptance: ng new', function () {
       .then(confirmBlueprinted);
   });
 
-  it('ng new without skip-git flag creates .git dir', function () {
+  it('ung new without skip-git flag creates .git dir', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(function () {
       expect(existsSync('.git'));
     });
   });
 
-  it('ng new with --dry-run does not create new directory', function () {
+  it('ung new with --dry-run does not create new directory', function () {
     return ng(['new', 'foo', '--dry-run']).then(function () {
       var cwd = process.cwd();
       expect(cwd).to.not.match(/foo/, 'does not change cwd to foo in a dry run');
@@ -113,7 +113,7 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('ng new with --directory uses given directory name and has correct package name', function () {
+  it('ung new with --directory uses given directory name and has correct package name', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git', '--directory=bar'])
       .then(function () {
         var cwd = process.cwd();
@@ -128,7 +128,7 @@ describe('Acceptance: ng new', function () {
       });
   });
 
-  it('ng new --inline-template does not generate a template file', () => {
+  it('ung new --inline-template does not generate a template file', () => {
     return ng(['new', 'foo', '--skip-npm', '--skip-git', '--inline-template'])
       .then(() => {
         const templateFile = path.join('src', 'app', 'app.component.html');
@@ -136,7 +136,7 @@ describe('Acceptance: ng new', function () {
       });
   });
 
-  it('ng new --inline-style does not gener a style file', () => {
+  it('ung new --inline-style does not gener a style file', () => {
     return ng(['new', 'foo', '--skip-npm', '--skip-git', '--inline-style'])
       .then(() => {
         const styleFile = path.join('src', 'app', 'app.component.css');

@@ -24,11 +24,11 @@ module.exports = function(options) {
   process.stdout.write = function (line) {
     line = line.toString();
     if (line.match(/ember-cli-(inject-)?live-reload/)) {
-      // don't replace 'ember-cli-live-reload' on ng init diffs
+      // don't replace 'ember-cli-live-reload' on ung init diffs
       return oldStdoutWrite.apply(process.stdout, arguments);
     }
     line = line.replace(/ember-cli(?!.com)/g, 'angular-cli')
-      .replace(/\bember\b(?!-cli.com)/g, 'ng');
+      .replace(/\bember\b(?!-cli.com)/g, 'ung');
     return oldStdoutWrite.apply(process.stdout, arguments);
   };
 
@@ -36,12 +36,12 @@ module.exports = function(options) {
   process.stderr.write = function (line) {
     line = line.toString()
       .replace(/ember-cli(?!.com)/g, 'angular-cli')
-      .replace(/\bember\b(?!-cli.com)/g, 'ng');
+      .replace(/\bember\b(?!-cli.com)/g, 'ung');
     return oldStderrWrite.apply(process.stdout, arguments);
   };
 
   options.cli = {
-    name: 'ng',
+    name: 'ung',
     root: path.join(__dirname, '..', '..'),
     npmPackage: 'universal-cli'
   };

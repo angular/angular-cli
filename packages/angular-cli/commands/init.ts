@@ -87,9 +87,9 @@ const InitCommand: any = Command.extend({
     const packageName = commandOptions.name !== '.' && commandOptions.name || project.name();
 
     if (!packageName) {
-      const message = 'The `ng ' + this.name + '` command requires a ' +
+      const message = 'The `ung ' + this.name + '` command requires a ' +
         'package.json in current folder with name attribute or a specified name via arguments. ' +
-        'For more details, use `ng help`.';
+        'For more details, use `ung help`.';
 
       return Promise.reject(new SilentError(message));
     }

@@ -10,7 +10,7 @@ const root = process.cwd();
 
 const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
-describe('Acceptance: ng generate class', function () {
+describe('Acceptance: ung generate class', function () {
   beforeEach(function () {
     this.timeout(10000);
     return tmp.setup('./tmp').then(function () {
@@ -24,21 +24,21 @@ describe('Acceptance: ng generate class', function () {
     return tmp.teardown('./tmp');
   });
 
-  it('ng generate class my-class', function () {
+  it('ung generate class my-class', function () {
     return ng(['generate', 'class', 'my-class']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
       expect(existsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
     });
   });
 
-  it('ng generate class my-class --no-spec', function () {
+  it('ung generate class my-class --no-spec', function () {
     return ng(['generate', 'class', 'my-class', '--no-spec']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
       expect(existsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
     });
   });
 
-  it('ng generate class my-class.model', function () {
+  it('ung generate class my-class.model', function () {
     return ng(['generate', 'class', 'my-class.model']).then(() => {
       expect(existsSync(path.join(testPath, 'my-class.model.ts'))).to.equal(true);
     });

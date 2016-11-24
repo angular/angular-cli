@@ -14,7 +14,7 @@ const denodeify = require('denodeify');
 const readFile = denodeify(fs.readFile);
 
 
-describe('Acceptance: ng generate component', function () {
+describe('Acceptance: ung generate component', function () {
   beforeEach(function () {
     this.timeout(10000);
     return tmp.setup('./tmp').then(function () {
@@ -124,7 +124,7 @@ describe('Acceptance: ng generate component', function () {
 
   it('..' + path.sep + 'my-comp from root dir will fail', () => {
     return ng(['generate', 'component', '..' + path.sep + 'my-comp']).then(() => {
-      throw new SilentError(`ng generate component ..${path.sep}my-comp from root dir should fail.`);
+      throw new SilentError(`ung generate component ..${path.sep}my-comp from root dir should fail.`);
     }, (err) => {
       expect(err).to.equal(`Invalid path: "..${path.sep}my-comp" cannot be above the "src${path.sep}app" directory`);
     });

@@ -1,9 +1,9 @@
 ###-begin-ng-completion###
 #
-# ng command completion script
+# ung command completion script
 #
-# Installation: ng completion 1>> ~/.bashrc 2>>&1
-#           or  ng completion 1>> ~/.zshrc 2>>&1
+# Installation: ung completion 1>> ~/.bashrc 2>>&1
+#           or  ung completion 1>> ~/.zshrc 2>>&1
 #
 
 ng_opts='b build completion doc e2e g generate get github-pages:deploy gh-pages:deploy h help i init install lint make-this-awesome new s serve server set t test v version -h --help'
@@ -48,7 +48,7 @@ if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then
     return 0
   }
 
-  complete -o default -F _ng_completion ng
+  complete -o default -F _ng_completion ung
 elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then
   _ng_completion () {
     local words cword opts
@@ -76,9 +76,9 @@ elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then
     unset shwordsplit
   }
 
-  compctl -K _ng_completion ng
+  compctl -K _ng_completion ung
 else
-  echo "Shell builtin command 'complete' or 'compctl' is redefined; cannot perform ng completion."
+  echo "Shell builtin command 'complete' or 'compctl' is redefined; cannot perform ung completion."
   return 1
 fi
 

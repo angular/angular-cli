@@ -16,7 +16,7 @@ function fileExpectations(expectation) {
   expect(existsSync(path.join(testPath, dir, 'my-route.component.ts'))).to.equal(expectation);
 }
 
-xdescribe('Acceptance: ng generate route', function () {
+xdescribe('Acceptance: ung generate route', function () {
   beforeEach(function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
@@ -31,19 +31,19 @@ xdescribe('Acceptance: ng generate route', function () {
     return tmp.teardown('./tmp');
   });
 
-  it('ng generate route my-route', function () {
+  it('ung generate route my-route', function () {
     return ng(['generate', 'route', 'my-route']).then(() => {
       fileExpectations(true, true);
     });
   });
 
-  it('ng generate route +my-route', function () {
+  it('ung generate route +my-route', function () {
     return ng(['generate', 'route', '+my-route']).then(() => {
       fileExpectations(true, true);
     });
   });
 
-  it('ng generate route +my-route/my-other', () => {
+  it('ung generate route +my-route/my-other', () => {
     return ng(['generate', 'route', '+my-route'])
       .then(() => ng(['generate', 'route', '+my-route/my-other', '--default']))
       .then(() => ng(['generate', 'route', '+my-route/+my-other/my-third', '--default']))
@@ -67,7 +67,7 @@ xdescribe('Acceptance: ng generate route', function () {
       });
   });
 
-  it('ng generate route details --path /details/:id', () => {
+  it('ung generate route details --path /details/:id', () => {
     return ng(['generate', 'route', 'details', '--path', '/details/:id'])
       .then(() => {
         const appContent = fs.readFileSync(path.join(testPath, 'foo.component.ts'), 'utf-8');
@@ -75,7 +75,7 @@ xdescribe('Acceptance: ng generate route', function () {
       });
   });
 
-  it('ng generate route my-route --dry-run does not modify files', () => {
+  it('ung generate route my-route --dry-run does not modify files', () => {
     var parentComponentPath = path.join(testPath, 'foo.component.ts');
     var parentComponentHtmlPath = path.join(testPath, 'foo.component.html')
 

@@ -5,4 +5,4 @@
 process.title = 'angular-cli';
 
 require('../lib/bootstrap-local');
-require('../packages/angular-cli/bin/ng');
+require('../packages/angular-cli/bin/ung');

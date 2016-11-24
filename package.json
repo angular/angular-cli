@@ -5,7 +5,7 @@
   "main": "packages/angular-cli/lib/cli/index.js",
   "trackingCode": "xx-xxxxxxx-xx",
   "bin": {
-    "ng": "./bin/ng"
+    "ung": "./bin/ung"
   },
   "keywords": [],
   "scripts": {
