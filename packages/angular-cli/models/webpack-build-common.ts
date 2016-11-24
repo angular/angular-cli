@@ -33,7 +33,7 @@ export function getWebpackCommonConfig(
   if (appConfig.scripts.length > 0) { entry['scripts'] = scripts; }
 
   return {
-    devtool: sourcemap ? 'source-map' : 'eval',
+    devtool: sourcemap ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
       modules: [path.resolve(projectRoot, 'node_modules')]
