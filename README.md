@@ -4,6 +4,9 @@ It is a separate package because the Core-CLI team is not able to maintain non-c
 
 I am looking for maintainers, please let me know if you're interested in supporting `universal-cli`.
 
+### Slack
+Feel free to ask questions related to Angular Universal and Universal-CLI at [angular-universal.slack.com](https://angular-universal.slack.com)
+
 [![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Build Status][travis-badge]][travis-badge-url]
