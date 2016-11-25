@@ -39,6 +39,9 @@
             },
             "default": []
           },
+          "publicPath": {
+            "type": "string"
+          },
           "index": {
             "type": "string",
             "default": "index.html"

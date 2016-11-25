@@ -25,11 +25,16 @@ export class NgCliWebpackConfig {
     baseHref?: string,
     isAoT = false,
     sourcemap = true,
+    vendorChunk = false,
+    verbose = false,
+    progress = true,
+    publicPath?: string
   ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
 
     appConfig.outDir = outputDir || appConfig.outDir;
+    appConfig.publicPath = publicPath || appConfig.publicPath;
 
     let baseConfig = getWebpackCommonConfig(
       this.ngCliProject.root,

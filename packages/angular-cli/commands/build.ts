@@ -12,6 +12,7 @@ export interface BuildOptions {
   baseHref?: string;
   aot?: boolean;
   sourcemap?: boolean;
+  publicPath?: string;
 }
 
 const BuildCommand = Command.extend({
@@ -33,7 +34,11 @@ const BuildCommand = Command.extend({
     { name: 'suppress-sizes', type: Boolean, default: false },
     { name: 'base-href',      type: String,  default: null, aliases: ['bh'] },
     { name: 'aot',            type: Boolean, default: false },
-    { name: 'sourcemap',      type: Boolean, default: true, aliases: ['sm'] }
+    { name: 'sourcemap',      type: Boolean, default: true, aliases: ['sm'] },
+    { name: 'vendor-chunk',   type: Boolean, default: true },
+    { name: 'verbose',        type: Boolean, default: false },
+    { name: 'progress',       type: Boolean, default: true },
+    { name: 'public-path',    type: String,  default: null, aliases: ['p'] }
   ],
 
   run: function (commandOptions: BuildOptions) {
