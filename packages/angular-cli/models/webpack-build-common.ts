@@ -91,7 +91,9 @@ export function getWebpackCommonConfig(
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
-        chunksSortMode: 'dependency'
+        chunksSortMode: 'dependency',
+        environment: require(path.resolve(appRoot, appConfig.environments[environment]))
+          .environment
       }),
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
