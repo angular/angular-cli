@@ -25,7 +25,7 @@ function clientId() {
   if (id) {
     return id;
   } else {
-    id = require('node-uuid').v4().toString();
+    id = require('uuid').v4().toString();
     configStore.set('client-id', id);
     return id;
   }

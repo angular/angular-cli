@@ -2,7 +2,14 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const atl = require('awesome-typescript-loader');
+const ngtools = require('@ngtools/webpack');
+
+
+const g = global;
+const webpackLoader = g['angularCliIsLocal']
+  ? g.angularCliPackages['@ngtools/webpack'].main
+  : '@ngtools/webpack';
+
 
 const getWebpackTestConfig = function (projectRoot, environment, appConfig, testConfig) {
 
@@ -48,8 +55,8 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
     resolve: {
       extensions: ['.ts', '.js'],
       plugins: [
-        new atl.TsConfigPathsPlugin({
-          tsconfig: path.resolve(appRoot, appConfig.tsconfig)
+        new ngtools.PathsPlugin({
+          tsConfigPath: path.resolve(appRoot, appConfig.tsconfig)
         })
       ]
     },
@@ -74,16 +81,11 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
           test: /\.ts$/,
           loaders: [
             {
-              loader: 'awesome-typescript-loader',
+              loader: webpackLoader,
               query: {
-                tsconfig: path.resolve(appRoot, appConfig.tsconfig),
-                module: 'commonjs',
-                target: 'es5',
-                forkChecker: true
+                tsConfigPath: path.resolve(appRoot, appConfig.tsconfig),
+                module: 'commonjs'
               }
-            },
-            {
-              loader: 'angular2-template-loader'
             }
           ],
           exclude: [/\.e2e\.ts$/]
