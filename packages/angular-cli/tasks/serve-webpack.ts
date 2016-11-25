@@ -27,7 +27,8 @@ export default Task.extend({
       undefined,
       undefined,
       commandOptions.aot,
-      commandOptions.sourcemap
+      commandOptions.sourcemap,
+      commandOptions.vendorChunk
     ).config;
 
     // This allows for live reload of page when changes are made to repo.
