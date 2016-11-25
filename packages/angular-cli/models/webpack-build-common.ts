@@ -1,6 +1,7 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
+import {packageChunkSort} from '../utilities/package-chunk-sort';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -12,17 +13,20 @@ export function getWebpackCommonConfig(
   environment: string,
   appConfig: any,
   baseHref: string,
-  sourcemap: boolean
+  sourcemap: boolean,
+  vendorChunk: boolean
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);
+  const nodeModules = path.resolve(projectRoot, 'node_modules');
   const styles = appConfig.styles
                ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
                : [];
   const scripts = appConfig.scripts
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
+  const extraPlugins: any[] = [];
 
   let entry: { [key: string]: string[] } = {
     main: [appMain]
@@ -32,11 +36,19 @@ export function getWebpackCommonConfig(
   if (appConfig.styles.length > 0) { entry['styles'] = styles; }
   if (appConfig.scripts.length > 0) { entry['scripts'] = scripts; }
 
+  if (vendorChunk) {
+    extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      chunks: ['main'],
+      minChunks: (module: any) => module.userRequest && module.userRequest.startsWith(nodeModules)
+    }));
+  }
+
   return {
-    devtool: sourcemap ? 'source-map' : 'eval',
+    devtool: sourcemap ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
-      modules: [path.resolve(projectRoot, 'node_modules')]
+      modules: [nodeModules]
     },
     context: path.resolve(__dirname, './'),
     entry: entry,
@@ -52,9 +64,7 @@ export function getWebpackCommonConfig(
           enforce: 'pre',
           test: /\.js$/,
           loader: 'source-map-loader',
-          exclude: [
-            /node_modules/
-          ]
+          exclude: [ nodeModules ]
         },
         // in main, load css as raw text
         {
@@ -91,7 +101,7 @@ export function getWebpackCommonConfig(
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
-        chunksSortMode: 'dependency'
+        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main'])
       }),
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
@@ -105,10 +115,6 @@ export function getWebpackCommonConfig(
         path.resolve(appRoot, appConfig.environments[environment])
       ),
       new webpack.optimize.CommonsChunkPlugin({
-        // Optimizing ensures loading order in index.html
-        name: ['styles', 'scripts', 'main'].reverse()
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
         name: 'inline'
       }),
@@ -121,8 +127,8 @@ export function getWebpackCommonConfig(
         options: {
           postcss: [ autoprefixer() ]
         },
-      }),
-    ],
+      })
+    ].concat(extraPlugins),
     node: {
       fs: 'empty',
       global: true,
