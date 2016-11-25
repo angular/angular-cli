@@ -45,6 +45,9 @@
             ],
             "default": []
           },
+          "deployUrl": {
+            "type": "string"
+          },
           "index": {
             "type": "string",
             "default": "index.html"
