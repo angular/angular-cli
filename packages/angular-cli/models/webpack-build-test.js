@@ -15,8 +15,8 @@ const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 const getWebpackTestConfig = function (projectRoot, environment, appConfig, testConfig) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
-  var extraRules = [];
-  var extraPlugins = [];
+  const extraRules = [];
+  const extraPlugins = [];
 
   if (testConfig.codeCoverage) {
     extraRules.push({
