@@ -5,7 +5,6 @@ const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 const WebpackDevServer = require('webpack-dev-server');
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 import { getWebpackStatsConfig } from '../models/';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';

@@ -26,7 +26,7 @@ const verboseWebpackOutputOptions = {
   chunkModules: false // TODO: set to true when console to file output is fixed
 };
 
-export function getWebpackStatsConfig(verbose = false){
+export function getWebpackStatsConfig(verbose = false) {
     return verbose
            ? Object.assign(webpackOutputOptions, verboseWebpackOutputOptions)
            : webpackOutputOptions;
