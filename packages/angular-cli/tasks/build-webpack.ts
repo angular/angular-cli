@@ -5,7 +5,7 @@ import * as webpack from 'webpack';
 const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 import { BuildOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
-import { webpackOutputOptions, verboseWebpackOutputOptions } from '../models/';
+import { getWebpackStatsConfig } from '../models/';
 import { CliConfig } from '../models/config';
 
 // Configure build and output;
@@ -32,9 +32,7 @@ export default <any>Task.extend({
 
     const webpackCompiler: any = webpack(config);
 
-    const statsOptions = runTaskOptions.verbose
-                        ? Object.assign(webpackOutputOptions, verboseWebpackOutputOptions)
-                        : webpackOutputOptions;
+    const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
 
     if (runTaskOptions.progress) {
       webpackCompiler.apply(new ProgressPlugin({
@@ -53,7 +51,7 @@ export default <any>Task.extend({
 
         if (stats.hash !== lastHash) {
           lastHash = stats.hash;
-          process.stdout.write(stats.toString(statsOptions) + '\n');
+          process.stdout.write(stats.toString(statsConfig) + '\n');
         }
 
         return stats.hasErrors() ? reject() : resolve();

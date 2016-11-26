@@ -4,7 +4,7 @@ export const ngAppResolve = (resolvePath: string): string => {
   return path.resolve(process.cwd(), resolvePath);
 };
 
-export const webpackOutputOptions = {
+const webpackOutputOptions = {
   colors: true,
   hash: true,
   timings: true,
@@ -18,10 +18,16 @@ export const webpackOutputOptions = {
   version: false
 };
 
-export const verboseWebpackOutputOptions = {
+const verboseWebpackOutputOptions = {
   children: true,
   assets: true,
   version: true,
   reasons: true,
   chunkModules: false // TODO: set to true when console to file output is fixed
 };
+
+export function getWebpackStatsConfig(verbose = false){
+    return verbose
+           ? Object.assign(webpackOutputOptions, verboseWebpackOutputOptions)
+           : webpackOutputOptions;
+}

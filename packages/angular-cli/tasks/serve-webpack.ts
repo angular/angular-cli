@@ -6,7 +6,7 @@ const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 const WebpackDevServer = require('webpack-dev-server');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
-import { webpackOutputOptions, verboseWebpackOutputOptions } from '../models/';
+import { getWebpackStatsConfig } from '../models/';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
@@ -39,9 +39,7 @@ export default Task.extend({
     );
     webpackCompiler = webpack(config);
 
-    const statsOptions = serveTaskOptions.verbose
-                        ? Object.assign(webpackOutputOptions, verboseWebpackOutputOptions)
-                        : webpackOutputOptions;
+    const statsConfig = getWebpackStatsConfig(serveTaskOptions.verbose);
 
     if (serveTaskOptions.progress) {
       webpackCompiler.apply(new ProgressPlugin({
@@ -84,7 +82,7 @@ export default Task.extend({
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
       },
-      stats: statsOptions,
+      stats: statsConfig,
       inline: true,
       proxy: proxyConfig,
       compress: serveTaskOptions.target === 'production',

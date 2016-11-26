@@ -4,7 +4,7 @@ const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 import { NgCliWebpackConfig } from '../models/webpack-config';
-import { webpackOutputOptions, verboseWebpackOutputOptions } from '../models/';
+import { getWebpackStatsConfig } from '../models/';
 import { BuildOptions } from '../commands/build';
 import { CliConfig } from '../models/config';
 
@@ -31,9 +31,7 @@ export default Task.extend({
     ).config;
     const webpackCompiler: any = webpack(config);
 
-    const statsOptions = runTaskOptions.verbose
-                        ? Object.assign(webpackOutputOptions, verboseWebpackOutputOptions)
-                        : webpackOutputOptions;
+    const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
 
     if (runTaskOptions.progress) {
       webpackCompiler.apply(new ProgressPlugin({
@@ -53,7 +51,7 @@ export default Task.extend({
 
         if (stats.hash !== lastHash) {
           lastHash = stats.hash;
-          process.stdout.write(stats.toString(statsOptions) + '\n');
+          process.stdout.write(stats.toString(statsConfig) + '\n');
         }
       });
     });
