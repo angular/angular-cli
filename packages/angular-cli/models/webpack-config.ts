@@ -26,7 +26,8 @@ export class NgCliWebpackConfig {
     isAoT = false,
     sourcemap = true,
     vendorChunk = false,
-    verbose = false
+    verbose = false,
+    progress = true
   ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
@@ -39,7 +40,9 @@ export class NgCliWebpackConfig {
       appConfig,
       baseHref,
       sourcemap,
-      vendorChunk
+      vendorChunk,
+      verbose,
+      progress
     );
     let targetConfigPartial = this.getTargetConfig(this.ngCliProject.root, appConfig, verbose);
     const typescriptConfigPartial = isAoT

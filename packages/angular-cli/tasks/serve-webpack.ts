@@ -29,7 +29,8 @@ export default Task.extend({
       serveTaskOptions.aot,
       serveTaskOptions.sourcemap,
       serveTaskOptions.vendorChunk,
-      serveTaskOptions.verbose
+      serveTaskOptions.verbose,
+      serveTaskOptions.progress
     ).config;
 
     // This allows for live reload of page when changes are made to repo.
@@ -40,13 +41,6 @@ export default Task.extend({
     webpackCompiler = webpack(config);
 
     const statsConfig = getWebpackStatsConfig(serveTaskOptions.verbose);
-
-    if (serveTaskOptions.progress) {
-      webpackCompiler.apply(new ProgressPlugin({
-        profile: serveTaskOptions.verbose,
-        colors: true
-      }));
-    }
 
     let proxyConfig = {};
     if (serveTaskOptions.proxyConfig) {

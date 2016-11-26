@@ -27,19 +27,13 @@ export default <any>Task.extend({
       runTaskOptions.aot,
       runTaskOptions.sourcemap,
       runTaskOptions.vendorChunk,
-      runTaskOptions.verbose
+      runTaskOptions.verbose,
+      runTaskOptions.progress
     ).config;
 
     const webpackCompiler: any = webpack(config);
 
     const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
-
-    if (runTaskOptions.progress) {
-      webpackCompiler.apply(new ProgressPlugin({
-        profile: runTaskOptions.verbose,
-        colors: true
-      }));
-    }
 
     return new Promise((resolve, reject) => {
       webpackCompiler.run((err: any, stats: any) => {
