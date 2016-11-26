@@ -101,7 +101,7 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
 }
 
 export function ng(...args: string[]) {
-  if (args[0] == 'build') {
+  if (args[0] == 'build' || args[0] == 'serve' || args[0] == 'test') {
     return silentNg(...args);
   } else {
     return _exec({}, 'ng', args);
