@@ -10,6 +10,7 @@
   - `git push master`
   - `git push --tags`
 - Publish to npm
+  - `npm run build`
   - `cd ./dist/angular-cli`
   - `npm publish --tag experimental` (install it with `npm install -g universal-cli@experimental` and test it)
   - `npm publish` (the new version is now available at npm)

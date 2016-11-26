@@ -1,41 +1,40 @@
-<a name="1.0.0-beta.20"></a>
-# [1.0.0-beta.20](https://github.com/angular/angular-cli/compare/v1.0.0-beta.19...v1.0.0-beta.20-1) (2016-11-16)
+<a name="1.0.0-alpha.universal.2"></a>
+# [1.0.0-alpha.universal.2](https://github.com/devCrossNet/angular-cli/compare/v1.0.0-beta.19...v1.0.0-alpha.universal.2) (2016-11-26)
 
 
 ### Bug Fixes
 
-* **@ngtools/webpack:** fixed relative path for AoT. ([#3114](https://github.com/angular/angular-cli/issues/3114)) ([27a034d](https://github.com/angular/angular-cli/commit/27a034d))
-* **aot:** exclude spec files from aot ([#2758](https://github.com/angular/angular-cli/issues/2758)) ([215e555](https://github.com/angular/angular-cli/commit/215e555))
-* **aot:** output the sources in the sourcemap. ([#3107](https://github.com/angular/angular-cli/issues/3107)) ([7127dba](https://github.com/angular/angular-cli/commit/7127dba))
-* **aot:** remove the genDir plugin option. ([0e91dfe](https://github.com/angular/angular-cli/commit/0e91dfe)), closes [#2849](https://github.com/angular/angular-cli/issues/2849) [#2876](https://github.com/angular/angular-cli/issues/2876)
-* **aot:** Use the proper path when statically analyzing lazy routes. ([#2992](https://github.com/angular/angular-cli/issues/2992)) ([88131a0](https://github.com/angular/angular-cli/commit/88131a0)), closes [#2452](https://github.com/angular/angular-cli/issues/2452) [#2735](https://github.com/angular/angular-cli/issues/2735) [#2900](https://github.com/angular/angular-cli/issues/2900)
-* **build:** correct forkChecker option for ATS. ([#3011](https://github.com/angular/angular-cli/issues/3011)) ([a987cf5](https://github.com/angular/angular-cli/commit/a987cf5))
-* **build:** enable chunkhash in inline.js ([30cc482](https://github.com/angular/angular-cli/commit/30cc482)), closes [#2899](https://github.com/angular/angular-cli/issues/2899)
-* **build:** show full error stats ([#2879](https://github.com/angular/angular-cli/issues/2879)) ([d59fa1f](https://github.com/angular/angular-cli/commit/d59fa1f))
-* **deps:** explicitely add portfinder ([#2831](https://github.com/angular/angular-cli/issues/2831)) ([2d8f162](https://github.com/angular/angular-cli/commit/2d8f162)), closes [#2755](https://github.com/angular/angular-cli/issues/2755) [#2769](https://github.com/angular/angular-cli/issues/2769)
-* **e2e:** fix broken test pipeline ([#2999](https://github.com/angular/angular-cli/issues/2999)) ([37a1225](https://github.com/angular/angular-cli/commit/37a1225))
-* **generate:** fix module component path if module is created in child folder ([#3066](https://github.com/angular/angular-cli/issues/3066)) ([38d5f2c](https://github.com/angular/angular-cli/commit/38d5f2c)), closes [#3063](https://github.com/angular/angular-cli/issues/3063)
-* **generate:** stop default browser error from ng new --routing ([a45a1f2](https://github.com/angular/angular-cli/commit/a45a1f2)), closes [#2794](https://github.com/angular/angular-cli/issues/2794)
-* **package:** add some more metadata to webpack package.json ([c2dbf88](https://github.com/angular/angular-cli/commit/c2dbf88)), closes [#2854](https://github.com/angular/angular-cli/issues/2854)
-* **serve:** added accept html headers option to webpack-dev-server ([#2990](https://github.com/angular/angular-cli/issues/2990)) ([86f2a1b](https://github.com/angular/angular-cli/commit/86f2a1b)), closes [#2989](https://github.com/angular/angular-cli/issues/2989)
-* **test:** catches module loading errors ([f09439c](https://github.com/angular/angular-cli/commit/f09439c)), closes [#2640](https://github.com/angular/angular-cli/issues/2640) [#2785](https://github.com/angular/angular-cli/issues/2785)
-* **version:** update version of [@angular](https://github.com/angular) packages. ([#3145](https://github.com/angular/angular-cli/issues/3145)) ([a2f0a1a](https://github.com/angular/angular-cli/commit/a2f0a1a))
-* bypass Watchman check ([#2846](https://github.com/angular/angular-cli/issues/2846)) ([9aa1099](https://github.com/angular/angular-cli/commit/9aa1099)), closes [#2791](https://github.com/angular/angular-cli/issues/2791)
+* **@ngtools/webpack:** fixed relative path for AoT. ([#3114](https://github.com/devCrossNet/angular-cli/issues/3114)) ([27a034d](https://github.com/devCrossNet/angular-cli/commit/27a034d))
+* **angular-cli:** add necessary dependencies. ([#3152](https://github.com/devCrossNet/angular-cli/issues/3152)) ([8f574e4](https://github.com/devCrossNet/angular-cli/commit/8f574e4)), closes [#3148](https://github.com/devCrossNet/angular-cli/issues/3148)
+* **angular-cli:** add necessary dependency. ([f7704b0](https://github.com/devCrossNet/angular-cli/commit/f7704b0))
+* **angular-cli:** change version of webpack plugin. ([07e96ea](https://github.com/devCrossNet/angular-cli/commit/07e96ea))
+* **aot:** exclude spec files from aot ([#2758](https://github.com/devCrossNet/angular-cli/issues/2758)) ([215e555](https://github.com/devCrossNet/angular-cli/commit/215e555))
+* **aot:** output the sources in the sourcemap. ([#3107](https://github.com/devCrossNet/angular-cli/issues/3107)) ([7127dba](https://github.com/devCrossNet/angular-cli/commit/7127dba))
+* **deps:** explicitely add portfinder ([#2831](https://github.com/devCrossNet/angular-cli/issues/2831)) ([2d8f162](https://github.com/devCrossNet/angular-cli/commit/2d8f162)), closes [#2755](https://github.com/devCrossNet/angular-cli/issues/2755) [#2769](https://github.com/devCrossNet/angular-cli/issues/2769)
+* **generate:** fix module component path if module is created in child folder ([#3066](https://github.com/devCrossNet/angular-cli/issues/3066)) ([38d5f2c](https://github.com/devCrossNet/angular-cli/commit/38d5f2c)), closes [#3063](https://github.com/devCrossNet/angular-cli/issues/3063)
+* **generate:** revert change to component dir in generate module, as it caused component declaration to go to parent module ([#3158](https://github.com/devCrossNet/angular-cli/issues/3158)) ([71bf855](https://github.com/devCrossNet/angular-cli/commit/71bf855))
+* **github-pages-deploy:** Show more accurate url ([#3160](https://github.com/devCrossNet/angular-cli/issues/3160)) ([a431389](https://github.com/devCrossNet/angular-cli/commit/a431389))
+* **universal:** add polyfills.ts ([37770d5](https://github.com/devCrossNet/angular-cli/commit/37770d5)), closes [#1](https://github.com/devCrossNet/angular-cli/issues/1)
+* **version:** update version of [@angular](https://github.com/angular) packages. ([#3145](https://github.com/devCrossNet/angular-cli/issues/3145)) ([a2f0a1a](https://github.com/devCrossNet/angular-cli/commit/a2f0a1a))
 
 
 ### Features
 
-* **build:** add loaders for fonts ([3497373](https://github.com/angular/angular-cli/commit/3497373)), closes [#1765](https://github.com/angular/angular-cli/issues/1765)
-* **build:** use appConfig.index to set output index file ([d3fd8b0](https://github.com/angular/angular-cli/commit/d3fd8b0)), closes [#2241](https://github.com/angular/angular-cli/issues/2241) [#2767](https://github.com/angular/angular-cli/issues/2767)
-* **build:** use static files for css ([a6415cc](https://github.com/angular/angular-cli/commit/a6415cc)), closes [#2148](https://github.com/angular/angular-cli/issues/2148) [#2020](https://github.com/angular/angular-cli/issues/2020) [#2826](https://github.com/angular/angular-cli/issues/2826) [#2646](https://github.com/angular/angular-cli/issues/2646)
-* **serve:** allow CORS access while running ng serve ([#2872](https://github.com/angular/angular-cli/issues/2872)) ([#3009](https://github.com/angular/angular-cli/issues/3009)) ([7c834a8](https://github.com/angular/angular-cli/commit/7c834a8))
+* **build:** add sourcemap option ([#3113](https://github.com/devCrossNet/angular-cli/issues/3113)) ([6f9d2c1](https://github.com/devCrossNet/angular-cli/commit/6f9d2c1))
+* **serve:** allow CORS access while running ung serve ([#2872](https://github.com/devCrossNet/angular-cli/issues/2872)) ([#3009](https://github.com/devCrossNet/angular-cli/issues/3009)) ([7c834a8](https://github.com/devCrossNet/angular-cli/commit/7c834a8))
+* **universal:** add custom webpack config ([cdfe1a0](https://github.com/devCrossNet/angular-cli/commit/cdfe1a0))
+* **universal:** Server routes ([5275ae2](https://github.com/devCrossNet/angular-cli/commit/5275ae2))
+
+
+### Performance Improvements
+
+* **universal:** add compression express middleware ([#4](https://github.com/devCrossNet/angular-cli/issues/4)) ([61d3abf](https://github.com/devCrossNet/angular-cli/commit/61d3abf))
+
 
 
 ### BREAKING CHANGES
 
-* aot: Using relative paths might lead to path clashing. We
-now properly output an error in this case.
-
+* binary `ng` renamed to `ung`
 
 
 <a name="1.0.0-alpha.universal.1"></a>
