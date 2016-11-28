@@ -471,15 +471,22 @@ export class NodeDomRenderer extends DomRenderer {
         propertyValue = '';
       }
     }
+
     if (propertyName === 'innerHTML') {
       return super.setElementProperty(renderElement, propertyName, propertyValue);
     }
+
+    if (propertyName === 'hidden') {
+      return this._setHiddenAttribute(renderElement, propertyName, propertyValue);
+    }
+
     // ignore boolean prop values for parse5 serialize
     if ((propertyName === 'autofocus' || propertyName === 'spellcheck') && propertyValue === false) {
         return;
     }
 
     let setProp = super.setElementProperty(renderElement, propertyName, propertyValue);
+
     if (IGNORE_ATTRIBUTES[propertyName]) {
       return setProp;
     }
@@ -559,6 +566,18 @@ export class NodeDomRenderer extends DomRenderer {
     }
     return super.setElementAttribute(renderElement, propertyName, propertyValue);
   }
+
+  _setHiddenAttribute(renderElement: any, propertyName: any, propertyValue: any) {
+    if (isPresent(propertyValue)) {
+      // Follow Angular default behavior, true || string (of anything) will cause it to be hidden
+      if (propertyValue === true || propertyValue.toString().length) {
+        return super.setElementAttribute(renderElement, propertyName, propertyValue);
+      } else {
+        return;
+      }
+    }
+  }
+
 }
 
 function moveNodesAfterSibling(sibling: any, nodes: any) {
