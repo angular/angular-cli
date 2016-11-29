@@ -91,9 +91,11 @@ testsToRun.reduce((previous, relativeName) => {
         throw new Error('Invalid test module.');
       };
 
+    let currentDir = null;
     let clean = true;
     return Promise.resolve()
       .then(() => printHeader(currentFileName))
+      .then(() => currentDir = process.cwd())
       .then(() => fn(argv, () => clean = false))
       .then(() => console.log('  ----'))
       .then(() => {
@@ -101,6 +103,11 @@ testsToRun.reduce((previous, relativeName) => {
         // requested an exception.
         if (allSetups.indexOf(relativeName) == -1 && clean) {
           return gitClean();
+        }
+      })
+      .then(() => {
+        if (allSetups.indexOf(relativeName) == -1) {
+          process.chdir(currentDir);
         }
       })
       .then(() => printFooter(currentFileName, start),
