@@ -11,6 +11,7 @@ export interface BuildOptions {
   supressSizes: boolean;
   baseHref?: string;
   aot?: boolean;
+  publicPath?: string;
 }
 
 const BuildCommand = Command.extend({

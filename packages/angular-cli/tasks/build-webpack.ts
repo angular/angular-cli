@@ -23,7 +23,8 @@ export default <any>Task.extend({
       runTaskOptions.environment,
       outputDir,
       runTaskOptions.baseHref,
-      runTaskOptions.aot
+      runTaskOptions.aot,
+      runTaskOptions.publicPath
     ).config;
 
     // fail on build error

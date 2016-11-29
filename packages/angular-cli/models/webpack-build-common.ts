@@ -11,7 +11,8 @@ export function getWebpackCommonConfig(
   projectRoot: string,
   environment: string,
   appConfig: any,
-  baseHref: string
+  baseHref: string,
+  publicPath: string,
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -41,7 +42,8 @@ export function getWebpackCommonConfig(
     entry: entry,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
-      filename: '[name].bundle.js'
+      filename: '[name].bundle.js',
+      publicPath: publicPath
     },
     module: {
       rules: [
