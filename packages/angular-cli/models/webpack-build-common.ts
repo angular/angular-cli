@@ -41,7 +41,7 @@ export function getWebpackCommonConfig(
     entry: entry,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
-      filename: '[name].bundle.js'
+      filename: '[name].[hash].bundle.js'
     },
     module: {
       rules: [
