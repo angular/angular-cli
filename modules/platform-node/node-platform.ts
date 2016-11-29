@@ -42,11 +42,12 @@ import {
   NgZone,
   Compiler,
   CompilerFactory,
-  TestabilityRegistry
+  TestabilityRegistry,
+  COMPILER_OPTIONS
 } from '@angular/core';
 
 import { CommonModule, PlatformLocation, APP_BASE_HREF } from '@angular/common';
-import { platformCoreDynamic } from '@angular/compiler';
+import { platformCoreDynamic, ResourceLoader, COMPILER_PROVIDERS } from '@angular/compiler';
 
 // TODO(gdi2290): allow removal of modules that are not used for AoT
 import { Jsonp, Http } from '@angular/http';
@@ -66,6 +67,8 @@ import {
   createUrlProviders,
 } from './tokens';
 
+import * as fs from 'fs';
+
 // @internal
 
 export function _errorHandler(): ErrorHandler {
@@ -73,6 +76,13 @@ export function _errorHandler(): ErrorHandler {
 }
 
 declare var Zone: any;
+
+// @internal
+export class NodeResourceLoader implements ResourceLoader {
+  get(url: string): Promise<string> {
+    return Promise.resolve(fs.readFileSync(url).toString());
+  }
+}
 
 // @internal
 const _documentDeps = [ NodeSharedStylesHost, NgZone ];
@@ -763,6 +773,17 @@ export const INTERNAL_NODE_PLATFORM_PROVIDERS: Array<any /*Type | Provider | any
   // { provide: PlatformLocation, useClass: NodePlatformLocation },
 ];
 
+const CUSTOM_COMPILER_PROVIDERS = [
+  { provide: PLATFORM_INITIALIZER, useValue: initParse5Adapter, multi: true },
+  COMPILER_PROVIDERS,
+  {
+    provide: COMPILER_OPTIONS,
+    useValue: {providers: [
+      { provide: ResourceLoader, useClass: NodeResourceLoader }
+    ]},
+    multi: true
+  }
+];
 
 /**
  * The node platform that supports the runtime compiler.
@@ -772,7 +793,7 @@ export const INTERNAL_NODE_PLATFORM_PROVIDERS: Array<any /*Type | Provider | any
 export const platformNodeDynamic = (extraProviders?: any[], platform?: any) => {
   if (!platform) {
     if (!getPlatformRef()) {
-      platform = createPlatformFactory(platformCoreDynamic, 'nodeDynamic', INTERNAL_NODE_PLATFORM_PROVIDERS)(extraProviders);
+      platform = createPlatformFactory(platformCoreDynamic, 'nodeDynamic', CUSTOM_COMPILER_PROVIDERS)(extraProviders);
       setPlatformRef(platform);
     } else {
       platform = getPlatformRef();
