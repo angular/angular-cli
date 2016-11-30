@@ -22,6 +22,7 @@ export interface ServeTaskOptions {
   liveReloadLiveCss?: boolean;
   target?: string;
   environment?: string;
+  showProgress: boolean;
   ssl?: boolean;
   sslKey?: string;
   sslCert?: string;
@@ -79,6 +80,13 @@ const ServeCommand = Command.extend({
       aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }]
     },
     { name: 'environment',          type: String,  default: '', aliases: ['e'] },
+    {
+      name: 'show-progress',
+      type: Boolean,
+      default: true,
+      description: 'Whether to show the Webpack build progress (default true)',
+      aliases: ['sp']
+    },
     { name: 'ssl',                  type: Boolean, default: false },
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
     { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' },

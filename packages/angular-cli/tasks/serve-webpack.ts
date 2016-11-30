@@ -38,10 +38,12 @@ export default Task.extend({
     );
     webpackCompiler = webpack(config);
 
-    webpackCompiler.apply(new ProgressPlugin({
-      profile: true,
-      colors: true
-    }));
+    if (commandOptions.showProgress) {
+      webpackCompiler.apply(new ProgressPlugin({
+        profile: false,
+        colors: false
+      }));
+    }
 
     let proxyConfig = {};
     if (commandOptions.proxyConfig) {
