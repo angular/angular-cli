@@ -92,10 +92,19 @@ testsToRun.reduce((previous, relativeName) => {
       };
 
     let clean = true;
+    let previousDir = null;
     return Promise.resolve()
       .then(() => printHeader(currentFileName))
+      .then(() => previousDir = process.cwd())
       .then(() => fn(argv, () => clean = false))
       .then(() => console.log('  ----'))
+      .then(() => {
+        // If we're not in a setup, change the directory back to where it was before the test.
+        // This allows tests to chdir without worrying about keeping the original directory.
+        if (allSetups.indexOf(relativeName) == -1 && previousDir) {
+          process.chdir(previousDir);
+        }
+      })
       .then(() => {
         // Only clean after a real test, not a setup step. Also skip cleaning if the test
         // requested an exception.
