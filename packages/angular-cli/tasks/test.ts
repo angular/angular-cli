@@ -26,7 +26,8 @@ export default Task.extend({
       karmaOptions.angularCli = {
         codeCoverage: options.codeCoverage,
         lint: options.lint,
-        sourcemap: options.sourcemap
+        sourcemap: options.sourcemap,
+        progress: options.progress
       };
 
       // Assign additional karmaConfig options to the local ngapp config
