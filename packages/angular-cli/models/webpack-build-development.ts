@@ -5,7 +5,7 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, appConfi
   const styles = appConfig.styles
                ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
                : [];
-  const cssLoaders = ['style-loader', 'css-loader?sourcemap', 'postcss-loader'];
+  const cssLoaders = ['style-loader', 'css-loader?sourceMap', 'postcss-loader'];
   return {
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
@@ -23,15 +23,15 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, appConfi
         }, {
           include: styles,
           test: /\.styl$/,
-          loaders: [...cssLoaders, 'stylus-loader?sourcemap']
+          loaders: [...cssLoaders, 'stylus-loader?sourceMap']
         }, {
           include: styles,
           test: /\.less$/,
-          loaders: [...cssLoaders, 'less-loader?sourcemap']
+          loaders: [...cssLoaders, 'less-loader?sourceMap']
         }, {
           include: styles,
           test: /\.scss$|\.sass$/,
-          loaders: [...cssLoaders, 'sass-loader?sourcemap']
+          loaders: [...cssLoaders, 'sass-loader?sourceMap']
         },
       ]
     }

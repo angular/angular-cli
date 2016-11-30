@@ -125,7 +125,13 @@ export function getWebpackCommonConfig(
       new webpack.LoaderOptionsPlugin({
         test: /\.(css|scss|sass|less|styl)$/,
         options: {
-          postcss: [ autoprefixer() ]
+          postcss: [ autoprefixer() ],
+          // workaround for https://github.com/webpack/css-loader/issues/340
+          context: path.resolve(__dirname, './'),
+          // workaround for https://github.com/jtangelder/sass-loader/issues/298
+          output: {
+            path: path.resolve(projectRoot, appConfig.outDir)
+          }
         },
       })
     ].concat(extraPlugins),

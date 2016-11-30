@@ -19,7 +19,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
   const styles = appConfig.styles
                ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
                : [];
-  const cssLoaders = ['css-loader?sourcemap&minimize', 'postcss-loader'];
+  const cssLoaders = ['css-loader?sourceMap&minimize', 'postcss-loader'];
   return {
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
@@ -37,15 +37,15 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
         }, {
           include: styles,
           test: /\.styl$/,
-          loaders: ExtractTextPlugin.extract([...cssLoaders, 'stylus-loader?sourcemap'])
+          loaders: ExtractTextPlugin.extract([...cssLoaders, 'stylus-loader?sourceMap'])
         }, {
           include: styles,
           test: /\.less$/,
-          loaders: ExtractTextPlugin.extract([...cssLoaders, 'less-loader?sourcemap'])
+          loaders: ExtractTextPlugin.extract([...cssLoaders, 'less-loader?sourceMap'])
         }, {
           include: styles,
           test: /\.scss$|\.sass$/,
-          loaders: ExtractTextPlugin.extract([...cssLoaders, 'sass-loader?sourcemap'])
+          loaders: ExtractTextPlugin.extract([...cssLoaders, 'sass-loader?sourceMap'])
         },
       ]
     },
@@ -71,7 +71,13 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
         options: {
           postcss: [
             require('postcss-discard-comments')
-          ]
+          ],
+          // workaround for https://github.com/webpack/css-loader/issues/340
+          context: path.resolve(__dirname, './'),
+          // workaround for https://github.com/jtangelder/sass-loader/issues/298
+          output: {
+            path: path.resolve(projectRoot, appConfig.outDir)
+          }
         }
       })
     ]
