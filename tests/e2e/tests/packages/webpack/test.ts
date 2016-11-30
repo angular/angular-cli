@@ -6,8 +6,6 @@ import {expectFileSizeToBeUnder} from '../../../utils/fs';
 
 
 export default function(argv: any, skipCleaning: () => void) {
-  const currentDir = process.cwd();
-
   if (process.platform.startsWith('win')) {
     // Disable the test on Windows.
     return Promise.resolve();
@@ -24,6 +22,5 @@ export default function(argv: any, skipCleaning: () => void) {
     .then(() => exec('node_modules/.bin/webpack', '-p'))
     .then(() => expectFileSizeToBeUnder('dist/app.main.js', 400000))
     .then(() => expectFileSizeToBeUnder('dist/0.app.main.js', 40000))
-    .then(() => process.chdir(currentDir))
     .then(() => skipCleaning());
 }

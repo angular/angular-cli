@@ -14,12 +14,15 @@ declare module 'webpack' {
   }
 }
 
-export const getWebpackProdConfigPartial = function(projectRoot: string, appConfig: any) {
+export const getWebpackProdConfigPartial = function(projectRoot: string,
+                                                    appConfig: any,
+                                                    verbose: any) {
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const styles = appConfig.styles
                ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
                : [];
   const cssLoaders = ['css-loader?sourcemap&minimize', 'postcss-loader'];
+
   return {
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
@@ -57,7 +60,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string, appConf
       }),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8 : true },
-        compress: { screw_ie8: true },
+        compress: { screw_ie8: true, warnings: verbose },
         sourceMap: true
       }),
       new CompressionPlugin({

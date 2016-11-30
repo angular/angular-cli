@@ -9,5 +9,5 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.md]
-max_line_length = 0
+max_line_length = off
 trim_trailing_whitespace = false

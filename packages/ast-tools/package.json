@@ -1,6 +1,6 @@
 {
   "name": "@angular-cli/ast-tools",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "CLI tool for Angular",
   "main": "./src/index.js",
   "keywords": [
