@@ -14,7 +14,7 @@ export function getWebpackCommonConfig(
   appConfig: any,
   baseHref: string,
   sourcemap: boolean,
-  vendorChunk: boolean
+  vendorChunk: boolean,
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -27,6 +27,8 @@ export function getWebpackCommonConfig(
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
   const extraPlugins: any[] = [];
+
+  const inject: boolean = appConfig.inject;
 
   let entry: { [key: string]: string[] } = {
     main: [appMain]
@@ -101,7 +103,8 @@ export function getWebpackCommonConfig(
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
-        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main'])
+        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main']),
+        inject: inject
       }),
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
