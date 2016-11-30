@@ -34,9 +34,12 @@ export default Task.extend({
 
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
-    config.entry.main.unshift(
-      `webpack-dev-server/client?http://${serveTaskOptions.host}:${serveTaskOptions.port}/`
-    );
+    let entryPoints = [`webpack-dev-server/client?http://${serveTaskOptions.host}:${serveTaskOptions.port}/`];
+    if (serveTaskOptions.hmr) {
+      entryPoints.push('webpack/hot/dev-server');
+      config.plugins.push(new webpack.HotModuleReplacementPlugin());
+    }
+    config.entry.main.unshift(...entryPoints);
     webpackCompiler = webpack(config);
 
     const statsConfig = getWebpackStatsConfig(serveTaskOptions.verbose);
@@ -89,6 +92,8 @@ export default Task.extend({
       webpackDevServerConfiguration.key = sslKey;
       webpackDevServerConfiguration.cert = sslCert;
     }
+
+    webpackDevServerConfiguration.hot = serveTaskOptions.hmr;
 
     ui.writeLine(chalk.green(oneLine`
       **
