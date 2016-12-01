@@ -41,10 +41,12 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-cli/ast-tools": "^1.0.0",
+    "@angular-cli/base-href-webpack": "^1.0.7",
     "@angular/compiler": "2.2.1",
     "@angular/compiler-cli": "2.2.1",
     "@angular/core": "2.2.1",
     "@angular/tsc-wrapped": "0.4.0",
+    "@ngtools/webpack": "^1.1.6",
     "angular2-template-loader": "^0.5.0",
     "autoprefixer": "^6.5.3",
     "awesome-typescript-loader": "^2.2.3",
