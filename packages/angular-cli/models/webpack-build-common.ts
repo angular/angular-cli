@@ -30,6 +30,7 @@ export function getWebpackCommonConfig(
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
   const extraPlugins: any[] = [];
+  const target = appConfig.target || 'web';
 
   let entry: { [key: string]: string[] } = {
     main: [appMain]
@@ -139,6 +140,7 @@ export function getWebpackCommonConfig(
         },
       })
     ].concat(extraPlugins),
+    target: target,
     node: {
       fs: 'empty',
       global: true,

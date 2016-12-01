@@ -78,6 +78,10 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "target": {
+            "description": "Webpack target config.",
+            "type": "string"
           }
         },
         "additionalProperties": false

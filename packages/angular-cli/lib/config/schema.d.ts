@@ -32,6 +32,10 @@ export interface CliConfig {
          */
         environments?: {
             [name: string]: any;
+        /**
+         * Webpack target config. Compile for usage ["web","webworker","node","async-node","node-webkit","electron","electron-renderer"]
+         */
+        target?: string;
         };
     }[];
     /**
