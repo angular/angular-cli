@@ -93,17 +93,24 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _directories: {[path: string]: VirtualDirStats} = Object.create(null);
   private _changed = false;
 
+  private _basePath: string;
   private _setParentNodes: boolean;
 
-  constructor(private _options: ts.CompilerOptions, private _basePath: string) {
+  constructor(private _options: ts.CompilerOptions, basePath: string) {
     this._setParentNodes = true;
     this._delegate = ts.createCompilerHost(this._options, this._setParentNodes);
+    this._basePath = this._normalizePath(basePath);
+  }
+
+  private _normalizePath(path: string) {
+    return path.replace(/\\/g, '/');
   }
 
   private _resolve(path: string) {
+    path = this._normalizePath(path);
     if (path[0] == '.') {
       return join(this.getCurrentDirectory(), path);
-    } else if (path[0] == '/') {
+    } else if (path[0] == '/' || path.match(/^\w:\//)) {
       return path;
     } else {
       return join(this._basePath, path);

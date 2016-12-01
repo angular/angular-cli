@@ -13,7 +13,7 @@ export interface TranspileOutput {
 
 
 function resolve(filePath: string, host: ts.CompilerHost, program: ts.Program) {
-  if (filePath[0] == '/') {
+  if (path.isAbsolute(filePath)) {
     return filePath;
   }
   return path.join(program.getCompilerOptions().baseUrl || process.cwd(), filePath);
@@ -34,7 +34,7 @@ export class TypeScriptFileRefactor {
   constructor(fileName: string,
               private _host: ts.CompilerHost,
               private _program?: ts.Program) {
-    fileName = resolve(fileName, _host, _program);
+    fileName = resolve(fileName, _host, _program).replace(/\\/g, '/');
     this._fileName = fileName;
     if (_program) {
       this._sourceFile = _program.getSourceFile(fileName);
