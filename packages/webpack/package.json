@@ -31,8 +31,8 @@
   },
   "peerDependencies": {
     "typescript": "^2.0.2",
-    "@angular/compiler-cli": "2.2.1",
-    "@angular/core": "2.2.1",
+    "@angular/compiler-cli": "2.2.3",
+    "@angular/core": "2.2.3",
     "reflect-metadata": "^0.1.8"
   }
 }
