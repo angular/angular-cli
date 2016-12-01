@@ -12,7 +12,8 @@ export interface CliConfig {
     apps?: {
         root?: string;
         outDir?: string;
-        assets?: string;
+        assets?: string[];
+        template?: string;
         index?: string;
         main?: string;
         test?: string;

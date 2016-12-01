@@ -39,6 +39,10 @@
             },
             "default": []
           },
+          "template": {
+            "type": "string",
+            "default": "index.html"
+          },
           "index": {
             "type": "string",
             "default": "index.html"
