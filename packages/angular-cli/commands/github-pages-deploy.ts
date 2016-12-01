@@ -147,6 +147,7 @@ const githubPagesDeployCommand = Command.extend({
       .then(saveStartingBranchName)
       .then(createGitHubRepoIfNeeded)
       .then(checkoutGhPages)
+      .then(cleanGhPagesBranch)
       .then(copyFiles)
       .then(createNotFoundPage)
       .then(addAndCommit)
@@ -203,6 +204,20 @@ const githubPagesDeployCommand = Command.extend({
         .then(() => execPromise('git add .gitignore', execOptions))
         .then(() => execPromise('git clean -f -d', execOptions))
         .then(() => execPromise(`git commit -m \"initial ${ghPagesBranch} commit\"`));
+    }
+
+    function cleanGhPagesBranch() {
+      return execPromise('git ls-files')
+        .then(function(stdout) {
+          let files = '';
+          stdout.split(/\n/).forEach(function(f) {
+            // skip .gitignore & 404.html
+            if (( f != '') && (f != '.gitignore') && (f != '404.html')) {
+              files = files.concat(`"${f}" `);
+            }
+          });
+          return execPromise(`git rm -r ${files}`);
+        });
     }
 
     function copyFiles() {
