@@ -201,8 +201,11 @@ export class TypeScriptFileRefactor {
       }
 
       const sourceMap = map.toJSON();
-      sourceMap.sources = [ this._fileName ];
-      sourceMap.file = path.basename(this._fileName, '.ts') + '.js';
+      const fileName = process.platform.startsWith('win')
+                     ? this._fileName.replace(/\//g, '\\')
+                     : this._fileName;
+      sourceMap.sources = [ fileName ];
+      sourceMap.file = path.basename(fileName, '.ts') + '.js';
       sourceMap.sourcesContent = [ this._sourceText ];
 
       return { outputText: result.outputText, sourceMap };
