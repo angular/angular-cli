@@ -7,8 +7,7 @@
   "dependencies": {
     "ie-shim": "<INHERIT>",
     "es6-promise": "<INHERIT>",
-    "es6-shim": "<INHERIT>",
-    "reflect-metadata": "<INHERIT>"
+    "es6-shim": "<INHERIT>"
   },
   "peerDependencies": {
     "zone.js": "<INHERIT>"
