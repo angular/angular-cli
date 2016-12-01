@@ -6,7 +6,8 @@ import { APP_SHELL_DIRECTIVES } from '@angular/app-shell';<% } %>
   template: `
   <h1>
     {{title}}
-  </h1>
+  </h1><% if (routing) { %>
+  <router-outlet></router-outlet><% } %>
   `,<% } else { %>
   templateUrl: './app.component.html',<% } %><% if (inlineStyle) { %>
   styles: []<% } else { %>
