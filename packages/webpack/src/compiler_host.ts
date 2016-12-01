@@ -135,15 +135,20 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       return;
     }
 
+    const isWindows = process.platform.startsWith('win');
     for (const fileName of Object.keys(this._files)) {
       const stats = this._files[fileName];
-      fs._statStorage.data[fileName] = [null, stats];
-      fs._readFileStorage.data[fileName] = [null, stats.content];
+      // If we're on windows, we need to populate with the proper path separator.
+      const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
+      fs._statStorage.data[path] = [null, stats];
+      fs._readFileStorage.data[path] = [null, stats.content];
     }
-    for (const path of Object.keys(this._directories)) {
-      const stats = this._directories[path];
-      const dirs = this.getDirectories(path);
-      const files = this.getFiles(path);
+    for (const dirName of Object.keys(this._directories)) {
+      const stats = this._directories[dirName];
+      const dirs = this.getDirectories(dirName);
+      const files = this.getFiles(dirName);
+      // If we're on windows, we need to populate with the proper path separator.
+      const path = isWindows ? dirName.replace(/\//g, '\\') : dirName;
       fs._statStorage.data[path] = [null, stats];
       fs._readdirStorage.data[path] = [null, files.concat(dirs)];
     }
@@ -215,7 +220,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
             onError?: (message: string) => void, sourceFiles?: ts.SourceFile[]): void => {
       fileName = this._resolve(fileName);
       this._setFileContent(fileName, data);
-    }
+    };
   }
 
   getCurrentDirectory(): string {
