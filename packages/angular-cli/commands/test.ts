@@ -14,6 +14,7 @@ export interface TestOptions {
   reporters?: string;
   build?: boolean;
   sourcemap?: boolean;
+  progress?: boolean;
 }
 
 
@@ -23,6 +24,7 @@ const NgCliTestCommand = TestCommand.extend({
     { name: 'code-coverage', type: Boolean, default: false, aliases: ['cc'] },
     { name: 'lint', type: Boolean, default: false, aliases: ['l'] },
     { name: 'single-run', type: Boolean, default: false, aliases: ['sr'] },
+    { name: 'progress', type: Boolean, default: true},
     { name: 'browsers', type: String },
     { name: 'colors', type: Boolean },
     { name: 'log-level', type: String },

@@ -4,6 +4,7 @@ import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
 import {packageChunkSort} from '../utilities/package-chunk-sort';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
+const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
@@ -15,6 +16,8 @@ export function getWebpackCommonConfig(
   baseHref: string,
   sourcemap: boolean,
   vendorChunk: boolean,
+  verbose: boolean,
+  progress: boolean
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -43,6 +46,13 @@ export function getWebpackCommonConfig(
       name: 'vendor',
       chunks: ['main'],
       minChunks: (module: any) => module.userRequest && module.userRequest.startsWith(nodeModules)
+    }));
+  }
+
+  if (progress) {
+    extraPlugins.push(new ProgressPlugin({
+      profile: verbose,
+      colors: true
     }));
   }
 

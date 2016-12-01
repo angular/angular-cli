@@ -13,7 +13,8 @@ const init = (config) => {
   const testConfig = {
     codeCoverage: config.angularCli.codeCoverage || false,
     lint: config.angularCli.lint || false,
-    sourcemap: config.angularCli.sourcemap
+    sourcemap: config.angularCli.sourcemap,
+    progress: config.angularCli.progress
   }
 
   // add webpack config
