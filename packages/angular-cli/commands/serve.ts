@@ -31,6 +31,7 @@ export interface ServeTaskOptions {
   progress?: boolean;
   open?: boolean;
   vendorChunk?: boolean;
+  hmr?: boolean;
 }
 
 const ServeCommand = Command.extend({
@@ -95,6 +96,12 @@ const ServeCommand = Command.extend({
       default: false,
       aliases: ['o'],
       description: 'Opens the url in default browser',
+    },
+    {
+      name: 'hmr',
+      type: Boolean,
+      default: false,
+      description: 'Enable hot module replacement',
     },
   ],
 
