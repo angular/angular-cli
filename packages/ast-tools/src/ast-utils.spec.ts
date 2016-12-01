@@ -285,6 +285,15 @@ class Module {}`
         );
       });
   });
+
+  it('works with backslashes', () => {
+    return addDeclarationToModule('1.ts', 'MyClass', 'My\\Import\\Path')
+      .then(change => change.apply())
+      .then(() => readFile('1.ts', 'utf-8'))
+      .then(content => {
+        expect(content).toContain('My/Import/Path');
+      });
+  });
 });
 
 /**
