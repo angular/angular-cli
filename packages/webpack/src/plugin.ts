@@ -32,8 +32,8 @@ export interface AotPluginOptions {
 
 export interface LazyRoute {
   moduleRoute: ModuleRoute;
-  moduleRelativePath: string;
-  moduleAbsolutePath: string;
+  absolutePath: string;
+  absoluteGenDirPath: string;
 }
 
 
@@ -102,12 +102,13 @@ export class AotPlugin implements Tapable {
     this._tsConfigPath = options.tsConfigPath;
 
     // Check the base path.
-    let basePath = path.resolve(process.cwd(), path.dirname(this._tsConfigPath));
-    if (fs.statSync(this._tsConfigPath).isDirectory()) {
-      basePath = this._tsConfigPath;
+    const maybeBasePath = path.resolve(process.cwd(), this._tsConfigPath);
+    let basePath = maybeBasePath;
+    if (fs.statSync(maybeBasePath).isFile()) {
+      basePath = path.dirname(basePath);
     }
     if (options.hasOwnProperty('basePath')) {
-      basePath = options.basePath;
+      basePath = path.resolve(process.cwd(), options.basePath);
     }
 
     const tsConfig = tsc.readConfiguration(this._tsConfigPath, basePath);
@@ -122,20 +123,7 @@ export class AotPlugin implements Tapable {
 
     this._compilerOptions = tsConfig.parsed.options;
 
-    if (options.entryModule) {
-      this._entryModule = ModuleRoute.fromString(options.entryModule);
-    } else {
-      if (options.mainPath) {
-        this._entryModule = ModuleRoute.fromString(resolveEntryModuleFromMain(options.mainPath));
-      } else {
-        this._entryModule = ModuleRoute.fromString((tsConfig.ngOptions as any).entryModule);
-      }
-    }
-    this._angularCompilerOptions = Object.assign({}, tsConfig.ngOptions, {
-      basePath,
-      entryModule: this._entryModule.toString(),
-      genDir
-    });
+    this._angularCompilerOptions = Object.assign({}, tsConfig.ngOptions, { basePath, genDir });
     this._basePath = basePath;
     this._genDir = genDir;
 
@@ -146,9 +134,22 @@ export class AotPlugin implements Tapable {
       this._skipCodeGeneration = options.skipCodeGeneration;
     }
 
-    this._compilerHost = new WebpackCompilerHost(this._compilerOptions);
+    this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
     this._program = ts.createProgram(
       this._rootFilePath, this._compilerOptions, this._compilerHost);
+
+    if (options.entryModule) {
+      this._entryModule = ModuleRoute.fromString(options.entryModule);
+    } else {
+      if (options.mainPath) {
+        const entryModuleString = resolveEntryModuleFromMain(options.mainPath, this._compilerHost,
+          this._program);
+        this._entryModule = ModuleRoute.fromString(entryModuleString);
+      } else {
+        this._entryModule = ModuleRoute.fromString((tsConfig.ngOptions as any).entryModule);
+      }
+    }
+
     this._reflectorHost = new ngCompiler.ReflectorHost(
       this._program, this._compilerHost, this._angularCompilerOptions);
     this._reflector = new ngCompiler.StaticReflector(this._reflectorHost);
@@ -170,7 +171,7 @@ export class AotPlugin implements Tapable {
           return callback();
         }
 
-        request.request = this.genDir;
+        request.request = this.skipCodeGeneration ? this.basePath : this.genDir;
         request.recursive = true;
         request.dependencies.forEach((d: any) => d.critical = false);
         return callback(null, request);
@@ -181,7 +182,7 @@ export class AotPlugin implements Tapable {
         }
 
         this.done.then(() => {
-          result.resource = this.genDir;
+          result.resource = this.skipCodeGeneration ? this.basePath : this.genDir;
           result.recursive = true;
           result.dependencies.forEach((d: any) => d.critical = false);
           result.resolveDependencies = createResolveDependenciesFromContextMap(
@@ -284,9 +285,9 @@ export class AotPlugin implements Tapable {
           .forEach(k => {
             const lazyRoute = allLazyRoutes[k];
             if (this.skipCodeGeneration) {
-              this._lazyRoutes[k] = lazyRoute.moduleAbsolutePath;
+              this._lazyRoutes[k] = lazyRoute.absolutePath + '.ts';
             } else {
-              this._lazyRoutes[k + '.ngfactory'] = lazyRoute.moduleAbsolutePath + '.ngfactory.ts';
+              this._lazyRoutes[k + '.ngfactory'] = lazyRoute.absoluteGenDirPath + '.ngfactory.ts';
             }
           });
       })
@@ -312,20 +313,31 @@ export class AotPlugin implements Tapable {
     const entryNgModuleMetadata = this.getNgModuleMetadata(staticSymbol);
     const loadChildrenRoute: LazyRoute[] = this.extractLoadChildren(entryNgModuleMetadata)
       .map(route => {
-        const mr = ModuleRoute.fromString(route);
-        const relativePath = this._resolveModulePath(mr, relativeModulePath);
-        const absolutePath = path.resolve(this.genDir, relativePath);
+        const moduleRoute = ModuleRoute.fromString(route);
+        const resolvedModule = ts.resolveModuleName(moduleRoute.path,
+          relativeModulePath, this._compilerOptions, this._compilerHost);
+
+        if (!resolvedModule.resolvedModule) {
+          throw new Error(`Could not resolve route "${route}" from file "${relativeModulePath}".`);
+        }
+
+        const relativePath = path.relative(this.basePath,
+          resolvedModule.resolvedModule.resolvedFileName).replace(/\.ts$/, '');
+
+        const absolutePath = path.join(this.basePath, relativePath);
+        const absoluteGenDirPath = path.join(this._genDir, relativePath);
+
         return {
-          moduleRoute: mr,
-          moduleRelativePath: relativePath,
-          moduleAbsolutePath: absolutePath
+          moduleRoute,
+          absoluteGenDirPath,
+          absolutePath
         };
       });
     const resultMap: LazyRouteMap = loadChildrenRoute
       .reduce((acc: LazyRouteMap, curr: LazyRoute) => {
         const key = curr.moduleRoute.path;
         if (acc[key]) {
-          if (acc[key].moduleAbsolutePath != curr.moduleAbsolutePath) {
+          if (acc[key].absolutePath != curr.absolutePath) {
             throw new Error(`Duplicated path in loadChildren detected: "${key}" is used in 2 ` +
               'loadChildren, but they point to different modules. Webpack cannot distinguish ' +
               'between the two based on context and would fail to load the proper one.');
@@ -344,7 +356,7 @@ export class AotPlugin implements Tapable {
         const child = children[p];
         const key = child.moduleRoute.path;
         if (resultMap[key]) {
-          if (resultMap[key].moduleAbsolutePath != child.moduleAbsolutePath) {
+          if (resultMap[key].absolutePath != child.absolutePath) {
             throw new Error(`Duplicated path in loadChildren detected: "${key}" is used in 2 ` +
               'loadChildren, but they point to different modules. Webpack cannot distinguish ' +
               'between the two based on context and would fail to load the proper one.');
