@@ -1,3 +1,32 @@
+<a name="1.0.0-beta.22"></a>
+# [1.0.0-beta.22](https://github.com/angular/angular-cli/compare/v1.0.0-beta.21...v1.0.0-beta.22) (2016-12-02)
+
+
+### Bug Fixes
+
+* **@ngtools/webpack:** fixed path resolution for entry modules and lazy routes ([#3332](https://github.com/angular/angular-cli/issues/3332)) ([45d5154](https://github.com/angular/angular-cli/commit/45d5154))
+* **build:** don't inline sourcemaps ([#3262](https://github.com/angular/angular-cli/issues/3262)) ([859d905](https://github.com/angular/angular-cli/commit/859d905))
+* **build:** use custom index value when copying to 404.html during github deploy ([#3201](https://github.com/angular/angular-cli/issues/3201)) ([b1cbf17](https://github.com/angular/angular-cli/commit/b1cbf17))
+* **ngtools/webpack:** move the generate directory to a separate dir ([#3256](https://github.com/angular/angular-cli/issues/3256)) ([d1037df](https://github.com/angular/angular-cli/commit/d1037df))
+* **version:** bump ast-tools and webpack versions to correct mismatch with published packages ([54ef738](https://github.com/angular/angular-cli/commit/54ef738))
+
+
+### Features
+
+* **angular:** Update Angular2 version to 2.2.3 ([#3295](https://github.com/angular/angular-cli/issues/3295)) ([ed305a2](https://github.com/angular/angular-cli/commit/ed305a2))
+* **build:** add --verbose and --progress flags ([#2858](https://github.com/angular/angular-cli/issues/2858)) ([f6f24e7](https://github.com/angular/angular-cli/commit/f6f24e7)), closes [#1836](https://github.com/angular/angular-cli/issues/1836) [#2012](https://github.com/angular/angular-cli/issues/2012)
+* **build:** auto generate vendor chunk ([#3117](https://github.com/angular/angular-cli/issues/3117)) ([bf9c8f1](https://github.com/angular/angular-cli/commit/bf9c8f1))
+* **new:** include routing in spec and inline template when called with `--routing` ([#3252](https://github.com/angular/angular-cli/issues/3252)) ([53ab4df](https://github.com/angular/angular-cli/commit/53ab4df))
+* **serve:** add --hmr flag for HotModuleReplacement support ([#3330](https://github.com/angular/angular-cli/issues/3330)) ([46efa9e](https://github.com/angular/angular-cli/commit/46efa9e))
+
+
+### BREAKING CHANGES
+
+* build: `ng build/serve` now generates `vendor.bundle.js` by
+default.
+
+
+
 <a name="1.0.0-beta.21"></a>
 # [1.0.0-beta.21](https://github.com/angular/angular-cli/compare/v1.0.0-beta.20-1...v1.0.0-beta.21) (2016-11-23)
 
