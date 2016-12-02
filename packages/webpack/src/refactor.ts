@@ -11,7 +11,17 @@ export interface TranspileOutput {
   sourceMap: any | null;
 }
 
+
+function resolve(filePath: string, host: ts.CompilerHost, program: ts.Program) {
+  if (path.isAbsolute(filePath)) {
+    return filePath;
+  }
+  return path.join(program.getCompilerOptions().baseUrl || process.cwd(), filePath);
+}
+
+
 export class TypeScriptFileRefactor {
+  private _fileName: string;
   private _sourceFile: ts.SourceFile;
   private _sourceString: any;
   private _sourceText: string;
@@ -21,15 +31,17 @@ export class TypeScriptFileRefactor {
   get sourceFile() { return this._sourceFile; }
   get sourceText() { return this._sourceString.toString(); }
 
-  constructor(private _fileName: string,
+  constructor(fileName: string,
               private _host: ts.CompilerHost,
               private _program?: ts.Program) {
+    fileName = resolve(fileName, _host, _program).replace(/\\/g, '/');
+    this._fileName = fileName;
     if (_program) {
-      this._sourceFile = _program.getSourceFile(_fileName);
+      this._sourceFile = _program.getSourceFile(fileName);
     }
     if (!this._sourceFile) {
       this._program = null;
-      this._sourceFile = ts.createSourceFile(_fileName, _host.readFile(_fileName),
+      this._sourceFile = ts.createSourceFile(fileName, _host.readFile(fileName),
         ts.ScriptTarget.Latest);
     }
     this._sourceText = this._sourceFile.getFullText(this._sourceFile);
@@ -48,18 +60,21 @@ export class TypeScriptFileRefactor {
 
   /**
    * Find all nodes from the AST in the subtree of node of SyntaxKind kind.
-   * @param node
-   * @param kind
+   * @param node The root node to check, or null if the whole tree should be searched.
+   * @param kind The kind of nodes to find.
    * @param recursive Whether to go in matched nodes to keep matching.
    * @param max The maximum number of items to return.
    * @return all nodes of kind, or [] if none is found
    */
-  findAstNodes(node: ts.Node,
+  findAstNodes(node: ts.Node | null,
                kind: ts.SyntaxKind,
                recursive = false,
                max: number = Infinity): ts.Node[] {
-    if (!node || max == 0) {
+    if (max == 0) {
       return [];
+    }
+    if (!node) {
+      node = this._sourceFile;
     }
 
     let arr: ts.Node[] = [];
@@ -157,8 +172,6 @@ export class TypeScriptFileRefactor {
   }
 
   transpile(compilerOptions: ts.CompilerOptions): TranspileOutput {
-    // const basePath = path.resolve(path.dirname(tsConfigPath),
-    //   tsConfig.config.compilerOptions.baseUrl || '.');
     compilerOptions = Object.assign({}, compilerOptions, {
       sourceMap: true,
       inlineSources: false,
@@ -188,8 +201,11 @@ export class TypeScriptFileRefactor {
       }
 
       const sourceMap = map.toJSON();
-      sourceMap.sources = [ this._fileName ];
-      sourceMap.file = path.basename(this._fileName, '.ts') + '.js';
+      const fileName = process.platform.startsWith('win')
+                     ? this._fileName.replace(/\//g, '\\')
+                     : this._fileName;
+      sourceMap.sources = [ fileName ];
+      sourceMap.file = path.basename(fileName, '.ts') + '.js';
       sourceMap.sourcesContent = [ this._sourceText ];
 
       return { outputText: result.outputText, sourceMap };
