@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import {basename, dirname} from 'path';
+import {basename, dirname, join} from 'path';
 import * as fs from 'fs';
 
 
@@ -93,8 +93,28 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _directories: {[path: string]: VirtualDirStats} = Object.create(null);
   private _changed = false;
 
-  constructor(private _options: ts.CompilerOptions, private _setParentNodes = true) {
+  private _basePath: string;
+  private _setParentNodes: boolean;
+
+  constructor(private _options: ts.CompilerOptions, basePath: string) {
+    this._setParentNodes = true;
     this._delegate = ts.createCompilerHost(this._options, this._setParentNodes);
+    this._basePath = this._normalizePath(basePath);
+  }
+
+  private _normalizePath(path: string) {
+    return path.replace(/\\/g, '/');
+  }
+
+  private _resolve(path: string) {
+    path = this._normalizePath(path);
+    if (path[0] == '.') {
+      return join(this.getCurrentDirectory(), path);
+    } else if (path[0] == '/' || path.match(/^\w:\//)) {
+      return path;
+    } else {
+      return join(this._basePath, path);
+    }
   }
 
   private _setFileContent(fileName: string, content: string) {
@@ -115,15 +135,20 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       return;
     }
 
+    const isWindows = process.platform.startsWith('win');
     for (const fileName of Object.keys(this._files)) {
       const stats = this._files[fileName];
-      fs._statStorage.data[fileName] = [null, stats];
-      fs._readFileStorage.data[fileName] = [null, stats.content];
+      // If we're on windows, we need to populate with the proper path separator.
+      const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
+      fs._statStorage.data[path] = [null, stats];
+      fs._readFileStorage.data[path] = [null, stats.content];
     }
-    for (const path of Object.keys(this._directories)) {
-      const stats = this._directories[path];
-      const dirs = this.getDirectories(path);
-      const files = this.getFiles(path);
+    for (const dirName of Object.keys(this._directories)) {
+      const stats = this._directories[dirName];
+      const dirs = this.getDirectories(dirName);
+      const files = this.getFiles(dirName);
+      // If we're on windows, we need to populate with the proper path separator.
+      const path = isWindows ? dirName.replace(/\//g, '\\') : dirName;
       fs._statStorage.data[path] = [null, stats];
       fs._readdirStorage.data[path] = [null, files.concat(dirs)];
     }
@@ -132,26 +157,31 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   fileExists(fileName: string): boolean {
+    fileName = this._resolve(fileName);
     return fileName in this._files || this._delegate.fileExists(fileName);
   }
 
   readFile(fileName: string): string {
+    fileName = this._resolve(fileName);
     return (fileName in this._files)
          ? this._files[fileName].content
          : this._delegate.readFile(fileName);
   }
 
   directoryExists(directoryName: string): boolean {
+    directoryName = this._resolve(directoryName);
     return (directoryName in this._directories) || this._delegate.directoryExists(directoryName);
   }
 
   getFiles(path: string): string[] {
+    path = this._resolve(path);
     return Object.keys(this._files)
       .filter(fileName => dirname(fileName) == path)
       .map(path => basename(path));
   }
 
   getDirectories(path: string): string[] {
+    path = this._resolve(path);
     const subdirs = Object.keys(this._directories)
       .filter(fileName => dirname(fileName) == path)
       .map(path => basename(path));
@@ -166,6 +196,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: OnErrorFn) {
+    fileName = this._resolve(fileName);
+
     if (!(fileName in this._files)) {
       return this._delegate.getSourceFile(fileName, languageVersion, onError);
     }
@@ -181,15 +213,22 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     return this._delegate.getDefaultLibFileName(options);
   }
 
-  writeFile(fileName: string, data: string, writeByteOrderMark: boolean, onError?: OnErrorFn) {
-    this._setFileContent(fileName, data);
+  // This is due to typescript CompilerHost interface being weird on writeFile. This shuts down
+  // typings in WebStorm.
+  get writeFile() {
+    return (fileName: string, data: string, writeByteOrderMark: boolean,
+            onError?: (message: string) => void, sourceFiles?: ts.SourceFile[]): void => {
+      fileName = this._resolve(fileName);
+      this._setFileContent(fileName, data);
+    };
   }
 
   getCurrentDirectory(): string {
-    return this._delegate.getCurrentDirectory();
+    return this._basePath !== null ? this._basePath : this._delegate.getCurrentDirectory();
   }
 
   getCanonicalFileName(fileName: string): string {
+    fileName = this._resolve(fileName);
     return this._delegate.getCanonicalFileName(fileName);
   }
 
