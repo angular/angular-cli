@@ -18,6 +18,8 @@ const green = chalk.green;
 const red = chalk.red;
 const white = chalk.white;
 
+const setGlobalVariable = require('./e2e/utils/env').setGlobalVariable;
+
 
 /**
  * Here's a short description of those flags:
@@ -73,6 +75,8 @@ if (testsToRun.length == allTests.length) {
   console.log(`Running ${testsToRun.length} tests (${allTests.length + allSetups.length} total)`);
 }
 
+setGlobalVariable('argv', argv);
+
 testsToRun.reduce((previous, relativeName) => {
   // Make sure this is a windows compatible path.
   let absoluteName = path.join(e2eRoot, relativeName);
@@ -96,7 +100,7 @@ testsToRun.reduce((previous, relativeName) => {
     return Promise.resolve()
       .then(() => printHeader(currentFileName))
       .then(() => previousDir = process.cwd())
-      .then(() => fn(argv, () => clean = false))
+      .then(() => fn(() => clean = false))
       .then(() => console.log('  ----'))
       .then(() => {
         // If we're not in a setup, change the directory back to where it was before the test.

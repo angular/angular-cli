@@ -5,7 +5,7 @@ import {join} from 'path';
 import {expectFileSizeToBeUnder} from '../../../utils/fs';
 
 
-export default function(argv: any, skipCleaning: () => void) {
+export default function(skipCleaning: () => void) {
   if (process.platform.startsWith('win')) {
     // Disable the test on Windows.
     return Promise.resolve();
