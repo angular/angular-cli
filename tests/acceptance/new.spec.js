@@ -6,7 +6,7 @@ var existsSync = require('exists-sync');
 var expect = require('chai').expect;
 var forEach = require('lodash/forEach');
 var walkSync = require('walk-sync');
-var Blueprint = require('angular-cli/ember-cli/lib/models/blueprint');
+var Blueprint = require('universal-cli/ember-cli/lib/models/blueprint');
 var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = process.cwd();
@@ -39,7 +39,7 @@ describe('Acceptance: ung new', function () {
       });
 
       expected.forEach(function (file, index) {
-        expected[index] = file.replace(/__name__/g, 'angular-cli');
+        expected[index] = file.replace(/__name__/g, 'universal-cli');
       });
 
       expected.sort();
@@ -86,7 +86,7 @@ describe('Acceptance: ung new', function () {
     });
   });
 
-  it('Cannot run ung new, inside of angular-cli project', function () {
+  it('Cannot run ung new, inside of universal-cli project', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git'])
       .then(function () {
         return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git']).then(() => {

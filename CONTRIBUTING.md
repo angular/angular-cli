@@ -1,6 +1,6 @@
-# Contributing to angular-cli
+# Contributing to universal-cli
 
-We would love for you to contribute to angular-cli and help make it even better
+We would love for you to contribute to universal-cli and help make it even better
 than it is today! As a contributor, here are the guidelines we would like you
 to follow:
 
@@ -18,7 +18,7 @@ Help us keep Angular open and inclusive. Please read and follow our [Code of Con
 
 ## <a name="question"></a> Got a Question or Problem?
 
-If you have questions about how to *use* Angular CLI, please direct them to [StackOverflow][stackoverflow]. Please note that angular-cli is still in early developer preview, and the core team's capacity to answer usage questions is limited. We are also available on [Gitter][gitter].
+If you have questions about how to *use* Angular CLI, please direct them to [StackOverflow][stackoverflow]. Please note that universal-cli is still in early developer preview, and the core team's capacity to answer usage questions is limited. We are also available on [Gitter][gitter].
 
 ## <a name="issue"></a> Found an Issue?
 If you find a bug in the source code or a mistake in the documentation, you can help us by
@@ -57,13 +57,13 @@ chances of your issue being dealt with quickly:
 * **Suggest a Fix** - if you can't fix the bug yourself, perhaps you can point to what might be
   causing the problem (line of code or commit)
 
-You can file new issues by providing the above information [here](https://github.com/angular/angular-cli/issues/new).
+You can file new issues by providing the above information [here](https://github.com/angular/universal-cli/issues/new).
 
 
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
 Before you submit your Pull Request (PR) consider the following guidelines:
 
-* Search [GitHub](https://github.com/angular/angular-cli/pulls) for an open or closed PR
+* Search [GitHub](https://github.com/angular/universal-cli/pulls) for an open or closed PR
   that relates to your submission. You don't want to duplicate effort.
 * Please sign our [Contributor License Agreement (CLA)](#cla) before sending PRs.
   We cannot accept code without this.
@@ -92,7 +92,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
     git push origin my-fix-branch
     ```
 
-* In GitHub, send a pull request to `angular-cli:master`.
+* In GitHub, send a pull request to `universal-cli:master`.
 * If we suggest changes then:
   * Make the required updates.
   * Re-run the Angular CLI test suites for JS and Dart to ensure tests are still passing.

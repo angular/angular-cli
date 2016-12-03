@@ -1,7 +1,7 @@
 const mockFs = require('mock-fs');
 const expect = require('chai').expect;
 import * as path from 'path';
-import {findLoadChildren, findLazyModules}  from 'angular-cli/models/find-lazy-modules';
+import {findLoadChildren, findLazyModules}  from 'universal-cli/models/find-lazy-modules';
 
 describe('find-lazy-modules', () => {
   beforeEach(() => {

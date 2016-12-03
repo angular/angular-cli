@@ -10,7 +10,7 @@ let packages = require('../../../lib/packages');
 
 
 export default function (argv: any) {
-  let createProject = null;
+  let createProject: any = null;
 
   // This is a dangerous flag, but is useful for testing packages only.
   if (argv.noproject) {

@@ -7,7 +7,7 @@ var expect = require('chai').expect;
 var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = process.cwd();
-var Promise = require('angular-cli/ember-cli/lib/ext/promise');
+var Promise = require('universal-cli/ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
 const denodeify = require('denodeify');
 

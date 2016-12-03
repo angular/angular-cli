@@ -21,9 +21,9 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 This project is very much still a work in progress.
 
 The CLI is now in alpha.
-If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
+If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/devCrossNet/angular-cli/issues).
 
-Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
+Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/devCrossNet/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
 
 ## Webpack update
 
@@ -31,7 +31,7 @@ We changed the build system between beta.10 and beta.14, from SystemJS to Webpac
 And with it comes a lot of benefits.
 To take advantage of these, your app built with the old beta will need to migrate.
 
-You can update your `beta.10` projects to `beta.14` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
+You can update your `beta.10` projects to `beta.14` by following [these instructions](https://github.com/devCrossNet/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
 
 ## Prerequisites
 
@@ -62,8 +62,8 @@ with NPM 3 or higher.
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
 * [Global Library Installation](#global-library-installation)
-* [Updating angular-cli](#updating-angular-cli)
-* [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
+* [Updating universal-cli](#updating-universal-cli)
+* [Development Hints for hacking on universal-cli](#development-hints-for-hacking-on-universal-cli)
 
 ## Installation
 
@@ -281,7 +281,7 @@ please see the angular/mobile-toolkit project and https://mobile.angular.io/ for
 
 ### Support for server side rendering
 
-**Angular-CLI includes Angular Universal via the `--universal` flag on `ung new` and `ung init`.**
+**Universal-CLI includes Angular Universal via the `--universal` flag on `ung new` and `ung init`.**
 
 **Angular Universal** helps you to seo optimize your application and offers a better user experience through server side rendering.
 Please see the **angular/universal** project and https://universal.angular.io/ for documentation on how to make use of this functionality.
@@ -336,7 +336,7 @@ You can add more global styles via the `apps[0].styles` property in `angular-cli
 
 ### CSS Preprocessor integration
 
-Angular-CLI supports all major CSS preprocessors:
+Universal-CLI supports all major CSS preprocessors:
 - sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
 - less ([http://lesscss.org/](http://lesscss.org/))
 - stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
@@ -425,21 +425,21 @@ Finally add the Bootstrap CSS to the `apps[0].styles` array:
 Restart `ung serve` if you're running it, and Bootstrap 4 should be working on
 your app.
 
-### Updating angular-cli
+### Updating universal-cli
 
-To update `angular-cli` to a new version, you must update both the global package and your project's local package.
+To update `universal-cli` to a new version, you must update both the global package and your project's local package.
 
 Global package:
 ```bash
-npm uninstall -g angular-cli
+npm uninstall -g universal-cli
 npm cache clean
-npm install -g angular-cli@latest
+npm install -g universal-cli
 ```
 
 Local project package:
 ```bash
 rm -rf node_modules dist tmp
-npm install --save-dev angular-cli@latest
+npm install --save-dev universal-cli
 npm install
 ung init
 ```
@@ -450,40 +450,40 @@ Carefully read the diffs for each code file, and either accept the changes or in
 
 **The main cause of errors after an update is failing to incorporate these updates into your code**.
 
-You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
+You can find more details about changes between versions in [CHANGELOG.md](https://github.com/devCrossNet/angular-cli/blob/master/CHANGELOG.md).
 
 
-## Development Hints for hacking on angular-cli
+## Development Hints for hacking on universal-cli
 
 ### Working with master
 
 ```bash
-git clone https://github.com/angular/angular-cli.git
+git clone https://github.com/devCrossNet/angular-cli.git
 cd angular-cli
 npm link
 ```
 
 `npm link` is very similar to `npm install -g` except that instead of downloading the package
 from the repo, the just cloned `angular-cli/` folder becomes the global package.
-Any changes to the files in the `angular-cli/` folder will immediately affect the global `angular-cli` package,
+Any changes to the files in the `angular-cli/` folder will immediately affect the global `universal-cli` package,
 allowing you to quickly test any changes you make to the cli project.
 
-Now you can use `angular-cli` via the command line:
+Now you can use `universal-cli` via the command line:
 
 ```bash
 ung new foo
 cd foo
-npm link angular-cli
+npm link universal-cli
 ung serve
 ```
 
-`npm link angular-cli` is needed because by default the globally installed `angular-cli` just loads
-the local `angular-cli` from the project which was fetched remotely from npm.
-`npm link angular-cli` symlinks the global `angular-cli` package to the local `angular-cli` package.
-Now the `angular-cli` you cloned before is in three places:
-The folder you cloned it into, npm's folder where it stores global packages and the `angular-cli` project you just created.
+`npm link universal-cli` is needed because by default the globally installed `universal-cli` just loads
+the local `universal-cli` from the project which was fetched remotely from npm.
+`npm link universal-cli` symlinks the global `universal-cli` package to the local `universal-cli` package.
+Now the `universal-cli` you cloned before is in three places:
+The folder you cloned it into, npm's folder where it stores global packages and the `universal-cli` project you just created.
 
-You can also use `ung new foo --link-cli` to automatically link the `angular-cli` package.
+You can also use `ung new foo --link-cli` to automatically link the `universal-cli` package.
 
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.

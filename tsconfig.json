@@ -22,14 +22,14 @@
       "node"
     ],
     "paths": {
-      "angular-cli/*": [ "./packages/angular-cli/*" ],
+      "universal-cli/*": [ "./packages/universal-cli/*" ],
       "@angular-cli/ast-tools": [ "./packages/ast-tools/src" ],
       "@angular-cli/base-href-webpack": [ "./packages/base-href-webpack/src" ],
       "@ngtools/webpack": [ "./packages/webpack/src" ]
     }
   },
   "exclude": [
-    "packages/angular-cli/blueprints/*/files/**/*",
+    "packages/universal-cli/blueprints/*/files/**/*",
     "dist/**/*",
     "node_modules/**/*",
     "tmp/**/*"

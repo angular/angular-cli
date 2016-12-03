@@ -3,7 +3,7 @@ import {stripIndents} from 'common-tags';
 import {expect} from 'chai';
 import {join} from 'path';
 
-import {findLazyModules} from 'angular-cli/models/find-lazy-modules';
+import {findLazyModules} from 'universal-cli/models/find-lazy-modules';
 
 
 describe('find-lazy-module', () => {

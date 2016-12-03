@@ -80,7 +80,7 @@ Promise.resolve()
     return files
       .map((fileName) => path.relative(packagesRoot, fileName))
       .filter((fileName) => {
-        if (/^angular-cli[\\\/]blueprints/.test(fileName)) {
+        if (/^universal-cli[\\\/]blueprints/.test(fileName)) {
           return true;
         }
         if (/\.d\.ts$/.test(fileName)) {
@@ -136,7 +136,7 @@ Promise.resolve()
       'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE', 'README.md'
     ].map(fileName => {
       console.log(`Copying ${fileName}...`);
-      return copy(fileName, path.join('dist/angular-cli', fileName));
+      return copy(fileName, path.join('dist/universal-cli', fileName));
     }));
   })
   .then(() => process.exit(0), (err) => {

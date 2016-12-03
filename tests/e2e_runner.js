@@ -23,7 +23,7 @@ const white = chalk.white;
  * Here's a short description of those flags:
  *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
  *   --noproject      Skip creating a project or using one.
- *   --nolink         Skip linking your local angular-cli directory. Can save a few seconds.
+ *   --nolink         Skip linking your local universal-cli directory. Can save a few seconds.
  *   --nightly        Install angular nightly builds over the test project.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
  *                    created, and npm installed. Ideally you want a project created by a previous

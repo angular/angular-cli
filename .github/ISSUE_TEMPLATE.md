@@ -6,7 +6,7 @@
 
 
 ### Versions.
-> Please run `ng --version`. If there's nothing outputted, please run in a Terminal: `node --version` and paste the result here:
+> Please run `ung --version`. If there's nothing outputted, please run in a Terminal: `node --version` and paste the result here:
 
 
 ### Repro steps.

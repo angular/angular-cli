@@ -8,7 +8,7 @@ import {InsertChange, NodeHost, RemoveChange, ReplaceChange} from './change';
 import fs = require('fs');
 
 let path = require('path');
-let Promise = require('angular-cli/ember-cli/lib/ext/promise');
+let Promise = require('universal-cli/ember-cli/lib/ext/promise');
 
 const readFile =  Promise.denodeify(fs.readFile);
 

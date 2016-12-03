@@ -2,7 +2,7 @@
 
 var fs = require('fs-extra');
 var existsSync = require('exists-sync');
-var Promise = require('angular-cli/ember-cli/lib/ext/promise');
+var Promise = require('universal-cli/ember-cli/lib/ext/promise');
 var remove = Promise.denodeify(fs.remove);
 var root = process.cwd();
 

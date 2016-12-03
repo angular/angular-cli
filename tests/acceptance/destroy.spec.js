@@ -16,14 +16,14 @@ describe('Acceptance: ung destroy', function () {
   });
 
   afterEach(function () {
-    return tmp.teardown('./tmp');
+    // return tmp.teardown('./tmp');
   });
 
   it('without args should fail', function () {
     return ng(['destroy']).then(() => {
       throw new SilentError('ung destroy should fail.');
     }, (err) => {
-      expect(err.message).to.equal('The destroy command is not supported by Angular-CLI.');
+      expect(err.message).to.equal('The destroy command is not supported by Universal-CLI.');
     });
   });
 
@@ -31,7 +31,7 @@ describe('Acceptance: ung destroy', function () {
     return ng(['destroy', 'something']).then(() => {
       throw new SilentError('ung destroy something should fail.');
     }, (err) => {
-      expect(err.message).to.equal('The destroy command is not supported by Angular-CLI.');
+      expect(err.message).to.equal('The destroy command is not supported by Universal-CLI.');
     });
   });
 });

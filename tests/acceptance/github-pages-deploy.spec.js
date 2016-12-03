@@ -3,7 +3,7 @@
 
 var ng = require('../helpers/ng');
 var tmp = require('../helpers/tmp');
-var Promise = require('angular-cli/ember-cli/lib/ext/promise');
+var Promise = require('universal-cli/ember-cli/lib/ext/promise');
 var fs = require('fs');
 var path = require('path');
 var chai = require('chai');

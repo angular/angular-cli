@@ -2,7 +2,7 @@
   "name": "universal-cli",
   "version": "1.0.0-alpha.universal.2-2",
   "description": "CLI tool for Angular with Angular Universal support",
-  "main": "packages/angular-cli/lib/cli/index.js",
+  "main": "packages/universal-cli/lib/cli/index.js",
   "trackingCode": "xx-xxxxxxx-xx",
   "bin": {
     "ung": "./bin/ung"
@@ -21,14 +21,14 @@
     "test:inspect": "node --inspect --debug-brk tests/runner",
     "test:packages": "node scripts/run-packages-spec.js",
     "test:universal": "UNIVERSAL=true node tests/e2e_runner.js",
-    "build-config-interface": "dtsgen packages/angular-cli/lib/config/schema.json --out packages/angular-cli/lib/config/schema.d.ts",
+    "build-config-interface": "dtsgen packages/universal-cli/lib/config/schema.json --out packages/universal-cli/lib/config/schema.d.ts",
     "eslint": "eslint .",
     "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
     "lint": "npm-run-all -c eslint tslint"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/devCrossNet/angular-cli.git"
+    "url": "https://github.com/devCrossNet/universal-cli.git"
   },
   "engines": {
     "node": ">= 4.1.0",
@@ -42,9 +42,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/devCrossNet/angular-cli/issues"
+    "url": "https://github.com/devCrossNet/universal-cli/issues"
   },
-  "homepage": "https://github.com/devCrossNet/angular-cli",
+  "homepage": "https://github.com/devCrossNet/universal-cli",
   "dependencies": {
     "@angular-cli/ast-tools": "^1.0.0",
     "@angular/compiler": "^2.1.0",
@@ -142,7 +142,7 @@
   },
   "ember-addon": {
     "paths": [
-      "./packages/angular-cli/lib/addon"
+      "./packages/universal-cli/lib/addon"
     ]
   },
   "devDependencies": {
