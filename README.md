@@ -1,5 +1,5 @@
 ## Universal-CLI
-Universal-CLI is fork from Angular-CLI. It supports Angular Universal see: [Support for server side rendering](#support-for-server-side-rendering).
+Universal-CLI is fork from Angular-CLI. It supports Angular Universal (with `--universal` flag after `ung new` or `ung init`), see  [Support for server side rendering](#support-for-server-side-rendering) for detail.
 It is a separate package because the Core-CLI team is not able to maintain non-core functionality.
 
 I am looking for maintainers, please let me know if you're interested in supporting `universal-cli`.
