@@ -1,6 +1,6 @@
 # <%= jsComponentName %>
 
-This project was generated with [universal-cli](https://github.com/devCrossNet/angular-cli) version <%= version %>.
+This project was generated with [universal-cli](https://github.com/devCrossNet/universal-cli) version <%= version %>.
 
 ## Development server
 Run `ung serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
@@ -28,4 +28,4 @@ Run `ung github-pages:deploy` to deploy to Github Pages.
 
 ## Further help
 
-To get more help on the `universal-cli` use `ung --help` or go check out the [Universal-CLI README](https://github.com/devCrossNet/angular-cli/blob/master/README.md).
+To get more help on the `universal-cli` use `ung --help` or go check out the [Universal-CLI README](https://github.com/devCrossNet/universal-cli/blob/master/README.md).

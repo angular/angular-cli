@@ -21,9 +21,9 @@ Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://ww
 This project is very much still a work in progress.
 
 The CLI is now in alpha.
-If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/devCrossNet/angular-cli/issues).
+If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/devCrossNet/universal-cli/issues).
 
-Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/devCrossNet/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
+Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/devCrossNet/universal-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).  
 
 ## Webpack update
 
@@ -31,7 +31,7 @@ We changed the build system between beta.10 and beta.14, from SystemJS to Webpac
 And with it comes a lot of benefits.
 To take advantage of these, your app built with the old beta will need to migrate.
 
-You can update your `beta.10` projects to `beta.14` by following [these instructions](https://github.com/devCrossNet/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
+You can update your `beta.10` projects to `beta.14` by following [these instructions](https://github.com/devCrossNet/universal-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
 
 ## Prerequisites
 
@@ -450,7 +450,7 @@ Carefully read the diffs for each code file, and either accept the changes or in
 
 **The main cause of errors after an update is failing to incorporate these updates into your code**.
 
-You can find more details about changes between versions in [CHANGELOG.md](https://github.com/devCrossNet/angular-cli/blob/master/CHANGELOG.md).
+You can find more details about changes between versions in [CHANGELOG.md](https://github.com/devCrossNet/universal-cli/blob/master/CHANGELOG.md).
 
 
 ## Development Hints for hacking on universal-cli
@@ -458,14 +458,14 @@ You can find more details about changes between versions in [CHANGELOG.md](https
 ### Working with master
 
 ```bash
-git clone https://github.com/devCrossNet/angular-cli.git
-cd angular-cli
+git clone https://github.com/devCrossNet/universal-cli.git
+cd universal-cli
 npm link
 ```
 
 `npm link` is very similar to `npm install -g` except that instead of downloading the package
-from the repo, the just cloned `angular-cli/` folder becomes the global package.
-Any changes to the files in the `angular-cli/` folder will immediately affect the global `universal-cli` package,
+from the repo, the just cloned `universal-cli/` folder becomes the global package.
+Any changes to the files in the `universal-cli/` folder will immediately affect the global `universal-cli` package,
 allowing you to quickly test any changes you make to the cli project.
 
 Now you can use `universal-cli` via the command line:
@@ -494,11 +494,11 @@ and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackageloca
 MIT
 
 
-[travis-badge]: https://travis-ci.org/devCrossNet/angular-cli.svg?branch=master
-[travis-badge-url]: https://travis-ci.org/devCrossNet/angular-cli
-[david-badge]: https://david-dm.org/devCrossNet/angular-cli.svg
-[david-badge-url]: https://david-dm.org/devCrossNet/angular-cli
-[david-dev-badge]: https://david-dm.org/devCrossNet/angular-cli/dev-status.svg
-[david-dev-badge-url]: https://david-dm.org/devCrossNet/angular-cli?type=dev
+[travis-badge]: https://travis-ci.org/devCrossNet/universal-cli.svg?branch=master
+[travis-badge-url]: https://travis-ci.org/devCrossNet/universal-cli
+[david-badge]: https://david-dm.org/devCrossNet/universal-cli.svg
+[david-badge-url]: https://david-dm.org/devCrossNet/universal-cli
+[david-dev-badge]: https://david-dm.org/devCrossNet/universal-cli/dev-status.svg
+[david-dev-badge-url]: https://david-dm.org/devCrossNet/universal-cli?type=dev
 [npm-badge]: https://img.shields.io/npm/v/universal-cli.svg
 [npm-badge-url]: https://www.npmjs.com/package/universal-cli

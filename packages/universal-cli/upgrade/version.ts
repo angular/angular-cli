@@ -99,7 +99,7 @@ export class Version {
         workflow, a faster build, and smaller bundles.
         
         To get more info, including a step-by-step guide to upgrade the CLI, follow this link:
-        https://github.com/devCrossNet/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14
+        https://github.com/devCrossNet/universal-cli/wiki/Upgrading-from-Beta.10-to-Beta.14
       ` + '\n')));
       process.exit(1);
     } else {
