@@ -5,7 +5,7 @@ import {ng} from '../../utils/process';
 import {addImportToModule} from '../../utils/ast';
 
 
-export default function(argv: any) {
+export default function() {
   let oldNumberOfFiles = 0;
   return Promise.resolve()
     .then(() => ng('build'))

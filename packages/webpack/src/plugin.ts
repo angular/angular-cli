@@ -160,12 +160,6 @@ export class AotPlugin implements Tapable {
     this._compiler = compiler;
 
     compiler.plugin('context-module-factory', (cmf: any) => {
-      cmf.resolvers.normal.apply(new PathsPlugin({
-        tsConfigPath: this._tsConfigPath,
-        compilerOptions: this._compilerOptions,
-        compilerHost: this._compilerHost
-      }));
-
       cmf.plugin('before-resolve', (request: any, callback: (err?: any, request?: any) => void) => {
         if (!request) {
           return callback();
@@ -209,6 +203,11 @@ export class AotPlugin implements Tapable {
         cb();
       }
     });
+    compiler.resolvers.normal.apply(new PathsPlugin({
+      tsConfigPath: this._tsConfigPath,
+      compilerOptions: this._compilerOptions,
+      compilerHost: this._compilerHost
+    }));
   }
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
