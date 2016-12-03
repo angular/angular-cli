@@ -102,6 +102,7 @@ const githubPagesDeployCommand = Command.extend({
     let ghPagesBranch = 'gh-pages';
     let destinationBranch = options.userPage ? 'master' : ghPagesBranch;
     let initialBranch: string;
+    let branchErrMsg = ' You might also need to return to the initial branch manually.';
 
     // declared here so that tests can stub exec
     const execPromise = <(cmd: string, options?: any) => Promise<string>>denodeify(exec);
@@ -240,7 +241,12 @@ const githubPagesDeployCommand = Command.extend({
     function addAndCommit() {
       return execPromise('git add .', execOptions)
         .then(() => execPromise(`git commit -m "${options.message}"`))
-        .catch(() => Promise.reject(new SilentError('No changes found. Deployment skipped.')));
+        .catch(() => {
+          let msg = 'No changes found. Deployment skipped.';
+          return returnStartingBranch()
+            .then(() => Promise.reject(new SilentError(msg)))
+            .catch(() => Promise.reject(new SilentError(msg.concat(branchErrMsg))));
+        });
     }
 
     function returnStartingBranch() {
@@ -248,7 +254,9 @@ const githubPagesDeployCommand = Command.extend({
     }
 
     function pushToGitRepo() {
-      return execPromise(`git push origin ${ghPagesBranch}:${destinationBranch}`);
+      return execPromise(`git push origin ${ghPagesBranch}:${destinationBranch}`)
+        .catch((err) => returnStartingBranch()
+          .catch(() => Promise.reject(err) ));
     }
 
     function printProjectUrl() {
@@ -267,8 +275,7 @@ const githubPagesDeployCommand = Command.extend({
         ui.writeLine(error.message);
         let msg = 'There was a permissions error during git file operations, ' +
           'please close any open project files/folders and try again.';
-        msg += `\nYou might also need to return to the ${initialBranch} branch manually.`;
-        return Promise.reject(new SilentError(msg));
+        return Promise.reject(new SilentError(msg.concat(branchErrMsg)));
       } else {
         return Promise.reject(error);
       }
