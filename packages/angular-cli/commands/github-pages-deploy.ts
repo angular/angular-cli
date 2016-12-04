@@ -10,6 +10,7 @@ export interface GithubPagesDeployOptions {
     ghToken?: string;
     ghUsername?: string;
     baseHref?: string;
+    customDomain?: string;
 }
 
 const githubPagesDeployCommand = Command.extend({
@@ -62,6 +63,12 @@ const githubPagesDeployCommand = Command.extend({
             type: String,
             default: null,
             aliases: ['bh']
+        }, {
+            name: 'custom-domain',
+            type: String,
+            default: null,
+            aliases: ['cd'],
+            description: 'Custom domain for Github Pages'
         }],
 
     run: function(options: GithubPagesDeployOptions, rawArgs: string[]) {
