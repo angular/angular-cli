@@ -6,7 +6,7 @@ import {expectFileSizeToBeUnder, expectFileToExist} from '../../../utils/fs';
 import {expectToFail} from '../../../utils/utils';
 
 
-export default function(argv: any, skipCleaning: () => void) {
+export default function(skipCleaning: () => void) {
   if (process.platform.startsWith('win')) {
     // Disable the test on Windows.
     return Promise.resolve();

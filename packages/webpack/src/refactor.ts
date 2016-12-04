@@ -172,16 +172,14 @@ export class TypeScriptFileRefactor {
   }
 
   transpile(compilerOptions: ts.CompilerOptions): TranspileOutput {
-    compilerOptions = Object.assign({}, compilerOptions, {
-      sourceMap: true,
-      inlineSources: false,
-      inlineSourceMap: false,
-      sourceRoot: ''
-    });
-
     const source = this.sourceText;
     const result = ts.transpileModule(source, {
-      compilerOptions,
+      compilerOptions: Object.assign({}, compilerOptions, {
+        sourceMap: true,
+        inlineSources: false,
+        inlineSourceMap: false,
+        sourceRoot: ''
+      }),
       fileName: this._fileName
     });
 
