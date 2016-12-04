@@ -216,7 +216,10 @@ const githubPagesDeployCommand = Command.extend({
               files = files.concat(`"${f}" `);
             }
           });
-          return execPromise(`git rm -r ${files}`);
+          return execPromise(`git rm -r ${files}`)
+            .catch(() => {
+              // Ignoring errors when trying to erase files.
+            });
         });
     }
 
