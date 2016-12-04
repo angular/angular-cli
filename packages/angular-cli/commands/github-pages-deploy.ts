@@ -14,6 +14,7 @@ import { oneLine } from 'common-tags';
 
 const fsReadDir = <any>denodeify(fs.readdir);
 const fsCopy = <any>denodeify(fse.copy);
+const fsWriteFile = <any>denodeify(fse.writeFile);
 
 interface GithubPagesDeployOptions {
   message?: string;
@@ -24,6 +25,7 @@ interface GithubPagesDeployOptions {
   ghToken?: string;
   ghUsername?: string;
   baseHref?: string;
+  customDomain?: string;
 }
 
 const githubPagesDeployCommand = Command.extend({
@@ -76,6 +78,11 @@ const githubPagesDeployCommand = Command.extend({
       type: String,
       default: null,
       aliases: ['bh']
+    }, {
+      name: 'custom-domain',
+      type: String,
+      default: null,
+      description: 'Custom domain for Github Pages'
     }],
 
   run: function(options: GithubPagesDeployOptions, rawArgs: string[]) {
@@ -117,11 +124,15 @@ const githubPagesDeployCommand = Command.extend({
 
     /**
      * BaseHref tag setting logic:
-     * First, use --base-href flag value if provided.
+     * First, no value if --custom-domain is provided.
+     * Second, use --base-href flag value if provided.
      * Else if --user-page is true, then keep baseHref default as declared in index.html.
      * Otherwise auto-replace with `/${projectName}/`.
      */
-    const baseHref = options.baseHref || (options.userPage ? null : `/${projectName}/`);
+    let baseHref: String = null;
+    if (!options.customDomain) {
+      baseHref = baseHref = options.baseHref || (options.userPage ? null : `/${projectName}/`);
+    }
 
     const buildOptions = {
       target: options.target,
@@ -150,6 +161,7 @@ const githubPagesDeployCommand = Command.extend({
       .then(cleanGhPagesBranch)
       .then(copyFiles)
       .then(createNotFoundPage)
+      .then(createCustomDomainFile)
       .then(addAndCommit)
       .then(returnStartingBranch)
       .then(pushToGitRepo)
@@ -237,6 +249,15 @@ const githubPagesDeployCommand = Command.extend({
       return fsCopy(indexHtml, notFoundPage);
     }
 
+    function createCustomDomainFile() {
+      if (!options.customDomain) {
+        return;
+      }
+
+      const cnameFile = path.join(root, 'CNAME');
+      return fsWriteFile(cnameFile, options.customDomain);
+    }
+
     function addAndCommit() {
       return execPromise('git add .', execOptions)
         .then(() => execPromise(`git commit -m "${options.message}"`))
@@ -256,7 +277,14 @@ const githubPagesDeployCommand = Command.extend({
         .then((stdout) => {
           let match = stdout.match(/origin\s+(?:https:\/\/|git@)github\.com(?:\:|\/)([^\/]+)/m);
           let userName = match[1].toLowerCase();
-          let url = `https://${userName}.github.io/${options.userPage ? '' : (baseHref + '/')}`;
+          let url = '';
+
+          if (options.customDomain) {
+            url = `http://${options.customDomain}/`;
+          } else {
+            url = `https://${userName}.github.io/${options.userPage ? '' : (baseHref + '/')}`;
+          }
+
           ui.writeLine(chalk.green(`Deployed! Visit ${url}`));
           ui.writeLine('Github pages might take a few minutes to show the deployed site.');
         });
