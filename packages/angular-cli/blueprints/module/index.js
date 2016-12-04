@@ -8,8 +8,7 @@ module.exports = {
 
   availableOptions: [
     { name: 'spec', type: Boolean },
-    { name: 'routing', type: Boolean, default: false },
-    { name: 'component', type: Boolean, default: false }
+    { name: 'routing', type: Boolean, default: false }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -62,16 +61,14 @@ module.exports = {
     // Note that `this.generatePath` already contains `this.dasherizedModuleName`
     // So, the path will end like `name/name`, 
     //  which is correct for `name.component.ts` created in module `name`
-    if (this.options && this.options.component) {
-      var componentPath = path.join(this.generatePath, this.dasherizedModuleName);
-      options.entity.name = path.relative(this.dynamicPath.appRoot, componentPath);
-      options.flat = true;
-      options.route = false;
-      options.inlineTemplate = false;
-      options.inlineStyle = false;
-      options.prefix = true;
-      options.spec = true;
-      return Blueprint.load(path.join(__dirname, '../component')).install(options);
-    }
+    var componentPath = path.join(this.generatePath, this.dasherizedModuleName);
+    options.entity.name = path.relative(this.dynamicPath.appRoot, componentPath);
+    options.flat = true;
+    options.route = false;
+    options.inlineTemplate = false;
+    options.inlineStyle = false;
+    options.prefix = true;
+    options.spec = true;
+    return Blueprint.load(path.join(__dirname, '../component')).install(options);
   }
 };
