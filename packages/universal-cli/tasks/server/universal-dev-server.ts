@@ -12,7 +12,7 @@ export class UniversalDevServer {
   constructor(private webpackCompiler: any, private webpackDevServerConfiguration: any) {
     this.appPath = path.join(
       webpackDevServerConfiguration.contentBase,
-      `../dist/${webpackDevServerConfiguration.filename.replace('.ts', '.bundle.js')}`
+      `../dist/server/${webpackDevServerConfiguration.filename.replace('.ts', '.bundle.js')}`
     );
     this.liveServer = new tinyLr.Server();
     this.liveServer.listen();

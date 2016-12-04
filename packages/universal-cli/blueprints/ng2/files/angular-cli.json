@@ -6,7 +6,7 @@
   "apps": [
     {
       "root": "<%= sourceDir %>",
-      "outDir": "dist",
+      "outDir": "dist<% if(universal) { %>/client<% } %>",
       "assets": [
         "assets",
         "favicon.ico"

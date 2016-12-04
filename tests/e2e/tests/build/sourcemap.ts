@@ -1,11 +1,14 @@
-import {ng} from '../../utils/process';
-import {expectFileToExist} from '../../utils/fs';
-import { expectToFail, getAppMain } from '../../utils/utils';
+import { ng } from '../../utils/process';
+import { expectFileToExist } from '../../utils/fs';
+import { expectToFail, getAppMain, getClientDist } from '../../utils/utils';
 
 
-export default function() {
+export default function () {
   return ng('build')
-    .then(() => expectFileToExist(`dist/${getAppMain()}.bundle.map`))
+    .then(() => expectFileToExist(`${getClientDist()}${getAppMain()}.bundle.map`))
     .then(() => ng('build', '--no-sourcemap'))
-    .then(() => expectToFail(() => expectFileToExist(`dist/${getAppMain()}.bundle.map`)));
+    .then(() => expectToFail(() => expectFileToExist(
+      `${getClientDist()}${getAppMain()}.bundle.map`
+      ))
+    );
 }

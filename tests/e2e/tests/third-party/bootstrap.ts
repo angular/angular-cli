@@ -2,7 +2,7 @@ import { npm, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectFileToMatch } from '../../utils/fs';
 import { oneLineTrim } from 'common-tags';
-import { getAppMain } from '../../utils/utils';
+import { getAppMain, getClientDist } from '../../utils/utils';
 
 
 export default function () {
@@ -18,11 +18,15 @@ export default function () {
       );
     }))
     .then(() => ng('build'))
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', '/*!\\n * jQuery JavaScript'))
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', '/*! tether '))
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', '/*!\\n * Bootstrap'))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', '/*!\\n * Bootstrap'))
-    .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
+    .then(() => expectFileToMatch(
+      `${getClientDist()}scripts.bundle.js`,
+      '/*!\\n * jQuery JavaScript'
+      )
+    )
+    .then(() => expectFileToMatch(`${getClientDist()}scripts.bundle.js`, '/*! tether '))
+    .then(() => expectFileToMatch(`${getClientDist()}scripts.bundle.js`, '/*!\\n * Bootstrap'))
+    .then(() => expectFileToMatch(`${getClientDist()}styles.bundle.js`, '/*!\\n * Bootstrap'))
+    .then(() => expectFileToMatch(`${getClientDist()}index.html`, oneLineTrim`
       <script type="text/javascript" src="inline.bundle.js"></script>
       <script type="text/javascript" src="styles.bundle.js"></script>
       <script type="text/javascript" src="scripts.bundle.js"></script>

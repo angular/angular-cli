@@ -1,6 +1,6 @@
 import { ng } from '../../utils/process';
 import { expectFileToMatch } from '../../utils/fs';
-import { isUniversalTest, expectToFail } from '../../utils/utils';
+import { isUniversalTest, expectToFail, getClientDist } from '../../utils/utils';
 
 export default function () {
   if (isUniversalTest()) {
@@ -8,7 +8,7 @@ export default function () {
       .then(() => expectToFail(() => ng('build', '--aot')));
   } else {
     return ng('build', '--aot')
-      .then(() => expectFileToMatch('dist/main.bundle.js',
+      .then(() => expectFileToMatch(`${getClientDist()}main.bundle.js`,
         /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//));
   }
 }

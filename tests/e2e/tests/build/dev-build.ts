@@ -1,12 +1,12 @@
 import { ng } from '../../utils/process';
 import { expectFileToMatch, expectFileToExist } from '../../utils/fs';
 import { expectGitToBeClean } from '../../utils/git';
-import { getAppMain, isUniversalTest } from '../../utils/utils';
+import { getAppMain, isUniversalTest, getClientDist } from '../../utils/utils';
 
 
 export default function () {
   return ng('build', '--env=dev')
-    .then(() => expectFileToMatch('dist/index.html', getAppMain() + '.bundle.js'))
+    .then(() => expectFileToMatch(`${getClientDist()}index.html`, getAppMain() + '.bundle.js'))
     .then(() => expectGitToBeClean())
     .then(() => {
       if (!isUniversalTest()) {
@@ -14,9 +14,9 @@ export default function () {
       }
 
       return Promise.resolve()
-        .then(() => expectFileToExist('dist/server.bundle.js'))
+        .then(() => expectFileToExist('dist/server/server.bundle.js'))
         .then(() => expectFileToMatch(
-          'dist/index.html',
+          `${getClientDist()}index.html`,
           'livereload.js')
         );
     });

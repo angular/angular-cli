@@ -3,6 +3,7 @@ import * as glob from 'glob';
 import { writeMultipleFiles, expectFileToMatch } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
+import { getClientDist } from '../../../utils/utils';
 
 
 export default function () {
@@ -38,16 +39,32 @@ export default function () {
       app['styles'].push('styles.scss');
     }))
     .then(() => ng('build'))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', 'body { background-color: blue; }'))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', 'p { background-color: red; }'))
     .then(() => expectFileToMatch(
-      'dist/styles.bundle.js',
+      `${getClientDist()}styles.bundle.js`,
+      'body { background-color: blue; }'
+      )
+    )
+    .then(() => expectFileToMatch(
+      `${getClientDist()}styles.bundle.js`,
+      'p { background-color: red; }'
+      )
+    )
+    .then(() => expectFileToMatch(
+      `${getClientDist()}styles.bundle.js`,
       'div { -webkit-box-flex: 1; -ms-flex: 1; flex: 1 }'))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', /.outer.*.inner.*background:\s*#[fF]+/))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', /.upper.*.lower.*background.*#def/))
+    .then(() => expectFileToMatch(
+      `${getClientDist()}styles.bundle.js`,
+      /.outer.*.inner.*background:\s*#[fF]+/
+      )
+    )
+    .then(() => expectFileToMatch(
+      `${getClientDist()}styles.bundle.js`,
+      /.upper.*.lower.*background.*#def/
+      )
+    )
 
     .then(() => ng('build', '--prod'))
-    .then(() => glob.sync('dist/styles.*.bundle.css').find(file => !!file))
+    .then(() => glob.sync(`${getClientDist()}styles.*.bundle.css`).find(file => !!file))
     .then((styles) =>
       expectFileToMatch(styles, /body\s*\{\s*background-color:\s*blue\s*\}/)
         .then(() => expectFileToMatch(styles, /p\s*\{\s*background-color:\s*red\s*\}/)

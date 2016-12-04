@@ -31,7 +31,7 @@ export function getWebpackNodeConfig(projectRoot: string, environment: string, a
     },
     context: path.resolve(__dirname, './'),
     output: {
-      path: path.resolve(projectRoot, appConfig.outDir),
+      path: path.resolve(projectRoot, appConfig.outDir, '../server'),
       filename: '[name].bundle.js',
       libraryTarget: 'commonjs2'
     },
@@ -111,6 +111,7 @@ export function getWebpackNodeConfig(projectRoot: string, environment: string, a
     externals: checkNodeImport,
     node: {
       global: true,
+      crypto: true,
       __dirname: false,
       __filename: true,
       process: true,

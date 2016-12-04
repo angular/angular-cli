@@ -18,6 +18,10 @@ export function getAppMain() {
   return isUniversalTest() ? 'client' : 'main';
 }
 
+export function getClientDist() {
+  return isUniversalTest() ? 'dist/client/' : 'dist/';
+}
+
 export function wait(msecs: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, msecs);

@@ -28,7 +28,7 @@ if (environment.production) {
  * Express View
  */
 app.engine('.html', createEngine({}));
-app.set('views', __dirname);
+app.set('views', path.join(ROOT, 'client'));
 app.set('view engine', 'html');
 
 /**
@@ -39,7 +39,7 @@ app.use(compression());
 /**
  * serve static files
  */
-app.use(express.static(path.join(ROOT, 'dist'), {index: false}));
+app.use('/', express.static(path.join(ROOT, 'client'), {index: false}));
 
 /**
  * place your api routes here
