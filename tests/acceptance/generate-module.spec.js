@@ -38,6 +38,14 @@ describe('Acceptance: ng generate module', function () {
     });
   });
 
+  it('should generate component when passed flag --component', function () {
+    return ng(['generate', 'module', 'my-module', '--component']).then( () => {
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.component.ts'))).to.equal(true);
+    })
+  });
+
   it('ng generate module my-module --spec', function () {
     return ng(['generate', 'module', 'my-module', '--spec']).then(() => {
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
