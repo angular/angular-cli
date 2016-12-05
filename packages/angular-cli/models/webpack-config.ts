@@ -4,13 +4,14 @@ import {
 } from './webpack-build-typescript';
 const webpackMerge = require('webpack-merge');
 import { CliConfig } from './config';
+import { getWebpackCommonConfig } from './webpack-build-common';
+import { getWebpackDevConfigPartial } from './webpack-build-development';
+import { getWebpackProdConfigPartial } from './webpack-build-production';
 import {
-  getWebpackCommonConfig,
-  getWebpackDevConfigPartial,
-  getWebpackProdConfigPartial,
   getWebpackMobileConfigPartial,
   getWebpackMobileProdConfigPartial
-} from './';
+} from './webpack-build-mobile';
+
 
 export class NgCliWebpackConfig {
   // TODO: When webpack2 types are finished lets replace all these any types
