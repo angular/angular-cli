@@ -3,7 +3,7 @@ const opn = require('opn');
 
 export const DocTask: any = Task.extend({
   run: function(keyword: string) {
-    const searchUrl = `https://angular.io/docs/ts/latest/api/#!?apiFilter=${keyword}`;
+    const searchUrl = `https://angular.io/docs/ts/latest/api/#!?query=${keyword}`;
     return opn(searchUrl, { wait: false });
   }
 });
