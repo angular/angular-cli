@@ -10,11 +10,6 @@ export default function() {
     .then(() => expectFileToExist(moduleDir))
     .then(() => expectFileToExist(join(moduleDir, 'test-module.module.ts')))
     .then(() => expectFileToExist(join(moduleDir, 'test-module-routing.module.ts')))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.ts')))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.spec.ts')))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.html')))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.css')))
-
     // Try to run the unit tests.
     .then(() => ng('test', '--single-run'));
 }
