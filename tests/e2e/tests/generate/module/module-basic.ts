@@ -11,10 +11,6 @@ export default function() {
     .then(() => expectFileToExist(moduleDir))
     .then(() => expectFileToExist(join(moduleDir, 'test-module.module.ts')))
     .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module.routing.ts'))))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.ts')))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.spec.ts')))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.html')))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.css')))
     .then(() => expectFileToMatch(join(moduleDir, 'test-module.module.ts'), 'TestModuleComponent'))
 
     // Try to run the unit tests.
