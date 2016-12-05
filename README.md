@@ -67,7 +67,7 @@ npm install -g angular-cli
 ## Usage
 
 ```bash
-ng --help
+ng help
 ```
 
 ### Generating and serving an Angular2 project via a development server
