@@ -69,4 +69,13 @@ describe('Acceptance: ng generate module', function () {
       })
     );
   });
+
+  it('should generate parent/child module and component when passed --component flag', function () {
+    return ng(['generate', 'module', 'parent']).then(() =>
+      ng(['generate', 'module', 'parent/child', '--component']).then(() => {
+        expect(existsSync(path.join(testPath, 'parent/child', 'child.module.ts'))).to.equal(true);
+        expect(existsSync(path.join(testPath, 'parent/child', 'child.component.ts'))).to.equal(true);
+      })
+    );
+  });
 });
