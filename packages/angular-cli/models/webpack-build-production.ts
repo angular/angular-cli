@@ -1,6 +1,7 @@
 import * as path from 'path';
+import {CompressionPlugin} from '../lib/webpack/compression-plugin';
+
 const WebpackMd5Hash = require('webpack-md5-hash');
-const CompressionPlugin = require('compression-webpack-plugin');
 import * as webpack from 'webpack';
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -66,9 +67,8 @@ export const getWebpackProdConfigPartial = function(projectRoot: string,
       new CompressionPlugin({
           asset: '[path].gz[query]',
           algorithm: 'gzip',
-          test: /\.js$|\.html$/,
-          threshold: 10240,
-          minRatio: 0.8
+          test: /\.js$|\.html$|\.css$/,
+          threshold: 10240
       }),
       new webpack.LoaderOptionsPlugin({
         options: {
