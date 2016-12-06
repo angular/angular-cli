@@ -38,6 +38,18 @@ const argv = minimist(process.argv.slice(2), {
 });
 
 
+/**
+ * Set the error code of the process to 255.  This is to ensure that if something forces node
+ * to exit without finishing properly, the error code will be 255. Right now that code is not used.
+ *
+ * When tests succeed we already call `process.exit(0)`, so this doesn't change any correct
+ * behaviour.
+ *
+ * One such case that would force node <= v6 to exit with code 0, is a Promise that doesn't resolve.
+ */
+process.exitCode = 255;
+
+
 let currentFileName = null;
 let index = 0;
 

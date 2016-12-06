@@ -7,15 +7,15 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "outDir": "../../dist/webpack",
+    "outDir": "../../../dist/@ngtools/webpack",
     "rootDir": ".",
     "lib": ["es2015", "es6", "dom"],
     "target": "es5",
     "sourceMap": true,
     "sourceRoot": "/",
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "@angular-cli/ast-tools": [ "../../dist/ast-tools/src" ]
+      "@angular-cli/ast-tools": [ "../../../dist/ast-tools/src" ]
     },
     "typeRoots": [
       "../../node_modules/@types"
