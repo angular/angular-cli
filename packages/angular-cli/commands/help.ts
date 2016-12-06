@@ -40,7 +40,7 @@ const HelpCommand = Command.extend({
       return acc;
     }, {});
 
-    if (rawArgs.includes('all')) {
+    if (rawArgs.indexOf('all') !== -1) {
       rawArgs = []; // just act as if command not specified
     }
 
