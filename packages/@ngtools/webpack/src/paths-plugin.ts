@@ -96,7 +96,7 @@ export class PathsPlugin implements Tapable {
           aliasPattern = new RegExp(`^${excapedAlias}$`);
         } else {
           let withStarCapturing = excapedAlias.replace('\\*', '(.*)');
-          aliasPattern = new RegExp(`^${withStarCapturing}`);
+          aliasPattern = new RegExp(`^${withStarCapturing}$`);
         }
 
         this.mappings.push({
@@ -122,22 +122,38 @@ export class PathsPlugin implements Tapable {
   }
 
   resolve(resolver: ResolverPlugin, mapping: any, request: any, callback: Callback<any>): any {
+    if (mapping.alias === '*') {
+      return callback();
+    }
+
     let innerRequest = getInnerRequest(resolver, request);
     if (!innerRequest) {
       return callback();
     }
 
+    let newRequestStr: string;
+
+    let moduleNames =
+      ts.nodeModuleNameResolver(innerRequest, mapping.alias, this._compilerOptions, this._host);
+    if (!moduleNames.resolvedModule) {
+      return callback();
+    } else {
+      newRequestStr = moduleNames.resolvedModule.resolvedFileName;
+    }
+
     let match = innerRequest.match(mapping.aliasPattern);
-    if (!match) {
+    if (!match && !newRequestStr) {
       return callback();
     }
 
-    let newRequestStr = mapping.target;
-    if (!mapping.onlyModule) {
-      newRequestStr = newRequestStr.replace('*', match[1]);
-    }
-    if (newRequestStr[0] === '.') {
-      newRequestStr = path.resolve(this._absoluteBaseUrl, newRequestStr);
+    if (!newRequestStr) {
+      newRequestStr = mapping.target;
+      if (!mapping.onlyModule) {
+        newRequestStr = newRequestStr.replace('*', match[1]);
+      }
+      if (newRequestStr[0] === '.') {
+        newRequestStr = path.resolve(this._absoluteBaseUrl, newRequestStr);
+      }
     }
 
     let newRequest = Object.assign({}, request, {
@@ -163,7 +179,7 @@ export class PathsPlugin implements Tapable {
   }
 
   createPlugin(resolver: ResolverPlugin, mapping: any): any {
-    return (request: any, callback: Callback<any>) => {
+    return (request: Request, callback: Callback<any>) => {
       try {
         this.resolve(resolver, mapping, request, callback);
       } catch (err) {
