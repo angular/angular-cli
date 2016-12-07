@@ -67,7 +67,7 @@ module.exports = {
     options.route = false;
     options.inlineTemplate = false;
     options.inlineStyle = false;
-    options.prefix = true;
+    options.prefix = null;
     options.spec = true;
     return Blueprint.load(path.join(__dirname, '../component')).install(options);
   }

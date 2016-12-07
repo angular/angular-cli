@@ -150,6 +150,26 @@ describe('Acceptance: ng generate component', function () {
       });
   });
 
+  it('mycomp --prefix= will not prefix selector', () => {
+    return ng(['generate', 'component', 'mycomp', '--prefix='])
+      .then(() => {
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'mycomp', 'mycomp.component.ts');
+        expect(existsSync(testPath)).to.equal(true);
+        var contents = fs.readFileSync(testPath, 'utf8');
+        expect(contents.indexOf('selector: \'mycomp\'') === -1).to.equal(false);
+      });
+  });
+
+  it('mycomp --prefix=test will prefix selector with \'test-\'', () => {
+    return ng(['generate', 'component', 'mycomp', '--prefix=test'])
+      .then(() => {
+        var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'mycomp', 'mycomp.component.ts');
+        expect(existsSync(testPath)).to.equal(true);
+        var contents = fs.readFileSync(testPath, 'utf8');
+        expect(contents.indexOf('selector: \'test-mycomp\'') === -1).to.equal(false);
+      });
+  });
+
   it('myComp will succeed', () => {
     return ng(['generate', 'component', 'myComp'])
       .then(() => {
