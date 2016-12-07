@@ -358,14 +358,23 @@ npm install @types/d3 --save-dev
 
 If the library doesn't have typings available at `@types/`, you can still use it by
 manually adding typings for it:
-```
-// in src/typings.d.ts
-declare module 'typeless-package';
 
-// in src/app/app.component.ts
-import * as typelessPackage from 'typeless-package';
-typelessPackage.method();
-```
+1. First, create a `typings.d.ts` file in your `src/` folder. This file will be automatically included as global type definition.
+
+2. Then, in `src/typings.d.ts`, add the following code:
+
+  ```typescript
+  declare module 'typeless-package';
+  ```
+
+3. Finally, in the component or file that uses the library, add the following code:
+
+  ```typescript
+  import * as typelessPackage from 'typeless-package';
+  typelessPackage.method();
+  ```
+
+Done. Note: you might need or find useful to define more typings for the library that you're trying to use.
 
 ### Global Library Installation
 
