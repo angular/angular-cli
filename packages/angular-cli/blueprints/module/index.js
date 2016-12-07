@@ -8,8 +8,7 @@ module.exports = {
 
   availableOptions: [
     { name: 'spec', type: Boolean },
-    { name: 'routing', type: Boolean, default: false },
-    { name: 'component', type: Boolean, default: false }
+    { name: 'routing', type: Boolean, default: false }
   ],
 
   normalizeEntityName: function (entityName) {
@@ -60,9 +59,9 @@ module.exports = {
 
   afterInstall: function (options) {
     // Note that `this.generatePath` already contains `this.dasherizedModuleName`
-    // So, the path will end like `name/name`, 
+    // So, the path will end like `name/name`,
     //  which is correct for `name.component.ts` created in module `name`
-    if (this.options && this.options.component) {
+    if (this.options && this.options.routing) {
       var componentPath = path.join(this.generatePath, this.dasherizedModuleName);
       options.entity.name = path.relative(this.dynamicPath.appRoot, componentPath);
       options.flat = true;
