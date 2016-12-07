@@ -1,6 +1,7 @@
 import {join} from 'path';
 import {ng} from '../../../utils/process';
 import {expectFileToExist} from '../../../utils/fs';
+import {expectToFail} from '../../../utils/utils';
 
 
 export default function() {
@@ -10,6 +11,11 @@ export default function() {
     .then(() => expectFileToExist(moduleDir))
     .then(() => expectFileToExist(join(moduleDir, 'test-module.module.ts')))
     .then(() => expectFileToExist(join(moduleDir, 'test-module-routing.module.ts')))
+    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.ts')))
+    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.spec.ts')))
+    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.html')))
+    .then(() => expectFileToExist(join(moduleDir, 'test-module.component.css')))
+    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module.spec.ts'))))
     // Try to run the unit tests.
     .then(() => ng('test', '--single-run'));
 }

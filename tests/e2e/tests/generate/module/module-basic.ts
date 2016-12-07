@@ -10,7 +10,7 @@ export default function() {
   return ng('generate', 'module', 'test-module')
     .then(() => expectFileToExist(moduleDir))
     .then(() => expectFileToExist(join(moduleDir, 'test-module.module.ts')))
-    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module.routing.ts'))))
+    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module-routing.module.ts'))))
     .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module.component.ts'))))
     .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module.spec.ts'))))
     .then(() => expectFileToMatch(join(moduleDir, 'test-module.module.ts'), 'TestModuleModule'))
