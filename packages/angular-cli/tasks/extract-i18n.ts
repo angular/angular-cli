@@ -5,9 +5,11 @@ import {Extractor} from '@angular/compiler-cli';
 import * as tsc from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
 import * as path from 'path';
+import * as chalk from 'chalk';
 
 export const Extracti18nTask = Task.extend({
   run: function () {
+    const ui = this.ui;
     const project = path.resolve(this.project.root, 'src');
     const cliOptions = new tsc.I18nExtractionCliOptions({
       i18nFormat: this.i18nFormat
@@ -35,7 +37,6 @@ export const Extracti18nTask = Task.extend({
         let ext: string;
         let serializer: compiler.Serializer;
         const format = (cliOptions.i18nFormat || 'xlf').toLowerCase();
-
         switch (format) {
           case 'xmb':
             ext = 'xmb';
@@ -43,11 +44,12 @@ export const Extracti18nTask = Task.extend({
             break;
           case 'xliff':
           case 'xlf':
-          default:
             const htmlParser = new compiler.I18NHtmlParser(new compiler.HtmlParser());
             ext = 'xlf';
             serializer = new compiler.Xliff(htmlParser, compiler.DEFAULT_INTERPOLATION_CONFIG);
             break;
+          default:
+            throw new Error('Unknown i18n output format. For available formats, see \`ng help\`.');
         }
 
         const dstPath = path.join(ngOptions.genDir, `messages.${ext}`);
@@ -55,6 +57,9 @@ export const Extracti18nTask = Task.extend({
       });
     }
 
-    return tsc.main(project, cliOptions, extract);
+    return tsc.main(project, cliOptions, extract)
+      .catch((e) => {
+        ui.writeLine(chalk.red(e.message));
+      });
   }
 });
