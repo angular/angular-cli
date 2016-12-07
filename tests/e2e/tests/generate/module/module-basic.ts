@@ -5,15 +5,15 @@ import {expectToFail} from '../../../utils/utils';
 
 
 export default function() {
-  const moduleDir = join('src', 'app', 'test-module');
+  const moduleDir = join('src', 'app', 'test');
 
-  return ng('generate', 'module', 'test-module')
+  return ng('generate', 'module', 'test')
     .then(() => expectFileToExist(moduleDir))
-    .then(() => expectFileToExist(join(moduleDir, 'test-module.module.ts')))
-    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module-routing.module.ts'))))
-    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module.component.ts'))))
-    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-module.spec.ts'))))
-    .then(() => expectFileToMatch(join(moduleDir, 'test-module.module.ts'), 'TestModuleModule'))
+    .then(() => expectFileToExist(join(moduleDir, 'test.module.ts')))
+    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-routing.module.ts'))))
+    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test.component.ts'))))
+    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test.spec.ts'))))
+    .then(() => expectFileToMatch(join(moduleDir, 'test.module.ts'), 'TestModule'))
 
     // Try to run the unit tests.
     .then(() => ng('test', '--single-run'));
