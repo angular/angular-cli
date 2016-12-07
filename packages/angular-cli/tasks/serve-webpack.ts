@@ -123,9 +123,10 @@ export default Task.extend({
           if (err.details) { console.error(err.details); }
           reject(err.details);
         } else {
-          const { open, host, port } = serveTaskOptions;
+          const { open, ssl, host, port } = serveTaskOptions;
           if (open) {
-            opn(url.format({ protocol: 'http', hostname: host, port: port.toString() }));
+            let protocol = ssl ? 'https' : 'http';
+            opn(url.format({ protocol: protocol, hostname: host, port: port.toString() }));
           }
         }
       });
