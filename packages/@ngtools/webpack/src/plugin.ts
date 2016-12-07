@@ -196,9 +196,11 @@ export class AotPlugin implements Tapable {
     });
 
     // Virtual file system.
-    compiler.resolvers.normal.plugin('resolve', (request: any, cb?: () => void) => {
+    compiler.resolvers.normal.plugin('resolve', (request: any, cb?: (err?: any) => void) => {
       if (request.request.match(/\.ts$/)) {
-        this.done.then(() => cb());
+        this.done
+          .then(() => cb())
+          .catch((err) => cb(err));
       } else {
         cb();
       }
@@ -212,9 +214,8 @@ export class AotPlugin implements Tapable {
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
     this._compilation = compilation;
-
     if (this._compilation._ngToolsWebpackPluginInstance) {
-      cb(new Error('An @ngtools/webpack plugin already exist for this compilation.'));
+      return cb(new Error('An @ngtools/webpack plugin already exist for this compilation.'));
     }
     this._compilation._ngToolsWebpackPluginInstance = this;
 
@@ -227,28 +228,28 @@ export class AotPlugin implements Tapable {
       basePath: this.basePath
     };
 
-    let promise = Promise.resolve();
-    if (!this._skipCodeGeneration) {
-      // Create the Code Generator.
-      const codeGenerator = ngCompiler.CodeGenerator.create(
-        this._angularCompilerOptions,
-        i18nOptions,
-        this._program,
-        this._compilerHost,
-        new ngCompiler.NodeReflectorHostContext(this._compilerHost),
-        this._resourceLoader
-      );
+    this._donePromise = Promise.resolve()
+      .then(() => {
+        if (this._skipCodeGeneration) {
+          return;
+        }
 
-      // We need to temporarily patch the CodeGenerator until either it's patched or allows us
-      // to pass in our own ReflectorHost.
-      // TODO: remove this.
-      patchReflectorHost(codeGenerator);
-      promise = promise.then(() => codeGenerator.codegen({
-        transitiveModules: true
-      }));
-    }
+        // Create the Code Generator.
+        const codeGenerator = ngCompiler.CodeGenerator.create(
+          this._angularCompilerOptions,
+          i18nOptions,
+          this._program,
+          this._compilerHost,
+          new ngCompiler.NodeReflectorHostContext(this._compilerHost),
+          this._resourceLoader
+        );
 
-    this._donePromise = promise
+        // We need to temporarily patch the CodeGenerator until either it's patched or allows us
+        // to pass in our own ReflectorHost.
+        // TODO: remove this.
+        patchReflectorHost(codeGenerator);
+        return codeGenerator.codegen({ transitiveModules: true });
+      })
       .then(() => {
         // Create a new Program, based on the old one. This will trigger a resolution of all
         // transitive modules, which include files that might just have been generated.
