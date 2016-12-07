@@ -35,12 +35,14 @@ describe('Acceptance: ng generate module', function () {
     return ng(['generate', 'module', 'my-module']).then(() => {
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.component.ts'))).to.equal(false);
     });
   });
 
-  it('should generate component when passed flag --component', function () {
-    return ng(['generate', 'module', 'my-module', '--component']).then( () => {
+  it('ng generate module  generate routing and component files when passed flag --routing', function () {
+    return ng(['generate', 'module', 'my-module', '--routing']).then( () => {
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module-routing.module.ts'))).to.equal(true);
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.component.ts'))).to.equal(true);
     })
@@ -70,10 +72,12 @@ describe('Acceptance: ng generate module', function () {
     );
   });
 
-  it('should generate parent/child module and component when passed --component flag', function () {
+  it('ng generate module should generate parent/child module with routing and component files when passed --routing flag', function () {
     return ng(['generate', 'module', 'parent']).then(() =>
-      ng(['generate', 'module', 'parent/child', '--component']).then(() => {
+      ng(['generate', 'module', 'parent/child', '--routing']).then(() => {
         expect(existsSync(path.join(testPath, 'parent/child', 'child.module.ts'))).to.equal(true);
+        expect(existsSync(path.join(testPath, 'parent/child', 'child-routing.module.ts'))).to.equal(true);
+        expect(existsSync(path.join(testPath, 'parent/child', 'child.module.spec.ts'))).to.equal(false);
         expect(existsSync(path.join(testPath, 'parent/child', 'child.component.ts'))).to.equal(true);
       })
     );
