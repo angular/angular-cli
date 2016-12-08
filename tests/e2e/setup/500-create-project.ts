@@ -19,7 +19,7 @@ export default function() {
   } else if (argv.reuse) {
     // If we're set to reuse an existing project, just chdir to it and clean it.
     createProject = Promise.resolve()
-      .then(() => process.chdir(argv.reuse))
+      .then(() => process.chdir(join(argv.reuse, 'test-project')))
       .then(() => gitClean());
   } else {
     // Otherwise create a project from scratch.
