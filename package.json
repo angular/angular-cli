@@ -148,7 +148,7 @@
     "@types/fs-extra": "^0.0.31",
     "@types/glob": "^5.0.29",
     "@types/jasmine": "^2.2.32",
-    "@types/lodash": "^4.0.25-alpha",
+    "@types/lodash": "4.14.42",
     "@types/mock-fs": "3.6.28",
     "@types/node": "^6.0.36",
     "@types/request": "0.0.30",
