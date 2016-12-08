@@ -27,8 +27,11 @@ export interface ServeTaskOptions {
   sslCert?: string;
   aot?: boolean;
   sourcemap?: boolean;
+  verbose?: boolean;
+  progress?: boolean;
   open?: boolean;
   vendorChunk?: boolean;
+  hmr?: boolean;
 }
 
 const ServeCommand = Command.extend({
@@ -85,12 +88,20 @@ const ServeCommand = Command.extend({
     { name: 'aot',                  type: Boolean, default: false },
     { name: 'sourcemap',            type: Boolean, default: true, aliases: ['sm'] },
     { name: 'vendor-chunk',         type: Boolean, default: true },
+    { name: 'verbose',              type: Boolean, default: false },
+    { name: 'progress',             type: Boolean, default: true },
     {
       name: 'open',
       type: Boolean,
       default: false,
       aliases: ['o'],
       description: 'Opens the url in default browser',
+    },
+    {
+      name: 'hmr',
+      type: Boolean,
+      default: false,
+      description: 'Enable hot module replacement',
     },
   ],
 

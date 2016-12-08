@@ -10,6 +10,7 @@ const webpackLoader = g['angularCliIsLocal']
   ? g.angularCliPackages['@ngtools/webpack'].main
   : '@ngtools/webpack';
 
+const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 
 const getWebpackTestConfig = function (projectRoot, environment, appConfig, testConfig) {
 
@@ -49,9 +50,13 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
     }))
   }
 
+  if (testConfig.progress) {
+    extraPlugins.push(new ProgressPlugin({ colors: true }));
+  }
+
   return {
     devtool: testConfig.sourcemap ? 'inline-source-map' : 'eval',
-    context: path.resolve(__dirname, './'),
+    context: projectRoot,
     resolve: {
       extensions: ['.ts', '.js'],
       plugins: [

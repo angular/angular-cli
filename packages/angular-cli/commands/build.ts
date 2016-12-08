@@ -13,6 +13,8 @@ export interface BuildOptions {
   aot?: boolean;
   sourcemap?: boolean;
   vendorChunk?: boolean;
+  verbose?: boolean;
+  progress?: boolean;
 }
 
 const BuildCommand = Command.extend({
@@ -35,7 +37,9 @@ const BuildCommand = Command.extend({
     { name: 'base-href',      type: String,  default: null, aliases: ['bh'] },
     { name: 'aot',            type: Boolean, default: false },
     { name: 'sourcemap',      type: Boolean, default: true, aliases: ['sm'] },
-    { name: 'vendor-chunk',   type: Boolean, default: true }
+    { name: 'vendor-chunk',   type: Boolean, default: true },
+    { name: 'verbose',        type: Boolean, default: false },
+    { name: 'progress',       type: Boolean, default: true }
   ],
 
   run: function (commandOptions: BuildOptions) {

@@ -4,6 +4,7 @@ import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
 import {packageChunkSort} from '../utilities/package-chunk-sort';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
+const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
@@ -14,7 +15,9 @@ export function getWebpackCommonConfig(
   appConfig: any,
   baseHref: string,
   sourcemap: boolean,
-  vendorChunk: boolean
+  vendorChunk: boolean,
+  verbose: boolean,
+  progress: boolean
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -44,13 +47,23 @@ export function getWebpackCommonConfig(
     }));
   }
 
+  if (progress) {
+    extraPlugins.push(new ProgressPlugin({
+      profile: verbose,
+      colors: true
+    }));
+  }
+
   return {
     devtool: sourcemap ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
-      modules: [nodeModules]
+      modules: [nodeModules],
     },
-    context: path.resolve(__dirname, './'),
+    resolveLoader: {
+      modules: [path.resolve(projectRoot, 'node_modules')]
+    },
+    context: projectRoot,
     entry: entry,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
