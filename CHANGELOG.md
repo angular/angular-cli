@@ -1,3 +1,53 @@
+<a name="1.0.0-beta.22"></a>
+# [1.0.0-beta.22](https://github.com/angular/angular-cli/compare/v1.0.0-beta.21...v1.0.0-beta.22) (2016-12-02)
+
+
+### Bug Fixes
+
+* **@ngtools/webpack:** fixed path resolution for entry modules and lazy routes ([#3332](https://github.com/angular/angular-cli/issues/3332)) ([45d5154](https://github.com/angular/angular-cli/commit/45d5154))
+* **build:** don't inline sourcemaps ([#3262](https://github.com/angular/angular-cli/issues/3262)) ([859d905](https://github.com/angular/angular-cli/commit/859d905))
+* **build:** use custom index value when copying to 404.html during github deploy ([#3201](https://github.com/angular/angular-cli/issues/3201)) ([b1cbf17](https://github.com/angular/angular-cli/commit/b1cbf17))
+* **ngtools/webpack:** move the generate directory to a separate dir ([#3256](https://github.com/angular/angular-cli/issues/3256)) ([d1037df](https://github.com/angular/angular-cli/commit/d1037df))
+* **version:** bump ast-tools and webpack versions to correct mismatch with published packages ([54ef738](https://github.com/angular/angular-cli/commit/54ef738))
+
+
+### Features
+
+* **angular:** Update Angular2 version to 2.2.3 ([#3295](https://github.com/angular/angular-cli/issues/3295)) ([ed305a2](https://github.com/angular/angular-cli/commit/ed305a2))
+* **build:** add --verbose and --progress flags ([#2858](https://github.com/angular/angular-cli/issues/2858)) ([f6f24e7](https://github.com/angular/angular-cli/commit/f6f24e7)), closes [#1836](https://github.com/angular/angular-cli/issues/1836) [#2012](https://github.com/angular/angular-cli/issues/2012)
+* **build:** auto generate vendor chunk ([#3117](https://github.com/angular/angular-cli/issues/3117)) ([bf9c8f1](https://github.com/angular/angular-cli/commit/bf9c8f1))
+* **new:** include routing in spec and inline template when called with `--routing` ([#3252](https://github.com/angular/angular-cli/issues/3252)) ([53ab4df](https://github.com/angular/angular-cli/commit/53ab4df))
+* **serve:** add --hmr flag for HotModuleReplacement support ([#3330](https://github.com/angular/angular-cli/issues/3330)) ([46efa9e](https://github.com/angular/angular-cli/commit/46efa9e))
+
+
+### BREAKING CHANGES
+
+* build: `ng build/serve` now generates `vendor.bundle.js` by
+default.
+
+
+
+<a name="1.0.0-beta.21"></a>
+# [1.0.0-beta.21](https://github.com/angular/angular-cli/compare/v1.0.0-beta.20-1...v1.0.0-beta.21) (2016-11-23)
+
+
+### Bug Fixes
+
+* **angular-cli:** add necessary dependencies. ([#3152](https://github.com/angular/angular-cli/issues/3152)) ([8f574e4](https://github.com/angular/angular-cli/commit/8f574e4)), closes [#3148](https://github.com/angular/angular-cli/issues/3148)
+* **angular-cli:** add necessary dependency. ([f7704b0](https://github.com/angular/angular-cli/commit/f7704b0))
+* **angular-cli:** change version of webpack plugin. ([07e96ea](https://github.com/angular/angular-cli/commit/07e96ea))
+* **aot:** lock the angular version to 2.2.1. ([#3242](https://github.com/angular/angular-cli/issues/3242)) ([6e8a848](https://github.com/angular/angular-cli/commit/6e8a848))
+* **editorconfig:** use off instead of 0 for max line length ([#3186](https://github.com/angular/angular-cli/issues/3186)) ([f833d25](https://github.com/angular/angular-cli/commit/f833d25))
+* **generate:** revert change to component dir in generate module, as it caused component declaration to go to parent module ([#3158](https://github.com/angular/angular-cli/issues/3158)) ([71bf855](https://github.com/angular/angular-cli/commit/71bf855))
+* **github-pages-deploy:** Show more accurate url ([#3160](https://github.com/angular/angular-cli/issues/3160)) ([a431389](https://github.com/angular/angular-cli/commit/a431389))
+
+
+### Features
+
+* **build:** add sourcemap option ([#3113](https://github.com/angular/angular-cli/issues/3113)) ([6f9d2c1](https://github.com/angular/angular-cli/commit/6f9d2c1))
+
+
+
 <a name="1.0.0-beta.20"></a>
 # [1.0.0-beta.20](https://github.com/angular/angular-cli/compare/v1.0.0-beta.19...v1.0.0-beta.20-1) (2016-11-16)
 

@@ -7,11 +7,10 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, appConfi
                : [];
   const cssLoaders = ['style-loader', 'css-loader?sourcemap', 'postcss-loader'];
   return {
-    devtool: 'source-map',
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].bundle.js',
-      sourceMapFilename: '[name].map',
+      sourceMapFilename: '[name].bundle.map',
       chunkFilename: '[id].chunk.js'
     },
     module: {

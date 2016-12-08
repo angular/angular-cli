@@ -1,0 +1,25 @@
+{
+  "name": "@angular-cli/base-href-webpack",
+  "version": "1.0.9",
+  "description": "Base HREF Webpack plugin",
+  "main": "./src/index.js",
+  "keywords": [
+    "angular",
+    "cli",
+    "webpack",
+    "plugin",
+    "tool"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "author": "angular",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "dependencies": {
+  }
+}

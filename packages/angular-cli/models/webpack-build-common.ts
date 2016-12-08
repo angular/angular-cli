@@ -1,27 +1,33 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
+import {packageChunkSort} from '../utilities/package-chunk-sort';
 import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
+const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const autoprefixer = require('autoprefixer');
-
 
 export function getWebpackCommonConfig(
   projectRoot: string,
   environment: string,
   appConfig: any,
-  baseHref: string
+  baseHref: string,
+  sourcemap: boolean,
+  vendorChunk: boolean,
+  verbose: boolean,
+  progress: boolean
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);
+  const nodeModules = path.resolve(projectRoot, 'node_modules');
   const styles = appConfig.styles
                ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
                : [];
   const scripts = appConfig.scripts
                 ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
                 : [];
+  const extraPlugins: any[] = [];
 
   let entry: { [key: string]: string[] } = {
     main: [appMain]
@@ -31,17 +37,37 @@ export function getWebpackCommonConfig(
   if (appConfig.styles.length > 0) { entry['styles'] = styles; }
   if (appConfig.scripts.length > 0) { entry['scripts'] = scripts; }
 
+  if (vendorChunk) {
+    extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      chunks: ['main'],
+      minChunks: (module: any) => module.userRequest && module.userRequest.startsWith(nodeModules)
+    }));
+  }
+
+  if (progress) {
+    extraPlugins.push(new ProgressPlugin({
+      profile: verbose,
+      colors: true
+    }));
+  }
+
   return {
-    devtool: 'source-map',
+    devtool: sourcemap ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
+      modules: [nodeModules],
+    },
+    resolveLoader: {
       modules: [path.resolve(projectRoot, 'node_modules')]
     },
-    context: path.resolve(__dirname, './'),
+    context: projectRoot,
     entry: entry,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
-      filename: '[name].bundle.js'
+      filename: '[name].bundle.js',
+      sourceMapFilename: '[name].bundle.map',
+      chunkFilename: '[id].chunk.js'
     },
     module: {
       rules: [
@@ -49,9 +75,7 @@ export function getWebpackCommonConfig(
           enforce: 'pre',
           test: /\.js$/,
           loader: 'source-map-loader',
-          exclude: [
-            /node_modules/
-          ]
+          exclude: [ nodeModules ]
         },
         // in main, load css as raw text
         {
@@ -80,7 +104,7 @@ export function getWebpackCommonConfig(
         { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
         { test: /\.html$/, loader: 'raw-loader' },
 
-        { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url?limit=10000' },
+        { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url-loader?limit=10000' },
         { test: /\.(eot|svg)$/, loader: 'file-loader' }
       ]
     },
@@ -88,7 +112,7 @@ export function getWebpackCommonConfig(
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
-        chunksSortMode: 'dependency'
+        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main'])
       }),
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
@@ -102,10 +126,6 @@ export function getWebpackCommonConfig(
         path.resolve(appRoot, appConfig.environments[environment])
       ),
       new webpack.optimize.CommonsChunkPlugin({
-        // Optimizing ensures loading order in index.html
-        name: ['styles', 'scripts', 'main'].reverse()
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
         name: 'inline'
       }),
@@ -116,10 +136,12 @@ export function getWebpackCommonConfig(
       new webpack.LoaderOptionsPlugin({
         test: /\.(css|scss|sass|less|styl)$/,
         options: {
-          postcss: [ autoprefixer() ]
+          postcss: [
+            require('autoprefixer')
+          ]
         },
-      }),
-    ],
+      })
+    ].concat(extraPlugins),
     node: {
       fs: 'empty',
       global: true,

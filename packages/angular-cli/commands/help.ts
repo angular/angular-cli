@@ -18,6 +18,8 @@ const HelpCommand = Command.extend({
 
   availableOptions: [],
 
+  anonymousOptions: ['command-name (Default: all)'],
+
   run: function (commandOptions: any, rawArgs: any) {
     let commandFiles = fs.readdirSync(__dirname)
       // Remove files that are not JavaScript or Typescript
@@ -38,6 +40,10 @@ const HelpCommand = Command.extend({
       return acc;
     }, {});
 
+    if (rawArgs.indexOf('all') !== -1) {
+      rawArgs = []; // just act as if command not specified
+    }
+
     commandFiles.forEach(cmd => {
       let Command = lookupCommand(commandMap, cmd);
 
@@ -50,7 +56,7 @@ const HelpCommand = Command.extend({
 
       if (rawArgs.length > 0) {
         if (cmd === rawArgs[0]) {
-          this.ui.writeLine(command.printDetailedHelp(commandOptions));
+          this.ui.writeLine(command.printBasicHelp(commandOptions));
         }
       } else {
         this.ui.writeLine(command.printBasicHelp(commandOptions));

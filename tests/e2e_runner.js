@@ -18,6 +18,8 @@ const green = chalk.green;
 const red = chalk.red;
 const white = chalk.white;
 
+const setGlobalVariable = require('./e2e/utils/env').setGlobalVariable;
+
 
 /**
  * Here's a short description of those flags:
@@ -34,6 +36,18 @@ const argv = minimist(process.argv.slice(2), {
   'boolean': ['debug', 'nolink', 'nightly', 'noproject'],
   'string': ['reuse']
 });
+
+
+/**
+ * Set the error code of the process to 255.  This is to ensure that if something forces node
+ * to exit without finishing properly, the error code will be 255. Right now that code is not used.
+ *
+ * When tests succeed we already call `process.exit(0)`, so this doesn't change any correct
+ * behaviour.
+ *
+ * One such case that would force node <= v6 to exit with code 0, is a Promise that doesn't resolve.
+ */
+process.exitCode = 255;
 
 
 let currentFileName = null;
@@ -73,6 +87,8 @@ if (testsToRun.length == allTests.length) {
   console.log(`Running ${testsToRun.length} tests (${allTests.length + allSetups.length} total)`);
 }
 
+setGlobalVariable('argv', argv);
+
 testsToRun.reduce((previous, relativeName) => {
   // Make sure this is a windows compatible path.
   let absoluteName = path.join(e2eRoot, relativeName);
@@ -92,10 +108,19 @@ testsToRun.reduce((previous, relativeName) => {
       };
 
     let clean = true;
+    let previousDir = null;
     return Promise.resolve()
       .then(() => printHeader(currentFileName))
-      .then(() => fn(argv, () => clean = false))
+      .then(() => previousDir = process.cwd())
+      .then(() => fn(() => clean = false))
       .then(() => console.log('  ----'))
+      .then(() => {
+        // If we're not in a setup, change the directory back to where it was before the test.
+        // This allows tests to chdir without worrying about keeping the original directory.
+        if (allSetups.indexOf(relativeName) == -1 && previousDir) {
+          process.chdir(previousDir);
+        }
+      })
       .then(() => {
         // Only clean after a real test, not a setup step. Also skip cleaning if the test
         // requested an exception.

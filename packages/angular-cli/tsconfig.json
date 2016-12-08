@@ -20,9 +20,9 @@
     ],
     "baseUrl": "",
     "paths": {
-      "@angular-cli/ast-tools": [ "../../dist/ast-tools/src" ],
-      "@angular-cli/base-href-webpack": [ "../../dist/base-href-webpack/src" ],
-      "@ngtools/webpack": [ "../../dist/webpack/src" ]
+      "@angular-cli/ast-tools": [ "../../dist/@angular-cli/ast-tools/src" ],
+      "@angular-cli/base-href-webpack": [ "../../dist/@angular-cli/base-href-webpack/src" ],
+      "@ngtools/webpack": [ "../../dist/@ngtools/webpack/src" ]
     }
   },
   "include": [
