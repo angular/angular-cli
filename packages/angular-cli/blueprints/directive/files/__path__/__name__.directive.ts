@@ -5,6 +5,7 @@ import { Directive } from '@angular/core';
 })
 export class <%= classifiedModuleName %>Directive {
 
-  constructor() { }
+  constructor() {
+  }
 
 }
