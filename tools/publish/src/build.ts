@@ -65,7 +65,12 @@ export default function build(packagesToBuild: string[], _opts: any,
     .then(() => logger.info('Deleting dist folder...'))
     .then(() => {
       if (willBuildEverything) {
-        return rimraf(dist);
+        return rimraf(dist + '/**', {
+          glob: {
+            ignore: ['**/node_modules/**'],
+            nodir: true
+          }
+        });
       }
     })
     .then(() => logger.info('Creating schema.d.ts...'))
