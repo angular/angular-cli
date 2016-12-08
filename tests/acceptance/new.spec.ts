@@ -1,18 +1,17 @@
-'use strict';
+const fs = require('fs-extra');
+const ng = require('../helpers/ng');
+const existsSync = require('exists-sync');
+const expect = require('chai').expect;
+const forEach = require('lodash/forEach');
+const walkSync = require('walk-sync');
+const Blueprint = require('angular-cli/ember-cli/lib/models/blueprint');
+const path = require('path');
+const tmp = require('../helpers/tmp');
+const root = process.cwd();
+const util = require('util');
+const EOL = require('os').EOL;
+const SilentError = require('silent-error');
 
-var fs = require('fs-extra');
-var ng = require('../helpers/ng');
-var existsSync = require('exists-sync');
-var expect = require('chai').expect;
-var forEach = require('lodash/forEach');
-var walkSync = require('walk-sync');
-var Blueprint = require('angular-cli/ember-cli/lib/models/blueprint');
-var path = require('path');
-var tmp = require('../helpers/tmp');
-var root = process.cwd();
-var util = require('util');
-var EOL = require('os').EOL;
-var SilentError = require('silent-error');
 
 describe('Acceptance: ng new', function () {
   beforeEach(function () {
@@ -29,10 +28,10 @@ describe('Acceptance: ng new', function () {
 
   function confirmBlueprintedForDir(dir) {
     return function () {
-      var blueprintPath = path.join(root, dir, 'files');
-      var expected = walkSync(blueprintPath);
-      var actual = walkSync('.').sort();
-      var directory = path.basename(process.cwd());
+      let blueprintPath = path.join(root, dir, 'files');
+      let expected = walkSync(blueprintPath);
+      let actual = walkSync('.').sort();
+      let directory = path.basename(process.cwd());
 
       forEach(Blueprint.renamedFiles, function (destFile, srcFile) {
         expected[expected.indexOf(srcFile)] = destFile;
@@ -56,6 +55,33 @@ describe('Acceptance: ng new', function () {
     return confirmBlueprintedForDir('blueprints/ng2');
   }
 
+  it('requires a valid name (!)', () => {
+    return ng(['new', '!', '--skip-npm', '--skip-git', '--inline-template'])
+      .then(() => { throw new Error(); }, () => {});
+  });
+  it('requires a valid name (abc-.)', () => {
+    return ng(['new', 'abc-.', '--skip-npm', '--skip-git', '--inline-template'])
+      .then(() => { throw new Error(); }, () => {});
+  });
+  it('requires a valid name (abc-)', () => {
+    return ng(['new', 'abc-', '--skip-npm', '--skip-git', '--inline-template'])
+      .then(() => { throw new Error(); }, () => {});
+  });
+  it('requires a valid name (abc-def-)', () => {
+    return ng(['new', 'abc-def-', '--skip-npm', '--skip-git', '--inline-template'])
+      .then(() => { throw new Error(); }, () => {});
+  });
+  it('requires a valid name (abc-123)', () => {
+    return ng(['new', 'abc-123', '--skip-npm', '--skip-git', '--inline-template'])
+      .then(() => { throw new Error(); }, () => {});
+  });
+  it('requires a valid name (abc)', () => {
+    return ng(['new', 'abc', '--skip-npm', '--skip-git', '--inline-template']);
+  });
+  it('requires a valid name (abc-def)', () => {
+    return ng(['new', 'abc-def', '--skip-npm', '--skip-git', '--inline-template']);
+  });
+
   it('ng new foo, where foo does not yet exist, works', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(confirmBlueprinted);
   });
@@ -72,7 +98,7 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
       expect(!existsSync('FooApp'));
 
-      var pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+      const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
       expect(pkgJson.name).to.equal('foo-app');
     });
   });
@@ -81,7 +107,7 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
       expect(!existsSync('FooApp'));
 
-      var editorConfig = fs.readFileSync('.editorconfig', 'utf8');
+      const editorConfig = fs.readFileSync('.editorconfig', 'utf8');
       expect(editorConfig).to.exist;
     });
   });
@@ -93,7 +119,7 @@ describe('Acceptance: ng new', function () {
           throw new SilentError('Cannot run ng new, inside of ember-cli project should fail.');
         }, () => {
           expect(!existsSync('foo'));
-        })
+        });
       })
       .then(confirmBlueprinted);
   });
@@ -106,7 +132,7 @@ describe('Acceptance: ng new', function () {
 
   it('ng new with --dry-run does not create new directory', function () {
     return ng(['new', 'foo', '--dry-run']).then(function () {
-      var cwd = process.cwd();
+      const cwd = process.cwd();
       expect(cwd).to.not.match(/foo/, 'does not change cwd to foo in a dry run');
       expect(!existsSync(path.join(cwd, 'foo')), 'does not create new directory');
       expect(!existsSync(path.join(cwd, '.git')), 'does not create git in current directory');
@@ -116,14 +142,14 @@ describe('Acceptance: ng new', function () {
   it('ng new with --directory uses given directory name and has correct package name', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git', '--directory=bar'])
       .then(function () {
-        var cwd = process.cwd();
+        const cwd = process.cwd();
         expect(cwd).to.not.match(/foo/, 'does not use app name for directory name');
         expect(!existsSync(path.join(cwd, 'foo')), 'does not create new directory with app name');
 
         expect(cwd).to.match(/bar/, 'uses given directory name');
         expect(existsSync(path.join(cwd, 'bar')), 'creates new directory with specified name');
 
-        var pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+        const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
         expect(pkgJson.name).to.equal('foo', 'uses app name for package name');
       });
   });
