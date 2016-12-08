@@ -6,7 +6,7 @@
 #           or  ng completion 1>> ~/.zshrc 2>>&1
 #
 
-ng_opts='b build completion doc e2e g generate get github-pages:deploy gh-pages:deploy h help i init install lint make-this-awesome new s serve server set t test v version -h --help'
+ng_opts='b build completion doc e2e g generate get github-pages:deploy gh-pages:deploy h help i init install lint make-this-awesome new s serve server set t test v version'
 
 build_opts='--aot --base-href --environment --output-path --progress --sourcemap --suppress-sizes --target --vendor-chunk --verbose --watch --watcher -bh -dev -e -o -prod -sm -t -w'
 generate_opts='class component directive enum module pipe route service c cl d e m p r s --help'
