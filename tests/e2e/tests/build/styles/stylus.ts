@@ -10,14 +10,14 @@ import { updateJsonFile } from '../../../utils/project';
 
 export default function () {
   return writeMultipleFiles({
-    'src/styles.scss': stripIndents`
-      @import './imported-styles.scss';
+    'src/styles.styl': stripIndents`
+      @import './imported-styles.styl';
       body { background-color: blue; }
     `,
-    'src/imported-styles.scss': stripIndents`
+    'src/imported-styles.styl': stripIndents`
       p { background-color: red; }
     `,
-    'src/app/app.component.scss': stripIndents`
+    'src/app/app.component.styl': stripIndents`
         .outer {
           .inner {
             background: #fff;
@@ -27,14 +27,14 @@ export default function () {
     .then(() => deleteFile('src/app/app.component.css'))
     .then(() => updateJsonFile('angular-cli.json', configJson => {
       const app = configJson['apps'][0];
-      app['styles'] = ['styles.scss'];
+      app['styles'] = ['styles.styl'];
     }))
     .then(() => replaceInFile('src/app/app.component.ts',
-      './app.component.css', './app.component.scss'))
+      './app.component.css', './app.component.styl'))
     .then(() => ng('build'))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      /body\s*{\s*background-color: blue;\s*}/))
+      /body\s*{\s*background-color: #00f;\s*}/))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      /p\s*{\s*background-color: red;\s*}/))
+      /p\s*{\s*background-color: #f00;\s*}/))
     .then(() => expectFileToMatch('dist/main.bundle.js', /.outer.*.inner.*background:\s*#[fF]+/));
 }

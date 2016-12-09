@@ -103,7 +103,7 @@
     "resolve": "^1.1.7",
     "rimraf": "^2.5.3",
     "rsvp": "^3.0.17",
-    "sass-loader": "^3.2.0",
+    "sass-loader": "^4.0.1",
     "script-loader": "^0.7.0",
     "semver": "^5.1.0",
     "silent-error": "^1.0.0",
