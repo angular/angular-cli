@@ -14,6 +14,7 @@ export interface CliConfig {
         outDir?: string;
         assets?: string;
         index?: string;
+        inject?: boolean;
         main?: string;
         test?: string;
         tsconfig?: string;

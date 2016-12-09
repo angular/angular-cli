@@ -28,7 +28,8 @@ export class NgCliWebpackConfig {
     sourcemap = true,
     vendorChunk = false,
     verbose = false,
-    progress = true
+    progress = true,
+    inject = true
   ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];

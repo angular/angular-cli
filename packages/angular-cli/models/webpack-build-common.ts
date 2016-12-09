@@ -51,6 +51,8 @@ export function getWebpackCommonConfig(
                 : [];
   const extraPlugins: any[] = [];
 
+  const inject: boolean = appConfig.inject;
+
   let entry: { [key: string]: string[] } = {
     main: [appMain]
   };
@@ -138,7 +140,8 @@ export function getWebpackCommonConfig(
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
-        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main'])
+        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main']),
+        inject: inject
       }),
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
