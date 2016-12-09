@@ -48,14 +48,22 @@ export class TypeScriptFileRefactor {
     this._sourceString = new MagicString(this._sourceText);
   }
 
+  /**
+   * Collates the diagnostic messages for the current source file
+   */
   getDiagnostics(): ts.Diagnostic[] {
     if (!this._program) {
       return [];
     }
+    let diagnostics:ts.Diagnostic[] = this._program.getSyntacticDiagnostics(this._sourceFile)
+                                      .concat(this._program.getSemanticDiagnostics(this._sourceFile));
+    // only concat the declaration diagnostics if the tsconfig config sets it to true.
+    if (this._program.getCompilerOptions().declaration == true){
+      diagnostics = diagnostics.concat(this._program.getDeclarationDiagnostics(this._sourceFile));
+    }
+    return diagnostics;
 
-    return this._program.getSyntacticDiagnostics(this._sourceFile)
-      .concat(this._program.getSemanticDiagnostics(this._sourceFile))
-      .concat(this._program.getDeclarationDiagnostics(this._sourceFile));
+
   }
 
   /**
