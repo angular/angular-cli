@@ -2,7 +2,6 @@
 
 var lookupCommand       = require('./lookup-command');
 var Promise             = require('../ext/promise');
-var UpdateChecker       = require('../models/update-checker');
 var getOptionArgs       = require('../utilities/get-option-args');
 var debug               = require('debug')('ember-cli:cli');
 var debugTesting        = require('debug')('ember-cli:testing');
@@ -65,11 +64,6 @@ CLI.prototype.run = function(environment) {
     }
 
     debug('command: %s', commandName);
-
-    if (commandName !== 'update' && !this.testing) {
-      var a = new UpdateChecker(this.ui, environment.settings);
-      update = a.checkForUpdates();
-    }
 
     if (!this.testing) {
       process.chdir(environment.project.root);

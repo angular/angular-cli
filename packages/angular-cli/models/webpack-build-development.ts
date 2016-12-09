@@ -1,5 +1,16 @@
 const path = require('path');
 
+/**
+ * Enumerate loaders and their dependencies from this file to let the dependency validator
+ * know they are used.
+ *
+ * require('style-loader')
+ * require('css-loader')
+ * require('stylus-loader')
+ * require('less-loader')
+ * require('sass-loader')
+ */
+
 export const getWebpackDevConfigPartial = function(projectRoot: string, appConfig: any) {
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const styles = appConfig.styles
