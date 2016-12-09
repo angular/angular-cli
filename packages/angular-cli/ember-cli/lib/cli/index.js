@@ -1,17 +1,14 @@
 'use strict';
+var path          = require('path');
 
 // Main entry point
 var Project       = require('../models/project');
-var requireAsHash = require('../utilities/require-as-hash');
-var Command       = require('../models/command');
-var commands      = requireAsHash('../commands/*.js', Command);
-var Task          = require('../models/task');
-var tasks         = requireAsHash('../tasks/*.js', Task);
+var commands      = require('../commands');
+var tasks         = require('../tasks');
 var CLI           = require('./cli');
 var packageConfig = require('../../../package.json');
 var debug         = require('debug')('ember-cli:cli/index');
 var merge         = require('lodash/merge');
-var path          = require('path');
 
 var version      = packageConfig.version;
 var name         = packageConfig.name;
@@ -25,7 +22,7 @@ function clientId() {
   if (id) {
     return id;
   } else {
-    id = require('node-uuid').v4().toString();
+    id = require('uuid').v4().toString();
     configStore.set('client-id', id);
     return id;
   }

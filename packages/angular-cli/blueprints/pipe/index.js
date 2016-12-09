@@ -12,14 +12,17 @@ module.exports = {
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: true },
-    { name: 'spec', type: Boolean }
+    { name: 'spec', type: Boolean },
+    { name: 'skip-import', type: Boolean, default: false }
   ],
 
-  beforeInstall: function() {
+  beforeInstall: function(options) {
     try {
       this.pathToModule = findParentModule(this.project, this.dynamicPath.dir);
     } catch(e) {
-      throw `Error locating module for declaration\n\t${e}`;
+      if (!options.skipImport) {
+        throw `Error locating module for declaration\n\t${e}`;
+      }
     }
   },
 
@@ -78,7 +81,7 @@ module.exports = {
     const relativeDir = path.relative(moduleDir, fullGeneratePath);
     const importPath = relativeDir ? `./${relativeDir}/${fileName}` : `./${fileName}`;
 
-    if (!options['skip-import']) {
+    if (!options.skipImport) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply(NodeHost)));

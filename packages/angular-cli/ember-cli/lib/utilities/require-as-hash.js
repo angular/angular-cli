@@ -16,15 +16,13 @@ var stringUtils = require('ember-cli-string-utils');
 
 var globSync      = require('glob').sync;
 var path          = require('path');
-var getCallerFile = require('get-caller-file');
 
 module.exports = requireAsHash;
 function requireAsHash(pattern, type) {
-  var callerFileDir = path.dirname(getCallerFile());
-  return globSync(pattern, { cwd: callerFileDir })
+  return globSync(pattern)
     .reduce(function(hash, file) {
 
-      var klass = require(callerFileDir + '/' + file);
+      var klass = require(file);
       if (!type || (klass.prototype instanceof type)) {
         hash[stringUtils.classify(path.basename(file, '.js'))] = klass;
       }

@@ -26,7 +26,12 @@ export interface ServeTaskOptions {
   sslKey?: string;
   sslCert?: string;
   aot?: boolean;
+  sourcemap?: boolean;
+  verbose?: boolean;
+  progress?: boolean;
   open?: boolean;
+  vendorChunk?: boolean;
+  hmr?: boolean;
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
@@ -84,12 +89,22 @@ const ServeCommand = Command.extend({
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
     { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' },
     { name: 'aot',                  type: Boolean, default: false },
+    { name: 'sourcemap',            type: Boolean, default: true, aliases: ['sm'] },
+    { name: 'vendor-chunk',         type: Boolean, default: true },
+    { name: 'verbose',              type: Boolean, default: false },
+    { name: 'progress',             type: Boolean, default: true },
     {
       name: 'open',
       type: Boolean,
       default: false,
       aliases: ['o'],
       description: 'Opens the url in default browser',
+    },
+    {
+      name: 'hmr',
+      type: Boolean,
+      default: false,
+      description: 'Enable hot module replacement',
     },
     { name: 'i18n-file',       type: String, default: null },
     { name: 'i18n-format',     type: String, default: null },

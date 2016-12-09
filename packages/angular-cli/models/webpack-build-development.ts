@@ -1,5 +1,16 @@
 const path = require('path');
 
+/**
+ * Enumerate loaders and their dependencies from this file to let the dependency validator
+ * know they are used.
+ *
+ * require('style-loader')
+ * require('css-loader')
+ * require('stylus-loader')
+ * require('less-loader')
+ * require('sass-loader')
+ */
+
 export const getWebpackDevConfigPartial = function(projectRoot: string, appConfig: any) {
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const styles = appConfig.styles
@@ -7,11 +18,10 @@ export const getWebpackDevConfigPartial = function(projectRoot: string, appConfi
                : [];
   const cssLoaders = ['style-loader', 'css-loader?sourcemap', 'postcss-loader'];
   return {
-    devtool: 'source-map',
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].bundle.js',
-      sourceMapFilename: '[name].map',
+      sourceMapFilename: '[name].bundle.map',
       chunkFilename: '[id].chunk.js'
     },
     module: {
