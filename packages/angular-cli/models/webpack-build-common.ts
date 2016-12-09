@@ -6,6 +6,28 @@ import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
 
 const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const SilentError = require('silent-error');
+
+/**
+ * Enumerate loaders and their dependencies from this file to let the dependency validator
+ * know they are used.
+ *
+ * require('source-map-loader')
+ * require('raw-loader')
+ * require('postcss-loader')
+ * require('stylus-loader')
+ * require('less-loader')
+ * require('sass-loader')
+ * require('script-loader')
+ * require('json-loader')
+ * require('url-loader')
+ * require('file-loader')
+ *
+ * require('node-sass')
+ * require('less')
+ * require('stylus')
+ */
+
 
 export function getWebpackCommonConfig(
   projectRoot: string,
@@ -32,6 +54,10 @@ export function getWebpackCommonConfig(
   let entry: { [key: string]: string[] } = {
     main: [appMain]
   };
+
+  if (!(environment in appConfig.environments)) {
+    throw new SilentError(`Environment "${environment}" does not exist.`);
+  }
 
   // Only add styles/scripts if there's actually entries there
   if (appConfig.styles.length > 0) { entry['styles'] = styles; }

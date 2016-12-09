@@ -59,16 +59,18 @@ module.exports = {
 
   afterInstall: function (options) {
     // Note that `this.generatePath` already contains `this.dasherizedModuleName`
-    // So, the path will end like `name/name`, 
+    // So, the path will end like `name/name`,
     //  which is correct for `name.component.ts` created in module `name`
-    var componentPath = path.join(this.generatePath, this.dasherizedModuleName);
-    options.entity.name = path.relative(this.dynamicPath.appRoot, componentPath);
-    options.flat = true;
-    options.route = false;
-    options.inlineTemplate = false;
-    options.inlineStyle = false;
-    options.prefix = true;
-    options.spec = true;
-    return Blueprint.load(path.join(__dirname, '../component')).install(options);
+    if (this.options && this.options.routing) {
+      var componentPath = path.join(this.generatePath, this.dasherizedModuleName);
+      options.entity.name = path.relative(this.dynamicPath.appRoot, componentPath);
+      options.flat = true;
+      options.route = false;
+      options.inlineTemplate = false;
+      options.inlineStyle = false;
+      options.prefix = true;
+      options.spec = true;
+      return Blueprint.load(path.join(__dirname, '../component')).install(options);
+    }
   }
 };
