@@ -1,5 +1,6 @@
 import * as chalk from 'chalk';
 import InitCommand from './init';
+import {oneLine} from 'common-tags';
 
 const Command = require('../ember-cli/lib/models/command');
 const Project = require('../ember-cli/lib/models/project');
@@ -36,6 +37,12 @@ const NewCommand = Command.extend({
       return Promise.reject(new SilentError(
         `The "ng ${this.name}" command requires a name argument to be specified. ` +
         `For more details, use "ng help".`));
+    }
+    if (!packageName.match(/^[a-zA-Z][.0-9a-zA-Z]*(-[a-zA-Z][.0-9a-zA-Z]*)*$/)) {
+      return Promise.reject(new SilentError(oneLine`
+        Project name "${packageName}" is not valid. New project names must
+        start with a letter, and must contain only alphanumeric characters or dashes.
+      `));
     }
 
     commandOptions.name = packageName;

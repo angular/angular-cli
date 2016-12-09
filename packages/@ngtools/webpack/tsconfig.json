@@ -15,7 +15,6 @@
     "sourceRoot": "/",
     "baseUrl": "./",
     "paths": {
-      "@angular-cli/ast-tools": [ "../../../dist/ast-tools/src" ]
     },
     "typeRoots": [
       "../../node_modules/@types"

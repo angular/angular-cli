@@ -8,5 +8,4 @@ module.exports = {
   NpmInstall: require('./tasks/npm-install'),
   NpmTask: require('./tasks/npm-task'),
   NpmUninstall: require('./tasks/npm-uninstall'),
-  Update: require('./tasks/update')
 };
