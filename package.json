@@ -22,7 +22,8 @@
     "test:packages": "node scripts/run-packages-spec.js",
     "eslint": "eslint .",
     "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
-    "lint": "npm-run-all -c eslint tslint"
+    "lint": "npm-run-all -c eslint tslint",
+    "sync-deps": "node ./scripts/sync-deps.js"
   },
   "repository": {
     "type": "git",
