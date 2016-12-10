@@ -46,6 +46,7 @@ function _parseJsonPath(path: string): string[] {
 function _getSchemaNodeForPath<T>(rootMetaData: SchemaTreeNode<T>,
                                   path: string): SchemaTreeNode<any> {
   let fragments = _parseJsonPath(path);
+  // TODO: make this work with union (oneOf) schemas
   return fragments.reduce((md: SchemaTreeNode<any>, current: string) => {
     return md && md.children && md.children[current];
   }, rootMetaData);

@@ -1,57 +1,59 @@
-import * as glob from 'glob';
+import {
+  writeMultipleFiles,
+  expectFileToExist,
+  expectFileToMatch
+} from '../../../utils/fs';
+import { ng } from '../../../utils/process';
+import { updateJsonFile } from '../../../utils/project';
+import { expectToFail } from '../../../utils/utils';
+import { oneLineTrim } from 'common-tags';
 
-import {writeMultipleFiles, expectFileToMatch} from '../../../utils/fs';
-import {ng} from '../../../utils/process';
-import {updateJsonFile} from '../../../utils/project';
-
-
-export default function() {
+export default function () {
   return writeMultipleFiles({
-    'src/styles.css': `
-      @import './imported-styles.css';
-
-      body { background-color: blue; }
-
-      div { flex: 1 }
-    `,
-    'src/imported-styles.css': `
-      p { background-color: red; }
-    `,
-    'src/styles.less': `
-        .outer {
-          .inner {
-            background: #fff;
-          }
-        }
-    `,
-    'src/styles.scss': `
-        .upper {
-          .lower {
-            background: #def;
-          }
-        }
-    `
+    'src/string-style.css': '.string-style { color: red }',
+    'src/input-style.css': '.input-style { color: red }',
+    'src/lazy-style.css': '.lazy-style { color: red }',
+    'src/pre-rename-style.css': '.pre-rename-style { color: red }',
+    'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }',
+    'src/common-entry-style.css': '.common-entry-style { color: red }',
+    'src/common-entry-script.js': 'console.log(\'common-entry-script\');'
   })
     .then(() => updateJsonFile('angular-cli.json', configJson => {
       const app = configJson['apps'][0];
-      app['styles'].push('styles.less');
-      app['styles'].push('styles.scss');
+      app['styles'] = [
+        'string-style.css',
+        { input: 'input-style.css' },
+        { input: 'lazy-style.css', lazy: true },
+        { input: 'pre-rename-style.css', output: 'renamed-style' },
+        { input: 'pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true },
+        { input: 'common-entry-style.css', output: 'common-entry' }
+      ];
+      app['scripts'] = [{ input: 'common-entry-script.js', output: 'common-entry' }];
     }))
     .then(() => ng('build'))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', 'body { background-color: blue; }'))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', 'p { background-color: red; }'))
-    .then(() => expectFileToMatch(
-      'dist/styles.bundle.js',
-      'div { -webkit-box-flex: 1; -ms-flex: 1; flex: 1 }'))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', /.outer.*.inner.*background:\s*#[fF]+/))
-    .then(() => expectFileToMatch('dist/styles.bundle.js', /.upper.*.lower.*background.*#def/))
-
-    .then(() => ng('build', '--prod'))
-    .then(() => glob.sync('dist/styles.*.bundle.css').find(file => !!file))
-    .then((styles) =>
-      expectFileToMatch(styles, /body\s*\{\s*background-color:\s*blue\s*\}/)
-        .then(() => expectFileToMatch(styles, /p\s*\{\s*background-color:\s*red\s*\}/)
-        .then(() => expectFileToMatch(styles, /.outer.*.inner.*background:\s*#[fF]+/))
-        .then(() => expectFileToMatch(styles, /.upper.*.lower.*background.*#def/)))
-    );
+    // files were created successfully
+    .then(() => expectFileToMatch('dist/styles.bundle.css', '.string-style'))
+    .then(() => expectFileToMatch('dist/styles.bundle.css', '.input-style'))
+    .then(() => expectFileToMatch('dist/lazy-style.bundle.css', '.lazy-style'))
+    .then(() => expectFileToMatch('dist/renamed-style.bundle.css', '.pre-rename-style'))
+    .then(() => expectFileToMatch('dist/renamed-lazy-style.bundle.css', '.pre-rename-lazy-style'))
+    .then(() => expectFileToMatch('dist/common-entry.bundle.css', '.common-entry-style'))
+    .then(() => expectFileToMatch('dist/common-entry.bundle.js', 'common-entry-script'))
+    // there are no js entry points for css only bundles
+    .then(() => expectToFail(() => expectFileToExist('dist/styles.bundle.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/lazy-styles.bundle.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/renamed-styles.bundle.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/renamed-lazy-styles.bundle.js')))
+    // index.html lists the right bundles
+    .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
+      <link href="renamed-style.bundle.css" rel="stylesheet">
+      <link href="styles.bundle.css" rel="stylesheet">
+      <link href="common-entry.bundle.css" rel="stylesheet">
+    `))
+    .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
+      <script type="text/javascript" src="inline.bundle.js"></script>
+      <script type="text/javascript" src="vendor.bundle.js"></script>
+      <script type="text/javascript" src="common-entry.bundle.js"></script>
+      <script type="text/javascript" src="main.bundle.js"></script>
+    `));
 }

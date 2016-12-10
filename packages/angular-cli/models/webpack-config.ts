@@ -45,7 +45,9 @@ export class NgCliWebpackConfig {
       verbose,
       progress
     );
-    let targetConfigPartial = this.getTargetConfig(this.ngCliProject.root, appConfig, verbose);
+    let targetConfigPartial = this.getTargetConfig(
+      this.ngCliProject.root, appConfig, sourcemap, verbose
+    );
     const typescriptConfigPartial = isAoT
       ? getWebpackAotConfigPartial(this.ngCliProject.root, appConfig)
       : getWebpackNonAotConfigPartial(this.ngCliProject.root, appConfig);
@@ -67,12 +69,12 @@ export class NgCliWebpackConfig {
     );
   }
 
-  getTargetConfig(projectRoot: string, appConfig: any, verbose: boolean): any {
+  getTargetConfig(projectRoot: string, appConfig: any, sourcemap: boolean, verbose: boolean): any {
     switch (this.target) {
       case 'development':
         return getWebpackDevConfigPartial(projectRoot, appConfig);
       case 'production':
-        return getWebpackProdConfigPartial(projectRoot, appConfig, verbose);
+        return getWebpackProdConfigPartial(projectRoot, appConfig, sourcemap, verbose);
       default:
         throw new Error("Invalid build target. Only 'development' and 'production' are available.");
     }
