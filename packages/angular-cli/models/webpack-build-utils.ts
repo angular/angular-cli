@@ -67,7 +67,7 @@ export function makeCssLoaders(stylePaths: string[] = []) {
     { test: /\.styl$/, loaders: ['stylus-loader'] }
   ];
 
-  const commonLoaders = ['css-loader', 'postcss-loader'];
+  const commonLoaders = ['postcss-loader'];
 
   // load component css as raw strings
   let cssLoaders: any = baseRules.map(({test, loaders}) => ({
@@ -78,7 +78,7 @@ export function makeCssLoaders(stylePaths: string[] = []) {
     // load global css as css files
     cssLoaders.push(...baseRules.map(({test, loaders}) => ({
       include: stylePaths, test, loaders: ExtractTextPlugin.extract({
-        loader: [...commonLoaders, ...loaders],
+        loader: ['css-loader', ...commonLoaders, ...loaders],
         fallbackLoader: 'style-loader'
       })
     })));
