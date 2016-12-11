@@ -65,7 +65,7 @@
     "lodash": "^4.11.1",
     "markdown-it": "4.3.0",
     "markdown-it-terminal": "0.0.3",
-    "minimatch": "^3.0.0",
+    "minimatch": "^3.0.3",
     "node-modules-path": "^1.0.0",
     "node-sass": "^3.10.1",
     "nopt": "^3.0.1",
