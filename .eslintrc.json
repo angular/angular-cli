@@ -8,7 +8,10 @@
     "node": true,
     "es6": true
   },
-  "parser": "espree",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
   "rules": {
     "no-alert": "off",
     "no-array-constructor": "off",

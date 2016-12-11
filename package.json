@@ -141,7 +141,7 @@
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
     "dtsgenerator": "^0.8.3",
-    "eslint": "^2.8.0",
+    "eslint": "^3.11.0",
     "express": "^4.14.0",
     "jasmine": "^2.4.1",
     "jasmine-spec-reporter": "^3.2.0",

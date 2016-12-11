@@ -28,7 +28,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
     return fsMkdir('./dist')
       .then(() => {
         let indexHtml = path.join(process.cwd(), 'dist', 'index.html');
-        let indexData = `<title>project</title>\n<base href="/">`;
+        let indexData = '<title>project</title>\n<base href="/">';
         return fsWriteFile(indexHtml, indexData, 'utf8');
       });
   }
