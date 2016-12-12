@@ -129,12 +129,21 @@ export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   protected _createChildProperty<T>(name: string, value: T, forward: SchemaTreeNode<T>,
                                     schema: Schema, define = true): SchemaTreeNode<T> {
 
-    // TODO: fix this
-    if (schema['fixme'] && typeof value === 'string') {
-      value = <T>(<any>[ value ]);
+    let type: string;
+
+    if (!schema['oneOf']) {
+      type = schema['type'];
+    } else {
+      for (let testSchema of schema['oneOf']) {
+        if ((testSchema['type'] === 'array' && Array.isArray(value))
+            || typeof value === testSchema['type']) {
+          type = testSchema['type'];
+          schema = testSchema;
+          break;
+        }
+      }
     }
 
-    const type = schema['type'];
     let Klass: any = null;
 
     switch (type) {
