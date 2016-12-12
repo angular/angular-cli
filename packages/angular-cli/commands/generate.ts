@@ -59,10 +59,11 @@ function mapBlueprintName(name: string): string {
 
 function mapSufix(args: Array): string {
   for(let alias in aliasMap){
-    if(args[1].indexOf(aliasMap[alias]) !== -1 && args[0] === aliasMap[alias]){
+    if(args[1].toLowerCase().indexOf(aliasMap[alias]) !== -1 && args[0] === aliasMap[alias]){
       // make sure that the suffix name is in the end of the string
-      let regex = new RegExp('([\\-]*)' + aliasMap[alias] +'$');
+      let regex = new RegExp('([\\-]*)' + aliasMap[alias] +'$', 'i');
       args[1] = args[1].replace(regex, '');
+      console.log(args[1])
     }
   }
   return args[1];

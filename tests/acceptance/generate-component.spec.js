@@ -186,6 +186,13 @@ describe('Acceptance: ng generate component', function () {
     });
   });
 
+  it('CompTestComponent should rename to CompTest', function(){
+    return ng(['generate', 'component', 'CompTestComponent']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'comp-test', 'comp-test.component.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
   it('comptestcomponent should rename to comptest', function(){
     return ng(['generate', 'component', 'comptestcomponent']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'comptest', 'comptest.component.ts');
