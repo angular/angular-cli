@@ -31,27 +31,27 @@ describe('Acceptance: ng generate module', function () {
     });
   });
 
-  it('ng generate module my-module', function () {
-    return ng(['generate', 'module', 'my-module']).then(() => {
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module.component.ts'))).to.equal(false);
+  it('ng generate module module-test', function () {
+    return ng(['generate', 'module', 'module-test']).then(() => {
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test.module.spec.ts'))).to.equal(false);
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test.component.ts'))).to.equal(false);
     });
   });
 
   it('ng generate module  generate routing and component files when passed flag --routing', function () {
-    return ng(['generate', 'module', 'my-module', '--routing']).then( () => {
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module-routing.module.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module.component.ts'))).to.equal(true);
+    return ng(['generate', 'module', 'module-test', '--routing']).then( () => {
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test-routing.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test.module.spec.ts'))).to.equal(false);
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test.component.ts'))).to.equal(true);
     })
   });
 
-  it('ng generate module my-module --spec', function () {
-    return ng(['generate', 'module', 'my-module', '--spec']).then(() => {
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(true);
+  it('ng generate module module-test --spec', function () {
+    return ng(['generate', 'module', 'module-test', '--spec']).then(() => {
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test.module.ts'))).to.equal(true);
+      expect(existsSync(path.join(testPath, 'module-test', 'module-test.module.spec.ts'))).to.equal(true);
     });
   });
 
