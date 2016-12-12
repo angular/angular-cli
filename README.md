@@ -90,8 +90,8 @@ ng serve --host 0.0.0.0 --port 4201 --live-reload-port 49153
 You can use the `ng generate` (or just `ng g`) command to generate Angular components:
 
 ```bash
-ng generate component my-new-component
-ng g component my-new-component # using the alias
+ng generate component component-file
+ng g c component-file # using the alias
 
 # components support relative path generation
 # if in the directory src/app/feature/ and you run
@@ -103,16 +103,16 @@ ng g component ../newer-cmp
 ```
 You can find all possible blueprints in the table below:
 
-Scaffold  | Usage | Generates | Class Name
----       | ---   | ---       | ---
-Component | `ng g component my-new-component` | my-new-component.component.ts | MyNewComponentComponent
-Directive | `ng g directive my-new-directive` | my-new-directive.directive.ts | MyNewDirectiveDirective
-Pipe      | `ng g pipe my-new-pipe` | my-new-pipe.pipe.ts | MyNewPipePipe
-Service   | `ng g service my-new-service` | my-new-service.service.ts | MyNewServiceService
-Class     | `ng g class my-new-class` | my-new-class.class.ts | MyNewClassClass
-Interface | `ng g interface my-new-interface` | my-new-interface.interface.ts | MyNewInterfaceInterface
-Enum      | `ng g enum my-new-enum` | my-new-enum.enum.ts | MyNewEnumEnum
-Module    | `ng g module my-new-module` | my-new-module.module.ts | MyNewModuleModule
+Scaffold  | Usage                           | File
+---       | ---                             | ---
+Component | `ng g component component-file` | component-file.component.ts
+Directive | `ng g directive directive-file` | directive-file.component.ts
+Pipe      | `ng g pipe pipe-file`           | pipe-file.component.ts
+Service   | `ng g service service-file`     | service-file.component.ts
+Class     | `ng g class class-file`         | class-file.component.ts
+Interface | `ng g interface interface-file` | interface-file.component.ts
+Enum      | `ng g enum enum-file`           | enum-file.component.ts
+Module    | `ng g module module-file`       | module-file.component.ts
 
 ### Generating a route
 
