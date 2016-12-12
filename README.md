@@ -103,16 +103,16 @@ ng g component ../newer-cmp
 ```
 You can find all possible blueprints in the table below:
 
-Scaffold  | Usage
----       | ---
-Component | `ng g component my-new-component`
-Directive | `ng g directive my-new-directive`
-Pipe      | `ng g pipe my-new-pipe`
-Service   | `ng g service my-new-service`
-Class     | `ng g class my-new-class`
-Interface | `ng g interface my-new-interface`
-Enum      | `ng g enum my-new-enum`
-Module    | `ng g module my-module`
+Scaffold  | Usage | Generates | Class Name
+---       | ---   | ---       | ---
+Component | `ng g component my-new-component` | my-new-component.component.ts | MyNewComponentComponent
+Directive | `ng g directive my-new-directive` | my-new-directive.directive.ts | MyNewDirectiveDirective
+Pipe      | `ng g pipe my-new-pipe` | my-new-pipe.pipe.ts | MyNewPipePipe
+Service   | `ng g service my-new-service` | my-new-service.service.ts | MyNewServiceService
+Class     | `ng g class my-new-class` | my-new-class.class.ts | MyNewClassClass
+Interface | `ng g interface my-new-interface` | my-new-interface.interface.ts | MyNewInterfaceInterface
+Enum      | `ng g enum my-new-enum` | my-new-enum.enum.ts | MyNewEnumEnum
+Module    | `ng g module my-new-module` | my-new-module.module.ts | MyNewModuleModule
 
 ### Generating a route
 
