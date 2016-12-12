@@ -192,4 +192,11 @@ describe('Acceptance: ng generate component', function () {
       expect(existsSync(testPath)).to.equal(true);
     });
   });
+
+  it('comp-test-directive should should ignore suffix removal', function(){
+    return ng(['generate', 'component', 'comp-test-directive']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'comp-test-directive', 'comp-test-directive.component.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
 });
