@@ -62,7 +62,6 @@ function mapSufix(name: string): string {
     if(name.indexOf(aliasMap[alias]) !== -1){
       // make sure that the suffix name is in the end of the string
       let regex = new RegExp('([\\-]*)' + aliasMap[alias] +'$');
-      console.log(regex);
       name = name.replace(regex, '');
     }
   }
