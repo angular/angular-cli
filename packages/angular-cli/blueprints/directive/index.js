@@ -6,7 +6,7 @@ const findParentModule = require('../../utilities/find-parent-module').default;
 const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const getFiles = Blueprint.prototype.files;
-const ts = require('typescript');
+const getConstConfig = require('../../utilities/get-const-config').default;
 
 
 module.exports = {
@@ -34,19 +34,7 @@ module.exports = {
 
     this.dynamicPath = parsedPath;
 
-    var modulePrefix = '';
-
-    // TODO : make it generic and move it to utilities
-    try {
-      let pathToModule = findParentModule(this.project, this.dynamicPath.dir);
-      astUtils.getSourceNodes(astUtils.getSource(pathToModule))
-        .last(node => (node.flags & ts.NodeFlags.Export) !== 0 && node.getText().indexOf('ModulePrefix') > -1)
-        .subscribe(node => {
-          modulePrefix = /= ?['"]([\w-]+)["']/.exec(node.getText())[1];
-        });
-    } catch(e) {
-      console.log(`there isn't any module for this directive\n\t`);
-    }
+    var modulePrefix = getConstConfig(this.project, this.dynamicPath.dir, 'ModulePrefix');
 
     var defaultPrefix = '';
     if (this.project.ngConfig &&
