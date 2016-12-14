@@ -8,13 +8,13 @@
 
 ng_opts='b build completion doc e2e g generate get github-pages:deploy gh-pages:deploy h help i init install lint make-this-awesome new s serve server set t test v version'
 
-build_opts='--aot --base-href --environment --output-path --progress --sourcemap --suppress-sizes --target --vendor-chunk --verbose --watch --watcher -bh -dev -e -o -prod -sm -t -w'
+build_opts='--aot --base-href --environment --i18n-file --i18n-format --locale --output-path --progress --sourcemap --suppress-sizes --target --vendor-chunk --verbose --watch --watcher -bh -dev -e -o -prod -sm -t -w'
 generate_opts='class component directive enum module pipe route service c cl d e m p r s --help'
 github_pages_deploy_opts='--base-href --environment --gh-token --gh-username --message --skip-build --target --user-page -bh -e -t'
 help_opts='--json --verbose -v'
 init_opts='--dry-run inline-style inline-template --link-cli --mobile --name --prefix --routing --skip-bower --skip-npm --source-dir --style --verbose -d -is -it -lc -n -p -sb -sd -sn -v'
 new_opts='--directory --dry-run inline-style inline-template --link-cli --mobile --prefix --routing --skip-bower --skip-git --skip-npm --source-dir --style --verbose -d -dir -is -it -lc -p -sb -sd -sg -sn -v'
-serve_opts='--aot --environment --hmr --host --live-reload --live-reload-base-url --live-reload-host --live-reload-live-css --live-reload-port --open --port --proxy-config --sourcemap --ssl --ssl-cert --ssl-key --target --watcher -H -e -lr -lrbu -lrh -lrp -o -p -pc -sm -t -w'
+serve_opts='--aot --environment --hmr --host --i18n-file --i18n-format --live-reload --live-reload-base-url --live-reload-host --live-reload-live-css --live-reload-port --locale --open --port --proxy-config --sourcemap --ssl --ssl-cert --ssl-key --target --watcher -H -e -lr -lrbu -lrh -lrp -o -p -pc -sm -t -w'
 set_opts='--global -g'
 test_opts='--browsers --build --code-coverage --colors --lint --log-level --port --reporters --single-run --sourcemap --watch -cc -l -sm -sr -w'
 
