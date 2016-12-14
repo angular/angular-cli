@@ -8,7 +8,8 @@ module.exports = {
 
   availableOptions: [
     { name: 'spec', type: Boolean },
-    { name: 'routing', type: Boolean, default: false }
+    { name: 'routing', type: Boolean, default: false },
+    { name: 'prefix', type: String, default: null}
   ],
 
   normalizeEntityName: function (entityName) {
@@ -27,7 +28,8 @@ module.exports = {
     return {
       dynamicPath: this.dynamicPath.dir,
       spec: options.spec,
-      routing: options.routing
+      routing: options.routing,
+      prefix: options.prefix
     };
   },
 
