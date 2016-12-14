@@ -7,6 +7,7 @@ const getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const NodeHost = require('@angular-cli/ast-tools').NodeHost;
+const ts = require('typescript');
 
 module.exports = {
   description: '',
@@ -37,6 +38,20 @@ module.exports = {
 
     this.dynamicPath = parsedPath;
 
+    var modulePrefix = '';
+
+    // TODO : make it generic and move it to utilities
+    try {
+      let pathToModule = findParentModule(this.project, this.dynamicPath.dir);
+      astUtils.getSourceNodes(astUtils.getSource(pathToModule))
+        .last(node => (node.flags & ts.NodeFlags.Export) !== 0 && node.getText().indexOf('ModulePrefix') > -1)
+        .subscribe(node => {
+          modulePrefix = /= ?['"]([\w-]+)["']/.exec(node.getText())[1];
+        });
+    } catch(e) {
+      console.log(`there isn't any module for this component\n\t`);
+    }
+   
     var defaultPrefix = '';
     if (this.project.ngConfig &&
         this.project.ngConfig.apps[0] &&
@@ -44,7 +59,8 @@ module.exports = {
       defaultPrefix = this.project.ngConfig.apps[0].prefix;
     }
 
-    var prefix = (this.options.prefix === 'false' || this.options.prefix === '') ? '' : (this.options.prefix || defaultPrefix);
+    var prefix = (this.options.prefix === 'false' || this.options.prefix === '')
+                      ? '' : (this.options.prefix || modulePrefix || defaultPrefix);
     prefix = prefix && `${prefix}-`;
 
     this.selector = stringUtils.dasherize(prefix + parsedPath.name);
