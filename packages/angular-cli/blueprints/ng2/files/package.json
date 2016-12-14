@@ -4,10 +4,11 @@
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
+    "ng": "ng",
     "start": "ng serve",
     "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
     "test": "ng test",
-    "pree2e": "webdriver-manager update",
+    "pree2e": "webdriver-manager update --standalone false --gecko false",
     "e2e": "protractor"
   },
   "private": true,
@@ -25,14 +26,7 @@
     "ts-helpers": "^1.1.1",
     "zone.js": "^0.6.23"
   },
-  "devDependencies": {<% if(isMobile) { %>
-    "@angular/platform-server": "2.2.3",
-    "@angular/service-worker": "0.2.0",
-    "@angular/app-shell": "0.0.0",
-    "angular2-universal":"0.104.5",
-    "angular2-universal-polyfills": "0.4.1",
-    "preboot": "2.1.2",
-    "parse5": "1.5.1",<% } %>
+  "devDependencies": {
     "@angular/compiler-cli": "2.2.3",
     "@types/jasmine": "2.5.38",
     "@types/node": "^6.0.42",
@@ -45,10 +39,9 @@
     "karma-cli": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "karma-remap-istanbul": "^0.2.1",
-    "protractor": "4.0.9",
+    "protractor": "~4.0.13",
     "ts-node": "1.2.1",
     "tslint": "^4.0.2",
-    "typescript": "~2.0.3",
-    "webdriver-manager": "10.2.5"
+    "typescript": "~2.0.3"
   }
 }

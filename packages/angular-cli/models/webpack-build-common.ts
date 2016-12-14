@@ -1,13 +1,27 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
-import {GlobCopyWebpackPlugin} from '../plugins/glob-copy-webpack-plugin';
-import {packageChunkSort} from '../utilities/package-chunk-sort';
-import {BaseHrefWebpackPlugin} from '@angular-cli/base-href-webpack';
+import { GlobCopyWebpackPlugin } from '../plugins/glob-copy-webpack-plugin';
+import { SuppressEntryChunksWebpackPlugin } from '../plugins/suppress-entry-chunks-webpack-plugin';
+import { packageChunkSort } from '../utilities/package-chunk-sort';
+import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
+import { extraEntryParser, makeCssLoaders } from './webpack-build-utils';
 
-const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
+const ProgressPlugin = require('webpack/lib/ProgressPlugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const SilentError = require('silent-error');
 
+/**
+ * Enumerate loaders and their dependencies from this file to let the dependency validator
+ * know they are used.
+ *
+ * require('source-map-loader')
+ * require('raw-loader')
+ * require('script-loader')
+ * require('json-loader')
+ * require('url-loader')
+ * require('file-loader')
+ */
 
 export function getWebpackCommonConfig(
   projectRoot: string,
@@ -23,21 +37,64 @@ export function getWebpackCommonConfig(
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);
   const nodeModules = path.resolve(projectRoot, 'node_modules');
-  const styles = appConfig.styles
-               ? appConfig.styles.map((style: string) => path.resolve(appRoot, style))
-               : [];
-  const scripts = appConfig.scripts
-                ? appConfig.scripts.map((script: string) => path.resolve(appRoot, script))
-                : [];
-  const extraPlugins: any[] = [];
 
-  let entry: { [key: string]: string[] } = {
+  let extraPlugins: any[] = [];
+  let extraRules: any[] = [];
+  let lazyChunks: string[] = [];
+
+  let entryPoints: { [key: string]: string[] } = {
     main: [appMain]
   };
 
-  // Only add styles/scripts if there's actually entries there
-  if (appConfig.styles.length > 0) { entry['styles'] = styles; }
-  if (appConfig.scripts.length > 0) { entry['scripts'] = scripts; }
+  if (!(environment in appConfig.environments)) {
+    throw new SilentError(`Environment "${environment}" does not exist.`);
+  }
+
+  // process global scripts
+  if (appConfig.scripts.length > 0) {
+    const globalScrips = extraEntryParser(appConfig.scripts, appRoot, 'scripts');
+
+    // add entry points and lazy chunks
+    globalScrips.forEach(script => {
+      if (script.lazy) { lazyChunks.push(script.entry); }
+      entryPoints[script.entry] = (entryPoints[script.entry] || []).concat(script.path);
+    });
+
+    // load global scripts using script-loader
+    extraRules.push({
+      include: globalScrips.map((script) => script.path), test: /\.js$/, loader: 'script-loader'
+    });
+  }
+
+  // process global styles
+  if (appConfig.styles.length === 0) {
+    // create css loaders for component css
+    extraRules.push(...makeCssLoaders());
+  } else {
+    const globalStyles = extraEntryParser(appConfig.styles, appRoot, 'styles');
+    let extractedCssEntryPoints: string[] = [];
+    // add entry points and lazy chunks
+    globalStyles.forEach(style => {
+      if (style.lazy) { lazyChunks.push(style.entry); }
+      if (!entryPoints[style.entry]) {
+        // since this entry point doesn't exist yet, it's going to only have
+        // extracted css and we can supress the entry point
+        extractedCssEntryPoints.push(style.entry);
+        entryPoints[style.entry] = (entryPoints[style.entry] || []).concat(style.path);
+      } else {
+        // existing entry point, just push the css in
+        entryPoints[style.entry].push(style.path);
+      }
+    });
+
+    // create css loaders for component css and for global css
+    extraRules.push(...makeCssLoaders(globalStyles.map((style) => style.path)));
+
+    if (extractedCssEntryPoints.length > 0) {
+      // don't emit the .js entry point for extracted styles
+      extraPlugins.push(new SuppressEntryChunksWebpackPlugin({ chunks: extractedCssEntryPoints }));
+    }
+  }
 
   if (vendorChunk) {
     extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
@@ -47,12 +104,7 @@ export function getWebpackCommonConfig(
     }));
   }
 
-  if (progress) {
-    extraPlugins.push(new ProgressPlugin({
-      profile: verbose,
-      colors: true
-    }));
-  }
+  if (progress) { extraPlugins.push(new ProgressPlugin({ profile: verbose, colors: true })); }
 
   return {
     devtool: sourcemap ? 'source-map' : false,
@@ -61,10 +113,10 @@ export function getWebpackCommonConfig(
       modules: [nodeModules],
     },
     resolveLoader: {
-      modules: [path.resolve(projectRoot, 'node_modules')]
+      modules: [nodeModules]
     },
     context: projectRoot,
-    entry: entry,
+    entry: entryPoints,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
       filename: '[name].bundle.js',
@@ -73,48 +125,22 @@ export function getWebpackCommonConfig(
     },
     module: {
       rules: [
-        {
-          enforce: 'pre',
-          test: /\.js$/,
-          loader: 'source-map-loader',
-          exclude: [ nodeModules ]
-        },
-        // in main, load css as raw text
-        {
-          exclude: styles,
-          test: /\.css$/,
-          loaders: ['raw-loader', 'postcss-loader']
-        }, {
-          exclude: styles,
-          test: /\.styl$/,
-          loaders: ['raw-loader', 'postcss-loader', 'stylus-loader'] },
-        {
-          exclude: styles,
-          test: /\.less$/,
-          loaders: ['raw-loader', 'postcss-loader', 'less-loader']
-        }, {
-          exclude: styles,
-          test: /\.scss$|\.sass$/,
-          loaders: ['raw-loader', 'postcss-loader', 'sass-loader']
-        },
+        { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
 
-
-        // load global scripts using script-loader
-        { include: scripts, test: /\.js$/, loader: 'script-loader' },
-
-        { test: /\.json$/, loader: 'json-loader' },
-        { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
-        { test: /\.html$/, loader: 'raw-loader' },
+        { test: /\.json$/, loader: 'json-loader' },
+        { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
+        { test: /\.html$/, loader: 'raw-loader' },
 
         { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url-loader?limit=10000' },
         { test: /\.(eot|svg)$/, loader: 'file-loader' }
-      ]
+      ].concat(extraRules)
     },
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
-        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main'])
+        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main']),
+        excludeChunks: lazyChunks
       }),
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
@@ -133,12 +159,18 @@ export function getWebpackCommonConfig(
       }),
       new GlobCopyWebpackPlugin({
         patterns: appConfig.assets,
-        globOptions: {cwd: appRoot, dot: true, ignore: '**/.gitkeep'}
+        globOptions: { cwd: appRoot, dot: true, ignore: '**/.gitkeep' }
       }),
       new webpack.LoaderOptionsPlugin({
         test: /\.(css|scss|sass|less|styl)$/,
         options: {
-          postcss: [ autoprefixer() ]
+          postcss: [autoprefixer()],
+          cssLoader: { sourceMap: sourcemap },
+          sassLoader: { sourceMap: sourcemap },
+          lessLoader: { sourceMap: sourcemap },
+          stylusLoader: { sourceMap: sourcemap },
+          // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
+          context: projectRoot,
         },
       })
     ].concat(extraPlugins),
