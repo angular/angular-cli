@@ -6,8 +6,6 @@ export default function getConstConfig(project: any, dir: string, identifier: st
     let modulePrefix = '';
     try {
         let pathToModule = findParentModule(project, dir);
-        console.log(pathToModule);
-
         astUtils.getSourceNodes(astUtils.getSource(pathToModule))
             .last((node: ts.Node) => {
                 // tslint:disable-next-line:no-bitwise
