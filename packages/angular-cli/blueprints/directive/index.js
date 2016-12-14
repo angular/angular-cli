@@ -6,13 +6,15 @@ const findParentModule = require('../../utilities/find-parent-module').default;
 const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const getFiles = Blueprint.prototype.files;
+const getConstConfig = require('../../utilities/get-const-config').default;
+
 
 module.exports = {
   description: '',
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: true },
-    { name: 'prefix', type: Boolean, default: true },
+    { name: 'prefix', type: String, default: null },
     { name: 'spec', type: Boolean },
     { name: 'skip-import', type: Boolean, default: false }
   ],
@@ -32,13 +34,19 @@ module.exports = {
 
     this.dynamicPath = parsedPath;
 
+    var modulePrefix = getConstConfig(this.project, this.dynamicPath.dir, 'ModulePrefix');
+
     var defaultPrefix = '';
     if (this.project.ngConfig &&
         this.project.ngConfig.apps[0] &&
         this.project.ngConfig.apps[0].prefix) {
       defaultPrefix = this.project.ngConfig.apps[0].prefix;
     }
-    var prefix = this.options.prefix ? `${defaultPrefix}-` : '';
+
+    var prefix = (this.options.prefix === 'false' || this.options.prefix === '')
+                      ? '' : (this.options.prefix || modulePrefix || defaultPrefix);
+    prefix = prefix && `${prefix}-`;
+
 
     this.selector = stringUtils.camelize(prefix + parsedPath.name);
     return parsedPath.name;

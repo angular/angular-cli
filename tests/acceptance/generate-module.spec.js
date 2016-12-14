@@ -2,6 +2,8 @@
 
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
+var fs = require('fs-extra');
+
 
 const existsSync = require('exists-sync');
 const expect = require('chai').expect;
@@ -36,6 +38,7 @@ describe('Acceptance: ng generate module', function () {
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.component.ts'))).to.equal(false);
+      
     });
   });
 
@@ -53,6 +56,15 @@ describe('Acceptance: ng generate module', function () {
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
       expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(true);
     });
+  });
+
+   it('ng generate module my-module --prefix=my', function () {
+    return ng(['generate', 'module', 'my-module', '--prefix=my']).then(() => {
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.ts'))).to.equal(true);
+      var contents = fs.readFileSync(path.join(testPath, 'my-module', 'my-module.module.ts'), 'utf8');
+      expect(contents.indexOf('export const ModulePrefix = \'my\';') === -1).to.equal(false);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.module.spec.ts'))).to.equal(false);
+      expect(existsSync(path.join(testPath, 'my-module', 'my-module.component.ts'))).to.equal(false);    });
   });
 
   it('ng generate module TwoWord', function () {
