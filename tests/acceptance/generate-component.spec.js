@@ -179,31 +179,44 @@ describe('Acceptance: ng generate component', function () {
     });
   });
 
-  it('comp-test-component should rename to comp-test', function(){
-    return ng(['generate', 'component', 'comp-test-component']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'comp-test', 'comp-test.component.ts');
+  it('a-test-component should generate file a-test.component', function(){
+    return ng(['generate', 'component', 'a-test-component']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test', 'a-test.component.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('CompTestComponent should rename to CompTest', function(){
-    return ng(['generate', 'component', 'CompTestComponent']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'comp-test', 'comp-test.component.ts');
+  it('ATestComponent should generate file atest.component', function(){
+    return ng(['generate', 'component', 'ATestComponent']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'atest', 'atest.component.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('comptestcomponent should rename to comptest', function(){
-    return ng(['generate', 'component', 'comptestcomponent']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'comptest', 'comptest.component.ts');
+  it('atestcomponent should generate file atest.component', function(){
+    return ng(['generate', 'component', 'atestcomponent']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'atest', 'atest.component.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
 
-  it('comp-test-directive should should ignore suffix removal', function(){
-    return ng(['generate', 'component', 'comp-test-directive']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'comp-test-directive', 'comp-test-directive.component.ts');
+  it('a-test-directive should should ignore suffix removal', function(){
+    return ng(['generate', 'component', 'a-test-directive']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test-directive', 'a-test-directive.component.ts');
       expect(existsSync(testPath)).to.equal(true);
     });
   });
+
+  it('name a-test-component generates ATestComponent component name not ATestComponentComponent', function () {
+    let testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test', 'a-test.component.ts');
+    return ng(['generate', 'component', 'a-test-component'])
+      .then(() => {
+        expect(existsSync(testPath)).to.equal(true);
+      })
+      .then(() => readFile(testPath, 'utf-8'))
+      .then(content => {
+        expect(content).to.matches(/^export\sclass\s(ATestComponent)/m);
+      });
+  });
+
 });

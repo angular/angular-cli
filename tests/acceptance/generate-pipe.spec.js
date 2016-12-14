@@ -156,4 +156,45 @@ describe('Acceptance: ng generate pipe', function () {
       expect(err).to.equal(`Invalid path: "..${path.sep}pipe-test" cannot be above the "src${path.sep}app" directory`);
     });
   });
+
+  it('a-test-pipe should generate file a-test.pipe', function(){
+    return ng(['generate', 'pipe', 'a-test-pipe']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test.pipe.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('ATestPipe should generate file atest.pipe', function(){
+    return ng(['generate', 'pipe', 'ATestPipe']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'atest.pipe.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('atestpipe should generate file atest.pipe', function(){
+    return ng(['generate', 'pipe', 'atestpipe']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'atest.pipe.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('a-test-component should should ignore suffix removal', function(){
+    return ng(['generate', 'pipe', 'a-test-component']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test-component.pipe.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('name a-test-pipe generates ATestPipe pipe name not ATestPipePipe', function () {
+    let testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test.pipe.ts');
+    return ng(['generate', 'pipe', 'a-test-pipe'])
+      .then(() => {
+        expect(existsSync(testPath)).to.equal(true);
+      })
+      .then(() => readFile(testPath, 'utf-8'))
+      .then(content => {
+        expect(content).to.matches(/^export\sclass\s(ATestPipe)/m);
+      });
+  });
+
 });

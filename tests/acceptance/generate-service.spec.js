@@ -165,4 +165,47 @@ describe('Acceptance: ng generate service', function () {
       expect(err).to.equal(`Invalid path: "..${path.sep}svc-test" cannot be above the "src${path.sep}app" directory`);
     });
   });
+
+
+  it('a-test-service should generate file a-test.service', function(){
+    return ng(['generate', 'service', 'a-test-service']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test.service.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('ATestService should generate file atest.service', function(){
+    return ng(['generate', 'service', 'ATestService']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'atest.service.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('atestservice should generate file atest.service', function(){
+    return ng(['generate', 'service', 'atestservice']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'atest.service.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('a-test-component should should ignore suffix removal', function(){
+    return ng(['generate', 'service', 'a-test-component']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test-component.service.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('name a-test-service generates ATestService service name not ATestServiceService', function () {
+    let testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test.service.ts');
+    return ng(['generate', 'service', 'a-test-service'])
+      .then(() => {
+        expect(existsSync(testPath)).to.equal(true);
+      })
+      .then(() => readFile(testPath, 'utf-8'))
+      .then(content => {
+        expect(content).to.matches(/^export\sclass\s(ATestService)/m);
+      });
+  });
+
+
 });

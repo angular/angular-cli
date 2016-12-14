@@ -11,6 +11,9 @@ const root = process.cwd();
 
 const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
+const denodeify = require('denodeify');
+const readFile = denodeify(fs.readFile);
+
 function fileExpectations(expectation) {
   const dir = 'route-test';
   expect(existsSync(path.join(testPath, dir, 'route-test.component.ts'))).to.equal(expectation);
@@ -90,4 +93,45 @@ xdescribe('Acceptance: ng generate route', function () {
       expect(afterGenerateParentHtml).to.equal(unmodifiedParentComponentHtml);
     });
   });
+
+  it('a-test-route should generate file a-test.route', function(){
+    return ng(['generate', 'route', 'a-test-route']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test.route.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('ATestRoute should generate file atest.route', function(){
+    return ng(['generate', 'route', 'ATestRoute']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'atest.route.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('atestroute should generate file atest.route', function(){
+    return ng(['generate', 'route', 'atestroute']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'atest.route.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('a-test-component should should ignore suffix removal', function(){
+    return ng(['generate', 'route', 'a-test-component']).then(() => {
+      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test-component.route.ts');
+      expect(existsSync(testPath)).to.equal(true);
+    });
+  });
+
+  it('name a-test-route generates ATestRoute route name not ATestRouteRoute', function () {
+    let testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'a-test.route.ts');
+    return ng(['generate', 'route', 'a-test-route'])
+      .then(() => {
+        expect(existsSync(testPath)).to.equal(true);
+      })
+      .then(() => readFile(testPath, 'utf-8'))
+      .then(content => {
+        expect(content).to.matches(/^export\sclass\s(ATestRoute)/m);
+      });
+  });
+
 });

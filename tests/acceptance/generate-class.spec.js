@@ -1,5 +1,6 @@
 'use strict';
 
+var fs = require('fs-extra');
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
 
@@ -7,6 +8,8 @@ const existsSync = require('exists-sync');
 const expect = require('chai').expect;
 const path = require('path');
 const root = process.cwd();
+const denodeify = require('denodeify');
+const readFile = denodeify(fs.readFile);
 
 const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
@@ -43,4 +46,18 @@ describe('Acceptance: ng generate class', function () {
       expect(existsSync(path.join(testPath, 'class-test.model.ts'))).to.equal(true);
     });
   });
+
+  it('name a-test-class generates ATest class name not ATest', function () {
+    let appFilePath = path.join(testPath, 'a-test.ts');
+    return ng(['generate', 'class', 'a-test-class'])
+      .then(() => {
+        expect(existsSync(appFilePath)).to.equal(true);
+      })
+      .then(() => readFile(appFilePath, 'utf-8'))
+      .then(content => {
+        expect(content).to.matches(/^export\sclass\s(ATest)/m);
+      })
+      .catch(e => console.error(e));
+  });
+
 });
