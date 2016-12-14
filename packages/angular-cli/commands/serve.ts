@@ -1,8 +1,8 @@
-import * as assign from 'lodash/assign';
 import * as denodeify from 'denodeify';
-const Command = require('../ember-cli/lib/models/command');
+const assign = require('lodash/assign');
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
+const Command = require('../ember-cli/lib/models/command');
 import ServeWebpackTask from '../tasks/serve-webpack';
 
 PortFinder.basePort = 49152;
