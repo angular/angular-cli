@@ -57,7 +57,6 @@ describe('Acceptance: ng generate class', function () {
       .then(content => {
         expect(content).to.matches(/^export\sclass\s(ATest)/m);
       })
-      .catch(e => console.error(e));
   });
 
 });
