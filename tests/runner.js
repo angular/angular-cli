@@ -7,7 +7,7 @@ var Mocha = require('mocha');
 var glob = require('glob');
 var path = require('path');
 
-var root = 'tests/{acceptance,models}';
+var root = 'tests/{acceptance,unit}';
 var specFiles = glob.sync(root + '/**/*.spec.*');
 var mocha = new Mocha({ timeout: 5000, reporter: 'spec' });
 
