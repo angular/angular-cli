@@ -59,6 +59,7 @@ const BuildCommand = Command.extend({
     }
 
     const project = this.project;
+
     const ui = this.ui;
     const buildTask = commandOptions.watch ?
       new WebpackBuildWatch({

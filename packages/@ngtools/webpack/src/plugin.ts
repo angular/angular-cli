@@ -139,7 +139,8 @@ export class AotPlugin implements Tapable {
     );
 
     if (this._angularCompilerOptions.hasOwnProperty('genDir')) {
-      genDir = path.join(basePath, this._angularCompilerOptions.genDir);
+      genDir = path.resolve(basePath, this._angularCompilerOptions.genDir);
+      this._angularCompilerOptions.genDir = genDir;
     }
 
     this._basePath = basePath;
