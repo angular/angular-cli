@@ -4,6 +4,7 @@ const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
 const Command = require('../ember-cli/lib/models/command');
 import ServeWebpackTask from '../tasks/serve-webpack';
+import {Version} from '../upgrade/version';
 
 PortFinder.basePort = 49152;
 
@@ -121,6 +122,8 @@ const ServeCommand = Command.extend({
       }
     }
 
+    // Check angular version.
+    Version.assertAngularVersionIs2_3_1OrBetter(this.project.root);
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
 
     return this._checkExpressPort(commandOptions)
