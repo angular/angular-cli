@@ -111,21 +111,23 @@ export class AotPlugin implements Tapable {
           ? [options.exclude as string] : (options.exclude as string[]);
 
       exclude.forEach((pattern: string) => {
-          pattern = pattern
-            // Replace windows path separators to forward slashes.
-            .replace(/\\/g, '/')
-            // Escape characters that are used normally in regexes, except stars.
-            .replace(/[\-\[\]{}()+?.\\^$|]/g, '\\$&')
-            // Two stars replacement.
-            .replace(/\*\*/g, '(?:.*)')
-            // One star replacement.
-            .replace(/\*/g, '(?:[^/]*)')
-            // Escape characters from the basePath and make sure it's forward slashes.
-            .replace(/^/, `(${basePath.replace(/\\/g, '/').replace(/[\-\[\]\/{}()+?.\\^$|*]/g, '\\$&')})?`);
+        const basePathPattern = '(' + basePath.replace(/\\/g, '/')
+            .replace(/[\-\[\]\/{}()+?.\\^$|*]/g, '\\$&') + ')?';
+        pattern = pattern
+          // Replace windows path separators to forward slashes.
+          .replace(/\\/g, '/')
+          // Escape characters that are used normally in regexes, except stars.
+          .replace(/[\-\[\]{}()+?.\\^$|]/g, '\\$&')
+          // Two stars replacement.
+          .replace(/\*\*/g, '(?:.*)')
+          // One star replacement.
+          .replace(/\*/g, '(?:[^/]*)')
+          // Escape characters from the basePath and make sure it's forward slashes.
+          .replace(/^/, basePathPattern);
 
-          const re = new RegExp('^' + pattern + '$');
-          fileNames = fileNames.filter(x => !x.replace(/\\/g, '/').match(re));
-        });
+        const re = new RegExp('^' + pattern + '$');
+        fileNames = fileNames.filter(x => !x.replace(/\\/g, '/').match(re));
+      });
     } else {
       fileNames = fileNames.filter(fileName => !/\.spec\.ts$/.test(fileName));
     }
