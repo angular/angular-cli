@@ -9,7 +9,6 @@ import {WebpackResourceLoader} from './resource_loader';
 import {createResolveDependenciesFromContextMap} from './utils';
 import {WebpackCompilerHost} from './compiler_host';
 import {resolveEntryModuleFromMain} from './entry_resolver';
-import {StaticSymbol} from '@angular/compiler-cli';
 import {Tapable} from './webpack';
 import {PathsPlugin} from './paths-plugin';
 
@@ -122,7 +121,7 @@ export class AotPlugin implements Tapable {
 
           const re = new RegExp('^' + pattern + '$');
           fileNames = fileNames.filter(x => !x.match(re));
-        })
+        });
     } else {
       fileNames = fileNames.filter(fileName => !/\.spec\.ts$/.test(fileName));
     }
@@ -140,7 +139,7 @@ export class AotPlugin implements Tapable {
     );
 
     if (this._angularCompilerOptions.hasOwnProperty('genDir')) {
-      genDir = this._angularCompilerOptions.genDir;
+      genDir = path.join(basePath, this._angularCompilerOptions.genDir);
     }
 
     this._basePath = basePath;
@@ -245,13 +244,6 @@ export class AotPlugin implements Tapable {
 
     this._resourceLoader = new WebpackResourceLoader(compilation);
 
-    const i18nOptions: ngCompiler.NgcCliOptions = {
-      i18nFile: this.i18nFile,
-      i18nFormat: this.i18nFormat,
-      locale: this.locale,
-      basePath: this.basePath
-    };
-
     this._donePromise = Promise.resolve()
       .then(() => {
         if (this._skipCodeGeneration) {
@@ -265,9 +257,9 @@ export class AotPlugin implements Tapable {
           program: this._program,
           host: this._compilerHost,
           angularCompilerOptions: this._angularCompilerOptions,
-          i18nFormat: null,
-          i18nFile: null,
-          locale: null,
+          i18nFile: this.i18nFile,
+          i18nFormat: this.i18nFormat,
+          locale: this.locale,
 
           readResource: (path: string) => this._resourceLoader.get(path)
         });
@@ -306,7 +298,7 @@ export class AotPlugin implements Tapable {
           program: this._program,
           host: this._compilerHost,
           angularCompilerOptions: this._angularCompilerOptions,
-          entryModule: this._entryModule.toString()
+          entryModule: this._entryModule
         });
         Object.keys(allLazyRoutes)
           .forEach(k => {
