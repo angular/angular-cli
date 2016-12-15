@@ -2,11 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 
-import {NgModule} from '@angular/core';
-import * as ngCompiler from '@angular/compiler-cli';
-import {tsc} from '@angular/tsc-wrapped/src/tsc';
+import {__NGTOOLS_PRIVATE_API_2} from '@angular/compiler-cli';
+import {AngularCompilerOptions} from '@angular/tsc-wrapped';
 
-import {patchReflectorHost} from './reflector_host';
 import {WebpackResourceLoader} from './resource_loader';
 import {createResolveDependenciesFromContextMap} from './utils';
 import {WebpackCompilerHost} from './compiler_host';
@@ -29,47 +27,22 @@ export interface AotPluginOptions {
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
-}
 
-
-export interface LazyRoute {
-  moduleRoute: ModuleRoute;
-  absolutePath: string;
-  absoluteGenDirPath: string;
-}
-
-
-export interface LazyRouteMap {
-  [path: string]: LazyRoute;
-}
-
-
-export class ModuleRoute {
-  constructor(public readonly path: string, public readonly className: string = null) {}
-
-  toString() {
-    return `${this.path}#${this.className}`;
-  }
-
-  static fromString(entry: string): ModuleRoute {
-    const split = entry.split('#');
-    return new ModuleRoute(split[0], split[1]);
-  }
+  // We do not have an include because tsconfig can be used for that.
+  exclude?: string | string[];
 }
 
 
 export class AotPlugin implements Tapable {
-  private _entryModule: ModuleRoute;
   private _compilerOptions: ts.CompilerOptions;
-  private _angularCompilerOptions: ngCompiler.AngularCompilerOptions;
+  private _angularCompilerOptions: AngularCompilerOptions;
   private _program: ts.Program;
-  private _reflector: ngCompiler.StaticReflector;
-  private _reflectorHost: ngCompiler.ReflectorHost;
   private _rootFilePath: string[];
   private _compilerHost: WebpackCompilerHost;
   private _resourceLoader: WebpackResourceLoader;
   private _lazyRoutes: { [route: string]: string };
   private _tsConfigPath: string;
+  private _entryModule: string;
 
   private _donePromise: Promise<void>;
   private _compiler: any = null;
@@ -93,7 +66,12 @@ export class AotPlugin implements Tapable {
   get compilerHost() { return this._compilerHost; }
   get compilerOptions() { return this._compilerOptions; }
   get done() { return this._donePromise; }
-  get entryModule() { return this._entryModule; }
+  get entryModule() {
+    const splitted = this._entryModule.split('#');
+    const path = splitted[0];
+    const className = splitted[1] || 'default';
+    return {path, className};
+  }
   get genDir() { return this._genDir; }
   get program() { return this._program; }
   get skipCodeGeneration() { return this._skipCodeGeneration; }
@@ -119,19 +97,52 @@ export class AotPlugin implements Tapable {
       basePath = path.resolve(process.cwd(), options.basePath);
     }
 
-    const tsConfig = tsc.readConfiguration(this._tsConfigPath, basePath);
-    this._rootFilePath = tsConfig.parsed.fileNames
-      .filter(fileName => !/\.spec\.ts$/.test(fileName));
+    let tsConfigJson: any = null;
+    try {
+      tsConfigJson = JSON.parse(fs.readFileSync(this._tsConfigPath, 'utf8'));
+    } catch (err) {
+      throw new Error(`An error happened while parsing ${this._tsConfigPath} JSON: ${err}.`);
+    }
+    const tsConfig = ts.parseJsonConfigFileContent(
+      tsConfigJson, ts.sys, basePath, null, this._tsConfigPath);
+
+    let fileNames = tsConfig.fileNames;
+    if (options.hasOwnProperty('exclude')) {
+      let exclude: string[] = typeof options.exclude == 'string'
+          ? [options.exclude as string] : (options.exclude as string[]);
+
+      exclude.forEach((pattern: string) => {
+          pattern = pattern
+            // Replace characters that are used normally in regexes, except stars.
+            .replace(/[\-\[\]\/{}()+?.\\^$|]/g, '\\$&')
+            // Two stars replacement.
+            .replace(/\*\*/g, '(?:.*)')
+            .replace(/\*/g, '(?:[^/]*)')
+            .replace(/^/, `(${basePath})?`);
+
+          const re = new RegExp('^' + pattern + '$');
+          fileNames = fileNames.filter(x => !x.match(re));
+        })
+    } else {
+      fileNames = fileNames.filter(fileName => !/\.spec\.ts$/.test(fileName));
+    }
+    this._rootFilePath = fileNames;
 
     // Check the genDir.
     let genDir = basePath;
-    if (tsConfig.ngOptions.hasOwnProperty('genDir')) {
-      genDir = tsConfig.ngOptions.genDir;
+
+    this._compilerOptions = tsConfig.options;
+    this._angularCompilerOptions = Object.assign(
+      { genDir },
+      this._compilerOptions,
+      tsConfig.raw['angularCompilerOptions'],
+      { basePath }
+    );
+
+    if (this._angularCompilerOptions.hasOwnProperty('genDir')) {
+      genDir = this._angularCompilerOptions.genDir;
     }
 
-    this._compilerOptions = tsConfig.parsed.options;
-
-    this._angularCompilerOptions = Object.assign({}, tsConfig.ngOptions, { basePath, genDir });
     this._basePath = basePath;
     this._genDir = genDir;
 
@@ -147,20 +158,15 @@ export class AotPlugin implements Tapable {
       this._rootFilePath, this._compilerOptions, this._compilerHost);
 
     if (options.entryModule) {
-      this._entryModule = ModuleRoute.fromString(options.entryModule);
+      this._entryModule = options.entryModule;
     } else {
       if (options.mainPath) {
-        const entryModuleString = resolveEntryModuleFromMain(options.mainPath, this._compilerHost,
+        this._entryModule = resolveEntryModuleFromMain(options.mainPath, this._compilerHost,
           this._program);
-        this._entryModule = ModuleRoute.fromString(entryModuleString);
       } else {
-        this._entryModule = ModuleRoute.fromString((tsConfig.ngOptions as any).entryModule);
+        this._entryModule = (tsConfig.raw['angularCompilerOptions'] as any).entryModule;
       }
     }
-
-    this._reflectorHost = new ngCompiler.ReflectorHost(
-      this._program, this._compilerHost, this._angularCompilerOptions);
-    this._reflector = new ngCompiler.StaticReflector(this._reflectorHost);
 
     if (options.hasOwnProperty('i18nFile')) {
       this._i18nFile = options.i18nFile;
@@ -253,20 +259,18 @@ export class AotPlugin implements Tapable {
         }
 
         // Create the Code Generator.
-        const codeGenerator = ngCompiler.CodeGenerator.create(
-          this._angularCompilerOptions,
-          i18nOptions,
-          this._program,
-          this._compilerHost,
-          new ngCompiler.NodeReflectorHostContext(this._compilerHost),
-          this._resourceLoader
-        );
+        return __NGTOOLS_PRIVATE_API_2.codeGen({
+          basePath: this._basePath,
+          compilerOptions: this._compilerOptions,
+          program: this._program,
+          host: this._compilerHost,
+          angularCompilerOptions: this._angularCompilerOptions,
+          i18nFormat: null,
+          i18nFile: null,
+          locale: null,
 
-        // We need to temporarily patch the CodeGenerator until either it's patched or allows us
-        // to pass in our own ReflectorHost.
-        // TODO: remove this.
-        patchReflectorHost(codeGenerator);
-        return codeGenerator.codegen({ transitiveModules: true });
+          readResource: (path: string) => this._resourceLoader.get(path)
+        });
       })
       .then(() => {
         // Create a new Program, based on the old one. This will trigger a resolution of all
@@ -298,155 +302,25 @@ export class AotPlugin implements Tapable {
       .then(() => {
         // Process the lazy routes
         this._lazyRoutes = {};
-        const allLazyRoutes = this._processNgModule(this._entryModule, null);
+        const allLazyRoutes = __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
+          program: this._program,
+          host: this._compilerHost,
+          angularCompilerOptions: this._angularCompilerOptions,
+          entryModule: this._entryModule.toString()
+        });
         Object.keys(allLazyRoutes)
           .forEach(k => {
             const lazyRoute = allLazyRoutes[k];
             if (this.skipCodeGeneration) {
-              this._lazyRoutes[k] = lazyRoute.absolutePath + '.ts';
+              this._lazyRoutes[k] = lazyRoute;
             } else {
-              this._lazyRoutes[k + '.ngfactory'] = lazyRoute.absoluteGenDirPath + '.ngfactory.ts';
+              const lr = path.relative(this.basePath, lazyRoute.replace(/\.ts$/, '.ngfactory.ts'));
+              this._lazyRoutes[k + '.ngfactory'] = path.join(this.genDir, lr);
             }
           });
       })
-      .then(() => cb(), (err: any) => { cb(err); });
-  }
-
-  private _resolveModulePath(module: ModuleRoute, containingFile: string) {
-    if (module.path.startsWith('.')) {
-      return path.join(path.dirname(containingFile), module.path);
-    }
-    return module.path;
-  }
-
-  private _processNgModule(module: ModuleRoute, containingFile: string | null): LazyRouteMap {
-    const modulePath = containingFile ? module.path : ('./' + path.basename(module.path));
-    if (containingFile === null) {
-      containingFile = module.path + '.ts';
-    }
-    const relativeModulePath = this._resolveModulePath(module, containingFile);
-
-    const staticSymbol = this._reflectorHost
-      .findDeclaration(modulePath, module.className, containingFile);
-    const entryNgModuleMetadata = this.getNgModuleMetadata(staticSymbol);
-    const loadChildrenRoute: LazyRoute[] = this.extractLoadChildren(entryNgModuleMetadata)
-      .map(route => {
-        const moduleRoute = ModuleRoute.fromString(route);
-        const resolvedModule = ts.resolveModuleName(moduleRoute.path,
-          relativeModulePath, this._compilerOptions, this._compilerHost);
-
-        if (!resolvedModule.resolvedModule) {
-          throw new Error(`Could not resolve route "${route}" from file "${relativeModulePath}".`);
-        }
-
-        const relativePath = path.relative(this.basePath,
-          resolvedModule.resolvedModule.resolvedFileName).replace(/\.ts$/, '');
-
-        const absolutePath = path.join(this.basePath, relativePath);
-        const absoluteGenDirPath = path.join(this._genDir, relativePath);
-
-        return {
-          moduleRoute,
-          absoluteGenDirPath,
-          absolutePath
-        };
+      .then(() => cb(), (err: any) => {
+        compilation.errors.push(err);
       });
-    const resultMap: LazyRouteMap = loadChildrenRoute
-      .reduce((acc: LazyRouteMap, curr: LazyRoute) => {
-        const key = curr.moduleRoute.path;
-        if (acc[key]) {
-          if (acc[key].absolutePath != curr.absolutePath) {
-            throw new Error(`Duplicated path in loadChildren detected: "${key}" is used in 2 ` +
-              'loadChildren, but they point to different modules. Webpack cannot distinguish ' +
-              'between the two based on context and would fail to load the proper one.');
-          }
-        } else {
-          acc[key] = curr;
-        }
-        return acc;
-      }, {});
-
-    // Also concatenate every child of child modules.
-    for (const lazyRoute of loadChildrenRoute) {
-      const mr = lazyRoute.moduleRoute;
-      const children = this._processNgModule(mr, relativeModulePath);
-      Object.keys(children).forEach(p => {
-        const child = children[p];
-        const key = child.moduleRoute.path;
-        if (resultMap[key]) {
-          if (resultMap[key].absolutePath != child.absolutePath) {
-            throw new Error(`Duplicated path in loadChildren detected: "${key}" is used in 2 ` +
-              'loadChildren, but they point to different modules. Webpack cannot distinguish ' +
-              'between the two based on context and would fail to load the proper one.');
-          }
-        } else {
-          resultMap[key] = child;
-        }
-      });
-    }
-    return resultMap;
-  }
-
-  private getNgModuleMetadata(staticSymbol: ngCompiler.StaticSymbol) {
-    const ngModules = this._reflector.annotations(staticSymbol).filter(s => s instanceof NgModule);
-    if (ngModules.length === 0) {
-      throw new Error(`${staticSymbol.name} is not an NgModule`);
-    }
-    return ngModules[0];
-  }
-
-  private extractLoadChildren(ngModuleDecorator: any): any[] {
-    const routes = (ngModuleDecorator.imports || []).reduce((mem: any[], m: any) => {
-      return mem.concat(this.collectRoutes(m.providers));
-    }, this.collectRoutes(ngModuleDecorator.providers));
-    return this.collectLoadChildren(routes)
-      .concat((ngModuleDecorator.imports || [])
-        // Also recursively extractLoadChildren of modules we import.
-        .map((staticSymbol: any) => {
-          if (staticSymbol instanceof StaticSymbol) {
-            const entryNgModuleMetadata = this.getNgModuleMetadata(staticSymbol);
-            return this.extractLoadChildren(entryNgModuleMetadata);
-          } else {
-            return [];
-          }
-        })
-        // Poor man's flat map.
-        .reduce((acc: any[], i: any) => acc.concat(i), []))
-      .filter(x => !!x);
-  }
-
-  private collectRoutes(providers: any[]): any[] {
-    if (!providers) {
-      return [];
-    }
-    const ROUTES = this._reflectorHost.findDeclaration(
-      '@angular/router/src/router_config_loader', 'ROUTES', undefined);
-
-    return providers.reduce((m, p) => {
-      if (p.provide === ROUTES) {
-        return m.concat(p.useValue);
-      } else if (Array.isArray(p)) {
-        return m.concat(this.collectRoutes(p));
-      } else {
-        return m;
-      }
-    }, []);
-  }
-
-  private collectLoadChildren(routes: any[]): any[] {
-    if (!routes) {
-      return [];
-    }
-    return routes.reduce((m, r) => {
-      if (r.loadChildren) {
-        return m.concat(r.loadChildren);
-      } else if (Array.isArray(r)) {
-        return m.concat(this.collectLoadChildren(r));
-      } else if (r.children) {
-        return m.concat(this.collectLoadChildren(r.children));
-      } else {
-        return m;
-      }
-    }, []);
   }
 }
