@@ -23,6 +23,10 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
       new AotPlugin({
         tsConfigPath: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
         mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
+        exclude: [
+          path.join(projectRoot, appConfig.root, appConfig.test),
+          '**/*.spec.ts'
+        ],
         skipCodeGeneration: true
       }),
     ]
@@ -47,8 +51,12 @@ export const getWebpackAotConfigPartial = function(projectRoot: string, appConfi
         mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
         i18nFile: i18nFile,
         i18nFormat: i18nFormat,
-        locale: locale
-      }),
+        locale: locale,
+        exclude: [
+          path.join(projectRoot, appConfig.root, appConfig.test),
+          '**/*.spec.ts'
+        ]
+      })
     ]
   };
 };

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "",
     "module": "es2015",
     "moduleResolution": "node",
     "target": "es5",
