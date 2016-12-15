@@ -29,7 +29,8 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
   };
 };
 
-export const getWebpackAotConfigPartial = function(projectRoot: string, appConfig: any) {
+export const getWebpackAotConfigPartial = function(projectRoot: string, appConfig: any,
+  i18nFile: string, i18nFormat: string, locale: string) {
   return {
     module: {
       rules: [
@@ -43,7 +44,10 @@ export const getWebpackAotConfigPartial = function(projectRoot: string, appConfi
     plugins: [
       new AotPlugin({
         tsConfigPath: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
-        mainPath: path.join(projectRoot, appConfig.root, appConfig.main)
+        mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
+        i18nFile: i18nFile,
+        i18nFormat: i18nFormat,
+        locale: locale
       }),
     ]
   };
