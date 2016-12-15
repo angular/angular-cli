@@ -17,9 +17,10 @@ function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
 }
 
 function _removeDecorators(refactor: TypeScriptFileRefactor) {
+  // TODO: replace this by tsickle.
   // Find all decorators.
-  refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
-    .forEach(d => refactor.removeNode(d));
+  // refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
+  //   .forEach(d => refactor.removeNode(d));
 }
 
 
