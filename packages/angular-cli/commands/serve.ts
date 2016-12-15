@@ -123,7 +123,7 @@ const ServeCommand = Command.extend({
     }
 
     // Check angular version.
-    Version.assertAngularVersionIs2_3_1OrBetter(this.project.root);
+    Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
 
     return this._checkExpressPort(commandOptions)

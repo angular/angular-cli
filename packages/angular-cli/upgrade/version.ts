@@ -45,7 +45,7 @@ export class Version {
   isReleaseCandidate() { return this.qualifier == 'rc'; }
   isKnown() { return this._version !== null; }
 
-  isLocal() { return this.isKnown() ? path.isAbsolute(this._version) : false; }
+  isLocal() { return this.isKnown() && path.isAbsolute(this._version); }
 
   get major() { return this._parse()[0] || 0; }
   get minor() { return this._parse()[1] || 0; }
@@ -93,7 +93,7 @@ export class Version {
     }
   }
 
-  static assertAngularVersionIs2_3_1OrBetter(projectRoot: string) {
+  static assertAngularVersionIs2_3_1OrHigher(projectRoot: string) {
     const angularCorePath = path.join(projectRoot, 'node_modules/@angular/core');
     const pkgJson = existsSync(angularCorePath)
       ? JSON.parse(readFileSync(path.join(angularCorePath, 'package.json'), 'utf8'))

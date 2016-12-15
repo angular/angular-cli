@@ -27,7 +27,7 @@ export interface AotPluginOptions {
   i18nFormat?: string;
   locale?: string;
 
-  // We do not have an include because tsconfig can be used for that.
+  // Use tsconfig to include path globs.
   exclude?: string | string[];
 }
 
@@ -114,7 +114,7 @@ export class AotPlugin implements Tapable {
         const basePathPattern = '(' + basePath.replace(/\\/g, '/')
             .replace(/[\-\[\]\/{}()+?.\\^$|*]/g, '\\$&') + ')?';
         pattern = pattern
-          // Replace windows path separators to forward slashes.
+          // Replace windows path separators with forward slashes.
           .replace(/\\/g, '/')
           // Escape characters that are used normally in regexes, except stars.
           .replace(/[\-\[\]{}()+?.\\^$|]/g, '\\$&')

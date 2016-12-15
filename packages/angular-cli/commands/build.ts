@@ -62,7 +62,7 @@ const BuildCommand = Command.extend({
     const project = this.project;
 
     // Check angular version.
-    Version.assertAngularVersionIs2_3_1OrBetter(project.root);
+    Version.assertAngularVersionIs2_3_1OrHigher(project.root);
 
     const ui = this.ui;
     const buildTask = commandOptions.watch ?
