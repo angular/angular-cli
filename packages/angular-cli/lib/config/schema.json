@@ -31,6 +31,9 @@
             "type": "string",
             "default": "dist/"
           },
+          "publicPath": {
+            "type": "string"
+          },
           "assets": {
             "oneOf": [
               {
