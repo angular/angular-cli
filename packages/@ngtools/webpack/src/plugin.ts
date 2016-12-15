@@ -112,12 +112,13 @@ export class AotPlugin implements Tapable {
 
       exclude.forEach((pattern: string) => {
           pattern = pattern
-            // Replace characters that are used normally in regexes, except stars.
+            // Escape characters that are used normally in regexes, except stars.
             .replace(/[\-\[\]\/{}()+?.\\^$|]/g, '\\$&')
             // Two stars replacement.
             .replace(/\*\*/g, '(?:.*)')
-            .replace(/\*/g, '(?:[^/]*)')
-            .replace(/^/, `(${basePath})?`);
+            .replace(/\*/g, '(?:[^/\\\\]*)')
+            // Escape every characters from the basePath.
+            .replace(/^/, `(${basePath.replace(/[\-\[\]\/{}()+?.\\^$|*]/g, '\\$&')})?`);
 
           const re = new RegExp('^' + pattern + '$');
           fileNames = fileNames.filter(x => !x.match(re));
