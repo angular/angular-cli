@@ -20,7 +20,7 @@ export type TreeNodeConstructorArgument<T> = {
   value: T;
   forward: SchemaTreeNode<any>;
   schema: Schema;
-}
+};
 
 
 /**
