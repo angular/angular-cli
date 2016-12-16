@@ -26,6 +26,8 @@ const setGlobalVariable = require('./e2e/utils/env').setGlobalVariable;
  *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
  *   --noproject      Skip creating a project or using one.
  *   --nolink         Skip linking your local angular-cli directory. Can save a few seconds.
+ *   --ng-sha=SHA     Use a specific ng-sha. Similar to nightly but point to a master SHA instead
+ *                    of using the latest.
  *   --nightly        Install angular nightly builds over the test project.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
  *                    created, and npm installed. Ideally you want a project created by a previous
@@ -34,7 +36,7 @@ const setGlobalVariable = require('./e2e/utils/env').setGlobalVariable;
  */
 const argv = minimist(process.argv.slice(2), {
   'boolean': ['debug', 'nolink', 'nightly', 'noproject'],
-  'string': ['reuse']
+  'string': ['reuse', 'ng-sha']
 });
 
 

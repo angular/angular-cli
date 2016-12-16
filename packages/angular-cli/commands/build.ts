@@ -1,3 +1,4 @@
+import {Version} from '../upgrade/version';
 const Command = require('../ember-cli/lib/models/command');
 import WebpackBuild from '../tasks/build-webpack';
 import WebpackBuildWatch from '../tasks/build-webpack-watch';
@@ -59,6 +60,10 @@ const BuildCommand = Command.extend({
     }
 
     const project = this.project;
+
+    // Check angular version.
+    Version.assertAngularVersionIs2_3_1OrHigher(project.root);
+
     const ui = this.ui;
     const buildTask = commandOptions.watch ?
       new WebpackBuildWatch({
