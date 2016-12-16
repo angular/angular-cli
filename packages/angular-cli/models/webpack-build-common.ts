@@ -132,7 +132,7 @@ export function getWebpackCommonConfig(
         { test: /\.html$/, loader: 'raw-loader' },
 
         { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url-loader?limit=10000' },
-        { test: /\.(eot|svg)$/, loader: 'file-loader' }
+        { test: /\.(eot|svg)$/, loader: 'file-loader' },
         { test: /\.(pug|jade)/, loaders: ['apply-loader', 'pug-loader']},
       ].concat(extraRules)
     },
