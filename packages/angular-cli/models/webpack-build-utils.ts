@@ -67,11 +67,11 @@ export function makeCssLoaders(stylePaths: string[] = []) {
     { test: /\.styl$/, loaders: ['stylus-loader'] }
   ];
 
-  const commonLoaders = ['css-loader', 'postcss-loader'];
+  const commonLoaders = ['raw-loader', 'postcss-loader'];
 
   // load component css as raw strings
   let cssLoaders: any = baseRules.map(({test, loaders}) => ({
-    exclude: stylePaths, test, loaders: ['raw-loader', ...commonLoaders, ...loaders]
+    exclude: stylePaths, test, loaders: [...commonLoaders, ...loaders]
   }));
 
   if (stylePaths.length > 0) {
