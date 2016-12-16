@@ -14,12 +14,19 @@ const VersionCommand = Command.extend({
   }],
 
   run: function (options: any) {
-    const versions: any = process.versions;
+    let versions: any = process.versions;
     const pkg = require(path.resolve(__dirname, '..', 'package.json'));
+    let projPkg: any;
+    try {
+      projPkg = require(path.resolve(this.project.root, 'package.json'));
+    } catch (exception) {
+      projPkg = undefined;
+    }
 
-    versions['os'] = process.platform + ' ' + process.arch;
+    versions.os = process.platform + ' ' + process.arch;
 
     const alwaysPrint = ['node', 'os'];
+    const roots = ['@angular/', '@ngtools/'];
 
     let ngCliVersion = pkg.version;
     if (!__dirname.match(/node_modules/)) {
@@ -33,13 +40,39 @@ const VersionCommand = Command.extend({
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
     }
 
+    if (projPkg) {
+      roots.forEach(root => {
+        versions = Object.assign(versions, this.getDependencyVersions(projPkg, root));
+      });
+    }
     this.printVersion('angular-cli', ngCliVersion);
 
     for (const module of Object.keys(versions)) {
-      if (options.verbose || alwaysPrint.indexOf(module) > -1) {
+      const isRoot = roots.some(root => module.startsWith(root));
+      if (options.verbose || alwaysPrint.indexOf(module) > -1 || isRoot) {
         this.printVersion(module, versions[module]);
       }
     }
+  },
+
+  getDependencyVersions: function(pkg: any, prefix: string): any {
+    const modules: any = {};
+
+    Object.keys(pkg.dependencies || {})
+      .concat(Object.keys(pkg.devDependencies || {}))
+      .filter(depName => depName && depName.startsWith(prefix))
+      .forEach(key => modules[key] = this.getVersion(key));
+
+    return modules;
+  },
+
+  getVersion: function(moduleName: string): string {
+    const modulePkg = require(path.resolve(
+      this.project.root,
+      'node_modules',
+      moduleName,
+      'package.json'));
+    return modulePkg.version;
   },
 
   printVersion: function (module: string, version: string) {
