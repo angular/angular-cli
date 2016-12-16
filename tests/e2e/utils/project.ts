@@ -26,7 +26,7 @@ export function updateTsConfig(fn: (json: any) => any | void) {
 
 export function ngServe(...args: string[]) {
   return silentExecAndWaitForOutputToMatch('ng',
-    ['serve', ...args], /webpack: bundle is now VALID/);
+    ['serve', '--no-progress', ...args], /webpack: bundle is now VALID/);
 }
 
 
@@ -42,22 +42,25 @@ export function createProject(name: string, ...args: string[]) {
     }))
     .then(() => {
       const argv: any = getGlobalVariable('argv');
-      if (argv.nightly) {
+      if (argv.nightly || argv['ng-sha']) {
+        const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
         return updateJsonFile('package.json', json => {
           // Install over the project with nightly builds.
-          const angularPackages = [
-            'core',
-            'common',
-            'compiler',
-            'forms',
-            'http',
-            'router',
-            'platform-browser',
-            'platform-browser-dynamic'
-          ];
-          angularPackages.forEach(pkgName => {
-            json['dependencies'][`@angular/${pkgName}`] = `github:angular/${pkgName}-builds`;
-          });
+          Object.keys(json['dependencies'] || {})
+            .filter(name => name.match(/^@angular\//))
+            .forEach(name => {
+              const pkgName = name.split(/\//)[1];
+              json['dependencies'][`@angular/${pkgName}`]
+                = `github:angular/${pkgName}-builds${label}`;
+            });
+
+          Object.keys(json['devDependencies'] || {})
+            .filter(name => name.match(/^@angular\//))
+            .forEach(name => {
+              const pkgName = name.split(/\//)[1];
+              json['devDependencies'][`@angular/${pkgName}`]
+                = `github:angular/${pkgName}-builds${label}`;
+            });
         });
       }
     })
