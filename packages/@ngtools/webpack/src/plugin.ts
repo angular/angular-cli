@@ -213,7 +213,8 @@ export class AotPlugin implements Tapable {
             (_: any, cb: any) => cb(null, this._lazyRoutes));
 
           return callback(null, result);
-        }).catch((err) => callback(err));
+        }, () => callback(null))
+        .catch(err => callback(err));
       });
     });
 
@@ -228,9 +229,7 @@ export class AotPlugin implements Tapable {
     // Virtual file system.
     compiler.resolvers.normal.plugin('resolve', (request: any, cb?: (err?: any) => void) => {
       if (request.request.match(/\.ts$/)) {
-        this.done
-          .then(() => cb())
-          .catch((err) => cb(err));
+        this.done.then(() => cb(), () => cb());
       } else {
         cb();
       }
@@ -320,6 +319,7 @@ export class AotPlugin implements Tapable {
       })
       .then(() => cb(), (err: any) => {
         compilation.errors.push(err);
+        cb();
       });
   }
 }
