@@ -126,7 +126,7 @@ Example:
       "url": {
         "prompt": "URL of your website:",
         "defaultValue": "${homepage}"
-      },
+      }
     }
   }
 }
