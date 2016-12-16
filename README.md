@@ -1,3 +1,5 @@
+# Current Status: Merging Universal into Angular core
+
 [![Build Status](https://travis-ci.org/angular/universal.svg?branch=master)](https://travis-ci.org/angular/universal)
 [![npm version](https://badge.fury.io/js/angular2-universal.svg)](http://badge.fury.io/js/angular2-universal)
 [![Join the chat at https://gitter.im/angular/universal](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/angular/universal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
