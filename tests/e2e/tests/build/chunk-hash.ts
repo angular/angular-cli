@@ -19,7 +19,7 @@ export default function() {
     .then(() => {
       fs.readdirSync('./dist')
         .forEach(name => {
-          if (!name.match(/(main|inline|style|\d+)\.[a-z0-9]+\.bundle\.(js|css)/)) {
+          if (!name.match(/(main|inline|styles|\d+)\.[a-z0-9]+\.bundle\.(js|css)/)) {
             return;
           }
 
@@ -33,7 +33,7 @@ export default function() {
     .then(() => {
       fs.readdirSync('./dist')
         .forEach(name => {
-          if (!name.match(/(main|inline|style|\d+)\.[a-z0-9]+\.bundle\.(js|css)/)) {
+          if (!name.match(/(main|inline|styles|\d+)\.[a-z0-9]+\.bundle\.(js|css)/)) {
             return;
           }
 
