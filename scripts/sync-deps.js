@@ -31,14 +31,8 @@ function sortObjectKeys(obj) {
 }
 
 Promise.resolve()
-  .then(() => glob(path.join(packagesRoot, '*/package.json')))
-  .then((files) => {
-    return glob(path.join(packagesRoot, '*/*/package.json'))
-      .then((extras) => {
-        Array.prototype.push.apply(files, extras);
-        return files;
-      })
-  })
+  .then(() => glob(path.join(packagesRoot, '**/package.json')))
+  .then((files) => files.filter(p => !p.match(/\/blueprints\//)))
   .then((files) => {
     return files.reduce((prev, filename) =>
       prev.then((sum) =>
@@ -51,19 +45,22 @@ Promise.resolve()
   })
   .then((jsonArr) => {
     const dependencies = _.merge(..._.map(jsonArr, 'dependencies'));
+    const peerDependencies = _.merge(..._.map(jsonArr, 'peerDependencies'));
 
-    const output = path.join(root, 'package.json');
+    const rootPackageJsonPath = path.join(root, 'package.json');
 
     const ignoredDeps = ['@angular-cli/base-href-webpack', '@ngtools/webpack', '@ngtools/json-schema', '@angular-cli/ast-tools'];
 
     ignoredDeps.forEach(key => delete dependencies[key])
 
-    return readJson(output)
-      .then((json) => {
-        json.dependencies = sortObjectKeys(dependencies);
+    return readJson(rootPackageJsonPath)
+      .then((rootPackageJson) => {
+        rootPackageJson.dependencies = sortObjectKeys(dependencies);
+        rootPackageJson.peerDependencies = sortObjectKeys(peerDependencies);
 
-        Object.keys(dependencies).forEach(key => delete json.devDependencies[key]);
+        Object.keys(dependencies).forEach(key => delete rootPackageJson.devDependencies[key]);
+        Object.keys(dependencies).forEach(key => delete rootPackageJson.peerDependencies[key]);
 
-        return writeFile(output/*.replace('package', 'test')*/, JSON.stringify(json, null, 2) + '\n');
+        return writeFile(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2) + '\n');
       })
   })
