@@ -24,7 +24,8 @@
     "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/config/schema.d.ts\" -e \"**/tests/**\" -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
     "lint": "npm-run-all -c eslint tslint",
     "tool": "node scripts/run-tool.js",
-    "sync-deps": "node ./scripts/sync-deps.js"
+    "sync-deps": "node ./scripts/sync-deps.js",
+    "precommit": "npm run sync-deps"
   },
   "repository": {
     "type": "git",
@@ -133,6 +134,7 @@
     "eslint": "^3.11.0",
     "exists-sync": "0.0.4",
     "express": "^4.14.0",
+    "husky": "^0.13.3",
     "jasmine": "^2.4.1",
     "jasmine-spec-reporter": "^3.2.0",
     "minimist": "^1.2.0",
