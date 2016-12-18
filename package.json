@@ -85,7 +85,7 @@
     "ora": "~1.0.0",
     "portfinder": "~1.0.12",
     "postcss-discard-comments": "^2.0.4",
-    "postcss-loader": "^0.9.1",
+    "postcss-loader": "^0.13.0",
     "quick-temp": "0.1.6",
     "raw-loader": "^0.5.1",
     "remap-istanbul": "^0.6.4",
