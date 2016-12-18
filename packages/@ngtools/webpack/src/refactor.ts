@@ -121,7 +121,7 @@ export class TypeScriptFileRefactor {
   }
 
   appendAfter(node: ts.Node, text: string): void {
-    this._sourceString.insertRight(node.getEnd(), text);
+    this._sourceString.appendRight(node.getEnd(), text);
   }
 
   insertImport(symbolName: string, modulePath: string): void {
