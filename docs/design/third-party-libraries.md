@@ -126,7 +126,7 @@ Example:
       "url": {
         "prompt": "URL of your website:",
         "defaultValue": "${homepage}"
-      },
+      }
     }
   }
 }
@@ -196,4 +196,4 @@ a migration hook for `postinstall`.
 # Remaining Problems
 
 1. Installing dependencies of packages need to be further sketched out.
-2. Need to add a full fledged example with Firebase.
+2. Need to add a fully fledged example with Firebase.
