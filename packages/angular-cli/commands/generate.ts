@@ -28,7 +28,7 @@ const GenerateCommand = EmberGenerateCommand.extend({
         `The \`ng generate ${rawArgs[0]}\` command requires a name to be specified.`);
     }
     // verify file name does not contain suffix word
-    rawArgs[1] = mapSufix(rawArgs);
+    rawArgs[1] = mapSuffix(rawArgs[0], rawArgs[1]);
 
     // Override default help to hide ember blueprints
     EmberGenerateCommand.prototype.printDetailedHelp = function() {
@@ -57,15 +57,9 @@ function mapBlueprintName(name: string): string {
   return mappedName ? mappedName : name;
 }
 
-function mapSufix(args: any): any {
-  for (let alias in aliasMap) {
-    if (args[1].toLowerCase().indexOf(aliasMap[alias]) !== -1 && args[0] === aliasMap[alias]) {
-      // make sure that the suffix name is in the end of the string
-      let regex = new RegExp('([\\-]*)' + aliasMap[alias] + '$', 'i');
-      args[1] = args[1].replace(regex, '');
-    }
-  }
-  return args[1];
+function mapSuffix(blueprint: string, name: string): string {
+  // remove `blueprint` if located at the end of `name`, optional `-`
+  return name.replace(new RegExp(`-?${blueprint}$`, 'i'), '');
 }
 
 const aliasMap: { [alias: string]: string } = {
