@@ -2,7 +2,29 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const atl = require('awesome-typescript-loader');
+const ngtools = require('@ngtools/webpack');
+
+
+const g = global;
+const webpackLoader = g['angularCliIsLocal']
+  ? g.angularCliPackages['@ngtools/webpack'].main
+  : '@ngtools/webpack';
+
+const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
+
+
+/**
+ * Enumerate loaders and their dependencies from this file to let the dependency validator
+ * know they are used.
+ *
+ * require('tslint-loader')
+ * require('source-map-loader')
+ * require('sourcemap-istanbul-instrumenter-loader')
+ *
+ * require('remap-istanbul')
+ * require('tslint')
+ */
+
 
 const getWebpackTestConfig = function (projectRoot, environment, appConfig, testConfig) {
 
@@ -42,14 +64,18 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
     }))
   }
 
+  if (testConfig.progress) {
+    extraPlugins.push(new ProgressPlugin({ colors: true }));
+  }
+
   return {
     devtool: testConfig.sourcemap ? 'inline-source-map' : 'eval',
-    context: path.resolve(__dirname, './'),
+    context: projectRoot,
     resolve: {
       extensions: ['.ts', '.js'],
       plugins: [
-        new atl.TsConfigPathsPlugin({
-          tsconfig: path.resolve(appRoot, appConfig.tsconfig)
+        new ngtools.PathsPlugin({
+          tsConfigPath: path.resolve(appRoot, appConfig.tsconfig)
         })
       ]
     },
@@ -74,16 +100,11 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
           test: /\.ts$/,
           loaders: [
             {
-              loader: 'awesome-typescript-loader',
+              loader: webpackLoader,
               query: {
-                tsconfig: path.resolve(appRoot, appConfig.tsconfig),
-                module: 'commonjs',
-                target: 'es5',
-                forkChecker: true
+                tsConfigPath: path.resolve(appRoot, appConfig.tsconfig),
+                module: 'commonjs'
               }
-            },
-            {
-              loader: 'angular2-template-loader'
             }
           ],
           exclude: [/\.e2e\.ts$/]

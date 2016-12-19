@@ -105,8 +105,8 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
 }
 
 export function ng(...args: string[]) {
-  if (args[0] == 'build') {
-    return silentNg(...args);
+  if (args[0] == 'build' || args[0] == 'serve' || args[0] == 'test') {
+    return silentNg(...args, '--no-progress');
   } else {
     return _exec({}, 'ung', args);
   }

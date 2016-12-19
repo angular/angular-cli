@@ -6,7 +6,7 @@ import { addImportToModule } from '../../utils/ast';
 import { isUniversalTest } from '../../utils/utils';
 
 
-export default function (argv: any) {
+export default function() {
   let oldNumberOfFiles = 0;
   if (isUniversalTest()) {
     return Promise.resolve()

@@ -4,10 +4,10 @@ import {
 } from './webpack-build-typescript';
 const webpackMerge = require('webpack-merge');
 import { CliConfig } from './config';
+import { getWebpackCommonConfig } from './webpack-build-common';
+import { getWebpackDevConfigPartial } from './webpack-build-development';
+import { getWebpackProdConfigPartial } from './webpack-build-production';
 import {
-  getWebpackCommonConfig,
-  getWebpackDevConfigPartial,
-  getWebpackProdConfigPartial,
   getWebpackMobileConfigPartial,
   getWebpackMobileProdConfigPartial,
   getWebpackNodeConfig
@@ -25,8 +25,14 @@ export class NgCliWebpackConfig {
     public environment: string,
     outputDir?: string,
     baseHref?: string,
+    i18nFile?: string,
+    i18nFormat?: string,
+    locale?: string,
     isAoT = false,
     sourcemap = true,
+    vendorChunk = false,
+    verbose = false,
+    progress = true
   ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
@@ -42,11 +48,16 @@ export class NgCliWebpackConfig {
       environment,
       appConfig,
       baseHref,
-      sourcemap
+      sourcemap,
+      vendorChunk,
+      verbose,
+      progress
     );
-    let targetConfigPartial = this.getTargetConfig(this.ngCliProject.root, appConfig);
+    let targetConfigPartial = this.getTargetConfig(
+      this.ngCliProject.root, appConfig, sourcemap, verbose
+    );
     const typescriptConfigPartial = isAoT
-      ? getWebpackAotConfigPartial(this.ngCliProject.root, appConfig)
+      ? getWebpackAotConfigPartial(this.ngCliProject.root, appConfig, i18nFile, i18nFormat, locale)
       : getWebpackNonAotConfigPartial(this.ngCliProject.root, appConfig);
 
     if (appConfig.mobile) {
@@ -73,7 +84,15 @@ export class NgCliWebpackConfig {
       ));
 
       this.configs.push(webpackMerge(
-        getWebpackNodeConfig(this.ngCliProject.root, environment, appConfig),
+        typescriptConfigPartial,
+        getWebpackNodeConfig(
+          this.ngCliProject.root,
+          environment,
+          appConfig,
+          baseHref,
+          sourcemap,
+          verbose,
+          progress),
         customServerConfig
       ));
     } else {
@@ -85,12 +104,12 @@ export class NgCliWebpackConfig {
     }
   }
 
-  getTargetConfig(projectRoot: string, appConfig: any): any {
+  getTargetConfig(projectRoot: string, appConfig: any, sourcemap: boolean, verbose: boolean): any {
     switch (this.target) {
       case 'development':
         return getWebpackDevConfigPartial(projectRoot, appConfig);
       case 'production':
-        return getWebpackProdConfigPartial(projectRoot, appConfig);
+        return getWebpackProdConfigPartial(projectRoot, appConfig, sourcemap, verbose);
       default:
         throw new Error("Invalid build target. Only 'development' and 'production' are available.");
     }

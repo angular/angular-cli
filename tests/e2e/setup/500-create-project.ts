@@ -1,16 +1,18 @@
-import { join } from 'path';
-import { git, ng, silentNpm } from '../utils/process';
-import { isMobileTest, isUniversalTest } from '../utils/utils';
-import { expectFileToExist } from '../utils/fs';
-import { updateTsConfig, updateJsonFile } from '../utils/project';
-import { gitClean, gitCommit } from '../utils/git';
+import {join} from 'path';
+import {git, ng, silentNpm} from '../utils/process';
+import {isMobileTest, isUniversalTest} from '../utils/utils';
+import {expectFileToExist} from '../utils/fs';
+import {updateTsConfig, updateJsonFile} from '../utils/project';
+import {gitClean, gitCommit} from '../utils/git';
+import {getGlobalVariable} from '../utils/env';
 
 
 let packages = require('../../../lib/packages');
 
 
-export default function (argv: any) {
-  let createProject: any = null;
+export default function() {
+  const argv = getGlobalVariable('argv');
+  let createProject = null;
 
   // This is a dangerous flag, but is useful for testing packages only.
   if (argv.noproject) {
@@ -37,29 +39,25 @@ export default function (argv: any) {
       });
     }))
     .then(() => {
-      if (argv.nightly) {
+      if (argv.nightly || argv['ng-sha']) {
+        const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
         return updateJsonFile('package.json', json => {
           // Install over the project with nightly builds.
-          const angularPackages = [
-            'core',
-            'common',
-            'compiler',
-            'forms',
-            'http',
-            'router',
-            'platform-browser',
-            'platform-browser-dynamic'
-          ];
-          angularPackages.forEach(pkgName => {
-            /**
-             * change package name to angular-cli because
-             * there is no universal-cli package at /angular
-             */
-            if (pkgName === 'universal-cli') {
-              pkgName = 'angular-cli';
-            }
-            json['dependencies'][`@angular/${pkgName}`] = `github:angular/${pkgName}-builds`;
-          });
+          Object.keys(json['dependencies'] || {})
+            .filter(name => name.match(/^@angular\//))
+            .forEach(name => {
+              const pkgName = name.split(/\//)[1];
+              json['dependencies'][`@angular/${pkgName}`]
+                = `github:angular/${pkgName}-builds${label}`;
+            });
+
+          Object.keys(json['devDependencies'] || {})
+            .filter(name => name.match(/^@angular\//))
+            .forEach(name => {
+              const pkgName = name.split(/\//)[1];
+              json['devDependencies'][`@angular/${pkgName}`]
+                = `github:angular/${pkgName}-builds${label}`;
+            });
         });
       }
     })

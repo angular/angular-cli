@@ -1,50 +1,47 @@
 dist: trusty
 sudo: required
+
 language: node_js
-node_js:
-  - "4"
-os:
-  - linux
+
 env:
   global:
     - DBUS_SESSION_BUS_ADDRESS=/dev/null
-  matrix:
-    - SCRIPT=lint
-    - SCRIPT=build
-    - SCRIPT=test
-    - NODE_SCRIPT=tests/e2e_runner.js
-    - NODE_SCRIPT="tests/e2e_runner.js --nightly"
-#    - TARGET=mobile SCRIPT=mobile_test
+
 matrix:
   fast_finish: true
   allow_failures:
-    - node_js: "5"
     - os: osx
+    - node_js: "7"
     - env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
   include:
-    - node_js: "5"
-      os: linux
-      env: SCRIPT=test
-    - node_js: "5"
-      os: linux
-      env: NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "6"
       os: linux
-      env: SCRIPT=test
+      env: SCRIPT=lint
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT=tests/e2e_runner.js
+      env: SCRIPT=build
     - node_js: "4"
-      os: osx
+      os: linux
+      env: NODE_SCRIPT=tests/e2e_runner.js
+    - node_js: "6"
+      os: linux
       env: SCRIPT=test
-    - node_js: "4"
-      os: osx
+    - node_js: "6"
+      os: linux
       env: NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "6"
       os: osx
-      env: SCRIPT=test
+      env: NODE_SCRIPT=tests/e2e_runner.js
+
+    # Optional builds.
     - node_js: "6"
       os: osx
+      env: SCRIPT=test
+    - node_js: "6"
+      os: linux
+      env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+    - node_js: "7"
+      os: linux
       env: NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "4"
       os: osx

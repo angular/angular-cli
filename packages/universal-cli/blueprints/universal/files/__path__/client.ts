@@ -1,3 +1,4 @@
+import './__2.1.1.workaround.ts'; // temporary until 2.1.1 things are patched in Core
 /**
  * the polyfills must be the first thing imported
  */
@@ -16,9 +17,4 @@ if (environment.production) {
 
 const platformRef = platformUniversalDynamic();
 
-/**
- * bootstrap Angular 2 on document ready
- */
-document.addEventListener('DOMContentLoaded', () => {
-  platformRef.bootstrapModule(AppModule);
-});
+platformRef.bootstrapModule(AppModule);

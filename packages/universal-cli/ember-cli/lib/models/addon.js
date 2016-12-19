@@ -22,8 +22,6 @@ var AddonsFactory   = require('../models/addons-factory');
 var CoreObject = require('../ext/core-object');
 var Project = require('./project');
 
-// var upstreamMergeTrees = require('broccoli-merge-trees');
-// var Funnel     = require('broccoli-funnel');
 var walkSync   = require('walk-sync');
 
 
@@ -111,7 +109,6 @@ Addon.prototype._requireBuildPackages = function() {
   }
 
   this.transpileModules = deprecatedAddonFilters(this, 'this.transpileModules', 'broccoli-es6modules', function(tree, options) {
-    return new (require('broccoli-es6modules'))(tree, options);
   });
 
   this.pickFiles = deprecatedAddonFilters(this, 'this.pickFiles', 'broccoli-funnel', function(tree, options) {
@@ -123,7 +120,6 @@ Addon.prototype._requireBuildPackages = function() {
     return new Funnel(tree, options);
   });
 
-  // this.mergeTrees = deprecatedAddonFilters(this, 'this.mergeTrees', 'broccoli-merge-trees', mergeTrees);
   this.walkSync = deprecatedAddonFilters(this, 'this.walkSync', 'node-walk-sync', walkSync);
 };
 
@@ -152,8 +148,6 @@ function deprecatedAddonFilters(addon, name, insteadUse, fn) {
   @return {tree} Modified tree
 */
 Addon.prototype.concatFiles = function(tree, options) {
-  options.sourceMapConfig = this.app.options.sourcemaps;
-  return require('broccoli-concat')(tree, options);
 };
 
 /**

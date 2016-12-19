@@ -18,18 +18,14 @@ export default function () {
       );
     }))
     .then(() => ng('build'))
-    .then(() => expectFileToMatch(
-      `${getClientDist()}scripts.bundle.js`,
-      '/*!\\n * jQuery JavaScript'
-      )
-    )
+    .then(() => expectFileToMatch(`${getClientDist()}scripts.bundle.js`, '* jQuery JavaScript'))
     .then(() => expectFileToMatch(`${getClientDist()}scripts.bundle.js`, '/*! tether '))
-    .then(() => expectFileToMatch(`${getClientDist()}scripts.bundle.js`, '/*!\\n * Bootstrap'))
-    .then(() => expectFileToMatch(`${getClientDist()}styles.bundle.js`, '/*!\\n * Bootstrap'))
+    .then(() => expectFileToMatch(`${getClientDist()}scripts.bundle.js`, '* Bootstrap'))
+    .then(() => expectFileToMatch(`${getClientDist()}styles.bundle.css`, '* Bootstrap'))
     .then(() => expectFileToMatch(`${getClientDist()}index.html`, oneLineTrim`
       <script type="text/javascript" src="inline.bundle.js"></script>
-      <script type="text/javascript" src="styles.bundle.js"></script>
       <script type="text/javascript" src="scripts.bundle.js"></script>
+      <script type="text/javascript" src="vendor.bundle.js"></script>
       <script type="text/javascript" src="${getAppMain()}.bundle.js"></script>
     `));
 }

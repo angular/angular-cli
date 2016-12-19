@@ -7,32 +7,24 @@
     "start": "ung serve",
     "lint": "tslint \"<%= sourceDir %>/**/*.ts\"",
     "test": "ung test",
-    "pree2e": "webdriver-manager update",
+    "pree2e": "webdriver-manager update --standalone false --gecko false",
     "e2e": "protractor"
   },
   "private": true,
-  "dependencies": {<% if(!universal) { %>
-    "@angular/common": "^2.1.0",
-    "@angular/compiler": "^2.1.0",
-    "@angular/core": "^2.1.0",
-    "@angular/forms": "^2.1.0",
-    "@angular/http": "^2.1.0",
-    "@angular/platform-browser": "^2.1.0",
-    "@angular/platform-browser-dynamic": "^2.1.0",
-    "@angular/router": "^3.1.0",<% } %><% if(universal) { %>
-    "@angular/common": "2.1.0",
-    "@angular/compiler": "2.1.0",
-    "@angular/core": "2.1.0",
-    "@angular/forms": "2.1.0",
-    "@angular/http": "2.1.0",
-    "@angular/platform-browser": "2.1.0",
-    "@angular/platform-browser-dynamic": "2.1.0",
-    "@angular/router": "3.1.0",
-    "@angular/platform-server": "2.1.0",
-    "angular2-platform-node": "2.0.11",
-    "angular2-universal": "2.0.11",
-    "angular2-universal-polyfills": "2.0.11",
-    "angular2-express-engine": "2.0.11",
+  "dependencies": {
+    "@angular/common": "2.2.3",
+    "@angular/compiler": "2.2.3",
+    "@angular/core": "2.2.3",
+    "@angular/forms": "2.2.3",
+    "@angular/http": "2.2.3",
+    "@angular/platform-browser": "2.2.3",
+    "@angular/platform-browser-dynamic": "2.2.3",
+    "@angular/router": "3.2.3",<% if(universal) { %>
+    "@angular/platform-server": "2.2.3",
+    "angular2-platform-node": "2.1.0-rc.1",
+    "angular2-universal": "2.1.0-rc.1",
+    "angular2-universal-polyfills": "2.1.0-rc.1",
+    "angular2-express-engine": "2.1.0-rc.1",
     "compression": "1.6.2",
     "express": "^4.14.0",<% } %>
     "core-js": "^2.4.1",
@@ -40,16 +32,16 @@
     "ts-helpers": "^1.1.1",
     "zone.js": "^0.6.23"
   },
-  "devDependencies": {<% if(isMobile) { %>
-    "@angular/platform-server": "~2.1.0",
+  "devDependencies": {
+    "@angular/compiler-cli": "2.2.3",<% if(isMobile) { %>
+    "@angular/platform-server": "2.2.3",
     "@angular/service-worker": "0.2.0",
     "@angular/app-shell": "0.0.0",
-    "angular2-universal":"0.104.5",
-    "angular2-universal-polyfills": "0.4.1",
+    "angular2-universal":"2.1.0-rc.1",
+    "angular2-universal-polyfills": "2.1.0-rc.1",
     "preboot": "2.1.2",
     "parse5": "1.5.1",<% } %>
-    "@angular/compiler-cli": "^2.1.0",
-    "@types/jasmine": "^2.2.30",
+    "@types/jasmine": "2.5.38",
     "@types/node": "^6.0.42",<% if(universal) { %>
     "@types/body-parser": "0.0.29",
     "@types/compression": "0.0.29",
@@ -59,18 +51,17 @@
     "@types/mime": "0.0.28",
     "@types/serve-static": "^1.7.27",<% } %>
     "universal-cli": "<%= version %>",
-    "codelyzer": "~1.0.0-beta.3",
-    "jasmine-core": "2.4.1",
+    "codelyzer": "~2.0.0-beta.1",
+    "jasmine-core": "2.5.2",
     "jasmine-spec-reporter": "2.5.0",
     "karma": "1.2.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-cli": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "karma-remap-istanbul": "^0.2.1",
-    "protractor": "4.0.9",
+    "protractor": "~4.0.13",
     "ts-node": "1.2.1",
-    "tslint": "3.13.0",
-    "typescript": "~2.0.3",
-    "webdriver-manager": "10.2.5"
+    "tslint": "^4.0.2",
+    "typescript": "~2.0.3"
   }
 }
