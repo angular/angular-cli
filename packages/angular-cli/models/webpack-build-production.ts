@@ -1,6 +1,5 @@
 import * as path from 'path';
 import * as webpack from 'webpack';
-const WebpackMd5Hash = require('webpack-md5-hash');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 import {CompressionPlugin} from '../lib/webpack/compression-plugin';
 const autoprefixer = require('autoprefixer');
@@ -30,7 +29,6 @@ export const getWebpackProdConfigPartial = function(projectRoot: string,
     },
     plugins: [
       new ExtractTextPlugin('[name].[chunkhash].bundle.css'),
-      new WebpackMd5Hash(),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production')
       }),

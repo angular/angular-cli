@@ -309,6 +309,7 @@ export class AotPlugin implements Tapable {
         Object.keys(allLazyRoutes)
           .forEach(k => {
             const lazyRoute = allLazyRoutes[k];
+            k = k.split('#')[0];
             if (this.skipCodeGeneration) {
               this._lazyRoutes[k] = lazyRoute;
             } else {

@@ -78,6 +78,7 @@ export function makeCssLoaders(stylePaths: string[] = []) {
     // load global css as css files
     cssLoaders.push(...baseRules.map(({test, loaders}) => ({
       include: stylePaths, test, loaders: ExtractTextPlugin.extract({
+        remove: false,
         loader: ['css-loader', ...commonLoaders, ...loaders],
         fallbackLoader: 'style-loader'
       })
