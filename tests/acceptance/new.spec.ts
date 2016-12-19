@@ -4,7 +4,7 @@ const existsSync = require('exists-sync');
 const expect = require('chai').expect;
 const forEach = require('lodash/forEach');
 const walkSync = require('walk-sync');
-const Blueprint = require('angular-cli/ember-cli/lib/models/blueprint');
+const Blueprint = require('universal-cli/ember-cli/lib/models/blueprint');
 const path = require('path');
 const tmp = require('../helpers/tmp');
 const root = process.cwd();
@@ -138,7 +138,8 @@ describe('Acceptance: ung new', function () {
     });
   });
 
-  it('ung new with --directory uses given directory name and has correct package name', function () {
+  it('ung new with --directory uses given directory name and has correct package name',
+  function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git', '--directory=bar'])
       .then(function () {
         const cwd = process.cwd();

@@ -54,11 +54,15 @@ export default Task.extend({
       entryPoints.push('webpack/hot/dev-server');
       configs[0].plugins.push(new webpack.HotModuleReplacementPlugin());
     }
-    configs[0].entry.main.unshift(...entryPoints);
+
+    const appConfig = CliConfig.fromProject().config.apps[0];
+
+    if (appConfig.universal === false) {
+      configs[0].entry.main.unshift(...entryPoints);
+    }
     webpackCompiler = webpack(configs);
 
     const statsConfig = getWebpackStatsConfig(serveTaskOptions.verbose);
-    const appConfig = CliConfig.fromProject().config.apps[0];
 
     let proxyConfig = {};
     if (serveTaskOptions.proxyConfig) {

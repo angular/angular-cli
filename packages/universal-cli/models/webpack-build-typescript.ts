@@ -44,8 +44,11 @@ export const getWebpackAotConfigPartial = function(projectRoot: string, appConfi
     plugins: [
       new AotPlugin({
         tsConfigPath: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
-        mainPath: path.join(projectRoot, appConfig.root, appConfig.main)
-      })
+        mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
+        i18nFile: i18nFile,
+        i18nFormat: i18nFormat,
+        locale: locale
+      }),
     ]
   };
 };

@@ -25,8 +25,10 @@ export interface AotPluginOptions {
   entryModule?: string;
   mainPath?: string;
   typeChecking?: boolean;
-
   skipCodeGeneration?: boolean;
+  i18nFile?: string;
+  i18nFormat?: string;
+  locale?: string;
 }
 
 
@@ -78,6 +80,9 @@ export class AotPlugin implements Tapable {
   private _basePath: string;
   private _genDir: string;
 
+  private _i18nFile: string;
+  private _i18nFormat: string;
+  private _locale: string;
 
   constructor(options: AotPluginOptions) {
     this._setupOptions(options);
@@ -93,6 +98,9 @@ export class AotPlugin implements Tapable {
   get program() { return this._program; }
   get skipCodeGeneration() { return this._skipCodeGeneration; }
   get typeCheck() { return this._typeCheck; }
+  get i18nFile() { return this._i18nFile; }
+  get i18nFormat() { return this._i18nFormat; }
+  get locale() { return this._locale; }
 
   private _setupOptions(options: AotPluginOptions) {
     // Fill in the missing options.
@@ -153,6 +161,16 @@ export class AotPlugin implements Tapable {
     this._reflectorHost = new ngCompiler.ReflectorHost(
       this._program, this._compilerHost, this._angularCompilerOptions);
     this._reflector = new ngCompiler.StaticReflector(this._reflectorHost);
+
+    if (options.hasOwnProperty('i18nFile')) {
+      this._i18nFile = options.i18nFile;
+    }
+    if (options.hasOwnProperty('i18nFormat')) {
+      this._i18nFormat = options.i18nFormat;
+    }
+    if (options.hasOwnProperty('locale')) {
+      this._locale = options.locale;
+    }
   }
 
   // registration hook for webpack plugin
@@ -222,9 +240,9 @@ export class AotPlugin implements Tapable {
     this._resourceLoader = new WebpackResourceLoader(compilation);
 
     const i18nOptions: ngCompiler.NgcCliOptions = {
-      i18nFile: undefined,
-      i18nFormat: undefined,
-      locale: undefined,
+      i18nFile: this.i18nFile,
+      i18nFormat: this.i18nFormat,
+      locale: this.locale,
       basePath: this.basePath
     };
 

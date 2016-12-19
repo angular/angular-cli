@@ -1,8 +1,8 @@
-import './__2.1.1.workaround.ts'; // temporary until 2.1.1 things are patched in Core
 /**
  * the polyfills must be the first thing imported
  */
 import './polyfills.ts';
+import './__2.1.1.workaround.ts'; // temporary until 2.1.1 things are patched in Core
 import * as path from 'path';
 import * as express from 'express';
 import * as compression from 'compression';

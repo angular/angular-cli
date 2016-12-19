@@ -1,12 +1,12 @@
 import {ng} from '../../utils/process';
 import {expectFileToMatch, writeFile, createDir, appendToFile} from '../../utils/fs';
-import {isUniversalTest, expectToFail} from '../../utils/utils';
+import {expectToFail, isUniversalTest} from '../../utils/utils';
 
 export default function() {
-  if (isUniversalTest()) {
-    return Promise.resolve()
-      .then(() => expectToFail(() => ng('build', '--aot')));
-  } else {
+    if (isUniversalTest()) {
+      return Promise.resolve()
+        .then(() => expectToFail(() => ng('build', '--aot')));
+    } else {
     return Promise.resolve()
       .then(() => createDir('src/locale'))
       .then(() => writeFile('src/locale/messages.fr.xlf', `
