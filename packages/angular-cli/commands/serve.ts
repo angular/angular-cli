@@ -15,6 +15,7 @@ export interface ServeTaskOptions {
   port?: number;
   host?: string;
   proxyConfig?: string;
+  serverConfig?: any;
   watcher?: string;
   liveReload?: boolean;
   liveReloadHost?: string;
@@ -53,6 +54,7 @@ const ServeCommand = Command.extend({
       description: 'Listens only on localhost by default'
     },
     { name: 'proxy-config',         type: 'Path',                          aliases: ['pc'] },
+    { name: 'server-config',        type: 'Path',                          aliases: ['sc'] },
     { name: 'watcher',              type: String,  default: 'events',      aliases: ['w'] },
     { name: 'live-reload',          type: Boolean, default: true,          aliases: ['lr'] },
     {

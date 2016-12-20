@@ -69,6 +69,17 @@ export default Task.extend({
       }
     }
 
+    let serverConfig = {};
+    if (serveTaskOptions.serverConfig) {
+      const serverConfigPath = path.resolve(this.project.root, serveTaskOptions.serverConfig);
+      if (fs.existsSync(serverConfigPath)) {
+        serverConfig = require(serverConfigPath);
+      } else {
+        const message = 'Server config file ' + serverConfigPath + ' does not exist.';
+        return Promise.reject(new SilentError(message));
+      }
+    }
+
     let sslKey: string = null;
     let sslCert: string = null;
     if (serveTaskOptions.ssl) {
@@ -95,6 +106,7 @@ export default Task.extend({
       stats: statsConfig,
       inline: true,
       proxy: proxyConfig,
+      setup: serverConfig,
       compress: serveTaskOptions.target === 'production',
       watchOptions: {
         poll: CliConfig.fromProject().config.defaults.poll
