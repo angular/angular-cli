@@ -133,8 +133,10 @@ export class AotPlugin implements Tapable {
     }
     this._rootFilePath = fileNames;
 
-    // Check the genDir.
-    let genDir = basePath;
+    // Check the genDir. We generate a default gendir that's under basepath; it will generate
+    // a `node_modules` directory and because of that we don't want TypeScript resolution to
+    // resolve to that directory but the real `node_modules`.
+    let genDir = path.join(basePath, '$$_gendir');
 
     this._compilerOptions = tsConfig.options;
     this._angularCompilerOptions = Object.assign(
