@@ -1,9 +1,10 @@
-import * as assign from 'lodash/assign';
 import * as denodeify from 'denodeify';
-const Command = require('../ember-cli/lib/models/command');
+const assign = require('lodash/assign');
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
+const Command = require('../ember-cli/lib/models/command');
 import ServeWebpackTask from '../tasks/serve-webpack';
+import {Version} from '../upgrade/version';
 
 PortFinder.basePort = 49152;
 
@@ -32,6 +33,9 @@ export interface ServeTaskOptions {
   open?: boolean;
   vendorChunk?: boolean;
   hmr?: boolean;
+  i18nFile?: string;
+  i18nFormat?: string;
+  locale?: string;
 }
 
 const ServeCommand = Command.extend({
@@ -103,6 +107,9 @@ const ServeCommand = Command.extend({
       default: false,
       description: 'Enable hot module replacement',
     },
+    { name: 'i18n-file',       type: String, default: null },
+    { name: 'i18n-format',     type: String, default: null },
+    { name: 'locale',         type: String, default: null }
   ],
 
   run: function(commandOptions: ServeTaskOptions) {
@@ -115,6 +122,8 @@ const ServeCommand = Command.extend({
       }
     }
 
+    // Check angular version.
+    Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
 
     return this._checkExpressPort(commandOptions)

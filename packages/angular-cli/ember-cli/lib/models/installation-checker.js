@@ -13,12 +13,12 @@ function InstallationChecker(options) {
 }
 
 /**
-* Check if npm and bower installation directories are present,
+* Check if npm directories are present,
 * and raise an error message with instructions on how to proceed.
 *
 * If some of these package managers aren't being used in the project
 * we just ignore them. Their usage is considered by checking the
-* presence of your manifest files: package.json for npm and bower.json for bower.
+* presence of your manifest files: package.json for npm.
 */
 InstallationChecker.prototype.checkInstallations = function() {
   var commands = [];
@@ -26,10 +26,6 @@ InstallationChecker.prototype.checkInstallations = function() {
   if (this.usingNpm() && this.npmDependenciesNotPresent()) {
     debug('npm dependencies not installed');
     commands.push('`npm install`');
-  }
-  if (this.usingBower() && this.bowerDependenciesNotPresent()) {
-    debug('bower dependencies not installed');
-    commands.push('`bower install`');
   }
   if (commands.length) {
     var commandText = commands.join(' and ');
@@ -49,18 +45,6 @@ function readJSON(path) {
     throw new SilentError('InstallationChecker: Unable to parse: ' + path);
   }
 }
-
-InstallationChecker.prototype.hasBowerDeps = function() {
-  return hasDependencies(readJSON(path.join(this.project.root, 'bower.json')));
-};
-
-InstallationChecker.prototype.usingBower = function() {
-  return existsSync(path.join(this.project.root, 'bower.json')) && this.hasBowerDeps();
-};
-
-InstallationChecker.prototype.bowerDependenciesNotPresent = function() {
-  return !existsSync(this.project.bowerDirectory);
-};
 
 InstallationChecker.prototype.hasNpmDeps = function() {
   return hasDependencies(readJSON(path.join(this.project.root, 'package.json')));

@@ -18,12 +18,16 @@ const green = chalk.green;
 const red = chalk.red;
 const white = chalk.white;
 
+const setGlobalVariable = require('./e2e/utils/env').setGlobalVariable;
+
 
 /**
  * Here's a short description of those flags:
  *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
  *   --noproject      Skip creating a project or using one.
  *   --nolink         Skip linking your local angular-cli directory. Can save a few seconds.
+ *   --ng-sha=SHA     Use a specific ng-sha. Similar to nightly but point to a master SHA instead
+ *                    of using the latest.
  *   --nightly        Install angular nightly builds over the test project.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
  *                    created, and npm installed. Ideally you want a project created by a previous
@@ -32,8 +36,20 @@ const white = chalk.white;
  */
 const argv = minimist(process.argv.slice(2), {
   'boolean': ['debug', 'nolink', 'nightly', 'noproject'],
-  'string': ['reuse']
+  'string': ['reuse', 'ng-sha']
 });
+
+
+/**
+ * Set the error code of the process to 255.  This is to ensure that if something forces node
+ * to exit without finishing properly, the error code will be 255. Right now that code is not used.
+ *
+ * When tests succeed we already call `process.exit(0)`, so this doesn't change any correct
+ * behaviour.
+ *
+ * One such case that would force node <= v6 to exit with code 0, is a Promise that doesn't resolve.
+ */
+process.exitCode = 255;
 
 
 let currentFileName = null;
@@ -73,6 +89,8 @@ if (testsToRun.length == allTests.length) {
   console.log(`Running ${testsToRun.length} tests (${allTests.length + allSetups.length} total)`);
 }
 
+setGlobalVariable('argv', argv);
+
 testsToRun.reduce((previous, relativeName) => {
   // Make sure this is a windows compatible path.
   let absoluteName = path.join(e2eRoot, relativeName);
@@ -96,7 +114,7 @@ testsToRun.reduce((previous, relativeName) => {
     return Promise.resolve()
       .then(() => printHeader(currentFileName))
       .then(() => previousDir = process.cwd())
-      .then(() => fn(argv, () => clean = false))
+      .then(() => fn(() => clean = false))
       .then(() => console.log('  ----'))
       .then(() => {
         // If we're not in a setup, change the directory back to where it was before the test.

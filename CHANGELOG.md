@@ -1,3 +1,59 @@
+<a name="1.0.0-beta.23"></a>
+# [1.0.0-beta.23](https://github.com/angular/angular-cli/compare/v1.0.0-beta.22-1...v1.0.0-beta.23) (2016-12-15)
+
+
+### Bug Fixes
+
+* **@ngtools/webpack:** keep the decorators in. ([#3583](https://github.com/angular/angular-cli/issues/3583)) ([db25183](https://github.com/angular/angular-cli/commit/db25183))
+* **@ngtools/webpack:** use tsconfig declaration flag to report decl errors ([#3499](https://github.com/angular/angular-cli/issues/3499)) ([c46de15](https://github.com/angular/angular-cli/commit/c46de15))
+* **blueprints:** remove app root barrel ([#3530](https://github.com/angular/angular-cli/issues/3530)) ([3329d46](https://github.com/angular/angular-cli/commit/3329d46)), closes [#3369](https://github.com/angular/angular-cli/issues/3369)
+* **build:** added autoprefixer to prod ([1648d51](https://github.com/angular/angular-cli/commit/1648d51)), closes [#3156](https://github.com/angular/angular-cli/issues/3156) [#3164](https://github.com/angular/angular-cli/issues/3164)
+* **build:** pin [@types](https://github.com/types)/lodash ([#3465](https://github.com/angular/angular-cli/issues/3465)) ([9b65481](https://github.com/angular/angular-cli/commit/9b65481))
+* **completion:** Update with the new help command ([#3479](https://github.com/angular/angular-cli/issues/3479)) ([0b5dc74](https://github.com/angular/angular-cli/commit/0b5dc74))
+* **dependencies:** reduce the dependencies further. ([#3488](https://github.com/angular/angular-cli/issues/3488)) ([901a64f](https://github.com/angular/angular-cli/commit/901a64f))
+* **deploy:** gh-pages checkout initial branch on error ([#3378](https://github.com/angular/angular-cli/issues/3378)) ([c5cd095](https://github.com/angular/angular-cli/commit/c5cd095)), closes [#3030](https://github.com/angular/angular-cli/issues/3030) [#2663](https://github.com/angular/angular-cli/issues/2663) [#1259](https://github.com/angular/angular-cli/issues/1259)
+* **deploy:** gh-pages deploy fail after repo create ([#3386](https://github.com/angular/angular-cli/issues/3386)) ([0a68cc5](https://github.com/angular/angular-cli/commit/0a68cc5)), closes [#3385](https://github.com/angular/angular-cli/issues/3385)
+* **gitignore:** No longer ignore VSCode settings ([#3477](https://github.com/angular/angular-cli/issues/3477)) ([8d88446](https://github.com/angular/angular-cli/commit/8d88446))
+* **help:** fix `ng help <command>` ([#3442](https://github.com/angular/angular-cli/issues/3442)) ([51659b9](https://github.com/angular/angular-cli/commit/51659b9))
+* **new:** Make sure the project name is valid. ([#3478](https://github.com/angular/angular-cli/issues/3478)) ([e836f92](https://github.com/angular/angular-cli/commit/e836f92))
+* **webpack:** fix some problems with errors not reported. ([#3444](https://github.com/angular/angular-cli/issues/3444)) ([09f9aa9](https://github.com/angular/angular-cli/commit/09f9aa9))
+* **webpack:** remove usage of __dirname from the config. ([#3422](https://github.com/angular/angular-cli/issues/3422)) ([8597786](https://github.com/angular/angular-cli/commit/8597786))
+
+
+### Features
+
+* Make CLI available without install ([761e86f](https://github.com/angular/angular-cli/commit/761e86f)), closes [#3126](https://github.com/angular/angular-cli/issues/3126)
+* **build:** add lazy styles/scripts ([#3402](https://github.com/angular/angular-cli/issues/3402)) ([20bb864](https://github.com/angular/angular-cli/commit/20bb864)), closes [#3401](https://github.com/angular/angular-cli/issues/3401) [#3400](https://github.com/angular/angular-cli/issues/3400)
+* **deps:** Unblock the version of Angular to >= 2.3 ([#3569](https://github.com/angular/angular-cli/issues/3569)) ([bd03100](https://github.com/angular/angular-cli/commit/bd03100))
+* **generate:** change generate --prefix option type from Boolean to string ([#3457](https://github.com/angular/angular-cli/issues/3457)) ([8d5a915](https://github.com/angular/angular-cli/commit/8d5a915))
+* **i18n:** add i18n command line options ([#3098](https://github.com/angular/angular-cli/issues/3098)) ([2a0a42d](https://github.com/angular/angular-cli/commit/2a0a42d))
+* **module:** component optional when generating module ([#3389](https://github.com/angular/angular-cli/issues/3389)) ([2fb2d13](https://github.com/angular/angular-cli/commit/2fb2d13))
+* **serve:** Add support to open with ssl. ([#3432](https://github.com/angular/angular-cli/issues/3432)) ([83dfc96](https://github.com/angular/angular-cli/commit/83dfc96))
+
+
+### Performance Improvements
+
+* **install time:** Remove dependency to zopfli. ([#3414](https://github.com/angular/angular-cli/issues/3414)) ([e6364a9](https://github.com/angular/angular-cli/commit/e6364a9))
+
+
+### BREAKING CHANGES
+
+* blueprints: The app root module and component must now be imported directly. (e.g., use `import { AppModule } from './app/app.module';` instead of `import { AppModule } from './app/';`)
+
+
+
+<a name="1.0.0-beta.22-1"></a>
+# [1.0.0-beta.22-1](https://github.com/angular/angular-cli/compare/v1.0.0-beta.22...v1.0.0-beta.22-1) (2016-12-05)
+
+
+### Bug Fixes
+
+* **@ngtools/webpack:** performance improvement. ([#3360](https://github.com/angular/angular-cli/issues/3360)) ([4dcfe27](https://github.com/angular/angular-cli/commit/4dcfe27))
+* **deploy:** clean up gh-pages obsolete files ([#3081](https://github.com/angular/angular-cli/issues/3081)) ([#3333](https://github.com/angular/angular-cli/issues/3333)) ([51869fb](https://github.com/angular/angular-cli/commit/51869fb))
+* change apiFilter querystring to query in ng doc([#3383](https://github.com/angular/angular-cli/issues/3383)) ([5b2a0fb](https://github.com/angular/angular-cli/commit/5b2a0fb)), closes [#3363](https://github.com/angular/angular-cli/issues/3363)
+
+
+
 <a name="1.0.0-beta.22"></a>
 # [1.0.0-beta.22](https://github.com/angular/angular-cli/compare/v1.0.0-beta.21...v1.0.0-beta.22) (2016-12-02)
 

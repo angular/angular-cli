@@ -25,6 +25,9 @@ export default Task.extend({
       serveTaskOptions.environment,
       undefined,
       undefined,
+      serveTaskOptions.i18nFile,
+      serveTaskOptions.i18nFormat,
+      serveTaskOptions.locale,
       serveTaskOptions.aot,
       serveTaskOptions.sourcemap,
       serveTaskOptions.vendorChunk,
@@ -115,17 +118,16 @@ export default Task.extend({
 
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
     return new Promise((resolve, reject) => {
-      server.listen(serveTaskOptions.port,
-                    `${serveTaskOptions.host}`,
-                    function(err: any, stats: any) {
+      server.listen(serveTaskOptions.port, `${serveTaskOptions.host}`, (err: any, stats: any) => {
         if (err) {
           console.error(err.stack || err);
           if (err.details) { console.error(err.details); }
           reject(err.details);
         } else {
-          const { open, host, port } = serveTaskOptions;
+          const { open, ssl, host, port } = serveTaskOptions;
           if (open) {
-            opn(url.format({ protocol: 'http', hostname: host, port: port.toString() }));
+            let protocol = ssl ? 'https' : 'http';
+            opn(url.format({ protocol: protocol, hostname: host, port: port.toString() }));
           }
         }
       });

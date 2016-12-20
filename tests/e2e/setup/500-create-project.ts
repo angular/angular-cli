@@ -4,12 +4,14 @@ import {isMobileTest} from '../utils/utils';
 import {expectFileToExist} from '../utils/fs';
 import {updateTsConfig, updateJsonFile} from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
+import {getGlobalVariable} from '../utils/env';
 
 
 let packages = require('../../../lib/packages');
 
 
-export default function(argv: any) {
+export default function() {
+  const argv = getGlobalVariable('argv');
   let createProject = null;
 
   // This is a dangerous flag, but is useful for testing packages only.
@@ -36,22 +38,25 @@ export default function(argv: any) {
       });
     }))
     .then(() => {
-      if (argv.nightly) {
+      if (argv.nightly || argv['ng-sha']) {
+        const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
         return updateJsonFile('package.json', json => {
           // Install over the project with nightly builds.
-          const angularPackages = [
-            'core',
-            'common',
-            'compiler',
-            'forms',
-            'http',
-            'router',
-            'platform-browser',
-            'platform-browser-dynamic'
-          ];
-          angularPackages.forEach(pkgName => {
-            json['dependencies'][`@angular/${pkgName}`] = `github:angular/${pkgName}-builds`;
-          });
+          Object.keys(json['dependencies'] || {})
+            .filter(name => name.match(/^@angular\//))
+            .forEach(name => {
+              const pkgName = name.split(/\//)[1];
+              json['dependencies'][`@angular/${pkgName}`]
+                = `github:angular/${pkgName}-builds${label}`;
+            });
+
+          Object.keys(json['devDependencies'] || {})
+            .filter(name => name.match(/^@angular\//))
+            .forEach(name => {
+              const pkgName = name.split(/\//)[1];
+              json['devDependencies'][`@angular/${pkgName}`]
+                = `github:angular/${pkgName}-builds${label}`;
+            });
         });
       }
     })

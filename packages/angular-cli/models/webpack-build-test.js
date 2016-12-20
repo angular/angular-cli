@@ -12,6 +12,20 @@ const webpackLoader = g['angularCliIsLocal']
 
 const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
 
+
+/**
+ * Enumerate loaders and their dependencies from this file to let the dependency validator
+ * know they are used.
+ *
+ * require('tslint-loader')
+ * require('source-map-loader')
+ * require('sourcemap-istanbul-instrumenter-loader')
+ *
+ * require('remap-istanbul')
+ * require('tslint')
+ */
+
+
 const getWebpackTestConfig = function (projectRoot, environment, appConfig, testConfig) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -56,7 +70,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
 
   return {
     devtool: testConfig.sourcemap ? 'inline-source-map' : 'eval',
-    context: path.resolve(__dirname, './'),
+    context: projectRoot,
     resolve: {
       extensions: ['.ts', '.js'],
       plugins: [

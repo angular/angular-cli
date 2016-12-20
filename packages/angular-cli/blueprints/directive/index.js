@@ -1,4 +1,5 @@
 const path = require('path');
+const chalk = require('chalk');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
@@ -12,7 +13,7 @@ module.exports = {
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: true },
-    { name: 'prefix', type: Boolean, default: true },
+    { name: 'prefix', type: String, default: null },
     { name: 'spec', type: Boolean },
     { name: 'skip-import', type: Boolean, default: false }
   ],
@@ -38,7 +39,10 @@ module.exports = {
         this.project.ngConfig.apps[0].prefix) {
       defaultPrefix = this.project.ngConfig.apps[0].prefix;
     }
-    var prefix = this.options.prefix ? `${defaultPrefix}-` : '';
+
+    var prefix = (this.options.prefix === 'false' || this.options.prefix === '') ? '' : (this.options.prefix || defaultPrefix);
+    prefix = prefix && `${prefix}-`;
+
 
     this.selector = stringUtils.camelize(prefix + parsedPath.name);
     return parsedPath.name;
@@ -97,6 +101,7 @@ module.exports = {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply(NodeHost)));
+      this._writeStatusToUI(chalk.yellow, 'update', path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);

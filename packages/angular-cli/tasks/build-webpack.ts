@@ -7,6 +7,7 @@ import { NgCliWebpackConfig } from '../models/webpack-config';
 import { getWebpackStatsConfig } from '../models/';
 import { CliConfig } from '../models/config';
 
+
 // Configure build and output;
 let lastHash: any = null;
 
@@ -23,6 +24,9 @@ export default <any>Task.extend({
       runTaskOptions.environment,
       outputDir,
       runTaskOptions.baseHref,
+      runTaskOptions.i18nFile,
+      runTaskOptions.i18nFormat,
+      runTaskOptions.locale,
       runTaskOptions.aot,
       runTaskOptions.sourcemap,
       runTaskOptions.vendorChunk,
@@ -36,7 +40,9 @@ export default <any>Task.extend({
 
     return new Promise((resolve, reject) => {
       webpackCompiler.run((err: any, stats: any) => {
-        if (err) { return reject(err); }
+        if (err) {
+          return reject(err);
+        }
 
         // Don't keep cache
         // TODO: Make conditional if using --watch
@@ -47,8 +53,18 @@ export default <any>Task.extend({
           process.stdout.write(stats.toString(statsConfig) + '\n');
         }
 
-        return stats.hasErrors() ? reject() : resolve();
+        if (stats.hasErrors()) {
+          reject();
+        } else {
+          resolve();
+        }
       });
+    })
+    .catch((err: Error) => {
+      if (err) {
+        this.ui.writeError('\nAn error occured during the build:\n' + ((err && err.stack) || err));
+      }
+      throw err;
     });
   }
 });

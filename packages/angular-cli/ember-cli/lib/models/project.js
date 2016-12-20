@@ -41,7 +41,6 @@ function Project(root, pkg, ui, cli) {
   this.addonPackages = {};
   this.addons = [];
   this.liveReloadFilterPatterns = [];
-  this.setupBowerDirectory();
   this.setupNodeModulesPath();
   this.addonDiscovery = new AddonDiscovery(this.ui);
   this.addonsFactory = new AddonsFactory(this, this);
@@ -51,46 +50,6 @@ function Project(root, pkg, ui, cli) {
     canNestRoots: false
   };
 }
-
-/**
-  Set when the `Watcher.detectWatchman` helper method finishes running,
-  so that other areas of the system can be aware that watchman is being used.
-
-  For example, this information is used in the broccoli build pipeline to know
-  if we can watch additional directories (like bower_components) "cheaply".
-
-  Contains `enabled` and `version`.
-
-  @private
-  @property _watchmanInfo
-  @returns {Object}
-  @default false
-*/
-
-/**
-  Sets the name of the bower directory for this project
-
-  @private
-  @method setupBowerDirectory
- */
-Project.prototype.setupBowerDirectory = function() {
-  var bowerrcPath = path.join(this.root, '.bowerrc');
-
-  debug('bowerrc path: %s', bowerrcPath);
-
-  if (existsSync(bowerrcPath)) {
-    var bowerrcContent = fs.readFileSync(bowerrcPath);
-    try {
-      this.bowerDirectory = JSON.parse(bowerrcContent).directory;
-    } catch (exception) {
-      debug('failed to parse bowerc: %s', exception);
-      this.bowerDirectory = null;
-    }
-  }
-
-  this.bowerDirectory = this.bowerDirectory || 'bower_components';
-  debug('bowerDirectory: %s', this.bowerDirectory);
-};
 
 Project.prototype.hasDependencies = function() {
   return !!this.nodeModulesPath;
@@ -304,22 +263,6 @@ Project.prototype.dependencies = function(pkg, excludeDevDeps) {
   }
 
   return assign({}, devDependencies, pkg['dependencies']);
-};
-
-/**
-  Returns the bower dependencies for this project.
-
-  @private
-  @method bowerDependencies
-  @param  {String} bower Path to bower.json
-  @return {Object}       Bower dependencies
- */
-Project.prototype.bowerDependencies = function(bower) {
-  if (!bower) {
-    var bowerPath = path.join(this.root, 'bower.json');
-    bower = (existsSync(bowerPath)) ? require(bowerPath) : {};
-  }
-  return assign({}, bower['devDependencies'], bower['dependencies']);
 };
 
 /**
