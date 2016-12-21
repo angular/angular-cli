@@ -15,6 +15,6 @@ module.exports = Command.extend({
   validateAndRun: function() {
     throw new SilentError('The specified command ' + this.name +
                           ' is invalid. For available options, see' +
-                          ' `ember help`.');
+                          ' `ng help`.');
   }
 });
