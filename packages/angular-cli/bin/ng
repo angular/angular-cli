@@ -7,6 +7,33 @@ process.title = 'angular-cli';
 const resolve = require('resolve');
 const packageJson = require('../package.json');
 const Version = require('../upgrade/version').Version;
+const yellow = require('chalk').yellow;
+const SemVer = require('semver').SemVer;
+const fs = require('fs');
+const path = require('path');
+
+
+function _fromPackageJson(cwd) {
+  cwd = cwd || process.cwd();
+
+  do {
+    const packageJsonPath = path.join(cwd, 'node_modules/angular-cli/package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      const content = fs.readFileSync(packageJsonPath, 'utf-8');
+      if (content) {
+        const json = JSON.parse(content);
+        if (json['version']) {
+          return new SemVer(json['version']);
+        }
+      }
+    }
+
+    // Check the parent.
+    cwd = path.dirname(cwd);
+  } while (cwd != path.dirname(cwd));
+
+  return null;
+}
 
 
 resolve('angular-cli', { basedir: process.cwd() },
@@ -22,6 +49,25 @@ resolve('angular-cli', { basedir: process.cwd() },
       // Verify that package's version.
       Version.assertPostWebpackVersion();
 
+      // This was run from a global, check local version.
+      const globalVersion = new SemVer(packageJson['version']);
+      let localVersion;
+      let shouldWarn = false;
+
+      try {
+        localVersion = _fromPackageJson();
+        shouldWarn = localVersion && globalVersion.compare(localVersion) < 0;
+      } catch (e) {
+        console.error(e);
+        shouldWarn = true;
+      }
+
+      if (shouldWarn) {
+        // eslint-disable no-console
+        console.log(yellow(`Your global Angular CLI version (${globalVersion}) is greater than `
+          + `your local version (${localVersion}). The local Angular CLI version is used.`));
+      }
+
       // No error implies a projectLocalCli, which will load whatever
       // version of ng-cli you have installed in a local package.json
       cli = require(projectLocalCli);
@@ -36,7 +82,6 @@ resolve('angular-cli', { basedir: process.cwd() },
       inputStream: process.stdin,
       outputStream: process.stdout
     }).then(function (result) {
-      var exitCode = typeof result === 'object' ? result.exitCode : result;
-      process.exit(exitCode);
+      process.exit(typeof result === 'object' ? result.exitCode : result);
     });
   });
