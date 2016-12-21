@@ -37,7 +37,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
     this.timeout(10000);
     return tmp.setup('./tmp')
       .then(() => process.chdir('./tmp'))
-      .then(() => ng(['new', project, '--skip-npm', '--skip-bower']))
+      .then(() => ng(['new', project, '--skip-npm']))
       .then(() => setupDist())
       .finally(() => execStub = new ExecStub());
   });

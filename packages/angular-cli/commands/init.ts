@@ -20,7 +20,6 @@ const InitCommand: any = Command.extend({
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
     { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
-    { name: 'skip-bower', type: Boolean, default: true, aliases: ['sb'] },
     { name: 'name', type: String, default: '', aliases: ['n'] },
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'style', type: String, default: 'css' },
@@ -36,7 +35,6 @@ const InitCommand: any = Command.extend({
   run: function (commandOptions: any, rawArgs: string[]) {
     if (commandOptions.dryRun) {
       commandOptions.skipNpm = true;
-      commandOptions.skipBower = true;
     }
 
     const installBlueprint = new this.tasks.InstallBlueprint({
@@ -67,15 +65,6 @@ const InitCommand: any = Command.extend({
     let linkCli: any;
     if (commandOptions.linkCli) {
       linkCli = new LinkCli({
-        ui: this.ui,
-        analytics: this.analytics,
-        project: this.project
-      });
-    }
-
-    let bowerInstall: any;
-    if (!commandOptions.skipBower) {
-      bowerInstall = new this.tasks.BowerInstall({
         ui: this.ui,
         analytics: this.analytics,
         project: this.project
@@ -137,13 +126,6 @@ const InitCommand: any = Command.extend({
       .then(function () {
         if (commandOptions.linkCli) {
           return linkCli.run();
-        }
-      })
-      .then(function () {
-        if (!commandOptions.skipBower) {
-          return bowerInstall.run({
-            verbose: commandOptions.verbose
-          });
         }
       });
   }

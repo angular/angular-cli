@@ -1,4 +1,5 @@
 const path = require('path');
+const chalk = require('chalk');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
@@ -100,6 +101,7 @@ module.exports = {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply(NodeHost)));
+      this._writeStatusToUI(chalk.yellow, 'update', path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);

@@ -11,6 +11,7 @@ import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 import * as url from 'url';
+import {stripIndents} from 'common-tags';
 const opn = require('opn');
 
 export default Task.extend({
@@ -109,6 +110,17 @@ export default Task.extend({
     }
 
     webpackDevServerConfiguration.hot = serveTaskOptions.hmr;
+
+    if (serveTaskOptions.target === 'production') {
+      ui.writeLine(chalk.red(stripIndents`
+        ****************************************************************************************
+        This is a simple server for use in testing or debugging Angular applications locally.
+        It hasn't been reviewed for security issues.
+
+        DON'T USE IT FOR PRODUCTION USE!
+        ****************************************************************************************
+      `));
+    }
 
     ui.writeLine(chalk.green(oneLine`
       **
