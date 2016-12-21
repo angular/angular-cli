@@ -8,7 +8,6 @@ export default Command.extend({
   run: function () {
     const lintTask = new LintTask({
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project
     });
 
