@@ -15,7 +15,7 @@ module.exports = {
     { name: 'flat', type: Boolean, default: false },
     { name: 'inline-template', type: Boolean, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, aliases: ['is'] },
-    { name: 'prefix', type: Boolean, default: true },
+    { name: 'prefix', type: String, default: null },
     { name: 'spec', type: Boolean },
     { name: 'view-encapsulation', type: String, aliases: ['ve'] },
     { name: 'change-detection', type: String, aliases: ['cd'] },
@@ -41,9 +41,12 @@ module.exports = {
     if (this.project.ngConfig &&
         this.project.ngConfig.apps[0] &&
         this.project.ngConfig.apps[0].prefix) {
-      defaultPrefix = this.project.ngConfig.apps[0].prefix + '-';
+      defaultPrefix = this.project.ngConfig.apps[0].prefix;
     }
-    var prefix = this.options.prefix ? defaultPrefix : '';
+
+    var prefix = (this.options.prefix === 'false' || this.options.prefix === '') ? '' : (this.options.prefix || defaultPrefix);
+    prefix = prefix && `${prefix}-`;
+
     this.selector = stringUtils.dasherize(prefix + parsedPath.name);
 
     if (this.selector.indexOf('-') === -1) {
@@ -146,6 +149,7 @@ module.exports = {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply(NodeHost)));
+      this._writeStatusToUI(chalk.yellow, 'update', path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);

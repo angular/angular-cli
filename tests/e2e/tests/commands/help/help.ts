@@ -1,4 +1,4 @@
-import {silentNg} from '../../utils/process';
+import {silentNg} from '../../../utils/process';
 
 
 export default function() {

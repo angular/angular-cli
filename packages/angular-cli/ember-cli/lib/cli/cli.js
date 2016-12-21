@@ -25,6 +25,16 @@ module.exports = CLI;
 CLI.prototype.run = function(environment) {
   return Promise.hash(environment).then(function(environment) {
     var args = environment.cliArgs.slice();
+
+    if (args[0] === '--help') {
+      if (args.length === 1) {
+        args[0] = 'help';
+      } else {
+        args.shift();
+        args.push('--help');
+      }
+    }
+
     var commandName = args.shift();
     var commandArgs = args;
     var helpOptions;

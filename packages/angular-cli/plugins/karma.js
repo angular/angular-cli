@@ -1,4 +1,6 @@
 const path = require('path');
+const fs = require('fs');
+
 const getWebpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
 const CliConfig = require('../models/config').CliConfig;
 
@@ -15,6 +17,27 @@ const init = (config) => {
     lint: config.angularCli.lint || false,
     sourcemap: config.angularCli.sourcemap,
     progress: config.angularCli.progress
+  }
+
+  // add assets
+  if (appConfig.assets) {
+    const assets = typeof appConfig.assets === 'string' ? [appConfig.assets] : appConfig.assets;
+    config.proxies = config.proxies || {};
+    assets.forEach(asset => {
+      const fullAssetPath = path.join(config.basePath, appConfig.root, asset);
+      const isDirectory = fs.lstatSync(fullAssetPath).isDirectory();
+      const filePattern = isDirectory ? fullAssetPath + '/**' : fullAssetPath;
+      const proxyPath = isDirectory ? asset + '/' : asset;
+      config.files.push({
+        pattern: filePattern,
+        included: false,
+        served: true,
+        watched: true
+      });
+      // The `files` entry serves the file from `/base/{appConfig.root}/{asset}`
+      //  so, we need to add a URL rewrite that exposes the asset as `/{asset}` only
+      config.proxies['/' + proxyPath] = '/base/' + appConfig.root + '/' + proxyPath;
+    });
   }
 
   // add webpack config
