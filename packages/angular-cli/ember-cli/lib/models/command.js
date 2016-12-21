@@ -430,7 +430,7 @@ Command.prototype.printBasicHelp = function() {
   if (this.isRoot) {
     output = 'Usage: ' + this.name;
   } else {
-    output = 'ember ' + this.name;
+    output = 'ng ' + this.name;
   }
 
   output += this._printCommand();
