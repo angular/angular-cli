@@ -39,7 +39,6 @@ const InitCommand: any = Command.extend({
 
     const installBlueprint = new this.tasks.InstallBlueprint({
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project
     });
 
@@ -57,7 +56,6 @@ const InitCommand: any = Command.extend({
     if (!commandOptions.skipNpm) {
       npmInstall = new NpmInstall({
         ui: this.ui,
-        analytics: this.analytics,
         project: this.project
       });
     }
@@ -66,7 +64,6 @@ const InitCommand: any = Command.extend({
     if (commandOptions.linkCli) {
       linkCli = new LinkCli({
         ui: this.ui,
-        analytics: this.analytics,
         project: this.project
       });
     }
