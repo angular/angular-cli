@@ -12,7 +12,7 @@ module.exports = {
 
   availableOptions: [
     { name: 'flat', type: Boolean, default: true },
-    { name: 'prefix', type: Boolean, default: true },
+    { name: 'prefix', type: String, default: null },
     { name: 'spec', type: Boolean },
     { name: 'skip-import', type: Boolean, default: false }
   ],
@@ -38,7 +38,10 @@ module.exports = {
         this.project.ngConfig.apps[0].prefix) {
       defaultPrefix = this.project.ngConfig.apps[0].prefix;
     }
-    var prefix = this.options.prefix ? `${defaultPrefix}-` : '';
+
+    var prefix = (this.options.prefix === 'false' || this.options.prefix === '') ? '' : (this.options.prefix || defaultPrefix);
+    prefix = prefix && `${prefix}-`;
+
 
     this.selector = stringUtils.camelize(prefix + parsedPath.name);
     return parsedPath.name;

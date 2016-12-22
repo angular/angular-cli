@@ -97,10 +97,12 @@ const githubPagesDeployCommand = Command.extend({
     const projectName = this.project.pkg.name;
 
     const outDir = CliConfig.fromProject().config.apps[0].outDir;
+    const indexFilename = CliConfig.fromProject().config.apps[0].index;
 
     let ghPagesBranch = 'gh-pages';
     let destinationBranch = options.userPage ? 'master' : ghPagesBranch;
     let initialBranch: string;
+    let branchErrMsg = ' You might also need to return to the initial branch manually.';
 
     // declared here so that tests can stub exec
     const execPromise = <(cmd: string, options?: any) => Promise<string>>denodeify(exec);
@@ -146,6 +148,7 @@ const githubPagesDeployCommand = Command.extend({
       .then(saveStartingBranchName)
       .then(createGitHubRepoIfNeeded)
       .then(checkoutGhPages)
+      .then(cleanGhPagesBranch)
       .then(copyFiles)
       .then(createNotFoundPage)
       .then(addAndCommit)
@@ -204,6 +207,23 @@ const githubPagesDeployCommand = Command.extend({
         .then(() => execPromise(`git commit -m \"initial ${ghPagesBranch} commit\"`));
     }
 
+    function cleanGhPagesBranch() {
+      return execPromise('git ls-files')
+        .then(function(stdout) {
+          let files = '';
+          stdout.split(/\n/).forEach(function(f) {
+            // skip .gitignore & 404.html
+            if (( f != '') && (f != '.gitignore') && (f != '404.html')) {
+              files = files.concat(`"${f}" `);
+            }
+          });
+          return execPromise(`git rm -r ${files}`)
+            .catch(() => {
+              // Ignoring errors when trying to erase files.
+            });
+        });
+    }
+
     function copyFiles() {
       return fsReadDir(outDir)
         .then((files: string[]) => Promise.all(files.map((file) => {
@@ -216,7 +236,7 @@ const githubPagesDeployCommand = Command.extend({
     }
 
     function createNotFoundPage() {
-      const indexHtml = path.join(root, 'index.html');
+      const indexHtml = path.join(root, indexFilename);
       const notFoundPage = path.join(root, '404.html');
       return fsCopy(indexHtml, notFoundPage);
     }
@@ -224,7 +244,12 @@ const githubPagesDeployCommand = Command.extend({
     function addAndCommit() {
       return execPromise('git add .', execOptions)
         .then(() => execPromise(`git commit -m "${options.message}"`))
-        .catch(() => Promise.reject(new SilentError('No changes found. Deployment skipped.')));
+        .catch(() => {
+          let msg = 'No changes found. Deployment skipped.';
+          return returnStartingBranch()
+            .then(() => Promise.reject(new SilentError(msg)))
+            .catch(() => Promise.reject(new SilentError(msg.concat(branchErrMsg))));
+        });
     }
 
     function returnStartingBranch() {
@@ -232,7 +257,9 @@ const githubPagesDeployCommand = Command.extend({
     }
 
     function pushToGitRepo() {
-      return execPromise(`git push origin ${ghPagesBranch}:${destinationBranch}`);
+      return execPromise(`git push origin ${ghPagesBranch}:${destinationBranch}`)
+        .catch((err) => returnStartingBranch()
+          .catch(() => Promise.reject(err) ));
     }
 
     function printProjectUrl() {
@@ -251,8 +278,7 @@ const githubPagesDeployCommand = Command.extend({
         ui.writeLine(error.message);
         let msg = 'There was a permissions error during git file operations, ' +
           'please close any open project files/folders and try again.';
-        msg += `\nYou might also need to return to the ${initialBranch} branch manually.`;
-        return Promise.reject(new SilentError(msg));
+        return Promise.reject(new SilentError(msg.concat(branchErrMsg)));
       } else {
         return Promise.reject(error);
       }

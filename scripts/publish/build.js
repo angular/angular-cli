@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-/*eslint-disable no-console */
+/* eslint-disable no-console */
 const chalk = require('chalk');
 const denodeify = require('denodeify');
 const fs = require('fs');

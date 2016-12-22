@@ -75,7 +75,11 @@ npm install -g universal-cli
 ## Usage
 
 ```bash
+<<<<<<< HEAD
 ung --help
+=======
+ng help
+>>>>>>> upstream/master
 ```
 
 ### Generating and serving an Angular2 project via a development server
@@ -169,7 +173,7 @@ ung build
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
-- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json`
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `angular-cli.json`
 - use them via the `--env=NAME` flag on the build/serve commands.
 
 ### Base tag handling in index.html
@@ -194,6 +198,10 @@ ung test
 ```
 
 Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false` or `--single-run`.
+
+You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
+
+Linting during tests is also available via the `--lint` flag. See [Linting and formatting code](#linting-and-formatting-code) chapter for more informations.
 
 ### Running end-to-end tests
 
@@ -341,7 +349,7 @@ Universal-CLI supports all major CSS preprocessors:
 - less ([http://lesscss.org/](http://lesscss.org/))
 - stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
 
-To use these prepocessors simply add the file to your component's `styleUrls`:
+To use these preprocessors simply add the file to your component's `styleUrls`:
 
 ```javascript
 @Component({
@@ -380,14 +388,23 @@ npm install @types/d3 --save-dev
 
 If the library doesn't have typings available at `@types/`, you can still use it by
 manually adding typings for it:
-```
-// in src/typings.d.ts
-declare module 'typeless-package';
 
-// in src/app/app.component.ts
-import * as typelessPackage from 'typeless-package';
-typelessPackage.method();
-```
+1. First, create a `typings.d.ts` file in your `src/` folder. This file will be automatically included as global type definition.
+
+2. Then, in `src/typings.d.ts`, add the following code:
+
+  ```typescript
+  declare module 'typeless-package';
+  ```
+
+3. Finally, in the component or file that uses the library, add the following code:
+
+  ```typescript
+  import * as typelessPackage from 'typeless-package';
+  typelessPackage.method();
+  ```
+
+Done. Note: you might need or find useful to define more typings for the library that you're trying to use.
 
 ### Global Library Installation
 
@@ -395,7 +412,7 @@ Some javascript libraries need to be added to the global scope, and loaded as if
 they were in a script tag. We can do this using the `apps[0].scripts` and
 `apps[0].styles` properties of `angular-cli.json`.
 
-As an example, to use [Boostrap 4](http://v4-alpha.getbootstrap.com/) this is
+As an example, to use [Bootstrap 4](http://v4-alpha.getbootstrap.com/) this is
 what you need to do:
 
 First install Bootstrap from `npm`:

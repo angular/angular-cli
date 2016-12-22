@@ -41,7 +41,7 @@ export default function () {
     )
     .then(() => expectFileToMatch(
       `${getClientDist()}index.html`,
-      /styles\.[0-9a-f]{32}\.bundle\.css/)
+      /styles\.[0-9a-f]{20}\.bundle\.css/)
     )
 
     // Check that the process didn't change local files.

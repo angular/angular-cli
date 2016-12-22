@@ -2,6 +2,7 @@
  * the polyfills must be the first thing imported
  */
 import './polyfills.ts';
+import './__2.1.1.workaround.ts'; // temporary until 2.1.1 things are patched in Core
 import { enableProdMode } from '@angular/core';
 import { environment } from './environments/environment';
 import { platformUniversalDynamic } from 'angular2-universal';
@@ -16,9 +17,4 @@ if (environment.production) {
 
 const platformRef = platformUniversalDynamic();
 
-/**
- * bootstrap Angular 2 on document ready
- */
-document.addEventListener('DOMContentLoaded', () => {
-  platformRef.bootstrapModule(AppModule);
-});
+platformRef.bootstrapModule(AppModule);
