@@ -116,11 +116,6 @@ Command.prototype.validateAndRun = function(args) {
     return Promise.resolve('callHelp');
   }
 
-  this.analytics.track({
-    name:    'ember ',
-    message: this.name
-  });
-
   if (commandOptions === null) {
     return Promise.resolve();
   }

@@ -19,9 +19,6 @@ var Watcher = Task.extend({
   didError: function(error) {
     debug('didError %o', error);
     this.ui.writeError(error);
-    this.analytics.trackError({
-      description: error && error.message
-    });
   },
 
   then: function() {
@@ -34,18 +31,6 @@ var Watcher = Task.extend({
 
     this.ui.writeLine('');
     this.ui.writeLine(chalk.green('Build successful - ' + Math.round(totalTime) + 'ms.'));
-
-    this.analytics.track({
-      name:    'ember rebuild',
-      message: 'broccoli rebuild time: ' + totalTime + 'ms'
-    });
-
-    this.analytics.trackTiming({
-      category: 'rebuild',
-      variable: 'rebuild time',
-      label:    'broccoli rebuild time',
-      value:    parseInt(totalTime, 10)
-    });
   },
 
   on: function() {
