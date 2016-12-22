@@ -1000,8 +1000,7 @@ Blueprint.prototype.taskFor = function(dasherizedName) {
 
   return new Task({
     ui: this.ui,
-    project: this.project,
-    analytics: this.analytics
+    project: this.project
   });
 };
 

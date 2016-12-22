@@ -135,7 +135,6 @@ const ServeCommand = Command.extend({
 
         const serve = new ServeWebpackTask({
           ui: this.ui,
-          analytics: this.analytics,
           project: this.project,
         });
 

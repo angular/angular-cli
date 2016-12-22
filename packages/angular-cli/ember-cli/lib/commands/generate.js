@@ -42,7 +42,6 @@ module.exports = Command.extend({
     var Task = this.tasks.GenerateFromBlueprint;
     var task = new Task({
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project,
       testing: this.testing,
       settings: this.settings

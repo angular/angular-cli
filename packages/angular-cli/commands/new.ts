@@ -72,11 +72,10 @@ const NewCommand = Command.extend({
     }
 
     const createAndStepIntoDirectory =
-      new this.tasks.CreateAndStepIntoDirectory({ ui: this.ui, analytics: this.analytics });
+      new this.tasks.CreateAndStepIntoDirectory({ ui: this.ui });
 
     const initCommand = new InitCommand({
       ui: this.ui,
-      analytics: this.analytics,
       tasks: this.tasks,
       project: Project.nullProject(this.ui, this.cli)
     });
