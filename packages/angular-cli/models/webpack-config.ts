@@ -35,7 +35,8 @@ export class NgCliWebpackConfig {
     deployUrl?: string,
     outputHashing?: string
   ) {
-    const appConfig = CliConfig.fromProject().config.apps[0];
+    const cliConfig = CliConfig.fromProject().config;
+    const appConfig = cliConfig.apps[0];
     const projectRoot = this.ngCliProject.root;
 
     appConfig.outDir = outputDir || appConfig.outDir;
@@ -45,6 +46,7 @@ export class NgCliWebpackConfig {
       projectRoot,
       environment,
       appConfig,
+      cliConfig,
       baseHref,
       sourcemap,
       vendorChunk,

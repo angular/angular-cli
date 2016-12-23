@@ -5,8 +5,10 @@ import { SuppressEntryChunksWebpackPlugin } from '../plugins/suppress-entry-chun
 import { packageChunkSort } from '../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
 import { extraEntryParser, makeCssLoaders, getOutputHashFormat } from './webpack-build-utils';
+import { CliConfig } from '../lib/config/schema.d';
 
 const autoprefixer = require('autoprefixer');
+const postcssDiscardComments = require('postcss-discard-comments');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -28,6 +30,7 @@ export function getWebpackCommonConfig(
   projectRoot: string,
   environment: string,
   appConfig: any,
+  cliConfig: CliConfig,
   baseHref: string,
   sourcemap: boolean,
   vendorChunk: boolean,
@@ -47,6 +50,39 @@ export function getWebpackCommonConfig(
 
   if (appConfig.main) {
     entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
+  }
+
+  // Configure webpack style loaders
+
+  /**
+   * Base settings for webpack preprocessor loaders
+   * @type {Object}
+   */
+  const basePreprocessorLoaderOptions = {
+    sourceMap: sourcemap,
+  };
+
+  // set default to base
+  let preprocessorLoaderOptions = basePreprocessorLoaderOptions;
+
+  if (appConfig.webpackStyleLoaderOptions) {
+    if (appConfig.webpackStyleLoaderOptions.includePaths) {
+      // resolve paths relative to project root
+      let includePaths = appConfig.webpackStyleLoaderOptions.includePaths.map(
+        (includePath: string) => path.resolve(projectRoot, includePath)
+      );
+      if (cliConfig.defaults.styleExt === 'styl' || cliConfig.defaults.styleExt === 'less')  {
+        // stylus and less uses paths
+        preprocessorLoaderOptions = Object.assign({}, basePreprocessorLoaderOptions, {
+          paths: includePaths
+        });
+      } else {
+        // sass use includePaths
+        preprocessorLoaderOptions = Object.assign({}, basePreprocessorLoaderOptions, {
+          includePaths
+        });
+      }
+    }
   }
 
   // determine hashing format
@@ -191,11 +227,15 @@ export function getWebpackCommonConfig(
       new webpack.LoaderOptionsPlugin({
         test: /\.(css|scss|sass|less|styl)$/,
         options: {
-          postcss: [autoprefixer()],
-          cssLoader: { sourceMap: sourcemap },
-          sassLoader: { sourceMap: sourcemap },
-          lessLoader: { sourceMap: sourcemap },
-          stylusLoader: { sourceMap: sourcemap },
+          postcss: [
+            autoprefixer(),
+            // NOTE: Moved check here for prod build
+            ...(environment === 'prod' ? [postcssDiscardComments] : [])
+          ],
+          cssLoader: preprocessorLoaderOptions,
+          sassLoader: preprocessorLoaderOptions,
+          lessLoader: preprocessorLoaderOptions,
+          stylusLoader: preprocessorLoaderOptions,
           // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
           context: projectRoot,
         },
