@@ -31,7 +31,6 @@ function clientId() {
 // Options: Array cliArgs, Stream inputStream, Stream outputStream
 module.exports = function(options) {
   var UI = options.UI || require('../ui');
-  var Leek = options.Leek || require('leek');
   var Yam = options.Yam || require('yam');
 
   // TODO: one UI (lib/models/project.js also has one for now...)
@@ -48,39 +47,12 @@ module.exports = function(options) {
     primary: Project.getProjectRoot()
   });
 
-  var leekOptions;
-
-  var disableAnalytics = options.cliArgs &&
-    (options.cliArgs.indexOf('--disable-analytics') > -1 ||
-    options.cliArgs.indexOf('-v') > -1 ||
-    options.cliArgs.indexOf('--version') > -1) ||
-    config.get('disableAnalytics');
-
-  var defaultLeekOptions = {
-    trackingCode: trackingCode,
-    globalName:   name,
-    name:         clientId(),
-    version:      version,
-    silent:       disableAnalytics
-  };
-
   var defaultUpdateCheckerOptions = {
     checkForUpdates: false
   };
 
-  if (config.get('leekOptions')) {
-    leekOptions = merge(defaultLeekOptions, config.get('leekOptions'));
-  } else {
-    leekOptions = defaultLeekOptions;
-  }
-
-  debug('leek: %o', leekOptions);
-
-  var leek = new Leek(leekOptions);
-
   var cli = new CLI({
     ui:        ui,
-    analytics: leek,
     testing:   options.testing,
     name: options.cli ? options.cli.name : 'ember',
     disableDependencyChecker: options.disableDependencyChecker,

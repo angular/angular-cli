@@ -39,7 +39,6 @@ const NgCliTestCommand = TestCommand.extend({
 
     const testTask = new TestTask({
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project
     });
 

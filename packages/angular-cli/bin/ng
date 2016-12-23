@@ -6,7 +6,6 @@ process.title = 'angular-cli';
 
 const resolve = require('resolve');
 const packageJson = require('../package.json');
-const Leek = require('leek');
 const Version = require('../upgrade/version').Version;
 
 
@@ -35,18 +34,9 @@ resolve('angular-cli', { basedir: process.cwd() },
     cli({
       cliArgs: process.argv.slice(2),
       inputStream: process.stdin,
-      outputStream: process.stdout,
-      Leek: CustomLeek
+      outputStream: process.stdout
     }).then(function (result) {
       var exitCode = typeof result === 'object' ? result.exitCode : result;
       process.exit(exitCode);
     });
-
-    function CustomLeek(options) {
-      options.trackingCode = packageJson.trackingCode;
-      options.globalName = packageJson.name;
-      options.name = packageJson.name;
-      options.version = packageJson.version;
-      return new Leek(options);
-    }
   });
