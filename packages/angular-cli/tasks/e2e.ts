@@ -10,7 +10,7 @@ export const E2eTask = Task.extend({
     let exitCode = 0;
 
     if (options.suite) {
-      commandArgs.push(`--suite=${options.suite}`);
+      commandArgs.push(`--suite="${options.suite}"`);
     }
 
     return new Promise((resolve) => {
