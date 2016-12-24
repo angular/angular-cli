@@ -83,7 +83,7 @@ describe('Acceptance: ng new', function () {
   });
 
   it('ng new foo, where foo does not yet exist, works', function () {
-    return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(confirmBlueprinted);
+    return ng(['new', 'foo', '--skip-npm']).then(confirmBlueprinted);
   });
 
   it('ng new with empty app does throw exception', function () {
@@ -95,7 +95,7 @@ describe('Acceptance: ng new', function () {
   });
 
   it('ng new with app name creates new directory and has a dasherized package name', function () {
-    return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
+    return ng(['new', 'FooApp', '--skip-npm', '--skip-git']).then(function () {
       expect(!existsSync('FooApp'));
 
       const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -104,7 +104,7 @@ describe('Acceptance: ng new', function () {
   });
 
   it('ng new has a .editorconfig file', function () {
-    return ng(['new', 'FooApp', '--skip-npm', '--skip-bower', '--skip-git']).then(function () {
+    return ng(['new', 'FooApp', '--skip-npm', '--skip-git']).then(function () {
       expect(!existsSync('FooApp'));
 
       const editorConfig = fs.readFileSync('.editorconfig', 'utf8');
@@ -113,9 +113,9 @@ describe('Acceptance: ng new', function () {
   });
 
   it('Cannot run ng new, inside of angular-cli project', function () {
-    return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git'])
+    return ng(['new', 'foo', '--skip-npm', '--skip-git'])
       .then(function () {
-        return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git']).then(() => {
+        return ng(['new', 'foo', '--skip-npm', '--skip-git']).then(() => {
           throw new SilentError('Cannot run ng new, inside of ember-cli project should fail.');
         }, () => {
           expect(!existsSync('foo'));
@@ -125,7 +125,7 @@ describe('Acceptance: ng new', function () {
   });
 
   it('ng new without skip-git flag creates .git dir', function () {
-    return ng(['new', 'foo', '--skip-npm', '--skip-bower']).then(function () {
+    return ng(['new', 'foo', '--skip-npm']).then(function () {
       expect(existsSync('.git'));
     });
   });
@@ -140,7 +140,7 @@ describe('Acceptance: ng new', function () {
   });
 
   it('ng new with --directory uses given directory name and has correct package name', function () {
-    return ng(['new', 'foo', '--skip-npm', '--skip-bower', '--skip-git', '--directory=bar'])
+    return ng(['new', 'foo', '--skip-npm', '--skip-git', '--directory=bar'])
       .then(function () {
         const cwd = process.cwd();
         expect(cwd).to.not.match(/foo/, 'does not use app name for directory name');

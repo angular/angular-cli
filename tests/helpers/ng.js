@@ -1,7 +1,6 @@
 'use strict';
 
 var MockUI = require('./mock-ui');
-var MockAnalytics = require('./mock-analytics');
 var Cli = require('angular-cli/lib/cli');
 
 module.exports = function ng(args) {
@@ -13,7 +12,6 @@ module.exports = function ng(args) {
     inputStream: [],
     outputStream: [],
     cliArgs: args,
-    Leek: MockAnalytics,
     UI: MockUI,
     testing: true
   });

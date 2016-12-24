@@ -1,5 +1,10 @@
 /*eslint-disable no-console */
 
+// Prevent the dependency validation from tripping because we don't import zone.js. We need
+// it as a peer dependency of @angular/core.
+// require('zone.js')
+
+
 // This file hooks up on require calls to transpile TypeScript.
 const cli = require('../../ember-cli/lib/cli');
 const UI = require('../../ember-cli/lib/ui');
