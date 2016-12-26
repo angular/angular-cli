@@ -87,6 +87,27 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
   refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
 }
 
+export function removeModuleIdOnlyForTesting(refactor: TypeScriptFileRefactor) {
+  _removeModuleId(refactor);
+}
+
+function _removeModuleId(refactor: TypeScriptFileRefactor) {
+  const sourceFile = refactor.sourceFile;
+
+  refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
+    // Get all their property assignments.
+    .filter((node: ts.ObjectLiteralExpression) =>
+      node.properties.some(prop => prop.name.getText() == 'moduleId'))
+    .forEach((node: ts.ObjectLiteralExpression) => {
+      const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, idx: number) => {
+        return prop.name.getText() == 'moduleId';
+      })[0];
+      // get the trailing comma
+      const moduleIdCommaProp = moduleIdProp.parent.getChildAt(1).getChildren()[1];
+      refactor.removeNodes(moduleIdProp, moduleIdCommaProp);
+    });
+}
+
 function _replaceResources(refactor: TypeScriptFileRefactor): void {
   const sourceFile = refactor.sourceFile;
 
@@ -163,7 +184,9 @@ export function ngcLoader(source: string) {
             .then(() => _removeDecorators(refactor))
             .then(() => _replaceBootstrap(plugin, refactor));
         } else {
-          return _replaceResources(refactor);
+          return Promise.resolve()
+            .then(() => _replaceResources(refactor))
+            .then(() => _removeModuleId(refactor));
         }
       })
       .then(() => {

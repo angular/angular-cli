@@ -116,11 +116,6 @@ Command.prototype.validateAndRun = function(args) {
     return Promise.resolve('callHelp');
   }
 
-  this.analytics.track({
-    name:    'ember ',
-    message: this.name
-  });
-
   if (commandOptions === null) {
     return Promise.resolve();
   }
@@ -430,7 +425,7 @@ Command.prototype.printBasicHelp = function() {
   if (this.isRoot) {
     output = 'Usage: ' + this.name;
   } else {
-    output = 'ember ' + this.name;
+    output = 'ng ' + this.name;
   }
 
   output += this._printCommand();

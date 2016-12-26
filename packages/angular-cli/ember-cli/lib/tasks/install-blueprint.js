@@ -26,7 +26,6 @@ module.exports = Task.extend({
       target: target,
       entity: { name: name },
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project,
       dryRun: options.dryRun,
       targetFiles: options.targetFiles,

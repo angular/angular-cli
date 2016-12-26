@@ -3158,15 +3158,6 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-leek@0.0.21:
-  version "0.0.21"
-  resolved "https://registry.yarnpkg.com/leek/-/leek-0.0.21.tgz#09804bf70f8aefbba745f5d56d2a4debf22711ff"
-  dependencies:
-    debug "^2.1.0"
-    lodash.assign "^3.2.0"
-    request "^2.27.0"
-    rsvp "^3.0.21"
-
 less-loader@^2.2.3:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-2.2.3.tgz#b6d8f8139c8493df09d992a93a00734b08f84528"
