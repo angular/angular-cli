@@ -169,6 +169,10 @@ export class TypeScriptFileRefactor {
     this._changed = true;
   }
 
+  removeNodes(...nodes: ts.Node[]) {
+    nodes.forEach(node => this.removeNode(node));
+  }
+
   replaceNode(node: ts.Node, replacement: string) {
     let replaceSymbolName: boolean = node.kind === ts.SyntaxKind.Identifier;
     this._sourceString.overwrite(node.getStart(this._sourceFile),

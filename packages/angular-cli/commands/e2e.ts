@@ -11,7 +11,6 @@ const E2eCommand = Command.extend({
 
     const e2eTask = new E2eTask({
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project
     });
 

@@ -109,7 +109,6 @@ const githubPagesDeployCommand = Command.extend({
 
     const buildTask = new WebpackBuild({
       ui: this.ui,
-      analytics: this.analytics,
       cliProject: this.project,
       target: options.target,
       environment: options.environment,
@@ -133,7 +132,6 @@ const githubPagesDeployCommand = Command.extend({
 
     const createGithubRepoTask = new CreateGithubRepo({
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project
     });
 
