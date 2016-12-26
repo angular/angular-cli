@@ -137,7 +137,8 @@ export function getWebpackCommonConfig(
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
         chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main']),
-        excludeChunks: lazyChunks
+        excludeChunks: lazyChunks,
+        xhtml: true
       }),
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
