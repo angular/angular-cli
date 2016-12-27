@@ -39,7 +39,7 @@ export default function () {
     .then(() => expectFileToMatch('dist/common-entry.bundle.css', '.common-entry-style'))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <link href="common-entry.bundle.css" rel="stylesheet">
+      <link href="common-entry.bundle.css" rel="stylesheet"/>
     `))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
       <script type="text/javascript" src="inline.bundle.js"></script>
