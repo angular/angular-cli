@@ -233,7 +233,7 @@ now run it with `npm start`
 Webpack dev server allows us to modify the ExpressJS `app` object using the `setup` method.
 We do this by passing a file to `--server-config`
 
-We create a file next to the projects `package.json` called `server.conf.js` with the content
+We create a file next to the project's `package.json` called `server.conf.js` with the content
 
 ```json
 module.exports = function(app){

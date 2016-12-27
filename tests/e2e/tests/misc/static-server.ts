@@ -6,7 +6,6 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default function() {
-  // const app = express();
   const serverConfigFile = 'server.config.js';
   const serverConfig = `module.exports = function(app){ 
     app.get('/api/test', function(req, res){
