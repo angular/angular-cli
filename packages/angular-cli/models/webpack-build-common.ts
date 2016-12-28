@@ -52,17 +52,17 @@ export function getWebpackCommonConfig(
 
   // process global scripts
   if (appConfig.scripts.length > 0) {
-    const globalScrips = extraEntryParser(appConfig.scripts, appRoot, 'scripts');
+    const globalScripts = extraEntryParser(appConfig.scripts, appRoot, 'scripts');
 
     // add entry points and lazy chunks
-    globalScrips.forEach(script => {
+    globalScripts.forEach(script => {
       if (script.lazy) { lazyChunks.push(script.entry); }
       entryPoints[script.entry] = (entryPoints[script.entry] || []).concat(script.path);
     });
 
     // load global scripts using script-loader
     extraRules.push({
-      include: globalScrips.map((script) => script.path), test: /\.js$/, loader: 'script-loader'
+      include: globalScripts.map((script) => script.path), test: /\.js$/, loader: 'script-loader'
     });
   }
 
