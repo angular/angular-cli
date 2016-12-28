@@ -13,7 +13,8 @@ module.exports = {
     { name: 'mobile', type: Boolean, default: false },
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
-    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
+    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
+    { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] }
   ],
 
   beforeInstall: function(options) {
@@ -71,6 +72,9 @@ module.exports = {
     }
     if (this.options && this.options.inlineStyle) {
       fileList = fileList.filter(p => p.indexOf('app.component.__styleext__') < 0);
+    }
+    if (this.options && this.options.skipGit) {
+      fileList = fileList.filter(p => p.indexOf('gitignore') < 0);
     }
 
     return fileList;
