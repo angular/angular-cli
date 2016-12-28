@@ -22,6 +22,7 @@
     "paths": {
       "@angular-cli/ast-tools": [ "../../dist/@angular-cli/ast-tools/src" ],
       "@angular-cli/base-href-webpack": [ "../../dist/@angular-cli/base-href-webpack/src" ],
+      "@angular-cli/version": [ "../../dist/@angular-cli/version/src" ],
       "@ngtools/webpack": [ "../../dist/@ngtools/webpack/src" ]
     }
   },

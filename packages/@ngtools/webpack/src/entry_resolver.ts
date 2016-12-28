@@ -130,7 +130,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
                                            program: ts.Program) {
   const source = new TypeScriptFileRefactor(mainPath, host, program);
 
-  const bootstrap = source.findAstNodes(source.sourceFile, ts.SyntaxKind.CallExpression, false)
+  const bootstrap = source.findAstNodes(source.sourceFile, ts.SyntaxKind.CallExpression, true)
     .map(node => node as ts.CallExpression)
     .filter(call => {
       const access = call.expression as ts.PropertyAccessExpression;

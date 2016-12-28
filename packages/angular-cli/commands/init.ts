@@ -92,7 +92,8 @@ const InitCommand: any = Command.extend({
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,
-      ignoredUpdateFiles: ['favicon.ico']
+      ignoredUpdateFiles: ['favicon.ico'],
+      skipGit: commandOptions.skipGit
     };
 
     if (!validProjectName(packageName)) {
