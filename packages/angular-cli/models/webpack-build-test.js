@@ -58,7 +58,8 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
         tslint: {
           emitErrors: false,
           failOnHint: false,
-          resourcePath: `./${appConfig.root}`
+          resourcePath: `./${appConfig.root}`,
+          typeCheck: true
         }
       }
     }))
