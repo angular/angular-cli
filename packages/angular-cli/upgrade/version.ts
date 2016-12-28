@@ -1,8 +1,11 @@
-import {CliConfig} from '../models/config';
-import {readFileSync, existsSync} from 'fs';
-import {stripIndents} from 'common-tags';
+import {SemVer} from 'semver';
 import {bold, red, yellow} from 'chalk';
+import {stripIndents} from 'common-tags';
+import {readFileSync, existsSync} from 'fs';
 import * as path from 'path';
+
+import {CliConfig} from '../models/config';
+
 const resolve = require('resolve');
 
 
@@ -32,12 +35,9 @@ function _hasOldCliBuildFile() {
 
 
 export class Version {
-  constructor(private _version: string = null) {}
-
-  private _parse() {
-    return this.isKnown()
-      ? this._version.match(/^(\d+)\.(\d+)(?:\.(\d+))?(?:-(alpha|beta|rc)\.(.*))?$/).slice(1)
-      : [];
+  private _semver: SemVer = null;
+  constructor(private _version: string = null) {
+    this._semver = _version && new SemVer(_version);
   }
 
   isAlpha() { return this.qualifier == 'alpha'; }
@@ -47,11 +47,11 @@ export class Version {
 
   isLocal() { return this.isKnown() && path.isAbsolute(this._version); }
 
-  get major() { return this._parse()[0] || 0; }
-  get minor() { return this._parse()[1] || 0; }
-  get patch() { return this._parse()[2] || 0; }
-  get qualifier() { return this._parse()[3] || ''; }
-  get extra() { return this._parse()[4] || ''; }
+  get major() { return this._semver ? this._semver.major : 0; }
+  get minor() { return this._semver ? this._semver.minor : 0; }
+  get patch() { return this._semver ? this._semver.patch : 0; }
+  get qualifier() { return this._semver ? this._semver.prerelease[0] : ''; }
+  get extra() { return this._semver ? this._semver.prerelease[1] : ''; }
 
   toString() { return this._version; }
 
