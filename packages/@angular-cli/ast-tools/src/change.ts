@@ -1,8 +1,8 @@
 import fs = require('fs');
 import denodeify = require('denodeify');
 
-const readFile = (denodeify(fs.readFile) as (...args: any[]) => Promise<string>);
-const writeFile = (denodeify(fs.writeFile) as (...args: any[]) => Promise<string>);
+const readFile = (denodeify(fs.readFile) as (...args: any[]) => Promise<any>);
+const writeFile = (denodeify(fs.writeFile) as (...args: any[]) => Promise<any>);
 
 export interface Host {
   write(path: string, content: string): Promise<void>;
