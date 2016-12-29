@@ -19,6 +19,7 @@ export interface BuildOptions {
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
+  deployUrl?: string;
 }
 
 const BuildCommand = Command.extend({
@@ -46,7 +47,8 @@ const BuildCommand = Command.extend({
     { name: 'progress',       type: Boolean, default: true },
     { name: 'i18n-file',      type: String, default: null },
     { name: 'i18n-format',    type: String, default: null },
-    { name: 'locale',         type: String, default: null }
+    { name: 'locale',         type: String, default: null },
+    { name: 'deploy-url',     type: String,  default: null, aliases: ['d'] }
   ],
 
   run: function (commandOptions: BuildOptions) {
