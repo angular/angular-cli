@@ -46,9 +46,9 @@ export default function () {
     .then(() => expectToFail(() => expectFileToExist('dist/renamed-lazy-styles.bundle.js')))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <link href="renamed-style.bundle.css" rel="stylesheet">
-      <link href="styles.bundle.css" rel="stylesheet">
-      <link href="common-entry.bundle.css" rel="stylesheet">
+      <link href="renamed-style.bundle.css" rel="stylesheet"/>
+      <link href="styles.bundle.css" rel="stylesheet"/>
+      <link href="common-entry.bundle.css" rel="stylesheet"/>
     `))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
       <script type="text/javascript" src="inline.bundle.js"></script>

@@ -14,8 +14,6 @@ var assign             = require('lodash/assign');
 var forOwn             = require('lodash/forOwn');
 var merge              = require('lodash/merge');
 var debug              = require('debug')('ember-cli:project');
-var AddonDiscovery     = require('../models/addon-discovery');
-var AddonsFactory      = require('../models/addons-factory');
 var Command            = require('../models/command');
 var UI                 = require('../ui');
 var nodeModulesPath    = require('node-modules-path');
@@ -42,8 +40,6 @@ function Project(root, pkg, ui, cli) {
   this.addons = [];
   this.liveReloadFilterPatterns = [];
   this.setupNodeModulesPath();
-  this.addonDiscovery = new AddonDiscovery(this.ui);
-  this.addonsFactory = new AddonsFactory(this, this);
   this._watchmanInfo = {
     enabled: false,
     version: null,
@@ -286,19 +282,6 @@ Project.prototype.supportedInternalAddonPaths = function() {
 };
 
 /**
-  Discovers all addons for this project and stores their names and
-  package.json contents in this.addonPackages as key-value pairs
-
-  @private
-  @method discoverAddons
- */
-Project.prototype.discoverAddons = function() {
-  var addonsList = this.addonDiscovery.discoverProjectAddons(this);
-
-  this.addonPackages = this.addonDiscovery.addonPackages(addonsList);
-};
-
-/**
   Loads and initializes all addons for this project.
 
   @private
@@ -312,13 +295,16 @@ Project.prototype.initializeAddons = function() {
 
   debug('initializeAddons for: %s', this.name());
 
-  this.discoverAddons();
-
-  this.addons = this.addonsFactory.initializeAddons(this.addonPackages);
-
-  this.addons.forEach(function(addon) {
-    debug('addon: %s', addon.name);
+  const cliPkg = require(path.resolve(__dirname, '../../../package.json'));
+  const Addon = require('../models/addon');
+  const Constructor = Addon.lookup({
+    name: 'angular-cli',
+    path: path.join(__dirname, '../../../'),
+    pkg: cliPkg,
   });
+
+  const addon = new Constructor(this.addonParent, this);
+  this.addons = [addon];
 };
 
 /**

@@ -1,24 +1,24 @@
-/*eslint-disable no-console */
-'use strict';
-require('../lib/bootstrap-local');
+// This may seem awkward but we're using Logger in our e2e. At this point the unit tests
+// have run already so it should be "safe", teehee.
+import {
+  ConsoleLoggerStack,
+  LogEntry,
+  IndentLogger,
+  NullLogger
+} from '../packages/@ngtools/logger/src/index';
+import {blue, bold, green, red, yellow, white} from 'chalk';
+import {gitClean} from './e2e/utils/git';
+import * as glob from 'glob';
+import * as minimist from 'minimist';
+import * as path from 'path';
+import {setGlobalVariable} from './e2e/utils/env';
+
+// RxJS
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/observable/empty';
+
 
 Error.stackTraceLimit = Infinity;
-
-/**
- * This file is ran using the command line, not using Jasmine / Mocha.
- */
-const chalk = require('chalk');
-const gitClean = require('./e2e/utils/git').gitClean;
-const glob = require('glob');
-const minimist = require('minimist');
-const path = require('path');
-const blue = chalk.blue;
-const bold = chalk.bold;
-const green = chalk.green;
-const red = chalk.red;
-const white = chalk.white;
-
-const setGlobalVariable = require('./e2e/utils/env').setGlobalVariable;
 
 
 /**
@@ -35,7 +35,7 @@ const setGlobalVariable = require('./e2e/utils/env').setGlobalVariable;
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = minimist(process.argv.slice(2), {
-  'boolean': ['debug', 'nolink', 'nightly', 'noproject'],
+  'boolean': ['debug', 'nolink', 'nightly', 'noproject', 'verbose'],
   'string': ['reuse', 'ng-sha']
 });
 
@@ -52,14 +52,30 @@ const argv = minimist(process.argv.slice(2), {
 process.exitCode = 255;
 
 
+ConsoleLoggerStack.start(new IndentLogger('name'))
+  .filter((entry: LogEntry) => (entry.level != 'debug' || argv.verbose))
+  .subscribe((entry: LogEntry) => {
+    let color: (s: string) => string = white;
+    let output = process.stdout;
+    switch (entry.level) {
+      case 'info': color = white; break;
+      case 'warn': color = yellow; break;
+      case 'error': color = red; output = process.stderr; break;
+      case 'fatal': color = (x: string) => bold(red(x)); output = process.stderr; break;
+    }
+
+    output.write(color(entry.message) + '\n');
+  });
+
+
 let currentFileName = null;
 let index = 0;
 
 const e2eRoot = path.join(__dirname, 'e2e');
-const allSetups = glob.sync(path.join(e2eRoot, 'setup/**/*'), { nodir: true })
+const allSetups = glob.sync(path.join(e2eRoot, 'setup/**/*.ts'), { nodir: true })
   .map(name => path.relative(e2eRoot, name))
   .sort();
-const allTests = glob.sync(path.join(e2eRoot, 'tests/**/*'), { nodir: true })
+const allTests = glob.sync(path.join(e2eRoot, 'tests/**/*.ts'), { nodir: true })
   .map(name => path.relative(e2eRoot, name))
   .sort();
 
@@ -73,8 +89,8 @@ const testsToRun = allSetups
 
       return argv._.some(argName => {
         return path.join(process.cwd(), argName) == path.join(__dirname, 'e2e', name)
-            || argName == name
-            || argName == name.replace(/\.ts$/, '');
+          || argName == name
+          || argName == name.replace(/\.ts$/, '');
       });
     }));
 
@@ -103,19 +119,21 @@ testsToRun.reduce((previous, relativeName) => {
     const start = +new Date();
 
     const module = require(absoluteName);
-    const fn = (typeof module == 'function') ? module
+    const fn: (...args: any[]) => Promise<any> | any =
+      (typeof module == 'function') ? module
       : (typeof module.default == 'function') ? module.default
-      : function() {
-        throw new Error('Invalid test module.');
-      };
+      : () => { throw new Error('Invalid test module.'); };
 
     let clean = true;
     let previousDir = null;
     return Promise.resolve()
       .then(() => printHeader(currentFileName))
       .then(() => previousDir = process.cwd())
+      .then(() => ConsoleLoggerStack.push(currentFileName))
       .then(() => fn(() => clean = false))
-      .then(() => console.log('  ----'))
+      .then(() => ConsoleLoggerStack.pop(), (err: any) => { ConsoleLoggerStack.pop(); throw err; })
+      .then(() => console.log('----'))
+      .then(() => { ConsoleLoggerStack.push(NullLogger); })
       .then(() => {
         // If we're not in a setup, change the directory back to where it was before the test.
         // This allows tests to chdir without worrying about keeping the original directory.
@@ -130,36 +148,37 @@ testsToRun.reduce((previous, relativeName) => {
           return gitClean();
         }
       })
+      .then(() => ConsoleLoggerStack.pop(), (err: any) => { ConsoleLoggerStack.pop(); throw err; })
       .then(() => printFooter(currentFileName, start),
-            (err) => {
-              printFooter(currentFileName, start);
-              console.error(err);
-              throw err;
-            });
+        (err) => {
+          printFooter(currentFileName, start);
+          console.error(err);
+          throw err;
+        });
   });
 }, Promise.resolve())
-.then(() => {
-  console.log(green('Done.'));
-  process.exit(0);
-},
-(err) => {
-  console.log('\n');
-  console.error(red(`Test "${currentFileName}" failed...`));
-  console.error(red(err.message));
-  console.error(red(err.stack));
+  .then(() => {
+      console.log(green('Done.'));
+      process.exit(0);
+    },
+    (err) => {
+      console.log('\n');
+      console.error(red(`Test "${currentFileName}" failed...`));
+      console.error(red(err.message));
+      console.error(red(err.stack));
 
-  if (argv.debug) {
-    console.log(`Current Directory: ${process.cwd()}`);
-    console.log('Will loop forever while you debug... CTRL-C to quit.');
+      if (argv.debug) {
+        console.log(`Current Directory: ${process.cwd()}`);
+        console.log('Will loop forever while you debug... CTRL-C to quit.');
 
-    /* eslint-disable no-constant-condition */
-    while (1) {
-      // That's right!
-    }
-  }
+        /* eslint-disable no-constant-condition */
+        while (1) {
+          // That's right!
+        }
+      }
 
-  process.exit(1);
-});
+      process.exit(1);
+    });
 
 
 function encode(str) {
