@@ -46,6 +46,9 @@ export class Version {
   isKnown() { return this._version !== null; }
 
   isLocal() { return this.isKnown() && path.isAbsolute(this._version); }
+  isGreaterThanOrEqualTo(other: SemVer) {
+    return this._semver.compare(other) >= 0;
+  }
 
   get major() { return this._semver ? this._semver.major : 0; }
   get minor() { return this._semver ? this._semver.minor : 0; }
@@ -105,7 +108,7 @@ export class Version {
       if (v.isLocal()) {
         console.warn(yellow('Using a local version of angular. Proceeding with care...'));
       } else {
-        if (v.major != 2 || ((v.minor == 3 && v.patch == 0) || v.minor < 3)) {
+        if (!v.isGreaterThanOrEqualTo(new SemVer('2.3.1'))) {
           console.error(bold(red(stripIndents`
             This version of CLI is only compatible with angular version 2.3.1 or better. Please
             upgrade your angular version, e.g. by running:
@@ -129,7 +132,7 @@ export class Version {
         It seems like you're using a project generated using an old version of the Angular CLI.
         The latest CLI now uses webpack and has a lot of improvements including a simpler
         workflow, a faster build, and smaller bundles.
-        
+
         To get more info, including a step-by-step guide to upgrade the CLI, follow this link:
         https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14
       ` + '\n')));
