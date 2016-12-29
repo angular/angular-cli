@@ -1,6 +1,6 @@
 {
   "name": "universal-cli",
-  "version": "1.0.0-alpha.universal.2-2",
+  "version": "1.0.0-alpha.universal.3",
   "cliVersion": "1.0.0-beta.23",
   "description": "CLI tool for Angular with Angular Universal support",
   "main": "lib/cli/index.js",

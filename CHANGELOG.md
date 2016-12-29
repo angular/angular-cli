@@ -1,3 +1,72 @@
+<a name="1.0.0-alpha.universal.3"></a>
+# [1.0.0-alpha.universal.3](https://github.com/devCrossNet/universal-cli/compare/v1.0.0-alpha.universal.2-2...v1.0.0-alpha.universal.3) (2016-12-29)
+
+
+### Bug Fixes
+
+* **@ngtools/webpack:** fixed path resolution for entry modules and lazy routes ([#3332](https://github.com/devCrossNet/universal-cli/issues/3332)) ([45d5154](https://github.com/devCrossNet/universal-cli/commit/45d5154))
+* **@ngtools/webpack:** keep the decorators in. ([#3583](https://github.com/devCrossNet/universal-cli/issues/3583)) ([db25183](https://github.com/devCrossNet/universal-cli/commit/db25183))
+* **@ngtools/webpack:** performance improvement. ([#3360](https://github.com/devCrossNet/universal-cli/issues/3360)) ([4dcfe27](https://github.com/devCrossNet/universal-cli/commit/4dcfe27))
+* **@ngtools/webpack:** report errors during codegen ([#3608](https://github.com/devCrossNet/universal-cli/issues/3608)) ([0f604ac](https://github.com/devCrossNet/universal-cli/commit/0f604ac))
+* **@ngtools/webpack:** use tsconfig declaration flag to report decl errors ([#3499](https://github.com/devCrossNet/universal-cli/issues/3499)) ([c46de15](https://github.com/devCrossNet/universal-cli/commit/c46de15))
+* **aot:** lock the angular version to 2.2.1. ([#3242](https://github.com/devCrossNet/universal-cli/issues/3242)) ([6e8a848](https://github.com/devCrossNet/universal-cli/commit/6e8a848))
+* **blueprints:** remove app root barrel ([#3530](https://github.com/devCrossNet/universal-cli/issues/3530)) ([3329d46](https://github.com/devCrossNet/universal-cli/commit/3329d46)), closes [#3369](https://github.com/devCrossNet/universal-cli/issues/3369)
+* **build:** added autoprefixer to prod ([1648d51](https://github.com/devCrossNet/universal-cli/commit/1648d51)), closes [#3156](https://github.com/devCrossNet/universal-cli/issues/3156) [#3164](https://github.com/devCrossNet/universal-cli/issues/3164)
+* **build:** don't inline sourcemaps ([#3262](https://github.com/devCrossNet/universal-cli/issues/3262)) ([859d905](https://github.com/devCrossNet/universal-cli/commit/859d905))
+* **build:** pin [@types](https://github.com/types)/lodash ([#3465](https://github.com/devCrossNet/universal-cli/issues/3465)) ([9b65481](https://github.com/devCrossNet/universal-cli/commit/9b65481))
+* **build:** use custom index value when copying to 404.html during github deploy ([#3201](https://github.com/devCrossNet/universal-cli/issues/3201)) ([b1cbf17](https://github.com/devCrossNet/universal-cli/commit/b1cbf17))
+* **completion:** Update with the new help command ([#3479](https://github.com/devCrossNet/universal-cli/issues/3479)) ([0b5dc74](https://github.com/devCrossNet/universal-cli/commit/0b5dc74))
+* **dependencies:** reduce the dependencies further. ([#3488](https://github.com/devCrossNet/universal-cli/issues/3488)) ([901a64f](https://github.com/devCrossNet/universal-cli/commit/901a64f))
+* **deploy:** clean up gh-pages obsolete files ([#3081](https://github.com/devCrossNet/universal-cli/issues/3081)) ([#3333](https://github.com/devCrossNet/universal-cli/issues/3333)) ([51869fb](https://github.com/devCrossNet/universal-cli/commit/51869fb))
+* **deploy:** gh-pages checkout initial branch on error ([#3378](https://github.com/devCrossNet/universal-cli/issues/3378)) ([c5cd095](https://github.com/devCrossNet/universal-cli/commit/c5cd095)), closes [#3030](https://github.com/devCrossNet/universal-cli/issues/3030) [#2663](https://github.com/devCrossNet/universal-cli/issues/2663) [#1259](https://github.com/devCrossNet/universal-cli/issues/1259)
+* **deploy:** gh-pages deploy fail after repo create ([#3386](https://github.com/devCrossNet/universal-cli/issues/3386)) ([0a68cc5](https://github.com/devCrossNet/universal-cli/commit/0a68cc5)), closes [#3385](https://github.com/devCrossNet/universal-cli/issues/3385)
+* **deps:** lock [@ngtools](https://github.com/ngtools)/webpack version ([758f1ea](https://github.com/devCrossNet/universal-cli/commit/758f1ea))
+* **deps:** upgrade node-sass & sass-loader ([fa74f3f](https://github.com/devCrossNet/universal-cli/commit/fa74f3f)), closes [#44](https://github.com/devCrossNet/universal-cli/issues/44)
+* **editorconfig:** use off instead of 0 for max line length ([#3186](https://github.com/devCrossNet/universal-cli/issues/3186)) ([f833d25](https://github.com/devCrossNet/universal-cli/commit/f833d25))
+* **gitignore:** No longer ignore VSCode settings ([#3477](https://github.com/devCrossNet/universal-cli/issues/3477)) ([8d88446](https://github.com/devCrossNet/universal-cli/commit/8d88446))
+* **help:** fix `ng help <command>` ([#3442](https://github.com/devCrossNet/universal-cli/issues/3442)) ([51659b9](https://github.com/devCrossNet/universal-cli/commit/51659b9))
+* **init:** The option '--universal' is not registered with the init command ([37c8357](https://github.com/devCrossNet/universal-cli/commit/37c8357)), closes [#27](https://github.com/devCrossNet/universal-cli/issues/27) [#24](https://github.com/devCrossNet/universal-cli/issues/24)
+* **new:** Make sure the project name is valid. ([#3478](https://github.com/devCrossNet/universal-cli/issues/3478)) ([e836f92](https://github.com/devCrossNet/universal-cli/commit/e836f92))
+* **ngtools/webpack:** move the generate directory to a separate dir ([#3256](https://github.com/devCrossNet/universal-cli/issues/3256)) ([d1037df](https://github.com/devCrossNet/universal-cli/commit/d1037df))
+* **test:** exclude non spec files from test.ts ([#3538](https://github.com/devCrossNet/universal-cli/issues/3538)) ([bcb324f](https://github.com/devCrossNet/universal-cli/commit/bcb324f))
+* **universal:** remove duplicate entry from package.json ([47b34a2](https://github.com/devCrossNet/universal-cli/commit/47b34a2)), closes [#26](https://github.com/devCrossNet/universal-cli/issues/26)
+* **version:** bump ast-tools and webpack versions to correct mismatch with published packages ([54ef738](https://github.com/devCrossNet/universal-cli/commit/54ef738))
+* **webpack:** correctly load component stylesheets ([#3511](https://github.com/devCrossNet/universal-cli/issues/3511)) ([d4da7bd](https://github.com/devCrossNet/universal-cli/commit/d4da7bd))
+* **webpack:** fix some problems with errors not reported. ([#3444](https://github.com/devCrossNet/universal-cli/issues/3444)) ([09f9aa9](https://github.com/devCrossNet/universal-cli/commit/09f9aa9))
+* change apiFilter querystring to query in ng doc([#3383](https://github.com/devCrossNet/universal-cli/issues/3383)) ([5b2a0fb](https://github.com/devCrossNet/universal-cli/commit/5b2a0fb)), closes [#3363](https://github.com/devCrossNet/universal-cli/issues/3363)
+* **webpack:** remove usage of __dirname from the config. ([#3422](https://github.com/devCrossNet/universal-cli/issues/3422)) ([8597786](https://github.com/devCrossNet/universal-cli/commit/8597786))
+
+
+### Features
+
+* **angular:** Update Angular2 version to 2.2.3 ([#3295](https://github.com/devCrossNet/universal-cli/issues/3295)) ([ed305a2](https://github.com/devCrossNet/universal-cli/commit/ed305a2))
+* **build:** add --verbose and --progress flags ([#2858](https://github.com/devCrossNet/universal-cli/issues/2858)) ([f6f24e7](https://github.com/devCrossNet/universal-cli/commit/f6f24e7)), closes [#1836](https://github.com/devCrossNet/universal-cli/issues/1836) [#2012](https://github.com/devCrossNet/universal-cli/issues/2012)
+* **build:** add lazy styles/scripts ([#3402](https://github.com/devCrossNet/universal-cli/issues/3402)) ([20bb864](https://github.com/devCrossNet/universal-cli/commit/20bb864)), closes [#3401](https://github.com/devCrossNet/universal-cli/issues/3401) [#3400](https://github.com/devCrossNet/universal-cli/issues/3400)
+* Make CLI available without install ([761e86f](https://github.com/devCrossNet/universal-cli/commit/761e86f)), closes [#3126](https://github.com/devCrossNet/universal-cli/issues/3126)
+* **build:** auto generate vendor chunk ([#3117](https://github.com/devCrossNet/universal-cli/issues/3117)) ([bf9c8f1](https://github.com/devCrossNet/universal-cli/commit/bf9c8f1))
+* **cli:** update to angular-cli beta >= 21 ([ef2104f](https://github.com/devCrossNet/universal-cli/commit/ef2104f)), closes [#21](https://github.com/devCrossNet/universal-cli/issues/21)
+* **deps:** Unblock the version of Angular to >= 2.3 ([#3569](https://github.com/devCrossNet/universal-cli/issues/3569)) ([bd03100](https://github.com/devCrossNet/universal-cli/commit/bd03100))
+* **generate:** change generate --prefix option type from Boolean to string ([#3457](https://github.com/devCrossNet/universal-cli/issues/3457)) ([8d5a915](https://github.com/devCrossNet/universal-cli/commit/8d5a915))
+* **i18n:** add i18n command line options ([#3098](https://github.com/devCrossNet/universal-cli/issues/3098)) ([2a0a42d](https://github.com/devCrossNet/universal-cli/commit/2a0a42d))
+* **module:** component optional when generating module ([#3389](https://github.com/devCrossNet/universal-cli/issues/3389)) ([2fb2d13](https://github.com/devCrossNet/universal-cli/commit/2fb2d13))
+* **new:** include routing in spec and inline template when called with `--routing` ([#3252](https://github.com/devCrossNet/universal-cli/issues/3252)) ([53ab4df](https://github.com/devCrossNet/universal-cli/commit/53ab4df))
+* **serve:** add --hmr flag for HotModuleReplacement support ([#3330](https://github.com/devCrossNet/universal-cli/issues/3330)) ([46efa9e](https://github.com/devCrossNet/universal-cli/commit/46efa9e))
+* **serve:** Add support to open with ssl. ([#3432](https://github.com/devCrossNet/universal-cli/issues/3432)) ([83dfc96](https://github.com/devCrossNet/universal-cli/commit/83dfc96))
+
+
+### Performance Improvements
+
+* **install time:** Remove dependency to zopfli. ([#3414](https://github.com/devCrossNet/universal-cli/issues/3414)) ([e6364a9](https://github.com/devCrossNet/universal-cli/commit/e6364a9))
+
+
+### BREAKING CHANGES
+
+* blueprints: The app root module and component must now be imported directly. (e.g., use `import { AppModule } from './app/app.module';` instead of `import { AppModule } from './app/';`)
+* build: `ng build/serve` now generates `vendor.bundle.js` by
+default.
+
+
+
 <a name="1.0.0-alpha.universal.2"></a>
 # [1.0.0-alpha.universal.2](https://github.com/devCrossNet/angular-cli/compare/v1.0.0-beta.19...v1.0.0-alpha.universal.2) (2016-11-26)
 
