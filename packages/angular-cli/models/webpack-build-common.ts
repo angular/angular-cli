@@ -118,7 +118,8 @@ export function getWebpackCommonConfig(
     context: projectRoot,
     entry: entryPoints,
     output: {
-      path: path.resolve(projectRoot, appConfig.outDir)
+      path: path.resolve(projectRoot, appConfig.outDir),
+      publicPath: appConfig.deployUrl
     },
     module: {
       rules: [
