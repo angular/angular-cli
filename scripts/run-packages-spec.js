@@ -6,14 +6,12 @@ const glob = require('glob');
 
 const path = require('path');
 const Jasmine = require('jasmine');
-const JasmineSpecReporter = require('jasmine-spec-reporter');
 
 const projectBaseDir = path.join(__dirname, '../packages');
 
 // Create a Jasmine runner and configure it.
 const jasmine = new Jasmine({ projectBaseDir: projectBaseDir });
 jasmine.loadConfig({});
-jasmine.addReporter(new JasmineSpecReporter());
 // Manually set exit code (needed with custom reporters)
 jasmine.onComplete((success) => process.exitCode = !success);
 

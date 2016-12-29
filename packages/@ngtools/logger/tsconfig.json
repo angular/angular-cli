@@ -7,12 +7,13 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "outDir": "../../../dist/@angular-cli/ast-tools",
+    "outDir": "../../../dist/@ngtools/logger",
     "rootDir": ".",
+    "lib": ["es2015", "es6", "dom"],
+    "target": "es5",
     "sourceMap": true,
     "sourceRoot": "/",
-    "target": "es5",
-    "lib": ["es6"],
+    "baseUrl": ".",
     "typeRoots": [
       "../../node_modules/@types"
     ],
