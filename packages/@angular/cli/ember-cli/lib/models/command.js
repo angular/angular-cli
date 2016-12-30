@@ -183,6 +183,7 @@ Command.prototype.mergeDuplicateOption = function(key) {
 */
 Command.prototype.normalizeOption = function(option) {
   option.key = camelize(option.name);
+  option.aliases = (option.aliases || []).concat(camelize(option.name));
   option.required = option.required || false;
   return option;
 };
