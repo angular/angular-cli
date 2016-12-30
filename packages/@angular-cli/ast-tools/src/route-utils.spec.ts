@@ -7,7 +7,7 @@ import denodeify = require('denodeify');
 import * as _ from 'lodash';
 import {it} from './spec-utils';
 
-const readFile = (denodeify(fs.readFile) as (...args: any[]) => Promise<string>);
+const readFile = (denodeify(fs.readFile) as (...args: any[]) => Promise<any>);
 
 
 describe('route utils', () => {
