@@ -54,17 +54,17 @@ const InitCommand: any = Command.extend({
       });
     }
 
-    let npmInstall: any;
-    if (!commandOptions.skipNpm) {
-      npmInstall = new NpmInstall({
+    let linkCli: any;
+    if (commandOptions.linkCli) {
+      linkCli = new LinkCli({
         ui: this.ui,
         project: this.project
       });
     }
 
-    let linkCli: any;
-    if (commandOptions.linkCli) {
-      linkCli = new LinkCli({
+    let npmInstall: any;
+    if (!commandOptions.skipNpm) {
+      npmInstall = new NpmInstall({
         ui: this.ui,
         project: this.project
       });
@@ -119,13 +119,13 @@ const InitCommand: any = Command.extend({
         }
       }.bind(this))
       .then(function () {
-        if (!commandOptions.skipNpm) {
-          return npmInstall.run();
+        if (commandOptions.linkCli) {
+          return linkCli.run();
         }
       })
       .then(function () {
-        if (commandOptions.linkCli) {
-          return linkCli.run();
+        if (!commandOptions.skipNpm) {
+          return npmInstall.run();
         }
       });
   }
