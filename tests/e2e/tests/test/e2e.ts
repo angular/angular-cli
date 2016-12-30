@@ -19,5 +19,6 @@ export default function() {
     .then(() => _runServeAndE2e())
     .then(() => _runServeAndE2e('--prod'))
     .then(() => _runServeAndE2e('--aot'))
-    .then(() => _runServeAndE2e('--aot', '--prod'));
+    .then(() => _runServeAndE2e('--aot', '--prod'))
+    .then(() => _runServeAndE2e('--config', 'config'));
 }
