@@ -228,19 +228,21 @@ export class AotPlugin implements Tapable {
       cb();
     });
 
-    // Virtual file system.
-    compiler.resolvers.normal.plugin('resolve', (request: any, cb?: (err?: any) => void) => {
-      if (request.request.match(/\.ts$/)) {
-        this.done.then(() => cb(), () => cb());
-      } else {
-        cb();
-      }
+    compiler.plugin('after-resolvers', (compiler: any) => {
+      // Virtual file system.
+      compiler.resolvers.normal.plugin('before-resolve', (request: any, cb: () => void) => {
+        if (request.request.match(/\.ts$/)) {
+          this.done.then(() => cb(), () => cb());
+        } else {
+          cb();
+        }
+      });
+      compiler.resolvers.normal.apply(new PathsPlugin({
+        tsConfigPath: this._tsConfigPath,
+        compilerOptions: this._compilerOptions,
+        compilerHost: this._compilerHost
+      }));
     });
-    compiler.resolvers.normal.apply(new PathsPlugin({
-      tsConfigPath: this._tsConfigPath,
-      compilerOptions: this._compilerOptions,
-      compilerHost: this._compilerHost
-    }));
   }
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
