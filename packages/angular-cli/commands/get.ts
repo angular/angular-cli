@@ -11,7 +11,7 @@ const GetCommand = Command.extend({
   availableOptions: [],
 
   run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       const config = CliConfig.fromProject();
       const value = config.get(rawArgs[0]);
 
