@@ -56,6 +56,10 @@ export class MultiChange implements Change {
   }
 
   appendChange(change: Change) {
+    // Do not append Noop changes.
+    if (change instanceof NoopChange) {
+      return;
+    }
     // Validate that the path is the same for everyone of those.
     if (this._path === undefined) {
       this._path = change.path;
