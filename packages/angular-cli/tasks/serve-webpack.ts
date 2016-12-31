@@ -39,8 +39,9 @@ export default Task.extend({
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
     let entryPoints = [
-      `webpack-dev-server/client?http://${serveTaskOptions.host}:${serveTaskOptions.port}/`
+      `webpack-dev-server/client?${serveTaskOptions.inlineClient}/`
     ];
+
     if (serveTaskOptions.hmr) {
       const webpackHmrLink = 'https://webpack.github.io/docs/hot-module-replacement.html';
       ui.writeLine(oneLine`

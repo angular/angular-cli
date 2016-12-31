@@ -36,6 +36,7 @@ export interface ServeTaskOptions {
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
+  inlineClient?: string;
 }
 
 const ServeCommand = Command.extend({
@@ -109,7 +110,13 @@ const ServeCommand = Command.extend({
     },
     { name: 'i18n-file',       type: String, default: null },
     { name: 'i18n-format',     type: String, default: null },
-    { name: 'locale',         type: String, default: null }
+    { name: 'locale',         type: String, default: null },
+    {
+      name: 'inline-client',
+      type: String,
+      aliases: ['ic'],
+      description: 'Websocket client URL for Webpack inline mode (Defaults to "http://host:port")'
+    }
   ],
 
   run: function(commandOptions: ServeTaskOptions) {
@@ -125,6 +132,9 @@ const ServeCommand = Command.extend({
     // Check angular version.
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
+
+    commandOptions.inlineClient = commandOptions.inlineClient ||
+      `http://${commandOptions.host}:${commandOptions.port}/`;
 
     return this._checkExpressPort(commandOptions)
       .then(this._autoFindLiveReloadPort.bind(this))
