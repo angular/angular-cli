@@ -52,6 +52,10 @@ export function getWebpackCommonConfig(
     entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
   }
 
+  if (appConfig.polyfills) {
+    entryPoints['polyfills'] = [path.resolve(appRoot, appConfig.polyfills)];
+  }
+
   // determine hashing format
   const hashFormat = getOutputHashFormat(outputHashing);
 
@@ -143,7 +147,7 @@ export function getWebpackCommonConfig(
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
-        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main']),
+        chunksSortMode: packageChunkSort(appConfig),
         excludeChunks: lazyChunks,
         xhtml: true
       }),
