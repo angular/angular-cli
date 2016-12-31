@@ -1,7 +1,4 @@
-import {Version} from '../upgrade/version';
 const Command = require('../ember-cli/lib/models/command');
-import WebpackBuild from '../tasks/build-webpack';
-import WebpackBuildWatch from '../tasks/build-webpack-watch';
 
 export interface BuildOptions {
   target?: string;
@@ -52,38 +49,7 @@ const BuildCommand = Command.extend({
   ],
 
   run: function (commandOptions: BuildOptions) {
-    if (commandOptions.environment === '') {
-      if (commandOptions.target === 'development') {
-        commandOptions.environment = 'dev';
-      }
-      if (commandOptions.target === 'production') {
-        commandOptions.environment = 'prod';
-      }
-    }
-
-    const project = this.project;
-
-    // Check angular version.
-    Version.assertAngularVersionIs2_3_1OrHigher(project.root);
-
-    const ui = this.ui;
-    const buildTask = commandOptions.watch ?
-      new WebpackBuildWatch({
-        cliProject: project,
-        ui: ui,
-        outputPath: commandOptions.outputPath,
-        target: commandOptions.target,
-        environment: commandOptions.environment
-      }) :
-      new WebpackBuild({
-        cliProject: project,
-        ui: ui,
-        outputPath: commandOptions.outputPath,
-        target: commandOptions.target,
-        environment: commandOptions.environment,
-      });
-
-    return buildTask.run(commandOptions);
+    return require('./build.run').default.call(this, commandOptions);
   }
 });
 
