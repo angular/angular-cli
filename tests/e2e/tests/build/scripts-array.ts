@@ -1,6 +1,7 @@
 import {
   writeMultipleFiles,
-  expectFileToMatch
+  expectFileToMatch,
+  appendToFile
 } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -16,6 +17,7 @@ export default function () {
     'src/common-entry-script.js': 'console.log(\'common-entry-script\');',
     'src/common-entry-style.css': '.common-entry-style { color: red }',
   })
+    .then(() => appendToFile('src/main.ts', 'import \'./string-script.js\';'))
     .then(() => updateJsonFile('angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['scripts'] = [
@@ -48,5 +50,7 @@ export default function () {
       <script type="text/javascript" src="scripts.bundle.js"></script>
       <script type="text/javascript" src="vendor.bundle.js"></script>
       <script type="text/javascript" src="main.bundle.js"></script>
-    `));
+    `))
+     // ensure scripts aren't using script-loader when imported from the app
+    .then(() => expectFileToMatch('dist/main.bundle.js', 'console.log(\'string-script\');'));
 }

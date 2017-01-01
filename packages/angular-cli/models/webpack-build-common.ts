@@ -57,13 +57,9 @@ export function getWebpackCommonConfig(
 
     // add entry points and lazy chunks
     globalScripts.forEach(script => {
+      let scriptPath = `script-loader!${script.path}`;
       if (script.lazy) { lazyChunks.push(script.entry); }
-      entryPoints[script.entry] = (entryPoints[script.entry] || []).concat(script.path);
-    });
-
-    // load global scripts using script-loader
-    extraRules.push({
-      include: globalScripts.map((script) => script.path), test: /\.js$/, loader: 'script-loader'
+      entryPoints[script.entry] = (entryPoints[script.entry] || []).concat(scriptPath);
     });
   }
 
