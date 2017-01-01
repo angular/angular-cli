@@ -11,7 +11,6 @@ var InstallationChecker = require('../models/installation-checker');
 function CLI(options) {
   this.name = options.name;
   this.ui = options.ui;
-  this.analytics = options.analytics;
   this.testing = options.testing;
   this.disableDependencyChecker = options.disableDependencyChecker;
   this.root = options.root;
@@ -47,7 +46,6 @@ CLI.prototype.run = function(environment) {
 
     var command = new CurrentCommand({
       ui:        this.ui,
-      analytics: this.analytics,
       commands:  environment.commands,
       tasks:     environment.tasks,
       project:   environment.project,
@@ -134,7 +132,6 @@ CLI.prototype.callHelp = function(options) {
 
   var help = new HelpCommand({
     ui:        this.ui,
-    analytics: this.analytics,
     commands:  environment.commands,
     tasks:     environment.tasks,
     project:   environment.project,

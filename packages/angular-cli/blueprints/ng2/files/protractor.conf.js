@@ -1,5 +1,5 @@
 // Protractor configuration file, see link for more information
-// https://github.com/angular/protractor/blob/master/docs/referenceConf.js
+// https://github.com/angular/protractor/blob/master/lib/config.ts
 
 /*global jasmine */
 var SpecReporter = require('jasmine-spec-reporter');

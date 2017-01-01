@@ -1,6 +1,27 @@
+<a name="1.0.0-beta.24"></a>
+# [1.0.0-beta.24](https://github.com/angular/angular-cli/compare/v1.0.0-beta.23...v1.0.0-beta.24) (2016-12-20)
+
+
+### Bug Fixes
+
+* **@ngtools/webpack:** report errors during codegen ([#3608](https://github.com/angular/angular-cli/issues/3608)) ([0f604ac](https://github.com/angular/angular-cli/commit/0f604ac))
+* **build:** hashes in prod builds now changes when ID change. ([#3609](https://github.com/angular/angular-cli/issues/3609)) ([8e9abf9](https://github.com/angular/angular-cli/commit/8e9abf9))
+* **test:** exclude non spec files from test.ts ([#3538](https://github.com/angular/angular-cli/issues/3538)) ([bcb324f](https://github.com/angular/angular-cli/commit/bcb324f))
+* **tests:** serve `assets` files from `ng test` ([#3628](https://github.com/angular/angular-cli/issues/3628)) ([3459300](https://github.com/angular/angular-cli/commit/3459300))
+* **webpack:** correctly load component stylesheets ([#3511](https://github.com/angular/angular-cli/issues/3511)) ([d4da7bd](https://github.com/angular/angular-cli/commit/d4da7bd))
+
+
+### Features
+
+* **generate:** Show files updated when generating ([#3642](https://github.com/angular/angular-cli/issues/3642)) ([c011b04](https://github.com/angular/angular-cli/commit/c011b04)), closes [#3624](https://github.com/angular/angular-cli/issues/3624)
+* **version:** display versions of [@angular](https://github.com/angular)/* and [@ngtools](https://github.com/ngtools)/* ([#3592](https://github.com/angular/angular-cli/issues/3592)) ([123f74d](https://github.com/angular/angular-cli/commit/123f74d)), closes [#3589](https://github.com/angular/angular-cli/issues/3589)
+
+
+
 <a name="1.0.0-beta.23"></a>
 # [1.0.0-beta.23](https://github.com/angular/angular-cli/compare/v1.0.0-beta.22-1...v1.0.0-beta.23) (2016-12-15)
 
+This beta was abandoned and unpublished due to a breaking bug.
 
 ### Bug Fixes
 

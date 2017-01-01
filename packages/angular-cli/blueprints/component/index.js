@@ -149,6 +149,7 @@ module.exports = {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then(change => change.apply(NodeHost)));
+      this._writeStatusToUI(chalk.yellow, 'update', path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);

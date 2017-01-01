@@ -133,8 +133,10 @@ export class AotPlugin implements Tapable {
     }
     this._rootFilePath = fileNames;
 
-    // Check the genDir.
-    let genDir = basePath;
+    // Check the genDir. We generate a default gendir that's under basepath; it will generate
+    // a `node_modules` directory and because of that we don't want TypeScript resolution to
+    // resolve to that directory but the real `node_modules`.
+    let genDir = path.join(basePath, '$$_gendir');
 
     this._compilerOptions = tsConfig.options;
     this._angularCompilerOptions = Object.assign(
@@ -213,7 +215,8 @@ export class AotPlugin implements Tapable {
             (_: any, cb: any) => cb(null, this._lazyRoutes));
 
           return callback(null, result);
-        }).catch((err) => callback(err));
+        }, () => callback(null))
+        .catch(err => callback(err));
       });
     });
 
@@ -225,21 +228,21 @@ export class AotPlugin implements Tapable {
       cb();
     });
 
-    // Virtual file system.
-    compiler.resolvers.normal.plugin('resolve', (request: any, cb?: (err?: any) => void) => {
-      if (request.request.match(/\.ts$/)) {
-        this.done
-          .then(() => cb())
-          .catch((err) => cb(err));
-      } else {
-        cb();
-      }
+    compiler.plugin('after-resolvers', (compiler: any) => {
+      // Virtual file system.
+      compiler.resolvers.normal.plugin('before-resolve', (request: any, cb: () => void) => {
+        if (request.request.match(/\.ts$/)) {
+          this.done.then(() => cb(), () => cb());
+        } else {
+          cb();
+        }
+      });
+      compiler.resolvers.normal.apply(new PathsPlugin({
+        tsConfigPath: this._tsConfigPath,
+        compilerOptions: this._compilerOptions,
+        compilerHost: this._compilerHost
+      }));
     });
-    compiler.resolvers.normal.apply(new PathsPlugin({
-      tsConfigPath: this._tsConfigPath,
-      compilerOptions: this._compilerOptions,
-      compilerHost: this._compilerHost
-    }));
   }
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
@@ -310,6 +313,7 @@ export class AotPlugin implements Tapable {
         Object.keys(allLazyRoutes)
           .forEach(k => {
             const lazyRoute = allLazyRoutes[k];
+            k = k.split('#')[0];
             if (this.skipCodeGeneration) {
               this._lazyRoutes[k] = lazyRoute;
             } else {
@@ -320,6 +324,7 @@ export class AotPlugin implements Tapable {
       })
       .then(() => cb(), (err: any) => {
         compilation.errors.push(err);
+        cb();
       });
   }
 }

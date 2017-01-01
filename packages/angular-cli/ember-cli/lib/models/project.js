@@ -14,8 +14,6 @@ var assign             = require('lodash/assign');
 var forOwn             = require('lodash/forOwn');
 var merge              = require('lodash/merge');
 var debug              = require('debug')('ember-cli:project');
-var AddonDiscovery     = require('../models/addon-discovery');
-var AddonsFactory      = require('../models/addons-factory');
 var Command            = require('../models/command');
 var UI                 = require('../ui');
 var nodeModulesPath    = require('node-modules-path');
@@ -41,56 +39,13 @@ function Project(root, pkg, ui, cli) {
   this.addonPackages = {};
   this.addons = [];
   this.liveReloadFilterPatterns = [];
-  this.setupBowerDirectory();
   this.setupNodeModulesPath();
-  this.addonDiscovery = new AddonDiscovery(this.ui);
-  this.addonsFactory = new AddonsFactory(this, this);
   this._watchmanInfo = {
     enabled: false,
     version: null,
     canNestRoots: false
   };
 }
-
-/**
-  Set when the `Watcher.detectWatchman` helper method finishes running,
-  so that other areas of the system can be aware that watchman is being used.
-
-  For example, this information is used in the broccoli build pipeline to know
-  if we can watch additional directories (like bower_components) "cheaply".
-
-  Contains `enabled` and `version`.
-
-  @private
-  @property _watchmanInfo
-  @returns {Object}
-  @default false
-*/
-
-/**
-  Sets the name of the bower directory for this project
-
-  @private
-  @method setupBowerDirectory
- */
-Project.prototype.setupBowerDirectory = function() {
-  var bowerrcPath = path.join(this.root, '.bowerrc');
-
-  debug('bowerrc path: %s', bowerrcPath);
-
-  if (existsSync(bowerrcPath)) {
-    var bowerrcContent = fs.readFileSync(bowerrcPath);
-    try {
-      this.bowerDirectory = JSON.parse(bowerrcContent).directory;
-    } catch (exception) {
-      debug('failed to parse bowerc: %s', exception);
-      this.bowerDirectory = null;
-    }
-  }
-
-  this.bowerDirectory = this.bowerDirectory || 'bower_components';
-  debug('bowerDirectory: %s', this.bowerDirectory);
-};
 
 Project.prototype.hasDependencies = function() {
   return !!this.nodeModulesPath;
@@ -307,22 +262,6 @@ Project.prototype.dependencies = function(pkg, excludeDevDeps) {
 };
 
 /**
-  Returns the bower dependencies for this project.
-
-  @private
-  @method bowerDependencies
-  @param  {String} bower Path to bower.json
-  @return {Object}       Bower dependencies
- */
-Project.prototype.bowerDependencies = function(bower) {
-  if (!bower) {
-    var bowerPath = path.join(this.root, 'bower.json');
-    bower = (existsSync(bowerPath)) ? require(bowerPath) : {};
-  }
-  return assign({}, bower['devDependencies'], bower['dependencies']);
-};
-
-/**
   Provides the list of paths to consult for addons that may be provided
   internally to this project. Used for middleware addons with built-in support.
 
@@ -343,19 +282,6 @@ Project.prototype.supportedInternalAddonPaths = function() {
 };
 
 /**
-  Discovers all addons for this project and stores their names and
-  package.json contents in this.addonPackages as key-value pairs
-
-  @private
-  @method discoverAddons
- */
-Project.prototype.discoverAddons = function() {
-  var addonsList = this.addonDiscovery.discoverProjectAddons(this);
-
-  this.addonPackages = this.addonDiscovery.addonPackages(addonsList);
-};
-
-/**
   Loads and initializes all addons for this project.
 
   @private
@@ -369,13 +295,16 @@ Project.prototype.initializeAddons = function() {
 
   debug('initializeAddons for: %s', this.name());
 
-  this.discoverAddons();
-
-  this.addons = this.addonsFactory.initializeAddons(this.addonPackages);
-
-  this.addons.forEach(function(addon) {
-    debug('addon: %s', addon.name);
+  const cliPkg = require(path.resolve(__dirname, '../../../package.json'));
+  const Addon = require('../models/addon');
+  const Constructor = Addon.lookup({
+    name: 'angular-cli',
+    path: path.join(__dirname, '../../../'),
+    pkg: cliPkg,
   });
+
+  const addon = new Constructor(this.addonParent, this);
+  this.addons = [addon];
 };
 
 /**

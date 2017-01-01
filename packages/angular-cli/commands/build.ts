@@ -1,7 +1,4 @@
-import {Version} from '../upgrade/version';
 const Command = require('../ember-cli/lib/models/command');
-import WebpackBuild from '../tasks/build-webpack';
-import WebpackBuildWatch from '../tasks/build-webpack-watch';
 
 export interface BuildOptions {
   target?: string;
@@ -19,6 +16,7 @@ export interface BuildOptions {
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
+  deployUrl?: string;
 }
 
 const BuildCommand = Command.extend({
@@ -46,42 +44,12 @@ const BuildCommand = Command.extend({
     { name: 'progress',       type: Boolean, default: true },
     { name: 'i18n-file',      type: String, default: null },
     { name: 'i18n-format',    type: String, default: null },
-    { name: 'locale',         type: String, default: null }
+    { name: 'locale',         type: String, default: null },
+    { name: 'deploy-url',     type: String,  default: null, aliases: ['d'] }
   ],
 
   run: function (commandOptions: BuildOptions) {
-    if (commandOptions.environment === '') {
-      if (commandOptions.target === 'development') {
-        commandOptions.environment = 'dev';
-      }
-      if (commandOptions.target === 'production') {
-        commandOptions.environment = 'prod';
-      }
-    }
-
-    const project = this.project;
-
-    // Check angular version.
-    Version.assertAngularVersionIs2_3_1OrHigher(project.root);
-
-    const ui = this.ui;
-    const buildTask = commandOptions.watch ?
-      new WebpackBuildWatch({
-        cliProject: project,
-        ui: ui,
-        outputPath: commandOptions.outputPath,
-        target: commandOptions.target,
-        environment: commandOptions.environment
-      }) :
-      new WebpackBuild({
-        cliProject: project,
-        ui: ui,
-        outputPath: commandOptions.outputPath,
-        target: commandOptions.target,
-        environment: commandOptions.environment,
-      });
-
-    return buildTask.run(commandOptions);
+    return require('./build.run').default.call(this, commandOptions);
   }
 });
 

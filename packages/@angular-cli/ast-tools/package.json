@@ -1,6 +1,6 @@
 {
   "name": "@angular-cli/ast-tools",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "CLI tool for Angular",
   "main": "./src/index.js",
   "keywords": [
@@ -24,8 +24,8 @@
     "npm": ">= 3.0.0"
   },
   "dependencies": {
-    "@angular/tsc-wrapped": "^0.3.0",
-    "rxjs": "5.0.0-rc.4",
+    "@angular/tsc-wrapped": "^0.5.0",
+    "rxjs": "^5.0.1",
     "denodeify": "^1.2.1",
     "typescript": "~2.0.3"
   }
