@@ -12,6 +12,10 @@ const util = require('util');
 const EOL = require('os').EOL;
 const SilentError = require('silent-error');
 
+const denodeify = require('denodeify');
+
+const readFile = denodeify(fs.readFile);
+
 
 describe('Acceptance: ng new', function () {
   beforeEach(function () {
@@ -169,4 +173,13 @@ describe('Acceptance: ng new', function () {
         expect(existsSync(styleFile)).to.equal(false);
       });
   });
+
+  it('should skip spec files when passed --skip-tests', () => {
+    return ng(['new', 'foo', '--skip-npm', '--skip-git', '--skip-tests'])
+      .then(() => {
+        const specFile = path.join('src', 'app', 'app.component.spec.ts');
+        expect(existsSync(specFile)).to.equal(false);
+      });
+  });
+
 });

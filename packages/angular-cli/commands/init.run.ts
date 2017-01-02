@@ -69,7 +69,8 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
     inlineStyle: commandOptions.inlineStyle,
     inlineTemplate: commandOptions.inlineTemplate,
     ignoredUpdateFiles: ['favicon.ico'],
-    skipGit: commandOptions.skipGit
+    skipGit: commandOptions.skipGit,
+    skipTests: commandOptions.skipTests
   };
 
   if (!validProjectName(packageName)) {
