@@ -12,11 +12,6 @@ const util = require('util');
 const EOL = require('os').EOL;
 const SilentError = require('silent-error');
 
-const denodeify = require('denodeify');
-
-const readFile = denodeify(fs.readFile);
-
-
 describe('Acceptance: ng new', function () {
   beforeEach(function () {
     return tmp.setup('./tmp').then(function () {
