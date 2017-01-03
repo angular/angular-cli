@@ -134,9 +134,11 @@ export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
     if (!schema['oneOf']) {
       type = schema['type'];
     } else {
+      let testValue = value || schema['default'];
+      // Match existing value to one of the schema types
       for (let testSchema of schema['oneOf']) {
-        if ((testSchema['type'] === 'array' && Array.isArray(value))
-            || typeof value === testSchema['type']) {
+        if ((testSchema['type'] === 'array' && Array.isArray(testValue))
+            || typeof testValue === testSchema['type']) {
           type = testSchema['type'];
           schema = testSchema;
           break;

@@ -46,12 +46,8 @@ export function getWebpackCommonConfig(
     main: [appMain]
   };
 
-  if (!(environment in appConfig.environments)) {
-    throw new SilentError(`Environment "${environment}" does not exist.`);
-  }
-
   // process global scripts
-  if (appConfig.scripts.length > 0) {
+  if (appConfig.scripts && appConfig.scripts.length > 0) {
     const globalScripts = extraEntryParser(appConfig.scripts, appRoot, 'scripts');
 
     // add entry points and lazy chunks
@@ -67,7 +63,7 @@ export function getWebpackCommonConfig(
   }
 
   // process global styles
-  if (appConfig.styles.length === 0) {
+  if (!appConfig.styles || appConfig.styles.length === 0) {
     // create css loaders for component css
     extraRules.push(...makeCssLoaders());
   } else {
@@ -101,6 +97,33 @@ export function getWebpackCommonConfig(
       name: 'vendor',
       chunks: ['main'],
       minChunks: (module: any) => module.userRequest && module.userRequest.startsWith(nodeModules)
+    }));
+  }
+
+  // process environment file replacement
+  if (appConfig.environments) {
+    if (!('source' in appConfig.environments)) {
+      throw new SilentError(`Environment configuration does not contain "source" entry.`);
+    }
+    if (!(environment in appConfig.environments)) {
+      throw new SilentError(`Environment "${environment}" does not exist.`);
+    }
+
+    extraPlugins.push(new webpack.NormalModuleReplacementPlugin(
+      // This plugin is responsible for swapping the environment files.
+      // Since it takes a RegExp as first parameter, we need to escape the path.
+      // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
+      new RegExp(path.resolve(appRoot, appConfig.environments['source'])
+        .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
+      path.resolve(appRoot, appConfig.environments[environment])
+    ));
+  }
+
+  // process asset entries
+  if (appConfig.assets) {
+    extraPlugins.push(new GlobCopyWebpackPlugin({
+      patterns: appConfig.assets,
+      globOptions: { cwd: appRoot, dot: true, ignore: '**/.gitkeep' }
     }));
   }
 
@@ -145,21 +168,9 @@ export function getWebpackCommonConfig(
       new BaseHrefWebpackPlugin({
         baseHref: baseHref
       }),
-      new webpack.NormalModuleReplacementPlugin(
-        // This plugin is responsible for swapping the environment files.
-        // Since it takes a RegExp as first parameter, we need to escape the path.
-        // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
-        new RegExp(path.resolve(appRoot, appConfig.environments['source'])
-          .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
-        path.resolve(appRoot, appConfig.environments[environment])
-      ),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
         name: 'inline'
-      }),
-      new GlobCopyWebpackPlugin({
-        patterns: appConfig.assets,
-        globOptions: { cwd: appRoot, dot: true, ignore: '**/.gitkeep' }
       }),
       new webpack.LoaderOptionsPlugin({
         test: /\.(css|scss|sass|less|styl)$/,
