@@ -108,6 +108,16 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
     });
 }
 
+function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) {
+  if (element.kind == ts.SyntaxKind.StringLiteral) {
+    // if string, assume relative path unless it start with /
+    return `'${loaderUtils.urlToRequest((element as ts.StringLiteral).text, '')}'`;
+  } else {
+    // if not string, just use expression directly
+    return element.getFullText(sourceFile);
+  }
+}
+
 function _replaceResources(refactor: TypeScriptFileRefactor): void {
   const sourceFile = refactor.sourceFile;
 
@@ -132,7 +142,7 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
 
       if (key == 'templateUrl') {
         refactor.replaceNode(node,
-          `template: require(${node.initializer.getFullText(sourceFile)})`);
+          `template: require(${_getResourceRequest(node.initializer, sourceFile)})`);
       } else if (key == 'styleUrls') {
         const arr = <ts.ArrayLiteralExpression[]>(
           refactor.findAstNodes(node, ts.SyntaxKind.ArrayLiteralExpression, false));
@@ -141,7 +151,7 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
         }
 
         const initializer = arr[0].elements.map((element: ts.Expression) => {
-          return element.getFullText(sourceFile);
+          return _getResourceRequest(element, sourceFile);
         });
         refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
       }
