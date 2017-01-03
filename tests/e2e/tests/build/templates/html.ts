@@ -7,10 +7,10 @@ import { stripIndents } from 'common-tags';
 
 export default function () {
   return writeMultipleFiles({
-    'src/foo.html': stripIndents`
+    'src/app/app.component.html': stripIndents`
       <h1>foo</h1>
     `})
     .then(() => ng('build'))
-    .then(() => expectFileToMatch('dist/foo.html',
+    .then(() => expectFileToMatch('dist/app/app.component.html',
       /<h1>foo<\/h1>/))
 }
