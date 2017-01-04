@@ -1,5 +1,4 @@
 import * as denodeify from 'denodeify';
-const assign = require('lodash/assign');
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
 import ServeWebpackTask from '../tasks/serve-webpack';
@@ -26,11 +25,7 @@ export default function serveRun(commandOptions: ServeTaskOptions) {
 
   return checkExpressPort(commandOptions)
     .then(() => autoFindLiveReloadPort(commandOptions))
-    .then((opts: ServeTaskOptions) => {
-      commandOptions = assign({}, opts, {
-        baseURL: this.project.config(commandOptions.target).baseURL || '/'
-      });
-
+    .then(() => {
       const serve = new ServeWebpackTask({
         ui: this.ui,
         project: this.project,
