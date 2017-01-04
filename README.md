@@ -328,8 +328,8 @@ To use these preprocessors simply add the file to your component's `styleUrls`:
 ```javascript
 @Component({
   selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   title = 'app works!';
