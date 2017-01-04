@@ -5,5 +5,5 @@ import {expectToFail} from '../../../utils/utils';
 export default function() {
   return Promise.resolve()
     .then(() => expectToFail(() =>
-      ng('generate', 'service', 'test-service', '--module', 'app.moduleXXX.ts')));
+      ng('generate', 'service', 'service-test', '--module', 'app.moduleXXX.ts')));
 }

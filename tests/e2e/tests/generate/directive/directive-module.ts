@@ -6,9 +6,9 @@ import {expectFileToMatch} from '../../../utils/fs';
 export default function() {
   const modulePath = join('src', 'app', 'app.module.ts');
 
-  return ng('generate', 'directive', 'test-directive', '--module', 'app.module.ts')
+  return ng('generate', 'directive', 'directive-test', '--module', 'app.module.ts')
     .then(() => expectFileToMatch(modulePath,
-      /import { TestDirectiveDirective } from '.\/test-directive.directive'/))
+      /import { DirectiveTestDirective } from '.\/directive-test.directive'/))
 
     // Try to run the unit tests.
     .then(() => ng('build'));

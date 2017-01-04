@@ -5,9 +5,9 @@ import {expectFileToExist} from '../../../utils/fs';
 
 export default function() {
   const directiveDir = join('src', 'app');
-  return ng('generate', 'directive', 'test-directive')
-    .then(() => expectFileToExist(join(directiveDir, 'test-directive.directive.ts')))
-    .then(() => expectFileToExist(join(directiveDir, 'test-directive.directive.spec.ts')))
+  return ng('generate', 'directive', 'directive-test')
+    .then(() => expectFileToExist(join(directiveDir, 'directive-test.directive.ts')))
+    .then(() => expectFileToExist(join(directiveDir, 'directive-test.directive.spec.ts')))
 
     // Try to run the unit tests.
     .then(() => ng('test', '--single-run'));
