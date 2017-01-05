@@ -277,3 +277,11 @@ export function addProviderToModule(modulePath: string, classifiedName: string,
   return _addSymbolToNgModuleMetadata(modulePath, 'providers', classifiedName, importPath);
 }
 
+/**
+ * Custom function to insert an export into NgModule. It also imports it.
+ */
+export function addExportToModule(modulePath: string, classifiedName: string,
+                                    importPath: string): Promise<Change> {
+  return _addSymbolToNgModuleMetadata(modulePath, 'exports', classifiedName, importPath);
+}
+
