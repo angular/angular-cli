@@ -23,6 +23,7 @@ export default function serveRun(commandOptions: ServeTaskOptions) {
   // Check angular version.
   Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
   commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
+  commandOptions.public = commandOptions.public || `http://${commandOptions.host}:${commandOptions.port}`;
 
   return checkExpressPort(commandOptions)
     .then(() => autoFindLiveReloadPort(commandOptions))
