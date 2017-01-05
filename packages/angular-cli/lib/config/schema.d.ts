@@ -29,6 +29,10 @@ export interface CliConfig {
          */
         scripts?: string[];
         /**
+         * Environment source file.
+         */
+        environmentSource?: string,
+        /**
          * Name and corresponding file for environment config.
          */
         environments?: {
