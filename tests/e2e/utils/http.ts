@@ -4,7 +4,11 @@ import * as _request from 'request';
 
 export function request(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    let options = { url: url, agentOptions: { rejectUnauthorized: false }};
+    let options = {
+      url: url,
+      headers: { 'Accept': 'text/html' },
+      agentOptions: { rejectUnauthorized: false }
+    };
     _request(options, (error: any, response: IncomingMessage, body: string) => {
       if (error) {
         reject(error);
