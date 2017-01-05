@@ -17,6 +17,7 @@ export interface BuildOptions {
   i18nFormat?: string;
   locale?: string;
   deployUrl?: string;
+  disableCacheBust?: boolean;
 }
 
 const BuildCommand = Command.extend({
@@ -45,7 +46,9 @@ const BuildCommand = Command.extend({
     { name: 'i18n-file',      type: String, default: null },
     { name: 'i18n-format',    type: String, default: null },
     { name: 'locale',         type: String, default: null },
-    { name: 'deploy-url',     type: String,  default: null, aliases: ['d'] }
+    { name: 'deploy-url',     type: String,  default: null, aliases: ['d'] },
+    { name: 'disable-cache-bust', type: Boolean, default: false, aliases: ['dcb'],
+      description: 'Disable webpack\'s caching mechanism.' }
   ],
 
   run: function (commandOptions: BuildOptions) {
