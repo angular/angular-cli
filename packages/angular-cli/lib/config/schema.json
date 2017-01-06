@@ -65,6 +65,9 @@
           "prefix": {
             "type": "string"
           },
+          "app": {
+            "type": "string"
+          },
           "mobile": {
             "type": "boolean"
           },
