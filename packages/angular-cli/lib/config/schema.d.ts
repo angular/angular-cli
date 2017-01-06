@@ -12,7 +12,7 @@ export interface CliConfig {
     apps?: {
         root?: string;
         outDir?: string;
-        assets?: string;
+        assets?: string | string[];
         deployUrl?: string;
         index?: string;
         main?: string;
@@ -23,11 +23,21 @@ export interface CliConfig {
         /**
          * Global styles to be included in the build.
          */
-        styles?: string[];
+        styles?: (string | {
+            [name: string]: any;
+            input?: string;
+        })[];
         /**
          * Global scripts to be included in the build.
          */
-        scripts?: string[];
+        scripts?: (string | {
+            [name: string]: any;
+            input?: string;
+        })[];
+        /**
+         * Source file for environment config.
+         */
+        environmentSource?: string;
         /**
          * Name and corresponding file for environment config.
          */
