@@ -260,6 +260,11 @@ ng github-pages:deploy --user-page --message "Optional commit message"
 This command pushes the app to the `master` branch on the github repo instead
 of pushing to `gh-pages`, since user and organization pages require this.
 
+#### Custom Domain
+
+```bash
+--baseHref 'http://my.custom.domain/'
+```
 
 ### Linting and formatting code
 
