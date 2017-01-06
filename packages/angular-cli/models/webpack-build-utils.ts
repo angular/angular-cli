@@ -109,3 +109,18 @@ export function extraEntryParser(
       return extraEntry;
     });
 }
+
+const hashFormats: { [option: string]: any } = {
+  'none':     { chunk: '',             extract: '',                  file: '[name]'    },
+  'media':    { chunk: '',             extract: '',                  file: '[hash:20]' },
+  'bundles':  { chunk: '.[chunkhash]', extract: '.[contenthash:20]', file: '[name]'    },
+  'all':      { chunk: '.[chunkhash]', extract: '.[contenthash:20]', file: '[hash:20]' },
+};
+
+export function getOutputHashFormat(hashOption: string): any {
+  let format = hashFormats['none'];
+  if (hashOption in hashFormats) {
+    format = hashFormats[hashOption];
+  }
+  return format;
+}
