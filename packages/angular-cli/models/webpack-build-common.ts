@@ -102,7 +102,7 @@ export function getWebpackCommonConfig(
 
   // process environment file replacement
   if (appConfig.environments) {
-    if (!('environmentSource' in appConfig.environments)) {
+    if (!(appConfig.environmentSource)) {
       throw new SilentError(`Environment configuration does not contain 
         "environmentSource" entry.`);
     }
