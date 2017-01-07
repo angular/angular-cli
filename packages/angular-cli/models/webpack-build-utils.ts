@@ -110,17 +110,20 @@ export function extraEntryParser(
     });
 }
 
-const hashFormats: { [option: string]: any } = {
-  'none':     { chunk: '',             extract: '',                  file: '[name]'    },
-  'media':    { chunk: '',             extract: '',                  file: '[hash:20]' },
-  'bundles':  { chunk: '.[chunkhash]', extract: '.[contenthash:20]', file: '[name]'    },
-  'all':      { chunk: '.[chunkhash]', extract: '.[contenthash:20]', file: '[hash:20]' },
-};
+export interface HashFormat {
+  chunk: string;
+  extract: string;
+  file: string;
+}
 
-export function getOutputHashFormat(hashOption: string): any {
-  let format = hashFormats['none'];
-  if (hashOption in hashFormats) {
-    format = hashFormats[hashOption];
-  }
-  return format;
+export function getOutputHashFormat(option: string, length = 20): HashFormat {
+  /* tslint:disable:max-line-length */
+  const hashFormats: { [option: string]: HashFormat } = {
+    none:    { chunk: '',                       extract: '',                         file: ''                  },
+    media:   { chunk: '',                       extract: '',                         file: `.[hash:${length}]` },
+    bundles: { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: ''                  },
+    all:     { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: `.[hash:${length}]` },
+  };
+  /* tslint:enable:max-line-length */
+  return hashFormats[option] || hashFormats['none'];
 }

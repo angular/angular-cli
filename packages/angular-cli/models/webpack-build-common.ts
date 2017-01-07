@@ -160,15 +160,15 @@ export function getWebpackCommonConfig(
         { test: /\.json$/, loader: 'json-loader' },
         {
           test: /\.(jpg|png|gif)$/,
-          loader: `url-loader?name=${hashFormat.file}.[ext]&limit=10000`
+          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
         },
         { test: /\.html$/, loader: 'raw-loader' },
 
         {
           test: /\.(otf|ttf|woff|woff2)$/,
-          loader: `url-loader?name=${hashFormat.file}.[ext]&limit=10000`
+          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
         },
-        { test: /\.(eot|svg)$/, loader: `file-loader?name=${hashFormat.file}.[ext]` }
+        { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` }
       ].concat(extraRules)
     },
     plugins: [
