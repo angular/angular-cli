@@ -43,6 +43,7 @@ const NewCommand = Command.extend({
       return Promise.reject(new SilentError(oneLine`
         Project name "${packageName}" is not valid. New project names must
         start with a letter, and must contain only alphanumeric characters or dashes.
+        When adding a dash the segment after the dash must start with a letter too.
       `));
     }
 
