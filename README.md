@@ -20,6 +20,7 @@
 * [Getting Started with Universal](#getting-started)
     * w/ NodeJS Server
     * w/ ASP.NET Core Server
+    * w/ AngularCLI (Universal fork)
 * [Universal "Gotchas"](#universal-gotchas)
 * [Modules](#modules)
     * [Universal](#universal)
@@ -45,6 +46,12 @@
 [* ASP.NET Core :: Universal Starter repo](https://github.com/MarkPieszak/aspnetcore-angular2-universal)
   - **Installation**: Clone the above repo, `npm i && dotnet restore` *(VStudio will run these automatically when opening the project)*
   - Launch files included for both VSCode & VStudio to run/debug automatically (press F5).
+
+[* **Angular Universal CLI** repo](https://github.com/devCrossNet/universal-cli)
+  - Universal-CLI is fork from Angular-CLI. It is a separate package because the Core-CLI team is not able to maintain non-core functionality.
+  - `npm install -g universal-cli` and once installed: `ung new PROJECT_NAME` 
+  - [Useage instructions here](https://github.com/devCrossNet/universal-cli#usage)
+
 
 ---- 
 
