@@ -20,7 +20,11 @@ export default function githubPagesDeployRun(options: GithubPagesDeployOptions, 
   const execOptions = {
     cwd: root
   };
-
+  const keepFiles=[
+    '.gitignore',
+    '404.html',
+    'CNAME'
+  ]
   if (options.environment === '') {
     if (options.target === 'development') {
       options.environment = 'dev';
@@ -147,7 +151,7 @@ export default function githubPagesDeployRun(options: GithubPagesDeployOptions, 
         let files = '';
         stdout.split(/\n/).forEach(function (f) {
           // skip .gitignore & 404.html
-          if ((f != '') && (f != '.gitignore') && (f != '404.html')) {
+          if ((f != '') && (keepFiles.indexOf(f)==-1) {
             files = files.concat(`"${f}" `);
           }
         });
