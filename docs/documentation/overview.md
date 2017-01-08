@@ -106,15 +106,16 @@ Restart `ng serve` if you're running it, and Bootstrap 4 should be working on
 your app.
 
 ### Additional Commands
-* [ng new](new)
-* [ng init](init)
-* [ng serve](serve)
-* [ng generate](generate)
-* [ng test](test)
-* [ng e2e](e2e)
-* [ng build](build)
-* [ng get/ng set](config)
-* [ng docs](docs)
+* [ng new](new.md)
+* [ng init](init.md)
+* [ng serve](serve.md)
+* [ng generate](generate.md)
+* [ng test](test.md)
+* [ng e2e](e2e.md)
+* [ng build](build.md)
+* [ng get/ng set](config.md)
+* [ng docs](docs.md)
+* [ng github-deploy:pages](github-deploy.md)
 
 ### How to Guides
 * Setup AngularFire _(coming soon)_
