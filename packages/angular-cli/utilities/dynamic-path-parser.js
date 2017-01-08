@@ -5,7 +5,12 @@ var fs = require('fs');
 module.exports = function dynamicPathParser(project, entityName) {
   var projectRoot = project.root;
   var sourceDir = project.ngConfig.apps[0].root;
+<<<<<<< HEAD
   var appRoot = path.join(sourceDir, project.ngConfig.apps[0].app || 'app');
+=======
+  var appPart = project.ngConfig.apps[0].app || 'app'
+  var appRoot = path.join(sourceDir, appPart);
+>>>>>>> 47bb324... make app point configurable
   var cwd = process.env.PWD;
 
   var rootPath = path.join(projectRoot, appRoot);
