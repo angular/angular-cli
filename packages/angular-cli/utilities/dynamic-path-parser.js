@@ -33,8 +33,11 @@ module.exports = function dynamicPathParser(project, entityName) {
       } else if (fs.existsSync(withPlus)) {
         return withPlus;
       }
-      
-      throw `Invalid path: "${withoutPlus}"" is not a valid path.`
+
+      // Folder not found, create it, and return it
+      fs.mkdirSync(withoutPlus);
+      return withoutPlus;
+
     }, parsedOutputPath.root);
     outputPath = path.join(newPath, parsedOutputPath.name);
   }
