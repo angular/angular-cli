@@ -1,12 +1,14 @@
 import { BuildOptions } from '../models/webpack-config';
 import { BaseBuildCommandOptions } from './build';
-
+import { CliConfig } from '../models/config';
 const PortFinder = require('portfinder');
 const Command = require('../ember-cli/lib/models/command');
+const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 
 PortFinder.basePort = 49152;
 
-const defaultPort = process.env.PORT || 4200;
+const defaultPort = process.env.PORT || config.get('defaults.serve.port');
+const defaultHost = config.get('defaults.serve.host');
 
 export interface ServeTaskOptions extends BuildOptions {
   port?: number;
@@ -34,9 +36,9 @@ const ServeCommand = Command.extend({
     {
       name: 'host',
       type: String,
-      default: 'localhost',
+      default: defaultHost,
       aliases: ['H'],
-      description: 'Listens only on localhost by default'
+      description: `Listens only on ${defaultHost} by default`
     },
     { name: 'proxy-config',         type: 'Path',                          aliases: ['pc'] },
     { name: 'live-reload',          type: Boolean, default: true,          aliases: ['lr'] },
