@@ -4,7 +4,7 @@
 `ng build` compiles the application into an output directory
 
 ## Options
-`--target` (`-t`, `-dev`, `prod`) define the build target
+`--target` (`-t`, `-dev`, `-prod`) define the build target
 
 `--environment` (`-e`)
 
