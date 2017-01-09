@@ -429,7 +429,7 @@ npm install -g angular-cli@latest
 
 Local project package:
 ```bash
-rm -rf node_modules dist tmp
+rm -rf node_modules dist # use rmdir on Windows
 npm install --save-dev angular-cli@latest
 npm install
 ng init
