@@ -51,7 +51,7 @@ const BuildCommand = Command.extend({
       name: 'output-hashing',
       type: String,
       values: ['none', 'all', 'media', 'bundles'],
-      description: 'Sets the hashing mode for output filenames'
+      description: 'define the output filename cache-busting hashing mode'
     }
   ],
 
