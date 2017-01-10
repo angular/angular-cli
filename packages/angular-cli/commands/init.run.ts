@@ -103,7 +103,7 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
         return linkCli.run();
       }
     })
-    .then(function () {
-      this.ui.writeLine(chalk.green('Project `' + packageName + '` successfully created.'));
-    }.bind(this));
+    .then(() => {
+      this.ui.writeLine(chalk.green(`Project '${packageName}' successfully created.`));
+    });
 }
