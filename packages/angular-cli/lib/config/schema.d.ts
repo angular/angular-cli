@@ -57,6 +57,12 @@ export interface CliConfig {
             config?: string;
         };
     };
+    build?: {
+        webpack?: {
+          extender?: string;
+          config?: string;
+        };
+    };
     defaults?: {
         styleExt?: string;
         prefixInterfaces?: boolean;
