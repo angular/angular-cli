@@ -92,7 +92,7 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
       if (commandOptions.skipGit === false) {
         return gitInit.run(commandOptions, rawArgs);
       }
-    }.bind(this))
+    })
     .then(function () {
       if (!commandOptions.skipNpm) {
         return npmInstall.run();
