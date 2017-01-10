@@ -10,7 +10,10 @@ describe('<%= classifiedModuleName %>Service', () => {
     });
   });
 
-  it('should ...', inject([<%= classifiedModuleName %>Service], (service: <%= classifiedModuleName %>Service) => {
-    expect(service).toBeTruthy();
-  }));
+  describe('.constructor()', () => {
+    it('should ...',
+      inject([<%= classifiedModuleName %>Service], (service: <%= classifiedModuleName %>Service) => {
+        expect(service).toBeTruthy();
+      }));
+  });
 });
