@@ -18,17 +18,18 @@ declare module 'webpack' {
 export const getWebpackProdConfigPartial = function(projectRoot: string,
                                                     appConfig: any,
                                                     sourcemap: boolean,
-                                                    verbose: any) {
+                                                    verbose: any,
+                                                    disableCacheBust: boolean) {
   const appRoot = path.resolve(projectRoot, appConfig.root);
 
   return {
     output: {
-      filename: '[name].[chunkhash].bundle.js',
-      sourceMapFilename: '[name].[chunkhash].bundle.map',
-      chunkFilename: '[id].[chunkhash].chunk.js'
+      filename: disableCacheBust ? '[name].bundle.js' : '[name].[chunkhash].bundle.js',
+      sourceMapFilename: disableCacheBust ? '[name].bundle.map' : '[name].[chunkhash].bundle.map',
+      chunkFilename: disableCacheBust ? '[id].chunk.js' : '[id].[chunkhash].chunk.js'
     },
     plugins: [
-      new ExtractTextPlugin('[name].[chunkhash].bundle.css'),
+      new ExtractTextPlugin(disableCacheBust ? '[name].bundle.css' : '[name].[chunkhash].bundle.css'),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production')
       }),

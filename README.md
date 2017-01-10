@@ -174,6 +174,14 @@ ng build --base-href /myUrl/
 ng build --bh /myUrl/
 ```
 
+### Disable cache busting
+
+You can disable webpack's caching mechanism in prod build with the `--disable-cache-bust` / `-dcb` flag.
+
+```bash
+ng build -dcb
+```
+
 ### Bundling
 
 All builds make use of bundling, and using the `--prod` flag in  `ng build --prod`
