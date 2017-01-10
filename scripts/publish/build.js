@@ -162,7 +162,7 @@ Promise.resolve()
   })
   .then(() => {
     // Copy LICENSE into all the packages
-    console.log(`Copying LICENSE...`);
+    console.log('Copying LICENSE...');
 
     const packages = require('../../lib/packages');
     return Promise.all(Object.keys(packages).map(pkgName => {
