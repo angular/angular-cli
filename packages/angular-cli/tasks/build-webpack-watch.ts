@@ -33,7 +33,8 @@ export default Task.extend({
       runTaskOptions.vendorChunk,
       runTaskOptions.verbose,
       runTaskOptions.progress,
-      deployUrl
+      deployUrl,
+      runTaskOptions.outputHashing
     ).config;
     const webpackCompiler: any = webpack(config);
 
