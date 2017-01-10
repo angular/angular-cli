@@ -1,5 +1,6 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
+import * as childProcess from 'child_process';
 import { GlobCopyWebpackPlugin } from '../plugins/glob-copy-webpack-plugin';
 import { SuppressEntryChunksWebpackPlugin } from '../plugins/suppress-entry-chunks-webpack-plugin';
 import { packageChunkSort } from '../utilities/package-chunk-sort';
@@ -128,6 +129,18 @@ export function getWebpackCommonConfig(
   }
 
   if (progress) { extraPlugins.push(new ProgressPlugin({ profile: verbose, colors: true })); }
+
+  // Define __GITVERSION__ in source code. If available, it will be something
+  // like "v1.0.2" or "v1.0.0-beta.23-52-g979e4f9". Otherwise it is undefined.
+  let gitVersion: string;
+  try {
+    gitVersion = childProcess.execSync(
+      'git describe --tags --always', { encoding: 'utf8' }).trim();
+  } catch (e) { }
+
+  extraPlugins.push(new webpack.DefinePlugin({
+    '__GITVERSION__': JSON.stringify(gitVersion),
+  }));
 
   return {
     devtool: sourcemap ? 'source-map' : false,

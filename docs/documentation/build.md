@@ -33,3 +33,11 @@ ng build
 `--base-href` (`-bh`) base url for the application being built
 
 `--aot` flag whether to build using Ahead of Time compilation
+
+## Defined variables
+The source code of the application can access extra information about the
+environment. As of today, only one is avaible:
+
+`__GITVERSION__` gives the string describing the git commit, such as `"v1.0.2"`
+or `"v1.0.0-beta.23-52-g979e4f9"`. If not available, `__GITVERSION__` is
+undefined.
