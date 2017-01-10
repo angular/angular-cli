@@ -7,7 +7,7 @@
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
 [![npm][npm-badge]][npm-badge-url]
 
-Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://www.ember-cli.com/) project.
+Prototype of a CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
 
