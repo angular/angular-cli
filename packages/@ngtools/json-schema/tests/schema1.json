@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "CliConfig",
+  "id": "JsonSchema",
   "type": "object",
   "properties": {
     "requiredKey": {
@@ -18,6 +18,18 @@
     },
     "numberKey": {
       "type": "number"
+    },
+    "oneOfKey1": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" }
+      ]
+    },
+    "oneOfKey2": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
     },
     "objectKey1": {
       "type": "object",
@@ -39,7 +51,8 @@
       "type": "object",
       "properties": {
         "stringKey": {
-          "type": "string"
+          "type": "string",
+          "default": "default objectKey2.stringKey"
         }
       },
       "additionalProperties": true
@@ -47,8 +60,11 @@
     "arrayKey1": {
       "type": "array",
       "items": {
-        "stringKey": {
-          "type": "string"
+        "type": "object",
+        "properties": {
+          "stringKey": {
+            "type": "string"
+          }
         }
       }
     },
