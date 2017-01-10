@@ -34,6 +34,7 @@ export function getWebpackCommonConfig(
   verbose: boolean,
   progress: boolean,
   outputHashing: string,
+  extractCss: boolean,
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -91,7 +92,7 @@ export function getWebpackCommonConfig(
     // create css loaders for component css and for global css
     extraRules.push(...makeCssLoaders(globalStyles.map((style) => style.path)));
 
-    if (extractedCssEntryPoints.length > 0) {
+    if (extractCss && extractedCssEntryPoints.length > 0) {
       // don't emit the .js entry point for extracted styles
       extraPlugins.push(new SuppressEntryChunksWebpackPlugin({ chunks: extractedCssEntryPoints }));
     }
@@ -172,7 +173,10 @@ export function getWebpackCommonConfig(
       ].concat(extraRules)
     },
     plugins: [
-      new ExtractTextPlugin(`[name]${hashFormat.extract}.bundle.css`),
+      new ExtractTextPlugin({
+        filename: `[name]${hashFormat.extract}.bundle.css`,
+        disable: !extractCss
+      }),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
