@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as webpack from 'webpack';
 import {CompressionPlugin} from '../lib/webpack/compression-plugin';
-const autoprefixer = require('autoprefixer');
 const postcssDiscardComments = require('postcss-discard-comments');
 
 declare module 'webpack' {
@@ -25,7 +24,6 @@ export const getWebpackProdConfigPartial = function(projectRoot: string,
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
-      new webpack.LoaderOptionsPlugin({ minimize: true }),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8 : true },
         compress: { screw_ie8: true, warnings: verbose },
@@ -37,20 +35,12 @@ export const getWebpackProdConfigPartial = function(projectRoot: string,
           test: /\.js$|\.html$|\.css$/,
           threshold: 10240
       }),
-      // LoaderOptionsPlugin needs to be fully duplicated because webpackMerge will replace it.
       new webpack.LoaderOptionsPlugin({
-        test: /\.(css|scss|sass|less|styl)$/,
+        minimize: true,
         options: {
           postcss: [
-            autoprefixer(),
             postcssDiscardComments
-          ],
-          cssLoader: { sourceMap: sourcemap },
-          sassLoader: { sourceMap: sourcemap },
-          lessLoader: { sourceMap: sourcemap },
-          stylusLoader: { sourceMap: sourcemap },
-          // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
-          context: projectRoot,
+          ]
         }
       })
     ]

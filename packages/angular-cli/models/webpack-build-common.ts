@@ -188,7 +188,6 @@ export function getWebpackCommonConfig(
         name: 'inline'
       }),
       new webpack.LoaderOptionsPlugin({
-        test: /\.(css|scss|sass|less|styl)$/,
         options: {
           postcss: [autoprefixer()],
           cssLoader: { sourceMap: sourcemap },

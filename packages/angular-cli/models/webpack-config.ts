@@ -41,6 +41,8 @@ export class NgCliWebpackConfig {
     appConfig.outDir = outputDir || appConfig.outDir;
     appConfig.deployUrl = deployUrl || appConfig.deployUrl;
 
+    const merge = webpackMerge.smartStrategy({}, ['LoaderOptionsPlugin']);
+
     let baseConfig = getWebpackCommonConfig(
       this.ngCliProject.root,
       environment,
@@ -63,13 +65,13 @@ export class NgCliWebpackConfig {
       let mobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig);
       let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root,
                                                                       appConfig);
-      baseConfig = webpackMerge(baseConfig, mobileConfigPartial);
+      baseConfig = merge(baseConfig, mobileConfigPartial);
       if (this.target == 'production') {
-        targetConfigPartial = webpackMerge(targetConfigPartial, mobileProdConfigPartial);
+        targetConfigPartial = merge(targetConfigPartial, mobileProdConfigPartial);
       }
     }
 
-    this.config = webpackMerge(
+    this.config = merge(
       baseConfig,
       targetConfigPartial,
       typescriptConfigPartial
