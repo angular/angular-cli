@@ -19,7 +19,6 @@
     "no-trailing-whitespace": true,
     "no-bitwise": true,
     "no-unused-expression": true,
-    "no-unused-variable": true,
     "no-var-keyword": true,
     "one-line": [
       true,
