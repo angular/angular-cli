@@ -39,6 +39,7 @@ export function getWebpackCommonConfig(
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const appMain = path.resolve(appRoot, appConfig.main);
   const nodeModules = path.resolve(projectRoot, 'node_modules');
+  const target = appConfig.target || 'web';
 
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
@@ -200,6 +201,7 @@ export function getWebpackCommonConfig(
         },
       })
     ].concat(extraPlugins),
+    target: target,
     node: {
       fs: 'empty',
       global: true,

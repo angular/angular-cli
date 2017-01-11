@@ -33,6 +33,10 @@ export interface CliConfig {
          */
         environments?: {
             [name: string]: any;
+        /**
+         * Webpack target config.
+         */
+        target?: string;
         };
     }[];
     /**
