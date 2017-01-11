@@ -32,7 +32,8 @@ export class NgCliWebpackConfig {
     vendorChunk = false,
     verbose = false,
     progress = true,
-    deployUrl?: string
+    deployUrl?: string,
+    outputHashing?: string
   ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
@@ -48,7 +49,8 @@ export class NgCliWebpackConfig {
       sourcemap,
       vendorChunk,
       verbose,
-      progress
+      progress,
+      outputHashing
     );
     let targetConfigPartial = this.getTargetConfig(
       this.ngCliProject.root, appConfig, sourcemap, verbose

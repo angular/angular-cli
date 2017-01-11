@@ -4,11 +4,12 @@ import { GlobCopyWebpackPlugin } from '../plugins/glob-copy-webpack-plugin';
 import { SuppressEntryChunksWebpackPlugin } from '../plugins/suppress-entry-chunks-webpack-plugin';
 import { packageChunkSort } from '../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
-import { extraEntryParser, makeCssLoaders } from './webpack-build-utils';
+import { extraEntryParser, makeCssLoaders, getOutputHashFormat } from './webpack-build-utils';
 
 const autoprefixer = require('autoprefixer');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SilentError = require('silent-error');
 
 /**
@@ -31,7 +32,8 @@ export function getWebpackCommonConfig(
   sourcemap: boolean,
   vendorChunk: boolean,
   verbose: boolean,
-  progress: boolean
+  progress: boolean,
+  outputHashing: string,
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -45,6 +47,9 @@ export function getWebpackCommonConfig(
   let entryPoints: { [key: string]: string[] } = {
     main: [appMain]
   };
+
+  // determine hashing format
+  const hashFormat = getOutputHashFormat(outputHashing);
 
   // process global scripts
   if (appConfig.scripts && appConfig.scripts.length > 0) {
@@ -143,21 +148,31 @@ export function getWebpackCommonConfig(
     entry: entryPoints,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
-      publicPath: appConfig.deployUrl
+      publicPath: appConfig.deployUrl,
+      filename: `[name]${hashFormat.chunk}.bundle.js`,
+      sourceMapFilename: `[name]${hashFormat.chunk}.bundle.map`,
+      chunkFilename: `[id]${hashFormat.chunk}.chunk.js`
     },
     module: {
       rules: [
         { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
 
         { test: /\.json$/, loader: 'json-loader' },
-        { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
+        {
+          test: /\.(jpg|png|gif)$/,
+          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
+        },
         { test: /\.html$/, loader: 'raw-loader' },
 
-        { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url-loader?limit=10000' },
-        { test: /\.(eot|svg)$/, loader: 'file-loader' }
+        {
+          test: /\.(otf|ttf|woff|woff2)$/,
+          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
+        },
+        { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` }
       ].concat(extraRules)
     },
     plugins: [
+      new ExtractTextPlugin(`[name]${hashFormat.extract}.bundle.css`),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),

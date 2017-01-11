@@ -56,6 +56,13 @@ function getDeps(pkg) {
 Promise.resolve()
   .then(() => console.log('Deleting dist folder...'))
   .then(() => rimraf(dist))
+  .then(() => console.log('Creating schema.d.ts...'))
+  .then(() => {
+    const script = path.join(root, 'scripts/build-schema-dts.js');
+    const input = path.join(root, 'packages/angular-cli/lib/config/schema.json');
+    const output = path.join(root, 'packages/angular-cli/lib/config/schema.d.ts');
+    return npmRun.execSync(`node ${script} ${input} ${output}`);
+  })
   .then(() => console.log('Compiling packages...'))
   .then(() => {
     const packages = require('../../lib/packages');
@@ -162,7 +169,7 @@ Promise.resolve()
   })
   .then(() => {
     // Copy LICENSE into all the packages
-    console.log(`Copying LICENSE...`);
+    console.log('Copying LICENSE...');
 
     const packages = require('../../lib/packages');
     return Promise.all(Object.keys(packages).map(pkgName => {

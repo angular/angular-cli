@@ -21,7 +21,6 @@
     "test:deps": "node scripts/publish/validate_dependencies.js",
     "test:inspect": "node --inspect --debug-brk tests/runner",
     "test:packages": "node scripts/run-packages-spec.js",
-    "build-config-interface": "dtsgen packages/angular-cli/lib/config/schema.json --out packages/angular-cli/lib/config/schema.d.ts",
     "eslint": "eslint .",
     "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
     "lint": "npm-run-all -c eslint tslint"
@@ -81,7 +80,7 @@
     "markdown-it-terminal": "0.0.3",
     "minimatch": "^3.0.3",
     "node-modules-path": "^1.0.0",
-    "node-sass": "^3.10.1",
+    "node-sass": "^4.1.1",
     "nopt": "^3.0.1",
     "offline-plugin": "^3.4.1",
     "opn": "4.0.1",
