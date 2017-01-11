@@ -17,6 +17,7 @@ export interface BuildOptions {
   i18nFormat?: string;
   locale?: string;
   deployUrl?: string;
+  outputHashing?: string;
 }
 
 const BuildCommand = Command.extend({
@@ -45,7 +46,13 @@ const BuildCommand = Command.extend({
     { name: 'i18n-file',      type: String, default: null },
     { name: 'i18n-format',    type: String, default: null },
     { name: 'locale',         type: String, default: null },
-    { name: 'deploy-url',     type: String,  default: null, aliases: ['d'] }
+    { name: 'deploy-url',     type: String,  default: null, aliases: ['d'] },
+    {
+      name: 'output-hashing',
+      type: String,
+      values: ['none', 'all', 'media', 'bundles'],
+      description: 'define the output filename cache-busting hashing mode'
+    }
   ],
 
   run: function (commandOptions: BuildOptions) {
