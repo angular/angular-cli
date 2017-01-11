@@ -114,7 +114,7 @@
     "typescript": "~2.0.3",
     "url-loader": "^0.5.7",
     "walk-sync": "^0.2.6",
-    "webpack": "2.2.0-rc.3",
+    "webpack": "beta",
     "webpack-dev-server": "2.2.0-rc.0",
     "webpack-merge": "^0.14.0",
     "webpack-sources": "^0.1.3",
