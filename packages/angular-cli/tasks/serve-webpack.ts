@@ -56,6 +56,7 @@ export default Task.extend({
       entryPoints.push('webpack/hot/dev-server');
       config.plugins.push(new webpack.HotModuleReplacementPlugin());
     }
+    if (!config.entry.main) { config.entry.main = []; }
     config.entry.main.unshift(...entryPoints);
     webpackCompiler = webpack(config);
 
