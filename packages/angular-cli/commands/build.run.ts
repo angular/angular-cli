@@ -13,6 +13,15 @@ export default function buildRun(commandOptions: BuildOptions) {
     }
   }
 
+  if (!commandOptions.outputHashing) {
+    if (commandOptions.target === 'development') {
+      commandOptions.outputHashing = 'none';
+    }
+    if (commandOptions.target === 'production') {
+      commandOptions.outputHashing = 'all';
+    }
+  }
+
   const project = this.project;
 
   // Check angular version.
