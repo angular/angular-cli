@@ -37,16 +37,17 @@ export function getWebpackCommonConfig(
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
-  const appMain = path.resolve(appRoot, appConfig.main);
   const nodeModules = path.resolve(projectRoot, 'node_modules');
 
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
   let lazyChunks: string[] = [];
 
-  let entryPoints: { [key: string]: string[] } = {
-    main: [appMain]
-  };
+  let entryPoints: { [key: string]: string[] } = {};
+
+  if (appConfig.main) {
+    entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
+  }
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(outputHashing);
