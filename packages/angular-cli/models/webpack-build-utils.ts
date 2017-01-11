@@ -109,3 +109,21 @@ export function extraEntryParser(
       return extraEntry;
     });
 }
+
+export interface HashFormat {
+  chunk: string;
+  extract: string;
+  file: string;
+}
+
+export function getOutputHashFormat(option: string, length = 20): HashFormat {
+  /* tslint:disable:max-line-length */
+  const hashFormats: { [option: string]: HashFormat } = {
+    none:    { chunk: '',                       extract: '',                         file: ''                  },
+    media:   { chunk: '',                       extract: '',                         file: `.[hash:${length}]` },
+    bundles: { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: ''                  },
+    all:     { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: `.[hash:${length}]` },
+  };
+  /* tslint:enable:max-line-length */
+  return hashFormats[option] || hashFormats['none'];
+}

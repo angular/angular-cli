@@ -26,6 +26,8 @@ ng build
 
 `--output-path` (`-o`) path where output will be placed
 
+`--output-hashing` define the output filename cache-busting hashing mode
+
 `--watch` (`-w`) flag to run builds when files change
 
 `--surpress-sizes` flag to suppress sizes from build output

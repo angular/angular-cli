@@ -1,3 +1,4 @@
+import * as chalk from 'chalk';
 import LinkCli from '../tasks/link-cli';
 import NpmInstall from '../tasks/npm-install';
 
@@ -92,7 +93,7 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
       if (commandOptions.skipGit === false) {
         return gitInit.run(commandOptions, rawArgs);
       }
-    }.bind(this))
+    })
     .then(function () {
       if (!commandOptions.skipNpm) {
         return npmInstall.run();
@@ -102,5 +103,8 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
       if (commandOptions.linkCli) {
         return linkCli.run();
       }
+    })
+    .then(() => {
+      this.ui.writeLine(chalk.green(`Project '${packageName}' successfully created.`));
     });
 }
