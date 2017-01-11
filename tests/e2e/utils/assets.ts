@@ -32,7 +32,7 @@ export function copyAssets(assetName: string) {
 
 
 export function createProjectFromAsset(assetName: string) {
-  const packages = require('../../../lib/packages');
+  const packages = require('../../../lib/packages').packages;
 
   return Promise.resolve()
     .then(() => copyAssets(assetName))

@@ -2,7 +2,7 @@ import {readFile, writeFile} from './fs';
 import {silentExecAndWaitForOutputToMatch, silentNpm, ng} from './process';
 import {getGlobalVariable} from './env';
 
-const packages = require('../../../lib/packages');
+const packages = require('../../../lib/packages').packages;
 
 
 const tsConfigPath = 'src/tsconfig.app.json';
