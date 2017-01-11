@@ -1,6 +1,6 @@
 import {node, ng, npm} from '../utils/process';
 
-const packages = require('../../../lib/packages');
+const packages = require('../../../lib/packages').packages;
 
 
 export default function() {

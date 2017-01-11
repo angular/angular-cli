@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+
+  "compilerOptions": {
+    "outDir": "../../dist/tools/publish",
+    "rootDir": ".",
+    "baseUrl": "",
+    "paths": {
+      "@ngtools/json-schema": [ "../../dist/@ngtools/json-schema/src" ],
+      "@ngtools/logger": [ "../../dist/@ngtools/logger/src" ]
+    }
+  }
+}

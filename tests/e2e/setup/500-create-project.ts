@@ -6,7 +6,7 @@ import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';
 
 
-let packages = require('../../../lib/packages');
+let packages = require('../../../lib/packages').packages;
 
 
 export default function() {
