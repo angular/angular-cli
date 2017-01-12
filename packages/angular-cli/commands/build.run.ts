@@ -22,7 +22,7 @@ export default function buildRun(commandOptions: BuildOptions) {
     }
   }
 
-  if (!commandOptions.sourcemap) {
+  if (typeof commandOptions.sourcemap === 'undefined') {
     if (commandOptions.target == 'development') {
       commandOptions.sourcemap = true;
     }
