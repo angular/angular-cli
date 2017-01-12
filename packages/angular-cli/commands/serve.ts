@@ -1,7 +1,4 @@
-const PortFinder = require('portfinder');
 const Command = require('../ember-cli/lib/models/command');
-
-PortFinder.basePort = 49152;
 
 const defaultPort = process.env.PORT || 4200;
 
@@ -9,12 +6,7 @@ export interface ServeTaskOptions {
   port?: number;
   host?: string;
   proxyConfig?: string;
-  watcher?: string;
   liveReload?: boolean;
-  liveReloadHost?: string;
-  liveReloadPort?: number;
-  liveReloadBaseUrl?: string;
-  liveReloadLiveCss?: boolean;
   target?: string;
   environment?: string;
   ssl?: boolean;
@@ -47,39 +39,15 @@ const ServeCommand = Command.extend({
       description: 'Listens only on localhost by default'
     },
     { name: 'proxy-config',         type: 'Path',                          aliases: ['pc'] },
-    { name: 'watcher',              type: String,  default: 'events',      aliases: ['w'] },
-    { name: 'live-reload',          type: Boolean, default: true,          aliases: ['lr'] },
-    {
-      name: 'live-reload-host',
-      type: String,
-      aliases: ['lrh'],
-      description: 'Defaults to host'
-    },
-    {
-      name: 'live-reload-base-url',
-      type: String,
-      aliases: ['lrbu'],
-      description: 'Defaults to baseURL'
-    },
-    {
-      name: 'live-reload-port',
-      type: Number,
-      aliases: ['lrp'],
-      description: '(Defaults to port number within [49152...65535])'
-    },
-    {
-      name: 'live-reload-live-css',
-      type: Boolean,
-      default: true,
-      description: 'Whether to live reload CSS (default true)'
-    },
+    { name: 'live-reload',          type: Boolean, default: true },
     {
       name: 'target',
       type: String,
+      values: ['development', 'production'],
       default: 'development',
       aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }]
     },
-    { name: 'environment',          type: String,  default: '', aliases: ['e'] },
+    { name: 'environment',          type: String,  aliases: ['e'] },
     { name: 'ssl',                  type: Boolean, default: false },
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
     { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' },
@@ -101,9 +69,9 @@ const ServeCommand = Command.extend({
       default: false,
       description: 'Enable hot module replacement',
     },
-    { name: 'i18n-file',       type: String, default: null },
-    { name: 'i18n-format',     type: String, default: null },
-    { name: 'locale',         type: String, default: null }
+    { name: 'i18n-file',       type: String },
+    { name: 'i18n-format',     type: String },
+    { name: 'locale',          type: String }
   ],
 
   run: function(commandOptions: ServeTaskOptions) {
