@@ -18,6 +18,7 @@ export interface BuildOptions {
   locale?: string;
   deployUrl?: string;
   outputHashing?: string;
+  extractCss?: boolean | null;
 }
 
 const BuildCommand = Command.extend({
@@ -52,7 +53,8 @@ const BuildCommand = Command.extend({
       type: String,
       values: ['none', 'all', 'media', 'bundles'],
       description: 'define the output filename cache-busting hashing mode'
-    }
+    },
+    { name: 'extract-css',    type: Boolean, default: true }
   ],
 
   run: function (commandOptions: BuildOptions) {

@@ -35,3 +35,5 @@
 `--aot` flag to turn on Ahead of Time compilation
 
 `--open` (`-o`) opens the app in the default browser
+
+`--extract-css` extract css from global styles onto css files instead of js ones
