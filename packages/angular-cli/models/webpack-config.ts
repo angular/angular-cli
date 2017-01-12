@@ -31,45 +31,49 @@ export class NgCliWebpackConfig {
     sourcemap = true,
     vendorChunk = false,
     verbose = false,
-    progress = true
+    progress = true,
+    deployUrl?: string,
+    outputHashing?: string
   ) {
-    const config: CliConfig = CliConfig.fromProject();
-    const appConfig = config.config.apps[0];
+    const appConfig = CliConfig.fromProject().config.apps[0];
+    const projectRoot = this.ngCliProject.root;
 
     appConfig.outDir = outputDir || appConfig.outDir;
+    appConfig.deployUrl = deployUrl || appConfig.deployUrl;
 
     let baseConfig = getWebpackCommonConfig(
-      this.ngCliProject.root,
+      projectRoot,
       environment,
       appConfig,
       baseHref,
       sourcemap,
       vendorChunk,
       verbose,
-      progress
+      progress,
+      outputHashing
     );
-    let targetConfigPartial = this.getTargetConfig(
-      this.ngCliProject.root, appConfig, sourcemap, verbose
-    );
-    const typescriptConfigPartial = isAoT
-      ? getWebpackAotConfigPartial(this.ngCliProject.root, appConfig, i18nFile, i18nFormat, locale)
-      : getWebpackNonAotConfigPartial(this.ngCliProject.root, appConfig);
+    let targetConfigPartial = this.getTargetConfig(projectRoot, appConfig, sourcemap, verbose);
 
     if (appConfig.mobile) {
-      let mobileConfigPartial = getWebpackMobileConfigPartial(this.ngCliProject.root, appConfig);
-      let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(this.ngCliProject.root,
-                                                                      appConfig);
+      let mobileConfigPartial = getWebpackMobileConfigPartial(projectRoot, appConfig);
+      let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(projectRoot, appConfig);
       baseConfig = webpackMerge(baseConfig, mobileConfigPartial);
       if (this.target == 'production') {
         targetConfigPartial = webpackMerge(targetConfigPartial, mobileProdConfigPartial);
       }
     }
 
-    this.config = webpackMerge(
-      baseConfig,
-      targetConfigPartial,
-      typescriptConfigPartial
-    );
+    let config = webpackMerge(baseConfig, targetConfigPartial);
+
+    if (appConfig.main) {
+      const typescriptConfigPartial = isAoT
+        ? getWebpackAotConfigPartial(projectRoot, appConfig, i18nFile, i18nFormat, locale)
+        : getWebpackNonAotConfigPartial(projectRoot, appConfig);
+
+      config = webpackMerge(config, typescriptConfigPartial);
+    }
+
+    this.config = config;
   }
 
   getTargetConfig(projectRoot: string, appConfig: any, sourcemap: boolean, verbose: boolean): any {

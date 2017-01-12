@@ -116,7 +116,7 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'foo', '--skip-npm', '--skip-git'])
       .then(function () {
         return ng(['new', 'foo', '--skip-npm', '--skip-git']).then(() => {
-          throw new SilentError('Cannot run ng new, inside of ember-cli project should fail.');
+          throw new SilentError('Cannot run ng new, inside of angular-cli project should fail.');
         }, () => {
           expect(!existsSync('foo'));
         });
