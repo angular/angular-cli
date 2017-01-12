@@ -32,6 +32,8 @@ module.exports = {
   locals: function(options) {
     this.styleExt = options.style;
     this.version = require(path.resolve(__dirname, '../../package.json')).version;
+    // set this.tests to opposite of skipTest options, meaning if tests are being skipped then the default.spec.BLUEPRINT will be false
+    this.tests = options.skipTests ? false : true;
 
     // Split/join with / not path.sep as reference to typings require forward slashes.
     const relativeRootPath = options.sourceDir.split('/').map(() => '..').join('/');
@@ -57,7 +59,8 @@ module.exports = {
       isMobile: options.mobile,
       routing: options.routing,
       inlineStyle: options.inlineStyle,
-      inlineTemplate: options.inlineTemplate
+      inlineTemplate: options.inlineTemplate,
+      tests: this.tests
     };
   },
 
@@ -75,6 +78,10 @@ module.exports = {
     }
     if (this.options && this.options.skipGit) {
       fileList = fileList.filter(p => p.indexOf('gitignore') < 0);
+    }
+
+    if (this.options && this.options.skipTests) {
+      fileList = fileList.filter(p => p.indexOf('app.component.spec.ts') < 0);
     }
 
     return fileList;
