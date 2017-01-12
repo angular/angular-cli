@@ -51,12 +51,12 @@ const githubPagesDeployCommand = Command.extend({
             name: 'gh-token',
             type: String,
             default: '',
-            description: 'Github token'
+            description: 'GitHub token'
         }, {
             name: 'gh-username',
             type: String,
             default: '',
-            description: 'Github username'
+            description: 'GitHub username'
         }, {
             name: 'base-href',
             type: String,
