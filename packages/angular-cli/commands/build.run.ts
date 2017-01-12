@@ -22,6 +22,15 @@ export default function buildRun(commandOptions: BuildOptions) {
     }
   }
 
+  if (typeof commandOptions.sourcemap === 'undefined') {
+    if (commandOptions.target == 'development') {
+      commandOptions.sourcemap = true;
+    }
+    if (commandOptions.target == 'production') {
+      commandOptions.sourcemap = false;
+    }
+  }
+
   const project = this.project;
 
   // Check angular version.
