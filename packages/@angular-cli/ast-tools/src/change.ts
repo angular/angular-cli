@@ -1,8 +1,8 @@
 import fs = require('fs');
 import denodeify = require('denodeify');
 
-const readFile = (denodeify(fs.readFile) as (...args: any[]) => Promise<string>);
-const writeFile = (denodeify(fs.writeFile) as (...args: any[]) => Promise<string>);
+const readFile = (denodeify(fs.readFile) as (...args: any[]) => Promise<any>);
+const writeFile = (denodeify(fs.writeFile) as (...args: any[]) => Promise<any>);
 
 export interface Host {
   write(path: string, content: string): Promise<void>;
@@ -56,6 +56,10 @@ export class MultiChange implements Change {
   }
 
   appendChange(change: Change) {
+    // Do not append Noop changes.
+    if (change instanceof NoopChange) {
+      return;
+    }
     // Validate that the path is the same for everyone of those.
     if (this._path === undefined) {
       this._path = change.path;

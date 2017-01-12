@@ -29,7 +29,7 @@ import 'rxjs/add/operator/toPromise';
 */
 export function getSource(filePath: string): ts.SourceFile {
   return ts.createSourceFile(filePath, fs.readFileSync(filePath).toString(),
-    ts.ScriptTarget.ES6, true);
+    ts.ScriptTarget.Latest, true);
 }
 
 

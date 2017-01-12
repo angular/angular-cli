@@ -19,6 +19,7 @@ const NewCommand = Command.extend({
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
     { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
     { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
+    { name: 'skip-commit', type: Boolean, default: false, aliases: ['sc'] },
     { name: 'directory', type: String, aliases: ['dir'] },
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'style', type: String, default: 'css' },

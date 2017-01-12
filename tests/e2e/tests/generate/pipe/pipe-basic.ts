@@ -1,7 +1,7 @@
 import {join} from 'path';
-import {ng} from '../../utils/process';
-import {expectFileToExist} from '../../utils/fs';
+import {ng} from '../../../utils/process';
 
+import {expectFileToExist} from '../../../utils/fs';
 
 export default function() {
   // Create the pipe in the same directory.

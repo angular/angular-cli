@@ -45,6 +45,9 @@
             ],
             "default": []
           },
+          "deployUrl": {
+            "type": "string"
+          },
           "index": {
             "type": "string",
             "default": "index.html"
@@ -56,7 +59,8 @@
             "type": "string"
           },
           "tsconfig": {
-            "type": "string"
+            "type": "string",
+            "default": "tsconfig.json"
           },
           "prefix": {
             "type": "string"
@@ -100,7 +104,8 @@
                       "type": "string"
                     }
                   },
-                  "additionalProperties": true
+                  "additionalProperties": true,
+                  "required": ["input"]
                 }
               ]
             },

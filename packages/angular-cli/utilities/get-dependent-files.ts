@@ -32,7 +32,7 @@ export interface ModuleMap {
 export function createTsSourceFile(fileName: string): Promise<ts.SourceFile> {
   return readFile(fileName, 'utf8')
     .then((contents: string) => {
-      return ts.createSourceFile(fileName, contents, ts.ScriptTarget.ES6, true);
+      return ts.createSourceFile(fileName, contents, ts.ScriptTarget.Latest, true);
     });
 }
 

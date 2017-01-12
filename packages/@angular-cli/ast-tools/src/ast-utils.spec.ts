@@ -296,5 +296,5 @@ function getNodesOfKind(kind: ts.SyntaxKind, sourceFile: string) {
 
 function getRootNode(sourceFile: string) {
   return ts.createSourceFile(sourceFile, fs.readFileSync(sourceFile).toString(),
-    ts.ScriptTarget.ES6, true);
+    ts.ScriptTarget.Latest, true);
 }

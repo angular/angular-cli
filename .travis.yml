@@ -12,7 +12,7 @@ matrix:
   allow_failures:
     - os: osx
     - node_js: "7"
-    - env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+    - env: NODE_SCRIPT="tests/run_e2e.js --nightly"
   include:
     - node_js: "6"
       os: linux
@@ -22,16 +22,16 @@ matrix:
       env: SCRIPT=build
     - node_js: "4"
       os: linux
-      env: NODE_SCRIPT=tests/e2e_runner.js
+      env: NODE_SCRIPT=tests/run_e2e.js
     - node_js: "6"
       os: linux
       env: SCRIPT=test
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT=tests/e2e_runner.js
+      env: NODE_SCRIPT=tests/run_e2e.js
     - node_js: "6"
       os: osx
-      env: NODE_SCRIPT=tests/e2e_runner.js
+      env: NODE_SCRIPT=tests/run_e2e.js
 
     # Optional builds.
     - node_js: "6"
@@ -39,10 +39,10 @@ matrix:
       env: SCRIPT=test
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT="tests/e2e_runner.js --nightly"
+      env: NODE_SCRIPT="tests/run_e2e.js --nightly"
     - node_js: "7"
       os: linux
-      env: NODE_SCRIPT=tests/e2e_runner.js
+      env: NODE_SCRIPT=tests/run_e2e.js
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi

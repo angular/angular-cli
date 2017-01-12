@@ -122,14 +122,14 @@ Command.prototype.validateAndRun = function(args) {
 
   if (this.works === 'insideProject' && !this.isWithinProject) {
     return Promise.reject(new SilentError(
-      'You have to be inside an ember-cli project in order to use ' +
+      'You have to be inside an angular-cli project in order to use ' +
       'the ' + chalk.green(this.name) + ' command.'
     ));
   }
 
   if (this.works === 'outsideProject' && this.isWithinProject) {
     return Promise.reject(new SilentError(
-      'You cannot use the ' + chalk.green(this.name) + ' command inside an ember-cli project.'
+      'You cannot use the ' + chalk.green(this.name) + ' command inside an angular-cli project.'
     ));
   }
 
@@ -363,7 +363,7 @@ Command.prototype.parseArgs = function(commandArgs) {
     // ignore 'argv', 'h', and 'help'
     if (!commandOptions.hasOwnProperty(key) && key !== 'argv' && key !== 'h' && key !== 'help') {
       this.ui.writeLine(chalk.yellow('The option \'--' + key + '\' is not registered with the ' + this.name + ' command. ' +
-                        'Run `ember ' + this.name + ' --help` for a list of supported options.'));
+                        'Run `ng ' + this.name + ' --help` for a list of supported options.'));
     }
     if (typeof parsedOptions[key] !== 'object') {
       commandOptions[camelize(key)] = parsedOptions[key];
@@ -408,7 +408,7 @@ Command.prototype._printCommand = printCommand;
 
   Basic help looks like this:
 
-      ember generate <blueprint> <options...>
+      ng generate <blueprint> <options...>
         Generates new code from blueprints
         aliases: g
         --dry-run (Default: false)
@@ -420,7 +420,7 @@ Command.prototype._printCommand = printCommand;
   @method printBasicHelp
 */
 Command.prototype.printBasicHelp = function() {
-  // ember command-name
+  // ng command-name
   var output;
   if (this.isRoot) {
     output = 'Usage: ' + this.name;

@@ -6,27 +6,9 @@ var Project       = require('../models/project');
 var commands      = require('../commands');
 var tasks         = require('../tasks');
 var CLI           = require('./cli');
-var packageConfig = require('../../../package.json');
 var debug         = require('debug')('ember-cli:cli/index');
 var merge         = require('lodash/merge');
 
-var version      = packageConfig.version;
-var name         = packageConfig.name;
-var trackingCode = packageConfig.trackingCode;
-
-function clientId() {
-  var ConfigStore = require('configstore');
-  var configStore = new ConfigStore('ember-cli');
-  var id = configStore.get('client-id');
-
-  if (id) {
-    return id;
-  } else {
-    id = require('uuid').v4().toString();
-    configStore.set('client-id', id);
-    return id;
-  }
-}
 
 // Options: Array cliArgs, Stream inputStream, Stream outputStream
 module.exports = function(options) {
