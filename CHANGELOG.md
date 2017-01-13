@@ -12,7 +12,7 @@
 * **build/serve:** correct check against angular v2.3.1 ([#3785](https://github.com/angular/angular-cli/issues/3785)) ([d0224a5](https://github.com/angular/angular-cli/commit/d0224a5)), closes [#3720](https://github.com/angular/angular-cli/issues/3720) [#3729](https://github.com/angular/angular-cli/issues/3729)
 * **config:** allow minimal config for build/serve ([#3835](https://github.com/angular/angular-cli/issues/3835)) ([f616158](https://github.com/angular/angular-cli/commit/f616158))
 * **lint:** remove tslint rule that requires type info ([#3818](https://github.com/angular/angular-cli/issues/3818)) ([1555c2b](https://github.com/angular/angular-cli/commit/1555c2b))
-* **lint:** use noUnusedParameters and noUnusedLocals instead of no-unused-variabl ([#3945](https://github.com/angular/angular-cli/issues/3945)) ([dd378fe](https://github.com/angular/angular-cli/commit/dd378fe))
+* **lint:** use noUnusedParameters and noUnusedLocals instead of no-unused-variable ([#3945](https://github.com/angular/angular-cli/issues/3945)) ([dd378fe](https://github.com/angular/angular-cli/commit/dd378fe))
 * **serve:** communicate that ng serve is not secure. ([#3646](https://github.com/angular/angular-cli/issues/3646)) ([766394d](https://github.com/angular/angular-cli/commit/766394d))
 * **serve:** fallback to config.app[0].index ([#3813](https://github.com/angular/angular-cli/issues/3813)) ([45e2985](https://github.com/angular/angular-cli/commit/45e2985)), closes [#3748](https://github.com/angular/angular-cli/issues/3748)
 * **test:** remove webpack size limit warning ([#3974](https://github.com/angular/angular-cli/issues/3974)) ([b25b97d](https://github.com/angular/angular-cli/commit/b25b97d))
