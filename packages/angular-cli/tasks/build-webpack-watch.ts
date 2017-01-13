@@ -33,7 +33,9 @@ export default Task.extend({
       runTaskOptions.vendorChunk,
       runTaskOptions.verbose,
       runTaskOptions.progress,
-      deployUrl
+      deployUrl,
+      runTaskOptions.outputHashing,
+      runTaskOptions.extractCss,
     ).config;
     const webpackCompiler: any = webpack(config);
 

@@ -4,11 +4,12 @@ import { GlobCopyWebpackPlugin } from '../plugins/glob-copy-webpack-plugin';
 import { SuppressEntryChunksWebpackPlugin } from '../plugins/suppress-entry-chunks-webpack-plugin';
 import { packageChunkSort } from '../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
-import { extraEntryParser, makeCssLoaders } from './webpack-build-utils';
+import { extraEntryParser, makeCssLoaders, getOutputHashFormat } from './webpack-build-utils';
 
 const autoprefixer = require('autoprefixer');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SilentError = require('silent-error');
 
 /**
@@ -31,20 +32,26 @@ export function getWebpackCommonConfig(
   sourcemap: boolean,
   vendorChunk: boolean,
   verbose: boolean,
-  progress: boolean
+  progress: boolean,
+  outputHashing: string,
+  extractCss: boolean,
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
-  const appMain = path.resolve(appRoot, appConfig.main);
   const nodeModules = path.resolve(projectRoot, 'node_modules');
 
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
   let lazyChunks: string[] = [];
 
-  let entryPoints: { [key: string]: string[] } = {
-    main: [appMain]
-  };
+  let entryPoints: { [key: string]: string[] } = {};
+
+  if (appConfig.main) {
+    entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
+  }
+
+  // determine hashing format
+  const hashFormat = getOutputHashFormat(outputHashing);
 
   // process global scripts
   if (appConfig.scripts && appConfig.scripts.length > 0) {
@@ -86,7 +93,7 @@ export function getWebpackCommonConfig(
     // create css loaders for component css and for global css
     extraRules.push(...makeCssLoaders(globalStyles.map((style) => style.path)));
 
-    if (extractedCssEntryPoints.length > 0) {
+    if (extractCss && extractedCssEntryPoints.length > 0) {
       // don't emit the .js entry point for extracted styles
       extraPlugins.push(new SuppressEntryChunksWebpackPlugin({ chunks: extractedCssEntryPoints }));
     }
@@ -143,21 +150,34 @@ export function getWebpackCommonConfig(
     entry: entryPoints,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
-      publicPath: appConfig.deployUrl
+      publicPath: appConfig.deployUrl,
+      filename: `[name]${hashFormat.chunk}.bundle.js`,
+      sourceMapFilename: `[name]${hashFormat.chunk}.bundle.map`,
+      chunkFilename: `[id]${hashFormat.chunk}.chunk.js`
     },
     module: {
       rules: [
         { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
 
         { test: /\.json$/, loader: 'json-loader' },
-        { test: /\.(jpg|png|gif)$/, loader: 'url-loader?limit=10000' },
+        {
+          test: /\.(jpg|png|gif)$/,
+          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
+        },
         { test: /\.html$/, loader: 'raw-loader' },
 
-        { test: /\.(otf|ttf|woff|woff2)$/, loader: 'url-loader?limit=10000' },
-        { test: /\.(eot|svg)$/, loader: 'file-loader' }
+        {
+          test: /\.(otf|ttf|woff|woff2)$/,
+          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
+        },
+        { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` }
       ].concat(extraRules)
     },
     plugins: [
+      new ExtractTextPlugin({
+        filename: `[name]${hashFormat.extract}.bundle.css`,
+        disable: !extractCss
+      }),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
