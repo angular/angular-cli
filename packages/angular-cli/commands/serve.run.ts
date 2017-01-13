@@ -20,6 +20,11 @@ export default function serveRun(commandOptions: ServeTaskOptions) {
     }
   }
 
+  // default to extractCss to true on prod target
+  if (typeof commandOptions.extractCss === 'undefined') {
+    commandOptions.extractCss = commandOptions.target === 'production';
+  }
+
   // Check angular version.
   Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
   commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;

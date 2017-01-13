@@ -219,7 +219,7 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
 [corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
 [dev-doc]: https://github.com/angular/angular/blob/master/DEVELOPER.md
-[github]: https://github.com/angular/angular-cli
+[GitHub]: https://github.com/angular/angular-cli
 [gitter]: https://gitter.im/angular/angular-cli
 [individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
 [js-style-guide]: https://google.github.io/styleguide/jsguide.html
