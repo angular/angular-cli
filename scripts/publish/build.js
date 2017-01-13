@@ -56,6 +56,13 @@ function getDeps(pkg) {
 Promise.resolve()
   .then(() => console.log('Deleting dist folder...'))
   .then(() => rimraf(dist))
+  .then(() => console.log('Creating schema.d.ts...'))
+  .then(() => {
+    const script = path.join(root, 'scripts/build-schema-dts.js');
+    const input = path.join(root, 'packages/angular-cli/lib/config/schema.json');
+    const output = path.join(root, 'packages/angular-cli/lib/config/schema.d.ts');
+    return npmRun.execSync(`node ${script} ${input} ${output}`);
+  })
   .then(() => console.log('Compiling packages...'))
   .then(() => {
     const packages = require('../../lib/packages');
@@ -154,11 +161,21 @@ Promise.resolve()
   })
   .then(() => {
     // Copy all resources that might have been missed.
-    return Promise.all([
-      'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE', 'README.md'
-    ].map(fileName => {
+    const extraFiles = ['CHANGELOG.md', 'CONTRIBUTING.md', 'README.md'];
+    return Promise.all(extraFiles.map(fileName => {
       console.log(`Copying ${fileName}...`);
       return copy(fileName, path.join('dist/angular-cli', fileName));
+    }));
+  })
+  .then(() => {
+    // Copy LICENSE into all the packages
+    console.log('Copying LICENSE...');
+
+    const packages = require('../../lib/packages');
+    return Promise.all(Object.keys(packages).map(pkgName => {
+      const pkg = packages[pkgName];
+      console.log(`  ${pkgName}`);
+      return copy('LICENSE', path.join(pkg.dist, 'LICENSE'));
     }));
   })
   .then(() => process.exit(0), (err) => {
