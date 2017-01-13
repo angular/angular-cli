@@ -7,6 +7,8 @@ import { AppModule } from './app/app.module';
 
 if (environment.production) {
   enableProdMode();
+} else {
+  require('zone.js/dist/long-stack-trace-zone');
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule);
