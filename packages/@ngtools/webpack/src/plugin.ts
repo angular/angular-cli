@@ -167,10 +167,12 @@ export class AotPlugin implements Tapable {
 
     if (options.entryModule) {
       this._entryModule = options.entryModule;
-    } else if (this._angularCompilerOptions.entryModule) {
-      this._entryModule = path.resolve(this._basePath, this._angularCompilerOptions.entryModule);
+    } else if ((tsConfig.raw['angularCompilerOptions'] as any)
+            && (tsConfig.raw['angularCompilerOptions'] as any).entryModule) {
+      this._entryModule = path.resolve(this._basePath,
+        (tsConfig.raw['angularCompilerOptions'] as any).entryModule);
     }
-    
+
     // still no _entryModule? => try to resolve from mainPath
     if (!this._entryModule && options.mainPath) {
       this._entryModule = resolveEntryModuleFromMain(options.mainPath, this._compilerHost,
