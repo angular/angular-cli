@@ -35,7 +35,10 @@ export default Task.extend({
       serveTaskOptions.sourcemap,
       serveTaskOptions.vendorChunk,
       serveTaskOptions.verbose,
-      serveTaskOptions.progress
+      serveTaskOptions.progress,
+      undefined,
+      undefined,
+      serveTaskOptions.extractCss
     ).config;
 
     // This allows for live reload of page when changes are made to repo.
@@ -55,7 +58,14 @@ export default Task.extend({
       ui.writeLine('  for information on working with HMR for Webpack.');
       entryPoints.push('webpack/hot/dev-server');
       config.plugins.push(new webpack.HotModuleReplacementPlugin());
+      if (serveTaskOptions.extractCss) {
+        ui.writeLine(oneLine`
+          ${chalk.yellow('NOTICE')} (HMR) does not allow for CSS hot reload when used
+          together with '--extract-css'.
+        `);
+      }
     }
+    if (!config.entry.main) { config.entry.main = []; }
     config.entry.main.unshift(...entryPoints);
     webpackCompiler = webpack(config);
 

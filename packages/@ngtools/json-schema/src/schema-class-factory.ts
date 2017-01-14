@@ -1,8 +1,11 @@
-import {NgToolkitError} from '../error';
 import {Serializer} from './serializer';
 import {RootSchemaTreeNode, SchemaTreeNode} from './schema-tree';
+import {JsonSchemaErrorBase} from './error';
 
-export class InvalidJsonPath extends NgToolkitError {}
+import './mimetypes';
+
+
+export class InvalidJsonPath extends JsonSchemaErrorBase {}
 
 
 // The schema tree node property of the SchemaClass.
@@ -65,6 +68,9 @@ export interface SchemaClass<JsonType> extends Object {
   $$typeOf(path: string): string;
   $$defined(path: string): boolean;
   $$delete(path: string): void;
+
+  // Direct access to the schema.
+  $$schema(): RootSchemaTreeNode;
 
   $$serialize(mimetype?: string): string;
 }
