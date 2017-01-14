@@ -50,29 +50,19 @@ of pushing to `gh-pages`, since user and organization pages require this.
 `--gh-token` Github token
   - Default: `''`
 
-`--gh-username Github username
+`--gh-username` Github username
   - Default `''`
 
-`--base-href The content for the base tag to place in `index.html`. 
-- Default `null`
-
+`--base-href` The content for the base tag to place in `index.html`. 
+  - Default `null`
     1. If provided, will use value
     
     2. If `--user-page` is `true`, will leave `index.html` unchanged
     
     3. Otherwise auto replace with git project name (`/my-project/` for git://github.com/myUser/my-project.git)
     
+`--custom-domain` Set a custom domain for the deployment.
+  - Default `null`
+  - Example `--custom-domain='bestproject.com'`
   
-
-
-## Deploying to Custom Domain
-In order to serve from a GitHub custom page, 
-
-1. Provide `--base-href='/'`
-
-2. The deployment will remove the CNAME file in the gh-pages branch
-
-3. When deployment is completed, update the `Custom Domain` from the `Settings` tab in your GitHub project page.
-   * This step will be unnecessary pending PR [#3392](https://github.com/angular/angular-cli/pull/3392) or [#3899](https://github.com/angular/angular-cli/pull/3899)
- 
-  
+     This requires `--base-href='/'` to also be set.  For setting up DNS, please see the [GitHub help topic](https://help.github.com/articles/using-a-custom-domain-with-github-pages/)
