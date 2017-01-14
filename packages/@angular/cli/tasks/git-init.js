@@ -9,8 +9,8 @@ var template = require('lodash/template');
 var Task = require('../ember-cli/lib/models/task');
 
 var gitEnvironmentVariables = {
-  GIT_AUTHOR_NAME: 'Angular CLI',
-  GIT_AUTHOR_EMAIL: 'angular-cli@angular.io',
+  GIT_AUTHOR_NAME: process.env.GIT_AUTHOR_NAME || 'Angular CLI',
+  GIT_AUTHOR_EMAIL: process.env.GIT_AUTHOR_EMAIL || 'angular-cli@angular.io',
   get GIT_COMMITTER_NAME() {
     return this.GIT_AUTHOR_NAME;
   },
