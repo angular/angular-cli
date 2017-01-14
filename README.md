@@ -36,6 +36,7 @@ with NPM 3 or higher.
 * [Installation](#installation)
 * [Usage](#usage)
 * [Generating a New Project](#generating-and-serving-an-angular2-project-via-a-development-server)
+* [Specifying application entry module](#specifying-application-entry-module)
 * [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
 * [Generating a Route](#generating-a-route)
 * [Creating a Build](#creating-a-build)
@@ -83,6 +84,17 @@ You can configure the default HTTP port and the one used by the LiveReload serve
 
 ```bash
 ng serve --host 0.0.0.0 --port 4201 --live-reload-port 49153
+```
+
+### Specifying application entry module
+
+In some cases ng-cli is unable to resolve the application entry module automatically. You can specify it explicitly in `angular-cli.json`:
+
+```json
+...
+"main": "main.ts",
+"entryModule": "app/app.module#AppModule",
+...
 ```
 
 ### Generating Components, Directives, Pipes and Services

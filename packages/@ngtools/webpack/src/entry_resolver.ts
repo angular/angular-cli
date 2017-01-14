@@ -124,6 +124,11 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
   return null;
 }
 
+export class ResolveEntryModuleError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
 
 export function resolveEntryModuleFromMain(mainPath: string,
                                            host: ts.CompilerHost,
@@ -143,7 +148,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
     .filter(node => node.kind == ts.SyntaxKind.Identifier);
 
   if (bootstrap.length != 1) {
-    throw new Error('Tried to find bootstrap code, but could not. Specify either '
+    throw new ResolveEntryModuleError('Tried to find bootstrap code, but could not. Specify either '
       + 'statically analyzable bootstrap code or pass in an entryModule '
       + 'to the plugins options.');
   }
@@ -154,7 +159,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
   }
 
   // shrug... something bad happened and we couldn't find the import statement.
-  throw new Error('Tried to find bootstrap code, but could not. Specify either '
+  throw new ResolveEntryModuleError('Tried to find bootstrap code, but could not. Specify either '
     + 'statically analyzable bootstrap code or pass in an entryModule '
     + 'to the plugins options.');
 }
