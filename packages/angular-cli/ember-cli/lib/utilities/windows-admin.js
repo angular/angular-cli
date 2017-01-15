@@ -21,8 +21,7 @@ module.exports = {
 
           if (!elevated && ui && ui.writeLine) {
             ui.writeLine(chalk.yellow('\nRunning without elevated rights. ' +
-              'Running Ember CLI "as Administrator" increases performance significantly.'));
-            ui.writeLine('See ember-cli.com/user-guide/#windows for details.\n');
+              'Running Angular CLI "as Administrator" increases performance significantly.'));
           }
 
           resolve({
