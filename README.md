@@ -280,19 +280,19 @@ To turn on auto completion use the following commands:
 
 For bash:
 ```bash
-ng completion 1>> ~/.bashrc 2>>&1
+ng completion --bash 1>> ~/.bashrc 2>>&1
 source ~/.bashrc
 ```
 
 For zsh:
 ```bash
-ng completion 1>> ~/.zshrc 2>>&1
+ng completion --zsh 1>> ~/.zshrc 2>>&1
 source ~/.zshrc
 ```
 
 Windows users using gitbash:
 ```bash
-ng completion 1>> ~/.bash_profile 2>>&1
+ng completion --bash 1>> ~/.bash_profile 2>>&1
 source ~/.bash_profile
 ```
 
