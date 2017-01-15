@@ -59,7 +59,8 @@
             "type": "string"
           },
           "tsconfig": {
-            "type": "string"
+            "type": "string",
+            "default": "tsconfig.json"
           },
           "prefix": {
             "type": "string"
@@ -103,7 +104,8 @@
                       "type": "string"
                     }
                   },
-                  "additionalProperties": true
+                  "additionalProperties": true,
+                  "required": ["input"]
                 }
               ]
             },

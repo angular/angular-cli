@@ -40,10 +40,10 @@ export default function () {
     .then(() => expectFileToMatch('dist/common-entry.bundle.css', '.common-entry-style'))
     .then(() => expectFileToMatch('dist/common-entry.bundle.js', 'common-entry-script'))
     // there are no js entry points for css only bundles
-    .then(() => expectToFail(() => expectFileToExist('dist/styles.bundle.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/lazy-styles.bundle.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/renamed-styles.bundle.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/renamed-lazy-styles.bundle.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/style.bundle.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/lazy-style.bundle.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/renamed-style.bundle.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/renamed-lazy-style.bundle.js')))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
       <link href="renamed-style.bundle.css" rel="stylesheet"/>
@@ -55,5 +55,11 @@ export default function () {
       <script type="text/javascript" src="vendor.bundle.js"></script>
       <script type="text/javascript" src="common-entry.bundle.js"></script>
       <script type="text/javascript" src="main.bundle.js"></script>
-    `));
+    `))
+    .then(() => ng('build', '--no-extract-css'))
+    // js files still exist when not extracting css
+    .then(() => expectFileToExist('dist/styles.bundle.js'))
+    .then(() => expectFileToExist('dist/lazy-style.bundle.js'))
+    .then(() => expectFileToExist('dist/renamed-style.bundle.js'))
+    .then(() => expectFileToExist('dist/renamed-lazy-style.bundle.js'));
 }

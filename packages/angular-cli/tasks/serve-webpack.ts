@@ -19,6 +19,8 @@ export default Task.extend({
     const ui = this.ui;
 
     let webpackCompiler: any;
+    const projectConfig = CliConfig.fromProject().config;
+    const appConfig = projectConfig.apps[0];
 
     let config = new NgCliWebpackConfig(
       this.project,
@@ -33,7 +35,10 @@ export default Task.extend({
       serveTaskOptions.sourcemap,
       serveTaskOptions.vendorChunk,
       serveTaskOptions.verbose,
-      serveTaskOptions.progress
+      serveTaskOptions.progress,
+      undefined,
+      undefined,
+      serveTaskOptions.extractCss
     ).config;
 
     // This allows for live reload of page when changes are made to repo.
@@ -53,7 +58,14 @@ export default Task.extend({
       ui.writeLine('  for information on working with HMR for Webpack.');
       entryPoints.push('webpack/hot/dev-server');
       config.plugins.push(new webpack.HotModuleReplacementPlugin());
+      if (serveTaskOptions.extractCss) {
+        ui.writeLine(oneLine`
+          ${chalk.yellow('NOTICE')} (HMR) does not allow for CSS hot reload when used
+          together with '--extract-css'.
+        `);
+      }
     }
+    if (!config.entry.main) { config.entry.main = []; }
     config.entry.main.unshift(...entryPoints);
     webpackCompiler = webpack(config);
 
@@ -84,12 +96,10 @@ export default Task.extend({
     }
 
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
-      contentBase: path.resolve(
-        this.project.root,
-        `./${CliConfig.fromProject().config.apps[0].root}`
-      ),
+      contentBase: path.join(this.project.root, `./${appConfig.root}`),
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
+        index: `/${appConfig.index}`,
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
       },
@@ -98,7 +108,7 @@ export default Task.extend({
       proxy: proxyConfig,
       compress: serveTaskOptions.target === 'production',
       watchOptions: {
-        poll: CliConfig.fromProject().config.defaults.poll
+        poll: projectConfig.defaults && projectConfig.defaults.poll
       },
       https: serveTaskOptions.ssl
     };

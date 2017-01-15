@@ -1,6 +1,7 @@
 dist/
 node_modules/
 npm-debug.log*
+yarn.lock
 
 # IDEs
 .idea/

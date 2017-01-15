@@ -7,7 +7,7 @@
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
 [![npm][npm-badge]][npm-badge-url]
 
-Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://www.ember-cli.com/) project.
+Prototype of a CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
 
@@ -243,11 +243,11 @@ This will do the following:
 - rebuilds the app in production mode at the current `HEAD`
 - creates a local `gh-pages` branch if one doesn't exist
 - moves your app to the `gh-pages` branch and creates a commit
-- edit the base tag in index.html to support github pages
-- pushes the `gh-pages` branch to github
+- edit the base tag in index.html to support GitHub Pages
+- pushes the `gh-pages` branch to GitHub
 - returns back to the original `HEAD`
 
-Creating the repo requires a token from github, and the remaining functionality
+Creating the repo requires a token from GitHub, and the remaining functionality
 relies on ssh authentication for all git operations that communicate with github.com.
 To simplify the authentication, be sure to [setup your ssh keys](https://help.github.com/articles/generating-ssh-keys/).
 
@@ -257,7 +257,7 @@ If you are deploying a [user or organization page](https://help.github.com/artic
 ng github-pages:deploy --user-page --message "Optional commit message"
 ```
 
-This command pushes the app to the `master` branch on the github repo instead
+This command pushes the app to the `master` branch on the GitHub repo instead
 of pushing to `gh-pages`, since user and organization pages require this.
 
 
@@ -328,8 +328,8 @@ To use these preprocessors simply add the file to your component's `styleUrls`:
 ```javascript
 @Component({
   selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   title = 'app works!';
@@ -429,7 +429,7 @@ npm install -g angular-cli@latest
 
 Local project package:
 ```bash
-rm -rf node_modules dist tmp
+rm -rf node_modules dist # use rmdir on Windows
 npm install --save-dev angular-cli@latest
 npm install
 ng init

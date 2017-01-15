@@ -54,7 +54,7 @@ export class PathsPlugin implements Tapable {
     if (tsConfig.error) {
       throw tsConfig.error;
     }
-    return tsConfig.config;
+    return tsConfig.config.compilerOptions;
   }
 
   constructor(options: PathsPluginOptions) {
@@ -110,7 +110,7 @@ export class PathsPlugin implements Tapable {
   }
 
   apply(resolver: ResolverPlugin): void {
-    let { baseUrl } = this._compilerOptions;
+    let baseUrl = this._compilerOptions.baseUrl || '.';
 
     if (baseUrl) {
       resolver.apply(new ModulesInRootPlugin('module', this._absoluteBaseUrl, 'resolve'));

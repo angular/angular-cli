@@ -13,6 +13,7 @@
     "eofline": true,
     "forin": true,
     "import-blacklist": [true, "rxjs"],
+    "import-spacing": true,
     "indent": [
       true,
       "spaces"
@@ -46,7 +47,6 @@
     "no-empty-interface": true,
     "no-eval": true,
     "no-inferrable-types": true,
-    "no-inferred-empty-object-type": true,
     "no-shadowed-variable": true,
     "no-string-literal": false,
     "no-string-throw": true,
@@ -63,6 +63,7 @@
       "check-else",
       "check-whitespace"
     ],
+    "prefer-const": true,
     "quotemark": [
       true,
       "single"
@@ -85,6 +86,8 @@
         "variable-declaration": "nospace"
       }
     ],
+    "typeof-compare": true,
+    "unified-signatures": true,
     "variable-name": false,
     "whitespace": [
       true,
@@ -106,7 +109,6 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
-    "import-destructuring-spacing": true,
     "no-access-missing-member": true,
     "templates-use-public": true,
     "invoke-injectable": true
