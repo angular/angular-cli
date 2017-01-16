@@ -9,3 +9,7 @@
 `--spec` specifies if a spec file is generated
 
 `--skip-import` allows for skipping the module import
+
+`--module` (`-m`) allows specification of the declaring module
+
+`--export` specifies if declaring module exports the pipe
