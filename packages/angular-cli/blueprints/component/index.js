@@ -72,6 +72,7 @@ module.exports = {
   },
 
   locals: function (options) {
+
     this.styleExt = 'css';
     if (this.project.ngConfig &&
         this.project.ngConfig.defaults &&
@@ -83,7 +84,7 @@ module.exports = {
       stringUtils.dasherize(options.suffix) :
       'component';
 
-    options.suffixName = stringUtils.classify(options.suffix);
+    options.classifiedSuffix = stringUtils.classify(options.suffix);
 
     options.inlineStyle = options.inlineStyle !== undefined ?
       options.inlineStyle :
@@ -108,7 +109,7 @@ module.exports = {
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
       suffix: options.suffix,
-      suffixName: options.suffix,
+      classifiedSuffix: options.classifiedSuffix,
       flat: options.flat,
       spec: options.spec,
       inlineTemplate: options.inlineTemplate,
@@ -166,7 +167,7 @@ module.exports = {
     }
 
     const returns = [];
-    const className = stringUtils.classify(`${options.entity.name}${options.suffixName}`);
+    const className = stringUtils.classify(options.entity.name) + options.classifiedSuffix;
     const fileName = stringUtils.dasherize(`${options.entity.name}.${options.suffix}`);
     const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;

@@ -13,7 +13,7 @@ import { Component, OnInit<% if(viewEncapsulation) { %>, ViewEncapsulation<% }%>
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection) { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })
-export class <%= classifiedModuleName %><%= suffixName %> implements OnInit {
+export class <%= classifiedModuleName %><%= classifiedSuffix %> implements OnInit {
 
   constructor() { }
 
