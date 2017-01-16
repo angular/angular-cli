@@ -129,7 +129,7 @@ Project.prototype.isEmberCLIAddon = function() {
   @return {String} Configuration path
  */
 Project.prototype.configPath = function() {
-  var configPath = 'config';
+  var configPath = 'src/environments';
 
   if (this.pkg['ember-addon'] && this.pkg['ember-addon']['configPath']) {
     configPath = this.pkg['ember-addon']['configPath'];
