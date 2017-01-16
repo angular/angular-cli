@@ -15,7 +15,6 @@ const GenerateCommand = EmberGenerateCommand.extend({
     if (!rawArgs.length) {
       return;
     }
-
     // map the blueprint name to allow for aliases
     rawArgs[0] = mapBlueprintName(rawArgs[0]);
 
@@ -28,6 +27,8 @@ const GenerateCommand = EmberGenerateCommand.extend({
       SilentError.debugOrThrow('angular-cli/commands/generate',
         `The \`ng generate ${rawArgs[0]}\` command requires a name to be specified.`);
     }
+    // verify file name does not contain suffix word
+    rawArgs[1] = mapSuffix(rawArgs[0], rawArgs[1]);
 
     // Override default help to hide ember blueprints
     EmberGenerateCommand.prototype.printDetailedHelp = function() {
@@ -54,6 +55,11 @@ const GenerateCommand = EmberGenerateCommand.extend({
 function mapBlueprintName(name: string): string {
   let mappedName: string = aliasMap[name];
   return mappedName ? mappedName : name;
+}
+
+function mapSuffix(blueprint: string, name: string): string {
+  // remove `blueprint` if located at the end of `name`, optional `-`
+  return name.replace(new RegExp(`-?${blueprint}$`, 'i'), '');
 }
 
 const aliasMap: { [alias: string]: string } = {

@@ -6,9 +6,9 @@ import {expectFileToMatch} from '../../../utils/fs';
 export default function() {
   const modulePath = join('src', 'app', 'app.module.ts');
 
-  return ng('generate', 'component', 'test-component', '--module', 'app.module.ts')
+  return ng('generate', 'component', 'component-test', '--module', 'app.module.ts')
     .then(() => expectFileToMatch(modulePath,
-      /import { TestComponentComponent } from '.\/test-component\/test-component.component'/))
+      /import { ComponentTestComponent } from '.\/component-test\/component-test.component'/))
 
     // Try to run the unit tests.
     .then(() => ng('build'));

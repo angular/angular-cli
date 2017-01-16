@@ -7,10 +7,10 @@ export default function() {
   // Does not create a sub directory.
   const serviceDir = join('src', 'app');
 
-  return ng('generate', 'service', 'test-service')
+  return ng('generate', 'service', 'service-test')
     .then(() => expectFileToExist(serviceDir))
-    .then(() => expectFileToExist(join(serviceDir, 'test-service.service.ts')))
-    .then(() => expectFileToExist(join(serviceDir, 'test-service.service.spec.ts')))
+    .then(() => expectFileToExist(join(serviceDir, 'service-test.service.ts')))
+    .then(() => expectFileToExist(join(serviceDir, 'service-test.service.spec.ts')))
 
     // Try to run the unit tests.
     .then(() => ng('test', '--single-run'));

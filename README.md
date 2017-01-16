@@ -90,8 +90,8 @@ ng serve --host 0.0.0.0 --port 4201 --live-reload-port 49153
 You can use the `ng generate` (or just `ng g`) command to generate Angular components:
 
 ```bash
-ng generate component my-new-component
-ng g component my-new-component # using the alias
+ng generate component component-file
+ng g c component-file # using the alias
 
 # components support relative path generation
 # if in the directory src/app/feature/ and you run
@@ -103,16 +103,16 @@ ng g component ../newer-cmp
 ```
 You can find all possible blueprints in the table below:
 
-Scaffold  | Usage
----       | ---
-Component | `ng g component my-new-component`
-Directive | `ng g directive my-new-directive`
-Pipe      | `ng g pipe my-new-pipe`
-Service   | `ng g service my-new-service`
-Class     | `ng g class my-new-class`
-Interface | `ng g interface my-new-interface`
-Enum      | `ng g enum my-new-enum`
-Module    | `ng g module my-module`
+Scaffold  | Usage                           | File                        | Class Name
+---       | ---                             | ---                         | ---
+Component | `ng g component component-file` | component-file.component.ts | ComponentFileComponent
+Directive | `ng g directive directive-file` | directive-file.directive.ts | DirectiveFileDirective
+Pipe      | `ng g pipe pipe-file`           | pipe-file.pipe.ts           | PipeFilePipe
+Service   | `ng g service service-file`     | service-file.service.ts     | ServiceFileService
+Class     | `ng g class class-file`         | class-file.ts               | ClassFile
+Interface | `ng g interface interface-file` | interface-file.ts           | InterfaceFile
+Enum      | `ng g enum enum-file`           | enum-file.enum.ts           | EnumFileEnum
+Module    | `ng g module module-file`       | module-file.module.ts       | ModuleFileModule
 
 ### Generating a route
 
