@@ -130,23 +130,6 @@ Project.prototype.isEmberCLIAddon = function() {
 };
 
 /**
-  Returns the path to the configuration.
-
-  @private
-  @method configPath
-  @return {String} Configuration path
- */
-Project.prototype.configPath = function() {
-  var configPath = 'config';
-
-  if (this.pkg['ember-addon'] && this.pkg['ember-addon']['configPath']) {
-    configPath = this.pkg['ember-addon']['configPath'];
-  }
-
-  return path.join(configPath, 'environment');
-};
-
-/**
   Loads the configuration for this project and its addons.
 
   @private
@@ -155,31 +138,9 @@ Project.prototype.configPath = function() {
   @return {Object}     Merged confiration object
  */
 Project.prototype.config = function(env) {
-  var configPath = this.configPath();
-
-  if (existsSync(path.join(this.root, configPath + '.js'))) {
-    var appConfig = this.require('./' + configPath)(env);
-    var addonsConfig = this.getAddonsConfig(env, appConfig);
-
-    return merge(addonsConfig, appConfig);
-  } else {
-    return this.getAddonsConfig(env, {});
-  }
-};
-
-/**
-  Returns the addons configuration.
-
-  @private
-  @method getAddonsConfig
-  @param  {String} env       Environment name
-  @param  {Object} appConfig Application configuration
-  @return {Object}           Merged configuration of all addons
- */
-Project.prototype.getAddonsConfig = function(env, appConfig) {
   this.initializeAddons();
 
-  var initialConfig = merge({}, appConfig);
+  var initialConfig = {};
 
   return this.addons.reduce(function(config, addon) {
     if (addon.config) {
