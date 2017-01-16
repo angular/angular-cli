@@ -7,13 +7,13 @@ import { Component, OnInit<% if(viewEncapsulation) { %>, ViewEncapsulation<% }%>
       <%= dasherizedModuleName %> Works!
     </p>
   `,<% } else { %>
-  templateUrl: './<%= dasherizedModuleName %>.component.html',<% } if(inlineStyle) { %>
+  templateUrl: './<%= dasherizedModuleName %>.<%= suffix %>.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['./<%= dasherizedModuleName %>.component.<%= styleExt %>']<% } %><% if(viewEncapsulation) { %>,
+  styleUrls: ['./<%= dasherizedModuleName %>.<%= suffix %>.<%= styleExt %>']<% } %><% if(viewEncapsulation) { %>,
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection) { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })
-export class <%= classifiedModuleName %>Component implements OnInit {
+export class <%= classifiedModuleName %><%= suffixName %> implements OnInit {
 
   constructor() { }
 

@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { <%= classifiedModuleName %>Component } from './<%= dasherizedModuleName %>.component';
+import { <%= classifiedModuleName %><%= suffixName %> } from './<%= dasherizedModuleName %>.<%= suffix %>';
 
-describe('<%= classifiedModuleName %>Component', () => {
-  let component: <%= classifiedModuleName %>Component;
-  let fixture: ComponentFixture<<%= classifiedModuleName %>Component>;
+describe('<%= classifiedModuleName %><%= suffixName %>', () => {
+  let component: <%= classifiedModuleName %><%= suffixName %>;
+  let fixture: ComponentFixture<<%= classifiedModuleName %><%= suffixName %>>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ <%= classifiedModuleName %>Component ]
+      declarations: [ <%= classifiedModuleName %><%= suffixName %> ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(<%= classifiedModuleName %>Component);
+    fixture = TestBed.createComponent(<%= classifiedModuleName %><%= suffixName %>);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

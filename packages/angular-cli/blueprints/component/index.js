@@ -13,6 +13,7 @@ module.exports = {
   description: '',
 
   availableOptions: [
+    { name: 'suffix', type: String, aliases: ['s'] },
     { name: 'flat', type: Boolean, default: false },
     { name: 'inline-template', type: Boolean, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, aliases: ['is'] },
@@ -78,6 +79,12 @@ module.exports = {
       this.styleExt = this.project.ngConfig.defaults.styleExt;
     }
 
+    options.suffix = options.suffix !== undefined ?
+      stringUtils.dasherize(options.suffix) :
+      'component';
+
+    options.suffixName = stringUtils.classify(options.suffix);
+
     options.inlineStyle = options.inlineStyle !== undefined ?
       options.inlineStyle :
       this.project.ngConfigObj.get('defaults.inline.style');
@@ -100,6 +107,8 @@ module.exports = {
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
+      suffix: options.suffix,
+      suffixName: options.suffix,
       flat: options.flat,
       spec: options.spec,
       inlineTemplate: options.inlineTemplate,
@@ -123,7 +132,7 @@ module.exports = {
       fileList = fileList.filter(p => p.indexOf('.__styleext__') < 0);
     }
     if (this.options && !this.options.spec) {
-      fileList = fileList.filter(p => p.indexOf('__name__.component.spec.ts') < 0);
+      fileList = fileList.filter(p => p.indexOf('__name__.__suffix__.spec.ts') < 0);
     }
 
     return fileList;
@@ -142,6 +151,9 @@ module.exports = {
         this.generatePath = dir;
         return dir;
       },
+      __suffix__: () => {
+        return options.locals.suffix;
+      },
       __styleext__: () => {
         return this.styleExt;
       }
@@ -154,8 +166,8 @@ module.exports = {
     }
 
     const returns = [];
-    const className = stringUtils.classify(`${options.entity.name}Component`);
-    const fileName = stringUtils.dasherize(`${options.entity.name}.component`);
+    const className = stringUtils.classify(`${options.entity.name}${options.suffixName}`);
+    const fileName = stringUtils.dasherize(`${options.entity.name}.${options.suffix}`);
     const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
