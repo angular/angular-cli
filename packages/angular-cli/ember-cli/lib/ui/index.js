@@ -35,7 +35,6 @@ function UI(options) {
   var spinner = this.spinner = ora({ color: 'green' });
 
   this.through  = require('through');
-  this.readline = require('readline2');
 
   // Output stream
   this.actualOutputStream = options.outputStream;
