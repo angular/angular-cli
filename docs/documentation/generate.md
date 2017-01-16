@@ -10,6 +10,7 @@
  - [component](generate/component)
  - [directive](generate/directive)
  - [enum](generate/enum)
+ - [guard](generate/guard)
  - [interface](generate/interface)
  - [module](generate/module)
  - [pipe](generate/pipe)

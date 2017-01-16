@@ -339,6 +339,22 @@
             }
           }
         },
+        "guard": {
+          "description": "Options for generating a guard.",
+          "type": "object",
+          "properties": {
+            "flat": {
+              "description": "Flag to indicate if a dir is created.",
+              "type": "boolean",
+              "default": true
+            },
+            "spec": {
+              "description": "Specifies if a spec file is generated.",
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
         "interface": {
           "description": "Options for generating an interface.",
           "type": "object",
