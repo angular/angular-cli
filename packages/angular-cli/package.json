@@ -75,7 +75,6 @@
     "postcss-loader": "^0.9.1",
     "quick-temp": "0.1.5",
     "raw-loader": "^0.5.1",
-    "readline2": "0.1.1",
     "remap-istanbul": "^0.6.4",
     "resolve": "^1.1.7",
     "rimraf": "^2.5.3",
