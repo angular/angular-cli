@@ -15,7 +15,6 @@ const DocCommand = Command.extend({
 
     const docTask = new DocTask({
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project
     });
 

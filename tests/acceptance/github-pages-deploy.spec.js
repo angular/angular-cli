@@ -37,7 +37,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
     this.timeout(10000);
     return tmp.setup('./tmp')
       .then(() => process.chdir('./tmp'))
-      .then(() => ng(['new', project, '--skip-npm', '--skip-bower']))
+      .then(() => ng(['new', project, '--skip-npm']))
       .then(() => setupDist())
       .finally(() => execStub = new ExecStub());
   });
@@ -66,6 +66,8 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', remote)
       .addExecSuccess(`git checkout ${ghPagesBranch}`)
+      .addExecSuccess('git ls-files')
+      .addExecSuccess('git rm -r ')
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecSuccess(`git checkout ${initialBranch}`)
@@ -73,6 +75,44 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess('git remote -v', remote);
 
     return ng(['github-pages:deploy', '--skip-build']);
+  });
+
+  it('should deploy with token and username', function () {
+    let token = 'token',
+      username = 'bar';
+
+    execStub.addExecSuccess('git status --porcelain')
+      .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
+      .addExecSuccess('git remote -v', remote)
+      .addExecSuccess(`git checkout ${ghPagesBranch}`)
+      .addExecSuccess('git ls-files')
+      .addExecSuccess('git rm -r ')
+      .addExecSuccess('git add .')
+      .addExecSuccess(`git commit -m "${message}"`)
+      .addExecSuccess(`git checkout ${initialBranch}`)
+      .addExecSuccess(`git push https://${token}@github.com/${username}/${project}.git ${ghPagesBranch}:${ghPagesBranch}`)
+      .addExecSuccess('git remote -v', remote);
+
+    return ng(['github-pages:deploy', '--skip-build', `--gh-token=${token}`, `--gh-username=${username}`]);
+  })
+
+  it('should deploy with token only', function () {
+    let token = 'token';
+
+    execStub.addExecSuccess('git status --porcelain')
+      .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
+      .addExecSuccess('git remote -v', remote)
+      .addExecSuccess(`git checkout ${ghPagesBranch}`)
+      .addExecSuccess('git ls-files')
+      .addExecSuccess('git rm -r ')
+      .addExecSuccess('git add .')
+      .addExecSuccess(`git commit -m "${message}"`)
+      .addExecSuccess(`git checkout ${initialBranch}`)
+      .addExecSuccess('git remote -v', remote)
+      .addExecSuccess(`git push https://${token}@github.com/username/${project}.git ${ghPagesBranch}:${ghPagesBranch}`)
+      .addExecSuccess('git remote -v', remote);
+
+    return ng(['github-pages:deploy', '--skip-build', `--gh-token=${token}`]);
   });
 
   it('should deploy with changed defaults', function() {
@@ -83,6 +123,8 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', remote)
       .addExecSuccess(`git checkout ${ghPagesBranch}`)
+      .addExecSuccess('git ls-files')
+      .addExecSuccess('git rm -r ')
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecSuccess(`git checkout ${initialBranch}`)
@@ -102,6 +144,8 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess('git add .gitignore')
       .addExecSuccess('git clean -f -d')
       .addExecSuccess(`git commit -m \"initial ${ghPagesBranch} commit\"`)
+      .addExecSuccess('git ls-files')
+      .addExecSuccess('git rm -r ')
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecSuccess(`git checkout ${initialBranch}`)
@@ -120,12 +164,14 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', noRemote)
       .addExecSuccess(`git remote add origin git@github.com:${username}/${project}.git`)
-      .addExecSuccess(`git push -u origin ${initialBranch}`)
+      .addExecSuccess(`git push -u https://${token}@github.com/${username}/${project}.git ${initialBranch}`)
       .addExecSuccess(`git checkout ${ghPagesBranch}`)
+      .addExecSuccess('git ls-files')
+      .addExecSuccess('git rm -r ')
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecSuccess(`git checkout ${initialBranch}`)
-      .addExecSuccess(`git push origin ${ghPagesBranch}:${ghPagesBranch}`)
+      .addExecSuccess(`git push https://${token}@github.com/${username}/${project}.git ${ghPagesBranch}:${ghPagesBranch}`)
       .addExecSuccess('git remote -v', remote);
 
     var httpsStub = sinon.stub(https, 'request', httpsRequestStubFunc);
@@ -220,6 +266,8 @@ describe('Acceptance: ng github-pages:deploy', function() {
       .addExecSuccess('git rev-parse --abbrev-ref HEAD', initialBranch)
       .addExecSuccess('git remote -v', remote)
       .addExecSuccess(`git checkout ${ghPagesBranch}`)
+      .addExecSuccess('git ls-files')
+      .addExecSuccess('git rm -r ')
       .addExecSuccess('git add .')
       .addExecSuccess(`git commit -m "${message}"`)
       .addExecError(`git checkout ${initialBranch}`, 'error: cannot stat \'src/client\': Permission denied');

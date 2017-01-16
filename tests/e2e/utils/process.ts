@@ -1,5 +1,5 @@
 import * as child_process from 'child_process';
-import {blue, white, yellow} from 'chalk';
+import {blue, yellow} from 'chalk';
 const treeKill = require('tree-kill');
 
 
@@ -15,9 +15,9 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   let stdout = '';
   let stderr = '';
   const cwd = process.cwd();
-  console.log(white(
-    `  ==========================================================================================`
-  ));
+  console.log(
+    `==========================================================================================`
+  );
 
   args = args.filter(x => x !== undefined);
   const flags = [
@@ -28,8 +28,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
     .join(', ')
     .replace(/^(.+)$/, ' [$1]');  // Proper formatting.
 
-  console.log(blue(`  Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
-  console.log(blue(`  CWD: ${cwd}`));
+  console.log(blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
+  console.log(blue(`CWD: ${cwd}`));
   const spawnOptions: any = {cwd};
 
   if (process.platform.startsWith('win')) {
@@ -101,8 +101,8 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
 }
 
 export function ng(...args: string[]) {
-  if (args[0] == 'build') {
-    return silentNg(...args);
+  if (args[0] == 'build' || args[0] == 'serve' || args[0] == 'test') {
+    return silentNg(...args, '--no-progress');
   } else {
     return _exec({}, 'ng', args);
   }

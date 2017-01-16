@@ -32,12 +32,21 @@
             "default": "dist/"
           },
           "assets": {
-            "fixme": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
             "default": []
+          },
+          "deployUrl": {
+            "type": "string"
           },
           "index": {
             "type": "string",
@@ -50,7 +59,8 @@
             "type": "string"
           },
           "tsconfig": {
-            "type": "string"
+            "type": "string",
+            "default": "tsconfig.json"
           },
           "prefix": {
             "type": "string"
@@ -62,7 +72,20 @@
             "description": "Global styles to be included in the build.",
             "type": "array",
             "items": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              ]
             },
             "additionalProperties": false
           },
@@ -70,7 +93,21 @@
             "description": "Global scripts to be included in the build.",
             "type": "array",
             "items": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true,
+                  "required": ["input"]
+                }
+              ]
             },
             "additionalProperties": false
           },

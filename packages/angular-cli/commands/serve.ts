@@ -1,13 +1,8 @@
-import * as assign from 'lodash/assign';
-import * as denodeify from 'denodeify';
-const Command = require('../ember-cli/lib/models/command');
-const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
-import ServeWebpackTask from '../tasks/serve-webpack';
+const Command = require('../ember-cli/lib/models/command');
 
 PortFinder.basePort = 49152;
 
-const getPort = <any>denodeify(PortFinder.getPort);
 const defaultPort = process.env.PORT || 4200;
 
 export interface ServeTaskOptions {
@@ -26,7 +21,16 @@ export interface ServeTaskOptions {
   sslKey?: string;
   sslCert?: string;
   aot?: boolean;
+  sourcemap?: boolean;
+  verbose?: boolean;
+  progress?: boolean;
   open?: boolean;
+  vendorChunk?: boolean;
+  hmr?: boolean;
+  i18nFile?: string;
+  i18nFormat?: string;
+  locale?: string;
+  extractCss?: boolean | null;
 }
 
 const ServeCommand = Command.extend({
@@ -81,6 +85,10 @@ const ServeCommand = Command.extend({
     { name: 'ssl-key',              type: String,  default: 'ssl/server.key' },
     { name: 'ssl-cert',             type: String,  default: 'ssl/server.crt' },
     { name: 'aot',                  type: Boolean, default: false },
+    { name: 'sourcemap',            type: Boolean, default: true, aliases: ['sm'] },
+    { name: 'vendor-chunk',         type: Boolean, default: true },
+    { name: 'verbose',              type: Boolean, default: false },
+    { name: 'progress',             type: Boolean, default: true },
     {
       name: 'open',
       type: Boolean,
@@ -88,72 +96,20 @@ const ServeCommand = Command.extend({
       aliases: ['o'],
       description: 'Opens the url in default browser',
     },
+    {
+      name: 'hmr',
+      type: Boolean,
+      default: false,
+      description: 'Enable hot module replacement',
+    },
+    { name: 'i18n-file',       type: String, default: null },
+    { name: 'i18n-format',     type: String, default: null },
+    { name: 'locale',         type: String, default: null },
+    { name: 'extract-css',    type: Boolean, default: null }
   ],
 
   run: function(commandOptions: ServeTaskOptions) {
-    if (commandOptions.environment === '') {
-      if (commandOptions.target === 'development') {
-        commandOptions.environment = 'dev';
-      }
-      if (commandOptions.target === 'production') {
-        commandOptions.environment = 'prod';
-      }
-    }
-
-    commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
-
-    return this._checkExpressPort(commandOptions)
-      .then(this._autoFindLiveReloadPort.bind(this))
-      .then((opts: ServeTaskOptions) => {
-        commandOptions = assign({}, opts, {
-          baseURL: this.project.config(commandOptions.target).baseURL || '/'
-        });
-
-        const serve = new ServeWebpackTask({
-          ui: this.ui,
-          analytics: this.analytics,
-          project: this.project,
-        });
-
-        return serve.run(commandOptions);
-      });
-  },
-
-  _checkExpressPort: function(commandOptions: ServeTaskOptions) {
-    return getPort({ port: commandOptions.port, host: commandOptions.host })
-      .then((foundPort: number) => {
-
-        if (commandOptions.port !== foundPort && commandOptions.port !== 0) {
-          throw new SilentError(`Port ${commandOptions.port} is already in use.`);
-        }
-
-        // otherwise, our found port is good
-        commandOptions.port = foundPort;
-        return commandOptions;
-
-      });
-  },
-
-  _autoFindLiveReloadPort: function(commandOptions: ServeTaskOptions) {
-    return getPort({ port: commandOptions.liveReloadPort, host: commandOptions.liveReloadHost })
-      .then((foundPort: number) => {
-
-        // if live reload port matches express port, try one higher
-        if (foundPort === commandOptions.port) {
-          commandOptions.liveReloadPort = foundPort + 1;
-          return this._autoFindLiveReloadPort(commandOptions);
-        }
-
-        // port was already open
-        if (foundPort === commandOptions.liveReloadPort) {
-          return commandOptions;
-        }
-
-        // use found port as live reload port
-        commandOptions.liveReloadPort = foundPort;
-        return commandOptions;
-
-      });
+    return require('./serve.run').default.call(this, commandOptions);
   }
 });
 

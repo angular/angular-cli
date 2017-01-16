@@ -1,5 +1,10 @@
 /*eslint-disable no-console */
 
+// Prevent the dependency validation from tripping because we don't import zone.js. We need
+// it as a peer dependency of @angular/core.
+// require('zone.js')
+
+
 // This file hooks up on require calls to transpile TypeScript.
 const cli = require('../../ember-cli/lib/cli');
 const UI = require('../../ember-cli/lib/ui');
@@ -19,26 +24,6 @@ module.exports = function(options) {
     options.watcher = 'node';
     return Promise.resolve(options);
   }
-
-  const oldStdoutWrite = process.stdout.write;
-  process.stdout.write = function (line) {
-    line = line.toString();
-    if (line.match(/ember-cli-(inject-)?live-reload/)) {
-      // don't replace 'ember-cli-live-reload' on ng init diffs
-      return oldStdoutWrite.apply(process.stdout, arguments);
-    }
-    line = line.replace(/ember-cli(?!.com)/g, 'angular-cli')
-      .replace(/\bember\b(?!-cli.com)/g, 'ng');
-    return oldStdoutWrite.apply(process.stdout, arguments);
-  };
-
-  const oldStderrWrite = process.stderr.write;
-  process.stderr.write = function (line) {
-    line = line.toString()
-      .replace(/ember-cli(?!.com)/g, 'angular-cli')
-      .replace(/\bember\b(?!-cli.com)/g, 'ng');
-    return oldStderrWrite.apply(process.stdout, arguments);
-  };
 
   options.cli = {
     name: 'ng',

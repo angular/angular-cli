@@ -1,4 +1,6 @@
 const path = require('path');
+const fs = require('fs');
+
 const getWebpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
 const CliConfig = require('../models/config').CliConfig;
 
@@ -9,10 +11,34 @@ const init = (config) => {
   }
   const angularCliConfig = require(path.join(config.basePath, config.angularCli.config));
   const appConfig = angularCliConfig.apps[0];
+  const appRoot = path.join(config.basePath, appConfig.root);
   const environment = config.angularCli.environment || 'dev';
   const testConfig = {
     codeCoverage: config.angularCli.codeCoverage || false,
-    lint: config.angularCli.lint || false
+    lint: config.angularCli.lint || false,
+    sourcemap: config.angularCli.sourcemap,
+    progress: config.angularCli.progress
+  }
+
+  // add assets
+  if (appConfig.assets) {
+    const assets = typeof appConfig.assets === 'string' ? [appConfig.assets] : appConfig.assets;
+    config.proxies = config.proxies || {};
+    assets.forEach(asset => {
+      const fullAssetPath = path.join(config.basePath, appConfig.root, asset);
+      const isDirectory = fs.lstatSync(fullAssetPath).isDirectory();
+      const filePattern = isDirectory ? fullAssetPath + '/**' : fullAssetPath;
+      const proxyPath = isDirectory ? asset + '/' : asset;
+      config.files.push({
+        pattern: filePattern,
+        included: false,
+        served: true,
+        watched: true
+      });
+      // The `files` entry serves the file from `/base/{appConfig.root}/{asset}`
+      //  so, we need to add a URL rewrite that exposes the asset as `/{asset}` only
+      config.proxies['/' + proxyPath] = '/base/' + appConfig.root + '/' + proxyPath;
+    });
   }
 
   // add webpack config
@@ -41,6 +67,25 @@ const init = (config) => {
     .filter((file) => config.preprocessors[file].indexOf('angular-cli') !== -1)
     .map((file) => config.preprocessors[file])
     .map((arr) => arr.splice(arr.indexOf('angular-cli'), 1, 'webpack', 'sourcemap'));
+
+  // Add global scripts
+  if (appConfig.scripts && appConfig.scripts.length > 0) {
+    const globalScriptPatterns = appConfig.scripts
+      .map(script => typeof script === 'string' ? { input: script } : script)
+      // Neither renamed nor lazy scripts are currently supported
+      .filter(script => !(script.output || script.lazy))
+      .map(script => ({
+        pattern: path.resolve(appRoot, script.input),
+        included: true,
+        served: true,
+        watched: true
+      }));
+
+    // Unshift elements onto the beginning of the files array.
+    // It's important to not replace the array, because
+    // karma already has a reference to the existing array.
+    Array.prototype.unshift.apply(config.files, globalScriptPatterns);
+  }
 }
 
 init.$inject = ['config'];

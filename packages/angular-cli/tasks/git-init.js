@@ -38,21 +38,23 @@ module.exports = Task.extend({
           .catch(function() {
             return false;
           })
-      })    
+      })
       .then(function (insideGitRepo) {
         if (insideGitRepo) {
           return ui.writeLine('Directory is already under version control. Skipping initialization of git.');
-        }  
+        }
         return exec('git init')
           .then(function () {
             return exec('git add .');
           })
           .then(function () {
-            var commitTemplate = fs.readFileSync(
-              path.join(__dirname, '../utilities/INITIAL_COMMIT_MESSAGE.txt'));
-            var commitMessage = template(commitTemplate)(pkg);
-            return exec(
-              'git commit -m "' + commitMessage + '"', { env: gitEnvironmentVariables });
+            if (!commandOptions.skipCommit) {
+              var commitTemplate = fs.readFileSync(
+                path.join(__dirname, '../utilities/INITIAL_COMMIT_MESSAGE.txt'));
+              var commitMessage = template(commitTemplate)(pkg);
+              return exec(
+                'git commit -m "' + commitMessage + '"', { env: gitEnvironmentVariables });
+            }
           })
           .then(function () {
             ui.writeLine(chalk.green('Successfully initialized git.'));

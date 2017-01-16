@@ -49,11 +49,11 @@
     },
     "spec": {
       "class": false,
-      "component": true,
-      "directive": true,
+      "component": <%= tests %>,
+      "directive": <%= tests %>,
       "module": false,
-      "pipe": true,
-      "service": true
+      "pipe": <%= tests %>,
+      "service": <%= tests %>
     }
   }
 }
