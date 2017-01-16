@@ -133,6 +133,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ].concat(extraRules)
     },
     plugins: [
+      new webpack.NoEmitOnErrorsPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(buildOptions.outputPath, appConfig.index),
