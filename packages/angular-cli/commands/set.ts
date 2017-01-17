@@ -29,7 +29,7 @@ const SetCommand = Command.extend({
   },
 
   run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       const [jsonPath, rawValue] = rawArgs;
       const config = CliConfig.fromProject();
       const type = config.typeOf(jsonPath);

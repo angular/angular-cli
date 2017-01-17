@@ -47,7 +47,6 @@ module.exports = Task.extend({
       target: this.project.root,
       entity: entity,
       ui: this.ui,
-      analytics: this.analytics,
       project: this.project,
       settings: this.settings,
       testing: this.testing,

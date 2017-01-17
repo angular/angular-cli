@@ -11,7 +11,6 @@ var InstallationChecker = require('../models/installation-checker');
 function CLI(options) {
   this.name = options.name;
   this.ui = options.ui;
-  this.analytics = options.analytics;
   this.testing = options.testing;
   this.disableDependencyChecker = options.disableDependencyChecker;
   this.root = options.root;
@@ -47,7 +46,6 @@ CLI.prototype.run = function(environment) {
 
     var command = new CurrentCommand({
       ui:        this.ui,
-      analytics: this.analytics,
       commands:  environment.commands,
       tasks:     environment.tasks,
       project:   environment.project,
@@ -64,12 +62,12 @@ CLI.prototype.run = function(environment) {
     if (!platform.isValid && !this.testing) {
       if (platform.isDeprecated) {
         this.ui.writeDeprecateLine('Node ' + process.version +
-                                   ' is no longer supported by Ember CLI. Please update to a more recent version of Node');
+                                   ' is no longer supported by Angular CLI. Please update to a more recent version of Node');
       }
 
       if (platform.isUntested) {
         this.ui.writeWarnLine('WARNING: Node ' + process.version +
-                              ' has currently not been tested against Ember CLI and may result in unexpected behaviour.');
+                              ' has currently not been tested against Angular CLI and may result in unexpected behaviour.');
       }
     }
 
@@ -134,7 +132,6 @@ CLI.prototype.callHelp = function(options) {
 
   var help = new HelpCommand({
     ui:        this.ui,
-    analytics: this.analytics,
     commands:  environment.commands,
     tasks:     environment.tasks,
     project:   environment.project,

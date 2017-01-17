@@ -29,7 +29,7 @@ import 'rxjs/add/operator/toPromise';
 */
 export function getSource(filePath: string): ts.SourceFile {
   return ts.createSourceFile(filePath, fs.readFileSync(filePath).toString(),
-    ts.ScriptTarget.ES6, true);
+    ts.ScriptTarget.Latest, true);
 }
 
 
@@ -275,5 +275,13 @@ export function addImportToModule(modulePath: string, classifiedName: string,
 export function addProviderToModule(modulePath: string, classifiedName: string,
                                     importPath: string): Promise<Change> {
   return _addSymbolToNgModuleMetadata(modulePath, 'providers', classifiedName, importPath);
+}
+
+/**
+ * Custom function to insert an export into NgModule. It also imports it.
+ */
+export function addExportToModule(modulePath: string, classifiedName: string,
+                                    importPath: string): Promise<Change> {
+  return _addSymbolToNgModuleMetadata(modulePath, 'exports', classifiedName, importPath);
 }
 

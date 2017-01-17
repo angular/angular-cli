@@ -17,9 +17,10 @@ function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
 }
 
 function _removeDecorators(refactor: TypeScriptFileRefactor) {
+  // TODO: replace this by tsickle.
   // Find all decorators.
-  refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
-    .forEach(d => refactor.removeNode(d));
+  // refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
+  //   .forEach(d => refactor.removeNode(d));
 }
 
 
@@ -86,6 +87,37 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
   refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
 }
 
+export function removeModuleIdOnlyForTesting(refactor: TypeScriptFileRefactor) {
+  _removeModuleId(refactor);
+}
+
+function _removeModuleId(refactor: TypeScriptFileRefactor) {
+  const sourceFile = refactor.sourceFile;
+
+  refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
+    // Get all their property assignments.
+    .filter((node: ts.ObjectLiteralExpression) =>
+      node.properties.some(prop => prop.name.getText() == 'moduleId'))
+    .forEach((node: ts.ObjectLiteralExpression) => {
+      const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, idx: number) => {
+        return prop.name.getText() == 'moduleId';
+      })[0];
+      // get the trailing comma
+      const moduleIdCommaProp = moduleIdProp.parent.getChildAt(1).getChildren()[1];
+      refactor.removeNodes(moduleIdProp, moduleIdCommaProp);
+    });
+}
+
+function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) {
+  if (element.kind == ts.SyntaxKind.StringLiteral) {
+    // if string, assume relative path unless it start with /
+    return `'${loaderUtils.urlToRequest((element as ts.StringLiteral).text, '')}'`;
+  } else {
+    // if not string, just use expression directly
+    return element.getFullText(sourceFile);
+  }
+}
+
 function _replaceResources(refactor: TypeScriptFileRefactor): void {
   const sourceFile = refactor.sourceFile;
 
@@ -110,7 +142,7 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
 
       if (key == 'templateUrl') {
         refactor.replaceNode(node,
-          `template: require(${node.initializer.getFullText(sourceFile)})`);
+          `template: require(${_getResourceRequest(node.initializer, sourceFile)})`);
       } else if (key == 'styleUrls') {
         const arr = <ts.ArrayLiteralExpression[]>(
           refactor.findAstNodes(node, ts.SyntaxKind.ArrayLiteralExpression, false));
@@ -119,7 +151,7 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
         }
 
         const initializer = arr[0].elements.map((element: ts.Expression) => {
-          return element.getFullText(sourceFile);
+          return _getResourceRequest(element, sourceFile);
         });
         refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
       }
@@ -162,7 +194,9 @@ export function ngcLoader(source: string) {
             .then(() => _removeDecorators(refactor))
             .then(() => _replaceBootstrap(plugin, refactor));
         } else {
-          return _replaceResources(refactor);
+          return Promise.resolve()
+            .then(() => _replaceResources(refactor))
+            .then(() => _removeModuleId(refactor));
         }
       })
       .then(() => {
