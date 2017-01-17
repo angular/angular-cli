@@ -133,7 +133,6 @@ testsToRun.reduce((previous, relativeName) => {
       .then(() => fn(() => clean = false))
       .then(() => ConsoleLoggerStack.pop(), (err: any) => { ConsoleLoggerStack.pop(); throw err; })
       .then(() => console.log('----'))
-      .then(() => { ConsoleLoggerStack.push(NullLogger); })
       .then(() => {
         // If we're not in a setup, change the directory back to where it was before the test.
         // This allows tests to chdir without worrying about keeping the original directory.
@@ -145,10 +144,14 @@ testsToRun.reduce((previous, relativeName) => {
         // Only clean after a real test, not a setup step. Also skip cleaning if the test
         // requested an exception.
         if (allSetups.indexOf(relativeName) == -1 && clean) {
-          return gitClean();
+          ConsoleLoggerStack.push(NullLogger);
+          return gitClean()
+            .then(() => ConsoleLoggerStack.pop(), (err: any) => {
+              ConsoleLoggerStack.pop();
+              throw err;
+            });
         }
       })
-      .then(() => ConsoleLoggerStack.pop(), (err: any) => { ConsoleLoggerStack.pop(); throw err; })
       .then(() => printFooter(currentFileName, start),
         (err) => {
           printFooter(currentFileName, start);

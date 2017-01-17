@@ -9,7 +9,8 @@ module.exports = {
 
   config: function () {
     this.project.ngConfigObj = this.project.ngConfigObj || config.CliConfig.fromProject();
-    this.project.ngConfig = this.project.ngConfig || this.project.ngConfigObj.config;
+    this.project.ngConfig = this.project.ngConfig || (
+        this.project.ngConfigObj && this.project.ngConfigObj.config);
   },
 
   blueprintsPath: function () {

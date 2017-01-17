@@ -1,6 +1,12 @@
+import {CliConfig} from '../models/config';
+
 const SilentError = require('silent-error');
 const Command = require('../ember-cli/lib/models/command');
-import {CliConfig} from '../models/config';
+
+
+export interface SetOptions {
+  global?: boolean;
+}
 
 
 const SetCommand = Command.extend({
@@ -9,7 +15,7 @@ const SetCommand = Command.extend({
   works: 'everywhere',
 
   availableOptions: [
-    { name: 'global', type: Boolean, default: false, aliases: ['g'] },
+    { name: 'global', type: Boolean, 'default': false, aliases: ['g'] },
   ],
 
   asBoolean: function (raw: string): boolean {
@@ -28,13 +34,25 @@ const SetCommand = Command.extend({
     return +raw;
   },
 
-  run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
+  run: function (commandOptions: SetOptions, rawArgs: string[]): Promise<void> {
     return new Promise<void>(resolve => {
-      const [jsonPath, rawValue] = rawArgs;
-      const config = CliConfig.fromProject();
+      const config = commandOptions.global ? CliConfig.fromGlobal() : CliConfig.fromProject();
+      if (config === null) {
+        throw new SilentError('No config found. If you want to use global configuration, '
+          + 'you need the --global argument.');
+      }
+
+      let [jsonPath, rawValue] = rawArgs;
+
+      if (rawValue === undefined) {
+        [jsonPath, rawValue] = jsonPath.split('=', 2);
+        if (rawValue === undefined) {
+          throw new SilentError('Must specify a value.');
+        }
+      }
+
       const type = config.typeOf(jsonPath);
       let value: any = rawValue;
-
       switch (type) {
         case 'boolean': value = this.asBoolean(rawValue); break;
         case 'number': value = this.asNumber(rawValue); break;
