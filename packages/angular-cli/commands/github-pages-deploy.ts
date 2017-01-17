@@ -24,6 +24,8 @@ interface GithubPagesDeployOptions {
   ghToken?: string;
   ghUsername?: string;
   baseHref?: string;
+  aot?: boolean;
+  vendorChunk?: boolean;
 }
 
 const githubPagesDeployCommand = Command.extend({
@@ -76,7 +78,16 @@ const githubPagesDeployCommand = Command.extend({
       type: String,
       default: null,
       aliases: ['bh']
-    }],
+    }, {
+      name: 'aot',
+      type: Boolean,
+      default: false
+    }, {
+      name: 'vendor-chunk',
+      type: Boolean,
+      default: false
+    }
+  ],
 
   run: function(options: GithubPagesDeployOptions, rawArgs: string[]) {
     const ui = this.ui;
