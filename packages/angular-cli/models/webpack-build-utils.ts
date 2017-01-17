@@ -80,7 +80,9 @@ export function makeCssLoaders(stylePaths: string[] = []) {
       include: stylePaths, test, loaders: ExtractTextPlugin.extract({
         remove: false,
         loader: ['css-loader', ...commonLoaders, ...loaders],
-        fallbackLoader: 'style-loader'
+        fallbackLoader: 'style-loader',
+        // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
+        publicPath: ''
       })
     })));
   }
