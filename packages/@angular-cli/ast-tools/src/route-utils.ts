@@ -553,5 +553,5 @@ function getValueForKey(objectLiteralNode: ts.Node, key: string) {
  * @param file
  */
 function getRootNode(file: string) {
-  return ts.createSourceFile(file, fs.readFileSync(file).toString(), ts.ScriptTarget.ES6, true);
+  return ts.createSourceFile(file, fs.readFileSync(file).toString(), ts.ScriptTarget.Latest, true);
 }

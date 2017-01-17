@@ -58,7 +58,8 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
         tslint: {
           emitErrors: false,
           failOnHint: false,
-          resourcePath: `./${appConfig.root}`
+          resourcePath: `./${appConfig.root}`,
+          typeCheck: true
         }
       }
     }))
@@ -70,6 +71,7 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
 
   return {
     devtool: testConfig.sourcemap ? 'inline-source-map' : 'eval',
+    performance: { hints: false },
     context: projectRoot,
     resolve: {
       extensions: ['.ts', '.js'],

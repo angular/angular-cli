@@ -11,7 +11,7 @@ const globSearch = <any>denodeify(glob);
 
 /**
  * Interface that represents a module specifier and its position in the source file.
- * Use for storing a string literal, start position and end posittion of ImportClause node kinds.
+ * Use for storing a string literal, start position and end position of ImportClause node kinds.
  */
 export interface ModuleImport {
   specifierText: string;
@@ -32,7 +32,7 @@ export interface ModuleMap {
 export function createTsSourceFile(fileName: string): Promise<ts.SourceFile> {
   return readFile(fileName, 'utf8')
     .then((contents: string) => {
-      return ts.createSourceFile(fileName, contents, ts.ScriptTarget.ES6, true);
+      return ts.createSourceFile(fileName, contents, ts.ScriptTarget.Latest, true);
     });
 }
 

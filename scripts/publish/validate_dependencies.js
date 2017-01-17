@@ -69,8 +69,28 @@ function listRequiredModules(source) {
     });
 }
 
+function reportMissingDependencies(missingDeps) {
+  if (missingDeps.length == 0) {
+    console.log(chalk.green('  no dependency missing from package.json.'));
+  } else {
+    console.log(chalk.yellow(`  ${missingDeps.length} missing from package.json:`));
+    missingDeps.forEach(md => console.log(`    ${md}`));
+    exitCode = 1;
+  }
+}
+
+function reportExcessiveDependencies(overDeps) {
+  if (overDeps.length == 0) {
+    console.log(chalk.green('  no excessive dependencies in package.json.'));
+  } else {
+    console.log(chalk.yellow(`  ${overDeps.length} excessive dependencies in package.json:`));
+    overDeps.forEach(md => console.log(`    ${md}`));
+    exitCode = 1;
+  }
+}
 
 let exitCode = 0;
+const overallDeps = [];
 for (const packageName of Object.keys(packages)) {
   console.log(chalk.green(`Reading dependencies of "${packageName}".`));
 
@@ -92,6 +112,7 @@ for (const packageName of Object.keys(packages)) {
   const dependencies = Object.keys(importMap)
     // Filter out the node packages that should not be depended on.
     .filter(x => NODE_PACKAGES.indexOf(x) == -1);
+  overallDeps.push(...dependencies);
 
   console.log(chalk.green(`  found ${dependencies.length} dependencies...`));
   const packageJson = JSON.parse(fs.readFileSync(packages[packageName].packageJson, 'utf8'));
@@ -101,25 +122,30 @@ for (const packageName of Object.keys(packages)) {
     .concat(Object.keys(packageJson['peerDependencies'] || {}));
 
   const missingDeps = dependencies.filter(d => allDeps.indexOf(d) == -1);
-  if (missingDeps.length == 0) {
-    console.log(chalk.green('  no dependency missing from package.json.'));
-  } else {
-    console.log(chalk.yellow(`  ${missingDeps.length} missing from package.json:`));
-    missingDeps.forEach(md => console.log(`    ${md}`));
-    exitCode = 1;
-  }
+  reportMissingDependencies(missingDeps);
 
   const overDeps = allDeps.filter(d => dependencies.indexOf(d) == -1)
     .filter(x => ANGULAR_PACKAGES.indexOf(x) == -1);
-  if (overDeps.length == 0) {
-    console.log(chalk.green('  no excessive dependencies in package.json.'));
-  } else {
-    console.log(chalk.yellow(`  ${overDeps.length} excessive dependencies in package.json:`));
-    overDeps.forEach(md => console.log(`    ${md}`));
-    exitCode = 1;
-  }
+  reportExcessiveDependencies(overDeps);
 
   console.log('');
 }
+
+console.log(chalk.green('Validating root package. [devDependencies ignored]'));
+const rootPackagePath = path.join(__dirname, '../../package.json');
+const rootPackageJson = JSON.parse(fs.readFileSync(rootPackagePath, 'utf8'));
+// devDependencies are ignored
+const allRootDeps = []
+    .concat(Object.keys(rootPackageJson['dependencies'] || {}))
+    .concat(Object.keys(rootPackageJson['peerDependencies'] || {}));
+
+const internalPackages = Object.keys(packages);
+const missingRootDeps = overallDeps.filter(d => allRootDeps.indexOf(d) == -1)
+  .filter(d => internalPackages.indexOf(d) == -1);
+reportMissingDependencies(missingRootDeps);
+
+const overRootDeps = allRootDeps.filter(d => overallDeps.indexOf(d) == -1)
+  .filter(x => ANGULAR_PACKAGES.indexOf(x) == -1);
+reportExcessiveDependencies(overRootDeps);
 
 process.exit(exitCode);

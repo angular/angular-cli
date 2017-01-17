@@ -16,7 +16,12 @@ function resolve(filePath: string, host: ts.CompilerHost, program: ts.Program) {
   if (path.isAbsolute(filePath)) {
     return filePath;
   }
-  return path.join(program.getCompilerOptions().baseUrl || process.cwd(), filePath);
+  const compilerOptions = program.getCompilerOptions();
+  const basePath = compilerOptions.baseUrl || compilerOptions.rootDir;
+  if (!basePath) {
+    throw new Error(`Trying to resolve '${filePath}' without a basePath.`);
+  }
+  return path.join(basePath, filePath);
 }
 
 
@@ -162,6 +167,10 @@ export class TypeScriptFileRefactor {
   removeNode(node: ts.Node) {
     this._sourceString.remove(node.getStart(this._sourceFile), node.getEnd());
     this._changed = true;
+  }
+
+  removeNodes(...nodes: ts.Node[]) {
+    nodes.forEach(node => this.removeNode(node));
   }
 
   replaceNode(node: ts.Node, replacement: string) {

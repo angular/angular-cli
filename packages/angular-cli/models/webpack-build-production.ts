@@ -1,7 +1,5 @@
 import * as path from 'path';
 import * as webpack from 'webpack';
-const WebpackMd5Hash = require('webpack-md5-hash');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 import {CompressionPlugin} from '../lib/webpack/compression-plugin';
 const autoprefixer = require('autoprefixer');
 const postcssDiscardComments = require('postcss-discard-comments');
@@ -23,15 +21,7 @@ export const getWebpackProdConfigPartial = function(projectRoot: string,
   const appRoot = path.resolve(projectRoot, appConfig.root);
 
   return {
-    output: {
-      path: path.resolve(projectRoot, appConfig.outDir),
-      filename: '[name].[chunkhash].bundle.js',
-      sourceMapFilename: '[name].[chunkhash].bundle.map',
-      chunkFilename: '[id].[chunkhash].chunk.js'
-    },
     plugins: [
-      new ExtractTextPlugin('[name].[chunkhash].bundle.css'),
-      new WebpackMd5Hash(),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
