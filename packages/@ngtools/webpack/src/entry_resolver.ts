@@ -97,6 +97,8 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
       (decl.moduleSpecifier as ts.StringLiteral).text,
       refactor.fileName, program.getCompilerOptions(), host);
     if (!resolvedModule.resolvedModule || !resolvedModule.resolvedModule.resolvedFileName) {
+      throw new Error('Could not resolve module name. Is '
+        + (decl.moduleSpecifier as ts.StringLiteral).text + ' installed?');
       return null;
     }
 
@@ -134,6 +136,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
     .map(node => node as ts.CallExpression)
     .filter(call => {
       const access = call.expression as ts.PropertyAccessExpression;
+
       return access.kind == ts.SyntaxKind.PropertyAccessExpression
           && access.name.kind == ts.SyntaxKind.Identifier
           && (access.name.text == 'bootstrapModule'
@@ -145,7 +148,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
   if (bootstrap.length != 1) {
     throw new Error('Tried to find bootstrap code, but could not. Specify either '
       + 'statically analyzable bootstrap code or pass in an entryModule '
-      + 'to the plugins options.');
+      + 'to the plugins options. I has ' + bootstrap.length + ' bootstraps muahahaha');
   }
   const bootstrapSymbolName = bootstrap[0].text;
   const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);
@@ -156,5 +159,5 @@ export function resolveEntryModuleFromMain(mainPath: string,
   // shrug... something bad happened and we couldn't find the import statement.
   throw new Error('Tried to find bootstrap code, but could not. Specify either '
     + 'statically analyzable bootstrap code or pass in an entryModule '
-    + 'to the plugins options.');
+    + 'to the plugins options. fell out');
 }
