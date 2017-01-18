@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import { oneLine } from 'common-tags';
 
 import BuildCommand from './build';
 import DestroyCommand from './destroy';
@@ -73,7 +74,8 @@ const optsHelp = optsNg.sort().join(' ');
 
 let optsBuild = generateOptionVar(BuildCommand.prototype.availableOptions);
 // let optsGenerate = generateMapVar (GenerateCommand.prototype.aliasMap);
-let optsGenerate = "cl class c component d directive e enum i interface m module p pipe r route s service";
+let optsGenerate = oneLine`
+    cl class c component d directive e enum i interface m module p pipe r route s service`;
 let optsGhPagesDeploy = generateOptionVar(githubPagesDeployCommand.prototype.availableOptions);
 let optsInit = generateOptionVar(InitCommand.prototype.availableOptions);
 let optsNew = generateOptionVar(NewCommand.prototype.availableOptions);
