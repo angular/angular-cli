@@ -16,6 +16,11 @@ function _findUp(name: string, from: string) {
       return p;
     }
 
+    const nodeModuleP = path.join(currentDir, 'node_modules');
+    if (fs.existsSync(nodeModuleP)) {
+      return null;
+    }
+
     currentDir = path.dirname(currentDir);
   }
 
@@ -24,7 +29,7 @@ function _findUp(name: string, from: string) {
 
 
 function getUserHome() {
-  return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+  return process.env[(process.platform.startsWith('win')) ? 'USERPROFILE' : 'HOME'];
 }
 
 
@@ -37,13 +42,34 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
         || _findUp(CLI_CONFIG_FILE_NAME, __dirname);
   }
 
+  static fromGlobal(): CliConfig {
+    const globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
+
+    const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(globalConfigPath);
+
+    const aliases = [
+      cliConfig.alias('apps.0.root', 'defaults.sourceDir'),
+      cliConfig.alias('apps.0.prefix', 'defaults.prefix')
+    ];
+
+    // If any of them returned true, output a deprecation warning.
+    if (aliases.some(x => !!x)) {
+      console.error(chalk.yellow(oneLine`
+        The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
+        are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
+        Please update in order to avoid errors in future versions of angular-cli.
+      `));
+    }
+
+    return cliConfig;
+  }
 
   static fromProject(): CliConfig {
     const configPath = this.configFilePath();
     const globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
 
     if (!configPath) {
-      return CliConfigBase.fromJson<ConfigInterface>({});
+      return null;
     }
 
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(

@@ -170,7 +170,7 @@ export class TypeScriptFileRefactor {
   }
 
   removeNodes(...nodes: ts.Node[]) {
-    nodes.forEach(node => this.removeNode(node));
+    nodes.forEach(node => node && this.removeNode(node));
   }
 
   replaceNode(node: ts.Node, replacement: string) {
