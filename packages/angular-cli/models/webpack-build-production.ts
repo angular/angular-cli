@@ -4,16 +4,6 @@ import {CompressionPlugin} from '../lib/webpack/compression-plugin';
 const autoprefixer = require('autoprefixer');
 const postcssDiscardComments = require('postcss-discard-comments');
 
-declare module 'webpack' {
-  export interface LoaderOptionsPlugin {}
-  export interface LoaderOptionsPluginStatic {
-    new (optionsObject: any): LoaderOptionsPlugin;
-  }
-  interface Webpack {
-    LoaderOptionsPlugin: LoaderOptionsPluginStatic;
-  }
-}
-
 export const getWebpackProdConfigPartial = function(projectRoot: string,
                                                     appConfig: any,
                                                     sourcemap: boolean,

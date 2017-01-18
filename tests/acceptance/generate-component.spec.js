@@ -178,6 +178,20 @@ describe('Acceptance: ng generate component', function () {
       });
   });
 
+  it(`non${path.sep}existing${path.sep}dir${path.sep}myComp will create dir and succeed`, () => {
+    const testPath =
+      path.join(root, 'tmp', 'foo', 'src', 'app', 'non', 'existing', 'dir', 'my-comp', 'my-comp.component.ts');
+    const appModule = path.join(root, 'tmp', 'foo', 'src', 'app', 'app.module.ts');
+    return ng(['generate', 'component', `non${path.sep}existing${path.sep}dir${path.sep}myComp`])
+      .then(() => expect(existsSync(testPath)).to.equal(true))
+      .then(() => readFile(appModule, 'utf-8'))
+      .then(content => {
+        // Expect that the app.module contains a reference to my-comp and its import.
+        expect(content)
+          .matches(/import.*MyCompComponent.*from '.\/non\/existing\/dir\/my-comp\/my-comp.component';/);
+      });
+  });
+
   it('my-comp --inline-template', function () {
     return ng(['generate', 'component', 'my-comp', '--inline-template']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.component.html');
