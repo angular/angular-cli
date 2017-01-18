@@ -138,7 +138,6 @@ export function getWebpackCommonConfig(
 
   return {
     devtool: sourcemap ? 'source-map' : false,
-    performance: { hints: false },
     resolve: {
       extensions: ['.ts', '.js'],
       modules: [nodeModules],
