@@ -116,9 +116,18 @@ Module    | `ng g module my-module`
 
 ### Generating a route
 
-Generating routes in the CLI has been disabled for the time being. A new router and new route generation blueprints are coming.
+The CLI supports routing in several ways:
 
-You can read the official documentation for the new Router here: https://angular.io/docs/ts/latest/guide/router.html. Please note that even though route generation is disabled, building your projects with routing is still fully supported.
+- We include the `@angular/router` NPM package when creating or initializing a project.
+
+- When you generate a module, you can use the `--routing` option like `ng g module my-module --routing`  to create a separate file `my-module-routing.module.ts` to store the module routes.
+
+  The file includes an empty `Routes` object that you can fill with routes to different components and/or modules.
+  
+  The `--routing` option also generates a default component with the same name as the module.
+
+- You can use the `--routing` option with `ng new` or `ng init` to create a `app-routing.module.ts` file when you create or initialize a project.
+
 
 ### Creating a build
 

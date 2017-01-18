@@ -97,10 +97,10 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
   refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
     // Get all their property assignments.
     .filter((node: ts.ObjectLiteralExpression) =>
-      node.properties.some(prop => prop.name.getText() == 'moduleId'))
+      node.properties.some(prop => _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId'))
     .forEach((node: ts.ObjectLiteralExpression) => {
       const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, idx: number) => {
-        return prop.name.getText() == 'moduleId';
+        return _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
       })[0];
       // get the trailing comma
       const moduleIdCommaProp = moduleIdProp.parent.getChildAt(1).getChildren()[1];

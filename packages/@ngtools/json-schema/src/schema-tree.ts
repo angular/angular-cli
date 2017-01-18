@@ -4,6 +4,7 @@ import {SchemaNode, TypeScriptType} from './node';
 
 
 export class InvalidSchema extends JsonSchemaErrorBase {}
+export class InvalidValueError extends JsonSchemaErrorBase {}
 export class MissingImplementationError extends JsonSchemaErrorBase {}
 export class SettingReadOnlyPropertyError extends JsonSchemaErrorBase {}
 
@@ -151,8 +152,9 @@ export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   // Helper function to create a child based on its schema.
   protected _createChildProperty<T>(name: string, value: T, forward: SchemaTreeNode<T>,
                                     schema: Schema, define = true): SchemaTreeNode<T> {
-
-    let type: string = schema['oneOf'] ? 'oneOf' : schema['type'];
+    const type: string =
+      ('oneOf' in schema) ? 'oneOf' :
+      ('enum' in schema) ? 'enum' : schema['type'];
     let Klass: { new (arg: TreeNodeConstructorArgument<any>): SchemaTreeNode<any> } = null;
 
     switch (type) {
@@ -163,6 +165,7 @@ export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
       case 'number': Klass = NumberSchemaTreeNode; break;
       case 'integer': Klass = IntegerSchemaTreeNode; break;
 
+      case 'enum': Klass = EnumSchemaTreeNode; break;
       case 'oneOf': Klass = OneOfSchemaTreeNode; break;
 
       default:
@@ -327,7 +330,8 @@ export class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array<any>> {
     this._set(metaData.value, true, false);
 
     // Keep the item's schema as a schema node. This is important to keep type information.
-    this._itemPrototype = this._createChildProperty('', null, null, metaData.schema['items']);
+    this._itemPrototype = this._createChildProperty(
+      '', null, null, metaData.schema['items'], false);
   }
 
   _set(value: any, init: boolean, force: boolean) {
@@ -397,7 +401,7 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
     super(metaData);
     this._defined = !(metaData.value === undefined || metaData.value === null);
     if ('default' in metaData.schema) {
-      this._default = metaData.schema['default'];
+      this._default = this.convert(metaData.schema['default']);
     }
   }
 
@@ -415,8 +419,15 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
       throw new SettingReadOnlyPropertyError();
     }
 
+    let convertedValue: T | null = this.convert(v);
+    if (convertedValue === null || convertedValue === undefined) {
+      if (this.required) {
+        throw new InvalidValueError(`Invalid value "${v}" on a required field.`);
+      }
+    }
+
     this.dirty = true;
-    this._value = this.convert(v);
+    this._value = convertedValue;
   }
 
   destroy() {
@@ -445,6 +456,38 @@ class StringSchemaTreeNode extends LeafSchemaTreeNode<string> {
   convert(v: any) { return v === undefined ? undefined : '' + v; }
   get type() { return 'string'; }
   get tsType() { return String; }
+}
+
+
+class EnumSchemaTreeNode extends StringSchemaTreeNode {
+  private _enumValues: string[];
+
+  constructor(metaData: TreeNodeConstructorArgument<string>) {
+    super(metaData);
+
+    if (!Array.isArray(metaData.schema['enum'])) {
+      throw new InvalidSchema();
+    }
+    this._enumValues = [].concat(metaData.schema['enum']);
+    this.set(metaData.value, true);
+  }
+
+  protected _isInEnum(value: string) {
+    return this._enumValues.some(v => v === value);
+  }
+
+  isCompatible(v: any) {
+    return (typeof v == 'string' || v instanceof String) && this._isInEnum('' + v);
+  }
+  convert(v: any) {
+    if (v === undefined) {
+      return undefined;
+    }
+    if (v === null || !this._isInEnum('' + v)) {
+      return null;
+    }
+    return '' + v;
+  }
 }
 
 
