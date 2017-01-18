@@ -1,6 +1,5 @@
 import { Version } from '../upgrade/version';
 import WebpackBuild from '../tasks/build-webpack';
-import WebpackBuildWatch from '../tasks/build-webpack-watch';
 import { BuildOptions } from './build';
 
 export default function buildRun(commandOptions: BuildOptions) {
@@ -36,18 +35,9 @@ export default function buildRun(commandOptions: BuildOptions) {
   // Check angular version.
   Version.assertAngularVersionIs2_3_1OrHigher(project.root);
 
-  const ui = this.ui;
-  const buildTask = commandOptions.watch ?
-    new WebpackBuildWatch({
+  const buildTask = new WebpackBuild({
       cliProject: project,
-      ui: ui,
-      outputPath: commandOptions.outputPath,
-      target: commandOptions.target,
-      environment: commandOptions.environment
-    }) :
-    new WebpackBuild({
-      cliProject: project,
-      ui: ui,
+      ui: this.ui,
       outputPath: commandOptions.outputPath,
       target: commandOptions.target,
       environment: commandOptions.environment,

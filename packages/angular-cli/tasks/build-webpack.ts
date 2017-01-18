@@ -8,10 +8,7 @@ import { getWebpackStatsConfig } from '../models/';
 import { CliConfig } from '../models/config';
 
 
-// Configure build and output;
-let lastHash: any = null;
-
-export default <any>Task.extend({
+export default Task.extend({
   run: function (runTaskOptions: BuildOptions) {
 
     const project = this.cliProject;
@@ -39,23 +36,19 @@ export default <any>Task.extend({
       runTaskOptions.extractCss,
     ).config;
 
-    const webpackCompiler: any = webpack(config);
-
+    const webpackCompiler = webpack(config);
     const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
 
     return new Promise((resolve, reject) => {
-      webpackCompiler.run((err: any, stats: any) => {
+      const callback: webpack.compiler.CompilerCallback = (err, stats) => {
         if (err) {
           return reject(err);
         }
 
-        // Don't keep cache
-        // TODO: Make conditional if using --watch
-        webpackCompiler.purgeInputFileSystem();
+        this.ui.writeLine(stats.toString(statsConfig));
 
-        if (stats.hash !== lastHash) {
-          lastHash = stats.hash;
-          process.stdout.write(stats.toString(statsConfig) + '\n');
+        if (runTaskOptions.watch) {
+          return;
         }
 
         if (stats.hasErrors()) {
@@ -63,7 +56,13 @@ export default <any>Task.extend({
         } else {
           resolve();
         }
-      });
+      };
+
+      if (runTaskOptions.watch) {
+        webpackCompiler.watch({}, callback);
+      } else {
+        webpackCompiler.run(callback);
+      }
     })
     .catch((err: Error) => {
       if (err) {
