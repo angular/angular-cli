@@ -130,8 +130,8 @@ const CompletionCommand = Command.extend({
 #   2. Produce Bash-only completion: "ng completion -b" or "ng completion --bash".
 #   3. Produce Zsh-only completion: "ng completion -z" or "ng completion --zsh".
 #
-# Installation: ng completion -b 1>> ~/.bashrc 2>>&1
-#           or  ng completion -z 1>> ~/.zshrc 2>>&1
+# Installation: ng completion -b 1>> ~/.bashrc
+#           or  ng completion -z 1>> ~/.zshrc
 #`);
 
     if (commandOptions.all && !commandOptions.bash) {

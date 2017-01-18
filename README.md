@@ -123,7 +123,7 @@ The CLI supports routing in several ways:
 - When you generate a module, you can use the `--routing` option like `ng g module my-module --routing`  to create a separate file `my-module-routing.module.ts` to store the module routes.
 
   The file includes an empty `Routes` object that you can fill with routes to different components and/or modules.
-  
+
   The `--routing` option also generates a default component with the same name as the module.
 
 - You can use the `--routing` option with `ng new` or `ng init` to create a `app-routing.module.ts` file when you create or initialize a project.
@@ -289,19 +289,19 @@ To turn on auto completion use the following commands:
 
 For bash:
 ```bash
-ng completion --bash 1>> ~/.bashrc 2>>&1
+ng completion --bash 1>> ~/.bashrc
 source ~/.bashrc
 ```
 
 For zsh:
 ```bash
-ng completion --zsh 1>> ~/.zshrc 2>>&1
+ng completion --zsh 1>> ~/.zshrc
 source ~/.zshrc
 ```
 
 Windows users using gitbash:
 ```bash
-ng completion --bash 1>> ~/.bash_profile 2>>&1
+ng completion --bash 1>> ~/.bash_profile
 source ~/.bash_profile
 ```
 
