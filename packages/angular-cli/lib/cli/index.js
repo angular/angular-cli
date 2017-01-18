@@ -32,7 +32,7 @@ module.exports = function(options) {
   };
 
   // ensure the environemnt variable for dynamic paths
-  process.env.PWD = process.env.PWD || process.cwd();
+  process.env.PWD = path.normalize(process.env.PWD || process.cwd());
   process.env.CLI_ROOT = process.env.CLI_ROOT || path.resolve(__dirname, '..', '..');
 
   return cli(options);
