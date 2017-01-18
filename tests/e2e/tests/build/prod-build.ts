@@ -12,6 +12,9 @@ export default function() {
     // Check for cache busting hash script src
     .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
     .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{20}\.bundle\.css/))
+    // Defaults to AoT
+    .then(() => expectFileToMatch('dist/main.bundle.js',
+      /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//))
 
     // Check that the process didn't change local files.
     .then(() => expectGitToBeClean());

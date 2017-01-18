@@ -31,7 +31,7 @@ export default function () {
     }))
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.less'))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--extract-css'))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
       /body\s*{\s*background-color: blue;\s*}/))
     .then(() => expectFileToMatch('dist/styles.bundle.css',

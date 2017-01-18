@@ -2,41 +2,22 @@ import * as rimraf from 'rimraf';
 import * as path from 'path';
 const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
-import { BuildOptions } from '../commands/build';
+import { BuildTaskOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
-import { getWebpackStatsConfig } from '../models/';
+import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { CliConfig } from '../models/config';
 
 
 export default Task.extend({
-  run: function (runTaskOptions: BuildOptions) {
+  run: function (runTaskOptions: BuildTaskOptions) {
 
     const project = this.cliProject;
 
-    const outputDir = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
-    const deployUrl = runTaskOptions.deployUrl ||
-                       CliConfig.fromProject().config.apps[0].deployUrl;
-    rimraf.sync(path.resolve(project.root, outputDir));
-    const config = new NgCliWebpackConfig(
-      project,
-      runTaskOptions.target,
-      runTaskOptions.environment,
-      outputDir,
-      runTaskOptions.baseHref,
-      runTaskOptions.i18nFile,
-      runTaskOptions.i18nFormat,
-      runTaskOptions.locale,
-      runTaskOptions.aot,
-      runTaskOptions.sourcemap,
-      runTaskOptions.vendorChunk,
-      runTaskOptions.verbose,
-      runTaskOptions.progress,
-      deployUrl,
-      runTaskOptions.outputHashing,
-      runTaskOptions.extractCss,
-    ).config;
+    const outputPath = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
+    rimraf.sync(path.resolve(project.root, outputPath));
 
-    const webpackCompiler = webpack(config);
+    const webpackConfig = new NgCliWebpackConfig(runTaskOptions).config;
+    const webpackCompiler = webpack(webpackConfig);
     const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
 
     return new Promise((resolve, reject) => {

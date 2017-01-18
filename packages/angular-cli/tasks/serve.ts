@@ -5,7 +5,7 @@ const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
 const WebpackDevServer = require('webpack-dev-server');
-import { getWebpackStatsConfig } from '../models/';
+import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
@@ -22,24 +22,14 @@ export default Task.extend({
     const projectConfig = CliConfig.fromProject().config;
     const appConfig = projectConfig.apps[0];
 
-    let config = new NgCliWebpackConfig(
-      this.project,
-      serveTaskOptions.target,
-      serveTaskOptions.environment,
-      undefined,
-      undefined,
-      serveTaskOptions.i18nFile,
-      serveTaskOptions.i18nFormat,
-      serveTaskOptions.locale,
-      serveTaskOptions.aot,
-      serveTaskOptions.sourcemap,
-      serveTaskOptions.vendorChunk,
-      serveTaskOptions.verbose,
-      serveTaskOptions.progress,
-      undefined,
-      undefined,
-      serveTaskOptions.extractCss
-    ).config;
+    const serveDefaults = {
+      // default deployUrl to '' on serve to prevent the default from angular-cli.json
+      deployUrl: ''
+    };
+
+    serveTaskOptions = Object.assign({}, serveDefaults, serveTaskOptions);
+
+    let webpackConfig = new NgCliWebpackConfig(serveTaskOptions).config;
 
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
@@ -57,8 +47,8 @@ export default Task.extend({
       ui.writeLine(`  See ${chalk.blue(webpackHmrLink)}`);
       ui.writeLine('  for information on working with HMR for Webpack.');
       entryPoints.push('webpack/hot/dev-server');
-      config.plugins.push(new webpack.HotModuleReplacementPlugin());
-      config.plugins.push(new webpack.NamedModulesPlugin());
+      webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
+      webpackConfig.plugins.push(new webpack.NamedModulesPlugin());
       if (serveTaskOptions.extractCss) {
         ui.writeLine(oneLine`
           ${chalk.yellow('NOTICE')} (HMR) does not allow for CSS hot reload when used
@@ -66,9 +56,9 @@ export default Task.extend({
         `);
       }
     }
-    if (!config.entry.main) { config.entry.main = []; }
-    config.entry.main.unshift(...entryPoints);
-    webpackCompiler = webpack(config);
+    if (!webpackConfig.entry.main) { webpackConfig.entry.main = []; }
+    webpackConfig.entry.main.unshift(...entryPoints);
+    webpackCompiler = webpack(webpackConfig);
 
     const statsConfig = getWebpackStatsConfig(serveTaskOptions.verbose);
 
