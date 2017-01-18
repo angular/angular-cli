@@ -35,6 +35,7 @@ export function getWebpackCommonConfig(
   progress: boolean,
   outputHashing: string,
   extractCss: boolean,
+  deployUrl: string
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -149,7 +150,7 @@ export function getWebpackCommonConfig(
     entry: entryPoints,
     output: {
       path: path.resolve(projectRoot, appConfig.outDir),
-      publicPath: appConfig.deployUrl,
+      publicPath: deployUrl,
       filename: `[name]${hashFormat.chunk}.bundle.js`,
       sourceMapFilename: `[name]${hashFormat.chunk}.bundle.map`,
       chunkFilename: `[id]${hashFormat.chunk}.chunk.js`

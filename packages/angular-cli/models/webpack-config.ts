@@ -40,7 +40,6 @@ export class NgCliWebpackConfig {
     const projectRoot = this.ngCliProject.root;
 
     appConfig.outDir = outputDir || appConfig.outDir;
-    appConfig.deployUrl = deployUrl || appConfig.deployUrl;
 
     let baseConfig = getWebpackCommonConfig(
       projectRoot,
@@ -53,6 +52,7 @@ export class NgCliWebpackConfig {
       progress,
       outputHashing,
       extractCss,
+      deployUrl
     );
     let targetConfigPartial = this.getTargetConfig(projectRoot, appConfig, sourcemap, verbose);
 
