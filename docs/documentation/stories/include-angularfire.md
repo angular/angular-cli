@@ -1,7 +1,8 @@
 # Include AngularFire
 
 [Firebase](https://firebase.google.com/) is a mobile and web application platform with tools and infrastructure designed
-to help developers build high-quality apps.
+to help developers build high-quality apps. [AngularFire2](https://github.com/angular/angularfire2) is the official 
+Angular library to use Firebase in your apps.
 
 #### Create new project
 
@@ -22,7 +23,7 @@ $ npm install --save angularfire2 firebase
 
 #### Get Firebase configuration details
 
-In order to connect AngularFire to Firebase we need to get the configuration details.
+In order to connect AngularFire to Firebase you need to get the configuration details.
 
 Firebase offers an easy way to get this, by showing a JavaScript object that you can copy and paste.
 
@@ -41,112 +42,50 @@ Firebase offers an easy way to get this, by showing a JavaScript object that you
   };
 ```
 
-#### Create FirebaseModule
+#### Configure the Environment
 
-We need a way to store these configuration details in our app. We do this by creating a module.
+These configuration details need to be stored in our app, one way to do this using the `environment`. This allows you to 
+use different credentials in development and production.
 
-Create a new file `src/app/firebase.ts` with the content below and pass in the variables you retrieved from Firebase.
+Open `src/environments/environment.ts` and add a key `firebase` to the exported constant:
 
 ```typescript
-import { AngularFireModule, AuthMethods } from 'angularfire2';
-import { FirebaseAppConfig } from 'angularfire2/interfaces';
-import { AuthConfiguration } from 'angularfire2/auth';
-
-const config: FirebaseAppConfig = {
-  apiKey: 'your-api-key',
-  authDomain: 'your-auth-domain',
-  databaseURL: 'your-database-url',
-  storageBucket: 'your-storage-bucket',
+export const environment = {
+  production: false,
+  firebase: {
+    apiKey: 'your-api-key',
+    authDomain: 'your-auth-domain',
+    databaseURL: 'your-database-url',
+    storageBucket: 'your-storage-bucket',
+  }
 };
-
-const authConfig: AuthConfiguration = {
-  method: AuthMethods.Popup,
-};
-
-export const FirebaseModule = AngularFireModule.initializeApp(config, authConfig);
 ```
 
-#### Import FirebaseModule
+To define the keys for production you need to update `src/environments/environment.prod.ts`.
 
-In `src/app/app.module.ts` we need to reference the FirebaseModule so it gets imported in our app.
+#### Import and load FirebaseModule
 
-On the top of the file you import the module from the file created in the previous step. In the array of imports you
-reference the module.
+The final step is to import `AngularFireModule` and initialize it using the parameters from the `environment`.
+
+Open `src/app/app.module.ts` and add the following lines on the top of the file, with the other imports:
 
 ```typescript
-/* other imports */
-import { FirebaseModule } from './firebase';
+import { AngularFireModule } from 'angularfire2';
+import { environment } from '../environments/environment';
+```
 
+To initialize AngularFire add the following line to the `imports` array inside the `NgModule`: 
+
+```typescript
 @NgModule({
-  ...
+  // declarations
   imports: [
-    ...
-    FirebaseModule
+    // BrowserModule, etc
+    AngularFireModule.initializeApp(environment.firebase),
   ]
-  ...
+  // providers
+  // bootstrap
 })
-
 ```
 
-
-# W.I.P.
-
-#### Use Firebase in your components
-
-```typescript
-import { Component } from '@angular/core';
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  title = 'Firebase TODO';
-
-  public todos: FirebaseListObservable<any[]>;
-
-  constructor(
-    private af: AngularFire
-  ) {
-    this.todos = af.database.list('/todos');
-  }
-
-  addTodo(name) {
-    this.todos.push({ name: name.value, done: false });
-    name.value = null;
-  }
-
-  toggleDone(todo) {
-    this.todos.update(todo, { done: !todo.done });
-  }
-
-  removeTodo(todo) {
-    this.todos.remove(todo);
-  }
-}
-
-```
-
-
-```html
-<h1>
-  {{title}}
-</h1>
-
-<form (submit)="addTodo(name)">
-  <input type="text" #name placeholder="Name">
-  <button type="submit">Add</button>
-</form>
-
-<ul>
-  <li *ngFor="let todo of todos | async">
-    <span [ngStyle]="{'text-decoration': todo.done ? 'line-through' : ''}">
-      {{todo.name}}
-    </span>
-    <a href="#" (click)="removeTodo(todo)">Delete</a>
-    <a href="#" (click)="toggleDone(todo)">Done</a>
-  </li>
-</ul>
-```
+#### Congratulations, you can now use Firebase in your Angular app!
