@@ -77,7 +77,7 @@ export class JsonSerializer implements Serializer {
         this._willOutputValue();
         this._writer(JSON.stringify(key));
         this._writer(': ');
-        this._writer(JSON.stringify(node.value));
+        this._writer(JSON.stringify(node.value[key]));
       }
     }
 
