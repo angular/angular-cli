@@ -290,7 +290,7 @@ Example ngConfig model for saved docker command state (per project):
         isImageDeploy: true,
         serviceName: 'ngapp'
       }
-    }    
+    }
   }
 }
 ```
