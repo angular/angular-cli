@@ -1,20 +1,25 @@
-// ExtractTextPlugin leaves behind the entry points, which we might not need anymore
-// if they were entirely css. This plugin removes those entry points.
+// Remove .js files from entry points consisting entirely of .css|scss|sass|less|styl.
+// To be used together with ExtractTextPlugin.
 
-export interface SuppressEntryChunksWebpackPluginOptions {
-  chunks: string[];
-}
-
-export class SuppressEntryChunksWebpackPlugin {
-  constructor(private options: SuppressEntryChunksWebpackPluginOptions) { }
+export class SuppressExtractedTextChunksWebpackPlugin {
+  constructor() { }
 
   apply(compiler: any): void {
-    let { chunks } = this.options;
     compiler.plugin('compilation', function (compilation: any) {
+      // find which chunks have css only entry points
+      const cssOnlyChunks: string[] = [];
+        const entryPoints = compilation.options.entry;
+        // determine which entry points are composed entirely of css files
+        for (let entryPoint of Object.keys(entryPoints)) {
+          if (entryPoints[entryPoint].every((el: string) =>
+            el.match(/\.(css|scss|sass|less|styl)$/))) {
+              cssOnlyChunks.push(entryPoint);
+          }
+        }
       // Remove the js file for supressed chunks
       compilation.plugin('after-seal', (callback: any) => {
         compilation.chunks
-          .filter((chunk: any) => chunks.indexOf(chunk.name) !== -1)
+          .filter((chunk: any) => cssOnlyChunks.indexOf(chunk.name) !== -1)
           .forEach((chunk: any) => {
             let newFiles: string[] = [];
             chunk.files.forEach((file: string) => {

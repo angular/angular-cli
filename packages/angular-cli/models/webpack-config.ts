@@ -7,6 +7,7 @@ import { CliConfig } from './config';
 import { getWebpackCommonConfig } from './webpack-build-common';
 import { getWebpackDevConfigPartial } from './webpack-build-development';
 import { getWebpackProdConfigPartial } from './webpack-build-production';
+import { getWebpackStylesConfig } from './webpack-build-styles';
 import {
   getWebpackMobileConfigPartial,
   getWebpackMobileProdConfigPartial
@@ -39,6 +40,8 @@ export class NgCliWebpackConfig {
     const appConfig = CliConfig.fromProject().config.apps[0];
     const projectRoot = this.ngCliProject.root;
 
+    appConfig.scripts = appConfig.scripts || [];
+    appConfig.styles = appConfig.styles || [];
     appConfig.outDir = outputDir || appConfig.outDir;
     appConfig.deployUrl = deployUrl || appConfig.deployUrl;
 
@@ -52,7 +55,6 @@ export class NgCliWebpackConfig {
       verbose,
       progress,
       outputHashing,
-      extractCss,
     );
     let targetConfigPartial = this.getTargetConfig(projectRoot, appConfig, sourcemap, verbose);
 
@@ -74,6 +76,17 @@ export class NgCliWebpackConfig {
 
       config = webpackMerge(config, typescriptConfigPartial);
     }
+
+    const stylesConfig = getWebpackStylesConfig(
+      projectRoot,
+      appConfig,
+      target,
+      sourcemap,
+      outputHashing,
+      extractCss
+    );
+
+    config = webpackMerge(config, stylesConfig);
 
     this.config = config;
   }
