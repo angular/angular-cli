@@ -7,13 +7,11 @@ var commands      = require('../commands');
 var tasks         = require('../tasks');
 var CLI           = require('./cli');
 var debug         = require('debug')('ember-cli:cli/index');
-var merge         = require('lodash/merge');
 
 
 // Options: Array cliArgs, Stream inputStream, Stream outputStream
 module.exports = function(options) {
   var UI = options.UI || require('../ui');
-  var Yam = options.Yam || require('yam');
 
   // TODO: one UI (lib/models/project.js also has one for now...)
   var ui = new UI({
@@ -25,9 +23,6 @@ module.exports = function(options) {
     writeLevel:   ~process.argv.indexOf('--silent') ? 'ERROR' : undefined
   });
 
-  var config = new Yam('ember-cli', {
-    primary: Project.getProjectRoot()
-  });
 
   var defaultUpdateCheckerOptions = {
     checkForUpdates: false
@@ -49,7 +44,7 @@ module.exports = function(options) {
     cliArgs:  options.cliArgs,
     commands: commands,
     project:  project,
-    settings: merge(defaultUpdateCheckerOptions, config.getAll())
+    settings: defaultUpdateCheckerOptions
   };
 
   return cli.run(environment);

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {SchemaClass, SchemaClassFactory} from '../json-schema/schema-class-factory';
+import {SchemaClass, SchemaClassFactory} from '@ngtools/json-schema';
 
 
 const DEFAULT_CONFIG_SCHEMA_PATH = path.join(__dirname, '../../lib/config/schema.json');
