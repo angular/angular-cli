@@ -16,7 +16,7 @@
       "test": "test.ts",
       "tsconfig": "tsconfig.json",
       "prefix": "<%= prefix %>",
-      "mobile": <%= isMobile %>,
+      "mobile": true,
       "styles": [
         "styles.<%= styleExt %>"
       ],
@@ -47,11 +47,11 @@
     },
     "spec": {
       "class": false,
-      "component": <%= tests %>,
-      "directive": <%= tests %>,
+      "component": true,
+      "directive": false,
       "module": false,
-      "pipe": <%= tests %>,
-      "service": <%= tests %>
+      "pipe": true,
+      "service": false
     }
   }
 }
