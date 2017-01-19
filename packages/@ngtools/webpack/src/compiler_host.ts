@@ -68,6 +68,10 @@ export class VirtualFileStats extends VirtualStats {
   set content(v: string) {
     this._content = v;
     this._mtime = new Date();
+    this._sourceFile = null;
+  }
+  setSourceFile(sourceFile: ts.SourceFile) {
+    this._sourceFile = sourceFile;
   }
   getSourceFile(languageVersion: ts.ScriptTarget, setParentNodes: boolean) {
     if (!this._sourceFile) {
@@ -95,6 +99,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   private _basePath: string;
   private _setParentNodes: boolean;
+
+  private _cache: boolean = false;
 
   constructor(private _options: ts.CompilerOptions, basePath: string) {
     this._setParentNodes = true;
@@ -129,6 +135,10 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     this._changed = true;
   }
 
+  enableCaching() {
+    this._cache = true;
+  }
+
   populateWebpackResolver(resolver: any) {
     const fs = resolver.fileSystem;
     if (!this._changed) {
@@ -156,21 +166,33 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     this._changed = false;
   }
 
+  invalidate(fileName: string): void {
+    this._files[fileName] = null;
+  }
+
   fileExists(fileName: string): boolean {
     fileName = this._resolve(fileName);
-    return fileName in this._files || this._delegate.fileExists(fileName);
+    return this._files[fileName] != null || this._delegate.fileExists(fileName);
   }
 
   readFile(fileName: string): string {
     fileName = this._resolve(fileName);
-    return (fileName in this._files)
-         ? this._files[fileName].content
-         : this._delegate.readFile(fileName);
+    if (this._files[fileName] == null) {
+      const result = this._delegate.readFile(fileName);
+      if (result !== undefined && this._cache) {
+        this._setFileContent(fileName, result);
+        return result;
+      } else {
+        return result;
+      }
+    }
+    return this._files[fileName].content;
   }
 
   directoryExists(directoryName: string): boolean {
     directoryName = this._resolve(directoryName);
-    return (directoryName in this._directories) || this._delegate.directoryExists(directoryName);
+    return (this._directories[directoryName] != null)
+        || this._delegate.directoryExists(directoryName);
   }
 
   getFiles(path: string): string[] {
@@ -198,8 +220,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: OnErrorFn) {
     fileName = this._resolve(fileName);
 
-    if (!(fileName in this._files)) {
-      return this._delegate.getSourceFile(fileName, languageVersion, onError);
+    if (this._files[fileName] == null) {
+      const content = this.readFile(fileName);
+      if (!this._cache) {
+        return ts.createSourceFile(fileName, content, languageVersion, this._setParentNodes);
+      }
     }
 
     return this._files[fileName].getSourceFile(languageVersion, this._setParentNodes);

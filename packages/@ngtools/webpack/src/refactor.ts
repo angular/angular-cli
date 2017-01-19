@@ -60,12 +60,15 @@ export class TypeScriptFileRefactor {
     if (!this._program) {
       return [];
     }
-    let diagnostics: ts.Diagnostic[] = this._program.getSyntacticDiagnostics(this._sourceFile)
-                              .concat(this._program.getSemanticDiagnostics(this._sourceFile));
+    let diagnostics: ts.Diagnostic[] = [];
     // only concat the declaration diagnostics if the tsconfig config sets it to true.
     if (this._program.getCompilerOptions().declaration == true) {
       diagnostics = diagnostics.concat(this._program.getDeclarationDiagnostics(this._sourceFile));
     }
+    diagnostics = diagnostics.concat(
+      this._program.getSyntacticDiagnostics(this._sourceFile),
+      this._program.getSemanticDiagnostics(this._sourceFile));
+
     return diagnostics;
   }
 
