@@ -1,3 +1,6 @@
+npm uninstall -g ng-cli
+npm i -g https://github.com/tycho01/angular-cli.git#pug-html
+
 ## Angular-CLI
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -314,6 +317,15 @@ You use the `assets` array in `angular-cli.json` to list files or folders you wa
   "favicon.ico"
 ]
 ```
+
+### Template engines
+
+Template engines currently supported are HTML and [Pug](https://pugjs.org/) (née Jade).
+Template engines other than HTML require processing through webpack, so should be
+included from their own file using `templateUrl`, whereas HTML supports using
+`@Component`'s `template` property as well. Example:
+- before: `@Component({ template: '<p>Hello world</p>' })` or `@Component({ templateUrl: './foo.html' })`
+- after: `@Component({ templateUrl: './foo.pug' })`
 
 ### Global styles
 

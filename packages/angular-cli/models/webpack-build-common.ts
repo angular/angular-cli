@@ -164,7 +164,10 @@ export function getWebpackCommonConfig(
           loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
         },
         { test: /\.html$/, loader: 'raw-loader' },
-
+        {
+          test: /\.(pug|jade)$/,
+          loaders: ['apply-loader', 'pug-loader'],
+        },
         {
           test: /\.(otf|ttf|woff|woff2)$/,
           loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`

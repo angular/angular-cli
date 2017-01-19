@@ -59,6 +59,15 @@ ng e2e
 Before running the tests make sure you are serving the app via `ng serve`.
 End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
+### Template engines
+
+Template engines currently supported are HTML and [Pug](https://pugjs.org/) (née Jade).
+Template engines other than HTML require processing through webpack, so should be
+included from their own file using `templateUrl`, whereas HTML supports using
+`@Component`'s `template` property as well. Example:
+- before: `@Component({ template: '<p>Hello world</p>' })` or `@Component({ templateUrl: './foo.html' })`
+- after: `@Component({ templateUrl: './foo.pug' })`
+
 ### Global styles
 
 The `styles.css` file allows users to add global styles and supports
