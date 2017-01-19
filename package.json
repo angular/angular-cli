@@ -90,6 +90,7 @@
     "portfinder": "1.0.9",
     "postcss-discard-comments": "^2.0.4",
     "postcss-loader": "^0.9.1",
+    "protractor": "^3.3.0",
     "pug": "^2.0.0-beta6",
     "pug-loader": "^2.3.0",
     "quick-temp": "0.1.5",
