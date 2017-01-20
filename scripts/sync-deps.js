@@ -54,7 +54,7 @@ Promise.resolve()
 
     const output = path.join(root, 'package.json');
 
-    const ignoredDeps = ['@angular-cli/base-href-webpack', '@ngtools/webpack'];
+    const ignoredDeps = ['@angular-cli/base-href-webpack', '@ngtools/webpack', '@ngtools/json-schema', '@angular-cli/ast-tools'];
 
     ignoredDeps.forEach(key => delete dependencies[key])
 
