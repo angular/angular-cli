@@ -15,7 +15,6 @@
     "test": "npm-run-all -c test:packages test:cli test:deps",
     "e2e": "npm run test:e2e",
     "e2e:nightly": "node tests/run_e2e.js --nightly",
-    "mobile_test": "mocha tests/e2e/e2e_workflow.spec.js",
     "test:e2e": "node tests/run_e2e.js",
     "test:cli": "node tests/runner",
     "test:deps": "node scripts/publish/validate_dependencies.js",
