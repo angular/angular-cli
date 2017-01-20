@@ -46,7 +46,7 @@ with NPM 3 or higher.
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Proxy To Backend](#proxy-to-backend)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
-* [Linting and formatting code](#linting-and-formatting-code)
+* [Linting code](#linting-code)
 * [Commands autocompletion](#commands-autocompletion)
 * [Project assets](#project-assets)
 * [Global styles](#global-styles)
@@ -197,7 +197,7 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 
 You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
 
-Linting during tests is also available via the `--lint` flag. See [Linting and formatting code](#linting-and-formatting-code) chapter for more informations.
+Linting during tests is also available via the `--lint` flag. See [Linting code](#linting-code) chapter for more information.
 
 ### Running end-to-end tests
 
@@ -269,7 +269,7 @@ This command pushes the app to the `master` branch on the GitHub repo instead
 of pushing to `gh-pages`, since user and organization pages require this.
 
 
-### Linting and formatting code
+### Linting code
 
 You can lint your app code by running `ng lint`.
 This will use the `lint` npm script that in generated projects uses `tslint`.
