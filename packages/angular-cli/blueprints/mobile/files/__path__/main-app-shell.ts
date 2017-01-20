@@ -2,12 +2,12 @@ import 'angular2-universal-polyfills';
 import { provide } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
 import { APP_SHELL_BUILD_PROVIDERS } from '@angular/app-shell';
-import { 
-  REQUEST_URL, 
-  ORIGIN_URL, 
-  Bootloader, 
-  BootloaderConfig, 
-  AppConfig 
+import {
+  REQUEST_URL,
+  ORIGIN_URL,
+  Bootloader,
+  BootloaderConfig,
+  AppConfig
 } from 'angular2-universal';
 import { AppComponent } from './app/';
 
@@ -39,7 +39,7 @@ export function getBootloader() : Bootloader  {
   return new Bootloader(bootloaderConfig);
 }
 
-// The build system will call this function with the bootloader from 
+// The build system will call this function with the bootloader from
 // getBootloader and the contents of the index page
 export function serialize(bootloader: Bootloader, template: string) : string {
   appConfig.template = template;
