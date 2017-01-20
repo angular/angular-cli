@@ -55,6 +55,9 @@
           "main": {
             "type": "string"
           },
+          "entryModule": {
+            "type": "string"
+          },
           "test": {
             "type": "string"
           },
