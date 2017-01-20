@@ -221,14 +221,15 @@ with the content
 
 ```json
 {
-  "/api": {
-    "target": "http://localhost:3000",
-    "secure": false
-  }
+  proxy: {
+        "/api/*": {
+          "target": "http://localhost:3000"
+        }
+    }
 }
 ```
 
-You can read more about what options are available here [webpack-dev-server proxy settings](https://webpack.github.io/docs/webpack-dev-server.html#proxy)
+You can read more about what options are available here [webpack-dev-server proxy settings](https://webpack.js.org/configuration/dev-server/)
 
 and then we edit the `package.json` file's start script to be
 
