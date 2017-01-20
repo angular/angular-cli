@@ -40,7 +40,6 @@ const NewCommand = Command.extend({
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'mobile', type: Boolean, default: false },
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
@@ -82,13 +81,6 @@ const NewCommand = Command.extend({
     if (!validProjectName(packageName)) {
       return Promise.reject(
         new SilentError(`We currently do not support a name of "${packageName}".`));
-    }
-
-    if (commandOptions.mobile) {
-      return Promise.reject(new SilentError(
-        'The --mobile flag has been disabled temporarily while we await an update of ' +
-        'angular-universal for supporting NgModule. Sorry for the inconvenience.'
-      ));
     }
 
     if (!commandOptions.directory) {

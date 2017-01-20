@@ -8,10 +8,6 @@ import { getWebpackCommonConfig } from './webpack-build-common';
 import { getWebpackDevConfigPartial } from './webpack-build-development';
 import { getWebpackProdConfigPartial } from './webpack-build-production';
 import { getWebpackStylesConfig } from './webpack-build-styles';
-import {
-  getWebpackMobileConfigPartial,
-  getWebpackMobileProdConfigPartial
-} from './webpack-build-mobile';
 
 
 export class NgCliWebpackConfig {
@@ -57,15 +53,6 @@ export class NgCliWebpackConfig {
       outputHashing,
     );
     let targetConfigPartial = this.getTargetConfig(projectRoot, appConfig, sourcemap, verbose);
-
-    if (appConfig.mobile) {
-      let mobileConfigPartial = getWebpackMobileConfigPartial(projectRoot, appConfig);
-      let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(projectRoot, appConfig);
-      baseConfig = webpackMerge(baseConfig, mobileConfigPartial);
-      if (this.target == 'production') {
-        targetConfigPartial = webpackMerge(targetConfigPartial, mobileProdConfigPartial);
-      }
-    }
 
     let config = webpackMerge(baseConfig, targetConfigPartial);
 
