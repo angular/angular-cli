@@ -1,5 +1,6 @@
 import * as child_process from 'child_process';
 import {blue, yellow} from 'chalk';
+import {join} from 'path';
 import {getGlobalVariable} from './env';
 import {rimraf, writeFile} from './fs';
 const treeKill = require('tree-kill');
@@ -32,7 +33,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
     options.silent && 'silent',
     options.waitForMatch && `matching(${options.waitForMatch})`
   ]
-    .filter(x => !!x)  // Remove false and undefined.
+  .filter(x => !!x)  // Remove false and undefined.
     .join(', ')
     .replace(/^(.+)$/, ' [$1]');  // Proper formatting.
 
@@ -184,4 +185,9 @@ export function git(...args: string[]) {
 
 export function silentGit(...args: string[]) {
   return _exec({silent: true}, 'git', args);
+}
+
+export function ngbench(...args: string[]) {
+  const ngbenchJs = join(__dirname, '../../../bin/ngbench');
+  return _exec({}, 'node', [ngbenchJs, ...args]);
 }
