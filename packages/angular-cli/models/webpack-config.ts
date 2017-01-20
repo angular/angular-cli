@@ -56,7 +56,7 @@ export class NgCliWebpackConfig {
 
     let config = webpackMerge(baseConfig, targetConfigPartial);
 
-    if (appConfig.main) {
+    if (appConfig.main || appConfig.polyfills) {
       const typescriptConfigPartial = isAoT
         ? getWebpackAotConfigPartial(projectRoot, appConfig, i18nFile, i18nFormat, locale)
         : getWebpackNonAotConfigPartial(projectRoot, appConfig);

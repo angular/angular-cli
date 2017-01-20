@@ -46,14 +46,15 @@ export default function () {
     .then(() => expectToFail(() => expectFileToExist('dist/renamed-lazy-style.bundle.js')))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <link href="renamed-style.bundle.css" rel="stylesheet"/>
-      <link href="styles.bundle.css" rel="stylesheet"/>
       <link href="common-entry.bundle.css" rel="stylesheet"/>
+      <link href="styles.bundle.css" rel="stylesheet"/>
+      <link href="renamed-style.bundle.css" rel="stylesheet"/>
     `))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
       <script type="text/javascript" src="inline.bundle.js"></script>
-      <script type="text/javascript" src="vendor.bundle.js"></script>
+      <script type="text/javascript" src="polyfills.bundle.js"></script>
       <script type="text/javascript" src="common-entry.bundle.js"></script>
+      <script type="text/javascript" src="vendor.bundle.js"></script>
       <script type="text/javascript" src="main.bundle.js"></script>
     `))
     .then(() => ng('build', '--no-extract-css'))

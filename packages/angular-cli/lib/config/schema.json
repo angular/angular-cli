@@ -55,6 +55,9 @@
           "main": {
             "type": "string"
           },
+          "polyfills": {
+            "type": "string"
+          },
           "test": {
             "type": "string"
           },
