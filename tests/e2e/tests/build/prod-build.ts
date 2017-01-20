@@ -1,4 +1,5 @@
 import {join} from 'path';
+import {readdirSync} from 'fs';
 import {expectFileToExist, expectFileToMatch} from '../../utils/fs';
 import {ng} from '../../utils/process';
 import {expectGitToBeClean} from '../../utils/git';
@@ -13,9 +14,10 @@ export default function() {
     .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
     .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{20}\.bundle\.css/))
     // Defaults to AoT
-    .then(() => expectFileToMatch('dist/main.bundle.js',
-      /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//))
-
+    .then(() => {
+      const main = readdirSync('./dist').find(name => !!name.match(/main.[a-z0-9]+\.bundle\.js/));
+      expectFileToMatch(`dist/${main}`, /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//);
+    })
     // Check that the process didn't change local files.
     .then(() => expectGitToBeClean());
 }
