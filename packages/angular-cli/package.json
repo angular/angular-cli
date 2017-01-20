@@ -8,7 +8,8 @@
     "ng": "./bin/ng"
   },
   "keywords": [
-    "ember-addon"
+    "angular",
+    "angular-cli"
   ],
   "repository": {
     "type": "git",
