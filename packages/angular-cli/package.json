@@ -67,7 +67,7 @@
     "node-modules-path": "^1.0.0",
     "node-sass": "^4.1.1",
     "nopt": "^3.0.1",
-    "offline-plugin": "^3.4.1",
+    "offline-plugin": "^4.5.5",
     "opn": "4.0.1",
     "ora": "^0.2.0",
     "portfinder": "1.0.9",
