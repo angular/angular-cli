@@ -89,6 +89,21 @@
             },
             "additionalProperties": false
           },
+          "stylePreprocessorOptions": {
+            "description": "Options to pass to style preprocessors",
+            "type": "object",
+            "properties": {
+              "includePaths": {
+                "description": "Paths to include. Paths will be resolved to project root.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              }
+            },
+            "additionalProperties": false
+          },
           "scripts": {
             "description": "Global scripts to be included in the build.",
             "type": "array",
