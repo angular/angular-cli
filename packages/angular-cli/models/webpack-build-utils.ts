@@ -1,22 +1,4 @@
 import * as path from 'path';
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-/**
- * Enumerate loaders and their dependencies from this file to let the dependency validator
- * know they are used.
- *
- * require('raw-loader')
- * require('style-loader')
- * require('postcss-loader')
- * require('css-loader')
- * require('stylus-loader')
- * require('less-loader')
- * require('sass-loader')
- *
- * require('node-sass')
- * require('less')
- * require('stylus')
- */
 
 export const ngAppResolve = (resolvePath: string): string => {
   return path.resolve(process.cwd(), resolvePath);
@@ -58,34 +40,11 @@ export interface ExtraEntry {
   entry?: string;
 }
 
-// create array of css loaders
-export function makeCssLoaders(stylePaths: string[] = []) {
-  const baseRules = [
-    { test: /\.css$/, loaders: [] },
-    { test: /\.scss$|\.sass$/, loaders: ['sass-loader'] },
-    { test: /\.less$/, loaders: ['less-loader'] },
-    { test: /\.styl$/, loaders: ['stylus-loader'] }
-  ];
-
-  const commonLoaders = ['postcss-loader'];
-
-  // load component css as raw strings
-  let cssLoaders: any = baseRules.map(({test, loaders}) => ({
-    exclude: stylePaths, test, loaders: ['raw-loader', ...commonLoaders, ...loaders]
-  }));
-
-  if (stylePaths.length > 0) {
-    // load global css as css files
-    cssLoaders.push(...baseRules.map(({test, loaders}) => ({
-      include: stylePaths, test, loaders: ExtractTextPlugin.extract({
-        remove: false,
-        loader: ['css-loader', ...commonLoaders, ...loaders],
-        fallbackLoader: 'style-loader'
-      })
-    })));
-  }
-
-  return cssLoaders;
+// Filter extra entries out of a arran of extraEntries
+export function lazyChunksFilter(extraEntries: ExtraEntry[]) {
+  return extraEntries
+    .filter(extraEntry => extraEntry.lazy)
+    .map(extraEntry => extraEntry.entry);
 }
 
 // convert all extra entries into the object representation, fill in defaults

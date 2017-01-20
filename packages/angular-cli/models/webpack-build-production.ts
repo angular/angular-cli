@@ -1,18 +1,7 @@
 import * as path from 'path';
 import * as webpack from 'webpack';
 import {CompressionPlugin} from '../lib/webpack/compression-plugin';
-const autoprefixer = require('autoprefixer');
-const postcssDiscardComments = require('postcss-discard-comments');
 
-declare module 'webpack' {
-  export interface LoaderOptionsPlugin {}
-  export interface LoaderOptionsPluginStatic {
-    new (optionsObject: any): LoaderOptionsPlugin;
-  }
-  interface Webpack {
-    LoaderOptionsPlugin: LoaderOptionsPluginStatic;
-  }
-}
 
 export const getWebpackProdConfigPartial = function(projectRoot: string,
                                                     appConfig: any,
@@ -36,22 +25,6 @@ export const getWebpackProdConfigPartial = function(projectRoot: string,
           algorithm: 'gzip',
           test: /\.js$|\.html$|\.css$/,
           threshold: 10240
-      }),
-      // LoaderOptionsPlugin needs to be fully duplicated because webpackMerge will replace it.
-      new webpack.LoaderOptionsPlugin({
-        test: /\.(css|scss|sass|less|styl)$/,
-        options: {
-          postcss: [
-            autoprefixer(),
-            postcssDiscardComments
-          ],
-          cssLoader: { sourceMap: sourcemap },
-          sassLoader: { sourceMap: sourcemap },
-          lessLoader: { sourceMap: sourcemap },
-          stylusLoader: { sourceMap: sourcemap },
-          // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
-          context: projectRoot,
-        }
       })
     ]
   };

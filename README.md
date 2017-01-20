@@ -7,7 +7,7 @@
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
 [![npm][npm-badge]][npm-badge-url]
 
-Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://www.ember-cli.com/) project.
+Prototype of a CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
 
@@ -116,9 +116,18 @@ Module    | `ng g module my-module`
 
 ### Generating a route
 
-Generating routes in the CLI has been disabled for the time being. A new router and new route generation blueprints are coming.
+The CLI supports routing in several ways:
 
-You can read the official documentation for the new Router here: https://angular.io/docs/ts/latest/guide/router.html. Please note that even though route generation is disabled, building your projects with routing is still fully supported.
+- We include the `@angular/router` NPM package when creating or initializing a project.
+
+- When you generate a module, you can use the `--routing` option like `ng g module my-module --routing`  to create a separate file `my-module-routing.module.ts` to store the module routes.
+
+  The file includes an empty `Routes` object that you can fill with routes to different components and/or modules.
+  
+  The `--routing` option also generates a default component with the same name as the module.
+
+- You can use the `--routing` option with `ng new` or `ng init` to create a `app-routing.module.ts` file when you create or initialize a project.
+
 
 ### Creating a build
 
@@ -243,11 +252,11 @@ This will do the following:
 - rebuilds the app in production mode at the current `HEAD`
 - creates a local `gh-pages` branch if one doesn't exist
 - moves your app to the `gh-pages` branch and creates a commit
-- edit the base tag in index.html to support github pages
-- pushes the `gh-pages` branch to github
+- edit the base tag in index.html to support GitHub Pages
+- pushes the `gh-pages` branch to GitHub
 - returns back to the original `HEAD`
 
-Creating the repo requires a token from github, and the remaining functionality
+Creating the repo requires a token from GitHub, and the remaining functionality
 relies on ssh authentication for all git operations that communicate with github.com.
 To simplify the authentication, be sure to [setup your ssh keys](https://help.github.com/articles/generating-ssh-keys/).
 
@@ -257,7 +266,7 @@ If you are deploying a [user or organization page](https://help.github.com/artic
 ng github-pages:deploy --user-page --message "Optional commit message"
 ```
 
-This command pushes the app to the `master` branch on the github repo instead
+This command pushes the app to the `master` branch on the GitHub repo instead
 of pushing to `gh-pages`, since user and organization pages require this.
 
 

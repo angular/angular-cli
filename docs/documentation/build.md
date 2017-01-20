@@ -35,3 +35,5 @@ ng build
 `--base-href` (`-bh`) base url for the application being built
 
 `--aot` flag whether to build using Ahead of Time compilation
+
+`--extract-css` extract css from global styles onto css files instead of js ones

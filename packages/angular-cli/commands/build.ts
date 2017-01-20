@@ -18,6 +18,7 @@ export interface BuildOptions {
   locale?: string;
   deployUrl?: string;
   outputHashing?: string;
+  extractCss?: boolean | null;
 }
 
 const BuildCommand = Command.extend({
@@ -39,7 +40,7 @@ const BuildCommand = Command.extend({
     { name: 'suppress-sizes', type: Boolean, default: false },
     { name: 'base-href',      type: String,  default: null, aliases: ['bh'] },
     { name: 'aot',            type: Boolean, default: false },
-    { name: 'sourcemap',      type: Boolean, default: true, aliases: ['sm'] },
+    { name: 'sourcemap',      type: Boolean, aliases: ['sm'] },
     { name: 'vendor-chunk',   type: Boolean, default: true },
     { name: 'verbose',        type: Boolean, default: false },
     { name: 'progress',       type: Boolean, default: true },
@@ -52,7 +53,8 @@ const BuildCommand = Command.extend({
       type: String,
       values: ['none', 'all', 'media', 'bundles'],
       description: 'define the output filename cache-busting hashing mode'
-    }
+    },
+    { name: 'extract-css',    type: Boolean, default: true }
   ],
 
   run: function (commandOptions: BuildOptions) {

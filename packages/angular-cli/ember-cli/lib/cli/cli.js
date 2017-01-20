@@ -62,12 +62,12 @@ CLI.prototype.run = function(environment) {
     if (!platform.isValid && !this.testing) {
       if (platform.isDeprecated) {
         this.ui.writeDeprecateLine('Node ' + process.version +
-                                   ' is no longer supported by Ember CLI. Please update to a more recent version of Node');
+                                   ' is no longer supported by Angular CLI. Please update to a more recent version of Node');
       }
 
       if (platform.isUntested) {
         this.ui.writeWarnLine('WARNING: Node ' + process.version +
-                              ' has currently not been tested against Ember CLI and may result in unexpected behaviour.');
+                              ' has currently not been tested against Angular CLI and may result in unexpected behaviour.');
       }
     }
 
