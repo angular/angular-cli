@@ -200,6 +200,11 @@ export class AotPlugin implements Tapable {
           return callback();
         }
 
+        // alter only request from @angular/core/src/linker
+        if (!request.context.endsWith(path.join('@angular/core/src/linker'))) {
+          return callback(null, request);
+        }
+
         request.request = this.skipCodeGeneration ? this.basePath : this.genDir;
         request.recursive = true;
         request.dependencies.forEach((d: any) => d.critical = false);
@@ -210,16 +215,24 @@ export class AotPlugin implements Tapable {
           return callback();
         }
 
-        this.done.then(() => {
-          result.resource = this.skipCodeGeneration ? this.basePath : this.genDir;
-          result.recursive = true;
-          result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = createResolveDependenciesFromContextMap(
-            (_: any, cb: any) => cb(null, this._lazyRoutes));
-
+        // there is no way to find the original request, so try to
+        // match request from @angular/core/src/linker as best as possible
+        if (
+          result.resource == (this.skipCodeGeneration ? this.basePath : this.genDir)
+          && result.recursive == true
+          && result.dependencies.every((d: any) => d.critical == false)
+        ) {
+          this.done.then(() => {
+            result.resolveDependencies = createResolveDependenciesFromContextMap(
+              this._lazyRoutes,
+              result.resolveDependencies
+            );
+            return callback(null, result);
+          }, () => callback(null))
+          .catch(err => callback(err));
+        } else {
           return callback(null, result);
-        }, () => callback(null))
-        .catch(err => callback(err));
+        }
       });
     });
 
