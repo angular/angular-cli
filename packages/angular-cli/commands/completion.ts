@@ -84,9 +84,8 @@ let optsSet = generateOptionVar(SetCommand.prototype.availableOptions);
 let optsTest = generateOptionVar(NgCliTestCommand.prototype.availableOptions);
 let optsVersion = generateOptionVar(VersionCommand.prototype.availableOptions);
 
-function displayCaseBlock () {
-  console.log(`
-      ng|help) opts="${optsHelp}" ;;
+let caseBlock =
+     `ng|help) opts="${optsHelp}" ;;
       ${caseBuild}) opts="${optsBuild}" ;;
       completion) opts="-a -b --all --bash --zsh" ;;
       ${caseGenerate}) opts="${optsGenerate}" ;;
@@ -97,8 +96,7 @@ function displayCaseBlock () {
       ${caseSet}) opts="${optsSet}" ;;
       ${caseTest}) opts="${optsTest}" ;;
       ${caseVersion}) opts="${optsVersion}" ;;
-      *) opts="" ;;`);
-}
+      *) opts="" ;;`;
 
 export interface CompletionCommandOptions {
   all?: boolean;
@@ -119,7 +117,7 @@ const CompletionCommand = Command.extend({
   run: function (commandOptions: CompletionCommandOptions, rawArgs: string[]) {
     commandOptions.all = !commandOptions.bash && !commandOptions.zsh;
 
-    console.log(`
+    this.ui.writeLine(`
 ###-begin-ng-completion###');
 #
 
@@ -135,12 +133,12 @@ const CompletionCommand = Command.extend({
 #`);
 
     if (commandOptions.all && !commandOptions.bash) {
-      console.log(`
+      this.ui.writeLine(`
 if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then`);
     }
 
     if (commandOptions.all || commandOptions.bash) {
-      console.log(`
+      this.ui.writeLine(`
   _ng_completion() {
     local cword pword opts
 
@@ -148,11 +146,8 @@ if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then`);
     cword=\${COMP_WORDS[COMP_CWORD]}
     pword=\${COMP_WORDS[COMP_CWORD - 1]}
 
-    case \${pword} in`);
-
-    displayCaseBlock();
-
-    console.log(`
+    case \${pword} in
+      ${caseBlock}
     esac
 
     COMPREPLY=( $(compgen -W '\${opts}' -- $cword) )
@@ -164,23 +159,20 @@ if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then`);
     }
 
     if (commandOptions.all) {
-      console.log(`
+      this.ui.writeLine(`
 elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then`);
     }
 
     if (commandOptions.all || commandOptions.zsh) {
-      console.log(`
+      this.ui.writeLine(`
   _ng_completion () {
     local words cword opts
     read -Ac words
     read -cn cword
     let cword-=1
 
-    case $words[cword] in`);
-
-    displayCaseBlock();
-
-    console.log(`
+    case $words[cword] in
+      ${caseBlock}
     esac
 
     setopt shwordsplit
@@ -192,14 +184,14 @@ elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then
     }
 
     if (commandOptions.all) {
-      console.log(`
+      this.ui.writeLine(`
 else
   echo "Shell builtin command 'complete' or 'compctl' is redefined; cannot perform ng completion."
   return 1
 fi`);
     }
 
-    console.log(`
+    this.ui.writeLine(`
 ###-end-ng-completion###
 `);
   }
