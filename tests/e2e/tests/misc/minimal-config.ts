@@ -7,7 +7,11 @@ export default function () {
     .then(() => writeFile('angular-cli.json', JSON.stringify({
       apps: [{
         root: 'src',
-        main: 'main.ts'
+        main: 'main.ts',
+        scripts: [
+          '../node_modules/core-js/client/shim.min.js',
+          '../node_modules/zone.js/dist/zone.js'
+        ]
       }],
       e2e: { protractor: { config: './protractor.conf.js' } }
     })))

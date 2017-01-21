@@ -65,9 +65,6 @@
           "prefix": {
             "type": "string"
           },
-          "mobile": {
-            "type": "boolean"
-          },
           "styles": {
             "description": "Global styles to be included in the build.",
             "type": "array",

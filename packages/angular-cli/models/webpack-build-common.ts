@@ -1,10 +1,9 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import { GlobCopyWebpackPlugin } from '../plugins/glob-copy-webpack-plugin';
-import { SuppressEntryChunksWebpackPlugin } from '../plugins/suppress-entry-chunks-webpack-plugin';
 import { packageChunkSort } from '../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
-import { extraEntryParser, makeCssLoaders, getOutputHashFormat } from './webpack-build-utils';
+import { extraEntryParser, lazyChunksFilter, getOutputHashFormat } from './webpack-build-utils';
 
 const autoprefixer = require('autoprefixer');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -33,8 +32,7 @@ export function getWebpackCommonConfig(
   vendorChunk: boolean,
   verbose: boolean,
   progress: boolean,
-  outputHashing: string,
-  extractCss: boolean,
+  outputHashing: string
 ) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
@@ -42,61 +40,35 @@ export function getWebpackCommonConfig(
 
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
-  let lazyChunks: string[] = [];
-
   let entryPoints: { [key: string]: string[] } = {};
+
+  // figure out which are the lazy loaded entry points
+  const lazyChunks = lazyChunksFilter([
+    ...extraEntryParser(appConfig.scripts, appRoot, 'scripts'),
+    ...extraEntryParser(appConfig.styles, appRoot, 'styles')
+  ]);
 
   if (appConfig.main) {
     entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
+  }
+
+  if (appConfig.polyfills) {
+    entryPoints['polyfills'] = [path.resolve(appRoot, appConfig.polyfills)];
   }
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(outputHashing);
 
   // process global scripts
-  if (appConfig.scripts && appConfig.scripts.length > 0) {
+  if (appConfig.scripts.length > 0) {
     const globalScripts = extraEntryParser(appConfig.scripts, appRoot, 'scripts');
 
     // add entry points and lazy chunks
     globalScripts.forEach(script => {
+      let scriptPath = `script-loader!${script.path}`;
       if (script.lazy) { lazyChunks.push(script.entry); }
-      entryPoints[script.entry] = (entryPoints[script.entry] || []).concat(script.path);
+      entryPoints[script.entry] = (entryPoints[script.entry] || []).concat(scriptPath);
     });
-
-    // load global scripts using script-loader
-    extraRules.push({
-      include: globalScripts.map((script) => script.path), test: /\.js$/, loader: 'script-loader'
-    });
-  }
-
-  // process global styles
-  if (!appConfig.styles || appConfig.styles.length === 0) {
-    // create css loaders for component css
-    extraRules.push(...makeCssLoaders());
-  } else {
-    const globalStyles = extraEntryParser(appConfig.styles, appRoot, 'styles');
-    let extractedCssEntryPoints: string[] = [];
-    // add entry points and lazy chunks
-    globalStyles.forEach(style => {
-      if (style.lazy) { lazyChunks.push(style.entry); }
-      if (!entryPoints[style.entry]) {
-        // since this entry point doesn't exist yet, it's going to only have
-        // extracted css and we can supress the entry point
-        extractedCssEntryPoints.push(style.entry);
-        entryPoints[style.entry] = (entryPoints[style.entry] || []).concat(style.path);
-      } else {
-        // existing entry point, just push the css in
-        entryPoints[style.entry].push(style.path);
-      }
-    });
-
-    // create css loaders for component css and for global css
-    extraRules.push(...makeCssLoaders(globalStyles.map((style) => style.path)));
-
-    if (extractCss && extractedCssEntryPoints.length > 0) {
-      // don't emit the .js entry point for extracted styles
-      extraPlugins.push(new SuppressEntryChunksWebpackPlugin({ chunks: extractedCssEntryPoints }));
-    }
   }
 
   if (vendorChunk) {
@@ -157,30 +129,20 @@ export function getWebpackCommonConfig(
     module: {
       rules: [
         { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
-
         { test: /\.json$/, loader: 'json-loader' },
-        {
-          test: /\.(jpg|png|gif)$/,
-          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
-        },
         { test: /\.html$/, loader: 'raw-loader' },
-
+        { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
         {
-          test: /\.(otf|ttf|woff|woff2)$/,
+          test: /\.(jpg|png|gif|otf|ttf|woff|woff2)$/,
           loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
-        },
-        { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` }
+        }
       ].concat(extraRules)
     },
     plugins: [
-      new ExtractTextPlugin({
-        filename: `[name]${hashFormat.extract}.bundle.css`,
-        disable: !extractCss
-      }),
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(appConfig.outDir, appConfig.index),
-        chunksSortMode: packageChunkSort(['inline', 'styles', 'scripts', 'vendor', 'main']),
+        chunksSortMode: packageChunkSort(appConfig),
         excludeChunks: lazyChunks,
         xhtml: true
       }),
@@ -190,18 +152,6 @@ export function getWebpackCommonConfig(
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
         name: 'inline'
-      }),
-      new webpack.LoaderOptionsPlugin({
-        test: /\.(css|scss|sass|less|styl)$/,
-        options: {
-          postcss: [autoprefixer()],
-          cssLoader: { sourceMap: sourcemap },
-          sassLoader: { sourceMap: sourcemap },
-          lessLoader: { sourceMap: sourcemap },
-          stylusLoader: { sourceMap: sourcemap },
-          // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
-          context: projectRoot,
-        },
       })
     ].concat(extraPlugins),
     node: {

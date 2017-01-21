@@ -35,7 +35,6 @@ const GenerateCommand = EmberGenerateCommand.extend({
       const blueprints = blueprintList
         .filter(bp => bp.indexOf('-test') === -1)
         .filter(bp => bp !== 'ng2')
-        .filter(bp => bp !== 'mobile')
         .map(bp => Blueprint.load(path.join(__dirname, '..', 'blueprints', bp)));
 
       let output = '';

@@ -65,7 +65,6 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
     sourceDir: commandOptions.sourceDir,
     style: commandOptions.style,
     prefix: commandOptions.prefix,
-    mobile: commandOptions.mobile,
     routing: commandOptions.routing,
     inlineStyle: commandOptions.inlineStyle,
     inlineTemplate: commandOptions.inlineTemplate,
@@ -77,13 +76,6 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
   if (!validProjectName(packageName)) {
     return Promise.reject(
       new SilentError('We currently do not support a name of `' + packageName + '`.'));
-  }
-
-  if (commandOptions.mobile) {
-    return Promise.reject(new SilentError(
-      'The --mobile flag has been disabled temporarily while we await an update of ' +
-      'angular-universal for supporting NgModule. Sorry for the inconvenience.'
-    ));
   }
 
   blueprintOpts.blueprint = normalizeBlueprint(blueprintOpts.blueprint);

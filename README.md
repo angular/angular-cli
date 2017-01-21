@@ -47,7 +47,6 @@ with NPM 3 or higher.
 * [Proxy To Backend](#proxy-to-backend)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
 * [Linting and formatting code](#linting-and-formatting-code)
-* [Support for offline applications](#support-for-offline-applications)
 * [Commands autocompletion](#commands-autocompletion)
 * [Project assets](#project-assets)
 * [Global styles](#global-styles)
@@ -276,12 +275,6 @@ You can lint your app code by running `ng lint`.
 This will use the `lint` npm script that in generated projects uses `tslint`.
 
 You can modify the these scripts in `package.json` to run whatever tool you prefer.
-
-### Support for offline applications
-
-**The `--mobile` flag has been disabled temporarily. Sorry for the inconvenience.**
-
-~~Angular-CLI includes support for offline applications via the `--` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.~~
 
 ### Commands autocompletion
 

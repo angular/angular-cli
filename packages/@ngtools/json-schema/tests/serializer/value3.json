@@ -16,7 +16,6 @@
       "test": "test.ts",
       "tsconfig": "tsconfig.json",
       "prefix": "<%= prefix %>",
-      "mobile": true,
       "styles": [
         "styles.<%= styleExt %>"
       ],

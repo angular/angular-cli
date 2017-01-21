@@ -7,10 +7,7 @@ import { CliConfig } from './config';
 import { getWebpackCommonConfig } from './webpack-build-common';
 import { getWebpackDevConfigPartial } from './webpack-build-development';
 import { getWebpackProdConfigPartial } from './webpack-build-production';
-import {
-  getWebpackMobileConfigPartial,
-  getWebpackMobileProdConfigPartial
-} from './webpack-build-mobile';
+import { getWebpackStylesConfig } from './webpack-build-styles';
 
 
 export class NgCliWebpackConfig {
@@ -39,6 +36,8 @@ export class NgCliWebpackConfig {
     const appConfig = CliConfig.fromProject().config.apps[0];
     const projectRoot = this.ngCliProject.root;
 
+    appConfig.scripts = appConfig.scripts || [];
+    appConfig.styles = appConfig.styles || [];
     appConfig.outDir = outputDir || appConfig.outDir;
     appConfig.deployUrl = deployUrl || appConfig.deployUrl;
 
@@ -52,28 +51,29 @@ export class NgCliWebpackConfig {
       verbose,
       progress,
       outputHashing,
-      extractCss,
     );
     let targetConfigPartial = this.getTargetConfig(projectRoot, appConfig, sourcemap, verbose);
 
-    if (appConfig.mobile) {
-      let mobileConfigPartial = getWebpackMobileConfigPartial(projectRoot, appConfig);
-      let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(projectRoot, appConfig);
-      baseConfig = webpackMerge(baseConfig, mobileConfigPartial);
-      if (this.target == 'production') {
-        targetConfigPartial = webpackMerge(targetConfigPartial, mobileProdConfigPartial);
-      }
-    }
-
     let config = webpackMerge(baseConfig, targetConfigPartial);
 
-    if (appConfig.main) {
+    if (appConfig.main || appConfig.polyfills) {
       const typescriptConfigPartial = isAoT
         ? getWebpackAotConfigPartial(projectRoot, appConfig, i18nFile, i18nFormat, locale)
         : getWebpackNonAotConfigPartial(projectRoot, appConfig);
 
       config = webpackMerge(config, typescriptConfigPartial);
     }
+
+    const stylesConfig = getWebpackStylesConfig(
+      projectRoot,
+      appConfig,
+      target,
+      sourcemap,
+      outputHashing,
+      extractCss
+    );
+
+    config = webpackMerge(config, stylesConfig);
 
     this.config = config;
   }
