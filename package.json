@@ -83,7 +83,7 @@
     "nopt": "^3.0.1",
     "opn": "4.0.1",
     "ora": "^0.2.0",
-    "portfinder": "1.0.9",
+    "portfinder": "1.0.12",
     "postcss-discard-comments": "^2.0.4",
     "postcss-loader": "^0.9.1",
     "quick-temp": "0.1.5",
