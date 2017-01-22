@@ -4,9 +4,9 @@ import * as ts from 'typescript';
 
 import {__NGTOOLS_PRIVATE_API_2} from '@angular/compiler-cli';
 import {AngularCompilerOptions} from '@angular/tsc-wrapped';
+const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 
 import {WebpackResourceLoader} from './resource_loader';
-import {createResolveDependenciesFromContextMap} from './utils';
 import {WebpackCompilerHost} from './compiler_host';
 import {resolveEntryModuleFromMain} from './entry_resolver';
 import {Tapable} from './webpack';
@@ -194,45 +194,30 @@ export class AotPlugin implements Tapable {
   apply(compiler: any) {
     this._compiler = compiler;
 
+    // Add lazy modules to the context module for @angular/core/src/linker
     compiler.plugin('context-module-factory', (cmf: any) => {
-      cmf.plugin('before-resolve', (request: any, callback: (err?: any, request?: any) => void) => {
-        if (!request) {
-          return callback();
-        }
-
-        // alter only request from @angular/core/src/linker
-        if (!request.context.endsWith(path.join('@angular/core/src/linker'))) {
-          return callback(null, request);
-        }
-
-        request.request = this.skipCodeGeneration ? this.basePath : this.genDir;
-        request.recursive = true;
-        request.dependencies.forEach((d: any) => d.critical = false);
-        return callback(null, request);
-      });
       cmf.plugin('after-resolve', (result: any, callback: (err?: any, request?: any) => void) => {
         if (!result) {
           return callback();
         }
 
-        // there is no way to find the original request, so try to
-        // match request from @angular/core/src/linker as best as possible
-        if (
-          result.resource == (this.skipCodeGeneration ? this.basePath : this.genDir)
-          && result.recursive == true
-          && result.dependencies.every((d: any) => d.critical == false)
-        ) {
-          this.done.then(() => {
-            result.resolveDependencies = createResolveDependenciesFromContextMap(
-              this._lazyRoutes,
-              result.resolveDependencies
-            );
-            return callback(null, result);
-          }, () => callback(null))
-          .catch(err => callback(err));
-        } else {
+        // alter only request from @angular/core/src/linker
+        if (!result.resource.endsWith(path.join('@angular/core/src/linker'))) {
           return callback(null, result);
         }
+
+        this.done.then(() => {
+          result.resource = this.skipCodeGeneration ? this.basePath : this.genDir;
+          result.recursive = true;
+          result.dependencies.forEach((d: any) => d.critical = false);
+          result.resolveDependencies = (p1: any, p2: any, p3: any, p4: RegExp, cb: any ) => {
+            const dependencies = Object.keys(this._lazyRoutes)
+              .map((key) => new ContextElementDependency(this._lazyRoutes[key], key));
+            cb(null, dependencies);
+          };
+          return callback(null, result);
+        }, () => callback(null))
+        .catch(err => callback(err));
       });
     });
 
