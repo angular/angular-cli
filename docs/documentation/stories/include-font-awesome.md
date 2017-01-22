@@ -1,3 +1,5 @@
+<!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+
 # Include [Font Awesome](http://fontawesome.io/)
 
 [Font Awesome](http://fontawesome.io/) gives you scalable vector icons that can instantly be customized — size, color, drop shadow, and anything that can be done with the power of CSS.

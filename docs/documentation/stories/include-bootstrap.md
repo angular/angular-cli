@@ -1,3 +1,5 @@
+<!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+
 # Include [Bootstrap](http://getbootstrap.com/)
 
 [Bootstrap](http://getbootstrap.com/) is a popular CSS framework which can be used within an Angular project.
