@@ -1,4 +1,4 @@
-const TestCommand = require('../ember-cli/lib/commands/test');
+const EmberTestCommand = require('../ember-cli/lib/commands/test');
 import TestTask from '../tasks/test';
 import {CliConfig} from '../models/config';
 
@@ -18,7 +18,7 @@ export interface TestOptions {
 }
 
 
-const NgCliTestCommand = TestCommand.extend({
+const TestCommand = EmberTestCommand.extend({
   availableOptions: [
     { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
     { name: 'code-coverage', type: Boolean, default: false, aliases: ['cc'] },
@@ -50,5 +50,5 @@ const NgCliTestCommand = TestCommand.extend({
   }
 });
 
-NgCliTestCommand.overrideCore = true;
-export default NgCliTestCommand;
+TestCommand.overrideCore = true;
+export default TestCommand;
