@@ -25,6 +25,12 @@ export interface CompletionCommandOptions {
   zsh?: boolean;
 };
 
+const commandsToIgnore = [
+  'easter-egg',
+  'destroy',
+  'github-pages-deploy' // errors because there is no base github-pages command
+];
+
 const optsNg: String[] = [];
 
 const CompletionCommand = Command.extend({
@@ -43,6 +49,9 @@ const CompletionCommand = Command.extend({
     const commandFiles = fs.readdirSync(__dirname)
       .filter(file => file.match(/\.ts$/) && !file.match(/\.run.ts$/))
       .map(file => path.parse(file).name)
+      .filter(file => {
+        return commandsToIgnore.indexOf(file) < 0;
+      })
       .map(file => file.toLowerCase());
 
     const commandMap = commandFiles.reduce((acc: any, curr: string) => {
