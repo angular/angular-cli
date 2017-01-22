@@ -37,7 +37,7 @@ const CompletionCommand = Command.extend({
     { name: 'zsh',   type: Boolean, default: false, aliases: ['z'] }
   ],
 
-  run: function (commandOptions: CompletionCommandOptions, rawArgs: string[]) {
+  run: function (commandOptions: CompletionCommandOptions) {
     commandOptions.all = !commandOptions.bash && !commandOptions.zsh;
 
     const commandFiles = fs.readdirSync(__dirname)
@@ -87,7 +87,7 @@ const CompletionCommand = Command.extend({
                 caseBlock +
                 '    *) opts="" ;;';
 
-    this.ui.writeLine(`###-begin-ng-completion###');
+    console.log(`###-begin-ng-completion###
 #
 
 # ng command completion script
@@ -103,11 +103,11 @@ const CompletionCommand = Command.extend({
 `);
 
     if (commandOptions.all && !commandOptions.bash) {
-      this.ui.writeLine('if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then');
+      console.log('if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then');
     }
 
     if (commandOptions.all || commandOptions.bash) {
-      this.ui.writeLine(`_ng_completion() {
+      console.log(`_ng_completion() {
   local cword pword opts
 
   COMPREPLY=()
@@ -128,12 +128,12 @@ complete -o default -F _ng_completion ng
     }
 
     if (commandOptions.all) {
-      this.ui.writeLine(
+      console.log(
         'elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then');
     }
 
     if (commandOptions.all || commandOptions.zsh) {
-      this.ui.writeLine(`_ng_completion () {
+      console.log(`_ng_completion () {
   local words cword opts
   read -Ac words
   read -cn cword
@@ -153,14 +153,14 @@ compctl -K _ng_completion ng
     }
 
     if (commandOptions.all) {
-      this.ui.writeLine(`else
+      console.log(`else
   echo "Shell builtin command 'complete' or 'compctl' is redefined; cannot perform ng completion."
   return 1
 fi
 `);
     }
 
-    this.ui.writeLine('###-end-ng-completion###');
+    console.log('###-end-ng-completion###');
 
   }
 });
