@@ -1,3 +1,5 @@
+<!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+
 # Include AngularFire
 
 [Firebase](https://firebase.google.com/) is a mobile and web application platform with tools and infrastructure designed

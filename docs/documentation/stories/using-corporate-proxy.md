@@ -1,3 +1,5 @@
+<!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+
 # Using corporate proxy
 
 If you work behind a corporate proxy, the regular [backend proxy](http://github.com/angular/angular-cli#proxy-to-backend) configuration will not work if you try to proxy calls to any URL outside your local network.
