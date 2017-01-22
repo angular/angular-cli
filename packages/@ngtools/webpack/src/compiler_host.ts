@@ -148,10 +148,12 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     const isWindows = process.platform.startsWith('win');
     for (const fileName of Object.keys(this._files)) {
       const stats = this._files[fileName];
-      // If we're on windows, we need to populate with the proper path separator.
-      const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
-      fs._statStorage.data[path] = [null, stats];
-      fs._readFileStorage.data[path] = [null, stats.content];
+      if (stats) {
+        // If we're on windows, we need to populate with the proper path separator.
+        const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
+        fs._statStorage.data[path] = [null, stats];
+        fs._readFileStorage.data[path] = [null, stats.content];
+      }
     }
     for (const dirName of Object.keys(this._directories)) {
       const stats = this._directories[dirName];
