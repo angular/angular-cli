@@ -50,7 +50,9 @@ function checkExpressPort(commandOptions: ServeTaskOptions) {
     .then((foundPort: number) => {
 
       if (commandOptions.port !== foundPort && commandOptions.port !== 0) {
-        throw new SilentError(`Port ${commandOptions.port} is already in use.`);
+        throw new SilentError(
+          `Port ${commandOptions.port} is already in use. Use '--port' to specify a different port.`
+        );
       }
 
       // otherwise, our found port is good
