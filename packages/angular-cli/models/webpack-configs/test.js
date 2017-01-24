@@ -26,7 +26,7 @@ const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
  */
 
 
-const getWebpackTestConfig = function (projectRoot, environment, appConfig, testConfig) {
+const getTestConfig = function (projectRoot, environment, appConfig, testConfig) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const extraRules = [];
@@ -151,4 +151,4 @@ const getWebpackTestConfig = function (projectRoot, environment, appConfig, test
   };
 }
 
-module.exports.getWebpackTestConfig = getWebpackTestConfig;
+module.exports.getTestConfig = getTestConfig;

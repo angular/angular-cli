@@ -16,7 +16,7 @@ export default function() {
         '../node_modules/bootstrap/dist/js/bootstrap.js'
       );
     }))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--extract-css'))
     .then(() => expectFileToMatch('dist/scripts.bundle.js', '* jQuery JavaScript'))
     .then(() => expectFileToMatch('dist/scripts.bundle.js', '/*! tether '))
     .then(() => expectFileToMatch('dist/scripts.bundle.js', '* Bootstrap'))

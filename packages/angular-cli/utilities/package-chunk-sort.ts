@@ -1,4 +1,4 @@
-import { ExtraEntry, extraEntryParser } from '../models/webpack-build-utils';
+import { ExtraEntry, extraEntryParser } from '../models/webpack-configs/utils';
 
 // Sort chunks according to a predefined order:
 // inline, polyfills, all scripts, all styles, vendor, main

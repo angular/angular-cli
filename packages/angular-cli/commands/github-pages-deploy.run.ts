@@ -6,7 +6,7 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import WebpackBuild from '../tasks/build-webpack';
+import Build from '../tasks/build';
 import CreateGithubRepo from '../tasks/create-github-repo';
 import { CliConfig } from '../models/config';
 import { GithubPagesDeployOptions } from './github-pages-deploy';
@@ -44,7 +44,7 @@ export default function githubPagesDeployRun(options: GithubPagesDeployOptions, 
   // declared here so that tests can stub exec
   const execPromise = <(cmd: string, options?: any) => Promise<string>>denodeify(exec);
 
-  const buildTask = new WebpackBuild({
+  const buildTask = new Build({
     ui: this.ui,
     cliProject: this.project,
     target: options.target,

@@ -1,9 +1,10 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
-import { GlobCopyWebpackPlugin } from '../plugins/glob-copy-webpack-plugin';
-import { packageChunkSort } from '../utilities/package-chunk-sort';
+import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
+import { packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
-import { extraEntryParser, lazyChunksFilter, getOutputHashFormat } from './webpack-build-utils';
+import { extraEntryParser, lazyChunksFilter, getOutputHashFormat } from './utils';
+import { WebpackConfigOptions } from '../webpack-config';
 
 const autoprefixer = require('autoprefixer');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -23,17 +24,8 @@ const SilentError = require('silent-error');
  * require('file-loader')
  */
 
-export function getWebpackCommonConfig(
-  projectRoot: string,
-  environment: string,
-  appConfig: any,
-  baseHref: string,
-  sourcemap: boolean,
-  vendorChunk: boolean,
-  verbose: boolean,
-  progress: boolean,
-  outputHashing: string
-) {
+export function getCommonConfig(wco: WebpackConfigOptions) {
+  const { projectRoot, buildOptions, appConfig } = wco;
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const nodeModules = path.resolve(projectRoot, 'node_modules');
@@ -57,7 +49,7 @@ export function getWebpackCommonConfig(
   }
 
   // determine hashing format
-  const hashFormat = getOutputHashFormat(outputHashing);
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
 
   // process global scripts
   if (appConfig.scripts.length > 0) {
@@ -71,7 +63,7 @@ export function getWebpackCommonConfig(
     });
   }
 
-  if (vendorChunk) {
+  if (buildOptions.vendorChunk) {
     extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       chunks: ['main'],
@@ -84,8 +76,8 @@ export function getWebpackCommonConfig(
     if (!('source' in appConfig.environments)) {
       throw new SilentError(`Environment configuration does not contain "source" entry.`);
     }
-    if (!(environment in appConfig.environments)) {
-      throw new SilentError(`Environment "${environment}" does not exist.`);
+    if (!(buildOptions.environment in appConfig.environments)) {
+      throw new SilentError(`Environment "${buildOptions.environment}" does not exist.`);
     }
 
     extraPlugins.push(new webpack.NormalModuleReplacementPlugin(
@@ -94,7 +86,7 @@ export function getWebpackCommonConfig(
       // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
       new RegExp(path.resolve(appRoot, appConfig.environments['source'])
         .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
-      path.resolve(appRoot, appConfig.environments[environment])
+      path.resolve(appRoot, appConfig.environments[buildOptions.environment])
     ));
   }
 
@@ -106,10 +98,12 @@ export function getWebpackCommonConfig(
     }));
   }
 
-  if (progress) { extraPlugins.push(new ProgressPlugin({ profile: verbose, colors: true })); }
+  if (buildOptions.progress) {
+    extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose, colors: true }));
+  }
 
   return {
-    devtool: sourcemap ? 'source-map' : false,
+    devtool: buildOptions.sourcemap ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
       modules: [nodeModules],
@@ -120,8 +114,8 @@ export function getWebpackCommonConfig(
     context: projectRoot,
     entry: entryPoints,
     output: {
-      path: path.resolve(projectRoot, appConfig.outDir),
-      publicPath: appConfig.deployUrl,
+      path: path.resolve(projectRoot, buildOptions.outputPath),
+      publicPath: buildOptions.deployUrl,
       filename: `[name]${hashFormat.chunk}.bundle.js`,
       sourceMapFilename: `[name]${hashFormat.chunk}.bundle.map`,
       chunkFilename: `[id]${hashFormat.chunk}.chunk.js`
@@ -141,13 +135,13 @@ export function getWebpackCommonConfig(
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
-        filename: path.resolve(appConfig.outDir, appConfig.index),
+        filename: path.resolve(buildOptions.outputPath, appConfig.index),
         chunksSortMode: packageChunkSort(appConfig),
         excludeChunks: lazyChunks,
         xhtml: true
       }),
       new BaseHrefWebpackPlugin({
-        baseHref: baseHref
+        baseHref: buildOptions.baseHref
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,

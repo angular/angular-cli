@@ -1,5 +1,6 @@
 import * as path from 'path';
 import {AotPlugin} from '@ngtools/webpack';
+import { WebpackConfigOptions } from '../webpack-config';
 
 
 const g: any = global;
@@ -8,7 +9,8 @@ const webpackLoader: string = g['angularCliIsLocal']
   : '@ngtools/webpack';
 
 
-export const getWebpackNonAotConfigPartial = function(projectRoot: string, appConfig: any) {
+export const getNonAotConfig = function(wco: WebpackConfigOptions) {
+  const { projectRoot, appConfig } = wco;
   let exclude = [ '**/*.spec.ts' ];
   if (appConfig.test) { exclude.push(path.join(projectRoot, appConfig.root, appConfig.test)); };
   return {
@@ -32,8 +34,8 @@ export const getWebpackNonAotConfigPartial = function(projectRoot: string, appCo
   };
 };
 
-export const getWebpackAotConfigPartial = function(projectRoot: string, appConfig: any,
-  i18nFile: string, i18nFormat: string, locale: string) {
+export const getAotConfig = function(wco: WebpackConfigOptions) {
+  const { projectRoot, buildOptions, appConfig } = wco;
   let exclude = [ '**/*.spec.ts' ];
   if (appConfig.test) { exclude.push(path.join(projectRoot, appConfig.root, appConfig.test)); };
   return {
@@ -50,9 +52,9 @@ export const getWebpackAotConfigPartial = function(projectRoot: string, appConfi
       new AotPlugin({
         tsConfigPath: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
         mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
-        i18nFile: i18nFile,
-        i18nFormat: i18nFormat,
-        locale: locale,
+        i18nFile: buildOptions.i18nFile,
+        i18nFormat: buildOptions.i18nFormat,
+        locale: buildOptions.locale,
         exclude: exclude
       })
     ]
