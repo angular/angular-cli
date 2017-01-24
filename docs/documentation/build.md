@@ -65,6 +65,8 @@ All builds make use of bundling, and using the `--prod` flag in  `ng build --pro
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ## Options
+`--watch` (`-w`) flag to run builds when files change
+
 `--target` (`-t`) define the build target
 
 `--environment` (`-e`) defines the build environment
@@ -75,14 +77,20 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 
 `--output-path` (`-po`) path where output will be placed
 
-`--output-hashing` define the output filename cache-busting hashing mode
+`--aot` flag whether to build using Ahead of Time compilation
 
-`--watch` (`-w`) flag to run builds when files change
+`--sourcemap` (`-sm`) output sourcemaps
 
-`--surpress-sizes` flag to suppress sizes from build output
+`--vendor-chunk` (`-vb`) use a separate bundle containing only vendor libraries
 
 `--base-href` (`-bh`) base url for the application being built
 
-`--aot` flag whether to build using Ahead of Time compilation
+`--deploy-url` (`-d`) url where files will be deployed
 
-`--extract-css` extract css from global styles onto css files instead of js ones
+`--verbose` (`-v`) adds more details to output logging
+
+`--progress` (`-pr`) log progress to the console while building
+
+`--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
+
+`--output-hashing` define the output filename cache-busting hashing mode
