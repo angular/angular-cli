@@ -73,7 +73,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 
 `--dev` flag to set build target and environment to development
 
-`--output-path` (`-o`) path where output will be placed
+`--output-path` (`-po`) path where output will be placed
 
 `--output-hashing` define the output filename cache-busting hashing mode
 
