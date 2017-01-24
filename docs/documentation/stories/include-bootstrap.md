@@ -39,7 +39,7 @@ A quick test is to add the following markup to `app.component.html`
 ```
 After saving this file, return to the browser to see the bootstrap styled button.
 
-## Using SASS
+## Using SASS (applies to version 4.x)
 Open `angular-cli.json` change reference of `styles.css` to `styles.scss` and rename the file accordingly.
 
 Create an empty file `_variables.scss` in `src/`.
