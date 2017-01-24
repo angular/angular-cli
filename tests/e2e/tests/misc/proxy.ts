@@ -24,8 +24,10 @@ export default function() {
   const proxyServerUrl = `http://${backendHost}:${backendPort}`;
   const proxyConfigFile = 'proxy.config.json';
   const proxyConfig = {
-    '/api/*': {
-      target: proxyServerUrl
+    proxy: {
+      '/api/*': {
+        target: proxyServerUrl
+      }
     }
   };
 

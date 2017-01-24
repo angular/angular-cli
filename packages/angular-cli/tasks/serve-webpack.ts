@@ -68,7 +68,6 @@ export default Task.extend({
     }
     if (!config.entry.main) { config.entry.main = []; }
     config.entry.main.unshift(...entryPoints);
-    webpackCompiler = webpack(config);
 
     const statsConfig = getWebpackStatsConfig(serveTaskOptions.verbose);
 
@@ -76,12 +75,14 @@ export default Task.extend({
     if (serveTaskOptions.proxyConfig) {
       const proxyPath = path.resolve(this.project.root, serveTaskOptions.proxyConfig);
       if (fs.existsSync(proxyPath)) {
-        proxyConfig = require(proxyPath);
+        config.devServer = require(proxyPath);
       } else {
         const message = 'Proxy config file ' + proxyPath + ' does not exist.';
         return Promise.reject(new SilentError(message));
       }
     }
+
+    webpackCompiler = webpack(config);
 
     let sslKey: string = null;
     let sslCert: string = null;
