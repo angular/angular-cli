@@ -86,3 +86,5 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 `--aot` flag whether to build using Ahead of Time compilation
 
 `--extract-css` extract css from global styles onto css files instead of js ones
+
+`--deploy-url` (`-d`) public URL of the output directory when referenced in a browser
