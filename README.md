@@ -237,6 +237,26 @@ and then we edit the `package.json` file's start script to be
 
 now run it with `npm start`
 
+### Mocking a Static Backend
+Webpack dev server allows us to modify the ExpressJS `app` object using the `setup` method.
+We do this by passing a file to `--server-config`
+
+We create a file next to the project's `package.json` called `server.conf.js` with the content
+
+```json
+module.exports = function(app){
+   app.get('/api/*', function(req, res){
+    res.sendFile(req.originalUrl, {root: __dirname + '/mocks/'});
+  });
+};
+
+```
+
+now run it with `ng serve --server-config server.conf.json`
+
+Thus fetches to `/api/foo` will return flat json from `/mocks/api/foo`
+
+
 ### Deploying the app via GitHub Pages
 
 You can deploy your apps quickly via:
