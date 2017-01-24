@@ -10,7 +10,7 @@ export default function () {
       div { flex: 1 }
     `)
     // uses autoprefixer plugin for all builds
-    .then(() => ng('build'))
+    .then(() => ng('build', '--extract-css'))
     .then(() => expectFileToMatch('dist/styles.bundle.css', stripIndents`
       /* normal-comment */
       /*! important-comment */

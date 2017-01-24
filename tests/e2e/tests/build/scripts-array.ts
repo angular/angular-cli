@@ -30,7 +30,7 @@ export default function () {
       ];
       app['styles'] = [{ input: 'common-entry-style.css', output: 'common-entry' }];
     }))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--extract-css'))
     // files were created successfully
     .then(() => expectFileToMatch('dist/scripts.bundle.js', 'string-script'))
     .then(() => expectFileToMatch('dist/scripts.bundle.js', 'input-script'))

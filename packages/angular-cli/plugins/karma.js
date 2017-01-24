@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const getWebpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
+const getTestConfig = require('../models/webpack-configs/test').getTestConfig;
 const CliConfig = require('../models/config').CliConfig;
 
 const init = (config) => {
@@ -42,7 +42,7 @@ const init = (config) => {
   }
 
   // add webpack config
-  const webpackConfig = getWebpackTestConfig(config.basePath, environment, appConfig, testConfig);
+  const webpackConfig = getTestConfig(config.basePath, environment, appConfig, testConfig);
   const webpackMiddlewareConfig = {
     noInfo: true, // Hide webpack output because its noisy.
     stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.

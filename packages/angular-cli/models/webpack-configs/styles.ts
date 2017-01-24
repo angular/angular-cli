@@ -2,8 +2,9 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 import {
   SuppressExtractedTextChunksWebpackPlugin
-} from '../plugins/suppress-entry-chunks-webpack-plugin';
-import { extraEntryParser, getOutputHashFormat } from './webpack-build-utils';
+} from '../../plugins/suppress-entry-chunks-webpack-plugin';
+import { extraEntryParser, getOutputHashFormat } from './utils';
+import { WebpackConfigOptions } from '../webpack-config';
 
 const postcssDiscardComments = require('postcss-discard-comments');
 const autoprefixer = require('autoprefixer');
@@ -25,14 +26,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
  * require('sass-loader')
  */
 
-export function getWebpackStylesConfig(
-  projectRoot: string,
-  appConfig: any,
-  target: string,
-  sourcemap: boolean,
-  outputHashing: string,
-  extractCss: boolean,
-) {
+export function getStylesConfig(wco: WebpackConfigOptions) {
+  const { projectRoot, buildOptions, appConfig } = wco;
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const entryPoints: { [key: string]: string[] } = {};
@@ -40,10 +35,12 @@ export function getWebpackStylesConfig(
   const extraPlugins: any[] = [];
 
   // discard comments in production
-  const extraPostCssPlugins = target === 'production' ? [postcssDiscardComments] : [];
+  const extraPostCssPlugins = buildOptions.target === 'production'
+                              ? [postcssDiscardComments]
+                              : [];
 
   // determine hashing format
-  const hashFormat = getOutputHashFormat(outputHashing);
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
 
   // use includePaths from appConfig
   const includePaths: string [] = [];
@@ -77,7 +74,7 @@ export function getWebpackStylesConfig(
     // stylus-loader doesn't support webpack.LoaderOptionsPlugin properly,
     // so we need to add options in it's query
     { test: /\.styl$/, loaders: [`stylus-loader?${JSON.stringify({
-      sourceMap: sourcemap,
+      sourceMap: buildOptions.sourcemap,
       paths: includePaths
     })}`] }
   ];
@@ -103,7 +100,7 @@ export function getWebpackStylesConfig(
   }
 
   // supress empty .js files in css only entry points
-  if (extractCss) {
+  if (buildOptions.extractCss) {
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
 
@@ -114,15 +111,15 @@ export function getWebpackStylesConfig(
       // extract global css from js files into own css file
       new ExtractTextPlugin({
         filename: `[name]${hashFormat.extract}.bundle.css`,
-        disable: !extractCss
+        disable: !buildOptions.extractCss
       }),
       new webpack.LoaderOptionsPlugin({
         options: {
           postcss: [autoprefixer()].concat(extraPostCssPlugins),
-          cssLoader: { sourceMap: sourcemap },
-          sassLoader: { sourceMap: sourcemap, includePaths },
+          cssLoader: { sourceMap: buildOptions.sourcemap },
+          sassLoader: { sourceMap: buildOptions.sourcemap, includePaths },
           // less-loader doesn't support paths
-          lessLoader: { sourceMap: sourcemap },
+          lessLoader: { sourceMap: buildOptions.sourcemap },
           // stylus-loader doesn't support LoaderOptionsPlugin properly, options in query instead
           // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
           context: projectRoot,
