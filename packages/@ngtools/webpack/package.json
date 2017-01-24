@@ -25,18 +25,18 @@
     "npm": ">= 3.0.0"
   },
   "dependencies": {
-    "enhanced-resolve": "^2.3.0",
+    "enhanced-resolve": "^3.0.0",
     "loader-utils": "^0.2.16",
-    "magic-string": "^0.16.0",
+    "magic-string": "^0.19.0",
     "source-map": "^0.5.6"
   },
   "peerDependencies": {
-    "@angular/compiler": "^2.3.1",
-    "@angular/compiler-cli": "^2.3.1",
-    "@angular/core": "^2.3.1",
+    "@angular/compiler": "~2.3.1",
+    "@angular/compiler-cli": "~2.3.1",
+    "@angular/core": "~2.3.1",
     "@angular/tsc-wrapped": "^0.5.0",
-    "typescript": "^2.0.2",
+    "typescript": "^2.0.3",
     "reflect-metadata": "^0.1.8",
-    "webpack": "2.2.0"
+    "webpack": "~2.2.0"
   }
 }

@@ -7,7 +7,7 @@ const expect = require('chai').expect;
 
 describe('Acceptance: ng destroy', function () {
   beforeEach(function () {
-    this.timeout(10000);
+    this.timeout(30000);
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
