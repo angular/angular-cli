@@ -31,10 +31,12 @@ export const baseBuildCommandOptions: any = [
     description: 'define the output filename cache-busting hashing mode',
     aliases: ['oh']
   },
+  { name: 'stats-json', type: Boolean, default: false },
 ];
 
 export interface BuildTaskOptions extends BuildOptions {
   watch?: boolean;
+  statsJson?: boolean;
 }
 
 const BuildCommand = Command.extend({
