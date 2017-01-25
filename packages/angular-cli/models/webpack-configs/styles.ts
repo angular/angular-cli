@@ -91,7 +91,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     rules.push(...baseRules.map(({test, loaders}) => ({
       include: globalStylePaths, test, loaders: ExtractTextPlugin.extract({
         remove: false,
-        loader: ['css-loader', ...commonLoaders, ...loaders],
+        loader: ['css-loader?sourceMaps', ...commonLoaders, ...loaders],
         fallbackLoader: 'style-loader',
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
         publicPath: ''
