@@ -18,14 +18,13 @@ export const Extracti18nTask = Task.extend({
     const buildDir = '.tmp';
     const genDir = runTaskOptions.outputPath || appConfig.root;
 
-    const config = new XI18nWebpackConfig(
-      project,
+    const config = new XI18nWebpackConfig({
       genDir,
       buildDir,
-      runTaskOptions.i18nFormat,
-      runTaskOptions.verbose,
-      runTaskOptions.progress
-    ).config;
+      i18nFormat: runTaskOptions.i18nFormat,
+      verbose: runTaskOptions.verbose,
+      progress: runTaskOptions.progress
+    }).config;
 
     const webpackCompiler = webpack(config);
     //const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);

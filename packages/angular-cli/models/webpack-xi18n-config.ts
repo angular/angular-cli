@@ -1,43 +1,39 @@
+import * as path from 'path';
+
 import {CliConfig} from './config';
 import {NgCliWebpackConfig} from './webpack-config';
 const webpackMerge = require('webpack-merge');
 import {getWebpackExtractI18nConfig} from './webpack-extract-i18n';
 
+export interface XI18WebpackOptions {
+  genDir?: string,
+  buildDir?: string,
+  i18nFormat?: string,
+  verbose?: boolean,
+  progress?: boolean
+}
 export class XI18nWebpackConfig extends NgCliWebpackConfig {
 
   public config: any;
 
-  constructor(
-    ngCliProject: any,
-    genDir: string,
-    buildDir: string,
-    i18nFormat: string,
-    verbose: boolean = false, progress: boolean = true) {
-    super(
-      ngCliProject,
-      'development',
-      'dev',
-      buildDir,
-      null,
-      null,
-      null,
-      null,
-      false,
-      true,
-      true,
-      verbose,
-      progress,
-      null,
-      'none',
-      true);
+  constructor(extractOptions: XI18WebpackOptions) {
 
+    super({
+      target: 'development',
+      verbose: extractOptions.verbose,
+      progress: extractOptions.progress
+    });
+
+    const configPath = CliConfig.configFilePath();
+    const projectRoot = path.dirname(configPath);
     const appConfig = CliConfig.fromProject().config.apps[0];
 
-    let config = this.config;
     const extractI18nConfig =
-      getWebpackExtractI18nConfig(this.ngCliProject.root, appConfig, genDir, i18nFormat);
-    config = webpackMerge(config, extractI18nConfig);
+      getWebpackExtractI18nConfig(projectRoot,
+        appConfig,
+        extractOptions.genDir,
+        extractOptions.i18nFormat);
 
-    this.config = config;
+    this.config = webpackMerge([this.config, extractI18nConfig]);
   }
 }
