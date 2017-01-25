@@ -13,7 +13,7 @@ export default function() {
     .then(() => writeFile(
       join(testComponentDir, 'i18n-test.component.html'),
       '<p i18n>Hello world</p>'))
-    .then(() => ng('xi18n', '--i18n-format=xmb'))
-    .then(() => expectFileToExist(join('src', 'messages.xmb')))
-    .then(() => expectFileToMatch(join('src', 'messages.xmb'), /Hello world/));
+    .then(() => ng('xi18n -o src/locale'))
+    .then(() => expectFileToExist(join('src', 'locale', 'messages.xlf')))
+    .then(() => expectFileToMatch(join('src', 'locale', 'messages.xlf'), /Hello world/));
 }

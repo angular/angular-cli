@@ -1,65 +1,59 @@
+import * as webpack from 'webpack';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+
 const Task = require('../ember-cli/lib/models/task');
 
-import * as compiler from '@angular/compiler';
-import {Extractor} from '@angular/compiler-cli';
-import * as tsc from '@angular/tsc-wrapped';
-import * as ts from 'typescript';
-import * as path from 'path';
-import * as chalk from 'chalk';
+import {XI18nWebpackConfig} from '../models/webpack-xi18n-config';
+import {CliConfig} from '../models/config';
+
 
 export const Extracti18nTask = Task.extend({
-  run: function () {
-    const ui = this.ui;
-    const project = path.resolve(this.project.root, 'src');
-    const cliOptions = new tsc.I18nExtractionCliOptions({
-      i18nFormat: this.i18nFormat
-    });
+  run: function (runTaskOptions: any) {
 
-    function extract (
-      ngOptions: tsc.AngularCompilerOptions, cliOptions: tsc.I18nExtractionCliOptions,
-      program: ts.Program, host: ts.CompilerHost) {
+    const project = this.project;
 
-      const resourceLoader: compiler.ResourceLoader = {
-        get: (s: string) => {
-          if (!host.fileExists(s)) {
-            // Return empty string to avoid extractor stop processing
-            return Promise.resolve('');
-          }
-          return Promise.resolve(host.readFile(s));
+    const appConfig = CliConfig.fromProject().config.apps[0];
+
+    const buildDir = '.tmp';
+    const genDir = runTaskOptions.outputPath || appConfig.root;
+
+    const config = new XI18nWebpackConfig(
+      project,
+      genDir,
+      buildDir,
+      runTaskOptions.i18nFormat,
+      runTaskOptions.verbose,
+      runTaskOptions.progress
+    ).config;
+
+    const webpackCompiler = webpack(config);
+    //const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
+
+    return new Promise((resolve, reject) => {
+      const callback: webpack.compiler.CompilerCallback = (err, stats) => {
+        if (err) {
+          return reject(err);
+        }
+
+        if (stats.hasErrors()) {
+          reject();
+        } else {
+          resolve();
         }
       };
-      const extractor =
-        Extractor.create(ngOptions, cliOptions.i18nFormat, program, host, resourceLoader);
 
-      const bundlePromise: Promise<compiler.MessageBundle> = extractor.extract();
-
-      return (bundlePromise).then(messageBundle => {
-        let ext: string;
-        let serializer: compiler.Serializer;
-        const format = (cliOptions.i18nFormat || 'xlf').toLowerCase();
-        switch (format) {
-          case 'xmb':
-            ext = 'xmb';
-            serializer = new compiler.Xmb();
-            break;
-          case 'xliff':
-          case 'xlf':
-            const htmlParser = new compiler.I18NHtmlParser(new compiler.HtmlParser());
-            ext = 'xlf';
-            serializer = new compiler.Xliff(htmlParser, compiler.DEFAULT_INTERPOLATION_CONFIG);
-            break;
-          default:
-            throw new Error('Unknown i18n output format. For available formats, see \`ng help\`.');
+      webpackCompiler.run(callback);
+    })
+      .then(() => {
+        // Deletes temporary build folder
+        rimraf.sync(path.resolve(project.root, buildDir));
+      })
+      .catch((err: Error) => {
+        if (err) {
+          this.ui.writeError('\nAn error occured during the i18n extraction:\n' + ((err && err.stack) || err));
         }
-
-        const dstPath = path.join(ngOptions.genDir, `messages.${ext}`);
-        host.writeFile(dstPath, messageBundle.write(serializer), false);
-      });
-    }
-
-    return tsc.main(project, cliOptions, extract)
-      .catch((e) => {
-        ui.writeLine(chalk.red(e.message));
+        throw err;
       });
   }
 });
