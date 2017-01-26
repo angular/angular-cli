@@ -100,7 +100,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _basePath: string;
   private _setParentNodes: boolean;
 
-  private _cache: boolean = false;
+  private _cache = false;
 
   constructor(private _options: ts.CompilerOptions, basePath: string) {
     this._setParentNodes = true;
