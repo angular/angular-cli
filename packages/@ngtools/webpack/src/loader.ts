@@ -2,8 +2,10 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import {AotPlugin} from './plugin';
 import {TypeScriptFileRefactor} from './refactor';
+import {LoaderContext, ModuleReason} from './webpack';
 
 const loaderUtils = require('loader-utils');
+const NormalModule = require('webpack/lib/NormalModule');
 
 
 function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
@@ -160,7 +162,7 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
 
 
 function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
-  const diagnostics = refactor.getDiagnostics();
+  const diagnostics: ts.Diagnostic[] = refactor.getDiagnostics();
 
   if (diagnostics.length > 0) {
     const message = diagnostics
@@ -175,10 +177,23 @@ function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
 }
 
 
+/**
+ * Recursively calls diagnose on the plugins for all the reverse dependencies.
+ * @private
+ */
+function _diagnoseDeps(reasons: ModuleReason[], plugin: AotPlugin) {
+  reasons
+    .filter(reason => reason && reason.module && reason.module instanceof NormalModule)
+    .forEach(reason => {
+      plugin.diagnose(reason.module.resource);
+      _diagnoseDeps(reason.module.reasons, plugin);
+    });
+}
+
+
 // Super simple TS transpiler loader for testing / isolated usage. does not type check!
-export function ngcLoader(source: string) {
-  this.cacheable();
-  const cb: any = this.async();
+export function ngcLoader(this: LoaderContext & { _compilation: any }) {
+  const cb = this.async();
   const sourceFileName: string = this.resourcePath;
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
@@ -201,7 +216,13 @@ export function ngcLoader(source: string) {
       })
       .then(() => {
         if (plugin.typeCheck) {
-          _checkDiagnostics(refactor);
+          // Check all diagnostics from this and reverse dependencies also.
+          if (!plugin.firstRun) {
+            _diagnoseDeps(this._module.reasons, plugin);
+          }
+          // We do this here because it will throw on error, resulting in rebuilding this file
+          // the next time around if it changes.
+          plugin.diagnose(sourceFileName);
         }
       })
       .then(() => {

@@ -57,6 +57,7 @@ export class AotPlugin implements Tapable {
   private _i18nFormat: string;
   private _locale: string;
 
+  private _diagnoseFiles: { [path: string]: boolean } = {};
   private _firstRun = true;
 
   constructor(options: AotPluginOptions) {
@@ -227,7 +228,11 @@ export class AotPlugin implements Tapable {
   apply(compiler: any) {
     this._compiler = compiler;
 
-    compiler.plugin('invalid', (fileName: string, timestamp: number) => {
+    compiler.plugin('invalid', (fileName: string) => {
+      // Turn this off as soon as a file becomes invalid and we're about to start a rebuild.
+      this._firstRun = false;
+      this._diagnoseFiles = {};
+
       this._compilerHost.invalidate(fileName);
     });
 
@@ -289,6 +294,37 @@ export class AotPlugin implements Tapable {
         compilerHost: this._compilerHost
       }));
     });
+  }
+
+  diagnose(fileName: string) {
+    if (this._diagnoseFiles[fileName]) {
+      return;
+    }
+    this._diagnoseFiles[fileName] = true;
+
+    const sourceFile = this._program.getSourceFile(fileName);
+      if (!sourceFile) {
+        return;
+      }
+
+    const diagnostics: ts.Diagnostic[] = []
+      .concat(
+        this._program.getCompilerOptions().declaration
+          ? this._program.getDeclarationDiagnostics(sourceFile) : [],
+        this._program.getSyntacticDiagnostics(sourceFile),
+        this._program.getSemanticDiagnostics(sourceFile)
+      );
+
+    if (diagnostics.length > 0) {
+      const message = diagnostics
+        .map(diagnostic => {
+          const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+          const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+          return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
+        })
+        .join('\n');
+      this._compilation.errors.push(message);
+    }
   }
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
@@ -382,8 +418,6 @@ export class AotPlugin implements Tapable {
       .then(() => {
         this._compilerHost.resetChangedFileTracker();
 
-        // Only turn this off for the first successful run.
-        this._firstRun = false;
         cb();
       }, (err: any) => {
         compilation.errors.push(err);

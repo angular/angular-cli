@@ -103,6 +103,12 @@ export function appendToFile(filePath: string, text: string) {
 }
 
 
+export function prependToFile(filePath: string, text: string) {
+  return readFile(filePath)
+    .then((content: string) => writeFile(filePath, text.concat(content)));
+}
+
+
 export function expectFileToExist(fileName: string) {
   return new Promise((resolve, reject) => {
     fs.exists(fileName, (exist) => {
