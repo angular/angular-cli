@@ -36,14 +36,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // discard comments in production
   const extraPostCssPlugins = buildOptions.target === 'production'
-                              ? [postcssDiscardComments]
-                              : [];
+    ? [postcssDiscardComments]
+    : [];
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
 
   // use includePaths from appConfig
-  const includePaths: string [] = [];
+  const includePaths: string[] = [];
 
   if (appConfig.stylePreprocessorOptions
     && appConfig.stylePreprocessorOptions.includePaths
@@ -72,11 +72,13 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     { test: /\.scss$|\.sass$/, loaders: ['sass-loader'] },
     { test: /\.less$/, loaders: ['less-loader'] },
     // stylus-loader doesn't support webpack.LoaderOptionsPlugin properly,
-    // so we need to add options in it's query
-    { test: /\.styl$/, loaders: [`stylus-loader?${JSON.stringify({
-      sourceMap: buildOptions.sourcemap,
-      paths: includePaths
-    })}`] }
+    // so we need to add options in its query
+    {
+      test: /\.styl$/, loaders: [`stylus-loader?${JSON.stringify({
+        sourceMap: buildOptions.sourcemap,
+        paths: includePaths
+      })}`]
+    }
   ];
 
   const commonLoaders = ['postcss-loader'];
@@ -91,7 +93,13 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     rules.push(...baseRules.map(({test, loaders}) => ({
       include: globalStylePaths, test, loaders: ExtractTextPlugin.extract({
         remove: false,
-        loader: ['css-loader', ...commonLoaders, ...loaders],
+        loader: [
+          // css-loader doesn't support webpack.LoaderOptionsPlugin properly,
+          // so we need to add options in its query
+          `css-loader?${JSON.stringify({ sourceMap: buildOptions.sourcemap })}`,
+          ...commonLoaders,
+          ...loaders
+        ],
         fallbackLoader: 'style-loader',
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
         publicPath: ''
@@ -114,13 +122,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         disable: !buildOptions.extractCss
       }),
       new webpack.LoaderOptionsPlugin({
+        sourceMap: true,
         options: {
           postcss: [autoprefixer()].concat(extraPostCssPlugins),
-          cssLoader: { sourceMap: buildOptions.sourcemap },
+          // css-loader, stylus-loader don't support LoaderOptionsPlugin properly
+          // options are in query instead
           sassLoader: { sourceMap: buildOptions.sourcemap, includePaths },
           // less-loader doesn't support paths
           lessLoader: { sourceMap: buildOptions.sourcemap },
-          // stylus-loader doesn't support LoaderOptionsPlugin properly, options in query instead
           // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
           context: projectRoot,
         },
