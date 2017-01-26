@@ -9,10 +9,6 @@ export function expectToFail(fn: () => Promise<any>, errorMessage?: string): Pro
     }, () => { });
 }
 
-export function isMobileTest() {
-  return !!process.env['MOBILE_TEST'];
-}
-
 export function wait(msecs: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, msecs);

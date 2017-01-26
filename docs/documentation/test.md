@@ -1,7 +1,21 @@
+<!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+
 # ng test
 
 ## Overview
 `ng test` compiles the application into an output directory
+
+### Running unit tests
+
+```bash
+ng test
+```
+
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false` or `--single-run`.
+
+You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
+
+Linting during tests is also available via the `--lint` flag. See [Linting and formatting code](#linting-and-formatting-code) chapter for more informations.
 
 ## Options
 `--watch` (`-w`) flag to run builds when files change

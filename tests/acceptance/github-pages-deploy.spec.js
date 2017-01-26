@@ -51,6 +51,7 @@ describe('Acceptance: ng github-pages:deploy', function() {
   });
 
   it('should fail with uncommited changes', function() {
+    this.timeout(10000);
     execStub.addExecSuccess('git status --porcelain', 'M dir/file.ext');
     return ng(['github-pages:deploy', '--skip-build'])
       .then(() => {

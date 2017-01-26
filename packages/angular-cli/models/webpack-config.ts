@@ -1,91 +1,131 @@
-import {
-  getWebpackAotConfigPartial,
-  getWebpackNonAotConfigPartial
-} from './webpack-build-typescript';
 const webpackMerge = require('webpack-merge');
 import { CliConfig } from './config';
-import { getWebpackCommonConfig } from './webpack-build-common';
-import { getWebpackDevConfigPartial } from './webpack-build-development';
-import { getWebpackProdConfigPartial } from './webpack-build-production';
 import {
-  getWebpackMobileConfigPartial,
-  getWebpackMobileProdConfigPartial
-} from './webpack-build-mobile';
+  getCommonConfig,
+  getDevConfig,
+  getProdConfig,
+  getStylesConfig,
+  getNonAotConfig,
+  getAotConfig
+} from './webpack-configs';
 
+const path = require('path');
+
+export interface BuildOptions {
+  target?: string;
+  environment?: string;
+  outputPath?: string;
+  aot?: boolean;
+  sourcemap?: boolean;
+  vendorChunk?: boolean;
+  baseHref?: string;
+  deployUrl?: string;
+  verbose?: boolean;
+  progress?: boolean;
+  i18nFile?: string;
+  i18nFormat?: string;
+  locale?: string;
+  extractCss?: boolean;
+  outputHashing?: string;
+}
+
+export interface WebpackConfigOptions {
+  projectRoot: string;
+  buildOptions: BuildOptions;
+  appConfig: any;
+}
 
 export class NgCliWebpackConfig {
-  // TODO: When webpack2 types are finished lets replace all these any types
-  // so this is more maintainable in the future for devs
   public config: any;
+  constructor(buildOptions: BuildOptions) {
 
-  constructor(
-    public ngCliProject: any,
-    public target: string,
-    public environment: string,
-    outputDir?: string,
-    baseHref?: string,
-    i18nFile?: string,
-    i18nFormat?: string,
-    locale?: string,
-    isAoT = false,
-    sourcemap = true,
-    vendorChunk = false,
-    verbose = false,
-    progress = true,
-    deployUrl?: string,
-    outputHashing?: string,
-    extractCss = true,
-  ) {
-    const appConfig = CliConfig.fromProject().config.apps[0];
-    const projectRoot = this.ngCliProject.root;
+    this.validateBuildOptions(buildOptions);
 
-    appConfig.outDir = outputDir || appConfig.outDir;
-    appConfig.deployUrl = deployUrl || appConfig.deployUrl;
+    const configPath = CliConfig.configFilePath();
+    const projectRoot = path.dirname(configPath);
+    let appConfig = CliConfig.fromProject().config.apps[0];
 
-    let baseConfig = getWebpackCommonConfig(
-      projectRoot,
-      environment,
-      appConfig,
-      baseHref,
-      sourcemap,
-      vendorChunk,
-      verbose,
-      progress,
-      outputHashing,
-      extractCss,
-    );
-    let targetConfigPartial = this.getTargetConfig(projectRoot, appConfig, sourcemap, verbose);
+    appConfig = this.addAppConfigDefaults(appConfig);
+    buildOptions = this.addTargetDefaults(buildOptions);
+    buildOptions = this.mergeConfigs(buildOptions, appConfig);
 
-    if (appConfig.mobile) {
-      let mobileConfigPartial = getWebpackMobileConfigPartial(projectRoot, appConfig);
-      let mobileProdConfigPartial = getWebpackMobileProdConfigPartial(projectRoot, appConfig);
-      baseConfig = webpackMerge(baseConfig, mobileConfigPartial);
-      if (this.target == 'production') {
-        targetConfigPartial = webpackMerge(targetConfigPartial, mobileProdConfigPartial);
-      }
+    const wco: WebpackConfigOptions = { projectRoot, buildOptions, appConfig };
+
+    let webpackConfigs = [
+      getCommonConfig(wco),
+      getStylesConfig(wco),
+      this.getTargetConfig(wco)
+    ];
+
+    if (appConfig.main || appConfig.polyfills) {
+      const typescriptConfigPartial = buildOptions.aot
+        ? getAotConfig(wco)
+        : getNonAotConfig(wco);
+      webpackConfigs.push(typescriptConfigPartial);
     }
 
-    let config = webpackMerge(baseConfig, targetConfigPartial);
-
-    if (appConfig.main) {
-      const typescriptConfigPartial = isAoT
-        ? getWebpackAotConfigPartial(projectRoot, appConfig, i18nFile, i18nFormat, locale)
-        : getWebpackNonAotConfigPartial(projectRoot, appConfig);
-
-      config = webpackMerge(config, typescriptConfigPartial);
-    }
-
-    this.config = config;
+    // add style config
+    this.config = webpackMerge(webpackConfigs);
   }
 
-  getTargetConfig(projectRoot: string, appConfig: any, sourcemap: boolean, verbose: boolean): any {
-    switch (this.target) {
+  getTargetConfig(webpackConfigOptions: WebpackConfigOptions): any {
+    switch (webpackConfigOptions.buildOptions.target) {
       case 'development':
-        return getWebpackDevConfigPartial(projectRoot, appConfig);
+        return getDevConfig(webpackConfigOptions);
       case 'production':
-        return getWebpackProdConfigPartial(projectRoot, appConfig, sourcemap, verbose);
-      default:
-        throw new Error("Invalid build target. Only 'development' and 'production' are available.");
+        return getProdConfig(webpackConfigOptions);
     }
+  }
+
+  // Validate build options
+  private validateBuildOptions(buildOptions: BuildOptions) {
+    if (buildOptions.target !== 'development' && buildOptions.target !== 'production') {
+      throw new Error("Invalid build target. Only 'development' and 'production' are available.");
+    }
+  }
+
+  // Fill in defaults for build targets
+  private addTargetDefaults(buildOptions: BuildOptions) {
+    const targetDefaults: any = {
+      development: {
+        environment: 'dev',
+        outputHashing: 'none',
+        sourcemap: true,
+        extractCss: false
+      },
+      production: {
+        environment: 'prod',
+        outputHashing: 'all',
+        sourcemap: false,
+        extractCss: true,
+        aot: true
+      }
+    };
+
+    return Object.assign({}, targetDefaults[buildOptions.target], buildOptions);
+  }
+
+  // Fill in defaults from angular-cli.json
+  private mergeConfigs(buildOptions: BuildOptions, appConfig: any) {
+    const mergeableOptions = {
+      outputPath: appConfig.outDir,
+      deployUrl: appConfig.deployUrl
+    };
+
+    return Object.assign({}, mergeableOptions, buildOptions);
+  }
+
+  private addAppConfigDefaults(appConfig: any) {
+    const appConfigDefaults: any = {
+      scripts: [],
+      styles: []
+    };
+
+    // can't use Object.assign here because appConfig has a lot of getters/setters
+    for (let key of Object.keys(appConfigDefaults)) {
+      appConfig[key] = appConfig[key] || appConfigDefaults[key];
+    }
+
+    return appConfig;
   }
 }

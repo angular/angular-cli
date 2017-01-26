@@ -1,12 +1,27 @@
 import * as chalk from 'chalk';
 import InitCommand from './init';
-import {oneLine} from 'common-tags';
+import {oneLine, stripIndent} from 'common-tags';
 
 const Command = require('../ember-cli/lib/models/command');
 const Project = require('../ember-cli/lib/models/project');
 const SilentError = require('silent-error');
 const validProjectName = require('../ember-cli/lib/utilities/valid-project-name');
 
+const packageNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[a-zA-Z][.0-9a-zA-Z]*)*$/;
+
+function getRegExpFailPosition(str: string) {
+  const parts = str.split('-');
+  const matched: string[] = [];
+
+  parts.forEach(part => {
+    if (part.match(packageNameRegexp)) {
+      matched.push(part);
+    }
+  });
+
+  const compare = matched.join('-');
+  return (str !== compare) ? compare.length : null;
+}
 
 const NewCommand = Command.extend({
   name: 'new',
@@ -25,7 +40,6 @@ const NewCommand = Command.extend({
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'style', type: String, default: 'css' },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'mobile', type: Boolean, default: false },
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
@@ -39,11 +53,18 @@ const NewCommand = Command.extend({
         `The "ng ${this.name}" command requires a name argument to be specified. ` +
         `For more details, use "ng help".`));
     }
-    if (!packageName.match(/^[a-zA-Z][.0-9a-zA-Z]*(-[a-zA-Z][.0-9a-zA-Z]*)*$/)) {
-      return Promise.reject(new SilentError(oneLine`
+    if (!packageName.match(packageNameRegexp)) {
+      const firstMessage = oneLine`
         Project name "${packageName}" is not valid. New project names must
         start with a letter, and must contain only alphanumeric characters or dashes.
-      `));
+        When adding a dash the segment after the dash must start with a letter too.
+      `;
+      const msg = stripIndent`
+        ${firstMessage}
+        ${packageName}
+        ${Array(getRegExpFailPosition(packageName) + 1).join(' ') + '^'}
+      `;
+      return Promise.reject(new SilentError(msg));
     }
 
     commandOptions.name = packageName;
@@ -60,13 +81,6 @@ const NewCommand = Command.extend({
     if (!validProjectName(packageName)) {
       return Promise.reject(
         new SilentError(`We currently do not support a name of "${packageName}".`));
-    }
-
-    if (commandOptions.mobile) {
-      return Promise.reject(new SilentError(
-        'The --mobile flag has been disabled temporarily while we await an update of ' +
-        'angular-universal for supporting NgModule. Sorry for the inconvenience.'
-      ));
     }
 
     if (!commandOptions.directory) {

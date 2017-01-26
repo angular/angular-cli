@@ -11,9 +11,11 @@ export interface GithubPagesDeployOptions {
     ghUsername?: string;
     baseHref?: string;
     customDomain?: string;
+    aot?: boolean;
+    vendorChunk?: boolean;
 }
 
-const githubPagesDeployCommand = Command.extend({
+const GithubPagesDeployCommand = Command.extend({
     name: 'github-pages:deploy',
     aliases: ['gh-pages:deploy'],
     description: oneLine`
@@ -69,6 +71,14 @@ const githubPagesDeployCommand = Command.extend({
             default: null,
             aliases: ['cd'],
             description: 'Custom domain for Github Pages'
+        }, {
+            name: 'aot',
+            type: Boolean,
+            default: false,
+        }, {
+            name: 'vendor-chunk',
+            type: Boolean,
+            default: false,
         }],
 
     run: function(options: GithubPagesDeployOptions, rawArgs: string[]) {
@@ -77,4 +87,4 @@ const githubPagesDeployCommand = Command.extend({
 });
 
 
-export default githubPagesDeployCommand;
+export default GithubPagesDeployCommand;

@@ -18,8 +18,6 @@ var Command            = require('../models/command');
 var UI                 = require('../ui');
 var nodeModulesPath    = require('node-modules-path');
 var getPackageBaseName = require('../utilities/get-package-base-name');
-var versionUtils       = require('../utilities/version-utils');
-var emberCLIVersion    = versionUtils.emberCLIVersion;
 
 /**
   The Project model is tied to your package.json. It is instiantiated
@@ -237,9 +235,6 @@ Project.prototype.require = function(file) {
     return require(path.join(this.nodeModulesPath, file));
   }
 };
-
-
-Project.prototype.emberCLIVersion = emberCLIVersion;
 
 /**
   Returns the dependencies from a package.json

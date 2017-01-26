@@ -4,9 +4,9 @@ import * as ts from 'typescript';
 
 import {__NGTOOLS_PRIVATE_API_2} from '@angular/compiler-cli';
 import {AngularCompilerOptions} from '@angular/tsc-wrapped';
+const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 
 import {WebpackResourceLoader} from './resource_loader';
-import {createResolveDependenciesFromContextMap} from './utils';
 import {WebpackCompilerHost} from './compiler_host';
 import {resolveEntryModuleFromMain} from './entry_resolver';
 import {Tapable} from './webpack';
@@ -165,6 +165,10 @@ export class AotPlugin implements Tapable {
     this._program = ts.createProgram(
       this._rootFilePath, this._compilerOptions, this._compilerHost);
 
+    // We enable caching of the filesystem in compilerHost _after_ the program has been created,
+    // because we don't want SourceFile instances to be cached past this point.
+    this._compilerHost.enableCaching();
+
     if (options.entryModule) {
       this._entryModule = options.entryModule;
     } else if ((tsConfig.raw['angularCompilerOptions'] as any)
@@ -194,29 +198,31 @@ export class AotPlugin implements Tapable {
   apply(compiler: any) {
     this._compiler = compiler;
 
-    compiler.plugin('context-module-factory', (cmf: any) => {
-      cmf.plugin('before-resolve', (request: any, callback: (err?: any, request?: any) => void) => {
-        if (!request) {
-          return callback();
-        }
+    compiler.plugin('invalid', (fileName: string, timestamp: number) => {
+      this._compilerHost.invalidate(fileName);
+    });
 
-        request.request = this.skipCodeGeneration ? this.basePath : this.genDir;
-        request.recursive = true;
-        request.dependencies.forEach((d: any) => d.critical = false);
-        return callback(null, request);
-      });
+    // Add lazy modules to the context module for @angular/core/src/linker
+    compiler.plugin('context-module-factory', (cmf: any) => {
       cmf.plugin('after-resolve', (result: any, callback: (err?: any, request?: any) => void) => {
         if (!result) {
           return callback();
+        }
+
+        // alter only request from @angular/core/src/linker
+        if (!result.resource.endsWith(path.join('@angular/core/src/linker'))) {
+          return callback(null, result);
         }
 
         this.done.then(() => {
           result.resource = this.skipCodeGeneration ? this.basePath : this.genDir;
           result.recursive = true;
           result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = createResolveDependenciesFromContextMap(
-            (_: any, cb: any) => cb(null, this._lazyRoutes));
-
+          result.resolveDependencies = (p1: any, p2: any, p3: any, p4: RegExp, cb: any ) => {
+            const dependencies = Object.keys(this._lazyRoutes)
+              .map((key) => new ContextElementDependency(this._lazyRoutes[key], key));
+            cb(null, dependencies);
+          };
           return callback(null, result);
         }, () => callback(null))
         .catch(err => callback(err));
@@ -253,6 +259,7 @@ export class AotPlugin implements Tapable {
     if (this._compilation._ngToolsWebpackPluginInstance) {
       return cb(new Error('An @ngtools/webpack plugin already exist for this compilation.'));
     }
+
     this._compilation._ngToolsWebpackPluginInstance = this;
 
     this._resourceLoader = new WebpackResourceLoader(compilation);
@@ -291,18 +298,20 @@ export class AotPlugin implements Tapable {
           this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
       })
       .then(() => {
-        const diagnostics = this._program.getGlobalDiagnostics();
-        if (diagnostics.length > 0) {
-          const message = diagnostics
-            .map(diagnostic => {
-              const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(
-                diagnostic.start);
-              const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-              return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
-            })
-            .join('\n');
+        if (this._typeCheck) {
+          const diagnostics = this._program.getGlobalDiagnostics();
+          if (diagnostics.length > 0) {
+            const message = diagnostics
+              .map(diagnostic => {
+                const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(
+                  diagnostic.start);
+                const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+                return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
+              })
+              .join('\n');
 
-          throw new Error(message);
+            throw new Error(message);
+          }
         }
       })
       .then(() => {
