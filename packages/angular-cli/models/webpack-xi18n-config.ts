@@ -3,14 +3,14 @@ import * as path from 'path';
 import {CliConfig} from './config';
 import {NgCliWebpackConfig} from './webpack-config';
 const webpackMerge = require('webpack-merge');
-import {getWebpackExtractI18nConfig} from './webpack-extract-i18n';
+import {getWebpackExtractI18nConfig} from './webpack-configs';
 
 export interface XI18WebpackOptions {
-  genDir?: string,
-  buildDir?: string,
-  i18nFormat?: string,
-  verbose?: boolean,
-  progress?: boolean
+  genDir?: string;
+  buildDir?: string;
+  i18nFormat?: string;
+  verbose?: boolean;
+  progress?: boolean;
 }
 export class XI18nWebpackConfig extends NgCliWebpackConfig {
 

@@ -13,7 +13,7 @@ export default function() {
     .then(() => writeFile(
       join(testComponentDir, 'i18n-test.component.html'),
       '<p i18n>Hello world</p>'))
-    .then(() => ng('xi18n -o src/locale'))
+    .then(() => ng('xi18n', '--no-progress', '--output-path', 'src/locale'))
     .then(() => expectFileToExist(join('src', 'locale', 'messages.xlf')))
     .then(() => expectFileToMatch(join('src', 'locale', 'messages.xlf'), /Hello world/));
 }

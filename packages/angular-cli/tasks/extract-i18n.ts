@@ -27,7 +27,6 @@ export const Extracti18nTask = Task.extend({
     }).config;
 
     const webpackCompiler = webpack(config);
-    //const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
 
     return new Promise((resolve, reject) => {
       const callback: webpack.compiler.CompilerCallback = (err, stats) => {
@@ -50,7 +49,8 @@ export const Extracti18nTask = Task.extend({
       })
       .catch((err: Error) => {
         if (err) {
-          this.ui.writeError('\nAn error occured during the i18n extraction:\n' + ((err && err.stack) || err));
+          this.ui.writeError('\nAn error occured during the i18n extraction:\n'
+            + ((err && err.stack) || err));
         }
         throw err;
       });

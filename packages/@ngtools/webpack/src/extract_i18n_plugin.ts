@@ -28,7 +28,7 @@ export class ExtractI18nPlugin implements Tapable {
   private _rootFilePath: string[];
   private _compilerOptions: any = null;
   private _angularCompilerOptions: any = null;
-  //private _compilerHost: WebpackCompilerHost;
+  // private _compilerHost: WebpackCompilerHost;
   private _compilerHost: ts.CompilerHost;
   private _program: ts.Program;
 
@@ -94,11 +94,9 @@ export class ExtractI18nPlugin implements Tapable {
     // By default messages will be generated in basePath
     let genDir = basePath;
 
-    if(options.hasOwnProperty('genDir')) {
+    if (options.hasOwnProperty('genDir')) {
       genDir = path.resolve(process.cwd(), options.genDir);
     }
-
-    console.log(genDir);
 
     this._compilerOptions = tsConfig.options;
     this._angularCompilerOptions = Object.assign(
@@ -111,7 +109,7 @@ export class ExtractI18nPlugin implements Tapable {
     this._basePath = basePath;
     this._genDir = genDir;
 
-    //this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
+    // this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
     this._compilerHost = ts.createCompilerHost(this._compilerOptions, true);
     this._program = ts.createProgram(
       this._rootFilePath, this._compilerOptions, this._compilerHost);
@@ -136,8 +134,9 @@ export class ExtractI18nPlugin implements Tapable {
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
     this._compilation = compilation;
-    if(this._compilation._ngToolsWebpackXi18nPluginInstance) {
-      return cb(new Error('An @ngtools/webpack xi18n plugin already exist for this compilation.'));
+    if (this._compilation._ngToolsWebpackXi18nPluginInstance) {
+      return cb(new Error('An @ngtools/webpack xi18n plugin already exist for ' +
+        'this compilation.'));
     }
 
     this._compilation._ngToolsWebpackXi18nPluginInstance = this;

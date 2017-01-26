@@ -19,7 +19,7 @@ const Xi18nCommand = Command.extend({
       default: 'xlf',
       aliases: ['f', {'xmb': 'xmb'}, {'xlf': 'xlf'}, {'xliff': 'xlf'}]
     },
-    { name: 'output-path',    type: 'Path', default: null, aliases: ['o']},
+    { name: 'output-path',    type: 'Path', default: null, aliases: ['op']},
     { name: 'verbose',        type: Boolean, default: false},
     { name: 'progress',       type: Boolean, default: true }
 

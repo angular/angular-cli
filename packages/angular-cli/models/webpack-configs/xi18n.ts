@@ -1,11 +1,11 @@
 import * as path from 'path';
-import {ExtractI18nPlugin} from '../../@ngtools/webpack/src/extract_i18n_plugin';
+import {ExtractI18nPlugin} from '@ngtools/webpack';
 
 export const getWebpackExtractI18nConfig = function(
   projectRoot: string,
   appConfig: any,
   genDir: string,
-  i18nFormat: string):any {
+  i18nFormat: string): any {
 
   let exclude: string[] = [];
   if (appConfig.test) {
@@ -21,5 +21,5 @@ export const getWebpackExtractI18nConfig = function(
         i18nFormat: i18nFormat
       })
     ]
-  }
+  };
 };
