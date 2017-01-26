@@ -87,7 +87,7 @@ resolve('angular-cli', { basedir: process.cwd() },
 
       if (shouldWarn) {
         // eslint-disable no-console
-        console.log(yellow(`Your global Angular CLI version (${globalVersion}) is greater than `
+        console.log(yellow(`Your global Angular CLI version (${globalVersion}) is lower than `
           + `your local version (${localVersion}). The local Angular CLI version is used.`));
       }
 
