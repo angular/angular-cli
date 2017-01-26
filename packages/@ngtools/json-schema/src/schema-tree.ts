@@ -31,8 +31,8 @@ export abstract class SchemaTreeNode<T> implements SchemaNode {
   // Hierarchy objects
   protected _parent: SchemaTreeNode<any>;
 
-  protected _defined: boolean = false;
-  protected _dirty: boolean = false;
+  protected _defined = false;
+  protected _dirty = false;
 
   protected _schema: Schema;
   protected _name: string;
@@ -247,7 +247,7 @@ export class OneOfSchemaTreeNode extends NonLeafSchemaTreeNode<any> {
 export class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: any}> {
   // The map of all children metadata.
   protected _children: { [key: string]: SchemaTreeNode<any> };
-  protected _frozen: boolean = false;
+  protected _frozen = false;
 
   constructor(metaData: TreeNodeConstructorArgument<any>) {
     super(metaData);
