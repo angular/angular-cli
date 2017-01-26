@@ -47,8 +47,8 @@ export class AotPlugin implements Tapable {
   private _compiler: any = null;
   private _compilation: any = null;
 
-  private _typeCheck: boolean = true;
-  private _skipCodeGeneration: boolean = false;
+  private _typeCheck = true;
+  private _skipCodeGeneration = false;
   private _basePath: string;
   private _genDir: string;
 
