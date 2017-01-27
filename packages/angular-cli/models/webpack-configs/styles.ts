@@ -125,6 +125,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         sourceMap: true,
         options: {
           postcss: [autoprefixer()].concat(extraPostCssPlugins),
+          postcssLoader: {sourceMap: 'inline'},
           // css-loader, stylus-loader don't support LoaderOptionsPlugin properly
           // options are in query instead
           sassLoader: { sourceMap: buildOptions.sourcemap, includePaths },
