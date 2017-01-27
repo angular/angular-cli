@@ -6,9 +6,13 @@ const stringUtils = require('ember-cli-string-utils');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
 
 const commandsToIgnore = [
+  'build.run',
   'easter-egg',
   'destroy',
-  'github-pages-deploy' // errors because there is no base github-pages command
+  'github-pages-deploy', // errors because there is no base github-pages command
+  'github-pages-deploy.run',
+  'init.run',
+  'serve.run'
 ];
 
 const HelpCommand = Command.extend({
