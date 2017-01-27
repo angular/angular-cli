@@ -1,4 +1,5 @@
-import { BuildOptions } from '../models/webpack-config';
+import { BuildOptions } from '../models/build-options';
+import { Version } from '../upgrade/version';
 
 const Command = require('../ember-cli/lib/models/command');
 
@@ -22,7 +23,7 @@ export const BaseBuildCommandOptions: any = [
   { name: 'i18n-file', type: String },
   { name: 'i18n-format', type: String },
   { name: 'locale', type: String },
-  { name: 'extract-css', type: Boolean, aliases: ['ec']},
+  { name: 'extract-css', type: Boolean, aliases: ['ec'] },
   {
     name: 'output-hashing',
     type: String,
@@ -46,7 +47,19 @@ const BuildCommand = Command.extend({
   ]),
 
   run: function (commandOptions: BuildTaskOptions) {
-    return require('./build.run').default.call(this, commandOptions);
+    const project = this.project;
+
+    // Check angular version.
+    Version.assertAngularVersionIs2_3_1OrHigher(project.root);
+
+    const BuildTask = require('../tasks/build').default;
+
+    const buildTask = new BuildTask({
+      cliProject: project,
+      ui: this.ui,
+    });
+
+    return buildTask.run(commandOptions);
   }
 });
 

@@ -1,5 +1,6 @@
 const webpackMerge = require('webpack-merge');
 import { CliConfig } from './config';
+import { BuildOptions } from './build-options';
 import {
   getCommonConfig,
   getDevConfig,
@@ -10,24 +11,6 @@ import {
 } from './webpack-configs';
 
 const path = require('path');
-
-export interface BuildOptions {
-  target?: string;
-  environment?: string;
-  outputPath?: string;
-  aot?: boolean;
-  sourcemap?: boolean;
-  vendorChunk?: boolean;
-  baseHref?: string;
-  deployUrl?: string;
-  verbose?: boolean;
-  progress?: boolean;
-  i18nFile?: string;
-  i18nFormat?: string;
-  locale?: string;
-  extractCss?: boolean;
-  outputHashing?: string;
-}
 
 export interface WebpackConfigOptions {
   projectRoot: string;

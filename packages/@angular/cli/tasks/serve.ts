@@ -2,21 +2,21 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
 import * as rimraf from 'rimraf';
-const SilentError = require('silent-error');
-const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
-const WebpackDevServer = require('webpack-dev-server');
+import * as url from 'url';
+import { oneLine, stripIndents } from 'common-tags';
 import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
-import { oneLine } from 'common-tags';
-import * as url from 'url';
-import {stripIndents} from 'common-tags';
+
+const WebpackDevServer = require('webpack-dev-server');
+const Task = require('../ember-cli/lib/models/task');
+const SilentError = require('silent-error');
 const opn = require('opn');
 
 export default Task.extend({
-  run: function(serveTaskOptions: ServeTaskOptions) {
+  run: function (serveTaskOptions: ServeTaskOptions) {
     const ui = this.ui;
 
     let webpackCompiler: any;
