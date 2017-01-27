@@ -67,7 +67,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       chunks: ['main'],
-      minChunks: (module: any) => module.userRequest && module.userRequest.startsWith(nodeModules)
+      minChunks: (module: any) => module.resource && module.resource.startsWith(nodeModules)
     }));
   }
 

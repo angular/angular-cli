@@ -95,7 +95,9 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _delegate: ts.CompilerHost;
   private _files: {[path: string]: VirtualFileStats} = Object.create(null);
   private _directories: {[path: string]: VirtualDirStats} = Object.create(null);
-  private _changed = false;
+
+  private _changedFiles: {[path: string]: boolean} = Object.create(null);
+  private _changedDirs: {[path: string]: boolean} = Object.create(null);
 
   private _basePath: string;
   private _setParentNodes: boolean;
@@ -129,10 +131,15 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     let p = dirname(fileName);
     while (p && !this._directories[p]) {
       this._directories[p] = new VirtualDirStats(p);
+      this._changedDirs[p] = true;
       p = dirname(p);
     }
 
-    this._changed = true;
+    this._changedFiles[fileName] = true;
+  }
+
+  get dirty() {
+    return Object.keys(this._changedFiles).length > 0;
   }
 
   enableCaching() {
@@ -141,21 +148,26 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   populateWebpackResolver(resolver: any) {
     const fs = resolver.fileSystem;
-    if (!this._changed) {
+    if (!this.dirty) {
       return;
     }
 
     const isWindows = process.platform.startsWith('win');
-    for (const fileName of Object.keys(this._files)) {
+    for (const fileName of this.getChangedFilePaths()) {
       const stats = this._files[fileName];
       if (stats) {
         // If we're on windows, we need to populate with the proper path separator.
         const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
         fs._statStorage.data[path] = [null, stats];
         fs._readFileStorage.data[path] = [null, stats.content];
+      } else {
+        // Support removing files as well.
+        const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
+        fs._statStorage.data[path] = [new Error(), null];
+        fs._readFileStorage.data[path] = [new Error(), null];
       }
     }
-    for (const dirName of Object.keys(this._directories)) {
+    for (const dirName of Object.keys(this._changedDirs)) {
       const stats = this._directories[dirName];
       const dirs = this.getDirectories(dirName);
       const files = this.getFiles(dirName);
@@ -164,12 +176,19 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       fs._statStorage.data[path] = [null, stats];
       fs._readdirStorage.data[path] = [null, files.concat(dirs)];
     }
+  }
 
-    this._changed = false;
+  resetChangedFileTracker() {
+    this._changedFiles = Object.create(null);
+    this._changedDirs = Object.create(null);
+  }
+  getChangedFilePaths(): string[] {
+    return Object.keys(this._changedFiles);
   }
 
   invalidate(fileName: string): void {
     this._files[fileName] = null;
+    this._changedFiles[fileName] = true;
   }
 
   fileExists(fileName: string): boolean {

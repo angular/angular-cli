@@ -83,6 +83,26 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   });
 }
 
+export function waitForAnyProcessOutputToMatch(match: RegExp, timeout = 30000): Promise<string> {
+  // Race between _all_ processes, and the timeout. First one to resolve/reject wins.
+  return Promise.race(_processes.map(childProcess => new Promise(resolve => {
+    let stdout = '';
+    childProcess.stdout.on('data', (data: Buffer) => {
+      stdout += data.toString();
+      if (data.toString().match(match)) {
+        resolve(stdout);
+      }
+    });
+  })).concat([
+    new Promise((resolve, reject) => {
+      // Wait for 30 seconds and timeout.
+      setTimeout(() => {
+        reject(new Error(`Waiting for ${match} timed out (timeout: ${timeout}msec)...`));
+      }, timeout);
+    })
+  ]));
+}
+
 export function killAllProcesses(signal = 'SIGTERM') {
   _processes.forEach(process => treeKill(process.pid, signal));
   _processes = [];

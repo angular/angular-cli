@@ -16,5 +16,6 @@ export default function(skipCleaning: () => void) {
     .then(() => replaceInFile('app/app.component.ts',
       './app.component.scss', 'app.component.scss'))
     .then(() => exec(normalize('node_modules/.bin/webpack'), '-p'))
+    // test
     .then(() => skipCleaning());
 }
