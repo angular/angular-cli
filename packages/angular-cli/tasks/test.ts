@@ -1,13 +1,7 @@
 const Task = require('../ember-cli/lib/models/task');
 import { TestOptions } from '../commands/test';
 import * as path from 'path';
-
-// require dependencies within the target project
-function requireDependency(root: string, moduleName: string) {
-  const packageJson = require(path.join(root, 'node_modules', moduleName, 'package.json'));
-  const main = path.normalize(packageJson.main);
-  return require(path.join(root, 'node_modules', moduleName, main));
-}
+import { requireDependency } from '../utilities/require-project-module';
 
 export default Task.extend({
   run: function (options: TestOptions) {
