@@ -26,8 +26,8 @@ export class CompressionPlugin {
   private algorithm: Function;
   private compressionOptions: any = {};
   private test: RegExp[];
-  private threshold: number = 0;
-  private minRatio: number = 0.8;
+  private threshold = 0;
+  private minRatio = 0.8;
 
   constructor(options: CompressionPluginOptions = {}) {
     if (options.hasOwnProperty('asset')) {
