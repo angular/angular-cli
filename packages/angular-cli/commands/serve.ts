@@ -34,7 +34,7 @@ const ServeCommand = Command.extend({
     {
       name: 'host',
       type: String,
-      default: 'localhost',
+      default: '0.0.0.0',
       aliases: ['H'],
       description: 'Listens only on localhost by default'
     },
