@@ -4,13 +4,14 @@ import * as ts from 'typescript';
 
 import {__NGTOOLS_PRIVATE_API_2} from '@angular/compiler-cli';
 import {AngularCompilerOptions} from '@angular/tsc-wrapped';
+const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 
 import {WebpackResourceLoader} from './resource_loader';
-import {createResolveDependenciesFromContextMap} from './utils';
 import {WebpackCompilerHost} from './compiler_host';
 import {resolveEntryModuleFromMain} from './entry_resolver';
 import {Tapable} from './webpack';
 import {PathsPlugin} from './paths-plugin';
+import {findLazyRoutes, LazyRouteMap} from './lazy_routes';
 
 
 /**
@@ -39,7 +40,7 @@ export class AotPlugin implements Tapable {
   private _rootFilePath: string[];
   private _compilerHost: WebpackCompilerHost;
   private _resourceLoader: WebpackResourceLoader;
-  private _lazyRoutes: { [route: string]: string };
+  private _lazyRoutes: LazyRouteMap = Object.create(null);
   private _tsConfigPath: string;
   private _entryModule: string;
 
@@ -47,14 +48,16 @@ export class AotPlugin implements Tapable {
   private _compiler: any = null;
   private _compilation: any = null;
 
-  private _typeCheck: boolean = true;
-  private _skipCodeGeneration: boolean = false;
+  private _typeCheck = true;
+  private _skipCodeGeneration = false;
   private _basePath: string;
   private _genDir: string;
 
   private _i18nFile: string;
   private _i18nFormat: string;
   private _locale: string;
+
+  private _firstRun = true;
 
   constructor(options: AotPluginOptions) {
     this._setupOptions(options);
@@ -78,6 +81,7 @@ export class AotPlugin implements Tapable {
   get i18nFile() { return this._i18nFile; }
   get i18nFormat() { return this._i18nFormat; }
   get locale() { return this._locale; }
+  get firstRun() { return this._firstRun; }
 
   private _setupOptions(options: AotPluginOptions) {
     // Fill in the missing options.
@@ -165,6 +169,10 @@ export class AotPlugin implements Tapable {
     this._program = ts.createProgram(
       this._rootFilePath, this._compilerOptions, this._compilerHost);
 
+    // We enable caching of the filesystem in compilerHost _after_ the program has been created,
+    // because we don't want SourceFile instances to be cached past this point.
+    this._compilerHost.enableCaching();
+
     if (options.entryModule) {
       this._entryModule = options.entryModule;
     } else if ((tsConfig.raw['angularCompilerOptions'] as any)
@@ -190,33 +198,68 @@ export class AotPlugin implements Tapable {
     }
   }
 
+  private _findLazyRoutesInAst(): LazyRouteMap {
+    const result: LazyRouteMap = Object.create(null);
+    const changedFilePaths = this._compilerHost.getChangedFilePaths();
+    for (const filePath of changedFilePaths) {
+      const fileLazyRoutes = findLazyRoutes(filePath, this._program, this._compilerHost);
+      for (const routeKey of Object.keys(fileLazyRoutes)) {
+        const route = fileLazyRoutes[routeKey];
+        if (routeKey in this._lazyRoutes) {
+          if (route === null) {
+            this._lazyRoutes[routeKey] = null;
+          } else if (this._lazyRoutes[routeKey] !== route) {
+            this._compilation.warnings.push(
+              new Error(`Duplicated path in loadChildren detected during a rebuild. `
+                + `We will take the latest version detected and override it to save rebuild time. `
+                + `You should perform a full build to validate that your routes don't overlap.`)
+            );
+          }
+        } else {
+          result[routeKey] = route;
+        }
+      }
+    }
+    return result;
+  }
+
   // registration hook for webpack plugin
   apply(compiler: any) {
     this._compiler = compiler;
 
-    compiler.plugin('context-module-factory', (cmf: any) => {
-      cmf.plugin('before-resolve', (request: any, callback: (err?: any, request?: any) => void) => {
-        if (!request) {
-          return callback();
-        }
+    compiler.plugin('invalid', (fileName: string, timestamp: number) => {
+      this._compilerHost.invalidate(fileName);
+    });
 
-        request.request = this.skipCodeGeneration ? this.basePath : this.genDir;
-        request.recursive = true;
-        request.dependencies.forEach((d: any) => d.critical = false);
-        return callback(null, request);
-      });
+    // Add lazy modules to the context module for @angular/core/src/linker
+    compiler.plugin('context-module-factory', (cmf: any) => {
       cmf.plugin('after-resolve', (result: any, callback: (err?: any, request?: any) => void) => {
         if (!result) {
           return callback();
+        }
+
+        // alter only request from @angular/core/src/linker
+        if (!result.resource.endsWith(path.join('@angular/core/src/linker'))) {
+          return callback(null, result);
         }
 
         this.done.then(() => {
           result.resource = this.skipCodeGeneration ? this.basePath : this.genDir;
           result.recursive = true;
           result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = createResolveDependenciesFromContextMap(
-            (_: any, cb: any) => cb(null, this._lazyRoutes));
-
+          result.resolveDependencies = (p1: any, p2: any, p3: any, p4: RegExp, cb: any ) => {
+            const dependencies = Object.keys(this._lazyRoutes)
+              .map((key) => {
+                const value = this._lazyRoutes[key];
+                if (value !== null) {
+                  return new ContextElementDependency(value, key);
+                } else {
+                  return null;
+                }
+              })
+              .filter(x => !!x);
+            cb(null, dependencies);
+          };
           return callback(null, result);
         }, () => callback(null))
         .catch(err => callback(err));
@@ -253,6 +296,7 @@ export class AotPlugin implements Tapable {
     if (this._compilation._ngToolsWebpackPluginInstance) {
       return cb(new Error('An @ngtools/webpack plugin already exist for this compilation.'));
     }
+
     this._compilation._ngToolsWebpackPluginInstance = this;
 
     this._resourceLoader = new WebpackResourceLoader(compilation);
@@ -286,18 +330,20 @@ export class AotPlugin implements Tapable {
           this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
       })
       .then(() => {
-        const diagnostics = this._program.getGlobalDiagnostics();
-        if (diagnostics.length > 0) {
-          const message = diagnostics
-            .map(diagnostic => {
-              const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(
-                diagnostic.start);
-              const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-              return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
-            })
-            .join('\n');
+        if (this._typeCheck) {
+          const diagnostics = this._program.getGlobalDiagnostics();
+          if (diagnostics.length > 0) {
+            const message = diagnostics
+              .map(diagnostic => {
+                const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(
+                  diagnostic.start);
+                const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+                return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
+              })
+              .join('\n');
 
-          throw new Error(message);
+            throw new Error(message);
+          }
         }
       })
       .then(() => {
@@ -305,18 +351,26 @@ export class AotPlugin implements Tapable {
         this._compilerHost.populateWebpackResolver(this._compiler.resolvers.normal);
       })
       .then(() => {
-        // Process the lazy routes
-        this._lazyRoutes = {};
-        const allLazyRoutes = __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
-          program: this._program,
-          host: this._compilerHost,
-          angularCompilerOptions: this._angularCompilerOptions,
-          entryModule: this._entryModule
-        });
-        Object.keys(allLazyRoutes)
+        // We need to run the `listLazyRoutes` the first time because it also navigates libraries
+        // and other things that we might miss using the findLazyRoutesInAst.
+        let discoveredLazyRoutes: LazyRouteMap = this.firstRun ?
+          __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
+            program: this._program,
+            host: this._compilerHost,
+            angularCompilerOptions: this._angularCompilerOptions,
+            entryModule: this._entryModule
+          })
+          : this._findLazyRoutesInAst();
+
+        // Process the lazy routes discovered.
+        Object.keys(discoveredLazyRoutes)
           .forEach(k => {
-            const lazyRoute = allLazyRoutes[k];
+            const lazyRoute = discoveredLazyRoutes[k];
             k = k.split('#')[0];
+            if (lazyRoute === null) {
+              return;
+            }
+
             if (this.skipCodeGeneration) {
               this._lazyRoutes[k] = lazyRoute;
             } else {
@@ -325,7 +379,13 @@ export class AotPlugin implements Tapable {
             }
           });
       })
-      .then(() => cb(), (err: any) => {
+      .then(() => {
+        this._compilerHost.resetChangedFileTracker();
+
+        // Only turn this off for the first successful run.
+        this._firstRun = false;
+        cb();
+      }, (err: any) => {
         compilation.errors.push(err);
         cb();
       });

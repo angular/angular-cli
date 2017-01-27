@@ -15,7 +15,7 @@ export interface GithubPagesDeployOptions {
     vendorChunk?: boolean;
 }
 
-const githubPagesDeployCommand = Command.extend({
+const GithubPagesDeployCommand = Command.extend({
     name: 'github-pages:deploy',
     aliases: ['gh-pages:deploy'],
     description: oneLine`
@@ -87,4 +87,4 @@ const githubPagesDeployCommand = Command.extend({
 });
 
 
-export default githubPagesDeployCommand;
+export default GithubPagesDeployCommand;

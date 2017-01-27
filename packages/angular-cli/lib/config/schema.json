@@ -55,6 +55,9 @@
           "main": {
             "type": "string"
           },
+          "polyfills": {
+            "type": "string"
+          },
           "test": {
             "type": "string"
           },
@@ -66,7 +69,8 @@
             "type": "string"
           },
           "mobile": {
-            "type": "boolean"
+            "type": "boolean",
+            "default": false
           },
           "styles": {
             "description": "Global styles to be included in the build.",

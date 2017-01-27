@@ -1,6 +1,5 @@
 import {
   writeMultipleFiles,
-  expectFileToExist,
   expectFileToMatch
 } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
@@ -30,7 +29,7 @@ export default function () {
       ];
       app['scripts'] = [{ input: 'common-entry-script.js', output: 'common-entry' }];
     }))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--extract-css'))
     // files were created successfully
     .then(() => expectFileToMatch('dist/styles.bundle.css', '.string-style'))
     .then(() => expectFileToMatch('dist/styles.bundle.css', '.input-style'))
@@ -39,27 +38,17 @@ export default function () {
     .then(() => expectFileToMatch('dist/renamed-lazy-style.bundle.css', '.pre-rename-lazy-style'))
     .then(() => expectFileToMatch('dist/common-entry.bundle.css', '.common-entry-style'))
     .then(() => expectFileToMatch('dist/common-entry.bundle.js', 'common-entry-script'))
-    // there are no js entry points for css only bundles
-    .then(() => expectToFail(() => expectFileToExist('dist/style.bundle.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/lazy-style.bundle.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/renamed-style.bundle.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/renamed-lazy-style.bundle.js')))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <link href="renamed-style.bundle.css" rel="stylesheet"/>
-      <link href="styles.bundle.css" rel="stylesheet"/>
       <link href="common-entry.bundle.css" rel="stylesheet"/>
+      <link href="styles.bundle.css" rel="stylesheet"/>
+      <link href="renamed-style.bundle.css" rel="stylesheet"/>
     `))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
       <script type="text/javascript" src="inline.bundle.js"></script>
-      <script type="text/javascript" src="vendor.bundle.js"></script>
+      <script type="text/javascript" src="polyfills.bundle.js"></script>
       <script type="text/javascript" src="common-entry.bundle.js"></script>
+      <script type="text/javascript" src="vendor.bundle.js"></script>
       <script type="text/javascript" src="main.bundle.js"></script>
-    `))
-    .then(() => ng('build', '--no-extract-css'))
-    // js files still exist when not extracting css
-    .then(() => expectFileToExist('dist/styles.bundle.js'))
-    .then(() => expectFileToExist('dist/lazy-style.bundle.js'))
-    .then(() => expectFileToExist('dist/renamed-style.bundle.js'))
-    .then(() => expectFileToExist('dist/renamed-lazy-style.bundle.js'));
+    `));
 }

@@ -4,6 +4,7 @@ import {
   expectFileToMatch,
   replaceInFile
 } from '../../../utils/fs';
+import { expectToFail } from '../../../utils/utils';
 import { ng } from '../../../utils/process';
 import { stripIndents } from 'common-tags';
 import { updateJsonFile } from '../../../utils/project';
@@ -31,10 +32,11 @@ export default function () {
     }))
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.styl'))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--extract-css', '--sourcemap'))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
       /body\s*{\s*background-color: #00f;\s*}/))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
       /p\s*{\s*background-color: #f00;\s*}/))
+    .then(() => expectToFail(() => expectFileToMatch('dist/styles.bundle.css', '"mappings":""')))
     .then(() => expectFileToMatch('dist/main.bundle.js', /.outer.*.inner.*background:\s*#[fF]+/));
 }

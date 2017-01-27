@@ -1,6 +1,6 @@
 'use strict';
 
-// This needs to be first so fs module can be mocked correctly. 
+// This needs to be first so fs module can be mocked correctly.
 let mockFs = require('mock-fs');
 import { expect, assert } from 'chai';
 import * as path from 'path';

@@ -1,3 +1,5 @@
+<!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+
 # ng serve
 
 ## Overview
@@ -6,11 +8,9 @@
 ## Options
 `--port` (`-p`) port to serve the application on
 
-`--host` (`-H`)
+`--host` (`-H`) host where to listen
 
-`--proxy-config` (`-pc`)
-
-`--watcher` (`-w`) provide a new watcher
+`--proxy-config` (`-pc`) proxy configuration file
 
 `--live-reload` (`-lr`) flag to turn off live reloading
 
@@ -22,18 +22,40 @@
 
 `--live-reload-live-css` flag to live reload CSS
 
-`--target` (`-t`, `-dev`, `-prod`) target environment
-
-`--environment` (`-e`) build environment
-
 `--ssl` flag to turn on SSL
 
 `--ssl-key` path to the SSL key
 
 `--ssl-cert` path to the SSL cert
 
-`--aot` flag to turn on Ahead of Time compilation
-
 `--open` (`-o`) opens the app in the default browser
 
-`--extract-css` extract css from global styles onto css files instead of js ones
+`--hmr` use hot module reload
+
+`--target` (`-t`) define the build target
+
+`--environment` (`-e`) defines the build environment
+
+`--prod` flag to set build target and environment to production
+
+`--dev` flag to set build target and environment to development
+
+`--output-path` (`-po`) path where output will be placed
+
+`--aot` flag whether to build using Ahead of Time compilation
+
+`--sourcemap` (`-sm`) output sourcemaps
+
+`--vendor-chunk` (`-vb`) use a separate bundle containing only vendor libraries
+
+`--base-href` (`-bh`) base url for the application being built
+
+`--deploy-url` (`-d`) url where files will be deployed
+
+`--verbose` (`-v`) adds more details to output logging
+
+`--progress` (`-pr`) log progress to the console while building
+
+`--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
+
+`--output-hashing` define the output filename cache-busting hashing mode

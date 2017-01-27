@@ -46,8 +46,7 @@ with NPM 3 or higher.
 * [Running End-to-End Tests](#running-end-to-end-tests)
 * [Proxy To Backend](#proxy-to-backend)
 * [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
-* [Linting and formatting code](#linting-and-formatting-code)
-* [Support for offline applications](#support-for-offline-applications)
+* [Linting code](#linting-code)
 * [Commands autocompletion](#commands-autocompletion)
 * [Project assets](#project-assets)
 * [Global styles](#global-styles)
@@ -123,12 +122,12 @@ The CLI supports routing in several ways:
 - When you generate a module, you can use the `--routing` option like `ng g module my-module --routing`  to create a separate file `my-module-routing.module.ts` to store the module routes.
 
   The file includes an empty `Routes` object that you can fill with routes to different components and/or modules.
-  
+
   The `--routing` option also generates a default component with the same name as the module.
 
 - You can use the `--routing` option with `ng new` or `ng init` to create a `app-routing.module.ts` file when you create or initialize a project.
 
-
+<!-- DeleteSection1 Start here to remove upon next release -->
 ### Creating a build
 
 ```bash
@@ -198,7 +197,7 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 
 You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
 
-Linting during tests is also available via the `--lint` flag. See [Linting and formatting code](#linting-and-formatting-code) chapter for more informations.
+Linting during tests is also available via the `--lint` flag. See [Linting code](#linting-code) chapter for more information.
 
 ### Running end-to-end tests
 
@@ -270,19 +269,16 @@ This command pushes the app to the `master` branch on the GitHub repo instead
 of pushing to `gh-pages`, since user and organization pages require this.
 
 
-### Linting and formatting code
+### Linting code
 
 You can lint your app code by running `ng lint`.
 This will use the `lint` npm script that in generated projects uses `tslint`.
 
 You can modify the these scripts in `package.json` to run whatever tool you prefer.
 
-### Support for offline applications
+<!-- DeleteSection1 End here -->
 
-**The `--mobile` flag has been disabled temporarily. Sorry for the inconvenience.**
-
-~~Angular-CLI includes support for offline applications via the `--` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.~~
-
+ <!-- consider removing autocompletion from readme -->
 ### Commands autocompletion
 
 To turn on auto completion use the following commands:
@@ -315,6 +311,7 @@ You use the `assets` array in `angular-cli.json` to list files or folders you wa
 ]
 ```
 
+<!-- DeleteSection2 Start here to remove upon next release -->
 ### Global styles
 
 The `styles.css` file allows users to add global styles and supports
@@ -424,6 +421,8 @@ Finally add the Bootstrap CSS to the `apps[0].styles` array:
 
 Restart `ng serve` if you're running it, and Bootstrap 4 should be working on
 your app.
+
+<!-- DeleteSection2 End here -->
 
 ### Updating angular-cli
 

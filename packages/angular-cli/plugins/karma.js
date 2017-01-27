@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const getWebpackTestConfig = require('../models/webpack-build-test').getWebpackTestConfig;
+const getTestConfig = require('../models/webpack-configs/test').getTestConfig;
 const CliConfig = require('../models/config').CliConfig;
 
 const init = (config) => {
@@ -42,7 +42,7 @@ const init = (config) => {
   }
 
   // add webpack config
-  const webpackConfig = getWebpackTestConfig(config.basePath, environment, appConfig, testConfig);
+  const webpackConfig = getTestConfig(config.basePath, environment, appConfig, testConfig);
   const webpackMiddlewareConfig = {
     noInfo: true, // Hide webpack output because its noisy.
     stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.
@@ -67,6 +67,19 @@ const init = (config) => {
     .filter((file) => config.preprocessors[file].indexOf('angular-cli') !== -1)
     .map((file) => config.preprocessors[file])
     .map((arr) => arr.splice(arr.indexOf('angular-cli'), 1, 'webpack', 'sourcemap'));
+
+  // Add polyfills file
+  if (appConfig.polyfills) {
+    const polyfillsFile = path.resolve(appRoot, appConfig.polyfills);
+    const polyfillsPattern = {
+      pattern: polyfillsFile,
+      included: true,
+      served: true,
+      watched: true
+    }
+    Array.prototype.unshift.apply(config.files, [polyfillsPattern]);
+    config.preprocessors[polyfillsFile] = ['webpack', 'sourcemap'];
+  }
 
   // Add global scripts
   if (appConfig.scripts && appConfig.scripts.length > 0) {
