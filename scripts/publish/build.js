@@ -61,7 +61,7 @@ Promise.resolve()
     const script = path.join(root, 'scripts/build-schema-dts.js');
     const input = path.join(root, 'packages/angular-cli/lib/config/schema.json');
     const output = path.join(root, 'packages/angular-cli/lib/config/schema.d.ts');
-    return npmRun.execSync(`node ${script} ${input} ${output}`);
+    return npmRun.execSync(`node "${script}" "${input}" "${output}"`);
   })
   .then(() => console.log('Compiling packages...'))
   .then(() => {
@@ -87,7 +87,7 @@ Promise.resolve()
         return promise.then(() => {
           console.log(`  ${name}`);
           try {
-            return npmRun.execSync(`tsc -p ${path.relative(process.cwd(), pkg.root)}`);
+            return npmRun.execSync(`tsc -p "${path.relative(process.cwd(), pkg.root)}"`);
           } catch (err) {
             throw new Error(`Compilation error.\n${err.stdout}`);
           }
