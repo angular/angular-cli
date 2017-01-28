@@ -96,3 +96,5 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 `--output-hashing` define the output filename cache-busting hashing mode
 
 `--stats-json` generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse
+
+`--poll` enable and define the file watching poll time period (milliseconds)

@@ -109,7 +109,7 @@ export default Task.extend({
       proxy: proxyConfig,
       compress: serveTaskOptions.target === 'production',
       watchOptions: {
-        poll: projectConfig.defaults && projectConfig.defaults.poll
+        poll: serveTaskOptions.poll
       },
       https: serveTaskOptions.ssl,
       overlay: serveTaskOptions.target === 'development'

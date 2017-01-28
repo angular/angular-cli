@@ -2,7 +2,6 @@ const path = require('path');
 const fs = require('fs');
 
 const getTestConfig = require('../models/webpack-configs/test').getTestConfig;
-const CliConfig = require('../models/config').CliConfig;
 
 function isDirectory(path) {
   try {
@@ -81,7 +80,7 @@ const init = (config) => {
       chunkModules: false
     },
     watchOptions: {
-      poll: CliConfig.fromProject().config.defaults.poll
+      poll: config.angularCli.poll
     }
   };
 

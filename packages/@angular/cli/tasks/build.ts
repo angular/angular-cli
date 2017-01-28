@@ -54,7 +54,7 @@ export default Task.extend({
       };
 
       if (runTaskOptions.watch) {
-        webpackCompiler.watch({}, callback);
+        webpackCompiler.watch({ poll: runTaskOptions.poll }, callback);
       } else {
         webpackCompiler.run(callback);
       }
