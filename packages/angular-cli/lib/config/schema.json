@@ -124,7 +124,9 @@
                     }
                   },
                   "additionalProperties": true,
-                  "required": ["input"]
+                  "required": [
+                    "input"
+                  ]
                 }
               ]
             },
@@ -172,6 +174,30 @@
         }
       },
       "additionalProperties": false
+    },
+    "lint": {
+      "description": "Properties to be passed to TSLint.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "string"
+          },
+          "project": {
+            "type": "string"
+          },
+          "tslintConfig": {
+            "type": "string",
+            "default": "tslint.json"
+          }
+        },
+        "required": [
+          "files",
+          "project"
+        ],
+        "additionalProperties": false
+      }
     },
     "test": {
       "type": "object",
