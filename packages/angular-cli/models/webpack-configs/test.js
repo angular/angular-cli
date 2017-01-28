@@ -17,12 +17,10 @@ const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
  * Enumerate loaders and their dependencies from this file to let the dependency validator
  * know they are used.
  *
- * require('tslint-loader')
  * require('source-map-loader')
  * require('sourcemap-istanbul-instrumenter-loader')
  *
  * require('remap-istanbul')
- * require('tslint')
  */
 
 
@@ -42,27 +40,6 @@ const getTestConfig = function (projectRoot, environment, appConfig, testConfig)
       ],
       query: { 'force-sourcemap': true }
     });
-  }
-
-  if (testConfig.lint) {
-    extraRules.push({
-      test: /\.ts$/,
-      enforce: 'pre',
-      loader: 'tslint-loader',
-      exclude: [
-        path.resolve(projectRoot, 'node_modules')
-      ]
-    });
-    extraPlugins.push(new webpack.LoaderOptionsPlugin({
-      options: {
-        tslint: {
-          emitErrors: false,
-          failOnHint: false,
-          resourcePath: `./${appConfig.root}`,
-          typeCheck: true
-        }
-      }
-    }))
   }
 
   if (testConfig.progress) {
