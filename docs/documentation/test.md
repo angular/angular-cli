@@ -29,3 +29,5 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 `--reporters` list of reporters to use
 
 `--build` flag to build prior to running tests
+
+`--poll` enable and define the file watching poll time period (milliseconds)
