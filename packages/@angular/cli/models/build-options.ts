@@ -14,4 +14,5 @@ export interface BuildOptions {
   locale?: string;
   extractCss?: boolean;
   outputHashing?: string;
+  poll?: number;
 }

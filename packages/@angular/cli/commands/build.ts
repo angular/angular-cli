@@ -1,7 +1,11 @@
+import { CliConfig } from '../models/config';
 import { BuildOptions } from '../models/build-options';
 import { Version } from '../upgrade/version';
 
 const Command = require('../ember-cli/lib/models/command');
+
+const config = CliConfig.fromProject() || CliConfig.fromGlobal();
+const pollDefault = config.config.defaults && config.config.defaults.poll;
 
 // defaults for BuildOptions
 export const baseBuildCommandOptions: any = [
@@ -32,6 +36,12 @@ export const baseBuildCommandOptions: any = [
     aliases: ['oh']
   },
   { name: 'stats-json', type: Boolean, default: false },
+  {
+    name: 'poll',
+    type: Number,
+    default: pollDefault,
+    description: 'enable and define the file watching poll time period (milliseconds)'
+  }
 ];
 
 export interface BuildTaskOptions extends BuildOptions {
