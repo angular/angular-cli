@@ -50,7 +50,7 @@
 [* **Angular Universal CLI** repo](https://github.com/devCrossNet/universal-cli)
   - Universal-CLI is fork from Angular-CLI. It is a separate package because the Core-CLI team is not able to maintain non-core functionality.
   - `npm install -g universal-cli` and once installed: `ung new PROJECT_NAME` 
-  - [Useage instructions here](https://github.com/devCrossNet/universal-cli#usage)
+  - [Usage instructions here](https://github.com/devCrossNet/universal-cli#usage)
 
 
 ---- 
