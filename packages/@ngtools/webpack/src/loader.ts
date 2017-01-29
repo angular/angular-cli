@@ -18,11 +18,137 @@ function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
   }
 }
 
+
+function _angularImportsFromNode(node: ts.ImportDeclaration, sourceFile: ts.SourceFile): string[] {
+  const ms = node.moduleSpecifier;
+  let modulePath: string | null = null;
+  switch (ms.kind) {
+    case ts.SyntaxKind.StringLiteral:
+      modulePath = (ms as ts.StringLiteral).text;
+      break;
+    default:
+      return [];
+  }
+
+  if (!modulePath.startsWith('@angular/')) {
+    return [];
+  }
+
+  if (node.importClause) {
+    if (node.importClause.name) {
+      // This is of the form `import Name from 'path'`. Ignore.
+      return [];
+    } else if (node.importClause.namedBindings) {
+      const nb = node.importClause.namedBindings;
+      if (nb.kind == ts.SyntaxKind.NamespaceImport) {
+        // This is of the form `import * as name from 'path'`. Return `name.`.
+        return [(nb as ts.NamespaceImport).name.text + '.'];
+      } else {
+        // This is of the form `import {a,b,c} from 'path'`
+        const namedImports = nb as ts.NamedImports;
+
+        return namedImports.elements
+          .map((is: ts.ImportSpecifier) => is.propertyName ? is.propertyName.text : is.name.text);
+      }
+    }
+  } else {
+    // This is of the form `import 'path';`. Nothing to do.
+    return [];
+  }
+}
+
+
+function _ctorParameterFromTypeReference(paramNode: ts.ParameterDeclaration,
+                                         angularImports: string[],
+                                         refactor: TypeScriptFileRefactor) {
+  if (paramNode.type.kind == ts.SyntaxKind.TypeReference) {
+    const type = paramNode.type as ts.TypeReferenceNode;
+    const decorators = refactor.findAstNodes(paramNode, ts.SyntaxKind.Decorator) as ts.Decorator[];
+    const decoratorStr = decorators
+      .map(decorator => {
+        const fnName =
+          (refactor.findFirstAstNode(decorator, ts.SyntaxKind.CallExpression) as ts.CallExpression)
+          .expression.getText(refactor.sourceFile);
+
+        if (angularImports.indexOf(fnName) === -1) {
+          return null;
+        } else {
+          return fnName;
+        }
+      })
+      .filter(x => !!x)
+      .map(name => `{ type: ${name} }`)
+      .join(', ');
+
+    if (type.typeName.kind == ts.SyntaxKind.Identifier) {
+      const typeName = type.typeName as ts.Identifier;
+      if (decorators.length > 0) {
+        return `{ type: ${typeName.text}, decorators: [${decoratorStr}] }`;
+      }
+      return `{ type: ${typeName.text} }`;
+    }
+  }
+
+  return 'null';
+}
+
+
+function _addCtorParameters(classNode: ts.ClassDeclaration,
+                            angularImports: string[],
+                            refactor: TypeScriptFileRefactor) {
+  // For every classes with constructors, output the ctorParameters function which contains a list
+  // of injectable types.
+  const ctor = (
+    refactor.findFirstAstNode(classNode, ts.SyntaxKind.Constructor) as ts.ConstructorDeclaration);
+  if (!ctor) {
+    // A class can be missing a constructor, and that's _okay_.
+    return;
+  }
+
+  const params = Array.from(ctor.parameters).map(paramNode => {
+    switch (paramNode.type.kind) {
+      case ts.SyntaxKind.TypeReference:
+        return _ctorParameterFromTypeReference(paramNode, angularImports, refactor);
+      default:
+        return 'null';
+    }
+  });
+
+  const ctorParametersDecl = `static ctorParameters() { return [ ${params.join(', ')} ]; }`;
+  refactor.prependBefore(classNode.getLastToken(refactor.sourceFile), ctorParametersDecl);
+}
+
+
 function _removeDecorators(refactor: TypeScriptFileRefactor) {
-  // TODO: replace this by tsickle.
+  const angularImports: string[]
+    = refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.ImportDeclaration)
+      .map((node: ts.ImportDeclaration) => _angularImportsFromNode(node, refactor.sourceFile))
+      .reduce((acc: string[], current: string[]) => acc.concat(current), []);
+
   // Find all decorators.
-  // refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
-  //   .forEach(d => refactor.removeNode(d));
+  refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
+    .forEach(node => {
+      // First, add decorators to classes to the classes array.
+      if (node.parent) {
+        const declarations = refactor.findAstNodes(node.parent,
+          ts.SyntaxKind.ClassDeclaration, false, 1);
+        if (declarations.length > 0) {
+          _addCtorParameters(declarations[0] as ts.ClassDeclaration, angularImports, refactor);
+        }
+      }
+
+      refactor.findAstNodes(node, ts.SyntaxKind.CallExpression)
+        .filter((node: ts.CallExpression) => {
+          const fnName = node.expression.getText(refactor.sourceFile);
+          if (fnName.indexOf('.') != -1) {
+            // Since this is `a.b`, see if it's the same namespace as a namespace import.
+            return angularImports.indexOf(fnName.replace(/\..*$/, '') + '.') != -1;
+          } else {
+            return angularImports.indexOf(fnName) != -1;
+          }
+        })
+        .forEach(() => refactor.removeNode(node));
+    });
 }
 
 

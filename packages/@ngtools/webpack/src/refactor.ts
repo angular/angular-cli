@@ -120,8 +120,19 @@ export class TypeScriptFileRefactor {
     return arr;
   }
 
+  findFirstAstNode(node: ts.Node | null, kind: ts.SyntaxKind): ts.Node | null {
+    return this.findAstNodes(node, kind, false, 1)[0] || null;
+  }
+
   appendAfter(node: ts.Node, text: string): void {
     this._sourceString.insertRight(node.getEnd(), text);
+  }
+  append(node: ts.Node, text: string): void {
+    this._sourceString.insertLeft(node.getEnd(), text);
+  }
+
+  prependBefore(node: ts.Node, text: string) {
+    this._sourceString.insertLeft(node.getStart(), text);
   }
 
   insertImport(symbolName: string, modulePath: string): void {
