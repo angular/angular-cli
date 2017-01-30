@@ -38,7 +38,17 @@ module.exports = Task.extend({
     // npm otherwise is otherwise noisy, already submitted PR for npm to fix
     // misplaced console.log
     this.disableLogger();
-    return spawn('npm', [this.command].concat(packages, npmOptions)).
+
+    // by default, use cnpm if installed
+    var strNPM = 'cnpm';
+    try {
+      console.log(require.resolve("cnpm"));
+    } catch(e) {
+      console.error("Cnpm is not found");
+      strNPM = 'npm';
+    }
+
+    return spawn(strNPM, [this.command].concat(packages, npmOptions)).
     // return npm(this.command, packages, npmOptions, this.npm).
       finally(this.finally.bind(this)).
       then(this.announceCompletion.bind(this));
