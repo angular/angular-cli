@@ -273,6 +273,22 @@
               "default": true
             }
           }
+        },
+        "serve": {
+          "description": "Properties to be passed to the serve command",
+          "type": "object",
+          "properties": {
+            "port": {
+              "description": "The port the application will be served on",
+              "type": "number",
+              "default": 4200
+            },
+            "host": {
+              "description": "The host the application will be served on",
+              "type": "string",
+              "default": "localhost"
+            }
+          }
         }
       },
       "additionalProperties": false
