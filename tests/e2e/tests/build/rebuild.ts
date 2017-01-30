@@ -3,7 +3,7 @@ import {
   exec,
   waitForAnyProcessOutputToMatch,
   silentExecAndWaitForOutputToMatch,
-  ng, execAndWaitForOutputToMatch,
+  ng,
 } from '../../utils/process';
 import {writeFile} from '../../utils/fs';
 import {wait} from '../../utils/utils';
@@ -17,18 +17,18 @@ export default function() {
   let oldNumberOfChunks = 0;
   const chunkRegExp = /chunk\s+\{/g;
 
-  return execAndWaitForOutputToMatch('ng', ['serve'], /webpack: bundle is now VALID/)
+  return silentExecAndWaitForOutputToMatch('ng', ['serve'], /webpack: bundle is now VALID/)
     // Should trigger a rebuild.
     .then(() => exec('touch', 'src/main.ts'))
     .then(() => waitForAnyProcessOutputToMatch(/webpack: bundle is now INVALID/, 1000))
     .then(() => waitForAnyProcessOutputToMatch(/webpack: bundle is now VALID/, 5000))
     // Count the bundles.
-    .then((stdout: string) => {
+    .then(({ stdout }) => {
       oldNumberOfChunks = stdout.split(chunkRegExp).length;
     })
     // Add a lazy module.
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
-    // Just wait for the rebuild, otherwise we might be validating this build.
+    // Just wait for the rebuild, otherwise we might be validating the last build.
     .then(() => wait(1000))
     .then(() => writeFile('src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
@@ -60,7 +60,7 @@ export default function() {
     .then(() => waitForAnyProcessOutputToMatch(/webpack: bundle is now INVALID/, 1000))
     .then(() => waitForAnyProcessOutputToMatch(/webpack: bundle is now VALID/, 5000))
     // Count the bundles.
-    .then((stdout: string) => {
+    .then(({ stdout }) => {
       let newNumberOfChunks = stdout.split(chunkRegExp).length;
       if (oldNumberOfChunks >= newNumberOfChunks) {
         throw new Error('Expected webpack to create a new chunk, but did not.');
