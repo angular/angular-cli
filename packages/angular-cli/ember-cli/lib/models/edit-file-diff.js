@@ -5,15 +5,13 @@ var Promise      = require('../ext/promise');
 var readFile     = Promise.denodeify(fs.readFile);
 var writeFile    = Promise.denodeify(fs.writeFile);
 var jsdiff       = require('diff');
-var quickTemp    = require('quick-temp');
+var temp         = require('temp').track();
 var path         = require('path');
 var SilentError  = require('silent-error');
 var openEditor   = require('../utilities/open-editor');
 
 function EditFileDiff(options) {
   this.info = options.info;
-
-  quickTemp.makeOrRemake(this, 'tmpDifferenceDir');
 }
 
 EditFileDiff.prototype.edit = function() {
@@ -27,7 +25,7 @@ EditFileDiff.prototype.edit = function() {
 };
 
 function cleanUp() {
-  quickTemp.remove(this, 'tmpDifferenceDir'); // jshint ignore:line
+  temp.cleanupSync();
 }
 
 function applyPatch(resultHash) {
@@ -51,7 +49,7 @@ function applyPatch(resultHash) {
 function invokeEditor(result) {
   var info     = this.info; // jshint ignore:line
   var diff     = jsdiff.createPatch(info.outputPath, result.output.toString(), result.input);
-  var diffPath = path.join(this.tmpDifferenceDir, 'currentDiff.diff'); // jshint ignore:line
+  var diffPath = path.join(temp.mkdirSync(), 'currentDiff.diff');
 
   return writeFile(diffPath, diff).then(function() {
     return openEditor(diffPath);

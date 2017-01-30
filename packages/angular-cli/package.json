@@ -70,7 +70,6 @@
     "portfinder": "1.0.9",
     "postcss-discard-comments": "^2.0.4",
     "postcss-loader": "^0.9.1",
-    "quick-temp": "0.1.5",
     "raw-loader": "^0.5.1",
     "remap-istanbul": "^0.6.4",
     "resolve": "^1.1.7",
