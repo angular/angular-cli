@@ -15,7 +15,6 @@ const init = (config) => {
   const environment = config.angularCli.environment || 'dev';
   const testConfig = {
     codeCoverage: config.angularCli.codeCoverage || false,
-    lint: config.angularCli.lint || false,
     sourcemap: config.angularCli.sourcemap,
     progress: config.angularCli.progress
   }
