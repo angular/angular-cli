@@ -6,6 +6,8 @@
 `ng generate component [name]` generates a component
 
 ## Options
+`--suffix` (`-s`) specifies the component suffix, defaults to `component`
+
 `--flat` flag to indicate if a dir is created
 
 `--inline-template` (`-it`) specifies if the template will be in the ts file

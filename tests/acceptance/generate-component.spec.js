@@ -212,4 +212,30 @@ describe('Acceptance: ng generate component', function () {
       expect(existsSync(testPath)).to.equal(false);
     });
   });
+
+  it('my-comp --suffix=route', function () {
+    const testPath = path.join(root, 'tmp/foo/src/app/my-comp/my-comp.route.ts');
+    const appModule = path.join(root, 'tmp/foo/src/app/app.module.ts');
+    return ng(['generate', 'component', 'my-comp', '--suffix=route'])
+      .then(() => expect(existsSync(testPath)).to.equal(true))
+      .then(() => readFile(appModule, 'utf-8'))
+      .then(content => {
+        // Expect that the app.module contains a reference to my-comp and its import.
+        expect(content).matches(/import.*MyCompRoute.*from '.\/my-comp\/my-comp.route';/);
+        expect(content).matches(/declarations:\s*\[[^\]]+?,\r?\n\s+MyCompRoute\r?\n/m);
+      });
+  });
+
+  it('my-comp --suffix=smart-component', function () {
+    const testPath = path.join(root, 'tmp/foo/src/app/my-comp/my-comp.smart-component.ts');
+    const appModule = path.join(root, 'tmp/foo/src/app/app.module.ts');
+    return ng(['generate', 'component', 'my-comp', '--suffix=smart-component'])
+      .then(() => expect(existsSync(testPath)).to.equal(true))
+      .then(() => readFile(appModule, 'utf-8'))
+      .then(content => {
+        // Expect that the app.module contains a reference to my-comp and its import.
+        expect(content).matches(/import.*MyCompSmartComponent.*from '.\/my-comp\/my-comp.smart-component';/);
+        expect(content).matches(/declarations:\s*\[[^\]]+?,\r?\n\s+MyCompSmartComponent\r?\n/m);
+      });
+  });
 });
