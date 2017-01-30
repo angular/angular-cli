@@ -27,6 +27,14 @@ describe('@ngtools/json-schema', () => {
       proto.oneOfKey2 = 'hello';
       expect(proto.oneOfKey2 instanceof Array).toBe(false);
     });
+
+    it('returns undefined for values that are non-existent', () => {
+      const proto: any = Object.create(null);
+      const root = new RootSchemaTreeNode(proto, { value: valueJson, schema: schemaJson });
+
+      const value = root.children['objectKey1'].children['objectKey'].children['stringKey'].get();
+      expect(value).toBe(undefined);
+    });
   });
 
 
