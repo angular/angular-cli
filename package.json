@@ -146,7 +146,7 @@
     "jasmine": "^2.4.1",
     "jasmine-spec-reporter": "^2.7.0",
     "minimist": "^1.2.0",
-    "mocha": "^2.4.5",
+    "mocha": "^3.2.0",
     "mock-fs": "^3.12.1",
     "npm-run": "^4.1.0",
     "npm-run-all": "^3.0.0",
