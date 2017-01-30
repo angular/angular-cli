@@ -6,7 +6,7 @@ import {
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
-const postcssDiscardComments = require('postcss-discard-comments');
+const cssnano = require('cssnano');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -38,9 +38,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // https://github.com/webpack-contrib/style-loader#recommended-configuration
   const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemap;
 
-  // discard comments in production
+  // minify/optimize css in production
+  // autoprefixer is always run separately so disable here
   const extraPostCssPlugins = buildOptions.target === 'production'
-    ? [postcssDiscardComments]
+    ? [cssnano({ safe: true, autoprefixer: false })]
     : [];
 
   // determine hashing format
