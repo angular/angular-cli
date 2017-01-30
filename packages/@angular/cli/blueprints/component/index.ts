@@ -14,7 +14,7 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean, default: false },
+    { name: 'flat', type: Boolean },
     { name: 'inline-template', type: Boolean, aliases: ['it'] },
     { name: 'inline-style', type: Boolean, aliases: ['is'] },
     { name: 'prefix', type: String, default: null },
@@ -82,23 +82,27 @@ export default Blueprint.extend({
 
     options.inlineStyle = options.inlineStyle !== undefined ?
       options.inlineStyle :
-      this.project.ngConfigObj.get('defaults.inline.style');
+      this.project.ngConfigObj.get('defaults.component.inlineStyle');
 
     options.inlineTemplate = options.inlineTemplate !== undefined ?
       options.inlineTemplate :
-      this.project.ngConfigObj.get('defaults.inline.template');
+      this.project.ngConfigObj.get('defaults.component.inlineTemplate');
+
+    options.flat = options.flat !== undefined ?
+      options.flat :
+      this.project.ngConfigObj.get('defaults.component.flat');
 
     options.spec = options.spec !== undefined ?
       options.spec :
-      this.project.ngConfigObj.get('defaults.spec.component');
+      this.project.ngConfigObj.get('defaults.component.spec');
 
     options.viewEncapsulation = options.viewEncapsulation !== undefined ?
       options.viewEncapsulation :
-      this.project.ngConfigObj.get('defaults.viewEncapsulation');
+      this.project.ngConfigObj.get('defaults.component.viewEncapsulation');
 
     options.changeDetection = options.changeDetection !== undefined ?
       options.changeDetection :
-      this.project.ngConfigObj.get('defaults.changeDetection');
+      this.project.ngConfigObj.get('defaults.component.changeDetection');
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),

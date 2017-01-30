@@ -30,7 +30,7 @@ export default Blueprint.extend({
 
     options.spec = options.spec !== undefined ?
       options.spec :
-      this.project.ngConfigObj.get('defaults.spec.class');
+      this.project.ngConfigObj.get('defaults.class.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,

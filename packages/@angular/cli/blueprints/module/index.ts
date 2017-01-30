@@ -8,6 +8,7 @@ export default Blueprint.extend({
 
   availableOptions: [
     { name: 'spec', type: Boolean },
+    { name: 'flat', type: Boolean },
     { name: 'routing', type: Boolean, default: false }
   ],
 
@@ -20,9 +21,13 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
+    options.flat = options.flat !== undefined ?
+      options.flat :
+      this.project.ngConfigObj.get('defaults.module.flat');
+
     options.spec = options.spec !== undefined ?
       options.spec :
-      this.project.ngConfigObj.get('defaults.spec.module');
+      this.project.ngConfigObj.get('defaults.module.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,
@@ -49,9 +54,10 @@ export default Blueprint.extend({
     this.dasherizedModuleName = options.dasherizedModuleName;
     return {
       __path__: () => {
-        this.generatePath = this.dynamicPath.dir
-          + path.sep
-          + options.dasherizedModuleName;
+        this.generatePath = this.dynamicPath.dir;
+        if (!options.locals.flat) {
+          this.generatePath += path.sep + options.dasherizedModuleName;
+        }
         return this.generatePath;
       }
     };
