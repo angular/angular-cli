@@ -74,8 +74,6 @@
     "loader-utils": "^0.2.16",
     "lodash": "^4.11.1",
     "magic-string": "^0.16.0",
-    "markdown-it": "4.3.0",
-    "markdown-it-terminal": "0.0.3",
     "minimatch": "^3.0.3",
     "node-modules-path": "^1.0.0",
     "node-sass": "^4.3.0",
