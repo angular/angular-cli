@@ -61,8 +61,6 @@
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "lodash": "^4.11.1",
-    "markdown-it": "4.3.0",
-    "markdown-it-terminal": "0.0.3",
     "minimatch": "^3.0.3",
     "node-modules-path": "^1.0.0",
     "node-sass": "^4.3.0",
