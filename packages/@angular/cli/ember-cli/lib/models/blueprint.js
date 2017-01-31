@@ -10,7 +10,6 @@ var printableProperties = require('../utilities/printable-properties').blueprint
 var sequence            = require('../utilities/sequence');
 var printCommand        = require('../utilities/print-command');
 var fs                  = require('fs-extra');
-var existsSync          = require('exists-sync');
 var inflector           = require('inflection');
 var minimatch           = require('minimatch');
 var path                = require('path');
@@ -34,6 +33,16 @@ var CoreObject          = require('../ext/core-object');
 var EOL                 = require('os').EOL;
 var debug               = require('debug')('ember-cli:blueprint');
 var normalizeEntityName = require('ember-cli-normalize-entity-name');
+
+function existsSync(path) {
+  try {
+    fs.accessSync(path);
+    return true;
+  }
+  catch (e) {
+    return false;
+  }
+}
 
 module.exports = Blueprint;
 

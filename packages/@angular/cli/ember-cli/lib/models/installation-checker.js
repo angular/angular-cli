@@ -2,9 +2,18 @@
 
 var debug       = require('debug')('ember-cli:installation-checker');
 var fs          = require('fs');
-var existsSync  = require('exists-sync');
 var path        = require('path');
 var SilentError = require('silent-error');
+
+function existsSync(path) {
+  try {
+    fs.accessSync(path);
+    return true;
+  }
+  catch (e) {
+    return false;
+  }
+}
 
 module.exports = InstallationChecker;
 
