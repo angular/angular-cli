@@ -1,3 +1,5 @@
+import { oneLine } from 'common-tags';
+
 const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
@@ -8,7 +10,7 @@ const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const getFiles = Blueprint.prototype.files;
 
-module.exports = {
+export default Blueprint.extend({
   description: '',
 
   availableOptions: [
@@ -17,7 +19,7 @@ module.exports = {
     { name: 'module', type: String, aliases: ['m'] }
   ],
 
-  beforeInstall: function(options) {
+  beforeInstall: function(options: any) {
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
@@ -30,14 +32,14 @@ module.exports = {
     }
   },
 
-  normalizeEntityName: function (entityName) {
-    var parsedPath = dynamicPathParser(this.project, entityName);
+  normalizeEntityName: function (entityName: string) {
+    const parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
-  locals: function (options) {
+  locals: function (options: any) {
     options.spec = options.spec !== undefined ?
       options.spec :
       this.project.ngConfigObj.get('defaults.spec.service');
@@ -49,7 +51,7 @@ module.exports = {
   },
 
   files: function() {
-    var fileList = getFiles.call(this);
+    let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && !this.options.spec) {
       fileList = fileList.filter(p => p.indexOf('__name__.service.spec.ts') < 0);
@@ -58,11 +60,11 @@ module.exports = {
     return fileList;
   },
 
-  fileMapTokens: function (options) {
+  fileMapTokens: function (options: any) {
     // Return custom template variables here.
     return {
       __path__: () => {
-        var dir = this.dynamicPath.dir;
+        let dir = this.dynamicPath.dir;
         if (!options.locals.flat) {
           dir += path.sep + options.dasherizedModuleName;
         }
@@ -72,11 +74,14 @@ module.exports = {
     };
   },
 
-  afterInstall(options) {
-    const returns = [];
+  afterInstall(options: any) {
+    const returns: Array<any> = [];
 
     if (!this.pathToModule) {
-      const warningMessage = 'Service is generated but not provided, it must be provided to be used';
+      const warningMessage = oneLine`
+        Service is generated but not provided,
+        it must be provided to be used
+      `;
       this._writeStatusToUI(chalk.yellow, 'WARNING', warningMessage);
     } else {
       const className = stringUtils.classify(`${options.entity.name}Service`);
@@ -87,10 +92,12 @@ module.exports = {
       const importPath = relativeDir ? `./${relativeDir}/${fileName}` : `./${fileName}`;
       returns.push(
         astUtils.addProviderToModule(this.pathToModule, className, importPath)
-          .then(change => change.apply(NodeHost)));
-      this._writeStatusToUI(chalk.yellow, 'update', path.relative(this.project.root, this.pathToModule));
+          .then((change: any) => change.apply(NodeHost)));
+      this._writeStatusToUI(chalk.yellow,
+                            'update',
+                            path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);
   }
-};
+});

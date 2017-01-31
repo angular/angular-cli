@@ -1202,17 +1202,17 @@ Blueprint.lookup = function(name, options) {
   @return {Blueprint} blueprint instance
 */
 Blueprint.load = function(blueprintPath) {
-  var constructorPath = path.resolve(blueprintPath, 'index.js');
+  var constructorPath = path.join(path.resolve(blueprintPath), 'index');
   var blueprintModule;
   var Constructor = Blueprint;
 
   if (fs.lstatSync(blueprintPath).isDirectory()) {
-
-    if (existsSync(constructorPath)) {
-      blueprintModule = require(constructorPath);
-
+    blueprintModule = require(constructorPath);
+    if (blueprintModule) {
       if (typeof blueprintModule === 'function') {
         Constructor = blueprintModule;
+      } else if (typeof blueprintModule.default === 'function') {
+        Constructor = blueprintModule.default
       } else {
         Constructor = Blueprint.extend(blueprintModule);
       }
