@@ -3,22 +3,22 @@ const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const getFiles = Blueprint.prototype.files;
 
-module.exports = {
+export default Blueprint.extend({
   description: '',
 
   availableOptions: [
     { name: 'spec', type: Boolean }
   ],
 
-  normalizeEntityName: function (entityName) {
-    var parsedPath = dynamicPathParser(this.project, entityName.split('.')[0]);
+  normalizeEntityName: function (entityName: string) {
+    const parsedPath = dynamicPathParser(this.project, entityName.split('.')[0]);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
-  locals: function (options) {
-    const rawName = options.args[1];
+  locals: function (options: any) {
+    const rawName = options.args[1] as string;
     const nameParts = rawName.split('.')
       .filter(part => part.length !== 0);
 
@@ -40,7 +40,7 @@ module.exports = {
   },
 
   files: function() {
-    var fileList = getFiles.call(this);
+    let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && !this.options.spec) {
       fileList = fileList.filter(p => p.indexOf('__name__.spec.ts') < 0);
@@ -61,4 +61,4 @@ module.exports = {
       }
     };
   }
-};
+});

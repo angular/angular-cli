@@ -1,17 +1,18 @@
 const stringUtils = require('ember-cli-string-utils');
-var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
 
-module.exports = {
+export default Blueprint.extend({
   description: '',
 
-  normalizeEntityName: function (entityName) {
-    var parsedPath = dynamicPathParser(this.project, entityName);
+  normalizeEntityName: function (entityName: string) {
+    const parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
-  locals: function (options) {
+  locals: function (options: any) {
     this.fileName = stringUtils.dasherize(options.entity.name);
 
     return {
@@ -33,4 +34,4 @@ module.exports = {
       }
     };
   }
-};
+});

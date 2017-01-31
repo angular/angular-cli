@@ -9,7 +9,7 @@ const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const getFiles = Blueprint.prototype.files;
 
-module.exports = {
+export default Blueprint.extend({
   description: '',
 
   availableOptions: [
@@ -20,7 +20,7 @@ module.exports = {
     { name: 'export', type: Boolean, default: false }
   ],
 
-  beforeInstall: function(options) {
+  beforeInstall: function(options: any) {
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
@@ -33,7 +33,7 @@ module.exports = {
     } else {
       try {
         this.pathToModule = findParentModule(this.project, this.dynamicPath.dir);
-      } catch(e) {
+      } catch (e) {
         if (!options.skipImport) {
           throw `Error locating module for declaration\n\t${e}`;
         }
@@ -41,14 +41,14 @@ module.exports = {
     }
   },
 
-  normalizeEntityName: function (entityName) {
-    var parsedPath = dynamicPathParser(this.project, entityName);
+  normalizeEntityName: function (entityName: string) {
+    const parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
-  locals: function (options) {
+  locals: function (options: any) {
     options.spec = options.spec !== undefined ?
       options.spec :
       this.project.ngConfigObj.get('defaults.spec.pipe');
@@ -60,7 +60,7 @@ module.exports = {
   },
 
   files: function() {
-    var fileList = getFiles.call(this);
+    let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && !this.options.spec) {
       fileList = fileList.filter(p => p.indexOf('__name__.pipe.spec.ts') < 0);
@@ -69,11 +69,11 @@ module.exports = {
     return fileList;
   },
 
-  fileMapTokens: function (options) {
+  fileMapTokens: function (options: any) {
     // Return custom template variables here.
     return {
       __path__: () => {
-        var dir = this.dynamicPath.dir;
+        let dir = this.dynamicPath.dir;
         if (!options.locals.flat) {
           dir += path.sep + options.dasherizedModuleName;
         }
@@ -83,12 +83,12 @@ module.exports = {
     };
   },
 
-  afterInstall: function(options) {
+  afterInstall: function(options: any) {
     if (options.dryRun) {
       return;
     }
 
-    const returns = [];
+    const returns: Array<any> = [];
     const className = stringUtils.classify(`${options.entity.name}Pipe`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.pipe`);
     const fullGeneratePath = path.join(this.project.root, this.generatePath);
@@ -99,17 +99,19 @@ module.exports = {
     if (!options.skipImport) {
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
-          .then(change => change.apply(NodeHost))
-          .then((result) => {
+          .then((change: any) => change.apply(NodeHost))
+          .then((result: any) => {
             if (options.export) {
               return astUtils.addExportToModule(this.pathToModule, className, importPath)
-                .then(change => change.apply(NodeHost));
+                .then((change: any) => change.apply(NodeHost));
             }
             return result;
           }));
-      this._writeStatusToUI(chalk.yellow, 'update', path.relative(this.project.root, this.pathToModule));
+      this._writeStatusToUI(chalk.yellow,
+                            'update',
+                            path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);
   }
-};
+});

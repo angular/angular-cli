@@ -3,7 +3,7 @@ const Blueprint   = require('../../ember-cli/lib/models/blueprint');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const getFiles = Blueprint.prototype.files;
 
-module.exports = {
+export default Blueprint.extend({
   description: '',
 
   availableOptions: [
@@ -11,15 +11,15 @@ module.exports = {
     { name: 'routing', type: Boolean, default: false }
   ],
 
-  normalizeEntityName: function (entityName) {
+  normalizeEntityName: function (entityName: string) {
     this.entityName = entityName;
-    var parsedPath = dynamicPathParser(this.project, entityName);
+    const parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
-  locals: function (options) {
+  locals: function (options: any) {
     options.spec = options.spec !== undefined ?
       options.spec :
       this.project.ngConfigObj.get('defaults.spec.module');
@@ -32,7 +32,7 @@ module.exports = {
   },
 
   files: function() {
-    var fileList = getFiles.call(this);
+    let fileList = getFiles.call(this) as Array<string>;
 
     if (!this.options || !this.options.spec) {
       fileList = fileList.filter(p => p.indexOf('__name__.module.spec.ts') < 0);
@@ -44,7 +44,7 @@ module.exports = {
     return fileList;
   },
 
-  fileMapTokens: function (options) {
+  fileMapTokens: function (options: any) {
     // Return custom template variables here.
     this.dasherizedModuleName = options.dasherizedModuleName;
     return {
@@ -57,7 +57,7 @@ module.exports = {
     };
   },
 
-  afterInstall: function (options) {
+  afterInstall: function (options: any) {
     if (this.options && this.options.routing) {
 
       // Component folder needs to be `/{moduleName}/{ComponentName}`
@@ -67,8 +67,8 @@ module.exports = {
       //      as `this.dynamicPath.dir` will be the same as `this.dynamicPath.appRoot`
       // 2. If it does have `/` (like `parent/mod-name`), it'll be `/parent/mod-name/mod-name`
       //      as `this.dynamicPath.dir` minus `this.dynamicPath.appRoot` will be `/parent`
-      var moduleDir =
-        this.dynamicPath.dir.replace(this.dynamicPath.appRoot, '') + path.sep + this.dasherizedModuleName;
+      const moduleDir = this.dynamicPath.dir.replace(this.dynamicPath.appRoot, '')
+                      + path.sep + this.dasherizedModuleName;
       options.entity.name = moduleDir + path.sep + this.dasherizedModuleName;
       options.flat = true;
 
@@ -80,4 +80,4 @@ module.exports = {
       return Blueprint.load(path.join(__dirname, '../component')).install(options);
     }
   }
-};
+});
