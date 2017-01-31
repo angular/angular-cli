@@ -1,9 +1,9 @@
 <!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
 
-# ng init
+# ng update
 
 ## Overview
-`ng init [name]` initializes, or re-initializes, an angular application.
+`ng update [name]` updates, initializes, or re-initializes, an angular application.
 
 Initialization is done in-place, meaning that the generated application is initialized in the current directory.
 
