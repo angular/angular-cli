@@ -107,7 +107,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         { test: /\.html$/, loader: 'raw-loader' },
         { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
         {
-          test: /\.(jpg|png|gif|otf|ttf|woff|woff2)$/,
+          test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
           loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
         }
       ].concat(extraRules)
