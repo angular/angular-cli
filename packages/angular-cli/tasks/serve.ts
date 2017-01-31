@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
+import * as rimraf from 'rimraf';
 const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
 import * as webpack from 'webpack';
@@ -21,6 +22,9 @@ export default Task.extend({
     let webpackCompiler: any;
     const projectConfig = CliConfig.fromProject().config;
     const appConfig = projectConfig.apps[0];
+
+    const outputPath = serveTaskOptions.outputPath || appConfig.outDir;
+    rimraf.sync(path.resolve(this.project.root, outputPath));
 
     const serveDefaults = {
       // default deployUrl to '' on serve to prevent the default from angular-cli.json
