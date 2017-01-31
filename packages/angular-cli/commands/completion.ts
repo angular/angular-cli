@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { oneLine, stripIndent } from 'common-tags';
+
 const stringUtils = require('ember-cli-string-utils');
 const Command = require('../ember-cli/lib/models/command');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
@@ -96,77 +98,80 @@ const CompletionCommand = Command.extend({
                 caseBlock +
                 '    *) opts="" ;;';
 
-    console.log(`###-begin-ng-completion###
-#
+    console.log(stripIndent`
+      ###-begin-ng-completion###
+      #
 
-# ng command completion script
-#   This command supports 3 cases.
-#   1. (Default case) It prints a common completion initialisation for both Bash and Zsh.
-#      It is the result of either calling "ng completion" or "ng completion -a".
-#   2. Produce Bash-only completion: "ng completion -b" or "ng completion --bash".
-#   3. Produce Zsh-only completion: "ng completion -z" or "ng completion --zsh".
-#
-# Installation: ng completion -b 1>> ~/.bashrc
-#           or  ng completion -z 1>> ~/.zshrc
-#
-`);
+      # ng command completion script
+      #   This command supports 3 cases.
+      #   1. (Default case) It prints a common completion initialisation for both Bash and Zsh.
+      #      It is the result of either calling "ng completion" or "ng completion -a".
+      #   2. Produce Bash-only completion: "ng completion -b" or "ng completion --bash".
+      #   3. Produce Zsh-only completion: "ng completion -z" or "ng completion --zsh".
+      #
+      # Installation: ng completion -b >> ~/.bashrc
+      #           or  ng completion -z >> ~/.zshrc
+      #`);
 
     if (commandOptions.all && !commandOptions.bash) {
       console.log('if test ".$(type -t complete 2>/dev/null || true)" = ".builtin"; then');
     }
 
     if (commandOptions.all || commandOptions.bash) {
-      console.log(`_ng_completion() {
-  local cword pword opts
+      console.log(stripIndent`
+          _ng_completion() {
+           local cword pword opts
 
-  COMPREPLY=()
-  cword=\${COMP_WORDS[COMP_CWORD]}
-  pword=\${COMP_WORDS[COMP_CWORD - 1]}
+           COMPREPLY=()
+           cword=\${COMP_WORDS[COMP_CWORD]}
+           pword=\${COMP_WORDS[COMP_CWORD - 1]}
 
-  case \${pword} in
-    ${caseBlock}
-  esac
+           case \${pword} in
+             ${caseBlock}
+           esac
 
-  COMPREPLY=( $(compgen -W '\${opts}' -- $cword) )
+           COMPREPLY=( $(compgen -W '\${opts}' -- $cword) )
 
-  return 0
-}
+           return 0
+         }
 
-complete -o default -F _ng_completion ng
-`);
+         complete -o default -F _ng_completion ng
+         `);
     }
 
     if (commandOptions.all) {
-      console.log(
-        'elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then');
+      console.log(stripIndent`
+        elif test ".$(type -w compctl 2>/dev/null || true)" = ".compctl: builtin" ; then
+        `);
     }
 
     if (commandOptions.all || commandOptions.zsh) {
-      console.log(`_ng_completion () {
-  local words cword opts
-  read -Ac words
-  read -cn cword
-  let cword-=1
+      console.log(stripIndent`
+          _ng_completion () {
+            local words cword opts
+            read -Ac words
+            read -cn cword
+            let cword-=1
 
-  case $words[cword] in
-    ${caseBlock}
-  esac
+            case $words[cword] in
+              ${caseBlock}
+            esac
 
-  setopt shwordsplit
-  reply=($opts)
-  unset shwordsplit
-}
+            setopt shwordsplit
+            reply=($opts)
+            unset shwordsplit
+          }
 
-compctl -K _ng_completion ng
-`);
+          compctl -K _ng_completion ng
+          `);
     }
 
     if (commandOptions.all) {
-      console.log(`else
-  echo "Shell builtin command 'complete' or 'compctl' is redefined; cannot perform ng completion."
-  return 1
-fi
-`);
+      console.log(stripIndent`
+        else
+          echo "Builtin command 'complete' or 'compctl' is redefined; cannot produce completion."
+          return 1
+        fi`);
     }
 
     console.log('###-end-ng-completion###');
