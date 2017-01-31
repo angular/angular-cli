@@ -292,6 +292,27 @@
         }
       },
       "additionalProperties": false
+    },
+    "warnings": {
+      "description": "Allow people to disable console warnings.",
+      "type": "object",
+      "properties": {
+        "nodeDeprecation": {
+          "description": "Show a warning when the node version is incompatible.",
+          "type": "boolean",
+          "default": true
+        },
+        "packageDeprecation": {
+          "description": "Show a warning when the user installed angular-cli.",
+          "type": "boolean",
+          "default": true
+        },
+        "versionMismatch": {
+          "description": "Show a warning when the global version is newer than the local one.",
+          "type": "boolean",
+          "default": true
+        }
+      }
     }
   },
   "additionalProperties": false
