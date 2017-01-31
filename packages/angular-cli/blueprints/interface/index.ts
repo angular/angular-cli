@@ -1,33 +1,34 @@
 const stringUtils = require('ember-cli-string-utils');
-var dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const dynamicPathParser = require('../../utilities/dynamic-path-parser');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
 
-module.exports = {
+export default Blueprint.extend({
   description: '',
-  
+
   anonymousOptions: [
     '<interface-type>'
   ],
-  
-  normalizeEntityName: function (entityName) {
-    var parsedPath = dynamicPathParser(this.project, entityName);
+
+  normalizeEntityName: function (entityName: string) {
+    const parsedPath = dynamicPathParser(this.project, entityName);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
-  locals: function (options) {
-    var interfaceType = options.args [2]
+  locals: function (options: any) {
+    const interfaceType = options.args[2];
     this.fileName = stringUtils.dasherize(options.entity.name);
     if (interfaceType) {
-      this.fileName += '.' + interfaceType; 
+      this.fileName += '.' + interfaceType;
     }
-    var prefix = '';
+    let prefix = '';
     if (this.project.ngConfig &&
         this.project.ngConfig.defaults &&
         this.project.ngConfig.defaults.prefixInterfaces) {
       prefix = 'I';
     }
-    return { 
+    return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat,
       fileName: this.fileName,
@@ -47,4 +48,4 @@ module.exports = {
       }
     };
   }
-};
+});

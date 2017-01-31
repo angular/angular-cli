@@ -3,7 +3,7 @@ const path        = require('path');
 const stringUtils = require('ember-cli-string-utils');
 const getFiles = Blueprint.prototype.files;
 
-module.exports = {
+export default Blueprint.extend({
   description: '',
 
   availableOptions: [
@@ -16,21 +16,23 @@ module.exports = {
     { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] }
   ],
 
-  beforeInstall: function(options) {
+  beforeInstall: function(options: any) {
     if (options.ignoredUpdateFiles && options.ignoredUpdateFiles.length > 0) {
-      return Blueprint.ignoredUpdateFiles = Blueprint.ignoredUpdateFiles.concat(options.ignoredUpdateFiles);
+      return Blueprint.ignoredUpdateFiles =
+        Blueprint.ignoredUpdateFiles.concat(options.ignoredUpdateFiles);
     }
   },
 
-  locals: function(options) {
+  locals: function(options: any) {
     this.styleExt = options.style;
     this.version = require(path.resolve(__dirname, '../../package.json')).version;
-    // set this.tests to opposite of skipTest options, meaning if tests are being skipped then the default.spec.BLUEPRINT will be false
+    // set this.tests to opposite of skipTest options,
+    // meaning if tests are being skipped then the default.spec.BLUEPRINT will be false
     this.tests = options.skipTests ? false : true;
 
     // Split/join with / not path.sep as reference to typings require forward slashes.
     const relativeRootPath = options.sourceDir.split('/').map(() => '..').join('/');
-    const fullAppName = stringUtils.dasherize(options.entity.name)
+    const fullAppName = (stringUtils.dasherize(options.entity.name) as string)
       .replace(/-(.)/g, (_, l) => ' ' + l.toUpperCase())
       .replace(/^./, (l) => l.toUpperCase());
 
@@ -51,7 +53,7 @@ module.exports = {
   },
 
   files: function() {
-    var fileList = getFiles.call(this);
+    let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && !this.options.routing) {
       fileList = fileList.filter(p => p.indexOf('app-routing.module.ts') < 0);
@@ -73,7 +75,7 @@ module.exports = {
     return fileList;
   },
 
-  fileMapTokens: function (options) {
+  fileMapTokens: function (options: any) {
     // Return custom template variables here.
     return {
       __path__: () => {
@@ -84,4 +86,4 @@ module.exports = {
       }
     };
   }
-};
+});
