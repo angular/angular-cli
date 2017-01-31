@@ -3,7 +3,6 @@
 var nopt                = require('nopt');
 var chalk               = require('chalk');
 var path                = require('path');
-var isGitRepo           = require('is-git-url');
 var camelize            = require('ember-cli-string-utils').camelize;
 var getCallerFile       = require('get-caller-file');
 var printableProperties = require('../utilities/printable-properties').command;
@@ -31,18 +30,6 @@ var allowedWorkOptions = {
 };
 
 path.name = 'Path';
-// extend nopt to recognize 'gitUrl' as a type
-nopt.typeDefs.gitUrl = {
-  type: 'gitUrl',
-  validate: function(data, k, val) {
-    if (isGitRepo(val)) {
-      data[k] = val;
-      return true;
-    } else {
-      return false;
-    }
-  }
-};
 
 module.exports = Command;
 

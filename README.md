@@ -125,7 +125,7 @@ The CLI supports routing in several ways:
 
   The `--routing` option also generates a default component with the same name as the module.
 
-- You can use the `--routing` option with `ng new` or `ng init` to create a `app-routing.module.ts` file when you create or initialize a project.
+- You can use the `--routing` option with `ng new` to create a `app-routing.module.ts` file when you create or initialize a project.
 
 <!-- DeleteSection1 Start here to remove upon next release -->
 ### Creating a build
@@ -440,12 +440,12 @@ Local project package:
 rm -rf node_modules dist # use rmdir on Windows
 npm install --save-dev angular-cli@latest
 npm install
-ng init
+ng update
 ```
 
-Running `ng init` will check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
+Running `ng update` will check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
 
-Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng init` finishes.
+Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng update` finishes.
 
 **The main cause of errors after an update is failing to incorporate these updates into your code**.
 

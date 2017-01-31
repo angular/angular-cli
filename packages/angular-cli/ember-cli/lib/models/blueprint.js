@@ -6,7 +6,6 @@
 var FileInfo            = require('./file-info');
 var Promise             = require('../ext/promise');
 var chalk               = require('chalk');
-var MarkdownColor       = require('../utilities/markdown-color');
 var printableProperties = require('../utilities/printable-properties').blueprint;
 var sequence            = require('../utilities/sequence');
 var printCommand        = require('../utilities/print-command');
@@ -1119,12 +1118,6 @@ Blueprint.prototype.printBasicHelp = function(verbose) {
 };
 
 Blueprint.prototype.printDetailedHelp = function() {
-  var markdownColor = new MarkdownColor();
-  var filePath = getDetailedHelpPath(this.path);
-
-  if (existsSync(filePath)) {
-    return markdownColor.renderFile(filePath, { indent: '        ' });
-  }
   return '';
 };
 
@@ -1479,14 +1472,4 @@ function dir(fullPath) {
   } else {
     return [];
   }
-}
-
-/**
-  @private
-  @method getDetailedHelpPath
-  @param {String} thisPath
-  @return {String} help path
-*/
-function getDetailedHelpPath(thisPath) {
-  return path.join(thisPath, './HELP.md');
 }

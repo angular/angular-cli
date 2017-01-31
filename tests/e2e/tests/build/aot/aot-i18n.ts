@@ -1,6 +1,6 @@
-import {ng} from '../../utils/process';
-import {expectFileToMatch, writeFile, createDir, appendToFile} from '../../utils/fs';
-import {expectToFail} from '../../utils/utils';
+import {ng} from '../../../utils/process';
+import {expectFileToMatch, writeFile, createDir, appendToFile} from '../../../utils/fs';
+import {expectToFail} from '../../../utils/utils';
 
 export default function() {
   return Promise.resolve()

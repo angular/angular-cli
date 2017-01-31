@@ -6,7 +6,7 @@ import {
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
-const postcssDiscardComments = require('postcss-discard-comments');
+const cssnano = require('cssnano');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -33,10 +33,15 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
   const extraPlugins: any[] = [];
+  // style-loader does not support sourcemaps without absolute publicPath, so it's
+  // better to disable them when not extracting css
+  // https://github.com/webpack-contrib/style-loader#recommended-configuration
+  const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemap;
 
-  // discard comments in production
+  // minify/optimize css in production
+  // autoprefixer is always run separately so disable here
   const extraPostCssPlugins = buildOptions.target === 'production'
-    ? [postcssDiscardComments]
+    ? [cssnano({ safe: true, autoprefixer: false })]
     : [];
 
   // determine hashing format
@@ -75,7 +80,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     // so we need to add options in its query
     {
       test: /\.styl$/, loaders: [`stylus-loader?${JSON.stringify({
-        sourceMap: buildOptions.sourcemap,
+        sourceMap: cssSourceMap,
         paths: includePaths
       })}`]
     }
@@ -95,7 +100,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         loader: [
           // css-loader doesn't support webpack.LoaderOptionsPlugin properly,
           // so we need to add options in its query
-          `css-loader?${JSON.stringify({ sourceMap: buildOptions.sourcemap })}`,
+          `css-loader?${JSON.stringify({ sourceMap: cssSourceMap })}`,
           ...commonLoaders,
           ...loaders
         ],
@@ -121,14 +126,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         disable: !buildOptions.extractCss
       }),
       new webpack.LoaderOptionsPlugin({
-        sourceMap: true,
+        sourceMap: cssSourceMap,
         options: {
           postcss: [autoprefixer()].concat(extraPostCssPlugins),
           // css-loader, stylus-loader don't support LoaderOptionsPlugin properly
           // options are in query instead
-          sassLoader: { sourceMap: buildOptions.sourcemap, includePaths },
+          sassLoader: { sourceMap: cssSourceMap, includePaths },
           // less-loader doesn't support paths
-          lessLoader: { sourceMap: buildOptions.sourcemap },
+          lessLoader: { sourceMap: cssSourceMap },
           // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
           context: projectRoot,
         },

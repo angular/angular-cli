@@ -409,10 +409,12 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
     if (!this.defined && this._forward) {
       return this._forward.get();
     }
-    if (!this.defined && this._default !== undefined) {
-      return this._default;
+    if (!this.defined) {
+      return this._default !== undefined ? this._default : undefined;
     }
-    return this._value === undefined ? undefined : this.convert(this._value);
+    return this._value === undefined
+      ? undefined
+      : (this._value === null ? null : this.convert(this._value));
   }
   set(v: T, force = false) {
     if (this.readOnly && !force) {
