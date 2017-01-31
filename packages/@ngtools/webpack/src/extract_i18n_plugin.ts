@@ -138,6 +138,10 @@ export class ExtractI18nPlugin implements Tapable {
       return cb(new Error('An @ngtools/webpack xi18n plugin already exist for ' +
         'this compilation.'));
     }
+    if (!this._compilation._ngToolsWebpackPluginInstance) {
+      return cb(new Error('An @ngtools/webpack aot plugin does not exists ' +
+        'for this compilation'));
+    }
 
     this._compilation._ngToolsWebpackXi18nPluginInstance = this;
 
