@@ -54,7 +54,6 @@
     "html-webpack-plugin": "^2.19.0",
     "inflection": "^1.7.0",
     "inquirer": "^0.12.0",
-    "is-git-url": "^0.2.0",
     "isbinaryfile": "^2.0.3",
     "json-loader": "^0.5.4",
     "karma-sourcemap-loader": "^0.3.7",

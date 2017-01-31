@@ -3,7 +3,6 @@
 var Blueprint     = require('../models/blueprint');
 var Task          = require('../models/task');
 var Promise       = require('../ext/promise');
-var isGitRepo     = require('is-git-url');
 var temp          = require('temp');
 var childProcess  = require('child_process');
 var path          = require('path');
@@ -34,22 +33,10 @@ module.exports = Task.extend({
 
     installOptions = merge(installOptions, options || {});
 
-    if (isGitRepo(blueprintOption)) {
-      return mkdir('ember-cli').then(function(pathName) {
-        var execArgs = ['git', 'clone', blueprintOption, pathName].join(' ');
-        return exec(execArgs).then(function() {
-          return exec('npm install', {cwd: pathName}).then(function() {
-            var blueprint = Blueprint.load(pathName);
-            return blueprint.install(installOptions);
-          });
-        });
-      });
-    } else {
-      var blueprintName = blueprintOption || 'app';
-      var blueprint = Blueprint.lookup(blueprintName, {
-        paths: this.project.blueprintLookupPaths()
-      });
-      return blueprint.install(installOptions);
-    }
+    var blueprintName = blueprintOption || 'app';
+    var blueprint = Blueprint.lookup(blueprintName, {
+      paths: this.project.blueprintLookupPaths()
+    });
+    return blueprint.install(installOptions);
   }
 });
