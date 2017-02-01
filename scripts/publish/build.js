@@ -59,27 +59,37 @@ Promise.resolve()
   .then(() => console.log('Creating schema.d.ts...'))
   .then(() => {
     const script = path.join(root, 'scripts/build-schema-dts.js');
-    const input = path.join(root, 'packages/angular-cli/lib/config/schema.json');
-    const output = path.join(root, 'packages/angular-cli/lib/config/schema.d.ts');
+    const input = path.join(root, 'packages/@angular/cli/lib/config/schema.json');
+    const output = path.join(root, 'packages/@angular/cli/lib/config/schema.d.ts');
     return npmRun.execSync(`node "${script}" "${input}" "${output}"`);
   })
   .then(() => console.log('Compiling packages...'))
   .then(() => {
     const packages = require('../../lib/packages');
-    return Object.keys(packages)
-      // Order packages in order of dependency.
-      .sort((a, b) => {
-        const aDependsOnB = Object.keys(getDeps(packages[a])).indexOf(b) != -1;
-        const bDependsOnA = Object.keys(getDeps(packages[b])).indexOf(a) != -1;
 
-        if (!aDependsOnB && !bDependsOnA) {
-          return 0;
-        } else if (aDependsOnB) {
-          return 1;
-        } else {
-          return -1;
+    // Order packages in order of dependency.
+    // We use bubble sort because we need a full topological sort but adding another dependency
+    // or implementing a full topo sort would be too much work and I'm lazy. We don't anticipate
+    // any large number of
+    const sortedPackages = Object.keys(packages);
+    let swapped = false;
+    do {
+      swapped = false;
+      for (let i = 0; i < sortedPackages.length - 1; i++) {
+        for (let j = i + 1; j < sortedPackages.length; j++) {
+          const a = sortedPackages[i];
+          const b = sortedPackages[j];
+
+          if (Object.keys(getDeps(packages[a])).indexOf(b) != -1) {
+            // Swap them.
+            [sortedPackages[i], sortedPackages[i + 1]] = [sortedPackages[i + 1], sortedPackages[i]];
+            swapped = true;
+          }
         }
-      })
+      }
+    } while(swapped);
+
+    return sortedPackages
       .reduce((promise, packageName) => {
         const pkg = packages[packageName];
         const name = path.relative(packagesRoot, pkg.root);
@@ -101,7 +111,7 @@ Promise.resolve()
     return files
       .map((fileName) => path.relative(packagesRoot, fileName))
       .filter((fileName) => {
-        if (/^angular-cli[\\\/]blueprints/.test(fileName)) {
+        if (/^@angular[\\\/]cli[\\\/]blueprints/.test(fileName)) {
           return true;
         }
         if (/\.d\.ts$/.test(fileName)) {
@@ -153,7 +163,7 @@ Promise.resolve()
   })
   .then(() => glob(path.join(dist, '**/*.spec.*')))
   .then(specFiles => specFiles.filter(fileName => {
-    return !/[\\\/]angular-cli[\\\/]blueprints/.test(fileName);
+    return !/[\\\/]@angular[\\\/]cli[\\\/]blueprints/.test(fileName);
   }))
   .then(specFiles => {
     console.log(`Found ${specFiles.length} spec files...`);
@@ -164,7 +174,7 @@ Promise.resolve()
     const extraFiles = ['CHANGELOG.md', 'CONTRIBUTING.md', 'README.md'];
     return Promise.all(extraFiles.map(fileName => {
       console.log(`Copying ${fileName}...`);
-      return copy(fileName, path.join('dist/angular-cli', fileName));
+      return copy(fileName, path.join('dist/@angular/cli', fileName));
     }));
   })
   .then(() => {

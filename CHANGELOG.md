@@ -1,5 +1,5 @@
-<a name="1.0.0-beta.27"></a>
-# [1.0.0-beta.27](https://github.com/angular/angular-cli/compare/v1.0.0-beta.26...v1.0.0-beta.27) (2017-02-01)
+<a name="1.0.0-beta.28"></a>
+# [1.0.0-beta.28](https://github.com/angular/angular-cli/compare/v1.0.0-beta.26...v1.0.0-beta.28) (2017-02-01)
 
 
 ### Bug Fixes
