@@ -11,7 +11,8 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
   return {
     plugins: [
       new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('production')
+        'process.env.NODE_ENV': JSON.stringify('production'),
+        'process.env.BUILD_VERSION': JSON.stringify(Date.now())
       }),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8: true },
