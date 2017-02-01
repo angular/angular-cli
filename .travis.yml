@@ -20,9 +20,6 @@ matrix:
     - node_js: "6"
       os: linux
       env: SCRIPT=build
-    - node_js: "4"
-      os: linux
-      env: NODE_SCRIPT=tests/run_e2e.js
     - node_js: "6"
       os: linux
       env: SCRIPT=test
