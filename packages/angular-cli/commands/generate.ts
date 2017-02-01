@@ -2,9 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
+import { blueprints } from './generate.options';
+
 const chalk = require('chalk');
 const EmberGenerateCommand = require('../ember-cli/lib/commands/generate');
-const Blueprint = require('../ember-cli/lib/models/blueprint');
 const SilentError = require('silent-error');
 
 
@@ -31,17 +32,7 @@ const GenerateCommand = EmberGenerateCommand.extend({
 
     // Override default help to hide ember blueprints
     EmberGenerateCommand.prototype.printDetailedHelp = function() {
-      const blueprintList = fs.readdirSync(path.join(__dirname, '..', 'blueprints'));
-      const blueprints = blueprintList
-        .filter(bp => bp.indexOf('-test') === -1)
-        .filter(bp => bp !== 'ng2')
-        .map(bp => Blueprint.load(path.join(__dirname, '..', 'blueprints', bp)));
-
-      let output = '';
-      blueprints
-        .forEach(function (bp) {
-          output += bp.printBasicHelp(false) + os.EOL;
-        });
+      let output = blueprints.map(bp => bp.printBasicHelp(false)).join(os.EOL);
       this.ui.writeLine(chalk.cyan('  Available blueprints'));
       this.ui.writeLine(output);
     };
