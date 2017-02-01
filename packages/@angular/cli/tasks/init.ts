@@ -2,6 +2,8 @@ import * as chalk from 'chalk';
 import LinkCli from '../tasks/link-cli';
 import NpmInstall from '../tasks/npm-install';
 import { validateProjectName } from '../utilities/validate-project-name';
+import {checkYarnOrCNPM} from '../utilities/check-package-manager';
+import {CliConfig} from '../models/config';
 
 const Task = require('../ember-cli/lib/models/task');
 const Promise = require('../ember-cli/lib/ext/promise');
@@ -13,7 +15,7 @@ const GitInit = require('../tasks/git-init');
 export default Task.extend({
   run: function (commandOptions: any, rawArgs: string[]) {
     if (commandOptions.dryRun) {
-      commandOptions.skipNpm = true;
+      commandOptions.skipInstall = true;
     }
 
     const installBlueprint = new this.tasks.InstallBlueprint({
@@ -32,10 +34,12 @@ export default Task.extend({
     }
 
     let npmInstall: any;
-    if (!commandOptions.skipNpm) {
+    if (!commandOptions.skipInstall) {
+      const packageManager = CliConfig.fromGlobal().get('packageManager');
       npmInstall = new NpmInstall({
         ui: this.ui,
-        project: this.project
+        project: this.project,
+        packageManager
       });
     }
 
@@ -87,7 +91,7 @@ export default Task.extend({
         }
       })
       .then(function () {
-        if (!commandOptions.skipNpm) {
+        if (!commandOptions.skipInstall) {
           return npmInstall.run();
         }
       })
@@ -96,6 +100,7 @@ export default Task.extend({
           return linkCli.run();
         }
       })
+      .then(checkYarnOrCNPM)
       .then(() => {
         this.ui.writeLine(chalk.green(`Project '${packageName}' successfully created.`));
       });

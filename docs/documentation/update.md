@@ -10,7 +10,7 @@ Initialization is done in-place, meaning that the generated application is initi
 ## Options
 `--dry-run` (`-d`) run through without making any changes
 
-`--skip-npm` (`-sn`) skip installing npm packages
+`--skip-install` (`-si`) skip installing packages
 
 `--skip-git` (`-sg`) skip initializing a git repository
 

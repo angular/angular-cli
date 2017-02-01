@@ -292,6 +292,11 @@
       },
       "additionalProperties": false
     },
+    "packageManager": {
+        "enum": [ "npm", "cnpm", "yarn", "default" ],
+        "default": "default",
+        "type": "string"
+    },
     "warnings": {
       "description": "Allow people to disable console warnings.",
       "type": "object",
