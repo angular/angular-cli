@@ -28,6 +28,10 @@ const NewCommand = Command.extend({
   description: `Creates a new directory and runs ${chalk.green('ng init')} in it.`,
   works: 'outsideProject',
 
+  anonymousOptions: [
+    '<project-name>'
+  ],
+
   availableOptions: [
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
@@ -46,6 +50,12 @@ const NewCommand = Command.extend({
   ],
 
   run: function (commandOptions: any, rawArgs: string[]) {
+    if (rawArgs.length != 1) {
+      throw new SilentError(oneLine`
+        The ${this.name} command expected 1 arguments, received ${rawArgs.length}.
+      `);
+    }
+
     const packageName = rawArgs.shift();
 
     if (!packageName) {

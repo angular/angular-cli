@@ -1,5 +1,6 @@
 'use strict';
 
+var oneLine             = require('common-tags').oneLine;
 var nopt                = require('nopt');
 var chalk               = require('chalk');
 var path                = require('path');
@@ -124,6 +125,13 @@ Command.prototype.validateAndRun = function(args) {
     if (!this.project.hasDependencies()) {
       throw new SilentError('node_modules appears empty, you may need to run `npm install`');
     }
+  }
+
+  if (commandOptions.args.length > this.anonymousOptions.length) {
+    throw new SilentError(oneLine`
+        The ${this.name} command expected at most ${this.anonymousOptions.length} arguments, 
+        received ${commandOptions.args.length}.
+      `);
   }
 
   return Watcher.detectWatcher(this.ui, commandOptions.options).then(function(options) {

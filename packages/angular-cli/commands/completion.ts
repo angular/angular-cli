@@ -7,7 +7,7 @@ const CompletionCommand = Command.extend({
   name: 'completion',
   description: 'Adds autocomplete functionality to `ng` commands and subcommands',
   works: 'everywhere',
-  run: function() {
+  run: function(options: any, rawArgs: any[]) {
     const scriptPath = path.resolve(__dirname, '..', 'utilities', 'completion.sh');
     const scriptOutput = fs.readFileSync(scriptPath, 'utf8');
 
