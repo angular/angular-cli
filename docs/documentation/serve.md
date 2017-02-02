@@ -16,13 +16,7 @@
 
 `--live-reload` (`-lr`) flag to turn off live reloading
 
-`--live-reload-host` (`-lrh`) specify the host for live reloading
-
-`--live-reload-base-url` (`-lrbu`) specify the base URL for live reloading
-
-`--live-reload-port` (`-lrp`) port for live reloading
-
-`--live-reload-live-css` flag to live reload CSS
+`--live-reload-client` specify the URL that the live reload browser client will use
 
 `--ssl` flag to turn on SSL
 
