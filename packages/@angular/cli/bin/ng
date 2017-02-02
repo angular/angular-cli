@@ -107,7 +107,7 @@ resolve('@angular/cli', { basedir: process.cwd() },
 
       try {
         localVersion = _fromPackageJson();
-        shouldWarn = localVersion && globalVersion.compare(localVersion) < 0;
+        shouldWarn = localVersion && globalVersion.compare(localVersion) > 0;
       } catch (e) {
         console.error(e);
         shouldWarn = true;
