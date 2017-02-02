@@ -1,20 +1,16 @@
-import * as denodeify from 'denodeify';
 import { BuildOptions } from '../models/build-options';
 import { baseBuildCommandOptions } from './build';
 import { CliConfig } from '../models/config';
 import { Version } from '../upgrade/version';
 import { ServeTaskOptions } from './serve';
+import { checkPort } from '../utilities/check-port';
 import { overrideOptions } from '../utilities/override-options';
 
-const SilentError = require('silent-error');
-const PortFinder = require('portfinder');
 const Command = require('../ember-cli/lib/models/command');
-const getPort = denodeify<{ host: string, port: number }, number>(PortFinder.getPort);
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const defaultPort = process.env.PORT || config.get('defaults.serve.port');
 const defaultHost = config.get('defaults.serve.host');
-PortFinder.basePort = defaultPort;
 
 export interface ServeTaskOptions extends BuildOptions {
   port?: number;
@@ -79,34 +75,18 @@ const ServeCommand = Command.extend({
     const ServeTask = require('../tasks/serve').default;
 
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
+    return checkPort(commandOptions.port, commandOptions.host, defaultPort)
+      .then(port => {
+        commandOptions.port = port;
 
-    return checkExpressPort(commandOptions)
-      .then((opts: ServeTaskOptions) => {
         const serve = new ServeTask({
           ui: this.ui,
           project: this.project,
         });
 
-        return serve.run(opts);
+        return serve.run(commandOptions);
       });
   }
 });
-
-function checkExpressPort(commandOptions: ServeTaskOptions) {
-  return getPort({ port: commandOptions.port, host: commandOptions.host })
-    .then((foundPort: number) => {
-
-      if (commandOptions.port !== foundPort && commandOptions.port !== 0) {
-        throw new SilentError(
-          `Port ${commandOptions.port} is already in use. Use '--port' to specify a different port.`
-        );
-      }
-
-      // otherwise, our found port is good
-      commandOptions.port = foundPort;
-      return commandOptions;
-
-    });
-}
 
 export default ServeCommand;

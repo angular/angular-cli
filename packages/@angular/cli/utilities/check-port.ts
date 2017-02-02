@@ -2,14 +2,12 @@ import * as denodeify from 'denodeify';
 
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
-const getPort = <any>denodeify(PortFinder.getPort);
+const getPort = denodeify<{host: string, port: number}, number>(PortFinder.getPort);
 
-PortFinder.basePort = 49152;
-
-
-export function checkPort(port: number, host: string) {
+export function checkPort(port: number, host: string, basePort = 49152): Promise<number> {
+  PortFinder.basePort = basePort;
   return getPort({ port, host })
-    .then((foundPort: number) => {
+    .then(foundPort => {
 
       // If the port isn't available and we weren't looking for any port, throw error.
       if (port !== foundPort && port !== 0) {
