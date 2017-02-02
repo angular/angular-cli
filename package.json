@@ -1,8 +1,8 @@
 {
-  "name": "angular-cli",
-  "version": "1.0.0-beta.28.3",
+  "name": "@angular/cli",
+  "version": "1.0.0-beta.29",
   "description": "CLI tool for Angular",
-  "main": "packages/angular-cli/lib/cli/index.js",
+  "main": "packages/@angular/cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
   "bin": {
     "ng": "./bin/ng"
@@ -112,7 +112,7 @@
   },
   "ember-addon": {
     "paths": [
-      "./packages/angular-cli/lib/addon"
+      "./packages/@angular/cli/lib/addon"
     ]
   },
   "devDependencies": {

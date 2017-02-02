@@ -5,7 +5,7 @@ const tmp = require('../helpers/tmp');
 const fs = require('fs-extra');
 const existsSync = require('exists-sync');
 const expect = require('chai').expect;
-const Promise = require('angular-cli/ember-cli/lib/ext/promise');
+const Promise = require('@angular/cli/ember-cli/lib/ext/promise');
 const path = require('path');
 const root = process.cwd();
 

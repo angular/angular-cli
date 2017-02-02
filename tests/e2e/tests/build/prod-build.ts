@@ -16,7 +16,7 @@ export default function() {
     // Defaults to AoT
     .then(() => {
       const main = readdirSync('./dist').find(name => !!name.match(/main.[a-z0-9]+\.bundle\.js/));
-      expectFileToMatch(`dist/${main}`, /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//);
+      expectFileToMatch(`dist/${main}`, /bootstrapModuleFactory\(/);
     })
     // Check that the process didn't change local files.
     .then(() => expectGitToBeClean());

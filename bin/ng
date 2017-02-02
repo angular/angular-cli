@@ -2,7 +2,7 @@
 'use strict';
 
 // Provide a title to the process in `ps`
-process.title = 'angular-cli';
+process.title = '@angular/cli';
 
 require('../lib/bootstrap-local');
-require('../packages/angular-cli/bin/ng');
+require('../packages/@angular/cli/bin/ng');

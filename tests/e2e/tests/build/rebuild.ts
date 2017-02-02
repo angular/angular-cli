@@ -17,11 +17,14 @@ export default function() {
   let oldNumberOfChunks = 0;
   const chunkRegExp = /chunk\s+\{/g;
 
-  return silentExecAndWaitForOutputToMatch('ng', ['serve'], /webpack: bundle is now VALID/)
+  return silentExecAndWaitForOutputToMatch('ng', ['serve'],
+      /webpack: bundle is now VALID|webpack: Compiled successfully./)
     // Should trigger a rebuild.
     .then(() => exec('touch', 'src/main.ts'))
-    .then(() => waitForAnyProcessOutputToMatch(/webpack: bundle is now INVALID/, 1000))
-    .then(() => waitForAnyProcessOutputToMatch(/webpack: bundle is now VALID/, 5000))
+    .then(() => waitForAnyProcessOutputToMatch(
+        /webpack: bundle is now INVALID|webpack: Compiling.../, 1000))
+    .then(() => waitForAnyProcessOutputToMatch(
+        /webpack: bundle is now VALID|webpack: Compiled successfully./, 5000))
     // Count the bundles.
     .then(({ stdout }) => {
       oldNumberOfChunks = stdout.split(chunkRegExp).length;
@@ -57,8 +60,10 @@ export default function() {
       export class AppModule { }
     `))
     // Should trigger a rebuild with a new bundle.
-    .then(() => waitForAnyProcessOutputToMatch(/webpack: bundle is now INVALID/, 1000))
-    .then(() => waitForAnyProcessOutputToMatch(/webpack: bundle is now VALID/, 5000))
+    .then(() => waitForAnyProcessOutputToMatch(
+        /webpack: bundle is now INVALID|webpack: Compiling.../, 1000))
+    .then(() => waitForAnyProcessOutputToMatch(
+        /webpack: bundle is now VALID|webpack: Compiled successfully./, 5000))
     // Count the bundles.
     .then(({ stdout }) => {
       let newNumberOfChunks = stdout.split(chunkRegExp).length;
