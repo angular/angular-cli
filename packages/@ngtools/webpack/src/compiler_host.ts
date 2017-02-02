@@ -117,12 +117,15 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _resolve(path: string) {
     path = this._normalizePath(path);
     if (path[0] == '.') {
-      return join(this.getCurrentDirectory(), path);
+      path = join(this.getCurrentDirectory(), path);
     } else if (path[0] == '/' || path.match(/^\w:\//)) {
-      return path;
+      //return path;
     } else {
-      return join(this._basePath, path);
+      path = join(this._basePath, path);
     }
+    if( fs.existsSync(path) )         // FIX symlink duplication in npm linked modules (#3875)
+      path = fs.realpathSync(path);
+    return path;
   }
 
   private _setFileContent(fileName: string, content: string) {
