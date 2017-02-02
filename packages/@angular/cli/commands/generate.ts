@@ -21,7 +21,8 @@ const GenerateCommand = EmberGenerateCommand.extend({
 
     if (rawArgs[0] !== '--help' &&
       !fs.existsSync(path.join(__dirname, '..', 'blueprints', rawArgs[0]))) {
-      SilentError.debugOrThrow('@angular/cli/commands/generate', `Invalid blueprint: ${rawArgs[0]}`);
+      SilentError.debugOrThrow('@angular/cli/commands/generate',
+                               `Invalid blueprint: ${rawArgs[0]}`);
     }
 
     if (!rawArgs[1]) {
