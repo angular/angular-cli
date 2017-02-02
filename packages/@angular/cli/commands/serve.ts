@@ -10,23 +10,19 @@ import { overrideOptions } from '../utilities/override-options';
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
 const Command = require('../ember-cli/lib/models/command');
-const getPort = <any>denodeify(PortFinder.getPort);
-
-PortFinder.basePort = 49152;
+const getPort = denodeify<{ host: string, port: number }, number>(PortFinder.getPort);
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const defaultPort = process.env.PORT || config.get('defaults.serve.port');
 const defaultHost = config.get('defaults.serve.host');
+PortFinder.basePort = defaultPort;
 
 export interface ServeTaskOptions extends BuildOptions {
   port?: number;
   host?: string;
   proxyConfig?: string;
   liveReload?: boolean;
-  liveReloadHost?: string;
-  liveReloadPort?: number;
-  liveReloadBaseUrl?: string;
-  liveReloadLiveCss?: boolean;
+  liveReloadClient?: string;
   ssl?: boolean;
   sslKey?: string;
   sslCert?: string;
@@ -66,28 +62,9 @@ const ServeCommand = Command.extend({
     baseServeCommandOptions.concat([
       { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
       {
-        name: 'live-reload-host',
+        name: 'live-reload-client',
         type: String,
-        aliases: ['lrh'],
-        description: 'Defaults to host'
-      },
-      {
-        name: 'live-reload-base-url',
-        type: String,
-        aliases: ['lrbu'],
-        description: 'Defaults to baseURL'
-      },
-      {
-        name: 'live-reload-port',
-        type: Number,
-        aliases: ['lrp'],
-        description: '(Defaults to port number within [49152...65535])'
-      },
-      {
-        name: 'live-reload-live-css',
-        type: Boolean,
-        default: true,
-        description: 'Whether to live reload CSS (default true)'
+        description: 'specify the URL that the live reload browser client will use'
       },
       {
         name: 'hmr',
@@ -104,11 +81,8 @@ const ServeCommand = Command.extend({
     const ServeTask = require('../tasks/serve').default;
 
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
-    commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
 
-    return checkPort(commandOptions.port, commandOptions.host)
-      .then((port: number) => commandOptions.port = port)
-      .then(() => autoFindLiveReloadPort(commandOptions))
+    return checkExpressPort(commandOptions)
       .then((opts: ServeTaskOptions) => {
         const serve = new ServeTask({
           ui: this.ui,
@@ -132,28 +106,6 @@ function checkExpressPort(commandOptions: ServeTaskOptions) {
 
       // otherwise, our found port is good
       commandOptions.port = foundPort;
-      return commandOptions;
-
-    });
-}
-
-function autoFindLiveReloadPort(commandOptions: ServeTaskOptions) {
-  return getPort({ port: commandOptions.liveReloadPort, host: commandOptions.liveReloadHost })
-    .then((foundPort: number) => {
-
-      // if live reload port matches express port, try one higher
-      if (foundPort === commandOptions.port) {
-        commandOptions.liveReloadPort = foundPort + 1;
-        return autoFindLiveReloadPort(commandOptions);
-      }
-
-      // port was already open
-      if (foundPort === commandOptions.liveReloadPort) {
-        return commandOptions;
-      }
-
-      // use found port as live reload port
-      commandOptions.liveReloadPort = foundPort;
       return commandOptions;
 
     });
