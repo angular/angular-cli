@@ -60,7 +60,7 @@ with NPM 3 or higher.
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
-npm install -g angular-cli
+npm install -g @angular/cli
 ```
 
 ## Usage
@@ -430,15 +430,15 @@ To update `angular-cli` to a new version, you must update both the global packag
 
 Global package:
 ```bash
-npm uninstall -g angular-cli
+npm uninstall -g angular-cli or npm uninstall -g @angular/cli
 npm cache clean
-npm install -g angular-cli@latest
+npm install -g @angular/cli@latest
 ```
 
 Local project package:
 ```bash
 rm -rf node_modules dist # use rmdir on Windows
-npm install --save-dev angular-cli@latest
+npm install --save-dev @angular/cli@latest
 npm install
 ng update
 ```
