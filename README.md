@@ -61,6 +61,7 @@ with NPM 3 or higher.
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
 npm install -g angular-cli
+npm install -g ember-cli 
 ```
 
 ## Usage
