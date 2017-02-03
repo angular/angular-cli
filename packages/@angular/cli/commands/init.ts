@@ -2,7 +2,7 @@ const Command = require('../ember-cli/lib/models/command');
 
 const InitCommand: any = Command.extend({
   name: 'init',
-  description: 'Creates a new angular-cli project in the current folder.',
+  description: 'Creates a new Angular CLI project in the current folder.',
   aliases: ['u', 'update', 'i'],
   works: 'everywhere',
 
