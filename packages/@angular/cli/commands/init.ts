@@ -7,6 +7,7 @@ const InitCommand: any = Command.extend({
   works: 'everywhere',
 
   availableOptions: [
+    { name: 'compare-spaces', type: Boolean, default: false, aliases: ['cs'] },
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },

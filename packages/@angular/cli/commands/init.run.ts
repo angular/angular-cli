@@ -57,6 +57,7 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
   }
 
   const blueprintOpts = {
+    compareSpaces: commandOptions.compareSpaces,
     dryRun: commandOptions.dryRun,
     blueprint: 'ng2',
     rawName: packageName,

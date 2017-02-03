@@ -32,6 +32,20 @@ function diffHighlight(line) {
   }
 }
 
+function normalizeEOL(string) {
+  return string.replace(/\r\n/g, '\n');
+}
+
+function stringsAreEqual(x, y, ignoreSpace) {
+  var a = normalizeEOL(x), b = normalizeEOL(y);
+  if (ignoreSpace) {
+    var reg = /^[\t ]*(.+?)[\t ]*$/mg;
+    return a.replace(reg, '$1') === b.replace(reg, '$1');
+  } else {
+    return a === b;
+  }
+}
+
 FileInfo.prototype.confirmOverwrite = function(path) {
   var promptOptions = {
     type: 'expand',
@@ -63,7 +77,8 @@ FileInfo.prototype.displayDiff = function() {
     output: readFile(info.outputPath)
   }).then(function(result) {
     var diff = jsdiff.createPatch(
-      info.outputPath, result.output.toString(), result.input
+      info.outputPath, normalizeEOL(result.output.toString()), normalizeEOL(result.input),
+      undefined, undefined, {ignoreWhitespace: !info.compareSpaces}
     );
     var lines = diff.split('\n');
 
@@ -81,6 +96,7 @@ function FileInfo(options) {
   this.displayPath = options.displayPath;
   this.inputPath =  options.inputPath;
   this.templateVariables = options.templateVariables;
+  this.compareSpaces = options.compareSpaces;
   this.ui = options.ui;
 }
 
@@ -117,12 +133,13 @@ FileInfo.prototype.checkForConflict = function() {
       var result;
 
       if (doesExist) {
+        var ignoreSpace = !this.compareSpaces;
         result = Promise.hash({
           input: this.render(),
           output: readFile(this.outputPath)
         }).then(function(result) {
           var type;
-          if (result.input === result.output.toString()) {
+          if (stringsAreEqual(result.input, result.output.toString(), ignoreSpace)) {
             type = 'identical';
           } else {
             type = 'confirm';

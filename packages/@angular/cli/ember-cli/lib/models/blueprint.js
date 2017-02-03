@@ -673,6 +673,7 @@ Blueprint.prototype.buildFileInfo = function(destPath, templateVariables, file) 
     displayPath: path.normalize(mappedPath),
     inputPath: this.srcPath(file),
     templateVariables: templateVariables,
+    compareSpaces: this.options.compareSpaces,
     ui: this.ui
   });
 };
