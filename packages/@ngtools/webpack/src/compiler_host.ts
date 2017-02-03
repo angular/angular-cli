@@ -187,6 +187,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   invalidate(fileName: string): void {
+    fileName = this._resolve(fileName);
     if (fileName in this._files) {
       this._files[fileName] = null;
       this._changedFiles[fileName] = true;
