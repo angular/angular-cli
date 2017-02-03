@@ -12,7 +12,7 @@ const DestroyCommand = Command.extend({
   ],
 
   run: function() {
-    return Promise.reject(new SilentError('The destroy command is not supported by Angular-CLI.'));
+    return Promise.reject(new SilentError('The destroy command is not supported by Angular CLI.'));
   }
 });
 
