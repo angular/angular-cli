@@ -57,7 +57,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
       console.error(chalk.yellow(oneLine`
         The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
         are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
-        Please update in order to avoid errors in future versions of angular-cli.
+        Please update in order to avoid errors in future versions of Angular CLI.
       `));
     }
 
@@ -85,7 +85,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
       console.error(chalk.yellow(oneLine`
         The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
         are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
-        Please update in order to avoid errors in future versions of angular-cli.
+        Please update in order to avoid errors in future versions of Angular CLI.
       `));
     }
 

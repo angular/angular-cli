@@ -5,7 +5,7 @@ import * as chalk from 'chalk';
 
 const VersionCommand = Command.extend({
   name: 'version',
-  description: 'outputs angular-cli version',
+  description: 'outputs Angular CLI version',
   aliases: ['v', '--version', '-v'],
   works: 'everywhere',
 
