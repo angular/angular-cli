@@ -23,3 +23,29 @@ export interface ResolverPlugin extends Tapable {
   join(relativePath: string, innerRequest: Request): Request;
 }
 
+export interface LoaderCallback {
+  (err: Error | null, source?: string, sourceMap?: string): void;
+}
+
+export interface ModuleReason {
+  dependency: any;
+  module: NormalModule;
+}
+
+export interface NormalModule {
+  buildTimestamp: number;
+  built: boolean;
+  reasons: ModuleReason[];
+  resource: string;
+}
+
+export interface LoaderContext {
+  _module: NormalModule;
+
+  async(): LoaderCallback;
+  cacheable(): void;
+
+  readonly resourcePath: string;
+  readonly query: any;
+}
+

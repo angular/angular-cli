@@ -15,7 +15,7 @@ Provide tasks for common Docker workflows:
 
 1. Requires user to have Docker CLI tools installed.
    (See also: ["Implementation Approaches"](#implementation-approaches))
-1. User is free to use the Angular CLI without Docker (and vice versa). By default, do not generate Docker files upon creation of a new project (`ng new`, `ng init`).
+1. User is free to use the Angular CLI without Docker (and vice versa). By default, do not generate Docker files upon creation of a new project (`ng new`).
 1. Don't recreate the wheel. Docker CLI tools are very full featured on their own. Implement the common Docker use cases that make it convenient for Angular applications.
 1. Don't inhibit users from using the standalone Docker CLI tools for other use cases.
 1. Assumes 1:1 Dockerfile with the Angular project. Support for multiple services under the same project is outside the scope of this initial design.

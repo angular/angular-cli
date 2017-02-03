@@ -39,7 +39,7 @@ export default function () {
       app['assets'] = [];
     }))
     .then(() => expectToFail(() => ng('test', '--single-run'),
-      'Should fail because the assets to serve were not in the angular-cli config'))
+      'Should fail because the assets to serve were not in the Angular CLI config'))
     // Test passing condition (assets are included)
     .then(() => updateJsonFile('angular-cli.json', configJson => {
       const app = configJson['apps'][0];

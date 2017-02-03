@@ -15,8 +15,6 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 
 You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
 
-Linting during tests is also available via the `--lint` flag. See [Linting and formatting code](#linting-and-formatting-code) chapter for more informations.
-
 ## Options
 `--watch` (`-w`) flag to run builds when files change
 

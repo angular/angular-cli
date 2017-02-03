@@ -26,7 +26,8 @@ export function updateTsConfig(fn: (json: any) => any | void) {
 
 export function ngServe(...args: string[]) {
   return silentExecAndWaitForOutputToMatch('ng',
-    ['serve', '--no-progress', ...args], /webpack: bundle is now VALID/);
+    ['serve', '--no-progress', ...args],
+    /webpack: bundle is now VALID|webpack: Compiled successfully./);
 }
 
 

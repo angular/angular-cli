@@ -4,10 +4,10 @@ var ng = require('../helpers/ng');
 var expect = require('chai').expect;
 var walkSync = require('walk-sync');
 var glob = require('glob');
-var Blueprint = require('angular-cli/ember-cli/lib/models/blueprint');
+var Blueprint = require('@angular/cli/ember-cli/lib/models/blueprint');
 var path = require('path');
 var tmp = require('../helpers/tmp');
-var root = path.join(__dirname, '../../packages/angular-cli');
+var root = path.join(__dirname, '../../packages/@angular/cli');
 var util = require('util');
 var minimatch = require('minimatch');
 var intersect = require('lodash/intersection');
@@ -20,7 +20,7 @@ var existsSync = require('exists-sync');
 
 var defaultIgnoredFiles = Blueprint.ignoredFiles;
 
-describe('Acceptance: ng init', function () {
+describe('Acceptance: ng update', function () {
   this.timeout(20000);
 
   beforeEach(function () {
@@ -94,14 +94,14 @@ describe('Acceptance: ng init', function () {
     });
   }
 
-  it('ng init', function () {
+  it('ng init does the same as ng update', function () {
     return ng([
       'init',
       '--skip-npm'
     ]).then(confirmBlueprinted);
   });
 
-  it('ng init can run in created folder', function () {
+  it('ng update can run in created folder', function () {
     return tmp.setup('./tmp/foo')
       .then(function () {
         process.chdir('./tmp/foo');
@@ -176,7 +176,7 @@ describe('Acceptance: ng init', function () {
       .then(confirmBlueprinted);
   });
 
-  it('ng init --inline-template does not generate a template file', () => {
+  it('ng update --inline-template does not generate a template file', () => {
     return ng(['init', '--skip-npm', '--skip-git', '--inline-template'])
       .then(() => {
         const templateFile = path.join('src', 'app', 'app.component.html');
@@ -184,7 +184,7 @@ describe('Acceptance: ng init', function () {
       });
   });
 
-  it('ng init --inline-style does not gener a style file', () => {
+  it('ng update --inline-style does not gener a style file', () => {
     return ng(['init', '--skip-npm', '--skip-git', '--inline-style'])
       .then(() => {
         const styleFile = path.join('src', 'app', 'app.component.css');

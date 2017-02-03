@@ -69,11 +69,13 @@ export class WebpackResourceLoader implements ResourceLoader {
           });
 
           // Restore the parent compilation to the state like it was before the child compilation.
-          this._parentCompilation.assets[outputName] = assetsBeforeCompilation[outputName];
-          if (assetsBeforeCompilation[outputName] === undefined) {
-            // If it wasn't there - delete it.
-            delete this._parentCompilation.assets[outputName];
-          }
+          Object.keys(childCompilation.assets).forEach((fileName) => {
+            this._parentCompilation.assets[fileName] = assetsBeforeCompilation[fileName];
+            if (assetsBeforeCompilation[fileName] === undefined) {
+              // If it wasn't there - delete it.
+              delete this._parentCompilation.assets[fileName];
+            }
+          });
 
           resolve({
             // Hash of the template entry point.

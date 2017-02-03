@@ -1,7 +1,7 @@
 'use strict';
 
 var MockUI = require('./mock-ui');
-var Cli = require('angular-cli/lib/cli');
+var Cli = require('@angular/cli/lib/cli');
 
 module.exports = function ng(args) {
   var cli;
