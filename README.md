@@ -1,4 +1,4 @@
-## Angular-CLI
+## Angular CLI
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -59,7 +59,7 @@ with NPM 3 or higher.
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
-npm install -g angular-cli
+npm install -g @angular/cli
 ```
 
 ## Usage
@@ -292,7 +292,7 @@ You can add more global styles via the `apps[0].styles` property in `angular-cli
 
 ### CSS Preprocessor integration
 
-Angular-CLI supports all major CSS preprocessors:
+Angular CLI supports all major CSS preprocessors:
 - sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
 - less ([http://lesscss.org/](http://lesscss.org/))
 - stylus ([http://stylus-lang.com/](http://stylus-lang.com/))

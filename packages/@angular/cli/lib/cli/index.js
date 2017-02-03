@@ -15,7 +15,7 @@ Error.stackTraceLimit = Infinity;
 
 module.exports = function(options) {
 
-  // patch UI to not print Ember-CLI warnings (which don't apply to Angular-CLI)
+  // patch UI to not print Ember-CLI warnings (which don't apply to Angular CLI)
   UI.prototype.writeWarnLine = function () { }
 
   // patch Watcher to always default to node, not checking for Watchman
