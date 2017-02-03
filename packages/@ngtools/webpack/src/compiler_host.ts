@@ -119,12 +119,14 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     if (path[0] == '.') {
       path = join(this.getCurrentDirectory(), path);
     } else if (path[0] == '/' || path.match(/^\w:\//)) {
-      //return path;
+      // return path;
     } else {
       path = join(this._basePath, path);
     }
-    if( fs.existsSync(path) )         // FIX symlink duplication in npm linked modules (#3875)
+    // FIX symlink duplication in npm linked modules (#3875)
+    if (fs.existsSync(path)) {
       path = fs.realpathSync(path);
+    }
     return path;
   }
 
