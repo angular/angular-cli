@@ -61,7 +61,7 @@ const init = (config) => {
   config.webpack = Object.assign(webpackConfig, config.webpack);
   config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
 
-  // replace the angular-cli preprocessor with webpack+sourcemap
+  // replace the @angular/cli preprocessor with webpack+sourcemap
   Object.keys(config.preprocessors)
     .filter((file) => config.preprocessors[file].indexOf('@angular/cli') !== -1)
     .map((file) => config.preprocessors[file])

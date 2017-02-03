@@ -1,4 +1,4 @@
-## Angular-CLI
+## Angular CLI
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -52,14 +52,14 @@ with NPM 3 or higher.
 * [CSS preprocessor integration](#css-preprocessor-integration)
 * [3rd Party Library Installation](#3rd-party-library-installation)
 * [Global Library Installation](#global-library-installation)
-* [Updating angular-cli](#updating-angular-cli)
-* [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
+* [Updating Angular CLI](#updating-angular-cli)
+* [Development Hints for hacking on Angular CLI](#development-hints-for-hacking-on-angular-cli)
 
 ## Installation
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
-npm install -g angular-cli
+npm install -g @angular/cli
 ```
 
 ## Usage
@@ -292,7 +292,7 @@ You can add more global styles via the `apps[0].styles` property in `angular-cli
 
 ### CSS Preprocessor integration
 
-Angular-CLI supports all major CSS preprocessors:
+Angular CLI supports all major CSS preprocessors:
 - sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
 - less ([http://lesscss.org/](http://lesscss.org/))
 - stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
@@ -392,21 +392,21 @@ your app.
 
 <!-- DeleteSection2 End here -->
 
-### Updating angular-cli
+### Updating Angular CLI
 
-To update `angular-cli` to a new version, you must update both the global package and your project's local package.
+To update Angular CLI to a new version, you must update both the global package and your project's local package.
 
 Global package:
 ```bash
-npm uninstall -g angular-cli
+npm uninstall -g angular-cli @angular/cli
 npm cache clean
-npm install -g angular-cli@latest
+npm install -g @angular/cli@latest
 ```
 
 Local project package:
 ```bash
 rm -rf node_modules dist # use rmdir on Windows
-npm install --save-dev angular-cli@latest
+npm install --save-dev @angular/cli@latest
 npm install
 ng update
 ```
@@ -420,7 +420,7 @@ Carefully read the diffs for each code file, and either accept the changes or in
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
 
 
-## Development Hints for hacking on angular-cli
+## Development Hints for hacking on Angular CLI
 
 ### Working with master
 
@@ -432,25 +432,25 @@ npm link
 
 `npm link` is very similar to `npm install -g` except that instead of downloading the package
 from the repo, the just cloned `angular-cli/` folder becomes the global package.
-Any changes to the files in the `angular-cli/` folder will immediately affect the global `angular-cli` package,
+Any changes to the files in the `angular-cli/` folder will immediately affect the global `@angular/cli` package,
 allowing you to quickly test any changes you make to the cli project.
 
-Now you can use `angular-cli` via the command line:
+Now you can use `@angular/cli` via the command line:
 
 ```bash
 ng new foo
 cd foo
-npm link angular-cli
+npm link @angular/cli
 ng serve
 ```
 
-`npm link angular-cli` is needed because by default the globally installed `angular-cli` just loads
-the local `angular-cli` from the project which was fetched remotely from npm.
-`npm link angular-cli` symlinks the global `angular-cli` package to the local `angular-cli` package.
+`npm link @angular/cli` is needed because by default the globally installed `@angular/cli` just loads
+the local `@angular/cli` from the project which was fetched remotely from npm.
+`npm link @angular/cli` symlinks the global `@angular/cli` package to the local `@angular/cli` package.
 Now the `angular-cli` you cloned before is in three places:
-The folder you cloned it into, npm's folder where it stores global packages and the `angular-cli` project you just created.
+The folder you cloned it into, npm's folder where it stores global packages and the Angular CLI project you just created.
 
-You can also use `ng new foo --link-cli` to automatically link the `angular-cli` package.
+You can also use `ng new foo --link-cli` to automatically link the `@angular/cli` package.
 
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
