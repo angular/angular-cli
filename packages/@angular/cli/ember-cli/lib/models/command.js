@@ -109,14 +109,14 @@ Command.prototype.validateAndRun = function(args) {
 
   if (this.works === 'insideProject' && !this.isWithinProject) {
     return Promise.reject(new SilentError(
-      'You have to be inside an angular-cli project in order to use ' +
+      'You have to be inside an Angular CLI project in order to use ' +
       'the ' + chalk.green(this.name) + ' command.'
     ));
   }
 
   if (this.works === 'outsideProject' && this.isWithinProject) {
     return Promise.reject(new SilentError(
-      'You cannot use the ' + chalk.green(this.name) + ' command inside an angular-cli project.'
+      'You cannot use the ' + chalk.green(this.name) + ' command inside an Angular CLI project.'
     ));
   }
 

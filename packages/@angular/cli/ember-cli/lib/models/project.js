@@ -106,7 +106,8 @@ Project.prototype.name = function() {
   @return {Boolean} Whether this is an Ember CLI project
  */
 Project.prototype.isEmberCLIProject = function() {
-  return (this.cli ? this.cli.npmPackage : 'ember-cli') in this.dependencies();
+  return 'angular-cli' in this.dependencies()
+      || '@angular/cli' in this.dependencies();
 };
 
 /**
