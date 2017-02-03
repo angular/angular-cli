@@ -8,4 +8,4 @@ export {
   confirmComponentExport,
   resolveComponentPath,
   applyChanges
-} from '@angular-cli/ast-tools';
+} from '../lib/ast-tools';

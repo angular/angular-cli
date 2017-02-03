@@ -2,7 +2,7 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
-import { BaseHrefWebpackPlugin } from '@angular-cli/base-href-webpack';
+import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { extraEntryParser, lazyChunksFilter, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 

@@ -10,4 +10,4 @@ export {
   addDeclarationToModule,
   addProviderToModule,
   addExportToModule
-} from '@angular-cli/ast-tools';
+} from '../lib/ast-tools';
