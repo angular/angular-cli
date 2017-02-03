@@ -60,6 +60,16 @@ describe('@ngtools/json-schema', () => {
       proto.a[1] = 'INVALID';
       expect(proto.a).toEqual(['v2', null, null, 'v3']);
     });
+
+    it('supports default values', () => {
+      const proto: any = Object.create(null);
+      const schema = new RootSchemaTreeNode(proto, {
+        value: valueJson,
+        schema: schemaJson
+      });
+
+      expect(schema.children['b'].get()).toEqual('default');
+    });
   });
 
 });
