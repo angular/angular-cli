@@ -1,3 +1,24 @@
+<a name="1.0.0-beta.30"></a>
+# [1.0.0-beta.30](https://github.com/angular/angular-cli/compare/v1.0.0-beta.28...v1.0.0-beta.30) (2017-02-03)
+
+
+### Bug Fixes
+
+* **@angular/cli:** Backwards warning that global CLI is greater version than local CLI [#4341](https://github.com/angular/angular-cli/issues/4341) ([cc2651c](https://github.com/angular/angular-cli/commit/cc2651c))
+* **@angular/cli:** properly check the project status ([#4381](https://github.com/angular/angular-cli/issues/4381)) ([1dd5399](https://github.com/angular/angular-cli/commit/1dd5399)), closes [#4379](https://github.com/angular/angular-cli/issues/4379)
+* **@ngtools/webpack:** change of CSS no longer breaks rebuild ([#4334](https://github.com/angular/angular-cli/issues/4334)) ([9afaa3a](https://github.com/angular/angular-cli/commit/9afaa3a)), closes [#4326](https://github.com/angular/angular-cli/issues/4326) [#4329](https://github.com/angular/angular-cli/issues/4329)
+* **@ngtools/webpack:** only diagnose each resource once ([#4374](https://github.com/angular/angular-cli/issues/4374)) ([b0c1551](https://github.com/angular/angular-cli/commit/b0c1551))
+* **@ngtools/webpack:** prevent emitting of sourcemaps ([#4221](https://github.com/angular/angular-cli/issues/4221)) ([a6b1bdd](https://github.com/angular/angular-cli/commit/a6b1bdd))
+
+
+<a name="1.0.0-beta.29"></a>
+# [1.0.0-beta.29](https://github.com/angular/angular-cli/compare/v1.0.0-beta.28...v1.0.0-beta.29) (2017-02-03)
+
+### Features
+
+* **@angular/cli:** move angular-cli to @angular/cli ([#4328](https://github.com/angular/angular-cli/issues/4328)) ([601f9b3](https://github.com/angular/angular-cli/commit/601f9b3))
+
+
 <a name="1.0.0-beta.28"></a>
 # [1.0.0-beta.28](https://github.com/angular/angular-cli/compare/v1.0.0-beta.26...v1.0.0-beta.28) (2017-02-01)
 
