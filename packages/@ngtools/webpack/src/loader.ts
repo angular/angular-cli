@@ -307,12 +307,14 @@ function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
  * Recursively calls diagnose on the plugins for all the reverse dependencies.
  * @private
  */
-function _diagnoseDeps(reasons: ModuleReason[], plugin: AotPlugin) {
+function _diagnoseDeps(reasons: ModuleReason[], plugin: AotPlugin, checked: Set<string>) {
   reasons
     .filter(reason => reason && reason.module && reason.module instanceof NormalModule)
+    .filter(reason => !checked.has(reason.module.resource))
     .forEach(reason => {
+      checked.add(reason.module.resource);
       plugin.diagnose(reason.module.resource);
-      _diagnoseDeps(reason.module.reasons, plugin);
+      _diagnoseDeps(reason.module.reasons, plugin, checked);
     });
 }
 
@@ -344,7 +346,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }) {
         if (plugin.typeCheck) {
           // Check all diagnostics from this and reverse dependencies also.
           if (!plugin.firstRun) {
-            _diagnoseDeps(this._module.reasons, plugin);
+            _diagnoseDeps(this._module.reasons, plugin, new Set<string>());
           }
           // We do this here because it will throw on error, resulting in rebuilding this file
           // the next time around if it changes.
