@@ -20,7 +20,6 @@ const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
  * require('source-map-loader')
  * require('sourcemap-istanbul-instrumenter-loader')
  *
- * require('remap-istanbul')
  */
 
 

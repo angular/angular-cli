@@ -70,7 +70,6 @@
     "portfinder": "1.0.9",
     "postcss-loader": "^0.9.1",
     "raw-loader": "^0.5.1",
-    "remap-istanbul": "^0.6.4",
     "resolve": "^1.1.7",
     "rimraf": "^2.5.3",
     "rsvp": "^3.0.17",
