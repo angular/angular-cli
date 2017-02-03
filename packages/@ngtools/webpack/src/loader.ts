@@ -84,7 +84,8 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
     });
 
   refactor.insertImport('platformBrowser', '@angular/platform-browser');
-  refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
+  refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath + '.ngfactory.ts');
+
 }
 
 export function removeModuleIdOnlyForTesting(refactor: TypeScriptFileRefactor) {
