@@ -5,4 +5,4 @@ export {
   InsertChange,
   RemoveChange,
   ReplaceChange
-} from '@angular-cli/ast-tools';
+} from '../lib/ast-tools';

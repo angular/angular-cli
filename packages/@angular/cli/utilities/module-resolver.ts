@@ -6,7 +6,7 @@ import * as dependentFilesUtils from './get-dependent-files';
 
 
 import {Change, ReplaceChange} from './change';
-import {NodeHost, Host} from '@angular-cli/ast-tools';
+import {NodeHost, Host} from '../lib/ast-tools';
 
 /**
  * Rewrites import module of dependent files when the file is moved.
