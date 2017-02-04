@@ -10,7 +10,6 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
-    - os: osx
     - node_js: "7"
     - env: NODE_SCRIPT="tests/run_e2e.js --nightly"
   include:
@@ -26,14 +25,8 @@ matrix:
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT=tests/run_e2e.js
-    - node_js: "6"
-      os: osx
-      env: NODE_SCRIPT=tests/run_e2e.js
 
     # Optional builds.
-    - node_js: "6"
-      os: osx
-      env: SCRIPT=test
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT="tests/run_e2e.js --nightly"
@@ -42,10 +35,6 @@ matrix:
       env: NODE_SCRIPT=tests/run_e2e.js
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome --force; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkdir ~/.config && echo "--no-sandbox" > ~/.config/chrome-flags.conf; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
