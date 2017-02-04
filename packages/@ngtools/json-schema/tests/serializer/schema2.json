@@ -8,6 +8,12 @@
       "items": {
         "enum": [ "v1", "v2", "v3" ]
       }
+    },
+    "b": {
+      "type": "array",
+      "items": {
+        "enum": [ 0, 1, "string", true, null ]
+      }
     }
   }
 }
