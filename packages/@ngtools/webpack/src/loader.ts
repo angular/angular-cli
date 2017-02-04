@@ -61,35 +61,57 @@ function _angularImportsFromNode(node: ts.ImportDeclaration, sourceFile: ts.Sour
 function _ctorParameterFromTypeReference(paramNode: ts.ParameterDeclaration,
                                          angularImports: string[],
                                          refactor: TypeScriptFileRefactor) {
-  if (paramNode.type.kind == ts.SyntaxKind.TypeReference) {
-    const type = paramNode.type as ts.TypeReferenceNode;
-    const decorators = refactor.findAstNodes(paramNode, ts.SyntaxKind.Decorator) as ts.Decorator[];
-    const decoratorStr = decorators
-      .map(decorator => {
-        const fnName =
-          (refactor.findFirstAstNode(decorator, ts.SyntaxKind.CallExpression) as ts.CallExpression)
-          .expression.getText(refactor.sourceFile);
+  let typeName = 'undefined';
 
-        if (angularImports.indexOf(fnName) === -1) {
-          return null;
+  if (paramNode.type) {
+    switch (paramNode.type.kind) {
+      case ts.SyntaxKind.TypeReference:
+        const type = paramNode.type as ts.TypeReferenceNode;
+        if (type.typeName) {
+          typeName = type.typeName.getText(refactor.sourceFile);
         } else {
-          return fnName;
+          typeName = type.getText(refactor.sourceFile);
         }
-      })
-      .filter(x => !!x)
-      .map(name => `{ type: ${name} }`)
-      .join(', ');
-
-    if (type.typeName.kind == ts.SyntaxKind.Identifier) {
-      const typeName = type.typeName as ts.Identifier;
-      if (decorators.length > 0) {
-        return `{ type: ${typeName.text}, decorators: [${decoratorStr}] }`;
-      }
-      return `{ type: ${typeName.text} }`;
+        break;
+      case ts.SyntaxKind.AnyKeyword:
+        typeName = 'undefined';
+        break;
+      default:
+        typeName = 'null';
     }
   }
 
-  return 'null';
+  const decorators = refactor.findAstNodes(paramNode, ts.SyntaxKind.Decorator) as ts.Decorator[];
+  const decoratorStr = decorators
+    .map(decorator => {
+      const call =
+        refactor.findFirstAstNode(decorator, ts.SyntaxKind.CallExpression) as ts.CallExpression;
+
+      if (!call) {
+        return null;
+      }
+
+      const fnName = call.expression.getText(refactor.sourceFile);
+      const args = call.arguments.map(x => x.getText(refactor.sourceFile)).join(', ');
+      if (angularImports.indexOf(fnName) === -1) {
+        return null;
+      } else {
+        return [fnName, args];
+      }
+    })
+    .filter(x => !!x)
+    .map(([name, args]: string[]) => {
+      if (args) {
+        return `{ type: ${name}, args: [${args}] }`;
+      }
+      return `{ type: ${name} }`;
+    })
+    .join(', ');
+
+  if (decorators.length > 0) {
+    return `{ type: ${typeName}, decorators: [${decoratorStr}] }`;
+  }
+  return `{ type: ${typeName} }`;
 }
 
 
@@ -106,12 +128,7 @@ function _addCtorParameters(classNode: ts.ClassDeclaration,
   }
 
   const params = Array.from(ctor.parameters).map(paramNode => {
-    switch (paramNode.type.kind) {
-      case ts.SyntaxKind.TypeReference:
-        return _ctorParameterFromTypeReference(paramNode, angularImports, refactor);
-      default:
-        return 'null';
-    }
+    return _ctorParameterFromTypeReference(paramNode, angularImports, refactor);
   });
 
   const ctorParametersDecl = `static ctorParameters() { return [ ${params.join(', ')} ]; }`;
