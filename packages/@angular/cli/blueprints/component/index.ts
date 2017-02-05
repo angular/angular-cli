@@ -1,3 +1,5 @@
+import {NodeHost} from '../../lib/ast-tools';
+
 const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
@@ -7,7 +9,6 @@ const findParentModule = require('../../utilities/find-parent-module').default;
 const getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
-const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 
 export default Blueprint.extend({
   description: '',

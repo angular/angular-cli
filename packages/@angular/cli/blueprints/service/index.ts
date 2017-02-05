@@ -1,3 +1,4 @@
+import {NodeHost} from '../../lib/ast-tools';
 import { oneLine } from 'common-tags';
 
 const path = require('path');
@@ -5,7 +6,6 @@ const fs = require('fs');
 const chalk = require('chalk');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
-const NodeHost = require('@angular-cli/ast-tools').NodeHost;
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const getFiles = Blueprint.prototype.files;
