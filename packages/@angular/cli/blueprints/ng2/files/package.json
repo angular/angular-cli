@@ -7,6 +7,7 @@
     "ng": "ng",
     "start": "ng serve",
     "test": "ng test",
+    "lint": "ng lint",
     "pree2e": "webdriver-manager update --standalone false --gecko false",
     "e2e": "protractor"
   },

@@ -181,18 +181,46 @@
         "type": "object",
         "properties": {
           "files": {
-            "type": "string"
+            "description": "File glob(s) to lint.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "default": []
           },
           "project": {
+            "description": "Location of the tsconfig.json project file. Will also use as files to lint if 'files' property not present.",
             "type": "string"
           },
           "tslintConfig": {
+            "description": "Location of the tslint.json configuration.",
             "type": "string",
             "default": "tslint.json"
+          },
+          "exclude": {
+            "description": "File glob(s) to ignore.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "default": []
           }
         },
         "required": [
-          "files",
           "project"
         ],
         "additionalProperties": false
