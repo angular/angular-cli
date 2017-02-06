@@ -10,7 +10,7 @@ as an example, but you should be able to adjust these instructions to other setu
 Note for Windows users: we show unix commands here like `cp -r` to copy and `rm -rf` to delete files.
 Windows does not have these commands so use Explorer instead.
 
-Start with preparing your existing project folder, let's call it `awesome-app`.
+Start with preparing your existing project folder. We'll refer to it as `awesome-app`.
 - commit and push your existing changes.
 - clean your folder from temporary files and ignored files using `git clean -fdx`.
 - rename your project folder to `old-awesome-app`.
@@ -24,18 +24,18 @@ Now make a new project on the same parent folder as `old-awesome-app` using Angu
 
 Copy over your app files.
 - Remove the existing app: `rm -rf src/app src/styles.css src/index.html e2e`.
-- Copy `src/app/`, `src/index.html`, `src/styles.css` and `e2e/`.
+- Copy `src/app/`, `src/index.html`, `src/styles.css` and `e2e/` from your old app.
 If you don't have a `src/` folder then these files and folders should be
 at the root of the old project instead.
 ```
-cp -r ../old-awesome-project/src/app ./src/app
-cp ../old-awesome-project/src/index.html ./src/index.html
-cp ../old-awesome-project/src/styles.css ./src/styles.css
-cp -r ../old-awesome-project/e2e ./e2e/
+cp -r ../old-awesome-app/src/app ./src/app
+cp ../old-awesome-app/src/index.html ./src/index.html
+cp ../old-awesome-app/src/styles.css ./src/styles.css
+cp -r ../old-awesome-app/e2e ./e2e/
 ```
-- Don't copy `../old-awesome-project/src/main.ts`. Instead compare it to the new `./src/main.ts`
+- Don't copy `../old-awesome-app/src/main.ts`. Instead compare it to the new `./src/main.ts`
 and manually copy any extra code the old one has.
-- Compare `../old-awesome-project/package.json` to the new `./package.json` and add in your
+- Compare `../old-awesome-app/package.json` to the new `./package.json` and add in your
 third party libraries and `@types/*` packages, project descriptions and any other fields.
 - Run `npm install` to install any packages you added.
 - Copy over any other files your app needs like images into `src/assets`.
@@ -53,10 +53,10 @@ relative paths instead.
   - Do the same for any remaining script tags as well, using the `scripts` array instead.
 
 The final step is to copy your git history so you can continue working without losing anything:
-- Copy over the git folder: `cp -r ../old-awesome-project/.git .git`
+- Copy over the git folder: `cp -r ../old-awesome-app/.git .git`
 - Commit and push your changes as normal.
 
-You can now delete `../old-existing-project`, and you're done!
+You can now delete `../old-awesome-app`, and you're done!
 
 The CLI runs static analysis on your code to ensure it's AOT ready, so you might run into a few
 new compilation errors that weren't there before.

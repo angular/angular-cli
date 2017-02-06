@@ -11,22 +11,22 @@ Moving out of the CLI is very similar to [Moving into the CLI](moving-into-the-c
 You'll have to make a brand new project using your new project seed, move your app files and
 cater to any changes in the build process.
 
-Start with preparing your existing project folder, let's call it `awesome-app`.
+Start with preparing your existing project folder. We'll refer to it as `awesome-app`.
 - commit and push your existing changes.
 - clean your folder from temporary files and ignored files using `git clean -fdx`.
 - rename your project folder to `old-awesome-app`.
 
-Now make a new project on the same folder as `old-awesome-app`.
+Now make a new project on the same parent folder as `old-awesome-app`.
 - Make a new app using your new project seed in a new `awesome-app` folder.
 - Move into the folder: `cd awesome-app`.
 
 Copy over your app files.
 - Locate `app/`, `styles.css` and the end-to-end test folder in your new project.
 - Replace them with the corresponding files from `../old-awesome-app`.
-- Don't copy `../old-awesome-project/src/main.ts`. It contains custom logic for the CLI
+- Don't copy `../old-awesome-app/src/main.ts`. It contains custom logic for the CLI
 `environments` feature. Instead compare code and take only what you need.
 - Do the same for `index.html`.
-- Compare `../old-awesome-project/package.json` to the new `./package.json` and add in your
+- Compare `../old-awesome-app/package.json` to the new `./package.json` and add in your
 third party libraries and `@types/*` packages, project descriptions and any other fields.
 - Run `npm install` to install any packages you added.
 - Copy over any other files your app needs like images, icons, etc.
@@ -40,10 +40,10 @@ project.
 and `styles` array. Check import these in your new project and add them accordingly.
 
 The final step is to copy your git history so you can continue working without losing anything:
-- Copy over the git folder: `cp -r ../old-awesome-project/.git .git`
+- Copy over the git folder: `cp -r ../old-awesome-app/.git .git`
 - Commit and push your changes as normal.
 
-You can now delete `../old-existing-project`, and you're done!
+You can now delete `../old-awesome-app`, and you're done!
 
 Every project seed does things slightly different so if you are running into problems be sure
 to ask in their issue tracker.
