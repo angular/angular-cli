@@ -1,7 +1,7 @@
 # Moving your project to Angular CLI
 
-It's easy to move your existing project to use Angular CLI.
-The most straightforward way is to to make a new CLI project and copy over your app files.
+The easiest way to move an existing project to Angular CLI is to copy your
+application files into a new, empty CLI project.
 
 Let's see how to do it step by step.
 Here we use a project made with the [official QuickStart](https://github.com/angular/quickstart)
@@ -15,8 +15,8 @@ Start with preparing your existing project folder, let's call it `awesome-app`.
 - clean your folder from temporary files and ignored files using `git clean -fdx`.
 - rename your project folder to `old-awesome-app`.
 
-Now make a new project on the same folder as `old-awesome-app` using Angular CLI.
-- Read up on [Angular CLI prerequisites](https://github.com/angular/angular-cli#prerequisites).
+Now make a new project on the same parent folder as `old-awesome-app` using Angular CLI.
+- Verify you have the [Angular CLI prerequisites](https://github.com/angular/angular-cli#prerequisites).
 - Install the CLI globally: `npm install -g @angular/cli`.
 - Make a new app: `ng new awesome-app`.
 - Move into the folder: `cd awesome-app`.
@@ -38,7 +38,8 @@ and manually copy any extra code the old one has.
 - Compare `../old-awesome-project/package.json` to the new `./package.json` and add in your
 third party libraries and `@types/*` packages, project descriptions and any other fields.
 - Run `npm install` to install any packages you added.
-- Copy over any other files your app needs like images, icons, etc.
+- Copy over any other files your app needs like images into `src/assets`.
+Adjust paths on your app to use this folder e.g. `<img src='assets/my-image.jpg>`.
 
 There are a few adjustments you need to do to use the CLI build system.
 - Change any absolute paths you have for `templateUrl`, `styleUrls` or lazy loaded NgModules to
