@@ -1,10 +1,10 @@
 import * as chalk from 'chalk';
 import LinkCli from '../tasks/link-cli';
 import NpmInstall from '../tasks/npm-install';
+import { validateProjectName } from '../utilities/validate-project-name';
 
 const Promise = require('../ember-cli/lib/ext/promise');
 const SilentError = require('silent-error');
-const validProjectName = require('../ember-cli/lib/utilities/valid-project-name');
 const normalizeBlueprint = require('../ember-cli/lib/utilities/normalize-blueprint-option');
 const GitInit = require('../tasks/git-init');
 
@@ -73,10 +73,7 @@ export default function initRun(commandOptions: any, rawArgs: string[]) {
     skipTests: commandOptions.skipTests
   };
 
-  if (!validProjectName(packageName)) {
-    return Promise.reject(
-      new SilentError('We currently do not support a name of `' + packageName + '`.'));
-  }
+  validateProjectName(packageName);
 
   blueprintOpts.blueprint = normalizeBlueprint(blueprintOpts.blueprint);
 
