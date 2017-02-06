@@ -23,6 +23,10 @@ Now make a new project on the same parent folder as `old-awesome-app`.
 Copy over your app files.
 - Locate `app/`, `styles.css` and the end-to-end test folder in your new project.
 - Replace them with the corresponding files from `../old-awesome-app`.
+- If your styles are not in CSS, you'll need to convert them to CSS since the quickstart doesn't
+use style preprocessors. You can also add preprocessor support yourself.
+- Copy over the code your app needs from the `environments/` folder, if any.
+You'll have to find another way to switch environments on the Quickstart.
 - Don't copy `../old-awesome-app/src/main.ts`. It contains custom logic for the CLI
 `environments` feature. Instead compare code and take only what you need.
 - Do the same for `index.html`.
