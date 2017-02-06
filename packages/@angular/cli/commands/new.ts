@@ -1,27 +1,10 @@
 import * as chalk from 'chalk';
 import InitCommand from './init';
-import {oneLine, stripIndent} from 'common-tags';
+import { validateProjectName } from '../utilities/validate-project-name';
 
 const Command = require('../ember-cli/lib/models/command');
 const Project = require('../ember-cli/lib/models/project');
 const SilentError = require('silent-error');
-const validProjectName = require('../ember-cli/lib/utilities/valid-project-name');
-
-const packageNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[a-zA-Z][.0-9a-zA-Z]*)*$/;
-
-function getRegExpFailPosition(str: string) {
-  const parts = str.split('-');
-  const matched: string[] = [];
-
-  parts.forEach(part => {
-    if (part.match(packageNameRegexp)) {
-      matched.push(part);
-    }
-  });
-
-  const compare = matched.join('-');
-  return (str !== compare) ? compare.length : null;
-}
 
 const NewCommand = Command.extend({
   name: 'new',
@@ -53,34 +36,12 @@ const NewCommand = Command.extend({
         `The "ng ${this.name}" command requires a name argument to be specified. ` +
         `For more details, use "ng help".`));
     }
-    if (!packageName.match(packageNameRegexp)) {
-      const firstMessage = oneLine`
-        Project name "${packageName}" is not valid. New project names must
-        start with a letter, and must contain only alphanumeric characters or dashes.
-        When adding a dash the segment after the dash must start with a letter too.
-      `;
-      const msg = stripIndent`
-        ${firstMessage}
-        ${packageName}
-        ${Array(getRegExpFailPosition(packageName) + 1).join(' ') + '^'}
-      `;
-      return Promise.reject(new SilentError(msg));
-    }
+
+    validateProjectName(packageName);
 
     commandOptions.name = packageName;
     if (commandOptions.dryRun) {
       commandOptions.skipGit = true;
-    }
-
-    if (packageName === '.') {
-      return Promise.reject(new SilentError(
-        `Trying to generate an application structure in this directory? Use "ng init" ` +
-        `instead.`));
-    }
-
-    if (!validProjectName(packageName)) {
-      return Promise.reject(
-        new SilentError(`We currently do not support a name of "${packageName}".`));
     }
 
     if (!commandOptions.directory) {
