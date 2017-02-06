@@ -127,7 +127,7 @@ export class AotPlugin implements Tapable {
           // Two stars replacement.
           .replace(/\*\*/g, '(?:.*)')
           // One star replacement.
-          .replace(/\*/g, '(?:[^/]*)')
+          .replace(/\/\*/g, '(?:[^/]*)')
           // Escape characters from the basePath and make sure it's forward slashes.
           .replace(/^/, basePathPattern);
 
