@@ -40,7 +40,7 @@ project.
 and `styles` array. Check import these in your new project and add them accordingly.
 
 The final step is to copy your git history so you can continue working without losing anything:
-- Copy over the git folder: `cp ../old-awesome-project/.git .git`
+- Copy over the git folder: `cp -r ../old-awesome-project/.git .git`
 - Commit and push your changes as normal.
 
 You can now delete `../old-existing-project`, and you're done!

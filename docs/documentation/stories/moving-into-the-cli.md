@@ -7,7 +7,7 @@ Let's see how to do it step by step.
 Here we use a project made with the [official QuickStart](https://github.com/angular/quickstart)
 as an example, but you should be able to adjust these instructions to other setups.
 
-Note for Windows users: we show unix commands here like `cp` to copy and `rm -rf` to delete files.
+Note for Windows users: we show unix commands here like `cp -r` to copy and `rm -rf` to delete files.
 Windows does not have these commands so use Explorer instead.
 
 Start with preparing your existing project folder, let's call it `awesome-app`.
@@ -28,10 +28,10 @@ Copy over your app files.
 If you don't have a `src/` folder then these files and folders should be
 at the root of the old project instead.
 ```
-cp ../old-awesome-project/src/app ./src/app
+cp -r ../old-awesome-project/src/app ./src/app
 cp ../old-awesome-project/src/index.html ./src/index.html
 cp ../old-awesome-project/src/styles.css ./src/styles.css
-cp ../old-awesome-project/e2e ./e2e/
+cp -r ../old-awesome-project/e2e ./e2e/
 ```
 - Don't copy `../old-awesome-project/src/main.ts`. Instead compare it to the new `./src/main.ts`
 and manually copy any extra code the old one has.
@@ -52,7 +52,7 @@ relative paths instead.
   - Do the same for any remaining script tags as well, using the `scripts` array instead.
 
 The final step is to copy your git history so you can continue working without losing anything:
-- Copy over the git folder: `cp ../old-awesome-project/.git .git`
+- Copy over the git folder: `cp -r ../old-awesome-project/.git .git`
 - Commit and push your changes as normal.
 
 You can now delete `../old-existing-project`, and you're done!
