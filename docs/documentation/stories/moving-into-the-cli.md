@@ -1,6 +1,6 @@
-# Moving your project to Angular-CLI
+# Moving your project to Angular CLI
 
-It's easy to move your existing project to use Angular-CLI.
+It's easy to move your existing project to use Angular CLI.
 The most straightforward way is to to make a new CLI project and copy over your app files.
 
 Let's see how to do it step by step.
@@ -15,8 +15,8 @@ Start with preparing your existing project folder, let's call it `awesome-app`.
 - clean your folder from temporary files and ignored files using `git clean -fdx`.
 - rename your project folder to `old-awesome-app`.
 
-Now make a new project on the same folder as `old-awesome-app` using Angular-CLI.
-- Read up on [Angular-CLI prerequisites](https://github.com/angular/angular-cli#prerequisites).
+Now make a new project on the same folder as `old-awesome-app` using Angular CLI.
+- Read up on [Angular CLI prerequisites](https://github.com/angular/angular-cli#prerequisites).
 - Install the CLI globally: `npm install -g @angular/cli`.
 - Make a new app: `ng new awesome-app`.
 - Move into the folder: `cd awesome-app`.

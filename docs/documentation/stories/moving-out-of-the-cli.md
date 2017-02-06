@@ -1,9 +1,9 @@
-# Moving your project out of Angular-CLI
+# Moving your project out of Angular CLI
 
-Each project is unique, and even though we try to cater to most setups in Angular-CLI sometimes
+Each project is unique, and even though we try to cater to most setups in Angular CLI sometimes
 you need a custom setup.
 
-Even if you need to use a different build system, you can still use other Angular-CLI features
+Even if you need to use a different build system, you can still use other Angular CLI features
 like `ng generate`, `ng lint`, `ng test` and `ng e2e` by leaving in `angular-cli.json` and
 supporting files like `src/test.ts`.
 
