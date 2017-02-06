@@ -194,7 +194,8 @@ ng test
 
 Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false` or `--single-run`.
 
-You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
+You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory. 
+If you would like to exclude files in addition to the default see how to update your `karma.conf.js` [here](https://github.com/marcules/karma-remap-istanbul/issues/26).
 
 Linting during tests is also available via the `--lint` flag. See [Linting code](#linting-code) chapter for more information.
 
