@@ -56,7 +56,7 @@
     "ember-cli-string-utils": "^1.0.0",
     "enhanced-resolve": "^2.3.0",
     "exists-sync": "0.0.3",
-    "extract-text-webpack-plugin": "^2.0.0-rc.1",
+    "extract-text-webpack-plugin": "^2.0.0-rc.3",
     "file-loader": "^0.8.5",
     "findup": "0.1.5",
     "fs-extra": "^0.30.0",
