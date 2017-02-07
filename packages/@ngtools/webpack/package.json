@@ -36,7 +36,6 @@
     "@angular/core": "^2.3.1",
     "@angular/tsc-wrapped": "^0.5.0",
     "typescript": "^2.0.2",
-    "reflect-metadata": "^0.1.8",
     "webpack": "2.2.0"
   }
 }
