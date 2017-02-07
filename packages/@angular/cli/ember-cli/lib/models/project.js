@@ -8,7 +8,6 @@ var path               = require('path');
 var findup             = Promise.denodeify(require('findup'));
 var resolve            = Promise.denodeify(require('resolve'));
 var fs                 = require('fs');
-var existsSync         = require('exists-sync');
 var find               = require('lodash/find');
 var assign             = require('lodash/assign');
 var forOwn             = require('lodash/forOwn');
@@ -18,6 +17,16 @@ var Command            = require('../models/command');
 var UI                 = require('../ui');
 var nodeModulesPath    = require('node-modules-path');
 var getPackageBaseName = require('../utilities/get-package-base-name');
+
+function existsSync(path) {
+  try {
+    fs.accessSync(path);
+    return true;
+  }
+  catch (e) {
+    return false;
+  }
+}
 
 /**
   The Project model is tied to your package.json. It is instiantiated

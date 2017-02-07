@@ -4,7 +4,7 @@
 @module ember-cli
 */
 
-var existsSync   = require('exists-sync');
+var fs           = require('fs');
 var path         = require('path');
 var assign       = require('lodash/assign');
 var SilentError  = require('silent-error');
@@ -14,6 +14,15 @@ var CoreObject = require('../ext/core-object');
 
 var walkSync   = require('walk-sync');
 
+function existsSync(path) {
+  try {
+    fs.accessSync(path);
+    return true;
+  }
+  catch (e) {
+    return false;
+  }
+}
 
 
 /**

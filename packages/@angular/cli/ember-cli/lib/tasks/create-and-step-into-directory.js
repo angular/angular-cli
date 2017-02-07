@@ -5,10 +5,19 @@
 
 var Promise     = require('../ext/promise');
 var fs          = require('fs');
-var existsSync  = require('exists-sync');
 var mkdir       = Promise.denodeify(fs.mkdir);
 var Task        = require('../models/task');
 var SilentError = require('silent-error');
+
+function existsSync(path) {
+  try {
+    fs.accessSync(path);
+    return true;
+  }
+  catch (e) {
+    return false;
+  }
+}
 
 module.exports = Task.extend({
   // Options: String directoryName, Boolean: dryRun

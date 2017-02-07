@@ -3,7 +3,6 @@
 var Command     = require('../models/command');
 var SilentError = require('silent-error');
 var path        = require('path');
-var existsSync  = require('exists-sync');
 
 var defaultPort = 7357;
 
