@@ -22,7 +22,7 @@ export default function() {
     // Should trigger a rebuild.
     .then(() => exec('touch', 'src/main.ts'))
     .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now INVALID|webpack: Compiling.../, 1000))
+        /webpack: bundle is now INVALID|webpack: Compiling.../, 5000))
     .then(() => waitForAnyProcessOutputToMatch(
         /webpack: bundle is now VALID|webpack: Compiled successfully./, 5000))
     // Count the bundles.
@@ -61,7 +61,7 @@ export default function() {
     `))
     // Should trigger a rebuild with a new bundle.
     .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now INVALID|webpack: Compiling.../, 1000))
+        /webpack: bundle is now INVALID|webpack: Compiling.../, 5000))
     .then(() => waitForAnyProcessOutputToMatch(
         /webpack: bundle is now VALID|webpack: Compiled successfully./, 5000))
     // Count the bundles.
