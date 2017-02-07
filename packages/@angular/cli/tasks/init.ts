@@ -71,6 +71,7 @@ export default Task.extend({
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,
       ignoredUpdateFiles: ['favicon.ico'],
+      ng4: commandOptions.ng4,
       skipGit: commandOptions.skipGit,
       skipTests: commandOptions.skipTests
     };
