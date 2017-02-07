@@ -14,7 +14,9 @@
     "sourceRoot": "",
     "inlineSourceMap": true,
     "target": "es5",
-    "lib": ["es6"],
+    "lib": [
+      "es2016"
+    ],
     "baseUrl": "",
     "typeRoots": [
       "./node_modules/@types"
