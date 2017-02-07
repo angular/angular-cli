@@ -78,9 +78,9 @@ export interface HashFormat {
 export function getOutputHashFormat(option: string, length = 20): HashFormat {
   /* tslint:disable:max-line-length */
   const hashFormats: { [option: string]: HashFormat } = {
-    none:    { chunk: '',                       extract: '',                         file: ''                  },
+    none:    { chunk: '',                       extract: '',                         file: `.[hash:${length}]` },
     media:   { chunk: '',                       extract: '',                         file: `.[hash:${length}]` },
-    bundles: { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: ''                  },
+    bundles: { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: `.[hash:${length}]` },
     all:     { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: `.[hash:${length}]` },
   };
   /* tslint:enable:max-line-length */
