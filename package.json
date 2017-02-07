@@ -21,7 +21,7 @@
     "test:inspect": "node --inspect --debug-brk tests/runner",
     "test:packages": "node scripts/run-packages-spec.js",
     "eslint": "eslint .",
-    "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
+    "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/tests/**\" -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
     "lint": "npm-run-all -c eslint tslint"
   },
   "repository": {

@@ -53,12 +53,12 @@ describe('@ngtools/json-schema', () => {
       });
 
       expect(proto.a instanceof Array).toBe(true);
-      expect(proto.a).toEqual([null, 'v1', null, 'v3']);
+      expect(proto.a).toEqual([undefined, 'v1', undefined, 'v3']);
 
       // Set it to a string, which is valid.
       proto.a[0] = 'v2';
       proto.a[1] = 'INVALID';
-      expect(proto.a).toEqual(['v2', null, null, 'v3']);
+      expect(proto.a).toEqual(['v2', undefined, undefined, 'v3']);
     });
 
     it('supports default values', () => {

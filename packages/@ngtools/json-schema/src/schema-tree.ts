@@ -273,7 +273,7 @@ export class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: 
         const propertySchema = schema['properties'][name];
         this._children[name] = this._createChildProperty(
           name,
-          value ? value[name] : null,
+          value ? value[name] : undefined,
           forward ? (forward as ObjectSchemaTreeNode).children[name] : null,
           propertySchema);
       }
@@ -331,7 +331,7 @@ export class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array<any>> {
 
     // Keep the item's schema as a schema node. This is important to keep type information.
     this._itemPrototype = this._createChildProperty(
-      '', null, null, metaData.schema['items'], false);
+      '', undefined, null, metaData.schema['items'], false);
   }
 
   _set(value: any, init: boolean, force: boolean) {
@@ -398,7 +398,7 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
 
   constructor(metaData: TreeNodeConstructorArgument<T>) {
     super(metaData);
-    this._defined = !(metaData.value === undefined || metaData.value === null);
+    this._defined = metaData.value !== undefined;
     if ('default' in metaData.schema) {
       this._default = this.convert(metaData.schema['default']);
     }
@@ -463,8 +463,8 @@ class StringSchemaTreeNode extends LeafSchemaTreeNode<string> {
 }
 
 
-class EnumSchemaTreeNode extends StringSchemaTreeNode {
-  constructor(metaData: TreeNodeConstructorArgument<string>) {
+class EnumSchemaTreeNode extends LeafSchemaTreeNode<any> {
+  constructor(metaData: TreeNodeConstructorArgument<any>) {
     super(metaData);
 
     if (!Array.isArray(metaData.schema['enum'])) {
@@ -480,18 +480,24 @@ class EnumSchemaTreeNode extends StringSchemaTreeNode {
     return this._schema['enum'].some((v: string) => v === value);
   }
 
+  get items() { return this._schema['enum']; }
+
   isCompatible(v: any) {
-    return (typeof v == 'string' || v instanceof String) && this._isInEnum('' + v);
+    return this._isInEnum(v);
   }
   convert(v: any) {
     if (v === undefined) {
       return undefined;
     }
-    if (v === null || !this._isInEnum('' + v)) {
-      return null;
+    if (!this._isInEnum(v)) {
+      return undefined;
     }
-    return '' + v;
+    return v;
   }
+
+  get type() { return 'any'; }
+  get tsType(): null { return null; }
+  serialize(serializer: Serializer) { serializer.outputEnum(this); }
 }
 
 
