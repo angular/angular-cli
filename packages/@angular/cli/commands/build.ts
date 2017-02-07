@@ -15,7 +15,7 @@ export const BaseBuildCommandOptions: any = [
   { name: 'aot', type: Boolean },
   { name: 'sourcemap', type: Boolean, aliases: ['sm'] },
   { name: 'vendor-chunk', type: Boolean, default: true, aliases: ['vc'] },
-  { name: 'base-href', type: String, default: '/', aliases: ['bh'] },
+  { name: 'base-href', type: String, aliases: ['bh'] },
   { name: 'deploy-url', type: String, aliases: ['d'] },
   { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
   { name: 'progress', type: Boolean, default: true, aliases: ['pr'] },
