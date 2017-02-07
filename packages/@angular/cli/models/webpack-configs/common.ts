@@ -74,7 +74,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   // process environment file replacement
   if (appConfig.environments) {
     if (!('source' in appConfig.environmentSource)) {
-      throw new SilentError(`Environment configuration does not contain "environmentSource" entry.`);
+      throw new SilentError(`Environment configuration does not contain
+        "environmentSource" entry.`);
     }
     if (!(buildOptions.environment in appConfig.environments)) {
       throw new SilentError(`Environment "${buildOptions.environment}" does not exist.`);
