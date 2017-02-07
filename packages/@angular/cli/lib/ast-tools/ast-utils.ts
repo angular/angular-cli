@@ -1,10 +1,5 @@
 import * as ts from 'typescript';
 import * as fs from 'fs';
-import {Symbols} from '@angular/tsc-wrapped/src/symbols';
-import {
-  isMetadataImportedSymbolReferenceExpression,
-  isMetadataModuleReferenceExpression
-} from '@angular/tsc-wrapped';
 import {Change, InsertChange, NoopChange, MultiChange} from './change';
 import {findNodes} from './node';
 import {insertImport} from './route-utils';
@@ -105,9 +100,64 @@ export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): st
 }
 
 
+
+function _angularImportsFromNode(node: ts.ImportDeclaration,
+                                 sourceFile: ts.SourceFile): {[name: string]: string} {
+  const ms = node.moduleSpecifier;
+  let modulePath: string | null = null;
+  switch (ms.kind) {
+    case ts.SyntaxKind.StringLiteral:
+      modulePath = (ms as ts.StringLiteral).text;
+      break;
+    default:
+      return {};
+  }
+
+  if (!modulePath.startsWith('@angular/')) {
+    return {};
+  }
+
+  if (node.importClause) {
+    if (node.importClause.name) {
+      // This is of the form `import Name from 'path'`. Ignore.
+      return {};
+    } else if (node.importClause.namedBindings) {
+      const nb = node.importClause.namedBindings;
+      if (nb.kind == ts.SyntaxKind.NamespaceImport) {
+        // This is of the form `import * as name from 'path'`. Return `name.`.
+        return {
+          [(nb as ts.NamespaceImport).name.text + '.']: modulePath
+        };
+      } else {
+        // This is of the form `import {a,b,c} from 'path'`
+        const namedImports = nb as ts.NamedImports;
+
+        return namedImports.elements
+          .map((is: ts.ImportSpecifier) => is.propertyName ? is.propertyName.text : is.name.text)
+          .reduce((acc: {[name: string]: string}, curr: string) => {
+            acc[curr] = modulePath;
+            return acc;
+          }, {});
+      }
+    }
+  } else {
+    // This is of the form `import 'path';`. Nothing to do.
+    return {};
+  }
+}
+
+
 export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
                                      module: string): Observable<ts.Node> {
-  const symbols = new Symbols(source as any);
+  const angularImports: {[name: string]: string}
+    = findNodes(source, ts.SyntaxKind.ImportDeclaration)
+      .map((node: ts.ImportDeclaration) => _angularImportsFromNode(node, source))
+      .reduce((acc: {[name: string]: string}, current: {[name: string]: string}) => {
+        for (const key of Object.keys(current)) {
+          acc[key] = current[key];
+        }
+        return acc;
+      }, {});
 
   return getSourceNodes(source)
     .filter(node => {
@@ -118,10 +168,8 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
     .filter(expr => {
       if (expr.expression.kind == ts.SyntaxKind.Identifier) {
         const id = <ts.Identifier>expr.expression;
-        const metaData = symbols.resolve(id.getFullText(source));
-        if (isMetadataImportedSymbolReferenceExpression(metaData)) {
-          return metaData.name == identifier && metaData.module == module;
-        }
+        return id.getFullText(source) == identifier
+            && angularImports[id.getFullText(source)] === module;
       } else if (expr.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
         // This covers foo.NgModule when importing * as foo.
         const paExpr = <ts.PropertyAccessExpression>expr.expression;
@@ -130,12 +178,9 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
           return false;
         }
 
-        const id = paExpr.name;
-        const moduleId = <ts.Identifier>paExpr.expression;
-        const moduleMetaData = symbols.resolve(moduleId.getFullText(source));
-        if (isMetadataModuleReferenceExpression(moduleMetaData)) {
-          return moduleMetaData.module == module && id.getFullText(source) == identifier;
-        }
+        const id = paExpr.name.text;
+        const moduleId = (<ts.Identifier>paExpr.expression).getText(source);
+        return id === identifier && (angularImports[moduleId + '.'] === module);
       }
       return false;
     })
