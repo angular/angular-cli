@@ -131,6 +131,11 @@
             },
             "additionalProperties": false
           },
+          "environmentSource": {
+            "description": "Source file for environment config.",
+            "type": "string",
+            "additionalProperties": true
+          },
           "environments": {
             "description": "Name and corresponding file for environment config.",
             "type": "object",
