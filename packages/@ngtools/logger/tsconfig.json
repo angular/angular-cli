@@ -13,7 +13,7 @@
       "es2016",
       "dom"
     ],
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
     "sourceRoot": "/",
     "baseUrl": ".",

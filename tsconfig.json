@@ -13,7 +13,7 @@
     "sourceMap": true,
     "sourceRoot": "",
     "inlineSourceMap": true,
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "es2016"
     ],
@@ -27,8 +27,8 @@
     ],
     "paths": {
       "@angular/cli/*": [ "./packages/@angular/cli/*" ],
-      "@angular-cli/ast-tools": [ "./packages/ast-tools/src" ],
-      "@angular-cli/base-href-webpack": [ "./packages/base-href-webpack/src" ],
+      "@ngtools/json-schema": [ "./packages/json-schema/src" ],
+      "@ngtools/logger": [ "./packages/logger/src" ],
       "@ngtools/webpack": [ "./packages/webpack/src" ]
     }
   },
