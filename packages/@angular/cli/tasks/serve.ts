@@ -24,6 +24,9 @@ export default Task.extend({
     const appConfig = projectConfig.apps[0];
 
     const outputPath = serveTaskOptions.outputPath || appConfig.outDir;
+    if (this.project.root === outputPath) {
+      throw new SilentError ('Output path MUST not be project root directory!');
+    }
     rimraf.sync(path.resolve(this.project.root, outputPath));
 
     const serveDefaults = {
