@@ -15,7 +15,7 @@ export default function(skipCleaning: () => void) {
     .then(() => expectFileToExist('dist/0.app.main.js'))
     .then(() => expectFileToExist('dist/1.app.main.js'))
     .then(() => expectFileToExist('dist/2.app.main.js'))
-    .then(() => expectFileSizeToBeUnder('dist/app.main.js', 400000))
+    .then(() => expectFileSizeToBeUnder('dist/app.main.js', 410000))
     .then(() => expectFileSizeToBeUnder('dist/0.app.main.js', 40000))
 
     // Skip code generation and rebuild.
@@ -27,7 +27,7 @@ export default function(skipCleaning: () => void) {
     .then(() => expectFileToExist('dist/0.app.main.js'))
     .then(() => expectFileToExist('dist/1.app.main.js'))
     .then(() => expectFileToExist('dist/2.app.main.js'))
-    .then(() => expectToFail(() => expectFileSizeToBeUnder('dist/app.main.js', 400000)))
+    .then(() => expectToFail(() => expectFileSizeToBeUnder('dist/app.main.js', 410000)))
     .then(() => expectFileSizeToBeUnder('dist/0.app.main.js', 40000))
     .then(() => skipCleaning());
 }
