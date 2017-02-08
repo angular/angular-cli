@@ -1,5 +1,5 @@
 import { writeFile, writeMultipleFiles } from '../../utils/fs';
-import { runServeAndE2e } from '../test/e2e';
+import { ng } from '../../utils/process';
 
 
 export default function () {
@@ -15,7 +15,7 @@ export default function () {
       }],
       e2e: { protractor: { config: './protractor.conf.js' } }
     })))
-    .then(() => runServeAndE2e())
+    .then(() => ng('e2e'))
     .then(() => writeMultipleFiles({
       './src/script.js': `
         document.querySelector('app-root').innerHTML = '<h1>app works!</h1>';
@@ -40,5 +40,5 @@ export default function () {
         e2e: { protractor: { config: './protractor.conf.js' } }
       }),
     }))
-    .then(() => runServeAndE2e());
+    .then(() => ng('e2e'));
 }

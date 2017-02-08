@@ -4,7 +4,7 @@ import { Version } from '../upgrade/version';
 const Command = require('../ember-cli/lib/models/command');
 
 // defaults for BuildOptions
-export const BaseBuildCommandOptions: any = [
+export const baseBuildCommandOptions: any = [
   {
     name: 'target',
     type: String,
@@ -42,7 +42,7 @@ const BuildCommand = Command.extend({
   description: 'Builds your app and places it into the output path (dist/ by default).',
   aliases: ['b'],
 
-  availableOptions: BaseBuildCommandOptions.concat([
+  availableOptions: baseBuildCommandOptions.concat([
     { name: 'watch', type: Boolean, default: false, aliases: ['w'] }
   ]),
 
