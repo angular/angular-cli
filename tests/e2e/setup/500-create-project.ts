@@ -45,6 +45,9 @@ export default function() {
             .filter(name => name.match(/^@angular\//))
             .forEach(name => {
               const pkgName = name.split(/\//)[1];
+              if (pkgName == 'cli') {
+                return;
+              }
               json['dependencies'][`@angular/${pkgName}`]
                 = `github:angular/${pkgName}-builds${label}`;
             });
@@ -53,6 +56,9 @@ export default function() {
             .filter(name => name.match(/^@angular\//))
             .forEach(name => {
               const pkgName = name.split(/\//)[1];
+              if (pkgName == 'cli') {
+                return;
+              }
               json['devDependencies'][`@angular/${pkgName}`]
                 = `github:angular/${pkgName}-builds${label}`;
             });
