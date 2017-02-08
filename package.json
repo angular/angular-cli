@@ -78,7 +78,6 @@
     "node-sass": "^4.3.0",
     "nopt": "^3.0.1",
     "opn": "4.0.1",
-    "ora": "^0.2.0",
     "portfinder": "1.0.9",
     "postcss-loader": "^0.9.1",
     "raw-loader": "^0.5.1",
@@ -97,7 +96,6 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^2.4.0",
     "temp": "0.8.3",
-    "through": "^2.3.6",
     "typescript": "~2.0.3",
     "url-loader": "^0.5.7",
     "walk-sync": "^0.2.6",
@@ -147,6 +145,7 @@
     "resolve-bin": "^0.4.0",
     "rewire": "^2.5.1",
     "sinon": "^1.17.3",
+    "through": "^2.3.6",
     "tree-kill": "^1.0.0",
     "ts-node": "^1.3.0",
     "tslint": "^4.0.2"

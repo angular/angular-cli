@@ -34,7 +34,7 @@ export default function() {
       console.log(funky('town'));
     `))
     // Should trigger a rebuild, no error expected.
-    .then(() => waitForAnyProcessOutputToMatch(doneRe, 5000))
+    .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
     // Create and import files.
     .then(() => wait(2000))
     .then(() => writeFile('src/funky2.ts', `
@@ -43,7 +43,7 @@ export default function() {
       }
     `))
     // Should trigger a rebuild, this time an error is expected.
-    .then(() => waitForAnyProcessOutputToMatch(doneRe, 5000))
+    .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
     .then(({ stdout }) => {
       if (!/ERROR in .*\/src\/main\.ts \(/.test(stdout)) {
         throw new Error('Expected an error but none happened.');
@@ -55,7 +55,7 @@ export default function() {
         return value + 'hello';
       }
     `))
-    .then(() => waitForAnyProcessOutputToMatch(doneRe, 5000))
+    .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
     .then(({ stdout }) => {
       if (/ERROR in .*\/src\/main\.ts \(/.test(stdout)) {
         throw new Error('Expected no error but an error was shown.');

@@ -104,7 +104,7 @@ export class AotPlugin implements Tapable {
 
     let tsConfigJson: any = null;
     try {
-      tsConfigJson = JSON.parse(fs.readFileSync(this._tsConfigPath, 'utf8'));
+      tsConfigJson = JSON.parse(ts.sys.readFile(this._tsConfigPath));
     } catch (err) {
       throw new Error(`An error happened while parsing ${this._tsConfigPath} JSON: ${err}.`);
     }

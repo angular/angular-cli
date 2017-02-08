@@ -32,6 +32,7 @@ module.exports = {
       'version': require('../commands/version').default,
       'completion': require('../commands/completion').default,
       'doc': require('../commands/doc').default,
+      'xi18n': require('../commands/xi18n').default,
 
       // Easter eggs.
       'make-this-awesome': require('../commands/easter-egg').default,
