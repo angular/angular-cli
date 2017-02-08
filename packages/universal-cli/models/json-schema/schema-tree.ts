@@ -30,8 +30,8 @@ export abstract class SchemaTreeNode<T> {
   // Hierarchy objects
   protected _parent: SchemaTreeNode<any>;
 
-  protected _defined: boolean = false;
-  protected _dirty: boolean = false;
+  protected _defined = false;
+  protected _dirty = false;
 
   protected _schema: Schema;
   protected _name: string;

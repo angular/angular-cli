@@ -4,7 +4,7 @@ const nodemon = require('nodemon');
 const tinyLr = require('tiny-lr');
 
 export class UniversalDevServer {
-  private appPath: string = '';
+  private appPath = '';
   private nodemonConfig: any;
   private demon: any;
   private liveServer: any;

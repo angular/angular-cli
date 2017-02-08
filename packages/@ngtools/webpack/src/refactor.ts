@@ -25,7 +25,7 @@ export class TypeScriptFileRefactor {
   private _sourceFile: ts.SourceFile;
   private _sourceString: any;
   private _sourceText: string;
-  private _changed: boolean = false;
+  private _changed = false;
 
   get fileName() { return this._fileName; }
   get sourceFile() { return this._sourceFile; }

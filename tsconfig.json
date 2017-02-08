@@ -6,6 +6,8 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
     "outDir": "./dist",
     "rootDir": ".",
     "sourceMap": true,
