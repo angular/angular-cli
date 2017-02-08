@@ -15,9 +15,9 @@ export function readFile(fileName: string) {
   });
 }
 
-export function writeFile(fileName: string, content: string) {
+export function writeFile(fileName: string, content: string, options?: any) {
   return new Promise<void>((resolve, reject) => {
-    fs.writeFile(fileName, content, (err: any) => {
+    fs.writeFile(fileName, content, options, (err: any) => {
       if (err) {
         reject(err);
       } else {
@@ -97,15 +97,15 @@ export function replaceInFile(filePath: string, match: RegExp, replacement: stri
 }
 
 
-export function appendToFile(filePath: string, text: string) {
+export function appendToFile(filePath: string, text: string, options?: any) {
   return readFile(filePath)
-    .then((content: string) => writeFile(filePath, content.concat(text)));
+    .then((content: string) => writeFile(filePath, content.concat(text), options));
 }
 
 
-export function prependToFile(filePath: string, text: string) {
+export function prependToFile(filePath: string, text: string, options?: any) {
   return readFile(filePath)
-    .then((content: string) => writeFile(filePath, text.concat(content)));
+    .then((content: string) => writeFile(filePath, text.concat(content), options));
 }
 
 
