@@ -7,6 +7,7 @@ const fs = require('fs');
 const glob = require('glob');
 const packages = require('../../lib/packages').packages;
 const path = require('path');
+const _ = require('lodash');
 
 
 const IMPORT_RE = /(^|\n)\s*import\b(?:.|\n)*?\'[^\']*\'/g;
@@ -32,6 +33,18 @@ const OPTIONAL_PACKAGES = [
   '@angular/service-worker'
 ];
 
+let exitCode = 0;
+
+const depsInfo = validateDependenciesPerPackage(packages);
+
+validateRootPackageJson(depsInfo.allSourceDeps);
+
+checkDependenciesConflictAcrossPackages(depsInfo.allDeclaredDepsMap);
+
+process.exit(exitCode);
+
+
+// utils
 
 function listImportedModules(source) {
   const imports = source.match(IMPORT_RE);
@@ -42,9 +55,9 @@ function listImportedModules(source) {
       return m && m[1];
     })
     .filter(x => !!x)
-    .filter(modulePath => modulePath[0] != '.')
+    .filter(modulePath => modulePath[0] !== '.')
     .map(fullImportPath => {
-      if (fullImportPath[0] == '@') {
+      if (fullImportPath[0] === '@') {
         // Need to get the scope as well.
         return fullImportPath.split('/').slice(0, 2).join('/');
       } else {
@@ -62,9 +75,9 @@ function listRequiredModules(source) {
       return m && m[1];
     })
     .filter(x => !!x)
-    .filter(modulePath => modulePath[0] != '.')
+    .filter(modulePath => modulePath[0] !== '.')
     .map(fullImportPath => {
-      if (fullImportPath[0] == '@') {
+      if (fullImportPath[0] === '@') {
         // Need to get the scope as well.
         return fullImportPath.split('/').slice(0, 2).join('/');
       } else {
@@ -84,7 +97,7 @@ function listIgnoredModules(source) {
 }
 
 function reportMissingDependencies(missingDeps) {
-  if (missingDeps.length == 0) {
+  if (missingDeps.length === 0) {
     console.log(chalk.green('  no dependency missing from package.json.'));
   } else {
     console.log(chalk.yellow(`  ${missingDeps.length} missing from package.json:`));
@@ -94,7 +107,7 @@ function reportMissingDependencies(missingDeps) {
 }
 
 function reportExcessiveDependencies(overDeps) {
-  if (overDeps.length == 0) {
+  if (overDeps.length === 0) {
     console.log(chalk.green('  no excessive dependencies in package.json.'));
   } else {
     console.log(chalk.yellow(`  ${overDeps.length} excessive dependencies in package.json:`));
@@ -103,18 +116,23 @@ function reportExcessiveDependencies(overDeps) {
   }
 }
 
-let exitCode = 0;
-const overallDeps = [];
-for (const packageName of Object.keys(packages)) {
-  console.log(chalk.green(`Reading dependencies of "${packageName}".`));
+function reportInconsistentDepsDependencies(inconsistentDeps) {
+  if (inconsistentDeps.length === 0) {
+    console.log(chalk.green('  no inconsistentDeps dependencies across packages.'));
+  } else {
+    console.log(chalk.yellow(`  ${inconsistentDeps.length} inconsistent dependencies found:`));
+    inconsistentDeps.forEach(arr => console.log(`    ${arr.join(' vs ')}`));
+    exitCode = 0;
+  }
+}
 
+function retrieveDependencyMapFromPackageSource(packageName) {
   const allSources = glob.sync(path.join(__dirname, '../../packages/', packageName, '**/*'))
     .filter(p => p.match(/\.(js|ts)$/))
     .filter(p => !p.match(/\.spec\./))
     .filter(p => !p.match(/\/blueprints\//));
 
-  const importMap = {};
-  allSources.forEach(function(filePath) {
+  return allSources.reduce(function (importMap, filePath) {
     const source = fs.readFileSync(filePath, 'utf8');
 
     listImportedModules(source)
@@ -125,50 +143,95 @@ for (const packageName of Object.keys(packages)) {
       .forEach(modulePath => {
         delete importMap[modulePath];
       });
-  });
 
-  const dependencies = Object.keys(importMap)
-    // Filter out the node packages that should not be depended on.
-    .filter(x => NODE_PACKAGES.indexOf(x) == -1);
-  overallDeps.push(...dependencies);
-
-  console.log(chalk.green(`  found ${dependencies.length} dependencies...`));
-  const packageJson = JSON.parse(fs.readFileSync(packages[packageName].packageJson, 'utf8'));
-  const allDeps = []
-    .concat(Object.keys(packageJson['dependencies'] || {}))
-    .concat(Object.keys(packageJson['optionalDependencies'] || {}))
-    .concat(Object.keys(packageJson['devDependencies'] || {}))
-    .concat(Object.keys(packageJson['peerDependencies'] || {}));
-
-  const missingDeps = dependencies
-    .filter(d => allDeps.indexOf(d) == -1)
-    .filter(d => OPTIONAL_PACKAGES.indexOf(d) == -1);
-  reportMissingDependencies(missingDeps);
-
-  const overDeps = allDeps.filter(d => dependencies.indexOf(d) == -1)
-    .filter(x => ANGULAR_PACKAGES.indexOf(x) == -1);
-  reportExcessiveDependencies(overDeps);
-
-  console.log('');
+    return importMap;
+  }, {});
 }
 
-console.log(chalk.green('Validating root package. [devDependencies ignored]'));
-const rootPackagePath = path.join(__dirname, '../../package.json');
-const rootPackageJson = JSON.parse(fs.readFileSync(rootPackagePath, 'utf8'));
-// devDependencies are ignored
-const allRootDeps = []
+function validateDependenciesPerPackage(packages) {
+  const allSourceDeps = [];
+  const allDeclaredDepsMap = {};
+
+  for (const packageName of Object.keys(packages)) {
+    console.log(chalk.blue(`Reading dependencies of "${packageName}".`));
+
+    const importMap = retrieveDependencyMapFromPackageSource(packageName)
+
+    const dependencies = Object.keys(importMap)
+      // Filter out the node packages that should not be depended on.
+      .filter(x => NODE_PACKAGES.indexOf(x) === -1);
+    allSourceDeps.push(...dependencies);
+
+    console.log(chalk.green(`  found ${dependencies.length} dependencies...`));
+
+    const packageJson = JSON.parse(fs.readFileSync(packages[packageName].packageJson, 'utf8'));
+
+    const DeclaredDepsMap = Object.assign(
+      {},
+      packageJson['dependencies'] || {},
+      packageJson['optionalDependencies'] || {},
+      packageJson['devDependencies'] || {},
+      packageJson['peerDependencies'] || {}
+    );
+    allDeclaredDepsMap[packageName] = DeclaredDepsMap;
+    const declaredDeps = Object.keys(DeclaredDepsMap);
+
+    const missingDeps = dependencies.filter(d => declaredDeps.indexOf(d) === -1)
+      .filter(d => OPTIONAL_PACKAGES.indexOf(d) === -1);
+    reportMissingDependencies(missingDeps);
+
+    const excessiveDeps = declaredDeps.filter(d => dependencies.indexOf(d) === -1)
+      .filter(x => ANGULAR_PACKAGES.indexOf(x) === -1);
+    reportExcessiveDependencies(excessiveDeps);
+  }
+
+  return {
+    allDeclaredDepsMap,
+    allSourceDeps
+  };
+}
+
+function validateRootPackageJson(overallDeps) {
+  console.log(chalk.blue('Validating root package. [devDependencies ignored]'));
+
+  const rootPackagePath = path.join(__dirname, '../../package.json');
+  const rootPackageJson = JSON.parse(fs.readFileSync(rootPackagePath, 'utf8'));
+
+  // devDependencies are ignored
+  const allRootDeps = []
     .concat(Object.keys(rootPackageJson['dependencies'] || {}))
     .concat(Object.keys(rootPackageJson['optionalDependencies'] || {}))
     .concat(Object.keys(rootPackageJson['peerDependencies'] || {}));
 
-const internalPackages = Object.keys(packages);
-const missingRootDeps = overallDeps.filter(d => allRootDeps.indexOf(d) == -1)
-  .filter(d => internalPackages.indexOf(d) == -1)
-  .filter(x => OPTIONAL_PACKAGES.indexOf(x) == -1);
-reportMissingDependencies(missingRootDeps);
+  const internalPackages = Object.keys(packages);
+  const missingRootDeps = overallDeps.filter(d => allRootDeps.indexOf(d) === -1)
+    .filter(d => internalPackages.indexOf(d) === -1)
+    .filter(x => OPTIONAL_PACKAGES.indexOf(x) === -1);
+  reportMissingDependencies(missingRootDeps);
 
-const overRootDeps = allRootDeps.filter(d => overallDeps.indexOf(d) == -1)
-  .filter(x => ANGULAR_PACKAGES.indexOf(x) == -1);
-reportExcessiveDependencies(overRootDeps);
+  const overRootDeps = allRootDeps.filter(d => overallDeps.indexOf(d) === -1)
+    .filter(x => ANGULAR_PACKAGES.indexOf(x) === -1);
+  reportExcessiveDependencies(overRootDeps);
+}
 
-process.exit(exitCode);
+function checkDependenciesConflictAcrossPackages(allDeclaredDepsMap) {
+  console.log(chalk.blue('Validating packages\' dependencies conflict.'));
+
+  const allDeclaredDeps = Object.keys(allDeclaredDepsMap)
+    .reduce((collect, packageName) => collect.concat(Object.keys(allDeclaredDepsMap[packageName])), []);
+
+  const inconsistentDeps = _.uniq(allDeclaredDeps).reduce(function (collect, dep) {
+    const test = _(allDeclaredDepsMap)
+      .map((map, name) => map[dep] ? [name, `${dep}@${map[dep]}`] : null)
+      .compact()
+      .uniqBy(1)
+      .value();
+    if (test.length > 1) {
+      collect.push(test.map(pair =>`[${pair[0]}]: ${pair[1]}`));
+    }
+
+    return collect;
+  }, []);
+
+  reportInconsistentDepsDependencies(inconsistentDeps);
+}
