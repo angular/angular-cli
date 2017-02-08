@@ -10,7 +10,6 @@ const autoprefixer = require('autoprefixer');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const SilentError = require('silent-error');
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -69,25 +68,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       chunks: ['main'],
       minChunks: (module: any) => module.resource && module.resource.startsWith(nodeModules)
     }));
-  }
-
-  // process environment file replacement
-  if (appConfig.environments) {
-    if (!('source' in appConfig.environments)) {
-      throw new SilentError(`Environment configuration does not contain "source" entry.`);
-    }
-    if (!(buildOptions.environment in appConfig.environments)) {
-      throw new SilentError(`Environment "${buildOptions.environment}" does not exist.`);
-    }
-
-    extraPlugins.push(new webpack.NormalModuleReplacementPlugin(
-      // This plugin is responsible for swapping the environment files.
-      // Since it takes a RegExp as first parameter, we need to escape the path.
-      // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
-      new RegExp(path.resolve(appRoot, appConfig.environments['source'])
-        .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
-      path.resolve(appRoot, appConfig.environments[buildOptions.environment])
-    ));
   }
 
   // process asset entries

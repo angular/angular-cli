@@ -24,6 +24,7 @@ export interface AotPluginOptions {
   mainPath?: string;
   typeChecking?: boolean;
   skipCodeGeneration?: boolean;
+  hostOverrideFileSystem?: { [path: string]: string };
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
@@ -167,6 +168,14 @@ export class AotPlugin implements Tapable {
     }
 
     this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
+
+    // Override some files in the FileSystem.
+    if (options.hasOwnProperty('hostOverrideFileSystem')) {
+      for (const filePath of Object.keys(options.hostOverrideFileSystem)) {
+        this._compilerHost.writeFile(filePath, options.hostOverrideFileSystem[filePath], false);
+      }
+    }
+
     this._program = ts.createProgram(
       this._rootFilePath, this._compilerOptions, this._compilerHost);
 
