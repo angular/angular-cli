@@ -22,9 +22,9 @@ export default function() {
     // Should trigger a rebuild.
     .then(() => exec('touch', 'src/main.ts'))
     .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now INVALID|webpack: Compiling.../, 5000))
+        /webpack: bundle is now INVALID|webpack: Compiling.../, 10000))
     .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now VALID|webpack: Compiled successfully./, 5000))
+        /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))
     // Count the bundles.
     .then(({ stdout }) => {
       oldNumberOfChunks = stdout.split(chunkRegExp).length;
@@ -61,9 +61,9 @@ export default function() {
     `))
     // Should trigger a rebuild with a new bundle.
     .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now INVALID|webpack: Compiling.../, 5000))
+        /webpack: bundle is now INVALID|webpack: Compiling.../, 10000))
     .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now VALID|webpack: Compiled successfully./, 5000))
+        /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))
     // Count the bundles.
     .then(({ stdout }) => {
       let newNumberOfChunks = stdout.split(chunkRegExp).length;
