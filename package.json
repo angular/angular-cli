@@ -130,7 +130,7 @@
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
     "dtsgenerator": "^0.9.1",
-    "eslint": "^2.8.0",
+    "eslint": "^3.11.0",
     "exists-sync": "0.0.4",
     "express": "^4.14.0",
     "jasmine": "^2.4.1",
