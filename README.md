@@ -75,11 +75,7 @@ npm install -g universal-cli
 ## Usage
 
 ```bash
-<<<<<<< HEAD
 ung --help
-=======
-ng help
->>>>>>> upstream/master
 ```
 
 ### Generating and serving an Angular2 project via a development server
