@@ -1,6 +1,7 @@
 import * as rimraf from 'rimraf';
 import * as path from 'path';
 const Task = require('../ember-cli/lib/models/task');
+const SilentError = require('silent-error');
 import * as webpack from 'webpack';
 import { BuildTaskOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
@@ -14,6 +15,9 @@ export default Task.extend({
     const project = this.cliProject;
 
     const outputPath = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
+    if (project.root === outputPath) {
+      throw new SilentError ('Output path MUST not be project root directory!');
+    }
     rimraf.sync(path.resolve(project.root, outputPath));
 
     const webpackConfig = new NgCliWebpackConfig(runTaskOptions).config;
