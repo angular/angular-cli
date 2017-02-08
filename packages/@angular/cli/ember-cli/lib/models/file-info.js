@@ -90,7 +90,7 @@ FileInfo.prototype.render = function() {
   if (!this.rendered) {
     this.rendered = readFile(path).then(function(content) {
       return lstat(path).then(function(fileStat) {
-        if (isBinaryFile(content, fileStat.size)) {
+        if (isBinaryFile.sync(content, fileStat.size)) {
           return content;
         } else {
           try {
