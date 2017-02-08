@@ -405,7 +405,6 @@ Local project package:
 ```bash
 rm -rf node_modules dist # use rmdir on Windows
 npm install --save-dev @angular/cli@latest
-npm install
 ng update
 ```
 
