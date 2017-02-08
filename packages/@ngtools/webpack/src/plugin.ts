@@ -237,12 +237,14 @@ export class AotPlugin implements Tapable {
   apply(compiler: any) {
     this._compiler = compiler;
 
-    compiler.plugin('invalid', (fileName: string) => {
+    compiler.plugin('invalid', () => {
       // Turn this off as soon as a file becomes invalid and we're about to start a rebuild.
       this._firstRun = false;
       this._diagnoseFiles = {};
 
-      this._compilerHost.invalidate(fileName);
+      compiler.watchFileSystem.watcher.once('aggregated', (changes: string[]) => {
+        changes.forEach((fileName: string) => this._compilerHost.invalidate(fileName));
+      });
     });
 
     // Add lazy modules to the context module for @angular/core/src/linker
