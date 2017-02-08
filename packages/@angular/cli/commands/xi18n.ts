@@ -1,7 +1,5 @@
 const Command = require('../ember-cli/lib/models/command');
 
-import {Extracti18nTask} from '../tasks/extract-i18n';
-
 export interface Xi18nOptions {
   outputPath?: string;
   verbose?: boolean;
@@ -25,6 +23,7 @@ const Xi18nCommand = Command.extend({
 
   ],
   run: function (commandOptions: any) {
+    const {Extracti18nTask} = require('../tasks/extract-i18n');
 
     const xi18nTask = new Extracti18nTask({
       ui: this.ui,
