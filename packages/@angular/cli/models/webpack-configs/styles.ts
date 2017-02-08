@@ -36,7 +36,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // style-loader does not support sourcemaps without absolute publicPath, so it's
   // better to disable them when not extracting css
   // https://github.com/webpack-contrib/style-loader#recommended-configuration
-  const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemap;
+  const cssSourceMap = buildOptions.sourcemap;
 
   // minify/optimize css in production
   // autoprefixer is always run separately so disable here
@@ -90,7 +90,12 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // load component css as raw strings
   let rules: any = baseRules.map(({test, loaders}) => ({
-    exclude: globalStylePaths, test, loaders: ['raw-loader', ...commonLoaders, ...loaders]
+    exclude: globalStylePaths, test, loaders: [
+      'css-with-mapping-loader',
+      `css-loader?${JSON.stringify({ sourceMap: cssSourceMap })}`,
+      ...commonLoaders,
+      ...loaders
+    ]
   }));
 
   // load global css as css files

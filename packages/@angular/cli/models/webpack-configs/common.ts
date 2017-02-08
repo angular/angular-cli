@@ -104,11 +104,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       rules: [
         { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
         { test: /\.json$/, loader: 'json-loader' },
-        { test: /\.html$/, loader: 'raw-loader' },
-        { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
+        { test: /\.html$/, loaders: ['html-loader'] },
+        { test: /\.(eot|svg)$/, loader: `url-loader?name=images/[name]${hashFormat.file}.[ext]&limit=256` },
         {
           test: /\.(jpg|png|gif|otf|ttf|woff|woff2)$/,
-          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
+          loader: `url-loader?name=images/[name]${hashFormat.file}.[ext]&limit=10000`
         }
       ].concat(extraRules)
     },
