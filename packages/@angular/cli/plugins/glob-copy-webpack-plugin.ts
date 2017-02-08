@@ -43,9 +43,10 @@ export class GlobCopyWebpackPlugin {
         // flatten results
         .then(globResults => [].concat.apply([], globResults))
         // add each file to compilation assets
-        .then(relPaths => relPaths.forEach((relPath: string) => addAsset(relPath)))
+        .then((relPaths: string[]) =>
+            Promise.all(relPaths.map((relPath: string) => addAsset(relPath))))
         .catch((err) => compilation.errors.push(err))
-        .then(cb);
+        .then(() => cb());
     });
   }
 }
