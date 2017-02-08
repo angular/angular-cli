@@ -79,7 +79,7 @@
     "nopt": "^4.0.1",
     "opn": "4.0.2",
     "portfinder": "~1.0.12",
-    "postcss-loader": "^0.9.1",
+    "postcss-loader": "^0.13.0",
     "raw-loader": "^0.5.1",
     "resolve": "^1.1.7",
     "rimraf": "^2.5.3",
