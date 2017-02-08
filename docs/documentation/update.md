@@ -8,6 +8,8 @@
 Initialization is done in-place, meaning that the generated application is initialized in the current directory.
 
 ## Options
+`--compare-spaces` (`-cs`) flag to indicate whether to compare spaces when comparing files
+
 `--dry-run` (`-d`) run through without making any changes
 
 `--skip-npm` (`-sn`) skip installing npm packages
