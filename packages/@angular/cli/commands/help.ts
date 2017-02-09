@@ -6,8 +6,7 @@ const stringUtils = require('ember-cli-string-utils');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
 
 const commandsToIgnore = [
-  'easter-egg',
-  'destroy'
+  'easter-egg'
 ];
 
 const HelpCommand = Command.extend({
