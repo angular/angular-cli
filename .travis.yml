@@ -20,9 +20,6 @@ matrix:
     - node_js: "6"
       os: linux
       env: SCRIPT=build
-    - node_js: "4"
-      os: linux
-      env: NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "6"
       os: linux
       env: SCRIPT=test
@@ -43,17 +40,11 @@ matrix:
     - node_js: "7"
       os: linux
       env: NODE_SCRIPT=tests/e2e_runner.js
-    - node_js: "4"
-      os: osx
-      env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "5"
       os: osx
       env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "6"
       os: osx
-      env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
-    - node_js: "4"
-      os: linux
       env: UNIVERSAL=true NODE_SCRIPT=tests/e2e_runner.js
     - node_js: "5"
       os: linux
@@ -71,7 +62,6 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "--no-sandbox" > ~/.config/chromium-flags.conf; fi
-  - if [[ "$TARGET" == "mobile" ]]; then export MOBILE_TEST=true; fi
   - npm install -g npm
   - npm config set spin false
   - npm config set progress false
@@ -82,3 +72,6 @@ install:
 script:
   - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
   - if [[ "$NODE_SCRIPT" ]]; then node $NODE_SCRIPT; fi
+
+notifications:
+  email: false
