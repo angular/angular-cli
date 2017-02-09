@@ -1,6 +1,6 @@
 import * as denodeify from 'denodeify';
 import { BuildOptions } from '../models/build-options';
-import { BaseBuildCommandOptions } from './build';
+import { baseBuildCommandOptions } from './build';
 import { CliConfig } from '../models/config';
 import { Version } from '../upgrade/version';
 import { ServeTaskOptions } from './serve';
@@ -32,21 +32,35 @@ export interface ServeTaskOptions extends BuildOptions {
   hmr?: boolean;
 }
 
+// Expose options unrelated to live-reload to other commands that need to run serve
+export const baseServeCommandOptions: any = baseBuildCommandOptions.concat([
+  { name: 'port', type: Number, default: defaultPort, aliases: ['p'] },
+  {
+    name: 'host',
+    type: String,
+    default: defaultHost,
+    aliases: ['H'],
+    description: `Listens only on ${defaultHost} by default`
+  },
+  { name: 'proxy-config', type: 'Path', aliases: ['pc'] },
+  { name: 'ssl', type: Boolean, default: false },
+  { name: 'ssl-key', type: String, default: 'ssl/server.key' },
+  { name: 'ssl-cert', type: String, default: 'ssl/server.crt' },
+  {
+    name: 'open',
+    type: Boolean,
+    default: false,
+    aliases: ['o'],
+    description: 'Opens the url in default browser',
+  }
+]);
+
 const ServeCommand = Command.extend({
   name: 'serve',
   description: 'Builds and serves your app, rebuilding on file changes.',
   aliases: ['server', 's'],
 
-  availableOptions: BaseBuildCommandOptions.concat([
-    { name: 'port', type: Number, default: defaultPort, aliases: ['p'] },
-    {
-      name: 'host',
-      type: String,
-      default: defaultHost,
-      aliases: ['H'],
-      description: `Listens only on ${defaultHost} by default`
-    },
-    { name: 'proxy-config', type: 'Path', aliases: ['pc'] },
+  availableOptions: baseServeCommandOptions.concat([
     { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
     {
       name: 'live-reload-host',
@@ -71,16 +85,6 @@ const ServeCommand = Command.extend({
       type: Boolean,
       default: true,
       description: 'Whether to live reload CSS (default true)'
-    },
-    { name: 'ssl', type: Boolean, default: false },
-    { name: 'ssl-key', type: String, default: 'ssl/server.key' },
-    { name: 'ssl-cert', type: String, default: 'ssl/server.crt' },
-    {
-      name: 'open',
-      type: Boolean,
-      default: false,
-      aliases: ['o'],
-      description: 'Opens the url in default browser',
     },
     {
       name: 'hmr',

@@ -3,7 +3,7 @@ import * as chalk from 'chalk';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as ts from 'typescript';
-import { requireDependency } from '../utilities/require-project-module';
+import { requireProjectModule } from '../utilities/require-project-module';
 import { CliConfig } from '../models/config';
 import { LintCommandOptions } from '../commands/lint';
 import { oneLine } from 'common-tags';
@@ -30,7 +30,7 @@ export default Task.extend({
       return Promise.resolve(0);
     }
 
-    const tslint = requireDependency(projectRoot, 'tslint');
+    const tslint = requireProjectModule(projectRoot, 'tslint');
     const Linter = tslint.Linter;
     const Configuration = tslint.Configuration;
 
