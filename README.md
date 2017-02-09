@@ -28,7 +28,7 @@ You can update your `beta.10` projects to `beta.14` by following [these instruct
 
 ## Prerequisites
 
-Both the CLI and generated project have dependencies that require Node 4 or higher, together
+Both the CLI and generated project have dependencies that require Node 6.9.0 or higher, together
 with NPM 3 or higher.
 
 ## Table of Contents
