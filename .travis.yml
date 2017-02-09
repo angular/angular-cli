@@ -12,6 +12,7 @@ matrix:
   allow_failures:
     - node_js: "7"
     - env: NODE_SCRIPT="tests/run_e2e.js --nightly"
+    - env: NODE_SCRIPT="tests/run_e2e.js --ng4"
   include:
     - node_js: "6"
       os: linux
