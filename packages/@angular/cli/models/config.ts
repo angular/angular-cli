@@ -36,7 +36,7 @@ function getUserHome() {
 
 export class CliConfig extends CliConfigBase<ConfigInterface> {
   static configFilePath(projectPath?: string): string {
-    // Find the configuration, either where specified, in the angular-cli project
+    // Find the configuration, either where specified, in the Angular CLI project
     // (if it's in node_modules) or from the current process.
     return (projectPath && _findUp(CLI_CONFIG_FILE_NAME, projectPath))
         || (projectPath && _findUp(CLI_CONFIG_FILE_NAME_ALT, projectPath))
