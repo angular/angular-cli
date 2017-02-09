@@ -186,6 +186,16 @@ ng build --bh /myUrl/
 All builds make use of bundling, and using the `--prod` flag in  `ng build --prod`
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
+### AoT (Ahead-of-Time) compilation
+
+You can instruct the build to do AoT compilation, such that all HTML templates are pre-compiled into the rendered Javascript files. The result is smaller download for the client (since we don't need to download @angular/compiler to the browser), faster execution and better tree-shaking. Use `--aot` to enable that, such as:
+
+```
+ng build --aot
+ng serve --aot
+ng build --prod --aot
+```
+
 ### Running unit tests
 
 ```bash
