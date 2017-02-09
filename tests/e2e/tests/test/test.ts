@@ -6,5 +6,5 @@ export default function () {
   return ng('test', '--single-run')
     .then(() => ng('test', '--watch=false'))
     .then(() => copyFile('./karma.conf.js', './karma.conf.bis.js'))
-    .then(() => ng('test', '--single-run', '--config-file', 'karma.conf.bis.js'));
+    .then(() => ng('test', '--single-run', '--config', 'karma.conf.bis.js'));
 }
