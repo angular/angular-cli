@@ -36,7 +36,7 @@ const getTestConfig = function (projectRoot, environment, appConfig, testConfig)
       exclude: [
         /\.(e2e|spec)\.ts$/,
         /node_modules/
-      ],
+      ]
     });
   }
 
