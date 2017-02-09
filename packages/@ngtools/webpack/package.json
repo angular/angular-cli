@@ -25,9 +25,9 @@
     "npm": ">= 3.0.0"
   },
   "dependencies": {
-    "enhanced-resolve": "^2.3.0",
+    "enhanced-resolve": "^3.1.0",
     "loader-utils": "^0.2.16",
-    "magic-string": "^0.16.0",
+    "magic-string": "^0.19.0",
     "source-map": "^0.5.6"
   },
   "peerDependencies": {
