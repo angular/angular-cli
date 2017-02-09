@@ -1,36 +1,46 @@
 const Task = require('../ember-cli/lib/models/task');
 import * as chalk from 'chalk';
 import * as path from 'path';
+import * as glob from 'glob';
+import * as ts from 'typescript';
 import { requireDependency } from '../utilities/require-project-module';
 import { CliConfig } from '../models/config';
 import { LintCommandOptions } from '../commands/lint';
 import { oneLine } from 'common-tags';
 
+interface CliLintConfig {
+  files?: (string | string[]);
+  project?: string;
+  tslintConfig?: string;
+  exclude?: (string | string[]);
+}
+
 export default Task.extend({
   run: function (commandOptions: LintCommandOptions) {
     const ui = this.ui;
     const projectRoot = this.project.root;
+    const lintConfigs: CliLintConfig[] = CliConfig.fromProject().config.lint || [];
 
-    return new Promise(function (resolve, reject) {
-      const tslint = requireDependency(projectRoot, 'tslint');
-      const Linter = tslint.Linter;
-      const Configuration = tslint.Configuration;
+    if (lintConfigs.length === 0) {
+      ui.writeLine(chalk.yellow(oneLine`
+        No lint config(s) found.
+        If this is not intended, run "ng update".
+      `));
 
-      const lintConfigs = CliConfig.fromProject().config.lint || [];
+      return Promise.resolve(0);
+    }
 
-      if (lintConfigs.length === 0) {
-        ui.writeLine(chalk.yellow(oneLine`
-          No lint config(s) found.
-          If this is not intended, run "ng update".
-        `));
-        return resolve(0);
-      }
+    const tslint = requireDependency(projectRoot, 'tslint');
+    const Linter = tslint.Linter;
+    const Configuration = tslint.Configuration;
 
-      let errors = 0;
+    let errors = 0;
+    let results = '';
 
-      lintConfigs.forEach((config) => {
-        const program = Linter.createProgram(config.project);
-        const files: string[] = Linter.getFileNames(program);
+    lintConfigs
+      .forEach((config) => {
+        const program: ts.Program = Linter.createProgram(config.project);
+        const files = getFilesToLint(program, config, Linter);
 
         const linter = new Linter({
           fix: commandOptions.fix,
@@ -45,17 +55,42 @@ export default Task.extend({
 
         const result = linter.getResult();
         errors += result.failureCount;
-
-        ui.writeLine(result.output.trim().concat('\n'));
+        results = results.concat(result.output.trim().concat('\n'));
       });
 
-      if (errors > 0) {
-        ui.writeLine(chalk.red('Lint errors found in the listed files.'));
-        return commandOptions.force ? resolve(0) : resolve(2);
-      }
+    if (errors > 0) {
+      ui.writeLine(results.trim());
+      ui.writeLine(chalk.red('Lint errors found in the listed files.'));
+      return commandOptions.force ? Promise.resolve(0) : Promise.resolve(2);
+    }
 
-      ui.writeLine(chalk.green('All files pass linting.'));
-      return resolve(0);
-    });
+    ui.writeLine(chalk.green('All files pass linting.'));
+    return Promise.resolve(0);
   }
 });
+
+function getFilesToLint(program: ts.Program, lintConfig: CliLintConfig, Linter: any): string[] {
+  let files: string[] = [];
+
+  if (lintConfig.files !== null) {
+    files = Array.isArray(lintConfig.files) ? lintConfig.files : [lintConfig.files];
+  } else {
+    files = Linter.getFileNames(program);
+  }
+
+  let globOptions = {};
+
+  if (lintConfig.exclude !== null) {
+    const excludePatterns = Array.isArray(lintConfig.exclude)
+      ? lintConfig.exclude
+      : [lintConfig.exclude];
+
+    globOptions = { ignore: excludePatterns, nodir: true };
+  }
+
+  files = files
+    .map((file: string) => glob.sync(file, globOptions))
+    .reduce((a: string[], b: string[]) => a.concat(b), []);
+
+  return files;
+}
