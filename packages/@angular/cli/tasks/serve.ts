@@ -112,7 +112,8 @@ export default Task.extend({
       watchOptions: {
         poll: projectConfig.defaults && projectConfig.defaults.poll
       },
-      https: serveTaskOptions.ssl
+      https: serveTaskOptions.ssl,
+      overlay: serveTaskOptions.target === 'development'
     };
 
     if (sslKey != null && sslCert != null) {

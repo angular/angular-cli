@@ -20,6 +20,7 @@ interface IWebpackDevServerConfigurationOptions {
   https?: boolean;
   key?: string;
   cert?: string;
+  overlay?: boolean;
 }
 
 interface WebpackProgressPluginOutputOptions {
