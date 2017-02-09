@@ -61,8 +61,6 @@ export default function() {
     `))
     // Should trigger a rebuild with a new bundle.
     .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now INVALID|webpack: Compiling.../, 10000))
-    .then(() => waitForAnyProcessOutputToMatch(
         /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))
     // Count the bundles.
     .then(({ stdout }) => {

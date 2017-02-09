@@ -24,7 +24,7 @@ export default function() {
   } else {
     // Otherwise create a project from scratch.
     createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--skip-npm'))
+      .then(() => ng('new', 'test-project', '--skip-npm', ...(argv['ng4'] ? ['--ng4'] : [])))
       .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
       .then(() => process.chdir('./test-project'));
   }
@@ -37,7 +37,7 @@ export default function() {
       });
     }))
     .then(() => {
-      if (argv.nightly || argv['ng-sha']) {
+      if (argv['nightly'] || argv['ng-sha']) {
         const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
         return updateJsonFile('package.json', json => {
           // Install over the project with nightly builds.

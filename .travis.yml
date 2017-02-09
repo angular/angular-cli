@@ -33,6 +33,9 @@ matrix:
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT="tests/run_e2e.js --nightly"
+    - node_js: "6"
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --ng4"
     - node_js: "7"
       os: linux
       env: NODE_SCRIPT=tests/run_e2e.js

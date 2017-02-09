@@ -48,6 +48,7 @@ export default Blueprint.extend({
       routing: options.routing,
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
+      ng4: options.ng4,
       tests: this.tests
     };
   },
