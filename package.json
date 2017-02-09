@@ -134,8 +134,7 @@
     "webpack-md5-hash": "0.0.5",
     "webpack-merge": "^0.14.0",
     "webpack-sources": "^0.1.3",
-    "yam": "0.0.18",
-    "zone.js": "0.6.23"
+    "yam": "0.0.18"
   },
   "ember-addon": {
     "paths": [
