@@ -6,6 +6,14 @@ import * as denodeify from 'denodeify';
 const globPromise = <any>denodeify(glob);
 const statPromise = <any>denodeify(fs.stat);
 
+function isDirectory(path: string) {
+  try {
+    return fs.statSync(path).isDirectory();
+  } catch (_) {
+    return false;
+  }
+}
+
 export interface GlobCopyWebpackPluginOptions {
   patterns: string[];
   globOptions: any;
@@ -17,9 +25,10 @@ export class GlobCopyWebpackPlugin {
   apply(compiler: any): void {
     let { patterns, globOptions } = this.options;
     let context = globOptions.cwd || compiler.options.context;
+    let optional = !!globOptions.optional;
 
     // convert dir patterns to globs
-    patterns = patterns.map(pattern => fs.statSync(path.resolve(context, pattern)).isDirectory()
+    patterns = patterns.map(pattern => isDirectory(path.resolve(context, pattern))
       ? pattern += '/**/*'
       : pattern
     );
@@ -37,7 +46,8 @@ export class GlobCopyWebpackPlugin {
           .then((stat: any) => compilation.assets[relPath] = {
             size: () => stat.size,
             source: () => fs.readFileSync(path.resolve(context, relPath))
-          });
+          })
+          .catch((err: any) => optional ? Promise.resolve() : Promise.reject(err));
 
       Promise.all(globs)
         // flatten results

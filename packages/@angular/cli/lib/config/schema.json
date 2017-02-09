@@ -67,7 +67,8 @@
           "prefix": {
             "type": "string"
           },
-          "mobile": {
+          "serviceWorker": {
+            "description": "Experimental support for a service worker from @angular/service-worker.",
             "type": "boolean",
             "default": false
           },
