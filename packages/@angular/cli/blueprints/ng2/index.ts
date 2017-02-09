@@ -24,7 +24,7 @@ export default Blueprint.extend({
   },
 
   locals: function(options: any) {
-    this.styleExt = options.style;
+    this.styleExt = options.style === 'stylus' ? 'styl' : options.style;
     this.version = require(path.resolve(__dirname, '../../package.json')).version;
     // set this.tests to opposite of skipTest options,
     // meaning if tests are being skipped then the default.spec.BLUEPRINT will be false
