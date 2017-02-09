@@ -24,7 +24,7 @@ export default function() {
   } else {
     // Otherwise create a project from scratch.
     createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--skip-npm', ...(argv['ng4'] ? ['--ng4'] : [])))
+      .then(() => ng('new', 'test-project', '--skip-install', ...(argv['ng4'] ? ['--ng4'] : [])))
       .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
       .then(() => process.chdir('./test-project'));
   }

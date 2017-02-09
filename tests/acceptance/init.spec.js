@@ -97,7 +97,7 @@ describe('Acceptance: ng update', function () {
   it('ng init does the same as ng update', function () {
     return ng([
       'init',
-      '--skip-npm'
+      '--skip-install'
     ]).then(confirmBlueprinted);
   });
 
@@ -109,7 +109,7 @@ describe('Acceptance: ng update', function () {
       .then(function () {
         return ng([
           'init',
-          '--skip-npm',
+          '--skip-install',
           '--name',
           'tmp'
         ]);
@@ -121,15 +121,15 @@ describe('Acceptance: ng update', function () {
   });
 
   it('init an already init\'d folder', function () {
-    return ng(['init', '--skip-npm'])
+    return ng(['init', '--skip-install'])
       .then(function () {
-        return ng(['init', '--skip-npm']);
+        return ng(['init', '--skip-install']);
       })
       .then(confirmBlueprinted);
   });
 
   it('init a single file', function () {
-    return ng(['init', 'package.json', '--skip-npm'])
+    return ng(['init', 'package.json', '--skip-install'])
       .then(function () {
         return 'package.json';
       })
@@ -137,15 +137,15 @@ describe('Acceptance: ng update', function () {
   });
 
   it('init a single file on already init\'d folder', function () {
-    return ng(['init', '--skip-npm'])
+    return ng(['init', '--skip-install'])
       .then(function () {
-        return ng(['init', 'package.json', '--skip-npm']);
+        return ng(['init', 'package.json', '--skip-install']);
       })
       .then(confirmBlueprinted);
   });
 
   it('init multiple files by glob pattern', function () {
-    return ng(['init', 'src/**', '--skip-npm'])
+    return ng(['init', 'src/**', '--skip-install'])
       .then(function () {
         return 'src/**';
       })
@@ -153,15 +153,15 @@ describe('Acceptance: ng update', function () {
   });
 
   it('init multiple files by glob pattern on already init\'d folder', function () {
-    return ng(['init', '--skip-npm'])
+    return ng(['init', '--skip-install'])
       .then(function () {
-        return ng(['init', 'src/**', '--skip-npm']);
+        return ng(['init', 'src/**', '--skip-install']);
       })
       .then(confirmBlueprinted);
   });
 
   it('init multiple files by glob patterns', function () {
-    return ng(['init', 'src/**', 'package.json', '--skip-npm'])
+    return ng(['init', 'src/**', 'package.json', '--skip-install'])
       .then(function () {
         return '{src/**,package.json}';
       })
@@ -169,15 +169,15 @@ describe('Acceptance: ng update', function () {
   });
 
   it('init multiple files by glob patterns on already init\'d folder', function () {
-    return ng(['init', '--skip-npm'])
+    return ng(['init', '--skip-install'])
       .then(function () {
-        return ng(['init', 'src/**', 'package.json', '--skip-npm']);
+        return ng(['init', 'src/**', 'package.json', '--skip-install']);
       })
       .then(confirmBlueprinted);
   });
 
   it('ng update --inline-template does not generate a template file', () => {
-    return ng(['init', '--skip-npm', '--skip-git', '--inline-template'])
+    return ng(['init', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => {
         const templateFile = path.join('src', 'app', 'app.component.html');
         expect(existsSync(templateFile)).to.equal(false);
@@ -185,7 +185,7 @@ describe('Acceptance: ng update', function () {
   });
 
   it('ng update --inline-style does not gener a style file', () => {
-    return ng(['init', '--skip-npm', '--skip-git', '--inline-style'])
+    return ng(['init', '--skip-install', '--skip-git', '--inline-style'])
       .then(() => {
         const styleFile = path.join('src', 'app', 'app.component.css');
         expect(existsSync(styleFile)).to.equal(false);
@@ -193,7 +193,7 @@ describe('Acceptance: ng update', function () {
   });
 
   it('should skip spec files when passed --skip-tests', () => {
-    return ng(['init', '--skip-npm', '--skip-git', '--skip-tests'])
+    return ng(['init', '--skip-install', '--skip-git', '--skip-tests'])
       .then(() => {
         const specFile = path.join('src', 'app', 'app.component.spec.ts');
         expect(existsSync(specFile)).to.equal(false);

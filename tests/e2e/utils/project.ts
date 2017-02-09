@@ -34,7 +34,7 @@ export function ngServe(...args: string[]) {
 export function createProject(name: string, ...args: string[]) {
   return Promise.resolve()
     .then(() => process.chdir(getGlobalVariable('tmp-root')))
-    .then(() => ng('new', name, '--skip-npm', ...args))
+    .then(() => ng('new', name, '--skip-install', ...args))
     .then(() => process.chdir(name))
     .then(() => updateJsonFile('package.json', json => {
       Object.keys(packages).forEach(pkgName => {
