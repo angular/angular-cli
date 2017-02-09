@@ -18,7 +18,7 @@ const ProgressPlugin  = require('webpack/lib/ProgressPlugin');
  * know they are used.
  *
  * require('source-map-loader')
- * require('sourcemap-istanbul-instrumenter-loader')
+ * require('istanbul-instrumenter-loader')
  *
  */
 
@@ -31,13 +31,12 @@ const getTestConfig = function (projectRoot, environment, appConfig, testConfig)
 
   if (testConfig.codeCoverage) {
     extraRules.push({
-      test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
+      test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
       enforce: 'post',
       exclude: [
         /\.(e2e|spec)\.ts$/,
         /node_modules/
-      ],
-      query: { 'force-sourcemap': true }
+      ]
     });
   }
 
