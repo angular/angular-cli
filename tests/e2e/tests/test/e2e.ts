@@ -1,16 +1,22 @@
 import {
   ng,
-  exec,
+  npm,
   execAndWaitForOutputToMatch,
   killAllProcesses
 } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { moveFile, copyFile } from '../../utils/fs';
 
 
 export default function () {
   // Should fail without updated webdriver
-  return exec('./node_modules/.bin/webdriver-manager', 'clean')
+  return updateJsonFile('package.json', packageJson => {
+    // Add to npm scripts to make running the binary compatible with Windows
+    const scripts = packageJson['scripts'];
+    scripts['wd:clean'] = 'webdriver-manager clean';
+  })
+    .then(() => npm('run', 'wd:clean'))
     .then(() => expectToFail(() => ng('e2e', '--no-webdriver-update', '--no-serve')))
     // Should fail without serving
     .then(() => expectToFail(() => ng('e2e', '--no-serve')))
