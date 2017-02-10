@@ -134,7 +134,6 @@
     "express": "^4.14.0",
     "jasmine": "^2.4.1",
     "jasmine-spec-reporter": "^3.2.0",
-    "license-checker": "^8.0.3",
     "minimist": "^1.2.0",
     "mocha": "^3.2.0",
     "mock-fs": "^4.0.0",
