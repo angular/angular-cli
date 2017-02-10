@@ -93,6 +93,8 @@ const allPackages = glob.sync(path.join(root, '**/node_modules/*/package.json'),
     return pkg;
   })
 
+// TODO: show total number of packages
+
 // Packages with bad licenses are those that neither pass SPDX nor are ignored.
 const badLicensePackages = allPackages
   .filter(pkg => !passesSpdx(pkg.license, acceptedSpdxLicenses))
