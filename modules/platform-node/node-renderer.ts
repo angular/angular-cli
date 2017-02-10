@@ -570,7 +570,7 @@ export class NodeDomRenderer extends DomRenderer {
   _setHiddenAttribute(renderElement: any, propertyName: any, propertyValue: any) {
     if (isPresent(propertyValue)) {
       // Follow Angular default behavior, true || string (of anything) will cause it to be hidden
-      if (propertyValue === true || propertyValue.toString().length) {
+      if (propertyValue === true || (typeof propertyValue !== 'boolean' ? propertyValue.toString().length : false)) {
         return super.setElementAttribute(renderElement, propertyName, propertyValue);
       } else {
         return;
