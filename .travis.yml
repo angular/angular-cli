@@ -28,14 +28,17 @@ matrix:
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT="tests/run_e2e.js --ignore=**/tests/build/**"
+    - node_js: "6"
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --ng4 --glob=tests/build/**"
+    - node_js: "6"
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --ng4 --ignore=**/tests/build/**"
 
     # Optional builds.
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT="tests/run_e2e.js --nightly --ng4"
-    - node_js: "6"
-      os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --ng4"
     - node_js: "7"
       os: linux
       env: NODE_SCRIPT=tests/run_e2e.js
