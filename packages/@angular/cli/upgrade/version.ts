@@ -5,32 +5,18 @@ import {readFileSync, existsSync} from 'fs';
 import * as path from 'path';
 
 import {CliConfig} from '../models/config';
+import {findUp} from '../utilities/find-up';
 
 const resolve = require('resolve');
 
 
-function _findUp(name: string, from: string) {
-  let currentDir = from;
-  while (currentDir && currentDir !== path.parse(currentDir).root) {
-    const p = path.join(currentDir, name);
-    if (existsSync(p)) {
-      return p;
-    }
-
-    currentDir = path.dirname(currentDir);
-  }
-
-  return null;
-}
-
-
 function _hasOldCliBuildFile() {
-  return existsSync(_findUp('angular-cli-build.js', process.cwd()))
-      || existsSync(_findUp('angular-cli-build.ts', process.cwd()))
-      || existsSync(_findUp('ember-cli-build.js', process.cwd()))
-      || existsSync(_findUp('angular-cli-build.js', __dirname))
-      || existsSync(_findUp('angular-cli-build.ts', __dirname))
-      || existsSync(_findUp('ember-cli-build.js', __dirname));
+  return existsSync(findUp('angular-cli-build.js', process.cwd()))
+      || existsSync(findUp('angular-cli-build.ts', process.cwd()))
+      || existsSync(findUp('ember-cli-build.js', process.cwd()))
+      || existsSync(findUp('angular-cli-build.js', __dirname))
+      || existsSync(findUp('angular-cli-build.ts', __dirname))
+      || existsSync(findUp('ember-cli-build.js', __dirname));
 }
 
 
@@ -112,7 +98,7 @@ export class Version {
           console.error(bold(red(stripIndents`
             This version of CLI is only compatible with angular version 2.3.1 or better. Please
             upgrade your angular version, e.g. by running:
-            
+
             npm install @angular/core@latest
           ` + '\n')));
           process.exit(3);
