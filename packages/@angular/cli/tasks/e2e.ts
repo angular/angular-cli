@@ -1,4 +1,5 @@
 import * as url from 'url';
+import { stripIndents } from 'common-tags';
 
 import { E2eTaskOptions } from '../commands/e2e';
 import { CliConfig } from '../models/config';
@@ -38,10 +39,25 @@ export const E2eTask = Task.extend({
       }
 
       if (e2eTaskOptions.webdriverUpdate) {
-        // webdriver-manager can only be accessed via a deep import from within
-        // protractor/node_modules. A double deep import if you will.
-        const webdriverUpdate = requireProjectModule(projectRoot,
-          'protractor/node_modules/webdriver-manager/built/lib/cmds/update');
+        // The webdriver-manager update command can only be accessed via a deep import.
+        const webdriverDeepImport = 'webdriver-manager/built/lib/cmds/update';
+        let webdriverUpdate: any;
+
+        try {
+          // When using npm, webdriver is within protractor/node_modules.
+          webdriverUpdate = requireProjectModule(projectRoot,
+            `protractor/node_modules/${webdriverDeepImport}`);
+        } catch (e) {
+          try {
+            // When using yarn, webdriver is found as a root module.
+            webdriverUpdate = requireProjectModule(projectRoot, webdriverDeepImport);
+          } catch (e) {
+            throw new SilentError(stripIndents`
+              Cannot automatically find webdriver-manager to update.
+              Update webdriver-manager manually and run 'ng e2e --no-webdriver-update' instead.
+            `);
+          }
+        }
         // run `webdriver-manager update --standalone false --gecko false --quiet`
         // if you change this, update the command comment in prev line, and in `eject` task
         promise = promise.then(() => webdriverUpdate.program.run({
