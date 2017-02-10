@@ -48,13 +48,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "--no-sandbox" > ~/.config/chromium-flags.conf; fi
-  - npm install -g npm
-  - npm install -g yarn
   - yarn config set spin false
   - yarn config set progress false
-
-install:
-  - yarn install --no-optional
 
 script:
   - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
