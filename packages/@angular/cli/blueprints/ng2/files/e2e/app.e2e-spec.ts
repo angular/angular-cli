@@ -1,6 +1,6 @@
 import { <%= jsComponentName %>Page } from './app.po';
 
-describe('<%= htmlComponentName %> App', function() {
+describe('<%= htmlComponentName %> App', () => {
   let page: <%= jsComponentName %>Page;
 
   beforeEach(() => {
