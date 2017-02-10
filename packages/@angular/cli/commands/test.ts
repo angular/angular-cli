@@ -14,6 +14,7 @@ export interface TestOptions {
   build?: boolean;
   sourcemap?: boolean;
   progress?: boolean;
+  config: string;
 }
 
 
@@ -21,6 +22,7 @@ const TestCommand = EmberTestCommand.extend({
   availableOptions: [
     { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
     { name: 'code-coverage', type: Boolean, default: false, aliases: ['cc'] },
+    { name: 'config', type: String, aliases: ['c'] },
     { name: 'single-run', type: Boolean, default: false, aliases: ['sr'] },
     { name: 'progress', type: Boolean, default: true},
     { name: 'browsers', type: String },
