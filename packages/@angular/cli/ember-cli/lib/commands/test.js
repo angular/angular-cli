@@ -13,7 +13,7 @@ module.exports = Command.extend({
 
   availableOptions: [
     { name: 'environment', type: String,  default: 'test',          aliases: ['e'] },
-    { name: 'config', type: String,                            aliases: ['c', 'cf']},
+    { name: 'config-file', type: String,                            aliases: ['c', 'cf']},
     { name: 'server',      type: Boolean, default: false,           aliases: ['s'] },
     { name: 'host',        type: String,                            aliases: ['H'] },
     { name: 'test-port',   type: Number,  default: defaultPort,     aliases: ['tp'], description: 'The test port to use when running with --server.' },
