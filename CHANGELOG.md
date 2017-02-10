@@ -1,3 +1,64 @@
+<a name="1.0.0-beta.31"></a>
+# [1.0.0-beta.31](https://github.com/angular/angular-cli/compare/v1.0.0-beta.30...v1.0.0-beta.31) (2017-02-09)
+
+Special thanks to: [Andrew Seguin](https://github.com/andrewseguin), [Bram Borggreve](https://github.com/beeman) and [Carlo Dapor](https://github.com/catull) for helping debugging issue [#4453](https://github.com/angular/angular-cli/issues/4453).
+
+**PLEASE TAKE NOT OF THE BREAKING CHANGES BELOW**
+
+### Bug Fixes
+
+* **.nvmrc:** change Node.js version from 4 to 6 ([#4399](https://github.com/angular/angular-cli/issues/4399)) ([e6422e9](https://github.com/angular/angular-cli/commit/e6422e9))
+* **@angular/cli:** add a dependency to RXJS ([#4465](https://github.com/angular/angular-cli/issues/4465)) ([39fa206](https://github.com/angular/angular-cli/commit/39fa206))
+* **@angular/cli:** add environment file to compilerHost ([#4475](https://github.com/angular/angular-cli/issues/4475)) ([2797a89](https://github.com/angular/angular-cli/commit/2797a89)), closes [#4375](https://github.com/angular/angular-cli/issues/4375)
+* **@angular/cli:** Bail out if output path is the root folder ([#4490](https://github.com/angular/angular-cli/issues/4490)) ([22f4bea](https://github.com/angular/angular-cli/commit/22f4bea))
+* **@angular/cli:** Bail out if output path is the root folder pt2 ([#4518](https://github.com/angular/angular-cli/issues/4518)) ([488185b](https://github.com/angular/angular-cli/commit/488185b))
+* **@angular/cli:** create app.component.styl for Stylus. ([#4540](https://github.com/angular/angular-cli/issues/4540)) ([0f7a35f](https://github.com/angular/angular-cli/commit/0f7a35f))
+* **@angular/cli:** don't override base-href if not directly specified ([#4489](https://github.com/angular/angular-cli/issues/4489)) ([6bab5ec](https://github.com/angular/angular-cli/commit/6bab5ec))
+* **@angular/cli:** GlobCopyWebpackPlugin should wait until assets are added before completing ([849155c](https://github.com/angular/angular-cli/commit/849155c))
+* **@angular/cli:** improve bootstrapping time ([#4537](https://github.com/angular/angular-cli/issues/4537)) ([6b26f91](https://github.com/angular/angular-cli/commit/6b26f91))
+* **@angular/cli:** remove unneeded dependencies ([#4473](https://github.com/angular/angular-cli/issues/4473)) ([d8f36df](https://github.com/angular/angular-cli/commit/d8f36df))
+* **@angular/cli:** update dependency to remove install warning ([#4562](https://github.com/angular/angular-cli/issues/4562)) ([4e06612](https://github.com/angular/angular-cli/commit/4e06612))
+* **@ngtools/json-schema:** enum values properly handle defaults and null. ([#4387](https://github.com/angular/angular-cli/issues/4387)) ([ea9f334](https://github.com/angular/angular-cli/commit/ea9f334))
+* **@ngtools/json-schema:** support enums in d.ts ([#4426](https://github.com/angular/angular-cli/issues/4426)) ([6ff0f80](https://github.com/angular/angular-cli/commit/6ff0f80))
+* **@ngtools/webpack:** better ctor parameters in AOT ([#4428](https://github.com/angular/angular-cli/issues/4428)) ([7f25548](https://github.com/angular/angular-cli/commit/7f25548)), closes [#4427](https://github.com/angular/angular-cli/issues/4427)
+* **@ngtools/webpack:** invalidate all the files changed ([#4542](https://github.com/angular/angular-cli/issues/4542)) ([9548d90](https://github.com/angular/angular-cli/commit/9548d90))
+* **@ngtools/webpack:** resolve file name before invalidating cached files ([#4384](https://github.com/angular/angular-cli/issues/4384)) ([9fcf10a](https://github.com/angular/angular-cli/commit/9fcf10a)), closes [#4422](https://github.com/angular/angular-cli/issues/4422) [#4345](https://github.com/angular/angular-cli/issues/4345) [#4338](https://github.com/angular/angular-cli/issues/4338)
+* **command options:** allow to use camelCase for options. ([#3787](https://github.com/angular/angular-cli/issues/3787)) ([496e13a](https://github.com/angular/angular-cli/commit/496e13a)), closes [#3625](https://github.com/angular/angular-cli/issues/3625)
+* **config:** tsconfig should support other formats too ([#4469](https://github.com/angular/angular-cli/issues/4469)) ([aa87de7](https://github.com/angular/angular-cli/commit/aa87de7))
+* **readme:** point npm badges to [@angular](https://github.com/angular)/cli instead of angular-cli ([#4395](https://github.com/angular/angular-cli/issues/4395)) ([4ad406f](https://github.com/angular/angular-cli/commit/4ad406f))
+* **webpack:** remove usage of fallbackLoader and loader ([#4435](https://github.com/angular/angular-cli/issues/4435)) ([73d5628](https://github.com/angular/angular-cli/commit/73d5628))
+
+
+### Code Refactoring
+
+* **@angular/cli:** removed the github pages deploy command ([#4385](https://github.com/angular/angular-cli/issues/4385)) ([0f8689b](https://github.com/angular/angular-cli/commit/0f8689b))
+
+
+### Features
+
+* **@angular/cli:** add ability to exclude files and directories ([#4437](https://github.com/angular/angular-cli/issues/4437)) ([6e3186d](https://github.com/angular/angular-cli/commit/6e3186d)), closes [#4350](https://github.com/angular/angular-cli/issues/4350)
+* **@angular/cli:** add ng4 option to ng new ([#4507](https://github.com/angular/angular-cli/issues/4507)) ([c096afb](https://github.com/angular/angular-cli/commit/c096afb))
+* **@angular/cli:** Add options for third party package manager ([#4321](https://github.com/angular/angular-cli/issues/4321)) ([d2849c7](https://github.com/angular/angular-cli/commit/d2849c7))
+* **@angular/cli:** add schema to the config ([#4504](https://github.com/angular/angular-cli/issues/4504)) ([186d50d](https://github.com/angular/angular-cli/commit/186d50d))
+* **@angular/cli:** Generate completion.sh automatically. ([d2f8ca7](https://github.com/angular/angular-cli/commit/d2f8ca7)), closes [#3981](https://github.com/angular/angular-cli/issues/3981)
+* **@angular/cli:** provide '--sourcemaps' alias for build ([#4462](https://github.com/angular/angular-cli/issues/4462)) ([e0fb87c](https://github.com/angular/angular-cli/commit/e0fb87c))
+* **@angular/cli:** show detailed help for blueprints. ([#4267](https://github.com/angular/angular-cli/issues/4267)) ([b20d87e](https://github.com/angular/angular-cli/commit/b20d87e))
+* **e2e:** use protractor api ([#4527](https://github.com/angular/angular-cli/issues/4527)) ([8d2d93a](https://github.com/angular/angular-cli/commit/8d2d93a)), closes [#4256](https://github.com/angular/angular-cli/issues/4256) [#4478](https://github.com/angular/angular-cli/issues/4478)
+* add support for [@angular](https://github.com/angular)/service-worker and manifest generation ([cb2e418](https://github.com/angular/angular-cli/commit/cb2e418)), closes [#4544](https://github.com/angular/angular-cli/issues/4544)
+* support TS 2.1 ([#4572](https://github.com/angular/angular-cli/issues/4572)) ([c617c21](https://github.com/angular/angular-cli/commit/c617c21))
+
+
+### BREAKING CHANGES
+
+* e2e: `ng e2e` no longer needs `ng serve` to be running.
+* @angular/cli: `--skip-npm` flag is now named `--skip-install`
+* @angular/cli: This command is being removed from the core of the CLI
+There are several options for deploying CLI-based applications outside the scope of this project.
+One of which being https://github.com/angular-buch/angular-cli-ghpages
+This functionality is likely to return in the form of an addon/plugin in the future
+
+
+
 <a name="1.0.0-beta.30"></a>
 # [1.0.0-beta.30](https://github.com/angular/angular-cli/compare/v1.0.0-beta.28...v1.0.0-beta.30) (2017-02-03)
 

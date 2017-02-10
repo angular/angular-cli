@@ -1,6 +1,6 @@
 {
   "name": "@ngtools/webpack",
-  "version": "1.2.7",
+  "version": "1.2.9",
   "description": "Webpack plugin that AoT compiles your Angular components and modules.",
   "main": "./src/index.js",
   "typings": "src/index.d.ts",
@@ -19,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/angular-cli/tree/master/packages/webpack",
+  "homepage": "https://github.com/angular/angular-cli/tree/master/packages/@ngtools/webpack",
   "engines": {
     "node": ">= 4.1.0",
     "npm": ">= 3.0.0"
