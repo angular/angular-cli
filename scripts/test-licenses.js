@@ -53,8 +53,7 @@ function testSpdx(licenses) {
 licenseCheckerInit({
   start: './',
   exclude: acceptedSpdxLicenses.concat(ignoredLicenseVariations).join(),
-  customFormat: { name: '', _location: '' },
-  production: true
+  customFormat: { name: '', _location: '' }
 })
   .then(json => {
     let badPackages = Object.keys(json)
