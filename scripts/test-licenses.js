@@ -38,7 +38,8 @@ const ignoredLicenseVariations = [
 const ignoredPackages = [
   'json-schema@0.2.3', // old license format, lists `AFLv2.1, BSD`
   'pause-stream@0.0.11', // old license format, lists `MIT, Apache2`
-  'rx-lite@3.1.2' // `Apache License, Version 2.0`, but licence-checker can't handle commas
+  'rx-lite@3.1.2', // `Apache License, Version 2.0`, but licence-checker can't handle commas
+  'map-stream@0.1.0', // has a MIT license but it's not listed in package.json
 ];
 
 function testSpdx(licenses) {
