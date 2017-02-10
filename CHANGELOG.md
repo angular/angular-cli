@@ -52,10 +52,9 @@ Special thanks to: [Andrew Seguin](https://github.com/andrewseguin), [Bram Borgg
 
 * e2e: `ng e2e` no longer needs `ng serve` to be running.
 * @angular/cli: `--skip-npm` flag is now named `--skip-install`
-* @angular/cli: This command is being removed from the core of the CLI
+* @angular/cli: The deploy command is being removed from the core of the CLI.
 There are several options for deploying CLI-based applications outside the scope of this project.
 One of which being https://github.com/angular-buch/angular-cli-ghpages
-This functionality is likely to return in the form of an addon/plugin in the future
 
 
 
