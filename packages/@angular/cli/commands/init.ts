@@ -11,7 +11,7 @@ const InitCommand: any = Command.extend({
     { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
     { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
     { name: 'ng4', type: Boolean, default: false },
-    { name: 'skip-npm', type: Boolean, default: false, aliases: ['sn'] },
+    { name: 'skip-install', type: Boolean, default: false, aliases: ['si'] },
     { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
     { name: 'skip-tests', type: Boolean, default: false, aliases: ['st'] },
     { name: 'skip-commit', type: Boolean, default: false, aliases: ['sc'] },

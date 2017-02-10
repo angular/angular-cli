@@ -1,26 +1,50 @@
+import * as url from 'url';
+
+import { E2eTaskOptions } from '../commands/e2e';
+import { requireProjectModule } from '../utilities/require-project-module';
 const Task = require('../ember-cli/lib/models/task');
-import * as chalk from 'chalk';
-import {exec} from 'child_process';
 
 
 export const E2eTask = Task.extend({
-  run: function () {
-    const ui = this.ui;
-    let exitCode = 0;
+  run: function (e2eTaskOptions: E2eTaskOptions) {
+    const projectRoot = this.project.root;
+    const protractorLauncher = requireProjectModule(projectRoot, 'protractor/built/launcher');
 
-    return new Promise((resolve) => {
-      exec(`npm run e2e -- ${this.project.ngConfig.config.e2e.protractor.config}`,
-        (err: NodeJS.ErrnoException, stdout: string, stderr: string) => {
-          ui.writeLine(stdout);
-          if (err) {
-            ui.writeLine(stderr);
-            ui.writeLine(chalk.red('Some end-to-end tests failed, see above.'));
-            exitCode = 1;
-          } else {
-            ui.writeLine(chalk.green('All end-to-end tests pass.'));
-          }
-          resolve(exitCode);
+    return new Promise(function () {
+      let promise = Promise.resolve();
+      let additionalProtractorConfig: any = {
+        elementExplorer: e2eTaskOptions.elementExplorer
+      };
+
+      // use serve url as override for protractors baseUrl
+      if (e2eTaskOptions.serve) {
+        additionalProtractorConfig.baseUrl = url.format({
+          protocol: e2eTaskOptions.ssl ? 'https' : 'http',
+          hostname: e2eTaskOptions.host,
+          port: e2eTaskOptions.port.toString()
         });
+      }
+
+      if (e2eTaskOptions.specs.length !== 0) {
+        additionalProtractorConfig['specs'] = e2eTaskOptions.specs;
+      }
+
+      if (e2eTaskOptions.webdriverUpdate) {
+        // webdriver-manager can only be accessed via a deep import from within
+        // protractor/node_modules. A double deep import if you will.
+        const webdriverUpdate = requireProjectModule(projectRoot,
+          'protractor/node_modules/webdriver-manager/built/lib/cmds/update');
+        // run `webdriver-manager update --standalone false --gecko false --quiet`
+        promise = promise.then(() => webdriverUpdate.program.run({
+          standalone: false,
+          gecko: false,
+          quiet: true
+        }));
+      }
+
+      // Don't call resolve(), protractor will manage exiting the process itself
+      return promise.then(() =>
+        protractorLauncher.init(e2eTaskOptions.config, additionalProtractorConfig));
     });
   }
 });

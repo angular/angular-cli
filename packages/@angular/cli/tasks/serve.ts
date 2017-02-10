@@ -16,7 +16,7 @@ const SilentError = require('silent-error');
 const opn = require('opn');
 
 export default Task.extend({
-  run: function (serveTaskOptions: ServeTaskOptions) {
+  run: function (serveTaskOptions: ServeTaskOptions, rebuildDoneCb: any) {
     const ui = this.ui;
 
     let webpackCompiler: any;
@@ -25,7 +25,7 @@ export default Task.extend({
 
     const outputPath = serveTaskOptions.outputPath || appConfig.outDir;
     if (this.project.root === outputPath) {
-      throw new SilentError ('Output path MUST not be project root directory!');
+      throw new SilentError('Output path MUST not be project root directory!');
     }
     rimraf.sync(path.resolve(this.project.root, outputPath));
 
@@ -66,6 +66,10 @@ export default Task.extend({
     if (!webpackConfig.entry.main) { webpackConfig.entry.main = []; }
     webpackConfig.entry.main.unshift(...entryPoints);
     webpackCompiler = webpack(webpackConfig);
+
+    if (rebuildDoneCb) {
+      webpackCompiler.plugin('done', rebuildDoneCb);
+    }
 
     const statsConfig = getWebpackStatsConfig(serveTaskOptions.verbose);
 

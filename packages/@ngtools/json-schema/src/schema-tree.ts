@@ -495,7 +495,9 @@ class EnumSchemaTreeNode extends LeafSchemaTreeNode<any> {
     return v;
   }
 
-  get type() { return 'any'; }
+  get type() {
+    return this._schema['type'] || 'any';
+  }
   get tsType(): null { return null; }
   serialize(serializer: Serializer) { serializer.outputEnum(this); }
 }

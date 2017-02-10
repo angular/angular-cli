@@ -5,8 +5,9 @@ import {
   silentExecAndWaitForOutputToMatch,
   ng,
 } from '../../utils/process';
-import {writeFile} from '../../utils/fs';
+import {writeFile, writeMultipleFiles, appendToFile, expectFileToMatch} from '../../utils/fs';
 import {wait} from '../../utils/utils';
+import {request} from '../../utils/http';
 
 
 export default function() {
@@ -67,6 +68,33 @@ export default function() {
       let newNumberOfChunks = stdout.split(chunkRegExp).length;
       if (oldNumberOfChunks >= newNumberOfChunks) {
         throw new Error('Expected webpack to create a new chunk, but did not.');
+      }
+    })
+    .then(() => wait(1000))
+    // Change multiple files and check that all of them are invalidated and recompiled.
+    .then(() => writeMultipleFiles({
+      'src/app/app.module.ts': `
+        console.log('$$_E2E_GOLDEN_VALUE_1');
+        export let X = '$$_E2E_GOLDEN_VALUE_2';
+      `,
+      'src/main.ts': `
+        import * as m from './app/app.module';
+        console.log(m.X);
+        console.log('$$_E2E_GOLDEN_VALUE_3');
+      `
+    }))
+    .then(() => waitForAnyProcessOutputToMatch(
+      /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))
+    .then(() => request('http://localhost:4200/main.bundle.js'))
+    .then((body) => {
+      if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
+        throw new Error('Expected golden value 1.');
+      }
+      if (!body.match(/\$\$_E2E_GOLDEN_VALUE_2/)) {
+        throw new Error('Expected golden value 2.');
+      }
+      if (!body.match(/\$\$_E2E_GOLDEN_VALUE_3/)) {
+        throw new Error('Expected golden value 3.');
       }
     })
     .then(() => killAllProcesses(), (err: any) => {

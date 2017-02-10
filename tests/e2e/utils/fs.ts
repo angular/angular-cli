@@ -82,11 +82,8 @@ export function copyFile(from: string, to: string) {
 }
 
 
-export function writeMultipleFiles(fs: any) {
-  return Object.keys(fs)
-    .reduce((previous, curr) => {
-      return previous.then(() => writeFile(curr, fs[curr]));
-    }, Promise.resolve());
+export function writeMultipleFiles(fs: { [path: string]: string }) {
+  return Promise.all(Object.keys(fs).map(fileName => writeFile(fileName, fs[fileName])));
 }
 
 

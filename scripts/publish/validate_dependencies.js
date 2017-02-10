@@ -27,6 +27,9 @@ const ANGULAR_PACKAGES = [
   '@angular/compiler-cli',
   '@angular/core'
 ];
+const OPTIONAL_PACKAGES = [
+  '@angular/service-worker'
+];
 
 
 function listImportedModules(source) {
@@ -121,7 +124,9 @@ for (const packageName of Object.keys(packages)) {
     .concat(Object.keys(packageJson['devDependencies'] || {}))
     .concat(Object.keys(packageJson['peerDependencies'] || {}));
 
-  const missingDeps = dependencies.filter(d => allDeps.indexOf(d) == -1);
+  const missingDeps = dependencies
+    .filter(d => allDeps.indexOf(d) == -1)
+    .filter(d => OPTIONAL_PACKAGES.indexOf(d) == -1);
   reportMissingDependencies(missingDeps);
 
   const overDeps = allDeps.filter(d => dependencies.indexOf(d) == -1)
@@ -141,7 +146,8 @@ const allRootDeps = []
 
 const internalPackages = Object.keys(packages);
 const missingRootDeps = overallDeps.filter(d => allRootDeps.indexOf(d) == -1)
-  .filter(d => internalPackages.indexOf(d) == -1);
+  .filter(d => internalPackages.indexOf(d) == -1)
+  .filter(x => OPTIONAL_PACKAGES.indexOf(x) == -1);
 reportMissingDependencies(missingRootDeps);
 
 const overRootDeps = allRootDeps.filter(d => overallDeps.indexOf(d) == -1)
