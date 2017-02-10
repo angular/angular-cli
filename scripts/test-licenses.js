@@ -10,19 +10,18 @@ require('rxjs/add/operator/filter');
 // Configure logger
 const logger = new Logger('test-licenses');
 
-logger
-  .subscribe((entry) => {
-    let color = chalk.white;
-    let output = process.stdout;
-    switch (entry.level) {
-      case 'info': color = chalk.white; break;
-      case 'warn': color = chalk.yellow; break;
-      case 'error': color = chalk.red; output = process.stderr; break;
-      case 'fatal': color = (x) => chalk.bold(chalk.red(x)); output = process.stderr; break;
-    }
+logger.subscribe((entry) => {
+  let color = chalk.white;
+  let output = process.stdout;
+  switch (entry.level) {
+    case 'info': color = chalk.white; break;
+    case 'warn': color = chalk.yellow; break;
+    case 'error': color = chalk.red; output = process.stderr; break;
+    case 'fatal': color = (x) => chalk.bold(chalk.red(x)); output = process.stderr; break;
+  }
 
-    output.write(color(entry.message) + '\n');
-  });
+  output.write(color(entry.message) + '\n');
+});
 
 logger
   .filter((entry) => entry.level == 'fatal')
@@ -81,7 +80,7 @@ const ignoredPackages = [
   'samsam@1.1.2', // BSD, but doesn't list it in package.json
   'stdout-stream@1.4.0', // MIT, but doesn't list it in package.json
   'undefined@undefined', // Test package with no name nor version.
-  'verror@1.3.6', // Looks like MIT
+  'verror@1.3.6' // Looks like MIT
 ];
 
 const root = path.resolve(__dirname, '../');
