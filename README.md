@@ -234,6 +234,8 @@ and then we edit the `package.json` file's start script to be
 
 now run it with `npm start`
 
+By design the repository for development and hosting of `gh-pages` are the same.
+You might want to evaluate the [angular-cli-ghpages](https://github.com/Angular2Buch/angular-cli-ghpages) addon if you want to deploy to a completely different github repository. 
 
 ### Linting code
 
