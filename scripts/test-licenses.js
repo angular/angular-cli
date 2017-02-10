@@ -2,10 +2,34 @@ require('../lib/bootstrap-local');
 
 const path = require('path');
 const glob = require('glob');
+const chalk = require('chalk');
 const spdxSatisfies = require('spdx-satisfies');
-// TODO use logger.Logger
-const logger = require('@ngtools/logger');
+const Logger = require('@ngtools/logger').Logger;
+require('rxjs/add/operator/filter');
 
+// Configure logger
+const logger = new Logger('test-licenses');
+
+logger
+  .subscribe((entry) => {
+    let color = chalk.white;
+    let output = process.stdout;
+    switch (entry.level) {
+      case 'info': color = chalk.white; break;
+      case 'warn': color = chalk.yellow; break;
+      case 'error': color = chalk.red; output = process.stderr; break;
+      case 'fatal': color = (x) => chalk.bold(chalk.red(x)); output = process.stderr; break;
+    }
+
+    output.write(color(entry.message) + '\n');
+  });
+
+logger
+  .filter((entry) => entry.level == 'fatal')
+  .subscribe(() => {
+    process.stderr.write('A fatal error happened. See details above.');
+    process.exit(1);
+  });
 
 // SPDX defined licenses, see https://spdx.org/licenses/.
 // TODO(hansl): confirm this list
@@ -28,7 +52,7 @@ const acceptedSpdxLicenses = [
 const licenseReplacements = [
   { name: 'Apache License, Version 2.0', replacement: 'Apache-2.0' },
   { name: 'AFLv2.1', replacement: 'AFL-2.1' },
-  // I guess they are kinda the same?
+  // I guess these are kinda the same?
   { name: 'BSD', replacement: 'BSD-2-Clause' },
   { name: 'BSD-like', replacement: 'BSD-2-Clause' },
   { name: 'MIT/X11', replacement: 'MIT' },
@@ -62,7 +86,7 @@ const ignoredPackages = [
 
 const root = path.resolve(__dirname, '../');
 
-// Find all folder directly under a `node_modules` that have a package.json.
+// Find all folders directly under a `node_modules` that have a package.json.
 const allPackages = glob.sync(path.join(root, '**/node_modules/*/package.json'), { nodir: true })
   .map(packageJsonPath => {
     const packageJson = require(packageJsonPath);
@@ -93,7 +117,7 @@ const allPackages = glob.sync(path.join(root, '**/node_modules/*/package.json'),
     return pkg;
   })
 
-// TODO: show total number of packages
+logger.info(`Testing ${allPackages.length} packages.\n`)
 
 // Packages with bad licenses are those that neither pass SPDX nor are ignored.
 const badLicensePackages = allPackages
@@ -102,11 +126,11 @@ const badLicensePackages = allPackages
 
 // Report packages with bad licenses
 if (badLicensePackages.length > 0) {
-  console.log('Invalid package licences found:\n');
-  badLicensePackages.forEach(pkg => console.log(`${pkg.id} (${pkg.path}): ${pkg.license}`));
-  process.exit(1);
+  logger.error('Invalid package licences found:');
+  badLicensePackages.forEach(pkg => logger.error(`${pkg.id} (${pkg.path}): ${pkg.license}`));
+  logger.fatal(`\n${badLicensePackages.length} total packages with invalid licenses.`);
 } else {
-  console.log('All package licenses are valid.');
+  logger.info('All package licenses are valid.');
 }
 
 // Check if a license is accepted by an array of accepted licenses
