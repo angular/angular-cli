@@ -17,6 +17,7 @@ const defaultPort = process.env.PORT || config.get('defaults.serve.port');
 const defaultHost = config.get('defaults.serve.host');
 
 export interface ServeTaskOptions extends BuildOptions {
+  watch?: boolean;
   port?: number;
   host?: string;
   proxyConfig?: string;
@@ -43,6 +44,7 @@ export const baseServeCommandOptions: any = baseBuildCommandOptions.concat([
     description: `Listens only on ${defaultHost} by default`
   },
   { name: 'proxy-config', type: 'Path', aliases: ['pc'] },
+  { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
   { name: 'ssl', type: Boolean, default: false },
   { name: 'ssl-key', type: String, default: 'ssl/server.key' },
   { name: 'ssl-cert', type: String, default: 'ssl/server.crt' },
@@ -61,7 +63,12 @@ const ServeCommand = Command.extend({
   aliases: ['server', 's'],
 
   availableOptions: baseServeCommandOptions.concat([
-    { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
+    {
+      name: 'live-reload',
+      type: Boolean,
+      aliases: ['lr'],
+      description: 'Defaults to watch'
+    },
     {
       name: 'live-reload-host',
       type: String,
@@ -99,6 +106,7 @@ const ServeCommand = Command.extend({
 
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
+    commandOptions.liveReload = commandOptions.liveReload || commandOptions.watch;
 
     return checkExpressPort(commandOptions)
       .then(() => autoFindLiveReloadPort(commandOptions))

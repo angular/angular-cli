@@ -109,6 +109,7 @@ export default Task.extend({
       inline: true,
       proxy: proxyConfig,
       compress: serveTaskOptions.target === 'production',
+      watch: serveTaskOptions.liveReload,
       watchOptions: {
         poll: projectConfig.defaults && projectConfig.defaults.poll
       },

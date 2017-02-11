@@ -12,6 +12,8 @@
 
 `--proxy-config` (`-pc`) proxy configuration file
 
+`--watch` (`-w`) flag to turn off watch mode
+
 `--live-reload` (`-lr`) flag to turn off live reloading
 
 `--live-reload-host` (`-lrh`) specify the host for live reloading

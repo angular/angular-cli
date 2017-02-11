@@ -9,6 +9,7 @@ interface IWebpackDevServerConfigurationOptions {
   noInfo?: boolean;
   lazy?: boolean;
   filename?: string;
+  watch?: boolean;
   watchOptions?: {
     aggregateTimeout?: number;
     poll?: number;
