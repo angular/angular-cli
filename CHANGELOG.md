@@ -3,7 +3,7 @@
 
 Special thanks to: [Andrew Seguin](https://github.com/andrewseguin), [Bram Borggreve](https://github.com/beeman) and [Carlo Dapor](https://github.com/catull) for helping debugging issue [#4453](https://github.com/angular/angular-cli/issues/4453).
 
-**PLEASE TAKE NOT OF THE BREAKING CHANGES BELOW**
+**PLEASE TAKE NOTE OF THE BREAKING CHANGES BELOW**
 
 ### Bug Fixes
 
