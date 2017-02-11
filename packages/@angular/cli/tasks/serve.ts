@@ -108,7 +108,7 @@ export default Task.extend({
       stats: statsConfig,
       inline: true,
       proxy: proxyConfig,
-      compress: serveTaskOptions.target === 'production',
+      compress: serveTaskOptions.target === 'production' && serveTaskOptions.compress,
       watchOptions: {
         poll: projectConfig.defaults && projectConfig.defaults.poll
       },

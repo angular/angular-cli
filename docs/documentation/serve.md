@@ -58,4 +58,6 @@
 
 `--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
 
+`--compress` use gzip compression in production mode
+
 `--output-hashing` define the output filename cache-busting hashing mode

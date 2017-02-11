@@ -25,6 +25,12 @@ export const baseBuildCommandOptions: any = [
   { name: 'locale', type: String },
   { name: 'extract-css', type: Boolean, aliases: ['ec'] },
   {
+    name: 'compress',
+    type: Boolean,
+    default: true,
+    description: 'use gzip compression in production mode'
+  },
+  {
     name: 'output-hashing',
     type: String,
     values: ['none', 'all', 'media', 'bundles'],

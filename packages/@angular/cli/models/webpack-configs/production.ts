@@ -76,12 +76,13 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
         compress: { screw_ie8: true, warnings: buildOptions.verbose },
         sourceMap: buildOptions.sourcemap
       }),
-      new CompressionPlugin({
-        asset: '[path].gz[query]',
-        algorithm: 'gzip',
-        test: /\.js$|\.html$|\.css$/,
-        threshold: 10240
-      })
+      buildOptions.compress ?
+        new CompressionPlugin({
+          asset: '[path].gz[query]',
+          algorithm: 'gzip',
+          test: /\.js$|\.html$|\.css$/,
+          threshold: 10240
+        }) : (): void => null
     ].concat(extraPlugins)
   };
 };
