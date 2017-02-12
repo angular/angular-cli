@@ -29,6 +29,7 @@ export interface CompletionCommandOptions {
 
 const commandsToIgnore = [
   'easter-egg',
+  'init',
   'destroy',
   'github-pages-deploy' // errors because there is no base github-pages command
 ];

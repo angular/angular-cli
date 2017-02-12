@@ -24,7 +24,6 @@ module.exports = {
       'new': require('../commands/new').default,
       'generate': require('../commands/generate').default,
       'destroy': require('../commands/destroy').default,
-      'init': require('../commands/init').default,
       'test': require('../commands/test').default,
       'e2e': require('../commands/e2e').default,
       'help': require('../commands/help').default,
