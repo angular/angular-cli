@@ -55,6 +55,32 @@ Special thanks to: [Andrew Seguin](https://github.com/andrewseguin), [Bram Borgg
 * @angular/cli: The deploy command is being removed from the core of the CLI.
 There are several options for deploying CLI-based applications outside the scope of this project.
 One of which being https://github.com/angular-buch/angular-cli-ghpages
+* @angular/cli: The default LCOV file is now `coverage/lcov.info` instead of `coverage/coverage.lcov`.
+* @angular/cli:`ng test --code-coverage` now uses `karma-coverage-istanbul-reporter` instead of `karma-remap-istanbul`.
+
+To update follow these steps in your project:
+- `npm uninstall karma-remap-istanbul --save-dev`
+- `npm install karma-coverage-istanbul-reporter --save-dev`
+
+Then copy `karma.conf.js` from a new project, or update it manually:
+- replace `require('karma-remap-istanbul'),` with `require('karma-coverage-istanbul-reporter'),`
+- replace `['progress', 'karma-remap-istanbul']` with `['progress', 'coverage-istanbul']`
+- replace
+```
+    remapIstanbulReporter: {
+      reports: {
+        html: 'coverage',
+        lcovonly: './coverage/coverage.lcov'
+      }
+    },
+```
+with
+```
+    coverageIstanbulReporter: {
+      reports: [ 'html', 'lcovonly' ],
+      fixWebpackSourcePaths: true
+    },
+```
 
 
 
