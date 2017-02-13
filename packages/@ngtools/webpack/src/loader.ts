@@ -9,7 +9,9 @@ const NormalModule = require('webpack/lib/NormalModule');
 
 
 function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
-  if (node.kind == ts.SyntaxKind.Identifier) {
+  if (!node) {
+    return null;
+  } else if (node.kind == ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
     return (node as ts.StringLiteral).text;
@@ -241,11 +243,16 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
 
   refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
     // Get all their property assignments.
-    .filter((node: ts.ObjectLiteralExpression) =>
-      node.properties.some(prop => _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId'))
+    .filter((node: ts.ObjectLiteralExpression) => {
+      return node.properties.some(prop => {
+        return prop.kind == ts.SyntaxKind.PropertyAssignment
+            && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
+      });
+    })
     .forEach((node: ts.ObjectLiteralExpression) => {
       const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, idx: number) => {
-        return _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
+        return prop.kind == ts.SyntaxKind.PropertyAssignment
+            && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
       })[0];
       // get the trailing comma
       const moduleIdCommaProp = moduleIdProp.parent.getChildAt(1).getChildren()[1];
