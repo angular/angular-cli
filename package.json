@@ -29,7 +29,7 @@
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": ">= 4.1.0",
+    "node": ">= 6.9.0",
     "npm": ">= 3.0.0"
   },
   "author": "Angular Authors",
