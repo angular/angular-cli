@@ -67,19 +67,6 @@ const init = (config) => {
     .map((file) => config.preprocessors[file])
     .map((arr) => arr.splice(arr.indexOf('@angular/cli'), 1, 'webpack', 'sourcemap'));
 
-  // Add polyfills file
-  if (appConfig.polyfills) {
-    const polyfillsFile = path.resolve(appRoot, appConfig.polyfills);
-    const polyfillsPattern = {
-      pattern: polyfillsFile,
-      included: true,
-      served: true,
-      watched: true
-    }
-    Array.prototype.unshift.apply(config.files, [polyfillsPattern]);
-    config.preprocessors[polyfillsFile] = ['webpack', 'sourcemap'];
-  }
-
   // Add global scripts
   if (appConfig.scripts && appConfig.scripts.length > 0) {
     const globalScriptPatterns = appConfig.scripts
@@ -97,6 +84,19 @@ const init = (config) => {
     // It's important to not replace the array, because
     // karma already has a reference to the existing array.
     Array.prototype.unshift.apply(config.files, globalScriptPatterns);
+  }
+
+  // Add polyfills file before everything else
+  if (appConfig.polyfills) {
+    const polyfillsFile = path.resolve(appRoot, appConfig.polyfills);
+    const polyfillsPattern = {
+      pattern: polyfillsFile,
+      included: true,
+      served: true,
+      watched: true
+    }
+    Array.prototype.unshift.apply(config.files, [polyfillsPattern]);
+    config.preprocessors[polyfillsFile] = ['webpack', 'sourcemap'];
   }
 }
 
