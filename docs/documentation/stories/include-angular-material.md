@@ -1,6 +1,6 @@
 # Include [Angular Material](https://material.angular.io)
 
-[Angular Material](https://material.angular.io) is a set of Material Design components for Angular apps. 
+[Angular Material](https://material.angular.io) is a set of Material Design components for Angular apps.
 This guide will walk you through adding material design to your Angular CLI project and configuring it to use Angular Material.
 
 Create a new project and navigate into the project...
@@ -16,10 +16,10 @@ npm install --save @angular/material
 
 Import the Angular Material NgModule into your app module...
 ```javascript
-//in src/app/app.module.ts 
+//in src/app/app.module.ts
 
 import { MaterialModule } from '@angular/material';
-// other imports 
+// other imports
 
 @NgModule({
   imports: [
@@ -49,14 +49,14 @@ To verify Angular Material has been set up correctly, change `src/app/app.compon
 </h1>
 
 <button md-raised-button>
-  Angular Material works! 
+  Angular Material works!
   <md-icon>done</md-icon>
 </button>
 ```
 
 After saving this file, return to the browser to see the Angular Material styled button.
 
-### More Info 
+### More Info
 
  - [Getting Started](https://material.angular.io/guide/getting-started)
  - [Theming Angular Material](https://material.angular.io/guide/theming)

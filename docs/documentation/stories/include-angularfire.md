@@ -3,7 +3,7 @@
 # Include AngularFire
 
 [Firebase](https://firebase.google.com/) is a mobile and web application platform with tools and infrastructure designed
-to help developers build high-quality apps. [AngularFire2](https://github.com/angular/angularfire2) is the official 
+to help developers build high-quality apps. [AngularFire2](https://github.com/angular/angularfire2) is the official
 Angular library to use Firebase in your apps.
 
 #### Create new project
@@ -46,7 +46,7 @@ Firebase offers an easy way to get this, by showing a JavaScript object that you
 
 #### Configure the Environment
 
-These configuration details need to be stored in our app, one way to do this using the `environment`. This allows you to 
+These configuration details need to be stored in our app, one way to do this using the `environment`. This allows you to
 use different credentials in development and production.
 
 Open `src/environments/environment.ts` and add a key `firebase` to the exported constant:
@@ -76,7 +76,7 @@ import { AngularFireModule } from 'angularfire2';
 import { environment } from '../environments/environment';
 ```
 
-To initialize AngularFire add the following line to the `imports` array inside the `NgModule`: 
+To initialize AngularFire add the following line to the `imports` array inside the `NgModule`:
 
 ```typescript
 @NgModule({
