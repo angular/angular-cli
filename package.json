@@ -149,7 +149,7 @@
     "@types/express": "^4.0.32",
     "@types/fs-extra": "^0.0.31",
     "@types/glob": "^5.0.29",
-    "@types/jasmine": "^2.2.32",
+    "@types/jasmine": "2.5.41",
     "@types/lodash": "4.14.50",
     "@types/mock-fs": "3.6.28",
     "@types/node": "^6.0.36",
