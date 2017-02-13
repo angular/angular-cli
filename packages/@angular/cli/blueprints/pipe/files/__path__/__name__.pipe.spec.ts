@@ -5,7 +5,7 @@ import { <%= classifiedModuleName %>Pipe } from './<%= dasherizedModuleName %>.p
 
 describe('<%= classifiedModuleName %>Pipe', () => {
   it('create an instance', () => {
-    let pipe: <%= classifiedModuleName %>Pipe = new <%= classifiedModuleName %>Pipe();
+    const pipe: <%= classifiedModuleName %>Pipe = new <%= classifiedModuleName %>Pipe();
     expect(pipe).toBeTruthy();
   });
 });
