@@ -6,13 +6,17 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
     "outDir": "./dist",
     "rootDir": ".",
     "sourceMap": true,
     "sourceRoot": "",
     "inlineSourceMap": true,
-    "target": "es5",
-    "lib": ["es6"],
+    "target": "es6",
+    "lib": [
+      "es2016"
+    ],
     "baseUrl": "",
     "typeRoots": [
       "./node_modules/@types"
@@ -22,14 +26,14 @@
       "node"
     ],
     "paths": {
-      "angular-cli/*": [ "./packages/angular-cli/*" ],
-      "@angular-cli/ast-tools": [ "./packages/ast-tools/src" ],
-      "@angular-cli/base-href-webpack": [ "./packages/base-href-webpack/src" ],
+      "@angular/cli/*": [ "./packages/@angular/cli/*" ],
+      "@ngtools/json-schema": [ "./packages/json-schema/src" ],
+      "@ngtools/logger": [ "./packages/logger/src" ],
       "@ngtools/webpack": [ "./packages/webpack/src" ]
     }
   },
   "exclude": [
-    "packages/angular-cli/blueprints/*/files/**/*",
+    "packages/@angular/cli/blueprints/*/files/**/*",
     "dist/**/*",
     "node_modules/**/*",
     "tmp/**/*"

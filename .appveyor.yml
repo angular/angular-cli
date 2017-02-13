@@ -1,6 +1,5 @@
 environment:
   matrix:
-  - nodejs_version: "4.0"
   - nodejs_version: "6.0"
 
 matrix:
@@ -8,13 +7,13 @@ matrix:
 
 install:
   - ps: Install-Product node $env:nodejs_version
-  - npm install -g npm
-  - npm install
+  - npm install -g yarn
+  - yarn install
 
 test_script:
   - node --version
-  - npm --version
-  - npm test
-  - node tests\e2e_runner.js
+  - yarn --version
+  - yarn test
+  - node tests\run_e2e.js
 
 build: off

@@ -1,6 +1,6 @@
-# Contributing to angular-cli
+# Contributing to Angular CLI
 
-We would love for you to contribute to angular-cli and help make it even better
+We would love for you to contribute to Angular CLI and help make it even better
 than it is today! As a contributor, here are the guidelines we would like you
 to follow:
 
@@ -18,7 +18,7 @@ Help us keep Angular open and inclusive. Please read and follow our [Code of Con
 
 ## <a name="question"></a> Got a Question or Problem?
 
-If you have questions about how to *use* Angular CLI, please direct them to [StackOverflow][stackoverflow]. Please note that angular-cli is still in early developer preview, and the core team's capacity to answer usage questions is limited. We are also available on [Gitter][gitter].
+If you have questions about how to *use* Angular CLI, please direct them to [StackOverflow][stackoverflow]. Please note that Angular CLI is still in early developer preview, and the core team's capacity to answer usage questions is limited. We are also available on [Gitter][gitter].
 
 ## <a name="issue"></a> Found an Issue?
 If you find a bug in the source code or a mistake in the documentation, you can help us by
@@ -219,10 +219,10 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
 [corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
 [dev-doc]: https://github.com/angular/angular/blob/master/DEVELOPER.md
-[github]: https://github.com/angular/angular-cli
+[GitHub]: https://github.com/angular/angular-cli
 [gitter]: https://gitter.im/angular/angular-cli
 [individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
-[js-style-guide]: http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
+[js-style-guide]: https://google.github.io/styleguide/jsguide.html
 [jsfiddle]: http://jsfiddle.net/
 [plunker]: http://plnkr.co/edit
 [runnable]: http://runnable.com/

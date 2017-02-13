@@ -7,8 +7,7 @@ var expect = require('chai').expect;
 var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = process.cwd();
-var conf = require('ember-cli/tests/helpers/conf');
-var Promise = require('ember-cli/lib/ext/promise');
+var Promise = require('@angular/cli/ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
 const denodeify = require('denodeify');
 
@@ -16,15 +15,11 @@ const readFile = denodeify(fs.readFile);
 
 
 describe('Acceptance: ng generate directive', function () {
-  before(conf.setup);
-
-  after(conf.restore);
-
   beforeEach(function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
-      return ng(['new', 'foo', '--skip-npm', '--skip-bower']);
+      return ng(['new', 'foo', '--skip-install']);
     });
   });
 

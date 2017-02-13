@@ -1,0 +1,32 @@
+{
+  "name": "@ngtools/json-schema",
+  "version": "1.0.3",
+  "description": "Schema validating and reading for configurations, similar to Angular CLI config.",
+  "main": "./src/index.js",
+  "typings": "src/index.d.ts",
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "json",
+    "json-schema",
+    "schema",
+    "config"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "author": "angular",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli/tree/master/packages/@ngtools/json-schema",
+  "engines": {
+    "node": ">= 4.1.0",
+    "npm": ">= 3.0.0"
+  },
+  "dependencies": {
+  },
+  "peerDependencies": {
+  }
+}

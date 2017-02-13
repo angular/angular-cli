@@ -2,7 +2,7 @@ import {
   insertImport as _insertImport,
   addImportToModule as _addImportToModule,
   NodeHost
-} from '@angular-cli/ast-tools';
+} from '../../../packages/@angular/cli/lib/ast-tools';
 
 
 export function insertImport(file: string, symbol: string, module: string) {

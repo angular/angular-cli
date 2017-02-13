@@ -1,0 +1,352 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "https://github.com/angular/angular-cli/blob/master/packages/@angular/cli/lib/config/schema.json#CliConfig",
+  "title": "Angular CLI Config Schema",
+  "type": "object",
+  "properties": {
+    "project": {
+      "description": "The global configuration of the project.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "apps": {
+      "description": "Properties of the different applications in this project.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "root": {
+            "type": "string"
+          },
+          "outDir": {
+            "type": "string",
+            "default": "dist/"
+          },
+          "assets": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "default": []
+          },
+          "deployUrl": {
+            "type": "string"
+          },
+          "index": {
+            "type": "string",
+            "default": "index.html"
+          },
+          "main": {
+            "type": "string"
+          },
+          "polyfills": {
+            "type": "string"
+          },
+          "test": {
+            "type": "string"
+          },
+          "tsconfig": {
+            "type": "string",
+            "default": "tsconfig.json"
+          },
+          "prefix": {
+            "type": "string"
+          },
+          "serviceWorker": {
+            "description": "Experimental support for a service worker from @angular/service-worker.",
+            "type": "boolean",
+            "default": false
+          },
+          "styles": {
+            "description": "Global styles to be included in the build.",
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              ]
+            },
+            "additionalProperties": false
+          },
+          "stylePreprocessorOptions": {
+            "description": "Options to pass to style preprocessors",
+            "type": "object",
+            "properties": {
+              "includePaths": {
+                "description": "Paths to include. Paths will be resolved to project root.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              }
+            },
+            "additionalProperties": false
+          },
+          "scripts": {
+            "description": "Global scripts to be included in the build.",
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true,
+                  "required": [
+                    "input"
+                  ]
+                }
+              ]
+            },
+            "additionalProperties": false
+          },
+          "environments": {
+            "description": "Name and corresponding file for environment config.",
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "additionalProperties": false
+    },
+    "addons": {
+      "description": "Configuration reserved for installed third party addons.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      }
+    },
+    "packages": {
+      "description": "Configuration reserved for installed third party packages.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      }
+    },
+    "e2e": {
+      "type": "object",
+      "properties": {
+        "protractor": {
+          "type": "object",
+          "properties": {
+            "config": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "lint": {
+      "description": "Properties to be passed to TSLint.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "description": "File glob(s) to lint.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "default": []
+          },
+          "project": {
+            "description": "Location of the tsconfig.json project file. Will also use as files to lint if 'files' property not present.",
+            "type": "string"
+          },
+          "tslintConfig": {
+            "description": "Location of the tslint.json configuration.",
+            "type": "string",
+            "default": "tslint.json"
+          },
+          "exclude": {
+            "description": "File glob(s) to ignore.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "default": []
+          }
+        },
+        "required": [
+          "project"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "test": {
+      "type": "object",
+      "properties": {
+        "karma": {
+          "type": "object",
+          "properties": {
+            "config": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "styleExt": {
+          "type": "string"
+        },
+        "prefixInterfaces": {
+          "type": "boolean"
+        },
+        "poll": {
+          "type": "number"
+        },
+        "viewEncapsulation": {
+          "type": "string"
+        },
+        "changeDetection": {
+          "type": "string"
+        },
+        "inline": {
+          "type": "object",
+          "properties": {
+            "style": {
+              "type": "boolean",
+              "default": false
+            },
+            "template": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "boolean",
+              "default": false
+            },
+            "component": {
+              "type": "boolean",
+              "default": true
+            },
+            "directive": {
+              "type": "boolean",
+              "default": true
+            },
+            "module": {
+              "type": "boolean",
+              "default": false
+            },
+            "pipe": {
+              "type": "boolean",
+              "default": true
+            },
+            "service": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "serve": {
+          "description": "Properties to be passed to the serve command",
+          "type": "object",
+          "properties": {
+            "port": {
+              "description": "The port the application will be served on",
+              "type": "number",
+              "default": 4200
+            },
+            "host": {
+              "description": "The host the application will be served on",
+              "type": "string",
+              "default": "localhost"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "packageManager": {
+        "enum": [ "npm", "cnpm", "yarn", "default" ],
+        "default": "default",
+        "type": "string"
+    },
+    "warnings": {
+      "description": "Allow people to disable console warnings.",
+      "type": "object",
+      "properties": {
+        "nodeDeprecation": {
+          "description": "Show a warning when the node version is incompatible.",
+          "type": "boolean",
+          "default": true
+        },
+        "packageDeprecation": {
+          "description": "Show a warning when the user installed angular-cli.",
+          "type": "boolean",
+          "default": true
+        },
+        "versionMismatch": {
+          "description": "Show a warning when the global version is newer than the local one.",
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

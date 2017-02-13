@@ -1,8 +1,8 @@
 'use strict';
 
-var UI = require('ember-cli/lib/ui');
+var UI = require('@angular/cli/ember-cli/lib/ui');
 var through = require('through');
-var Promise = require('ember-cli/lib/ext/promise');
+var Promise = require('@angular/cli/ember-cli/lib/ext/promise');
 
 module.exports = MockUI;
 function MockUI() {

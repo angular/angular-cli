@@ -1,5 +1,5 @@
 import * as child_process from 'child_process';
-import {blue, white, yellow} from 'chalk';
+import {blue, yellow} from 'chalk';
 const treeKill = require('tree-kill');
 
 
@@ -11,13 +11,19 @@ interface ExecOptions {
 
 let _processes: child_process.ChildProcess[] = [];
 
-function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<string> {
+type ProcessOutput = {
+  stdout: string;
+  stdout: string;
+};
+
+
+function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<ProcessOutput> {
   let stdout = '';
   let stderr = '';
   const cwd = process.cwd();
-  console.log(white(
-    `  ==========================================================================================`
-  ));
+  console.log(
+    `==========================================================================================`
+  );
 
   args = args.filter(x => x !== undefined);
   const flags = [
@@ -28,8 +34,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
     .join(', ')
     .replace(/^(.+)$/, ' [$1]');  // Proper formatting.
 
-  console.log(blue(`  Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
-  console.log(blue(`  CWD: ${cwd}`));
+  console.log(blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
+  console.log(blue(`CWD: ${cwd}`));
   const spawnOptions: any = {cwd};
 
   if (process.platform.startsWith('win')) {
@@ -51,6 +57,9 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   });
   childProcess.stderr.on('data', (data: Buffer) => {
     stderr += data.toString('utf-8');
+    if (options.silent) {
+      return;
+    }
     data.toString('utf-8')
       .split(/[\n\r]+/)
       .filter(line => line !== '')
@@ -76,11 +85,36 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
     if (options.waitForMatch) {
       childProcess.stdout.on('data', (data: Buffer) => {
         if (data.toString().match(options.waitForMatch)) {
-          resolve(stdout);
+          resolve({ stdout, stderr });
         }
       });
     }
   });
+}
+
+export function waitForAnyProcessOutputToMatch(match: RegExp,
+                                               timeout = 30000): Promise<ProcessOutput> {
+  // Race between _all_ processes, and the timeout. First one to resolve/reject wins.
+  return Promise.race(_processes.map(childProcess => new Promise(resolve => {
+    let stdout = '';
+    let stderr = '';
+    childProcess.stdout.on('data', (data: Buffer) => {
+      stdout += data.toString();
+      if (data.toString().match(match)) {
+        resolve({ stdout, stderr });
+      }
+    });
+    childProcess.stderr.on('data', (data: Buffer) => {
+      stderr += data.toString();
+    });
+  })).concat([
+    new Promise((resolve, reject) => {
+      // Wait for 30 seconds and timeout.
+      setTimeout(() => {
+        reject(new Error(`Waiting for ${match} timed out (timeout: ${timeout}msec)...`));
+      }, timeout);
+    })
+  ]));
 }
 
 export function killAllProcesses(signal = 'SIGTERM') {
@@ -101,8 +135,8 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
 }
 
 export function ng(...args: string[]) {
-  if (args[0] == 'build') {
-    return silentNg(...args);
+  if (args[0] == 'build' || args[0] == 'serve' || args[0] == 'test') {
+    return silentNg(...args, '--no-progress');
   } else {
     return _exec({}, 'ng', args);
   }
