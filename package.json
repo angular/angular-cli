@@ -66,6 +66,7 @@
     "less": "^2.7.2",
     "less-loader": "^4.0.2",
     "loader-utils": "^1.0.2",
+    "license-webpack-plugin": "^0.4.3",
     "lodash": "^4.11.1",
     "magic-string": "^0.19.0",
     "memory-fs": "^0.4.1",

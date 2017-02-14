@@ -21,6 +21,7 @@ const angularCliPlugins = require('../plugins/webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SilentError = require('silent-error');
+const licensePlugin = require('license-webpack-plugin');
 const Task = require('../ember-cli/lib/models/task');
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -134,6 +135,12 @@ class JsonWebpackSerializer {
     return plugin.defaultValues;
   }
 
+  private _licenseWebpackPlugin(plugin: any) {
+    return {
+      'pattern': plugin.pattern
+    };
+  }
+
   private _pluginsReplacer(plugins: any[]) {
     return plugins.map(plugin => {
       let args = plugin.options || undefined;
@@ -180,13 +187,14 @@ class JsonWebpackSerializer {
           args = this._environmentPlugin(plugin);
           this._addImport('webpack', 'EnvironmentPlugin');
           break;
-
+        case licensePlugin:
+          args = this._licenseWebpackPlugin(plugin);
+          this.variableImports['license-webpack-plugin'] = 'licensePlugin';
         default:
           if (plugin.constructor.name == 'AngularServiceWorkerPlugin') {
             this._addImport('@angular/service-worker/build/webpack', plugin.constructor.name);
           }
           break;
-
       }
 
       const argsSerialized = JSON.stringify(args, (k, v) => this._replacer(k, v), 2) || '';

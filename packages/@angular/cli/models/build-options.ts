@@ -19,4 +19,5 @@ export interface BuildOptions {
   app?: string;
   deleteOutputPath?: boolean;
   preserveSymlinks?: boolean;
+  extractLicenses?: boolean;
 }
