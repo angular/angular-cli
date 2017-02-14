@@ -22,8 +22,8 @@ export default function () {
       './src/output-asset.txt': 'output-asset.txt',
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
     }))
-    // Add asset config in angular-cli.json.
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    // Add asset config in .angular-cli.json.
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['assets'] = [
         'folder',

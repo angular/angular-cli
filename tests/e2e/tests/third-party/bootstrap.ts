@@ -7,7 +7,7 @@ import {oneLineTrim} from 'common-tags';
 export default function() {
   return Promise.resolve()
     .then(() => npm('install', 'bootstrap@next'))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['styles'].push('../node_modules/bootstrap/dist/css/bootstrap.css');
       app['scripts'].push(

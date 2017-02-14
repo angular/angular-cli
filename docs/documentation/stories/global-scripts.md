@@ -1,7 +1,7 @@
 # Global styles
 
 You can add Javascript files to the global scope via the `apps[0].scripts`
-property in `angular-cli.json`.
+property in `.angular-cli.json`.
 These will be loaded exactly as if you had added them in a `<script>` tag inside `index.html`.
 
 This is especially useful for legacy libraries or analytic snippets.

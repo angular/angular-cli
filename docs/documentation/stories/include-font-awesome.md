@@ -16,7 +16,7 @@ npm install --save font-awesome
 
 To add Font Awesome CSS icons to your app...
 ```json
-// in angular-cli.json
+// in .angular-cli.json
 
 "styles": [
   "styles.css",

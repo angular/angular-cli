@@ -19,7 +19,7 @@ The build artifacts will be stored in the `dist/` directory.
 environment file to be used with that build (`--environment=dev` or `--environment=prod`).
 By default, the development build target and environment are used.
 
-The mapping used to determine which environment file is used can be found in `angular-cli.json`:
+The mapping used to determine which environment file is used can be found in `.angular-cli.json`:
 
 ```json
 "environments": {
@@ -46,7 +46,7 @@ ng build
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
-- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `angular-cli.json`
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `.angular-cli.json`
 - use them via the `--env=NAME` flag on the build/serve commands.
 
 ### Base tag handling in index.html
