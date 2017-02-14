@@ -55,6 +55,7 @@
     "ember-cli-normalize-entity-name": "^1.0.0",
     "ember-cli-string-utils": "^1.0.0",
     "enhanced-resolve": "^3.1.0",
+    "exports-loader": "^0.6.3",
     "extract-text-webpack-plugin": "^2.0.0-rc.3",
     "file-loader": "^0.10.0",
     "findup": "0.1.5",
