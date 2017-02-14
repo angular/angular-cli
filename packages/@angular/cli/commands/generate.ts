@@ -8,11 +8,18 @@ const chalk = require('chalk');
 const EmberGenerateCommand = require('../ember-cli/lib/commands/generate');
 const SilentError = require('silent-error');
 
+const blueprintList = fs.readdirSync(path.join(__dirname, '..', 'blueprints'));
+const blueprints = blueprintList
+  .filter(bp => bp.indexOf('-test') === -1)
+  .filter(bp => bp !== 'ng2')
+  .map(bp => Blueprint.load(path.join(__dirname, '..', 'blueprints', bp)));
 
 const GenerateCommand = EmberGenerateCommand.extend({
   name: 'generate',
 
-  beforeRun: function(rawArgs: string[]) {
+  blueprints: blueprints,
+
+  beforeRun: function (rawArgs: string[]) {
     if (!rawArgs.length) {
       return;
     }
@@ -23,7 +30,7 @@ const GenerateCommand = EmberGenerateCommand.extend({
     if (rawArgs[0] !== '--help' &&
       !fs.existsSync(path.join(__dirname, '..', 'blueprints', rawArgs[0]))) {
       SilentError.debugOrThrow('@angular/cli/commands/generate',
-                               `Invalid blueprint: ${rawArgs[0]}`);
+        `Invalid blueprint: ${rawArgs[0]}`);
     }
 
     if (!rawArgs[1]) {
@@ -32,10 +39,9 @@ const GenerateCommand = EmberGenerateCommand.extend({
     }
 
     // Override default help to hide ember blueprints
-    EmberGenerateCommand.prototype.printDetailedHelp = function() {
-      let output = blueprints.map(bp => bp.printBasicHelp(false)).join(os.EOL);
+    EmberGenerateCommand.prototype.printDetailedHelp = function () {
       this.ui.writeLine(chalk.cyan('  Available blueprints'));
-      this.ui.writeLine(output);
+      this.ui.writeLine(blueprints.map(bp => bp.printBasicHelp(false)).join(os.EOL));
     };
 
     return EmberGenerateCommand.prototype.beforeRun.apply(this, arguments);
