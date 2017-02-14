@@ -98,7 +98,6 @@ export default Task.extend({
     }
 
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
-      contentBase: path.join(this.project.root, `./${appConfig.root}`),
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
         index: `/${appConfig.index}`,

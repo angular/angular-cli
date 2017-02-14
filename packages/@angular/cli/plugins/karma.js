@@ -4,6 +4,14 @@ const fs = require('fs');
 const getTestConfig = require('../models/webpack-configs/test').getTestConfig;
 const CliConfig = require('../models/config').CliConfig;
 
+function isDirectory(path) {
+  try {
+    return fs.statSync(path).isDirectory();
+  } catch (_) {
+    return false;
+  }
+}
+
 const init = (config) => {
   // load Angular CLI config
   if (!config.angularCli || !config.angularCli.config) {
@@ -19,24 +27,43 @@ const init = (config) => {
     progress: config.angularCli.progress
   }
 
-  // add assets
+  // Add assets. This logic is mimics the one present in GlobCopyWebpackPlugin.
   if (appConfig.assets) {
-    const assets = typeof appConfig.assets === 'string' ? [appConfig.assets] : appConfig.assets;
     config.proxies = config.proxies || {};
-    assets.forEach(asset => {
-      const fullAssetPath = path.join(config.basePath, appConfig.root, asset);
-      const isDirectory = fs.lstatSync(fullAssetPath).isDirectory();
-      const filePattern = isDirectory ? fullAssetPath + '/**' : fullAssetPath;
-      const proxyPath = isDirectory ? asset + '/' : asset;
+    appConfig.assets.forEach(pattern => {
+      // Convert all string patterns to Pattern type.
+      pattern = typeof pattern === 'string' ? { glob: pattern } : pattern;
+      // Add defaults.
+      // Input is always resolved relative to the appRoot.
+      pattern.input = path.resolve(appRoot, pattern.input || '');
+      pattern.output = pattern.output || '';
+      pattern.glob = pattern.glob || '';
+
+      // Build karma file pattern.
+      const assetPath = path.join(pattern.input, pattern.glob);
+      const filePattern = isDirectory(assetPath) ? assetPath + '/**' : assetPath;
       config.files.push({
         pattern: filePattern,
         included: false,
         served: true,
         watched: true
       });
-      // The `files` entry serves the file from `/base/{appConfig.root}/{asset}`
-      //  so, we need to add a URL rewrite that exposes the asset as `/{asset}` only
-      config.proxies['/' + proxyPath] = '/base/' + appConfig.root + '/' + proxyPath;
+
+      // The `files` entry serves the file from `/base/{asset.input}/{asset.glob}`.
+      // We need to add a URL rewrite that exposes the asset as `/{asset.output}/{asset.glob}`.
+      let relativePath, proxyPath;
+      if (fs.existsSync(assetPath)) {
+        relativePath = path.relative(config.basePath, assetPath);
+        proxyPath = path.join(pattern.output, pattern.glob);
+      } else {
+        // For globs (paths that don't exist), proxy pattern.output to pattern.input.
+        relativePath = path.relative(config.basePath, pattern.input);
+        proxyPath = path.join(pattern.output);
+
+      }
+      // Proxy paths must have only forward slashes.
+      proxyPath = proxyPath.replace(/\\/g, '/');
+      config.proxies['/' + proxyPath] = '/base/' + relativePath;
     });
   }
 

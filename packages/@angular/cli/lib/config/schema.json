@@ -31,17 +31,32 @@
             "default": "dist/"
           },
           "assets": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "array",
-                "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
                   "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "glob": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "input": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "output": {
+                      "type": "string",
+                      "default": ""
+                    }
+                  },
+                  "additionalProperties": false
                 }
-              }
-            ],
+              ]
+            },
             "default": []
           },
           "deployUrl": {
