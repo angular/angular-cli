@@ -7,6 +7,7 @@ import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 
+const licensePlugin = require('license-webpack-plugin');
 
 export const getProdConfig = function (wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
@@ -79,6 +80,13 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     entryPoints['sw-register'] = [registerPath];
   }
 
+  if (buildOptions.extractLicenses) {
+    extraPlugins.push(new licensePlugin({
+      pattern: /^(MIT|ISC|BSD.*)$/,
+      suppressErrors: true
+    }));
+  }
+
   return {
     entry: entryPoints,
     plugins: [
@@ -89,7 +97,8 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8: true },
         compress: { screw_ie8: true, warnings: buildOptions.verbose },
-        sourceMap: buildOptions.sourcemaps
+        sourceMap: buildOptions.sourcemaps,
+        comments: false
       })
     ].concat(extraPlugins)
   };

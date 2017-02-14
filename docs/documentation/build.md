@@ -81,6 +81,8 @@ Flag                | `--dev` | `--prod`
 `--sourcemaps`      | `true`  | `false`
 `--extract-css`     | `false` | `true`
 
+`--extract-licenses` Extract all licenses in a separate file, in the case of production builds only.
+`--i18n-file` Localization file to use for i18n.
 `--prod` also sets the following non-flaggable settings:
 - Adds service worker if configured in `.angular-cli.json`.
 - Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
