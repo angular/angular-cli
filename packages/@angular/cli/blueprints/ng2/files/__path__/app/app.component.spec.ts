@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
 
-  let component: AppComponent;
+  let app: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
 
   beforeEach(() => {
@@ -23,13 +23,13 @@ describe('AppComponent', () => {
 
   it('should create the app', async(() => {
     fixture = TestBed.createComponent(AppComponent);
-    component = fixture.debugElement.componentInstance;
+    app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   }));
 
   it(`should have as title '<%= prefix %> works!'`, async(() => {
     fixture = TestBed.createComponent(AppComponent);
-    component = fixture.debugElement.componentInstance;
+    app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual('<%= prefix %> works!');
   }));
 
