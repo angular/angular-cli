@@ -6,8 +6,8 @@ import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
 
-  let component: <%= classifiedModuleName %>Component;
-  let fixture: ComponentFixture<<%= classifiedModuleName %>Component>;
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({<% if (routing) { %>
