@@ -11,7 +11,7 @@ export default function() {
     .then(() => writeFile(
       join('src/app/i18n-test', 'i18n-test.component.html'),
       '<p i18n>Hello world</p>'))
-    .then(() => ng('xi18n', '--no-progress'))
+    .then(() => ng('xi18n'))
     .then(() => expectFileToExist(join('src', 'messages.xlf')))
     .then(() => expectFileToMatch(join('src', 'messages.xlf'), /Hello world/));
 }
