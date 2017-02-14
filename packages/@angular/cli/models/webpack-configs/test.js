@@ -103,7 +103,7 @@ const getTestConfig = function (projectRoot, environment, appConfig, testConfig)
         // This plugin is responsible for swapping the environment files.
         // Since it takes a RegExp as first parameter, we need to escape the path.
         // See https://webpack.github.io/docs/list-of-plugins.html#normalmodulereplacementplugin
-        new RegExp(path.resolve(appRoot, appConfig.environments['source'])
+        new RegExp(path.resolve(appRoot, appConfig.environmentSource)
           .replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')),
         path.resolve(appRoot, appConfig.environments[environment])
       ),

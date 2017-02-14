@@ -19,15 +19,16 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
   let hostOverrideFileSystem: any = {};
   // process environment file replacement
   if (appConfig.environments) {
-    if (!('source' in appConfig.environments)) {
-      throw new SilentError(`Environment configuration does not contain "source" entry.`);
+    if (!appConfig.environmentSource) {
+      throw new SilentError(
+        'Environment configuration does not contain "environmentSource" entry.');
     }
     if (!(buildOptions.environment in appConfig.environments)) {
       throw new SilentError(`Environment "${buildOptions.environment}" does not exist.`);
     }
 
     const appRoot = path.resolve(projectRoot, appConfig.root);
-    const sourcePath = appConfig.environments['source'];
+    const sourcePath = appConfig.environmentSource;
     const envFile = appConfig.environments[buildOptions.environment];
     const environmentContent = fs.readFileSync(path.join(appRoot, envFile)).toString();
 
