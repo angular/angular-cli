@@ -28,9 +28,9 @@ module.exports = function (config) {
       config: './angular-cli.json',
       environment: 'dev'
     },
-    reporters: config.angularCli && config.angularCli.codeCoverage
-              ? ['progress', 'coverage-istanbul']
-              : ['progress'],
+    reporters: ['progress'].concat(
+      config.angularCli && config.angularCli.codeCoverage ? ['coverage-istanbul'] : []
+    ),
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
