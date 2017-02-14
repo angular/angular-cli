@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { oneLine, stripIndent } from 'common-tags';
+import { availableOptions } from './completion.options';
 
 const stringUtils = require('ember-cli-string-utils');
 const Command = require('../ember-cli/lib/models/command');
@@ -28,10 +29,9 @@ export interface CompletionCommandOptions {
 };
 
 const commandsToIgnore = [
-  'easter-egg',
-  'init',
   'destroy',
-  'github-pages-deploy' // errors because there is no base github-pages command
+  'easter-egg',
+  'init'
 ];
 
 const optsNg: String[] = [];
@@ -40,17 +40,13 @@ const CompletionCommand = Command.extend({
   name: 'completion',
   description: 'Adds autocomplete functionality to `ng` commands and subcommands',
   works: 'everywhere',
-  availableOptions: [
-    { name: 'all',   type: Boolean, default: true,  aliases: ['a'] },
-    { name: 'bash',  type: Boolean, default: false, aliases: ['b'] },
-    { name: 'zsh',   type: Boolean, default: false, aliases: ['z'] }
-  ],
+  availableOptions: availableOptions,
 
   run: function (commandOptions: CompletionCommandOptions) {
     commandOptions.all = !commandOptions.bash && !commandOptions.zsh;
 
     const commandFiles = fs.readdirSync(__dirname)
-      .filter(file => file.match(/\.ts$/) && !file.match(/\.run.ts$/))
+      .filter(file => file.match(/\.ts$/) && !file.match(/\.options.ts$/))
       .map(file => path.parse(file).name)
       .filter(file => {
         return commandsToIgnore.indexOf(file) < 0;
@@ -90,14 +86,14 @@ const CompletionCommand = Command.extend({
       }
 
       if (command.availableOptions && command.availableOptions[0]) {
-        let opts = extractOptions (command.availableOptions);
+        let opts = extractOptions(command.availableOptions);
         caseBlock = caseBlock + '    ' + com.sort().join('|') + ') opts="' + opts + '" ;;\n';
       }
     });
 
     caseBlock = 'ng|help) opts="' + optsNg.sort().join(' ') + '" ;;\n' +
-                caseBlock +
-                '    *) opts="" ;;';
+      caseBlock +
+      '    *) opts="" ;;';
 
     console.log(stripIndent`
       ###-begin-ng-completion###

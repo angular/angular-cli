@@ -1,4 +1,5 @@
-import {CliConfig} from '../models/config';
+import { CliConfig } from '../models/config';
+import { availableOptions } from './set.options';
 
 const SilentError = require('silent-error');
 const Command = require('../ember-cli/lib/models/command');
@@ -14,9 +15,7 @@ const SetCommand = Command.extend({
   description: 'Set a value in the configuration.',
   works: 'everywhere',
 
-  availableOptions: [
-    { name: 'global', type: Boolean, 'default': false, aliases: ['g'] },
-  ],
+  availableOptions: availableOptions,
 
   asBoolean: function (raw: string): boolean {
     if (raw == 'true' || raw == '1') {
