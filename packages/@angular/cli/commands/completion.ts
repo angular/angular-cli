@@ -7,8 +7,8 @@ const stringUtils = require('ember-cli-string-utils');
 const Command = require('../ember-cli/lib/models/command');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
 
-function extractOptions(opts: any): String {
-  const output: String[] = [];
+function extractOptions(opts: any): string {
+  const output: string[] = [];
 
   for (let index = 0; index < opts.length; index++) {
     const element = opts[index];
@@ -21,6 +21,17 @@ function extractOptions(opts: any): String {
   return output.sort().join(' ');
 }
 
+function extractBlueprints(opts: any): string {
+  const output: string[] = [];
+
+  for (let index = 0; index < opts.length; index++) {
+    const element = opts[index];
+    output.push(element.name);
+  }
+
+  return output.sort().join(' ');
+}
+
 export interface CompletionCommandOptions {
   all?: boolean;
   bash?: boolean;
@@ -28,13 +39,12 @@ export interface CompletionCommandOptions {
 };
 
 const commandsToIgnore = [
-  'easter-egg',
-  'init',
   'destroy',
-  'github-pages-deploy' // errors because there is no base github-pages command
+  'easter-egg',
+  'init'
 ];
 
-const optsNg: String[] = [];
+const optsNg: string[] = [];
 
 const CompletionCommand = Command.extend({
   name: 'completion',
@@ -70,7 +80,7 @@ const CompletionCommand = Command.extend({
 
     commandFiles.forEach(cmd => {
       const Command = lookupCommand(commandMap, cmd);
-      const com: String[] = [];
+      const com: string[] = [];
 
       const command = new Command({
         ui: this.ui,
@@ -83,21 +93,26 @@ const CompletionCommand = Command.extend({
       com.push(command.name);
 
       if (command.aliases) {
-        command.aliases.forEach((element: String) => {
+        command.aliases.forEach((element: string) => {
           optsNg.push(element);
           com.push(element);
         });
       }
 
+      let opts = '';
+      if (command.blueprints && command.blueprints[0]) {
+        opts += extractBlueprints(command.blueprints);
+      }
+
       if (command.availableOptions && command.availableOptions[0]) {
-        let opts = extractOptions (command.availableOptions);
+        opts += extractOptions(command.availableOptions);
         caseBlock = caseBlock + '    ' + com.sort().join('|') + ') opts="' + opts + '" ;;\n';
       }
     });
 
     caseBlock = 'ng|help) opts="' + optsNg.sort().join(' ') + '" ;;\n' +
-                caseBlock +
-                '    *) opts="" ;;';
+      caseBlock +
+      '    *) opts="" ;;';
 
     console.log(stripIndent`
       ###-begin-ng-completion###
