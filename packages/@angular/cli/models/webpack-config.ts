@@ -81,6 +81,7 @@ export class NgCliWebpackConfig {
         outputHashing: 'all',
         sourcemap: false,
         extractCss: true,
+        compress: true,
         aot: true
       }
     };

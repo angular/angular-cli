@@ -13,5 +13,6 @@ export interface BuildOptions {
   i18nFormat?: string;
   locale?: string;
   extractCss?: boolean;
+  compress?: boolean;
   outputHashing?: string;
 }
