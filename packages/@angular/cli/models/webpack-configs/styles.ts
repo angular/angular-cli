@@ -14,7 +14,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
  * Enumerate loaders and their dependencies from this file to let the dependency validator
  * know they are used.
  *
- * require('raw-loader')
+ * require('exports-loader')
  * require('style-loader')
  * require('postcss-loader')
  * require('css-loader')
@@ -86,11 +86,20 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     }
   ];
 
-  const commonLoaders = ['postcss-loader'];
+  const commonLoaders = [
+    // css-loader doesn't support webpack.LoaderOptionsPlugin properly,
+    // so we need to add options in its query
+    `css-loader?${JSON.stringify({ sourceMap: cssSourceMap, importLoaders: 1 })}`,
+    'postcss-loader'
+  ];
 
   // load component css as raw strings
   let rules: any = baseRules.map(({test, loaders}) => ({
-    exclude: globalStylePaths, test, loaders: ['raw-loader', ...commonLoaders, ...loaders]
+    exclude: globalStylePaths, test, loaders: [
+      'exports-loader?module.exports.toString()',
+      ...commonLoaders,
+      ...loaders
+    ]
   }));
 
   // load global css as css files
@@ -98,9 +107,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     rules.push(...baseRules.map(({test, loaders}) => ({
       include: globalStylePaths, test, loaders: ExtractTextPlugin.extract({
         use: [
-          // css-loader doesn't support webpack.LoaderOptionsPlugin properly,
-          // so we need to add options in its query
-          `css-loader?${JSON.stringify({ sourceMap: cssSourceMap })}`,
           ...commonLoaders,
           ...loaders
         ],

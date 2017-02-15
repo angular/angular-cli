@@ -98,7 +98,6 @@ export default Task.extend({
     }
 
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
-      contentBase: path.join(this.project.root, `./${appConfig.root}`),
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
         index: `/${appConfig.index}`,
@@ -112,7 +111,8 @@ export default Task.extend({
       watchOptions: {
         poll: projectConfig.defaults && projectConfig.defaults.poll
       },
-      https: serveTaskOptions.ssl
+      https: serveTaskOptions.ssl,
+      overlay: serveTaskOptions.target === 'development'
     };
 
     if (sslKey != null && sslCert != null) {

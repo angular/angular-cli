@@ -33,16 +33,16 @@ export default function() {
     // Add a lazy module.
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
     // Just wait for the rebuild, otherwise we might be validating the last build.
-    .then(() => wait(1000))
+    .then(() => wait(2000))
     .then(() => writeFile('src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
       import { FormsModule } from '@angular/forms';
       import { HttpModule } from '@angular/http';
-      
+
       import { AppComponent } from './app.component';
       import { RouterModule } from '@angular/router';
-      
+
       @NgModule({
         declarations: [
           AppComponent
@@ -60,6 +60,7 @@ export default function() {
       })
       export class AppModule { }
     `))
+    .then(() => wait(2000))
     // Should trigger a rebuild with a new bundle.
     .then(() => waitForAnyProcessOutputToMatch(
         /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))

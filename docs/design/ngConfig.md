@@ -90,7 +90,7 @@ For example, assuming the following globals/locals:
 
 ```js
 // Global
-{ 
+{
   "key1": {
     "key2": {
       "value": 0,
@@ -100,7 +100,7 @@ For example, assuming the following globals/locals:
 }
 
 // Local
-{ 
+{
   "key1": {
     "key2": {
       "value2": 2,
@@ -136,4 +136,3 @@ console.log(config.local.key1.key2.value4);  // 99, the global value.
 
 config.save();  // Commits if there's a change to global and/or local.
 ```
-

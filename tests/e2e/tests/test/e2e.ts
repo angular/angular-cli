@@ -21,21 +21,21 @@ export default function () {
     // Should fail without serving
     .then(() => expectToFail(() => ng('e2e', '--no-serve')))
     // These should work.
-    .then(() => ng('e2e', '--no-progress'))
-    .then(() => ng('e2e', '--prod', '--no-progress'))
+    .then(() => ng('e2e'))
+    .then(() => ng('e2e', '--prod'))
     // Should use port in baseUrl
-    .then(() => ng('e2e', '--port', '4400', '--no-progress'))
+    .then(() => ng('e2e', '--port', '4400'))
     // Should accept different config file
     .then(() => moveFile('./protractor.conf.js', './renamed-protractor.conf.js'))
-    .then(() => ng('e2e', '--config', './renamed-protractor.conf.js', '--no-progress'))
+    .then(() => ng('e2e', '--config', './renamed-protractor.conf.js'))
     .then(() => moveFile('./renamed-protractor.conf.js', './protractor.conf.js'))
     // Should accept different multiple spec files
     .then(() => moveFile('./e2e/app.e2e-spec.ts', './e2e/renamed-app.e2e-spec.ts'))
     .then(() => copyFile('./e2e/renamed-app.e2e-spec.ts', './e2e/another-app.e2e-spec.ts'))
     .then(() => ng('e2e', '--specs', './e2e/renamed-app.e2e-spec.ts',
-      '--specs', './e2e/another-app.e2e-spec.ts', '--no-progress'))
+      '--specs', './e2e/another-app.e2e-spec.ts'))
     // Should start up Element Explorer
-    .then(() => execAndWaitForOutputToMatch('ng', ['e2e', '--element-explorer', '--no-progress'],
+    .then(() => execAndWaitForOutputToMatch('ng', ['e2e', '--element-explorer'],
       /Element Explorer/))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();

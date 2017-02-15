@@ -135,7 +135,8 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
 }
 
 export function ng(...args: string[]) {
-  if (args[0] == 'build' || args[0] == 'serve' || args[0] == 'test') {
+  // Auto-add --no-progress to commands that build the app, otherwise we get thousands of lines.
+  if (['build', 'serve', 'test', 'e2e', 'xi18n'].indexOf(args[0]) != -1) {
     return silentNg(...args, '--no-progress');
   } else {
     return _exec({}, 'ng', args);

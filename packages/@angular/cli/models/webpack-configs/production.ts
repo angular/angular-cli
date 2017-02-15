@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import { stripIndent } from 'common-tags';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
-import { CompressionPlugin } from '../../lib/webpack/compression-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 
 
@@ -75,12 +74,6 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
         mangle: { screw_ie8: true },
         compress: { screw_ie8: true, warnings: buildOptions.verbose },
         sourceMap: buildOptions.sourcemap
-      }),
-      new CompressionPlugin({
-        asset: '[path].gz[query]',
-        algorithm: 'gzip',
-        test: /\.js$|\.html$|\.css$/,
-        threshold: 10240
       })
     ].concat(extraPlugins)
   };
