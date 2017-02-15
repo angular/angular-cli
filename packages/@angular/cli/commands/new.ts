@@ -1,6 +1,7 @@
 import * as chalk from 'chalk';
 import InitCommand from './init';
 import { validateProjectName } from '../utilities/validate-project-name';
+import { availableOptions } from './new.options';
 
 const Command = require('../ember-cli/lib/models/command');
 const Project = require('../ember-cli/lib/models/project');
@@ -11,23 +12,7 @@ const NewCommand = Command.extend({
   description: `Creates a new directory and a new Angular app.`,
   works: 'outsideProject',
 
-  availableOptions: [
-    { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
-    { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
-    { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
-    { name: 'ng4', type: Boolean, default: false },
-    { name: 'skip-install', type: Boolean, default: false, aliases: ['si'] },
-    { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
-    { name: 'skip-tests', type: Boolean, default: false, aliases: ['st'] },
-    { name: 'skip-commit', type: Boolean, default: false, aliases: ['sc'] },
-    { name: 'directory', type: String, aliases: ['dir'] },
-    { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
-    { name: 'style', type: String, default: 'css' },
-    { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'routing', type: Boolean, default: false },
-    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
-    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
-  ],
+  availableOptions: availableOptions,
 
   run: function (commandOptions: any, rawArgs: string[]) {
     const packageName = rawArgs.shift();

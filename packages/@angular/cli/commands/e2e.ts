@@ -1,9 +1,10 @@
 const SilentError = require('silent-error');
 
 import { CliConfig } from '../models/config';
-import { ServeTaskOptions, baseServeCommandOptions } from './serve';
+import { availableOptions } from './e2e.options';
 const Command = require('../ember-cli/lib/models/command');
 
+import { ServeTaskOptions } from './serve';
 
 export interface E2eTaskOptions extends ServeTaskOptions {
   config: string;
@@ -13,21 +14,12 @@ export interface E2eTaskOptions extends ServeTaskOptions {
   elementExplorer: boolean;
 }
 
-export const e2eCommandOptions = baseServeCommandOptions.concat([
-  { name: 'config', type: String, aliases: ['c'] },
-  { name: 'specs', type: Array, default: [], aliases: ['sp'] },
-  { name: 'element-explorer', type: Boolean, default: false, aliases: ['ee'] },
-  { name: 'webdriver-update', type: Boolean, default: true, aliases: ['wu'] },
-  { name: 'serve', type: Boolean, default: true, aliases: ['s'] }
-]);
-
-
 const E2eCommand = Command.extend({
   name: 'e2e',
   aliases: ['e'],
   description: 'Run e2e tests in existing project',
   works: 'insideProject',
-  availableOptions: e2eCommandOptions,
+  availableOptions: availableOptions,
   run: function (commandOptions: E2eTaskOptions) {
     const E2eTask = require('../tasks/e2e').E2eTask;
     this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();

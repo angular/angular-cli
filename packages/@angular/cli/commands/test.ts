@@ -1,6 +1,8 @@
 const EmberTestCommand = require('../ember-cli/lib/commands/test');
+
 import TestTask from '../tasks/test';
-import {CliConfig} from '../models/config';
+import { CliConfig } from '../models/config';
+import { availableOptions } from './test.options';
 
 export interface TestOptions {
   watch?: boolean;
@@ -19,22 +21,9 @@ export interface TestOptions {
 
 
 const TestCommand = EmberTestCommand.extend({
-  availableOptions: [
-    { name: 'watch', type: Boolean, default: true, aliases: ['w'] },
-    { name: 'code-coverage', type: Boolean, default: false, aliases: ['cc'] },
-    { name: 'config', type: String, aliases: ['c'] },
-    { name: 'single-run', type: Boolean, default: false, aliases: ['sr'] },
-    { name: 'progress', type: Boolean, default: true},
-    { name: 'browsers', type: String },
-    { name: 'colors', type: Boolean },
-    { name: 'log-level', type: String },
-    { name: 'port', type: Number },
-    { name: 'reporters', type: String },
-    { name: 'build', type: Boolean, default: true },
-    { name: 'sourcemap', type: Boolean, default: true, aliases: ['sm'] }
-  ],
+  availableOptions: availableOptions,
 
-  run: function(commandOptions: TestOptions) {
+  run: function (commandOptions: TestOptions) {
     this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();
 
     const testTask = new TestTask({

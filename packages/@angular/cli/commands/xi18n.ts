@@ -1,4 +1,5 @@
 const Command = require('../ember-cli/lib/models/command');
+import { availableOptions } from './xi18n.options';
 
 export interface Xi18nOptions {
   outputPath?: string;
@@ -10,18 +11,7 @@ const Xi18nCommand = Command.extend({
   name: 'xi18n',
   description: 'Extracts i18n messages from source code.',
   works: 'insideProject',
-  availableOptions: [
-    {
-      name: 'i18n-format',
-      type: String,
-      default: 'xlf',
-      aliases: ['f', {'xmb': 'xmb'}, {'xlf': 'xlf'}, {'xliff': 'xlf'}]
-    },
-    { name: 'output-path',    type: 'Path', default: null, aliases: ['op']},
-    { name: 'verbose',        type: Boolean, default: false},
-    { name: 'progress',       type: Boolean, default: true }
-
-  ],
+  availableOptions: availableOptions,
   run: function (commandOptions: any) {
     const {Extracti18nTask} = require('../tasks/extract-i18n');
 

@@ -1,7 +1,9 @@
 const Command = require('../ember-cli/lib/models/command');
+
 import * as path from 'path';
 import * as child_process from 'child_process';
 import * as chalk from 'chalk';
+import { availableOptions } from './version.options';
 
 const VersionCommand = Command.extend({
   name: 'version',
@@ -9,10 +11,7 @@ const VersionCommand = Command.extend({
   aliases: ['v', '--version', '-v'],
   works: 'everywhere',
 
-  availableOptions: [{
-    name: 'verbose',
-    type: Boolean, 'default': false
-  }],
+  availableOptions: availableOptions,
 
   run: function (options: any) {
     let versions: any = process.versions;

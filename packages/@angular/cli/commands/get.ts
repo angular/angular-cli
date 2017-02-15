@@ -1,4 +1,5 @@
-import {CliConfig} from '../models/config';
+import { CliConfig } from '../models/config';
+import { availableOptions } from './get.options';
 
 const SilentError = require('silent-error');
 const Command = require('../ember-cli/lib/models/command');
@@ -14,9 +15,7 @@ const GetCommand = Command.extend({
   description: 'Get a value from the configuration.',
   works: 'everywhere',
 
-  availableOptions: [
-    { name: 'global', type: Boolean, 'default': false }
-  ],
+  availableOptions: availableOptions,
 
   run: function (commandOptions: GetOptions, rawArgs: string[]): Promise<void> {
     return new Promise<void>(resolve => {

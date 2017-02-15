@@ -6,9 +6,9 @@ const stringUtils = require('ember-cli-string-utils');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
 
 const commandsToIgnore = [
+  'destroy',
   'easter-egg',
-  'init',
-  'destroy'
+  'init'
 ];
 
 const HelpCommand = Command.extend({
@@ -22,14 +22,12 @@ const HelpCommand = Command.extend({
 
   run: function (commandOptions: any, rawArgs: any) {
     let commandFiles = fs.readdirSync(__dirname)
-      // Remove files that are not JavaScript or Typescript
-      .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
+      // Remove files that are not pure command Typescript
+      .filter(file => file.match(/\.ts$/) && !file.match(/\.d.ts$/) &&
+        !file.match(/\.options.ts$/))
       .map(file => path.parse(file).name)
-      .map(file => file.toLowerCase());
-
-    commandFiles = commandFiles.filter(file => {
-      return commandsToIgnore.indexOf(file) < 0;
-    });
+      .map(file => file.toLowerCase())
+      .filter(file => commandsToIgnore.indexOf(file) < 0);
 
     let commandMap = commandFiles.reduce((acc: any, curr: string) => {
       let classifiedName = stringUtils.classify(curr);
