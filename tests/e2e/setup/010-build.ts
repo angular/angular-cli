@@ -8,6 +8,10 @@ const packages = require('../../../lib/packages');
 export default function() {
   const argv = getGlobalVariable('argv');
 
+  if (argv.nobuild) {
+    return;
+  }
+
   return npm('run', 'build')
     .then(() => console.log('Updating package.json from dist...'))
     .then(() => Promise.all(Object.keys(packages).map(pkgName => {
