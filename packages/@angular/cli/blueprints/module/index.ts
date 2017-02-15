@@ -61,29 +61,5 @@ export default Blueprint.extend({
         return this.generatePath;
       }
     };
-  },
-
-  afterInstall: function (options: any) {
-    if (this.options && this.options.routing) {
-
-      // Component folder needs to be `/{moduleName}/{ComponentName}`
-      // Note that we are using `flat`, so no extra dir will be created
-      // We need the leading `/` so the component path resolution work for both cases below:
-      // 1. If module name has no path (no `/`), that's going to be `/mod-name/mod-name`
-      //      as `this.dynamicPath.dir` will be the same as `this.dynamicPath.appRoot`
-      // 2. If it does have `/` (like `parent/mod-name`), it'll be `/parent/mod-name/mod-name`
-      //      as `this.dynamicPath.dir` minus `this.dynamicPath.appRoot` will be `/parent`
-      const moduleDir = this.dynamicPath.dir.replace(this.dynamicPath.appRoot, '')
-                      + path.sep + this.dasherizedModuleName;
-      options.entity.name = moduleDir + path.sep + this.dasherizedModuleName;
-      options.flat = true;
-
-      options.route = false;
-      options.inlineTemplate = false;
-      options.inlineStyle = false;
-      options.prefix = null;
-      options.spec = true;
-      return Blueprint.load(path.join(__dirname, '../component')).install(options);
-    }
   }
 });
