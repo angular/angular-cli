@@ -25,6 +25,8 @@ Error.stackTraceLimit = Infinity;
  * Here's a short description of those flags:
  *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
  *   --noproject      Skip creating a project or using one.
+ *   --nobuild        Skip building the packages. Use with --nolink and --reuse to quickly
+ *                    rerun tests.
  *   --nolink         Skip linking your local @angular/cli directory. Can save a few seconds.
  *   --ng-sha=SHA     Use a specific ng-sha. Similar to nightly but point to a master SHA instead
  *                    of using the latest.
