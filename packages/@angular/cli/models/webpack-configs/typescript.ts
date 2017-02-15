@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { stripIndent } from 'common-tags';
 import {AotPlugin, AotPluginOptions} from '@ngtools/webpack';
 import { WebpackConfigOptions } from '../webpack-config';
 
@@ -20,8 +21,35 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
   // process environment file replacement
   if (appConfig.environments) {
     if (!appConfig.environmentSource) {
+      let migrationMessage = '';
+      if ('source' in appConfig.environments) {
+        migrationMessage = '\n\n' + stripIndent`
+          A new environmentSource entry replaces the previous source entry inside environments.
+
+          To migrate angular-cli.json follow the example below:
+
+          Before:
+
+          "environments": {
+            "source": "environments/environment.ts",
+            "dev": "environments/environment.ts",
+            "prod": "environments/environment.prod.ts"
+          }
+
+
+          After:
+
+          "environmentSource": "environments/environment.ts",
+          "environments": {
+            "dev": "environments/environment.ts",
+            "prod": "environments/environment.prod.ts"
+          }
+        `;
+      }
       throw new SilentError(
-        'Environment configuration does not contain "environmentSource" entry.');
+        `Environment configuration does not contain "environmentSource" entry.${migrationMessage}`
+      );
+
     }
     if (!(buildOptions.environment in appConfig.environments)) {
       throw new SilentError(`Environment "${buildOptions.environment}" does not exist.`);
