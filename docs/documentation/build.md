@@ -94,3 +94,5 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 `--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
 
 `--output-hashing` define the output filename cache-busting hashing mode
+
+`--stats-json` generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse

@@ -7,6 +7,7 @@ import { BuildTaskOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { CliConfig } from '../models/config';
+const fs = require('fs');
 
 
 export default Task.extend({
@@ -34,6 +35,15 @@ export default Task.extend({
 
         if (runTaskOptions.watch) {
           return;
+        }
+
+        if (!runTaskOptions.watch && runTaskOptions.statsJson) {
+          const jsonStats = stats.toJson('verbose');
+
+          fs.writeFileSync(
+            path.resolve(project.root, outputPath, 'stats.json'),
+            JSON.stringify(jsonStats, null, 2)
+          );
         }
 
         if (stats.hasErrors()) {
