@@ -1,6 +1,6 @@
 environment:
   matrix:
-  - nodejs_version: "6.0"
+  - nodejs_version: "6.9"
 
 matrix:
   fast_finish: true
