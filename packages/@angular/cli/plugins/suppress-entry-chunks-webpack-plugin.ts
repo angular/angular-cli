@@ -23,7 +23,7 @@ export class SuppressExtractedTextChunksWebpackPlugin {
           .forEach((chunk: any) => {
             let newFiles: string[] = [];
             chunk.files.forEach((file: string) => {
-              if (file.match(/\.js$/)) {
+              if (file.match(/\.js(\.map)?$/)) {
                 // remove js files
                 delete compilation.assets[file];
               } else {
