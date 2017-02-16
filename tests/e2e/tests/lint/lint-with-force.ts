@@ -8,12 +8,12 @@ export default function () {
   return Promise.resolve()
     .then(() => writeFile(fileName, 'const foo = "";\n'))
     .then(() => ng('lint', '--force'))
-    .then((output) => {
-      if (!output.match(/" should be '/)) {
-        throw new Error(`Expected to match "" should be '" in ${output}.`);
+    .then(({ stdout }) => {
+      if (!stdout.match(/" should be '/)) {
+        throw new Error(`Expected to match "" should be '" in ${stdout}.`);
       }
 
-      return output;
+      return stdout;
     })
     .then((output) => {
       if (!output.match(/Lint errors found in the listed files\./)) {

@@ -7,9 +7,9 @@ export default function() {
     .then(() => process.chdir('/'))
     .then(() => expectToFail(() => ng('get', 'defaults.component.inlineStyle')))
     .then(() => ng('get', '--global', 'defaults.component.inlineStyle'))
-    .then(output => {
-      if (!output.match(/false\n?/)) {
-        throw new Error(`Expected "false", received "${JSON.stringify(output)}".`);
+    .then(({ stdout }) => {
+      if (!stdout.match(/false\n?/)) {
+        throw new Error(`Expected "false", received "${JSON.stringify(stdout)}".`);
       }
     })
     .then(() => expectToFail(() => {
@@ -17,9 +17,9 @@ export default function() {
     }))
     .then(() => ng('set', '--global', 'defaults.component.inlineStyle', 'true'))
     .then(() => ng('get', '--global', 'defaults.component.inlineStyle'))
-    .then(output => {
-      if (!output.match(/true\n?/)) {
-        throw new Error(`Expected "true", received "${JSON.stringify(output)}".`);
+    .then(({ stdout }) => {
+      if (!stdout.match(/true\n?/)) {
+        throw new Error(`Expected "true", received "${JSON.stringify(stdout)}".`);
       }
     })
     .then(() => ng('set', '--global', 'defaults.component.inlineStyle', 'false'));
