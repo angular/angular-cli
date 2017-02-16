@@ -86,10 +86,10 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     devtool: buildOptions.sourcemap ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
-      modules: [nodeModules],
+      modules: [nodeModules, 'node_modules'],
     },
     resolveLoader: {
-      modules: [nodeModules]
+      modules: [nodeModules, 'node_modules']
     },
     context: projectRoot,
     entry: entryPoints,
