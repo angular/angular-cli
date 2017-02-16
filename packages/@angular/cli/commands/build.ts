@@ -35,7 +35,6 @@ export const baseBuildCommandOptions: any = [
     description: 'define the output filename cache-busting hashing mode',
     aliases: ['oh']
   },
-  { name: 'stats-json', type: Boolean, default: false },
   {
     name: 'poll',
     type: Number,
@@ -55,7 +54,8 @@ const BuildCommand = Command.extend({
   aliases: ['b'],
 
   availableOptions: baseBuildCommandOptions.concat([
-    { name: 'watch', type: Boolean, default: false, aliases: ['w'] }
+    { name: 'watch', type: Boolean, default: false, aliases: ['w'] },
+    { name: 'stats-json', type: Boolean, default: false }
   ]),
 
   run: function (commandOptions: BuildTaskOptions) {
