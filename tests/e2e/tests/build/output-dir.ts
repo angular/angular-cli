@@ -1,11 +1,17 @@
-import {ng} from '../../utils/process';
+import {getGlobalVariable} from '../../utils/env';
 import {expectFileToExist} from '../../utils/fs';
-import {expectToFail} from '../../utils/utils';
 import {expectGitToBeClean} from '../../utils/git';
+import {ng} from '../../utils/process';
 import {updateJsonFile} from '../../utils/project';
+import {expectToFail} from '../../utils/utils';
 
 
 export default function() {
+  // Skip this in ejected tests.
+  if (getGlobalVariable('argv').eject) {
+    return Promise.resolve();
+  }
+
   return ng('build', '-op', './build-output')
     .then(() => expectFileToExist('./build-output/index.html'))
     .then(() => expectFileToExist('./build-output/main.bundle.js'))

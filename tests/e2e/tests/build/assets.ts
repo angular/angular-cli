@@ -7,9 +7,13 @@ import {
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
+import {getGlobalVariable} from '../../utils/env';
 
 
 export default function () {
+  // Disable parts of it in webpack tests.
+  const ejected = getGlobalVariable('argv').eject;
+
   return Promise.resolve()
     .then(_ => createDir('./src/folder'))
     .then(_ => createDir('./node_modules/some-package/'))
@@ -44,7 +48,7 @@ export default function () {
     // .gitkeep shouldn't be copied.
     .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
     // Update app to test assets are present.
-    .then(_ => writeMultipleFiles({
+    .then(_ => !ejected && writeMultipleFiles({
       'src/app/app.component.ts': `
         import { Component } from '@angular/core';
         import { Http, Response } from '@angular/http';
@@ -108,6 +112,6 @@ export default function () {
           });
         });`,
     }))
-    .then(() => ng('test', '--single-run'))
-    .then(() => ng('e2e', '--no-progress'));
+    .then(() => !ejected && ng('test', '--single-run'))
+    .then(() => !ejected && ng('e2e', '--no-progress'));
 }

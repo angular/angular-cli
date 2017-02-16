@@ -3,9 +3,13 @@ import {readdirSync} from 'fs';
 import {expectFileToExist, expectFileToMatch} from '../../utils/fs';
 import {ng} from '../../utils/process';
 import {expectGitToBeClean} from '../../utils/git';
+import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
+  // Skip this in ejected tests.
+  const ejected = getGlobalVariable('argv').eject;
+
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
   return ng('build', '--prod')
@@ -19,5 +23,5 @@ export default function() {
       expectFileToMatch(`dist/${main}`, /bootstrapModuleFactory\(/);
     })
     // Check that the process didn't change local files.
-    .then(() => expectGitToBeClean());
+    .then(() => !ejected && expectGitToBeClean());
 }

@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as rimrafPackage from 'rimraf';
 import {dirname} from 'path';
 import {stripIndents} from 'common-tags';
 
@@ -38,6 +39,19 @@ export function deleteFile(path: string) {
       }
     });
   });
+}
+
+
+export function rimraf(path: string) {
+  return new Promise<void>((resolve, reject) => {
+    rimrafPackage(path, (err?: any) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    })
+  }
 }
 
 
