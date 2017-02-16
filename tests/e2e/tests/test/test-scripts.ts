@@ -58,7 +58,7 @@ export default function () {
     }))
     // should fail because the global scripts were not added to scripts array
     .then(() => expectToFail(() => ng('test', '--single-run')))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['scripts'] = [
         'string-script.js',

@@ -19,7 +19,7 @@ export default function () {
       'src/common-entry-style.css': '.common-entry-style { color: red }',
       'src/common-entry-script.js': 'console.log(\'common-entry-script\');'
     }))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['styles'] = [
         'string-style.css',

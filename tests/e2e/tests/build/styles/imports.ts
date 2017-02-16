@@ -35,7 +35,7 @@ export default function () {
           h1 { background: #000; }
         `})
         // change files to use preprocessor
-        .then(() => updateJsonFile('angular-cli.json', configJson => {
+        .then(() => updateJsonFile('.angular-cli.json', configJson => {
           const app = configJson['apps'][0];
           app['styles'] = [`styles.${ext}`];
         }))
@@ -57,7 +57,7 @@ export default function () {
         .then(() => expectFileToMatch('dist/main.bundle.js',
           /h1.*background:\s*#000+/))
         // change files back
-        .then(() => updateJsonFile('angular-cli.json', configJson => {
+        .then(() => updateJsonFile('.angular-cli.json', configJson => {
           const app = configJson['apps'][0];
           app['styles'] = ['styles.css'];
         }))

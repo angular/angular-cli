@@ -16,14 +16,14 @@ Since the data is static, we only need to keep it in a static store somewhere.
 
 One solution would be to keep the data in the `package.json`. Unfortunately, the metadata contains too much data and the `package.json` file would become unmanageable.
 
-Instead of polluting the package file, a `angular-cli.json` file will be created that contains all the values. Access to that file will be allowed to the user if he knows the structure of the file (unknown keys will be kept but ignored), and it's easy to read and write.
+Instead of polluting the package file, a `.angular-cli.json` file will be created that contains all the values. Access to that file will be allowed to the user if he knows the structure of the file (unknown keys will be kept but ignored), and it's easy to read and write.
 
 
 ## Fallback
 
-There should be two `angular-cli.json` files; one for the project and a general one. The general one should contain information that can be useful when scaffolding new apps, or informations about the user.
+There should be two `.angular-cli.json` files; one for the project and a general one. The general one should contain information that can be useful when scaffolding new apps, or informations about the user.
 
-The project `angular-cli.json` goes into the project root. The global configuration should live at `$HOME/.angular-cli.json`.
+The project `.angular-cli.json` goes into the project root. The global configuration should live at `$HOME/.angular-cli.json`.
 
 ## Structure
 

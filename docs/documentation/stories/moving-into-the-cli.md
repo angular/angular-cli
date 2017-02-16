@@ -47,8 +47,8 @@ relative paths instead.
 - Polyfills are listed in `./src/polyfills.ts` so remove `core-js` and `zone.js` from `index.html`.
 - SystemJS is not needed anymore, so remove it from `index.html` as well.
 - Instead of using `<script>` and `<link>` tags directly in `index.html`, use
-`angular-cli.json` instead.
-  - Look for the `styles` array in `angular-cli.json` and add in any CSS files you have in
+`.angular-cli.json` instead.
+  - Look for the `styles` array in `.angular-cli.json` and add in any CSS files you have in
 `src/index.html`. Use a relative path from `./src/`.
   - Do the same for any remaining script tags as well, using the `scripts` array instead.
 

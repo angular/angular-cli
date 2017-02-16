@@ -1285,7 +1285,8 @@ Blueprint.list = function(options) {
   @property renameFiles
 */
 Blueprint.renamedFiles = {
-  'gitignore': '.gitignore'
+  'gitignore': '.gitignore',
+  'angular-cli.json': '.angular-cli.json'
 };
 
 /**

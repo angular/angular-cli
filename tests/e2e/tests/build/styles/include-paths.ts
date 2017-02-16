@@ -34,7 +34,7 @@ export default function () {
     }))
     .then(() => replaceInFile('src/app/app.component.ts', `'./app.component.css\'`,
       `'./app.component.scss', './app.component.styl'`))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['styles'] = [
         'styles.scss',

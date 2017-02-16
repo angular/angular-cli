@@ -23,7 +23,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       throw new Error(stripIndent`
         Your project is configured with serviceWorker = true, but @angular/service-worker
         is not installed. Run \`npm install --save-dev @angular/service-worker\`
-        and try again, or run \`ng set apps.0.serviceWorker=false\` in your angular-cli.json.
+        and try again, or run \`ng set apps.0.serviceWorker=false\` in your .angular-cli.json.
       `);
     }
 
