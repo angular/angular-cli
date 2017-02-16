@@ -48,7 +48,11 @@ export default Task.extend({
         }, program);
 
         files.forEach((file) => {
-          const fileContents = program.getSourceFile(file).getFullText();
+          const sourceFile = program.getSourceFile(file);
+          if (!sourceFile) {
+            return;
+          }
+          const fileContents = sourceFile.getFullText();
           const configLoad = Configuration.findConfiguration(config.tslintConfig, file);
           linter.lint(file, fileContents, configLoad.results);
         });
