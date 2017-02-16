@@ -13,6 +13,11 @@
         },
         "name": {
           "type": "string"
+        },
+        "ejected": {
+          "description": "Whether or not this project was ejected.",
+          "type": "boolean",
+          "default": false
         }
       },
       "additionalProperties": false

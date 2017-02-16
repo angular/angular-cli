@@ -27,6 +27,9 @@ matrix:
       env: NODE_SCRIPT="tests/run_e2e.js --glob=tests/build/**"
     - node_js: "6"
       os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --eject --glob=tests/build/**"
+    - node_js: "6"
+      os: linux
       env: NODE_SCRIPT="tests/run_e2e.js --ignore=**/tests/build/**"
     - node_js: "6"
       os: linux

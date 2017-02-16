@@ -8,10 +8,15 @@ import {
 import {writeFile, writeMultipleFiles, appendToFile, expectFileToMatch} from '../../utils/fs';
 import {wait} from '../../utils/utils';
 import {request} from '../../utils/http';
+import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
   if (process.platform.startsWith('win')) {
+    return Promise.resolve();
+  }
+  // Skip this in ejected tests.
+  if (getGlobalVariable('argv').eject) {
     return Promise.resolve();
   }
 
