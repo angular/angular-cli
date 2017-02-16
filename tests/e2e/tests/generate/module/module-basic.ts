@@ -11,7 +11,6 @@ export default function() {
     .then(() => expectFileToExist(moduleDir))
     .then(() => expectFileToExist(join(moduleDir, 'test.module.ts')))
     .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-routing.module.ts'))))
-    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test.component.ts'))))
     .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test.spec.ts'))))
     .then(() => expectFileToMatch(join(moduleDir, 'test.module.ts'), 'TestModule'))
 
