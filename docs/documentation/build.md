@@ -22,8 +22,8 @@ By default, the development build target and environment are used.
 The mapping used to determine which environment file is used can be found in `.angular-cli.json`:
 
 ```json
+"environmentSource": "environments/environment.ts",
 "environments": {
-  "source": "environments/environment.ts",
   "dev": "environments/environment.ts",
   "prod": "environments/environment.prod.ts"
 }
