@@ -18,7 +18,7 @@ export default function () {
     // verify --deploy-url isn't applied to extracted css urls
     .then(() => expectFileToMatch('dist/styles.bundle.css', 'url\(more.svg\)'))
     // verify option also works in config
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['deployUrl'] = 'config-deployUrl/';
     }))

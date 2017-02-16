@@ -26,6 +26,10 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
+    "@angular/compiler": ">=2.3.1 <5.0.0",
+    "@angular/compiler-cli": ">=2.3.1 <5.0.0",
+    "@angular/core": ">=2.3.1 <5.0.0",
+    "@angular/tsc-wrapped": ">=0.5.0 <5.0.0",
     "@ngtools/json-schema": "1.0.3",
     "@ngtools/webpack": "1.2.9",
     "autoprefixer": "^6.5.3",

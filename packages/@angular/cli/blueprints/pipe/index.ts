@@ -14,7 +14,7 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean, default: true },
+    { name: 'flat', type: Boolean },
     { name: 'spec', type: Boolean },
     { name: 'skip-import', type: Boolean, default: false },
     { name: 'module', type: String, aliases: ['m'] },
@@ -50,9 +50,13 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
+    options.flat = options.flat !== undefined ?
+      options.flat :
+      this.project.ngConfigObj.get('defaults.pipe.flat');
+
     options.spec = options.spec !== undefined ?
       options.spec :
-      this.project.ngConfigObj.get('defaults.spec.pipe');
+      this.project.ngConfigObj.get('defaults.pipe.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,

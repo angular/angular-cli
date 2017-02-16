@@ -4,10 +4,10 @@ import {
   expectFileToMatch,
   replaceInFile
 } from '../../../utils/fs';
+import { expectToFail } from '../../../utils/utils';
 import { ng } from '../../../utils/process';
 import { stripIndents } from 'common-tags';
 import { updateJsonFile } from '../../../utils/project';
-import { expectToFail } from '../../../utils/utils';
 
 export default function () {
   return writeMultipleFiles({
@@ -32,8 +32,11 @@ export default function () {
     }))
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.scss'))
-    .then(() => ng('build'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/styles.bundle.css', /exports/)))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.bundle.js',
-      /".*module\.exports.*\.outer.*background:/)));
+    .then(() => ng('build', '--extract-css', '--sourcemap'))
+    .then(() => expectFileToMatch('dist/styles.bundle.css',
+      /body\s*{\s*background-color: blue;\s*}/))
+    .then(() => expectFileToMatch('dist/styles.bundle.css',
+      /p\s*{\s*background-color: red;\s*}/))
+    .then(() => expectToFail(() => expectFileToMatch('dist/styles.bundle.css', '"mappings":""')))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /.outer.*.inner.*background:\s*#[fF]+/));
 }

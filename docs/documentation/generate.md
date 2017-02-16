@@ -6,11 +6,11 @@
 `ng generate [name]` generates the specified blueprint
 
 ## Available blueprints:
- - [class](class)
- - [component](component)
- - [directive](directive)
- - [enum](enum)
- - [interface](interface)
- - [module](module)
- - [pipe](pipe)
- - [service](service)
+ - [class](generate/class)
+ - [component](generate/component)
+ - [directive](generate/directive)
+ - [enum](generate/enum)
+ - [interface](generate/interface)
+ - [module](generate/module)
+ - [pipe](generate/pipe)
+ - [service](generate/service)

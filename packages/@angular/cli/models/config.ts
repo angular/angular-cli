@@ -5,7 +5,8 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const CLI_CONFIG_FILE_NAME = 'angular-cli.json';
+export const CLI_CONFIG_FILE_NAME = '.angular-cli.json';
+const CLI_CONFIG_FILE_NAME_ALT = 'angular-cli.json';
 
 
 function _findUp(name: string, from: string) {
@@ -38,8 +39,11 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     // Find the configuration, either where specified, in the angular-cli project
     // (if it's in node_modules) or from the current process.
     return (projectPath && _findUp(CLI_CONFIG_FILE_NAME, projectPath))
+        || (projectPath && _findUp(CLI_CONFIG_FILE_NAME_ALT, projectPath))
         || _findUp(CLI_CONFIG_FILE_NAME, process.cwd())
-        || _findUp(CLI_CONFIG_FILE_NAME, __dirname);
+        || _findUp(CLI_CONFIG_FILE_NAME_ALT, process.cwd())
+        || _findUp(CLI_CONFIG_FILE_NAME, __dirname)
+        || _findUp(CLI_CONFIG_FILE_NAME_ALT, __dirname);
   }
 
   static fromGlobal(): CliConfig {
@@ -52,10 +56,21 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
       cliConfig.alias('apps.0.prefix', 'defaults.prefix')
     ];
 
+    // Additional aliases which do not emit any messages.
+    cliConfig.alias('defaults.interface.prefix', 'defaults.inline.prefixInterfaces');
+    cliConfig.alias('defaults.component.inlineStyle', 'defaults.inline.style');
+    cliConfig.alias('defaults.component.inlineTemplate', 'defaults.inline.template');
+    cliConfig.alias('defaults.component.spec', 'defaults.spec.component');
+    cliConfig.alias('defaults.class.spec', 'defaults.spec.class');
+    cliConfig.alias('defaults.component.directive', 'defaults.spec.directive');
+    cliConfig.alias('defaults.component.module', 'defaults.spec.module');
+    cliConfig.alias('defaults.component.pipe', 'defaults.spec.pipe');
+    cliConfig.alias('defaults.component.service', 'defaults.spec.service');
+
     // If any of them returned true, output a deprecation warning.
     if (aliases.some(x => !!x)) {
       console.error(chalk.yellow(oneLine`
-        The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
+        The "defaults.prefix" and "defaults.sourceDir" properties of .angular-cli.json
         are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
         Please update in order to avoid errors in future versions of Angular CLI.
       `));
@@ -83,7 +98,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     // If any of them returned true, output a deprecation warning.
     if (aliases.some(x => !!x)) {
       console.error(chalk.yellow(oneLine`
-        The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
+        The "defaults.prefix" and "defaults.sourceDir" properties of .angular-cli.json
         are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
         Please update in order to avoid errors in future versions of Angular CLI.
       `));

@@ -2,6 +2,9 @@ const EmberTestCommand = require('../ember-cli/lib/commands/test');
 import TestTask from '../tasks/test';
 import {CliConfig} from '../models/config';
 
+const config = CliConfig.fromProject() || CliConfig.fromGlobal();
+const pollDefault = config.config.defaults && config.config.defaults.poll;
+
 export interface TestOptions {
   watch?: boolean;
   codeCoverage?: boolean;
@@ -15,6 +18,7 @@ export interface TestOptions {
   sourcemap?: boolean;
   progress?: boolean;
   config: string;
+  poll?: number;
 }
 
 
@@ -31,7 +35,13 @@ const TestCommand = EmberTestCommand.extend({
     { name: 'port', type: Number },
     { name: 'reporters', type: String },
     { name: 'build', type: Boolean, default: true },
-    { name: 'sourcemap', type: Boolean, default: true, aliases: ['sm'] }
+    { name: 'sourcemap', type: Boolean, default: true, aliases: ['sm'] },
+    {
+      name: 'poll',
+      type: Number,
+      default: pollDefault,
+      description: 'enable and define the file watching poll time period (milliseconds)'
+    }
   ],
 
   run: function(commandOptions: TestOptions) {

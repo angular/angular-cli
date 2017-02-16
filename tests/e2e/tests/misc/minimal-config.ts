@@ -4,7 +4,7 @@ import { ng } from '../../utils/process';
 
 export default function () {
   return Promise.resolve()
-    .then(() => writeFile('angular-cli.json', JSON.stringify({
+    .then(() => writeFile('.angular-cli.json', JSON.stringify({
       apps: [{
         root: 'src',
         main: 'main.ts',
@@ -32,7 +32,7 @@ export default function () {
           });
         });
       `,
-      'angular-cli.json': JSON.stringify({
+      '.angular-cli.json': JSON.stringify({
         apps: [{
           root: 'src',
           scripts: ['./script.js']

@@ -3,6 +3,7 @@
 // Prevent the dependency validation from tripping because we don't import these. We need
 // it as a peer dependency of @angular/core.
 // require('zone.js')
+// require('@angular/tsc-wrapped')
 
 
 // This file hooks up on require calls to transpile TypeScript.

@@ -30,7 +30,7 @@ export default Task.extend({
     rimraf.sync(path.resolve(this.project.root, outputPath));
 
     const serveDefaults = {
-      // default deployUrl to '' on serve to prevent the default from angular-cli.json
+      // default deployUrl to '' on serve to prevent the default from .angular-cli.json
       deployUrl: ''
     };
 
@@ -109,7 +109,7 @@ export default Task.extend({
       proxy: proxyConfig,
       compress: serveTaskOptions.target === 'production',
       watchOptions: {
-        poll: projectConfig.defaults && projectConfig.defaults.poll
+        poll: serveTaskOptions.poll
       },
       https: serveTaskOptions.ssl,
       overlay: serveTaskOptions.target === 'development'

@@ -10,7 +10,7 @@ export default function() {
     .then(() => expectFileToExist('./build-output/index.html'))
     .then(() => expectFileToExist('./build-output/main.bundle.js'))
     .then(() => expectToFail(expectGitToBeClean))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['outDir'] = 'config-build-output';
     }))

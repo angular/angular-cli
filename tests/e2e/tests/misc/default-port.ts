@@ -5,7 +5,7 @@ import { updateJsonFile } from '../../utils/project';
 
 export default function() {
   return Promise.resolve()
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson.defaults;
       app.serve = { port: 4201 };
     }))

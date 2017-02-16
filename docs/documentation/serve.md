@@ -59,3 +59,5 @@
 `--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
 
 `--output-hashing` define the output filename cache-busting hashing mode
+
+`--poll` enable and define the file watching poll time period (milliseconds)
