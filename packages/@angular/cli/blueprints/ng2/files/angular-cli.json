@@ -51,18 +51,6 @@
   },
   "defaults": {
     "styleExt": "<%= styleExt %>",
-    "prefixInterfaces": false,
-    "inline": {
-      "style": false,
-      "template": false
-    },
-    "spec": {
-      "class": false,
-      "component": <%= tests %>,
-      "directive": <%= tests %>,
-      "module": false,
-      "pipe": <%= tests %>,
-      "service": <%= tests %>
-    }
+    "component": {}
   }
 }

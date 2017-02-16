@@ -263,55 +263,101 @@
         "styleExt": {
           "type": "string"
         },
-        "prefixInterfaces": {
-          "type": "boolean"
-        },
         "poll": {
           "type": "number"
         },
-        "viewEncapsulation": {
-          "type": "string"
-        },
-        "changeDetection": {
-          "type": "string"
-        },
-        "inline": {
+        "class": {
           "type": "object",
           "properties": {
-            "style": {
-              "type": "boolean",
-              "default": false
-            },
-            "template": {
+            "spec": {
               "type": "boolean",
               "default": false
             }
           }
         },
-        "spec": {
+        "component": {
           "type": "object",
           "properties": {
-            "class": {
+            "flat": {
               "type": "boolean",
               "default": false
             },
-            "component": {
+            "spec": {
               "type": "boolean",
               "default": true
             },
-            "directive": {
-              "type": "boolean",
-              "default": true
-            },
-            "module": {
+            "inlineStyle": {
               "type": "boolean",
               "default": false
             },
-            "pipe": {
+            "inlineTemplate": {
+              "type": "boolean",
+              "default": false
+            },
+            "viewEncapsulation": {
+              "enum": ["Emulated", "Native", "None"]
+            },
+            "changeDetection": {
+              "enum": ["Default", "OnPush"]
+            }
+          }
+        },
+        "directive": {
+          "type": "object",
+          "properties": {
+            "flat": {
               "type": "boolean",
               "default": true
             },
-            "service": {
+            "spec": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "interface": {
+          "type": "object",
+          "properties": {
+            "prefix": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        },
+        "module": {
+          "type": "object",
+          "properties": {
+            "flat": {
+              "type": "boolean",
+              "default": false
+            },
+            "spec": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "pipe": {
+          "type": "object",
+          "properties": {
+            "flat": {
+              "type": "boolean",
+              "default": true
+            },
+            "spec": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "flat": {
+              "type": "boolean",
+              "default": true
+            },
+            "spec": {
               "type": "boolean",
               "default": true
             }

@@ -22,12 +22,7 @@ export default Blueprint.extend({
     if (interfaceType) {
       this.fileName += '.' + interfaceType;
     }
-    let prefix = '';
-    if (this.project.ngConfig &&
-        this.project.ngConfig.defaults &&
-        this.project.ngConfig.defaults.prefixInterfaces) {
-      prefix = 'I';
-    }
+    const prefix = this.project.ngConfigObj.get('defaults.interface.prefix');
     return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat,

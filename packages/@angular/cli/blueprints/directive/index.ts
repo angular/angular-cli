@@ -14,7 +14,7 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean, default: true },
+    { name: 'flat', type: Boolean },
     { name: 'prefix', type: String, default: null },
     { name: 'spec', type: Boolean },
     { name: 'skip-import', type: Boolean, default: false },
@@ -67,7 +67,11 @@ export default Blueprint.extend({
   locals: function (options: any) {
     options.spec = options.spec !== undefined ?
       options.spec :
-      this.project.ngConfigObj.get('defaults.spec.directive');
+      this.project.ngConfigObj.get('defaults.directive.spec');
+
+    options.flat = options.flat !== undefined ?
+      options.flat :
+      this.project.ngConfigObj.get('defaults.directive.flat');
 
     return {
       dynamicPath: this.dynamicPath.dir,
