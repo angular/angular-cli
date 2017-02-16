@@ -31,51 +31,50 @@ export interface ServeTaskOptions extends BuildOptions {
 }
 
 // Expose options unrelated to live-reload to other commands that need to run serve
-export const baseServeCommandOptions: any = baseBuildCommandOptions.concat([
-  { name: 'port', type: Number, default: defaultPort, aliases: ['p'] },
-  {
-    name: 'host',
-    type: String,
-    default: defaultHost,
-    aliases: ['H'],
-    description: `Listens only on ${defaultHost} by default`
-  },
-  { name: 'proxy-config', type: 'Path', aliases: ['pc'] },
-  { name: 'ssl', type: Boolean, default: false },
-  { name: 'ssl-key', type: String, default: 'ssl/server.key' },
-  { name: 'ssl-cert', type: String, default: 'ssl/server.crt' },
-  {
-    name: 'open',
-    type: Boolean,
-    default: false,
-    aliases: ['o'],
-    description: 'Opens the url in default browser',
-  }
-]);
+export const baseServeCommandOptions: any = overrideOptions(
+  baseBuildCommandOptions.concat([
+    { name: 'port', type: Number, default: defaultPort, aliases: ['p'] },
+    {
+      name: 'host',
+      type: String,
+      default: defaultHost,
+      aliases: ['H'],
+      description: `Listens only on ${defaultHost} by default`
+    },
+    { name: 'proxy-config', type: 'Path', aliases: ['pc'] },
+    { name: 'ssl', type: Boolean, default: false },
+    { name: 'ssl-key', type: String, default: 'ssl/server.key' },
+    { name: 'ssl-cert', type: String, default: 'ssl/server.crt' },
+    {
+      name: 'open',
+      type: Boolean,
+      default: false,
+      aliases: ['o'],
+      description: 'Opens the url in default browser',
+    },
+    { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
+    {
+      name: 'live-reload-client',
+      type: String,
+      description: 'specify the URL that the live reload browser client will use'
+    },
+    {
+      name: 'hmr',
+      type: Boolean,
+      default: false,
+      description: 'Enable hot module replacement',
+    }
+  ]), [
+    { name: 'watch', default: true },
+  ]
+);
 
 const ServeCommand = Command.extend({
   name: 'serve',
   description: 'Builds and serves your app, rebuilding on file changes.',
   aliases: ['server', 's'],
 
-  availableOptions: overrideOptions(
-    baseServeCommandOptions.concat([
-      { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
-      {
-        name: 'live-reload-client',
-        type: String,
-        description: 'specify the URL that the live reload browser client will use'
-      },
-      {
-        name: 'hmr',
-        type: Boolean,
-        default: false,
-        description: 'Enable hot module replacement',
-      }
-    ]), [
-      { name: 'watch', default: true },
-    ]
-  ),
+  availableOptions: baseServeCommandOptions,
 
   run: function (commandOptions: ServeTaskOptions) {
     const ServeTask = require('../tasks/serve').default;
