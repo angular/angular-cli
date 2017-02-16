@@ -2,6 +2,8 @@ const Command = require('../ember-cli/lib/models/command');
 import * as path from 'path';
 import * as child_process from 'child_process';
 import * as chalk from 'chalk';
+import { CliConfig } from '../models/config';
+
 
 const VersionCommand = Command.extend({
   name: 'version',
@@ -40,6 +42,13 @@ const VersionCommand = Command.extend({
 
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
     }
+    const config = CliConfig.fromProject();
+    if (config && config.config.project.version !== pkg.version) {
+      ngCliVersion += ` [${config.config.project.version}]`;
+    }
+    if (config && config.config.project.ejected) {
+      ngCliVersion += ' (e)';
+    }
 
     if (projPkg) {
       roots.forEach(root => {
@@ -76,12 +85,16 @@ const VersionCommand = Command.extend({
   },
 
   getVersion: function(moduleName: string): string {
-    const modulePkg = require(path.resolve(
-      this.project.root,
-      'node_modules',
-      moduleName,
-      'package.json'));
-    return modulePkg.version;
+    try {
+      const modulePkg = require(path.resolve(
+        this.project.root,
+        'node_modules',
+        moduleName,
+        'package.json'));
+      return modulePkg.version;
+    } catch (e) {
+      return 'error';
+    }
   },
 
   printVersion: function (module: string, version: string) {
