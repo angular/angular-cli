@@ -5,15 +5,15 @@ export default function () {
   return Promise.resolve()
     .then(() => ng('set', 'lint', '[]'))
     .then(() => ng('lint'))
-    .then((output) => {
-      if (!output.match(/No lint config\(s\) found\./)) {
+    .then(({ stdout }) => {
+      if (!stdout.match(/No lint config\(s\) found\./)) {
         throw new Error(oneLine`
           Expected to match "No lint configs found."
-          in ${output}.
+          in ${stdout}.
         `);
       }
 
-      return output;
+      return stdout;
     })
     .then((output) => {
       if (!output.match(/If this is not intended, run "ng update"\./)) {
