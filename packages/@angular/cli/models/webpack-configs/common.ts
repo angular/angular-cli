@@ -9,7 +9,7 @@ import { WebpackConfigOptions } from '../webpack-config';
 const autoprefixer = require('autoprefixer');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
