@@ -1,4 +1,4 @@
-# Global styles
+# Global scripts
 
 You can add Javascript files to the global scope via the `apps[0].scripts`
 property in `.angular-cli.json`.
