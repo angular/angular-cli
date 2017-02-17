@@ -227,6 +227,29 @@ class Module {}`
       });
   });
 
+  it('does not append duplicate declarations', () => {
+    return addDeclarationToModule('2.ts', 'MyClass', 'MyImportPath')
+      .then(change => change.apply(NodeHost))
+      .then(() => addDeclarationToModule('2.ts', 'MyClass', 'MyImportPath'))
+      .then(change => change.apply(NodeHost))
+      .then(() => readFile('2.ts', 'utf-8'))
+      .then(content => {
+        expect(content).toEqual(
+          '\n' +
+          'import {NgModule} from \'@angular/core\';\n' +
+          'import { MyClass } from \'MyImportPath\';\n' +
+          '\n' +
+          '@NgModule({\n' +
+          '  declarations: [\n' +
+          '    Other,\n' +
+          '    MyClass\n' +
+          '  ]\n' +
+          '})\n' +
+          'class Module {}'
+        );
+      });
+  });
+
   it('works with array with declarations', () => {
     return addDeclarationToModule('2.ts', 'MyClass', 'MyImportPath')
       .then(change => change.apply(NodeHost))

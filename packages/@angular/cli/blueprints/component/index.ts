@@ -1,8 +1,8 @@
-import {NodeHost} from '../../lib/ast-tools';
+import { NodeHost } from '../../lib/ast-tools';
 
-const path = require('path');
-const fs = require('fs');
-const chalk = require('chalk');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as chalk from 'chalk';
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const findParentModule = require('../../utilities/find-parent-module').default;
@@ -26,7 +26,7 @@ export default Blueprint.extend({
     { name: 'export', type: Boolean, default: false }
   ],
 
-  beforeInstall: function(options: any) {
+  beforeInstall: function (options: any) {
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
@@ -119,7 +119,7 @@ export default Blueprint.extend({
     };
   },
 
-  files: function() {
+  files: function () {
     let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && this.options.inlineTemplate) {
@@ -154,7 +154,7 @@ export default Blueprint.extend({
     };
   },
 
-  afterInstall: function(options: any) {
+  afterInstall: function (options: any) {
     if (options.dryRun) {
       return;
     }
@@ -166,6 +166,8 @@ export default Blueprint.extend({
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
     if (!options.skipImport) {
+      const preChange = fs.readFileSync(this.pathToModule, 'utf8');
+
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then((change: any) => change.apply(NodeHost))
@@ -175,10 +177,19 @@ export default Blueprint.extend({
                 .then((change: any) => change.apply(NodeHost));
             }
             return result;
+          })
+          .then(() => {
+            const postChange = fs.readFileSync(this.pathToModule, 'utf8');
+            let moduleStatus = 'update';
+
+            if (postChange === preChange) {
+              moduleStatus = 'identical';
+            }
+
+            this._writeStatusToUI(chalk.yellow,
+              moduleStatus,
+              path.relative(this.project.root, this.pathToModule));
           }));
-      this._writeStatusToUI(chalk.yellow,
-                            'update',
-                            path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);

@@ -1,11 +1,10 @@
 import * as ts from 'typescript';
 import * as fs from 'fs';
-import {Change, InsertChange, NoopChange, MultiChange} from './change';
-import {findNodes} from './node';
-import {insertImport} from './route-utils';
-
-import {Observable} from 'rxjs/Observable';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
+import { Change, InsertChange, NoopChange, MultiChange } from './change';
+import { findNodes } from './node';
+import { insertImport } from './route-utils';
+import { Observable } from 'rxjs/Observable';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/do';
@@ -162,17 +161,17 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
   return getSourceNodes(source)
     .filter(node => {
       return node.kind == ts.SyntaxKind.Decorator
-          && (<ts.Decorator>node).expression.kind == ts.SyntaxKind.CallExpression;
+          && (node as ts.Decorator).expression.kind == ts.SyntaxKind.CallExpression;
     })
-    .map(node => <ts.CallExpression>(<ts.Decorator>node).expression)
+    .map(node => (node as ts.Decorator).expression as ts.CallExpression)
     .filter(expr => {
       if (expr.expression.kind == ts.SyntaxKind.Identifier) {
-        const id = <ts.Identifier>expr.expression;
+        const id = expr.expression as ts.Identifier;
         return id.getFullText(source) == identifier
             && angularImports[id.getFullText(source)] === module;
       } else if (expr.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
         // This covers foo.NgModule when importing * as foo.
-        const paExpr = <ts.PropertyAccessExpression>expr.expression;
+        const paExpr = expr.expression as ts.PropertyAccessExpression;
         // If the left expression is not an identifier, just give up at that point.
         if (paExpr.expression.kind !== ts.SyntaxKind.Identifier) {
           return false;
@@ -186,7 +185,7 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
     })
     .filter(expr => expr.arguments[0]
                  && expr.arguments[0].kind == ts.SyntaxKind.ObjectLiteralExpression)
-    .map(expr => <ts.ObjectLiteralExpression>expr.arguments[0]);
+    .map(expr => expr.arguments[0] as ts.ObjectLiteralExpression);
 }
 
 
@@ -229,14 +228,14 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
         return metadata.toPromise();
       }
 
-      const assignment = <ts.PropertyAssignment>matchingProperties[0];
+      const assignment = matchingProperties[0] as ts.PropertyAssignment;
 
       // If it's not an array, nothing we can do really.
       if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
         return null;
       }
 
-      const arrLiteral = <ts.ArrayLiteralExpression>assignment.initializer;
+      const arrLiteral = assignment.initializer as ts.ArrayLiteralExpression;
       if (arrLiteral.elements.length == 0) {
         // Forward the property.
         return arrLiteral;
@@ -245,11 +244,17 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
     })
     .then((node: ts.Node) => {
       if (!node) {
-        /* eslint-disable no-console */
         console.log('No app module found. Please add your new class to your component.');
         return new NoopChange();
       }
+
       if (Array.isArray(node)) {
+        const nodeArray = node as any as Array<ts.Node>;
+        const symbolsArray = nodeArray.map(node => node.getText());
+        if (symbolsArray.includes(symbolName)) {
+          return new NoopChange();
+        }
+
         node = node[node.length - 1];
       }
 
@@ -258,7 +263,7 @@ function _addSymbolToNgModuleMetadata(ngModulePath: string, metadataField: strin
       if (node.kind == ts.SyntaxKind.ObjectLiteralExpression) {
         // We haven't found the field in the metadata declaration. Insert a new
         // field.
-        let expr = <ts.ObjectLiteralExpression>node;
+        let expr = node as ts.ObjectLiteralExpression;
         if (expr.properties.length == 0) {
           position = expr.getEnd() - 1;
           toInsert = `  ${metadataField}: [${symbolName}]\n`;
@@ -326,7 +331,7 @@ export function addProviderToModule(modulePath: string, classifiedName: string,
  * Custom function to insert an export into NgModule. It also imports it.
  */
 export function addExportToModule(modulePath: string, classifiedName: string,
-                                    importPath: string): Promise<Change> {
+                                  importPath: string): Promise<Change> {
   return _addSymbolToNgModuleMetadata(modulePath, 'exports', classifiedName, importPath);
 }
 
