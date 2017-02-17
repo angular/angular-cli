@@ -43,11 +43,13 @@ const VersionCommand = Command.extend({
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
     }
     const config = CliConfig.fromProject();
-    if (config && config.config.project.version !== pkg.version) {
-      ngCliVersion += ` [${config.config.project.version}]`;
-    }
-    if (config && config.config.project.ejected) {
-      ngCliVersion += ' (e)';
+    if (config && config.config && config.config.project) {
+      if (config.config.project.version !== pkg.version) {
+        ngCliVersion += ` [${config.config.project.version}]`;
+      }
+      if (config.config.project.ejected) {
+        ngCliVersion += ' (e)';
+      }
     }
 
     if (projPkg) {

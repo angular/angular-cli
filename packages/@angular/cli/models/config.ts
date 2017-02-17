@@ -47,7 +47,11 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
   }
 
   static fromGlobal(): CliConfig {
-    const globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
+    let globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
+    const altGlobalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME_ALT);
+    if (!fs.existsSync(globalConfigPath) && fs.existsSync(altGlobalConfigPath)) {
+      globalConfigPath = altGlobalConfigPath;
+    }
 
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(globalConfigPath);
 
@@ -81,10 +85,14 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
 
   static fromProject(): CliConfig {
     const configPath = this.configFilePath();
-    const globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
-
     if (!configPath) {
       return null;
+    }
+
+    let globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
+    const altGlobalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME_ALT);
+    if (!fs.existsSync(globalConfigPath) && fs.existsSync(altGlobalConfigPath)) {
+      globalConfigPath = altGlobalConfigPath;
     }
 
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(
