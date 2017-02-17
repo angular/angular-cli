@@ -44,7 +44,6 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 
 ### Additional Commands
 * [ng new](new)
-* [ng update](update)
 * [ng serve](serve)
 * [ng generate](generate)
 * [ng test](test)
