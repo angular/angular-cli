@@ -56,7 +56,11 @@ const HelpCommand = Command.extend({
 
       if (rawArgs.length > 0) {
         if (cmd === rawArgs[0]) {
-          this.ui.writeLine(command.printDetailedHelp(commandOptions));
+          if (command.printDetailedHelp(commandOptions)) {
+            this.ui.writeLine(command.printDetailedHelp(commandOptions));
+          } else {
+            this.ui.writeLine(command.printBasicHelp(commandOptions));
+          }
         }
       } else {
         this.ui.writeLine(command.printBasicHelp(commandOptions));
