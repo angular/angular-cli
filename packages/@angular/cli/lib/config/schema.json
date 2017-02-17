@@ -4,6 +4,9 @@
   "title": "Angular CLI Config Schema",
   "type": "object",
   "properties": {
+    "$schema": {
+      "type": "string"
+    },
     "project": {
       "description": "The global configuration of the project.",
       "type": "object",

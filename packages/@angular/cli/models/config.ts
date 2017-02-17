@@ -5,28 +5,11 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import {findUp} from '../utilities/find-up';
+
+
 export const CLI_CONFIG_FILE_NAME = '.angular-cli.json';
 const CLI_CONFIG_FILE_NAME_ALT = 'angular-cli.json';
-
-
-function _findUp(name: string, from: string) {
-  let currentDir = from;
-  while (currentDir && currentDir !== path.parse(currentDir).root) {
-    const p = path.join(currentDir, name);
-    if (fs.existsSync(p)) {
-      return p;
-    }
-
-    const nodeModuleP = path.join(currentDir, 'node_modules');
-    if (fs.existsSync(nodeModuleP)) {
-      return null;
-    }
-
-    currentDir = path.dirname(currentDir);
-  }
-
-  return null;
-}
 
 
 function getUserHome() {
@@ -38,12 +21,12 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
   static configFilePath(projectPath?: string): string {
     // Find the configuration, either where specified, in the Angular CLI project
     // (if it's in node_modules) or from the current process.
-    return (projectPath && _findUp(CLI_CONFIG_FILE_NAME, projectPath))
-        || (projectPath && _findUp(CLI_CONFIG_FILE_NAME_ALT, projectPath))
-        || _findUp(CLI_CONFIG_FILE_NAME, process.cwd())
-        || _findUp(CLI_CONFIG_FILE_NAME_ALT, process.cwd())
-        || _findUp(CLI_CONFIG_FILE_NAME, __dirname)
-        || _findUp(CLI_CONFIG_FILE_NAME_ALT, __dirname);
+    return (projectPath && findUp(CLI_CONFIG_FILE_NAME, projectPath))
+        || (projectPath && findUp(CLI_CONFIG_FILE_NAME_ALT, projectPath))
+        || findUp(CLI_CONFIG_FILE_NAME, process.cwd())
+        || findUp(CLI_CONFIG_FILE_NAME_ALT, process.cwd())
+        || findUp(CLI_CONFIG_FILE_NAME, __dirname)
+        || findUp(CLI_CONFIG_FILE_NAME_ALT, __dirname);
   }
 
   static fromGlobal(): CliConfig {
