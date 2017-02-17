@@ -18,6 +18,7 @@ const angularCliPlugins = require('../plugins/webpack');
 
 
 const autoprefixer = require('autoprefixer');
+const postcssUrl = require('postcss-url');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SilentError = require('silent-error');
@@ -29,6 +30,7 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 
 
 export const pluginArgs = Symbol('plugin-args');
+export const postcssArgs = Symbol('postcss-args');
 
 
 class JsonWebpackSerializer {
@@ -135,6 +137,15 @@ class JsonWebpackSerializer {
           if (x && x.toString() == autoprefixer()) {
             this.variableImports['autoprefixer'] = 'autoprefixer';
             return this._escape('autoprefixer()');
+          } else if (x && x.toString() == postcssUrl()) {
+            this.variableImports['postcss-url'] = 'postcssUrl';
+            let args = '';
+            if (x[postcssArgs] && x[postcssArgs].url) {
+              this.variables['baseHref'] = JSON.stringify(x[postcssArgs].baseHref);
+              this.variables['deployUrl'] = JSON.stringify(x[postcssArgs].deployUrl);
+              args = `{"url": ${x[postcssArgs].url.toString()}}`;
+            }
+            return this._escape(`postcssUrl(${args})`);
           } else if (x && x.postcssPlugin == 'cssnano') {
             this.variableImports['cssnano'] = 'cssnano';
             return this._escape('cssnano({ safe: true, autoprefixer: false })');
@@ -442,15 +453,18 @@ export default Task.extend({
         packageJson['devDependencies']['webpack-dev-server']
             = ourPackageJson['dependencies']['webpack-dev-server'];
 
-        // Update all loaders from webpack.
+        // Update all loaders from webpack, plus postcss plugins.
         [
+          'autoprefixer',
           'css-loader',
+          'cssnano',
           'exports-loader',
           'file-loader',
           'json-loader',
           'karma-sourcemap-loader',
           'less-loader',
           'postcss-loader',
+          'postcss-url',
           'raw-loader',
           'sass-loader',
           'script-loader',
@@ -487,13 +501,13 @@ export default Task.extend({
         console.log(yellow(stripIndent`
           ==========================================================================================
           Ejection was successful.
-          
+
           To run your builds, you now need to do the following commands:
              - "npm run build" to build.
              - "npm run test" to run unit tests.
              - "npm start" to serve the app using webpack-dev-server.
              - "npm run e2e" to run protractor.
-          
+
           Running the equivalent CLI commands will result in an error.
 
           ==========================================================================================
