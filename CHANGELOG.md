@@ -1,3 +1,83 @@
+<a name="1.0.0-beta.32"></a>
+# [1.0.0-beta.32](https://github.com/angular/angular-cli/compare/v1.0.0-beta.31...v1.0.0-beta.32) (2017-02-17)
+
+
+### Bug Fixes
+
+* **@angular/cli:** don't load old ember config ([98a3430](https://github.com/angular/angular-cli/commit/98a3430)), closes [#4057](https://github.com/angular/angular-cli/issues/4057)
+* **@angular/cli:** don't rerun protractor on rebuild ([#4661](https://github.com/angular/angular-cli/issues/4661)) ([3a85ffc](https://github.com/angular/angular-cli/commit/3a85ffc))
+* **@angular/cli:** fixing the help command ([#4726](https://github.com/angular/angular-cli/issues/4726)) ([121c390](https://github.com/angular/angular-cli/commit/121c390))
+* **@angular/cli:** generate command now ignores duplicate component symbol ([#4446](https://github.com/angular/angular-cli/issues/4446)) ([9c25f74](https://github.com/angular/angular-cli/commit/9c25f74)), closes [#4323](https://github.com/angular/angular-cli/issues/4323)
+* **@angular/cli:** include polyfills before scripts in ng test ([ca29eab](https://github.com/angular/angular-cli/commit/ca29eab)), closes [#4545](https://github.com/angular/angular-cli/issues/4545) [#4656](https://github.com/angular/angular-cli/issues/4656)
+* **@angular/cli:** lint now works with excluded files. ([351f6b1](https://github.com/angular/angular-cli/commit/351f6b1))
+* **@angular/cli:** remove component generation from module generation ([#4706](https://github.com/angular/angular-cli/issues/4706)) ([9db71d8](https://github.com/angular/angular-cli/commit/9db71d8)), closes [#4209](https://github.com/angular/angular-cli/issues/4209)
+* **@angular/cli:** remove inexistent tslint override ([82b9715](https://github.com/angular/angular-cli/commit/82b9715)), closes [#4696](https://github.com/angular/angular-cli/issues/4696)
+* **@angular/cli:** show blueprints in completion script ([26b1ee4](https://github.com/angular/angular-cli/commit/26b1ee4)), closes [#4571](https://github.com/angular/angular-cli/issues/4571)
+* **@angular/cli:** use correct tslint rule args ([#4662](https://github.com/angular/angular-cli/issues/4662)) ([16bceee](https://github.com/angular/angular-cli/commit/16bceee)), closes [#4648](https://github.com/angular/angular-cli/issues/4648)
+* **@angular/cli:** use default .map filename ([#4742](https://github.com/angular/angular-cli/issues/4742)) ([78313b3](https://github.com/angular/angular-cli/commit/78313b3)), closes [#4741](https://github.com/angular/angular-cli/issues/4741)
+* **@ngtools/webpack:** fix error with object spread ([#4642](https://github.com/angular/angular-cli/issues/4642)) ([8b3e300](https://github.com/angular/angular-cli/commit/8b3e300)), closes [#4600](https://github.com/angular/angular-cli/issues/4600)
+
+
+### Code Refactoring
+
+* **@angular/cli:** remove ng init & ng update ([#4628](https://github.com/angular/angular-cli/issues/4628)) ([a127cad](https://github.com/angular/angular-cli/commit/a127cad))
+* **@angular/cli:** rename config file from angular-cli.json to .angular-cli.json ([#4681](https://github.com/angular/angular-cli/issues/4681)) ([809340a](https://github.com/angular/angular-cli/commit/809340a))
+* **@angular/cli:** remove compression plugin
+
+
+
+### Features
+
+* **@angular/cli:** add --stats-json flag to build ([#4189](https://github.com/angular/angular-cli/issues/4189)) ([469ca91](https://github.com/angular/angular-cli/commit/469ca91)), closes [#3179](https://github.com/angular/angular-cli/issues/3179)
+* **@angular/cli:** add in-browser development error overlay ([7ea8013](https://github.com/angular/angular-cli/commit/7ea8013)), closes [#4513](https://github.com/angular/angular-cli/issues/4513)
+* **@angular/cli:** add watch flag to serve/e2e ([#4749](https://github.com/angular/angular-cli/issues/4749)) ([9d29cbc](https://github.com/angular/angular-cli/commit/9d29cbc))
+* **@angular/cli:** added *.sublime-workspace to gitignore blueprint ([#4698](https://github.com/angular/angular-cli/issues/4698)) ([f8b5c94](https://github.com/angular/angular-cli/commit/f8b5c94))
+* **@angular/cli:** added argument for karma configuration file ([#4564](https://github.com/angular/angular-cli/issues/4564)) ([b9295e0](https://github.com/angular/angular-cli/commit/b9295e0)), closes [#183](https://github.com/angular/angular-cli/issues/183)
+* **@angular/cli:** allow assets from outside of app root. ([9e91d86](https://github.com/angular/angular-cli/commit/9e91d86)), closes [#3555](https://github.com/angular/angular-cli/issues/3555) [#4691](https://github.com/angular/angular-cli/issues/4691)
+* **@angular/cli:** allow component css imports ([#4667](https://github.com/angular/angular-cli/issues/4667)) ([e55cb82](https://github.com/angular/angular-cli/commit/e55cb82)), closes [#4285](https://github.com/angular/angular-cli/issues/4285)
+* **@angular/cli:** disable invalid commands on ejected apps ([6402a27](https://github.com/angular/angular-cli/commit/6402a27)), closes [#4680](https://github.com/angular/angular-cli/issues/4680)
+* **@angular/cli:** eject command ([7ac0d05](https://github.com/angular/angular-cli/commit/7ac0d05))
+* **@angular/cli:** extend karma.conf.js w/ kjhtml reporter ([4543be9](https://github.com/angular/angular-cli/commit/4543be9)), closes [#4567](https://github.com/angular/angular-cli/issues/4567)
+* **@angular/cli:** use environmentSource key for environments ([#4705](https://github.com/angular/angular-cli/issues/4705)) ([16bfdf0](https://github.com/angular/angular-cli/commit/16bfdf0)), closes [#3857](https://github.com/angular/angular-cli/issues/3857)
+* **@angular/cli:** version shows ejected app or not ([6b53cd0](https://github.com/angular/angular-cli/commit/6b53cd0))
+* **@ngtools/webpack:** add an option to redirect files ([e0edccf](https://github.com/angular/angular-cli/commit/e0edccf))
+* **build:** add `--poll` option to build/serve/test commands ([57ef508](https://github.com/angular/angular-cli/commit/57ef508)), closes [#4268](https://github.com/angular/angular-cli/issues/4268) [#4715](https://github.com/angular/angular-cli/issues/4715)
+* **new:** read GIT_AUTHOR_NAME/_EMAIL from process.ENV for initial commit message ([fd4cf47](https://github.com/angular/angular-cli/commit/fd4cf47)), closes [#4012](https://github.com/angular/angular-cli/issues/4012)
+
+
+### BREAKING CHANGES
+
+* @angular/cli: compressed output (.gz) is no longer generated on production builds.
+* @angular/cli: sourcemaps now are always [filename].map (e.g `main.bundle.js.map` instead of `main.bundle.map`).
+* @angular/cli: The configuration file angular-cli.json has been renamed to .angular-cli.json
+* @angular/cli: Generating a module with routing will no longer generate an associated component.
+* @angular/cli: 'assets' as a string in angular-cli.json is no longer allowed, use an array instead.
+* @angular/cli: Removing the `ng init` & `ng update` commands because their current implementation causes more problems than it solves. Once RC is released, we won't need to use those to update anymore as the step will be as simple as installing the latest version of the CLI.
+* @angular/cli: A new environmentSource entry replaces the previous source entry inside environments.
+	To migrate the code follow the example below:
+
+	Before:
+
+	```
+	"environments": {
+	  "source": "environments/environment.ts",
+	  "dev": "environments/environment.ts",
+	  "prod": "environments/environment.prod.ts"
+	}
+	```
+
+	After:
+
+	```
+	"environmentSource": "environments/environment.ts",
+	"environments": {
+	  "dev": "environments/environment.ts",
+	  "prod": "environments/environment.prod.ts"
+	}
+	```
+
+
+
 <a name="1.0.0-beta.31"></a>
 # [1.0.0-beta.31](https://github.com/angular/angular-cli/compare/v1.0.0-beta.30...v1.0.0-beta.31) (2017-02-09)
 
