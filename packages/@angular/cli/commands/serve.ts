@@ -4,6 +4,8 @@ import { baseBuildCommandOptions } from './build';
 import { CliConfig } from '../models/config';
 import { Version } from '../upgrade/version';
 import { ServeTaskOptions } from './serve';
+import { checkPort } from '../utilities/check-port';
+import { overrideOptions } from '../utilities/override-options';
 
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
@@ -60,53 +62,52 @@ const ServeCommand = Command.extend({
   description: 'Builds and serves your app, rebuilding on file changes.',
   aliases: ['server', 's'],
 
-  availableOptions: baseServeCommandOptions.concat([
-    { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
-    {
-      name: 'live-reload-host',
-      type: String,
-      aliases: ['lrh'],
-      description: 'Defaults to host'
-    },
-    {
-      name: 'live-reload-base-url',
-      type: String,
-      aliases: ['lrbu'],
-      description: 'Defaults to baseURL'
-    },
-    {
-      name: 'live-reload-port',
-      type: Number,
-      aliases: ['lrp'],
-      description: '(Defaults to port number within [49152...65535])'
-    },
-    {
-      name: 'live-reload-live-css',
-      type: Boolean,
-      default: true,
-      description: 'Whether to live reload CSS (default true)'
-    },
-    {
-      name: 'hmr',
-      type: Boolean,
-      default: false,
-      description: 'Enable hot module replacement',
-    }
-  ]),
+  availableOptions: overrideOptions(
+    baseServeCommandOptions.concat([
+      { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
+      {
+        name: 'live-reload-host',
+        type: String,
+        aliases: ['lrh'],
+        description: 'Defaults to host'
+      },
+      {
+        name: 'live-reload-base-url',
+        type: String,
+        aliases: ['lrbu'],
+        description: 'Defaults to baseURL'
+      },
+      {
+        name: 'live-reload-port',
+        type: Number,
+        aliases: ['lrp'],
+        description: '(Defaults to port number within [49152...65535])'
+      },
+      {
+        name: 'live-reload-live-css',
+        type: Boolean,
+        default: true,
+        description: 'Whether to live reload CSS (default true)'
+      },
+      {
+        name: 'hmr',
+        type: Boolean,
+        default: false,
+        description: 'Enable hot module replacement',
+      }
+    ]), [
+      { name: 'watch', default: true },
+    ]
+  ),
 
   run: function (commandOptions: ServeTaskOptions) {
     const ServeTask = require('../tasks/serve').default;
 
-    const additionalDefaults: any = {
-      watch: true
-    };
-
-    commandOptions = Object.assign({}, additionalDefaults, commandOptions);
-
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
 
-    return checkExpressPort(commandOptions)
+    return checkPort(commandOptions.port, commandOptions.host)
+      .then((port: number) => commandOptions.port = port)
       .then(() => autoFindLiveReloadPort(commandOptions))
       .then((opts: ServeTaskOptions) => {
         const serve = new ServeTask({

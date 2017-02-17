@@ -28,7 +28,7 @@ export const baseBuildCommandOptions: any = [
   { name: 'i18n-format', type: String },
   { name: 'locale', type: String },
   { name: 'extract-css', type: Boolean, aliases: ['ec'] },
-  { name: 'watch', type: Boolean, aliases: ['w'] },
+  { name: 'watch', type: Boolean, default: false, aliases: ['w'] },
   {
     name: 'output-hashing',
     type: String,
@@ -59,12 +59,6 @@ const BuildCommand = Command.extend({
 
   run: function (commandOptions: BuildTaskOptions) {
     const project = this.project;
-
-    const additionalDefaults: any = {
-      watch: false
-    };
-
-    commandOptions = Object.assign({}, additionalDefaults, commandOptions);
 
     // Check angular version.
     Version.assertAngularVersionIs2_3_1OrHigher(project.root);
