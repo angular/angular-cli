@@ -255,9 +255,11 @@ export class AotPlugin implements Tapable {
       this._firstRun = false;
       this._diagnoseFiles = {};
 
-      compiler.watchFileSystem.watcher.once('aggregated', (changes: string[]) => {
-        changes.forEach((fileName: string) => this._compilerHost.invalidate(fileName));
-      });
+      if (compiler.watchFileSystem.watcher) {
+        compiler.watchFileSystem.watcher.once('aggregated', (changes: string[]) => {
+          changes.forEach((fileName: string) => this._compilerHost.invalidate(fileName));
+        });
+      }
     });
 
     // Add lazy modules to the context module for @angular/core/src/linker

@@ -6,6 +6,8 @@
 `ng serve` builds the application and starts a web server
 
 ## Options
+`--watch` (`-w`) rebuild when files change
+
 `--port` (`-p`) port to serve the application on
 
 `--host` (`-H`) host where to listen

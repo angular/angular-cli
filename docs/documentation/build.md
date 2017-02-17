@@ -65,7 +65,7 @@ All builds make use of bundling, and using the `--prod` flag in  `ng build --pro
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ## Options
-`--watch` (`-w`) flag to run builds when files change
+`--watch` (`-w`) rebuild when files change
 
 `--target` (`-t`) define the build target
 

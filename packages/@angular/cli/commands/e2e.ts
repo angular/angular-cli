@@ -32,6 +32,12 @@ const E2eCommand = Command.extend({
     const E2eTask = require('../tasks/e2e').E2eTask;
     this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();
 
+    const additionalDefaults: any = {
+      watch: false
+    };
+
+    commandOptions = Object.assign({}, additionalDefaults, commandOptions);
+
     const e2eTask = new E2eTask({
       ui: this.ui,
       project: this.project

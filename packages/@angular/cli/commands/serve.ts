@@ -97,6 +97,12 @@ const ServeCommand = Command.extend({
   run: function (commandOptions: ServeTaskOptions) {
     const ServeTask = require('../tasks/serve').default;
 
+    const additionalDefaults: any = {
+      watch: true
+    };
+
+    commandOptions = Object.assign({}, additionalDefaults, commandOptions);
+
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
 

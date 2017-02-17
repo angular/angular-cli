@@ -68,6 +68,19 @@ export default Task.extend({
     }
     if (!webpackConfig.entry.main) { webpackConfig.entry.main = []; }
     webpackConfig.entry.main.unshift(...entryPoints);
+
+    if (!serveTaskOptions.watch) {
+      // There's no option to turn off file watching in webpack-dev-server, but
+      // we can override the file watcher instead.
+      webpackConfig.plugins.unshift({
+        apply: (compiler: any) => {
+          compiler.plugin('after-environment', () => {
+            compiler.watchFileSystem = { watch: () => {} };
+          });
+        }
+      });
+    }
+
     webpackCompiler = webpack(webpackConfig);
 
     if (rebuildDoneCb) {
