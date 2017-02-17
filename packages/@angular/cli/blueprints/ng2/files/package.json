@@ -28,7 +28,7 @@
     "@angular/compiler-cli": "<%= ng4 ? '>=4.0.0-beta <5.0.0' : '^2.4.0' %>",
     "@types/jasmine": "2.5.38",
     "@types/node": "~6.0.60",
-    "codelyzer": "~2.0.0-beta.4",
+    "codelyzer": "~2.0.0",
     "jasmine-core": "~2.5.2",
     "jasmine-spec-reporter": "~3.2.0",
     "karma": "~1.4.1",
