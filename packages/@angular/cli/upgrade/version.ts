@@ -76,7 +76,7 @@ export class Version {
 
     try {
       const json = JSON.parse(configJson);
-      return new Version(json.project && json.project.version);
+      return new Version(json.project);
     } catch (e) {
       return new Version(null);
     }
