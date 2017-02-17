@@ -14,9 +14,21 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean },
-    { name: 'spec', type: Boolean },
-    { name: 'module', type: String, aliases: ['m'] }
+    {
+      name: 'flat',
+      type: Boolean,
+      description: 'Flag to indicate if a dir is created.'
+    },
+    {
+      name: 'spec',
+      type: Boolean,
+      description: 'Specifies if a spec file is generated.'
+    },
+    {
+      name: 'module',
+      type: String, aliases: ['m'],
+      description: 'Allows specification of the declaring module.'
+    }
   ],
 
   beforeInstall: function(options: any) {

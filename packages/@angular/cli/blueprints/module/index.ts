@@ -7,9 +7,22 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'spec', type: Boolean },
-    { name: 'flat', type: Boolean },
-    { name: 'routing', type: Boolean, default: false }
+    {
+      name: 'spec',
+      type: Boolean,
+      description: 'Specifies if a spec file is generated.'
+    },
+    {
+      name: 'flat',
+      type: Boolean,
+      description: 'Flag to indicate if a dir is created.'
+    },
+    {
+      name: 'routing',
+      type: Boolean,
+      default: false,
+      description: 'Specifies if a routing module file should be generated.'
+    }
   ],
 
   normalizeEntityName: function (entityName: string) {
