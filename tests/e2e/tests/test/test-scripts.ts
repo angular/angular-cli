@@ -29,10 +29,11 @@ export default function () {
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(() => {
-            TestBed.configureTestingModule({ declarations: [ AppComponent ] });
-            TestBed.compileComponents();
-          });
+          beforeEach(async(() => {
+            TestBed.configureTestingModule({ 
+              declarations: [ AppComponent ] 
+            }).compileComponents();
+          }));
 
           it('should have access to string-script.js', async(() => {
             let app = TestBed.createComponent(AppComponent).debugElement.componentInstance;
