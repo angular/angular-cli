@@ -11,10 +11,6 @@
       "description": "The global configuration of the project.",
       "type": "object",
       "properties": {
-        "version": {
-          "type": "string",
-          "description": "The version of @angular/cli in the project."
-        },
         "name": {
           "description": "The name of the project.",
           "type": "string"
