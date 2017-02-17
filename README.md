@@ -118,6 +118,8 @@ npm install
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
 
+You'll also need to update the `project` / `version` field in the `.angular-cli.json` file to the version you are updating to. You can run `ng version`, and copy the value in front of `@angular/cli: ` to be sure it's the correct value.
+
 
 ## Development Hints for hacking on Angular CLI
 
