@@ -20,11 +20,9 @@
 
 ### Code Refactoring
 
-* **@angular/cli:** remove ng init & ng update ([#4628](https://github.com/angular/angular-cli/issues/4628)) ([a127cad](https://github.com/angular/angular-cli/commit/a127cad))
-* **@angular/cli:** rename config file from angular-cli.json to .angular-cli.json ([#4681](https://github.com/angular/angular-cli/issues/4681)) ([809340a](https://github.com/angular/angular-cli/commit/809340a))
-* **@angular/cli:** remove compression plugin
-
-
+* **@angular/cli:** remove ng init & ng update ([#4628](https://github.com/angular/angular-cli/issues/4628)) ([a127cad](https://github.com/angular/angular-cli/commit/a127cad)). Use this section for updates, along with [update documentation](https://github.com/angular/angular-cli#updating-angular-cli).
+* **@angular/cli:** rename config file from angular-cli.json to .angular-cli.json ([#4681](https://github.com/angular/angular-cli/issues/4681)) ([809340a](https://github.com/angular/angular-cli/commit/809340a)). Rename the file in your project, and update the file reference in `karma.conf.js`.
+* **@angular/cli:** remove compression plugin. Build will not produce `.gz` files in output folder even with `-prod`. Most servers don't need the file anyway.
 
 ### Features
 
