@@ -35,7 +35,7 @@ with NPM 3 or higher.
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [Generating a New Project](#generating-and-serving-an-angular2-project-via-a-development-server)
+* [Generating a New Project](#generating-and-serving-an-angular-project-via-a-development-server)
 * [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
 * [Updating Angular CLI](#updating-angular-cli)
 * [Development Hints for hacking on Angular CLI](#development-hints-for-hacking-on-angular-cli)
@@ -54,7 +54,7 @@ npm install -g @angular/cli
 ng help
 ```
 
-### Generating and serving an Angular2 project via a development server
+### Generating and serving an Angular project via a development server
 
 ```bash
 ng new PROJECT_NAME

@@ -27,6 +27,9 @@ export default Task.extend({
     if (this.project.root === outputPath) {
       throw new SilentError('Output path MUST not be project root directory!');
     }
+    if (projectConfig.project && projectConfig.project.ejected) {
+      throw new SilentError('An ejected project cannot use the build command anymore.');
+    }
     rimraf.sync(path.resolve(this.project.root, outputPath));
 
     const serveDefaults = {

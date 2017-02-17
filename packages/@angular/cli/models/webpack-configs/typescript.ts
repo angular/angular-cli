@@ -17,7 +17,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
   const { appConfig, projectRoot, buildOptions } = wco;
 
   // Read the environment, and set it in the compiler host.
-  let hostOverrideFileSystem: any = {};
+  let hostReplacementPaths: any = {};
   // process environment file replacement
   if (appConfig.environments) {
     if (!appConfig.environmentSource) {
@@ -58,9 +58,10 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
     const appRoot = path.resolve(projectRoot, appConfig.root);
     const sourcePath = appConfig.environmentSource;
     const envFile = appConfig.environments[buildOptions.environment];
-    const environmentContent = fs.readFileSync(path.join(appRoot, envFile)).toString();
 
-    hostOverrideFileSystem = { [path.join(appRoot, sourcePath)]: environmentContent };
+    hostReplacementPaths = {
+      [path.join(appRoot, sourcePath)]: path.join(appRoot, envFile)
+    };
   }
 
   return new AotPlugin(Object.assign({}, {
@@ -69,7 +70,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
       i18nFile: buildOptions.i18nFile,
       i18nFormat: buildOptions.i18nFormat,
       locale: buildOptions.locale,
-      hostOverrideFileSystem
+      hostReplacementPaths
     }, options));
 }
 
@@ -77,7 +78,10 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
 export const getNonAotConfig = function(wco: WebpackConfigOptions) {
   const { projectRoot, appConfig } = wco;
   let exclude = [ '**/*.spec.ts' ];
-  if (appConfig.test) { exclude.push(path.join(projectRoot, appConfig.root, appConfig.test)); };
+  if (appConfig.test) {
+    exclude.push(path.join(projectRoot, appConfig.root, appConfig.test));
+  }
+
   return {
     module: {
       rules: [

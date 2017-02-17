@@ -8,11 +8,11 @@ export default function () {
   return Promise.resolve()
     .then(() => writeFile(fileName, 'const foo = "";\n'))
     .then(() => ng('lint', '--format=stylish', '--force'))
-    .then((output) => {
-      if (!output.match(/1:13  quotemark  " should be '/)) {
+    .then(({ stdout }) => {
+      if (!stdout.match(/1:13  quotemark  " should be '/)) {
         throw new Error(oneLine`
           Expected to match "1:13  quotemark  " should be '"
-          in ${output}.
+          in ${stdout}.
         `);
       }
     });

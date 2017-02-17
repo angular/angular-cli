@@ -25,6 +25,7 @@ export interface AotPluginOptions {
   typeChecking?: boolean;
   skipCodeGeneration?: boolean;
   hostOverrideFileSystem?: { [path: string]: string };
+  hostReplacementPaths?: { [path: string]: string };
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
@@ -35,6 +36,8 @@ export interface AotPluginOptions {
 
 
 export class AotPlugin implements Tapable {
+  private _options: AotPluginOptions;
+
   private _compilerOptions: ts.CompilerOptions;
   private _angularCompilerOptions: AngularCompilerOptions;
   private _program: ts.Program;
@@ -62,9 +65,11 @@ export class AotPlugin implements Tapable {
   private _firstRun = true;
 
   constructor(options: AotPluginOptions) {
-    this._setupOptions(options);
+    this._options = Object.assign({}, options);
+    this._setupOptions(this._options);
   }
 
+  get options() { return this._options; }
   get basePath() { return this._basePath; }
   get compilation() { return this._compilation; }
   get compilerHost() { return this._compilerHost; }
@@ -175,6 +180,14 @@ export class AotPlugin implements Tapable {
         this._compilerHost.writeFile(filePath, options.hostOverrideFileSystem[filePath], false);
       }
     }
+    // Override some files in the FileSystem with paths from the actual file system.
+    if (options.hasOwnProperty('hostReplacementPaths')) {
+      for (const filePath of Object.keys(options.hostReplacementPaths)) {
+        const replacementFilePath = options.hostReplacementPaths[filePath];
+        const content = this._compilerHost.readFile(replacementFilePath);
+        this._compilerHost.writeFile(filePath, content, false);
+      }
+    }
 
     this._program = ts.createProgram(
       this._rootFilePath, this._compilerOptions, this._compilerHost);
@@ -193,8 +206,8 @@ export class AotPlugin implements Tapable {
 
     // still no _entryModule? => try to resolve from mainPath
     if (!this._entryModule && options.mainPath) {
-      this._entryModule = resolveEntryModuleFromMain(options.mainPath, this._compilerHost,
-        this._program);
+      const mainPath = path.resolve(basePath, options.mainPath);
+      this._entryModule = resolveEntryModuleFromMain(mainPath, this._compilerHost, this._program);
     }
 
     if (options.hasOwnProperty('i18nFile')) {

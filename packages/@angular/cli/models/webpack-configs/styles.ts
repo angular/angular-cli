@@ -5,6 +5,7 @@ import {
 } from '../../plugins/suppress-entry-chunks-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
+import { pluginArgs } from '../../tasks/eject';
 
 const cssnano = require('cssnano');
 const autoprefixer = require('autoprefixer');
@@ -104,8 +105,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // load global css as css files
   if (globalStylePaths.length > 0) {
-    rules.push(...baseRules.map(({test, loaders}) => ({
-      include: globalStylePaths, test, loaders: ExtractTextPlugin.extract({
+    rules.push(...baseRules.map(({test, loaders}) => {
+      const extractTextPlugin = {
         use: [
           ...commonLoaders,
           ...loaders
@@ -113,8 +114,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         fallback: 'style-loader',
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
         publicPath: ''
-      })
-    })));
+      };
+      const ret: any = {
+        include: globalStylePaths, test, loaders: ExtractTextPlugin.extract(extractTextPlugin)
+      };
+      // Save the original options as arguments for eject.
+      ret[pluginArgs] = extractTextPlugin;
+      return ret;
+    }));
   }
 
   // supress empty .js files in css only entry points

@@ -14,10 +14,14 @@ export default Task.extend({
   run: function (runTaskOptions: BuildTaskOptions) {
 
     const project = this.cliProject;
+    const config = CliConfig.fromProject().config;
 
-    const outputPath = runTaskOptions.outputPath || CliConfig.fromProject().config.apps[0].outDir;
+    const outputPath = runTaskOptions.outputPath || config.apps[0].outDir;
     if (project.root === outputPath) {
-      throw new SilentError ('Output path MUST not be project root directory!');
+      throw new SilentError('Output path MUST not be project root directory!');
+    }
+    if (config.project && config.project.ejected) {
+      throw new SilentError('An ejected project cannot use the build command anymore.');
     }
     rimraf.sync(path.resolve(project.root, outputPath));
 

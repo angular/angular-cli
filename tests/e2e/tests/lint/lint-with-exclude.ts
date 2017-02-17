@@ -9,11 +9,11 @@ export default function () {
     .then(() => ng('set', 'lint.0.exclude', '"**/foo.ts"'))
     .then(() => writeFile(fileName, 'const foo = "";\n'))
     .then(() => ng('lint'))
-    .then((output) => {
-      if (!output.match(/All files pass linting\./)) {
+    .then(({ stdout }) => {
+      if (!stdout.match(/All files pass linting\./)) {
         throw new Error(oneLine`
           Expected to match "All files pass linting."
-          in ${output}.
+          in ${stdout}.
         `);
       }
     });

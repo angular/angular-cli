@@ -3,7 +3,7 @@ export interface BaseHrefWebpackPluginOptions {
 }
 
 export class BaseHrefWebpackPlugin {
-  constructor(private options: BaseHrefWebpackPluginOptions) { }
+  constructor(public readonly options: BaseHrefWebpackPluginOptions) { }
 
   apply(compiler: any): void {
     // Ignore if baseHref is not passed

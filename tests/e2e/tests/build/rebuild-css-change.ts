@@ -5,6 +5,7 @@ import {
   silentExecAndWaitForOutputToMatch
 } from '../../utils/process';
 import {appendToFile} from '../../utils/fs';
+import {getGlobalVariable} from '../../utils/env';
 
 const webpackGoodRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
 
@@ -12,6 +13,11 @@ export default function() {
   if (process.platform.startsWith('win')) {
     return Promise.resolve();
   }
+  // Skip this in ejected tests.
+  if (getGlobalVariable('argv').eject) {
+    return Promise.resolve();
+  }
+
 
   return silentExecAndWaitForOutputToMatch('ng', ['serve'], webpackGoodRegEx)
     // Should trigger a rebuild.
