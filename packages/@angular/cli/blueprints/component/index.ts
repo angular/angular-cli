@@ -14,16 +14,64 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean },
-    { name: 'inline-template', type: Boolean, aliases: ['it'] },
-    { name: 'inline-style', type: Boolean, aliases: ['is'] },
-    { name: 'prefix', type: String, default: null },
-    { name: 'spec', type: Boolean },
-    { name: 'view-encapsulation', type: String, aliases: ['ve'] },
-    { name: 'change-detection', type: String, aliases: ['cd'] },
-    { name: 'skip-import', type: Boolean, default: false },
-    { name: 'module', type: String, aliases: ['m'] },
-    { name: 'export', type: Boolean, default: false }
+    {
+      name: 'flat',
+      type: Boolean,
+      description: 'Flag to indicate if a dir is created.'
+    },
+    {
+      name: 'inline-template',
+      type: Boolean,
+      aliases: ['it'],
+      description: 'Specifies if the template will be in the ts file.'
+    },
+    {
+      name: 'inline-style',
+      type: Boolean,
+      aliases: ['is'],
+      description: 'Specifies if the style will be in the ts file.'
+    },
+    {
+      name: 'prefix',
+      type: String,
+      default: null,
+      description: 'Specifies whether to use the prefix.'
+    },
+    {
+      name: 'spec',
+      type: Boolean,
+      description: 'Specifies if a spec file is generated.'
+    },
+    {
+      name: 'view-encapsulation',
+      type: String,
+      aliases: ['ve'],
+      description: 'Specifies the view encapsulation strategy.'
+    },
+    {
+      name: 'change-detection',
+      type: String,
+      aliases: ['cd'],
+      description: 'Specifies the change detection strategy.'
+    },
+    {
+      name: 'skip-import',
+      type: Boolean,
+      default: false,
+      description: 'Allows for skipping the module import.'
+    },
+    {
+      name: 'module',
+      type: String,
+      aliases: ['m'],
+      description: 'Allows specification of the declaring module.'
+    },
+    {
+      name: 'export',
+      type: Boolean,
+      default: false,
+      description: 'Specifies if declaring module exports the component.'
+    }
   ],
 
   beforeInstall: function (options: any) {

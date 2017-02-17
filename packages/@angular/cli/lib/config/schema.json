@@ -12,9 +12,11 @@
       "type": "object",
       "properties": {
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "The version of @angular/cli in the project."
         },
         "name": {
+          "description": "The name of the project.",
           "type": "string"
         },
         "ejected": {
@@ -32,14 +34,17 @@
         "type": "object",
         "properties": {
           "root": {
-            "type": "string"
+            "type": "string",
+            "description": "The root directory of the app."
           },
           "outDir": {
             "type": "string",
-            "default": "dist/"
+            "default": "dist/",
+            "description": "The output directory for build results."
           },
           "assets": {
             "type": "array",
+            "description": "List of application assets.",
             "items": {
               "oneOf": [
                 {
@@ -50,15 +55,18 @@
                   "properties": {
                     "glob": {
                       "type": "string",
-                      "default": ""
+                      "default": "",
+                      "description": "The pattern to match."
                     },
                     "input": {
                       "type": "string",
-                      "default": ""
+                      "default": "",
+                      "description": "The dir to seach within."
                     },
                     "output": {
                       "type": "string",
-                      "default": ""
+                      "default": "",
+                      "description": "The output path (relative to the outDir."
                     }
                   },
                   "additionalProperties": false
@@ -68,27 +76,34 @@
             "default": []
           },
           "deployUrl": {
-            "type": "string"
+            "type": "string",
+            "description": ""
           },
           "index": {
             "type": "string",
-            "default": "index.html"
+            "default": "index.html",
+            "description": "The name of the start HTML file."
           },
           "main": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the main entry-point file."
           },
           "polyfills": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the polyfills file."
           },
           "test": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the test entry-point file."
           },
           "tsconfig": {
             "type": "string",
-            "default": "tsconfig.json"
+            "default": "tsconfig.json",
+            "description": "The name of the TypeScript configuration file."
           },
           "prefix": {
-            "type": "string"
+            "type": "string",
+            "description": "The prefix to apply to generated selectors."
           },
           "serviceWorker": {
             "description": "Experimental support for a service worker from @angular/service-worker.",
@@ -169,31 +184,15 @@
       },
       "additionalProperties": false
     },
-    "addons": {
-      "description": "Configuration reserved for installed third party addons.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {},
-        "additionalProperties": true
-      }
-    },
-    "packages": {
-      "description": "Configuration reserved for installed third party packages.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {},
-        "additionalProperties": true
-      }
-    },
     "e2e": {
       "type": "object",
+      "description": "Confirguration for end-to-end tests.",
       "properties": {
         "protractor": {
           "type": "object",
           "properties": {
             "config": {
+              "description": "Path to the config file.",
               "type": "string"
             }
           },
@@ -255,12 +254,14 @@
       }
     },
     "test": {
+      "description": "Configuration for unit tests.",
       "type": "object",
       "properties": {
         "karma": {
           "type": "object",
           "properties": {
             "config": {
+              "description": "Path to the karma config file.",
               "type": "string"
             }
           },
@@ -270,106 +271,132 @@
       "additionalProperties": false
     },
     "defaults": {
+      "description": "Specify the default values for generating.",
       "type": "object",
       "properties": {
         "styleExt": {
+          "description": "The file extension to be used for style files.",
           "type": "string"
         },
         "poll": {
+          "description": "How often to check for file updates.",
           "type": "number"
         },
         "class": {
+          "description": "Options for generating a class",
           "type": "object",
           "properties": {
             "spec": {
+              "description": "Specifies if a spec file is generated.",
               "type": "boolean",
               "default": false
             }
           }
         },
         "component": {
+          "description": "Options for generating a component.",
           "type": "object",
           "properties": {
             "flat": {
+              "description": "Flag to indicate if a dir is created.",
               "type": "boolean",
               "default": false
             },
             "spec": {
+              "description": "Specifies if a spec file is generated.",
               "type": "boolean",
               "default": true
             },
             "inlineStyle": {
+              "description": "Specifies if the style will be in the ts file.",
               "type": "boolean",
               "default": false
             },
             "inlineTemplate": {
+              "description": "Specifies if the template will be in the ts file.",
               "type": "boolean",
               "default": false
             },
             "viewEncapsulation": {
+              "description": "Specifies the view encapsulation strategy.",
               "enum": ["Emulated", "Native", "None"]
             },
             "changeDetection": {
+              "description": "Specifies the change detection strategy.",
               "enum": ["Default", "OnPush"]
             }
           }
         },
         "directive": {
+          "description": "Options for generating a directive.",
           "type": "object",
           "properties": {
             "flat": {
+              "description": "Flag to indicate if a dir is created.",
               "type": "boolean",
               "default": true
             },
             "spec": {
+              "description": "Specifies if a spec file is generated.",
               "type": "boolean",
               "default": true
             }
           }
         },
         "interface": {
+          "description": "Options for generating an interface.",
           "type": "object",
           "properties": {
             "prefix": {
+              "description": "Prefix to apply to interface names. (i.e. I)",
               "type": "string",
               "default": ""
             }
           }
         },
         "module": {
+          "description": "Options for generating a module.",
           "type": "object",
           "properties": {
             "flat": {
+              "description": "Flag to indicate if a dir is created.",
               "type": "boolean",
               "default": false
             },
             "spec": {
+              "description": "Specifies if a spec file is generated.",
               "type": "boolean",
               "default": false
             }
           }
         },
         "pipe": {
+          "description": "Options for generating a pipe.",
           "type": "object",
           "properties": {
             "flat": {
+              "description": "Flag to indicate if a dir is created.",
               "type": "boolean",
               "default": true
             },
             "spec": {
+              "description": "Specifies if a spec file is generated.",
               "type": "boolean",
               "default": true
             }
           }
         },
         "service": {
+          "description": "Options for generating a service.",
           "type": "object",
           "properties": {
             "flat": {
+              "description": "Flag to indicate if a dir is created.",
               "type": "boolean",
               "default": true
             },
             "spec": {
+              "description": "Specifies if a spec file is generated.",
               "type": "boolean",
               "default": true
             }
@@ -395,9 +422,10 @@
       "additionalProperties": false
     },
     "packageManager": {
-        "enum": [ "npm", "cnpm", "yarn", "default" ],
-        "default": "default",
-        "type": "string"
+      "description": "Specify which package manager tool to use.",
+      "enum": [ "npm", "cnpm", "yarn", "default" ],
+      "default": "default",
+      "type": "string"
     },
     "warnings": {
       "description": "Allow people to disable console warnings.",

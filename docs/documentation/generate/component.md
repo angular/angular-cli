@@ -16,9 +16,9 @@
 
 `--spec` specifies if a spec file is generated
 
-`--view-encapsulation` (`-ve`) set the view encapsulation strategy
+`--view-encapsulation` (`-ve`) specifies the view encapsulation strategy
 
-`--change-detection` (`-cd`) set the change detection strategy
+`--change-detection` (`-cd`) specifies the change detection strategy
 
 `--skip-import` allows for skipping the module import
 

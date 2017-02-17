@@ -7,7 +7,11 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'spec', type: Boolean }
+    {
+      name: 'spec',
+      type: Boolean,
+      description: 'Specifies if a spec file is generated.'
+    }
   ],
 
   normalizeEntityName: function (entityName: string) {
