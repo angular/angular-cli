@@ -1,7 +1,6 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "version": "<%= version %>",
     "name": "<%= htmlComponentName %>"
   },
   "apps": [

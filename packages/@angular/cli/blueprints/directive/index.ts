@@ -14,12 +14,39 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean },
-    { name: 'prefix', type: String, default: null },
-    { name: 'spec', type: Boolean },
-    { name: 'skip-import', type: Boolean, default: false },
-    { name: 'module', type: String, aliases: ['m'] },
-    { name: 'export', type: Boolean, default: false }
+    {
+      name: 'flat',
+      type: Boolean,
+      description: 'Flag to indicate if a dir is created.'
+    },
+    {
+      name: 'prefix',
+      type: String,
+      default: null,
+      description: 'Specifies whether to use the prefix.'
+    },
+    {
+      name: 'spec',
+      type: Boolean,
+      description: 'Specifies if a spec file is generated.'
+    },
+    {
+      name: 'skip-import',
+      type: Boolean,
+      default: false,
+      description: 'Allows for skipping the module import.'
+    },
+    {
+      name: 'module',
+      type: String, aliases: ['m'],
+      description: 'Allows specification of the declaring module.'
+    },
+    {
+      name: 'export',
+      type: Boolean,
+      default: false,
+      description: 'Specifies if declaring module exports the component.'
+    }
   ],
 
   beforeInstall: function(options: any) {

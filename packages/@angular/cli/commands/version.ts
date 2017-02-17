@@ -44,9 +44,6 @@ const VersionCommand = Command.extend({
     }
     const config = CliConfig.fromProject();
     if (config && config.config && config.config.project) {
-      if (config.config.project.version !== pkg.version) {
-        ngCliVersion += ` [${config.config.project.version}]`;
-      }
       if (config.config.project.ejected) {
         ngCliVersion += ' (e)';
       }

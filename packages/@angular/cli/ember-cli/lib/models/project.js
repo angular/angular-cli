@@ -5,7 +5,7 @@
 */
 var Promise            = require('../ext/promise');
 var path               = require('path');
-var findup             = Promise.denodeify(require('findup'));
+var findUp             = require('../../../utilities/find-up').findUp;
 var resolve            = Promise.denodeify(require('resolve'));
 var fs                 = require('fs');
 var find               = require('lodash/find');
@@ -470,7 +470,7 @@ Project.closest = function(pathName, _ui, _cli) {
       return new Project(result.directory, result.pkg, ui, _cli);
     })
     .catch(function(reason) {
-      handleFindupError(pathName, reason);
+      handleFindupError(pathName);
     });
 };
 
@@ -546,7 +546,7 @@ Project.projectOrnullProject = function(_ui, _cli) {
  */
 Project.getProjectRoot = function () {
   try {
-    var directory = findup.sync(process.cwd(), 'package.json');
+    var directory = path.dirname(findUp(process.cwd(), 'package.json'));
     var pkg = require(path.join(directory, 'package.json'));
 
     if (pkg && pkg.name === 'ember-cli') {
@@ -557,12 +557,8 @@ Project.getProjectRoot = function () {
     debug('getProjectRoot %s -> %s', process.cwd(), directory);
     return directory;
   } catch (reason) {
-    if (isFindupError(reason)) {
-      debug('getProjectRoot: not found. Will use cwd: %s', process.cwd());
-      return process.cwd();
-    } else {
-      throw reason;
-    }
+    debug('getProjectRoot: not found. Will use cwd: %s', process.cwd());
+    return process.cwd();
   }
 };
 
@@ -594,34 +590,24 @@ function ensureUI(_ui) {
 }
 
 function closestPackageJSON(pathName) {
-  return findup(pathName, 'package.json')
-    .then(function(directory) {
-      return Promise.hash({
-        directory: directory,
-        pkg: require(path.join(directory, 'package.json'))
-      });
-    });
+  return Promise.resolve()
+    .then(() => findUp('package.json', pathName))
+    .then(filePath => ({
+      directory: path.dirname(filePath),
+      pkg: require(filePath)
+    }));
 }
 
 function findupPath(pathName) {
   try {
-    return findup.sync(pathName, 'package.json');
+    return path.dirname(findUp('package.json', pathName));
   } catch (reason) {
-    handleFindupError(pathName, reason);
+    handleFindupError(pathName);
   }
 }
 
-function isFindupError(reason) {
-  // Would be nice if findup threw error subclasses
-  return reason && /not found/i.test(reason.message);
-}
-
-function handleFindupError(pathName, reason) {
-  if (isFindupError(reason)) {
-    throw new NotFoundError('No project found at or up from: `' + pathName + '`');
-  } else {
-    throw reason;
-  }
+function handleFindupError(pathName) {
+  throw new NotFoundError('No project found at or up from: `' + pathName + '`');
 }
 
 // Export
