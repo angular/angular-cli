@@ -34,7 +34,7 @@
     "@angular/compiler": "^2.3.1 || >=4.0.0-beta <5.0.0",
     "@angular/compiler-cli": "^2.3.1 || >=4.0.0-beta <5.0.0",
     "@angular/core": "^2.3.1 || >=4.0.0-beta <5.0.0",
-    "@angular/tsc-wrapped": "^0.5.0",
+    "@angular/tsc-wrapped": "^0.5.0 || >=4.0.0-beta <5.0.0",
     "typescript": "^2.0.2",
     "webpack": "^2.2.0"
   }
