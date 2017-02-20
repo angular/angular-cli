@@ -132,10 +132,6 @@ export default Blueprint.extend({
   },
 
   afterInstall: function(options: any) {
-    if (options.dryRun) {
-      return;
-    }
-
     const returns: Array<any> = [];
     const className = stringUtils.classify(`${options.entity.name}Directive`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.directive`);
@@ -145,6 +141,12 @@ export default Blueprint.extend({
     const importPath = relativeDir ? `./${relativeDir}/${fileName}` : `./${fileName}`;
 
     if (!options.skipImport) {
+      if (options.dryRun) {
+        this._writeStatusToUI(chalk.yellow,
+          'update',
+          path.relative(this.project.root, this.pathToModule));
+        return;
+      }
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
           .then((change: any) => change.apply(NodeHost))
@@ -155,9 +157,9 @@ export default Blueprint.extend({
             }
             return result;
           }));
-      this._writeStatusToUI(chalk.yellow,
-                            'update',
-                            path.relative(this.project.root, this.pathToModule));
+        this._writeStatusToUI(chalk.yellow,
+          'update',
+          path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);

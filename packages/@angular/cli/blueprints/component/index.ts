@@ -203,10 +203,6 @@ export default Blueprint.extend({
   },
 
   afterInstall: function (options: any) {
-    if (options.dryRun) {
-      return;
-    }
-
     const returns: Array<any> = [];
     const className = stringUtils.classify(`${options.entity.name}Component`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.component`);
@@ -214,6 +210,12 @@ export default Blueprint.extend({
     const importPath = componentDir ? `./${componentDir}/${fileName}` : `./${fileName}`;
 
     if (!options.skipImport) {
+      if (options.dryRun) {
+        this._writeStatusToUI(chalk.yellow,
+          'update',
+          path.relative(this.project.root, this.pathToModule));
+        return;
+      }
       const preChange = fs.readFileSync(this.pathToModule, 'utf8');
 
       returns.push(
