@@ -114,14 +114,7 @@ Local project package:
 rm -rf node_modules dist # use rmdir on Windows
 npm install --save-dev @angular/cli@latest
 npm install
-ng update
 ```
-
-Running `ng update` will check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
-
-Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng update` finishes.
-
-**The main cause of errors after an update is failing to incorporate these updates into your code**.
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
 

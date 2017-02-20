@@ -25,6 +25,10 @@ CLI.prototype.run = function(environment) {
   return Promise.hash(environment).then(function(environment) {
     var args = environment.cliArgs.slice();
 
+    if (args.length === 0) {
+      args[0] = 'help';
+    }
+
     if (args[0] === '--help') {
       if (args.length === 1) {
         args[0] = 'help';
