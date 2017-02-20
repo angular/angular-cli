@@ -36,20 +36,21 @@ export default function () {
       `url\('\/assets\/global-img-absolute\.svg'\)`))
     .then(() => expectFileToMatch('dist/styles.bundle.css', 'url\(global-img-relative.svg\)'))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      `url\('\/assets\/component-img-absolute\.svg'\)`))
-    .then(() => expectFileToMatch('dist/main.bundle.js', 'background: url\(" \+ __webpack_require'))
+      `url\(\\'\/assets\/component-img-absolute\.svg\\'\)`))
+    .then(() => expectFileToMatch('dist/main.bundle.js', 'url\(component-img-relative\.svg\)'))
     // Check files are correctly created.
-    .then(() => expectToFail(() => expectFileToExist('global-img-absolute.svg')))
-    .then(() => expectFileToExist('global-img-relative.svg'))
-    .then(() => expectToFail(() => expectFileToExist('component-img-absolute.svg')))
-    .then(() => expectFileToExist('component-img-relative.svg'))
+    .then(() => expectToFail(() => expectFileToExist('dist/global-img-absolute.svg')))
+    .then(() => expectFileToExist('dist/global-img-relative.svg'))
+    .then(() => expectToFail(() => expectFileToExist('dist/component-img-absolute.svg')))
+    .then(() => expectFileToExist('dist/component-img-relative.svg'))
     // Also check with base-href and deploy-url flags.
-    .then(() => ng('build', '--base-href=/base/', '--deploy-url=/deploy/', '--extract-css'))
+    .then(() => ng('build', '--base-href=/base/', '--deploy-url=deploy/',
+      '--extract-css', '--aot'))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
       `url\('\/base\/deploy\/assets\/global-img-absolute\.svg'\)`))
     .then(() => expectFileToMatch('dist/styles.bundle.css', 'url\(global-img-relative.svg\)'))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      `url\('\/base\/deploy\/assets\/component-img-absolute\.svg'\)`))
+      `url\(\\'\/base\/deploy\/assets\/component-img-absolute\.svg\\'\)`))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      'background: url\(" \+ __webpack_require'));
+      'url\(deploy/component-img-relative\.svg\)'));
 }
