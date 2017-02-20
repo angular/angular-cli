@@ -17,6 +17,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
  *
  * require('source-map-loader')
  * require('raw-loader')
+ * require('apply-loader')
+ * require('pug-loader')
+ * require('pug')
  * require('script-loader')
  * require('json-loader')
  * require('url-loader')
@@ -104,6 +107,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.html$/, loader: 'raw-loader' },
+        { test: /\.(pug|jade)/, loaders: ['apply-loader', 'pug-loader']},
         { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
         {
           test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
