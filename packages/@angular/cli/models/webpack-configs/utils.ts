@@ -86,3 +86,19 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
   /* tslint:enable:max-line-length */
   return hashFormats[option] || hashFormats['none'];
 }
+
+export function getBundleOutputPath(
+  appConfig: any,
+  hashFormat?: HashFormat,
+): string {
+  let result = '';
+  if (appConfig.bundlesOutDir !== '.') {
+    result += `${appConfig.bundlesOutDir}/`;
+    if (hashFormat) {
+      result += `[name]${hashFormat.file}.[ext]`;
+    } else {
+      result += `[name].[ext]`;
+    }
+  }
+  return result;
+}
