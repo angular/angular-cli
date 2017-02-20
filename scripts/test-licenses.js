@@ -64,6 +64,7 @@ const licenseReplacements = [
 // TODO(hansl): review these
 const ignoredPackages = [
   'async-foreach@0.1.3', // MIT, but doesn't list it in package.json
+  'directory-encoder@0.7.2', // MIT, but doesn't list it in package.json
   'domelementtype@1.1.3', // Looks like MIT
   'domelementtype@1.3.0', // Looks like MIT
   'domhandler@2.1.0', // Looks like MIT
@@ -79,8 +80,10 @@ const ignoredPackages = [
   'progress@1.1.8', // MIT, but doesn't list it in package.json
   'samsam@1.1.2', // BSD, but doesn't list it in package.json
   'stdout-stream@1.4.0', // MIT, but doesn't list it in package.json
+  'uglify-js@2.3.6', // BSD, but doesn't list it in package.json
   'undefined@undefined', // Test package with no name nor version.
-  'verror@1.3.6' // Looks like MIT
+  'verror@1.3.6', // Looks like MIT
+  'xmldom@0.1.27' // LGPL,MIT but has a broken licenses array
 ];
 
 const root = path.resolve(__dirname, '../');
