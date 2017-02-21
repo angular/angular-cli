@@ -101,6 +101,7 @@ export class NgCliWebpackConfig {
   private addAppConfigDefaults(appConfig: any) {
     const appConfigDefaults: any = {
       scripts: [],
+      libs: [],
       styles: []
     };
 

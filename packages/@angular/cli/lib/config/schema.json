@@ -166,6 +166,30 @@
             },
             "additionalProperties": false
           },
+          "libs": {
+            "description": "Static libraries to be included in the build.",
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true,
+                  "required": [
+                    "input"
+                  ]
+                }
+              ]
+            },
+            "additionalProperties": false
+          },
           "environmentSource":{
             "description": "Source file for environment config.",
             "type": "string"
