@@ -113,35 +113,16 @@ export class AotPlugin implements Tapable {
     } catch (err) {
       throw new Error(`An error happened while parsing ${this._tsConfigPath} JSON: ${err}.`);
     }
+
+    // Default excludes to **/*.spec.ts files.
+    if (!options.hasOwnProperty('exclude')) {
+      options.exclude = ['**/*.spec.ts'];
+    }
+    tsConfigJson.exclude = (tsConfigJson.exclude || []).concat(options.exclude);
+
     const tsConfig = ts.parseJsonConfigFileContent(
       tsConfigJson, ts.sys, basePath, null, this._tsConfigPath);
-
     let fileNames = tsConfig.fileNames;
-    if (options.hasOwnProperty('exclude')) {
-      let exclude: string[] = typeof options.exclude == 'string'
-          ? [options.exclude as string] : (options.exclude as string[]);
-
-      exclude.forEach((pattern: string) => {
-        const basePathPattern = '(' + basePath.replace(/\\/g, '/')
-            .replace(/[\-\[\]\/{}()+?.\\^$|*]/g, '\\$&') + ')?';
-        pattern = pattern
-          // Replace windows path separators with forward slashes.
-          .replace(/\\/g, '/')
-          // Escape characters that are used normally in regexes, except stars.
-          .replace(/[\-\[\]{}()+?.\\^$|]/g, '\\$&')
-          // Two stars replacement.
-          .replace(/\*\*/g, '(?:.*)')
-          // One star replacement.
-          .replace(/\*/g, '(?:[^/]*)')
-          // Escape characters from the basePath and make sure it's forward slashes.
-          .replace(/^/, basePathPattern);
-
-        const re = new RegExp('^' + pattern + '$');
-        fileNames = fileNames.filter(x => !x.replace(/\\/g, '/').match(re));
-      });
-    } else {
-      fileNames = fileNames.filter(fileName => !/\.spec\.ts$/.test(fileName));
-    }
     this._rootFilePath = fileNames;
 
     // Check the genDir. We generate a default gendir that's under basepath; it will generate

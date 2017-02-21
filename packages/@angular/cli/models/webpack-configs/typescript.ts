@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
 import {AotPlugin, AotPluginOptions} from '@ngtools/webpack';
+
+import { CliConfig } from '../config';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const SilentError = require('silent-error');
@@ -13,8 +15,11 @@ const webpackLoader: string = g['angularCliIsLocal']
   : '@ngtools/webpack';
 
 
-function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
+function _createAotPlugin(wco: WebpackConfigOptions, options: any = {}) {
   const { appConfig, projectRoot, buildOptions } = wco;
+
+  // Exclude test files by default.
+  options.exclude = CliConfig.fromProject().config.test.include;
 
   // Read the environment, and set it in the compiler host.
   let hostReplacementPaths: any = {};
@@ -76,12 +81,6 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
 
 
 export const getNonAotConfig = function(wco: WebpackConfigOptions) {
-  const { projectRoot, appConfig } = wco;
-  let exclude = [ '**/*.spec.ts' ];
-  if (appConfig.test) {
-    exclude.push(path.join(projectRoot, appConfig.root, appConfig.test));
-  }
-
   return {
     module: {
       rules: [
@@ -93,15 +92,12 @@ export const getNonAotConfig = function(wco: WebpackConfigOptions) {
       ]
     },
     plugins: [
-      _createAotPlugin(wco, { exclude, skipCodeGeneration: true }),
+      _createAotPlugin(wco, { skipCodeGeneration: true }),
     ]
   };
 };
 
 export const getAotConfig = function(wco: WebpackConfigOptions) {
-  const { projectRoot, appConfig } = wco;
-  let exclude = [ '**/*.spec.ts' ];
-  if (appConfig.test) { exclude.push(path.join(projectRoot, appConfig.root, appConfig.test)); };
   return {
     module: {
       rules: [
@@ -113,7 +109,7 @@ export const getAotConfig = function(wco: WebpackConfigOptions) {
       ]
     },
     plugins: [
-      _createAotPlugin(wco, { exclude })
+      _createAotPlugin(wco)
     ]
   };
 };

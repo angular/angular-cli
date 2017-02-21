@@ -262,6 +262,17 @@
             }
           },
           "additionalProperties": false
+        },
+        "include":{
+          "description": "Test files to include in the TypeScript compilation.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/*.spec.ts",
+            "test.ts"
+          ]
         }
       },
       "additionalProperties": false
