@@ -1,32 +1,9 @@
 {
+  "extends": "../../../tsconfig.json",
+
   "compilerOptions": {
-    "declaration": true,
-    "experimentalDecorators": true,
-    "mapRoot": "",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
     "outDir": "../../../dist/@ngtools/webpack",
     "rootDir": ".",
-    "lib": [
-      "es2016",
-      "dom"
-    ],
-    "target": "es6",
-    "sourceMap": true,
-    "sourceRoot": "/",
-    "baseUrl": "./",
-    "paths": {
-    },
-    "typeRoots": [
-      "../../node_modules/@types"
-    ],
-    "types": [
-      "jasmine",
-      "node"
-    ]
+    "baseUrl": ""
   }
 }

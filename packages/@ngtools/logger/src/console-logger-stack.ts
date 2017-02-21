@@ -9,12 +9,12 @@ let originalConsoleError: (message?: any, ...optionalParams: any[]) => void;
 
 function _push(logger: Logger) {
   if (globalConsoleStack.length == 0) {
-    originalConsoleDebug = console.debug;
+    originalConsoleDebug = (console as any).debug;  // Some environment (node) don't have debug.
     originalConsoleLog = console.log;
     originalConsoleWarn = console.warn;
     originalConsoleError = console.error;
 
-    console.debug = (msg: string, ...args: any[]) => {
+    (console as any).debug = (msg: string, ...args: any[]) => {
       globalConsoleStack[globalConsoleStack.length - 1].debug(msg, { args });
     };
     console.log = (msg: string, ...args: any[]) => {
@@ -39,7 +39,7 @@ function _pop() {
     console.log = originalConsoleLog;
     console.warn = originalConsoleWarn;
     console.error = originalConsoleError;
-    console.debug = originalConsoleDebug;
+    (console as any).debug = originalConsoleDebug;  // Some environment (node) don't have debug.
     globalConsoleStack = null;
   }
 }

@@ -17,7 +17,7 @@ describe('ConsoleLoggerStack', () => {
       })
       .then(() => done(), (err: any) => done.fail(err));
 
-    console.debug('hello');
+    (console as any).debug('hello');
     console.log('world');
     ConsoleLoggerStack.end();
   });
