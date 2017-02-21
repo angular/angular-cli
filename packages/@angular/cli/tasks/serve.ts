@@ -39,7 +39,7 @@ export default Task.extend({
 
     serveTaskOptions = Object.assign({}, serveDefaults, serveTaskOptions);
 
-    let webpackConfig = new NgCliWebpackConfig(serveTaskOptions).config;
+    let webpackConfig = new NgCliWebpackConfig(serveTaskOptions).buildConfig();
 
     const serverAddress = url.format({
       protocol: serveTaskOptions.ssl ? 'https' : 'http',
