@@ -6,6 +6,7 @@ import { Pattern } from './glob-copy-webpack-plugin';
 import { extraEntryParser } from '../models/webpack-configs/utils';
 import { WebpackTestConfig, WebpackTestOptions } from '../models/webpack-test-config';
 
+const getAppFromConfig = require('../utilities/app-utils').getAppFromConfig;
 
 function isDirectory(path: string) {
   try {
@@ -16,7 +17,8 @@ function isDirectory(path: string) {
 }
 
 const init: any = (config: any) => {
-  const appConfig = CliConfig.fromProject().config.apps[0];
+  const apps = CliConfig.fromProject().config.apps;
+  const appConfig = getAppFromConfig(apps, config.angularCli.app);
   const appRoot = path.join(config.basePath, appConfig.root);
   const testConfig: WebpackTestOptions = Object.assign({
     environment: 'dev',
@@ -66,7 +68,7 @@ const init: any = (config: any) => {
   }
 
   // Add webpack config.
-  const webpackConfig = new WebpackTestConfig(testConfig).buildConfig();
+  const webpackConfig = new WebpackTestConfig(testConfig, appConfig).buildConfig();
   const webpackMiddlewareConfig = {
     noInfo: true, // Hide webpack output because its noisy.
     stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.

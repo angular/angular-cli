@@ -19,6 +19,7 @@ export interface TestOptions {
   progress?: boolean;
   config: string;
   poll?: number;
+  app?: string;
 }
 
 
@@ -41,6 +42,12 @@ const TestCommand = EmberTestCommand.extend({
       type: Number,
       default: pollDefault,
       description: 'enable and define the file watching poll time period (milliseconds)'
+    },
+    {
+      name: 'app',
+      type: String,
+      aliases: ['a'],
+      description: 'Specifies app name to use.'
     }
   ],
 

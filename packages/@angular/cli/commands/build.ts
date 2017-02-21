@@ -41,6 +41,12 @@ export const baseBuildCommandOptions: any = [
     type: Number,
     default: pollDefault,
     description: 'enable and define the file watching poll time period (milliseconds)'
+  },
+  {
+    name: 'app',
+    type: String,
+    aliases: ['a'],
+    description: 'Specifies app name to use.'
   }
 ];
 

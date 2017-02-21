@@ -22,13 +22,12 @@ export interface WebpackConfigOptions {
 export class NgCliWebpackConfig {
   public config: any;
   public wco: WebpackConfigOptions;
-  constructor(buildOptions: BuildOptions) {
+  constructor(buildOptions: BuildOptions, appConfig: any) {
 
     this.validateBuildOptions(buildOptions);
 
     const configPath = CliConfig.configFilePath();
     const projectRoot = path.dirname(configPath);
-    let appConfig = CliConfig.fromProject().config.apps[0];
 
     appConfig = this.addAppConfigDefaults(appConfig);
     buildOptions = this.addTargetDefaults(buildOptions);
