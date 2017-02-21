@@ -17,8 +17,19 @@ module.exports = Command.extend({
   works: 'insideProject',
 
   availableOptions: [
-    { name: 'dry-run',       type: Boolean, default: false, aliases: ['d'] },
-    { name: 'verbose',       type: Boolean, default: false, aliases: ['v'] },
+    { name: 'dry-run',
+      type: Boolean,
+      default: false,
+      aliases: ['d'],
+      description: 'Run through without making any changes.'
+    },
+    {
+      name: 'verbose',
+      type: Boolean,
+      default: false,
+      aliases: ['v'],
+      description: 'Adds more details to output logging.'
+    },
     { name: 'pod',           type: Boolean, default: false, aliases: ['p'] },
     { name: 'classic',       type: Boolean, default: false, aliases: ['c'] },
     { name: 'dummy',         type: Boolean, default: false, aliases: ['dum', 'id'] },

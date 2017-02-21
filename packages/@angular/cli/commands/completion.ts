@@ -48,7 +48,7 @@ const optsNg: string[] = [];
 
 const CompletionCommand = Command.extend({
   name: 'completion',
-  description: 'Adds autocomplete functionality to `ng` commands and subcommands',
+  description: 'Adds autocomplete functionality to `ng` commands and subcommands.',
   works: 'everywhere',
   availableOptions: [
     { name: 'all',   type: Boolean, default: true,  aliases: ['a'] },

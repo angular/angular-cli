@@ -9,7 +9,7 @@ export interface LintCommandOptions {
 export default Command.extend({
   name: 'lint',
   aliases: ['l'],
-  description: 'Lints code in existing project',
+  description: 'Lints code in existing project.',
   works: 'insideProject',
   availableOptions: [
     { name: 'fix', type: Boolean, default: false },

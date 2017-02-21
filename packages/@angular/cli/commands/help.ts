@@ -13,7 +13,7 @@ const commandsToIgnore = [
 
 const HelpCommand = Command.extend({
   name: 'help',
-  description: 'Shows help for the CLI',
+  description: 'Shows help for the CLI.',
   works: 'everywhere',
 
   availableOptions: [],

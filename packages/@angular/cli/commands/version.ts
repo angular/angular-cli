@@ -7,13 +7,15 @@ import { CliConfig } from '../models/config';
 
 const VersionCommand = Command.extend({
   name: 'version',
-  description: 'outputs Angular CLI version',
+  description: 'Outputs Angular CLI version.',
   aliases: ['v', '--version', '-v'],
   works: 'everywhere',
 
   availableOptions: [{
     name: 'verbose',
-    type: Boolean, 'default': false
+    type: Boolean,
+    'default': false,
+    description: 'Adds more details to output logging.'
   }],
 
   run: function (options: any) {

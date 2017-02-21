@@ -19,21 +19,106 @@ const NewCommand = Command.extend({
   works: 'outsideProject',
 
   availableOptions: [
-    { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },
-    { name: 'verbose', type: Boolean, default: false, aliases: ['v'] },
-    { name: 'link-cli', type: Boolean, default: false, aliases: ['lc'] },
-    { name: 'ng4', type: Boolean, default: false },
-    { name: 'skip-install', type: Boolean, default: false, aliases: ['si'] },
-    { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
-    { name: 'skip-tests', type: Boolean, default: false, aliases: ['st'] },
-    { name: 'skip-commit', type: Boolean, default: false, aliases: ['sc'] },
-    { name: 'directory', type: String, aliases: ['dir'] },
-    { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
-    { name: 'style', type: String, default: 'css' },
-    { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'routing', type: Boolean, default: false },
-    { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
-    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
+    {
+      name: 'dry-run',
+      type: Boolean,
+      default: false,
+      aliases: ['d'],
+      description: 'Run through without making any changes.'
+    },
+    {
+      name: 'verbose',
+      type: Boolean,
+      default: false,
+      aliases: ['v'],
+      description: 'Adds more details to output logging.'
+    },
+    {
+      name: 'link-cli',
+      type: Boolean,
+      default: false,
+      aliases: ['lc'],
+      description: 'Automatically link the `@angular/cli` package.'
+    },
+    {
+      name: 'ng4',
+      type: Boolean,
+      default: false,
+      description: 'Create a project with Angular 4 in the template.'
+    },
+    {
+      name: 'skip-install',
+      type: Boolean,
+      default: false,
+      aliases: ['si'],
+      description: 'Skip installing packages.'
+    },
+    {
+      name: 'skip-git',
+      type: Boolean,
+      default: false,
+      aliases: ['sg'],
+      description: 'Skip initializing a git repository.'
+    },
+    {
+      name: 'skip-tests',
+      type: Boolean,
+      default: false,
+      aliases: ['st'],
+      description: 'Skip creating spec files.'
+    },
+    {
+      name: 'skip-commit',
+      type: Boolean,
+      default: false,
+      aliases: ['sc']
+    },
+    {
+      name: 'directory',
+      type: String,
+      aliases: ['dir'],
+      description: 'The directory name to create the app in.'
+    },
+    {
+      name: 'source-dir',
+      type: String,
+      default: 'src',
+      aliases: ['sd'],
+      description: 'The name of the source directory.'
+    },
+    {
+      name: 'style',
+      type: String,
+      default: 'css',
+      description: 'The style file default extension.'
+    },
+    {
+      name: 'prefix',
+      type: String,
+      default: 'app',
+      aliases: ['p'],
+      description: 'The prefix to use for all component selectors.'
+    },
+    {
+      name: 'routing',
+      type: Boolean,
+      default: false,
+      description: 'Generate a routing module.'
+    },
+    {
+      name: 'inline-style',
+      type: Boolean,
+      default: false,
+      aliases: ['is'],
+      description: 'Should have an inline style.'
+    },
+    {
+      name: 'inline-template',
+      type: Boolean,
+      default: false,
+      aliases: ['it'],
+      description: 'Should have an inline template.'
+     }
   ],
 
   isProject: function (projectPath: string) {

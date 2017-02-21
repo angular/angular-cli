@@ -37,7 +37,7 @@ export const baseServeCommandOptions: any = overrideOptions(
       type: String,
       default: defaultHost,
       aliases: ['H'],
-      description: `Listens only on ${defaultHost} by default`
+      description: `Listens only on ${defaultHost} by default.`
     },
     { name: 'proxy-config', type: 'Path', aliases: ['pc'] },
     { name: 'ssl', type: Boolean, default: defaultSsl },
@@ -48,19 +48,19 @@ export const baseServeCommandOptions: any = overrideOptions(
       type: Boolean,
       default: false,
       aliases: ['o'],
-      description: 'Opens the url in default browser',
+      description: 'Opens the url in default browser.',
     },
     { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
     {
       name: 'live-reload-client',
       type: String,
-      description: 'specify the URL that the live reload browser client will use'
+      description: 'Specify the URL that the live reload browser client will use.'
     },
     {
       name: 'hmr',
       type: Boolean,
       default: false,
-      description: 'Enable hot module replacement',
+      description: 'Enable hot module replacement.',
     }
   ]), [
     { name: 'watch', default: true }
