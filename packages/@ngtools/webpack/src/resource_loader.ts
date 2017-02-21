@@ -18,7 +18,7 @@ export class WebpackResourceLoader implements ResourceLoader {
     this._context = _parentCompilation.context;
   }
 
-  private _compile(filePath: string, content: string): Promise<any> {
+  private _compile(filePath: string, _content: string): Promise<any> {
     const compilerName = `compiler(${this._uniqueId++})`;
     const outputOptions = { filename: filePath };
     const relativePath = path.relative(this._context || '', filePath);

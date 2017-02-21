@@ -175,8 +175,8 @@ export default Task.extend({
     `));
 
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
-    return new Promise((resolve, reject) => {
-      server.listen(serveTaskOptions.port, serveTaskOptions.host, (err: any, stats: any) => {
+    return new Promise((_resolve, reject) => {
+      server.listen(serveTaskOptions.port, serveTaskOptions.host, (err: any, _stats: any) => {
         if (err) {
           return reject(err);
         }

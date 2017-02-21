@@ -1,6 +1,5 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
-import { oneLineTrim } from 'common-tags';
 import {
   SuppressExtractedTextChunksWebpackPlugin
 } from '../../plugins/suppress-entry-chunks-webpack-plugin';

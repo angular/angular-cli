@@ -1,7 +1,6 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
-import {AotPlugin, AotPluginOptions} from '@ngtools/webpack';
+import {AotPlugin} from '@ngtools/webpack';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const SilentError = require('silent-error');

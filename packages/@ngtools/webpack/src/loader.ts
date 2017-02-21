@@ -8,7 +8,7 @@ const loaderUtils = require('loader-utils');
 const NormalModule = require('webpack/lib/NormalModule');
 
 
-function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
+function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
   if (!node) {
     return null;
   } else if (node.kind == ts.SyntaxKind.Identifier) {
@@ -21,7 +21,7 @@ function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
 }
 
 
-function _angularImportsFromNode(node: ts.ImportDeclaration, sourceFile: ts.SourceFile): string[] {
+function _angularImportsFromNode(node: ts.ImportDeclaration, _sourceFile: ts.SourceFile): string[] {
   const ms = node.moduleSpecifier;
   let modulePath: string | null = null;
   switch (ms.kind) {
@@ -250,7 +250,7 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
       });
     })
     .forEach((node: ts.ObjectLiteralExpression) => {
-      const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, idx: number) => {
+      const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, _idx: number) => {
         return prop.kind == ts.SyntaxKind.PropertyAssignment
             && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
       })[0];
@@ -308,22 +308,6 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
         refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
       }
     });
-}
-
-
-function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
-  const diagnostics: ts.Diagnostic[] = refactor.getDiagnostics();
-
-  if (diagnostics.length > 0) {
-    const message = diagnostics
-      .map(diagnostic => {
-        const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-        const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-        return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
-      })
-      .join('\n');
-    throw new Error(message);
-  }
 }
 
 

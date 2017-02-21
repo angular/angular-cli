@@ -4,7 +4,6 @@ import { baseBuildCommandOptions } from './build';
 import { CliConfig } from '../models/config';
 import { Version } from '../upgrade/version';
 import { ServeTaskOptions } from './serve';
-import { checkPort } from '../utilities/check-port';
 import { overrideOptions } from '../utilities/override-options';
 
 const SilentError = require('silent-error');

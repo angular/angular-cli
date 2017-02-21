@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import InitCommand from './init';
 import { validateProjectName } from '../utilities/validate-project-name';
 

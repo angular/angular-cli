@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import {TypeScriptFileRefactor} from './refactor';
 
 
-function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
+function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
   if (node.kind == ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {

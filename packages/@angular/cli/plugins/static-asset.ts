@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-
 export class StaticAssetPlugin {
 
   constructor(private name: string, private contents: string) {}

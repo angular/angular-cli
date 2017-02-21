@@ -6,7 +6,6 @@ import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { extraEntryParser, lazyChunksFilter, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
-const autoprefixer = require('autoprefixer');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 

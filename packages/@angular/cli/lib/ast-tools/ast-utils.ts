@@ -88,7 +88,7 @@ export function insertAfterLastOccurrence(nodes: ts.Node[], toInsert: string,
 }
 
 
-export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
+export function getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
   if (node.kind == ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
@@ -101,7 +101,7 @@ export function getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): st
 
 
 function _angularImportsFromNode(node: ts.ImportDeclaration,
-                                 sourceFile: ts.SourceFile): {[name: string]: string} {
+                                 _sourceFile: ts.SourceFile): {[name: string]: string} {
   const ms = node.moduleSpecifier;
   let modulePath: string | null = null;
   switch (ms.kind) {
