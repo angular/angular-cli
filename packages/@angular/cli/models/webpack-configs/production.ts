@@ -9,7 +9,6 @@ import { WebpackConfigOptions } from '../webpack-config';
 
 export const getProdConfig = function (wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
-  const appRoot = path.resolve(projectRoot, appConfig.root);
 
   let extraPlugins: any[] = [];
   let entryPoints: {[key: string]: string[]} = {};

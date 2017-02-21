@@ -278,7 +278,8 @@ export class AotPlugin implements Tapable {
           result.resource = this.skipCodeGeneration ? this.basePath : this.genDir;
           result.recursive = true;
           result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = (p1: any, p2: any, p3: any, p4: RegExp, cb: any ) => {
+          result.resolveDependencies = (_fs: any, _resource: any, _recursive: any,
+            _regExp: RegExp, cb: any) => {
             const dependencies = Object.keys(this._lazyRoutes)
               .map((key) => {
                 const value = this._lazyRoutes[key];

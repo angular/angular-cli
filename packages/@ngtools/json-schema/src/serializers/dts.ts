@@ -141,24 +141,24 @@ export class DTsSerializer implements Serializer {
     this._writer(')');
   }
 
-  outputValue(node: SchemaNode) {
+  outputValue(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('any');
   }
 
-  outputString(node: SchemaNode) {
+  outputString(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('string');
   }
-  outputNumber(node: SchemaNode) {
+  outputNumber(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('number');
   }
-  outputInteger(node: SchemaNode) {
+  outputInteger(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('number');
   }
-  outputBoolean(node: SchemaNode) {
+  outputBoolean(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('boolean');
   }

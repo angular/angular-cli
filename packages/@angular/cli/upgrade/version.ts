@@ -50,7 +50,7 @@ export class Version {
     try {
       const angularCliPath = resolve.sync('@angular/cli', {
         basedir: process.cwd(),
-        packageFilter: (pkg: any, pkgFile: string) => {
+        packageFilter: (pkg: any, _pkgFile: string) => {
           packageJson = pkg;
         }
       });

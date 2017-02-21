@@ -1,6 +1,5 @@
 const Task = require('../ember-cli/lib/models/task');
 import * as chalk from 'chalk';
-import * as path from 'path';
 import * as glob from 'glob';
 import * as ts from 'typescript';
 import { requireProjectModule } from '../utilities/require-project-module';

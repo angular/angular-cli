@@ -4,9 +4,9 @@ import {BaseHrefWebpackPlugin} from './base-href-webpack-plugin';
 
 function mockCompiler(indexHtml: string, callback: Function) {
   return {
-    plugin: function (event: any, compilerCallback: Function) {
+    plugin: function (_event: any, compilerCallback: Function) {
       const compilation = {
-        plugin: function (hook: any, compilationCallback: Function) {
+        plugin: function (_hook: any, compilationCallback: Function) {
           const htmlPluginData = {
             html: indexHtml
           };
@@ -29,7 +29,7 @@ describe('base href webpack plugin', () => {
   it('should do nothing when baseHref is null', () => {
     const plugin = new BaseHrefWebpackPlugin({ baseHref: null });
 
-    const compiler = mockCompiler(html, (x: any, htmlPluginData: any) => {
+    const compiler = mockCompiler(html, (_x: any, htmlPluginData: any) => {
       expect(htmlPluginData.html).toEqual('<body><head></head></body>');
     });
     plugin.apply(compiler);
@@ -37,7 +37,7 @@ describe('base href webpack plugin', () => {
 
   it('should insert base tag when not exist', function () {
     const plugin = new BaseHrefWebpackPlugin({ baseHref: '/' });
-    const compiler = mockCompiler(html, (x: any, htmlPluginData: any) => {
+    const compiler = mockCompiler(html, (_x: any, htmlPluginData: any) => {
         expect(htmlPluginData.html).toEqual(oneLineTrim`
           <html>
             <head><base href="/"></head>
@@ -55,7 +55,7 @@ describe('base href webpack plugin', () => {
     const compiler = mockCompiler(oneLineTrim`
           <head><base href="/" target="_blank"></head>
           <body></body>
-        `, (x: any, htmlPluginData: any) => {
+        `, (_x: any, htmlPluginData: any) => {
       expect(htmlPluginData.html).toEqual(oneLineTrim`
           <head><base href="/myUrl/" target="_blank"></head>
           <body></body>

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { oneLine, stripIndent } from 'common-tags';
+import { stripIndent } from 'common-tags';
 
 const stringUtils = require('ember-cli-string-utils');
 const Command = require('../ember-cli/lib/models/command');
