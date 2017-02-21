@@ -24,7 +24,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
 
-const CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 const LoaderOptionsPlugin = webpack.LoaderOptionsPlugin;
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 
@@ -319,7 +318,7 @@ class JsonWebpackSerializer {
     });
   }
 
-  private _replacer(key: string, value: any) {
+  private _replacer(_key: string, value: any) {
     if (value === undefined) {
       return value;
     }

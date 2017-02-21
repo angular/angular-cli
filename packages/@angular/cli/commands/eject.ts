@@ -1,5 +1,4 @@
 import { BuildOptions } from '../models/build-options';
-import { Version } from '../upgrade/version';
 import {baseBuildCommandOptions} from './build';
 
 const Command = require('../ember-cli/lib/models/command');

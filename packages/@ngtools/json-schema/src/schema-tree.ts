@@ -89,7 +89,7 @@ export abstract class SchemaTreeNode<T> implements SchemaNode {
     return this._parent.isChildRequired(this.name);
   }
 
-  isChildRequired(name: string) { return false; }
+  isChildRequired(_name: string) { return false; }
 
   get parent(): SchemaTreeNode<any> { return this._parent; }
   get children(): { [key: string]: SchemaTreeNode<any> } | null { return null; }
@@ -97,13 +97,13 @@ export abstract class SchemaTreeNode<T> implements SchemaNode {
   get itemPrototype(): SchemaTreeNode<any> | null { return null; }
 
   abstract get(): T;
-  set(v: T, init = false, force = false) {
+  set(_v: T, _init = false, _force = false) {
     if (!this.readOnly) {
       throw new MissingImplementationError();
     }
     throw new SettingReadOnlyPropertyError();
   };
-  isCompatible(v: any) { return false; }
+  isCompatible(_v: any) { return false; }
 
   abstract serialize(serializer: Serializer): void;
 
@@ -223,7 +223,7 @@ export class OneOfSchemaTreeNode extends NonLeafSchemaTreeNode<any> {
     this._currentTypeHolder.set(v, false, true);
   }
 
-  set(v: any, init = false, force = false) {
+  set(v: any, _init = false, force = false) {
     return this._set(v, false, force);
   }
 
@@ -334,7 +334,7 @@ export class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array<any>> {
       '', undefined, null, metaData.schema['items'], false);
   }
 
-  _set(value: any, init: boolean, force: boolean) {
+  _set(value: any, init: boolean, _force: boolean) {
     const schema = this._schema;
     const forward = this._forward;
 
