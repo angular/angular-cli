@@ -116,9 +116,21 @@ export class AotPlugin implements Tapable {
 
     // Default excludes to **/*.spec.ts files.
     if (!options.hasOwnProperty('exclude')) {
-      options.exclude = ['**/*.spec.ts'];
+      options['exclude'] = ['**/*.spec.ts'];
     }
-    tsConfigJson.exclude = (tsConfigJson.exclude || []).concat(options.exclude);
+
+    // If the tsconfig doesn't contain any excludes, we must add the default ones before adding
+    // any extra ones (otherwise we'd include all of these which can cause unexpected errors).
+    // This is the same logic as present in TypeScript.
+    if (!tsConfigJson.exclude) {
+      tsConfigJson['exclude'] = ['node_modules', 'bower_components', 'jspm_packages'];
+      if (tsConfigJson.compilerOptions && tsConfigJson.compilerOptions.outDir) {
+        tsConfigJson.exclude.push(tsConfigJson.compilerOptions.outDir);
+      }
+    }
+
+    // Join our custom excludes with the existing ones.
+    tsConfigJson.exclude = tsConfigJson.exclude.concat(options.exclude);
 
     const tsConfig = ts.parseJsonConfigFileContent(
       tsConfigJson, ts.sys, basePath, null, this._tsConfigPath);

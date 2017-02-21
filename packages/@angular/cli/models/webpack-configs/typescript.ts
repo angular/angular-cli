@@ -19,7 +19,11 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any = {}) {
   const { appConfig, projectRoot, buildOptions } = wco;
 
   // Exclude test files by default.
-  options.exclude = CliConfig.fromProject().config.test.include;
+  const testConfig = CliConfig.fromProject().config.test;
+  options.exclude = (testConfig && testConfig.include) || [
+    '**/*.spec.ts',
+    'test.ts'
+  ];
 
   // Read the environment, and set it in the compiler host.
   let hostReplacementPaths: any = {};

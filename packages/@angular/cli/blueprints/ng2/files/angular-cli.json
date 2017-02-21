@@ -46,7 +46,11 @@
   "test": {
     "karma": {
       "config": "./karma.conf.js"
-    }
+    },
+    "include": [
+      "**/*.spec.ts",
+      "test.ts"
+    ]
   },
   "defaults": {
     "styleExt": "<%= styleExt %>",
