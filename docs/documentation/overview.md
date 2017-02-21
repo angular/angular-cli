@@ -51,6 +51,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 * [ng build](build)
 * [ng get/ng set](config)
 * [ng docs](docs)
+* [ng github-deploy:pages](github-deploy)
 
 ### How to Guides
 * Setup AngularFire _(coming soon)_
