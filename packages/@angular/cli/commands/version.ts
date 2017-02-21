@@ -54,12 +54,11 @@ const VersionCommand = Command.extend({
         versions = Object.assign(versions, this.getDependencyVersions(projPkg, root));
       });
     }
-    const asciiArt = `
-                             _                           _  _
-  __ _  _ __    __ _  _   _ | |  __ _  _ __         ___ | |(_)
- / _\` || '_ \\  / _\` || | | || | / _\` || '__|_____  / __|| || |
-| (_| || | | || (_| || |_| || || (_| || |  |_____|| (__ | || |
- \\__,_||_| |_| \\__, | \\__,_||_| \\__,_||_|          \\___||_||_|
+    const asciiArt = `    _                      _                 ____ _     ___
+   / \\   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+  / △ \\ | '_ \\ / _\` | | | | |/ _\` | '__|   | |   | |    | |
+ / ___ \\| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+/_/   \\_\\_| |_|\\__, |\\__,_|_|\\__,_|_|       \\____|_____|___|
                |___/`;
     this.ui.writeLine(chalk.red(asciiArt));
     this.printVersion('@angular/cli', ngCliVersion);
