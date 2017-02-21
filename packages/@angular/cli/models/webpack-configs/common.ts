@@ -1,13 +1,10 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
-import { packageChunkSort } from '../../utilities/package-chunk-sort';
-import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
-import { extraEntryParser, lazyChunksFilter, getOutputHashFormat } from './utils';
+import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 /**
@@ -32,12 +29,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   let extraRules: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
 
-  // figure out which are the lazy loaded entry points
-  const lazyChunks = lazyChunksFilter([
-    ...extraEntryParser(appConfig.scripts, appRoot, 'scripts'),
-    ...extraEntryParser(appConfig.styles, appRoot, 'styles')
-  ]);
-
   if (appConfig.main) {
     entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
   }
@@ -56,17 +47,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     // add entry points and lazy chunks
     globalScripts.forEach(script => {
       let scriptPath = `script-loader!${script.path}`;
-      if (script.lazy) { lazyChunks.push(script.entry); }
       entryPoints[script.entry] = (entryPoints[script.entry] || []).concat(scriptPath);
     });
-  }
-
-  if (buildOptions.vendorChunk) {
-    extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      chunks: ['main'],
-      minChunks: (module: any) => module.resource && module.resource.startsWith(nodeModules)
-    }));
   }
 
   // process asset entries
@@ -111,21 +93,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ].concat(extraRules)
     },
     plugins: [
-      new webpack.NoEmitOnErrorsPlugin(),
-      new HtmlWebpackPlugin({
-        template: path.resolve(appRoot, appConfig.index),
-        filename: path.resolve(buildOptions.outputPath, appConfig.index),
-        chunksSortMode: packageChunkSort(appConfig),
-        excludeChunks: lazyChunks,
-        xhtml: true
-      }),
-      new BaseHrefWebpackPlugin({
-        baseHref: buildOptions.baseHref
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        minChunks: Infinity,
-        name: 'inline'
-      })
+      new webpack.NoEmitOnErrorsPlugin()
     ].concat(extraPlugins),
     node: {
       fs: 'empty',

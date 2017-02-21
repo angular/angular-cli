@@ -116,3 +116,27 @@ export const getAotConfig = function(wco: WebpackConfigOptions) {
     ]
   };
 };
+
+export const getNonAotTestConfig = function(wco: WebpackConfigOptions) {
+  return {
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          loader: webpackLoader,
+          query: { module: 'commonjs' },
+          exclude: [/\.(e2e)\.ts$/]
+        }
+      ]
+    },
+    plugins: [
+      _createAotPlugin(wco, {
+        exclude: [],
+        skipCodeGeneration: true,
+        compilerOptions: {
+          module: 'commonjs'
+        }
+      }),
+    ]
+  };
+};

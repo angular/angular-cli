@@ -24,7 +24,7 @@ export const Extracti18nTask = Task.extend({
       i18nFormat: runTaskOptions.i18nFormat,
       verbose: runTaskOptions.verbose,
       progress: runTaskOptions.progress
-    }).config;
+    }).buildConfig();
 
     const webpackCompiler = webpack(config);
 

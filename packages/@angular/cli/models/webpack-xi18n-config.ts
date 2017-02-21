@@ -16,14 +16,16 @@ export class XI18nWebpackConfig extends NgCliWebpackConfig {
 
   public config: any;
 
-  constructor(extractOptions: XI18WebpackOptions) {
-
+  constructor(public extractOptions: XI18WebpackOptions) {
     super({
       target: 'development',
       verbose: extractOptions.verbose,
       progress: extractOptions.progress
     });
+    super.buildConfig();
+  }
 
+  public buildConfig() {
     const configPath = CliConfig.configFilePath();
     const projectRoot = path.dirname(configPath);
     const appConfig = CliConfig.fromProject().config.apps[0];
@@ -31,9 +33,10 @@ export class XI18nWebpackConfig extends NgCliWebpackConfig {
     const extractI18nConfig =
       getWebpackExtractI18nConfig(projectRoot,
         appConfig,
-        extractOptions.genDir,
-        extractOptions.i18nFormat);
+        this.extractOptions.genDir,
+        this.extractOptions.i18nFormat);
 
     this.config = webpackMerge([this.config, extractI18nConfig]);
+    return this.config;
   }
 }
