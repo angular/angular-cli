@@ -1,8 +1,11 @@
 import { <%= classifiedModuleName %>Pipe } from './<%= dasherizedModuleName %>.pipe';
 
 describe('<%= classifiedModuleName %>Pipe', () => {
+
+  let <%= camelizedModuleName %>Pipe: <%= classifiedModuleName %>Pipe;
+
   it('create an instance', () => {
-    const pipe = new <%= classifiedModuleName %>Pipe();
-    expect(pipe).toBeTruthy();
+    <%= camelizedModuleName %>Pipe = new <%= classifiedModuleName %>Pipe();
+    expect(<%= camelizedModuleName %>Pipe).toBeTruthy();
   });
 });
