@@ -106,6 +106,7 @@ export class NgCliWebpackConfig {
 
   public addAppConfigDefaults(appConfig: any) {
     const appConfigDefaults: any = {
+      testTsconfig: appConfig.tsconfig,
       scripts: [],
       styles: []
     };
