@@ -43,6 +43,7 @@ export const E2eTask = Task.extend({
         const webdriverUpdate = requireProjectModule(projectRoot,
           'protractor/node_modules/webdriver-manager/built/lib/cmds/update');
         // run `webdriver-manager update --standalone false --gecko false --quiet`
+        // if you change this, update the command comment in prev line, and in `eject` task
         promise = promise.then(() => webdriverUpdate.program.run({
           standalone: false,
           gecko: false,
