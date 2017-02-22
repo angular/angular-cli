@@ -71,6 +71,10 @@
             },
             "default": []
           },
+          "bundlesOutDir": {
+            "type": "string",
+            "default": "."
+          },
           "deployUrl": {
             "type": "string",
             "description": ""

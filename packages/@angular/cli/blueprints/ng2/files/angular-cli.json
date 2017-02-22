@@ -11,6 +11,7 @@
         "assets",
         "favicon.ico"
       ],
+      "bundlesOutDir": ".",
       "index": "index.html",
       "main": "main.ts",
       "polyfills": "polyfills.ts",

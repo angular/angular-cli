@@ -3,8 +3,13 @@ import * as path from 'path';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
-import { extraEntryParser, lazyChunksFilter, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
+import {
+  extraEntryParser,
+  lazyChunksFilter,
+  getOutputHashFormat,
+  getBundleOutputPath,
+} from './utils';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -95,18 +100,32 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     output: {
       path: path.resolve(projectRoot, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl,
-      filename: `[name]${hashFormat.chunk}.bundle.js`,
-      chunkFilename: `[id]${hashFormat.chunk}.chunk.js`
+      filename: `${appConfig.bundlesOutDir}/[name]${hashFormat.chunk}.bundle.js`,
+      chunkFilename: `${appConfig.bundlesOutDir}/[id]${hashFormat.chunk}.chunk.js`
     },
     module: {
       rules: [
-        { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
-        { test: /\.json$/, loader: 'json-loader' },
-        { test: /\.html$/, loader: 'raw-loader' },
-        { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
+        {
+          enforce: 'pre',
+          test: /\.js$/,
+          loader: `source-map-loader?name=${getBundleOutputPath(appConfig)}`,
+          exclude: [nodeModules]
+        },
+        {
+          test: /\.json$/,
+          loader: `json-loader?name=${getBundleOutputPath(appConfig)}`
+        },
+        {
+          test: /\.html$/,
+          loader: `raw-loader?name=${getBundleOutputPath(appConfig)}`
+        },
+        {
+          test: /\.(eot|svg)$/,
+          loader: `file-loader?name=${getBundleOutputPath(appConfig, hashFormat)}`
+        },
         {
           test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
-          loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
+          loader: `url-loader?name=${getBundleOutputPath(appConfig, hashFormat)}&limit=10000`
         }
       ].concat(extraRules)
     },

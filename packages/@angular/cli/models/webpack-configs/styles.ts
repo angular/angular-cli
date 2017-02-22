@@ -160,7 +160,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     plugins: [
       // extract global css from js files into own css file
       new ExtractTextPlugin({
-        filename: `[name]${hashFormat.extract}.bundle.css`,
+        filename: `${appConfig.bundlesOutDir}/[name]${hashFormat.extract}.bundle.css`,
         disable: !buildOptions.extractCss
       }),
       new webpack.LoaderOptionsPlugin({
