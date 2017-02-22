@@ -62,7 +62,7 @@ export default Task.extend({
       });
 
     // print formatter output directly for non human-readable formats
-    if (['prose', 'verbose'].indexOf(commandOptions.format) == -1) {
+    if (['prose', 'verbose', 'stylish'].indexOf(commandOptions.format) == -1) {
       ui.writeLine(results.trim());
       return (errors == 0 || commandOptions.force) ? Promise.resolve(0) : Promise.resolve(2);
     }
