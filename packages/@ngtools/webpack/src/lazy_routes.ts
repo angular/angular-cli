@@ -47,8 +47,9 @@ export function findLazyRoutes(filePath: string,
     .map((routePath: string) => {
       const moduleName = routePath.split('#')[0];
       const resolvedModuleName: ts.ResolvedModuleWithFailedLookupLocations = moduleName[0] == '.'
-        ? { resolvedModule: { resolvedFileName: join(dirname(filePath), moduleName) + '.ts' },
-            failedLookupLocations: [] }
+        ? ({
+            resolvedModule: { resolvedFileName: join(dirname(filePath), moduleName) + '.ts' }
+          } as any)
         : ts.resolveModuleName(moduleName, filePath, program.getCompilerOptions(), host);
       if (resolvedModuleName.resolvedModule
           && resolvedModuleName.resolvedModule.resolvedFileName

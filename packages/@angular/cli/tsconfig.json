@@ -1,37 +1,13 @@
 {
+  "extends": "../../../tsconfig.json",
+
   "compilerOptions": {
-    "declaration": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "mapRoot": "",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
     "outDir": "../../../dist/@angular/cli",
     "rootDir": ".",
-    "sourceMap": true,
-    "sourceRoot": "/",
-    "target": "es6",
-    "lib": [
-      "es2016"
-    ],
-    "skipLibCheck": true,
-    "typeRoots": [
-      "../../../node_modules/@types"
-    ],
     "baseUrl": "",
     "paths": {
       "@ngtools/json-schema": [ "../../../dist/@ngtools/json-schema/src" ],
       "@ngtools/webpack": [ "../../../dist/@ngtools/webpack/src" ]
     }
-  },
-  "include": [
-    "**/*"
-  ],
-  "exclude": [
-    "blueprints/*/files/**/*"
-  ]
+  }
 }
