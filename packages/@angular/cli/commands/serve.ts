@@ -11,6 +11,9 @@ const Command = require('../ember-cli/lib/models/command');
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const defaultPort = process.env.PORT || config.get('defaults.serve.port');
 const defaultHost = config.get('defaults.serve.host');
+const defaultSsl = config.get('defaults.serve.ssl');
+const defaultSslKey = config.get('defaults.serve.sslKey');
+const defaultSslCert = config.get('defaults.serve.sslCert');
 
 export interface ServeTaskOptions extends BuildOptions {
   port?: number;
@@ -37,9 +40,9 @@ export const baseServeCommandOptions: any = overrideOptions(
       description: `Listens only on ${defaultHost} by default`
     },
     { name: 'proxy-config', type: 'Path', aliases: ['pc'] },
-    { name: 'ssl', type: Boolean, default: false },
-    { name: 'ssl-key', type: String, default: 'ssl/server.key' },
-    { name: 'ssl-cert', type: String, default: 'ssl/server.crt' },
+    { name: 'ssl', type: Boolean, default: defaultSsl },
+    { name: 'ssl-key', type: String, default: defaultSslKey },
+    { name: 'ssl-cert', type: String, default: defaultSslCert },
     {
       name: 'open',
       type: Boolean,
