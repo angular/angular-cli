@@ -33,7 +33,8 @@ export default Task.extend({
         codeCoverage: options.codeCoverage,
         sourcemap: options.sourcemap,
         progress: options.progress,
-        poll: options.poll
+        poll: options.poll,
+        app: options.app
       };
 
       // Assign additional karmaConfig options to the local ngapp config

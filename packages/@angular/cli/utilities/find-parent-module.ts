@@ -2,11 +2,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 const SilentError = require('silent-error');
 
-export default function findParentModule(project: any, currentDir: string): string {
-  const sourceRoot = path.join(project.root, project.ngConfig.apps[0].root, 'app');
+export default function findParentModule(
+  projectRoot: string, appRoot: string, currentDir: string): string {
+
+  const sourceRoot = path.join(projectRoot, appRoot, 'app');
 
   // trim currentDir
-  currentDir = currentDir.replace(path.join(project.ngConfig.apps[0].root, 'app'), '');
+  currentDir = currentDir.replace(path.join(appRoot, 'app'), '');
 
   let pathToCheck = path.join(sourceRoot, currentDir);
 

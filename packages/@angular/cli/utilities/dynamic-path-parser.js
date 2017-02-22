@@ -2,14 +2,13 @@ var path = require('path');
 var process = require('process');
 var fs = require('fs');
 
-module.exports = function dynamicPathParser(project, entityName) {
+module.exports = function dynamicPathParser(project, entityName, appConfig) {
   var projectRoot = project.root;
-  var sourceDir = project.ngConfig.apps[0].root;
+  var sourceDir = appConfig.root;
   var appRoot = path.join(sourceDir, 'app');
   var cwd = process.env.PWD;
 
   var rootPath = path.join(projectRoot, appRoot);
-
   var outputPath = path.join(rootPath, entityName);
   
   if (entityName.indexOf(path.sep) === 0) {

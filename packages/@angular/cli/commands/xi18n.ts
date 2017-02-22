@@ -19,7 +19,13 @@ const Xi18nCommand = Command.extend({
     },
     { name: 'output-path',    type: 'Path', default: null, aliases: ['op']},
     { name: 'verbose',        type: Boolean, default: false},
-    { name: 'progress',       type: Boolean, default: true }
+    { name: 'progress',       type: Boolean, default: true },
+    {
+      name: 'app',
+      type: String,
+      aliases: ['a'],
+      description: 'Specifies app name to use.'
+    }
 
   ],
   run: function (commandOptions: any) {

@@ -1,4 +1,5 @@
 import {NodeHost} from '../../lib/ast-tools';
+import {getAppFromConfig} from '../../utilities/app-utils';
 
 const path = require('path');
 const fs = require('fs');
@@ -46,14 +47,21 @@ export default Blueprint.extend({
       type: Boolean,
       default: false,
       description: 'Specifies if declaring module exports the component.'
+    },
+    {
+      name: 'app',
+      type: String,
+      aliases: ['a'],
+      description: 'Specifies app name to use.'
     }
   ],
 
   beforeInstall: function(options: any) {
+    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
-      const parsedPath = dynamicPathParser(this.project, modulePath);
+      const parsedPath = dynamicPathParser(this.project, modulePath, appConfig);
       this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
 
       if (!fs.existsSync(this.pathToModule)) {
@@ -61,7 +69,8 @@ export default Blueprint.extend({
       }
     } else {
       try {
-        this.pathToModule = findParentModule(this.project, this.dynamicPath.dir);
+        this.pathToModule = findParentModule
+          (this.project.root, appConfig.root, this.dynamicPath.dir);
       } catch (e) {
         if (!options.skipImport) {
           throw `Error locating module for declaration\n\t${e}`;
@@ -71,16 +80,12 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const parsedPath = dynamicPathParser(this.project, entityName);
+    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
+    const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
 
-    let defaultPrefix = '';
-    if (this.project.ngConfig &&
-        this.project.ngConfig.apps[0] &&
-        this.project.ngConfig.apps[0].prefix) {
-      defaultPrefix = this.project.ngConfig.apps[0].prefix;
-    }
+    const defaultPrefix = (appConfig && appConfig.prefix) || '';
 
     let prefix = (this.options.prefix === 'false' || this.options.prefix === '')
                  ? '' : (this.options.prefix || defaultPrefix);

@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import * as webpack from 'webpack';
 
+import { getAppFromConfig } from '../utilities/app-utils';
 import { EjectTaskOptions } from '../commands/eject';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { CliConfig } from '../models/config';
@@ -400,15 +401,17 @@ export default Task.extend({
     const project = this.cliProject;
     const cliConfig = CliConfig.fromProject();
     const config = cliConfig.config;
-    const tsConfigPath = path.join(process.cwd(), config.apps[0].root, config.apps[0].tsconfig);
-    const outputPath = runTaskOptions.outputPath || config.apps[0].outDir;
+    const appConfig = getAppFromConfig(config.apps, runTaskOptions.app);
+
+    const tsConfigPath = path.join(process.cwd(), appConfig.root, appConfig.tsconfig);
+    const outputPath = runTaskOptions.outputPath || appConfig.outDir;
     const force = runTaskOptions.force;
 
     if (project.root === outputPath) {
       throw new SilentError ('Output path MUST not be project root directory!');
     }
 
-    const webpackConfig = new NgCliWebpackConfig(runTaskOptions).buildConfig();
+    const webpackConfig = new NgCliWebpackConfig(runTaskOptions, appConfig).buildConfig();
     const serializer = new JsonWebpackSerializer(process.cwd(), outputPath);
     const output = serializer.serialize(webpackConfig);
     const webpackConfigStr = `${serializer.generateVariables()}\n\nmodule.exports = ${output};\n`;

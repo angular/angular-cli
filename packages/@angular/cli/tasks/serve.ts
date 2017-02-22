@@ -9,6 +9,7 @@ import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
+import { getAppFromConfig } from '../utilities/app-utils';
 
 const WebpackDevServer = require('webpack-dev-server');
 const Task = require('../ember-cli/lib/models/task');
@@ -21,7 +22,7 @@ export default Task.extend({
 
     let webpackCompiler: any;
     const projectConfig = CliConfig.fromProject().config;
-    const appConfig = projectConfig.apps[0];
+    const appConfig = getAppFromConfig(projectConfig.apps, serveTaskOptions.app);
 
     const outputPath = serveTaskOptions.outputPath || appConfig.outDir;
     if (this.project.root === outputPath) {
@@ -39,7 +40,7 @@ export default Task.extend({
 
     serveTaskOptions = Object.assign({}, serveDefaults, serveTaskOptions);
 
-    let webpackConfig = new NgCliWebpackConfig(serveTaskOptions).buildConfig();
+    let webpackConfig = new NgCliWebpackConfig(serveTaskOptions, appConfig).buildConfig();
 
     const serverAddress = url.format({
       protocol: serveTaskOptions.ssl ? 'https' : 'http',

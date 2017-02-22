@@ -1,5 +1,6 @@
 import {NodeHost} from '../../lib/ast-tools';
 import { oneLine } from 'common-tags';
+import {getAppFromConfig} from '../../utilities/app-utils';
 
 const path = require('path');
 const fs = require('fs');
@@ -20,10 +21,11 @@ export default Blueprint.extend({
   ],
 
   beforeInstall: function(options: any) {
+    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
-      const parsedPath = dynamicPathParser(this.project, modulePath);
+      const parsedPath = dynamicPathParser(this.project, modulePath, appConfig);
       this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
 
       if (!fs.existsSync(this.pathToModule)) {
@@ -33,7 +35,8 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const parsedPath = dynamicPathParser(this.project, entityName);
+    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
+    const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;

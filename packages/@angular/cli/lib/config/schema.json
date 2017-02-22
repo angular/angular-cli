@@ -29,6 +29,10 @@
       "items": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the app."
+          },          
           "root": {
             "type": "string",
             "description": "The root directory of the app."

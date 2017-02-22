@@ -14,8 +14,8 @@ export interface WebpackTestOptions extends BuildOptions {
   codeCoverage?: boolean;
 }
 export class WebpackTestConfig extends NgCliWebpackConfig {
-  constructor(private testOptions: WebpackTestOptions) {
-    super(testOptions);
+  constructor(private testOptions: WebpackTestOptions, appConfig: any) {
+    super(testOptions, appConfig);
   }
 
   public buildConfig() {

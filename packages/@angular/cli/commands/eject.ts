@@ -6,11 +6,18 @@ const Command = require('../ember-cli/lib/models/command');
 // defaults for BuildOptions
 export const baseEjectCommandOptions: any = [
   ...baseBuildCommandOptions,
-  { name: 'force', 'type': Boolean }
+  { name: 'force', 'type': Boolean },
+  {
+    name: 'app',
+    type: String,
+    aliases: ['a'],
+    description: 'Specifies app name to use.'
+  }
 ];
 
 export interface EjectTaskOptions extends BuildOptions {
   force?: boolean;
+  app?: string;
 }
 
 

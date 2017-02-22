@@ -63,7 +63,7 @@ export const baseServeCommandOptions: any = overrideOptions(
       description: 'Enable hot module replacement',
     }
   ]), [
-    { name: 'watch', default: true },
+    { name: 'watch', default: true }
   ]
 );
 
