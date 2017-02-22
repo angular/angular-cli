@@ -31,6 +31,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
+  let inlineChunks: any[] = [];
 
   // figure out which are the lazy loaded entry points
   const lazyChunks = lazyChunksFilter([
@@ -40,10 +41,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   if (appConfig.main) {
     entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
+    inlineChunks.push('main');
   }
 
   if (appConfig.polyfills) {
     entryPoints['polyfills'] = [path.resolve(appRoot, appConfig.polyfills)];
+    inlineChunks.push('polyfills');
   }
 
   // determine hashing format
@@ -58,6 +61,18 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       let scriptPath = `script-loader!${script.path}`;
       if (script.lazy) { lazyChunks.push(script.entry); }
       entryPoints[script.entry] = (entryPoints[script.entry] || []).concat(scriptPath);
+      inlineChunks.push(script.entry);
+    });
+  }
+
+  // process static libraries
+  if (appConfig.libs.length > 0) {
+    const staticLibs = extraEntryParser(appConfig.libs, appRoot, 'libs');
+
+    // add entry points
+    staticLibs.forEach(lib => {
+      lazyChunks.push(lib.entry);
+      entryPoints[lib.entry] = [lib.output];
     });
   }
 
@@ -67,6 +82,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       chunks: ['main'],
       minChunks: (module: any) => module.resource && module.resource.startsWith(nodeModules)
     }));
+    inlineChunks.push('vendor');
   }
 
   // process asset entries
@@ -124,7 +140,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
-        name: 'inline'
+        name: 'inline',
+        chunks: inlineChunks
       })
     ].concat(extraPlugins),
     node: {
