@@ -94,8 +94,12 @@
           },
           "tsconfig": {
             "type": "string",
-            "default": "tsconfig.json",
+            "default": "tsconfig.app.json",
             "description": "The name of the TypeScript configuration file."
+          },
+          "testTsconfig": {
+            "type": "string",
+            "description": "The name of the TypeScript configuration file for unit tests."
           },
           "prefix": {
             "type": "string",

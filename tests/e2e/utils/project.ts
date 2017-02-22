@@ -5,7 +5,7 @@ import {getGlobalVariable} from './env';
 const packages = require('../../../lib/packages');
 
 
-const tsConfigPath = 'src/tsconfig.json';
+const tsConfigPath = 'src/tsconfig.app.json';
 
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {

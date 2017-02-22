@@ -15,7 +15,8 @@
       "main": "main.ts",
       "polyfills": "polyfills.ts",
       "test": "test.ts",
-      "tsconfig": "tsconfig.json",
+      "tsconfig": "tsconfig.app.json",
+      "testTsconfig": "tsconfig.spec.json",
       "prefix": "<%= prefix %>",
       "styles": [
         "styles.<%= styleExt %>"
@@ -35,12 +36,13 @@
   },
   "lint": [
     {
-      "files": "<%= sourceDir %>/**/*.ts",
-      "project": "<%= sourceDir %>/tsconfig.json"
+      "project": "<%= sourceDir %>/tsconfig.app.json"
     },
     {
-      "files": "e2e/**/*.ts",
-      "project": "e2e/tsconfig.json"
+      "project": "<%= sourceDir %>/tsconfig.spec.json"
+    },
+    {
+      "project": "e2e/tsconfig.e2e.json"
     }
   ],
   "test": {
