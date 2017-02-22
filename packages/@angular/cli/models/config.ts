@@ -17,6 +17,9 @@ function getUserHome() {
 }
 
 
+const configCacheMap = new Map<string, CliConfigBase<ConfigInterface>>();
+
+
 export class CliConfig extends CliConfigBase<ConfigInterface> {
   static configFilePath(projectPath?: string): string {
     // Find the configuration, either where specified, in the Angular CLI project
@@ -34,6 +37,10 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     const altGlobalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME_ALT);
     if (!fs.existsSync(globalConfigPath) && fs.existsSync(altGlobalConfigPath)) {
       globalConfigPath = altGlobalConfigPath;
+    }
+
+    if (configCacheMap.has(globalConfigPath)) {
+      return configCacheMap.get(globalConfigPath);
     }
 
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(globalConfigPath);
@@ -63,6 +70,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
       `));
     }
 
+    configCacheMap.set(globalConfigPath, cliConfig);
     return cliConfig;
   }
 
@@ -70,6 +78,9 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     const configPath = this.configFilePath();
     if (!configPath) {
       return null;
+    }
+    if (configCacheMap.has(configPath)) {
+      return configCacheMap.get(configPath);
     }
 
     let globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
@@ -106,6 +117,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
       `));
     }
 
+    configCacheMap.set(configPath, cliConfig);
     return cliConfig as CliConfig;
   }
 }
