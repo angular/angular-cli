@@ -2,25 +2,16 @@
 'use strict';
 
 /* eslint-disable no-console */
-const fs = require('fs-extra');
-const path = require('path');
-const util = require('util');
 const exec = require('child_process').exec;
+const fs = require('fs');
+const path = require('path');
+const temp = require('temp');
+const util = require('util');
 const version = require('../../package.json').version;
 
-const documentationPath = './docs/documentation';
-const outputPath = '/tmp/documentation/';
+const documentationPath = path.join(__dirname, '../../docs/documentation');
+const outputPath = temp.mkdirSync('angular-cli-docs');
 
-function createTempDirectory() {
-  return new Promise((resolve, reject) => {
-    fs.emptyDir(outputPath, (error) => {
-      if (error) {
-        reject(error);
-      }
-      resolve();
-    })
-  });
-}
 
 function execute(command) {
   return new Promise((resolve, reject) => {
@@ -31,10 +22,6 @@ function execute(command) {
       resolve(stdout.trim())
     });
   });
-}
-
-function gitClone(url, directory)  {
-  return execute(util.format('git clone %s %s', url, directory));
 }
 
 function readFiles(directory, filelist) {
@@ -76,7 +63,7 @@ function copyFile(from, to, linksToReplace) {
         const r = new RegExp(str, 'gi');
         fileData = fileData.replace(r, link.newName);
       });
-      fs.outputFile(to, fileData, (error2) => {
+      fs.writeFile(to, fileData, (error2) => {
         if (error2) {
           reject(error2);
         }
@@ -89,7 +76,9 @@ function copyFile(from, to, linksToReplace) {
 function createFiles() {
   const files = readFiles(documentationPath) || [];
   const linksToReplace = checkNameLinks(files);
-  const copies = files.map(({ originalPath, newPath }) => copyFile(originalPath, newPath, linksToReplace));
+  const copies = files.map(({ originalPath, newPath }) => {
+    return copyFile(originalPath, newPath, linksToReplace)
+  });
   return Promise.all(copies);
 }
 
@@ -107,19 +96,17 @@ function checkNameLinks(files) {
   }, []);
 }
 
-(function() {
-  Promise.resolve()
-    .then(() => createTempDirectory())
-    .then(() => gitClone('https://github.com/angular/angular-cli.wiki', outputPath))
-    .then(() => createFiles())
-    .then(() => process.chdir(outputPath))
-    .then(() => execute('git add .'))
-    .then(() => execute(`git commit -m ${version}`))
-    .then(() => execute('git status'))
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((error) => {
-      console.log('error', error);
-    })
-})();
+Promise.resolve()
+  .then(() => console.log(`Documentation Path: ${documentationPath}`))
+  .then(() => console.log(`Wiki path: ${outputPath}`))
+  .then(() => console.log('Cloning...'))
+  .then(() => execute(`git clone "https://github.com/angular/angular-cli.wiki" ${outputPath}`))
+  .then(() => console.log('Copying Files...'))
+  .then(() => createFiles())
+  .then(() => process.chdir(outputPath))
+  .then(() => console.log('Committing...'))
+  .then(() => execute('git add .'))
+  .then(() => execute(`git commit -m "${version}"`))
+  .then(() => execute('git push'))
+  .then(() => console.log('Done...'))
+  .catch(err => console.error(`Error:\n${err.message}`));
