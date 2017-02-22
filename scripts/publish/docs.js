@@ -6,7 +6,6 @@ const exec = require('child_process').exec;
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp');
-const util = require('util');
 const version = require('../../package.json').version;
 
 const documentationPath = path.join(__dirname, '../../docs/documentation');
