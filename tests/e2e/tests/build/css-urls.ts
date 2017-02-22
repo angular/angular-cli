@@ -35,13 +35,13 @@ export default function () {
     .then(() => ng('build', '--extract-css', '--aot'))
     // Check paths are correctly generated.
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      `url\('\/assets\/global-img-absolute\.svg'\)`))
+      /url\('\/assets\/global-img-absolute\.svg'\)/))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      'url\(global-img-relative\.[0-9a-f]{20}\.svg\)'))
+      /url\(global-img-relative\.[0-9a-f]{20}\.svg\)/))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      `url\(\\'\/assets\/component-img-absolute\.svg\\'\)`))
+      /url\(\\'\/assets\/component-img-absolute\.svg\\'\)/))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      'url\(component-img-relative\.[0-9a-f]{20}\.svg\)'))
+      /url\(component-img-relative\.[0-9a-f]{20}\.svg\)/))
     // Check files are correctly created.
     .then(() => expectToFail(() => expectFileToExist('dist/global-img-absolute.svg')))
     .then(() => expectToFail(() => expectFileToExist('dist/component-img-absolute.svg')))
@@ -51,11 +51,11 @@ export default function () {
     .then(() => ng('build', '--base-href=/base/', '--deploy-url=deploy/',
       '--extract-css', '--aot'))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      `url\('\/base\/deploy\/assets\/global-img-absolute\.svg'\)`))
+      /url\('\/base\/deploy\/assets\/global-img-absolute\.svg'\)/))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      'url\(global-img-relative\.[0-9a-f]{20}\.svg\)'))
+      /url\(global-img-relative\.[0-9a-f]{20}\.svg\)/))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      `url\(\\'\/base\/deploy\/assets\/component-img-absolute\.svg\\'\)`))
+      /url\(\\'\/base\/deploy\/assets\/component-img-absolute\.svg\\'\)/))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      'url\(deploy/component-img-relative\.[0-9a-f]{20}\.svg\)'));
+      /url\(deploy\/component-img-relative\.[0-9a-f]{20}\.svg\)/));
 }

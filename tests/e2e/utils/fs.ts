@@ -124,7 +124,7 @@ export function expectFileMatchToExist(dir: string, regex: RegExp) {
   return new Promise((resolve, reject) => {
     const [fileName] = fs.readdirSync(dir).filter(name => name.match(regex));
     if (!fileName) {
-      reject(new Error(`File ${fileName} was expected to exist but not found...`));
+      reject(new Error(`File ${regex} was expected to exist but not found...`));
     }
     resolve(fileName);
   });
