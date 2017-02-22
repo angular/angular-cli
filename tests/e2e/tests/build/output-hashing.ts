@@ -1,17 +1,10 @@
 import {stripIndents} from 'common-tags';
-import * as fs from 'fs';
 import {ng} from '../../utils/process';
-import { writeMultipleFiles, expectFileToMatch } from '../../utils/fs';
+import { writeMultipleFiles, expectFileToMatch, expectFileMatchToExist } from '../../utils/fs';
 
 function verifyMedia(css: RegExp, content: RegExp) {
-  return new Promise((resolve, reject) => {
-    const [fileName] = fs.readdirSync('./dist').filter(name => name.match(css));
-    if (!fileName) {
-      reject(new Error(`File ${fileName} was expected to exist but not found...`));
-    }
-    resolve(fileName);
-  })
-  .then(fileName => expectFileToMatch(`dist/${fileName}`, content));
+  return expectFileMatchToExist('./dist', css)
+    .then(fileName => expectFileToMatch(`dist/${fileName}`, content));
 }
 
 export default function() {

@@ -78,7 +78,7 @@ export class NgCliWebpackConfig {
     const targetDefaults: any = {
       development: {
         environment: 'dev',
-        outputHashing: 'none',
+        outputHashing: 'media',
         sourcemap: true,
         extractCss: false
       },
