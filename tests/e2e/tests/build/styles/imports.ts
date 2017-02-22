@@ -1,6 +1,5 @@
 import {
   writeMultipleFiles,
-  deleteFile,
   expectFileToMatch,
   replaceInFile
 } from '../../../utils/fs';
@@ -8,8 +7,12 @@ import { expectToFail } from '../../../utils/utils';
 import { ng } from '../../../utils/process';
 import { stripIndents } from 'common-tags';
 import { updateJsonFile } from '../../../utils/project';
+import { getGlobalVariable } from '../../../utils/env';
 
 export default function () {
+  // Disable parts of it in webpack tests.
+  const ejected = getGlobalVariable('argv').eject;
+
   const extensions = ['css', 'scss', 'less', 'styl'];
   let promise = Promise.resolve();
 
@@ -56,6 +59,8 @@ export default function () {
           /.outer.*.inner.*background:\s*#[fF]+/))
         .then(() => expectFileToMatch('dist/main.bundle.js',
           /h1.*background:\s*#000+/))
+        // Also check imports work on ng test
+        .then(() => !ejected && ng('test', '--single-run'))
         // change files back
         .then(() => updateJsonFile('.angular-cli.json', configJson => {
           const app = configJson['apps'][0];

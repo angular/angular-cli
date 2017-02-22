@@ -1,9 +1,17 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import denodeify = require('denodeify');
+
 import InitCommand from './init';
+import { CliConfig } from '../models/config';
 import { validateProjectName } from '../utilities/validate-project-name';
+import { oneLine } from 'common-tags';
 
 const Command = require('../ember-cli/lib/models/command');
 const Project = require('../ember-cli/lib/models/project');
 const SilentError = require('silent-error');
+const mkdir = denodeify(fs.mkdir);
+
 
 const NewCommand = Command.extend({
   name: 'new',
@@ -28,6 +36,10 @@ const NewCommand = Command.extend({
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
   ],
 
+  isProject: function (projectPath: string) {
+    return CliConfig.fromProject(projectPath) !== null;
+  },
+
   run: function (commandOptions: any, rawArgs: string[]) {
     const packageName = rawArgs.shift();
 
@@ -44,12 +56,8 @@ const NewCommand = Command.extend({
       commandOptions.skipGit = true;
     }
 
-    if (!commandOptions.directory) {
-      commandOptions.directory = packageName;
-    }
-
-    const createAndStepIntoDirectory =
-      new this.tasks.CreateAndStepIntoDirectory({ ui: this.ui });
+    const directoryName = path.join(process.cwd(),
+      commandOptions.directory ? commandOptions.directory : packageName);
 
     const initCommand = new InitCommand({
       ui: this.ui,
@@ -57,11 +65,33 @@ const NewCommand = Command.extend({
       project: Project.nullProject(this.ui, this.cli)
     });
 
-    return createAndStepIntoDirectory
-      .run({
-        directoryName: commandOptions.directory,
-        dryRun: commandOptions.dryRun
-      })
+    let createDirectory;
+    if (commandOptions.dryRun) {
+      createDirectory = Promise.resolve()
+        .then(() => {
+          if (fs.existsSync(directoryName) && this.isProject(directoryName)) {
+            throw new SilentError(oneLine`
+              Directory ${directoryName} exists and is already an Angular CLI project.
+            `);
+          }
+        });
+    } else {
+      createDirectory = mkdir(directoryName)
+        .catch(err => {
+          if (err.code === 'EEXIST') {
+            if (this.isProject(directoryName)) {
+              throw new SilentError(oneLine`
+                Directory ${directoryName} exists and is already an Angular CLI project.
+              `);
+            }
+          } else {
+            throw err;
+          }
+        })
+        .then(() => process.chdir(directoryName));
+    }
+
+    return createDirectory
       .then(initCommand.run.bind(initCommand, commandOptions, rawArgs));
   }
 });

@@ -2,8 +2,10 @@ import * as path from 'path';
 import { existsSync } from 'fs';
 
 export function findUp(name: string, from: string, stopOnNodeModules = false) {
+  const root = path.parse(from).root;
+
   let currentDir = from;
-  while (currentDir && currentDir !== path.parse(currentDir).root) {
+  while (currentDir && currentDir !== root) {
     const p = path.join(currentDir, name);
     if (existsSync(p)) {
       return p;

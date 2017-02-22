@@ -25,7 +25,7 @@ export default Task.extend({
     }
     rimraf.sync(path.resolve(project.root, outputPath));
 
-    const webpackConfig = new NgCliWebpackConfig(runTaskOptions).config;
+    const webpackConfig = new NgCliWebpackConfig(runTaskOptions).buildConfig();
     const webpackCompiler = webpack(webpackConfig);
     const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
 

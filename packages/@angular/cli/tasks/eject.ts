@@ -175,6 +175,9 @@ class JsonWebpackSerializer {
         case webpack.NoEmitOnErrorsPlugin:
           this._addImport('webpack', 'NoEmitOnErrorsPlugin');
           break;
+        case (<any>webpack).HashedModuleIdsPlugin:
+          this._addImport('webpack', 'HashedModuleIdsPlugin');
+          break;
         case webpack.optimize.UglifyJsPlugin:
           this._addImport('webpack.optimize', 'UglifyJsPlugin');
           break;
@@ -403,7 +406,7 @@ export default Task.extend({
       throw new SilentError ('Output path MUST not be project root directory!');
     }
 
-    const webpackConfig = new NgCliWebpackConfig(runTaskOptions).config;
+    const webpackConfig = new NgCliWebpackConfig(runTaskOptions).buildConfig();
     const serializer = new JsonWebpackSerializer(process.cwd(), outputPath);
     const output = serializer.serialize(webpackConfig);
     const webpackConfigStr = `${serializer.generateVariables()}\n\nmodule.exports = ${output};\n`;

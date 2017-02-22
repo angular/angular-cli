@@ -32,6 +32,7 @@ export interface AotPluginOptions {
 
   // Use tsconfig to include path globs.
   exclude?: string | string[];
+  compilerOptions?: ts.CompilerOptions;
 }
 
 
@@ -113,6 +114,14 @@ export class AotPlugin implements Tapable {
     } catch (err) {
       throw new Error(`An error happened while parsing ${this._tsConfigPath} JSON: ${err}.`);
     }
+
+    if (options.hasOwnProperty('compilerOptions')) {
+      tsConfigJson.compilerOptions = Object.assign({},
+        tsConfigJson.compilerOptions,
+        options.compilerOptions
+      );
+    }
+
     const tsConfig = ts.parseJsonConfigFileContent(
       tsConfigJson, ts.sys, basePath, null, this._tsConfigPath);
 
