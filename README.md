@@ -39,6 +39,7 @@ with NPM 3 or higher.
 * [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
 * [Updating Angular CLI](#updating-angular-cli)
 * [Development Hints for hacking on Angular CLI](#development-hints-for-hacking-on-angular-cli)
+* [Documentation](#documentation)
 * [License](#license)
 
 ## Installation
@@ -160,6 +161,10 @@ You can also use `ng new foo --link-cli` to automatically link the `@angular/cli
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
 
+
+## Documentation
+
+The documentation for the Angular CLI is located in this repo's [wiki](https://github.com/angular/angular-cli/wiki).
 
 ## License
 
