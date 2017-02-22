@@ -49,7 +49,27 @@
 
 * @angular/cli: compressed output (.gz) is no longer generated on production builds.
 * @angular/cli: sourcemaps now are always [filename].map (e.g `main.bundle.js.map` instead of `main.bundle.map`).
-* @angular/cli: The configuration file angular-cli.json has been renamed to .angular-cli.json
+* @angular/cli: The configuration file angular-cli.json has been renamed to .angular-cli.json.  New file name must be updated in `karama.conf.js`.
+
+  Before:
+
+  ```
+    angularCli: {
+      config: './angular-cli.json',
+      environment: 'dev'
+    },
+  ```
+
+  After:
+
+  ```
+    angularCli: {
+      config: './.angular-cli.json',
+      environment: 'dev'
+    },
+  ```
+
+
 * @angular/cli: Generating a module with routing will no longer generate an associated component.
 * @angular/cli: 'assets' as a string in angular-cli.json is no longer allowed, use an array instead.
 * @angular/cli: Removing the `ng init` & `ng update` commands because their current implementation causes more problems than it solves. Once RC is released, we won't need to use those to update anymore as the step will be as simple as installing the latest version of the CLI.
