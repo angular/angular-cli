@@ -14,6 +14,7 @@ const resolve = require('resolve');
 const stripIndents = require('common-tags').stripIndents;
 const yellow = require('chalk').yellow;
 const SemVer = require('semver').SemVer;
+const events = require('events');
 
 
 function _fromPackageJson(cwd) {
@@ -132,9 +133,18 @@ resolve('@angular/cli', { basedir: process.cwd() },
       cli = cli['default'];
     }
 
+    let standardInput;
+    try {
+      standardInput = process.stdin;
+    } catch (e) {
+      delete process.stdin;
+      process.stdin = new events.EventEmitter();
+      standardInput = process.stdin;
+    }
+
     cli({
       cliArgs: process.argv.slice(2),
-      inputStream: process.stdin,
+      inputStream: standardInput,
       outputStream: process.stdout
     }).then(function (result) {
       process.exit(typeof result === 'object' ? result.exitCode : result);
