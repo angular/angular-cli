@@ -35,13 +35,11 @@ function readFiles(directory, filelist) {
       filelist = readFiles(directory + file + '/', filelist);
     } else {
       const originalPath = directory + file;
-      const newPath = outputPath + originalPath
+      const newPath = path.join(outputPath, originalPath
         .replace(documentationPath + '/', '')
-        .replace('/', '-');
-      filelist.push({
-        originalPath,
-        newPath
-      });
+        .replace('/', '-'));
+
+      filelist.push({ originalPath, newPath });
     }
   });
   return filelist;
@@ -99,7 +97,7 @@ Promise.resolve()
   .then(() => console.log(`Documentation Path: ${documentationPath}`))
   .then(() => console.log(`Wiki path: ${outputPath}`))
   .then(() => console.log('Cloning...'))
-  .then(() => execute(`git clone "https://github.com/angular/angular-cli.wiki" ${outputPath}`))
+  .then(() => execute(`git clone "https://github.com/angular/angular-cli.wiki" "${outputPath}"`))
   .then(() => console.log('Copying Files...'))
   .then(() => createFiles())
   .then(() => process.chdir(outputPath))
