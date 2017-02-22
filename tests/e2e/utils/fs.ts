@@ -120,6 +120,16 @@ export function prependToFile(filePath: string, text: string, options?: any) {
 }
 
 
+export function expectFileMatchToExist(dir: string, regex: RegExp) {
+  return new Promise((resolve, reject) => {
+    const [fileName] = fs.readdirSync(dir).filter(name => name.match(regex));
+    if (!fileName) {
+      reject(new Error(`File ${regex} was expected to exist but not found...`));
+    }
+    resolve(fileName);
+  });
+}
+
 export function expectFileToExist(fileName: string) {
   return new Promise((resolve, reject) => {
     fs.exists(fileName, (exist) => {

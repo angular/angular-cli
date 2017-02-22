@@ -16,7 +16,7 @@ export default function () {
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css'))
     .then(() => expectFileToMatch('dist/index.html', 'deployUrl/main.bundle.js'))
     // verify --deploy-url isn't applied to extracted css urls
-    .then(() => expectFileToMatch('dist/styles.bundle.css', 'url\(more.svg\)'))
+    .then(() => expectFileToMatch('dist/styles.bundle.css', /url\(more\.[0-9a-f]{20}\.svg\)/))
     // verify option also works in config
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
@@ -27,5 +27,5 @@ export default function () {
     // verify --deploy-url is applied to non-extracted css urls
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css=false'))
     .then(() => expectFileToMatch('dist/styles.bundle.js',
-      '__webpack_require__.p \+ \"more.svg\"'));
+      /__webpack_require__.p \+ \"more\.[0-9a-f]{20}\.svg\"/));
 }
