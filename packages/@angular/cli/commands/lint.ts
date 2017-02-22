@@ -4,6 +4,7 @@ export interface LintCommandOptions {
   fix?: boolean;
   format?: string;
   force?: boolean;
+  output?: string;
 }
 
 export default Command.extend({
@@ -14,7 +15,8 @@ export default Command.extend({
   availableOptions: [
     { name: 'fix', type: Boolean, default: false },
     { name: 'force', type: Boolean, default: false },
-    { name: 'format', alias: 't', type: String, default: 'prose' }
+    { name: 'format', alias: 't', type: String, default: 'prose' },
+    { name: 'output', alias: 'o', type: String, default: '' }
   ],
   run: function (commandOptions: LintCommandOptions) {
     const LintTask = require('../tasks/lint').default;

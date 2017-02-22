@@ -6,6 +6,7 @@ import { requireProjectModule } from '../utilities/require-project-module';
 import { CliConfig } from '../models/config';
 import { LintCommandOptions } from '../commands/lint';
 import { oneLine } from 'common-tags';
+const fs = require('fs');
 
 interface CliLintConfig {
   files?: (string | string[]);
@@ -61,8 +62,14 @@ export default Task.extend({
         results = results.concat(result.output.trim().concat('\n'));
       });
 
-    if (errors > 0) {
+    if (commandOptions.output === '') {
       ui.writeLine(results.trim());
+    } else {
+      fs.writeFileSync(commandOptions.output, results.trim());
+      ui.writeLine('Saved lint results to ' + commandOptions.output + '.');
+    }
+
+    if (errors > 0) {
       ui.writeLine(chalk.red('Lint errors found in the listed files.'));
       return commandOptions.force ? Promise.resolve(0) : Promise.resolve(2);
     }
