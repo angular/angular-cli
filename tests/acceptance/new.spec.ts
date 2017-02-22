@@ -51,7 +51,7 @@ describe('Acceptance: ng new', function () {
   }
 
   function confirmBlueprinted() {
-    return confirmBlueprintedForDir('blueprints/ng2');
+    return confirmBlueprintedForDir('blueprints/ng');
   }
 
   it('requires a valid name (!)', () => {
