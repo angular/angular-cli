@@ -64,7 +64,7 @@ export default Task.extend({
 
     const blueprintOpts = {
       dryRun: commandOptions.dryRun,
-      blueprint: 'ng2',
+      blueprint: 'ng',
       rawName: packageName,
       targetFiles: rawArgs || '',
       rawArgs: rawArgs.toString(),
