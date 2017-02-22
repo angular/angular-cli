@@ -9,6 +9,18 @@ npm install d3 --save
 npm install @types/d3 --save-dev
 ```
 
+Then open `src/tsconfig.app.json` and add it to the `types` array:
+
+```
+"types":[
+  "d3"
+]
+```
+
+If the library you added typings for is only to be used on your e2e tests,
+instead use `e2e/tsconfig.e2e.json`.
+The same goes for unit tests and `src/tsconfig.spec.json`.
+
 If the library doesn't have typings available at `@types/`, you can still use it by
 manually adding typings for it:
 
