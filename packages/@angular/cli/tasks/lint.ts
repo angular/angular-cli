@@ -61,6 +61,12 @@ export default Task.extend({
         results = results.concat(result.output.trim().concat('\n'));
       });
 
+    // print formatter output directly for non human-readable formats
+    if (['prose', 'verbose', 'stylish'].indexOf(commandOptions.format) == -1) {
+      ui.writeLine(results.trim());
+      return (errors == 0 || commandOptions.force) ? Promise.resolve(0) : Promise.resolve(2);
+    }
+
     if (errors > 0) {
       ui.writeLine(results.trim());
       ui.writeLine(chalk.red('Lint errors found in the listed files.'));
