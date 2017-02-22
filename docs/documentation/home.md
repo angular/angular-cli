@@ -52,10 +52,6 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 * [ng get/ng set](config)
 * [ng docs](docs)
 
-### How to Guides
-* Setup AngularFire _(coming soon)_
-* Include bootstrap (CSS) _(coming soon)_
-* Include Font Awesome _(coming soon)_
-* Setup of global styles _(coming soon)_
-* Setup bootstrap with SASS _(coming soon)_
-* Setup Angular Material 2 _(coming soon)_
+### Additional Information
+There are several [stories](stories) which will walk you through setting up
+additional aspects of Angular applciations.
