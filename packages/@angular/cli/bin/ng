@@ -134,14 +134,12 @@ resolve('@angular/cli', { basedir: process.cwd() },
     }
 
     let standardInput;
-    if (process.platform === 'win32') {
-      try {
-        standardInput = process.stdin;
-      } catch (e) {
-        delete process.stdin;
-        process.stdin = new events.EventEmitter();
-        standardInput = process.stdin;
-      }
+    try {
+      standardInput = process.stdin;
+    } catch (e) {
+      delete process.stdin;
+      process.stdin = new events.EventEmitter();
+      standardInput = process.stdin;
     }
 
     cli({
