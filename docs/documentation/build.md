@@ -65,36 +65,46 @@ All builds make use of bundling, and using the `--prod` flag in  `ng build --pro
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ## Options
-`--watch` (`-w`) rebuild when files change
+`--aot` Build using Ahead of Time compilation.
 
-`--target` (`-t`) define the build target
+`--app` Specifies app name or index to use.
 
-`--environment` (`-e`) defines the build environment
+`--base-href` (`-bh`) Base url for the application being built.
 
-`--prod` flag to set build target and environment to production
+`--deploy-url` (`-d`) URL where files will be deployed.
 
-`--dev` flag to set build target and environment to development
+`--dev` Build target and environment to development.
 
 `--output-path` (`-op`) path where output will be placed
 
-`--aot` flag whether to build using Ahead of Time compilation
+`--environment` (`-e`) Defines the build environment.
 
-`--sourcemap` (`-sm`) output sourcemaps
+`--extract-css` (`-ec`) Extract css from global styles onto css files instead of js ones.
 
-`--vendor-chunk` (`-vb`) use a separate bundle containing only vendor libraries
+`--i18n-file` Localization file to use for i18n.
 
-`--base-href` (`-bh`) base url for the application being built
+`--i18n-format` Format of the localization file specified with --i18n-file.
 
-`--deploy-url` (`-d`) url where files will be deployed
+`--locale` Locale to use for i18n.
 
-`--verbose` (`-v`) adds more details to output logging
+`--output-hashing` Define the output filename cache-busting hashing mode.
 
-`--progress` (`-pr`) log progress to the console while building
+`--output-path` (`-op`) Path where output will be placed.
 
-`--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
+`--poll` Enable and define the file watching poll time period (milliseconds).
 
-`--output-hashing` define the output filename cache-busting hashing mode
+`--prod` Build target and environment to production.
 
-`--stats-json` generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse
+`--progress` (`-pr`) Log progress to the console while building.
 
-`--poll` enable and define the file watching poll time period (milliseconds)
+`--sourcemap` (`-sm`) Output sourcemaps.
+
+`--stats-json` Generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse.
+
+`--target` (`-t`) Defines the build target.
+
+`--vendor-chunk` (`-vb`) Use a separate bundle containing only vendor libraries.
+
+`--verbose` (`-v`) Adds more details to output logging.
+
+`--watch` (`-w`) Run build when files change.
