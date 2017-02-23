@@ -345,14 +345,7 @@ Project.prototype.localBlueprintLookupPath = function() {
   @return {Array} List of paths
  */
 Project.prototype.blueprintLookupPaths = function() {
-  if (this.isEmberCLIProject()) {
-    var lookupPaths = [this.localBlueprintLookupPath()];
-    var addonLookupPaths = this.addonBlueprintLookupPaths();
-
-    return lookupPaths.concat(addonLookupPaths);
-  } else {
-    return this.addonBlueprintLookupPaths();
-  }
+  return this.addonBlueprintLookupPaths();
 };
 
 /**
