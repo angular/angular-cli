@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import * as glob from 'glob';
 
 import { CliConfig } from '../models/config';
 import { Pattern } from './glob-copy-webpack-plugin';
@@ -13,6 +14,29 @@ function isDirectory(path: string) {
     return fs.statSync(path).isDirectory();
   } catch (_) {
     return false;
+  }
+}
+
+// Add files to the Karma files array.
+function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
+  const defaults = {
+    included: true,
+    served: true,
+    watched: true
+  };
+
+  const processedFiles = newFiles
+    // Remove globs that do not match any files, otherwise Karma will show a warning for these.
+    .filter(file => glob.sync(file.pattern, { nodir: true }).length != 0)
+    // Fill in pattern properties with defaults.
+    .map(file => ({ ...defaults, ...file }));
+
+  // It's important to not replace the array, because
+  // karma already has a reference to the existing array.
+  if (prepend) {
+    files.unshift(...processedFiles);
+  } else {
+    files.push(...processedFiles);
   }
 }
 
@@ -42,12 +66,7 @@ const init: any = (config: any) => {
       // Build karma file pattern.
       const assetPath = path.join(pattern.input, pattern.glob);
       const filePattern = isDirectory(assetPath) ? assetPath + '/**' : assetPath;
-      config.files.push({
-        pattern: filePattern,
-        included: false,
-        served: true,
-        watched: true
-      });
+      addKarmaFiles(config.files, [{ pattern: filePattern, included: false }]);
 
       // The `files` entry serves the file from `/base/{asset.input}/{asset.glob}`.
       // We need to add a URL rewrite that exposes the asset as `/{asset.output}/{asset.glob}`.
@@ -99,31 +118,15 @@ const init: any = (config: any) => {
     const globalScriptPatterns = extraEntryParser(appConfig.scripts, appRoot, 'scripts')
       // Neither renamed nor lazy scripts are currently supported
       .filter(script => !(script.output || script.lazy))
-      .map(script => ({
-        pattern: path.resolve(appRoot, script.input),
-        included: true,
-        served: true,
-        watched: true
-      }));
-
-    // Unshift elements onto the beginning of the files array.
-    // It's important to not replace the array, because
-    // karma already has a reference to the existing array.
-    config.files.unshift(...globalScriptPatterns);
+      .map(script => ({ pattern: path.resolve(appRoot, script.input) }));
+    addKarmaFiles(config.files, globalScriptPatterns, true);
   }
 
   // Add polyfills file before everything else
   if (appConfig.polyfills) {
     const polyfillsFile = path.resolve(appRoot, appConfig.polyfills);
-    const polyfillsPattern = {
-      pattern: polyfillsFile,
-      included: true,
-      served: true,
-      watched: true
-    };
     config.preprocessors[polyfillsFile] = ['webpack', 'sourcemap'];
-    // Same as above.
-    config.files.unshift(polyfillsPattern);
+    addKarmaFiles(config.files, [{ pattern: polyfillsFile }], true);
   }
 };
 
