@@ -94,7 +94,9 @@ export class Version {
       if (v.isLocal()) {
         console.warn(yellow('Using a local version of angular. Proceeding with care...'));
       } else {
-        if (!v.isGreaterThanOrEqualTo(new SemVer('2.3.1'))) {
+        // Check if major is not 0, so that we stay compatible with local compiled versions
+        // of angular.
+        if (!v.isGreaterThanOrEqualTo(new SemVer('2.3.1')) && v.major != 0) {
           console.error(bold(red(stripIndents`
             This version of CLI is only compatible with angular version 2.3.1 or better. Please
             upgrade your angular version, e.g. by running:
