@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as glob from 'glob';
 import * as webpack from 'webpack';
 
 import { CliConfig } from '../config';
@@ -20,14 +21,27 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
   const appConfig = CliConfig.fromProject().config.apps[0];
   const extraRules: any[] = [];
 
-  if (testConfig.codeCoverage) {
+  if (testConfig.codeCoverage && CliConfig.fromProject()) {
+    const codeCoverageExclude = CliConfig.fromProject().get('test.codeCoverage.exclude');
+    let exclude: (string | RegExp)[] = [
+      /\.(e2e|spec)\.ts$/,
+      /node_modules/
+    ];
+
+    if (codeCoverageExclude) {
+      codeCoverageExclude.forEach((excludeGlob: string) => {
+        const excludeFiles = glob
+          .sync(path.join(projectRoot, excludeGlob), { nodir: true })
+          .map(file => path.normalize(file));
+        exclude.push(...excludeFiles);
+      });
+    }
+
+
     extraRules.push({
       test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
       enforce: 'post',
-      exclude: [
-        /\.(e2e|spec)\.ts$/,
-        /node_modules/
-      ]
+      exclude
     });
   }
 
