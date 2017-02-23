@@ -1,5 +1,6 @@
 import { NodeHost } from '../../lib/ast-tools';
-import {getAppFromConfig} from '../../utilities/app-utils';
+import { CliConfig } from '../../models/config';
+import { getAppFromConfig } from '../../utilities/app-utils';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -82,7 +83,9 @@ export default Blueprint.extend({
   ],
 
   beforeInstall: function (options: any) {
-    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
+    const cliConfig = CliConfig.fromProject();
+    const ngConfig = cliConfig && cliConfig.config;
+    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
@@ -105,7 +108,9 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
+    const cliConfig = CliConfig.fromProject();
+    const ngConfig = cliConfig && cliConfig.config;
+    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
@@ -126,36 +131,37 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
+    const cliConfig = CliConfig.fromProject();
+    const ngConfig = cliConfig && cliConfig.config;
+
     this.styleExt = 'css';
-    if (this.project.ngConfig &&
-        this.project.ngConfig.defaults &&
-        this.project.ngConfig.defaults.styleExt) {
-      this.styleExt = this.project.ngConfig.defaults.styleExt;
+    if (ngConfig && ngConfig.defaults && ngConfig.defaults.styleExt) {
+      this.styleExt = ngConfig.defaults.styleExt;
     }
 
     options.inlineStyle = options.inlineStyle !== undefined ?
       options.inlineStyle :
-      this.project.ngConfigObj.get('defaults.component.inlineStyle');
+      cliConfig && cliConfig.get('defaults.component.inlineStyle');
 
     options.inlineTemplate = options.inlineTemplate !== undefined ?
       options.inlineTemplate :
-      this.project.ngConfigObj.get('defaults.component.inlineTemplate');
+      cliConfig && cliConfig.get('defaults.component.inlineTemplate');
 
     options.flat = options.flat !== undefined ?
       options.flat :
-      this.project.ngConfigObj.get('defaults.component.flat');
+      cliConfig && cliConfig.get('defaults.component.flat');
 
     options.spec = options.spec !== undefined ?
       options.spec :
-      this.project.ngConfigObj.get('defaults.component.spec');
+      cliConfig && cliConfig.get('defaults.component.spec');
 
     options.viewEncapsulation = options.viewEncapsulation !== undefined ?
       options.viewEncapsulation :
-      this.project.ngConfigObj.get('defaults.component.viewEncapsulation');
+      cliConfig && cliConfig.get('defaults.component.viewEncapsulation');
 
     options.changeDetection = options.changeDetection !== undefined ?
       options.changeDetection :
-      this.project.ngConfigObj.get('defaults.component.changeDetection');
+      cliConfig && cliConfig.get('defaults.component.changeDetection');
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
@@ -189,6 +195,10 @@ export default Blueprint.extend({
   },
 
   fileMapTokens: function (options: any) {
+    const cliConfig = CliConfig.fromProject();
+    const ngConfig = cliConfig && cliConfig.config;
+    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+
     // Return custom template variables here.
     return {
       __path__: () => {
@@ -196,7 +206,6 @@ export default Blueprint.extend({
         if (!options.locals.flat) {
           dir += path.sep + options.dasherizedModuleName;
         }
-        const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
         const srcDir = appConfig.root;
         this.appDir = dir.substr(dir.indexOf(srcDir) + srcDir.length);
         this.generatePath = dir;
