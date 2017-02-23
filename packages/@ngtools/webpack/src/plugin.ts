@@ -274,8 +274,8 @@ export class AotPlugin implements Tapable {
           return callback();
         }
 
-        // alter only request from @angular/core/src/linker
-        if (!result.resource.endsWith(path.join('@angular/core/src/linker'))) {
+        // alter only request from @angular/core/src/linker/src
+        if (!result.resource.endsWith(path.join('@angular/core/src/linker/src'))) {
           return callback(null, result);
         }
 
