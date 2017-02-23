@@ -1,5 +1,7 @@
 import * as child_process from 'child_process';
-import {blue, white, yellow} from 'chalk';
+import {blue, yellow} from 'chalk';
+import {getGlobalVariable} from './env';
+import {rimraf, writeFile} from './fs';
 const treeKill = require('tree-kill');
 
 
@@ -11,13 +13,19 @@ interface ExecOptions {
 
 let _processes: child_process.ChildProcess[] = [];
 
-function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<string> {
+type ProcessOutput = {
+  stdout: string;
+  stdout: string;
+};
+
+
+function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<ProcessOutput> {
   let stdout = '';
   let stderr = '';
   const cwd = process.cwd();
-  console.log(white(
-    `  ==========================================================================================`
-  ));
+  console.log(
+    `==========================================================================================`
+  );
 
   args = args.filter(x => x !== undefined);
   const flags = [
@@ -28,8 +36,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
     .join(', ')
     .replace(/^(.+)$/, ' [$1]');  // Proper formatting.
 
-  console.log(blue(`  Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
-  console.log(blue(`  CWD: ${cwd}`));
+  console.log(blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
+  console.log(blue(`CWD: ${cwd}`));
   const spawnOptions: any = {cwd};
 
   if (process.platform.startsWith('win')) {
@@ -51,6 +59,9 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
   });
   childProcess.stderr.on('data', (data: Buffer) => {
     stderr += data.toString('utf-8');
+    if (options.silent) {
+      return;
+    }
     data.toString('utf-8')
       .split(/[\n\r]+/)
       .filter(line => line !== '')
@@ -66,7 +77,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
       _processes = _processes.filter(p => p !== childProcess);
 
       if (!error) {
-        resolve(stdout);
+        resolve({ stdout });
       } else {
         err.message += `${error}...\n\nSTDOUT:\n${stdout}\n`;
         reject(err);
@@ -76,11 +87,36 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<strin
     if (options.waitForMatch) {
       childProcess.stdout.on('data', (data: Buffer) => {
         if (data.toString().match(options.waitForMatch)) {
-          resolve(stdout);
+          resolve({ stdout, stderr });
         }
       });
     }
   });
+}
+
+export function waitForAnyProcessOutputToMatch(match: RegExp,
+                                               timeout = 30000): Promise<ProcessOutput> {
+  // Race between _all_ processes, and the timeout. First one to resolve/reject wins.
+  return Promise.race(_processes.map(childProcess => new Promise(resolve => {
+    let stdout = '';
+    let stderr = '';
+    childProcess.stdout.on('data', (data: Buffer) => {
+      stdout += data.toString();
+      if (data.toString().match(match)) {
+        resolve({ stdout, stderr });
+      }
+    });
+    childProcess.stderr.on('data', (data: Buffer) => {
+      stderr += data.toString();
+    });
+  })).concat([
+    new Promise((resolve, reject) => {
+      // Wait for 30 seconds and timeout.
+      setTimeout(() => {
+        reject(new Error(`Waiting for ${match} timed out (timeout: ${timeout}msec)...`));
+      }, timeout);
+    })
+  ]));
 }
 
 export function killAllProcesses(signal = 'SIGTERM') {
@@ -100,9 +136,27 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
   return _exec({ silent: true, waitForMatch: match }, cmd, args);
 }
 
+
+let npmInstalledEject = false;
 export function ng(...args: string[]) {
-  if (args[0] == 'build') {
-    return silentNg(...args);
+  // Auto-add --no-progress to commands that build the app, otherwise we get thousands of lines.
+  if (['build', 'serve', 'test', 'e2e', 'xi18n'].indexOf(args[0]) != -1) {
+    // If we have the --eject, use webpack for the test.
+    const argv = getGlobalVariable('argv');
+    if (args[0] == 'build' && argv.eject) {
+      return silentNg('eject', ...args.slice(1), '--force')
+        .then(() => {
+          if (!npmInstalledEject) {
+            npmInstalledEject = true;
+            // We need to run npm install on the first eject.
+            return silentNpm('install');
+          }
+        })
+        .then(() => rimraf('dist'))
+        .then(() => _exec({silent: true}, 'node_modules/.bin/webpack', []));
+    }
+
+    return silentNg(...args, '--no-progress');
   } else {
     return _exec({}, 'ng', args);
   }

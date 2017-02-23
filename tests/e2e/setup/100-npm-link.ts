@@ -1,18 +1,20 @@
 import {join} from 'path';
 import {npm, exec} from '../utils/process';
 import {updateJsonFile} from '../utils/project';
+import {getGlobalVariable} from '../utils/env';
 
 const packages = require('../../../lib/packages');
 
 
-export default function (argv: any) {
+export default function () {
   return Promise.resolve()
     .then(() => {
+      const argv = getGlobalVariable('argv');
       if (argv.nolink) {
         return;
       }
 
-      const distAngularCli = join(__dirname, '../../../dist/angular-cli');
+      const distAngularCli = packages['@angular/cli'].dist;
       const oldCwd = process.cwd();
       process.chdir(distAngularCli);
 

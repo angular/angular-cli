@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "",
     "module": "es2015",
     "moduleResolution": "node",
     "target": "es5",
@@ -9,7 +10,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [
-      "es2015",
+      "es2016",
       "dom"
     ],
     "outDir": "lib",

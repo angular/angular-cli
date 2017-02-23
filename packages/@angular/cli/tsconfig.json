@@ -1,0 +1,13 @@
+{
+  "extends": "../../../tsconfig.json",
+
+  "compilerOptions": {
+    "outDir": "../../../dist/@angular/cli",
+    "rootDir": ".",
+    "baseUrl": "",
+    "paths": {
+      "@ngtools/json-schema": [ "../../../dist/@ngtools/json-schema/src" ],
+      "@ngtools/webpack": [ "../../../dist/@ngtools/webpack/src" ]
+    }
+  }
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-/*eslint-disable no-console */
+/* eslint-disable no-console */
 const chalk = require('chalk');
 const denodeify = require('denodeify');
 const fs = require('fs');
@@ -32,6 +32,20 @@ function copy(from, to) {
 }
 
 
+function rm(p) {
+  path.relative(process.cwd(), p);
+  return new Promise((resolve, reject) => {
+    fs.unlink(p, err => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+
 function getDeps(pkg) {
   const packageJson = require(pkg.packageJson);
   return Object.assign({}, packageJson['dependencies'], packageJson['devDependencies']);
@@ -42,23 +56,40 @@ function getDeps(pkg) {
 Promise.resolve()
   .then(() => console.log('Deleting dist folder...'))
   .then(() => rimraf(dist))
+  .then(() => console.log('Creating schema.d.ts...'))
+  .then(() => {
+    const script = path.join(root, 'scripts/build-schema-dts.js');
+    const input = path.join(root, 'packages/@angular/cli/lib/config/schema.json');
+    const output = path.join(root, 'packages/@angular/cli/lib/config/schema.d.ts');
+    return npmRun.execSync(`node "${script}" "${input}" "${output}"`);
+  })
   .then(() => console.log('Compiling packages...'))
   .then(() => {
     const packages = require('../../lib/packages');
-    return Object.keys(packages)
-      // Order packages in order of dependency.
-      .sort((a, b) => {
-        const aDependsOnB = Object.keys(getDeps(packages[a])).indexOf(b) != -1;
-        const bDependsOnA = Object.keys(getDeps(packages[b])).indexOf(a) != -1;
 
-        if (!aDependsOnB && !bDependsOnA) {
-          return 0;
-        } else if (aDependsOnB) {
-          return 1;
-        } else {
-          return -1;
+    // Order packages in order of dependency.
+    // We use bubble sort because we need a full topological sort but adding another dependency
+    // or implementing a full topo sort would be too much work and I'm lazy. We don't anticipate
+    // any large number of
+    const sortedPackages = Object.keys(packages);
+    let swapped = false;
+    do {
+      swapped = false;
+      for (let i = 0; i < sortedPackages.length - 1; i++) {
+        for (let j = i + 1; j < sortedPackages.length; j++) {
+          const a = sortedPackages[i];
+          const b = sortedPackages[j];
+
+          if (Object.keys(getDeps(packages[a])).indexOf(b) != -1) {
+            // Swap them.
+            [sortedPackages[i], sortedPackages[i + 1]] = [sortedPackages[i + 1], sortedPackages[i]];
+            swapped = true;
+          }
         }
-      })
+      }
+    } while(swapped);
+
+    return sortedPackages
       .reduce((promise, packageName) => {
         const pkg = packages[packageName];
         const name = path.relative(packagesRoot, pkg.root);
@@ -66,7 +97,7 @@ Promise.resolve()
         return promise.then(() => {
           console.log(`  ${name}`);
           try {
-            return npmRun.execSync(`tsc -p ${path.relative(process.cwd(), pkg.root)}`);
+            return npmRun.execSync(`tsc -p "${path.relative(process.cwd(), pkg.root)}"`);
           } catch (err) {
             throw new Error(`Compilation error.\n${err.stdout}`);
           }
@@ -76,11 +107,11 @@ Promise.resolve()
   .then(() => console.log('Copying uncompiled resources...'))
   .then(() => glob(path.join(packagesRoot, '**/*'), { dot: true }))
   .then(files => {
-    console.log(`  Found ${files.length} files...`);
+    console.log(`Found ${files.length} files...`);
     return files
       .map((fileName) => path.relative(packagesRoot, fileName))
       .filter((fileName) => {
-        if (/^angular-cli[\\\/]blueprints/.test(fileName)) {
+        if (/^@angular[\\\/]cli[\\\/]blueprints/.test(fileName)) {
           return true;
         }
         if (/\.d\.ts$/.test(fileName)) {
@@ -130,13 +161,31 @@ Promise.resolve()
         return promise.then(() => current);
       }, Promise.resolve());
   })
+  .then(() => glob(path.join(dist, '**/*.spec.*')))
+  .then(specFiles => specFiles.filter(fileName => {
+    return !/[\\\/]@angular[\\\/]cli[\\\/]blueprints/.test(fileName);
+  }))
+  .then(specFiles => {
+    console.log(`Found ${specFiles.length} spec files...`);
+    return Promise.all(specFiles.map(rm));
+  })
   .then(() => {
     // Copy all resources that might have been missed.
-    return Promise.all([
-      'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE', 'README.md'
-    ].map(fileName => {
+    const extraFiles = ['CHANGELOG.md', 'CONTRIBUTING.md', 'README.md'];
+    return Promise.all(extraFiles.map(fileName => {
       console.log(`Copying ${fileName}...`);
-      return copy(fileName, path.join('dist/angular-cli', fileName));
+      return copy(fileName, path.join('dist/@angular/cli', fileName));
+    }));
+  })
+  .then(() => {
+    // Copy LICENSE into all the packages
+    console.log('Copying LICENSE...');
+
+    const packages = require('../../lib/packages');
+    return Promise.all(Object.keys(packages).map(pkgName => {
+      const pkg = packages[pkgName];
+      console.log(`  ${pkgName}`);
+      return copy('LICENSE', path.join(pkg.dist, 'LICENSE'));
     }));
   })
   .then(() => process.exit(0), (err) => {
