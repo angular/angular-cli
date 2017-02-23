@@ -69,10 +69,10 @@ export default function () {
       protractorGoodRegEx
     ))
     // Let app run.
-    .then(_ => wait(1000))
+    .then(_ => wait(2000))
     .then(_ => appendToFile('src/main.ts', 'console.log(1);'))
     .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 5000))
-    .then(_ => wait(1000))
+    .then(_ => wait(2000))
     .then(_ => {
       if (liveReloadCount != 2) {
         throw new Error(
@@ -88,10 +88,10 @@ export default function () {
       ['e2e', '--watch', '--no-live-reload'],
       protractorGoodRegEx
     ))
-    .then(_ => wait(1000))
+    .then(_ => wait(2000))
     .then(_ => appendToFile('src/main.ts', 'console.log(1);'))
     .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 5000))
-    .then(_ => wait(1000))
+    .then(_ => wait(2000))
     .then(_ => {
       if (liveReloadCount != 1) {
         throw new Error(
