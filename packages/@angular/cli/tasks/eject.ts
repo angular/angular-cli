@@ -439,6 +439,12 @@ export default Task.extend({
             Your package.json scripts needs to not contain a start script as it will be overwritten.
           `);
         }
+        if (scripts['pree2e'] && scripts['prepree2e'] !== 'npm start' && !force) {
+          throw new SilentError(oneLine`
+            Your package.json scripts needs to not contain a prepree2e script as it will be
+            overwritten.
+          `);
+        }
         if (scripts['pree2e'] && scripts['pree2e'] !== pree2eNpmScript && !force) {
           throw new SilentError(oneLine`
             Your package.json scripts needs to not contain a pree2e script as it will be
@@ -457,8 +463,9 @@ export default Task.extend({
         }
 
         packageJson['scripts']['build'] = 'webpack';
-        packageJson['scripts']['start'] = 'webpack-dev-server';
+        packageJson['scripts']['start'] = 'webpack-dev-server --port=4200';
         packageJson['scripts']['test'] = 'karma start ./karma.conf.js';
+        packageJson['scripts']['prepree2e'] = 'npm start';
         packageJson['scripts']['pree2e'] = pree2eNpmScript;
         packageJson['scripts']['e2e'] = 'protractor ./protractor.conf.js';
 
