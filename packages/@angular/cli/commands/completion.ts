@@ -36,7 +36,7 @@ export interface CompletionCommandOptions {
   all?: boolean;
   bash?: boolean;
   zsh?: boolean;
-};
+}
 
 const commandsToIgnore = [
   'destroy',
@@ -51,9 +51,27 @@ const CompletionCommand = Command.extend({
   description: 'Adds autocomplete functionality to `ng` commands and subcommands.',
   works: 'everywhere',
   availableOptions: [
-    { name: 'all',   type: Boolean, default: true,  aliases: ['a'] },
-    { name: 'bash',  type: Boolean, default: false, aliases: ['b'] },
-    { name: 'zsh',   type: Boolean, default: false, aliases: ['z'] }
+    {
+      name: 'all',
+      type: Boolean,
+      default: true,
+      aliases: ['a'],
+      description: 'Generate a completion script compatible with both bash and zsh.'
+    },
+    {
+      name: 'bash',
+      type: Boolean,
+      default: false,
+      aliases: ['b']
+      description: 'Generate a completion script for bash.'
+    },
+    {
+      name: 'zsh',
+      type: Boolean,
+      default: false,
+      aliases: ['z']
+      description: 'Generate a completion script for zsh.'
+    }
   ],
 
   run: function (commandOptions: CompletionCommandOptions) {

@@ -24,78 +24,81 @@ export const baseBuildCommandOptions: any = [
     description: 'Defines the build environment.'
   },
   {
-     name: 'output-path',
-     type: 'Path',
-     aliases: ['op'],
-     description: 'Path where output will be placed.'
+    name: 'output-path',
+    type: 'Path',
+    aliases: ['op'],
+    description: 'Path where output will be placed.'
   },
   {
-     name: 'aot',
-     type: Boolean,
-     description: 'Build using Ahead of Time compilation.'
+    name: 'aot',
+    type: Boolean,
+    description: 'Build using Ahead of Time compilation.'
   },
   {
-     name: 'sourcemap',
-     type: Boolean,
-     aliases: ['sm', 'sourcemaps'],
-     description: 'Output sourcemaps.'
+    name: 'sourcemap',
+    type: Boolean,
+    aliases: ['sm', 'sourcemaps'],
+    description: 'Output sourcemaps.'
   },
   {
-     name: 'vendor-chunk',
-     type: Boolean,
-     default: true,
-     aliases: ['vc'],
-     description: 'Use a separate bundle containing only vendor libraries.'
+    name: 'vendor-chunk',
+    type: Boolean,
+    default: true,
+    aliases: ['vc'],
+    description: 'Use a separate bundle containing only vendor libraries.'
   },
   {
-     name: 'base-href',
-     type: String,
-     aliases: ['bh'],
-     description: 'Base url for the application being built.'
+    name: 'base-href',
+    type: String,
+    aliases: ['bh'],
+    description: 'Base url for the application being built.'
   },
   {
-     name: 'deploy-url',
-     type: String,
-     aliases: ['d'],
-     description: 'URL where files will be deployed.'
+    name: 'deploy-url',
+    type: String,
+    aliases: ['d'],
+    description: 'URL where files will be deployed.'
   },
   {
-     name: 'verbose',
-     type: Boolean,
-     default: false,
-     aliases: ['v'],
-     description: 'Adds more details to output logging.'
+    name: 'verbose',
+    type: Boolean,
+    default: false,
+    aliases: ['v'],
+    description: 'Adds more details to output logging.'
   },
   {
-     name: 'progress',
-     type: Boolean,
-     default: true,
-     aliases: ['pr'],
-     description: 'Log progress to the console while building.'
+    name: 'progress',
+    type: Boolean,
+    default: true,
+    aliases: ['pr'],
+    description: 'Log progress to the console while building.'
   },
   {
-     name: 'i18n-file',
-     type: String
+    name: 'i18n-file',
+    type: String,
+    description: 'Localization file to use for i18n.'
   },
   {
-     name: 'i18n-format',
-     type: String
+    name: 'i18n-format',
+    type: String,
+    description: 'Format of the localization file specified with --i18n-file.'
   },
   {
-     name: 'locale',
-     type: String
+    name: 'locale',
+    type: String,
+    description: 'Locale to use for i18n.'
   },
   {
-     name: 'extract-css',
-     type: Boolean,
-     aliases: ['ec'],
-     description: 'Extract css from global styles onto css files instead of js ones.'
+    name: 'extract-css',
+    type: Boolean,
+    aliases: ['ec'],
+    description: 'Extract css from global styles onto css files instead of js ones.'
   },
   {
-     name: 'watch',
-     type: Boolean, default: false,
-     aliases: ['w'],
-     description: 'Run build when files change.'
+    name: 'watch',
+    type: Boolean, default: false,
+    aliases: ['w'],
+    description: 'Run build when files change.'
   },
   {
     name: 'output-hashing',

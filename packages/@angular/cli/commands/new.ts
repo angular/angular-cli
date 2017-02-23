@@ -71,7 +71,8 @@ const NewCommand = Command.extend({
       name: 'skip-commit',
       type: Boolean,
       default: false,
-      aliases: ['sc']
+      aliases: ['sc'],
+      description: 'Skip committing the first commit to git.'
     },
     {
       name: 'directory',

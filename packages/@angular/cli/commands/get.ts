@@ -15,7 +15,12 @@ const GetCommand = Command.extend({
   works: 'everywhere',
 
   availableOptions: [
-    { name: 'global', type: Boolean, 'default': false }
+    {
+      name: 'global',
+      type: Boolean,
+      'default': false,
+      description: 'Get the value in the global configuration (in your home directory).'
+    }
   ],
 
   run: function (commandOptions: GetOptions, rawArgs: string[]): Promise<void> {

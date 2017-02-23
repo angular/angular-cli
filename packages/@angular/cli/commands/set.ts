@@ -1,4 +1,4 @@
-import {CliConfig} from '../models/config';
+\import {CliConfig} from '../models/config';
 
 const SilentError = require('silent-error');
 const Command = require('../ember-cli/lib/models/command');
@@ -15,7 +15,13 @@ const SetCommand = Command.extend({
   works: 'everywhere',
 
   availableOptions: [
-    { name: 'global', type: Boolean, 'default': false, aliases: ['g'] },
+    {
+      name: 'global',
+      type: Boolean,
+      'default': false,
+      aliases: ['g'],
+      description: 'Set the value in the global configuration rather than in your project\'s.'
+    },
   ],
 
   asBoolean: function (raw: string): boolean {

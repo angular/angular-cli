@@ -15,7 +15,8 @@ const Xi18nCommand = Command.extend({
       name: 'i18n-format',
       type: String,
       default: 'xlf',
-      aliases: ['f', {'xmb': 'xmb'}, {'xlf': 'xlf'}, {'xliff': 'xlf'}]
+      aliases: ['f', {'xmb': 'xmb'}, {'xlf': 'xlf'}, {'xliff': 'xlf'}],
+      description: 'Output format for the generated file.'
     },
     {
       name: 'output-path',

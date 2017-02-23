@@ -6,7 +6,11 @@ const Command = require('../ember-cli/lib/models/command');
 // defaults for BuildOptions
 export const baseEjectCommandOptions: any = [
   ...baseBuildCommandOptions,
-  { name: 'force', 'type': Boolean },
+  {
+    name: 'force',
+    type: Boolean,
+    description: 'Overwrite any webpack.config.js and npm scripts already existing.'
+  },
   {
     name: 'app',
     type: String,

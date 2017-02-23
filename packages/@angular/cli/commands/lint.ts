@@ -1,4 +1,7 @@
+import {oneLine} from 'common-tags';
+
 const Command = require('../ember-cli/lib/models/command');
+
 
 export interface LintCommandOptions {
   fix?: boolean;
@@ -12,9 +15,27 @@ export default Command.extend({
   description: 'Lints code in existing project.',
   works: 'insideProject',
   availableOptions: [
-    { name: 'fix', type: Boolean, default: false },
-    { name: 'force', type: Boolean, default: false },
-    { name: 'format', alias: 't', type: String, default: 'prose' }
+    {
+      name: 'fix',
+      type: Boolean,
+      default: false,
+      description: 'Fixes linting errors (may overwrite linted files).'
+    },
+    {
+      name: 'force',
+      type: Boolean,
+      default: false,
+      description: 'Succeeds even if there was linting errors.'
+    },
+    {
+      name: 'format',
+      alias: 't',
+      type: String,
+      default: 'prose',
+      description: oneLine`
+        Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).
+      `
+    }
   ],
   run: function (commandOptions: LintCommandOptions) {
     const LintTask = require('../tasks/lint').default;
