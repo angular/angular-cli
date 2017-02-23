@@ -1,4 +1,4 @@
-\import {CliConfig} from '../models/config';
+import {CliConfig} from '../models/config';
 
 const SilentError = require('silent-error');
 const Command = require('../ember-cli/lib/models/command');

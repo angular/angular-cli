@@ -62,14 +62,14 @@ const CompletionCommand = Command.extend({
       name: 'bash',
       type: Boolean,
       default: false,
-      aliases: ['b']
+      aliases: ['b'],
       description: 'Generate a completion script for bash.'
     },
     {
       name: 'zsh',
       type: Boolean,
       default: false,
-      aliases: ['z']
+      aliases: ['z'],
       description: 'Generate a completion script for zsh.'
     }
   ],
