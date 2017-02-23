@@ -269,13 +269,26 @@ export class AotPlugin implements Tapable {
 
     // Add lazy modules to the context module for @angular/core/src/linker
     compiler.plugin('context-module-factory', (cmf: any) => {
+      const angularCorePackagePath = require.resolve('@angular/core/package.json');
+      const angularCorePackageJson = require(angularCorePackagePath);
+      const angularCoreModulePath = path.resolve(path.dirname(angularCorePackagePath),
+                                                 angularCorePackageJson['module']);
+      // Pick the last part after the last node_modules instance. We do this to let people have
+      // a linked @angular/core or cli which would not be under the same path as the project
+      // being built.
+      const angularCoreModuleDir = path.dirname(angularCoreModulePath).split(/node_modules/).pop();
+
       cmf.plugin('after-resolve', (result: any, callback: (err?: any, request?: any) => void) => {
         if (!result) {
           return callback();
         }
 
-        // alter only request from @angular/core/src/linker
-        if (!result.resource.endsWith(path.join('@angular/core/src/linker'))) {
+        // Alter only request from Angular;
+        //   @angular/core/src/linker matches for 2.*.*,
+        //   The other logic is for flat modules and requires reading the package.json of angular
+        //     (see above).
+        if (!result.resource.endsWith(path.join('@angular/core/src/linker'))
+            && (angularCoreModuleDir && !result.resource.endsWith(angularCoreModuleDir))) {
           return callback(null, result);
         }
 
