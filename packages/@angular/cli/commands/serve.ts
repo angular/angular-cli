@@ -26,6 +26,7 @@ export interface ServeTaskOptions extends BuildOptions {
   sslCert?: string;
   open?: boolean;
   hmr?: boolean;
+  useDist?: boolean;
 }
 
 // Expose options unrelated to live-reload to other commands that need to run serve
@@ -93,14 +94,21 @@ export const baseServeCommandOptions: any = overrideOptions([
     type: Boolean,
     default: false,
     description: 'Enable hot module replacement.',
-  }
-], [
+  },
   {
-    name: 'watch',
-    default: true,
-    description: 'Rebuild on change.'
-  }
-]);
+    name: 'use-dist',
+    type: Boolean,
+    default: false,
+    aliases: ['ud'],
+    description: 'Uses the files in the dist folder to run tests instead of re-building.',
+  },
+], [
+    {
+      name: 'watch',
+      default: true,
+      description: 'Rebuild on change.'
+    }
+  ]);
 
 const ServeCommand = Command.extend({
   name: 'serve',
