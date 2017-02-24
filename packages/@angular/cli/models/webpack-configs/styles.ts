@@ -5,8 +5,10 @@ import {
 } from '../../plugins/suppress-entry-chunks-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
+import { pluginArgs, postcssArgs } from '../../tasks/eject';
 
 const cssnano = require('cssnano');
+const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -38,11 +40,35 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // https://github.com/webpack-contrib/style-loader#recommended-configuration
   const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemap;
 
-  // minify/optimize css in production
-  // autoprefixer is always run separately so disable here
-  const extraPostCssPlugins = buildOptions.target === 'production'
-    ? [cssnano({ safe: true, autoprefixer: false })]
-    : [];
+  // Minify/optimize css in production.
+  const cssnanoPlugin = cssnano({ safe: true, autoprefixer: false });
+
+  // Convert absolute resource URLs to account for base-href and deploy-url.
+  const baseHref = wco.buildOptions.baseHref;
+  const deployUrl = wco.buildOptions.deployUrl;
+  const postcssUrlOptions = {
+    url: (URL: string) => {
+      // Only convert absolute URLs, which CSS-Loader won't process into require().
+      if (!URL.startsWith('/')) {
+        return URL;
+      }
+      // Join together base-href, deploy-url and the original URL.
+      // Also dedupe multiple slashes into single ones.
+      return `/${baseHref || ''}/${deployUrl || ''}/${URL}`.replace(/\/\/+/g, '/');
+    }
+  };
+  const urlPlugin = postcssUrl(postcssUrlOptions);
+  // We need to save baseHref and deployUrl for the Ejected webpack config to work (we reuse
+  //  the function defined above).
+  (postcssUrlOptions as any).baseHref = baseHref;
+  (postcssUrlOptions as any).deployUrl = deployUrl;
+  // Save the original options as arguments for eject.
+  urlPlugin[postcssArgs] = postcssUrlOptions;
+
+  // PostCSS plugins.
+  const postCssPlugins = [autoprefixer(), urlPlugin].concat(
+    buildOptions.target === 'production' ? [cssnanoPlugin] : []
+  );
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
@@ -104,8 +130,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // load global css as css files
   if (globalStylePaths.length > 0) {
-    rules.push(...baseRules.map(({test, loaders}) => ({
-      include: globalStylePaths, test, loaders: ExtractTextPlugin.extract({
+    rules.push(...baseRules.map(({test, loaders}) => {
+      const extractTextPlugin = {
         use: [
           ...commonLoaders,
           ...loaders
@@ -113,8 +139,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         fallback: 'style-loader',
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
         publicPath: ''
-      })
-    })));
+      };
+      const ret: any = {
+        include: globalStylePaths, test, loaders: ExtractTextPlugin.extract(extractTextPlugin)
+      };
+      // Save the original options as arguments for eject.
+      ret[pluginArgs] = extractTextPlugin;
+      return ret;
+    }));
   }
 
   // supress empty .js files in css only entry points
@@ -134,7 +166,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       new webpack.LoaderOptionsPlugin({
         sourceMap: cssSourceMap,
         options: {
-          postcss: [autoprefixer()].concat(extraPostCssPlugins),
+          postcss: postCssPlugins,
           // css-loader, stylus-loader don't support LoaderOptionsPlugin properly
           // options are in query instead
           sassLoader: { sourceMap: cssSourceMap, includePaths },

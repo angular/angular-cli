@@ -8,12 +8,14 @@ const CliConfig = require('../models/config').CliConfig;
 const Version = require('../upgrade/version').Version;
 
 const fs = require('fs');
+const findUp = require('../utilities/find-up').findUp;
 const packageJson = require('../package.json');
 const path = require('path');
 const resolve = require('resolve');
 const stripIndents = require('common-tags').stripIndents;
 const yellow = require('chalk').yellow;
 const SemVer = require('semver').SemVer;
+const events = require('events');
 
 
 function _fromPackageJson(cwd) {
@@ -86,6 +88,32 @@ if (require('../package.json')['name'] == 'angular-cli'
   `));
 }
 
+const packageJsonProjectPath = findUp('package.json', process.cwd(), true);
+if (packageJsonProjectPath && fs.existsSync(packageJsonProjectPath)) {
+  const packageJsonProject = require(packageJsonProjectPath);
+  const hasOldDep = !!packageJsonProject.dependencies['angular-cli'];
+  const hasOldDevDep = !!packageJsonProject.devDependencies['angular-cli'];
+  const hasDevDep = !!packageJsonProject.devDependencies['@angular/cli'];
+
+  if (hasOldDep || hasOldDevDep || !hasDevDep) {
+    const warnings = [
+      'The package "angular-cli" has been renamed to "@angular/cli". The old package will be '
+      + 'deprecated soon.',
+      '',
+      'Please take the following steps to avoid issues:'
+    ];
+    if (hasOldDep) {
+      warnings.push('"npm uninstall --save angular-cli"');
+    }
+    if (hasOldDevDep) {
+      warnings.push('"npm uninstall --save-dev angular-cli"');
+    }
+    if (!hasDevDep) {
+      warnings.push('"npm install --save-dev @angular/cli@latest"');
+    }
+    process.stderr.write(yellow(warnings.join('\n'), '\n\n'));
+  }
+}
 
 resolve('@angular/cli', { basedir: process.cwd() },
   function (error, projectLocalCli) {
@@ -132,9 +160,18 @@ resolve('@angular/cli', { basedir: process.cwd() },
       cli = cli['default'];
     }
 
+    let standardInput;
+    try {
+      standardInput = process.stdin;
+    } catch (e) {
+      delete process.stdin;
+      process.stdin = new events.EventEmitter();
+      standardInput = process.stdin;
+    }
+
     cli({
       cliArgs: process.argv.slice(2),
-      inputStream: process.stdin,
+      inputStream: standardInput,
       outputStream: process.stdout
     }).then(function (result) {
       process.exit(typeof result === 'object' ? result.exitCode : result);

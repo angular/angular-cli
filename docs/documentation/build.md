@@ -19,11 +19,11 @@ The build artifacts will be stored in the `dist/` directory.
 environment file to be used with that build (`--environment=dev` or `--environment=prod`).
 By default, the development build target and environment are used.
 
-The mapping used to determine which environment file is used can be found in `angular-cli.json`:
+The mapping used to determine which environment file is used can be found in `.angular-cli.json`:
 
 ```json
+"environmentSource": "environments/environment.ts",
 "environments": {
-  "source": "environments/environment.ts",
   "dev": "environments/environment.ts",
   "prod": "environments/environment.prod.ts"
 }
@@ -46,7 +46,7 @@ ng build
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
-- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `angular-cli.json`
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `.angular-cli.json`
 - use them via the `--env=NAME` flag on the build/serve commands.
 
 ### Base tag handling in index.html
@@ -65,7 +65,7 @@ All builds make use of bundling, and using the `--prod` flag in  `ng build --pro
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ## Options
-`--watch` (`-w`) flag to run builds when files change
+`--watch` (`-w`) rebuild when files change
 
 `--target` (`-t`) define the build target
 
@@ -94,3 +94,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 `--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
 
 `--output-hashing` define the output filename cache-busting hashing mode
+
+`--stats-json` generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse
+
+`--poll` enable and define the file watching poll time period (milliseconds)

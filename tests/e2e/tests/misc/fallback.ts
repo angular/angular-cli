@@ -18,7 +18,7 @@ export default function () {
     .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
     // should correctly fallback to a changed index
     .then(() => moveFile('src/index.html', 'src/not-index.html'))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['index'] = 'not-index.html';
     }))

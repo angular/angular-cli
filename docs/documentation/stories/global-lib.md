@@ -2,7 +2,7 @@
 
 Some javascript libraries need to be added to the global scope, and loaded as if
 they were in a script tag. We can do this using the `apps[0].scripts` and
-`apps[0].styles` properties of `angular-cli.json`.
+`apps[0].styles` properties of `.angular-cli.json`.
 
 As an example, to use [Bootstrap 4](http://v4-alpha.getbootstrap.com/) this is
 what you need to do:

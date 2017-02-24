@@ -14,7 +14,7 @@ ng e2e
 End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
 ## Options
-`--config` (`-c`) use a specific config file. Defaults to the protractor config file in `angular-cli.json`.
+`--config` (`-c`) use a specific config file. Defaults to the protractor config file in `.angular-cli.json`.
 
 `--specs` (`-sp`) override specs in the protractor config.
 Can send in multiple specs by repeating flag (`ng e2e --specs=spec1.ts --specs=spec2.ts`).

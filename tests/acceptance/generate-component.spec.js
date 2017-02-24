@@ -42,6 +42,16 @@ describe('Acceptance: ng generate component', function () {
       });
   });
 
+  it('generating my-comp twice does not add two declarations to module', function () {
+    const appModule = path.join(root, 'tmp/foo/src/app/app.module.ts');
+    return ng(['generate', 'component', 'my-comp'])
+      .then(() => ng(['generate', 'component', 'my-comp']))
+      .then(() => readFile(appModule, 'utf-8'))
+      .then(content => {
+        expect(content).matches(/declarations:\s+\[\r?\n\s+AppComponent,\r?\n\s+MyCompComponent\r?\n\s+\]/m);
+      });
+  });
+
   it('test' + path.sep + 'my-comp', function () {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', 'test'));
     return ng(['generate', 'component', 'test' + path.sep + 'my-comp']).then(() => {
@@ -206,7 +216,7 @@ describe('Acceptance: ng generate component', function () {
     });
   });
 
-  it('my-comp --no-spec', function() {
+  it('my-comp --no-spec', function () {
     return ng(['generate', 'component', 'my-comp', '--no-spec']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.component.spec.ts');
       expect(existsSync(testPath)).to.equal(false);

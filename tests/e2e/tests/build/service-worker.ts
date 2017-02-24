@@ -1,9 +1,14 @@
 import {join} from 'path';
-import {npm} from '../../utils/process';
+import {getGlobalVariable} from '../../utils/env';
 import {expectFileToExist} from '../../utils/fs';
-import {ng} from '../../utils/process';
+import {ng, npm} from '../../utils/process';
 
 export default function() {
+  // Skip this in ejected tests.
+  if (getGlobalVariable('argv').eject) {
+    return Promise.resolve();
+  }
+
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
   return npm('install', '@angular/service-worker')

@@ -1,5 +1,7 @@
 import * as child_process from 'child_process';
 import {blue, yellow} from 'chalk';
+import {getGlobalVariable} from './env';
+import {rimraf, writeFile} from './fs';
 const treeKill = require('tree-kill');
 
 
@@ -75,7 +77,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
       _processes = _processes.filter(p => p !== childProcess);
 
       if (!error) {
-        resolve(stdout);
+        resolve({ stdout });
       } else {
         err.message += `${error}...\n\nSTDOUT:\n${stdout}\n`;
         reject(err);
@@ -134,9 +136,26 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
   return _exec({ silent: true, waitForMatch: match }, cmd, args);
 }
 
+
+let npmInstalledEject = false;
 export function ng(...args: string[]) {
   // Auto-add --no-progress to commands that build the app, otherwise we get thousands of lines.
   if (['build', 'serve', 'test', 'e2e', 'xi18n'].indexOf(args[0]) != -1) {
+    // If we have the --eject, use webpack for the test.
+    const argv = getGlobalVariable('argv');
+    if (args[0] == 'build' && argv.eject) {
+      return silentNg('eject', ...args.slice(1), '--force')
+        .then(() => {
+          if (!npmInstalledEject) {
+            npmInstalledEject = true;
+            // We need to run npm install on the first eject.
+            return silentNpm('install');
+          }
+        })
+        .then(() => rimraf('dist'))
+        .then(() => _exec({silent: true}, 'node_modules/.bin/webpack', []));
+    }
+
     return silentNg(...args, '--no-progress');
   } else {
     return _exec({}, 'ng', args);

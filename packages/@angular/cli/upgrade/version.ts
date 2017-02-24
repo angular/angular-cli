@@ -5,32 +5,18 @@ import {readFileSync, existsSync} from 'fs';
 import * as path from 'path';
 
 import {CliConfig} from '../models/config';
+import {findUp} from '../utilities/find-up';
 
 const resolve = require('resolve');
 
 
-function _findUp(name: string, from: string) {
-  let currentDir = from;
-  while (currentDir && currentDir !== path.parse(currentDir).root) {
-    const p = path.join(currentDir, name);
-    if (existsSync(p)) {
-      return p;
-    }
-
-    currentDir = path.dirname(currentDir);
-  }
-
-  return null;
-}
-
-
 function _hasOldCliBuildFile() {
-  return existsSync(_findUp('angular-cli-build.js', process.cwd()))
-      || existsSync(_findUp('angular-cli-build.ts', process.cwd()))
-      || existsSync(_findUp('ember-cli-build.js', process.cwd()))
-      || existsSync(_findUp('angular-cli-build.js', __dirname))
-      || existsSync(_findUp('angular-cli-build.ts', __dirname))
-      || existsSync(_findUp('ember-cli-build.js', __dirname));
+  return existsSync(findUp('angular-cli-build.js', process.cwd()))
+      || existsSync(findUp('angular-cli-build.ts', process.cwd()))
+      || existsSync(findUp('ember-cli-build.js', process.cwd()))
+      || existsSync(findUp('angular-cli-build.js', __dirname))
+      || existsSync(findUp('angular-cli-build.ts', __dirname))
+      || existsSync(findUp('ember-cli-build.js', __dirname));
 }
 
 
@@ -64,7 +50,7 @@ export class Version {
     try {
       const angularCliPath = resolve.sync('@angular/cli', {
         basedir: process.cwd(),
-        packageFilter: (pkg: any, pkgFile: string) => {
+        packageFilter: (pkg: any, _pkgFile: string) => {
           packageJson = pkg;
         }
       });
@@ -90,7 +76,7 @@ export class Version {
 
     try {
       const json = JSON.parse(configJson);
-      return new Version(json.project && json.project.version);
+      return new Version(json.project);
     } catch (e) {
       return new Version(null);
     }
@@ -108,11 +94,13 @@ export class Version {
       if (v.isLocal()) {
         console.warn(yellow('Using a local version of angular. Proceeding with care...'));
       } else {
-        if (!v.isGreaterThanOrEqualTo(new SemVer('2.3.1'))) {
+        // Check if major is not 0, so that we stay compatible with local compiled versions
+        // of angular.
+        if (!v.isGreaterThanOrEqualTo(new SemVer('2.3.1')) && v.major != 0) {
           console.error(bold(red(stripIndents`
             This version of CLI is only compatible with angular version 2.3.1 or better. Please
             upgrade your angular version, e.g. by running:
-            
+
             npm install @angular/core@latest
           ` + '\n')));
           process.exit(3);

@@ -97,7 +97,7 @@ If an `env` name is provided, other than "default", generate compose files with 
 
 If `--use-image == false` and the selected machine for the environment is a Docker Swarm machine, warn the user. Docker Swarm clusters cannot use the `build:` option in compose, since the resulting built image will not be distributed to other nodes. Swarm requires using the `image:` option in compose, pushing the image to a registry beforehand so that the Swarm nodes have a place to pull the image from (see [Swarm Limitations](https://docs.docker.com/compose/swarm/#building-images)).
 
-Certain configuration values will be stored in the project's ngConfig `angular-cli.json` for use with other docker commands (ie. deploy, logs, exec). See also: [Saved State](#saved-state) section.
+Certain configuration values will be stored in the project's ngConfig `.angular-cli.json` for use with other docker commands (ie. deploy, logs, exec). See also: [Saved State](#saved-state) section.
 
 Provide instructions on what the user can do after initialization completes (push, deploy).
 

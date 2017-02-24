@@ -14,7 +14,7 @@ export default Task.extend({
     return new Promise(function(resolve, reject) {
       ui.writeLine(chalk.green(`Installing packages for tooling via ${packageManager}.`));
       exec(`${packageManager} install`,
-        (err: NodeJS.ErrnoException, stdout: string, stderr: string) => {
+        (err: NodeJS.ErrnoException, _stdout: string, stderr: string) => {
         if (err) {
           ui.writeLine(stderr);
           ui.writeLine(chalk.red('Package install failed, see above.'));

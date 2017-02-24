@@ -4,7 +4,7 @@ Each project is unique, and even though we try to cater to most setups in Angula
 you need a custom setup.
 
 Even if you need to use a different build system, you can still use other Angular CLI features
-like `ng generate`, `ng lint`, `ng test` and `ng e2e` by leaving in `angular-cli.json` and
+like `ng generate`, `ng lint`, `ng test` and `ng e2e` by leaving in `.angular-cli.json` and
 supporting files like `src/test.ts`.
 
 Moving out of the CLI is very similar to [Moving into the CLI](moving-into-the-cli).
@@ -40,7 +40,7 @@ You might also need to make adjustments to conform to your new build system.
 You might need to change these.
 - Polyfills are listed in `../old-awesome-app/src/polyfills.ts`. Incorporate these into the new
 project.
-- The CLI lists used `<script>` and `<link>` tags in the `angular-cli.json` `scripts`
+- The CLI lists used `<script>` and `<link>` tags in the `.angular-cli.json` `scripts`
 and `styles` array. Check import these in your new project and add them accordingly.
 
 The final step is to copy your git history so you can continue working without losing anything:

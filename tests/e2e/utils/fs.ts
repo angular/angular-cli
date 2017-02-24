@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as rimrafPackage from 'rimraf';
 import {dirname} from 'path';
 import {stripIndents} from 'common-tags';
 
@@ -38,6 +39,19 @@ export function deleteFile(path: string) {
       }
     });
   });
+}
+
+
+export function rimraf(path: string) {
+  return new Promise<void>((resolve, reject) => {
+    rimrafPackage(path, (err?: any) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    })
+  }
 }
 
 
@@ -105,6 +119,16 @@ export function prependToFile(filePath: string, text: string, options?: any) {
     .then((content: string) => writeFile(filePath, text.concat(content), options));
 }
 
+
+export function expectFileMatchToExist(dir: string, regex: RegExp) {
+  return new Promise((resolve, reject) => {
+    const [fileName] = fs.readdirSync(dir).filter(name => name.match(regex));
+    if (!fileName) {
+      reject(new Error(`File ${regex} was expected to exist but not found...`));
+    }
+    resolve(fileName);
+  });
+}
 
 export function expectFileToExist(fileName: string) {
   return new Promise((resolve, reject) => {

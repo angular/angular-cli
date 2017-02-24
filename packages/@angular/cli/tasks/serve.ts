@@ -9,6 +9,7 @@ import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
+import { getAppFromConfig } from '../utilities/app-utils';
 
 const WebpackDevServer = require('webpack-dev-server');
 const Task = require('../ember-cli/lib/models/task');
@@ -21,50 +22,85 @@ export default Task.extend({
 
     let webpackCompiler: any;
     const projectConfig = CliConfig.fromProject().config;
-    const appConfig = projectConfig.apps[0];
+    const appConfig = getAppFromConfig(projectConfig.apps, serveTaskOptions.app);
 
     const outputPath = serveTaskOptions.outputPath || appConfig.outDir;
     if (this.project.root === outputPath) {
       throw new SilentError('Output path MUST not be project root directory!');
     }
+    if (projectConfig.project && projectConfig.project.ejected) {
+      throw new SilentError('An ejected project cannot use the build command anymore.');
+    }
     rimraf.sync(path.resolve(this.project.root, outputPath));
 
     const serveDefaults = {
-      // default deployUrl to '' on serve to prevent the default from angular-cli.json
+      // default deployUrl to '' on serve to prevent the default from .angular-cli.json
       deployUrl: ''
     };
 
     serveTaskOptions = Object.assign({}, serveDefaults, serveTaskOptions);
 
-    let webpackConfig = new NgCliWebpackConfig(serveTaskOptions).config;
+    let webpackConfig = new NgCliWebpackConfig(serveTaskOptions, appConfig).buildConfig();
 
-    // This allows for live reload of page when changes are made to repo.
-    // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
-    let entryPoints = [
-      `webpack-dev-server/client?http://${serveTaskOptions.host}:${serveTaskOptions.port}/`
-    ];
-    if (serveTaskOptions.hmr) {
-      const webpackHmrLink = 'https://webpack.github.io/docs/hot-module-replacement.html';
-      ui.writeLine(oneLine`
-        ${chalk.yellow('NOTICE')} Hot Module Replacement (HMR) is enabled for the dev server.
-      `);
-      ui.writeLine('  The project will still live reload when HMR is enabled,');
-      ui.writeLine('  but to take advantage of HMR additional application code is required');
-      ui.writeLine('  (not included in an Angular CLI project by default).');
-      ui.writeLine(`  See ${chalk.blue(webpackHmrLink)}`);
-      ui.writeLine('  for information on working with HMR for Webpack.');
-      entryPoints.push('webpack/hot/dev-server');
-      webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
-      webpackConfig.plugins.push(new webpack.NamedModulesPlugin());
-      if (serveTaskOptions.extractCss) {
-        ui.writeLine(oneLine`
-          ${chalk.yellow('NOTICE')} (HMR) does not allow for CSS hot reload when used
-          together with '--extract-css'.
-        `);
+    const serverAddress = url.format({
+      protocol: serveTaskOptions.ssl ? 'https' : 'http',
+      hostname: serveTaskOptions.host,
+      port: serveTaskOptions.port.toString()
+    });
+    let clientAddress = serverAddress;
+    if (serveTaskOptions.liveReloadClient) {
+      const clientUrl = url.parse(serveTaskOptions.liveReloadClient);
+      // very basic sanity check
+      if (!clientUrl.host) {
+        return Promise.reject(new SilentError(`'live-reload-client' must be a full URL.`));
       }
+      clientAddress = clientUrl.href;
     }
-    if (!webpackConfig.entry.main) { webpackConfig.entry.main = []; }
-    webpackConfig.entry.main.unshift(...entryPoints);
+
+    if (serveTaskOptions.liveReload) {
+      // This allows for live reload of page when changes are made to repo.
+      // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
+      let entryPoints = [
+        `webpack-dev-server/client?${clientAddress}`
+      ];
+      if (serveTaskOptions.hmr) {
+        const webpackHmrLink = 'https://webpack.github.io/docs/hot-module-replacement.html';
+        ui.writeLine(oneLine`
+          ${chalk.yellow('NOTICE')} Hot Module Replacement (HMR) is enabled for the dev server.
+        `);
+        ui.writeLine('  The project will still live reload when HMR is enabled,');
+        ui.writeLine('  but to take advantage of HMR additional application code is required');
+        ui.writeLine('  (not included in an Angular CLI project by default).');
+        ui.writeLine(`  See ${chalk.blue(webpackHmrLink)}`);
+        ui.writeLine('  for information on working with HMR for Webpack.');
+        entryPoints.push('webpack/hot/dev-server');
+        webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
+        webpackConfig.plugins.push(new webpack.NamedModulesPlugin());
+        if (serveTaskOptions.extractCss) {
+          ui.writeLine(oneLine`
+            ${chalk.yellow('NOTICE')} (HMR) does not allow for CSS hot reload when used
+            together with '--extract-css'.
+          `);
+        }
+      }
+      if (!webpackConfig.entry.main) { webpackConfig.entry.main = []; }
+      webpackConfig.entry.main.unshift(...entryPoints);
+    } else if (serveTaskOptions.hmr) {
+      ui.writeLine(chalk.yellow('Live reload is disabled. HMR option ignored.'));
+    }
+
+    if (!serveTaskOptions.watch) {
+      // There's no option to turn off file watching in webpack-dev-server, but
+      // we can override the file watcher instead.
+      webpackConfig.plugins.unshift({
+        apply: (compiler: any) => {
+          compiler.plugin('after-environment', () => {
+            compiler.watchFileSystem = { watch: () => {} };
+          });
+        }
+      });
+    }
+
     webpackCompiler = webpack(webpackConfig);
 
     if (rebuildDoneCb) {
@@ -109,7 +145,7 @@ export default Task.extend({
       proxy: proxyConfig,
       compress: serveTaskOptions.target === 'production',
       watchOptions: {
-        poll: projectConfig.defaults && projectConfig.defaults.poll
+        poll: serveTaskOptions.poll
       },
       https: serveTaskOptions.ssl,
       overlay: serveTaskOptions.target === 'development'
@@ -135,26 +171,26 @@ export default Task.extend({
 
     ui.writeLine(chalk.green(oneLine`
       **
-      NG Live Development Server is running on
-      http${serveTaskOptions.ssl ? 's' : ''}://${serveTaskOptions.host}:${serveTaskOptions.port}.
+      NG Live Development Server is running on ${serverAddress}
       **
     `));
 
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
-    return new Promise((resolve, reject) => {
-      server.listen(serveTaskOptions.port, `${serveTaskOptions.host}`, (err: any, stats: any) => {
+    return new Promise((_resolve, reject) => {
+      server.listen(serveTaskOptions.port, serveTaskOptions.host, (err: any, _stats: any) => {
         if (err) {
-          console.error(err.stack || err);
-          if (err.details) { console.error(err.details); }
-          reject(err.details);
-        } else {
-          const { open, ssl, host, port } = serveTaskOptions;
-          if (open) {
-            let protocol = ssl ? 'https' : 'http';
-            opn(url.format({ protocol: protocol, hostname: host, port: port.toString() }));
-          }
+          return reject(err);
+        }
+        if (serveTaskOptions.open) {
+            opn(serverAddress);
         }
       });
+    })
+    .catch((err: Error) => {
+      if (err) {
+        this.ui.writeError('\nAn error occured during the build:\n' + ((err && err.stack) || err));
+      }
+      throw err;
     });
   }
 });

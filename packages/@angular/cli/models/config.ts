@@ -5,27 +5,11 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const CLI_CONFIG_FILE_NAME = 'angular-cli.json';
+import {findUp} from '../utilities/find-up';
 
 
-function _findUp(name: string, from: string) {
-  let currentDir = from;
-  while (currentDir && currentDir !== path.parse(currentDir).root) {
-    const p = path.join(currentDir, name);
-    if (fs.existsSync(p)) {
-      return p;
-    }
-
-    const nodeModuleP = path.join(currentDir, 'node_modules');
-    if (fs.existsSync(nodeModuleP)) {
-      return null;
-    }
-
-    currentDir = path.dirname(currentDir);
-  }
-
-  return null;
-}
+export const CLI_CONFIG_FILE_NAME = '.angular-cli.json';
+const CLI_CONFIG_FILE_NAME_ALT = 'angular-cli.json';
 
 
 function getUserHome() {
@@ -33,17 +17,34 @@ function getUserHome() {
 }
 
 
+const configCacheMap = new Map<string, CliConfigBase<ConfigInterface>>();
+
+
 export class CliConfig extends CliConfigBase<ConfigInterface> {
   static configFilePath(projectPath?: string): string {
-    // Find the configuration, either where specified, in the angular-cli project
+    const configNames = [CLI_CONFIG_FILE_NAME, CLI_CONFIG_FILE_NAME_ALT];
+    // Find the configuration, either where specified, in the Angular CLI project
     // (if it's in node_modules) or from the current process.
-    return (projectPath && _findUp(CLI_CONFIG_FILE_NAME, projectPath))
-        || _findUp(CLI_CONFIG_FILE_NAME, process.cwd())
-        || _findUp(CLI_CONFIG_FILE_NAME, __dirname);
+    return (projectPath && findUp(configNames, projectPath))
+        || findUp(configNames, process.cwd())
+        || findUp(configNames, __dirname);
+  }
+
+  static globalConfigFilePath(): string {
+    let globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
+    const altGlobalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME_ALT);
+    if (!fs.existsSync(globalConfigPath) && fs.existsSync(altGlobalConfigPath)) {
+      return altGlobalConfigPath;
+    }
+    return globalConfigPath;
   }
 
   static fromGlobal(): CliConfig {
-    const globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
+    const globalConfigPath = this.globalConfigFilePath();
+
+    if (configCacheMap.has(globalConfigPath)) {
+      return configCacheMap.get(globalConfigPath);
+    }
 
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(globalConfigPath);
 
@@ -52,43 +53,73 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
       cliConfig.alias('apps.0.prefix', 'defaults.prefix')
     ];
 
+    // Additional aliases which do not emit any messages.
+    cliConfig.alias('defaults.interface.prefix', 'defaults.inline.prefixInterfaces');
+    cliConfig.alias('defaults.component.inlineStyle', 'defaults.inline.style');
+    cliConfig.alias('defaults.component.inlineTemplate', 'defaults.inline.template');
+    cliConfig.alias('defaults.component.spec', 'defaults.spec.component');
+    cliConfig.alias('defaults.class.spec', 'defaults.spec.class');
+    cliConfig.alias('defaults.component.directive', 'defaults.spec.directive');
+    cliConfig.alias('defaults.component.module', 'defaults.spec.module');
+    cliConfig.alias('defaults.component.pipe', 'defaults.spec.pipe');
+    cliConfig.alias('defaults.component.service', 'defaults.spec.service');
+
     // If any of them returned true, output a deprecation warning.
-    if (aliases.some(x => !!x)) {
+    if (aliases.some(x => x)) {
       console.error(chalk.yellow(oneLine`
-        The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
+        The "defaults.prefix" and "defaults.sourceDir" properties of .angular-cli.json
         are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
         Please update in order to avoid errors in future versions of Angular CLI.
       `));
     }
 
+    configCacheMap.set(globalConfigPath, cliConfig);
     return cliConfig;
   }
 
-  static fromProject(): CliConfig {
-    const configPath = this.configFilePath();
-    const globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
-
-    if (!configPath) {
+  static fromProject(projectPath?: string): CliConfig {
+    const configPath = this.configFilePath(projectPath);
+    if (!configPath || configPath === this.globalConfigFilePath()) {
       return null;
     }
+    if (configCacheMap.has(configPath)) {
+      return configCacheMap.get(configPath);
+    }
 
-    const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(
-      CliConfig.configFilePath(), [globalConfigPath]);
+    let globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
+    const altGlobalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME_ALT);
+    if (!fs.existsSync(globalConfigPath) && fs.existsSync(altGlobalConfigPath)) {
+      globalConfigPath = altGlobalConfigPath;
+    }
+
+    const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(configPath, [globalConfigPath]);
 
     const aliases = [
       cliConfig.alias('apps.0.root', 'defaults.sourceDir'),
       cliConfig.alias('apps.0.prefix', 'defaults.prefix')
     ];
 
+    // Additional aliases which do not emit any messages.
+    cliConfig.alias('defaults.interface.prefix', 'defaults.inline.prefixInterfaces');
+    cliConfig.alias('defaults.component.inlineStyle', 'defaults.inline.style');
+    cliConfig.alias('defaults.component.inlineTemplate', 'defaults.inline.template');
+    cliConfig.alias('defaults.component.spec', 'defaults.spec.component');
+    cliConfig.alias('defaults.class.spec', 'defaults.spec.class');
+    cliConfig.alias('defaults.component.directive', 'defaults.spec.directive');
+    cliConfig.alias('defaults.component.module', 'defaults.spec.module');
+    cliConfig.alias('defaults.component.pipe', 'defaults.spec.pipe');
+    cliConfig.alias('defaults.component.service', 'defaults.spec.service');
+
     // If any of them returned true, output a deprecation warning.
-    if (aliases.some(x => !!x)) {
+    if (aliases.some(x => x)) {
       console.error(chalk.yellow(oneLine`
-        The "defaults.prefix" and "defaults.sourceDir" properties of angular-cli.json
+        The "defaults.prefix" and "defaults.sourceDir" properties of .angular-cli.json
         are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
         Please update in order to avoid errors in future versions of Angular CLI.
       `));
     }
 
+    configCacheMap.set(configPath, cliConfig);
     return cliConfig as CliConfig;
   }
 }

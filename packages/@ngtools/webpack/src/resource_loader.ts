@@ -18,7 +18,7 @@ export class WebpackResourceLoader implements ResourceLoader {
     this._context = _parentCompilation.context;
   }
 
-  private _compile(filePath: string, content: string): Promise<any> {
+  private _compile(filePath: string, _content: string): Promise<any> {
     const compilerName = `compiler(${this._uniqueId++})`;
     const outputOptions = { filename: filePath };
     const relativePath = path.relative(this._context || '', filePath);
@@ -70,10 +70,12 @@ export class WebpackResourceLoader implements ResourceLoader {
 
           // Restore the parent compilation to the state like it was before the child compilation.
           Object.keys(childCompilation.assets).forEach((fileName) => {
-            this._parentCompilation.assets[fileName] = assetsBeforeCompilation[fileName];
-            if (assetsBeforeCompilation[fileName] === undefined) {
-              // If it wasn't there - delete it.
+            // If it wasn't there and it's a source file (absolute path) - delete it.
+            if (assetsBeforeCompilation[fileName] === undefined && path.isAbsolute(fileName)) {
               delete this._parentCompilation.assets[fileName];
+            } else {
+              // Otherwise, add it to the parent compilation.
+              this._parentCompilation.assets[fileName] = childCompilation.assets[fileName];
             }
           });
 

@@ -1,6 +1,6 @@
 # Project assets
 
-You use the `assets` array in `angular-cli.json` to list files or folders you want to copy as-is
+You use the `assets` array in `.angular-cli.json` to list files or folders you want to copy as-is
 when building your project.
 
 By default, the `src/assets/` folder and `src/favicon.ico` are copied over.

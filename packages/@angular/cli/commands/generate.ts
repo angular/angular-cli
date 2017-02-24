@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import {CliConfig} from '../models/config';
 
 const chalk = require('chalk');
 const EmberGenerateCommand = require('../ember-cli/lib/commands/generate');
@@ -10,7 +11,7 @@ const SilentError = require('silent-error');
 const blueprintList = fs.readdirSync(path.join(__dirname, '..', 'blueprints'));
 const blueprints = blueprintList
   .filter(bp => bp.indexOf('-test') === -1)
-  .filter(bp => bp !== 'ng2')
+  .filter(bp => bp !== 'ng')
   .map(bp => Blueprint.load(path.join(__dirname, '..', 'blueprints', bp)));
 
 const GenerateCommand = EmberGenerateCommand.extend({
@@ -25,6 +26,7 @@ const GenerateCommand = EmberGenerateCommand.extend({
 
     // map the blueprint name to allow for aliases
     rawArgs[0] = mapBlueprintName(rawArgs[0]);
+    this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();
 
     if (rawArgs[0] !== '--help' &&
       !fs.existsSync(path.join(__dirname, '..', 'blueprints', rawArgs[0]))) {

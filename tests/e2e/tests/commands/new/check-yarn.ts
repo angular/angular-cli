@@ -8,9 +8,9 @@ export default function() {
     .then(() => process.chdir(getGlobalVariable('tmp-root')))
     .then(() =>  ng('set', '--global', 'packageManager=default'))
     .then(() =>  ng('new', 'foo'))
-    .then((stdout) => {
+    .then(({ stdout }) => {
       // Assuming yarn is installed and checking for message with yarn.
-      if (!stdout.toString().match(yarnRegEx)) {
+      if (!stdout.match(yarnRegEx)) {
         throw new Error('Should display message to use yarn packageManager');
       }
     });

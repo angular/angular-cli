@@ -33,7 +33,7 @@ npm install bootstrap@next --save
 
 Now that the project is set up it must be configured to include the bootstrap CSS.
 
-- Open the file `angular-cli.json` from the root of your project.
+- Open the file `.angular-cli.json` from the root of your project.
 - Under the property `apps` the first item in that array is the default application.
 - There is a property `styles` which allows external global styles to be applied to your application.
 - Specify the path to `bootstrap.min.css`
@@ -46,7 +46,7 @@ Now that the project is set up it must be configured to include the bootstrap CS
   ],
   ```
 
-**Note:** When you make changes to `angular-cli.json` you will need to re-start `ng serve` to pick up configuration changes.
+**Note:** When you make changes to `.angular-cli.json` you will need to re-start `ng serve` to pick up configuration changes.
 
 ### Testing Project
 

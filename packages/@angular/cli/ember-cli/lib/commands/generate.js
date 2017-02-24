@@ -17,12 +17,19 @@ module.exports = Command.extend({
   works: 'insideProject',
 
   availableOptions: [
-    { name: 'dry-run',       type: Boolean, default: false, aliases: ['d'] },
-    { name: 'verbose',       type: Boolean, default: false, aliases: ['v'] },
-    { name: 'pod',           type: Boolean, default: false, aliases: ['p'] },
-    { name: 'classic',       type: Boolean, default: false, aliases: ['c'] },
-    { name: 'dummy',         type: Boolean, default: false, aliases: ['dum', 'id'] },
-    { name: 'in-repo-addon', type: String,  default: null,  aliases: ['in-repo', 'ir'] }
+    { name: 'dry-run',
+      type: Boolean,
+      default: false,
+      aliases: ['d'],
+      description: 'Run through without making any changes.'
+    },
+    {
+      name: 'verbose',
+      type: Boolean,
+      default: false,
+      aliases: ['v'],
+      description: 'Adds more details to output logging.'
+    }
   ],
 
   anonymousOptions: [
@@ -52,7 +59,7 @@ module.exports = Command.extend({
     };
 
     if (this.settings && this.settings.usePods && !commandOptions.classic) {
-      commandOptions.pod = !commandOptions.pod;
+      commandOptions.pod = false;
     }
 
     var taskOptions = merge(taskArgs, commandOptions || {});
@@ -69,7 +76,7 @@ module.exports = Command.extend({
   },
 
   addAdditionalJsonForHelp: function(json, options) {
-    json.availableBlueprints = this.getAllBlueprints(options);
+    json.availableBlueprints = this.getAllBlueprints(options).filter(x => x.name !== 'ng');
   },
 
   getAllBlueprints: function(options) {
@@ -121,14 +128,13 @@ module.exports = Command.extend({
     }
 
     var output = '';
-
-    if (blueprints.length && !singleBlueprintName && !options.json) {
-      output += '    ' + collection.source + ':' + EOL;
-    }
-
     var blueprintsJson = [];
 
     blueprints.forEach(function(blueprint) {
+      if (blueprint.name === 'ng') {
+        // Skip
+        return;
+      }
       var singleMatch = singleBlueprintName === blueprint.name;
       if (singleMatch) {
         verbose = true;

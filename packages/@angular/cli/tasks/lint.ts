@@ -1,6 +1,5 @@
 const Task = require('../ember-cli/lib/models/task');
 import * as chalk from 'chalk';
-import * as path from 'path';
 import * as glob from 'glob';
 import * as ts from 'typescript';
 import { requireProjectModule } from '../utilities/require-project-module';
@@ -48,7 +47,11 @@ export default Task.extend({
         }, program);
 
         files.forEach((file) => {
-          const fileContents = program.getSourceFile(file).getFullText();
+          const sourceFile = program.getSourceFile(file);
+          if (!sourceFile) {
+            return;
+          }
+          const fileContents = sourceFile.getFullText();
           const configLoad = Configuration.findConfiguration(config.tslintConfig, file);
           linter.lint(file, fileContents, configLoad.results);
         });
@@ -57,6 +60,12 @@ export default Task.extend({
         errors += result.failureCount;
         results = results.concat(result.output.trim().concat('\n'));
       });
+
+    // print formatter output directly for non human-readable formats
+    if (['prose', 'verbose', 'stylish'].indexOf(commandOptions.format) == -1) {
+      ui.writeLine(results.trim());
+      return (errors == 0 || commandOptions.force) ? Promise.resolve(0) : Promise.resolve(2);
+    }
 
     if (errors > 0) {
       ui.writeLine(results.trim());

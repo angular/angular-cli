@@ -9,7 +9,6 @@ import { WebpackConfigOptions } from '../webpack-config';
 
 export const getProdConfig = function (wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
-  const appRoot = path.resolve(projectRoot, appConfig.root);
 
   let extraPlugins: any[] = [];
   let entryPoints: {[key: string]: string[]} = {};
@@ -23,7 +22,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       throw new Error(stripIndent`
         Your project is configured with serviceWorker = true, but @angular/service-worker
         is not installed. Run \`npm install --save-dev @angular/service-worker\`
-        and try again, or run \`ng set apps.0.serviceWorker=false\` in your angular-cli.json.
+        and try again, or run \`ng set apps.0.serviceWorker=false\` in your .angular-cli.json.
       `);
     }
 
@@ -70,6 +69,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
+      new (<any>webpack).HashedModuleIdsPlugin(),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8: true },
         compress: { screw_ie8: true, warnings: buildOptions.verbose },

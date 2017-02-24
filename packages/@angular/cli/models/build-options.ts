@@ -13,5 +13,9 @@ export interface BuildOptions {
   i18nFormat?: string;
   locale?: string;
   extractCss?: boolean;
+  watch?: boolean;
   outputHashing?: string;
+  poll?: number;
+  app?: string;
+
 }

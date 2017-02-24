@@ -1,4 +1,6 @@
 import {NodeHost} from '../../lib/ast-tools';
+import {CliConfig} from '../../models/config';
+import {getAppFromConfig} from '../../utilities/app-utils';
 import { oneLine } from 'common-tags';
 
 const path = require('path');
@@ -14,16 +16,37 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'flat', type: Boolean, default: true },
-    { name: 'spec', type: Boolean },
-    { name: 'module', type: String, aliases: ['m'] }
+    {
+      name: 'flat',
+      type: Boolean,
+      description: 'Flag to indicate if a dir is created.'
+    },
+    {
+      name: 'spec',
+      type: Boolean,
+      description: 'Specifies if a spec file is generated.'
+    },
+    {
+      name: 'module',
+      type: String, aliases: ['m'],
+      description: 'Allows specification of the declaring module.'
+    },
+    {
+      name: 'app',
+      type: String,
+      aliases: ['a'],
+      description: 'Specifies app name to use.'
+    }
   ],
 
   beforeInstall: function(options: any) {
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
-      const parsedPath = dynamicPathParser(this.project, modulePath);
+      const cliConfig = CliConfig.fromProject();
+      const ngConfig = cliConfig && cliConfig.config;
+      const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+      const parsedPath = dynamicPathParser(this.project, modulePath, appConfig);
       this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
 
       if (!fs.existsSync(this.pathToModule)) {
@@ -33,16 +56,24 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const parsedPath = dynamicPathParser(this.project, entityName);
+    const cliConfig = CliConfig.fromProject();
+    const ngConfig = cliConfig && cliConfig.config;
+    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
   locals: function (options: any) {
+    const cliConfig = CliConfig.fromProject();
+    options.flat = options.flat !== undefined ?
+      options.flat :
+      cliConfig && cliConfig.get('defaults.service.flat');
+
     options.spec = options.spec !== undefined ?
       options.spec :
-      this.project.ngConfigObj.get('defaults.spec.service');
+      cliConfig && cliConfig.get('defaults.service.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,

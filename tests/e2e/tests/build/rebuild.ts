@@ -8,10 +8,15 @@ import {
 import {writeFile, writeMultipleFiles, appendToFile, expectFileToMatch} from '../../utils/fs';
 import {wait} from '../../utils/utils';
 import {request} from '../../utils/http';
+import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
   if (process.platform.startsWith('win')) {
+    return Promise.resolve();
+  }
+  // Skip this in ejected tests.
+  if (getGlobalVariable('argv').eject) {
     return Promise.resolve();
   }
 
@@ -71,7 +76,7 @@ export default function() {
         throw new Error('Expected webpack to create a new chunk, but did not.');
       }
     })
-    .then(() => wait(1000))
+    .then(() => wait(2000))
     // Change multiple files and check that all of them are invalidated and recompiled.
     .then(() => writeMultipleFiles({
       'src/app/app.module.ts': `
@@ -86,6 +91,7 @@ export default function() {
     }))
     .then(() => waitForAnyProcessOutputToMatch(
       /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))
+    .then(() => wait(2000))
     .then(() => request('http://localhost:4200/main.bundle.js'))
     .then((body) => {
       if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {

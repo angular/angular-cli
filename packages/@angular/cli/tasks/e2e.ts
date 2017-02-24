@@ -1,14 +1,22 @@
 import * as url from 'url';
 
 import { E2eTaskOptions } from '../commands/e2e';
+import { CliConfig } from '../models/config';
 import { requireProjectModule } from '../utilities/require-project-module';
+
 const Task = require('../ember-cli/lib/models/task');
+const SilentError = require('silent-error');
 
 
 export const E2eTask = Task.extend({
   run: function (e2eTaskOptions: E2eTaskOptions) {
+    const projectConfig = CliConfig.fromProject().config;
     const projectRoot = this.project.root;
     const protractorLauncher = requireProjectModule(projectRoot, 'protractor/built/launcher');
+
+    if (projectConfig.project && projectConfig.project.ejected) {
+      throw new SilentError('An ejected project cannot use the build command anymore.');
+    }
 
     return new Promise(function () {
       let promise = Promise.resolve();
@@ -35,6 +43,7 @@ export const E2eTask = Task.extend({
         const webdriverUpdate = requireProjectModule(projectRoot,
           'protractor/node_modules/webdriver-manager/built/lib/cmds/update');
         // run `webdriver-manager update --standalone false --gecko false --quiet`
+        // if you change this, update the command comment in prev line, and in `eject` task
         promise = promise.then(() => webdriverUpdate.program.run({
           standalone: false,
           gecko: false,

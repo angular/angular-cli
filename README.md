@@ -35,10 +35,11 @@ with NPM 3 or higher.
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [Generating a New Project](#generating-and-serving-an-angular2-project-via-a-development-server)
+* [Generating a New Project](#generating-and-serving-an-angular-project-via-a-development-server)
 * [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
 * [Updating Angular CLI](#updating-angular-cli)
 * [Development Hints for hacking on Angular CLI](#development-hints-for-hacking-on-angular-cli)
+* [Documentation](#documentation)
 * [License](#license)
 
 ## Installation
@@ -54,7 +55,7 @@ npm install -g @angular/cli
 ng help
 ```
 
-### Generating and serving an Angular2 project via a development server
+### Generating and serving an Angular project via a development server
 
 ```bash
 ng new PROJECT_NAME
@@ -100,11 +101,17 @@ Module    | `ng g module my-module`
 
 ### Updating Angular CLI
 
+If you're using Angular CLI `beta.28` or less, you need to uninstall `angular-cli` package. It should be done due to changing of package's name and scope from `angular-cli` to `@angular/cli`:
+```bash
+npm uninstall -g angular-cli
+npm uninstall --save-dev angular-cli
+```
+
 To update Angular CLI to a new version, you must update both the global package and your project's local package.
 
 Global package:
 ```bash
-npm uninstall -g angular-cli @angular/cli
+npm uninstall -g @angular/cli
 npm cache clean
 npm install -g @angular/cli@latest
 ```
@@ -114,14 +121,7 @@ Local project package:
 rm -rf node_modules dist # use rmdir on Windows
 npm install --save-dev @angular/cli@latest
 npm install
-ng update
 ```
-
-Running `ng update` will check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
-
-Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng update` finishes.
-
-**The main cause of errors after an update is failing to incorporate these updates into your code**.
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
 
@@ -161,6 +161,10 @@ You can also use `ng new foo --link-cli` to automatically link the `@angular/cli
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
 
+
+## Documentation
+
+The documentation for the Angular CLI is located in this repo's [wiki](https://github.com/angular/angular-cli/wiki).
 
 ## License
 

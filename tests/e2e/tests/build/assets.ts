@@ -7,9 +7,13 @@ import {
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
+import {getGlobalVariable} from '../../utils/env';
 
 
 export default function () {
+  // Disable parts of it in webpack tests.
+  const ejected = getGlobalVariable('argv').eject;
+
   return Promise.resolve()
     .then(_ => createDir('./src/folder'))
     .then(_ => createDir('./node_modules/some-package/'))
@@ -22,8 +26,8 @@ export default function () {
       './src/output-asset.txt': 'output-asset.txt',
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
     }))
-    // Add asset config in angular-cli.json.
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    // Add asset config in .angular-cli.json.
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['assets'] = [
         'folder',
@@ -44,7 +48,7 @@ export default function () {
     // .gitkeep shouldn't be copied.
     .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
     // Update app to test assets are present.
-    .then(_ => writeMultipleFiles({
+    .then(_ => !ejected && writeMultipleFiles({
       'src/app/app.component.ts': `
         import { Component } from '@angular/core';
         import { Http, Response } from '@angular/http';
@@ -73,17 +77,16 @@ export default function () {
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(() => {
+          beforeEach(async(() => {
             TestBed.configureTestingModule({
               imports: [
                 HttpModule
               ],
               declarations: [
                 AppComponent
-              ],
-            });
-            TestBed.compileComponents();
-          });
+              ]
+            }).compileComponents();
+          }));
 
           it('should create the app', async(() => {
             const fixture = TestBed.createComponent(AppComponent);
@@ -108,6 +111,6 @@ export default function () {
           });
         });`,
     }))
-    .then(() => ng('test', '--single-run'))
-    .then(() => ng('e2e', '--no-progress'));
+    .then(() => !ejected && ng('test', '--single-run'))
+    .then(() => !ejected && ng('e2e', '--no-progress'));
 }

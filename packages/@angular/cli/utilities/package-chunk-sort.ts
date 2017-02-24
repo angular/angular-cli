@@ -21,7 +21,7 @@ export function packageChunkSort(appConfig: any) {
 
   entryPoints.push(...['vendor', 'main']);
 
-  return function sort(left: any, right: any) {
+  function sort(left: any, right: any) {
     let leftIndex = entryPoints.indexOf(left.names[0]);
     let rightindex = entryPoints.indexOf(right.names[0]);
 
@@ -32,5 +32,10 @@ export function packageChunkSort(appConfig: any) {
     } else {
       return 0;
     }
-  };
+  }
+
+  // We need to list of entry points for the Ejected webpack config to work (we reuse the function
+  // defined above).
+  (sort as any).entryPoints = entryPoints;
+  return sort;
 }

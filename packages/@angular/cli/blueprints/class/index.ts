@@ -1,3 +1,6 @@
+import {getAppFromConfig} from '../../utilities/app-utils';
+import {CliConfig} from '../../models/config';
+
 const stringUtils = require('ember-cli-string-utils');
 const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
@@ -7,11 +10,24 @@ export default Blueprint.extend({
   description: '',
 
   availableOptions: [
-    { name: 'spec', type: Boolean }
+    {
+      name: 'spec',
+      type: Boolean,
+      description: 'Specifies if a spec file is generated.'
+    },
+    {
+      name: 'app',
+      type: String,
+      aliases: ['a'],
+      description: 'Specifies app name to use.'
+    }
   ],
 
   normalizeEntityName: function (entityName: string) {
-    const parsedPath = dynamicPathParser(this.project, entityName.split('.')[0]);
+    const cliConfig = CliConfig.fromProject();
+    const ngConfig = cliConfig && cliConfig.config;
+    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const parsedPath = dynamicPathParser(this.project, entityName.split('.')[0], appConfig);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
@@ -28,9 +44,10 @@ export default Blueprint.extend({
       this.fileName += '.' + classType.toLowerCase();
     }
 
+    const cliConfig = CliConfig.fromProject();
     options.spec = options.spec !== undefined ?
       options.spec :
-      this.project.ngConfigObj.get('defaults.spec.class');
+      cliConfig && cliConfig.get('defaults.class.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,

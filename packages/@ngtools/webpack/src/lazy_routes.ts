@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import {TypeScriptFileRefactor} from './refactor';
 
 
-function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
+function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
   if (node.kind == ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
@@ -47,8 +47,9 @@ export function findLazyRoutes(filePath: string,
     .map((routePath: string) => {
       const moduleName = routePath.split('#')[0];
       const resolvedModuleName: ts.ResolvedModuleWithFailedLookupLocations = moduleName[0] == '.'
-        ? { resolvedModule: { resolvedFileName: join(dirname(filePath), moduleName) + '.ts' },
-            failedLookupLocations: [] }
+        ? ({
+            resolvedModule: { resolvedFileName: join(dirname(filePath), moduleName) + '.ts' }
+          } as any)
         : ts.resolveModuleName(moduleName, filePath, program.getCompilerOptions(), host);
       if (resolvedModuleName.resolvedModule
           && resolvedModuleName.resolvedModule.resolvedFileName

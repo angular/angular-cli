@@ -5,7 +5,7 @@ import {getGlobalVariable} from './env';
 const packages = require('../../../lib/packages');
 
 
-const tsConfigPath = 'src/tsconfig.json';
+const tsConfigPath = 'src/tsconfig.app.json';
 
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
@@ -32,9 +32,11 @@ export function ngServe(...args: string[]) {
 
 
 export function createProject(name: string, ...args: string[]) {
+  const argv: any = getGlobalVariable('argv');
+
   return Promise.resolve()
     .then(() => process.chdir(getGlobalVariable('tmp-root')))
-    .then(() => ng('new', name, '--skip-install', ...args))
+    .then(() => ng('new', name, '--skip-install', ...(argv['ng4'] ? ['--ng4'] : []), ...args))
     .then(() => process.chdir(name))
     .then(() => updateJsonFile('package.json', json => {
       Object.keys(packages).forEach(pkgName => {
@@ -42,7 +44,6 @@ export function createProject(name: string, ...args: string[]) {
       });
     }))
     .then(() => {
-      const argv: any = getGlobalVariable('argv');
       if (argv.nightly || argv['ng-sha']) {
         const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
         return updateJsonFile('package.json', json => {

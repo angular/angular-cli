@@ -1,0 +1,23 @@
+{
+  "maxLength": 100,
+  "types": [
+    "build",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "refactor",
+    "style",
+    "test"
+  ],
+  "scopes": [
+    "@angular/cli",
+    "@ngtools/json-schema",
+    "@ngtools/logger",
+    "@ngtools/webpack",
+
+    "packaging",
+    "changelog"
+  ]
+}

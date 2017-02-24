@@ -1,30 +1,26 @@
-import * as denodeify from 'denodeify';
 import { BuildOptions } from '../models/build-options';
 import { baseBuildCommandOptions } from './build';
 import { CliConfig } from '../models/config';
 import { Version } from '../upgrade/version';
 import { ServeTaskOptions } from './serve';
+import { checkPort } from '../utilities/check-port';
+import { overrideOptions } from '../utilities/override-options';
 
-const SilentError = require('silent-error');
-const PortFinder = require('portfinder');
 const Command = require('../ember-cli/lib/models/command');
-const getPort = <any>denodeify(PortFinder.getPort);
-
-PortFinder.basePort = 49152;
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const defaultPort = process.env.PORT || config.get('defaults.serve.port');
 const defaultHost = config.get('defaults.serve.host');
+const defaultSsl = config.get('defaults.serve.ssl');
+const defaultSslKey = config.get('defaults.serve.sslKey');
+const defaultSslCert = config.get('defaults.serve.sslCert');
 
 export interface ServeTaskOptions extends BuildOptions {
   port?: number;
   host?: string;
   proxyConfig?: string;
   liveReload?: boolean;
-  liveReloadHost?: string;
-  liveReloadPort?: number;
-  liveReloadBaseUrl?: string;
-  liveReloadLiveCss?: boolean;
+  liveReloadClient?: string;
   ssl?: boolean;
   sslKey?: string;
   sslCert?: string;
@@ -33,25 +29,76 @@ export interface ServeTaskOptions extends BuildOptions {
 }
 
 // Expose options unrelated to live-reload to other commands that need to run serve
-export const baseServeCommandOptions: any = baseBuildCommandOptions.concat([
-  { name: 'port', type: Number, default: defaultPort, aliases: ['p'] },
+export const baseServeCommandOptions: any = overrideOptions([
+  ...baseBuildCommandOptions,
+  {
+    name: 'port',
+    type: Number,
+    default: defaultPort,
+    aliases: ['p'],
+    description: 'Port to listen to for serving.'
+  },
   {
     name: 'host',
     type: String,
     default: defaultHost,
     aliases: ['H'],
-    description: `Listens only on ${defaultHost} by default`
+    description: `Listens only on ${defaultHost} by default.`
   },
-  { name: 'proxy-config', type: 'Path', aliases: ['pc'] },
-  { name: 'ssl', type: Boolean, default: false },
-  { name: 'ssl-key', type: String, default: 'ssl/server.key' },
-  { name: 'ssl-cert', type: String, default: 'ssl/server.crt' },
+  {
+    name: 'proxy-config',
+    type: 'Path',
+    aliases: ['pc'],
+    description: 'Proxy configuration file.'
+  },
+  {
+    name: 'ssl',
+    type: Boolean,
+    default: defaultSsl,
+    description: 'Serve using HTTPS.'
+  },
+  {
+    name: 'ssl-key',
+    type: String,
+    default: defaultSslKey,
+    description: 'SSL key to use for serving HTTPS.'
+  },
+  {
+    name: 'ssl-cert',
+    type: String,
+    default: defaultSslCert,
+    description: 'SSL certificate to use for serving HTTPS.'
+  },
   {
     name: 'open',
     type: Boolean,
     default: false,
     aliases: ['o'],
-    description: 'Opens the url in default browser',
+    description: 'Opens the url in default browser.',
+  },
+  {
+    name: 'live-reload',
+    type: Boolean,
+    default: true,
+    aliases: ['lr'],
+    description: 'Whether to reload the page on change, using live-reload.'
+  },
+  {
+    name: 'live-reload-client',
+    type: String,
+    description: 'Specify the URL that the live reload browser client will use.'
+  },
+  {
+    name: 'hmr',
+    type: Boolean,
+    default: false,
+    description: 'Enable hot module replacement.',
+  }
+], [
+  {
+    name: 'watch',
+    default: true,
+    description: 'Rebuild on change.'
   }
 ]);
 
@@ -60,96 +107,24 @@ const ServeCommand = Command.extend({
   description: 'Builds and serves your app, rebuilding on file changes.',
   aliases: ['server', 's'],
 
-  availableOptions: baseServeCommandOptions.concat([
-    { name: 'live-reload', type: Boolean, default: true, aliases: ['lr'] },
-    {
-      name: 'live-reload-host',
-      type: String,
-      aliases: ['lrh'],
-      description: 'Defaults to host'
-    },
-    {
-      name: 'live-reload-base-url',
-      type: String,
-      aliases: ['lrbu'],
-      description: 'Defaults to baseURL'
-    },
-    {
-      name: 'live-reload-port',
-      type: Number,
-      aliases: ['lrp'],
-      description: '(Defaults to port number within [49152...65535])'
-    },
-    {
-      name: 'live-reload-live-css',
-      type: Boolean,
-      default: true,
-      description: 'Whether to live reload CSS (default true)'
-    },
-    {
-      name: 'hmr',
-      type: Boolean,
-      default: false,
-      description: 'Enable hot module replacement',
-    }
-  ]),
+  availableOptions: baseServeCommandOptions,
 
   run: function (commandOptions: ServeTaskOptions) {
     const ServeTask = require('../tasks/serve').default;
 
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
-    commandOptions.liveReloadHost = commandOptions.liveReloadHost || commandOptions.host;
+    return checkPort(commandOptions.port, commandOptions.host, defaultPort)
+      .then(port => {
+        commandOptions.port = port;
 
-    return checkExpressPort(commandOptions)
-      .then(() => autoFindLiveReloadPort(commandOptions))
-      .then((opts: ServeTaskOptions) => {
         const serve = new ServeTask({
           ui: this.ui,
           project: this.project,
         });
 
-        return serve.run(opts);
+        return serve.run(commandOptions);
       });
   }
 });
-
-function checkExpressPort(commandOptions: ServeTaskOptions) {
-  return getPort({ port: commandOptions.port, host: commandOptions.host })
-    .then((foundPort: number) => {
-
-      if (commandOptions.port !== foundPort && commandOptions.port !== 0) {
-        throw new SilentError(
-          `Port ${commandOptions.port} is already in use. Use '--port' to specify a different port.`
-        );
-      }
-
-      // otherwise, our found port is good
-      commandOptions.port = foundPort;
-      return commandOptions;
-
-    });
-}
-
-function autoFindLiveReloadPort(commandOptions: ServeTaskOptions) {
-  return getPort({ port: commandOptions.liveReloadPort, host: commandOptions.liveReloadHost })
-    .then((foundPort: number) => {
-
-      // if live reload port matches express port, try one higher
-      if (foundPort === commandOptions.port) {
-        commandOptions.liveReloadPort = foundPort + 1;
-        return autoFindLiveReloadPort(commandOptions);
-      }
-
-      // port was already open
-      if (foundPort === commandOptions.liveReloadPort) {
-        return commandOptions;
-      }
-
-      // use found port as live reload port
-      commandOptions.liveReloadPort = foundPort;
-      return commandOptions;
-
-    });
-}
 
 export default ServeCommand;

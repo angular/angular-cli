@@ -1,11 +1,22 @@
-const Task = require('../ember-cli/lib/models/task');
-import { TestOptions } from '../commands/test';
 import * as path from 'path';
+
+import { TestOptions } from '../commands/test';
+import { CliConfig } from '../models/config';
 import { requireProjectModule } from '../utilities/require-project-module';
+
+const Task = require('../ember-cli/lib/models/task');
+const SilentError = require('silent-error');
+
 
 export default Task.extend({
   run: function (options: TestOptions) {
+    const projectConfig = CliConfig.fromProject().config;
     const projectRoot = this.project.root;
+
+    if (projectConfig.project && projectConfig.project.ejected) {
+      throw new SilentError('An ejected project cannot use the build command anymore.');
+    }
+
     return new Promise((resolve) => {
       const karma = requireProjectModule(projectRoot, 'karma');
       const karmaConfig = path.join(projectRoot, options.config ||
@@ -21,7 +32,9 @@ export default Task.extend({
       karmaOptions.angularCli = {
         codeCoverage: options.codeCoverage,
         sourcemap: options.sourcemap,
-        progress: options.progress
+        progress: options.progress,
+        poll: options.poll,
+        app: options.app
       };
 
       // Assign additional karmaConfig options to the local ngapp config
