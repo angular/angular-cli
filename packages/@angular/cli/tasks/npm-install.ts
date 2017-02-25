@@ -13,7 +13,7 @@ export default Task.extend({
 
     return new Promise(function(resolve, reject) {
       ui.writeLine(chalk.green(`Installing packages for tooling via ${packageManager}.`));
-      exec(`${packageManager} install`,
+      exec(`${packageManager} --quiet install`,
         (err: NodeJS.ErrnoException, _stdout: string, stderr: string) => {
         if (err) {
           ui.writeLine(stderr);
