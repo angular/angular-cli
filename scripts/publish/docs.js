@@ -24,20 +24,20 @@ function execute(command) {
 }
 
 function readFiles(directory, filelist) {
-  if(directory[directory.length - 1] != '/') {
-    directory = directory.concat('/');
+  if(directory[directory.length - 1] != `${path.sep}`) {
+    directory = directory.concat(`${path.sep}`);
   }
 
   const files = fs.readdirSync(directory);
   filelist = filelist || [];
   files.forEach((file) => {
     if (fs.statSync(directory + file).isDirectory()) {
-      filelist = readFiles(directory + file + '/', filelist);
+      filelist = readFiles(directory + file + `${path.sep}`, filelist);
     } else {
       const originalPath = directory + file;
       const newPath = path.join(outputPath, originalPath
-        .replace(documentationPath + '/', '')
-        .replace('/', '-'));
+        .replace(documentationPath + `${path.sep}`, '')
+        .replace(`${path.sep}`, '-'));
 
       filelist.push({ originalPath, newPath });
     }
@@ -81,8 +81,11 @@ function createFiles() {
 
 function checkNameLinks(files) {
   return files.reduce((pValue, cValue) => {
-    const oldName = cValue.originalPath.split('/').slice(-1).pop().replace('.md', '');
-    const newName = '(' + cValue.newPath.split('/').slice(-1).pop().replace('.md', '') + ')';
+    const oldName = cValue.originalPath
+        .replace(documentationPath + `${path.sep}`, '')
+        .replace('.md', '')
+        .replace(`${path.sep}`, '/')
+    const newName = '(' + cValue.newPath.split(`${path.sep}`).slice(-1).pop().replace('.md', '') + ')';
     if (oldName !== newName) {
       pValue.push({
         oldName,
