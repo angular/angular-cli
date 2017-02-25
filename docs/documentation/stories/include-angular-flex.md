@@ -17,7 +17,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 @NgModule({
   imports: [
     ...
-    FlexLayoutModule.forRoot()
+    FlexLayoutModule
   ],
   ...
 })
