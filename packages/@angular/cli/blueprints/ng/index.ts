@@ -1,3 +1,5 @@
+import {CliConfig} from '../../models/config';
+
 const Blueprint   = require('../../ember-cli/lib/models/blueprint');
 const path        = require('path');
 const stringUtils = require('ember-cli-string-utils');
@@ -71,6 +73,12 @@ export default Blueprint.extend({
 
     if (this.options && this.options.skipTests) {
       fileList = fileList.filter(p => p.indexOf('app.component.spec.ts') < 0);
+    }
+
+    const cliConfig = CliConfig.fromProject();
+    const ngConfig = cliConfig && cliConfig.config;
+    if (!ngConfig || ngConfig.packageManager != 'yarn') {
+      fileList = fileList.filter(p => p.indexOf('yarn.lock') < 0);
     }
 
     return fileList;
