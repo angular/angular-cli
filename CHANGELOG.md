@@ -1,5 +1,5 @@
-<a name="1.0.0-beta.33"></a>
-# [1.0.0-beta.33](https://github.com/angular/angular-cli/compare/v1.0.0-beta.32...v1.0.0-beta.33) (2017-02-25)
+<a name="1.0.0-rc.0"></a>
+# [1.0.0-rc.0](https://github.com/angular/angular-cli/compare/v1.0.0-beta.32...v1.0.0-rc.0) (2017-02-25)
 
 
 ### Bug Fixes
