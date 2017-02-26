@@ -24,9 +24,7 @@ export default Blueprint.extend({
   ],
 
   normalizeEntityName: function (entityName: string) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName.split('.')[0], appConfig);
 
     this.dynamicPath = parsedPath;
@@ -44,10 +42,8 @@ export default Blueprint.extend({
       this.fileName += '.' + classType.toLowerCase();
     }
 
-    const cliConfig = CliConfig.fromProject();
     options.spec = options.spec !== undefined ?
-      options.spec :
-      cliConfig && cliConfig.get('defaults.class.spec');
+      options.spec : CliConfig.getValue('defaults.class.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,

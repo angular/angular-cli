@@ -80,7 +80,6 @@ const E2eCommand = Command.extend({
   ]),
   run: function (commandOptions: E2eTaskOptions) {
     const E2eTask = require('../tasks/e2e').E2eTask;
-    this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();
 
     const e2eTask = new E2eTask({
       ui: this.ui,

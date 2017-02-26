@@ -22,9 +22,7 @@ export default Blueprint.extend({
   ],
 
   normalizeEntityName: function (entityName: string) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
@@ -32,14 +30,12 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
-    const cliConfig = CliConfig.fromProject();
-
     const interfaceType = options.args[2];
     this.fileName = stringUtils.dasherize(options.entity.name);
     if (interfaceType) {
       this.fileName += '.' + interfaceType;
     }
-    const prefix = cliConfig && cliConfig.get('defaults.interface.prefix');
+    const prefix = CliConfig.getValue('defaults.interface.prefix');
     return {
       dynamicPath: this.dynamicPath.dir,
       flat: options.flat,
