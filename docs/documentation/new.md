@@ -12,7 +12,7 @@ Default applications are created in a directory of the same name, with an initia
 
 `--verbose` (`-v`) adds more details to output logging
 
-`--link-cli` (`-lc`) automatically link the `@angular/cli` package.
+`--link-cli` (`-lc`) automatically link the `@angular/cli` package
 
 `--ng4` create a project with Angular 4 in the template
 
