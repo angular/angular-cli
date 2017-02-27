@@ -1,6 +1,6 @@
 {
   "name": "@ngtools/json-schema",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Schema validating and reading for configurations, similar to Angular CLI config.",
   "main": "./src/index.js",
   "typings": "src/index.d.ts",

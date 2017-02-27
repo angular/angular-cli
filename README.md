@@ -7,24 +7,17 @@
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
 [![npm][npm-badge]][npm-badge-url]
 
-Prototype of a CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
+CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
 
-This project is very much still a work in progress.
+The CLI is now in Release Candidate (RC).
+If you are updating from a beta version, check out our [RC.0 Update Guide]
+(https://github.com/angular/angular-cli/wiki/stories-rc.0-update).
 
-The CLI is now in beta.
-If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
+If you wish to collaborate, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
 Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).
-
-## Webpack update
-
-We changed the build system between beta.10 and beta.14, from SystemJS to Webpack.
-And with it comes a lot of benefits.
-To take advantage of these, your app built with the old beta will need to migrate.
-
-You can update your `beta.10` projects to `beta.14` by following [these instructions](https://github.com/angular/angular-cli/wiki/Upgrading-from-Beta.10-to-Beta.14).
 
 ## Prerequisites
 
