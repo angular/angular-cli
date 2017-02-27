@@ -91,9 +91,9 @@ if (require('../package.json')['name'] == 'angular-cli'
 const packageJsonProjectPath = findUp('package.json', process.cwd(), true);
 if (packageJsonProjectPath && fs.existsSync(packageJsonProjectPath)) {
   const packageJsonProject = require(packageJsonProjectPath);
-  const hasOldDep = !!packageJsonProject.dependencies['angular-cli'];
-  const hasOldDevDep = !!packageJsonProject.devDependencies['angular-cli'];
-  const hasDevDep = !!packageJsonProject.devDependencies['@angular/cli'];
+  const hasOldDep = !!(packageJsonProject.dependencies && packageJsonProject.dependencies['angular-cli']);
+  const hasOldDevDep = !!(packageJsonProject.devDependencies && packageJsonProject.devDependencies['angular-cli']);
+  const hasDevDep = !!(packageJsonProject.devDependencies && packageJsonProject.devDependencies['@angular/cli']);
 
   if (hasOldDep || hasOldDevDep || !hasDevDep) {
     const warnings = [
