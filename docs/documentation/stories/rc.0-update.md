@@ -316,7 +316,6 @@ Packages in `dependencies`:
 - `@types/node` was updated to `~6.0.60`
 - `codelyzer` was updated to `~2.0.0`
 - `jasmine-core` was updated to `~2.5.2`
-- `jasmine-spec-reporter` was **removed**
 - `karma` was updated to `~1.4.1`
 - `karma-chrome-launcher` was updated to `~2.0.0`
 - `karma-cli` was updated to `~1.0.1`
@@ -447,5 +446,3 @@ Add these new rules:
 ```
 
 Update `no-inferrable-types` to `"no-inferrable-types": [true, "ignore-params"]`.
-
-
