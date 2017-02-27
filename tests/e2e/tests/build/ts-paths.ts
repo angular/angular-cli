@@ -13,6 +13,10 @@ export default function() {
       ],
       '@shared/*': [
         'app/shared/*'
+      ],
+      '*': [
+        '*',
+        'app/shared/*'
       ]
     };
   })
@@ -25,12 +29,14 @@ export default function() {
     import { meaning } from 'app/shared/meaning';
     import { meaning as meaning2 } from '@shared';
     import { meaning as meaning3 } from '@shared/meaning';
+    import { meaning as meaning4 } from 'meaning';
 
     // need to use imports otherwise they are ignored and
     // no error is outputted, even if baseUrl/paths don't work
     console.log(meaning)
     console.log(meaning2)
     console.log(meaning3)
+    console.log(meaning4)
   `))
   .then(() => ng('build'));
 }
