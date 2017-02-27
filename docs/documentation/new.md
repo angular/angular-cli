@@ -10,9 +10,19 @@ Default applications are created in a directory of the same name, with an initia
 ## Options
 `--dry-run` (`-d`) run through without making any changes
 
+`--verbose` (`-v`) adds more details to output logging
+
+`--link-cli` (`-lc`) automatically link the `@angular/cli` package.
+
+`--ng4` create a project with Angular 4 in the template
+
 `--skip-install` (`-si`) skip installing packages
 
 `--skip-git` (`-sg`) skip initializing a git repository
+
+`--skip-tests` (`-sg`) skip creating spec files
+
+`--skip-commit` (`-sg`) skip committing the first commit to git
 
 `--directory` (`-dir`) the directory name to create the app in
 
