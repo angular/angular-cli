@@ -111,7 +111,7 @@ npm install -g @angular/cli@latest
 
 Local project package:
 ```bash
-rm -rf node_modules dist # use rmdir on Windows
+rm -rf node_modules dist # use rmdir /S/Q node_modules dist in Windows Command Prompt; use rm -r -fo node_modules,dist in Windows PowerShell
 npm install --save-dev @angular/cli@latest
 npm install
 ```
