@@ -7,8 +7,10 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "target": "es5",
     "lib": [
-      "es2016"
+      "es2016",
+      "dom"
     ]
   }
 }
