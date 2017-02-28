@@ -1,22 +1,18 @@
 {<% if (ng4) { %>
   "extends": "<%= relativeRootPath %>/tsconfig.json",
-  "compilerOptions": {
-  "lib": [
-    "es2016",
-    "dom"
-  ],<% } else { %>
+  "compilerOptions": {<% } else { %>
   "compilerOptions": {
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "target": "es5",
     "lib": [
       "es2016",
       "dom"
     ],<% } %>
     "outDir": "<%= relativeRootPath %>/out-tsc/app",
-    "target": "es5",
     "module": "es2015",
     "baseUrl": "",
     "types": []
