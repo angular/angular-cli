@@ -2,8 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 
-import {__NGTOOLS_PRIVATE_API_2} from '@angular/compiler-cli';
-import {AngularCompilerOptions} from '@angular/tsc-wrapped';
+const {__NGTOOLS_PRIVATE_API_2} = require('@angular/compiler-cli');
 const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 
 import {WebpackResourceLoader} from './resource_loader';
@@ -40,7 +39,7 @@ export class AotPlugin implements Tapable {
   private _options: AotPluginOptions;
 
   private _compilerOptions: ts.CompilerOptions;
-  private _angularCompilerOptions: AngularCompilerOptions;
+  private _angularCompilerOptions: any;
   private _program: ts.Program;
   private _rootFilePath: string[];
   private _compilerHost: WebpackCompilerHost;
