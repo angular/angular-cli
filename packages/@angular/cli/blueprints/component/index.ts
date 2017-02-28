@@ -83,9 +83,7 @@ export default Blueprint.extend({
   ],
 
   beforeInstall: function (options: any) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
@@ -108,9 +106,7 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
@@ -131,37 +127,25 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-
-    this.styleExt = 'css';
-    if (ngConfig && ngConfig.defaults && ngConfig.defaults.styleExt) {
-      this.styleExt = ngConfig.defaults.styleExt;
-    }
+    this.styleExt = CliConfig.getValue('defaults.styleExt') || 'css';
 
     options.inlineStyle = options.inlineStyle !== undefined ?
-      options.inlineStyle :
-      cliConfig && cliConfig.get('defaults.component.inlineStyle');
+      options.inlineStyle : CliConfig.getValue('defaults.component.inlineStyle');
 
     options.inlineTemplate = options.inlineTemplate !== undefined ?
-      options.inlineTemplate :
-      cliConfig && cliConfig.get('defaults.component.inlineTemplate');
+      options.inlineTemplate : CliConfig.getValue('defaults.component.inlineTemplate');
 
     options.flat = options.flat !== undefined ?
-      options.flat :
-      cliConfig && cliConfig.get('defaults.component.flat');
+      options.flat : CliConfig.getValue('defaults.component.flat');
 
     options.spec = options.spec !== undefined ?
-      options.spec :
-      cliConfig && cliConfig.get('defaults.component.spec');
+      options.spec : CliConfig.getValue('defaults.component.spec');
 
     options.viewEncapsulation = options.viewEncapsulation !== undefined ?
-      options.viewEncapsulation :
-      cliConfig && cliConfig.get('defaults.component.viewEncapsulation');
+      options.viewEncapsulation : CliConfig.getValue('defaults.component.viewEncapsulation');
 
     options.changeDetection = options.changeDetection !== undefined ?
-      options.changeDetection :
-      cliConfig && cliConfig.get('defaults.component.changeDetection');
+      options.changeDetection : CliConfig.getValue('defaults.component.changeDetection');
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
@@ -195,9 +179,7 @@ export default Blueprint.extend({
   },
 
   fileMapTokens: function (options: any) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
 
     // Return custom template variables here.
     return {

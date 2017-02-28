@@ -17,7 +17,7 @@ export default Blueprint.extend({
   ],
 
   normalizeEntityName: function (entityName: string) {
-    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
