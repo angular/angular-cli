@@ -1,4 +1,3 @@
-import {ResourceLoader} from '@angular/compiler';
 import {readFileSync} from 'fs';
 import * as vm from 'vm';
 import * as path from 'path';
@@ -10,7 +9,7 @@ const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
 
 
-export class WebpackResourceLoader implements ResourceLoader {
+export class WebpackResourceLoader {
   private _context: string;
   private _uniqueId = 0;
 
