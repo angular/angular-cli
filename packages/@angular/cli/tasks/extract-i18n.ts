@@ -5,7 +5,6 @@ import * as rimraf from 'rimraf';
 const Task = require('../ember-cli/lib/models/task');
 
 import {XI18nWebpackConfig} from '../models/webpack-xi18n-config';
-import {CliConfig} from '../models/config';
 import {getAppFromConfig} from '../utilities/app-utils';
 
 export const Extracti18nTask = Task.extend({
@@ -13,7 +12,7 @@ export const Extracti18nTask = Task.extend({
 
     const project = this.project;
 
-    const appConfig = getAppFromConfig(CliConfig.fromProject().config.apps, runTaskOptions.app);
+    const appConfig = getAppFromConfig(runTaskOptions.app);
 
     const buildDir = '.tmp';
     const genDir = runTaskOptions.outputPath || appConfig.root;

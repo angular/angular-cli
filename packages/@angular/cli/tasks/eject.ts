@@ -401,7 +401,7 @@ export default Task.extend({
     const project = this.cliProject;
     const cliConfig = CliConfig.fromProject();
     const config = cliConfig.config;
-    const appConfig = getAppFromConfig(config.apps, runTaskOptions.app);
+    const appConfig = getAppFromConfig(runTaskOptions.app);
 
     const tsConfigPath = path.join(process.cwd(), appConfig.root, appConfig.tsconfig);
     const outputPath = runTaskOptions.outputPath || appConfig.outDir;

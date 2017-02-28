@@ -43,9 +43,7 @@ export default Blueprint.extend({
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
-      const cliConfig = CliConfig.fromProject();
-      const ngConfig = cliConfig && cliConfig.config;
-      const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+      const appConfig = getAppFromConfig(this.options.app);
       const parsedPath = dynamicPathParser(this.project, modulePath, appConfig);
       this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
 
@@ -56,9 +54,7 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
@@ -66,14 +62,11 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
-    const cliConfig = CliConfig.fromProject();
     options.flat = options.flat !== undefined ?
-      options.flat :
-      cliConfig && cliConfig.get('defaults.service.flat');
+      options.flat : CliConfig.getValue('defaults.service.flat');
 
     options.spec = options.spec !== undefined ?
-      options.spec :
-      cliConfig && cliConfig.get('defaults.service.spec');
+      options.spec : CliConfig.getValue('defaults.service.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,

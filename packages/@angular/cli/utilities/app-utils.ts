@@ -1,6 +1,7 @@
-import {CliConfig as CliConfigInterface} from '../lib/config/schema';
+import { CliConfig } from '../models/config';
 
-export function getAppFromConfig(apps: CliConfigInterface['apps'], nameOrIndex: String) {
+export function getAppFromConfig(nameOrIndex?: String) {
+  const apps: any[] = CliConfig.getValue('apps');
   let app = apps[0];
   if (nameOrIndex) {
     if (nameOrIndex.match(/^[0-9]+$/)) {

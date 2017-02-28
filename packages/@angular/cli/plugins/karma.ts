@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as glob from 'glob';
 
-import { CliConfig } from '../models/config';
 import { Pattern } from './glob-copy-webpack-plugin';
 import { extraEntryParser } from '../models/webpack-configs/utils';
 import { WebpackTestConfig, WebpackTestOptions } from '../models/webpack-test-config';
@@ -41,8 +40,7 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
 }
 
 const init: any = (config: any) => {
-  const apps = CliConfig.fromProject().config.apps;
-  const appConfig = getAppFromConfig(apps, config.angularCli.app);
+  const appConfig = getAppFromConfig(config.angularCli.app);
   const appRoot = path.join(config.basePath, appConfig.root);
   const testConfig: WebpackTestOptions = Object.assign({
     environment: 'dev',

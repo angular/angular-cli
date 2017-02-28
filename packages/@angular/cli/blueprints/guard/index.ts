@@ -35,9 +35,7 @@ export default Blueprint.extend({
   ],
 
   beforeInstall: function(options: any) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
@@ -51,9 +49,7 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
@@ -61,12 +57,11 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
-    const cliConfig = CliConfig.fromProject();
     options.flat = options.flat !== undefined ?
-      options.flat : cliConfig.get('defaults.guard.flat');
+      options.flat : CliConfig.getValue('defaults.guard.flat');
 
     options.spec = options.spec !== undefined ?
-      options.spec : cliConfig.get('defaults.guard.spec');
+      options.spec : CliConfig.getValue('defaults.guard.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,

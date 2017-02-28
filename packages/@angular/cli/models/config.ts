@@ -30,6 +30,22 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
         || findUp(configNames, __dirname);
   }
 
+  static getValue(jsonPath: string): any {
+    let value;
+
+    const projectConfig = CliConfig.fromProject();
+    if (projectConfig) {
+      value = projectConfig.get(jsonPath);
+    } else {
+      const globalConfig = CliConfig.fromGlobal();
+      if (globalConfig) {
+        value = globalConfig.get(jsonPath);
+      }
+    }
+
+    return value;
+  }
+
   static globalConfigFilePath(): string {
     let globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
     const altGlobalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME_ALT);

@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import {CliConfig} from '../models/config';
 
 const chalk = require('chalk');
 const EmberGenerateCommand = require('../ember-cli/lib/commands/generate');
@@ -26,7 +25,6 @@ const GenerateCommand = EmberGenerateCommand.extend({
 
     // map the blueprint name to allow for aliases
     rawArgs[0] = mapBlueprintName(rawArgs[0]);
-    this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();
 
     if (rawArgs[0] !== '--help' &&
       !fs.existsSync(path.join(__dirname, '..', 'blueprints', rawArgs[0]))) {
