@@ -15,7 +15,7 @@
  - [Bootstrap](stories/include-bootstrap)
  - [Font Awesome](stories/include-font-awesome)
  - [Moving Into the CLI](stories/moving-into-the-cli)
- - [Movine Out of the CLI](stories/moving-out-of-the-cli)
+ - [Moving Out of the CLI](stories/moving-out-of-the-cli)
  - [Proxy](stories/proxy)
  - [Routing](stories/routing)
  - [3rd Party Lib](stories/third-party-lib)
