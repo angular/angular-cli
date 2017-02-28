@@ -464,6 +464,9 @@ export default Task.extend({
 
         // Add new dependencies based on our dependencies.
         const ourPackageJson = require('../package.json');
+        if (!packageJson['devDependencies']) {
+          packageJson['devDependencies'] = {};
+        }
         packageJson['devDependencies']['webpack-dev-server']
             = ourPackageJson['dependencies']['webpack-dev-server'];
 
