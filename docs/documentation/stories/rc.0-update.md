@@ -144,6 +144,14 @@ targets are listed:
 },
 ```
 
+The `tsconfig` entry under `apps` should be changed to `tsconfig.app.json` and a new `testTsconfig`
+was added and should be set to `tsconfig.spec.json`:
+
+```
+"tsconfig": "tsconfig.app.json",
+"testTsconfig": "tsconfig.spec.json",
+```
+
 ### Generator defaults
 
 Now you can list generator defaults per generator ([#4389](https://github.com/angular/angular-cli/pull/4389))
