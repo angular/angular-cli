@@ -66,7 +66,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   urlPlugin[postcssArgs] = postcssUrlOptions;
 
   // PostCSS plugins.
-  const postCssPlugins = [autoprefixer(), urlPlugin].concat(
+  const postCssPlugins = [autoprefixer({remove: false}), urlPlugin].concat(
     buildOptions.target === 'production' ? [cssnanoPlugin] : []
   );
 
