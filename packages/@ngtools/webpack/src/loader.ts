@@ -374,7 +374,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }) {
       })
       .catch(err => cb(err));
   } else {
-    const options = loaderUtils.parseQuery(this.query);
+    const options = loaderUtils.getOptions(this) || {};
     const tsConfigPath = options.tsConfigPath;
     const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
 
