@@ -11,7 +11,7 @@ export default Blueprint.extend({
   availableOptions: [
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
-    { name: 'style', type: String, default: 'css' },
+    { name: 'style', type: String },
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
@@ -27,6 +27,10 @@ export default Blueprint.extend({
 
   locals: function(options: any) {
     this.styleExt = options.style === 'stylus' ? 'styl' : options.style;
+    if (!options.style) {
+      this.styleExt = CliConfig.getValue('defaults.styleExt') || 'css';
+    }
+
     this.version = require(path.resolve(__dirname, '../../package.json')).version;
     // set this.tests to opposite of skipTest options,
     // meaning if tests are being skipped then the default.spec.BLUEPRINT will be false

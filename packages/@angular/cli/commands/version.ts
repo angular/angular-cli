@@ -76,8 +76,8 @@ const VersionCommand = Command.extend({
   getDependencyVersions: function(pkg: any, prefix: string): any {
     const modules: any = {};
 
-    Object.keys(pkg.dependencies || {})
-      .concat(Object.keys(pkg.devDependencies || {}))
+    Object.keys(pkg['dependencies'] || {})
+      .concat(Object.keys(pkg['devDependencies'] || {}))
       .filter(depName => depName && depName.startsWith(prefix))
       .forEach(key => modules[key] = this.getVersion(key));
 

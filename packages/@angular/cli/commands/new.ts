@@ -136,7 +136,6 @@ const NewCommand = Command.extend({
     }
 
     validateProjectName(packageName);
-
     commandOptions.name = packageName;
     if (commandOptions.dryRun) {
       commandOptions.skipGit = true;
