@@ -97,6 +97,10 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
       (decl.moduleSpecifier as ts.StringLiteral).text,
       refactor.fileName, program.getCompilerOptions(), host);
     if (!resolvedModule.resolvedModule || !resolvedModule.resolvedModule.resolvedFileName) {
+      throw new Error('Could not resolve module name. Is '
+        + (decl.moduleSpecifier as ts.StringLiteral).text
+        + ' installed?');
+
       return null;
     }
 
