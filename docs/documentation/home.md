@@ -54,4 +54,4 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 
 ### Additional Information
 There are several [stories](stories) which will walk you through setting up
-additional aspects of Angular applciations.
+additional aspects of Angular applications.
