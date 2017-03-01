@@ -21,6 +21,8 @@ export const Extracti18nTask = Task.extend({
       genDir,
       buildDir,
       i18nFormat: runTaskOptions.i18nFormat,
+      locale: runTaskOptions.locale,
+      outFile: runTaskOptions.outFile,
       verbose: runTaskOptions.verbose,
       progress: runTaskOptions.progress,
       app: runTaskOptions.app,
