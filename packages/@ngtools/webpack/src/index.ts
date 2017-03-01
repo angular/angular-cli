@@ -1,3 +1,4 @@
+// @ignoreDep @angular/compiler-cli
 import * as path from 'path';
 
 let version;

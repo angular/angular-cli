@@ -11,6 +11,7 @@ const path = require('path');
 
 const IMPORT_RE = /(^|\n)\s*import\b(?:.|\n)*?\'[^\']*\'/g;
 const REQUIRE_RE = /\brequire\('[^)]+?'\)/g;
+const IGNORE_RE = /\s+@ignoreDep\s+\S+/g;
 const NODE_PACKAGES = [
   'child_process',
   'fs',
@@ -72,6 +73,16 @@ function listRequiredModules(source) {
     });
 }
 
+function listIgnoredModules(source) {
+  const ignored = source.match(IGNORE_RE);
+  return (ignored || [])
+    .map(match => {
+      const m = match.match(/@ignoreDep\s+(\S+)/);
+      return m && m[1];
+    })
+    .filter(x => !!x);
+}
+
 function reportMissingDependencies(missingDeps) {
   if (missingDeps.length == 0) {
     console.log(chalk.green('  no dependency missing from package.json.'));
@@ -110,6 +121,10 @@ for (const packageName of Object.keys(packages)) {
       .forEach(modulePath => importMap[modulePath] = true);
     listRequiredModules(source)
       .forEach(modulePath => importMap[modulePath] = true);
+    listIgnoredModules(source)
+      .forEach(modulePath => {
+        delete importMap[modulePath];
+      });
   });
 
   const dependencies = Object.keys(importMap)

@@ -1,3 +1,4 @@
+// @ignoreDep @angular/compiler-cli
 import {CodeGenerator} from '@angular/compiler-cli';
 
 
