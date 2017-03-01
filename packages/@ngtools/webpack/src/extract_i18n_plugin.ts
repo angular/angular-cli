@@ -1,3 +1,4 @@
+// @ignoreDep @angular/compiler-cli
 import * as ts from 'typescript';
 import * as path from 'path';
 import * as fs from 'fs';
