@@ -32,7 +32,7 @@ logger
 // Note: This is based on the gulp task found in the angular/angular repository
 
 exec(
-  'git fetch origin master && git log --reverse --format=%s origin/master.. --no-merges',
+  'git fetch origin master && git log --reverse --format=%s --no-merges $(git rev-parse --abbrev-ref HEAD) --not $(git for-each-ref --format=\'%(refname)\' refs/heads/ | grep -v "refs/heads/$(git rev-parse --abbrev-ref HEAD)")',
   (error, stdout, stderr) => {
     if (error) {
       logger.fatal(stderr);
