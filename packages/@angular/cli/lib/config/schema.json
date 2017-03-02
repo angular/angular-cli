@@ -46,8 +46,7 @@
             "type": "array",
             "description": "List of application assets.",
             "items": {
-              "oneOf": [
-                {
+              "oneOf": [{
                   "type": "string"
                 },
                 {
@@ -118,8 +117,7 @@
             "description": "Global styles to be included in the build.",
             "type": "array",
             "items": {
-              "oneOf": [
-                {
+              "oneOf": [{
                   "type": "string"
                 },
                 {
@@ -150,12 +148,16 @@
             },
             "additionalProperties": false
           },
+          "uglifyOptions": {
+            "description": "Options to pass to the Uglify plugin",
+            "type": "object",
+            "additionalProperties": true
+          },
           "scripts": {
             "description": "Global scripts to be included in the build.",
             "type": "array",
             "items": {
-              "oneOf": [
-                {
+              "oneOf": [{
                   "type": "string"
                 },
                 {
@@ -174,7 +176,7 @@
             },
             "additionalProperties": false
           },
-          "environmentSource":{
+          "environmentSource": {
             "description": "Source file for environment config.",
             "type": "string"
           },
@@ -213,8 +215,7 @@
         "properties": {
           "files": {
             "description": "File glob(s) to lint.",
-            "oneOf": [
-              {
+            "oneOf": [{
                 "type": "string"
               },
               {
@@ -237,8 +238,7 @@
           },
           "exclude": {
             "description": "File glob(s) to ignore.",
-            "oneOf": [
-              {
+            "oneOf": [{
                 "type": "string"
               },
               {
@@ -475,7 +475,7 @@
     },
     "packageManager": {
       "description": "Specify which package manager tool to use.",
-      "enum": [ "npm", "cnpm", "yarn", "default" ],
+      "enum": ["npm", "cnpm", "yarn", "default"],
       "default": "default",
       "type": "string"
     },
