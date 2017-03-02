@@ -388,6 +388,13 @@ export class AotPlugin implements Tapable {
           return;
         }
 
+        // Create a new Program before compiling to invalidate source
+        // cache. Fixes error when watching for changes where the
+        // pre-save version of the file is used.
+        this._program = ts.createProgram(
+            this._rootFilePath, this._compilerOptions, this._compilerHost, this._program
+        );
+
         // Create the Code Generator.
         return __NGTOOLS_PRIVATE_API_2.codeGen({
           basePath: this._basePath,
