@@ -4,6 +4,8 @@ export interface Xi18nOptions {
   outputPath?: string;
   verbose?: boolean;
   i18nFormat?: string;
+  locale?: string;
+  outFile?: string;
 }
 
 const Xi18nCommand = Command.extend({
@@ -42,7 +44,19 @@ const Xi18nCommand = Command.extend({
       type: String,
       aliases: ['a'],
       description: 'Specifies app name to use.'
-    }
+    },
+    {
+      name: 'locale',
+      type: String,
+      aliases: ['l'],
+      description: 'Specifies the source language of the application.'
+    },
+    {
+      name: 'out-file',
+      type: String,
+      aliases: ['of'],
+      description: 'Name of the file to output.'
+    },
   ],
   run: function (commandOptions: any) {
     const {Extracti18nTask} = require('../tasks/extract-i18n');
