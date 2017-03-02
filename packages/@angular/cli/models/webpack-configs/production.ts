@@ -43,7 +43,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     }
 
     extraPlugins.push(new GlobCopyWebpackPlugin({
-      patterns: ['ngsw-manifest.json'],
+      patterns: ['ngsw-manifest.json', 'src/ngsw-manifest.json'],
       globOptions: {
         optional: true,
       },
