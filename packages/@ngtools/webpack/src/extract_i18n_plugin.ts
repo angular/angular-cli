@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import {__NGTOOLS_PRIVATE_API_2} from '@angular/compiler-cli';
+import {__NGTOOLS_PRIVATE_API_2, VERSION} from '@angular/compiler-cli';
 
 import {Tapable} from './webpack';
 import {WebpackResourceLoader} from './resource_loader';
@@ -12,6 +12,8 @@ export interface ExtractI18nPluginOptions {
   basePath?: string;
   genDir?: string;
   i18nFormat?: string;
+  locale?: string;
+  outFile?: string;
   exclude?: string[];
 }
 
@@ -33,6 +35,8 @@ export class ExtractI18nPlugin implements Tapable {
   private _program: ts.Program;
 
   private _i18nFormat: string;
+  private _locale: string;
+  private _outFile: string;
 
   constructor(options: ExtractI18nPluginOptions) {
     this._setupOptions(options);
@@ -117,6 +121,20 @@ export class ExtractI18nPlugin implements Tapable {
     if (options.hasOwnProperty('i18nFormat')) {
       this._i18nFormat = options.i18nFormat;
     }
+    if (options.hasOwnProperty('locale')) {
+      if (VERSION.major === '2') {
+        console.warn("The option '--locale' is only available on the xi18n command"
+          + ' starting from Angular v4, please update to a newer version.', '\n\n');
+      }
+      this._locale = options.locale;
+    }
+    if (options.hasOwnProperty('outFile')) {
+      if (VERSION.major === '2') {
+        console.warn("The option '--out-file' is only available on the xi18n command"
+          + ' starting from Angular v4, please update to a newer version.', '\n\n');
+      }
+      this._outFile = options.outFile;
+    }
   }
 
   apply(compiler: any) {
@@ -156,6 +174,8 @@ export class ExtractI18nPlugin implements Tapable {
           host: this._compilerHost,
           angularCompilerOptions: this._angularCompilerOptions,
           i18nFormat: this._i18nFormat,
+          locale: this._locale,
+          outFile: this._outFile,
 
           readResource: (path: string) => this._resourceLoader.get(path)
         });

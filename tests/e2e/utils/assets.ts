@@ -38,6 +38,13 @@ export function createProjectFromAsset(assetName: string) {
     .then(() => copyAssets(assetName))
     .then(dir => process.chdir(dir))
     .then(() => updateJsonFile('package.json', json => {
+      if (!json['dependencies']) {
+        json['dependencies'] = {};
+      }
+      if (!json['devDependencies']) {
+        json['devDependencies'] = {};
+      }
+
       for (const packageName of Object.keys(packages)) {
         if (json['dependencies'].hasOwnProperty(packageName)) {
           json['dependencies'][packageName] = packages[packageName].dist;

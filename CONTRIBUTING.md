@@ -171,20 +171,32 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 ### Type
 Must be one of the following:
 
+* **build**: Changes that affect the build system or external dependencies
+* **ci**: Changes to our CI configuration files and scripts
+* **docs**: Documentation only changes
 * **feat**: A new feature
 * **fix**: A bug fix
-* **docs**: Documentation only changes
+* **perf**: A code change that improves performance
+* **refactor**: A code change that neither fixes a bug nor adds a feature
 * **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing
   semi-colons, etc)
-* **refactor**: A code change that neither fixes a bug nor adds a feature
-* **perf**: A code change that improves performance
 * **test**: Adding missing tests or correcting existing tests
-* **build** Changes that affect the build system, CI configuration or external dependencies (example scopes: gulp, broccoli, npm)
-* **chore**: Other changes that don't modify `src` or `test` files
 
 ### Scope
-The scope could be anything specifying place of the commit change. For example
-`Compiler`, `ElementInjector`, etc.
+The scope should be the name of the npm package affected as perceived by the person reading changelog generated from the commit messages.
+
+The following is the list of supported scopes:
+
+* **@angular/cli**
+* **@ngtools/json-schema**
+* **@ngtools/logger**
+* **@ngtools/webpack**
+
+There are currently a few exceptions to the "use package name" rule:
+
+* **packaging**: used for changes that change the npm package layout in all of our packages, e.g. public path changes, package.json changes done to all packages, d.ts file/format changes, changes to bundles, etc.
+* **changelog**: used for updating the release notes in CHANGELOG.md
+* none/empty string: useful for `style`, `test` and `refactor` changes that are done across all packages (e.g. `style: add missing semicolons`)
 
 ### Subject
 The subject contains succinct description of the change:

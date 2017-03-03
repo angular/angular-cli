@@ -2,7 +2,7 @@ import {oneLine, stripIndent} from 'common-tags';
 
 const SilentError = require('silent-error');
 
-const projectNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[a-zA-Z][.0-9a-zA-Z]*)*$/;
+const projectNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$/;
 const unsupportedProjectNames = ['test', 'ember', 'ember-cli', 'vendor', 'app'];
 
 function getRegExpFailPosition(str: string): number | null {

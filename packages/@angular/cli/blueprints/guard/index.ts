@@ -1,6 +1,7 @@
-import {NodeHost} from '../../lib/ast-tools';
 import { oneLine } from 'common-tags';
-import {getAppFromConfig} from '../../utilities/app-utils';
+import { NodeHost } from '../../lib/ast-tools';
+import { CliConfig } from '../../models/config';
+import { getAppFromConfig } from '../../utilities/app-utils';
 
 const path = require('path');
 const fs = require('fs');
@@ -34,7 +35,7 @@ export default Blueprint.extend({
   ],
 
   beforeInstall: function(options: any) {
-    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
@@ -48,7 +49,7 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const appConfig = getAppFromConfig(this.project.ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
@@ -57,12 +58,10 @@ export default Blueprint.extend({
 
   locals: function (options: any) {
     options.flat = options.flat !== undefined ?
-      options.flat :
-      this.project.ngConfigObj.get('defaults.guard.flat');
+      options.flat : CliConfig.getValue('defaults.guard.flat');
 
     options.spec = options.spec !== undefined ?
-      options.spec :
-      this.project.ngConfigObj.get('defaults.guard.spec');
+      options.spec : CliConfig.getValue('defaults.guard.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,

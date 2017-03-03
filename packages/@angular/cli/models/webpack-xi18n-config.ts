@@ -9,6 +9,8 @@ export interface XI18WebpackOptions {
   genDir?: string;
   buildDir?: string;
   i18nFormat?: string;
+  locale?: string;
+  outFile?: string;
   verbose?: boolean;
   progress?: boolean;
   app?: string;
@@ -35,7 +37,9 @@ export class XI18nWebpackConfig extends NgCliWebpackConfig {
       getWebpackExtractI18nConfig(projectRoot,
         this.appConfig,
         this.extractOptions.genDir,
-        this.extractOptions.i18nFormat);
+        this.extractOptions.i18nFormat,
+        this.extractOptions.locale,
+        this.extractOptions.outFile);
 
     this.config = webpackMerge([this.config, extractI18nConfig]);
     return this.config;

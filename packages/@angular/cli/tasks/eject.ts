@@ -401,7 +401,7 @@ export default Task.extend({
     const project = this.cliProject;
     const cliConfig = CliConfig.fromProject();
     const config = cliConfig.config;
-    const appConfig = getAppFromConfig(config.apps, runTaskOptions.app);
+    const appConfig = getAppFromConfig(runTaskOptions.app);
 
     const tsConfigPath = path.join(process.cwd(), appConfig.root, appConfig.tsconfig);
     const outputPath = runTaskOptions.outputPath || appConfig.outDir;
@@ -464,6 +464,9 @@ export default Task.extend({
 
         // Add new dependencies based on our dependencies.
         const ourPackageJson = require('../package.json');
+        if (!packageJson['devDependencies']) {
+          packageJson['devDependencies'] = {};
+        }
         packageJson['devDependencies']['webpack-dev-server']
             = ourPackageJson['dependencies']['webpack-dev-server'];
 
