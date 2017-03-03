@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as webpack from 'webpack';
 import * as fs from 'fs';
+import * as semver from 'semver';
 import { stripIndent } from 'common-tags';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
@@ -26,6 +27,19 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       `);
     }
 
+    // Read the version of @angular/service-worker and throw if it doesn't match the
+    // expected version.
+    const allowedVersion = '>= 1.0.0-beta.5 < 2.0.0';
+    const swPackageJson = fs.readFileSync(`${swModule}/package.json`).toString();
+    const swVersion = JSON.parse(swPackageJson)['version'];
+    if (!semver.satisfies(swVersion, allowedVersion)) {
+      throw new Error(stripIndent`
+        The installed version of @angular/service-worker is ${swVersion}. This version of the CLI
+        requires the @angular/service-worker version to satisfy ${allowedVersion}. Please upgrade
+        your service worker version.
+      `);
+    }
+
     // Path to the worker script itself.
     const workerPath = path.resolve(swModule, 'bundles/worker-basic.min.js');
 
@@ -43,7 +57,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     }
 
     extraPlugins.push(new GlobCopyWebpackPlugin({
-      patterns: ['ngsw-manifest.json'],
+      patterns: ['ngsw-manifest.json', 'src/ngsw-manifest.json'],
       globOptions: {
         optional: true,
       },
@@ -52,7 +66,9 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     // Load the Webpack plugin for manifest generation and install it.
     const AngularServiceWorkerPlugin = require('@angular/service-worker/build/webpack')
         .AngularServiceWorkerPlugin;
-    extraPlugins.push(new AngularServiceWorkerPlugin());
+    extraPlugins.push(new AngularServiceWorkerPlugin({
+      baseHref: buildOptions.baseHref || '/',
+    }));
 
     // Copy the worker script into assets.
     const workerContents = fs.readFileSync(workerPath).toString();

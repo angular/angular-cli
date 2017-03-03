@@ -297,6 +297,14 @@ beforeLaunch: function() {
 },
 ```
 
+These configs have an `types` array where you should add any package you install via `@types/*`.
+This array helps keep typings isolated to the apps that really need them and avoid problems with
+duplicate typings.
+
+For instance, the unit test `tsconfig` has `jasmine` and `node`, which correspond to
+`@types/jasmine` and `@types/node`.
+Add any typings you've installed to the appropriate `tsconfig` as well.
+
 ## package.json
 
 We've updated a lot of packages over the last months in order to keep projects up to date.
