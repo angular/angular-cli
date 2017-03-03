@@ -1,4 +1,4 @@
-# Angular CLI RC.0 migration guide
+# Angular CLI RC migration guide
 
 In this migration guide we'll be looking at some of the major changes to CLI projects in the
 last two months.
@@ -19,7 +19,7 @@ The new [Stories](https://github.com/angular/angular-cli/wiki/stories) section c
 scenarios, so be sure to have a look!
 
 Below are the changes between a project generated two months ago, with `1.0.0-beta.24` and
-a `1.0.0-rc.0` project.
+a `1.0.0-rc.1` project.
 If you kept your project up to date you might have a lot of these already.
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
@@ -272,8 +272,10 @@ There is an additional root-level `tsconfig.json` that is used for IDE integrati
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "target": "es5",
     "lib": [
-      "es2016"
+      "es2016",
+      "dom"
     ]
   }
 }
@@ -455,5 +457,3 @@ Add these new rules:
 ```
 
 Update `no-inferrable-types` to `"no-inferrable-types": [true, "ignore-params"]`.
-
-
