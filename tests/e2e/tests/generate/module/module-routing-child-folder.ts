@@ -5,7 +5,7 @@ import { expectFileToExist } from '../../../utils/fs';
 import { expectToFail } from '../../../utils/utils';
 
 
-const Promise = require('angular-cli/ember-cli/lib/ext/promise');
+const Promise = require('@angular/cli/ember-cli/lib/ext/promise');
 
 export default function () {
   const root = process.cwd();
@@ -20,10 +20,6 @@ export default function () {
         .then(() => expectFileToExist(join(testPath, 'sub-dir/child')))
         .then(() => expectFileToExist(join(testPath, 'sub-dir/child', 'child.module.ts')))
         .then(() => expectFileToExist(join(testPath, 'sub-dir/child', 'child-routing.module.ts')))
-        .then(() => expectFileToExist(join(testPath, 'sub-dir/child', 'child.component.ts')))
-        .then(() => expectFileToExist(join(testPath, 'sub-dir/child', 'child.component.spec.ts')))
-        .then(() => expectFileToExist(join(testPath, 'sub-dir/child', 'child.component.html')))
-        .then(() => expectFileToExist(join(testPath, 'sub-dir/child', 'child.component.css')))
         .then(() => expectToFail(() =>
           expectFileToExist(join(testPath, 'sub-dir/child', 'child.spec.ts'))
         ))

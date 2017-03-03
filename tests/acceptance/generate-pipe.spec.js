@@ -8,7 +8,7 @@ var expect = require('chai').expect;
 var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = process.cwd();
-var Promise = require('angular-cli/ember-cli/lib/ext/promise');
+var Promise = require('@angular/cli/ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
 const denodeify = require('denodeify');
 
@@ -20,7 +20,7 @@ describe('Acceptance: ng generate pipe', function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
-      return ng(['new', 'foo', '--skip-npm']);
+      return ng(['new', 'foo', '--skip-install']);
     });
   });
 

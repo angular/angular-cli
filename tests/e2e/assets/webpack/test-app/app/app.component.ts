@@ -1,4 +1,5 @@
 import {Component, ViewEncapsulation} from '@angular/core';
+import {MyInjectable} from './injectable';
 
 
 @Component({
@@ -7,4 +8,8 @@ import {Component, ViewEncapsulation} from '@angular/core';
   styleUrls: ['./app.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class AppComponent { }
+export class AppComponent {
+  constructor(public inj: MyInjectable) {
+    console.log(inj);
+  }
+}

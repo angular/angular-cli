@@ -8,7 +8,10 @@
     "node": true,
     "es6": true
   },
-  "parser": "espree",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
   "rules": {
     "no-alert": "off",
     "no-array-constructor": "off",
@@ -161,7 +164,7 @@
     "guard-for-in": "off",
     "handle-callback-err": "off",
     "id-length": "off",
-    "indent": [2,2],
+    "indent": [2,2, { "SwitchCase": 1 }],
     "init-declarations": "off",
     "jsx-quotes": "off",
     "key-spacing": [2, {

@@ -18,7 +18,7 @@ export default function () {
     'src/common-entry-style.css': '.common-entry-style { color: red }',
   })
     .then(() => appendToFile('src/main.ts', 'import \'./string-script.js\';'))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['scripts'] = [
         'string-script.js',

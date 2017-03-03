@@ -12,7 +12,7 @@ export interface TranspileOutput {
 }
 
 
-function resolve(filePath: string, host: ts.CompilerHost, program: ts.Program) {
+function resolve(filePath: string, _host: ts.CompilerHost, program: ts.Program) {
   if (path.isAbsolute(filePath)) {
     return filePath;
   }
@@ -30,14 +30,14 @@ export class TypeScriptFileRefactor {
   private _sourceFile: ts.SourceFile;
   private _sourceString: any;
   private _sourceText: string;
-  private _changed: boolean = false;
+  private _changed = false;
 
   get fileName() { return this._fileName; }
   get sourceFile() { return this._sourceFile; }
   get sourceText() { return this._sourceString.toString(); }
 
   constructor(fileName: string,
-              private _host: ts.CompilerHost,
+              _host: ts.CompilerHost,
               private _program?: ts.Program) {
     fileName = resolve(fileName, _host, _program).replace(/\\/g, '/');
     this._fileName = fileName;
@@ -120,8 +120,19 @@ export class TypeScriptFileRefactor {
     return arr;
   }
 
+  findFirstAstNode(node: ts.Node | null, kind: ts.SyntaxKind): ts.Node | null {
+    return this.findAstNodes(node, kind, false, 1)[0] || null;
+  }
+
   appendAfter(node: ts.Node, text: string): void {
-    this._sourceString.insertRight(node.getEnd(), text);
+    this._sourceString.appendRight(node.getEnd(), text);
+  }
+  append(node: ts.Node, text: string): void {
+    this._sourceString.appendLeft(node.getEnd(), text);
+  }
+
+  prependBefore(node: ts.Node, text: string) {
+    this._sourceString.appendLeft(node.getStart(), text);
   }
 
   insertImport(symbolName: string, modulePath: string): void {

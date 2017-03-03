@@ -2,12 +2,16 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import {AotPlugin} from './plugin';
 import {TypeScriptFileRefactor} from './refactor';
+import {LoaderContext, ModuleReason} from './webpack';
 
 const loaderUtils = require('loader-utils');
+const NormalModule = require('webpack/lib/NormalModule');
 
 
-function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
-  if (node.kind == ts.SyntaxKind.Identifier) {
+function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
+  if (!node) {
+    return null;
+  } else if (node.kind == ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
     return (node as ts.StringLiteral).text;
@@ -16,11 +20,154 @@ function _getContentOfKeyLiteral(source: ts.SourceFile, node: ts.Node): string {
   }
 }
 
+
+function _angularImportsFromNode(node: ts.ImportDeclaration, _sourceFile: ts.SourceFile): string[] {
+  const ms = node.moduleSpecifier;
+  let modulePath: string | null = null;
+  switch (ms.kind) {
+    case ts.SyntaxKind.StringLiteral:
+      modulePath = (ms as ts.StringLiteral).text;
+      break;
+    default:
+      return [];
+  }
+
+  if (!modulePath.startsWith('@angular/')) {
+    return [];
+  }
+
+  if (node.importClause) {
+    if (node.importClause.name) {
+      // This is of the form `import Name from 'path'`. Ignore.
+      return [];
+    } else if (node.importClause.namedBindings) {
+      const nb = node.importClause.namedBindings;
+      if (nb.kind == ts.SyntaxKind.NamespaceImport) {
+        // This is of the form `import * as name from 'path'`. Return `name.`.
+        return [(nb as ts.NamespaceImport).name.text + '.'];
+      } else {
+        // This is of the form `import {a,b,c} from 'path'`
+        const namedImports = nb as ts.NamedImports;
+
+        return namedImports.elements
+          .map((is: ts.ImportSpecifier) => is.propertyName ? is.propertyName.text : is.name.text);
+      }
+    }
+  } else {
+    // This is of the form `import 'path';`. Nothing to do.
+    return [];
+  }
+}
+
+
+function _ctorParameterFromTypeReference(paramNode: ts.ParameterDeclaration,
+                                         angularImports: string[],
+                                         refactor: TypeScriptFileRefactor) {
+  let typeName = 'undefined';
+
+  if (paramNode.type) {
+    switch (paramNode.type.kind) {
+      case ts.SyntaxKind.TypeReference:
+        const type = paramNode.type as ts.TypeReferenceNode;
+        if (type.typeName) {
+          typeName = type.typeName.getText(refactor.sourceFile);
+        } else {
+          typeName = type.getText(refactor.sourceFile);
+        }
+        break;
+      case ts.SyntaxKind.AnyKeyword:
+        typeName = 'undefined';
+        break;
+      default:
+        typeName = 'null';
+    }
+  }
+
+  const decorators = refactor.findAstNodes(paramNode, ts.SyntaxKind.Decorator) as ts.Decorator[];
+  const decoratorStr = decorators
+    .map(decorator => {
+      const call =
+        refactor.findFirstAstNode(decorator, ts.SyntaxKind.CallExpression) as ts.CallExpression;
+
+      if (!call) {
+        return null;
+      }
+
+      const fnName = call.expression.getText(refactor.sourceFile);
+      const args = call.arguments.map(x => x.getText(refactor.sourceFile)).join(', ');
+      if (angularImports.indexOf(fnName) === -1) {
+        return null;
+      } else {
+        return [fnName, args];
+      }
+    })
+    .filter(x => !!x)
+    .map(([name, args]: string[]) => {
+      if (args) {
+        return `{ type: ${name}, args: [${args}] }`;
+      }
+      return `{ type: ${name} }`;
+    })
+    .join(', ');
+
+  if (decorators.length > 0) {
+    return `{ type: ${typeName}, decorators: [${decoratorStr}] }`;
+  }
+  return `{ type: ${typeName} }`;
+}
+
+
+function _addCtorParameters(classNode: ts.ClassDeclaration,
+                            angularImports: string[],
+                            refactor: TypeScriptFileRefactor) {
+  // For every classes with constructors, output the ctorParameters function which contains a list
+  // of injectable types.
+  const ctor = (
+    refactor.findFirstAstNode(classNode, ts.SyntaxKind.Constructor) as ts.ConstructorDeclaration);
+  if (!ctor) {
+    // A class can be missing a constructor, and that's _okay_.
+    return;
+  }
+
+  const params = Array.from(ctor.parameters).map(paramNode => {
+    return _ctorParameterFromTypeReference(paramNode, angularImports, refactor);
+  });
+
+  const ctorParametersDecl = `static ctorParameters() { return [ ${params.join(', ')} ]; }`;
+  refactor.prependBefore(classNode.getLastToken(refactor.sourceFile), ctorParametersDecl);
+}
+
+
 function _removeDecorators(refactor: TypeScriptFileRefactor) {
-  // TODO: replace this by tsickle.
+  const angularImports: string[]
+    = refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.ImportDeclaration)
+      .map((node: ts.ImportDeclaration) => _angularImportsFromNode(node, refactor.sourceFile))
+      .reduce((acc: string[], current: string[]) => acc.concat(current), []);
+
   // Find all decorators.
-  // refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
-  //   .forEach(d => refactor.removeNode(d));
+  refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Decorator)
+    .forEach(node => {
+      // First, add decorators to classes to the classes array.
+      if (node.parent) {
+        const declarations = refactor.findAstNodes(node.parent,
+          ts.SyntaxKind.ClassDeclaration, false, 1);
+        if (declarations.length > 0) {
+          _addCtorParameters(declarations[0] as ts.ClassDeclaration, angularImports, refactor);
+        }
+      }
+
+      refactor.findAstNodes(node, ts.SyntaxKind.CallExpression)
+        .filter((node: ts.CallExpression) => {
+          const fnName = node.expression.getText(refactor.sourceFile);
+          if (fnName.indexOf('.') != -1) {
+            // Since this is `a.b`, see if it's the same namespace as a namespace import.
+            return angularImports.indexOf(fnName.replace(/\..*$/, '') + '.') != -1;
+          } else {
+            return angularImports.indexOf(fnName) != -1;
+          }
+        })
+        .forEach(() => refactor.removeNode(node));
+    });
 }
 
 
@@ -96,11 +243,16 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
 
   refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
     // Get all their property assignments.
-    .filter((node: ts.ObjectLiteralExpression) =>
-      node.properties.some(prop => _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId'))
+    .filter((node: ts.ObjectLiteralExpression) => {
+      return node.properties.some(prop => {
+        return prop.kind == ts.SyntaxKind.PropertyAssignment
+            && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
+      });
+    })
     .forEach((node: ts.ObjectLiteralExpression) => {
-      const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, idx: number) => {
-        return _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
+      const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, _idx: number) => {
+        return prop.kind == ts.SyntaxKind.PropertyAssignment
+            && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
       })[0];
       // get the trailing comma
       const moduleIdCommaProp = moduleIdProp.parent.getChildAt(1).getChildren()[1];
@@ -159,26 +311,25 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
 }
 
 
-function _checkDiagnostics(refactor: TypeScriptFileRefactor) {
-  const diagnostics = refactor.getDiagnostics();
-
-  if (diagnostics.length > 0) {
-    const message = diagnostics
-      .map(diagnostic => {
-        const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-        const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-        return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
-      })
-      .join('\n');
-    throw new Error(message);
-  }
+/**
+ * Recursively calls diagnose on the plugins for all the reverse dependencies.
+ * @private
+ */
+function _diagnoseDeps(reasons: ModuleReason[], plugin: AotPlugin, checked: Set<string>) {
+  reasons
+    .filter(reason => reason && reason.module && reason.module instanceof NormalModule)
+    .filter(reason => !checked.has(reason.module.resource))
+    .forEach(reason => {
+      checked.add(reason.module.resource);
+      plugin.diagnose(reason.module.resource);
+      _diagnoseDeps(reason.module.reasons, plugin, checked);
+    });
 }
 
 
 // Super simple TS transpiler loader for testing / isolated usage. does not type check!
-export function ngcLoader(source: string) {
-  this.cacheable();
-  const cb: any = this.async();
+export function ngcLoader(this: LoaderContext & { _compilation: any }) {
+  const cb = this.async();
   const sourceFileName: string = this.resourcePath;
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
@@ -201,7 +352,13 @@ export function ngcLoader(source: string) {
       })
       .then(() => {
         if (plugin.typeCheck) {
-          _checkDiagnostics(refactor);
+          // Check all diagnostics from this and reverse dependencies also.
+          if (!plugin.firstRun) {
+            _diagnoseDeps(this._module.reasons, plugin, new Set<string>());
+          }
+          // We do this here because it will throw on error, resulting in rebuilding this file
+          // the next time around if it changes.
+          plugin.diagnose(sourceFileName);
         }
       })
       .then(() => {
@@ -217,7 +374,7 @@ export function ngcLoader(source: string) {
       })
       .catch(err => cb(err));
   } else {
-    const options = loaderUtils.parseQuery(this.query);
+    const options = loaderUtils.getOptions(this) || {};
     const tsConfigPath = options.tsConfigPath;
     const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
 

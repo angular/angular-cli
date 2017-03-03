@@ -1,6 +1,6 @@
 # CSS Preprocessor integration
 
-Angular-CLI supports all major CSS preprocessors:
+Angular CLI supports all major CSS preprocessors:
 - sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
 - less ([http://lesscss.org/](http://lesscss.org/))
 - stylus ([http://stylus-lang.com/](http://stylus-lang.com/))

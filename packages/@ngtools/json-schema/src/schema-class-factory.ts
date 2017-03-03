@@ -96,6 +96,9 @@ class SchemaClassBase<T> implements SchemaClass<T> {
   /** Sets the value of a destination if the value is currently undefined. */
   $$alias(source: string, destination: string) {
     let sourceSchemaTreeNode = _getSchemaNodeForPath(this.$$schema(), source);
+    if (!sourceSchemaTreeNode) {
+      return false;
+    }
 
     const fragments = _parseJsonPath(destination);
     const maybeValue = fragments.reduce((value: any, current: string) => {

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "declaration": true,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "mapRoot": "",
     "module": "commonjs",
@@ -10,11 +12,15 @@
     "noUnusedLocals": true,
     "outDir": "./dist",
     "rootDir": ".",
+    "skipLibCheck": true,
     "sourceMap": true,
     "sourceRoot": "",
-    "inlineSourceMap": true,
-    "target": "es5",
-    "lib": ["es6"],
+    "target": "es6",
+    "lib": [
+      "es2015",
+      "es2016",
+      "es2017"
+    ],
     "baseUrl": "",
     "typeRoots": [
       "./node_modules/@types"
@@ -24,14 +30,13 @@
       "node"
     ],
     "paths": {
-      "angular-cli/*": [ "./packages/angular-cli/*" ],
-      "@angular-cli/ast-tools": [ "./packages/ast-tools/src" ],
-      "@angular-cli/base-href-webpack": [ "./packages/base-href-webpack/src" ],
-      "@ngtools/webpack": [ "./packages/webpack/src" ]
+      "@ngtools/json-schema": [ "packages/@ngtools/json-schema/src" ],
+      "@ngtools/logger": [ "./packages/@ngtools/logger/src" ],
+      "@ngtools/webpack": [ "./packages/@ngtools/webpack/src" ]
     }
   },
   "exclude": [
-    "packages/angular-cli/blueprints/*/files/**/*",
+    "packages/@angular/cli/blueprints/*/files/**/*",
     "dist/**/*",
     "node_modules/**/*",
     "tmp/**/*"

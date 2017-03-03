@@ -1,8 +1,14 @@
 {
   "a": [
-    null,
+    "v2",
     "v1",
-    null,
+    "v2",
     "v3"
+  ],
+  "b": [
+    1,
+    null,
+    "string",
+    true
   ]
 }

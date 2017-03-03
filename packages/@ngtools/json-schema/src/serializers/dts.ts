@@ -15,7 +15,7 @@ export class DTsSerializer implements Serializer {
     if (interfaceName) {
       _writer(`export interface ${interfaceName} `);
     } else {
-      _writer('export default interface ');
+      _writer('interface _ ');
     }
   }
 
@@ -51,6 +51,9 @@ export class DTsSerializer implements Serializer {
   end() {
     if (this._indentDelta) {
       this._writer('\n');
+    }
+    if (!this.interfaceName) {
+      this._writer('export default _;\n');
     }
   }
 
@@ -126,24 +129,36 @@ export class DTsSerializer implements Serializer {
     this._writer(')');
   }
 
-  outputValue(node: SchemaNode) {
+  outputEnum(node: SchemaNode) {
+    this._willOutputValue();
+    this._writer('(');
+    for (let i = 0; i < node.items.length; i++) {
+      this._writer(JSON.stringify(node.items[i]));
+      if (i != node.items.length - 1) {
+        this._writer(' | ');
+      }
+    }
+    this._writer(')');
+  }
+
+  outputValue(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('any');
   }
 
-  outputString(node: SchemaNode) {
+  outputString(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('string');
   }
-  outputNumber(node: SchemaNode) {
+  outputNumber(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('number');
   }
-  outputInteger(node: SchemaNode) {
+  outputInteger(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('number');
   }
-  outputBoolean(node: SchemaNode) {
+  outputBoolean(_node: SchemaNode) {
     this._willOutputValue();
     this._writer('boolean');
   }

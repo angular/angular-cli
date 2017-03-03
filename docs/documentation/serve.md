@@ -6,6 +6,8 @@
 `ng serve` builds the application and starts a web server
 
 ## Options
+`--watch` (`-w`) rebuild when files change
+
 `--port` (`-p`) port to serve the application on
 
 `--host` (`-H`) host where to listen
@@ -14,13 +16,7 @@
 
 `--live-reload` (`-lr`) flag to turn off live reloading
 
-`--live-reload-host` (`-lrh`) specify the host for live reloading
-
-`--live-reload-base-url` (`-lrbu`) specify the base URL for live reloading
-
-`--live-reload-port` (`-lrp`) port for live reloading
-
-`--live-reload-live-css` flag to live reload CSS
+`--live-reload-client` specify the URL that the live reload browser client will use
 
 `--ssl` flag to turn on SSL
 
@@ -59,3 +55,5 @@
 `--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
 
 `--output-hashing` define the output filename cache-busting hashing mode
+
+`--poll` enable and define the file watching poll time period (milliseconds)

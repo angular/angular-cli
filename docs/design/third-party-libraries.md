@@ -77,7 +77,7 @@ The `install` task will perform the following subtasks:
 1. **Detect if a package named `angular/cli-wrapper-${libName}` exist in the angular
    organization.** If so, run the steps above as if ng install angular/angular-${libName}. If
    this install fails, ignore the failure.
-  
+
    These packages can be used to wrap libraries that we want to support but can't update
    easily, like Jasmine or LESS.
 1. **Install typings.** See the [Typings](#typings) section.
@@ -102,7 +102,7 @@ its `(pre|post|)install` hooks only on packages that are newly installed. It sho
 packages should be kept before performing `npm install`.
 
 # <a name="appData">appData</a>
-The `angular-cli` key in the generated app should be used for `angular-cli` specific data.
+The `angular-cli` key in the generated app should be used for Angular CLI specific data.
 This includes the CLI configuration itself, as well as third-parties library configuration.
 
 Third-parties can store data that will be passed to the app, and can use that data themselves.

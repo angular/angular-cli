@@ -10,9 +10,8 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
-    - os: osx
     - node_js: "7"
-    - env: NODE_SCRIPT="tests/run_e2e.js --nightly"
+    - env: NODE_SCRIPT="tests/run_e2e.js --nightly --ng4"
   include:
     - node_js: "6"
       os: linux
@@ -20,45 +19,40 @@ matrix:
     - node_js: "6"
       os: linux
       env: SCRIPT=build
-    - node_js: "4"
-      os: linux
-      env: NODE_SCRIPT=tests/run_e2e.js
     - node_js: "6"
       os: linux
       env: SCRIPT=test
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT=tests/run_e2e.js
+      env: NODE_SCRIPT="tests/run_e2e.js --glob=tests/build/**"
     - node_js: "6"
-      os: osx
-      env: NODE_SCRIPT=tests/run_e2e.js
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --eject --glob=tests/build/**"
+    - node_js: "6"
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --ignore=**/tests/build/**"
+    - node_js: "6"
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --ng4 --glob=tests/build/**"
+    - node_js: "6"
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --ng4 --ignore=**/tests/build/**"
 
     # Optional builds.
     - node_js: "6"
-      os: osx
-      env: SCRIPT=test
-    - node_js: "6"
       os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --nightly"
+      env: NODE_SCRIPT="tests/run_e2e.js --nightly --ng4"
     - node_js: "7"
       os: linux
       env: NODE_SCRIPT=tests/run_e2e.js
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome --force; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkdir ~/.config && echo "--no-sandbox" > ~/.config/chrome-flags.conf; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "--no-sandbox" > ~/.config/chromium-flags.conf; fi
-  - npm install -g npm
-  - npm config set spin false
-  - npm config set progress false
-
-install:
-  - npm install --no-optional
+  - yarn config set spin false
+  - yarn config set progress false
 
 script:
   - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi

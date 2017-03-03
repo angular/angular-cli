@@ -126,6 +126,9 @@ export class JsonSerializer implements Serializer {
   outputOneOf(node: SchemaNode) {
     this.outputValue(node);
   }
+  outputEnum(node: SchemaNode) {
+    this.outputValue(node);
+  }
 
   outputValue(node: SchemaNode) {
     this._willOutputValue();

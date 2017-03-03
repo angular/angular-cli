@@ -13,7 +13,7 @@ export default function() {
     .then(() => expectFileToMatch('dist/assets/test.abc', 'hello world'))
     .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
     // doesn't break beta.16 projects
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['assets'] = 'assets';
     }))

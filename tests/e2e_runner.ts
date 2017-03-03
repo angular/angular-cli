@@ -25,9 +25,13 @@ Error.stackTraceLimit = Infinity;
  * Here's a short description of those flags:
  *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
  *   --noproject      Skip creating a project or using one.
- *   --nolink         Skip linking your local angular-cli directory. Can save a few seconds.
+ *   --nobuild        Skip building the packages. Use with --nolink and --reuse to quickly
+ *                    rerun tests.
+ *   --nolink         Skip linking your local @angular/cli directory. Can save a few seconds.
  *   --ng-sha=SHA     Use a specific ng-sha. Similar to nightly but point to a master SHA instead
  *                    of using the latest.
+ *   --glob           Run tests matching this glob pattern (relative to tests/e2e/).
+ *   --ignore         Ignore tests matching this glob pattern.
  *   --nightly        Install angular nightly builds over the test project.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
  *                    created, and npm installed. Ideally you want a project created by a previous
@@ -35,8 +39,8 @@ Error.stackTraceLimit = Infinity;
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = minimist(process.argv.slice(2), {
-  'boolean': ['debug', 'nolink', 'nightly', 'noproject', 'verbose'],
-  'string': ['reuse', 'ng-sha']
+  'boolean': ['debug', 'nolink', 'nightly', 'noproject', 'verbose', 'eject'],
+  'string': ['glob', 'ignore', 'reuse', 'ng-sha', ]
 });
 
 
@@ -67,7 +71,7 @@ ConsoleLoggerStack.start(new IndentLogger('name'))
     output.write(color(entry.message) + '\n');
   });
 
-
+const testGlob = argv.glob || 'tests/**/*.ts';
 let currentFileName = null;
 let index = 0;
 
@@ -75,7 +79,7 @@ const e2eRoot = path.join(__dirname, 'e2e');
 const allSetups = glob.sync(path.join(e2eRoot, 'setup/**/*.ts'), { nodir: true })
   .map(name => path.relative(e2eRoot, name))
   .sort();
-const allTests = glob.sync(path.join(e2eRoot, 'tests/**/*.ts'), { nodir: true })
+const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: argv.ignore })
   .map(name => path.relative(e2eRoot, name))
   .sort();
 

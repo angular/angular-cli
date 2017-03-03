@@ -21,7 +21,7 @@ xdescribe('Acceptance: ng generate route', function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
-      return ng(['new', 'foo', '--skip-npm']);
+      return ng(['new', 'foo', '--skip-install']);
     });
   });
 

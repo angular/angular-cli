@@ -31,8 +31,8 @@ export abstract class SchemaTreeNode<T> implements SchemaNode {
   // Hierarchy objects
   protected _parent: SchemaTreeNode<any>;
 
-  protected _defined: boolean = false;
-  protected _dirty: boolean = false;
+  protected _defined = false;
+  protected _dirty = false;
 
   protected _schema: Schema;
   protected _name: string;
@@ -89,7 +89,7 @@ export abstract class SchemaTreeNode<T> implements SchemaNode {
     return this._parent.isChildRequired(this.name);
   }
 
-  isChildRequired(name: string) { return false; }
+  isChildRequired(_name: string) { return false; }
 
   get parent(): SchemaTreeNode<any> { return this._parent; }
   get children(): { [key: string]: SchemaTreeNode<any> } | null { return null; }
@@ -97,13 +97,13 @@ export abstract class SchemaTreeNode<T> implements SchemaNode {
   get itemPrototype(): SchemaTreeNode<any> | null { return null; }
 
   abstract get(): T;
-  set(v: T, force = false) {
+  set(_v: T, _init = false, _force = false) {
     if (!this.readOnly) {
       throw new MissingImplementationError();
     }
     throw new SettingReadOnlyPropertyError();
   };
-  isCompatible(v: any) { return false; }
+  isCompatible(_v: any) { return false; }
 
   abstract serialize(serializer: Serializer): void;
 
@@ -220,10 +220,10 @@ export class OneOfSchemaTreeNode extends NonLeafSchemaTreeNode<any> {
     }
 
     this._currentTypeHolder = proto;
-    this._currentTypeHolder.set(v, true);
+    this._currentTypeHolder.set(v, false, true);
   }
 
-  set(v: any, force = false) {
+  set(v: any, _init = false, force = false) {
     return this._set(v, false, force);
   }
 
@@ -247,7 +247,7 @@ export class OneOfSchemaTreeNode extends NonLeafSchemaTreeNode<any> {
 export class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: any}> {
   // The map of all children metadata.
   protected _children: { [key: string]: SchemaTreeNode<any> };
-  protected _frozen: boolean = false;
+  protected _frozen = false;
 
   constructor(metaData: TreeNodeConstructorArgument<any>) {
     super(metaData);
@@ -273,7 +273,7 @@ export class ObjectSchemaTreeNode extends NonLeafSchemaTreeNode<{[key: string]: 
         const propertySchema = schema['properties'][name];
         this._children[name] = this._createChildProperty(
           name,
-          value ? value[name] : null,
+          value ? value[name] : undefined,
           forward ? (forward as ObjectSchemaTreeNode).children[name] : null,
           propertySchema);
       }
@@ -331,14 +331,13 @@ export class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array<any>> {
 
     // Keep the item's schema as a schema node. This is important to keep type information.
     this._itemPrototype = this._createChildProperty(
-      '', null, null, metaData.schema['items'], false);
+      '', undefined, null, metaData.schema['items'], false);
   }
 
-  _set(value: any, init: boolean, force: boolean) {
+  _set(value: any, init: boolean, _force: boolean) {
     const schema = this._schema;
     const forward = this._forward;
 
-    this._defined = !!value;
     this._value = Object.create(null);
     this._dirty = this._dirty || !init;
 
@@ -361,8 +360,8 @@ export class ArraySchemaTreeNode extends NonLeafSchemaTreeNode<Array<any>> {
     }
   }
 
-  set(v: any, force = false) {
-    return this._set(v, false, force);
+  set(v: any, init = false, force = false) {
+    return this._set(v, init, force);
   }
 
   isCompatible(v: any) { return Array.isArray(v); }
@@ -395,11 +394,11 @@ export class RootSchemaTreeNode extends ObjectSchemaTreeNode {
 
 /** A leaf in the schema tree. Must contain a single primitive value. */
 export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
-  private _default: T;
+  protected _default: T;
 
   constructor(metaData: TreeNodeConstructorArgument<T>) {
     super(metaData);
-    this._defined = !(metaData.value === undefined || metaData.value === null);
+    this._defined = metaData.value !== undefined;
     if ('default' in metaData.schema) {
       this._default = this.convert(metaData.schema['default']);
     }
@@ -409,12 +408,14 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
     if (!this.defined && this._forward) {
       return this._forward.get();
     }
-    if (!this.defined && this._default !== undefined) {
-      return this._default;
+    if (!this.defined) {
+      return 'default' in this._schema ? this._default : undefined;
     }
-    return this._value === undefined ? undefined : this.convert(this._value);
+    return this._value === undefined
+      ? undefined
+      : (this._value === null ? null : this.convert(this._value));
   }
-  set(v: T, force = false) {
+  set(v: T, init = false, force = false) {
     if (this.readOnly && !force) {
       throw new SettingReadOnlyPropertyError();
     }
@@ -426,7 +427,7 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
       }
     }
 
-    this.dirty = true;
+    this.dirty = !init;
     this._value = convertedValue;
   }
 
@@ -436,7 +437,10 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   }
 
   get defaultValue(): T {
-    return 'default' in this._schema ? this._default : null;
+    return this.hasDefault ? this._default : null;
+  }
+  get hasDefault() {
+    return 'default' in this._schema;
   }
 
   abstract convert(v: any): T;
@@ -459,35 +463,43 @@ class StringSchemaTreeNode extends LeafSchemaTreeNode<string> {
 }
 
 
-class EnumSchemaTreeNode extends StringSchemaTreeNode {
-  private _enumValues: string[];
-
-  constructor(metaData: TreeNodeConstructorArgument<string>) {
+class EnumSchemaTreeNode extends LeafSchemaTreeNode<any> {
+  constructor(metaData: TreeNodeConstructorArgument<any>) {
     super(metaData);
 
     if (!Array.isArray(metaData.schema['enum'])) {
       throw new InvalidSchema();
     }
-    this._enumValues = [].concat(metaData.schema['enum']);
-    this.set(metaData.value, true);
+    if (this.hasDefault && !this._isInEnum(this._default)) {
+      throw new InvalidSchema();
+    }
+    this.set(metaData.value, true, true);
   }
 
   protected _isInEnum(value: string) {
-    return this._enumValues.some(v => v === value);
+    return this._schema['enum'].some((v: string) => v === value);
   }
 
+  get items() { return this._schema['enum']; }
+
   isCompatible(v: any) {
-    return (typeof v == 'string' || v instanceof String) && this._isInEnum('' + v);
+    return this._isInEnum(v);
   }
   convert(v: any) {
     if (v === undefined) {
       return undefined;
     }
-    if (v === null || !this._isInEnum('' + v)) {
-      return null;
+    if (!this._isInEnum(v)) {
+      return undefined;
     }
-    return '' + v;
+    return v;
   }
+
+  get type() {
+    return this._schema['type'] || 'any';
+  }
+  get tsType(): null { return null; }
+  serialize(serializer: Serializer) { serializer.outputEnum(this); }
 }
 
 

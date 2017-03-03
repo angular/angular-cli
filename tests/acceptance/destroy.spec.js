@@ -11,7 +11,7 @@ describe('Acceptance: ng destroy', function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
-      return ng(['new', 'foo', '--skip-npm']);
+      return ng(['new', 'foo', '--skip-install']);
     });
   });
 
@@ -23,7 +23,7 @@ describe('Acceptance: ng destroy', function () {
     return ng(['destroy']).then(() => {
       throw new SilentError('ng destroy should fail.');
     }, (err) => {
-      expect(err.message).to.equal('The destroy command is not supported by Angular-CLI.');
+      expect(err.message).to.equal('The destroy command is not supported by Angular CLI.');
     });
   });
 
@@ -31,7 +31,7 @@ describe('Acceptance: ng destroy', function () {
     return ng(['destroy', 'something']).then(() => {
       throw new SilentError('ng destroy something should fail.');
     }, (err) => {
-      expect(err.message).to.equal('The destroy command is not supported by Angular-CLI.');
+      expect(err.message).to.equal('The destroy command is not supported by Angular CLI.');
     });
   });
 });

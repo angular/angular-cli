@@ -1,10 +1,10 @@
 import { writeFile, writeMultipleFiles } from '../../utils/fs';
-import { runServeAndE2e } from '../test/e2e';
+import { ng } from '../../utils/process';
 
 
 export default function () {
   return Promise.resolve()
-    .then(() => writeFile('angular-cli.json', JSON.stringify({
+    .then(() => writeFile('.angular-cli.json', JSON.stringify({
       apps: [{
         root: 'src',
         main: 'main.ts',
@@ -15,7 +15,7 @@ export default function () {
       }],
       e2e: { protractor: { config: './protractor.conf.js' } }
     })))
-    .then(() => runServeAndE2e())
+    .then(() => ng('e2e'))
     .then(() => writeMultipleFiles({
       './src/script.js': `
         document.querySelector('app-root').innerHTML = '<h1>app works!</h1>';
@@ -32,7 +32,7 @@ export default function () {
           });
         });
       `,
-      'angular-cli.json': JSON.stringify({
+      '.angular-cli.json': JSON.stringify({
         apps: [{
           root: 'src',
           scripts: ['./script.js']
@@ -40,5 +40,5 @@ export default function () {
         e2e: { protractor: { config: './protractor.conf.js' } }
       }),
     }))
-    .then(() => runServeAndE2e());
+    .then(() => ng('e2e'));
 }
