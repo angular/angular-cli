@@ -1,21 +1,7 @@
-# Autocompletion
+# Angular 4 Project
 
-To turn on auto completion use the following commands:
+To create an Angular 4 project use the following command:
 
-For bash:
 ```bash
-ng completion --bash >> ~/.bashrc
-source ~/.bashrc
-```
-
-For zsh:
-```bash
-ng completion --zsh >> ~/.zshrc
-source ~/.zshrc
-```
-
-Windows users using gitbash:
-```bash
-ng completion --bash >> ~/.bash_profile
-source ~/.bash_profile
+ng new ProjectName --ng4
 ```
