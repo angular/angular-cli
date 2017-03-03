@@ -40,7 +40,7 @@ export class NgCliWebpackConfig {
     appConfig.outDir = outputDir || appConfig.outDir;
 
     if (appConfig.universal === true && isAoT === true) {
-      throw new Error('AoT is not supported in universal yet.');
+      console.warn('For now, AoT is only supported on client side.');
     }
 
     let baseConfig = getWebpackCommonConfig(
@@ -84,7 +84,7 @@ export class NgCliWebpackConfig {
       ));
 
       this.configs.push(webpackMerge(
-        typescriptConfigPartial,
+        getWebpackNonAotConfigPartial(this.ngCliProject.root, appConfig),
         getWebpackNodeConfig(
           this.ngCliProject.root,
           environment,

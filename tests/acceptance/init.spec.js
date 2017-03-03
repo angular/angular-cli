@@ -66,7 +66,6 @@ describe('Acceptance: ung init', function () {
     }
     if (additionalFolders.indexOf('universal') > -1) {
       expected = expected.filter(p => p.indexOf('main.ts') < 0);
-      expected = expected.filter(p => p.indexOf('app.module.ts') < 0);
     }
 
     if (!routing) {

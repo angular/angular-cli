@@ -22,6 +22,12 @@ export function getClientDist() {
   return isUniversalTest() ? 'dist/client/' : 'dist/';
 }
 
+export function getMainAppModuleRegex() {
+  return isUniversalTest() ?
+    /bootstrapModuleFactory.*\/\* BrowserAppModuleNgFactory \*\// :
+    /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//;
+}
+
 export function wait(msecs: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, msecs);

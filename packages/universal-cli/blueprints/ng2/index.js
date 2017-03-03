@@ -85,7 +85,6 @@ module.exports = {
 
     if (this.options && this.options.universal) {
       fileList = fileList.filter(p => p.indexOf('main.ts') < 0);
-      fileList = fileList.filter(p => p.indexOf('app.module.ts') < 0);
     }
 
     return fileList;

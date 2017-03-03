@@ -9,6 +9,7 @@
 import { NgModule } from '@angular/core';
 import { UniversalModule } from 'angular2-universal';
 import { FormsModule } from '@angular/forms';
+import { AppModule } from './app.module';
 import { AppComponent } from './index';
 // import { RouterModule } from '@angular/router';
 // import { appRoutes } from './app/app.routing';
@@ -19,21 +20,19 @@ import { AppComponent } from './index';
 @NgModule({
   /** Root App Component */
   bootstrap: [ AppComponent ],
-  /** Our Components */
-  declarations: [ AppComponent ],
   imports: [
     /**
      * NOTE: Needs to be your first import (!)
      * BrowserModule, HttpModule, and JsonpModule are included
      */
     UniversalModule,
-    FormsModule
+    AppModule
     /**
      * using routes
      */
     // RouterModule.forRoot(appRoutes)
   ]
 })
-export class AppModule {
+export class BrowserAppModule {
 
 }
