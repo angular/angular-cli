@@ -1,3 +1,27 @@
+<a name="1.0.0-rc.1"></a>
+# [1.0.0-rc.1](https://github.com/angular/angular-cli/compare/v1.0.0-rc.0...v1.0.0-rc.1) (2017-03-03)
+
+
+### Bug Fixes
+
+* **@angular/cli:** add dom to lib array ([#5060](https://github.com/angular/angular-cli/issues/5060)) ([dd9eb17](https://github.com/angular/angular-cli/commit/dd9eb17)), closes [#5046](https://github.com/angular/angular-cli/issues/5046)
+* **@angular/cli:** add typing for module.id for SystemJS usage ([21d776f](https://github.com/angular/angular-cli/commit/21d776f))
+* **@angular/cli:** fix access to sections of package.json that dont exist ([#5074](https://github.com/angular/angular-cli/issues/5074)) ([211270d](https://github.com/angular/angular-cli/commit/211270d)), closes [#5070](https://github.com/angular/angular-cli/issues/5070)
+* **@angular/cli:** fix webdriver deep import on yarn ([#5057](https://github.com/angular/angular-cli/issues/5057)) ([97bfb12](https://github.com/angular/angular-cli/commit/97bfb12)), closes [#4596](https://github.com/angular/angular-cli/issues/4596)
+* **@angular/cli:** Fixing duplicate aliases issue ([#4987](https://github.com/angular/angular-cli/issues/4987)) ([0fc2190](https://github.com/angular/angular-cli/commit/0fc2190))
+* **@angular/cli:** ignore ts-node when attempting to run karma with a linked cli ([#4997](https://github.com/angular/angular-cli/issues/4997)) ([7b8f692](https://github.com/angular/angular-cli/commit/7b8f692)), closes [#4568](https://github.com/angular/angular-cli/issues/4568) [#4177](https://github.com/angular/angular-cli/issues/4177)
+* **@angular/cli:** look for existing manifest in src/ as well ([7f03b5a](https://github.com/angular/angular-cli/commit/7f03b5a))
+* **@angular/cli:** pass the base href through to the sw plugin ([f3644a9](https://github.com/angular/angular-cli/commit/f3644a9))
+* **@ngtools/webpack:** Bump loader-utils and use getOptions ([#5001](https://github.com/angular/angular-cli/issues/5001)) ([864d520](https://github.com/angular/angular-cli/commit/864d520))
+* **@ngtools/webpack:** continue past invalid imports ([#5028](https://github.com/angular/angular-cli/issues/5028)) ([dbd71b7](https://github.com/angular/angular-cli/commit/dbd71b7))
+
+
+### Features
+
+* **@angular/cli:** add new xi18n parameters --locale and --outFile ([#5154](https://github.com/angular/angular-cli/issues/5154)) ([d52d290](https://github.com/angular/angular-cli/commit/d52d290)), closes [#5145](https://github.com/angular/angular-cli/issues/5145)
+
+
+
 <a name="1.0.0-rc.0"></a>
 # [1.0.0-rc.0](https://github.com/angular/angular-cli/compare/v1.0.0-beta.32...v1.0.0-rc.0) (2017-02-25)
 
