@@ -7,6 +7,16 @@ import {LoaderContext, ModuleReason} from './webpack';
 const loaderUtils = require('loader-utils');
 const NormalModule = require('webpack/lib/NormalModule');
 
+// This is a map of changes which need to be made
+const changeMap: {[key: string]: string} = {
+  platformBrowserDynamic: 'platformBrowser',
+  platformDynamicServer: 'platformServer'
+};
+
+const importLocations: { [key: string]: string } = {
+  platformBrowser: '@angular/platform-browser',
+  platformServer: '@angular/platform-server'
+};
 
 function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
   if (!node) {
@@ -205,9 +215,10 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
         = refactor.findAstNodes(access, ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
       return previous.concat(expressions);
     }, [])
+    .filter((call: ts.CallExpression) => call.expression.kind == ts.SyntaxKind.Identifier)
     .filter((call: ts.CallExpression) => {
-      return call.expression.kind == ts.SyntaxKind.Identifier
-          && (call.expression as ts.Identifier).text == 'platformBrowserDynamic';
+      // Find if the expression matches one of the replacement targets
+      return !!changeMap[(call.expression as ts.Identifier).text];
     });
 
   if (calls.length == 0) {
@@ -222,7 +233,10 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
       refactor.replaceNode(call.arguments[0], entryModule.className + 'NgFactory');
     });
 
-  calls.forEach(call => refactor.replaceNode(call.expression, 'platformBrowser'));
+  calls.forEach(call => {
+    // Replace with mapped replacement
+    refactor.replaceNode(call.expression, changeMap[(call.expression as ts.Identifier).text]);
+  });
 
   bootstraps
     .forEach((bs: ts.PropertyAccessExpression) => {
@@ -230,8 +244,14 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
       refactor.replaceNode(bs.name, 'bootstrapModuleFactory');
     });
 
-  refactor.insertImport('platformBrowser', '@angular/platform-browser');
   refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
+
+  // We need to import the additional imports which are used
+  Object.keys(importLocations)
+    .filter(imp => refactor.sourceMatch(new RegExp(imp)))
+    .forEach(imp => {
+      refactor.insertImport(imp, importLocations[imp]);
+    });
 }
 
 export function removeModuleIdOnlyForTesting(refactor: TypeScriptFileRefactor) {
