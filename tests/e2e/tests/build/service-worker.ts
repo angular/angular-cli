@@ -1,6 +1,6 @@
 import {join} from 'path';
 import {getGlobalVariable} from '../../utils/env';
-import {expectFileToExist} from '../../utils/fs';
+import {expectFileToExist, expectFileToMatch} from '../../utils/fs';
 import {ng, npm} from '../../utils/process';
 
 export default function() {
@@ -15,5 +15,8 @@ export default function() {
     .then(() => ng('set', 'apps.0.serviceWorker=true'))
     .then(() => ng('build', '--prod'))
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
-    .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw-manifest.json')));
+    .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw-manifest.json')))
+    .then(() => ng('build', '--prod', '--base-href=/foo/bar'))
+    .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw-manifest.json')))
+    .then(() => expectFileToMatch('dist/ngsw-manifest.json', /"\/foo\/bar\/index.html"/));
 }

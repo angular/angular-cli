@@ -97,7 +97,7 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
       (decl.moduleSpecifier as ts.StringLiteral).text,
       refactor.fileName, program.getCompilerOptions(), host);
     if (!resolvedModule.resolvedModule || !resolvedModule.resolvedModule.resolvedFileName) {
-      return null;
+      continue;
     }
 
     const module = resolvedModule.resolvedModule.resolvedFileName;

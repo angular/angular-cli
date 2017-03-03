@@ -5,7 +5,9 @@ export const getWebpackExtractI18nConfig = function(
   projectRoot: string,
   appConfig: any,
   genDir: string,
-  i18nFormat: string): any {
+  i18nFormat: string,
+  locale: string,
+  outFile: string): any {
 
   let exclude: string[] = [];
   if (appConfig.test) {
@@ -18,7 +20,9 @@ export const getWebpackExtractI18nConfig = function(
         tsConfigPath: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
         exclude: exclude,
         genDir: genDir,
-        i18nFormat: i18nFormat
+        i18nFormat: i18nFormat,
+        locale: locale,
+        outFile: outFile,
       })
     ]
   };

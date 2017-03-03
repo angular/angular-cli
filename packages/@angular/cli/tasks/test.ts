@@ -20,7 +20,7 @@ export default Task.extend({
     return new Promise((resolve) => {
       const karma = requireProjectModule(projectRoot, 'karma');
       const karmaConfig = path.join(projectRoot, options.config ||
-        this.project.ngConfig.config.test.karma.config);
+        CliConfig.getValue('test.karma.config'));
 
       let karmaOptions: any = Object.assign({}, options);
 

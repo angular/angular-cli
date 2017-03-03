@@ -18,8 +18,7 @@ export default Task.extend({
     const project = this.cliProject;
     const config = CliConfig.fromProject().config;
 
-    const apps = CliConfig.fromProject().config.apps;
-    const app = getAppFromConfig(apps, runTaskOptions.app);
+    const app = getAppFromConfig(runTaskOptions.app);
 
     const outputPath = runTaskOptions.outputPath || app.outDir;
     if (project.root === outputPath) {

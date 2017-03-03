@@ -58,9 +58,7 @@ export default Blueprint.extend({
   ],
 
   beforeInstall: function(options: any) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     if (options.module) {
       // Resolve path to module
       const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
@@ -83,9 +81,7 @@ export default Blueprint.extend({
   },
 
   normalizeEntityName: function (entityName: string) {
-    const cliConfig = CliConfig.fromProject();
-    const ngConfig = cliConfig && cliConfig.config;
-    const appConfig = getAppFromConfig(ngConfig.apps, this.options.app);
+    const appConfig = getAppFromConfig(this.options.app);
     const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
@@ -102,15 +98,11 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
-    const cliConfig = CliConfig.fromProject();
-
     options.spec = options.spec !== undefined ?
-      options.spec :
-      cliConfig && cliConfig.get('defaults.directive.spec');
+      options.spec : CliConfig.getValue('defaults.directive.spec');
 
     options.flat = options.flat !== undefined ?
-      options.flat :
-      cliConfig && cliConfig.get('defaults.directive.flat');
+      options.flat : CliConfig.getValue('defaults.directive.flat');
 
     return {
       dynamicPath: this.dynamicPath.dir,

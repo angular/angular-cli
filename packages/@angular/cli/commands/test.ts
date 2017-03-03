@@ -113,8 +113,6 @@ const TestCommand = EmberTestCommand.extend({
   ],
 
   run: function(commandOptions: TestOptions) {
-    this.project.ngConfig = this.project.ngConfig || CliConfig.fromProject();
-
     const testTask = new TestTask({
       ui: this.ui,
       project: this.project

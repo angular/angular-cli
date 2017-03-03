@@ -22,7 +22,7 @@ export default Task.extend({
 
     let webpackCompiler: any;
     const projectConfig = CliConfig.fromProject().config;
-    const appConfig = getAppFromConfig(projectConfig.apps, serveTaskOptions.app);
+    const appConfig = getAppFromConfig(serveTaskOptions.app);
 
     const outputPath = serveTaskOptions.outputPath || appConfig.outDir;
     if (this.project.root === outputPath) {
