@@ -181,8 +181,8 @@ export class ExtractI18nPlugin implements Tapable {
         });
       })
       .then(() => cb(), (err: any) => {
-        compilation.errors.push(err);
-        cb();
+        this._compilation.errors.push(err);
+        cb(err);
       });
 
   }
