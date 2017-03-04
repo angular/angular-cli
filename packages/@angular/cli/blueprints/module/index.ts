@@ -1,9 +1,9 @@
 import {CliConfig} from '../../models/config';
 import {getAppFromConfig} from '../../utilities/app-utils';
+import {dynamicPathParser} from '../../utilities/dynamic-path-parser';
 
 const path = require('path');
 const Blueprint   = require('../../ember-cli/lib/models/blueprint');
-const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const getFiles = Blueprint.prototype.files;
 
 export default Blueprint.extend({

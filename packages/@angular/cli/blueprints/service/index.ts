@@ -1,12 +1,12 @@
 import {NodeHost} from '../../lib/ast-tools';
 import {CliConfig} from '../../models/config';
 import {getAppFromConfig} from '../../utilities/app-utils';
+import {dynamicPathParser} from '../../utilities/dynamic-path-parser';
 import { oneLine } from 'common-tags';
 
 const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
-const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');

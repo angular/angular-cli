@@ -1,16 +1,16 @@
-var path = require('path');
-var process = require('process');
-var fs = require('fs');
-var stringUtils = require('ember-cli-string-utils');
+import * as path from 'path';
+import * as process from 'process';
+import * as fs from 'fs';
+const stringUtils = require('ember-cli-string-utils');
 
-module.exports = function dynamicPathParser(project, entityName, appConfig) {
-  var projectRoot = project.root;
-  var sourceDir = appConfig.root;
-  var appRoot = path.join(sourceDir, 'app');
-  var cwd = process.env.PWD;
+export function dynamicPathParser(project: any, entityName: string, appConfig: any) {
+  const projectRoot = project.root;
+  const sourceDir = appConfig.root;
+  const appRoot = path.join(sourceDir, 'app');
+  const cwd = process.env.PWD;
 
-  var rootPath = path.join(projectRoot, appRoot);
-  var outputPath = path.join(rootPath, entityName);
+  const rootPath = path.join(projectRoot, appRoot);
+  let outputPath = path.join(rootPath, entityName);
 
   if (entityName.indexOf(path.sep) === 0) {
     outputPath = path.join(rootPath, entityName.substr(1));
@@ -20,14 +20,15 @@ module.exports = function dynamicPathParser(project, entityName, appConfig) {
 
   if (!fs.existsSync(outputPath)) {
     // Verify the path exists on disk.
-    var parsedOutputPath = path.parse(outputPath);
-    var parts = parsedOutputPath.dir.split(path.sep).slice(1);
-    var newPath = parts.reduce((tempPath, part) => {
+    const parsedOutputPath = path.parse(outputPath);
+    const parts = parsedOutputPath.dir.split(path.sep).slice(1);
+    const newPath = parts.reduce((tempPath: string, part: string) => {
       // if (tempPath === '') {
       //   return part;
       // }
-      var withoutPlus = path.join(tempPath, part);
-      var withPlus = path.join(tempPath, '+' + part);
+
+      const withoutPlus = path.join(tempPath, part);
+      const withPlus = path.join(tempPath, '+' + part);
       if (fs.existsSync(withoutPlus)) {
         return withoutPlus;
       } else if (fs.existsSync(withPlus)) {
@@ -49,17 +50,15 @@ module.exports = function dynamicPathParser(project, entityName, appConfig) {
         `above the "${appRoot}" directory`;
   }
 
-  var adjustedPath = outputPath.replace(projectRoot, '');
+  const adjustedPath = outputPath.replace(projectRoot, '');
 
-  var parsedPath = path.parse(adjustedPath);
+  const parsedPath = path.parse(adjustedPath);
 
   if (parsedPath.dir.indexOf(path.sep) === 0) {
     parsedPath.dir = parsedPath.dir.substr(1);
   }
 
   parsedPath.dir = parsedPath.dir === path.sep ? '' : parsedPath.dir;
-  parsedPath.appRoot = appRoot;
-  parsedPath.sourceDir = sourceDir;
 
-  return parsedPath;
+  return { ...parsedPath, appRoot, sourceDir };
 };
