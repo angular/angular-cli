@@ -113,12 +113,15 @@ export class AotPlugin implements Tapable {
       basePath = path.resolve(process.cwd(), options.basePath);
     }
 
-    let tsConfigJson: any = null;
-    try {
-      tsConfigJson = JSON.parse(ts.sys.readFile(this._tsConfigPath));
-    } catch (err) {
-      throw new Error(`An error happened while parsing ${this._tsConfigPath} JSON: ${err}.`);
+    const configResult = ts.readConfigFile(this._tsConfigPath, ts.sys.readFile);
+    if (configResult.error) {
+      const diagnostic = configResult.error;
+      const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+      const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+      throw new Error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`);
     }
+
+    const tsConfigJson = configResult.config;
 
     if (options.hasOwnProperty('compilerOptions')) {
       tsConfigJson.compilerOptions = Object.assign({},

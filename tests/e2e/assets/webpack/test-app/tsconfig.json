@@ -1,4 +1,5 @@
 {
+  // Test comment
   "compilerOptions": {
     "baseUrl": "",
     "module": "es2015",
