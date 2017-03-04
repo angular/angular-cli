@@ -4,18 +4,24 @@ import {AotPlugin} from './plugin';
 import {TypeScriptFileRefactor} from './refactor';
 import {LoaderContext, ModuleReason} from './webpack';
 
+interface Platform {
+  name: string;
+  importLocation: string;
+}
+
 const loaderUtils = require('loader-utils');
 const NormalModule = require('webpack/lib/NormalModule');
 
 // This is a map of changes which need to be made
-const changeMap: {[key: string]: string} = {
-  platformBrowserDynamic: 'platformBrowser',
-  platformDynamicServer: 'platformServer'
-};
-
-const importLocations: { [key: string]: string } = {
-  platformBrowser: '@angular/platform-browser',
-  platformServer: '@angular/platform-server'
+const changeMap: {[key: string]: Platform} = {
+  platformBrowserDynamic: {
+    name: 'platformBrowser',
+    importLocation: '@angular/platform-browser'
+  },
+  platformDynamicServer: {
+    name: 'platformServer',
+    importLocation: '@angular/platform-server'
+  }
 };
 
 function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
@@ -234,8 +240,13 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
     });
 
   calls.forEach(call => {
+    const platform = changeMap[(call.expression as ts.Identifier).text];
+
     // Replace with mapped replacement
-    refactor.replaceNode(call.expression, changeMap[(call.expression as ts.Identifier).text]);
+    refactor.replaceNode(call.expression, platform.name);
+
+    // Add the appropriate import
+    refactor.insertImport(platform.name, platform.importLocation);
   });
 
   bootstraps
@@ -245,13 +256,6 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
     });
 
   refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
-
-  // We need to import the additional imports which are used
-  Object.keys(importLocations)
-    .filter(imp => refactor.sourceMatch(new RegExp(imp)))
-    .forEach(imp => {
-      refactor.insertImport(imp, importLocations[imp]);
-    });
 }
 
 export function removeModuleIdOnlyForTesting(refactor: TypeScriptFileRefactor) {
