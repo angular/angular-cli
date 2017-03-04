@@ -54,7 +54,6 @@ export const Extracti18nTask = Task.extend({
           this.ui.writeError('\nAn error occured during the i18n extraction:\n'
             + ((err && err.stack) || err));
         }
-        throw err;
       });
   }
 });
