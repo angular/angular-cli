@@ -15,7 +15,6 @@ export interface TestOptions {
   log?: string;
   port?: number;
   reporters?: string;
-  build?: boolean;
   sourcemap?: boolean;
   progress?: boolean;
   config: string;
@@ -84,12 +83,6 @@ const TestCommand = EmberTestCommand.extend({
       name: 'reporters',
       type: String,
       description: 'List of reporters to use.'
-    },
-    {
-      name: 'build',
-      type: Boolean,
-      default: true,
-      description: 'Build prior to running tests.'
     },
     {
       name: 'sourcemap',

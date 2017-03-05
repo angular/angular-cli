@@ -20,8 +20,6 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 
 `--browsers` Override which browsers tests are run against.
 
-`--build` Build prior to running tests.
-
 `--code-coverage` Coverage report will be in the coverage/ directory.
 
 `--colors` Enable or disable colors in the output (reporters and logs).
