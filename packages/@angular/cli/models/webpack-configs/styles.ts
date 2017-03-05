@@ -48,8 +48,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const deployUrl = wco.buildOptions.deployUrl;
   const postcssUrlOptions = {
     url: (URL: string) => {
-      // Only convert absolute URLs, which CSS-Loader won't process into require().
-      if (!URL.startsWith('/')) {
+      // Only convert root relative URLs, which CSS-Loader won't process into require().
+      if (!URL.startsWith('/') || URL.startsWith('//')) {
         return URL;
       }
       // Join together base-href, deploy-url and the original URL.
