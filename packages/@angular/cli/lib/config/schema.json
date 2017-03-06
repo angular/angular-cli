@@ -182,6 +182,11 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "performance": {
+            "description": "Performance Webpack options for bundle and assets size limit.",
+            "type": "object",
+            "additionalProperties": true
           }
         },
         "additionalProperties": false

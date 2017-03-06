@@ -28,9 +28,14 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
+  let performance: { [key: string]: number|string } = {};
 
   if (appConfig.main) {
     entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
+  }
+
+  if (appConfig.performance) {
+    performance = appConfig.performance;
   }
 
   if (appConfig.polyfills) {
@@ -80,6 +85,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       filename: `[name]${hashFormat.chunk}.bundle.js`,
       chunkFilename: `[id]${hashFormat.chunk}.chunk.js`
     },
+    performance: performance,
     module: {
       rules: [
         { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
