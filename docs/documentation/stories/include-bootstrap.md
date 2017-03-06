@@ -2,7 +2,7 @@
 
 # Include [Bootstrap](http://getbootstrap.com/)
 
-[Bootstrap](http://getbootstrap.com/) is a popular CSS framework which can be used within an Angular project.
+[Bootstrap](https://getbootstrap.com/) is a popular CSS framework which can be used within an Angular project.
 This guide will walk you through adding bootstrap to your Angular CLI project and configuring it to use bootstrap.
 
 ## Using CSS
@@ -44,7 +44,27 @@ Now that the project is set up it must be configured to include the bootstrap CS
     "../node_modules/bootstrap/dist/css/bootstrap.min.css",
     "styles.css"
   ],
-  ```
+  
+  ### Adding full Bootstrap component JS support
+
+  # version 4.x
+
+  **Note:** from Bootstrap site 
+  
+  Some plugins and CSS components depend on other plugins. If you include plugins individually, 
+  make sure to check for these dependencies in the docs. Also note that all plugins depend on 
+  jQuery (this means jQuery must be included before the plugin files). Consult our bower.json 
+  to see which versions of jQuery are supported.  
+  https://v4-alpha.getbootstrap.com/getting-started/javascript/
+  
+  ``json
+  "scripts": [
+  	"../node_modules/jquery/dist/jquery.js",
+		"../node_modules/tether/dist/js/tether.js",
+		"../node_modules/bootstrap/dist/js/bootstrap.js",
+  ]
+
+
 
 **Note:** When you make changes to `.angular-cli.json` you will need to re-start `ng serve` to pick up configuration changes.
 
