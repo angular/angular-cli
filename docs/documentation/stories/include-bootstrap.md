@@ -44,25 +44,31 @@ Now that the project is set up it must be configured to include the bootstrap CS
     "../node_modules/bootstrap/dist/css/bootstrap.min.css",
     "styles.css"
   ],
+  ```
   
-  ### Adding full Bootstrap component JS support
+### Adding full Bootstrap component JS support
 
-  # version 4.x
+```json
 
-  **Note:** from Bootstrap site 
+// version 4
+
+**Note:** from Bootstrap site 
   
-  Some plugins and CSS components depend on other plugins. If you include plugins individually, 
-  make sure to check for these dependencies in the docs. Also note that all plugins depend on 
-  jQuery (this means jQuery must be included before the plugin files). Consult our bower.json 
-  to see which versions of jQuery are supported.  
-  https://v4-alpha.getbootstrap.com/getting-started/javascript/
-  
-  ``json
+Some plugins and CSS components depend on other plugins. If you include plugins individually, 
+make sure to check for these dependencies in the docs. Also note that all plugins depend on 
+jQuery (this means jQuery must be included before the plugin files).
+Consult our bower.json to see which versions of jQuery are supported.
+https://v4-alpha.getbootstrap.com/getting-started/javascript/
+
+In `.angular-cli.json` add the following lines to the scripts section:
+
+# version 4.x
   "scripts": [
   	"../node_modules/jquery/dist/jquery.js",
-		"../node_modules/tether/dist/js/tether.js",
-		"../node_modules/bootstrap/dist/js/bootstrap.js",
+    "../node_modules/tether/dist/js/tether.js",
+    "../node_modules/bootstrap/dist/js/bootstrap.js",
   ]
+```
 
 
 
