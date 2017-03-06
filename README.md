@@ -12,8 +12,8 @@ CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/)
 ## Note
 
 The CLI is now in Release Candidate (RC).
-If you are updating from a beta version, check out our [RC.0 Update Guide]
-(https://github.com/angular/angular-cli/wiki/stories-rc.0-update).
+If you are updating from a beta version, check out our [RC Update Guide]
+(https://github.com/angular/angular-cli/wiki/stories-rc-update).
 
 If you wish to collaborate, check out [our issue list](https://github.com/angular/angular-cli/issues).
 

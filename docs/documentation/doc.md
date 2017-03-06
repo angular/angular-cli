@@ -3,4 +3,4 @@
 # ng doc
 
 ## Overview
-`ng doc [search term]` searches documentation on [angular.io](https://angular.io)
+`ng doc [search term]`  Opens the official Angular documentation for a given keyword on [angular.io](https://angular.io).
