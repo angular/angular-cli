@@ -91,6 +91,8 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 
 `--progress` (`-pr`) log progress to the console while building
 
+`--no-progress` prevent logging progress to the console while building
+
 `--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
 
 `--output-hashing` define the output filename cache-busting hashing mode
