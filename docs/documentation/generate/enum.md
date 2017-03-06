@@ -4,3 +4,6 @@
 
 ## Overview
 `ng generate enum [name]` generates an enumeration
+
+## Options
+`--app` Specifies app name or index to use.

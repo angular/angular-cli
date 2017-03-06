@@ -6,14 +6,16 @@
 `ng generate directive [name]` generates a directive
 
 ## Options
-`--flat` flag to indicate if a dir is created
+`--app` Specifies app name or index to use.
 
-`--prefix` specifies whether to use the prefix
+`--export` Specifies if declaring module exports the component.
 
-`--spec` specifies if a spec file is generated
+`--flat` Flag to indicate if a dir is created.
 
-`--skip-import` allows for skipping the module import
+`--module` (`-m`) Allows specification of the declaring module.
 
-`--module` (`-m`) allows specification of the declaring module
+`--prefix` Specifies whether to use the prefix.
 
-`--export` specifies if declaring module exports the directive
+`--skip-import` Allows for skipping the module import.
+
+`--spec` Specifies if a spec file is generated.

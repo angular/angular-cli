@@ -8,22 +8,32 @@
 Default applications are created in a directory of the same name, with an initialized Angular application.
 
 ## Options
-`--dry-run` (`-d`) run through without making any changes
+`--directory` (`-dir`) The directory name to create the app in.
 
-`--skip-install` (`-si`) skip installing packages
+`--dry-run` (`-d`) Run through without making any changes.
 
-`--skip-git` (`-sg`) skip initializing a git repository
+`--inline-style` (`is`) Should have an inline style.
 
-`--directory` (`-dir`) the directory name to create the app in
+`--inline-template` (`it`) Should have an inline template.
 
-`--source-dir` (`-sd`) the name of the source directory
+`--link-cli` Automatically link the `@angular/cli` package.
 
-`--style` the style file default extension
+`--ng4` Create a project with Angular 4 in the template.
 
-`--prefix` (`p`) the prefix to use for all component selectors
+`--prefix` (`p`) The prefix to use for all component selectors.
 
-`--routing` flag to indicate whether to generate a routing module
+`--routing` Generate a routing module.
 
-`--inline-style` (`is`) flag to indicate if the app component should have an inline style
+`--skip-commit` Skip committing the first commit to git.
 
-`--inline-template` (`it`) flag to indicate if the app component should have an inline template
+`--skip-git` (`-sg`) Skip initializing a git repository.
+
+`--skip-install` (`-si`) Skip installing packages.
+
+`--skip-tests` Skip creating spec files.
+
+`--source-dir` (`-sd`) The name of the source directory.
+
+`--style` The style file default extension.
+
+`--verbose` Adds more details to output logging.
