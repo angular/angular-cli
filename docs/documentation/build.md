@@ -103,7 +103,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 
 `--target` (`-t`) Defines the build target.
 
-`--vendor-chunk` (`-vb`) Use a separate bundle containing only vendor libraries.
+`--vendor-chunk` (`-vc`) Use a separate bundle containing only vendor libraries.
 
 `--verbose` (`-v`) Adds more details to output logging.
 

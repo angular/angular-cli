@@ -8,4 +8,4 @@
 ## Options
 `--app` Specifies app name or index to use.
 
-`type` Pptional String to specify the type of interface.
+`type` Optional String to specify the type of interface.
