@@ -273,6 +273,9 @@ There is an additional root-level `tsconfig.json` that is used for IDE integrati
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "lib": [
       "es2016",
       "dom"
