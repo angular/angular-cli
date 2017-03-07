@@ -45,7 +45,7 @@ const TestCommand = EmberTestCommand.extend({
       type: String,
       aliases: ['c'],
       description: oneLine`Use a specific config file.
-        Defaults to the protractor config file in angular-cli.json.`
+        Defaults to the karma config file in .angular-cli.json.`
     },
     {
       name: 'single-run',
