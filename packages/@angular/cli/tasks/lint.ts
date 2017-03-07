@@ -60,6 +60,9 @@ export default Task.extend({
         errors += result.failureCount;
         results = results.concat(result.output.trim().concat('\n'));
       });
+      let allResults = results.split('\n');
+      allResults = allResults.filter((item, index) => allResults.indexOf(item) === index);
+      results = allResults.join('\n');
 
     // print formatter output directly for non human-readable formats
     if (['prose', 'verbose', 'stylish'].indexOf(commandOptions.format) == -1) {
