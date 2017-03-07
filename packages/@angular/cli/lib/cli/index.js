@@ -12,7 +12,6 @@ const UI = require('../../ember-cli/lib/ui');
 const Watcher = require('../../ember-cli/lib/models/watcher');
 const path = require('path');
 
-Error.stackTraceLimit = Infinity;
 
 module.exports = function(options) {
 
