@@ -4,8 +4,10 @@
 `ng generate guard [name]` generates a guard
 
 ## Options
-`--flat` flag to indicate if a dir is created
+`--app` Specifies app name or index to use.
 
-`--spec` specifies if a spec file is generated
+`--flat` Indicate if a dir is created.
 
-`--module` (`-m`) allows specification of the declaring module
+`--module` (`-m`) Allows specification of the declaring module.
+
+`--spec` Specifies if a spec file is generated.

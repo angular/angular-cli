@@ -6,9 +6,10 @@
 `ng generate module [name]` generates an NgModule
 
 ## Options
+`--app` Specifies app name or index to use.
 
-`--flat` flag to indicate if a dir is created
+`--flat` Flag to indicate if a dir is created.
 
-`--spec` specifies if a spec file is generated
+`--spec` Specifies if a spec file is generated.
 
-`--routing` specifies if a routing module file should be generated
+`--routing` Specifies if a routing module file should be generated.

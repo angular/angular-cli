@@ -16,14 +16,10 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 ## Options
 `--config` (`-c`) use a specific config file. Defaults to the protractor config file in `.angular-cli.json`.
 
-`--specs` (`-sp`) override specs in the protractor config.
-Can send in multiple specs by repeating flag (`ng e2e --specs=spec1.ts --specs=spec2.ts`).
+`--element-explorer` (`-ee`) Start Protractor's [Element Explorer](https://github.com/angular/protractor/blob/master/docs/debugging.md#testing-out-protractor-interactively) for debugging.
 
-`--element-explorer` (`-ee`) start Protractor's
-[Element Explorer](https://github.com/angular/protractor/blob/master/docs/debugging.md#testing-out-protractor-interactively)
-for debugging.
+`--serve` Compile and Serve the app. All serve options are also available. The live-reload option defaults to false, and the default port will be random.
 
-`--webdriver-update` (`-wu`) try to update webdriver.
+`--specs` Override specs in the protractor config. Can send in multiple specs by repeating flag (ng e2e --specs=spec1.ts --specs=spec2.ts).
 
-`--serve` (`-s`) compile and serve the app.
-All non-reload related serve options are also available (e.g. `--port=4400`).
+`--webdriver-update` (`-wu`) (Default: true) Try to update webdriver.

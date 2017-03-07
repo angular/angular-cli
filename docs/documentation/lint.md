@@ -7,8 +7,8 @@
 
 ## Options
 
-`--fix` will attempt to fix lint errors
+`--fix` Fixes linting errors (may overwrite linted files).
 
-`--force` will always return error code 0 even with lint errors
+`--force` Succeeds even if there was linting errors.
 
-`--format` (`-t`) the output formatter to use
+`--format` (`-t`) Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).
