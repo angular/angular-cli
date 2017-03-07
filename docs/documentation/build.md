@@ -83,10 +83,14 @@ router.events.map(event => console.log(event.constructor.name));
 ```
 
 #### Difference between building with or without `---prod` flag
+The functionality that does not have * after it, are by default added to the workflow.
+
 |              | With | Without |
 |--------------|:----:|:-------:|
-| Tree-shaking |  x   |    x    |
+| Tree-shaking |  x   |    x*   |
 | Uglifying    |  x   |         |
+
+*The flag must specifically be added.
 
 ## Options
 `--aot` Build using Ahead of Time compilation.
