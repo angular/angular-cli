@@ -6,22 +6,24 @@
 `ng generate component [name]` generates a component
 
 ## Options
-`--flat` flag to indicate if a dir is created
+`--app` Specifies app name or index to use.
 
-`--inline-template` (`-it`) specifies if the template will be in the ts file
+`--change-detection` (`-cd`) Specifies the change detection strategy.
 
-`--inline-style` (`-is`) specifies if the style will be in the ts file
+`--flat` Flag to indicate if a dir is created.
 
-`--prefix` specifies whether to use the prefix
+`--export` Specifies if declaring module exports the component.
 
-`--spec` specifies if a spec file is generated
+`--inline-style` (`-is`) Specifies if the style will be in the ts file.
 
-`--view-encapsulation` (`-ve`) specifies the view encapsulation strategy
+`--inline-template` (`-it`) Specifies if the template will be in the ts file.
 
-`--change-detection` (`-cd`) specifies the change detection strategy
+`--module` (`-m`) Allows specification of the declaring module.
 
-`--skip-import` allows for skipping the module import
+`--prefix` Specifies whether to use the prefix.
 
-`--module` (`-m`) allows specification of the declaring module
+`--skip-import` Allows for skipping the module import.
 
-`--export` specifies if declaring module exports the component
+`--spec` Specifies if a spec file is generated.
+
+`--view-encapsulation` (`-ve`) Specifies the view encapsulation strategy.

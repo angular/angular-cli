@@ -5,6 +5,7 @@
 ## Overview
 `ng generate interface [name] <type>` generates an interface
 
-## Arguments
+## Options
+`--app` Specifies app name or index to use.
 
-`type` optional string to specify the type of interface
+`type` Pptional String to specify the type of interface.
