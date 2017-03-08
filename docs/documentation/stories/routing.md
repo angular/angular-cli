@@ -8,6 +8,4 @@ The CLI supports routing in several ways:
 
   The file includes an empty `Routes` object that you can fill with routes to different components and/or modules.
 
-  The `--routing` option also generates a default component with the same name as the module.
-
 - You can use the `--routing` option with `ng new` to create a `app-routing.module.ts` file when you create or initialize a project.
