@@ -25,3 +25,6 @@ All the build Options are available in serve below are the additional options.
 `--ssl-cert` SSL certificate to use for serving HTTPS.
 
 `--ssl-key` SSL key to use for serving HTTPS.
+
+## Note
+When running `ng serve`, the compiled output is served from memory, not from disk. This means that the application being served is not located on disk in the `dist` folder.
