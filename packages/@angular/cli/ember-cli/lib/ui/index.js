@@ -174,12 +174,10 @@ UI.prototype.prompt = function(questions, callback) {
 
   // If no callback was provided, automatically return a promise
   if (callback) {
-    inquirer.prompt(questions, callback);
-  } else {
-    return new Promise(function(resolve) {
-      inquirer.prompt(questions, resolve);
-    });
+    return inquirer.prompt(questions, callback);
   }
+
+  return inquirer.prompt(questions);
 };
 
 /**
