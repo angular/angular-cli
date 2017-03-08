@@ -20,3 +20,4 @@
  - [Routing](stories/routing)
  - [3rd Party Lib](stories/third-party-lib)
  - [Corporate Proxy](stories/using-corporate-proxy)
+ - [Serve from Disk](stories/disk-serve)
