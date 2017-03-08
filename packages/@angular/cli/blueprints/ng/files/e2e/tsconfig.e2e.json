@@ -10,7 +10,7 @@
     "lib": [
       "es2016"
     ],<% } %>
-    "outDir": "../dist/out-tsc-e2e",
+    "outDir": "../out-tsc/e2e",
     "module": "commonjs",
     "target": "es5",
     "types":[
