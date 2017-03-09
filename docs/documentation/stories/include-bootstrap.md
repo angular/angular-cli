@@ -69,10 +69,16 @@ In `.angular-cli.json` add the following lines to the scripts section:
     "../node_modules/bootstrap/dist/js/bootstrap.js",
   ]
 ```
-
-
-
 **Note:** When you make changes to `.angular-cli.json` you will need to re-start `ng serve` to pick up configuration changes.
+
+### Other Bootstrap component libaries
+
+ - ng bootstrap https://ng-bootstrap.github.io (version 4.x only)
+ - ng2 bootstrap http://valor-software.com/ng2-bootstrap/ (version 3.x & 4.x)
+ 
+You should check with the libraries for instructions how to include their project with Angular-cli. You probably only need to 
+include the above CSS instructions, the JS/TS part will be provided by the library themself.
+
 
 ### Testing Project
 
