@@ -64,7 +64,7 @@ const SetCommand = Command.extend({
         case 'number': value = this.asNumber(rawValue); break;
         case 'string': value = rawValue; break;
 
-        default: value = JSON.parse(rawValue);
+        default: value = parseValue(rawValue, jsonPath);
       }
 
       config.set(jsonPath, value);
@@ -73,5 +73,13 @@ const SetCommand = Command.extend({
     });
   }
 });
+
+function parseValue(rawValue: string, path: string) {
+  try {
+    return JSON.parse(rawValue);
+  } catch (error) {
+    throw new SilentError(`No node found at path ${path}`);
+  }
+}
 
 export default SetCommand;
