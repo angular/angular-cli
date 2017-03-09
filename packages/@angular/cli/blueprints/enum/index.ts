@@ -6,6 +6,7 @@ const Blueprint = require('../../ember-cli/lib/models/blueprint');
 
 export default Blueprint.extend({
   description: '',
+  aliases: ['e'],
 
   availableOptions: [
     {

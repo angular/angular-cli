@@ -35,6 +35,7 @@ function correctCase(options: any) {
 
 export default Blueprint.extend({
   description: '',
+  aliases: ['c'],
 
   availableOptions: [
     {
