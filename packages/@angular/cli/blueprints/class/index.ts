@@ -8,6 +8,7 @@ const getFiles = Blueprint.prototype.files;
 
 export default Blueprint.extend({
   description: '',
+  aliases: ['cl'],
 
   availableOptions: [
     {
