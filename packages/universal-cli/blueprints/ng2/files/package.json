@@ -51,7 +51,7 @@
     "@types/mime": "0.0.28",
     "@types/serve-static": "^1.7.27",<% } %>
     "universal-cli": "<%= version %>",
-    "codelyzer": "~2.0.0-beta.1",
+    "codelyzer": "2.0.0",
     "jasmine-core": "2.5.2",
     "jasmine-spec-reporter": "2.5.0",
     "karma": "1.2.0",
