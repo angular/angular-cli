@@ -5,7 +5,6 @@ import * as ts from 'typescript';
 import { requireProjectModule } from '../utilities/require-project-module';
 import { CliConfig } from '../models/config';
 import { LintCommandOptions } from '../commands/lint';
-import { oneLine } from 'common-tags';
 
 interface CliLintConfig {
   files?: (string | string[]);
@@ -21,11 +20,7 @@ export default Task.extend({
     const lintConfigs: CliLintConfig[] = CliConfig.fromProject().config.lint || [];
 
     if (lintConfigs.length === 0) {
-      ui.writeLine(chalk.yellow(oneLine`
-        No lint config(s) found.
-        If this is not intended, run "ng update".
-      `));
-
+      ui.writeLine(chalk.yellow('No lint configuration(s) found.'));
       return Promise.resolve(0);
     }
 
