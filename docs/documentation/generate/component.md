@@ -18,7 +18,7 @@
 
 `--inline-template` (`-it`) Specifies if the template will be in the ts file.
 
-`--module` (`-m`) Allows specification of the declaring module.
+`--module` (`-m`) Allows specification of the declaring module's file name (e.g `app.module.ts`).
 
 `--prefix` Specifies whether to use the prefix.
 
