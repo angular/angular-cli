@@ -72,7 +72,7 @@
     `--module` (alias: `-m`)
   </p>
   <p>
-    Allows specification of the declaring module.
+    Allows specification of the declaring module's file name (e.g `app.module.ts`).
   </p>
 </details>
 
