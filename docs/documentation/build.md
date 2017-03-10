@@ -65,46 +65,205 @@ All builds make use of bundling, and using the `--prod` flag in  `ng build --pro
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ## Options
-`--aot` Build using Ahead of Time compilation.
+<details>
+  <summary>aot</summary>
+  <p>
+    `--aot` _default: false_
+  </p>
+  <p>
+    Build using Ahead of Time compilation.
+  </p>
+</details>
 
-`--app` Specifies app name or index to use.
+<details>
+  <summary>app</summary>
+  <p>
+    `--app` (aliases: `-a`)
+  </p>
+  <p>
+    Specifies app name or index to use.
+  </p>
+</details>
 
-`--base-href` (`-bh`) Base url for the application being built.
+<details>
+  <summary>base-href</summary>
+  <p>
+    `--base-href` (aliases: `-bh`)
+  </p>
+  <p>
+    Base url for the application being built.
+  </p>
+</details>
 
-`--deploy-url` (`-d`) URL where files will be deployed.
+<details>
+  <summary>deploy-url</summary>
+  <p>
+    `--deploy-url` (aliases: `-d`)
+  </p>
+  <p>
+    URL where files will be deployed.
+  </p>
+</details>
 
-`--dev` Build target and environment to development.
+<details>
+  <summary>output-path</summary>
+  <p>
+    `--output-path` (aliases: `-op`)
+  </p>
+  <p>
+    Path where output will be placed
+  </p>
+</details>
 
-`--output-path` (`-op`) path where output will be placed
+<details>
+  <summary>environment</summary>
+  <p>
+    `--environment` (aliases: `-e`)
+  </p>
+  <p>
+    Defines the build environment.
+  </p>
+</details>
 
-`--environment` (`-e`) Defines the build environment.
+<details>
+  <summary>extract-css</summary>
+  <p>
+    `--extract-css` (aliases: `-ec`)
+  </p>
+  <p>
+    Extract css from global styles onto css files instead of js ones.
+  </p>
+</details>
 
-`--extract-css` (`-ec`) Extract css from global styles onto css files instead of js ones.
+<details>
+  <summary>i18n-file</summary>
+  <p>
+    `--i18n-file`
+  </p>
+  <p>
+    Localization file to use for i18n.
+  </p>
+</details>
 
-`--i18n-file` Localization file to use for i18n.
+<details>
+  <summary>i18n-format</summary>
+  <p>
+    `--i18n-format`
+  </p>
+  <p>
+    Format of the localization file specified with --i18n-file.
+  </p>
+</details>
 
-`--i18n-format` Format of the localization file specified with --i18n-file.
+<details>
+  <summary>locale</summary>
+  <p>
+    `--locale`
+  </p>
+  <p>
+    Locale to use for i18n.
+  </p>
+</details>
 
-`--locale` Locale to use for i18n.
+<details>
+  <summary>output-hashing</summary>
+  <p>
+    `--output-hashing` (aliases: `-oh`)
+  </p>
+  <p>
+    Define the output filename cache-busting hashing mode.
+  </p>
+  <p>
+    Values: `none`, `all`, `media`, `bundles`
+  </p>
+</details>
 
-`--output-hashing` Define the output filename cache-busting hashing mode.
+<details>
+  <summary>output-path</summary>
+  <p>
+    `--output-path` (aliases: `-op`)
+  </p>
+  <p>
+    Path where output will be placed.
+  </p>
+</details>
 
-`--output-path` (`-op`) Path where output will be placed.
+<details>
+  <summary>poll</summary>
+  <p>
+    `--poll`
+  </p>
+  <p>
+    Enable and define the file watching poll time period (milliseconds).
+  </p>
+</details>
 
-`--poll` Enable and define the file watching poll time period (milliseconds).
+<details>
+  <summary>progress</summary>
+  <p>
+    `--progress` (aliases: `-pr`) _default value: true_
+  </p>
+  <p>
+    Log progress to the console while building.
+  </p>
+</details>
 
-`--prod` Build target and environment to production.
+<details>
+  <summary>sourcemap</summary>
+  <p>
+    `--sourcemap` (aliases: `-sm`, `sourcemaps`)
+  </p>
+  <p>
+    Output sourcemaps.
+  </p>
+</details>
 
-`--progress` (`-pr`) Log progress to the console while building.
+<details>
+  <summary>stats-json</summary>
+  <p>
+    `--stats-json` (aliases: `-`)
+  </p>
+  <p>
+    Generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse.
+  </p>
+</details>
 
-`--sourcemap` (`-sm`) Output sourcemaps.
+<details>
+  <summary>target</summary>
+  <p>
+    `--target` (aliases: `-t`, `-dev`, `-prod`) _default value: development_
+  </p>
+  <p>
+    Defines the build target.
+  </p>
+</details>
 
-`--stats-json` Generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse.
+<details>
+  <summary>vendor-chunk</summary>
+  <p>
+    `--vendor-chunk` (aliases: `-vc`) _default value: true_
+  </p>
+  <p>
+    Use a separate bundle containing only vendor libraries.
+  </p>
+</details>
 
-`--target` (`-t`) Defines the build target.
+<details>
+  <summary>verbose</summary>
+  <p>
+    `--verbose` (aliases: `-v`) _default value: false_
+  </p>
+  <p>
+    Adds more details to output logging.
+  </p>
+</details>
 
-`--vendor-chunk` (`-vc`) Use a separate bundle containing only vendor libraries.
-
-`--verbose` (`-v`) Adds more details to output logging.
-
-`--watch` (`-w`) Run build when files change.
+<details>
+  <summary>watch</summary>
+  <p>
+    `--watch` (aliases: `-w`)
+  </p>
+  <p>
+    Run build when files change.
+  </p>
+</details>
