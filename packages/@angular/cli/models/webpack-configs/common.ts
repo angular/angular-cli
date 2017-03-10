@@ -98,7 +98,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     node: {
       fs: 'empty',
       global: true,
-      crypto: 'empty',
+      crypto: true,
       tls: 'empty',
       net: 'empty',
       process: true,
