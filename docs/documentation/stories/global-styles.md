@@ -26,3 +26,27 @@ You can also rename the output and lazy load it by using the object format:
   { "input": "pre-rename-style.scss", "output": "renamed-style" },
 ],
 ```
+
+In Sass and Stylus you can also make use of the `includePaths` functionality for both component and
+global styles, which allows you to add extra base paths that will be checked for imports.
+
+To add paths, use the `stylePreprocessorOptions` entry in angular-cli.json `app` object:
+
+```
+"stylePreprocessorOptions": {
+  "includePaths": [
+    "style-paths"
+  ]
+},
+```
+
+Files in that folder, e.g. `src/style-paths/_variables.scss`, can be imported from anywhere in your
+project without the need for a relative path:
+
+```
+// src/app/app.component.scss
+// A relative path works
+@import '../style-paths/variables';
+// But now this works as well
+@import 'variables';
+```
