@@ -1,4 +1,3 @@
-import {CliConfig} from '../../models/config';
 import {getAppFromConfig} from '../../utilities/app-utils';
 
 const path = require('path');
