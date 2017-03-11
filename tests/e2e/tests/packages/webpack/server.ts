@@ -7,7 +7,7 @@ import {expectFileToMatch} from '../../../utils/fs';
 export default function(skipCleaning: () => void) {
   return Promise.resolve()
     .then(() => createProjectFromAsset('webpack/test-server-app'))
-    .then(() => exec(normalize('node_modules/.bin/webpack'), '-p'))
+    .then(() => exec(normalize('node_modules/.bin/webpack')))
     .then(() => expectFileToMatch('dist/app.main.js',
       new RegExp('.bootstrapModuleFactory'))
     .then(() => expectFileToMatch('dist/app.main.js',
