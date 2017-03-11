@@ -6,7 +6,15 @@
 `ng get [key]` Get a value from the configuration.
 
 ## Options
-`--global` Get the value in the global configuration (in your home directory).
+<details>
+  <summary>global</summary>
+  <p>
+    `--global` _default value: false_
+  </p>
+  <p>
+    Get the value in the global configuration (in your home directory).
+  </p>
+</details>
 
 
 # ng set
@@ -15,4 +23,12 @@
 `ng set [key]=[value]` Set a value in the configuration.
 
 ## Options
-`--global` Set the value in the global configuration rather than in your project's.
+<details>
+  <summary>global</summary>
+  <p>
+    `--global` _default value: false_
+  </p>
+  <p>
+    Get the value in the global configuration (in your home directory).
+  </p>
+</details>
