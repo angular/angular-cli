@@ -12,6 +12,27 @@ const getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 
+const viewEncapsulationMap: any = {
+  'emulated': 'Emulated',
+  'native': 'Native',
+  'none': 'None'
+};
+
+const changeDetectionMap: any = {
+  'default': 'Default',
+  'onpush': 'OnPush'
+};
+
+function correctCase(options: any) {
+  if (options.viewEncapsulation) {
+    options.viewEncapsulation = viewEncapsulationMap[options.viewEncapsulation.toLowerCase()];
+  }
+
+  if (options.changeDetection) {
+    options.changeDetection = changeDetectionMap[options.changeDetection.toLowerCase()];
+  }
+}
+
 export default Blueprint.extend({
   description: '',
 
@@ -145,6 +166,8 @@ export default Blueprint.extend({
 
     options.changeDetection = options.changeDetection !== undefined ?
       options.changeDetection : CliConfig.getValue('defaults.component.changeDetection');
+
+    correctCase(options);
 
     return {
       dynamicPath: this.dynamicPath.dir.replace(this.dynamicPath.appRoot, ''),
