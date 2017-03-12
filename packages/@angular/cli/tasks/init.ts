@@ -33,9 +33,10 @@ export default Task.extend({
       });
     }
 
+    const packageManager = CliConfig.fromGlobal().get('packageManager');
+
     let npmInstall: any;
     if (!commandOptions.skipInstall) {
-      const packageManager = CliConfig.fromGlobal().get('packageManager');
       npmInstall = new NpmInstall({
         ui: this.ui,
         project: this.project,
@@ -47,7 +48,8 @@ export default Task.extend({
     if (commandOptions.linkCli) {
       linkCli = new LinkCli({
         ui: this.ui,
-        project: this.project
+        project: this.project,
+        packageManager
       });
     }
 
@@ -105,4 +107,3 @@ export default Task.extend({
       });
   }
 });
-
