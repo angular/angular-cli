@@ -501,7 +501,7 @@ export default Task.extend({
           packageJson['devDependencies'][packageName] = ourPackageJson['dependencies'][packageName];
         });
 
-        return writeFile('package.json', JSON.stringify(packageJson, null, 2));
+        return writeFile('package.json', JSON.stringify(packageJson, null, 2) + '\n');
       })
       .then(() => JSON.parse(ts.sys.readFile(tsConfigPath)))
       .then((tsConfigJson: any) => {
@@ -512,7 +512,7 @@ export default Task.extend({
             '**/*.spec.ts'
           ];
         }
-        return writeFile(tsConfigPath, JSON.stringify(tsConfigJson, null, 2));
+        return writeFile(tsConfigPath, JSON.stringify(tsConfigJson, null, 2) + '\n');
       })
       // Output the webpack.config.js.
       .then(() => writeFile('webpack.config.js', webpackConfigStr))
