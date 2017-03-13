@@ -44,17 +44,23 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const cssnanoPlugin = cssnano({ safe: true, autoprefixer: false });
 
   // Convert absolute resource URLs to account for base-href and deploy-url.
-  const baseHref = wco.buildOptions.baseHref;
-  const deployUrl = wco.buildOptions.deployUrl;
+  const baseHref = wco.buildOptions.baseHref || '';
+  const deployUrl = wco.buildOptions.deployUrl || '';
   const postcssUrlOptions = {
     url: (URL: string) => {
       // Only convert root relative URLs, which CSS-Loader won't process into require().
       if (!URL.startsWith('/') || URL.startsWith('//')) {
         return URL;
       }
-      // Join together base-href, deploy-url and the original URL.
-      // Also dedupe multiple slashes into single ones.
-      return `/${baseHref || ''}/${deployUrl || ''}/${URL}`.replace(/\/\/+/g, '/');
+
+      if (deployUrl.match(/:\/\//)) {
+        // If deployUrl contains a scheme, ignore baseHref use deployUrl as is.
+        return `${deployUrl.replace(/\/$/, '')}${URL}`;
+      } else {
+        // Join together base-href, deploy-url and the original URL.
+        // Also dedupe multiple slashes into single ones.
+        return `/${baseHref}/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
+      }
     }
   };
   const urlPlugin = postcssUrl(postcssUrlOptions);
