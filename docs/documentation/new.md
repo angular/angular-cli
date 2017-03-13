@@ -8,32 +8,142 @@
 Default applications are created in a directory of the same name, with an initialized Angular application.
 
 ## Options
-`--directory` (`-dir`) The directory name to create the app in.
+<details>
+  <summary>directory</summary>
+  <p>
+    `--directory` (alias: `-dir`) _default value: dir_
+  </p>
+  <p>
+    The directory name to create the app in.
+  </p>
+</details>
 
-`--dry-run` (`-d`) Run through without making any changes.
+<details>
+  <summary>dry-run</summary>
+  <p>
+    `--dry-run` (alias: `-d`) _default value: false_
+  </p>
+  <p>
+    Run through without making any changes.
+  </p>
+</details>
 
-`--inline-style` (`is`) Should have an inline style.
+<details>
+  <summary>inline-style</summary>
+  <p>
+    `--inline-style` (alias: `-is`) _default value: false_
+  </p>
+  <p>
+    Should have an inline style.
+  </p>
+</details>
 
-`--inline-template` (`it`) Should have an inline template.
+<details>
+  <summary>inline-template</summary>
+  <p>
+    `--inline-template` (alias: `-it`) _default value: false_
+  </p>
+  <p>
+    Should have an inline template.
+  </p>
+</details>
 
-`--link-cli` Automatically link the `@angular/cli` package.
+<details>
+  <summary>ng4</summary>
+  <p>
+    `--ng4` _default value: false_
+  </p>
+  <p>
+    Create a project with Angular 4 in the template.
+  </p>
+</details>
 
-`--ng4` Create a project with Angular 4 in the template.
+<details>
+  <summary>prefix</summary>
+  <p>
+    `--prefix` (alias: `-p`) _default value: app_
+  </p>
+  <p>
+    The prefix to use for all component selectors.
+  </p>
+</details>
 
-`--prefix` (`p`) The prefix to use for all component selectors.
+<details>
+  <summary>routing</summary>
+  <p>
+    `--routing` _default value: false_
+  </p>
+  <p>
+    Generate a routing module.
+  </p>
+</details>
 
-`--routing` Generate a routing module.
+<details>
+  <summary>skip-commit</summary>
+  <p>
+    `--skip-commit` (alias: `-sc`) _default value: false_
+  </p>
+  <p>
+    Skip committing the first commit to git.
+  </p>
+</details>
 
-`--skip-commit` Skip committing the first commit to git.
+<details>
+  <summary>skip-git</summary>
+  <p>
+    `--skip-git` (alias: `-sg`) _default value: false_
+  </p>
+  <p>
+    Skip initializing a git repository.
+  </p>
+</details>
 
-`--skip-git` (`-sg`) Skip initializing a git repository.
+<details>
+  <summary>skip-install</summary>
+  <p>
+    `--skip-install` (alias: `-si`) _default value: false_
+  </p>
+  <p>
+    Skip installing packages.
+  </p>
+</details>
 
-`--skip-install` (`-si`) Skip installing packages.
+<details>
+  <summary>skip-tests</summary>
+  <p>
+    `--skip-tests` (alias: `-st`) _default value: false_
+  </p>
+  <p>
+    Skip creating spec files.
+  </p>
+</details>
 
-`--skip-tests` Skip creating spec files.
+<details>
+  <summary>source-dir</summary>
+  <p>
+    `--source-dir` (alias: `-sd`) _default value: src_
+  </p>
+  <p>
+    The name of the source directory.
+  </p>
+</details>
 
-`--source-dir` (`-sd`) The name of the source directory.
+<details>
+  <summary>style</summary>
+  <p>
+    `--style` _default value: css_
+  </p>
+  <p>
+    The style file default extension.
+  </p>
+</details>
 
-`--style` The style file default extension.
-
-`--verbose` Adds more details to output logging.
+<details>
+  <summary>verbose</summary>
+  <p>
+    `--verbose` (alias: `-v`) _default value: false_
+  </p>
+  <p>
+    Adds more details to output logging.
+  </p>
+</details>
