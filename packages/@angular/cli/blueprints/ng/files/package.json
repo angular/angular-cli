@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve",<% if (hmr) { %>
+    "hmr": "ng serve --hmr -e=hmr",<% } %>
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -26,7 +27,8 @@
   },
   "devDependencies": {
     "@angular/cli": "<%= version %>",
-    "@angular/compiler-cli": "<%= ng4 ? '>=4.0.0-beta <5.0.0' : '^2.4.0' %>",
+    "@angular/compiler-cli": "<%= ng4 ? '>=4.0.0-beta <5.0.0' : '^2.4.0' %>",<% if (hmr) { %>
+    "@angularclass/hmr": "^1.2.2",<% } %>
     "@types/jasmine": "2.5.38",
     "@types/node": "~6.0.60",
     "codelyzer": "~2.0.0",
