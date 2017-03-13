@@ -33,10 +33,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
   }
 
-  if (appConfig.polyfills) {
-    entryPoints['polyfills'] = [path.resolve(appRoot, appConfig.polyfills)];
-  }
-
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
 
