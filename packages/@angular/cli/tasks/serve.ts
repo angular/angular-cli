@@ -64,15 +64,9 @@ export default Task.extend({
         `webpack-dev-server/client?${clientAddress}`
       ];
       if (serveTaskOptions.hmr) {
-        const webpackHmrLink = 'https://webpack.github.io/docs/hot-module-replacement.html';
         ui.writeLine(oneLine`
           ${chalk.yellow('NOTICE')} Hot Module Replacement (HMR) is enabled for the dev server.
         `);
-        ui.writeLine('  The project will still live reload when HMR is enabled,');
-        ui.writeLine('  but to take advantage of HMR additional application code is required');
-        ui.writeLine('  (not included in an Angular CLI project by default).');
-        ui.writeLine(`  See ${chalk.blue(webpackHmrLink)}`);
-        ui.writeLine('  for information on working with HMR for Webpack.');
         entryPoints.push('webpack/hot/dev-server');
         webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
         webpackConfig.plugins.push(new webpack.NamedModulesPlugin());
