@@ -12,40 +12,192 @@ ng eject
 ```
 
 ## Options
-  `--aot` Build using Ahead of Time compilation.
+<details>
+  <summary>aot</summary>
+  <p>
+    `--aot`
+  </p>
+  <p>
+    Build using Ahead of Time compilation.
+  </p>
+</details>
 
-  `--app` (`-a`) Specifies app name to use.
+<details>
+  <summary>app</summary>
+  <p>
+    `--app` (alias: `-a`) _default value: 1st app_
+  </p>
+  <p>
+    Specifies app name to use.
+  </p>
+</details>
 
-  `--base-href` (`-bh`) Base url for the application being built.
+<details>
+  <summary>base-href</summary>
+  <p>
+    `--base-href` (alias: `-bh`)
+  </p>
+  <p>
+    Base url for the application being built.
+  </p>
+</details>
 
-  `--deploy-url` (`-d`) URL where files will be deployed.
+<details>
+  <summary>deploy-url</summary>
+  <p>
+    `--deploy-url` (alias: `-d`)
+  </p>
+  <p>
+    URL where files will be deployed.
+  </p>
+</details>
 
-  `--environment` (`-e`) Defines the build environment.
+<details>
+  <summary>environment</summary>
+  <p>
+    `--environment` (alias: `-e`)
+  </p>
+  <p>
+    Defines the build environment.
+  </p>
+</details>
 
-  `--extract-css` (`-ec`) Extract css from global styles onto css files instead of js ones.
+<details>
+  <summary>extract-css</summary>
+  <p>
+    `--extract-css` (alias: `-ec`)
+  </p>
+  <p>
+    Extract css from global styles onto css files instead of js ones.
+  </p>
+</details>
 
-  `--force` Overwrite any webpack.config.js and npm scripts already existing.
+<details>
+  <summary>force</summary>
+  <p>
+    `--force` _default value: false_
+  </p>
+  <p>
+    Overwrite any webpack.config.js and npm scripts already existing.
+  </p>
+</details>
 
-  `--i18n-file` Localization file to use for i18n.
+<details>
+  <summary>i18n-file</summary>
+  <p>
+    `--i18n-file`
+  </p>
+  <p>
+    Localization file to use for i18n.
+  </p>
+</details>
 
-  `--i18n-format` Format of the localization file specified with --i18n-file.
+<details>
+  <summary>i18n-format</summary>
+  <p>
+    `--i18n-format`
+  </p>
+  <p>
+    Format of the localization file specified with --i18n-file.
+  </p>
+</details>
 
-  `--locale` Locale to use for i18n.
+<details>
+  <summary>locale</summary>
+  <p>
+    `--locale`
+  </p>
+  <p>
+    Locale to use for i18n.
+  </p>
+</details>
 
-  `--output-hashing` (`-oh`) Define the output filename cache-busting hashing mode. Possible values: `none`, `all`, `media`, `bundles`
+<details>
+  <summary>output-hashing</summary>
+  <p>
+    `--output-hashing` (alias: `-oh`) _default value: _
+  </p>
+  <p>
+    Define the output filename cache-busting hashing mode. Possible values: `none`, `all`, `media`, `bundles`
+  </p>
+</details>
 
-  `--output-path` (`-op`) Path where output will be placed.
+<details>
+  <summary>output-path</summary>
+  <p>
+    `--output-path` (alias: `-op`) _default value: _
+  </p>
+  <p>
+    Path where output will be placed.
+  </p>
+</details>
 
-  `--poll` Enable and define the file watching poll time period (milliseconds) .
+<details>
+  <summary>poll</summary>
+  <p>
+    `--poll`
+  </p>
+  <p>
+    Enable and define the file watching poll time period (milliseconds) .
+  </p>
+</details>
 
-  `--progress` (`-pr`) Log progress to the console while building.
+<details>
+  <summary>progress</summary>
+  <p>
+    `--progress` (alias: `-pr`) _default value: true_
+  </p>
+  <p>
+    Log progress to the console while building.
+  </p>
+</details>
 
-  `--sourcemap` (`-sm`, `--sourcemaps`) Output sourcemaps.
+<details>
+  <summary>sourcemap</summary>
+  <p>
+    `--sourcemap` (alias: `-sm`, `sourcemaps`)
+  </p>
+  <p>
+    Output sourcemaps.
+  </p>
+</details>
 
-  `--target` (`-t`, `-dev`, `-prod`) Defines the build target.
+<details>
+  <summary>target</summary>
+  <p>
+    `--target` (aliases: `-t`, `-dev`, `-prod`) _default value: development_
+  </p>
+  <p>
+    Defines the build target.
+  </p>
+</details>
 
-  `--vendor-chunk` (`-vc`) Use a separate bundle containing only vendor libraries.
+<details>
+  <summary>vendor-chunk</summary>
+  <p>
+    `--vendor-chunk` (aliases: `-vc`) _default value: true_
+  </p>
+  <p>
+    Use a separate bundle containing only vendor libraries.
+  </p>
+</details>
 
-  `--verbose` (`-v`) Adds more details to output logging.
+<details>
+  <summary>verbose</summary>
+  <p>
+    `--verbose` (aliases: `-v`) _default value: false_
+  </p>
+  <p>
+    Adds more details to output logging.
+  </p>
+</details>
 
-  `--watch` (`-w`) Run build when files change.
+<details>
+  <summary>watch</summary>
+  <p>
+    `--watch` (aliases: `-w`)
+  </p>
+  <p>
+    Run build when files change.
+  </p>
+</details>
