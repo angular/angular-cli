@@ -5,7 +5,7 @@
 ## Overview
 `ng serve` builds the application and starts a web server
 
-All the build Options are available in serve below are the additional options.
+All the build Options are available in serve, below are the additional options.
 
 ## Options
 `--host` (`-H`) Listens only on localhost by default.
