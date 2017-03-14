@@ -1,15 +1,18 @@
 import {join} from 'path';
-import {ng} from '../../../utils/process';
 import {expectFileToMatch} from '../../../utils/fs';
+import {testGenerate} from '../../../utils/generate';
 
 
 export default function() {
-  const modulePath = join('src', 'app', 'app.module.ts');
+  const appDir = join('src', 'app');
 
-  return ng('generate', 'guard', 'test-guard', '--module', 'app.module.ts')
-    .then(() => expectFileToMatch(modulePath,
-      /import { TestGuardGuard } from '.\/test-guard.guard'/))
-    .then(() => expectFileToMatch(modulePath,
-      /providers:\s*\[TestGuardGuard\]/m))
-    .then(() => ng('build'));
+  return testGenerate({
+    blueprint: 'guard',
+    name: 'module',
+    flags: ['--module', 'app.module.ts']
+  })
+  .then(() => expectFileToMatch(join(appDir, 'app.module.ts'),
+    /import { ModuleGuard } from '.\/module.guard'/))
+  .then(() => expectFileToMatch(join(appDir, 'app.module.ts'),
+    /providers:\s*\[ModuleGuard\]/m));
 }

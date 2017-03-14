@@ -1,24 +1,24 @@
 import {join} from 'path';
-import {ng} from '../../../utils/process';
-import {expectFileToExist} from '../../../utils/fs';
+import {testGenerate} from '../../../utils/generate';
 import {updateJsonFile} from '../../../utils/project';
 
 
 export default function() {
-  const appDir = join('src', 'app');
-
+  const componentDir = join('src', 'app');
   return Promise.resolve()
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const comp = configJson.defaults.component;
       comp.flat = true;
     }))
-    .then(() => ng('generate', 'component', 'test-component'))
-    .then(() => expectFileToExist(appDir))
-    .then(() => expectFileToExist(join(appDir, 'test-component.component.ts')))
-    .then(() => expectFileToExist(join(appDir, 'test-component.component.spec.ts')))
-    .then(() => expectFileToExist(join(appDir, 'test-component.component.html')))
-    .then(() => expectFileToExist(join(appDir, 'test-component.component.css')))
-
-    // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => testGenerate({
+      blueprint: 'component',
+      name: 'flat',
+      pathsToVerify: [
+        componentDir,
+        join(componentDir, 'flat.component.ts'),
+        join(componentDir, 'flat.component.spec.ts'),
+        join(componentDir, 'flat.component.html'),
+        join(componentDir, 'flat.component.css')
+      ],
+    }));
 }

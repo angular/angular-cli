@@ -1,8 +1,11 @@
-import {ng} from '../../../utils/process';
 import {expectToFail} from '../../../utils/utils';
+import {testGenerate} from '../../../utils/generate';
 
 export default function() {
-  return Promise.resolve()
-    .then(() => expectToFail(() =>
-      ng('generate', 'guard', 'test-guard', '--module', 'app.moduleXXX.ts')));
+  return expectToFail(() =>
+    testGenerate({
+      blueprint: 'guard',
+      name: 'module-fail',
+      flags: ['--module', 'app.moduleXXX.ts']
+  }));
 }

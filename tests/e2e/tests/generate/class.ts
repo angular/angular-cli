@@ -1,16 +1,18 @@
 import {join} from 'path';
-import {ng} from '../../utils/process';
-import {expectFileToExist} from '../../utils/fs';
+import {testGenerate} from '../../utils/generate';
 
 
 export default function() {
   const classDir = join('src', 'app');
 
-  return ng('generate', 'class', 'test-class', '--spec')
-    .then(() => expectFileToExist(classDir))
-    .then(() => expectFileToExist(join(classDir, 'test-class.ts')))
-    .then(() => expectFileToExist(join(classDir, 'test-class.spec.ts')))
-
-    // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+  return testGenerate({
+    blueprint: 'class',
+    name: 'basic',
+    flags: ['--spec'],
+    pathsToVerify: [
+      classDir,
+      join(classDir, 'basic.ts'),
+      join(classDir, 'basic.spec.ts')
+    ]
+  });
 }

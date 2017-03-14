@@ -1,15 +1,17 @@
 import {join} from 'path';
-import {ng} from '../../../utils/process';
+import {testGenerate} from '../../../utils/generate';
 import {expectFileToMatch} from '../../../utils/fs';
 
-
 export default function() {
-  const compDir = join('src', 'app', 'test');
-
-  return Promise.resolve()
-    .then(() => ng('generate', 'component', 'test', '-cd', 'onpush', '-ve', 'emulated'))
-    .then(() => expectFileToMatch(join(compDir, 'test.component.ts'),
+  const componentName = 'flag-case';
+  const compDir = join('src', 'app', componentName);
+  return testGenerate({
+      blueprint: 'component',
+      name: componentName,
+      flags: ['-cd', 'onpush', '-ve', 'emulated']
+    })
+    .then(() => expectFileToMatch(join(compDir, `${componentName}.component.ts`),
       /changeDetection: ChangeDetectionStrategy.OnPush/))
-    .then(() => expectFileToMatch(join(compDir, 'test.component.ts'),
+    .then(() => expectFileToMatch(join(compDir, `${componentName}.component.ts`),
       /encapsulation: ViewEncapsulation.Emulated/));
 }

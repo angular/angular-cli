@@ -1,19 +1,21 @@
 import {join} from 'path';
-import {ng} from '../../../utils/process';
-import {expectFileToExist, expectFileToMatch} from '../../../utils/fs';
-import {expectToFail} from '../../../utils/utils';
+import {testGenerate} from '../../../utils/generate';
+import {expectFileToMatch} from '../../../utils/fs';
 
 
 export default function() {
-  const moduleDir = join('src', 'app', 'test');
+  const moduleDir = join('src', 'app', 'basic');
 
-  return ng('generate', 'module', 'test')
-    .then(() => expectFileToExist(moduleDir))
-    .then(() => expectFileToExist(join(moduleDir, 'test.module.ts')))
-    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test-routing.module.ts'))))
-    .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test.spec.ts'))))
-    .then(() => expectFileToMatch(join(moduleDir, 'test.module.ts'), 'TestModule'))
+  return testGenerate({
+    blueprint: 'module',
+    name: 'basic',
+    pathsToVerify: [
+      moduleDir,
+      join(moduleDir, 'basic.module.ts'),
+      '!' + join(moduleDir, 'basic-routing.module.ts'),
+      '!' + join(moduleDir, 'basic.spec.ts'),
+    ]
+  })
+  .then(() => expectFileToMatch(join(moduleDir, 'basic.module.ts'), 'BasicModule'))
 
-    // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
 }

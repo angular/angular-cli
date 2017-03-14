@@ -1,9 +1,12 @@
-import * as path from 'path';
-import { ng } from '../../../utils/process';
-import { oneLine } from 'common-tags';
+import {testGenerate} from '../../../utils/generate';
+import {oneLine} from 'common-tags';
 
-export default function () {
-  return ng('generate', 'component', 'test-component')
+export default function() {
+  const componentName = 'dupe';
+  return testGenerate({
+      blueprint: 'component',
+      name: componentName
+    })
     .then((output) => {
       if (!output.stdout.match(/update src[\\|\/]app[\\|\/]app.module.ts/)) {
         throw new Error(oneLine`
@@ -12,7 +15,10 @@ export default function () {
           in ${output}.`);
       }
     })
-    .then(() => ng('generate', 'component', 'test-component'))
+    .then(() => testGenerate({
+      blueprint: 'component',
+      name: componentName,
+    }))
     .then((output) => {
       if (!output.stdout.match(/identical src[\\|\/]app[\\|\/]app.module.ts/)) {
         throw new Error(oneLine`

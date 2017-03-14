@@ -1,11 +1,7 @@
 import * as fs from 'fs-extra';
 import { join } from 'path';
-import { ng } from '../../../utils/process';
-import { expectFileToExist } from '../../../utils/fs';
-import { expectToFail } from '../../../utils/utils';
+import {testGenerate} from '../../../utils/generate';
 
-
-const Promise = require('@angular/cli/ember-cli/lib/ext/promise');
 
 export default function () {
   const root = process.cwd();
@@ -14,16 +10,14 @@ export default function () {
   process.chdir(testPath);
   fs.mkdirSync('./sub-dir');
 
-  return Promise.resolve()
-    .then(() =>
-      ng('generate', 'module', 'sub-dir/child', '--routing')
-        .then(() => expectFileToExist(join(testPath, 'sub-dir/child')))
-        .then(() => expectFileToExist(join(testPath, 'sub-dir/child', 'child.module.ts')))
-        .then(() => expectFileToExist(join(testPath, 'sub-dir/child', 'child-routing.module.ts')))
-        .then(() => expectToFail(() =>
-          expectFileToExist(join(testPath, 'sub-dir/child', 'child.spec.ts'))
-        ))
-        // Try to run the unit tests.
-        .then(() => ng('test', '--single-run'))
-    );
+  return testGenerate({
+    blueprint: 'module',
+    name: 'sub-dir/child',
+    flags: ['--routing'],
+    pathsToVerify: [
+      join(testPath, 'sub-dir/child'),
+      join(testPath, 'sub-dir/child', 'child.module.ts'),
+      join(testPath, 'sub-dir/child', 'child-routing.module.ts'),
+      '!' + join(testPath, 'sub-dir/child', 'child.spec.ts')
+    ]})
 }

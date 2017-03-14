@@ -1,17 +1,16 @@
 import {join} from 'path';
-import {ng} from '../../../utils/process';
-import {expectFileToExist} from '../../../utils/fs';
-
+import {testGenerate} from '../../../utils/generate';
 
 export default function() {
-  // Does not create a sub directory.
   const guardDir = join('src', 'app');
 
-  return ng('generate', 'guard', 'test-guard')
-    .then(() => expectFileToExist(guardDir))
-    .then(() => expectFileToExist(join(guardDir, 'test-guard.guard.ts')))
-    .then(() => expectFileToExist(join(guardDir, 'test-guard.guard.spec.ts')))
-
-    // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+  return testGenerate({
+      blueprint: 'guard',
+      name: 'basic',
+      pathsToVerify: [
+        guardDir,
+        join(guardDir, 'basic.guard.ts'),
+        join(guardDir, 'basic.guard.spec.ts')
+      ],
+    });
 }
