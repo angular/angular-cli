@@ -12,7 +12,12 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
   let extraPlugins: any[] = [];
-  let entryPoints: {[key: string]: string[]} = {};
+  let entryPoints: { [key: string]: string[] } = {};
+  let appUglifyOptions = appConfig.uglifyOptions || {};
+  let baseUglifyOptions = {
+    mangle: { screw_ie8: true },
+    compress: { screw_ie8: true, warnings: buildOptions.verbose }
+  };
 
   if (appConfig.serviceWorker) {
     const nodeModules = path.resolve(projectRoot, 'node_modules');
@@ -65,7 +70,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
 
     // Load the Webpack plugin for manifest generation and install it.
     const AngularServiceWorkerPlugin = require('@angular/service-worker/build/webpack')
-        .AngularServiceWorkerPlugin;
+      .AngularServiceWorkerPlugin;
     extraPlugins.push(new AngularServiceWorkerPlugin({
       baseHref: buildOptions.baseHref || '/',
     }));
@@ -87,8 +92,8 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       }),
       new (<any>webpack).HashedModuleIdsPlugin(),
       new webpack.optimize.UglifyJsPlugin(<any>{
-        mangle: { screw_ie8: true },
-        compress: { screw_ie8: true, warnings: buildOptions.verbose },
+        mangle: Object.assign(baseUglifyOptions.mangle, appUglifyOptions.mangle),
+        compress: Object.assign(baseUglifyOptions.compress, appUglifyOptions.compress),
         sourceMap: buildOptions.sourcemap
       })
     ].concat(extraPlugins)
