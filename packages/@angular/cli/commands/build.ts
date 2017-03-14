@@ -35,9 +35,9 @@ export const baseBuildCommandOptions: any = [
     description: 'Build using Ahead of Time compilation.'
   },
   {
-    name: 'sourcemap',
+    name: 'sourcemaps',
     type: Boolean,
-    aliases: ['sm', 'sourcemaps'],
+    aliases: ['sm', 'sourcemap'],
     description: 'Output sourcemaps.'
   },
   {

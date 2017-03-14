@@ -64,7 +64,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   return {
-    devtool: buildOptions.sourcemap ? 'source-map' : false,
+    devtool: buildOptions.sourcemaps ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
       modules: [nodeModules],
