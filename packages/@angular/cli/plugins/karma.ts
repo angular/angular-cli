@@ -45,7 +45,7 @@ const init: any = (config: any) => {
   const testConfig: WebpackTestOptions = Object.assign({
     environment: 'dev',
     codeCoverage: false,
-    sourcemap: true,
+    sourcemaps: true,
     progress: true,
   }, config.angularCli);
 
