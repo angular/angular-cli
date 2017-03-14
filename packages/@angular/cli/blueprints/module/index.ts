@@ -53,6 +53,7 @@ export default Blueprint.extend({
 
     return {
       dynamicPath: this.dynamicPath.dir,
+      flat: options.flat,
       spec: options.spec,
       routing: options.routing
     };
