@@ -6,24 +6,112 @@
 `ng generate component [name]` generates a component
 
 ## Options
-`--app` Specifies app name or index to use.
+<details>
+  <summary>app</summary>
+  <p>
+    `--app` (alias: `-a`) _default value: 1st app_
+  </p>
+  <p>
+    Specifies app name to use.
+  </p>
+</details>
 
-`--change-detection` (`-cd`) Specifies the change detection strategy.
+<details>
+  <summary>change-detection</summary>
+  <p>
+    `--change-detection` (alias: `-cd`)
+  </p>
+  <p>
+    Specifies the change detection strategy.
+  </p>
+</details>
 
-`--flat` Flag to indicate if a dir is created.
+<details>
+  <summary>flat</summary>
+  <p>
+    `--flat` _default value: false_
+  </p>
+  <p>
+    Flag to indicate if a dir is created.
+  </p>
+</details>
 
-`--export` Specifies if declaring module exports the component.
+<details>
+  <summary>export</summary>
+  <p>
+    `--export` (alias: `-`) _default value: false_
+  </p>
+  <p>
+    Specifies if declaring module exports the component.
+  </p>
+</details>
 
-`--inline-style` (`-is`) Specifies if the style will be in the ts file.
+<details>
+  <summary>inline-style</summary>
+  <p>
+    `--inline-style` (alias: `-is`) _default value: false_
+  </p>
+  <p>
+    Specifies if the style will be in the ts file.
+  </p>
+</details>
 
-`--inline-template` (`-it`) Specifies if the template will be in the ts file.
+<details>
+  <summary>inline-template</summary>
+  <p>
+    `--inline-template` (alias: `-it`) _default value: false_
+  </p>
+  <p>
+    Specifies if the template will be in the ts file.
+  </p>
+</details>
 
-`--module` (`-m`) Allows specification of the declaring module.
+<details>
+  <summary>module</summary>
+  <p>
+    `--module` (alias: `-m`)
+  </p>
+  <p>
+    Allows specification of the declaring module.
+  </p>
+</details>
 
-`--prefix` Specifies whether to use the prefix.
+<details>
+  <summary>prefix</summary>
+  <p>
+    `--prefix`
+  </p>
+  <p>
+    Specifies whether to use the prefix.
+  </p>
+</details>
 
-`--skip-import` Allows for skipping the module import.
+<details>
+  <summary>skip-import</summary>
+  <p>
+    `--skip-import` _default value: false_
+  </p>
+  <p>
+    Allows for skipping the module import.
+  </p>
+</details>
 
-`--spec` Specifies if a spec file is generated.
+<details>
+  <summary>spec</summary>
+  <p>
+    `--spec`
+  </p>
+  <p>
+    Specifies if a spec file is generated.
+  </p>
+</details>
 
-`--view-encapsulation` (`-ve`) Specifies the view encapsulation strategy.
+<details>
+  <summary>view-encapsulation</summary>
+  <p>
+    `--view-encapsulation` (alias: `-ve`)
+  </p>
+  <p>
+    Specifies the view encapsulation strategy.
+  </p>
+</details>
