@@ -262,8 +262,9 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
 
 function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) {
   if (element.kind == ts.SyntaxKind.StringLiteral) {
-    // if string, assume relative path unless it start with /
-    return `'${loaderUtils.urlToRequest((element as ts.StringLiteral).text, '')}'`;
+    const url = (element as ts.StringLiteral).text;
+    // If the URL does not start with ./ or ../, prepends ./ to it.
+    return `'${/^\.?\.\//.test(url) ? '' : './'}${url}'`;
   } else {
     // if not string, just use expression directly
     return element.getFullText(sourceFile);
