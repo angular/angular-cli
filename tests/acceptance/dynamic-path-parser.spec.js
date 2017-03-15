@@ -17,12 +17,12 @@ describe('dynamic path parser', () => {
   var root = 'src';
   beforeEach(() => {
     project = {
-      root: rootName, 
+      root: rootName,
       ngConfig: {
         apps: [{
           root: root
         }]
-      } 
+      }
     };
     var mockFolder = {};
     mockFolder[rootName] = {
@@ -35,7 +35,7 @@ describe('dynamic path parser', () => {
     };
     mockFs(mockFolder);
   });
-  
+
   afterEach(() => {
     mockFs.restore();
   });
@@ -125,7 +125,7 @@ describe('dynamic path parser', () => {
       expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
       expect(result.name).to.equal(entityName);
     });
-    
+
   it('auto look for dirs with a "+" when not specified', () => {
     var mockFolder = {};
     mockFolder[rootName] = {
@@ -139,6 +139,13 @@ describe('dynamic path parser', () => {
     process.env.PWD = path.join(project.root, 'src', 'app', 'my-route');
     var result = dynamicPathParser(project, entityName, appConfig);
     expect(result.dir).to.equal(`${appDir}${path.sep}+my-route`);
+    expect(result.name).to.equal(entityName);
+  });
+
+  it('create new dirs as dasherized', () => {
+    process.env.PWD = project.root;
+    var result = dynamicPathParser(project, path.join('NewDir', entityName), appConfig);
+    expect(result.dir).to.equal(`${appDir}${path.sep}new-dir`);
     expect(result.name).to.equal(entityName);
   });
 });
