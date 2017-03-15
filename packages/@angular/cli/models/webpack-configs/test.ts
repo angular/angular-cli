@@ -46,7 +46,7 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
   }
 
   return {
-    devtool: testConfig.sourcemap ? 'inline-source-map' : 'eval',
+    devtool: testConfig.sourcemaps ? 'inline-source-map' : 'eval',
     entry: {
       test: path.resolve(projectRoot, appConfig.root, appConfig.test)
     },
