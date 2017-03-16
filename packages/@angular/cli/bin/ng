@@ -95,9 +95,9 @@ if (packageJsonProjectPath && fs.existsSync(packageJsonProjectPath)) {
   const devDeps = packageJsonProject['devDependencies'] || {};
   const hasOldDep = !!deps['angular-cli'];
   const hasOldDevDep = !!devDeps['angular-cli'];
-  const hasDevDep = !!devDeps['@angular/cli'];
+  const hasDep = !!(devDeps['@angular/cli'] || deps['@angular/cli']);
 
-  if (hasOldDep || hasOldDevDep || !hasDevDep) {
+  if (hasOldDep || hasOldDevDep || !hasDep) {
     const warnings = [
       'The package "angular-cli" has been renamed to "@angular/cli". The old package will be '
       + 'deprecated soon.',
