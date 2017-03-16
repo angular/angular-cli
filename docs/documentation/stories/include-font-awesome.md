@@ -3,6 +3,7 @@
 # Include [Font Awesome](http://fontawesome.io/)
 
 [Font Awesome](http://fontawesome.io/) gives you scalable vector icons that can instantly be customized — size, color, drop shadow, and anything that can be done with the power of CSS.
+
 Create a new project and navigate into the project...
 ```
 ng new my-app
@@ -14,6 +15,8 @@ Install the `font-awesome` library and add the dependency to package.json...
 npm install --save font-awesome
 ```
 
+### Using CSS
+
 To add Font Awesome CSS icons to your app...
 ```json
 // in .angular-cli.json
@@ -23,6 +26,22 @@ To add Font Awesome CSS icons to your app...
   "../node_modules/font-awesome/css/font-awesome.css"
 ]
 ```
+### Using SASS
+
+Create an empty file _variables.scss in src/.
+
+Add the following to _variables.scss:
+
+```
+$fa-font-path : '../node_modules/font-awesome/fonts';
+```
+In styles.scss add the following:
+
+```
+@import 'variables';
+@import '../node_modules/font-awesome/scss/font-awesome';
+```
+### Test
 
 Run `ng serve` to run your application in develop mode, and navigate to `http://localhost:4200`.
 
