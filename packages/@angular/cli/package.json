@@ -61,7 +61,6 @@
     "lodash": "^4.11.1",
     "minimatch": "^3.0.3",
     "node-modules-path": "^1.0.0",
-    "node-sass": "^4.3.0",
     "nopt": "^4.0.1",
     "opn": "4.0.2",
     "portfinder": "~1.0.12",
@@ -89,6 +88,9 @@
     "webpack-dev-server": "~2.3.0",
     "webpack-merge": "^2.4.0",
     "zone.js": "^0.7.2"
+  },
+  "optionalDependencies": {
+    "node-sass": "^4.3.0"
   },
   "ember-addon": {
     "paths": [
