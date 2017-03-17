@@ -4,10 +4,10 @@ const mockFs = require('mock-fs');
 
 import * as ts from 'typescript';
 import * as path from 'path';
-import * as dependentFilesUtils from '../../addon/ng2/utilities/get-dependent-files';
+import * as dependentFilesUtils from '@angular/cli/utilities/get-dependent-files';
 
 import { expect } from 'chai';
-import { ModuleResolver } from '../../addon/ng2/utilities/module-resolver';
+import { ModuleResolver } from '@angular/cli/utilities/module-resolver';
 
 describe('ModuleResolver', () => {
   let rootPath = 'src/app';
@@ -22,7 +22,8 @@ describe('ModuleResolver', () => {
           'baz': {
             'baz.component.ts': `import * from "../bar.component"
                                  import * from '../../foo-baz/qux/quux/foobar/foobar.component'
-                                 `
+                                 `,
+            'baz.component.spec.ts': 'import * from "./baz.component";'
           },
           'bar.component.ts': `import * from './baz/baz.component'
                                import * from '../foo/foo.component'`,
@@ -64,7 +65,7 @@ describe('ModuleResolver', () => {
     it('when there is no index.ts in oldPath', () => {
       let oldFilePath = path.join(rootPath, 'bar/baz/baz.component.ts');
       let newFilePath = path.join(rootPath, 'foo');
-      let resolver = new ModuleResolver(oldFilePath, newFilePath);
+      let resolver = new ModuleResolver(oldFilePath, newFilePath, rootPath);
       return resolver.resolveDependentFiles()
         .then((changes) => resolver.applySortedChangePromise(changes))
         .then(() => dependentFilesUtils.createTsSourceFile(barFile))
@@ -93,7 +94,7 @@ describe('ModuleResolver', () => {
     it('when no files are importing the given file', () => {
       let oldFilePath = path.join(rootPath, 'foo-baz/foo-baz.component.ts');
       let newFilePath = path.join(rootPath, 'bar');
-      let resolver = new ModuleResolver(oldFilePath, newFilePath);
+      let resolver = new ModuleResolver(oldFilePath, newFilePath, rootPath);
       return resolver.resolveDependentFiles()
         .then((changes) => resolver.applySortedChangePromise(changes))
         .then(() => resolver.resolveOwnImports())
@@ -108,7 +109,7 @@ describe('ModuleResolver', () => {
     it('when oldPath and newPath both do not have index.ts', () => {
       let oldFilePath = path.join(rootPath, 'bar/baz/baz.component.ts');
       let newFilePath = path.join(rootPath, 'foo-baz');
-      let resolver = new ModuleResolver(oldFilePath, newFilePath);
+      let resolver = new ModuleResolver(oldFilePath, newFilePath, rootPath);
       return resolver.resolveDependentFiles()
         .then((changes) => resolver.applySortedChangePromise(changes))
         .then(() => dependentFilesUtils.createTsSourceFile(barFile))
@@ -129,7 +130,8 @@ describe('ModuleResolver', () => {
         .then((tsFile: ts.SourceFile) => {
           let contentsBaz = dependentFilesUtils.getImportClauses(tsFile);
           let barExpectedContent = path.normalize('../bar/bar.component');
-          let fooBarExpectedContent = `.${path.sep}qux${path.sep}quux${path.sep}foobar${path.sep}foobar.component`;
+          let fooBarExpectedContent =
+            `.${path.sep}qux${path.sep}quux${path.sep}foobar${path.sep}foobar.component`;
           expect(contentsBaz[0].specifierText).to.equal(barExpectedContent);
           expect(contentsBaz[1].specifierText).to.equal(fooBarExpectedContent);
         });
@@ -137,7 +139,7 @@ describe('ModuleResolver', () => {
     it('when there are multiple spaces between symbols and specifier', () => {
       let oldFilePath = path.join(rootPath, 'foo-baz/qux/quux/foobar/foobar.component.ts');
       let newFilePath = path.join(rootPath, 'foo');
-      let resolver = new ModuleResolver(oldFilePath, newFilePath);
+      let resolver = new ModuleResolver(oldFilePath, newFilePath, rootPath);
       return resolver.resolveDependentFiles()
         .then((changes) => resolver.applySortedChangePromise(changes))
         .then(() => dependentFilesUtils.createTsSourceFile(fooQuxFile))

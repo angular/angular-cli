@@ -3,7 +3,6 @@
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
 
-const conf = require('ember-cli/tests/helpers/conf');
 const existsSync = require('exists-sync');
 const expect = require('chai').expect;
 const fs = require('fs');
@@ -12,22 +11,17 @@ const root = process.cwd();
 
 const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
-function fileExpectations(lazy, expectation) {
-  const lazyPrefix = lazy ? '+' : '';
-  const dir = `${lazyPrefix}my-route`;
+function fileExpectations(expectation) {
+  const dir = 'my-route';
   expect(existsSync(path.join(testPath, dir, 'my-route.component.ts'))).to.equal(expectation);
 }
 
 xdescribe('Acceptance: ng generate route', function () {
-  before(conf.setup);
-
-  after(conf.restore);
-
   beforeEach(function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
-      return ng(['new', 'foo', '--skip-npm', '--skip-bower']);
+      return ng(['new', 'foo', '--skip-install']);
     });
   });
 
@@ -40,12 +34,6 @@ xdescribe('Acceptance: ng generate route', function () {
   it('ng generate route my-route', function () {
     return ng(['generate', 'route', 'my-route']).then(() => {
       fileExpectations(true, true);
-    });
-  });
-
-  it('ng generate route my-route --lazy false', function () {
-    return ng(['generate', 'route', 'my-route', '--lazy', 'false']).then(() => {
-      fileExpectations(false, true);
     });
   });
 
@@ -101,15 +89,5 @@ xdescribe('Acceptance: ng generate route', function () {
       expect(afterGenerateParentComponent).to.equal(unmodifiedParentComponent);
       expect(afterGenerateParentHtml).to.equal(unmodifiedParentComponentHtml);
     });
-  });
-  
-  it('lazy route prefix', () => {
-    return ng(['set', 'defaults.lazyRoutePrefix', 'myprefix'])
-      .then(() => ng(['generate', 'route', 'prefix-test']))
-      .then(() => {
-        var folderPath = path.join(testPath, 'myprefixprefix-test', 'prefix-test.component.ts');
-        expect(existsSync(folderPath))
-          .to.equal(true);
-      });
   });
 });

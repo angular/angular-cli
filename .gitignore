@@ -1,9 +1,12 @@
+dist/
 node_modules/
-npm-debug.log
+npm-debug.log*
+yarn-error.log*
 
 # IDEs
 .idea/
 jsconfig.json
+.vscode/
 
 # Typings file.
 typings/

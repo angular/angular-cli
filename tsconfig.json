@@ -8,14 +8,37 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "outDir": "../dist/",
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "outDir": "./dist",
     "rootDir": ".",
+    "skipLibCheck": true,
     "sourceMap": true,
-    "sourceRoot": "/",
-    "target": "es5",
-    "lib": ["es6"]
+    "sourceRoot": "",
+    "target": "es6",
+    "lib": [
+      "es2015",
+      "es2016",
+      "es2017"
+    ],
+    "baseUrl": "",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": [
+      "jasmine",
+      "node"
+    ],
+    "paths": {
+      "@ngtools/json-schema": [ "packages/@ngtools/json-schema/src" ],
+      "@ngtools/logger": [ "./packages/@ngtools/logger/src" ],
+      "@ngtools/webpack": [ "./packages/@ngtools/webpack/src" ]
+    }
   },
-  "includes": [
-    "./custom-typings.d.ts"
+  "exclude": [
+    "packages/@angular/cli/blueprints/*/files/**/*",
+    "dist/**/*",
+    "node_modules/**/*",
+    "tmp/**/*"
   ]
 }

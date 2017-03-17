@@ -1,4 +1,4 @@
-## Angular-CLI
+## Angular CLI
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -7,61 +7,48 @@
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
 [![npm][npm-badge]][npm-badge-url]
 
-Prototype of a CLI for Angular 2 applications based on the [ember-cli](http://www.ember-cli.com/) project.
+CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 ## Note
 
-This project is very much still a work in progress.
+The CLI is now in Release Candidate (RC).
+If you are updating from a beta version, check out our [RC Update Guide]
+(https://github.com/angular/angular-cli/wiki/stories-rc-update).
 
-The CLI is now in beta. 
-If you wish to collaborate while the project is still young, check out [our issue list](https://github.com/angular/angular-cli/issues).
+If you wish to collaborate, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
-## Webpack preview release update
-
-We're updating the build system in Angular-CLI to use webpack instead of Broccoli.
-
-You can install and update your projects using [these instructions](https://github.com/angular/angular-cli/blob/master/WEBPACK_UPDATE.md).
+Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).
 
 ## Prerequisites
 
-The generated project has dependencies that require **Node 4 or greater**.
+Both the CLI and generated project have dependencies that require Node 6.9.0 or higher, together
+with NPM 3 or higher.
 
 ## Table of Contents
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [Generating a New Project](#generating-and-serving-an-angular2-project-via-a-development-server)
+* [Generating a New Project](#generating-and-serving-an-angular-project-via-a-development-server)
 * [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
-* [Generating a Route](#generating-a-route)
-* [Creating a Build](#creating-a-build)
-* [Build Targets and Environment Files](#build-targets-and-environment-files)
-* [Bundling](#bundling)
-* [Running Unit Tests](#running-unit-tests)
-* [Running End-to-End Tests](#running-end-to-end-tests)
-* [Deploying the App via GitHub Pages](#deploying-the-app-via-github-pages)
-* [Linting and formatting code](#linting-and-formatting-code)
-* [Support for offline applications](#support-for-offline-applications)
-* [Commands autocompletion](#commands-autocompletion)
-* [CSS preprocessor integration](#css-preprocessor-integration)
-* [3rd Party Library Installation](#3rd-party-library-installation)
-* [Updating angular-cli](#updating-angular-cli)
-* [Known Issues](#known-issues)
-* [Development Hints for hacking on angular-cli](#development-hints-for-hacking-on-angular-cli)
+* [Updating Angular CLI](#updating-angular-cli)
+* [Development Hints for hacking on Angular CLI](#development-hints-for-hacking-on-angular-cli)
+* [Documentation](#documentation)
+* [License](#license)
 
 ## Installation
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
-npm install -g angular-cli
+npm install -g @angular/cli
 ```
 
 ## Usage
 
 ```bash
-ng --help
+ng help
 ```
 
-### Generating and serving an Angular2 project via a development server
+### Generating and serving an Angular project via a development server
 
 ```bash
 ng new PROJECT_NAME
@@ -70,10 +57,10 @@ ng serve
 ```
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
+You can configure the default HTTP host and port used by the development server with two command-line options :
 
 ```bash
-ng serve --port 4201 --live-reload-port 49153
+ng serve --host 0.0.0.0 --port 4201
 ```
 
 ### Generating Components, Directives, Pipes and Services
@@ -101,227 +88,39 @@ Directive | `ng g directive my-new-directive`
 Pipe      | `ng g pipe my-new-pipe`
 Service   | `ng g service my-new-service`
 Class     | `ng g class my-new-class`
+Guard     | `ng g guard my-new-guard`
 Interface | `ng g interface my-new-interface`
 Enum      | `ng g enum my-new-enum`
+Module    | `ng g module my-module`
 
-### Generating a route
+### Updating Angular CLI
 
-Generating routes in the CLI has been disabled for the time being. A new router and new route generation blueprints are coming.
-
-You can read the official documentation for the new Router here: https://angular.io/docs/ts/latest/guide/router.html. Please note that even though route generation is disabled, building your projects with routing is still fully supported.
-
-### Creating a build
-
+If you're using Angular CLI `beta.28` or less, you need to uninstall `angular-cli` package. It should be done due to changing of package's name and scope from `angular-cli` to `@angular/cli`:
 ```bash
-ng build
+npm uninstall -g angular-cli
+npm uninstall --save-dev angular-cli
 ```
 
-The build artifacts will be stored in the `dist/` directory.
-
-### Build Targets and Environment Files
-
-A build can specify both a build target (`development` or `production`) and an 
-environment file to be used with that build. By default, the development build 
-target is used.
-
-At build time, `src/app/environments/environment.ts` will be replaced by
-`src/app/environments/environment.{NAME}.ts` where `NAME` is the argument 
-provided to the `--environment` flag.
-
-These options also apply to the serve command. If you do not pass a value for `environment`,
-it will default to `dev` for `development` and `prod` for `production`.
-
-```bash
-# these are equivalent
-ng build --target=production --environment=prod
-ng build --prod --env=prod
-ng build --prod
-# and so are these
-ng build --target=development --environment=dev
-ng build --dev --e=dev
-ng build --dev
-ng build
-```
-
-You can also add your own env files other than `dev` and `prod` by creating a
-`src/app/environments/environment.{NAME}.ts` and use them by using the `--env=NAME`
-flag on the build/serve commands.
-
-### Bundling
-
-Builds created with the `-prod` flag via `ng build -prod` or `ng serve -prod` bundle
-all dependencies into a single file, and make use of tree-shaking techniques.
-
-### Running unit tests
-
-```bash
-ng test
-```
-
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false`.
-
-### Running end-to-end tests
-
-```bash
-ng e2e
-```
-
-Before running the tests make sure you are serving the app via `ng serve`.
-
-End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
-
-
-### Deploying the app via GitHub Pages
-
-You can deploy your apps quickly via:
-
-```
-ng github-pages:deploy --message "Optional commit message"
-```
-
-This will do the following:
-
-- creates GitHub repo for the current project if one doesn't exist
-- rebuilds the app in production mode at the current `HEAD`
-- creates a local `gh-pages` branch if one doesn't exist
-- moves your app to the `gh-pages` branch and creates a commit
-- edit the base tag in index.html to support github pages
-- pushes the `gh-pages` branch to github
-- returns back to the original `HEAD`
-
-Creating the repo requires a token from github, and the remaining functionality
-relies on ssh authentication for all git operations that communicate with github.com.
-To simplify the authentication, be sure to [setup your ssh keys](https://help.github.com/articles/generating-ssh-keys/).
-
-If you are deploying a [user or organization page](https://help.github.com/articles/user-organization-and-project-pages/), you can instead use the following command:
-
-```
-ng github-pages:deploy --user-page --message "Optional commit message"
-```
-
-This command pushes the app to the `master` branch on the github repo instead
-of pushing to `gh-pages`, since user and organization pages require this.
-
-
-### Linting and formatting code
-
-You can lint your app code by running `ng lint`.
-This will use the `lint` npm script that in generated projects uses `tslint`.
-
-You can modify the these scripts in `package.json` to run whatever tool you prefer.
-
-### Support for offline applications
-
-Angular-CLI includes support for offline applications via the `--mobile` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.
-
-### Commands autocompletion
-
-To turn on auto completion use the following commands:
-
-For bash:
-```bash
-ng completion >> ~/.bashrc
-source ~/.bashrc
-```
-
-For zsh:
-```bash
-ng completion >> ~/.zshrc
-source ~/.zshrc
-```
-
-Windows users using gitbash:
-```bash
-ng completion >> ~/.bash_profile
-source ~/.bash_profile
-```
-
-
-### CSS Preprocessor integration
-
-Angular-CLI supports all major CSS preprocessors:
-- sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
-- less ([http://lesscss.org/](http://lesscss.org/))
-- compass ([http://compass-style.org/](http://compass-style.org/))
-- stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
-
-To use these prepocessors simply add the file to your component's `styleUrls`:
-
-```
-@Component({
-  moduleId: module.id,
-  selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
-})
-export class AppComponent {
-  title = 'app works!';
-}
-```
-
-When generating a new project you can also define which extention you want for
-style files:
-
-```bash
-ng new sassy-project --style=sass
-```
-
-Or set the default style on an existing project:
-
-```bash
-ng set defaults.styleExt scss
-```
-
-### 3rd Party Library Installation
-
-Simply install your library via `npm install lib-name --save` and import it in your code.
-
-If the library does not include typings, you can install them using npm:
-
-```bash
-npm install moment --save
-npm install @types/moment --save-dev
-```
-
-### Updating angular-cli
-
-To update `angular-cli` to a new version, you must update both the global package and your project's local package.
+To update Angular CLI to a new version, you must update both the global package and your project's local package.
 
 Global package:
-```
-npm uninstall -g angular-cli
+```bash
+npm uninstall -g @angular/cli
 npm cache clean
-npm install -g angular-cli@latest
+npm install -g @angular/cli@latest
 ```
 
 Local project package:
+```bash
+rm -rf node_modules dist # use rmdir /S/Q node_modules dist in Windows Command Prompt; use rm -r -fo node_modules,dist in Windows PowerShell
+npm install --save-dev @angular/cli@latest
+npm install
 ```
-rm -rf node_modules dist tmp
-npm install --save-dev angular-cli@latest
-ng init
-```
-
-Running `ng init` will check for changes in all the auto-generated files created by `ng new` and allow you to update yours. You are offered four choices for each changed file: `y` (overwrite), `n` (don't overwrite), `d` (show diff between your file and the updated file) and `h` (help).
-
-Carefully read the diffs for each code file, and either accept the changes or incorporate them manually after `ng init` finishes.
-
-**The main cause of errors after an update is failing to incorporate these updates into your code**. 
 
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
 
 
-## Known issues
-
-This project is currently a prototype so there are many known issues. Just to mention a few:
-
-- All blueprints/scaffolds are in TypeScript only, in the future blueprints in all dialects officially supported by Angular will be available.
-- On Windows you need to run the `build` and `serve` commands with Admin permissions, otherwise the performance is not good.
-- The initial installation as well as `ng new` take too long because of lots of npm dependencies.
-- Many existing ember addons are not compatible with Angular apps built via angular-cli.
-- When you `ng serve` remember that the generated project has dependencies that require **Node 4 or greater**.
-
-
-## Development Hints for hacking on angular-cli
+## Development Hints for hacking on Angular CLI
 
 ### Working with master
 
@@ -333,29 +132,33 @@ npm link
 
 `npm link` is very similar to `npm install -g` except that instead of downloading the package
 from the repo, the just cloned `angular-cli/` folder becomes the global package.
-Any changes to the files in the `angular-cli/` folder will immediately affect the global `angular-cli` package,
+Any changes to the files in the `angular-cli/` folder will immediately affect the global `@angular/cli` package,
 allowing you to quickly test any changes you make to the cli project.
 
-Now you can use `angular-cli` via the command line:
+Now you can use `@angular/cli` via the command line:
 
 ```bash
 ng new foo
 cd foo
-npm link angular-cli
+npm link @angular/cli
 ng serve
 ```
 
-`npm link angular-cli` is needed because by default the globally installed `angular-cli` just loads
-the local `angular-cli` from the project which was fetched remotely from npm.
-`npm link angular-cli` symlinks the global `angular-cli` package to the local `angular-cli` package.
+`npm link @angular/cli` is needed because by default the globally installed `@angular/cli` just loads
+the local `@angular/cli` from the project which was fetched remotely from npm.
+`npm link @angular/cli` symlinks the global `@angular/cli` package to the local `@angular/cli` package.
 Now the `angular-cli` you cloned before is in three places:
-The folder you cloned it into, npm's folder where it stores global packages and the `angular-cli` project you just created.
+The folder you cloned it into, npm's folder where it stores global packages and the Angular CLI project you just created.
 
-You can also use `ng new foo --link-cli` to automatically link the `angular-cli` package.
+You can also use `ng new foo --link-cli` to automatically link the `@angular/cli` package.
 
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
 
+
+## Documentation
+
+The documentation for the Angular CLI is located in this repo's [wiki](https://github.com/angular/angular-cli/wiki).
 
 ## License
 
@@ -367,6 +170,6 @@ MIT
 [david-badge]: https://david-dm.org/angular/angular-cli.svg
 [david-badge-url]: https://david-dm.org/angular/angular-cli
 [david-dev-badge]: https://david-dm.org/angular/angular-cli/dev-status.svg
-[david-dev-badge-url]: https://david-dm.org/angular/angular-cli#info=devDependencies
-[npm-badge]: https://img.shields.io/npm/v/angular-cli.svg
-[npm-badge-url]: https://www.npmjs.com/package/angular-cli
+[david-dev-badge-url]: https://david-dm.org/angular/angular-cli?type=dev
+[npm-badge]: https://img.shields.io/npm/v/@angular/cli.svg
+[npm-badge-url]: https://www.npmjs.com/package/@angular/cli
