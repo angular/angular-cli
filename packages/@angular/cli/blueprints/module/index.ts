@@ -1,9 +1,15 @@
-import {CliConfig} from '../../models/config';
-import {getAppFromConfig} from '../../utilities/app-utils';
-import {dynamicPathParser} from '../../utilities/dynamic-path-parser';
+import * as chalk from 'chalk';
+import * as path from 'path';
+import { oneLine } from 'common-tags';
+import { NodeHost } from '../../lib/ast-tools';
+import { CliConfig } from '../../models/config';
+import { getAppFromConfig } from '../../utilities/app-utils';
+import { resolveModulePath } from '../../utilities/resolve-module-file';
+import { dynamicPathParser } from '../../utilities/dynamic-path-parser';
 
-const path = require('path');
-const Blueprint   = require('../../ember-cli/lib/models/blueprint');
+const stringUtils = require('ember-cli-string-utils');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
+const astUtils = require('../../utilities/ast-utils');
 const getFiles = Blueprint.prototype.files;
 
 export default Blueprint.extend({
@@ -32,8 +38,21 @@ export default Blueprint.extend({
       type: String,
       aliases: ['a'],
       description: 'Specifies app name to use.'
+    },
+    {
+      name: 'module',
+      type: String, aliases: ['m'],
+      description: 'Specifies where the module should be imported.'
     }
   ],
+
+  beforeInstall: function(options: any) {
+    if (options.module) {
+      const appConfig = getAppFromConfig(this.options.app);
+      this.pathToModule =
+        resolveModulePath(options.module, this.project, this.project.root, appConfig);
+    }
+  },
 
   normalizeEntityName: function (entityName: string) {
     this.entityName = entityName;
@@ -59,7 +78,7 @@ export default Blueprint.extend({
     };
   },
 
-  files: function() {
+  files: function () {
     let fileList = getFiles.call(this) as Array<string>;
 
     if (!this.options || !this.options.spec) {
@@ -84,5 +103,36 @@ export default Blueprint.extend({
         return this.generatePath;
       }
     };
+  },
+
+  afterInstall(options: any) {
+    const returns: Array<any> = [];
+
+    if (!this.pathToModule) {
+      const warningMessage = oneLine`
+        Module is generated but not provided,
+        it must be provided to be used
+      `;
+      this._writeStatusToUI(chalk.yellow, 'WARNING', warningMessage);
+    } else {
+      let className = stringUtils.classify(`${options.entity.name}Module`);
+      let fileName = stringUtils.dasherize(`${options.entity.name}.module`);
+      if (options.routing) {
+        className = stringUtils.classify(`${options.entity.name}RoutingModule`);
+        fileName = stringUtils.dasherize(`${options.entity.name}-routing.module`);
+      }
+      const fullGeneratePath = path.join(this.project.root, this.generatePath);
+      const moduleDir = path.parse(this.pathToModule).dir;
+      const relativeDir = path.relative(moduleDir, fullGeneratePath);
+      const importPath = relativeDir ? `./${relativeDir}/${fileName}` : `./${fileName}`;
+      returns.push(
+        astUtils.addImportToModule(this.pathToModule, className, importPath)
+          .then((change: any) => change.apply(NodeHost)));
+      this._writeStatusToUI(chalk.yellow,
+                            'update',
+                            path.relative(this.project.root, this.pathToModule));
+    }
+
+    return Promise.all(returns);
   }
 });
