@@ -97,6 +97,8 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 
 `--progress` (`-pr`) Log progress to the console while building.
 
+`--no-progress` prevent logging progress to the console while building
+
 `--sourcemap` (`-sm`) Output sourcemaps.
 
 `--stats-json` Generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse.
