@@ -9,5 +9,6 @@ export {
   getDecoratorMetadata,
   addDeclarationToModule,
   addProviderToModule,
+  addImportToModule,
   addExportToModule
 } from '../lib/ast-tools';
