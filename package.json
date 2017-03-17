@@ -107,6 +107,9 @@
     ]
   },
   "devDependencies": {
+    "@angular/compiler": "^4.0.0-rc.5",
+    "@angular/compiler-cli": "^4.0.0-rc.5",
+    "@angular/core": "^4.0.0-rc.5",
     "@types/chai": "^3.4.32",
     "@types/chalk": "^0.4.28",
     "@types/common-tags": "^1.2.4",
