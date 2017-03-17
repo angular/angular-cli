@@ -93,6 +93,15 @@ Scaffold  | Usage
 [Module](https://github.com/angular/angular-cli/wiki/generate-module)       | `ng g module my-module`
 
 
+
+
+angular-cli will add reference to `components`, `directives` and `pipes` automatically in the `app.module.ts`. If you need to add this references to another custom module, follow this steps:
+ 
+ 1. `ng g module new-module` to create a new module
+ 2.  call `ng g component new-module/new-component`
+ 
+This should add the new `component`, `directive` or `pipe` reference to the `new-module` you've created.
+ 
 ### Updating Angular CLI
 
 If you're using Angular CLI `beta.28` or less, you need to uninstall `angular-cli` package. It should be done due to changing of package's name and scope from `angular-cli` to `@angular/cli`:
