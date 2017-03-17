@@ -8,6 +8,6 @@
 
 `--flat` Indicate if a dir is created.
 
-`--module` (`-m`) Allows specification of the declaring module.
+`--module` (`-m`) Specifies where the guard should be provided.
 
 `--spec` Specifies if a spec file is generated.

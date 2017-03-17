@@ -75,8 +75,6 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 
 `--dev` Build target and environment to development.
 
-`--output-path` (`-op`) path where output will be placed
-
 `--environment` (`-e`) Defines the build environment.
 
 `--extract-css` (`-ec`) Extract css from global styles onto css files instead of js ones.
