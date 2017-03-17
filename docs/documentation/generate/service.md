@@ -32,7 +32,7 @@
     `--module` (alias: `-m`)
   </p>
   <p>
-    Allows you to specify the module where the service should be provided
+    Specifies where the service should be provided.
   </p>
 </details>
 

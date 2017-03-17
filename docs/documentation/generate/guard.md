@@ -30,6 +30,7 @@
     `--module` (alias: `-m`)
   </p>
   <p>
+    Specifies where the guard should be provided.
   </p>
 </details>
 
