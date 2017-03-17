@@ -1,12 +1,12 @@
-import {NodeHost} from '../../lib/ast-tools';
-import {CliConfig} from '../../models/config';
-import {getAppFromConfig} from '../../utilities/app-utils';
-import {dynamicPathParser} from '../../utilities/dynamic-path-parser';
+import * as chalk from 'chalk';
+import * as path from 'path';
 import { oneLine } from 'common-tags';
+import { NodeHost } from '../../lib/ast-tools';
+import { CliConfig } from '../../models/config';
+import { dynamicPathParser } from '../../utilities/dynamic-path-parser';
+import { getAppFromConfig } from '../../utilities/app-utils';
+import { resolveModulePath } from '../../utilities/resolve-module-file';
 
-const path = require('path');
-const fs = require('fs');
-const chalk = require('chalk');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
@@ -40,17 +40,11 @@ export default Blueprint.extend({
     }
   ],
 
-  beforeInstall: function(options: any) {
+  beforeInstall: function (options: any) {
     if (options.module) {
-      // Resolve path to module
-      const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
       const appConfig = getAppFromConfig(this.options.app);
-      const parsedPath = dynamicPathParser(this.project, modulePath, appConfig);
-      this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
-
-      if (!fs.existsSync(this.pathToModule)) {
-        throw 'Module specified does not exist';
-      }
+      this.pathToModule =
+        resolveModulePath(options.module, this.project, this.project.root, appConfig);
     }
   },
 
@@ -75,7 +69,7 @@ export default Blueprint.extend({
     };
   },
 
-  files: function() {
+  files: function () {
     let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && !this.options.spec) {
@@ -119,8 +113,8 @@ export default Blueprint.extend({
         astUtils.addProviderToModule(this.pathToModule, className, importPath)
           .then((change: any) => change.apply(NodeHost)));
       this._writeStatusToUI(chalk.yellow,
-                            'update',
-                            path.relative(this.project.root, this.pathToModule));
+        'update',
+        path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);
