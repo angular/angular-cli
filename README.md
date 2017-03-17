@@ -81,17 +81,17 @@ ng g component ../newer-cmp
 ```
 You can find all possible blueprints in the table below:
 
-Scaffold  | Usage
----       | ---
-Component | `ng g component my-new-component`
-Directive | `ng g directive my-new-directive`
-Pipe      | `ng g pipe my-new-pipe`
-Service   | `ng g service my-new-service`
-Class     | `ng g class my-new-class`
-Guard     | `ng g guard my-new-guard`
-Interface | `ng g interface my-new-interface`
-Enum      | `ng g enum my-new-enum`
-Module    | `ng g module my-module`
+Scaffold  | Usage                               | Documentation
+---       | ---                                 | ---
+Component | `ng g component my-new-component`   | [see docs](https://github.com/angular/angular-cli/wiki/generate-component)
+Directive | `ng g directive my-new-directive`   | [see docs](https://github.com/angular/angular-cli/wiki/generate-directive)
+Pipe      | `ng g pipe my-new-pipe`             | [see docs](https://github.com/angular/angular-cli/wiki/generate-pipe)
+Service   | `ng g service my-new-service`       | [see docs](https://github.com/angular/angular-cli/wiki/generate-service)
+Class     | `ng g class my-new-class`           | [see docs](https://github.com/angular/angular-cli/wiki/generate-class)
+Guard     | `ng g guard my-new-guard`           | [see docs](https://github.com/angular/angular-cli/wiki/generate-guard)
+Interface | `ng g interface my-new-interface`   | [see docs](https://github.com/angular/angular-cli/wiki/generate-interface)
+Enum      | `ng g enum my-new-enum`             | [see docs](https://github.com/angular/angular-cli/wiki/generate-enum)
+Module    | `ng g module my-module`             | [see docs](https://github.com/angular/angular-cli/wiki/generate-module)
 
 ### Updating Angular CLI
 
