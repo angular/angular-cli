@@ -42,6 +42,7 @@ export interface NormalModule {
 export interface LoaderContext {
   _module: NormalModule;
 
+  addDependency(path: string): void;
   async(): LoaderCallback;
   cacheable(): void;
 
