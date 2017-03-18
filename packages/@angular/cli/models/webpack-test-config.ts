@@ -28,6 +28,7 @@ export class WebpackTestConfig extends NgCliWebpackConfig {
     ];
 
     this.config = webpackMerge(webpackConfigs);
+    delete this.config.entry;
 
     // Remove any instance of CommonsChunkPlugin, not needed with karma-webpack.
     this.config.plugins = this.config.plugins.filter((plugin: any) =>
