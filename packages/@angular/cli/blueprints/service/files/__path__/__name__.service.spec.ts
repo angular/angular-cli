@@ -9,7 +9,7 @@ describe('<%= classifiedModuleName %>Service', () => {
     });
   });
 
-  it('should ...', inject([<%= classifiedModuleName %>Service], (service: <%= classifiedModuleName %>Service) => {
+  it('should be created', inject([<%= classifiedModuleName %>Service], (service: <%= classifiedModuleName %>Service) => {
     expect(service).toBeTruthy();
   }));
 });
