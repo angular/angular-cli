@@ -77,6 +77,9 @@ ng g component new-cmp
 # but if you were to run
 ng g component ../newer-cmp
 # your component will be generated in src/app/newer-cmp
+# if in the directory src/app you can also run
+ng g component feature/new-cmp
+# and your component will be generated in src/app/feature/new-cmp
 ```
 You can find all possible blueprints in the table below:
 
