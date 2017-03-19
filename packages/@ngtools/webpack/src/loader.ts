@@ -241,7 +241,10 @@ export function removeModuleIdOnlyForTesting(refactor: TypeScriptFileRefactor) {
 function _removeModuleId(refactor: TypeScriptFileRefactor) {
   const sourceFile = refactor.sourceFile;
 
-  refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
+  refactor.findAstNodes(sourceFile, ts.SyntaxKind.Decorator, true)
+    .reduce((acc, node) => {
+      return acc.concat(refactor.findAstNodes(node, ts.SyntaxKind.ObjectLiteralExpression, true));
+    }, [])
     // Get all their property assignments.
     .filter((node: ts.ObjectLiteralExpression) => {
       return node.properties.some(prop => {
@@ -254,8 +257,9 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
         return prop.kind == ts.SyntaxKind.PropertyAssignment
             && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
       })[0];
-      // get the trailing comma
-      const moduleIdCommaProp = moduleIdProp.parent.getChildAt(1).getChildren()[1];
+      // Get the trailing comma.
+      const moduleIdCommaProp = moduleIdProp.parent
+        ? moduleIdProp.parent.getChildAt(1).getChildren()[1] : null;
       refactor.removeNodes(moduleIdProp, moduleIdCommaProp);
     });
 }
