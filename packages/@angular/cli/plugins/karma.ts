@@ -5,6 +5,7 @@ import * as glob from 'glob';
 import { Pattern } from './glob-copy-webpack-plugin';
 import { extraEntryParser } from '../models/webpack-configs/utils';
 import { WebpackTestConfig, WebpackTestOptions } from '../models/webpack-test-config';
+import { KarmaWebpackThrowError } from './karma-webpack-throw-error';
 
 const getAppFromConfig = require('../utilities/app-utils').getAppFromConfig;
 
@@ -101,6 +102,11 @@ const init: any = (config: any) => {
       poll: testConfig.poll
     }
   };
+
+  // If Karma is being ran in single run mode, throw errors.
+  if (config.singleRun) {
+    webpackConfig.plugins.push(new KarmaWebpackThrowError());
+  }
 
   config.webpack = Object.assign(webpackConfig, config.webpack);
   config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
