@@ -45,9 +45,8 @@ export class TypeScriptFileRefactor {
       this._sourceFile = _program.getSourceFile(fileName);
     }
     if (!this._sourceFile) {
-      this._program = null;
       this._sourceFile = ts.createSourceFile(fileName, _host.readFile(fileName),
-        ts.ScriptTarget.Latest);
+        ts.ScriptTarget.Latest, true);
     }
     this._sourceText = this._sourceFile.getFullText(this._sourceFile);
     this._sourceString = new MagicString(this._sourceText);
