@@ -4,6 +4,7 @@ import * as webpack from 'webpack';
 
 import { CliConfig } from '../config';
 import { WebpackTestOptions } from '../webpack-test-config';
+import { KarmaWebpackEmitlessError } from '../../plugins/karma-webpack-emitless-error';
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -57,7 +58,8 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
       new webpack.SourceMapDevToolPlugin({
         filename: null, // if no value is provided the sourcemap is inlined
         test: /\.(ts|js)($|\?)/i // process .js and .ts files only
-      })
+      }),
+      new KarmaWebpackEmitlessError()
     ]
   };
 }
