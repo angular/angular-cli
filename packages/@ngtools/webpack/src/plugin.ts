@@ -411,6 +411,11 @@ export class AotPlugin implements Tapable {
           this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
       })
       .then(() => {
+        // Re-diagnose changed files.
+        const changedFilePaths = this._compilerHost.getChangedFilePaths();
+        changedFilePaths.forEach(filePath => this.diagnose(filePath));
+      })
+      .then(() => {
         if (this._typeCheck) {
           const diagnostics = this._program.getGlobalDiagnostics();
           if (diagnostics.length > 0) {
@@ -461,7 +466,9 @@ export class AotPlugin implements Tapable {
           });
       })
       .then(() => {
-        this._compilerHost.resetChangedFileTracker();
+        if (this._compilation.errors == 0) {
+          this._compilerHost.resetChangedFileTracker();
+        }
 
         cb();
       }, (err: any) => {

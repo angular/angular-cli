@@ -8,6 +8,7 @@ const getFiles = Blueprint.prototype.files;
 
 export default Blueprint.extend({
   description: '',
+  aliases: ['m'],
 
   availableOptions: [
     {
@@ -52,6 +53,7 @@ export default Blueprint.extend({
 
     return {
       dynamicPath: this.dynamicPath.dir,
+      flat: options.flat,
       spec: options.spec,
       routing: options.routing
     };

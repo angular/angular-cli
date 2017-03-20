@@ -50,9 +50,10 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 * [ng e2e](e2e)
 * [ng build](build)
 * [ng get/ng set](config)
-* [ng docs](docs)
+* [ng doc](doc)
 * [ng eject](eject)
+* [ng xi18n](xi18n)
 
 ### Additional Information
 There are several [stories](stories) which will walk you through setting up
-additional aspects of Angular applciations.
+additional aspects of Angular applications.

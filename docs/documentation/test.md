@@ -16,18 +16,28 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
 
 ## Options
-`--watch` (`-w`) flag to run builds when files change
+`--app` Specifies app name or index to use.
 
-`--browsers` override which browsers tests are run against
+`--browsers` Override which browsers tests are run against.
 
-`--colors` enable or disable colors in the output (reporters and logs)
+`--code-coverage` Coverage report will be in the coverage/ directory.
 
-`--log-level` level of logging
+`--colors` Enable or disable colors in the output (reporters and logs).
 
-`--port` port where the web server will be listening
+`--config` Use a specific config file. Defaults to the protractor config file in angular-cli.json.
 
-`--reporters` list of reporters to use
+`--log-level` Level of logging.
 
-`--build` flag to build prior to running tests
+`--poll` Enable and define the file watching poll time period (milliseconds).
 
-`--poll` enable and define the file watching poll time period (milliseconds)
+`--port` Port where the web server will be listening.
+
+`--progress` Log progress to the console while in progress.
+
+`--reporters` List of reporters to use.
+
+`--single-run` Run tests a single time.
+
+`--sourcemap` Output sourcemaps.
+
+`--watch` (`-w`) Run build when files change.

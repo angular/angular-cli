@@ -73,18 +73,18 @@ export class NgCliWebpackConfig {
   }
 
   // Fill in defaults for build targets
-  public addTargetDefaults(buildOptions: BuildOptions) {
-    const targetDefaults: any = {
+  public addTargetDefaults(buildOptions: BuildOptions): BuildOptions {
+    const targetDefaults: { [target: string]: BuildOptions } = {
       development: {
         environment: 'dev',
         outputHashing: 'media',
-        sourcemap: true,
+        sourcemaps: true,
         extractCss: false
       },
       production: {
         environment: 'prod',
         outputHashing: 'all',
-        sourcemap: false,
+        sourcemaps: false,
         extractCss: true,
         aot: true
       }

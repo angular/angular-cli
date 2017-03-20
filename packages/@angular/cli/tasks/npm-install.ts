@@ -13,7 +13,11 @@ export default Task.extend({
 
     return new Promise(function(resolve, reject) {
       ui.writeLine(chalk.green(`Installing packages for tooling via ${packageManager}.`));
-      exec(`${packageManager} --quiet install`,
+      let installCommand = `${packageManager} --quiet install`;
+      if (packageManager === 'yarn') {
+        installCommand = `${packageManager} install`;
+      }
+      exec(installCommand,
         (err: NodeJS.ErrnoException, _stdout: string, stderr: string) => {
         if (err) {
           ui.writeLine(stderr);

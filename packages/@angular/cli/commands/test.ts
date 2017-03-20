@@ -15,8 +15,7 @@ export interface TestOptions {
   log?: string;
   port?: number;
   reporters?: string;
-  build?: boolean;
-  sourcemap?: boolean;
+  sourcemaps?: boolean;
   progress?: boolean;
   config: string;
   poll?: number;
@@ -45,7 +44,7 @@ const TestCommand = EmberTestCommand.extend({
       type: String,
       aliases: ['c'],
       description: oneLine`Use a specific config file.
-        Defaults to the protractor config file in angular-cli.json.`
+        Defaults to the karma config file in .angular-cli.json.`
     },
     {
       name: 'single-run',
@@ -86,16 +85,10 @@ const TestCommand = EmberTestCommand.extend({
       description: 'List of reporters to use.'
     },
     {
-      name: 'build',
+      name: 'sourcemaps',
       type: Boolean,
       default: true,
-      description: 'Build prior to running tests.'
-    },
-    {
-      name: 'sourcemap',
-      type: Boolean,
-      default: true,
-      aliases: ['sm'],
+      aliases: ['sm', 'sourcemap'],
       description: 'Output sourcemaps.'
     },
     {

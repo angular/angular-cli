@@ -6,12 +6,14 @@
 `ng generate pipe [name]` generates a pipe
 
 ## Options
-`--flat` flag to indicate if a dir is created
+`--app` Specifies app name or index to use.
 
-`--spec` specifies if a spec file is generated
+`--export` Specifies if declaring module exports the pipe.
 
-`--skip-import` allows for skipping the module import
+`--flat` Flag to indicate if a dir is created.
 
-`--module` (`-m`) allows specification of the declaring module
+`--module` (`-m`) Allows specification of the declaring module.
 
-`--export` specifies if declaring module exports the pipe
+`--skip-import` Allows for skipping the module import.
+
+`--spec` Specifies if a spec file is generated.

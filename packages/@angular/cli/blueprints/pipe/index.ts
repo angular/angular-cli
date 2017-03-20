@@ -14,6 +14,7 @@ const getFiles = Blueprint.prototype.files;
 
 export default Blueprint.extend({
   description: '',
+  aliases: ['p'],
 
   availableOptions: [
     {
@@ -65,8 +66,7 @@ export default Blueprint.extend({
       }
     } else {
       try {
-        this.pathToModule = findParentModule
-          (this.project.root, appConfig.root, this.dynamicPath.dir);
+        this.pathToModule = findParentModule(this.project.root, appConfig.root, this.generatePath);
       } catch (e) {
         if (!options.skipImport) {
           throw `Error locating module for declaration\n\t${e}`;

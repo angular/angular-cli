@@ -24,7 +24,7 @@ import { MaterialModule } from '@angular/material';
 @NgModule({
   imports: [
     ...
-    MaterialModule.forRoot()
+    MaterialModule
   ],
   ...
 })

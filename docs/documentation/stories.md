@@ -20,3 +20,5 @@
  - [Routing](stories/routing)
  - [3rd Party Lib](stories/third-party-lib)
  - [Corporate Proxy](stories/using-corporate-proxy)
+ - [Internationalization (i18n)](stories/internationalization)
+ - [Serve from Disk](stories/disk-serve)

@@ -40,12 +40,24 @@ export default function() {
     `))
     // Should trigger a rebuild, no error expected.
     .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
-    // Create and import files.
+    // Make an invalid version of the file.
     .then(() => wait(2000))
     .then(() => writeFile('src/funky2.ts', `
       export function funky(value: number): number {
         return value + 1;
       }
+    `))
+    // Should trigger a rebuild, this time an error is expected.
+    .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
+    .then(({ stdout }) => {
+      if (!/ERROR in .*\/src\/main\.ts \(/.test(stdout)) {
+        throw new Error('Expected an error but none happened.');
+      }
+    })
+    // Change an UNRELATED file and the error should still happen.
+    .then(() => wait(2000))
+    .then(() => appendToFile('src/app/app.module.ts', `
+      function anything(): number {}
     `))
     // Should trigger a rebuild, this time an error is expected.
     .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))

@@ -6,4 +6,6 @@
 `ng generate class [name]` generates a class
 
 ## Options
-`--spec` specifies if a spec file is generated
+`--app` Specifies app name or index to use.
+
+`--spec` Specifies if a spec file is generated.

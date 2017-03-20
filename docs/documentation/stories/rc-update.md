@@ -273,6 +273,9 @@ There is an additional root-level `tsconfig.json` that is used for IDE integrati
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "lib": [
       "es2016",
       "dom"
@@ -317,16 +320,17 @@ Packages in `dependencies`:
 - `@angular/*` packages now have a `^2.4.0` minimum (`^3.4.0` for router)
 - `core-js` remains unchanged at `^2.4.1`
 - `rxjs` to `^5.1.0`
+- `ts-helpers` was **removed**
 - `zone.js` to `^0.7.6`
 
-Packages in `dependencies`:
+Packages in `devDependencies`:
 - `@angular/cli` at `1.0.0-rc.0` replaces `angular-cli`
 - `@angular/compiler-cli` is also at `^2.4.0`
 - `@types/jasmine` remains unchanged and pinned at `2.5.38`
 - `@types/node` was updated to `~6.0.60`
 - `codelyzer` was updated to `~2.0.0`
 - `jasmine-core` was updated to `~2.5.2`
-- `jasmine-spec-reporter` was **removed**
+- `jasmine-spec-reporter` was updated to `~3.2.0`
 - `karma` was updated to `~1.4.1`
 - `karma-chrome-launcher` was updated to `~2.0.0`
 - `karma-cli` was updated to `~1.0.1`
@@ -350,6 +354,7 @@ We also updated the scripts section to make it more simple:
 "scripts": {
   "ng": "ng",
   "start": "ng serve",
+  "build": "ng build",
   "test": "ng test",
   "lint": "ng lint",
   "e2e": "ng e2e"

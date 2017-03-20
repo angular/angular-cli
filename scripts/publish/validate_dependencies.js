@@ -121,6 +121,7 @@ for (const packageName of Object.keys(packages)) {
   const packageJson = JSON.parse(fs.readFileSync(packages[packageName].packageJson, 'utf8'));
   const allDeps = []
     .concat(Object.keys(packageJson['dependencies'] || {}))
+    .concat(Object.keys(packageJson['optionalDependencies'] || {}))
     .concat(Object.keys(packageJson['devDependencies'] || {}))
     .concat(Object.keys(packageJson['peerDependencies'] || {}));
 
@@ -142,6 +143,7 @@ const rootPackageJson = JSON.parse(fs.readFileSync(rootPackagePath, 'utf8'));
 // devDependencies are ignored
 const allRootDeps = []
     .concat(Object.keys(rootPackageJson['dependencies'] || {}))
+    .concat(Object.keys(rootPackageJson['optionalDependencies'] || {}))
     .concat(Object.keys(rootPackageJson['peerDependencies'] || {}));
 
 const internalPackages = Object.keys(packages);

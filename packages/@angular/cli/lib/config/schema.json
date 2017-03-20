@@ -337,11 +337,13 @@
             },
             "viewEncapsulation": {
               "description": "Specifies the view encapsulation strategy.",
-              "enum": ["Emulated", "Native", "None"]
+              "enum": ["Emulated", "Native", "None"],
+              "type": "string"
             },
             "changeDetection": {
               "description": "Specifies the change detection strategy.",
-              "enum": ["Default", "OnPush"]
+              "enum": ["Default", "OnPush"],
+              "type": "string"
             }
           }
         },

@@ -10,6 +10,7 @@ var commandProperties = [
 ];
 var blueprintProperties = [
   'name',
+  'aliases',
   'description',
   'availableOptions',
   'anonymousOptions',

@@ -7,6 +7,7 @@ const Blueprint = require('../../ember-cli/lib/models/blueprint');
 
 export default Blueprint.extend({
   description: '',
+  aliases: ['i'],
 
   anonymousOptions: [
     '<interface-type>'

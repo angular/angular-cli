@@ -57,10 +57,10 @@ ng serve
 ```
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-You can configure the default HTTP port and the one used by the LiveReload server with two command-line options :
+You can configure the default HTTP host and port used by the development server with two command-line options :
 
 ```bash
-ng serve --host 0.0.0.0 --port 4201 --live-reload-port 49153
+ng serve --host 0.0.0.0 --port 4201
 ```
 
 ### Generating Components, Directives, Pipes and Services
@@ -88,6 +88,7 @@ Directive | `ng g directive my-new-directive`
 Pipe      | `ng g pipe my-new-pipe`
 Service   | `ng g service my-new-service`
 Class     | `ng g class my-new-class`
+Guard     | `ng g guard my-new-guard`
 Interface | `ng g interface my-new-interface`
 Enum      | `ng g enum my-new-enum`
 Module    | `ng g module my-module`
@@ -111,7 +112,7 @@ npm install -g @angular/cli@latest
 
 Local project package:
 ```bash
-rm -rf node_modules dist # use rmdir on Windows
+rm -rf node_modules dist # use rmdir /S/Q node_modules dist in Windows Command Prompt; use rm -r -fo node_modules,dist in Windows PowerShell
 npm install --save-dev @angular/cli@latest
 npm install
 ```
