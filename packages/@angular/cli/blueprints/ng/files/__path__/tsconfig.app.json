@@ -15,7 +15,9 @@
     "outDir": "<%= relativeRootPath %>/out-tsc/app",
     "module": "es2015",
     "baseUrl": "",
-    "types": []
+    "types": [
+      "src/typings.d.ts"
+    ]
   },
   "exclude": [
     "test.ts",
