@@ -438,7 +438,7 @@ beforeLaunch: function() {
 
 Update `onPrepare`:
 ```
-onPrepare() {
+onPrepare: function() {
   jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
 }
 ```
