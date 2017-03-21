@@ -1,9 +1,0 @@
-{
-  "name": "angular2-hapi-engine",
-  "main": "index.js",
-  "typings": "index.d.ts",
-  "description": "Universal (isomorphic) javascript support for Angular2",
-  "peerDependencies": {
-    "angular2-universal": "<INHERIT>"
-  }
-}
