@@ -73,6 +73,7 @@ const ignoredPackages = [
   'extsprintf@1.0.2', // Looks like MIT
   'formatio@1.1.1', // BSD, but doesn't list it in package.json
   'indexof@0.0.1', // MIT, but doesn't list it in package.json
+  'jschardet@1.4.2', // LGPL-2.1, listed as LGPL-2.1+.
   'map-stream@0.1.0', // MIT, license but it's not listed in package.json.
   'mime@1.2.11', // MIT, but doesn't list it in package.json
   'ms@0.7.1', // MIT, but doesn't list it in package.json
