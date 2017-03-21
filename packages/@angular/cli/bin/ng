@@ -98,7 +98,7 @@ if (packageJsonProjectPath && fs.existsSync(packageJsonProjectPath)) {
   const hasOldDevDep = !!devDeps['angular-cli'];
   const hasDevDep = !!devDeps['@angular/cli'];
 
-  if (hasOldDep || hasOldDevDep || !hasDevDep || !hasDep) {
+  if (hasOldDep || hasOldDevDep || !(hasDevDep || hasDep)) {
     const warnings = [
       'Unable to find "@angular/cli" in devDependencies.',
       ''
