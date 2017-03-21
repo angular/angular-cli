@@ -198,9 +198,51 @@ instead of using 4200.
 	  "dev": "environments/environment.ts",
 	  "prod": "environments/environment.prod.ts"
 	}
+	```  
+* @angular/cli: simplify default arguments in angular-cli.json [#4389](https://github.com/angular/angular-cli/pull/4389)
+	
+  If you specified your own `generate` defaults, use the example below to make any necessary migrations (see the [schema](https://github.com/angular/angular-cli/blob/b6893d0b7fb351baf2ae499decb7740411305ef5/packages/%40angular/cli/lib/config/schema.json) for full documentation):
+
+	Before:
+
+	```
+  "defaults": {
+    "styleExt": "css",
+    "inline": {
+      "style": true,
+      "template": true
+    },
+    "spec": {
+      "component": false,
+      "directive": false,
+      "pipe": false,
+      "service": false
+    }
+  }
 	```
 
+	After:
 
+	```
+  "defaults": {
+    "styleExt": "css",
+    "component": {
+      "flat": true,
+      "inlineStyle": true,
+      "inlineTemplate": true,
+      "spec": false
+    },
+    "directive": {
+      "spec": false
+    },
+    "pipe": {
+      "spec": false
+    },
+    "service": {
+      "spec": false
+    }
+  }
+	```
 
 <a name="1.0.0-beta.31"></a>
 # [1.0.0-beta.31](https://github.com/angular/angular-cli/compare/v1.0.0-beta.30...v1.0.0-beta.31) (2017-02-09)
