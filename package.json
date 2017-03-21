@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.4",
   "description": "CLI tool for Angular",
   "main": "packages/@angular/cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -99,7 +99,7 @@
     "webpack": "~2.2.0",
     "webpack-dev-server": "~2.3.0",
     "webpack-merge": "^2.4.0",
-    "zone.js": "^0.7.2"
+    "zone.js": "^0.8.4"
   },
   "ember-addon": {
     "paths": [
