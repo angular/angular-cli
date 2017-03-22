@@ -169,6 +169,22 @@ describe('Acceptance: ng new', function () {
       });
   });
 
+  it('ng new --hmr should gener a hmr config file', () => {
+    return ng(['new', 'foo', '--skip-install', '--skip-git', '--hmr'])
+      .then(() => {
+        const hmrFile = path.join('src', 'hmr.ts');
+        expect(existsSync(hmrFile)).to.equal(true);
+      });
+  });
+
+  it('ng new --hmr should gener a hmr environment file', () => {
+    return ng(['new', 'foo', '--skip-install', '--skip-git', '--hmr'])
+      .then(() => {
+        const environmentFile = path.join('src', 'environments', 'environment.hmr.ts');
+        expect(existsSync(environmentFile)).to.equal(true);
+      });
+  });
+
   it('should skip spec files when passed --skip-tests', () => {
     return ng(['new', 'foo', '--skip-install', '--skip-git', '--skip-tests'])
       .then(() => {

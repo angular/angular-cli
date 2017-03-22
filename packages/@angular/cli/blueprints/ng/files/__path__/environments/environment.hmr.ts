@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,<% if (hmr) { %>
-  hmr: false,<% } %>
+  hmr: true,<% } %>
 };

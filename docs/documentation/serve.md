@@ -10,7 +10,7 @@ All the build Options are available in serve, below are the additional options.
 ## Options
 `--host` (`-H`) Listens only on localhost by default.
 
-`--hmr` Enable hot module replacement.
+`--hmr e=hmr` Enable hot module replacement. If the project was not generated using `ng new --hmr` remove `e=hmr` and configure the environment manually (see [Enable HMR in angular-cli apps][hmr-tutorial])
 
 `--live-reload` (`-lr`) Whether to reload the page on change, using live-reload.
 
@@ -28,3 +28,5 @@ All the build Options are available in serve, below are the additional options.
 
 ## Note
 When running `ng serve`, the compiled output is served from memory, not from disk. This means that the application being served is not located on disk in the `dist` folder.
+
+[hmr-tutorial][https://medium.com/@beeman/tutorial-enable-hrm-in-angular-cli-apps-1b0d13b80130]

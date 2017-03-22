@@ -15,7 +15,8 @@ export default Blueprint.extend({
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
-    { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] }
+    { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
+    { name: 'hmr', type: Boolean, default: false }
   ],
 
   beforeInstall: function(options: any) {
@@ -54,6 +55,7 @@ export default Blueprint.extend({
       routing: options.routing,
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
+      hmr: options.hmr,
       ng4: options.ng4,
       tests: this.tests
     };
@@ -70,6 +72,10 @@ export default Blueprint.extend({
     }
     if (this.options && this.options.inlineStyle) {
       fileList = fileList.filter(p => p.indexOf('app.component.__styleext__') < 0);
+    }
+    if (this.options && !this.options.hmr) {
+      fileList = fileList.filter(p => p.indexOf('environment.hmr.ts') < 0);
+      fileList = fileList.filter(p => p.indexOf('hmr.ts') < 0);
     }
     if (this.options && this.options.skipGit) {
       fileList = fileList.filter(p => p.indexOf('gitignore') < 0);

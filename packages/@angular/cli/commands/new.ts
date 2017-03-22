@@ -119,7 +119,13 @@ const NewCommand = Command.extend({
       default: false,
       aliases: ['it'],
       description: 'Should have an inline template.'
-     }
+    },
+    {
+      name: 'hmr',
+      type: Boolean,
+      default: false,
+      description: 'Should enable hot module replacement.'
+    }
   ],
 
   isProject: function (projectPath: string) {

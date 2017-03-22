@@ -74,6 +74,7 @@ export default Task.extend({
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,
+      hmr: commandOptions.hmr,
       ignoredUpdateFiles: ['favicon.ico'],
       ng4: commandOptions.ng4,
       skipGit: commandOptions.skipGit,
