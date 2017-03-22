@@ -1,7 +1,7 @@
 import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
 import {expectFileToExist} from '../utils/fs';
-import {updateTsConfig, updateJsonFile} from '../utils/project';
+import {updateTsConfig, updateJsonFile, useNg2} from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';
 
@@ -24,7 +24,7 @@ export default function() {
   } else {
     // Otherwise create a project from scratch.
     createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--skip-install', ...(argv['ng4'] ? ['--ng4'] : [])))
+      .then(() => ng('new', 'test-project', '--skip-install'))
       .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
       .then(() => process.chdir('./test-project'));
   }
@@ -36,6 +36,7 @@ export default function() {
         json['dependencies'][pkgName] = packages[pkgName].dist;
       });
     }))
+    .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => {
       if (argv['nightly'] || argv['ng-sha']) {
         const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
