@@ -64,6 +64,34 @@ ng build --bh /myUrl/
 All builds make use of bundling, and using the `--prod` flag in  `ng build --prod`
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
+**Note:** It is not recommended using `[class].constructor.name` while using the
+`--prod` build flag. Since the name of the class will be uglified.
+#### Example
+```js
+// Outputing router events to log
+router.events.map(event => console.log(event.constructor.name));
+
+// Output without --prod flag:
+// NavigationStart
+// RoutesRecognized
+// NavigationEnd
+
+// With --prod flag:
+// t
+// v
+// c
+```
+
+#### Difference between building with or without `---prod` flag
+The functionality that does not have * after it, are by default added to the workflow.
+
+|              | With | Without |
+|--------------|:----:|:-------:|
+| Tree-shaking |  x   |    x*   |
+| Uglifying    |  x   |         |
+
+*The flag must specifically be added.
+
 ## Options
 `--aot` Build using Ahead of Time compilation.
 
