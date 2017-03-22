@@ -1,0 +1,71 @@
+# Angular Express Engine
+
+This is an Express Engine for running Angular Apps on the server for server side rendering.
+
+## Usage
+
+To use it, set the engine and then route requests to it
+
+```ts
+import * as express from 'express';
+import { ngExpressEngine } from '@universal/ng-express-engine';
+
+// Set the engine
+app.engine('html', ngExpressEngine({
+  bootstrap: ServerAppModule // Give it a module to bootstrap
+}));
+
+app.set('view engine', 'html');
+
+app.get('/**/*', (req: Request, res: Response) => {
+  req: req,
+  res: res
+});
+```
+
+## Extra Providers
+
+Extra Providers can be provided either on engine setup
+
+```ts
+app.engine('html', ngExpressEngine({
+  bootstrap: ServerAppModule,
+  providers: [
+    ServerService
+  ]
+}));
+```
+
+## Advanced Usage
+
+### Request based Bootstrap
+
+The Bootstrap module as well as more providers can be passed on request
+
+```ts
+app.get('/**/*', (req: Request, res: Response) => {
+  req: req,
+  res: res,
+  bootstrap: OtherServerAppModule,
+  providers: [
+    OtherServerService
+  ]
+});
+```
+
+### Using the Request and Response
+
+The Request and Response objects are injected into the app via injection tokens.
+You can access them by @Inject
+
+```ts
+import { Request } from 'express';
+import { REQUEST } from '@universal/ng-express-engine';
+
+@Injectable()
+export class RequestService {
+  constructor(@Inject(REQUEST) private request: Request) {}
+}
+```
+
+If your app runs on the client side too, you will have to provide your own versions of these in the client app.

@@ -63,5 +63,15 @@
     "test": "exit 0"
   },
   "devDependencies": {
+    "@angular/common": "^4.0.0-rc.5",
+    "@angular/compiler": "^4.0.0-rc.5",
+    "@angular/core": "^4.0.0-rc.5",
+    "@angular/platform-browser": "^4.0.0-rc.5",
+    "@angular/platform-server": "^4.0.0-rc.5",
+    "express": "^4.15.2",
+    "rimraf": "^2.6.1",
+    "rxjs": "^5.2.0",
+    "typescript": "^2.2.1",
+    "zone.js": "^0.8.4"
   }
 }
