@@ -512,7 +512,8 @@ export class AotPlugin implements Tapable {
             if (this.skipCodeGeneration) {
               this._lazyRoutes[k] = lazyRoute;
             } else {
-              const lr = path.relative(this.basePath, lazyRoute.replace(/\.ts$/, '.ngfactory.ts'));
+              const factoryPath = lazyRoute.replace(/(\.d)?\.ts$/, '.ngfactory.ts');
+              const lr = path.relative(this.basePath, factoryPath);
               this._lazyRoutes[k + '.ngfactory'] = path.join(this.genDir, lr);
             }
           });
