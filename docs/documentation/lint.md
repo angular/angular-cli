@@ -27,6 +27,16 @@
 </details>
 
 <details>
+  <summary>type-check</summary>
+  <p>
+    `--type-check` _default value: false_
+  </p>
+  <p>
+    Controls the type check for linting.
+  </p>
+</details>
+
+<details>
   <summary>format</summary>
   <p>
     `--format` (alias: `-t`) _default value: prose_
