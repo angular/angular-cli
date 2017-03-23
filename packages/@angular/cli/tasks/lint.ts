@@ -5,7 +5,7 @@ import * as ts from 'typescript';
 import { requireProjectModule } from '../utilities/require-project-module';
 import { CliConfig } from '../models/config';
 import { LintCommandOptions } from '../commands/lint';
-import { oneLine } from 'common-tags';
+import { stripIndent } from 'common-tags';
 
 interface CliLintConfig {
   files?: (string | string[]);
@@ -21,9 +21,12 @@ export default Task.extend({
     const lintConfigs: CliLintConfig[] = CliConfig.fromProject().config.lint || [];
 
     if (lintConfigs.length === 0) {
-      ui.writeLine(chalk.yellow(oneLine`
+      ui.writeLine(chalk.yellow(stripIndent`
         No lint config(s) found.
-        If this is not intended, run "ng update".
+
+        If this is not intended, you will need to modify your .angular-cli.json file.
+        Follow the "Breaking Changes" instructions found here:
+        https://github.com/angular/angular-cli/blob/master/CHANGELOG.md#100-beta28-2017-02-01
       `));
 
       return Promise.resolve(0);
