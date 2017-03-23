@@ -14,8 +14,8 @@
   - *root* (`string`): The root directory of the app.
   - *outDir* (`string`): The output directory for build results. Default is `dist/`.
   - *assets* (`array`): List of application assets.
-  - *deployUrl* (`string`): ...
-  - *index* (`string`): The name of the start HTML file. Default is `index.hrml`
+  - *deployUrl* (`string`): URL where files will be deployed.
+  - *index* (`string`): The name of the start HTML file. Default is `index.html`
   - *main* (`string`): The name of the main entry-point file.
   - *polyfills* (`string`): The name of the main entry-point file.
   - *test* (`string`): The name of the test entry-point file.
