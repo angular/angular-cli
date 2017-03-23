@@ -37,6 +37,7 @@ it will default to `dev` for `development` and `prod` for `production`.
 ng build --target=production --environment=prod
 ng build --prod --env=prod
 ng build --prod
+
 # and so are these
 ng build --target=development --environment=dev
 ng build --dev --e=dev
@@ -65,7 +66,7 @@ All builds make use of bundling, and using the `--prod` flag in  `ng build --pro
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ## Options
-`--aot` Build using Ahead of Time compilation.
+`--aot` Build using Ahead of Time compilation. Defaults to false.
 
 `--app` Specifies app name or index to use.
 
@@ -75,11 +76,11 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 
 `--dev` Build target and environment to development.
 
-`--output-path` (`-op`) path where output will be placed
+`--output-path` (`-op`) path where output will be placed.
 
 `--environment` (`-e`) Defines the build environment.
 
-`--extract-css` (`-ec`) Extract css from global styles onto css files instead of js ones.
+`--extract-css` (`-ec`) Extract css from global styles into css files instead of js ones. Defaults to false.
 
 `--i18n-file` Localization file to use for i18n.
 
@@ -103,7 +104,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 
 `--target` (`-t`) Defines the build target.
 
-`--vendor-chunk` (`-vc`) Use a separate bundle containing only vendor libraries.
+`--vendor-chunk` (`-vc`) Use a separate bundle containing only vendor libraries. Defaults to true.
 
 `--verbose` (`-v`) Adds more details to output logging.
 
