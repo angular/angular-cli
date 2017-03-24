@@ -2,7 +2,7 @@
 
 # Stories describing how to do more with the CLI
 
- - [RC Update](stories/rc-update)
+ - [1.0 Update](stories/1.0-update)
  - [Asset Configuration](stories/asset-configuration)
  - [Autocompletion](stories/autocompletion)
  - [CSS Preprocessors](stories/css-preprocessors)
