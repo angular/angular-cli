@@ -5,6 +5,7 @@ const Command = require('../ember-cli/lib/models/command');
 
 export interface LintCommandOptions {
   fix?: boolean;
+  typeCheck?: boolean;
   format?: string;
   force?: boolean;
 }
@@ -20,6 +21,12 @@ export default Command.extend({
       type: Boolean,
       default: false,
       description: 'Fixes linting errors (may overwrite linted files).'
+    },
+    {
+      name: 'type-check',
+      type: Boolean,
+      default: false,
+      description: 'Controls the type check for linting.'
     },
     {
       name: 'force',

@@ -6,16 +6,16 @@
 `ng xi18n` Extracts i18n messages from the templates.
 
 ## Options
-`--i18n-format` (`-f`) Output format for the generated file: either `xmb` or `xlf`.
+`--app` (`-a`) Specifies app name to use.
 
-`--output-path` (`-op`) Path where output will be placed.
+`--i18n-format` (`-f`) Output format for the generated file: either `xmb` or `xlf`.
 
 `--locale` (`-l`) Specifies the source language of the application.
 
 `--outfile` (`-of`)  Name of the file to output.
 
-`--verbose` Adds more details to output logging.
+`--output-path` (`-op`) Path where output will be placed.
 
 `--progress` Log progress to the console while running.
 
-`--app` (`-a`) Specifies app name to use.
+`--verbose` Adds more details to output logging.

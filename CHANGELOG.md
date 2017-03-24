@@ -1,3 +1,31 @@
+<a name="1.0.0-rc.4"></a>
+# [1.0.0-rc.4](https://github.com/angular/angular-cli/compare/v1.0.0-rc.2...v1.0.0-rc.4) (2017-03-20)
+
+### Notes
+
+* To align with @angular/core behavior, all `templateUrl` and `styleUrls` are now treated as relative - developers should use the `./foo.html` form in all cases.
+* Certain systems have issues installing the `node-sass` dependency, causing `npm install` to fail. `node-sass` is now an optional dependency, which will prevent installation failures on unsupported systems.
+* The CLI no longer depends on a specific Angular version - this should lead to fewer version mismatch errors.
+
+### Bug Fixes
+
+* **@angular/cli:** all styleUrls and templateUrl are relative ([9b52253](https://github.com/angular/angular-cli/commit/9b52253)), closes [#5056](https://github.com/angular/angular-cli/issues/5056)
+* **@angular/cli:** don't fail install due to node-sass ([#5282](https://github.com/angular/angular-cli/issues/5282)) ([1e47657](https://github.com/angular/angular-cli/commit/1e47657)), closes [#4429](https://github.com/angular/angular-cli/issues/4429)
+* **@angular/cli:** fix error handling on test ([9cda847](https://github.com/angular/angular-cli/commit/9cda847)), closes [#2778](https://github.com/angular/angular-cli/issues/2778) [#3424](https://github.com/angular/angular-cli/issues/3424)
+* **@angular/cli:** fix test typings ([303b2c0](https://github.com/angular/angular-cli/commit/303b2c0)), closes [#3911](https://github.com/angular/angular-cli/issues/3911) [#5332](https://github.com/angular/angular-cli/issues/5332) [#5351](https://github.com/angular/angular-cli/issues/5351)
+* **@angular/cli:** generating will dasherize all new dirs ([#5437](https://github.com/angular/angular-cli/issues/5437)) ([d6504e2](https://github.com/angular/angular-cli/commit/d6504e2)), closes [#5424](https://github.com/angular/angular-cli/issues/5424)
+* **@angular/cli:** ignore the whole "coverage" directory ([1fa27aa](https://github.com/angular/angular-cli/commit/1fa27aa))
+* **@angular/cli:** obey the flat option when generating modules ([#5411](https://github.com/angular/angular-cli/issues/5411)) ([0fe1949](https://github.com/angular/angular-cli/commit/0fe1949)), closes [#5373](https://github.com/angular/angular-cli/issues/5373)
+* **@angular/cli:** remove dependencies to [@angular](https://github.com/angular) ([b965a49](https://github.com/angular/angular-cli/commit/b965a49))
+* **@angular/cli:** sourcemaps should be the main option, sourcemap an alias ([d94040b](https://github.com/angular/angular-cli/commit/d94040b))
+* **@angular/cli:** updates module.id subsequent variable typing ([#5500](https://github.com/angular/angular-cli/issues/5500)) ([7087195](https://github.com/angular/angular-cli/commit/7087195))
+* **@ngtools/webpack:** add parent nodes and keep program ([ebb495d](https://github.com/angular/angular-cli/commit/ebb495d)), closes [#5143](https://github.com/angular/angular-cli/issues/5143) [#4817](https://github.com/angular/angular-cli/issues/4817)
+* **@ngtools/webpack:** only remove moduleId in decorators ([82ddc5c](https://github.com/angular/angular-cli/commit/82ddc5c)), closes [#5509](https://github.com/angular/angular-cli/issues/5509)
+* **@ngtools/webpack:** remove webpack plugins peer deps on [@angular](https://github.com/angular)/core ([507b399](https://github.com/angular/angular-cli/commit/507b399))
+* **@ngtools/webpack:** when an error happens rediagnose the file ([4bd8bd2](https://github.com/angular/angular-cli/commit/4bd8bd2)), closes [#4810](https://github.com/angular/angular-cli/issues/4810) [#5404](https://github.com/angular/angular-cli/issues/5404)
+
+
+
 <a name="1.0.0-rc.2"></a>
 # [1.0.0-rc.2](https://github.com/angular/angular-cli/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2017-03-13)
 

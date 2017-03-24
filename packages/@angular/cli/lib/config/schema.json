@@ -77,7 +77,7 @@
           },
           "deployUrl": {
             "type": "string",
-            "description": ""
+            "description": "URL where files will be deployed."
           },
           "index": {
             "type": "string",

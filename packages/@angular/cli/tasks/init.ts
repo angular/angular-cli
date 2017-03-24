@@ -70,12 +70,11 @@ export default Task.extend({
       rawArgs: rawArgs.toString(),
       sourceDir: commandOptions.sourceDir,
       style: commandOptions.style,
-      prefix: commandOptions.prefix,
+      prefix: commandOptions.prefix.trim() || 'app',
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,
       ignoredUpdateFiles: ['favicon.ico'],
-      ng4: commandOptions.ng4,
       skipGit: commandOptions.skipGit,
       skipTests: commandOptions.skipTests
     };

@@ -30,7 +30,7 @@ export default Blueprint.extend({
     {
       name: 'module',
       type: String, aliases: ['m'],
-      description: 'Allows specification of the declaring module.'
+      description: 'Specifies where the service should be provided.'
     },
     {
       name: 'app',

@@ -10,8 +10,9 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
+    - env: NODE_SCRIPT="tests/run_e2e.js --nightly"
+    - env: NODE_SCRIPT="tests/run_e2e.js --ng2"
     - node_js: "7"
-    - env: NODE_SCRIPT="tests/run_e2e.js --nightly --ng4"
   include:
     - node_js: "6"
       os: linux
@@ -27,21 +28,18 @@ matrix:
       env: NODE_SCRIPT="tests/run_e2e.js --glob=tests/build/**"
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --eject --glob=tests/build/**"
-    - node_js: "6"
-      os: linux
       env: NODE_SCRIPT="tests/run_e2e.js --ignore=**/tests/build/**"
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --ng4 --glob=tests/build/**"
-    - node_js: "6"
-      os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --ng4 --ignore=**/tests/build/**"
+      env: NODE_SCRIPT="tests/run_e2e.js --eject --glob=tests/build/**"
 
     # Optional builds.
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --nightly --ng4"
+      env: NODE_SCRIPT="tests/run_e2e.js --ng2"
+    - node_js: "6"
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --nightly"
     - node_js: "7"
       os: linux
       env: NODE_SCRIPT=tests/run_e2e.js
@@ -51,6 +49,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "--no-sandbox" > ~/.config/chromium-flags.conf; fi
+  - curl -o- -L https://yarnpkg.com/install.sh | bash
+  - export PATH="$HOME/.yarn/bin:$PATH"
   - yarn config set spin false
   - yarn config set progress false
 

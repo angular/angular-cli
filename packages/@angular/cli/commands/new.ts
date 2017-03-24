@@ -41,12 +41,6 @@ const NewCommand = Command.extend({
       description: 'Automatically link the `@angular/cli` package.'
     },
     {
-      name: 'ng4',
-      type: Boolean,
-      default: false,
-      description: 'Create a project with Angular 4 in the template.'
-    },
-    {
       name: 'skip-install',
       type: Boolean,
       default: false,
