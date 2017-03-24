@@ -7,7 +7,7 @@
 <details>
   <summary>app</summary>
   <p>
-    `--app` (alias: `-a`) _default value: 1st app_
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
   </p>
   <p>
     Specifies app name to use.
@@ -17,7 +17,7 @@
 <details>
   <summary>flat</summary>
   <p>
-    `--flat`
+    <code>--flat</code>
   </p>
   <p>
     Indicate if a dir is created.
@@ -27,7 +27,7 @@
 <details>
   <summary>module</summary>
   <p>
-    `--module` (alias: `-m`)
+    <code>--module</code> (aliases: <code>-m</code>)
   </p>
   <p>
     Specifies where the guard should be provided.
@@ -37,7 +37,7 @@
 <details>
   <summary>spec</summary>
   <p>
-    `--spec`
+    <code>--spec</code>
   </p>
   <p>
     Specifies if a spec file is generated.

@@ -68,7 +68,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>aot</summary>
   <p>
-    `--aot` _default: false_
+    <code>--aot</code> <em>default value: false</em>
   </p>
   <p>
     Build using Ahead of Time compilation.
@@ -78,7 +78,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>app</summary>
   <p>
-    `--app` (aliases: `-a`)
+    <code>--app</code> (aliases: <code>-a</code>)
   </p>
   <p>
     Specifies app name or index to use.
@@ -88,7 +88,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>base-href</summary>
   <p>
-    `--base-href` (aliases: `-bh`)
+    <code>--base-href</code> (aliases: <code>-bh</code>)
   </p>
   <p>
     Base url for the application being built.
@@ -98,7 +98,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>deploy-url</summary>
   <p>
-    `--deploy-url` (aliases: `-d`)
+    <code>--deploy-url</code> (aliases: <code>-d</code>)
   </p>
   <p>
     URL where files will be deployed.
@@ -108,7 +108,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>output-path</summary>
   <p>
-    `--output-path` (aliases: `-op`)
+    <code>--output-path</code> (aliases: <code>-op</code>)
   </p>
   <p>
     Path where output will be placed
@@ -118,7 +118,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>environment</summary>
   <p>
-    `--environment` (aliases: `-e`)
+    <code>--environment</code> (aliases: <code>-e</code>)
   </p>
   <p>
     Defines the build environment.
@@ -128,7 +128,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>extract-css</summary>
   <p>
-    `--extract-css` (aliases: `-ec`)
+    <code>--extract-css</code> (aliases: <code>-ec</code>)
   </p>
   <p>
     Extract css from global styles onto css files instead of js ones.
@@ -138,7 +138,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>i18n-file</summary>
   <p>
-    `--i18n-file`
+    <code>--i18n-file</code>
   </p>
   <p>
     Localization file to use for i18n.
@@ -148,7 +148,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>i18n-format</summary>
   <p>
-    `--i18n-format`
+    <code>--i18n-format</code>
   </p>
   <p>
     Format of the localization file specified with --i18n-file.
@@ -158,7 +158,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>locale</summary>
   <p>
-    `--locale`
+    <code>--locale</code>
   </p>
   <p>
     Locale to use for i18n.
@@ -168,20 +168,20 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>output-hashing</summary>
   <p>
-    `--output-hashing` (aliases: `-oh`)
+    <code>--output-hashing</code> (aliases: <code>-oh</code>)
   </p>
   <p>
     Define the output filename cache-busting hashing mode.
   </p>
   <p>
-    Values: `none`, `all`, `media`, `bundles`
+    Values: <code>none</code>, <code>all</code>, <code>media</code>, <code>bundles</code>
   </p>
 </details>
 
 <details>
   <summary>output-path</summary>
   <p>
-    `--output-path` (aliases: `-op`)
+    <code>--output-path</code> (aliases: <code>-op</code>)
   </p>
   <p>
     Path where output will be placed.
@@ -191,7 +191,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>poll</summary>
   <p>
-    `--poll`
+    <code>--poll</code>
   </p>
   <p>
     Enable and define the file watching poll time period (milliseconds).
@@ -201,7 +201,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>progress</summary>
   <p>
-    `--progress` (aliases: `-pr`) _default value: true_
+    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true</<em>
   </p>
   <p>
     Log progress to the console while building.
@@ -211,7 +211,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>sourcemap</summary>
   <p>
-    `--sourcemap` (aliases: `-sm`, `sourcemaps`)
+    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
   </p>
   <p>
     Output sourcemaps.
@@ -221,17 +221,17 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>stats-json</summary>
   <p>
-    `--stats-json` (aliases: `-`)
+    <code>--stats-json</code>
   </p>
   <p>
-    Generates a `stats.json` file which can be analyzed using tools such as: `webpack-bundle-analyzer` or https://webpack.github.io/analyse.
+    Generates a <code>stats.json</code> file which can be analyzed using tools such as: <code>webpack-bundle-analyzer</code> or https://webpack.github.io/analyse.
   </p>
 </details>
 
 <details>
   <summary>target</summary>
   <p>
-    `--target` (aliases: `-t`, `-dev`, `-prod`) _default value: development_
+    <code>--target</code> (aliases: <code>-t</code>, <code>-dev</code>, <code>-prod</code>) <em>default value: development</em>
   </p>
   <p>
     Defines the build target.
@@ -241,7 +241,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>vendor-chunk</summary>
   <p>
-    `--vendor-chunk` (aliases: `-vc`) _default value: true_
+    <code>--vendor-chunk</code> (aliases: <code>-vc</code>) <em>default value: true</em>
   </p>
   <p>
     Use a separate bundle containing only vendor libraries.
@@ -251,7 +251,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>verbose</summary>
   <p>
-    `--verbose` (aliases: `-v`) _default value: false_
+    <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
   </p>
   <p>
     Adds more details to output logging.
@@ -261,7 +261,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 <details>
   <summary>watch</summary>
   <p>
-    `--watch` (aliases: `-w`)
+    <code>--watch</code> (aliases: <code>-w</code>)
   </p>
   <p>
     Run build when files change.

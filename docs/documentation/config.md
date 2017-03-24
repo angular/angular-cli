@@ -9,7 +9,7 @@
 <details>
   <summary>global</summary>
   <p>
-    `--global` _default value: false_
+    <code>--global</code> <em>default value: false</em>
   </p>
   <p>
     Get the value in the global configuration (in your home directory).
@@ -26,7 +26,7 @@
 <details>
   <summary>global</summary>
   <p>
-    `--global` _default value: false_
+    <code>--global</code> <em>default value: false</em>
   </p>
   <p>
     Get the value in the global configuration (in your home directory).

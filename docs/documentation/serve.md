@@ -11,7 +11,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>host</summary>
   <p>
-    `--host` (alias: `-H`) _default value: localhost_
+    <code>--host</code> (aliases: <code>-H</code>) <em>default value: localhost</em>
   </p>
   <p>
     Listens only on localhost by default.
@@ -21,7 +21,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>hmr</summary>
   <p>
-    `--hmr` _default value: false_
+    <code>--hmr</code> <em>default value: false</em>
   </p>
   <p>
     Enable hot module replacement.
@@ -31,7 +31,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>live-reload</summary>
   <p>
-    `--live-reload` (alias: `-lr`) _default value: true_
+    <code>--live-reload</code> (aliases: <code>-lr</code>) <em>default value: true</em>
   </p>
   <p>
     Whether to reload the page on change, using live-reload.
@@ -41,7 +41,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>live-reload-client</summary>
   <p>
-    `--live-reload-client`
+    <code>--live-reload-client</code>
   </p>
   <p>
     Specify the URL that the live reload browser client will use.
@@ -51,7 +51,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>open</summary>
   <p>
-    `--open` (alias: `-o`) _default value: false_
+    <code>--open</code> (aliases: <code>-o</code>) <em>default value: false</em>
   </p>
   <p>
     Opens the url in default browser.
@@ -61,7 +61,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>port</summary>
   <p>
-    `--port` (alias: `-p`) _default value: 4200_
+    <code>--port</code> (aliases: <code>-p</code>) <em>default value: 4200</em>
   </p>
   <p>
     Port to listen to for serving.
@@ -71,7 +71,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>ssl</summary>
   <p>
-    `--ssl`
+    <code>--ssl</code>
   </p>
   <p>
     Serve using HTTPS.
@@ -81,7 +81,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>ssl-cert</summary>
   <p>
-    `--ssl-cert` (alias: `-`) _default value: _
+    <code>--ssl-cert</code> (aliases: <code>-</code>) <em>default value: </em>
   </p>
   <p>
     SSL certificate to use for serving HTTPS.
@@ -91,7 +91,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>ssl-key</summary>
   <p>
-    `--ssl-key`
+    <code>--ssl-key</code>
   </p>
   <p>
     SSL key to use for serving HTTPS.
@@ -101,7 +101,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>aot</summary>
   <p>
-    `--aot`
+    <code>--aot</code>
   </p>
   <p>
     Build using Ahead of Time compilation.
@@ -111,7 +111,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>base-href</summary>
   <p>
-    `--base-href` (alias: `-bh`)
+    <code>--base-href</code> (aliases: <code>-bh</code>)
   </p>
   <p>
     Base url for the application being built.
@@ -121,7 +121,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>deploy-url</summary>
   <p>
-    `--deploy-url` (alias: `-d`)
+    <code>--deploy-url</code> (aliases: <code>-d</code>)
   </p>
   <p>
     URL where files will be deployed.
@@ -131,7 +131,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>environment</summary>
   <p>
-    `--environment` (alias: `-e`)
+    <code>--environment</code> (aliases: <code>-e</code>)
   </p>
   <p>
     Defines the build environment.
@@ -141,7 +141,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>extract-css</summary>
   <p>
-    `--extract-css` (alias: `-ec`)
+    <code>--extract-css</code> (aliases: <code>-ec</code>)
   </p>
   <p>
     Extract css from global styles onto css files instead of js ones.
@@ -151,7 +151,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>i18n-file</summary>
   <p>
-    `--i18n-file`
+    <code>--i18n-file</code>
   </p>
   <p>
     Localization file to use for i18n.
@@ -161,7 +161,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>i18n-format</summary>
   <p>
-    `--i18n-format`
+    <code>--i18n-format</code>
   </p>
   <p>
     Format of the localization file specified with --i18n-file.
@@ -171,7 +171,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>locale</summary>
   <p>
-    `--locale`
+    <code>--locale</code>
   </p>
   <p>
     Locale to use for i18n.
@@ -181,17 +181,17 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>output-hashing</summary>
   <p>
-    `--output-hashing` (alias: `-oh`) _default value: _
+    <code>--output-hashing</code> (aliases: <code>-oh</code>) <em>default value: </em>
   </p>
   <p>
-    Define the output filename cache-busting hashing mode. Possible values: `none`, `all`, `media`, `bundles`
+    Define the output filename cache-busting hashing mode. Possible values: <code>none</code>, <code>all</code>, <code>media</code>, <code>bundles</code>
   </p>
 </details>
 
 <details>
   <summary>output-path</summary>
   <p>
-    `--output-path` (alias: `-op`) _default value: _
+    <code>--output-path</code> (aliases: <code>-op</code>) <em>default value: </em>
   </p>
   <p>
     Path where output will be placed.
@@ -201,7 +201,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>poll</summary>
   <p>
-    `--poll`
+    <code>--poll</code>
   </p>
   <p>
     Enable and define the file watching poll time period (milliseconds) .
@@ -211,7 +211,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>progress</summary>
   <p>
-    `--progress` (alias: `-pr`) _default value: true_
+    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true</em>
   </p>
   <p>
     Log progress to the console while building.
@@ -221,7 +221,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>sourcemap</summary>
   <p>
-    `--sourcemap` (alias: `-sm`, `sourcemaps`)
+    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
   </p>
   <p>
     Output sourcemaps.
@@ -231,7 +231,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>target</summary>
   <p>
-    `--target` (aliases: `-t`, `-dev`, `-prod`) _default value: development_
+    <code>--target</code> (aliases: <code>-t</code>, <code>-dev</code>, <code>-prod</code>) <em>default value: development</em>
   </p>
   <p>
     Defines the build target.
@@ -241,7 +241,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>vendor-chunk</summary>
   <p>
-    `--vendor-chunk` (aliases: `-vc`) _default value: true_
+    <code>--vendor-chunk</code> (aliases: <code>-vc</code>) <em>default value: true</em>
   </p>
   <p>
     Use a separate bundle containing only vendor libraries.
@@ -251,7 +251,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>verbose</summary>
   <p>
-    `--verbose` (aliases: `-v`) _default value: false_
+    <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
   </p>
   <p>
     Adds more details to output logging.
@@ -261,7 +261,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>watch</summary>
   <p>
-    `--watch` (aliases: `-w`)
+    <code>--watch</code> (aliases: <code>-w</code>)
   </p>
   <p>
     Run build when files change.

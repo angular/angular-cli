@@ -17,7 +17,7 @@ End-to-end tests are run via [Protractor] (https://angular.github.io/protractor/
 <details>
   <summary>config</summary>
   <p>
-    `--config` (alias: `-c`)
+    <code>--config</code> (aliases: <code>-c</code>)
   </p>
   <p>
     Use a specific config file. Defaults to the protractor config file in `.angular-cli.json`.
@@ -27,7 +27,7 @@ End-to-end tests are run via [Protractor] (https://angular.github.io/protractor/
 <details>
   <summary>element-explorer</summary>
   <p>
-    `--element-explorer` (alias: `-ee`) _default value: false_
+    <code>--element-explorer</code> (aliases: <code>-ee</code>) <em>default value: false</em>
   </p>
   <p>
     Start Protractor's [Element Explorer](https://github.com/angular/protractor/blob/master/docs/debugging.md#testing-out-protractor-interactively) for debugging.
@@ -37,7 +37,7 @@ End-to-end tests are run via [Protractor] (https://angular.github.io/protractor/
 <details>
   <summary>serve</summary>
   <p>
-    `--serve` (alias: `-s`) _default value: true_
+    <code>--serve</code> (aliases: <code>-s</code>) <em>default value: true</em>
   </p>
   <p>
     Compile and Serve the app. All serve options are also available. The live-reload option defaults to false, and the default port will be random.
@@ -47,7 +47,7 @@ End-to-end tests are run via [Protractor] (https://angular.github.io/protractor/
 <details>
   <summary>specs</summary>
   <p>
-    `--specs` (alias: `-sp`) _default value: []_
+    <code>--specs</code> (aliases: <code>-sp</code>) <em>default value: []</em>
   </p>
   <p>
     Override specs in the protractor config. Can send in multiple specs by repeating flag (ng e2e --specs=spec1.ts --specs=spec2.ts).
@@ -57,7 +57,7 @@ End-to-end tests are run via [Protractor] (https://angular.github.io/protractor/
 <details>
   <summary>webdrive-update</summary>
   <p>
-    `--webdrive-update` (alias: `-wu`) _default value: true_
+    <code>--webdrive-update</code> (aliases: <code>-wu</code>) <em>default value: true</em>
   </p>
   <p>
     Try to update webdriver.

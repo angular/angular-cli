@@ -6,16 +6,72 @@
 `ng xi18n` Extracts i18n messages from the templates.
 
 ## Options
-`--app` (`-a`) Specifies app name to use.
+<details>
+  <summary>app</summary>
+  <p>
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+  </p>
+  <p>
+    Specifies app name to use.
+  </p>
+</details>
 
-`--i18n-format` (`-f`) Output format for the generated file: either `xmb` or `xlf`.
+<details>
+  <summary>i18n-format</summary>
+  <p>
+    <code>--i18n-format</code> (aliases: <code>-f</code>)
+  </p>
+  <p>
+    Output format for the generated file: either `xmb` or `xlf`.
+  </p>
+</details>
 
-`--locale` (`-l`) Specifies the source language of the application.
+<details>
+  <summary>locale</summary>
+  <p>
+    <code>--locale</code> (aliases: <code>-l</code>)
+  </p>
+  <p>
+    Specifies the source language of the application.
+  </p>
+</details>
 
-`--outfile` (`-of`)  Name of the file to output.
+<details>
+  <summary>outfile</summary>
+  <p>
+    <code>--outfile</code> (aliases: <code>-of</code>)
+  </p>
+  <p>
+    Name of the file to output.
+  </p>
+</details>
 
-`--output-path` (`-op`) Path where output will be placed.
+<details>
+  <summary>output-path</summary>
+  <p>
+    <code>--output-path</code> (aliases: <code>-op</code>)
+  </p>
+  <p>
+    Path where output will be placed.
+  </p>
+</details>
 
-`--progress` Log progress to the console while running.
+<details>
+  <summary>progress</summary>
+  <p>
+    <code>--progress</code>
+  </p>
+  <p>
+    Log progress to the console while running.
+  </p>
+</details>
 
-`--verbose` Adds more details to output logging.
+<details>
+  <summary>verbose</summary>
+  <p>
+    <code>--verbose</code>
+  </p>
+  <p>
+    Adds more details to output logging.
+  </p>
+</details>
