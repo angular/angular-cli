@@ -10,9 +10,9 @@
 
 `--change-detection` (`-cd`) Specifies the change detection strategy.
 
-`--flat` Flag to indicate if a dir is created.
-
 `--export` Specifies if declaring module exports the component.
+
+`--flat` Flag to indicate if a dir is created.
 
 `--inline-style` (`-is`) Specifies if the style will be in the ts file.
 

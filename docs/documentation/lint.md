@@ -6,7 +6,6 @@
 `ng lint` will lint you app code using tslint.
 
 ## Options
-
 `--fix` Fixes linting errors (may overwrite linted files).
 
 `--force` Succeeds even if there was linting errors.

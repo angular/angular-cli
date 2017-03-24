@@ -10,6 +10,6 @@
 
 `--flat` Flag to indicate if a dir is created.
 
-`--module` (`-m`) Allows you to specify the module where the service should be provided
+`--module` (`-m`) Specifies where the service should be provided.
 
 `--spec` Specifies if a spec file is generated.
