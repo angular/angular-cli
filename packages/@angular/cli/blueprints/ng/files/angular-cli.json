@@ -24,7 +24,8 @@
       "scripts": [],
       "environmentSource": "environments/environment.ts",
       "environments": {
-        "dev": "environments/environment.ts",
+        "dev": "environments/environment.ts",<% if (hmr) { %>
+        "hmr": "environments/environment.hmr.ts",<% } %>
         "prod": "environments/environment.prod.ts"
       }
     }
