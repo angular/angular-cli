@@ -6,6 +6,7 @@
 
 * The Angular CLI v1.0 release is here! 
 * You can find the documentation on our [Github wiki](https://github.com/angular/angular-cli/wiki)!
+* If you are updating from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
 * By default, now that Angular 4 is final, we will generate an Angular 4.0 project with `ng new`.
 * We fixed a problem with AOT and templates where errors were not always reported. Now they should be. This may surface previously hidden bugs that existed in your codebase.
 * We really hope to make your life easier.
