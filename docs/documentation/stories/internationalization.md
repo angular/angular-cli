@@ -13,7 +13,7 @@ When your app is ready, you can extract the strings to translate from your templ
 `ng xi18n` command.
 
 By default it will create a file named `messages.xlf` in your `src` folder.
-You can use [parameters from the xi18n command](../xi18n) to change the format,
+You can use [parameters from the xi18n command](./xi18n) to change the format,
 the name, the location and the source locale of the extracted file.
 
 For example to create a file in the `src/locale` folder you would use:
