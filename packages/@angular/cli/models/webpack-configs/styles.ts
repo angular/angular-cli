@@ -41,44 +41,47 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemaps;
 
   // Minify/optimize css in production.
-  const cssnanoPlugin = cssnano({ safe: true, autoprefixer: false });
-
+  const minimizeCss = buildOptions.target === 'production';
   // Convert absolute resource URLs to account for base-href and deploy-url.
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
-  const postcssUrlOptions = {
-    url: (URL: string) => {
-      // Only convert root relative URLs, which CSS-Loader won't process into require().
-      if (!URL.startsWith('/') || URL.startsWith('//')) {
-        return URL;
-      }
 
-      if (deployUrl.match(/:\/\//)) {
-        // If deployUrl contains a scheme, ignore baseHref use deployUrl as is.
-        return `${deployUrl.replace(/\/$/, '')}${URL}`;
-      } else if (baseHref.match(/:\/\//)) {
-        // If baseHref contains a scheme, include it as is.
-        return baseHref.replace(/\/$/, '') +
-               `/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
-      } else {
-        // Join together base-href, deploy-url and the original URL.
-        // Also dedupe multiple slashes into single ones.
-        return `/${baseHref}/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
-      }
-    }
+  const postcssPluginCreator = function() {
+    return [
+      autoprefixer(),
+      postcssUrl({
+        url: (URL: string) => {
+          // Only convert root relative URLs, which CSS-Loader won't process into require().
+          if (!URL.startsWith('/') || URL.startsWith('//')) {
+            return URL;
+          }
+
+          if (deployUrl.match(/:\/\//)) {
+            // If deployUrl contains a scheme, ignore baseHref use deployUrl as is.
+            return `${deployUrl.replace(/\/$/, '')}${URL}`;
+          } else if (baseHref.match(/:\/\//)) {
+            // If baseHref contains a scheme, include it as is.
+            return baseHref.replace(/\/$/, '') +
+                `/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
+          } else {
+            // Join together base-href, deploy-url and the original URL.
+            // Also dedupe multiple slashes into single ones.
+            return `/${baseHref}/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
+          }
+        }
+      })
+    ].concat(
+        minimizeCss ? [cssnano({ safe: true, autoprefixer: false })] : []
+    );
   };
-  const urlPlugin = postcssUrl(postcssUrlOptions);
-  // We need to save baseHref and deployUrl for the Ejected webpack config to work (we reuse
-  //  the function defined above).
-  (postcssUrlOptions as any).baseHref = baseHref;
-  (postcssUrlOptions as any).deployUrl = deployUrl;
-  // Save the original options as arguments for eject.
-  urlPlugin[postcssArgs] = postcssUrlOptions;
-
-  // PostCSS plugins.
-  const postCssPlugins = [autoprefixer(), urlPlugin].concat(
-    buildOptions.target === 'production' ? [cssnanoPlugin] : []
-  );
+  (postcssPluginCreator as any)[postcssArgs] = {
+    variableImports: {
+      'autoprefixer': 'autoprefixer',
+      'postcss-url': 'postcssUrl',
+      'cssnano': 'cssnano'
+    },
+    variables: { minimizeCss, baseHref, deployUrl }
+  };
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
@@ -108,50 +111,77 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   // set base rules to derive final rules from
-  const baseRules = [
-    { test: /\.css$/, loaders: [] },
-    { test: /\.scss$|\.sass$/, loaders: ['sass-loader'] },
-    { test: /\.less$/, loaders: ['less-loader'] },
-    // stylus-loader doesn't support webpack.LoaderOptionsPlugin properly,
-    // so we need to add options in its query
+  const baseRules: webpack.NewUseRule[] = [
+    { test: /\.css$/, use: [] },
+    { test: /\.scss$|\.sass$/, use: [{
+        loader: 'sass-loader',
+        options: {
+          sourceMap: cssSourceMap,
+          includePaths
+        }
+      }]
+    },
+    { test: /\.less$/, use: [{
+        loader: 'less-loader',
+        options: {
+          sourceMap: cssSourceMap
+        }
+      }]
+    },
     {
-      test: /\.styl$/, loaders: [`stylus-loader?${JSON.stringify({
-        sourceMap: cssSourceMap,
-        paths: includePaths
-      })}`]
+      test: /\.styl$/, use: [{
+        loader: 'stylus-loader',
+        options: {
+          sourceMap: cssSourceMap,
+          paths: includePaths
+        }
+      }]
     }
   ];
 
-  const commonLoaders = [
-    // css-loader doesn't support webpack.LoaderOptionsPlugin properly,
-    // so we need to add options in its query
-    `css-loader?${JSON.stringify({ sourceMap: cssSourceMap, importLoaders: 1 })}`,
-    'postcss-loader'
+  const commonLoaders: webpack.Loader[] = [
+    {
+      loader: 'css-loader',
+      options: {
+        sourceMap: cssSourceMap,
+        importLoaders: 1
+      }
+    },
+    {
+      loader: 'postcss-loader',
+      options: {
+        // A non-function property is required to workaround a webpack option handling bug
+        ident: 'postcss',
+        plugins: postcssPluginCreator
+      }
+    }
   ];
 
   // load component css as raw strings
-  let rules: any = baseRules.map(({test, loaders}) => ({
-    exclude: globalStylePaths, test, loaders: [
+  const rules: webpack.Rule[] = baseRules.map(({test, use}) => ({
+    exclude: globalStylePaths, test, use: [
       'exports-loader?module.exports.toString()',
       ...commonLoaders,
-      ...loaders
+      ...(use as webpack.Loader[])
     ]
   }));
 
   // load global css as css files
   if (globalStylePaths.length > 0) {
-    rules.push(...baseRules.map(({test, loaders}) => {
+    rules.push(...baseRules.map(({test, use}) => {
       const extractTextPlugin = {
         use: [
           ...commonLoaders,
-          ...loaders
+          ...(use as webpack.Loader[])
         ],
         fallback: 'style-loader',
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
         publicPath: ''
       };
       const ret: any = {
-        include: globalStylePaths, test, loaders: ExtractTextPlugin.extract(extractTextPlugin)
+        include: globalStylePaths,
+        test,
+        use: ExtractTextPlugin.extract(extractTextPlugin)
       };
       // Save the original options as arguments for eject.
       ret[pluginArgs] = extractTextPlugin;
@@ -159,8 +189,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  // supress empty .js files in css only entry points
   if (buildOptions.extractCss) {
+    // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
 
@@ -172,19 +202,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       new ExtractTextPlugin({
         filename: `[name]${hashFormat.extract}.bundle.css`,
         disable: !buildOptions.extractCss
-      }),
-      new webpack.LoaderOptionsPlugin({
-        sourceMap: cssSourceMap,
-        options: {
-          postcss: postCssPlugins,
-          // css-loader, stylus-loader don't support LoaderOptionsPlugin properly
-          // options are in query instead
-          sassLoader: { sourceMap: cssSourceMap, includePaths },
-          // less-loader doesn't support paths
-          lessLoader: { sourceMap: cssSourceMap },
-          // context needed as a workaround https://github.com/jtangelder/sass-loader/issues/285
-          context: projectRoot,
-        },
       })
     ].concat(extraPlugins)
   };
