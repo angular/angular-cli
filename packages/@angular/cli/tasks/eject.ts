@@ -18,14 +18,11 @@ const writeFile = (denodeify(fs.writeFile) as (...args: any[]) => Promise<any>);
 const angularCliPlugins = require('../plugins/webpack');
 
 
-const autoprefixer = require('autoprefixer');
-const postcssUrl = require('postcss-url');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
 
-const LoaderOptionsPlugin = webpack.LoaderOptionsPlugin;
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 
 
@@ -43,6 +40,7 @@ class JsonWebpackSerializer {
   public variables: {[name: string]: string} = {
     'nodeModules': `path.join(process.cwd(), 'node_modules')`,
   };
+  private _postcssProcessed = false;
 
 
   constructor(private _root: string, private _dist: string) {}
@@ -128,41 +126,6 @@ class JsonWebpackSerializer {
     });
   }
 
-  private _loaderOptionsPlugin(plugin: any) {
-    return Object.assign({}, plugin.options, {
-      test: plugin.options.test instanceof RegExp
-        ? this._serializeRegExp(plugin.options.test)
-        : undefined,
-      options: Object.assign({}, plugin.options.options, {
-        context: '',
-        postcss: plugin.options.options.postcss.map((x: any) => {
-          if (x && x.toString() == autoprefixer()) {
-            this.variableImports['autoprefixer'] = 'autoprefixer';
-            return this._escape('autoprefixer()');
-          } else if (x && x.toString() == postcssUrl()) {
-            this.variableImports['postcss-url'] = 'postcssUrl';
-            let args = '';
-            if (x[postcssArgs] && x[postcssArgs].url) {
-              this.variables['baseHref'] = JSON.stringify(x[postcssArgs].baseHref);
-              this.variables['deployUrl'] = JSON.stringify(x[postcssArgs].deployUrl);
-              args = `{"url": ${x[postcssArgs].url.toString()}}`;
-            }
-            return this._escape(`postcssUrl(${args})`);
-          } else if (x && x.postcssPlugin == 'cssnano') {
-            this.variableImports['cssnano'] = 'cssnano';
-            return this._escape('cssnano({ safe: true, autoprefixer: false })');
-          } else {
-            if (typeof x == 'function') {
-              return this._serializeFunction(x);
-            } else {
-              return x;
-            }
-          }
-        })
-      })
-    });
-  }
-
   _definePlugin(plugin: any) {
     return plugin.definitions;
   }
@@ -205,10 +168,6 @@ class JsonWebpackSerializer {
         case HtmlWebpackPlugin:
           args = this._htmlWebpackPlugin(plugin);
           this.variableImports['html-webpack-plugin'] = 'HtmlWebpackPlugin';
-          break;
-        case LoaderOptionsPlugin:
-          args = this._loaderOptionsPlugin(plugin);
-          this._addImport('webpack', 'LoaderOptionsPlugin');
           break;
         case webpack.DefinePlugin:
           args = this._definePlugin(plugin);
@@ -265,6 +224,19 @@ class JsonWebpackSerializer {
       if (loader.loader) {
         loader.loader = this._loaderReplacer(loader.loader);
       }
+      if (loader.loader === 'postcss-loader' && !this._postcssProcessed) {
+        const args: any = loader.options.plugins[postcssArgs];
+
+        Object.keys(args.variableImports)
+          .forEach(key => this.variableImports[key] = args.variableImports[key]);
+        Object.keys(args.variables)
+          .forEach(key => this.variables[key] = JSON.stringify(args.variables[key]));
+
+        this.variables['postcssPlugins'] = loader.options.plugins;
+        loader.options.plugins = this._escape('postcssPlugins');
+
+        this._postcssProcessed = true;
+      }
     }
     return loader;
   }
@@ -302,6 +274,13 @@ class JsonWebpackSerializer {
     }
     if (value.loader) {
       value.loader = this._loaderReplacer(value.loader);
+    }
+    if (value.use) {
+      if (Array.isArray(value.use)) {
+        value.use = value.use.map((loader: any) => this._loaderReplacer(loader));
+      } else {
+        value.use = this._loaderReplacer(value.loader);
+      }
     }
 
     if (value.exclude) {
