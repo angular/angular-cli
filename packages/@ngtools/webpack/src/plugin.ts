@@ -361,8 +361,8 @@ export class AotPlugin implements Tapable {
 
       const original = consumer.originalPositionFor({ line, column: character });
       return {
-        line: original.line,
-        character: original.column,
+        line: typeof original.line == 'number' ? original.line : line,
+        character: typeof original.column == 'number' ? original.column : character,
         fileName: original.source || fileName
       };
     } catch (e) {
@@ -390,19 +390,25 @@ export class AotPlugin implements Tapable {
       );
 
     if (diagnostics.length > 0) {
-      const message = diagnostics
-        .map(diagnostic => {
-          const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+      diagnostics.forEach(diagnostic => {
+        const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
 
-          const sourceText = diagnostic.file.getFullText();
-          let {line, character, fileName} = this._translateSourceMap(sourceText,
-            diagnostic.file.fileName, position);
+        const sourceText = diagnostic.file.getFullText();
+        let {line, character, fileName} = this._translateSourceMap(sourceText,
+          diagnostic.file.fileName, position);
 
-          const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-          return `${fileName} (${line + 1},${character + 1}): ${message}`;
-        })
-        .join('\n');
-      this._compilation.errors.push(message);
+        const messageText = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+        const message = `${fileName} (${line + 1},${character + 1}): ${messageText}`;
+
+        switch (diagnostic.category) {
+          case ts.DiagnosticCategory.Error:
+            this._compilation.errors.push(message);
+            break;
+
+          default:
+            this._compilation.warnings.push(message);
+        }
+      });
     }
   }
 
