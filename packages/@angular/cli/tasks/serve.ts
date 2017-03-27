@@ -204,7 +204,11 @@ export default Task.extend({
           return reject(err);
         }
         if (serveTaskOptions.open) {
-          opn(serverAddress);
+           if (serveTaskOptions.browser) {
+            opn(serverAddress, { app: serveTaskOptions.browser });
+           } else {
+             opn(serverAddress);
+           }
         }
       });
     })
