@@ -141,6 +141,9 @@ class JsonWebpackSerializer {
         case webpack.NoEmitOnErrorsPlugin:
           this._addImport('webpack', 'NoEmitOnErrorsPlugin');
           break;
+        case webpack.NamedModulesPlugin:
+          this._addImport('webpack', 'NamedModulesPlugin');
+          break;
         case (<any>webpack).HashedModuleIdsPlugin:
           this._addImport('webpack', 'HashedModuleIdsPlugin');
           break;
