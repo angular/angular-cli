@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as chalk from 'chalk';
 import denodeify = require('denodeify');
 
 import InitCommand from './init';
@@ -15,7 +16,7 @@ const mkdir = denodeify(fs.mkdir);
 
 const NewCommand = Command.extend({
   name: 'new',
-  description: `Creates a new directory and a new Angular app.`,
+  description: `Creates a new directory and a new Angular app eg. "ng new [name]".`,
   works: 'outsideProject',
 
   availableOptions: [
@@ -125,7 +126,8 @@ const NewCommand = Command.extend({
 
     if (!packageName) {
       return Promise.reject(new SilentError(
-        `The "ng ${this.name}" command requires a name argument to be specified. ` +
+        `The "ng ${this.name}" command requires a name argument to be specified eg. ` +
+        chalk.yellow('ng new [name] ') +
         `For more details, use "ng help".`));
     }
 
