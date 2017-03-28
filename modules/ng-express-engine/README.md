@@ -69,3 +69,16 @@ export class RequestService {
 ```
 
 If your app runs on the client side too, you will have to provide your own versions of these in the client app.
+
+### Using a Custom Callback
+
+You can also use a custom callback to better handle your errors
+
+```ts
+app.get('/**/*', (req: Request, res: Response) => {
+  req: req,
+  res: res
+}, (err: Error, html: string) => {
+  res.status(html ? 200 : 500).send(html || err.message);
+});
+```
