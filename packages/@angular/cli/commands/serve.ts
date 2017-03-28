@@ -16,7 +16,7 @@ const defaultSslKey = config.get('defaults.serve.sslKey');
 const defaultSslCert = config.get('defaults.serve.sslCert');
 
 export interface ServeTaskOptions extends BuildOptions {
-  port?: number;
+  port?: string;
   host?: string;
   proxyConfig?: string;
   liveReload?: boolean;
@@ -33,7 +33,7 @@ export const baseServeCommandOptions: any = overrideOptions([
   ...baseBuildCommandOptions,
   {
     name: 'port',
-    type: Number,
+    type: String,
     default: defaultPort,
     aliases: ['p'],
     description: 'Port to listen to for serving.'
