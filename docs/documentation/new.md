@@ -49,16 +49,6 @@ Default applications are created in a directory of the same name, with an initia
 </details>
 
 <details>
-  <summary>ng4</summary>
-  <p>
-    <code>--ng4</code> <em>default value: false</em>
-  </p>
-  <p>
-    Create a project with Angular 4 in the template.
-  </p>
-</details>
-
-<details>
   <summary>prefix</summary>
   <p>
     <code>--prefix</code> (aliases: <code>-p</code>) <em>default value: app</em>
