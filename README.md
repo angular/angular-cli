@@ -100,7 +100,7 @@ angular-cli will add reference to `components`, `directives` and `pipes` automat
  1. `ng g module new-module` to create a new module
  2.  call `ng g component new-module/new-component`
  
-This should add the new `component`, `directive` or `pipe` reference to the `newModule` you've created.
+This should add the new `component`, `directive` or `pipe` reference to the `new-module` you've created.
  
 ### Updating Angular CLI
 
