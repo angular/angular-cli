@@ -45,9 +45,9 @@ Environments are defined and mapped to environment definition files, inside `.an
 }
 ```
 Whenever you need environment in your code, you import **environmentSource** which is **environments/environment.ts** by default.
-angular cli will merge it (override it) with the specified `environment` option during `ng build`.
+angular cli will merge it (override it) with the specified [***environment***](#user-content-environment) option during `ng build`.
 
-As noted in [build targets](#build-targets), if you do not pass a value for environment, it will default to dev for development target and prod for production.
+As noted in [build targets](#build-targets), if you do not pass a value for [***environment***](#user-content-environment), it will default to dev for development target and prod for production.
 
 So these are equivalent:
 ```bash
