@@ -20,18 +20,18 @@ Production build target applies optimization techniques (uglification and tree-s
 Beside that, each target introduces different default values for some of the build options:
 
 - Default build options for **development** target:
-  - ***environment*** (`--environment`): **dev**
-  - ***output-hashing*** (`--output-hashing`): **media**
-  - ***sourcemaps*** (`--sourcemap`): true
-  - ***extract-css*** (`--extract-css`) : false
-  - ***aot*** (`--aot`): false
+  - [***environment***](#user-content-environment) (`--environment`): **dev**
+  - [***output-hashing***](#user-content-output-hashing) (`--output-hashing`): **media**
+  - [***sourcemaps***](#user-content-sourcemaps) (`--sourcemap`): true
+  - [***extract-css***](#user-content-extract-css) (`--extract-css`) : false
+  - [***aot***](#user-content-aot) (`--aot`): false
   
 - Default build options for **production** target:
-  - ***environment*** (`--environment`): **prod**
-  - ***output-hashing*** (`--output-hashing`): **all**
-  - ***sourcemaps*** (`--sourcemap`): false
-  - ***extract-css*** (`--extract-css`) : true
-  - ***aot*** (`--aot`): true
+  - [***environment***](#user-content-environment) (`--environment`): **prod**
+  - [***output-hashing***](#user-content-output-hashing) (`--output-hashing`): **all**
+  - [***sourcemaps***](#user-content-sourcemaps) (`--sourcemap`): false
+  - [***extract-css***](#user-content-extract-css) (`--extract-css`) : true
+  - [***aot***](#user-content-aot) (`--aot`): true
 
 
 ### Environments
@@ -45,9 +45,9 @@ Environments are defined and mapped to environment definition files, inside `.an
 }
 ```
 Whenever you need environment in your code, you import **environmentSource** which is **environments/environment.ts** by default.
-angular cli will merge it (override it) with the specified `environment` option during `ng build`.
+angular cli will merge it (override it) with the specified [***environment***](#user-content-environment) option during `ng build`.
 
-As noted in [build targets](#build-targets), if you do not pass a value for environment, it will default to dev for development target and prod for production.
+As noted in [build targets](#build-targets), if you do not pass a value for [***environment***](#user-content-environment), it will default to dev for development target and prod for production.
 
 So these are equivalent:
 ```bash
@@ -99,7 +99,7 @@ All builds make use of bundling, and using the `--prod` flag in  `ng build --pro
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ## Options
-<details>
+<details id="aot">
   <summary>aot</summary>
   <p>
     `--aot` _default: false_
@@ -159,7 +159,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
   </p>
 </details>
 
-<details>
+<details id="extract-css">
   <summary>extract-css</summary>
   <p>
     `--extract-css` (aliases: `-ec`)
@@ -199,7 +199,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
   </p>
 </details>
 
-<details>
+<details id="output-hashing">
   <summary>output-hashing</summary>
   <p>
     `--output-hashing` (aliases: `-oh`)
@@ -242,7 +242,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
   </p>
 </details>
 
-<details>
+<details id="sourcemaps">
   <summary>sourcemap</summary>
   <p>
     `--sourcemap` (aliases: `-sm`, `sourcemaps`)
