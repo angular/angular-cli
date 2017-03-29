@@ -109,6 +109,16 @@ Default applications are created in a directory of the same name, with an initia
 </details>
 
 <details>
+  <summary>skip-e2e</summary>
+  <p>
+    `--skip-e2e` (alias: `-se`) _default value: false_
+  </p>
+  <p>
+    Skip creating e2e spec files.
+  </p>
+</details>
+
+<details>
   <summary>source-dir</summary>
   <p>
     `--source-dir` (alias: `-sd`) _default value: src_
