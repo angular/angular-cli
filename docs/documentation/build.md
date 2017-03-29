@@ -29,8 +29,12 @@ The mapping used to determine which environment file is used can be found in `.a
 }
 ```
 
-These options also apply to the serve command. If you do not pass a value for `environment`,
-it will default to `dev` for `development` target and `prod` for `production`.
+These options also apply to the serve command.
+
+#### default environment
+If you do not pass a value for `environment`, it will be determined by the target:
+- if **target** is `development`, **environment** defaults to `dev`
+- if **target** is `production`, **environment** defaults to `prod`
 
 So these are equivalent:
 ```bash
