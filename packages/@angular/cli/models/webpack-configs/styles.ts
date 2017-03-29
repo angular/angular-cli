@@ -185,22 +185,27 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           ...commonLoaders,
           ...(use as webpack.Loader[])
         ],
-        fallback: 'style-loader',
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
         publicPath: ''
       };
       const ret: any = {
         include: globalStylePaths,
         test,
-        use: ExtractTextPlugin.extract(extractTextPlugin)
+        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin)
+                                     : ['style-loader', ...extractTextPlugin.use]
       };
       // Save the original options as arguments for eject.
-      ret[pluginArgs] = extractTextPlugin;
+      if (buildOptions.extractCss) {
+        ret[pluginArgs] = extractTextPlugin;
+      }
       return ret;
     }));
   }
 
   if (buildOptions.extractCss) {
+    // extract global css from js files into own css file
+    extraPlugins.push(
+      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.bundle.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
@@ -208,12 +213,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   return {
     entry: entryPoints,
     module: { rules },
-    plugins: [
-      // extract global css from js files into own css file
-      new ExtractTextPlugin({
-        filename: `[name]${hashFormat.extract}.bundle.css`,
-        disable: !buildOptions.extractCss
-      })
-    ].concat(extraPlugins)
+    plugins: [].concat(extraPlugins)
   };
 }
