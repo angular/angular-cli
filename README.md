@@ -97,8 +97,8 @@ Module    | `ng g module my-module`
 
 angular-cli will add reference to `components`, `directives` and `pipes` automatically in the `app.module.ts`. If you need to add this references to another custom module, follow this steps:
  
- 1. `ng g module newModule` to create a new module
- 2.  call `ng g component new-module/newComponent`
+ 1. `ng g module new-module` to create a new module
+ 2.  call `ng g component new-module/new-component`
  
 This should add the new `component`, `directive` or `pipe` reference to the `newModule` you've created.
  
