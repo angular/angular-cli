@@ -30,17 +30,33 @@ The mapping used to determine which environment file is used can be found in `.a
 ```
 
 These options also apply to the serve command. If you do not pass a value for `environment`,
-it will default to `dev` for `development` and `prod` for `production`.
+it will default to `dev` for `development` target and `prod` for `production`.
 
 ```bash
-# these are equivalent
+# These are equivalent:
+
+## most explicit version
 ng build --target=production --environment=prod
-ng build --prod --env=prod
+
+## no environment specified, --target=production implies --environment=prod
+ng build --target=production
+
+## --prod is a shortcut for --target=production
 ng build --prod
-# and so are these
+
+
+# and so are these:
+
+## most explicit version
 ng build --target=development --environment=dev
-ng build --dev --e=dev
+
+## no environment specified, --target=development implies --environment=dev
+ng build --target=development
+
+## --prod is a shortcut for --target=development
 ng build --dev
+
+## default target is development
 ng build
 ```
 
@@ -147,7 +163,7 @@ Note: service worker support is experimental and subject to change.
 <details>
   <summary>environment</summary>
   <p>
-    <code>--environment</code> (aliases: <code>-e</code>)
+    <code>--environment</code> (aliases: <code>-e</code>, <code>`--env`</code>)
   </p>
   <p>
     Defines the build environment.
@@ -260,7 +276,10 @@ Note: service worker support is experimental and subject to change.
 <details>
   <summary>target</summary>
   <p>
-    <code>--target</code> (aliases: <code>-t</code>, <code>-dev</code>, <code>-prod</code>) <em>default value: development</em>
+    <code>--target</code> (aliases: <code>-t</code>) <em>default value: development</em> <br />
+    Shortcuts: <br/>
+    `--dev` is equivalent to `--target=development` <br />
+    `--prod` is equivalent to `--target=production`
   </p>
   <p>
     Defines the build target.
