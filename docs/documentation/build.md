@@ -13,13 +13,29 @@ ng build
 
 The build artifacts will be stored in the `dist/` directory.
 
-### Build Targets and Environment Files
+### Build Targets
+There are two possible values for build target: **development** (default) and **production**.
+`--dev` and `--prod` are shortcuts for `-target=development` and `-target=production` respectively.
 
-`ng build` can specify both a build target (`--target=production` or `--target=development`) and an
-environment file to be used with that build (`--environment=dev` or `--environment=prod`).
-By default, the development build target and environment are used.
+Both build targets make use of bundling and limited tree-shaking.
+Production build target applies the following settings in addition to that:
+- Adds service worker if configured in `.angular-cli.json`.
+- Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
+- Runs UglifyJS on the code.
 
-The mapping used to determine which environment file is used can be found in `.angular-cli.json`:
+Beside that, target is a 'meta' flag and sets different default values for some other flags:
+
+Flag                | development target | production target
+---                 | ---                | ---
+`--aot`             | `false`            | `true`
+`--environment`     | `dev`              | `prod`
+`--output-hashing`  | `media`            | `all`
+`--sourcemaps`      | `true`             | `false`
+`--extract-css`     | `false`            | `true`
+
+
+### Environments
+Environments are defined and mapped to environment definition files, inside `.angular-cli.json`:
 
 ```json
 "environmentSource": "environments/environment.ts",
@@ -28,13 +44,10 @@ The mapping used to determine which environment file is used can be found in `.a
   "prod": "environments/environment.prod.ts"
 }
 ```
+Whenever you need environment in your code, you import **environmentSource** which is **environments/environment.ts** by default.
+angular cli will merge it (override it) with the specified `environment` option during `ng build`.
 
-These options also apply to the serve command.
-
-#### Default environment
-If you do not pass a value for `environment`, it will be determined by the target:
-- if **target** is `development`, **environment** defaults to `dev`
-- if **target** is `production`, **environment** defaults to `prod`
+As noted in [build targets](#build-targets), if you do not pass a value for environment, it will default to dev for development target and prod for production.
 
 So these are equivalent:
 ```bash
@@ -66,7 +79,9 @@ ng build
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
 - add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `.angular-cli.json`
-- use them via the `--env=NAME` flag on the build/serve commands.
+- use them via the `--environment=NAME` flag on the build/serve commands.
+
+Please note that `production` field inside default generated dev and prod environments has nothing to do with production build target. it's only a variable in the environment definition.
 
 ### Base tag handling in index.html
 
@@ -77,29 +92,6 @@ When building you can modify base tag (`<base href="/">`) in your index.html wit
 ng build --base-href /myUrl/
 ng build --bh /myUrl/
 ```
-
-### Bundling & Tree-Shaking
-
-All builds make use of bundling and limited tree-shaking, while `--prod` builds also run limited
-dead code elimination via UglifyJS.
-
-### `--dev` vs `--prod` builds
-
-Both `--dev`/`--target=development` and `--prod`/`--target=production` are 'meta' flags, that set other flags.
-If you do not specify either you will get the `--dev` defaults.
-
-Flag                | `--dev` | `--prod`
----                 | ---     | ---
-`--aot`             | `false` | `true`
-`--environment`     | `dev`   | `prod`
-`--output-hashing`  | `media` | `all`
-`--sourcemaps`      | `true`  | `false`
-`--extract-css`     | `false` | `true`
-
-`--prod` also sets the following non-flaggable settings:
-- Adds service worker if configured in `.angular-cli.json`.
-- Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
-- Runs UglifyJS on the code.
 
 ### CSS resources
 
