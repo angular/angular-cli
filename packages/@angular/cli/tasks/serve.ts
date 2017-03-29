@@ -44,7 +44,7 @@ export default Task.extend({
 
     const serverAddress = url.format({
       protocol: serveTaskOptions.ssl ? 'https' : 'http',
-      hostname: serveTaskOptions.host,
+      hostname: serveTaskOptions.host === '0.0.0.0' ? 'localhost' : serveTaskOptions.host,
       port: serveTaskOptions.port.toString()
     });
     let clientAddress = serverAddress;
@@ -175,7 +175,8 @@ export default Task.extend({
 
     ui.writeLine(chalk.green(oneLine`
       **
-      NG Live Development Server is running on ${serverAddress}
+      NG Live Development Server is listening on ${serveTaskOptions.host}:${serveTaskOptions.port},
+      open your browser on ${serverAddress}
       **
     `));
 
