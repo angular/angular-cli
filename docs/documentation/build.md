@@ -32,31 +32,30 @@ The mapping used to determine which environment file is used can be found in `.a
 These options also apply to the serve command. If you do not pass a value for `environment`,
 it will default to `dev` for `development` target and `prod` for `production`.
 
+So these are equivalent:
 ```bash
-# These are equivalent:
-
-## most explicit version
+# most explicit version
 ng build --target=production --environment=prod
 
-## no environment specified, --target=production implies --environment=prod
+# no environment specified, --target=production implies --environment=prod
 ng build --target=production
 
-## --prod is a shortcut for --target=production
+# --prod is a shortcut for --target=production
 ng build --prod
+```
 
-
-# and so are these:
-
-## most explicit version
+and so are these:
+```bash
+# most explicit version
 ng build --target=development --environment=dev
 
-## no environment specified, --target=development implies --environment=dev
+# no environment specified, --target=development implies --environment=dev
 ng build --target=development
 
-## --prod is a shortcut for --target=development
+# --prod is a shortcut for --target=development
 ng build --dev
 
-## default target is development
+# default target is development
 ng build
 ```
 
