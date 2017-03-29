@@ -87,7 +87,7 @@
     "semver": "^5.3.0",
     "silent-error": "^1.0.0",
     "source-map": "^0.5.6",
-    "source-map-loader": "^0.1.5",
+    "source-map-loader": "^0.2.0",
     "style-loader": "^0.13.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
