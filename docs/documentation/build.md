@@ -13,13 +13,29 @@ ng build
 
 The build artifacts will be stored in the `dist/` directory.
 
-### Build Targets and Environment Files
+### Build Targets
+There are two possible values for build target: **development** (default) and **production**.
 
-`ng build` can specify both a build target (`--target=production` or `--target=development`) and an
-environment file to be used with that build (`--environment=dev` or `--environment=prod`).
-By default, the development build target and environment are used.
+Production build target applies optimization techniques (uglification and tree-shaking) to the underlaying webpack bundle building. 
+Beside that, each target introduces different default values for some of the build options:
 
-The mapping used to determine which environment file is used can be found in `.angular-cli.json`:
+- Default build options for **development** target:
+  - ***environment*** (`--environment`): **dev**
+  - ***output-hashing*** (`--output-hashing`): **media**
+  - ***sourcemaps*** (`--sourcemap`): true
+  - ***extract-css*** (`--extract-css`) : false
+  - ***aot*** (`--aot`): false
+  
+- Default build options for **production** target:
+  - ***environment*** (`--environment`): **prod**
+  - ***output-hashing*** (`--output-hashing`): **all**
+  - ***sourcemaps*** (`--sourcemap`): false
+  - ***extract-css*** (`--extract-css`) : true
+  - ***aot*** (`--aot`): true
+
+
+### Environments
+Environments are defined and mapped to environment definition files, inside `.angular-cli.json`:
 
 ```json
 "environmentSource": "environments/environment.ts",
@@ -28,13 +44,10 @@ The mapping used to determine which environment file is used can be found in `.a
   "prod": "environments/environment.prod.ts"
 }
 ```
+Whenever you need environment in your code, you import **environmentSource** which is **environments/environment.ts** by default.
+angular cli will merge it (override it) with the specified `environment` option during `ng build`.
 
-These options also apply to the serve command.
-
-#### Default environment
-If you do not pass a value for `environment`, it will be determined by the target:
-- if **target** is `development`, **environment** defaults to `dev`
-- if **target** is `production`, **environment** defaults to `prod`
+As noted in [build targets](#build-targets), if you do not pass a value for environment, it will default to dev for development target and prod for production.
 
 So these are equivalent:
 ```bash
@@ -66,7 +79,9 @@ ng build
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
 - add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `.angular-cli.json`
-- use them via the `--env=NAME` flag on the build/serve commands.
+- use them via the `--environment=NAME` flag on the build/serve commands.
+
+Please note that `production` field inside default generated dev and prod environments has nothing to do with production build target. it's only a variable in the environment definition.
 
 ### Base tag handling in index.html
 
@@ -134,7 +149,7 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
   </p>
 </details>
 
-<details>
+<details id='environment'>
   <summary>environment</summary>
   <p>
     `--environment` (aliases: `-e`, `--env`)
