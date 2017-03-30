@@ -22,14 +22,3 @@ interface IWebpackDevServerConfigurationOptions {
   cert?: string;
   overlay?: boolean;
 }
-
-interface WebpackProgressPluginOutputOptions {
-  colors?: boolean;
-  chunks?: boolean;
-  modules?: boolean;
-  reasons?: boolean;
-  chunkModules?: boolean;
-}
-
-declare var HtmlWebpackPlugin: any;
-declare var LoaderOptionsPlugin: any;
