@@ -171,7 +171,7 @@ export default Task.extend({
 
     ui.writeLine(chalk.green(oneLine`
       **
-      NG Live Development Server is running on ${serverAddress}
+      NG Live Development Server is listening on ${serveTaskOptions.host}:${serveTaskOptions.port}, open your browser on ${serverAddress}
       **
     `));
 
