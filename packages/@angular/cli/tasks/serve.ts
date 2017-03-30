@@ -148,7 +148,8 @@ export default Task.extend({
         poll: serveTaskOptions.poll
       },
       https: serveTaskOptions.ssl,
-      overlay: serveTaskOptions.target === 'development'
+      overlay: serveTaskOptions.target === 'development',
+      contentBase: false
     };
 
     if (sslKey != null && sslCert != null) {
