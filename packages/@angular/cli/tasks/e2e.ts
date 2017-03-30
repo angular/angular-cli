@@ -32,6 +32,8 @@ export const E2eTask = Task.extend({
           hostname: e2eTaskOptions.host,
           port: e2eTaskOptions.port.toString()
         });
+      } else if (e2eTaskOptions.baseHref) {
+        additionalProtractorConfig.baseUrl = e2eTaskOptions.baseHref;
       }
 
       if (e2eTaskOptions.specs.length !== 0) {
