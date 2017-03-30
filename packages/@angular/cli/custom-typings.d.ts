@@ -1,5 +1,5 @@
 interface IWebpackDevServerConfigurationOptions {
-  contentBase?: string;
+  contentBase?: boolean | string | string[];
   hot?: boolean;
   historyApiFallback?: {[key: string]: any} | boolean;
   compress?: boolean;

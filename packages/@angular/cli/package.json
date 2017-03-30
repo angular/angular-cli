@@ -81,7 +81,7 @@
     "url-loader": "^0.5.7",
     "walk-sync": "^0.3.1",
     "webpack": "~2.2.0",
-    "webpack-dev-server": "~2.3.0",
+    "webpack-dev-server": "~2.4.2",
     "webpack-merge": "^2.4.0",
     "zone.js": "^0.8.4"
   },
