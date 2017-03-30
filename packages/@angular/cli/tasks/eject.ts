@@ -458,6 +458,7 @@ export default Task.extend({
 
         // Update all loaders from webpack, plus postcss plugins.
         [
+          'webpack',
           'autoprefixer',
           'css-loader',
           'cssnano',
