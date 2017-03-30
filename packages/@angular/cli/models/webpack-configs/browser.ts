@@ -49,7 +49,12 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         filename: path.resolve(buildOptions.outputPath, appConfig.index),
         chunksSortMode: packageChunkSort(appConfig),
         excludeChunks: lazyChunks,
-        xhtml: true
+        xhtml: true,
+        minify: buildOptions.target === 'production' ? {
+          caseSensitive: true,
+          collapseWhitespace: true,
+          keepClosingSlash: true
+        } : false
       }),
       new BaseHrefWebpackPlugin({
         baseHref: buildOptions.baseHref
