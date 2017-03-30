@@ -114,7 +114,7 @@ Default applications are created in a directory of the same name, with an initia
     `--skip-e2e` (alias: `-se`) _default value: false_
   </p>
   <p>
-    Skip creating e2e spec files.
+    Skip including e2e functionality.
   </p>
 </details>
 
