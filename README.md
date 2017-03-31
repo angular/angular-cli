@@ -107,12 +107,14 @@ constructor(element: ElementRef, renderer: Renderer) {
 We believe that using the word "universal" is correct when referring to a JavaScript Application that runs in more environments than the browser. (inspired by [Universal JavaScript](https://medium.com/@mjackson/universal-javascript-4761051b7ae9))
 
 # Universal Team
-- PatrickJS and Jeff Whelpley - Founders of the Angular Universal project. (Universal rendering is also called [PatrickJS-ing](https://twitter.com/jeffbcross/status/846512930971516928))
-- Mark Pieszak - Contributor and Evangelist, ASP.NET Core Engine
-- Jason Jean - Express engine and Universal support for CLI
-- Wassim Chegham - Contributor and Evangelist, Hapi engine developer. [Angular for the rest of us](https://medium.com/google-developer-experts/angular-universal-for-the-rest-of-us-922ca8bac84), [Angular outside the browser](http://slides.com/wassimchegham/angular2-universal#/)
-- Jeff Cross - Evangelist and performance consultant
-- Vikram Subramanian and Alex Rickabaugh - Angular Core API
+- [PatrickJS](https://twitter.com/gdi2290) and [Jeff Whelpley](https://twitter.com/jeffwhelpley) - Founders of the Angular Universal project. (Universal rendering is also called [PatrickJS-ing](https://twitter.com/jeffbcross/status/846512930971516928))
+- [Mark Pieszak](https://twitter.com/MarkPieszak) - Contributor and Evangelist, ASP.NET Core Engine
+- [Jason Jean](https://github.com/FrozenPandaz) - Express engine and Universal support for CLI
+- [Wassim Chegham](https://twitter.com/manekinekko) - Contributor and Evangelist, Hapi engine developer. 
+  - [Angular for the rest of us](https://medium.com/google-developer-experts/angular-universal-for-the-rest-of-us-922ca8bac84)
+  - [Angular outside the browser](http://slides.com/wassimchegham/angular2-universal#/)
+- [Jeff Cross](https://twitter.com/jeffbcross) - Evangelist and performance consultant
+- [Vikram Subramanian](https://twitter.com/vikerman) and [Alex Rickabaugh](https://github.com/alxhub) - Angular Core API
 
 The Universal project is driven by community contributions. Please send us your Pull Requests!
 
