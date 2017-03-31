@@ -16,7 +16,11 @@ These will be loaded exactly as if you had added them in a `<link>` tag inside `
 ],
 ```
 
-You can also rename the output and lazy load it by using the object format:
+You can also use object format to do more advanced things:
+- `input` (required) - file path
+- `lazy` - flag to indicate if to lazy load it
+- `output` - the output bundle name
+- `env` - the environment to be included in
 
 ```json
 "styles": [
@@ -24,6 +28,7 @@ You can also rename the output and lazy load it by using the object format:
   "more-styles.css",
   { "input": "lazy-style.scss", "lazy": true },
   { "input": "pre-rename-style.scss", "output": "renamed-style" },
+  { "input": "production-style.scss", "env": "prod" }
 ],
 ```
 

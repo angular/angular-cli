@@ -1,10 +1,12 @@
 import {
   writeMultipleFiles,
   expectFileToMatch,
-  appendToFile
+  appendToFile,
+  expectFileToExist
 } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
+import { expectToFail } from '../../utils/utils';
 import { oneLineTrim } from 'common-tags';
 
 export default function () {
@@ -16,6 +18,8 @@ export default function () {
     'src/pre-rename-lazy-script.js': 'console.log(\'pre-rename-lazy-script\');',
     'src/common-entry-script.js': 'console.log(\'common-entry-script\');',
     'src/common-entry-style.css': '.common-entry-style { color: red }',
+    'src/development-script.js': 'console.log(\'development-script\');',
+    'src/production-script.js': 'console.log(\'production-script\');',
   })
     .then(() => appendToFile('src/main.ts', 'import \'./string-script.js\';'))
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
@@ -26,7 +30,9 @@ export default function () {
         { input: 'lazy-script.js', lazy: true },
         { input: 'pre-rename-script.js', output: 'renamed-script' },
         { input: 'pre-rename-lazy-script.js', output: 'renamed-lazy-script', lazy: true },
-        { input: 'common-entry-script.js', output: 'common-entry' }
+        { input: 'common-entry-script.js', output: 'common-entry' },
+        { input: 'development-script.js', output: 'development-script', env: 'dev' },
+        { input: 'production-script.js', output: 'production-script', env: 'prod' },
       ];
       app['styles'] = [{ input: 'common-entry-style.css', output: 'common-entry' }];
     }))
@@ -39,6 +45,8 @@ export default function () {
     .then(() => expectFileToMatch('dist/renamed-lazy-script.bundle.js', 'pre-rename-lazy-script'))
     .then(() => expectFileToMatch('dist/common-entry.bundle.js', 'common-entry-script'))
     .then(() => expectFileToMatch('dist/common-entry.bundle.css', '.common-entry-style'))
+    .then(() => expectFileToMatch('dist/development-script.bundle.js', 'development-script'))
+    .then(() => expectToFail(() => expectFileToExist('dist/production-script.bundle.js')))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
       <link href="common-entry.bundle.css" rel="stylesheet"/>
@@ -49,6 +57,7 @@ export default function () {
       <script type="text/javascript" src="scripts.bundle.js"></script>
       <script type="text/javascript" src="renamed-script.bundle.js"></script>
       <script type="text/javascript" src="common-entry.bundle.js"></script>
+      <script type="text/javascript" src="development-script.bundle.js"></script>
       <script type="text/javascript" src="vendor.bundle.js"></script>
       <script type="text/javascript" src="main.bundle.js"></script>
     `))
