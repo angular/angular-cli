@@ -9,7 +9,7 @@
 <details>
   <summary>app</summary>
   <p>
-    `--app` (alias: `-a`) _default value: 1st app_
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
   </p>
   <p>
     Specifies app name to use.
@@ -19,7 +19,7 @@
 <details>
   <summary>change-detection</summary>
   <p>
-    `--change-detection` (alias: `-cd`)
+    <code>--change-detection</code> (aliases: <code>-cd</code>)
   </p>
   <p>
     Specifies the change detection strategy.
@@ -29,7 +29,7 @@
 <details>
   <summary>flat</summary>
   <p>
-    `--flat` _default value: false_
+    <code>--flat</code> <em>default value: false</em>
   </p>
   <p>
     Flag to indicate if a dir is created.
@@ -39,7 +39,7 @@
 <details>
   <summary>export</summary>
   <p>
-    `--export` (alias: `-`) _default value: false_
+    <code>--export</code> <em>default value: false</em>
   </p>
   <p>
     Specifies if declaring module exports the component.
@@ -49,7 +49,7 @@
 <details>
   <summary>inline-style</summary>
   <p>
-    `--inline-style` (alias: `-is`) _default value: false_
+    <code>--inline-style</code> (aliases: <code>-is</code>) <em>default value: false</em>
   </p>
   <p>
     Specifies if the style will be in the ts file.
@@ -59,7 +59,7 @@
 <details>
   <summary>inline-template</summary>
   <p>
-    `--inline-template` (alias: `-it`) _default value: false_
+    <code>--inline-template</code> (aliases: <code>-it</code>) <em>default value: false</em>
   </p>
   <p>
     Specifies if the template will be in the ts file.
@@ -69,7 +69,7 @@
 <details>
   <summary>module</summary>
   <p>
-    `--module` (alias: `-m`)
+    <code>--module</code> (aliases: <code>-m</code>)
   </p>
   <p>
     Allows specification of the declaring module's file name (e.g `app.module.ts`).
@@ -79,7 +79,7 @@
 <details>
   <summary>prefix</summary>
   <p>
-    `--prefix`
+    <code>--prefix</code>
   </p>
   <p>
     Specifies whether to use the prefix.
@@ -89,7 +89,7 @@
 <details>
   <summary>skip-import</summary>
   <p>
-    `--skip-import` _default value: false_
+    <code>--skip-import</code> <em>default value: false</em>
   </p>
   <p>
     Allows for skipping the module import.
@@ -99,7 +99,7 @@
 <details>
   <summary>spec</summary>
   <p>
-    `--spec`
+    <code>--spec</code>
   </p>
   <p>
     Specifies if a spec file is generated.
@@ -109,7 +109,7 @@
 <details>
   <summary>view-encapsulation</summary>
   <p>
-    `--view-encapsulation` (alias: `-ve`)
+    <code>--view-encapsulation</code> (aliases: <code>-ve</code>)
   </p>
   <p>
     Specifies the view encapsulation strategy.

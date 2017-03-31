@@ -9,7 +9,7 @@
 <details>
   <summary>app</summary>
   <p>
-    `--app` (alias: `-a`) _default value: 1st app_
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
   </p>
   <p>
     Specifies app name to use.

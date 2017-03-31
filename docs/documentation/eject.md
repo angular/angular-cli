@@ -15,7 +15,7 @@ ng eject
 <details>
   <summary>aot</summary>
   <p>
-    `--aot`
+    <code>--aot</code>
   </p>
   <p>
     Build using Ahead of Time compilation.
@@ -25,7 +25,7 @@ ng eject
 <details>
   <summary>app</summary>
   <p>
-    `--app` (alias: `-a`) _default value: 1st app_
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
   </p>
   <p>
     Specifies app name to use.
@@ -35,7 +35,7 @@ ng eject
 <details>
   <summary>base-href</summary>
   <p>
-    `--base-href` (alias: `-bh`)
+    <code>--base-href</code> (aliases: <code>-bh</code>)
   </p>
   <p>
     Base url for the application being built.
@@ -45,7 +45,7 @@ ng eject
 <details>
   <summary>deploy-url</summary>
   <p>
-    `--deploy-url` (alias: `-d`)
+    <code>--deploy-url</code> (aliases: <code>-d</code>)
   </p>
   <p>
     URL where files will be deployed.
@@ -55,7 +55,7 @@ ng eject
 <details>
   <summary>environment</summary>
   <p>
-    `--environment` (alias: `-e`)
+    <code>--environment</code> (aliases: <code>-e</code>)
   </p>
   <p>
     Defines the build environment.
@@ -65,7 +65,7 @@ ng eject
 <details>
   <summary>extract-css</summary>
   <p>
-    `--extract-css` (alias: `-ec`)
+    <code>--extract-css</code> (aliases: <code>-ec</code>)
   </p>
   <p>
     Extract css from global styles onto css files instead of js ones.
@@ -75,7 +75,7 @@ ng eject
 <details>
   <summary>force</summary>
   <p>
-    `--force` _default value: false_
+    <code>--force</code> <em>default value: false</em>
   </p>
   <p>
     Overwrite any webpack.config.js and npm scripts already existing.
@@ -85,7 +85,7 @@ ng eject
 <details>
   <summary>i18n-file</summary>
   <p>
-    `--i18n-file`
+    <code>--i18n-file</code>
   </p>
   <p>
     Localization file to use for i18n.
@@ -95,7 +95,7 @@ ng eject
 <details>
   <summary>i18n-format</summary>
   <p>
-    `--i18n-format`
+    <code>--i18n-format</code>
   </p>
   <p>
     Format of the localization file specified with --i18n-file.
@@ -105,7 +105,7 @@ ng eject
 <details>
   <summary>locale</summary>
   <p>
-    `--locale`
+    <code>--locale</code>
   </p>
   <p>
     Locale to use for i18n.
@@ -115,17 +115,17 @@ ng eject
 <details>
   <summary>output-hashing</summary>
   <p>
-    `--output-hashing` (alias: `-oh`) _default value: _
+    <code>--output-hashing</code> (aliases: <code>-oh</code>) <em>default value: </em>
   </p>
   <p>
-    Define the output filename cache-busting hashing mode. Possible values: `none`, `all`, `media`, `bundles`
+    Define the output filename cache-busting hashing mode. Possible values: <code>none</code>, <code>all</code>, <code>media</code>, <code>bundles</code>
   </p>
 </details>
 
 <details>
   <summary>output-path</summary>
   <p>
-    `--output-path` (alias: `-op`) _default value: _
+    <code>--output-path</code> (aliases: <code>-op</code>) <em>default value: </em>
   </p>
   <p>
     Path where output will be placed.
@@ -135,7 +135,7 @@ ng eject
 <details>
   <summary>poll</summary>
   <p>
-    `--poll`
+    <code>--poll</code>
   </p>
   <p>
     Enable and define the file watching poll time period (milliseconds) .
@@ -145,7 +145,7 @@ ng eject
 <details>
   <summary>progress</summary>
   <p>
-    `--progress` (alias: `-pr`) _default value: true_
+    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true</em>
   </p>
   <p>
     Log progress to the console while building.
@@ -155,7 +155,7 @@ ng eject
 <details>
   <summary>sourcemap</summary>
   <p>
-    `--sourcemap` (alias: `-sm`, `sourcemaps`)
+    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
   </p>
   <p>
     Output sourcemaps.
@@ -165,7 +165,7 @@ ng eject
 <details>
   <summary>target</summary>
   <p>
-    `--target` (aliases: `-t`, `-dev`, `-prod`) _default value: development_
+    <code>--target</code> (aliases: <code>-t</code>, <code>-dev</code>, <code>-prod</code>) <em>default value: development</em>
   </p>
   <p>
     Defines the build target.
@@ -175,7 +175,7 @@ ng eject
 <details>
   <summary>vendor-chunk</summary>
   <p>
-    `--vendor-chunk` (aliases: `-vc`) _default value: true_
+    <code>--vendor-chunk</code> (aliases: <code>-vc</code>) <em>default value: true</em>
   </p>
   <p>
     Use a separate bundle containing only vendor libraries.
@@ -185,7 +185,7 @@ ng eject
 <details>
   <summary>verbose</summary>
   <p>
-    `--verbose` (aliases: `-v`) _default value: false_
+    <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
   </p>
   <p>
     Adds more details to output logging.
@@ -195,7 +195,7 @@ ng eject
 <details>
   <summary>watch</summary>
   <p>
-    `--watch` (aliases: `-w`)
+    <code>--watch</code> (aliases: <code>-w</code>)
   </p>
   <p>
     Run build when files change.

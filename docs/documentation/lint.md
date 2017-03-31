@@ -9,7 +9,7 @@
 <details>
   <summary>fix</summary>
   <p>
-    `--fix` _default value: false_
+    <code>--fix</code> <em>default value: false</em>
   </p>
   <p>
     Fixes linting errors (may overwrite linted files).
@@ -19,7 +19,7 @@
 <details>
   <summary>force</summary>
   <p>
-    `--force` _default value: false_
+    <code>--force</code> <em>default value: false</em>
   </p>
   <p>
     Succeeds even if there was linting errors.
@@ -29,7 +29,7 @@
 <details>
   <summary>type-check</summary>
   <p>
-    `--type-check` _default value: false_
+    <code>--type-check</code> <em>default value: false</em>
   </p>
   <p>
     Controls the type check for linting.
@@ -39,7 +39,7 @@
 <details>
   <summary>format</summary>
   <p>
-    `--format` (alias: `-t`) _default value: prose_
+    <code>--format</code> (aliases: <code>-t</code>) <em>default value: prose</em>
   </p>
   <p>
     Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).

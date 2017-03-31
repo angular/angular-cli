@@ -9,7 +9,7 @@
 <details>
   <summary>app</summary>
   <p>
-    `--app` (alias: `-a`) _default value: 1st app_
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
   </p>
   <p>
     Specifies app name to use.
@@ -19,7 +19,7 @@
 <details>
   <summary>export</summary>
   <p>
-    `--export`
+    <code>--export</code>
   </p>
   <p>
     Specifies if declaring module exports the pipe.
@@ -29,7 +29,7 @@
 <details>
   <summary>flat</summary>
   <p>
-    `--flat`
+    <code>--flat</code>
   </p>
   <p>
     Flag to indicate if a dir is created.
@@ -39,7 +39,7 @@
 <details>
   <summary>module</summary>
   <p>
-    `--module` (alias: `-m`)
+    <code>--module</code> (aliases: <code>-m</code>)
   </p>
   <p>
     Allows specification of the declaring module.
@@ -49,7 +49,7 @@
 <details>
   <summary>skip-import</summary>
   <p>
-    `--skip-import`
+    <code>--skip-import</code>
   </p>
   <p>
     Allows for skipping the module import.
@@ -59,7 +59,7 @@
 <details>
   <summary>spec</summary>
   <p>
-    `--spec`
+    <code>--spec</code>
   </p>
   <p>
     Specifies if a spec file is generated.

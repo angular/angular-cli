@@ -19,7 +19,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>app</summary>
   <p>
-    `--app` (alias: `-a`) _default value: 1st app_
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
   </p>
   <p>
     Specifies app name or index to use.
@@ -29,7 +29,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>browsers</summary>
   <p>
-    `--browsers`
+    <code>--browsers</code>
   </p>
   <p>
     Override which browsers tests are run against.
@@ -39,7 +39,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>code-coverage</summary>
   <p>
-    `--code-coverage` (alias: `-cc`) _default value: false_
+    <code>--code-coverage</code> (aliases: <code>-cc</code>) <em>default value: false</em>
   </p>
   <p>
     Coverage report will be in the coverage/ directory.
@@ -49,7 +49,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>colors</summary>
   <p>
-    `--colors`
+    <code>--colors</code>
   </p>
   <p>
     Enable or disable colors in the output (reporters and logs).
@@ -59,7 +59,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>config</summary>
   <p>
-    `--config` (alias: `-c`)
+    <code>--config</code> (aliases: <code>-c</code>)
   </p>
   <p>
     Use a specific config file. Defaults to the protractor config file in angular-cli.json.
@@ -69,7 +69,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>log-level</summary>
   <p>
-    `--log-level`
+    <code>--log-level</code>
   </p>
   <p>
     Level of logging.
@@ -79,7 +79,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>poll</summary>
   <p>
-    `--poll`
+    <code>--poll</code>
   </p>
   <p>
     Enable and define the file watching poll time period (milliseconds).
@@ -89,7 +89,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>port</summary>
   <p>
-    `--port`
+    <code>--port</code>
   </p>
   <p>
     Port where the web server will be listening.
@@ -99,7 +99,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>progress</summary>
   <p>
-    `--progress` _default value: true_
+    <code>--progress</code> <em>default value: true</em>
   </p>
   <p>
     Log progress to the console while in progress.
@@ -109,7 +109,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>reporters</summary>
   <p>
-    `--reporters`
+    <code>--reporters</code>
   </p>
   <p>
     List of reporters to use.
@@ -119,7 +119,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>single-run</summary>
   <p>
-    `--single-run` (alias: `-sr`) _default value: false_
+    <code>--single-run</code> (aliases: <code>-sr</code>) <em>default value: false</em>
   </p>
   <p>
     Run tests a single time.
@@ -129,7 +129,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>sourcemap</summary>
   <p>
-    `--sourcemap` (alias: `-sm`, `sourcemaps`)
+    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
   </p>
   <p>
     Output sourcemaps.
@@ -139,7 +139,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>watch</summary>
   <p>
-    `--watch` (aliases: `-w`)
+    <code>--watch</code> (aliases: <code>-w</code>)
   </p>
   <p>
     Run build when files change.
