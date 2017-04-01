@@ -1,4 +1,4 @@
-const EmberTestCommand = require('../ember-cli/lib/commands/test');
+const Command = require('../ember-cli/lib/models/command');
 import TestTask from '../tasks/test';
 import {CliConfig} from '../models/config';
 import { oneLine } from 'common-tags';
@@ -23,7 +23,12 @@ export interface TestOptions {
 }
 
 
-const TestCommand = EmberTestCommand.extend({
+const TestCommand = Command.extend({
+  name: 'test',
+  aliases: ['t'],
+  description: 'Run unit tests in existing project.',
+  works: 'insideProject',
+
   availableOptions: [
     {
       name: 'watch',
