@@ -20,7 +20,6 @@ var keys                = require('lodash/keys');
 var EOL                 = require('os').EOL;
 var CoreObject          = require('../ext/core-object');
 var debug               = require('debug')('ember-cli:command');
-var Watcher             = require('../models/watcher');
 var SilentError         = require('silent-error');
 
 var allowedWorkOptions = {
@@ -126,13 +125,7 @@ Command.prototype.validateAndRun = function(args) {
     }
   }
 
-  return Watcher.detectWatcher(this.ui, commandOptions.options).then(function(options) {
-    if (options._watchmanInfo) {
-      this.project._watchmanInfo = options._watchmanInfo;
-    }
-
-    return this.run(options, commandOptions.args);
-  }.bind(this));
+  return this.run(commandOptions.options, commandOptions.args);
 };
 
 /*
