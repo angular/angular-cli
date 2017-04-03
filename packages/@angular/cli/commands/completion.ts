@@ -38,12 +38,6 @@ export interface CompletionCommandOptions {
   zsh?: boolean;
 }
 
-const commandsToIgnore = [
-  'destroy',
-  'easter-egg',
-  'init'
-];
-
 const optsNg: string[] = [];
 
 const CompletionCommand = Command.extend({
@@ -80,9 +74,6 @@ const CompletionCommand = Command.extend({
     const commandFiles = fs.readdirSync(__dirname)
       .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
       .map(file => path.parse(file).name)
-      .filter(file => {
-        return commandsToIgnore.indexOf(file) < 0;
-      })
       .map(file => file.toLowerCase());
 
     const commandMap = commandFiles.reduce((acc: any, curr: string) => {
@@ -106,6 +97,10 @@ const CompletionCommand = Command.extend({
         commands: this.commands,
         tasks: this.tasks
       });
+
+      if (command.hidden || command.unknown) {
+        return;
+      }
 
       optsNg.push(command.name);
       com.push(command.name);
