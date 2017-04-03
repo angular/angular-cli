@@ -117,6 +117,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         loader: 'sass-loader',
         options: {
           sourceMap: cssSourceMap,
+          // bootstrap-sass requires a minimum precision of 8
+          precision: 8,
           includePaths
         }
       }]
