@@ -4,6 +4,7 @@ const InitCommand: any = Command.extend({
   name: 'init',
   description: 'Creates a new Angular CLI project in the current folder.',
   works: 'everywhere',
+  hidden: true,
 
   availableOptions: [
     { name: 'dry-run', type: Boolean, default: false, aliases: ['d'] },

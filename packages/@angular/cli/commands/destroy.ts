@@ -6,6 +6,7 @@ const DestroyCommand = Command.extend({
   name: 'destroy',
   aliases: ['d'],
   works: 'insideProject',
+  hidden: true,
 
   anonymousOptions: [
     '<blueprint>'

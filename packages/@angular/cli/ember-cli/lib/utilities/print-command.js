@@ -22,7 +22,8 @@ module.exports = function(initialMargin, shouldDescriptionBeGrey) {
     }).join(' '));
   }
 
-  options = this.availableOptions;
+  options = this.availableOptions
+    .filter(function(option) { return !option.hidden; });
 
   // <options...>
   if (options.length) {
