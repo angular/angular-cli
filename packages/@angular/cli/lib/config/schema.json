@@ -232,8 +232,7 @@
           },
           "tslintConfig": {
             "description": "Location of the tslint.json configuration.",
-            "type": "string",
-            "default": "tslint.json"
+            "type": "string"
           },
           "exclude": {
             "description": "File glob(s) to ignore.",
