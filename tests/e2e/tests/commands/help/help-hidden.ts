@@ -13,5 +13,14 @@ export default function() {
           in help output.
         `);
       }
-    });
+    })
+    .then(() => silentNg('--help', 'new'))
+    .then(({ stdout }) => {
+      if (stdout.match(/--link-cli/)) {
+        throw new Error(oneLine`
+          Expected to not match "--link-cli"
+          in help output.
+        `);
+      }
+    })
 }

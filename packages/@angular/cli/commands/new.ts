@@ -39,7 +39,8 @@ const NewCommand = Command.extend({
       type: Boolean,
       default: false,
       aliases: ['lc'],
-      description: 'Automatically link the `@angular/cli` package.'
+      description: 'Automatically link the `@angular/cli` package.',
+      hidden: true
     },
     {
       name: 'skip-install',
