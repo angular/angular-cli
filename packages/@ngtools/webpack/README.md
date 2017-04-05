@@ -46,7 +46,7 @@ The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ng
 * Compiles SCSS/LESS
 * TypeScript transpilation
 * Bundles JavaScript, CSS
-* Asset optimiation
+* Asset optimization
 * Virtual filesystem for assets
  * For serving local assets and compile versions.
 * Live-reload via websockets
