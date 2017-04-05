@@ -184,6 +184,13 @@ export const baseBuildCommandOptions: any = [
     // aliases: ['eac'],  // We should not have shorthand aliases for experimental flags.
     description: '(Experimental) Use new Angular Compiler (Angular version 5 and greater only).',
     default: AngularCompilerPlugin.isSupported()
+  },
+  {
+    name: 'subresource-integrity',
+    type: Boolean,
+    default: false,
+    aliases: ['sri'],
+    description: 'Enables the use of subresource integrity validation.'
   }
 ];
 
