@@ -97,6 +97,7 @@
     "webpack-dev-middleware": "~1.12.0",
     "webpack-dev-server": "~2.7.1",
     "webpack-merge": "^4.1.0",
+    "webpack-subresource-integrity": "^1.0.1",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
