@@ -150,6 +150,11 @@
             },
             "additionalProperties": false
           },
+          "stylesPrefix": {
+            "type": "string",
+            "default": "",
+            "description": "The prefix for output filenames of styles."
+          },
           "scripts": {
             "description": "Global scripts to be included in the build.",
             "type": "array",
@@ -173,6 +178,11 @@
               ]
             },
             "additionalProperties": false
+          },
+          "scriptsPrefix": {
+            "type": "string",
+            "default": "",
+            "description": "The prefix for output filenames of scripts."
           },
           "environmentSource":{
             "description": "Source file for environment config.",
