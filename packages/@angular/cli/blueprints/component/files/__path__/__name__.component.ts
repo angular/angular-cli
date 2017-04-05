@@ -17,7 +17,7 @@ export class <%= classifiedModuleName %>Component implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit(): void {
   }
 
 }
