@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
@@ -60,7 +61,16 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  if (buildOptions.subresourceIntegrity) {
+    extraPlugins.push(new SubresourceIntegrityPlugin({
+      hashFuncNames: ['sha384']
+    }));
+  }
+
   return {
+    output: {
+      crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false
+    },
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),

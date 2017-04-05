@@ -26,4 +26,5 @@ export interface BuildOptions {
   buildOptimizer?: boolean;
   namedChunks?: boolean;
   experimentalAngularCompiler?: boolean;
+  subresourceIntegrity?: boolean;
 }
