@@ -7,13 +7,7 @@
 
 * **What modules are related to this Issue?**
 - [ ] express-engine
-- [ ] grunt-prerender
-- [ ] gulp-prerender
-- [ ] hapi-engine
-- [ ] universal-next
-- [ ] universal
-- [ ] webpack-prerender
-
+- [ ] aspnetcore-engine
 
 * **Do you want to request a *feature* or report a *bug*?**
 
@@ -37,11 +31,11 @@
 
 * **Please tell us about your environment:**
 
-- Angular version: 2.0.0-rc.X
+- Angular version: 4.X
 - Browser: [all | Chrome XX | Firefox XX | IE XX | Safari XX ]
 - Language: [all | TypeScript X.X | ES6/7 | ES5 ]
 - OS:  [all | Mac OS X | Windows | Linux ]
-- Platform: [all | NodeJs | Java | PHP | .NET | Ruby]
+- Platform: [all | NodeJs | Java | PHP | .NETCore | Ruby]
 
 
 
