@@ -1,5 +1,5 @@
 {
-  "name": "@universal/ng-express-engine",
+  "name": "@nguniversal/express-engine",
   "main": "dist/main.js",
   "types": "dist/index.d.ts",
   "version": "1.0.0-beta.0",
@@ -28,16 +28,16 @@
     "prebuild": "rimraf dist"
   },
   "peerDependencies": {
-    "@angular/core": "^4.0.0-rc.5",
-    "@angular/platform-server": "^4.0.0-rc.5",
+    "@angular/core": "^4.0.0",
+    "@angular/platform-server": "^4.0.0",
     "express": "^4.15.2"
   },
   "devDependencies": {
-    "@angular/common": "^4.0.0-rc.5",
-    "@angular/compiler": "^4.0.0-rc.5",
-    "@angular/core": "^4.0.0-rc.5",
-    "@angular/platform-browser": "^4.0.0-rc.5",
-    "@angular/platform-server": "^4.0.0-rc.5",
+    "@angular/common": "^4.0.0",
+    "@angular/compiler": "^4.0.0",
+    "@angular/core": "^4.0.0",
+    "@angular/platform-browser": "^4.0.0",
+    "@angular/platform-server": "^4.0.0",
     "express": "^4.15.2",
     "rimraf": "^2.6.1",
     "rxjs": "^5.2.0",
