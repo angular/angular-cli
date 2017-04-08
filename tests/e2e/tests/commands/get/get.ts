@@ -4,6 +4,7 @@ import {expectToFail} from '../../../utils/utils';
 export default function() {
   return Promise.resolve()
     .then(() => expectToFail(() => ng('get', 'apps.zzz.prefix')))
+    .then(() => expectToFail(() => ng('get', undefined)))
     .then(() => ng('get', 'apps.0.prefix'))
     .then(({ stdout }) => {
       if (!stdout.match(/app/)) {
