@@ -11,7 +11,7 @@ export interface GetOptions {
 
 const GetCommand = Command.extend({
   name: 'get',
-  description: 'Get a value from the configuration.',
+  description: 'Get a value from the configuration. Example: ng get [key]',
   works: 'everywhere',
 
   availableOptions: [
@@ -30,6 +30,10 @@ const GetCommand = Command.extend({
       if (config === null) {
         throw new SilentError('No config found. If you want to use global configuration, '
           + 'you need the --global argument.');
+      }
+
+      if (!rawArgs[0]) {
+        throw new SilentError('No key specified. Run "ng help get" for usage.');
       }
 
       const value = config.get(rawArgs[0]);
