@@ -11,7 +11,7 @@ export interface GetOptions {
 
 const GetCommand = Command.extend({
   name: 'get',
-  description: 'Get a value from the configuration. Example: ng get project.name',
+  description: 'Get a value from the configuration. Example: ng get [key]',
   works: 'everywhere',
 
   availableOptions: [
