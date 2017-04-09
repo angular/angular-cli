@@ -119,7 +119,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>single-run</summary>
   <p>
-    <code>--single-run</code> (aliases: <code>-sr</code>) <em>default value: false</em>
+    <code>--single-run</code> (aliases: <code>-sr</code>)
   </p>
   <p>
     Run tests a single time.

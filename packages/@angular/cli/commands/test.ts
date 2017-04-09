@@ -1,6 +1,6 @@
 const Command = require('../ember-cli/lib/models/command');
 import TestTask from '../tasks/test';
-import {CliConfig} from '../models/config';
+import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
@@ -33,7 +33,6 @@ const TestCommand = Command.extend({
     {
       name: 'watch',
       type: Boolean,
-      default: true,
       aliases: ['w'],
       description: 'Run build when files change.'
     },
@@ -54,7 +53,6 @@ const TestCommand = Command.extend({
     {
       name: 'single-run',
       type: Boolean,
-      default: false,
       aliases: ['sr'],
       description: 'Run tests a single time.'
     },
@@ -110,13 +108,13 @@ const TestCommand = Command.extend({
     }
   ],
 
-  run: function(commandOptions: TestOptions) {
+  run: function (commandOptions: TestOptions) {
     const testTask = new TestTask({
       ui: this.ui,
       project: this.project
     });
 
-    if (!commandOptions.watch) {
+    if (commandOptions.watch !== undefined && !commandOptions.watch) {
       // if not watching ensure karma is doing a single run
       commandOptions.singleRun = true;
     }
