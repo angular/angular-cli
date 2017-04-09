@@ -29,11 +29,13 @@ describe('Config', () => {
 
   describe('Get', () => {
     it('works', () => {
-      const config = new CliConfig(null, schema, <ConfigInterface>{
+      const rawConfigObj = {
         requiredKey: 1,
         stringKey: 'stringValue'
-      });
+      };
+      const config = new CliConfig(null, schema, <ConfigInterface>rawConfigObj);
 
+      expect(config.get()).toEqual(rawConfigObj);
       expect(config.get('requiredKey')).toEqual(1);
       expect(config.get('stringKey')).toEqual('stringValue');
       expect(config.get('booleanKey')).toEqual(undefined);
