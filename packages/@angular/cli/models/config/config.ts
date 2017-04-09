@@ -39,7 +39,10 @@ export class CliConfig<JsonType> {
     return this._config.$$alias(path, newPath);
   }
 
-  get(jsonPath: string) {
+  get(jsonPath?: string) {
+    if (!jsonPath) {
+      return this._config.$$root();
+    }
     return this._config.$$get(jsonPath);
   }
 
