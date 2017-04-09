@@ -35,7 +35,7 @@ describe('Config', () => {
       };
       const config = new CliConfig(null, schema, <ConfigInterface>rawConfigObj);
 
-      expect(config.get()).toEqual(rawConfigObj);
+      expect(JSON.parse(JSON.stringify(config.get()))).toEqual(rawConfigObj);
       expect(config.get('requiredKey')).toEqual(1);
       expect(config.get('stringKey')).toEqual('stringValue');
       expect(config.get('booleanKey')).toEqual(undefined);
