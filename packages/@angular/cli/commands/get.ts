@@ -32,16 +32,12 @@ const GetCommand = Command.extend({
           + 'you need the --global argument.');
       }
 
-      if (!rawArgs[0]) {
-        throw new SilentError('No key specified. Run "ng help get" for usage.');
-      }
-
       const value = config.get(rawArgs[0]);
 
       if (value === null || value === undefined) {
         throw new SilentError('Value cannot be found.');
       } else if (typeof value == 'object') {
-        console.log(JSON.stringify(value));
+        console.log(JSON.stringify(value, null, 2));
       } else {
         console.log(value);
       }

@@ -34,6 +34,11 @@ describe('Config', () => {
         stringKey: 'stringValue'
       });
 
+      expect(JSON.parse(JSON.stringify(config.get()))).toEqual({
+        requiredKey: 1,
+        stringKeyDefault: 'defaultValue',
+        stringKey: 'stringValue'
+      });
       expect(config.get('requiredKey')).toEqual(1);
       expect(config.get('stringKey')).toEqual('stringValue');
       expect(config.get('booleanKey')).toEqual(undefined);
