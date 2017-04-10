@@ -4,9 +4,7 @@ import {JsonSchemaErrorBase} from './error';
 
 import './mimetypes';
 
-
 export class InvalidJsonPath extends JsonSchemaErrorBase {}
-
 
 // The schema tree node property of the SchemaClass.
 const kSchemaNode = Symbol('schema-node');
@@ -132,6 +130,7 @@ class SchemaClassBase<T> implements SchemaClass<T> {
   /** Set a value from a JSON path. */
   $$set(path: string, value: any): void {
     const node = _getSchemaNodeForPath(this.$$schema(), path);
+
     if (node) {
       node.set(value);
     } else {
