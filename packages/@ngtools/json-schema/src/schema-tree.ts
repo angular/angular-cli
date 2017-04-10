@@ -7,7 +7,7 @@ export class InvalidSchema extends JsonSchemaErrorBase {}
 export class InvalidValueError extends JsonSchemaErrorBase {}
 export class MissingImplementationError extends JsonSchemaErrorBase {}
 export class SettingReadOnlyPropertyError extends JsonSchemaErrorBase {}
-
+export class InvalidUpdateValue extends JsonSchemaErrorBase {}
 
 export interface Schema {
   [key: string]: any;
@@ -481,6 +481,13 @@ class EnumSchemaTreeNode extends LeafSchemaTreeNode<any> {
   }
 
   get items() { return this._schema['enum']; }
+
+  set(value: string, init = false, force = false) {
+    if (!(value === undefined || this._isInEnum(value))) {
+      throw new InvalidUpdateValue('Invalid value can only be one of these: ' + this.items);
+    }
+    super.set(value, init, force);
+  }
 
   isCompatible(v: any) {
     return this._isInEnum(v);

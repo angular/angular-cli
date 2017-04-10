@@ -55,12 +55,11 @@ describe('@ngtools/json-schema', () => {
       });
 
       expect(proto.a instanceof Array).toBe(true);
-      expect(proto.a).toEqual([undefined, 'v1', undefined, 'v3']);
+      expect(proto.a).toEqual(['v1', 'v3']);
 
       // Set it to a string, which is valid.
       proto.a[0] = 'v2';
-      proto.a[1] = 'INVALID';
-      expect(proto.a).toEqual(['v2', undefined, undefined, 'v3']);
+      expect(proto.a).toEqual(['v2', 'v3']);
     });
 
     it('supports default values', () => {
@@ -72,6 +71,23 @@ describe('@ngtools/json-schema', () => {
 
       expect(schema.children['b'].get()).toEqual('default');
     });
+
+
+    it('should throw error when setting invalid value', () => {
+      const proto: any = Object.create(null);
+      // tslint:disable-next-line
+      new RootSchemaTreeNode(proto, {
+        value: valueJson,
+        schema: schemaJson
+      });
+
+      try {
+        proto.a[0] = 'INVALID';
+      } catch (error) {
+        expect(error.message).toBe('Invalid value can only be one of these: v1,v2,v3');
+      }
+    });
+
   });
 
 });
