@@ -74,8 +74,12 @@ const SetCommand = Command.extend({
         updateLintForPrefix(this.project.root + '/tslint.json', value);
       }
 
-      config.set(jsonPath, value);
-      config.save();
+      try {
+        config.set(jsonPath, value);
+        config.save();
+      } catch (error) {
+        throw new SilentError(error.message);
+      }
       resolve();
     });
   }
