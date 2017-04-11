@@ -13,7 +13,7 @@ export interface DynamicPathOptions {
 export function dynamicPathParser(options: DynamicPathOptions) {
   const projectRoot = options.project.root;
   const sourceDir = options.appConfig.root;
-  const appRoot = path.join(sourceDir, 'app');
+  const appRoot = path.join(sourceDir, options.appConfig.appRoot || 'app');
   const cwd = process.env.PWD;
 
   const rootPath = path.join(projectRoot, appRoot);

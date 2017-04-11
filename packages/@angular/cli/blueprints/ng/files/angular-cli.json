@@ -5,6 +5,7 @@
   },
   "apps": [
     {
+      "appRoot": "app",
       "root": "<%= sourceDir %>",
       "outDir": "dist",
       "assets": [

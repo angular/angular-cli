@@ -3,12 +3,12 @@ import * as path from 'path';
 const SilentError = require('silent-error');
 
 export default function findParentModule(
-  projectRoot: string, appRoot: string, currentDir: string): string {
+  projectRoot: string, srcRoot: string, currentDir: string, appRoot = 'app'): string {
 
-  const sourceRoot = path.join(projectRoot, appRoot, 'app');
+  const sourceRoot = path.join(projectRoot, srcRoot, appRoot);
 
   // trim currentDir
-  currentDir = currentDir.replace(path.join(appRoot, 'app'), '');
+  currentDir = currentDir.replace(path.join(srcRoot, appRoot), '');
 
   let pathToCheck = path.join(sourceRoot, currentDir);
 
