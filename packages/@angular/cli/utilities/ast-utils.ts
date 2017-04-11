@@ -8,6 +8,7 @@ export {
   getContentOfKeyLiteral,
   getDecoratorMetadata,
   addDeclarationToModule,
+  addImportToModule,
   addProviderToModule,
   addExportToModule
 } from '../lib/ast-tools';
