@@ -4,6 +4,7 @@
 
 ## Overview
 `ng get [key]` Get a value from the configuration.
+`[key]` should be in JSON path format. Example: `a[3].foo.bar[2]`.
 
 ## Options
 <details>
@@ -21,6 +22,7 @@
 
 ## Overview
 `ng set [key]=[value]` Set a value in the configuration.
+`[key]` should be in JSON path format. Example: `a[3].foo.bar[2]`.
 
 ## Options
 <details>
