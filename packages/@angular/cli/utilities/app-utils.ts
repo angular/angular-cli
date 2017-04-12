@@ -25,6 +25,8 @@ export function getAppFromConfig(nameOrIndex?: String) {
   } else {
     return apps[0];
   }
-  throw new SilentError(chalk.red(oneLine`Unable to find app with name or index. 
-    Make you have proper apps configuration in \`.angular-cli.json\``));
+  throw new SilentError(chalk.red(oneLine`
+    Unable to find app with name or index.
+    Verify the configuration in \`.angular-cli.json\`
+  `));
 }

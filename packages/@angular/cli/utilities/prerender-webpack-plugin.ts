@@ -53,4 +53,4 @@ export class PrerenderWebpackPlugin {
         delete require.cache[key];
       });
   }
-};
+}

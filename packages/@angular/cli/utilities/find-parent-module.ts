@@ -34,4 +34,4 @@ export default function findParentModule(
   }
 
   throw new SilentError('No module files found');
-};
+}
