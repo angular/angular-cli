@@ -6,6 +6,7 @@ import { CliConfig } from '../../models/config';
 import { getAppFromConfig } from '../../utilities/app-utils';
 import { dynamicPathParser } from '../../utilities/dynamic-path-parser';
 import { resolveModulePath } from '../../utilities/resolve-module-file';
+import { getBlueprintFilesPathFor } from '../../utilities/get-blueprint-files-path-for';
 
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const findParentModule = require('../../utilities/find-parent-module').default;
@@ -143,6 +144,7 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
+
     this.styleExt = CliConfig.getValue('defaults.styleExt') || 'css';
 
     options.inlineStyle = options.inlineStyle !== undefined ?
@@ -194,6 +196,10 @@ export default Blueprint.extend({
     }
 
     return fileList;
+  },
+
+  filesPath: function () {
+    return getBlueprintFilesPathFor.call(this, 'component');
   },
 
   fileMapTokens: function (options: any) {
