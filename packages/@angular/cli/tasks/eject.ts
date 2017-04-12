@@ -320,6 +320,10 @@ class JsonWebpackSerializer {
   serialize(config: any): string {
     // config = Object.assign({}, config);
     config['plugins'] = this._pluginsReplacer(config['plugins']);
+    // Routes using PathLocationStrategy break without this.
+    config['devServer'] = {
+      'historyApiFallback': true
+    };
     config['resolve'] = this._resolveReplacer(config['resolve']);
     config['resolveLoader'] = this._resolveReplacer(config['resolveLoader']);
     config['entry'] = this._entryReplacer(config['entry']);
