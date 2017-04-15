@@ -47,8 +47,16 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const deployUrl = wco.buildOptions.deployUrl || '';
 
   const postcssPluginCreator = function() {
+    // safe settings based on: https://github.com/ben-eb/cssnano/issues/358#issuecomment-283696193
+    const importantCommentRe = /@preserve|@license|[@#]\s*source(?:Mapping)?URL|^!/i;
+    const minimizeOptions = {
+      autoprefixer: false, // full pass with autoprefixer is run separately
+      safe: true,
+      mergeLonghand: false, // version 3+ should be safe; cssnano currently uses 2.x
+      discardComments : { remove: (comment: string) => !importantCommentRe.test(comment) }
+    };
+
     return [
-      autoprefixer(),
       postcssUrl({
         url: (URL: string) => {
           // Only convert root relative URLs, which CSS-Loader won't process into require().
@@ -69,9 +77,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             return `/${baseHref}/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
           }
         }
-      })
+      }),
+      autoprefixer(),
     ].concat(
-        minimizeCss ? [cssnano({ safe: true, autoprefixer: false })] : []
+        minimizeCss ? [cssnano(minimizeOptions)] : []
     );
   };
   (postcssPluginCreator as any)[postcssArgs] = {
