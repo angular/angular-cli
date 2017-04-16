@@ -6,10 +6,15 @@ export default Task.extend({
   run: function() {
     const ui = this.ui;
 
+    let packageManager = this.packageManager;
+    if (packageManager === 'default') {
+      packageManager = 'npm';
+    }
+
     return new Promise(function(resolve, reject) {
-      exec('npm link @angular/cli', (err) => {
+      exec(`${packageManager} link @angular/cli`, (err) => {
         if (err) {
-          ui.writeLine(chalk.red('Couldn\'t do \'npm link @angular/cli\'.'));
+          ui.writeLine(chalk.red(`Couldn't do '${packageManager} link @angular/cli'.`));
           reject();
         } else {
           ui.writeLine(chalk.green('Successfully linked to @angular/cli.'));

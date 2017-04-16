@@ -78,7 +78,7 @@ export interface SchemaClass<JsonType> extends Object {
   // Direct access to the schema.
   $$schema(): RootSchemaTreeNode;
 
-  $$serialize(mimetype?: string): string;
+  $$serialize(mimetype?: string, ...args: any[]): string;
 }
 
 

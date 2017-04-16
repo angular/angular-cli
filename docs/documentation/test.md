@@ -16,28 +16,132 @@ Tests will execute after a build is executed via [Karma](http://karma-runner.git
 You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
 
 ## Options
-`--app` Specifies app name or index to use.
+<details>
+  <summary>app</summary>
+  <p>
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+  </p>
+  <p>
+    Specifies app name or index to use.
+  </p>
+</details>
 
-`--browsers` Override which browsers tests are run against.
+<details>
+  <summary>browsers</summary>
+  <p>
+    <code>--browsers</code>
+  </p>
+  <p>
+    Override which browsers tests are run against.
+  </p>
+</details>
 
-`--code-coverage` Coverage report will be in the coverage/ directory.
+<details>
+  <summary>code-coverage</summary>
+  <p>
+    <code>--code-coverage</code> (aliases: <code>-cc</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Coverage report will be in the coverage/ directory.
+  </p>
+</details>
 
-`--colors` Enable or disable colors in the output (reporters and logs).
+<details>
+  <summary>colors</summary>
+  <p>
+    <code>--colors</code>
+  </p>
+  <p>
+    Enable or disable colors in the output (reporters and logs).
+  </p>
+</details>
 
-`--config` Use a specific config file. Defaults to the protractor config file in angular-cli.json.
+<details>
+  <summary>config</summary>
+  <p>
+    <code>--config</code> (aliases: <code>-c</code>)
+  </p>
+  <p>
+    Use a specific config file. Defaults to the protractor config file in angular-cli.json.
+  </p>
+</details>
 
-`--log-level` Level of logging.
+<details>
+  <summary>log-level</summary>
+  <p>
+    <code>--log-level</code>
+  </p>
+  <p>
+    Level of logging.
+  </p>
+</details>
 
-`--poll` Enable and define the file watching poll time period (milliseconds).
+<details>
+  <summary>poll</summary>
+  <p>
+    <code>--poll</code>
+  </p>
+  <p>
+    Enable and define the file watching poll time period (milliseconds).
+  </p>
+</details>
 
-`--port` Port where the web server will be listening.
+<details>
+  <summary>port</summary>
+  <p>
+    <code>--port</code>
+  </p>
+  <p>
+    Port where the web server will be listening.
+  </p>
+</details>
 
-`--progress` Log progress to the console while in progress.
+<details>
+  <summary>progress</summary>
+  <p>
+    <code>--progress</code> <em>default value: true</em>
+  </p>
+  <p>
+    Log progress to the console while in progress.
+  </p>
+</details>
 
-`--reporters` List of reporters to use.
+<details>
+  <summary>reporters</summary>
+  <p>
+    <code>--reporters</code>
+  </p>
+  <p>
+    List of reporters to use.
+  </p>
+</details>
 
-`--single-run` Run tests a single time.
+<details>
+  <summary>single-run</summary>
+  <p>
+    <code>--single-run</code> (aliases: <code>-sr</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Run tests a single time.
+  </p>
+</details>
 
-`--sourcemap` Output sourcemaps.
+<details>
+  <summary>sourcemap</summary>
+  <p>
+    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
+  </p>
+  <p>
+    Output sourcemaps.
+  </p>
+</details>
 
-`--watch` (`-w`) Run build when files change.
+<details>
+  <summary>watch</summary>
+  <p>
+    <code>--watch</code> (aliases: <code>-w</code>)
+  </p>
+  <p>
+    Run build when files change.
+  </p>
+</details>

@@ -6,4 +6,12 @@
 `ng generate enum [name]` generates an enumeration
 
 ## Options
-`--app` Specifies app name or index to use.
+<details>
+  <summary>app</summary>
+  <p>
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+  </p>
+  <p>
+    Specifies app name to use.
+  </p>
+</details>

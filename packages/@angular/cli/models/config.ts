@@ -95,8 +95,10 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
 
   static fromProject(projectPath?: string): CliConfig {
     const configPath = this.configFilePath(projectPath);
-    if (!configPath || configPath === this.globalConfigFilePath()) {
-      return null;
+
+    if (!configPath ||
+     (configPath === this.globalConfigFilePath() && process.cwd() !== path.dirname(configPath))) {
+        return null;
     }
     if (configCacheMap.has(configPath)) {
       return configCacheMap.get(configPath);

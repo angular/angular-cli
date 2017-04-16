@@ -1,8 +1,9 @@
+// @ignoreDep @angular/compiler-cli
 import * as ts from 'typescript';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import {__NGTOOLS_PRIVATE_API_2, VERSION} from '@angular/compiler-cli';
+const {__NGTOOLS_PRIVATE_API_2, VERSION} = require('@angular/compiler-cli');
 
 import {Tapable} from './webpack';
 import {WebpackResourceLoader} from './resource_loader';
@@ -46,7 +47,8 @@ export class ExtractI18nPlugin implements Tapable {
     if (!options.hasOwnProperty('tsConfigPath')) {
       throw new Error('Must specify "tsConfigPath" in the configuration of @ngtools/webpack.');
     }
-    this._tsConfigPath = options.tsConfigPath;
+    // TS represents paths internally with '/' and expects the tsconfig path to be in this format
+    this._tsConfigPath = options.tsConfigPath.replace(/\\/g, '/');
 
     // Check the base path.
     const maybeBasePath = path.resolve(process.cwd(), this._tsConfigPath);

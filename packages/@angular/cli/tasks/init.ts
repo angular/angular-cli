@@ -33,9 +33,10 @@ export default Task.extend({
       });
     }
 
+    const packageManager = CliConfig.fromGlobal().get('packageManager');
+
     let npmInstall: any;
     if (!commandOptions.skipInstall) {
-      const packageManager = CliConfig.fromGlobal().get('packageManager');
       npmInstall = new NpmInstall({
         ui: this.ui,
         project: this.project,
@@ -47,7 +48,8 @@ export default Task.extend({
     if (commandOptions.linkCli) {
       linkCli = new LinkCli({
         ui: this.ui,
-        project: this.project
+        project: this.project,
+        packageManager
       });
     }
 
@@ -70,14 +72,14 @@ export default Task.extend({
       rawArgs: rawArgs.toString(),
       sourceDir: commandOptions.sourceDir,
       style: commandOptions.style,
-      prefix: commandOptions.prefix,
+      prefix: commandOptions.prefix.trim() || 'app',
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,
       ignoredUpdateFiles: ['favicon.ico'],
-      ng4: commandOptions.ng4,
       skipGit: commandOptions.skipGit,
-      skipTests: commandOptions.skipTests
+      skipTests: commandOptions.skipTests,
+      skipE2e: commandOptions.skipE2e
     };
 
     validateProjectName(packageName);
@@ -106,4 +108,3 @@ export default Task.extend({
       });
   }
 });
-

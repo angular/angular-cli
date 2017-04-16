@@ -1,14 +1,14 @@
-'use strict';
+import { oneLine } from 'common-tags';
 
-var Promise = require('../ember-cli/lib/ext/promise');
-var exec = Promise.denodeify(require('child_process').exec);
-var path = require('path');
-var pkg = require('../package.json');
-var fs = require('fs');
-var template = require('lodash/template');
-var Task = require('../ember-cli/lib/models/task');
+const Promise = require('../ember-cli/lib/ext/promise');
+const exec = Promise.denodeify(require('child_process').exec);
+const path = require('path');
+const pkg = require('../package.json');
+const fs = require('fs');
+const template = require('lodash/template');
+const Task = require('../ember-cli/lib/models/task');
 
-var gitEnvironmentVariables = {
+const gitEnvironmentVariables = {
   GIT_AUTHOR_NAME: process.env.GIT_AUTHOR_NAME || 'Angular CLI',
   GIT_AUTHOR_EMAIL: process.env.GIT_AUTHOR_EMAIL || 'angular-cli@angular.io',
   get GIT_COMMITTER_NAME() {
@@ -20,9 +20,9 @@ var gitEnvironmentVariables = {
 };
 
 module.exports = Task.extend({
-  run: function (commandOptions) {
-    var chalk = require('chalk');
-    var ui = this.ui;
+  run: function (commandOptions: any) {
+    const chalk = require('chalk');
+    const ui = this.ui;
 
     if (commandOptions.skipGit) {
       return Promise.resolve();
@@ -37,11 +37,14 @@ module.exports = Task.extend({
           })
           .catch(function() {
             return false;
-          })
+          });
       })
-      .then(function (insideGitRepo) {
+      .then(function (insideGitRepo: boolean) {
         if (insideGitRepo) {
-          return ui.writeLine('Directory is already under version control. Skipping initialization of git.');
+          ui.writeLine(oneLine`
+            Directory is already under version control.
+            Skipping initialization of git.`);
+          return;
         }
         return exec('git init')
           .then(function () {
@@ -49,9 +52,9 @@ module.exports = Task.extend({
           })
           .then(function () {
             if (!commandOptions.skipCommit) {
-              var commitTemplate = fs.readFileSync(
+              const commitTemplate = fs.readFileSync(
                 path.join(__dirname, '../utilities/INITIAL_COMMIT_MESSAGE.txt'));
-              var commitMessage = template(commitTemplate)(pkg);
+              const commitMessage = template(commitTemplate)(pkg);
               return exec(
                 'git commit -m "' + commitMessage + '"', { env: gitEnvironmentVariables });
             }

@@ -1,12 +1,13 @@
+import * as chalk from 'chalk';
+import * as fs from 'fs';
+import * as path from 'path';
 import { NodeHost } from '../../lib/ast-tools';
 import { CliConfig } from '../../models/config';
 import { getAppFromConfig } from '../../utilities/app-utils';
+import { dynamicPathParser } from '../../utilities/dynamic-path-parser';
+import { resolveModulePath } from '../../utilities/resolve-module-file';
 
-import * as fs from 'fs';
-import * as path from 'path';
-import * as chalk from 'chalk';
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
-const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const findParentModule = require('../../utilities/find-parent-module').default;
 const getFiles = Blueprint.prototype.files;
 const stringUtils = require('ember-cli-string-utils');
@@ -107,14 +108,8 @@ export default Blueprint.extend({
   beforeInstall: function (options: any) {
     const appConfig = getAppFromConfig(this.options.app);
     if (options.module) {
-      // Resolve path to module
-      const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
-      const parsedPath = dynamicPathParser(this.project, modulePath, appConfig);
-      this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
-
-      if (!fs.existsSync(this.pathToModule)) {
-        throw 'Module specified does not exist';
-      }
+      this.pathToModule =
+        resolveModulePath(options.module, this.project, this.project.root, appConfig);
     } else {
       try {
         this.pathToModule = findParentModule(this.project.root, appConfig.root, this.generatePath);
@@ -135,7 +130,7 @@ export default Blueprint.extend({
     const defaultPrefix = (appConfig && appConfig.prefix) || '';
 
     let prefix = (this.options.prefix === 'false' || this.options.prefix === '')
-                 ? '' : (this.options.prefix || defaultPrefix);
+      ? '' : (this.options.prefix || defaultPrefix);
     prefix = prefix && `${prefix}-`;
 
     this.selector = stringUtils.dasherize(prefix + parsedPath.name);

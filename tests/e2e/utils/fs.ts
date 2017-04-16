@@ -130,6 +130,18 @@ export function expectFileMatchToExist(dir: string, regex: RegExp) {
   });
 }
 
+export function expectFileNotToExist(fileName: string) {
+  return new Promise((resolve, reject) => {
+    fs.exists(fileName, (exist) => {
+      if (exist) {
+        reject(new Error(`File ${fileName} was expected not to exist but found...`));
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
 export function expectFileToExist(fileName: string) {
   return new Promise((resolve, reject) => {
     fs.exists(fileName, (exist) => {

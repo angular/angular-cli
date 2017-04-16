@@ -94,21 +94,32 @@ if (packageJsonProjectPath && fs.existsSync(packageJsonProjectPath)) {
   const deps = packageJsonProject['dependencies'] || {};
   const devDeps = packageJsonProject['devDependencies'] || {};
   const hasOldDep = !!deps['angular-cli'];
+  const hasDep = !!deps['@angular/cli'];
   const hasOldDevDep = !!devDeps['angular-cli'];
   const hasDevDep = !!devDeps['@angular/cli'];
 
-  if (hasOldDep || hasOldDevDep || !hasDevDep) {
+  if (hasOldDep || hasOldDevDep || !(hasDevDep || hasDep)) {
     const warnings = [
-      'The package "angular-cli" has been renamed to "@angular/cli". The old package will be '
-      + 'deprecated soon.',
-      '',
-      'Please take the following steps to avoid issues:'
+      'Unable to find "@angular/cli" in devDependencies.',
+      ''
     ];
+
+    if (hasOldDep || hasOldDevDep) {
+      warnings.push(
+        'The package "angular-cli" has been deprecated and renamed to "@angular/cli".',
+        '');
+    }
+
+    warnings.push('Please take the following steps to avoid issues:');
+
     if (hasOldDep) {
       warnings.push('"npm uninstall --save angular-cli"');
     }
     if (hasOldDevDep) {
       warnings.push('"npm uninstall --save-dev angular-cli"');
+    }
+    if (hasDep) {
+      warnings.push('"npm uninstall --save @angular/cli"')
     }
     if (!hasDevDep) {
       warnings.push('"npm install --save-dev @angular/cli@latest"');
@@ -148,7 +159,7 @@ resolve('@angular/cli', { basedir: process.cwd() },
         console.log(yellow(stripIndents`
           Your global Angular CLI version (${globalVersion}) is greater than your local
           version (${localVersion}). The local Angular CLI version is used.
-  
+
           To disable this warning use "ng set --global warnings.versionMismatch=false".
         `));
       }

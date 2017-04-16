@@ -23,6 +23,7 @@ export default function () {
     }))
     .then(() => updateJsonFile('src/tsconfig.json', tsconfigJson => {
       delete tsconfigJson['exclude'];
+      delete tsconfigJson['compilerOptions']['types'];
     }))
     .then(() => ng('build', '--aot'))
     .then(() => !ejected && ng('test', '--single-run'));

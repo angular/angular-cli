@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as chalk from 'chalk';
 import denodeify = require('denodeify');
 
 import InitCommand from './init';
@@ -15,7 +16,7 @@ const mkdir = denodeify(fs.mkdir);
 
 const NewCommand = Command.extend({
   name: 'new',
-  description: `Creates a new directory and a new Angular app.`,
+  description: `Creates a new directory and a new Angular app eg. "ng new [name]".`,
   works: 'outsideProject',
 
   availableOptions: [
@@ -41,12 +42,6 @@ const NewCommand = Command.extend({
       description: 'Automatically link the `@angular/cli` package.'
     },
     {
-      name: 'ng4',
-      type: Boolean,
-      default: false,
-      description: 'Create a project with Angular 4 in the template.'
-    },
-    {
       name: 'skip-install',
       type: Boolean,
       default: false,
@@ -66,6 +61,13 @@ const NewCommand = Command.extend({
       default: false,
       aliases: ['st'],
       description: 'Skip creating spec files.'
+    },
+    {
+      name: 'skip-e2e',
+      type: Boolean,
+      default: false,
+      aliases: ['s2'],
+      description: 'Skip creating e2e files.'
     },
     {
       name: 'skip-commit',
@@ -131,7 +133,8 @@ const NewCommand = Command.extend({
 
     if (!packageName) {
       return Promise.reject(new SilentError(
-        `The "ng ${this.name}" command requires a name argument to be specified. ` +
+        `The "ng ${this.name}" command requires a name argument to be specified eg. ` +
+        chalk.yellow('ng new [name] ') +
         `For more details, use "ng help".`));
     }
 

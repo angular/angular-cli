@@ -1,11 +1,11 @@
-import {NodeHost} from '../../lib/ast-tools';
-import {CliConfig} from '../../models/config';
-import {getAppFromConfig} from '../../utilities/app-utils';
+import * as chalk from 'chalk';
+import * as path from 'path';
+import { NodeHost } from '../../lib/ast-tools';
+import { CliConfig } from '../../models/config';
+import { getAppFromConfig } from '../../utilities/app-utils';
+import { resolveModulePath } from '../../utilities/resolve-module-file';
+import { dynamicPathParser } from '../../utilities/dynamic-path-parser';
 
-const path = require('path');
-const fs = require('fs');
-const chalk = require('chalk');
-const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const findParentModule = require('../../utilities/find-parent-module').default;
@@ -58,17 +58,11 @@ export default Blueprint.extend({
     }
   ],
 
-  beforeInstall: function(options: any) {
+  beforeInstall: function (options: any) {
     const appConfig = getAppFromConfig(this.options.app);
     if (options.module) {
-      // Resolve path to module
-      const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
-      const parsedPath = dynamicPathParser(this.project, modulePath, appConfig);
-      this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
-
-      if (!fs.existsSync(this.pathToModule)) {
-        throw ' ';
-      }
+      this.pathToModule =
+        resolveModulePath(options.module, this.project, this.project.root, appConfig);
     } else {
       try {
         this.pathToModule = findParentModule(this.project.root, appConfig.root, this.generatePath);
@@ -89,7 +83,7 @@ export default Blueprint.extend({
     const defaultPrefix = (appConfig && appConfig.prefix) || '';
 
     let prefix = (this.options.prefix === 'false' || this.options.prefix === '')
-                 ? '' : (this.options.prefix || defaultPrefix);
+      ? '' : (this.options.prefix || defaultPrefix);
     prefix = prefix && `${prefix}-`;
 
 
@@ -111,7 +105,7 @@ export default Blueprint.extend({
     };
   },
 
-  files: function() {
+  files: function () {
     let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && !this.options.spec) {
@@ -135,7 +129,7 @@ export default Blueprint.extend({
     };
   },
 
-  afterInstall: function(options: any) {
+  afterInstall: function (options: any) {
     const returns: Array<any> = [];
     const className = stringUtils.classify(`${options.entity.name}Directive`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.directive`);
@@ -161,9 +155,9 @@ export default Blueprint.extend({
             }
             return result;
           }));
-        this._writeStatusToUI(chalk.yellow,
-          'update',
-          path.relative(this.project.root, this.pathToModule));
+      this._writeStatusToUI(chalk.yellow,
+        'update',
+        path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);

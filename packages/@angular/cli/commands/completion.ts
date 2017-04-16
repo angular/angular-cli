@@ -7,7 +7,7 @@ const stringUtils = require('ember-cli-string-utils');
 const Command = require('../ember-cli/lib/models/command');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
 
-function extractOptions(opts: any): string {
+function extractOptions(opts: any): string[] {
   const output: string[] = [];
 
   for (let index = 0; index < opts.length; index++) {
@@ -18,10 +18,10 @@ function extractOptions(opts: any): string {
     }
   }
 
-  return output.sort().join(' ');
+  return output;
 }
 
-function extractBlueprints(opts: any): string {
+function extractBlueprints(opts: any): string[] {
   const output: string[] = [];
 
   for (let index = 0; index < opts.length; index++) {
@@ -29,7 +29,7 @@ function extractBlueprints(opts: any): string {
     output.push(element.name);
   }
 
-  return output.sort().join(' ');
+  return output;
 }
 
 export interface CompletionCommandOptions {
@@ -117,20 +117,21 @@ const CompletionCommand = Command.extend({
         });
       }
 
-      let opts = '';
+      let opts: string[] = [];
       if (command.blueprints && command.blueprints[0]) {
-        opts += extractBlueprints(command.blueprints);
+        opts = opts.concat(extractBlueprints(command.blueprints));
       }
 
       if (command.availableOptions && command.availableOptions[0]) {
-        opts += extractOptions(command.availableOptions);
-        caseBlock = caseBlock + '    ' + com.sort().join('|') + ') opts="' + opts + '" ;;\n';
+        opts = opts.concat(extractOptions(command.availableOptions));
+        const optsStr = opts.sort().join(' ');
+        caseBlock = `${caseBlock}
+             ${com.sort().join('|')}) opts="${optsStr}" ;;`;
       }
     });
 
-    caseBlock = 'ng|help) opts="' + optsNg.sort().join(' ') + '" ;;\n' +
-      caseBlock +
-      '    *) opts="" ;;';
+    caseBlock = `ng|help) opts="${optsNg.sort().join(' ')}" ;;${caseBlock}
+             *) opts="" ;;`;
 
     console.log(stripIndent`
       ###-begin-ng-completion###
@@ -143,8 +144,8 @@ const CompletionCommand = Command.extend({
       #   2. Produce Bash-only completion: "ng completion -b" or "ng completion --bash".
       #   3. Produce Zsh-only completion: "ng completion -z" or "ng completion --zsh".
       #
-      # Installation: ng completion -b >> ~/.bashrc
-      #           or  ng completion -z >> ~/.zshrc
+      # Usage: . <(ng completion --bash) # place it appropriately in .bashrc or
+      #        . <(ng completion --zsh) # find a spot for it in .zshrc
       #`);
 
     if (commandOptions.all && !commandOptions.bash) {
