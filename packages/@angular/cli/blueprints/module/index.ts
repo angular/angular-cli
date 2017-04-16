@@ -14,17 +14,20 @@ export default Blueprint.extend({
     {
       name: 'spec',
       type: Boolean,
+      aliases: ['sp'],
       description: 'Specifies if a spec file is generated.'
     },
     {
       name: 'flat',
       type: Boolean,
+      aliases: ['f'],
       description: 'Flag to indicate if a dir is created.'
     },
     {
       name: 'routing',
       type: Boolean,
       default: false,
+      aliases: ['r'],
       description: 'Specifies if a routing module file should be generated.'
     },
     {

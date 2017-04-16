@@ -20,17 +20,20 @@ export default Blueprint.extend({
     {
       name: 'flat',
       type: Boolean,
+      aliases: ['f'],
       description: 'Flag to indicate if a dir is created.'
     },
     {
       name: 'spec',
       type: Boolean,
+      aliases: ['sp'],
       description: 'Specifies if a spec file is generated.'
     },
     {
       name: 'skip-import',
       type: Boolean,
       default: false,
+      aliases: ['ski'],
       description: 'Allows for skipping the module import.'
     },
     {
@@ -43,6 +46,7 @@ export default Blueprint.extend({
       name: 'export',
       type: Boolean,
       default: false,
+      aliases: ['e'],
       description: 'Specifies if declaring module exports the pipe.'
     },
     {
