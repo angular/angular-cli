@@ -222,7 +222,7 @@ export default Blueprint.extend({
     const appConfig = getAppFromConfig(this.options.app);
     if (options.prefix && appConfig.prefix && appConfig.prefix !== options.prefix) {
       console.log(chalk.yellow(oneLine`You are using different prefix from app,
-       you might get lint errors. Please update "tslint.json" to remove those.`));
+       you might get lint errors. Please update "tslint.json" accordingly.`));
     }
 
     const returns: Array<any> = [];
