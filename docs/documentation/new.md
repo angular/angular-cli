@@ -111,7 +111,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>skip-e2e</summary>
   <p>
-    `--skip-e2e` (alias: `-se`) _default value: false_
+    <code>--skip-e2e</code> (alias: <code>-se</code>) <em>default value: false</em>
   </p>
   <p>
     Skip including e2e functionality.
