@@ -63,11 +63,12 @@
     "test": "exit 0"
   },
   "devDependencies": {
-    "@angular/common": "^4.0.0-rc.5",
-    "@angular/compiler": "^4.0.0-rc.5",
-    "@angular/core": "^4.0.0-rc.5",
-    "@angular/platform-browser": "^4.0.0-rc.5",
-    "@angular/platform-server": "^4.0.0-rc.5",
+    "@angular/animations": "^4.0.0",
+    "@angular/common": "^4.0.0",
+    "@angular/compiler": "^4.0.0",
+    "@angular/core": "^4.0.0",
+    "@angular/platform-browser": "^4.0.0",
+    "@angular/platform-server": "^4.0.0",
     "express": "^4.15.2",
     "rimraf": "^2.6.1",
     "rxjs": "^5.2.0",
