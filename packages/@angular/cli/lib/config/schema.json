@@ -426,6 +426,22 @@
             }
           }
         },
+        "resolver": {
+          "description": "Options for generating a resolver.",
+          "type": "object",
+          "properties": {
+            "flat": {
+              "description": "Flag to indicate if a dir is created.",
+              "type": "boolean",
+              "default": true
+            },
+            "spec": {
+              "description": "Specifies if a spec file is generated.",
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
         "service": {
           "description": "Options for generating a service.",
           "type": "object",
