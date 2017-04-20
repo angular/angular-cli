@@ -27,7 +27,8 @@ export default Blueprint.extend({
 
   normalizeEntityName: function (entityName: string) {
     const appConfig = getAppFromConfig(this.options.app);
-    const parsedPath = dynamicPathParser(this.project, entityName.split('.')[0], appConfig);
+    const parsedPath =
+     dynamicPathParser(this.project, entityName.split('.')[0], appConfig, this.options.dryRun);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;

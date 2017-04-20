@@ -41,7 +41,7 @@ export function resolveModulePath(
 }
 
 function buildFullPath(project: any, relativeModulePath: string, appConfig: any, projectRoot: any) {
-  const parsedPath = dynamicPathParser(project, relativeModulePath, appConfig);
+  const parsedPath = dynamicPathParser(project, relativeModulePath, appConfig, false);
   const fullModulePath = path.join(projectRoot, parsedPath.dir, parsedPath.base);
 
   return fullModulePath;

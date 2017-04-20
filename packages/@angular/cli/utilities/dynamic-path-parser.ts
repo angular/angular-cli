@@ -3,7 +3,8 @@ import * as process from 'process';
 import * as fs from 'fs-extra';
 const stringUtils = require('ember-cli-string-utils');
 
-export function dynamicPathParser(project: any, entityName: string, appConfig: any) {
+export function dynamicPathParser(project: any, entityName: string, appConfig: any,
+                                  dryRun: boolean) {
   const projectRoot = project.root;
   const sourceDir = appConfig.root;
   const appRoot = path.join(sourceDir, 'app');
@@ -38,7 +39,9 @@ export function dynamicPathParser(project: any, entityName: string, appConfig: a
       // Folder not found, create it, and return it
       const dasherizedPart = stringUtils.dasherize(part);
       const dasherizedDirName = path.join(tempPath, dasherizedPart);
-      fs.mkdirpSync(dasherizedDirName);
+      if (!dryRun) {
+        fs.mkdirpSync(dasherizedDirName);
+      }
       return dasherizedDirName;
 
     }, parsedOutputPath.root);
