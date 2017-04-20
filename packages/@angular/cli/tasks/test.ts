@@ -3,6 +3,7 @@ import * as path from 'path';
 import { TestOptions } from '../commands/test';
 import { CliConfig } from '../models/config';
 import { requireProjectModule } from '../utilities/require-project-module';
+import { getAppFromConfig } from '../utilities/app-utils';
 
 const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
@@ -12,6 +13,7 @@ export default Task.extend({
   run: function (options: TestOptions) {
     const projectConfig = CliConfig.fromProject().config;
     const projectRoot = this.project.root;
+    const app = getAppFromConfig(options.app);
 
     if (projectConfig.project && projectConfig.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
@@ -19,7 +21,7 @@ export default Task.extend({
 
     return new Promise((resolve) => {
       const karma = requireProjectModule(projectRoot, 'karma');
-      const karmaConfig = path.join(projectRoot, options.config ||
+      const karmaConfig = path.join(projectRoot, options.config || app.karma ||
         CliConfig.getValue('test.karma.config'));
 
       let karmaOptions: any = Object.assign({}, options);
