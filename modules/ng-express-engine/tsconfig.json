@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "es2015",
+    "module": "commonjs",
     "moduleResolution": "node",
     "declaration": true,
     "noImplicitAny": false,
@@ -16,7 +16,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "rootDir": ".",
-    "outDir": "dist",
+    "outDir": "../../dist/ng-express-engine/dist",
     "lib": [
       "dom",
       "es6"

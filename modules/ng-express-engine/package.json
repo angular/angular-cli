@@ -1,6 +1,6 @@
 {
   "name": "@nguniversal/express-engine",
-  "main": "dist/main.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "version": "1.0.0-beta.0",
   "description": "Express Engine for running Server Angular Apps",
