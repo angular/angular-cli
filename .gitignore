@@ -1,0 +1,21 @@
+# Outputs
+build/
+dist/
+
+# IDEs
+.idea/
+jsconfig.json
+.vscode/
+
+# Typings file.
+typings/
+
+# Misc
+node_modules/
+tmp/
+npm-debug.log*
+yarn-error.log*
+
+# Mac OSX Finder files.
+**/.DS_Store
+.DS_Store

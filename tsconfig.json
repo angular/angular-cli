@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "mapRoot": "",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "outDir": "./build",
+    "rootDir": ".",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "sourceRoot": "",
+    "target": "es6",
+    "lib": [
+      "es2015",
+      "es2016",
+      "es2017"
+    ],
+    "baseUrl": "",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": [
+      "jasmine",
+      "node"
+    ]
+  },
+  "exclude": [
+    "build/**/*",
+    "dist/**/*",
+    "node_modules/**/*",
+    "tmp/**/*"
+  ]
+}
