@@ -3,7 +3,7 @@ import {npm, exec} from '../utils/process';
 import {updateJsonFile} from '../utils/project';
 import {getGlobalVariable} from '../utils/env';
 
-const packages = require('../../../lib/packages');
+const packages = require('../../../lib/packages').packages;
 
 
 export default function () {

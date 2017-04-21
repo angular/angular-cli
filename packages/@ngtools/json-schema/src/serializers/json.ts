@@ -110,6 +110,11 @@ export class JsonSerializer implements Serializer {
 
     this._willOutputValue();
 
+    if (node.items.length === 0) {
+      this._writer('[]');
+      return;
+    }
+
     this._writer('[');
     this._state.push({ empty: true, type: 'array' });
     for (let i = 0; i < node.items.length; i++) {

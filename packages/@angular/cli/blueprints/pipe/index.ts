@@ -1,11 +1,11 @@
-import {NodeHost} from '../../lib/ast-tools';
-import {CliConfig} from '../../models/config';
-import {getAppFromConfig} from '../../utilities/app-utils';
+import * as chalk from 'chalk';
+import * as path from 'path';
+import { NodeHost } from '../../lib/ast-tools';
+import { CliConfig } from '../../models/config';
+import { dynamicPathParser } from '../../utilities/dynamic-path-parser';
+import { getAppFromConfig } from '../../utilities/app-utils';
+import { resolveModulePath } from '../../utilities/resolve-module-file';
 
-const path = require('path');
-const fs = require('fs');
-const chalk = require('chalk');
-const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
 const findParentModule = require('../../utilities/find-parent-module').default;
@@ -56,14 +56,8 @@ export default Blueprint.extend({
   beforeInstall: function(options: any) {
     const appConfig = getAppFromConfig(this.options.app);
     if (options.module) {
-      // Resolve path to module
-      const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
-      const parsedPath = dynamicPathParser(this.project, modulePath, appConfig);
-      this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
-
-      if (!fs.existsSync(this.pathToModule)) {
-        throw 'Module specified does not exist';
-      }
+      this.pathToModule =
+        resolveModulePath(options.module, this.project, this.project.root, appConfig);
     } else {
       try {
         this.pathToModule = findParentModule(this.project.root, appConfig.root, this.generatePath);

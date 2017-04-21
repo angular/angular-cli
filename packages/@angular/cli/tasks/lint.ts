@@ -5,7 +5,6 @@ import * as ts from 'typescript';
 import { requireProjectModule } from '../utilities/require-project-module';
 import { CliConfig } from '../models/config';
 import { LintCommandOptions } from '../commands/lint';
-import { oneLine } from 'common-tags';
 
 interface CliLintConfig {
   files?: (string | string[]);
@@ -21,11 +20,7 @@ export default Task.extend({
     const lintConfigs: CliLintConfig[] = CliConfig.fromProject().config.lint || [];
 
     if (lintConfigs.length === 0) {
-      ui.writeLine(chalk.yellow(oneLine`
-        No lint config(s) found.
-        If this is not intended, run "ng update".
-      `));
-
+      ui.writeLine(chalk.yellow('No lint configuration(s) found.'));
       return Promise.resolve(0);
     }
 
@@ -37,11 +32,12 @@ export default Task.extend({
       .map((config) => {
         const program: ts.Program = Linter.createProgram(config.project);
         const files = getFilesToLint(program, config, Linter);
-
-        const linter = new Linter({
+        const lintOptions = {
           fix: commandOptions.fix,
           formatter: commandOptions.format
-        }, program);
+        };
+        const lintProgram = commandOptions.typeCheck ? program : undefined;
+        const linter = new Linter(lintOptions, lintProgram);
 
         files.forEach((file) => {
           const sourceFile = program.getSourceFile(file);
@@ -80,7 +76,7 @@ export default Task.extend({
     // print formatter output directly for non human-readable formats
     if (['prose', 'verbose', 'stylish'].indexOf(commandOptions.format) == -1) {
       return (result.failures.length == 0 || commandOptions.force)
-            ? Promise.resolve(0) : Promise.resolve(2);
+        ? Promise.resolve(0) : Promise.resolve(2);
     }
 
     if (result.failures.length > 0) {

@@ -1,5 +1,5 @@
 interface IWebpackDevServerConfigurationOptions {
-  contentBase?: string;
+  contentBase?: boolean | string | string[];
   hot?: boolean;
   historyApiFallback?: {[key: string]: any} | boolean;
   compress?: boolean;
@@ -22,14 +22,3 @@ interface IWebpackDevServerConfigurationOptions {
   cert?: string;
   overlay?: boolean;
 }
-
-interface WebpackProgressPluginOutputOptions {
-  colors?: boolean;
-  chunks?: boolean;
-  modules?: boolean;
-  reasons?: boolean;
-  chunkModules?: boolean;
-}
-
-declare var HtmlWebpackPlugin: any;
-declare var LoaderOptionsPlugin: any;

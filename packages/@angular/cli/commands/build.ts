@@ -117,7 +117,7 @@ export const baseBuildCommandOptions: any = [
     name: 'app',
     type: String,
     aliases: ['a'],
-    description: 'Specifies app name to use.'
+    description: 'Specifies app name or index to use.'
   }
 ];
 
@@ -135,7 +135,7 @@ const BuildCommand = Command.extend({
        name: 'stats-json',
        type: Boolean,
        default: false,
-       description: oneLine`Generates a \`stats.json\` file which can be analyzed using tools 
+       description: oneLine`Generates a \`stats.json\` file which can be analyzed using tools
        such as: \`webpack-bundle-analyzer\` or https://webpack.github.io/analyse.`
       }
   ]),

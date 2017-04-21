@@ -6,10 +6,42 @@
 `ng generate module [name]` generates an NgModule
 
 ## Options
-`--app` Specifies app name or index to use.
+<details>
+  <summary>app</summary>
+  <p>
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+  </p>
+  <p>
+    Specifies app name to use.
+  </p>
+</details>
 
-`--flat` Flag to indicate if a dir is created.
+<details>
+  <summary>flat</summary>
+  <p>
+    <code>--flat</code>
+  </p>
+  <p>
+    Flag to indicate if a dir is created.
+  </p>
+</details>
 
-`--spec` Specifies if a spec file is generated.
+<details>
+  <summary>spec</summary>
+  <p>
+    <code>--spec</code>
+  </p>
+  <p>
+    Specifies if a spec file is generated.
+  </p>
+</details>
 
-`--routing` Specifies if a routing module file should be generated.
+<details>
+  <summary>routing</summary>
+  <p>
+    <code>--routing</code>
+  </p>
+  <p>
+    Specifies if a routing module file should be generated.
+  </p>
+</details>

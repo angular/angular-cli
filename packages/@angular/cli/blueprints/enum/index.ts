@@ -1,7 +1,7 @@
 import {getAppFromConfig} from '../../utilities/app-utils';
+import {dynamicPathParser} from '../../utilities/dynamic-path-parser';
 
 const stringUtils = require('ember-cli-string-utils');
-const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 
 export default Blueprint.extend({

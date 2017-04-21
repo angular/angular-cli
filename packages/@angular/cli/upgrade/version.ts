@@ -108,7 +108,7 @@ export class Version {
       }
     } else {
       console.error(bold(red(stripIndents`
-        You seem to not be dependending on "@angular/core". This is an error.
+        You seem to not be depending on "@angular/core". This is an error.
       `)));
       process.exit(2);
     }

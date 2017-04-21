@@ -6,10 +6,42 @@
 `ng generate service [name]` generates a service
 
 ## Options
-`--app` Specifies app name or index to use.
+<details>
+  <summary>app</summary>
+  <p>
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+  </p>
+  <p>
+    Specifies app name to use.
+  </p>
+</details>
 
-`--flat` Flag to indicate if a dir is created.
+<details>
+  <summary>flat</summary>
+  <p>
+    <code>--flat</code>
+  </p>
+  <p>
+    Flag to indicate if a dir is created.
+  </p>
+</details>
 
-`--module` (`-m`) Allows you to specify the module where the service should be provided
+<details>
+  <summary>module</summary>
+  <p>
+    <code>--module</code> (aliases: <code>-m</code>)
+  </p>
+  <p>
+    Specifies where the service should be provided.
+  </p>
+</details>
 
-`--spec` Specifies if a spec file is generated.
+<details>
+  <summary>spec</summary>
+  <p>
+    <code>--spec</code>
+  </p>
+  <p>
+    Specifies if a spec file is generated.
+  </p>
+</details>

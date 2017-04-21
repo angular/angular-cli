@@ -61,12 +61,12 @@
                     "input": {
                       "type": "string",
                       "default": "",
-                      "description": "The dir to seach within."
+                      "description": "The dir to search within."
                     },
                     "output": {
                       "type": "string",
                       "default": "",
-                      "description": "The output path (relative to the outDir."
+                      "description": "The output path (relative to the outDir)."
                     }
                   },
                   "additionalProperties": false
@@ -77,7 +77,7 @@
           },
           "deployUrl": {
             "type": "string",
-            "description": ""
+            "description": "URL where files will be deployed."
           },
           "index": {
             "type": "string",
@@ -190,7 +190,7 @@
     },
     "e2e": {
       "type": "object",
-      "description": "Confirguration for end-to-end tests.",
+      "description": "Configuration for end-to-end tests.",
       "properties": {
         "protractor": {
           "type": "object",
@@ -232,8 +232,7 @@
           },
           "tslintConfig": {
             "description": "Location of the tslint.json configuration.",
-            "type": "string",
-            "default": "tslint.json"
+            "type": "string"
           },
           "exclude": {
             "description": "File glob(s) to ignore.",
@@ -301,7 +300,7 @@
           "type": "number"
         },
         "class": {
-          "description": "Options for generating a class",
+          "description": "Options for generating a class.",
           "type": "object",
           "properties": {
             "spec": {
@@ -439,34 +438,34 @@
           }
         },
         "serve": {
-          "description": "Properties to be passed to the serve command",
+          "description": "Properties to be passed to the serve command.",
           "type": "object",
           "properties": {
             "port": {
-              "description": "The port the application will be served on",
+              "description": "The port the application will be served on.",
               "type": "number",
               "default": 4200
             },
             "host": {
-              "description": "The host the application will be served on",
+              "description": "The host the application will be served on.",
               "type": "string",
               "default": "localhost"
 
             },
             "ssl": {
-              "description": "Enables ssl for the application",
+              "description": "Enables ssl for the application.",
               "type": "boolean",
               "default": false
 
             },
             "sslKey": {
-              "description": "The ssl key used by the server",
+              "description": "The ssl key used by the server.",
               "type": "string",
               "default": "ssl/server.key"
 
             },
             "sslCert": {
-              "description": "The ssl certificate used by the server",
+              "description": "The ssl certificate used by the server.",
               "type": "string",
               "default": "ssl/server.crt"
             }

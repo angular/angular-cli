@@ -21,6 +21,7 @@ const fs = require('fs');
 const path = require('path');
 const configPath = path.resolve(__dirname, './commit-message.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+const { packages, tools } = require('../../lib/packages');
 const PATTERN = /^(revert\: )?(\w+)(?:\(([^)]+)\))?\: (.+)$/;
 
 module.exports = function(commitSubject) {
@@ -45,11 +46,24 @@ module.exports = function(commitSubject) {
   }
 
   const scope = match[3];
+  const allScopes = Object.keys(packages).concat(Object.keys(tools));
 
-  if (scope && !config['scopes'].includes(scope)) {
+  if (scope && !allScopes.includes(scope)) {
     error(
         `"${scope}" is not an allowed scope.\n => SCOPES: ${config['scopes'].join(', ')}`,
         commitSubject);
+    return false;
+  }
+
+  // Having a tool scope and not using tool() is an error.
+  if (scope && Object.keys(tools).includes(scope) && type !== 'tool') {
+    error(`"${scope}" is a tool, but the type is NOT "tool".`);
+    return false;
+  }
+
+  // Having a package scope and using tool() is an error.
+  if (scope && Object.keys(tools).includes(scope) && type !== 'tool') {
+    error(`"${scope}" is NOT a tool, but the type is "tool".`);
     return false;
   }
 

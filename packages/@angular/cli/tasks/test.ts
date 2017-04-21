@@ -31,7 +31,7 @@ export default Task.extend({
 
       karmaOptions.angularCli = {
         codeCoverage: options.codeCoverage,
-        sourcemap: options.sourcemaps,
+        sourcemaps: options.sourcemaps,
         progress: options.progress,
         poll: options.poll,
         app: options.app

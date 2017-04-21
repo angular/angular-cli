@@ -6,24 +6,112 @@
 `ng generate component [name]` generates a component
 
 ## Options
-`--app` Specifies app name or index to use.
+<details>
+  <summary>app</summary>
+  <p>
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+  </p>
+  <p>
+    Specifies app name to use.
+  </p>
+</details>
 
-`--change-detection` (`-cd`) Specifies the change detection strategy.
+<details>
+  <summary>change-detection</summary>
+  <p>
+    <code>--change-detection</code> (aliases: <code>-cd</code>)
+  </p>
+  <p>
+    Specifies the change detection strategy.
+  </p>
+</details>
 
-`--flat` Flag to indicate if a dir is created.
+<details>
+  <summary>flat</summary>
+  <p>
+    <code>--flat</code> <em>default value: false</em>
+  </p>
+  <p>
+    Flag to indicate if a dir is created.
+  </p>
+</details>
 
-`--export` Specifies if declaring module exports the component.
+<details>
+  <summary>export</summary>
+  <p>
+    <code>--export</code> <em>default value: false</em>
+  </p>
+  <p>
+    Specifies if declaring module exports the component.
+  </p>
+</details>
 
-`--inline-style` (`-is`) Specifies if the style will be in the ts file.
+<details>
+  <summary>inline-style</summary>
+  <p>
+    <code>--inline-style</code> (aliases: <code>-is</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Specifies if the style will be in the ts file.
+  </p>
+</details>
 
-`--inline-template` (`-it`) Specifies if the template will be in the ts file.
+<details>
+  <summary>inline-template</summary>
+  <p>
+    <code>--inline-template</code> (aliases: <code>-it</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Specifies if the template will be in the ts file.
+  </p>
+</details>
 
-`--module` (`-m`) Allows specification of the declaring module.
+<details>
+  <summary>module</summary>
+  <p>
+    <code>--module</code> (aliases: <code>-m</code>)
+  </p>
+  <p>
+    Allows specification of the declaring module's file name (e.g `app.module.ts`).
+  </p>
+</details>
 
-`--prefix` Specifies whether to use the prefix.
+<details>
+  <summary>prefix</summary>
+  <p>
+    <code>--prefix</code>
+  </p>
+  <p>
+    Specifies whether to use the prefix.
+  </p>
+</details>
 
-`--skip-import` Allows for skipping the module import.
+<details>
+  <summary>skip-import</summary>
+  <p>
+    <code>--skip-import</code> <em>default value: false</em>
+  </p>
+  <p>
+    Allows for skipping the module import.
+  </p>
+</details>
 
-`--spec` Specifies if a spec file is generated.
+<details>
+  <summary>spec</summary>
+  <p>
+    <code>--spec</code>
+  </p>
+  <p>
+    Specifies if a spec file is generated.
+  </p>
+</details>
 
-`--view-encapsulation` (`-ve`) Specifies the view encapsulation strategy.
+<details>
+  <summary>view-encapsulation</summary>
+  <p>
+    <code>--view-encapsulation</code> (aliases: <code>-ve</code>)
+  </p>
+  <p>
+    Specifies the view encapsulation strategy.
+  </p>
+</details>

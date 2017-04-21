@@ -11,9 +11,8 @@ CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/)
 
 ## Note
 
-The CLI is now in Release Candidate (RC).
-If you are updating from a beta version, check out our [RC Update Guide]
-(https://github.com/angular/angular-cli/wiki/stories-rc-update).
+The CLI is now in 1.0.
+If you are updating from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
 
 If you wish to collaborate, check out [our issue list](https://github.com/angular/angular-cli/issues).
 
@@ -31,7 +30,7 @@ with NPM 3 or higher.
 * [Generating a New Project](#generating-and-serving-an-angular-project-via-a-development-server)
 * [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
 * [Updating Angular CLI](#updating-angular-cli)
-* [Development Hints for hacking on Angular CLI](#development-hints-for-hacking-on-angular-cli)
+* [Development Hints for working on Angular CLI](#development-hints-for-working-on-angular-cli)
 * [Documentation](#documentation)
 * [License](#license)
 
@@ -83,15 +82,16 @@ You can find all possible blueprints in the table below:
 
 Scaffold  | Usage
 ---       | ---
-Component | `ng g component my-new-component`
-Directive | `ng g directive my-new-directive`
-Pipe      | `ng g pipe my-new-pipe`
-Service   | `ng g service my-new-service`
-Class     | `ng g class my-new-class`
-Guard     | `ng g guard my-new-guard`
-Interface | `ng g interface my-new-interface`
-Enum      | `ng g enum my-new-enum`
-Module    | `ng g module my-module`
+[Component](https://github.com/angular/angular-cli/wiki/generate-component) | `ng g component my-new-component`
+[Directive](https://github.com/angular/angular-cli/wiki/generate-directive) | `ng g directive my-new-directive`
+[Pipe](https://github.com/angular/angular-cli/wiki/generate-pipe)           | `ng g pipe my-new-pipe`
+[Service](https://github.com/angular/angular-cli/wiki/generate-service)     | `ng g service my-new-service`
+[Class](https://github.com/angular/angular-cli/wiki/generate-class)         | `ng g class my-new-class`
+[Guard](https://github.com/angular/angular-cli/wiki/generate-guard)         | `ng g guard my-new-guard`
+[Interface](https://github.com/angular/angular-cli/wiki/generate-interface) | `ng g interface my-new-interface`
+[Enum](https://github.com/angular/angular-cli/wiki/generate-enum)           | `ng g enum my-new-enum`
+[Module](https://github.com/angular/angular-cli/wiki/generate-module)       | `ng g module my-module`
+
 
 ### Updating Angular CLI
 
@@ -117,10 +117,12 @@ npm install --save-dev @angular/cli@latest
 npm install
 ```
 
+If you are updating to 1.0 from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
+
 You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
 
 
-## Development Hints for hacking on Angular CLI
+## Development Hints for working on Angular CLI
 
 ### Working with master
 
@@ -132,6 +134,9 @@ npm link
 
 `npm link` is very similar to `npm install -g` except that instead of downloading the package
 from the repo, the just cloned `angular-cli/` folder becomes the global package.
+Additionally, this repository publishes several packages and we use special logic to load all of them
+on development setups.
+
 Any changes to the files in the `angular-cli/` folder will immediately affect the global `@angular/cli` package,
 allowing you to quickly test any changes you make to the cli project.
 
@@ -154,6 +159,12 @@ You can also use `ng new foo --link-cli` to automatically link the `@angular/cli
 
 Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
+
+To run the Angular CLI test suite use the `node tests/run_e2e.js` command.
+It can also receive a filename to only run that test (e.g. `node tests/run_e2e.js tests/e2e/tests/build/dev-build.ts`).
+
+As part of the test procedure, all packages will be built and linked.
+You will need to re-run `npm link` to re-link the development Angular CLI environment after tests finish.
 
 
 ## Documentation

@@ -6,23 +6,13 @@ export default function () {
     .then(() => ng('set', 'lint', '[]'))
     .then(() => ng('lint'))
     .then(({ stdout }) => {
-      if (!stdout.match(/No lint config\(s\) found\./)) {
+      if (!stdout.match(/No lint configuration\(s\) found\./)) {
         throw new Error(oneLine`
-          Expected to match "No lint configs found."
+          Expected to match "No lint configuration(s) found."
           in ${stdout}.
         `);
       }
 
       return stdout;
-    })
-    .then((output) => {
-      if (!output.match(/If this is not intended, run "ng update"\./)) {
-        throw new Error(oneLine`
-          Expected to match "If this is not intended, run "ng update"."
-          in ${output}.
-        `);
-      }
-
-      return output;
     });
 }

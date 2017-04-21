@@ -2,6 +2,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
+import * as SourceMap from 'source-map';
 
 const {__NGTOOLS_PRIVATE_API_2} = require('@angular/compiler-cli');
 const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
@@ -34,6 +35,9 @@ export interface AotPluginOptions {
   exclude?: string | string[];
   compilerOptions?: ts.CompilerOptions;
 }
+
+
+const inlineSourceMapRe = /\/\/# sourceMappingURL=data:application\/json;base64,([\s\S]+)$/;
 
 
 export class AotPlugin implements Tapable {
@@ -109,12 +113,15 @@ export class AotPlugin implements Tapable {
       basePath = path.resolve(process.cwd(), options.basePath);
     }
 
-    let tsConfigJson: any = null;
-    try {
-      tsConfigJson = JSON.parse(ts.sys.readFile(this._tsConfigPath));
-    } catch (err) {
-      throw new Error(`An error happened while parsing ${this._tsConfigPath} JSON: ${err}.`);
+    const configResult = ts.readConfigFile(this._tsConfigPath, ts.sys.readFile);
+    if (configResult.error) {
+      const diagnostic = configResult.error;
+      const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+      const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+      throw new Error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`);
     }
+
+    const tsConfigJson = configResult.config;
 
     if (options.hasOwnProperty('compilerOptions')) {
       tsConfigJson.compilerOptions = Object.assign({},
@@ -342,6 +349,30 @@ export class AotPlugin implements Tapable {
     });
   }
 
+  private _translateSourceMap(sourceText: string, fileName: string,
+                              {line, character}: {line: number, character: number}) {
+    const match = sourceText.match(inlineSourceMapRe);
+
+    if (!match) {
+      return {line, character, fileName};
+    }
+
+    // On any error, return line and character.
+    try {
+      const sourceMapJson = JSON.parse(Buffer.from(match[1], 'base64').toString());
+      const consumer = new SourceMap.SourceMapConsumer(sourceMapJson);
+
+      const original = consumer.originalPositionFor({ line, column: character });
+      return {
+        line: typeof original.line == 'number' ? original.line : line,
+        character: typeof original.column == 'number' ? original.column : character,
+        fileName: original.source || fileName
+      };
+    } catch (e) {
+      return {line, character, fileName};
+    }
+  }
+
   diagnose(fileName: string) {
     if (this._diagnoseFiles[fileName]) {
       return;
@@ -349,9 +380,9 @@ export class AotPlugin implements Tapable {
     this._diagnoseFiles[fileName] = true;
 
     const sourceFile = this._program.getSourceFile(fileName);
-      if (!sourceFile) {
-        return;
-      }
+    if (!sourceFile) {
+      return;
+    }
 
     const diagnostics: ts.Diagnostic[] = []
       .concat(
@@ -362,14 +393,25 @@ export class AotPlugin implements Tapable {
       );
 
     if (diagnostics.length > 0) {
-      const message = diagnostics
-        .map(diagnostic => {
-          const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-          const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-          return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
-        })
-        .join('\n');
-      this._compilation.errors.push(message);
+      diagnostics.forEach(diagnostic => {
+        const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+
+        const sourceText = diagnostic.file.getFullText();
+        let {line, character, fileName} = this._translateSourceMap(sourceText,
+          diagnostic.file.fileName, position);
+
+        const messageText = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+        const message = `${fileName} (${line + 1},${character + 1}): ${messageText}`;
+
+        switch (diagnostic.category) {
+          case ts.DiagnosticCategory.Error:
+            this._compilation.errors.push(message);
+            break;
+
+          default:
+            this._compilation.warnings.push(message);
+        }
+      });
     }
   }
 
@@ -404,6 +446,15 @@ export class AotPlugin implements Tapable {
         });
       })
       .then(() => {
+        // Get the ngfactory that were created by the previous step, and add them to the root
+        // file path (if those files exists).
+        const newRootFilePath = this._compilerHost.getChangedFilePaths()
+          .filter(x => x.match(/\.ngfactory\.ts$/));
+        // Remove files that don't exist anymore, and add new files.
+        this._rootFilePath = this._rootFilePath
+          .filter(x => this._compilerHost.fileExists(x))
+          .concat(newRootFilePath);
+
         // Create a new Program, based on the old one. This will trigger a resolution of all
         // transitive modules, which include files that might just have been generated.
         // This needs to happen after the code generator has been created for generated files

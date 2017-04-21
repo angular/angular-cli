@@ -5,7 +5,7 @@
 const chalk = require('chalk');
 const fs = require('fs');
 const glob = require('glob');
-const packages = require('../../lib/packages');
+const packages = require('../../lib/packages').packages;
 const path = require('path');
 
 

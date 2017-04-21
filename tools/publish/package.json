@@ -1,0 +1,33 @@
+{
+  "name": "publish",
+  "version": "0.0.0",
+  "description": "Tool for managing releases in the CLI.",
+  "main": "./src/main.js",
+  "keywords": [
+    "angular",
+    "cli",
+    "tool",
+    "project management",
+    "publish"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "author": "angular",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "engines": {
+    "node": ">= 6.1.0",
+    "npm": ">= 3.0.0"
+  },
+  "dependencies": {
+    "@angular/core": "^2.4.0",
+    "@ngtools/logger": "^1.0.0",
+    "chalk": "^1.1.3",
+    "minimist": "^1.2.0"
+  }
+}
