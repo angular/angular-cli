@@ -1,12 +1,8 @@
 import { ng } from '../../utils/process';
-import { expectToFail } from '../../utils/utils';
 import { writeMultipleFiles, createDir } from '../../utils/fs';
-import { killAllProcesses } from '../../utils/process';
 
 export default function () {
   return Promise.resolve()
-    .then(() => ng('test', '--single-run', '--app=0'))
-    .then(() => expectToFail(() => ng('test', '--single-run', '--app=1')))
     .then(() => createDir('src/app1'))
     .then(() => writeMultipleFiles({
       '.angular-cli.json': MULTI_APP_JSON,
@@ -19,11 +15,7 @@ export default function () {
       'src/app1/app1.component.ts': APP2_COMPONENT,
       'src/app1/app1.module.ts': APP2_MODULE,
     }))
-    .then(() => ng('test', '--single-run', '--app=1'))
-    .then(() => killAllProcesses(), (err: any) => {
-      killAllProcesses();
-      throw err;
-    });;
+    .then(() => ng('test', '--single-run', '--app=1'));
 }
 
 const APP2_CSS = '';
@@ -95,7 +87,8 @@ import { AppComponent } from './app1.component';
 export class AppModule { }
 `;
 
-const APP2_TEST = `// This file is required by karma.conf.js and loads recursively all the .spec and framework files
+const APP2_TEST = `// This file is required by karma.conf.js
+// and loads recursively all the .spec and framework files
 
 import 'zone.js/dist/long-stack-trace-zone';
 import 'zone.js/dist/proxy.js';
@@ -228,8 +221,12 @@ const MULTI_APP_JSON = `{
       "index": "index.html",
       "main": "main2.ts",
       "polyfills": "polyfills.ts",
-      "test": "test2.ts",
-      "karma": "karma2.conf.js",
+      "test": {
+        "input": "test2.ts",
+        "karma": {
+          "config": "./karma2.conf.js"
+        }
+      },
       "tsconfig": "tsconfig.app.json",
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",

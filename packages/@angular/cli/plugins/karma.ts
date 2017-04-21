@@ -116,7 +116,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
 
   // Remove the @angular/cli test file if present, for backwards compatibility.
-  const testFilePath = path.join(appRoot, appConfig.test);
+  const testFilePath = path.join(appRoot, appConfig.test.input || appConfig.test);
   config.files.forEach((file: any, index: number) => {
     if (path.normalize(file.pattern) === testFilePath) {
       config.files.splice(index, 1);

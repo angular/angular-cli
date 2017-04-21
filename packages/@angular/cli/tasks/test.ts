@@ -19,10 +19,14 @@ export default Task.extend({
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }
 
+    let appKarmaConfig = CliConfig.getValue('test.karma.config');
+    if (app.test.karma && app.test.karma.config ) {
+      appKarmaConfig = app.test.karma.config;
+    }
+
     return new Promise((resolve) => {
       const karma = requireProjectModule(projectRoot, 'karma');
-      const karmaConfig = path.join(projectRoot, options.config || app.karma ||
-        CliConfig.getValue('test.karma.config'));
+      const karmaConfig = path.join(projectRoot, options.config || appKarmaConfig);
 
       let karmaOptions: any = Object.assign({}, options);
 
