@@ -231,7 +231,17 @@ export default Blueprint.extend({
           path.relative(this.project.root, this.pathToModule));
         return;
       }
-      const preChange = fs.readFileSync(this.pathToModule, 'utf8');
+
+      let preChange: any;
+      try {
+         preChange = fs.readFileSync(this.pathToModule, 'utf8');
+      } catch (err) {
+        if (err.code === 'EISDIR') {
+          throw 'Module specified should be a file, not a directory';
+        } else {
+          throw err;
+        }
+      }
 
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
