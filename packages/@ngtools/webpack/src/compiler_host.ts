@@ -117,11 +117,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _resolve(path: string) {
     path = this._normalizePath(path);
     if (path[0] == '.') {
-      return join(this.getCurrentDirectory(), path);
+      return this._normalizePath(join(this.getCurrentDirectory(), path));
     } else if (path[0] == '/' || path.match(/^\w:\//)) {
       return path;
     } else {
-      return join(this._basePath, path);
+      return this._normalizePath(join(this._basePath, path));
     }
   }
 
