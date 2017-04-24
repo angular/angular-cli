@@ -82,8 +82,8 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
   return {
     entry: entryPoints,
     plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('production')
+      new webpack.EnvironmentPlugin({
+        'NODE_ENV': 'production'
       }),
       new (<any>webpack).HashedModuleIdsPlugin(),
       new webpack.optimize.UglifyJsPlugin(<any>{

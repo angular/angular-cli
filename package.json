@@ -125,7 +125,7 @@
     "@types/rimraf": "0.0.28",
     "@types/semver": "^5.3.30",
     "@types/source-map": "^0.5.0",
-    "@types/webpack": "^2.2.4",
+    "@types/webpack": "^2.2.15",
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
     "dtsgenerator": "^0.9.1",
