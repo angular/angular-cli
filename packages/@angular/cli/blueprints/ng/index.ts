@@ -84,6 +84,7 @@ export default Blueprint.extend({
       fileList = fileList
         .filter(p => p.indexOf('protractor.conf.js') < 0)
         .filter(p => p.indexOf('app.po.ts') < 0)
+        .filter(p => p.indexOf('tsconfig.e2e.json') < 0)
         .filter(p => p.indexOf('app.e2e-spec.ts') < 0);
     }
 
