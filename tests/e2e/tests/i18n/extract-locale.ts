@@ -15,7 +15,7 @@ export default function() {
     .then((output) => {
       if (!output.stdout.match(/starting from Angular v4/)) {
         expectFileToExist(join('src', 'messages.xlf'));
-        expectFileToMatch(join('src', 'messages.xlf'), /source-language="fr"/)
+        expectFileToMatch(join('src', 'messages.xlf'), /source-language="fr"/);
       }
     });
 }
