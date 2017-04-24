@@ -22,7 +22,6 @@
       "es6"
     ],
     "types": [
-      "jasmine",
       "node"
     ]
   },
