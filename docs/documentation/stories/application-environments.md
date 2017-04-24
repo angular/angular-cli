@@ -1,4 +1,4 @@
-# Handling environment variables
+# Application Environments
 
 ## Configuring available environments
 
@@ -11,12 +11,12 @@
 }
 ```
 
-You can add additional environments as required.  To add a **test** environment, your configuration would look like:
+You can add additional environments as required.  To add a **staging** environment, your configuration would look like:
 
 ``` json
 "environments": {
     "dev": "environments/environment.ts",
-    "test": "environments/environment.test.ts",
+    "staging": "environments/environment.staging.ts",
     "prod": "environments/environment.prod.ts"
 }
 ```
@@ -32,13 +32,13 @@ The environment-specific files are set out as shown below:
         └── environment.ts
 ```
 
-If you wanted to add another environment for **test**, your file structure would become:
+If you wanted to add another environment for **staging**, your file structure would become:
 
 ```
 └── src
     └── environments
         ├── environment.prod.ts
-        ├── environment.test.ts
+        ├── environment.staging.ts
         └── environment.ts
 ```
 
@@ -71,16 +71,36 @@ export const environment = {
 
 ## Using environment-specific variables in your application
 
-Simply import the environment into your file, for example:
+Given the following application structure:
 
-``` TypeScript
-import { environment } from './../../environments/environment';
+```
+└── src
+    └── app
+        ├── app.component.html
+        └── app.component.ts
+    └── environments
+        ├── environment.prod.ts
+        ├── environment.staging.ts
+        └── environment.ts
 ```
 
-And later in your code:
+Using environment variables inside of `app.component.ts` might look something like this:
 
 ``` TypeScript
-console.log(environment.production); // Logs false for default environment
+import { Component } from '@angular/core';
+import { environment } from './../environments/environment';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  constructor() {
+    console.log(environment.production); // Logs false for default environment
+  }
+  title = 'app works!';
+}
 ```
 
 ## Environment-specific builds
@@ -96,7 +116,7 @@ Will use the defaults found in `environment.ts`
 Running:
 
 ```
-ng build --env=test
+ng build --env=staging
 ```
 
-Will use the values from `environment.test.ts`
+Will use the values from `environment.staging.ts`
