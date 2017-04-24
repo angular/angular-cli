@@ -109,6 +109,13 @@ const NewCommand = Command.extend({
       description: 'Generate a routing module.'
     },
     {
+      name: 'animation',
+      type: Boolean,
+      default: false,
+      aliases: ['a'],
+      description: 'Generate with animation support.'
+    },
+    {
       name: 'inline-style',
       type: Boolean,
       default: false,
