@@ -126,8 +126,8 @@ class JsonWebpackSerializer {
     });
   }
 
-  _definePlugin(plugin: any) {
-    return plugin.definitions;
+  _environmentPlugin(plugin: any) {
+    return plugin.defaultValues;
   }
 
   private _pluginsReplacer(plugins: any[]) {
@@ -172,9 +172,9 @@ class JsonWebpackSerializer {
           args = this._htmlWebpackPlugin(plugin);
           this.variableImports['html-webpack-plugin'] = 'HtmlWebpackPlugin';
           break;
-        case webpack.DefinePlugin:
-          args = this._definePlugin(plugin);
-          this._addImport('webpack', 'DefinePlugin');
+        case webpack.EnvironmentPlugin:
+          args = this._environmentPlugin(plugin);
+          this._addImport('webpack', 'EnvironmentPlugin');
           break;
 
         default:
