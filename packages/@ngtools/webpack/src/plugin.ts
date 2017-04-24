@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import * as SourceMap from 'source-map';
 
-const {__NGTOOLS_PRIVATE_API_2} = require('@angular/compiler-cli');
+const {__NGTOOLS_PRIVATE_API_2, VERSION} = require('@angular/compiler-cli');
 const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 
 import {WebpackResourceLoader} from './resource_loader';
@@ -31,6 +31,7 @@ export interface AotPluginOptions {
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
+  missingTranslation?: string;
 
   // Use tsconfig to include path globs.
   exclude?: string | string[];
@@ -68,6 +69,7 @@ export class AotPlugin implements Tapable {
   private _i18nFile: string;
   private _i18nFormat: string;
   private _locale: string;
+  private _missingTranslation: string;
 
   private _diagnoseFiles: { [path: string]: boolean } = {};
   private _firstRun = true;
@@ -97,6 +99,7 @@ export class AotPlugin implements Tapable {
   get i18nFile() { return this._i18nFile; }
   get i18nFormat() { return this._i18nFormat; }
   get locale() { return this._locale; }
+  get missingTranslation() { return this._missingTranslation; }
   get firstRun() { return this._firstRun; }
   get lazyRoutes() { return this._lazyRoutes; }
   get discoveredLazyRoutes() { return this._discoveredLazyRoutes; }
@@ -245,6 +248,15 @@ export class AotPlugin implements Tapable {
     }
     if (options.hasOwnProperty('replaceExport')) {
       this._replaceExport = options.replaceExport || this._replaceExport;
+    }
+    if (options.hasOwnProperty('missingTranslation')) {
+      const [MAJOR, MINOR, PATCH] = VERSION.full.split('.').map((x: string) => parseInt(x, 10));
+      if (MAJOR < 4 || (MINOR == 2 && PATCH < 2)) {
+        console.warn((`The --missing-translation parameter will be ignored because it is only `
+          + `compatible with Angular version 4.2.0 or higher. If you want to use it, please `
+          + `upgrade your Angular version.\n`));
+      }
+      this._missingTranslation = options.missingTranslation;
     }
   }
 
@@ -483,6 +495,7 @@ export class AotPlugin implements Tapable {
           i18nFile: this.i18nFile,
           i18nFormat: this.i18nFormat,
           locale: this.locale,
+          missingTranslation: this.missingTranslation,
 
           readResource: (path: string) => this._resourceLoader.get(path)
         });
