@@ -1,4 +1,5 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';<% if (animation) { %>
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';<% } %>
 import { NgModule } from '@angular/core';
 <% if (routing) { %>
 import { AppRoutingModule } from './app-routing.module';<% } %>
@@ -9,7 +10,8 @@ import { AppComponent } from './app.component';
     AppComponent
   ],
   imports: [
-    BrowserModule<% if (routing) { %>,
+    BrowserModule<% if (animation) { %>,
+    BrowserAnimationsModule<% } %><% if (routing) { %>,
     AppRoutingModule<% } %>
   ],
   providers: [],

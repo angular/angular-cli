@@ -1,13 +1,21 @@
 import { TestBed, async } from '@angular/core/testing';<% if (routing) { %>
-import { RouterTestingModule } from '@angular/router/testing';<% } %>
+import { RouterTestingModule } from '@angular/router/testing';<% } %><% if (animation) { %>
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';<% } %>
 
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
-    TestBed.configureTestingModule({<% if (routing) { %>
+    TestBed.configureTestingModule({<% if (routing && animation) { %>
+      imports: [
+        RouterTestingModule,
+        NoopAnimationsModule
+      ],<% } %><% if (routing && !animation) { %>
       imports: [
         RouterTestingModule
+      ],<% } %><% if (animation && !routing) { %>
+      imports: [
+        NoopAnimationsModule
       ],<% } %>
       declarations: [
         AppComponent
