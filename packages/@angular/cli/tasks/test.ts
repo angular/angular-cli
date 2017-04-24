@@ -13,6 +13,10 @@ export default Task.extend({
     const projectConfig = CliConfig.fromProject().config;
     const projectRoot = this.project.root;
 
+    if (!projectConfig.test) {
+      throw new SilentError('Project doesn\'t seems to have test configured.');
+    }
+
     if (projectConfig.project && projectConfig.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }

@@ -77,7 +77,11 @@ export default Blueprint.extend({
     }
 
     if (this.options && this.options.skipTests) {
-      fileList = fileList.filter(p => p.indexOf('app.component.spec.ts') < 0);
+      fileList = fileList
+        .filter(p => p.indexOf('app.component.spec.ts') < 0)
+        .filter(p => p.indexOf('test.ts') < 0)
+        .filter(p => p.indexOf('karma.conf.js') < 0)
+        .filter(p => p.indexOf('tsconfig.spec.json') < 0);
     }
 
     if (this.options && this.options.skipE2e) {
