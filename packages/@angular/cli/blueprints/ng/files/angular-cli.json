@@ -13,10 +13,10 @@
       ],
       "index": "index.html",
       "main": "main.ts",
-      "polyfills": "polyfills.ts",
-      "test": "test.ts",
-      "tsconfig": "tsconfig.app.json",
-      "testTsconfig": "tsconfig.spec.json",
+      "polyfills": "polyfills.ts",<% if(tests) { %>
+      "test": "test.ts",<% } %>
+      "tsconfig": "tsconfig.app.json",<% if(tests) { %>
+      "testTsconfig": "tsconfig.spec.json",<% } %>
       "prefix": "<%= prefix %>",
       "styles": [
         "styles.<%= styleExt %>"
@@ -37,19 +37,19 @@
   "lint": [
     {
       "project": "<%= sourceDir %>/tsconfig.app.json"
-    },
+    },<% if(tests) { %>
     {
       "project": "<%= sourceDir %>/tsconfig.spec.json"
-    },
+    },<% } %>
     {
       "project": "e2e/tsconfig.e2e.json"
     }
-  ],
+  ],<% if(tests) { %>
   "test": {
     "karma": {
       "config": "./karma.conf.js"
     }
-  },
+  },<% } %>
   "defaults": {
     "styleExt": "<%= styleExt %>",
     "component": {}
