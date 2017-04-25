@@ -71,6 +71,17 @@ export function createDir(path: string) {
   _recursiveMkDir(path);
 }
 
+export function rename(from: string, to: string) {
+  return new Promise((resolve, reject) => {
+      fs.rename(from, to, (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+  });
+}
 
 function _recursiveMkDir(path: string) {
   if (fs.existsSync(path)) {
