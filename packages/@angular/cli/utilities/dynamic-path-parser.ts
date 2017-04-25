@@ -6,7 +6,7 @@ const stringUtils = require('ember-cli-string-utils');
 export function dynamicPathParser(project: any, entityName: string, appConfig: any) {
   const projectRoot = project.root;
   const sourceDir = appConfig.root;
-  const appRoot = path.join(sourceDir, 'app');
+  const appRoot = path.join(sourceDir, appConfig.appRoot || 'app');
   const cwd = process.env.PWD;
 
   const rootPath = path.join(projectRoot, appRoot);
