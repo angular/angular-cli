@@ -89,9 +89,7 @@ const E2eCommand = Command.extend({
     if (!commandOptions.config) {
       const e2eConfig = CliConfig.fromProject().config.e2e;
 
-      if (!e2eConfig) {
-        throw new SilentError('No e2e config found in .angular-cli.json.');
-      } else if (!e2eConfig.protractor.config) {
+      if (!e2eConfig.protractor.config) {
         throw new SilentError('No protractor config found in .angular-cli.json.');
       }
 

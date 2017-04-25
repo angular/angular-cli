@@ -28,22 +28,22 @@
         "prod": "environments/environment.prod.ts"
       }
     }
-  ],<% if(e2e) { %>
+  ],
   "e2e": {
     "protractor": {
       "config": "./protractor.conf.js"
     }
-  },<% } %>
+  },
   "lint": [
     {
       "project": "<%= sourceDir %>/tsconfig.app.json"
     },
     {
       "project": "<%= sourceDir %>/tsconfig.spec.json"
-    }<% if(e2e) { %>,
+    },
     {
       "project": "e2e/tsconfig.e2e.json"
-    }<% } %>
+    }
   ],
   "test": {
     "karma": {
