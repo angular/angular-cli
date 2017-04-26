@@ -4,15 +4,22 @@ This is an ASP.NET Core Engine for running Angular Apps on the server for server
 
 ---
 
+## Installation
+
+```bash
+npm i --S @nguniversal/aspnetcore-engine
+# or yarn install
+```
+
 ## Example Application utilizing this Engine
 
 #### [Asp.net Core & Angular advanced starter application](https://github.com/MarkPieszak/aspnetcore-angular2-universal)
 
 # Usage
 
-> Things have changed since the previous ASP.NET Core & Angular Universal useage. We're no longer using TagHelpers, but now invoking the **boot-server** file from the **Home Controller** *itself*, and passing all the data down to .NET.
+> Things have changed since the previous ASP.NET Core & Angular Universal useage. We're no longer using TagHelpers, but now invoking the **main.server** file from the **Home Controller** *itself*, and passing all the data down to .NET.
 
-Within our boot-server file, things haven't changed much, you still have your `createServerRenderer()` function that's being exported (this is what's called within the Node process) which is expecting a `Promise` to be returned.
+Within our main.server file, things haven't changed much, you still have your `createServerRenderer()` function that's being exported (this is what's called within the Node process) which is expecting a `Promise` to be returned.
 
 Within that promise we simply call the ngAspnetCoreEngine itself, passing in our providers Array (here we give it the current `url` from the Server, and also our Root application, which in our case is just `<app></app>`).
 
@@ -30,7 +37,7 @@ import { createServerRenderer, RenderResult } from 'aspnet-prerendering';
 // Grab the (Node) server-specific NgModule
 import { AppServerModule } from './app/app.server.module';
 // ***** The ASPNETCore Angular Engine *****
-import { ngAspnetCoreEngine } from '@universal/ng-aspnetcore-engine';
+import { ngAspnetCoreEngine } from '@nguniversal/aspnetcore-engine';
 
 enableProdMode(); // for faster server rendered builds
 
@@ -84,11 +91,11 @@ export default createServerRenderer(params => {
 
 # What about on the .NET side?
 
-Previously, this was all done with TagHelpers and you passed in your boot-server file to it: `<app asp-prerender-module="dist/boot-server.js"></app>`, but this hindered us from getting the SEO benefits of prerendering.
+Previously, this was all done with TagHelpers and you passed in your main.server file to it: `<app asp-prerender-module="dist/main.server.js"></app>`, but this hindered us from getting the SEO benefits of prerendering.
 
 Because .NET has control over the Html, using the ngAspnetCoreEngine, we're able to *pull out the important pieces*, and give them back to .NET to place them through out the View.
 
-Below is how you can invoke the boot-server file which gets everything started:
+Below is how you can invoke the main.server file which gets everything started:
 
 > Hopefully in the future this will be cleaned up and less code as well.
 
@@ -138,7 +145,7 @@ namespace WebApplicationBasic.Controllers
                 new JavaScriptModuleExport(applicationBasePath + "/ClientApp/dist/main-server"),
                 unencodedAbsoluteUrl,
                 unencodedPathAndQuery,
-                // Our Transfer data here will be passed down to Angular (within the boot-server file)
+                // Our Transfer data here will be passed down to Angular (within the main.server file)
                 // Available there via `params.data.yourData`
                 transferData, 
                 30000, // timeout duration
@@ -292,7 +299,7 @@ ORIGIN_URL
 REQUEST
 
 // imported 
-import { ORIGIN_URL, REQUEST } from '@ng-universal/ng-aspnetcore-engine';
+import { ORIGIN_URL, REQUEST } from '@nguniversal/aspnetcore-engine';
 ```
 
 Make sure in your BrowserModule you provide these tokens as well, if you're going to use them!
@@ -318,7 +325,7 @@ Make sure in your BrowserModule you provide these tokens as well, if you're goin
 Don't forget that the server needs Absolute URLs for paths when doing Http requests! So if your server api is at the same location as this Angular app, you can't just do `http.get('/api/whatever')` so use the ORIGIN_URL Injection Token.
 
 ```typescript
-  import { ORIGIN_URL } from '@ng-universal/ng-aspnetcore-engine';
+  import { ORIGIN_URL } from '@nguniversal/aspnetcore-engine';
 
   constructor(@Inject(ORIGIN_URL) private originUrl: string, private http: Http) {
     this.http.get(`${this.originUrl}/api/whatever`)
@@ -328,7 +335,7 @@ Don't forget that the server needs Absolute URLs for paths when doing Http reque
 As for the REQUEST object, you'll find Cookies, Headers, and Host (from .NET that we passed down in our HomeController. They'll all be accessible from that Injection Token as well.
 
 ```typescript
-  import { REQUEST } from '@ng-universal/ng-aspnetcore-engine';
+  import { REQUEST } from '@nguniversal/aspnetcore-engine';
 
   constructor(@Inject(REQUEST) private request) { 
     // this.request.cookies

@@ -2,7 +2,7 @@
   "name": "angular2-universal",
   "main": "index.js",
   "version": "2.0.11",
-  "description": "Universal (isomorphic) javascript support for Angular2",
+  "description": "Universal (isomorphic) javascript support for Angular2+",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
   "contributors": [
@@ -61,6 +61,7 @@
     "ngc": "ngc",
     "jasmine": "jasmine",
     "build:ng-express-engine": "tsc -p modules/ng-express-engine/tsconfig.json",
+    "build:ng-aspnetcore-engine": "tsc -p modules/ng-aspnetcore-engine/tsconfig.json",
     "build": "./build.sh",
     "test": "exit 0"
   },
