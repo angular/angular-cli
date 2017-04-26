@@ -39,11 +39,11 @@ module.exports = function(commitSubject, branch) {
 
   const type = match[2];
   const types = Object.keys(config['types']);
-  if (!(type in types)) {
-    error(`${type} is not an allowed type.\n => TYPES: ${types.join(', ')}`, commitSubject);
+  if (types.indexOf(type) === -1) {
+    error(`"${type}" is not an allowed type.\n => TYPES: "${types.join('", "')}"`, commitSubject);
     return false;
   }
-  if (types[type] !== "" && types[type] !== branch) {
+  if (config['types'][type] !== '' && config['types'][type] !== branch) {
     error(`${type} is not allowed to be on branch ${branch}.`, commitSubject);
     return false;
   }
