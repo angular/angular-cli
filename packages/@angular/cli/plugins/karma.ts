@@ -1,13 +1,17 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as glob from 'glob';
+import * as webpack from 'webpack';
+const webpackDevMiddleware = require('webpack-dev-middleware');
 
 import { Pattern } from './glob-copy-webpack-plugin';
-import { extraEntryParser } from '../models/webpack-configs/utils';
 import { WebpackTestConfig, WebpackTestOptions } from '../models/webpack-test-config';
 import { KarmaWebpackThrowError } from './karma-webpack-throw-error';
 
 const getAppFromConfig = require('../utilities/app-utils').getAppFromConfig;
+
+let blocked: any[] = [];
+let isBlocked = false;
 
 function isDirectory(path: string) {
   try {
@@ -40,7 +44,7 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
   }
 }
 
-const init: any = (config: any) => {
+const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   const appConfig = getAppFromConfig(config.angularCli.app);
   const appRoot = path.join(config.basePath, appConfig.root);
   const testConfig: WebpackTestOptions = Object.assign({
@@ -89,6 +93,8 @@ const init: any = (config: any) => {
   const webpackConfig = new WebpackTestConfig(testConfig, appConfig).buildConfig();
   const webpackMiddlewareConfig = {
     noInfo: true, // Hide webpack output because its noisy.
+    watchOptions: { poll: testConfig.poll },
+    publicPath: '/_karma_webpack_/',
     stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.
       assets: false,
       colors: true,
@@ -97,9 +103,6 @@ const init: any = (config: any) => {
       timings: false,
       chunks: false,
       chunkModules: false
-    },
-    watchOptions: {
-      poll: testConfig.poll
     }
   };
 
@@ -108,40 +111,125 @@ const init: any = (config: any) => {
     webpackConfig.plugins.push(new KarmaWebpackThrowError());
   }
 
+  // Use existing config if any.
   config.webpack = Object.assign(webpackConfig, config.webpack);
   config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
 
-  // Replace the @angular/cli preprocessor with webpack+sourcemap.
-  Object.keys(config.preprocessors)
-    .filter((file) => config.preprocessors[file].indexOf('@angular/cli') !== -1)
-    .map((file) => config.preprocessors[file])
-    .map((arr) => arr.splice(arr.indexOf('@angular/cli'), 1, 'webpack', 'sourcemap'));
+  // Remove the @angular/cli test file if present, for backwards compatibility.
+  const testFilePath = path.join(appRoot, appConfig.test);
+  config.files.forEach((file: any, index: number) => {
+    if (path.normalize(file.pattern) === testFilePath) {
+      config.files.splice(index, 1);
+    }
+  });
 
-  // Add global scripts. This logic mimics the one in webpack-configs/common.
-  if (appConfig.scripts && appConfig.scripts.length > 0) {
-    const globalScriptPatterns = extraEntryParser(appConfig.scripts, appRoot, 'scripts')
-      // Neither renamed nor lazy scripts are currently supported
-      .filter(script => !(script.output || script.lazy))
-      .map(script => ({ pattern: path.resolve(appRoot, script.input) }));
-    addKarmaFiles(config.files, globalScriptPatterns, true);
+  // When using code-coverage, auto-add coverage-istanbul.
+  config.reporters = config.reporters || [];
+  if (testConfig.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
+    config.reporters.push('coverage-istanbul');
   }
 
-  // Add polyfills file before everything else
-  if (appConfig.polyfills) {
-    const polyfillsFile = path.resolve(appRoot, appConfig.polyfills);
-    config.preprocessors[polyfillsFile] = ['webpack', 'sourcemap'];
-    addKarmaFiles(config.files, [{ pattern: polyfillsFile }], true);
+  // Our custom context and debug files list the webpack bundles directly instead of using
+  // the karma files array.
+  config.customContextFile = `${__dirname}/karma-context.html`;
+  config.customDebugFile = `${__dirname}/karma-debug.html`;
+
+  // Add the request blocker.
+  config.beforeMiddleware = config.beforeMiddleware || [];
+  config.beforeMiddleware.push('angularCliBlocker');
+
+  // Delete global styles entry, we don't want to load them.
+  delete webpackConfig.entry.styles;
+
+  // The webpack tier owns the watch behavior so we want to force it in the config.
+  webpackConfig.watch = true;
+  // Files need to be served from a custom path for Karma.
+  webpackConfig.output.path = '/_karma_webpack_/';
+  webpackConfig.output.publicPath = '/_karma_webpack_/';
+
+  let compiler: any;
+  try {
+    compiler = webpack(webpackConfig);
+  } catch (e) {
+    console.error(e.stack || e);
+    if (e.details) {
+      console.error(e.details);
+    }
+    throw e;
   }
+
+  ['invalid', 'watch-run', 'run'].forEach(function (name) {
+    compiler.plugin(name, function (_: any, callback: () => void) {
+      isBlocked = true;
+
+      if (typeof callback === 'function') {
+        callback();
+      }
+    });
+  });
+
+  compiler.plugin('done', (stats: any) => {
+    // Don't refresh karma when there are webpack errors.
+    if (stats.compilation.errors.length === 0) {
+      emitter.refreshFiles();
+      isBlocked = false;
+      blocked.forEach((cb) => cb());
+      blocked = [];
+    }
+  });
+
+  const middleware = new webpackDevMiddleware(compiler, webpackMiddlewareConfig);
+
+  // Forward requests to webpack server.
+  customFileHandlers.push({
+    urlRegex: /^\/_karma_webpack_\/.*/,
+    handler: function handler(req: any, res: any) {
+      middleware(req, res, function () {
+        // Ensure script and style bundles are served.
+        // They are mentioned in the custom karma context page and we don't want them to 404.
+        const alwaysServe = [
+          '/_karma_webpack_/inline.bundle.js',
+          '/_karma_webpack_/polyfills.bundle.js',
+          '/_karma_webpack_/scripts.bundle.js',
+          '/_karma_webpack_/vendor.bundle.js',
+        ];
+        if (alwaysServe.indexOf(req.url) != -1) {
+          res.statusCode = 200;
+          res.end();
+        } else {
+          res.statusCode = 404;
+          res.end('Not found');
+        }
+      });
+    }
+  });
+
+  emitter.on('exit', (done: any) => {
+    middleware.close();
+    done();
+  });
 };
 
-init.$inject = ['config'];
+init.$inject = ['config', 'emitter', 'customFileHandlers'];
 
 // Dummy preprocessor, just to keep karma from showing a warning.
 const preprocessor: any = () => (content: any, _file: string, done: any) => done(null, content);
 preprocessor.$inject = [];
 
+// Block requests until the Webpack compilation is done.
+function requestBlocker() {
+  return function (_request: any, _response: any, next: () => void) {
+    if (isBlocked) {
+      blocked.push(next);
+    } else {
+      next();
+    }
+  };
+}
+
 // Also export karma-webpack and karma-sourcemap-loader.
 module.exports = Object.assign({
   'framework:@angular/cli': ['factory', init],
-  'preprocessor:@angular/cli': ['factory', preprocessor]
-}, require('karma-webpack'), require('karma-sourcemap-loader'));
+  'preprocessor:@angular/cli': ['factory', preprocessor],
+  'middleware:angularCliBlocker': ['factory', requestBlocker]
+});

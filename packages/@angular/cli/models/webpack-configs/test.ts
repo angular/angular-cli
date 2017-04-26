@@ -4,7 +4,7 @@ import * as webpack from 'webpack';
 
 import { CliConfig } from '../config';
 import { WebpackTestOptions } from '../webpack-test-config';
-import { KarmaWebpackEmitlessError } from '../../plugins/karma-webpack-emitless-error';
+
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -20,7 +20,9 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
   const configPath = CliConfig.configFilePath();
   const projectRoot = path.dirname(configPath);
   const appConfig = CliConfig.fromProject().config.apps[0];
+  const nodeModules = path.resolve(projectRoot, 'node_modules');
   const extraRules: any[] = [];
+  const extraPlugins: any[] = [];
 
   if (testConfig.codeCoverage && CliConfig.fromProject()) {
     const codeCoverageExclude = CliConfig.fromProject().get('test.codeCoverage.exclude');
@@ -38,7 +40,6 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
       });
     }
 
-
     extraRules.push({
       test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
       enforce: 'post',
@@ -49,17 +50,21 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
   return {
     devtool: testConfig.sourcemaps ? 'inline-source-map' : 'eval',
     entry: {
-      test: path.resolve(projectRoot, appConfig.root, appConfig.test)
+      main: path.resolve(projectRoot, appConfig.root, appConfig.test)
     },
     module: {
       rules: [].concat(extraRules)
     },
     plugins: [
-      new webpack.SourceMapDevToolPlugin({
-        filename: null, // if no value is provided the sourcemap is inlined
-        test: /\.(ts|js)($|\?)/i // process .js and .ts files only
+      new webpack.optimize.CommonsChunkPlugin({
+        minChunks: Infinity,
+        name: 'inline'
       }),
-      new KarmaWebpackEmitlessError()
-    ]
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'vendor',
+        chunks: ['main'],
+        minChunks: (module: any) => module.resource && module.resource.startsWith(nodeModules)
+      })
+    ].concat(extraPlugins)
   };
 }
