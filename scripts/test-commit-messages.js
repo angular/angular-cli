@@ -1,9 +1,15 @@
+'use strict';
+
 require('../lib/bootstrap-local');
 
+const fs = require('fs');
+const path = require('path');
 const validateCommitMessage = require('./validate-commit-message');
-const exec = require('child_process').exec;
+const execSync = require('child_process').execSync;
 const chalk = require('chalk');
 const Logger = require('@ngtools/logger').Logger;
+const configPath = path.resolve(__dirname, './validate-commit-message/commit-message.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 require('rxjs/add/operator/filter');
 
 // Configure logger
@@ -23,39 +29,64 @@ logger.subscribe((entry) => {
 });
 
 logger
-  .filter((entry) => entry.level == 'fatal')
+  .filter((entry) => entry.level === 'fatal')
   .subscribe(() => {
     process.stderr.write('A fatal error happened. See details above.');
     process.exit(1);
   });
 
 // Note: This is based on the gulp task found in the angular/angular repository
+execSync('git fetch origin');
 
-exec(
-  'git fetch origin master:master && git log --reverse --format=%s master.. --no-merges',
-  (error, stdout, stderr) => {
-    if (error) {
-      logger.fatal(stderr);
-      return;
-    }
+// Find the branch
+const branchRefs = {};
+for (const name of config['branches']) {
+  const output = execSync(`git show-ref --hash ${name}`, { encoding: 'utf-8' });
+  if (output) {
+    branchRefs[name] = output;
+  }
+}
+logger.info(`Found refs for branches:\n  ${Object.entries(branchRefs).forEach(([key, value]) => {
+  return `${key} => ${value}`;
+}).join('\n  ')}`);
 
-    const output = stdout.trim();
-    if (output.length == 0) {
-      logger.warn('There are zero new commits between this HEAD and master');
-      return;
-    }
 
-    const commitsByLine = output.split(/\n/);
+const output = execSync('git log --format="%H %s" --no-merges', { encoding: 'utf-8' });
 
-    logger.info(`Examining ${commitsByLine.length} commit(s) between HEAD and master`);
+if (output.length === 0) {
+  logger.warn('There are zero new commits between this HEAD and master');
+  return;
+}
 
-    const someCommitsInvalid = !commitsByLine.every(validateCommitMessage);
+const commitByLines = [];
+let branch = null;
 
-    if (someCommitsInvalid) {
-      logger.error('Please fix the failing commit messages before continuing...');
-      logger.fatal(
-        'Commit message guidelines: https://github.com/angular/angular-cli/blob/master/CONTRIBUTING.md#commit');
-    } else {
-      logger.info('All commit messages are valid.');
-    }
-  });
+// Finding the closest branch marker.
+for (const line of output.split(/n/)) {
+  const [hash, ...messageArray] = line.split(/ /);
+  const message = messageArray.join(' ');
+
+  const maybeBranch = Object.keys(branchRefs).find(branchName => branchRefs[branchName] == hash);
+  if (maybeBranch) {
+    branch = maybeBranch;
+    break;
+  }
+  commitByLines.push(message);
+}
+
+if (!branch) {
+  logger.fatal('Something wrong happened.');
+  return;
+}
+
+logger.info(`Examining ${commitsByLine.length} commit(s) between HEAD and ${branch}`);
+
+const someCommitsInvalid = !commitsByLine.every(validateCommitMessage);
+
+if (someCommitsInvalid) {
+  logger.error('Please fix the failing commit messages before continuing...');
+  logger.fatal(
+    'Commit message guidelines: https://github.com/angular/angular-cli/blob/master/CONTRIBUTING.md#commit');
+} else {
+  logger.info('All commit messages are valid.');
+}
