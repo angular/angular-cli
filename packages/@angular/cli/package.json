@@ -50,8 +50,6 @@
     "inquirer": "^3.0.0",
     "isbinaryfile": "^3.0.0",
     "json-loader": "^0.5.4",
-    "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^2.0.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.2",
     "lodash": "^4.11.1",
@@ -81,6 +79,7 @@
     "url-loader": "^0.5.7",
     "walk-sync": "^0.3.1",
     "webpack": "~2.4.0",
+    "webpack-dev-middleware": "^1.10.2",
     "webpack-dev-server": "~2.4.2",
     "webpack-merge": "^2.4.0",
     "zone.js": "^0.8.4"
