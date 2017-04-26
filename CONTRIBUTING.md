@@ -40,12 +40,21 @@ You can *request* a new feature by [submitting an issue](#submit-issue) to our [
 Repository][github]. If you would like to *implement* a new feature, please submit an issue with
 a proposal for your work first, to be sure that we can use it. Angular CLI is in developer preview
 and we are not ready to accept major contributions ahead of the full release.
-Please consider what kind of change it is:
 
-* For a **Major Feature**, first open an issue and outline your proposal so that it can be
+First open an issue and outline your proposal so that it can be
 discussed. This will also allow us to better coordinate our efforts, prevent duplication of work,
 and help you to craft the change so that it is successfully accepted into the project.
-* **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
+
+**All features require a proper design and review by team members.** Before starting work, you might want to
+discuss with us to figure out:
+
+* Is this something we want? Sometimes people make feature requests that make sense for them, but aren't valuable
+  to the rest of the CLI users, or impede on other people's workflow. We try to always put the greater community
+  first.
+* Is the API valid? Does it change currently existing flags, or add new ones?
+* What's the impact on the rest of the CLI? Does it affect other commands/flags?
+
+Answering those questions first in the request might help us make a decision.
 
 ## <a name="submit"></a> Submission Guidelines
 
