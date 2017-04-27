@@ -161,6 +161,11 @@ export default Task.extend({
 
     webpackDevServerConfiguration.hot = serveTaskOptions.hmr;
 
+    // set publicPath property to be sent on webpack server config
+    if (serveTaskOptions.deployUrl) {
+      webpackDevServerConfiguration.publicPath = serveTaskOptions.deployUrl;
+    }
+
     if (serveTaskOptions.target === 'production') {
       ui.writeLine(chalk.red(stripIndents`
         ****************************************************************************************
