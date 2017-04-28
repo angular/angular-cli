@@ -1,15 +1,19 @@
 {
   "maxLength": 100,
-  "types": [
-    "build",
-    "ci",
-    "docs",
-    "feat",
-    "fix",
-    "perf",
-    "refactor",
-    "style",
-    "test",
-    "tool"
+  "types": {
+    "build": "",
+    "ci": "",
+    "docs": "",
+    "feat": "origin/1.1.x",
+    "fix": "",
+    "perf": "",
+    "refactor": "",
+    "style": "",
+    "test": "",
+    "tool": ""
+  },
+  "branches": [
+    "origin/master",
+    "origin/1.1.x"
   ]
 }
