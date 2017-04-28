@@ -106,16 +106,6 @@ or `ng serve --prod` will also make use of uglifying and tree-shaking functional
 </details>
 
 <details>
-  <summary>output-path</summary>
-  <p>
-    <code>--output-path</code> (aliases: <code>-op</code>)
-  </p>
-  <p>
-    Path where output will be placed
-  </p>
-</details>
-
-<details>
   <summary>environment</summary>
   <p>
     <code>--environment</code> (aliases: <code>-e</code>)

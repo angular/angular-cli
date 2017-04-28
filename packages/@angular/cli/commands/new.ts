@@ -63,13 +63,6 @@ const NewCommand = Command.extend({
       description: 'Skip creating spec files.'
     },
     {
-      name: 'skip-e2e',
-      type: Boolean,
-      default: false,
-      aliases: ['s2'],
-      description: 'Skip creating e2e files.'
-    },
-    {
       name: 'skip-commit',
       type: Boolean,
       default: false,

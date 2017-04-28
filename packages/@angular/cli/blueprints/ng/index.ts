@@ -35,7 +35,6 @@ export default Blueprint.extend({
     // set this.tests to opposite of skipTest options,
     // meaning if tests are being skipped then the default.spec.BLUEPRINT will be false
     this.tests = options.skipTests ? false : true;
-    this.e2e = options.skipE2e ? false : true;
 
     // Split/join with / not path.sep as reference to typings require forward slashes.
     const relativeRootPath = options.sourceDir.split('/').map(() => '..').join('/');
@@ -55,8 +54,7 @@ export default Blueprint.extend({
       routing: options.routing,
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
-      tests: this.tests,
-      e2e: this.e2e,
+      tests: this.tests
     };
   },
 
@@ -78,13 +76,6 @@ export default Blueprint.extend({
 
     if (this.options && this.options.skipTests) {
       fileList = fileList.filter(p => p.indexOf('app.component.spec.ts') < 0);
-    }
-
-    if (this.options && this.options.skipE2e) {
-      fileList = fileList
-        .filter(p => p.indexOf('protractor.conf.js') < 0)
-        .filter(p => p.indexOf('app.po.ts') < 0)
-        .filter(p => p.indexOf('app.e2e-spec.ts') < 0);
     }
 
     const cliConfig = CliConfig.fromProject();
