@@ -16,7 +16,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "rootDir": ".",
-    "outDir": "../../dist/ng-express-engine/dist",
+    "outDir": "../../dist/ng-express-engine",
     "lib": [
       "dom",
       "es6"
@@ -26,7 +26,8 @@
     ]
   },
   "files": [
-    "index.ts"
+    "index.ts",
+    "tokens.ts"
   ],
   "compileOnSave": false,
   "buildOnSave": false,
