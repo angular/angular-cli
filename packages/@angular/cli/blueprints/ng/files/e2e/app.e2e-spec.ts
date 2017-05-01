@@ -7,8 +7,8 @@ describe('<%= htmlComponentName %> App', () => {
     page = new <%= jsComponentName %>Page();
   });
 
-  it('should display message saying app works', () => {
+  it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('<%= prefix %> works!');
+    expect(page.getParagraphText()).toEqual('Welcome to <%= prefix %>!!');
   });
 });

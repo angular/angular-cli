@@ -49,6 +49,27 @@ export default function () {
     .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
     // Update app to test assets are present.
     .then(_ => !ejected && writeMultipleFiles({
+      'src/app/app.module.ts': `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { FormsModule } from '@angular/forms';
+        import { HttpModule } from '@angular/http';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            FormsModule,
+            HttpModule
+          ],
+          providers: [],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `,
       'src/app/app.component.ts': `
         import { Component } from '@angular/core';
         import { Http, Response } from '@angular/http';
@@ -111,6 +132,7 @@ export default function () {
           });
         });`,
     }))
-    .then(() => !ejected && ng('test', '--single-run'))
-    .then(() => !ejected && ng('e2e', '--no-progress'));
+    // .then(() => !ejected && ng('test', '--single-run'))
+    // .then(_ => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
+    .then(() => ng('e2e'));
 }

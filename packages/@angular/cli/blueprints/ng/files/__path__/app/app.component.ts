@@ -13,5 +13,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.<%= styleExt %>']<% } %>
 })
 export class AppComponent {
-  title = '<%= prefix %> works!';
+  title = '<%= prefix %>';
 }
