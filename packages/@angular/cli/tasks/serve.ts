@@ -148,7 +148,10 @@ export default Task.extend({
         poll: serveTaskOptions.poll
       },
       https: serveTaskOptions.ssl,
-      overlay: serveTaskOptions.target === 'development',
+      overlay: {
+        errors: serveTaskOptions.target === 'development',
+        warnings: false
+      },
       contentBase: false
     };
 
