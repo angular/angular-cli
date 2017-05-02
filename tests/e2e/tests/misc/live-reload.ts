@@ -36,6 +36,26 @@ export default function () {
 
   return Promise.resolve()
     .then(_ => writeMultipleFiles({
+      'src/app/app.module.ts': `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { FormsModule } from '@angular/forms';
+        import { HttpModule } from '@angular/http';
+        import { AppComponent } from './app.component';
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            FormsModule,
+            HttpModule
+          ],
+          providers: [],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `,
       // e2e test that just opens the page and waits, so that the app runs.
       './e2e/app.e2e-spec.ts': `
         import { browser } from 'protractor';

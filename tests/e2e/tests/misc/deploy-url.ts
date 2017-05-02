@@ -10,7 +10,7 @@ export default function () {
     .then(() => expectToFail(() => request('http://localhost:4200')))
     .then(() => request('http://localhost:4200/deployurl'))
     .then(body => {
-      if (!body.match(/<app-root>Loading...<\/app-root>/)) {
+      if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value.');
       }
     })
