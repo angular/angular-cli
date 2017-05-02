@@ -41,13 +41,17 @@ execSync('git fetch origin');
 // Find the branch
 const branchRefs = {};
 for (const name of config['branches']) {
-  const output = execSync(`git show-ref --hash ${name}`, { encoding: 'utf-8' });
-  if (output) {
-    branchRefs[name] = output;
+  try {
+    const output = execSync(`git show-ref --hash ${name}`, { encoding: 'utf-8' });
+    if (output) {
+      branchRefs[name] = output.replace(/\n/g, '').trim();
+    }
+  } catch (e) {
+    // Ignore.
   }
 }
-logger.info(`Found refs for branches:\n  ${Object.entries(branchRefs).forEach(([key, value]) => {
-  return `${key} => ${value}`;
+logger.info(`Found refs for branches:\n  ${Object.keys(branchRefs).map(key => {
+  return `${key} => ${JSON.stringify(branchRefs[key])}`;
 }).join('\n  ')}`);
 
 
@@ -55,33 +59,33 @@ const output = execSync('git log --format="%H %s" --no-merges', { encoding: 'utf
 
 if (output.length === 0) {
   logger.warn('There are zero new commits between this HEAD and master');
-  return;
+  process.exit(0);
 }
 
-const commitByLines = [];
+const commitsByLine = [];
 let branch = null;
 
 // Finding the closest branch marker.
-for (const line of output.split(/n/)) {
-  const [hash, ...messageArray] = line.split(/ /);
+for (const line of output.split(/\n/)) {
+  const [hash, ...messageArray] = line.split(' ');
   const message = messageArray.join(' ');
 
-  const maybeBranch = Object.keys(branchRefs).find(branchName => branchRefs[branchName] == hash);
+  const maybeBranch = Object.keys(branchRefs).find(branchName => branchRefs[branchName] === hash);
   if (maybeBranch) {
     branch = maybeBranch;
     break;
   }
-  commitByLines.push(message);
+  commitsByLine.push(message);
 }
 
 if (!branch) {
   logger.fatal('Something wrong happened.');
-  return;
+  process.exit(1);
 }
 
 logger.info(`Examining ${commitsByLine.length} commit(s) between HEAD and ${branch}`);
 
-const someCommitsInvalid = !commitsByLine.every(validateCommitMessage);
+const someCommitsInvalid = !commitsByLine.every(message => validateCommitMessage(message, branch));
 
 if (someCommitsInvalid) {
   logger.error('Please fix the failing commit messages before continuing...');
