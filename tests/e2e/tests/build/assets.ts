@@ -132,7 +132,6 @@ export default function () {
           });
         });`,
     }))
-    // .then(() => !ejected && ng('test', '--single-run'))
-    // .then(_ => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
-    .then(() => ng('e2e'));
+    .then(() => !ejected && ng('test', '--single-run'))
+    .then(() => !ejected && ng('e2e'));
 }
