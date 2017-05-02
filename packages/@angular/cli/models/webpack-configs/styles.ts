@@ -45,8 +45,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // Convert absolute resource URLs to account for base-href and deploy-url.
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
+  const configuredPostCssPlugins = (appConfig.postCssPlugins &&
+                          appConfig.postCssPlugins.length > 0 ? appConfig.postCssPlugins : []);
 
   const postcssPluginCreator = function() {
+    const postCssExtraPlugins = configuredPostCssPlugins.map(
+      (pluginName: string) => require(pluginName)()
+    );
+
     return [
       autoprefixer(),
       postcssUrl({
@@ -69,10 +75,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             return `/${baseHref}/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
           }
         }
-      })
-    ].concat(
-        minimizeCss ? [cssnano({ safe: true, autoprefixer: false })] : []
-    );
+      }),
+      ...postCssExtraPlugins,
+      ...(minimizeCss ? [cssnano({ safe: true, autoprefixer: false })] : [])
+    ];
   };
   (postcssPluginCreator as any)[postcssArgs] = {
     variableImports: {
@@ -80,7 +86,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       'postcss-url': 'postcssUrl',
       'cssnano': 'cssnano'
     },
-    variables: { minimizeCss, baseHref, deployUrl }
+    variables: { minimizeCss, baseHref, deployUrl, configuredPostCssPlugins }
   };
 
   // determine hashing format
