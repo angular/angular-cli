@@ -20,7 +20,8 @@ export interface ServeTaskOptions extends BuildOptions {
   host?: string;
   proxyConfig?: string;
   liveReload?: boolean;
-  liveReloadClient?: string;
+  publicHost?: string;
+  disableHostCheck?: boolean;
   ssl?: boolean;
   sslKey?: string;
   sslCert?: string;
@@ -84,9 +85,16 @@ export const baseServeCommandOptions: any = overrideOptions([
     description: 'Whether to reload the page on change, using live-reload.'
   },
   {
-    name: 'live-reload-client',
+    name: 'public-host',
     type: String,
-    description: 'Specify the URL that the live reload browser client will use.'
+    aliases: ['live-reload-client'],
+    description: 'Specify the URL that the browser client will use.'
+  },
+  {
+    name: 'disable-host-check',
+    type: Boolean,
+    default: false,
+    description: 'Don\'t verify connected clients are part of allowed hosts.',
   },
   {
     name: 'hmr',

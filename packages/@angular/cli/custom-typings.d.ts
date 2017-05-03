@@ -21,4 +21,6 @@ interface IWebpackDevServerConfigurationOptions {
   key?: string;
   cert?: string;
   overlay?: boolean | { errors: boolean, warnings: boolean };
+  public?: string;
+  disableHostCheck?: boolean;
 }

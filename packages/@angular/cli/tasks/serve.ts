@@ -49,9 +49,18 @@ export default Task.extend({
       hostname: serveTaskOptions.host === '0.0.0.0' ? 'localhost' : serveTaskOptions.host,
       port: serveTaskOptions.port.toString()
     });
+
+    if (serveTaskOptions.disableHostCheck) {
+      ui.writeLine(oneLine`
+          ${chalk.yellow('WARNING')} Running a server with --disable-host-check is a security risk.
+          See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
+          for more information.
+        `);
+    }
+
     let clientAddress = serverAddress;
-    if (serveTaskOptions.liveReloadClient) {
-      const clientUrl = url.parse(serveTaskOptions.liveReloadClient);
+    if (serveTaskOptions.publicHost) {
+      const clientUrl = url.parse(serveTaskOptions.publicHost);
       // very basic sanity check
       if (!clientUrl.host) {
         return Promise.reject(new SilentError(`'live-reload-client' must be a full URL.`));
@@ -96,7 +105,7 @@ export default Task.extend({
       webpackConfig.plugins.unshift({
         apply: (compiler: any) => {
           compiler.plugin('after-environment', () => {
-            compiler.watchFileSystem = { watch: () => {} };
+            compiler.watchFileSystem = { watch: () => { } };
           });
         }
       });
@@ -153,7 +162,9 @@ export default Task.extend({
         errors: serveTaskOptions.target === 'development',
         warnings: false
       },
-      contentBase: false
+      contentBase: false,
+      public: serveTaskOptions.publicHost,
+      disableHostCheck: serveTaskOptions.disableHostCheck
     };
 
     if (sslKey != null && sslCert != null) {
@@ -193,7 +204,7 @@ export default Task.extend({
           return reject(err);
         }
         if (serveTaskOptions.open) {
-            opn(serverAddress);
+          opn(serverAddress);
         }
       });
     })

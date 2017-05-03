@@ -124,7 +124,7 @@ export default function () {
     // Serve with live reload client set to api should call api.
     .then(_ => silentExecAndWaitForOutputToMatch(
       'ng',
-      ['e2e', '--watch', `--live-reload-client=${apiUrl}`],
+      ['e2e', '--watch', `--public-host=${apiUrl}`],
       protractorGoodRegEx
     ))
     .then(_ => wait(2000))
