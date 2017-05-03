@@ -1,3 +1,17 @@
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/angular/angular-cli/compare/v1.0.1...v1.0.2) (2017-05-03)
+
+
+### Bug Fixes
+
+* **@angular/cli:** explicitly disable warning overlays ([f73a9e4](https://github.com/angular/angular-cli/commit/f73a9e4))
+* **@angular/cli:** Improve error message for create component with -m option ([b11d560](https://github.com/angular/angular-cli/commit/b11d560))
+* **@angular/cli:** removing skip e2e test ([fb96871](https://github.com/angular/angular-cli/commit/fb96871))
+* **@angular/cli:** use quiet flag only in case of npm ([9805010](https://github.com/angular/angular-cli/commit/9805010))
+* **@angular/cli:** use safer stylesheet minification settings ([806447e](https://github.com/angular/angular-cli/commit/806447e))
+
+
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/angular/angular-cli/compare/v1.0.0...1.0.1) (2017-04-25)
 
@@ -34,7 +48,7 @@
 
 ### Notes
 
-* The Angular CLI v1.0 release is here! 
+* The Angular CLI v1.0 release is here!
 * You can find the documentation on our [Github wiki](https://github.com/angular/angular-cli/wiki)!
 * If you are updating from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
 * By default, now that Angular 4 is final, we will generate an Angular 4.0 project with `ng new`.
@@ -222,3 +236,18 @@ instead of using 4200.
 ----
 
 CHANGELOG for Betas and before can still be found on github: https://github.com/angular/angular-cli/blob/ed5f47dc22d5eb4a5d4b4ae2c8f7cb0ec1a999f3/CHANGELOG.md
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/angular/angular-cli/compare/v1.0.1...v1.0.2) (2017-05-03)
+
+
+### Bug Fixes
+
+* add support for branch-only commit message types. ([646c1b0](https://github.com/angular/angular-cli/commit/646c1b0))
+* **@angular/cli:** explicitly disable warning overlays ([f73a9e4](https://github.com/angular/angular-cli/commit/f73a9e4))
+* **@angular/cli:** Improve error message for create component with -m option ([b11d560](https://github.com/angular/angular-cli/commit/b11d560))
+* **@angular/cli:** removing skip e2e test ([fb96871](https://github.com/angular/angular-cli/commit/fb96871))
+* **@angular/cli:** use quiet flag only in case of npm ([9805010](https://github.com/angular/angular-cli/commit/9805010))
+* **@angular/cli:** use safer stylesheet minification settings ([806447e](https://github.com/angular/angular-cli/commit/806447e))
+
+
+
