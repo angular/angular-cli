@@ -4,16 +4,12 @@
     "build": "",
     "ci": "",
     "docs": "",
-    "feat": "origin/1.1.x",
+    "feat": "",
     "fix": "",
     "perf": "",
     "refactor": "",
     "style": "",
     "test": "",
     "tool": ""
-  },
-  "branches": [
-    "origin/master",
-    "origin/1.1.x"
-  ]
+  }
 }
