@@ -39,12 +39,22 @@ All the build Options are available in serve, below are the additional options.
 </details>
 
 <details>
-  <summary>live-reload-client</summary>
+  <summary>public-host</summary>
   <p>
-    <code>--live-reload-client</code>
+    <code>--public-host</code> (aliases: <code>--live-reload-client</code>)
   </p>
   <p>
-    Specify the URL that the live reload browser client will use.
+    Specify the URL that the browser client will use.
+  </p>
+</details>
+
+<details>
+  <summary>disable-host-check</summary>
+  <p>
+    <code>--disable-host-check</code> <em>default value: false</em>
+  </p>
+  <p>
+    Don't verify connected clients are part of allowed hosts.
   </p>
 </details>
 
