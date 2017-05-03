@@ -1,3 +1,16 @@
+<a name="1.1.0-beta.0"></a>
+# [1.1.0-beta.0](https://github.com/angular/angular-cli/compare/v1.0.1...v1.1.0-beta.0) (2017-05-03)
+
+
+### Features
+
+* **@angular/cli:** add language service in devDependencies section ([2a40d1e](https://github.com/angular/angular-cli/commit/2a40d1e))
+* **@angular/cli:** adding option to search docs as well ([b5bbdcd](https://github.com/angular/angular-cli/commit/b5bbdcd))
+* **@angular/cli:** bump to tslint 5 & codelyzer 3 ([7f698f7](https://github.com/angular/angular-cli/commit/7f698f7))
+* **@angular/cli:** use and support webpack 2.3 ([d5325e6](https://github.com/angular/angular-cli/commit/d5325e6))
+
+
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://github.com/angular/angular-cli/compare/v1.0.1...v1.0.2) (2017-05-03)
 
