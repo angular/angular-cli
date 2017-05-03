@@ -3,20 +3,26 @@ import * as process from 'process';
 import * as fs from 'fs-extra';
 const stringUtils = require('ember-cli-string-utils');
 
-export function dynamicPathParser(project: any, entityName: string, appConfig: any,
-                                  dryRun: boolean) {
-  const projectRoot = project.root;
-  const sourceDir = appConfig.root;
+export interface DynamicPathOptions {
+  project: any;
+  entityName: string;
+  appConfig: any;
+  dryRun: boolean;
+}
+
+export function dynamicPathParser(options: DynamicPathOptions) {
+  const projectRoot = options.project.root;
+  const sourceDir = options.appConfig.root;
   const appRoot = path.join(sourceDir, 'app');
   const cwd = process.env.PWD;
 
   const rootPath = path.join(projectRoot, appRoot);
-  let outputPath = path.join(rootPath, entityName);
+  let outputPath = path.join(rootPath, options.entityName);
 
-  if (entityName.indexOf(path.sep) === 0) {
-    outputPath = path.join(rootPath, entityName.substr(1));
+  if (options.entityName.indexOf(path.sep) === 0) {
+    outputPath = path.join(rootPath, options.entityName.substr(1));
   } else if (cwd.indexOf(rootPath) >= 0) {
-    outputPath = path.join(cwd, entityName);
+    outputPath = path.join(cwd, options.entityName);
   }
 
   if (!fs.existsSync(outputPath)) {
@@ -39,7 +45,7 @@ export function dynamicPathParser(project: any, entityName: string, appConfig: a
       // Folder not found, create it, and return it
       const dasherizedPart = stringUtils.dasherize(part);
       const dasherizedDirName = path.join(tempPath, dasherizedPart);
-      if (!dryRun) {
+      if (!options.dryRun) {
         fs.mkdirpSync(dasherizedDirName);
       }
       return dasherizedDirName;
@@ -49,7 +55,7 @@ export function dynamicPathParser(project: any, entityName: string, appConfig: a
   }
 
   if (outputPath.indexOf(rootPath) < 0) {
-    throw `Invalid path: "${entityName}" cannot be ` +
+    throw `Invalid path: "${options.entityName}" cannot be ` +
         `above the "${appRoot}" directory`;
   }
 
