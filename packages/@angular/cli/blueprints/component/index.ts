@@ -1,6 +1,7 @@
 import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
+import { oneLine } from 'common-tags';
 import { NodeHost } from '../../lib/ast-tools';
 import { CliConfig } from '../../models/config';
 import { getAppFromConfig } from '../../utilities/app-utils';
@@ -218,6 +219,12 @@ export default Blueprint.extend({
   },
 
   afterInstall: function (options: any) {
+    const appConfig = getAppFromConfig(this.options.app);
+    if (options.prefix && appConfig.prefix && appConfig.prefix !== options.prefix) {
+      console.log(chalk.yellow(oneLine`You are using different prefix from app,
+       you might get lint errors. Please update "tslint.json" accordingly.`));
+    }
+
     const returns: Array<any> = [];
     const className = stringUtils.classify(`${options.entity.name}Component`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.component`);

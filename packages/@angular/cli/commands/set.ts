@@ -1,8 +1,10 @@
-import {CliConfig} from '../models/config';
+import * as fs from 'fs';
+import { CliConfig } from '../models/config';
+import { oneLine } from 'common-tags';
 
 const SilentError = require('silent-error');
+const chalk = require('chalk');
 const Command = require('../ember-cli/lib/models/command');
-
 
 export interface SetOptions {
   global?: boolean;
@@ -67,12 +69,37 @@ const SetCommand = Command.extend({
         default: value = parseValue(rawValue, jsonPath);
       }
 
+      if (jsonPath.indexOf('prefix') > 0) {
+        // update tslint if prefix is updated
+        updateLintForPrefix(this.project.root + '/tslint.json', value);
+      }
+
       config.set(jsonPath, value);
       config.save();
       resolve();
     });
   }
 });
+
+function updateLintForPrefix(filePath: string, prefix: string): void {
+    const tsLint = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const componentLint = tsLint.rules['component-selector'][2];
+    if (componentLint instanceof Array) {
+      tsLint.rules['component-selector'][2].push(prefix);
+    } else {
+      tsLint.rules['component-selector'][2] = prefix;
+    }
+
+    const directiveLint = tsLint.rules['directive-selector'][2];
+    if (directiveLint instanceof Array) {
+      tsLint.rules['directive-selector'][2].push(prefix);
+    } else {
+      tsLint.rules['directive-selector'][2] = prefix;
+    }
+    fs.writeFileSync(filePath, JSON.stringify(tsLint, null, 2));
+    console.log(chalk.yellow(oneLine`we have updated tslint to match prefix,
+     you may want to fix linting errors.`));
+}
 
 function parseValue(rawValue: string, path: string) {
   try {
