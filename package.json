@@ -23,7 +23,9 @@
     "eslint": "eslint .",
     "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/config/schema.d.ts\" -e \"**/tests/**\" -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
     "lint": "npm-run-all -c eslint tslint",
-    "tool": "node scripts/run-tool.js"
+    "tool": "node scripts/run-tool.js",
+    "sync-deps": "node ./scripts/sync-deps.js",
+    "precommit": "npm run sync-deps"
   },
   "repository": {
     "type": "git",
@@ -54,7 +56,7 @@
     "exports-loader": "^0.6.3",
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.10.0",
-    "fs-extra": "~2.0.0",
+    "fs-extra": "^2.0.0",
     "get-caller-file": "^1.0.0",
     "glob": "^7.0.3",
     "html-webpack-plugin": "^2.19.0",
@@ -92,7 +94,7 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "temp": "0.8.3",
-    "typescript": "~2.2.0",
+    "typescript": ">=2.0.0 <2.3.0",
     "url-loader": "^0.5.7",
     "walk-sync": "^0.3.1",
     "webpack": "~2.3.0",
@@ -132,6 +134,7 @@
     "eslint": "^3.11.0",
     "exists-sync": "0.0.4",
     "express": "^4.14.0",
+    "husky": "^0.13.3",
     "jasmine": "^2.4.1",
     "jasmine-spec-reporter": "^3.2.0",
     "minimist": "^1.2.0",
