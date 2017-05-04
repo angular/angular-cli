@@ -17,5 +17,5 @@ export interface BuildOptions {
   outputHashing?: string;
   poll?: number;
   app?: string;
-
+  deleteOutputPath?: boolean;
 }
