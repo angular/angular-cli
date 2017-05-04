@@ -31,7 +31,9 @@ export default Task.extend({
     if (projectConfig.project && projectConfig.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }
-    rimraf.sync(path.resolve(this.project.root, outputPath));
+    if (serveTaskOptions.deleteOutputPath) {
+      rimraf.sync(path.resolve(this.project.root, outputPath));
+    }
 
     const serveDefaults = {
       // default deployUrl to '' on serve to prevent the default from .angular-cli.json
