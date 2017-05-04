@@ -40,7 +40,7 @@ export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max: number = Infi
 export function removeAstNode(node: ts.Node): Change {
   const source = node.getSourceFile();
   return new RemoveChange(
-    source.path,
+    (source as any).path,
     node.getStart(source),
     node.getFullText(source)
   );
