@@ -18,8 +18,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
 
   // figure out which are the lazy loaded entry points
   const lazyChunks = lazyChunksFilter([
-    ...extraEntryParser(appConfig.scripts, appRoot, 'scripts'),
-    ...extraEntryParser(appConfig.styles, appRoot, 'styles')
+    ...extraEntryParser(appConfig.scripts, appRoot, 'scripts', buildOptions.environment),
+    ...extraEntryParser(appConfig.styles, appRoot, 'styles', buildOptions.environment)
   ]);
 
   if (buildOptions.vendorChunk) {
@@ -35,7 +35,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
         filename: path.resolve(buildOptions.outputPath, appConfig.index),
-        chunksSortMode: packageChunkSort(appConfig),
+        chunksSortMode: packageChunkSort(appConfig, buildOptions.environment),
         excludeChunks: lazyChunks,
         xhtml: true
       }),

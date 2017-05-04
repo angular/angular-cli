@@ -126,10 +126,26 @@
                   "type": "object",
                   "properties": {
                     "input": {
+                      "description": "The file path.",
+                      "type": "string"
+                    },
+                    "lazy": {
+                      "description": "Flag to indicate if it's lazy loaded.",
+                      "type": "boolean"
+                    },
+                    "output": {
+                      "description": "The output bundle name.",
+                      "type": "string"
+                    },
+                    "env": {
+                      "description": "The environment to be included in.",
                       "type": "string"
                     }
                   },
-                  "additionalProperties": true
+                  "additionalProperties": true,
+                  "required": [
+                    "input"
+                  ]
                 }
               ]
             },
@@ -162,6 +178,19 @@
                   "type": "object",
                   "properties": {
                     "input": {
+                      "description": "The file path.",
+                      "type": "string"
+                    },
+                    "lazy": {
+                      "description": "Flag to indicate if it's lazy loaded.",
+                      "type": "boolean"
+                    },
+                    "output": {
+                      "description": "The output bundle name.",
+                      "type": "string"
+                    },
+                    "env": {
+                      "description": "The environment to be included in.",
                       "type": "string"
                     }
                   },

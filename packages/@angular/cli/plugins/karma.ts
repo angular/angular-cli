@@ -119,7 +119,8 @@ const init: any = (config: any) => {
 
   // Add global scripts. This logic mimics the one in webpack-configs/common.
   if (appConfig.scripts && appConfig.scripts.length > 0) {
-    const globalScriptPatterns = extraEntryParser(appConfig.scripts, appRoot, 'scripts')
+    const globalScriptPatterns = extraEntryParser(appConfig.scripts, appRoot, 'scripts',
+      testConfig.environment)
       // Neither renamed nor lazy scripts are currently supported
       .filter(script => !(script.output || script.lazy))
       .map(script => ({ pattern: path.resolve(appRoot, script.input) }));

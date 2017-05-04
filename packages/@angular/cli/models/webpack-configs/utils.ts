@@ -38,6 +38,7 @@ export interface ExtraEntry {
   lazy?: boolean;
   path?: string;
   entry?: string;
+  env?: string;
 }
 
 // Filter extra entries out of a arran of extraEntries
@@ -51,7 +52,8 @@ export function lazyChunksFilter(extraEntries: ExtraEntry[]) {
 export function extraEntryParser(
   extraEntries: (string | ExtraEntry)[],
   appRoot: string,
-  defaultEntry: string
+  defaultEntry: string,
+  environment: string
 ): ExtraEntry[] {
   return extraEntries
     .map((extraEntry: string | ExtraEntry) =>
@@ -66,7 +68,8 @@ export function extraEntryParser(
         extraEntry.entry = defaultEntry;
       }
       return extraEntry;
-    });
+    })
+    .filter(extraEntry => !extraEntry.env || extraEntry.env === environment);
 }
 
 export interface HashFormat {

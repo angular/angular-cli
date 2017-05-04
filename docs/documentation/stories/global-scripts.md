@@ -12,12 +12,17 @@ This is especially useful for legacy libraries or analytic snippets.
 ],
 ```
 
-You can also rename the output and lazy load it by using the object format:
+You can also use object format to do more advanced things:
+- `input` (required) - file path
+- `lazy` - flag to indicate if to lazy load it
+- `output` - the output bundle name
+- `env` - the environment to be included in
 
 ```json
 "scripts": [
   "global-script.js",
   { "input": "lazy-script.js", "lazy": true },
   { "input": "pre-rename-script.js", "output": "renamed-script" },
+  { "input": "production-script.js", "env": "prod" }
 ],
 ```

@@ -42,7 +42,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // process global scripts
   if (appConfig.scripts.length > 0) {
-    const globalScripts = extraEntryParser(appConfig.scripts, appRoot, 'scripts');
+    const globalScripts = extraEntryParser(appConfig.scripts, appRoot, 'scripts',
+      buildOptions.environment);
 
     // add entry points and lazy chunks
     globalScripts.forEach(script => {

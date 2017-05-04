@@ -108,7 +108,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // process global styles
   if (appConfig.styles.length > 0) {
-    const globalStyles = extraEntryParser(appConfig.styles, appRoot, 'styles');
+    const globalStyles = extraEntryParser(appConfig.styles, appRoot, 'styles',
+      buildOptions.environment);
+
     // add style entry points
     globalStyles.forEach(style =>
       entryPoints[style.entry]
