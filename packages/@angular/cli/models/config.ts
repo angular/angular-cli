@@ -13,7 +13,12 @@ const CLI_CONFIG_FILE_NAME_ALT = 'angular-cli.json';
 
 
 function getUserHome() {
-  return process.env[(process.platform.startsWith('win')) ? 'USERPROFILE' : 'HOME'];
+  const envHomeName = (process.platform.startsWith('win')) ? 'USERPROFILE' : 'HOME';
+  const env = process.env[envHomeName];
+  if (env == null) {
+    throw new Error('Missing environment variable ' + envHomeName);
+  }
+  return env;
 }
 
 
