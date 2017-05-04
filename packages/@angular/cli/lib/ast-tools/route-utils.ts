@@ -143,7 +143,7 @@ export function insertImport(fileToEdit: string, symbolName: string,
     fallbackPos,
     ts.SyntaxKind.StringLiteral
   );
-};
+}
 
 /**
  * Inserts a path to the new route into src/routes.ts if it doesn't exist
