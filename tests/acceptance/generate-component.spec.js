@@ -267,7 +267,7 @@ describe('Acceptance: ng generate component', function () {
         .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo', 'foo.module.ts')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazComponent.*from '.\/..\/baz\/baz.component';/);
+          expect(content).matches(/import.*BazComponent.*from '..\/baz\/baz.component';/);
           expect(content).matches(/declarations:\s+\[BazComponent]/m);
         });
     });
@@ -281,7 +281,7 @@ describe('Acceptance: ng generate component', function () {
         .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo', 'foo')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazComponent.*from '.\/..\/baz\/baz.component';/);
+          expect(content).matches(/import.*BazComponent.*from '..\/baz\/baz.component';/);
           expect(content).matches(/declarations:\s+\[BazComponent]/m);
         });
     });
@@ -295,7 +295,7 @@ describe('Acceptance: ng generate component', function () {
         .then(() => ng(['generate', 'component', 'baz', '--module', 'foo']))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazComponent.*from '.\/..\/baz\/baz.component';/);
+          expect(content).matches(/import.*BazComponent.*from '..\/baz\/baz.component';/);
           expect(content).matches(/declarations:\s+\[BazComponent]/m);
         });
     });
@@ -310,7 +310,7 @@ describe('Acceptance: ng generate component', function () {
         .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo', 'bar')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazComponent.*from '.\/..\/..\/baz\/baz.component';/);
+          expect(content).matches(/import.*BazComponent.*from '..\/..\/baz\/baz.component';/);
           expect(content).matches(/declarations:\s+\[BazComponent]/m);
         });
     });

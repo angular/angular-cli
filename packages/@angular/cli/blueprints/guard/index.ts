@@ -103,7 +103,8 @@ export default Blueprint.extend({
       const fullGeneratePath = path.join(this.project.root, this.generatePath);
       const moduleDir = path.parse(this.pathToModule).dir;
       const relativeDir = path.relative(moduleDir, fullGeneratePath);
-      const importPath = relativeDir ? `./${relativeDir}/${fileName}` : `./${fileName}`;
+      const normalizeRelativeDir = relativeDir.startsWith('.') ? relativeDir : `./${relativeDir}`;
+      const importPath = relativeDir ? `${normalizeRelativeDir}/${fileName}` : `./${fileName}`;
       returns.push(
         astUtils.addProviderToModule(this.pathToModule, className, importPath)
           .then((change: any) => change.apply(NodeHost)));

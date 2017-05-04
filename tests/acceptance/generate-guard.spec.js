@@ -209,7 +209,7 @@ describe('Acceptance: ng generate guard', function () {
         .then(() => ng(['generate', 'guard', 'baz', '--module', path.join('foo', 'foo.module.ts')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).to.matches(/import.*BazGuard.*from '.\/..\/baz.guard';/);
+          expect(content).to.matches(/import.*BazGuard.*from '..\/baz.guard';/);
           expect(content).to.matches(/providers:\s*\[BazGuard\]/m);
         });
     });
@@ -223,7 +223,7 @@ describe('Acceptance: ng generate guard', function () {
         .then(() => ng(['generate', 'guard', 'baz', '--module', path.join('foo', 'foo')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).to.matches(/import.*BazGuard.*from '.\/..\/baz.guard';/);
+          expect(content).to.matches(/import.*BazGuard.*from '..\/baz.guard';/);
           expect(content).to.matches(/providers:\s*\[BazGuard\]/m);
         });
     });
@@ -237,7 +237,7 @@ describe('Acceptance: ng generate guard', function () {
         .then(() => ng(['generate', 'guard', 'baz', '--module', 'foo']))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).to.matches(/import.*BazGuard.*from '.\/..\/baz.guard';/);
+          expect(content).to.matches(/import.*BazGuard.*from '..\/baz.guard';/);
           expect(content).to.matches(/providers:\s*\[BazGuard\]/m);
         });
     });
@@ -252,7 +252,7 @@ describe('Acceptance: ng generate guard', function () {
         .then(() => ng(['generate', 'guard', 'baz', '--module', path.join('foo', 'bar')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).to.matches(/import.*BazGuard.*from '.\/..\/..\/baz.guard';/);
+          expect(content).to.matches(/import.*BazGuard.*from '..\/..\/baz.guard';/);
           expect(content).to.matches(/providers:\s*\[BazGuard\]/m);
         });
     });
