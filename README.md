@@ -93,6 +93,241 @@ Scaffold  | Usage
 [Module](https://github.com/angular/angular-cli/wiki/generate-module)       | `ng g module my-module`
 
 
+
+angular-cli will add reference to `components`, `directives` and `pipes` automatically in the `app.module.ts`. If you need to add this references to another custom module, follow this steps:
+
+1. `ng g module newModule` to create a new module
+2.  call `ng g component new-module/newComponent`
+
+This should add the new `component`, `directive` or `pipe` reference to the `newModule` you've created.
+
+### Generating a route
+
+Generating routes in the CLI has been disabled for the time being. A new router and new route generation blueprints are coming.
+
+You can read the official documentation for the new Router here: https://angular.io/docs/ts/latest/guide/router.html. Please note that even though route generation is disabled, building your projects with routing is still fully supported.
+
+### Creating a build
+
+```bash
+ng build
+```
+
+The build artifacts will be stored in the `dist/` directory.
+
+### Build Targets and Environment Files
+
+`ng build` can specify both a build target (`--target=production` or `--target=development`) and an
+environment file to be used with that build (`--environment=dev` or `--environment=prod`).
+By default, the development build target and environment are used.
+
+The mapping used to determine which environment file is used can be found in `angular-cli.json`:
+
+```json
+"environments": {
+  "source": "environments/environment.ts",
+  "dev": "environments/environment.ts",
+  "prod": "environments/environment.prod.ts"
+}
+```
+
+These options also apply to the serve command. If you do not pass a value for `environment`,
+it will default to `dev` for `development` and `prod` for `production`.
+
+```bash
+# these are equivalent
+ng build --target=production --environment=prod
+ng build --prod --env=prod
+ng build --prod
+# and so are these
+ng build --target=development --environment=dev
+ng build --dev --e=dev
+ng build --dev
+ng build
+```
+
+You can also add your own env files other than `dev` and `prod` by doing the following:
+- create a `src/environments/environment.NAME.ts`
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the the `apps[0].environments` object in `angular-cli.json`
+- use them via the `--env=NAME` flag on the build/serve commands.
+
+### Base tag handling in index.html
+
+When building you can modify base tag (`<base href="/">`) in your index.html with `--base-href your-url` option.
+
+```bash
+# Sets base tag href to /myUrl/ in your index.html
+ng build --base-href /myUrl/
+ng build --bh /myUrl/
+```
+
+### Bundling
+
+All builds make use of bundling, and using the `--prod` flag in  `ng build --prod`
+or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
+
+### Running unit tests
+
+```bash
+ng test
+```
+
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false` or `--single-run`.
+
+### Running end-to-end tests
+
+```bash
+ng e2e
+```
+
+Before running the tests make sure you are serving the app via `ng serve`.
+
+End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
+
+### Proxy To Backend
+Using the proxying support in webpack's dev server we can highjack certain urls and send them to a backend server.
+We do this by passing a file to `--proxy-config`
+
+Say we have a server running on `http://localhost:3000/api` and we want all calls to `http://localhost:4200/api` to go to that server.
+
+We create a file next to projects `package.json` called `proxy.conf.json`
+with the content
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false
+  }
+}
+```
+
+You can read more about what options are available here [webpack-dev-server proxy settings](https://webpack.github.io/docs/webpack-dev-server.html#proxy)
+
+and then we edit the `package.json` file's start script to be
+
+```json
+"start": "ng serve --proxy-config proxy.conf.json",
+```
+
+now run it with `npm start`
+
+### Deploying the app via GitHub Pages
+
+You can deploy your apps quickly via:
+
+```bash
+ng github-pages:deploy --message "Optional commit message"
+```
+
+This will do the following:
+
+- creates GitHub repo for the current project if one doesn't exist
+- rebuilds the app in production mode at the current `HEAD`
+- creates a local `gh-pages` branch if one doesn't exist
+- moves your app to the `gh-pages` branch and creates a commit
+- edit the base tag in index.html to support github pages
+- pushes the `gh-pages` branch to github
+- returns back to the original `HEAD`
+
+Creating the repo requires a token from github, and the remaining functionality
+relies on ssh authentication for all git operations that communicate with github.com.
+To simplify the authentication, be sure to [setup your ssh keys](https://help.github.com/articles/generating-ssh-keys/).
+
+If you are deploying a [user or organization page](https://help.github.com/articles/user-organization-and-project-pages/), you can instead use the following command:
+
+```bash
+ng github-pages:deploy --user-page --message "Optional commit message"
+```
+
+This command pushes the app to the `master` branch on the github repo instead
+of pushing to `gh-pages`, since user and organization pages require this.
+
+
+### Linting and formatting code
+
+You can lint your app code by running `ng lint`.
+This will use the `lint` npm script that in generated projects uses `tslint`.
+
+You can modify the these scripts in `package.json` to run whatever tool you prefer.
+
+### Support for offline applications
+
+**The `--mobile` flag has been disabled temporarily. Sorry for the inconvenience.**
+
+~~Angular-CLI includes support for offline applications via the `--` flag on `ng new`. Support is experimental, please see the angular/mobile-toolkit project and https://mobile.angular.io/ for documentation on how to make use of this functionality.~~
+
+### Commands autocompletion
+
+To turn on auto completion use the following commands:
+
+For bash:
+```bash
+ng completion 1>> ~/.bashrc 2>>&1
+source ~/.bashrc
+```
+
+For zsh:
+```bash
+ng completion 1>> ~/.zshrc 2>>&1
+source ~/.zshrc
+```
+
+Windows users using gitbash:
+```bash
+ng completion 1>> ~/.bash_profile 2>>&1
+source ~/.bash_profile
+```
+
+### Project assets
+
+You use the `assets` array in `angular-cli.json` to list files or folders you want to copy as-is when building your project:
+```json
+"assets": [
+  "assets",
+  "favicon.ico"
+]
+```
+
+### Global styles
+
+The `styles.css` file allows users to add global styles and supports
+[CSS imports](https://developer.mozilla.org/en/docs/Web/CSS/@import).
+
+If the project is created with the `--style=sass` option, this will be a `.sass`
+file instead, and the same applies to `scss/less/styl`.
+
+You can add more global styles via the `apps[0].styles` property in `angular-cli.json`.
+
+### CSS Preprocessor integration
+
+Angular-CLI supports all major CSS preprocessors:
+- sass/scss ([http://sass-lang.com/](http://sass-lang.com/))
+- less ([http://lesscss.org/](http://lesscss.org/))
+- stylus ([http://stylus-lang.com/](http://stylus-lang.com/))
+
+To use these prepocessors simply add the file to your component's `styleUrls`:
+
+```javascript
+@Component({
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss']
+})
+export class AppComponent {
+  title = 'app works!';
+}
+```
+
+When generating a new project you can also define which extension you want for
+style files:
+
+```bash
+ng new sassy-project --style=sass
+```
+
+Or set the default style on an existing project:
+
 ### Updating Angular CLI
 
 If you're using Angular CLI `beta.28` or less, you need to uninstall `angular-cli` package. It should be done due to changing of package's name and scope from `angular-cli` to `@angular/cli`:
