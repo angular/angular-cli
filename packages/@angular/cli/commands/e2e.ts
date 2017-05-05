@@ -14,6 +14,7 @@ export interface E2eTaskOptions extends ServeTaskOptions {
   webdriverUpdate: boolean;
   specs: string[];
   elementExplorer: boolean;
+  useDist: boolean;
 }
 
 const E2eCommand = Command.extend({
@@ -65,7 +66,14 @@ const E2eCommand = Command.extend({
         Compile and Serve the app.
         All non-reload related serve options are also available (e.g. --port=4400).
       `
-    }
+    },
+    {
+      name: 'use-dist',
+      type: Boolean,
+      default: false,
+      aliases: ['ud'],
+      description: 'Uses the files in the dist folder to run tests instead of serving from memory.',
+    },
   ], [
     {
       name: 'port',

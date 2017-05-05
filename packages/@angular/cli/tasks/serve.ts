@@ -31,7 +31,15 @@ export default Task.extend({
     if (projectConfig.project && projectConfig.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }
-    rimraf.sync(path.resolve(this.project.root, outputPath));
+
+    const contentBase = path.resolve(this.project.root, outputPath);
+    if (serveTaskOptions.useDist) {
+      if(!fs.existsSync(contentBase)) {
+        throw new SilentError('Dist directory not found');
+      }
+    } else {
+      rimraf.sync(contentBase);
+    }
 
     const serveDefaults = {
       // default deployUrl to '' on serve to prevent the default from .angular-cli.json
@@ -154,6 +162,12 @@ export default Task.extend({
       contentBase: false
     };
 
+    if (serveTaskOptions.useDist) {
+      webpackDevServerConfiguration.contentBase = contentBase;
+      webpackDevServerConfiguration.lazy = true;
+      webpackDevServerConfiguration.filename = appConfig.main;
+    }
+
     if (sslKey != null && sslCert != null) {
       webpackDevServerConfiguration.key = sslKey;
       webpackDevServerConfiguration.cert = sslCert;
@@ -190,7 +204,10 @@ export default Task.extend({
           return reject(err);
         }
         if (serveTaskOptions.open) {
-            opn(serverAddress);
+          opn(serverAddress);
+        }
+        if(serveTaskOptions.useDist && rebuildDoneCb) {
+          rebuildDoneCb();
         }
       });
     })
