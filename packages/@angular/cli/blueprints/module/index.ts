@@ -13,6 +13,7 @@ const astUtils = require('../../utilities/ast-utils');
 const getFiles = Blueprint.prototype.files;
 
 export default Blueprint.extend({
+  name: 'module',
   description: '',
   aliases: ['m'],
 
