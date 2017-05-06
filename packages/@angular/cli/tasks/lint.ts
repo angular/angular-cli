@@ -1,10 +1,14 @@
-const Task = require('../ember-cli/lib/models/task');
 import * as chalk from 'chalk';
+import * as fs from 'fs';
 import * as glob from 'glob';
+import * as path from 'path';
 import * as ts from 'typescript';
 import { requireProjectModule } from '../utilities/require-project-module';
 import { CliConfig } from '../models/config';
 import { LintCommandOptions } from '../commands/lint';
+
+const SilentError = require('silent-error');
+const Task = require('../ember-cli/lib/models/task');
 
 interface CliLintConfig {
   files?: (string | string[]);
@@ -30,7 +34,12 @@ export default Task.extend({
 
     const result = lintConfigs
       .map((config) => {
-        const program: ts.Program = Linter.createProgram(config.project);
+        let program: ts.Program;
+        if (config.project) {
+          program = Linter.createProgram(config.project);
+        } else if (commandOptions.typeCheck) {
+          ui.writeLine(chalk.yellow('A "project" must be specified to enable type checking.'));
+        }
         const files = getFilesToLint(program, config, Linter);
         const lintOptions = {
           fix: commandOptions.fix,
@@ -39,13 +48,21 @@ export default Task.extend({
         const lintProgram = commandOptions.typeCheck ? program : undefined;
         const linter = new Linter(lintOptions, lintProgram);
 
+        let lastDirectory: string;
+        let configLoad: any;
         files.forEach((file) => {
-          const sourceFile = program.getSourceFile(file);
-          if (!sourceFile) {
+          const fileContents = getFileContents(file, program);
+          if (!fileContents) {
             return;
           }
-          const fileContents = sourceFile.getFullText();
-          const configLoad = Configuration.findConfiguration(config.tslintConfig, file);
+
+          // Only check for a new tslint config if path changes
+          const currentDirectory = path.dirname(file);
+          if (currentDirectory !== lastDirectory) {
+            configLoad = Configuration.findConfiguration(config.tslintConfig, file);
+            lastDirectory = currentDirectory;
+          }
+
           linter.lint(file, fileContents, configLoad.results);
         });
 
@@ -94,7 +111,7 @@ function getFilesToLint(program: ts.Program, lintConfig: CliLintConfig, Linter: 
 
   if (lintConfig.files !== null) {
     files = Array.isArray(lintConfig.files) ? lintConfig.files : [lintConfig.files];
-  } else {
+  } else if (program) {
     files = Linter.getFileNames(program);
   }
 
@@ -113,4 +130,24 @@ function getFilesToLint(program: ts.Program, lintConfig: CliLintConfig, Linter: 
     .reduce((a: string[], b: string[]) => a.concat(b), []);
 
   return files;
+}
+
+function getFileContents(file: string, program?: ts.Program): string {
+  let contents: string;
+
+  if (program) {
+    const sourceFile = program.getSourceFile(file);
+    if (sourceFile) {
+       contents = sourceFile.getFullText();
+    }
+  } else {
+    // NOTE: The tslint CLI checks for and excludes MPEG transport streams; this does not.
+    try {
+      contents = fs.readFileSync(file, 'utf8');
+    } catch (e) {
+      throw new SilentError(`Could not read file "${file}".`);
+    }
+  }
+
+  return contents;
 }
