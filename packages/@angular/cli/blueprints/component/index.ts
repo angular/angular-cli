@@ -36,6 +36,7 @@ function correctCase(options: any) {
 }
 
 export default Blueprint.extend({
+  name: 'component',
   description: '',
   aliases: ['c'],
 

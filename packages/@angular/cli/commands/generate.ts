@@ -1,69 +1,115 @@
+import * as chalk from 'chalk';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import { oneLine } from 'common-tags';
 
-const chalk = require('chalk');
-const EmberGenerateCommand = require('../ember-cli/lib/commands/generate');
+const Command = require('../ember-cli/lib/models/command');
 const Blueprint = require('../ember-cli/lib/models/blueprint');
+const parseOptions = require('../ember-cli/lib/utilities/parse-options');
 const SilentError = require('silent-error');
 
-const blueprintList = fs.readdirSync(path.join(__dirname, '..', 'blueprints'));
-const blueprints = blueprintList
-  .filter(bp => bp.indexOf('-test') === -1)
-  .filter(bp => bp !== 'ng')
-  .map(bp => Blueprint.load(path.join(__dirname, '..', 'blueprints', bp)));
+function loadBlueprints(): Array<any> {
+  const blueprintList = fs.readdirSync(path.join(__dirname, '..', 'blueprints'));
+  const blueprints = blueprintList
+    .filter(bp => bp.indexOf('-test') === -1)
+    .filter(bp => bp !== 'ng')
+    .map(bp => Blueprint.load(path.join(__dirname, '..', 'blueprints', bp)));
 
-const GenerateCommand = EmberGenerateCommand.extend({
+  return blueprints;
+}
+
+export default Command.extend({
   name: 'generate',
+  description: 'Generates and/or modifies files based on a blueprint.',
+  aliases: ['g'],
 
-  blueprints: blueprints,
+  availableOptions: [
+    {
+      name: 'dry-run',
+      type: Boolean,
+      default: false,
+      aliases: ['d'],
+      description: 'Run through without making any changes.'
+    },
+    {
+      name: 'verbose',
+      type: Boolean,
+      default: false,
+      aliases: ['v'],
+      description: 'Adds more details to output logging.'
+    }
+  ],
+
+  anonymousOptions: [
+    '<blueprint>'
+  ],
 
   beforeRun: function (rawArgs: string[]) {
     if (!rawArgs.length) {
       return;
     }
 
-    // map the blueprint name to allow for aliases
-    rawArgs[0] = mapBlueprintName(rawArgs[0]);
-
-    const isHelp: boolean = ['--help', '-h'].indexOf(rawArgs[0]) > -1;
-    if (!isHelp && !fs.existsSync(path.join(__dirname, '..', 'blueprints', rawArgs[0]))) {
-      SilentError.debugOrThrow('@angular/cli/commands/generate',
-        `Invalid blueprint: ${rawArgs[0]}`);
+    const isHelp = ['--help', '-h'].includes(rawArgs[0]);
+    if (isHelp) {
+      return;
     }
 
-    if (!isHelp && !rawArgs[1]) {
+    this.blueprints = loadBlueprints();
+
+    const name = rawArgs[0];
+    const blueprint = this.blueprints.find((bp: any) => bp.name === name
+                                        || (bp.aliases && bp.aliases.includes(name)));
+
+    if (!blueprint) {
       SilentError.debugOrThrow('@angular/cli/commands/generate',
-        `The \`ng generate ${rawArgs[0]}\` command requires a name to be specified.`);
+        `Invalid blueprint: ${name}`);
     }
 
-    // Override default help to hide ember blueprints
-    EmberGenerateCommand.prototype.printDetailedHelp = function () {
-      this.ui.writeLine(chalk.cyan('  Available blueprints'));
-      this.ui.writeLine(blueprints.map(bp => bp.printBasicHelp(false)).join(os.EOL));
+    if (!rawArgs[1]) {
+      SilentError.debugOrThrow('@angular/cli/commands/generate',
+        `The \`ng generate ${name}\` command requires a name to be specified.`);
+    }
+
+    rawArgs[0] = blueprint.name;
+    this.registerOptions(blueprint);
+  },
+
+  printDetailedHelp: function () {
+    if (!this.blueprints) {
+      this.blueprints = loadBlueprints();
+    }
+    this.ui.writeLine(chalk.cyan('  Available blueprints'));
+    this.ui.writeLine(this.blueprints.map((bp: any) => bp.printBasicHelp(false)).join(os.EOL));
+  },
+
+  run: function (commandOptions: any, rawArgs: string[]) {
+    const name = rawArgs[0];
+    if (!name) {
+      return Promise.reject(new SilentError(oneLine`
+          The "ng generate" command requires a
+          blueprint name to be specified.
+          For more details, use "ng help".
+      `));
+    }
+
+    const blueprint = this.blueprints.find((bp: any) => bp.name === name
+                                        || (bp.aliases && bp.aliases.includes(name)));
+
+    const blueprintOptions = {
+      target: this.project.root,
+      entity: {
+        name: rawArgs[1],
+        options: parseOptions(rawArgs.slice(2))
+      },
+      ui: this.ui,
+      project: this.project,
+      settings: this.settings,
+      testing: this.testing,
+      args: rawArgs,
+      ...commandOptions
     };
 
-    return EmberGenerateCommand.prototype.beforeRun.apply(this, arguments);
+    return blueprint.install(blueprintOptions);
   }
 });
-
-function mapBlueprintName(name: string): string {
-  let mappedName: string = aliasMap[name];
-  return mappedName ? mappedName : name;
-}
-
-const aliasMap: { [alias: string]: string } = {
-  'cl': 'class',
-  'c': 'component',
-  'd': 'directive',
-  'e': 'enum',
-  'g': 'guard',
-  'i': 'interface',
-  'm': 'module',
-  'p': 'pipe',
-  'r': 'route',
-  's': 'service'
-};
-
-export default GenerateCommand;
-GenerateCommand.overrideCore = true;

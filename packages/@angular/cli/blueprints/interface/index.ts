@@ -6,6 +6,7 @@ const stringUtils = require('ember-cli-string-utils');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 
 export default Blueprint.extend({
+  name: 'interface',
   description: '',
   aliases: ['i'],
 
