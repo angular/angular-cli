@@ -13,6 +13,7 @@ const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const getFiles = Blueprint.prototype.files;
 
 export default Blueprint.extend({
+  name: 'directive',
   description: '',
   aliases: ['d'],
 
