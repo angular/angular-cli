@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { oneLine } from 'common-tags';
+import { CliConfig } from '../models/config';
 
 const Command = require('../ember-cli/lib/models/command');
 const Blueprint = require('../ember-cli/lib/models/blueprint');
@@ -33,6 +34,12 @@ export default Command.extend({
       description: 'Run through without making any changes.'
     },
     {
+      name: 'lint-fix',
+      type: Boolean,
+      aliases: ['lf'],
+      description: 'Use lint to fix files after generation.'
+    },
+    {
       name: 'verbose',
       type: Boolean,
       default: false,
@@ -59,7 +66,7 @@ export default Command.extend({
 
     const name = rawArgs[0];
     const blueprint = this.blueprints.find((bp: any) => bp.name === name
-                                        || (bp.aliases && bp.aliases.includes(name)));
+      || (bp.aliases && bp.aliases.includes(name)));
 
     if (!blueprint) {
       SilentError.debugOrThrow('@angular/cli/commands/generate',
@@ -94,7 +101,7 @@ export default Command.extend({
     }
 
     const blueprint = this.blueprints.find((bp: any) => bp.name === name
-                                        || (bp.aliases && bp.aliases.includes(name)));
+      || (bp.aliases && bp.aliases.includes(name)));
 
     const blueprintOptions = {
       target: this.project.root,
@@ -110,6 +117,27 @@ export default Command.extend({
       ...commandOptions
     };
 
-    return blueprint.install(blueprintOptions);
+    return blueprint.install(blueprintOptions)
+      .then(() => {
+        const lintFix = commandOptions.lintFix !== undefined ?
+          commandOptions.lintFix : CliConfig.getValue('defaults.lintFix');
+
+        if (lintFix && blueprint.modifiedFiles) {
+            const LintTask = require('../tasks/lint').default;
+            const lintTask = new LintTask({
+              ui: this.ui,
+              project: this.project
+            });
+
+            return lintTask.run({
+              fix: true,
+              force: true,
+              silent: true,
+              configs: [{
+                files: blueprint.modifiedFiles.filter((file: string) => /.ts$/.test(file))
+              }]
+            });
+        }
+      });
   }
 });
