@@ -111,6 +111,7 @@ export default Blueprint.extend({
       this._writeStatusToUI(chalk.yellow,
         'update',
         path.relative(this.project.root, this.pathToModule));
+      this.addModifiedFile(this.pathToModule);
     }
 
     return Promise.all(returns);

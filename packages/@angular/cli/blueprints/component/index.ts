@@ -272,6 +272,7 @@ export default Blueprint.extend({
             this._writeStatusToUI(chalk.yellow,
               moduleStatus,
               path.relative(this.project.root, this.pathToModule));
+            this.addModifiedFile(this.pathToModule);
           }));
     }
 

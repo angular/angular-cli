@@ -299,6 +299,11 @@
           "description": "How often to check for file updates.",
           "type": "number"
         },
+        "lintFix": {
+          "description": "Use lint to fix files after generation",
+          "type": "boolean",
+          "default": false
+        },
         "class": {
           "description": "Options for generating a class.",
           "type": "object",

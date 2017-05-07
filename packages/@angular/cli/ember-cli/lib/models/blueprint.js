@@ -364,6 +364,13 @@ Blueprint.prototype._writeStatusToUI = function(chalkColor, keyword, message) {
   }
 };
 
+Blueprint.prototype.addModifiedFile = function(file) {
+  if (!this.modifiedFiles) {
+    this.modifiedFiles = [];
+  }
+  this.modifiedFiles.push(file);
+}
+
 /**
   @private
   @method _writeFile
@@ -372,6 +379,7 @@ Blueprint.prototype._writeStatusToUI = function(chalkColor, keyword, message) {
 */
 Blueprint.prototype._writeFile = function(info) {
   if (!this.dryRun) {
+    this.addModifiedFile(info.outputPath);
     return writeFile(info.outputPath, info.render());
   }
 };
