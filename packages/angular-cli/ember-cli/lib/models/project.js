@@ -298,8 +298,20 @@ Project.prototype.initializeAddons = function() {
     pkg: cliPkg,
   });
 
+  let customAddonObject = {
+    name: 'custom-addon',
+    path: this.root,
+    pkg: cliPkg,
+  }
+  let customAddonModulePath = Addon.resolvePath(customAddonObject);
+  if(existsSync(customAddonModulePath)){
+    const CustomAddonLookup = Addon.lookup(customAddonObject);
+    const customAddon = new CustomAddonLookup(this.addonParent, this);
+    this.addons.push(customAddon);
+  }
+
   const addon = new Constructor(this.addonParent, this);
-  this.addons = [addon];
+  this.addons.push(addon);
 };
 
 /**
