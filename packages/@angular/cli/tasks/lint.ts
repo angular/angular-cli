@@ -64,6 +64,9 @@ export default Task.extend({
         failures: [],
         fixes: undefined
       });
+      let allResults = results.split('\n');
+      allResults = allResults.filter((item, index) => allResults.indexOf(item) === index);
+      results = allResults.join('\n');
 
     const Formatter = tslint.findFormatter(commandOptions.format);
     const formatter = new Formatter();
