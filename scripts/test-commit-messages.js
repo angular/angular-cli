@@ -33,6 +33,8 @@ logger
 
 // Note: This is based on the gulp task found in the angular/angular repository
 execSync('git fetch origin');
+// Travis doesn't have master when running jobs on other branches (minor/patch/etc).
+execSync('git fetch origin master:master');
 
 
 const output = execSync('git log master.. --reverse --format="%H %s" --no-merges', {
