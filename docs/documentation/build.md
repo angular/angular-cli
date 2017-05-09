@@ -59,10 +59,28 @@ ng build --base-href /myUrl/
 ng build --bh /myUrl/
 ```
 
-### Bundling
+### Bundling & Tree-Shaking
 
-All builds make use of bundling, and using the `--prod` flag in  `ng build --prod`
-or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
+All builds make use of bundling and limited tree-shaking, while `--prod` builds also run limited
+dead code elimination via UglifyJS.
+
+### `--dev` vs `--prod` builds
+
+Both `--dev`/`--target=development` and `--prod`/`--target=production` are 'meta' flags, that set other flags.
+If you do not specify either you will get the `--dev` defaults.
+
+Flag                | `--dev` | `--prod`
+---                 | ---     | ---
+`--aot`             | `false` | `true`
+`--environment`     | `dev`   | `prod`
+`--output-hashing`  | `media` | `all`
+`--sourcemaps`      | `true`  | `false`
+`--extract-css`     | `false` | `true`
+
+`--prod` also sets the following non-flaggable settings:
+- Adds service worker if configured in `.angular-cli.json`.
+- Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
+- Runs UglifyJS on the code.
 
 ## Options
 <details>
