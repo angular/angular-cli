@@ -222,7 +222,7 @@ describe('Acceptance: ng generate directive', function () {
         .then(() => ng(['generate', 'directive', 'baz', '--module', path.join('foo', 'foo.module.ts')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazDirective.*from '.\/..\/baz.directive';/);
+          expect(content).matches(/import.*BazDirective.*from '..\/baz.directive';/);
           expect(content).matches(/declarations:\s+\[BazDirective]/m);
         });
     });
@@ -236,7 +236,7 @@ describe('Acceptance: ng generate directive', function () {
         .then(() => ng(['generate', 'directive', 'baz', '--module', path.join('foo', 'foo')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazDirective.*from '.\/..\/baz.directive';/);
+          expect(content).matches(/import.*BazDirective.*from '..\/baz.directive';/);
           expect(content).matches(/declarations:\s+\[BazDirective]/m);
         });
     });
@@ -250,7 +250,7 @@ describe('Acceptance: ng generate directive', function () {
         .then(() => ng(['generate', 'directive', 'baz', '--module', 'foo']))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazDirective.*from '.\/..\/baz.directive';/);
+          expect(content).matches(/import.*BazDirective.*from '..\/baz.directive';/);
           expect(content).matches(/declarations:\s+\[BazDirective]/m);
         });
     });
@@ -265,7 +265,7 @@ describe('Acceptance: ng generate directive', function () {
         .then(() => ng(['generate', 'directive', 'baz', '--module', path.join('foo', 'bar')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazDirective.*from '.\/..\/..\/baz.directive';/);
+          expect(content).matches(/import.*BazDirective.*from '..\/..\/baz.directive';/);
           expect(content).matches(/declarations:\s+\[BazDirective]/m);
         });
     });

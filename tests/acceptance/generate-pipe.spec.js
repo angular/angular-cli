@@ -200,7 +200,7 @@ describe('Acceptance: ng generate pipe', function () {
         .then(() => ng(['generate', 'pipe', 'baz', '--module', path.join('foo', 'foo.module.ts')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazPipe.*from '.\/..\/baz.pipe';/);
+          expect(content).matches(/import.*BazPipe.*from '..\/baz.pipe';/);
           expect(content).matches(/declarations:\s+\[BazPipe]/m);
         });
     });
@@ -214,7 +214,7 @@ describe('Acceptance: ng generate pipe', function () {
         .then(() => ng(['generate', 'pipe', 'baz', '--module', path.join('foo', 'foo')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazPipe.*from '.\/..\/baz.pipe';/);
+          expect(content).matches(/import.*BazPipe.*from '..\/baz.pipe';/);
           expect(content).matches(/declarations:\s+\[BazPipe]/m);
         });
     });
@@ -228,7 +228,7 @@ describe('Acceptance: ng generate pipe', function () {
         .then(() => ng(['generate', 'pipe', 'baz', '--module', 'foo']))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazPipe.*from '.\/..\/baz.pipe';/);
+          expect(content).matches(/import.*BazPipe.*from '..\/baz.pipe';/);
           expect(content).matches(/declarations:\s+\[BazPipe]/m);
         });
     });
@@ -243,7 +243,7 @@ describe('Acceptance: ng generate pipe', function () {
         .then(() => ng(['generate', 'pipe', 'baz', '--module', path.join('foo', 'bar')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).matches(/import.*BazPipe.*from '.\/..\/..\/baz.pipe';/);
+          expect(content).matches(/import.*BazPipe.*from '..\/..\/baz.pipe';/);
           expect(content).matches(/declarations:\s+\[BazPipe]/m);
         });
     });
