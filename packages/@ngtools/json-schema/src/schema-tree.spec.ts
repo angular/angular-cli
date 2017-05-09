@@ -15,6 +15,7 @@ describe('@ngtools/json-schema', () => {
 
     it('works', () => {
       const proto: any = Object.create(null);
+      // tslint:disable-next-line
       new RootSchemaTreeNode(proto, {
         value: valueJson,
         schema: schemaJson
@@ -47,6 +48,7 @@ describe('@ngtools/json-schema', () => {
 
     it('works', () => {
       const proto: any = Object.create(null);
+      // tslint:disable-next-line
       new RootSchemaTreeNode(proto, {
         value: valueJson,
         schema: schemaJson

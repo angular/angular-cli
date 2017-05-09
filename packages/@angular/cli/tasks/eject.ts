@@ -126,8 +126,8 @@ class JsonWebpackSerializer {
     });
   }
 
-  _definePlugin(plugin: any) {
-    return plugin.definitions;
+  _environmentPlugin(plugin: any) {
+    return plugin.defaultValues;
   }
 
   private _pluginsReplacer(plugins: any[]) {
@@ -140,6 +140,9 @@ class JsonWebpackSerializer {
           break;
         case webpack.NoEmitOnErrorsPlugin:
           this._addImport('webpack', 'NoEmitOnErrorsPlugin');
+          break;
+        case webpack.NamedModulesPlugin:
+          this._addImport('webpack', 'NamedModulesPlugin');
           break;
         case (<any>webpack).HashedModuleIdsPlugin:
           this._addImport('webpack', 'HashedModuleIdsPlugin');
@@ -169,9 +172,9 @@ class JsonWebpackSerializer {
           args = this._htmlWebpackPlugin(plugin);
           this.variableImports['html-webpack-plugin'] = 'HtmlWebpackPlugin';
           break;
-        case webpack.DefinePlugin:
-          args = this._definePlugin(plugin);
-          this._addImport('webpack', 'DefinePlugin');
+        case webpack.EnvironmentPlugin:
+          args = this._environmentPlugin(plugin);
+          this._addImport('webpack', 'EnvironmentPlugin');
           break;
 
         default:
@@ -462,6 +465,7 @@ export default Task.extend({
 
         // Update all loaders from webpack, plus postcss plugins.
         [
+          'webpack',
           'autoprefixer',
           'css-loader',
           'cssnano',

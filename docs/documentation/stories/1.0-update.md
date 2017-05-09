@@ -23,31 +23,57 @@ If you prefer, you can also generate a new project in a separate folder using
 
 ## @angular/cli
 
-Angular CLI can now be found on NPM under `@angular/cli` instead of `angular-cli`, and has a
-minimum requirement of Node 6.9.0 or higher, together with NPM 3 or higher.
+Angular CLI can now be found on NPM under `@angular/cli` instead of `angular-cli`, and upgrading is a simple 3 step process:
 
-If you're using Angular CLI `beta.28` or less, you need to uninstall the `angular-cli` package.
+1. Uninstall old version
+2. Update node/npm if necessary
+3. Install new version
+
+### 1. Uninstall old version
+
+If you're using Angular CLI `beta.28` or less, you need to uninstall the `angular-cli` packages:
 ```bash
-npm uninstall -g angular-cli
-npm uninstall --save-dev angular-cli
+npm uninstall -g angular-cli          # Remove global package
+npm uninstall --save-dev angular-cli  # Remove from package.json
 ```
 
-To update Angular CLI to a new version, you must update both the global package and your project's
-local package.
-
-Global package:
+Otherwise, uninstall the  `@angular/cli` packages:
 ```bash
-npm uninstall -g @angular/cli
+npm uninstall -g @angular/cli         # Remove global package
+npm uninstall --save-dev @angular/cli # Remove from package.json
+```
+
+Also purge the cache and local packages:
+```
+rm -rf node_modules dist # Use rmdir on Windows
 npm cache clean
-npm install -g @angular/cli@latest
 ```
 
-Local project package:
+At this point, you should not have Angular CLI on your system anymore. If invoking Angular CLI at the commandline reveals that it still exists on your system, you will have to manually remove it. See _Manually removing residual Angular CLI_.
+
+### 2. Update node/npm if necessary
+
+Angular CLI now has a minimum requirement of Node 6.9.0 or higher, together with NPM 3 or higher.
+
+If your Node or NPM versions do not meet these requirements, please refer to [the documentation](https://docs.npmjs.com/getting-started/installing-node) on how to upgrade. 
+
+### 3. Install the new version
+
+To update Angular CLI to a new version, you must update both the global package and your project's local package:
+
 ```bash
-rm -rf node_modules dist # use rmdir on Windows
-npm install --save-dev @angular/cli@latest
-npm install
+npm install -g @angular/cli@latest          # Global package
+npm install --save-dev @angular/cli@latest  # Local package
+npm install                                 # Restore removed dependencies
 ```
+
+### Manually removing residual Angular CLI
+
+If you accidentally updated NPM before removing the old Angular CLI, you may find that uninstalling the package using `npm uninstall` is proving fruitless. This _could_ be because the global install (and uninstall) path changed between versions of npm from `/usr/local/lib` to `/usr/lib`, and hence, no longer searches through the old directory. In this case you'll have to remove it manually:
+
+`rm -rf /usr/local/lib/node_modules/@angular/cli`
+
+If the old Angular CLI package _still_ persists, you'll need to research how to remove it before proceeding with the upgrade.
 
 ## .angular-cli.json
 

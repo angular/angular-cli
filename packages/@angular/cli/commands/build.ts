@@ -118,6 +118,13 @@ export const baseBuildCommandOptions: any = [
     type: String,
     aliases: ['a'],
     description: 'Specifies app name or index to use.'
+  },
+  {
+    name: 'delete-output-path',
+    type: Boolean,
+    default: true,
+    aliases: ['dop'],
+    description: 'Delete output path before build.'
   }
 ];
 

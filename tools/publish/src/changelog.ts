@@ -24,8 +24,8 @@ const config = {
 
 function prependDelta() {
   return exec(
-    'cat CHANGELOG-delta.md CHANGELOG.md > CHANGELOG-new.md;' +
-    'mv CHANGELOG-new.md CHANGELOG.md;' +
+    'cat CHANGELOG-delta.md CHANGELOG.md > CHANGELOG-new.md &&' +
+    'mv CHANGELOG-new.md CHANGELOG.md &&' +
     'rm CHANGELOG-delta.md');
 }
 

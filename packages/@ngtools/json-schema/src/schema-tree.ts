@@ -102,7 +102,7 @@ export abstract class SchemaTreeNode<T> implements SchemaNode {
       throw new MissingImplementationError();
     }
     throw new SettingReadOnlyPropertyError();
-  };
+  }
   isCompatible(_v: any) { return false; }
 
   abstract serialize(serializer: Serializer): void;

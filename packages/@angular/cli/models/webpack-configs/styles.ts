@@ -47,8 +47,16 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const deployUrl = wco.buildOptions.deployUrl || '';
 
   const postcssPluginCreator = function() {
+    // safe settings based on: https://github.com/ben-eb/cssnano/issues/358#issuecomment-283696193
+    const importantCommentRe = /@preserve|@license|[@#]\s*source(?:Mapping)?URL|^!/i;
+    const minimizeOptions = {
+      autoprefixer: false, // full pass with autoprefixer is run separately
+      safe: true,
+      mergeLonghand: false, // version 3+ should be safe; cssnano currently uses 2.x
+      discardComments : { remove: (comment: string) => !importantCommentRe.test(comment) }
+    };
+
     return [
-      autoprefixer(),
       postcssUrl({
         url: (URL: string) => {
           // Only convert root relative URLs, which CSS-Loader won't process into require().
@@ -69,9 +77,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             return `/${baseHref}/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
           }
         }
-      })
+      }),
+      autoprefixer(),
     ].concat(
-        minimizeCss ? [cssnano({ safe: true, autoprefixer: false })] : []
+        minimizeCss ? [cssnano(minimizeOptions)] : []
     );
   };
   (postcssPluginCreator as any)[postcssArgs] = {
@@ -176,22 +185,27 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           ...commonLoaders,
           ...(use as webpack.Loader[])
         ],
-        fallback: 'style-loader',
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
         publicPath: ''
       };
       const ret: any = {
         include: globalStylePaths,
         test,
-        use: ExtractTextPlugin.extract(extractTextPlugin)
+        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin)
+                                     : ['style-loader', ...extractTextPlugin.use]
       };
       // Save the original options as arguments for eject.
-      ret[pluginArgs] = extractTextPlugin;
+      if (buildOptions.extractCss) {
+        ret[pluginArgs] = extractTextPlugin;
+      }
       return ret;
     }));
   }
 
   if (buildOptions.extractCss) {
+    // extract global css from js files into own css file
+    extraPlugins.push(
+      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.bundle.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
@@ -199,12 +213,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   return {
     entry: entryPoints,
     module: { rules },
-    plugins: [
-      // extract global css from js files into own css file
-      new ExtractTextPlugin({
-        filename: `[name]${hashFormat.extract}.bundle.css`,
-        disable: !buildOptions.extractCss
-      })
-    ].concat(extraPlugins)
+    plugins: [].concat(extraPlugins)
   };
 }

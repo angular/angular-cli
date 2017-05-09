@@ -2,14 +2,10 @@
 
 require('../lib/bootstrap-local');
 
-const fs = require('fs');
-const path = require('path');
 const validateCommitMessage = require('./validate-commit-message');
 const execSync = require('child_process').execSync;
 const chalk = require('chalk');
 const Logger = require('@ngtools/logger').Logger;
-const configPath = path.resolve(__dirname, './validate-commit-message/commit-message.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 require('rxjs/add/operator/filter');
 
 // Configure logger
@@ -37,51 +33,24 @@ logger
 
 // Note: This is based on the gulp task found in the angular/angular repository
 execSync('git fetch origin');
-
-// Find the branch
-const branchRefs = {};
-for (const name of config['branches']) {
-  const output = execSync(`git show-ref --hash ${name}`, { encoding: 'utf-8' });
-  if (output) {
-    branchRefs[name] = output;
-  }
-}
-logger.info(`Found refs for branches:\n  ${Object.entries(branchRefs).forEach(([key, value]) => {
-  return `${key} => ${value}`;
-}).join('\n  ')}`);
+// Travis doesn't have master when running jobs on other branches (minor/patch/etc).
+execSync('git fetch origin master:master');
 
 
-const output = execSync('git log --format="%H %s" --no-merges', { encoding: 'utf-8' });
+const output = execSync('git log master.. --reverse --format="%H %s" --no-merges', {
+  encoding: 'utf-8'
+});
 
 if (output.length === 0) {
   logger.warn('There are zero new commits between this HEAD and master');
-  return;
+  process.exit(0);
 }
+const commitsByLine = output.trim().split(/\n/).map(line => {
+  return line.trim().split(' ').slice(1).join(' ');
+});
+logger.info(`Examining ${commitsByLine.length} commit(s) between HEAD and master`);
 
-const commitByLines = [];
-let branch = null;
-
-// Finding the closest branch marker.
-for (const line of output.split(/n/)) {
-  const [hash, ...messageArray] = line.split(/ /);
-  const message = messageArray.join(' ');
-
-  const maybeBranch = Object.keys(branchRefs).find(branchName => branchRefs[branchName] == hash);
-  if (maybeBranch) {
-    branch = maybeBranch;
-    break;
-  }
-  commitByLines.push(message);
-}
-
-if (!branch) {
-  logger.fatal('Something wrong happened.');
-  return;
-}
-
-logger.info(`Examining ${commitsByLine.length} commit(s) between HEAD and ${branch}`);
-
-const someCommitsInvalid = !commitsByLine.every(validateCommitMessage);
+const someCommitsInvalid = !commitsByLine.every(message => validateCommitMessage(message));
 
 if (someCommitsInvalid) {
   logger.error('Please fix the failing commit messages before continuing...');

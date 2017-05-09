@@ -142,7 +142,7 @@ export function getDependentFiles(fileName: string, rootPath: string): Promise<M
           });
         if (tempModuleSpecifiers.length > 0) {
           relevantFiles[filePath] = tempModuleSpecifiers;
-        };
+        }
       });
       return relevantFiles;
     }));

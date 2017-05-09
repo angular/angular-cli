@@ -61,4 +61,4 @@ export function dynamicPathParser(project: any, entityName: string, appConfig: a
   parsedPath.dir = parsedPath.dir === path.sep ? '' : parsedPath.dir;
 
   return { ...parsedPath, appRoot, sourceDir };
-};
+}

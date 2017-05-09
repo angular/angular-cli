@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "1.0.1",
+  "version": "1.1.0-beta.0",
   "description": "CLI tool for Angular",
   "main": "packages/@angular/cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -63,8 +63,6 @@
     "isbinaryfile": "^3.0.0",
     "istanbul-instrumenter-loader": "^2.0.0",
     "json-loader": "^0.5.4",
-    "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^2.0.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.2",
     "loader-utils": "^1.0.2",
@@ -87,15 +85,16 @@
     "semver": "^5.3.0",
     "silent-error": "^1.0.0",
     "source-map": "^0.5.6",
-    "source-map-loader": "^0.1.5",
+    "source-map-loader": "^0.2.0",
     "style-loader": "^0.13.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "temp": "0.8.3",
-    "typescript": "~2.2.0",
+    "typescript": "~2.3.1",
     "url-loader": "^0.5.7",
     "walk-sync": "^0.3.1",
-    "webpack": "~2.2.0",
+    "webpack": "~2.4.0",
+    "webpack-dev-middleware": "^1.10.2",
     "webpack-dev-server": "~2.4.2",
     "webpack-merge": "^2.4.0",
     "zone.js": "^0.8.4"
@@ -125,7 +124,7 @@
     "@types/rimraf": "0.0.28",
     "@types/semver": "^5.3.30",
     "@types/source-map": "^0.5.0",
-    "@types/webpack": "^2.2.4",
+    "@types/webpack": "^2.2.15",
     "chai": "^3.5.0",
     "conventional-changelog": "^1.1.0",
     "dtsgenerator": "^0.9.1",
@@ -148,7 +147,7 @@
     "through": "^2.3.6",
     "tree-kill": "^1.0.0",
     "ts-node": "^2.0.0",
-    "tslint": "^4.0.2"
+    "tslint": "^5.1.0"
   },
   "optionalDependencies": {
     "node-sass": "^4.3.0"

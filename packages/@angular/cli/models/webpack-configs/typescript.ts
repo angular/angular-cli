@@ -95,7 +95,7 @@ export const getAotConfig = function(wco: WebpackConfigOptions) {
   // Fallback to exclude spec files from AoT compilation on projects using a shared tsconfig.
   if (testTsConfigPath === tsConfigPath) {
     let exclude = [ '**/*.spec.ts' ];
-    if (appConfig.test) { exclude.push(path.join(projectRoot, appConfig.root, appConfig.test)); };
+    if (appConfig.test) { exclude.push(path.join(projectRoot, appConfig.root, appConfig.test)); }
     pluginOptions.exclude = exclude;
   }
 

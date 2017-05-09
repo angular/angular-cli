@@ -8,7 +8,6 @@
 // This file hooks up on require calls to transpile TypeScript.
 const cli = require('../../ember-cli/lib/cli');
 const UI = require('../../ember-cli/lib/ui');
-const Watcher = require('../../ember-cli/lib/models/watcher');
 const path = require('path');
 
 
@@ -16,13 +15,6 @@ module.exports = function(options) {
 
   // patch UI to not print Ember-CLI warnings (which don't apply to Angular CLI)
   UI.prototype.writeWarnLine = function () { }
-
-  // patch Watcher to always default to node, not checking for Watchman
-  Watcher.detectWatcher = function(ui, _options){
-    var options = _options || {};
-    options.watcher = 'node';
-    return Promise.resolve(options);
-  }
 
   options.cli = {
     name: 'ng',

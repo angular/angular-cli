@@ -27,6 +27,16 @@
 </details>
 
 <details>
+  <summary>module</summary>
+  <p>
+    <code>--module</code> (aliases: <code>-m</code>)
+  </p>
+  <p>
+    Specifies where the module should be imported.
+  </p>
+</details>
+
+<details>
   <summary>spec</summary>
   <p>
     <code>--spec</code>
@@ -45,3 +55,5 @@
     Specifies if a routing module file should be generated.
   </p>
 </details>
+
+

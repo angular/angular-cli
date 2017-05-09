@@ -24,7 +24,7 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const { packages, tools } = require('../../lib/packages');
 const PATTERN = /^(revert\: )?(\w+)(?:\(([^)]+)\))?\: (.+)$/;
 
-module.exports = function(commitSubject, branch) {
+module.exports = function(commitSubject) {
   if (commitSubject.length > config['maxLength']) {
     error(`The commit message is longer than ${config['maxLength']} characters`, commitSubject);
     return false;
@@ -39,12 +39,8 @@ module.exports = function(commitSubject, branch) {
 
   const type = match[2];
   const types = Object.keys(config['types']);
-  if (!(type in types)) {
-    error(`${type} is not an allowed type.\n => TYPES: ${types.join(', ')}`, commitSubject);
-    return false;
-  }
-  if (types[type] !== "" && types[type] !== branch) {
-    error(`${type} is not allowed to be on branch ${branch}.`, commitSubject);
+  if (types.indexOf(type) === -1) {
+    error(`"${type}" is not an allowed type.\n => TYPES: "${types.join('", "')}"`, commitSubject);
     return false;
   }
 

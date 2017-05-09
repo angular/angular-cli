@@ -5,12 +5,6 @@ const Command = require('../ember-cli/lib/models/command');
 const stringUtils = require('ember-cli-string-utils');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
 
-const commandsToIgnore = [
-  'easter-egg',
-  'init',
-  'destroy'
-];
-
 const HelpCommand = Command.extend({
   name: 'help',
   description: 'Shows help for the CLI.',
@@ -27,10 +21,6 @@ const HelpCommand = Command.extend({
       .map(file => path.parse(file).name)
       .map(file => file.toLowerCase());
 
-    commandFiles = commandFiles.filter(file => {
-      return commandsToIgnore.indexOf(file) < 0;
-    });
-
     let commandMap = commandFiles.reduce((acc: any, curr: string) => {
       let classifiedName = stringUtils.classify(curr);
       let defaultImport = require(`./${curr}`).default;
@@ -45,14 +35,18 @@ const HelpCommand = Command.extend({
     }
 
     commandFiles.forEach(cmd => {
-      let Command = lookupCommand(commandMap, cmd);
+      const Command = lookupCommand(commandMap, cmd);
 
-      let command = new Command({
+      const command = new Command({
         ui: this.ui,
         project: this.project,
         commands: this.commands,
         tasks: this.tasks
       });
+
+      if (command.hidden || command.unknown) {
+        return;
+      }
 
       if (rawArgs.length > 0) {
         let commandInput = rawArgs[0];
