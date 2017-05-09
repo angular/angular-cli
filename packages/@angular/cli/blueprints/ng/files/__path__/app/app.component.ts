@@ -3,10 +3,10 @@ import { Component } from '@angular/core';
 @Component({
   selector: '<%= prefix %>-root',<% if (inlineTemplate) { %>
   template: `
-  <h1>
-    {{title}}
-  </h1><% if (routing) { %>
-  <router-outlet></router-outlet><% } %>
+    <h1>
+      {{title}}
+    </h1><% if (routing) { %>
+    <router-outlet></router-outlet><% } %>
   `,<% } else { %>
   templateUrl: './app.component.html',<% } %><% if (inlineStyle) { %>
   styles: []<% } else { %>
