@@ -36,8 +36,12 @@ execSync('git fetch origin');
 // Travis doesn't have master when running jobs on other branches (minor/patch/etc).
 execSync('git fetch origin master:master');
 
+// Get PR target branch, default to master for running locally.
+const currentBranch = process.env.TRAVIS_BRANCH
+  || process.env.APPVEYOR_REPO_BRANCH
+  || 'master';
 
-const output = execSync('git log master.. --reverse --format="%H %s" --no-merges', {
+const output = execSync('git log ' + currentBranch + '..HEAD --reverse --format="%H %s" --no-merges', {
   encoding: 'utf-8'
 });
 
