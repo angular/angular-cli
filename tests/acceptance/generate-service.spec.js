@@ -210,7 +210,7 @@ describe('Acceptance: ng generate service', function () {
         .then(() => ng(['generate', 'service', 'baz', '--module', path.join('foo', 'foo.module.ts')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).to.matches(/import.*BazService.*from '.\/..\/baz.service';/);
+          expect(content).to.matches(/import.*BazService.*from '..\/baz.service';/);
           expect(content).to.matches(/providers:\s*\[BazService\]/m);
         });
     });
@@ -224,7 +224,7 @@ describe('Acceptance: ng generate service', function () {
         .then(() => ng(['generate', 'service', 'baz', '--module', path.join('foo', 'foo')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).to.matches(/import.*BazService.*from '.\/..\/baz.service';/);
+          expect(content).to.matches(/import.*BazService.*from '..\/baz.service';/);
           expect(content).to.matches(/providers:\s*\[BazService\]/m);
         });
     });
@@ -238,7 +238,7 @@ describe('Acceptance: ng generate service', function () {
         .then(() => ng(['generate', 'service', 'baz', '--module', 'foo']))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).to.matches(/import.*BazService.*from '.\/..\/baz.service';/);
+          expect(content).to.matches(/import.*BazService.*from '..\/baz.service';/);
           expect(content).to.matches(/providers:\s*\[BazService\]/m);
         });
     });
@@ -253,7 +253,7 @@ describe('Acceptance: ng generate service', function () {
         .then(() => ng(['generate', 'service', 'baz', '--module', path.join('foo', 'bar')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
-          expect(content).to.matches(/import.*BazService.*from '.\/..\/..\/baz.service';/);
+          expect(content).to.matches(/import.*BazService.*from '..\/..\/baz.service';/);
           expect(content).to.matches(/providers:\s*\[BazService\]/m);
         });
     });
