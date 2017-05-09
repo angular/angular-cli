@@ -12,7 +12,7 @@ export default function() {
     .then(() => ngServe())
     .then(() => request('https://localhost:4200/'))
     .then(body => {
-      if (!body.match(/<app-root>Loading...<\/app-root>/)) {
+      if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value.');
       }
     })
