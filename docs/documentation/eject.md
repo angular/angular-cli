@@ -72,6 +72,17 @@ ng eject
   </p>
 </details>
 
+
+<details>
+  <summary>inline</summary>
+  <p>
+    `--inline` _default: false_
+  </p>
+  <p>
+    Inline Webpack bootstrap to index.html.
+  </p>
+</details>
+
 <details>
   <summary>force</summary>
   <p>

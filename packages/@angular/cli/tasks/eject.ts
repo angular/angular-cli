@@ -20,6 +20,7 @@ const angularCliPlugins = require('../plugins/webpack');
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const SilentError = require('silent-error');
 const licensePlugin = require('license-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -204,6 +205,10 @@ class JsonWebpackSerializer {
         case HtmlWebpackPlugin:
           args = this._htmlWebpackPlugin(plugin);
           this.variableImports['html-webpack-plugin'] = 'HtmlWebpackPlugin';
+          break;
+        case ScriptExtHtmlWebpackPlugin:
+          this.variableImports['script-ext-html-webpack-plugin']
+            = 'ScriptExtHtmlWebpackPlugin';
           break;
         case webpack.EnvironmentPlugin:
           args = this._environmentPlugin(plugin);
