@@ -16,7 +16,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "rootDir": ".",
-    "outDir": "dist",
+    "outDir": "../../dist/ng-aspnetcore-engine",
     "lib": [
       "dom",
       "es6"
