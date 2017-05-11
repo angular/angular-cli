@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "<%= relativeRootPath %>/out-tsc/app",
     "module": "es2015",
+    "importHelpers": true,
     "baseUrl": "",
     "types": []
   },
