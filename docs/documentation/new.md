@@ -11,7 +11,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>directory</summary>
   <p>
-    `--directory` (alias: `-dir`) _default value: dir_
+    <code>--directory</code> (alias: <code>-dir</code>) <em>default value: dir</em>
   </p>
   <p>
     The directory name to create the app in.
@@ -21,7 +21,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>dry-run</summary>
   <p>
-    `--dry-run` (alias: `-d`) _default value: false_
+    <code>--dry-run</code> (alias: <code>-d</code>) <em>default value: false</em>
   </p>
   <p>
     Run through without making any changes.
@@ -31,7 +31,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>inline-style</summary>
   <p>
-    `--inline-style` (alias: `-is`) _default value: false_
+    <code>--inline-style</code> (alias: <code>-is</code>) <em>default value: false</em>
   </p>
   <p>
     Should have an inline style.
@@ -41,7 +41,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>inline-template</summary>
   <p>
-    `--inline-template` (alias: `-it`) _default value: false_
+    <code>--inline-template</code> (alias: <code>-it</code>) <em>default value: false</em>
   </p>
   <p>
     Should have an inline template.
@@ -51,7 +51,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>prefix</summary>
   <p>
-    `--prefix` (alias: `-p`) _default value: app_
+    <code>--prefix</code> (alias: <code>-p</code>) <em>default value: app</em>
   </p>
   <p>
     The prefix to use for all component selectors.
@@ -61,7 +61,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>routing</summary>
   <p>
-    `--routing` _default value: false_
+    <code>--routing</code> <em>default value: false</em>
   </p>
   <p>
     Generate a routing module.
@@ -71,7 +71,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>skip-commit</summary>
   <p>
-    `--skip-commit` (alias: `-sc`) _default value: false_
+    <code>--skip-commit</code> (alias: <code>-sc</code>) <em>default value: false</em>
   </p>
   <p>
     Skip committing the first commit to git.
@@ -81,7 +81,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>skip-git</summary>
   <p>
-    `--skip-git` (alias: `-sg`) _default value: false_
+    <code>--skip-git</code> (alias: <code>-sg</code>) <em>default value: false</em>
   </p>
   <p>
     Skip initializing a git repository.
@@ -91,7 +91,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>skip-install</summary>
   <p>
-    `--skip-install` (alias: `-si`) _default value: false_
+    <code>--skip-install</code> (alias: <code>-si</code>) <em>default value: false</em>
   </p>
   <p>
     Skip installing packages.
@@ -101,7 +101,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>skip-tests</summary>
   <p>
-    <code>--skip-tests</code> (aliases: <code>-st</code>) <em>default value: false</em>
+    <code>--skip-tests (aliases: </code>-st) <em>default value: false</em>
   </p>
   <p>
     Skip creating spec files.
@@ -114,7 +114,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>source-dir</summary>
   <p>
-    `--source-dir` (alias: `-sd`) _default value: src_
+    <code>--source-dir</code> (alias: <code>-sd</code>) <em>default value: src</em>
   </p>
   <p>
     The name of the source directory.
@@ -124,7 +124,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>style</summary>
   <p>
-    `--style` _default value: css_
+    <code>--style</code> <em>default value: css</em>
   </p>
   <p>
     The style file default extension.
@@ -134,7 +134,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>verbose</summary>
   <p>
-    `--verbose` (alias: `-v`) _default value: false_
+    <code>--verbose</code> (alias: <code>-v</code>) <em>default value: false</em>
   </p>
   <p>
     Adds more details to output logging.
