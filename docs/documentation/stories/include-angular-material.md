@@ -9,12 +9,12 @@ ng new my-app
 cd my-app
 ```
 
-Install the `@angular/material` library and add the dependency to package.json...
+Install the `@angular/material` library and add the dependency to package.json.
 ```bash
 npm install --save @angular/material
 ```
 
-Some Material components depend on the Angular animations module so install the `@angular/animations` library and add the dependency to package.json...
+Some Material components depend on the Angular animations module so install the `@angular/animations` library and add the dependency to package.json.
 ```bash
 npm install --save @angular/animations
 ```
