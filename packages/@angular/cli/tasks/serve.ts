@@ -17,6 +17,39 @@ const SilentError = require('silent-error');
 const opn = require('opn');
 const yellow = require('chalk').yellow;
 
+function findDefaultServePath(baseHref: string, deployUrl: string): string | null {
+  if (!baseHref && !deployUrl) {
+    return '';
+  }
+
+  if (/^(\w+:)?\/\//.test(baseHref) || /^(\w+:)?\/\//.test(deployUrl)) {
+    // If baseHref or deployUrl is absolute, unsupported by ng serve
+    return null;
+  }
+
+  // normalize baseHref
+  // for ng serve the starting base is always `/` so a relative
+  // and root relative value are identical
+  const baseHrefParts = (baseHref || '')
+    .split('/')
+    .filter(part => part !== '');
+  if (baseHref && !baseHref.endsWith('/')) {
+    baseHrefParts.pop();
+  }
+  const normalizedBaseHref = baseHrefParts.length === 0 ? '/' : `/${baseHrefParts.join('/')}/`;
+
+  if (deployUrl && deployUrl[0] === '/') {
+    if (baseHref && baseHref[0] === '/' && normalizedBaseHref !== deployUrl) {
+      // If baseHref and deployUrl are root relative and not equivalent, unsupported by ng serve
+      return null;
+    }
+    return deployUrl;
+  }
+
+  // Join together baseHref and deployUrl
+  return `${normalizedBaseHref}${deployUrl || ''}`;
+}
+
 export default Task.extend({
   run: function (serveTaskOptions: ServeTaskOptions, rebuildDoneCb: any) {
     const ui = this.ui;
@@ -156,10 +189,29 @@ export default Task.extend({
       }
     }
 
+    let servePath = serveTaskOptions.servePath;
+    if (!servePath && servePath !== '') {
+      const defaultServePath =
+        findDefaultServePath(serveTaskOptions.baseHref, serveTaskOptions.deployUrl);
+      if (defaultServePath == null) {
+        ui.writeLine(oneLine`
+            ${chalk.yellow('WARNING')} --deploy-url and/or --base-href contain
+            unsupported values for ng serve.  Default serve path of '/' used.
+            Use --serve-path to override.
+          `);
+      }
+      servePath = defaultServePath || '';
+    }
+    if (servePath.endsWith('/')) {
+      servePath = servePath.substr(0, servePath.length - 1);
+    }
+    if (!servePath.startsWith('/')) {
+      servePath = `/${servePath}`;
+    }
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
-        index: `/${appConfig.index}`,
+        index: `${servePath}/${appConfig.index}`,
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
       },
@@ -177,7 +229,8 @@ export default Task.extend({
       },
       contentBase: false,
       public: serveTaskOptions.publicHost,
-      disableHostCheck: serveTaskOptions.disableHostCheck
+      disableHostCheck: serveTaskOptions.disableHostCheck,
+      publicPath: servePath
     };
 
     if (sslKey != null && sslCert != null) {
@@ -186,13 +239,6 @@ export default Task.extend({
     }
 
     webpackDevServerConfiguration.hot = serveTaskOptions.hmr;
-
-    // set publicPath property to be sent on webpack server config
-    if (serveTaskOptions.deployUrl) {
-      webpackDevServerConfiguration.publicPath = serveTaskOptions.deployUrl;
-      (webpackDevServerConfiguration.historyApiFallback as any).index =
-        serveTaskOptions.deployUrl + `/${appConfig.index}`;
-    }
 
     if (serveTaskOptions.target === 'production') {
       ui.writeLine(chalk.red(stripIndents`
@@ -208,7 +254,7 @@ export default Task.extend({
     ui.writeLine(chalk.green(oneLine`
       **
       NG Live Development Server is listening on ${serveTaskOptions.host}:${serveTaskOptions.port},
-      open your browser on ${serverAddress}
+      open your browser on ${serverAddress}${servePath}
       **
     `));
 
