@@ -26,6 +26,7 @@ export interface ServeTaskOptions extends BuildOptions {
   sslCert?: string;
   open?: boolean;
   hmr?: boolean;
+  servePath?: string;
 }
 
 // Expose options unrelated to live-reload to other commands that need to run serve
@@ -95,6 +96,11 @@ export const baseServeCommandOptions: any = overrideOptions([
     type: Boolean,
     default: false,
     description: 'Don\'t verify connected clients are part of allowed hosts.',
+  },
+  {
+    name: 'serve-path',
+    type: String,
+    description: 'The pathname where the app will be served.'
   },
   {
     name: 'hmr',
