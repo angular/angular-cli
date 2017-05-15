@@ -2,7 +2,7 @@
 
 # Using corporate proxy
 
-If you work behind a corporate proxy, the regular [backend proxy](http://github.com/angular/angular-cli#proxy-to-backend) configuration will not work if you try to proxy calls to any URL outside your local network.
+If you work behind a corporate proxy, the regular [backend proxy](https://github.com/angular/angular-cli/wiki/stories-proxy) configuration will not work if you try to proxy calls to any URL outside your local network.
 
 In this case, you can configure the backend proxy to redirect calls through your corporate proxy using an agent:
 
