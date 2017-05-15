@@ -93,12 +93,12 @@ export default function () {
           }
         }`,
       'src/app/app.component.spec.ts': `
-        import { TestBed, async } from '@angular/core/testing';
+        import { TestBed } from '@angular/core/testing';
         import { HttpModule } from '@angular/http';
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(async(() => {
+          beforeEach(() => {
             TestBed.configureTestingModule({
               imports: [
                 HttpModule
@@ -106,14 +106,14 @@ export default function () {
               declarations: [
                 AppComponent
               ]
-            }).compileComponents();
-          }));
+            });
+          });
 
-          it('should create the app', async(() => {
+          it('should create the app', () => {
             const fixture = TestBed.createComponent(AppComponent);
             const app = fixture.debugElement.componentInstance;
             expect(app).toBeTruthy();
-          }));
+          });
         });`,
       'e2e/app.e2e-spec.ts': `
         import { browser, element, by } from 'protractor';
