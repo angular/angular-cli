@@ -82,6 +82,20 @@ Flag                | `--dev` | `--prod`
 - Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
 - Runs UglifyJS on the code.
 
+### Service Worker
+
+There is experimental service worker support for production builds available in the CLI.
+To enable it, run the following commands:
+```
+npm install @angular/service-worker --save
+ng set apps.0.serviceWorker=true
+```
+
+On `--prod` builds a service worker manifest will be created and loaded automatically.
+Remember to disable the service worker while developing to avoid stale code.
+
+Note: service worker support is experimental and subject to change.
+
 ## Options
 <details>
   <summary>aot</summary>
