@@ -82,6 +82,13 @@ Flag                | `--dev` | `--prod`
 - Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
 - Runs UglifyJS on the code.
 
+### CSS resources
+
+Resources in CSS, such as images and fonts, will be copied over automatically as part of a build.
+If a resource is less than 10kb it will also be inlined.
+
+You'll see these resources be outputted and fingerprinted at the root of `dist/`.
+
 ## Options
 <details>
   <summary>aot</summary>
