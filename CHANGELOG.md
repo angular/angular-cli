@@ -1,3 +1,17 @@
+<a name="1.1.0-rc.0"></a>
+# [1.1.0-rc.0](https://github.com/angular/angular-cli/compare/v1.1.0-beta.1...v1.1.0-rc.0) (2017-05-15)
+
+
+### Bug Fixes
+
+* **@angular/cli:** adds language to index.html for accessibility ([cfe60b5](https://github.com/angular/angular-cli/commit/cfe60b5))
+* **@angular/cli:** allow e2e multi capabilities ([4f48be0](https://github.com/angular/angular-cli/commit/4f48be0)), closes [#975](https://github.com/angular/angular-cli/issues/975)
+* **@angular/cli:** enable full node module resolution for project deps ([#6276](https://github.com/angular/angular-cli/issues/6276)) ([54b1e35](https://github.com/angular/angular-cli/commit/54b1e35))
+* **@angular/cli:** language-service as devDeps only ([#6257](https://github.com/angular/angular-cli/issues/6257)) ([02aaec4](https://github.com/angular/angular-cli/commit/02aaec4))
+* **@angular/cli:** prefix `historyApiFallback.index` with `deployUrl` ([#6279](https://github.com/angular/angular-cli/issues/6279)) ([a5cfdde](https://github.com/angular/angular-cli/commit/a5cfdde))
+
+
+
 <a name="1.1.0-beta.1"></a>
 # [1.1.0-beta.1](https://github.com/angular/angular-cli/compare/v1.0.1...v1.1.0-beta.1) (2017-05-09)
 
