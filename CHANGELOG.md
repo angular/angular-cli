@@ -1,3 +1,66 @@
+<a name="1.1.0-rc.0"></a>
+# [1.1.0-rc.0](https://github.com/angular/angular-cli/compare/v1.1.0-beta.1...v1.1.0-rc.0) (2017-05-15)
+
+
+### Bug Fixes
+
+* **@angular/cli:** adds language to index.html for accessibility ([cfe60b5](https://github.com/angular/angular-cli/commit/cfe60b5))
+* **@angular/cli:** allow e2e multi capabilities ([4f48be0](https://github.com/angular/angular-cli/commit/4f48be0)), closes [#975](https://github.com/angular/angular-cli/issues/975)
+* **@angular/cli:** enable full node module resolution for project deps ([#6276](https://github.com/angular/angular-cli/issues/6276)) ([54b1e35](https://github.com/angular/angular-cli/commit/54b1e35))
+* **@angular/cli:** language-service as devDeps only ([#6257](https://github.com/angular/angular-cli/issues/6257)) ([02aaec4](https://github.com/angular/angular-cli/commit/02aaec4))
+* **@angular/cli:** prefix `historyApiFallback.index` with `deployUrl` ([#6279](https://github.com/angular/angular-cli/issues/6279)) ([a5cfdde](https://github.com/angular/angular-cli/commit/a5cfdde))
+
+
+
+<a name="1.1.0-beta.1"></a>
+# [1.1.0-beta.1](https://github.com/angular/angular-cli/compare/v1.0.1...v1.1.0-beta.1) (2017-05-09)
+
+
+### Bug Fixes
+
+* **@angular/cli:** add error message when missing config env variable ([#5980](https://github.com/angular/angular-cli/issues/5980)) ([11d0afc](https://github.com/angular/angular-cli/commit/11d0afc))
+* **@angular/cli:** fix text descriptions ([17ae140](https://github.com/angular/angular-cli/commit/17ae140)), closes [#5501](https://github.com/angular/angular-cli/issues/5501)
+* **@angular/cli:** fixing component blueprint indent ([0ef9eb7](https://github.com/angular/angular-cli/commit/0ef9eb7))
+* **@angular/cli:** format files according to tslint ([377a062](https://github.com/angular/angular-cli/commit/377a062)), closes [#5751](https://github.com/angular/angular-cli/issues/5751)
+* **@angular/cli:** import at least one locale-data with intl ([#6190](https://github.com/angular/angular-cli/issues/6190)) ([1cc979f](https://github.com/angular/angular-cli/commit/1cc979f))
+* **@angular/cli:** install webpack at ejection ([#5745](https://github.com/angular/angular-cli/issues/5745)) ([8e2f8cf](https://github.com/angular/angular-cli/commit/8e2f8cf))
+* **@angular/cli:** ng get: return whole config root when no path provided. ([a5d8bc1](https://github.com/angular/angular-cli/commit/a5d8bc1)), closes [#5887](https://github.com/angular/angular-cli/issues/5887)
+* **@angular/cli:** open option in serve command should open localhost when host is 0.0.0.0 ([23c039d](https://github.com/angular/angular-cli/commit/23c039d)), closes [#5743](https://github.com/angular/angular-cli/issues/5743)
+* **@angular/cli:** properly support CSS url()'s with whitespace ([d9af12c](https://github.com/angular/angular-cli/commit/d9af12c))
+* **@angular/cli:** remove default for test runners ([e7966a2](https://github.com/angular/angular-cli/commit/e7966a2))
+* **@angular/cli:** removes redundant rules from tslint.json ([#5783](https://github.com/angular/angular-cli/issues/5783)) ([d90292e](https://github.com/angular/angular-cli/commit/d90292e)), closes [#5755](https://github.com/angular/angular-cli/issues/5755)
+* correctly generate changelog ([3ec74e2](https://github.com/angular/angular-cli/commit/3ec74e2))
+* **@angular/cli:** simplify import path if possible ([#6184](https://github.com/angular/angular-cli/issues/6184)) ([2d42a58](https://github.com/angular/angular-cli/commit/2d42a58)), closes [#6183](https://github.com/angular/angular-cli/issues/6183)
+* **@angular/cli:** small typo on generated app.component.html ([6eeb9de](https://github.com/angular/angular-cli/commit/6eeb9de))
+* **@angular/cli:** Throw error when no key provided for ng get ([382ba8d](https://github.com/angular/angular-cli/commit/382ba8d)), closes [#5887](https://github.com/angular/angular-cli/issues/5887)
+* **@angular/cli:** Update README.md project generation text. ([#5958](https://github.com/angular/angular-cli/issues/5958)) ([a67eb07](https://github.com/angular/angular-cli/commit/a67eb07))
+* **@ngtools/logger:** add typings and other information to logger package.json ([698aa3e](https://github.com/angular/angular-cli/commit/698aa3e))
+
+
+### Features
+
+* **@angular/cli:** add flag to not delete output path ([8bf040b](https://github.com/angular/angular-cli/commit/8bf040b)), closes [#5925](https://github.com/angular/angular-cli/issues/5925) [#6193](https://github.com/angular/angular-cli/issues/6193)
+* **@angular/cli:** add host check flags to ng serve ([a54a991](https://github.com/angular/angular-cli/commit/a54a991)), closes [#6070](https://github.com/angular/angular-cli/issues/6070)
+* **@angular/cli:** add import flag to modules ([8b220a4](https://github.com/angular/angular-cli/commit/8b220a4)), closes [#5377](https://github.com/angular/angular-cli/issues/5377)
+* **@angular/cli:** add language service in devDependencies section ([bb99fac](https://github.com/angular/angular-cli/commit/bb99fac))
+* **@angular/cli:** add option to use lint to adjust generated files ([a3bf529](https://github.com/angular/angular-cli/commit/a3bf529))
+* **@angular/cli:** add publicPath support via command and angular-cli.json for webpack-dev-server ([8c78fb9](https://github.com/angular/angular-cli/commit/8c78fb9)), closes [#2727](https://github.com/angular/angular-cli/issues/2727)
+* **@angular/cli:** add some rules from tslint 4.5 ([d482986](https://github.com/angular/angular-cli/commit/d482986))
+* **@angular/cli:** adding option to search docs as well ([5e39361](https://github.com/angular/angular-cli/commit/5e39361))
+* **@angular/cli:** allow lint project setting to be optional ([8035f54](https://github.com/angular/angular-cli/commit/8035f54))
+* **@angular/cli:** always use named webpack modules in dev builds ([b07f631](https://github.com/angular/angular-cli/commit/b07f631))
+* **@angular/cli:** bump to tslint 5 & codelyzer 3 ([af758b8](https://github.com/angular/angular-cli/commit/af758b8))
+* **@angular/cli:** improve ng test performance ([1cd0a08](https://github.com/angular/angular-cli/commit/1cd0a08)), closes [#5423](https://github.com/angular/angular-cli/issues/5423)
+* **@angular/cli:** new project landing page ([#6144](https://github.com/angular/angular-cli/issues/6144)) ([0ac878a](https://github.com/angular/angular-cli/commit/0ac878a)), closes [#5928](https://github.com/angular/angular-cli/issues/5928) [#6125](https://github.com/angular/angular-cli/issues/6125)
+* **@angular/cli:** support inline source maps with defined charset ([ea4c864](https://github.com/angular/angular-cli/commit/ea4c864))
+* **@angular/cli:** support TypeScript 2.3 ([69d3d2b](https://github.com/angular/angular-cli/commit/69d3d2b))
+* **@angular/cli:** update tslint on updating prefix ([#5908](https://github.com/angular/angular-cli/issues/5908)) ([2bf5c96](https://github.com/angular/angular-cli/commit/2bf5c96)), closes [#5794](https://github.com/angular/angular-cli/issues/5794)
+* **@angular/cli:** upgrade the blueprint karma-coverage-istanbul-reporter version ([#5519](https://github.com/angular/angular-cli/issues/5519)) ([d7b46d0](https://github.com/angular/angular-cli/commit/d7b46d0))
+* **@angular/cli:** use and support webpack 2.3 ([aa958a6](https://github.com/angular/angular-cli/commit/aa958a6))
+* **@angular/cli:** use and support webpack 2.4 ([818936e](https://github.com/angular/angular-cli/commit/818936e))
+
+
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/angular/angular-cli/compare/v1.0.2...v1.0.3) (2017-05-09)
 
