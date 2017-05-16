@@ -39,11 +39,13 @@ class JsonWebpackSerializer {
   };
   public variables: {[name: string]: string} = {
     'nodeModules': `path.join(process.cwd(), 'node_modules')`,
+    'genDirNodeModules':
+      `path.join(process.cwd(), '${this._appRoot}', '$$_gendir', 'node_modules')`,
   };
   private _postcssProcessed = false;
 
 
-  constructor(private _root: string, private _dist: string) {}
+  constructor(private _root: string, private _dist: string, private _appRoot: string) {}
 
   private _escape(str: string) {
     return '\uFF01' + str + '\uFF01';
@@ -398,7 +400,7 @@ export default Task.extend({
     }
 
     const webpackConfig = new NgCliWebpackConfig(runTaskOptions, appConfig).buildConfig();
-    const serializer = new JsonWebpackSerializer(process.cwd(), outputPath);
+    const serializer = new JsonWebpackSerializer(process.cwd(), outputPath, appConfig.root);
     const output = serializer.serialize(webpackConfig);
     const webpackConfigStr = `${serializer.generateVariables()}\n\nmodule.exports = ${output};\n`;
 

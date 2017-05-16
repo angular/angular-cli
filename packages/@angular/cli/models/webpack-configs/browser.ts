@@ -12,7 +12,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
-  const nodeModules = path.resolve(projectRoot, 'node_modules');
 
   let extraPlugins: any[] = [];
 
@@ -23,10 +22,16 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   ]);
 
   if (buildOptions.vendorChunk) {
+    // Separate modules from node_modules into a vendor chunk.
+    const nodeModules = path.resolve(projectRoot, 'node_modules');
+    // --aot puts the generated *.ngfactory.ts in src/$$_gendir/node_modules.
+    const genDirNodeModules = path.resolve(appRoot, '$$_gendir', 'node_modules');
+
     extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       chunks: ['main'],
-      minChunks: (module: any) => module.resource && module.resource.startsWith(nodeModules)
+      minChunks: (module: any) => module.resource &&
+        (module.resource.startsWith(nodeModules) || module.resource.startsWith(genDirNodeModules))
     }));
   }
 
