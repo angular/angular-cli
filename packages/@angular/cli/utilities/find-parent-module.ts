@@ -26,7 +26,7 @@ export default function findParentModule(
     if (files.length === 1) {
       return path.join(pathToCheck, files[0]);
     } else if (files.length > 1) {
-      throw new SilentError(`Multiple module files found: ${pathToCheck.replace(sourceRoot, '')}`);
+      throw new SilentError(`Multiple module files found: ${JSON.stringify(files)}`);
     }
 
     // move to parent directory

@@ -7,6 +7,11 @@ export function resolveModulePath(
   let baseModuleName = moduleNameFromFlag;
   let parentFolders = '';
 
+  // If it's a full path from the cwd, we use it as is.
+  if (fs.existsSync(moduleNameFromFlag) && fs.statSync(moduleNameFromFlag).isFile()) {
+    return path.resolve(moduleNameFromFlag);
+  }
+
   if (baseModuleName.includes(path.sep)) {
     const splitPath = baseModuleName.split(path.sep);
     baseModuleName = splitPath.pop();
@@ -14,10 +19,7 @@ export function resolveModulePath(
   }
 
   if (baseModuleName.includes('.')) {
-    baseModuleName = baseModuleName
-      .split('.')
-      .filter(part => part !== 'module' && part !== 'ts')
-      .join('.');
+    baseModuleName = baseModuleName.replace(/(\.module)?(\.ts)?$/, '');
   }
 
   const baseModuleWithFileSuffix = `${baseModuleName}.module.ts`;
