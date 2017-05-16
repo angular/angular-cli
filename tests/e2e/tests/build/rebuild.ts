@@ -5,11 +5,13 @@ import {
   silentExecAndWaitForOutputToMatch,
   ng,
 } from '../../utils/process';
-import {writeFile, writeMultipleFiles, appendToFile, expectFileToMatch} from '../../utils/fs';
+import {writeFile, writeMultipleFiles} from '../../utils/fs';
 import {wait} from '../../utils/utils';
 import {request} from '../../utils/http';
 import {getGlobalVariable} from '../../utils/env';
 
+const validBundleRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
+const invalidBundleRegEx = /webpack: bundle is now INVALID|webpack: Compiling.../;
 
 export default function() {
   if (process.platform.startsWith('win')) {
@@ -23,14 +25,11 @@ export default function() {
   let oldNumberOfChunks = 0;
   const chunkRegExp = /chunk\s+\{/g;
 
-  return silentExecAndWaitForOutputToMatch('ng', ['serve'],
-      /webpack: bundle is now VALID|webpack: Compiled successfully./)
+  return silentExecAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
     // Should trigger a rebuild.
     .then(() => exec('touch', 'src/main.ts'))
-    .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now INVALID|webpack: Compiling.../, 10000))
-    .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(invalidBundleRegEx, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
     // Count the bundles.
     .then(({ stdout }) => {
       oldNumberOfChunks = stdout.split(chunkRegExp).length;
@@ -38,7 +37,7 @@ export default function() {
     // Add a lazy module.
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
     // Just wait for the rebuild, otherwise we might be validating the last build.
-    .then(() => wait(2000))
+    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
     .then(() => writeFile('src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
@@ -65,10 +64,8 @@ export default function() {
       })
       export class AppModule { }
     `))
-    .then(() => wait(2000))
     // Should trigger a rebuild with a new bundle.
-    .then(() => waitForAnyProcessOutputToMatch(
-        /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
     // Count the bundles.
     .then(({ stdout }) => {
       let newNumberOfChunks = stdout.split(chunkRegExp).length;
@@ -76,7 +73,6 @@ export default function() {
         throw new Error('Expected webpack to create a new chunk, but did not.');
       }
     })
-    .then(() => wait(2000))
     // Change multiple files and check that all of them are invalidated and recompiled.
     .then(() => writeMultipleFiles({
       'src/app/app.module.ts': `
@@ -89,8 +85,7 @@ export default function() {
         console.log('$$_E2E_GOLDEN_VALUE_3');
       `
     }))
-    .then(() => waitForAnyProcessOutputToMatch(
-      /webpack: bundle is now VALID|webpack: Compiled successfully./, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
     .then(() => wait(2000))
     .then(() => request('http://localhost:4200/main.bundle.js'))
     .then((body) => {
