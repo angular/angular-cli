@@ -8,6 +8,7 @@ import { <%= classifiedModuleName %>RoutingModule } from './<%= dasherizedModule
     CommonModule<% if (routing) { %>,
     <%= classifiedModuleName %>RoutingModule<% } %>
   ],
-  declarations: []
+  declarations: [],
+  exports: []
 })
 export class <%= classifiedModuleName %>Module { }
