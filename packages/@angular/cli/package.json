@@ -53,6 +53,7 @@
     "less": "^2.7.2",
     "less-loader": "^4.0.2",
     "lodash": "^4.11.1",
+    "memory-fs": "^0.4.1",
     "minimatch": "^3.0.3",
     "node-modules-path": "^1.0.0",
     "nopt": "^4.0.1",
