@@ -32,8 +32,9 @@ global library, and one imported as a module.
 This is especially bad for libraries with plugins, like JQuery, because each copy will have
 different plugins.
 
-Instead, download typings for your library (`npm install @types/jquery`) which will give you
-access to the global variables exposed by that library.
+Instead, download typings for your library (`npm install @types/jquery`) and follow
+the [3rd Party Library Installation](https://github.com/angular/angular-cli/wiki/stories-third-party-lib) steps,
+this will give you access to the global variables exposed by that library.
 
 If the global library you need to use does not have global typings, you can also declare them
 manually in `src/typings.d.ts` as `any`:
@@ -41,3 +42,15 @@ manually in `src/typings.d.ts` as `any`:
 ```
 declare var libraryName: any;
 ```
+
+When working with scripts that extend other libraries, for instance with JQuery plugins
+(e.g, `$('.test').myPlugin();`), since the installed `@types/jquery` may not include `myPlugin`,
+you would need to add an interface like the one below in `src/typings.d.ts`.
+
+```
+interface JQuery {
+  myPlugin(options?: any): any;
+}
+```
+
+Otherwise you may see `[TS][Error] Property 'myPlugin' does not exist on type 'JQuery'.` in your IDE.
