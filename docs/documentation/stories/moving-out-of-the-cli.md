@@ -7,7 +7,7 @@ Even if you need to use a different build system, you can still use other Angula
 like `ng generate`, `ng lint`, `ng test` and `ng e2e` by leaving in `.angular-cli.json` and
 supporting files like `src/test.ts`.
 
-Moving out of the CLI is very similar to [Moving into the CLI](moving-into-the-cli).
+Moving out of the CLI is very similar to [Moving into the CLI](moving-into-the-cli.md).
 You'll have to make a brand new project using your new project seed, move your app files and
 cater to any changes in the build process.
 
