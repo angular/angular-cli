@@ -42,6 +42,10 @@
             "default": "dist/",
             "description": "The output directory for build results."
           },
+          "platform": {
+            "type": "string",
+            "description": "The destination platform of app."
+          },
           "assets": {
             "type": "array",
             "description": "List of application assets.",

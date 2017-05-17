@@ -3,6 +3,7 @@ import { CliConfig } from './config';
 import { BuildOptions } from './build-options';
 import {
   getBrowserConfig,
+  getServerConfig,
   getCommonConfig,
   getDevConfig,
   getProdConfig,
@@ -37,12 +38,22 @@ export class NgCliWebpackConfig {
   }
 
   public buildConfig() {
-    let webpackConfigs = [
-      getCommonConfig(this.wco),
-      getBrowserConfig(this.wco),
-      getStylesConfig(this.wco),
-      this.getTargetConfig(this.wco)
+    let webpackConfigs: any[] = [
+      getCommonConfig(this.wco)
     ];
+
+    switch (this.wco.appConfig.platform) {
+      case 'browser':
+        webpackConfigs.push(getBrowserConfig(this.wco), getStylesConfig(this.wco));
+        break;
+      case 'server':
+        webpackConfigs.push(getServerConfig());
+        break;
+      default:
+        throw new Error('Only browser and server platforms are supported');
+    }
+
+    webpackConfigs.push(this.getTargetConfig(this.wco));
 
     if (this.wco.appConfig.main || this.wco.appConfig.polyfills) {
       const typescriptConfigPartial = this.wco.buildOptions.aot
@@ -106,6 +117,7 @@ export class NgCliWebpackConfig {
   public addAppConfigDefaults(appConfig: any) {
     const appConfigDefaults: any = {
       testTsconfig: appConfig.tsconfig,
+      platform: 'browser',
       scripts: [],
       styles: []
     };

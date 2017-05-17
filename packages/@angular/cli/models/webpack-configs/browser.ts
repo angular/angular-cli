@@ -13,6 +13,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const nodeModules = path.resolve(projectRoot, 'node_modules');
+  const entryPoints: { [key: string]: string[] } = {};
 
   let extraPlugins: any[] = [];
 
@@ -21,6 +22,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     ...extraEntryParser(appConfig.scripts, appRoot, 'scripts'),
     ...extraEntryParser(appConfig.styles, appRoot, 'styles')
   ]);
+
+  if (appConfig.polyfills) {
+    entryPoints['polyfills'] = [path.resolve(appRoot, appConfig.polyfills)];
+  }
 
   if (buildOptions.vendorChunk) {
     extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
@@ -31,6 +36,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   }
 
   return {
+    entry: entryPoints,
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
