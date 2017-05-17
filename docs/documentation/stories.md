@@ -26,3 +26,4 @@
  - [Application Environments](stories/application-environments)
  - [Autoprefixer Configuration](stories/autoprefixer)
  - [Deploy to GitHub Pages](stories/githug-pages)
+ - [Linked Library](stories/linked-library)
