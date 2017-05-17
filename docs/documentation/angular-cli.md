@@ -17,7 +17,7 @@
   - *deployUrl* (`string`): URL where files will be deployed.
   - *index* (`string`): The name of the start HTML file. Default is `index.html`
   - *main* (`string`): The name of the main entry-point file.
-  - *polyfills* (`string`): The name of the main entry-point file.
+  - *polyfills* (`string`): The name of the polyfills entry-point file. Loaded before the app.
   - *test* (`string`): The name of the test entry-point file.
   - *tsconfig* (`string`): The name of the TypeScript configuration file. Default is `tsconfig.app.json`.
   - *testTsconfig* (`string`): The name of the TypeScript configuration file for unit tests.
