@@ -99,6 +99,13 @@ export default Blueprint.extend({
       `;
       this._writeStatusToUI(chalk.yellow, 'WARNING', warningMessage);
     } else {
+      if (options.dryRun) {
+        this._writeStatusToUI(chalk.yellow,
+          'update',
+          path.relative(this.project.root, this.pathToModule));
+        return;
+      }
+
       const className = stringUtils.classify(`${options.entity.name}Guard`);
       const fileName = stringUtils.dasherize(`${options.entity.name}.guard`);
       const fullGeneratePath = path.join(this.project.root, this.generatePath);
