@@ -60,12 +60,13 @@ export default Task.extend({
 
     let clientAddress = serverAddress;
     if (serveTaskOptions.publicHost) {
-      const clientUrl = url.parse(serveTaskOptions.publicHost);
-      // very basic sanity check
-      if (!clientUrl.host) {
-        return Promise.reject(new SilentError(`'live-reload-client' must be a full URL.`));
+      let publicHost = serveTaskOptions.publicHost;
+      if (!/^\w+:\/\//.test(publicHost)) {
+        publicHost = `${serveTaskOptions.ssl ? 'https' : 'http'}://${publicHost}`;
       }
-      clientAddress = clientUrl.href;
+      const clientUrl = url.parse(publicHost);
+      serveTaskOptions.publicHost = clientUrl.host;
+      clientAddress = url.format(clientUrl);
     }
 
     if (serveTaskOptions.liveReload) {
