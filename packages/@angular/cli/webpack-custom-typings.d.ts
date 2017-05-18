@@ -7,4 +7,9 @@ declare module 'webpack' {
   export class HashedModuleIdsPlugin {
     constructor();
   }
+  namespace optimize {
+    export class ModuleConcatenationPlugin {
+      constructor();
+    }
+  }
 }

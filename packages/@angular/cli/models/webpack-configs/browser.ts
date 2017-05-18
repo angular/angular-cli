@@ -69,6 +69,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         baseHref: buildOptions.baseHref
       }),
       new webpack.optimize.CommonsChunkPlugin({
+        name: 'main',
         async: 'common',
         children: true,
         minChunks: 2
