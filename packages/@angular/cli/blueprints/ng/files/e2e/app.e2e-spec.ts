@@ -7,8 +7,10 @@ describe('<%= htmlComponentName %> App', () => {
     page = new <%= jsComponentName %>Page();
   });
 
-  it('should display welcome message', () => {
+  it('should display welcome message', done => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('Welcome to <%= prefix %>!!');
+    page.getParagraphText()
+      .then(msg => expect(msg).toEqual('Welcome to <%= prefix %>!!'))
+      .then(done, done.fail);
   });
 });
