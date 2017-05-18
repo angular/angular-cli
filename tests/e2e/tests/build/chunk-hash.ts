@@ -61,11 +61,11 @@ export default function() {
     `, '@angular/router'))
     .then(() => addImportToModule(
       'src/app/app.module.ts', 'ReactiveFormsModule', '@angular/forms'))
-    .then(() => ng('build', '--prod'))
+    .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       oldHashes = generateFileHashMap();
     })
-    .then(() => ng('build', '--prod'))
+    .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       newHashes = generateFileHashMap();
     })
@@ -74,16 +74,16 @@ export default function() {
       oldHashes = newHashes;
     })
     .then(() => writeFile('src/styles.css', 'body { background: blue; }'))
-    .then(() => ng('build', '--prod'))
+    .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       newHashes = generateFileHashMap();
     })
     .then(() => {
-      validateHashes(oldHashes, newHashes, ['styles']);
+      validateHashes(oldHashes, newHashes, ['inline', 'styles']);
       oldHashes = newHashes;
     })
     .then(() => writeFile('src/app/app.component.css', 'h1 { margin: 10px; }'))
-    .then(() => ng('build', '--prod'))
+    .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       newHashes = generateFileHashMap();
     })
@@ -93,7 +93,7 @@ export default function() {
     })
     .then(() => addImportToModule(
       'src/app/lazy/lazy.module.ts', 'ReactiveFormsModule', '@angular/forms'))
-    .then(() => ng('build', '--prod'))
+    .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       newHashes = generateFileHashMap();
     })

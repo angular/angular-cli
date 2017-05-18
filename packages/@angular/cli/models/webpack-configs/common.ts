@@ -106,6 +106,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     ].concat(extraPlugins),
     node: {
       fs: 'empty',
+      // `global` should be kept true, removing it resulted in a
+      // massive size increase with NGO on AIO.
       global: true,
       crypto: 'empty',
       tls: 'empty',
