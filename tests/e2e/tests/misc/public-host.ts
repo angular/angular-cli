@@ -39,5 +39,21 @@ export default function () {
         throw new Error('Response does not match expected value.');
       }
     })
+    .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
+    .then(() => ngServe('--host=0.0.0.0', `--public-host=${localAddress}`))
+    .then(() => request(localAddress))
+    .then(body => {
+      if (!body.match(/<app-root><\/app-root>/)) {
+        throw new Error('Response does not match expected value.');
+      }
+    })
+    .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
+    .then(() => ngServe('--host=0.0.0.0', `--public-host=${firstLocalIp}`))
+    .then(() => request(localAddress))
+    .then(body => {
+      if (!body.match(/<app-root><\/app-root>/)) {
+        throw new Error('Response does not match expected value.');
+      }
+    })
     .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; });
 }
