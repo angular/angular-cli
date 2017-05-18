@@ -174,6 +174,9 @@ class JsonWebpackSerializer {
         case webpack.optimize.UglifyJsPlugin:
           this._addImport('webpack.optimize', 'UglifyJsPlugin');
           break;
+        case (webpack.optimize as any).ModuleConcatenationPlugin:
+          this._addImport('webpack.optimize', 'ModuleConcatenationPlugin');
+          break;
         case angularCliPlugins.BaseHrefWebpackPlugin:
         case angularCliPlugins.NamedLazyChunksWebpackPlugin:
         case angularCliPlugins.SuppressExtractedTextChunksWebpackPlugin:
