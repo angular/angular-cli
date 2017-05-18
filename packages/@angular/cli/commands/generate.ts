@@ -78,6 +78,11 @@ export default Command.extend({
         `The \`ng generate ${name}\` command requires a name to be specified.`);
     }
 
+    if (/^\d/.test(rawArgs[1])) {
+      SilentError.debugOrThrow('@angular/cli/commands/generate',
+          `The \`ng generate ${name} ${rawArgs[1]}\` file name cannot begin with a digit.`);
+    }
+
     rawArgs[0] = blueprint.name;
     this.registerOptions(blueprint);
   },
