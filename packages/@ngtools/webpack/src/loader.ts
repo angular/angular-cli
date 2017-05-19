@@ -182,7 +182,7 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
   const genDir = path.normalize(plugin.genDir);
   const dirName = path.normalize(path.dirname(refactor.fileName));
   const entryModule = plugin.entryModule;
-  const entryModuleFileName = path.normalize(entryModule.path + '.ngfactory');
+  const entryModuleFileName = path.normalize(entryModule.path.replace(/\.ts$/, '.ngfactory.ts'));
   const relativeEntryModulePath = path.relative(basePath, entryModuleFileName);
   const fullEntryModulePath = path.resolve(genDir, relativeEntryModulePath);
   const relativeNgFactoryPath = path.relative(dirName, fullEntryModulePath);
@@ -231,7 +231,8 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
     });
 
   refactor.insertImport('platformBrowser', '@angular/platform-browser');
-  refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
+  refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath + '.ngfactory.ts');
+
 }
 
 export function removeModuleIdOnlyForTesting(refactor: TypeScriptFileRefactor) {
