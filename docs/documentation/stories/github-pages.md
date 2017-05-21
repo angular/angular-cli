@@ -9,7 +9,7 @@ Make a note of the user name and project name in GitHub.
 
 Then all you need to do is run `ng build --prod --output-path docs --base-href PROJECT_NAME`, where
 `PROJECT_NAME` is the name of your project in GitHub.
-Make a copy of `dist/index.html` and name it `dist/404.html`.
+Make a copy of `docs/index.html` and name it `docs/404.html`.
 
 Commit your changes and push. On the GitHub project page, configure it to
 [publish from the docs folder](https://help.github.com/articles/configuring-a-publishing-source-for-github-pages/#publishing-your-github-pages-site-from-a-docs-folder-on-your-master-branch).
