@@ -386,7 +386,7 @@ class JsonWebpackSerializer {
 
 export default Task.extend({
   run: function (runTaskOptions: EjectTaskOptions) {
-    const project = this.cliProject;
+    const project = this.project;
     const cliConfig = CliConfig.fromProject();
     const config = cliConfig.config;
     const appConfig = getAppFromConfig(runTaskOptions.app);
