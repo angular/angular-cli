@@ -148,15 +148,13 @@ const BuildCommand = Command.extend({
   ]),
 
   run: function (commandOptions: BuildTaskOptions) {
-    const project = this.project;
-
     // Check angular version.
-    Version.assertAngularVersionIs2_3_1OrHigher(project.root);
+    Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
 
     const BuildTask = require('../tasks/build').default;
 
     const buildTask = new BuildTask({
-      cliProject: project,
+      project: this.project,
       ui: this.ui,
     });
 

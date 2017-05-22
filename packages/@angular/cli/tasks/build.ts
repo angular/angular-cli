@@ -15,20 +15,19 @@ const SilentError = require('silent-error');
 
 export default Task.extend({
   run: function (runTaskOptions: BuildTaskOptions) {
-    const project = this.cliProject;
     const config = CliConfig.fromProject().config;
 
     const app = getAppFromConfig(runTaskOptions.app);
 
     const outputPath = runTaskOptions.outputPath || app.outDir;
-    if (project.root === outputPath) {
+    if (this.project.root === outputPath) {
       throw new SilentError('Output path MUST not be project root directory!');
     }
     if (config.project && config.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }
     if (runTaskOptions.deleteOutputPath) {
-      rimraf.sync(path.resolve(project.root, outputPath));
+      rimraf.sync(path.resolve(this.project.root, outputPath));
     }
 
     const webpackConfig = new NgCliWebpackConfig(runTaskOptions, app).buildConfig();
@@ -51,7 +50,7 @@ export default Task.extend({
           const jsonStats = stats.toJson('verbose');
 
           fs.writeFileSync(
-            path.resolve(project.root, outputPath, 'stats.json'),
+            path.resolve(this.project.root, outputPath, 'stats.json'),
             JSON.stringify(jsonStats, null, 2)
           );
         }

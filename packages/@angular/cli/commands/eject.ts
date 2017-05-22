@@ -32,10 +32,9 @@ const EjectCommand = Command.extend({
   availableOptions: baseEjectCommandOptions,
 
   run: function (commandOptions: EjectTaskOptions) {
-    const project = this.project;
     const EjectTask = require('../tasks/eject').default;
     const ejectTask = new EjectTask({
-      cliProject: project,
+      project: this.project,
       ui: this.ui,
     });
 
