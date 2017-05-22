@@ -29,7 +29,6 @@ const InitCommand: any = Command.extend({
     const InitTask = require('../tasks/init').default;
 
     const initTask = new InitTask({
-      cliProject: this.project,
       project: this.project,
       tasks: this.tasks,
       ui: this.ui,
