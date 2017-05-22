@@ -49,6 +49,16 @@ Default applications are created in a directory of the same name, with an initia
 </details>
 
 <details>
+  <summary>minimal</summary>
+  <p>
+    <code>--minimal</code> <em>default value: false</em>
+  </p>
+  <p>
+    Should create a minimal app.
+  </p>
+</details>
+
+<details>
   <summary>prefix</summary>
   <p>
     <code>--prefix</code> (alias: <code>-p</code>) <em>default value: app</em>

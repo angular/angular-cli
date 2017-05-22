@@ -20,7 +20,13 @@ const InitCommand: any = Command.extend({
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
-    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] }
+    { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
+    {
+      name: 'minimal',
+      type: Boolean,
+      default: false,
+      description: 'Should create a minimal app.'
+     }
   ],
 
   anonymousOptions: ['<glob-pattern>'],
