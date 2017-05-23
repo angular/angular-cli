@@ -9,7 +9,7 @@
     "noImplicitAny": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "outDir": "./build",
+    "outDir": "./dist",
     "rootDir": ".",
     "skipLibCheck": true,
     "inlineSourceMap": true,
@@ -41,6 +41,6 @@
     "dist/**/*",
     "node_modules/**/*",
     "tmp/**/*",
-    "packages/schematics-cli/schematics/*/files/**"
+    "packages/schematics_cli/schematics/*/files/**"
   ]
 }
