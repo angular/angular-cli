@@ -103,12 +103,14 @@ export default Command.extend({
     const blueprint = this.blueprints.find((bp: any) => bp.name === name
       || (bp.aliases && bp.aliases.includes(name)));
 
+    const projectName = CliConfig.getValue('project.name');
     const blueprintOptions = {
       target: this.project.root,
       entity: {
         name: rawArgs[1],
         options: parseOptions(rawArgs.slice(2))
       },
+      projectName,
       ui: this.ui,
       project: this.project,
       settings: this.settings,
