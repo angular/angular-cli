@@ -13,6 +13,7 @@ export default function () {
     .then(() => ngServe())
     .then(() => expectToFail(() => ng('e2e', '--no-serve')))
     .then(() => ng('e2e', '--no-serve', '--base-href=http://localhost:4400'))
+    .then(() => ng('e2e', '--no-serve', '--port=4400'))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();
       throw err;
