@@ -856,7 +856,7 @@ Blueprint.prototype._generateFileMapVariables = function(moduleName, locals, opt
   @return {Object}
 */
 Blueprint.prototype._locals = function(options) {
-  var packageName = options.project.name();
+  var packageName = options.project.name() || options.projectName;
   var moduleName = options.entity && options.entity.name || packageName;
   var sanitizedModuleName = moduleName.replace(/\//g, '-');
 
