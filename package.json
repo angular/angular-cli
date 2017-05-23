@@ -3,13 +3,11 @@
   "version": "0.0.0",
   "description": "Software Development Kit for Angular",
   "bin": {
-    "sdk-admin": "./bin/sdk-admin",
-    "schematics": "./bin/schematics"
+    "sdk-admin": "./bin/sdk-admin"
   },
   "keywords": [],
   "scripts": {
-    "build": "sdk-admin build",
-    "test": "sdk-admin test"
+    "test": "./bin/sdk-admin test"
   },
   "repository": {
     "type": "git",

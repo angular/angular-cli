@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * This file is useful for not having to load bootstrap-local in various javascript.
+ * Simply use package.json to have npm scripts that use this script as well, or use
+ * this script directly.
+ */
+
+require('../lib/bootstrap-local');
+
+const minimist = require('minimist');
+
+const args = minimist(process.argv.slice(2));
+
+
+switch (args._[0]) {
+  case 'test': require('../scripts/test').default(args); break;
+
+  default: console.log('Unknown command: ' + args._[0]); break;
+}
