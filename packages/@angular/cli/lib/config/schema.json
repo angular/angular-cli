@@ -33,6 +33,43 @@
             "type": "string",
             "description": "Name of the app."
           },
+          "blueprints": {
+            "type": "object",
+            "properties": {
+              "class": {
+                "type": "string",
+                "description": "Path to a directory that contains blueprint files for the class generator."
+              },
+              "component": {
+                "type": "string",
+                "description": "Path to a directory that contains blueprint files for the component generator."
+              },
+              "directive": {
+                "type": "string",
+                "description": "Path to a directory that contains blueprint files for the directive generator."
+              },
+              "enum": {
+                "type": "string",
+                "description": "Path to a directory that contains blueprint files for the enum generator."
+              },
+              "guard": {
+                "type": "string",
+                "description": "Path to a directory that contains blueprint files for the guard generator."
+              },
+              "interface": {
+                "type": "string",
+                "description": "Path to a directory that contains blueprint files for the interface generator."
+              },
+              "pipe": {
+                "type": "string",
+                "description": "Path to a directory that contains blueprint files for the pipe generator."
+              },
+              "service": {
+                "type": "string",
+                "description": "Path to a directory that contains blueprint files for the service generator."
+              }
+            }
+          },
           "root": {
             "type": "string",
             "description": "The root directory of the app."

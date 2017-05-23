@@ -1,6 +1,7 @@
 import {getAppFromConfig} from '../../utilities/app-utils';
 import {dynamicPathParser} from '../../utilities/dynamic-path-parser';
 import {CliConfig} from '../../models/config';
+import {getBlueprintFilesPathFor} from '../../utilities/get-blueprint-files-path-for';
 
 const stringUtils = require('ember-cli-string-utils');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
@@ -62,6 +63,10 @@ export default Blueprint.extend({
     }
 
     return fileList;
+  },
+
+  filesPath: function () {
+    return getBlueprintFilesPathFor.call(this, 'class');
   },
 
   fileMapTokens: function () {
