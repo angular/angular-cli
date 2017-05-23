@@ -1,4 +1,5 @@
 # Outputs
+bazel-*
 build/
 dist/
 
@@ -11,6 +12,7 @@ jsconfig.json
 typings/
 
 # Misc
+coverage/
 node_modules/
 tmp/
 npm-debug.log*

@@ -3,7 +3,6 @@
     "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "mapRoot": "",
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -13,12 +12,15 @@
     "outDir": "./build",
     "rootDir": ".",
     "skipLibCheck": true,
-    "sourceMap": true,
-    "sourceRoot": "",
+    "inlineSourceMap": true,
+    "sourceRoot": ".",
+    // Inline sources are necessary for out tests to show the proper sources, since we are using
+    // Istanbul (not Constantinople) as well, and applying both source maps to get the original
+    // source in devtools.
+    "inlineSources": true,
+    "strictNullChecks": true,
     "target": "es6",
     "lib": [
-      "es2015",
-      "es2016",
       "es2017"
     ],
     "baseUrl": "",
@@ -28,12 +30,17 @@
     "types": [
       "jasmine",
       "node"
-    ]
+    ],
+    "paths": {
+      "@angular/schematics": [ "./packages/schematics/src/index" ]
+    }
   },
   "exclude": [
+    "bazel-*/**/*",
     "build/**/*",
     "dist/**/*",
     "node_modules/**/*",
-    "tmp/**/*"
+    "tmp/**/*",
+    "packages/schematics-cli/schematics/*/files/**"
   ]
 }
