@@ -34,6 +34,12 @@ export const E2eTask = Task.extend({
         });
       } else if (e2eTaskOptions.baseHref) {
         additionalProtractorConfig.baseUrl = e2eTaskOptions.baseHref;
+      } else if (e2eTaskOptions.port) {
+        additionalProtractorConfig.baseUrl = url.format({
+          protocol: e2eTaskOptions.ssl ? 'https' : 'http',
+          hostname: e2eTaskOptions.host,
+          port: e2eTaskOptions.port.toString()
+        });
       }
 
       if (e2eTaskOptions.specs.length !== 0) {
