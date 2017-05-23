@@ -1,0 +1,16 @@
+{
+  "name": "@angular/schematics",
+  "version": "0.0.0",
+  "schematics": {
+    "angular-app": {
+      "factory": "./angular-app",
+      "schema": "./angular-app/schema.json",
+      "description": "Create an Angular application."
+    },
+    "component": {
+      "factory": "./component",
+      "description": "Create an Angular component.",
+      "schema": "./component/schema.json"
+    }
+  }
+}

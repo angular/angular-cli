@@ -1,0 +1,13 @@
+{
+  "extends": "<%= path.split('/').map(x => '..').join('/') %>/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "<%= path.split('/').map(x => '..').join('/') %>/out-tsc/app",
+    "module": "es2015",
+    "baseUrl": "",
+    "types": []
+  },
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts"
+  ]
+}

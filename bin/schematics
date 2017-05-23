@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+'use strict';
+require('../lib/bootstrap-local');
+const packages = require('../lib/packages').packages;
+
+require(packages['@angular/schematics-cli'].bin['schematics']);

@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "https://github.com/angular/angular-cli/blob/master/packages/@angular/cli/lib/config/schema.json#CliConfig",
+  "title": "Angular Application Options Schema",
+  "type": "object",
+  "properties": {
+    "path": {
+      "type": "string",
+      "default": "src"
+    },
+    "sourceDir": {
+      "type": "string",
+      "default": ""
+    },
+    "name": {
+      "type": "string"
+    },
+    "inlineStyle": {
+      "description": "Specifies if the style will be in the ts file.",
+      "type": "boolean",
+      "default": false
+    },
+    "inlineTemplate": {
+      "description": "Specifies if the template will be in the ts file.",
+      "type": "boolean",
+      "default": false
+    },
+    "viewEncapsulation": {
+      "description": "Specifies the view encapsulation strategy.",
+      "enum": ["Emulated", "Native", "None"],
+      "type": "string",
+      "default": "None"
+    },
+    "changeDetection": {
+      "description": "Specifies the change detection strategy.",
+      "enum": ["Default", "OnPush"],
+      "type": "string",
+      "default": "Default"
+    },
+    "version": {
+      "type": "string"
+    },
+    "routing": {
+      "type": "boolean",
+      "default": false
+    },
+    "prefix": {
+      "type": "string",
+      "description": "The prefix to apply to generated selectors.",
+      "default": "app"
+    },
+    "styleext": {
+      "description": "The file extension to be used for style files.",
+      "type": "string",
+      "default": "css"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
