@@ -6,10 +6,10 @@ import {checkYarnOrCNPM} from '../utilities/check-package-manager';
 import {CliConfig} from '../models/config';
 
 const Task = require('../ember-cli/lib/models/task');
-const Promise = require('../ember-cli/lib/ext/promise');
 const SilentError = require('silent-error');
 const normalizeBlueprint = require('../ember-cli/lib/utilities/normalize-blueprint-option');
 const GitInit = require('../tasks/git-init');
+const InstallBlueprint = require('../ember-cli/lib/tasks/install-blueprint');
 
 
 export default Task.extend({
@@ -18,7 +18,7 @@ export default Task.extend({
       commandOptions.skipInstall = true;
     }
 
-    const installBlueprint = new this.tasks.InstallBlueprint({
+    const installBlueprint = new InstallBlueprint({
       ui: this.ui,
       project: this.project
     });
