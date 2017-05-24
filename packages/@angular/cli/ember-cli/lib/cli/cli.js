@@ -133,7 +133,6 @@ class CLI {
       logger.info('command: %s', commandName);
 
       if (!this.testing) {
-        process.chdir(environment.project.root);
         let skipInstallationCheck = commandArgs.indexOf('--skip-installation-check') !== -1;
         if (environment.project.isEmberCLIProject() && !skipInstallationCheck) {
           const InstallationChecker = require('../models/installation-checker');
