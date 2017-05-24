@@ -1,3 +1,32 @@
+<a name="1.1.0-rc.1"></a>
+# [1.1.0-rc.1](https://github.com/angular/angular-cli/compare/v1.1.0-rc.0...v1.1.0-rc.1) (2017-05-24)
+
+
+### Bug Fixes
+
+* **@angular/cli:** allow e2e tests to run if no-serve and port is provided ([3f10c5a](https://github.com/angular/angular-cli/commit/3f10c5a))
+* **@angular/cli:** fix issue of folder getting generated on dry run ([e4cedbb](https://github.com/angular/angular-cli/commit/e4cedbb))
+* **@angular/cli:** fix leading digit in file names from generate command ([8683c3c](https://github.com/angular/angular-cli/commit/8683c3c))
+* **@angular/cli:** fix package name fetching from package.json ([169dc9e](https://github.com/angular/angular-cli/commit/169dc9e))
+* **@angular/cli:** if user pass a full path, use the path ([#6341](https://github.com/angular/angular-cli/issues/6341)) ([6372f29](https://github.com/angular/angular-cli/commit/6372f29))
+* **@angular/cli:** proper generation when the target dir exists ([#5929](https://github.com/angular/angular-cli/issues/5929)) ([e619df1](https://github.com/angular/angular-cli/commit/e619df1))
+* **@angular/cli:** put vendor ngfactory in vendor chunk ([b4abe6d](https://github.com/angular/angular-cli/commit/b4abe6d))
+* **@angular/cli:** remove broken script after eject ([2b0d935](https://github.com/angular/angular-cli/commit/2b0d935))
+* **@angular/cli:** supress module file modification when generating guard with dry-run flag ([872737b](https://github.com/angular/angular-cli/commit/872737b))
+* **@angular/cli:** update new project dev dependencies ([#6415](https://github.com/angular/angular-cli/issues/6415)) ([7bd4074](https://github.com/angular/angular-cli/commit/7bd4074))
+* **@angular/cli:** update protractor API usage in the blueprints. ([f6e5961](https://github.com/angular/angular-cli/commit/f6e5961)), closes [#6163](https://github.com/angular/angular-cli/issues/6163)
+* **@angular/cli:** use realpath for project root ([3ca583b](https://github.com/angular/angular-cli/commit/3ca583b)), closes [#2726](https://github.com/angular/angular-cli/issues/2726)
+* **@ngtools/json-schema:** only values in enum should be allowed to update ([7159920](https://github.com/angular/angular-cli/commit/7159920))
+* **@ngtools/webpack:** fix aot builds using npm packages that have lazy loaded modules ([b59bccf](https://github.com/angular/angular-cli/commit/b59bccf)), closes [#5594](https://github.com/angular/angular-cli/issues/5594)
+* **@ngtools/webpack:** fix paths-plugin to allow '*' as alias ([1484868](https://github.com/angular/angular-cli/commit/1484868)), closes [#5033](https://github.com/angular/angular-cli/issues/5033)
+
+
+### Features
+
+* **@ngtools/webpack:** replace server bootstrap code ([#5194](https://github.com/angular/angular-cli/issues/5194)) ([ad026ef](https://github.com/angular/angular-cli/commit/ad026ef))
+
+
+
 <a name="1.1.0-rc.0"></a>
 # [1.1.0-rc.0](https://github.com/angular/angular-cli/compare/v1.1.0-beta.1...v1.1.0-rc.0) (2017-05-15)
 
