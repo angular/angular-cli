@@ -1,3 +1,20 @@
+<a name="1.0.5"></a>
+## [1.0.5](https://github.com/angular/angular-cli/compare/v1.0.4...v1.0.5) (2017-05-24)
+
+
+### Bug Fixes
+
+* **@angular/cli:** allow e2e tests to run if no-serve and port is provided ([ce54caf](https://github.com/angular/angular-cli/commit/ce54caf))
+* **@angular/cli:** fix issue of folder getting generated on dry run ([6395129](https://github.com/angular/angular-cli/commit/6395129))
+* **@angular/cli:** fix leading digit in file names from generate command ([0ecaa2d](https://github.com/angular/angular-cli/commit/0ecaa2d))
+* **@angular/cli:** fix package name fetching from package.json ([9c83f3b](https://github.com/angular/angular-cli/commit/9c83f3b))
+* **@angular/cli:** remove broken script after eject ([41d8522](https://github.com/angular/angular-cli/commit/41d8522))
+* **@ngtools/json-schema:** only values in enum should be allowed to update ([456361d](https://github.com/angular/angular-cli/commit/456361d))
+* **@ngtools/webpack:** fix aot builds using npm packages that have lazy loaded modules ([fd002df](https://github.com/angular/angular-cli/commit/fd002df)), closes [#5594](https://github.com/angular/angular-cli/issues/5594)
+* **@ngtools/webpack:** fix paths-plugin to allow '*' as alias ([0f24e04](https://github.com/angular/angular-cli/commit/0f24e04)), closes [#5033](https://github.com/angular/angular-cli/issues/5033)
+
+
+
 <a name="1.0.4"></a>
 ## [1.0.4](https://github.com/angular/angular-cli/compare/v1.0.3...v1.0.4) (2017-05-18)
 
