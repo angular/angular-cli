@@ -3,8 +3,6 @@ var path          = require('path');
 
 // Main entry point
 var Project       = require('../models/project');
-var commands      = require('../commands');
-var tasks         = require('../tasks');
 var CLI           = require('./cli');
 var debug         = require('debug')('ember-cli:cli/index');
 
@@ -40,9 +38,9 @@ module.exports = function(options) {
   var project = Project.projectOrnullProject(ui, cli);
 
   var environment = {
-    tasks:    tasks,
+    tasks:    { },
     cliArgs:  options.cliArgs,
-    commands: commands,
+    commands: { },
     project:  project,
     settings: defaultUpdateCheckerOptions
   };
