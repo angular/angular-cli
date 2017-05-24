@@ -1,5 +1,5 @@
 import {getAppFromConfig} from '../../utilities/app-utils';
-import {dynamicPathParser} from '../../utilities/dynamic-path-parser';
+import {dynamicPathParser, DynamicPathOptions} from '../../utilities/dynamic-path-parser';
 import {CliConfig} from '../../models/config';
 
 const stringUtils = require('ember-cli-string-utils');
@@ -27,7 +27,14 @@ export default Blueprint.extend({
 
   normalizeEntityName: function (entityName: string) {
     const appConfig = getAppFromConfig(this.options.app);
-    const parsedPath = dynamicPathParser(this.project, entityName.split('.')[0], appConfig);
+    const dynamicPathOptions: DynamicPathOptions = {
+      project: this.project,
+      entityName: entityName.split('.')[0],
+      appConfig,
+      dryRun: this.options.dryRun
+    };
+
+    const parsedPath = dynamicPathParser(dynamicPathOptions);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
