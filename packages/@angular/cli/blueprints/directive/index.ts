@@ -4,7 +4,7 @@ import { NodeHost } from '../../lib/ast-tools';
 import { CliConfig } from '../../models/config';
 import { getAppFromConfig } from '../../utilities/app-utils';
 import { resolveModulePath } from '../../utilities/resolve-module-file';
-import { dynamicPathParser } from '../../utilities/dynamic-path-parser';
+import { dynamicPathParser, DynamicPathOptions } from '../../utilities/dynamic-path-parser';
 
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
@@ -77,7 +77,13 @@ export default Blueprint.extend({
 
   normalizeEntityName: function (entityName: string) {
     const appConfig = getAppFromConfig(this.options.app);
-    const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
+    const dynamicPathOptions: DynamicPathOptions = {
+      project: this.project,
+      entityName,
+      appConfig,
+      dryRun: this.options.dryRun
+    };
+    const parsedPath = dynamicPathParser(dynamicPathOptions);
 
     this.dynamicPath = parsedPath;
 

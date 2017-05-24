@@ -509,7 +509,7 @@ Blueprint.prototype.install = function(options) {
     ui.writeLine(chalk.yellow('You specified the dry-run flag, so no' +
       ' changes will be written.'));
   }
-
+  
   this._normalizeEntityName(options.entity);
   this._checkForPod(options.verbose);
   this._checkInRepoAddonExists(options.inRepoAddon);

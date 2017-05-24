@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { dynamicPathParser } from './dynamic-path-parser';
+import { dynamicPathParser, DynamicPathOptions } from './dynamic-path-parser';
 
 export function resolveModulePath(
   moduleNameFromFlag: string, project: any, projectRoot: any, appConfig: any): string {
@@ -41,7 +41,13 @@ export function resolveModulePath(
 }
 
 function buildFullPath(project: any, relativeModulePath: string, appConfig: any, projectRoot: any) {
-  const parsedPath = dynamicPathParser(project, relativeModulePath, appConfig);
+  const dynamicPathOptions: DynamicPathOptions = {
+    project,
+    entityName: relativeModulePath,
+    appConfig,
+    dryRun: false
+  };
+  const parsedPath = dynamicPathParser(dynamicPathOptions);
   const fullModulePath = path.join(projectRoot, parsedPath.dir, parsedPath.base);
 
   return fullModulePath;
