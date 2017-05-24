@@ -45,6 +45,8 @@ There are a few adjustments you need to do to use the CLI build system.
 - Change any absolute paths you have for `templateUrl`, `styleUrls` or lazy loaded NgModules to
 relative paths instead.
 - Remove any `module.id` that you have in `@Component` metadata. They aren't needed in the CLI.
+- Remove all default anonymous function export. If not it cause strange issue during compilation like:
+TypeError: Cannot read property 'text' of undefined
 - Polyfills are listed in `./src/polyfills.ts` so remove `core-js` and `zone.js` from `index.html`.
 - SystemJS is not needed anymore, so remove it from `index.html` as well.
 - Instead of using `<script>` and `<link>` tags directly in `index.html`, use
