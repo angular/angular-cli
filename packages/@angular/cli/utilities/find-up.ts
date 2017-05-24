@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { existsSync, realpathSync } from 'fs';
+import { existsSync } from 'fs';
 
 export function findUp(names: string | string[], from: string, stopOnNodeModules = false) {
   if (!Array.isArray(names)) {
@@ -12,7 +12,7 @@ export function findUp(names: string | string[], from: string, stopOnNodeModules
     for (const name of names) {
       const p = path.join(currentDir, name);
       if (existsSync(p)) {
-        return realpathSync(p);
+        return p;
       }
     }
 
