@@ -1,3 +1,11 @@
+This CHANGELOG file is being deprecated. Our CHANGELOG is now part of GitHub releases. You can find those releases [here](https://github.com/angular/angular-cli/releases).
+
+
+---
+
+Historical CHANGELOG (these will be removed soon).
+
+
 <a name="1.0.5"></a>
 ## [1.0.5](https://github.com/angular/angular-cli/compare/v1.0.4...v1.0.5) (2017-05-24)
 
