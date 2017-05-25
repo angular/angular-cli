@@ -7,7 +7,6 @@
 - [ ] Express Engine
 
 * **What kind of change does this PR introduce?** (Bug fix, feature, docs update, ...)
-remove unused proxy imports from some test files
 
 
 * **What is the current behavior?** (You can also link to an open issue here)
@@ -19,7 +18,6 @@ remove unused proxy imports from some test files
 
 
 * **Does this PR introduce a breaking change?** (What changes might users need to make in their application due to this PR?)
-No
 
 
 * **Other information**:
