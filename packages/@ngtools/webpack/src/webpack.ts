@@ -39,18 +39,6 @@ export interface NormalModule {
   resource: string;
 }
 
-export interface NormalModuleFactory {
-  plugin(
-    event: string,
-    callback: (data: NormalModuleFactoryRequest, callback: Callback<any>) => void
-  ): any;
-}
-
-export interface NormalModuleFactoryRequest {
-  request: string;
-  contextInfo: { issuer: string };
-}
-
 export interface LoaderContext {
   _module: NormalModule;
 

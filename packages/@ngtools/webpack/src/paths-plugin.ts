@@ -1,25 +1,46 @@
 import * as path from 'path';
 import * as ts from 'typescript';
-import {Callback, Tapable, NormalModuleFactory, NormalModuleFactoryRequest} from './webpack';
+import {Request, ResolverPlugin, Callback, Tapable} from './webpack';
+
+
+const ModulesInRootPlugin: new (a: string, b: string, c: string) => ResolverPlugin
+  = require('enhanced-resolve/lib/ModulesInRootPlugin');
+
+interface CreateInnerCallback {
+  (callback: Callback<any>,
+   options: Callback<any>,
+   message?: string,
+   messageOptional?: string): Callback<any>;
+}
+
+const createInnerCallback: CreateInnerCallback
+  = require('enhanced-resolve/lib/createInnerCallback');
+const getInnerRequest: (resolver: ResolverPlugin, request: Request) => string
+  = require('enhanced-resolve/lib/getInnerRequest');
+
 
 function escapeRegExp(str: string): string {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
 
+
 export interface PathsPluginOptions {
-  nmf: NormalModuleFactory;
   tsConfigPath: string;
   compilerOptions?: ts.CompilerOptions;
   compilerHost?: ts.CompilerHost;
 }
 
 export class PathsPlugin implements Tapable {
-  private _nmf: NormalModuleFactory;
   private _tsConfigPath: string;
   private _compilerOptions: ts.CompilerOptions;
   private _host: ts.CompilerHost;
+
+  source: string;
+  target: string;
+
+  private mappings: any;
+
   private _absoluteBaseUrl: string;
-  private _mappings: any[] = [];
 
   private static _loadOptionsFromTsConfig(tsConfigPath: string, host?: ts.CompilerHost):
       ts.CompilerOptions {
@@ -55,13 +76,15 @@ export class PathsPlugin implements Tapable {
       this._host = ts.createCompilerHost(this._compilerOptions, false);
     }
 
+    this.source = 'described-resolve';
+    this.target = 'resolve';
+
     this._absoluteBaseUrl = path.resolve(
       path.dirname(this._tsConfigPath),
       this._compilerOptions.baseUrl || '.'
     );
 
-    this._nmf = options.nmf;
-
+    this.mappings = [];
     let paths = this._compilerOptions.paths || {};
     Object.keys(paths).forEach(alias => {
       let onlyModule = alias.indexOf('*') === -1;
@@ -76,7 +99,7 @@ export class PathsPlugin implements Tapable {
           aliasPattern = new RegExp(`^${withStarCapturing}`);
         }
 
-        this._mappings.push({
+        this.mappings.push({
           onlyModule,
           alias,
           aliasPattern,
@@ -86,36 +109,66 @@ export class PathsPlugin implements Tapable {
     });
   }
 
-  apply(): void {
-    this._nmf.plugin('before-resolve', (request: NormalModuleFactoryRequest,
-        callback: Callback<any>) => {
-      for (let mapping of this._mappings) {
-        const match = request.request.match(mapping.aliasPattern);
-        if (!match) { continue; }
+  apply(resolver: ResolverPlugin): void {
+    let baseUrl = this._compilerOptions.baseUrl || '.';
 
-        let newRequestStr = mapping.target;
-        if (!mapping.onlyModule) {
-          newRequestStr = newRequestStr.replace('*', match[1]);
-        }
+    if (baseUrl) {
+      resolver.apply(new ModulesInRootPlugin('module', this._absoluteBaseUrl, 'resolve'));
+    }
 
-        const moduleResolver: ts.ResolvedModuleWithFailedLookupLocations =
-            ts.nodeModuleNameResolver(
-              newRequestStr,
-              this._absoluteBaseUrl,
-              this._compilerOptions,
-              this._host
-            );
-        const moduleFilePath = moduleResolver.resolvedModule ?
-            moduleResolver.resolvedModule.resolvedFileName : '';
-
-        if (moduleFilePath) {
-          return callback(null, Object.assign({}, request, {
-            request: moduleFilePath.includes('.d.ts') ? newRequestStr : moduleFilePath
-          }));
-        }
-      }
-
-      return callback(null, request);
+    this.mappings.forEach((mapping: any) => {
+      resolver.plugin(this.source, this.createPlugin(resolver, mapping));
     });
+  }
+
+  resolve(resolver: ResolverPlugin, mapping: any, request: any, callback: Callback<any>): any {
+    let innerRequest = getInnerRequest(resolver, request);
+    if (!innerRequest) {
+      return callback();
+    }
+
+    let match = innerRequest.match(mapping.aliasPattern);
+    if (!match) {
+      return callback();
+    }
+
+    let newRequestStr = mapping.target;
+    if (!mapping.onlyModule) {
+      newRequestStr = newRequestStr.replace('*', match[1]);
+    }
+    if (newRequestStr[0] === '.') {
+      newRequestStr = path.resolve(this._absoluteBaseUrl, newRequestStr);
+    }
+
+    let newRequest = Object.assign({}, request, {
+      request: newRequestStr
+    }) as Request;
+
+    return resolver.doResolve(
+      this.target,
+      newRequest,
+      `aliased with mapping '${innerRequest}': '${mapping.alias}' to '${newRequestStr}'`,
+      createInnerCallback(
+        function(err, result) {
+          if (arguments.length > 0) {
+            return callback(err, result);
+          }
+
+          // don't allow other aliasing or raw request
+          callback(null, null);
+        },
+        callback
+      )
+    );
+  }
+
+  createPlugin(resolver: ResolverPlugin, mapping: any): any {
+    return (request: any, callback: Callback<any>) => {
+      try {
+        this.resolve(resolver, mapping, request, callback);
+      } catch (err) {
+        callback(err);
+      }
+    };
   }
 }
