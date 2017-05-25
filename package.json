@@ -60,8 +60,8 @@
   "scripts": {
     "ngc": "ngc",
     "jasmine": "jasmine",
-    "build:ng-express-engine": "tsc -p modules/ng-express-engine/tsconfig.json",
-    "build:ng-aspnetcore-engine": "tsc -p modules/ng-aspnetcore-engine/tsconfig.json",
+    "build:ng-express-engine": "ngc -p modules/ng-express-engine/tsconfig.json",
+    "build:ng-aspnetcore-engine": "ngc -p modules/ng-aspnetcore-engine/tsconfig.json",
     "build": "./build.sh",
     "test": "exit 0"
   },
@@ -69,6 +69,7 @@
     "@angular/animations": "^4.0.0",
     "@angular/common": "^4.0.0",
     "@angular/compiler": "^4.0.0",
+    "@angular/compiler-cli": "^4.0.0",
     "@angular/core": "^4.0.0",
     "@angular/http": "^4.0.0",
     "@angular/platform-browser": "^4.0.0",

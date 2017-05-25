@@ -16,6 +16,7 @@ logs
 typings
 dist
 node_modules
+ngfactory
 
 /compiled
 *.metadata.json

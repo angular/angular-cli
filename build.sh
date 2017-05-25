@@ -1,5 +1,7 @@
 rm -rf dist
 
+set -x
+
 npm run build:ng-express-engine
 
 cp modules/ng-express-engine/package.json dist/ng-express-engine/package.json

@@ -25,6 +25,9 @@
       "node"
     ]
   },
+  "angularCompilerOptions": {
+    "genDir": "ngfactory"
+  },
   "files": [
     "index.ts",
     "tokens.ts"
