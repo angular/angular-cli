@@ -24,4 +24,6 @@ export class HomeView {}
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  static testProp: string;
+}
