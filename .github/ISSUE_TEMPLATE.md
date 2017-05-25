@@ -1,13 +1,18 @@
 **Note: for support questions, please use one of these channels:** https://github.com/angular/universal/blob/master/CONTRIBUTING.md#question. This repository's issues are reserved for feature requests and bug reports. Also, **Preboot has moved** to https://github.com/angular/preboot - please make preboot-related issues there.
 
 * **I'm submitting a ...**
+```
 - [ ] bug report
 - [ ] feature request
 - [ ] support request => Please do not submit support request here, see note at the top of this template.
+```
 
 * **What modules are related to this Issue?**
-- [ ] express-engine
+```
 - [ ] aspnetcore-engine
+- [ ] express-engine
+- [ ] hapi-engine
+```
 
 * **Do you want to request a *feature* or report a *bug*?**
 
