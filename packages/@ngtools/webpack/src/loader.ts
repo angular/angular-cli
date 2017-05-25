@@ -187,12 +187,7 @@ function _removeDecorators(refactor: TypeScriptFileRefactor) {
 }
 
 
-function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) {
-  // If bootstrapModule can't be found, bail out early.
-  if (!refactor.sourceMatch(/\bbootstrapModule\b/)) {
-    return;
-  }
-
+function _getNgFactoryPath(plugin: AotPlugin, refactor: TypeScriptFileRefactor) {
   // Calculate the base path.
   const basePath = path.normalize(plugin.basePath);
   const genDir = path.normalize(plugin.genDir);
@@ -202,44 +197,20 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
   const relativeEntryModulePath = path.relative(basePath, entryModuleFileName);
   const fullEntryModulePath = path.resolve(genDir, relativeEntryModulePath);
   const relativeNgFactoryPath = path.relative(dirName, fullEntryModulePath);
-  const ngFactoryPath = './' + relativeNgFactoryPath.replace(/\\/g, '/');
+  return './' + relativeNgFactoryPath.replace(/\\/g, '/');
+}
 
-  const allCalls = refactor.findAstNodes(refactor.sourceFile,
-    ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
 
-  const bootstraps = allCalls
-    .filter(call => call.expression.kind == ts.SyntaxKind.PropertyAccessExpression)
-    .map(call => call.expression as ts.PropertyAccessExpression)
-    .filter(access => {
-      return access.name.kind == ts.SyntaxKind.Identifier
-          && access.name.text == 'bootstrapModule';
-    });
+function _replacePlatform(
+  refactor: TypeScriptFileRefactor, bootstrapCall: ts.PropertyAccessExpression) {
+  const platforms = (refactor.findAstNodes(bootstrapCall,
+    ts.SyntaxKind.CallExpression, true) as ts.CallExpression[])
+    .filter(call => {
+      return call.expression.kind == ts.SyntaxKind.Identifier;
+    })
+    .filter(call => !!changeMap[(call.expression as ts.Identifier).text]);
 
-  const calls: ts.CallExpression[] = bootstraps
-    .reduce((previous, access) => {
-      const expressions
-        = refactor.findAstNodes(access, ts.SyntaxKind.CallExpression, true) as ts.CallExpression[];
-      return previous.concat(expressions);
-    }, [])
-    .filter((call: ts.CallExpression) => call.expression.kind == ts.SyntaxKind.Identifier)
-    .filter((call: ts.CallExpression) => {
-      // Find if the expression matches one of the replacement targets
-      return !!changeMap[(call.expression as ts.Identifier).text];
-    });
-
-  if (calls.length == 0) {
-    // Didn't find any dynamic bootstrapping going on.
-    return;
-  }
-
-  // Create the changes we need.
-  allCalls
-    .filter(call => bootstraps.some(bs => bs == call.expression))
-    .forEach((call: ts.CallExpression) => {
-      refactor.replaceNode(call.arguments[0], entryModule.className + 'NgFactory');
-    });
-
-  calls.forEach(call => {
+  platforms.forEach(call => {
     const platform = changeMap[(call.expression as ts.Identifier).text];
 
     // Replace with mapped replacement
@@ -248,14 +219,70 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
     // Add the appropriate import
     refactor.insertImport(platform.name, platform.importLocation);
   });
+}
 
-  bootstraps
-    .forEach((bs: ts.PropertyAccessExpression) => {
-      // This changes the call.
-      refactor.replaceNode(bs.name, 'bootstrapModuleFactory');
+
+function _replaceBootstrap(refactor: TypeScriptFileRefactor, call: ts.CallExpression) {
+  // If bootstrapModule can't be found, bail out early.
+  if (!call.getText().includes('bootstrapModule')) {
+    return;
+  }
+
+  if (call.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+    const access = call.expression as ts.PropertyAccessExpression;
+
+    if (access.name.text === 'bootstrapModule') {
+      _replacePlatform(refactor, access);
+      refactor.replaceNode(access.name, 'bootstrapModuleFactory');
+    }
+  }
+}
+
+
+function _getCaller(node: ts.Node): ts.CallExpression {
+  while (node = node.parent) {
+    if (node.kind === ts.SyntaxKind.CallExpression) {
+      return node as ts.CallExpression;
+    }
+  }
+  return null;
+}
+
+
+function _replaceEntryModule(plugin: AotPlugin, refactor: TypeScriptFileRefactor) {
+  const modules = refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Identifier, true)
+    .filter(identifier => identifier.getText() === plugin.entryModule.className)
+    .filter(identifier =>
+      identifier.parent.kind === ts.SyntaxKind.CallExpression ||
+      identifier.parent.kind === ts.SyntaxKind.PropertyAssignment)
+    .filter(node => !!_getCaller(node));
+
+  if (modules.length == 0) {
+    return;
+  }
+
+  const factoryClassName = plugin.entryModule.className + 'NgFactory';
+
+  refactor.insertImport(factoryClassName, _getNgFactoryPath(plugin, refactor));
+
+  modules
+    .forEach(reference => {
+      refactor.replaceNode(reference, factoryClassName);
+      _replaceBootstrap(refactor, _getCaller(reference));
     });
+}
 
-  refactor.insertImport(entryModule.className + 'NgFactory', ngFactoryPath);
+
+function _refactorBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) {
+  const genDir = path.normalize(plugin.genDir);
+  const dirName = path.normalize(path.dirname(refactor.fileName));
+
+  // Bail if in the generated directory
+  if (dirName.startsWith(genDir)) {
+    return;
+  }
+
+  _replaceEntryModule(plugin, refactor);
 }
 
 export function removeModuleIdOnlyForTesting(refactor: TypeScriptFileRefactor) {
@@ -410,7 +437,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }) {
         if (!plugin.skipCodeGeneration) {
           return Promise.resolve()
             .then(() => _removeDecorators(refactor))
-            .then(() => _replaceBootstrap(plugin, refactor));
+            .then(() => _refactorBootstrap(plugin, refactor));
         } else {
           return Promise.resolve()
             .then(() => _replaceResources(refactor))
