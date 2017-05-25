@@ -1,39 +1,12 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "module": "es2015",
-    "moduleResolution": "node",
-    "declaration": true,
-    "noImplicitAny": false,
-    "noUnusedLocals": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedParameters": true,
-    "removeComments": false,
-    "baseUrl": ".",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "rootDir": ".",
-    "outDir": "../../dist/ng-aspnetcore-engine",
-    "lib": [
-      "dom",
-      "es6"
-    ],
-    "types": [
-      "node"
-    ]
+    "outDir": "../../dist/ng-aspnetcore-engine"
   },
   "angularCompilerOptions": {
     "genDir": "ngfactory"
   },
   "files": [
     "index.ts"
-  ],
-  "compileOnSave": false,
-  "buildOnSave": false,
-  "atom": {
-    "rewriteTsconfig": false
-  }
+  ]
 }

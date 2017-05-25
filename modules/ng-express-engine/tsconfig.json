@@ -1,29 +1,7 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "declaration": true,
-    "noImplicitAny": false,
-    "noUnusedLocals": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedParameters": true,
-    "removeComments": false,
-    "baseUrl": ".",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "rootDir": ".",
-    "outDir": "../../dist/ng-express-engine",
-    "lib": [
-      "dom",
-      "es6"
-    ],
-    "types": [
-      "node"
-    ]
+    "outDir": "../../dist/ng-express-engine"
   },
   "angularCompilerOptions": {
     "genDir": "ngfactory"
@@ -31,10 +9,5 @@
   "files": [
     "index.ts",
     "tokens.ts"
-  ],
-  "compileOnSave": false,
-  "buildOnSave": false,
-  "atom": {
-    "rewriteTsconfig": false
-  }
+  ]
 }

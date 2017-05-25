@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Request, Response, Send } from 'express';
+import { Request, Response } from 'express';
 
 import { Provider, NgModuleFactory, Type, CompilerFactory, Compiler } from '@angular/core';
 import { ResourceLoader } from '@angular/compiler';
@@ -39,8 +39,6 @@ const factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
  */
 export function ngExpressEngine(setupOptions: NgSetupOptions) {
 
-  setupOptions.providers = setupOptions.providers || [];
-
   const compilerFactory: CompilerFactory = platformDynamicServer().injector.get(CompilerFactory);
   const compiler: Compiler = compilerFactory.createCompiler([
     {
@@ -50,7 +48,7 @@ export function ngExpressEngine(setupOptions: NgSetupOptions) {
     }
   ]);
 
-  return function (filePath: string, options: RenderOptions, callback: Send) {
+  return function (filePath: string, options: RenderOptions, callback: (err?: Error | null, html?: string) => void) {
 
     options.providers = options.providers || [];
 
@@ -60,6 +58,8 @@ export function ngExpressEngine(setupOptions: NgSetupOptions) {
       if (!moduleOrFactory) {
         throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
       }
+
+      setupOptions.providers = setupOptions.providers || [];
 
       const extraProviders = setupOptions.providers.concat(
         options.providers,
@@ -126,7 +126,7 @@ function getFactory(
 /**
  * Get providers of the request and response
  */
-function getReqResProviders(req: Request, res: Response): Provider[] {
+function getReqResProviders(req: Request, res?: Response): Provider[] {
   const providers: Provider[] = [
     {
       provide: REQUEST,

@@ -14,8 +14,6 @@ export function ngAspnetCoreEngine(
   options: IEngineOptions
 ): Promise<{ html: string, globals: { styles: string, title: string, meta: string, transferData?: {}, [key: string]: any } }> {
 
-  options.providers = options.providers || [];
-
   const compilerFactory: CompilerFactory = platformDynamicServer().injector.get(CompilerFactory);
   const compiler: Compiler = compilerFactory.createCompiler([
     {
@@ -32,6 +30,8 @@ export function ngAspnetCoreEngine(
       if (!moduleOrFactory) {
         throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
       }
+
+      options.providers = options.providers || [];
 
       const extraProviders = options.providers.concat(
         options.providers,
@@ -69,7 +69,7 @@ export function ngAspnetCoreEngine(
               .subscribe(() => {
 
                 // Fire the TransferState Cache
-                const bootstrap = moduleRef.instance['ngOnBootstrap'];
+                const bootstrap = (<{ ngOnBootstrap?: Function }> moduleRef.instance).ngOnBootstrap;
                 bootstrap && bootstrap();
 
                 // The parse5 Document itself
