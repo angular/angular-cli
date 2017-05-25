@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {
   applyContentTemplate,
   applyPathTemplate,
@@ -94,5 +101,11 @@ describe('contentTemplate', () => {
     expect(applyContentTemplate('a<%- html %>b', {
       html: '<script>'
     })).toBe('a&lt;script&gt;b');
+  });
+
+  it('escapes strings properly', () => {
+    expect(applyContentTemplate('a<%= value %>b', { value: `'abc'` })).toBe('a\'abc\'b');
+    expect(applyContentTemplate('a<%= \'a\' + "b" %>b', {})).toBe('aabb');
+    expect(applyContentTemplate('a<%= "\\n" + "b" %>b', {})).toBe('a\nbb');
   });
 });

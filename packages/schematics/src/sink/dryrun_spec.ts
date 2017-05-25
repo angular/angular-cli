@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {DryRunSink} from './dryrun';
 import {FileSystemTree} from '../tree/filesystem';
 import {InMemoryFileSystemTreeHost} from '../tree/memory-host';

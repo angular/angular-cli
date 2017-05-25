@@ -1,5 +1,11 @@
-// Starting with TS 2.1, Error cannot be properly extended anymore, so we implement the same
-// interface but in a different package.
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
 export class BaseException extends Error {
   constructor(message = '') {
     super(message);

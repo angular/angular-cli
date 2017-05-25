@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 const STRING_DASHERIZE_REGEXP = (/[ _]/g);
 const STRING_DECAMELIZE_REGEXP = (/([a-z\d])([A-Z])/g);
 const STRING_CAMELIZE_REGEXP = (/(-|_|\.|\s)+(.)?/g);

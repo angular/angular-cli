@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {SimpleFileEntry} from './entry';
 import {UpdateRecorderBase} from './recorder';
 import {FileEntry, MergeStrategy, Tree, UpdateRecorder} from './interface';
