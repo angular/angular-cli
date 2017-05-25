@@ -23,7 +23,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
-  const nodeModules = path.resolve(projectRoot, 'node_modules');
+  const projectRootNodeModules = path.resolve(projectRoot, 'node_modules');
+  const nodeModules = module.paths.slice(0, module.paths.indexOf(projectRootNodeModules) + 1)
 
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
@@ -67,10 +68,10 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     devtool: buildOptions.sourcemaps ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
-      modules: ['node_modules', nodeModules],
+      modules: [appRoot].concat(nodeModules),
     },
     resolveLoader: {
-      modules: [nodeModules]
+      modules: nodeModules
     },
     context: projectRoot,
     entry: entryPoints,
@@ -82,7 +83,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     },
     module: {
       rules: [
-        { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
+        { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: nodeModules },
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.html$/, loader: 'raw-loader' },
         { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },

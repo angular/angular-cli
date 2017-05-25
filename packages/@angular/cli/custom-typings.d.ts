@@ -24,3 +24,8 @@ interface IWebpackDevServerConfigurationOptions {
   public?: string;
   disableHostCheck?: boolean;
 }
+
+
+interface NodeModule {
+  paths: string[];
+}
