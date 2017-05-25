@@ -68,6 +68,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     resolve: {
       extensions: ['.ts', '.js'],
       modules: ['node_modules', nodeModules],
+      symlinks: !buildOptions.preserveSymlinks
     },
     resolveLoader: {
       modules: [nodeModules, 'node_modules']

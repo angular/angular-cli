@@ -125,6 +125,12 @@ export const baseBuildCommandOptions: any = [
     default: true,
     aliases: ['dop'],
     description: 'Delete output path before build.'
+  },
+  {
+    name: 'preserve-symlinks',
+    type: Boolean,
+    default: false,
+    description: 'Do not use the real path when resolving modules.'
   }
 ];
 
