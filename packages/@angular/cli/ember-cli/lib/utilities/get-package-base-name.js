@@ -1,12 +1,10 @@
 'use strict';
 
-module.exports = function (name) {
-  var packageParts;
-
+module.exports = function(name) {
   if (!name) {
     return null;
   }
 
-  packageParts = name.split('/');
+  const packageParts = name.split('/');
   return packageParts[(packageParts.length - 1)];
 };

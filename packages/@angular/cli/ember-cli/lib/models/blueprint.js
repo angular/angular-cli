@@ -29,7 +29,7 @@ var walkSync            = require('walk-sync');
 var writeFile           = Promise.denodeify(fs.outputFile);
 var removeFile          = Promise.denodeify(fs.remove);
 var SilentError         = require('silent-error');
-var CoreObject          = require('../ext/core-object');
+var CoreObject          = require('core-object');
 var EOL                 = require('os').EOL;
 var debug               = require('debug')('ember-cli:blueprint');
 var normalizeEntityName = require('ember-cli-normalize-entity-name');
@@ -517,7 +517,7 @@ Blueprint.prototype.install = function(options) {
     ui.writeLine(chalk.yellow('You specified the dry-run flag, so no' +
       ' changes will be written.'));
   }
-  
+
   this._normalizeEntityName(options.entity);
   this._checkForPod(options.verbose);
   this._checkInRepoAddonExists(options.inRepoAddon);
@@ -754,7 +754,7 @@ function finishProcessingForInstall(infos) {
 
   var infosNeedingConfirmation = infos.reduce(gatherConfirmationMessages, []);
 
-  return sequence(infosNeedingConfirmation).returns(infos);
+  return sequence(infosNeedingConfirmation).then(() => infos);
 }
 
 function finishProcessingForUninstall(infos) {
