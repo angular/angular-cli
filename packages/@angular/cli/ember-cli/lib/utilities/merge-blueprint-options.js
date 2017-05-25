@@ -1,7 +1,7 @@
 'use strict';
 
-var SilentError = require('silent-error');
-var Blueprint   = require('../models/blueprint');
+const SilentError = require('silent-error');
+const Blueprint = require('../models/blueprint');
 
 /*
  * Helper for commands that use a blueprint to merge the blueprint's options
@@ -19,13 +19,13 @@ module.exports = function(rawArgs) {
     return;
   }
   // merge in blueprint availableOptions
-  var blueprint;
+  let blueprint;
   try {
     blueprint = Blueprint.lookup(rawArgs[0], {
-      paths: this.project.blueprintLookupPaths()
+      paths: this.project.blueprintLookupPaths(),
     });
     this.registerOptions(blueprint);
   } catch (e) {
-    SilentError.debugOrThrow('ember-cli/commands/' + this.name, e);
+    SilentError.debugOrThrow(`ember-cli/commands/${this.name}`, e);
   }
 };
