@@ -12,6 +12,11 @@ npm run build:aspnetcore-engine
 cp modules/aspnetcore-engine/package.json dist/aspnetcore-engine/package.json
 cp modules/aspnetcore-engine/README.md dist/aspnetcore-engine/README.md
 
+npm run build:hapi-engine
+
+cp modules/hapi-engine/package.json dist/hapi-engine/package.json
+cp modules/hapi-engine/README.md dist/hapi-engine/README.md
+
 npm run build:module-map-ngfactory-loader
 
 cp modules/module-map-ngfactory-loader/package.json dist/module-map-ngfactory-loader/package.json

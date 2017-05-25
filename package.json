@@ -62,6 +62,7 @@
     "jasmine": "jasmine",
     "build:express-engine": "ngc -p modules/express-engine/tsconfig.json",
     "build:aspnetcore-engine": "ngc -p modules/aspnetcore-engine/tsconfig.json",
+    "build:hapi-engine": "ngc -p modules/hapi-engine/tsconfig.json",
     "build:module-map-ngfactory-loader": "ngc -p modules/module-map-ngfactory-loader/tsconfig.json",
     "build": "./build.sh",
     "test": "exit 0"
@@ -77,7 +78,9 @@
     "@angular/platform-browser-dynamic": "^5.0.0-beta.7",
     "@angular/platform-server": "^5.0.0-beta.7",
     "@types/express": "^4.0.35",
+    "@types/hapi": "^16.1.2",
     "express": "^4.15.2",
+    "hapi": "^16.1.1",
     "rimraf": "^2.6.1",
     "rxjs": "^5.2.0",
     "typescript": "2.4.2",

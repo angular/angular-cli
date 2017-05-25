@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/hapi-engine"
+  },
+  "angularCompilerOptions": {
+    "genDir": "ngfactory"
+  },
+  "files": [
+    "index.ts"
+  ]
+}
