@@ -341,11 +341,7 @@ export class AotPlugin implements Tapable {
           cb();
         }
       });
-    });
-
-    compiler.plugin('normal-module-factory', (nmf: any) => {
       compiler.resolvers.normal.apply(new PathsPlugin({
-        nmf,
         tsConfigPath: this._tsConfigPath,
         compilerOptions: this._compilerOptions,
         compilerHost: this._compilerHost
