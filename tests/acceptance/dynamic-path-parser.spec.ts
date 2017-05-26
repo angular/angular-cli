@@ -1,20 +1,18 @@
-'use strict';
+import { expect } from 'chai';
+import * as path from 'path';
+import { dynamicPathParser } from '@angular/cli/utilities/dynamic-path-parser';
+import mockFs = require('mock-fs');
 
-var expect = require('chai').expect;
-var path = require('path');
-var dynamicPathParser = require('../../packages/@angular/cli/utilities/dynamic-path-parser').dynamicPathParser;
-var mockFs = require('mock-fs');
-
-var appDir = `src${path.sep}app`;
+const appDir = `src${path.sep}app`;
 const appConfig = {
   root: 'src'
 };
 
 describe('dynamic path parser', () => {
-  var project;
-  var entityName = 'temp-name';
-  var rootName = path.parse(process.cwd()).root + 'project';
-  var root = 'src';
+  let project: any;
+  const entityName = 'temp-name';
+  const rootName = path.parse(process.cwd()).root + 'project';
+  const root = 'src';
   beforeEach(() => {
     project = {
       root: rootName,
@@ -24,7 +22,7 @@ describe('dynamic path parser', () => {
         }]
       }
     };
-    var mockFolder = {};
+    const mockFolder: any = {};
     mockFolder[rootName] = {
       src: {
         app: {
@@ -42,58 +40,58 @@ describe('dynamic path parser', () => {
 
   it('parse from proj root dir', () => {
     process.env.PWD = project.root;
-    var options = {
+    const options = {
       project,
       entityName,
       appConfig,
       dryRun: false
     };
-    var result = dynamicPathParser(options);
+    const result = dynamicPathParser(options);
     expect(result.dir).to.equal(appDir);
     expect(result.name).to.equal(entityName);
   });
 
   it('parse from proj src dir', () => {
     process.env.PWD = path.join(project.root, 'src');
-    var options = {
+    const options = {
       project,
       entityName,
       appConfig,
       dryRun: false
     };
-    var result = dynamicPathParser(options);
+    const result = dynamicPathParser(options);
     expect(result.dir).to.equal(appDir);
     expect(result.name).to.equal(entityName);
   });
 
   it(`parse from proj src${path.sep}client dir`, () => {
     process.env.PWD = path.join(project.root, 'src', 'client');
-    var options = {
+    const options = {
       project,
       entityName,
       appConfig,
       dryRun: false
     };
-    var result = dynamicPathParser(options);
+    const result = dynamicPathParser(options);
     expect(result.dir).to.equal(appDir);
     expect(result.name).to.equal(entityName);
   });
 
   it(`parse from proj src${path.sep}client${path.sep}app dir`, () => {
     process.env.PWD = path.join(project.root, 'src', 'client', 'app');
-    var options = {
+    const options = {
       project,
       entityName,
       appConfig,
       dryRun: false
     };
-    var result = dynamicPathParser(options);
+    const result = dynamicPathParser(options);
     expect(result.dir).to.equal(appDir);
     expect(result.name).to.equal(entityName);
   });
 
   it(`parse from proj src${path.sep}client${path.sep}app${path.sep}child-dir`, () => {
-    var mockFolder = {};
+    const mockFolder: any = {};
     mockFolder[rootName] = {
       src: {
         app: {
@@ -106,19 +104,20 @@ describe('dynamic path parser', () => {
     };
     mockFs(mockFolder);
     process.env.PWD = path.join(project.root, 'src', 'app', 'child-dir');
-    var options = {
+    const options = {
       project,
       entityName,
       appConfig,
       dryRun: false
     };
-    var result = dynamicPathParser(options);
+    const result = dynamicPathParser(options);
     expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
     expect(result.name).to.equal(entityName);
   });
 
+  // tslint:disable-next-line:max-line-length
   it(`parse from proj src${path.sep}client${path.sep}app${path.sep}child-dir w/ ..${path.sep}`, () => {
-    var mockFolder = {};
+    const mockFolder: any = {};
     mockFolder[rootName] = {
       src: {
         app: {
@@ -130,20 +129,21 @@ describe('dynamic path parser', () => {
     };
     mockFs(mockFolder);
     process.env.PWD = path.join(project.root, 'src', 'app', 'child-dir');
-    var options = {
+    const options = {
       project,
       entityName: '..' + path.sep + entityName,
       appConfig,
       dryRun: false
     };
-    var result = dynamicPathParser(options);    
+    const result = dynamicPathParser(options);
     expect(result.dir).to.equal(appDir);
     expect(result.name).to.equal(entityName);
   });
 
+  // tslint:disable-next-line:max-line-length
   it(`parse from proj src${path.sep}client${path.sep}app${path.sep}child-dir${path.sep}grand-child-dir w/ ..${path.sep}`,
     () => {
-      var mockFolder = {};
+      const mockFolder: any = {};
       mockFolder[rootName] = {
         src: {
           app: {
@@ -157,19 +157,19 @@ describe('dynamic path parser', () => {
       };
       mockFs(mockFolder);
       process.env.PWD = path.join(project.root, 'src', 'app', 'child-dir', 'grand-child-dir');
-      var options = {
+      const options = {
         project,
         entityName: '..' + path.sep + entityName,
         appConfig,
         dryRun: false
       };
-      var result = dynamicPathParser(options);
+      const result = dynamicPathParser(options);
       expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
       expect(result.name).to.equal(entityName);
     });
 
   it('auto look for dirs with a "+" when not specified', () => {
-    var mockFolder = {};
+    const mockFolder: any = {};
     mockFolder[rootName] = {
       src: {
         app: {
@@ -179,26 +179,26 @@ describe('dynamic path parser', () => {
     };
     mockFs(mockFolder);
     process.env.PWD = path.join(project.root, 'src', 'app', 'my-route');
-    var options = {
+    const options = {
       project,
       entityName,
       appConfig,
       dryRun: false
     };
-    var result = dynamicPathParser(options);
+    const result = dynamicPathParser(options);
     expect(result.dir).to.equal(`${appDir}${path.sep}+my-route`);
     expect(result.name).to.equal(entityName);
   });
 
   it('create new dirs as dasherized', () => {
     process.env.PWD = project.root;
-    var options = {
+    const options = {
       project,
       entityName: path.join('NewDir', entityName),
       appConfig,
       dryRun: false
     };
-    var result = dynamicPathParser(options);
+    const result = dynamicPathParser(options);
     expect(result.dir).to.equal(`${appDir}${path.sep}new-dir`);
     expect(result.name).to.equal(entityName);
   });

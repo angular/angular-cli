@@ -1,11 +1,10 @@
-'use strict';
+import * as fs from 'fs-extra';
+import { expect } from 'chai';
+import * as path from 'path';
 
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
 
-const existsSync = require('exists-sync');
-const expect = require('chai').expect;
-const path = require('path');
 const root = process.cwd();
 
 const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
@@ -26,21 +25,21 @@ describe('Acceptance: ng generate class', function () {
 
   it('ng generate class my-class', function () {
     return ng(['generate', 'class', 'my-class']).then(() => {
-      expect(existsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
+      expect(fs.pathExistsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
+      expect(fs.pathExistsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
     });
   });
 
   it('ng generate class my-class --no-spec', function () {
     return ng(['generate', 'class', 'my-class', '--no-spec']).then(() => {
-      expect(existsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
-      expect(existsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
+      expect(fs.pathExistsSync(path.join(testPath, 'my-class.ts'))).to.equal(true);
+      expect(fs.pathExistsSync(path.join(testPath, 'my-class.spec.ts'))).to.equal(false);
     });
   });
 
   it('ng generate class my-class.model', function () {
     return ng(['generate', 'class', 'my-class.model']).then(() => {
-      expect(existsSync(path.join(testPath, 'my-class.model.ts'))).to.equal(true);
+      expect(fs.pathExistsSync(path.join(testPath, 'my-class.model.ts'))).to.equal(true);
     });
   });
 });

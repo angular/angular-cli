@@ -1,7 +1,4 @@
-'use strict';
-
-const mockFs = require('mock-fs');
-
+import mockFs = require('mock-fs');
 import * as ts from 'typescript';
 import * as path from 'path';
 import * as dependentFilesUtils from '@angular/cli/utilities/get-dependent-files';
