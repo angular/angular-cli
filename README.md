@@ -34,6 +34,10 @@ with NPM 3 or higher.
 * [Documentation](#documentation)
 * [License](#license)
 
+## Prerequisites
+
+The generated project has dependencies that require **Node 4 or greater**.
+
 ## Installation
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
