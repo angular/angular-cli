@@ -1,16 +1,19 @@
-const fs = require('fs-extra');
+// tslint:disable:max-line-length no-unused-expression
+import * as fs from 'fs-extra';
+import { expect } from 'chai';
+import * as path from 'path';
+import * as util from 'util';
+import { EOL } from 'os';
+import { forEach } from 'lodash';
+
 const ng = require('../helpers/ng');
-const existsSync = require('exists-sync');
-const expect = require('chai').expect;
-const forEach = require('lodash/forEach');
-const walkSync = require('walk-sync');
-const Blueprint = require('@angular/cli/ember-cli/lib/models/blueprint');
-const path = require('path');
 const tmp = require('../helpers/tmp');
-const root = process.cwd();
-const util = require('util');
-const EOL = require('os').EOL;
+const walkSync = require('walk-sync');
 const SilentError = require('silent-error');
+const Blueprint = require('@angular/cli/ember-cli/lib/models/blueprint');
+
+const root = process.cwd();
+
 
 describe('Acceptance: ng new', function () {
   beforeEach(function () {
@@ -25,10 +28,10 @@ describe('Acceptance: ng new', function () {
     return tmp.teardown('./tmp');
   });
 
-  function confirmBlueprintedForDir(dir) {
+  function confirmBlueprintedForDir(dir: string) {
     return function () {
       let blueprintPath = path.join(root, dir, 'files');
-      let expected = walkSync(blueprintPath);
+      let expected: string[] = walkSync(blueprintPath);
       let actual = walkSync('.').sort();
       let directory = path.basename(process.cwd());
 
@@ -95,7 +98,7 @@ describe('Acceptance: ng new', function () {
 
   it('ng new with app name creates new directory and has a dasherized package name', function () {
     return ng(['new', 'FooApp', '--skip-install', '--skip-git']).then(function () {
-      expect(!existsSync('FooApp'));
+      expect(!fs.pathExistsSync('FooApp'));
 
       const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
       expect(pkgJson.name).to.equal('foo-app');
@@ -104,7 +107,7 @@ describe('Acceptance: ng new', function () {
 
   it('ng new has a .editorconfig file', function () {
     return ng(['new', 'FooApp', '--skip-install', '--skip-git']).then(function () {
-      expect(!existsSync('FooApp'));
+      expect(!fs.pathExistsSync('FooApp'));
 
       const editorConfig = fs.readFileSync('.editorconfig', 'utf8');
       expect(editorConfig).to.exist;
@@ -117,7 +120,7 @@ describe('Acceptance: ng new', function () {
         return ng(['new', 'foo', '--skip-install', '--skip-git']).then(() => {
           throw new SilentError('Cannot run ng new, inside of Angular CLI project should fail.');
         }, () => {
-          expect(!existsSync('foo'));
+          expect(!fs.pathExistsSync('foo'));
         });
       })
       .then(confirmBlueprinted);
@@ -125,7 +128,7 @@ describe('Acceptance: ng new', function () {
 
   it('ng new without skip-git flag creates .git dir', function () {
     return ng(['new', 'foo', '--skip-install']).then(function () {
-      expect(existsSync('.git'));
+      expect(fs.pathExistsSync('.git'));
     });
   });
 
@@ -133,8 +136,8 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'foo', '--dry-run']).then(function () {
       const cwd = process.cwd();
       expect(cwd).to.not.match(/foo/, 'does not change cwd to foo in a dry run');
-      expect(!existsSync(path.join(cwd, 'foo')), 'does not create new directory');
-      expect(!existsSync(path.join(cwd, '.git')), 'does not create git in current directory');
+      expect(!fs.pathExistsSync(path.join(cwd, 'foo')), 'does not create new directory');
+      expect(!fs.pathExistsSync(path.join(cwd, '.git')), 'does not create git in current directory');
     });
   });
 
@@ -143,10 +146,10 @@ describe('Acceptance: ng new', function () {
       .then(function () {
         const cwd = process.cwd();
         expect(cwd).to.not.match(/foo/, 'does not use app name for directory name');
-        expect(!existsSync(path.join(cwd, 'foo')), 'does not create new directory with app name');
+        expect(!fs.pathExistsSync(path.join(cwd, 'foo')), 'does not create new directory with app name');
 
         expect(cwd).to.match(/bar/, 'uses given directory name');
-        expect(existsSync(path.join(cwd, 'bar')), 'creates new directory with specified name');
+        expect(fs.pathExistsSync(path.join(cwd, 'bar')), 'creates new directory with specified name');
 
         const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
         expect(pkgJson.name).to.equal('foo', 'uses app name for package name');
@@ -157,7 +160,7 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'foo', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => {
         const templateFile = path.join('src', 'app', 'app.component.html');
-        expect(existsSync(templateFile)).to.equal(false);
+        expect(fs.pathExistsSync(templateFile)).to.equal(false);
       });
   });
 
@@ -165,7 +168,7 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'foo', '--skip-install', '--skip-git', '--inline-style'])
       .then(() => {
         const styleFile = path.join('src', 'app', 'app.component.css');
-        expect(existsSync(styleFile)).to.equal(false);
+        expect(fs.pathExistsSync(styleFile)).to.equal(false);
       });
   });
 
@@ -173,7 +176,7 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'foo', '--skip-install', '--skip-git', '--skip-tests'])
       .then(() => {
         const specFile = path.join('src', 'app', 'app.component.spec.ts');
-        expect(existsSync(specFile)).to.equal(false);
+        expect(fs.pathExistsSync(specFile)).to.equal(false);
       });
   });
 

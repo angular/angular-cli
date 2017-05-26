@@ -1,18 +1,13 @@
-/*eslint-disable no-console */
-'use strict';
+import * as fs from 'fs-extra';
+import { expect } from 'chai';
+import * as path from 'path';
 
-var fs = require('fs-extra');
-var ng = require('../helpers/ng');
-var existsSync = require('exists-sync');
-var expect = require('chai').expect;
-var path = require('path');
-var tmp = require('../helpers/tmp');
-var root = process.cwd();
-var Promise = require('@angular/cli/ember-cli/lib/ext/promise');
-var SilentError = require('silent-error');
-const denodeify = require('denodeify');
+const ng = require('../helpers/ng');
+const tmp = require('../helpers/tmp');
+const SilentError = require('silent-error');
 
-const readFile = denodeify(fs.readFile);
+const root = process.cwd();
+
 
 describe('Acceptance: ng generate pipe', function () {
   beforeEach(function () {
@@ -36,11 +31,11 @@ describe('Acceptance: ng generate pipe', function () {
     const appModulePath = path.join(appRoot, 'src/app/app.module.ts');
     return ng(['generate', 'pipe', 'my-pipe'])
       .then(() => {
-        expect(existsSync(testPath)).to.equal(true);
-        expect(existsSync(testSpecPath)).to.equal(true);
+        expect(fs.pathExistsSync(testPath)).to.equal(true);
+        expect(fs.pathExistsSync(testSpecPath)).to.equal(true);
       })
-      .then(() => readFile(appModulePath, 'utf-8'))
-      .then(content => {
+      .then(() => fs.readFile(appModulePath, 'utf-8'))
+      .then((content: string) => {
         expect(content).matches(/import.*\bMyPipePipe\b.*from '.\/my-pipe.pipe';/);
         expect(content).matches(/declarations:\s*\[[^\]]+?,\r?\n\s+MyPipePipe\r?\n/m);
       });
@@ -53,23 +48,23 @@ describe('Acceptance: ng generate pipe', function () {
 
     return ng(['generate', 'pipe', 'my-pipe', '--no-spec'])
       .then(() => {
-        expect(existsSync(testPath)).to.equal(true);
-        expect(existsSync(testSpecPath)).to.equal(false);
+        expect(fs.pathExistsSync(testPath)).to.equal(true);
+        expect(fs.pathExistsSync(testSpecPath)).to.equal(false);
       });
   });
 
   it('ng generate pipe test' + path.sep + 'my-pipe', function () {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', 'test'));
     return ng(['generate', 'pipe', 'test' + path.sep + 'my-pipe']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'test', 'my-pipe.pipe.ts');
-      expect(existsSync(testPath)).to.equal(true);
+      const testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'test', 'my-pipe.pipe.ts');
+      expect(fs.pathExistsSync(testPath)).to.equal(true);
     });
   });
 
   it('ng generate pipe test' + path.sep + '..' + path.sep + 'my-pipe', function () {
     return ng(['generate', 'pipe', 'test' + path.sep + '..' + path.sep + 'my-pipe']).then(() => {
-      var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-pipe.pipe.ts');
-      expect(existsSync(testPath)).to.equal(true);
+      const testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-pipe.pipe.ts');
+      expect(fs.pathExistsSync(testPath)).to.equal(true);
     });
   });
 
@@ -83,11 +78,11 @@ describe('Acceptance: ng generate pipe', function () {
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
-        return ng(['generate', 'pipe', 'my-pipe'])
+        return ng(['generate', 'pipe', 'my-pipe']);
       })
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-pipe.pipe.ts');
-        expect(existsSync(testPath)).to.equal(true);
+        const testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-pipe.pipe.ts');
+        expect(fs.pathExistsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
 
@@ -101,12 +96,12 @@ describe('Acceptance: ng generate pipe', function () {
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
-        return ng(['generate', 'pipe', 'child-dir' + path.sep + 'my-pipe'])
+        return ng(['generate', 'pipe', 'child-dir' + path.sep + 'my-pipe']);
       })
       .then(() => {
-        var testPath = path.join(
+        const testPath = path.join(
           root, 'tmp', 'foo', 'src', 'app', '1', 'child-dir', 'my-pipe.pipe.ts');
-        expect(existsSync(testPath)).to.equal(true);
+        expect(fs.pathExistsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
 
@@ -120,11 +115,11 @@ describe('Acceptance: ng generate pipe', function () {
       .then(() => process.chdir('./1'))
       .then(() => {
         process.env.CWD = process.cwd();
-        return ng(['generate', 'pipe', 'child-dir' + path.sep + '..' + path.sep + 'my-pipe'])
+        return ng(['generate', 'pipe', 'child-dir' + path.sep + '..' + path.sep + 'my-pipe']);
       })
       .then(() => {
-        var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-pipe.pipe.ts');
-        expect(existsSync(testPath)).to.equal(true);
+        const testPath = path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'my-pipe.pipe.ts');
+        expect(fs.pathExistsSync(testPath)).to.equal(true);
       }, err => console.log('ERR: ', err));
   });
 
@@ -140,18 +135,19 @@ describe('Acceptance: ng generate pipe', function () {
         .then(() => process.chdir('./1'))
         .then(() => {
           process.env.CWD = process.cwd();
-          return ng(['generate', 'pipe', path.sep + 'my-pipe'])
+          return ng(['generate', 'pipe', path.sep + 'my-pipe']);
         })
         .then(() => {
-          var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-pipe.pipe.ts');
-          expect(existsSync(testPath)).to.equal(true);
+          const testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-pipe.pipe.ts');
+          expect(fs.pathExistsSync(testPath)).to.equal(true);
         }, err => console.log('ERR: ', err));
     });
 
   it('ng generate pipe ..' + path.sep + 'my-pipe from root dir will fail', () => {
     return ng(['generate', 'pipe', '..' + path.sep + 'my-pipe']).then(() => {
       throw new SilentError(`ng generate pipe ..${path.sep}my-pipe from root dir should fail.`);
-    }, (err) => {
+    }, (err: string) => {
+      // tslint:disable-next-line:max-line-length
       expect(err).to.equal(`Invalid path: "..${path.sep}my-pipe" cannot be above the "src${path.sep}app" directory`);
     });
   });
@@ -161,7 +157,7 @@ describe('Acceptance: ng generate pipe', function () {
       .then(() => ng(['generate', 'pipe', 'baz', '--module', 'foo']))
       .catch((error) => {
         expect(error).to.equal('Specified module does not exist');
-      })
+      });
   });
 
   describe('should import and add to declaration list', () => {
@@ -171,9 +167,10 @@ describe('Acceptance: ng generate pipe', function () {
 
       return Promise.resolve()
         .then(() => ng(['generate', 'pipe', 'baz', '--module', 'app.module.ts']))
-        .then(() => readFile(modulePath, 'utf-8'))
+        .then(() => fs.readFile(modulePath, 'utf-8'))
         .then(content => {
           expect(content).matches(/import.*BazPipe.*from '.\/baz.pipe';/);
+          // tslint:disable-next-line:max-line-length
           expect(content).matches(/declarations:\s+\[\r?\n\s+AppComponent,\r?\n\s+BazPipe\r?\n\s+\]/m);
         });
     });
@@ -184,9 +181,10 @@ describe('Acceptance: ng generate pipe', function () {
 
       return Promise.resolve()
         .then(() => ng(['generate', 'pipe', 'baz', '--module', 'app']))
-        .then(() => readFile(modulePath, 'utf-8'))
+        .then(() => fs.readFile(modulePath, 'utf-8'))
         .then(content => {
           expect(content).matches(/import.*BazPipe.*from '.\/baz.pipe';/);
+          // tslint:disable-next-line:max-line-length
           expect(content).matches(/declarations:\s+\[\r?\n\s+AppComponent,\r?\n\s+BazPipe\r?\n\s+\]/m);
         });
     });
@@ -198,7 +196,7 @@ describe('Acceptance: ng generate pipe', function () {
       return Promise.resolve()
         .then(() => ng(['generate', 'module', 'foo']))
         .then(() => ng(['generate', 'pipe', 'baz', '--module', path.join('foo', 'foo.module.ts')]))
-        .then(() => readFile(modulePath, 'utf-8'))
+        .then(() => fs.readFile(modulePath, 'utf-8'))
         .then(content => {
           expect(content).matches(/import.*BazPipe.*from '..\/baz.pipe';/);
           expect(content).matches(/declarations:\s+\[BazPipe]/m);
@@ -212,7 +210,7 @@ describe('Acceptance: ng generate pipe', function () {
       return Promise.resolve()
         .then(() => ng(['generate', 'module', 'foo']))
         .then(() => ng(['generate', 'pipe', 'baz', '--module', path.join('foo', 'foo')]))
-        .then(() => readFile(modulePath, 'utf-8'))
+        .then(() => fs.readFile(modulePath, 'utf-8'))
         .then(content => {
           expect(content).matches(/import.*BazPipe.*from '..\/baz.pipe';/);
           expect(content).matches(/declarations:\s+\[BazPipe]/m);
@@ -226,7 +224,7 @@ describe('Acceptance: ng generate pipe', function () {
       return Promise.resolve()
         .then(() => ng(['generate', 'module', 'foo']))
         .then(() => ng(['generate', 'pipe', 'baz', '--module', 'foo']))
-        .then(() => readFile(modulePath, 'utf-8'))
+        .then(() => fs.readFile(modulePath, 'utf-8'))
         .then(content => {
           expect(content).matches(/import.*BazPipe.*from '..\/baz.pipe';/);
           expect(content).matches(/declarations:\s+\[BazPipe]/m);
@@ -241,7 +239,7 @@ describe('Acceptance: ng generate pipe', function () {
         .then(() => ng(['generate', 'module', 'foo']))
         .then(() => ng(['generate', 'module', path.join('foo', 'bar')]))
         .then(() => ng(['generate', 'pipe', 'baz', '--module', path.join('foo', 'bar')]))
-        .then(() => readFile(modulePath, 'utf-8'))
+        .then(() => fs.readFile(modulePath, 'utf-8'))
         .then(content => {
           expect(content).matches(/import.*BazPipe.*from '..\/..\/baz.pipe';/);
           expect(content).matches(/declarations:\s+\[BazPipe]/m);

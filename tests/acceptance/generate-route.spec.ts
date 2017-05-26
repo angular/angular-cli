@@ -1,19 +1,19 @@
-'use strict';
+// tslint:disable:max-line-length
+import * as fs from 'fs-extra';
+import { expect } from 'chai';
+import * as path from 'path';
 
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
 
-const existsSync = require('exists-sync');
-const expect = require('chai').expect;
-const fs = require('fs');
-const path = require('path');
 const root = process.cwd();
 
 const testPath = path.join(root, 'tmp', 'foo', 'src', 'app');
 
-function fileExpectations(expectation) {
+function fileExpectations(expectation: boolean) {
   const dir = 'my-route';
-  expect(existsSync(path.join(testPath, dir, 'my-route.component.ts'))).to.equal(expectation);
+  expect(fs.pathExistsSync(path.join(testPath, dir, 'my-route.component.ts')))
+    .to.equal(expectation);
 }
 
 xdescribe('Acceptance: ng generate route', function () {
@@ -33,13 +33,13 @@ xdescribe('Acceptance: ng generate route', function () {
 
   it('ng generate route my-route', function () {
     return ng(['generate', 'route', 'my-route']).then(() => {
-      fileExpectations(true, true);
+      fileExpectations(true);
     });
   });
 
   it('ng generate route +my-route', function () {
     return ng(['generate', 'route', '+my-route']).then(() => {
-      fileExpectations(true, true);
+      fileExpectations(true);
     });
   });
 
@@ -48,11 +48,11 @@ xdescribe('Acceptance: ng generate route', function () {
       .then(() => ng(['generate', 'route', '+my-route/my-other', '--default']))
       .then(() => ng(['generate', 'route', '+my-route/+my-other/my-third', '--default']))
       .then(() => {
-        expect(existsSync(path.join(testPath, '+my-route/my-route.component.ts')))
+        expect(fs.pathExistsSync(path.join(testPath, '+my-route/my-route.component.ts')))
           .to.equal(true);
-        expect(existsSync(path.join(testPath, '+my-route/+my-other/my-other.component.ts')))
+        expect(fs.pathExistsSync(path.join(testPath, '+my-route/+my-other/my-other.component.ts')))
           .to.equal(true);
-        expect(existsSync(path.join(testPath, '+my-route/+my-other/+my-third/my-third.component.ts')))
+        expect(fs.pathExistsSync(path.join(testPath, '+my-route/+my-other/+my-third/my-third.component.ts')))
           .to.equal(true);
 
         const appContent = fs.readFileSync(path.join(testPath, 'foo.component.ts'), 'utf-8');
@@ -76,15 +76,15 @@ xdescribe('Acceptance: ng generate route', function () {
   });
 
   it('ng generate route my-route --dry-run does not modify files', () => {
-    var parentComponentPath = path.join(testPath, 'foo.component.ts');
-    var parentComponentHtmlPath = path.join(testPath, 'foo.component.html')
+    const parentComponentPath = path.join(testPath, 'foo.component.ts');
+    const parentComponentHtmlPath = path.join(testPath, 'foo.component.html');
 
-    var unmodifiedParentComponent = fs.readFileSync(parentComponentPath, 'utf8');
-    var unmodifiedParentComponentHtml = fs.readFileSync(parentComponentHtmlPath, 'utf8');
+    const unmodifiedParentComponent = fs.readFileSync(parentComponentPath, 'utf8');
+    const unmodifiedParentComponentHtml = fs.readFileSync(parentComponentHtmlPath, 'utf8');
 
     return ng(['generate', 'route', 'my-route', '--dry-run']).then(() => {
-      var afterGenerateParentComponent = fs.readFileSync(parentComponentPath, 'utf8');
-      var afterGenerateParentHtml = fs.readFileSync(parentComponentHtmlPath, 'utf8');
+      const afterGenerateParentComponent = fs.readFileSync(parentComponentPath, 'utf8');
+      const afterGenerateParentHtml = fs.readFileSync(parentComponentHtmlPath, 'utf8');
 
       expect(afterGenerateParentComponent).to.equal(unmodifiedParentComponent);
       expect(afterGenerateParentHtml).to.equal(unmodifiedParentComponentHtml);

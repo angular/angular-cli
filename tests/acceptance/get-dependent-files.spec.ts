@@ -1,7 +1,8 @@
-'use strict';
+// tslint:disable:no-unused-expression
 
-// This needs to be first so fs module can be mocked correctly.
-let mockFs = require('mock-fs');
+// mock-fs needs to be first so fs module can be mocked correctly.
+import mockFs = require('mock-fs');
+
 import { expect, assert } from 'chai';
 import * as path from 'path';
 import * as ts from 'typescript';
