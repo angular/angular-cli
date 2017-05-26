@@ -13,6 +13,8 @@ const Project = require('../ember-cli/lib/models/project');
 const SilentError = require('silent-error');
 const mkdir = denodeify(fs.mkdir);
 
+const configFile = '.angular-cli.json';
+const changeLater = (path: string) => `You can later change the value in "${configFile}" (${path})`;
 
 const NewCommand = Command.extend({
   name: 'new',
@@ -26,7 +28,10 @@ const NewCommand = Command.extend({
       type: Boolean,
       default: false,
       aliases: ['d'],
-      description: 'Run through without making any changes.'
+      description: oneLine`
+        Run through without making any changes.
+        Will list all files that would have been created when running "ng new".
+      `
     },
     {
       name: 'verbose',
@@ -82,20 +87,26 @@ const NewCommand = Command.extend({
       type: String,
       default: 'src',
       aliases: ['sd'],
-      description: 'The name of the source directory.'
+      description: `The name of the source directory. ${changeLater('apps[0].root')}.`
     },
     {
       name: 'style',
       type: String,
       default: 'css',
-      description: 'The style file default extension.'
+      description: oneLine`The style file default extension.
+        Possible values: css, scss, less, sass, styl(stylus).
+        ${changeLater('defaults.styleExt')}.
+      `
     },
     {
       name: 'prefix',
       type: String,
       default: 'app',
       aliases: ['p'],
-      description: 'The prefix to use for all component selectors.'
+      description: oneLine`
+        The prefix to use for all component selectors.
+        ${changeLater('apps[0].prefix')}.
+      `
     },
     {
       name: 'routing',
