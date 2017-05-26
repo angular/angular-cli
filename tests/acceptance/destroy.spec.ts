@@ -1,9 +1,8 @@
-'use strict';
+import { expect } from 'chai';
 
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
 const SilentError = require('silent-error');
-const expect = require('chai').expect;
 
 describe('Acceptance: ng destroy', function () {
   beforeEach(function () {
@@ -22,7 +21,7 @@ describe('Acceptance: ng destroy', function () {
   it('without args should fail', function () {
     return ng(['destroy']).then(() => {
       throw new SilentError('ng destroy should fail.');
-    }, (err) => {
+    }, (err: any) => {
       expect(err.message).to.equal('The destroy command is not supported by Angular CLI.');
     });
   });
@@ -30,7 +29,7 @@ describe('Acceptance: ng destroy', function () {
   it('with args should fail', function () {
     return ng(['destroy', 'something']).then(() => {
       throw new SilentError('ng destroy something should fail.');
-    }, (err) => {
+    }, (err: any) => {
       expect(err.message).to.equal('The destroy command is not supported by Angular CLI.');
     });
   });

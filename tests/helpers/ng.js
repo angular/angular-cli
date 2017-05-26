@@ -1,20 +1,16 @@
 'use strict';
 
-var MockUI = require('./mock-ui');
-var Cli = require('@angular/cli/lib/cli');
+const MockUI = require('./mock-ui');
+const cli = require('@angular/cli/lib/cli');
 
 module.exports = function ng(args) {
-  var cli;
-
   process.env.PWD = process.cwd();
 
-  cli = new Cli({
+  return cli({
     inputStream: [],
     outputStream: [],
     cliArgs: args,
     UI: MockUI,
     testing: true
   });
-
-  return cli;
 };
