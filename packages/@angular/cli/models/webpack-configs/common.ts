@@ -70,9 +70,9 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       modules: ['node_modules', nodeModules],
     },
     resolveLoader: {
-      modules: [nodeModules]
+      modules: [nodeModules, 'node_modules']
     },
-    context: projectRoot,
+    context: __dirname,
     entry: entryPoints,
     output: {
       path: path.resolve(projectRoot, buildOptions.outputPath),
