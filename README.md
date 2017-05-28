@@ -59,8 +59,9 @@ Navigate to `http://localhost:4200/`. The app will automatically reload if you c
 You can configure the default HTTP host and port used by the development server with two command-line options :
 
 ```bash
-ng serve --host 0.0.0.0 --port 4201
+ng serve --host <public ip or valid domain> --port 4201
 ```
+You have to use exactly the same `<public ip>` or `<domain` when opening the app or you will get "Invalid Host header".
 
 ### Generating Components, Directives, Pipes and Services
 
