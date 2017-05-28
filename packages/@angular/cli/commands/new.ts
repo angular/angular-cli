@@ -16,6 +16,7 @@ const mkdir = denodeify(fs.mkdir);
 
 const NewCommand = Command.extend({
   name: 'new',
+  aliases: ['n'],
   description: `Creates a new directory and a new Angular app eg. "ng new [name]".`,
   works: 'outsideProject',
 
