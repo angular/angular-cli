@@ -83,6 +83,7 @@
     - *ssl* (`boolean`): Enables ssl for the application. Default is `false`.
     - *sslKey* (`string`): The ssl key used by the server. Default is `ssl/server.key`.
     - *sslCert* (`string`): The ssl certificate used by the server. Default is `ssl/server.crt`.
+    - *proxyConfig* (`string`): Proxy configuration file.
 
 - **packageManager** (`string`): Specify which package manager tool to use. Options include `npm`, `cnpm` and `yarn`.
 

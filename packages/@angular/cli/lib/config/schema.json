@@ -482,6 +482,10 @@
               "description": "The ssl certificate used by the server.",
               "type": "string",
               "default": "ssl/server.crt"
+            },
+            "proxyConfig": {
+              "description": "Proxy configuration file.",
+              "type": "string"
             }
           }
         }
