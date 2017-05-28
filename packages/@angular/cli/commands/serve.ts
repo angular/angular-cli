@@ -14,6 +14,7 @@ const defaultHost = config.get('defaults.serve.host');
 const defaultSsl = config.get('defaults.serve.ssl');
 const defaultSslKey = config.get('defaults.serve.sslKey');
 const defaultSslCert = config.get('defaults.serve.sslCert');
+const defaultProxyConfig = config.get('defaults.serve.proxyConfig');
 
 export interface ServeTaskOptions extends BuildOptions {
   port?: number;
@@ -49,6 +50,7 @@ export const baseServeCommandOptions: any = overrideOptions([
   {
     name: 'proxy-config',
     type: 'Path',
+    default: defaultProxyConfig,
     aliases: ['pc'],
     description: 'Proxy configuration file.'
   },
