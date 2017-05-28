@@ -222,19 +222,32 @@ function _replacePlatform(
 }
 
 
-function _replaceBootstrap(refactor: TypeScriptFileRefactor, call: ts.CallExpression) {
-  // If bootstrapModule can't be found, bail out early.
-  if (!call.getText().includes('bootstrapModule')) {
-    return;
+function _replaceBootstrapOrRender(refactor: TypeScriptFileRefactor, call: ts.CallExpression) {
+  // If neither bootstrapModule or renderModule can't be found, bail out early.
+  let replacementTarget: string;
+  let identifier: ts.Identifier;
+  if (call.getText().includes('bootstrapModule')) {
+    if (call.expression.kind != ts.SyntaxKind.PropertyAccessExpression) {
+      return;
+    }
+
+    replacementTarget = 'bootstrapModule';
+    const access = call.expression as ts.PropertyAccessExpression;
+    identifier = access.name;
+    _replacePlatform(refactor, access);
+
+  } else if (call.getText().includes('renderModule')) {
+    if (call.expression.kind != ts.SyntaxKind.Identifier) {
+      return;
+    }
+
+    replacementTarget = 'renderModule';
+    identifier = call.expression as ts.Identifier;
+    refactor.insertImport('renderModuleFactory', '@angular/platform-server');
   }
 
-  if (call.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
-    const access = call.expression as ts.PropertyAccessExpression;
-
-    if (access.name.text === 'bootstrapModule') {
-      _replacePlatform(refactor, access);
-      refactor.replaceNode(access.name, 'bootstrapModuleFactory');
-    }
+  if (identifier && identifier.text === replacementTarget) {
+    refactor.replaceNode(identifier, replacementTarget + 'Factory');
   }
 }
 
@@ -268,7 +281,8 @@ function _replaceEntryModule(plugin: AotPlugin, refactor: TypeScriptFileRefactor
   modules
     .forEach(reference => {
       refactor.replaceNode(reference, factoryClassName);
-      _replaceBootstrap(refactor, _getCaller(reference));
+      const caller = _getCaller(reference);
+      _replaceBootstrapOrRender(refactor, caller);
     });
 }
 
