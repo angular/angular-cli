@@ -17,6 +17,8 @@ export default function(skipCleaning: () => void) {
     .then(() => expectFileToMatch('dist/app.main.js',
       new RegExp('AppComponent.ctorParameters = .*MyInjectable'))
     .then(() => expectFileToMatch('dist/app.main.js',
-      /AppModule.*\.testProp = \'testing\'/)
+      /AppModule \*\/\].*\.testProp = \'testing\'/))
+    .then(() => expectFileToMatch('dist/app.main.js',
+      /renderModuleFactory \*\/\].*\/\* AppModuleNgFactory \*\/\]/))
     .then(() => skipCleaning());
 }
