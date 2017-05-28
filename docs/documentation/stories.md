@@ -25,5 +25,5 @@
  - [Code Coverage](stories/code-coverage)
  - [Application Environments](stories/application-environments)
  - [Autoprefixer Configuration](stories/autoprefixer)
- - [Deploy to GitHub Pages](stories/githug-pages)
+ - [Deploy to GitHub Pages](stories/github-pages)
  - [Linked Library](stories/linked-library)
