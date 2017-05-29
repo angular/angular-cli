@@ -93,7 +93,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   };
 
   // determine hashing format
-  const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing, buildOptions.customHash);
 
   // use includePaths from appConfig
   const includePaths: string[] = [];

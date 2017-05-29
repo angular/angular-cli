@@ -21,7 +21,19 @@ export default function() {
     .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{20}\.bundle\.(css|js)/))
     .then(() => verifyMedia(/styles\.[0-9a-f]{20}\.bundle\.(css|js)/, /image\.[0-9a-f]{20}\.svg/))
 
+    .then(() => ng('build', '--dev', '--output-hashing=all --custom-hash=someHash'))//custom hash can be any string
+    .then(() => expectFileToMatch('dist/index.html', /inline\.someHash\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /main\.someHash\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /styles\.someHash\.bundle\.(css|js)/))
+    .then(() => verifyMedia(/styles\.someHash\.bundle\.(css|js)/, /image\.someHash\.svg/))
+
     .then(() => ng('build', '--prod', '--output-hashing=none'))
+    .then(() => expectFileToMatch('dist/index.html', /inline\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /main\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /styles\.bundle\.(css|js)/))
+    .then(() => verifyMedia(/styles\.bundle\.(css|js)/, /image\.svg/))
+
+    .then(() => ng('build', '--prod', '--output-hashing=none --custom-hash=someHash'))
     .then(() => expectFileToMatch('dist/index.html', /inline\.bundle\.js/))
     .then(() => expectFileToMatch('dist/index.html', /main\.bundle\.js/))
     .then(() => expectFileToMatch('dist/index.html', /styles\.bundle\.(css|js)/))
@@ -33,9 +45,21 @@ export default function() {
     .then(() => expectFileToMatch('dist/index.html', /styles\.bundle\.(css|js)/))
     .then(() => verifyMedia(/styles\.bundle\.(css|js)/, /image\.[0-9a-f]{20}\.svg/))
 
+    .then(() => ng('build', '--dev', '--output-hashing=media --custom-hash=someHash'))
+    .then(() => expectFileToMatch('dist/index.html', /inline\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /main\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /styles\.bundle\.(css|js)/))
+    .then(() => verifyMedia(/styles\.bundle\.(css|js)/, /image\.someHash\.svg/))
+
     .then(() => ng('build', '--dev', '--output-hashing=bundles'))
     .then(() => expectFileToMatch('dist/index.html', /inline\.[0-9a-f]{20}\.bundle\.js/))
     .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
     .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{20}\.bundle\.(css|js)/))
-    .then(() => verifyMedia(/styles\.[0-9a-f]{20}\.bundle\.(css|js)/, /image\.svg/));
+    .then(() => verifyMedia(/styles\.[0-9a-f]{20}\.bundle\.(css|js)/, /image\.svg/))
+
+    .then(() => ng('build', '--dev', '--output-hashing=bundles --custom-hash=someHash'))
+    .then(() => expectFileToMatch('dist/index.html', /inline\.someHash\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /main\.someHash\.bundle\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /styles\.someHash\.bundle\.(css|js)/))
+    .then(() => verifyMedia(/styles\.someHash\.bundle\.(css|js)/, /image\.svg/));
 }

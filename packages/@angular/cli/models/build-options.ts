@@ -15,6 +15,7 @@ export interface BuildOptions {
   extractCss?: boolean;
   watch?: boolean;
   outputHashing?: string;
+  customHash?: string;
   poll?: number;
   app?: string;
   deleteOutputPath?: boolean;
