@@ -67,6 +67,19 @@ export function moveFile(from: string, to: string) {
   });
 }
 
+
+export function symlinkFile(from: string, to: string, type?: string) {
+  return new Promise<void>((resolve, reject) => {
+    fs.symlink(from, to, type, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
 export function createDir(path: string) {
   _recursiveMkDir(path);
 }
