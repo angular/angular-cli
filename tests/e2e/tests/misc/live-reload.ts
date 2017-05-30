@@ -28,6 +28,10 @@ export default function () {
   app.set('port', server.address().port);
   const apiUrl = `http://localhost:${server.address().port}`;
 
+  // Use a diffrent, but defined port for the webserver
+  const webserverPort = server.address().port + 1;
+  const webserverUrl = `http://localhost:${webserverPort}`;
+
   // This endpoint will be pinged by the main app on each reload.
   app.get('/live-reload-count', _ => liveReloadCount++);
   // This endpoint will be pinged by webpack to check for live reloads.
@@ -124,7 +128,7 @@ export default function () {
     // Serve with live reload client set to api should call api.
     .then(_ => silentExecAndWaitForOutputToMatch(
       'ng',
-      ['e2e', '--watch', `--public-host=${apiUrl}`],
+      ['e2e', '--watch', `--port=${webserverPort}`,`--public-host=${webserverUrl}`],
       protractorGoodRegEx
     ))
     .then(_ => wait(2000))
