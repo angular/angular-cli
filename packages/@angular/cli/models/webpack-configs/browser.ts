@@ -1,5 +1,6 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
+import * as fs from 'fs';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
@@ -23,7 +24,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
 
   if (buildOptions.vendorChunk) {
     // Separate modules from node_modules into a vendor chunk.
-    const nodeModules = path.resolve(projectRoot, 'node_modules');
+    const nodeModules = fs.realpathSync(path.resolve(projectRoot, 'node_modules'));
     // --aot puts the generated *.ngfactory.ts in src/$$_gendir/node_modules.
     const genDirNodeModules = path.resolve(appRoot, '$$_gendir', 'node_modules');
 
