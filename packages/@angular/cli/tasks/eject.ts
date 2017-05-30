@@ -35,10 +35,12 @@ const pree2eNpmScript = `webdriver-manager update --standalone false --gecko fal
 class JsonWebpackSerializer {
   public imports: {[name: string]: string[]} = {};
   public variableImports: {[name: string]: string} = {
-    'path': 'path'
+    'fs': 'fs',
+    'path': 'path',
   };
   public variables: {[name: string]: string} = {
     'nodeModules': `path.join(process.cwd(), 'node_modules')`,
+    'realNodeModules': `fs.realpathSync(nodeModules)`,
     'genDirNodeModules':
       `path.join(process.cwd(), '${this._appRoot}', '$$_gendir', 'node_modules')`,
   };
