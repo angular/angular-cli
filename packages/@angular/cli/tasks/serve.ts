@@ -67,6 +67,13 @@ export default Task.extend({
       const clientUrl = url.parse(publicHost);
       serveTaskOptions.publicHost = clientUrl.host;
       clientAddress = url.format(clientUrl);
+
+      // if (!clientUrl.href.startsWith('http')) {
+      //   const protocol = serveTaskOptions.ssl ? 'https' : 'http';
+      //   clientAddress = `${protocol}://${clientUrl.href}`;
+      // } else {
+      //   clientAddress = clientUrl.href;
+      // }
     }
 
     if (serveTaskOptions.liveReload) {

@@ -29,13 +29,10 @@ export const E2eTask = Task.extend({
       if (e2eTaskOptions.serve && e2eTaskOptions.publicHost) {
         const clientUrl = url.parse(e2eTaskOptions.publicHost);
         if (!clientUrl.hostname) {
-          return Promise.reject(new SilentError(`'publicHost' must be a full URL.`));
+          return Promise.reject(new SilentError(`'public-host' must be a full URL.`));
         }
-        additionalProtractorConfig.baseUrl = url.format({
-          protocol: e2eTaskOptions.ssl ? 'https' : 'http',
-          hostname: clientUrl.hostname,
-          port: clientUrl.port
-        });
+        const protocol = e2eTaskOptions.ssl ? 'https' : 'http';
+        additionalProtractorConfig.baseUrl = `${protocol}://${clientUrl.href}`
       } else if (e2eTaskOptions.serve) {
         additionalProtractorConfig.baseUrl = url.format({
           protocol: e2eTaskOptions.ssl ? 'https' : 'http',
