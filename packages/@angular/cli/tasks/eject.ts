@@ -387,10 +387,10 @@ class JsonWebpackSerializer {
     variableOutput += '\n';
     variableOutput += `const argv = require('yargs').argv.env;\n`;
     variableOutput += `let environment;
-    if(argv.NODE_ENV === 'staging'){
+    if(argv && argv.NODE_ENV === 'staging'){
       environment = '${appConfig.environments.staging}';
     }
-    else if(argv.NODE_ENV === 'production'){
+    else if(argv && argv.NODE_ENV === 'production'){
       environment = '${appConfig.environments.prod}';
     }
     else{
