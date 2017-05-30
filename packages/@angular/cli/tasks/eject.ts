@@ -168,7 +168,7 @@ class JsonWebpackSerializer {
           break;
         case AotPlugin:
           args = this._aotPluginSerialize(plugin);
-          if(args['hostReplacementPaths']]){
+          if(args['hostReplacementPaths']){
 			let mainEnv = Object.keys(args['hostReplacementPaths']);
           	args['hostReplacementPaths'][mainEnv[0]] = '`${environment}`';
 		  }
@@ -355,7 +355,7 @@ class JsonWebpackSerializer {
       });
   }
 
-  generateVariables(): string {
+  generateVariables(appConfig: any): string {
     let variableOutput = '';
     Object.keys(this.variableImports)
       .forEach((key: string) => {
@@ -388,13 +388,13 @@ class JsonWebpackSerializer {
     variableOutput += `const argv = require('yargs').argv.env;\n`;
     variableOutput += `let environment;
     if(argv.NODE_ENV === 'staging'){
-      environment = 'environments/environment.staging.ts';
+      environment = '${appConfig.environments.staging}';
     }
     else if(argv.NODE_ENV === 'production'){
-      environment = 'environments/environment.production.ts';
+      environment = '${appConfig.environments.prod}';
     }
     else{
-      environment = 'environments/environment.ts';
+      environment = '${appConfig.environments.dev || appConfig.environmentSource}';
     }
       `;
     variableOutput += '\n\n';
@@ -423,7 +423,7 @@ export default Task.extend({
     const webpackConfig = new NgCliWebpackConfig(runTaskOptions, appConfig).buildConfig();
     const serializer = new JsonWebpackSerializer(process.cwd(), outputPath, appConfig.root);
     const output = serializer.serialize(webpackConfig);
-    const webpackConfigStr = `${serializer.generateVariables()}\n\nmodule.exports = ${output};\n`;
+    const webpackConfigStr = `${serializer.generateVariables(appConfig)}\n\nmodule.exports = ${output};\n`;
 
     return Promise.resolve()
       .then(() => exists('webpack.config.js'))
