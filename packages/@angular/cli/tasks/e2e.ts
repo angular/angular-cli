@@ -32,7 +32,7 @@ export const E2eTask = Task.extend({
           return Promise.reject(new SilentError(`'public-host' must be a full URL.`));
         }
         const protocol = e2eTaskOptions.ssl ? 'https' : 'http';
-        additionalProtractorConfig.baseUrl = `${protocol}://${clientUrl.href}`
+        additionalProtractorConfig.baseUrl = `${protocol}://${clientUrl.href}`;
       } else if (e2eTaskOptions.serve) {
         additionalProtractorConfig.baseUrl = url.format({
           protocol: e2eTaskOptions.ssl ? 'https' : 'http',
