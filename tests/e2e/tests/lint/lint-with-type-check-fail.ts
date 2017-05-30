@@ -36,7 +36,6 @@ function check(val: any, fxState: any) {
     fxState.num = val + "";
   }
 }
-
   `;
 
   return Promise.resolve()
