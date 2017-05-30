@@ -18,25 +18,16 @@ export default function () {
   const app = express();
   const server = http.createServer(app);
   let liveReloadCount = 0;
-  let liveReloadClientCalled = false;
   function resetApiVars() {
     liveReloadCount = 0;
-    liveReloadClientCalled = false;
   }
 
   server.listen(0);
   app.set('port', server.address().port);
   const apiUrl = `http://localhost:${server.address().port}`;
 
-  // Use a diffrent, but defined port for the webserver
-  const webserverPort = server.address().port + 1;
-  const webserverUrl = `http://localhost:${webserverPort}`;
-
   // This endpoint will be pinged by the main app on each reload.
   app.get('/live-reload-count', _ => liveReloadCount++);
-  // This endpoint will be pinged by webpack to check for live reloads.
-  app.get('/sockjs-node/info', _ => liveReloadClientCalled = true);
-
 
   return Promise.resolve()
     .then(_ => writeMultipleFiles({
@@ -121,20 +112,6 @@ export default function () {
         throw new Error(
           `Expected API to have been called 1 time but it was called ${liveReloadCount} times.`
         );
-      }
-    })
-    .then(_ => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
-    .then(_ => resetApiVars())
-    // Serve with live reload client set to api should call api.
-    .then(_ => silentExecAndWaitForOutputToMatch(
-      'ng',
-      ['e2e', '--watch', `--port=${webserverPort}`,`--public-host=${webserverUrl}`],
-      protractorGoodRegEx
-    ))
-    .then(_ => wait(2000))
-    .then(_ => {
-      if (!liveReloadClientCalled) {
-        throw new Error(`Expected live-reload client to have been called but it was not.`);
       }
     })
     .then(_ => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
