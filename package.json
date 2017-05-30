@@ -97,7 +97,7 @@
     "webpack": "~2.4.0",
     "webpack-dev-middleware": "^1.10.2",
     "webpack-dev-server": "~2.4.5",
-    "webpack-merge": "^2.4.0",
+    "webpack-merge": "^2.4.0"
     "zone.js": "^0.8.4"
   },
   "ember-addon": {
@@ -148,6 +148,7 @@
     "through": "^2.3.6",
     "tree-kill": "^1.0.0",
     "ts-node": "^2.0.0",
+    "yargs": "^8.0.1",
     "tslint": "^5.1.0"
   },
   "optionalDependencies": {

@@ -168,6 +168,10 @@ class JsonWebpackSerializer {
           break;
         case AotPlugin:
           args = this._aotPluginSerialize(plugin);
+          if(args['hostReplacementPaths']]){
+			let mainEnv = Object.keys(args['hostReplacementPaths']);
+          	args['hostReplacementPaths'][mainEnv[0]] = '`${environment}`';
+		  }
           this._addImport('@ngtools/webpack', 'AotPlugin');
           break;
         case HtmlWebpackPlugin:
@@ -187,11 +191,13 @@ class JsonWebpackSerializer {
 
       }
 
-      const argsSerialized = JSON.stringify(args, (k, v) => this._replacer(k, v), 2) || '';
+      const argsSerialized = this._addVariableSupport(JSON.stringify(args, (k, v) => this._replacer(k, v), 2) || '');
       return `\uFF02${plugin.constructor.name}(${argsSerialized})\uFF02`;
     });
   }
-
+  private _addVariableSupport(str: string){
+    return str.replace('"`${', '`${').replace('}`"', '}`');
+  }
   private _resolveReplacer(value: any) {
     return Object.assign({}, value, {
       modules: value.modules.map((x: string) => './' + path.relative(this._root, x))
@@ -377,7 +383,22 @@ class JsonWebpackSerializer {
       .forEach((key: string) => {
         variableOutput += `const ${key} = ${this.variables[key]};\n`;
       });
+
+    variableOutput += '\n';
+    variableOutput += `const argv = require('yargs').argv.env;\n`;
+    variableOutput += `let environment;
+    if(argv.NODE_ENV === 'staging'){
+      environment = 'environments/environment.staging.ts';
+    }
+    else if(argv.NODE_ENV === 'production'){
+      environment = 'environments/environment.production.ts';
+    }
+    else{
+      environment = 'environments/environment.ts';
+    }
+      `;
     variableOutput += '\n\n';
+
 
     return variableOutput;
   }
@@ -450,6 +471,19 @@ export default Task.extend({
         packageJson['scripts']['pree2e'] = pree2eNpmScript;
         packageJson['scripts']['e2e'] = 'protractor ./protractor.conf.js';
 
+        if(appConfig['environments']){
+          if(appConfig['environments']['dev']){
+            packageJson['scripts']['start'] = 'webpack-dev-server --port=4200 --env.NODE_ENV=development';
+          }
+          if(appConfig['environments']['staging']){
+            packageJson['scripts']['start:stage'] = 'webpack-dev-server --port=4200 --env.NODE_ENV=staging';
+          }
+          if(appConfig['environments']['prod']){
+            packageJson['scripts']['start:prod'] = 'webpack-dev-server --port=4200 -p --env.NODE_ENV=production';
+          }
+        }
+
+
         // Add new dependencies based on our dependencies.
         const ourPackageJson = require('../package.json');
         if (!packageJson['devDependencies']) {
@@ -479,6 +513,7 @@ export default Task.extend({
           'style-loader',
           'stylus-loader',
           'url-loader',
+          'yargs'
         ].forEach((packageName: string) => {
           packageJson['devDependencies'][packageName] = ourPackageJson['dependencies'][packageName];
         });
