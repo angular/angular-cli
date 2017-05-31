@@ -19,6 +19,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
  * require('json-loader')
  * require('url-loader')
  * require('file-loader')
+ * require('@angular-devkit/build-optimizer')
  */
 
 export function getCommonConfig(wco: WebpackConfigOptions) {
@@ -71,6 +72,16 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  if (buildOptions.buildOptimizer) {
+    extraRules.push({
+      test: /\.js$/,
+      use: [{
+        loader: '@angular-devkit/build-optimizer/webpack-loader',
+        options: { sourceMap: buildOptions.sourcemaps }
+      }]
+    });
+  }
+
   return {
     resolve: {
       extensions: ['.ts', '.js'],
@@ -107,7 +118,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     node: {
       fs: 'empty',
       // `global` should be kept true, removing it resulted in a
-      // massive size increase with NGO on AIO.
+      // massive size increase with Build Optimizer on AIO.
       global: true,
       crypto: 'empty',
       tls: 'empty',

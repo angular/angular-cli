@@ -121,6 +121,12 @@ const ServeCommand = Command.extend({
     const ServeTask = require('../tasks/serve').default;
 
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
+
+    // Default vendor chunk to false when build optimizer is on.
+    if (commandOptions.vendorChunk === undefined) {
+      commandOptions.vendorChunk = !commandOptions.buildOptimizer;
+    }
+
     return checkPort(commandOptions.port, commandOptions.host, defaultPort)
       .then(port => {
         commandOptions.port = port;

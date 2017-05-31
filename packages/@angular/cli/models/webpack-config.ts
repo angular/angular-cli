@@ -70,6 +70,11 @@ export class NgCliWebpackConfig {
     if (buildOptions.target !== 'development' && buildOptions.target !== 'production') {
       throw new Error("Invalid build target. Only 'development' and 'production' are available.");
     }
+
+    if (buildOptions.buildOptimizer
+      && !(buildOptions.aot || buildOptions.target === 'production')) {
+      throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
+    }
   }
 
   // Fill in defaults for build targets
