@@ -332,3 +332,13 @@ Note: service worker support is experimental and subject to change.
     Show circular dependency warnings on builds.
   </p>
 </details>
+
+<details>
+  <summary>build-optimizer</summary>
+  <p>
+    <code>--build-optimizer</code> (aliases: <code>-bo</code>)
+  </p>
+  <p>
+    (Experimental) Enables @angular-devkit/build-optimizer optimizations when using `--aot`.
+  </p>
+</details>

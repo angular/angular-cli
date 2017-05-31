@@ -48,7 +48,6 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'vendor-chunk',
     type: Boolean,
-    default: true,
     aliases: ['vc'],
     description: 'Use a separate bundle containing only vendor libraries.'
   },
@@ -159,6 +158,14 @@ export const baseBuildCommandOptions: any = [
     aliases: ['scd'],
     description: 'Show circular dependency warnings on builds.',
     default: buildConfigDefaults['showCircularDependencies']
+  },
+  {
+    name: 'build-optimizer',
+    type: Boolean,
+    default: false,
+    aliases: ['bo'],
+    description: '(Experimental) Enables @angular-devkit/build-optimizer '
+    + 'optimizations when using `--aot`.'
   }
 ];
 
@@ -184,6 +191,11 @@ const BuildCommand = Command.extend({
   run: function (commandOptions: BuildTaskOptions) {
     // Check angular version.
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
+
+    // Default vendor chunk to false when build optimizer is on.
+    if (commandOptions.vendorChunk === undefined) {
+      commandOptions.vendorChunk = !commandOptions.buildOptimizer;
+    }
 
     const BuildTask = require('../tasks/build').default;
 

@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"@angular-devkit/build-optimizer@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/build-optimizer/-/build-optimizer-0.0.3.tgz#092bdf732b79a779ce540f9bb99d6590dd971204"
+  dependencies:
+    loader-utils "^1.1.0"
+    magic-string "^0.19.1"
+    source-map "^0.5.6"
+    typescript "^2.3.3"
+
 "@angular/compiler-cli@^4.0.0":
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-4.2.4.tgz#cce941a28362fc1c042ab85890fcaab1e233dd57"
@@ -3143,7 +3152,7 @@ macaddress@^0.2.8:
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/macaddress/-/macaddress-0.2.8.tgz#5904dc537c39ec6dbefeae902327135fa8511f12"
 
-magic-string@^0.19.0:
+magic-string@^0.19.0, magic-string@^0.19.1:
   version "0.19.1"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.19.1.tgz#14d768013caf2ec8fdea16a49af82fc377e75201"
   dependencies:
@@ -5242,7 +5251,7 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@~2.3.1:
+typescript@^2.3.3, typescript@~2.3.1:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.3.4.tgz#3d38321828231e434f287514959c37a82b629f42"
 
