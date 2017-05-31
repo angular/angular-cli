@@ -8,71 +8,108 @@
 import {CollectionImpl} from './collection';
 import {
   Collection,
-  Engine, EngineHost,
-  ProtocolHandler,
+  Engine,
+  EngineHost,
   Schematic,
-  SchematicContext,
-  Source
+  Source,
+  TypedSchematicContext
 } from './interface';
 import {SchematicImpl} from './schematic';
 import {BaseException} from '../exception/exception';
-import {empty} from '../tree/static';
+import {MergeStrategy} from '../tree/interface';
+import {NullTree} from '../tree/null';
+import {branch, empty} from '../tree/static';
 
 import {Url, parse, format} from 'url';
+import 'rxjs/add/operator/map';
 
 
-export class InvalidSourceUrlException extends BaseException {
-  constructor(url: string) { super(`Invalid source url: "${url}".`); }
-}
 export class UnknownUrlSourceProtocol extends BaseException {
   constructor(url: string) { super(`Unknown Protocol on url "${url}".`); }
 }
 
+export class UnknownCollectionException extends BaseException {
+  constructor(name: string) { super(`Unknown collection "${name}".`); }
+}
+export class UnknownSchematicException extends BaseException {
+  constructor(name: string, collection: Collection<any, any>) {
+    super(`Schematic "${name}" not found in collection "${collection.name}".`);
+  }
+}
 
-export class SchematicEngine implements Engine {
-  private _protocolMap = new Map<string, ProtocolHandler>();
 
-  constructor(private _options: EngineHost) {
-    // Default implementations.
-    this._protocolMap.set('null', () => {
-      return () => empty();
-    });
-    this._protocolMap.set('', (url: Url) => {
-      // Make a copy, change the protocol.
-      const fileUrl = parse(format(url));
-      fileUrl.protocol = 'file:';
-      return (context: SchematicContext) => context.engine.createSourceFromUrl(fileUrl)(context);
-    });
+export class SchematicEngine<CollectionT, SchematicT> implements Engine<CollectionT, SchematicT> {
+  private _collectionCache = new Map<string, CollectionImpl<CollectionT, SchematicT>>();
+  private _schematicCache
+    = new Map<string, Map<string, SchematicImpl<CollectionT, SchematicT>>>();
+
+  constructor(private _host: EngineHost<CollectionT, SchematicT>) {
   }
 
-  createCollection(name: string): Collection | null {
-    const description = this._options.loadCollection(name);
-    if (!description) {
-      return null;
+  get defaultMergeStrategy() { return this._host.defaultMergeStrategy || MergeStrategy.Default; }
+
+  createCollection(name: string): Collection<CollectionT, SchematicT> {
+    let collection = this._collectionCache.get(name);
+    if (collection) {
+      return collection;
     }
 
-    return new CollectionImpl(description, this);
-  }
-
-  createSchematic<T>(name: string, collection: Collection, options: T): Schematic | null {
-    const description = this._options.loadSchematic<T>(name, collection, options);
+    const description = this._host.createCollectionDescription(name);
     if (!description) {
-      return null;
+      throw new UnknownCollectionException(name);
     }
 
-    return new SchematicImpl(description, collection);
+    collection = new CollectionImpl<CollectionT, SchematicT>(description, this);
+    this._collectionCache.set(name, collection);
+    this._schematicCache.set(name, new Map());
+    return collection;
   }
 
-  registerUrlProtocolHandler(protocol: string, handler: ProtocolHandler) {
-    this._protocolMap.set(protocol, handler);
+  createSchematic(
+      name: string,
+      collection: Collection<CollectionT, SchematicT>): Schematic<CollectionT, SchematicT> {
+    const collectionImpl = this._collectionCache.get(collection.name);
+    const schematicMap = this._schematicCache.get(collection.name);
+    if (!collectionImpl || !schematicMap || collectionImpl !== collection) {
+      // This is weird, maybe the collection was created by another engine?
+      throw new UnknownCollectionException(collection.name);
+    }
+
+    let schematic = schematicMap.get(name);
+    if (schematic) {
+      return schematic;
+    }
+
+    const description = this._host.createSchematicDescription(name, collection.description);
+    if (!description) {
+      throw new UnknownSchematicException(name, collection);
+    }
+    const factory = this._host.getSchematicRuleFactory(description, collection.description);
+    schematic = new SchematicImpl<CollectionT, SchematicT>(description, factory, collection, this);
+
+    schematicMap.set(name, schematic);
+    return schematic;
   }
 
   createSourceFromUrl(url: Url): Source {
-    const protocol = (url.protocol || '').replace(/:$/, '');
-    const handler = this._protocolMap.get(protocol);
-    if (!handler) {
-      throw new UnknownUrlSourceProtocol(url.toString());
+    switch (url.protocol) {
+      case 'null:': return () => new NullTree();
+      case 'empty:': return () => empty();
+      case 'host:': return (context: TypedSchematicContext<CollectionT, SchematicT>) => {
+        return context.host.map(tree => branch(tree));
+      };
+      case '':
+        const fileUrl = parse(format(url));
+        fileUrl.protocol = 'file:';
+        return (context: TypedSchematicContext<CollectionT, SchematicT>) => {
+          return context.engine.createSourceFromUrl(fileUrl)(context);
+        };
+      default:
+        const hostSource = this._host.createSourceFromUrl(url);
+        if (!hostSource) {
+          throw new UnknownUrlSourceProtocol(url.toString());
+        }
+        return hostSource;
     }
-    return handler(url);
   }
 }

@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {ResolvedSchematicDescription} from './interface';
+import {SchematicDescription} from './interface';
 import {SchematicImpl} from './schematic';
-import {Tree} from '../tree/interface';
+import {MergeStrategy, Tree} from '../tree/interface';
 import {branch, empty} from '../tree/static';
 
 import 'rxjs/add/operator/toArray';
@@ -15,25 +15,27 @@ import 'rxjs/add/operator/toPromise';
 import {Observable} from 'rxjs/Observable';
 
 
+const engine = {
+  defaultMergeStrategy: MergeStrategy.Default
+} as any;
+
 
 describe('Schematic', () => {
   it('works with a rule', done => {
     let inner: any = null;
-    const desc: ResolvedSchematicDescription = {
+    const desc: SchematicDescription<any, any> = {
       name: 'test',
       description: '',
-      factory: '',
       path: 'a/b/c',
-      rule: (tree: Tree) => {
+      factory: () => (tree: Tree) => {
         inner = branch(tree);
         tree.create('a/b/c', 'some content');
         return tree;
       }
     };
 
-    const schematic = new SchematicImpl(desc, null !);
-
-    schematic.call(Observable.of(empty()), {})
+    const schematic = new SchematicImpl(desc, desc.factory, null !, engine);
+    schematic.call({}, Observable.of(empty()))
       .toPromise()
       .then(x => {
         expect(inner.files).toEqual([]);
@@ -44,20 +46,19 @@ describe('Schematic', () => {
 
   it('works with a rule that returns an observable', done => {
     let inner: any = null;
-    const desc: ResolvedSchematicDescription = {
+    const desc: SchematicDescription<any, any> = {
       name: 'test',
       description: '',
-      factory: '',
       path: 'a/b/c',
-      rule: (fem: Tree) => {
+      factory: () => (fem: Tree) => {
         inner = fem;
         return Observable.of(empty());
       }
     };
 
 
-    const schematic = new SchematicImpl(desc, null !);
-    schematic.call(Observable.of(empty()), {})
+    const schematic = new SchematicImpl(desc, desc.factory, null !, engine);
+    schematic.call({}, Observable.of(empty()))
       .toPromise()
       .then(x => {
         expect(inner.files).toEqual([]);

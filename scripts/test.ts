@@ -114,7 +114,6 @@ class IstanbulReporter implements jasmine.CustomReporter {
 
       // Update statement maps.
       for (const branchId of Object.keys(coverage.branchMap)) {
-        debugger;
         const branch = coverage.branchMap[branchId];
         let line: number | null = null;
         let column = 0;

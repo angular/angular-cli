@@ -10,9 +10,24 @@ import {SchematicPath} from '../utility/path';
 
 
 export enum MergeStrategy {
-  Error = -1,  // Error out if 2 files have the same path.
-  Default = 0,  // Uses the default strategy.
-  Overwrite = 1,  // Overwrite the file.
+  AllowOverwriteConflict    = 1 << 1,
+  AllowCreationConflict     = 1 << 2,
+  AllowDeleteConflict       = 1 << 3,
+
+  // Uses the default strategy.
+  Default                   = 0,
+
+  // Error out if 2 files have the same path. It is useful to have a different value than
+  // Default in this case as the tooling Default might differ.
+  Error                     = 1 << 0,
+
+  // Only content conflicts are overwritten.
+  ContentOnly               = MergeStrategy.AllowOverwriteConflict,
+
+  // Overwrite everything with the latest change.
+  Overwrite                 = MergeStrategy.AllowOverwriteConflict
+                            + MergeStrategy.AllowCreationConflict
+                            + MergeStrategy.AllowDeleteConflict
 }
 
 

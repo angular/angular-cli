@@ -105,6 +105,9 @@ export class ActionList implements Iterable<Action> {
     }
     return false;
   }
+  find(predicate: (value: Action) => boolean): Action | null {
+    return this._actions.find(predicate) || null;
+  }
   forEach(fn: (value: Action, index: number, array: Action[]) => void, thisArg?: any) {
     this._actions.forEach(fn, thisArg);
   }

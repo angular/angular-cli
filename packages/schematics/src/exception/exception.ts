@@ -28,3 +28,8 @@ export class ContentHasMutatedException extends BaseException {
 export class InvalidUpdateRecordException extends BaseException {
   constructor() { super(`Invalid record instance.`); }
 }
+export class MergeConflictException extends BaseException {
+  constructor(path: string) {
+    super(`A merge conflicted on path "${path}".`);
+  }
+}

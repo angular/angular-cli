@@ -12,15 +12,35 @@ import {branch} from '../tree/static';
 import {Observable} from 'rxjs/Observable';
 
 
-export type SchematicOptions = {
-  name: string;
-  options: any;
-};
-
-
-export function schematic(options: SchematicOptions): Rule {
+/**
+ * Run a schematic from a separate collection.
+ *
+ * @param collectionName The name of the collection that contains the schematic to run.
+ * @param schematicName The name of the schematic to run.
+ * @param options The options to pass as input to the RuleFactory.
+ */
+export function externalSchematic<T>(collectionName: string,
+                                     schematicName: string,
+                                     options: T): Rule {
   return (host: Tree, context: SchematicContext) => {
-    const schematic = context.schematic.collection.createSchematic(options.name, options.options);
-    return schematic.call(Observable.of(branch(host)), context);
+    const collection = context.engine.createCollection(collectionName);
+    const schematic = collection.createSchematic(schematicName);
+    return schematic.call(options, Observable.of(branch(host)));
+  };
+}
+
+
+/**
+ * Run a schematic from the same collection.
+ *
+ * @param schematicName The name of the schematic to run.
+ * @param options The options to pass as input to the RuleFactory.
+ */
+export function schematic<T>(schematicName: string, options: T): Rule {
+  return (host: Tree, context: SchematicContext) => {
+    let collection = context.schematic.collection;
+
+    const schematic = collection.createSchematic(schematicName);
+    return schematic.call(options, Observable.of(branch(host)));
   };
 }

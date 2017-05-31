@@ -32,7 +32,8 @@
       "node"
     ],
     "paths": {
-      "@angular/schematics": [ "./packages/schematics/src/index" ]
+      "@angular/schematics": [ "./packages/schematics/src/index" ],
+      "@angular/schematics/tooling": [ "./packages/schematics/tooling/index" ]
     }
   },
   "exclude": [

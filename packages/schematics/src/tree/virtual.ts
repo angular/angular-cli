@@ -15,7 +15,7 @@ import {
   ContentHasMutatedException,
   FileAlreadyExistException,
   FileDoesNotExistException,
-  InvalidUpdateRecordException
+  InvalidUpdateRecordException, MergeConflictException
 } from '../exception/exception';
 
 
@@ -195,7 +195,7 @@ export class VirtualTree implements Tree {
       case 'c':
         if (this._cacheMap.has(action.path)) {
           switch (strategy) {
-            case MergeStrategy.Error: throw new FileAlreadyExistException(action.path);
+            case MergeStrategy.Error: throw new MergeConflictException(action.path);
             case MergeStrategy.Overwrite:
               this._overwrite(action.path, action.content, action);
               break;

@@ -15,6 +15,7 @@ ts_library(
       "//packages/schematics/src/rules",
       "//packages/schematics/src/sink",
       "//packages/schematics/src/tree",
+      "//packages/schematics/tooling",
     ],
     tsconfig = "//:tsconfig.json",
     visibility = [ "//visibility:public" ],

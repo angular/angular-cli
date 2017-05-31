@@ -13,7 +13,7 @@ export default function(options: any): Rule {
   return mergeWith([
     apply(url('./files'), [
       template({ utils: stringUtils, ...options }),
-      move(options.sourceDir)
+      move(options.sourceDir),
     ])
   ]);
 };

@@ -2,7 +2,7 @@ import {FileSystemTreeHost} from '@angular/schematics';
 import {readFileSync, readdirSync, statSync} from 'fs';
 import {join} from 'path';
 
-export class Host implements FileSystemTreeHost {
+export class FileSystemHost implements FileSystemTreeHost {
   constructor(private _root: string) {}
 
   listDirectory(path: string) {

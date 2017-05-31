@@ -1,5 +1,5 @@
 {
-  "name": "@angular/schematics",
+  "name": "@angular/schematics-cli",
   "version": "0.0.0",
   "schematics": {
     "angular-app": {

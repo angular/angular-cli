@@ -21,7 +21,7 @@ import 'rxjs/add/operator/mergeMap';
 
 export class InvalidRuleResultException extends BaseException {
   constructor(value: any) {
-    let v: string = 'Unknown Type';
+    let v = 'Unknown Type';
     if (value === undefined) {
       v = 'undefined';
     } else if (value === null) {

@@ -5,34 +5,33 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Host} from './file-system-host';
-import {SimpleCliEngineHost} from './simple-cli-engine';
-
+import * as minimist from 'minimist';
+import {Observable} from 'rxjs/Observable';
 import {
   DryRunEvent,
   DryRunSink,
   FileSystemSink,
   FileSystemTree,
-  SchematicContext,
   SchematicEngine,
   Tree,
 } from '@angular/schematics';
-import * as minimist from 'minimist';
-import {resolve} from 'path';
-import {Observable} from 'rxjs/Observable';
-import {Url} from 'url';
+import {
+  FileSystemHost,
+  NodeModulesEngineHost
+} from '@angular/schematics/tooling';
+import {SchemaClassFactory} from '@ngtools/json-schema';
 
 
 /**
- * Show usage of the
+ * Show usage of the CLI tool, and exit the process.
  */
 function usage(exitCode = 0): never {
   console.log(`
     schematics [CollectionName:]SchematicName [options, ...]
-    
+
     By default, if the collection name is not specified, use the internal collection provided
     by the Schematics CLI.
-    
+
     Options:
         --dry-run           Do not output anything, but instead just show what actions would be
                             performed.
@@ -41,7 +40,7 @@ function usage(exitCode = 0): never {
         --help              Show this message.
     
     Any additional option is passed to the Schematics depending on 
-  `.replace(/^\s\s\s\s/, ''));  // To remove the indentation.
+  `.replace(/^\s\s\s\s/g, ''));  // To remove the indentation.
 
   process.exit(exitCode);
   throw 0;  // The node typing sometimes don't have a never type for process.exit().
@@ -102,18 +101,8 @@ const {
  * Create the SchematicEngine, which is used by the Schematic library as callbacks to load a
  * Collection or a Schematic.
  */
-const engine = new SchematicEngine(new SimpleCliEngineHost());
-
-
-// Register loading from a file:// protocol.
-engine.registerUrlProtocolHandler('file', (url: Url) => {
-  return (context: SchematicContext) => {
-    // Resolve all file:///a/b/c/d from the schematic's own path, and not the current
-    // path.
-    const root = resolve(context.schematic.path, url.path);
-    return new FileSystemTree(new Host(root), true);
-  };
-});
+const engineHost = new NodeModulesEngineHost(process.cwd());
+const engine = new SchematicEngine(engineHost);
 
 
 /**
@@ -130,21 +119,21 @@ if (collection === null) {
 
 /** If the user wants to list schematics, we simply show all the schematic names. */
 if (argv['list-schematics']) {
-  console.log(collection.listSchematicNames());
+  console.log(engineHost.listSchematics(collection));
   process.exit(0);
   throw 0;  // TypeScript doesn't know that process.exit() never returns.
 }
 
 
 /** Create the schematic from the collection. */
-const schematic = collection.createSchematic(schematicName, argv);
+const schematic = collection.createSchematic(schematicName);
 
 /** Gather the arguments for later use. */
 const force = argv['force'];
 const dryRun = argv['dry-run'];
 
 /** This host is the original Tree created from the current directory. */
-const host = Observable.of(new FileSystemTree(new Host(process.cwd())));
+const host = Observable.of(new FileSystemTree(new FileSystemHost(process.cwd())));
 
 // We need two sinks if we want to output what will happen, and actually do the work.
 // Note that fsSink is technically not used if `--dry-run` is passed, but creating the Sink
@@ -181,6 +170,14 @@ dryRunSink.reporter.subscribe((event: DryRunEvent) => {
 });
 
 
+let options: any = argv;
+if (schematic.description.schema) {
+  const SchemaMetaClass = SchemaClassFactory<any>(schematic.description.schemaJson !);
+  const schemaClass = new SchemaMetaClass(argv);
+  options = schemaClass.$$root();
+}
+
+
 /**
  * The main path. Call the schematic with the host. This creates a new Context for the schematic
  * to run in, then call the schematic rule using the input Tree. This returns a new Tree as if
@@ -193,7 +190,7 @@ dryRunSink.reporter.subscribe((event: DryRunEvent) => {
  * Then we proceed to run the dryRun commit. We run this before we then commit to the filesystem
  * (if --dry-run was not passed or an error was detected by dryRun).
  */
-schematic.call(host, {})
+schematic.call(options, host)
   .map((tree: Tree) => Tree.optimize(tree))
   .concatMap((tree: Tree) => {
     return new Observable(o => dryRunSink.commit(tree).subscribe({
