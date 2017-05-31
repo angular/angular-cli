@@ -20,7 +20,7 @@ export default Task.extend({
     const app = getAppFromConfig(runTaskOptions.app);
 
     const outputPath = runTaskOptions.outputPath || app.outDir;
-    if (this.project.root === outputPath) {
+    if (this.project.root === path.resolve(outputPath)) {
       throw new SilentError('Output path MUST not be project root directory!');
     }
     if (config.project && config.project.ejected) {
