@@ -99,8 +99,8 @@ This repository will host the various tools like engines to integrate with vario
    - Also for RxJs timeouts, make sure to _cancel_ their stream on success, for they can slow down rendering as well.
  - **Don't manipulate the nativeElement directly**. Use the _Renderer2_. We do this to ensure that in any environment we're able to change our view.
 ```
-constructor(element: ElementRef, renderer: Renderer) {
-  renderer.setElementStyle(element.nativeElement, 'font-size', 'x-large');
+constructor(element: ElementRef, renderer: Renderer2) {
+  renderer.setStyle(element.nativeElement, 'font-size', 'x-large');
 }
 ```
  - The application runs XHR requests on the server & once again on the Client-side (when the application bootstraps)
