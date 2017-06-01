@@ -5,8 +5,6 @@ import { expectFileToExist } from '../../../utils/fs';
 import { expectToFail } from '../../../utils/utils';
 
 
-const Promise = require('@angular/cli/ember-cli/lib/ext/promise');
-
 export default function () {
   const root = process.cwd();
   const testPath = join(root, 'src', 'app');
