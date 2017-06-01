@@ -1,16 +1,11 @@
-'use strict';
-
 // This needs to be first so fs module can be mocked correctly.
-let mockFs = require('mock-fs');
+import mockFs = require('mock-fs');
 
-import {it} from './spec-utils';
-import {InsertChange, NodeHost, RemoveChange, ReplaceChange} from './change';
-import fs = require('fs');
+import { it } from './spec-utils';
+import { InsertChange, NodeHost, RemoveChange, ReplaceChange } from './change';
+import { readFile } from 'fs-extra';
+import * as path from 'path';
 
-let path = require('path');
-let Promise = require('@angular/cli/ember-cli/lib/ext/promise');
-
-const readFile =  Promise.denodeify(fs.readFile);
 
 describe('Change', () => {
   let sourcePath = 'src/app/my-component';
