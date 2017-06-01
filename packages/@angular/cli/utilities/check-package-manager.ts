@@ -1,9 +1,9 @@
 import * as chalk from 'chalk';
 import {exec} from 'child_process';
 import {CliConfig} from '../models/config';
+import denodeify = require('denodeify');
 
-const Promise = require('../ember-cli/lib/ext/promise');
-const execPromise = Promise.denodeify(exec);
+const execPromise = denodeify(exec);
 const packageManager = CliConfig.fromGlobal().get('packageManager');
 
 
