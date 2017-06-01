@@ -10,7 +10,7 @@ describe('<%= htmlComponentName %> App', () => {
   it('should display welcome message', done => {
     page.navigateTo();
     page.getParagraphText()
-      .then(msg => expect(msg).toEqual('Welcome to <%= prefix %>!!'))
+      .then(msg => expect(msg).toEqual('<%= prefix %>'))
       .then(done, done.fail);
   });
 });
