@@ -39,12 +39,12 @@ it will default to `dev` for `development` and `prod` for `production`.
 ```bash
 # these are equivalent
 ng build --target=production --environment=prod
-ng build --prod --env=prod
-ng build --prod
+ng build -prod --env=prod
+ng build -prod
 # and so are these
 ng build --target=development --environment=dev
-ng build --dev --e=dev
-ng build --dev
+ng build -dev --e=dev
+ng build -dev
 ng build
 ```
 
@@ -65,15 +65,15 @@ ng build --bh /myUrl/
 
 ### Bundling & Tree-Shaking
 
-All builds make use of bundling and limited tree-shaking, while `--prod` builds also run limited
+All builds make use of bundling and limited tree-shaking, while `-prod` builds also run limited
 dead code elimination via UglifyJS.
 
-### `--dev` vs `--prod` builds
+### `-dev` vs `-prod` builds
 
-Both `--dev`/`--target=development` and `--prod`/`--target=production` are 'meta' flags, that set other flags.
-If you do not specify either you will get the `--dev` defaults.
+Both `-dev`/`--target=development` and `-prod`/`--target=production` are 'meta' flags, that set other flags.
+If you do not specify either you will get the `-dev` defaults.
 
-Flag                | `--dev` | `--prod`
+Flag                | `-dev` | `-prod`
 ---                 | ---     | ---
 `--aot`             | `false` | `true`
 `--environment`     | `dev`   | `prod`
@@ -81,7 +81,7 @@ Flag                | `--dev` | `--prod`
 `--sourcemaps`      | `true`  | `false`
 `--extract-css`     | `false` | `true`
 
-`--prod` also sets the following non-flaggable settings:
+`-prod` also sets the following non-flaggable settings:
 - Adds service worker if configured in `.angular-cli.json`.
 - Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
 - Runs UglifyJS on the code.
@@ -102,7 +102,7 @@ npm install @angular/service-worker --save
 ng set apps.0.serviceWorker=true
 ```
 
-On `--prod` builds a service worker manifest will be created and loaded automatically.
+On `-prod` builds a service worker manifest will be created and loaded automatically.
 Remember to disable the service worker while developing to avoid stale code.
 
 Note: service worker support is experimental and subject to change.
