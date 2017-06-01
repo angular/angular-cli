@@ -9,7 +9,7 @@ const Command = require('../ember-cli/lib/models/command');
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const buildConfigDefaults = config.getPaths('defaults.build', [
   'sourcemaps', 'baseHref', 'progress', 'poll', 'deleteOutputPath', 'preserveSymlinks',
-  'showCircularDependencies'
+  'showCircularDependencies', 'preloadBundles'
 ]);
 
 // defaults for BuildOptions
@@ -144,6 +144,12 @@ export const baseBuildCommandOptions: any = [
     type: Boolean,
     default: true,
     description: 'Extract all licenses in a separate file, in the case of production builds only.'
+  },
+  {
+    name: 'preload-bundles',
+    type: Boolean,
+    description: 'Add preload hints for initial bundles; does not include `scripts` bundles.',
+    default: buildConfigDefaults['preloadBundles']
   },
   {
     name: 'show-circular-dependencies',
