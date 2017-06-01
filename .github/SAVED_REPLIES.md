@@ -12,6 +12,7 @@ Thanks for reporting this issue. Luckily, it has already been fixed in one of th
 If the problem persists in your application after upgrading, please open a new issue, provide a simple repository reproducing the problem, and describe the difference between the expected and current behavior. You can use `ng new repro-app` to create a new project where you reproduce the problem.
 ```
 
+
 ## Angular CLI: Don't Understand (v1)
 ```
 I'm sorry, but we don't understand the problem you are reporting.
@@ -33,9 +34,9 @@ Thanks for reporting this issue. However, you didn't provide sufficient informat
 If the problem persists, please file a new issue and ensure you provide all of the required information when filling out the issue template.
 ```
 
-## Angular CLI: Issue Outside of Angular CLI (v1)
+## Angular CLI: Issue Outside of Angular CLI (v1.1)
 ```
-I'm sorry, but this issue is not caused by Angular CLI. Please contact the author(s) of project <PROJECT NAME> or file issue on their issue tracker.
+I'm sorry, but this issue is not caused by Angular CLI. Please contact the author(s) of the <PROJECT NAME> project or file an issue on their issue tracker.
 ```
 
 
@@ -45,6 +46,7 @@ I'm sorry, but we can't reproduce the problem following the instructions you pro
 
 If the problem persists, please open a new issue following [our submission guidelines](https://github.com/angular/angular-cli/blob/master/CONTRIBUTING.md#-submitting-an-issue).
 ```
+
 
 ## Angular CLI: Obsolete (v1)
 ```
