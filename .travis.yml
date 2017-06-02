@@ -32,6 +32,9 @@ matrix:
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT="tests/run_e2e.js --eject --glob=tests/build/**"
+    - node_js: "6"
+      os: linux
+      env: DEPLOY_SCRIPT="scripts/git-builds.js"
 
     # Optional builds.
     - node_js: "6"
@@ -64,9 +67,4 @@ before_install:
 script:
   - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
   - if [[ "$NODE_SCRIPT" ]]; then node $NODE_SCRIPT; fi
-
-deploy:
-  provider: script
-  script: node scripts/git-builds.js
-  on:
-    branch: master
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" ]]; then node $DEPLOY_SCRIPT; fi
