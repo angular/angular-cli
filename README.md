@@ -107,7 +107,7 @@ This should add the new `component`, `directive` or `pipe` reference to the `new
  
 ### Updating Angular CLI
 
-If you're using Angular CLI `beta.28` or less, you need to uninstall `angular-cli` package. It should be done due to changing of package's name and scope from `angular-cli` to `@angular/cli`:
+If you're using Angular CLI `1.0.0-beta.28` or less, you need to uninstall `angular-cli` package. It should be done due to changing of package's name and scope from `angular-cli` to `@angular/cli`:
 ```bash
 npm uninstall -g angular-cli
 npm uninstall --save-dev angular-cli
