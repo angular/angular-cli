@@ -1,6 +1,7 @@
 import {stripIndents} from 'common-tags';
 import {ng} from '../../utils/process';
 import { writeMultipleFiles, expectFileToMatch, expectFileMatchToExist } from '../../utils/fs';
+import { getGlobalVariable } from '../../utils/env';
 
 function verifyMedia(css: RegExp, content: RegExp) {
   return expectFileMatchToExist('./dist', css)
@@ -8,6 +9,11 @@ function verifyMedia(css: RegExp, content: RegExp) {
 }
 
 export default function() {
+  // Skip this in Appveyor tests.
+  if (getGlobalVariable('argv').appveyor) {
+    return Promise.resolve();
+  }
+
   return Promise.resolve()
     .then(() => writeMultipleFiles({
     'src/styles.css': stripIndents`

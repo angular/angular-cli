@@ -2,9 +2,15 @@ import { writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
+import { getGlobalVariable } from '../../utils/env';
 import { stripIndent } from 'common-tags';
 
 export default function () {
+  // Skip this in Appveyor tests.
+  if (getGlobalVariable('argv').appveyor) {
+    return Promise.resolve();
+  }
+
   return Promise.resolve()
     .then(() => ng('test', '--watch=false'))
     // prepare global scripts test files
@@ -30,8 +36,8 @@ export default function () {
 
         describe('AppComponent', () => {
           beforeEach(async(() => {
-            TestBed.configureTestingModule({ 
-              declarations: [ AppComponent ] 
+            TestBed.configureTestingModule({
+              declarations: [ AppComponent ]
             }).compileComponents();
           }));
 
