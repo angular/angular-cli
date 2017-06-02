@@ -1,10 +1,17 @@
 import { ng } from '../../utils/process';
 import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
+import { getGlobalVariable } from '../../utils/env';
 import { stripIndents } from 'common-tags';
 
 
 export default function () {
+  // Skip this in Appveyor tests.
+  if (getGlobalVariable('argv').appveyor) {
+    return Promise.resolve();
+  }
+
+
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/styles.css': 'div { background: url("./assets/more.svg"); }',
