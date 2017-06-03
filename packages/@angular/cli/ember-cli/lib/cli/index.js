@@ -38,9 +38,9 @@ module.exports = function(options) {
   var project = Project.projectOrnullProject(ui, cli);
 
   var environment = {
-    tasks:    { },
+    tasks:    options.tasks || {},
     cliArgs:  options.cliArgs,
-    commands: { },
+    commands: options.commands || {},
     project:  project,
     settings: defaultUpdateCheckerOptions
   };

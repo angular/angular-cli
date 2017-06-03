@@ -260,17 +260,6 @@ Project.prototype.initializeAddons = function() {
   this._addonsInitialized = true;
 
   debug('initializeAddons for: %s', this.name());
-
-  const cliPkg = require(path.resolve(__dirname, '../../../package.json'));
-  const Addon = require('../models/addon');
-  const Constructor = Addon.lookup({
-    name: '@angular/cli',
-    path: path.join(__dirname, '../../../'),
-    pkg: cliPkg,
-  });
-
-  const addon = new Constructor(this.addonParent, this);
-  this.addons = [addon];
 };
 
 /**
@@ -334,7 +323,7 @@ Project.prototype.eachAddonCommand = function(callback) {
   @return {String} Path to blueprints
  */
 Project.prototype.localBlueprintLookupPath = function() {
-  return path.join(this.root, 'blueprints');
+  return path.join(this.cli.root, 'blueprints');
 };
 
 /**
@@ -345,7 +334,7 @@ Project.prototype.localBlueprintLookupPath = function() {
   @return {Array} List of paths
  */
 Project.prototype.blueprintLookupPaths = function() {
-  return this.addonBlueprintLookupPaths();
+  return [this.localBlueprintLookupPath()];
 };
 
 /**

@@ -101,11 +101,6 @@
     "webpack-merge": "^2.4.0",
     "zone.js": "^0.8.4"
   },
-  "ember-addon": {
-    "paths": [
-      "./packages/@angular/cli/lib/addon"
-    ]
-  },
   "devDependencies": {
     "@angular/compiler": "^4.0.0",
     "@angular/compiler-cli": "^4.0.0",

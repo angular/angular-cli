@@ -88,11 +88,5 @@
   },
   "optionalDependencies": {
     "node-sass": "^4.3.0"
-  },
-  "ember-addon": {
-    "paths": [
-      "./"
-    ],
-    "main": "./addon/index.js"
   }
 }
