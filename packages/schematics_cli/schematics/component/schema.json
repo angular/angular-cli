@@ -61,6 +61,10 @@
     },
     "htmlTemplate": {
       "type": "string"
+    },
+    "skip-import": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
