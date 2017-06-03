@@ -8,12 +8,12 @@ import { forEach } from 'lodash';
 
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
+const readConfigFile = require('../helpers/config-file');
 const walkSync = require('walk-sync');
 const SilentError = require('silent-error');
 const Blueprint = require('@angular/cli/ember-cli/lib/models/blueprint');
 
 const root = process.cwd();
-
 
 describe('Acceptance: ng new', function () {
   beforeEach(function () {
@@ -180,4 +180,19 @@ describe('Acceptance: ng new', function () {
       });
   });
 
+  it(`should set inline-style in .angular-cli.json when passed --inline-style`, () => {
+    return ng(['new', 'foo', '--skip-install', '--skip-git', `--inline-style`])
+      .then(() => {
+          const configFile = readConfigFile();
+          expect(configFile.defaults.component.inlineStyle).to.equal(true);
+      });
+  });
+
+  it(`should set inline-template in .angular-cli.json when passed --inline-template`, () => {
+    return ng(['new', 'foo', '--skip-install', '--skip-git', `--inline-template`])
+      .then(() => {
+          const configFile = readConfigFile();
+          expect(configFile.defaults.component.inlineTemplate).to.equal(true);
+      });
+  });
 });

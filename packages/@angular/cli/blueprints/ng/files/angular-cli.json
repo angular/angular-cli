@@ -52,7 +52,10 @@
   },
   "defaults": {
     "styleExt": "<%= styleExt %>",<% if (!minimal) { %>
-    "component": {}<% } else { %>
+    "component": {
+      "inlineStyle": <%= inlineStyle %>,
+      "inlineTemplate": <%= inlineTemplate %>
+    }<% } else { %>
     "component": {
       "spec": false,
       "inlineStyle": true,
