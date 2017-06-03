@@ -2,6 +2,7 @@
   "rulesDirectory": [
     "node_modules/codelyzer"
   ],
+  "defaultSeverity": "warn",
   "rules": {
     "arrow-return-shorthand": true,
     "callable-types": true,
