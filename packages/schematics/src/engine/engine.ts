@@ -20,7 +20,7 @@ import {MergeStrategy} from '../tree/interface';
 import {NullTree} from '../tree/null';
 import {branch, empty} from '../tree/static';
 
-import {Url, parse, format} from 'url';
+import {Url} from 'url';
 import 'rxjs/add/operator/map';
 
 

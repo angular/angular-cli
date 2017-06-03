@@ -101,7 +101,7 @@ const {
  * Create the SchematicEngine, which is used by the Schematic library as callbacks to load a
  * Collection or a Schematic.
  */
-const engineHost = new NodeModulesEngineHost(process.cwd());
+const engineHost = new NodeModulesEngineHost();
 const engine = new SchematicEngine(engineHost);
 
 

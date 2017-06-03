@@ -33,3 +33,7 @@ export class MergeConflictException extends BaseException {
     super(`A merge conflicted on path "${path}".`);
   }
 }
+
+export class UnimplementedException extends BaseException {
+  constructor() { super('This function is unimplemented.'); }
+}

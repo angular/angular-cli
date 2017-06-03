@@ -36,7 +36,7 @@ describe('ExportStringRef', () => {
 
   it('works on package names', () => {
     // META
-    const ref = new ExportStringRef('@angular/schematics-cli#ExportStringRef');
+    const ref = new ExportStringRef('@angular/schematics/tooling#ExportStringRef');
     expect(ref.ref).toEqual(ExportStringRef);
     expect(ref.path).toBe(__dirname);
     expect(ref.module).toBe(path.join(__dirname, 'index.ts'));
