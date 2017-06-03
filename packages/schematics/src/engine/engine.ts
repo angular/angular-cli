@@ -98,12 +98,6 @@ export class SchematicEngine<CollectionT, SchematicT> implements Engine<Collecti
       case 'host:': return (context: TypedSchematicContext<CollectionT, SchematicT>) => {
         return context.host.map(tree => branch(tree));
       };
-      case '':
-        const fileUrl = parse(format(url));
-        fileUrl.protocol = 'file:';
-        return (context: TypedSchematicContext<CollectionT, SchematicT>) => {
-          return context.engine.createSourceFromUrl(fileUrl)(context);
-        };
       default:
         const hostSource = this._host.createSourceFromUrl(url);
         if (!hostSource) {

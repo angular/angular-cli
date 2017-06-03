@@ -122,7 +122,7 @@ export class NodeModulesEngineHost implements EngineHost<NodeModulesCollectionDe
 
   createSourceFromUrl(url: Url): Source | null {
     switch (url.protocol) {
-      case '':
+      case null:
       case 'file:':
         return (context: NodeModulesSchematicContext) => {
           // Resolve all file:///a/b/c/d from the schematic's own path, and not the current
