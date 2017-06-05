@@ -11,7 +11,7 @@ let packages = require('../../../lib/packages').packages;
 
 export default function() {
   const argv = getGlobalVariable('argv');
-  let createProject = null;
+  let createProject: Promise<any> = null;
 
   // This is a dangerous flag, but is useful for testing packages only.
   if (argv.noproject) {
@@ -19,7 +19,10 @@ export default function() {
   } else if (argv.reuse) {
     // If we're set to reuse an existing project, just chdir to it and clean it.
     createProject = Promise.resolve()
-      .then(() => process.chdir(argv.reuse))
+      .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
+      .then(() => Promise.resolve(),
+        () => ng('new', 'test-project', '--skip-install', ...(argv['ng4'] ? ['--ng4'] : [])))
+      .then(() => process.chdir('./test-project'))
       .then(() => gitClean());
   } else {
     // Otherwise create a project from scratch.

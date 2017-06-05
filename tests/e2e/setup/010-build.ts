@@ -24,9 +24,9 @@ export default function() {
             json['devDependencies'] = {};
           }
           if (json['dependencies'] && pkgName in json['dependencies']) {
-            json['dependencies'][pkgName] = packages[pkgName].dist;
+            json['dependencies'][pkgName] = 'file:' + packages[pkgName].dist;
           } else if (json['devDependencies'] && pkgName in json['devDependencies']) {
-            json['devDependencies'][pkgName] = packages[pkgName].dist;
+            json['devDependencies'][pkgName] = 'file:' + packages[pkgName].dist;
           }
         });
       });
