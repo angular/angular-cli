@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import * as path from 'path';
 import { dynamicPathParser } from '@angular/cli/utilities/dynamic-path-parser';
 import mockFs = require('mock-fs');
@@ -47,8 +46,8 @@ describe('dynamic path parser', () => {
       dryRun: false
     };
     const result = dynamicPathParser(options);
-    expect(result.dir).to.equal(appDir);
-    expect(result.name).to.equal(entityName);
+    expect(result.dir).toBe(appDir);
+    expect(result.name).toBe(entityName);
   });
 
   it('parse from proj src dir', () => {
@@ -60,8 +59,8 @@ describe('dynamic path parser', () => {
       dryRun: false
     };
     const result = dynamicPathParser(options);
-    expect(result.dir).to.equal(appDir);
-    expect(result.name).to.equal(entityName);
+    expect(result.dir).toBe(appDir);
+    expect(result.name).toBe(entityName);
   });
 
   it(`parse from proj src${path.sep}client dir`, () => {
@@ -73,8 +72,8 @@ describe('dynamic path parser', () => {
       dryRun: false
     };
     const result = dynamicPathParser(options);
-    expect(result.dir).to.equal(appDir);
-    expect(result.name).to.equal(entityName);
+    expect(result.dir).toBe(appDir);
+    expect(result.name).toBe(entityName);
   });
 
   it(`parse from proj src${path.sep}client${path.sep}app dir`, () => {
@@ -86,8 +85,8 @@ describe('dynamic path parser', () => {
       dryRun: false
     };
     const result = dynamicPathParser(options);
-    expect(result.dir).to.equal(appDir);
-    expect(result.name).to.equal(entityName);
+    expect(result.dir).toBe(appDir);
+    expect(result.name).toBe(entityName);
   });
 
   it(`parse from proj src${path.sep}client${path.sep}app${path.sep}child-dir`, () => {
@@ -111,8 +110,8 @@ describe('dynamic path parser', () => {
       dryRun: false
     };
     const result = dynamicPathParser(options);
-    expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
-    expect(result.name).to.equal(entityName);
+    expect(result.dir).toBe(`${appDir}${path.sep}child-dir`);
+    expect(result.name).toBe(entityName);
   });
 
   // tslint:disable-next-line:max-line-length
@@ -136,8 +135,8 @@ describe('dynamic path parser', () => {
       dryRun: false
     };
     const result = dynamicPathParser(options);
-    expect(result.dir).to.equal(appDir);
-    expect(result.name).to.equal(entityName);
+    expect(result.dir).toBe(appDir);
+    expect(result.name).toBe(entityName);
   });
 
   // tslint:disable-next-line:max-line-length
@@ -164,8 +163,8 @@ describe('dynamic path parser', () => {
         dryRun: false
       };
       const result = dynamicPathParser(options);
-      expect(result.dir).to.equal(`${appDir}${path.sep}child-dir`);
-      expect(result.name).to.equal(entityName);
+      expect(result.dir).toBe(`${appDir}${path.sep}child-dir`);
+      expect(result.name).toBe(entityName);
     });
 
   it('auto look for dirs with a "+" when not specified', () => {
@@ -186,8 +185,8 @@ describe('dynamic path parser', () => {
       dryRun: false
     };
     const result = dynamicPathParser(options);
-    expect(result.dir).to.equal(`${appDir}${path.sep}+my-route`);
-    expect(result.name).to.equal(entityName);
+    expect(result.dir).toBe(`${appDir}${path.sep}+my-route`);
+    expect(result.name).toBe(entityName);
   });
 
   it('create new dirs as dasherized', () => {
@@ -199,7 +198,7 @@ describe('dynamic path parser', () => {
       dryRun: false
     };
     const result = dynamicPathParser(options);
-    expect(result.dir).to.equal(`${appDir}${path.sep}new-dir`);
-    expect(result.name).to.equal(entityName);
+    expect(result.dir).toBe(`${appDir}${path.sep}new-dir`);
+    expect(result.name).toBe(entityName);
   });
 });

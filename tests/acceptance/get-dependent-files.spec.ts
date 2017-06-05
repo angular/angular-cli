@@ -1,9 +1,6 @@
-// tslint:disable:no-unused-expression
-
 // mock-fs needs to be first so fs module can be mocked correctly.
 import mockFs = require('mock-fs');
 
-import { expect, assert } from 'chai';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as dependentFilesUtils from '@angular/cli/utilities/get-dependent-files';
@@ -55,7 +52,7 @@ describe('Get Dependent Files: ', () => {
   });
 
   describe('getImportClauses', () => {
-    it('returns import specifiers when there is a single import statement', () => {
+    it('returns import specifiers when there is a single import statement', (done) => {
       let sourceFile = path.join(rootPath, 'bar/baz/baz.component.ts');
       return dependentFilesUtils.createTsSourceFile(sourceFile)
         .then((tsFile: ts.SourceFile) => {
@@ -65,10 +62,11 @@ describe('Get Dependent Files: ', () => {
             pos: 13,
             end: 32
           }];
-          assert.deepEqual(contents, expectedContents);
-        });
+          expect(contents).toEqual(expectedContents);
+        })
+        .then(done, done.fail);
     });
-    it('returns imports specifiers when there are multiple import statements', () => {
+    it('returns imports specifiers when there are multiple import statements', (done) => {
       let sourceFile = path.join(rootPath, 'foo/foo.component.ts');
       return dependentFilesUtils.createTsSourceFile(sourceFile)
         .then((tsFile: ts.SourceFile) => {
@@ -85,41 +83,45 @@ describe('Get Dependent Files: ', () => {
               end: 108
             }
           ];
-          assert.deepEqual(contents, expectedContents);
-        });
+          expect(contents).toEqual(expectedContents);
+        })
+        .then(done, done.fail);
     });
   });
 
   describe('createTsSourceFile', () => {
-    it('creates ts.SourceFile give a file path', () => {
+    it('creates ts.SourceFile give a file path', (done) => {
       let sourceFile = path.join(rootPath, 'foo/foo.component.ts');
       return dependentFilesUtils.createTsSourceFile(sourceFile)
         .then((tsFile: ts.SourceFile) => {
           let isTsSourceFile = (tsFile.kind === ts.SyntaxKind.SourceFile);
-          expect(isTsSourceFile).to.be.true;
-        });
+          expect(isTsSourceFile).toBe(true);
+        })
+        .then(done, done.fail);
     });
   });
 
   describe('hasIndexFile', () => {
-    it('returns true when there is a index file', () => {
+    it('returns true when there is a index file', (done) => {
       let sourceFile = path.join(rootPath, 'foo');
       dependentFilesUtils.hasIndexFile(sourceFile)
         .then((booleanValue: boolean) => {
-          expect(booleanValue).to.be.true;
-        });
+          expect(booleanValue).toBe(true);
+        })
+        .then(done, done.fail);
     });
-    it('returns false when there is no index file', () => {
+    it('returns false when there is no index file', (done) => {
       let sourceFile = path.join(rootPath, 'bar');
       dependentFilesUtils.hasIndexFile(sourceFile)
         .then((booleanValue: boolean) => {
-            expect(booleanValue).to.be.false;
-        });
+          expect(booleanValue).toBe(false);
+        })
+        .then(done, done.fail);
     });
   });
 
   describe('returns an array of all the associated files of a given component unit.', () => {
-    it('when the component name has a special Angular tag(component/pipe/service)', () => {
+    it('when the component name has a special Angular tag(component/pipe/service)', (done) => {
       let sourceFile = path.join(rootPath, 'foo/foo.component.ts');
       return dependentFilesUtils.getAllAssociatedFiles(sourceFile)
         .then((files: string[]) => {
@@ -129,10 +131,11 @@ describe('Get Dependent Files: ', () => {
             'src/app/foo/foo.component.spec.ts',
             'src/app/foo/foo.component.ts'
           ];
-        assert.deepEqual(files, expectedContents);
-        });
+          expect(files).toEqual(expectedContents);
+        })
+        .then(done, done.fail);
     });
-    it('when the component name has non-Angular tag', () => {
+    it('when the component name has non-Angular tag', (done) => {
       let sourceFile = path.join(rootPath, 'noAngular.tag.ts');
       return dependentFilesUtils.getAllAssociatedFiles(sourceFile)
         .then((files: string[]) => {
@@ -142,10 +145,11 @@ describe('Get Dependent Files: ', () => {
             'src/app/noAngular.tag.spec.ts',
             'src/app/noAngular.tag.ts'
             ];
-          assert.deepEqual(files, expectedContents);
-        });
+          expect(files).toEqual(expectedContents);
+        })
+        .then(done, done.fail);
     });
-    it('when the component name has no tag after the unique file name', () => {
+    it('when the component name has no tag after the unique file name', (done) => {
       let sourceFile = path.join(rootPath, 'quux/quux.ts');
       return dependentFilesUtils.getAllAssociatedFiles(sourceFile)
         .then((files: string[]) => {
@@ -155,13 +159,14 @@ describe('Get Dependent Files: ', () => {
             'src/app/quux/quux.spec.ts',
             'src/app/quux/quux.ts'
             ];
-          assert.deepEqual(files, expectedContents);
-        });
+          expect(files).toEqual(expectedContents);
+        })
+        .then(done, done.fail);
     });
   });
 
   describe('returns a map of all files which depend on a given file ', () => {
-    it('when the given component unit has no index file', () => {
+    it('when the given component unit has no index file', (done) => {
       let sourceFile = path.join(rootPath, 'bar/bar.component.ts');
       return dependentFilesUtils.getDependentFiles(sourceFile, rootPath)
         .then((contents: dependentFilesUtils.ModuleMap) => {
@@ -184,10 +189,11 @@ describe('Get Dependent Files: ', () => {
             pos: 13,
             end: 36
           }];
-          assert.deepEqual(contents, expectedContents);
-        });
+          expect(contents).toEqual(expectedContents);
+        })
+        .then(done, done.fail);
     });
-    it('when the given component unit has no index file [More Test]', () => {
+    it('when the given component unit has no index file [More Test]', (done) => {
       let sourceFile = path.join(rootPath, 'bar/baz/baz.component.ts');
       return dependentFilesUtils.getDependentFiles(sourceFile, rootPath)
         .then((contents: dependentFilesUtils.ModuleMap) => {
@@ -204,15 +210,17 @@ describe('Get Dependent Files: ', () => {
             pos: 13,
             end: 40
           }];
-          assert.deepEqual(contents, expectedContents);
-        });
+          expect(contents).toEqual(expectedContents);
+        })
+        .then(done, done.fail);
     });
-    it('when there are no dependent files', () => {
+    it('when there are no dependent files', (done) => {
       let sourceFile = path.join(rootPath, 'foo-baz/no-module.component.ts');
       return dependentFilesUtils.getDependentFiles(sourceFile, rootPath)
         .then((contents: dependentFilesUtils.ModuleMap) => {
-          assert.deepEqual(contents, {});
-        });
+          expect(contents).toEqual({});
+        })
+        .then(done, done.fail);
     });
  });
 });
