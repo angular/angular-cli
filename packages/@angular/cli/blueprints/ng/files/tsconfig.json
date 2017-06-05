@@ -12,6 +12,9 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "types": [
+      "src/typings.d.ts"
+    ],
     "lib": [
       "es2016",
       "dom"

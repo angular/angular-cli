@@ -7,7 +7,8 @@
     "baseUrl": "",
     "types": [
       "jasmine",
-      "node"
+      "node",
+      "src/typings.d.ts"
     ]
   },
   "files": [
