@@ -101,7 +101,11 @@ export default Task.extend({
           return linkCli.run();
         }
       })
-      .then(checkYarnOrCNPM)
+      .then(() => {
+        if (!commandOptions.skipInstall || commandOptions.linkCli) {
+          return checkYarnOrCNPM();
+        }
+      })
       .then(() => {
         this.ui.writeLine(chalk.green(`Project '${packageName}' successfully created.`));
       });
