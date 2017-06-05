@@ -95,6 +95,11 @@ Promise.resolve()
   .then(() => execute('git', './ngtools-webpack-builds', 'add', '-A'))
   .then(() => getCommitMessage('./angular-cli'))
   .then((message) => execute('git', './ngtools-webpack-builds', 'commit', '-am', message.substr(1)))
+  // Update the credentials using the GITHUB TOKEN.
+  .then(() => execute('git', './ngtools-webpack-builds', 'config', 'credential.helper',
+    'store --file=.git/credentials'))
+  .then(() => fs.appendFileSync('./ngtools-webpack-builds/.git/credentials',
+    `https://${process.env['GITHUB_TOKEN_ANGULAR']}:@github.com`))
   .then(() => execute('git', './ngtools-webpack-builds', 'push'))
   //---------------------------- cli-builds ----------------------------------//
   .then(() => printMessage('Copying cli-builds dist....'))
@@ -107,6 +112,11 @@ Promise.resolve()
   .then(() => execute('git', './cli-builds', 'add', '-A'))
   .then(() => getCommitMessage('./angular-cli'))
   .then((message) => execute('git', './cli-builds', 'commit', '-am', message.substr(1)))
+  // Update the credentials using the GITHUB TOKEN.
+  .then(() => execute('git', './cli-builds', 'config', 'credential.helper',
+      'store --file=.git/credentials'))
+  .then(() => fs.appendFileSync('./cli-builds/.git/credentials',
+      `https://${process.env['GITHUB_TOKEN_ANGULAR']}:@github.com`))
   .then(() => execute('git', './cli-builds', 'push'))
   //---------------------------- done ----------------------------------------//
   .then(() => console.log('Done...'))
