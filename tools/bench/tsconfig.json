@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "experimentalDecorators": true,
+    "mapRoot": "",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "outDir": "../../dist/tools/bench",
+    "rootDir": ".",
+    "lib": [
+      "es2015",
+      "es6",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "target": "es5",
+    "sourceMap": true,
+    "sourceRoot": "/",
+    "baseUrl": ".",
+    "typeRoots": [
+      "../../node_modules/@types"
+    ],
+    "paths": {
+      "@ngtools/logger": [
+        "../../dist/@ngtools/logger/src"
+      ]
+    },
+    "types": [
+      "node",
+      "yargs"
+    ]
+  }
+}

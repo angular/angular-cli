@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+'use strict';
+
+// Provide a title to the process in `ps`
+process.title = 'bench';
+
+require('../lib/bootstrap-local');
+require('../tools/bench/bin/ngbench');
