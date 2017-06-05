@@ -1,36 +1,23 @@
-import { expect } from 'chai';
+import { ng, setupProject } from '../helpers';
 
-const ng = require('../helpers/ng');
-const tmp = require('../helpers/tmp');
-const SilentError = require('silent-error');
+describe('Acceptance: ng destroy', () => {
+  setupProject();
 
-describe('Acceptance: ng destroy', function () {
-  beforeEach(function () {
-    this.timeout(10000);
-    return tmp.setup('./tmp').then(function () {
-      process.chdir('./tmp');
-    }).then(function () {
-      return ng(['new', 'foo', '--skip-install']);
-    });
+  it('without args should fail', (done) => {
+    return ng(['destroy'])
+      .then(() => done.fail())
+      .catch(error => {
+        expect(error.message).toBe('The destroy command is not supported by Angular CLI.');
+        done();
+      });
   });
 
-  afterEach(function () {
-    return tmp.teardown('./tmp');
-  });
-
-  it('without args should fail', function () {
-    return ng(['destroy']).then(() => {
-      throw new SilentError('ng destroy should fail.');
-    }, (err: any) => {
-      expect(err.message).to.equal('The destroy command is not supported by Angular CLI.');
-    });
-  });
-
-  it('with args should fail', function () {
-    return ng(['destroy', 'something']).then(() => {
-      throw new SilentError('ng destroy something should fail.');
-    }, (err: any) => {
-      expect(err.message).to.equal('The destroy command is not supported by Angular CLI.');
-    });
+  it('with args should fail', (done) => {
+    return ng(['destroy', 'something'])
+      .then(() => done.fail())
+      .catch(error => {
+        expect(error.message).toBe('The destroy command is not supported by Angular CLI.');
+        done();
+      });
   });
 });
