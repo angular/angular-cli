@@ -72,4 +72,4 @@ before_install:
 script:
   - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
   - if [[ "$NODE_SCRIPT" ]]; then node -e $NODE_SCRIPT; fi
-  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" && "$DEPLOY_SCRIPT" ]]; then node -e $DEPLOY_SCRIPT; fi
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" && "$DEPLOY_SCRIPT" != "" ]]; then node -e $DEPLOY_SCRIPT; fi
