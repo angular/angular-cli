@@ -32,9 +32,14 @@ matrix:
     - node_js: "6"
       os: linux
       env: NODE_SCRIPT="tests/run_e2e.js --eject --glob=tests/build/**"
+
+    # Deploy builds.
     - node_js: "6"
       os: linux
       env: DEPLOY_SCRIPT="scripts/git-builds.js"
+      # GITHUB_TOKEN_ANGULAR=<github token, a personal access token of the angular-builds account, account access in valentine>
+      # This is needed for the e2e Travis matrix task to publish packages to github for continuous packages delivery.
+      secure: "aCdHveZuY8AT4Jr1JoJB4LxZsnGWRe/KseZh1YXYe5UtufFCtTVHvUcLn0j2aLBF0KpdyS+hWf0i4np9jthKu2xPKriefoPgCMpisYeC0MFkwbmv+XlgkUbgkgVZMGiVyX7DCYXVahxIoOUjVMEDCbNiHTIrfEuyq24U3ok2tHc="
 
     # Optional builds.
     - node_js: "6"
@@ -66,5 +71,5 @@ before_install:
 
 script:
   - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
-  - if [[ "$NODE_SCRIPT" ]]; then node $NODE_SCRIPT; fi
-  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" && "$DEPLOY_SCRIPT" ]]; then node $DEPLOY_SCRIPT; fi
+  - if [[ "$NODE_SCRIPT" ]]; then node -e $NODE_SCRIPT; fi
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" && "$DEPLOY_SCRIPT" ]]; then node -e $DEPLOY_SCRIPT; fi
