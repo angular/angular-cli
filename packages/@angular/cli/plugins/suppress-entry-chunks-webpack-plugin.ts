@@ -26,7 +26,7 @@ export class SuppressExtractedTextChunksWebpackPlugin {
           .forEach((chunk: any) => {
             let newFiles: string[] = [];
             chunk.files.forEach((file: string) => {
-              if (file.match(/\.js(\.map)?(\\?[a-z0-9]+)?$/)) {
+              if (file.match(/\.js(\.map)?(\?[a-z0-9]+)?$/)) {
                 // remove js files
                 delete compilation.assets[file];
               } else {
@@ -42,7 +42,7 @@ export class SuppressExtractedTextChunksWebpackPlugin {
       compilation.plugin('html-webpack-plugin-alter-asset-tags',
         (htmlPluginData: any, callback: any) => {
           const filterFn = (tag: any) =>
-            !(tag.tagName === 'script' && tag.attributes.src.match(/\.css(\\?[a-z0-9]+)?$/));
+            !(tag.tagName === 'script' && tag.attributes.src.match(/\.css(\?[a-z0-9]+)?$/));
           htmlPluginData.head = htmlPluginData.head.filter(filterFn);
           htmlPluginData.body = htmlPluginData.body.filter(filterFn);
           callback(null, htmlPluginData);
