@@ -20,7 +20,7 @@ Before submitting new issues, have a look at [issues marked with the `type: faq`
 
 ## Prerequisites
 
-Both the CLI and generated project have dependencies that require Node 6.9.0 or higher, together
+Both the CLI and generated project have dependencies that require Python 3.6 or higher, Node 6.9.0 or higher, together
 with NPM 3 or higher.
 
 ## Table of Contents
