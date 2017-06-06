@@ -28,6 +28,7 @@ export interface EjectTaskOptions extends BuildOptions {
 const EjectCommand = Command.extend({
   name: 'eject',
   description: 'Ejects your app and output the proper webpack configuration and scripts.',
+  aliases: ['webpack', 'larkin'],
 
   availableOptions: baseEjectCommandOptions,
 
