@@ -12,6 +12,7 @@ matrix:
   allow_failures:
     - env: NODE_SCRIPT="tests/run_e2e.js --nightly"
     - env: NODE_SCRIPT="tests/run_e2e.js --ng2"
+    - env: DEPLOY_SCRIPT="scripts/git-builds.js"
     - node_js: "7"
   include:
     - node_js: "6"
@@ -39,7 +40,7 @@ matrix:
       env: DEPLOY_SCRIPT="scripts/git-builds.js"
       # GITHUB_TOKEN_ANGULAR=<github token, a personal access token of the angular-builds account, account access in valentine>
       # This is needed for the e2e Travis matrix task to publish packages to github for continuous packages delivery.
-      secure: "aCdHveZuY8AT4Jr1JoJB4LxZsnGWRe/KseZh1YXYe5UtufFCtTVHvUcLn0j2aLBF0KpdyS+hWf0i4np9jthKu2xPKriefoPgCMpisYeC0MFkwbmv+XlgkUbgkgVZMGiVyX7DCYXVahxIoOUjVMEDCbNiHTIrfEuyq24U3ok2tHc="
+      secure: "efXzwvgE/2UFFhlhGWS/nkjc9bwc5AkCRSHrosUGk9/yMzeacJ9U/fnL120EbiYzc2vFMIeWEvIAzqI+NvVjSeOnTshj8xDSF70Bqjqa1H2vNnk4yyAOy8AGW98ktyK4+gzAnAs+GwTG4rqWDEcPvFoSHhQyzbQQEZcMJKxlQ1TZBgf9nxuaa0ywzY1HjqCPLTKjSvWhTjlgiy4CMeLtXvxm2x5i+SYQb8JuiDoylpxxVuQIFRqPoqx2NlhWi30pUMLygfQB8z6I8HzfFvH1MT1U81pygwqEyVnPQ8j8Jk7ZhT53qrR4rVnJMvw1/+taYIppMVNzZPOktqPMn9oRsW7Fn+6UEEC57ywh0a+bV6l0+NrFxZ0jxYEwOQDxnmY03xCwIHpiLC55OIgVwqLgb3gpDYZdZMGBN72uqQG680oXXNjRjzh/+AXgubmo5lfAtj2ff5828p8Wm2HMjtGlYnnyviz6yMWaFzuxnq+fGWwS2Z/ReHL+E+v0qoKEXK4W+Ndcd2xK4Ya/xZk4wV5FIzrzHf1P7814QJU8ntrJiSkmVZ5lC3cr6Hj22K8/eTHFMANBl7i5nGMSgwH6PcmkYtslK123YCyaP1yt7sjfr2GmU4q3oLxt6JgDIaNopys4pUWlK2010TvVxmOkG2g7nE4NAE4S7j3kRCV7rOisdGI="
 
     # Optional builds.
     - node_js: "6"
