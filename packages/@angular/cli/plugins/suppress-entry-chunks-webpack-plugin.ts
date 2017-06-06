@@ -8,11 +8,14 @@ export class SuppressExtractedTextChunksWebpackPlugin {
     compiler.plugin('compilation', function (compilation: any) {
       // find which chunks have css only entry points
       const cssOnlyChunks: string[] = [];
-        const entryPoints = compilation.options.entry;
+      const entryPoints             = compilation.options.entry;
+      const regExp                  = new RegExp(
+                '(\.(css|scss|sass|less|styl)|node_modules[\/\\\\]webpack-dev-server[\/\\\\]client[\/\\\\]index\.js(\\?https?\:\/\/.+)?|webpack[\/\\\\]hot[\/\\\\]dev-server)$',
+                'i'
+            );
         // determine which entry points are composed entirely of css files
         for (let entryPoint of Object.keys(entryPoints)) {
-          if (entryPoints[entryPoint].every((el: string) =>
-            el.match(/\.(css|scss|sass|less|styl)$/))) {
+          if (entryPoints[entryPoint].every((el: string) => el.match(regExp))) {
               cssOnlyChunks.push(entryPoint);
           }
         }
@@ -23,7 +26,7 @@ export class SuppressExtractedTextChunksWebpackPlugin {
           .forEach((chunk: any) => {
             let newFiles: string[] = [];
             chunk.files.forEach((file: string) => {
-              if (file.match(/\.js(\.map)?$/)) {
+              if (file.match(/\.js(\.map)?(\\?[a-z0-9]+)?$/)) {
                 // remove js files
                 delete compilation.assets[file];
               } else {
@@ -39,7 +42,7 @@ export class SuppressExtractedTextChunksWebpackPlugin {
       compilation.plugin('html-webpack-plugin-alter-asset-tags',
         (htmlPluginData: any, callback: any) => {
           const filterFn = (tag: any) =>
-            !(tag.tagName === 'script' && tag.attributes.src.match(/\.css$/));
+            !(tag.tagName === 'script' && tag.attributes.src.match(/\.css(\\?[a-z0-9]+)?$/));
           htmlPluginData.head = htmlPluginData.head.filter(filterFn);
           htmlPluginData.body = htmlPluginData.body.filter(filterFn);
           callback(null, htmlPluginData);
