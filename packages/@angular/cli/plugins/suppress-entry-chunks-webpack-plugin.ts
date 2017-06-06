@@ -10,7 +10,12 @@ export class SuppressExtractedTextChunksWebpackPlugin {
       const cssOnlyChunks: string[] = [];
       const entryPoints             = compilation.options.entry;
       const regExp                  = new RegExp(
-                '(\.(css|scss|sass|less|styl)|node_modules[\/\\\\]webpack-dev-server[\/\\\\]client[\/\\\\]index\.js(\\?https?\:\/\/.+)?|webpack[\/\\\\]hot[\/\\\\]dev-server)$',
+                '(' +
+                  '\.(css|scss|sass|less|styl)|' +
+                  'node_modules[\/\\\\]webpack-dev-server[\/\\\\]client[\/\\\\]index\.js' +
+                      '(\\?https?\:\/\/.+)?|' +
+                  'webpack[\/\\\\]hot[\/\\\\]dev-server' +
+                ')$',
                 'i'
             );
         // determine which entry points are composed entirely of css files
