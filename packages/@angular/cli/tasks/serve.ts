@@ -201,14 +201,19 @@ export default Task.extend({
 
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
     return new Promise((_resolve, reject) => {
-      server.listen(serveTaskOptions.port, serveTaskOptions.host, (err: any, _stats: any) => {
+      let callback = (err, _stats) => {
         if (err) {
           return reject(err);
         }
         if (serveTaskOptions.open) {
           opn(serverAddress);
         }
-      });
+      };
+      serveTaskOptions.port
+               ?
+      server.listen(serveTaskOptions.port, serveTaskOptions.host,callback)
+               :
+      server.listen(serveTaskOptions.host,callback);
     })
     .catch((err: Error) => {
       if (err) {
