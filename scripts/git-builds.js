@@ -100,6 +100,7 @@ Promise.resolve()
     'store', '--file=.git/credentials'))
   .then(() => fs.writeFileSync('./ngtools-webpack-builds/.git/credentials',
     `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`))
+  .then(() => console.log(process.env['DEPLOY_SCRIPT']))
   .then(() => execute('git', './ngtools-webpack-builds', 'push'))
   //---------------------------- cli-builds ----------------------------------//
   .then(() => printMessage('Copying cli-builds dist....'))
