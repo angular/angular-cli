@@ -97,7 +97,7 @@ Promise.resolve()
   .then((message) => execute('git', './ngtools-webpack-builds', 'commit', '-am', message.substr(1)))
   // Update the credentials using the GITHUB TOKEN.
   .then(() => execute('git', './ngtools-webpack-builds', 'config', 'credential.helper',
-    'store', '--file=.git/credentials'))
+    'store --file=.git/credentials'))
   .then(() => fs.writeFileSync('./ngtools-webpack-builds/.git/credentials',
     `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`))
   .then(() => console.log(process.env['DEPLOY_SCRIPT']))
@@ -115,7 +115,7 @@ Promise.resolve()
   .then((message) => execute('git', './cli-builds', 'commit', '-am', message.substr(1)))
   // Update the credentials using the GITHUB TOKEN.
   .then(() => execute('git', './cli-builds', 'config', 'credential.helper',
-      'store', '--file=.git/credentials'))
+      'store --file=.git/credentials'))
   .then(() => fs.writeFileSync('./cli-builds/.git/credentials',
       `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`))
   .then(() => execute('git', './cli-builds', 'push'))
