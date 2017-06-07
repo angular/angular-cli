@@ -2,123 +2,145 @@
 'use strict';
 
 /* eslint-disable no-console */
-const spawn = require( 'child_process').spawnSync;
+const spawnSync = require( 'child_process').spawnSync;
 const fs = require('fs');
 const temp = require('temp');
-const chalk = require('chalk');
+const { blue, green, red, gray, yellow } = require('chalk');
 
-const outputPath = temp.mkdirSync('angular-cli-builds');
+const path = require('path');
+const glob = require('glob');
 const cli = 'https://github.com/angular/angular-cli.git';
 const cliBuilds = 'https://github.com/angular/cli-builds.git';
 const ngToolsWebpackBuilds = 'https://github.com/angular/ngtools-webpack-builds.git';
 
-function execute(command, cwd, ...args) {
-  return new Promise((resolve, reject) => {
-    const runCommand = spawn(command, args, { cwd });
+
+class Executor {
+  constructor(cwd) { this._cwd = cwd; }
+
+  execute(command, ...args) {
+    args = args.filter(x => x !== undefined);
+    console.log(blue(`Running \`${command} ${args.map(x => `"${x}"`).join(' ')}\`...`));
+    console.log(blue(`CWD: ${this._cwd}`));
+
+    const runCommand = spawnSync(command, args, { cwd: this._cwd });
     if (runCommand.status === 0) {
-      console.log(chalk.gray(runCommand.output.toString()));
-      resolve(runCommand.output.toString());
+      console.log(gray(runCommand.stdout.toString()));
+      return runCommand.stdout.toString();
     } else {
-      reject({ message: runCommand.error || runCommand.stdout.toString() || runCommand.stderr.toString() });
+      throw new Error(
+        `Command returned status ${runCommand.status}. Details:\n${runCommand.stderr}`);
     }
-  });
-}
+  }
 
-function printMessage(message) {
-  console.log(chalk.green(`${message}\r\n`));
-}
+  git(...args) { return this.execute('git', ...args); }
+  npm(...args) { return this.execute('npm', ...args); }
+  rm(...args) { return this.execute('rm', ...args); }
 
-function updateDependencyPath(path, commitMessage) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf-8', (readError, data) => {
-      if (readError) {
-        reject(readError);
-      } else {
-        let packageJSON = JSON.parse(data);
-        packageJSON.dependencies['@ngtools/webpack'] = `${ngToolsWebpackBuilds}#${commitMessage.substr(1, 7)}`;
-        fs.writeFile(path, JSON.stringify(packageJSON, null, 2), (writeError, updatedFile) => {
-          if (writeError) {
-            reject(writeError);
-          } else {
-            resolve(updatedFile);
-          }
-        });
+  glob(pattern, options) {
+    return glob.sync(pattern, Object.assign({}, options || {}, { cwd: this._cwd }));
+  }
+
+  cp(root, destRoot) {
+    function mkdirp(p) {
+      if (fs.existsSync(p)) {
+        return;
       }
-    });
-  });
+      mkdirp(path.dirname(p));
+      fs.mkdirSync(p);
+    }
+
+    this.glob(path.join(root, '**/*'), { nodir: true })
+      .forEach(name => {
+        const src = name;
+        const dest = path.join(destRoot, src.substr(root.length));
+
+        mkdirp(path.dirname(dest));
+        fs.writeFileSync(dest, fs.readFileSync(src));
+      });
+  }
+
+  read(p) {
+    return fs.readFileSync(path.join(this._cwd, p), 'utf-8');
+  }
+  write(p, content) {
+    fs.writeFileSync(path.join(this._cwd, p), content);
+  }
+
+  updateVersion(hash) {
+    const packageJson = JSON.parse(this.read('package.json'));
+    packageJson.version = `${packageJson.version}-${hash.substr(1, 7)}`;
+    this.write('package.json', JSON.stringify(packageJson, null, 2));
+  }
+
+  updateDependencies(hash) {
+    const packageJson = JSON.parse(this.read('package.json'));
+    packageJson.dependencies['@ngtools/webpack'] = ngToolsWebpackBuilds + '#' + hash;
+    this.write('package.json', JSON.stringify(packageJson, null, 2));
+  }
 }
 
-function updateVersion(path, commitMessage) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf-8', (readError, data) => {
-      if (readError) {
-        reject(readError);
-      } else {
-        let packageJSON = JSON.parse(data);
-        packageJSON.version = packageJSON.version + '-' + commitMessage.substr(1, 7);
-        fs.writeFile(path, JSON.stringify(packageJSON, null, 2), (writeError, updatedFile) => {
-          if (writeError) {
-            reject(writeError);
-          } else {
-            resolve(updatedFile);
-          }
-        });
-      }
-    });
-  });
+
+async function main() {
+  const cliPath = process.cwd();
+  const cliExec = new Executor(cliPath);
+  const tempRoot = temp.mkdirSync('angular-cli-builds');
+  const tempExec = new Executor(tempRoot);
+
+  console.log(green(`Cloning builds repos...\n`));
+  tempExec.git('clone', cliBuilds);
+  tempExec.git('clone', ngToolsWebpackBuilds);
+
+  console.log(green('Building...'));
+
+  const cliBuildsRoot = path.join(tempRoot, 'cli-builds');
+  const cliBuildsExec = new Executor(cliBuildsRoot);
+  const ngToolsWebpackBuildsRoot = path.join(tempRoot, 'ngtools-webpack-builds');
+  const ngToolsWebpackBuildsExec = new Executor(ngToolsWebpackBuildsRoot);
+
+  cliExec.npm('run', 'build');
+
+  const message = cliExec.git('log', '--format=%h %s', '-n', '1');
+  const hash = message.split(' ')[0];
+
+  console.log(green('Copying ng-tools-webpack-builds dist'));
+  ngToolsWebpackBuildsExec.git('checkout', '-B', process.env['TRAVIS_BRANCH']);
+  ngToolsWebpackBuildsExec.rm('-rf', ...ngToolsWebpackBuildsExec.glob('*'));
+  cliExec.cp('dist/@ngtools/webpack', ngToolsWebpackBuildsRoot);
+  console.log(green('Updating package.json version'));
+  ngToolsWebpackBuildsExec.updateVersion(hash);
+  ngToolsWebpackBuildsExec.git('add', '-A');
+  ngToolsWebpackBuildsExec.git('commit', '-m', message);
+  ngToolsWebpackBuildsExec.git('tag', hash);
+
+  ngToolsWebpackBuildsExec.git('config', 'credential.helper', 'store --file=.git/credentials');
+  ngToolsWebpackBuildsExec.write('.git/credentials',
+      `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`);
+
+
+  console.log(green('Copying cli-builds dist'));
+  cliBuildsExec.git('checkout', '-B', process.env['TRAVIS_BRANCH']);
+  cliBuildsExec.rm('-rf', ...cliBuildsExec.glob('*'));
+  cliExec.cp('dist/@angular/cli', cliBuildsRoot);
+
+  console.log(green('Updating package.json version'));
+  cliBuildsExec.updateVersion(hash);
+  cliBuildsExec.updateDependencies(hash);
+
+  cliBuildsExec.git('add', '-A');
+  cliBuildsExec.git('commit', '-m', message);
+  cliBuildsExec.git('tag', hash);
+
+  cliBuildsExec.git('config', 'credential.helper', 'store --file=.git/credentials');
+  cliBuildsExec.write('.git/credentials',
+    `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`);
+
+  console.log(green('Done. Pushing...'));
+  ngToolsWebpackBuildsExec.git('push', '-f');
+  ngToolsWebpackBuildsExec.git('push', '--tags');
+  cliBuildsExec.git('push', '-f');
+  cliBuildsExec.git('push', '--tags');
 }
 
-function getCommitMessage(path) {
-  return execute('git', path, 'log', '--format=%h %s', '-n', 1)
-    .then(data => {
-      return data;
-    });
-}
-
-Promise.resolve()
-  .then(() => process.chdir(outputPath))
-  .then(() => console.log(process.cwd()))
-  .then(() => printMessage('Cloning...'))
-  .then(() => execute('git', process.cwd(), 'clone', cli))
-  .then(() => execute('git', process.cwd(), 'clone', cliBuilds))
-  .then(() => execute('git', process.cwd(), 'clone', ngToolsWebpackBuilds))
-  .then(() => printMessage('Installing packages...'))
-  .then(() => execute('npm', './angular-cli', 'install'))
-  .then(() => printMessage('Creating build...'))
-  .then(() => execute('npm', './angular-cli', 'run', 'build'))
-   //---------------------------- ngtools-webpack-builds ----------------------//
-  .then(() => printMessage('Copying ngtools-webpack-builds dist....'))
-  .then(() => execute('cp', './ngtools-webpack-builds', '-a', './../angular-cli/dist/@ngtools/webpack/.', '.'))
-  .then(() => printMessage('Updating package.json'))
-  .then(() => getCommitMessage('./angular-cli'))
-  .then((message) => updateVersion('./ngtools-webpack-builds/package.json', message))
-  .then(() => execute('git', './ngtools-webpack-builds', 'add', '-A'))
-  .then(() => getCommitMessage('./angular-cli'))
-  .then((message) => execute('git', './ngtools-webpack-builds', 'commit', '-am', message.substr(1)))
-  // Update the credentials using the GITHUB TOKEN.
-  .then(() => execute('git', './ngtools-webpack-builds', 'config', 'credential.helper',
-    'store --file=.git/credentials'))
-  .then(() => fs.writeFileSync('./ngtools-webpack-builds/.git/credentials',
-    `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`))
-  .then(() => console.log(process.env['DEPLOY_SCRIPT']))
-  .then(() => execute('git', './ngtools-webpack-builds', 'push'))
-  //---------------------------- cli-builds ----------------------------------//
-  .then(() => printMessage('Copying cli-builds dist....'))
-  .then(() => execute('cp', './cli-builds', '-a', './../angular-cli/dist/@angular/cli/.', '.'))
-  .then(() => printMessage('Updating package.json'))
-  .then(() => getCommitMessage('./angular-cli'))
-  .then((message) => updateVersion('./cli-builds/package.json', message))
-  .then(() => getCommitMessage('./ngtools-webpack-builds'))
-  .then((message) => updateDependencyPath('./cli-builds/package.json', message))
-  .then(() => execute('git', './cli-builds', 'add', '-A'))
-  .then(() => getCommitMessage('./angular-cli'))
-  .then((message) => execute('git', './cli-builds', 'commit', '-am', message.substr(1)))
-  // Update the credentials using the GITHUB TOKEN.
-  .then(() => execute('git', './cli-builds', 'config', 'credential.helper',
-      'store --file=.git/credentials'))
-  .then(() => fs.writeFileSync('./cli-builds/.git/credentials',
-      `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`))
-  .then(() => execute('git', './cli-builds', 'push'))
-  //---------------------------- done ----------------------------------------//
-  .then(() => console.log('Done...'))
-  .catch(err => console.error(`Error:\n${err.message}`));
+main()
+  .then(() => console.log(green('All good. Thank you.')))
+  .catch(err => console.log(red('Error happened. Details:\n' + err)));
