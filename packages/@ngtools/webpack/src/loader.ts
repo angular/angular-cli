@@ -361,7 +361,7 @@ function _getResourcesUrls(refactor: TypeScriptFileRefactor): string[] {
         const arr = <ts.ArrayLiteralExpression[]>(
           refactor.findAstNodes(node, ts.SyntaxKind.ArrayLiteralExpression, false));
         if (!arr || arr.length == 0 || arr[0].elements.length == 0) {
-          return;
+          return acc;
         }
 
         arr[0].elements.forEach((element: ts.Expression) => {
