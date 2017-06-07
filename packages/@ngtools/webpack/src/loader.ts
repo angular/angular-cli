@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as ts from 'typescript';
-import {AotPlugin} from './plugin';
-import {TypeScriptFileRefactor} from './refactor';
-import {LoaderContext, ModuleReason} from './webpack';
+import { AotPlugin } from './plugin';
+import { TypeScriptFileRefactor } from './refactor';
+import { LoaderContext, ModuleReason } from './webpack';
 
 interface Platform {
   name: string;
@@ -11,9 +11,10 @@ interface Platform {
 
 const loaderUtils = require('loader-utils');
 const NormalModule = require('webpack/lib/NormalModule');
+const fs = require('fs');
 
 // This is a map of changes which need to be made
-const changeMap: {[key: string]: Platform} = {
+const changeMap: { [key: string]: Platform } = {
   platformBrowserDynamic: {
     name: 'platformBrowser',
     importLocation: '@angular/platform-browser'
@@ -77,8 +78,8 @@ function _angularImportsFromNode(node: ts.ImportDeclaration, _sourceFile: ts.Sou
 
 
 function _ctorParameterFromTypeReference(paramNode: ts.ParameterDeclaration,
-                                         angularImports: string[],
-                                         refactor: TypeScriptFileRefactor) {
+  angularImports: string[],
+  refactor: TypeScriptFileRefactor) {
   let typeName = 'undefined';
 
   if (paramNode.type) {
@@ -134,8 +135,8 @@ function _ctorParameterFromTypeReference(paramNode: ts.ParameterDeclaration,
 
 
 function _addCtorParameters(classNode: ts.ClassDeclaration,
-                            angularImports: string[],
-                            refactor: TypeScriptFileRefactor) {
+  angularImports: string[],
+  refactor: TypeScriptFileRefactor) {
   // For every classes with constructors, output the ctorParameters function which contains a list
   // of injectable types.
   const ctor = (
@@ -212,7 +213,7 @@ function _replaceBootstrap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) 
     .map(call => call.expression as ts.PropertyAccessExpression)
     .filter(access => {
       return access.name.kind == ts.SyntaxKind.Identifier
-          && access.name.text == 'bootstrapModule';
+        && access.name.text == 'bootstrapModule';
     });
 
   const calls: ts.CallExpression[] = bootstraps
@@ -273,13 +274,13 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
     .filter((node: ts.ObjectLiteralExpression) => {
       return node.properties.some(prop => {
         return prop.kind == ts.SyntaxKind.PropertyAssignment
-            && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
+          && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
       });
     })
     .forEach((node: ts.ObjectLiteralExpression) => {
       const moduleIdProp = node.properties.filter((prop: ts.ObjectLiteralElement, _idx: number) => {
         return prop.kind == ts.SyntaxKind.PropertyAssignment
-            && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
+          && _getContentOfKeyLiteral(sourceFile, prop.name) == 'moduleId';
       })[0];
       // Get the trailing comma.
       const moduleIdCommaProp = moduleIdProp.parent
@@ -297,6 +298,19 @@ function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) 
     // if not string, just use expression directly
     return element.getFullText(sourceFile);
   }
+}
+
+function _getPrecompiledResult(fileName: string) {
+  const basePath = fileName.substr(0, fileName.lastIndexOf('\\') + 1),
+    packageJson = require(basePath + "package.json"),
+    precompiledFileName = basePath + packageJson.es2015,
+    output = fs.readFileSync(precompiledFileName, 'utf8'),
+    sourceMap = fs.readFileSync(precompiledFileName + '.map', 'utf8');
+
+  return {
+    outputText: output,
+    sourceMap: sourceMap
+  };
 }
 
 function _replaceResources(refactor: TypeScriptFileRefactor): void {
@@ -331,7 +345,7 @@ function _getResourceNodes(refactor: TypeScriptFileRefactor) {
 
   // Find all object literals.
   return refactor.findAstNodes(sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
-  // Get all their property assignments.
+    // Get all their property assignments.
     .map(node => refactor.findAstNodes(node, ts.SyntaxKind.PropertyAssignment))
     // Flatten into a single array (from an array of array<property assignments>).
     .reduce((prev, curr) => curr ? prev.concat(curr) : prev, [])
@@ -398,6 +412,7 @@ function _diagnoseDeps(reasons: ModuleReason[], plugin: AotPlugin, checked: Set<
 export function ngcLoader(this: LoaderContext & { _compilation: any }) {
   const cb = this.async();
   const sourceFileName: string = this.resourcePath;
+  const regex = /\.d\.ts/ig;
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
   // We must verify that AotPlugin is an instance of the right class.
@@ -442,33 +457,38 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }) {
           sourceRoot: plugin.basePath
         });
 
-        const result = refactor.transpile(compilerOptions);
+        const result = (regex.test(sourceFileName)) ? _getPrecompiledResult(sourceFileName) : refactor.transpile(compilerOptions);
         cb(null, result.outputText, result.sourceMap);
       })
       .catch(err => cb(err));
   } else {
-    const options = loaderUtils.getOptions(this) || {};
-    const tsConfigPath = options.tsConfigPath;
-    const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+    if (regex.test(sourceFileName)) {
+      const result = _getPrecompiledResult(sourceFileName);
+      cb(null, result.outputText, result.sourceMap);
+    } else {
+      const options = loaderUtils.getOptions(this) || {};
+      const tsConfigPath = options.tsConfigPath;
+      const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
 
-    if (tsConfig.error) {
-      throw tsConfig.error;
-    }
-
-    const compilerOptions: ts.CompilerOptions = tsConfig.config.compilerOptions;
-    for (const key of Object.keys(options)) {
-      if (key == 'tsConfigPath') {
-        continue;
+      if (tsConfig.error) {
+        throw tsConfig.error;
       }
-      compilerOptions[key] = options[key];
-    }
-    const compilerHost = ts.createCompilerHost(compilerOptions);
-    const refactor = new TypeScriptFileRefactor(sourceFileName, compilerHost);
-    _replaceResources(refactor);
 
-    const result = refactor.transpile(compilerOptions);
-    // Webpack is going to take care of this.
-    result.outputText = result.outputText.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
-    cb(null, result.outputText, result.sourceMap);
+      const compilerOptions: ts.CompilerOptions = tsConfig.config.compilerOptions;
+      for (const key of Object.keys(options)) {
+        if (key == 'tsConfigPath') {
+          continue;
+        }
+        compilerOptions[key] = options[key];
+      }
+      const compilerHost = ts.createCompilerHost(compilerOptions);
+      const refactor = new TypeScriptFileRefactor(sourceFileName, compilerHost);
+      _replaceResources(refactor);
+
+      const result = refactor.transpile(compilerOptions);
+      // Webpack is going to take care of this.
+      result.outputText = result.outputText.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+      cb(null, result.outputText, result.sourceMap);
+    }
   }
 }
