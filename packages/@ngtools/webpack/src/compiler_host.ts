@@ -152,29 +152,25 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       return;
     }
 
-    const isWindows = process.platform.startsWith('win');
     for (const fileName of this.getChangedFilePaths()) {
       const stats = this._files[fileName];
+      
       if (stats) {
-        // If we're on windows, we need to populate with the proper path separator.
-        const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
-        fs._statStorage.data[path] = [null, stats];
-        fs._readFileStorage.data[path] = [null, stats.content];
+        fs._statStorage.data[fileName] = [null, stats];
+        fs._readFileStorage.data[fileName] = [null, stats.content];
       } else {
         // Support removing files as well.
-        const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
-        fs._statStorage.data[path] = [new Error(), null];
-        fs._readFileStorage.data[path] = [new Error(), null];
+        fs._statStorage.data[fileName] = [new Error(), null];
+        fs._readFileStorage.data[fileName] = [new Error(), null];
       }
     }
     for (const dirName of Object.keys(this._changedDirs)) {
       const stats = this._directories[dirName];
       const dirs = this.getDirectories(dirName);
       const files = this.getFiles(dirName);
-      // If we're on windows, we need to populate with the proper path separator.
-      const path = isWindows ? dirName.replace(/\//g, '\\') : dirName;
-      fs._statStorage.data[path] = [null, stats];
-      fs._readdirStorage.data[path] = [null, files.concat(dirs)];
+
+      fs._statStorage.data[dirName] = [null, stats];
+      fs._readdirStorage.data[dirName] = [null, files.concat(dirs)];
     }
   }
 
