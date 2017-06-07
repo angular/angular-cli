@@ -1,8 +1,8 @@
-import {ng} from '../../../utils/process';
 import {expectToFail} from '../../../utils/utils';
+import {testGenerate} from '../../../utils/generate';
+
 
 export default function() {
-  return Promise.resolve()
-    .then(() => expectToFail(() =>
-      ng('generate', 'directive', 'test-directive', '--module', 'app.moduleXXX.ts')));
+  return expectToFail(() =>
+    testGenerate({blueprint: 'directive', name: 'dir', flags: ['--module', 'app.moduleX.ts']}));
 }

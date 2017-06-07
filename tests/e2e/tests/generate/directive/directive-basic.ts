@@ -1,14 +1,16 @@
-import {ng} from '../../../utils/process';
 import {join} from 'path';
-import {expectFileToExist} from '../../../utils/fs';
+import {testGenerate} from '../../../utils/generate';
 
 
 export default function() {
   const directiveDir = join('src', 'app');
-  return ng('generate', 'directive', 'test-directive')
-    .then(() => expectFileToExist(join(directiveDir, 'test-directive.directive.ts')))
-    .then(() => expectFileToExist(join(directiveDir, 'test-directive.directive.spec.ts')))
 
-    // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+  return testGenerate({
+    blueprint: 'directive',
+    name: 'basic',
+    pathsToVerify: [
+      join(directiveDir, 'basic.directive.ts'),
+      join(directiveDir, 'basic.directive.spec.ts')
+    ]
+  });
 }

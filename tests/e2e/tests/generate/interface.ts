@@ -1,15 +1,17 @@
 import {join} from 'path';
-import {ng} from '../../utils/process';
-import {expectFileToExist} from '../../utils/fs';
+import {testGenerate} from '../../utils/generate';
 
 
 export default function() {
   const interfaceDir = join('src', 'app');
 
-  return ng('generate', 'interface', 'test-interface', 'model')
-    .then(() => expectFileToExist(interfaceDir))
-    .then(() => expectFileToExist(join(interfaceDir, 'test-interface.model.ts')))
-
-    // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+  return testGenerate({
+    blueprint: 'interface',
+    name: 'basic',
+    flags: ['model'],
+    pathsToVerify: [
+      interfaceDir,
+      join(interfaceDir, 'basic.model.ts')
+    ]
+  });
 }
