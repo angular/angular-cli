@@ -144,10 +144,10 @@ function main() {
     `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`);
 
   console.log(green('Done. Pushing...'));
-  ngToolsWebpackBuildsExec.git('push', '-f', branchName);
-  ngToolsWebpackBuildsExec.git('push', '--tags', branchName);
-  cliBuildsExec.git('push', '-f', branchName);
-  cliBuildsExec.git('push', '--tags', branchName);
+  ngToolsWebpackBuildsExec.git('push', '-f', 'origin', branchName);
+  ngToolsWebpackBuildsExec.git('push', '--tags', 'origin', branchName);
+  cliBuildsExec.git('push', '-f', 'origin', branchName);
+  cliBuildsExec.git('push', '--tags', 'origin', branchName);
 }
 
 main();
