@@ -93,6 +93,8 @@ function main() {
   const tempRoot = temp.mkdirSync('angular-cli-builds');
   const tempExec = new Executor(tempRoot);
 
+  const branchName = process.env['TRAVIS_BRANCH'];
+
   console.log(green('Cloning builds repos...\n'));
   tempExec.git('clone', cliBuilds);
   tempExec.git('clone', ngToolsWebpackBuilds);
@@ -110,7 +112,7 @@ function main() {
   const hash = message.split(' ')[0];
 
   console.log(green('Copying ng-tools-webpack-builds dist'));
-  ngToolsWebpackBuildsExec.git('checkout', '-B', process.env['TRAVIS_BRANCH']);
+  ngToolsWebpackBuildsExec.git('checkout', '-B', branchName);
   ngToolsWebpackBuildsExec.rm('-rf', ...ngToolsWebpackBuildsExec.glob('*'));
   cliExec.cp('dist/@ngtools/webpack', ngToolsWebpackBuildsRoot);
   console.log(green('Updating package.json version'));
@@ -125,7 +127,7 @@ function main() {
 
 
   console.log(green('Copying cli-builds dist'));
-  cliBuildsExec.git('checkout', '-B', process.env['TRAVIS_BRANCH']);
+  cliBuildsExec.git('checkout', '-B', branchName);
   cliBuildsExec.rm('-rf', ...cliBuildsExec.glob('*'));
   cliExec.cp('dist/@angular/cli', cliBuildsRoot);
 
@@ -142,10 +144,10 @@ function main() {
     `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`);
 
   console.log(green('Done. Pushing...'));
-  ngToolsWebpackBuildsExec.git('push', '-f');
-  ngToolsWebpackBuildsExec.git('push', '--tags');
-  cliBuildsExec.git('push', '-f');
-  cliBuildsExec.git('push', '--tags');
+  ngToolsWebpackBuildsExec.git('push', '-f', branchName);
+  ngToolsWebpackBuildsExec.git('push', '--tags', branchName);
+  cliBuildsExec.git('push', '-f', branchName);
+  cliBuildsExec.git('push', '--tags', branchName);
 }
 
 main();
