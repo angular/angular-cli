@@ -41,7 +41,8 @@
     "build/**/*",
     "dist/**/*",
     "node_modules/**/*",
+    "**/node_modules/**/*",
     "tmp/**/*",
-    "packages/schematics_cli/schematics/*/files/**"
+    "packages/schematics_cli/schematics/*/files/**/*"
   ]
 }

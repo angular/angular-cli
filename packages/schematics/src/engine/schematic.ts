@@ -17,7 +17,6 @@ import {Tree} from '../tree/interface';
 import {BaseException} from '../exception/exception';
 
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/concatMap';
 

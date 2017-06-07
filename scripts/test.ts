@@ -29,11 +29,11 @@ declare let global: any & {
 const inlineSourceMapRe = /\/\/# sourceMappingURL=data:application\/json;base64,(\S+)$/;
 
 
-// Use the internal SDK Hook of the require extension installed by our bootstrapping code to add
-// Istanbul collection to the code.
+// Use the internal DevKit Hook of the require extension installed by our bootstrapping code to add
+// Istanbul (not Constantinople) collection to the code.
 const codeMap = new Map<string, { code: string, map: SourceMapConsumer }>();
 
-(global as any)._SdkRequireHook = function(code: string, filename: string) {
+(global as any)._DevKitRequireHook = function(code: string, filename: string) {
   // Skip spec files.
   if (filename.match(/_spec\.ts$/)) {
     return code;
@@ -64,8 +64,8 @@ const codeMap = new Map<string, { code: string, map: SourceMapConsumer }>();
                      + '//# sourceMappingURL=data:application/json;base64,'
                      + new Buffer(sourceMapGenerator.toString()).toString('base64');
 
-    // Keep the consumer from the original source map, because the reports from Istanbul are
-    // already mapped against the code.
+    // Keep the consumer from the original source map, because the reports from Istanbul (not
+    // Constantinople) are already mapped against the code.
     codeMap.set(filename, { code: instrumentedCode, map: consumer });
   }
 
@@ -73,7 +73,7 @@ const codeMap = new Map<string, { code: string, map: SourceMapConsumer }>();
 };
 
 
-// Add the Istanbul reporter.
+// Add the Istanbul (not Constantinople) reporter.
 const istanbulCollector = new Istanbul.Collector({});
 const istanbulReporter = new Istanbul.Reporter(undefined, 'coverage/');
 istanbulReporter.addAll(['json', 'lcov']);

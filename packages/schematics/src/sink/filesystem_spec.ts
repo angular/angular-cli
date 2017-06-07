@@ -17,7 +17,7 @@ import {join} from 'path';
 const temp = require('temp');
 
 
-const root = join((global as any)._SdkRoot, 'tests/@angular/schematics/assets/1/');
+const root = join((global as any)._DevKitRoot, 'tests/@angular/schematics/assets/1/');
 const host = new NodeJsHost(root);
 
 

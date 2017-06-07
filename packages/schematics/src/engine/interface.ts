@@ -13,38 +13,39 @@ import {Url} from 'url';
 
 /**
  * The description (metadata) of a collection. This type contains every information the engine
- * needs to run. The CollectionT type parameter contains additional metadata that you want to
- * store while remaining type-safe.
+ * needs to run. The CollectionMetadataT type parameter contains additional metadata that you
+ * want to store while remaining type-safe.
  */
-export type CollectionDescription<CollectionT extends {}> = CollectionT & {
+export type CollectionDescription<CollectionMetadataT extends {}> = CollectionMetadataT & {
   readonly name: string;
 };
 
 /**
  * The description (metadata) of a schematic. This type contains every information the engine
- * needs to run. The SchematicT and CollectionT type parameters contain additional metadata
- * that you want to store while remaining type-safe.
+ * needs to run. The SchematicMetadataT and CollectionMetadataT type parameters contain additional
+ * metadata that you want to store while remaining type-safe.
  */
-export type SchematicDescription<CollectionT extends {}, SchematicT extends {}> = SchematicT & {
-  readonly collection: CollectionDescription<CollectionT>;
+export type SchematicDescription<CollectionMetadataT extends {},
+                                 SchematicMetadataT extends {}> = SchematicMetadataT & {
+  readonly collection: CollectionDescription<CollectionMetadataT>;
   readonly name: string;
 };
 
 
 /**
  * The Host for the Engine. Specifically, the piece of the tooling responsible for resolving
- * collections and schematics descriptions. The SchematicT and CollectionT type parameters contain
- * additional metadata that you want to store while remaining type-safe.
+ * collections and schematics descriptions. The SchematicMetadataT and CollectionMetadataT type
+ * parameters contain additional metadata that you want to store while remaining type-safe.
  */
-export interface EngineHost<CollectionT extends {}, SchematicT extends {}> {
-  createCollectionDescription(name: string): CollectionDescription<CollectionT> | null;
+export interface EngineHost<CollectionMetadataT extends {}, SchematicMetadataT extends {}> {
+  createCollectionDescription(name: string): CollectionDescription<CollectionMetadataT> | null;
   createSchematicDescription(
       name: string,
-      collection: CollectionDescription<CollectionT>):
-        SchematicDescription<CollectionT, SchematicT> | null;
+      collection: CollectionDescription<CollectionMetadataT>):
+        SchematicDescription<CollectionMetadataT, SchematicMetadataT> | null;
   getSchematicRuleFactory<OptionT>(
-      schematic: SchematicDescription<CollectionT, SchematicT>,
-      collection: CollectionDescription<CollectionT>): RuleFactory<OptionT>;
+      schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
+      collection: CollectionDescription<CollectionMetadataT>): RuleFactory<OptionT>;
   createSourceFromUrl(url: Url): Source | null;
 
   readonly defaultMergeStrategy?: MergeStrategy;
@@ -55,16 +56,18 @@ export interface EngineHost<CollectionT extends {}, SchematicT extends {}> {
  * The root Engine for creating and running schematics and collections. Everything related to
  * a schematic execution starts from this interface.
  *
- * CollectionT is, by default, a generic Collection metadata type. This is used throughout the
- * engine typings so that you can use a type that's merged into descriptions, while being type-safe.
+ * CollectionMetadataT is, by default, a generic Collection metadata type. This is used throughout
+ * the engine typings so that you can use a type that's merged into descriptions, while being
+ * type-safe.
  *
- * SchematicT is a type that contains additional typing for the Schematic Description.
+ * SchematicMetadataT is a type that contains additional typing for the Schematic Description.
  */
-export interface Engine<CollectionT extends {}, SchematicT extends {}> {
-  createCollection(name: string): Collection<CollectionT, SchematicT>;
+export interface Engine<CollectionMetadataT extends {}, SchematicMetadataT extends {}> {
+  createCollection(name: string): Collection<CollectionMetadataT, SchematicMetadataT>;
   createSchematic(
       name: string,
-      collection: Collection<CollectionT, SchematicT>): Schematic<CollectionT, SchematicT>;
+      collection: Collection<CollectionMetadataT, SchematicMetadataT>
+  ): Schematic<CollectionMetadataT, SchematicMetadataT>;
   createSourceFromUrl(url: Url): Source;
 
   readonly defaultMergeStrategy: MergeStrategy;
@@ -75,11 +78,10 @@ export interface Engine<CollectionT extends {}, SchematicT extends {}> {
  * A Collection as created by the Engine. This should be used by the tool to create schematics,
  * or by rules to create other schematics as well.
  */
-export interface Collection<CollectionT, SchematicT> {
-  readonly name: string;
-  readonly description: CollectionDescription<CollectionT>;
+export interface Collection<CollectionMetadataT, SchematicMetadataT> {
+  readonly description: CollectionDescription<CollectionMetadataT>;
 
-  createSchematic(name: string): Schematic<CollectionT, SchematicT>;
+  createSchematic(name: string): Schematic<CollectionMetadataT, SchematicMetadataT>;
 }
 
 
@@ -87,9 +89,9 @@ export interface Collection<CollectionT, SchematicT> {
  * A Schematic as created by the Engine. This should be used by the tool to execute the main
  * schematics, or by rules to execute other schematics as well.
  */
-export interface Schematic<CollectionT, SchematicT> {
-  readonly description: SchematicDescription<CollectionT, SchematicT>;
-  readonly collection: Collection<CollectionT, SchematicT>;
+export interface Schematic<CollectionMetadataT, SchematicMetadataT> {
+  readonly description: SchematicDescription<CollectionMetadataT, SchematicMetadataT>;
+  readonly collection: Collection<CollectionMetadataT, SchematicMetadataT>;
 
   call<T>(options: T, host: Observable<Tree>): Observable<Tree>;
 }
@@ -99,9 +101,9 @@ export interface Schematic<CollectionT, SchematicT> {
  * A SchematicContext. Contains information necessary for Schematics to execute some rules, for
  * example when using another schematics, as we need the engine and collection.
  */
-export interface TypedSchematicContext<CollectionT, SchematicT> {
-  readonly engine: Engine<CollectionT, SchematicT>;
-  readonly schematic: Schematic<CollectionT, SchematicT>;
+export interface TypedSchematicContext<CollectionMetadataT, SchematicMetadataT> {
+  readonly engine: Engine<CollectionMetadataT, SchematicMetadataT>;
+  readonly schematic: Schematic<CollectionMetadataT, SchematicMetadataT>;
   readonly host: Observable<Tree>;
   readonly strategy: MergeStrategy;
 }

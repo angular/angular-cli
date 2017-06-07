@@ -11,20 +11,23 @@ import {
   DeleteFileAction,
   OverwriteFileAction,
   RenameFileAction,
-  UnknownActionException
+  UnknownActionException,
+  isAction
 } from '../tree/action';
 import {FileAlreadyExistException, FileDoesNotExistException} from '../exception/exception';
 import {Tree} from '../tree/interface';
 
 import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/defer';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/operator/concatMap';
+import 'rxjs/add/operator/ignoreElements';
 import 'rxjs/add/operator/last';
 import 'rxjs/add/operator/mergeMap';
 
 
 export interface Sink {
-  preCommitAction: (action: Action) => void | Observable<Action | void> | Action;
+  preCommitAction: (action: Action) => void | PromiseLike<Action> | Observable<Action> | Action;
   preCommit: () => void | Observable<void>;
   postCommit: () => void | Observable<void>;
 
@@ -36,7 +39,10 @@ const Noop: any = function() {};
 
 
 export abstract class SimpleSinkBase implements Sink {
-  preCommitAction: (action: Action) => void | Action | Observable<Action> = Noop;
+  preCommitAction: (action: Action) => void
+                                     | Action
+                                     | PromiseLike<Action>
+                                     | Observable<Action> = Noop;
   postCommitAction: (action: Action) => void | Observable<void> = Noop;
   preCommit: () => void | Observable<void> = Noop;
   postCommit: () => void | Observable<void> = Noop;
@@ -111,37 +117,22 @@ export abstract class SimpleSinkBase implements Sink {
   commit(tree: Tree): Observable<void> {
     const actions = Observable.from(tree.actions);
     return (this.preCommit() || Observable.empty<void>())
-      .concat(new Observable(observer => actions.subscribe(observer)))
+      .concat(Observable.defer(() => actions))
       .concatMap((action: Action) => {
         const maybeAction = this.preCommitAction(action);
-        if (maybeAction instanceof Observable) {
-          return maybeAction;
-        } else if (maybeAction) {
+        if (!maybeAction) {
+          return Observable.of(action);
+        } else if (isAction(maybeAction)) {
           return Observable.of(maybeAction);
         } else {
-          return Observable.of(action);
+          return maybeAction;
         }
       })
-      .mergeMap(action => new Observable<Action>(o => {
-        return this.commitSingleAction(action)
-          .subscribe({
-            error(err) { o.error(err); },
-            complete() {
-              o.next(action);
-              o.complete();
-            }
-          });
-      }))
-      .mergeMap(action => this.postCommitAction(action) || Observable.empty<void>())
-      .concat(new Observable<void>(observer => { this._done().subscribe(observer); }))
-      .concat(new Observable<void>(observer => {
-        const maybeObservable = this.postCommit();
-        if (maybeObservable) {
-          maybeObservable.subscribe(observer);
-        } else {
-          observer.complete();
-        }
-      }))
-      .map(() => {});
+      .mergeMap((action: Action) => {
+        return this.commitSingleAction(action).ignoreElements().concat([action]);
+      })
+      .mergeMap((action: Action) => this.postCommitAction(action) || Observable.empty<void>())
+      .concat(Observable.defer(() => this._done()))
+      .concat(Observable.defer(() => this.postCommit() || Observable.empty<void>()));
   }
 }

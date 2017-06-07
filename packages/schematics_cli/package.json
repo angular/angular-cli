@@ -13,11 +13,11 @@
     "code generation",
     "schematics",
     "cli",
-    "Angular SDK"
+    "Angular DevKit"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/sdk.git"
+    "url": "https://github.com/angular/devkit.git"
   },
   "engines": {
     "node": ">= 6.9.0",
@@ -26,10 +26,10 @@
   "author": "Angular Authors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/angular/sdk/issues"
+    "url": "https://github.com/angular/devkit/issues"
   },
   "schematics": "./schematics/collection.json",
-  "homepage": "https://github.com/angular/sdk",
+  "homepage": "https://github.com/angular/devkit",
   "dependencies": {
     "@angular/schematics": "0.0.0"
   }

@@ -14,7 +14,7 @@ import {
   apply,
   chain,
   filter,
-  mergeWith,
+  merge,
   move,
   noop,
   normalizePath,
@@ -24,7 +24,6 @@ import {
 import * as stringUtils from '../strings';
 
 import * as ts from 'typescript';
-import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/merge';
 
 
@@ -97,6 +96,6 @@ export default function(options: any): Rule {
   return chain([
     filter(path => path.endsWith('.module.ts') && !path.endsWith('-routing.module.ts')),
     addDeclarationToNgModule(options),
-    mergeWith([templateSource])
+    merge([templateSource])
   ]);
 }

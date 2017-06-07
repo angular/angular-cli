@@ -1,18 +1,22 @@
 {
-  "name": "@angular/sdk",
+  "name": "@angular/devkit",
   "version": "0.0.0",
   "description": "Software Development Kit for Angular",
   "bin": {
-    "sdk-admin": "./bin/sdk-admin",
+    "devkit-admin": "./bin/devkit-admin",
     "schematics": "./bin/schematics"
   },
   "keywords": [],
   "scripts": {
-    "test": "./bin/sdk-admin test"
+    "admin": "./bin/devkit-admin",
+    "build": "tsc -p tsconfig.json",
+    "fix": "npm run lint -- --fix",
+    "lint": "tslint --config tslint.json --project tsconfig.json --type-check",
+    "test": "./bin/devkit-admin test"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/sdk.git"
+    "url": "https://github.com/angular/devkit.git"
   },
   "engines": {
     "node": ">= 6.9.0",
@@ -21,9 +25,9 @@
   "author": "Angular Authors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/angular/sdk/issues"
+    "url": "https://github.com/angular/devkit/issues"
   },
-  "homepage": "https://github.com/angular/sdk",
+  "homepage": "https://github.com/angular/devkit",
   "dependencies": {
     "@ngtools/json-schema": "^1.0.9",
     "@ngtools/logger": "^1.0.1",

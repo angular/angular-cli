@@ -21,6 +21,8 @@ import {
 } from '@angular/schematics/tooling';
 import {SchemaClassFactory} from '@ngtools/json-schema';
 
+import 'rxjs/add/operator/ignoreElements';
+
 
 /**
  * Show usage of the CLI tool, and exit the process.
@@ -193,28 +195,12 @@ if (schematic.description.schema) {
 schematic.call(options, host)
   .map((tree: Tree) => Tree.optimize(tree))
   .concatMap((tree: Tree) => {
-    return new Observable(o => dryRunSink.commit(tree).subscribe({
-      error(err: any) {
-        o.error(err);
-      },
-      complete() {
-        o.next(tree);
-        o.complete();
-      }
-    }));
+    return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));
   })
   .concatMap((tree: Tree) => {
     if (dryRun || error) {
       return Observable.of(tree);
     }
-    return new Observable(o => fsSink.commit(tree).subscribe({
-      error(err: any) {
-        o.error(err);
-      },
-      complete() {
-        o.next(tree);
-        o.complete();
-      }
-    }));
+    return fsSink.commit(tree).ignoreElements().concat(Observable.of(tree));
   })
   .subscribe({ error(err: Error) { console.error(err); } });

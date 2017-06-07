@@ -5,7 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {apply, callRule, callSource, chain} from './base';
+import {apply, chain} from './base';
+import {callRule, callSource} from './call';
 import {Rule, SchematicContext, Source} from '../engine/interface';
 import {Tree} from '../tree/interface';
 import {empty} from '../tree/static';

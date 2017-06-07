@@ -10,12 +10,9 @@
 require('../lib/bootstrap-local');
 
 const minimist = require('minimist');
+const path = require('path');
 
 const args = minimist(process.argv.slice(2));
+const scriptName = path.join('../scripts', args._.shift());
 
-
-switch (args._[0]) {
-  case 'test': require('../scripts/test').default(args); break;
-
-  default: console.log('Unknown command: ' + args._[0]); break;
-}
+require(scriptName).default(args);

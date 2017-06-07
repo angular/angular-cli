@@ -121,6 +121,15 @@ export function isContentAction(action: Action): action is CreateFileAction | Ov
 }
 
 
+export function isAction(action: any): action is Action {
+  const kind = action && action.kind;
+  return action !== null
+      && typeof action.id == 'number'
+      && typeof action.path == 'string'
+      && (kind == 'c' || kind == 'o' || kind == 'r' || kind == 'd');
+}
+
+
 // Create a file. If the file already exists then this is an error.
 export interface CreateFileAction extends ActionBase {
   readonly kind: 'c';

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {ExportStringRef} from './export-ref';
+import {FileSystemHost} from './file-system-host';
 import * as path from 'path';
 
 
@@ -36,8 +37,8 @@ describe('ExportStringRef', () => {
 
   it('works on package names', () => {
     // META
-    const ref = new ExportStringRef('@angular/schematics/tooling#ExportStringRef');
-    expect(ref.ref).toEqual(ExportStringRef);
+    const ref = new ExportStringRef('@angular/schematics/tooling#FileSystemHost');
+    expect(ref.ref).toEqual(FileSystemHost);
     expect(ref.path).toBe(__dirname);
     expect(ref.module).toBe(path.join(__dirname, 'index.ts'));
   });

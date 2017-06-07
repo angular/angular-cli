@@ -28,7 +28,7 @@ export class RegistryEngineHost extends FileSystemEngineHostBase {
 
     const json: FileSystemCollectionDesc = readJsonFile(path);
     if (!json) {
-      throw new Error(`Invalid path for collection: "${path}".`)
+      throw new Error(`Invalid path for collection: "${path}".`);
     }
 
     // Validate that the name is not in the registry already (and that the registry does not

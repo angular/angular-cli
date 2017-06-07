@@ -33,7 +33,7 @@ export class UnknownCollectionException extends BaseException {
 }
 export class UnknownSchematicException extends BaseException {
   constructor(name: string, collection: Collection<any, any>) {
-    super(`Schematic "${name}" not found in collection "${collection.name}".`);
+    super(`Schematic "${name}" not found in collection "${collection.description.name}".`);
   }
 }
 
@@ -68,11 +68,11 @@ export class SchematicEngine<CollectionT, SchematicT> implements Engine<Collecti
   createSchematic(
       name: string,
       collection: Collection<CollectionT, SchematicT>): Schematic<CollectionT, SchematicT> {
-    const collectionImpl = this._collectionCache.get(collection.name);
-    const schematicMap = this._schematicCache.get(collection.name);
+    const collectionImpl = this._collectionCache.get(collection.description.name);
+    const schematicMap = this._schematicCache.get(collection.description.name);
     if (!collectionImpl || !schematicMap || collectionImpl !== collection) {
       // This is weird, maybe the collection was created by another engine?
-      throw new UnknownCollectionException(collection.name);
+      throw new UnknownCollectionException(collection.description.name);
     }
 
     let schematic = schematicMap.get(name);
