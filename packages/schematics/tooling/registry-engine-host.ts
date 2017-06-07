@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {ExportStringRef} from './export-ref';
 import {FileSystemCollectionDesc, FileSystemEngineHostBase} from './file-system-engine-host-base';
 import {RuleFactory} from '../src/engine/interface';

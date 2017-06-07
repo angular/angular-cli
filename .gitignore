@@ -1,6 +1,5 @@
 # Outputs
 bazel-*
-build/
 dist/
 
 # IDEs
