@@ -571,6 +571,28 @@
           "default": true
         }
       }
+    },
+    "update": {
+      "type": "object",
+      "description": "Configuration for CLI update checks.",
+      "default": {},
+      "properties": {
+        "lastChecked": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": true
+        },
+        "checkFrequency": {
+          "type": "string",
+          "description": "Defines how often to check for an updated version.",
+          "default": "1d"
+        },
+        "includePrerelease": {
+          "type": "boolean",
+          "description": "Include pre-release versions when checking for updates.",
+          "default": false
+        }
+      }
     }
   },
   "additionalProperties": false

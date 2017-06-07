@@ -4,6 +4,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { oneLine } from 'common-tags';
 import { CliConfig } from '../models/config';
+import VersionCheckTask from '../tasks/version-check';
 
 const Command = require('../ember-cli/lib/models/command');
 const Blueprint = require('../ember-cli/lib/models/blueprint');
@@ -125,6 +126,16 @@ export default Command.extend({
     };
 
     return blueprint.install(blueprintOptions)
+      .then(() => {
+        const versionCheckTask = new VersionCheckTask({
+          ui: this.ui,
+          project: this.project
+        });
+        return versionCheckTask.run({
+          forceCheck: false,
+          includeUnstable: CliConfig.getValue('update.includePrerelease')
+        });
+      })
       .then(() => {
         const lintFix = commandOptions.lintFix !== undefined ?
           commandOptions.lintFix : CliConfig.getValue('defaults.lintFix');
