@@ -5,17 +5,18 @@
 const spawnSync = require( 'child_process').spawnSync;
 const fs = require('fs');
 const temp = require('temp');
-const { blue, green, red, gray, yellow } = require('chalk');
+const { blue, green, gray } = require('chalk');
 
 const path = require('path');
 const glob = require('glob');
-const cli = 'https://github.com/angular/angular-cli.git';
 const cliBuilds = 'https://github.com/angular/cli-builds.git';
 const ngToolsWebpackBuilds = 'https://github.com/angular/ngtools-webpack-builds.git';
 
 
 class Executor {
-  constructor(cwd) { this._cwd = cwd; }
+  constructor(cwd) {
+    this._cwd = cwd;
+  }
 
   execute(command, ...args) {
     args = args.filter(x => x !== undefined);
@@ -32,9 +33,15 @@ class Executor {
     }
   }
 
-  git(...args) { return this.execute('git', ...args); }
-  npm(...args) { return this.execute('npm', ...args); }
-  rm(...args) { return this.execute('rm', ...args); }
+  git(...args) {
+    return this.execute('git', ...args);
+  }
+  npm(...args) {
+    return this.execute('npm', ...args);
+  }
+  rm(...args) {
+    return this.execute('rm', ...args);
+  }
 
   glob(pattern, options) {
     return glob.sync(pattern, Object.assign({}, options || {}, { cwd: this._cwd }));
@@ -68,7 +75,7 @@ class Executor {
 
   updateVersion(hash) {
     const packageJson = JSON.parse(this.read('package.json'));
-    packageJson.version = `${packageJson.version}-${hash.substr(1, 7)}`;
+    packageJson.version = `${packageJson.version}-${hash}`;
     this.write('package.json', JSON.stringify(packageJson, null, 2));
   }
 
@@ -86,7 +93,7 @@ function main() {
   const tempRoot = temp.mkdirSync('angular-cli-builds');
   const tempExec = new Executor(tempRoot);
 
-  console.log(green(`Cloning builds repos...\n`));
+  console.log(green('Cloning builds repos...\n'));
   tempExec.git('clone', cliBuilds);
   tempExec.git('clone', ngToolsWebpackBuilds);
 
