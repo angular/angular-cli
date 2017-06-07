@@ -80,7 +80,7 @@ class Executor {
 }
 
 
-async function main() {
+function main() {
   const cliPath = process.cwd();
   const cliExec = new Executor(cliPath);
   const tempRoot = temp.mkdirSync('angular-cli-builds');
@@ -141,6 +141,4 @@ async function main() {
   cliBuildsExec.git('push', '--tags');
 }
 
-main()
-  .then(() => console.log(green('All good. Thank you.')))
-  .catch(err => console.log(red('Error happened. Details:\n' + err)));
+main();
