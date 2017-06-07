@@ -34,7 +34,7 @@ Default applications are created in a directory of the same name, with an initia
     <code>--inline-style</code> (alias: <code>-is</code>) <em>default value: false</em>
   </p>
   <p>
-    Should have an inline style.
+    Determine whether generated component styles will be inlined in the component code, or a seperate styles file.
   </p>
 </details>
 
@@ -44,7 +44,7 @@ Default applications are created in a directory of the same name, with an initia
     <code>--inline-template</code> (alias: <code>-it</code>) <em>default value: false</em>
   </p>
   <p>
-    Should have an inline template.
+    Determine whether generated component templates will be inlined in the component code, or a seperate template file.
   </p>
 </details>
 
