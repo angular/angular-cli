@@ -26,3 +26,33 @@ and then we edit the `package.json` file's start script to be
 ```
 
 now run it with `npm start`
+
+### Multiple entries
+
+If you need to proxy multiple entries to the same target define the configuration in `proxy.conf.js` e.g.
+
+```js
+const PROXY_CONFIG = [
+    {
+        context: [
+            "/my",
+            "/many",
+            "/endpoints",
+            "/i",
+            "/need",
+            "/to",
+            "/proxy"
+        ],
+        target: "http://localhost:3000",
+        secure: false
+    }
+]
+
+module.exports = PROXY_CONFIG;
+```
+
+and make sure to point to the right file
+
+```json
+"start": "ng serve --proxy-config proxy.conf.js",
+```
