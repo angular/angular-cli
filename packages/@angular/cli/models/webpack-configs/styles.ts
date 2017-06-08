@@ -65,10 +65,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           }
 
           if (deployUrl.match(/:\/\//)) {
-            // If deployUrl contains a scheme, ignore baseHref use deployUrl as is.
+            // If deployUrl contains a scheme, ignore baseHref and use deployUrl as is.
             return `${deployUrl.replace(/\/$/, '')}${URL}`;
           } else if (baseHref.match(/:\/\//)) {
-            // If baseHref contains a scheme, include it as is.
+            // If baseHref contains no scheme, include it as is.
             return baseHref.replace(/\/$/, '') +
                 `/${deployUrl}/${URL}`.replace(/\/\/+/g, '/');
           } else {
