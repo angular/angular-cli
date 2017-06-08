@@ -97,7 +97,8 @@ export class NgCliWebpackConfig {
   public mergeConfigs(buildOptions: BuildOptions, appConfig: any) {
     const mergeableOptions = {
       outputPath: appConfig.outDir,
-      deployUrl: appConfig.deployUrl
+      deployUrl: appConfig.deployUrl,
+      baseHref: appConfig.baseHref
     };
 
     return Object.assign({}, mergeableOptions, buildOptions);
