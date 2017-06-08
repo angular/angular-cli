@@ -131,6 +131,17 @@ export default Task.extend({
       }
     }
 
+    let setupScript = undefined;
+    if (serveTaskOptions.setupScript) {
+      const setupPath = path.resolve(this.project.root, serveTaskOptions.setupScript);
+      if (fs.existsSync(setupPath)) {
+        setupScript = require(setupPath);
+      } else {
+        const message = 'Setup script file ' + setupPath + ' does not exist.';
+        return Promise.reject(new SilentError(message));
+      }
+    }
+
     let sslKey: string = null;
     let sslCert: string = null;
     if (serveTaskOptions.ssl) {
@@ -153,6 +164,7 @@ export default Task.extend({
       },
       stats: statsConfig,
       inline: true,
+      setup: setupScript,
       proxy: proxyConfig,
       compress: serveTaskOptions.target === 'production',
       watchOptions: {

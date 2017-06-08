@@ -19,6 +19,7 @@ export interface ServeTaskOptions extends BuildOptions {
   port?: number;
   host?: string;
   proxyConfig?: string;
+  setupScript?: string;
   liveReload?: boolean;
   publicHost?: string;
   disableHostCheck?: boolean;
@@ -51,6 +52,12 @@ export const baseServeCommandOptions: any = overrideOptions([
     type: 'Path',
     aliases: ['pc'],
     description: 'Proxy configuration file.'
+  },
+  {
+    name: 'setup-script',
+    type: 'Path',
+    aliases: ['su'],
+    description: 'Setup script file.'
   },
   {
     name: 'ssl',

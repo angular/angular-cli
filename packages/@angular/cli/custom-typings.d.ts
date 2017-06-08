@@ -4,6 +4,7 @@ interface IWebpackDevServerConfigurationOptions {
   historyApiFallback?: {[key: string]: any} | boolean;
   compress?: boolean;
   proxy?: {[key: string]: string};
+  setup?: Function;
   staticOptions?: any;
   quiet?: boolean;
   noInfo?: boolean;
