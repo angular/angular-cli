@@ -135,6 +135,7 @@
     "npm-run": "^4.1.0",
     "npm-run-all": "^4.0.0",
     "object-assign": "^4.0.1",
+    "process-nextick-args": "^1.0.7",
     "request": "^2.74.0",
     "resolve-bin": "^0.4.0",
     "rewire": "^2.5.1",
