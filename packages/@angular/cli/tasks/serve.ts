@@ -165,6 +165,7 @@ export default Task.extend({
       },
       contentBase: false,
       public: serveTaskOptions.publicHost,
+      publicPath: serveTaskOptions.baseHref,
       disableHostCheck: serveTaskOptions.disableHostCheck
     };
 
