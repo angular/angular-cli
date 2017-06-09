@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {FileSystemTreeHost} from '@angular/schematics';
+import {FileSystemTreeHost} from '../src/tree/filesystem';
 import {readFileSync, readdirSync, statSync} from 'fs';
 import {join} from 'path';
 

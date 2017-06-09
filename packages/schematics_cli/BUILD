@@ -5,6 +5,7 @@
 package(default_visibility=["//visibility:public"])
 load("@io_bazel_rules_typescript//:defs.bzl", "ts_library")
 load("@io_bazel_rules_typescript//internal:node.bzl", "node_binary")
+licenses(["notice"])  # MIT License
 
 
 ts_library(

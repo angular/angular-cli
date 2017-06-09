@@ -4,6 +4,7 @@
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility=["//visibility:public"])
 load("@io_bazel_rules_typescript//:defs.bzl", "ts_library")
+licenses(["notice"])  # MIT License
 
 
 ts_library(
@@ -15,4 +16,6 @@ ts_library(
         "//packages/schematics/src/tree",
     ],
     tsconfig = "//:tsconfig.json",
+    module_name = "@angular/schematics/tooling",
+    module_root = ".",
 )

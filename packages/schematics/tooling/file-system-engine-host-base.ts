@@ -6,16 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {FileSystemHost} from './file-system-host';
+import {FileSystemTree} from '../src/tree/filesystem';
 import {
   Collection,
   CollectionDescription,
   EngineHost,
-  FileSystemTree,
   RuleFactory,
   SchematicDescription,
   Source,
-  TypedSchematicContext,
-} from '../src/index';
+  TypedSchematicContext
+} from '../src/engine/interface';
 
 import {dirname, join, resolve} from 'path';
 import {Url} from 'url';
