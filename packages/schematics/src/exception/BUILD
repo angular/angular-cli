@@ -9,7 +9,20 @@ licenses(["notice"])  # MIT License
 
 ts_library(
     name = "exception",
-    srcs = glob(["*.ts"]),
+    srcs = glob(
+        include = ["*.ts"],
+        exclude = ["*_spec.ts"],
+    ),
     deps = [],
+    tsconfig = "//:tsconfig.json",
+)
+
+
+ts_library(
+    name = "spec",
+    srcs = glob(["*_spec.ts"]),
+    deps = [
+        ":exception",
+    ],
     tsconfig = "//:tsconfig.json",
 )

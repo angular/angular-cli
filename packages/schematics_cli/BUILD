@@ -10,11 +10,16 @@ licenses(["notice"])  # MIT License
 
 ts_library(
     name = "schematics",
-    srcs = glob([
-        "schematics/*.ts",
-        "schematics/*/index.ts",
-        "schematics/component/utility/*.ts"
-    ]),
+    srcs = glob(
+        include = [
+            "schematics/*.ts",
+            "schematics/*/index.ts",
+            "schematics/component/utility/*.ts"
+        ],
+        exclude = [
+            "**/*_spec.ts"
+        ]
+    ),
     deps = [
         "//packages/schematics",
     ],
@@ -24,7 +29,10 @@ ts_library(
 
 ts_library(
     name = "cli_lib",
-    srcs = glob([ "src/*.ts" ]),
+    srcs = glob(
+        include = ["src/*.ts"],
+        exclude = ["src/*_spec.ts"],
+    ),
     deps = [
         "//packages/schematics",
     ],

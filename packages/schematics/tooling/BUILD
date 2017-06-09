@@ -9,7 +9,10 @@ licenses(["notice"])  # MIT License
 
 ts_library(
     name = "tooling",
-    srcs = glob(["*.ts"]),
+    srcs = glob(
+        include = ["*.ts"],
+        exclude = ["*_spec.ts"],
+    ),
     deps = [
         "//packages/schematics/src/engine",
         "//packages/schematics/src/exception",
@@ -18,4 +21,14 @@ ts_library(
     tsconfig = "//:tsconfig.json",
     module_name = "@angular/schematics/tooling",
     module_root = ".",
+)
+
+
+ts_library(
+    name = "spec",
+    srcs = glob(["*_spec.ts"]),
+    deps = [
+        ":tooling",
+    ],
+    tsconfig = "//:tsconfig.json",
 )

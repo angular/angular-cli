@@ -4,16 +4,28 @@
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility=["//visibility:public"])
 load("@io_bazel_rules_typescript//:defs.bzl", "ts_library")
-
 licenses(["notice"])  # MIT License
 
 
 ts_library(
     name = "engine",
-    srcs = glob(["*.ts"]),
+    srcs = glob(
+        include = ["*.ts"],
+        exclude = ["*_spec.ts"],
+    ),
     deps = [
         "//packages/schematics/src/exception",
         "//packages/schematics/src/tree",
+    ],
+    tsconfig = "//:tsconfig.json",
+)
+
+
+ts_library(
+    name = "spec",
+    srcs = glob(["*_spec.ts"]),
+    deps = [
+        ":engine",
     ],
     tsconfig = "//:tsconfig.json",
 )

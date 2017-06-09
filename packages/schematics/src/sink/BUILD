@@ -9,10 +9,23 @@ licenses(["notice"])  # MIT License
 
 ts_library(
     name = "sink",
-    srcs = glob(["*.ts"]),
+    srcs = glob(
+        include = ["*.ts"],
+        exclude = ["*_spec.ts"],
+    ),
     deps = [
         "//packages/schematics/src/exception",
         "//packages/schematics/src/tree",
+    ],
+    tsconfig = "//:tsconfig.json",
+)
+
+
+ts_library(
+    name = "spec",
+    srcs = glob(["*_spec.ts"]),
+    deps = [
+        ":sink",
     ],
     tsconfig = "//:tsconfig.json",
 )
