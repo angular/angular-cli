@@ -5,7 +5,7 @@
 package(default_visibility=["//visibility:private"])
 load("@io_bazel_rules_typescript//:defs.bzl", "ts_library")
 
-exports_files(["tsconfig.json"])
+exports_files(["tsconfig.json"])  # @external
 
 
 ts_library(
