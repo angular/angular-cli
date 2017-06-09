@@ -228,8 +228,11 @@ export default Blueprint.extend({
   afterInstall: function (options: any) {
     const appConfig = getAppFromConfig(this.options.app);
     if (options.prefix && appConfig.prefix && appConfig.prefix !== options.prefix) {
-      console.log(chalk.yellow(oneLine`You are using different prefix from app,
-       you might get lint errors. Please update "tslint.json" accordingly.`));
+      this._writeStatusToUI(chalk.yellow, 'WARNING', oneLine`
+        You are using a different prefix than the app ['${appConfig.prefix}']
+        and may receive lint failures.
+        Please verify/update 'tslint.json' accordingly.
+      `);
     }
 
     const returns: Array<any> = [];
