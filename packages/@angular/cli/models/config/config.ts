@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
+import { stripIndent } from 'common-tags';
 
 import {SchemaClass, SchemaClassFactory} from '@ngtools/json-schema';
 
@@ -73,15 +74,13 @@ export class CliConfig<JsonType> {
   }
 
   static fromConfigPath<T>(configPath: string, otherPath: string[] = []): CliConfig<T> {
-    const configContent = fs.existsSync(configPath)
-      ? ts.sys.readFile(configPath)
-      : '{}';
+    const configContent = ts.sys.readFile(configPath) || '{}';
     const schemaContent = fs.readFileSync(DEFAULT_CONFIG_SCHEMA_PATH, 'utf-8');
 
     let otherContents = new Array<string>();
     if (configPath !== otherPath[0]) {
       otherContents = otherPath
-        .map(path => fs.existsSync(path) && ts.sys.readFile(path))
+        .map(path => ts.sys.readFile(path))
         .filter(content => !!content);
     }
 
@@ -92,18 +91,28 @@ export class CliConfig<JsonType> {
     try {
       content = JSON.parse(configContent);
     } catch (err) {
-      throw new InvalidConfigError(
-        'Parsing .angular-cli.json failed. Please make sure your .angular-cli.json'
-        + ' is valid JSON. Error:\n' + err
-      );
+      throw new InvalidConfigError(stripIndent`
+        Parsing '${configPath}' failed. Ensure the file is valid JSON.
+        Error: ${err.message}
+      `);
     }
+
+    others = otherContents.map(otherContent => {
+      try {
+        return JSON.parse(otherContent);
+      } catch (err) {
+        throw new InvalidConfigError(stripIndent`
+          Parsing '${configPath}' failed. Ensure the file is valid JSON.
+          Error: ${err.message}
+        `);
+      }
+    });
 
     try {
       schema = JSON.parse(schemaContent);
-      others = otherContents.map(otherContent => JSON.parse(otherContent));
     } catch (err) {
       throw new InvalidConfigError(
-        `Parsing Angular CLI schema or other configuration files failed. Error:\n${err}`
+        `Parsing Angular CLI schema failed. Error:\n${err.message}`
       );
     }
 
