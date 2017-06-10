@@ -11,11 +11,9 @@ licenses(["notice"])  # MIT License
 
 ts_library(
     name = "schematics_tools",
-    srcs = [
-      "src/index.ts",
-    ],
+    srcs = glob(["src/*.ts"]),
     deps = [
-      "//packages/schematics"
+        "//packages/angular/schematics"
     ],
     tsconfig = "//:tsconfig.json",
     visibility = [ "//visibility:public" ],

@@ -7,7 +7,8 @@
  */
 import {ExportStringRef} from './export-ref';
 import {FileSystemEngineHostBase} from './file-system-engine-host-base';
-import {RuleFactory} from '../src/engine/interface';
+
+import {RuleFactory} from '@angular/schematics';
 
 import {join} from 'path';
 

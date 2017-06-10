@@ -11,6 +11,9 @@ import {FileDoesNotExistException} from '../exception/exception';
 import {UpdateBuffer} from '../utility/update-buffer';
 
 import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/map';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/concat';
 import 'rxjs/add/operator/reduce';

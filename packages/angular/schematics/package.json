@@ -1,7 +1,7 @@
 {
   "name": "@angular/schematics",
   "version": "0.0.0",
-  "description": "Schematics library for Code Generation.",
+  "description": "Angular Schematics - Library",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "keywords": [

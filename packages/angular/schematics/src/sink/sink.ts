@@ -23,6 +23,7 @@ import 'rxjs/add/operator/concat';
 import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/ignoreElements';
 import 'rxjs/add/operator/last';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/observable/from';
 

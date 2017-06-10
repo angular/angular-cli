@@ -6,20 +6,21 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {FileSystemHost} from './file-system-host';
-import {FileSystemTree} from '@angular/schematics';
+import {readJsonFile} from './file-system-utility';
+
 import {
   Collection,
   CollectionDescription,
   EngineHost,
+  FileSystemTree,
   RuleFactory,
   SchematicDescription,
   Source,
   TypedSchematicContext
-} from '../src/engine/interface';
+} from '@angular/schematics';
 
 import {dirname, join, resolve} from 'path';
 import {Url} from 'url';
-import {readJsonFile} from './file-system-utility';
 
 
 export interface FileSystemCollectionDescription {
