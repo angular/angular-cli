@@ -22,6 +22,14 @@ notifications:
 env:
   global:
   - SAUCE_ACCESS_KEY=''
+  - CXX=g++-4.8
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 
 before_install:
   # Updating NPM to relevant version >= 3 on Node.JS LTS
