@@ -1,5 +1,5 @@
 {
-  "name": "@angular/schematics-cli",
+  "name": "@_/schematics-cli",
   "version": "0.0.0",
   "description": "CLI tool for Angular",
   "main": "src/cli.js",
@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/angular/devkit",
   "dependencies": {
-    "@angular/schematics": "0.0.0"
+    "@angular/schematics": "0.0.0",
+    "@angular/schematics-tools": "0.0.0"
   }
 }

@@ -29,5 +29,6 @@
   },
   "homepage": "https://github.com/angular/devkit",
   "dependencies": {
+    "@angular/schematics": "0.0.0"
   }
 }

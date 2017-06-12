@@ -32,16 +32,15 @@
       "node"
     ],
     "paths": {
-      "@angular/schematics": [ "./packages/schematics/src/index" ],
-      "@angular/schematics/tooling": [ "./packages/schematics/tooling/index" ]
+      "@angular/schematics": [ "./packages/angular/schematics/src/index" ],
+      "@angular/schematics-tools": [ "./packages/angular/schematics_tools/src/index" ]
     }
   },
   "exclude": [
     "bazel-*/**/*",
     "dist/**/*",
     "node_modules/**/*",
-    "packages/schematics_cli/schematics/*/files/**/*",
-    "packages/schematics_workbench/node_modules/**/*",
+    "packages/schematics/angular/*/files/**/*",
     "tmp/**/*"
   ]
 }

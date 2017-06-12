@@ -2,11 +2,14 @@
   "extends": "../../../tsconfig.json",
 
   "compilerOptions": {
-    "outDir": "../../../dist/@angular/schematics-tools",
+    "outDir": "../../../dist/@schematics/angular",
     "rootDir": ".",
     "baseUrl": "",
     "paths": {
       "@angular/schematics": [ "../../../dist/@angular/schematics/src/index" ]
     }
-  }
+  },
+  "exclude": [
+    "*/files/**/*"
+  ]
 }
