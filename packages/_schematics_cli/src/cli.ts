@@ -18,7 +18,7 @@ import {
 import {
   FileSystemHost,
   NodeModulesEngineHost
-} from '@angular/schematics/tooling';
+} from '@angular/schematics-tools';
 import {SchemaClassFactory} from '@ngtools/json-schema';
 
 import 'rxjs/add/operator/ignoreElements';
@@ -56,7 +56,7 @@ function usage(exitCode = 0): never {
  * and show usage.
  *
  * In the case where a collection name isn't part of the argument, the default is to use this
- * package (@angular/schematics-cli) as the collection.
+ * package (@schematics/angular) as the collection.
  *
  * This logic is entirely up to the tooling.
  *
@@ -64,7 +64,7 @@ function usage(exitCode = 0): never {
  * @return {{collection: string, schematic: (string)}}
  */
 function parseSchematicName(str: string | null): { collection: string, schematic: string } {
-  let collection = '@angular/schematics-cli';
+  let collection = '@schematics/angular';
 
   if (!str) {
     usage(1);

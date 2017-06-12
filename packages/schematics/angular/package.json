@@ -1,15 +1,14 @@
 {
-  "name": "@angular/schematics",
+  "name": "@schematics/angular",
   "version": "0.0.0",
-  "description": "CLI tool for Angular",
-  "main": "src/index.js",
-  "typings": "src/index.d.ts",
+  "description": "Schematics specific to Angular",
   "keywords": [
     "angular",
     "sdk",
     "blueprints",
     "code generation",
     "schematics",
+    "cli",
     "Angular DevKit"
   ],
   "repository": {
@@ -25,7 +24,6 @@
   "bugs": {
     "url": "https://github.com/angular/devkit/issues"
   },
-  "homepage": "https://github.com/angular/devkit",
-  "dependencies": {
-  }
+  "schematics": "./collection.json",
+  "homepage": "https://github.com/angular/devkit"
 }

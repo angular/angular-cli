@@ -1,0 +1,32 @@
+{
+  "name": "@angular/schematics",
+  "version": "0.0.0",
+  "description": "Schematics library for Code Generation.",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "keywords": [
+    "angular",
+    "sdk",
+    "blueprints",
+    "scaffolding",
+    "code generation",
+    "schematics",
+    "Angular DevKit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/devkit.git"
+  },
+  "engines": {
+    "node": ">= 6.9.0",
+    "npm": ">= 3.0.0"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/devkit/issues"
+  },
+  "homepage": "https://github.com/angular/devkit",
+  "dependencies": {
+  }
+}

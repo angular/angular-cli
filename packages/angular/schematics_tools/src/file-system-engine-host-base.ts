@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {FileSystemHost} from './file-system-host';
-import {FileSystemTree} from '../src/tree/filesystem';
+import {FileSystemTree} from '@angular/schematics';
 import {
   Collection,
   CollectionDescription,
