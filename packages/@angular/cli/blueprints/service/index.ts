@@ -21,16 +21,19 @@ export default Blueprint.extend({
     {
       name: 'flat',
       type: Boolean,
+      aliases: ['f'],
       description: 'Flag to indicate if a dir is created.'
     },
     {
       name: 'spec',
       type: Boolean,
+      aliases: ['sp'],
       description: 'Specifies if a spec file is generated.'
     },
     {
       name: 'module',
-      type: String, aliases: ['m'],
+      type: String,
+      aliases: ['m'],
       description: 'Specifies where the service should be provided.'
     },
     {

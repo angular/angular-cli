@@ -15,6 +15,7 @@ export default Blueprint.extend({
     {
       name: 'spec',
       type: Boolean,
+      aliases: ['sp'],
       description: 'Specifies if a spec file is generated.'
     },
     {

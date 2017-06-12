@@ -22,34 +22,40 @@ export default Blueprint.extend({
     {
       name: 'flat',
       type: Boolean,
+      aliases: ['f'],
       description: 'Flag to indicate if a dir is created.'
     },
     {
       name: 'prefix',
       type: String,
       default: null,
+      aliases: ['p'],
       description: 'Specifies whether to use the prefix.'
     },
     {
       name: 'spec',
       type: Boolean,
+      aliases: ['sp'],
       description: 'Specifies if a spec file is generated.'
     },
     {
       name: 'skip-import',
       type: Boolean,
       default: false,
+      aliases: ['ski'],
       description: 'Allows for skipping the module import.'
     },
     {
       name: 'module',
-      type: String, aliases: ['m'],
+      type: String,
+      aliases: ['m'],
       description: 'Allows specification of the declaring module.'
     },
     {
       name: 'export',
       type: Boolean,
       default: false,
+      aliases: ['e'],
       description: 'Specifies if declaring module exports the component.'
     },
     {

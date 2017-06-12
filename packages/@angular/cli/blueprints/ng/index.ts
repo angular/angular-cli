@@ -12,7 +12,7 @@ export default Blueprint.extend({
     { name: 'source-dir', type: String, default: 'src', aliases: ['sd'] },
     { name: 'prefix', type: String, default: 'app', aliases: ['p'] },
     { name: 'style', type: String },
-    { name: 'routing', type: Boolean, default: false },
+    { name: 'routing', type: Boolean, default: false, aliases: ['r'] },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
     { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
