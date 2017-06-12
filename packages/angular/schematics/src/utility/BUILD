@@ -17,6 +17,7 @@ ts_library(
         "//packages/angular/schematics/src/exception",
         # @typings: es2015.collection
         # @typings: node
+        # @typings: typescript
     ],
     tsconfig = "//:tsconfig.json",
 )
