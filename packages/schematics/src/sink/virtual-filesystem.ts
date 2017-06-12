@@ -12,7 +12,9 @@ import {UpdateBuffer} from '../utility/update-buffer';
 
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/merge';
+import 'rxjs/add/observable/concat';
 import 'rxjs/add/operator/reduce';
+import 'rxjs/add/operator/do';
 
 
 export interface VirtualFileSystemSinkHost {
