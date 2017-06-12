@@ -53,8 +53,8 @@
   "defaults": {
     "styleExt": "<%= styleExt %>",<% if (!minimal) { %>
     "component": {
-      "inlineStyle": <%= inlineStyle %>,
-      "inlineTemplate": <%= inlineTemplate %>
+      "inlineStyle": <%= inlineStyleAll %>,
+      "inlineTemplate": <%= inlineTemplateAll %>
     }<% } else { %>
     "component": {
       "spec": false,

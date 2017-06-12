@@ -21,6 +21,8 @@ const InitCommand: any = Command.extend({
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
+    { name: 'inline-style-all', type: Boolean, default: false, aliases: ['isa'] },
+    { name: 'inline-template-all', type: Boolean, default: false, aliases: ['ita'] },
     {
       name: 'minimal',
       type: Boolean,

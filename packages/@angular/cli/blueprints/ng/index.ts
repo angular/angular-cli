@@ -1,7 +1,7 @@
-import {CliConfig} from '../../models/config';
+import { CliConfig } from '../../models/config';
 
-const Blueprint   = require('../../ember-cli/lib/models/blueprint');
-const path        = require('path');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
+const path = require('path');
 const stringUtils = require('ember-cli-string-utils');
 const getFiles = Blueprint.prototype.files;
 
@@ -15,25 +15,23 @@ export default Blueprint.extend({
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
+    { name: 'inline-style-all', type: Boolean, default: false, aliases: ['isa'] },
+    { name: 'inline-template-all', type: Boolean, default: false, aliases: ['ita'] },
     { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
-    { name: 'minimal',
-      type: Boolean,
-      default: false,
-      description: 'Should create a minimal app.'
-     }
+    { name: 'minimal', type: Boolean, default: false }
   ],
 
-  beforeInstall: function(options: any) {
+  beforeInstall: function (options: any) {
     if (options.ignoredUpdateFiles && options.ignoredUpdateFiles.length > 0) {
       return Blueprint.ignoredUpdateFiles =
         Blueprint.ignoredUpdateFiles.concat(options.ignoredUpdateFiles);
     }
   },
 
-  locals: function(options: any) {
+  locals: function (options: any) {
     if (options.minimal) {
-      options.inlineStyle = true;
-      options.inlineTemplate = true;
+      options.inlineStyleAll = true;
+      options.inlineTemplateAll = true;
       options.skipTests = true;
     }
 
@@ -63,39 +61,38 @@ export default Blueprint.extend({
       styleExt: this.styleExt,
       relativeRootPath: relativeRootPath,
       routing: options.routing,
-      inlineStyle: options.inlineStyle,
-      inlineTemplate: options.inlineTemplate,
+      inlineStyle: options.inlineStyle || options.inlineStyleAll,
+      inlineTemplate: options.inlineTemplate || options.inlineTemplateAll,
+      inlineStyleAll: options.inlineStyleAll,
+      inlineTemplateAll: options.inlineTemplateAll,
       tests: this.tests,
       minimal: options.minimal
     };
   },
 
-  files: function() {
+  files: function () {
     let fileList = getFiles.call(this) as Array<string>;
 
-    if (this.options && !this.options.routing) {
-      fileList = fileList.filter(p => p.indexOf('app-routing.module.ts') < 0);
-    }
-    if (this.options && this.options.inlineTemplate) {
-      fileList = fileList.filter(p => p.indexOf('app.component.html') < 0);
-    }
-    if (this.options && this.options.inlineStyle) {
-      fileList = fileList.filter(p => p.indexOf('app.component.__styleext__') < 0);
-    }
-    if (this.options && this.options.skipGit) {
-      fileList = fileList.filter(p => p.indexOf('gitignore') < 0);
-    }
+    if (this.options) {
+      const inlineTemplate = this.options.inlineTemplate || this.options.inlineTemplateAll;
+      const inlineStyle = this.options.inlineStyle || this.options.inlineStyleAll;
+      const fileFilters: { filter: boolean, fileName: string }[] = [
+        { filter: !this.options.routing, fileName: 'app-routing.module.ts' },
+        { filter: inlineTemplate , fileName: 'app.component.html' },
+        { filter: inlineStyle, fileName: 'app.component.__styleext__' },
+        { filter: this.options.skipGit, fileName: 'gitignore' },
+        { filter: this.options.skipTests, fileName: 'app.component.spec.ts' }
+      ];
 
-    if (this.options && this.options.skipTests) {
-      fileList = fileList.filter(p => p.indexOf('app.component.spec.ts') < 0);
-    }
-
-    if (this.options && this.options.minimal) {
-      const toRemoveList: RegExp[] = [/e2e\//, /editorconfig/, /README/, /karma.conf.js/,
-        /protractor.conf.js/, /test.ts/, /tsconfig.spec.json/, /tslint.json/, /favicon.ico/];
-      fileList = fileList.filter(p => {
-        return !toRemoveList.some(re => re.test(p));
+      fileFilters.filter(f => f.filter).forEach(({fileName}) => {
+          fileList = fileList.filter(p => p.indexOf(fileName) < 0);
       });
+
+      if (this.options.minimal) {
+        const toRemoveList: RegExp[] = [/e2e\//, /editorconfig/, /README/, /karma.conf.js/,
+          /protractor.conf.js/, /test.ts/, /tsconfig.spec.json/, /tslint.json/, /favicon.ico/];
+        fileList = fileList.filter(p => !toRemoveList.some(re => re.test(p)));
+      }
     }
 
     const cliConfig = CliConfig.fromProject();

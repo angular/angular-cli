@@ -119,21 +119,49 @@ const NewCommand = Command.extend({
       type: Boolean,
       default: false,
       aliases: ['is'],
-      description: 'Should have an inline style.'
+      description: oneLine`
+        Determine whether the generated AppComponent styles will be
+        inlined in the component code, or a seperate styles file.
+      `
+    },
+    {
+      name: 'inline-style-all',
+      type: Boolean,
+      default: false,
+      aliases: ['isa'],
+      description: oneLine`
+        Determine whether all generated components' styles will be
+        inlined in the component code, or a seperate styles file.
+        ${changeLater('defaults.component.inlineStyle')}.
+      `
     },
     {
       name: 'inline-template',
       type: Boolean,
       default: false,
       aliases: ['it'],
-      description: 'Should have an inline template.'
-     },
-     {
+      description: oneLine`
+        Determine whether the generated AppComponent template will be
+        inlined in the component code, or a seperate template file.
+      `
+    },
+    {
+      name: 'inline-template-all',
+      type: Boolean,
+      default: false,
+      aliases: ['ita'],
+      description: oneLine`
+        Determine whether all generated components' templates will be
+        inlined in the component code, or a seperate template file.
+        ${changeLater('defaults.component.inlineTemplate')}.
+      `
+    },
+    {
       name: 'minimal',
       type: Boolean,
       default: false,
       description: 'Should create a minimal app.'
-     }
+    }
   ],
 
   isProject: function (projectPath: string) {
