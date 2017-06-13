@@ -11,12 +11,32 @@ licenses(["notice"])  # MIT License
 
 ts_library(
     name = "schematics_tools",
-    srcs = glob(["src/*.ts"]),
+    srcs = glob(
+        include = ["src/*.ts"],
+        exclude = ["src/*_spec.ts"],
+    ),
     deps = [
-        "//packages/angular/schematics"
+        "//packages/angular/schematics",
+        # @typings: node
     ],
     tsconfig = "//:tsconfig.json",
     visibility = [ "//visibility:public" ],
     module_name = "@angular/schematics-tools",
-    module_root = "src"
+    module_root = "src",
+)
+
+ts_library(
+    name = "spec",
+    srcs = glob(
+        include = ["src/*_spec.ts"],
+    ),
+    deps = [
+        ":schematics_tools",
+        # @typings: node
+        # @typings: jasmine
+    ],
+    tsconfig = "//:tsconfig.json",
+    visibility = [ "//visibility:public" ],
+    module_name = "@angular/schematics-tools",
+    module_root = "src",
 )

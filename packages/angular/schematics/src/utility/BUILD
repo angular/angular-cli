@@ -28,6 +28,7 @@ ts_library(
     srcs = glob(["*_spec.ts"]),
     deps = [
         ":utility",
+        # @typings: jasmine
     ],
     tsconfig = "//:tsconfig.json",
 )
