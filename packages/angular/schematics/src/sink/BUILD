@@ -34,6 +34,7 @@ ts_library(
         "//packages/angular/schematics/src/tree",
         "//packages/angular/schematics/src/utility",
         # @deps: glob
+        # @deps: rxjs
         # @typings: jasmine
         # @typings: node
     ],

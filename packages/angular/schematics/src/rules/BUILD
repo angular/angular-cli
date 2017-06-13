@@ -35,6 +35,9 @@ ts_library(
     srcs = glob(["*_spec.ts"]),
     deps = [
         ":rules",
+        "//packages/angular/schematics/src/engine",
+        "//packages/angular/schematics/src/tree",
+        # @deps: rxjs
         # @typings: jasmine
     ],
     tsconfig = "//:tsconfig.json",
