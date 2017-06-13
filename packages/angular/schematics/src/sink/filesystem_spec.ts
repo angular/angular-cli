@@ -7,7 +7,7 @@
  */
 import {FileSystemSink} from './filesystem';
 import {FileSystemTree} from '../tree/filesystem';
-import {NodeJsHost} from '../tree/node-host';
+import {InMemoryFileSystemTreeHost} from '../tree/memory-host';
 import {optimize} from '../tree/static';
 
 import * as fs from 'fs';
@@ -15,10 +15,6 @@ import * as glob from 'glob';
 import {join} from 'path';
 
 const temp = require('temp');
-
-
-const root = join((global as any)._DevKitRoot, 'tests/@angular/schematics/assets/1/');
-const host = new NodeJsHost(root);
 
 
 describe('FileSystemSink', () => {
@@ -29,6 +25,11 @@ describe('FileSystemSink', () => {
   });
 
   it('works', done => {
+    const host = new InMemoryFileSystemTreeHost({
+      '/hello': 'world',
+      '/sub/directory/file2': '',
+      '/sub/file1': ''
+    });
     const tree = new FileSystemTree(host, true);
 
     tree.create('/test', 'testing 1 2');

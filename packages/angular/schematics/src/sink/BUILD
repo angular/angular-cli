@@ -30,7 +30,12 @@ ts_library(
     srcs = glob(["*_spec.ts"]),
     deps = [
         ":sink",
+        "//packages/angular/schematics/src/exception",
+        "//packages/angular/schematics/src/tree",
+        "//packages/angular/schematics/src/utility",
+        # @deps: glob
         # @typings: jasmine
+        # @typings: node
     ],
     tsconfig = "//:tsconfig.json",
 )
