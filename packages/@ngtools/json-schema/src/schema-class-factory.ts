@@ -142,7 +142,12 @@ class SchemaClassBase<T> implements SchemaClass<T> {
       }
       const parent: any = splitPath
         .slice(0, -1)
-        .reduce((parent: any, curr: string) => parent && parent[curr], this);
+        .reduce((parent: any, curr: string) => {
+          if (!parent[curr]) {
+            parent[curr] = new Object();
+          }
+          return parent && parent[curr];
+        }, this);
 
       if (parent) {
         parent[splitPath[splitPath.length - 1]] = value;
