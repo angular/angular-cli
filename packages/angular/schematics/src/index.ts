@@ -34,8 +34,6 @@ export * from './utility/path';
 
 
 export interface TreeConstructor {
-  new (): TreeInterface;
-
   empty(): TreeInterface;
   branch(tree: TreeInterface): TreeInterface;
   merge(tree: TreeInterface, other: TreeInterface, strategy?: MergeStrategy): TreeInterface;
@@ -56,4 +54,4 @@ export const Tree: TreeConstructor = {
     return partition(tree, predicate);
   },
   optimize(tree: TreeInterface) { return optimize(tree); }
-} as any;
+};

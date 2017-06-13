@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
 import {FileSystemHost} from './file-system-host';
 import {readJsonFile} from './file-system-utility';
 
@@ -21,29 +22,6 @@ import {
 
 import {dirname, join, resolve} from 'path';
 import {Url} from 'url';
-
-
-export interface FileSystemCollectionDescription {
-  readonly path: string;
-  readonly version?: string;
-  readonly schematics: { [name: string]: FileSystemSchematicJsonDescription };
-}
-
-
-export interface FileSystemSchematicJsonDescription {
-  readonly factory: string;
-  readonly description: string;
-  readonly schema?: string;
-}
-
-export interface FileSystemSchematicDescription extends FileSystemSchematicJsonDescription {
-  // Processed by the EngineHost.
-  readonly path: string;
-  readonly schemaJson?: Object;
-  // Using `any` here is okay because the type isn't resolved when we read this value,
-  // but rather when the Engine asks for it.
-  readonly factoryFn: RuleFactory<any>;
-}
 
 
 /**
@@ -65,9 +43,15 @@ export declare type FileSystemSchematicContext
  */
 export abstract class FileSystemEngineHostBase implements
     EngineHost<FileSystemCollectionDescription, FileSystemSchematicDescription> {
-  protected abstract _resolveCollectionPath(_name: string): string | null;
+  protected abstract _resolveCollectionPath(name: string): string | null;
   protected abstract _resolveReferenceString(
-      _name: string, _parentPath: string): { ref: RuleFactory<any>, path: string } | null;
+      name: string, parentPath: string): { ref: RuleFactory<any>, path: string } | null;
+  protected abstract _transformCollectionDescription(
+      name: string, desc: Partial<FileSystemCollectionDesc>): FileSystemCollectionDesc | null;
+  protected abstract _transformSchematicDescription(
+      name: string,
+      collection: FileSystemCollectionDesc,
+      desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc | null;
 
   listSchematics(collection: FileSystemCollection) {
     return Object.keys(collection.description.schematics);
@@ -85,15 +69,20 @@ export abstract class FileSystemEngineHostBase implements
         return null;
       }
 
-      const description: FileSystemCollectionDesc = readJsonFile(path);
-      if (!description.name) {
+      const partialDesc: Partial<FileSystemCollectionDesc> | null = readJsonFile(path);
+      if (!partialDesc) {
         return null;
       }
 
-      return {
-        ...description,
+      const description = this._transformCollectionDescription(name, {
+        ...partialDesc,
         path,
-      };
+      });
+      if (!description || !description.name) {
+        return null;
+      }
+
+      return description;
     } catch (e) {
       return null;
     }
@@ -106,36 +95,44 @@ export abstract class FileSystemEngineHostBase implements
     }
 
     const collectionPath = dirname(collection.path);
-    const description = collection.schematics[name];
-
-    if (!description) {
+    const partialDesc: Partial<FileSystemSchematicDesc> | null = collection.schematics[name];
+    if (!partialDesc) {
       return null;
     }
 
     // Use any on this ref as we don't have the OptionT here, but we don't need it (we only need
     // the path).
-    const resolvedRef = this._resolveReferenceString(description.factory, collectionPath);
+    if (!partialDesc.factory) {
+      return null;
+    }
+    const resolvedRef = this._resolveReferenceString(partialDesc.factory, collectionPath);
     if (!resolvedRef) {
       return null;
     }
 
     const { path } = resolvedRef;
-    let schema = description.schema;
+    let schema = partialDesc.schema;
     let schemaJson = undefined;
     if (schema) {
       schema = join(collectionPath, schema);
       schemaJson = readJsonFile(schema);
     }
 
-    return {
-      ...description,
+    const description = this._transformSchematicDescription(name, collection, {
+      ...partialDesc,
       schema,
       schemaJson,
       name,
       path,
       factoryFn: resolvedRef.ref,
       collection
-    };
+    });
+
+    if (!description) {
+      return null;
+    }
+
+    return description;
   }
 
   createSourceFromUrl(url: Url): Source | null {

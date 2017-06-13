@@ -20,7 +20,7 @@ What distinguish Schematics from other generators, such as Yeoman or Yarn Create
 | **Sink**       | The final destination of all `Action`s. |
 
 # Tooling
-Schematics is a library, and does not work by itself. A reference CLI is available in [`@angular/schematics-cli`](../schematics_cli/README.md). This document explain the library usage and the tooling API, but does not go into the tool implementation itself.
+Schematics is a library, and does not work by itself. A [reference CLI](https://github.com/angular/devkit/tree/master/packages/_schematics_cli) is available on this repository, but is not published on NPM. This document explain the library usage and the tooling API, but does not go into the tool implementation itself.
 
 The tooling is responsible for the following tasks:
 
@@ -34,7 +34,19 @@ The tooling is responsible for the following tasks:
 The tooling API is composed of the following pieces:
 
 ## Engine
-The `SchematicEngine` is responsible for loading and constructing `Collection`s and `Schematics`'. When creating an engine, the tooling provides an `EngineHost` interface that understands how to create a `CollectionDescription` from a name, and how to create a `Schematic
+The `SchematicEngine` is responsible for loading and constructing `Collection`s and `Schematics`'. When creating an engine, the tooling provides an `EngineHost` interface that understands how to create a `CollectionDescription` from a name, and how to create a `SchematicDescription`.
+
+# Schematics (Generators)
+Schematics are generators and part of a `Collection`.
+
+## Collection
+A Collection is defined by a `collection.json` file (in the reference CLI). This JSON defines the following properties:
+
+| Prop Name | Type | Description |
+|---|---|---|
+| **name** | `string` | The name of the collection. |
+| **version** | `string` | Unused fi
+
 
 # Examples
 
@@ -57,13 +69,10 @@ A few things from this example:
 1. The function receives the list of options from the tooling.
 1. It returns a [`Rule`](src/engine/interface.ts#L73), which is a transformation from a `Tree` to another `Tree`.
 
-
-
 # Future Work
 
 Schematics is not done yet. Here's a list of things we are considering:
 
 * Smart defaults for Options. Having a JavaScript function for default values based on other default values.
 * Prompt for input options. This should only be prompted for the original schematics, dependencies to other schematics should not trigger another prompting.
-* Tasks for running tooling-specific jobs before and after a schematics has been scaffolded. Such tasks can involve initialize git, or npm install. A specific list of tasks should be provided by the tool, with unsupported tasks generating an error. 
-
+* Tasks for running tooling-specific jobs before and after a schematics has been scaffolded. Such tasks can involve initialize git, or npm install. A specific list of tasks should be provided by the tool, with unsupported tasks generating an error.

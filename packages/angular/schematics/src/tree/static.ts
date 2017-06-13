@@ -22,7 +22,7 @@ export function merge(tree: Tree,
   return VirtualTree.merge(tree, other, strategy);
 }
 
-export function partition(tree: Tree, predicate: FilePredicate<boolean>) {
+export function partition(tree: Tree, predicate: FilePredicate<boolean>): [Tree, Tree] {
   return [
     new FilteredTree(tree, predicate),
     new FilteredTree(tree, (path, entry) => !predicate(path, entry))

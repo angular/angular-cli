@@ -1,6 +1,4 @@
 {
-  "name": "@schematics/angular",
-  "version": "0.0.0",
   "schematics": {
     "angular-app": {
       "factory": "./angular-app",

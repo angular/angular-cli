@@ -6,11 +6,25 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {ExportStringRef} from './export-ref';
+import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
 import {FileSystemEngineHostBase} from './file-system-engine-host-base';
 
-import {RuleFactory} from '@angular/schematics';
+import {
+  CollectionDescription,
+  SchematicDescription,
+  RuleFactory,
+} from '@angular/schematics';
 
 import {join} from 'path';
+
+
+/**
+ * Used to simplify typings.
+ */
+export declare type FileSystemCollectionDesc
+  = CollectionDescription<FileSystemCollectionDescription>;
+export declare type FileSystemSchematicDesc
+  = SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 
 
 /**
@@ -29,5 +43,31 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
   protected _resolveReferenceString(refString: string, parentPath: string) {
     const ref = new ExportStringRef<RuleFactory<any>>(refString, parentPath);
     return { ref: ref.ref, path: ref.module };
+  }
+
+  protected _transformCollectionDescription(name: string,
+                                            desc: Partial<FileSystemCollectionDesc>) {
+    if (!desc.path || !desc.schematics) {
+      return null;
+    }
+    if (typeof desc.schematics != 'object') {
+      return null;
+    }
+    const version = require(join(name, 'package.json'))['version'];
+
+    return <FileSystemCollectionDesc>{
+      ...desc,
+      name,
+      version
+    };
+  }
+
+  protected _transformSchematicDescription(_name: string,
+                                           _collection: FileSystemCollectionDesc,
+                                           desc: Partial<FileSystemSchematicDesc>) {
+    if (!desc.factoryFn || !desc.path || !desc.description) {
+      return null;
+    }
+    return <FileSystemSchematicDesc>desc;
   }
 }
