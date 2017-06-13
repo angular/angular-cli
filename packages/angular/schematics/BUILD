@@ -8,7 +8,6 @@ load("@io_bazel_rules_typescript//:defs.bzl", "ts_library")
 exports_files(["tsconfig.json"])  # @external
 licenses(["notice"])  # MIT License
 
-
 ts_library(
     name = "schematics",
     srcs = [
