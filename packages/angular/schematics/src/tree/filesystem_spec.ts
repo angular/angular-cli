@@ -6,17 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {FileSystemTree} from './filesystem';
-import {NodeJsHost} from './node-host';
+import {InMemoryFileSystemTreeHost} from './memory-host';
 
-import {join} from 'path';
-
-
-const root = join((global as any)._DevKitRoot, 'tests/@angular/schematics/assets/1/');
-const host = new NodeJsHost(root);
 
 describe('FileSystem', () => {
   it('can create files', () => {
+    const host = new InMemoryFileSystemTreeHost({
+      '/hello': 'world',
+      '/sub/directory/file2': '',
+      '/sub/file1': ''
+    });
     const tree = new FileSystemTree(host);
+
     expect(tree.files).toEqual(['/hello', '/sub/directory/file2', '/sub/file1']);
   });
 });

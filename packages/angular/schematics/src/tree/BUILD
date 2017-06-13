@@ -27,6 +27,8 @@ ts_library(
     name = "spec",
     srcs = glob(["*_spec.ts"]),
     deps = [
+        "//packages/angular/schematics/src/exception",
+        "//packages/angular/schematics/src/utility",
         ":tree",
         # @typings: jasmine
     ],
