@@ -38,6 +38,4 @@ ts_library(
     ],
     tsconfig = "//:tsconfig.json",
     visibility = [ "//visibility:public" ],
-    module_name = "@angular/schematics-tools",
-    module_root = "src",
 )
