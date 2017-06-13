@@ -12,15 +12,15 @@ licenses(["notice"])  # MIT License
 ts_library(
     name = "schematics",
     srcs = [
-      "src/index.ts",
+        "src/index.ts",
     ],
     deps = [
-      "//packages/angular/schematics/src/engine",
-      "//packages/angular/schematics/src/exception",
-      "//packages/angular/schematics/src/rules",
-      "//packages/angular/schematics/src/sink",
-      "//packages/angular/schematics/src/tree",
-      "//packages/angular/schematics/src/utility",
+        "//packages/angular/schematics/src/engine",
+        "//packages/angular/schematics/src/exception",
+        "//packages/angular/schematics/src/rules",
+        "//packages/angular/schematics/src/sink",
+        "//packages/angular/schematics/src/tree",
+        "//packages/angular/schematics/src/utility",
     ],
     tsconfig = "//:tsconfig.json",
     module_name = "@angular/schematics",
