@@ -23,6 +23,9 @@ export function normalizePath(path: string): SchematicPath {
   if (p[0] != '/') {
     p = '/' + p;
   }
+  if (p.endsWith('..')) {
+    throw new InvalidPathException(path);
+  }
 
   let oldP: string | null = null;
   while (oldP !== p) {
@@ -34,7 +37,7 @@ export function normalizePath(path: string): SchematicPath {
       .replace(/\/\.?\//g, '/');
   }
 
-  if (p.startsWith('/../') || (p[p.length - 1] == '/' && p !== '/')) {
+  if (p.startsWith('/../') || (p.endsWith('/') && p !== '/')) {
     throw new InvalidPathException(path);
   }
   return (p as SchematicPath);
