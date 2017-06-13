@@ -203,4 +203,9 @@ schematic.call(options, host)
     }
     return fsSink.commit(tree).ignoreElements().concat(Observable.of(tree));
   })
-  .subscribe({ error(err: Error) { console.error(err); } });
+  .subscribe({
+    error(err: Error) {
+      console.error(err);
+      process.exit(1);
+    }
+  });
