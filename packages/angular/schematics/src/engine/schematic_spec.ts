@@ -16,6 +16,7 @@ import {Observable} from 'rxjs/Observable';
 
 
 const engine = {
+  transformOptions: (_: any, options: any) => options,
   defaultMergeStrategy: MergeStrategy.Default
 } as any;
 
