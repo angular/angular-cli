@@ -13,7 +13,6 @@
  * Simply use package.json to have npm scripts that use this script as well, or use
  * this script directly.
  */
-
 require('../lib/bootstrap-local');
 
 const minimist = require('minimist');
@@ -22,4 +21,5 @@ const path = require('path');
 const args = minimist(process.argv.slice(2));
 const scriptName = path.join('../scripts', args._.shift());
 
+process.chdir(path.join(__dirname, '..'));
 require(scriptName).default(args);

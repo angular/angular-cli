@@ -14,7 +14,7 @@ import {
   apply,
   chain,
   filter,
-  merge,
+  mergeWith,
   move,
   noop,
   normalizePath,
@@ -96,6 +96,6 @@ export default function(options: any): Rule {
   return chain([
     filter(path => path.endsWith('.module.ts') && !path.endsWith('-routing.module.ts')),
     addDeclarationToNgModule(options),
-    merge([templateSource])
+    mergeWith(templateSource)
   ]);
 }

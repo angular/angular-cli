@@ -45,7 +45,52 @@ A Collection is defined by a `collection.json` file (in the reference CLI). This
 | Prop Name | Type | Description |
 |---|---|---|
 | **name** | `string` | The name of the collection. |
-| **version** | `string` | Unused fi
+| **version** | `string` | Unused field. |
+
+## Schematic
+
+# Operators, Sources and Rules
+A `Source` is a generator of `Tree`; it creates a root tree from nothing. A `Rule` is a transformation from one `Tree` to another. A `Schematic` (at the root) is a `Rule` that is normally applied on the filesystem.
+
+## Operators
+`FileOperator`s apply changes to a single `FileEntry` and return a new `FileEntry`. The result follows these rules:
+
+1. If the `FileEntry` returned is null, a `DeleteAction` will be added to the action list.
+1. If the path changed, a `RenameAction` will be added to the action list.
+1. If the content changed, an `OverwriteAction` will be added to the action list.
+
+It is impossible to create files using a `FileOperator`.
+
+| FileOperator | Description |
+|---|---|
+| `contentTemplate<T>(options: T)` | Apply a content template (see the Template section) |
+| `pathTemplate<T>(options: T)` | Apply a path template (see the Template section) |
+
+## Provided Sources
+The Schematics library provides multiple `Source` factories by default that cover basic use cases:
+
+| Source | Description |
+|---|---|
+| `source(tree: Tree)` | Creates a source that returns the tree passed in argument. |
+| `empty()` | Creates a source that returns an empty tree. |
+| `apply(source: Source, rules: Rule[])` | Apply a list of rules to a source, and return the result. |
+| `url(url: string)` | Loads a list of files from a URL and returns a Tree with the files as `CreateAction` applied to an empty `Tree` |
+
+## Provided Rules
+The schematics library also provides `Rule` factories by default:
+
+| Rule | Description |
+|---|---|
+| `noop()` | Returns the input `Tree` as is. |
+| `chain(rules: Rule[])` | Returns a `Rule` that's the concatenation of other rules. |
+| `forEach(op: FileOperator)` | Returns a `Rule` that applies an operator to every file of the input `Tree`. |
+| `move(root: string)` | Moves all the files from the input to a subdirectory. |
+| `merge(other: Tree)` | Merge the input `tree` with the other `Tree`. |
+| `reduce(sources: Source[], rule: Rule, fn: (t1: Tree, t2: Tree) => Observable<Tree>)` | 
+| `contentTemplate<T>(options: T)` | Apply a content template (see the Template section) to the entire `Tree`. |
+| `pathTemplate<T>(options: T)` | Apply a path template (see the Template section) to the entire `Tree`. |
+| `template<T>(options: T)` | Apply both path and content templates (see the Template section) to the entire `Tree`. |
+| `filter(predicate: FilePredicate<boolean>)` | Returns the input `Tree` with files that do not pass the `FilePredicate`. |
 
 
 # Examples

@@ -5,12 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {chain} from './base';
+import {chain, forEach} from './base';
 import {template as templateImpl} from './template/template';
 import {isBinary} from './utils/is-binary';
-import {Rule} from '../engine/interface';
+import {FileOperator, Rule} from '../engine/interface';
 import {BaseException} from '../exception/exception';
-import {Tree} from '../tree/interface';
+import {FileEntry} from '../tree/interface';
+import {normalizePath} from '../utility/path';
 
 
 
@@ -34,73 +35,64 @@ export const kPathTemplatePipeRE = /@([^@]+)/;
 
 
 
-export function applyContentTemplate<T extends { [key: string]: any }>(original: string,
-                                                                       options: T): string {
-  return templateImpl(original, {})(options);
+export function applyContentTemplate<T extends { [key: string]: any }>(options: T): FileOperator {
+  return (entry: FileEntry) => {
+    const {path, content} = entry;
+    if (isBinary(content)) {
+      return entry;
+    }
+    return {
+      path: path,
+      content: new Buffer(templateImpl(content.toString('utf-8'), {})(options))
+    };
+  };
 }
 
 
 export function contentTemplate<T extends { [key: string]: any }>(options: T): Rule {
-  return (tree: Tree) => {
-    tree.files.forEach(originalPath => {
-      // Lodash Template.
-      const content = tree.read(originalPath);
-
-      if (content && !isBinary(content)) {
-        const output = applyContentTemplate(content.toString('utf-8'), options);
-        tree.overwrite(originalPath, output);
-      }
-    });
-
-    return tree;
-  };
+  return forEach(applyContentTemplate(options));
 }
 
 
-export function applyPathTemplate<T extends { [key: string]: any }>(original: string,
-                                                                    options: T): string {
-  // Path template.
-  return original.replace(kPathTemplateComponentRE, (_, match) => {
-    const [name, ...pipes] = match.split(kPathTemplatePipeRE);
-    const value = typeof options[name] == 'function'
-                ? options[name].call(options, original)
-                : options[name];
+export function applyPathTemplate<T extends { [key: string]: any }>(options: T): FileOperator {
+  return (entry: FileEntry) => {
+    let {path, content} = entry;
+    const original = path;
 
-    if (value === undefined) {
-      throw new OptionIsNotDefinedException(name);
-    }
+    // Path template.
+    path = normalizePath(path.replace(kPathTemplateComponentRE, (_, match) => {
+      const [name, ...pipes] = match.split(kPathTemplatePipeRE);
+      const value = typeof options[name] == 'function'
+        ? options[name].call(options, original)
+        : options[name];
 
-    return pipes.reduce((acc: string, pipe: string) => {
-      if (!pipe) {
-        return acc;
-      }
-      if (!(pipe in options)) {
-        throw new UnknownPipeException(pipe);
-      }
-      if (typeof options[pipe] != 'function') {
-        throw new InvalidPipeException(pipe);
+      if (value === undefined) {
+        throw new OptionIsNotDefinedException(name);
       }
 
-      // Coerce to string.
-      return '' + (options[pipe])(acc);
-    }, '' + value);
-  });
+      return pipes.reduce((acc: string, pipe: string) => {
+        if (!pipe) {
+          return acc;
+        }
+        if (!(pipe in options)) {
+          throw new UnknownPipeException(pipe);
+        }
+        if (typeof options[pipe] != 'function') {
+          throw new InvalidPipeException(pipe);
+        }
+
+        // Coerce to string.
+        return '' + (options[pipe])(acc);
+      }, '' + value);
+    }));
+
+    return { path, content };
+  };
 }
 
 
 export function pathTemplate<T extends { [key: string]: any }>(options: T): Rule {
-  return (tree: Tree) => {
-    tree.files.forEach(originalPath => {
-      const newPath = applyPathTemplate(originalPath, options);
-      if (originalPath === newPath) {
-        return;
-      }
-
-      tree.rename(originalPath, newPath);
-    });
-
-    return tree;
-  };
+  return forEach(applyPathTemplate(options));
 }
 
 

@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {callRule, callSource} from './call';
-import {MergeStrategy, FilePredicate} from '../tree/interface';
-import {Rule, SchematicContext, Source} from '../engine/interface';
+import {MergeStrategy, FilePredicate, FileEntry} from '../tree/interface';
+import {FileOperator, Rule, SchematicContext, Source} from '../engine/interface';
 import {VirtualTree} from '../tree/virtual';
 import {FilteredTree} from '../tree/filtered';
 import {Tree} from '../tree/interface';
@@ -58,28 +58,12 @@ export function apply(source: Source, rules: Rule[]): Source {
 
 
 /**
- * Merge multiple sources' output.
+ * Merge an input tree with the source passed in.
  */
-export function mergeSources(sources: Source[],
-                             strategy: MergeStrategy = MergeStrategy.Default): Source {
-  return apply(empty(), [merge(sources, strategy)]);
-}
-
-
-/**
- *
- * @param sources
- * @param strategy
- * @return {(tree:Tree, context:SchematicContext)=>Observable<Tree>}
- */
-export function merge(sources: Source[], strategy: MergeStrategy = MergeStrategy.Default): Rule {
+export function mergeWith(source: Source, strategy: MergeStrategy = MergeStrategy.Default): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    return sources.reduce((acc: Observable<Tree>, curr: Source) => {
-      const result = callSource(curr, context);
-      return acc.concatMap(x => {
-        return result.map(y => VirtualTree.merge(x, y, strategy || context.strategy));
-      });
-    }, Observable.of<Tree>(tree));
+    const result = callSource(source, context);
+    return result.map(other => VirtualTree.merge(tree, other, strategy || context.strategy));
   };
 }
 
@@ -91,4 +75,47 @@ export function noop(): Rule {
 
 export function filter(predicate: FilePredicate<boolean>): Rule {
   return (tree: Tree) => new FilteredTree(tree, predicate);
+}
+
+
+export function asSource(rule: Rule): Source {
+  return apply(empty(), [rule]);
+}
+
+
+export function when(predicate: FilePredicate<boolean>, operator: FileOperator): FileOperator {
+  return (entry: FileEntry) => {
+    if (predicate(entry.path, entry)) {
+      return operator(entry);
+    } else {
+      return entry;
+    }
+  };
+}
+
+
+export function forEach(operator: FileOperator): Rule {
+  return (tree: Tree) => {
+    tree.files.forEach(path => {
+      const entry = tree.get(path);
+      if (!entry) {
+        return;
+      }
+      const newEntry = operator(entry);
+      if (newEntry === entry) {
+        return;
+      }
+      if (newEntry === null) {
+        tree.delete(path);
+        return;
+      }
+      if (newEntry.path != path) {
+        tree.rename(path, newEntry.path);
+      }
+      if (!newEntry.content.equals(entry.content)) {
+        tree.overwrite(newEntry.path, newEntry.content);
+      }
+    });
+    return tree;
+  };
 }

@@ -11,8 +11,10 @@ import {FilePredicate, Tree} from './interface';
 
 export class FilteredTree extends VirtualTree {
   constructor(tree: Tree, filter: FilePredicate<boolean> = () => true) {
-    const virtualTree = VirtualTree.optimize(tree) as VirtualTree;
     super();
+
+    const virtualTree = (tree instanceof VirtualTree
+      ? tree : VirtualTree.optimize(tree)) as VirtualTree;
 
     const root = virtualTree.root;
     const staging = virtualTree.staging;

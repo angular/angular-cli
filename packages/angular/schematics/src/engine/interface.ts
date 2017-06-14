@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {MergeStrategy, Tree} from '../tree/interface';
+import {FileEntry, MergeStrategy, Tree} from '../tree/interface';
 
 import {Observable} from 'rxjs/Observable';
 import {Url} from 'url';
@@ -121,6 +121,14 @@ export type SchematicContext = TypedSchematicContext<any, any>;
  * after loading a schematic description.
  */
 export type RuleFactory<T> = (options: T) => Rule;
+
+
+/**
+ * A FileOperator applies changes synchronously to a FileEntry. An async operator returns
+ * asynchronously. We separate them so that the type system can catch early errors.
+ */
+export type FileOperator = (entry: FileEntry) => FileEntry | null;
+export type AsyncFileOperator = (tree: FileEntry) => Observable<FileEntry | null>;
 
 
 /**

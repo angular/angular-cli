@@ -22,26 +22,34 @@ export type Action = CreateFileAction
 
 export interface ActionBase {
   readonly id: number;
+  readonly parent: number;
   readonly path: SchematicPath;
 }
 
 
-let _id = 0;
+let _id = 1;
 
 export class ActionList implements Iterable<Action> {
   private _actions: Action[] = [];
 
+  protected _action(action: Partial<Action>) {
+    this._actions.push(Object.assign({
+      id: _id++,
+      parent: this._actions[this._actions.length - 1] || 0
+    }, action) as Action);
+  }
+
   create(path: SchematicPath, content: Buffer) {
-    this._actions.push({ id: _id++, kind: 'c', path, content });
+    this._action({ kind: 'c', path, content });
   }
   overwrite(path: SchematicPath, content: Buffer) {
-    this._actions.push({ id: _id++, kind: 'o', path, content });
+    this._action({ kind: 'o', path, content });
   }
   rename(path: SchematicPath, to: SchematicPath) {
-    this._actions.push({ id: _id++, kind: 'r', path, to });
+    this._action({ kind: 'r', path, to });
   }
   delete(path: SchematicPath) {
-    this._actions.push({ id: _id++, kind: 'd', path });
+    this._action({ kind: 'd', path });
   }
 
 

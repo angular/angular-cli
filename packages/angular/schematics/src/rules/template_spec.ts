@@ -12,42 +12,67 @@ import {
   OptionIsNotDefinedException,
   UnknownPipeException
 } from './template';
+import {FileEntry} from '../tree/interface';
+import {normalizePath} from '../utility/path';
+
+
+function _entry(path?: string, content?: string): FileEntry {
+  if (!path) {
+    path = 'a/b/c';
+  }
+  if (!content) {
+    content = 'hello world';
+  }
+  return {
+    path: normalizePath(path),
+    content: new Buffer(content),
+  };
+}
 
 
 describe('applyPathTemplate', () => {
+  function _applyPathTemplate(path: string, options: any): string | null {
+    const newEntry = applyPathTemplate(options)(_entry(path));
+    if (newEntry) {
+      return newEntry.path;
+    } else {
+      return null;
+    }
+  }
+
   it('works', () => {
-    expect(applyPathTemplate('a/b/c/d', {})).toBe('a/b/c/d');
-    expect(applyPathTemplate('a/b/__c__/d', { c: 1 })).toBe('a/b/1/d');
-    expect(applyPathTemplate('a/b/__c__/d', { c: 'hello/world' })).toBe('a/b/hello/world/d');
-    expect(applyPathTemplate('a__c__b', { c: 'hello/world' })).toBe('ahello/worldb');
-    expect(applyPathTemplate('a__c__b__d__c', { c: '1', d: '2' })).toBe('a1b2c');
+    expect(_applyPathTemplate('a/b/c/d', {})).toBe('/a/b/c/d');
+    expect(_applyPathTemplate('a/b/__c__/d', { c: 1 })).toBe('/a/b/1/d');
+    expect(_applyPathTemplate('a/b/__c__/d', { c: 'hello/world' })).toBe('/a/b/hello/world/d');
+    expect(_applyPathTemplate('a__c__b', { c: 'hello/world' })).toBe('/ahello/worldb');
+    expect(_applyPathTemplate('a__c__b__d__c', { c: '1', d: '2' })).toBe('/a1b2c');
   });
 
   it('works with functions', () => {
     let arg = '';
-    expect(applyPathTemplate('a__c__b', {
+    expect(_applyPathTemplate('a__c__b', {
       c: (x: string) => {
         arg = x;
         return 'hello';
       }
-    })).toBe('ahellob');
-    expect(arg).toBe('a__c__b');
+    })).toBe('/ahellob');
+    expect(arg).toBe('/a__c__b');
   });
 
   it('works with pipes', () => {
     let called = '';
     let called2 = '';
 
-    expect(applyPathTemplate('a__c@d__b', {
+    expect(_applyPathTemplate('a__c@d__b', {
       c: 1,
       d: (x: string) => {
         called = x;
         return 2;
       }
-    })).toBe('a2b');
+    })).toBe('/a2b');
     expect(called).toBe('1');
 
-    expect(applyPathTemplate('a__c@d@e__b', {
+    expect(_applyPathTemplate('a__c@d@e__b', {
       c: 10,
       d: (x: string) => {
         called = x;
@@ -57,18 +82,18 @@ describe('applyPathTemplate', () => {
         called2 = x;
         return 30;
       }
-    })).toBe('a30b');
+    })).toBe('/a30b');
     expect(called).toBe('10');
     expect(called2).toBe('20');
   });
 
   it('errors out on undefined values', () => {
-    expect(() => applyPathTemplate('a__b__c', {})).toThrow(new OptionIsNotDefinedException('b'));
+    expect(() => _applyPathTemplate('a__b__c', {})).toThrow(new OptionIsNotDefinedException('b'));
   });
 
   it('errors out on undefined or invalid pipes', () => {
-    expect(() => applyPathTemplate('a__b@d__c', { b: 1 })).toThrow(new UnknownPipeException('d'));
-    expect(() => applyPathTemplate('a__b@d__c', { b: 1, d: 1 }))
+    expect(() => _applyPathTemplate('a__b@d__c', { b: 1 })).toThrow(new UnknownPipeException('d'));
+    expect(() => _applyPathTemplate('a__b@d__c', { b: 1, d: 1 }))
       .toThrow(new InvalidPipeException('d'));
   });
 });
@@ -76,36 +101,45 @@ describe('applyPathTemplate', () => {
 
 
 describe('contentTemplate', () => {
+  function _applyContentTemplate(content: string, options: any) {
+    const newEntry = applyContentTemplate(options)(_entry('', content));
+    if (newEntry) {
+      return newEntry.content.toString('utf-8');
+    } else {
+      return null;
+    }
+  }
+
   it('works with echo token <%= ... %>', () => {
-    expect(applyContentTemplate('a<%= value %>b', { value: 123 })).toBe('a123b');
+    expect(_applyContentTemplate('a<%= value %>b', { value: 123 })).toBe('a123b');
   });
 
   it('works with if', () => {
-    expect(applyContentTemplate('a<% if (a) { %>b<% } %>c', {
+    expect(_applyContentTemplate('a<% if (a) { %>b<% } %>c', {
       value: 123,
       a: true
     })).toBe('abc');
-    expect(applyContentTemplate('a<% if (a) { %>b<% } %>c', {
+    expect(_applyContentTemplate('a<% if (a) { %>b<% } %>c', {
       value: 123,
       a: false
     })).toBe('ac');
   });
 
   it('works with for', () => {
-    expect(applyContentTemplate('a<% for (let i = 0; i < value; i++) { %>1<% } %>b', {
+    expect(_applyContentTemplate('a<% for (let i = 0; i < value; i++) { %>1<% } %>b', {
       value: 5
     })).toBe('a11111b');
   });
 
   it('escapes HTML', () => {
-    expect(applyContentTemplate('a<%- html %>b', {
+    expect(_applyContentTemplate('a<%- html %>b', {
       html: '<script>'
     })).toBe('a&lt;script&gt;b');
   });
 
   it('escapes strings properly', () => {
-    expect(applyContentTemplate('a<%= value %>b', { value: `'abc'` })).toBe('a\'abc\'b');
-    expect(applyContentTemplate('a<%= \'a\' + "b" %>b', {})).toBe('aabb');
-    expect(applyContentTemplate('a<%= "\\n" + "b" %>b', {})).toBe('a\nbb');
+    expect(_applyContentTemplate('a<%= value %>b', { value: `'abc'` })).toBe('a\'abc\'b');
+    expect(_applyContentTemplate('a<%= \'a\' + "b" %>b', {})).toBe('aabb');
+    expect(_applyContentTemplate('a<%= "\\n" + "b" %>b', {})).toBe('a\nbb');
   });
 });

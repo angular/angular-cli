@@ -5,13 +5,33 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Rule} from '../engine/interface';
-import {Tree} from '../tree/interface';
+import {forEach} from './base';
+import {FileOperator, Rule} from '../engine/interface';
+import {FileEntry} from '../tree/interface';
+import {normalizePath} from '../utility/path';
 
 
-export function move(root: string): Rule {
-  return (tree: Tree) => {
-    tree.files.forEach(originalPath => tree.rename(originalPath, `${root}/${originalPath}`));
-    return tree;
+export function moveOp(from: string, to?: string): FileOperator {
+  if (to === undefined) {
+    to = from;
+    from = '/';
+  }
+
+  const fromPath = normalizePath(from);
+  const toPath = normalizePath(to);
+
+  return (entry: FileEntry) => {
+    if (entry.path.startsWith(fromPath)) {
+      return {
+        content: entry.content,
+        path: normalizePath(toPath + '/' + entry.path.substr(fromPath.length))
+      };
+    }
+    return entry;
   };
+}
+
+
+export function move(from: string, to?: string): Rule {
+  return forEach(moveOp(from, to));
 }
