@@ -151,6 +151,9 @@ class JsonWebpackSerializer {
         case (<any>webpack).HashedModuleIdsPlugin:
           this._addImport('webpack', 'HashedModuleIdsPlugin');
           break;
+        case webpack.SourceMapDevToolPlugin:
+          this._addImport('webpack', 'SourceMapDevToolPlugin');
+          break;
         case webpack.optimize.UglifyJsPlugin:
           this._addImport('webpack.optimize', 'UglifyJsPlugin');
           break;
