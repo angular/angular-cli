@@ -12,13 +12,12 @@ import {
   EngineHost,
   Schematic,
   Source,
-  TypedSchematicContext
 } from './interface';
 import {SchematicImpl} from './schematic';
 import {BaseException} from '../exception/exception';
 import {MergeStrategy} from '../tree/interface';
 import {NullTree} from '../tree/null';
-import {branch, empty} from '../tree/static';
+import {empty} from '../tree/static';
 
 import {Url} from 'url';
 import 'rxjs/add/operator/map';
@@ -38,7 +37,9 @@ export class UnknownSchematicException extends BaseException {
 }
 
 
-export class SchematicEngine<CollectionT, SchematicT> implements Engine<CollectionT, SchematicT> {
+export class SchematicEngine<CollectionT extends object, SchematicT extends object>
+    implements Engine<CollectionT, SchematicT> {
+
   private _collectionCache = new Map<string, CollectionImpl<CollectionT, SchematicT>>();
   private _schematicCache
     = new Map<string, Map<string, SchematicImpl<CollectionT, SchematicT>>>();
@@ -91,13 +92,18 @@ export class SchematicEngine<CollectionT, SchematicT> implements Engine<Collecti
     return schematic;
   }
 
+  transformOptions<OptionT extends object, ResultT extends object>(
+      schematic: Schematic<CollectionT, SchematicT>, options: OptionT): ResultT {
+    return this._host.transformOptions<OptionT, ResultT>(
+      schematic.description,
+      options
+    );
+  }
+
   createSourceFromUrl(url: Url): Source {
     switch (url.protocol) {
       case 'null:': return () => new NullTree();
       case 'empty:': return () => empty();
-      case 'host:': return (context: TypedSchematicContext<CollectionT, SchematicT>) => {
-        return context.host.map(tree => branch(tree));
-      };
       default:
         const hostSource = this._host.createSourceFromUrl(url);
         if (!hostSource) {

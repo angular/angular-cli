@@ -17,6 +17,7 @@ import {
 } from '@angular/schematics';
 import {
   FileSystemHost,
+  FileSystemSchematicDesc,
   NodeModulesEngineHost
 } from '@angular/schematics-tools';
 import {SchemaClassFactory} from '@ngtools/json-schema';
@@ -106,6 +107,16 @@ const {
 const engineHost = new NodeModulesEngineHost();
 const engine = new SchematicEngine(engineHost);
 
+// Add support for schemaJson.
+engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options: any) => {
+  if (schematic.schema) {
+    const SchemaMetaClass = SchemaClassFactory<any>(schematic.schemaJson !);
+    const schemaClass = new SchemaMetaClass(options);
+    return schemaClass.$$root();
+  }
+  return options;
+});
+
 
 /**
  * The collection to be used.
@@ -148,6 +159,9 @@ const fsSink = new FileSystemSink(process.cwd(), force);
 // actual filesystem. In this case we simply show the dry-run, but skip the fsSink commit.
 let error = false;
 
+
+const loggingQueue: string[] = [];
+
 // Logs out dry run events.
 dryRunSink.reporter.subscribe((event: DryRunEvent) => {
   switch (event.kind) {
@@ -157,27 +171,19 @@ dryRunSink.reporter.subscribe((event: DryRunEvent) => {
       error = true;
       break;
     case 'update':
-      console.log(`UPDATE ${event.path} (${event.content.length} bytes)`);
+      loggingQueue.push(`UPDATE ${event.path} (${event.content.length} bytes)`);
       break;
     case 'create':
-      console.log(`CREATE ${event.path} (${event.content.length} bytes)`);
+      loggingQueue.push(`CREATE ${event.path} (${event.content.length} bytes)`);
       break;
     case 'delete':
-      console.log(`DELETE ${event.path}`);
+      loggingQueue.push(`DELETE ${event.path}`);
       break;
     case 'rename':
-      console.log(`RENAME ${event.path} => ${event.to}`);
+      loggingQueue.push(`RENAME ${event.path} => ${event.to}`);
       break;
   }
 });
-
-
-let options: any = argv;
-if (schematic.description.schema) {
-  const SchemaMetaClass = SchemaClassFactory<any>(schematic.description.schemaJson !);
-  const schemaClass = new SchemaMetaClass(argv);
-  options = schemaClass.$$root();
-}
 
 
 /**
@@ -192,12 +198,17 @@ if (schematic.description.schema) {
  * Then we proceed to run the dryRun commit. We run this before we then commit to the filesystem
  * (if --dry-run was not passed or an error was detected by dryRun).
  */
-schematic.call(options, host)
+schematic.call(argv, host)
   .map((tree: Tree) => Tree.optimize(tree))
   .concatMap((tree: Tree) => {
     return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));
   })
   .concatMap((tree: Tree) => {
+    if (!error) {
+      // Output the logging queue.
+      loggingQueue.forEach(log => console.log(log));
+    }
+
     if (dryRun || error) {
       return Observable.of(tree);
     }

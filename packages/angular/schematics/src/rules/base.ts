@@ -11,7 +11,7 @@ import {FileOperator, Rule, SchematicContext, Source} from '../engine/interface'
 import {VirtualTree} from '../tree/virtual';
 import {FilteredTree} from '../tree/filtered';
 import {Tree} from '../tree/interface';
-import {empty as staticEmpty} from '../tree/static';
+import {branch, empty as staticEmpty, merge as staticMerge} from '../tree/static';
 
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
@@ -80,6 +80,15 @@ export function filter(predicate: FilePredicate<boolean>): Rule {
 
 export function asSource(rule: Rule): Source {
   return apply(empty(), [rule]);
+}
+
+
+export function branchAndMerge(rule: Rule): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    const branchedTree = branch(tree);
+    return callRule(rule, Observable.of(branchedTree), context)
+      .map(t => staticMerge(tree, t));
+  };
 }
 
 

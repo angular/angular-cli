@@ -28,7 +28,9 @@ export class InvalidSchematicsNameException extends BaseException {
 }
 
 
-export class SchematicImpl<CollectionT, SchematicT> implements Schematic<CollectionT, SchematicT> {
+export class SchematicImpl<CollectionT extends object, SchematicT extends object>
+    implements Schematic<CollectionT, SchematicT> {
+
   constructor(private _description: SchematicDescription<CollectionT, SchematicT>,
               private _factory: RuleFactory<any>,
               private _collection: Collection<CollectionT, SchematicT>,
@@ -41,16 +43,16 @@ export class SchematicImpl<CollectionT, SchematicT> implements Schematic<Collect
   get description() { return this._description; }
   get collection() { return this._collection; }
 
-  call<OptionT>(options: OptionT, host: Observable<Tree>): Observable<Tree> {
+  call<OptionT extends object>(options: OptionT, host: Observable<Tree>): Observable<Tree> {
     let context: TypedSchematicContext<CollectionT, SchematicT> = {
       engine: this._engine,
       schematic: this,
-      host,
       strategy: this._engine.defaultMergeStrategy
     };
+    const transformedOptions = this._engine.transformOptions(this, options);
 
     return host.concatMap(tree => {
-      const result = this._factory(options)(tree, context);
+      const result = this._factory(transformedOptions)(tree, context);
       if (result instanceof Observable) {
         return result;
       } else {

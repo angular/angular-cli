@@ -22,10 +22,10 @@ import {Observable} from 'rxjs/Observable';
 export function externalSchematic<T>(collectionName: string,
                                      schematicName: string,
                                      options: T): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (input: Tree, context: SchematicContext) => {
     const collection = context.engine.createCollection(collectionName);
     const schematic = collection.createSchematic(schematicName);
-    return schematic.call(options, Observable.of(branch(host)));
+    return schematic.call(options, Observable.of(branch(input)));
   };
 }
 
@@ -37,10 +37,10 @@ export function externalSchematic<T>(collectionName: string,
  * @param options The options to pass as input to the RuleFactory.
  */
 export function schematic<T>(schematicName: string, options: T): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (input: Tree, context: SchematicContext) => {
     let collection = context.schematic.collection;
 
     const schematic = collection.createSchematic(schematicName);
-    return schematic.call(options, Observable.of(branch(host)));
+    return schematic.call(options, Observable.of(branch(input)));
   };
 }

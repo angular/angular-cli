@@ -12,6 +12,7 @@ import {
   Rule,
   Tree,
   apply,
+  branchAndMerge,
   chain,
   filter,
   mergeWith,
@@ -94,8 +95,10 @@ export default function(options: any): Rule {
   ]);
 
   return chain([
-    filter(path => path.endsWith('.module.ts') && !path.endsWith('-routing.module.ts')),
-    addDeclarationToNgModule(options),
-    mergeWith(templateSource)
+    branchAndMerge(chain([
+      filter(path => path.endsWith('.module.ts') && !path.endsWith('-routing.module.ts')),
+      addDeclarationToNgModule(options),
+      mergeWith(templateSource)
+    ]))
   ]);
 }

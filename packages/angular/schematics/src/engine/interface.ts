@@ -16,7 +16,7 @@ import {Url} from 'url';
  * needs to run. The CollectionMetadataT type parameter contains additional metadata that you
  * want to store while remaining type-safe.
  */
-export type CollectionDescription<CollectionMetadataT extends {}> = CollectionMetadataT & {
+export type CollectionDescription<CollectionMetadataT extends object> = CollectionMetadataT & {
   readonly name: string;
 };
 
@@ -25,8 +25,8 @@ export type CollectionDescription<CollectionMetadataT extends {}> = CollectionMe
  * needs to run. The SchematicMetadataT and CollectionMetadataT type parameters contain additional
  * metadata that you want to store while remaining type-safe.
  */
-export type SchematicDescription<CollectionMetadataT extends {},
-                                 SchematicMetadataT extends {}> = SchematicMetadataT & {
+export type SchematicDescription<CollectionMetadataT extends object,
+                                 SchematicMetadataT extends object> = SchematicMetadataT & {
   readonly collection: CollectionDescription<CollectionMetadataT>;
   readonly name: string;
 };
@@ -37,16 +37,21 @@ export type SchematicDescription<CollectionMetadataT extends {},
  * collections and schematics descriptions. The SchematicMetadataT and CollectionMetadataT type
  * parameters contain additional metadata that you want to store while remaining type-safe.
  */
-export interface EngineHost<CollectionMetadataT extends {}, SchematicMetadataT extends {}> {
+export interface EngineHost<CollectionMetadataT extends object, SchematicMetadataT extends object> {
   createCollectionDescription(name: string): CollectionDescription<CollectionMetadataT> | null;
   createSchematicDescription(
       name: string,
       collection: CollectionDescription<CollectionMetadataT>):
         SchematicDescription<CollectionMetadataT, SchematicMetadataT> | null;
-  getSchematicRuleFactory<OptionT>(
+  getSchematicRuleFactory<OptionT extends object>(
       schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
       collection: CollectionDescription<CollectionMetadataT>): RuleFactory<OptionT>;
   createSourceFromUrl(url: Url): Source | null;
+  transformOptions<OptionT extends object, ResultT extends object>(
+    schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
+    options: OptionT
+  ): ResultT;
+
 
   readonly defaultMergeStrategy?: MergeStrategy;
 }
@@ -62,13 +67,17 @@ export interface EngineHost<CollectionMetadataT extends {}, SchematicMetadataT e
  *
  * SchematicMetadataT is a type that contains additional typing for the Schematic Description.
  */
-export interface Engine<CollectionMetadataT extends {}, SchematicMetadataT extends {}> {
+export interface Engine<CollectionMetadataT extends object, SchematicMetadataT extends object> {
   createCollection(name: string): Collection<CollectionMetadataT, SchematicMetadataT>;
   createSchematic(
       name: string,
       collection: Collection<CollectionMetadataT, SchematicMetadataT>
   ): Schematic<CollectionMetadataT, SchematicMetadataT>;
   createSourceFromUrl(url: Url): Source;
+  transformOptions<OptionT extends object, ResultT extends object>(
+      schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
+      options: OptionT
+  ): ResultT;
 
   readonly defaultMergeStrategy: MergeStrategy;
 }
@@ -78,7 +87,7 @@ export interface Engine<CollectionMetadataT extends {}, SchematicMetadataT exten
  * A Collection as created by the Engine. This should be used by the tool to create schematics,
  * or by rules to create other schematics as well.
  */
-export interface Collection<CollectionMetadataT, SchematicMetadataT> {
+export interface Collection<CollectionMetadataT extends object, SchematicMetadataT extends object> {
   readonly description: CollectionDescription<CollectionMetadataT>;
 
   createSchematic(name: string): Schematic<CollectionMetadataT, SchematicMetadataT>;
@@ -89,7 +98,7 @@ export interface Collection<CollectionMetadataT, SchematicMetadataT> {
  * A Schematic as created by the Engine. This should be used by the tool to execute the main
  * schematics, or by rules to execute other schematics as well.
  */
-export interface Schematic<CollectionMetadataT, SchematicMetadataT> {
+export interface Schematic<CollectionMetadataT extends object, SchematicMetadataT extends object> {
   readonly description: SchematicDescription<CollectionMetadataT, SchematicMetadataT>;
   readonly collection: Collection<CollectionMetadataT, SchematicMetadataT>;
 
@@ -101,10 +110,10 @@ export interface Schematic<CollectionMetadataT, SchematicMetadataT> {
  * A SchematicContext. Contains information necessary for Schematics to execute some rules, for
  * example when using another schematics, as we need the engine and collection.
  */
-export interface TypedSchematicContext<CollectionMetadataT, SchematicMetadataT> {
+export interface TypedSchematicContext<CollectionMetadataT extends object,
+                                       SchematicMetadataT extends object> {
   readonly engine: Engine<CollectionMetadataT, SchematicMetadataT>;
   readonly schematic: Schematic<CollectionMetadataT, SchematicMetadataT>;
-  readonly host: Observable<Tree>;
   readonly strategy: MergeStrategy;
 }
 
@@ -120,7 +129,7 @@ export type SchematicContext = TypedSchematicContext<any, any>;
  * A rule factory, which is normally the way schematics are implemented. Returned by the tooling
  * after loading a schematic description.
  */
-export type RuleFactory<T> = (options: T) => Rule;
+export type RuleFactory<T extends object> = (options: T) => Rule;
 
 
 /**

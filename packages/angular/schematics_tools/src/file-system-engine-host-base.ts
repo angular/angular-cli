@@ -36,6 +36,9 @@ export declare type FileSystemSchematicDesc
 export declare type FileSystemSchematicContext
     = TypedSchematicContext<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 
+export declare type OptionTransform<T extends object, R extends object>
+    = (schematic: FileSystemSchematicDescription, options: T) => R;
+
 
 /**
  * A EngineHost base class that uses the file system to resolve collections. This is the base of
@@ -53,8 +56,14 @@ export abstract class FileSystemEngineHostBase implements
       collection: FileSystemCollectionDesc,
       desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc | null;
 
+  private _transforms: OptionTransform<object, object>[] = [];
+
   listSchematics(collection: FileSystemCollection) {
     return Object.keys(collection.description.schematics);
+  }
+
+  registerOptionsTransform<T extends object, R extends object>(t: OptionTransform<T, R>) {
+    this._transforms.push(t);
   }
 
   /**
@@ -150,7 +159,14 @@ export abstract class FileSystemEngineHostBase implements
     return null;
   }
 
-  getSchematicRuleFactory<OptionT>(
+  transformOptions<OptionT extends object, ResultT extends object>(
+      schematic: FileSystemSchematicDesc, options: OptionT): ResultT {
+    return this._transforms.reduce((acc: any, t: OptionTransform<any, any>) => {
+      return t(schematic, acc);
+    }, options);
+  }
+
+  getSchematicRuleFactory<OptionT extends object>(
     schematic: FileSystemSchematicDesc,
     _collection: FileSystemCollectionDesc): RuleFactory<OptionT> {
     return schematic.factoryFn;

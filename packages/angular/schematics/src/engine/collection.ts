@@ -9,7 +9,7 @@ import {SchematicEngine} from './engine';
 import {Collection, CollectionDescription, Schematic} from './interface';
 
 
-export class CollectionImpl<CollectionT, SchematicT>
+export class CollectionImpl<CollectionT extends object, SchematicT extends object>
     implements Collection<CollectionT, SchematicT> {
   constructor(private _description: CollectionDescription<CollectionT>,
               private _engine: SchematicEngine<CollectionT, SchematicT>) {

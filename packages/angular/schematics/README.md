@@ -86,11 +86,11 @@ The schematics library also provides `Rule` factories by default:
 | `forEach(op: FileOperator)` | Returns a `Rule` that applies an operator to every file of the input `Tree`. |
 | `move(root: string)` | Moves all the files from the input to a subdirectory. |
 | `merge(other: Tree)` | Merge the input `tree` with the other `Tree`. |
-| `reduce(sources: Source[], rule: Rule, fn: (t1: Tree, t2: Tree) => Observable<Tree>)` | 
 | `contentTemplate<T>(options: T)` | Apply a content template (see the Template section) to the entire `Tree`. |
 | `pathTemplate<T>(options: T)` | Apply a path template (see the Template section) to the entire `Tree`. |
 | `template<T>(options: T)` | Apply both path and content templates (see the Template section) to the entire `Tree`. |
 | `filter(predicate: FilePredicate<boolean>)` | Returns the input `Tree` with files that do not pass the `FilePredicate`. |
+| `branch
 
 
 # Examples
