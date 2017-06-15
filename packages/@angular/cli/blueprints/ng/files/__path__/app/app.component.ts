@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: '<%= prefix %>-root',<% if (inlineTemplate) { %>
   template: `
     <h1>
-      {{title}}
+      Welcome to {{title}}!!
     </h1><% if (routing) { %>
     <router-outlet></router-outlet><% } %>
   `,<% } else { %>
