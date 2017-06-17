@@ -5,6 +5,7 @@
  - [1.0 Update](stories/1.0-update)
  - [Asset Configuration](stories/asset-configuration)
  - [Autocompletion](stories/autocompletion)
+ - [Configure Hot Module Replacement](stories/configure-hmr)
  - [CSS Preprocessors](stories/css-preprocessors)
  - [Global Lib](stories/global-lib)
  - [Global Scripts](stories/global-scripts)
