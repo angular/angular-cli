@@ -493,6 +493,11 @@
       "description": "Allow people to disable console warnings.",
       "type": "object",
       "properties": {
+        "hmrWarning": {
+          "description": "Show a warning when the user enabled the --hmr option.",
+          "type": "boolean",
+          "default": true
+        },
         "nodeDeprecation": {
           "description": "Show a warning when the node version is incompatible.",
           "type": "boolean",
