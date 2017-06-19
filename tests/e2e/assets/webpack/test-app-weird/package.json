@@ -19,6 +19,7 @@
   "devDependencies": {
     "node-sass": "^3.7.0",
     "performance-now": "^0.2.0",
+    "preprocess-loader": "^0.2.2",
     "raw-loader": "^0.5.1",
     "sass-loader": "^3.2.0",
     "typescript": "~2.1.0",

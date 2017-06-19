@@ -38,14 +38,19 @@ export class TypeScriptFileRefactor {
 
   constructor(fileName: string,
               _host: ts.CompilerHost,
-              private _program?: ts.Program) {
+              private _program?: ts.Program,
+              source?: string | null) {
     fileName = resolve(fileName, _host, _program).replace(/\\/g, '/');
     this._fileName = fileName;
     if (_program) {
-      this._sourceFile = _program.getSourceFile(fileName);
+      if (source) {
+        this._sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
+      } else {
+        this._sourceFile = _program.getSourceFile(fileName);
+      }
     }
     if (!this._sourceFile) {
-      this._sourceFile = ts.createSourceFile(fileName, _host.readFile(fileName),
+      this._sourceFile = ts.createSourceFile(fileName, source || _host.readFile(fileName),
         ts.ScriptTarget.Latest, true);
     }
     this._sourceText = this._sourceFile.getFullText(this._sourceFile);
@@ -55,7 +60,7 @@ export class TypeScriptFileRefactor {
   /**
    * Collates the diagnostic messages for the current source file
    */
-  getDiagnostics(): ts.Diagnostic[] {
+  getDiagnostics(typeCheck = true): ts.Diagnostic[] {
     if (!this._program) {
       return [];
     }
@@ -66,7 +71,7 @@ export class TypeScriptFileRefactor {
     }
     diagnostics = diagnostics.concat(
       this._program.getSyntacticDiagnostics(this._sourceFile),
-      this._program.getSemanticDiagnostics(this._sourceFile));
+      typeCheck ? this._program.getSemanticDiagnostics(this._sourceFile) : []);
 
     return diagnostics;
   }
