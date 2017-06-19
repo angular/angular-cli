@@ -1,3 +1,15 @@
 :host {
   background-color: blue;
 }
+
+// @ifdef DEBUG
+:host::before {
+  content: 'DEBUG_ONLY';
+}
+// @endif
+
+// @ifndef DEBUG
+:host::before {
+  content: 'PRODUCTION_ONLY';
+}
+// @endif
