@@ -10,6 +10,15 @@ import { AppComponent } from './app.component';
 export class HomeView {}
 
 
+// @ifdef DEBUG
+console.log("DEBUG_ONLY");
+// @endif
+
+// @ifndef DEBUG
+console.log("PRODUCTION_ONLY");
+// @endif
+
+
 @NgModule({
   declarations: [
     AppComponent,
