@@ -436,15 +436,20 @@ function _diagnoseDeps(reasons: ModuleReason[], plugin: AotPlugin, checked: Set<
 
 
 // Super simple TS transpiler loader for testing / isolated usage. does not type check!
-export function ngcLoader(this: LoaderContext & { _compilation: any }) {
+export function ngcLoader(this: LoaderContext & { _compilation: any }, source: string | null) {
   const cb = this.async();
   const sourceFileName: string = this.resourcePath;
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
   // We must verify that AotPlugin is an instance of the right class.
   if (plugin && plugin instanceof AotPlugin) {
+    if (plugin.compilerHost.readFile(sourceFileName) == source) {
+      // In the case where the source is the same as the one in compilerHost, we don't have
+      // extra TS loaders and there's no need to do any trickery.
+      source = null;
+    }
     const refactor = new TypeScriptFileRefactor(
-      sourceFileName, plugin.compilerHost, plugin.program);
+      sourceFileName, plugin.compilerHost, plugin.program, source);
 
     Promise.resolve()
       .then(() => {
@@ -476,6 +481,25 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }) {
         });
       })
       .then(() => {
+        if (source) {
+          // We need to validate diagnostics. We ignore type checking though, to save time.
+          const diagnostics = refactor.getDiagnostics(false);
+          if (diagnostics.length) {
+            let message = '';
+
+            diagnostics.forEach(diagnostic => {
+              const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+
+              const fileName = diagnostic.file.fileName;
+              const {line, character} = position;
+
+              const messageText = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+              message += `${fileName} (${line + 1},${character + 1}): ${messageText}\n`;
+            });
+            throw new Error(message);
+          }
+        }
+
         // Force a few compiler options to make sure we get the result we want.
         const compilerOptions: ts.CompilerOptions = Object.assign({}, plugin.compilerOptions, {
           inlineSources: true,
