@@ -22,8 +22,9 @@ export default Task.extend({
         (err: NodeJS.ErrnoException, _stdout: string, stderr: string) => {
         if (err) {
           ui.writeLine(stderr);
-          ui.writeLine(chalk.red('Package install failed, see above.'));
-          throw new Error('Package install failed, see above.');
+          const message = 'Package install failed, see above.';
+          ui.writeLine(chalk.red(message));
+          throw new Error(message);
         } else {
           ui.writeLine(chalk.green(`Installed packages for tooling via ${packageManager}.`));
         }
