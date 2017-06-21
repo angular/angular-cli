@@ -13,7 +13,7 @@ import {
   CollectionDescription,
   RuleFactory,
   SchematicDescription,
-} from '@angular/schematics';
+} from '@angular-devkit/schematics';
 
 import {join} from 'path';
 import {existsSync} from 'fs';

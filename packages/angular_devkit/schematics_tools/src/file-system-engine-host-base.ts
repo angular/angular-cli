@@ -18,7 +18,7 @@ import {
   SchematicDescription,
   Source,
   TypedSchematicContext
-} from '@angular/schematics';
+} from '@angular-devkit/schematics';
 
 import {dirname, join, resolve} from 'path';
 import {Url} from 'url';

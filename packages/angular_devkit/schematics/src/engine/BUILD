@@ -15,8 +15,8 @@ ts_library(
         exclude = ["*_spec.ts"],
     ),
     deps = [
-        "//packages/angular/schematics/src/exception",
-        "//packages/angular/schematics/src/tree",
+        "//packages/angular_devkit/schematics/src/exception",
+        "//packages/angular_devkit/schematics/src/tree",
         # @deps: rxjs
         # @typings: node
     ],
@@ -28,8 +28,8 @@ ts_library(
     srcs = glob(["*_spec.ts"]),
     deps = [
         ":engine",
-        "//packages/angular/schematics/src/exception",
-        "//packages/angular/schematics/src/tree",
+        "//packages/angular_devkit/schematics/src/exception",
+        "//packages/angular_devkit/schematics/src/tree",
         # @deps: rxjs
         # @typings: jasmine
     ],

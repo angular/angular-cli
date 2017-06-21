@@ -11,7 +11,7 @@ import {
   RuleFactory,
   SchematicDescription,
   TypedSchematicContext
-} from '@angular/schematics';
+} from '@angular-devkit/schematics';
 
 
 export interface FileSystemCollectionDescription {

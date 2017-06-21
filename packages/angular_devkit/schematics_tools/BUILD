@@ -17,12 +17,12 @@ ts_library(
         exclude = ["src/*_spec.ts"],
     ),
     deps = [
-        "//packages/angular/schematics",
+        "//packages/angular_devkit/schematics",
         # @typings: node
     ],
     tsconfig = "//:tsconfig.json",
     visibility = [ "//visibility:public" ],
-    module_name = "@angular/schematics-tools",
+    module_name = "@angular-devkit/schematics-tools",
     module_root = "src",
 )
 

@@ -2,7 +2,7 @@
   "extends": "../../../tsconfig.json",
 
   "compilerOptions": {
-    "outDir": "../../../dist/@angular/schematics",
+    "outDir": "../../../dist/@angular-devkit/schematics",
     "rootDir": ".",
     "baseUrl": ""
   }

@@ -6,8 +6,10 @@
     "rootDir": ".",
     "baseUrl": "",
     "paths": {
-      "@angular/schematics": [ "../../dist/@angular/schematics/src/index" ],
-      "@angular/schematics-tools": [ "../../dist/@angular/schematics-tools/src/index" ]
+      "@angular-devkit/schematics": [ "../../dist/@angular-devkit/schematics/src/index" ],
+      "@angular-devkit/schematics-tools": [
+        "../../dist/@angular-devkit/schematics-tools/src/index"
+      ]
     }
   }
 }

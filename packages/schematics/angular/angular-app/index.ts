@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as stringUtils from '../strings';
-import {Rule, apply, mergeWith, move, template, url} from '@angular/schematics';
+import {Rule, apply, mergeWith, move, template, url} from '@angular-devkit/schematics';
 
 
 export default function(options: any): Rule {

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "https://github.com/angular/angular-cli/blob/master/packages/@angular/cli/lib/config/schema.json#CliConfig",
+  "id": "SchematicsAngularApp",
   "title": "Angular Application Options Schema",
   "type": "object",
   "properties": {

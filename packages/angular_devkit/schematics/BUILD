@@ -14,14 +14,14 @@ ts_library(
         "src/index.ts",
     ],
     deps = [
-        "//packages/angular/schematics/src/engine",
-        "//packages/angular/schematics/src/exception",
-        "//packages/angular/schematics/src/rules",
-        "//packages/angular/schematics/src/sink",
-        "//packages/angular/schematics/src/tree",
-        "//packages/angular/schematics/src/utility",
+        "//packages/angular_devkit/schematics/src/engine",
+        "//packages/angular_devkit/schematics/src/exception",
+        "//packages/angular_devkit/schematics/src/rules",
+        "//packages/angular_devkit/schematics/src/sink",
+        "//packages/angular_devkit/schematics/src/tree",
+        "//packages/angular_devkit/schematics/src/utility",
     ],
     tsconfig = "//:tsconfig.json",
-    module_name = "@angular/schematics",
+    module_name = "@angular-devkit/schematics",
     module_root = "src"
 )

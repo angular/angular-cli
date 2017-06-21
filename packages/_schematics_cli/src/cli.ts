@@ -14,12 +14,12 @@ import {
   FileSystemTree,
   SchematicEngine,
   Tree,
-} from '@angular/schematics';
+} from '@angular-devkit/schematics';
 import {
   FileSystemHost,
   FileSystemSchematicDesc,
   NodeModulesEngineHost
-} from '@angular/schematics-tools';
+} from '@angular-devkit/schematics-tools';
 import {SchemaClassFactory} from '@ngtools/json-schema';
 
 import 'rxjs/add/operator/ignoreElements';

@@ -99,7 +99,7 @@ The schematics library also provides `Rule` factories by default:
 An example of a simple Schematics which creates a "hello world" file, using an option to determine its path:
 
 ```typescript
-import {Tree} from '@angular/schematics';
+import {Tree} from '@angular-devkit/schematics';
 
 export default function MySchematic(options: any) {
   return (tree: Tree) => {

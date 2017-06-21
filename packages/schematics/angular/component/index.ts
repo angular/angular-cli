@@ -21,7 +21,7 @@ import {
   normalizePath,
   template,
   url,
-} from '@angular/schematics';
+} from '@angular-devkit/schematics';
 import * as stringUtils from '../strings';
 
 import * as ts from 'typescript';

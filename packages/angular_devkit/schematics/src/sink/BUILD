@@ -9,14 +9,16 @@ load("@io_bazel_rules_typescript//:defs.bzl", "ts_library")
 licenses(["notice"])  # MIT License
 
 ts_library(
-    name = "utility",
+    name = "sink",
     srcs = glob(
         include = ["*.ts"],
         exclude = ["*_spec.ts"],
     ),
     deps = [
-        "//packages/angular/schematics/src/exception",
-        # @typings: es2015.collection
+        "//packages/angular_devkit/schematics/src/exception",
+        "//packages/angular_devkit/schematics/src/tree",
+        "//packages/angular_devkit/schematics/src/utility",
+        # @deps: rxjs
         # @typings: es2015.core
         # @typings: node
     ],
@@ -27,8 +29,14 @@ ts_library(
     name = "spec",
     srcs = glob(["*_spec.ts"]),
     deps = [
-        ":utility",
+        ":sink",
+        "//packages/angular_devkit/schematics/src/exception",
+        "//packages/angular_devkit/schematics/src/tree",
+        "//packages/angular_devkit/schematics/src/utility",
+        # @deps: rxjs
+        # @typings: glob
         # @typings: jasmine
+        # @typings: node
     ],
     tsconfig = "//:tsconfig.json",
 )

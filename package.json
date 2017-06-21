@@ -1,5 +1,5 @@
 {
-  "name": "@angular/devkit",
+  "name": "@angular-devkit/devkit",
   "version": "0.0.0",
   "description": "Software Development Kit for Angular",
   "bin": {
