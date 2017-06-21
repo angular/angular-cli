@@ -19,6 +19,7 @@ matrix:
     - env: NODE_SCRIPT="tests/run_e2e.js --ng2"
     - env: DEPLOY_SCRIPT="scripts/git-builds.js"
     - node_js: "7"
+    - node_js: "8"
   include:
     - node_js: "6"
       os: linux
@@ -58,6 +59,9 @@ matrix:
     - node_js: "7"
       os: linux
       env: NODE_SCRIPT=tests/run_e2e.js
+    - node_js: "8"
+      os: linux
+      env: NODE_SCRIPT="tests/run_e2e.js --glob=tests/build/**"
 
 before_install:
   # Use a virtual display.
