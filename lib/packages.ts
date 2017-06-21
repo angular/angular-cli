@@ -12,6 +12,7 @@ import * as path from 'path';
 
 const packageRoot = path.join(__dirname, '../packages');
 const distRoot = path.join(__dirname, '../dist');
+const versions = require('../versions.json');
 
 
 export interface PackageInfo {
@@ -50,6 +51,11 @@ export const packages: PackageMap =
       Object.keys(pkgJson['bin'] || {}).forEach(binName => {
         bin[binName] = path.resolve(pkg.root, pkgJson['bin'][binName]);
       });
+
+      if (!(name in versions)) {
+        console.error(`ERROR: package ${name} does not have a version.`);
+        process.exit(101);
+      }
 
       packages[name] = {
         build: path.join(distRoot, pkgRoot.substr(path.dirname(__dirname).length)),
