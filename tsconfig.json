@@ -32,8 +32,8 @@
       "node"
     ],
     "paths": {
-      "@angular-devkit/schematics": [ "./packages/angular-devkit/schematics/src/index" ],
-      "@angular-devkit/schematics-tools": [ "./packages/angular-devkit/schematics_tools/src/index" ]
+      "@angular-devkit/schematics": [ "./packages/angular_devkit/schematics/src/index" ],
+      "@angular-devkit/schematics-tools": [ "./packages/angular_devkit/schematics_tools/src/index" ]
     }
   },
   "exclude": [

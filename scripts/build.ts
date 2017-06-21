@@ -48,19 +48,39 @@ function copy(from: string, to: string) {
 }
 
 
+function recursiveCopy(from: string, to: string) {
+  if (!fs.existsSync(from)) {
+    console.error(`File "${from}" does not exist.`);
+    process.exit(4);
+  }
+  if (fs.statSync(from).isDirectory()) {
+    fs.readdirSync(from).forEach(fileName => {
+      recursiveCopy(path.join(from, fileName), path.join(to, fileName));
+    });
+  } else {
+    copy(from, to);
+  }
+}
+
+
 function rm(p: string) {
   p = path.relative(process.cwd(), p);
   fs.unlinkSync(p);
 }
 
 
-export default function() {
-  console.log('Removing dist/...');
-  glob.sync(path.join(__dirname, '../dist', '**/*'), { dot: true, nodir: true })
+function rimraf(p: string) {
+  glob.sync(path.join(p, '**/*'), { dot: true, nodir: true })
     .forEach(p => fs.unlinkSync(p));
-  glob.sync(path.join(__dirname, '../dist', '**/*'), { dot: true })
+  glob.sync(path.join(p, '**/*'), { dot: true })
     .sort((a, b) => b.length - a.length)
     .forEach(p => fs.rmdirSync(p));
+}
+
+
+export default function() {
+  console.log('Removing dist/...');
+  rimraf(path.join(__dirname, '../dist'));
 
   // Order packages in order of dependency.
   // We use bubble sort because we need a full topological sort but adding another dependency
@@ -87,19 +107,21 @@ export default function() {
 
 
   console.log('Building...');
+  const tsConfigPath = path.relative(process.cwd(), path.join(__dirname, '../tsconfig.json'));
+  try {
+    npmRun.execSync(`tsc -p "${tsConfigPath}"`);
+  } catch (err) {
+    const stdout = err.stdout.toString().split('\n').join('\n  ');
+    console.error(`TypeScript compiler failed:\n\nSTDOUT:\n  ${stdout}`);
+    process.exit(1);
+  }
+
+  console.log('Moving packages to dist/');
   for (const packageName of sortedPackages) {
     console.log(`  ${packageName}`);
     const pkg = packages[packageName];
-
-    // Build the package.
-    if (pkg.tsConfig) {
-      try {
-        npmRun.execSync(`tsc -p "${path.relative(process.cwd(), pkg.tsConfig)}"`);
-      } catch (err) {
-        console.error(`Compilation error.\n${err.stdout}`);
-        process.exit(1);
-      }
-    }
+    recursiveCopy(pkg.build, pkg.dist);
+    rimraf(pkg.build);
   }
 
   console.log('Copying resources...');
@@ -129,7 +151,8 @@ export default function() {
         if (fileName.endsWith('.ts')) {
           // Verify that it was actually built.
           if (!fs.existsSync(path.join(pkg.dist, fileName).replace(/ts$/, 'js'))) {
-            throw new Error(`Source found but compiled file not found: "${fileName}".`);
+            console.error(`\nSource found but compiled file not found: "${fileName}".`);
+            process.exit(2);
           }
           // Skip all sources.
           return false;

@@ -7,7 +7,6 @@
  */
 'use strict';
 
-import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 
@@ -22,7 +21,7 @@ export interface PackageInfo {
   relative: string;
   main: string;
   dist: string;
-  tsConfig?: string;
+  build: string;
   packageJson: string;
   dependencies: string[];
 }
@@ -52,19 +51,14 @@ export const packages: PackageMap =
         bin[binName] = path.resolve(pkg.root, pkgJson['bin'][binName]);
       });
 
-      let tsConfig: string | undefined = path.resolve(pkgRoot, 'tsconfig.json');
-      if (!fs.existsSync(tsConfig)) {
-        tsConfig = undefined;
-      }
-
       packages[name] = {
+        build: path.join(distRoot, pkgRoot.substr(path.dirname(__dirname).length)),
         dist: path.join(distRoot, name),
         packageJson: path.join(pkgRoot, 'package.json'),
         root: pkgRoot,
         relative: path.relative(path.dirname(__dirname), pkgRoot),
         main: path.resolve(pkgRoot, 'src/index.ts'),
         bin,
-        tsConfig,
         name,
         dependencies: []
       };
