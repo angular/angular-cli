@@ -23,10 +23,45 @@ export interface PackageInfo {
   main: string;
   dist: string;
   build: string;
-  packageJson: string;
+  packageJson: any;
   dependencies: string[];
 }
 export type PackageMap = { [name: string]: PackageInfo };
+
+
+function loadPackageJson(p: string) {
+  const root = require('../package.json');
+  const pkg = require(p);
+
+  for (const key of Object.keys(root)) {
+    switch (key) {
+      case 'bin':
+      case 'description':
+      case 'dependencies':
+      case 'devDependencies':
+      case 'name':
+      case 'main':
+      case 'peerDependencies':
+      case 'scripts':
+      case 'typings':
+      case 'version':
+        continue;
+
+      case 'keywords':
+        const a = pkg[key] || [];
+        const b = Object.keys(root[key].concat(a).reduce((acc: any, curr: string) => {
+          acc[curr] = true;
+          return acc;
+        }, {}));
+        pkg[key] = b;
+        break;
+
+      default:
+        pkg[key] = root[key];
+    }
+  }
+  return pkg;
+}
 
 
 const packageJsonPaths =
@@ -45,11 +80,11 @@ export const packages: PackageMap =
     })
     .reduce((packages: PackageMap, pkg) => {
       const pkgRoot = pkg.root;
-      let pkgJson = require(path.join(pkgRoot, 'package.json'));
-      let name = pkgJson['name'];
-      let bin: {[name: string]: string} = {};
-      Object.keys(pkgJson['bin'] || {}).forEach(binName => {
-        bin[binName] = path.resolve(pkg.root, pkgJson['bin'][binName]);
+      const pacakgeJson = loadPackageJson(path.join(pkgRoot, 'package.json'));
+      const name = pacakgeJson['name'];
+      const bin: {[name: string]: string} = {};
+      Object.keys(pacakgeJson['bin'] || {}).forEach(binName => {
+        bin[binName] = path.resolve(pkg.root, pacakgeJson['bin'][binName]);
       });
 
       if (!(name in versions)) {
@@ -60,7 +95,7 @@ export const packages: PackageMap =
       packages[name] = {
         build: path.join(distRoot, pkgRoot.substr(path.dirname(__dirname).length)),
         dist: path.join(distRoot, name),
-        packageJson: path.join(pkgRoot, 'package.json'),
+        packageJson: pacakgeJson,
         root: pkgRoot,
         relative: path.relative(path.dirname(__dirname), pkgRoot),
         main: path.resolve(pkgRoot, 'src/index.ts'),

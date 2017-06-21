@@ -6,29 +6,6 @@
   "bin": {
     "schematics": "./bin/schematics.js"
   },
-  "keywords": [
-    "angular",
-    "sdk",
-    "blueprints",
-    "code generation",
-    "schematics",
-    "cli",
-    "Angular DevKit"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/angular/devkit.git"
-  },
-  "engines": {
-    "node": ">= 6.9.0",
-    "npm": ">= 3.0.0"
-  },
-  "author": "Angular Authors",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/angular/devkit/issues"
-  },
-  "homepage": "https://github.com/angular/devkit",
   "dependencies": {
     "@angular-devkit/schematics": "0.0.0",
     "@angular-devkit/schematics-tools": "0.0.0"

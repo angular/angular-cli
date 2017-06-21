@@ -6,7 +6,12 @@
     "devkit-admin": "./bin/devkit-admin",
     "schematics": "./bin/schematics"
   },
-  "keywords": [],
+  "keywords": [
+    "angular",
+    "devkit",
+    "sdk",
+    "Angular DevKit"
+  ],
   "scripts": {
     "admin": "./bin/devkit-admin",
     "build": "tsc -p tsconfig.json",

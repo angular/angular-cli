@@ -3,13 +3,9 @@
   "version": "0.0.0",
   "description": "Schematics specific to Angular",
   "keywords": [
-    "angular",
-    "sdk",
     "blueprints",
     "code generation",
-    "schematics",
-    "cli",
-    "Angular DevKit"
+    "schematics"
   ],
   "repository": {
     "type": "git",

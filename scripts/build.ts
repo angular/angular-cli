@@ -128,7 +128,7 @@ export default function() {
   for (const packageName of sortedPackages) {
     console.log(`  ${packageName}`);
     const pkg = packages[packageName];
-    const pkgJson = require(pkg.packageJson);
+    const pkgJson = pkg.packageJson;
     const files = glob.sync(path.join(pkg.root, '**/*'), { dot: true, nodir: true });
     console.log(`    ${files.length} files total...`);
     const resources = files
@@ -199,7 +199,7 @@ export default function() {
     console.log(`  ${packageName}`);
     const pkg = packages[packageName];
     const packageJsonPath = path.join(pkg.dist, 'package.json');
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const packageJson = pkg.packageJson;
 
     if (versions[packageName]) {
       packageJson['version'] = versions[packageName];

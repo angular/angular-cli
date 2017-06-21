@@ -5,29 +5,13 @@
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "keywords": [
-    "angular",
     "sdk",
     "blueprints",
     "scaffolding",
     "tooling",
     "code generation",
-    "schematics",
-    "Angular DevKit"
+    "schematics"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/angular/devkit.git"
-  },
-  "engines": {
-    "node": ">= 6.9.0",
-    "npm": ">= 3.0.0"
-  },
-  "author": "Angular Authors",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/angular/devkit/issues"
-  },
-  "homepage": "https://github.com/angular/devkit",
   "dependencies": {
     "@angular-devkit/schematics": "0.0.0"
   }
