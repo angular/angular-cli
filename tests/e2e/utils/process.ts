@@ -15,7 +15,7 @@ let _processes: child_process.ChildProcess[] = [];
 
 type ProcessOutput = {
   stdout: string;
-  stdout: string;
+  stderr: string;
 };
 
 
