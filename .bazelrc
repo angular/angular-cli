@@ -1,8 +1,9 @@
 # Disable sandboxing because it's too slow.
 # https://github.com/bazelbuild/bazel/issues/2424
-# TODO(alexeagle): do use the sandbox on CI
-#build --spawn_strategy=standalone
+build --spawn_strategy=standalone --strategy=TypeScriptCompile=worker
 
 # Performance: avoid stat'ing input files
 build --watchfs
 
+# Do not generate the symbolic links bazel-*.
+build --symlink_prefix=/

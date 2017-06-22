@@ -1,0 +1,51 @@
+version: 2
+
+defaults: &defaults
+  working_directory: ~/ng
+  docker:
+    - image: angular/ngcontainer
+
+jobs:
+  lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
+
+      - run: npm install
+      - run: npm run lint
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
+
+      - run: npm install
+      - run: npm run test
+
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
+
+      - run: bazel run @io_bazel_rules_typescript_node//:bin/npm install
+      - run: bazel build ...
+
+      - save_cache:
+          key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - "node_modules"
+
+
+workflows:
+  version: 2
+  default_workflow:
+    jobs:
+      - lint
+      - build
+      - test

@@ -63,5 +63,8 @@
     "ts-node": "^2.0.0",
     "tslint": "^4.0.2",
     "typescript": "~2.3.0"
+  },
+  "devDependencies": {
+    "protobufjs": "5.0.0"
   }
 }

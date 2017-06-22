@@ -6,16 +6,18 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "outDir": "./dist",
     "rootDir": ".",
+    "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "inlineSourceMap": true,
     "sourceRoot": ".",
-    // Inline sources are necessary for out tests to show the proper sources, since we are using
+    // Inline sources are necessary for our tests to show the proper sources, since we are using
     // Istanbul (not Constantinople) as well, and applying both source maps to get the original
     // source in devtools.
     "inlineSources": true,
