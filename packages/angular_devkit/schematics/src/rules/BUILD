@@ -24,6 +24,7 @@ ts_library(
         "//packages/angular_devkit/schematics/src/engine",
         "//packages/angular_devkit/schematics/src/exception",
         "//packages/angular_devkit/schematics/src/tree",
+        "//packages/angular_devkit/schematics/src/utility",
         # @deps: rxjs
         # @typings: node
     ],
@@ -37,6 +38,7 @@ ts_library(
         ":rules",
         "//packages/angular_devkit/schematics/src/engine",
         "//packages/angular_devkit/schematics/src/tree",
+        "//packages/angular_devkit/schematics/src/utility",
         # @deps: rxjs
         # @typings: jasmine
     ],
