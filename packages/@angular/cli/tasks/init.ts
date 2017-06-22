@@ -88,13 +88,13 @@ export default Task.extend({
 
     return installBlueprint.run(blueprintOpts)
       .then(function () {
-        if (commandOptions.skipGit === false) {
-          return gitInit.run(commandOptions, rawArgs);
+        if (!commandOptions.skipInstall) {
+          return npmInstall.run();
         }
       })
       .then(function () {
-        if (!commandOptions.skipInstall) {
-          return npmInstall.run();
+        if (commandOptions.skipGit === false) {
+          return gitInit.run(commandOptions, rawArgs);
         }
       })
       .then(function () {
