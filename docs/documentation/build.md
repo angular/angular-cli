@@ -302,3 +302,15 @@ Note: service worker support is experimental and subject to change.
     Run build when files change.
   </p>
 </details>
+
+
+
+<details>
+  <summary>delete output path</summary>
+  <p>
+    <code>--delete-output-path</code> (aliases: <code>-w</code>)
+  </p>
+  <p>
+    Do not delete output path.
+  </p>
+</details>
