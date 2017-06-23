@@ -80,11 +80,11 @@ export const packages: PackageMap =
     })
     .reduce((packages: PackageMap, pkg) => {
       const pkgRoot = pkg.root;
-      const pacakgeJson = loadPackageJson(path.join(pkgRoot, 'package.json'));
-      const name = pacakgeJson['name'];
+      const packageJson = loadPackageJson(path.join(pkgRoot, 'package.json'));
+      const name = packageJson['name'];
       const bin: {[name: string]: string} = {};
-      Object.keys(pacakgeJson['bin'] || {}).forEach(binName => {
-        bin[binName] = path.resolve(pkg.root, pacakgeJson['bin'][binName]);
+      Object.keys(packageJson['bin'] || {}).forEach(binName => {
+        bin[binName] = path.resolve(pkg.root, packageJson['bin'][binName]);
       });
 
       if (!(name in versions)) {
@@ -95,13 +95,13 @@ export const packages: PackageMap =
       packages[name] = {
         build: path.join(distRoot, pkgRoot.substr(path.dirname(__dirname).length)),
         dist: path.join(distRoot, name),
-        packageJson: pacakgeJson,
         root: pkgRoot,
         relative: path.relative(path.dirname(__dirname), pkgRoot),
         main: path.resolve(pkgRoot, 'src/index.ts'),
+        dependencies: [],
         bin,
         name,
-        dependencies: []
+        packageJson,
       };
       return packages;
     }, {});
