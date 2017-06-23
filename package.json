@@ -41,6 +41,8 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-devkit/build-optimizer": "0.0.13",
+    "@angular-devkit/schematics": "0.0.17",
+    "@schematics/angular": "0.0.27",
     "autoprefixer": "^6.5.3",
     "chalk": "^2.0.1",
     "circular-dependency-plugin": "^3.0.0",

@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { ng } from '../../../utils/process';
 import { oneLine } from 'common-tags';
 
@@ -8,17 +7,17 @@ export default function () {
       if (!output.stdout.match(/update src[\\|\/]app[\\|\/]app.module.ts/)) {
         throw new Error(oneLine`
           Expected to match
-          "update src${path.sep}app${path.sep}app.module.ts"
-          in ${output}.`);
+          "update src/app/app.module.ts"
+          in ${output.stdout}.`);
       }
     })
     .then(() => ng('generate', 'component', 'test-component'))
     .then((output) => {
-      if (!output.stdout.match(/identical src[\\|\/]app[\\|\/]app.module.ts/)) {
+      if (!output.stdout.match(/error! src[\\|\/]app[\\|\/]test-component[\\|\/]test-component.component.ts already exists./)) {
         throw new Error(oneLine`
           Expected to match
-          "identical src${path.sep}app${path.sep}app.module.ts"
-          in ${output}.`);
+          "ERROR! src/app/test-component/test-component.ts"
+          in ${output.stdout}.`);
       }
     });
 }

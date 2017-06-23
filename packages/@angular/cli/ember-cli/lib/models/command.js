@@ -496,7 +496,7 @@ let Command = CoreObject.extend({
     @param {Object} commandArgs
     @return {Object|null}
   */
-  parseArgs(commandArgs) {
+  parseArgs(commandArgs, showErrors = true) {
     let knownOpts = {}; // Parse options
     let commandOptions = {};
     let parsedOptions;
@@ -507,7 +507,7 @@ let Command = CoreObject.extend({
 
     let validateParsed = function(key) {
       // ignore 'argv', 'h', and 'help'
-      if (!commandOptions.hasOwnProperty(key) && key !== 'argv' && key !== 'h' && key !== 'help') {
+      if (!commandOptions.hasOwnProperty(key) && key !== 'argv' && key !== 'h' && key !== 'help' && showErrors) {
         this.ui.writeLine(chalk.yellow(`The option '--${key}' is not registered with the ${this.name} command. ` +
           `Run \`ng ${this.name} --help\` for a list of supported options.`));
       }

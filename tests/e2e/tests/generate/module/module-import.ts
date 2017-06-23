@@ -27,17 +27,19 @@ export default function () {
     .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test3Module(.|\s)*\]/m))
 
     .then(() => ng('generate', 'module', 'test4', '--routing', '--module', 'app'))
-    .then(() => expectFileToMatch(modulePath,
-      /import { Test4RoutingModule } from '.\/test4\/test4-routing.module'/))
-    .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test4RoutingModule(.|\s)*\]/m))
+    .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test4Module(.|\s)*\]/m))
+    .then(() => expectFileToMatch(join('src', 'app', 'test4', 'test4.module.ts'),
+      /import { Test4RoutingModule } from '.\/test4-routing.module'/))
+    .then(() => expectFileToMatch(join('src', 'app', 'test4', 'test4.module.ts'),
+      /imports: \[(.|\s)*Test4RoutingModule(.|\s)*\]/m))
 
     .then(() => ng('generate', 'module', 'test5', '--module', 'sub'))
     .then(() => expectFileToMatch(subModulePath,
-      /import { Test5Module } from '.\/..\/test5\/test5.module'/))
+      /import { Test5Module } from '..\/test5\/test5.module'/))
     .then(() => expectFileToMatch(subModulePath, /imports: \[(.|\s)*Test5Module(.|\s)*\]/m))
 
     .then(() => ng('generate', 'module', 'test6', '--module', join('sub', 'deep'))
     .then(() => expectFileToMatch(deepSubModulePath,
-      /import { Test6Module } from '.\/..\/..\/test6\/test6.module'/))
+      /import { Test6Module } from '..\/..\/test6\/test6.module'/))
     .then(() => expectFileToMatch(deepSubModulePath, /imports: \[(.|\s)*Test6Module(.|\s)*\]/m)));
 }

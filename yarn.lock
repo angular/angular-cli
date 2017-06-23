@@ -2,14 +2,27 @@
 # yarn lockfile v1
 
 
-"@angular-devkit/build-optimizer@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/build-optimizer/-/build-optimizer-0.0.3.tgz#092bdf732b79a779ce540f9bb99d6590dd971204"
+"@angular-devkit/build-optimizer@0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/build-optimizer/-/build-optimizer-0.0.5.tgz#321b141126ce462843e4d13e9d5603877e044860"
   dependencies:
     loader-utils "^1.1.0"
     magic-string "^0.19.1"
     source-map "^0.5.6"
     typescript "^2.3.3"
+
+"@angular-devkit/core@0.0.6", "@angular-devkit/core@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-0.0.6.tgz#caf25c0c7928196e244b5fe5124256fcef6bce7c"
+
+"@angular-devkit/schematics@0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-0.0.9.tgz#84668c0196648de7e88e1727b2e7defbd7962dfd"
+  dependencies:
+    "@angular-devkit/core" "0.0.6"
+    "@ngtools/json-schema" "^1.1.0"
+    minimist "^1.2.0"
+    rxjs "^5.4.2"
 
 "@angular/compiler-cli@^4.0.0":
   version "4.2.4"
@@ -36,6 +49,16 @@
   resolved "https://registry.yarnpkg.com/@angular/tsc-wrapped/-/tsc-wrapped-4.2.4.tgz#956ff14ccf2043243b0cc82336b221dbe6315aef"
   dependencies:
     tsickle "^0.21.0"
+
+"@ngtools/json-schema@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@ngtools/json-schema/-/json-schema-1.1.0.tgz#c3a0c544d62392acc2813a42c8a0dc6f58f86922"
+
+"@schematics/angular@0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-0.0.9.tgz#c9ff31078af3079990e448ddd07b735ed3c1b4bd"
+  dependencies:
+    "@angular-devkit/schematics" "0.0.9"
 
 "@types/chalk@^0.4.28":
   version "0.4.31"
