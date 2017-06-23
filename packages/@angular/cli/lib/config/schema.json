@@ -536,6 +536,23 @@
               "type": "string"
             }
           }
+        },
+        "schematics": {
+          "description": "Properties about schematics.",
+          "type": "object",
+          "properties": {
+            "collection": {
+              "description": "The schematics collection to use.",
+              "type": "string",
+              "default": "@schematics/angular"
+            },
+            "newApp": {
+              "description": "The new app schematic.",
+              "type": "string",
+              "default": "application"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

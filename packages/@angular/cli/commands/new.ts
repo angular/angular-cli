@@ -1,23 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
-import denodeify = require('denodeify');
 
 import InitCommand from './init';
 import { CliConfig } from '../models/config';
 import { validateProjectName } from '../utilities/validate-project-name';
 import { oneLine } from 'common-tags';
+import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 
 const Command = require('../ember-cli/lib/models/command');
 const Project = require('../ember-cli/lib/models/project');
 const SilentError = require('silent-error');
-
-// There's some problem with the generic typings for fs.makedir.
-// Couldn't find matching types for the callbacks so leaving it as any for now.
-const mkdir = denodeify<string, void>(fs.mkdir as any);
-
-const configFile = '.angular-cli.json';
-const changeLater = (path: string) => `You can later change the value in "${configFile}" (${path})`;
 
 const NewCommand = Command.extend({
   name: 'new',
@@ -66,13 +59,6 @@ const NewCommand = Command.extend({
       description: 'Skip initializing a git repository.'
     },
     {
-      name: 'skip-tests',
-      type: Boolean,
-      default: false,
-      aliases: ['st'],
-      description: 'Skip creating spec files.'
-    },
-    {
       name: 'skip-commit',
       type: Boolean,
       default: false,
@@ -80,67 +66,57 @@ const NewCommand = Command.extend({
       description: 'Skip committing the first commit to git.'
     },
     {
-      name: 'directory',
+      name: 'collection',
       type: String,
-      aliases: ['dir'],
-      description: 'The directory name to create the app in.'
-    },
-    {
-      name: 'source-dir',
-      type: String,
-      default: 'src',
-      aliases: ['sd'],
-      description: `The name of the source directory. ${changeLater('apps[0].root')}.`
-    },
-    {
-      name: 'style',
-      type: String,
-      default: 'css',
-      description: oneLine`The style file default extension.
-        Possible values: css, scss, less, sass, styl(stylus).
-        ${changeLater('defaults.styleExt')}.
-      `
-    },
-    {
-      name: 'prefix',
-      type: String,
-      default: 'app',
-      aliases: ['p'],
-      description: oneLine`
-        The prefix to use for all component selectors.
-        ${changeLater('apps[0].prefix')}.
-      `
-    },
-    {
-      name: 'routing',
-      type: Boolean,
-      default: false,
-      description: 'Generate a routing module.'
-    },
-    {
-      name: 'inline-style',
-      type: Boolean,
-      default: false,
-      aliases: ['is'],
-      description: 'Should have an inline style.'
-    },
-    {
-      name: 'inline-template',
-      type: Boolean,
-      default: false,
-      aliases: ['it'],
-      description: 'Should have an inline template.'
-     },
-     {
-      name: 'minimal',
-      type: Boolean,
-      default: false,
-      description: 'Should create a minimal app.'
-     }
+      aliases: ['c'],
+      description: 'Schematics collection to use.'
+    }
   ],
 
   isProject: function (projectPath: string) {
     return CliConfig.fromProject(projectPath) !== null;
+  },
+
+  getCollectionName(rawArgs: string[]) {
+    let collectionName = CliConfig.fromGlobal().get('defaults.schematics.collection');
+    if (rawArgs) {
+      const parsedArgs = this.parseArgs(rawArgs, false);
+      if (parsedArgs.options.collection) {
+        collectionName = parsedArgs.options.collection;
+      }
+    }
+    return collectionName;
+  },
+
+  beforeRun: function (rawArgs: string[]) {
+    const isHelp = ['--help', '-h'].includes(rawArgs[0]);
+    if (isHelp) {
+      return;
+    }
+
+    const schematicName = CliConfig.getValue('defaults.schematics.newApp');
+
+    if (/^\d/.test(rawArgs[1])) {
+      SilentError.debugOrThrow('@angular/cli/commands/generate',
+        `The \`ng new ${rawArgs[0]}\` file name cannot begin with a digit.`);
+    }
+
+    const SchematicGetOptionsTask = require('../tasks/schematic-get-options').default;
+
+    const getOptionsTask = new SchematicGetOptionsTask({
+      ui: this.ui,
+      project: this.project
+    });
+
+    return getOptionsTask.run({
+      schematicName,
+      collectionName: this.getCollectionName(rawArgs)
+    })
+      .then((availableOptions: SchematicAvailableOptions) => {
+        this.registerOptions({
+          availableOptions: availableOptions
+        });
+      });
   },
 
   run: function (commandOptions: any, rawArgs: string[]) {
@@ -159,8 +135,16 @@ const NewCommand = Command.extend({
       commandOptions.skipGit = true;
     }
 
-    const directoryName = path.join(process.cwd(),
-      commandOptions.directory ? commandOptions.directory : packageName);
+    commandOptions.directory = commandOptions.directory || packageName;
+    const directoryName = path.join(process.cwd(), commandOptions.directory);
+
+    if (fs.existsSync(directoryName) && this.isProject(directoryName)) {
+      throw new SilentError(oneLine`
+        Directory ${directoryName} exists and is already an Angular CLI project.
+      `);
+    }
+
+    commandOptions.collectionName = this.getCollectionName(rawArgs);
 
     const initCommand = new InitCommand({
       ui: this.ui,
@@ -168,34 +152,9 @@ const NewCommand = Command.extend({
       project: Project.nullProject(this.ui, this.cli)
     });
 
-    let createDirectory;
-    if (commandOptions.dryRun) {
-      createDirectory = Promise.resolve()
-        .then(() => {
-          if (fs.existsSync(directoryName) && this.isProject(directoryName)) {
-            throw new SilentError(oneLine`
-              Directory ${directoryName} exists and is already an Angular CLI project.
-            `);
-          }
-        });
-    } else {
-      createDirectory = mkdir(directoryName)
-        .catch((err) => {
-          if (err.code === 'EEXIST') {
-            if (this.isProject(directoryName)) {
-              throw new SilentError(oneLine`
-                Directory ${directoryName} exists and is already an Angular CLI project.
-              `);
-            }
-          } else {
-            throw err;
-          }
-        })
-        .then(() => process.chdir(directoryName));
-    }
-
-    return createDirectory
+    return Promise.resolve()
       .then(initCommand.run.bind(initCommand, commandOptions, rawArgs));
+
   }
 });
 
