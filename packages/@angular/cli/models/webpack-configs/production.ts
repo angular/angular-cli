@@ -97,8 +97,13 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       new webpack.EnvironmentPlugin({
         'NODE_ENV': 'production'
       }),
+      new webpack.LoaderOptionsPlugin({
+        minimize: true,
+        debug: false
+      }),
       new (<any>webpack).HashedModuleIdsPlugin(),
       new webpack.optimize.UglifyJsPlugin(<any>{
+        beautify: false,
         mangle: { screw_ie8: true },
         compress: { screw_ie8: true, warnings: buildOptions.verbose },
         sourceMap: buildOptions.sourcemaps,
