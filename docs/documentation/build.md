@@ -223,8 +223,6 @@ Note: service worker support is experimental and subject to change.
   </p>
 </details>
 
-https://github.com/angular/angular-cli/blob/master/packages/@angular/cli/commands/build.ts#L124
-
 <details>
   <summary>delete-output-path</summary>
   <p>
