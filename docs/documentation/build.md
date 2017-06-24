@@ -223,6 +223,18 @@ Note: service worker support is experimental and subject to change.
   </p>
 </details>
 
+https://github.com/angular/angular-cli/blob/master/packages/@angular/cli/commands/build.ts#L124
+
+<details>
+  <summary>delete-output-path</summary>
+  <p>
+  <code>--delete-output-path</code> (aliases: <code>-dop</code> <em>default value: true</em>)
+  </p>
+  <p>
+    Delete the output path directory.
+  </p>
+</details>
+
 <details>
   <summary>poll</summary>
   <p>
