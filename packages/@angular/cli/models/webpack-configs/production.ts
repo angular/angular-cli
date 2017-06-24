@@ -3,6 +3,8 @@ import * as webpack from 'webpack';
 import * as fs from 'fs';
 import * as semver from 'semver';
 import { stripIndent } from 'common-tags';
+import { PurifyPlugin } from 'ngo-loader';
+
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
@@ -93,14 +95,28 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
 
   return {
     entry: entryPoints,
+    module: {
+      rules: [
+        {
+          'test': /(\\|\/)@angular(\\|\/).*\.js$/, use: [{
+            loader: 'ngo-loader',
+            options: {
+              sourceMap: buildOptions.sourcemaps
+            }
+          }]
+        },
+      ]
+    },
     plugins: [
       new webpack.EnvironmentPlugin({
         'NODE_ENV': 'production'
       }),
       new (<any>webpack).HashedModuleIdsPlugin(),
+      new PurifyPlugin(),
+      new (<any>webpack.optimize).ModuleConcatenationPlugin(),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8: true },
-        compress: { screw_ie8: true, warnings: buildOptions.verbose },
+        compress: { screw_ie8: true, warnings: buildOptions.verbose, pure_getters: true },
         sourceMap: buildOptions.sourcemaps,
         comments: false
       })
