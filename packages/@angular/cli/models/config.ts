@@ -4,22 +4,13 @@ import { oneLine } from 'common-tags';
 import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
+import { homedir } from 'os';
 
 import {findUp} from '../utilities/find-up';
 
 
 export const CLI_CONFIG_FILE_NAME = '.angular-cli.json';
 const CLI_CONFIG_FILE_NAME_ALT = 'angular-cli.json';
-
-
-function getUserHome() {
-  const envHomeName = (process.platform.startsWith('win')) ? 'USERPROFILE' : 'HOME';
-  const env = process.env[envHomeName];
-  if (env == null) {
-    throw new Error('Missing environment variable ' + envHomeName);
-  }
-  return env;
-}
 
 
 const configCacheMap = new Map<string, CliConfigBase<ConfigInterface>>();
@@ -52,11 +43,16 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
   }
 
   static globalConfigFilePath(): string {
-    let globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
-    const altGlobalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME_ALT);
-    if (!fs.existsSync(globalConfigPath) && fs.existsSync(altGlobalConfigPath)) {
+    const globalConfigPath = path.join(homedir(), CLI_CONFIG_FILE_NAME);
+    if (fs.existsSync(globalConfigPath)) {
+      return globalConfigPath;
+    }
+
+    const altGlobalConfigPath = path.join(homedir(), CLI_CONFIG_FILE_NAME_ALT);
+    if (fs.existsSync(altGlobalConfigPath)) {
       return altGlobalConfigPath;
     }
+
     return globalConfigPath;
   }
 
@@ -109,12 +105,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
       return configCacheMap.get(configPath);
     }
 
-    let globalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME);
-    const altGlobalConfigPath = path.join(getUserHome(), CLI_CONFIG_FILE_NAME_ALT);
-    if (!fs.existsSync(globalConfigPath) && fs.existsSync(altGlobalConfigPath)) {
-      globalConfigPath = altGlobalConfigPath;
-    }
-
+    const globalConfigPath = CliConfig.globalConfigFilePath();
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(configPath, [globalConfigPath]);
 
     const aliases = [
