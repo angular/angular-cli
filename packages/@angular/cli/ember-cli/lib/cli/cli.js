@@ -78,7 +78,6 @@ CLI.prototype.run = function(environment) {
     debug('command: %s', commandName);
 
     if (!this.testing) {
-      process.chdir(environment.project.root);
       var skipInstallationCheck = commandArgs.indexOf('--skip-installation-check') !== -1;
       if (environment.project.isEmberCLIProject() && !skipInstallationCheck) {
         new InstallationChecker({ project: environment.project }).checkInstallations();
