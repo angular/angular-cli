@@ -321,21 +321,19 @@ function _readArray(context: JsonParserContext): JsonAstArray {
   const value: JsonArray = [];
   const elements: JsonAstNode[] = [];
 
-  _readBlanks(context);
+  const comments = _readBlanks(context);
   if (_peek(context) != ']') {
     const node = _readValue(context);
     elements.push(node);
     value.push(node.value);
   }
 
-  _readBlanks(context);
   while (_peek(context) != ']') {
     _token(context, ',');
 
     const node = _readValue(context);
     elements.push(node);
     value.push(node.value);
-    _readBlanks(context);
   }
 
   _token(context, ']');
@@ -346,7 +344,7 @@ function _readArray(context: JsonParserContext): JsonAstArray {
     text: context.original.substring(start.offset, context.position.offset),
     value,
     elements,
-    comments: context.comments,
+    comments,
   };
 }
 
@@ -394,6 +392,7 @@ function _readIdentifier(context: JsonParserContext): JsonAstIdentifier {
 function _readProperty(context: JsonParserContext): JsonAstKeyValue {
   const start = context.position;
   let key;
+  const comments = _readBlanks(context);
   if ((context.mode & JsonParseMode.IdentifierKeyNamesAllowed) != 0) {
     const top = _peek(context);
     if (top == '"' || top == '\'') {
@@ -417,13 +416,14 @@ function _readProperty(context: JsonParserContext): JsonAstKeyValue {
     start,
     end,
     text: context.original.substring(start.offset, end.offset),
-    comments: context.comments,
+    comments,
   };
 }
 
 
 function _readObject(context: JsonParserContext): JsonAstObject {
   const objStart = context.position;
+  const comments = _readBlanks(context);
   // Consume the first delimiter.
   _token(context, '{');
   const value: JsonObject = {};
@@ -434,16 +434,13 @@ function _readObject(context: JsonParserContext): JsonAstObject {
     const property = _readProperty(context);
     value[property.key.value] = property.value.value;
     properties.push(property);
-    _readBlanks(context);
 
     while (_peek(context) != '}') {
       _token(context, ',');
-      _readBlanks(context);
 
       const property = _readProperty(context);
       value[property.key.value] = property.value.value;
       properties.push(property);
-      _readBlanks(context);
     }
   }
 
@@ -455,12 +452,12 @@ function _readObject(context: JsonParserContext): JsonAstObject {
     end: context.position,
     value,
     text: context.original.substring(objStart.offset, context.position.offset),
-    comments: context.comments,
+    comments,
   };
 }
 
 
-function _readBlanks(context: JsonParserContext) {
+function _readBlanks(context: JsonParserContext): (JsonAstComment | JsonAstMultilineComment)[] {
   if ((context.mode & JsonParseMode.CommentsAllowed) != 0) {
     const comments: (JsonAstComment | JsonAstMultilineComment)[] = [];
     while (true) {
@@ -472,7 +469,7 @@ function _readBlanks(context: JsonParserContext) {
         _next(context);
         char = context.original[context.position.offset];
         while (context.original[context.position.offset] != '*'
-            && context.original[context.position.offset + 1] != '/') {
+            || context.original[context.position.offset + 1] != '/') {
           _next(context);
           if (context.position.offset >= context.original.length) {
             throw new UnexpectedEndOfInputException(context);
@@ -515,23 +512,19 @@ function _readBlanks(context: JsonParserContext) {
         });
       } else if (char == ' ' || char == '\t' || char == '\n' || char == '\r' || char == '\f') {
         _next(context);
-        char = context.original[context.position.offset];
       } else {
         break;
       }
     }
 
-    if (comments.length > 0) {
-      context.comments = comments;
-    } else {
-      context.comments = undefined;
-    }
+    return comments;
   } else {
     let char = context.original[context.position.offset];
     while (char == ' ' || char == '\t' || char == '\n' || char == '\r' || char == '\f') {
       _next(context);
       char = context.original[context.position.offset];
     }
+    return [];
   }
 }
 

@@ -28,7 +28,7 @@ describe('parseJson and parseJsonAst', () => {
     ];
 
     for (const [n, [start, end, text]] of entries(numbers)) {
-      it(`works for "${n}"`, () => {
+      it(`works for ${JSON.stringify(n)}`, () => {
         const ast = parseJsonAst(n);
         expect(ast.start).toEqual({offset: start[0], line: start[1], character: start[2]});
         expect(ast.end).toEqual({offset: end[0], line: end[1], character: end[2]});
@@ -39,7 +39,7 @@ describe('parseJson and parseJsonAst', () => {
     }
 
     for (const n of errors) {
-      it(`errors for "${n}"`, () => {
+      it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
         expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
@@ -73,7 +73,7 @@ describe('parseJson and parseJsonAst', () => {
     ];
 
     for (const [n, [start, end, text]] of entries(numbers)) {
-      it(`works for "${n}"`, () => {
+      it(`works for ${JSON.stringify(n)}`, () => {
         const ast = parseJsonAst(n);
         expect(ast.kind).toBe('number');
         expect(ast.start).toEqual({offset: start[0], line: start[1], character: start[2]});
@@ -85,7 +85,7 @@ describe('parseJson and parseJsonAst', () => {
     }
 
     for (const n of errors) {
-      it(`errors for "${n}"`, () => {
+      it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
         expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
@@ -111,7 +111,7 @@ describe('parseJson and parseJsonAst', () => {
     ];
 
     for (const [n, [start, end, text]] of entries(strings)) {
-      it(`works for "${n}"`, () => {
+      it(`works for ${JSON.stringify(n)}`, () => {
         const ast = parseJsonAst(n);
         expect(ast.kind).toBe('string');
         expect(ast.start).toEqual({offset: start[0], line: start[1], character: start[2]});
@@ -123,7 +123,7 @@ describe('parseJson and parseJsonAst', () => {
     }
 
     for (const n of errors) {
-      it(`errors for "${n}"`, () => {
+      it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
         expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
@@ -142,7 +142,7 @@ describe('parseJson and parseJsonAst', () => {
     ];
 
     for (const [n, [kind, start, end, value, text]] of entries(strings)) {
-      it(`works for "${n}"`, () => {
+      it(`works for ${JSON.stringify(n)}`, () => {
         const ast = parseJsonAst(n);
         expect(ast.kind).toBe(kind);
         expect(ast.start).toEqual({offset: start[0], line: start[1], character: start[2]});
@@ -153,7 +153,7 @@ describe('parseJson and parseJsonAst', () => {
     }
 
     for (const n of errors) {
-      it(`errors for "${n}"`, () => {
+      it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
         expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
@@ -178,7 +178,7 @@ describe('parseJson and parseJsonAst', () => {
     ];
 
     for (const [n, [start, end, text]] of entries(strings)) {
-      it(`works for "${n}"`, () => {
+      it(`works for ${JSON.stringify(n)}`, () => {
         const ast = parseJsonAst(n);
         expect(ast.kind).toBe('array');
         expect(ast.start).toEqual({offset: start[0], line: start[1], character: start[2]});
@@ -190,7 +190,7 @@ describe('parseJson and parseJsonAst', () => {
     }
 
     for (const n of errors) {
-      it(`errors for "${n}"`, () => {
+      it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
         expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
@@ -213,7 +213,7 @@ describe('parseJson and parseJsonAst', () => {
     ];
 
     for (const [n, [start, end, text]] of entries(strings)) {
-      it(`works for "${n}"`, () => {
+      it(`works for ${JSON.stringify(n)}`, () => {
         const ast = parseJsonAst(n);
         expect(ast.kind).toBe('object');
         expect(ast.start).toEqual({offset: start[0], line: start[1], character: start[2]});
@@ -225,7 +225,7 @@ describe('parseJson and parseJsonAst', () => {
     }
 
     for (const n of errors) {
-      it(`errors for "${n}"`, () => {
+      it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n)).toThrow();
         expect(() => parseJson(n)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
@@ -263,11 +263,37 @@ describe('parseJson and parseJsonAst', () => {
     }
 
     for (const n of errors) {
-      it(`errors for "${n}"`, () => {
+      it(`errors for ${JSON.stringify(n)}`, () => {
         expect(() => parseJsonAst(n, JsonParseMode.Loose)).toThrow();
         expect(() => parseJson(n, JsonParseMode.Loose)).toThrow();
         expect(() => JSON.parse(n)).toThrow();
       });
     }
+  });
+
+  describe('complex', () => {
+    it('strips comments', () => {
+      expect(parseJson(`
+        // THIS IS A COMMENT
+        {
+          /* THIS IS ALSO A COMMENT */ // IGNORED BECAUSE COMMENT
+          // AGAIN, COMMENT /* THIS SHOULD NOT BE WEIRD
+          "a": "this // should not be a comment",
+          "a2": "this /* should also not be a comment",
+          /* MULTIPLE
+             LINE
+             COMMENT
+             \o/ */
+          "b" /* COMMENT */: /* YOU GUESSED IT */ 1 // COMMENT
+          , /* STILL VALID */
+          "c": 2
+        }
+      `, JsonParseMode.Loose)).toEqual({
+        a: 'this // should not be a comment',
+        a2: 'this /* should also not be a comment',
+        b: 1,
+        c: 2
+      });
+    });
   });
 });
