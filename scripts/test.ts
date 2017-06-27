@@ -165,12 +165,16 @@ if (process.argv.indexOf('--spec-reporter') != -1) {
         return x.substr(0, x.indexOf('\n', x.indexOf('\n', x.lastIndexOf('.ts:')) + 1));
       }
     },
+    spec: {
+      displayDuration: true,
+    },
     suite: {
-      displayNumber: true
+      displayNumber: true,
     },
     summary: {
       displayStacktrace: true,
-      displayErrorMessages: true
+      displayErrorMessages: true,
+      displayDuration: true,
     }
   }));
 }
