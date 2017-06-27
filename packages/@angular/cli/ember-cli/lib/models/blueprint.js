@@ -32,7 +32,6 @@ var removeFile          = RSVP.denodeify(fs.remove);
 var SilentError         = require('silent-error');
 var CoreObject          = require('core-object');
 var EOL                 = require('os').EOL;
-var debug               = require('debug')('ember-cli:blueprint');
 var normalizeEntityName = require('ember-cli-normalize-entity-name');
 
 function existsSync(path) {
@@ -524,14 +523,12 @@ Blueprint.prototype.install = function(options) {
   this._checkForPod(options.verbose);
   this._checkInRepoAddonExists(options.inRepoAddon);
 
-  debug('START: processing blueprint: `%s`', this.name);
   var start = new Date();
   return this._process(
     options,
     this.beforeInstall,
     this.processFiles,
     this.afterInstall).finally(function() {
-      debug('END: processing blueprint: `%s` in (%dms)', this.name, new Date() - start);
     }.bind(this));
 };
 
