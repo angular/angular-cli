@@ -1,0 +1,7 @@
+{
+  "name": "@_/benchmark",
+  "version": "0.0.0",
+  "description": "CLI tool for Angular",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts"
+}

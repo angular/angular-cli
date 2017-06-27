@@ -62,7 +62,8 @@
     "temp": "^0.8.3",
     "ts-node": "^2.0.0",
     "tslint": "^4.0.2",
-    "typescript": "~2.3.0"
+    "typescript": "~2.3.0",
+    "v8-profiler": "^5.7.0"
   },
   "devDependencies": {
     "protobufjs": "5.0.0"

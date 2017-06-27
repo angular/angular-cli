@@ -1,5 +1,6 @@
 {
   "@_/schematics-cli": "0.0.0",
+  "@_/benchmark": "0.0.0",
   "@angular-devkit/core": "0.0.1",
   "@angular-devkit/schematics": "0.0.1",
   "@angular-devkit/schematics-tools": "0.0.1",
