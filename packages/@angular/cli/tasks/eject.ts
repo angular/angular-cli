@@ -22,6 +22,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SilentError = require('silent-error');
 const licensePlugin = require('license-webpack-plugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 const Task = require('../ember-cli/lib/models/task');
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -177,6 +178,9 @@ class JsonWebpackSerializer {
         case ExtractTextPlugin:
           args = this._extractTextPluginSerialize(plugin);
           this.variableImports['extract-text-webpack-plugin'] = 'ExtractTextPlugin';
+          break;
+        case CircularDependencyPlugin:
+          this.variableImports['circular-dependency-plugin'] = 'CircularDependencyPlugin';
           break;
         case AotPlugin:
           args = this._aotPluginSerialize(plugin);
