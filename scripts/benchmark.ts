@@ -65,7 +65,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
       const stat = this._stats;
       const padding = '             ';
 
-      function pad(x: number, p: string = padding): string {
+      function pad(x: string | number, p: string = padding): string {
         const s = ('' + x).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         return p.substr(0, p.length - ('' + s).length) + s;
       }
