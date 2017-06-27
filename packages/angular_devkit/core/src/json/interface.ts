@@ -108,4 +108,4 @@ export interface JsonAstComment extends JsonAstNodeBase {
 }
 
 
-export type JsonValue = JsonAstNode['value'] | null;
+export type JsonValue = JsonAstNode['value'];

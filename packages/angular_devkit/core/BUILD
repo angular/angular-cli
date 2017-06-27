@@ -14,6 +14,22 @@ ts_library(
         exclude = ["**/*_spec.ts", "**/*_benchmark.ts"],
     ),
     deps = [
+        # @deps: rxjs
+    ],
+    tsconfig = "//:tsconfig.json",
+    module_name = "@angular-devkit/schematics",
+    module_root = "src"
+)
+
+ts_library(
+    name = "spec",
+    srcs = glob(
+        include = ["**/*_spec.ts"],
+    ),
+    deps = [
+        ":core",
+        # @deps: rxjs
+        # @typings: jasmine
     ],
     tsconfig = "//:tsconfig.json",
     module_name = "@angular-devkit/schematics",
