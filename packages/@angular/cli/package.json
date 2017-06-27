@@ -43,7 +43,7 @@
     "exports-loader": "^0.6.3",
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.10.0",
-    "fs-extra": "^2.0.0",
+    "fs-extra": "^3.0.1",
     "get-caller-file": "^1.0.0",
     "glob": "^7.0.3",
     "heimdalljs": "^0.2.4",

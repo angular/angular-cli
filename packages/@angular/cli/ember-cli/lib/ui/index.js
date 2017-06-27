@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise          = require('../ext/promise');
 var EOL              = require('os').EOL;
 var chalk            = require('chalk');
 var writeError       = require('./write-error');
