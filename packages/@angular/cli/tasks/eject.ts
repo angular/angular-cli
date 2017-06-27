@@ -22,6 +22,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SilentError = require('silent-error');
 const licensePlugin = require('license-webpack-plugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 const Task = require('../ember-cli/lib/models/task');
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -73,6 +74,15 @@ class JsonWebpackSerializer {
     if (this.imports[module].indexOf(importName) == -1) {
       this.imports[module].push(importName);
     }
+  }
+
+  private _globCopyWebpackPluginSerialize(value: any): any {
+    let patterns = value.options.patterns;
+    let globOptions = value.options.globOptions;
+    return {
+      patterns,
+      globOptions: this._globReplacer(globOptions)
+    };
   }
 
   private _commonsChunkPluginSerialize(value: any): any {
@@ -165,11 +175,13 @@ class JsonWebpackSerializer {
           this._addImport('webpack.optimize', 'UglifyJsPlugin');
           break;
         case angularCliPlugins.BaseHrefWebpackPlugin:
-        case angularCliPlugins.GlobCopyWebpackPlugin:
         case angularCliPlugins.SuppressExtractedTextChunksWebpackPlugin:
           this._addImport('@angular/cli/plugins/webpack', plugin.constructor.name);
           break;
-
+        case angularCliPlugins.GlobCopyWebpackPlugin:
+          args = this._globCopyWebpackPluginSerialize(plugin);
+          this._addImport('@angular/cli/plugins/webpack', 'GlobCopyWebpackPlugin');
+          break;
         case webpack.optimize.CommonsChunkPlugin:
           args = this._commonsChunkPluginSerialize(plugin);
           this._addImport('webpack.optimize', 'CommonsChunkPlugin');
@@ -177,6 +189,9 @@ class JsonWebpackSerializer {
         case ExtractTextPlugin:
           args = this._extractTextPluginSerialize(plugin);
           this.variableImports['extract-text-webpack-plugin'] = 'ExtractTextPlugin';
+          break;
+        case CircularDependencyPlugin:
+          this.variableImports['circular-dependency-plugin'] = 'CircularDependencyPlugin';
           break;
         case AotPlugin:
           args = this._aotPluginSerialize(plugin);
@@ -318,6 +333,12 @@ class JsonWebpackSerializer {
   private _moduleReplacer(value: any) {
     return Object.assign({}, value, {
       rules: value.rules && value.rules.map((x: any) => this._ruleReplacer(x))
+    });
+  }
+
+  private _globReplacer(value: any) {
+    return Object.assign({}, value, {
+      cwd: this._relativePath('process.cwd()', path.relative(this._root, value.cwd))
     });
   }
 

@@ -32,6 +32,6 @@
   },
   "peerDependencies": {
     "typescript": "^2.0.2",
-    "webpack": "^2.2.0"
+    "webpack": "^2.2.0 || ^3.0.0"
   }
 }
