@@ -2,10 +2,6 @@
 
 const fs = require('fs-extra');
 const EOL = require('os').EOL;
-const RSVP = require('rsvp');
-
-const Promise = RSVP.Promise;
-const writeFile = RSVP.denodeify(fs.outputFile);
 
 /**
   Inserts the given content into a file. If the `contentsToInsert` string is already
@@ -88,7 +84,7 @@ function insertIntoFile(fullPath, contentsToInsert, providedOptions) {
   if (contentsToWrite !== originalContents) {
     returnValue.inserted = true;
 
-    return writeFile(fullPath, contentsToWrite)
+    return fs.writeFile(fullPath, contentsToWrite)
       .then(() => returnValue);
 
   } else {

@@ -1,6 +1,5 @@
 'use strict';
 
-const Promise = require('rsvp').Promise;
 const spawn = require('child_process').spawn;
 
 function openEditor(file) {

@@ -4,9 +4,9 @@
 
 var chalk = require('chalk');
 var Task  = require('../models/task');
-var Promise = require('../ext/promise');
+var RSVP = require('rsvp');
 
-var spawn = Promise.denodeify(require('child_process').spawn);
+var spawn = RSVP.denodeify(require('child_process').spawn);
 
 
 module.exports = Task.extend({

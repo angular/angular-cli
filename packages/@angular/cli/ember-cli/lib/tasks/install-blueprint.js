@@ -2,14 +2,8 @@
 
 var Blueprint     = require('../models/blueprint');
 var Task          = require('../models/task');
-var Promise       = require('../ext/promise');
-var temp          = require('temp');
-var childProcess  = require('child_process');
 var path          = require('path');
 var merge         = require('lodash/merge');
-
-var mkdir = Promise.denodeify(temp.mkdir);
-var exec = Promise.denodeify(childProcess.exec);
 
 module.exports = Task.extend({
   run: function(options) {

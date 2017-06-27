@@ -1,6 +1,6 @@
 'use strict';
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const RSVP = require('rsvp');
 const chalk = require('chalk');
 const EditFileDiff = require('./edit-file-diff');
@@ -8,10 +8,6 @@ const EOL = require('os').EOL;
 const rxEOL = new RegExp(EOL, 'g');
 const isBinaryFile = require('isbinaryfile').sync;
 const canEdit = require('../utilities/open-editor').canEdit;
-
-const Promise = RSVP.Promise;
-const readFile = RSVP.denodeify(fs.readFile);
-const lstat = RSVP.denodeify(fs.stat);
 
 function processTemplate(content, context) {
   let options = {
@@ -84,7 +80,7 @@ class FileInfo {
         jsdiff = require('diff');
     return RSVP.hash({
       input: this.render(),
-      output: readFile(info.outputPath),
+      output: fs.readFile(info.outputPath),
     }).then(result => {
       let diff = jsdiff.createPatch(
         info.outputPath, result.output.toString().replace(rxEOL, '\n'), result.input.replace(rxEOL, '\n')
@@ -103,8 +99,8 @@ class FileInfo {
     let path = this.inputPath,
         context = this.templateVariables;
     if (!this.rendered) {
-      this.rendered = readFile(path)
-        .then(content => lstat(path)
+      this.rendered = fs.readFile(path)
+        .then(content => fs.stat(path)
           .then(fileStat => {
             if (isBinaryFile(content, fileStat.size)) {
               return content;
@@ -133,7 +129,7 @@ class FileInfo {
         if (doesExist) {
           result = RSVP.hash({
             input: this.render(),
-            output: readFile(this.outputPath),
+            output: fs.readFile(this.outputPath),
           }).then(result => {
             let type;
             if (result.input.toString().replace(rxEOL, '\n') === result.output.toString().replace(rxEOL, '\n')) {

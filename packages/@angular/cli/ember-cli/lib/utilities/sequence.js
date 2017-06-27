@@ -1,6 +1,5 @@
 'use strict';
 
-const Promise = require('rsvp').Promise;
 /*
  *
  * given an array of functions, that may or may not return promises sequence

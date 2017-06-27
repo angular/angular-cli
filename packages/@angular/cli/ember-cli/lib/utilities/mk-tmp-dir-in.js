@@ -2,22 +2,14 @@
 
 const fs = require('fs-extra');
 const temp = require('temp');
-const RSVP = require('rsvp');
+const denodeify = require('denodeify');
 
-const Promise = RSVP.Promise;
-const mkdir = RSVP.denodeify(fs.mkdir);
-const mkdirTemp = RSVP.denodeify(temp.mkdir);
-
-function exists(dir) {
-  return new Promise(resolve => {
-    fs.exists(dir, resolve);
-  });
-}
+const mkdirTemp = denodeify(temp.mkdir);
 
 function mkTmpDirIn(dir) {
-  return exists(dir).then(doesExist => {
+  return fs.pathExists(dir).then(doesExist => {
     if (!doesExist) {
-      return mkdir(dir);
+      return fs.mkdir(dir);
     }
   }).then(() => mkdirTemp({ dir }));
 }
