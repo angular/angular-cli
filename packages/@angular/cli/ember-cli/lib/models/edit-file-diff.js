@@ -1,15 +1,12 @@
 'use strict';
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const RSVP = require('rsvp');
 const jsdiff = require('diff');
 const temp = require('temp').track();
 const path = require('path');
 const SilentError = require('silent-error');
 const openEditor = require('../utilities/open-editor');
-
-const readFile = RSVP.denodeify(fs.readFile);
-const writeFile = RSVP.denodeify(fs.writeFile);
 
 class EditFileDiff {
   constructor(options) {
@@ -19,7 +16,7 @@ class EditFileDiff {
   edit() {
     return RSVP.hash({
       input: this.info.render(),
-      output: readFile(this.info.outputPath),
+      output: fs.readFile(this.info.outputPath),
     })
       .then(this.invokeEditor.bind(this))
       .then(this.applyPatch.bind(this))
@@ -32,8 +29,8 @@ class EditFileDiff {
 
   applyPatch(resultHash) {
     return RSVP.hash({
-      diffString: readFile(resultHash.diffPath),
-      currentString: readFile(resultHash.outputPath),
+      diffString: fs.readFile(resultHash.diffPath),
+      currentString: fs.readFile(resultHash.outputPath),
     }).then(result => {
       let appliedDiff = jsdiff.applyPatch(result.currentString.toString(), result.diffString.toString());
 
@@ -43,7 +40,7 @@ class EditFileDiff {
         throw new SilentError(message);
       }
 
-      return writeFile(resultHash.outputPath, appliedDiff);
+      return fs.writeFile(resultHash.outputPath, appliedDiff);
     });
   }
 
@@ -52,7 +49,7 @@ class EditFileDiff {
     let diff = jsdiff.createPatch(info.outputPath, result.output.toString(), result.input);
     let diffPath = path.join(temp.mkdirSync(), 'currentDiff.diff');
 
-    return writeFile(diffPath, diff)
+    return fs.writeFile(diffPath, diff)
       .then(() => openEditor(diffPath))
       .then(() => ({ outputPath: info.outputPath, diffPath }));
   }

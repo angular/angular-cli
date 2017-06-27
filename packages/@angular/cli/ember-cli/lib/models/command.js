@@ -6,7 +6,6 @@ const path = require('path');
 const camelize = require('ember-cli-string-utils').camelize;
 const getCallerFile = require('get-caller-file');
 const printCommand = require('../utilities/print-command');
-const Promise = require('rsvp').Promise;
 const _ = require('lodash');
 const EOL = require('os').EOL;
 const CoreObject = require('core-object');
