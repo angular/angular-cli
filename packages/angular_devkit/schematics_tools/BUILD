@@ -15,6 +15,7 @@ ts_library(
         exclude = ["src/*_spec.ts"],
     ),
     deps = [
+        "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         # @typings: node
     ],

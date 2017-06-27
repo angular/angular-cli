@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as minimist from 'minimist';
-import {Observable} from 'rxjs/Observable';
+import {createLogger} from '@angular-devkit/core';
 import {
   DryRunEvent,
   DryRunSink,
@@ -21,6 +20,8 @@ import {
   NodeModulesEngineHost
 } from '@angular-devkit/schematics-tools';
 import {SchemaClassFactory} from '@ngtools/json-schema';
+import * as minimist from 'minimist';
+import {Observable} from 'rxjs/Observable';
 
 import 'rxjs/add/operator/ignoreElements';
 
@@ -29,7 +30,7 @@ import 'rxjs/add/operator/ignoreElements';
  * Show usage of the CLI tool, and exit the process.
  */
 function usage(exitCode = 0): never {
-  console.log(`
+  logger.info(`
     schematics [CollectionName:]SchematicName [options, ...]
 
     By default, if the collection name is not specified, use the internal collection provided
@@ -86,8 +87,10 @@ function parseSchematicName(str: string | null): { collection: string, schematic
 
 /** Parse the command line. */
 const argv = minimist(process.argv.slice(2), {
-  boolean: [ 'dry-run', 'force', 'help', 'list-schematics' ]
+  boolean: [ 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ]
 });
+/** Create the DevKit Logger used through the CLI. */
+const logger = createLogger(argv['verbose']);
 
 if (argv.help) {
   usage();
@@ -124,7 +127,7 @@ engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options
  */
 const collection = engine.createCollection(collectionName);
 if (collection === null) {
-  console.log(`Invalid collection name: "${collectionName}".`);
+  logger.fatal(`Invalid collection name: "${collectionName}".`);
   process.exit(3);
   throw 3;  // TypeScript doesn't know that process.exit() never returns.
 }
@@ -132,7 +135,7 @@ if (collection === null) {
 
 /** If the user wants to list schematics, we simply show all the schematic names. */
 if (argv['list-schematics']) {
-  console.log(engineHost.listSchematics(collection));
+  logger.info(engineHost.listSchematics(collection).join('\n'));
   process.exit(0);
   throw 0;  // TypeScript doesn't know that process.exit() never returns.
 }
@@ -167,7 +170,7 @@ dryRunSink.reporter.subscribe((event: DryRunEvent) => {
   switch (event.kind) {
     case 'error':
       const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist.';
-      console.log(`ERROR! ${event.path} ${desc}.`);
+      logger.warn(`ERROR! ${event.path} ${desc}.`);
       error = true;
       break;
     case 'update':
@@ -206,7 +209,7 @@ schematic.call(argv, host)
   .concatMap((tree: Tree) => {
     if (!error) {
       // Output the logging queue.
-      loggingQueue.forEach(log => console.log(log));
+      loggingQueue.forEach(log => logger.info(log));
     }
 
     if (dryRun || error) {
@@ -216,7 +219,7 @@ schematic.call(argv, host)
   })
   .subscribe({
     error(err: Error) {
-      console.error(err);
+      logger.fatal(err.toString());
       process.exit(1);
     }
   });

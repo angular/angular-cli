@@ -7,7 +7,7 @@
  */
 import 'jasmine';
 
-import {yellow} from 'chalk';
+import {yellow} from '@angular-devkit/core';
 import * as glob from 'glob';
 import {SpecReporter as JasmineSpecReporter} from 'jasmine-spec-reporter';
 import {join, relative} from 'path';

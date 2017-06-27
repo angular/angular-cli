@@ -17,7 +17,7 @@ ts_library(
         # @deps: rxjs
     ],
     tsconfig = "//:tsconfig.json",
-    module_name = "@angular-devkit/schematics",
+    module_name = "@angular-devkit/core",
     module_root = "src"
 )
 
@@ -32,6 +32,6 @@ ts_library(
         # @typings: jasmine
     ],
     tsconfig = "//:tsconfig.json",
-    module_name = "@angular-devkit/schematics",
+    module_name = "@angular-devkit/core",
     module_root = "src"
 )
