@@ -5,6 +5,7 @@ import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 
 /**
@@ -69,6 +70,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       moduleFilenameTemplate: '[resource-path]',
       fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
       sourceRoot: 'webpack:///'
+    }));
+  }
+
+  if (!appConfig.hideCircularDependencyWarnings) {
+    extraPlugins.push(new CircularDependencyPlugin({
+      exclude: /(\\|\/)node_modules(\\|\/)/
     }));
   }
 
