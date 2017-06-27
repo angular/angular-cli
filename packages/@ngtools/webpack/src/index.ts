@@ -4,11 +4,7 @@ import * as path from 'path';
 let version;
 
 // Check that Angular is available.
-try {
-  version = require('@angular/compiler-cli').VERSION;
-} catch (e) {
-  throw new Error('The "@angular/compiler-cli" package was not properly installed.');
-}
+version = require('@angular/compiler-cli').VERSION;
 
 // Check that Angular is also not part of this module's node_modules (it should be the project's).
 const compilerCliPath = require.resolve('@angular/compiler-cli');
