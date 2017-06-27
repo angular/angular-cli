@@ -8,17 +8,12 @@ load("@io_bazel_rules_typescript//:defs.bzl", "ts_library")
 licenses(["notice"])  # MIT License
 
 ts_library(
-    name = "schematics",
-    srcs = [
-        "src/index.ts",
-    ],
+    name = "core",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = ["**/*_spec.ts", "**/*_benchmark.ts"],
+    ),
     deps = [
-        "//packages/angular_devkit/schematics/src/engine",
-        "//packages/angular_devkit/schematics/src/exception",
-        "//packages/angular_devkit/schematics/src/rules",
-        "//packages/angular_devkit/schematics/src/sink",
-        "//packages/angular_devkit/schematics/src/tree",
-        "//packages/angular_devkit/schematics/src/utility",
     ],
     tsconfig = "//:tsconfig.json",
     module_name = "@angular-devkit/schematics",
