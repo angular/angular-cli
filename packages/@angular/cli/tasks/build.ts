@@ -1,4 +1,4 @@
-import * as rimraf from 'rimraf';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as webpack from 'webpack';
 
@@ -8,7 +8,6 @@ import { NgCliWebpackConfig } from '../models/webpack-config';
 import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { CliConfig } from '../models/config';
 
-const fs = require('fs');
 const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
 
@@ -27,7 +26,7 @@ export default Task.extend({
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }
     if (runTaskOptions.deleteOutputPath) {
-      rimraf.sync(path.resolve(this.project.root, outputPath));
+      fs.removeSync(path.resolve(this.project.root, outputPath));
     }
 
     const webpackConfig = new NgCliWebpackConfig(runTaskOptions, app).buildConfig();
