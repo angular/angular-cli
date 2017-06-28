@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {BaseException} from '../exception/exception';
+import {BaseException} from '..';
 import {
   JsonAstNode,
   JsonValue,
@@ -30,8 +30,9 @@ import {
  */
 export class InvalidJsonCharacterException extends BaseException {
   constructor(context: JsonParserContext) {
-    const pos = context.position;
-    super(`Invalid JSON character: ${_peek(context)} at ${pos.line}:${pos.character}.`);
+    const pos = context.previous;
+    super(`Invalid JSON character: ${JSON.stringify(_peek(context))} `
+        + `at ${pos.line}:${pos.character}.`);
   }
 }
 
@@ -46,23 +47,35 @@ export class UnexpectedEndOfInputException extends BaseException {
 }
 
 
+/**
+ * Context passed around the parser with information about where we currently are in the parse.
+ */
 export interface JsonParserContext {
   position: Position;
   previous: Position;
-  comments?: (JsonAstComment | JsonAstMultilineComment)[];
   readonly original: string;
   readonly mode: JsonParseMode;
 }
 
+
+/**
+ * Peek and return the next character from the context.
+ * @private
+ */
 function _peek(context: JsonParserContext): string | undefined {
   return context.original[context.position.offset];
 }
 
+
+/**
+ * Move the context to the next character, including incrementing the line if necessary.
+ * @private
+ */
 function _next(context: JsonParserContext) {
-  const char = _peek(context);
   context.previous = context.position;
 
   let {offset, line, character} = context.position;
+  const char = context.original[offset];
   offset++;
   if (char == '\n') {
     line++;
@@ -74,11 +87,12 @@ function _next(context: JsonParserContext) {
 }
 
 
-function _prev(context: JsonParserContext) {
-  context.position = context.previous;
-}
-
-
+/**
+ * Read a token
+ * @param context
+ * @param valid
+ * @private
+ */
 function _token(context: JsonParserContext, valid: string): string;
 function _token(context: JsonParserContext): string | undefined;
 function _token(context: JsonParserContext, valid?: string): string | undefined {
@@ -88,7 +102,6 @@ function _token(context: JsonParserContext, valid?: string): string | undefined 
       throw new UnexpectedEndOfInputException(context);
     }
     if (valid.indexOf(char) == -1) {
-      _prev(context);
       throw new InvalidJsonCharacterException(context);
     }
   }
@@ -101,7 +114,8 @@ function _token(context: JsonParserContext, valid?: string): string | undefined 
 
 function _readExpNumber(context: JsonParserContext,
                         start: Position,
-                        str: string): JsonAstNumber {
+                        str: string,
+                        comments: (JsonAstComment | JsonAstMultilineComment)[]): JsonAstNumber {
   let char;
   let signed = false;
 
@@ -123,19 +137,19 @@ function _readExpNumber(context: JsonParserContext,
   }
 
   // We're done reading this number.
-  _prev(context);
+  context.position = context.previous;
   return {
     kind: 'number',
     start,
     end: context.position,
     text: context.original.substring(start.offset, context.position.offset),
     value: Number.parseFloat(str),
-    comments: context.comments,
+    comments: comments,
   };
 }
 
 
-function _readNumber(context: JsonParserContext): JsonAstNumber {
+function _readNumber(context: JsonParserContext, comments = _readBlanks(context)): JsonAstNumber {
   let str = '';
   let dotted = false;
   const start = context.position;
@@ -147,38 +161,34 @@ function _readNumber(context: JsonParserContext): JsonAstNumber {
     // Read tokens, one by one.
     if (char == '-') {
       if (str != '') {
-        _prev(context);
         throw new InvalidJsonCharacterException(context);
       }
     } else if (char == '0') {
       if (str == '0' || str == '-0') {
-        _prev(context);
         throw new InvalidJsonCharacterException(context);
       }
     } else if (char == '1' || char == '2' || char == '3' || char == '4' || char == '5'
         || char == '6' || char == '7' || char == '8' || char == '9') {
       if (str == '0' || str == '-0') {
-        _prev(context);
         throw new InvalidJsonCharacterException(context);
       }
     } else if (char == '.') {
       if (dotted) {
-        _prev(context);
         throw new InvalidJsonCharacterException(context);
       }
       dotted = true;
     } else if (char == 'e' || char == 'E') {
-      return _readExpNumber(context, start, str + char);
+      return _readExpNumber(context, start, str + char, comments);
     } else {
       // We're done reading this number.
-      _prev(context);
+      context.position = context.previous;
       return {
         kind: 'number',
         start,
         end: context.position,
         text: context.original.substring(start.offset, context.position.offset),
         value: Number.parseFloat(str),
-        comments: context.comments,
+        comments,
       };
     }
 
@@ -187,22 +197,22 @@ function _readNumber(context: JsonParserContext): JsonAstNumber {
 }
 
 
-function _readString(context: JsonParserContext): JsonAstString {
+function _readString(context: JsonParserContext, comments = _readBlanks(context)): JsonAstString {
   const start = context.position;
+
   // Consume the first string delimiter.
-  const delim = _token(context, '"\'');
+  const delim = _token(context);
   if ((context.mode & JsonParseMode.SingleQuotesAllowed) == 0) {
     if (delim == '\'') {
-      _prev(context);
       throw new InvalidJsonCharacterException(context);
     }
+  } else if (delim != '\'' && delim != '"') {
+    throw new InvalidJsonCharacterException(context);
   }
 
   let str = '';
-
-  let char: string | undefined;
   while (true) {
-    char = _token(context);
+    let char = _token(context);
     if (char == delim) {
       return {
         kind: 'string',
@@ -210,7 +220,7 @@ function _readString(context: JsonParserContext): JsonAstString {
         end: context.position,
         text: context.original.substring(start.offset, context.position.offset),
         value: str,
-        comments: context.comments,
+        comments: comments,
       };
     } else if (char == '\\') {
       char = _token(context);
@@ -238,13 +248,11 @@ function _readString(context: JsonParserContext): JsonAstString {
         case undefined:
           throw new UnexpectedEndOfInputException(context);
         default:
-          _prev(context);
           throw new InvalidJsonCharacterException(context);
       }
     } else if (char === undefined) {
       throw new UnexpectedEndOfInputException(context);
     } else if (char == '\b' || char == '\f' || char == '\n' || char == '\r' || char == '\t') {
-      _prev(context);
       throw new InvalidJsonCharacterException(context);
     } else {
       str += char;
@@ -253,9 +261,9 @@ function _readString(context: JsonParserContext): JsonAstString {
 }
 
 
-function _readTrue(context: JsonParserContext): JsonAstConstantTrue {
+function _readTrue(context: JsonParserContext,
+                   comments = _readBlanks(context)): JsonAstConstantTrue {
   const start = context.position;
-
   _token(context, 't');
   _token(context, 'r');
   _token(context, 'u');
@@ -268,14 +276,14 @@ function _readTrue(context: JsonParserContext): JsonAstConstantTrue {
     end,
     text: context.original.substring(start.offset, end.offset),
     value: true,
-    comments: context.comments,
+    comments,
   };
 }
 
 
-function _readFalse(context: JsonParserContext): JsonAstConstantFalse {
+function _readFalse(context: JsonParserContext,
+                    comments = _readBlanks(context)): JsonAstConstantFalse {
   const start = context.position;
-
   _token(context, 'f');
   _token(context, 'a');
   _token(context, 'l');
@@ -289,12 +297,13 @@ function _readFalse(context: JsonParserContext): JsonAstConstantFalse {
     end,
     text: context.original.substring(start.offset, end.offset),
     value: false,
-    comments: context.comments,
+    comments,
   };
 }
 
 
-function _readNull(context: JsonParserContext): JsonAstConstantNull {
+function _readNull(context: JsonParserContext,
+                   comments = _readBlanks(context)): JsonAstConstantNull {
   const start = context.position;
 
   _token(context, 'n');
@@ -309,19 +318,20 @@ function _readNull(context: JsonParserContext): JsonAstConstantNull {
     end,
     text: context.original.substring(start.offset, end.offset),
     value: null,
-    comments: context.comments,
+    comments: comments,
   };
 }
 
 
-function _readArray(context: JsonParserContext): JsonAstArray {
+function _readArray(context: JsonParserContext, comments = _readBlanks(context)): JsonAstArray {
   const start = context.position;
+
   // Consume the first delimiter.
   _token(context, '[');
   const value: JsonArray = [];
   const elements: JsonAstNode[] = [];
 
-  const comments = _readBlanks(context);
+  _readBlanks(context);
   if (_peek(context) != ']') {
     const node = _readValue(context);
     elements.push(node);
@@ -349,7 +359,8 @@ function _readArray(context: JsonParserContext): JsonAstArray {
 }
 
 
-function _readIdentifier(context: JsonParserContext): JsonAstIdentifier {
+function _readIdentifier(context: JsonParserContext,
+                         comments = _readBlanks(context)): JsonAstIdentifier {
   const start = context.position;
 
   let char = _peek(context);
@@ -373,13 +384,14 @@ function _readIdentifier(context: JsonParserContext): JsonAstIdentifier {
     char = _token(context);
     if (char == undefined
         || (first ? identValidFirstChar.indexOf(char) : identValidChar.indexOf(char)) == -1) {
-      _prev(context);
+      context.position = context.previous;
       return {
         kind: 'identifier',
         start,
         end: context.position,
         text: context.original.substr(start.offset, context.position.offset),
-        value
+        value,
+        comments
       };
     }
 
@@ -389,10 +401,11 @@ function _readIdentifier(context: JsonParserContext): JsonAstIdentifier {
 }
 
 
-function _readProperty(context: JsonParserContext): JsonAstKeyValue {
+function _readProperty(context: JsonParserContext,
+                       comments = _readBlanks(context)): JsonAstKeyValue {
   const start = context.position;
+
   let key;
-  const comments = _readBlanks(context);
   if ((context.mode & JsonParseMode.IdentifierKeyNamesAllowed) != 0) {
     const top = _peek(context);
     if (top == '"' || top == '\'') {
@@ -421,9 +434,9 @@ function _readProperty(context: JsonParserContext): JsonAstKeyValue {
 }
 
 
-function _readObject(context: JsonParserContext): JsonAstObject {
-  const objStart = context.position;
-  const comments = _readBlanks(context);
+function _readObject(context: JsonParserContext,
+                     comments = _readBlanks(context)): JsonAstObject {
+  const start = context.position;
   // Consume the first delimiter.
   _token(context, '{');
   const value: JsonObject = {};
@@ -448,10 +461,10 @@ function _readObject(context: JsonParserContext): JsonAstObject {
   return {
     kind: 'object',
     properties,
-    start: objStart,
+    start,
     end: context.position,
     value,
-    text: context.original.substring(objStart.offset, context.position.offset),
+    text: context.original.substring(start.offset, context.position.offset),
     comments,
   };
 }
@@ -533,8 +546,9 @@ function _readValue(context: JsonParserContext): JsonAstNode {
   let result: JsonAstNode;
 
   // Clean up before.
-  _readBlanks(context);
-  switch (_peek(context)) {
+  const comments = _readBlanks(context);
+  const char = _peek(context);
+  switch (char) {
     case undefined:
       throw new UnexpectedEndOfInputException(context);
 
@@ -549,30 +563,30 @@ function _readValue(context: JsonParserContext): JsonAstNode {
     case '7':
     case '8':
     case '9':
-      result = _readNumber(context);
+      result = _readNumber(context, comments);
       break;
 
     case '\'':
     case '"':
-      result = _readString(context);
+      result = _readString(context, comments);
       break;
 
     case 't':
-      result = _readTrue(context);
+      result = _readTrue(context, comments);
       break;
     case 'f':
-      result = _readFalse(context);
+      result = _readFalse(context, comments);
       break;
     case 'n':
-      result = _readNull(context);
+      result = _readNull(context, comments);
       break;
 
     case '[':
-      result = _readArray(context);
+      result = _readArray(context, comments);
       break;
 
     case '{':
-      result = _readObject(context);
+      result = _readObject(context, comments);
       break;
 
     default:
