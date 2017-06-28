@@ -67,7 +67,6 @@
     "postcss-url": "^5.1.2",
     "raw-loader": "^0.5.1",
     "resolve": "^1.1.7",
-    "rimraf": "^2.5.3",
     "rsvp": "^3.0.17",
     "rxjs": "^5.0.1",
     "sass-loader": "^6.0.3",

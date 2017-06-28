@@ -1,12 +1,11 @@
 import {Logger} from '@ngtools/logger';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import {buildSchema} from './build-schema';
 
 const denodeify = require('denodeify');
 const glob = denodeify(require('glob'));
 const npmRun = require('npm-run');
-const rimraf = denodeify(require('rimraf'));
 
 
 const root = path.join(__dirname, '../../..');
@@ -65,7 +64,7 @@ export default function build(packagesToBuild: string[], _opts: any,
     .then(() => logger.info('Deleting dist folder...'))
     .then(() => {
       if (willBuildEverything) {
-        return rimraf(dist);
+        return fs.remove(dist);
       }
     })
     .then(() => logger.info('Creating schema.d.ts...'))
