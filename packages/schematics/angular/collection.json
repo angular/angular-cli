@@ -5,6 +5,11 @@
       "schema": "./angular-app/schema.json",
       "description": "Create an Angular application."
     },
+    "class": {
+      "factory": "./class",
+      "description": "Create a class.",
+      "schema": "./class/schema.json"
+    },
     "component": {
       "factory": "./component",
       "description": "Create an Angular component.",
