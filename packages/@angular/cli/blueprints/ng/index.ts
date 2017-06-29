@@ -1,7 +1,7 @@
-import {CliConfig} from '../../models/config';
+import { CliConfig } from '../../models/config';
 
-const Blueprint   = require('../../ember-cli/lib/models/blueprint');
-const path        = require('path');
+const Blueprint = require('../../ember-cli/lib/models/blueprint');
+const path = require('path');
 const stringUtils = require('ember-cli-string-utils');
 const getFiles = Blueprint.prototype.files;
 
@@ -16,21 +16,22 @@ export default Blueprint.extend({
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
     { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
-    { name: 'minimal',
+    {
+      name: 'minimal',
       type: Boolean,
       default: false,
       description: 'Should create a minimal app.'
-     }
+    }
   ],
 
-  beforeInstall: function(options: any) {
+  beforeInstall: function (options: any) {
     if (options.ignoredUpdateFiles && options.ignoredUpdateFiles.length > 0) {
       return Blueprint.ignoredUpdateFiles =
         Blueprint.ignoredUpdateFiles.concat(options.ignoredUpdateFiles);
     }
   },
 
-  locals: function(options: any) {
+  locals: function (options: any) {
     if (options.minimal) {
       options.inlineStyle = true;
       options.inlineTemplate = true;
@@ -39,7 +40,7 @@ export default Blueprint.extend({
 
     this.styleExt = options.style === 'stylus' ? 'styl' : options.style;
     if (!options.style) {
-      this.styleExt = CliConfig.getValue('defaults.styleExt') || 'css';
+      this.styleExt = CliConfig.getValue('defaults.styleExt') || 'scss';
     }
 
     this.version = require(path.resolve(__dirname, '../../package.json')).version;
@@ -70,7 +71,7 @@ export default Blueprint.extend({
     };
   },
 
-  files: function() {
+  files: function () {
     let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && !this.options.routing) {

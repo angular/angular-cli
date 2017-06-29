@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-<% if (routing) { %>
-import { AppRoutingModule } from './app-routing.module';<% } %>
+import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 
 @NgModule({
@@ -9,8 +8,8 @@ import { AppComponent } from './app.component';
     AppComponent
   ],
   imports: [
-    BrowserModule<% if (routing) { %>,
-    AppRoutingModule<% } %>
+    BrowserModule,
+    RouterModule.forRoot([])
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import { stripIndent } from 'common-tags';
 
-import {SchemaClass, SchemaClassFactory} from '@ngtools/json-schema';
+import { SchemaClass, SchemaClassFactory } from '@ngtools/json-schema';
 
 
 const DEFAULT_CONFIG_SCHEMA_PATH = path.join(__dirname, '../../lib/config/schema.json');
@@ -21,9 +21,9 @@ export class CliConfig<JsonType> {
   private _config: SchemaClass<JsonType>;
 
   constructor(private _configPath: string,
-                      schema: Object,
-                      configJson: JsonType,
-                      fallbacks: JsonType[] = []) {
+    schema: Object,
+    configJson: JsonType,
+    fallbacks: JsonType[] = []) {
     this._config = new (SchemaClassFactory<JsonType>(schema))(configJson, ...fallbacks);
   }
 

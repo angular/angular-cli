@@ -151,8 +151,9 @@ export default Blueprint.extend({
   },
 
   locals: function (options: any) {
-    this.styleExt = CliConfig.getValue('defaults.styleExt') || 'css';
 
+    this.styleExt = CliConfig.getValue('defaults.styleExt') || 'scss';
+    console.log(this.styleExt, "stylext");
     options.inlineStyle = options.inlineStyle !== undefined ?
       options.inlineStyle : CliConfig.getValue('defaults.component.inlineStyle');
 
@@ -192,7 +193,7 @@ export default Blueprint.extend({
     let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && this.options.inlineTemplate) {
-      fileList = fileList.filter(p => p.indexOf('.html') < 0);
+      fileList = fileList.filter(p => p.indexOf('.pug') < 0);
     }
     if (this.options && this.options.inlineStyle) {
       fileList = fileList.filter(p => p.indexOf('.__styleext__') < 0);
@@ -205,8 +206,8 @@ export default Blueprint.extend({
   },
 
   fileMapTokens: function (options: any) {
-    const appConfig = getAppFromConfig(this.options.app);
 
+    const appConfig = getAppFromConfig(this.options.app);
     // Return custom template variables here.
     return {
       __path__: () => {
@@ -228,6 +229,7 @@ export default Blueprint.extend({
   afterInstall: function (options: any) {
     const appConfig = getAppFromConfig(this.options.app);
     if (options.prefix && appConfig.prefix && appConfig.prefix !== options.prefix) {
+
       this._writeStatusToUI(chalk.yellow, 'WARNING', oneLine`
         You are using a different prefix than the app ['${appConfig.prefix}']
         and may receive lint failures.
@@ -244,7 +246,7 @@ export default Blueprint.extend({
 
     if (!options.skipImport) {
       if (options.dryRun) {
-        this._writeStatusToUI(chalk.yellow,
+        this._writeStatusToUI(chalk.green,
           'update',
           path.relative(this.project.root, this.pathToModule));
         return;
@@ -252,7 +254,7 @@ export default Blueprint.extend({
 
       let preChange: any;
       try {
-         preChange = fs.readFileSync(this.pathToModule, 'utf8');
+        preChange = fs.readFileSync(this.pathToModule, 'utf8');
       } catch (err) {
         if (err.code === 'EISDIR') {
           throw 'Module specified should be a file, not a directory';
@@ -260,6 +262,7 @@ export default Blueprint.extend({
           throw err;
         }
       }
+
 
       returns.push(
         astUtils.addDeclarationToModule(this.pathToModule, className, importPath)
@@ -278,10 +281,8 @@ export default Blueprint.extend({
             if (postChange === preChange) {
               moduleStatus = 'identical';
             }
-
-            this._writeStatusToUI(chalk.yellow,
-              moduleStatus,
-              path.relative(this.project.root, this.pathToModule));
+            //moduleStatus
+            this._writeStatusToUI(chalk.red, "小傑很屌是不是？？", path.relative(this.project.root, this.pathToModule));
             this.addModifiedFile(this.pathToModule);
           }));
     }

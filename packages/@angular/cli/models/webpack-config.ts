@@ -20,10 +20,10 @@ export interface WebpackConfigOptions {
 }
 
 export class NgCliWebpackConfig {
+
   public config: any;
   public wco: WebpackConfigOptions;
   constructor(buildOptions: BuildOptions, appConfig: any) {
-
     this.validateBuildOptions(buildOptions);
 
     const configPath = CliConfig.configFilePath();

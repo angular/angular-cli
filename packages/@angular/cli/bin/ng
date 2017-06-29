@@ -17,7 +17,6 @@ const yellow = require('chalk').yellow;
 const SemVer = require('semver').SemVer;
 const events = require('events');
 
-
 function _fromPackageJson(cwd) {
   cwd = cwd || process.cwd();
 
@@ -67,7 +66,7 @@ if (process.env['NG_CLI_PROFILING']) {
 // Show the warnings due to package and version deprecation.
 const version = new SemVer(process.version);
 if (version.compare(new SemVer('6.9.0')) < 0
-    && CliConfig.fromGlobal().get('warnings.nodeDeprecation')) {
+  && CliConfig.fromGlobal().get('warnings.nodeDeprecation')) {
   process.stderr.write(yellow(stripIndents`
     You are running version ${version.version} of Node, which will not be supported in future
     versions of the CLI. The official Node version that will be supported is 6.9 and greater.
@@ -127,6 +126,7 @@ if (packageJsonProjectPath && fs.existsSync(packageJsonProjectPath)) {
     process.stderr.write(yellow(warnings.join('\n'), '\n\n'));
   }
 }
+
 
 resolve('@angular/cli', { basedir: process.cwd() },
   function (error, projectLocalCli) {

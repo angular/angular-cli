@@ -1,20 +1,18 @@
-import {CliConfig as CliConfigBase} from './config/config';
-import {CliConfig as ConfigInterface} from '../lib/config/schema';
+import { CliConfig as CliConfigBase } from './config/config';
+import { CliConfig as ConfigInterface } from '../lib/config/schema';
 import { oneLine } from 'common-tags';
 import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { homedir } from 'os';
 
-import {findUp} from '../utilities/find-up';
+import { findUp } from '../utilities/find-up';
 
 
 export const CLI_CONFIG_FILE_NAME = '.angular-cli.json';
 const CLI_CONFIG_FILE_NAME_ALT = 'angular-cli.json';
 
-
 const configCacheMap = new Map<string, CliConfigBase<ConfigInterface>>();
-
 
 export class CliConfig extends CliConfigBase<ConfigInterface> {
   static configFilePath(projectPath?: string): string {
@@ -22,8 +20,8 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     // Find the configuration, either where specified, in the Angular CLI project
     // (if it's in node_modules) or from the current process.
     return (projectPath && findUp(configNames, projectPath))
-        || findUp(configNames, process.cwd())
-        || findUp(configNames, __dirname);
+      || findUp(configNames, process.cwd())
+      || findUp(configNames, __dirname);
   }
 
   static getValue(jsonPath: string): any {
@@ -31,6 +29,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
 
     const projectConfig = CliConfig.fromProject();
     if (projectConfig) {
+
       value = projectConfig.get(jsonPath);
     } else {
       const globalConfig = CliConfig.fromGlobal();
@@ -58,7 +57,6 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
 
   static fromGlobal(): CliConfig {
     const globalConfigPath = this.globalConfigFilePath();
-
     if (configCacheMap.has(globalConfigPath)) {
       return configCacheMap.get(globalConfigPath);
     }
@@ -98,8 +96,8 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     const configPath = this.configFilePath(projectPath);
 
     if (!configPath ||
-     (configPath === this.globalConfigFilePath() && process.cwd() !== path.dirname(configPath))) {
-        return null;
+      (configPath === this.globalConfigFilePath() && process.cwd() !== path.dirname(configPath))) {
+      return null;
     }
     if (configCacheMap.has(configPath)) {
       return configCacheMap.get(configPath);

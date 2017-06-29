@@ -7,7 +7,6 @@ import { WebpackConfigOptions } from '../webpack-config';
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 
-
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
  * know they are used.
@@ -15,6 +14,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
  * require('source-map-loader')
  * require('raw-loader')
  * require('script-loader')
+ * require("pug-html-loader")
  * require('json-loader')
  * require('url-loader')
  * require('file-loader')
@@ -101,6 +101,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.html$/, loader: 'raw-loader' },
+        { test: /\.(jade|pug)$/, loader: ['raw-loader', "pug-html-loader"] },
         { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
         {
           test: /\.(jpg|png|webp|gif|otf|ttf|woff|woff2|cur|ani)$/,
