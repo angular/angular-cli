@@ -34,7 +34,20 @@ Default applications are created in a directory of the same name, with an initia
     <code>--inline-style</code> (alias: <code>-is</code>) <em>default value: false</em>
   </p>
   <p>
-    Should have an inline style.
+    Determine whether the generated AppComponent styles will be inlined in the component code, or a seperate styles file.
+  </p>
+</details>
+
+<details>
+  <summary>inline-style-all</summary>
+  <p>
+    <code>--inline-style-all</code> (alias: <code>-isa</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Determine whether all generated components' styles will be inlined in the component code, or a seperate styles file.
+  </p>
+  <p>
+    You can later change the value in <em>.angular-cli.json</em> (<code>defaults.component.inlineStyle</code>).
   </p>
 </details>
 
@@ -44,7 +57,20 @@ Default applications are created in a directory of the same name, with an initia
     <code>--inline-template</code> (alias: <code>-it</code>) <em>default value: false</em>
   </p>
   <p>
-    Should have an inline template.
+    Determine whether the generated AppComponent template will be inlined in the component code, or a seperate template file.
+  </p>
+</details>
+
+<details>
+  <summary>inline-template-all</summary>
+  <p>
+    <code>--inline-template-all</code> (alias: <code>-ita</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Determine whether all generated components' templates will be inlined in the component code, or a seperate template file.
+  </p>
+  <p>
+    You can later change the value in <em>.angular-cli.json</em> (<code>defaults.component.inlineTemplate</code>).
   </p>
 </details>
 

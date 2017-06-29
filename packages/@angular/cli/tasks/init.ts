@@ -76,6 +76,8 @@ export default Task.extend({
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,
+      inlineStyleAll: commandOptions.inlineStyleAll,
+      inlineTemplateAll: commandOptions.inlineTemplateAll,
       minimal: commandOptions.minimal,
       ignoredUpdateFiles: ['favicon.ico'],
       skipGit: commandOptions.skipGit,

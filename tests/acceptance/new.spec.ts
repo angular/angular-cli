@@ -8,28 +8,29 @@ import { forEach } from 'lodash';
 
 const ng = require('../helpers/ng');
 const tmp = require('../helpers/tmp');
+const readConfigFile = require('../helpers/config-file');
 const walkSync = require('walk-sync');
 const SilentError = require('silent-error');
 const Blueprint = require('@angular/cli/ember-cli/lib/models/blueprint');
 
 const root = process.cwd();
+const commonNewParams = ['new', 'foo', '--skip-install', '--skip-git'];
 
-
-describe('Acceptance: ng new', function () {
-  beforeEach(function () {
-    return tmp.setup('./tmp').then(function () {
+describe('Acceptance: ng new', () => {
+  beforeEach(() => {
+    return tmp.setup('./tmp').then(() => {
       process.chdir('./tmp');
     });
   });
 
-  afterEach(function () {
+  afterEach(function() {
     this.timeout(10000);
 
     return tmp.teardown('./tmp');
   });
 
   function confirmBlueprintedForDir(dir: string) {
-    return function () {
+    return () => {
       let blueprintPath = path.join(root, dir, 'files');
       let expected: string[] = walkSync(blueprintPath);
       let actual = walkSync('.').sort();
@@ -59,23 +60,23 @@ describe('Acceptance: ng new', function () {
 
   it('requires a valid name (!)', () => {
     return ng(['new', '!', '--skip-install', '--skip-git', '--inline-template'])
-      .then(() => { throw new Error(); }, () => {});
+      .then(() => { throw new Error(); }, () => { });
   });
   it('requires a valid name (abc-.)', () => {
     return ng(['new', 'abc-.', '--skip-install', '--skip-git', '--inline-template'])
-      .then(() => { throw new Error(); }, () => {});
+      .then(() => { throw new Error(); }, () => { });
   });
   it('requires a valid name (abc-)', () => {
     return ng(['new', 'abc-', '--skip-install', '--skip-git', '--inline-template'])
-      .then(() => { throw new Error(); }, () => {});
+      .then(() => { throw new Error(); }, () => { });
   });
   it('requires a valid name (abc-def-)', () => {
     return ng(['new', 'abc-def-', '--skip-install', '--skip-git', '--inline-template'])
-      .then(() => { throw new Error(); }, () => {});
+      .then(() => { throw new Error(); }, () => { });
   });
   it('requires a valid name (abc-123)', () => {
     return ng(['new', 'abc-123', '--skip-install', '--skip-git', '--inline-template'])
-      .then(() => { throw new Error(); }, () => {});
+      .then(() => { throw new Error(); }, () => { });
   });
   it('requires a valid name (abc)', () => {
     return ng(['new', 'abc', '--skip-install', '--skip-git', '--inline-template']);
@@ -84,20 +85,20 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'abc-def', '--skip-install', '--skip-git', '--inline-template']);
   });
 
-  it('ng new foo, where foo does not yet exist, works', function () {
+  it('ng new foo, where foo does not yet exist, works', () => {
     return ng(['new', 'foo', '--skip-install']).then(confirmBlueprinted);
   });
 
-  it('ng new with empty app does throw exception', function () {
+  it('ng new with empty app does throw exception', () => {
     expect(ng(['new', ''])).to.throw;
   });
 
-  it('ng new without app name does throw exception', function () {
+  it('ng new without app name does throw exception', () => {
     expect(ng(['new', ''])).to.throw;
   });
 
-  it('ng new with app name creates new directory and has a dasherized package name', function () {
-    return ng(['new', 'FooApp', '--skip-install', '--skip-git']).then(function () {
+  it('ng new with app name creates new directory and has a dasherized package name', () => {
+    return ng(['new', 'FooApp', '--skip-install', '--skip-git']).then(() => {
       expect(!fs.pathExistsSync('FooApp'));
 
       const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -105,8 +106,8 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('ng new has a .editorconfig file', function () {
-    return ng(['new', 'FooApp', '--skip-install', '--skip-git']).then(function () {
+  it('ng new has a .editorconfig file', () => {
+    return ng(['new', 'FooApp', '--skip-install', '--skip-git']).then(() => {
       expect(!fs.pathExistsSync('FooApp'));
 
       const editorConfig = fs.readFileSync('.editorconfig', 'utf8');
@@ -114,10 +115,10 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('Cannot run ng new, inside of Angular CLI project', function () {
-    return ng(['new', 'foo', '--skip-install', '--skip-git'])
-      .then(function () {
-        return ng(['new', 'foo', '--skip-install', '--skip-git']).then(() => {
+  it('Cannot run ng new, inside of Angular CLI project', () => {
+    return ng([...commonNewParams])
+      .then(() => {
+        return ng([...commonNewParams]).then(() => {
           throw new SilentError('Cannot run ng new, inside of Angular CLI project should fail.');
         }, () => {
           expect(!fs.pathExistsSync('foo'));
@@ -126,14 +127,14 @@ describe('Acceptance: ng new', function () {
       .then(confirmBlueprinted);
   });
 
-  it('ng new without skip-git flag creates .git dir', function () {
-    return ng(['new', 'foo', '--skip-install']).then(function () {
+  it('ng new without skip-git flag creates .git dir', () => {
+    return ng(['new', 'foo', '--skip-install']).then(() => {
       expect(fs.pathExistsSync('.git'));
     });
   });
 
-  it('ng new with --dry-run does not create new directory', function () {
-    return ng(['new', 'foo', '--dry-run']).then(function () {
+  it('ng new with --dry-run does not create new directory', () => {
+    return ng(['new', 'foo', '--dry-run']).then(() => {
       const cwd = process.cwd();
       expect(cwd).to.not.match(/foo/, 'does not change cwd to foo in a dry run');
       expect(!fs.pathExistsSync(path.join(cwd, 'foo')), 'does not create new directory');
@@ -141,9 +142,9 @@ describe('Acceptance: ng new', function () {
     });
   });
 
-  it('ng new with --directory uses given directory name and has correct package name', function () {
-    return ng(['new', 'foo', '--skip-install', '--skip-git', '--directory=bar'])
-      .then(function () {
+  it('ng new with --directory uses given directory name and has correct package name', () => {
+    return ng([...commonNewParams, '--directory=bar'])
+      .then(() => {
         const cwd = process.cwd();
         expect(cwd).to.not.match(/foo/, 'does not use app name for directory name');
         expect(!fs.pathExistsSync(path.join(cwd, 'foo')), 'does not create new directory with app name');
@@ -157,7 +158,7 @@ describe('Acceptance: ng new', function () {
   });
 
   it('ng new --inline-template does not generate a template file', () => {
-    return ng(['new', 'foo', '--skip-install', '--skip-git', '--inline-template'])
+    return ng([...commonNewParams, '--inline-template'])
       .then(() => {
         const templateFile = path.join('src', 'app', 'app.component.html');
         expect(fs.pathExistsSync(templateFile)).to.equal(false);
@@ -165,7 +166,7 @@ describe('Acceptance: ng new', function () {
   });
 
   it('ng new --inline-style does not gener a style file', () => {
-    return ng(['new', 'foo', '--skip-install', '--skip-git', '--inline-style'])
+    return ng([...commonNewParams, '--inline-style'])
       .then(() => {
         const styleFile = path.join('src', 'app', 'app.component.css');
         expect(fs.pathExistsSync(styleFile)).to.equal(false);
@@ -173,11 +174,42 @@ describe('Acceptance: ng new', function () {
   });
 
   it('should skip spec files when passed --skip-tests', () => {
-    return ng(['new', 'foo', '--skip-install', '--skip-git', '--skip-tests'])
+    return ng([...commonNewParams, '--skip-tests'])
       .then(() => {
         const specFile = path.join('src', 'app', 'app.component.spec.ts');
         expect(fs.pathExistsSync(specFile)).to.equal(false);
       });
   });
 
+  it(`should not set inlineStyle in .angular-cli.json when passed --inline-style`, () => {
+    return ng([...commonNewParams, `--inline-style`])
+      .then(() => {
+        const configFile = readConfigFile();
+        expect(configFile.defaults.component.inlineStyle).to.equal(false);
+      });
+  });
+
+  it(`should not set inlineTemplate in .angular-cli.json when passed --inline-template`, () => {
+    return ng([...commonNewParams, `--inline-template`])
+      .then(() => {
+        const configFile = readConfigFile();
+        expect(configFile.defaults.component.inlineTemplate).to.equal(false);
+      });
+  });
+
+  it(`should set inlineStyle in .angular-cli.json when passed --inline-style-all`, () => {
+    return ng([...commonNewParams, `--inline-style-all`])
+      .then(() => {
+        const configFile = readConfigFile();
+        expect(configFile.defaults.component.inlineStyle).to.equal(true);
+      });
+  });
+
+  it(`should set inlineTemplate in .angular-cli.json when passed --inline-template-all`, () => {
+    return ng([...commonNewParams, `--inline-template-all`])
+      .then(() => {
+        const configFile = readConfigFile();
+        expect(configFile.defaults.component.inlineTemplate).to.equal(true);
+      });
+  });
 });
