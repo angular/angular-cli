@@ -513,6 +513,7 @@ export default Task.extend({
           'style-loader',
           'stylus-loader',
           'url-loader',
+          'circular-dependency-plugin',
         ].forEach((packageName: string) => {
           packageJson['devDependencies'][packageName] = ourPackageJson['dependencies'][packageName];
         });
