@@ -74,6 +74,9 @@ before_install:
   - yarn config set spin false
   - yarn config set progress false
 
+install:
+  - yarn --frozen-lockfile
+
 script:
   - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
   - if [[ "$NODE_SCRIPT" ]]; then node $NODE_SCRIPT; fi
