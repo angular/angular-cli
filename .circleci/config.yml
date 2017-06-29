@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/angular-cli
+    docker:
+      - image: angular/ngcontainer
+    steps:
+      - checkout
+      - restore_cache:
+          key: angular-cli-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - run: yarn --frozen-lockfile
+      - save_cache:
+          key: angular-cli-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - "node_modules"
+      - run: xvfb-run -a node tests/run_e2e.js --glob=tests/build/**

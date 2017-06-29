@@ -1,5 +1,5 @@
 import {join} from 'path';
-import {npm, exec} from '../utils/process';
+import {silentNpm, exec} from '../utils/process';
 import {updateJsonFile} from '../utils/project';
 import {getGlobalVariable} from '../utils/env';
 
@@ -33,7 +33,8 @@ export default function () {
           }
         });
       }))
-      .then(() => npm('link'))
+      // npm link is very noisy on the older version used in Circle CI.
+      .then(() => silentNpm('link'))
       .then(() => process.chdir(oldCwd));
     })
     .then(() => exec(process.platform.startsWith('win') ? 'where' : 'which', 'ng'));
