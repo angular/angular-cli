@@ -118,10 +118,10 @@
             "type": "boolean",
             "default": false
           },
-          "hideCircularDependencyWarnings": {
-            "description": "Hide circular dependency warnings on builds.",
+          "showCircularDependencies": {
+            "description": "Show circular dependency warnings on builds.",
             "type": "boolean",
-            "default": false
+            "default": true
           },
           "styles": {
             "description": "Global styles to be included in the build.",
