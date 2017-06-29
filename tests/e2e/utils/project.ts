@@ -93,6 +93,8 @@ export function useNg2() {
     },
     'devDependencies': {
       '@angular/compiler-cli': '^2.4.0',
+      '@types/jasmine': '~2.2.0',
+      '@types/jasminewd2': undefined,
       'typescript': '~2.0.0'
     }
   };
