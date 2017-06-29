@@ -88,9 +88,8 @@ function _next(context: JsonParserContext) {
 
 
 /**
- * Read a token
- * @param context
- * @param valid
+ * Read a single character from the input. If a `valid` string is passed, validate that the
+ * character is included in the valid string.
  * @private
  */
 function _token(context: JsonParserContext, valid: string): string;
@@ -112,6 +111,12 @@ function _token(context: JsonParserContext, valid?: string): string | undefined 
 }
 
 
+/**
+ * Read the exponent part of a number. The exponent part is looser for JSON than the number
+ * part. `str` is the string of the number itself found so far, and start the position
+ * where the full number started. Returns the node found.
+ * @private
+ */
 function _readExpNumber(context: JsonParserContext,
                         start: Position,
                         str: string,
@@ -149,6 +154,10 @@ function _readExpNumber(context: JsonParserContext,
 }
 
 
+/**
+ * Read a number from the context.
+ * @private
+ */
 function _readNumber(context: JsonParserContext, comments = _readBlanks(context)): JsonAstNumber {
   let str = '';
   let dotted = false;
@@ -197,6 +206,11 @@ function _readNumber(context: JsonParserContext, comments = _readBlanks(context)
 }
 
 
+/**
+ * Read a string from the context. Takes the comments of the string or read the blanks before the
+ * string.
+ * @private
+ */
 function _readString(context: JsonParserContext, comments = _readBlanks(context)): JsonAstString {
   const start = context.position;
 
@@ -261,6 +275,10 @@ function _readString(context: JsonParserContext, comments = _readBlanks(context)
 }
 
 
+/**
+ * Read the constant `true` from the context.
+ * @private
+ */
 function _readTrue(context: JsonParserContext,
                    comments = _readBlanks(context)): JsonAstConstantTrue {
   const start = context.position;
@@ -281,6 +299,10 @@ function _readTrue(context: JsonParserContext,
 }
 
 
+/**
+ * Read the constant `false` from the context.
+ * @private
+ */
 function _readFalse(context: JsonParserContext,
                     comments = _readBlanks(context)): JsonAstConstantFalse {
   const start = context.position;
@@ -302,6 +324,10 @@ function _readFalse(context: JsonParserContext,
 }
 
 
+/**
+ * Read the constant `null` from the context.
+ * @private
+ */
 function _readNull(context: JsonParserContext,
                    comments = _readBlanks(context)): JsonAstConstantNull {
   const start = context.position;
@@ -323,6 +349,10 @@ function _readNull(context: JsonParserContext,
 }
 
 
+/**
+ * Read an array of JSON values from the context.
+ * @private
+ */
 function _readArray(context: JsonParserContext, comments = _readBlanks(context)): JsonAstArray {
   const start = context.position;
 
@@ -359,6 +389,11 @@ function _readArray(context: JsonParserContext, comments = _readBlanks(context))
 }
 
 
+/**
+ * Read an identifier from the context. An identifier is a valid JavaScript identifier, and this
+ * function is only used in Loose mode.
+ * @private
+ */
 function _readIdentifier(context: JsonParserContext,
                          comments = _readBlanks(context)): JsonAstIdentifier {
   const start = context.position;
@@ -401,6 +436,11 @@ function _readIdentifier(context: JsonParserContext,
 }
 
 
+/**
+ * Read a property from the context. A property is a string or (in Loose mode only) a number or
+ * an identifier, followed by a colon `:`.
+ * @private
+ */
 function _readProperty(context: JsonParserContext,
                        comments = _readBlanks(context)): JsonAstKeyValue {
   const start = context.position;
@@ -434,6 +474,10 @@ function _readProperty(context: JsonParserContext,
 }
 
 
+/**
+ * Read an object of properties -> JSON values from the context.
+ * @private
+ */
 function _readObject(context: JsonParserContext,
                      comments = _readBlanks(context)): JsonAstObject {
   const start = context.position;
@@ -470,6 +514,11 @@ function _readObject(context: JsonParserContext,
 }
 
 
+/**
+ * Remove any blank character or comments (in Loose mode) from the context, returning an array
+ * of comments if any are found.
+ * @private
+ */
 function _readBlanks(context: JsonParserContext): (JsonAstComment | JsonAstMultilineComment)[] {
   if ((context.mode & JsonParseMode.CommentsAllowed) != 0) {
     const comments: (JsonAstComment | JsonAstMultilineComment)[] = [];
@@ -542,6 +591,10 @@ function _readBlanks(context: JsonParserContext): (JsonAstComment | JsonAstMulti
 }
 
 
+/**
+ * Read a JSON value from the context, which can be any form of JSON value.
+ * @private
+ */
 function _readValue(context: JsonParserContext): JsonAstNode {
   let result: JsonAstNode;
 
@@ -599,17 +652,28 @@ function _readValue(context: JsonParserContext): JsonAstNode {
 }
 
 
+/**
+ * The Parse mode used for parsing the JSON string.
+ */
 export enum JsonParseMode {
-  Strict                    =      0,
-  CommentsAllowed           = 1 << 0,
-  SingleQuotesAllowed       = 1 << 1,
-  IdentifierKeyNamesAllowed = 1 << 2,
+  Strict                    =      0,  // Standard JSON.
+  CommentsAllowed           = 1 << 0,  // Allows comments, both single or multi lines.
+  SingleQuotesAllowed       = 1 << 1,  // Allow single quoted strings.
+  IdentifierKeyNamesAllowed = 1 << 2,  // Allow identifiers as objectp properties.
 
   Default                   = Strict,
-  Loose = CommentsAllowed | SingleQuotesAllowed | IdentifierKeyNamesAllowed,
+  Loose                     = CommentsAllowed | SingleQuotesAllowed | IdentifierKeyNamesAllowed,
 }
 
 
+/**
+ * Parse the JSON string and return its AST. The AST may be losing data (end comments are
+ * discarded for example, and space characters are not represented in the AST), but all values
+ * will have a single node in the AST (a 1-to-1 mapping).
+ * @param input The string to use.
+ * @param mode The mode to parse the input with. {@see JsonParseMode}.
+ * @returns {JsonAstNode} The root node of the value of the AST.
+ */
 export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonAstNode {
   if (mode == JsonParseMode.Default) {
     mode = JsonParseMode.Strict;
@@ -633,6 +697,13 @@ export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonA
   return ast;
 }
 
+
+/**
+ * Parse a JSON string into its value.  This discards the AST and only returns the value itself.
+ * @param input The string to parse.
+ * @param mode The mode to parse the input with. {@see JsonParseMode}.
+ * @returns {JsonValue} The value represented by the JSON string.
+ */
 export function parseJson(input: string, mode = JsonParseMode.Default): JsonValue {
   // Try parsing for the fastest path available, if error, uses our own parser for better errors.
   if (mode == JsonParseMode.Strict) {
