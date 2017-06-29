@@ -170,6 +170,7 @@ UI.prototype.stopProgress = function() {
 
 UI.prototype.prompt = function(questions, callback) {
   var inquirer = require('inquirer');
+  // require('external-editor')
 
   // If no callback was provided, automatically return a promise
   if (callback) {
