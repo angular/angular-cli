@@ -312,3 +312,13 @@ Note: service worker support is experimental and subject to change.
     Run build when files change.
   </p>
 </details>
+
+<details>
+  <summary>show-circular-dependencies</summary>
+  <p>
+    <code>--show-circular-dependencies</code> (aliases: <code>-scd</code>)
+  </p>
+  <p>
+    Show circular dependency warnings on builds.
+  </p>
+</details>
