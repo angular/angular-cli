@@ -5,6 +5,7 @@ import {buildSchema} from './build-schema';
 
 const denodeify = require('denodeify');
 const glob = denodeify(require('glob'));
+const tar = require('tar');
 const npmRun = require('npm-run');
 
 
@@ -31,7 +32,7 @@ function copy(from: string, to: string): Promise<void> {
 
 
 function rm(p: string): Promise<void> {
-  path.relative(process.cwd(), p);
+  p = path.relative(process.cwd(), p);
   return new Promise<void>((resolve, reject) => {
     fs.unlink(p, err => {
       if (err) {
@@ -41,6 +42,12 @@ function rm(p: string): Promise<void> {
       }
     });
   });
+}
+
+
+function tarFiles(out: string, dir: string): Promise<void> {
+  // const files = fs.readdirSync(dir);
+  return tar.create({ gzip: true, strict: true, portable: true, cwd: dir, file: out }, ['.']);
 }
 
 
@@ -216,8 +223,18 @@ export default function build(packagesToBuild: string[], _opts: any,
       const licenseLogger = new Logger('license', logger);
       return Promise.all(Object.keys(packages).map(pkgName => {
         const pkg = packages[pkgName];
-        licenseLogger.info(`${pkgName}`);
+        licenseLogger.info(pkgName);
         return copy('LICENSE', path.join(pkg.dist, 'LICENSE'));
+      }));
+    })
+    .then(() => {
+      logger.info('Tarring all packages...');
+
+      const tarLogger = new Logger('license', logger);
+      return Promise.all(Object.keys(packages).map(pkgName => {
+        const pkg = packages[pkgName];
+        tarLogger.info(`${pkgName} => ${pkg.tar}`);
+        return tarFiles(pkg.tar, pkg.dist);
       }));
     })
     .then(() => process.exit(0), (err) => {
