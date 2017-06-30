@@ -203,7 +203,7 @@ export default function build(packagesToBuild: string[], _opts: any,
     })
     .then(() => {
       // Copy all resources that might have been missed.
-      const extraFiles = ['CHANGELOG.md', 'CONTRIBUTING.md', 'README.md'];
+      const extraFiles = ['CONTRIBUTING.md', 'README.md'];
       return Promise.all(extraFiles.map(fileName => {
         logger.info(`Copying ${fileName}...`);
         return copy(fileName, path.join('dist/@angular/cli', fileName));
