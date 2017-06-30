@@ -33,7 +33,7 @@ export default function() {
     .then(() => createProject)
     .then(() => updateJsonFile('package.json', json => {
       Object.keys(packages).forEach(pkgName => {
-        json['dependencies'][pkgName] = packages[pkgName].dist;
+        json['dependencies'][pkgName] = packages[pkgName].tar;
       });
     }))
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
