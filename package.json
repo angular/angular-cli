@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "1.2.0-rc.1",
+  "version": "0.0.3",
   "description": "CLI tool for Angular",
   "main": "packages/@angular/cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -27,13 +27,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/angular-cli.git"
+    "url": "https://github.com/yueming/angular-cli.git"
   },
   "engines": {
     "node": ">= 6.9.0",
     "npm": ">= 3.0.0"
   },
-  "author": "Angular Authors",
+  "author": "Rach Chen power by ng-au",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"

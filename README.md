@@ -1,3 +1,11 @@
+## usage
+1. clone this project
+2. move to this project and command `yarn` and `npm install`
+3. if you are oldest @angular-cli , you have to remove it .
+4. Now the default `view-engine` is `pug` and default `styleExt` is `scss`.
+
+### If your command `ng` display erro , you need to `sudo npm link`
+
 ## Angular CLI
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
