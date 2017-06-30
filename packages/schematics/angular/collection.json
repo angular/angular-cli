@@ -19,6 +19,11 @@
       "factory": "./enum",
       "description": "Create an enumeration.",
       "schema": "./enum/schema.json"
+    },
+    "module": {
+      "factory": "./module",
+      "description": "Create an Angular module.",
+      "schema": "./module/schema.json"
     }
   }
 }
