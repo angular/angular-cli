@@ -4,7 +4,7 @@
 3. if you are oldest @angular-cli , you have to remove it .
 4. Now the default `view-engine` is `pug` and default `styleExt` is `scss`.
 
-### If your command `ng` display erro , you need to `sudo npm link`
+#### If you command `ng` display error , you need to `sudo npm link`
 
 ## Angular CLI
 
