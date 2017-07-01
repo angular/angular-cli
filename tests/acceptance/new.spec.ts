@@ -59,6 +59,10 @@ describe('Acceptance: ng new', function () {
     return ng(['new', '!', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => done.fail(), () => done());
   });
+  it('requires a valid name (123)', (done) => {
+    return ng(['new', '123', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
   it('requires a valid name (abc-.)', (done) => {
     return ng(['new', 'abc-.', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => done.fail(), () => done());
@@ -67,20 +71,97 @@ describe('Acceptance: ng new', function () {
     return ng(['new', 'abc-', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => done.fail(), () => done());
   });
-  it('requires a valid name (abc-def-)', (done) => {
-    return ng(['new', 'abc-def-', '--skip-install', '--skip-git', '--inline-template'])
+  it('requires a valid name ( abc)', (done) => {
+    return ng(['new', ' abc', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc )', (done) => {
+    return ng(['new', 'abc ', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (.abc)', (done) => {
+    return ng(['new', '.abc', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc.)', (done) => {
+    return ng(['new', 'abc.', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => done.fail(), () => done());
   });
   it('requires a valid name (abc-123)', (done) => {
     return ng(['new', 'abc-123', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => done.fail(), () => done());
   });
+  it('requires a valid name (abc 123)', (done) => {
+    return ng(['new', 'abc 123', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc.123)', (done) => {
+    return ng(['new', 'abc.123', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc-def-)', (done) => {
+    return ng(['new', 'abc-def-', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc-def--)', (done) => {
+    return ng(['new', 'abc-def--', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc--def)', (done) => {
+    return ng(['new', 'abc--def', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc.def.)', (done) => {
+    return ng(['new', 'abc.def.', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc.def..)', (done) => {
+    return ng(['new', 'abc.def..', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc..def)', (done) => {
+    return ng(['new', 'abc..def', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc def )', (done) => {
+    return ng(['new', 'abc def ', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+  it('requires a valid name (abc  def)', (done) => {
+    return ng(['new', 'abc  def', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done.fail(), () => done());
+  });
+
   it('requires a valid name (abc)', (done) => {
     return ng(['new', 'abc', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => done(), () => done.fail());
   });
   it('requires a valid name (abc-def)', (done) => {
     return ng(['new', 'abc-def', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done(), () => done.fail());
+  });
+  it('requires a valid name (abc-def123)', (done) => {
+    return ng(['new', 'abc-def123', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done(), () => done.fail());
+  });
+  it('requires a valid name (abc def)', (done) => {
+    return ng(['new', 'abc def', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done(), () => done.fail());
+  });
+  it('requires a valid name (abc def123)', (done) => {
+    return ng(['new', 'abc def123', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done(), () => done.fail());
+  });
+  it('requires a valid name (abc.def)', (done) => {
+    return ng(['new', 'abc.def', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done(), () => done.fail());
+  });
+  it('requires a valid name (abc.def123)', (done) => {
+    return ng(['new', 'abc.def123', '--skip-install', '--skip-git', '--inline-template'])
+      .then(() => done(), () => done.fail());
+  });
+  it('requires a valid name (abc-def hello.app)', (done) => {
+    return ng(['new', 'abc-def hello.app', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => done(), () => done.fail());
   });
 
