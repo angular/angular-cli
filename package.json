@@ -42,7 +42,6 @@
   "homepage": "https://github.com/angular/devkit",
   "dependencies": {
     "@ngtools/json-schema": "^1.0.9",
-    "@ngtools/logger": "^1.0.1",
     "@types/common-tags": "^1.2.4",
     "@types/glob": "^5.0.29",
     "@types/istanbul": "^0.4.29",
