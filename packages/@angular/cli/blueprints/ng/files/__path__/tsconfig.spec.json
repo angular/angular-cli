@@ -2,9 +2,9 @@
   "extends": "<%= relativeRootPath %>/tsconfig.json",
   "compilerOptions": {
     "outDir": "<%= relativeRootPath %>/out-tsc/spec",
+    "baseUrl": "./",
     "module": "commonjs",
     "target": "es5",
-    "baseUrl": "",
     "types": [
       "jasmine",
       "node"
