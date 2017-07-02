@@ -124,10 +124,6 @@ export default Blueprint.extend({
     } else {
       let className = stringUtils.classify(`${options.entity.name}Module`);
       let fileName = stringUtils.dasherize(`${options.entity.name}.module`);
-      if (options.routing) {
-        className = stringUtils.classify(`${options.entity.name}RoutingModule`);
-        fileName = stringUtils.dasherize(`${options.entity.name}-routing.module`);
-      }
       const fullGeneratePath = path.join(this.project.root, this.generatePath);
       const moduleDir = path.parse(this.pathToModule).dir;
       const relativeDir = path.relative(moduleDir, fullGeneratePath);
