@@ -2,8 +2,8 @@
   "extends": "<%= relativeRootPath %>/tsconfig.json",
   "compilerOptions": {
     "outDir": "<%= relativeRootPath %>/out-tsc/app",
+    "baseUrl": "./",
     "module": "es2015",
-    "baseUrl": "",
     "types": []
   },
   "exclude": [
