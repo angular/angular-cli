@@ -42,6 +42,15 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  if (buildOptions.sourcemaps) {
+    extraPlugins.push(new webpack.SourceMapDevToolPlugin({
+      filename: '[file].map[query]',
+      moduleFilenameTemplate: '[resource-path]',
+      fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
+      sourceRoot: 'webpack:///'
+    }));
+  }
+
   return {
     plugins: [
       new HtmlWebpackPlugin({
