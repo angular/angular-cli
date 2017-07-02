@@ -65,15 +65,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose, colors: true }));
   }
 
-  if (buildOptions.sourcemaps) {
-    extraPlugins.push(new webpack.SourceMapDevToolPlugin({
-      filename: '[file].map[query]',
-      moduleFilenameTemplate: '[resource-path]',
-      fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
-      sourceRoot: 'webpack:///'
-    }));
-  }
-
   if (buildOptions.showCircularDependencies) {
     extraPlugins.push(new CircularDependencyPlugin({
       exclude: /(\\|\/)node_modules(\\|\/)/
