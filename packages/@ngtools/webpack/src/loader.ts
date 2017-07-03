@@ -441,8 +441,16 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
   const sourceFileName: string = this.resourcePath;
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
-  // We must verify that AotPlugin is an instance of the right class.
-  if (plugin && plugin instanceof AotPlugin) {
+  if (plugin) {
+    // We must verify that AotPlugin is an instance of the right class.
+    // Throw an error if it isn't, that often means multiple @ngtools/webpack installs.
+    if (!(plugin instanceof AotPlugin)) {
+      throw new Error('AotPlugin was detected but it was an instance of the wrong class.\n'
+        + 'This likely means you have several @ngtools/webpack packages installed. '
+        + 'You can check this with `npm ls @ngtools/webpack`, and then remove the extra copies.'
+      );
+    }
+
     if (plugin.compilerHost.readFile(sourceFileName) == source) {
       // In the case where the source is the same as the one in compilerHost, we don't have
       // extra TS loaders and there's no need to do any trickery.
@@ -514,6 +522,13 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
   } else {
     const options = loaderUtils.getOptions(this) || {};
     const tsConfigPath = options.tsConfigPath;
+
+    if (tsConfigPath === undefined) {
+      throw new Error('@ngtools/webpack is being used as a loader but no `tsConfigPath` option nor '
+        + 'AotPlugin was detected. You must provide at least one of these.'
+      );
+    }
+
     const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
 
     if (tsConfig.error) {
