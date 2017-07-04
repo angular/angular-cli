@@ -66,6 +66,18 @@ export default function() {
         });
       }
     })
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+      // Auto-add some flags to ng commands that build or test the app.
+      // --no-progress disables progress logging, which in CI logs thousands of lines.
+      // --no-sourcemaps disables sourcemaps, making builds faster.
+      // We add these flags before other args so that they can be overriden.
+      // e.g. `--no-sourcemaps --sourcemaps` will still generate sourcemaps.
+      const defaults = configJson.defaults;
+      defaults.build = {
+        sourcemaps: false,
+        progress: false
+      };
+    }))
     .then(() => silentNpm('install'))
     // Force sourcemaps to be from the root of the filesystem.
     .then(() => updateTsConfig(json => {
