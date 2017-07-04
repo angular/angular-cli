@@ -30,7 +30,7 @@ import 'rxjs/add/operator/merge';
 
 function addDeclarationToNgModule(options: any): Rule {
   return (host: Tree) => {
-    if (options['skip-import']) {
+    if (options.skipImport) {
       return host;
     }
 
@@ -47,14 +47,14 @@ function addDeclarationToNgModule(options: any): Rule {
         modulePath = matches[0];
         break;
       } else if (matches.length > 1) {
-        throw new Error('More than one module matches. Use skip-import option to skip importing '
+        throw new Error('More than one module matches. Use skipImport option to skip importing '
           + 'the component into the closest module.');
       }
       closestModule = closestModule.split('/').slice(0, -1).join('/');
     }
 
     if (!modulePath) {
-      throw new Error('Could not find an NgModule for the new component. Use the skip-import '
+      throw new Error('Could not find an NgModule for the new component. Use the skipImport '
         + 'option to skip importing components in NgModule.');
     }
 

@@ -62,7 +62,7 @@
     "htmlTemplate": {
       "type": "string"
     },
-    "skip-import": {
+    "skipImport": {
       "type": "boolean",
       "default": false
     }
