@@ -9,7 +9,6 @@ export default function() {
     .then(() => symlinkFile('../node_modules', 'node_modules', 'dir'))
     .then(() => ng('build'))
     .then(() => expectFileToExist('dist/vendor.bundle.js'))
-    .then(() => expectFileToExist('dist/vendor.bundle.js.map'))
     // Cleanup
     .then(() => {
       return deleteFile('node_modules')
