@@ -20,6 +20,11 @@
       "description": "Create an enumeration.",
       "schema": "./enum/schema.json"
     },
+    "interface": {
+      "factory": "./interface",
+      "description": "Create an interface.",
+      "schema": "./interface/schema.json"
+    },
     "module": {
       "factory": "./module",
       "description": "Create an Angular module.",

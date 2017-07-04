@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularInterface",
+  "title": "Angular Interface Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string",
+      "default": "app"
+    },
+    "sourceDir": {
+      "type": "string",
+      "default": "src"
+    },
+    "prefix": {
+      "type": "string",
+      "default": "",
+      "description": "Specifies the prefix to use."
+    },
+    "type": {
+      "type": "string",
+      "description": "Specifies the type of interface.",
+      "default": ""
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
