@@ -18,7 +18,6 @@ import {
   mergeWith,
   move,
   noop,
-  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -26,6 +25,7 @@ import * as stringUtils from '../strings';
 
 import * as ts from 'typescript';
 import 'rxjs/add/operator/merge';
+import {findModule, buildRelativePath} from '../utility/find-module';
 
 
 function addDeclarationToNgModule(options: any): Rule {
@@ -34,40 +34,19 @@ function addDeclarationToNgModule(options: any): Rule {
       return host;
     }
 
-    let closestModule = options.sourceDir + '/' + options.path;
-    const allFiles = host.files;
-
-    let modulePath: string | null = null;
-    const moduleRe = /\.module\.ts$/;
-    while (closestModule) {
-      const normalizedRoot = normalizePath(closestModule);
-      const matches = allFiles.filter(p => moduleRe.test(p) && p.startsWith(normalizedRoot));
-
-      if (matches.length == 1) {
-        modulePath = matches[0];
-        break;
-      } else if (matches.length > 1) {
-        throw new Error('More than one module matches. Use skipImport option to skip importing '
-          + 'the component into the closest module.');
-      }
-      closestModule = closestModule.split('/').slice(0, -1).join('/');
-    }
-
-    if (!modulePath) {
-      throw new Error('Could not find an NgModule for the new component. Use the skipImport '
-        + 'option to skip importing components in NgModule.');
-    }
+    const modulePath = findModule(host, options.sourceDir + '/' + options.path);
 
     const sourceText = host.read(modulePath) !.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
-    const componentModule = '.' + options.path + '/'
-                          + (options.flat ? stringUtils.dasherize(options.name) + '/' : '')
+    const componentPath = `/${options.sourceDir}/${options.path}/`
+                          + (options.flat ? '' : stringUtils.dasherize(options.name) + '/')
                           + stringUtils.dasherize(options.name)
                           + '.component';
+    const relativePath = buildRelativePath(modulePath, componentPath);
     const changes = addDeclarationToModule(source, modulePath,
-                                           stringUtils.classify(options.name),
-                                           componentModule);
+                                           stringUtils.classify(`${options.name}Component`),
+                                           relativePath);
     const recorder = host.beginUpdate(modulePath);
     for (const change of changes) {
       if (change instanceof InsertChange) {
@@ -80,8 +59,17 @@ function addDeclarationToNgModule(options: any): Rule {
   };
 }
 
+function buildSelector(options: any) {
+  let selector = stringUtils.dasherize(options.name);
+  if (options.prefix) {
+    selector = `${options.prefix}-${selector}`;
+  }
+  return selector;
+}
 
 export default function(options: any): Rule {
+  options.selector = options.selector || buildSelector(options);
+
   const templateSource = apply(url('./files'), [
     options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
     options.inlineStyle ? filter(path => !path.endsWith('.__styleext__')) : noop(),

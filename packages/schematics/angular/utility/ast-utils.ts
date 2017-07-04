@@ -243,7 +243,28 @@ function _addSymbolToNgModuleMetadata(source: ts.SourceFile,
     return [];
   }
   if (matchingProperties.length == 0) {
-    return [];
+    // We haven't found the field in the metadata declaration. Insert a new field.
+    let expr = node as ts.ObjectLiteralExpression;
+    let position: number;
+    let toInsert: string;
+    if (expr.properties.length == 0) {
+      position = expr.getEnd() - 1;
+      toInsert = `  ${metadataField}: [${symbolName}]\n`;
+    } else {
+      node = expr.properties[expr.properties.length - 1];
+      position = node.getEnd();
+      // Get the indentation of the last element, if any.
+      const text = node.getFullText(source);
+      if (text.match('^\r?\r?\n')) {
+        toInsert = `,${text.match(/^\r?\n\s+/)[0]}${metadataField}: [${symbolName}]`;
+      } else {
+        toInsert = `, ${metadataField}: [${symbolName}]`;
+      }
+    }
+    const newMetadataProperty = new InsertChange(ngModulePath, position, toInsert);
+    const newMetadataImport = insertImport(source,
+      ngModulePath, symbolName.replace(/\..*$/, ''), importPath);
+    return [newMetadataProperty, newMetadataImport];
   }
 
   const assignment = matchingProperties[0] as ts.PropertyAssignment;
@@ -309,7 +330,6 @@ function _addSymbolToNgModuleMetadata(source: ts.SourceFile,
       toInsert = `, ${symbolName}`;
     }
   }
-
   const insert = new InsertChange(ngModulePath, position, toInsert);
   const importInsert: Change = insertImport(source,
     ngModulePath, symbolName.replace(/\..*$/, ''), importPath);
@@ -354,5 +374,14 @@ export function addExportToModule(source: ts.SourceFile,
                                   modulePath: string, classifiedName: string,
                                   importPath: string): Change[] {
   return _addSymbolToNgModuleMetadata(source, modulePath, 'exports', classifiedName, importPath);
+}
+
+/**
+ * Custom function to insert an export into NgModule. It also imports it.
+ */
+export function addBootstrapToModule(source: ts.SourceFile,
+                                     modulePath: string, classifiedName: string,
+                                     importPath: string): Change[] {
+  return _addSymbolToNgModuleMetadata(source, modulePath, 'bootstrap', classifiedName, importPath);
 }
 

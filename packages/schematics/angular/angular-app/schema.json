@@ -10,7 +10,7 @@
     },
     "sourceDir": {
       "type": "string",
-      "default": ""
+      "default": "src"
     },
     "name": {
       "type": "string"

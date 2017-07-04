@@ -65,6 +65,9 @@
     "skipImport": {
       "type": "boolean",
       "default": false
+    },
+    "selector": {
+      "type": "string"
     }
   },
   "required": [
