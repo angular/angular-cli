@@ -30,6 +30,11 @@
       "description": "Create an Angular module.",
       "schema": "./module/schema.json"
     },
+    "pipe": {
+      "factory": "./pipe",
+      "description": "Create an Angular pipe.",
+      "schema": "./pipe/schema.json"
+    },
     "service": {
       "factory": "./service",
       "description": "Create an Angular service.",
