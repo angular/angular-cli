@@ -12,17 +12,27 @@ export default function() {
     .then(() => ng('build'))
     .then(() => oldNumberOfFiles = readdirSync('dist').length)
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
+    .then(() => ng('generate', 'module', 'too/lazy', '--routing'))
     .then(() => addImportToModule('src/app/app.module.ts', oneLine`
       RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }]),
-      RouterModule.forRoot([{ path: "lazy1", loadChildren: "./lazy/lazy.module#LazyModule" }])
+      RouterModule.forRoot([{ path: "lazy1", loadChildren: "./lazy/lazy.module#LazyModule" }]),
+      RouterModule.forRoot([{ path: "lazy2", loadChildren: "./too/lazy/lazy.module#LazyModule" }])
       `, '@angular/router'))
     .then(() => ng('build'))
-    .then(() => readdirSync('dist').length)
-    .then(currentNumberOfDistFiles => {
+    .then(() => readdirSync('dist'))
+    .then((distFiles) => {
+      const currentNumberOfDistFiles = distFiles.length;
       if (oldNumberOfFiles >= currentNumberOfDistFiles) {
         throw new Error('A bundle for the lazy module was not created.');
       }
       oldNumberOfFiles = currentNumberOfDistFiles;
+
+      if (!distFiles.includes('lazy.module.chunk.js')){
+        throw new Error('The bundle for the lazy module did not have a name.');
+      }
+      if (!distFiles.includes('lazy.module.0.chunk.js')){
+        throw new Error('The bundle for the lazy module did not use a unique name.');
+      }
     })
     // verify System.import still works
     .then(() => writeFile('src/app/lazy-file.ts', ''))
