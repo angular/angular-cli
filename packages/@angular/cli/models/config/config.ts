@@ -30,7 +30,7 @@ export class CliConfig<JsonType> {
   get config(): JsonType { return <any>this._config; }
 
   save(path: string = this._configPath) {
-    return fs.writeFileSync(path, this.serialize(), 'utf-8');
+    return fs.writeFileSync(path, this.serialize(), {encoding: 'utf-8'});
   }
   serialize(mimetype = 'application/json'): string {
     return this._config.$$serialize(mimetype);

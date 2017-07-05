@@ -11,7 +11,10 @@ import { oneLine } from 'common-tags';
 const Command = require('../ember-cli/lib/models/command');
 const Project = require('../ember-cli/lib/models/project');
 const SilentError = require('silent-error');
-const mkdir = denodeify(fs.mkdir);
+
+// There's some problem with the generic typings for fs.makedir.
+// Couldn't find matching types for the callbacks so leaving it as any for now.
+const mkdir = denodeify<string, void>(fs.mkdir as any);
 
 const configFile = '.angular-cli.json';
 const changeLater = (path: string) => `You can later change the value in "${configFile}" (${path})`;
@@ -177,7 +180,7 @@ const NewCommand = Command.extend({
         });
     } else {
       createDirectory = mkdir(directoryName)
-        .catch(err => {
+        .catch((err) => {
           if (err.code === 'EEXIST') {
             if (this.isProject(directoryName)) {
               throw new SilentError(oneLine`

@@ -1,7 +1,7 @@
 import {
   killAllProcesses,
   waitForAnyProcessOutputToMatch,
-  execAndWaitForOutputToMatch
+  execAndWaitForOutputToMatch,
 } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 import { readFile, writeFile } from '../../utils/fs';
@@ -20,7 +20,7 @@ export default function () {
     .then(() => expectToFail(() => waitForAnyProcessOutputToMatch(karmaGoodRegEx, 10000)))
     // Restore working spec.
     .then(() => writeFile('src/app/app.component.spec.ts', originalSpec))
-    .then(() => waitForAnyProcessOutputToMatch(karmaGoodRegEx, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(karmaGoodRegEx, 20000))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();
       throw err;
