@@ -5,7 +5,7 @@
   "main": "packages/@angular/cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
   "bin": {
-    "ejay": "./bin/ng"
+    "ay": "./bin/ng"
   },
   "keywords": [],
   "scripts": {
