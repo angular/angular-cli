@@ -78,7 +78,7 @@ export default function build(packagesToBuild: string[], _opts: any,
     .then(() => {
       const input = path.join(root, 'packages/@angular/cli/lib/config/schema.json');
       const output = path.join(root, 'packages/@angular/cli/lib/config/schema.d.ts');
-      fs.writeFileSync(output, buildSchema(input, logger), 'utf-8');
+      fs.writeFileSync(output, buildSchema(input, logger), { encoding: 'utf-8' });
     })
     .then(() => logger.info('Compiling packages...'))
     .then(() => {
