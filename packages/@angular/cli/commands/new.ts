@@ -176,8 +176,8 @@ const NewCommand = Command.extend({
           }
         });
     } else {
-      createDirectory = mkdir(directoryName)
-        .catch(err => {
+      createDirectory = (mkdir as any)(directoryName)
+        .catch((err: any) => {
           if (err.code === 'EEXIST') {
             if (this.isProject(directoryName)) {
               throw new SilentError(oneLine`
