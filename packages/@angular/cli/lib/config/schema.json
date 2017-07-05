@@ -118,11 +118,6 @@
             "type": "boolean",
             "default": false
           },
-          "showCircularDependencies": {
-            "description": "Show circular dependency warnings on builds.",
-            "type": "boolean",
-            "default": true
-          },
           "styles": {
             "description": "Global styles to be included in the build.",
             "type": "array",
@@ -446,6 +441,44 @@
             },
             "spec": {
               "description": "Specifies if a spec file is generated.",
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "build": {
+          "description": "Properties to be passed to the build command.",
+          "type": "object",
+          "properties": {
+            "sourcemaps": {
+              "description": "Output sourcemaps.",
+              "type": "boolean"
+            },
+            "baseHref": {
+              "description": "Base url for the application being built.",
+              "type": "string"
+            },
+            "progress": {
+              "description": "The ssl key used by the server.",
+              "type": "boolean",
+              "default": true
+            },
+            "poll": {
+              "description": "Enable and define the file watching poll time period (milliseconds).",
+              "type": "number"
+            },
+            "deleteOutputPath": {
+              "description": "Delete output path before build.",
+              "type": "boolean",
+              "default": true
+            },
+            "preserveSymlinks": {
+              "description": "Do not use the real path when resolving modules.",
+              "type": "boolean",
+              "default": false
+            },
+            "showCircularDependencies": {
+              "description": "Show circular dependency warnings on builds.",
               "type": "boolean",
               "default": true
             }

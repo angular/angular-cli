@@ -9,12 +9,10 @@ import { overrideOptions } from '../utilities/override-options';
 const Command = require('../ember-cli/lib/models/command');
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
-const defaultPort = process.env.PORT || config.get('defaults.serve.port');
-const defaultHost = config.get('defaults.serve.host');
-const defaultSsl = config.get('defaults.serve.ssl');
-const defaultSslKey = config.get('defaults.serve.sslKey');
-const defaultSslCert = config.get('defaults.serve.sslCert');
-const defaultProxyConfig = config.get('defaults.serve.proxyConfig');
+const serveConfigDefaults = config.getPaths('defaults.serve', [
+  'port', 'host', 'ssl', 'sslKey', 'sslCert', 'proxyConfig'
+]);
+const defaultPort = process.env.PORT || serveConfigDefaults['port'];
 
 export interface ServeTaskOptions extends BuildOptions {
   port?: number;
@@ -43,33 +41,33 @@ export const baseServeCommandOptions: any = overrideOptions([
   {
     name: 'host',
     type: String,
-    default: defaultHost,
+    default: serveConfigDefaults['host'],
     aliases: ['H'],
-    description: `Listens only on ${defaultHost} by default.`
+    description: `Listens only on ${serveConfigDefaults['host']} by default.`
   },
   {
     name: 'proxy-config',
     type: 'Path',
-    default: defaultProxyConfig,
+    default: serveConfigDefaults['proxyConfig'],
     aliases: ['pc'],
     description: 'Proxy configuration file.'
   },
   {
     name: 'ssl',
     type: Boolean,
-    default: defaultSsl,
+    default: serveConfigDefaults['ssl'],
     description: 'Serve using HTTPS.'
   },
   {
     name: 'ssl-key',
     type: String,
-    default: defaultSslKey,
+    default: serveConfigDefaults['sslKey'],
     description: 'SSL key to use for serving HTTPS.'
   },
   {
     name: 'ssl-cert',
     type: String,
-    default: defaultSslCert,
+    default: serveConfigDefaults['sslCert'],
     description: 'SSL certificate to use for serving HTTPS.'
   },
   {
