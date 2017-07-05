@@ -5,8 +5,12 @@ import { oneLine } from 'common-tags';
 
 const Command = require('../ember-cli/lib/models/command');
 
+
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
-const pollDefault = config.config.defaults && config.config.defaults.poll;
+const buildConfigDefaults = config.getPaths('defaults.build', [
+  'sourcemaps', 'baseHref', 'progress', 'poll', 'deleteOutputPath', 'preserveSymlinks',
+  'showCircularDependencies'
+]);
 
 // defaults for BuildOptions
 export const baseBuildCommandOptions: any = [
@@ -20,7 +24,7 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'environment',
     type: String,
-    aliases: ['e'] ,
+    aliases: ['e'],
     description: 'Defines the build environment.'
   },
   {
@@ -38,7 +42,8 @@ export const baseBuildCommandOptions: any = [
     name: 'sourcemaps',
     type: Boolean,
     aliases: ['sm', 'sourcemap'],
-    description: 'Output sourcemaps.'
+    description: 'Output sourcemaps.',
+    default: buildConfigDefaults['sourcemaps']
   },
   {
     name: 'vendor-chunk',
@@ -51,7 +56,8 @@ export const baseBuildCommandOptions: any = [
     name: 'base-href',
     type: String,
     aliases: ['bh'],
-    description: 'Base url for the application being built.'
+    description: 'Base url for the application being built.',
+    default: buildConfigDefaults['base-href']
   },
   {
     name: 'deploy-url',
@@ -69,9 +75,9 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'progress',
     type: Boolean,
-    default: true,
     aliases: ['pr'],
-    description: 'Log progress to the console while building.'
+    description: 'Log progress to the console while building.',
+    default: buildConfigDefaults['progress']
   },
   {
     name: 'i18n-file',
@@ -111,8 +117,8 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'poll',
     type: Number,
-    default: pollDefault,
-    description: 'Enable and define the file watching poll time period (milliseconds).'
+    description: 'Enable and define the file watching poll time period (milliseconds).',
+    default: buildConfigDefaults['poll']
   },
   {
     name: 'app',
@@ -123,15 +129,15 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'delete-output-path',
     type: Boolean,
-    default: true,
     aliases: ['dop'],
-    description: 'Delete output path before build.'
+    description: 'Delete output path before build.',
+    default: buildConfigDefaults['deleteOutputPath'],
   },
   {
     name: 'preserve-symlinks',
     type: Boolean,
-    default: false,
-    description: 'Do not use the real path when resolving modules.'
+    description: 'Do not use the real path when resolving modules.',
+    default: buildConfigDefaults['preserveSymlinks']
   },
   {
     name: 'extract-licenses',
@@ -143,7 +149,8 @@ export const baseBuildCommandOptions: any = [
     name: 'show-circular-dependencies',
     type: Boolean,
     aliases: ['scd'],
-    description: 'Show circular dependency warnings on builds.'
+    description: 'Show circular dependency warnings on builds.',
+    default: buildConfigDefaults['showCircularDependencies']
   }
 ];
 
@@ -158,12 +165,12 @@ const BuildCommand = Command.extend({
 
   availableOptions: baseBuildCommandOptions.concat([
     {
-       name: 'stats-json',
-       type: Boolean,
-       default: false,
-       description: oneLine`Generates a \`stats.json\` file which can be analyzed using tools
+      name: 'stats-json',
+      type: Boolean,
+      default: false,
+      description: oneLine`Generates a \`stats.json\` file which can be analyzed using tools
        such as: \`webpack-bundle-analyzer\` or https://webpack.github.io/analyse.`
-      }
+    }
   ]),
 
   run: function (commandOptions: BuildTaskOptions) {

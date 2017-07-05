@@ -61,6 +61,12 @@ export class CliConfig<JsonType> {
     this._config.$$set(jsonPath, value);
   }
 
+  getPaths(baseJsonPath: string, keys: string[]) {
+    const ret: { [k: string]: any } = {};
+    keys.forEach(key => ret[key] = this.get(`${baseJsonPath}.${key}`));
+    return ret;
+  }
+
   static fromJson<ConfigType>(content: ConfigType, ...global: ConfigType[]) {
     const schemaContent = fs.readFileSync(DEFAULT_CONFIG_SCHEMA_PATH, 'utf-8');
     let schema: Object;

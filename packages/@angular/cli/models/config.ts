@@ -65,31 +65,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
 
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(globalConfigPath);
 
-    const aliases = [
-      cliConfig.alias('apps.0.root', 'defaults.sourceDir'),
-      cliConfig.alias('apps.0.prefix', 'defaults.prefix')
-    ];
-
-    // Additional aliases which do not emit any messages.
-    cliConfig.alias('defaults.interface.prefix', 'defaults.inline.prefixInterfaces');
-    cliConfig.alias('defaults.component.inlineStyle', 'defaults.inline.style');
-    cliConfig.alias('defaults.component.inlineTemplate', 'defaults.inline.template');
-    cliConfig.alias('defaults.component.spec', 'defaults.spec.component');
-    cliConfig.alias('defaults.class.spec', 'defaults.spec.class');
-    cliConfig.alias('defaults.component.directive', 'defaults.spec.directive');
-    cliConfig.alias('defaults.component.module', 'defaults.spec.module');
-    cliConfig.alias('defaults.component.pipe', 'defaults.spec.pipe');
-    cliConfig.alias('defaults.component.service', 'defaults.spec.service');
-
-    // If any of them returned true, output a deprecation warning.
-    if (aliases.some(x => x)) {
-      console.error(chalk.yellow(oneLine`
-        The "defaults.prefix" and "defaults.sourceDir" properties of .angular-cli.json
-        are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
-        Please update in order to avoid errors in future versions of Angular CLI.
-      `));
-    }
-
+    CliConfig.addAliases(cliConfig);
     configCacheMap.set(globalConfigPath, cliConfig);
     return cliConfig;
   }
@@ -108,10 +84,27 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     const globalConfigPath = CliConfig.globalConfigFilePath();
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(configPath, [globalConfigPath]);
 
+    CliConfig.addAliases(cliConfig);
+    configCacheMap.set(configPath, cliConfig);
+    return cliConfig as CliConfig;
+  }
+
+  static addAliases(cliConfig: CliConfigBase<ConfigInterface>) {
+
+    // Aliases with deprecation messages.
     const aliases = [
       cliConfig.alias('apps.0.root', 'defaults.sourceDir'),
       cliConfig.alias('apps.0.prefix', 'defaults.prefix')
     ];
+
+    // If any of them returned true, output a deprecation warning.
+    if (aliases.some(x => x)) {
+      console.error(chalk.yellow(oneLine`
+        The "defaults.prefix" and "defaults.sourceDir" properties of .angular-cli.json
+        are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
+        Please update in order to avoid errors in future versions of Angular CLI.
+      `));
+    }
 
     // Additional aliases which do not emit any messages.
     cliConfig.alias('defaults.interface.prefix', 'defaults.inline.prefixInterfaces');
@@ -123,17 +116,6 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     cliConfig.alias('defaults.component.module', 'defaults.spec.module');
     cliConfig.alias('defaults.component.pipe', 'defaults.spec.pipe');
     cliConfig.alias('defaults.component.service', 'defaults.spec.service');
-
-    // If any of them returned true, output a deprecation warning.
-    if (aliases.some(x => x)) {
-      console.error(chalk.yellow(oneLine`
-        The "defaults.prefix" and "defaults.sourceDir" properties of .angular-cli.json
-        are deprecated in favor of "apps[0].root" and "apps[0].prefix".\n
-        Please update in order to avoid errors in future versions of Angular CLI.
-      `));
-    }
-
-    configCacheMap.set(configPath, cliConfig);
-    return cliConfig as CliConfig;
+    cliConfig.alias('defaults.build.poll', 'defaults.poll');
   }
 }
