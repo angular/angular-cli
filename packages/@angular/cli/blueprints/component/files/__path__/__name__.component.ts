@@ -1,5 +1,5 @@
 import { Component, OnInit<% if(viewEncapsulation) { %>, ViewEncapsulation <% }%><% if(changeDetection) { %>, ChangeDetectionStrategy <% }%> } from '@angular/core';
-
+import { Router, ActivatedRoute } from '@angular/router';
 @Component({
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
     template: `
