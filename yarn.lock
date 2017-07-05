@@ -45,7 +45,7 @@
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/@types/common-tags/-/common-tags-1.2.5.tgz#14f29893992eb325594b83d739af02f2b6520f46"
 
-"@types/denodeify@^1.2.29":
+"@types/denodeify@^1.2.30":
   version "1.2.30"
   resolved "https://registry.yarnpkg.com/@types/denodeify/-/denodeify-1.2.30.tgz#9e356062b44524e7a399fb446d836fcfe352b9dc"
 
@@ -107,9 +107,13 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^6.0.36":
+"@types/node@*":
   version "6.0.78"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.78.tgz#5d4a3f579c1524e01ee21bf474e6fba09198f470"
+
+"@types/node@^6.0.84":
+  version "6.0.84"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.84.tgz#193ffe5a9f42864d425ffd9739d95b753c6a1eab"
 
 "@types/request@0.0.39":
   version "0.0.39"
@@ -4536,9 +4540,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs@^5.0.1:
-  version "5.4.1"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.4.1.tgz#b62f757f279445d265a18a58fb0a70dc90e91626"
+rxjs@^5.4.2:
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.4.2.tgz#2a3236fcbf03df57bae06fd6972fd99e5c08fcf7"
   dependencies:
     symbol-observable "^1.0.1"
 
@@ -5251,9 +5255,13 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@^2.3.3, typescript@~2.3.1:
+typescript@^2.3.3:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.3.4.tgz#3d38321828231e434f287514959c37a82b629f42"
+
+typescript@~2.4.1:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.2.tgz#f8395f85d459276067c988aa41837a8f82870844"
 
 uglify-js@3.0.x:
   version "3.0.19"

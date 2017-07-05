@@ -22,7 +22,7 @@
     "preprocess-loader": "^0.2.2",
     "raw-loader": "^0.5.1",
     "sass-loader": "^3.2.0",
-    "typescript": "~2.1.0",
+    "typescript": "~2.4.2",
     "webpack": "2.2.0"
   }
 }

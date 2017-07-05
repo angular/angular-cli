@@ -176,8 +176,11 @@ const NewCommand = Command.extend({
           }
         });
     } else {
-      createDirectory = mkdir(directoryName)
-        .catch(err => {
+      // The type of `mkdir` in ts2.4 seems to be wrong.
+      // Might be due to denodeify.
+      // TODO(@filipesilva): fix this.
+      createDirectory = (mkdir as any)(directoryName)
+        .catch((err: any) => {
           if (err.code === 'EEXIST') {
             if (this.isProject(directoryName)) {
               throw new SilentError(oneLine`
