@@ -51,6 +51,7 @@ export class FileSystemSinkHost implements VirtualFileSystemSinkHost {
 
   write(path: string, content: Buffer): Observable<void> {
     path = join(this._root, path);
+
     return new Observable<void>(o => {
       this.mkDir(dirname(path));
 
@@ -66,6 +67,7 @@ export class FileSystemSinkHost implements VirtualFileSystemSinkHost {
 
   read(path: string): Observable<Buffer> {
     path = join(this._root, path);
+
     return new Observable(o => {
       fs.readFile(path, (err, data) => {
         if (err) {

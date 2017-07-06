@@ -7,21 +7,22 @@
  */
 import {BaseException} from '..';
 import {
-  JsonAstNode,
-  JsonValue,
-  Position,
-  JsonAstNumber,
-  JsonAstString,
-  JsonAstConstantTrue,
+  JsonArray,
+  JsonAstArray,
+  JsonAstComment,
   JsonAstConstantFalse,
   JsonAstConstantNull,
-  JsonAstArray,
+  JsonAstConstantTrue,
+  JsonAstIdentifier,
   JsonAstKeyValue,
-  JsonArray,
-  JsonObject,
+  JsonAstMultilineComment,
+  JsonAstNode,
+  JsonAstNumber,
   JsonAstObject,
-  JsonAstComment,
-  JsonAstMultilineComment, JsonAstIdentifier,
+  JsonAstString,
+  JsonObject,
+  JsonValue,
+  Position,
 } from './interface';
 
 
@@ -107,6 +108,7 @@ function _token(context: JsonParserContext, valid?: string): string | undefined 
 
   // Move the position of the context to the next character.
   _next(context);
+
   return char;
 }
 
@@ -143,6 +145,7 @@ function _readExpNumber(context: JsonParserContext,
 
   // We're done reading this number.
   context.position = context.previous;
+
   return {
     kind: 'number',
     start,
@@ -165,7 +168,7 @@ function _readNumber(context: JsonParserContext, comments = _readBlanks(context)
 
   // read until `e` or end of line.
   while (true) {
-    let char = _token(context);
+    const char = _token(context);
 
     // Read tokens, one by one.
     if (char == '-') {
@@ -191,6 +194,7 @@ function _readNumber(context: JsonParserContext, comments = _readBlanks(context)
     } else {
       // We're done reading this number.
       context.position = context.previous;
+
       return {
         kind: 'number',
         start,
@@ -288,6 +292,7 @@ function _readTrue(context: JsonParserContext,
   _token(context, 'e');
 
   const end = context.position;
+
   return {
     kind: 'true',
     start,
@@ -313,6 +318,7 @@ function _readFalse(context: JsonParserContext,
   _token(context, 'e');
 
   const end = context.position;
+
   return {
     kind: 'false',
     start,
@@ -338,6 +344,7 @@ function _readNull(context: JsonParserContext,
   _token(context, 'l');
 
   const end = context.position;
+
   return {
     kind: 'null',
     start,
@@ -377,6 +384,7 @@ function _readArray(context: JsonParserContext, comments = _readBlanks(context))
   }
 
   _token(context, ']');
+
   return {
     kind: 'array',
     start,
@@ -401,6 +409,7 @@ function _readIdentifier(context: JsonParserContext,
   let char = _peek(context);
   if (char && '0123456789'.indexOf(char) != -1) {
     const identifierNode = _readNumber(context);
+
     return {
       kind: 'identifier',
       start,
@@ -420,13 +429,14 @@ function _readIdentifier(context: JsonParserContext,
     if (char == undefined
         || (first ? identValidFirstChar.indexOf(char) : identValidChar.indexOf(char)) == -1) {
       context.position = context.previous;
+
       return {
         kind: 'identifier',
         start,
         end: context.position,
         text: context.original.substr(start.offset, context.position.offset),
         value,
-        comments
+        comments,
       };
     }
 
@@ -502,6 +512,7 @@ function _readObject(context: JsonParserContext,
   }
 
   _token(context, '}');
+
   return {
     kind: 'object',
     properties,
@@ -586,6 +597,7 @@ function _readBlanks(context: JsonParserContext): (JsonAstComment | JsonAstMulti
       _next(context);
       char = context.original[context.position.offset];
     }
+
     return [];
   }
 }
@@ -648,6 +660,7 @@ function _readValue(context: JsonParserContext): JsonAstNode {
 
   // Clean up after.
   _readBlanks(context);
+
   return result;
 }
 
@@ -684,7 +697,7 @@ export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonA
     previous: { offset: 0, line: 0, character: 0 },
     original: input,
     comments: undefined,
-    mode
+    mode,
   };
 
   const ast = _readValue(context);
@@ -694,6 +707,7 @@ export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonA
     throw new Error(`Expected end of file, got "${i}" at `
         + `${context.position.line}:${context.position.character}.`);
   }
+
   return ast;
 }
 

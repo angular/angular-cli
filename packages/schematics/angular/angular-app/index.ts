@@ -5,7 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as stringUtils from '../strings';
+// TODO: replace `options: any` with an actual type generated from the schema.
+// tslint:disable:no-any
 import {
   Rule,
   Tree,
@@ -14,8 +15,9 @@ import {
   mergeWith,
   schematic,
   template,
-  url
+  url,
 } from '@angular-devkit/schematics';
+import * as stringUtils from '../strings';
 import {addBootstrapToModule, addImportToModule} from '../utility/ast-utils';
 
 import * as ts from 'typescript';
@@ -40,7 +42,7 @@ function addBootstrapToNgModule(): Rule {
                                                   componentModule);
     const changes = [
       ...importChanges,
-      ...bootstrapChanges
+      ...bootstrapChanges,
     ];
 
     const recorder = host.beginUpdate(modulePath);
@@ -59,14 +61,14 @@ export default function (options: any): Rule {
   return chain([
     mergeWith(
       apply(url('./files'), [
-        template({ utils: stringUtils, ...options })
+        template({ utils: stringUtils, ...options }),
       ])),
     schematic('module', { name: 'app' }),
     schematic('component', {
       name: 'app',
       selector: 'app-root',
-      flat: true
+      flat: true,
     }),
-    addBootstrapToNgModule()
+    addBootstrapToNgModule(),
   ]);
 };

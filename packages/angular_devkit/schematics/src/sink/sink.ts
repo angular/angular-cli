@@ -5,6 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/observable/from';
+import 'rxjs/add/operator/concat';
+import 'rxjs/add/operator/concatMap';
+import 'rxjs/add/operator/ignoreElements';
+import 'rxjs/add/operator/last';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
+import {FileAlreadyExistException, FileDoesNotExistException} from '../exception/exception';
 import {
   Action,
   CreateFileAction,
@@ -12,20 +22,9 @@ import {
   OverwriteFileAction,
   RenameFileAction,
   UnknownActionException,
-  isAction
+  isAction,
 } from '../tree/action';
-import {FileAlreadyExistException, FileDoesNotExistException} from '../exception/exception';
 import {Tree} from '../tree/interface';
-
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/defer';
-import 'rxjs/add/operator/concat';
-import 'rxjs/add/operator/concatMap';
-import 'rxjs/add/operator/ignoreElements';
-import 'rxjs/add/operator/last';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/observable/from';
 
 
 export interface Sink {
@@ -37,7 +36,7 @@ export interface Sink {
 }
 
 
-const Noop: any = function() {};
+const Noop = function() {};
 
 
 export abstract class SimpleSinkBase implements Sink {
@@ -118,6 +117,7 @@ export abstract class SimpleSinkBase implements Sink {
 
   commit(tree: Tree): Observable<void> {
     const actions = Observable.from(tree.actions);
+
     return (this.preCommit() || Observable.empty<void>())
       .concat(Observable.defer(() => actions))
       .concatMap((action: Action) => {

@@ -17,7 +17,7 @@ import {
 import {
   FileSystemHost,
   FileSystemSchematicDesc,
-  NodeModulesEngineHost
+  NodeModulesEngineHost,
 } from '@angular-devkit/schematics-tools';
 import {SchemaClassFactory} from '@ngtools/json-schema';
 import * as minimist from 'minimist';
@@ -87,7 +87,7 @@ function parseSchematicName(str: string | null): { collection: string, schematic
 
 /** Parse the command line. */
 const argv = minimist(process.argv.slice(2), {
-  boolean: [ 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ]
+  boolean: [ 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ],
 });
 /** Create the DevKit Logger used through the CLI. */
 const logger = createLogger(argv['verbose']);
@@ -99,7 +99,7 @@ if (argv.help) {
 /** Get the collection an schematic name from the first argument. */
 const {
   collection: collectionName,
-  schematic: schematicName
+  schematic: schematicName,
 } = parseSchematicName(argv._.shift() || null);
 
 
@@ -111,12 +111,14 @@ const engineHost = new NodeModulesEngineHost();
 const engine = new SchematicEngine(engineHost);
 
 // Add support for schemaJson.
-engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options: any) => {
+engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options: {}) => {
   if (schematic.schema) {
-    const SchemaMetaClass = SchemaClassFactory<any>(schematic.schemaJson !);
+    const SchemaMetaClass = SchemaClassFactory<{}>(schematic.schemaJson !);
     const schemaClass = new SchemaMetaClass(options);
+
     return schemaClass.$$root();
   }
+
   return options;
 });
 
@@ -215,11 +217,12 @@ schematic.call(argv, host)
     if (dryRun || error) {
       return Observable.of(tree);
     }
+
     return fsSink.commit(tree).ignoreElements().concat(Observable.of(tree));
   })
   .subscribe({
     error(err: Error) {
       logger.fatal(err.toString());
       process.exit(1);
-    }
+    },
   });

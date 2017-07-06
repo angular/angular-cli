@@ -5,10 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
-import {FileSystemHost} from './file-system-host';
-import {readJsonFile} from './file-system-utility';
-
+import {JsonObject} from '@angular-devkit/core';
 import {
   Collection,
   CollectionDescription,
@@ -17,11 +14,13 @@ import {
   RuleFactory,
   SchematicDescription,
   Source,
-  TypedSchematicContext
+  TypedSchematicContext,
 } from '@angular-devkit/schematics';
-
 import {dirname, join, resolve} from 'path';
 import {Url} from 'url';
+import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
+import {FileSystemHost} from './file-system-host';
+import {readJsonFile} from './file-system-utility';
 
 
 /**
@@ -48,7 +47,7 @@ export abstract class FileSystemEngineHostBase implements
     EngineHost<FileSystemCollectionDescription, FileSystemSchematicDescription> {
   protected abstract _resolveCollectionPath(name: string): string | null;
   protected abstract _resolveReferenceString(
-      name: string, parentPath: string): { ref: RuleFactory<any>, path: string } | null;
+      name: string, parentPath: string): { ref: RuleFactory<{}>, path: string } | null;
   protected abstract _transformCollectionDescription(
       name: string, desc: Partial<FileSystemCollectionDesc>): FileSystemCollectionDesc | null;
   protected abstract _transformSchematicDescription(
@@ -121,10 +120,10 @@ export abstract class FileSystemEngineHostBase implements
 
     const { path } = resolvedRef;
     let schema = partialDesc.schema;
-    let schemaJson = undefined;
+    let schemaJson: JsonObject | undefined = undefined;
     if (schema) {
       schema = join(collectionPath, schema);
-      schemaJson = readJsonFile(schema);
+      schemaJson = readJsonFile(schema) as JsonObject;
     }
 
     const description = this._transformSchematicDescription(name, collection, {
@@ -134,7 +133,7 @@ export abstract class FileSystemEngineHostBase implements
       name,
       path,
       factoryFn: resolvedRef.ref,
-      collection
+      collection,
     });
 
     if (!description) {
@@ -152,6 +151,7 @@ export abstract class FileSystemEngineHostBase implements
           // Resolve all file:///a/b/c/d from the schematic's own path, and not the current
           // path.
           const root = resolve(dirname(context.schematic.description.path), url.path);
+
           return new FileSystemTree(new FileSystemHost(root), true);
         };
     }
@@ -161,9 +161,7 @@ export abstract class FileSystemEngineHostBase implements
 
   transformOptions<OptionT extends object, ResultT extends object>(
       schematic: FileSystemSchematicDesc, options: OptionT): ResultT {
-    return this._transforms.reduce((acc: any, t: OptionTransform<any, any>) => {
-      return t(schematic, acc);
-    }, options);
+    return this._transforms.reduce((acc: ResultT, t) => t(schematic, acc), options) as ResultT;
   }
 
   getSchematicRuleFactory<OptionT extends object>(

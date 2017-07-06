@@ -53,5 +53,5 @@ export const Tree: TreeConstructor = {
   partition(tree: TreeInterface, predicate: FilePredicate<boolean>) {
     return partition(tree, predicate);
   },
-  optimize(tree: TreeInterface) { return optimize(tree); }
+  optimize(tree: TreeInterface) { return optimize(tree); },
 };

@@ -15,6 +15,7 @@ export class LinkedList<T extends {next: T | null}> {
       l--;
       c = c.next;
     }
+
     return c;
   }
 
@@ -26,6 +27,7 @@ export class LinkedList<T extends {next: T | null}> {
       i++;
       c = c.next;
     }
+
     return i;
   }
 
@@ -38,6 +40,7 @@ export class LinkedList<T extends {next: T | null}> {
       i++;
       c = c.next;
     }
+
     return acc;
   }
 
@@ -51,6 +54,7 @@ export class LinkedList<T extends {next: T | null}> {
       i++;
       c = c.next;
     }
+
     return c;
   }
 

@@ -17,12 +17,12 @@ const Jasmine = require('jasmine');
 
 const projectBaseDir = join(__dirname, '../packages');
 require('source-map-support').install({
-  hookRequire: true
+  hookRequire: true,
 });
 
 
-declare let global: any & {
-  benchmarkReporter: any;
+declare const global: {} & {
+  benchmarkReporter: {};
 };
 
 
@@ -41,7 +41,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
 
   constructor() {
     super({
-      summary: {}
+      summary: {},
     });
   }
 
@@ -67,6 +67,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
 
       function pad(x: string | number, p: string = padding): string {
         const s = ('' + x).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
         return p.substr(0, p.length - ('' + s).length) + s;
       }
 
@@ -128,6 +129,6 @@ const allTests =
     .filter(p => !/schematics_cli\/schematics\//.test(p));
 
 
-export default function(_args: any) {
+export default function(_args: {}) {
   runner.execute(allTests);
 }

@@ -40,5 +40,6 @@ export function normalizePath(path: string): SchematicPath {
   if (p.startsWith('/../') || (p.endsWith('/') && p !== '/')) {
     throw new InvalidPathException(path);
   }
+
   return (p as SchematicPath);
 }

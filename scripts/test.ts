@@ -18,13 +18,27 @@ const Jasmine = require('jasmine');
 
 const projectBaseDir = join(__dirname, '../packages');
 require('source-map-support').install({
-  hookRequire: true
+  hookRequire: true,
 });
 
 
-declare let global: any & {
-  __coverage__: any;
+declare const global: {
+  _DevKitRequireHook: Function,
+  __coverage__: CoverageType;
 };
+
+
+interface Instrumenter extends Istanbul.Instrumenter {
+  sourceMap: SourceMapGenerator;
+}
+
+
+interface CoverageLocation {
+  start: Position;
+  end: Position;
+}
+type CoverageType = any;  // tslint:disable-line:no-any
+
 
 const inlineSourceMapRe = /\/\/# sourceMappingURL=data:application\/json;base64,(\S+)$/;
 
@@ -33,7 +47,7 @@ const inlineSourceMapRe = /\/\/# sourceMappingURL=data:application\/json;base64,
 // Istanbul (not Constantinople) collection to the code.
 const codeMap = new Map<string, { code: string, map: SourceMapConsumer }>();
 
-(global as any)._DevKitRequireHook = function(code: string, filename: string) {
+global._DevKitRequireHook = function(code: string, filename: string) {
   // Skip spec files.
   if (filename.match(/_spec\.ts$/)) {
     return code;
@@ -46,14 +60,14 @@ const codeMap = new Map<string, { code: string, map: SourceMapConsumer }>();
     esModules: true,
     codeGenerationOptions: {
       sourceMap: filename,
-      sourceMapWithCode: true
-    }
-  });
+      sourceMapWithCode: true,
+    },
+  }) as Instrumenter;
   let instrumentedCode = instrumenter.instrumentSync(code, filename);
-  const sourceMapGenerator: SourceMapGenerator = (instrumenter as any).sourceMap;
   const match = code.match(inlineSourceMapRe);
 
   if (match) {
+    const sourceMapGenerator: SourceMapGenerator = instrumenter.sourceMap;
     // Fix source maps for exception reporting (since the exceptions happen in the instrumented
     // code.
     const sourceMapJson = JSON.parse(Buffer.from(match[1], 'base64').toString());
@@ -79,11 +93,6 @@ const istanbulReporter = new Istanbul.Reporter(undefined, 'coverage/');
 istanbulReporter.addAll(['json', 'lcov']);
 
 
-interface CoverageLocation {
-  start: Position;
-  end: Position;
-}
-
 class IstanbulReporter implements jasmine.CustomReporter {
   // Update a location object from a SourceMap. Will ignore the location if the sourcemap does
   // not have a valid mapping.
@@ -101,7 +110,7 @@ class IstanbulReporter implements jasmine.CustomReporter {
     }
   }
 
-  private _updateCoverageJsonSourceMap(coverageJson: any) {
+  private _updateCoverageJsonSourceMap(coverageJson: CoverageType) {
     // Update the coverageJson with the SourceMap.
     for (const path of Object.keys(coverageJson)) {
       const entry = codeMap.get(path);
@@ -163,7 +172,7 @@ if (process.argv.indexOf('--spec-reporter') != -1) {
       // trace.
       filter: (x: string) => {
         return x.substr(0, x.indexOf('\n', x.indexOf('\n', x.lastIndexOf('.ts:')) + 1));
-      }
+      },
     },
     spec: {
       displayDuration: true,
@@ -175,7 +184,7 @@ if (process.argv.indexOf('--spec-reporter') != -1) {
       displayStacktrace: true,
       displayErrorMessages: true,
       displayDuration: true,
-    }
+    },
   }));
 }
 runner.env.addReporter(new IstanbulReporter());
@@ -199,6 +208,6 @@ const allTests =
     .map(p => relative(projectBaseDir, p))
     .filter(p => !/schematics_cli\/schematics\//.test(p));
 
-export default function(_args: any) {
+export default function() {
   runner.execute(allTests);
 }

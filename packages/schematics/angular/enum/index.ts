@@ -5,7 +5,8 @@
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.io/license
 */
-
+// TODO: replace `options: any` with an actual type generated from the schema.
+// tslint:disable:no-any
 import {
   Rule,
   apply,
@@ -14,7 +15,7 @@ import {
   mergeWith,
   move,
   template,
-  url
+  url,
 } from '@angular-devkit/schematics';
 import * as stringUtils from '../strings';
 
@@ -23,14 +24,14 @@ export default function (options: any): Rule {
   const templateSource = apply(url('./files'), [
     template({
       ...stringUtils,
-      ...options
+      ...options,
     }),
-    move(options.sourceDir)
+    move(options.sourceDir),
   ]);
 
   return chain([
     branchAndMerge(chain([
-      mergeWith(templateSource)
-    ]))
+      mergeWith(templateSource),
+    ])),
   ]);
 }

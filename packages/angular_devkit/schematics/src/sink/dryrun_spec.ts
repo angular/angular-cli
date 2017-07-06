@@ -5,15 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {DryRunSink} from './dryrun';
 import {FileSystemTree} from '../tree/filesystem';
 import {InMemoryFileSystemTreeHost} from '../tree/memory-host';
 import {optimize} from '../tree/static';
+import {DryRunSink} from './dryrun';
 
-import 'rxjs/add/operator/toArray';
-import 'rxjs/add/operator/toPromise';
 import * as fs from 'fs';
 import * as path from 'path';
+import 'rxjs/add/operator/toArray';
+import 'rxjs/add/operator/toPromise';
 
 const temp = require('temp');
 
@@ -21,7 +21,7 @@ const temp = require('temp');
 const host = new InMemoryFileSystemTreeHost({
   '/hello': '',
   '/sub/file1': '',
-  '/sub/directory/file2': ''
+  '/sub/directory/file2': '',
 });
 
 

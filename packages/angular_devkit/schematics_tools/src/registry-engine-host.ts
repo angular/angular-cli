@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {ExportStringRef} from './export-ref';
 import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
+import {ExportStringRef} from './export-ref';
 import {FileSystemEngineHostBase} from './file-system-engine-host-base';
 
 import {
@@ -15,10 +15,9 @@ import {
   SchematicDescription,
 } from '@angular-devkit/schematics';
 
-import {join} from 'path';
 import {existsSync, statSync} from 'fs';
+import {join} from 'path';
 import {readJsonFile} from './file-system-utility';
-
 
 
 /**
@@ -28,7 +27,6 @@ export declare type FileSystemCollectionDesc
   = CollectionDescription<FileSystemCollectionDescription>;
 export declare type FileSystemSchematicDesc
   = SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-
 
 
 /**
@@ -50,7 +48,7 @@ export class RegistryEngineHost extends FileSystemEngineHostBase {
       throw new Error(`Invalid path: "${path}".`);
     }
 
-    const json: FileSystemCollectionDesc = readJsonFile(path);
+    const json: FileSystemCollectionDesc = readJsonFile(path) as FileSystemCollectionDesc;
     if (!json) {
       throw new Error(`Invalid path for collection: "${path}".`);
     }
@@ -86,12 +84,17 @@ export class RegistryEngineHost extends FileSystemEngineHostBase {
 
   protected _resolveCollectionPath(name: string): string | null {
     const maybePath = this._registry.get(name);
+
     return maybePath || null;
   }
 
   protected _resolveReferenceString(refString: string, parentPath: string) {
     // Use the same kind of export strings as NodeModule.
-    const ref = new ExportStringRef<RuleFactory<any>>(refString, parentPath);
+    const ref = new ExportStringRef<RuleFactory<{}>>(refString, parentPath);
+    if (!ref.ref) {
+      return null;
+    }
+
     return { ref: ref.ref, path: ref.module };
   }
 
@@ -103,6 +106,7 @@ export class RegistryEngineHost extends FileSystemEngineHostBase {
     if (typeof desc.schematics != 'object') {
       return null;
     }
+
     return <FileSystemCollectionDesc>desc;
   }
 
@@ -112,6 +116,7 @@ export class RegistryEngineHost extends FileSystemEngineHostBase {
     if (!desc.factoryFn || !desc.path || !desc.description) {
       return null;
     }
+
     return <FileSystemSchematicDesc>desc;
   }
 }

@@ -5,8 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {LogEntry, Logger} from './logger';
+// tslint:disable:no-any
 import {IndentLogger} from './indent';
+import {LogEntry, Logger} from './logger';
 
 
 describe('IndentSpec', () => {
@@ -24,7 +25,7 @@ describe('IndentSpec', () => {
           jasmine.objectContaining({ message: 'test5', level: 'info', name: 'test' }) as any,
         ]);
       })
-      .then(() => done(), (err: any) => done.fail(err));
+      .then(() => done(), err => done.fail(err));
     const logger2 = new Logger('test2', logger);
     const logger3 = new Logger('test3', logger2);
     const logger4 = new Logger('test4', logger);

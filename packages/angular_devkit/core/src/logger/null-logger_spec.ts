@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {NullLogger} from './null-logger';
 import {LogEntry, Logger} from './logger';
+import {NullLogger} from './null-logger';
 
 
 describe('NullLogger', () => {
@@ -18,7 +18,7 @@ describe('NullLogger', () => {
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([]);
       })
-      .then(() => done(), (err: any) => done.fail(err));
+      .then(() => done(), err => done.fail(err));
 
     logger.debug('hello');
     logger.info('world');
@@ -33,7 +33,7 @@ describe('NullLogger', () => {
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([]);
       })
-      .then(() => done(), (err: any) => done.fail(err));
+      .then(() => done(), err => done.fail(err));
 
     const nullLogger = new NullLogger(logger);
     const child = new Logger('test', nullLogger);

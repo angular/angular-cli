@@ -49,7 +49,7 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
   createSourceFromUrl(url: Url): Source | null;
   transformOptions<OptionT extends object, ResultT extends object>(
     schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
-    options: OptionT
+    options: OptionT,
   ): ResultT;
 
 
@@ -71,12 +71,12 @@ export interface Engine<CollectionMetadataT extends object, SchematicMetadataT e
   createCollection(name: string): Collection<CollectionMetadataT, SchematicMetadataT>;
   createSchematic(
       name: string,
-      collection: Collection<CollectionMetadataT, SchematicMetadataT>
+      collection: Collection<CollectionMetadataT, SchematicMetadataT>,
   ): Schematic<CollectionMetadataT, SchematicMetadataT>;
   createSourceFromUrl(url: Url): Source;
   transformOptions<OptionT extends object, ResultT extends object>(
       schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
-      options: OptionT
+      options: OptionT,
   ): ResultT;
 
   readonly defaultMergeStrategy: MergeStrategy;
@@ -122,7 +122,7 @@ export interface TypedSchematicContext<CollectionMetadataT extends object,
  * This is used by the Schematics implementations in order to avoid needing to have typing from
  * the tooling. Schematics are not specific to a tool.
  */
-export type SchematicContext = TypedSchematicContext<any, any>;
+export type SchematicContext = TypedSchematicContext<{}, {}>;
 
 
 /**

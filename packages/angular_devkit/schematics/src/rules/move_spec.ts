@@ -5,14 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {callRule} from './call';
 import {SchematicContext} from '../engine/interface';
+import {callRule} from './call';
 
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 import {VirtualTree} from '../tree/virtual';
 import {move} from './move';
-
 
 
 const context: SchematicContext = null !;

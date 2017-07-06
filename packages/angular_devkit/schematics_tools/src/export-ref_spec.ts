@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as path from 'path';
 import {ExportStringRef} from './export-ref';
 import {FileSystemHost} from './file-system-host';
-import * as path from 'path';
 
 
 describe('ExportStringRef', () => {
@@ -22,7 +22,7 @@ describe('ExportStringRef', () => {
   it('works without an inner ref', () => {
     // META
     const ref = new ExportStringRef(path.join(__dirname, 'export-ref'));
-    expect(ref.ref).toBe(undefined as any);
+    expect(ref.ref).toBe(undefined);
     expect(ref.path).toBe(__dirname);
     expect(ref.module).toBe(path.join(__dirname, 'export-ref.ts'));
   });

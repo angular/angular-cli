@@ -14,7 +14,7 @@ describe('FileSystem', () => {
     const host = new InMemoryFileSystemTreeHost({
       '/hello': 'world',
       '/sub/directory/file2': '',
-      '/sub/file1': ''
+      '/sub/file1': '',
     });
     const tree = new FileSystemTree(host);
 

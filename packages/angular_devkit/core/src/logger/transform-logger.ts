@@ -7,7 +7,7 @@
  */
 import {Observable} from 'rxjs/Observable';
 
-import {Logger, LogEntry} from './logger';
+import {LogEntry, Logger} from './logger';
 
 
 export class TransformLogger extends Logger {

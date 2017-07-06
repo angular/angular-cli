@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {FileSystemSink} from './filesystem';
 import {FileSystemTree} from '../tree/filesystem';
 import {InMemoryFileSystemTreeHost} from '../tree/memory-host';
 import {optimize} from '../tree/static';
+import {FileSystemSink} from './filesystem';
 
 import * as fs from 'fs';
 import * as glob from 'glob';
@@ -28,7 +28,7 @@ describe('FileSystemSink', () => {
     const host = new InMemoryFileSystemTreeHost({
       '/hello': 'world',
       '/sub/directory/file2': '',
-      '/sub/file1': ''
+      '/sub/file1': '',
     });
     const tree = new FileSystemTree(host, true);
 

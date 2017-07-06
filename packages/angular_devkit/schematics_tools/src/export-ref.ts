@@ -9,7 +9,7 @@ import {dirname, resolve} from 'path';
 
 
 export class ExportStringRef<T> {
-  private _ref: T;
+  private _ref?: T;
   private _module: string;
   private _path: string;
 
@@ -19,9 +19,10 @@ export class ExportStringRef<T> {
     this._module = require.resolve(this._module);
     this._path = dirname(this._module);
 
-    this._ref = require(this._module);
     if (inner) {
-      this._ref = (this._ref as any)[name || 'default'];
+      this._ref = require(this._module)[name || 'default'];
+    } else {
+      this._ref = require(this._module);
     }
   }
 

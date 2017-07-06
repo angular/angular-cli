@@ -21,6 +21,7 @@ export class FileSystemHost implements FileSystemTreeHost {
         // Remove node_modules.
         .filter(path => path !== 'node_modules');
     }
+
     // Add the path as root is part of the file list.
     return files;
   }

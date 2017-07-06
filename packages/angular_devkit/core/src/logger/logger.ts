@@ -8,8 +8,8 @@
 import {JsonObject} from '../json/interface';
 
 import {Observable} from 'rxjs/Observable';
-import {Operator} from 'rxjs/Operator';
 import {PartialObserver} from 'rxjs/Observer';
+import {Operator} from 'rxjs/Operator';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 
@@ -45,7 +45,7 @@ export class Logger extends Observable<LogEntry> {
         if (this.parent) {
           this.parent._subject.next(value);
         }
-      }, (error: any) => {
+      }, (error: Error) => {
         if (this.parent) {
           this.parent._subject.error(error);
         }
@@ -61,7 +61,7 @@ export class Logger extends Observable<LogEntry> {
   constructor(public readonly name: string, public readonly parent: Logger | null = null) {
     super();
 
-    let path: string[] = [];
+    const path: string[] = [];
     let p = parent;
     while (p) {
       path.push(p.name);
@@ -81,7 +81,7 @@ export class Logger extends Observable<LogEntry> {
 
   log(level: LogLevel, message: string, metadata: JsonObject = {}): void {
     const entry: LogEntry = Object.assign({}, this._metadata, metadata, {
-      level, message, timestamp: +Date.now()
+      level, message, timestamp: +Date.now(),
     });
     this._subject.next(entry);
   }
@@ -112,10 +112,10 @@ export class Logger extends Observable<LogEntry> {
 
   subscribe(): Subscription;
   subscribe(observer: PartialObserver<LogEntry>): Subscription;
-  subscribe(next?: (value: LogEntry) => void, error?: (error: any) => void,
+  subscribe(next?: (value: LogEntry) => void, error?: (error: Error) => void,
             complete?: () => void): Subscription;
   subscribe(_observerOrNext?: PartialObserver<LogEntry> | ((value: LogEntry) => void),
-            _error?: (error: any) => void,
+            _error?: (error: Error) => void,
             _complete?: () => void): Subscription {
     return this._observable.subscribe.apply(this._observable, arguments);
   }

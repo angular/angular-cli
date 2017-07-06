@@ -35,7 +35,7 @@ export class ActionList implements Iterable<Action> {
   protected _action(action: Partial<Action>) {
     this._actions.push(Object.assign({
       id: _id++,
-      parent: this._actions[this._actions.length - 1] || 0
+      parent: this._actions[this._actions.length - 1] || 0,
     }, action) as Action);
   }
 
@@ -88,7 +88,7 @@ export class ActionList implements Iterable<Action> {
           deleted.add(path);
         }
       } else if (deleted.has(iAction.path)) {
-        continue;
+        // DoNothing
       } else {
         switch (iAction.kind) {
           case 'o': this.overwrite(iAction.path, iAction.content); break;
@@ -111,12 +111,13 @@ export class ActionList implements Iterable<Action> {
         return false;
       }
     }
+
     return false;
   }
   find(predicate: (value: Action) => boolean): Action | null {
     return this._actions.find(predicate) || null;
   }
-  forEach(fn: (value: Action, index: number, array: Action[]) => void, thisArg?: any) {
+  forEach(fn: (value: Action, index: number, array: Action[]) => void, thisArg?: {}) {
     this._actions.forEach(fn, thisArg);
   }
   get length() { return this._actions.length; }
@@ -129,8 +130,9 @@ export function isContentAction(action: Action): action is CreateFileAction | Ov
 }
 
 
-export function isAction(action: any): action is Action {
+export function isAction(action: any): action is Action {  // tslint:disable-line:no-any
   const kind = action && action.kind;
+
   return action !== null
       && typeof action.id == 'number'
       && typeof action.path == 'string'

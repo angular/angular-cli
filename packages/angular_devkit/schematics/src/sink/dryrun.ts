@@ -12,7 +12,6 @@ import {Subject} from 'rxjs/Subject';
 import 'rxjs/add/observable/empty';
 
 
-
 export interface DryRunErrorEvent {
   kind: 'error';
   description: 'alreadyExist' | 'doesNotExist';
@@ -66,14 +65,14 @@ export class DryRunSink extends FileSystemSink {
       this._subject.next({
         kind: 'error',
         description: 'alreadyExist',
-        path
+        path,
       });
     });
     this._fileDoesNotExistExceptionSet.forEach(path => {
       this._subject.next({
         kind: 'error',
         description: 'doesNotExist',
-        path
+        path,
       });
     });
 
@@ -112,6 +111,7 @@ export class DryRunSink extends FileSystemSink {
     });
 
     this._subject.complete();
+
     return Observable.empty<void>();
   }
 }

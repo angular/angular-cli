@@ -5,10 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {JsonValue} from '../json/interface';
-import {Logger} from './logger';
+// tslint:disable:no-any
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
+import {JsonValue} from '../json/interface';
+import {Logger} from './logger';
 
 
 describe('Logger', () => {
@@ -23,7 +24,7 @@ describe('Logger', () => {
           jasmine.objectContaining({ message: 'world', level: 'info', name: 'test' }) as any,
         ]);
       })
-      .then(() => done(), (err: any) => done.fail(err));
+      .then(() => done(), err => done.fail(err));
 
     logger.debug('hello');
     logger.info('world');
@@ -43,7 +44,7 @@ describe('Logger', () => {
         ]);
         expect(hasCompleted).toBe(true);
       })
-      .then(() => done(), (err: any) => done.fail(err));
+      .then(() => done(), err => done.fail(err));
 
     const childLogger = new Logger('child', logger);
     childLogger.subscribe(undefined, undefined, () => hasCompleted = true);

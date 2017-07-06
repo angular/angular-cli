@@ -32,6 +32,4 @@ ts_library(
         # @typings: jasmine
     ],
     tsconfig = "//:tsconfig.json",
-    module_name = "@angular-devkit/core",
-    module_root = "src"
 )

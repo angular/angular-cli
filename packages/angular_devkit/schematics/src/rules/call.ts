@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {BaseException} from '../exception/exception';
 import {Rule, SchematicContext, Source} from '../engine/interface';
+import {BaseException} from '../exception/exception';
 import {Tree} from '../tree/interface';
 import {VirtualTree} from '../tree/virtual';
 
@@ -17,7 +17,7 @@ import {Observable} from 'rxjs/Observable';
  * When a rule or source returns an invalid value.
  */
 export class InvalidRuleResultException extends BaseException {
-  constructor(value: any) {
+  constructor(value: {}) {
     let v = 'Unknown Type';
     if (value === undefined) {
       v = 'undefined';
@@ -69,5 +69,4 @@ export function callRule(rule: Rule,
     }
   });
 }
-
 

@@ -22,7 +22,7 @@ const kHtmlEscapes: {[char: string]: string} = {
   '>': '&gt;',
   '"': '&quot;',
   "'": '&#39;',
-  '`': '&#96;'
+  '`': '&#96;',
 };
 
 // Used to match HTML entities and HTML characters.
@@ -47,7 +47,7 @@ const stringEscapes: {[char: string]: string} = {
   '\n': '\\n',
   '\r': '\\r',
   '\u2028': '\\u2028',
-  '\u2029': '\\u2029'
+  '\u2029': '\\u2029',
 };
 
 // Used to match unescaped characters in compiled string literals.
@@ -131,5 +131,6 @@ export function template<T>(content: string, options: TemplateOptions): (input: 
   // Provide the compiled function's source by its `toString` method or
   // the `source` property as a convenience for inlining compiled templates.
   result.source = source;
+
   return result;
 }

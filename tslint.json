@@ -1,5 +1,12 @@
 {
   "rules": {
+    "align": [
+      true,
+      "elements",
+      "members",
+      "parameters",
+      "statements"
+    ],
     "max-line-length": [true, 100],
     "no-inferrable-types": true,
     "class-name": true,
@@ -12,8 +19,14 @@
       "spaces"
     ],
     "eofline": true,
+    "import-spacing": true,
+    "linebreak-style": [true, "LF"],
+    "match-default-export-name": true,
+    "newline-before-return": true,
+    "no-consecutive-blank-lines": [true, 2],
     "no-duplicate-variable": true,
     "no-eval": true,
+    "no-any": true,
     "no-arg": true,
     "no-internal-module": true,
     "no-trailing-whitespace": true,
@@ -23,15 +36,31 @@
       true,
       "check-catch",
       "check-else",
+      "check-finally",
       "check-open-brace",
       "check-whitespace"
     ],
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "lowercase-last",
+        "named-imports-order": "lowercase-last"
+      }
+    ],
+    "prefer-const": true,
     "quotemark": [
       true,
       "single",
       "avoid-escape"
     ],
     "semicolon": [true, "always"],
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
     "typedef-whitespace": [
       true,
       {

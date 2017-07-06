@@ -25,6 +25,7 @@ export function externalSchematic<T>(collectionName: string,
   return (input: Tree, context: SchematicContext) => {
     const collection = context.engine.createCollection(collectionName);
     const schematic = collection.createSchematic(schematicName);
+
     return schematic.call(options, Observable.of(branch(input)));
   };
 }
@@ -38,9 +39,9 @@ export function externalSchematic<T>(collectionName: string,
  */
 export function schematic<T>(schematicName: string, options: T): Rule {
   return (input: Tree, context: SchematicContext) => {
-    let collection = context.schematic.collection;
-
+    const collection = context.schematic.collection;
     const schematic = collection.createSchematic(schematicName);
+
     return schematic.call(options, Observable.of(branch(input)));
   };
 }

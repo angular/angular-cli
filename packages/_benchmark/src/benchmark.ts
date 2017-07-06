@@ -5,15 +5,27 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-declare let global: any;
+declare const global: {
+  benchmarkReporter: {
+    reportBenchmark: Function,
+  },
+};
 
 
 const kNanosecondsPerSeconds = 1e9;
+const kBenchmarkIterationMaxCount = 10000;
+const kBenchmarkTimeoutInMsec = 5000;
+const kWarmupIterationCount = 10;
+const kTopMetricCount = 5;
 
 
 function _run(fn: () => void, collector: number[]) {
   const timeout = Date.now();
-  for (let i = 0; i < 10000 && (Date.now() - timeout) < 5000; i++) {
+  // Gather the first 5 seconds runs, or kMaxNumberOfIterations runs whichever comes first
+  // (soft timeout).
+  for (let i = 0;
+       i < kBenchmarkIterationMaxCount && (Date.now() - timeout) < kBenchmarkTimeoutInMsec;
+       i++) {
     // Start time.
     const start = process.hrtime();
     fn();
@@ -36,10 +48,10 @@ function _stats(metrics: number[]) {
   const average = total / metrics.length;
 
   return {
-    slowest: metrics.slice(-5).reverse(),
-    fastest: metrics.slice(0, 5),
+    fastest: metrics.slice(0, kTopMetricCount),
+    slowest: metrics.reverse().slice(0, kTopMetricCount),
     mean,
-    average
+    average,
   };
 }
 
@@ -47,16 +59,15 @@ function _stats(metrics: number[]) {
 export function benchmark(name: string, fn: () => void, base?: () => void) {
   it(name + ' (time in nanoseconds)', (done) => {
     process.nextTick(() => {
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < kWarmupIterationCount; i++) {
         // Warm it up.
         fn();
       }
 
-      const reporter: any = global.benchmarkReporter;
+      const reporter = global.benchmarkReporter;
       const metrics: number[] = [];
       const baseMetrics: number[] = [];
 
-      // Gather the first 5 seconds runs, or 10000 runs whichever comes first (soft timeout).
       _run(fn, metrics);
       if (base) {
         _run(base, baseMetrics);
@@ -64,7 +75,7 @@ export function benchmark(name: string, fn: () => void, base?: () => void) {
 
       reporter.reportBenchmark({
         ..._stats(metrics),
-        base: base ? _stats(baseMetrics) : null
+        base: base ? _stats(baseMetrics) : null,
       });
 
       done();

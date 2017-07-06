@@ -8,7 +8,7 @@
 import {IndentLogger} from './indent';
 import {LogEntry, Logger} from './logger';
 
-import {bold, dim, yellow, red, white} from '../terminal';
+import {bold, dim, red, white, yellow} from '../terminal';
 
 import 'rxjs/add/operator/filter';
 

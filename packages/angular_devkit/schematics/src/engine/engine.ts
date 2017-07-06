@@ -5,6 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {BaseException} from '../exception/exception';
+import {MergeStrategy} from '../tree/interface';
+import {NullTree} from '../tree/null';
+import {empty} from '../tree/static';
 import {CollectionImpl} from './collection';
 import {
   Collection,
@@ -14,13 +18,9 @@ import {
   Source,
 } from './interface';
 import {SchematicImpl} from './schematic';
-import {BaseException} from '../exception/exception';
-import {MergeStrategy} from '../tree/interface';
-import {NullTree} from '../tree/null';
-import {empty} from '../tree/static';
 
-import {Url} from 'url';
 import 'rxjs/add/operator/map';
+import {Url} from 'url';
 
 
 export class UnknownUrlSourceProtocol extends BaseException {
@@ -31,7 +31,7 @@ export class UnknownCollectionException extends BaseException {
   constructor(name: string) { super(`Unknown collection "${name}".`); }
 }
 export class UnknownSchematicException extends BaseException {
-  constructor(name: string, collection: Collection<any, any>) {
+  constructor(name: string, collection: Collection<{}, {}>) {
     super(`Schematic "${name}" not found in collection "${collection.description.name}".`);
   }
 }
@@ -63,6 +63,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     collection = new CollectionImpl<CollectionT, SchematicT>(description, this);
     this._collectionCache.set(name, collection);
     this._schematicCache.set(name, new Map());
+
     return collection;
   }
 
@@ -89,6 +90,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     schematic = new SchematicImpl<CollectionT, SchematicT>(description, factory, collection, this);
 
     schematicMap.set(name, schematic);
+
     return schematic;
   }
 
@@ -96,7 +98,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
       schematic: Schematic<CollectionT, SchematicT>, options: OptionT): ResultT {
     return this._host.transformOptions<OptionT, ResultT>(
       schematic.description,
-      options
+      options,
     );
   }
 
@@ -109,6 +111,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
         if (!hostSource) {
           throw new UnknownUrlSourceProtocol(url.toString());
         }
+
         return hostSource;
     }
   }

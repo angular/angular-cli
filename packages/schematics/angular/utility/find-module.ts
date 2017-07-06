@@ -52,7 +52,7 @@ export function buildRelativePath(from: string, to: string) {
   fromParts.pop();
   const toFileName = toParts.pop();
 
-  let relativePath = path.relative(fromParts.join('/'), toParts.join('/'));
+  const relativePath = path.relative(fromParts.join('/'), toParts.join('/'));
   let pathPrefix = '';
 
   // Set the path prefix for same dir or child dir, parent dir starts with `..`

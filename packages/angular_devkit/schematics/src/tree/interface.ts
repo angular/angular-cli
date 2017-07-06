@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Action} from './action';
 import {SchematicPath} from '../utility/path';
+import {Action} from './action';
 
 
 export enum MergeStrategy {
@@ -27,7 +27,7 @@ export enum MergeStrategy {
   // Overwrite everything with the latest change.
   Overwrite                 = MergeStrategy.AllowOverwriteConflict
                             + MergeStrategy.AllowCreationConflict
-                            + MergeStrategy.AllowDeleteConflict
+                            + MergeStrategy.AllowDeleteConflict,
 }
 
 

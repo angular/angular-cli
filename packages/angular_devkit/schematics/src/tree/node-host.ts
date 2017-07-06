@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {FileSystemTreeHost} from './filesystem';
 import * as fs from 'fs';
 import {join} from 'path';
+import {FileSystemTreeHost} from './filesystem';
 
 
 export class NodeJsHost implements FileSystemTreeHost {

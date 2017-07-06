@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {ExportStringRef} from './export-ref';
 import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
+import {ExportStringRef} from './export-ref';
 import {FileSystemEngineHostBase} from './file-system-engine-host-base';
 
 import {
@@ -15,8 +15,8 @@ import {
   SchematicDescription,
 } from '@angular-devkit/schematics';
 
-import {join} from 'path';
 import {existsSync} from 'fs';
+import {join} from 'path';
 
 
 /**
@@ -51,7 +51,11 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
 
   protected _resolveReferenceString(refString: string, parentPath: string) {
     // Use the same kind of export strings as NodeModule.
-    const ref = new ExportStringRef<RuleFactory<any>>(refString, parentPath);
+    const ref = new ExportStringRef<RuleFactory<{}>>(refString, parentPath);
+    if (!ref.ref) {
+      return null;
+    }
+
     return { ref: ref.ref, path: ref.module };
   }
 
@@ -63,6 +67,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
     if (typeof desc.schematics != 'object') {
       return null;
     }
+
     return <FileSystemCollectionDesc>desc;
   }
 
@@ -72,6 +77,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
     if (!desc.factoryFn || !desc.path || !desc.description) {
       return null;
     }
+
     return <FileSystemSchematicDesc>desc;
   }
 }

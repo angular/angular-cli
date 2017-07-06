@@ -38,6 +38,7 @@ export class IndentLogger extends Logger {
       }
 
       entry.message = map[l] + entry.message;
+
       return entry;
     });
   }

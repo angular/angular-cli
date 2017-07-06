@@ -95,6 +95,7 @@ export class Chunk {
       if (essential) {
         throw new ContentCannotBeRemovedException();
       }
+
       return;
     }
 
@@ -112,6 +113,7 @@ export class Chunk {
       if (essential) {
         throw new ContentCannotBeRemovedException();
       }
+
       return;
     }
 
@@ -169,6 +171,7 @@ export class Chunk {
       this._right.copy(target, start);
       start += this._right.length;
     }
+
     return start;
   }
 }
@@ -201,7 +204,7 @@ export class UpdateBuffer {
     this._assertIndex(start);
 
     // Find the chunk by going through the list.
-    let h = this._linkedList.find(chunk => start <= chunk.end);
+    const h = this._linkedList.find(chunk => start <= chunk.end);
     if (!h) {
       throw Error('Chunk cannot be found.');
     }
@@ -209,6 +212,7 @@ export class UpdateBuffer {
     if (start == h.end && h.next !== null) {
       return [h !, h.next !];
     }
+
     return [h !, h.slice(start) !];
   }
 
@@ -229,6 +233,7 @@ export class UpdateBuffer {
       chunk.copy(result, i);
       i += chunk.length;
     });
+
     return result;
   }
 

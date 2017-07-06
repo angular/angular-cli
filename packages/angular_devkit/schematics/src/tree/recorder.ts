@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {ContentHasMutatedException} from '../exception/exception';
 import {UpdateBuffer} from '../utility/update-buffer';
 import {FileEntry, UpdateRecorder} from './interface';
-import {ContentHasMutatedException} from '../exception/exception';
 
 
 export class UpdateRecorderBase implements UpdateRecorder {
@@ -26,14 +26,19 @@ export class UpdateRecorderBase implements UpdateRecorder {
   // These just record changes.
   insertLeft(index: number, content: Buffer | string): UpdateRecorder {
     this._content.insertLeft(index, typeof content == 'string' ? new Buffer(content) : content);
+
     return this;
   }
+
   insertRight(index: number, content: Buffer | string): UpdateRecorder {
     this._content.insertRight(index, typeof content == 'string' ? new Buffer(content) : content);
+
     return this;
   }
+
   remove(index: number, length: number): UpdateRecorder {
     this._content.remove(index, length);
+
     return this;
   }
 
@@ -41,6 +46,7 @@ export class UpdateRecorderBase implements UpdateRecorder {
     if (!content.equals(this._content.original)) {
       throw new ContentHasMutatedException(this.path);
     }
+
     return this._content.generate();
   }
 }

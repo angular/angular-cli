@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 
+import {JsonObject} from '@angular-devkit/core';
 import {packages} from '../lib/packages';
 
 const minimatch = require('minimatch');
@@ -21,6 +22,7 @@ const gitIgnore = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8'
 
 function gitIgnoreMatch(p: string) {
   p = path.relative(path.dirname(__dirname), p);
+
   return gitIgnore.some(line => minimatch(p, line));
 }
 
@@ -154,6 +156,7 @@ export default function() {
             console.error(`\nSource found but compiled file not found: "${fileName}".`);
             process.exit(2);
           }
+
           // Skip all sources.
           return false;
         }
@@ -210,8 +213,9 @@ export default function() {
     for (const depName of Object.keys(versions)) {
       const v = versions[depName];
       for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies']) {
-        if (packageJson[depKey] && packageJson[depKey][depName] == '0.0.0') {
-          packageJson[depKey][depName] = v;
+        const obj = packageJson[depKey] as JsonObject | null;
+        if (obj && obj[depName] == '0.0.0') {
+          obj[depName] = v;
         }
       }
     }

@@ -57,10 +57,11 @@ export class InsertChange implements Change {
   /**
    * This method does not insert spaces if there is none in the original string.
    */
-  apply(host: Host): Promise<any> {
+  apply(host: Host) {
     return host.read(this.path).then(content => {
-      let prefix = content.substring(0, this.pos);
-      let suffix = content.substring(this.pos);
+      const prefix = content.substring(0, this.pos);
+      const suffix = content.substring(this.pos);
+
       return host.write(this.path, `${prefix}${this.toAdd}${suffix}`);
     });
   }
@@ -82,10 +83,11 @@ export class RemoveChange implements Change {
     this.order = pos;
   }
 
-  apply(host: Host): Promise<any> {
+  apply(host: Host): Promise<void> {
     return host.read(this.path).then(content => {
-      let prefix = content.substring(0, this.pos);
-      let suffix = content.substring(this.pos + this.toRemove.length);
+      const prefix = content.substring(0, this.pos);
+      const suffix = content.substring(this.pos + this.toRemove.length);
+
       // TODO: throw error if toRemove doesn't match removed string.
       return host.write(this.path, `${prefix}${suffix}`);
     });
@@ -108,7 +110,7 @@ export class ReplaceChange implements Change {
     this.order = pos;
   }
 
-  apply(host: Host): Promise<any> {
+  apply(host: Host): Promise<void> {
     return host.read(this.path).then(content => {
       const prefix = content.substring(0, this.pos);
       const suffix = content.substring(this.pos + this.oldText.length);
@@ -117,6 +119,7 @@ export class ReplaceChange implements Change {
       if (text !== this.oldText) {
         return Promise.reject(new Error(`Invalid replace: "${text}" != "${this.oldText}".`));
       }
+
       // TODO: throw error if oldText doesn't match removed string.
       return host.write(this.path, `${prefix}${this.newText}${suffix}`);
     });

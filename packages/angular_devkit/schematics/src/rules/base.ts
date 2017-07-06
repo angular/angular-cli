@@ -5,18 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {callRule, callSource} from './call';
-import {MergeStrategy, FilePredicate, FileEntry} from '../tree/interface';
-import {FileOperator, Rule, SchematicContext, Source} from '../engine/interface';
-import {VirtualTree} from '../tree/virtual';
-import {FilteredTree} from '../tree/filtered';
-import {Tree} from '../tree/interface';
-import {branch, empty as staticEmpty, merge as staticMerge} from '../tree/static';
-
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
+import {FileOperator, Rule, SchematicContext, Source} from '../engine/interface';
+import {FilteredTree} from '../tree/filtered';
+import {FileEntry, FilePredicate, MergeStrategy, Tree} from '../tree/interface';
+import {branch, empty as staticEmpty, merge as staticMerge} from '../tree/static';
+import {VirtualTree} from '../tree/virtual';
+import {callRule, callSource} from './call';
 
 
 /**
@@ -63,6 +61,7 @@ export function apply(source: Source, rules: Rule[]): Source {
 export function mergeWith(source: Source, strategy: MergeStrategy = MergeStrategy.Default): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const result = callSource(source, context);
+
     return result.map(other => VirtualTree.merge(tree, other, strategy || context.strategy));
   };
 }
@@ -86,6 +85,7 @@ export function asSource(rule: Rule): Source {
 export function branchAndMerge(rule: Rule): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const branchedTree = branch(tree);
+
     return callRule(rule, Observable.of(branchedTree), context)
       .map(t => staticMerge(tree, t));
   };
@@ -116,6 +116,7 @@ export function forEach(operator: FileOperator): Rule {
       }
       if (newEntry === null) {
         tree.delete(path);
+
         return;
       }
       if (newEntry.path != path) {
@@ -125,6 +126,7 @@ export function forEach(operator: FileOperator): Rule {
         tree.overwrite(newEntry.path, newEntry.content);
       }
     });
+
     return tree;
   };
 }

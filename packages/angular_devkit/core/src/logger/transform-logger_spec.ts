@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {TransformLogger} from './transform-logger';
-import {LogEntry} from './logger';
-
+// tslint:disable:no-any
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
+import {LogEntry} from './logger';
+import {TransformLogger} from './transform-logger';
 
 
 describe('TransformLogger', () => {
@@ -17,10 +17,7 @@ describe('TransformLogger', () => {
     const logger = new TransformLogger('test', stream => {
       return stream
         .filter(entry => entry.message != 'hello')
-        .map(entry => {
-          entry.message += '1';
-          return entry;
-        });
+        .map(entry => (entry.message += '1', entry));
     });
     logger
       .toArray()
@@ -30,7 +27,7 @@ describe('TransformLogger', () => {
           jasmine.objectContaining({ message: 'world1', level: 'info', name: 'test' }) as any,
         ]);
       })
-      .then(() => done(), (err: any) => done.fail(err));
+      .then(() => done(), err => done.fail(err));
 
     logger.debug('hello');
     logger.info('world');

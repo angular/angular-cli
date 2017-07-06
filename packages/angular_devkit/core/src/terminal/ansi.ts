@@ -16,7 +16,7 @@ const kColors = {
     underline: [4, 24],
     inverse: [7, 27],
     hidden: [8, 28],
-    strikethrough: [9, 29]
+    strikethrough: [9, 29],
   },
   colors: {
     black: [30, 39],
@@ -27,7 +27,7 @@ const kColors = {
     magenta: [35, 39],
     cyan: [36, 39],
     white: [37, 39],
-    gray: [90, 39]
+    gray: [90, 39],
   },
   bgColors: {
     bgBlack: [40, 49],
@@ -37,8 +37,8 @@ const kColors = {
     bgBlue: [44, 49],
     bgMagenta: [45, 49],
     bgCyan: [46, 49],
-    bgWhite: [47, 49]
-  }
+    bgWhite: [47, 49],
+  },
 };
 const kColorFunctions = mapObject(kColors, (_, v) => {
   return mapObject(v, (_, vv) => (x: string) => `\u001b[${vv[0]}m${x}\u001b[${vv[1]}m`);

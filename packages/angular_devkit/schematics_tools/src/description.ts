@@ -10,7 +10,7 @@ import {
   CollectionDescription,
   RuleFactory,
   SchematicDescription,
-  TypedSchematicContext
+  TypedSchematicContext,
 } from '@angular-devkit/schematics';
 
 
@@ -33,7 +33,7 @@ export interface FileSystemSchematicDescription extends FileSystemSchematicJsonD
   readonly schemaJson?: Object;
   // Using `any` here is okay because the type isn't resolved when we read this value,
   // but rather when the Engine asks for it.
-  readonly factoryFn: RuleFactory<any>;
+  readonly factoryFn: RuleFactory<{}>;
 }
 
 
@@ -48,5 +48,4 @@ export declare type FileSystemSchematicDesc
   = SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 export declare type FileSystemSchematicContext
   = TypedSchematicContext<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-
 

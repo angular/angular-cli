@@ -5,19 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {SimpleSinkBase} from './sink';
-import {CreateFileAction} from '../tree/action';
-import {FileDoesNotExistException} from '../exception/exception';
-import {UpdateBuffer} from '../utility/update-buffer';
-
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/empty';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/concat';
+import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/reduce';
+import {FileDoesNotExistException} from '../exception/exception';
+import {CreateFileAction} from '../tree/action';
+import {UpdateBuffer} from '../utility/update-buffer';
+import {SimpleSinkBase} from './sink';
 
 
 export interface VirtualFileSystemSinkHost {
@@ -66,10 +65,12 @@ export abstract class VirtualFileSystemSink extends SimpleSinkBase {
 
   protected _overwriteFile(path: string, content: Buffer): Observable<void> {
     this._filesToUpdate.set(path, new UpdateBuffer(content));
+
     return Observable.empty<void>();
   }
   protected _createFile(path: string, content: Buffer): Observable<void> {
     this._filesToCreate.set(path, new UpdateBuffer(content));
+
     return Observable.empty<void>();
   }
   protected _renameFile(from: string, to: string): Observable<void> {
@@ -87,12 +88,13 @@ export abstract class VirtualFileSystemSink extends SimpleSinkBase {
     } else {
       this._filesToDelete.add(path);
     }
+
     return Observable.empty<void>();
   }
 
   _done() {
     // Really commit everything to the actual filesystem.
-    return Observable.concat<any>(
+    return Observable.concat(
       Observable.from([...this._filesToDelete.values()])
         .concatMap(path => this._host.delete(path)),
       Observable.from([...this._filesToCreate.entries()])
@@ -100,7 +102,7 @@ export abstract class VirtualFileSystemSink extends SimpleSinkBase {
       Observable.from([...this._filesToRename.entries()])
         .concatMap(([_, [path, to]]) => this._host.rename(path, to)),
       Observable.from([...this._filesToUpdate.entries()])
-        .concatMap(([path, buffer]) => this._host.write(path, buffer.generate()))
+        .concatMap(([path, buffer]) => this._host.write(path, buffer.generate())),
     ).reduce(() => {});
   }
 }

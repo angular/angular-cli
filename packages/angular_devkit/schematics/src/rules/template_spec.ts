@@ -5,15 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  applyContentTemplate,
-  applyPathTemplate,
-  InvalidPipeException,
-  OptionIsNotDefinedException,
-  UnknownPipeException
-} from './template';
 import {FileEntry} from '../tree/interface';
 import {normalizePath} from '../utility/path';
+import {
+  InvalidPipeException,
+  OptionIsNotDefinedException,
+  UnknownPipeException,
+  applyContentTemplate,
+  applyPathTemplate,
+} from './template';
 
 
 function _entry(path?: string, content?: string): FileEntry {
@@ -23,6 +23,7 @@ function _entry(path?: string, content?: string): FileEntry {
   if (!content) {
     content = 'hello world';
   }
+
   return {
     path: normalizePath(path),
     content: new Buffer(content),
@@ -31,7 +32,7 @@ function _entry(path?: string, content?: string): FileEntry {
 
 
 describe('applyPathTemplate', () => {
-  function _applyPathTemplate(path: string, options: any): string | null {
+  function _applyPathTemplate(path: string, options: {}): string | null {
     const newEntry = applyPathTemplate(options)(_entry(path));
     if (newEntry) {
       return newEntry.path;
@@ -51,10 +52,7 @@ describe('applyPathTemplate', () => {
   it('works with functions', () => {
     let arg = '';
     expect(_applyPathTemplate('a__c__b', {
-      c: (x: string) => {
-        arg = x;
-        return 'hello';
-      }
+      c: (x: string) => (arg = x, 'hello'),
     })).toBe('/ahellob');
     expect(arg).toBe('/a__c__b');
   });
@@ -65,23 +63,14 @@ describe('applyPathTemplate', () => {
 
     expect(_applyPathTemplate('a__c@d__b', {
       c: 1,
-      d: (x: string) => {
-        called = x;
-        return 2;
-      }
+      d: (x: string) => (called = x, 2),
     })).toBe('/a2b');
     expect(called).toBe('1');
 
     expect(_applyPathTemplate('a__c@d@e__b', {
       c: 10,
-      d: (x: string) => {
-        called = x;
-        return 20;
-      },
-      e: (x: string) => {
-        called2 = x;
-        return 30;
-      }
+      d: (x: string) => (called = x, 20),
+      e: (x: string) => (called2 = x, 30),
     })).toBe('/a30b');
     expect(called).toBe('10');
     expect(called2).toBe('20');
@@ -99,9 +88,8 @@ describe('applyPathTemplate', () => {
 });
 
 
-
 describe('contentTemplate', () => {
-  function _applyContentTemplate(content: string, options: any) {
+  function _applyContentTemplate(content: string, options: {}) {
     const newEntry = applyContentTemplate(options)(_entry('', content));
     if (newEntry) {
       return newEntry.content.toString('utf-8');
@@ -117,23 +105,23 @@ describe('contentTemplate', () => {
   it('works with if', () => {
     expect(_applyContentTemplate('a<% if (a) { %>b<% } %>c', {
       value: 123,
-      a: true
+      a: true,
     })).toBe('abc');
     expect(_applyContentTemplate('a<% if (a) { %>b<% } %>c', {
       value: 123,
-      a: false
+      a: false,
     })).toBe('ac');
   });
 
   it('works with for', () => {
     expect(_applyContentTemplate('a<% for (let i = 0; i < value; i++) { %>1<% } %>b', {
-      value: 5
+      value: 5,
     })).toBe('a11111b');
   });
 
   it('escapes HTML', () => {
     expect(_applyContentTemplate('a<%- html %>b', {
-      html: '<script>'
+      html: '<script>',
     })).toBe('a&lt;script&gt;b');
   });
 

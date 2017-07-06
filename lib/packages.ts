@@ -7,6 +7,7 @@
  */
 'use strict';
 
+import {JsonObject} from '@angular-devkit/core';
 import * as glob from 'glob';
 import * as path from 'path';
 
@@ -23,7 +24,7 @@ export interface PackageInfo {
   main: string;
   dist: string;
   build: string;
-  packageJson: any;
+  packageJson: JsonObject;
   dependencies: string[];
 }
 export type PackageMap = { [name: string]: PackageInfo };
@@ -49,10 +50,12 @@ function loadPackageJson(p: string) {
 
       case 'keywords':
         const a = pkg[key] || [];
-        const b = Object.keys(root[key].concat(a).reduce((acc: any, curr: string) => {
-          acc[curr] = true;
-          return acc;
-        }, {}));
+        const b = Object.keys(
+          root[key].concat(a).reduce((acc: {[k: string]: boolean}, curr: string) => {
+            acc[curr] = true;
+
+            return acc;
+          }, {}));
         pkg[key] = b;
         break;
 
@@ -60,6 +63,7 @@ function loadPackageJson(p: string) {
         pkg[key] = root[key];
     }
   }
+
   return pkg;
 }
 
@@ -103,6 +107,7 @@ export const packages: PackageMap =
         name,
         packageJson,
       };
+
       return packages;
     }, {});
 

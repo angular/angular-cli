@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {JsonParseMode, parseJson} from '@angular-devkit/core';
+import {JsonParseMode, JsonValue, parseJson} from '@angular-devkit/core';
 import {existsSync, readFileSync} from 'fs';
 
 
@@ -27,6 +27,7 @@ export function readFile(fileName: string): string | null {
       buffer[i] = buffer[i + 1];
       buffer[i + 1] = temp;
     }
+
     return buffer.toString('utf16le', 2);
   }
   if (len >= 2 && buffer[0] === 0xFF && buffer[1] === 0xFE) {
@@ -37,11 +38,12 @@ export function readFile(fileName: string): string | null {
     // UTF-8 byte order mark detected
     return buffer.toString('utf8', 3);
   }
+
   // Default is UTF-8 with no byte order mark
   return buffer.toString('utf8');
 }
 
 
-export function readJsonFile(path: string): any {
+export function readJsonFile(path: string): JsonValue {
   return parseJson(readFile(path) || '{}', JsonParseMode.Loose);
 }

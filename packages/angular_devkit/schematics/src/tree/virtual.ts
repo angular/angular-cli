@@ -5,17 +5,17 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {SimpleFileEntry} from './entry';
-import {UpdateRecorderBase} from './recorder';
-import {FileEntry, MergeStrategy, Tree, UpdateRecorder} from './interface';
+import {SchematicPath, normalizePath} from '../utility/path';
 import {Action, ActionList, UnknownActionException} from './action';
-import {normalizePath, SchematicPath} from '../utility/path';
+import {SimpleFileEntry} from './entry';
+import {FileEntry, MergeStrategy, Tree, UpdateRecorder} from './interface';
+import {UpdateRecorderBase} from './recorder';
 
 import {
   ContentHasMutatedException,
   FileAlreadyExistException,
   FileDoesNotExistException,
-  InvalidUpdateRecordException, MergeConflictException
+  InvalidUpdateRecordException, MergeConflictException,
 } from '../exception/exception';
 
 
@@ -53,6 +53,7 @@ export class VirtualTree implements Tree {
 
   get(path: string): FileEntry | null {
     const normalizedPath = this._normalizePath(path);
+
     return this._cacheMap.get(normalizedPath) || this._root.get(normalizedPath) || null;
   }
   has(path: string) {
@@ -68,6 +69,7 @@ export class VirtualTree implements Tree {
 
   read(path: string): Buffer | null {
     const entry = this.get(path);
+
     return entry ? entry.content : null;
   }
 
@@ -76,6 +78,7 @@ export class VirtualTree implements Tree {
     if (!entry) {
       throw new FileDoesNotExistException(path);
     }
+
     return new UpdateRecorderBase(entry);
   }
 
@@ -233,6 +236,7 @@ export class VirtualTree implements Tree {
   branch(): Tree {
     const newTree = new VirtualTree();
     this._copyTo(newTree);
+
     return newTree;
   }
 
@@ -253,12 +257,14 @@ export class VirtualTree implements Tree {
   static merge(tree: Tree, other: Tree, strategy: MergeStrategy = MergeStrategy.Default): Tree {
     const newTree = (tree as VirtualTree).branch() as VirtualTree;
     newTree.merge((other as VirtualTree), strategy);
+
     return newTree;
   }
 
   static optimize(tree: Tree) {
     const newTree = (tree as VirtualTree).branch() as VirtualTree;
     newTree.optimize();
+
     return newTree;
   }
 }

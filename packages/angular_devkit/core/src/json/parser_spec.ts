@@ -9,22 +9,18 @@ import {JsonParseMode, parseJson, parseJsonAst} from './parser';
 
 
 // Node 6 compatibility.
-function entries(x: {[key: string]: any}): Array<[string, any]> {
-  return Object.keys(x).reduce((acc: [string, any][], k: string) => {
-    const v = x[k];
-    acc.push([k, v]);
-    return acc;
-  }, []);
+function entries(x: {[key: string]: any}): any {  // tslint:disable-line:no-any
+  return Object.keys(x).map(k => [k, x[k]]);
 }
 
 
 describe('parseJson and parseJsonAst', () => {
   describe('generic', () => {
-    const numbers: any = {
+    const numbers = {
     };
-    const errors: any = [
+    const errors = [
       '',
-      '-abcdefghijklmnopqrstuvwxyz'
+      '-abcdefghijklmnopqrstuvwxyz',
     ];
 
     for (const [n, [start, end, text]] of entries(numbers)) {
@@ -48,7 +44,7 @@ describe('parseJson and parseJsonAst', () => {
   });
 
   describe('numbers', () => {
-    const numbers: any = {
+    const numbers = {
       '1234': [[0, 0, 0], [4, 0, 4]],
       '12E34': [[0, 0, 0], [5, 0, 5]],
       '12E+4': [[0, 0, 0], [5, 0, 5]],
@@ -61,7 +57,7 @@ describe('parseJson and parseJsonAst', () => {
       '0': [[0, 0, 0], [1, 0, 1]],
       '\n\n\n\n\n0': [[5, 5, 0], [6, 5, 1], '0'],
     };
-    const errors: any = [
+    const errors = [
       '000',
       '01',
       '1E1+1',
@@ -94,14 +90,14 @@ describe('parseJson and parseJsonAst', () => {
   });
 
   describe('strings', () => {
-    const strings: any = {
+    const strings = {
       '""': [[0, 0, 0], [2, 0, 2]],
       '"hello"': [[0, 0, 0], [7, 0, 7]],
       '"a\\nb"': [[0, 0, 0], [6, 0, 6]],
       '"a\\nb\\tc\\rd\\\\e\\/f\\\"g\\bh\\fi"': [[0, 0, 0], [27, 0, 27]],
       '"a\\u1234b"': [[0, 0, 0], [10, 0, 10]],
     };
-    const errors: any = [
+    const errors = [
       '"\\z"',
       '\'hello\'',
       '"\\',
@@ -132,13 +128,13 @@ describe('parseJson and parseJsonAst', () => {
   });
 
   describe('constants', () => {
-    const strings: any = {
+    const strings = {
       'true': ['true', [0, 0, 0], [4, 0, 4], true],
       'false': ['false', [0, 0, 0], [5, 0, 5], false],
       'null': ['null', [0, 0, 0], [4, 0, 4], null],
     };
-    const errors: any = [
-      'undefined'
+    const errors = [
+      'undefined',
     ];
 
     for (const [n, [kind, start, end, value, text]] of entries(strings)) {
@@ -162,7 +158,7 @@ describe('parseJson and parseJsonAst', () => {
   });
 
   describe('arrays', () => {
-    const strings: any = {
+    const strings = {
       '[0,1,2,3]': [[0, 0, 0], [9, 0, 9]],
       '[[0],1,2,3]': [[0, 0, 0], [11, 0, 11]],
       '[0\n,\n1,2,3]': [[0, 0, 0], [11, 2, 6]],
@@ -171,7 +167,7 @@ describe('parseJson and parseJsonAst', () => {
       '[\n]': [[0, 0, 0], [3, 1, 1]],
       '[\n\n]': [[0, 0, 0], [4, 2, 1]],
     };
-    const errors: any = [
+    const errors = [
       '[',
       '[,]',
       '[0,]',
@@ -200,14 +196,14 @@ describe('parseJson and parseJsonAst', () => {
   });
 
   describe('objects', () => {
-    const strings: any = {
+    const strings = {
       '{}': [[0, 0, 0], [2, 0, 2]],
       '{\n}': [[0, 0, 0], [3, 1, 1]],
       '{"hello": "world"}': [[0, 0, 0], [18, 0, 18]],
       '{"hello": 0, "world": 1}': [[0, 0, 0], [24, 0, 24]],
       '{"hello": {"hello": {"hello": "world"}}}': [[0, 0, 0], [40, 0, 40]],
     };
-    const errors: any = [
+    const errors = [
       '{',
       '{,}',
       '{"hello": 0',
@@ -235,7 +231,7 @@ describe('parseJson and parseJsonAst', () => {
   });
 
   describe('loose', () => {
-    const strings: any = {
+    const strings = {
       '{\'hello\': 0}': [[0, 0, 0], [12, 0, 12], {'hello': 0}],
       '{hello: 0}': [[0, 0, 0], [10, 0, 10], {hello: 0}],
       '{1: 0}': [[0, 0, 0], [6, 0, 6], {1: 0}],
@@ -245,7 +241,7 @@ describe('parseJson and parseJsonAst', () => {
       '{}//  ': [[0, 0, 0], [2, 0, 2], {}, '{}'],
       '{}//': [[0, 0, 0], [2, 0, 2], {}, '{}'],
     };
-    const errors: any = [
+    const errors = [
       '{1b: 0}',
       ' /*',
       '',
@@ -293,7 +289,7 @@ describe('parseJson and parseJsonAst', () => {
         a: 'this // should not be a comment',
         a2: 'this /* should also not be a comment',
         b: 1,
-        c: 2
+        c: 2,
       });
     });
   });
