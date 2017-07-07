@@ -29,6 +29,11 @@
       "factory": "./module",
       "description": "Create an Angular module.",
       "schema": "./module/schema.json"
+    },
+    "service": {
+      "factory": "./service",
+      "description": "Create an Angular service.",
+      "schema": "./service/schema.json"
     }
   }
 }
