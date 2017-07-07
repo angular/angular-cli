@@ -13,6 +13,7 @@ import {
   apply,
   chain,
   mergeWith,
+  move,
   schematic,
   template,
   url,
@@ -24,9 +25,9 @@ import * as ts from 'typescript';
 import {InsertChange} from '../utility/change';
 
 
-function addBootstrapToNgModule(): Rule {
+function addBootstrapToNgModule(directory: string): Rule {
   return (host: Tree) => {
-    const modulePath = 'src/app/app.module.ts';
+    const modulePath = `${directory}/src/app/app.module.ts`;
     const sourceText = host.read(modulePath) !.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
@@ -62,13 +63,18 @@ export default function (options: any): Rule {
     mergeWith(
       apply(url('./files'), [
         template({ utils: stringUtils, ...options }),
+        move(options.directory),
       ])),
-    schematic('module', { name: 'app' }),
+    schematic('module', {
+      name: 'app',
+      sourceDir: options.directory + '/' + options.sourceDir,
+    }),
     schematic('component', {
       name: 'app',
       selector: 'app-root',
+      sourceDir: options.directory + '/' + options.sourceDir,
       flat: true,
     }),
-    addBootstrapToNgModule(),
+    addBootstrapToNgModule(options.directory),
   ]);
 };
