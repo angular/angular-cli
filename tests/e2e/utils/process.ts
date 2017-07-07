@@ -128,6 +128,10 @@ export function exec(cmd: string, ...args: string[]) {
   return _exec({}, cmd, args);
 }
 
+export function silentExec(cmd: string, ...args: string[]) {
+  return _exec({ silent: true }, cmd, args);
+}
+
 export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
   return _exec({ waitForMatch: match }, cmd, args);
 }
