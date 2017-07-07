@@ -44,7 +44,7 @@ matrix:
       env: build
     - node_js: "6"
       os: linux
-      script: node tests/run_e2e.js "--ignore=**/tests/build/**"
+      script: travis_wait 120 node tests/run_e2e.js "--ignore=**/tests/build/**"
       env: e2e
     - node_js: "6"
       os: linux
