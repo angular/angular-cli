@@ -436,6 +436,9 @@ export default Task.extend({
     if (project.root === path.resolve(outputPath)) {
       throw new SilentError ('Output path MUST not be project root directory!');
     }
+    if (appConfig.platform === 'server') {
+      throw new SilentError('ng eject for platform server applications is coming soon!');
+    }
 
     const webpackConfig = new NgCliWebpackConfig(runTaskOptions, appConfig).buildConfig();
     const serializer = new JsonWebpackSerializer(process.cwd(), outputPath, appConfig.root);

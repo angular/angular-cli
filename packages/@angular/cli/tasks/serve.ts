@@ -31,6 +31,9 @@ export default Task.extend({
     if (projectConfig.project && projectConfig.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }
+    if (appConfig.platform === 'server') {
+      throw new SilentError('ng serve for platform server applications is coming soon!');
+    }
     if (serveTaskOptions.deleteOutputPath) {
       fs.removeSync(path.resolve(this.project.root, outputPath));
     }

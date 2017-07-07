@@ -83,6 +83,12 @@
             "type": "string",
             "description": "Base url for the application being built."
           },
+          "platform": {
+            "type": "string",
+            "enum": ["browser", "server"],
+            "default": "browser",
+            "description": "The runtime platform of the app."
+          },
           "index": {
             "type": "string",
             "default": "index.html",

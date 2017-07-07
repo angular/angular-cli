@@ -68,6 +68,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
       i18nFile: buildOptions.i18nFile,
       i18nFormat: buildOptions.i18nFormat,
       locale: buildOptions.locale,
+      replaceExport: appConfig.platform === 'server',
       hostReplacementPaths,
       // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
       exclude: []

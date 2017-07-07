@@ -7,6 +7,7 @@ import {
   getDevConfig,
   getProdConfig,
   getStylesConfig,
+  getServerConfig,
   getNonAotConfig,
   getAotConfig
 } from './webpack-configs';
@@ -37,9 +38,12 @@ export class NgCliWebpackConfig {
   }
 
   public buildConfig() {
+    const platformConfig = this.wco.appConfig.platform === 'server' ?
+      getServerConfig(this.wco) : getBrowserConfig(this.wco);
+
     let webpackConfigs = [
       getCommonConfig(this.wco),
-      getBrowserConfig(this.wco),
+      platformConfig,
       getStylesConfig(this.wco),
       this.getTargetConfig(this.wco)
     ];
