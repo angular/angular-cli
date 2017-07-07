@@ -37,7 +37,7 @@ describe('ExportStringRef', () => {
 
   it('works on package names', () => {
     // META
-    const ref = new ExportStringRef('@angular-devkit/schematics-tools#FileSystemHost');
+    const ref = new ExportStringRef('@angular-devkit/schematics/tools#FileSystemHost');
     expect(ref.ref).toEqual(FileSystemHost);
     expect(ref.path).toBe(__dirname);
     expect(ref.module).toBe(path.join(__dirname, 'index.ts'));

@@ -7,7 +7,6 @@
     "schematics": "./bin/schematics.js"
   },
   "dependencies": {
-    "@angular-devkit/schematics": "0.0.0",
-    "@angular-devkit/schematics-tools": "0.0.0"
+    "@angular-devkit/schematics": "0.0.0"
   }
 }

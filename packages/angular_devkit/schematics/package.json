@@ -8,6 +8,7 @@
     "blueprints",
     "scaffolding",
     "template",
+    "tooling",
     "code generation",
     "schematics"
   ],

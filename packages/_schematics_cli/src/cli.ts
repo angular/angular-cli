@@ -18,7 +18,7 @@ import {
   FileSystemHost,
   FileSystemSchematicDesc,
   NodeModulesEngineHost,
-} from '@angular-devkit/schematics-tools';
+} from '@angular-devkit/schematics/tools';
 import {SchemaClassFactory} from '@ngtools/json-schema';
 import * as minimist from 'minimist';
 import {Observable} from 'rxjs/Observable';
