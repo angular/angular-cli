@@ -15,12 +15,19 @@
  */
 require('../lib/bootstrap-local');
 
+
+const {bold, gray, red, yellow, white} = require('chalk');
 const minimist = require('minimist');
 const fs = require('fs');
 const path = require('path');
 
-const args = minimist(process.argv.slice(2));
-const scriptName = path.join('../scripts', args._.shift());
+const args = minimist(process.argv.slice(2), {
+  boolean: ['verbose']
+});
+const scriptName = args._.shift();
+const scriptPath = path.join('../scripts', scriptName);
+
+process.chdir(path.join(__dirname, '..'));
 
 
 // Check if we need to profile this CLI run.
@@ -50,5 +57,42 @@ if (process.env['DEVKIT_PROFILING']) {
 }
 
 
-process.chdir(path.join(__dirname, '..'));
-require(scriptName).default(args);
+// This might get awkward, so we fallback to console if there was an error.
+let logger = null;
+try {
+  logger = new (require('@angular-devkit/core').IndentLogger)('root');
+
+  logger
+    .filter(entry => (entry.level !== 'debug' || args.verbose))
+    .subscribe(entry => {
+      let color = gray;
+      let output = process.stdout;
+      switch (entry.level) {
+        case 'info': color = white; break;
+        case 'warn': color = yellow; break;
+        case 'error': color = red; output = process.stderr; break;
+        case 'fatal': color = x => bold(red(x)); output = process.stderr; break;
+      }
+
+      output.write(color(entry.message) + '\n');
+    });
+
+  logger
+    .filter(entry => entry.level === 'fatal')
+    .subscribe(() => {
+      process.stderr.write('A fatal error happened. See details above.');
+      process.exit(100);
+    });
+} catch (e) {
+  console.error(red(`Reverting to manual console logging.\nReason: ${e.message}.`));
+  logger = {
+    debug: console.debug.bind(console),
+    info: console.log.bind(console),
+    warn: console.warn.bind(console),
+    error: console.error.bind(console),
+    fatal: x => { console.error(x); process.exit(100); },
+  };
+}
+
+
+require(scriptPath).default(args, logger);

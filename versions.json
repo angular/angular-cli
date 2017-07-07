@@ -1,7 +1,16 @@
 {
-  "@_/schematics-cli": "0.0.0",
-  "@_/benchmark": "0.0.0",
-  "@angular-devkit/core": "0.0.1",
-  "@angular-devkit/schematics": "0.0.1",
-  "@schematics/angular": "0.0.2"
+  "versions": {
+    "@_/schematics-cli": "0.0.0",
+    "@_/benchmark": "0.0.0",
+    "@angular-devkit/core": "0.0.1",
+    "@angular-devkit/schematics": "0.0.1",
+    "@schematics/angular": "0.0.2"
+  },
+  "hashes": {
+    "@_/benchmark": "ffa6961b50035929c89ce4ae90be121b",
+    "@_/schematics-cli": "64e345dc7a5f8311b71a8cdbdd035ef5",
+    "@angular-devkit/core": "da0c91af5ddd601e8fb31e551bfd2da8",
+    "@angular-devkit/schematics": "a9c9571f1725a52ea806c450d835f082",
+    "@schematics/angular": "9cf81e965a6611e8c1510fdcc942d8c1"
+  }
 }

@@ -8,5 +8,6 @@
   },
   "dependencies": {
     "@angular-devkit/schematics": "0.0.0"
-  }
+  },
+  "private": true
 }

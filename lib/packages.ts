@@ -13,7 +13,6 @@ import * as path from 'path';
 
 const packageRoot = path.join(__dirname, '../packages');
 const distRoot = path.join(__dirname, '../dist');
-const versions = require('../versions.json');
 
 
 export interface PackageInfo {
@@ -24,6 +23,7 @@ export interface PackageInfo {
   main: string;
   dist: string;
   build: string;
+  private: boolean;
   packageJson: JsonObject;
   dependencies: string[];
 }
@@ -91,11 +91,6 @@ export const packages: PackageMap =
         bin[binName] = path.resolve(pkg.root, packageJson['bin'][binName]);
       });
 
-      if (!(name in versions)) {
-        console.error(`ERROR: package ${name} does not have a version.`);
-        process.exit(101);
-      }
-
       packages[name] = {
         build: path.join(distRoot, pkgRoot.substr(path.dirname(__dirname).length)),
         dist: path.join(distRoot, name),
@@ -103,6 +98,7 @@ export const packages: PackageMap =
         relative: path.relative(path.dirname(__dirname), pkgRoot),
         main: path.resolve(pkgRoot, 'src/index.ts'),
         dependencies: [],
+        private: packageJson.private,
         bin,
         name,
         packageJson,

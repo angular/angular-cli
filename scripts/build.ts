@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 
-import {JsonObject} from '@angular-devkit/core';
+import {JsonObject, Logger} from '@angular-devkit/core';
 import {packages} from '../lib/packages';
 
 const minimatch = require('minimatch');
@@ -50,14 +50,14 @@ function copy(from: string, to: string) {
 }
 
 
-function recursiveCopy(from: string, to: string) {
+function recursiveCopy(from: string, to: string, logger: Logger) {
   if (!fs.existsSync(from)) {
-    console.error(`File "${from}" does not exist.`);
+    logger.error(`File "${from}" does not exist.`);
     process.exit(4);
   }
   if (fs.statSync(from).isDirectory()) {
     fs.readdirSync(from).forEach(fileName => {
-      recursiveCopy(path.join(from, fileName), path.join(to, fileName));
+      recursiveCopy(path.join(from, fileName), path.join(to, fileName), logger);
     });
   } else {
     copy(from, to);
@@ -80,8 +80,8 @@ function rimraf(p: string) {
 }
 
 
-export default function() {
-  console.log('Removing dist/...');
+export default function(_: {}, logger: Logger) {
+  logger.info('Removing dist/...');
   rimraf(path.join(__dirname, '../dist'));
 
   // Order packages in order of dependency.
@@ -108,31 +108,31 @@ export default function() {
   } while (swapped);
 
 
-  console.log('Building...');
+  logger.info('Building...');
   const tsConfigPath = path.relative(process.cwd(), path.join(__dirname, '../tsconfig.json'));
   try {
     npmRun.execSync(`tsc -p "${tsConfigPath}"`);
   } catch (err) {
     const stdout = err.stdout.toString().split('\n').join('\n  ');
-    console.error(`TypeScript compiler failed:\n\nSTDOUT:\n  ${stdout}`);
+    logger.error(`TypeScript compiler failed:\n\nSTDOUT:\n  ${stdout}`);
     process.exit(1);
   }
 
-  console.log('Moving packages to dist/');
+  logger.info('Moving packages to dist/');
   for (const packageName of sortedPackages) {
-    console.log(`  ${packageName}`);
+    logger.info(`  ${packageName}`);
     const pkg = packages[packageName];
-    recursiveCopy(pkg.build, pkg.dist);
+    recursiveCopy(pkg.build, pkg.dist, logger);
     rimraf(pkg.build);
   }
 
-  console.log('Copying resources...');
+  logger.info('Copying resources...');
   for (const packageName of sortedPackages) {
-    console.log(`  ${packageName}`);
+    logger.info(`  ${packageName}`);
     const pkg = packages[packageName];
     const pkgJson = pkg.packageJson;
     const files = glob.sync(path.join(pkg.root, '**/*'), { dot: true, nodir: true });
-    console.log(`    ${files.length} files total...`);
+    logger.info(`    ${files.length} files total...`);
     const resources = files
       .map((fileName) => path.relative(pkg.root, fileName))
       .filter(fileName => {
@@ -153,7 +153,7 @@ export default function() {
         if (fileName.endsWith('.ts')) {
           // Verify that it was actually built.
           if (!fs.existsSync(path.join(pkg.dist, fileName).replace(/ts$/, 'js'))) {
-            console.error(`\nSource found but compiled file not found: "${fileName}".`);
+            logger.error(`\nSource found but compiled file not found: "${fileName}".`);
             process.exit(2);
           }
 
@@ -174,32 +174,32 @@ export default function() {
         return true;
       });
 
-    console.log(`    ${resources.length} resources...`);
+    logger.info(`    ${resources.length} resources...`);
     resources.forEach(fileName => {
       copy(path.join(pkg.root, fileName), path.join(pkg.dist, fileName));
     });
   }
 
-  console.log('Copying extra resources...');
+  logger.info('Copying extra resources...');
   for (const packageName of sortedPackages) {
     const pkg = packages[packageName];
     copy(path.join(__dirname, '../LICENSE'), path.join(pkg.dist, 'LICENSE'));
   }
 
-  console.log('Removing spec files...');
+  logger.info('Removing spec files...');
   for (const packageName of sortedPackages) {
-    console.log(`  ${packageName}`);
+    logger.info(`  ${packageName}`);
     const pkg = packages[packageName];
     const files = glob.sync(path.join(pkg.dist, '**/*_spec.js'));
-    console.log(`    ${files.length} spec files found...`);
+    logger.info(`    ${files.length} spec files found...`);
     files.forEach(fileName => rm(fileName));
   }
 
-  console.log('Setting versions...');
+  logger.info('Setting versions...');
 
-  const versions = require(path.join(__dirname, '../versions.json'));
+  const { versions } = require(path.join(__dirname, '../versions.json'));
   for (const packageName of sortedPackages) {
-    console.log(`  ${packageName}`);
+    logger.info(`  ${packageName}`);
     const pkg = packages[packageName];
     const packageJsonPath = path.join(pkg.dist, 'package.json');
     const packageJson = pkg.packageJson;
@@ -207,7 +207,7 @@ export default function() {
     if (versions[packageName]) {
       packageJson['version'] = versions[packageName];
     } else {
-      console.log('    No version found... Only updating dependencies.');
+      logger.info('    No version found... Only updating dependencies.');
     }
 
     for (const depName of Object.keys(versions)) {
@@ -223,5 +223,5 @@ export default function() {
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
   }
 
-  console.log(`Done.`);
+  logger.info(`Done.`);
 }
