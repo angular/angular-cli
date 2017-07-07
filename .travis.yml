@@ -12,46 +12,80 @@ env:
   global:
     - DBUS_SESSION_BUS_ADDRESS=/dev/null
 
+
+matrix:
+  allow_failures:
+    - env: nightly
+    - env: ng2
+    - node_js: "7"
+    - node_js: "8"
+
+
 matrix:
   fast_finish: true
   allow_failures:
-    - env: NODE_SCRIPT="tests/run_e2e.js --nightly --glob=tests/{build,test,misc}/**"
-    - env: NODE_SCRIPT="tests/run_e2e.js --ng2 --glob=tests/{build,test,misc}/**"
+    - env: nightly
+    - env: ng2
     - node_js: "7"
     - node_js: "8"
   include:
+    - stage: build
+      script: npm run lint
+      env: lint
+    - script: npm run build
+      env: build
+
+    - stage: test
+      script: npm run test
+      env: test
     - node_js: "6"
       os: linux
-      env: SCRIPT=lint
+      script: node tests/run_e2e.js "--glob=tests/build/**"
+      env: build
     - node_js: "6"
       os: linux
-      env: SCRIPT=build
+      script: node tests/run_e2e.js "--ignore=**/tests/build/**"
+      env: e2e
     - node_js: "6"
       os: linux
-      env: SCRIPT=test
-    - node_js: "6"
-      os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --glob=tests/build/**"
-    - node_js: "6"
-      os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --ignore=**/tests/build/**"
-    - node_js: "6"
-      os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --eject --glob=tests/build/**"
+      script: node tests/run_e2e.js --eject "--glob=tests/build/**"
+      env: eject
 
     # Optional builds.
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --ng2 --glob=tests/{build,test,misc}/**"
+      script: node tests/run_e2e.js --ng2 "--glob=tests/{build,test,misc}/**"
+      env: ng2
     - node_js: "6"
       os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --nightly --glob=tests/{build,test,misc}/**"
+      script: node tests/run_e2e.js "--nightly --glob=tests/{build,test,misc}/**"
+      env: nightly
     - node_js: "7"
       os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --glob=tests/{build,test,misc}/**"
+      script: node tests/run_e2e.js "--glob=tests/{build,test,misc}/**"
+      env: node7
     - node_js: "8"
       os: linux
-      env: NODE_SCRIPT="tests/run_e2e.js --glob=tests/build/**"
+      script: node tests/run_e2e.js "--glob=tests/build/**"
+      env: node8
+
+    - stage: deploy
+      script: skip
+      env: builds
+      deploy:
+      - provider: script
+        script: node scripts/git-builds.js
+        on:
+          all_branches: true
+    - stage: deploy
+      script: skip
+      env: publish
+      deploy:
+      - provider: script
+        script: node scripts/publish/publish.js
+        on:
+          tags: true
+
 
 before_install:
   # Use a virtual display.
@@ -67,10 +101,6 @@ before_install:
 install:
   - yarn --frozen-lockfile
 
-script:
-  - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi
-  - if [[ "$NODE_SCRIPT" ]]; then node $NODE_SCRIPT; fi
-
 env:
   global:
     # GITHUB_ACCESS_TOKEN=<github token, a personal access token of the angular-builds account, account access in valentine>
@@ -80,12 +110,3 @@ env:
     - secure: "QDefZm9p3/SQ6ts0WVkzwr1qv4tvxpu5hB5ptTGQwRP02oPQumebE+uazSjhrbMf9zCnlrQSaCV7VxMdqQ0GUdAQ+gZz4mr/6SyT1eThTfgqq4GFX24M5dlcWW4rB6ot5NICPnsvASBVDn4IkapTY135/s5fqp2TeDJmAH8xMxKRbsG/b4+KCvhjpO7WJMZumkrwsWFrtAh1zFjrXoHwEySYPkwZceJmSi7GPmjZLodMmSkMxi4vuOAgrx6kWPTuCszKGXm7+Y1UbjeSSoBYLt2c19oy2dJKrER9sSx8/1yeV1C2JJ/cabYBktcn1svUh0lo1j1YOWtEXaIv7SRU694EtWxiuaL8iIcABHdoaLt/BZ34MLG0RdvFu0i2Bv5HxGWQg5TB/Jy502dqkep5ILofF80Ya9NTeapIPSbI3IEWcsCCw+t0pv/91XXU7mduDwtvBtzwxC4nKS4PITjrFTSrsr0wiLagW6ZCbKMrUitEFgedvsa3Tf8wVtt1s/Z7W2iLt81TTVdCei+46PtLIG3k9R1J78WmPLsGJ3uMXo/Cgc7q5PN66Dx6V1RZMBbS9xG0OPxd8a/6Lj94u6QWS1x50osVPEqUqGmT2tWP5fabrDKLUnVLm2Y0O1eBnnu9ew+ccCKou0FCqlx5ppRekBIaMibHbmgahRLMgNbaJR0="
 
 
-deploy:
-  - provider: script
-    script: node scripts/git-builds.js
-    on:
-      all_branches: true
-  - provider: script
-    script: node scripts/publish/publish.js
-    on:
-      tags: true
