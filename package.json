@@ -17,7 +17,8 @@
     "build": "tsc -p tsconfig.json",
     "fix": "npm run lint -- --fix",
     "lint": "tslint --config tslint.json --project tsconfig.json --type-check",
-    "test": "./bin/devkit-admin test"
+    "test": "./bin/devkit-admin test",
+    "validate-commits": "./bin/devkit-admin validate-commits"
   },
   "repository": {
     "type": "git",

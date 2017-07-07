@@ -16,6 +16,16 @@ jobs:
       - run: npm install
       - run: npm run lint
 
+  commits:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
+
+      - run: npm install
+      - run: npm run validate-commits
+
   test:
     <<: *defaults
     steps:
@@ -47,5 +57,6 @@ workflows:
   default_workflow:
     jobs:
       - lint
+      - commits
       - build
       - test
