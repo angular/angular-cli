@@ -9,6 +9,7 @@ import {Logger} from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
+import {ReleaseType} from 'semver';
 
 const crypto = require('crypto');
 const tar = require('tar');
@@ -71,7 +72,7 @@ function _upgrade(release: string, logger: Logger) {
 
     const hash = _getHashOf(packages[pkg].root);
     const version = versions[pkg];
-    let newVersion = version;
+    let newVersion: string = version;
 
     if (release == 'minor-beta') {
       if (hash !== hashes[pkg]) {
@@ -110,7 +111,7 @@ function _upgrade(release: string, logger: Logger) {
         }
       }
     } else if (hash !== hashes[pkg] || release !== 'patch') {
-      newVersion = semver.inc(version, release);
+      newVersion = semver.inc(version, release as ReleaseType);
     }
 
     if (version !== newVersion) {

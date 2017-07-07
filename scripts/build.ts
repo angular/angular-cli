@@ -119,20 +119,23 @@ export default function(_: {}, logger: Logger) {
   }
 
   logger.info('Moving packages to dist/');
+  const packageLogger = new Logger('packages', logger);
   for (const packageName of sortedPackages) {
-    logger.info(`  ${packageName}`);
+    packageLogger.info(packageName);
     const pkg = packages[packageName];
     recursiveCopy(pkg.build, pkg.dist, logger);
     rimraf(pkg.build);
   }
 
   logger.info('Copying resources...');
+  const resourceLogger = new Logger('resources', logger);
   for (const packageName of sortedPackages) {
-    logger.info(`  ${packageName}`);
+    resourceLogger.info(packageName);
     const pkg = packages[packageName];
     const pkgJson = pkg.packageJson;
     const files = glob.sync(path.join(pkg.root, '**/*'), { dot: true, nodir: true });
-    logger.info(`    ${files.length} files total...`);
+    const subSubLogger = new Logger(packageName, resourceLogger);
+    subSubLogger.info(`${files.length} files total...`);
     const resources = files
       .map((fileName) => path.relative(pkg.root, fileName))
       .filter(fileName => {
@@ -153,7 +156,7 @@ export default function(_: {}, logger: Logger) {
         if (fileName.endsWith('.ts')) {
           // Verify that it was actually built.
           if (!fs.existsSync(path.join(pkg.dist, fileName).replace(/ts$/, 'js'))) {
-            logger.error(`\nSource found but compiled file not found: "${fileName}".`);
+            subSubLogger.error(`\nSource found but compiled file not found: "${fileName}".`);
             process.exit(2);
           }
 
@@ -174,7 +177,7 @@ export default function(_: {}, logger: Logger) {
         return true;
       });
 
-    logger.info(`    ${resources.length} resources...`);
+    subSubLogger.info(`${resources.length} resources...`);
     resources.forEach(fileName => {
       copy(path.join(pkg.root, fileName), path.join(pkg.dist, fileName));
     });
@@ -187,19 +190,21 @@ export default function(_: {}, logger: Logger) {
   }
 
   logger.info('Removing spec files...');
+  const specLogger = new Logger('specfiles', logger);
   for (const packageName of sortedPackages) {
-    logger.info(`  ${packageName}`);
+    specLogger.info(packageName);
     const pkg = packages[packageName];
     const files = glob.sync(path.join(pkg.dist, '**/*_spec.js'));
-    logger.info(`    ${files.length} spec files found...`);
+    specLogger.info(`  ${files.length} spec files found...`);
     files.forEach(fileName => rm(fileName));
   }
 
   logger.info('Setting versions...');
 
   const { versions } = require(path.join(__dirname, '../versions.json'));
+  const versionLogger = new Logger('versions', logger);
   for (const packageName of sortedPackages) {
-    logger.info(`  ${packageName}`);
+    versionLogger.info(packageName);
     const pkg = packages[packageName];
     const packageJsonPath = path.join(pkg.dist, 'package.json');
     const packageJson = pkg.packageJson;
@@ -207,7 +212,7 @@ export default function(_: {}, logger: Logger) {
     if (versions[packageName]) {
       packageJson['version'] = versions[packageName];
     } else {
-      logger.info('    No version found... Only updating dependencies.');
+      versionLogger.fatal('No version found... Only updating dependencies.');
     }
 
     for (const depName of Object.keys(versions)) {
