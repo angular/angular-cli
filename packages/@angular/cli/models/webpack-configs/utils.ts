@@ -75,12 +75,12 @@ export interface HashFormat {
   file: string;
 }
 
-export function getOutputHashFormat(option: string, hash='', length = 20): HashFormat {
+export function getOutputHashFormat(option: string, hash= '', length = 20): HashFormat {
   /* tslint:disable:max-line-length */
   let chunkHash = hash || `[chunkhash:${length}]`;
   let contentHash = hash || `[contenthash:${length}]`;
   let fileHash = hash || `[hash:${length}]`;
-  let customHash = hash ? `.${hash}`: '';
+  let customHash = hash ? `.${hash}` : '';
   const hashFormats: { [option: string]: HashFormat } = {
     none: { chunk: customHash, extract: customHash, file: customHash},
     media: { chunk: customHash, extract: customHash, file: `.${fileHash}`},
