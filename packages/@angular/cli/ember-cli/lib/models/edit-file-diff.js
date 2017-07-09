@@ -1,61 +1,58 @@
 'use strict';
 
-var fs           = require('fs');
-var Promise      = require('../ext/promise');
-var readFile     = Promise.denodeify(fs.readFile);
-var writeFile    = Promise.denodeify(fs.writeFile);
-var jsdiff       = require('diff');
-var temp         = require('temp').track();
-var path         = require('path');
-var SilentError  = require('silent-error');
-var openEditor   = require('../utilities/open-editor');
+const fs = require('fs-extra');
+const RSVP = require('rsvp');
+const jsdiff = require('diff');
+const temp = require('temp').track();
+const path = require('path');
+const SilentError = require('silent-error');
+const openEditor = require('../utilities/open-editor');
 
-function EditFileDiff(options) {
-  this.info = options.info;
-}
+class EditFileDiff {
+  constructor(options) {
+    this.info = options.info;
+  }
 
-EditFileDiff.prototype.edit = function() {
-  return Promise.hash({
-    input:  this.info.render(),
-    output: readFile(this.info.outputPath)
-  })
-    .then(invokeEditor.bind(this))
-    .then(applyPatch.bind(this))
-    .finally(cleanUp.bind(this));
-};
+  edit() {
+    return RSVP.hash({
+      input: this.info.render(),
+      output: fs.readFile(this.info.outputPath),
+    })
+      .then(this.invokeEditor.bind(this))
+      .then(this.applyPatch.bind(this))
+      .finally(this.cleanUp.bind(this));
+  }
 
-function cleanUp() {
-  temp.cleanupSync();
-}
+  cleanUp() {
+    temp.cleanupSync();
+  }
 
-function applyPatch(resultHash) {
-  /*jshint validthis:true */
-  return Promise.hash({
-    diffString: readFile(resultHash.diffPath),
-    currentString: readFile(resultHash.outputPath)
-  }).then(function(result) {
-    var appliedDiff = jsdiff.applyPatch(result.currentString.toString(), result.diffString.toString());
+  applyPatch(resultHash) {
+    return RSVP.hash({
+      diffString: fs.readFile(resultHash.diffPath),
+      currentString: fs.readFile(resultHash.outputPath),
+    }).then(result => {
+      let appliedDiff = jsdiff.applyPatch(result.currentString.toString(), result.diffString.toString());
 
-    if (!appliedDiff) {
-      var message = 'Patch was not cleanly applied.';
-      this.info.ui.writeLine(message + ' Please choose another action.');
-      throw new SilentError(message);
-    }
+      if (!appliedDiff) {
+        let message = 'Patch was not cleanly applied.';
+        this.info.ui.writeLine(`${message} Please choose another action.`);
+        throw new SilentError(message);
+      }
 
-    return writeFile(resultHash.outputPath, appliedDiff);
-  }.bind(this));
-}
+      return fs.writeFile(resultHash.outputPath, appliedDiff);
+    });
+  }
 
-function invokeEditor(result) {
-  var info     = this.info; // jshint ignore:line
-  var diff     = jsdiff.createPatch(info.outputPath, result.output.toString(), result.input);
-  var diffPath = path.join(temp.mkdirSync(), 'currentDiff.diff');
+  invokeEditor(result) {
+    let info = this.info;
+    let diff = jsdiff.createPatch(info.outputPath, result.output.toString(), result.input);
+    let diffPath = path.join(temp.mkdirSync(), 'currentDiff.diff');
 
-  return writeFile(diffPath, diff).then(function() {
-    return openEditor(diffPath);
-  }).then(function() {
-    return { outputPath: info.outputPath, diffPath: diffPath };
-  });
+    return fs.writeFile(diffPath, diff)
+      .then(() => openEditor(diffPath))
+      .then(() => ({ outputPath: info.outputPath, diffPath }));
+  }
 }
 
 module.exports = EditFileDiff;

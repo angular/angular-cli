@@ -23,6 +23,7 @@
   - *testTsconfig* (`string`): The name of the TypeScript configuration file for unit tests.
   - *prefix* (`string`): The prefix to apply to generated selectors.
   - *serviceWorker* (`boolean`): Experimental support for a service worker from @angular/service-worker. Default is `false`.
+  - *showCircularDependencies* (`boolean`): Show circular dependency warnings on builds. Default is `true`.
   - *styles* (`string|array`): Global styles to be included in the build.
   - *stylePreprocessorOptions* : Options to pass to style preprocessors.
     - *includePaths* (`array`): Paths to include. Paths will be resolved to project root.
@@ -82,6 +83,7 @@
     - *ssl* (`boolean`): Enables ssl for the application. Default is `false`.
     - *sslKey* (`string`): The ssl key used by the server. Default is `ssl/server.key`.
     - *sslCert* (`string`): The ssl certificate used by the server. Default is `ssl/server.crt`.
+    - *proxyConfig* (`string`): Proxy configuration file.
 
 - **packageManager** (`string`): Specify which package manager tool to use. Options include `npm`, `cnpm` and `yarn`.
 

@@ -7,13 +7,12 @@ matrix:
 
 install:
   - ps: Install-Product node $env:nodejs_version
-  - yarn install
+  - yarn --frozen-lockfile
 
 test_script:
   - node --version
   - yarn --version
-  - yarn test
-  - node tests\run_e2e.js
+  - node tests\run_e2e.js --appveyor
 
 build: off
 

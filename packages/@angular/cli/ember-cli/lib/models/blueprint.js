@@ -4,7 +4,8 @@
 @module ember-cli
 */
 var FileInfo            = require('./file-info');
-var Promise             = require('../ext/promise');
+var RSVP                = require('rsvp');
+var Promise             = RSVP.Promise;
 var chalk               = require('chalk');
 var printableProperties = require('../utilities/printable-properties').blueprint;
 var sequence            = require('../utilities/sequence');
@@ -13,7 +14,7 @@ var fs                  = require('fs-extra');
 var inflector           = require('inflection');
 var minimatch           = require('minimatch');
 var path                = require('path');
-var stat                = Promise.denodeify(fs.stat);
+var stat                = RSVP.denodeify(fs.stat);
 var stringUtils         = require('ember-cli-string-utils');
 var compact             = require('lodash/compact');
 var intersect           = require('lodash/intersection');
@@ -26,12 +27,11 @@ var keys                = require('lodash/keys');
 var merge               = require('lodash/merge');
 var values              = require('lodash/values');
 var walkSync            = require('walk-sync');
-var writeFile           = Promise.denodeify(fs.outputFile);
-var removeFile          = Promise.denodeify(fs.remove);
+var writeFile           = RSVP.denodeify(fs.outputFile);
+var removeFile          = RSVP.denodeify(fs.remove);
 var SilentError         = require('silent-error');
-var CoreObject          = require('../ext/core-object');
+var CoreObject          = require('core-object');
 var EOL                 = require('os').EOL;
-var debug               = require('debug')('ember-cli:blueprint');
 var normalizeEntityName = require('ember-cli-normalize-entity-name');
 
 function existsSync(path) {
@@ -493,7 +493,8 @@ Blueprint.prototype._process = function(options, beforeHook, process, afterHook)
   return this._locals(options).then(function (locals) {
     return Promise.resolve()
       .then(beforeHook.bind(self, options, locals))
-      .then(process.bind(self, intoDir, locals)).map(self._commit.bind(self))
+      .then(process.bind(self, intoDir, locals))
+      .then(promises => RSVP.map(promises, self._commit.bind(self)))
       .then(afterHook.bind(self, options));
   });
 };
@@ -517,19 +518,17 @@ Blueprint.prototype.install = function(options) {
     ui.writeLine(chalk.yellow('You specified the dry-run flag, so no' +
       ' changes will be written.'));
   }
-  
+
   this._normalizeEntityName(options.entity);
   this._checkForPod(options.verbose);
   this._checkInRepoAddonExists(options.inRepoAddon);
 
-  debug('START: processing blueprint: `%s`', this.name);
   var start = new Date();
   return this._process(
     options,
     this.beforeInstall,
     this.processFiles,
     this.afterInstall).finally(function() {
-      debug('END: processing blueprint: `%s` in (%dms)', this.name, new Date() - start);
     }.bind(this));
 };
 
@@ -754,7 +753,7 @@ function finishProcessingForInstall(infos) {
 
   var infosNeedingConfirmation = infos.reduce(gatherConfirmationMessages, []);
 
-  return sequence(infosNeedingConfirmation).returns(infos);
+  return sequence(infosNeedingConfirmation).then(() => infos);
 }
 
 function finishProcessingForUninstall(infos) {
@@ -774,9 +773,9 @@ Blueprint.prototype.processFiles = function(intoDir, templateVariables) {
 
   this._ignoreUpdateFiles();
 
-  return Promise.filter(fileInfos, isValidFile).
-    map(prepareConfirm).
-    then(finishProcessingForInstall);
+  return RSVP.filter(fileInfos, isValidFile)
+    .then(promises => RSVP.map(promises, prepareConfirm))
+    .then(finishProcessingForInstall);
 };
 
 /**
@@ -789,7 +788,7 @@ Blueprint.prototype.processFilesForUninstall = function(intoDir, templateVariabl
 
   this._ignoreUpdateFiles();
 
-  return Promise.filter(fileInfos, isValidFile).
+  return RSVP.filter(fileInfos, isValidFile).
     then(finishProcessingForUninstall);
 };
 
@@ -1374,7 +1373,7 @@ function gatherConfirmationMessages(collection, info) {
   @return {Boolean}
 */
 function isFile(info) {
-  return stat(info.inputPath).invoke('isFile');
+  return stat(info.inputPath).then(it => it.isFile());
 }
 
 /**

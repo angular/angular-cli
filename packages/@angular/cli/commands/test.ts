@@ -19,6 +19,7 @@ export interface TestOptions {
   progress?: boolean;
   config: string;
   poll?: number;
+  environment?: string;
   app?: string;
 }
 
@@ -99,6 +100,12 @@ const TestCommand = Command.extend({
       type: Number,
       default: pollDefault,
       description: 'Enable and define the file watching poll time period (milliseconds).'
+    },
+    {
+      name: 'environment',
+      type: String,
+      aliases: ['e'] ,
+      description: 'Defines the build environment.'
     },
     {
       name: 'app',

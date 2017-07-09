@@ -1,87 +1,86 @@
 'use strict';
 
-var chalk = require('chalk');
-var EOL   = require('os').EOL;
+const chalk = require('chalk');
+const EOL = require('os').EOL;
 
 module.exports = function(initialMargin, shouldDescriptionBeGrey) {
   initialMargin = initialMargin || '';
 
-  var output = '';
+  let output = '';
 
-  var options = this.anonymousOptions;
+  let options = this.anonymousOptions;
 
   // <anonymous-option-1> ...
   if (options.length) {
-    output += ' ' + chalk.yellow(options.map(function(option) {
+    output += ` ${chalk.yellow(options.map(option => {
       // blueprints we insert brackets, commands already have them
       if (option.indexOf('<') === 0) {
         return option;
       } else {
-        return '<' + option + '>';
+        return `<${option}>`;
       }
-    }).join(' '));
+    }).join(' '))}`;
   }
 
-  options = this.availableOptions
-    .filter(function(option) { return !option.hidden; });
+  options = this.availableOptions.filter(option => !option.hidden);
 
   // <options...>
   if (options.length) {
-    output += ' ' + chalk.cyan('<options...>');
+    output += ` ${chalk.cyan('<options...>')}`;
   }
 
   // Description
-  var description = this.description;
+  let description = this.description;
   if (description) {
     if (shouldDescriptionBeGrey) {
       description = chalk.grey(description);
     }
-    output += EOL + initialMargin + '  ' + description;
+    output += `${EOL + initialMargin}  ${description}`;
   }
 
   // aliases: a b c
   if (this.aliases && this.aliases.length) {
-    output += EOL + initialMargin + '  ' + chalk.grey('aliases: ' + this.aliases.filter(function(a) { return a; }).join(', '));
+    output += `${EOL + initialMargin}  ${chalk.grey(`aliases: ${this.aliases.filter(a => a).join(', ')}`)}`;
   }
 
   // --available-option (Required) (Default: value)
   // ...
-  options.forEach(function(option) {
-    output += EOL + initialMargin + '  ' + chalk.cyan('--' + option.name);
+  options.forEach(option => {
+    output += `${EOL + initialMargin}  ${chalk.cyan(`--${option.name}`)}`;
 
     if (option.values) {
-      output += chalk.cyan('=' + option.values.join('|'));
+      output += chalk.cyan(`=${option.values.join('|')}`);
     }
 
     if (option.type) {
-      var types = Array.isArray(option.type) ?
+      let types = Array.isArray(option.type) ?
         option.type.map(formatType).join(', ') :
         formatType(option.type);
 
-      output += ' ' + chalk.cyan('(' + types + ')');
+      output += ` ${chalk.cyan(`(${types})`)}`;
     }
 
     if (option.required) {
-      output += ' ' + chalk.cyan('(Required)');
+      output += ` ${chalk.cyan('(Required)')}`;
     }
 
     if (option.default !== undefined) {
-      output += ' ' + chalk.cyan('(Default: ' + option.default + ')');
+      output += ` ${chalk.cyan(`(Default: ${option.default})`)}`;
     }
 
     if (option.description) {
-      output += ' ' + option.description;
+      output += ` ${option.description}`;
     }
 
     if (option.aliases && option.aliases.length) {
-      output += EOL + initialMargin + '    ' + chalk.grey('aliases: ' + option.aliases.map(function(a) {
+      output += `${EOL + initialMargin}    ${chalk.grey(`aliases: ${option.aliases.map(a => {
         if (typeof a === 'string') {
           return (a.length > 4 ? '--' : '-') + a + (option.type === Boolean ? '' : ' <value>');
         } else {
-          var key = Object.keys(a)[0];
-          return (key.length > 4 ? '--' : '-') + key + ' (--' + option.name + '=' + a[key] + ')';
+          let key = Object.keys(a)[0];
+          return `${(key.length > 4 ? '--' : '-') + key} (--${option.name}=${a[key]})`;
         }
-      }).join(', '));
+      }).join(', ')}`)}`;
     }
   });
 

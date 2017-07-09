@@ -1,12 +1,12 @@
 import {Logger} from '@ngtools/logger';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import {buildSchema} from './build-schema';
 
 const denodeify = require('denodeify');
 const glob = denodeify(require('glob'));
+const tar = require('tar');
 const npmRun = require('npm-run');
-const rimraf = denodeify(require('rimraf'));
 
 
 const root = path.join(__dirname, '../../..');
@@ -32,7 +32,7 @@ function copy(from: string, to: string): Promise<void> {
 
 
 function rm(p: string): Promise<void> {
-  path.relative(process.cwd(), p);
+  p = path.relative(process.cwd(), p);
   return new Promise<void>((resolve, reject) => {
     fs.unlink(p, err => {
       if (err) {
@@ -42,6 +42,12 @@ function rm(p: string): Promise<void> {
       }
     });
   });
+}
+
+
+function tarFiles(out: string, dir: string): Promise<void> {
+  // const files = fs.readdirSync(dir);
+  return tar.create({ gzip: true, strict: true, portable: true, cwd: dir, file: out }, ['.']);
 }
 
 
@@ -65,7 +71,7 @@ export default function build(packagesToBuild: string[], _opts: any,
     .then(() => logger.info('Deleting dist folder...'))
     .then(() => {
       if (willBuildEverything) {
-        return rimraf(dist);
+        return fs.remove(dist);
       }
     })
     .then(() => logger.info('Creating schema.d.ts...'))
@@ -204,7 +210,7 @@ export default function build(packagesToBuild: string[], _opts: any,
     })
     .then(() => {
       // Copy all resources that might have been missed.
-      const extraFiles = ['CHANGELOG.md', 'CONTRIBUTING.md', 'README.md'];
+      const extraFiles = ['CONTRIBUTING.md', 'README.md'];
       return Promise.all(extraFiles.map(fileName => {
         logger.info(`Copying ${fileName}...`);
         return copy(fileName, path.join('dist/@angular/cli', fileName));
@@ -217,8 +223,18 @@ export default function build(packagesToBuild: string[], _opts: any,
       const licenseLogger = new Logger('license', logger);
       return Promise.all(Object.keys(packages).map(pkgName => {
         const pkg = packages[pkgName];
-        licenseLogger.info(`${pkgName}`);
+        licenseLogger.info(pkgName);
         return copy('LICENSE', path.join(pkg.dist, 'LICENSE'));
+      }));
+    })
+    .then(() => {
+      logger.info('Tarring all packages...');
+
+      const tarLogger = new Logger('license', logger);
+      return Promise.all(Object.keys(packages).map(pkgName => {
+        const pkg = packages[pkgName];
+        tarLogger.info(`${pkgName} => ${pkg.tar}`);
+        return tarFiles(pkg.tar, pkg.dist);
       }));
     })
     .then(() => process.exit(0), (err) => {

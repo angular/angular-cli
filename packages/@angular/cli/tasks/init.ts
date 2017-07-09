@@ -6,10 +6,10 @@ import {checkYarnOrCNPM} from '../utilities/check-package-manager';
 import {CliConfig} from '../models/config';
 
 const Task = require('../ember-cli/lib/models/task');
-const Promise = require('../ember-cli/lib/ext/promise');
 const SilentError = require('silent-error');
 const normalizeBlueprint = require('../ember-cli/lib/utilities/normalize-blueprint-option');
 const GitInit = require('../tasks/git-init');
+const InstallBlueprint = require('../ember-cli/lib/tasks/install-blueprint');
 
 
 export default Task.extend({
@@ -18,7 +18,7 @@ export default Task.extend({
       commandOptions.skipInstall = true;
     }
 
-    const installBlueprint = new this.tasks.InstallBlueprint({
+    const installBlueprint = new InstallBlueprint({
       ui: this.ui,
       project: this.project
     });
@@ -76,6 +76,7 @@ export default Task.extend({
       routing: commandOptions.routing,
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,
+      minimal: commandOptions.minimal,
       ignoredUpdateFiles: ['favicon.ico'],
       skipGit: commandOptions.skipGit,
       skipTests: commandOptions.skipTests
@@ -87,13 +88,13 @@ export default Task.extend({
 
     return installBlueprint.run(blueprintOpts)
       .then(function () {
-        if (commandOptions.skipGit === false) {
-          return gitInit.run(commandOptions, rawArgs);
+        if (!commandOptions.skipInstall) {
+          return npmInstall.run();
         }
       })
       .then(function () {
-        if (!commandOptions.skipInstall) {
-          return npmInstall.run();
+        if (commandOptions.skipGit === false) {
+          return gitInit.run(commandOptions, rawArgs);
         }
       })
       .then(function () {
@@ -101,7 +102,11 @@ export default Task.extend({
           return linkCli.run();
         }
       })
-      .then(checkYarnOrCNPM)
+      .then(() => {
+        if (!commandOptions.skipInstall || commandOptions.linkCli) {
+          return checkYarnOrCNPM();
+        }
+      })
       .then(() => {
         this.ui.writeLine(chalk.green(`Project '${packageName}' successfully created.`));
       });

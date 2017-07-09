@@ -79,6 +79,10 @@
             "type": "string",
             "description": "URL where files will be deployed."
           },
+          "baseHref": {
+            "type": "string",
+            "description": "Base url for the application being built."
+          },
           "index": {
             "type": "string",
             "default": "index.html",
@@ -442,6 +446,44 @@
             }
           }
         },
+        "build": {
+          "description": "Properties to be passed to the build command.",
+          "type": "object",
+          "properties": {
+            "sourcemaps": {
+              "description": "Output sourcemaps.",
+              "type": "boolean"
+            },
+            "baseHref": {
+              "description": "Base url for the application being built.",
+              "type": "string"
+            },
+            "progress": {
+              "description": "The ssl key used by the server.",
+              "type": "boolean",
+              "default": true
+            },
+            "poll": {
+              "description": "Enable and define the file watching poll time period (milliseconds).",
+              "type": "number"
+            },
+            "deleteOutputPath": {
+              "description": "Delete output path before build.",
+              "type": "boolean",
+              "default": true
+            },
+            "preserveSymlinks": {
+              "description": "Do not use the real path when resolving modules.",
+              "type": "boolean",
+              "default": false
+            },
+            "showCircularDependencies": {
+              "description": "Show circular dependency warnings on builds.",
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
         "serve": {
           "description": "Properties to be passed to the serve command.",
           "type": "object",
@@ -473,6 +515,10 @@
               "description": "The ssl certificate used by the server.",
               "type": "string",
               "default": "ssl/server.crt"
+            },
+            "proxyConfig": {
+              "description": "Proxy configuration file.",
+              "type": "string"
             }
           }
         }
@@ -489,6 +535,11 @@
       "description": "Allow people to disable console warnings.",
       "type": "object",
       "properties": {
+        "hmrWarning": {
+          "description": "Show a warning when the user enabled the --hmr option.",
+          "type": "boolean",
+          "default": true
+        },
         "nodeDeprecation": {
           "description": "Show a warning when the node version is incompatible.",
           "type": "boolean",

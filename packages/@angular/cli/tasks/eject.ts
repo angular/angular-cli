@@ -21,6 +21,8 @@ const angularCliPlugins = require('../plugins/webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SilentError = require('silent-error');
+const licensePlugin = require('license-webpack-plugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 const Task = require('../ember-cli/lib/models/task');
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -35,10 +37,12 @@ const pree2eNpmScript = `webdriver-manager update --standalone false --gecko fal
 class JsonWebpackSerializer {
   public imports: {[name: string]: string[]} = {};
   public variableImports: {[name: string]: string} = {
-    'path': 'path'
+    'fs': 'fs',
+    'path': 'path',
   };
   public variables: {[name: string]: string} = {
     'nodeModules': `path.join(process.cwd(), 'node_modules')`,
+    'realNodeModules': `fs.realpathSync(nodeModules)`,
     'genDirNodeModules':
       `path.join(process.cwd(), '${this._appRoot}', '$$_gendir', 'node_modules')`,
   };
@@ -70,6 +74,15 @@ class JsonWebpackSerializer {
     if (this.imports[module].indexOf(importName) == -1) {
       this.imports[module].push(importName);
     }
+  }
+
+  private _globCopyWebpackPluginSerialize(value: any): any {
+    let patterns = value.options.patterns;
+    let globOptions = value.options.globOptions;
+    return {
+      patterns,
+      globOptions: this._globReplacer(globOptions)
+    };
   }
 
   private _commonsChunkPluginSerialize(value: any): any {
@@ -132,6 +145,12 @@ class JsonWebpackSerializer {
     return plugin.defaultValues;
   }
 
+  private _licenseWebpackPlugin(plugin: any) {
+    return {
+      'pattern': plugin.pattern
+    };
+  }
+
   private _pluginsReplacer(plugins: any[]) {
     return plugins.map(plugin => {
       let args = plugin.options || undefined;
@@ -149,15 +168,21 @@ class JsonWebpackSerializer {
         case (<any>webpack).HashedModuleIdsPlugin:
           this._addImport('webpack', 'HashedModuleIdsPlugin');
           break;
+        case webpack.SourceMapDevToolPlugin:
+          this._addImport('webpack', 'SourceMapDevToolPlugin');
+          break;
         case webpack.optimize.UglifyJsPlugin:
           this._addImport('webpack.optimize', 'UglifyJsPlugin');
           break;
         case angularCliPlugins.BaseHrefWebpackPlugin:
-        case angularCliPlugins.GlobCopyWebpackPlugin:
+        case angularCliPlugins.NamedLazyChunksWebpackPlugin:
         case angularCliPlugins.SuppressExtractedTextChunksWebpackPlugin:
           this._addImport('@angular/cli/plugins/webpack', plugin.constructor.name);
           break;
-
+        case angularCliPlugins.GlobCopyWebpackPlugin:
+          args = this._globCopyWebpackPluginSerialize(plugin);
+          this._addImport('@angular/cli/plugins/webpack', 'GlobCopyWebpackPlugin');
+          break;
         case webpack.optimize.CommonsChunkPlugin:
           args = this._commonsChunkPluginSerialize(plugin);
           this._addImport('webpack.optimize', 'CommonsChunkPlugin');
@@ -165,6 +190,9 @@ class JsonWebpackSerializer {
         case ExtractTextPlugin:
           args = this._extractTextPluginSerialize(plugin);
           this.variableImports['extract-text-webpack-plugin'] = 'ExtractTextPlugin';
+          break;
+        case CircularDependencyPlugin:
+          this.variableImports['circular-dependency-plugin'] = 'CircularDependencyPlugin';
           break;
         case AotPlugin:
           args = this._aotPluginSerialize(plugin);
@@ -182,13 +210,14 @@ class JsonWebpackSerializer {
           args = this._environmentPlugin(plugin);
           this._addImport('webpack', 'EnvironmentPlugin');
           break;
-
+        case licensePlugin:
+          args = this._licenseWebpackPlugin(plugin);
+          this.variableImports['license-webpack-plugin'] = 'licensePlugin';
         default:
           if (plugin.constructor.name == 'AngularServiceWorkerPlugin') {
             this._addImport('@angular/service-worker/build/webpack', plugin.constructor.name);
           }
           break;
-
       }
 
       const argsSerialized = this._addVariableSupport(JSON.stringify(args,
@@ -315,6 +344,12 @@ class JsonWebpackSerializer {
     });
   }
 
+  private _globReplacer(value: any) {
+    return Object.assign({}, value, {
+      cwd: this._relativePath('process.cwd()', path.relative(this._root, value.cwd))
+    });
+  }
+
   private _replacer(_key: string, value: any) {
     if (value === undefined) {
       return value;
@@ -417,7 +452,7 @@ export default Task.extend({
     const outputPath = runTaskOptions.outputPath || appConfig.outDir;
     const force = runTaskOptions.force;
 
-    if (project.root === outputPath) {
+    if (project.root === path.resolve(outputPath)) {
       throw new SilentError ('Output path MUST not be project root directory!');
     }
 
@@ -518,6 +553,7 @@ export default Task.extend({
           'style-loader',
           'stylus-loader',
           'url-loader',
+          'circular-dependency-plugin',
           'yargs'
         ].forEach((packageName: string) => {
           packageJson['devDependencies'][packageName] = ourPackageJson['dependencies'][packageName];

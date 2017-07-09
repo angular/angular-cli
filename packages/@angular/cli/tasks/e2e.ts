@@ -26,7 +26,15 @@ export const E2eTask = Task.extend({
       };
 
       // use serve url as override for protractors baseUrl
-      if (e2eTaskOptions.serve) {
+      if (e2eTaskOptions.serve && e2eTaskOptions.publicHost) {
+        let publicHost = e2eTaskOptions.publicHost;
+        if (!/^\w+:\/\//.test(publicHost)) {
+          publicHost = `${e2eTaskOptions.ssl ? 'https' : 'http'}://${publicHost}`;
+        }
+        const clientUrl = url.parse(publicHost);
+        e2eTaskOptions.publicHost = clientUrl.host;
+        additionalProtractorConfig.baseUrl = url.format(clientUrl);
+      } else if (e2eTaskOptions.serve) {
         additionalProtractorConfig.baseUrl = url.format({
           protocol: e2eTaskOptions.ssl ? 'https' : 'http',
           hostname: e2eTaskOptions.host,

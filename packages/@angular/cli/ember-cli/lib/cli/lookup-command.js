@@ -1,22 +1,22 @@
 'use strict';
 
-var UnknownCommand = require('../commands/unknown');
+const UnknownCommand = require('../commands/unknown');
 
 module.exports = function(commands, commandName, commandArgs, optionHash) {
-  var options = optionHash || {};
-  var project = options.project;
-  var ui      = options.ui;
+  let options = optionHash || {};
+  let project = options.project;
+  let ui = options.ui;
 
   function aliasMatches(alias) {
     return alias === commandName;
   }
 
   function findCommand(commands, commandName) {
-    for (var key in commands) {
-      var command = commands[key];
+    for (let key in commands) {
+      let command = commands[key];
 
-      var name = command.prototype.name;
-      var aliases = command.prototype.aliases || [];
+      let name = command.prototype.name;
+      let aliases = command.prototype.aliases || [];
 
       if (name === commandName || aliases.some(aliasMatches)) {
         return command;
@@ -25,12 +25,12 @@ module.exports = function(commands, commandName, commandArgs, optionHash) {
   }
 
   // Attempt to find command in ember-cli core commands
-  var command = findCommand(commands, commandName);
+  let command = findCommand(commands, commandName);
 
-  var addonCommand;
+  let addonCommand;
   // Attempt to find command within addons
   if (project && project.eachAddonCommand) {
-    project.eachAddonCommand(function(addonName, commands) {
+    project.eachAddonCommand((addonName, commands) => {
       addonCommand = findCommand(commands, commandName);
       return !addonCommand;
     });
@@ -38,14 +38,14 @@ module.exports = function(commands, commandName, commandArgs, optionHash) {
 
   if (command && addonCommand) {
     if (addonCommand.overrideCore) {
-      ui.writeWarnLine('An ember-addon has attempted to override the core command "' +
-              command.prototype.name + '". The addon command will be used as the overridding was explicit.');
+      ui.writeWarnLine(`An ember-addon has attempted to override the core command "${command.prototype.name}". ` +
+        `The addon command will be used as the overridding was explicit.`);
 
       return addonCommand;
     }
 
-    ui.writeWarnLine('An ember-addon has attempted to override the core command "' +
-                            command.prototype.name + '". The core command will be used.');
+    ui.writeWarnLine(`An ember-addon has attempted to override the core command "${command.prototype.name}". ` +
+      `The core command will be used.`);
     return command;
   }
 
@@ -58,7 +58,10 @@ module.exports = function(commands, commandName, commandArgs, optionHash) {
   }
 
   // if we didn't find anything, return an "UnknownCommand"
-  return UnknownCommand.extend({
-    name: commandName
-  });
+  return class extends UnknownCommand {
+    constructor(options) {
+      super(options);
+      this.name = commandName;
+    }
+  };
 };

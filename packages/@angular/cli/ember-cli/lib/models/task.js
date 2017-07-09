@@ -1,15 +1,22 @@
 'use strict';
 
-var CoreObject = require('../ext/core-object');
+const CoreObject = require('core-object');
 
-function Task() {
-  CoreObject.apply(this, arguments);
+class Task extends CoreObject {
+  run(/*options*/) {
+    throw new Error('Task needs to have run() defined.');
+  }
+
+  /**
+   * Interrupt comamd with an exit code
+   * Called when the process is interrupted from outside, e.g. CTRL+C or `process.kill()`
+   *
+   * @private
+   * @method onInterrupt
+   */
+  onInterrupt() {
+    process.exit(1);
+  }
 }
 
 module.exports = Task;
-
-Task.__proto__ = CoreObject;
-
-Task.prototype.run = function(/*options*/) {
-  throw new Error('Task needs to have run() defined.');
-};

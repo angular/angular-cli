@@ -81,6 +81,8 @@ Flag                | `--dev` | `--prod`
 `--sourcemaps`      | `true`  | `false`
 `--extract-css`     | `false` | `true`
 
+`--extract-licenses` Extract all licenses in a separate file, in the case of production builds only.
+`--i18n-file` Localization file to use for i18n.
 `--prod` also sets the following non-flaggable settings:
 - Adds service worker if configured in `.angular-cli.json`.
 - Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
@@ -222,6 +224,16 @@ Note: service worker support is experimental and subject to change.
 </details>
 
 <details>
+  <summary>delete-output-path</summary>
+  <p>
+    <code>--delete-output-path</code> (aliases: <code>-dop</code>) <em>default value: true</<em>
+  </p>
+  <p>
+    Delete the output-path directory.
+  </p>
+</details>
+
+<details>
   <summary>poll</summary>
   <p>
     <code>--poll</code>
@@ -298,5 +310,15 @@ Note: service worker support is experimental and subject to change.
   </p>
   <p>
     Run build when files change.
+  </p>
+</details>
+
+<details>
+  <summary>show-circular-dependencies</summary>
+  <p>
+    <code>--show-circular-dependencies</code> (aliases: <code>-scd</code>)
+  </p>
+  <p>
+    Show circular dependency warnings on builds.
   </p>
 </details>

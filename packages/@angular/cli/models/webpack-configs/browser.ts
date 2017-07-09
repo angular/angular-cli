@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -24,14 +25,29 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   if (buildOptions.vendorChunk) {
     // Separate modules from node_modules into a vendor chunk.
     const nodeModules = path.resolve(projectRoot, 'node_modules');
+    // Resolves all symlink to get the actual node modules folder.
+    const realNodeModules = fs.realpathSync(nodeModules);
     // --aot puts the generated *.ngfactory.ts in src/$$_gendir/node_modules.
     const genDirNodeModules = path.resolve(appRoot, '$$_gendir', 'node_modules');
 
     extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       chunks: ['main'],
-      minChunks: (module: any) => module.resource &&
-        (module.resource.startsWith(nodeModules) || module.resource.startsWith(genDirNodeModules))
+      minChunks: (module: any) => {
+        return module.resource
+            && (   module.resource.startsWith(nodeModules)
+                || module.resource.startsWith(genDirNodeModules)
+                || module.resource.startsWith(realNodeModules));
+      }
+    }));
+  }
+
+  if (buildOptions.sourcemaps) {
+    extraPlugins.push(new webpack.SourceMapDevToolPlugin({
+      filename: '[file].map[query]',
+      moduleFilenameTemplate: '[resource-path]',
+      fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
+      sourceRoot: 'webpack:///'
     }));
   }
 
@@ -42,10 +58,20 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         filename: path.resolve(buildOptions.outputPath, appConfig.index),
         chunksSortMode: packageChunkSort(appConfig),
         excludeChunks: lazyChunks,
-        xhtml: true
+        xhtml: true,
+        minify: buildOptions.target === 'production' ? {
+          caseSensitive: true,
+          collapseWhitespace: true,
+          keepClosingSlash: true
+        } : false
       }),
       new BaseHrefWebpackPlugin({
         baseHref: buildOptions.baseHref
+      }),
+      new webpack.optimize.CommonsChunkPlugin({
+        async: 'common',
+        children: true,
+        minChunks: 2
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
