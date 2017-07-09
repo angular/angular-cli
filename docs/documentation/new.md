@@ -24,7 +24,7 @@ Default applications are created in a directory of the same name, with an initia
     <code>--dry-run</code> (alias: <code>-d</code>) <em>default value: false</em>
   </p>
   <p>
-    Run through without making any changes.
+    Run through without making any changes. Will list all files that would have been created when running <code>ng new</code>.
   </p>
 </details>
 
@@ -49,12 +49,25 @@ Default applications are created in a directory of the same name, with an initia
 </details>
 
 <details>
+  <summary>minimal</summary>
+  <p>
+    <code>--minimal</code> <em>default value: false</em>
+  </p>
+  <p>
+    Should create a minimal app.
+  </p>
+</details>
+
+<details>
   <summary>prefix</summary>
   <p>
     <code>--prefix</code> (alias: <code>-p</code>) <em>default value: app</em>
   </p>
   <p>
     The prefix to use for all component selectors.
+  </p>
+  <p>
+    You can later change the value in <em>.angular-cli.json</em> (<code>apps[0].prefix</code>).
   </p>
 </details>
 
@@ -119,6 +132,9 @@ Default applications are created in a directory of the same name, with an initia
   <p>
     The name of the source directory.
   </p>
+  <p>
+    You can later change the value in <em>.angular-cli.json</em> (<code>apps[0].root</code>).
+  </p>
 </details>
 
 <details>
@@ -126,8 +142,18 @@ Default applications are created in a directory of the same name, with an initia
   <p>
     <code>--style</code> <em>default value: css</em>
   </p>
+  <div>
+    The style file default extension. Possible values:
+    <ul>
+      <li>css</li>
+      <li>scss</li>
+      <li>less</li>
+      <li>sass</li>
+      <li>styl (<code>stylus</code>)<li>
+    </ul>
+  </div>
   <p>
-    The style file default extension.
+    You can later change the value in <em>.angular-cli.json</em> (<code>defaults.styleExt</code>).
   </p>
 </details>
 

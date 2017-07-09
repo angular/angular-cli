@@ -26,7 +26,7 @@ export function updateTsConfig(fn: (json: any) => any | void) {
 
 export function ngServe(...args: string[]) {
   return silentExecAndWaitForOutputToMatch('ng',
-    ['serve', '--no-progress', ...args],
+    ['serve', ...args],
     /webpack: bundle is now VALID|webpack: Compiled successfully./);
 }
 
@@ -93,6 +93,8 @@ export function useNg2() {
     },
     'devDependencies': {
       '@angular/compiler-cli': '^2.4.0',
+      '@types/jasmine': '~2.2.0',
+      '@types/jasminewd2': undefined,
       'typescript': '~2.0.0'
     }
   };

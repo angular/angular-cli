@@ -1,7 +1,7 @@
 import { oneLine } from 'common-tags';
+import denodeify = require('denodeify');
 
-const Promise = require('../ember-cli/lib/ext/promise');
-const exec = Promise.denodeify(require('child_process').exec);
+const exec: any = denodeify(require('child_process').exec);
 const path = require('path');
 const pkg = require('../package.json');
 const fs = require('fs');

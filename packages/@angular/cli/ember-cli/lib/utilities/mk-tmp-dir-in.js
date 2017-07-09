@@ -1,25 +1,17 @@
 'use strict';
 
-var Promise   = require('../ext/promise');
-var fs        = require('fs-extra');
-var temp      = require('temp');
-var mkdir     = Promise.denodeify(fs.mkdir);
-var mkdirTemp = Promise.denodeify(temp.mkdir);
+const fs = require('fs-extra');
+const temp = require('temp');
+const denodeify = require('denodeify');
 
-function exists(dir) {
-  return new Promise(function(resolve) {
-    fs.exists(dir, resolve);
-  });
-}
+const mkdirTemp = denodeify(temp.mkdir);
 
 function mkTmpDirIn(dir) {
-  return exists(dir).then(function(doesExist) {
+  return fs.pathExists(dir).then(doesExist => {
     if (!doesExist) {
-      return mkdir(dir);
+      return fs.mkdir(dir);
     }
-  }).then(function() {
-    return mkdirTemp({ dir: dir });
-  });
+  }).then(() => mkdirTemp({ dir }));
 }
 
 module.exports = mkTmpDirIn;

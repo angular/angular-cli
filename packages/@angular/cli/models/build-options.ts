@@ -18,4 +18,7 @@ export interface BuildOptions {
   poll?: number;
   app?: string;
   deleteOutputPath?: boolean;
+  preserveSymlinks?: boolean;
+  extractLicenses?: boolean;
+  showCircularDependencies?: boolean;
 }

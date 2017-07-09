@@ -1,10 +1,12 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
+import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 
 /**
@@ -63,16 +65,22 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose, colors: true }));
   }
 
+  if (buildOptions.showCircularDependencies) {
+    extraPlugins.push(new CircularDependencyPlugin({
+      exclude: /(\\|\/)node_modules(\\|\/)/
+    }));
+  }
+
   return {
-    devtool: buildOptions.sourcemaps ? 'source-map' : false,
     resolve: {
       extensions: ['.ts', '.js'],
       modules: ['node_modules', nodeModules],
+      symlinks: !buildOptions.preserveSymlinks
     },
     resolveLoader: {
-      modules: [nodeModules]
+      modules: [nodeModules, 'node_modules']
     },
-    context: projectRoot,
+    context: __dirname,
     entry: entryPoints,
     output: {
       path: path.resolve(projectRoot, buildOptions.outputPath),
@@ -87,13 +95,14 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         { test: /\.html$/, loader: 'raw-loader' },
         { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
         {
-          test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
+          test: /\.(jpg|png|webp|gif|otf|ttf|woff|woff2|cur|ani)$/,
           loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
         }
       ].concat(extraRules)
     },
     plugins: [
-      new webpack.NoEmitOnErrorsPlugin()
+      new webpack.NoEmitOnErrorsPlugin(),
+      new NamedLazyChunksWebpackPlugin(),
     ].concat(extraPlugins),
     node: {
       fs: 'empty',

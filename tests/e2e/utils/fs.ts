@@ -1,5 +1,4 @@
-import * as fs from 'fs';
-import * as rimrafPackage from 'rimraf';
+import * as fs from 'fs-extra';
 import {dirname} from 'path';
 import {stripIndents} from 'common-tags';
 
@@ -44,20 +43,33 @@ export function deleteFile(path: string) {
 
 export function rimraf(path: string) {
   return new Promise<void>((resolve, reject) => {
-    rimrafPackage(path, (err?: any) => {
+    fs.remove(path, (err?: any) => {
       if (err) {
         reject(err);
       } else {
         resolve();
       }
-    })
-  }
+    });
+  });
 }
 
 
 export function moveFile(from: string, to: string) {
   return new Promise<void>((resolve, reject) => {
     fs.rename(from, to, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+
+export function symlinkFile(from: string, to: string, type?: string) {
+  return new Promise<void>((resolve, reject) => {
+    fs.symlink(from, to, type, (err) => {
       if (err) {
         reject(err);
       } else {

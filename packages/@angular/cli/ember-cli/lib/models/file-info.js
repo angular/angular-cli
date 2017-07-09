@@ -1,23 +1,21 @@
 'use strict';
 
-var fs           = require('fs');
-var Promise      = require('../ext/promise');
-var readFile     = Promise.denodeify(fs.readFile);
-var lstat        = Promise.denodeify(fs.stat);
-var chalk        = require('chalk');
-var EditFileDiff = require('./edit-file-diff');
-var EOL          = require('os').EOL;
-var isBinaryFile = require('isbinaryfile');
-var template     = require('lodash/template');
-var canEdit      = require('../utilities/open-editor').canEdit;
+const fs = require('fs-extra');
+const RSVP = require('rsvp');
+const chalk = require('chalk');
+const EditFileDiff = require('./edit-file-diff');
+const EOL = require('os').EOL;
+const rxEOL = new RegExp(EOL, 'g');
+const isBinaryFile = require('isbinaryfile').sync;
+const canEdit = require('../utilities/open-editor').canEdit;
 
 function processTemplate(content, context) {
-  var options = {
-    evaluate:    /<%([\s\S]+?)%>/g,
+  let options = {
+    evaluate: /<%([\s\S]+?)%>/g,
     interpolate: /<%=([\s\S]+?)%>/g,
-    escape:      /<%-([\s\S]+?)%>/g
+    escape: /<%-([\s\S]+?)%>/g,
   };
-  return template(content, options)(context);
+  return require('lodash/template')(content, options)(context);
 }
 
 function diffHighlight(line) {
@@ -32,142 +30,154 @@ function diffHighlight(line) {
   }
 }
 
-FileInfo.prototype.confirmOverwrite = function(path) {
-  var promptOptions = {
-    type: 'expand',
-    name: 'answer',
-    default: false,
-    message: chalk.red('Overwrite') + ' ' + path + '?',
-    choices: [
-      { key: 'y', name: 'Yes, overwrite', value: 'overwrite' },
-      { key: 'n', name: 'No, skip', value: 'skip' },
-      { key: 'd', name: 'Diff', value: 'diff' }
-    ]
-  };
-
-  if (canEdit()) {
-    promptOptions.choices.push({ key: 'e', name: 'Edit', value: 'edit' });
+class FileInfo {
+  constructor(options) {
+    this.action = options.action;
+    this.outputBasePath = options.outputBasePath;
+    this.outputPath = options.outputPath;
+    this.displayPath = options.displayPath;
+    this.inputPath = options.inputPath;
+    this.templateVariables = options.templateVariables;
+    this.ui = options.ui;
   }
 
-  return this.ui.prompt(promptOptions)
-    .then(function(response) {
-      return response.answer;
-    });
-};
+  confirmOverwrite(path) {
+    let promptOptions = {
+      type: 'expand',
+      name: 'answer',
+      default: false,
+      message: `${chalk.red('Overwrite')} ${path}?`,
+      choices: [
+        { key: 'y', name: 'Yes, overwrite', value: 'overwrite' },
+        { key: 'n', name: 'No, skip', value: 'skip' },
+      ],
+    };
 
-FileInfo.prototype.displayDiff = function() {
-  var info = this,
-      jsdiff = require('diff');
-  return Promise.hash({
-    input: this.render(),
-    output: readFile(info.outputPath)
-  }).then(function(result) {
-    var diff = jsdiff.createPatch(
-      info.outputPath, result.output.toString(), result.input
+    let outputPathIsFile = false;
+    try { outputPathIsFile = fs.statSync(this.outputPath).isFile(); } catch (err) { /* ignore */ }
+
+    let canDiff = (
+      !isBinaryFile(this.inputPath) && (
+        !outputPathIsFile ||
+        !isBinaryFile(this.outputPath)
+      )
     );
-    var lines = diff.split('\n');
 
-    for (var i = 0; i < lines.length; i++) {
-      info.ui.write(
-        diffHighlight(lines[i] + EOL)
-      );
+    if (canDiff) {
+      promptOptions.choices.push({ key: 'd', name: 'Diff', value: 'diff' });
+
+      if (canEdit()) {
+        promptOptions.choices.push({ key: 'e', name: 'Edit', value: 'edit' });
+      }
     }
-  });
-};
 
-function FileInfo(options) {
-  this.action = options.action;
-  this.outputPath = options.outputPath;
-  this.displayPath = options.displayPath;
-  this.inputPath =  options.inputPath;
-  this.templateVariables = options.templateVariables;
-  this.ui = options.ui;
-}
+    return this.ui.prompt(promptOptions)
+      .then(response => response.answer);
+  }
 
-FileInfo.prototype.render = function() {
-  var path = this.inputPath,
-      context = this.templateVariables;
-  if (!this.rendered) {
-    this.rendered = readFile(path).then(function(content) {
-      return lstat(path).then(function(fileStat) {
-        if (isBinaryFile.sync(content, fileStat.size)) {
-          return content;
-        } else {
-          try {
-            return processTemplate(content.toString(), context);
-          } catch (err) {
-            err.message += ' (Error in blueprint template: ' + path + ')';
-            throw err;
-          }
+  displayDiff() {
+    let info = this,
+        jsdiff = require('diff');
+    return RSVP.hash({
+      input: this.render(),
+      output: fs.readFile(info.outputPath),
+    }).then(result => {
+      let diff = jsdiff.createPatch(
+        info.outputPath, result.output.toString().replace(rxEOL, '\n'), result.input.replace(rxEOL, '\n')
+      );
+      let lines = diff.split('\n');
+
+      for (let i = 0; i < lines.length; i++) {
+        info.ui.write(
+          diffHighlight(lines[i] + EOL)
+        );
+      }
+    });
+  }
+
+  render() {
+    let path = this.inputPath,
+        context = this.templateVariables;
+    if (!this.rendered) {
+      this.rendered = fs.readFile(path)
+        .then(content => fs.stat(path)
+          .then(fileStat => {
+            if (isBinaryFile(content, fileStat.size)) {
+              return content;
+            } else {
+              try {
+                return processTemplate(content.toString(), context);
+              } catch (err) {
+                err.message += ` (Error in blueprint template: ${path})`;
+                throw err;
+              }
+            }
+          }));
+    }
+    return this.rendered;
+  }
+
+  checkForConflict() {
+    return new Promise((resolve, reject) => {
+      fs.exists(this.outputPath, (doesExist, error) => {
+        if (error) {
+          reject(error);
+          return;
         }
+        let result;
+
+        if (doesExist) {
+          result = RSVP.hash({
+            input: this.render(),
+            output: fs.readFile(this.outputPath),
+          }).then(result => {
+            let type;
+            if (result.input.toString().replace(rxEOL, '\n') === result.output.toString().replace(rxEOL, '\n')) {
+              type = 'identical';
+            } else {
+              type = 'confirm';
+            }
+            return type;
+          });
+        } else {
+          result = 'none';
+        }
+
+        resolve(result);
       });
     });
   }
-  return this.rendered;
-};
 
-FileInfo.prototype.checkForConflict = function() {
-  return new Promise(function (resolve, reject) {
-    fs.exists(this.outputPath, function (doesExist, error) {
-      if (error) {
-        reject(error);
-        return;
-      }
+  confirmOverwriteTask() {
+    let info = this;
 
-      var result;
-
-      if (doesExist) {
-        result = Promise.hash({
-          input: this.render(),
-          output: readFile(this.outputPath)
-        }).then(function(result) {
-          var type;
-          if (result.input === result.output.toString()) {
-            type = 'identical';
-          } else {
-            type = 'confirm';
-          }
-          return type;
-        }.bind(this));
-      } else {
-        result = 'none';
-      }
-
-      resolve(result);
-    }.bind(this));
-  }.bind(this));
-};
-
-FileInfo.prototype.confirmOverwriteTask = function() {
-  var info = this;
-
-  return function() {
-    return new Promise(function(resolve, reject) {
-      function doConfirm() {
-        info.confirmOverwrite(info.displayPath).then(function(action) {
-          if (action === 'diff') {
-            info.displayDiff().then(doConfirm, reject);
-          } else if (action === 'edit') {
-            var editFileDiff = new EditFileDiff({info: info});
-            editFileDiff.edit().then(function() {
-              info.action = action;
-              resolve(info);
-            }).catch(function() {
-              doConfirm()
-                .finally(function() {
+    return function() {
+      return new Promise((resolve, reject) => {
+        function doConfirm() {
+          info.confirmOverwrite(info.displayPath).then(action => {
+            if (action === 'diff') {
+              info.displayDiff().then(doConfirm, reject);
+            } else if (action === 'edit') {
+              let editFileDiff = new EditFileDiff({ info });
+              editFileDiff.edit().then(() => {
+                info.action = action;
+                resolve(info);
+              }).catch(() => {
+                doConfirm().finally(() => {
                   resolve(info);
                 });
-            });
-          } else {
-            info.action = action;
-            resolve(info);
-          }
-        }, reject);
-      }
+              });
+            } else {
+              info.action = action;
+              resolve(info);
+            }
+          }, reject);
+        }
 
-      doConfirm();
-    });
-  }.bind(this);
-};
+        doConfirm();
+      });
+    }.bind(this);
+  }
+}
 
 module.exports = FileInfo;

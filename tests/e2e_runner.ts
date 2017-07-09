@@ -39,7 +39,7 @@ Error.stackTraceLimit = Infinity;
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = minimist(process.argv.slice(2), {
-  'boolean': ['debug', 'nolink', 'nightly', 'noproject', 'verbose', 'eject'],
+  'boolean': ['debug', 'nolink', 'nightly', 'noproject', 'verbose', 'eject', 'appveyor'],
   'string': ['glob', 'ignore', 'reuse', 'ng-sha', ]
 });
 

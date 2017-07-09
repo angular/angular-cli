@@ -16,5 +16,9 @@ export default function(skipCleaning: () => void) {
                + 'type: undefined, decorators.*Inject.*args: .*DOCUMENT.*'))
     .then(() => expectFileToMatch('dist/app.main.js',
       new RegExp('AppComponent.ctorParameters = .*MyInjectable'))
+    .then(() => expectFileToMatch('dist/app.main.js',
+      /AppModule \*\/\].*\.testProp = \'testing\'/))
+    .then(() => expectFileToMatch('dist/app.main.js',
+      /renderModuleFactory \*\/\].*\/\* AppModuleNgFactory \*\/\]/))
     .then(() => skipCleaning());
 }

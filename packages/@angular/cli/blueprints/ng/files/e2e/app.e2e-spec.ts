@@ -1,16 +1,14 @@
-import { <%= jsComponentName %>Page } from './app.po';
+import { AppPage } from './app.po';
 
 describe('<%= htmlComponentName %> App', () => {
-  let page: <%= jsComponentName %>Page;
+  let page: AppPage;
 
   beforeEach(() => {
-    page = new <%= jsComponentName %>Page();
+    page = new AppPage();
   });
 
-  it('should display welcome message', done => {
+  it('should display welcome message', () => {
     page.navigateTo();
-    page.getParagraphText()
-      .then(msg => expect(msg).toEqual('Welcome to <%= prefix %>!!'))
-      .then(done, done.fail);
+    expect(page.getParagraphText()).toEqual('Welcome to <%= prefix %>!');
   });
 });

@@ -1,7 +1,6 @@
 'use strict';
 
-var Promise = require('../ext/promise');
-var spawn = require('child_process').spawn;
+const spawn = require('child_process').spawn;
 
 function openEditor(file) {
   if (!openEditor.canEdit()) {
@@ -12,12 +11,12 @@ function openEditor(file) {
     throw new Error('No `file` option provided');
   }
 
-  var editorArgs  = openEditor._env().EDITOR.split(' ');
-  var editor      = editorArgs.shift();
-  var editProcess = openEditor._spawn(editor, [file].concat(editorArgs), {stdio: 'inherit'});
+  let editorArgs = openEditor._env().EDITOR.split(' ');
+  let editor = editorArgs.shift();
+  let editProcess = openEditor._spawn(editor, [file].concat(editorArgs), { stdio: 'inherit' });
 
-  return new Promise(function(resolve, reject) {
-    editProcess.on('close', function (code) {
+  return new Promise((resolve, reject) => {
+    editProcess.on('close', code => {
       if (code === 0) {
         resolve();
       } else {

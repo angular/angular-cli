@@ -15,7 +15,12 @@ export default Blueprint.extend({
     { name: 'routing', type: Boolean, default: false },
     { name: 'inline-style', type: Boolean, default: false, aliases: ['is'] },
     { name: 'inline-template', type: Boolean, default: false, aliases: ['it'] },
-    { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] }
+    { name: 'skip-git', type: Boolean, default: false, aliases: ['sg'] },
+    { name: 'minimal',
+      type: Boolean,
+      default: false,
+      description: 'Should create a minimal app.'
+     }
   ],
 
   beforeInstall: function(options: any) {
@@ -26,6 +31,12 @@ export default Blueprint.extend({
   },
 
   locals: function(options: any) {
+    if (options.minimal) {
+      options.inlineStyle = true;
+      options.inlineTemplate = true;
+      options.skipTests = true;
+    }
+
     this.styleExt = options.style === 'stylus' ? 'styl' : options.style;
     if (!options.style) {
       this.styleExt = CliConfig.getValue('defaults.styleExt') || 'css';
@@ -54,7 +65,8 @@ export default Blueprint.extend({
       routing: options.routing,
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
-      tests: this.tests
+      tests: this.tests,
+      minimal: options.minimal
     };
   },
 
@@ -76,6 +88,14 @@ export default Blueprint.extend({
 
     if (this.options && this.options.skipTests) {
       fileList = fileList.filter(p => p.indexOf('app.component.spec.ts') < 0);
+    }
+
+    if (this.options && this.options.minimal) {
+      const toRemoveList: RegExp[] = [/e2e\//, /editorconfig/, /README/, /karma.conf.js/,
+        /protractor.conf.js/, /test.ts/, /tsconfig.spec.json/, /tslint.json/, /favicon.ico/];
+      fileList = fileList.filter(p => {
+        return !toRemoveList.some(re => re.test(p));
+      });
     }
 
     const cliConfig = CliConfig.fromProject();

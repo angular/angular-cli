@@ -67,6 +67,16 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 </details>
 
 <details>
+  <summary>environment</summary>
+  <p>
+    <code>--environment</code> (aliases: <code>-e</code>)
+  </p>
+  <p>
+    Defines the build environment.
+  </p>
+</details>
+
+<details>
   <summary>log-level</summary>
   <p>
     <code>--log-level</code>

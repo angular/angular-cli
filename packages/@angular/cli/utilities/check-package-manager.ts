@@ -1,17 +1,13 @@
 import * as chalk from 'chalk';
 import {exec} from 'child_process';
 import {CliConfig} from '../models/config';
+import denodeify = require('denodeify');
 
-const Promise = require('../ember-cli/lib/ext/promise');
-const execPromise = Promise.denodeify(exec);
+const execPromise = denodeify(exec);
 const packageManager = CliConfig.fromGlobal().get('packageManager');
 
 
 export function checkYarnOrCNPM() {
-  if (packageManager !== 'default') {
-    return Promise.resolve();
-  }
-
   return Promise
       .all([checkYarn(), checkCNPM()])
       .then((data: Array<boolean>) => {
@@ -23,6 +19,11 @@ export function checkYarnOrCNPM() {
           console.log(chalk.yellow('You can `ng set --global packageManager=yarn`.'));
         } else if (isCNPMInstalled) {
           console.log(chalk.yellow('You can `ng set --global packageManager=cnpm`.'));
+        } else  {
+          if (packageManager !== 'default' && packageManager !== 'npm') {
+            console.log(chalk.yellow(`Seems that ${packageManager} is not installed.`));
+            console.log(chalk.yellow('You can `ng set --global packageManager=npm`.'));
+          }
         }
       });
 }

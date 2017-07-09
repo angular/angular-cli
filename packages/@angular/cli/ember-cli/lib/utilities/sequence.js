@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise = require('../ext/promise');
 /*
  *
  * given an array of functions, that may or may not return promises sequence
@@ -29,11 +28,11 @@ var Promise = require('../ext/promise');
  *
  */
 module.exports = function sequence(tasks) {
-  var length = tasks.length;
-  var current = Promise.resolve();
-  var results = new Array(length);
+  let length = tasks.length;
+  let current = Promise.resolve();
+  let results = new Array(length);
 
-  for (var i = 0; i < length; ++i) {
+  for (let i = 0; i < length; ++i) {
     current = results[i] = current.then(tasks[i]);
   }
 
