@@ -40,12 +40,20 @@ matrix:
       env: test
     - node_js: "6"
       os: linux
-      script: node tests/run_e2e.js "--glob=tests/build/**"
-      env: build
+      script: node tests/run_e2e.js "--ignore=**/tests/build/**" --nb-shards=4 --shard=0
+      env: e2e-0
     - node_js: "6"
       os: linux
-      script: travis_wait 120 node tests/run_e2e.js "--ignore=**/tests/build/**"
-      env: e2e
+      script: node tests/run_e2e.js "--ignore=**/tests/build/**" --nb-shards=4 --shard=1
+      env: e2e-1
+    - node_js: "6"
+      os: linux
+      script: node tests/run_e2e.js "--ignore=**/tests/build/**" --nb-shards=4 --shard=2
+      env: e2e-2
+    - node_js: "6"
+      os: linux
+      script: node tests/run_e2e.js "--ignore=**/tests/build/**" --nb-shards=4 --shard=3
+      env: e2e-3
     - node_js: "6"
       os: linux
       script: node tests/run_e2e.js --eject "--glob=tests/build/**"
