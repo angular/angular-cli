@@ -28,10 +28,10 @@ export default function() {
       oldNumberOfFiles = currentNumberOfDistFiles;
 
       if (!distFiles.includes('lazy.module.chunk.js')){
-        throw new Error('The bundle for the lazy module did not have a name.');
+        throw new Error('The chunk for the lazy module did not have a name.');
       }
       if (!distFiles.includes('lazy.module.0.chunk.js')){
-        throw new Error('The bundle for the lazy module did not use a unique name.');
+        throw new Error('The chunk for the lazy module did not use a unique name.');
       }
     })
     // verify System.import still works
@@ -43,10 +43,14 @@ export default function() {
       System.import('./lazy-' + lazyFile);
     `))
     .then(() => ng('build'))
-    .then(() => readdirSync('dist').length)
-    .then(currentNumberOfDistFiles => {
+    .then(() => readdirSync('dist'))
+    .then((distFiles) => {
+      const currentNumberOfDistFiles = distFiles.length;
       if (oldNumberOfFiles >= currentNumberOfDistFiles) {
         throw new Error('A bundle for the lazy file was not created.');
+      }
+      if (!distFiles.includes('lazy-file.chunk.js')) {
+        throw new Error('The chunk for the lazy file did not have a name.');
       }
       oldNumberOfFiles = currentNumberOfDistFiles;
     })

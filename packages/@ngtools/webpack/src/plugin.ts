@@ -310,11 +310,7 @@ export class AotPlugin implements Tapable {
               .map((key) => {
                 const value = this._lazyRoutes[key];
                 if (value !== null) {
-                  const dep = new ContextElementDependency(value, key);
-                  // lazyRouteChunkName is used by webpack.NamedChunksPlugin to give the
-                  // lazy loaded chunk a name.
-                  dep.lazyRouteChunkName = path.basename(key, '.ts');
-                  return dep;
+                  return new ContextElementDependency(value, key);
                 } else {
                   return null;
                 }
