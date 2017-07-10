@@ -83,6 +83,7 @@ matrix:
       deploy:
       - provider: script
         script: node scripts/git-builds.js
+        skip_cleanup: true
         on:
           all_branches: true
     - stage: deploy
@@ -91,6 +92,7 @@ matrix:
       deploy:
       - provider: script
         script: node scripts/publish/publish.js
+        skip_cleanup: true
         on:
           tags: true
 
