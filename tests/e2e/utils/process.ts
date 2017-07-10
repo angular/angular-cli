@@ -139,11 +139,12 @@ export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], m
 
 let npmInstalledEject = false;
 export function ng(...args: string[]) {
+  const argv = getGlobalVariable('argv');
+  const maybeSilentNg = argv['nosilent'] ? noSilentNg : silentNg;
   if (['build', 'serve', 'test', 'e2e', 'xi18n'].indexOf(args[0]) != -1) {
     // If we have the --eject, use webpack for the test.
-    const argv = getGlobalVariable('argv');
     if (args[0] == 'build' && argv.eject) {
-      return silentNg('eject', ...args.slice(1), '--force')
+      return maybeSilentNg('eject', ...args.slice(1), '--force')
         .then(() => {
           if (!npmInstalledEject) {
             npmInstalledEject = true;
@@ -153,12 +154,20 @@ export function ng(...args: string[]) {
         })
         .then(() => rimraf('dist'))
         .then(() => _exec({silent: true}, 'node_modules/.bin/webpack', []));
+    } else if (args[0] == 'e2e') {
+      // Wait 1 second before running any end-to-end test.
+      return new Promise(resolve => setTimeout(resolve, 1000))
+        .then(() => maybeSilentNg(...args));
     }
 
-    return silentNg(...args);
+    return maybeSilentNg(...args);
   } else {
-    return _exec({}, 'ng', args);
+    return noSilentNg(...args);
   }
+}
+
+export function noSilentNg(...args: string[]) {
+  return _exec({}, 'ng', args);
 }
 
 export function silentNg(...args: string[]) {
