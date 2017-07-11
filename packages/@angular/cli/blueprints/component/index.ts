@@ -238,11 +238,12 @@ export default Blueprint.extend({
     const returns: Array<any> = [];
     const className = stringUtils.classify(`${options.entity.name}Component`);
     const fileName = stringUtils.dasherize(`${options.entity.name}.component`);
-    const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
-    const normalizeRelativeDir = componentDir.startsWith('.') ? componentDir : `./${componentDir}`;
-    const importPath = componentDir ? `${normalizeRelativeDir}/${fileName}` : `./${fileName}`;
 
     if (!options.skipImport) {
+      const componentDir = path.relative(path.dirname(this.pathToModule), this.generatePath);
+      const normalizeRelativeDir = componentDir.startsWith('.') ? componentDir : `./${componentDir}`;
+      const importPath = componentDir ? `${normalizeRelativeDir}/${fileName}` : `./${fileName}`;
+
       if (options.dryRun) {
         this._writeStatusToUI(chalk.yellow,
           'update',
