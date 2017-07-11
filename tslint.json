@@ -20,7 +20,6 @@
     ],
     "eofline": true,
     "import-spacing": true,
-    "linebreak-style": [true, "LF"],
     "match-default-export-name": true,
     "newline-before-return": true,
     "no-consecutive-blank-lines": [true, 2],
