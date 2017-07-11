@@ -1,0 +1,17 @@
+{
+  "name": "@angular-devkit/build-optimizer",
+  "version": "0.0.0",
+  "description": "Angular Build Optimizer",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "bin": {
+    "build-optimizer": "./src/build-optimizer/cli.js",
+    "purify": "./src/purify/cli.js"
+  },
+  "dependencies": {
+    "loader-utils": "^1.1.0",
+    "magic-string": "^0.19.1",
+    "source-map": "^0.5.6",
+    "typescript": "^2.3.3"
+  }
+}

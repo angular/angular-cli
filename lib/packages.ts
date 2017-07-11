@@ -71,7 +71,9 @@ function loadPackageJson(p: string) {
 const packageJsonPaths =
   glob.sync(path.join(packageRoot, '**/package.json'))
     // Removing all files from templates.
-    .filter(p => !p.match(/\/angular.*files\//));
+    .filter(p => !p.match(/\/angular.*files\//))
+    // Remove extra build-optimizer package.json.
+    .filter(p => !p.match(/\/build_optimizer\/webpack-loader\//));
 
 
 // All the supported packages. Go through the packages directory and create a _map of
