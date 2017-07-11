@@ -153,11 +153,11 @@ export class VirtualTree implements Tree {
     }
     this.set(new SimpleFileEntry(path, content as Buffer));
   }
-  protected _rename(path: SchematicPath, to: SchematicPath, action?: Action) {
+  protected _rename(path: SchematicPath, to: SchematicPath, action?: Action, force = false) {
     if (!this._cacheMap.has(path)) {
       throw new FileDoesNotExistException(path);
     }
-    if (this._cacheMap.has(to)) {
+    if (this._cacheMap.has(to) && !force) {
       throw new FileAlreadyExistException(to);
     }
 
@@ -208,7 +208,11 @@ export class VirtualTree implements Tree {
         }
         break;
 
-      case 'r': this._rename(action.path, action.to, action); break;
+      case 'r':
+        const force = (strategy & MergeStrategy.AllowOverwriteConflict) != 0;
+        this._rename(action.path, action.to, action, force);
+        break;
+
       case 'd': this._delete(action.path, action); break;
 
       default: throw new UnknownActionException(action);
