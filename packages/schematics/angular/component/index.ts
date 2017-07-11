@@ -27,7 +27,7 @@ import * as stringUtils from '../strings';
 
 import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
-import {buildRelativePath, findModule} from '../utility/find-module';
+import { buildRelativePath, findModule } from '../utility/find-module';
 
 
 function addDeclarationToNgModule(options: any): Rule {
@@ -36,7 +36,15 @@ function addDeclarationToNgModule(options: any): Rule {
       return host;
     }
 
-    const modulePath = findModule(host, options.sourceDir + '/' + options.path);
+    let modulePath;
+    if (options.module) {
+      if (!host.exists(options.module)) {
+        throw new Error(`Module specified (${options.module}) does not exist.`);
+      }
+      modulePath = options.module;
+    } else {
+      modulePath = findModule(host, options.sourceDir + '/' + options.path);
+    }
 
     const sourceText = host.read(modulePath) !.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);

@@ -8,6 +8,7 @@
 // TODO: replace `options: any` with an actual type generated from the schema.
 // tslint:disable:no-any
 import {
+  MergeStrategy,
   Rule,
   Tree,
   apply,
@@ -76,5 +77,10 @@ export default function (options: any): Rule {
       flat: true,
     }),
     addBootstrapToNgModule(options.directory),
+    mergeWith(
+      apply(url('./helper-files'), [
+        template({ utils: stringUtils, ...options }),
+        move(options.directory + '/' + options.sourceDir + '/app'),
+      ]), MergeStrategy.Overwrite),
   ]);
 };
