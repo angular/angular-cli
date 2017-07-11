@@ -54,22 +54,22 @@ matrix:
     # Optional builds.
     - node_js: "6"
       os: linux
-      before_install: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
+      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js --ng2 "--glob=tests/{build,test,misc}/**"
       env: ng2
     - node_js: "6"
       os: linux
-      before_install: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
+      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js "--nightly --glob=tests/{build,test,misc}/**"
       env: nightly
     - node_js: "7"
       os: linux
-      before_install: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
+      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js "--glob=tests/{build,test,misc}/**"
       env: node7
     - node_js: "8"
       os: linux
-      before_install: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
+      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js "--glob=tests/build/**"
       env: node8
 
