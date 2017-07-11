@@ -8,11 +8,6 @@ cache:
   directories:
      - ./node_modules
 
-env:
-  global:
-    - DBUS_SESSION_BUS_ADDRESS=/dev/null
-
-
 matrix:
   fast_finish: true
   allow_failures:
@@ -109,6 +104,7 @@ install:
 
 env:
   global:
+    - DBUS_SESSION_BUS_ADDRESS=/dev/null
     # GITHUB_ACCESS_TOKEN=<github token, a personal access token of the angular-builds account, account access in valentine>
     # This is needed to publish packages to github for continuous packages delivery.
     - secure: "XUM1RCN/ZH34ju2PI9eHPRMnSlbj45XcBx/ZnZ13wfau60iJCveU7Ded8SC8uwGDp58rGGePXyJfh5l5dAnIWbSAGNKlrEgGTr41RSCbyzrV6m4lAcwNzUo/PkKum1vAApk21PqscrSSWOBAOC3nMCln25GLzgUMm6G8FBOc599NuszcoQvru+H+4JthSHn4l/nmeTZDs2oCBvwnmng/78rEW5CXvJEpAwuaaZLvzzIFdoZu+SuceYvGnL5xHo0ppPF/0NYzZlb7KBKREp44Lq1lOKlDtH5wqjEi7b2aA7/GnesOgLUBmbbSVUzmCxs6PtzGhD56aiL2Qtu8c4LZyvNfzPXSLbx8ljYmdytHkio9w3377wWFRXJDfIsgv9JKHxxyA0T34yzQkqWbgWKPMgJ3om+lb875iXAtXfNyS0trnN+rwLZZtFxygjHyx8IWY+NZD5i5fyjMdFyetNxbHe3ktI73nY+Tl6hDqJXvN8WwQlMovLNUMcY4wGUoPooLka9L+94uetbf3U4KVgshrLHI59jMZsO0qrDGsCZMubHEy80acrNkCTi/uGIbVR0KF94z81VF+S7edYv80AkQTRijpgNV34045L/IqSHgbueozRgVFj2arkAGGFjLlZJifmsRC/Eq1ZWkKsKY/1NusKssCRtycJQjeLOW0qV1T0w="
