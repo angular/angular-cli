@@ -27,19 +27,19 @@ matrix:
       env: test
     - node_js: "6"
       os: linux
-      script: node tests/run_e2e.js "--ignore=**/tests/build/**" --nb-shards=4 --shard=0 --nosilent
+      script: node tests/run_e2e.js --nb-shards=4 --shard=0 --nosilent
       env: e2e-0
     - node_js: "6"
       os: linux
-      script: node tests/run_e2e.js "--ignore=**/tests/build/**" --nb-shards=4 --shard=1 --nosilent
+      script: node tests/run_e2e.js --nb-shards=4 --shard=1 --nosilent
       env: e2e-1
     - node_js: "6"
       os: linux
-      script: node tests/run_e2e.js "--ignore=**/tests/build/**" --nb-shards=4 --shard=2 --nosilent
+      script: node tests/run_e2e.js --nb-shards=4 --shard=2 --nosilent
       env: e2e-2
     - node_js: "6"
       os: linux
-      script: node tests/run_e2e.js "--ignore=**/tests/build/**" --nb-shards=4 --shard=3 --nosilent
+      script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent
       env: e2e-3
     - node_js: "6"
       os: linux
