@@ -71,7 +71,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
 
     // Load the Webpack plugin for manifest generation and install it.
     const AngularServiceWorkerPlugin = require('@angular/service-worker/build/webpack')
-        .AngularServiceWorkerPlugin;
+      .AngularServiceWorkerPlugin;
     extraPlugins.push(new AngularServiceWorkerPlugin({
       baseHref: buildOptions.baseHref || '/',
     }));
@@ -111,9 +111,10 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       }),
       new webpack.HashedModuleIdsPlugin(),
       new webpack.optimize.ModuleConcatenationPlugin(),
-      new webpack.optimize.UglifyJsPlugin({
+      new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8: true },
         compress: uglifyCompressOptions,
+        output: { ascii_only: true },
         sourceMap: buildOptions.sourcemaps,
         comments: false
       })
