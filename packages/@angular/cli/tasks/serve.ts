@@ -152,6 +152,9 @@ export default Task.extend({
       }
     }
 
+
+    console.log(`### poll `, serveTaskOptions.poll);
+
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {

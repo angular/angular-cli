@@ -270,7 +270,10 @@ export class AotPlugin implements Tapable {
 
       if (compiler.watchFileSystem.watcher) {
         compiler.watchFileSystem.watcher.once('aggregated', (changes: string[]) => {
-          changes.forEach((fileName: string) => this._compilerHost.invalidate(fileName));
+          changes.forEach((fileName: string) => {
+            console.log('\n### changed file ', fileName)
+            return this._compilerHost.invalidate(fileName);
+          });
         });
       }
     });
