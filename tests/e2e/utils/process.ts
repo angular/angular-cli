@@ -52,7 +52,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
     if (options.silent) {
       return;
     }
-    data.toString('utf-8')
+    (`# ${(new Date()).toISOString()}: ` + data.toString('utf-8'))
       .split(/[\n\r]+/)
       .filter(line => line !== '')
       .forEach(line => console.log('  ' + line));
@@ -62,7 +62,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
     if (options.silent) {
       return;
     }
-    data.toString('utf-8')
+    (`# ${(new Date()).toISOString()}: ` + data.toString('utf-8'))
       .split(/[\n\r]+/)
       .filter(line => line !== '')
       .forEach(line => console.error(yellow('  ' + line)));
@@ -133,7 +133,7 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
 }
 
 export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
-  return _exec({ silent: true, waitForMatch: match }, cmd, args);
+  return _exec({ silent: false, waitForMatch: match }, cmd, args);
 }
 
 

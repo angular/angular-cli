@@ -13,4 +13,4 @@ jobs:
           key: angular-cli-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - "node_modules"
-      - run: xvfb-run -a node tests/run_e2e.js --glob=tests/build/**
+      - run: xvfb-run -a node tests/run_e2e.js --glob=tests/build/poll.ts
