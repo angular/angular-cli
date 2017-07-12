@@ -25,6 +25,11 @@
       "description": "Create an enumeration.",
       "schema": "./enum/schema.json"
     },
+    "guard": {
+      "factory": "./guard",
+      "description": "Create an guard.",
+      "schema": "./guard/schema.json"
+    },
     "interface": {
       "factory": "./interface",
       "description": "Create an interface.",

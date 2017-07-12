@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularGuard",
+  "title": "Angular Guard Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "spec": {
+      "type": "boolean",
+      "default": true
+    },
+    "flat": {
+      "type": "boolean",
+      "default": false
+    },
+    "module":  {
+      "type": "string",
+      "description": "Allows specification of the declaring module.",
+      "alias": "m",
+      "subtype": "filepath"
+    },
+    "path": {
+      "type": "string",
+      "default": "app"
+    },
+    "sourceDir": {
+      "type": "string",
+      "default": "src"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
