@@ -65,6 +65,7 @@
     "isbinaryfile": "^3.0.0",
     "istanbul-instrumenter-loader": "^2.0.0",
     "json-loader": "^0.5.4",
+    "karma-source-map-support": "^1.2.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.2",
     "license-webpack-plugin": "^0.4.3",
