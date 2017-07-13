@@ -86,7 +86,7 @@
     "webpack-dev-middleware": "^1.11.0",
     "webpack-dev-server": "~2.4.5",
     "webpack-merge": "^2.4.0",
-    "zone.js": "^0.8.4"
+    "zone.js": "0.8.12"
   },
   "optionalDependencies": {
     "node-sass": "^4.3.0"
