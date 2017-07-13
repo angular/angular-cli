@@ -125,6 +125,10 @@ const ServeCommand = Command.extend({
       .then(port => {
         commandOptions.port = port;
 
+        // enable Angular DLL for development serving only.
+        // DLL's don't work well with scope hoisting (production)
+        commandOptions.angularLib = commandOptions.target === 'development';
+
         const serve = new ServeTask({
           ui: this.ui,
           project: this.project,
