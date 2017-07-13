@@ -50,6 +50,7 @@ export class AotPlugin implements Tapable {
   private _compilerHost: WebpackCompilerHost;
   private _resourceLoader: WebpackResourceLoader;
   private _lazyRoutes: LazyRouteMap = Object.create(null);
+  private _discoveredLazyRoutes: LazyRouteMap;
   private _tsConfigPath: string;
   private _entryModule: string;
 
@@ -485,25 +486,28 @@ export class AotPlugin implements Tapable {
         }
       })
       .then(() => {
+        if (!this.firstRun) {
+          this._discoveredLazyRoutes = this._findLazyRoutesInAst();
+        }
         // Populate the file system cache with the virtual module.
         this._compilerHost.populateWebpackResolver(this._compiler.resolvers.normal);
       })
       .then(() => {
         // We need to run the `listLazyRoutes` the first time because it also navigates libraries
         // and other things that we might miss using the findLazyRoutesInAst.
-        let discoveredLazyRoutes: LazyRouteMap = this.firstRun ?
-          __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
+        if (this.firstRun) {
+          this._discoveredLazyRoutes = __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
             program: this._program,
             host: this._compilerHost,
             angularCompilerOptions: this._angularCompilerOptions,
             entryModule: this._entryModule
-          })
-          : this._findLazyRoutesInAst();
+          });
+        }
 
         // Process the lazy routes discovered.
-        Object.keys(discoveredLazyRoutes)
+        Object.keys(this._discoveredLazyRoutes)
           .forEach(k => {
-            const lazyRoute = discoveredLazyRoutes[k];
+            const lazyRoute = this._discoveredLazyRoutes[k];
             k = k.split('#')[0];
             if (lazyRoute === null) {
               return;
