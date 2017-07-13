@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {Observable} from 'rxjs/Observable';
-
 import {LogEntry, Logger} from './logger';
 
 

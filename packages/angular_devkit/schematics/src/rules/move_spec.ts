@@ -5,12 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {SchematicContext} from '../engine/interface';
-import {callRule} from './call';
-
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
+import {SchematicContext} from '../engine/interface';
 import {VirtualTree} from '../tree/virtual';
+import {callRule} from './call';
 import {move} from './move';
 
 

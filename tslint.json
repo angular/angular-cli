@@ -1,5 +1,14 @@
 {
+  "rulesDirectory": [
+    "dist/rules"
+  ],
   "rules": {
+    "import-groups": true,
+
+    "import-blacklist": [
+      true,
+      "rxjs"
+    ],
     "align": [
       true,
       "elements",
@@ -71,6 +80,10 @@
       }
     ],
     "curly": true,
+    "file-header": [
+      true,
+      "Copyright Google Inc\\. All Rights Reserved."
+    ],
     "variable-name": [
       true,
       "ban-keywords",
@@ -82,9 +95,12 @@
       true,
       "check-branch",
       "check-decl",
+      "check-module",
+      "check-preblock",
       "check-operator",
       "check-separator",
-      "check-type"
+      "check-type",
+      "check-typecast"
     ]
   }
 }

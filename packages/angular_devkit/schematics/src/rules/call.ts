@@ -5,12 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {Observable} from 'rxjs/Observable';
 import {Rule, SchematicContext, Source} from '../engine/interface';
 import {BaseException} from '../exception/exception';
 import {Tree} from '../tree/interface';
 import {VirtualTree} from '../tree/virtual';
-
-import {Observable} from 'rxjs/Observable';
 
 
 /**

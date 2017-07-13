@@ -5,13 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {JsonObject} from '../json/interface';
-
 import {Observable} from 'rxjs/Observable';
 import {PartialObserver} from 'rxjs/Observer';
 import {Operator} from 'rxjs/Operator';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
+import {JsonObject} from '../json/interface';
 
 
 export interface LoggerMetadata extends JsonObject {

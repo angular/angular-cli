@@ -19,10 +19,9 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import * as ts from 'typescript';
 import * as stringUtils from '../strings';
 import {addBootstrapToModule, addImportToModule} from '../utility/ast-utils';
-
-import * as ts from 'typescript';
 import {InsertChange} from '../utility/change';
 
 

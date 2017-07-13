@@ -5,18 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
-import {ExportStringRef} from './export-ref';
-import {FileSystemEngineHostBase} from './file-system-engine-host-base';
-
 import {
   CollectionDescription,
   RuleFactory,
   SchematicDescription,
 } from '@angular-devkit/schematics';
-
 import {existsSync} from 'fs';
 import {join} from 'path';
+import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
+import {ExportStringRef} from './export-ref';
+import {FileSystemEngineHostBase} from './file-system-engine-host-base';
 
 
 /**
@@ -68,7 +66,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
       return null;
     }
 
-    return <FileSystemCollectionDesc>desc;
+    return desc as FileSystemCollectionDesc;
   }
 
   protected _transformSchematicDescription(_name: string,
@@ -78,6 +76,6 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
       return null;
     }
 
-    return <FileSystemSchematicDesc>desc;
+    return desc as FileSystemSchematicDesc;
   }
 }

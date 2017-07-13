@@ -5,15 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {FileSystemTree} from '../tree/filesystem';
-import {InMemoryFileSystemTreeHost} from '../tree/memory-host';
-import {optimize} from '../tree/static';
-import {DryRunSink} from './dryrun';
-
 import * as fs from 'fs';
 import * as path from 'path';
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
+import {FileSystemTree} from '../tree/filesystem';
+import {InMemoryFileSystemTreeHost} from '../tree/memory-host';
+import {optimize} from '../tree/static';
+import {DryRunSink} from './dryrun';
 
 const temp = require('temp');
 

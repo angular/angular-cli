@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {JsonObject, Logger} from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
-
-import {JsonObject, Logger} from '@angular-devkit/core';
 import {packages} from '../lib/packages';
 
 const minimatch = require('minimatch');

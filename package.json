@@ -17,7 +17,7 @@
     "build": "npm run admin -- build",
     "build-tsc": "tsc -p tsconfig.json",
     "fix": "npm run lint -- --fix",
-    "lint": "tslint --config tslint.json --project tsconfig.json --type-check",
+    "lint": "tsc -p rules/tsconfig.json && tslint --config tslint.json --project tsconfig.json --type-check",
     "test": "node ./bin/devkit-admin test",
     "validate-commits": "./bin/devkit-admin validate-commits",
     "integration": "npm run build && npm run integration:build-optimizer",

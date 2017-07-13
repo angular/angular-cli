@@ -166,7 +166,7 @@ describe('VirtualTree', () => {
 
       tree.merge(tree2, MergeStrategy.Overwrite);
       const fileEntry = tree.get('/hello');
-      expect((<FileEntry>fileEntry).content.toString()).toEqual(newContent);
+      expect((fileEntry as FileEntry).content.toString()).toEqual(newContent);
     });
   });
 });

@@ -204,7 +204,7 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
         }
 
         const id = paExpr.name.text;
-        const moduleId = (<ts.Identifier>paExpr.expression).getText(source);
+        const moduleId = (paExpr.expression as ts.Identifier).getText(source);
 
         return id === identifier && (angularImports[moduleId + '.'] === module);
       }

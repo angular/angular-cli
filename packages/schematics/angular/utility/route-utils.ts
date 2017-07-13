@@ -30,7 +30,7 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
     // StringLiteral of the ImportDeclaration is the import file (fileName in this case).
     const importFiles = node.getChildren()
       .filter(child => child.kind === ts.SyntaxKind.StringLiteral)
-      .map(n => (<ts.StringLiteral>n).text);
+      .map(n => (n as ts.StringLiteral).text);
 
     return importFiles.filter(file => file === fileName).length === 1;
   });
@@ -51,7 +51,7 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
       return new NoopChange();
     }
 
-    const importTextNodes = imports.filter(n => (<ts.Identifier>n).text === symbolName);
+    const importTextNodes = imports.filter(n => (n as ts.Identifier).text === symbolName);
 
     // insert import if it's not there
     if (importTextNodes.length === 0) {

@@ -5,14 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as fs from 'fs';
+import * as glob from 'glob';
+import {join} from 'path';
 import {FileSystemTree} from '../tree/filesystem';
 import {InMemoryFileSystemTreeHost} from '../tree/memory-host';
 import {optimize} from '../tree/static';
 import {FileSystemSink} from './filesystem';
-
-import * as fs from 'fs';
-import * as glob from 'glob';
-import {join} from 'path';
 
 const temp = require('temp');
 

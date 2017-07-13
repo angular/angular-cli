@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
 
 
@@ -74,7 +81,7 @@ export function findTopLevelFunctions(parentNode: ts.Node): ts.Node[] {
       // This check was in the old ngo but it doesn't seem to make sense with the typings.
       // TODO(filipesilva): ask Alex Rickabaugh about it.
       // && !(<ts.CallExpression>node).expression.text
-      && (<ts.CallExpression>node).expression.kind !== ts.SyntaxKind.PropertyAccessExpression;
+      && (node as ts.CallExpression).expression.kind !== ts.SyntaxKind.PropertyAccessExpression;
   }
 
   ts.forEachChild(parentNode, cb);
@@ -88,10 +95,10 @@ export function findPureImports(parentNode: ts.Node): string[] {
 
   function cb(node: ts.Node) {
     if (node.kind === ts.SyntaxKind.ImportDeclaration
-      && (<ts.ImportDeclaration>node).importClause) {
+      && (node as ts.ImportDeclaration).importClause) {
 
       // Save the path of the import transformed into snake case
-      const moduleSpecifier = (<ts.ImportDeclaration>node).moduleSpecifier as ts.StringLiteral;
+      const moduleSpecifier = (node as ts.ImportDeclaration).moduleSpecifier as ts.StringLiteral;
       pureImports.push(moduleSpecifier.text.replace(/[\/@\-]/g, '_'));
     }
 

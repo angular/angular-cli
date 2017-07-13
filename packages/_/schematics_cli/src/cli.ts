@@ -22,7 +22,6 @@ import {
 import {SchemaClassFactory} from '@ngtools/json-schema';
 import * as minimist from 'minimist';
 import {Observable} from 'rxjs/Observable';
-
 import 'rxjs/add/operator/ignoreElements';
 
 

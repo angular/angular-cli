@@ -5,18 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {
+  ContentHasMutatedException,
+  FileAlreadyExistException,
+  FileDoesNotExistException,
+  InvalidUpdateRecordException,
+  MergeConflictException,
+} from '../exception/exception';
 import {SchematicPath, normalizePath} from '../utility/path';
 import {Action, ActionList, UnknownActionException} from './action';
 import {SimpleFileEntry} from './entry';
 import {FileEntry, MergeStrategy, Tree, UpdateRecorder} from './interface';
 import {UpdateRecorderBase} from './recorder';
-
-import {
-  ContentHasMutatedException,
-  FileAlreadyExistException,
-  FileDoesNotExistException,
-  InvalidUpdateRecordException, MergeConflictException,
-} from '../exception/exception';
 
 
 /**
