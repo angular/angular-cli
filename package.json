@@ -61,6 +61,7 @@
     "magic-string": "^0.22.2",
     "marked-terminal": "^2.0.0",
     "minimist": "^1.2.0",
+    "npm": "^5.2.0",
     "npm-run": "^4.1.2",
     "npm-run-all": "^4.0.0",
     "rxjs": "^5.0.1",
