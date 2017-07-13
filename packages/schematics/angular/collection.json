@@ -15,6 +15,11 @@
       "description": "Create an Angular component.",
       "schema": "./component/schema.json"
     },
+    "directive": {
+      "factory": "./directive",
+      "description": "Create an Angular directive.",
+      "schema": "./directive/schema.json"
+    },
     "enum": {
       "factory": "./enum",
       "description": "Create an enumeration.",

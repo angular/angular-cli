@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularClass",
+  "title": "Angular Class Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string",
+      "default": "app"
+    },
+    "sourceDir": {
+      "type": "string",
+      "default": "src"
+    },
+    "spec": {
+      "type": "boolean",
+      "description": "Specifies if a spec file is generated.",
+      "default": false
+    },
+    "skipImport": {
+      "type": "boolean",
+      "default": false
+    },
+    "selector": {
+      "type": "string"
+    },
+    "flat": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
