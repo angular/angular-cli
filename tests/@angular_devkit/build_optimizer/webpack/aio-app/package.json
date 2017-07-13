@@ -11,7 +11,7 @@
     "e2e": "concurrently \"npm run serve\" \"npm run protractor\" --kill-others --success first",
     "preprotractor": "webdriver-manager update",
     "protractor": "protractor protractor.config.js",
-    "benchmark": "npm run build && npm run build-no-ngo && npm run build-old-ngo && node benchmark.js && node parity-benchmark.js",
+    "benchmark": "npm run build && npm run build-no-ngo && node benchmark.js",
     "reinstall-bo": "rimraf node_modules/@angular-devkit/build-optimizer && npm i ../../../../../dist/@angular-devkit/build-optimizer/"
   },
   "dependencies": {
@@ -40,9 +40,7 @@
     "copy-webpack-plugin": "^4.0.1",
     "jasmine": "^2.6.0",
     "lite-server": "^2.3.0",
-    "ngo-loader": "alxhub/ngo",
     "protractor": "^5.1.2",
-    "purify": "igorminar/purify",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.1",
     "ts-node": "^3.0.4",

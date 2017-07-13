@@ -58,4 +58,13 @@ if (diffTotal > 1) {
   throw new Error('Total size difference is positive, ngo made the bundle bigger.');
 }
 
+// Cached value from building with alxhub/ngo and igorminar/purify. See webpack.config.old-ngo.js
+const oldNgoTotal = 642113;
+const diffParityTotal = sizeDiff(oldNgoTotal, ngoTotal);
+
+if (diffParityTotal > 2) {
+  console.log('');
+  throw new Error('Total size difference is positive and more than 2%, build-optimizer performed worse than old ngo.');
+}
+
 console.log('');
