@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/concat';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/merge';
@@ -13,10 +13,10 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/reduce';
-import {FileDoesNotExistException} from '../exception/exception';
-import {CreateFileAction} from '../tree/action';
-import {UpdateBuffer} from '../utility/update-buffer';
-import {SimpleSinkBase} from './sink';
+import { FileDoesNotExistException } from '../exception/exception';
+import { CreateFileAction } from '../tree/action';
+import { UpdateBuffer } from '../utility/update-buffer';
+import { SimpleSinkBase } from './sink';
 
 
 export interface VirtualFileSystemSinkHost {

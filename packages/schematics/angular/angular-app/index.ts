@@ -21,8 +21,8 @@ import {
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
-import {addBootstrapToModule, addImportToModule} from '../utility/ast-utils';
-import {InsertChange} from '../utility/change';
+import { addBootstrapToModule, addImportToModule } from '../utility/ast-utils';
+import { InsertChange } from '../utility/change';
 
 
 function addBootstrapToNgModule(directory: string): Rule {
@@ -82,4 +82,4 @@ export default function (options: any): Rule {
         move(options.directory + '/' + options.sourceDir + '/app'),
       ]), MergeStrategy.Overwrite),
   ]);
-};
+}

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import 'rxjs/add/operator/map';
-import {Logger} from './logger';
+import { Logger } from './logger';
 
 
 /**

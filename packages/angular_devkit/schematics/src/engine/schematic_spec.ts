@@ -5,13 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
-import {MergeStrategy, Tree} from '../tree/interface';
-import {branch, empty} from '../tree/static';
-import {CollectionDescription, Engine, Rule, SchematicDescription} from './interface';
-import {SchematicImpl} from './schematic';
+import { MergeStrategy, Tree } from '../tree/interface';
+import { branch, empty } from '../tree/static';
+import { CollectionDescription, Engine, Rule, SchematicDescription } from './interface';
+import { SchematicImpl } from './schematic';
 
 
 type CollectionT = {

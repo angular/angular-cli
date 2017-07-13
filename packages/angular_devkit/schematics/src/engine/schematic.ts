@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/concatMap';
-import {BaseException} from '../exception/exception';
-import {Tree} from '../tree/interface';
+import { BaseException } from '../exception/exception';
+import { Tree } from '../tree/interface';
 import {
   Collection,
   Engine,

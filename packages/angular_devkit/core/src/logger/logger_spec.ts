@@ -8,8 +8,8 @@
 // tslint:disable:no-any
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
-import {JsonValue} from '../json/interface';
-import {Logger} from './logger';
+import { JsonValue } from '../json/interface';
+import { Logger } from './logger';
 
 
 describe('Logger', () => {

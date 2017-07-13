@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {ContentHasMutatedException} from '../exception/exception';
-import {UpdateBuffer} from '../utility/update-buffer';
-import {FileEntry, UpdateRecorder} from './interface';
+import { ContentHasMutatedException } from '../exception/exception';
+import { UpdateBuffer } from '../utility/update-buffer';
+import { FileEntry, UpdateRecorder } from './interface';
 
 
 export class UpdateRecorderBase implements UpdateRecorder {

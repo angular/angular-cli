@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
-import {join} from 'path';
-import {FileSystemTreeHost} from './filesystem';
+import { join } from 'path';
+import { FileSystemTreeHost } from './filesystem';
 
 
 export class NodeJsHost implements FileSystemTreeHost {

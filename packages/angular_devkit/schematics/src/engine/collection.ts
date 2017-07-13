@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {SchematicEngine} from './engine';
-import {Collection, CollectionDescription, Schematic} from './interface';
+import { SchematicEngine } from './engine';
+import { Collection, CollectionDescription, Schematic } from './interface';
 
 
 export class CollectionImpl<CollectionT extends object, SchematicT extends object>

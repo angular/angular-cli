@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import {JsonObject} from '@angular-devkit/core';
+import { JsonObject } from '@angular-devkit/core';
 import * as glob from 'glob';
 import * as path from 'path';
 

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {createLogger} from '@angular-devkit/core';
+import { createLogger } from '@angular-devkit/core';
 import {
   DryRunEvent,
   DryRunSink,
@@ -19,9 +19,9 @@ import {
   FileSystemSchematicDesc,
   NodeModulesEngineHost,
 } from '@angular-devkit/schematics/tools';
-import {SchemaClassFactory} from '@ngtools/json-schema';
+import { SchemaClassFactory } from '@ngtools/json-schema';
 import * as minimist from 'minimist';
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/ignoreElements';
 
 
@@ -41,8 +41,8 @@ function usage(exitCode = 0): never {
         --force             Force overwriting files that would otherwise be an error.
         --list-schematics   List all schematics from the collection, by name.
         --help              Show this message.
-    
-    Any additional option is passed to the Schematics depending on 
+
+    Any additional option is passed to the Schematics depending on
   `.replace(/^\s\s\s\s/g, ''));  // To remove the indentation.
 
   process.exit(exitCode);

@@ -8,8 +8,8 @@
 // tslint:disable:no-any
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
-import {LogEntry} from './logger';
-import {TransformLogger} from './transform-logger';
+import { LogEntry } from './logger';
+import { TransformLogger } from './transform-logger';
 
 
 describe('TransformLogger', () => {

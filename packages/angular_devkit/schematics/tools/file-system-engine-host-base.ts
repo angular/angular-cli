@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {JsonObject} from '@angular-devkit/core';
+import { JsonObject } from '@angular-devkit/core';
 import {
   Collection,
   CollectionDescription,
@@ -16,11 +16,11 @@ import {
   Source,
   TypedSchematicContext,
 } from '@angular-devkit/schematics';
-import {dirname, join, resolve} from 'path';
-import {Url} from 'url';
-import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
-import {FileSystemHost} from './file-system-host';
-import {readJsonFile} from './file-system-utility';
+import { dirname, join, resolve } from 'path';
+import { Url } from 'url';
+import { FileSystemCollectionDescription, FileSystemSchematicDescription } from './description';
+import { FileSystemHost } from './file-system-host';
+import { readJsonFile } from './file-system-utility';
 
 
 /**

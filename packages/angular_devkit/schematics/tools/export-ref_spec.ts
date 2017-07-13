@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as path from 'path';
-import {ExportStringRef} from './export-ref';
-import {FileSystemHost} from './file-system-host';
+import { ExportStringRef } from './export-ref';
+import { FileSystemHost } from './file-system-host';
 
 
 describe('ExportStringRef', () => {

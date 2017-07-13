@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/defer';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/concat';
@@ -14,7 +14,7 @@ import 'rxjs/add/operator/ignoreElements';
 import 'rxjs/add/operator/last';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
-import {FileAlreadyExistException, FileDoesNotExistException} from '../exception/exception';
+import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import {
   Action,
   CreateFileAction,
@@ -24,7 +24,7 @@ import {
   UnknownActionException,
   isAction,
 } from '../tree/action';
-import {Tree} from '../tree/interface';
+import { Tree } from '../tree/interface';
 
 
 export interface Sink {

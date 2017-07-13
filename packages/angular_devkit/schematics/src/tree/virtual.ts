@@ -12,11 +12,11 @@ import {
   InvalidUpdateRecordException,
   MergeConflictException,
 } from '../exception/exception';
-import {SchematicPath, normalizePath} from '../utility/path';
-import {Action, ActionList, UnknownActionException} from './action';
-import {SimpleFileEntry} from './entry';
-import {FileEntry, MergeStrategy, Tree, UpdateRecorder} from './interface';
-import {UpdateRecorderBase} from './recorder';
+import { SchematicPath, normalizePath } from '../utility/path';
+import { Action, ActionList, UnknownActionException } from './action';
+import { SimpleFileEntry } from './entry';
+import { FileEntry, MergeStrategy, Tree, UpdateRecorder } from './interface';
+import { UpdateRecorderBase } from './recorder';
 
 
 /**

@@ -23,9 +23,9 @@ import {
 import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
-import {addDeclarationToModule} from '../utility/ast-utils';
-import {InsertChange} from '../utility/change';
-import {buildRelativePath} from '../utility/find-module';
+import { addDeclarationToModule } from '../utility/ast-utils';
+import { InsertChange } from '../utility/change';
+import { buildRelativePath } from '../utility/find-module';
 
 
 function addDeclarationToNgModule(options: any): Rule {

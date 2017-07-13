@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-any
-import {IndentLogger} from './indent';
-import {LogEntry, Logger} from './logger';
+import { IndentLogger } from './indent';
+import { LogEntry, Logger } from './logger';
 
 
 describe('IndentSpec', () => {

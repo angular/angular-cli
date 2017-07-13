@@ -9,10 +9,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
-import {FileSystemTree} from '../tree/filesystem';
-import {InMemoryFileSystemTreeHost} from '../tree/memory-host';
-import {optimize} from '../tree/static';
-import {DryRunSink} from './dryrun';
+import { FileSystemTree } from '../tree/filesystem';
+import { InMemoryFileSystemTreeHost } from '../tree/memory-host';
+import { optimize } from '../tree/static';
+import { DryRunSink } from './dryrun';
 
 const temp = require('temp');
 

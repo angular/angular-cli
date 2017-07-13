@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {FileSystemTree} from './filesystem';
-import {InMemoryFileSystemTreeHost} from './memory-host';
+import { FileSystemTree } from './filesystem';
+import { InMemoryFileSystemTreeHost } from './memory-host';
 
 
 describe('FileSystem', () => {

@@ -5,16 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
-import {FileOperator, Rule, SchematicContext, Source} from '../engine/interface';
-import {FilteredTree} from '../tree/filtered';
-import {FileEntry, FilePredicate, MergeStrategy, Tree} from '../tree/interface';
-import {branch, empty as staticEmpty, merge as staticMerge} from '../tree/static';
-import {VirtualTree} from '../tree/virtual';
-import {callRule, callSource} from './call';
+import { FileOperator, Rule, SchematicContext, Source } from '../engine/interface';
+import { FilteredTree } from '../tree/filtered';
+import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
+import { branch, empty as staticEmpty, merge as staticMerge } from '../tree/static';
+import { VirtualTree } from '../tree/virtual';
+import { callRule, callSource } from './call';
 
 
 /**

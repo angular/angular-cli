@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import 'rxjs/add/operator/filter';
-import {bold, dim, red, white, yellow} from '../terminal';
-import {IndentLogger} from './indent';
-import {LogEntry, Logger} from './logger';
+import { bold, dim, red, white, yellow } from '../terminal';
+import { IndentLogger } from './indent';
+import { LogEntry, Logger } from './logger';
 
 
 /**

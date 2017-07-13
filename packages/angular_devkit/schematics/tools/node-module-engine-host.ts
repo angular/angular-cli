@@ -10,10 +10,10 @@ import {
   RuleFactory,
   SchematicDescription,
 } from '@angular-devkit/schematics';
-import {join} from 'path';
-import {FileSystemCollectionDescription, FileSystemSchematicDescription} from './description';
-import {ExportStringRef} from './export-ref';
-import {FileSystemEngineHostBase} from './file-system-engine-host-base';
+import { join } from 'path';
+import { FileSystemCollectionDescription, FileSystemSchematicDescription } from './description';
+import { ExportStringRef } from './export-ref';
+import { FileSystemEngineHostBase } from './file-system-engine-host-base';
 
 
 /**

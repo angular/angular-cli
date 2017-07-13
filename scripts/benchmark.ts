@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {yellow} from '@angular-devkit/core';
+import { yellow } from '@angular-devkit/core';
 import * as glob from 'glob';
 import 'jasmine';
-import {SpecReporter as JasmineSpecReporter} from 'jasmine-spec-reporter';
-import {join, relative} from 'path';
+import {SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
+import { join, relative } from 'path';
 
 
 const Jasmine = require('jasmine');

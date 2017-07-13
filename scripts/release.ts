@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Logger} from '@angular-devkit/core';
+import { Logger } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
-import {ReleaseType} from 'semver';
+import { ReleaseType } from 'semver';
 
 const crypto = require('crypto');
 const tar = require('tar');

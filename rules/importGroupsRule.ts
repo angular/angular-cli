@@ -56,7 +56,7 @@ class Walker extends Lint.RuleWalker {
             node.getStart(),
             node.getWidth(),
             Rule.FAILURE_STRING,
-            this.createFix(Lint.Replacement.deleteFromTo(previous.getEnd() + 1, node.getStart())),
+            Lint.Replacement.deleteFromTo(previous.getEnd() + 1, node.getStart()),
           );
         }
       }

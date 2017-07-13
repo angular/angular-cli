@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import 'rxjs/add/operator/map';
-import {Url} from 'url';
-import {BaseException} from '../exception/exception';
-import {MergeStrategy} from '../tree/interface';
-import {NullTree} from '../tree/null';
-import {empty} from '../tree/static';
-import {CollectionImpl} from './collection';
+import { Url } from 'url';
+import { BaseException } from '../exception/exception';
+import { MergeStrategy } from '../tree/interface';
+import { NullTree } from '../tree/null';
+import { empty } from '../tree/static';
+import { CollectionImpl } from './collection';
 import {
   Collection,
   Engine,
@@ -19,7 +19,7 @@ import {
   Schematic,
   Source,
 } from './interface';
-import {SchematicImpl} from './schematic';
+import { SchematicImpl } from './schematic';
 
 
 export class UnknownUrlSourceProtocol extends BaseException {

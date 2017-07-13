@@ -82,7 +82,7 @@
     "curly": true,
     "file-header": [
       true,
-      "Copyright Google Inc\\. All Rights Reserved."
+      "Copyright Google Inc\\. All Rights Reserved\\."
     ],
     "variable-name": [
       true,

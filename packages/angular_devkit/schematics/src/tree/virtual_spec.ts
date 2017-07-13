@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {FileAlreadyExistException, FileDoesNotExistException} from '../exception/exception';
-import {FileSystemTree} from './filesystem';
-import {FileEntry, MergeStrategy} from './interface';
-import {InMemoryFileSystemTreeHost} from './memory-host';
-import {merge, partition} from './static';
-import {VirtualTree} from './virtual';
+import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
+import { FileSystemTree } from './filesystem';
+import { FileEntry, MergeStrategy } from './interface';
+import { InMemoryFileSystemTreeHost } from './memory-host';
+import { merge, partition } from './static';
+import { VirtualTree } from './virtual';
 
 
 describe('VirtualTree', () => {

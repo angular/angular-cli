@@ -23,9 +23,9 @@ import {
 import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
-import {addProviderToModule} from '../utility/ast-utils';
-import {InsertChange} from '../utility/change';
-import {buildRelativePath} from '../utility/find-module';
+import { addProviderToModule } from '../utility/ast-utils';
+import { InsertChange } from '../utility/change';
+import { buildRelativePath } from '../utility/find-module';
 
 function addProviderToNgModule(options: any): Rule {
   return (host: Tree) => {

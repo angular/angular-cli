@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
-import {dirname, join} from 'path';
-import {Observable} from 'rxjs/Observable';
-import {VirtualFileSystemSink, VirtualFileSystemSinkHost} from './virtual-filesystem';
+import { dirname, join } from 'path';
+import { Observable } from 'rxjs/Observable';
+import { VirtualFileSystemSink, VirtualFileSystemSinkHost } from './virtual-filesystem';
 
 
 export class FileSystemSinkHost implements VirtualFileSystemSinkHost {

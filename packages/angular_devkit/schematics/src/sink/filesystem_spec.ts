@@ -7,11 +7,11 @@
  */
 import * as fs from 'fs';
 import * as glob from 'glob';
-import {join} from 'path';
-import {FileSystemTree} from '../tree/filesystem';
-import {InMemoryFileSystemTreeHost} from '../tree/memory-host';
-import {optimize} from '../tree/static';
-import {FileSystemSink} from './filesystem';
+import { join } from 'path';
+import { FileSystemTree } from '../tree/filesystem';
+import { InMemoryFileSystemTreeHost } from '../tree/memory-host';
+import { optimize } from '../tree/static';
+import { FileSystemSink } from './filesystem';
 
 const temp = require('temp');
 

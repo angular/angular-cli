@@ -8,9 +8,9 @@
 import * as glob from 'glob';
 import * as Istanbul from 'istanbul';
 import 'jasmine';
-import {SpecReporter as JasmineSpecReporter} from 'jasmine-spec-reporter';
-import {join, relative} from 'path';
-import {Position, SourceMapConsumer, SourceMapGenerator} from 'source-map';
+import {SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
+import { join, relative } from 'path';
+import { Position, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 
 
 const Jasmine = require('jasmine');

@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Logger} from '@angular-devkit/core';
-import {execSync} from 'child_process';
-import {packages} from '../lib/packages';
+import { Logger } from '@angular-devkit/core';
+import { execSync } from 'child_process';
+import { packages } from '../lib/packages';
 
 
 export default function (_: {}, logger: Logger) {
