@@ -101,7 +101,7 @@
     "webpack-dev-middleware": "^1.11.0",
     "webpack-dev-server": "~2.5.1",
     "webpack-merge": "^2.4.0",
-    "zone.js": "^0.8.4"
+    "zone.js": "0.8.12"
   },
   "devDependencies": {
     "@angular/compiler": "^4.0.0",
