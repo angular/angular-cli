@@ -1,13 +1,23 @@
 ## Angular CLI
+### CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
-[![Join the chat at https://gitter.im/angular/angular-cli](https://badges.gitter.im/angular/angular-cli.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-[![Build Status][travis-badge]][travis-badge-url]
+<!-- Badges section here. -->
+[![Build Status](https://img.shields.io/travis/angular/angular-cli/master.svg?label=travis)][travis-badge-url]
+[![CircleCI branch](https://img.shields.io/circleci/project/github/RedSparr0w/node-csgo-parser/master.svg?label=circleci)](https://circleci.com/gh/angular/angular-cli)
 [![Dependency Status][david-badge]][david-badge-url]
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
-[![npm][npm-badge]][npm-badge-url]
 
-CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
+[![npm](https://img.shields.io/npm/v/%40angular/cli.svg)][npm-badge-url]
+[![npm](https://img.shields.io/npm/v/%40angular/cli/next.svg)][npm-badge-url]
+[![npm](https://img.shields.io/npm/l/@angular/cli.svg)][npm-badge-url]
+[![npm](https://img.shields.io/npm/dm/@angular/cli.svg)][npm-badge-url]
+
+[![Join the chat at https://gitter.im/angular/angular-cli](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Caretaker](https://img.shields.io/badge/caretaker-brocco-blue.svg)](https://github.com/brocco)
+
+[![GitHub forks](https://img.shields.io/github/forks/angular/angular-cli.svg?style=social&label=Fork)](https://github.com/angular/angular-cli/fork)
+[![GitHub stars](https://img.shields.io/github/stars/angular/angular-cli.svg?style=social&label=Star)](https://github.com/angular/angular-cli)
+
 
 ## Note
 
