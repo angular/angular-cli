@@ -1,7 +1,7 @@
 import {
   killAllProcesses,
   waitForAnyProcessOutputToMatch,
-  silentExecAndWaitForOutputToMatch
+  execAndWaitForOutputToMatch
 } from '../../utils/process';
 import {appendToFile} from '../../utils/fs';
 import {expectToFail, wait} from '../../utils/utils';
@@ -19,7 +19,7 @@ export default function() {
   }
 
 
-  return silentExecAndWaitForOutputToMatch('ng', ['serve', '--poll=10000'], webpackGoodRegEx)
+  return execAndWaitForOutputToMatch('ng', ['serve', '--poll=10000'], webpackGoodRegEx)
     // Wait before editing a file.
     // Editing too soon seems to trigger a rebuild and throw polling out of whack.
     .then(() => wait(2000))

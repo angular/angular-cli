@@ -6,7 +6,7 @@ import * as http from 'http';
 import {appendToFile, writeMultipleFiles, writeFile} from '../../utils/fs';
 import {
   killAllProcesses,
-  silentExecAndWaitForOutputToMatch,
+  execAndWaitForOutputToMatch,
   waitForAnyProcessOutputToMatch
 } from '../../utils/process';
 import { wait } from '../../utils/utils';
@@ -96,7 +96,7 @@ export default function () {
         }
       `
     }))
-    .then(_ => silentExecAndWaitForOutputToMatch(
+    .then(_ => execAndWaitForOutputToMatch(
       'ng',
       ['e2e', '--watch', '--live-reload'],
       protractorGoodRegEx
@@ -116,7 +116,7 @@ export default function () {
     .then(_ => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
     .then(_ => resetApiVars())
     // Serve with live reload off should call api only once.
-    .then(_ => silentExecAndWaitForOutputToMatch(
+    .then(_ => execAndWaitForOutputToMatch(
       'ng',
       ['e2e', '--watch', '--no-live-reload'],
       protractorGoodRegEx
@@ -150,7 +150,7 @@ export default function () {
             http.get('http://${publicHost + '/live-reload-count'}').subscribe(res => null);
           }
         }`))
-    .then(_ => silentExecAndWaitForOutputToMatch(
+    .then(_ => execAndWaitForOutputToMatch(
       'ng',
       ['e2e', '--watch', '--host=0.0.0.0', '--port=4200', `--public-host=${publicHost}`, '--proxy', proxyConfigFile],
       protractorGoodRegEx
