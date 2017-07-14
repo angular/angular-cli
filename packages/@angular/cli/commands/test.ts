@@ -4,7 +4,9 @@ import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
-const pollDefault = config.config.defaults && config.config.defaults.poll;
+const testConfigDefaults = config.getPaths('defaults.build', [
+  'progress', 'poll'
+]);
 
 export interface TestOptions {
   watch?: boolean;
@@ -60,7 +62,7 @@ const TestCommand = Command.extend({
     {
       name: 'progress',
       type: Boolean,
-      default: true,
+      default: testConfigDefaults['progress'],
       description: 'Log progress to the console while in progress.'
     },
     {
@@ -98,7 +100,7 @@ const TestCommand = Command.extend({
     {
       name: 'poll',
       type: Number,
-      default: pollDefault,
+      default: testConfigDefaults['poll'],
       description: 'Enable and define the file watching poll time period (milliseconds).'
     },
     {
