@@ -32,7 +32,7 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     const projectConfig = CliConfig.fromProject();
     if (projectConfig) {
       value = projectConfig.get(jsonPath);
-    } else {
+    } else if (CliConfig.globalConfigFilePath() !== CliConfig.configFilePath()) {
       const globalConfig = CliConfig.fromGlobal();
       if (globalConfig) {
         value = globalConfig.get(jsonPath);
