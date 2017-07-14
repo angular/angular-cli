@@ -2,7 +2,6 @@ import {
   ng,
   npm,
   execAndWaitForOutputToMatch,
-  silentExecAndWaitForOutputToMatch,
   killAllProcesses
 } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -43,7 +42,7 @@ export default function () {
       throw err;
     })
     // Should run side-by-side with `ng serve`
-    .then(() => silentExecAndWaitForOutputToMatch('ng', ['serve'],
+    .then(() => execAndWaitForOutputToMatch('ng', ['serve'],
       /webpack: Compiled successfully./))
     .then(() => ng('e2e'));
 }
