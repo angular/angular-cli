@@ -7,6 +7,7 @@ import { BuildTaskOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { CliConfig } from '../models/config';
+import {statsToString} from '../utilities/stats';
 
 const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
@@ -39,18 +40,19 @@ export default Task.extend({
           return reject(err);
         }
 
-        this.ui.writeLine(stats.toString(statsConfig));
+        const json = stats.toJson('verbose');
+        if (runTaskOptions.verbose) {
+          this.ui.writeLine(stats.toString(statsConfig));
+        } else {
+          this.ui.writeLine(statsToString(json, statsConfig));
+        }
 
         if (runTaskOptions.watch) {
           return;
-        }
-
-        if (!runTaskOptions.watch && runTaskOptions.statsJson) {
-          const jsonStats = stats.toJson('verbose');
-
+        } else if (runTaskOptions.statsJson) {
           fs.writeFileSync(
             path.resolve(this.project.root, outputPath, 'stats.json'),
-            JSON.stringify(jsonStats, null, 2)
+            JSON.stringify(json, null, 2)
           );
         }
 
