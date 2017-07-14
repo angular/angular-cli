@@ -36,13 +36,16 @@
   },
   "lint": [
     {
-      "project": "<%= sourceDir %>/tsconfig.app.json"
+      "project": "<%= sourceDir %>/tsconfig.app.json",
+      "exclude": "**/node_modules/**"
     },
     {
-      "project": "<%= sourceDir %>/tsconfig.spec.json"
+      "project": "<%= sourceDir %>/tsconfig.spec.json",
+      "exclude": "**/node_modules/**"
     },
     {
-      "project": "e2e/tsconfig.e2e.json"
+      "project": "e2e/tsconfig.e2e.json",
+      "exclude": "**/node_modules/**"
     }
   ],
   "test": {
