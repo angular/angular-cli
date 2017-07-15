@@ -59,10 +59,15 @@ function addBootstrapToNgModule(directory: string): Rule {
 }
 
 export default function (options: any): Rule {
+  const appRootSelector = 'app-root';
+
   return chain([
     mergeWith(
       apply(url('./files'), [
-        template({ utils: stringUtils, ...options }),
+        template({
+          utils: stringUtils,
+          'dot': '.',
+          ...options }),
         move(options.directory),
       ])),
     schematic('module', {
@@ -71,14 +76,14 @@ export default function (options: any): Rule {
     }),
     schematic('component', {
       name: 'app',
-      selector: 'app-root',
+      selector: appRootSelector,
       sourceDir: options.directory + '/' + options.sourceDir,
       flat: true,
     }),
     addBootstrapToNgModule(options.directory),
     mergeWith(
-      apply(url('./helper-files'), [
-        template({ utils: stringUtils, ...options }),
+      apply(url('./other-files'), [
+        template({ utils: stringUtils, ...options, selector: appRootSelector }),
         move(options.directory + '/' + options.sourceDir + '/app'),
       ]), MergeStrategy.Overwrite),
   ]);
