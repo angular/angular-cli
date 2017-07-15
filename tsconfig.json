@@ -47,6 +47,7 @@
     "dist/**/*",
     "node_modules/**/*",
     "packages/schematics/angular/*/files/**/*",
+    "packages/schematics/angular/*/other-files/**/*",
     "tmp/**/*",
     "tests/**/*"
   ]

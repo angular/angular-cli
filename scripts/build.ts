@@ -139,7 +139,8 @@ export default function(_: {}, logger: Logger) {
       .map((fileName) => path.relative(pkg.root, fileName))
       .filter(fileName => {
         // Schematics template files.
-        if (pkgJson['schematics'] && fileName.match(/(\/|\\)files(\/|\\)/)) {
+        if (pkgJson['schematics'] &&
+         (fileName.match(/(\/|\\)files(\/|\\)/) || fileName.match(/(\/|\\)other-files(\/|\\)/))) {
           return true;
         }
 
