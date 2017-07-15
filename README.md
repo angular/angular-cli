@@ -127,6 +127,7 @@ Local project package:
 rm -rf node_modules dist # use rmdir /S/Q node_modules dist in Windows Command Prompt; use rm -r -fo node_modules,dist in Windows PowerShell
 npm install --save-dev @angular/cli@latest
 npm install
+npm update
 ```
 
 If you are updating to 1.0 from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
