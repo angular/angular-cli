@@ -3,6 +3,7 @@ import * as glob from 'glob';
 import * as webpack from 'webpack';
 
 import { CliConfig } from '../config';
+import { getAppFromConfig } from '../../utilities/app-utils';
 import { WebpackTestOptions } from '../webpack-test-config';
 
 
@@ -19,7 +20,7 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
 
   const configPath = CliConfig.configFilePath();
   const projectRoot = path.dirname(configPath);
-  const appConfig = CliConfig.fromProject().config.apps[0];
+  const appConfig = getAppFromConfig(testConfig.app);
   const nodeModules = path.resolve(projectRoot, 'node_modules');
   const extraRules: any[] = [];
   const extraPlugins: any[] = [];
