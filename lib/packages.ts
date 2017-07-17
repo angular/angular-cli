@@ -8,6 +8,7 @@
 'use strict';
 
 import { JsonObject } from '@angular-devkit/core';
+import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 import * as ts from 'typescript';
@@ -94,7 +95,11 @@ export const packages: PackageMap =
       }
       const bin: {[name: string]: string} = {};
       Object.keys(packageJson['bin'] || {}).forEach(binName => {
-        bin[binName] = path.resolve(pkg.root, packageJson['bin'][binName]);
+        let p = path.resolve(pkg.root, packageJson['bin'][binName]);
+        if (!fs.existsSync(p)) {
+          p = p.replace(/\.js$/, '.ts');
+        }
+        bin[binName] = p;
       });
 
       packages[name] = {
