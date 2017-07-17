@@ -24,6 +24,7 @@ export interface PackageInfo {
   main: string;
   dist: string;
   build: string;
+  tar: string;
   private: boolean;
   packageJson: JsonObject;
   dependencies: string[];
@@ -110,6 +111,7 @@ export const packages: PackageMap =
         main: path.resolve(pkgRoot, 'src/index.ts'),
         dependencies: [],
         private: packageJson.private,
+        tar: path.join(distRoot, name.replace('/', '_') + '.tgz'),
         bin,
         name,
         packageJson,

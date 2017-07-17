@@ -13,32 +13,46 @@ import { packages } from '../lib/packages';
 
 const minimatch = require('minimatch');
 const npmRun = require('npm-run');
+const tar = require('tar');
 
 const gitIgnore = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8')
   .split('\n')
   .map(line => line.replace(/#.*/, ''))
   .filter(line => !line.match(/^\s*$/));
 
-function gitIgnoreMatch(p: string) {
+
+function _gitIgnoreMatch(p: string) {
   p = path.relative(path.dirname(__dirname), p);
 
   return gitIgnore.some(line => minimatch(p, line));
 }
 
 
-function mkdirp(p: string) {
+function _mkdirp(p: string) {
   // Create parent folder if necessary.
   if (!fs.existsSync(path.dirname(p))) {
-    mkdirp(path.dirname(p));
+    _mkdirp(path.dirname(p));
   }
   fs.mkdirSync(p);
 }
 
 
-function copy(from: string, to: string) {
+function _tar(out: string, dir: string) {
+  return tar.create({
+    gzip: true,
+    strict: true,
+    portable: true,
+    cwd: dir,
+    file: out,
+    sync: true,
+  }, ['.']);
+}
+
+
+function _copy(from: string, to: string) {
   // Create parent folder if necessary.
   if (!fs.existsSync(path.dirname(to))) {
-    mkdirp(path.dirname(to));
+    _mkdirp(path.dirname(to));
   }
 
   from = path.relative(process.cwd(), from);
@@ -49,28 +63,28 @@ function copy(from: string, to: string) {
 }
 
 
-function recursiveCopy(from: string, to: string, logger: Logger) {
+function _recursiveCopy(from: string, to: string, logger: Logger) {
   if (!fs.existsSync(from)) {
     logger.error(`File "${from}" does not exist.`);
     process.exit(4);
   }
   if (fs.statSync(from).isDirectory()) {
     fs.readdirSync(from).forEach(fileName => {
-      recursiveCopy(path.join(from, fileName), path.join(to, fileName), logger);
+      _recursiveCopy(path.join(from, fileName), path.join(to, fileName), logger);
     });
   } else {
-    copy(from, to);
+    _copy(from, to);
   }
 }
 
 
-function rm(p: string) {
+function _rm(p: string) {
   p = path.relative(process.cwd(), p);
   fs.unlinkSync(p);
 }
 
 
-function rimraf(p: string) {
+function _rimraf(p: string) {
   glob.sync(path.join(p, '**/*'), { dot: true, nodir: true })
     .forEach(p => fs.unlinkSync(p));
   glob.sync(path.join(p, '**/*'), { dot: true })
@@ -79,10 +93,14 @@ function rimraf(p: string) {
 }
 
 
-export default function(_: {}, logger: Logger) {
-  logger.info('Removing dist/...');
-  rimraf(path.join(__dirname, '../dist'));
+function _clean(logger: Logger) {
+  logger.info('Cleaning...');
+  logger.info('  Removing dist/...');
+  _rimraf(path.join(__dirname, '../dist'));
+}
 
+
+function _sortPackages() {
   // Order packages in order of dependency.
   // We use bubble sort because we need a full topological sort but adding another dependency
   // or implementing a full topo sort would be too much work and I'm lazy. We don't anticipate
@@ -106,7 +124,11 @@ export default function(_: {}, logger: Logger) {
     }
   } while (swapped);
 
+  return sortedPackages;
+}
 
+
+function _build(logger: Logger) {
   logger.info('Building...');
   const tsConfigPath = path.relative(process.cwd(), path.join(__dirname, '../tsconfig.json'));
   try {
@@ -116,14 +138,22 @@ export default function(_: {}, logger: Logger) {
     logger.error(`TypeScript compiler failed:\n\nSTDOUT:\n  ${stdout}`);
     process.exit(1);
   }
+}
+
+
+export default function(_: {}, logger: Logger) {
+  _clean(logger);
+
+  const sortedPackages = _sortPackages();
+  _build(logger);
 
   logger.info('Moving packages to dist/');
   const packageLogger = new Logger('packages', logger);
   for (const packageName of sortedPackages) {
     packageLogger.info(packageName);
     const pkg = packages[packageName];
-    recursiveCopy(pkg.build, pkg.dist, logger);
-    rimraf(pkg.build);
+    _recursiveCopy(pkg.build, pkg.dist, logger);
+    _rimraf(pkg.build);
   }
 
   logger.info('Copying resources...');
@@ -171,7 +201,7 @@ export default function(_: {}, logger: Logger) {
         }
 
         // Skip files from gitignore.
-        if (gitIgnoreMatch(fileName)) {
+        if (_gitIgnoreMatch(fileName)) {
           return false;
         }
 
@@ -180,14 +210,14 @@ export default function(_: {}, logger: Logger) {
 
     subSubLogger.info(`${resources.length} resources...`);
     resources.forEach(fileName => {
-      copy(path.join(pkg.root, fileName), path.join(pkg.dist, fileName));
+      _copy(path.join(pkg.root, fileName), path.join(pkg.dist, fileName));
     });
   }
 
   logger.info('Copying extra resources...');
   for (const packageName of sortedPackages) {
     const pkg = packages[packageName];
-    copy(path.join(__dirname, '../LICENSE'), path.join(pkg.dist, 'LICENSE'));
+    _copy(path.join(__dirname, '../LICENSE'), path.join(pkg.dist, 'LICENSE'));
   }
 
   logger.info('Removing spec files...');
@@ -197,7 +227,7 @@ export default function(_: {}, logger: Logger) {
     const pkg = packages[packageName];
     const files = glob.sync(path.join(pkg.dist, '**/*_spec.js'));
     specLogger.info(`  ${files.length} spec files found...`);
-    files.forEach(fileName => rm(fileName));
+    files.forEach(fileName => _rm(fileName));
   }
 
   logger.info('Setting versions...');
@@ -228,6 +258,14 @@ export default function(_: {}, logger: Logger) {
 
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
   }
+
+  logger.info('Tarring all packages...');
+  const tarLogger = new Logger('license', logger);
+  Object.keys(packages).forEach(pkgName => {
+    const pkg = packages[pkgName];
+    tarLogger.info(`${pkgName} => ${pkg.tar}`);
+    _tar(pkg.tar, pkg.dist);
+  });
 
   logger.info(`Done.`);
 }
