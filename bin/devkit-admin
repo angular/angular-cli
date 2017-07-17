@@ -86,7 +86,7 @@ try {
 } catch (e) {
   console.error(red(`Reverting to manual console logging.\nReason: ${e.message}.`));
   logger = {
-    debug: console.debug.bind(console),
+    debug: console.log.bind(console),
     info: console.log.bind(console),
     warn: console.warn.bind(console),
     error: console.error.bind(console),

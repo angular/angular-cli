@@ -10,8 +10,8 @@
 import { JsonObject } from '@angular-devkit/core';
 import * as glob from 'glob';
 import * as path from 'path';
+import * as ts from 'typescript';
 
-const packageRoot = path.join(__dirname, '../packages');
 const distRoot = path.join(__dirname, '../dist');
 
 
@@ -68,26 +68,30 @@ function loadPackageJson(p: string) {
 }
 
 
-const packageJsonPaths =
-  glob.sync(path.join(packageRoot, '**/package.json'))
-    // Removing all files from templates.
-    .filter(p => !p.match(/\/angular.*files\//))
-    // Remove extra build-optimizer package.json.
-    .filter(p => !p.match(/\/build_optimizer\/webpack-loader\//));
+const tsConfigPath = path.join(__dirname, '../tsconfig.json');
+const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+// tslint:disable-next-line:no-any
+const pattern = (ts as any).getRegularExpressionForWildcard(
+    tsConfig.config.exclude, path.dirname(tsConfigPath), 'exclude');
+const excludeRe = new RegExp(pattern);
 
+// Remove all files from tsconfig, and our own package.json.
+const packageJsonPaths = glob.sync(path.join(__dirname, '../*/**/package.json'))
+  .filter(p => !excludeRe.test(p));
 
 // All the supported packages. Go through the packages directory and create a _map of
 // name => fullPath.
 export const packages: PackageMap =
   packageJsonPaths
-    .map(pkgPath => [pkgPath, path.relative(packageRoot, path.dirname(pkgPath))])
-    .map(([pkgPath, pkgName]) => {
-      return { name: pkgName, root: path.dirname(pkgPath) };
-    })
+    .map(pkgPath => ({ root: path.dirname(pkgPath) }))
     .reduce((packages: PackageMap, pkg) => {
       const pkgRoot = pkg.root;
       const packageJson = loadPackageJson(path.join(pkgRoot, 'package.json'));
       const name = packageJson['name'];
+      if (!name) {
+        // Only build the entry if there's a package name.
+        return packages;
+      }
       const bin: {[name: string]: string} = {};
       Object.keys(packageJson['bin'] || {}).forEach(binName => {
         bin[binName] = path.resolve(pkg.root, packageJson['bin'][binName]);
