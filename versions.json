@@ -1,18 +1,18 @@
 {
   "versions": {
-    "@_/schematics-cli": "0.0.1",
+    "@_/schematics-cli": "0.0.2",
     "@_/benchmark": "0.0.1",
-    "@angular-devkit/build-optimizer": "0.0.2",
-    "@angular-devkit/core": "0.0.2",
-    "@angular-devkit/schematics": "0.0.2",
-    "@schematics/angular": "0.0.3"
+    "@angular-devkit/build-optimizer": "0.0.3",
+    "@angular-devkit/core": "0.0.3",
+    "@angular-devkit/schematics": "0.0.3",
+    "@schematics/angular": "0.0.4"
   },
   "hashes": {
     "@_/benchmark": "90ff01f6b5414a07939369ce709706a9",
-    "@_/schematics-cli": "4f08070f820518f3403bc829fc641a3b",
-    "@angular-devkit/core": "8cfbcbcaa5ed39f9ef08c0dd2fb0f6e5",
-    "@angular-devkit/schematics": "7515344097016dda9f8021ee9c86e8e9",
-    "@schematics/angular": "f934e77171e210a3e6c64b335d55403c",
-    "@angular-devkit/build-optimizer": "4fcaef6ca380c3559fdb4a00490d8a0a"
+    "@_/schematics-cli": "fd0d6e9fcd9b49e0dce88e1b527a6f1d",
+    "@angular-devkit/core": "c930497a9d03da0c4102a31ccd9c7b62",
+    "@angular-devkit/schematics": "844c2477cd99b716bb1c69dfaf3f92b0",
+    "@schematics/angular": "f71ad78d2934b81a201a6f1f05d7b551",
+    "@angular-devkit/build-optimizer": "c9be1c78a241aa5c8da4d658e9d52e17"
   }
 }
