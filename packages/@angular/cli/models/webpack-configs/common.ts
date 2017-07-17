@@ -82,6 +82,10 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     });
   }
 
+  if (buildOptions.namedChunks) {
+    extraPlugins.push(new NamedLazyChunksWebpackPlugin());
+  }
+
   return {
     resolve: {
       extensions: ['.ts', '.js'],
@@ -112,8 +116,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ].concat(extraRules)
     },
     plugins: [
-      new webpack.NoEmitOnErrorsPlugin(),
-      new NamedLazyChunksWebpackPlugin(),
+      new webpack.NoEmitOnErrorsPlugin()
     ].concat(extraPlugins),
     node: {
       fs: 'empty',

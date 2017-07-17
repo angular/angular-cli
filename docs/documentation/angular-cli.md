@@ -77,6 +77,15 @@
   - *service*: Options for generating a service.
     - *flat* (`boolean`): Flag to indicate if a dir is created. Default is `true`.
     - *spec* (`boolean`): Specifies if a spec file is generated. Default is `true`.
+  - *build*: Properties to be passed to the build command.
+    - *sourcemaps* (`boolean`): Output sourcemaps.
+    - *baseHref* (`string`): Base url for the application being built.
+    - *progress* (`boolean`): Log progress to the console while building. Default is `true`.
+    - *poll* (`number`): Enable and define the file watching poll time period (milliseconds).
+    - *deleteOutputPath* (`boolean`): Delete output path before build. Default is `true`.
+    - *preserveSymlinks* (`boolean`): Do not use the real path when resolving modules. Default is `false`.
+    - *showCircularDependencies* (`boolean`): Show circular dependency warnings on builds. Default is `true`.
+    - *namedChunks* (`boolean`): Use file name for lazy loaded chunks.
   - *serve*: Properties to be passed to the serve command
     - *port* (`number`): The port the application will be served on. Default is `4200`.
     - *host* (`string`): The host the application will be served on. Default is `localhost`.
