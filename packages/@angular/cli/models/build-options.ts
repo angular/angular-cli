@@ -23,4 +23,5 @@ export interface BuildOptions {
   extractLicenses?: boolean;
   showCircularDependencies?: boolean;
   buildOptimizer?: boolean;
+  namedChunks?: boolean;
 }

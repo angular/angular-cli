@@ -84,13 +84,16 @@ export class NgCliWebpackConfig {
         environment: 'dev',
         outputHashing: 'media',
         sourcemaps: true,
-        extractCss: false
+        extractCss: false,
+        namedChunks: true,
+        aot: false
       },
       production: {
         environment: 'prod',
         outputHashing: 'all',
         sourcemaps: false,
         extractCss: true,
+        namedChunks: false,
         aot: true
       }
     };

@@ -342,3 +342,13 @@ Note: service worker support is experimental and subject to change.
     (Experimental) Enables @angular-devkit/build-optimizer optimizations when using `--aot`.
   </p>
 </details>
+
+<details>
+  <summary>named-chunks</summary>
+  <p>
+    <code>--named-chunks</code> (aliases: <code>-nm</code>)
+  </p>
+  <p>
+    Use file name for lazy loaded chunks.
+  </p>
+</details>

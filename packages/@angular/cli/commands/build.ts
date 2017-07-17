@@ -9,7 +9,7 @@ const Command = require('../ember-cli/lib/models/command');
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const buildConfigDefaults = config.getPaths('defaults.build', [
   'sourcemaps', 'baseHref', 'progress', 'poll', 'deleteOutputPath', 'preserveSymlinks',
-  'showCircularDependencies', 'commonChunk'
+  'showCircularDependencies', 'commonChunk', 'namedChunks'
 ]);
 
 // defaults for BuildOptions
@@ -166,6 +166,13 @@ export const baseBuildCommandOptions: any = [
     aliases: ['bo'],
     description: '(Experimental) Enables @angular-devkit/build-optimizer '
     + 'optimizations when using `--aot`.'
+  },
+  {
+    name: 'named-chunks',
+    type: Boolean,
+    aliases: ['nc'],
+    description: 'Use file name for lazy loaded chunks.',
+    default: buildConfigDefaults['namedChunks']
   }
 ];
 
