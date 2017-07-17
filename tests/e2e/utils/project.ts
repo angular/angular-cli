@@ -108,7 +108,7 @@ export function useNg2() {
       'experimentalDecorators': true,
       'target': 'es5',
       'lib': [
-        'es2016',
+        'es2017',
         'dom'
       ],
       'outDir': '../out-tsc/app',
@@ -130,7 +130,7 @@ export function useNg2() {
       'emitDecoratorMetadata': true,
       'experimentalDecorators': true,
       'lib': [
-        'es2016',
+        'es2017',
         'dom'
       ],
       'outDir': '../out-tsc/spec',
@@ -159,7 +159,7 @@ export function useNg2() {
       'emitDecoratorMetadata': true,
       'experimentalDecorators': true,
       'lib': [
-        'es2016'
+        'es2017'
       ],
       'outDir': '../out-tsc/e2e',
       'module': 'commonjs',
