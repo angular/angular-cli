@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
@@ -51,6 +52,15 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  let deferBundles;
+  let preloadBundles;
+  if (buildOptions.preloadBundles) {
+    deferBundles = appConfig.scripts.length > 0 ?
+          ['vendor', 'main'] :
+          ['inline', 'polyfills', 'vendor', 'main'];
+    preloadBundles = ['inline', 'polyfills', 'vendor', 'main'];
+  }
+
   return {
     plugins: [
       new HtmlWebpackPlugin({
@@ -67,6 +77,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       }),
       new BaseHrefWebpackPlugin({
         baseHref: buildOptions.baseHref
+      }),
+      new ScriptExtHtmlWebpackPlugin({
+        defer: deferBundles || [],
+        preload: preloadBundles || []
       }),
       new webpack.optimize.CommonsChunkPlugin({
         name: 'main',

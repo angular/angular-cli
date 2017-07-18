@@ -20,5 +20,6 @@ export interface BuildOptions {
   deleteOutputPath?: boolean;
   preserveSymlinks?: boolean;
   extractLicenses?: boolean;
+  preloadBundles?: boolean;
   showCircularDependencies?: boolean;
 }

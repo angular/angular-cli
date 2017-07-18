@@ -85,6 +85,7 @@
     "rsvp": "^3.0.17",
     "rxjs": "^5.0.1",
     "sass-loader": "^6.0.3",
+    "script-ext-html-webpack-plugin": "^1.8.1",
     "script-loader": "^0.7.0",
     "semver": "^5.3.0",
     "silent-error": "^1.0.0",

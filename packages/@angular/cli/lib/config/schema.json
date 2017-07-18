@@ -477,6 +477,11 @@
               "type": "boolean",
               "default": false
             },
+            "preloadBundles": {
+              "description": "Add preload hints for initial bundles; does not include `scripts` bundles.",
+              "type": "boolean",
+              "default": false
+            },
             "showCircularDependencies": {
               "description": "Show circular dependency warnings on builds.",
               "type": "boolean",
