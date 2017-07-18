@@ -481,6 +481,11 @@
               "description": "Show circular dependency warnings on builds.",
               "type": "boolean",
               "default": true
+            },
+            "commonChunk": {
+              "description": "Use a separate bundle containing code used across multiple bundles.",
+              "type": "boolean",
+              "default": true
             }
           }
         },

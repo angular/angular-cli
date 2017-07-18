@@ -294,6 +294,16 @@ Note: service worker support is experimental and subject to change.
 </details>
 
 <details>
+  <summary>common-chunk</summary>
+  <p>
+    <code>--common-chunk</code> (aliases: <code>-cc</code>) <em>default value: true</em>
+  </p>
+  <p>
+    Use a separate bundle containing code used across multiple bundles.
+  </p>
+</details>
+
+<details>
   <summary>verbose</summary>
   <p>
     <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
