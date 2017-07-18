@@ -3,7 +3,8 @@ import {oneLine} from 'common-tags';
 
 import {ng, npm} from '../../utils/process';
 import {addImportToModule} from '../../utils/ast';
-import {appendToFile} from '../../utils/fs';
+import {appendToFile, expectFileToExist} from '../../utils/fs';
+import {expectToFail} from '../../utils/utils';
 
 
 export default function() {
@@ -42,12 +43,23 @@ export default function() {
       console.log(moment);
     `))
     .then(() => ng('build'))
+    .then(() => expectFileToExist('dist/common.chunk.js'))
     .then(() => readdirSync('dist').length)
     .then(currentNumberOfDistFiles => {
       if (oldNumberOfFiles >= currentNumberOfDistFiles) {
-        throw new Error('A bundle for the common async module was not created.');
+        throw new Error(oneLine`The build contains the wrong number of files.
+          The test for 'dist/common.chunk.js' to exist should have failed.`);
       }
       oldNumberOfFiles = currentNumberOfDistFiles;
+    })
+    .then(() => ng('build', '--no-common-chunk'))
+    .then(() => expectToFail(() => expectFileToExist('dist/common.chunk.js')))
+    .then(() => readdirSync('dist').length)
+    .then(currentNumberOfDistFiles => {
+      if (oldNumberOfFiles <= currentNumberOfDistFiles) {
+        throw new Error(oneLine`The build contains the wrong number of files.
+          The test for 'dist/common.chunk.js' not to exist should have failed.`);
+      }
     })
     // Check for AoT and lazy routes.
     .then(() => ng('build', '--aot'))

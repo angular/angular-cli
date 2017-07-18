@@ -5,6 +5,7 @@ export interface BuildOptions {
   aot?: boolean;
   sourcemaps?: boolean;
   vendorChunk?: boolean;
+  commonChunk?: boolean;
   baseHref?: string;
   deployUrl?: string;
   verbose?: boolean;

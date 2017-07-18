@@ -51,6 +51,15 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  if (buildOptions.commonChunk) {
+    extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
+      name: 'main',
+      async: 'common',
+      children: true,
+      minChunks: 2
+    }));
+  }
+
   return {
     plugins: [
       new HtmlWebpackPlugin({
@@ -67,12 +76,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       }),
       new BaseHrefWebpackPlugin({
         baseHref: buildOptions.baseHref
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'main',
-        async: 'common',
-        children: true,
-        minChunks: 2
       }),
       new webpack.optimize.CommonsChunkPlugin({
         minChunks: Infinity,
