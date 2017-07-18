@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AutoDllPlugin = require('autodll-webpack-plugin');
 
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
@@ -13,6 +14,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
+  const nodeModules = path.resolve(projectRoot, 'node_modules');
 
   let extraPlugins: any[] = [];
 
@@ -24,7 +26,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
 
   if (buildOptions.vendorChunk) {
     // Separate modules from node_modules into a vendor chunk.
-    const nodeModules = path.resolve(projectRoot, 'node_modules');
+
     // Resolves all symlink to get the actual node modules folder.
     const realNodeModules = fs.realpathSync(nodeModules);
     // --aot puts the generated *.ngfactory.ts in src/$$_gendir/node_modules.
@@ -48,6 +50,27 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       moduleFilenameTemplate: '[resource-path]',
       fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
       sourceRoot: 'webpack:///'
+    }));
+  }
+
+  if (buildOptions.angularLib) {
+    const angularPackages = [
+          '@angular/core',
+          '@angular/common',
+          '@angular/compiler',
+          '@angular/forms',
+          '@angular/http',
+          '@angular/router',
+          '@angular/platform-browser',
+          '@angular/platform-browser-dynamic'
+    ].filter(lib => fs.existsSync(path.join(nodeModules, lib)));
+
+    extraPlugins.push(new AutoDllPlugin({
+      inject: true,
+      filename: '[name].dll.js',
+      entry: {
+        angular: angularPackages
+      }
     }));
   }
 
