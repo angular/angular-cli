@@ -8,6 +8,12 @@ const packageManager = CliConfig.fromGlobal().get('packageManager');
 
 
 export function checkYarnOrCNPM() {
+
+  // Don't show messages if user has already changed the default.
+  if (packageManager !== 'default') {
+    return Promise.resolve();
+  }
+
   return Promise
       .all([checkYarn(), checkCNPM()])
       .then((data: Array<boolean>) => {
