@@ -97,8 +97,30 @@
             "description": "The name of the polyfills file."
           },
           "test": {
-            "type": "string",
-            "description": "The name of the test entry-point file."
+            "description": "The name of the test entry-point file.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "string"
+                  },
+                  "karma": {
+                    "type": "object",
+                    "properties": {
+                      "config": {
+                        "description": "Path to the karma config file.",
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              }
+            ]
           },
           "tsconfig": {
             "type": "string",

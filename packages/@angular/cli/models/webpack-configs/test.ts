@@ -4,8 +4,7 @@ import * as webpack from 'webpack';
 
 import { CliConfig } from '../config';
 import { WebpackTestOptions } from '../webpack-test-config';
-
-
+import { getAppFromConfig } from '../../utilities/app-utils';
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
  * know they are used.
@@ -19,8 +18,8 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
 
   const configPath = CliConfig.configFilePath();
   const projectRoot = path.dirname(configPath);
-  const appConfig = CliConfig.fromProject().config.apps[0];
   const nodeModules = path.resolve(projectRoot, 'node_modules');
+  const appConfig = getAppFromConfig(testConfig.app);
   const extraRules: any[] = [];
   const extraPlugins: any[] = [];
 
@@ -50,7 +49,7 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
   return {
     devtool: testConfig.sourcemaps ? 'inline-source-map' : 'eval',
     entry: {
-      main: path.resolve(projectRoot, appConfig.root, appConfig.test)
+      main: path.resolve(projectRoot, appConfig.root, appConfig.test.input || appConfig.test)
     },
     module: {
       rules: [].concat(extraRules)
