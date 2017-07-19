@@ -29,7 +29,7 @@ if (!inputFile.match(tsOrJsRegExp)) {
   throw new Error(`Input file must be .js or .ts.`);
 }
 
-// Use provided output file, or add the .ngo suffix before the extension.
+// Use provided output file, or add the .purify suffix before the extension.
 const outputFile = process.argv[3]
   || inputFile.replace(tsOrJsRegExp, (subStr) => `.purify${subStr}`);
 

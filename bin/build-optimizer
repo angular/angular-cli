@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+'use strict';
+
+
+require('../lib/bootstrap-local');
+const packages = require('../lib/packages').packages;
+require(packages['@angular-devkit/build-optimizer'].bin['build-optimizer']);

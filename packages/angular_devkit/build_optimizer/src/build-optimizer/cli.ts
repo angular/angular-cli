@@ -13,10 +13,10 @@ import { buildOptimizer } from './build-optimizer';
 
 if (process.argv.length < 3 || process.argv.length > 4) {
   throw new Error(`
-    ngo should be called with either one or two arguments:
+    build-optimizer should be called with either one or two arguments:
 
-      ngo input.js
-      ngo input.js output.js
+      build-optimizer input.js
+      build-optimizer input.js output.js
   `);
 }
 
@@ -29,14 +29,14 @@ if (!inputFile.match(tsOrJsRegExp)) {
   throw new Error(`Input file must be .js or .ts.`);
 }
 
-// Use provided output file, or add the .ngo suffix before the extension.
-const outputFile = process.argv[3] || inputFile.replace(tsOrJsRegExp, (subStr) => `.ngo${subStr}`);
+// Use provided output file, or add the .bo suffix before the extension.
+const outputFile = process.argv[3] || inputFile.replace(tsOrJsRegExp, (subStr) => `.bo${subStr}`);
 
-const ngoOutput = buildOptimizer({
+const boOutput = buildOptimizer({
   inputFilePath: join(currentDir, inputFile),
   outputFilePath: join(currentDir, outputFile),
   emitSourceMap: true,
 });
 
-writeFileSync(join(currentDir, outputFile), ngoOutput.content);
-writeFileSync(join(currentDir, `${outputFile}.map`), JSON.stringify(ngoOutput.sourceMap));
+writeFileSync(join(currentDir, outputFile), boOutput.content);
+writeFileSync(join(currentDir, `${outputFile}.map`), JSON.stringify(boOutput.sourceMap));
