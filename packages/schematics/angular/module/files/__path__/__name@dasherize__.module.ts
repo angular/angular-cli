@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';<% if (routing) { %>
 
-import { <%= classify(name) %>RoutingModule } from './<%= dasherizedModuleName %>-routing.module';<% } %>
+import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-routing.module';<% } %>
 
 @NgModule({
   imports: [
