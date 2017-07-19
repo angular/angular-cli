@@ -15,7 +15,7 @@
     "@ngtools/webpack": "0.0.0",
     "core-js": "^2.4.1",
     "rxjs": "^5.3.1",
-    "zone.js": "^0.8.10"
+    "zone.js": "^0.8.14"
   },
   "devDependencies": {
     "node-sass": "^4.5.0",
