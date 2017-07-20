@@ -72,6 +72,8 @@ export default function (options: any): Rule {
       ])),
     schematic('module', {
       name: 'app',
+      commonModule: false,
+      flat: true,
       sourceDir: options.directory + '/' + options.sourceDir,
     }),
     schematic('component', {

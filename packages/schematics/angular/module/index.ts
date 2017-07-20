@@ -28,6 +28,7 @@ export default function (options: any): Rule {
     options.routing ? noop() : filter(path => !path.endsWith('-routing.module.ts')),
     template({
       ...stringUtils,
+      'if-flat': (s: string) => options.flat ? '' : s,
       ...options,
     }),
     move(options.sourceDir),

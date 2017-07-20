@@ -22,6 +22,14 @@
     "spec": {
       "type": "boolean",
       "default": true
+    },
+    "flat": {
+      "type": "boolean",
+      "default": false
+    },
+    "commonModule": {
+      "type": "boolean",
+      "defualt": true
     }
   },
   "required": [

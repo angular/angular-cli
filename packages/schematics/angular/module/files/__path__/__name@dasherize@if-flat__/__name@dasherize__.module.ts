@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';<% if (routing) { %>
+import { NgModule } from '@angular/core';<% if (commonModule) { %>
+import { CommonModule } from '@angular/common';<% } %><% if (routing) { %>
 
 import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-routing.module';<% } %>
 
 @NgModule({
-  imports: [
-    CommonModule<% if (routing) { %>,
+  imports: [<% if (commonModule) { %>
+    CommonModule<% } %><% if (routing) { %>,
     <%= classify(name) %>RoutingModule<% } %>
   ],
   declarations: []
