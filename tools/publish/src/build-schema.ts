@@ -22,7 +22,7 @@ export function build(args: string[], _opts: any, logger: Logger): void {
 
   const output = require('./build-schema').buildSchema(inFile, logger);
   if (outFile) {
-    fs.writeFileSync(outFile, output, 'utf-8');
+    fs.writeFileSync(outFile, output, { encoding: 'utf-8' });
   } else {
     logger.info(output);
   }
