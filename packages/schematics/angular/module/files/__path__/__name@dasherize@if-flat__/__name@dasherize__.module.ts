@@ -5,7 +5,7 @@ import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-rou
 
 @NgModule({
   imports: [<% if (commonModule) { %>
-    CommonModule<% } %><% if (routing) { %>,
+    CommonModule<%= routing ? ',' : '' %><% } %><% if (routing) { %>
     <%= classify(name) %>RoutingModule<% } %>
   ],
   declarations: []

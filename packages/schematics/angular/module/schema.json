@@ -29,7 +29,7 @@
     },
     "commonModule": {
       "type": "boolean",
-      "defualt": true
+      "default": true
     }
   },
   "required": [
