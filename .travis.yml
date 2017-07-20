@@ -7,7 +7,6 @@ addons:
 language: node_js
 
 cache:
-  yarn: true
   directories:
      - ./node_modules
 
@@ -92,14 +91,11 @@ matrix:
 
 
 before_install:
-  # Install yarn.
-  - curl -o- -L https://yarnpkg.com/install.sh | bash
-  - export PATH="$HOME/.yarn/bin:$PATH"
-  - yarn config set spin false
-  - yarn config set progress false
+  # Install npm 5.
+  - npm install -g npm@~5.3.0
 
 install:
-  - yarn --frozen-lockfile
+  - npm install
 
 env:
   global:
