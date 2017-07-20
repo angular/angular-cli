@@ -4,9 +4,10 @@ import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
-const testConfigDefaults = config.getPaths('defaults.build', [
-  'progress', 'poll'
-]);
+const testConfigDefaults = {
+  progress: config.get('defaults.build.progress'),
+  poll: config.get('defaults.build.poll')
+};
 
 export interface TestOptions {
   watch?: boolean;
