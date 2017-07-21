@@ -74,7 +74,7 @@ function parseSchematicName(str: string | null): { collection: string, schematic
 
   let schematic: string = str !;
   if (schematic.indexOf(':') != -1) {
-    [collection, schematic] = schematicName.split(':', 2);
+    [collection, schematic] = schematic.split(':', 2);
 
     if (!schematic) {
       usage(2);
