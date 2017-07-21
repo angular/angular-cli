@@ -496,6 +496,8 @@ export default Task.extend({
           'cssnano',
           'exports-loader',
           'file-loader',
+          'html-webpack-plugin',
+          'json-loader',
           'karma-sourcemap-loader',
           'less-loader',
           'postcss-loader',
