@@ -1,4 +1,5 @@
 # Current Status: Universal platform API has been merged into Angular 4.0!
+## https://github.com/angular/angular/tree/master/packages/platform-server
 (The code for the 2.x version of angular2-universal has been archived at https://github.com/angular/universal/tree/2.x)
 
 [![Build Status](https://travis-ci.org/angular/universal.svg?branch=master)](https://travis-ci.org/angular/universal)
