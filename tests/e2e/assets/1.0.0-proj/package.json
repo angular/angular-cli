@@ -33,7 +33,7 @@
     "jasmine-core": "~2.5.2",
     "jasmine-spec-reporter": "~3.2.0",
     "karma": "~1.4.1",
-    "karma-chrome-launcher": "~2.0.0",
+    "karma-chrome-launcher": "~2.1.1",
     "karma-cli": "~1.0.1",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
