@@ -1,7 +1,7 @@
 import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
 import {expectFileToExist, replaceInFile} from '../utils/fs';
-import {updateTsConfig, updateJsonFile, useNg2} from '../utils/project';
+import {updateTsConfig, updateJsonFile, useNg2, useCIChrome} from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';
 
@@ -36,16 +36,7 @@ export default function() {
         json['dependencies'][pkgName] = packages[pkgName].tar;
       });
     }))
-    // There's a race condition happening in Chrome. Enabling logging in chrome used by
-    // protractor actually fixes it. Logging is piped to a file so it doesn't affect our setup.
-    .then(() => replaceInFile('protractor.conf.js', `'browserName': 'chrome'`,
-      `'browserName': 'chrome',
-        chromeOptions: {
-          args: [
-            "--enable-logging",
-          ]
-        }
-      `))
+    .then(() => useCIChrome())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => {
       if (argv['nightly'] || argv['ng-sha']) {
