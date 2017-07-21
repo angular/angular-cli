@@ -1,6 +1,6 @@
-import {readFile, writeFile} from './fs';
-import {execAndWaitForOutputToMatch, silentNpm, ng} from './process';
-import {getGlobalVariable} from './env';
+import { readFile, writeFile, replaceInFile } from './fs';
+import { execAndWaitForOutputToMatch, silentNpm, ng } from './process';
+import { getGlobalVariable } from './env';
 
 const packages = require('../../../lib/packages').packages;
 
@@ -43,6 +43,7 @@ export function createProject(name: string, ...args: string[]) {
         json['dependencies'][pkgName] = packages[pkgName].dist;
       });
     }))
+    .then(() => useCIChrome())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => {
       if (argv.nightly || argv['ng-sha']) {
@@ -75,6 +76,36 @@ export function createProject(name: string, ...args: string[]) {
     })
     .then(() => console.log(`Project ${name} created... Installing npm.`))
     .then(() => silentNpm('install'));
+}
+
+export function useCIChrome() {
+  // There's a race condition happening in Chrome. Enabling logging in chrome used by
+  // protractor actually fixes it. Logging is piped to a file so it doesn't affect our setup.
+  // --no-sandbox is needed for Circle CI.
+  // Travis can use headless chrome, but not appveyor.
+  return Promise.resolve()
+    .then(() => replaceInFile('protractor.conf.js', `'browserName': 'chrome'`,
+      `'browserName': 'chrome',
+        chromeOptions: {
+          args: [
+            "--enable-logging",
+            "--no-sandbox",
+            ${process.env['TRAVIS'] ? '"--headless", "--disable-gpu"' : ''}
+          ]
+        }
+    `))
+    // Not a problem if the file can't be found.
+    .catch(() => null)
+    .then(() => replaceInFile('karma.conf.js', `browsers: ['Chrome'],`,
+      `browsers: ['ChromeCI'],
+      customLaunchers: {
+        ChromeCI: {
+          base: '${process.env['TRAVIS'] ? 'ChromeHeadless' : 'Chrome'}',
+          flags: ['--no-sandbox']
+        }
+      },
+    `))
+    .catch(() => null);
 }
 
 // Convert a Angular 4 project to Angular 2.
