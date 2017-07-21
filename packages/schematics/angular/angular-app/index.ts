@@ -13,8 +13,10 @@ import {
   Tree,
   apply,
   chain,
+  filter,
   mergeWith,
   move,
+  noop,
   schematic,
   template,
   url,
@@ -58,12 +60,27 @@ function addBootstrapToNgModule(directory: string): Rule {
   };
 }
 
+function minimalPathFilter(path: string): boolean {
+  const toRemoveList: RegExp[] = [/e2e\//, /editorconfig/, /README/, /karma.conf.js/,
+                                  /protractor.conf.js/, /test.ts/, /tsconfig.spec.json/,
+                                  /tslint.json/, /favicon.ico/];
+
+  return !toRemoveList.some(re => re.test(path));
+}
+
 export default function (options: any): Rule {
   const appRootSelector = 'app-root';
+  const componentOptions = !options.minimal ? {} :
+    {
+      inlineStyle: true,
+      inlineTemplate: true,
+      spec: false,
+    };
 
   return chain([
     mergeWith(
       apply(url('./files'), [
+        options.minimal ? filter(minimalPathFilter) : noop(),
         template({
           utils: stringUtils,
           'dot': '.',
@@ -81,6 +98,7 @@ export default function (options: any): Rule {
       selector: appRootSelector,
       sourceDir: options.directory + '/' + options.sourceDir,
       flat: true,
+      ...componentOptions,
     }),
     addBootstrapToNgModule(options.directory),
     mergeWith(
