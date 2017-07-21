@@ -1,6 +1,9 @@
 dist: trusty
 sudo: false
 
+addons:
+  chrome: stable
+
 language: node_js
 
 cache:
@@ -90,9 +93,8 @@ matrix:
 
 before_install:
   # Use a virtual display.
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CHROME_BIN=chromium-browser; fi
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
   # Install yarn.
   - curl -o- -L https://yarnpkg.com/install.sh | bash
   - export PATH="$HOME/.yarn/bin:$PATH"
