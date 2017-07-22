@@ -507,7 +507,6 @@ export default Task.extend({
           'cssnano',
           'exports-loader',
           'file-loader',
-          'json-loader',
           'karma-sourcemap-loader',
           'less-loader',
           'postcss-loader',
