@@ -20,7 +20,7 @@ These are used by [UglifyJS](https://github.com/mishoo/UglifyJS2) to identify pu
 
 Static properties are folded into ES5 classes:
 
-```
+```typescript
 // input
 var Clazz = (function () { function Clazz() { } return Clazz; }());
 Clazz.prop = 1;
@@ -34,7 +34,7 @@ var Clazz = (function () { function Clazz() { } Clazz.prop = 1; return Clazz; }(
 
 Angular decorators, property decorators and constructor parameters are removed, while leaving non-Angular ones intact.
 
-```
+```typescript
 // input
 import { Injectable, Input } from '@angular/core';
 import { NotInjectable } from 'another-lib';
@@ -56,7 +56,7 @@ Clazz.decorators = [{ type: NotInjectable }];
 Adds `/*@__PURE__*/` comments to top level downleveled class declarations and instantiation. 
 Webpack library imports are also marked as `/*@__PURE__*/` when used with [Purify Plugin](#purify-plugin).
 
-```
+```typescript
 // input
 var Clazz = (function () { function Clazz() { } return Clazz; }());
 var newClazz = new Clazz();
@@ -73,7 +73,7 @@ var newClazzTwo = /*@__PURE__*/ Clazz();
 
 TypeScript helpers (`__extends/__decorate/__metadata/__param`) are replaced with `tslib` imports whenever found.
 
-```
+```typescript
 // input
 var __extends = (this && this.__extends) || function (d, b) {
   for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -94,14 +94,14 @@ enums and webpack imports (used with [Prefix functions](#prefix-functions))
 
 ## Library Usage
 
-```
+```typescript
 import { buildOptimizer } from '@angular-devkit/build-optimizer';
 
 const transpiledContent = buildOptimizer({ content: input }).content;
 ```
 
 Available options:
-```
+```typescript
 export interface BuildOptimizerOptions {
   content?: string;
   inputFilePath?: string;
@@ -114,7 +114,7 @@ export interface BuildOptimizerOptions {
 
 ## Webpack loader and plugin usage:
 
-```
+```typescript
 const PurifyPlugin = require('@angular-devkit/build-optimizer').PurifyPlugin;
 
 module.exports = {
@@ -138,7 +138,7 @@ module.exports = {
 
 ## CLI usage
 
-```
+```bash
 build-optimizer input.js
 build-optimizer input.js output.js
 purify input.js
