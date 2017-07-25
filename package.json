@@ -99,7 +99,7 @@
     "typescript": "~2.4.2",
     "url-loader": "^0.5.7",
     "walk-sync": "^0.3.1",
-    "webpack": "~3.3.0",
+    "webpack": "3.3.0",
     "webpack-dev-middleware": "^1.11.0",
     "webpack-dev-server": "~2.5.1",
     "webpack-merge": "^4.1.0",
