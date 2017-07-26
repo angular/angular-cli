@@ -98,6 +98,9 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     // This plugin must be before webpack.optimize.UglifyJsPlugin.
     extraPlugins.push(new PurifyPlugin());
     uglifyCompressOptions.pure_getters = true;
+    // PURE comments work best with 3 passes.
+    // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
+    uglifyCompressOptions.passes = 3;
   }
 
   return {
