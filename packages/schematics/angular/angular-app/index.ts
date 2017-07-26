@@ -70,7 +70,12 @@ function minimalPathFilter(path: string): boolean {
 
 export default function (options: any): Rule {
   const appRootSelector = 'app-root';
-  const componentOptions = !options.minimal ? {} :
+  const componentOptions = !options.minimal ?
+    {
+      inlineStyle: options.inlineStyle,
+      inlineTemplate: options.inlineTemplate,
+      styleext: options.styleext,
+    } :
     {
       inlineStyle: true,
       inlineTemplate: true,
@@ -92,6 +97,7 @@ export default function (options: any): Rule {
       commonModule: false,
       flat: true,
       sourceDir: options.directory + '/' + options.sourceDir,
+      routing: options.routing,
     }),
     schematic('component', {
       name: 'app',
@@ -103,6 +109,8 @@ export default function (options: any): Rule {
     addBootstrapToNgModule(options.directory),
     mergeWith(
       apply(url('./other-files'), [
+        options.minimal || options.inlineTemplate ?
+          filter(path => !path.endsWith('.html')) : noop(),
         template({ utils: stringUtils, ...options, selector: appRootSelector }),
         move(options.directory + '/' + options.sourceDir + '/app'),
       ]), MergeStrategy.Overwrite),

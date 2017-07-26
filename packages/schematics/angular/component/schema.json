@@ -10,7 +10,8 @@
     },
     "sourceDir": {
       "type": "string",
-      "default": "src"
+      "default": "src",
+      "alias": "sd"
     },
     "name": {
       "type": "string"
@@ -18,24 +19,28 @@
     "inlineStyle": {
       "description": "Specifies if the style will be in the ts file.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "alias": "is"
     },
     "inlineTemplate": {
       "description": "Specifies if the template will be in the ts file.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "alias": "it"
     },
     "viewEncapsulation": {
       "description": "Specifies the view encapsulation strategy.",
       "enum": ["Emulated", "Native", "None"],
       "type": "string",
-      "default": "None"
+      "default": "None",
+      "alias": "ve"
     },
     "changeDetection": {
       "description": "Specifies the change detection strategy.",
       "enum": ["Default", "OnPush"],
       "type": "string",
-      "default": "Default"
+      "default": "Default",
+      "alias": "ve"
     },
     "routing": {
       "type": "boolean",
@@ -44,7 +49,8 @@
     "prefix": {
       "type": "string",
       "description": "The prefix to apply to generated selectors.",
-      "default": "app"
+      "default": "app",
+      "alias": "p"
     },
     "styleext": {
       "description": "The file extension to be used for style files.",
