@@ -82,7 +82,7 @@ function getLocalVersion(rootDir: string, name: string): Promise<string> {
 
 function httpsGet(url: string): Promise<any> {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
+    https.get((<any>url), (res) => {
       const { statusCode } = res;
       const contentType = res.headers['content-type'];
 
