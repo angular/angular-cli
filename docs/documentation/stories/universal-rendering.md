@@ -77,7 +77,7 @@ Create a main file for your Universal bundle. This file only needs to export you
 export {AppServerModule} from './app/app.server.module';
 ```
 
-Copy `tsconfig.app.json` to `tsconfig-server.json` and change it to build with a `"module"` target of `"commonjs"`.
+Copy `tsconfig.app.json` to `tsconfig.server.json` and change it to build with a `"module"` target of `"commonjs"`.
 
 Add a section for `"angularCompilerOptions"` and set `"entryModule"` to your `AppServerModule`, specified as a path to the import with a hash (`#`) containing the symbol name. In this example, this would be `app/app.server.module#AppServerModule`.
 
