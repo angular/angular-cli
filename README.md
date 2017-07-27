@@ -62,7 +62,7 @@ This repository will host the various tools like engines to integrate with vario
 
 # Getting Started
 
-[* **NodeJS** :: Example repo](https://github.com/robwormald/ng-universal-demo)
+[* **NodeJS** :: Example repo](https://github.com/angular/universal-starter)
   - Minimal webpack & universal example with Angular 4.0
 
 [* ASP.NET Core :: Universal Starter repo](https://github.com/MarkPieszak/aspnetcore-angular2-universal)
