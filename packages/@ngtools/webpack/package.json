@@ -25,12 +25,12 @@
     "npm": ">= 3.0.0"
   },
   "dependencies": {
-    "enhanced-resolve": "3.3.0",
     "loader-utils": "^1.0.2",
     "magic-string": "^0.22.3",
     "source-map": "^0.5.6"
   },
   "peerDependencies": {
+    "enhanced-resolve": "^3.1.0",
     "typescript": "^2.0.2",
     "webpack": "^2.2.0 || ^3.0.0"
   }
