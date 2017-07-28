@@ -8,7 +8,8 @@ import {
   getProdConfig,
   getStylesConfig,
   getNonAotConfig,
-  getAotConfig
+  getAotConfig,
+  getCustomConfig
 } from './webpack-configs';
 
 const path = require('path');
@@ -50,6 +51,8 @@ export class NgCliWebpackConfig {
         : getNonAotConfig(this.wco);
       webpackConfigs.push(typescriptConfigPartial);
     }
+
+    webpackConfigs.push(getCustomConfig(this.wco));
 
     this.config = webpackMerge(webpackConfigs);
     return this.config;
