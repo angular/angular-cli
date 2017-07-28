@@ -62,6 +62,7 @@
     "jasmine": "jasmine",
     "build:ng-express-engine": "ngc -p modules/ng-express-engine/tsconfig.json",
     "build:ng-aspnetcore-engine": "ngc -p modules/ng-aspnetcore-engine/tsconfig.json",
+    "build:ng-module-map-ngfactory-loader": "ngc -p modules/ng-module-map-ngfactory-loader/tsconfig.json",
     "build": "./build.sh",
     "test": "exit 0"
   },

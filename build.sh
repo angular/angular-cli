@@ -11,3 +11,8 @@ npm run build:ng-aspnetcore-engine
 
 cp modules/ng-aspnetcore-engine/package.json dist/ng-aspnetcore-engine/package.json
 cp modules/ng-aspnetcore-engine/README.md dist/ng-aspnetcore-engine/README.md
+
+npm run build:ng-module-map-ngfactory-loader
+
+cp modules/ng-module-map-ngfactory-loader/package.json dist/ng-module-map-ngfactory-loader/package.json
+cp modules/ng-module-map-ngfactory-loader/README.md dist/ng-module-map-ngfactory-loader/README.md
