@@ -25,7 +25,7 @@
     "engine-strict": true
   },
   "engines": {
-    "node": ">= 5.4.1 <= 7",
+    "node": ">= 5.4.1 <= 8",
     "npm": ">= 3"
   },
   "scripts": {
@@ -45,7 +45,7 @@
     "@angular/platform-server": "^4.0.0",
     "rimraf": "^2.6.1",
     "rxjs": "^5.2.0",
-    "typescript": "^2.2.1",
+    "typescript": "~2.3.2",
     "zone.js": "^0.8.4"
   },
   "dependencies": {

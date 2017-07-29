@@ -54,7 +54,7 @@
     "engine-strict": true
   },
   "engines": {
-    "node": ">= 5.4.1 <= 7",
+    "node": ">= 5.4.1 <= 8",
     "npm": ">= 3"
   },
   "scripts": {
