@@ -9,7 +9,7 @@ import { NgCliWebpackConfig } from '../models/webpack-config';
 import { ServeTaskOptions } from '../commands/serve';
 import { CliConfig } from '../models/config';
 import { getAppFromConfig } from '../utilities/app-utils';
-import {statsToString} from '../utilities/stats';
+import { statsToString, statsWarningsToString, statsErrorsToString } from '../utilities/stats';
 
 const WebpackDevServer = require('webpack-dev-server');
 const Task = require('../ember-cli/lib/models/task');
@@ -215,13 +215,13 @@ export default Task.extend({
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
     if (!serveTaskOptions.verbose) {
       webpackCompiler.plugin('done', (stats: any) => {
-        const str = statsToString(stats.toJson(), statsConfig);
+        const json = stats.toJson('verbose');
+        this.ui.writeLine(statsToString(json, statsConfig));
+        if (stats.hasWarnings()) {
+          this.ui.writeLine(statsWarningsToString(json, statsConfig));
+        }
         if (stats.hasErrors()) {
-          this.ui.writeError(str);
-        } else if (stats.hasWarnings()) {
-          this.ui.writeWarnLine(str);
-        } else {
-          this.ui.writeLine(str);
+          this.ui.writeError(statsErrorsToString(json, statsConfig));
         }
       });
     }
