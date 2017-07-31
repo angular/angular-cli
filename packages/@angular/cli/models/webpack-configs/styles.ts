@@ -135,7 +135,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     { test: /\.less$/, use: [{
         loader: 'less-loader',
         options: {
-          sourceMap: cssSourceMap
+          sourceMap: cssSourceMap,
+          paths: includePaths
         }
       }]
     },
