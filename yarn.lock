@@ -2,24 +2,23 @@
 # yarn lockfile v1
 
 
-"@angular-devkit/build-optimizer@0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/build-optimizer/-/build-optimizer-0.0.5.tgz#321b141126ce462843e4d13e9d5603877e044860"
+"@angular-devkit/build-optimizer@0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/build-optimizer/-/build-optimizer-0.0.13.tgz#cf397af76abe899aa909d4a735106694ca1f08cf"
   dependencies:
     loader-utils "^1.1.0"
-    magic-string "^0.19.1"
     source-map "^0.5.6"
     typescript "^2.3.3"
 
-"@angular-devkit/core@0.0.6", "@angular-devkit/core@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-0.0.6.tgz#caf25c0c7928196e244b5fe5124256fcef6bce7c"
+"@angular-devkit/core@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-0.0.10.tgz#fb4d2d691d737978042cb3885813f6212c20dc2b"
 
-"@angular-devkit/schematics@0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-0.0.9.tgz#84668c0196648de7e88e1727b2e7defbd7962dfd"
+"@angular-devkit/schematics@0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-0.0.17.tgz#61d086a266adafd8790972c87dd8f7a44f004de6"
   dependencies:
-    "@angular-devkit/core" "0.0.6"
+    "@angular-devkit/core" "0.0.10"
     "@ngtools/json-schema" "^1.1.0"
     minimist "^1.2.0"
     rxjs "^5.4.2"
@@ -54,11 +53,9 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@ngtools/json-schema/-/json-schema-1.1.0.tgz#c3a0c544d62392acc2813a42c8a0dc6f58f86922"
 
-"@schematics/angular@0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-0.0.9.tgz#c9ff31078af3079990e448ddd07b735ed3c1b4bd"
-  dependencies:
-    "@angular-devkit/schematics" "0.0.9"
+"@schematics/angular@0.0.27":
+  version "0.0.27"
+  resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-0.0.27.tgz#5067451954b59545f9e96a1b84588a6757fbc563"
 
 "@types/chalk@^0.4.28":
   version "0.4.31"
@@ -1580,12 +1577,6 @@ elliptic@^6.0.0:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
 
-ember-cli-normalize-entity-name@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/ember-cli-normalize-entity-name/-/ember-cli-normalize-entity-name-1.0.0.tgz#0b14f7bcbc599aa117b5fddc81e4fd03c4bad5b7"
-  dependencies:
-    silent-error "^1.0.0"
-
 ember-cli-string-utils@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/ember-cli-string-utils/-/ember-cli-string-utils-1.1.0.tgz#39b677fc2805f55173735376fcef278eaa4452a1"
@@ -2562,10 +2553,6 @@ indexof@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/indexof/-/indexof-0.0.1.tgz#82dc336d232b9062179d05ab3293a66059fd435d"
 
-inflection@^1.7.0:
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/inflection/-/inflection-1.12.0.tgz#a200935656d6f5f6bc4dc7502e1aecb703228416"
-
 inflight@^1.0.4:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/inflight/-/inflight-1.0.6.tgz#49bd6331d7d02d0c09bc910a1075ba8165b56df9"
@@ -2859,10 +2846,6 @@ isarray@1.0.0, isarray@^1.0.0, isarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
 
-isbinaryfile@^3.0.0:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/isbinaryfile/-/isbinaryfile-3.0.2.tgz#4a3e974ec0cba9004d3fc6cde7209ea69368a621"
-
 isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
@@ -3091,9 +3074,9 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-license-webpack-plugin@^0.4.3:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-0.4.3.tgz#f9d88d4ebc04407a0061e8ccac26571f88e51a16"
+license-webpack-plugin@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-0.5.1.tgz#68d8af103486a9c4ebceddb7ed5d3bd61f383be4"
   dependencies:
     object-assign "^4.1.0"
 
@@ -3225,12 +3208,6 @@ macaddress@^0.2.8:
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/macaddress/-/macaddress-0.2.8.tgz#5904dc537c39ec6dbefeae902327135fa8511f12"
 
-magic-string@^0.19.1:
-  version "0.19.1"
-  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.19.1.tgz#14d768013caf2ec8fdea16a49af82fc377e75201"
-  dependencies:
-    vlq "^0.2.1"
-
 magic-string@^0.22.3:
   version "0.22.3"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.22.3.tgz#047989d99bfc7cbdefba1604adc8912551cd7ef1"
@@ -3354,7 +3331,7 @@ minimalistic-crypto-utils@^1.0.0, minimalistic-crypto-utils@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
 
-minimatch@^3.0.0, minimatch@^3.0.2, minimatch@^3.0.3, minimatch@^3.0.4, minimatch@~3.0.2:
+minimatch@^3.0.0, minimatch@^3.0.2, minimatch@^3.0.4, minimatch@~3.0.2:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   dependencies:
