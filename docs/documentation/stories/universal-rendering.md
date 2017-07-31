@@ -13,7 +13,7 @@ $ npm install --save-dev @angular/platform-server
 ```
 or
 ```bash
-$ yarn add @angular/platform-server
+$ yarn add @angular/platform-server --dev
 ```
 
 
