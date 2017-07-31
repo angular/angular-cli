@@ -31,7 +31,7 @@ export default function () {
       h4
         background-color: $primary-color
     `,
-      'src/style-paths/variables.less': '@primary-color: #ADD;',
+      'src/style-paths/variables.less': '@primary-color: #ADDADD;',
       'src/styles.less': `
       @import 'variables';
       h5 { color: @primary-color; }
