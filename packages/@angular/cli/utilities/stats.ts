@@ -1,4 +1,4 @@
-import { bold, green, reset, white, yellow } from 'chalk';
+import { bold, green, red, reset, white, yellow } from 'chalk';
 import { stripIndents } from 'common-tags';
 
 
@@ -16,12 +16,12 @@ function _formatSize(size: number): string {
 
 export function statsToString(json: any, statsConfig: any) {
   const colors = statsConfig.colors;
-  const r = (x: string) => colors ? reset(x) : x;
+  const rs = (x: string) => colors ? reset(x) : x;
   const w = (x: string) => colors ? bold(white(x)) : x;
   const g = (x: string) => colors ? bold(green(x)) : x;
   const y = (x: string) => colors ? bold(yellow(x)) : x;
 
-  return r(stripIndents`
+  return rs(stripIndents`
     Date: ${w(new Date().toISOString())}
     Hash: ${w(json.hash)}
     Time: ${w('' + json.time)}ms
@@ -38,8 +38,21 @@ export function statsToString(json: any, statsConfig: any) {
 
       return `chunk {${y(chunk.id)}} ${g(files)}${names}${size}${parents} ${initial}${flags}`;
     }).join('\n')}
-
-    ${json.warnings.map((warning: any) => y(`WARNING in ${warning}`)).join('\n\n')}
-    ${json.errors.map((error: any) => r(`ERROR in ${error}`)).join('\n')}
     `);
+}
+
+export function statsWarningsToString(json: any, statsConfig: any) {
+  const colors = statsConfig.colors;
+  const rs = (x: string) => colors ? reset(x) : x;
+  const y = (x: string) => colors ? bold(yellow(x)) : x;
+
+  return rs('\n' + json.warnings.map((warning: any) => y(`WARNING in ${warning}`)).join('\n\n'));
+}
+
+export function statsErrorsToString(json: any, statsConfig: any) {
+  const colors = statsConfig.colors;
+  const rs = (x: string) => colors ? reset(x) : x;
+  const r = (x: string) => colors ? bold(red(x)) : x;
+
+  return rs('\n' + json.errors.map((error: any) => r(`ERROR in ${error}`)).join('\n'));
 }
