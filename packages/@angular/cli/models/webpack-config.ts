@@ -10,8 +10,7 @@ import {
   getNonAotConfig,
   getAotConfig
 } from './webpack-configs';
-
-const path = require('path');
+import * as path from 'path';
 
 export interface WebpackConfigOptions {
   projectRoot: string;
@@ -31,7 +30,7 @@ export class NgCliWebpackConfig {
 
     appConfig = this.addAppConfigDefaults(appConfig);
     buildOptions = this.addTargetDefaults(buildOptions);
-    buildOptions = this.mergeConfigs(buildOptions, appConfig);
+    buildOptions = this.mergeConfigs(buildOptions, appConfig, projectRoot);
 
     this.wco = { projectRoot, buildOptions, appConfig };
   }
@@ -94,9 +93,9 @@ export class NgCliWebpackConfig {
   }
 
   // Fill in defaults from .angular-cli.json
-  public mergeConfigs(buildOptions: BuildOptions, appConfig: any) {
+  public mergeConfigs(buildOptions: BuildOptions, appConfig: any, projectRoot: string) {
     const mergeableOptions = {
-      outputPath: appConfig.outDir,
+      outputPath: path.resolve(projectRoot, appConfig.outDir),
       deployUrl: appConfig.deployUrl,
       baseHref: appConfig.baseHref
     };
