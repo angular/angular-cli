@@ -1,16 +1,9 @@
 // tslint:disable:max-line-length
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as util from 'util';
-import { EOL } from 'os';
-import { forEach } from 'lodash';
 import { ng } from '../helpers';
 
 const tmp = require('../helpers/tmp');
-const walkSync = require('walk-sync');
-const Blueprint = require('@angular/cli/ember-cli/lib/models/blueprint');
-
-const root = process.cwd();
 
 
 describe('Acceptance: ng new', function () {
@@ -32,35 +25,6 @@ describe('Acceptance: ng new', function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     tmp.teardown('./tmp').then(() => done());
   });
-
-  function confirmBlueprintedForDir(dir: string) {
-    return function () {
-      let blueprintPath = path.join(root, dir, 'files');
-      let expected: string[] = walkSync(blueprintPath);
-      let actual = walkSync('.').sort();
-      let directory = path.basename(process.cwd());
-
-      forEach(Blueprint.renamedFiles, function (destFile, srcFile) {
-        expected[expected.indexOf(srcFile)] = destFile;
-      });
-
-      expected.forEach(function (file, index) {
-        expected[index] = file.replace(/__name__/g, '@angular/cli');
-      });
-
-      expected.sort();
-
-      expect(directory).toBe('foo');
-      expect(expected).toEqual(
-        actual,
-        EOL + ' expected: ' + util.inspect(expected) + EOL + ' but got: ' + util.inspect(actual));
-
-    };
-  }
-
-  function confirmBlueprinted() {
-    return confirmBlueprintedForDir('blueprints/ng');
-  }
 
   it('requires a valid name (!)', (done) => {
     return ng(['new', '!', '--skip-install', '--skip-git', '--inline-template'])
@@ -93,7 +57,10 @@ describe('Acceptance: ng new', function () {
 
   it('ng new foo, where foo does not yet exist, works', (done) => {
     return ng(['new', 'foo', '--skip-install'])
-      .then(confirmBlueprinted)
+      .then(() => {
+        expect(fs.pathExistsSync('../foo'));
+        expect(fs.pathExistsSync('package.json'));
+      })
       .then(done, done.fail);
   });
 
@@ -136,7 +103,6 @@ describe('Acceptance: ng new', function () {
           expect(!fs.pathExistsSync('foo'));
         });
       })
-      .then(confirmBlueprinted)
       .then(done, done.fail);
   });
 
