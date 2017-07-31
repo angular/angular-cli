@@ -294,6 +294,16 @@ Note: service worker support is experimental and subject to change.
 </details>
 
 <details>
+  <summary>common-chunk</summary>
+  <p>
+    <code>--common-chunk</code> (aliases: <code>-cc</code>) <em>default value: true</em>
+  </p>
+  <p>
+    Use a separate bundle containing code used across multiple bundles.
+  </p>
+</details>
+
+<details>
   <summary>verbose</summary>
   <p>
     <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
@@ -320,5 +330,25 @@ Note: service worker support is experimental and subject to change.
   </p>
   <p>
     Show circular dependency warnings on builds.
+  </p>
+</details>
+
+<details>
+  <summary>build-optimizer</summary>
+  <p>
+    <code>--build-optimizer</code> (aliases: <code>-bo</code>)
+  </p>
+  <p>
+    (Experimental) Enables @angular-devkit/build-optimizer optimizations when using `--aot`.
+  </p>
+</details>
+
+<details>
+  <summary>named-chunks</summary>
+  <p>
+    <code>--named-chunks</code> (aliases: <code>-nm</code>)
+  </p>
+  <p>
+    Use file name for lazy loaded chunks.
   </p>
 </details>

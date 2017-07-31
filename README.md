@@ -131,7 +131,7 @@ npm install
 
 If you are updating to 1.0 from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
 
-You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
+You can find more details about changes between versions in [the Releases tab on GitHub](https://github.com/angular/angular-cli/releases).
 
 
 ## Development Hints for working on Angular CLI
@@ -169,7 +169,7 @@ The folder you cloned it into, npm's folder where it stores global packages and 
 
 You can also use `ng new foo --link-cli` to automatically link the `@angular/cli` package.
 
-Please read the official [npm-link documentation](https://www.npmjs.org/doc/cli/npm-link.html)
+Please read the official [npm-link documentation](https://docs.npmjs.com/cli/link)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
 
 To run the Angular CLI test suite use the `node tests/run_e2e.js` command.

@@ -7,7 +7,7 @@ let version;
 try {
   version = require('@angular/compiler-cli').VERSION;
 } catch (e) {
-  throw new Error('The "@angular/compiler-cli" package was not properly installed.');
+  throw new Error('The "@angular/compiler-cli" package was not properly installed. Error: ' + e);
 }
 
 // Check that Angular is also not part of this module's node_modules (it should be the project's).
@@ -17,8 +17,9 @@ if (compilerCliPath.startsWith(path.dirname(__dirname))) {
                 + 'Please clean your node_modules and reinstall.');
 }
 
-// Throw if we're neither 2.3.1 or more, nor 4.x.y.
-if (!(   version.major == '4'
+// Throw if we're neither 2.3.1 or more, nor 4.x.y, nor 5.x.y.
+if (!(   version.major == '5'
+      || version.major == '4'
       || (version.major == '2'
           && (   version.minor == '4'
               || version.minor == '3' && version.patch == '1')))) {

@@ -3,6 +3,7 @@ import * as webpack from 'webpack';
 import * as fs from 'fs';
 import * as semver from 'semver';
 import { stripIndent } from 'common-tags';
+import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
@@ -91,19 +92,28 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     }));
   }
 
+  const uglifyCompressOptions: any = { screw_ie8: true, warnings: buildOptions.verbose };
+
+  if (buildOptions.buildOptimizer) {
+    // This plugin must be before webpack.optimize.UglifyJsPlugin.
+    extraPlugins.push(new PurifyPlugin());
+    uglifyCompressOptions.pure_getters = true;
+  }
+
   return {
     entry: entryPoints,
-    plugins: [
+    plugins: extraPlugins.concat([
       new webpack.EnvironmentPlugin({
         'NODE_ENV': 'production'
       }),
-      new (<any>webpack).HashedModuleIdsPlugin(),
+      new webpack.HashedModuleIdsPlugin(),
+      new webpack.optimize.ModuleConcatenationPlugin(),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8: true },
-        compress: { screw_ie8: true, warnings: buildOptions.verbose },
+        compress: uglifyCompressOptions,
         sourceMap: buildOptions.sourcemaps,
         comments: false
       })
-    ].concat(extraPlugins)
+    ])
   };
 };

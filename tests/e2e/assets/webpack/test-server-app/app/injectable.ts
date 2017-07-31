@@ -4,5 +4,5 @@ import {DOCUMENT} from '@angular/platform-browser';
 
 @Injectable()
 export class MyInjectable {
-  constructor(public viewContainer: ViewContainerRef, @Inject(DOCUMENT) public doc) {}
+  constructor(@Inject(DOCUMENT) public doc) {}
 }

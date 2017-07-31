@@ -14,7 +14,13 @@ const root = process.cwd();
 
 
 describe('Acceptance: ng new', function () {
+  let originalTimeout: number;
+
   beforeEach((done) => {
+    // Increase timeout for these tests only.
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+
     spyOn(console, 'error');
 
     tmp.setup('./tmp')
@@ -23,6 +29,7 @@ describe('Acceptance: ng new', function () {
   }, 10000);
 
   afterEach((done) => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     tmp.teardown('./tmp').then(() => done());
   });
 

@@ -30,7 +30,7 @@ export class CliConfig<JsonType> {
   get config(): JsonType { return <any>this._config; }
 
   save(path: string = this._configPath) {
-    return fs.writeFileSync(path, this.serialize(), 'utf-8');
+    return fs.writeFileSync(path, this.serialize(), {encoding: 'utf-8'});
   }
   serialize(mimetype = 'application/json'): string {
     return this._config.$$serialize(mimetype);
@@ -59,6 +59,12 @@ export class CliConfig<JsonType> {
 
   set(jsonPath: string, value: any) {
     this._config.$$set(jsonPath, value);
+  }
+
+  getPaths(baseJsonPath: string, keys: string[]) {
+    const ret: { [k: string]: any } = {};
+    keys.forEach(key => ret[key] = this.get(`${baseJsonPath}.${key}`));
+    return ret;
   }
 
   static fromJson<ConfigType>(content: ConfigType, ...global: ConfigType[]) {

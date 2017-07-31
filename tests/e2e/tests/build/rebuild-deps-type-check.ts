@@ -1,7 +1,7 @@
 import {
   killAllProcesses,
   waitForAnyProcessOutputToMatch,
-  silentExecAndWaitForOutputToMatch,
+  execAndWaitForOutputToMatch,
 } from '../../utils/process';
 import {writeFile, prependToFile, appendToFile} from '../../utils/fs';
 import {wait} from '../../utils/utils';
@@ -39,7 +39,7 @@ export default function() {
     `))
     .then(() => wait(2000))
     // Should trigger a rebuild, no error expected.
-    .then(() => silentExecAndWaitForOutputToMatch('ng', ['serve'], doneRe))
+    .then(() => execAndWaitForOutputToMatch('ng', ['serve'], doneRe))
     // Make an invalid version of the file.
     .then(() => writeFile('src/funky2.ts', `
       export function funky2(value: number): number {

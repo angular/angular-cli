@@ -152,19 +152,49 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       return;
     }
 
+    /**
+     * storageDataSetter is a temporary hack to address these two issues:
+     * - https://github.com/angular/angular-cli/issues/7113
+     * - https://github.com/angular/angular-cli/issues/7136
+     *
+     * This way we set values correctly in both a Map (enhanced-resove>=3.4.0) and
+     * object (enhanced-resolve >= 3.1.0 <3.4.0).
+     *
+     * The right solution is to create a virtual filesystem by decorating the filesystem,
+     * instead of injecting data into the private cache of the filesystem.
+     *
+     * Doing it the right way should fix other related bugs, but meanwhile we hack it since:
+     * - it's affecting a lot of users.
+     * - the real solution is non-trivial.
+     */
+    function storageDataSetter(data: Map<string, any> | {[k: string]: any}, k: string, v: any) {
+
+      if (data instanceof Map) {
+        data.set(k, v);
+      } else {
+        data[k] = v;
+      }
+    }
+
+
+
     const isWindows = process.platform.startsWith('win');
     for (const fileName of this.getChangedFilePaths()) {
       const stats = this._files[fileName];
       if (stats) {
         // If we're on windows, we need to populate with the proper path separator.
         const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
-        fs._statStorage.data[path] = [null, stats];
-        fs._readFileStorage.data[path] = [null, stats.content];
+        // fs._statStorage.data[path] = [null, stats];
+        // fs._readFileStorage.data[path] = [null, stats.content];
+        storageDataSetter(fs._statStorage.data, path, [null, stats]);
+        storageDataSetter(fs._readFileStorage.data, path, [null, stats.content]);
       } else {
         // Support removing files as well.
         const path = isWindows ? fileName.replace(/\//g, '\\') : fileName;
-        fs._statStorage.data[path] = [new Error(), null];
-        fs._readFileStorage.data[path] = [new Error(), null];
+        // fs._statStorage.data[path] = [new Error(), null];
+        // fs._readFileStorage.data[path] = [new Error(), null];
+        storageDataSetter(fs._statStorage.data, path, [new Error(), null]);
+        storageDataSetter(fs._readFileStorage.data, path, [new Error(), null]);
       }
     }
     for (const dirName of Object.keys(this._changedDirs)) {
@@ -173,8 +203,10 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       const files = this.getFiles(dirName);
       // If we're on windows, we need to populate with the proper path separator.
       const path = isWindows ? dirName.replace(/\//g, '\\') : dirName;
-      fs._statStorage.data[path] = [null, stats];
-      fs._readdirStorage.data[path] = [null, files.concat(dirs)];
+      // fs._statStorage.data[path] = [null, stats];
+      // fs._readdirStorage.data[path] = [null, files.concat(dirs)];
+      storageDataSetter(fs._statStorage.data, path, [null, stats]);
+      storageDataSetter(fs._readFileStorage.data, path, [null, files.concat(dirs)]);
     }
   }
 

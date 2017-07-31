@@ -196,7 +196,7 @@ export class TypeScriptFileRefactor {
     this._sourceString.overwrite(node.getStart(this._sourceFile),
                                  node.getEnd(),
                                  replacement,
-                                 replaceSymbolName);
+                                 { storeName: replaceSymbolName });
     this._changed = true;
   }
 

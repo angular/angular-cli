@@ -1,7 +1,7 @@
 import {
   killAllProcesses,
   waitForAnyProcessOutputToMatch,
-  silentExecAndWaitForOutputToMatch
+  execAndWaitForOutputToMatch,
 } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 import { readFile, writeFile } from '../../utils/fs';
@@ -12,7 +12,7 @@ const karmaGoodRegEx = /Executed 3 of 3 SUCCESS \(\d+\.\d+ secs/;
 
 export default function () {
   let originalSpec: string;
-  return silentExecAndWaitForOutputToMatch('ng', ['test', '--no-progress'], karmaGoodRegEx)
+  return execAndWaitForOutputToMatch('ng', ['test'], karmaGoodRegEx)
     .then(() => readFile('src/app/app.component.spec.ts'))
     .then((data) => originalSpec = data)
     // Trigger a failed rebuild, which shouldn't run tests again.
@@ -20,7 +20,7 @@ export default function () {
     .then(() => expectToFail(() => waitForAnyProcessOutputToMatch(karmaGoodRegEx, 10000)))
     // Restore working spec.
     .then(() => writeFile('src/app/app.component.spec.ts', originalSpec))
-    .then(() => waitForAnyProcessOutputToMatch(karmaGoodRegEx, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(karmaGoodRegEx, 20000))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();
       throw err;

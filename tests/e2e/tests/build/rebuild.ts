@@ -2,7 +2,7 @@ import {
   killAllProcesses,
   exec,
   waitForAnyProcessOutputToMatch,
-  silentExecAndWaitForOutputToMatch,
+  execAndWaitForOutputToMatch,
   ng,
 } from '../../utils/process';
 import {writeFile, writeMultipleFiles} from '../../utils/fs';
@@ -25,7 +25,7 @@ export default function() {
   let oldNumberOfChunks = 0;
   const chunkRegExp = /chunk\s+\{/g;
 
-  return silentExecAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
+  return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
     // Should trigger a rebuild.
     .then(() => exec('touch', 'src/main.ts'))
     .then(() => waitForAnyProcessOutputToMatch(invalidBundleRegEx, 10000))

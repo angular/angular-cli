@@ -5,8 +5,12 @@ import { oneLine } from 'common-tags';
 
 const Command = require('../ember-cli/lib/models/command');
 
+
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
-const pollDefault = config.config.defaults && config.config.defaults.poll;
+const buildConfigDefaults = config.getPaths('defaults.build', [
+  'sourcemaps', 'baseHref', 'progress', 'poll', 'deleteOutputPath', 'preserveSymlinks',
+  'showCircularDependencies', 'commonChunk', 'namedChunks'
+]);
 
 // defaults for BuildOptions
 export const baseBuildCommandOptions: any = [
@@ -20,7 +24,7 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'environment',
     type: String,
-    aliases: ['e'] ,
+    aliases: ['e'],
     description: 'Defines the build environment.'
   },
   {
@@ -38,20 +42,29 @@ export const baseBuildCommandOptions: any = [
     name: 'sourcemaps',
     type: Boolean,
     aliases: ['sm', 'sourcemap'],
-    description: 'Output sourcemaps.'
+    description: 'Output sourcemaps.',
+    default: buildConfigDefaults['sourcemaps']
   },
   {
     name: 'vendor-chunk',
     type: Boolean,
-    default: true,
     aliases: ['vc'],
     description: 'Use a separate bundle containing only vendor libraries.'
+  },
+  {
+    name: 'common-chunk',
+    type: Boolean,
+    default: buildConfigDefaults['common-chunk'] === undefined ?
+      true : buildConfigDefaults['common-chunk'],
+    aliases: ['cc'],
+    description: 'Use a separate bundle containing code used across multiple bundles.'
   },
   {
     name: 'base-href',
     type: String,
     aliases: ['bh'],
-    description: 'Base url for the application being built.'
+    description: 'Base url for the application being built.',
+    default: buildConfigDefaults['base-href']
   },
   {
     name: 'deploy-url',
@@ -69,9 +82,9 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'progress',
     type: Boolean,
-    default: true,
     aliases: ['pr'],
-    description: 'Log progress to the console while building.'
+    description: 'Log progress to the console while building.',
+    default: buildConfigDefaults['progress']
   },
   {
     name: 'i18n-file',
@@ -111,8 +124,8 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'poll',
     type: Number,
-    default: pollDefault,
-    description: 'Enable and define the file watching poll time period (milliseconds).'
+    description: 'Enable and define the file watching poll time period (milliseconds).',
+    default: buildConfigDefaults['poll']
   },
   {
     name: 'app',
@@ -123,15 +136,15 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'delete-output-path',
     type: Boolean,
-    default: true,
     aliases: ['dop'],
-    description: 'Delete output path before build.'
+    description: 'Delete output path before build.',
+    default: buildConfigDefaults['deleteOutputPath'],
   },
   {
     name: 'preserve-symlinks',
     type: Boolean,
-    default: false,
-    description: 'Do not use the real path when resolving modules.'
+    description: 'Do not use the real path when resolving modules.',
+    default: buildConfigDefaults['preserveSymlinks']
   },
   {
     name: 'extract-licenses',
@@ -143,7 +156,23 @@ export const baseBuildCommandOptions: any = [
     name: 'show-circular-dependencies',
     type: Boolean,
     aliases: ['scd'],
-    description: 'Show circular dependency warnings on builds.'
+    description: 'Show circular dependency warnings on builds.',
+    default: buildConfigDefaults['showCircularDependencies']
+  },
+  {
+    name: 'build-optimizer',
+    type: Boolean,
+    default: false,
+    aliases: ['bo'],
+    description: '(Experimental) Enables @angular-devkit/build-optimizer '
+    + 'optimizations when using `--aot`.'
+  },
+  {
+    name: 'named-chunks',
+    type: Boolean,
+    aliases: ['nc'],
+    description: 'Use file name for lazy loaded chunks.',
+    default: buildConfigDefaults['namedChunks']
   }
 ];
 
@@ -158,17 +187,22 @@ const BuildCommand = Command.extend({
 
   availableOptions: baseBuildCommandOptions.concat([
     {
-       name: 'stats-json',
-       type: Boolean,
-       default: false,
-       description: oneLine`Generates a \`stats.json\` file which can be analyzed using tools
+      name: 'stats-json',
+      type: Boolean,
+      default: false,
+      description: oneLine`Generates a \`stats.json\` file which can be analyzed using tools
        such as: \`webpack-bundle-analyzer\` or https://webpack.github.io/analyse.`
-      }
+    }
   ]),
 
   run: function (commandOptions: BuildTaskOptions) {
     // Check angular version.
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
+
+    // Default vendor chunk to false when build optimizer is on.
+    if (commandOptions.vendorChunk === undefined) {
+      commandOptions.vendorChunk = !commandOptions.buildOptimizer;
+    }
 
     const BuildTask = require('../tasks/build').default;
 

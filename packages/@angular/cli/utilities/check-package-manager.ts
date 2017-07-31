@@ -8,6 +8,8 @@ const packageManager = CliConfig.fromGlobal().get('packageManager');
 
 
 export function checkYarnOrCNPM() {
+
+  // Don't show messages if user has already changed the default.
   if (packageManager !== 'default') {
     return Promise.resolve();
   }
@@ -23,6 +25,11 @@ export function checkYarnOrCNPM() {
           console.log(chalk.yellow('You can `ng set --global packageManager=yarn`.'));
         } else if (isCNPMInstalled) {
           console.log(chalk.yellow('You can `ng set --global packageManager=cnpm`.'));
+        } else  {
+          if (packageManager !== 'default' && packageManager !== 'npm') {
+            console.log(chalk.yellow(`Seems that ${packageManager} is not installed.`));
+            console.log(chalk.yellow('You can `ng set --global packageManager=npm`.'));
+          }
         }
       });
 }

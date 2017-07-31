@@ -10,7 +10,7 @@ export default function() {
     return Promise.resolve();
   }
 
-  return ng('build')
+  return ng('build', '--sourcemaps')
     .then(() => expectFileToExist('dist/main.bundle.js.map'))
 
     .then(() => ng('build', '--no-sourcemap'))

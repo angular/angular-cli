@@ -1,6 +1,7 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
+import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
@@ -15,9 +16,9 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
  * require('source-map-loader')
  * require('raw-loader')
  * require('script-loader')
- * require('json-loader')
  * require('url-loader')
  * require('file-loader')
+ * require('@angular-devkit/build-optimizer')
  */
 
 export function getCommonConfig(wco: WebpackConfigOptions) {
@@ -64,19 +65,24 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose, colors: true }));
   }
 
-  if (buildOptions.sourcemaps) {
-    extraPlugins.push(new webpack.SourceMapDevToolPlugin({
-      filename: '[file].map[query]',
-      moduleFilenameTemplate: '[resource-path]',
-      fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
-      sourceRoot: 'webpack:///'
-    }));
-  }
-
   if (buildOptions.showCircularDependencies) {
     extraPlugins.push(new CircularDependencyPlugin({
       exclude: /(\\|\/)node_modules(\\|\/)/
     }));
+  }
+
+  if (buildOptions.buildOptimizer) {
+    extraRules.push({
+      test: /\.js$/,
+      use: [{
+        loader: '@angular-devkit/build-optimizer/webpack-loader',
+        options: { sourceMap: buildOptions.sourcemaps }
+      }]
+    });
+  }
+
+  if (buildOptions.namedChunks) {
+    extraPlugins.push(new NamedLazyChunksWebpackPlugin());
   }
 
   return {
@@ -91,7 +97,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     context: __dirname,
     entry: entryPoints,
     output: {
-      path: path.resolve(projectRoot, buildOptions.outputPath),
+      path: path.resolve(buildOptions.outputPath),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${hashFormat.chunk}.bundle.js`,
       chunkFilename: `[id]${hashFormat.chunk}.chunk.js`
@@ -99,11 +105,10 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     module: {
       rules: [
         { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
-        { test: /\.json$/, loader: 'json-loader' },
         { test: /\.html$/, loader: 'raw-loader' },
-        { test: /\.(eot|svg)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
+        { test: /\.(eot|svg|cur)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
         {
-          test: /\.(jpg|png|webp|gif|otf|ttf|woff|woff2|cur|ani)$/,
+          test: /\.(jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
           loader: `url-loader?name=[name]${hashFormat.file}.[ext]&limit=10000`
         }
       ].concat(extraRules)
@@ -113,6 +118,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     ].concat(extraPlugins),
     node: {
       fs: 'empty',
+      // `global` should be kept true, removing it resulted in a
+      // massive size increase with Build Optimizer on AIO.
       global: true,
       crypto: 'empty',
       tls: 'empty',

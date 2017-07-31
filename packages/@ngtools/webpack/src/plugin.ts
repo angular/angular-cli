@@ -25,6 +25,7 @@ export interface AotPluginOptions {
   mainPath?: string;
   typeChecking?: boolean;
   skipCodeGeneration?: boolean;
+  replaceExport?: boolean;
   hostOverrideFileSystem?: { [path: string]: string };
   hostReplacementPaths?: { [path: string]: string };
   i18nFile?: string;
@@ -49,6 +50,7 @@ export class AotPlugin implements Tapable {
   private _rootFilePath: string[];
   private _compilerHost: WebpackCompilerHost;
   private _resourceLoader: WebpackResourceLoader;
+  private _discoveredLazyRoutes: LazyRouteMap;
   private _lazyRoutes: LazyRouteMap = Object.create(null);
   private _tsConfigPath: string;
   private _entryModule: string;
@@ -59,6 +61,7 @@ export class AotPlugin implements Tapable {
 
   private _typeCheck = true;
   private _skipCodeGeneration = false;
+  private _replaceExport = false;
   private _basePath: string;
   private _genDir: string;
 
@@ -89,11 +92,14 @@ export class AotPlugin implements Tapable {
   get genDir() { return this._genDir; }
   get program() { return this._program; }
   get skipCodeGeneration() { return this._skipCodeGeneration; }
+  get replaceExport() { return this._replaceExport; }
   get typeCheck() { return this._typeCheck; }
   get i18nFile() { return this._i18nFile; }
   get i18nFormat() { return this._i18nFormat; }
   get locale() { return this._locale; }
   get firstRun() { return this._firstRun; }
+  get lazyRoutes() { return this._lazyRoutes; }
+  get discoveredLazyRoutes() { return this._discoveredLazyRoutes; }
 
   private _setupOptions(options: AotPluginOptions) {
     // Fill in the missing options.
@@ -232,6 +238,9 @@ export class AotPlugin implements Tapable {
     if (options.hasOwnProperty('locale')) {
       this._locale = options.locale;
     }
+    if (options.hasOwnProperty('replaceExport')) {
+      this._replaceExport = options.replaceExport || this._replaceExport;
+    }
   }
 
   private _findLazyRoutesInAst(): LazyRouteMap {
@@ -257,6 +266,25 @@ export class AotPlugin implements Tapable {
       }
     }
     return result;
+  }
+
+  private _getLazyRoutesFromNgtools() {
+    try {
+      return __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
+        program: this._program,
+        host: this._compilerHost,
+        angularCompilerOptions: this._angularCompilerOptions,
+        entryModule: this._entryModule
+      });
+    } catch (err) {
+      // We silence the error that the @angular/router could not be found. In that case, there is
+      // basically no route supported by the app itself.
+      if (err.message.startsWith('Could not resolve module @angular/router')) {
+        return {};
+      } else {
+        throw err;
+      }
+    }
   }
 
   // registration hook for webpack plugin
@@ -491,19 +519,14 @@ export class AotPlugin implements Tapable {
       .then(() => {
         // We need to run the `listLazyRoutes` the first time because it also navigates libraries
         // and other things that we might miss using the findLazyRoutesInAst.
-        let discoveredLazyRoutes: LazyRouteMap = this.firstRun ?
-          __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
-            program: this._program,
-            host: this._compilerHost,
-            angularCompilerOptions: this._angularCompilerOptions,
-            entryModule: this._entryModule
-          })
+        this._discoveredLazyRoutes = this.firstRun
+          ? this._getLazyRoutesFromNgtools()
           : this._findLazyRoutesInAst();
 
         // Process the lazy routes discovered.
-        Object.keys(discoveredLazyRoutes)
+        Object.keys(this.discoveredLazyRoutes)
           .forEach(k => {
-            const lazyRoute = discoveredLazyRoutes[k];
+            const lazyRoute = this.discoveredLazyRoutes[k];
             k = k.split('#')[0];
             if (lazyRoute === null) {
               return;

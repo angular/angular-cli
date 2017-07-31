@@ -435,14 +435,97 @@ function _diagnoseDeps(reasons: ModuleReason[], plugin: AotPlugin, checked: Set<
 }
 
 
+export function _getModuleExports(plugin: AotPlugin,
+                                  refactor: TypeScriptFileRefactor): ts.Identifier[] {
+  const exports = refactor
+    .findAstNodes(refactor.sourceFile, ts.SyntaxKind.ExportDeclaration, true);
+
+  return exports
+    .filter(node => {
+
+      const identifiers = refactor.findAstNodes(node, ts.SyntaxKind.Identifier, false)
+        .filter(node => node.getText() === plugin.entryModule.className);
+
+      return identifiers.length > 0;
+    }) as ts.Identifier[];
+}
+
+
+export function _replaceExport(plugin: AotPlugin, refactor: TypeScriptFileRefactor) {
+  if (!plugin.replaceExport) {
+    return;
+  }
+  _getModuleExports(plugin, refactor)
+    .forEach(node => {
+      const factoryPath = _getNgFactoryPath(plugin, refactor);
+      const factoryClassName = plugin.entryModule.className + 'NgFactory';
+      const exportStatement = `export \{ ${factoryClassName} \} from '${factoryPath}'`;
+      refactor.appendAfter(node, exportStatement);
+    });
+}
+
+
+export function _exportModuleMap(plugin: AotPlugin, refactor: TypeScriptFileRefactor) {
+  if (!plugin.replaceExport) {
+    return;
+  }
+
+  const dirName = path.normalize(path.dirname(refactor.fileName));
+  const classNameAppend = plugin.skipCodeGeneration ? '' : 'NgFactory';
+  const modulePathAppend = plugin.skipCodeGeneration ? '' : '.ngfactory';
+
+  _getModuleExports(plugin, refactor)
+    .forEach(node => {
+      const modules = Object.keys(plugin.discoveredLazyRoutes)
+        .map((loadChildrenString) => {
+          let [lazyRouteKey, moduleName] = loadChildrenString.split('#');
+
+          if (!lazyRouteKey || !moduleName) {
+            throw new Error(`${loadChildrenString} was not a proper loadChildren string`);
+          }
+
+          moduleName += classNameAppend;
+          lazyRouteKey += modulePathAppend;
+          const modulePath = plugin.lazyRoutes[lazyRouteKey];
+
+          return {
+            modulePath,
+            moduleName,
+            loadChildrenString
+          };
+        });
+
+      modules.forEach((module, index) => {
+        const relativePath = path.relative(dirName, module.modulePath).replace(/\\/g, '/');
+        refactor.prependBefore(node, `import * as __lazy_${index}__ from './${relativePath}'`);
+      });
+
+      const jsonContent: string = modules
+        .map((module, index) =>
+          `"${module.loadChildrenString}": __lazy_${index}__.${module.moduleName}`)
+        .join();
+
+      refactor.appendAfter(node, `export const LAZY_MODULE_MAP = {${jsonContent}};`);
+    });
+}
+
+
 // Super simple TS transpiler loader for testing / isolated usage. does not type check!
 export function ngcLoader(this: LoaderContext & { _compilation: any }, source: string | null) {
   const cb = this.async();
   const sourceFileName: string = this.resourcePath;
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance as AotPlugin;
-  // We must verify that AotPlugin is an instance of the right class.
-  if (plugin && plugin instanceof AotPlugin) {
+  if (plugin) {
+    // We must verify that AotPlugin is an instance of the right class.
+    // Throw an error if it isn't, that often means multiple @ngtools/webpack installs.
+    if (!(plugin instanceof AotPlugin)) {
+      throw new Error('AotPlugin was detected but it was an instance of the wrong class.\n'
+        + 'This likely means you have several @ngtools/webpack packages installed. '
+        + 'You can check this with `npm ls @ngtools/webpack`, and then remove the extra copies.'
+      );
+    }
+
     if (plugin.compilerHost.readFile(sourceFileName) == source) {
       // In the case where the source is the same as the one in compilerHost, we don't have
       // extra TS loaders and there's no need to do any trickery.
@@ -456,11 +539,14 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
         if (!plugin.skipCodeGeneration) {
           return Promise.resolve()
             .then(() => _removeDecorators(refactor))
-            .then(() => _refactorBootstrap(plugin, refactor));
+            .then(() => _refactorBootstrap(plugin, refactor))
+            .then(() => _replaceExport(plugin, refactor))
+            .then(() => _exportModuleMap(plugin, refactor));
         } else {
           return Promise.resolve()
             .then(() => _replaceResources(refactor))
-            .then(() => _removeModuleId(refactor));
+            .then(() => _removeModuleId(refactor))
+            .then(() => _exportModuleMap(plugin, refactor));
         }
       })
       .then(() => {
@@ -514,6 +600,13 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
   } else {
     const options = loaderUtils.getOptions(this) || {};
     const tsConfigPath = options.tsConfigPath;
+
+    if (tsConfigPath === undefined) {
+      throw new Error('@ngtools/webpack is being used as a loader but no `tsConfigPath` option nor '
+        + 'AotPlugin was detected. You must provide at least one of these.'
+      );
+    }
+
     const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
 
     if (tsConfig.error) {

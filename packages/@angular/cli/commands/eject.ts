@@ -32,6 +32,12 @@ const EjectCommand = Command.extend({
   availableOptions: baseEjectCommandOptions,
 
   run: function (commandOptions: EjectTaskOptions) {
+
+    // Default vendor chunk to false when build optimizer is on.
+    if (commandOptions.vendorChunk === undefined) {
+      commandOptions.vendorChunk = !commandOptions.buildOptimizer;
+    }
+
     const EjectTask = require('../tasks/eject').default;
     const ejectTask = new EjectTask({
       project: this.project,

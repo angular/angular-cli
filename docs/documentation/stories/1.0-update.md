@@ -16,7 +16,7 @@ Below are the changes between a project generated two months ago, with `1.0.0-be
 a `1.0.0` project.
 If you kept your project up to date you might have a lot of these already.
 
-You can find more details about changes between versions in [CHANGELOG.md](https://github.com/angular/angular-cli/blob/master/CHANGELOG.md).
+You can find more details about changes between versions in [the releases tab on GitHub](https://github.com/angular/angular-cli/releases).
 
 If you prefer, you can also generate a new project in a separate folder using
  `ng new upgrade-project --skip-install` and compare the differences.
@@ -215,7 +215,7 @@ CLI projects now use one tsconfig per app ([#4924](https://github.com/angular/an
     "experimentalDecorators": true,
     "target": "es5",
     "lib": [
-      "es2016",
+      "es2017",
       "dom"
     ],
     "outDir": "../out-tsc/app",
@@ -239,7 +239,7 @@ CLI projects now use one tsconfig per app ([#4924](https://github.com/angular/an
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [
-      "es2016",
+      "es2017",
       "dom"
     ],
     "outDir": "../out-tsc/spec",
@@ -271,7 +271,7 @@ CLI projects now use one tsconfig per app ([#4924](https://github.com/angular/an
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [
-      "es2016"
+      "es2017"
     ],
     "outDir": "../out-tsc/e2e",
     "module": "commonjs",
@@ -302,7 +302,7 @@ There is an additional root-level `tsconfig.json` that is used for IDE integrati
       "node_modules/@types"
     ],
     "lib": [
-      "es2016",
+      "es2017",
       "dom"
     ]
   }

@@ -7,11 +7,11 @@ import {
   getDevConfig,
   getProdConfig,
   getStylesConfig,
+  getServerConfig,
   getNonAotConfig,
   getAotConfig
 } from './webpack-configs';
-
-const path = require('path');
+import * as path from 'path';
 
 export interface WebpackConfigOptions {
   projectRoot: string;
@@ -31,15 +31,18 @@ export class NgCliWebpackConfig {
 
     appConfig = this.addAppConfigDefaults(appConfig);
     buildOptions = this.addTargetDefaults(buildOptions);
-    buildOptions = this.mergeConfigs(buildOptions, appConfig);
+    buildOptions = this.mergeConfigs(buildOptions, appConfig, projectRoot);
 
     this.wco = { projectRoot, buildOptions, appConfig };
   }
 
   public buildConfig() {
+    const platformConfig = this.wco.appConfig.platform === 'server' ?
+      getServerConfig(this.wco) : getBrowserConfig(this.wco);
+
     let webpackConfigs = [
       getCommonConfig(this.wco),
-      getBrowserConfig(this.wco),
+      platformConfig,
       getStylesConfig(this.wco),
       this.getTargetConfig(this.wco)
     ];
@@ -70,6 +73,11 @@ export class NgCliWebpackConfig {
     if (buildOptions.target !== 'development' && buildOptions.target !== 'production') {
       throw new Error("Invalid build target. Only 'development' and 'production' are available.");
     }
+
+    if (buildOptions.buildOptimizer
+      && !(buildOptions.aot || buildOptions.target === 'production')) {
+      throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
+    }
   }
 
   // Fill in defaults for build targets
@@ -79,13 +87,16 @@ export class NgCliWebpackConfig {
         environment: 'dev',
         outputHashing: 'media',
         sourcemaps: true,
-        extractCss: false
+        extractCss: false,
+        namedChunks: true,
+        aot: false
       },
       production: {
         environment: 'prod',
         outputHashing: 'all',
         sourcemaps: false,
         extractCss: true,
+        namedChunks: false,
         aot: true
       }
     };
@@ -94,12 +105,11 @@ export class NgCliWebpackConfig {
   }
 
   // Fill in defaults from .angular-cli.json
-  public mergeConfigs(buildOptions: BuildOptions, appConfig: any) {
+  public mergeConfigs(buildOptions: BuildOptions, appConfig: any, projectRoot: string) {
     const mergeableOptions = {
-      outputPath: appConfig.outDir,
+      outputPath: path.resolve(projectRoot, appConfig.outDir),
       deployUrl: appConfig.deployUrl,
-      baseHref: appConfig.baseHref,
-      showCircularDependencies: appConfig.showCircularDependencies
+      baseHref: appConfig.baseHref
     };
 
     return Object.assign({}, mergeableOptions, buildOptions);

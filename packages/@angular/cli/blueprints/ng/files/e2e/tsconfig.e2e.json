@@ -2,6 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/e2e",
+    "baseUrl": "./",
     "module": "commonjs",
     "target": "es5",
     "types": [

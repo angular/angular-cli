@@ -4,6 +4,7 @@ import { stripIndents } from 'common-tags';
 import { E2eTaskOptions } from '../commands/e2e';
 import { CliConfig } from '../models/config';
 import { requireProjectModule } from '../utilities/require-project-module';
+import { getAppFromConfig } from '../utilities/app-utils';
 
 const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
@@ -14,9 +15,13 @@ export const E2eTask = Task.extend({
     const projectConfig = CliConfig.fromProject().config;
     const projectRoot = this.project.root;
     const protractorLauncher = requireProjectModule(projectRoot, 'protractor/built/launcher');
+    const appConfig = getAppFromConfig(e2eTaskOptions.app);
 
     if (projectConfig.project && projectConfig.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
+    }
+    if (appConfig.platform === 'server') {
+      throw new SilentError('ng test for platform server applications is coming soon!');
     }
 
     return new Promise(function () {

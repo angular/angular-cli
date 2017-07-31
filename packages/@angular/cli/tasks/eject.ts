@@ -174,7 +174,11 @@ class JsonWebpackSerializer {
         case webpack.optimize.UglifyJsPlugin:
           this._addImport('webpack.optimize', 'UglifyJsPlugin');
           break;
+        case (webpack.optimize as any).ModuleConcatenationPlugin:
+          this._addImport('webpack.optimize', 'ModuleConcatenationPlugin');
+          break;
         case angularCliPlugins.BaseHrefWebpackPlugin:
+        case angularCliPlugins.NamedLazyChunksWebpackPlugin:
         case angularCliPlugins.SuppressExtractedTextChunksWebpackPlugin:
           this._addImport('@angular/cli/plugins/webpack', plugin.constructor.name);
           break;
@@ -432,6 +436,9 @@ export default Task.extend({
     if (project.root === path.resolve(outputPath)) {
       throw new SilentError ('Output path MUST not be project root directory!');
     }
+    if (appConfig.platform === 'server') {
+      throw new SilentError('ng eject for platform server applications is coming soon!');
+    }
 
     const webpackConfig = new NgCliWebpackConfig(runTaskOptions, appConfig).buildConfig();
     const serializer = new JsonWebpackSerializer(process.cwd(), outputPath, appConfig.root);
@@ -500,6 +507,7 @@ export default Task.extend({
           'cssnano',
           'exports-loader',
           'file-loader',
+          'html-webpack-plugin',
           'json-loader',
           'karma-sourcemap-loader',
           'less-loader',
@@ -545,7 +553,7 @@ export default Task.extend({
 
           To run your builds, you now need to do the following commands:
              - "npm run build" to build.
-             - "npm run test" to run unit tests.
+             - "npm test" to run unit tests.
              - "npm start" to serve the app using webpack-dev-server.
              - "npm run e2e" to run protractor.
 

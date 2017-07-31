@@ -21,9 +21,9 @@ If the problem persists, please open a new issue, provide a simple repository re
 ```
 
 
-## Angular CLI: Duplicate (v1)
+## Angular CLI: Duplicate (v1.1)
 ```
-Thanks for reporting this issue. However, this issue is a duplicate of an existing issue #<ISSUE_NUMBER>. Please subscribe to that issue for future updates.
+Thanks for reporting this issue. However, this issue is a duplicate of #<ISSUE_NUMBER>. Please subscribe to that issue for future updates.
 ```
 
 
