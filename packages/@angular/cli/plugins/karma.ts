@@ -12,6 +12,7 @@ import { KarmaWebpackThrowError } from './karma-webpack-throw-error';
  * Enumerate needed (but not require/imported) dependencies from this file
  *  to let the dependency validator know they are used.
  *
+ * require('source-map-support')
  * require('karma-source-map-support')
  */
 
