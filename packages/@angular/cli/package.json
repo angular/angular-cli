@@ -56,7 +56,7 @@
     "karma-source-map-support": "^1.2.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
-    "license-webpack-plugin": "^0.4.2",
+    "license-webpack-plugin": "^0.5.1",
     "lodash": "^4.11.1",
     "memory-fs": "^0.4.1",
     "minimatch": "^3.0.3",
