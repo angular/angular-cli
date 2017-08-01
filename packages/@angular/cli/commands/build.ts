@@ -108,6 +108,11 @@ export const baseBuildCommandOptions: any = [
     description: 'Extract css from global styles onto css files instead of js ones.'
   },
   {
+    name: 'inline',
+    type: Boolean, default: false,
+    description: 'Inline Webpack bootstrap to index.html.'
+  },
+  {
     name: 'watch',
     type: Boolean,
     default: false,

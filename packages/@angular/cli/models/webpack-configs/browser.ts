@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
@@ -60,6 +61,14 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  if (buildOptions.inline) {
+    extraPlugins.push(
+      new ScriptExtHtmlWebpackPlugin({
+        inline: /^inline(?:\.[0-9a-f]{20})?\.bundle\.js$/
+      })
+    );
+  }
+
   return {
     plugins: [
       new HtmlWebpackPlugin({
@@ -72,7 +81,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
           caseSensitive: true,
           collapseWhitespace: true,
           keepClosingSlash: true
-        } : false
+        } : false,
+        cache: false // to allow inlining working properly
       }),
       new BaseHrefWebpackPlugin({
         baseHref: buildOptions.baseHref
