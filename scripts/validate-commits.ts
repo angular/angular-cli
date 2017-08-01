@@ -13,15 +13,37 @@ import { packages } from '../lib/packages';
 export default function (_: {}, logger: Logger) {
   logger.info('Getting merge base...');
 
-  const parentBranch = process.env['CIRCLE_BRANCH'] || 'master';
-  const mergeBase = execSync(`git merge-base --fork-point ${parentBranch}`).toString().trim();
-  logger.info('  SHA: ' + mergeBase);
+  const prNumber = process.env['CIRCLE_PR_NUMBER'] || '';
+  let baseSha = '';
+  let sha = '';
 
-  const log = execSync(`git log --oneline "${mergeBase}.."`).toString().trim();
+  if (prNumber) {
+    const url = `https://api.github.com/repos/angular/devkit/pulls/${prNumber}`;
+    const prJson = JSON.parse(execSync(`curl "${url}"`, {
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf8',
+    }).toString());
+    baseSha = prJson['base']['sha'];
+    sha = prJson['head']['sha'];
+  } else {
+    const parentRemote = process.env['GIT_REMOTE'] || 'origin';
+    const parentBranch = process.env['GIT_BRANCH'] || 'master';
+    baseSha = execSync(`git merge-base --fork-point "${parentRemote}/${parentBranch}"`)
+      .toString().trim();
+    sha = 'HEAD';
+  }
+  logger.info('  Base: ' + baseSha);
+  logger.info('  HEAD: ' + sha);
+
+  const log = execSync(`git log --oneline "${baseSha}..${sha}"`).toString().trim();
+  logger.debug('Commits:');
+  logger.debug('  ' + log.split(/\n/).join('\n  '));
+  logger.debug('');
+
   const commits = log.split(/\n/)
     .map(i => i.match(/(^[0-9a-f]+) (.+)$/))
     .filter(x => !!x)
-    .map(x => Array.from(x !));
+    .map(x => Array.from(x !).slice(1));
   logger.info(`Found ${commits.length} commits...`);
 
   const output = new Logger('check', logger);
