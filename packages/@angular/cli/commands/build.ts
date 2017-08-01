@@ -163,7 +163,6 @@ export const baseBuildCommandOptions: any = [
     name: 'build-optimizer',
     type: Boolean,
     default: false,
-    aliases: ['bo'],
     description: '(Experimental) Enables @angular-devkit/build-optimizer '
     + 'optimizations when using `--aot`.'
   },
