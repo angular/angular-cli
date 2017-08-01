@@ -52,6 +52,7 @@ module.exports = function(options) {
     disableDependencyChecker: options.disableDependencyChecker,
     root: options.cli ? options.cli.root : path.resolve(__dirname, '..', '..'),
     npmPackage: options.cli ? options.cli.npmPackage : 'ember-cli',
+    command: options.cliArgs.join(' ') || ''
   });
 
   let project = Project.projectOrnullProject(ui, cli);
