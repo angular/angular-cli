@@ -111,7 +111,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       }),
       new webpack.HashedModuleIdsPlugin(),
       new webpack.optimize.ModuleConcatenationPlugin(),
-      new webpack.optimize.UglifyJsPlugin(<any>{
+      new webpack.optimize.UglifyJsPlugin({
         mangle: { screw_ie8: true },
         compress: uglifyCompressOptions,
         sourceMap: buildOptions.sourcemaps,
