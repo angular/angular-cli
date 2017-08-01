@@ -1,15 +1,19 @@
 version: 2
 
-defaults: &defaults
+_defaults: &defaults
   working_directory: ~/ng
   docker:
     - image: angular/ngcontainer
+
+_post_checkout: &post_checkout
+  post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
 
 jobs:
   lint:
     <<: *defaults
     steps:
-      - checkout
+      - checkout:
+          <<: *post_checkout
       - restore_cache:
           key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
 
@@ -29,7 +33,8 @@ jobs:
   test:
     <<: *defaults
     steps:
-      - checkout
+      - checkout:
+          <<: *post_checkout
       - restore_cache:
           key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
 
@@ -39,7 +44,8 @@ jobs:
   integration:
     <<: *defaults
     steps:
-      - checkout
+      - checkout:
+          <<: *post_checkout
       - restore_cache:
           key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
       - restore_cache:
@@ -62,7 +68,8 @@ jobs:
   build:
     <<: *defaults
     steps:
-      - checkout
+      - checkout:
+          <<: *post_checkout
       - restore_cache:
           key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
 
