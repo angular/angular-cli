@@ -68,9 +68,9 @@
   dependencies:
     "@types/node" "*"
 
-"@types/fs-extra@~3.0.2":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-3.0.3.tgz#1d66eb670ebf657e57c0fda014df340c19d8aa0c"
+"@types/fs-extra@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-4.0.0.tgz#1dd742ad5c9bce308f7a52d02ebc01421bc9102f"
   dependencies:
     "@types/node" "*"
 
@@ -143,9 +143,9 @@
   dependencies:
     "@types/source-map" "*"
 
-"@types/webpack@^2.2.15":
-  version "2.2.16"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-2.2.16.tgz#9ca93f468ab3a8eb4b6f45f589acf58c8133aa9b"
+"@types/webpack@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-3.0.5.tgz#da3bca3665071ccbaba9ff929e361db85d3cc48a"
   dependencies:
     "@types/node" "*"
     "@types/tapable" "*"
