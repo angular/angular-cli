@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import {AotPlugin} from './plugin';
-import {TypeScriptFileRefactor} from './refactor';
+import {getTypeScriptFileRefactor, TypeScriptFileRefactor} from './refactor/refactor';
 import {LoaderContext, ModuleReason} from './webpack';
 
 interface Platform {
@@ -150,7 +150,11 @@ function _addCtorParameters(classNode: ts.ClassDeclaration,
   });
 
   const ctorParametersDecl = `static ctorParameters() { return [ ${params.join(', ')} ]; }`;
-  refactor.prependBefore(classNode.getLastToken(refactor.sourceFile), ctorParametersDecl);
+  // ts.createIdentifier() with complex declarations is a hack to not have to manually
+  // create the node with TS primitives.
+  // TODO: replace with primitives over time.
+  const ctorParametersNode = ts.createIdentifier(ctorParametersDecl);
+  refactor.prependNode(classNode.getLastToken(refactor.sourceFile), ctorParametersNode);
 }
 
 
@@ -214,7 +218,7 @@ function _replacePlatform(
     const platform = changeMap[(call.expression as ts.Identifier).text];
 
     // Replace with mapped replacement
-    refactor.replaceNode(call.expression, platform.name);
+    refactor.replaceNode(call.expression, ts.createIdentifier(platform.name));
 
     // Add the appropriate import
     refactor.insertImport(platform.name, platform.importLocation);
@@ -247,7 +251,7 @@ function _replaceBootstrapOrRender(refactor: TypeScriptFileRefactor, call: ts.Ca
   }
 
   if (identifier && identifier.text === replacementTarget) {
-    refactor.replaceNode(identifier, replacementTarget + 'Factory');
+    refactor.replaceNode(identifier, ts.createIdentifier(replacementTarget + 'Factory'));
   }
 }
 
@@ -280,7 +284,7 @@ function _replaceEntryModule(plugin: AotPlugin, refactor: TypeScriptFileRefactor
 
   modules
     .forEach(reference => {
-      refactor.replaceNode(reference, factoryClassName);
+      refactor.replaceNode(reference, ts.createIdentifier(factoryClassName));
       const caller = _getCaller(reference);
       _replaceBootstrapOrRender(refactor, caller);
     });
@@ -325,7 +329,7 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
       // Get the trailing comma.
       const moduleIdCommaProp = moduleIdProp.parent
         ? moduleIdProp.parent.getChildAt(1).getChildren()[1] : null;
-      refactor.removeNodes(moduleIdProp, moduleIdCommaProp);
+      refactor.removeNodes([moduleIdProp, moduleIdCommaProp]);
     });
 }
 
@@ -349,8 +353,9 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
       const key = _getContentOfKeyLiteral(sourceFile, node.name);
 
       if (key == 'templateUrl') {
-        refactor.replaceNode(node,
-          `template: require(${_getResourceRequest(node.initializer, sourceFile)})`);
+        refactor.replaceNode(node, ts.createIdentifier(
+          `template: require(${_getResourceRequest(node.initializer, sourceFile)})`
+        ));
       } else if (key == 'styleUrls') {
         const arr = <ts.ArrayLiteralExpression[]>(
           refactor.findAstNodes(node, ts.SyntaxKind.ArrayLiteralExpression, false));
@@ -361,7 +366,9 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
         const initializer = arr[0].elements.map((element: ts.Expression) => {
           return _getResourceRequest(element, sourceFile);
         });
-        refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
+        refactor.replaceNode(node, ts.createIdentifier(
+          `styles: [require(${initializer.join('), require(')})]`
+        ));
       }
     });
 }
@@ -460,7 +467,7 @@ export function _replaceExport(plugin: AotPlugin, refactor: TypeScriptFileRefact
       const factoryPath = _getNgFactoryPath(plugin, refactor);
       const factoryClassName = plugin.entryModule.className + 'NgFactory';
       const exportStatement = `export \{ ${factoryClassName} \} from '${factoryPath}'`;
-      refactor.appendAfter(node, exportStatement);
+      refactor.appendNode(node, ts.createIdentifier(exportStatement));
     });
 }
 
@@ -497,7 +504,9 @@ export function _exportModuleMap(plugin: AotPlugin, refactor: TypeScriptFileRefa
 
       modules.forEach((module, index) => {
         const relativePath = path.relative(dirName, module.modulePath).replace(/\\/g, '/');
-        refactor.prependBefore(node, `import * as __lazy_${index}__ from './${relativePath}'`);
+        refactor.prependNode(node, ts.createIdentifier(
+          `import * as __lazy_${index}__ from './${relativePath}'`
+        ));
       });
 
       const jsonContent: string = modules
@@ -505,7 +514,9 @@ export function _exportModuleMap(plugin: AotPlugin, refactor: TypeScriptFileRefa
           `"${module.loadChildrenString}": __lazy_${index}__.${module.moduleName}`)
         .join();
 
-      refactor.appendAfter(node, `export const LAZY_MODULE_MAP = {${jsonContent}};`);
+      refactor.prependNode(node, ts.createIdentifier(
+        `export const LAZY_MODULE_MAP = {${jsonContent}};`
+      ));
     });
 }
 
@@ -531,8 +542,8 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
       // extra TS loaders and there's no need to do any trickery.
       source = null;
     }
-    const refactor = new TypeScriptFileRefactor(
-      sourceFileName, plugin.compilerHost, plugin.program, source);
+    const refactor = getTypeScriptFileRefactor(
+      sourceFileName, plugin.compilerHost, plugin.programManager, source);
 
     Promise.resolve()
       .then(() => {
@@ -586,14 +597,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
           }
         }
 
-        // Force a few compiler options to make sure we get the result we want.
-        const compilerOptions: ts.CompilerOptions = Object.assign({}, plugin.compilerOptions, {
-          inlineSources: true,
-          inlineSourceMap: false,
-          sourceRoot: plugin.basePath
-        });
-
-        const result = refactor.transpile(compilerOptions);
+        const result = refactor.transpile();
         cb(null, result.outputText, result.sourceMap);
       })
       .catch(err => cb(err));
@@ -621,7 +625,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
       compilerOptions[key] = options[key];
     }
     const compilerHost = ts.createCompilerHost(compilerOptions);
-    const refactor = new TypeScriptFileRefactor(sourceFileName, compilerHost);
+    const refactor = getTypeScriptFileRefactor(sourceFileName, compilerHost);
     _replaceResources(refactor);
 
     const result = refactor.transpile(compilerOptions);

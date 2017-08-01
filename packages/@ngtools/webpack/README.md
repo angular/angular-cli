@@ -38,6 +38,7 @@ The loader works with the webpack plugin to compile your TypeScript. It's import
 * `skipCodeGeneration`. Optional, defaults to false. Disable code generation and do not refactor the code to bootstrap. This replaces `templateUrl: "string"` with `template: require("string")` (and similar for styles) to allow for webpack to properly link the resources.
 * `typeChecking`. Optional, defaults to true. Enable type checking through your application. This will slow down compilation, but show syntactic and semantic errors in webpack.
 * `exclude`. Optional. Extra files to exclude from TypeScript compilation.
+* `sourceMap`. Optional. Include sourcemaps.
 * `compilerOptions`. Optional. Override options in `tsconfig.json`.
 
 ## Features

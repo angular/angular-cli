@@ -1,7 +1,7 @@
-import * as ts from 'typescript';
 import {removeModuleIdOnlyForTesting} from './loader';
 import {WebpackCompilerHost} from './compiler_host';
-import {TypeScriptFileRefactor} from './refactor';
+import {getTypeScriptFileRefactor} from './refactor/refactor';
+import {ProgramManager} from './program_manager';
 
 describe('@ngtools/webpack', () => {
   describe('loader', () => {
@@ -20,25 +20,28 @@ describe('@ngtools/webpack', () => {
           @SomeDecorator({ otherValue4: 4, moduleId: 123 }) class CLS4 {}
         `, false);
 
-        const program = ts.createProgram(['/file.ts', '/file2.ts'], {}, host);
+        const programManager = new ProgramManager(['/file.ts', '/file2.ts'], {}, host);
 
-        const refactor = new TypeScriptFileRefactor('/file.ts', host, program);
+        const refactor = getTypeScriptFileRefactor('/file.ts', host, programManager);
         removeModuleIdOnlyForTesting(refactor);
-        expect(refactor.sourceText).not.toMatch(/obj = \{\s+};/);
-        expect(refactor.sourceText).not.toMatch(/\{\s*otherValue: 1\s*};/);
 
-        const refactor2 = new TypeScriptFileRefactor('/file2.ts', host, program);
+        const outputText = refactor.transpile().outputText;
+        expect(outputText).not.toMatch(/obj = \{\s+};/);
+        expect(outputText).not.toMatch(/\{\s*otherValue: 1\s*};/);
+
+        const refactor2 = getTypeScriptFileRefactor('/file2.ts', host, programManager);
         removeModuleIdOnlyForTesting(refactor2);
-        expect(refactor2.sourceText).toMatch(/\(\{\s+}\)/);
-        expect(refactor2.sourceText).toMatch(/\(\{\s*otherValue1: 1\s*}\)/);
-        expect(refactor2.sourceText).toMatch(/\(\{\s*otherValue2: 2\s*,\s*otherValue3: 3\s*}\)/);
-        expect(refactor2.sourceText).toMatch(/\(\{\s*otherValue4: 4\s*}\)/);
+        const outputText2 = refactor2.transpile().outputText;
+        expect(outputText2).toMatch(/\(\{\s*}\)/);
+        expect(outputText2).toMatch(/\(\{\s*otherValue1: 1\s*}\)/);
+        expect(outputText2).toMatch(/\(\{\s*otherValue2: 2\s*,\s*otherValue3: 3\s*}\)/);
+        expect(outputText2).toMatch(/\(\{\s*otherValue4: 4\s*}\)/);
       });
 
       it('should work without a root name', () => {
         const host = new WebpackCompilerHost({}, '');
         host.writeFile('/file.ts', `
-          import './file2.ts';
+          import './file2';
         `, false);
         host.writeFile('/file2.ts', `
           @SomeDecorator({ moduleId: 123 }) class CLS {}
@@ -47,13 +50,14 @@ describe('@ngtools/webpack', () => {
           @SomeDecorator({ otherValue4: 4, moduleId: 123 }) class CLS4 {}
         `, false);
 
-        const program = ts.createProgram(['/file.ts'], {}, host);
-        const refactor = new TypeScriptFileRefactor('/file2.ts', host, program);
+        const programManager = new ProgramManager(['/file.ts'], {}, host);
+        const refactor = getTypeScriptFileRefactor('/file2.ts', host, programManager);
         removeModuleIdOnlyForTesting(refactor);
-        expect(refactor.sourceText).toMatch(/\(\{\s+}\)/);
-        expect(refactor.sourceText).toMatch(/\(\{\s*otherValue1: 1\s*}\)/);
-        expect(refactor.sourceText).toMatch(/\(\{\s*otherValue2: 2\s*,\s*otherValue3: 3\s*}\)/);
-        expect(refactor.sourceText).toMatch(/\(\{\s*otherValue4: 4\s*}\)/);
+        const outputText = refactor.transpile().outputText;
+        expect(outputText).toMatch(/\(\{\s*}\)/);
+        expect(outputText).toMatch(/\(\{\s*otherValue1: 1\s*}\)/);
+        expect(outputText).toMatch(/\(\{\s*otherValue2: 2\s*,\s*otherValue3: 3\s*}\)/);
+        expect(outputText).toMatch(/\(\{\s*otherValue4: 4\s*}\)/);
       });
     });
   });

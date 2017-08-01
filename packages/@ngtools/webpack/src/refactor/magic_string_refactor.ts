@@ -5,31 +5,16 @@ import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
 
 const MagicString = require('magic-string');
 
-
-export interface TranspileOutput {
-  outputText: string;
-  sourceMap: any | null;
-}
+import {TypeScriptFileRefactor, TranspileOutput, resolve} from './refactor';
+import {ProgramManager} from '../program_manager';
 
 
-function resolve(filePath: string, _host: ts.CompilerHost, program: ts.Program) {
-  if (path.isAbsolute(filePath)) {
-    return filePath;
-  }
-  const compilerOptions = program.getCompilerOptions();
-  const basePath = compilerOptions.baseUrl || compilerOptions.rootDir;
-  if (!basePath) {
-    throw new Error(`Trying to resolve '${filePath}' without a basePath.`);
-  }
-  return path.join(basePath, filePath);
-}
-
-
-export class TypeScriptFileRefactor {
+export class TypeScriptMagicStringFileRefactor implements TypeScriptFileRefactor {
   private _fileName: string;
   private _sourceFile: ts.SourceFile;
   private _sourceString: any;
   private _sourceText: string;
+  private _compilerOptions: ts.CompilerOptions = {};
   private _changed = false;
 
   get fileName() { return this._fileName; }
@@ -38,15 +23,18 @@ export class TypeScriptFileRefactor {
 
   constructor(fileName: string,
               _host: ts.CompilerHost,
-              private _program?: ts.Program,
+              private _programManager?: ProgramManager,
               source?: string | null) {
-    fileName = resolve(fileName, _host, _program).replace(/\\/g, '/');
+
+    const program = _programManager.program;
+    fileName = resolve(fileName, _host, program).replace(/\\/g, '/');
     this._fileName = fileName;
-    if (_program) {
+    if (program) {
+      this._compilerOptions = program.getCompilerOptions();
       if (source) {
         this._sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
       } else {
-        this._sourceFile = _program.getSourceFile(fileName);
+        this._sourceFile = program.getSourceFile(fileName);
       }
     }
     if (!this._sourceFile) {
@@ -57,23 +45,45 @@ export class TypeScriptFileRefactor {
     this._sourceString = new MagicString(this._sourceText);
   }
 
+  // Nodes don't always have text, and .getText() fails on nodes created manually.
+  // We have to duck type it.
+  _getNodeText(node: ts.Node) {
+    const text = (node as any).text;
+    if (text === undefined) {
+      throw new Error('Refactor failed to retrieve node text.');
+    }
+
+    return text;
+  }
+
   /**
    * Collates the diagnostic messages for the current source file
    */
   getDiagnostics(typeCheck = true): ts.Diagnostic[] {
-    if (!this._program) {
+    const program = this._programManager.program;
+    if (!program) {
       return [];
     }
     let diagnostics: ts.Diagnostic[] = [];
     // only concat the declaration diagnostics if the tsconfig config sets it to true.
-    if (this._program.getCompilerOptions().declaration == true) {
-      diagnostics = diagnostics.concat(this._program.getDeclarationDiagnostics(this._sourceFile));
+    if (program.getCompilerOptions().declaration == true) {
+      diagnostics = diagnostics.concat(program.getDeclarationDiagnostics(this._sourceFile));
     }
-    diagnostics = diagnostics.concat(
-      this._program.getSyntacticDiagnostics(this._sourceFile),
-      typeCheck ? this._program.getSemanticDiagnostics(this._sourceFile) : []);
+    diagnostics = diagnostics.concat(program.getSyntacticDiagnostics(this._sourceFile),
+      typeCheck ? program.getSemanticDiagnostics(this._sourceFile) : []);
 
     return diagnostics;
+  }
+
+  getFirstNode(): ts.Node | null {
+    const syntaxList = this.findFirstAstNode(null, ts.SyntaxKind.SyntaxList);
+    return (syntaxList && syntaxList.getChildCount() > 0) ? syntaxList.getChildAt(0) : null;
+  }
+
+  getLastNode(): ts.Node | null {
+    const syntaxList = this.findFirstAstNode(null, ts.SyntaxKind.SyntaxList);
+    const childCount = syntaxList.getChildCount();
+    return childCount > 0 ? syntaxList.getChildAt(childCount - 1) : null;
   }
 
   /**
@@ -128,15 +138,12 @@ export class TypeScriptFileRefactor {
     return this.findAstNodes(node, kind, false, 1)[0] || null;
   }
 
-  appendAfter(node: ts.Node, text: string): void {
-    this._sourceString.appendRight(node.getEnd(), text);
-  }
-  append(node: ts.Node, text: string): void {
-    this._sourceString.appendLeft(node.getEnd(), text);
+  appendNode(node: ts.Node, newNode: ts.Node): void {
+    this._sourceString.appendRight(node.getEnd(), this._getNodeText(newNode));
   }
 
-  prependBefore(node: ts.Node, text: string) {
-    this._sourceString.appendLeft(node.getStart(), text);
+  prependNode(node: ts.Node, newNode: ts.Node) {
+    this._sourceString.appendLeft(node.getStart(), this._getNodeText(newNode));
   }
 
   insertImport(symbolName: string, modulePath: string): void {
@@ -173,12 +180,12 @@ export class TypeScriptFileRefactor {
         return;
       }
       // Just pick the first one and insert at the end of its identifier list.
-      this.appendAfter(maybeImports[0].elements[maybeImports[0].elements.length - 1],
-        `, ${symbolName}`);
+      this.appendNode(maybeImports[0].elements[maybeImports[0].elements.length - 1],
+        ts.createIdentifier(`, ${symbolName}`));
     } else {
       // Find the last import and insert after.
-      this.appendAfter(allImports[allImports.length - 1],
-        `import {${symbolName}} from '${modulePath}';`);
+      this.appendNode(allImports[allImports.length - 1],
+        ts.createIdentifier(`import {${symbolName}} from '${modulePath}';`));
     }
   }
 
@@ -187,15 +194,16 @@ export class TypeScriptFileRefactor {
     this._changed = true;
   }
 
-  removeNodes(...nodes: ts.Node[]) {
+  removeNodes(nodes: ts.Node[]) {
     nodes.forEach(node => node && this.removeNode(node));
   }
 
-  replaceNode(node: ts.Node, replacement: string) {
+  replaceNode(node: ts.Node, replacementNode: ts.Node) {
+    const replacementString = this._getNodeText(replacementNode);
     let replaceSymbolName: boolean = node.kind === ts.SyntaxKind.Identifier;
     this._sourceString.overwrite(node.getStart(this._sourceFile),
                                  node.getEnd(),
-                                 replacement,
+                                 replacementString,
                                  { storeName: replaceSymbolName });
     this._changed = true;
   }
@@ -207,12 +215,15 @@ export class TypeScriptFileRefactor {
   transpile(compilerOptions: ts.CompilerOptions): TranspileOutput {
     const source = this.sourceText;
     const result = ts.transpileModule(source, {
-      compilerOptions: Object.assign({}, compilerOptions, {
-        sourceMap: true,
-        inlineSources: false,
-        inlineSourceMap: false,
-        sourceRoot: ''
-      }),
+      compilerOptions: Object.assign({},
+        this._compilerOptions,
+        compilerOptions,
+        {
+          sourceMap: true,
+          inlineSources: false,
+          inlineSourceMap: false,
+          sourceRoot: ''
+        }),
       fileName: this._fileName
     });
 
