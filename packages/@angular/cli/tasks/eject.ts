@@ -180,6 +180,7 @@ class JsonWebpackSerializer {
         case angularCliPlugins.BaseHrefWebpackPlugin:
         case angularCliPlugins.NamedLazyChunksWebpackPlugin:
         case angularCliPlugins.SuppressExtractedTextChunksWebpackPlugin:
+        case angularCliPlugins.SafeImportsPlugin:
           this._addImport('@angular/cli/plugins/webpack', plugin.constructor.name);
           break;
         case angularCliPlugins.GlobCopyWebpackPlugin:
