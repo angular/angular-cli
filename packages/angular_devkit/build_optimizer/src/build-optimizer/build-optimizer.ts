@@ -36,11 +36,11 @@ export function buildOptimizer(options: BuildOptimizerOptions):
   const { inputFilePath, emitSourceMap, outputFilePath, strict } = options;
   let { content } = options;
 
-  if (!inputFilePath && !content) {
+  if (!inputFilePath && content === undefined) {
     throw new Error('Either filePath or content must be specified in options.');
   }
 
-  if (!content) {
+  if (content === undefined) {
     content = readFileSync(inputFilePath as string, 'UTF-8');
   }
 
