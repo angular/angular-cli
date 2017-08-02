@@ -21,7 +21,11 @@ export default function buildOptimizerLoader
   this.cacheable();
   const options: BuildOptimizerLoaderOptions = loaderUtils.getOptions(this) || {};
 
-  const boOutput = buildOptimizer({ content, emitSourceMap: options.sourceMap });
+  const boOutput = buildOptimizer({
+    content,
+    inputFilePath: this.resourcePath,
+    emitSourceMap: options.sourceMap,
+  });
   const intermediateSourceMap = boOutput.sourceMap;
   let newContent = boOutput.content;
 

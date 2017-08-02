@@ -40,10 +40,11 @@ describe('build-optimizer', () => {
       `;
       // tslint:enable:max-line-length
 
-      expect(oneLine`${buildOptimizer({ content: input }).content}`).toEqual(output);
+      const inputFilePath = '/node_modules/@angular/some-lib';
+      expect(oneLine`${buildOptimizer({ content: input, inputFilePath }).content}`).toEqual(output);
     });
 
-    it('doesn\'t process files without decorators/ctorParameters', () => {
+    it('doesn\'t process files without decorators/ctorParameters/outside Angular', () => {
       const input = oneLine`
         var Clazz = (function () { function Clazz() { } return Clazz; }());
         ${staticProperty}

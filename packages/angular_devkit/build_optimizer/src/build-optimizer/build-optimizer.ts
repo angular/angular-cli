@@ -19,6 +19,7 @@ import { getScrubFileTransformer } from '../transforms/scrub-file';
 const hasDecorators = /decorators/;
 const hasCtorParameters = /ctorParameters/;
 const hasTsHelpers = /var (__extends|__decorate|__metadata|__param) = /;
+const isAngularPackage = /(\\|\/)node_modules(\\|\/)@angular(\\|\/)/;
 
 export interface BuildOptimizerOptions {
   content?: string;
@@ -50,15 +51,22 @@ export function buildOptimizer(options: BuildOptimizerOptions):
     getTransforms.push(getImportTslibTransformer);
   }
 
-
-  if (hasDecorators.test(content) || hasCtorParameters.test(content)) {
+  if (inputFilePath && isAngularPackage.test(inputFilePath)) {
     // Order matters, getPrefixFunctionsTransformer needs to be called before
     // getFoldFileTransformer.
-    getTransforms.push(...[
+    getTransforms.push(
+      // getPrefixFunctionsTransformer is rather dangerous.
+      // It will mark both `require()` calls and `console.log(stuff)` as pure.
+      // We only apply it to @angular/* packages, since we know they are safe.
       getPrefixFunctionsTransformer,
       getScrubFileTransformer,
       getFoldFileTransformer,
-    ]);
+    );
+  } else if (hasDecorators.test(content) || hasCtorParameters.test(content)) {
+    getTransforms.push(
+      getScrubFileTransformer,
+      getFoldFileTransformer,
+    );
   }
 
   if (getTransforms.length > 0) {
