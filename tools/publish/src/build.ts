@@ -57,7 +57,7 @@ function getDeps(pkg: any): any {
 }
 
 
-export default function build(packagesToBuild: string[], _opts: any,
+export default function build(packagesToBuild: string[], opts: { local: boolean },
                               logger: Logger): Promise<void> {
   const { packages, tools } = require('../../../lib/packages');
 
@@ -226,6 +226,38 @@ export default function build(packagesToBuild: string[], _opts: any,
         licenseLogger.info(pkgName);
         return copy('LICENSE', path.join(pkg.dist, 'LICENSE'));
       }));
+    })
+    .then(() => {
+      if (!opts.local) {
+        return;
+      }
+
+      logger.info('Changing dependencies between packages to tar files...');
+      logger.warn('=================================================');
+      logger.warn('= THIS SHOULD NOT BE USED FOR PUBLISHING TO NPM =');
+      logger.warn('=================================================');
+
+      Object.keys(packages).forEach(pkgName => {
+        const pkg = packages[pkgName];
+        const json = JSON.parse(fs.readFileSync(pkg.packageJson).toString());
+
+        if (!json['dependencies']) {
+          json['dependencies'] = {};
+        }
+        if (!json['devDependencies']) {
+          json['devDependencies'] = {};
+        }
+
+        for (const packageName of Object.keys(packages)) {
+          if (json['dependencies'].hasOwnProperty(packageName)) {
+            json['dependencies'][packageName] = packages[packageName].tar;
+          } else if (json['devDependencies'].hasOwnProperty(packageName)) {
+            json['devDependencies'][packageName] = packages[packageName].tar;
+          }
+        }
+
+        fs.writeFileSync(pkg.distPackageJson, JSON.stringify(json, null, 2));
+      });
     })
     .then(() => {
       logger.info('Tarring all packages...');
