@@ -63,4 +63,19 @@ describe('base href webpack plugin', () => {
     });
     plugin.apply(compiler);
   });
+
+  it('should replace href attribute when baseHref is empty', function () {
+    const plugin = new BaseHrefWebpackPlugin({ baseHref: '' });
+
+    const compiler = mockCompiler(oneLineTrim`
+          <head><base href="/" target="_blank"></head>
+          <body></body>
+        `, (_x: any, htmlPluginData: any) => {
+      expect(htmlPluginData.html).toEqual(oneLineTrim`
+          <head><base href="" target="_blank"></head>
+          <body></body>
+        `);
+    });
+    plugin.apply(compiler);
+  });
 });

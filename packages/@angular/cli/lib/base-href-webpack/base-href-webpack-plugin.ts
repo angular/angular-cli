@@ -7,7 +7,7 @@ export class BaseHrefWebpackPlugin {
 
   apply(compiler: any): void {
     // Ignore if baseHref is not passed
-    if (!this.options.baseHref) {
+    if (!this.options.baseHref && this.options.baseHref !== '') {
       return;
     }
 
