@@ -26,9 +26,9 @@ export default function (_: {}, logger: Logger) {
     baseSha = prJson['base']['sha'];
     sha = prJson['head']['sha'];
   } else {
-    const parentRemote = process.env['GIT_REMOTE'] || 'origin';
+    const parentRemote = process.env['GIT_REMOTE'] ? process.env['GIT_REMOTE'] + '/' : '';
     const parentBranch = process.env['GIT_BRANCH'] || 'master';
-    baseSha = execSync(`git merge-base --fork-point "${parentRemote}/${parentBranch}"`)
+    baseSha = execSync(`git merge-base --fork-point "${parentRemote}${parentBranch}"`)
       .toString().trim();
     sha = 'HEAD';
   }
