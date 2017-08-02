@@ -12,7 +12,7 @@ export default function() {
     return;
   }
 
-  return npm('run', 'build')
+  return npm('run', 'build', '--', '--local')
     .then(() => console.log('Updating package.json from dist...'))
     .then(() => Promise.all(Object.keys(packages).map(pkgName => {
       return updateJsonFile(join(packages[pkgName].dist, 'package.json'), json => {
