@@ -40,7 +40,7 @@
       "enum": ["Default", "OnPush"],
       "type": "string",
       "default": "Default",
-      "alias": "ve"
+      "alias": "cd"
     },
     "routing": {
       "type": "boolean",
@@ -63,6 +63,7 @@
     },
     "flat": {
       "type": "boolean",
+      "description": "Flag to indicate if a dir is created.",
       "default": false
     },
     "htmlTemplate": {
@@ -80,6 +81,11 @@
       "description": "Allows specification of the declaring module.",
       "alias": "m",
       "subtype": "filepath"
+    },
+    "export": {
+      "type": "boolean",
+      "default": false,
+      "description": "Specifies if declaring module exports the component."
     }
   },
   "required": [

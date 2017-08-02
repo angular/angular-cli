@@ -23,7 +23,7 @@ import {
 import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
-import { addDeclarationToModule } from '../utility/ast-utils';
+import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModule } from '../utility/find-module';
 
@@ -41,27 +41,48 @@ function addDeclarationToNgModule(options: any): Rule {
       }
       modulePath = options.module;
     } else {
-      modulePath = findModule(host, options.sourceDir + '/' + options.path);
+      let pathToCheck = options.sourceDir + '/' + options.path;
+      pathToCheck += options.flat ? '' : '/' + stringUtils.dasherize(options.name);
+      modulePath = findModule(host, pathToCheck);
     }
 
-    const sourceText = host.read(modulePath) !.toString('utf-8');
-    const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
+    let sourceText = host.read(modulePath) !.toString('utf-8');
+    let source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
-    const componentPath = `/${options.sourceDir}/${options.path}/`
+    const directivePath = `/${options.sourceDir}/${options.path}/`
                           + (options.flat ? '' : stringUtils.dasherize(options.name) + '/')
                           + stringUtils.dasherize(options.name)
-                          + '.component';
-    const relativePath = buildRelativePath(modulePath, componentPath);
-    const changes = addDeclarationToModule(source, modulePath,
-                                           stringUtils.classify(`${options.name}Component`),
-                                           relativePath);
-    const recorder = host.beginUpdate(modulePath);
-    for (const change of changes) {
+                          + '.directive';
+    const relativePath = buildRelativePath(modulePath, directivePath);
+    const classifiedName = stringUtils.classify(`${options.name}Directive`);
+    const declarationChanges = addDeclarationToModule(source,
+                                                      modulePath,
+                                                      classifiedName,
+                                                      relativePath);
+    const declarationRecorder = host.beginUpdate(modulePath);
+    for (const change of declarationChanges) {
       if (change instanceof InsertChange) {
-        recorder.insertLeft(change.pos, change.toAdd);
+        declarationRecorder.insertLeft(change.pos, change.toAdd);
       }
     }
-    host.commitUpdate(recorder);
+    host.commitUpdate(declarationRecorder);
+
+    if (options.export) {
+      sourceText = host.read(modulePath) !.toString('utf-8');
+      source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
+
+      const exportRecorder = host.beginUpdate(modulePath);
+      const exportChanges = addExportToModule(source, modulePath,
+                                              stringUtils.classify(`${options.name}Directive`),
+                                              relativePath);
+
+      for (const change of exportChanges) {
+        if (change instanceof InsertChange) {
+          exportRecorder.insertLeft(change.pos, change.toAdd);
+        }
+      }
+      host.commitUpdate(exportRecorder);
+    }
 
     return host;
   };

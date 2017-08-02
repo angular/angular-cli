@@ -75,6 +75,7 @@ export default function (options: any): Rule {
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
       styleext: options.styleext,
+      spec: !options.skipTests,
     } :
     {
       inlineStyle: true,
@@ -109,9 +110,14 @@ export default function (options: any): Rule {
     addBootstrapToNgModule(options.directory),
     mergeWith(
       apply(url('./other-files'), [
-        options.minimal || options.inlineTemplate ?
-          filter(path => !path.endsWith('.html')) : noop(),
-        template({ utils: stringUtils, ...options, selector: appRootSelector }),
+        componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
+        !componentOptions.spec ? filter(path => !path.endsWith('.spec.ts')) : noop(),
+        template({
+          utils: stringUtils,
+          ...options,
+          selector: appRootSelector,
+          ...componentOptions,
+        }),
         move(options.directory + '/' + options.sourceDir + '/app'),
       ]), MergeStrategy.Overwrite),
   ]);

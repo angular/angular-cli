@@ -13,7 +13,7 @@
     },
     "flat": {
       "type": "boolean",
-      "default": false
+      "default": true
     },
     "module":  {
       "type": "string",

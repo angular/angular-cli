@@ -30,6 +30,12 @@
     "commonModule": {
       "type": "boolean",
       "default": true
+    },
+    "module":  {
+      "type": "string",
+      "description": "Allows specification of the declaring module.",
+      "alias": "m",
+      "subtype": "filepath"
     }
   },
   "required": [

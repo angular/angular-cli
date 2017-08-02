@@ -9,6 +9,7 @@
 // tslint:disable:no-any
 import {
   Rule,
+  Tree,
   apply,
   branchAndMerge,
   chain,
@@ -19,8 +20,47 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import * as ts from 'typescript';
 import * as stringUtils from '../strings';
+import { addDeclarationToModule } from '../utility/ast-utils';
+import { InsertChange } from '../utility/change';
+import { buildRelativePath } from '../utility/find-module';
 
+
+function addDeclarationToNgModule(options: any): Rule {
+  return (host: Tree) => {
+    if (!options.module) {
+      return host;
+    }
+
+    if (!host.exists(options.module)) {
+      throw new Error(`Module specified (${options.module}) does not exist.`);
+    }
+    const modulePath = options.module;
+
+    const sourceText = host.read(modulePath) !.toString('utf-8');
+    const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
+
+    const importModulePath = `/${options.sourceDir}/${options.path}/`
+                     + (options.flat ? '' : stringUtils.dasherize(options.name) + '/')
+                     + stringUtils.dasherize(options.name)
+                     + '.module';
+    const relativePath = buildRelativePath(modulePath, importModulePath);
+    const changes = addDeclarationToModule(source, modulePath,
+                                           stringUtils.classify(`${options.name}Module`),
+                                           relativePath);
+
+    const recorder = host.beginUpdate(modulePath);
+    for (const change of changes) {
+      if (change instanceof InsertChange) {
+        recorder.insertLeft(change.pos, change.toAdd);
+      }
+    }
+    host.commitUpdate(recorder);
+
+    return host;
+  };
+}
 
 export default function (options: any): Rule {
   const templateSource = apply(url('./files'), [
@@ -36,6 +76,7 @@ export default function (options: any): Rule {
 
   return chain([
     branchAndMerge(chain([
+      addDeclarationToNgModule(options),
       mergeWith(templateSource),
     ])),
   ]);

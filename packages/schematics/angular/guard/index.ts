@@ -23,7 +23,7 @@ import {
 import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
-import { addDeclarationToModule } from '../utility/ast-utils';
+import { addProviderToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath } from '../utility/find-module';
 
@@ -42,14 +42,14 @@ function addDeclarationToNgModule(options: any): Rule {
     const sourceText = host.read(modulePath) !.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
-    const componentPath = `/${options.sourceDir}/${options.path}/`
+    const guardPath = `/${options.sourceDir}/${options.path}/`
                           + (options.flat ? '' : stringUtils.dasherize(options.name) + '/')
                           + stringUtils.dasherize(options.name)
                           + '.guard';
-    const relativePath = buildRelativePath(modulePath, componentPath);
-    const changes = addDeclarationToModule(source, modulePath,
-                                           stringUtils.classify(`${options.name}Component`),
-                                           relativePath);
+    const relativePath = buildRelativePath(modulePath, guardPath);
+    const changes = addProviderToModule(source, modulePath,
+                                        stringUtils.classify(`${options.name}Guard`),
+                                        relativePath);
     const recorder = host.beginUpdate(modulePath);
     for (const change of changes) {
       if (change instanceof InsertChange) {

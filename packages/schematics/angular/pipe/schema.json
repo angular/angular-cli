@@ -17,7 +17,7 @@
     },
     "flat": {
       "type": "boolean",
-      "default": false,
+      "default": true,
       "description": "Flag to indicate if a dir is created."
     },
     "spec": {
@@ -33,7 +33,9 @@
     "module": {
       "type": "string",
       "default": "",
-      "description": "Allows specification of the declaring module."
+      "description": "Allows specification of the declaring module.",
+      "alias": "m",
+      "subtype": "filepath"
     },
     "export": {
       "type": "boolean",

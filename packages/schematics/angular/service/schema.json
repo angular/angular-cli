@@ -28,7 +28,9 @@
     "module": {
       "type": "string",
       "default": "",
-      "description": "Allows specification of the declaring module."
+      "description": "Allows specification of the declaring module.",
+      "alias": "m",
+      "subtype": "filepath"
     }
   },
   "required": [
