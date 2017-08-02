@@ -13,11 +13,16 @@ export default function() {
       ],
       '@shared/*': [
         'app/shared/*'
+      ],
+      '*': [
+        '*',
+        'app/shared/*'
       ]
     };
   })
   .then(() => createDir('src/app/shared'))
   .then(() => writeMultipleFiles({
+    'src/meaning-too.ts': 'export var meaning = 42;',
     'src/app/shared/meaning.ts': 'export var meaning = 42;',
     'src/app/shared/index.ts': `export * from './meaning'`
   }))
@@ -25,12 +30,16 @@ export default function() {
     import { meaning } from 'app/shared/meaning';
     import { meaning as meaning2 } from '@shared';
     import { meaning as meaning3 } from '@shared/meaning';
+    import { meaning as meaning4 } from 'meaning';
+    import { meaning as meaning5 } from 'meaning-too';
 
     // need to use imports otherwise they are ignored and
     // no error is outputted, even if baseUrl/paths don't work
     console.log(meaning)
     console.log(meaning2)
     console.log(meaning3)
+    console.log(meaning4)
+    console.log(meaning5)
   `))
   .then(() => ng('build'));
 }
