@@ -30,15 +30,25 @@ export default function () {
       @import 'variables'
       h4
         background-color: $primary-color
+    `,
+      'src/style-paths/variables.less': '@primary-color: #ADDADD;',
+      'src/styles.less': `
+      @import 'variables';
+      h5 { color: @primary-color; }
+    `,
+      'src/app/app.component.less': `
+      @import 'variables';
+      h6 { color: @primary-color; }
     `
     }))
     .then(() => replaceInFile('src/app/app.component.ts', `'./app.component.css\'`,
-      `'./app.component.scss', './app.component.styl'`))
+      `'./app.component.scss', './app.component.styl', './app.component.less'`))
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['styles'] = [
         'styles.scss',
-        'styles.styl'
+        'styles.styl',
+        'styles.less'
       ];
       app['stylePreprocessorOptions'] = {
         includePaths: [
@@ -52,9 +62,13 @@ export default function () {
     .then(() => expectFileToMatch('dist/main.bundle.js', /h2.*{.*color: red;.*}/))
     .then(() => expectFileToMatch('dist/styles.bundle.css', /h3\s*{\s*color: #008000;\s*}/))
     .then(() => expectFileToMatch('dist/main.bundle.js', /h4.*{.*color: #008000;.*}/))
+    .then(() => expectFileToMatch('dist/styles.bundle.css', /h5\s*{\s*color: #ADDADD;\s*}/))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /h6.*{.*color: #ADDADD;.*}/))
     .then(() => ng('build', '--extract-css', '--aot'))
     .then(() => expectFileToMatch('dist/styles.bundle.css', /h1\s*{\s*color: red;\s*}/))
     .then(() => expectFileToMatch('dist/main.bundle.js', /h2.*{.*color: red;.*}/))
     .then(() => expectFileToMatch('dist/styles.bundle.css', /h3\s*{\s*color: #008000;\s*}/))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /h4.*{.*color: #008000;.*}/));
+    .then(() => expectFileToMatch('dist/main.bundle.js', /h4.*{.*color: #008000;.*}/))
+    .then(() => expectFileToMatch('dist/styles.bundle.css', /h5\s*{\s*color: #ADDADD;\s*}/))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /h6.*{.*color: #ADDADD;.*}/));
 }
