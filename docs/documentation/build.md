@@ -80,6 +80,7 @@ Flag                | `--dev` | `--prod`
 `--output-hashing`  | `media` | `all`
 `--sourcemaps`      | `true`  | `false`
 `--extract-css`     | `false` | `true`
+`--named-chunks`    | `true`  | `false`
 
 `--extract-licenses` Extract all licenses in a separate file, in the case of production builds only.
 `--i18n-file` Localization file to use for i18n.
