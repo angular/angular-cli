@@ -59,7 +59,7 @@ export default Task.extend({
         } else if (runTaskOptions.statsJson) {
           fs.writeFileSync(
             path.resolve(this.project.root, outputPath, 'stats.json'),
-            JSON.stringify(json, null, 2)
+            JSON.stringify(stats.toJson(), null, 2)
           );
         }
 
