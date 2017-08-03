@@ -12,7 +12,7 @@
     "preprotractor": "webdriver-manager update",
     "protractor": "protractor protractor.config.js",
     "benchmark": "npm run build && npm run build-no-ngo && node benchmark.js",
-    "reinstall-bo": "rimraf node_modules/@angular-devkit/build-optimizer && npm i ../../../../../dist/@angular-devkit_build-optimizer.tgz"
+    "reinstall-bo": "rimraf node_modules/@angular-devkit/build-optimizer && npm i -q ../../../../../dist/@angular-devkit_build-optimizer.tgz"
   },
   "dependencies": {
     "@angular/animations": "4.2.3",
