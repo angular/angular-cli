@@ -38,5 +38,9 @@ const boOutput = buildOptimizer({
   emitSourceMap: true,
 });
 
-writeFileSync(join(currentDir, outputFile), boOutput.content);
-writeFileSync(join(currentDir, `${outputFile}.map`), JSON.stringify(boOutput.sourceMap));
+if (boOutput.emitSkipped) {
+  console.log('Nothing to emit.');
+} else {
+  writeFileSync(join(currentDir, outputFile), boOutput.content);
+  writeFileSync(join(currentDir, `${outputFile}.map`), JSON.stringify(boOutput.sourceMap));
+}

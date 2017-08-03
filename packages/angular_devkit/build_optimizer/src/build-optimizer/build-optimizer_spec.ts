@@ -41,7 +41,9 @@ describe('build-optimizer', () => {
       // tslint:enable:max-line-length
 
       const inputFilePath = '/node_modules/@angular/some-lib';
-      expect(oneLine`${buildOptimizer({ content: input, inputFilePath }).content}`).toEqual(output);
+      const boOutput = buildOptimizer({ content: input, inputFilePath });
+      expect(oneLine`${boOutput.content}`).toEqual(output);
+      expect(boOutput.emitSkipped).toEqual(false);
     });
 
     it('doesn\'t process files without decorators/ctorParameters/outside Angular', () => {
@@ -50,7 +52,9 @@ describe('build-optimizer', () => {
         ${staticProperty}
       `;
 
-      expect(oneLine`${buildOptimizer({ content: input }).content}`).toEqual(input);
+      const boOutput = buildOptimizer({ content: input });
+      expect(boOutput.content).toBeFalsy();
+      expect(boOutput.emitSkipped).toEqual(true);
     });
   });
 
@@ -63,7 +67,9 @@ describe('build-optimizer', () => {
         Clazz.decorators = [ { type: Injectable } ];
       `;
 
-      expect(oneLine`${buildOptimizer({ content: input }).content}`).toEqual(input);
+      const boOutput = buildOptimizer({ content: input });
+      expect(boOutput.content).toBeFalsy();
+      expect(boOutput.emitSkipped).toEqual(true);
     });
 
     it('throws on files with invalid syntax in strict mode', () => {
@@ -89,25 +95,29 @@ describe('build-optimizer', () => {
     });
 
     it('produces sourcemaps', () => {
-      const ignoredInput = oneLine`
-        var Clazz = (function () { function Clazz() { } return Clazz; }());
-        ${staticProperty}
-      `;
-      expect(buildOptimizer({ content: ignoredInput, emitSourceMap: true }).sourceMap).toBeTruthy();
       expect(buildOptimizer(
         { content: transformableInput, emitSourceMap: true },
       ).sourceMap).toBeTruthy();
     });
 
-    it('produces sourcemaps for ignored files', () => {
+    it('doesn\'t produce sourcemaps when emitting was skipped', () => {
       const ignoredInput = oneLine`
         var Clazz = (function () { function Clazz() { } return Clazz; }());
         ${staticProperty}
       `;
-      expect(buildOptimizer({ content: ignoredInput, emitSourceMap: true }).sourceMap).toBeTruthy();
-      expect(buildOptimizer(
-        { content: transformableInput, emitSourceMap: true },
-      ).sourceMap).toBeTruthy();
+      const invalidInput = oneLine`
+        ))))invalid syntax
+        ${clazz}
+        Clazz.decorators = [ { type: Injectable } ];
+      `;
+
+      const ignoredOutput = buildOptimizer({ content: ignoredInput, emitSourceMap: true });
+      expect(ignoredOutput.emitSkipped).toBeTruthy();
+      expect(ignoredOutput.sourceMap).toBeFalsy();
+
+      const invalidOutput = buildOptimizer({ content: invalidInput, emitSourceMap: true });
+      expect(invalidOutput.emitSkipped).toBeTruthy();
+      expect(invalidOutput.sourceMap).toBeFalsy();
     });
 
     it('emits sources content', () => {

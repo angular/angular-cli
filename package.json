@@ -58,7 +58,6 @@
     "jasmine": "^2.6.0",
     "jasmine-spec-reporter": "^3.2.0",
     "loader-utils": "^1.1.0",
-    "magic-string": "^0.22.2",
     "marked-terminal": "^2.0.0",
     "minimist": "^1.2.0",
     "npm": "^5.2.0",

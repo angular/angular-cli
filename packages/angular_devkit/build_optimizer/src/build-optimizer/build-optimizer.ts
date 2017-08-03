@@ -6,10 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { readFileSync } from 'fs';
-import { RawSourceMap } from 'source-map';
-const MagicString = require('magic-string');
-
-import { transformJavascript } from '../helpers/transform-javascript';
+import { TransformJavascriptOutput, transformJavascript } from '../helpers/transform-javascript';
 import { getFoldFileTransformer } from '../transforms/class-fold';
 import { getImportTslibTransformer } from '../transforms/import-tslib';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
@@ -29,11 +26,9 @@ export interface BuildOptimizerOptions {
   strict?: boolean;
 }
 
-export function buildOptimizer(options: BuildOptimizerOptions):
-  { content: string, sourceMap: RawSourceMap | null } {
+export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascriptOutput {
 
-  options.emitSourceMap = !!options.emitSourceMap;
-  const { inputFilePath, emitSourceMap, outputFilePath, strict } = options;
+  const { inputFilePath } = options;
   let { content } = options;
 
   if (!inputFilePath && content === undefined) {
@@ -69,32 +64,5 @@ export function buildOptimizer(options: BuildOptimizerOptions):
     );
   }
 
-  if (getTransforms.length > 0) {
-    // Only transform if there are transforms to apply.
-    return transformJavascript({
-      content,
-      getTransforms,
-      emitSourceMap,
-      inputFilePath,
-      outputFilePath,
-      strict,
-    });
-  } else if (emitSourceMap) {
-    // Emit a sourcemap with no changes.
-    const ms = new MagicString(content);
-
-    return {
-      content,
-      sourceMap: ms.generateMap({
-        source: inputFilePath,
-        file: outputFilePath ? `${outputFilePath}.map` : null,
-        includeContent: true,
-      }),
-    };
-  } else {
-    return {
-      content,
-      sourceMap: null,
-    };
-  }
+  return transformJavascript({ ...options, getTransforms, content });
 }
