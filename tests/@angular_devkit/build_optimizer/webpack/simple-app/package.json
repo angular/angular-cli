@@ -12,7 +12,7 @@
     "preprotractor": "webdriver-manager update",
     "protractor": "protractor protractor.config.js",
     "benchmark": "npm run build && npm run build-no-ngo && node benchmark.js",
-    "reinstall-bo": "rimraf node_modules/@angular-devkit/build-optimizer && npm i ../../../../../dist/@angular-devkit/build-optimizer/"
+    "reinstall-bo": "rimraf node_modules/@angular-devkit/build-optimizer && npm i ../../../../../dist/@angular-devkit_build-optimizer.tgz"
   },
   "dependencies": {
     "@angular/common": "^4.2.3",
@@ -29,7 +29,7 @@
     "zone.js": "^0.8.4"
   },
   "devDependencies": {
-    "@angular-devkit/build-optimizer": "file:../../../../../dist/@angular-devkit/build-optimizer",
+    "@angular-devkit/build-optimizer": "file:../../../../../dist/@angular-devkit_build-optimizer.tgz",
     "@types/jasmine": "2.5.45",
     "compression-webpack-plugin": "^0.4.0",
     "concurrently": "^3.4.0",
