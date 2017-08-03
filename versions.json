@@ -1,10 +1,10 @@
 {
   "versions": {
     "@_/benchmark": "0.0.3",
-    "@angular-devkit/build-optimizer": "0.0.7",
+    "@angular-devkit/build-optimizer": "0.0.8",
     "@angular-devkit/core": "0.0.5",
-    "@angular-devkit/schematics": "0.0.9",
-    "@schematics/angular": "0.0.9"
+    "@angular-devkit/schematics": "0.0.10",
+    "@schematics/angular": "0.0.10"
   },
   "hashes": {
     "@_/benchmark": "90ff01f6b5414a07939369ce709706a9",
