@@ -24,8 +24,20 @@ export default function buildOptimizerLoader
   const boOutput = buildOptimizer({
     content,
     inputFilePath: this.resourcePath,
+    // Add a name to the build optimizer output.
+    // Without a name the sourcemaps cannot be properly chained.
+    outputFilePath: this.resourcePath + '.build-optimizer.js',
     emitSourceMap: options.sourceMap,
   });
+
+  if (boOutput.emitSkipped || boOutput.content === null) {
+    // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
+    // tslint:disable-next-line:no-any
+    this.callback(null, content, previousSourceMap as any);
+
+    return;
+  }
+
   const intermediateSourceMap = boOutput.sourceMap;
   let newContent = boOutput.content;
 
@@ -35,22 +47,27 @@ export default function buildOptimizerLoader
     // Webpack doesn't need sourceMappingURL since we pass them on explicitely.
     newContent = newContent.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
 
-    if (!previousSourceMap) {
-      // If we're emitting sourcemaps but there is no previous one, then we're the first loader.
-      newSourceMap = JSON.stringify(intermediateSourceMap);
-    } else {
-      // If there's a previous sourcemap, we're an intermediate loader and we have to chain them.
+    if (previousSourceMap) {
+      // If there's a previous sourcemap, we have to chain them.
+      // See https://github.com/mozilla/source-map/issues/216#issuecomment-150839869 for a simple
+      // source map chaining example.
+      // Use http://sokra.github.io/source-map-visualization/ to validate sourcemaps make sense.
+
       // Fill in the intermediate sourcemap source as the previous sourcemap file.
       intermediateSourceMap.sources = [previousSourceMap.file];
-      intermediateSourceMap.file = previousSourceMap.file;
 
       // Chain the sourcemaps.
       const consumer = new SourceMapConsumer(intermediateSourceMap);
       const generator = SourceMapGenerator.fromSourceMap(consumer);
       generator.applySourceMap(new SourceMapConsumer(previousSourceMap));
-      newSourceMap = JSON.stringify(generator.toJSON());
+      newSourceMap = generator.toJSON();
+    } else {
+      // Otherwise just return our generated sourcemap.
+      newSourceMap = intermediateSourceMap;
     }
   }
 
-  this.callback(null, newContent, newSourceMap);
+  // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
+  // tslint:disable-next-line:no-any
+  this.callback(null, newContent, newSourceMap as any);
 }

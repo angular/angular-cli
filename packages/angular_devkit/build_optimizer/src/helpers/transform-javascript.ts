@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { readFileSync } from 'fs';
-import { basename, dirname, join } from 'path';
+import { dirname, join } from 'path';
 import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
 
@@ -145,7 +145,7 @@ export function transformJavascript(
     sourceMap = JSON.parse(tsSourceMap as string) as RawSourceMap;
     // Fix sourcemaps file references.
     if (outputFilePath) {
-      sourceMap.file = basename(outputFilePath);
+      sourceMap.file = outputFilePath;
       transformedContent = transformedContent.replace(urlRegExp,
         `//# sourceMappingURL=${sourceMap.file}.map\n`);
       if (inputFilePath) {

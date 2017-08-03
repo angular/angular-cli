@@ -141,8 +141,8 @@ describe('build-optimizer', () => {
     });
 
     it('uses inputFilePath and outputFilePath if provided', () => {
-      const inputFilePath = 'file.js';
-      const outputFilePath = 'file.bo.js';
+      const inputFilePath = '/path/to/file.js';
+      const outputFilePath = '/path/to/file.bo.js';
       const { content, sourceMap } = buildOptimizer({
         content: transformableInput,
         emitSourceMap: true,
