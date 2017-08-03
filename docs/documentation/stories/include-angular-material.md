@@ -11,7 +11,7 @@ cd my-app
 
 Install the `@angular/material` library and add the dependency to package.json...
 ```bash
-npm install --save @angular/material
+npm install --save @angular/material @angular/cdk
 ```
 
 Import the Angular Material NgModule into your app module...
