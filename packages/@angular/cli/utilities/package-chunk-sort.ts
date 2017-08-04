@@ -1,7 +1,7 @@
 import { ExtraEntry, extraEntryParser } from '../models/webpack-configs/utils';
 
 // Sort chunks according to a predefined order:
-// inline, polyfills, all scripts, all styles, vendor, main
+// inline, polyfills, all styles, vendor, main
 export function packageChunkSort(appConfig: any) {
   let entryPoints = ['inline', 'polyfills', 'sw-register'];
 
@@ -10,10 +10,6 @@ export function packageChunkSort(appConfig: any) {
       entryPoints.push(extraEntry.entry);
     }
   };
-
-  if (appConfig.scripts) {
-    extraEntryParser(appConfig.scripts, './', 'scripts').forEach(pushExtraEntries);
-  }
 
   if (appConfig.styles) {
     extraEntryParser(appConfig.styles, './', 'styles').forEach(pushExtraEntries);

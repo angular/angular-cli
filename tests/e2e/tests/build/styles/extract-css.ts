@@ -21,9 +21,7 @@ export default function () {
       'src/input-style.css': '.input-style { color: red }',
       'src/lazy-style.css': '.lazy-style { color: red }',
       'src/pre-rename-style.css': '.pre-rename-style { color: red }',
-      'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }',
-      'src/common-entry-style.css': '.common-entry-style { color: red }',
-      'src/common-entry-script.js': 'console.log(\'common-entry-script\');'
+      'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }'
     }))
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
@@ -32,10 +30,8 @@ export default function () {
         { input: 'input-style.css' },
         { input: 'lazy-style.css', lazy: true },
         { input: 'pre-rename-style.css', output: 'renamed-style' },
-        { input: 'pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true },
-        { input: 'common-entry-style.css', output: 'common-entry' }
+        { input: 'pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true }
       ];
-      app['scripts'] = [{ input: 'common-entry-script.js', output: 'common-entry' }];
     }))
     .then(() => ng('build', '--extract-css'))
     // files were created successfully
@@ -44,8 +40,6 @@ export default function () {
     .then(() => expectFileToMatch('dist/lazy-style.bundle.css', '.lazy-style'))
     .then(() => expectFileToMatch('dist/renamed-style.bundle.css', '.pre-rename-style'))
     .then(() => expectFileToMatch('dist/renamed-lazy-style.bundle.css', '.pre-rename-lazy-style'))
-    .then(() => expectFileToMatch('dist/common-entry.bundle.css', '.common-entry-style'))
-    .then(() => expectFileToMatch('dist/common-entry.bundle.js', 'common-entry-script'))
     // there are no js entry points for css only bundles
     .then(() => expectToFail(() => expectFileToExist('dist/style.bundle.js')))
     .then(() => expectToFail(() => expectFileToExist('dist/lazy-style.bundle.js')))
@@ -53,14 +47,12 @@ export default function () {
     .then(() => expectToFail(() => expectFileToExist('dist/renamed-lazy-style.bundle.js')))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <link href="common-entry.bundle.css" rel="stylesheet"/>
       <link href="styles.bundle.css" rel="stylesheet"/>
       <link href="renamed-style.bundle.css" rel="stylesheet"/>
     `))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
       <script type="text/javascript" src="inline.bundle.js"></script>
       <script type="text/javascript" src="polyfills.bundle.js"></script>
-      <script type="text/javascript" src="common-entry.bundle.js"></script>
       <script type="text/javascript" src="vendor.bundle.js"></script>
       <script type="text/javascript" src="main.bundle.js"></script>
     `))
@@ -72,13 +64,10 @@ export default function () {
     .then(() => expectFileToMatch('dist/lazy-style.bundle.js', '.lazy-style'))
     .then(() => expectFileToMatch('dist/renamed-style.bundle.js', '.pre-rename-style'))
     .then(() => expectFileToMatch('dist/renamed-lazy-style.bundle.js', '.pre-rename-lazy-style'))
-    .then(() => expectFileToMatch('dist/common-entry.bundle.js', '.common-entry-style'))
-    .then(() => expectFileToMatch('dist/common-entry.bundle.js', 'common-entry-script'))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
       <script type="text/javascript" src="inline.bundle.js"></script>
       <script type="text/javascript" src="polyfills.bundle.js"></script>
-      <script type="text/javascript" src="common-entry.bundle.js"></script>
       <script type="text/javascript" src="styles.bundle.js"></script>
       <script type="text/javascript" src="renamed-style.bundle.js"></script>
       <script type="text/javascript" src="vendor.bundle.js"></script>
