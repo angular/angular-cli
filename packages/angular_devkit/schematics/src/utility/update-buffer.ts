@@ -10,7 +10,7 @@ import { LinkedList } from './linked-list';
 
 
 export class IndexOutOfBoundException extends BaseException {
-  constructor(index: number, min: number, max: number = Infinity) {
+  constructor(index: number, min: number, max = Infinity) {
     super(`Index ${index} outside of range [${min}, ${max}].`);
   }
 }

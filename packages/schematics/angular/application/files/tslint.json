@@ -3,6 +3,7 @@
     "node_modules/codelyzer"
   ],
   "rules": {
+    "arrow-return-shorthand": true,
     "callable-types": true,
     "class-name": true,
     "comment-format": [
@@ -12,7 +13,10 @@
     "curly": true,
     "eofline": true,
     "forin": true,
-    "import-blacklist": [true, "rxjs"],
+    "import-blacklist": [
+      true,
+      "rxjs"
+    ],
     "import-spacing": true,
     "indent": [
       true,
@@ -27,8 +31,14 @@
     "member-access": false,
     "member-ordering": [
       true,
-      "static-before-instance",
-      "variables-before-functions"
+      {
+        "order": [
+          "static-field",
+          "instance-field",
+          "static-method",
+          "instance-method"
+        ]
+      }
     ],
     "no-arg": true,
     "no-bitwise": true,
@@ -42,16 +52,22 @@
     ],
     "no-construct": true,
     "no-debugger": true,
-    "no-duplicate-variable": true,
+    "no-duplicate-super": true,
     "no-empty": false,
     "no-empty-interface": true,
     "no-eval": true,
-    "no-inferrable-types": [true, "ignore-params"],
+    "no-inferrable-types": [
+      true,
+      "ignore-params"
+    ],
+    "no-misused-new": true,
+    "no-non-null-assertion": true,
     "no-shadowed-variable": true,
     "no-string-literal": false,
     "no-string-throw": true,
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": true,
+    "no-unnecessary-initializer": true,
     "no-unused-expression": true,
     "no-use-before-declare": true,
     "no-var-keyword": true,
@@ -70,6 +86,7 @@
     ],
     "radix": true,
     "semicolon": [
+      true,
       "always"
     ],
     "triple-equals": [
@@ -97,9 +114,18 @@
       "check-separator",
       "check-type"
     ],
-
-    "directive-selector": [true, "attribute", "<%= prefix %>", "camelCase"],
-    "component-selector": [true, "element", "<%= prefix %>", "kebab-case"],
+    "directive-selector": [
+      true,
+      "attribute",
+      "<%= prefix %>",
+      "camelCase"
+    ],
+    "component-selector": [
+      true,
+      "element",
+      "<%= prefix %>",
+      "kebab-case"
+    ],
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
     "use-host-property-decorator": true,

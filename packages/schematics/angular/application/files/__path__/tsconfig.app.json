@@ -2,8 +2,8 @@
   "extends": "<%= path.split('/').map(x => '..').join('/') %>/tsconfig.json",
   "compilerOptions": {
     "outDir": "<%= path.split('/').map(x => '..').join('/') %>/out-tsc/app",
-    "module": "es2015",
     "baseUrl": "",
+    "module": "es2015",
     "types": []
   },
   "exclude": [

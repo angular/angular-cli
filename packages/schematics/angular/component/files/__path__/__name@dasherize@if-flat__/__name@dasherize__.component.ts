@@ -9,8 +9,8 @@ import { Component, OnInit<% if(viewEncapsulation) { %>, ViewEncapsulation<% }%>
   `,<% } else { %>
   templateUrl: './<%= dasherize(name) %>.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['./<%= dasherize(name) %>.component.<%= styleext %>']<% } %><% if(viewEncapsulation) { %>,
-  encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection) { %>,
+  styleUrls: ['./<%= dasherize(name) %>.component.<%= styleext %>']<% } %><% if(viewEncapsulation !== 'None') { %>,
+  encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })
 export class <%= classify(name) %>Component implements OnInit {

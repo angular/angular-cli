@@ -1,4 +1,4 @@
-import { Component, OnInit<% if(viewEncapsulation) { %>, ViewEncapsulation<% }%><% if(changeDetection) { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
@@ -9,16 +9,8 @@ import { Component, OnInit<% if(viewEncapsulation) { %>, ViewEncapsulation<% }%>
   `,<% } else { %>
   templateUrl: './app.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['./app.component.<%= styleext %>']<% } %><% if(viewEncapsulation) { %>,
-  encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection) { %>,
-  changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
+  styleUrls: ['./app.component.<%= styleext %>']<% } %>
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = '<%= prefix %>';
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
 }

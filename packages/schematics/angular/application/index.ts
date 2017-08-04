@@ -97,8 +97,9 @@ export default function (options: any): Rule {
       name: 'app',
       commonModule: false,
       flat: true,
-      sourceDir: options.directory + '/' + options.sourceDir,
       routing: options.routing,
+      sourceDir: options.directory + '/' + options.sourceDir,
+      spec: false,
     }),
     schematic('component', {
       name: 'app',
