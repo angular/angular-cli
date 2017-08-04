@@ -43,4 +43,7 @@ if (boOutput.emitSkipped) {
 } else {
   writeFileSync(join(currentDir, outputFile), boOutput.content);
   writeFileSync(join(currentDir, `${outputFile}.map`), JSON.stringify(boOutput.sourceMap));
+  console.log('Emitted:');
+  console.log(`  ${outputFile}`);
+  console.log(`  ${outputFile}.map`);
 }

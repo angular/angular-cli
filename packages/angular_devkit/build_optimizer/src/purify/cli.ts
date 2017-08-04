@@ -36,3 +36,4 @@ const outputFile = process.argv[3]
 const purifyOutput = purify(readFileSync(join(currentDir, inputFile), 'UTF-8'));
 
 writeFileSync(join(currentDir, outputFile), purifyOutput);
+console.log(`Emitted: ${outputFile}`);
