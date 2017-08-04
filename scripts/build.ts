@@ -225,7 +225,7 @@ export default function(_: {}, logger: Logger) {
   for (const packageName of sortedPackages) {
     specLogger.info(packageName);
     const pkg = packages[packageName];
-    const files = glob.sync(path.join(pkg.dist, '**/*_spec.js'));
+    const files = glob.sync(path.join(pkg.dist, '**/*_spec.@(js|d.ts)'));
     specLogger.info(`  ${files.length} spec files found...`);
     files.forEach(fileName => _rm(fileName));
   }
