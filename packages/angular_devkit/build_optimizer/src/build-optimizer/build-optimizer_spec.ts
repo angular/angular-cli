@@ -40,7 +40,7 @@ describe('build-optimizer', () => {
       `;
       // tslint:enable:max-line-length
 
-      const inputFilePath = '/node_modules/@angular/some-lib';
+      const inputFilePath = '/node_modules/@angular/core/@angular/core.es5.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });
       expect(oneLine`${boOutput.content}`).toEqual(output);
       expect(boOutput.emitSkipped).toEqual(false);
@@ -80,6 +80,31 @@ describe('build-optimizer', () => {
       `;
 
       expect(() => buildOptimizer({ content: input, strict: true })).toThrow();
+    });
+  });
+
+  describe('whitelisted modules', () => {
+    // This statement is considered pure by getPrefixFunctionsTransformer on whitelisted modules.
+    const input = 'console.log(42);';
+    const output = '/*@__PURE__*/ console.log(42);';
+
+    it('should process whitelisted modules', () => {
+      const inputFilePath = '/node_modules/@angular/core/@angular/core.es5.js';
+      const boOutput = buildOptimizer({ content: input, inputFilePath });
+      expect(boOutput.content).toContain(output);
+      expect(boOutput.emitSkipped).toEqual(false);
+    });
+
+    it('should not process non-whitelisted modules', () => {
+      const inputFilePath = '/node_modules/other-package/core.es5.js';
+      const boOutput = buildOptimizer({ content: input, inputFilePath });
+      expect(boOutput.emitSkipped).toEqual(true);
+    });
+
+    it('should not process non-whitelisted umd modules', () => {
+      const inputFilePath = '/node_modules/@angular/core/bundles/core.umd.js';
+      const boOutput = buildOptimizer({ content: input, inputFilePath });
+      expect(boOutput.emitSkipped).toEqual(true);
     });
   });
 
