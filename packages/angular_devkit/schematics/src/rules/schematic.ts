@@ -18,9 +18,9 @@ import { branch } from '../tree/static';
  * @param schematicName The name of the schematic to run.
  * @param options The options to pass as input to the RuleFactory.
  */
-export function externalSchematic<T>(collectionName: string,
-                                     schematicName: string,
-                                     options: T): Rule {
+export function externalSchematic<OptionT extends object>(collectionName: string,
+                                                          schematicName: string,
+                                                          options: OptionT): Rule {
   return (input: Tree, context: SchematicContext) => {
     const collection = context.engine.createCollection(collectionName);
     const schematic = collection.createSchematic(schematicName);
@@ -36,7 +36,7 @@ export function externalSchematic<T>(collectionName: string,
  * @param schematicName The name of the schematic to run.
  * @param options The options to pass as input to the RuleFactory.
  */
-export function schematic<T>(schematicName: string, options: T): Rule {
+export function schematic<OptionT extends object>(schematicName: string, options: OptionT): Rule {
   return (input: Tree, context: SchematicContext) => {
     const collection = context.schematic.collection;
     const schematic = collection.createSchematic(schematicName);

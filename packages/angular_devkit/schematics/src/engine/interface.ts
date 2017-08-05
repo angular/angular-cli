@@ -101,7 +101,7 @@ export interface Schematic<CollectionMetadataT extends object, SchematicMetadata
   readonly description: SchematicDescription<CollectionMetadataT, SchematicMetadataT>;
   readonly collection: Collection<CollectionMetadataT, SchematicMetadataT>;
 
-  call<T>(options: T, host: Observable<Tree>): Observable<Tree>;
+  call<OptionT extends object>(options: OptionT, host: Observable<Tree>): Observable<Tree>;
 }
 
 
