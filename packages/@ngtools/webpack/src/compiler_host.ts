@@ -150,8 +150,12 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     this._changedFiles = Object.create(null);
     this._changedDirs = Object.create(null);
   }
-  getChangedFilePaths(): string[] {
-    return Object.keys(this._changedFiles);
+
+  getChangedFilePaths(tsOnly = true): string[] {
+    // Only get changed ts files by default.
+    // That's what we mostly care about and want to transpile, but all kinds of files are on this
+    // list, like package.json and .ngsummary.json files.
+    return Object.keys(this._changedFiles).filter(k => !tsOnly || k.endsWith('.ts'));
   }
 
   invalidate(fileName: string): void {

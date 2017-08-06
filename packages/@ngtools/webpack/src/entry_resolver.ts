@@ -3,12 +3,13 @@ import {join} from 'path';
 import * as ts from 'typescript';
 
 import {TypeScriptFileRefactor} from './refactor';
+import {ProgramManager} from './program_manager';
 
 
 function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
                                       symbolName: string,
                                       host: ts.CompilerHost,
-                                      program: ts.Program): string | null {
+                                      programManager: ProgramManager): string | null {
   // Check this file.
   const hasSymbol = refactor.findAstNodes(null, ts.SyntaxKind.ClassDeclaration)
     .some((cd: ts.ClassDeclaration) => {
@@ -29,15 +30,16 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
 
     const modulePath = (decl.moduleSpecifier as ts.StringLiteral).text;
     const resolvedModule = ts.resolveModuleName(
-      modulePath, refactor.fileName, program.getCompilerOptions(), host);
+      modulePath, refactor.fileName, programManager.program.getCompilerOptions(), host);
     if (!resolvedModule.resolvedModule || !resolvedModule.resolvedModule.resolvedFileName) {
       return null;
     }
 
     const module = resolvedModule.resolvedModule.resolvedFileName;
     if (!decl.exportClause) {
-      const moduleRefactor = new TypeScriptFileRefactor(module, host, program);
-      const maybeModule = _recursiveSymbolExportLookup(moduleRefactor, symbolName, host, program);
+      const moduleRefactor = new TypeScriptFileRefactor(module, host, programManager);
+      const maybeModule = _recursiveSymbolExportLookup(
+        moduleRefactor, symbolName, host, programManager);
       if (maybeModule) {
         return maybeModule;
       }
@@ -51,9 +53,9 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
         if (fs.statSync(module).isDirectory()) {
           const indexModule = join(module, 'index.ts');
           if (fs.existsSync(indexModule)) {
-            const indexRefactor = new TypeScriptFileRefactor(indexModule, host, program);
+            const indexRefactor = new TypeScriptFileRefactor(indexModule, host, programManager);
             const maybeModule = _recursiveSymbolExportLookup(
-              indexRefactor, symbolName, host, program);
+              indexRefactor, symbolName, host, programManager);
             if (maybeModule) {
               return maybeModule;
             }
@@ -61,7 +63,7 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
         }
 
         // Create the source and verify that the symbol is at least a class.
-        const source = new TypeScriptFileRefactor(module, host, program);
+        const source = new TypeScriptFileRefactor(module, host, programManager);
         const hasSymbol = source.findAstNodes(null, ts.SyntaxKind.ClassDeclaration)
           .some((cd: ts.ClassDeclaration) => {
             return cd.name != undefined && cd.name.text == symbolName;
@@ -80,7 +82,7 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
 function _symbolImportLookup(refactor: TypeScriptFileRefactor,
                              symbolName: string,
                              host: ts.CompilerHost,
-                             program: ts.Program): string | null {
+                             programManager: ProgramManager): string | null {
   // We found the bootstrap variable, now we just need to get where it's imported.
   const imports = refactor.findAstNodes(null, ts.SyntaxKind.ImportDeclaration)
     .map(node => node as ts.ImportDeclaration);
@@ -95,7 +97,7 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
 
     const resolvedModule = ts.resolveModuleName(
       (decl.moduleSpecifier as ts.StringLiteral).text,
-      refactor.fileName, program.getCompilerOptions(), host);
+      refactor.fileName, programManager.program.getCompilerOptions(), host);
     if (!resolvedModule.resolvedModule || !resolvedModule.resolvedModule.resolvedFileName) {
       continue;
     }
@@ -114,8 +116,9 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
       for (const specifier of binding.elements) {
         if (specifier.name.text == symbolName) {
           // Create the source and recursively lookup the import.
-          const source = new TypeScriptFileRefactor(module, host, program);
-          const maybeModule = _recursiveSymbolExportLookup(source, symbolName, host, program);
+          const source = new TypeScriptFileRefactor(module, host, programManager);
+          const maybeModule = _recursiveSymbolExportLookup(
+            source, symbolName, host, programManager);
           if (maybeModule) {
             return maybeModule;
           }
@@ -129,8 +132,8 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
 
 export function resolveEntryModuleFromMain(mainPath: string,
                                            host: ts.CompilerHost,
-                                           program: ts.Program) {
-  const source = new TypeScriptFileRefactor(mainPath, host, program);
+                                           programManager: ProgramManager) {
+  const source = new TypeScriptFileRefactor(mainPath, host, programManager);
 
   const bootstrap = source.findAstNodes(source.sourceFile, ts.SyntaxKind.CallExpression, true)
     .map(node => node as ts.CallExpression)
@@ -150,7 +153,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
       + 'to the plugins options.');
   }
   const bootstrapSymbolName = bootstrap[0].text;
-  const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);
+  const module = _symbolImportLookup(source, bootstrapSymbolName, host, programManager);
   if (module) {
     return `${module.replace(/\.ts$/, '')}#${bootstrapSymbolName}`;
   }
