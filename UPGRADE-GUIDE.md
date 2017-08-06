@@ -63,4 +63,4 @@ export class ServerAppModule { }
 
 ## Angular 4 / platform-server example
 
-An official starter will be available soon at `angular/universal-starter`, but for now you can see a fully functional demo of Angular4 with platform-server [here](https://github.com/FrozenPandaz/ng-universal-demo), to compare it to your current older application.
+An official starter can be found at [angular/universal-starter](https://github.com/angular/universal-starter)
