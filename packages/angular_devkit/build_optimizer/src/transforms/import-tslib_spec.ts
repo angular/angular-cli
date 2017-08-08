@@ -7,29 +7,30 @@
  */
 import { oneLine, stripIndent } from 'common-tags';
 import { transformJavascript } from '../helpers/transform-javascript';
-import { getImportTslibTransformer } from './import-tslib';
+import { getImportTslibTransformer, importTslibRegexes } from './import-tslib';
 
 
 const transform = (content: string) => transformJavascript(
   { content, getTransforms: [getImportTslibTransformer] }).content;
 
 describe('import-tslib', () => {
-  it('replaces __extends with', () => {
+  it('replaces __extends', () => {
     const input = stripIndent`
       var __extends = (this && this.__extends) || function (d, b) {
-        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+          for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+          function __() { this.constructor = d; }
+          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
     `;
     const output = stripIndent`
       import { __extends } from "tslib";
     `;
 
+    expect(importTslibRegexes.some((regex) => regex.test(input))).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
-  it('replaces __decorate with', () => {
+  it('replaces __decorate', () => {
     // tslint:disable:max-line-length
     const input = stripIndent`
       var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -44,14 +45,15 @@ describe('import-tslib', () => {
       import { __decorate } from "tslib";
     `;
 
+    expect(importTslibRegexes.some((regex) => regex.test(input))).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
-  it('replaces __metadata with', () => {
+  it('replaces __metadata', () => {
     // tslint:disable:max-line-length
     const input = stripIndent`
       var __metadata = (this && this.__metadata) || function (k, v) {
-        if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+          if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
       };
     `;
     // tslint:enable:max-line-length
@@ -59,10 +61,11 @@ describe('import-tslib', () => {
       import { __metadata } from "tslib";
     `;
 
+    expect(importTslibRegexes.some((regex) => regex.test(input))).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
-  it('replaces __param with', () => {
+  it('replaces __param', () => {
     const input = stripIndent`
       var __param = (this && this.__param) || function (paramIndex, decorator) {
           return function (target, key) { decorator(target, key, paramIndex); }
@@ -73,15 +76,16 @@ describe('import-tslib', () => {
       import { __param } from "tslib";
     `;
 
+    expect(importTslibRegexes.some((regex) => regex.test(input))).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
   it('replaces uses "require" instead of "import" on CJS modules', () => {
     const input = stripIndent`
       var __extends = (this && this.__extends) || function (d, b) {
-        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+          for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+          function __() { this.constructor = d; }
+          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
       exports.meaning = 42;
     `;

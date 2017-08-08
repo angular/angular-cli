@@ -8,6 +8,12 @@
 import * as ts from 'typescript';
 
 
+export const scrubFileRegexes = [
+  /decorators/,
+  /propDecorators/,
+  /ctorParameters/,
+];
+
 // Don't remove `ctorParameters` from these.
 const platformWhitelist = [
   'PlatformRef_',

@@ -8,15 +8,12 @@
 import { readFileSync } from 'fs';
 import { TransformJavascriptOutput, transformJavascript } from '../helpers/transform-javascript';
 import { getFoldFileTransformer } from '../transforms/class-fold';
-import { getImportTslibTransformer } from '../transforms/import-tslib';
+import { getImportTslibTransformer, importTslibRegexes } from '../transforms/import-tslib';
 import { getPrefixClassesTransformer, prefixClassRegexes } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
-import { getScrubFileTransformer } from '../transforms/scrub-file';
+import { getScrubFileTransformer, scrubFileRegexes } from '../transforms/scrub-file';
 
 
-const hasDecorators = /decorators/;
-const hasCtorParameters = /ctorParameters/;
-const hasTsHelpers = /var (__extends|__decorate|__metadata|__param) = /;
 const isAngularModuleFile = /\.es5\.js$/;
 const whitelistedAngularModules = [
   /(\\|\/)node_modules(\\|\/)@angular(\\|\/)animations(\\|\/)/,
@@ -59,6 +56,14 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   // Determine which transforms to apply.
   const getTransforms = [];
 
+  if (importTslibRegexes.some((regex) => regex.test(content as string))) {
+    getTransforms.push(getImportTslibTransformer);
+  }
+
+  if (prefixClassRegexes.some((regex) => regex.test(content as string))) {
+    getTransforms.push(getPrefixClassesTransformer);
+  }
+
   if (inputFilePath
     && isAngularModuleFile.test(inputFilePath)
     && whitelistedAngularModules.some((re) => re.test(inputFilePath))
@@ -72,19 +77,11 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
       getScrubFileTransformer,
       getFoldFileTransformer,
     );
-  } else if (hasDecorators.test(content) || hasCtorParameters.test(content)) {
+  } else if (scrubFileRegexes.some((regex) => regex.test(content as string))) {
     getTransforms.push(
       getScrubFileTransformer,
       getFoldFileTransformer,
     );
-  }
-
-  if (hasTsHelpers.test(content)) {
-    getTransforms.push(getImportTslibTransformer);
-  }
-
-  if (prefixClassRegexes.some((regex) => regex.test(content as string))) {
-    getTransforms.push(getPrefixClassesTransformer);
   }
 
   return transformJavascript({ ...options, getTransforms, content });

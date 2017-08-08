@@ -7,6 +7,9 @@
  */
 import * as ts from 'typescript';
 
+export const importTslibRegexes = [
+  /var (__extends|__decorate|__metadata|__param) = \(.*\r?\n(    .*\r?\n)*\};/,
+];
 
 export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {

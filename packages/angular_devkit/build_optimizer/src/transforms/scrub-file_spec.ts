@@ -7,7 +7,7 @@
  */
 import { oneLine, stripIndent } from 'common-tags';
 import { transformJavascript } from '../helpers/transform-javascript';
-import { getScrubFileTransformer } from './scrub-file';
+import { getScrubFileTransformer, scrubFileRegexes } from './scrub-file';
 
 
 const transform = (content: string) => transformJavascript(
@@ -27,6 +27,7 @@ describe('scrub-file', () => {
         Clazz.decorators = [ { type: Injectable } ];
       `;
 
+      expect(scrubFileRegexes.some((regex) => regex.test(input))).toBeTruthy();
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
     });
 
@@ -69,6 +70,7 @@ describe('scrub-file', () => {
         Clazz.propDecorators = { 'ngIf': [{ type: Input }] }
       `;
 
+      expect(scrubFileRegexes.some((regex) => regex.test(input))).toBeTruthy();
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
     });
 
@@ -115,6 +117,7 @@ describe('scrub-file', () => {
         Clazz.ctorParameters = function () { return []; };
       `;
 
+      expect(scrubFileRegexes.some((regex) => regex.test(input))).toBeTruthy();
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
     });
 

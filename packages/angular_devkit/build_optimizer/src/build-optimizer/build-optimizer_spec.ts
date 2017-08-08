@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { oneLine } from 'common-tags';
+import { oneLine, stripIndent } from 'common-tags';
 import { RawSourceMap } from 'source-map';
 import { buildOptimizer } from './build-optimizer';
 
@@ -18,12 +18,12 @@ describe('build-optimizer', () => {
 
   describe('basic functionality', () => {
     it('applies class-fold, scrub-file and prefix-functions', () => {
-      const input = oneLine`
+      const input = stripIndent`
         ${imports}
         var __extends = (this && this.__extends) || function (d, b) {
-          for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-          function __() { this.constructor = d; }
-          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
         ${clazz}
         ${staticProperty}

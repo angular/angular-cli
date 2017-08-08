@@ -7,6 +7,11 @@
  */
 import * as ts from 'typescript';
 
+export const prefixClassRegexes = [
+  // tslint:disable-next-line:max-line-length
+  /^(var (\S+) = )(\(function \(\) \{\r?\n(?:    (?:\/\*\*| \*|\*\/|\/\/)[^\r?\n]*\r?\n)*    function \2\([^\)]*\) \{\r?\n)/mg,
+  /^(var (\S+) = )(\(function \(_super\) \{\r?\n    \w*__extends\(\w+, _super\);\r?\n)/mg,
+];
 
 export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
