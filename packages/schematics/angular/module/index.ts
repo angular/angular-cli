@@ -22,7 +22,7 @@ import {
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
-import { addDeclarationToModule } from '../utility/ast-utils';
+import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath } from '../utility/find-module';
 
@@ -46,9 +46,9 @@ function addDeclarationToNgModule(options: any): Rule {
                      + stringUtils.dasherize(options.name)
                      + '.module';
     const relativePath = buildRelativePath(modulePath, importModulePath);
-    const changes = addDeclarationToModule(source, modulePath,
-                                           stringUtils.classify(`${options.name}Module`),
-                                           relativePath);
+    const changes = addImportToModule(source, modulePath,
+                                      stringUtils.classify(`${options.name}Module`),
+                                      relativePath);
 
     const recorder = host.beginUpdate(modulePath);
     for (const change of changes) {
