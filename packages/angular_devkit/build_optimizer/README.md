@@ -53,7 +53,7 @@ Clazz.decorators = [{ type: NotInjectable }];
 
 ### Prefix functions
 
-Adds `/*@__PURE__*/` comments to top level downleveled class declarations and instantiation. 
+Adds `/*@__PURE__*/` comments to top level downleveled class declarations and instantiation.
 Webpack library imports are also marked as `/*@__PURE__*/` when used with [Purify Plugin](#purify-plugin).
 
 ```typescript
@@ -66,6 +66,31 @@ var newClazzTwo = Clazz();
 var Clazz = /*@__PURE__*/ (function () { function Clazz() { } return Clazz; }());
 var newClazz = /*@__PURE__*/ new Clazz();
 var newClazzTwo = /*@__PURE__*/ Clazz();
+```
+
+
+### Prefix Classes
+
+Adds `/*@__PURE__*/` to downlevered TypeScript classes.
+
+```typescript
+// input
+var ReplayEvent = (function () {
+    function ReplayEvent(time, value) {
+        this.time = time;
+        this.value = value;
+    }
+    return ReplayEvent;
+}());
+
+// output
+var ReplayEvent = /*@__PURE__*/ (function () {
+    function ReplayEvent(time, value) {
+        this.time = time;
+        this.value = value;
+    }
+    return ReplayEvent;
+}());
 ```
 
 
@@ -88,7 +113,7 @@ import { __extends } from "tslib";
 
 ### Purify Plugin
 
-Performs regex based replacements on all files that add `/*@__PURE__*/` comments to downleveled classes,  TypeScript 
+Performs regex based replacements on all files that add `/*@__PURE__*/` comments to downleveled classes,  TypeScript
 enums and webpack imports (used with [Prefix functions](#prefix-functions))
 
 

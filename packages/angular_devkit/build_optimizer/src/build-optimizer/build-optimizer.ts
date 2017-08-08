@@ -9,6 +9,7 @@ import { readFileSync } from 'fs';
 import { TransformJavascriptOutput, transformJavascript } from '../helpers/transform-javascript';
 import { getFoldFileTransformer } from '../transforms/class-fold';
 import { getImportTslibTransformer } from '../transforms/import-tslib';
+import { getPrefixClassesTransformer, prefixClassRegexes } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
 import { getScrubFileTransformer } from '../transforms/scrub-file';
 
@@ -58,10 +59,6 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   // Determine which transforms to apply.
   const getTransforms = [];
 
-  if (hasTsHelpers.test(content)) {
-    getTransforms.push(getImportTslibTransformer);
-  }
-
   if (inputFilePath
     && isAngularModuleFile.test(inputFilePath)
     && whitelistedAngularModules.some((re) => re.test(inputFilePath))
@@ -80,6 +77,14 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
       getScrubFileTransformer,
       getFoldFileTransformer,
     );
+  }
+
+  if (hasTsHelpers.test(content)) {
+    getTransforms.push(getImportTslibTransformer);
+  }
+
+  if (prefixClassRegexes.some((regex) => regex.test(content as string))) {
+    getTransforms.push(getPrefixClassesTransformer);
   }
 
   return transformJavascript({ ...options, getTransforms, content });
