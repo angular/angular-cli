@@ -17,17 +17,13 @@ class NullStream extends stream.Writable {
 
 
 export default function (_: {}, logger: Logger) {
+  logger.info('Building...');
+  const build = require('./build').default;
+  build({}, new Logger('build', logger));
+
   return new Promise<void>((resolve, reject) => {
-    npm.load({
-      progress: false,
-      logstream: new NullStream(),
-    }, (err: Error | string) => {
-      if (err) {
-        reject(new Error('' + err));
-      } else {
-        resolve();
-      }
-    });
+    const loadOptions = { progress: false, logstream: new NullStream() };
+    npm.load(loadOptions, (err: Error | string) => err ? reject(err) : resolve());
   })
     .then(() => {
       return Object.keys(packages).reduce((acc: Promise<void>, name: string) => {
