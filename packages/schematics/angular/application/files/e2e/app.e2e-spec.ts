@@ -1,10 +1,10 @@
-import { <%= utils.classify(name) %>Page } from './app.po';
+import { AppPage } from './app.po';
 
 describe('<%= utils.dasherize(name) %> App', () => {
-  let page: <%= utils.classify(name) %>Page;
+  let page: AppPage;
 
   beforeEach(() => {
-    page = new <%= utils.classify(name) %>Page();
+    page = new AppPage();
   });
 
   it('should display welcome message', () => {

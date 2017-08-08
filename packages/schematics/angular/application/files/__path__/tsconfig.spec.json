@@ -2,7 +2,7 @@
   "extends": "<%= path.split('/').map(x => '..').join('/') %>/tsconfig.json",
   "compilerOptions": {
     "outDir": "<%= path.split('/').map(x => '..').join('/') %>/out-tsc/spec",
-    "baseUrl": "",
+    "baseUrl": "./",
     "module": "commonjs",
     "target": "es5",
     "types": [
