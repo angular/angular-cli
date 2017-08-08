@@ -19,6 +19,11 @@ export default function() {
     .then(() => expectFileToMatch(modulePath,
       /import { TestService2Service } from '.\/test-service2.service'/))
 
+    .then(() => process.chdir(join(root, 'src', 'app', 'sub-dir')))
+    .then(() => ng('generate', 'service', 'test-service3', '--module', 'app.module.ts'))
+    .then(() => expectFileToMatch(modulePath,
+      /import { TestService3Service } from '.\/test-service3.service'/))
+
     // Try to run the unit tests.
     .then(() => ng('build'));
 }
