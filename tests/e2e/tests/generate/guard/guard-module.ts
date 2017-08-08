@@ -21,5 +21,10 @@ export default function() {
     .then(() => expectFileToMatch(modulePath,
       /import { TestGuard2Guard } from '.\/test-guard2.guard'/))
 
+    .then(() => process.chdir(join(root, 'src', 'app', 'sub-dir')))
+    .then(() => ng('generate', 'guard', 'test-guard3', '--module', 'app.module.ts'))
+    .then(() => expectFileToMatch(modulePath,
+      /import { TestGuard3Guard } from '.\/test-guard3.guard'/))
+
     .then(() => ng('build'));
 }

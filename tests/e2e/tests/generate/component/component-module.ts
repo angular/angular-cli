@@ -19,6 +19,11 @@ export default function() {
     .then(() => expectFileToMatch(modulePath,
       /import { TestComponent2Component } from '.\/test-component2\/test-component2.component'/))
 
+    .then(() => process.chdir(join(root, 'src', 'app', 'sub-dir')))
+    .then(() => ng('generate', 'component', 'test-component3', '--module', 'app.module.ts'))
+    .then(() => expectFileToMatch(modulePath,
+      /import { TestComponent3Component } from '.\/test-component3\/test-component3.component'/))
+
     // Try to run the unit tests.
     .then(() => ng('build'));
 }
