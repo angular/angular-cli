@@ -37,7 +37,7 @@ function addDeclarationToNgModule(options: any): Rule {
     let modulePath;
     if (options.module) {
       if (!host.exists(options.module)) {
-        throw new Error(`Module specified (${options.module}) does not exist.`);
+        throw new Error('Specified module does not exist');
       }
       modulePath = options.module;
     } else {

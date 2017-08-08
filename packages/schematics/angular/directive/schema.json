@@ -11,6 +11,12 @@
       "type": "string",
       "default": "app"
     },
+    "prefix": {
+      "type": "string",
+      "description": "The prefix to apply to generated selectors.",
+      "default": "app",
+      "alias": "p"
+    },
     "sourceDir": {
       "type": "string",
       "default": "src"

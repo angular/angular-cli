@@ -37,7 +37,7 @@ function addDeclarationToNgModule(options: any): Rule {
     let modulePath;
     if (options.module) {
       if (!host.exists(options.module)) {
-        throw new Error(`Module specified (${options.module}) does not exist.`);
+        throw new Error('Specified module does not exist');
       }
       modulePath = options.module;
     } else {
@@ -90,12 +90,12 @@ function addDeclarationToNgModule(options: any): Rule {
 
 
 function buildSelector(options: any) {
-  let selector = stringUtils.dasherize(options.name);
+  let selector = options.name;
   if (options.prefix) {
     selector = `${options.prefix}-${selector}`;
   }
 
-  return selector;
+  return stringUtils.camelize(selector);
 }
 
 export default function (options: any): Rule {

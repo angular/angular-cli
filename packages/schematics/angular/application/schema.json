@@ -58,7 +58,7 @@
       "default": "app",
       "alias": "p"
     },
-    "styleext": {
+    "style": {
       "description": "The file extension to be used for style files.",
       "type": "string",
       "default": "css"
