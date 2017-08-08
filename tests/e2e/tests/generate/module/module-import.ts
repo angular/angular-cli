@@ -52,4 +52,10 @@ export default function () {
     .then(() => expectFileToMatch(modulePath,
       /import { Test7Module } from '.\/test7\/test7.module'/))
     .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test7Module(.|\s)*\]/m))
+
+    .then(() => process.chdir(join(root, 'src', 'app', 'sub-dir')))
+    .then(() => ng('generate', 'module', 'test8', '--module', 'app.module.ts')))
+    .then(() => expectFileToMatch(modulePath,
+      /import { Test8Module } from '.\/test8\/test8.module'/))
+    .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test8Module(.|\s)*\]/m))
 }

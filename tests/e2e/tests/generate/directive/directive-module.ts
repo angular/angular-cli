@@ -19,6 +19,11 @@ export default function() {
     .then(() => expectFileToMatch(modulePath,
       /import { TestDirective2Directive } from '.\/test-directive2.directive'/))
 
+    .then(() => process.chdir(join(root, 'src', 'app', 'sub-dir')))
+    .then(() => ng('generate', 'directive', 'test-directive3', '--module', 'app.module.ts'))
+    .then(() => expectFileToMatch(modulePath,
+      /import { TestDirective3Directive } from '.\/test-directive3.directive'/))
+
     // Try to run the unit tests.
     .then(() => ng('build'));
 }
