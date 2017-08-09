@@ -141,7 +141,7 @@ describe('purify', () => {
     expect(oneLine`${purify(input)}`).toEqual(oneLine`${output}`);
   });
 
-  it('prefix CCF and CMF statements', () => {
+  it('prefix createComponentFactory and createNgModuleFactory function calls', () => {
     const input = stripIndent`
       var AppComponentNgFactory = __WEBPACK_IMPORTED_MODULE_1__angular_core__["I" /* ɵccf */]('app-root');
       var AppModuleNgFactory = __WEBPACK_IMPORTED_MODULE_1__angular_core__["I" /* ɵcmf */]('app-root');
@@ -151,6 +151,17 @@ describe('purify', () => {
       var AppComponentNgFactory = /*@__PURE__*/__WEBPACK_IMPORTED_MODULE_1__angular_core__["I" /* ɵccf */]('app-root');
       var AppModuleNgFactory = /*@__PURE__*/__WEBPACK_IMPORTED_MODULE_1__angular_core__["I" /* ɵcmf */]('app-root');
       var SelectComponentNgFactory = /*@__PURE__*/select_component_ngfactory___WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* ɵccf */]('aio-select');
+    `;
+
+    expect(oneLine`${purify(input)}`).toEqual(oneLine`${output}`);
+  });
+
+  it('should prefix createRendererType2 function calls', () => {
+    const input = stripIndent`
+      var RenderType_MdOption = index_ngfactory___WEBPACK_IMPORTED_MODULE_0__angular_core__["W" /* ɵcrt */]({ encapsulation: 2, styles: styles_MdOption});
+    `;
+    const output = stripIndent`
+      var RenderType_MdOption = /*@__PURE__*/index_ngfactory___WEBPACK_IMPORTED_MODULE_0__angular_core__["W" /* ɵcrt */]({ encapsulation: 2, styles: styles_MdOption});
     `;
 
     expect(oneLine`${purify(input)}`).toEqual(oneLine`${output}`);

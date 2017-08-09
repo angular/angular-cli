@@ -50,7 +50,7 @@ export function purify(content: string) {
     )
     /* Prefix CCF and CMF statements */
     .replace(
-      /\w*__WEBPACK_IMPORTED_MODULE_\d+__angular_core__\["\w+" \/\* (ɵccf|ɵcmf) \*\/\]\(/mg,
+      /\w*__WEBPACK_IMPORTED_MODULE_\d+__angular_core__\["\w+" \/\* (ɵccf|ɵcmf|ɵcrt) \*\/\]\(/mg,
       '/*@__PURE__*/$&',
     )
     /* Prefix module statements */
