@@ -13,6 +13,7 @@ import {resolveEntryModuleFromMain} from './entry_resolver';
 import {Tapable} from './webpack';
 import {PathsPlugin} from './paths-plugin';
 import {findLazyRoutes, LazyRouteMap} from './lazy_routes';
+import {ProgramManager} from './program_manager';
 
 
 /**
@@ -31,9 +32,11 @@ export interface AotPluginOptions {
   i18nFile?: string;
   i18nFormat?: string;
   locale?: string;
+  sourceMap?: boolean;
 
   // Use tsconfig to include path globs.
   exclude?: string | string[];
+  include?: string[];
   compilerOptions?: ts.CompilerOptions;
 }
 
@@ -46,8 +49,7 @@ export class AotPlugin implements Tapable {
 
   private _compilerOptions: ts.CompilerOptions;
   private _angularCompilerOptions: any;
-  private _program: ts.Program;
-  private _rootFilePath: string[];
+  private _programManager: ProgramManager;
   private _compilerHost: WebpackCompilerHost;
   private _resourceLoader: WebpackResourceLoader;
   private _discoveredLazyRoutes: LazyRouteMap;
@@ -90,7 +92,8 @@ export class AotPlugin implements Tapable {
     return {path, className};
   }
   get genDir() { return this._genDir; }
-  get program() { return this._program; }
+  get program() { return this._programManager.program; }
+  get programManager() { return this._programManager; }
   get skipCodeGeneration() { return this._skipCodeGeneration; }
   get replaceExport() { return this._replaceExport; }
   get typeCheck() { return this._typeCheck; }
@@ -166,7 +169,6 @@ export class AotPlugin implements Tapable {
       tsConfigJson, ts.sys, basePath, null, this._tsConfigPath);
 
     let fileNames = tsConfig.fileNames;
-    this._rootFilePath = fileNames;
 
     // Check the genDir. We generate a default gendir that's under basepath; it will generate
     // a `node_modules` directory and because of that we don't want TypeScript resolution to
@@ -213,8 +215,17 @@ export class AotPlugin implements Tapable {
       }
     }
 
-    this._program = ts.createProgram(
-      this._rootFilePath, this._compilerOptions, this._compilerHost);
+    // Force the right sourcemap options.
+    if (options.sourceMap) {
+      this._compilerOptions.sourceMap = true;
+      this._compilerOptions.inlineSources = true;
+      this._compilerOptions.inlineSourceMap = false;
+      this._compilerOptions.sourceRoot = basePath;
+    } else {
+      this._compilerOptions.sourceMap = false;
+    }
+
+    this._programManager = new ProgramManager(fileNames, this._compilerOptions, this._compilerHost);
 
     // We enable caching of the filesystem in compilerHost _after_ the program has been created,
     // because we don't want SourceFile instances to be cached past this point.
@@ -231,7 +242,8 @@ export class AotPlugin implements Tapable {
     // still no _entryModule? => try to resolve from mainPath
     if (!this._entryModule && options.mainPath) {
       const mainPath = path.resolve(basePath, options.mainPath);
-      this._entryModule = resolveEntryModuleFromMain(mainPath, this._compilerHost, this._program);
+      this._entryModule = resolveEntryModuleFromMain(
+        mainPath, this._compilerHost, this.programManager);
     }
 
     if (options.hasOwnProperty('i18nFile')) {
@@ -252,7 +264,7 @@ export class AotPlugin implements Tapable {
     const result: LazyRouteMap = Object.create(null);
     const changedFilePaths = this._compilerHost.getChangedFilePaths();
     for (const filePath of changedFilePaths) {
-      const fileLazyRoutes = findLazyRoutes(filePath, this._program, this._compilerHost);
+      const fileLazyRoutes = findLazyRoutes(filePath, this.programManager, this._compilerHost);
       for (const routeKey of Object.keys(fileLazyRoutes)) {
         const route = fileLazyRoutes[routeKey];
         if (routeKey in this._lazyRoutes) {
@@ -276,7 +288,7 @@ export class AotPlugin implements Tapable {
   private _getLazyRoutesFromNgtools() {
     try {
       return __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
-        program: this._program,
+        program: this.program,
         host: this._compilerHost,
         angularCompilerOptions: this._angularCompilerOptions,
         entryModule: this._entryModule
@@ -416,17 +428,17 @@ export class AotPlugin implements Tapable {
     }
     this._diagnoseFiles[fileName] = true;
 
-    const sourceFile = this._program.getSourceFile(fileName);
+    const sourceFile = this.program.getSourceFile(fileName);
     if (!sourceFile) {
       return;
     }
 
     const diagnostics: ts.Diagnostic[] = []
       .concat(
-        this._program.getCompilerOptions().declaration
-          ? this._program.getDeclarationDiagnostics(sourceFile) : [],
-        this._program.getSyntacticDiagnostics(sourceFile),
-        this._program.getSemanticDiagnostics(sourceFile)
+        this.program.getCompilerOptions().declaration
+          ? this.program.getDeclarationDiagnostics(sourceFile) : [],
+        this.program.getSyntacticDiagnostics(sourceFile),
+        this.program.getSemanticDiagnostics(sourceFile)
       );
 
     if (diagnostics.length > 0) {
@@ -478,7 +490,7 @@ export class AotPlugin implements Tapable {
         return __NGTOOLS_PRIVATE_API_2.codeGen({
           basePath: this._basePath,
           compilerOptions: this._compilerOptions,
-          program: this._program,
+          program: this.program,
           host: this._compilerHost,
           angularCompilerOptions: this._angularCompilerOptions,
           i18nFile: this.i18nFile,
@@ -491,19 +503,11 @@ export class AotPlugin implements Tapable {
       .then(() => {
         // Get the ngfactory that were created by the previous step, and add them to the root
         // file path (if those files exists).
-        const newRootFilePath = this._compilerHost.getChangedFilePaths()
+        const newFiles = this._compilerHost.getChangedFilePaths()
           .filter(x => x.match(/\.ngfactory\.ts$/));
-        // Remove files that don't exist anymore, and add new files.
-        this._rootFilePath = this._rootFilePath
-          .filter(x => this._compilerHost.fileExists(x))
-          .concat(newRootFilePath);
-
-        // Create a new Program, based on the old one. This will trigger a resolution of all
-        // transitive modules, which include files that might just have been generated.
         // This needs to happen after the code generator has been created for generated files
         // to be properly resolved.
-        this._program = ts.createProgram(
-          this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
+        this._programManager.update(newFiles);
       })
       .then(() => {
         // Re-diagnose changed files.
@@ -512,7 +516,7 @@ export class AotPlugin implements Tapable {
       })
       .then(() => {
         if (this._typeCheck) {
-          const diagnostics = this._program.getGlobalDiagnostics();
+          const diagnostics = this.program.getGlobalDiagnostics();
           if (diagnostics.length > 0) {
             const message = diagnostics
               .map(diagnostic => {
