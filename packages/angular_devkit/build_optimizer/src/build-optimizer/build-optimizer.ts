@@ -31,6 +31,7 @@ const whitelistedAngularModules = [
   /(\\|\/)node_modules(\\|\/)@angular(\\|\/)router(\\|\/)/,
   /(\\|\/)node_modules(\\|\/)@angular(\\|\/)upgrade(\\|\/)/,
   /(\\|\/)node_modules(\\|\/)@angular(\\|\/)material(\\|\/)/,
+  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)cdk(\\|\/)/,
 ];
 
 export interface BuildOptimizerOptions {
