@@ -74,7 +74,7 @@ export default function (options: any): Rule {
     {
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
-      styleext: options.styleext,
+      styleext: options.style,
       spec: !options.skipTests,
     } :
     {
