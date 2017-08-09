@@ -9,7 +9,7 @@ import {RemoveChange, Change} from './change';
  * @param max The maximum number of items to return.
  * @return all nodes of kind, or [] if none is found
  */
-export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max: number = Infinity): ts.Node[] {
+export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = Infinity): ts.Node[] {
   if (!node || max == 0) {
     return [];
   }
