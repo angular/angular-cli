@@ -67,6 +67,12 @@ class CLI {
 
     /**
      * @private
+     * @property command
+     */
+    this.command = options.command;
+
+    /**
+     * @private
      * @property instrumentation
      */
     this.instrumentation = {

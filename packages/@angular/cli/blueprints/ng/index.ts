@@ -66,7 +66,8 @@ export default Blueprint.extend({
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
       tests: this.tests,
-      minimal: options.minimal
+      minimal: options.minimal,
+      command: (options.project.cli.command || '')
     };
   },
 
