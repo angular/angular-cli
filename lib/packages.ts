@@ -9,7 +9,6 @@
 
 import { JsonObject } from '@angular-devkit/core';
 import * as fs from 'fs';
-import * as glob from 'glob';
 import * as path from 'path';
 import * as ts from 'typescript';
 
@@ -70,16 +69,44 @@ function loadPackageJson(p: string) {
 }
 
 
+function _findAllPackageJson(dir: string, exclude: RegExp): string[] {
+  const result: string[] = [];
+  fs.readdirSync(dir)
+    .forEach(fileName => {
+      const p = path.join(dir, fileName);
+
+      if (exclude.test(p)) {
+        return;
+      } else if (fileName == 'package.json') {
+        result.push(p);
+      } else if (fs.statSync(p).isDirectory()) {
+        result.push(..._findAllPackageJson(p, exclude));
+      }
+    });
+
+  return result;
+}
+
+
 const tsConfigPath = path.join(__dirname, '../tsconfig.json');
 const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
-// tslint:disable-next-line:no-any
-const pattern = (ts as any).getRegularExpressionForWildcard(
-    tsConfig.config.exclude, path.dirname(tsConfigPath), 'exclude');
+const pattern = '^('
+  + (tsConfig.config.exclude as string[])
+    .map(ex => path.join(path.dirname(tsConfigPath), ex))
+    .map(ex => '('
+      + ex
+        .replace(/[\-\[\]{}()+?.\\^$|]/g, '\\$&')
+        .replace(/\/\*\*/g, '(/.+?)?')
+        .replace(/\*/g, '[^/]*')
+      + ')')
+    .join('|')
+  + ')($|/)';
 const excludeRe = new RegExp(pattern);
 
-// Remove all files from tsconfig, and our own package.json.
-const packageJsonPaths = glob.sync(path.join(__dirname, '../*/**/package.json'))
-  .filter(p => !excludeRe.test(p));
+// Find all the package.json that aren't excluded from tsconfig.
+const packageJsonPaths = _findAllPackageJson(path.join(__dirname, '..'), excludeRe)
+  // Remove the root package.json.
+  .filter(p => p != path.join(__dirname, '../package.json'));
 
 // All the supported packages. Go through the packages directory and create a _map of
 // name => fullPath.
