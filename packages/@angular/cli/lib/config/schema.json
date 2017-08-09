@@ -125,40 +125,10 @@
             "default": false
           },
           "styles": {
-            "description": "Global styles to be included in the build.",
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "input": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": true
-                }
-              ]
-            },
-            "additionalProperties": false
+            "$ref": "#/definitions/styles"
           },
           "stylePreprocessorOptions": {
-            "description": "Options to pass to style preprocessors",
-            "type": "object",
-            "properties": {
-              "includePaths": {
-                "description": "Paths to include. Paths will be resolved to project root.",
-                "type": "array",
-                "items": {
-                  "type": "string"
-                },
-                "default": []
-              }
-            },
-            "additionalProperties": false
+            "$ref": "#/definitions/stylePreprocessorOptions"
           },
           "scripts": {
             "description": "Global scripts to be included in the build.",
@@ -191,7 +161,27 @@
           "environments": {
             "description": "Name and corresponding file for environment config.",
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "config": {
+                      "type": "string"
+                    },
+                    "styles": {
+                      "$ref": "#/definitions/styles"
+                    },
+                    "stylePreprocessorOptions": {
+                      "$ref": "#/definitions/stylePreprocessorOptions"
+                    }
+                  }
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -573,5 +563,43 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "definitions": {
+    "styles": {
+      "description": "Global styles to be included in the build.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "input": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        ]
+      },
+      "additionalProperties": false
+    },
+    "stylePreprocessorOptions": {
+      "description": "Options to pass to style preprocessors",
+      "type": "object",
+      "properties": {
+        "includePaths": {
+          "description": "Paths to include. Paths will be resolved to project root.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }
