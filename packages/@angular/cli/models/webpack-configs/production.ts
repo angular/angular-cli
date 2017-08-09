@@ -3,12 +3,12 @@ import * as webpack from 'webpack';
 import * as fs from 'fs';
 import * as semver from 'semver';
 import { stripIndent } from 'common-tags';
+import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 
-const licensePlugin = require('license-webpack-plugin');
 
 export const getProdConfig = function (wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
@@ -86,9 +86,11 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.extractLicenses) {
-    extraPlugins.push(new licensePlugin({
+    extraPlugins.push(new LicenseWebpackPlugin({
       pattern: /^(MIT|ISC|BSD.*)$/,
-      suppressErrors: true
+      suppressErrors: true,
+      perChunkOutput: false,
+      outputFilename: `3rdpartylicenses.txt`
     }));
   }
 
