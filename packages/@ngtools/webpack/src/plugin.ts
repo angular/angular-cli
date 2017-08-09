@@ -334,8 +334,7 @@ export class AotPlugin implements Tapable {
         }
 
         this.done.then(() => {
-          result.resource = this.skipCodeGeneration ? this.basePath : this.genDir;
-          result.recursive = true;
+          result.resource = this.genDir;
           result.dependencies.forEach((d: any) => d.critical = false);
           result.resolveDependencies = (_fs: any, _resource: any, _recursive: any,
             _regExp: RegExp, cb: any) => {
