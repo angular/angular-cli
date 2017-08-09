@@ -74,13 +74,14 @@ export default function (options: any): Rule {
     {
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
-      styleext: options.style,
       spec: !options.skipTests,
+      styleext: options.style,
     } :
     {
       inlineStyle: true,
       inlineTemplate: true,
       spec: false,
+      styleext: options.style,
     };
 
   return chain([
