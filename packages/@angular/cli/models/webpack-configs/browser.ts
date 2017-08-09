@@ -60,11 +60,13 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  const flatIndex = appConfig.index.substr(appConfig.index.lastIndexOf('/') + 1);
+
   return {
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(appRoot, appConfig.index),
-        filename: path.resolve(buildOptions.outputPath, appConfig.index),
+        filename: path.resolve(buildOptions.outputPath, flatIndex),
         chunksSortMode: packageChunkSort(appConfig),
         excludeChunks: lazyChunks,
         xhtml: true,
