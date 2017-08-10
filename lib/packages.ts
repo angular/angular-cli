@@ -95,12 +95,12 @@ const pattern = '^('
     .map(ex => path.join(path.dirname(tsConfigPath), ex))
     .map(ex => '('
       + ex
-        .replace(/[\-\[\]{}()+?.\\^$|]/g, '\\$&')
-        .replace(/\/\*\*/g, '(/.+?)?')
-        .replace(/\*/g, '[^/]*')
+        .replace(/[\-\[\]{}()+?./\\^$|]/g, '\\$&')
+        .replace(/(\\\\|\\\/)\*\*/g, '((\/|\\\\).+?)?')
+        .replace(/\*/g, '[^/\\\\]*')
       + ')')
     .join('|')
-  + ')($|/)';
+  + ')($|/|\\\\)';
 const excludeRe = new RegExp(pattern);
 
 // Find all the package.json that aren't excluded from tsconfig.
