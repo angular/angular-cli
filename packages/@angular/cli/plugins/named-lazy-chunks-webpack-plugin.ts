@@ -8,14 +8,14 @@ const ImportDependency = require('webpack/lib/dependencies/ImportDependency');
 export class NamedLazyChunksWebpackPlugin extends webpack.NamedChunksPlugin {
   constructor() {
     // Append a dot and number if the name already exists.
-    const nameMap = new Map<string, boolean>();
-    function getUniqueName(baseName: string) {
+    const nameMap = new Map<string, string>();
+    function getUniqueName(baseName: string, request: string) {
       let name = baseName;
       let num = 0;
-      while (nameMap.has(name)) {
+      while (nameMap.has(name) && nameMap.get(name) !== request) {
         name = `${baseName}.${num++}`;
       }
-      nameMap.set(name, true);
+      nameMap.set(name, request);
       return name;
     }
 
@@ -34,13 +34,13 @@ export class NamedLazyChunksWebpackPlugin extends webpack.NamedChunksPlugin {
           || chunk.blocks[0].dependencies[0] instanceof ImportDependency)
       ) {
         // Create chunkname from file request, stripping ngfactory and extension.
-        const req = chunk.blocks[0].dependencies[0].request;
-        const chunkName = basename(req).replace(/(\.ngfactory)?\.(js|ts)$/, '');
+        const request = chunk.blocks[0].dependencies[0].request;
+        const chunkName = basename(request).replace(/(\.ngfactory)?\.(js|ts)$/, '');
         if (!chunkName || chunkName === '') {
           // Bail out if something went wrong with the name.
           return null;
         }
-        return getUniqueName(chunkName);
+        return getUniqueName(chunkName, request);
       }
 
       return null;
