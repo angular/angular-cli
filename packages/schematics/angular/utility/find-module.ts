@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Tree, normalizePath } from '@angular-devkit/schematics';
-import * as path from 'path';
+import { Tree, normalizePath, relativePath } from '@angular-devkit/schematics';
 
 /**
  * Function to find the "closest" module to a generated file's path.
@@ -43,6 +42,9 @@ export function findModule(host: Tree, generateDir: string): string {
  * Build a relative path from one file path to another file path.
  */
 export function buildRelativePath(from: string, to: string) {
+  from = normalizePath(from);
+  to = normalizePath(to);
+
   // Convert to arrays.
   const fromParts = from.split('/');
   const toParts = to.split('/');
@@ -51,15 +53,16 @@ export function buildRelativePath(from: string, to: string) {
   fromParts.pop();
   const toFileName = toParts.pop();
 
-  const relativePath = path.relative(fromParts.join('/'), toParts.join('/'));
+  const relative = relativePath(normalizePath(fromParts.join('/')),
+                                normalizePath(toParts.join('/')));
   let pathPrefix = '';
 
   // Set the path prefix for same dir or child dir, parent dir starts with `..`
-  if (!relativePath) {
+  if (!relative) {
     pathPrefix = '.';
-  } else if (!relativePath.startsWith('.')) {
+  } else if (!relative.startsWith('.')) {
     pathPrefix = `./`;
   }
 
-  return `${pathPrefix}${relativePath}/${toFileName}`;
+  return `${pathPrefix}/${relative}/${toFileName}`;
 }
