@@ -17,6 +17,7 @@ import {
   mergeWith,
   move,
   noop,
+  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -100,6 +101,8 @@ function buildSelector(options: any) {
 
 export default function (options: any): Rule {
   options.selector = options.selector || buildSelector(options);
+
+  options.module = normalizePath(options.module);
 
   const templateSource = apply(url('./files'), [
     options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),

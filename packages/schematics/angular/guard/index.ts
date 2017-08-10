@@ -17,6 +17,7 @@ import {
   mergeWith,
   move,
   noop,
+  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -63,6 +64,8 @@ function addDeclarationToNgModule(options: any): Rule {
 }
 
 export default function (options: any): Rule {
+  options.module = normalizePath(options.module);
+
   const templateSource = apply(url('./files'), [
     options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
     template({
