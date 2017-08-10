@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "1.3.0",
+  "version": "1.4.0-beta.0",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -29,7 +29,7 @@
   "dependencies": {
     "@angular-devkit/build-optimizer": "0.0.13",
     "@ngtools/json-schema": "1.1.0",
-    "@ngtools/webpack": "1.6.0",
+    "@ngtools/webpack": "1.7.0-beta.0",
     "autoprefixer": "^6.5.3",
     "chalk": "^2.0.1",
     "circular-dependency-plugin": "^3.0.0",
