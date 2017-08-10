@@ -19,7 +19,7 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "<%= prefix %>",
       "styles": [
-        "styles.<%= styleext %>"
+        "styles.<%= style %>"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
@@ -51,7 +51,7 @@
     }
   },
   "defaults": {
-    "styleExt": "<%= styleext %>",<% if (!minimal) { %>
+    "styleExt": "<%= style %>",<% if (!minimal) { %>
     "component": {}<% } else { %>
     "component": {
       "spec": false,
