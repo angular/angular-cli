@@ -56,6 +56,8 @@ Clazz.decorators = [{ type: NotInjectable }];
 Adds `/*@__PURE__*/` comments to top level downleveled class declarations and instantiation.
 Webpack library imports are also marked as `/*@__PURE__*/` when used with [Purify Plugin](#purify-plugin).
 
+Warning: this transform assumes the file is a pure module. It should not be used with unpure modules.
+
 ```typescript
 // input
 var Clazz = (function () { function Clazz() { } return Clazz; }());
@@ -71,7 +73,7 @@ var newClazzTwo = /*@__PURE__*/ Clazz();
 
 ### Prefix Classes
 
-Adds `/*@__PURE__*/` to downlevered TypeScript classes.
+Adds `/*@__PURE__*/` to downleveled TypeScript classes.
 
 ```typescript
 // input
@@ -110,11 +112,32 @@ var __extends = (this && this.__extends) || function (d, b) {
 import { __extends } from "tslib";
 ```
 
+### Wrap enums
+
+Wrap downleveled TypeScript enums in a function, and adds `/*@__PURE__*/` comment.
+
+```typescript
+// input
+var ChangeDetectionStrategy;
+(function (ChangeDetectionStrategy) {
+    ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+    ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+})(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
+
+// output
+var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
+  var ChangeDetectionStrategy = {};
+  ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+  ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+  return ChangeDetectionStrategy;
+})();
+```
+
 
 ### Purify Plugin
 
-Performs regex based replacements on all files that add `/*@__PURE__*/` comments to downleveled classes,  TypeScript
-enums and webpack imports (used with [Prefix functions](#prefix-functions))
+Performs regex based replacements on all bundles that add `/*@__PURE__*/` comments to
+known pure webpack imports (used with [Prefix functions](#prefix-functions)).
 
 
 ## Library Usage

@@ -10,47 +10,6 @@ import { purify } from './purify';
 
 // tslint:disable:max-line-length
 describe('purify', () => {
-  it('wraps ts 2.2 enums in IIFE', () => {
-    const input = stripIndent`
-      var ChangeDetectionStrategy = {};
-      ChangeDetectionStrategy.OnPush = 0;
-      ChangeDetectionStrategy.Default = 1;
-      ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = "OnPush";
-      ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = "Default";
-    `;
-    const output = stripIndent`
-      var ChangeDetectionStrategy = /*@__PURE__*/(function() {
-      var ChangeDetectionStrategy = {};
-      ChangeDetectionStrategy.OnPush = 0;
-      ChangeDetectionStrategy.Default = 1;
-      ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = "OnPush";
-      ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = "Default";;
-      return ChangeDetectionStrategy;})();
-    `;
-
-    expect(oneLine`${purify(input)}`).toEqual(oneLine`${output}`);
-  });
-
-  it('wraps ts 2.3 enums in IIFE', () => {
-    const input = stripIndent`
-      var ChangeDetectionStrategy;
-      (function (ChangeDetectionStrategy) {
-        ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
-        ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
-      })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
-    `;
-    const output = stripIndent`
-      var ChangeDetectionStrategy = /*@__PURE__*/(function() {
-          var ChangeDetectionStrategy = {};
-          ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
-          ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
-          return ChangeDetectionStrategy;
-      })();
-    `;
-
-    expect(oneLine`${purify(input)}`).toEqual(oneLine`${output}`);
-  });
-
   it('prefixes safe imports with /*@__PURE__*/', () => {
     const input = stripIndent`
       /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__ = __webpack_require__("EEr4");

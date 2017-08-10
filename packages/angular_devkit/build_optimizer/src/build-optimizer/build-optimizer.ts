@@ -12,6 +12,7 @@ import { getImportTslibTransformer, importTslibRegexes } from '../transforms/imp
 import { getPrefixClassesTransformer, prefixClassRegexes } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
 import { getScrubFileTransformer, scrubFileRegexes } from '../transforms/scrub-file';
+import { getWrapEnumsTransformer, wrapEnumsRegexes } from '../transforms/wrap-enums';
 
 
 const isAngularModuleFile = /\.es5\.js$/;
@@ -55,6 +56,10 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
 
   // Determine which transforms to apply.
   const getTransforms = [];
+
+  if (wrapEnumsRegexes.some((regex) => regex.test(content as string))) {
+    getTransforms.push(getWrapEnumsTransformer);
+  }
 
   if (importTslibRegexes.some((regex) => regex.test(content as string))) {
     getTransforms.push(getImportTslibTransformer);

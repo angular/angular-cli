@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { collectDeepNodes } from '../helpers/ast-utils';
 
 
 export const scrubFileRegexes = [
@@ -94,20 +95,6 @@ export function expect<T extends ts.Node>(node: ts.Node, kind: ts.SyntaxKind): T
   }
 
   return node as T;
-}
-
-function collectDeepNodes<T>(node: ts.Node, kind: ts.SyntaxKind): T[] {
-  const nodes: T[] = [];
-  const helper = (child: ts.Node) => {
-    if (child.kind === kind) {
-      // tslint:disable-next-line:no-any
-      nodes.push(child as any as T);
-    }
-    ts.forEachChild(child, helper);
-  };
-  ts.forEachChild(node, helper);
-
-  return nodes;
 }
 
 function nameOfSpecifier(node: ts.ImportSpecifier): string {

@@ -25,6 +25,11 @@ describe('build-optimizer', () => {
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
+        var ChangeDetectionStrategy;
+        (function (ChangeDetectionStrategy) {
+          ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+          ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+        })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
         ${clazz}
         ${staticProperty}
         ${decorators}
@@ -36,9 +41,14 @@ describe('build-optimizer', () => {
         /** PURE_IMPORTS_START _angular_core,tslib PURE_IMPORTS_END */
         ${imports}
         import { __extends } from "tslib";
+        var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
+          var ChangeDetectionStrategy = {};
+          ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+          ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+          return ChangeDetectionStrategy;
+        })();
         var Clazz = /*@__PURE__*/ (function () { function Clazz() { } ${staticProperty} return Clazz; }());
       `;
-      // tslint:enable:max-line-length
 
       const inputFilePath = '/node_modules/@angular/core/@angular/core.es5.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });

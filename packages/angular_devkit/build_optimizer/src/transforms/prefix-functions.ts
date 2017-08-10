@@ -13,11 +13,12 @@ export const prefixClassRegexes = [
   /^(var (\S+) = )(\(function \(_super\) \{\r?\n    \w*__extends\(\w+, _super\);\r?\n)/mg,
 ];
 
+const pureFunctionComment = '@__PURE__';
+
 export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
-      const pureFunctionComment = '@__PURE__';
       const topLevelFunctions = findTopLevelFunctions(sf);
       const pureImports = findPureImports(sf);
       const pureImportsComment = `* PURE_IMPORTS_START ${pureImports.join(',')} PURE_IMPORTS_END `;
@@ -68,11 +69,14 @@ export function findTopLevelFunctions(parentNode: ts.Node): ts.Node[] {
     // expressions: `(function() {}())` Their start pos doesn't include the opening paren
     // and must be adjusted.
     if (isIIFE(node)
-      && previousNode.kind === ts.SyntaxKind.ParenthesizedExpression
-      && node.parent) {
+        && previousNode.kind === ts.SyntaxKind.ParenthesizedExpression
+        && node.parent
+        && !hasPureComment(node.parent)) {
       topLevelFunctions.push(node.parent);
-    } else if (node.kind === ts.SyntaxKind.CallExpression
-      || node.kind === ts.SyntaxKind.NewExpression) {
+    } else if ((node.kind === ts.SyntaxKind.CallExpression
+              || node.kind === ts.SyntaxKind.NewExpression)
+        && !hasPureComment(node)
+    ) {
       topLevelFunctions.push(node);
     }
 
@@ -111,4 +115,10 @@ export function findPureImports(parentNode: ts.Node): string[] {
   }
 
   return pureImports;
+}
+
+function hasPureComment(node: ts.Node) {
+  const leadingComment = ts.getSyntheticLeadingComments(node);
+
+  return leadingComment && leadingComment.some((comment) => comment.text === pureFunctionComment);
 }
