@@ -18,6 +18,31 @@ export class InvalidPathException extends BaseException {
 }
 
 
+export function relativePath(from: SchematicPath, to: SchematicPath): SchematicPath {
+  let p: string;
+
+  if (from == to) {
+    p = '';
+  } else {
+    const splitFrom = from.split('/');
+    const splitTo = to.split('/');
+
+    while (splitFrom.length > 0 && splitTo.length > 0 && splitFrom[0] == splitTo[0]) {
+      splitFrom.shift();
+      splitTo.shift();
+    }
+
+    if (splitFrom.length == 0) {
+      p = splitTo.join('/');
+    } else {
+      p = splitFrom.map(_ => '..').concat(splitTo).join('/');
+    }
+  }
+
+  return (p as SchematicPath);
+}
+
+
 export function normalizePath(path: string): SchematicPath {
   let p = path;
   if (p[0] != '/') {

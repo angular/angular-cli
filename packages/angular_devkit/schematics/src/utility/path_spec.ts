@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { InvalidPathException, normalizePath } from './path';
+import { InvalidPathException, normalizePath, relativePath } from './path';
 
 
 describe('normalizePath', () => {
@@ -38,4 +38,23 @@ describe('normalizePath', () => {
     expect(() => normalizePath('/c/..')).toThrow(new InvalidPathException('/c/..'));
     expect(() => normalizePath('/c/../../')).toThrow(new InvalidPathException('/c/../../'));
   });
+});
+
+
+describe('relativePath', () => {
+  const tests = [
+    ['a/b/c', 'a/b/c', ''],
+    ['a/b', 'a/b/c', 'c'],
+    ['a/b/c', 'a/b', '..'],
+    ['a/b/c', 'a/b/d', '../d'],
+  ];
+
+  for (const [from, to, result] of tests) {
+    it(`("${from}", "${to}") == "${result}"`, () => {
+      const f = normalizePath(from);
+      const t = normalizePath(to);
+
+      expect(relativePath(f, t)).toBe(result);
+    });
+  }
 });
