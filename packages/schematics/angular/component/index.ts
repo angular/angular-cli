@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// TODO: replace `options: any` with an actual type generated from the schema.
-// tslint:disable:no-any
 import {
   Rule,
   SchematicContext,
@@ -27,9 +25,10 @@ import * as stringUtils from '../strings';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModule, findModuleFromOptions } from '../utility/find-module';
+import { Schema as ComponentOptions } from './schema';
 
 
-function addDeclarationToNgModule(options: any): Rule {
+function addDeclarationToNgModule(options: ComponentOptions): Rule {
   return (host: Tree) => {
     if (options.skipImport) {
       return host;
@@ -92,7 +91,7 @@ function addDeclarationToNgModule(options: any): Rule {
 }
 
 
-function buildSelector(options: any) {
+function buildSelector(options: ComponentOptions) {
   let selector = stringUtils.dasherize(options.name);
   if (options.prefix) {
     selector = `${options.prefix}-${selector}`;
@@ -102,7 +101,7 @@ function buildSelector(options: any) {
 }
 
 
-export default function(options: any): Rule {
+export default function(options: ComponentOptions): Rule {
   options.selector = options.selector || buildSelector(options);
 
   return (host: Tree, context: SchematicContext) => {
@@ -115,9 +114,9 @@ export default function(options: any): Rule {
       template({
         ...stringUtils,
         'if-flat': (s: string) => options.flat ? '' : s,
-        ...options,
+        ...options as object,
       }),
-      move(options.sourceDir),
+      move(options.sourceDir !),
     ]);
 
     return chain([

@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// TODO: replace `options: any` with an actual type generated from the schema.
-// tslint:disable:no-any
 import {
   Rule,
   apply,
@@ -18,18 +16,19 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as stringUtils from '../strings';
+import { Schema as InterfaceOptions } from './schema';
 
 
-export default function (options: any): Rule {
+export default function (options: InterfaceOptions): Rule {
   options.prefix = options.prefix ? options.prefix : '';
   options.type = !!options.type ? `.${options.type}` : '';
 
   const templateSource = apply(url('./files'), [
     template({
       ...stringUtils,
-      ...options,
+      ...options as object,
     }),
-    move(options.sourceDir),
+    move(options.sourceDir !),
   ]);
 
   return chain([

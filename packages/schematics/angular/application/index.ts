@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// TODO: replace `options: any` with an actual type generated from the schema.
-// tslint:disable:no-any
 import {
   MergeStrategy,
   Rule,
@@ -25,6 +23,7 @@ import * as ts from 'typescript';
 import * as stringUtils from '../strings';
 import { addBootstrapToModule, addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
+import { Schema as ApplicationOptions } from './schema';
 
 
 function addBootstrapToNgModule(directory: string): Rule {
@@ -68,7 +67,7 @@ function minimalPathFilter(path: string): boolean {
   return !toRemoveList.some(re => re.test(path));
 }
 
-export default function (options: any): Rule {
+export default function (options: ApplicationOptions): Rule {
   const appRootSelector = 'app-root';
   const componentOptions = !options.minimal ?
     {
@@ -91,8 +90,9 @@ export default function (options: any): Rule {
         template({
           utils: stringUtils,
           'dot': '.',
-          ...options }),
-        move(options.directory),
+          ...options as object,
+        }),
+        move(options.directory !),
       ])),
     schematic('module', {
       name: 'app',
@@ -109,14 +109,14 @@ export default function (options: any): Rule {
       flat: true,
       ...componentOptions,
     }),
-    addBootstrapToNgModule(options.directory),
+    addBootstrapToNgModule(options.directory !),
     mergeWith(
       apply(url('./other-files'), [
         componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
         !componentOptions.spec ? filter(path => !path.endsWith('.spec.ts')) : noop(),
         template({
           utils: stringUtils,
-          ...options,
+          ...options as any,  // tslint:disable-line:no-any
           selector: appRootSelector,
           ...componentOptions,
         }),

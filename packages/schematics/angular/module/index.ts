@@ -5,8 +5,6 @@
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.io/license
 */
-// TODO: replace `options: any` with an actual type generated from the schema.
-// tslint:disable:no-any
 import {
   Rule,
   SchematicContext,
@@ -26,9 +24,10 @@ import * as stringUtils from '../strings';
 import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { Schema as ModuleOptions } from './schema';
 
 
-function addDeclarationToNgModule(options: any): Rule {
+function addDeclarationToNgModule(options: ModuleOptions): Rule {
   return (host: Tree) => {
     if (!options.module) {
       return host;
@@ -63,7 +62,7 @@ function addDeclarationToNgModule(options: any): Rule {
   };
 }
 
-export default function (options: any): Rule {
+export default function (options: ModuleOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     if (options.module) {
       options.module = findModuleFromOptions(host, options);
@@ -75,9 +74,9 @@ export default function (options: any): Rule {
       template({
         ...stringUtils,
         'if-flat': (s: string) => options.flat ? '' : s,
-        ...options,
+        ...options as object,
       }),
-      move(options.sourceDir),
+      move(options.sourceDir !),
     ]);
 
     return chain([
