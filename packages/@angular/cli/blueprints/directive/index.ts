@@ -67,7 +67,8 @@ export default Blueprint.extend({
         resolveModulePath(options.module, this.project, this.project.root, appConfig);
     } else {
       try {
-        this.pathToModule = findParentModule(this.project.root, appConfig.root, this.generatePath);
+        this.pathToModule = findParentModule(this.project.root, appConfig.root, appConfig.directory,
+          this.generatePath);
       } catch (e) {
         if (!options.skipImport) {
           throw `Error locating module for declaration\n\t${e}`;

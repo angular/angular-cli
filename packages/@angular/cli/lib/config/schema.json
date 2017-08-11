@@ -37,6 +37,11 @@
             "type": "string",
             "description": "The root directory of the app."
           },
+          "directory": {
+            "type": "string",
+            "default": "app",
+            "description": "The directory under root for the app."
+          },
           "outDir": {
             "type": "string",
             "default": "dist/",

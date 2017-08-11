@@ -334,7 +334,10 @@ function resolveImportName (importName: string, importPath: string, fileName: st
  * @return component file name
  * @throw Error if component file referenced by path is not found
  */
-export function resolveComponentPath(projectRoot: string, currentDir: string, filePath: string) {
+export function resolveComponentPath(projectRoot: string, appDir: string,
+  currentDir: string, filePath: string) {
+
+  appDir = appDir || 'app';
 
   let parsedPath = path.parse(filePath);
   let componentName = parsedPath.base.split('.')[0];
@@ -349,14 +352,14 @@ export function resolveComponentPath(projectRoot: string, currentDir: string, fi
     filePath = componentName;
   }
   let directory = filePath[0] === path.sep ?
-    path.resolve(path.join(projectRoot, 'src', 'app', filePath)) :
+    path.resolve(path.join(projectRoot, 'src', appDir, filePath)) :
     path.resolve(currentDir, filePath);
 
   if (!fs.existsSync(directory)) {
     throw new Error(`path '${filePath}' must be relative to current directory` +
                     ` or absolute from project root`);
   }
-  if (directory.indexOf('src' + path.sep + 'app') === -1) {
+  if (directory.indexOf('src' + path.sep + appDir) === -1) {
     throw new Error('Route must be within app');
   }
   let componentFile = path.join(directory, `${componentName}.component.ts`);
