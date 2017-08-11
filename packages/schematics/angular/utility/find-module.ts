@@ -103,7 +103,9 @@ export function buildRelativePath(from: string, to: string): string {
   } else if (!relative.startsWith('.')) {
     pathPrefix = `./`;
   }
+  if (pathPrefix && !pathPrefix.endsWith('/')) {
+    pathPrefix += '/';
+  }
 
-  return (pathPrefix.endsWith('/') ? pathPrefix : pathPrefix + '/')
-       + (relative ? relative + '/' : '') + toFileName;
+  return pathPrefix + (relative ? relative + '/' : '') + toFileName;
 }
