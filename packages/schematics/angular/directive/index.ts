@@ -24,28 +24,17 @@ import * as ts from 'typescript';
 import * as stringUtils from '../strings';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { buildRelativePath, findModule, findModuleFromOptions } from '../utility/find-module';
+import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { Schema as DirectiveOptions } from './schema';
 
 
 function addDeclarationToNgModule(options: DirectiveOptions): Rule {
   return (host: Tree) => {
-    if (options.skipImport) {
+    if (options.skipImport || !options.module) {
       return host;
     }
 
-    let modulePath;
-    if (options.module) {
-      if (!host.exists(options.module)) {
-        throw new Error('Specified module does not exist');
-      }
-      modulePath = options.module;
-    } else {
-      let pathToCheck = options.sourceDir + '/' + options.path;
-      pathToCheck += options.flat ? '' : '/' + stringUtils.dasherize(options.name);
-      modulePath = findModule(host, pathToCheck);
-    }
-
+    const modulePath = options.module;
     let sourceText = host.read(modulePath) !.toString('utf-8');
     let source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
