@@ -82,6 +82,16 @@ Default applications are created in a directory of the same name, with an initia
 </details>
 
 <details>
+  <summary>animation</summary>
+  <p>
+    <code>--animation</code> (aliases: <code>-a</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Generate with animation support.
+  </p>
+</details>
+
+<details>
   <summary>skip-commit</summary>
   <p>
     <code>--skip-commit</code> (alias: <code>-sc</code>) <em>default value: false</em>

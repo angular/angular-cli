@@ -74,6 +74,7 @@ export default Task.extend({
       style: commandOptions.style,
       prefix: commandOptions.prefix.trim() || 'app',
       routing: commandOptions.routing,
+      animation: commandOptions.animation,
       inlineStyle: commandOptions.inlineStyle,
       inlineTemplate: commandOptions.inlineTemplate,
       minimal: commandOptions.minimal,
