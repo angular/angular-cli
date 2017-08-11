@@ -37,6 +37,16 @@ describe('normalizePath', () => {
     expect(() => normalizePath('../a/b/c')).toThrow(new InvalidPathException('../a/b/c'));
     expect(() => normalizePath('/c/..')).toThrow(new InvalidPathException('/c/..'));
     expect(() => normalizePath('/c/../../')).toThrow(new InvalidPathException('/c/../../'));
+
+    // Windows use cases.
+    expect(normalizePath('a\\b\\c')).toBe('/a/b/c');
+    expect(normalizePath('\\a\\b\\c')).toBe('/a/b/c');
+    expect(normalizePath('.\\a\\b\\c')).toBe('/a/b/c');
+    expect(normalizePath('\\.\\a\\b\\c')).toBe('/a/b/c');
+    expect(normalizePath('\\.\\a\\b\\.\\c')).toBe('/a/b/c');
+    expect(normalizePath('\\.\\a\\b\\d\\..\\c')).toBe('/a/b/c');
+    expect(normalizePath('\\.\\a\\b\\.\\d\\..\\c')).toBe('/a/b/c');
+    expect(() => normalizePath('a\\')).toThrow(new InvalidPathException('a\\'));
   });
 });
 

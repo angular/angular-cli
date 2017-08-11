@@ -59,7 +59,8 @@ export function normalizePath(path: string): SchematicPath {
       .replace(/\/[^\/]+\/\.\.\//g, '/')
       .replace(/\/[^\/]+\/\.\.$/g, '/')
       .replace(/\/\.?$/g, '/')
-      .replace(/\/\.?\//g, '/');
+      .replace(/\/\.?\//g, '/')
+      .replace(/\\/g, '/');
   }
 
   if (p.startsWith('/../') || (p.endsWith('/') && p !== '/')) {
