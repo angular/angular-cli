@@ -184,7 +184,7 @@ export default function(_: {}, logger: Logger) {
         }
 
         // Skip sources.
-        if (fileName.endsWith('.ts')) {
+        if (fileName.endsWith('.ts') && !fileName.endsWith('.d.ts')) {
           // Verify that it was actually built.
           if (!fs.existsSync(path.join(pkg.dist, fileName).replace(/ts$/, 'js'))) {
             subSubLogger.error(`\nSource found but compiled file not found: "${fileName}".`);
