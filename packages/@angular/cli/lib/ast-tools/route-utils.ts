@@ -329,6 +329,7 @@ function resolveImportName (importName: string, importPath: string, fileName: st
  * Resolve a path to a component file. If the path begins with path.sep, it is treated to be
  * absolute from the app/ directory. Otherwise, it is relative to currDir
  * @param projectRoot
+ * @param appDir
  * @param currentDir
  * @param filePath componentName or path to componentName
  * @return component file name
