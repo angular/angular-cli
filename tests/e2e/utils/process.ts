@@ -77,7 +77,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
       _processes = _processes.filter(p => p !== childProcess);
 
       if (!error) {
-        resolve({ stdout });
+        resolve({ stdout, stderr });
       } else {
         err.message += `${error}...\n\nSTDOUT:\n${stdout}\n`;
         reject(err);
