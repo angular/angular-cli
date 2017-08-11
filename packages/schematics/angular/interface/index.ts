@@ -12,6 +12,7 @@ import {
   chain,
   mergeWith,
   move,
+  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -22,6 +23,7 @@ import { Schema as InterfaceOptions } from './schema';
 export default function (options: InterfaceOptions): Rule {
   options.prefix = options.prefix ? options.prefix : '';
   options.type = !!options.type ? `.${options.type}` : '';
+  options.path = options.path ? normalizePath(options.path) : options.path;
 
   const templateSource = apply(url('./files'), [
     template({

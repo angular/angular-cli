@@ -16,6 +16,7 @@ import {
   mergeWith,
   move,
   noop,
+  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -89,6 +90,7 @@ function buildSelector(options: DirectiveOptions) {
 
 export default function (options: DirectiveOptions): Rule {
   options.selector = options.selector || buildSelector(options);
+  options.path = options.path ? normalizePath(options.path) : options.path;
 
   return (host: Tree, context: SchematicContext) => {
     options.module = findModuleFromOptions(host, options);

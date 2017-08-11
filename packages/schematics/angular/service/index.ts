@@ -16,6 +16,7 @@ import {
   mergeWith,
   move,
   noop,
+  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -63,6 +64,8 @@ function addProviderToNgModule(options: ServiceOptions): Rule {
 }
 
 export default function (options: ServiceOptions): Rule {
+  options.path = options.path ? normalizePath(options.path) : options.path;
+
   return (host: Tree, context: SchematicContext) => {
     if (options.module) {
       options.module = findModuleFromOptions(host, options);

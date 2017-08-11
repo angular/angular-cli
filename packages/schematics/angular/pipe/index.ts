@@ -16,6 +16,7 @@ import {
   mergeWith,
   move,
   noop,
+  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -76,6 +77,8 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 }
 
 export default function (options: PipeOptions): Rule {
+  options.path = options.path ? normalizePath(options.path) : options.path;
+
   return (host: Tree, context: SchematicContext) => {
     options.module = findModuleFromOptions(host, options);
 

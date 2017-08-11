@@ -14,6 +14,7 @@ import {
   mergeWith,
   move,
   noop,
+  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -23,6 +24,7 @@ import { Schema as ClassOptions } from './schema';
 
 export default function (options: ClassOptions): Rule {
   options.type = !!options.type ? `.${options.type}` : '';
+  options.path = options.path ? normalizePath(options.path) : options.path;
 
   const templateSource = apply(url('./files'), [
     options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
