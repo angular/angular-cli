@@ -72,7 +72,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     // Load the Webpack plugin for manifest generation and install it.
     const AngularServiceWorkerPlugin = require('@angular/service-worker/build/webpack')
       .AngularServiceWorkerPlugin;
-    
+
     // Add baseHref in manifest and ignore system files
     extraPlugins.push(new AngularServiceWorkerPlugin({
       baseHref: buildOptions.baseHref || '/',
