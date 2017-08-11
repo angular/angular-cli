@@ -9,6 +9,7 @@
 // tslint:disable:no-any
 import {
   Rule,
+  SchematicContext,
   Tree,
   apply,
   branchAndMerge,
@@ -17,7 +18,6 @@ import {
   mergeWith,
   move,
   noop,
-  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -26,7 +26,7 @@ import * as ts from 'typescript';
 import * as stringUtils from '../strings';
 import { addProviderToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { buildRelativePath } from '../utility/find-module';
+import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 
 
 function addDeclarationToNgModule(options: any): Rule {
@@ -64,21 +64,23 @@ function addDeclarationToNgModule(options: any): Rule {
 }
 
 export default function (options: any): Rule {
-  options.module = normalizePath(options.module);
+  return (host: Tree, context: SchematicContext) => {
+    options.module = findModuleFromOptions(host, options);
 
-  const templateSource = apply(url('./files'), [
-    options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
-    template({
-      ...stringUtils,
-      ...options,
-    }),
-    move(options.sourceDir),
-  ]);
+    const templateSource = apply(url('./files'), [
+      options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
+      template({
+        ...stringUtils,
+        ...options,
+      }),
+      move(options.sourceDir),
+    ]);
 
-  return chain([
-    branchAndMerge(chain([
-      addDeclarationToNgModule(options),
-      mergeWith(templateSource),
-    ])),
-  ]);
+    return chain([
+      branchAndMerge(chain([
+        addDeclarationToNgModule(options),
+        mergeWith(templateSource),
+      ])),
+    ])(host, context);
+  };
 }

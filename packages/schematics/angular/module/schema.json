@@ -34,8 +34,7 @@
     "module":  {
       "type": "string",
       "description": "Allows specification of the declaring module.",
-      "alias": "m",
-      "subtype": "filepath"
+      "alias": "m"
     }
   },
   "required": [

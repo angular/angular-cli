@@ -5,12 +5,52 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Tree, normalizePath, relativePath } from '@angular-devkit/schematics';
+import { SchematicPath, Tree, normalizePath, relativePath } from '@angular-devkit/schematics';
+import { dasherize } from '../strings';
+
+
+export interface ModuleOptions {
+  module?: string;
+  name: string;
+  flat?: boolean;
+  sourceDir?: string;
+  path?: string;
+  skipImport?: boolean;
+}
+
+
+/**
+ * Find the module refered by a set of options passed to the schematics.
+ */
+export function findModuleFromOptions(host: Tree,
+                                      options: ModuleOptions): SchematicPath | undefined {
+  if (options.hasOwnProperty('skipImport') && options.skipImport) {
+    return undefined;
+  }
+
+  if (!options.module) {
+    const pathToCheck = (options.sourceDir || '') + '/' + (options.path || '')
+                      + options.flat ? '' : '/' + dasherize(options.name);
+
+    return normalizePath(findModule(host, pathToCheck));
+  } else {
+    const modulePath = options.sourceDir + '/' + options.path + '/' + options.module;
+    if (host.exists(modulePath)) {
+      return normalizePath(modulePath);
+    } else if (host.exists(modulePath + '.ts')) {
+      return normalizePath(modulePath + '.ts');
+    } else if (host.exists(modulePath + '.module.ts')) {
+      return normalizePath(modulePath + '.module.ts');
+    } else {
+      throw new Error('Specified module does not exist');
+    }
+  }
+}
 
 /**
  * Function to find the "closest" module to a generated file's path.
  */
-export function findModule(host: Tree, generateDir: string): string {
+export function findModule(host: Tree, generateDir: string): SchematicPath {
   let closestModule = generateDir;
   const allFiles = host.files;
 
@@ -35,13 +75,13 @@ export function findModule(host: Tree, generateDir: string): string {
       + 'option to skip importing components in NgModule.');
   }
 
-  return modulePath;
+  return normalizePath(modulePath);
 }
 
 /**
  * Build a relative path from one file path to another file path.
  */
-export function buildRelativePath(from: string, to: string) {
+export function buildRelativePath(from: string, to: string): string {
   from = normalizePath(from);
   to = normalizePath(to);
 
@@ -64,5 +104,6 @@ export function buildRelativePath(from: string, to: string) {
     pathPrefix = `./`;
   }
 
-  return `${pathPrefix}/${relative}/${toFileName}`;
+  return (pathPrefix.endsWith('/') ? pathPrefix : pathPrefix + '/')
+       + (relative ? relative + '/' : '') + toFileName;
 }

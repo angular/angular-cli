@@ -9,6 +9,7 @@
 // tslint:disable:no-any
 import {
   Rule,
+  SchematicContext,
   Tree,
   apply,
   branchAndMerge,
@@ -17,7 +18,6 @@ import {
   mergeWith,
   move,
   noop,
-  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -26,7 +26,7 @@ import * as ts from 'typescript';
 import * as stringUtils from '../strings';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { buildRelativePath, findModule } from '../utility/find-module';
+import { buildRelativePath, findModule, findModuleFromOptions } from '../utility/find-module';
 
 
 function addDeclarationToNgModule(options: any): Rule {
@@ -102,22 +102,23 @@ function buildSelector(options: any) {
 export default function (options: any): Rule {
   options.selector = options.selector || buildSelector(options);
 
-  options.module = normalizePath(options.module);
+  return (host: Tree, context: SchematicContext) => {
+    options.module = findModuleFromOptions(host, options);
+    const templateSource = apply(url('./files'), [
+      options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
+      template({
+        ...stringUtils,
+        'if-flat': (s: string) => options.flat ? '' : s,
+        ...options,
+      }),
+      move(options.sourceDir),
+    ]);
 
-  const templateSource = apply(url('./files'), [
-    options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
-    template({
-      ...stringUtils,
-      'if-flat': (s: string) => options.flat ? '' : s,
-      ...options,
-    }),
-    move(options.sourceDir),
-  ]);
-
-  return chain([
-    branchAndMerge(chain([
-      addDeclarationToNgModule(options),
-      mergeWith(templateSource),
-    ])),
-  ]);
+    return chain([
+      branchAndMerge(chain([
+        addDeclarationToNgModule(options),
+        mergeWith(templateSource),
+      ])),
+    ])(host, context);
+  };
 }
