@@ -30,7 +30,7 @@ export function findModuleFromOptions(host: Tree,
 
   if (!options.module) {
     const pathToCheck = (options.sourceDir || '') + '/' + (options.path || '')
-                      + options.flat ? '' : '/' + dasherize(options.name);
+                      + (options.flat ? '' : '/' + dasherize(options.name));
 
     return normalizePath(findModule(host, pathToCheck));
   } else {
