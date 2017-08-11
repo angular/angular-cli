@@ -64,7 +64,9 @@ function addDeclarationToNgModule(options: GuardOptions): Rule {
 
 export default function (options: GuardOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
-    options.module = findModuleFromOptions(host, options);
+    if (options.module) {
+      options.module = findModuleFromOptions(host, options);
+    }
 
     const templateSource = apply(url('./files'), [
       options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),

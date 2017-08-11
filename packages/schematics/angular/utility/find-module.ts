@@ -35,12 +35,15 @@ export function findModuleFromOptions(host: Tree,
     return normalizePath(findModule(host, pathToCheck));
   } else {
     const modulePath = options.sourceDir + '/' + options.path + '/' + options.module;
+    const moduleBaseName = options.module.split('/').pop();
     if (host.exists(modulePath)) {
       return normalizePath(modulePath);
     } else if (host.exists(modulePath + '.ts')) {
       return normalizePath(modulePath + '.ts');
     } else if (host.exists(modulePath + '.module.ts')) {
       return normalizePath(modulePath + '.module.ts');
+    } else if (host.exists(modulePath + '/' + moduleBaseName + '.module.ts')) {
+      return normalizePath(modulePath + '/' + moduleBaseName + '.module.ts');
     } else {
       throw new Error('Specified module does not exist');
     }
