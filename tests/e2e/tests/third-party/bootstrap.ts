@@ -11,14 +11,10 @@ export default function() {
       const app = configJson['apps'][0];
       app['styles'].push('../node_modules/bootstrap/dist/css/bootstrap.css');
       app['scripts'].push(
-        '../node_modules/jquery/dist/jquery.js',
-        '../node_modules/tether/dist/js/tether.js',
         '../node_modules/bootstrap/dist/js/bootstrap.js'
       );
     }))
     .then(() => ng('build', '--extract-css'))
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', '* jQuery JavaScript'))
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', '/*! tether '))
     .then(() => expectFileToMatch('dist/scripts.bundle.js', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/styles.bundle.css', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
