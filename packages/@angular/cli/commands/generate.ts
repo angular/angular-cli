@@ -83,7 +83,7 @@ export default Command.extend({
           `The \`ng generate ${name} ${rawArgs[1]}\` file name cannot begin with a digit.`);
     }
     
-    if ('ng'==(rawArgs[1]) && (name=='module')) {
+    if ('ng' === (rawArgs[1]) && ( name === 'module' )) {
       SilentError.debugOrThrow('@angular/cli/commands/generate',
           `The \`ng generate ${name} ${rawArgs[1]}\` cannot create with angular reserved names.`);
     }
