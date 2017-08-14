@@ -196,7 +196,7 @@ runner.onComplete((success: boolean) => {
 
 
 glob.sync('packages/**/*.spec.ts')
-  .filter(p => !/\/schematics\/.*\/files\//.test(p))
+  .filter(p => !/\/schematics\/.*\/(other-)?files\//.test(p))
   .forEach(path => {
     console.error(`Invalid spec file name: ${path}. You're using the old convention.`);
   });
