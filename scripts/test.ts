@@ -9,6 +9,7 @@ import * as glob from 'glob';
 import * as Istanbul from 'istanbul';
 import 'jasmine';
 import {SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
+import { ParsedArgs } from 'minimist';
 import { join, relative } from 'path';
 import { Position, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 
@@ -201,12 +202,16 @@ glob.sync('packages/**/*.spec.ts')
     console.error(`Invalid spec file name: ${path}. You're using the old convention.`);
   });
 
-// Run the tests.
-const allTests =
-  glob.sync('packages/**/*_spec.ts')
-    .map(p => relative(projectBaseDir, p))
-    .filter(p => !/schematics_cli\/schematics\//.test(p));
+export default function (args: ParsedArgs) {
+  let regex = 'packages/**/*_spec.ts';
+  if (args.glob) {
+    regex = `packages/**/${args.glob}/**/*_spec.ts`;
+  }
 
-export default function() {
+  // Run the tests.
+  const allTests =
+    glob.sync(regex)
+      .map(p => relative(projectBaseDir, p))
+      .filter(p => !/schematics_cli\/schematics\//.test(p));
   runner.execute(allTests);
 }
