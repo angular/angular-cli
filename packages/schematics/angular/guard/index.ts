@@ -35,11 +35,7 @@ function addDeclarationToNgModule(options: GuardOptions): Rule {
       return host;
     }
 
-    if (!host.exists(options.module)) {
-      throw new Error('Specified module does not exist');
-    }
     const modulePath = options.module;
-
     const sourceText = host.read(modulePath) !.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 

@@ -8,6 +8,7 @@
 import {
   MergeStrategy,
   Rule,
+  SchematicContext,
   Tree,
   apply,
   chain,
@@ -66,61 +67,62 @@ function minimalPathFilter(path: string): boolean {
 
   return !toRemoveList.some(re => re.test(path));
 }
-
 export default function (options: ApplicationOptions): Rule {
-  const appRootSelector = 'app-root';
-  const componentOptions = !options.minimal ?
-    {
-      inlineStyle: options.inlineStyle,
-      inlineTemplate: options.inlineTemplate,
-      spec: !options.skipTests,
-      styleext: options.style,
-    } :
-    {
-      inlineStyle: true,
-      inlineTemplate: true,
-      spec: false,
-      styleext: options.style,
-    };
+  return (host: Tree, context: SchematicContext) => {
+    const appRootSelector = 'app-root';
+    const componentOptions = !options.minimal ?
+      {
+        inlineStyle: options.inlineStyle,
+        inlineTemplate: options.inlineTemplate,
+        spec: !options.skipTests,
+        styleext: options.style,
+      } :
+      {
+        inlineStyle: true,
+        inlineTemplate: true,
+        spec: false,
+        styleext: options.style,
+      };
 
-  return chain([
-    mergeWith(
-      apply(url('./files'), [
-        options.minimal ? filter(minimalPathFilter) : noop(),
-        template({
-          utils: stringUtils,
-          'dot': '.',
-          ...options as object,
-        }),
-        move(options.directory !),
-      ])),
-    schematic('module', {
-      name: 'app',
-      commonModule: false,
-      flat: true,
-      routing: options.routing,
-      sourceDir: options.directory + '/' + options.sourceDir,
-      spec: false,
-    }),
-    schematic('component', {
-      name: 'app',
-      selector: appRootSelector,
-      sourceDir: options.directory + '/' + options.sourceDir,
-      flat: true,
-      ...componentOptions,
-    }),
-    addBootstrapToNgModule(options.directory !),
-    mergeWith(
-      apply(url('./other-files'), [
-        componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
-        !componentOptions.spec ? filter(path => !path.endsWith('.spec.ts')) : noop(),
-        template({
-          utils: stringUtils,
-          ...options as any,  // tslint:disable-line:no-any
-          selector: appRootSelector,
-          ...componentOptions,
-        }),
-        move(options.directory + '/' + options.sourceDir + '/app'),
-      ]), MergeStrategy.Overwrite),
-  ]);
+    return chain([
+      mergeWith(
+        apply(url('./files'), [
+          options.minimal ? filter(minimalPathFilter) : noop(),
+          template({
+            utils: stringUtils,
+            'dot': '.',
+            ...options as object,
+          }),
+          move(options.directory !),
+        ])),
+      schematic('module', {
+        name: 'app',
+        commonModule: false,
+        flat: true,
+        routing: options.routing,
+        sourceDir: options.directory + '/' + options.sourceDir,
+        spec: false,
+      }),
+      schematic('component', {
+        name: 'app',
+        selector: appRootSelector,
+        sourceDir: options.directory + '/' + options.sourceDir,
+        flat: true,
+        ...componentOptions,
+      }),
+      addBootstrapToNgModule(options.directory !),
+      mergeWith(
+        apply(url('./other-files'), [
+          componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
+          !componentOptions.spec ? filter(path => !path.endsWith('.spec.ts')) : noop(),
+          template({
+            utils: stringUtils,
+            ...options as any,  // tslint:disable-line:no-any
+            selector: appRootSelector,
+            ...componentOptions,
+          }),
+          move(options.directory + '/' + options.sourceDir + '/app'),
+        ]), MergeStrategy.Overwrite),
+    ])(host, context);
+  };
 }

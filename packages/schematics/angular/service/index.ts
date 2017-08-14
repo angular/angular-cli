@@ -36,10 +36,6 @@ function addProviderToNgModule(options: ServiceOptions): Rule {
     }
 
     const modulePath = options.module;
-    if (!host.exists(options.module)) {
-      throw new Error('Specified module does not exist');
-    }
-
     const sourceText = host.read(modulePath) !.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 

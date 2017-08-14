@@ -34,8 +34,10 @@ export function findModuleFromOptions(host: Tree,
 
     return normalizePath(findModule(host, pathToCheck));
   } else {
-    const modulePath = options.sourceDir + '/' + options.path + '/' + options.module;
-    const moduleBaseName = options.module.split('/').pop();
+    const modulePath = normalizePath(
+      options.sourceDir + '/' + options.path + '/' + options.module);
+    const moduleBaseName = normalizePath(modulePath).split('/').pop();
+
     if (host.exists(modulePath)) {
       return normalizePath(modulePath);
     } else if (host.exists(modulePath + '.ts')) {

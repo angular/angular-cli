@@ -92,10 +92,9 @@ function buildSelector(options: ComponentOptions) {
 
 
 export default function(options: ComponentOptions): Rule {
-  options.selector = options.selector || buildSelector(options);
-  options.path = options.path ? normalizePath(options.path) : options.path;
-
   return (host: Tree, context: SchematicContext) => {
+    options.selector = options.selector || buildSelector(options);
+    options.path = options.path ? normalizePath(options.path) : options.path;
     options.module = findModuleFromOptions(host, options);
 
     const templateSource = apply(url('./files'), [

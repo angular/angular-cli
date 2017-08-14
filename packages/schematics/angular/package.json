@@ -8,7 +8,7 @@
     "schematics"
   ],
   "schematics": "./collection.json",
-  "dependencies": {
+  "peerDependencies": {
     "@angular-devkit/schematics": "0.0.0"
   }
 }
