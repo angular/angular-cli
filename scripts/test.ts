@@ -47,7 +47,7 @@ const inlineSourceMapRe = /\/\/# sourceMappingURL=data:application\/json;base64,
 // Istanbul (not Constantinople) collection to the code.
 const codeMap = new Map<string, { code: string, map: SourceMapConsumer }>();
 
-global._DevKitRequireHook = function(code: string, filename: string) {
+function istanbulDevKitRequireHook(code: string, filename: string) {
   // Skip spec files.
   if (filename.match(/_spec\.ts$/)) {
     return code;
@@ -84,7 +84,7 @@ global._DevKitRequireHook = function(code: string, filename: string) {
   }
 
   return instrumentedCode;
-};
+}
 
 
 // Add the Istanbul (not Constantinople) reporter.
@@ -187,7 +187,6 @@ if (process.argv.indexOf('--spec-reporter') != -1) {
     },
   }));
 }
-runner.env.addReporter(new IstanbulReporter());
 
 
 // Manually set exit code (needed with custom reporters)
@@ -206,6 +205,11 @@ export default function (args: ParsedArgs) {
   let regex = 'packages/**/*_spec.ts';
   if (args.glob) {
     regex = `packages/**/${args.glob}/**/*_spec.ts`;
+  }
+
+  if (args['code-coverage']) {
+    global._DevKitRequireHook = istanbulDevKitRequireHook;
+    runner.env.addReporter(new IstanbulReporter());
   }
 
   // Run the tests.
