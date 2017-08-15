@@ -229,6 +229,16 @@ All the build Options are available in serve, below are the additional options.
 </details>
 
 <details>
+  <summary>proxy-config</summary>
+  <p>
+    <code>--proxy-config</code>
+  </p>
+  <p>
+    Use a <a href="https://github.com/angular/angular-cli/blob/master/docs/documentation/stories/proxy.md">proxy</a> configuration file to send some requests to a backend server rather than the webpack dev server.
+  </p>
+</details>
+
+<details>
   <summary>sourcemap</summary>
   <p>
     <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
