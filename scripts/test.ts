@@ -5,16 +5,19 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Logger } from '@angular-devkit/core';
 import * as glob from 'glob';
 import * as Istanbul from 'istanbul';
 import 'jasmine';
-import {SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
+import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
 import { ParsedArgs } from 'minimist';
 import { join, relative } from 'path';
 import { Position, SourceMapConsumer, SourceMapGenerator } from 'source-map';
+import { packages } from '../lib/packages';
 
 
 const Jasmine = require('jasmine');
+const { versions } = require('../versions.json');
 
 const projectBaseDir = join(__dirname, '../packages');
 require('source-map-support').install({
@@ -201,7 +204,7 @@ glob.sync('packages/**/*.spec.ts')
     console.error(`Invalid spec file name: ${path}. You're using the old convention.`);
   });
 
-export default function (args: ParsedArgs) {
+export default function (args: ParsedArgs, logger: Logger) {
   let regex = 'packages/**/*_spec.ts';
   if (args.glob) {
     regex = `packages/**/${args.glob}/**/*_spec.ts`;
@@ -215,7 +218,18 @@ export default function (args: ParsedArgs) {
   // Run the tests.
   const allTests =
     glob.sync(regex)
-      .map(p => relative(projectBaseDir, p))
-      .filter(p => !/schematics_cli\/schematics\//.test(p));
-  runner.execute(allTests);
+      .map(p => relative(projectBaseDir, p));
+
+  let tests = allTests;
+  if (!args.full) {
+    // Remove the tests from packages that haven't changed.
+    tests = tests
+      .filter(p => Object.keys(packages).some(name => {
+        return p.startsWith(packages[name].root) && packages[name].hash !== versions[name];
+      }));
+
+    logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
+  }
+
+  runner.execute(tests);
 }

@@ -39,7 +39,7 @@ jobs:
           key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
 
       - run: npm install --quiet
-      - run: npm run test -- --code-coverage
+      - run: npm run test -- --code-coverage --full
 
   integration:
     <<: *defaults
