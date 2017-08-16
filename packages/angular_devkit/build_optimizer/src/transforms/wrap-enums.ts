@@ -9,12 +9,16 @@ import * as ts from 'typescript';
 import { collectDeepNodes, drilldownNodes } from '../helpers/ast-utils';
 
 
-export const wrapEnumsRegexes = [
-  // tslint:disable:max-line-length
-  /var (\S+) = \{\};\r?\n(\1\.(\S+) = \d+;\r?\n)+\1\[\1\.(\S+)\] = "\4";\r?\n(\1\[\1\.(\S+)\] = "\S+";\r?\n*)+/,
-  /var (\S+);(\/\*@__PURE__\*\/)*\r?\n\(function \(\1\) \{\s+(\1\[\1\["(\S+)"\] = 0\] = "\4";(\s+\1\[\1\["\S+"\] = \d\] = "\S+";)*\r?\n)\}\)\(\1 \|\| \(\1 = \{\}\)\);/,
+export function testWrapEnums(content: string) {
+  const regexes = [
+    // tslint:disable:max-line-length
+    /var (\S+) = \{\};\r?\n(\1\.(\S+) = \d+;\r?\n)+\1\[\1\.(\S+)\] = "\4";\r?\n(\1\[\1\.(\S+)\] = "\S+";\r?\n*)+/,
+    /var (\S+);(\/\*@__PURE__\*\/)*\r?\n\(function \(\1\) \{\s+(\1\[\1\["(\S+)"\] = 0\] = "\4";(\s+\1\[\1\["\S+"\] = \d\] = "\S+";)*\r?\n)\}\)\(\1 \|\| \(\1 = \{\}\)\);/,
   // tslint:enable:max-line-length
-];
+  ];
+
+  return regexes.some((regex) => regex.test(content));
+}
 
 interface EnumData {
   name: string;

@@ -9,11 +9,15 @@ import * as ts from 'typescript';
 import { collectDeepNodes } from '../helpers/ast-utils';
 
 
-export const scrubFileRegexes = [
-  /decorators/,
-  /propDecorators/,
-  /ctorParameters/,
-];
+export function testScrubFile(content: string) {
+  const markers = [
+    'decorators',
+    'propDecorators',
+    'ctorParameters',
+  ];
+
+  return markers.some((marker) => content.indexOf(marker) !== -1);
+}
 
 // Don't remove `ctorParameters` from these.
 const platformWhitelist = [

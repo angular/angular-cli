@@ -8,11 +8,15 @@
 import * as ts from 'typescript';
 
 
-export const prefixClassRegexes = [
-  // tslint:disable-next-line:max-line-length
-  /^(var (\S+) = )(\(function \(\) \{\r?\n(?:    (?:\/\*\*| \*|\*\/|\/\/)[^\r?\n]*\r?\n)*    function \2\([^\)]*\) \{\r?\n)/,
-  /^(var (\S+) = )(\(function \(_super\) \{\r?\n    \w*__extends\(\w+, _super\);\r?\n)/,
-];
+export function testPrefixClasses(content: string) {
+  const regexes = [
+    // tslint:disable-next-line:max-line-length
+    /^(var (\S+) = )(\(function \(\) \{\r?\n(?:    (?:\/\*\*| \*|\*\/|\/\/)[^\r?\n]*\r?\n)*    function \2\([^\)]*\) \{\r?\n)/,
+    /^(var (\S+) = )(\(function \(_super\) \{\r?\n    \w*__extends\(\w+, _super\);\r?\n)/,
+  ];
+
+  return regexes.some((regex) => regex.test(content));
+}
 
 export function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {

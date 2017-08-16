@@ -7,7 +7,7 @@
  */
 import { oneLine, stripIndent } from 'common-tags';
 import { transformJavascript } from '../helpers/transform-javascript';
-import { getPrefixClassesTransformer, prefixClassRegexes } from './prefix-classes';
+import { getPrefixClassesTransformer, testPrefixClasses } from './prefix-classes';
 
 
 const transform = (content: string) => transformJavascript(
@@ -34,7 +34,7 @@ describe('prefix-classes', () => {
       }());
     `;
 
-    expect(prefixClassRegexes.some((regex) => regex.test(input))).toBeTruthy();
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
@@ -75,7 +75,7 @@ describe('prefix-classes', () => {
       }(OuterSubscriber_1.OuterSubscriber));
     `;
 
-    expect(prefixClassRegexes.some((regex) => regex.test(input))).toBeTruthy();
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
   // tslint:enable:max-line-length

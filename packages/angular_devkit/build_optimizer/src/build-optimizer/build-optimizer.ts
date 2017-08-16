@@ -8,11 +8,11 @@
 import { readFileSync } from 'fs';
 import { TransformJavascriptOutput, transformJavascript } from '../helpers/transform-javascript';
 import { getFoldFileTransformer } from '../transforms/class-fold';
-import { getImportTslibTransformer, importTslibRegexes } from '../transforms/import-tslib';
-import { getPrefixClassesTransformer, prefixClassRegexes } from '../transforms/prefix-classes';
+import { getImportTslibTransformer, testImportTslib } from '../transforms/import-tslib';
+import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
-import { getScrubFileTransformer, scrubFileRegexes } from '../transforms/scrub-file';
-import { getWrapEnumsTransformer, wrapEnumsRegexes } from '../transforms/wrap-enums';
+import { getScrubFileTransformer, testScrubFile } from '../transforms/scrub-file';
+import { getWrapEnumsTransformer, testWrapEnums } from '../transforms/wrap-enums';
 
 
 const isAngularModuleFile = /\.es5\.js$/;
@@ -57,15 +57,15 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   // Determine which transforms to apply.
   const getTransforms = [];
 
-  if (wrapEnumsRegexes.some((regex) => regex.test(content as string))) {
+  if (testWrapEnums(content)) {
     getTransforms.push(getWrapEnumsTransformer);
   }
 
-  if (importTslibRegexes.some((regex) => regex.test(content as string))) {
+  if (testImportTslib(content)) {
     getTransforms.push(getImportTslibTransformer);
   }
 
-  if (prefixClassRegexes.some((regex) => regex.test(content as string))) {
+  if (testPrefixClasses(content)) {
     getTransforms.push(getPrefixClassesTransformer);
   }
 
@@ -82,7 +82,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
       getScrubFileTransformer,
       getFoldFileTransformer,
     );
-  } else if (scrubFileRegexes.some((regex) => regex.test(content as string))) {
+  } else if (testScrubFile(content)) {
     getTransforms.push(
       getScrubFileTransformer,
       getFoldFileTransformer,

@@ -7,7 +7,7 @@
  */
 import { oneLine, stripIndent } from 'common-tags';
 import { transformJavascript } from '../helpers/transform-javascript';
-import { getImportTslibTransformer, importTslibRegexes } from './import-tslib';
+import { getImportTslibTransformer, testImportTslib } from './import-tslib';
 
 
 const transform = (content: string) => transformJavascript(
@@ -26,7 +26,7 @@ describe('import-tslib', () => {
       import { __extends } from "tslib";
     `;
 
-    expect(importTslibRegexes.some((regex) => regex.test(input))).toBeTruthy();
+    expect(testImportTslib(input)).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
@@ -45,7 +45,7 @@ describe('import-tslib', () => {
       import { __decorate } from "tslib";
     `;
 
-    expect(importTslibRegexes.some((regex) => regex.test(input))).toBeTruthy();
+    expect(testImportTslib(input)).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
@@ -61,7 +61,7 @@ describe('import-tslib', () => {
       import { __metadata } from "tslib";
     `;
 
-    expect(importTslibRegexes.some((regex) => regex.test(input))).toBeTruthy();
+    expect(testImportTslib(input)).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
@@ -76,7 +76,7 @@ describe('import-tslib', () => {
       import { __param } from "tslib";
     `;
 
-    expect(importTslibRegexes.some((regex) => regex.test(input))).toBeTruthy();
+    expect(testImportTslib(input)).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 

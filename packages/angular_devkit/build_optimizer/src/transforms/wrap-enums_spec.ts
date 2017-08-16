@@ -7,7 +7,7 @@
  */
 import { oneLine, stripIndent } from 'common-tags';
 import { transformJavascript } from '../helpers/transform-javascript';
-import { getWrapEnumsTransformer, wrapEnumsRegexes } from './wrap-enums';
+import { getWrapEnumsTransformer, testWrapEnums } from './wrap-enums';
 
 
 const transform = (content: string) => transformJavascript(
@@ -33,7 +33,7 @@ describe('prefix-classes', () => {
       })();
     `;
 
-    expect(wrapEnumsRegexes.some((regex) => regex.test(input))).toBeTruthy();
+    expect(testWrapEnums(input)).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 
@@ -54,7 +54,7 @@ describe('prefix-classes', () => {
       })();
     `;
 
-    expect(wrapEnumsRegexes.some((regex) => regex.test(input))).toBeTruthy();
+    expect(testWrapEnums(input)).toBeTruthy();
     expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
   });
 });
