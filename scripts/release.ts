@@ -10,36 +10,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
 import { ReleaseType } from 'semver';
-import { PackageInfo, packages } from '../lib/packages';
+import { packages } from '../lib/packages';
 
-const crypto = require('crypto');
-const glob = require('glob');
 const { hashes, versions } = require('../versions.json');
-
-
-const hashCache: {[name: string]: string} = {};
-function _getHashOf(pkg: PackageInfo): string {
-  if (!(pkg.name in hashCache)) {
-    const md5Stream = crypto.createHash('md5');
-
-    // Update the stream with all files content.
-    const files: string[] = glob.sync(path.join(pkg.root, '**'), { nodir: true });
-    files.forEach(filePath => {
-      md5Stream.write(`\0${filePath}\0`);
-      md5Stream.write(fs.readFileSync(filePath));
-    });
-    // Update the stream with all versions of upstream dependencies.
-    pkg.dependencies.forEach(depName => {
-      md5Stream.write(`\0${depName}\0${_getHashOf(packages[depName])}\0`);
-    });
-
-    md5Stream.end();
-
-    hashCache[pkg.name] = md5Stream.read().toString('hex');
-  }
-
-  return hashCache[pkg.name];
-}
 
 
 function _showVersions(logger: Logger) {
@@ -49,7 +22,7 @@ function _showVersions(logger: Logger) {
     }
 
     const version = versions[pkg] || '???';
-    const hash = _getHashOf(packages[pkg]);
+    const hash = packages[pkg].hash;
     const diff = hashes[pkg] !== hash ? '!' : '';
 
     const pad1 = '                                  '.slice(pkg.length);
@@ -70,7 +43,7 @@ function _upgrade(release: string, logger: Logger) {
       versions[pkg] = '0.0.0';
     }
 
-    const hash = _getHashOf(packages[pkg]);
+    const hash = packages[pkg].hash;
     const version = versions[pkg];
     let newVersion: string = version;
 

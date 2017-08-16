@@ -8,10 +8,12 @@
 'use strict';
 
 import { JsonObject } from '@angular-devkit/core';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 
+const glob = require('glob');
 const distRoot = path.join(__dirname, '../dist');
 
 
@@ -27,8 +29,42 @@ export interface PackageInfo {
   private: boolean;
   packageJson: JsonObject;
   dependencies: string[];
+
+  hash: string;
 }
 export type PackageMap = { [name: string]: PackageInfo };
+
+
+const hashCache: {[name: string]: string | null} = {};
+function _getHashOf(pkg: PackageInfo): string {
+  if (!(pkg.name in hashCache)) {
+    hashCache[pkg.name] = null;
+    const md5Stream = crypto.createHash('md5');
+
+    // Update the stream with all files content.
+    const files: string[] = glob.sync(path.join(pkg.root, '**'), { nodir: true });
+    files.forEach(filePath => {
+      md5Stream.write(`\0${filePath}\0`);
+      md5Stream.write(fs.readFileSync(filePath));
+    });
+    // Update the stream with all versions of upstream dependencies.
+    pkg.dependencies.forEach(depName => {
+      md5Stream.write(`\0${depName}\0${_getHashOf(packages[depName])}\0`);
+    });
+
+    md5Stream.end();
+
+    hashCache[pkg.name] = (md5Stream.read() as Buffer).toString('hex');
+  }
+
+  if (!hashCache[pkg.name]) {
+    // Protect against circular dependency.
+    throw new Error('Circular dependency detected between the following packages: '
+      + Object.keys(hashCache).filter(key => hashCache[key] == null).join(', '));
+  }
+
+  return hashCache[pkg.name] !;
+}
 
 
 function loadPackageJson(p: string) {
@@ -108,8 +144,10 @@ const packageJsonPaths = _findAllPackageJson(path.join(__dirname, '..'), exclude
   // Remove the root package.json.
   .filter(p => p != path.join(__dirname, '../package.json'));
 
-// All the supported packages. Go through the packages directory and create a _map of
-// name => fullPath.
+
+// All the supported packages. Go through the packages directory and create a map of
+// name => PackageInfo. This map is partial as it lacks some information that requires the
+// map itself to finish building.
 export const packages: PackageMap =
   packageJsonPaths
     .map(pkgPath => ({ root: path.dirname(pkgPath) }))
@@ -136,12 +174,14 @@ export const packages: PackageMap =
         root: pkgRoot,
         relative: path.relative(path.dirname(__dirname), pkgRoot),
         main: path.resolve(pkgRoot, 'src/index.ts'),
-        dependencies: [],
         private: packageJson.private,
         tar: path.join(distRoot, name.replace('/', '_') + '.tgz'),
         bin,
         name,
         packageJson,
+
+        dependencies: [],
+        hash: '',
       };
 
       return packages;
@@ -157,4 +197,10 @@ for (const pkgName of Object.keys(packages)) {
         || name in (pkgJson.devDependencies || {})
         || name in (pkgJson.peerDependencies || {});
   });
+}
+
+
+// Update the hash values of each.
+for (const pkgName of Object.keys(packages)) {
+  packages[pkgName].hash = _getHashOf(packages[pkgName]);
 }
