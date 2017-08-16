@@ -132,9 +132,11 @@ export default Blueprint.extend({
       const moduleDir = path.parse(this.pathToModule).dir;
       const relativeDir = path.relative(moduleDir, fullGeneratePath);
       const importPath = relativeDir ? `./${relativeDir}/${fileName}` : `./${fileName}`;
-      returns.push(
-        astUtils.addImportToModule(this.pathToModule, className, importPath)
-          .then((change: any) => change.apply(NodeHost)));
+      if (!options.dryRun) {
+        returns.push(
+          astUtils.addImportToModule(this.pathToModule, className, importPath)
+            .then((change: any) => change.apply(NodeHost)));
+      }
       this._writeStatusToUI(chalk.yellow,
                             'update',
                             path.relative(this.project.root, this.pathToModule));
