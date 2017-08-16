@@ -587,19 +587,19 @@ export default [
     });
 
     it('accepts component name without \'component\' suffix: resolveComponentPath', () => {
-      let fileName = nru.resolveComponentPath(projectRoot, 'src/app', 'about');
+      let fileName = nru.resolveComponentPath(projectRoot, '', 'src/app', 'about');
       expect(fileName).toEqual(componentFile);
     });
     it('accepts component name with \'component\' suffix: resolveComponentPath', () => {
-      let fileName = nru.resolveComponentPath(projectRoot, 'src/app', 'about.component');
+      let fileName = nru.resolveComponentPath(projectRoot, '', 'src/app', 'about.component');
       expect(fileName).toEqual(componentFile);
     });
     it('accepts path absolute from project root: resolveComponentPath', () => {
-      let fileName = nru.resolveComponentPath(projectRoot, '', `${path.sep}about`);
+      let fileName = nru.resolveComponentPath(projectRoot, '', '', `${path.sep}about`);
       expect(fileName).toEqual(componentFile);
     });
     it('accept component with directory name: resolveComponentPath', () => {
-      let fileName = nru.resolveComponentPath(projectRoot, 'src/app', 'about/about.component');
+      let fileName = nru.resolveComponentPath(projectRoot, '', 'src/app', 'about/about.component');
       expect(fileName).toEqual(componentFile);
     });
 
