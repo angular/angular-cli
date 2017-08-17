@@ -64,7 +64,17 @@ All the build Options are available in serve, below are the additional options.
     <code>--open</code> (aliases: <code>-o</code>) <em>default value: false</em>
   </p>
   <p>
-    Opens the url in default browser.
+    Opens the url in default browser. 
+  </p>
+</details>
+
+<details>
+  <summary>browser</summary>
+  <p>
+    `--browser` (alias: `-b`)
+  </p>
+  <p>
+    Opens the url in specified browser instead of default. The browser name is platform dependent. For example, Chrome is google chrome on macOS, google-chrome on Linux and chrome on Windows.
   </p>
 </details>
 

@@ -26,6 +26,7 @@ export interface ServeTaskOptions extends BuildOptions {
   sslCert?: string;
   open?: boolean;
   hmr?: boolean;
+  browser?: string;
 }
 
 // Expose options unrelated to live-reload to other commands that need to run serve
@@ -76,6 +77,12 @@ export const baseServeCommandOptions: any = overrideOptions([
     default: false,
     aliases: ['o'],
     description: 'Opens the url in default browser.',
+  },
+  {
+    name: 'browser',
+    type: String,
+    aliases: ['b'],
+    description: 'Opens the url in specified browser instead of default.',
   },
   {
     name: 'live-reload',
