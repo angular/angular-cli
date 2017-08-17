@@ -4,6 +4,7 @@ import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
+import { SafeImportsPlugin } from '../../plugins/safe-imports';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -114,7 +115,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ].concat(extraRules)
     },
     plugins: [
-      new webpack.NoEmitOnErrorsPlugin()
+      new webpack.NoEmitOnErrorsPlugin(),
+      new SafeImportsPlugin()
     ].concat(extraPlugins),
     node: {
       fs: 'empty',

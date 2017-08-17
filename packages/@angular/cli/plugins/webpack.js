@@ -8,5 +8,7 @@ module.exports = {
     require('../plugins/suppress-entry-chunks-webpack-plugin')
       .SuppressExtractedTextChunksWebpackPlugin,
   NamedLazyChunksWebpackPlugin:
-    require('../plugins/named-lazy-chunks-webpack-plugin').NamedLazyChunksWebpackPlugin
+    require('../plugins/named-lazy-chunks-webpack-plugin').NamedLazyChunksWebpackPlugin,
+  SafeImportsPlugin:
+    require('../plugins/safe-imports').SafeImportsPlugin
 };
