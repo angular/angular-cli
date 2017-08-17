@@ -14,17 +14,24 @@ Install the `@angular/material` library and add the dependency to package.json..
 npm install --save @angular/material @angular/cdk
 ```
 
-Import the Angular Material NgModule into your app module...
+Some Material components depend on the Angular animations module so install the `@angular/animations` library and add the dependency to package.json.
+```bash
+npm install --save @angular/animations
+```
+
+Import both the Angular Material and the BrowserAnimationsModule NgModules into your app module...
 ```javascript
 //in src/app/app.module.ts
 
 import { MaterialModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // other imports
 
 @NgModule({
   imports: [
     ...
-    MaterialModule
+    MaterialModule,
+    BrowserAnimationsModule
   ],
   ...
 })
@@ -36,8 +43,8 @@ To add an angular CSS theme and material icons to your app...
 ```sass
 /* in src/styles.css */
 
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
-@import '~https://fonts.googleapis.com/icon?family=Material+Icons';
+@import url('~@angular/material/prebuilt-themes/deeppurple-amber.css');
+@import url('~https://fonts.googleapis.com/icon?family=Material+Icons');
 ```
 
 Run `ng serve` to run your application in development mode, and navigate to `http://localhost:4200`.
