@@ -33,9 +33,14 @@
             "type": "string",
             "description": "Name of the app."
           },
+          "appRoot": {
+            "type": "string",
+            "default": "app",
+            "description": "The root directory of the app."
+          },          
           "root": {
             "type": "string",
-            "description": "The root directory of the app."
+            "description": "The root src directory for the apps."
           },
           "outDir": {
             "type": "string",
