@@ -62,7 +62,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
     <code>--config</code> (aliases: <code>-c</code>)
   </p>
   <p>
-    Use a specific config file. Defaults to the protractor config file in angular-cli.json.
+    Use a specific config file. Defaults to the karma config file in `.angular-cli.json`.
   </p>
 </details>
 
