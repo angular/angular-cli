@@ -1,14 +1,11 @@
 'use strict';
 
-const RSVP = require('rsvp');
-
 const lookupCommand = require('./lookup-command');
 const getOptionArgs = require('../utilities/get-option-args');
 let logger = require('heimdalljs-logger')('ember-cli:cli');
 let loggerTesting = require('heimdalljs-logger')('ember-cli:testing');
 const heimdall = require('heimdalljs');
 
-const Promise = RSVP.Promise;
 // Disabled until e2e and serve command can be evaluated/corrected -- require('../utilities/will-interrupt-process');
 const onProcessInterrupt = { addHandler: (_handler) => { }, removeHandler: (_handler) => { } };
 
@@ -86,7 +83,7 @@ class CLI {
   run(environment) {
     let shutdownOnExit = null;
 
-    return RSVP.hash(environment).then(environment => {
+    return Promise.resolve().then(() => {
       let args = environment.cliArgs.slice();
 
       if (args.length === 0) {
@@ -161,11 +158,6 @@ class CLI {
         onProcessInterrupt.removeHandler(onCommandInterrupt);
 
         return result;
-      }).finally(() => {
-        instrumentation.start('shutdown');
-        shutdownOnExit = function() {
-          instrumentation.stopAndReport('shutdown');
-        };
       }).then(result => {
         // if the help option was passed, call the help command
         if (result === 'callHelp') {
@@ -200,11 +192,6 @@ class CLI {
           .then(() => runPromise);
 
       return runPromise;
-    })
-    .finally(() => {
-      if (shutdownOnExit) {
-        shutdownOnExit();
-      }
     })
     .catch(this.logError.bind(this));
   }
