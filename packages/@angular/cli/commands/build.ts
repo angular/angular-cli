@@ -121,6 +121,12 @@ export const baseBuildCommandOptions: any = [
     aliases: ['oh']
   },
   {
+    name: 'custom-hash',
+    type: String,
+    description: 'Define a custom hash for cache-busting',
+    aliases: ['ch']
+  },
+  {
     name: 'poll',
     type: Number,
     description: 'Enable and define the file watching poll time period (milliseconds).',

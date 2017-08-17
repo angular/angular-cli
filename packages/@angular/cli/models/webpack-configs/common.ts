@@ -40,7 +40,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   // determine hashing format
-  const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing, buildOptions.customHash);
 
   // process global scripts
   if (appConfig.scripts.length > 0) {

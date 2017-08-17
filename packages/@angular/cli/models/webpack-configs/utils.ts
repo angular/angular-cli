@@ -75,13 +75,17 @@ export interface HashFormat {
   file: string;
 }
 
-export function getOutputHashFormat(option: string, length = 20): HashFormat {
+export function getOutputHashFormat(option: string, hash= '', length = 20): HashFormat {
   /* tslint:disable:max-line-length */
+  let chunkHash = hash || `[chunkhash:${length}]`;
+  let contentHash = hash || `[contenthash:${length}]`;
+  let fileHash = hash || `[hash:${length}]`;
+  let customHash = hash ? `.${hash}` : '';
   const hashFormats: { [option: string]: HashFormat } = {
-    none:    { chunk: '',                       extract: '',                         file: ''                  },
-    media:   { chunk: '',                       extract: '',                         file: `.[hash:${length}]` },
-    bundles: { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: ''                  },
-    all:     { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: `.[hash:${length}]` },
+    none: { chunk: customHash, extract: customHash, file: customHash},
+    media: { chunk: customHash, extract: customHash, file: `.${fileHash}`},
+    bundles: { chunk: `.${chunkHash}`, extract: `.${contentHash}`, file: customHash},
+    all: { chunk: `.${chunkHash}`, extract: `.${contentHash}`, file: `.${fileHash}`},
   };
   /* tslint:enable:max-line-length */
   return hashFormats[option] || hashFormats['none'];
