@@ -22,6 +22,7 @@ export default function() {
     .then(() => expectToFail(() => expectFileToMatch('package.json', '"protractor":')))
     .then(() => expectToFail(() => expectFileToMatch('package.json', '"karma":')))
     .then(() => expectToFail(() => expectFileToMatch('package.json', '"jasmine-core":')))
+    .then(() => expectToFail(() => expectFileToMatch('package.json', '"tslint-language-service":')))
 
     // Try to run a build.
     .then(() => ng('build'));
