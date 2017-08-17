@@ -72,16 +72,11 @@ const ignoredPackages = [
   'domutils@1.5.1', // Looks like MIT
   'domutils@1.1.6', // Looks like MIT
   'extsprintf@1.0.2', // Looks like MIT
-  'formatio@1.1.1', // BSD, but doesn't list it in package.json
   'indexof@0.0.1', // MIT, but doesn't list it in package.json
   'jschardet@1.5.1', // LGPL-2.1, listed as LGPL-2.1+.
   'map-stream@0.1.0', // MIT, license but it's not listed in package.json.
-  'mime@1.2.11', // MIT, but doesn't list it in package.json
-  'ms@0.7.1', // MIT, but doesn't list it in package.json
   'pause-stream@0.0.11', // MIT AND Apache-2.0, but broken license field in package.json lists.
-  'process@0.5.2', // MIT, but doesn't list it in package.json
   'progress@1.1.8', // MIT, but doesn't list it in package.json
-  'samsam@1.1.2', // BSD, but doesn't list it in package.json
   'stdout-stream@1.4.0', // MIT, but doesn't list it in package.json
   'thunky@0.1.0', // MIT, but doesn't list it in package.json.
   'uglify-js@2.3.6', // BSD, but doesn't list it in package.json
