@@ -8,14 +8,17 @@ export class SuppressExtractedTextChunksWebpackPlugin {
     compiler.plugin('compilation', function (compilation: any) {
       // find which chunks have css only entry points
       const cssOnlyChunks: string[] = [];
-        const entryPoints = compilation.options.entry;
-        // determine which entry points are composed entirely of css files
-        for (let entryPoint of Object.keys(entryPoints)) {
-          if (entryPoints[entryPoint].every((el: string) =>
-            el.match(/\.(css|scss|sass|less|styl)$/))) {
-              cssOnlyChunks.push(entryPoint);
-          }
+      const entryPoints = compilation.options.entry;
+      // determine which entry points are composed entirely of css files
+      for (let entryPoint of Object.keys(entryPoints)) {
+        let entryFiles: string[]|string = entryPoints[entryPoint];
+        // when type of entryFiles is not array, make it as an array
+        entryFiles = entryFiles instanceof Array ? entryFiles : [entryFiles];
+        if (entryFiles.every((el: string) =>
+          el.match(/\.(css|scss|sass|less|styl)$/) !== null)) {
+            cssOnlyChunks.push(entryPoint);
         }
+      }
       // Remove the js file for supressed chunks
       compilation.plugin('after-seal', (callback: any) => {
         compilation.chunks
