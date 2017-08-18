@@ -67,13 +67,13 @@ export class PathsPlugin implements Tapable {
     }
     this._tsConfigPath = options.tsConfigPath;
 
-    if (options.hasOwnProperty('compilerOptions')) {
-      this._compilerOptions = Object.assign({}, options.compilerOptions);
+    if (options.compilerOptions) {
+      this._compilerOptions = options.compilerOptions;
     } else {
-      this._compilerOptions = PathsPlugin._loadOptionsFromTsConfig(this._tsConfigPath, null);
+      this._compilerOptions = PathsPlugin._loadOptionsFromTsConfig(this._tsConfigPath);
     }
 
-    if (options.hasOwnProperty('compilerHost')) {
+    if (options.compilerHost) {
       this._host = options.compilerHost;
     } else {
       this._host = ts.createCompilerHost(this._compilerOptions, false);

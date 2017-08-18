@@ -56,7 +56,7 @@ export class AotPlugin implements Tapable {
   private _tsConfigPath: string;
   private _entryModule: string;
 
-  private _donePromise: Promise<void>;
+  private _donePromise: Promise<void> | null;
   private _compiler: any = null;
   private _compilation: any = null;
 
@@ -66,10 +66,10 @@ export class AotPlugin implements Tapable {
   private _basePath: string;
   private _genDir: string;
 
-  private _i18nFile: string;
-  private _i18nFormat: string;
-  private _locale: string;
-  private _missingTranslation: string;
+  private _i18nFile?: string;
+  private _i18nFormat?: string;
+  private _locale?: string;
+  private _missingTranslation?: string;
 
   private _diagnoseFiles: { [path: string]: boolean } = {};
   private _firstRun = true;
@@ -128,7 +128,7 @@ export class AotPlugin implements Tapable {
       const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
 
       if (diagnostic.file) {
-        const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+        const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!);
         throw new Error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`);
       } else {
         throw new Error(message);
@@ -166,7 +166,7 @@ export class AotPlugin implements Tapable {
     }
 
     const tsConfig = ts.parseJsonConfigFileContent(
-      tsConfigJson, ts.sys, basePath, null, this._tsConfigPath);
+      tsConfigJson, ts.sys, basePath, undefined, this._tsConfigPath);
 
     let fileNames = tsConfig.fileNames;
     this._rootFilePath = fileNames;
@@ -192,23 +192,23 @@ export class AotPlugin implements Tapable {
     this._basePath = basePath;
     this._genDir = genDir;
 
-    if (options.hasOwnProperty('typeChecking')) {
+    if (options.typeChecking !== undefined) {
       this._typeCheck = options.typeChecking;
     }
-    if (options.hasOwnProperty('skipCodeGeneration')) {
+    if (options.skipCodeGeneration !== undefined) {
       this._skipCodeGeneration = options.skipCodeGeneration;
     }
 
     this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
 
     // Override some files in the FileSystem.
-    if (options.hasOwnProperty('hostOverrideFileSystem')) {
+    if (options.hostOverrideFileSystem) {
       for (const filePath of Object.keys(options.hostOverrideFileSystem)) {
         this._compilerHost.writeFile(filePath, options.hostOverrideFileSystem[filePath], false);
       }
     }
     // Override some files in the FileSystem with paths from the actual file system.
-    if (options.hasOwnProperty('hostReplacementPaths')) {
+    if (options.hostReplacementPaths) {
       for (const filePath of Object.keys(options.hostReplacementPaths)) {
         const replacementFilePath = options.hostReplacementPaths[filePath];
         const content = this._compilerHost.readFile(replacementFilePath);
@@ -345,7 +345,7 @@ export class AotPlugin implements Tapable {
           return callback(null, result);
         }
 
-        this.done.then(() => {
+        this.done!.then(() => {
           result.resource = this.genDir;
           result.dependencies.forEach((d: any) => d.critical = false);
           result.resolveDependencies = (_fs: any, _resource: any, _recursive: any,
@@ -380,7 +380,7 @@ export class AotPlugin implements Tapable {
       // Virtual file system.
       compiler.resolvers.normal.plugin('before-resolve', (request: any, cb: () => void) => {
         if (request.request.match(/\.ts$/)) {
-          this.done.then(() => cb(), () => cb());
+          this.done!.then(() => cb(), () => cb());
         } else {
           cb();
         }
@@ -432,13 +432,12 @@ export class AotPlugin implements Tapable {
       return;
     }
 
-    const diagnostics: ts.Diagnostic[] = []
-      .concat(
-        this._program.getCompilerOptions().declaration
-          ? this._program.getDeclarationDiagnostics(sourceFile) : [],
-        this._program.getSyntacticDiagnostics(sourceFile),
-        this._program.getSemanticDiagnostics(sourceFile)
-      );
+    const diagnostics: Array<ts.Diagnostic> = [
+        ...(this._program.getCompilerOptions().declaration
+            ? this._program.getDeclarationDiagnostics(sourceFile) : []),
+        ...this._program.getSyntacticDiagnostics(sourceFile),
+        ...this._program.getSemanticDiagnostics(sourceFile)
+    ];
 
     if (diagnostics.length > 0) {
       diagnostics.forEach(diagnostic => {
@@ -446,7 +445,7 @@ export class AotPlugin implements Tapable {
         let message;
 
         if (diagnostic.file) {
-          const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+          const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!);
 
           const sourceText = diagnostic.file.getFullText();
           let {line, character, fileName} = this._translateSourceMap(sourceText,
@@ -532,7 +531,7 @@ export class AotPlugin implements Tapable {
 
                 if (diagnostic.file) {
                   const {line, character} = diagnostic.file.getLineAndCharacterOfPosition(
-                    diagnostic.start);
+                    diagnostic.start!);
                   return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message})`;
                 } else {
                   return message;
