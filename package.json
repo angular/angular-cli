@@ -62,7 +62,6 @@
     "heimdalljs": "^0.2.4",
     "heimdalljs-logger": "^0.1.9",
     "html-webpack-plugin": "^2.29.0",
-    "inquirer": "^3.0.0",
     "istanbul-instrumenter-loader": "^2.0.0",
     "karma-source-map-support": "^1.2.0",
     "less": "^2.7.2",
