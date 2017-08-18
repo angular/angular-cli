@@ -93,11 +93,6 @@ export default Task.extend({
         }
       })
       .then(function () {
-        if (!commandOptions.dryRun && commandOptions.skipInstall === false) {
-          return npmInstall.run();
-        }
-      })
-      .then(function () {
         if (!commandOptions.dryRun && commandOptions.linkCli) {
           return linkCli.run();
         }
