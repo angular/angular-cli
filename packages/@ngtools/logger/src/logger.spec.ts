@@ -38,7 +38,7 @@ describe('Logger', () => {
       .then(() => done(), (err: any) => done.fail(err));
 
     const childLogger = new Logger('child', logger);
-    childLogger.subscribe(null, null, () => hasCompleted = true);
+    childLogger.subscribe(undefined, undefined, () => hasCompleted = true);
     childLogger.debug('hello');
     childLogger.info('world');
     logger.complete();

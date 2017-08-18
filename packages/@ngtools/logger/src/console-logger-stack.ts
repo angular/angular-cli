@@ -1,13 +1,19 @@
 import {Logger} from './logger';
 
-let globalConsoleStack: Logger[] = null;
-let originalConsoleDebug: (message?: any, ...optionalParams: any[]) => void;
-let originalConsoleLog: (message?: any, ...optionalParams: any[]) => void;
-let originalConsoleWarn: (message?: any, ...optionalParams: any[]) => void;
-let originalConsoleError: (message?: any, ...optionalParams: any[]) => void;
+type ConsoleWriter = (message?: any, ...optionalParams: any[]) => void;
+
+let globalConsoleStack: Logger[] | null = null;
+let originalConsoleDebug: ConsoleWriter;
+let originalConsoleLog: ConsoleWriter;
+let originalConsoleWarn: ConsoleWriter;
+let originalConsoleError: ConsoleWriter;
 
 
-function _push(logger: Logger) {
+function _push(logger: Logger): Logger {
+  if (!globalConsoleStack) {
+    throw new Error('ConsoleLoggerStack must be started before pushing a logger.');
+  }
+
   if (globalConsoleStack.length == 0) {
     originalConsoleDebug = (console as any).debug;  // Some environment (node) don't have debug.
     originalConsoleLog = console.log;
@@ -15,16 +21,28 @@ function _push(logger: Logger) {
     originalConsoleError = console.error;
 
     (console as any).debug = (msg: string, ...args: any[]) => {
-      globalConsoleStack[globalConsoleStack.length - 1].debug(msg, { args });
+      const logger = ConsoleLoggerStack.top();
+      if (logger) {
+        logger.debug(msg, { args });
+      }
     };
     console.log = (msg: string, ...args: any[]) => {
-      globalConsoleStack[globalConsoleStack.length - 1].info(msg, { args });
+      const logger = ConsoleLoggerStack.top();
+      if (logger) {
+        logger.info(msg, { args });
+      }
     };
     console.warn = (msg: string, ...args: any[]) => {
-      globalConsoleStack[globalConsoleStack.length - 1].warn(msg, { args });
+      const logger = ConsoleLoggerStack.top();
+      if (logger) {
+        logger.warn(msg, { args });
+      }
     };
     console.error = (msg: string, ...args: any[]) => {
-      globalConsoleStack[globalConsoleStack.length - 1].error(msg, { args });
+      const logger = ConsoleLoggerStack.top();
+      if (logger) {
+        logger.error(msg, { args });
+      }
     };
   }
   globalConsoleStack.push(logger);
@@ -33,6 +51,9 @@ function _push(logger: Logger) {
 }
 
 function _pop() {
+  if (!globalConsoleStack) {
+    return;
+  }
   globalConsoleStack[globalConsoleStack.length - 1].complete();
   globalConsoleStack.pop();
   if (globalConsoleStack.length == 0) {
@@ -55,18 +76,16 @@ export class ConsoleLoggerStack {
   static push(logger: Logger): Logger;
   static push<T extends Logger>(loggerClass: LoggerConstructor<T>, ...args: any[]): Logger;
   static push<T extends Logger>(nameOrLogger: string | Logger | LoggerConstructor<T> = '',
-                                ...args: any[]) {
+                                ...args: any[]): Logger {
     if (typeof nameOrLogger == 'string') {
-      return _push(new Logger(nameOrLogger as string, this.top()));
+      return _push(new Logger(nameOrLogger, this.top()));
     } else if (nameOrLogger instanceof Logger) {
-      const logger = nameOrLogger as Logger;
-      if (logger.parent !== this.top()) {
+      if (nameOrLogger.parent !== this.top()) {
         throw new Error('Pushing a logger that is not a direct child of the top of the stack.');
       }
-      return _push(logger);
+      return _push(nameOrLogger);
     } else {
-      const klass = nameOrLogger as LoggerConstructor<T>;
-      return _push(new klass(...args, this.top()));
+      return _push(new nameOrLogger(...args, this.top()));
     }
   }
   static pop(): Logger | null {
@@ -82,19 +101,18 @@ export class ConsoleLoggerStack {
   static start(logger: Logger): Logger;
   static start<T extends Logger>(loggerClass: LoggerConstructor<T>, ...args: any[]): Logger;
   static start<T extends Logger>(nameOrLogger: string | Logger | LoggerConstructor<T> = '',
-                                ...args: any[]) {
+                                ...args: any[]): Logger {
     if (globalConsoleStack !== null) {
       throw new Error('Cannot start a new console logger stack while one is already going.');
     }
 
     globalConsoleStack = [];
     if (typeof nameOrLogger == 'string') {
-      return _push(new Logger(nameOrLogger as string, this.top()));
+      return _push(new Logger(nameOrLogger, this.top()));
     } else if (nameOrLogger instanceof Logger) {
-      return _push(nameOrLogger as Logger);
+      return _push(nameOrLogger);
     } else {
-      const klass = nameOrLogger as LoggerConstructor<T>;
-      return _push(new klass(...args, this.top()));
+      return _push(new nameOrLogger(...args, this.top()));
     }
   }
   static end() {
