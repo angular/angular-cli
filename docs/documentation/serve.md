@@ -189,6 +189,19 @@ All the build Options are available in serve, below are the additional options.
 </details>
 
 <details>
+  <summary>missing-translation</summary>
+  <p>
+    <code>--missing-translation</code>
+  </p>
+  <p>
+    How to handle missing translations for i18n.
+  </p>
+  <p>
+    Values: <code>error</code>, <code>warning</code>, <code>ignore</code>
+  </p>
+</details>
+
+<details>
   <summary>output-hashing</summary>
   <p>
     <code>--output-hashing</code> (aliases: <code>-oh</code>) <em>default value: </em>
@@ -225,6 +238,16 @@ All the build Options are available in serve, below are the additional options.
   </p>
   <p>
     Log progress to the console while building.
+  </p>
+</details>
+
+<details>
+  <summary>proxy-config</summary>
+  <p>
+    <code>--proxy-config</code>
+  </p>
+  <p>
+    Use a <a href="https://github.com/angular/angular-cli/blob/master/docs/documentation/stories/proxy.md">proxy</a> configuration file to send some requests to a backend server rather than the webpack dev server.
   </p>
 </details>
 

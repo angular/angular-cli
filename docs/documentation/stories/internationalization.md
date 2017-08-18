@@ -25,14 +25,15 @@ ng xi18n --output-path src/locale
 Now that you have generated a messages bundle source file, you can translate it.
 Let's say that your file containing the french translations is named `messages.fr.xlf` 
 and is located in the `src/locale` folder.
-If you want to use it when you serve your application you can use the 3 following commands:
+If you want to use it when you serve your application you can use the 4 following commands:
 - `--i18n-file` Localization file to use for i18n.
 - `--i18n-format` Format of the localization file specified with --i18n-file.
 - `--locale` Locale to use for i18n.
+- `--missing-translation` Defines the strategy to use for missing i18n translations.
 
 In our case we can load the french translations with the following command:
 ```sh
-ng serve --aot --locale fr --i18n-format xlf --i18n-file src/locale/messages.fr.xlf
+ng serve --aot --locale fr --i18n-format xlf --i18n-file src/locale/messages.fr.xlf --missing-translation error
 ```
 
 Our application is exactly the same but the `LOCALE_ID` has been provided with "fr",
@@ -46,14 +47,14 @@ your bootstrap file yourself.
 To build your application with a specific locale you can use the exact same commands
 that you used for `serve`:
 ```sh
-ng build --aot --locale fr --i18n-format xlf --i18n-file src/i18n/messages.fr.xlf
+ng build --aot --locale fr --i18n-format xlf --i18n-file src/i18n/messages.fr.xlf --missing-translation error
 ```
 
 When you build your application for a specific locale, it is probably a good idea to change
 the output path with the command `--output-path` in order to save the files to a different location.
 
 ```sh
-ng build --aot --output-path dist/fr --locale fr --i18n-format xlf --i18n-file src/i18n/messages.fr.xlf
+ng build --aot --output-path dist/fr --locale fr --i18n-format xlf --i18n-file src/i18n/messages.fr.xlf --missing-translation error
 ```
 
 If you end up serving this specific version from a subdirectory, you can also change
@@ -63,7 +64,7 @@ For example if the french version of your application is served from https://mya
 then you would build the french version like this:
 
 ```sh
-ng build --aot --output-path dist/fr --base-href fr --locale fr --i18n-format xlf --i18n-file src/i18n/messages.fr.xlf
+ng build --aot --output-path dist/fr --base-href fr --locale fr --i18n-format xlf --i18n-file src/i18n/messages.fr.xlf --missing-translation error
 ```
 
 If you need more details about how to create scripts to generate the app in multiple

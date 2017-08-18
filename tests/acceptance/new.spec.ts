@@ -166,4 +166,12 @@ describe('Acceptance: ng new', function () {
       .then(done, done.fail);
   });
 
+  it('should specify a version of the CLI', (done) => {
+    return ng(['new', 'FooApp', '--skip-install', '--skip-git']).then(() => {
+      const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+      expect(pkgJson.devDependencies['@angular/cli']).toMatch(/\d+\.\d+\.\d+/);
+    })
+    .then(done, done.fail);
+  })
+
 });

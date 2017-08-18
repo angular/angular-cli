@@ -1,6 +1,8 @@
 import {ng} from '../../../utils/process';
-import {expectFileToMatch, writeFile, createDir, appendToFile} from '../../../utils/fs';
+import {expectFileToMatch, writeFile, createDir, appendToFile, readFile} from '../../../utils/fs';
 import {expectToFail} from '../../../utils/utils';
+import {Version} from '../../../../../packages/@angular/cli/upgrade/version';
+import {SemVer} from 'semver';
 
 export default function() {
   return Promise.resolve()
@@ -22,10 +24,35 @@ export default function() {
       '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>'))
     .then(() => ng('build', '--aot', '--i18n-file', 'src/locale/messages.fr.xlf', '--i18n-format',
       'xlf', '--locale', 'fr'))
-    .then(() => ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf', '--i18nFormat',
-      'xlf', '--locale', 'fr'))
     .then(() => expectFileToMatch('dist/main.bundle.js', /Bonjour i18n!/))
     .then(() => ng('build', '--aot'))
     .then(() => expectToFail(() => expectFileToMatch('dist/main.bundle.js', /Bonjour i18n!/)))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /Hello i18n!/));
+    .then(() => expectFileToMatch('dist/main.bundle.js', /Hello i18n!/))
+    .then(() => appendToFile('src/app/app.component.html',
+      '<p i18n>Other content</p>'))
+    .then(() => readFile('node_modules/@angular/compiler-cli/package.json')
+      .then((compilerCliPackage): any => {
+        const version = new Version(JSON.parse(compilerCliPackage).version);
+        if (version.major === 2) {
+          return expectToFail(() => ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf',
+            '--i18nFormat', 'xlf', '--locale', 'fr', '--missingTranslation', 'ignore'));
+        } else {
+          return ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf', '--i18nFormat',
+            'xlf', '--locale', 'fr', '--missingTranslation', 'ignore')
+            .then(() => expectFileToMatch('dist/main.bundle.js', /Other content/));
+        }
+      })
+    )
+    .then(() => readFile('node_modules/@angular/compiler-cli/package.json')
+      .then((compilerCliPackage): any => {
+        const version = new Version(JSON.parse(compilerCliPackage).version);
+        if (version.isGreaterThanOrEqualTo(new SemVer('4.2.0-beta.0')) || version.major === 2) {
+          return expectToFail(() => ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf',
+            '--i18nFormat', 'xlf', '--locale', 'fr', '--missingTranslation', 'error'));
+        } else {
+          return ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf',
+            '--i18nFormat', 'xlf', '--locale', 'fr', '--missingTranslation', 'error');
+        }
+      })
+    );
 }
