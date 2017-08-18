@@ -168,17 +168,6 @@ UI.prototype.stopProgress = function() {
 
 };
 
-UI.prototype.prompt = function(questions, callback) {
-  var inquirer = require('inquirer');
-
-  // If no callback was provided, automatically return a promise
-  if (callback) {
-    return inquirer.prompt(questions, callback);
-  }
-
-  return inquirer.prompt(questions);
-};
-
 /**
   @property WRITE_LEVELS
   @private
