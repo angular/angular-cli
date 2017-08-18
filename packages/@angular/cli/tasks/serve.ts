@@ -68,6 +68,9 @@ export default Task.extend({
     if (appConfig.platform === 'server') {
       throw new SilentError('ng serve for platform server applications is coming soon!');
     }
+    if (appConfig.platform === 'electron') {
+      throw new SilentError('ng serve for platform electron applications is not supported.');
+    }
     if (serveTaskOptions.deleteOutputPath) {
       fs.removeSync(path.resolve(this.project.root, outputPath));
     }

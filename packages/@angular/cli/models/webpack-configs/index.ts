@@ -3,6 +3,7 @@ export * from './common';
 export * from './development';
 export * from './production';
 export * from './server';
+export * from './electron';
 export * from './styles';
 export * from './test';
 export * from './typescript';
