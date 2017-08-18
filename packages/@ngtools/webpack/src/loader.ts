@@ -24,7 +24,7 @@ const changeMap: {[key: string]: Platform} = {
   }
 };
 
-function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
+function _getContentOfKeyLiteral(_source: ts.SourceFile, node?: ts.Node): string | null {
   if (!node) {
     return null;
   } else if (node.kind == ts.SyntaxKind.Identifier) {
@@ -73,6 +73,7 @@ function _angularImportsFromNode(node: ts.ImportDeclaration, _sourceFile: ts.Sou
     // This is of the form `import 'path';`. Nothing to do.
     return [];
   }
+  return [];
 }
 
 
@@ -224,8 +225,8 @@ function _replacePlatform(
 
 function _replaceBootstrapOrRender(refactor: TypeScriptFileRefactor, call: ts.CallExpression) {
   // If neither bootstrapModule or renderModule can't be found, bail out early.
-  let replacementTarget: string;
-  let identifier: ts.Identifier;
+  let replacementTarget: string | undefined;
+  let identifier: ts.Identifier | undefined;
   if (call.getText().includes('bootstrapModule')) {
     if (call.expression.kind != ts.SyntaxKind.PropertyAccessExpression) {
       return;
@@ -252,8 +253,9 @@ function _replaceBootstrapOrRender(refactor: TypeScriptFileRefactor, call: ts.Ca
 }
 
 
-function _getCaller(node: ts.Node): ts.CallExpression {
-  while (node = node.parent) {
+function _getCaller(node: ts.Node): ts.CallExpression | null {
+  while (node.parent) {
+    node = node.parent;
     if (node.kind === ts.SyntaxKind.CallExpression) {
       return node as ts.CallExpression;
     }
@@ -266,8 +268,9 @@ function _replaceEntryModule(plugin: AotPlugin, refactor: TypeScriptFileRefactor
   const modules = refactor.findAstNodes(refactor.sourceFile, ts.SyntaxKind.Identifier, true)
     .filter(identifier => identifier.getText() === plugin.entryModule.className)
     .filter(identifier =>
-      identifier.parent.kind === ts.SyntaxKind.CallExpression ||
-      identifier.parent.kind === ts.SyntaxKind.PropertyAssignment)
+      identifier.parent &&
+      (identifier.parent.kind === ts.SyntaxKind.CallExpression ||
+      identifier.parent.kind === ts.SyntaxKind.PropertyAssignment))
     .filter(node => !!_getCaller(node));
 
   if (modules.length == 0) {
@@ -282,7 +285,9 @@ function _replaceEntryModule(plugin: AotPlugin, refactor: TypeScriptFileRefactor
     .forEach(reference => {
       refactor.replaceNode(reference, factoryClassName);
       const caller = _getCaller(reference);
-      _replaceBootstrapOrRender(refactor, caller);
+      if (caller) {
+        _replaceBootstrapOrRender(refactor, caller);
+      }
     });
 }
 
@@ -309,7 +314,7 @@ function _removeModuleId(refactor: TypeScriptFileRefactor) {
   refactor.findAstNodes(sourceFile, ts.SyntaxKind.Decorator, true)
     .reduce((acc, node) => {
       return acc.concat(refactor.findAstNodes(node, ts.SyntaxKind.ObjectLiteralExpression, true));
-    }, [])
+    }, new Array<ts.Node>())
     // Get all their property assignments.
     .filter((node: ts.ObjectLiteralExpression) => {
       return node.properties.some(prop => {
@@ -496,7 +501,7 @@ export function _exportModuleMap(plugin: AotPlugin, refactor: TypeScriptFileRefa
         });
 
       modules.forEach((module, index) => {
-        const relativePath = path.relative(dirName, module.modulePath).replace(/\\/g, '/');
+        const relativePath = path.relative(dirName, module.modulePath!).replace(/\\/g, '/');
         refactor.prependBefore(node, `import * as __lazy_${index}__ from './${relativePath}'`);
       });
 
@@ -577,7 +582,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
               const messageText = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
 
               if (diagnostic.file) {
-                const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!);
                 const fileName = diagnostic.file.fileName;
                 const {line, character} = position;
                 message += `${fileName} (${line + 1},${character + 1}): ${messageText}\n`;
