@@ -12,7 +12,7 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
   // Check this file.
   const hasSymbol = refactor.findAstNodes(null, ts.SyntaxKind.ClassDeclaration)
     .some((cd: ts.ClassDeclaration) => {
-      return cd.name && cd.name.text == symbolName;
+      return cd.name != undefined && cd.name.text == symbolName;
     });
   if (hasSymbol) {
     return refactor.fileName;
@@ -64,7 +64,7 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
         const source = new TypeScriptFileRefactor(module, host, program);
         const hasSymbol = source.findAstNodes(null, ts.SyntaxKind.ClassDeclaration)
           .some((cd: ts.ClassDeclaration) => {
-            return cd.name && cd.name.text == symbolName;
+            return cd.name != undefined && cd.name.text == symbolName;
           });
 
         if (hasSymbol) {
@@ -101,13 +101,15 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
     }
 
     const module = resolvedModule.resolvedModule.resolvedFileName;
-    if (decl.importClause.namedBindings.kind == ts.SyntaxKind.NamespaceImport) {
+    if (decl.importClause.namedBindings
+        && decl.importClause.namedBindings.kind == ts.SyntaxKind.NamespaceImport) {
       const binding = decl.importClause.namedBindings as ts.NamespaceImport;
       if (binding.name.text == symbolName) {
         // This is a default export.
         return module;
       }
-    } else if (decl.importClause.namedBindings.kind == ts.SyntaxKind.NamedImports) {
+    } else if (decl.importClause.namedBindings
+               && decl.importClause.namedBindings.kind == ts.SyntaxKind.NamedImports) {
       const binding = decl.importClause.namedBindings as ts.NamedImports;
       for (const specifier of binding.elements) {
         if (specifier.name.text == symbolName) {

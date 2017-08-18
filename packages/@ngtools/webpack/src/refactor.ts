@@ -40,7 +40,7 @@ export class TypeScriptFileRefactor {
               _host: ts.CompilerHost,
               private _program?: ts.Program,
               source?: string | null) {
-    fileName = resolve(fileName, _host, _program).replace(/\\/g, '/');
+    fileName = resolve(fileName, _host, _program!).replace(/\\/g, '/');
     this._fileName = fileName;
     if (_program) {
       if (source) {
@@ -187,7 +187,7 @@ export class TypeScriptFileRefactor {
     this._changed = true;
   }
 
-  removeNodes(...nodes: ts.Node[]) {
+  removeNodes(...nodes: Array<ts.Node | null>) {
     nodes.forEach(node => node && this.removeNode(node));
   }
 

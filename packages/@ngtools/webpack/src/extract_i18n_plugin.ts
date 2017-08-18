@@ -21,7 +21,7 @@ export interface ExtractI18nPluginOptions {
 export class ExtractI18nPlugin implements Tapable {
   private _resourceLoader: WebpackResourceLoader;
 
-  private _donePromise: Promise<void>;
+  private _donePromise: Promise<void> | null;
   private _compiler: any = null;
   private _compilation: any = null;
 
@@ -35,9 +35,9 @@ export class ExtractI18nPlugin implements Tapable {
   private _compilerHost: ts.CompilerHost;
   private _program: ts.Program;
 
-  private _i18nFormat: string;
-  private _locale: string;
-  private _outFile: string;
+  private _i18nFormat?: string;
+  private _locale?: string;
+  private _outFile?: string;
 
   constructor(options: ExtractI18nPluginOptions) {
     this._setupOptions(options);
@@ -67,7 +67,7 @@ export class ExtractI18nPlugin implements Tapable {
       throw new Error(`An error happened while parsing ${this._tsConfigPath} JSON: ${err}.`);
     }
     const tsConfig = ts.parseJsonConfigFileContent(
-      tsConfigJson, ts.sys, basePath, null, this._tsConfigPath);
+      tsConfigJson, ts.sys, basePath, undefined, this._tsConfigPath);
 
     let fileNames = tsConfig.fileNames;
     if (options.hasOwnProperty('exclude')) {

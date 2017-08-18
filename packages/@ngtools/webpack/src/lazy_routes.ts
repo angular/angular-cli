@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import {TypeScriptFileRefactor} from './refactor';
 
 
-function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string {
+function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string | null {
   if (node.kind == ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
   } else if (node.kind == ts.SyntaxKind.StringLiteral) {
@@ -16,7 +16,7 @@ function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string 
 
 
 export interface LazyRouteMap {
-  [path: string]: string;
+  [path: string]: string | null;
 }
 
 

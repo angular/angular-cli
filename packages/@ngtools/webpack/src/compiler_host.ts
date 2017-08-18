@@ -59,7 +59,7 @@ export class VirtualDirStats extends VirtualStats {
 }
 
 export class VirtualFileStats extends VirtualStats {
-  private _sourceFile: ts.SourceFile;
+  private _sourceFile: ts.SourceFile | null;
   constructor(_fileName: string, private _content: string) {
     super(_fileName);
   }
@@ -93,8 +93,8 @@ export class VirtualFileStats extends VirtualStats {
 
 export class WebpackCompilerHost implements ts.CompilerHost {
   private _delegate: ts.CompilerHost;
-  private _files: {[path: string]: VirtualFileStats} = Object.create(null);
-  private _directories: {[path: string]: VirtualDirStats} = Object.create(null);
+  private _files: {[path: string]: VirtualFileStats | null} = Object.create(null);
+  private _directories: {[path: string]: VirtualDirStats | null} = Object.create(null);
 
   private _changedFiles: {[path: string]: boolean} = Object.create(null);
   private _changedDirs: {[path: string]: boolean} = Object.create(null);
@@ -233,7 +233,9 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   readFile(fileName: string): string {
     fileName = this._resolve(fileName);
-    if (this._files[fileName] == null) {
+
+    const stats = this._files[fileName];
+    if (stats == null) {
       const result = this._delegate.readFile(fileName);
       if (result !== undefined && this._cache) {
         this._setFileContent(fileName, result);
@@ -242,13 +244,14 @@ export class WebpackCompilerHost implements ts.CompilerHost {
         return result;
       }
     }
-    return this._files[fileName].content;
+    return stats.content;
   }
 
   directoryExists(directoryName: string): boolean {
     directoryName = this._resolve(directoryName);
     return (this._directories[directoryName] != null)
-        || this._delegate.directoryExists(directoryName);
+            || (this._delegate.directoryExists != undefined
+                && this._delegate.directoryExists(directoryName));
   }
 
   getFiles(path: string): string[] {
@@ -276,18 +279,19 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, _onError?: OnErrorFn) {
     fileName = this._resolve(fileName);
 
-    if (this._files[fileName] == null) {
+    const stats = this._files[fileName];
+    if (stats == null) {
       const content = this.readFile(fileName);
       if (!this._cache) {
         return ts.createSourceFile(fileName, content, languageVersion, this._setParentNodes);
       }
     }
 
-    return this._files[fileName].getSourceFile(languageVersion, this._setParentNodes);
+    return this._files[fileName]!.getSourceFile(languageVersion, this._setParentNodes);
   }
 
   getCancellationToken() {
-    return this._delegate.getCancellationToken();
+    return this._delegate.getCancellationToken!();
   }
 
   getDefaultLibFileName(options: ts.CompilerOptions) {
