@@ -85,7 +85,7 @@
           },
           "platform": {
             "type": "string",
-            "enum": ["browser", "server"],
+            "enum": ["browser", "server", "electron"],
             "default": "browser",
             "description": "The runtime platform of the app."
           },

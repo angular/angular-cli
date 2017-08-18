@@ -8,6 +8,7 @@ import {
   getProdConfig,
   getStylesConfig,
   getServerConfig,
+  getElectronConfig,
   getNonAotConfig,
   getAotConfig
 } from './webpack-configs';
@@ -38,7 +39,10 @@ export class NgCliWebpackConfig {
 
   public buildConfig() {
     const platformConfig = this.wco.appConfig.platform === 'server' ?
-      getServerConfig(this.wco) : getBrowserConfig(this.wco);
+    getServerConfig(this.wco) :
+            this.wco.appConfig.platform === 'electron' ?
+              getElectronConfig(this.wco) :
+              getBrowserConfig(this.wco);
 
     let webpackConfigs = [
       getCommonConfig(this.wco),
