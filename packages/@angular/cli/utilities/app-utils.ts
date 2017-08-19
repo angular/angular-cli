@@ -6,7 +6,7 @@ import { CliConfig } from '../models/config';
 
 export function getAppFromConfig(nameOrIndex?: String) {
   const apps: any[] = CliConfig.getValue('apps');
-  if (!apps) {
+  if (!apps || apps.length === 0) {
     throw new SilentError(chalk.red('Unable to find any apps in `.angular-cli.json`.'));
   }
 

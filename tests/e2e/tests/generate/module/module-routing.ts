@@ -5,7 +5,7 @@ import {expectToFail} from '../../../utils/utils';
 
 
 export default function() {
-  const moduleDir = join('src', 'app', 'test');
+  const moduleDir = join('apps', 'myapp', 'src', 'app', 'test');
 
   return ng('generate', 'module', 'test', '--routing')
     .then(() => expectFileToExist(moduleDir))

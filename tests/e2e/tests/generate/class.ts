@@ -4,7 +4,7 @@ import {expectFileToExist} from '../../utils/fs';
 
 
 export default function() {
-  const classDir = join('src', 'app');
+  const classDir = join('apps', 'myapp', 'src', 'app');
 
   return ng('generate', 'class', 'test-class', '--spec')
     .then(() => expectFileToExist(classDir))

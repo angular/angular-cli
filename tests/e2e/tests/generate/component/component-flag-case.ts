@@ -4,7 +4,7 @@ import {expectFileToMatch} from '../../../utils/fs';
 
 
 export default function() {
-  const compDir = join('src', 'app', 'test');
+  const compDir = join('apps', 'myapp', 'src', 'app', 'test');
 
   return Promise.resolve()
     .then(() => ng('generate', 'component', 'test', '-cd', 'onpush', '-ve', 'emulated'))

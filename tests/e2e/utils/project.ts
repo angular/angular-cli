@@ -5,7 +5,7 @@ import { getGlobalVariable } from './env';
 const packages = require('../../../lib/packages').packages;
 
 
-const tsConfigPath = 'src/tsconfig.app.json';
+const tsConfigPath = 'tsconfig.json';
 
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
@@ -248,11 +248,5 @@ export function useNg2() {
         json['devDependencies'][pkgName] = ng2Deps['devDependencies'][pkgName];
       });
       console.log(JSON.stringify(json))
-    }))
-    .then(() => updateJsonFile('src/tsconfig.app.json', json =>
-      Object.assign(json, tsconfigAppJson)))
-    .then(() => updateJsonFile('src/tsconfig.spec.json', json =>
-      Object.assign(json, tsconfigSpecJson)))
-    .then(() => updateJsonFile('e2e/tsconfig.e2e.json', json =>
-      Object.assign(json, tsconfigE2eJson)));
+    }));
 }

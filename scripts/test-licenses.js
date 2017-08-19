@@ -82,7 +82,8 @@ const ignoredPackages = [
   'uglify-js@2.3.6', // BSD, but doesn't list it in package.json
   'undefined@undefined', // Test package with no name nor version.
   'verror@1.3.6', // Looks like MIT
-  'xmldom@0.1.27' // LGPL,MIT but has a broken licenses array
+  'xmldom@0.1.27', // LGPL,MIT but has a broken licenses array,
+  'jasmine-marbles@0.1.0' // MIT but doesn't list it in package.json
 ];
 
 const root = path.resolve(__dirname, '../');

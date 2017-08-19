@@ -144,7 +144,11 @@ const NewCommand = Command.extend({
       `);
     }
 
-    commandOptions.collectionName = this.getCollectionName(rawArgs);
+    // rawArgs got mutated, so --collection is no longer there.
+    commandOptions.collectionName = commandOptions.collection;
+    if (! commandOptions.collectionName) {
+      commandOptions.collectionName = this.getCollectionName(rawArgs);
+    }
 
     const initCommand = new InitCommand({
       ui: this.ui,

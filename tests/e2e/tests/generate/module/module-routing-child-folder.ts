@@ -7,7 +7,7 @@ import { expectToFail } from '../../../utils/utils';
 
 export default function () {
   const root = process.cwd();
-  const testPath = join(root, 'src', 'app');
+  const testPath = join(root, 'apps', 'myapp', 'src', 'app');
 
   process.chdir(testPath);
   fs.mkdirSync('./sub-dir');

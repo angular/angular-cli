@@ -12,6 +12,7 @@ import {
 } from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';
+import {execSync} from 'child_process';
 
 
 let packages = require('../../../lib/packages').packages;
@@ -32,7 +33,7 @@ export default function() {
   } else {
     // Otherwise create a project from scratch.
     createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--skip-install'))
+      .then(() => ng('new', 'test-project', '--collection=@nrwl/nx', '--skip-install'))
       .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
       .then(() => process.chdir('./test-project'));
   }
@@ -44,8 +45,9 @@ export default function() {
     .then(() => useCIDefaults())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
-    // npm link on Circle CI is very noisy.
     .then(() => silentNpm('install'))
+    .then(() => ng('generate', 'app', 'myapp'))
+    .then(() => execSync('bazel build :init'))
     // Force sourcemaps to be from the root of the filesystem.
     .then(() => updateTsConfig(json => {
       json['compilerOptions']['sourceRoot'] = '/';

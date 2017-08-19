@@ -3,9 +3,9 @@ import { ng } from '../../../utils/process';
 import { expectFileToMatch } from '../../../utils/fs';
 
 export default function () {
-  const modulePath = join('src', 'app', 'app.module.ts');
-  const subModulePath = join('src', 'app', 'sub', 'sub.module.ts');
-  const deepSubModulePath = join('src', 'app', 'sub', 'deep', 'deep.module.ts');
+  const modulePath = join('apps', 'myapp', 'src', 'app', 'app.module.ts');
+  const subModulePath = join('apps', 'myapp', 'src', 'app', 'sub', 'sub.module.ts');
+  const deepSubModulePath = join('apps', 'myapp', 'src', 'app', 'sub', 'deep', 'deep.module.ts');
 
   return Promise.resolve()
     .then(() => ng('generate', 'module', 'sub'))
@@ -28,9 +28,9 @@ export default function () {
 
     .then(() => ng('generate', 'module', 'test4', '--routing', '--module', 'app'))
     .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test4Module(.|\s)*\]/m))
-    .then(() => expectFileToMatch(join('src', 'app', 'test4', 'test4.module.ts'),
+    .then(() => expectFileToMatch(join('apps', 'myapp', 'src', 'app', 'test4', 'test4.module.ts'),
       /import { Test4RoutingModule } from '.\/test4-routing.module'/))
-    .then(() => expectFileToMatch(join('src', 'app', 'test4', 'test4.module.ts'),
+    .then(() => expectFileToMatch(join('apps', 'myapp', 'src', 'app', 'test4', 'test4.module.ts'),
       /imports: \[(.|\s)*Test4RoutingModule(.|\s)*\]/m))
 
     .then(() => ng('generate', 'module', 'test5', '--module', 'sub'))
