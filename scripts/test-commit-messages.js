@@ -31,15 +31,15 @@ logger
     process.exit(1);
   });
 
-// Note: This is based on the gulp task found in the angular/angular repository
-execSync('git fetch origin');
-// Travis doesn't have master when running jobs on other branches (minor/patch/etc).
-execSync('git fetch origin master:master');
-
 // Get PR target branch, default to master for running locally.
 const currentBranch = process.env.TRAVIS_BRANCH
   || process.env.APPVEYOR_REPO_BRANCH
   || 'master';
+
+// Note: This is based on the gulp task found in the angular/angular repository
+execSync('git fetch origin');
+// Travis doesn't have master when running jobs on other branches (minor/patch/etc).
+execSync(`git fetch origin ${currentBranch}:${currentBranch}`);
 
 const output = execSync('git log ' + currentBranch + '..HEAD --reverse --format="%H %s" --no-merges', {
   encoding: 'utf-8'
@@ -52,7 +52,7 @@ if (output.length === 0) {
 const commitsByLine = output.trim().split(/\n/).map(line => {
   return line.trim().split(' ').slice(1).join(' ');
 });
-logger.info(`Examining ${commitsByLine.length} commit(s) between HEAD and master`);
+logger.info(`Examining ${commitsByLine.length} commit(s) between HEAD and ${currentBranch}`);
 
 const someCommitsInvalid = !commitsByLine.every(message => validateCommitMessage(message));
 
