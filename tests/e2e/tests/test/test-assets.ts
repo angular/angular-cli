@@ -14,10 +14,10 @@ export default function () {
 
   return Promise.resolve()
     .then(() => writeMultipleFiles({
-      'src/assets/file.txt': 'assets-folder-content',
-      'src/file.txt': 'file-content',
+      'apps/myapp/src/assets/file.txt': 'assets-folder-content',
+      'apps/myapp/src/file.txt': 'file-content',
       // Not using `async()` in tests as it seemed to swallow `fetch()` errors
-      'src/app/app.component.spec.ts': stripIndent`
+      'apps/myapp/src/app/app.component.spec.ts': stripIndent`
         describe('Test Runner', () => {
           const fetch = global['fetch'];
           it('should serve files in assets folder', (done) => {

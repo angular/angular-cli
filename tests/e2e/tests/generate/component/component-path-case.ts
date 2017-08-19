@@ -5,7 +5,7 @@ import {expectFileToExist} from '../../../utils/fs';
 
 export default function() {
   const upperDirs = join('non', 'existing', 'dir');
-  const rootDir = join('src', 'app', upperDirs);
+  const rootDir = join('apps', 'myapp', 'src', 'app', upperDirs);
 
   const componentDir = join(rootDir, 'test-component');
   const componentTwoDir = join(rootDir, 'test-component-two');

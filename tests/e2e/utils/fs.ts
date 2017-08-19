@@ -1,6 +1,8 @@
 import * as fs from 'fs-extra';
 import {dirname} from 'path';
 import {stripIndents} from 'common-tags';
+import {execSync} from 'child_process';
+import {bazelBinDirectory} from '../../../packages/@angular/cli/utilities/bazel-utils';
 
 
 export function readFile(fileName: string) {
@@ -166,6 +168,8 @@ export function expectFileToExist(fileName: string) {
 }
 
 export function expectFileToMatch(fileName: string, regEx: RegExp | string) {
+  fileName = fileName.replace('__DIST__', bazelBinDirectory());
+
   return readFile(fileName)
     .then(content => {
       if (typeof regEx == 'string') {

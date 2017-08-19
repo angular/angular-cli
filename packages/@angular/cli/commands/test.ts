@@ -10,7 +10,6 @@ const testConfigDefaults = config.getPaths('defaults.build', [
 
 export interface TestOptions {
   watch?: boolean;
-  codeCoverage?: boolean;
   singleRun?: boolean;
   browsers?: string;
   colors?: boolean;
@@ -21,7 +20,6 @@ export interface TestOptions {
   progress?: boolean;
   config: string;
   poll?: number;
-  environment?: string;
   app?: string;
 }
 
@@ -38,13 +36,6 @@ const TestCommand = Command.extend({
       type: Boolean,
       aliases: ['w'],
       description: 'Run build when files change.'
-    },
-    {
-      name: 'code-coverage',
-      type: Boolean,
-      default: false,
-      aliases: ['cc'],
-      description: 'Coverage report will be in the coverage/ directory.'
     },
     {
       name: 'config',
@@ -96,18 +87,6 @@ const TestCommand = Command.extend({
       default: true,
       aliases: ['sm', 'sourcemap'],
       description: 'Output sourcemaps.'
-    },
-    {
-      name: 'poll',
-      type: Number,
-      default: testConfigDefaults['poll'],
-      description: 'Enable and define the file watching poll time period (milliseconds).'
-    },
-    {
-      name: 'environment',
-      type: String,
-      aliases: ['e'] ,
-      description: 'Defines the build environment.'
     },
     {
       name: 'app',
