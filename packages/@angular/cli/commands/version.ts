@@ -31,7 +31,7 @@ const VersionCommand = Command.extend({
     versions.os = process.platform + ' ' + process.arch;
 
     const alwaysPrint = ['node', 'os'];
-    const roots = ['@angular/', '@ngtools/', 'typescript'];
+    const roots = ['@angular/', '@ngtools/'];
 
     let ngCliVersion = pkg.version;
     if (!__dirname.match(/node_modules/)) {
