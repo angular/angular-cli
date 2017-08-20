@@ -21,11 +21,11 @@ export interface Schema {
     /**
      * Specifies the view encapsulation strategy.
      */
-    viewEncapsulation?: ("Emulated" | "Native" | "None");
+    viewEncapsulation?: ('Emulated' | 'Native' | 'None');
     /**
      * Specifies the change detection strategy.
      */
-    changeDetection?: ("Default" | "OnPush");
+    changeDetection?: ('Default' | 'OnPush');
     routing?: boolean;
     /**
      * The prefix to apply to generated selectors.
