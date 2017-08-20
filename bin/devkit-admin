@@ -30,33 +30,6 @@ const scriptPath = path.join('../scripts', scriptName);
 process.chdir(path.join(__dirname, '..'));
 
 
-// Check if we need to profile this CLI run.
-let profiler = null;
-if (process.env['DEVKIT_PROFILING']) {
-  profiler = require('v8-profiler');
-  profiler.startProfiling();
-
-  function exitHandler(options, _err) {
-    if (options.cleanup) {
-      const cpuProfile = profiler.stopProfiling();
-      const profileData = JSON.stringify(cpuProfile);
-      const filePath = path.resolve(process.cwd(), process.env.DEVKIT_PROFILING) + '.cpuprofile';
-
-      console.log(`Profiling data saved in "${filePath}": ${profileData.length} bytes`);
-      fs.writeFileSync(filePath, profileData);
-    }
-
-    if (options.exit) {
-      process.exit();
-    }
-  }
-
-  process.on('exit', exitHandler.bind(null, { cleanup: true }));
-  process.on('SIGINT', exitHandler.bind(null, { exit: true }));
-  process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
-}
-
-
 // This might get awkward, so we fallback to console if there was an error.
 let logger = null;
 try {
