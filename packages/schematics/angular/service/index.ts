@@ -8,6 +8,7 @@
 import {
   Rule,
   SchematicContext,
+  SchematicsError,
   Tree,
   apply,
   branchAndMerge,
@@ -36,7 +37,16 @@ function addProviderToNgModule(options: ServiceOptions): Rule {
     }
 
     const modulePath = options.module;
-    const sourceText = host.read(modulePath) !.toString('utf-8');
+    if (!host.exists(options.module)) {
+      throw new Error('Specified module does not exist');
+    }
+
+    const text = host.read(modulePath);
+    if (text === null) {
+      throw new SchematicsError(`File ${modulePath} does not exist.`);
+    }
+    const sourceText = text.toString('utf-8');
+
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
     const servicePath = `/${options.sourceDir}/${options.path}/`
@@ -61,6 +71,10 @@ function addProviderToNgModule(options: ServiceOptions): Rule {
 
 export default function (options: ServiceOptions): Rule {
   options.path = options.path ? normalizePath(options.path) : options.path;
+  const sourceDir = options.sourceDir;
+  if (!sourceDir) {
+    throw new SchematicsError(`sourceDir option is required.`);
+  }
 
   return (host: Tree, context: SchematicContext) => {
     if (options.module) {
@@ -74,7 +88,7 @@ export default function (options: ServiceOptions): Rule {
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options as object,
       }),
-      move(options.sourceDir !),
+      move(sourceDir),
     ]);
 
     return chain([

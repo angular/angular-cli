@@ -8,6 +8,7 @@
 import {
   Rule,
   SchematicContext,
+  SchematicsError,
   Tree,
   apply,
   branchAndMerge,
@@ -36,7 +37,11 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 
     const modulePath = options.module;
 
-    const sourceText = host.read(modulePath) !.toString('utf-8');
+    const text = host.read(modulePath);
+    if (text === null) {
+      throw new SchematicsError(`File ${modulePath} does not exist.`);
+    }
+    const sourceText = text.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
     const importModulePath = `/${options.sourceDir}/${options.path}/`
@@ -62,6 +67,10 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 
 export default function (options: ModuleOptions): Rule {
   options.path = options.path ? normalizePath(options.path) : options.path;
+  const sourceDir = options.sourceDir;
+  if (!sourceDir) {
+    throw new SchematicsError(`sourceDir option is required.`);
+  }
 
   return (host: Tree, context: SchematicContext) => {
     if (options.module) {
@@ -76,7 +85,7 @@ export default function (options: ModuleOptions): Rule {
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options as object,
       }),
-      move(options.sourceDir !),
+      move(sourceDir),
     ]);
 
     return chain([

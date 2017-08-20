@@ -42,8 +42,8 @@ export default function (_: {}, logger: Logger) {
 
   const commits = log.split(/\n/)
     .map(i => i.match(/(^[0-9a-f]+) (.+)$/))
-    .filter(x => !!x)
-    .map(x => Array.from(x !).slice(1));
+    .map(x => x ? Array.from(x).slice(1) : null)
+    .filter(x => !!x) as [string, string][];
   logger.info(`Found ${commits.length} commits...`);
 
   const output = new Logger('check', logger);

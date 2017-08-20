@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable:non-null-operator
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 import { SchematicContext } from '../engine/interface';

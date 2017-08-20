@@ -55,8 +55,9 @@ function istanbulDevKitRequireHook(code: string, filename: string) {
   if (filename.match(/_spec\.ts$/)) {
     return code;
   }
-  if (codeMap.get(filename)) {
-    return codeMap.get(filename)!.code;
+  const codeFile = codeMap.get(filename);
+  if (codeFile) {
+    return codeFile.code;
   }
 
   const instrumenter = new Istanbul.Instrumenter({

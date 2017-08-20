@@ -7,6 +7,7 @@
 */
 import {
   Rule,
+  SchematicsError,
   apply,
   branchAndMerge,
   chain,
@@ -22,13 +23,17 @@ import { Schema as EnumOptions } from './schema';
 
 export default function (options: EnumOptions): Rule {
   options.path = options.path ? normalizePath(options.path) : options.path;
+  const sourceDir = options.sourceDir;
+  if (!sourceDir) {
+    throw new SchematicsError(`sourceDir option is required.`);
+  }
 
   const templateSource = apply(url('./files'), [
     template({
       ...stringUtils,
       ...options as object,
     }),
-    move(options.sourceDir !),
+    move(sourceDir),
   ]);
 
   return chain([

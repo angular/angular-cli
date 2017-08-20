@@ -57,13 +57,14 @@ function _getHashOf(pkg: PackageInfo): string {
     hashCache[pkg.name] = (md5Stream.read() as Buffer).toString('hex');
   }
 
-  if (!hashCache[pkg.name]) {
+  const value = hashCache[pkg.name];
+  if (!value) {
     // Protect against circular dependency.
     throw new Error('Circular dependency detected between the following packages: '
       + Object.keys(hashCache).filter(key => hashCache[key] == null).join(', '));
   }
 
-  return hashCache[pkg.name] !;
+  return value;
 }
 
 

@@ -68,11 +68,11 @@ function usage(exitCode = 0): never {
 function parseSchematicName(str: string | null): { collection: string, schematic: string } {
   let collection = '@schematics/angular';
 
-  if (!str) {
+  if (!str || str === null) {
     usage(1);
   }
 
-  let schematic: string = str !;
+  let schematic: string = str as string;
   if (schematic.indexOf(':') != -1) {
     [collection, schematic] = schematic.split(':', 2);
 
@@ -112,8 +112,8 @@ const engine = new SchematicEngine(engineHost);
 
 // Add support for schemaJson.
 engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options: {}) => {
-  if (schematic.schema) {
-    const SchemaMetaClass = SchemaClassFactory<{}>(schematic.schemaJson !);
+  if (schematic.schema && schematic.schemaJson) {
+    const SchemaMetaClass = SchemaClassFactory<{}>(schematic.schemaJson);
     const schemaClass = new SchemaMetaClass(options);
 
     return schemaClass.$$root();

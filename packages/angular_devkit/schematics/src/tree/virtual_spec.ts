@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable:non-null-operator
 import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import { FileSystemTree } from './filesystem';
 import { FileEntry, MergeStrategy } from './interface';

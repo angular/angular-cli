@@ -4,6 +4,7 @@
   ],
   "rules": {
     "import-groups": true,
+    "non-null-operator": true,
 
     "import-blacklist": [
       true,

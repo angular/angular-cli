@@ -83,7 +83,14 @@ export function transformJavascript(
     k, ts.createSourceFile(k, v, ts.ScriptTarget.ES2015)));
 
   const host: ts.CompilerHost = {
-    getSourceFile: (fileName) => sourcesMap.get(fileName)!,
+    getSourceFile: (fileName) => {
+      const sourceFile = sourcesMap.get(fileName);
+      if (!sourceFile) {
+        throw new Error(`File ${fileName} does not have a sourceFile.`);
+      }
+
+      return sourceFile;
+    },
     getDefaultLibFileName: () => defaultLibFileName,
     getCurrentDirectory: () => '',
     getDirectories: () => [],
@@ -91,7 +98,14 @@ export function transformJavascript(
     useCaseSensitiveFileNames: () => true,
     getNewLine: () => '\n',
     fileExists: (fileName) => fileMap.has(fileName),
-    readFile: (fileName) => fileMap.has(fileName) ? fileMap.get(fileName)! : '',
+    readFile: (fileName) => {
+      const content = fileMap.get(fileName);
+      if (!content) {
+        throw new Error(`File ${fileName} does not exist.`);
+      }
+
+      return content;
+    },
     writeFile: (fileName, text) => outputs.set(fileName, text),
   };
 

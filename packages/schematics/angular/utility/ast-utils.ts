@@ -98,8 +98,11 @@ export function insertAfterLastOccurrence(nodes: ts.Node[],
                                           fallbackPos: number,
                                           syntaxKind?: ts.SyntaxKind): Change {
   let lastItem = nodes.sort(nodesByPosition).pop();
+  if (!lastItem) {
+    throw new Error();
+  }
   if (syntaxKind) {
-    lastItem = findNodes(lastItem !, syntaxKind).sort(nodesByPosition).pop();
+    lastItem = findNodes(lastItem, syntaxKind).sort(nodesByPosition).pop();
   }
   if (!lastItem && fallbackPos == undefined) {
     throw new Error(`tried to insert ${toInsert} as first occurence with no fallback position`);
@@ -124,7 +127,7 @@ export function getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): s
 function _angularImportsFromNode(node: ts.ImportDeclaration,
                                  _sourceFile: ts.SourceFile): {[name: string]: string} {
   const ms = node.moduleSpecifier;
-  let modulePath: string | null = null;
+  let modulePath: string;
   switch (ms.kind) {
     case ts.SyntaxKind.StringLiteral:
       modulePath = (ms as ts.StringLiteral).text;
@@ -155,7 +158,7 @@ function _angularImportsFromNode(node: ts.ImportDeclaration,
         return namedImports.elements
           .map((is: ts.ImportSpecifier) => is.propertyName ? is.propertyName.text : is.name.text)
           .reduce((acc: {[name: string]: string}, curr: string) => {
-            acc[curr] = modulePath !;
+            acc[curr] = modulePath;
 
             return acc;
           }, {});

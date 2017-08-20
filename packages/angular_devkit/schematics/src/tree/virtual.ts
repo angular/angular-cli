@@ -154,7 +154,8 @@ export class VirtualTree implements Tree {
     this.set(new SimpleFileEntry(path, content as Buffer));
   }
   protected _rename(path: SchematicPath, to: SchematicPath, action?: Action, force = false) {
-    if (!this._cacheMap.has(path)) {
+    const entry = this.get(path);
+    if (!entry) {
       throw new FileDoesNotExistException(path);
     }
     if (this._cacheMap.has(to) && !force) {
@@ -167,7 +168,6 @@ export class VirtualTree implements Tree {
       this._actions.rename(path, to);
     }
 
-    const entry = this.get(path) !;
     this.set(new SimpleFileEntry(to, entry.content));
     this._cacheMap.delete(path);
   }

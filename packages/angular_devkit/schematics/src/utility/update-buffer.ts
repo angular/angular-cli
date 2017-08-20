@@ -210,10 +210,10 @@ export class UpdateBuffer {
     }
 
     if (start == h.end && h.next !== null) {
-      return [h !, h.next !];
+      return [h, h.next];
     }
 
-    return [h !, h.slice(start) !];
+    return [h, h.slice(start)];
   }
 
   get length(): number {

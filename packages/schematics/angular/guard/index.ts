@@ -8,6 +8,7 @@
 import {
   Rule,
   SchematicContext,
+  SchematicsError,
   Tree,
   apply,
   branchAndMerge,
@@ -36,7 +37,12 @@ function addDeclarationToNgModule(options: GuardOptions): Rule {
     }
 
     const modulePath = options.module;
-    const sourceText = host.read(modulePath) !.toString('utf-8');
+    const text = host.read(modulePath);
+    if (text === null) {
+      throw new SchematicsError(`File ${modulePath} does not exist.`);
+    }
+    const sourceText = text.toString('utf-8');
+
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
     const guardPath = `/${options.sourceDir}/${options.path}/`
@@ -61,6 +67,10 @@ function addDeclarationToNgModule(options: GuardOptions): Rule {
 
 export default function (options: GuardOptions): Rule {
   options.path = options.path ? normalizePath(options.path) : options.path;
+  const sourceDir = options.sourceDir;
+  if (!sourceDir) {
+    throw new SchematicsError(`sourceDir option is required.`);
+  }
 
   return (host: Tree, context: SchematicContext) => {
     if (options.module) {
@@ -73,7 +83,7 @@ export default function (options: GuardOptions): Rule {
         ...stringUtils,
         ...options as object,
       }),
-      move(options.sourceDir !),
+      move(sourceDir),
     ]);
 
     return chain([

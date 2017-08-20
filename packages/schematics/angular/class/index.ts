@@ -7,6 +7,7 @@
 */
 import {
   Rule,
+  SchematicsError,
   apply,
   branchAndMerge,
   chain,
@@ -25,6 +26,10 @@ import { Schema as ClassOptions } from './schema';
 export default function (options: ClassOptions): Rule {
   options.type = !!options.type ? `.${options.type}` : '';
   options.path = options.path ? normalizePath(options.path) : options.path;
+  const sourceDir = options.sourceDir;
+  if (!sourceDir) {
+    throw new SchematicsError(`sourceDir option is required.`);
+  }
 
   const templateSource = apply(url('./files'), [
     options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
@@ -32,7 +37,7 @@ export default function (options: ClassOptions): Rule {
       ...stringUtils,
       ...options as object,
     }),
-    move(options.sourceDir !),
+    move(sourceDir),
   ]);
 
   return chain([

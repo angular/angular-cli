@@ -98,7 +98,7 @@ export default function (options: ApplicationOptions): Rule {
             'dot': '.',
             ...options as object,
           }),
-        move(options.directory),
+          move(options.directory),
         ])),
       schematic('module', {
         name: 'app',
@@ -115,7 +115,7 @@ export default function (options: ApplicationOptions): Rule {
         flat: true,
         ...componentOptions,
       }),
-    addBootstrapToNgModule(options.directory),
+      addBootstrapToNgModule(options.directory),
       mergeWith(
         apply(url('./other-files'), [
           componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
