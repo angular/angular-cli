@@ -9,6 +9,7 @@ import {
   MergeStrategy,
   Rule,
   SchematicContext,
+  SchematicsError,
   Tree,
   apply,
   chain,
@@ -30,7 +31,11 @@ import { Schema as ApplicationOptions } from './schema';
 function addBootstrapToNgModule(directory: string): Rule {
   return (host: Tree) => {
     const modulePath = `${directory}/src/app/app.module.ts`;
-    const sourceText = host.read(modulePath) !.toString('utf-8');
+    const content = host.read(modulePath);
+    if (!content) {
+      throw new SchematicsError(`File ${modulePath} does not exist.`);
+    }
+    const sourceText = content.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
     const componentModule = './app.component';
@@ -93,7 +98,7 @@ export default function (options: ApplicationOptions): Rule {
             'dot': '.',
             ...options as object,
           }),
-          move(options.directory !),
+        move(options.directory),
         ])),
       schematic('module', {
         name: 'app',
@@ -110,7 +115,7 @@ export default function (options: ApplicationOptions): Rule {
         flat: true,
         ...componentOptions,
       }),
-      addBootstrapToNgModule(options.directory !),
+    addBootstrapToNgModule(options.directory),
       mergeWith(
         apply(url('./other-files'), [
           componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),

@@ -10,7 +10,7 @@ export interface Schema {
     /**
      * The directory name to create the app in.
      */
-    directory?: string;
+    directory: string;
     path?: string;
     sourceDir?: string;
     name: string;

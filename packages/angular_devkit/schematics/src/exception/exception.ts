@@ -13,6 +13,10 @@ export class BaseException extends Error {
 }
 
 
+// Used by schematics to throw exceptions.
+export class SchematicsError extends BaseException {}
+
+
 // Exceptions
 export class FileDoesNotExistException extends BaseException {
   constructor(path: string) { super(`Path "${path}" does not exist.`); }

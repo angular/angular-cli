@@ -10,7 +10,7 @@ import {Tree as TreeInterface } from './tree/interface';
 import { branch, empty, merge, optimize, partition } from './tree/static';
 
 
-export { BaseException } from './exception/exception';
+export { SchematicsError } from './exception/exception';
 
 export * from './tree/action';
 export * from './engine/collection';
