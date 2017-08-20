@@ -82,6 +82,7 @@
     - *baseHref* (`string`): Base url for the application being built.
     - *progress* (`boolean`): Log progress to the console while building. Default is `true`.
     - *poll* (`number`): Enable and define the file watching poll time period (milliseconds).
+    - *ignored* (`string|array`): Avoid rebuilding files when files matching this [anymatch](https://github.com/es128/anymatch) pattern fails.
     - *deleteOutputPath* (`boolean`): Delete output path before build. Default is `true`.
     - *preserveSymlinks* (`boolean`): Do not use the real path when resolving modules. Default is `false`.
     - *showCircularDependencies* (`boolean`): Show circular dependency warnings on builds. Default is `true`.

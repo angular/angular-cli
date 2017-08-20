@@ -473,6 +473,20 @@
               "description": "Enable and define the file watching poll time period (milliseconds).",
               "type": "number"
             },
+            "ignored": {
+              "description": "Avoid rebuilding files when files matching this anymatch pattern fails.",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
             "deleteOutputPath": {
               "description": "Delete output path before build.",
               "type": "boolean",
