@@ -42,6 +42,7 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
 
     extraRules.push({
       test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
+      options: { esModules: true },
       enforce: 'post',
       exclude
     });
