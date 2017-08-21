@@ -579,7 +579,7 @@ export class AotPlugin implements Tapable {
 
         cb();
       }, (err: any) => {
-        compilation.errors.push(err);
+        compilation.errors.push(err.stack);
         cb();
       });
   }
