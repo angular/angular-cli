@@ -11,6 +11,7 @@ interface IWebpackDevServerConfigurationOptions {
   filename?: string;
   watchOptions?: {
     aggregateTimeout?: number;
+    ignored?: string | string[];
     poll?: number;
   };
   publicPath?: string;
