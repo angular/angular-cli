@@ -51,6 +51,10 @@ export default Task.extend({
     const project = this.project;
     const packageName = commandOptions.name !== '.' && commandOptions.name || project.name();
 
+    if (commandOptions.style === undefined) {
+      commandOptions.style = CliConfig.fromGlobal().get('defaults.styleExt');
+    }
+
     if (!packageName) {
       const message = 'The `ng ' + this.name + '` command requires a ' +
         'package.json in current folder with name attribute or a specified name via arguments. ' +
