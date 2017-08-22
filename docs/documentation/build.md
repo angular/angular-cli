@@ -350,7 +350,7 @@ Note: service worker support is experimental and subject to change.
 <details>
   <summary>build-optimizer</summary>
   <p>
-    <code>--build-optimizer</code> (aliases: <code>-bo</code>)
+    <code>--build-optimizer</code>
   </p>
   <p>
     (Experimental) Enables @angular-devkit/build-optimizer optimizations when using `--aot`.
