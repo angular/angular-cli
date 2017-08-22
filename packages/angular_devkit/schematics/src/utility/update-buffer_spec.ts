@@ -159,6 +159,14 @@ describe('UpdateBuffer', () => {
       expect(() => mb.insertRight(6, new Buffer('B'), true)).toThrow();
       expect(mb.toString()).toBe('01234A');
     });
+
+    it('works for content at start/end of buffer', () => {
+      const buffer = new UpdateBuffer(new Buffer('012345'));
+      buffer.insertLeft(0, new Buffer('ABC'));
+      buffer.insertRight(6, new Buffer('DEF'));
+      buffer.remove(0, 6);
+      expect(buffer.toString()).toBe('ABC');
+    });
   });
 
   describe('generate', () => {
