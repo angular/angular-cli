@@ -6,6 +6,7 @@ import * as SourceMap from 'source-map';
 
 const {__NGTOOLS_PRIVATE_API_2, VERSION} = require('@angular/compiler-cli');
 const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
+const NodeWatchFileSystem = require('webpack/lib/node/NodeWatchFileSystem');
 
 import {WebpackResourceLoader} from './resource_loader';
 import {WebpackCompilerHost} from './compiler_host';
@@ -13,6 +14,7 @@ import {resolveEntryModuleFromMain} from './entry_resolver';
 import {Tapable} from './webpack';
 import {PathsPlugin} from './paths-plugin';
 import {findLazyRoutes, LazyRouteMap} from './lazy_routes';
+import {VirtualFileSystemDecorator} from './virtual_file_system_decorator';
 
 
 /**
@@ -308,16 +310,18 @@ export class AotPlugin implements Tapable {
   apply(compiler: any) {
     this._compiler = compiler;
 
+    // Decorate inputFileSystem to serve contents of CompilerHost.
+    // Use decorated inputFileSystem in watchFileSystem.
+    compiler.plugin('environment', () => {
+      compiler.inputFileSystem = new VirtualFileSystemDecorator(
+        compiler.inputFileSystem, this._compilerHost);
+      compiler.watchFileSystem = new NodeWatchFileSystem(compiler.inputFileSystem);
+    });
+
     compiler.plugin('invalid', () => {
       // Turn this off as soon as a file becomes invalid and we're about to start a rebuild.
       this._firstRun = false;
       this._diagnoseFiles = {};
-
-      if (compiler.watchFileSystem.watcher) {
-        compiler.watchFileSystem.watcher.once('aggregated', (changes: string[]) => {
-          changes.forEach((fileName: string) => this._compilerHost.invalidate(fileName));
-        });
-      }
     });
 
     // Add lazy modules to the context module for @angular/core/src/linker
@@ -542,10 +546,6 @@ export class AotPlugin implements Tapable {
             throw new Error(message);
           }
         }
-      })
-      .then(() => {
-        // Populate the file system cache with the virtual module.
-        this._compilerHost.populateWebpackResolver(this._compiler.resolvers.normal);
       })
       .then(() => {
         // We need to run the `listLazyRoutes` the first time because it also navigates libraries
