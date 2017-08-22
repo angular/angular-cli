@@ -122,29 +122,37 @@ export class PathsPlugin implements Tapable {
 
     this._nmf.plugin('before-resolve', (request: NormalModuleFactoryRequest,
                                         callback: Callback<any>) => {
+      // Only work on TypeScript issuers.
+      if (!request.contextInfo.issuer || !request.contextInfo.issuer.endsWith('.ts')) {
+        return callback(null, request);
+      }
+
       for (let mapping of this._mappings) {
         const match = request.request.match(mapping.aliasPattern);
         if (!match) { continue; }
-
         let newRequestStr = mapping.target;
         if (!mapping.onlyModule) {
           newRequestStr = newRequestStr.replace('*', match[1]);
         }
+        const moduleResolver = ts.resolveModuleName(
+          request.request,
+          request.contextInfo.issuer,
+          this._compilerOptions,
+          this._host
+        );
+        let moduleFilePath = moduleResolver.resolvedModule
+                          && moduleResolver.resolvedModule.resolvedFileName;
 
-        const moduleResolver: ts.ResolvedModuleWithFailedLookupLocations =
-          ts.nodeModuleNameResolver(
-            newRequestStr,
-            this._absoluteBaseUrl,
-            this._compilerOptions,
-            this._host
-          );
-        const moduleFilePath = moduleResolver.resolvedModule ?
-          moduleResolver.resolvedModule.resolvedFileName : '';
-
+        // If TypeScript gives us a .d.ts it's probably a node module and we need to let webpack
+        // do the resolution.
+        if (moduleFilePath && moduleFilePath.endsWith('.d.ts')) {
+          moduleFilePath = moduleFilePath.replace(/\.d\.ts$/, '.js');
+          if (!this._host.fileExists(moduleFilePath)) {
+            continue;
+          }
+        }
         if (moduleFilePath) {
-          return callback(null, Object.assign({}, request, {
-            request: moduleFilePath.includes('.d.ts') ? newRequestStr : moduleFilePath
-          }));
+          return callback(null, Object.assign({}, request, { request: moduleFilePath }));
         }
       }
 
