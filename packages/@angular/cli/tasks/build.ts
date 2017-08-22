@@ -1,15 +1,20 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as webpack from 'webpack';
-import { red } from 'chalk';
+import { red, yellow } from 'chalk';
 
 import { getAppFromConfig } from '../utilities/app-utils';
 import { BuildTaskOptions } from '../commands/build';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { CliConfig } from '../models/config';
-import { statsToString, statsWarningsToString, statsErrorsToString } from '../utilities/stats';
-import { oneLine } from 'common-tags';
+import {
+  statsToString,
+  statsWarningsToString,
+  statsErrorsToString,
+  evaluateBudgets,
+  BudgetResult
+} from '../utilities/stats';
 
 const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
@@ -43,31 +48,30 @@ export default Task.extend({
         }
 
         const json = stats.toJson('verbose');
+
+        let budgetResults: BudgetResult[];
+        if (runTaskOptions.target === 'production' && !!appConfig.budgets) {
+          budgetResults = evaluateBudgets(json, appConfig.budgets);
+        }
+
         if (runTaskOptions.verbose) {
           this.ui.writeLine(stats.toString(statsConfig));
         } else {
-          this.ui.writeLine(statsToString(json, statsConfig));
+          const bundleBudgetResults = budgetResults.filter(br => br.type === 'bundle');
+          this.ui.writeLine(statsToString(json, statsConfig, bundleBudgetResults));
         }
 
-        if (runTaskOptions.target === 'production' && !!appConfig.budgets) {
-          let budgetErrors: string[] = [];
-          appConfig.budgets.forEach((budget: {name: string; budget: number}) => {
-            const chunk = json.chunks.filter(
-              (c: { names: string[]; }) => c.names.indexOf(budget.name) !== -1)[0];
-            const asset = json.assets.filter((x: any) => x.name == chunk.files[0])[0];
-            const size = asset.size / 1000;
-            if (size > budget.budget) {
-              budgetErrors.push(oneLine`${budget.name}
-                budget: ${budget.budget} kB
-                size: ${size.toPrecision(3)} kB`);
-            }
-          });
-          if (budgetErrors.length > 0) {
-            const budgetError = 'Allowed bundle budgets have been exceeded';
-            this.ui.writeLine(red(`\n...${budgetError}`));
-            budgetErrors.forEach(err => this.ui.writeLine(red(`  ${err}`)));
-            reject(budgetError);
-          }
+
+        const initialBudgetResults = budgetResults.filter(br => br.type === 'initial');
+        if (initialBudgetResults.length > 0) {
+          const prefix = initialBudgetResults.every(b => b.result === 'Warning')
+            ? 'Warning' : 'Error';
+          const color = prefix === 'Warning' ? yellow : red;
+          this.ui.writeLine(color(`${prefix}: Initial budget size exceeded.`));
+        }
+
+        if (budgetResults.filter(br => br.result === 'Error').length > 0) {
+          reject('Bundle budget exceeded');
         }
 
         if (stats.hasWarnings()) {

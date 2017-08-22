@@ -196,15 +196,20 @@
           "budgets": {
             "description": "Defines the budget allotments for bundles.",
             "type": "array",
-            "items": {"type": "object",
+            "items": {
+              "type": "object",
               "properties": {
-                "name": {
-                  "description": "Name of the bundle.",
+                "budget": {
+                  "type": "number"
+                },
+                "type": {
                   "type": "string"
                 },
-                "budget": {
-                  "description": "Threshold to measure against. (in kb)",
-                  "type": "number"
+                "unit": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string"
                 }
               }
             }
