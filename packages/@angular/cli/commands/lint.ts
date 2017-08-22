@@ -37,7 +37,7 @@ export default Command.extend({
     },
     {
       name: 'format',
-      alias: 't',
+      aliases: ['t'],
       type: String,
       default: 'prose',
       description: oneLine`
