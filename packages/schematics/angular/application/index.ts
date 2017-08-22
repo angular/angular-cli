@@ -74,7 +74,7 @@ function minimalPathFilter(path: string): boolean {
 }
 export default function (options: ApplicationOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
-    const appRootSelector = 'app-root';
+    const appRootSelector = `${options.prefix}-root`;
     const componentOptions = !options.minimal ?
       {
         inlineStyle: options.inlineStyle,
