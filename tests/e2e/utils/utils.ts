@@ -9,7 +9,7 @@ export function expectToFail(fn: () => Promise<any>, errorMessage?: string): Pro
     }, () => { });
 }
 
-export function wait(msecs: number) {
+export function wait(msecs: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, msecs);
   });
