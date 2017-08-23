@@ -1,6 +1,5 @@
 import {
   killAllProcesses,
-  exec,
   waitForAnyProcessOutputToMatch,
   execAndWaitForOutputToMatch
 } from '../../utils/process';
@@ -21,8 +20,6 @@ export default function() {
 
   return execAndWaitForOutputToMatch('ng', ['serve'], webpackGoodRegEx)
     // Should trigger a rebuild.
-    .then(() => exec('touch', 'src/main.ts'))
-    .then(() => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 10000))
     .then(() => appendToFile('src/app/app.component.css', ':host { color: blue; }'))
     .then(() => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 10000))
     .then(() => killAllProcesses(), (err: any) => {

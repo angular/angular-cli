@@ -1,7 +1,8 @@
 import * as child_process from 'child_process';
 import {blue, yellow} from 'chalk';
 import {getGlobalVariable} from './env';
-import {rimraf, writeFile} from './fs';
+import {rimraf} from './fs';
+import {wait} from './utils';
 const treeKill = require('tree-kill');
 
 
@@ -13,7 +14,7 @@ interface ExecOptions {
 
 let _processes: child_process.ChildProcess[] = [];
 
-type ProcessOutput = {
+export type ProcessOutput = {
   stdout: string;
   stderr: string;
 };
@@ -97,26 +98,29 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 export function waitForAnyProcessOutputToMatch(match: RegExp,
                                                timeout = 30000): Promise<ProcessOutput> {
   // Race between _all_ processes, and the timeout. First one to resolve/reject wins.
-  return Promise.race(_processes.map(childProcess => new Promise(resolve => {
-    let stdout = '';
-    let stderr = '';
-    childProcess.stdout.on('data', (data: Buffer) => {
-      stdout += data.toString();
-      if (data.toString().match(match)) {
-        resolve({ stdout, stderr });
-      }
-    });
-    childProcess.stderr.on('data', (data: Buffer) => {
-      stderr += data.toString();
-    });
-  })).concat([
-    new Promise((resolve, reject) => {
-      // Wait for 30 seconds and timeout.
-      setTimeout(() => {
-        reject(new Error(`Waiting for ${match} timed out (timeout: ${timeout}msec)...`));
-      }, timeout);
-    })
-  ]));
+  const timeoutPromise: Promise<ProcessOutput> = new Promise((_resolve, reject) => {
+    // Wait for 30 seconds and timeout.
+    setTimeout(() => {
+      reject(new Error(`Waiting for ${match} timed out (timeout: ${timeout}msec)...`));
+    }, timeout);
+  });
+
+  const matchPromises: Promise<ProcessOutput>[] = _processes.map(
+    childProcess => new Promise(resolve => {
+      let stdout = '';
+      let stderr = '';
+      childProcess.stdout.on('data', (data: Buffer) => {
+        stdout += data.toString();
+        if (data.toString().match(match)) {
+          resolve({ stdout, stderr });
+        }
+      });
+      childProcess.stderr.on('data', (data: Buffer) => {
+        stderr += data.toString();
+      });
+    }));
+
+  return Promise.race(matchPromises.concat([timeoutPromise]));
 }
 
 export function killAllProcesses(signal = 'SIGTERM') {
@@ -133,11 +137,22 @@ export function silentExec(cmd: string, ...args: string[]) {
 }
 
 export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
-  return _exec({ waitForMatch: match }, cmd, args);
+  let maybeWait = Promise.resolve();
+  if (cmd === 'ng' && args[0] === 'serve') {
+    // Webpack watcher can rebuild a few times due to files changes that happened just before the
+    // build (e.g. `git clean`), so we wait here.
+    maybeWait = wait(5000);
+  }
+  return maybeWait.then(() => _exec({ waitForMatch: match }, cmd, args));
 }
 
 export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
-  return _exec({ silent: true, waitForMatch: match }, cmd, args);
+  let maybeWait = Promise.resolve();
+  if (cmd === 'ng' && args[0] === 'serve') {
+    // See execAndWaitForOutputToMatch for why the wait.
+    maybeWait = wait(5000);
+  }
+  return maybeWait.then(() => _exec({ silent: true, waitForMatch: match }, cmd, args));
 }
 
 
