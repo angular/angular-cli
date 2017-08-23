@@ -13,7 +13,7 @@
 [![npm](https://img.shields.io/npm/dm/@angular/cli.svg)][npm-badge-url]
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Caretaker](https://img.shields.io/badge/caretaker-hansl-blue.svg)](https://github.com/hansl)
+[![Caretaker](https://img.shields.io/badge/caretaker-filipesilva-blue.svg)](https://github.com/filipesilva)
 
 [![GitHub forks](https://img.shields.io/github/forks/angular/angular-cli.svg?style=social&label=Fork)](https://github.com/angular/angular-cli/fork)
 [![GitHub stars](https://img.shields.io/github/stars/angular/angular-cli.svg?style=social&label=Star)](https://github.com/angular/angular-cli)
