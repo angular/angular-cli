@@ -1,11 +1,15 @@
+import * as fs from 'fs-extra';
 import { join } from 'path';
 import { ng } from '../../../utils/process';
 import { expectFileToMatch } from '../../../utils/fs';
 
 export default function () {
-  const modulePath = join('src', 'app', 'app.module.ts');
+  const root = process.cwd();
+  const modulePath = join(root, 'src', 'app', 'app.module.ts');
   const subModulePath = join('src', 'app', 'sub', 'sub.module.ts');
   const deepSubModulePath = join('src', 'app', 'sub', 'deep', 'deep.module.ts');
+
+  fs.mkdirSync('./src/app/sub-dir');
 
   return Promise.resolve()
     .then(() => ng('generate', 'module', 'sub'))
@@ -42,4 +46,10 @@ export default function () {
     .then(() => expectFileToMatch(deepSubModulePath,
       /import { Test6Module } from '..\/..\/test6\/test6.module'/))
     .then(() => expectFileToMatch(deepSubModulePath, /imports: \[(.|\s)*Test6Module(.|\s)*\]/m)));
+
+    .then(() => process.chdir(join(root, 'src', 'app')))
+    .then(() => ng('generate', 'module', 'test7', '--module', 'app.module.ts')))
+    .then(() => expectFileToMatch(modulePath,
+      /import { Test7Module } from '.\/test7\/test7.module'/))
+    .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test7Module(.|\s)*\]/m))
 }
