@@ -1,3 +1,5 @@
+import { Stats } from 'fs';
+
 // Declarations for (some) Webpack types. Only what's needed.
 
 export interface Request {
@@ -60,3 +62,16 @@ export interface LoaderContext {
   readonly query: any;
 }
 
+export interface InputFileSystem {
+  stat(path: string, callback: Callback<any>): void;
+  readdir(path: string, callback: Callback<any>): void;
+  readFile(path: string, callback: Callback<any>): void;
+  readJson(path: string, callback: Callback<any>): void;
+  readlink(path: string, callback: Callback<any>): void;
+  statSync(path: string): Stats;
+  readdirSync(path: string): string[];
+  readFileSync(path: string): string;
+  readJsonSync(path: string): string;
+  readlinkSync(path: string): string;
+  purge(changes?: string[] | string): void;
+}
