@@ -1,6 +1,5 @@
 import {
   killAllProcesses,
-  exec,
   waitForAnyProcessOutputToMatch,
   execAndWaitForOutputToMatch,
   ng,
@@ -11,7 +10,6 @@ import {request} from '../../utils/http';
 import {getGlobalVariable} from '../../utils/env';
 
 const validBundleRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
-const invalidBundleRegEx = /webpack: bundle is now INVALID|webpack: Compiling.../;
 
 export default function() {
   if (process.platform.startsWith('win')) {
@@ -26,95 +24,96 @@ export default function() {
   const chunkRegExp = /chunk\s+\{/g;
 
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
-    // Should trigger a rebuild.
-    .then(() => exec('touch', 'src/main.ts'))
-    .then(() => waitForAnyProcessOutputToMatch(invalidBundleRegEx, 10000))
-    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
     // Count the bundles.
     .then(({ stdout }) => {
       oldNumberOfChunks = stdout.split(chunkRegExp).length;
     })
     // Add a lazy module.
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
-    // Just wait for the rebuild, otherwise we might be validating the last build.
-    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
-    .then(() => writeFile('src/app/app.module.ts', `
-      import { BrowserModule } from '@angular/platform-browser';
-      import { NgModule } from '@angular/core';
-      import { FormsModule } from '@angular/forms';
-      import { HttpModule } from '@angular/http';
-
-      import { AppComponent } from './app.component';
-      import { RouterModule } from '@angular/router';
-
-      @NgModule({
-        declarations: [
-          AppComponent
-        ],
-        imports: [
-          BrowserModule,
-          FormsModule,
-          HttpModule,
-          RouterModule.forRoot([
-            { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
-          ])
-        ],
-        providers: [],
-        bootstrap: [AppComponent]
-      })
-      export class AppModule { }
-    `))
     // Should trigger a rebuild with a new bundle.
-    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
-    // Count the bundles.
-    .then(({ stdout }) => {
-      let newNumberOfChunks = stdout.split(chunkRegExp).length;
-      if (oldNumberOfChunks >= newNumberOfChunks) {
-        throw new Error('Expected webpack to create a new chunk, but did not.');
-      }
-    })
-    // Change multiple files and check that all of them are invalidated and recompiled.
-    .then(() => writeMultipleFiles({
-      'src/app/app.module.ts': `
+    // We need to use Promise.all to ensure we are waiting for the rebuild just before we write
+    // the file, otherwise rebuilds can be too fast and fail CI.
+    .then(() => Promise.all([
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      writeFile('src/app/app.module.ts', `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
+        import { FormsModule } from '@angular/forms';
+        import { HttpModule } from '@angular/http';
 
         import { AppComponent } from './app.component';
+        import { RouterModule } from '@angular/router';
 
         @NgModule({
           declarations: [
             AppComponent
           ],
           imports: [
-            BrowserModule
+            BrowserModule,
+            FormsModule,
+            HttpModule,
+            RouterModule.forRoot([
+              { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
+            ])
           ],
           providers: [],
           bootstrap: [AppComponent]
         })
         export class AppModule { }
+      `)
+    ]))
+    // Count the bundles.
+    .then((results) => {
+      const stdout = results[0].stdout;
+      let newNumberOfChunks = stdout.split(chunkRegExp).length;
+      if (oldNumberOfChunks >= newNumberOfChunks) {
+        throw new Error('Expected webpack to create a new chunk, but did not.');
+      }
+    })
+    // Change multiple files and check that all of them are invalidated and recompiled.
+    .then(() => Promise.all([
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      writeMultipleFiles({
+        'src/app/app.module.ts': `
+          import { BrowserModule } from '@angular/platform-browser';
+          import { NgModule } from '@angular/core';
 
-        console.log('$$_E2E_GOLDEN_VALUE_1');
-        export let X = '$$_E2E_GOLDEN_VALUE_2';
-      `,
-      'src/main.ts': `
-        import { enableProdMode } from '@angular/core';
-        import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+          import { AppComponent } from './app.component';
 
-        import { AppModule } from './app/app.module';
-        import { environment } from './environments/environment';
+          @NgModule({
+            declarations: [
+              AppComponent
+            ],
+            imports: [
+              BrowserModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+          })
+          export class AppModule { }
 
-        if (environment.production) {
-          enableProdMode();
-        }
+          console.log('$$_E2E_GOLDEN_VALUE_1');
+          export let X = '$$_E2E_GOLDEN_VALUE_2';
+        `,
+          'src/main.ts': `
+          import { enableProdMode } from '@angular/core';
+          import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-        platformBrowserDynamic().bootstrapModule(AppModule);
+          import { AppModule } from './app/app.module';
+          import { environment } from './environments/environment';
 
-        import * as m from './app/app.module';
-        console.log(m.X);
-        console.log('$$_E2E_GOLDEN_VALUE_3');
-      `
-    }))
-    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
+          if (environment.production) {
+            enableProdMode();
+          }
+
+          platformBrowserDynamic().bootstrapModule(AppModule);
+
+          import * as m from './app/app.module';
+          console.log(m.X);
+          console.log('$$_E2E_GOLDEN_VALUE_3');
+        `
+      })
+    ]))
     .then(() => wait(2000))
     .then(() => request('http://localhost:4200/main.bundle.js'))
     .then((body) => {
