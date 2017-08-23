@@ -65,7 +65,10 @@ export function findModule(host: Tree, generateDir: string): SchematicPath {
   while (closestModule) {
     const normalizedRoot = normalizePath(closestModule);
     const matches = allFiles
-      .filter(p => moduleRe.test(p) && !routingModuleRe.test(p) && p.startsWith(normalizedRoot));
+      .filter(p => moduleRe.test(p) &&
+        !routingModuleRe.test(p) &&
+        p.startsWith(normalizedRoot) &&
+        p.split('/').length === normalizedRoot.split('/').length);
 
     if (matches.length == 1) {
       modulePath = matches[0];
