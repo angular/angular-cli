@@ -10,45 +10,72 @@
       "description": "Create a class.",
       "schema": "./class/schema.json"
     },
+    "cl": {
+      "extends": "class"
+    },
     "component": {
       "factory": "./component",
       "description": "Create an Angular component.",
       "schema": "./component/schema.json"
+    },
+    "c": {
+      "extends": "component"
     },
     "directive": {
       "factory": "./directive",
       "description": "Create an Angular directive.",
       "schema": "./directive/schema.json"
     },
+    "d": {
+      "extends": "directive"
+    },
     "enum": {
       "factory": "./enum",
       "description": "Create an enumeration.",
       "schema": "./enum/schema.json"
+    },
+    "e": {
+      "extends": "enum"
     },
     "guard": {
       "factory": "./guard",
       "description": "Create an guard.",
       "schema": "./guard/schema.json"
     },
+    "g": {
+      "extends": "guard"
+    },
     "interface": {
       "factory": "./interface",
       "description": "Create an interface.",
       "schema": "./interface/schema.json"
+    },
+    "i": {
+      "extends": "interface"
     },
     "module": {
       "factory": "./module",
       "description": "Create an Angular module.",
       "schema": "./module/schema.json"
     },
+    "m": {
+      "extends": "module"
+    },
     "pipe": {
       "factory": "./pipe",
       "description": "Create an Angular pipe.",
       "schema": "./pipe/schema.json"
     },
+    "p": {
+      "extends": "pipe"
+    },
     "service": {
       "factory": "./service",
       "description": "Create an Angular service.",
       "schema": "./service/schema.json"
+    },
+    "s": {
+      "extends": "service"
     }
   }
 }
