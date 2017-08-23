@@ -25,6 +25,7 @@ export interface FileSystemSchematicJsonDescription {
   readonly factory: string;
   readonly description: string;
   readonly schema?: string;
+  readonly extends?: string;
 }
 
 export interface FileSystemSchematicDescription extends FileSystemSchematicJsonDescription {

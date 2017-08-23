@@ -58,7 +58,20 @@ export abstract class FileSystemEngineHostBase implements
   private _transforms: OptionTransform<object, object>[] = [];
 
   listSchematics(collection: FileSystemCollection) {
-    return Object.keys(collection.description.schematics);
+    const schematics: string[] = [];
+    for (const key in collection.description.schematics) {
+      const schematic = collection.description.schematics[key];
+
+      // If extends is present without a factory it is an alias, do not return it
+      //   unless it is from another collection.
+      if (!schematic.extends || schematic.factory) {
+        schematics.push(key);
+      } else if (schematic.extends && schematic.extends.indexOf(':') !== -1) {
+        schematics.push(key);
+      }
+    }
+
+    return schematics;
   }
 
   registerOptionsTransform<T extends object, R extends object>(t: OptionTransform<T, R>) {
@@ -103,7 +116,28 @@ export abstract class FileSystemEngineHostBase implements
     }
 
     const collectionPath = dirname(collection.path);
-    const partialDesc: Partial<FileSystemSchematicDesc> | null = collection.schematics[name];
+    let partialDesc: Partial<FileSystemSchematicDesc> | null = collection.schematics[name];
+    if (!partialDesc) {
+      return null;
+    }
+
+    if (partialDesc.extends) {
+      const index = partialDesc.extends.indexOf(':');
+      const collectionName = index !== -1 ? partialDesc.extends.substr(0, index) : null;
+      const schematicName = index !== -1 ?
+        partialDesc.extends : partialDesc.extends.substr(index + 1);
+
+      if (collectionName !== null) {
+        // const extendCollection = engine.createCollection(collectionName);
+        const extendCollection = this.createCollectionDescription(collectionName);
+        if (!extendCollection) {
+          return null;
+        }
+        partialDesc = this.createSchematicDescription(schematicName, extendCollection);
+      } else {
+        partialDesc = this.createSchematicDescription(schematicName, collection);
+      }
+    }
     if (!partialDesc) {
       return null;
     }

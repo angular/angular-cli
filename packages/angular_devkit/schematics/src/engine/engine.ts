@@ -85,6 +85,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     if (!description) {
       throw new UnknownSchematicException(name, collection);
     }
+
     const factory = this._host.getSchematicRuleFactory(description, collection.description);
     schematic = new SchematicImpl<CollectionT, SchematicT>(description, factory, collection, this);
 
