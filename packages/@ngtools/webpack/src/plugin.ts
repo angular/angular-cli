@@ -378,8 +378,11 @@ export class AotPlugin implements Tapable {
 
     compiler.plugin('after-resolvers', (compiler: any) => {
       // Virtual file system.
+      // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
+      // when the issuer is a `.ts` file.
       compiler.resolvers.normal.plugin('before-resolve', (request: any, cb: () => void) => {
-        if (request.request.match(/\.ts$/)) {
+        if (request.request.endsWith('.ts')
+          || (request.context.issuer && request.context.issuer.endsWith('.ts'))) {
           this.done!.then(() => cb(), () => cb());
         } else {
           cb();
