@@ -44,8 +44,8 @@ function _upgrade(release: string, logger: Logger) {
     }
 
     const hash = packages[pkg].hash;
-    const version = versions[pkg];
-    let newVersion: string = version;
+    const version = versions[pkg] || '0.0.0';
+    let newVersion: string | null = version;
 
     if (release == 'minor-beta') {
       if (hash !== hashes[pkg]) {
@@ -88,7 +88,7 @@ function _upgrade(release: string, logger: Logger) {
     }
 
     let message = '';
-    if (version !== newVersion) {
+    if (newVersion && version !== newVersion) {
       message = `${pkg} changed... updating v${version} => v${newVersion}`;
       versions[pkg] = newVersion;
       hashes[pkg] = hash;
