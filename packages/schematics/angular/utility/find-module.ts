@@ -62,13 +62,13 @@ export function findModule(host: Tree, generateDir: string): SchematicPath {
   let modulePath: string | null = null;
   const moduleRe = /\.module\.ts$/;
   const routingModuleRe = /-routing\.module\.ts/;
+
   while (closestModule) {
     const normalizedRoot = normalizePath(closestModule);
     const matches = allFiles
       .filter(p => moduleRe.test(p) &&
         !routingModuleRe.test(p) &&
-        p.startsWith(normalizedRoot) &&
-        p.split('/').length === normalizedRoot.split('/').length);
+        !/\//g.test(p.replace(normalizedRoot + '/', '')));
 
     if (matches.length == 1) {
       modulePath = matches[0];
