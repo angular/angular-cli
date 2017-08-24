@@ -226,7 +226,9 @@ export default function (args: ParsedArgs, logger: Logger) {
     // Remove the tests from packages that haven't changed.
     tests = tests
       .filter(p => Object.keys(packages).some(name => {
-        return p.startsWith(packages[name].root) && packages[name].hash !== versions[name];
+        const relativeRoot = relative(projectBaseDir, packages[name].root);
+
+        return p.startsWith(relativeRoot) && packages[name].hash !== versions[name];
       }));
 
     logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
