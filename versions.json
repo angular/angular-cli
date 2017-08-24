@@ -4,13 +4,13 @@
     "@angular-devkit/build-optimizer": "0.0.15",
     "@angular-devkit/core": "0.0.10",
     "@angular-devkit/schematics": "0.0.18",
-    "@schematics/angular": "0.0.29"
+    "@schematics/angular": "0.0.30"
   },
   "hashes": {
     "@_/benchmark": "faab0531c82005d6b85fb084e9a0d6ac",
     "@angular-devkit/core": "7dd3de13eae953f8678da365f1e19640",
     "@angular-devkit/schematics": "763063cbca65b1fc870cba04bcbe97a2",
-    "@schematics/angular": "ff10b39fe1358e9ee053990867708039",
+    "@schematics/angular": "d625c1f528d1b06cfc961e2217bd0f2e",
     "@angular-devkit/build-optimizer": "18ff0a7a5add0ef467d3836c56a72a86"
   }
 }
