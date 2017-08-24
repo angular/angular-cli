@@ -126,9 +126,11 @@ npm uninstall --save-dev angular-cli
 To update Angular CLI to a new version, you must update both the global package and your project's local package.
 
 Global package:
+
 ```bash
 npm uninstall -g @angular/cli
-npm cache clean
+npm cache clean # if using npm4
+npm cache verify # if you are using npm5+
 npm install -g @angular/cli@latest
 ```
 
