@@ -1,7 +1,7 @@
 {
   "name": "angular2-universal",
   "main": "index.js",
-  "version": "2.0.11",
+  "version": "1.0.0-beta.3",
   "description": "Universal (isomorphic) javascript support for Angular2+",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",

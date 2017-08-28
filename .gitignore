@@ -17,6 +17,7 @@ typings
 dist
 node_modules
 ngfactory
+web_modules
 
 /compiled
 *.metadata.json

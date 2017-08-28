@@ -2,7 +2,7 @@
   "name": "@nguniversal/module-map-ngfactory-loader",
   "main": "index.js",
   "types": "index.d.ts",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.3",
   "description": "NgFactoryLoader which uses a Map to load ngfactories without lazy loading",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
