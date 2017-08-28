@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Tree, VirtualTree } from '@angular-devkit/schematics';
-import { SchematicTestRunner } from '../utility/schematic-test-runner';
+import { SchematicTestRunner } from '@angular-devkit/schematics/test';
+import { createAppModule } from '../utility/test';
 import { Schema as ModuleSchema } from './schema';
 
 
@@ -25,7 +26,7 @@ describe('Module Schematic', () => {
 
   beforeEach(() => {
     appTree = new VirtualTree();
-    appTree = SchematicTestRunner.createAppNgModule(appTree);
+    appTree = createAppModule(appTree);
   });
 
   it('should create a module', () => {

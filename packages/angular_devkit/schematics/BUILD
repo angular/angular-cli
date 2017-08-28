@@ -38,6 +38,23 @@ ts_library(
 )
 
 ts_library(
+    name = "test",
+    srcs = glob(
+        include = ["test/**/*.ts"],
+        exclude = [],
+    ),
+    deps = [
+        ":schematics",
+        ":tools",
+        "//packages/angular_devkit/core",
+        # @deps: rxjs
+    ],
+    tsconfig = "//:tsconfig.json",
+    module_name = "@angular-devkit/schematics/test",
+    module_root = "test"
+)
+
+ts_library(
     name = "spec",
     srcs = glob(
         include = ["src/**/*_spec.ts"],
