@@ -1,12 +1,13 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/ng-module-map-ngfactory-loader"
+    "outDir": "../../dist/express-engine"
   },
   "angularCompilerOptions": {
     "genDir": "ngfactory"
   },
   "files": [
-    "index.ts"
+    "index.ts",
+    "tokens.ts"
   ]
 }

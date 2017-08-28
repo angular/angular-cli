@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/ng-aspnetcore-engine"
+    "outDir": "../../dist/module-map-ngfactory-loader"
   },
   "angularCompilerOptions": {
     "genDir": "ngfactory"

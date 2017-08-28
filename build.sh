@@ -2,17 +2,17 @@ rm -rf dist
 
 set -x
 
-npm run build:ng-express-engine
+npm run build:express-engine
 
-cp modules/ng-express-engine/package.json dist/ng-express-engine/package.json
-cp modules/ng-express-engine/README.md dist/ng-express-engine/README.md
+cp modules/express-engine/package.json dist/express-engine/package.json
+cp modules/express-engine/README.md dist/express-engine/README.md
 
-npm run build:ng-aspnetcore-engine
+npm run build:aspnetcore-engine
 
-cp modules/ng-aspnetcore-engine/package.json dist/ng-aspnetcore-engine/package.json
-cp modules/ng-aspnetcore-engine/README.md dist/ng-aspnetcore-engine/README.md
+cp modules/aspnetcore-engine/package.json dist/aspnetcore-engine/package.json
+cp modules/aspnetcore-engine/README.md dist/aspnetcore-engine/README.md
 
-npm run build:ng-module-map-ngfactory-loader
+npm run build:module-map-ngfactory-loader
 
-cp modules/ng-module-map-ngfactory-loader/package.json dist/ng-module-map-ngfactory-loader/package.json
-cp modules/ng-module-map-ngfactory-loader/README.md dist/ng-module-map-ngfactory-loader/README.md
+cp modules/module-map-ngfactory-loader/package.json dist/module-map-ngfactory-loader/package.json
+cp modules/module-map-ngfactory-loader/README.md dist/module-map-ngfactory-loader/README.md

@@ -1,4 +1,4 @@
-# Upgrading from Angular2-Universal (2.x) to Angular 4 / platform-server
+# Upgrading from Angular2-Universal (2.x) to Angular v4 / platform-server
 
 In general, you're going to want to make sure you remove all references of `angular2-universal` from your project. If you're using `isBrowser / isNode`, use instead `isPlatformBrowser()` which you'll find information on [here](#universal-gotchas).
 

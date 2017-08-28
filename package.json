@@ -1,8 +1,8 @@
 {
-  "name": "angular2-universal",
+  "name": "nguniversal",
   "main": "index.js",
   "version": "1.0.0-beta.3",
-  "description": "Universal (isomorphic) javascript support for Angular2+",
+  "description": "Universal (isomorphic) javascript support for Angular",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
   "contributors": [
@@ -60,9 +60,9 @@
   "scripts": {
     "ngc": "ngc",
     "jasmine": "jasmine",
-    "build:ng-express-engine": "ngc -p modules/ng-express-engine/tsconfig.json",
-    "build:ng-aspnetcore-engine": "ngc -p modules/ng-aspnetcore-engine/tsconfig.json",
-    "build:ng-module-map-ngfactory-loader": "ngc -p modules/ng-module-map-ngfactory-loader/tsconfig.json",
+    "build:express-engine": "ngc -p modules/express-engine/tsconfig.json",
+    "build:aspnetcore-engine": "ngc -p modules/aspnetcore-engine/tsconfig.json",
+    "build:module-map-ngfactory-loader": "ngc -p modules/module-map-ngfactory-loader/tsconfig.json",
     "build": "./build.sh",
     "test": "exit 0"
   },
