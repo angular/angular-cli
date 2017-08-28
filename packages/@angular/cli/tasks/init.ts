@@ -1,7 +1,6 @@
 import * as chalk from 'chalk';
 import LinkCli from '../tasks/link-cli';
 import NpmInstall from '../tasks/npm-install';
-import BazelInit from '../tasks/bazel-init';
 import { validateProjectName } from '../utilities/validate-project-name';
 import {checkYarnOrCNPM} from '../utilities/check-package-manager';
 import {CliConfig} from '../models/config';
@@ -32,16 +31,11 @@ export default Task.extend({
     const packageManager = CliConfig.fromGlobal().get('packageManager');
 
     let npmInstall: any;
-    let bazelInit: any;
     if (!commandOptions.skipInstall) {
       npmInstall = new NpmInstall({
         ui: this.ui,
         project: this.project,
         packageManager
-      });
-
-      bazelInit = new BazelInit({
-        ui: this.ui,
       });
     }
 
@@ -103,11 +97,6 @@ export default Task.extend({
       .then(function () {
         if (!commandOptions.dryRun && commandOptions.skipInstall === false) {
           return npmInstall.run();
-        }
-      })
-      .then(function () {
-        if (!commandOptions.dryRun && commandOptions.skipInstall === false) {
-          return bazelInit.run();
         }
       })
       .then(function () {
