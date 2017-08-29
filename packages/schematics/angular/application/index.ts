@@ -105,6 +105,7 @@ export default function (options: ApplicationOptions): Rule {
         commonModule: false,
         flat: true,
         routing: options.routing,
+        routingScope: 'Root',
         sourceDir: options.directory + '/' + options.sourceDir,
         spec: false,
       }),

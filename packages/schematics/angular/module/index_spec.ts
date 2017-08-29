@@ -54,6 +54,10 @@ describe('Module Schematic', () => {
     const files = tree.files;
     expect(files.indexOf('/src/app/foo/foo.module.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/src/app/foo/foo-routing.module.ts')).toBeGreaterThanOrEqual(0);
+    const moduleContent = getFileContent(tree, '/src/app/foo/foo.module.ts');
+    expect(moduleContent).toMatch(/import { FooRoutingModule } from '.\/foo-routing.module'/);
+    const routingModuleContent = getFileContent(tree, '/src/app/foo/foo-routing.module.ts');
+    expect(routingModuleContent).toMatch(/RouterModule.forChild\(routes\)/);
   });
 
   it('should respect the spec flag', () => {
@@ -73,6 +77,4 @@ describe('Module Schematic', () => {
     expect(files.indexOf('/src/app/two-word/two-word.module.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/src/app/two-word/two-word.module.spec.ts')).toBeGreaterThanOrEqual(0);
   });
-
-
 });

@@ -4,7 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.for<%= routingScope %>(routes)],
   exports: [RouterModule]
 })
 export class <%= classify(name) %>RoutingModule { }

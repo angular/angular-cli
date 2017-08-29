@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
+import { getFileContent } from '../utility/test';
 import { Schema as AppSchema } from './schema';
 
 
@@ -63,4 +64,16 @@ describe('Application Schematic', () => {
     expect(files.indexOf('/foo/src/app/app.component.ts')).toBeGreaterThanOrEqual(0);
   });
 
+  it('should handle the routing flag', () => {
+    const options = { ...defaultOptions, routing: true };
+
+    const tree = schematicRunner.runSchematic('application', options);
+    const files = tree.files;
+    expect(files.indexOf('/foo/src/app/app.module.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/foo/src/app/app-routing.module.ts')).toBeGreaterThanOrEqual(0);
+    const moduleContent = getFileContent(tree, '/foo/src/app/app.module.ts');
+    expect(moduleContent).toMatch(/import { AppRoutingModule } from '.\/app-routing.module'/);
+    const routingModuleContent = getFileContent(tree, '/foo/src/app/app-routing.module.ts');
+    expect(routingModuleContent).toMatch(/RouterModule.forRoot\(routes\)/);
+  });
 });
