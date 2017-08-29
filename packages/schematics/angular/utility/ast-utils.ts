@@ -266,8 +266,9 @@ function _addSymbolToNgModuleMetadata(source: ts.SourceFile,
       position = node.getEnd();
       // Get the indentation of the last element, if any.
       const text = node.getFullText(source);
-      if (text.match('^\r?\r?\n')) {
-        toInsert = `,${text.match(/^\r?\n\s+/)[0]}${metadataField}: [${symbolName}]`;
+      const matches = text.match(/^\r?\n\s*/);
+      if (matches.length > 0) {
+        toInsert = `,${matches[0]}${metadataField}: [${symbolName}]`;
       } else {
         toInsert = `, ${metadataField}: [${symbolName}]`;
       }

@@ -7,7 +7,7 @@
  */
 import { Tree, VirtualTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
-import { createAppModule } from '../utility/test';
+import { createAppModule, getFileContent } from '../utility/test';
 import { Schema as ModuleSchema } from './schema';
 
 
@@ -36,6 +36,42 @@ describe('Module Schematic', () => {
     const files = tree.files;
     expect(files.indexOf('/src/app/foo/foo.module.spec.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/src/app/foo/foo.module.ts')).toBeGreaterThanOrEqual(0);
+  });
+
+  it('should import into another module', () => {
+    const options = { ...defaultOptions, module: 'app.module.ts' };
+
+    const tree = schematicRunner.runSchematic('module', options, appTree);
+    const content = getFileContent(tree, '/src/app/app.module.ts');
+    expect(content).toMatch(/import { FooModule } from '.\/foo\/foo.module'/);
+    expect(content).toMatch(/imports: \[(.|\s)*FooModule(.|\s)*\]/m);
+  });
+
+  it('should createa routing module', () => {
+    const options = { ...defaultOptions, routing: true };
+
+    const tree = schematicRunner.runSchematic('module', options, appTree);
+    const files = tree.files;
+    expect(files.indexOf('/src/app/foo/foo.module.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/src/app/foo/foo-routing.module.ts')).toBeGreaterThanOrEqual(0);
+  });
+
+  it('should respect the spec flag', () => {
+    const options = { ...defaultOptions, spec: false };
+
+    const tree = schematicRunner.runSchematic('module', options, appTree);
+    const files = tree.files;
+    expect(files.indexOf('/src/app/foo/foo.module.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/src/app/foo/foo.module.spec.ts')).toEqual(-1);
+  });
+
+  it('should dasherize a name', () => {
+    const options = { ...defaultOptions, name: 'TwoWord' };
+
+    const tree = schematicRunner.runSchematic('module', options, appTree);
+    const files = tree.files;
+    expect(files.indexOf('/src/app/two-word/two-word.module.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/src/app/two-word/two-word.module.spec.ts')).toBeGreaterThanOrEqual(0);
   });
 
 

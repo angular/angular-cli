@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
+import { getFileContent } from '../utility/test';
 import { Schema as InterfaceSchema } from './schema';
 
 
@@ -27,11 +28,8 @@ describe('Interface Schematic', () => {
 
   it('should create an interface named "Foo"', () => {
     const tree = schematicRunner.runSchematic('interface', defaultOptions);
-    const fileEntry = tree.get(tree.files[0]);
-    if (fileEntry) {
-      const fileContent = fileEntry.content.toString();
-      expect(fileContent).toMatch(/export interface Foo/);
-    }
+    const fileContent = getFileContent(tree, '/src/app/foo.ts');
+    expect(fileContent).toMatch(/export interface Foo/);
   });
 
   it('should put type in the file name', () => {

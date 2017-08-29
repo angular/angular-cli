@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
+import { getFileContent } from '../utility/test';
 import { Schema as ClassSchema } from './schema';
 
 
@@ -52,4 +53,12 @@ describe('Class Schematic', () => {
     expect(tree.files[0]).toEqual('/src/app/foo.model.ts');
   });
 
+  it('should split the name to name & type with split on "."', () => {
+    const options = {...defaultOptions, name: 'foo.model' };
+    const tree = schematicRunner.runSchematic('class', options);
+    expect(tree.files.length).toEqual(1);
+    expect(tree.files[0]).toEqual('/src/app/foo.model.ts');
+    const content = getFileContent(tree, '/src/app/foo.model.ts');
+    expect(content).toMatch(/export class Foo/);
+  });
 });
