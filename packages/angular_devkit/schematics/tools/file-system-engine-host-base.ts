@@ -16,7 +16,7 @@ import {
   Source,
   TypedSchematicContext,
 } from '@angular-devkit/schematics';
-import { dirname, join, resolve } from 'path';
+import { dirname, isAbsolute, join, resolve } from 'path';
 import { Url } from 'url';
 import { FileSystemCollectionDescription, FileSystemSchematicDescription } from './description';
 import { FileSystemHost } from './file-system-host';
@@ -156,7 +156,9 @@ export abstract class FileSystemEngineHostBase implements
     let schema = partialDesc.schema;
     let schemaJson: JsonObject | undefined = undefined;
     if (schema) {
-      schema = join(collectionPath, schema);
+      if (!isAbsolute(schema)) {
+        schema = join(collectionPath, schema);
+      }
       schemaJson = readJsonFile(schema) as JsonObject;
     }
 
