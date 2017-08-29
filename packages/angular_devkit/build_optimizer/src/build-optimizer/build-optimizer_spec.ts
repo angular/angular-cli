@@ -112,7 +112,7 @@ describe('build-optimizer', () => {
     });
 
     it('should not process non-whitelisted umd modules', () => {
-      const inputFilePath = '/node_modules/@angular/core/bundles/core.umd.js';
+      const inputFilePath = '/node_modules/other_lib/index.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });
       expect(boOutput.emitSkipped).toEqual(true);
     });

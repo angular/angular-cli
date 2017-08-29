@@ -15,7 +15,6 @@ import { getScrubFileTransformer, testScrubFile } from '../transforms/scrub-file
 import { getWrapEnumsTransformer, testWrapEnums } from '../transforms/wrap-enums';
 
 
-const isAngularModuleFile = /\.es5\.js$/;
 const whitelistedAngularModules = [
   /(\\|\/)node_modules(\\|\/)@angular(\\|\/)animations(\\|\/)/,
   /(\\|\/)node_modules(\\|\/)@angular(\\|\/)common(\\|\/)/,
@@ -70,7 +69,6 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   }
 
   if (inputFilePath
-    && isAngularModuleFile.test(inputFilePath)
     && whitelistedAngularModules.some((re) => re.test(inputFilePath))
   ) {
     getTransforms.push(
