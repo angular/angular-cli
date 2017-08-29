@@ -19,6 +19,7 @@
     "fix": "npm run admin -- lint --fix",
     "lint": "npm run admin -- lint",
     "test": "node ./bin/devkit-admin test",
+    "test:watch": "nodemon --watch packages -e ts ./bin/devkit-admin test",
     "validate-commits": "./bin/devkit-admin validate-commits",
     "integration": "npm run build && npm run integration:build-optimizer",
     "integration:build-optimizer": "npm run integration:build-optimizer:simple && npm run integration:build-optimizer:aio",
