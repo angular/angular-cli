@@ -74,7 +74,7 @@
     "style-loader": "^0.13.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "typescript": ">=2.0.0 <2.5.0",
+    "typescript": ">=2.0.0 <2.6.0",
     "url-loader": "^0.5.7",
     "webpack": "~3.5.5",
     "webpack-concat-plugin": "1.4.0",
