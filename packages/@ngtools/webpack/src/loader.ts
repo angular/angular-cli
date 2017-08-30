@@ -151,7 +151,7 @@ function _addCtorParameters(classNode: ts.ClassDeclaration,
   });
 
   const ctorParametersDecl = `static ctorParameters() { return [ ${params.join(', ')} ]; }`;
-  refactor.prependBefore(classNode.getLastToken(refactor.sourceFile), ctorParametersDecl);
+  refactor.prependNode(classNode.getLastToken(refactor.sourceFile), ctorParametersDecl);
 }
 
 
@@ -347,6 +347,7 @@ function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) 
 
 function _replaceResources(refactor: TypeScriptFileRefactor): void {
   const sourceFile = refactor.sourceFile;
+  let refactored = false;
 
   _getResourceNodes(refactor)
     // Get the full text of the initializer.
@@ -356,9 +357,11 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
       if (key == 'templateUrl') {
         refactor.replaceNode(node,
           `template: require(${_getResourceRequest(node.initializer, sourceFile)})`);
+        refactored = true;
       } else if (key == 'styleUrls') {
         const arr = <ts.ArrayLiteralExpression[]>(
           refactor.findAstNodes(node, ts.SyntaxKind.ArrayLiteralExpression, false));
+          refactored = true;
         if (!arr || arr.length == 0 || arr[0].elements.length == 0) {
           return;
         }
@@ -367,8 +370,17 @@ function _replaceResources(refactor: TypeScriptFileRefactor): void {
           return _getResourceRequest(element, sourceFile);
         });
         refactor.replaceNode(node, `styles: [require(${initializer.join('), require(')})]`);
+        refactored = true;
       }
     });
+
+  if (refactored) {
+    // If we added a require call, we need to also add typings for it.
+    // The typings need to be compatible with node typings, but also work by themselves.
+    refactor.prependNode(refactor.getFirstNode(),
+      'declare var require: NodeRequire;interface NodeRequire {(id: string): any;}'
+    );
+  }
 }
 
 
@@ -465,7 +477,7 @@ export function _replaceExport(plugin: AotPlugin, refactor: TypeScriptFileRefact
       const factoryPath = _getNgFactoryPath(plugin, refactor);
       const factoryClassName = plugin.entryModule.className + 'NgFactory';
       const exportStatement = `export \{ ${factoryClassName} \} from '${factoryPath}'`;
-      refactor.appendAfter(node, exportStatement);
+      refactor.appendNode(node, exportStatement);
     });
 }
 
@@ -502,7 +514,7 @@ export function _exportModuleMap(plugin: AotPlugin, refactor: TypeScriptFileRefa
 
       modules.forEach((module, index) => {
         const relativePath = path.relative(dirName, module.modulePath!).replace(/\\/g, '/');
-        refactor.prependBefore(node, `import * as __lazy_${index}__ from './${relativePath}'`);
+        refactor.prependNode(node, `import * as __lazy_${index}__ from './${relativePath}'`);
       });
 
       const jsonContent: string = modules
@@ -510,7 +522,7 @@ export function _exportModuleMap(plugin: AotPlugin, refactor: TypeScriptFileRefa
           `"${module.loadChildrenString}": __lazy_${index}__.${module.moduleName}`)
         .join();
 
-      refactor.appendAfter(node, `export const LAZY_MODULE_MAP = {${jsonContent}};`);
+      refactor.appendNode(node, `export const LAZY_MODULE_MAP = {${jsonContent}};`);
     });
 }
 
@@ -537,7 +549,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
       source = null;
     }
     const refactor = new TypeScriptFileRefactor(
-      sourceFileName, plugin.compilerHost, plugin.program, source);
+      sourceFileName, plugin.compilerHost, plugin.programManager, source);
 
     Promise.resolve()
       .then(() => {
@@ -594,14 +606,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
           }
         }
 
-        // Force a few compiler options to make sure we get the result we want.
-        const compilerOptions: ts.CompilerOptions = Object.assign({}, plugin.compilerOptions, {
-          inlineSources: true,
-          inlineSourceMap: false,
-          sourceRoot: plugin.basePath
-        });
-
-        const result = refactor.transpile(compilerOptions);
+        const result = refactor.transpile();
         cb(null, result.outputText, result.sourceMap);
       })
       .catch(err => cb(err));

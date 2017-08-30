@@ -2,6 +2,7 @@ import {dirname, join} from 'path';
 import * as ts from 'typescript';
 
 import {TypeScriptFileRefactor} from './refactor';
+import {ProgramManager} from './program_manager';
 
 
 function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string | null {
@@ -21,9 +22,9 @@ export interface LazyRouteMap {
 
 
 export function findLazyRoutes(filePath: string,
-                               program: ts.Program,
+                               programManager: ProgramManager,
                                host: ts.CompilerHost): LazyRouteMap {
-  const refactor = new TypeScriptFileRefactor(filePath, host, program);
+  const refactor = new TypeScriptFileRefactor(filePath, host, programManager);
 
   return refactor
     // Find all object literals in the file.
@@ -50,7 +51,8 @@ export function findLazyRoutes(filePath: string,
         ? ({
             resolvedModule: { resolvedFileName: join(dirname(filePath), moduleName) + '.ts' }
           } as any)
-        : ts.resolveModuleName(moduleName, filePath, program.getCompilerOptions(), host);
+        : ts.resolveModuleName(
+            moduleName, filePath, programManager.program.getCompilerOptions(), host);
       if (resolvedModuleName.resolvedModule
           && resolvedModuleName.resolvedModule.resolvedFileName
           && host.fileExists(resolvedModuleName.resolvedModule.resolvedFileName)) {

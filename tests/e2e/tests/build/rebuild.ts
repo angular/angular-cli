@@ -65,7 +65,8 @@ export default function() {
       export class AppModule { }
     `))
     // Should trigger a rebuild with a new bundle.
-    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 10000))
+    // Adding lazy chunks can trigger a longer rebuild due to extra dependencies.
+    .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 20000))
     // Count the bundles.
     .then(({ stdout }) => {
       let newNumberOfChunks = stdout.split(chunkRegExp).length;
