@@ -14,7 +14,7 @@ export class FileSystemHost implements FileSystemTreeHost {
 
   listDirectory(path: string) {
     let files = readdirSync(join(this._root, path));
-    if (path == '/') {
+    if (path == '/' || path == '') {
       files = files
       // Remove .git.
         .filter(path => path !== '.git')
