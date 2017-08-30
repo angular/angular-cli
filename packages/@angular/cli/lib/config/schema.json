@@ -192,6 +192,27 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "budgets": {
+            "description": "Defines the budget allotments for bundles.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "budget": {
+                  "type": "number"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string"
+                }
+              }
+            }
           }
         },
         "additionalProperties": false
