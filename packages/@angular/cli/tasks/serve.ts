@@ -273,14 +273,27 @@ export default Task.extend({
     }
 
     return new Promise((_resolve, reject) => {
-      server.listen(serveTaskOptions.port, serveTaskOptions.host, (err: any, _stats: any) => {
-        if (err) {
-          return reject(err);
-        }
-        if (serveTaskOptions.open) {
-          opn(serverAddress);
-        }
-      });
+      const httpServer = server.listen(
+        serveTaskOptions.port,
+        serveTaskOptions.host,
+        (err: any, _stats: any) => {
+          if (err) {
+            return reject(err);
+          }
+          if (serveTaskOptions.open) {
+            opn(serverAddress);
+          }
+        });
+      // Node 8.0 - 8.4 has a keepAliveTimeout bug which doesn't respect active connections.
+      // Connections will end after ~5 seconds (arbitrary), often not letting the full download
+      // of large pieces of content, such as a vendor javascript file.  This results in browsers
+      // throwing a "net::ERR_CONTENT_LENGTH_MISMATCH" error.
+      // https://github.com/angular/angular-cli/issues/7197
+      // https://github.com/nodejs/node/issues/13391
+      // https://github.com/nodejs/node/commit/2cb6f2b281eb96a7abe16d58af6ebc9ce23d2e96
+      if (/^v8.[0-4].\d+$/.test(process.version)) {
+        httpServer.keepAliveTimeout = 30000; // 30 seconds
+      }
     })
     .catch((err: Error) => {
       if (err) {
