@@ -1,6 +1,11 @@
-import { bold, green, red, reset, white, yellow } from 'chalk';
+import * as chalk from 'chalk';
 import { stripIndents } from 'common-tags';
 
+
+// Force basic color support on terminals with no color support.
+// Chalk typings don't have the correct constructor parameters.
+const chalkCtx = new (chalk.constructor as any)(chalk.supportsColor ? {} : { level: 1 });
+const { bold, green, red, reset, white, yellow } = chalkCtx;
 
 function _formatSize(size: number): string {
   if (size <= 0) {
