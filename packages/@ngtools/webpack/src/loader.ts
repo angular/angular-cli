@@ -602,7 +602,14 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
         });
 
         const result = refactor.transpile(compilerOptions);
-        cb(null, result.outputText, result.sourceMap);
+
+        if (plugin.failedCompilation) {
+          // Return an empty string to prevent extra loader errors (missing imports etc).
+          // Plugin errors were already pushed to the compilation errors.
+          cb(null, '');
+        } else {
+          cb(null, result.outputText, result.sourceMap);
+        }
       })
       .catch(err => cb(err));
   } else {
