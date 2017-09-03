@@ -19,16 +19,16 @@ Then add the needed script files to `apps[0].scripts`:
 
 ```json
 "scripts": [
-	"../node_modules/jquery/dist/jquery.slim.js",
-	"../node_modules/popper.js/dist/umd/popper.js",
-	"../node_modules/bootstrap/dist/js/bootstrap.js"
+  "../node_modules/jquery/dist/jquery.slim.js",
+  "../node_modules/popper.js/dist/umd/popper.js",
+  "../node_modules/bootstrap/dist/js/bootstrap.js"
 ],
 ```
 
 Finally add the Bootstrap CSS to the `apps[0].styles` array:
 ```json
 "styles": [
-	"../node_modules/bootstrap/dist/css/bootstrap.css",
+  "../node_modules/bootstrap/dist/css/bootstrap.css",
 	"styles.css"
 ],
 ```
