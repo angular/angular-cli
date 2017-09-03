@@ -10,24 +10,26 @@ what you need to do:
 First install Bootstrap from `npm`:
 
 ```bash
-npm install bootstrap@next
+npm install jquery --save
+npm install bootstrap@next --save
+npm install popper.js --save
 ```
 
 Then add the needed script files to `apps[0].scripts`:
 
 ```json
 "scripts": [
-  "../node_modules/jquery/dist/jquery.js",
-  "../node_modules/tether/dist/js/tether.js",
-  "../node_modules/bootstrap/dist/js/bootstrap.js"
+	"../node_modules/jquery/dist/jquery.slim.js",
+	"../node_modules/popper.js/dist/umd/popper.js",
+	"../node_modules/bootstrap/dist/js/bootstrap.js"
 ],
 ```
 
 Finally add the Bootstrap CSS to the `apps[0].styles` array:
 ```json
 "styles": [
-  "../node_modules/bootstrap/dist/css/bootstrap.css",
-  "styles.css"
+	"../node_modules/bootstrap/dist/css/bootstrap.css",
+	"styles.css"
 ],
 ```
 
