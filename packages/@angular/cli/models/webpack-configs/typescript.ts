@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
-import {AotPlugin} from '@ngtools/webpack';
+import { AotPlugin, AngularCompilerPlugin } from '@ngtools/webpack';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const SilentError = require('silent-error');
@@ -63,17 +63,24 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
     };
   }
 
-  return new AotPlugin(Object.assign({}, {
-      mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
-      i18nFile: buildOptions.i18nFile,
-      i18nFormat: buildOptions.i18nFormat,
-      locale: buildOptions.locale,
-      replaceExport: appConfig.platform === 'server',
-      missingTranslation: buildOptions.missingTranslation,
-      hostReplacementPaths,
-      // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
-      exclude: []
-    }, options));
+  const pluginOptions = Object.assign({}, {
+    mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
+    i18nFile: buildOptions.i18nFile,
+    i18nFormat: buildOptions.i18nFormat,
+    locale: buildOptions.locale,
+    replaceExport: appConfig.platform === 'server',
+    missingTranslation: buildOptions.missingTranslation,
+    hostReplacementPaths,
+    sourceMap: buildOptions.sourcemaps,
+    // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
+    exclude: []
+  }, options);
+
+  if (wco.buildOptions.experimentalAngularCompiler && !options.skipCodeGeneration) {
+    return new AngularCompilerPlugin(pluginOptions);
+  } else {
+    return new AotPlugin(pluginOptions);
+  }
 }
 
 export const getNonAotConfig = function(wco: WebpackConfigOptions) {

@@ -7,7 +7,7 @@ import { getAppFromConfig } from '../utilities/app-utils';
 import { EjectTaskOptions } from '../commands/eject';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { CliConfig } from '../models/config';
-import { AotPlugin } from '@ngtools/webpack';
+import { AotPlugin, AngularCompilerPlugin } from '@ngtools/webpack';
 import { yellow } from 'chalk';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 
@@ -217,6 +217,10 @@ class JsonWebpackSerializer {
         case AotPlugin:
           args = this._aotPluginSerialize(plugin);
           this._addImport('@ngtools/webpack', 'AotPlugin');
+          break;
+        case AngularCompilerPlugin:
+          args = this._aotPluginSerialize(plugin);
+          this._addImport('@ngtools/webpack', 'AngularCompilerPlugin');
           break;
         case HtmlWebpackPlugin:
           args = this._htmlWebpackPlugin(plugin);

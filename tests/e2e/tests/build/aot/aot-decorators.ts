@@ -1,8 +1,16 @@
 import {ng} from '../../../utils/process';
 import {appendToFile, expectFileToMatch, prependToFile, replaceInFile} from '../../../utils/fs';
 import {expectToFail} from '../../../utils/utils';
+import {getGlobalVariable} from '../../../utils/env';
 
 export default function() {
+
+  // TODO: re-enable this test for ng5
+  // now we only remove decorators via --build-optimizer
+  if (getGlobalVariable('argv').nightly) {
+    return Promise.resolve();
+  }
+
   return ng('generate', 'component', 'test-component', '--module', 'app.module.ts')
     .then(() => prependToFile('src/app/test-component/test-component.component.ts', `
       import { Optional, SkipSelf } from '@angular/core';

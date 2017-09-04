@@ -180,7 +180,9 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     },
     module: {
       rules: [
-        { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [nodeModules] },
+        { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader', exclude: [
+          nodeModules, /\.ngfactory\.js$/, /\.ngstyle\.js$/
+        ] },
         { test: /\.html$/, loader: 'raw-loader' },
         { test: /\.(eot|svg|cur)$/, loader: `file-loader?name=[name]${hashFormat.file}.[ext]` },
         {
