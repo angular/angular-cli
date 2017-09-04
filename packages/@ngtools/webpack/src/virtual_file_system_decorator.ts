@@ -9,6 +9,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     private _webpackCompilerHost: WebpackCompilerHost
   ) { }
 
+  // We only need to intercept calls to individual files that are present in WebpackCompilerHost.
   private _readFileSync(path: string): string | null {
     if (this._webpackCompilerHost.fileExists(path, false)) {
       return this._webpackCompilerHost.readFile(path);
@@ -18,19 +19,8 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   private _statSync(path: string): Stats | null {
-    if (this._webpackCompilerHost.fileExists(path, false)
-      || this._webpackCompilerHost.directoryExists(path, false)) {
+    if (this._webpackCompilerHost.fileExists(path, false)) {
       return this._webpackCompilerHost.stat(path);
-    }
-
-    return null;
-  }
-
-  private _readDirSync(path: string): string[] | null {
-    if (this._webpackCompilerHost.directoryExists(path, false)) {
-      const dirs = this._webpackCompilerHost.getDirectories(path);
-      const files = this._webpackCompilerHost.getFiles(path);
-      return files.concat(dirs);
     }
 
     return null;
@@ -46,12 +36,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   readdir(path: string, callback: Callback<any>): void {
-    const result = this._readDirSync(path);
-    if (result) {
-      callback(null, result);
-    } else {
-      this._inputFileSystem.readdir(path, callback);
-    }
+    this._inputFileSystem.readdir(path, callback);
   }
 
   readFile(path: string, callback: Callback<any>): void {
@@ -77,8 +62,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   readdirSync(path: string): string[] {
-    const result = this._readDirSync(path);
-    return result || this._inputFileSystem.readdirSync(path);
+    return this._inputFileSystem.readdirSync(path);
   }
 
   readFileSync(path: string): string {

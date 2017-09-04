@@ -68,6 +68,7 @@ export function useBuiltPackages() {
 }
 
 export function useSha() {
+  const argv = getGlobalVariable('argv');
   if (argv.nightly || argv['ng-sha']) {
     const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
     return updateJsonFile('package.json', json => {

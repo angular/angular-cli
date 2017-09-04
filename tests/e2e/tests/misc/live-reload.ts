@@ -104,7 +104,7 @@ export default function () {
     // Let app run.
     .then(_ => wait(2000))
     .then(_ => appendToFile('src/main.ts', 'console.log(1);'))
-    .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 5000))
+    .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 10000))
     .then(_ => wait(2000))
     .then(_ => {
       if (liveReloadCount != 2) {
@@ -123,7 +123,7 @@ export default function () {
     ))
     .then(_ => wait(2000))
     .then(_ => appendToFile('src/main.ts', 'console.log(1);'))
-    .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 5000))
+    .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 10000))
     .then(_ => wait(2000))
     .then(_ => {
       if (liveReloadCount != 1) {
@@ -157,7 +157,7 @@ export default function () {
     ))
     .then(_ => wait(2000))
     .then(_ => appendToFile('src/main.ts', 'console.log(1);'))
-    .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 5000))
+    .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 10000))
     .then(_ => wait(2000))
     .then(_ => {
       if (liveReloadCount != 2) {

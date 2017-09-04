@@ -21,8 +21,9 @@ export interface LazyRouteMap {
 
 
 export function findLazyRoutes(filePath: string,
-                               program: ts.Program,
-                               host: ts.CompilerHost): LazyRouteMap {
+                               host: ts.CompilerHost,
+                               program?: ts.Program,
+                               compilerOptions?: ts.CompilerOptions): LazyRouteMap {
   const refactor = new TypeScriptFileRefactor(filePath, host, program);
 
   return refactor
@@ -46,11 +47,12 @@ export function findLazyRoutes(filePath: string,
     // does not exist.
     .map((routePath: string) => {
       const moduleName = routePath.split('#')[0];
+      const compOptions = program ? program.getCompilerOptions() : compilerOptions;
       const resolvedModuleName: ts.ResolvedModuleWithFailedLookupLocations = moduleName[0] == '.'
         ? ({
             resolvedModule: { resolvedFileName: join(dirname(filePath), moduleName) + '.ts' }
           } as any)
-        : ts.resolveModuleName(moduleName, filePath, program.getCompilerOptions(), host);
+        : ts.resolveModuleName(moduleName, filePath, compOptions, host);
       if (resolvedModuleName.resolvedModule
           && resolvedModuleName.resolvedModule.resolvedFileName
           && host.fileExists(resolvedModuleName.resolvedModule.resolvedFileName)) {

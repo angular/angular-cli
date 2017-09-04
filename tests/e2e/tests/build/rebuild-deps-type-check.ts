@@ -48,21 +48,21 @@ export default function() {
       }
     `))
     // Should trigger a rebuild, this time an error is expected.
-    .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(doneRe, 20000))
     .then(({ stderr }) => {
-      if (!/ERROR in .*\/src\/main\.ts \(/.test(stderr)) {
+      if (!/ERROR in (.*\/src\/)?main\.ts/.test(stderr)) {
         throw new Error('Expected an error but none happened.');
       }
     })
     // Change an UNRELATED file and the error should still happen.
     .then(() => wait(2000))
     .then(() => appendToFile('src/app/app.module.ts', `
-      function anything(): number {}
+    function anything(): number {}
     `))
     // Should trigger a rebuild, this time an error is expected.
-    .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(doneRe, 20000))
     .then(({ stderr }) => {
-      if (!/ERROR in .*\/src\/main\.ts \(/.test(stderr)) {
+      if (!/ERROR in (.*\/src\/)?main\.ts/.test(stderr)) {
         throw new Error('Expected an error but none happened.');
       }
     })
@@ -73,9 +73,9 @@ export default function() {
         return value + 'hello';
       }
     `))
-    .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
+    .then(() => waitForAnyProcessOutputToMatch(doneRe, 20000))
     .then(({ stderr }) => {
-      if (/ERROR in .*\/src\/main\.ts \(/.test(stderr)) {
+      if (/ERROR in (.*\/src\/)?main\.ts/.test(stderr)) {
         throw new Error('Expected no error but an error was shown.');
       }
     })

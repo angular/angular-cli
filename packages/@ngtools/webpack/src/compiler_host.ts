@@ -1,6 +1,7 @@
 import * as ts from 'typescript';
 import {basename, dirname, join} from 'path';
 import * as fs from 'fs';
+import {WebpackResourceLoader} from './resource_loader';
 
 
 export interface OnErrorFn {
@@ -103,6 +104,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _setParentNodes: boolean;
 
   private _cache = false;
+  private _resourceLoader?: WebpackResourceLoader | undefined;
 
   constructor(private _options: ts.CompilerOptions, basePath: string) {
     this._setParentNodes = true;
@@ -150,6 +152,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     this._changedFiles = Object.create(null);
     this._changedDirs = Object.create(null);
   }
+
   getChangedFilePaths(): string[] {
     return Object.keys(this._changedFiles);
   }
@@ -266,5 +269,19 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   getNewLine(): string {
     return this._delegate.getNewLine();
+  }
+
+  setResourceLoader(resourceLoader: WebpackResourceLoader) {
+    this._resourceLoader = resourceLoader;
+  }
+
+  readResource(fileName: string) {
+    if (this._resourceLoader) {
+      // We still read it to add it to the compiler host file list.
+      this.readFile(fileName);
+      return this._resourceLoader.get(fileName);
+    } else {
+      return this.readFile(fileName);
+    }
   }
 }
