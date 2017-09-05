@@ -6,6 +6,7 @@ import * as path from 'path';
 
 import {CliConfig} from '../models/config';
 import {findUp} from '../utilities/find-up';
+import {requireProjectModule} from '../utilities/require-project-module';
 
 const resolve = require('resolve');
 
@@ -83,10 +84,15 @@ export class Version {
   }
 
   static assertAngularVersionIs2_3_1OrHigher(projectRoot: string) {
-    const angularCorePath = path.join(projectRoot, 'node_modules/@angular/core');
-    const pkgJson = existsSync(angularCorePath)
-      ? JSON.parse(readFileSync(path.join(angularCorePath, 'package.json'), 'utf8'))
-      : null;
+    let pkgJson;
+    try {
+      pkgJson = requireProjectModule(projectRoot, '@angular/core/package.json');
+    } catch (_) {
+      console.error(bold(red(stripIndents`
+        You seem to not be depending on "@angular/core". This is an error.
+      `)));
+      process.exit(2);
+    }
 
     // Just check @angular/core.
     if (pkgJson && pkgJson['version']) {
