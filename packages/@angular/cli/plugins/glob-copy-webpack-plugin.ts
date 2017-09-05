@@ -2,18 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as denodeify from 'denodeify';
+import { AssetPattern } from '../models/webpack-configs/utils';
+import { isDirectory } from '../utilities/is-directory';
 
 const flattenDeep = require('lodash/flattenDeep');
 const globPromise = <any>denodeify(glob);
 const statPromise = <any>denodeify(fs.stat);
-
-function isDirectory(path: string) {
-  try {
-    return fs.statSync(path).isDirectory();
-  } catch (_) {
-    return false;
-  }
-}
 
 interface Asset {
   originPath: string;
@@ -21,14 +15,8 @@ interface Asset {
   relativePath: string;
 }
 
-export interface Pattern {
-  glob: string;
-  input?: string;
-  output?: string;
-}
-
 export interface GlobCopyWebpackPluginOptions {
-  patterns: (string | Pattern)[];
+  patterns: (string | AssetPattern)[];
   globOptions: any;
 }
 
@@ -79,7 +67,7 @@ export class GlobCopyWebpackPlugin {
 
     compiler.plugin('emit', (compilation: any, cb: any) => {
       // Create an array of promises for each pattern glob
-      const globs = patterns.map((pattern: Pattern) => new Promise((resolve, reject) =>
+      const globs = patterns.map((pattern: AssetPattern) => new Promise((resolve, reject) =>
         // Individual patterns can override cwd
         globPromise(pattern.glob, Object.assign({}, globOptions, { cwd: pattern.input }))
           // Map the results onto an Asset
