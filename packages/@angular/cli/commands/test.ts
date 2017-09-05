@@ -5,7 +5,7 @@ import { oneLine } from 'common-tags';
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const testConfigDefaults = config.getPaths('defaults.build', [
-  'progress', 'poll'
+  'progress', 'poll', 'preserveSymlinks'
 ]);
 
 export interface TestOptions {
@@ -23,6 +23,7 @@ export interface TestOptions {
   poll?: number;
   environment?: string;
   app?: string;
+  preserveSymlinks?: boolean;
 }
 
 
@@ -108,6 +109,12 @@ const TestCommand = Command.extend({
       type: String,
       aliases: ['e'] ,
       description: 'Defines the build environment.'
+    },
+    {
+      name: 'preserve-symlinks',
+      type: Boolean,
+      description: 'Do not use the real path when resolving modules.',
+      default: testConfigDefaults['preserveSymlinks']
     },
     {
       name: 'app',

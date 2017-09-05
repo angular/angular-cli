@@ -54,6 +54,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     codeCoverage: false,
     sourcemaps: true,
     progress: true,
+    preserveSymlinks: false,
   }, config.angularCli);
 
   if (testConfig.sourcemaps) {
