@@ -24,6 +24,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SilentError = require('silent-error');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const ConcatPlugin = require('webpack-concat-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const Task = require('../ember-cli/lib/models/task');
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -158,6 +159,10 @@ class JsonWebpackSerializer {
     return plugin.settings;
   }
 
+  private _uglifyjsPlugin(plugin: any) {
+    return plugin.options;
+  }
+
   private _pluginsReplacer(plugins: any[]) {
     return plugins.map(plugin => {
       let args = plugin.options || undefined;
@@ -227,6 +232,10 @@ class JsonWebpackSerializer {
         case ConcatPlugin:
           args = this._concatPlugin(plugin);
           this.variableImports['webpack-concat-plugin'] = 'ConcatPlugin';
+          break;
+        case UglifyJSPlugin:
+          args = this._uglifyjsPlugin(plugin);
+          this.variableImports['uglifyjs-webpack-plugin'] = 'UglifyJSPlugin';
           break;
         default:
           if (plugin.constructor.name == 'AngularServiceWorkerPlugin') {
@@ -538,6 +547,7 @@ export default Task.extend({
           'url-loader',
           'circular-dependency-plugin',
           'webpack-concat-plugin',
+          'uglifyjs-webpack-plugin',
         ].forEach((packageName: string) => {
           packageJson['devDependencies'][packageName] = ourPackageJson['dependencies'][packageName];
         });
