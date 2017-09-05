@@ -9,6 +9,8 @@ import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+
 
 export const getProdConfig = function (wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
@@ -94,7 +96,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     }));
   }
 
-  const uglifyCompressOptions: any = { screw_ie8: true, warnings: buildOptions.verbose };
+  const uglifyCompressOptions: any = {};
 
   if (buildOptions.buildOptimizer) {
     // This plugin must be before webpack.optimize.UglifyJsPlugin.
@@ -113,12 +115,22 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       }),
       new webpack.HashedModuleIdsPlugin(),
       new webpack.optimize.ModuleConcatenationPlugin(),
-      new webpack.optimize.UglifyJsPlugin(<any>{
-        mangle: { screw_ie8: true },
-        compress: uglifyCompressOptions,
-        output: { ascii_only: true },
+      new UglifyJSPlugin({
         sourceMap: buildOptions.sourcemaps,
-        comments: false
+        // Some options (like warnings) aren't being properly passed to uglify with parallel: true.
+        parallel: false,
+        uglifyOptions: {
+          // TODO: adjust this together with tsconfig `target` property when adding target option.
+          ecma: 5,
+          warnings: buildOptions.verbose,
+          ie8: false,
+          mangle: true,
+          compress: uglifyCompressOptions,
+          output: {
+            ascii_only: true,
+            comments: false
+          },
+        }
       })
     ])
   };
