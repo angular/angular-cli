@@ -4,7 +4,8 @@ import * as glob from 'glob';
 import * as webpack from 'webpack';
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
-import { Pattern } from './glob-copy-webpack-plugin';
+import { AssetPattern } from '../models/webpack-configs/utils';
+import { isDirectory } from '../utilities/is-directory';
 import { WebpackTestConfig, WebpackTestOptions } from '../models/webpack-test-config';
 import { KarmaWebpackThrowError } from './karma-webpack-throw-error';
 
@@ -21,14 +22,6 @@ const getAppFromConfig = require('../utilities/app-utils').getAppFromConfig;
 
 let blocked: any[] = [];
 let isBlocked = false;
-
-function isDirectory(path: string) {
-  try {
-    return fs.statSync(path).isDirectory();
-  } catch (_) {
-    return false;
-  }
-}
 
 // Add files to the Karma files array.
 function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
@@ -82,7 +75,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   // Add assets. This logic is mimics the one present in GlobCopyWebpackPlugin.
   if (appConfig.assets) {
     config.proxies = config.proxies || {};
-    appConfig.assets.forEach((pattern: Pattern) => {
+    appConfig.assets.forEach((pattern: AssetPattern) => {
       // Convert all string patterns to Pattern type.
       pattern = typeof pattern === 'string' ? { glob: pattern } : pattern;
       // Add defaults.

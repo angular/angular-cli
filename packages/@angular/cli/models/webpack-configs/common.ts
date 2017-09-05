@@ -1,9 +1,10 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
-import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
+import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
 import { InsertConcatAssetsWebpackPlugin } from '../../plugins/insert-concat-assets-webpack-plugin';
-import { extraEntryParser, getOutputHashFormat } from './utils';
+import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
+import { isDirectory } from '../../utilities/is-directory';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const ConcatPlugin = require('webpack-concat-plugin');
@@ -84,10 +85,44 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // process asset entries
   if (appConfig.assets) {
-    extraPlugins.push(new GlobCopyWebpackPlugin({
-      patterns: appConfig.assets,
-      globOptions: { cwd: appRoot, dot: true, ignore: '**/.gitkeep' }
-    }));
+    const copyWebpackPluginPatterns = appConfig.assets.map((asset: string | AssetPattern) => {
+      // Convert all string assets to object notation.
+      asset = typeof asset === 'string' ? { glob: asset } : asset;
+      // Add defaults.
+      // Input is always resolved relative to the appRoot.
+      asset.input = path.resolve(appRoot, asset.input || '');
+      asset.output = asset.output || '';
+      asset.glob = asset.glob || '';
+
+      // Ensure trailing slash.
+      if (isDirectory(path.resolve(asset.input))) {
+        asset.input += '/';
+      }
+
+      // Convert dir patterns to globs.
+      if (isDirectory(path.resolve(asset.input, asset.glob))) {
+        asset.glob = asset.glob + '/**/*';
+      }
+
+      return {
+        context: asset.input,
+        to: asset.output,
+        from: {
+          glob: asset.glob,
+          dot: true
+        }
+      };
+    });
+    const copyWebpackPluginOptions = { ignore: ['.gitkeep'] };
+
+    const copyWebpackPluginInstance = new CopyWebpackPlugin(copyWebpackPluginPatterns,
+      copyWebpackPluginOptions);
+
+    // Save options so we can use them in eject.
+    (copyWebpackPluginInstance as any)['copyWebpackPluginPatterns'] = copyWebpackPluginPatterns;
+    (copyWebpackPluginInstance as any)['copyWebpackPluginOptions'] = copyWebpackPluginOptions;
+
+    extraPlugins.push(copyWebpackPluginInstance);
   }
 
   if (buildOptions.progress) {

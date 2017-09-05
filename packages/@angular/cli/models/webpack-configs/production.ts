@@ -58,6 +58,11 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       `);
     }
 
+    // CopyWebpackPlugin replaces GlobCopyWebpackPlugin, but AngularServiceWorkerPlugin depends
+    // on specific behaviour from latter.
+    // AngularServiceWorkerPlugin expects the ngsw-manifest.json to be present in the 'emit' phase
+    // but with CopyWebpackPlugin it's only there on 'after-emit'.
+    // So for now we keep it here, but if AngularServiceWorkerPlugin changes we remove it.
     extraPlugins.push(new GlobCopyWebpackPlugin({
       patterns: [
         'ngsw-manifest.json',
