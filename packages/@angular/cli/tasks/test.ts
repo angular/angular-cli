@@ -40,6 +40,7 @@ export default Task.extend({
         progress: options.progress,
         poll: options.poll,
         environment: options.environment,
+        preserveSymlinks: options.preserveSymlinks,
         app: options.app
       };
 
