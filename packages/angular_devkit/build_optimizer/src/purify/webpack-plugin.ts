@@ -21,7 +21,7 @@ export class PurifyPlugin {
       compilation.plugin('optimize-chunk-assets', (chunks: Chunk[], callback: () => void) => {
         chunks.forEach((chunk: Chunk) => {
           chunk.files
-            .filter((fileName: string) => fileName.endsWith('.bundle.js'))
+            .filter((fileName: string) => fileName.endsWith('.js'))
             .forEach((fileName: string) => {
               const purifiedSource = purify(compilation.assets[fileName].source());
               compilation.assets[fileName]._cachedSource = purifiedSource;
