@@ -1,6 +1,7 @@
 import {
   DryRunEvent,
   DryRunSink,
+  EmptyTree,
   FileSystemSink,
   FileSystemTree,
   Schematic,
@@ -22,6 +23,7 @@ const Task = require('../ember-cli/lib/models/task');
 export interface SchematicRunOptions {
   taskOptions: SchematicOptions;
   workingDir: string;
+  emptyHost: boolean;
   collectionName: string;
   schematicName: string;
 }
@@ -44,7 +46,7 @@ interface OutputLogging {
 
 export default Task.extend({
   run: function (options: SchematicRunOptions): Promise<SchematicOutput> {
-    const { taskOptions, workingDir, collectionName, schematicName } = options;
+    const { taskOptions, workingDir, emptyHost, collectionName, schematicName } = options;
 
     const ui = this.ui;
 
@@ -63,7 +65,8 @@ export default Task.extend({
     const preppedOptions = prepOptions(schematic, taskOptions);
     const opts = { ...taskOptions, ...preppedOptions };
 
-    const host = Observable.of(new FileSystemTree(new FileSystemHost(workingDir)));
+    const tree = emptyHost ? new EmptyTree() : new FileSystemTree(new FileSystemHost(workingDir));
+    const host = Observable.of(tree);
 
     const dryRunSink = new DryRunSink(workingDir, opts.force);
     const fsSink = new FileSystemSink(workingDir, opts.force);

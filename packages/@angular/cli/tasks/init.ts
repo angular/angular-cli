@@ -78,6 +78,7 @@ export default Task.extend({
     const runOptions = {
       taskOptions: commandOptions,
       workingDir: cwd,
+      emptyHost: true,
       collectionName: commandOptions.collectionName,
       schematicName
     };
