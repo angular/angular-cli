@@ -2,19 +2,23 @@ import * as path from 'path';
 import * as webpack from 'webpack';
 import * as fs from 'fs';
 import * as semver from 'semver';
+import * as ts from 'typescript';
 import { stripIndent } from 'common-tags';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
+import { readTsconfig } from '../../utilities/read-tsconfig';
+
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 
 export const getProdConfig = function (wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
   let extraPlugins: any[] = [];
-  let entryPoints: {[key: string]: string[]} = {};
+  let entryPoints: { [key: string]: string[] } = {};
 
   if (appConfig.serviceWorker) {
     const nodeModules = path.resolve(projectRoot, 'node_modules');
@@ -66,7 +70,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     extraPlugins.push(new GlobCopyWebpackPlugin({
       patterns: [
         'ngsw-manifest.json',
-        {glob: 'ngsw-manifest.json', input: path.resolve(projectRoot, appConfig.root), output: ''}
+        { glob: 'ngsw-manifest.json', input: path.resolve(projectRoot, appConfig.root), output: '' }
       ],
       globOptions: {
         cwd: projectRoot,
@@ -99,7 +103,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     }));
   }
 
-  const uglifyCompressOptions: any = { screw_ie8: true, warnings: buildOptions.verbose };
+  const uglifyCompressOptions: any = {};
 
   if (buildOptions.buildOptimizer) {
     // This plugin must be before webpack.optimize.UglifyJsPlugin.
@@ -110,21 +114,49 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     uglifyCompressOptions.passes = 3;
   }
 
+  // Read the tsconfig to determine if we should apply ES6 uglify.
+  const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
+  const tsConfig = readTsconfig(tsconfigPath);
+  const supportES2015 = tsConfig.options.target !== ts.ScriptTarget.ES3
+    && tsConfig.options.target !== ts.ScriptTarget.ES5;
+
+  if (supportES2015) {
+    extraPlugins.push(new UglifyJSPlugin({
+      sourceMap: buildOptions.sourcemaps,
+      uglifyOptions: {
+        ecma: 6,
+        warnings: buildOptions.verbose,
+        ie8: false,
+        mangle: true,
+        compress: uglifyCompressOptions,
+        output: {
+          ascii_only: true,
+          comments: false
+        },
+      }
+    }));
+  } else {
+    uglifyCompressOptions.screw_ie8 = true;
+    uglifyCompressOptions.warnings = buildOptions.verbose;
+    extraPlugins.push(new webpack.optimize.UglifyJsPlugin(<any>{
+      mangle: { screw_ie8: true },
+      compress: uglifyCompressOptions,
+      output: { ascii_only: true },
+      sourceMap: buildOptions.sourcemaps,
+      comments: false
+    }));
+
+  }
+
   return {
     entry: entryPoints,
-    plugins: extraPlugins.concat([
+    plugins: [
       new webpack.EnvironmentPlugin({
         'NODE_ENV': 'production'
       }),
       new webpack.HashedModuleIdsPlugin(),
       new webpack.optimize.ModuleConcatenationPlugin(),
-      new webpack.optimize.UglifyJsPlugin(<any>{
-        mangle: { screw_ie8: true },
-        compress: uglifyCompressOptions,
-        output: { ascii_only: true },
-        sourceMap: buildOptions.sourcemaps,
-        comments: false
-      })
-    ])
+      ...extraPlugins
+    ]
   };
 };

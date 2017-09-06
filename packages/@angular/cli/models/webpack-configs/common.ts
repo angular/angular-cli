@@ -1,11 +1,13 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
+import * as ts from 'typescript';
 import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
 import { InsertConcatAssetsWebpackPlugin } from '../../plugins/insert-concat-assets-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
 import { WebpackConfigOptions } from '../webpack-config';
+import { readTsconfig } from '../../utilities/read-tsconfig';
 
 const ConcatPlugin = require('webpack-concat-plugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -149,10 +151,20 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new NamedLazyChunksWebpackPlugin());
   }
 
+  // Read the tsconfig to determine if we should prefer ES2015 modules.
+  const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
+  const tsConfig = readTsconfig(tsconfigPath);
+  const supportES2015 = tsConfig.options.target !== ts.ScriptTarget.ES3
+    && tsConfig.options.target !== ts.ScriptTarget.ES5;
+
   return {
     resolve: {
       extensions: ['.ts', '.js'],
       modules: ['node_modules', nodeModules],
+      mainFields: [
+        ...(supportES2015 ? ['es2015'] : []),
+        'browser', 'module', 'main'
+      ],
       symlinks: !buildOptions.preserveSymlinks
     },
     resolveLoader: {
