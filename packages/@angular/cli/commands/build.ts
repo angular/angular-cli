@@ -199,8 +199,9 @@ const BuildCommand = Command.extend({
   ]),
 
   run: function (commandOptions: BuildTaskOptions) {
-    // Check angular version.
+    // Check Angular and TypeScript versions.
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
+    Version.assertTypescriptVersion(this.project.root);
 
     // Default vendor chunk to false when build optimizer is on.
     if (commandOptions.vendorChunk === undefined) {

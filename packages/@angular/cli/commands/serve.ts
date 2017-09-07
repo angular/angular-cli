@@ -126,7 +126,9 @@ const ServeCommand = Command.extend({
   run: function (commandOptions: ServeTaskOptions) {
     const ServeTask = require('../tasks/serve').default;
 
+    // Check Angular and TypeScript versions.
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
+    Version.assertTypescriptVersion(this.project.root);
 
     // Default vendor chunk to false when build optimizer is on.
     if (commandOptions.vendorChunk === undefined) {
