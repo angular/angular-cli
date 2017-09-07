@@ -41,6 +41,7 @@ export default function() {
     // Should trigger a rebuild, no error expected.
     .then(() => execAndWaitForOutputToMatch('ng', ['serve'], doneRe))
     // Make an invalid version of the file.
+    .then(() => wait(2000))
     .then(() => writeFile('src/funky2.ts', `
       export function funky2(value: number): number {
         return value + 1;
@@ -66,6 +67,7 @@ export default function() {
       }
     })
     // Fix the error!
+    .then(() => wait(2000))
     .then(() => writeFile('src/funky2.ts', `
       export function funky2(value: string): string {
         return value + 'hello';
