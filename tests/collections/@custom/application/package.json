@@ -1,0 +1,4 @@
+{
+  "name": "empty-app",
+  "schematics": "./collection.json"
+}
