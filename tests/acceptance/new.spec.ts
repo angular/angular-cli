@@ -15,6 +15,9 @@ describe('Acceptance: ng new', function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
     spyOn(console, 'error');
+    // symlink custom collections to node_modules, so we can use with ng new
+    // it is a bit dirty, but bootstrap-local tricks won't work here
+    fs.symlinkSync(`${process.cwd()}/tests/collections/@custom`, `./node_modules/@custom`, 'dir');
 
     tmp.setup('./tmp')
       .then(() => process.chdir('./tmp'))
@@ -22,6 +25,7 @@ describe('Acceptance: ng new', function () {
   }, 10000);
 
   afterEach((done) => {
+    fs.unlinkSync(path.join(__dirname, '/../../node_modules/@custom'));
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     tmp.teardown('./tmp').then(() => done());
   });
@@ -172,6 +176,12 @@ describe('Acceptance: ng new', function () {
       expect(pkgJson.devDependencies['@angular/cli']).toMatch(/\d+\.\d+\.\d+/);
     })
     .then(done, done.fail);
-  })
+  });
 
+  it('should support passing a custom collection', (done) => {
+    return ng(['new', 'foo', '--collection=@custom/application', '--skip-install', '--skip-git']).then(() => {
+      expect(() => fs.readFileSync('emptyapp', 'utf8')).not.toThrow();
+    })
+    .then(done, done.fail);
+  });
 });
