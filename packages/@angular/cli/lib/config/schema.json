@@ -586,6 +586,11 @@
           "description": "Show a warning when the global version is newer than the local one.",
           "type": "boolean",
           "default": true
+        },
+        "typescriptMismatch": {
+          "description": "Show a warning when the TypeScript version is incompatible",
+          "type": "boolean",
+          "default": true
         }
       }
     }
