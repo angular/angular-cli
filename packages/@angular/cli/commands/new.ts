@@ -144,7 +144,11 @@ const NewCommand = Command.extend({
       `);
     }
 
-    commandOptions.collectionName = this.getCollectionName(rawArgs);
+    if (commandOptions.collection) {
+      commandOptions.collectionName = commandOptions.collection;
+    } else {
+      commandOptions.collectionName = this.getCollectionName(rawArgs);
+    }
 
     const initCommand = new InitCommand({
       ui: this.ui,
