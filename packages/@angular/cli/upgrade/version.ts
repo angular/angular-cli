@@ -1,6 +1,6 @@
-import {SemVer} from 'semver';
+import {SemVer, satisfies} from 'semver';
 import {bold, red, yellow} from 'chalk';
-import {stripIndents} from 'common-tags';
+import {stripIndents, stripIndent} from 'common-tags';
 import {readFileSync, existsSync} from 'fs';
 import * as path from 'path';
 
@@ -140,6 +140,50 @@ export class Version {
           It will be ignored.
         ` + '\n')));
       }
+    }
+  }
+
+  static assertTypescriptVersion(projectRoot: string) {
+    if (!CliConfig.fromGlobal().get('warnings.typescriptMismatch')) {
+      return;
+    }
+    let compilerVersion: string, tsVersion: string;
+    try {
+      compilerVersion = requireProjectModule(projectRoot, '@angular/compiler-cli').VERSION.full;
+      tsVersion = requireProjectModule(projectRoot, 'typescript').version;
+    } catch (_) {
+      console.error(bold(red(stripIndents`
+        Versions of @angular/compiler-cli and typescript could not be determined.
+        The most common reason for this is a broken npm install.
+
+        Please make sure your package.json contains both @angular/compiler-cli and typescript in
+        devDependencies, then delete node_modules and package-lock.json (if you have one) and
+        run npm install again.
+      `)));
+      process.exit(2);
+    }
+
+    const versionCombos = [
+      { compiler: '>=2.3.1 <3.0.0', typescript: '>=2.0.2 <2.3.0' },
+      { compiler: '>=4.0.0 <5.0.0', typescript: '>=2.1.0 <2.4.0' },
+      { compiler: '>=5.0.0 <6.0.0', typescript: '>=2.4.0 <2.6.0' }
+    ];
+
+    const currentCombo = versionCombos.find((combo) => satisfies(compilerVersion, combo.compiler));
+
+    if (currentCombo && !satisfies(tsVersion, currentCombo.typescript)) {
+      // First line of warning looks weird being split in two, disable tslint for it.
+      console.log((yellow('\n' + stripIndent`
+        @angular/compiler-cli@${compilerVersion} requires typescript@'${
+          currentCombo.typescript}' but ${tsVersion} was found instead.
+        Using this version can result in undefined behaviour and difficult to debug problems.
+
+        Please run the following command to install a compatible version of TypeScript.
+
+            npm install typescript@'${currentCombo.typescript}'
+
+        To disable this warning run "ng set --global warnings.typescriptMismatch=false".
+      ` + '\n')));
     }
   }
 
