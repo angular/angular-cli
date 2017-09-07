@@ -73,7 +73,7 @@ jobs:
       - restore_cache:
           key: angular_devkit-{{ .Branch }}-{{ checksum "package-lock.json" }}
 
-      - run: bazel run @io_bazel_rules_typescript_node//:bin/npm install
+      - run: bazel run @nodejs//:npm install
       - run: bazel build ...
 
       - save_cache:

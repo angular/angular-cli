@@ -76,6 +76,6 @@
     "webpack-sources": "^1.0.1"
   },
   "devDependencies": {
-    "protobufjs": "5.0.0"
+    "@bazel/typescript": "0.0.10"
   }
 }
