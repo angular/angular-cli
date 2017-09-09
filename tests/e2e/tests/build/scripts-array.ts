@@ -7,10 +7,18 @@ import {
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { oneLineTrim } from 'common-tags';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export default function () {
   return writeMultipleFiles({
     'src/string-script.js': 'console.log(\'string-script\'); var number = 1+1;',
+    'src/zstring-script.js': 'console.log(\'zstring-script\');',
+    'src/fstring-script.js': 'console.log(\'fstring-script\');',
+    'src/ustring-script.js': 'console.log(\'ustring-script\');',
+    'src/bstring-script.js': 'console.log(\'bstring-script\');',
+    'src/astring-script.js': 'console.log(\'astring-script\');',
+    'src/cstring-script.js': 'console.log(\'cstring-script\');',
     'src/input-script.js': 'console.log(\'input-script\');',
     'src/lazy-script.js': 'console.log(\'lazy-script\');',
     'src/pre-rename-script.js': 'console.log(\'pre-rename-script\');',
@@ -21,6 +29,12 @@ export default function () {
       const app = configJson['apps'][0];
       app['scripts'] = [
         'string-script.js',
+        'zstring-script.js',
+        'fstring-script.js',
+        'ustring-script.js',
+        'bstring-script.js',
+        'astring-script.js',
+        'cstring-script.js',
         { input: 'input-script.js' },
         { input: 'lazy-script.js', lazy: true },
         { input: 'pre-rename-script.js', output: 'renamed-script' },
@@ -53,5 +67,24 @@ export default function () {
     .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.bundle\.js/))
     .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.bundle\.js.map/))
     .then(() => expectFileToMatch('dist/lazy-script.bundle.js', 'lazy-script'))
-    .then(() => expectFileToMatch('dist/renamed-lazy-script.bundle.js', 'pre-rename-lazy-script'));
+    .then(() => expectFileToMatch('dist/renamed-lazy-script.bundle.js', 'pre-rename-lazy-script'))
+
+    // Expect order to be preserved.
+    .then(() => {
+      const [fileName] = fs.readdirSync('dist')
+        .filter(name => name.match(/^scripts\..*\.bundle\.js$/));
+
+      const content = fs.readFileSync(path.join('dist', fileName), 'utf-8');
+      const re = new RegExp(/['"]string-script['"].*/.source
+                          + /['"]zstring-script['"].*/.source
+                          + /['"]fstring-script['"].*/.source
+                          + /['"]ustring-script['"].*/.source
+                          + /['"]bstring-script['"].*/.source
+                          + /['"]astring-script['"].*/.source
+                          + /['"]cstring-script['"].*/.source
+                          + /['"]input-script['"]/.source;
+      if (!content.match(re)) {
+        throw new Error('Scripts are not included in order.');
+      }
+    });
 }
