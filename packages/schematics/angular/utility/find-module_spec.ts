@@ -36,6 +36,12 @@ describe('find-module', () => {
       expect(foundModule).toEqual(modulePath);
     });
 
+    it('should work with weird paths', () => {
+      host.create('/foo/src/app/app-routing.module.ts', 'app module');
+      const foundModule = findModule(host, 'foo//src//app/bar/');
+      expect(foundModule).toEqual(modulePath);
+    });
+
     it('should throw if no modules found', () => {
       host.create('/foo/src/app/oops.module.ts', 'app module');
       try {

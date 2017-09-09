@@ -56,7 +56,7 @@ export function findModuleFromOptions(host: Tree,
  * Function to find the "closest" module to a generated file's path.
  */
 export function findModule(host: Tree, generateDir: string): SchematicPath {
-  let closestModule = generateDir;
+  let closestModule: string = normalizePath(generateDir.replace(/[\\/]$/, ''));
   const allFiles = host.files;
 
   let modulePath: string | null = null;
