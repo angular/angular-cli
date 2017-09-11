@@ -1,5 +1,6 @@
 // TODO: move this in its own package.
 import * as path from 'path';
+import * as fs from 'fs';
 import * as ts from 'typescript';
 import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
 
@@ -205,6 +206,9 @@ export class TypeScriptFileRefactor {
   }
 
   transpile(compilerOptions: ts.CompilerOptions): TranspileOutput {
+    if (this._fileName.endsWith('.d.ts') && this._fileName.indexOf('node_modules') > -1) {
+      return this._getCompiledFromPackage();
+    }
     const source = this.sourceText;
     const result = ts.transpileModule(source, {
       compilerOptions: Object.assign({}, compilerOptions, {
@@ -246,5 +250,18 @@ export class TypeScriptFileRefactor {
         sourceMap: null
       };
     }
+  }
+
+  _getCompiledFromPackage(): TranspileOutput {
+    const basePath: string = path.dirname(this._fileName),
+      packageJson = require(path.join(basePath, 'package.json')),
+      precompiledFileName = path.join(basePath, packageJson.es2015),
+      output = fs.readFileSync(precompiledFileName, 'utf8'),
+      sourceMap = fs.readFileSync(precompiledFileName + '.map', 'utf8');
+
+   return {
+     outputText: output,
+     sourceMap: sourceMap
+   };
   }
 }
