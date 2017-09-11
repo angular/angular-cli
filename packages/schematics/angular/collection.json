@@ -39,7 +39,7 @@
     },
     "guard": {
       "factory": "./guard",
-      "description": "Create an guard.",
+      "description": "Create a guard.",
       "schema": "./guard/schema.json"
     },
     "g": {
