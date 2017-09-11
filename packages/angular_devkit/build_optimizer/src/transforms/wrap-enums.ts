@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { collectDeepNodes, drilldownNodes } from '../helpers/ast-utils';
+import { drilldownNodes } from '../helpers/ast-utils';
 
 
 export function testWrapEnums(content: string) {
@@ -20,121 +20,152 @@ export function testWrapEnums(content: string) {
   return regexes.some((regex) => regex.test(content));
 }
 
-interface EnumData {
-  name: string;
-  hostNode: ts.Node;
-  statements: ts.ExpressionStatement[];
-  dropNodes: ts.Node[];
+function isBlockLike(node: ts.Node): node is ts.BlockLike {
+  return node.kind === ts.SyntaxKind.Block
+      || node.kind === ts.SyntaxKind.ModuleBlock
+      || node.kind === ts.SyntaxKind.CaseClause
+      || node.kind === ts.SyntaxKind.DefaultClause
+      || node.kind === ts.SyntaxKind.SourceFile;
+}
+
+// NOTE: 'isXXXX' helper functions can be replaced with native TS helpers with TS 2.4+
+
+function isVariableStatement(node: ts.Node): node is ts.VariableStatement {
+  return node.kind === ts.SyntaxKind.VariableStatement;
+}
+
+function isIdentifier(node: ts.Node): node is ts.Identifier {
+  return node.kind === ts.SyntaxKind.Identifier;
+}
+
+function isObjectLiteralExpression(node: ts.Node): node is ts.ObjectLiteralExpression {
+  return node.kind === ts.SyntaxKind.ObjectLiteralExpression;
 }
 
 export function getWrapEnumsTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
-      const enums = findEnumDeclarations(sf);
-      const dropNodes = enums.reduce((acc: ts.Node[], curr) => acc.concat(curr.dropNodes), []);
+      const result = visitBlockStatements(sf.statements, context);
 
-      const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
-
-        const enumData = enums.find((e) => e.hostNode === node);
-        if (enumData) {
-          // Replace node with a wrapped enum.
-          return ts.visitEachChild(createWrappedEnum(enumData), visitor, context);
-        }
-
-        // Drop enum nodes we relocated.
-        if (dropNodes.find((n) => n === node)) {
-          // According to @mhegazy returning undefined is supported.
-          // https://github.com/Microsoft/TypeScript/pull/17044
-          // tslint:disable-next-line:no-any
-          return undefined as any;
-        }
-
-        // Otherwise return node as is.
-        return ts.visitEachChild(node, visitor, context);
-      };
-
-      return ts.visitNode(sf, visitor);
+      return ts.updateSourceFileNode(sf, result);
     };
 
     return transformer;
   };
 }
 
+function visitBlockStatements(
+  statements: Array<ts.Statement>,
+  context: ts.TransformationContext,
+): Array<ts.Statement> {
 
-// Find all enum declarations, build a EnumData for each.
-function findEnumDeclarations(sourceFile: ts.SourceFile): EnumData[] {
-  const enums: EnumData[] = [];
+  // copy of statements to modify; lazy initialized
+  let updatedStatements: Array<ts.Statement> | undefined;
 
-  const enumHoldingNodes = [
-    sourceFile,
-    ...collectDeepNodes<ts.Block>(sourceFile, ts.SyntaxKind.Block),
-  ];
-
-  enumHoldingNodes.forEach((node) => {
-
-    const stmts = node.statements;
-
-    stmts.forEach((stmt, idx) => {
-      // We're looking for a variable statement with more statements after it.
-      if (idx >= stmts.length - 1
-        || stmt.kind !== ts.SyntaxKind.VariableStatement) {
-        return;
+  const visitor: ts.Visitor = (node) => {
+    if (isBlockLike(node)) {
+      const result = visitBlockStatements(node.statements, context);
+      if (result === node.statements) {
+        return node;
       }
+      switch (node.kind) {
+        case ts.SyntaxKind.Block:
+          return ts.updateBlock(node as ts.Block, result);
+        case ts.SyntaxKind.ModuleBlock:
+          return ts.updateModuleBlock(node as ts.ModuleBlock, result);
+        case ts.SyntaxKind.CaseClause:
+          const clause = node as ts.CaseClause;
 
-      const varStmt = stmt as ts.VariableStatement;
-
-      if (varStmt.declarationList.declarations.length !== 1) {
-        return;
+          return ts.updateCaseClause(clause, clause.expression, result);
+        case ts.SyntaxKind.DefaultClause:
+          return ts.updateDefaultClause(node as ts.DefaultClause, result);
+        default:
+          return node;
       }
+    } else {
+      return ts.visitEachChild(node, visitor, context);
+    }
+  };
 
-      // We've found a single variable declaration statement, it might be the start of an enum.
-      const maybeHostNode = varStmt;
-      const varDecl = maybeHostNode.declarationList.declarations[0];
+  // 'oIndex' is the original statement index; 'uIndex' is the updated statement index
+  for (let oIndex = 0, uIndex = 0; oIndex < statements.length; oIndex++, uIndex++) {
+    const currentStatement = statements[oIndex];
 
-      if (varDecl.name.kind !== ts.SyntaxKind.Identifier) {
-        return;
+    // these can't contain an enum declaration
+    if (currentStatement.kind === ts.SyntaxKind.ImportDeclaration) {
+      continue;
+    }
+
+    // enum declarations must:
+    //   * not be last statement
+    //   * be a variable statement
+    //   * have only one declaration
+    //   * have an identifer as a declaration name
+    if (oIndex < statements.length - 1
+        && isVariableStatement(currentStatement)
+        && currentStatement.declarationList.declarations.length === 1) {
+
+      const variableDeclaration = currentStatement.declarationList.declarations[0];
+      if (isIdentifier(variableDeclaration.name)) {
+        const name = variableDeclaration.name.text;
+
+        if (!variableDeclaration.initializer) {
+          const enumStatements = findTs2_3EnumStatements(name, statements[oIndex + 1]);
+          if (enumStatements.length > 0) {
+            // found an enum
+            if (!updatedStatements) {
+              updatedStatements = statements.slice();
+            }
+            // create wrapper and replace variable statement and IIFE
+            updatedStatements.splice(uIndex, 2, createWrappedEnum(
+              name,
+              currentStatement,
+              enumStatements,
+            ));
+            // skip IIFE statement
+            oIndex++;
+            continue;
+          }
+        } else if (isObjectLiteralExpression(variableDeclaration.initializer)
+                   && variableDeclaration.initializer.properties.length === 0) {
+          const nextStatements = statements.slice(oIndex + 1);
+          const enumStatements = findTs2_2EnumStatements(name, nextStatements);
+          if (enumStatements.length > 0) {
+            // found an enum
+            if (!updatedStatements) {
+              updatedStatements = statements.slice();
+            }
+            // create wrapper and replace variable statement and enum member statements
+            updatedStatements.splice(uIndex, enumStatements.length + 1, createWrappedEnum(
+              name,
+              currentStatement,
+              enumStatements,
+            ));
+            // skip enum member declarations
+            oIndex += enumStatements.length;
+            continue;
+          }
+        }
+
       }
+    }
 
-      const maybeName = (varDecl.name as ts.Identifier).text;
-      const enumStatements: ts.ExpressionStatement[] = [], enumDropNodes: ts.Node[] = [];
-
-      // Try to figure out the enum type from the variable declaration.
-      if (!varDecl.initializer) {
-        // Typescript 2.3 enums have no initializer.
-        const nextStatement = stmts[idx + 1];
-        enumStatements.push(...findTs2_3EnumStatements(maybeName, nextStatement));
-        enumDropNodes.push(nextStatement);
-      } else if (varDecl.initializer
-          && varDecl.initializer.kind === ts.SyntaxKind.ObjectLiteralExpression
-          && (varDecl.initializer as ts.ObjectLiteralExpression).properties.length === 0) {
-        // Typescript 2.2 enums have a {} initializer.
-        const nextStatements = stmts.slice(idx + 1);
-        const statements = findTs2_2EnumStatements(maybeName, nextStatements);
-        // We have to create new statements so we can keep new ones and drop old ones.
-        enumStatements.push(...statements.map(stmt => ts.createStatement(stmt.expression)));
-        enumDropNodes.push(...statements);
-      } else {
-        return;
+    const result = ts.visitNode(currentStatement, visitor);
+    if (result !== currentStatement) {
+      if (!updatedStatements) {
+        updatedStatements = statements.slice();
       }
+      updatedStatements[uIndex] = result;
+    }
+  }
 
-      if (enumStatements.length === 0) {
-        return;
-      }
-
-      enums.push({
-        name: maybeName,
-        hostNode: maybeHostNode,
-        statements: enumStatements,
-        dropNodes: enumDropNodes,
-      });
-    });
-  });
-
-  return enums;
+  // if changes, return updated statements
+  // otherwise, return original array instance
+  return updatedStatements ? updatedStatements : statements;
 }
 
-// TS 2.3 enums have statements are inside a IIFE.
+// TS 2.3 enums have statements that are inside a IIFE.
 function findTs2_3EnumStatements(name: string, statement: ts.Statement): ts.ExpressionStatement[] {
   const enumStatements: ts.ExpressionStatement[] = [];
   const noNodes: ts.ExpressionStatement[] = [];
@@ -254,10 +285,12 @@ function findTs2_2EnumStatements(
   return enumStatements;
 }
 
-function createWrappedEnum(enumData: EnumData): ts.Node {
+function createWrappedEnum(
+  name: string,
+  hostNode: ts.VariableStatement,
+  statements: Array<ts.Statement>,
+): ts.Statement {
   const pureFunctionComment = '@__PURE__';
-
-  const { name, statements } = enumData;
 
   const innerVarStmt = ts.createVariableStatement(
     undefined,
@@ -268,6 +301,7 @@ function createWrappedEnum(enumData: EnumData): ts.Node {
 
   const innerReturn = ts.createReturn(ts.createIdentifier(name));
 
+  // NOTE: TS 2.4+ has a create IIFE helper method
   const iife = ts.createCall(
     ts.createParen(
       ts.createFunctionExpression(
@@ -288,18 +322,24 @@ function createWrappedEnum(enumData: EnumData): ts.Node {
     [],
   );
 
-  // Create a new node with the pure comment before the variable declaration initializer.
-  const outerVarStmt = ts.createVariableStatement(
-    undefined,
-    ts.createVariableDeclarationList([
-      ts.createVariableDeclaration(
-        name,
-        undefined,
-        ts.addSyntheticLeadingComment(
-          iife, ts.SyntaxKind.MultiLineCommentTrivia, pureFunctionComment, false,
+  // Update existing host node with the pure comment before the variable declaration initializer.
+  const variableDeclaration = hostNode.declarationList.declarations[0];
+  const outerVarStmt = ts.updateVariableStatement(
+    hostNode,
+    hostNode.modifiers,
+    ts.updateVariableDeclarationList(
+      hostNode.declarationList,
+      [
+        ts.updateVariableDeclaration(
+          variableDeclaration,
+          variableDeclaration.name,
+          variableDeclaration.type,
+          ts.addSyntheticLeadingComment(
+            iife, ts.SyntaxKind.MultiLineCommentTrivia, pureFunctionComment, false,
+          ),
         ),
-      ),
-    ]),
+      ],
+    ),
   );
 
   return outerVarStmt;
