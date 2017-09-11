@@ -1,5 +1,5 @@
 // Add assets from `ConcatPlugin` to index.html.
-import * as path from 'path';
+
 
 export class InsertConcatAssetsWebpackPlugin {
   // Priority list of where to insert asset.
@@ -24,7 +24,13 @@ export class InsertConcatAssetsWebpackPlugin {
               throw new Error(`Cannot find file for ${entryName} script.`);
             }
 
-            return path.join(htmlPluginData.assets.publicPath, fileName);
+            if (htmlPluginData.assets.publicPath) {
+              if (htmlPluginData.assets.publicPath.endsWith('/')) {
+                return htmlPluginData.assets.publicPath + fileName;
+              }
+              return htmlPluginData.assets.publicPath + '/' + fileName;
+            }
+            return fileName;
           });
 
           let insertAt = 0;
