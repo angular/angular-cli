@@ -28,9 +28,9 @@ import { InsertChange } from '../utility/change';
 import { Schema as ApplicationOptions } from './schema';
 
 
-function addBootstrapToNgModule(directory: string): Rule {
+function addBootstrapToNgModule(directory: string, sourceDir: string): Rule {
   return (host: Tree) => {
-    const modulePath = `${directory}/src/app/app.module.ts`;
+    const modulePath = `${directory}/${sourceDir}/app/app.module.ts`;
     const content = host.read(modulePath);
     if (!content) {
       throw new SchematicsError(`File ${modulePath} does not exist.`);
@@ -88,6 +88,7 @@ export default function (options: ApplicationOptions): Rule {
         spec: false,
         styleext: options.style,
       };
+    const sourceDir = options.sourceDir || 'src';
 
     return chain([
       mergeWith(
@@ -106,17 +107,17 @@ export default function (options: ApplicationOptions): Rule {
         flat: true,
         routing: options.routing,
         routingScope: 'Root',
-        sourceDir: options.directory + '/' + options.sourceDir,
+        sourceDir: options.directory + '/' + sourceDir,
         spec: false,
       }),
       schematic('component', {
         name: 'app',
         selector: appRootSelector,
-        sourceDir: options.directory + '/' + options.sourceDir,
+        sourceDir: options.directory + '/' + sourceDir,
         flat: true,
         ...componentOptions,
       }),
-      addBootstrapToNgModule(options.directory),
+      addBootstrapToNgModule(options.directory, sourceDir),
       mergeWith(
         apply(url('./other-files'), [
           componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
@@ -127,7 +128,7 @@ export default function (options: ApplicationOptions): Rule {
             selector: appRootSelector,
             ...componentOptions,
           }),
-          move(options.directory + '/' + options.sourceDir + '/app'),
+          move(options.directory + '/' + sourceDir + '/app'),
         ]), MergeStrategy.Overwrite),
     ])(host, context);
   };

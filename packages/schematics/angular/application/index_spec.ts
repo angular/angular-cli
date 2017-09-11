@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Tree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import { getFileContent } from '../utility/test';
 import { Schema as AppSchema } from './schema';
@@ -62,6 +63,20 @@ describe('Application Schematic', () => {
     expect(files.indexOf('/foo/src/app/app.component.html')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/foo/src/app/app.component.spec.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/foo/src/app/app.component.ts')).toBeGreaterThanOrEqual(0);
+  });
+
+  it('should handle a different sourceDir', () => {
+    const options = { ...defaultOptions, sourceDir: 'some/custom/path' };
+
+    let tree: Tree | null = null;
+    expect(() => tree = schematicRunner.runSchematic('application', options))
+      .not.toThrow();
+
+    if (tree) {
+      // tslint:disable-next-line:non-null-operator
+      const files = tree !.files;
+      expect(files.indexOf('/foo/some/custom/path/app/app.module.ts')).toBeGreaterThanOrEqual(0);
+    }
   });
 
   it('should handle the routing flag', () => {
