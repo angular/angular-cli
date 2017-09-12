@@ -15,6 +15,9 @@ export default function() {
     .then(() => ng('generate', 'component', 'test-component'))
     .then(() => expectFileToMatch(join(componentDir, 'test-component.component.ts'),
       /selector: 'pre-/))
+    .then(() => ng('g', 'c', 'alias'))
+    .then(() => expectFileToMatch(join('src', 'app', 'alias', 'alias.component.ts'),
+      /selector: 'pre-/))
 
     // Try to run the unit tests.
     .then(() => ng('test', '--single-run'));
