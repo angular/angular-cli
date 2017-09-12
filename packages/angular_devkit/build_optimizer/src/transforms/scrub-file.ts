@@ -56,9 +56,13 @@ export function getScrubFileTransformer(program: ts.Program): ts.TransformerFact
       const ngMetadata = findAngularMetadata(sf);
 
       const nodes: ts.Node[] = [];
-      ts.forEachChild(sf, (node) => {
+      ts.forEachChild(sf, checkNodeForDecorators);
+
+      function checkNodeForDecorators(node: ts.Node): void {
         if (node.kind !== ts.SyntaxKind.ExpressionStatement) {
-          return;
+          // TS 2.4 nests decorators inside downleveled class IIFEs, so we
+          // must recurse into them to find the relevant expression statements.
+          return ts.forEachChild(node, checkNodeForDecorators);
         }
         const exprStmt = node as ts.ExpressionStatement;
         if (isDecoratorAssignmentExpression(exprStmt)) {
@@ -71,7 +75,7 @@ export function getScrubFileTransformer(program: ts.Program): ts.TransformerFact
           && !isCtorParamsWhitelistedService(exprStmt)) {
           nodes.push(node);
         }
-      });
+      }
 
       const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
         // Check if node is a statement to be dropped.

@@ -17,7 +17,7 @@ describe('scrub-file', () => {
   const clazz = 'var Clazz = (function () { function Clazz() { } return Clazz; }());';
 
   describe('decorators', () => {
-    it('removes Angular decorators', () => {
+    it('removes top-level Angular decorators', () => {
       const output = stripIndent`
         import { Injectable } from '@angular/core';
         ${clazz}
@@ -31,6 +31,26 @@ describe('scrub-file', () => {
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
     });
 
+    it('removes nested Angular decorators', () => {
+      const output = stripIndent`
+        import { Injectable } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          return Clazz;
+        }());
+      `;
+      const input = stripIndent`
+        import { Injectable } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() {}
+          Clazz.decorators = [ { type: Injectable } ];
+          return Clazz;
+        }());
+      `;
+
+      expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    });
+
     it('doesn\'t remove non Angular decorators', () => {
       const input = stripIndent`
         import { Injectable } from 'another-lib';
@@ -41,7 +61,7 @@ describe('scrub-file', () => {
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${input}`);
     });
 
-    it('leaves non-Angulars decorators in mixed arrays', () => {
+    it('leaves non-Angular decorators in mixed arrays', () => {
       const input = stripIndent`
         import { Injectable } from '@angular/core';
         import { NotInjectable } from 'another-lib';
@@ -60,7 +80,7 @@ describe('scrub-file', () => {
   });
 
   describe('propDecorators', () => {
-    it('removes Angular propDecorators', () => {
+    it('removes top-level Angular propDecorators', () => {
       const output = stripIndent`
         import { Input } from '@angular/core';
         ${clazz}
@@ -74,6 +94,26 @@ describe('scrub-file', () => {
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
     });
 
+    it('removes nested Angular propDecorators', () => {
+      const output = stripIndent`
+        import { Input } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          return Clazz;
+        }());
+      `;
+      const input = stripIndent`
+        import { Input } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() {}
+          Clazz.propDecorators = { 'ngIf': [{ type: Input }] };
+          return Clazz;
+        }());
+      `;
+
+      expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    });
+
     it('doesn\'t remove non Angular propDecorators', () => {
       const input = stripIndent`
         import { Input } from 'another-lib';
@@ -84,7 +124,7 @@ describe('scrub-file', () => {
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${input}`);
     });
 
-    it('leaves non-Angulars propDecorators in mixed arrays', () => {
+    it('leaves non-Angular propDecorators in mixed arrays', () => {
       const output = stripIndent`
         import { Input } from '@angular/core';
         import { NotInput } from 'another-lib';
@@ -121,13 +161,33 @@ describe('scrub-file', () => {
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
     });
 
-    it('removes non-empty constructor parameters', () => {
+    it('removes non-empty top-level style constructor parameters', () => {
       const output = stripIndent`
         ${clazz}
       `;
       const input = stripIndent`
         ${clazz}
         Clazz.ctorParameters = function () { return [{type: Injector}]; };
+      `;
+
+      expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    });
+
+    it('removes nested constructor parameters', () => {
+      const output = stripIndent`
+        import { Injector } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          return Clazz;
+        }());
+      `;
+      const input = stripIndent`
+        import { Injector } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() {}
+          Clazz.ctorParameters = function () { return [{type: Injector}]; };
+          return Clazz;
+        }());
       `;
 
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
