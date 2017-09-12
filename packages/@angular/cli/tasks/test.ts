@@ -40,7 +40,8 @@ export default Task.extend({
         progress: options.progress,
         poll: options.poll,
         environment: options.environment,
-        app: options.app
+        app: options.app,
+        preserveSymlinks: options.preserveSymlinks
       };
 
       // Assign additional karmaConfig options to the local ngapp config
