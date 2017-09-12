@@ -23,6 +23,7 @@ export interface TestOptions {
   poll?: number;
   environment?: string;
   app?: string;
+  preserveSymlinks?:boolean;
 }
 
 
@@ -114,6 +115,12 @@ const TestCommand = Command.extend({
       type: String,
       aliases: ['a'],
       description: 'Specifies app name to use.'
+    },
+    {
+      name: 'preserve-symlinks',
+      type: Boolean,
+      description: 'Do not use the real path when resolving modules.',
+      default: false
     }
   ],
 
