@@ -59,7 +59,7 @@ export default function() {
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(doneRe, 20000),
       appendToFile('src/app/app.module.ts', `
-        function anything(): number {}
+        function anything(): number { return 1; }
       `)
     ]))
     .then((results) => {

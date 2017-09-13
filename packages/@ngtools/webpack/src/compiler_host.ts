@@ -116,7 +116,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     return path.replace(/\\/g, '/');
   }
 
-  private _resolve(path: string) {
+  resolve(path: string) {
     path = this._normalizePath(path);
     if (path[0] == '.') {
       return this._normalizePath(join(this.getCurrentDirectory(), path));
@@ -158,7 +158,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   invalidate(fileName: string): void {
-    fileName = this._resolve(fileName);
+    fileName = this.resolve(fileName);
     if (fileName in this._files) {
       this._files[fileName] = null;
       this._changedFiles[fileName] = true;
@@ -166,12 +166,12 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   fileExists(fileName: string, delegate = true): boolean {
-    fileName = this._resolve(fileName);
+    fileName = this.resolve(fileName);
     return this._files[fileName] != null || (delegate && this._delegate.fileExists(fileName));
   }
 
   readFile(fileName: string): string {
-    fileName = this._resolve(fileName);
+    fileName = this.resolve(fileName);
 
     const stats = this._files[fileName];
     if (stats == null) {
@@ -188,12 +188,12 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   // Does not delegate, use with `fileExists/directoryExists()`.
   stat(path: string): VirtualStats {
-    path = this._resolve(path);
+    path = this.resolve(path);
     return this._files[path] || this._directories[path];
   }
 
   directoryExists(directoryName: string, delegate = true): boolean {
-    directoryName = this._resolve(directoryName);
+    directoryName = this.resolve(directoryName);
     return (this._directories[directoryName] != null)
             || (delegate
                 && this._delegate.directoryExists != undefined
@@ -201,14 +201,14 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   getFiles(path: string): string[] {
-    path = this._resolve(path);
+    path = this.resolve(path);
     return Object.keys(this._files)
       .filter(fileName => dirname(fileName) == path)
       .map(path => basename(path));
   }
 
   getDirectories(path: string): string[] {
-    path = this._resolve(path);
+    path = this.resolve(path);
     const subdirs = Object.keys(this._directories)
       .filter(fileName => dirname(fileName) == path)
       .map(path => basename(path));
@@ -223,13 +223,19 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, _onError?: OnErrorFn) {
-    fileName = this._resolve(fileName);
+    fileName = this.resolve(fileName);
 
     const stats = this._files[fileName];
     if (stats == null) {
       const content = this.readFile(fileName);
+
       if (!this._cache) {
         return ts.createSourceFile(fileName, content, languageVersion, this._setParentNodes);
+      } else if (!this._files[fileName]) {
+        // If cache is turned on and the file exists, the readFile call will have populated stats.
+        // Empty stats at this point mean the file doesn't exist at and so we should return
+        // undefined.
+        return undefined;
       }
     }
 
@@ -249,7 +255,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   get writeFile() {
     return (fileName: string, data: string, _writeByteOrderMark: boolean,
             _onError?: (message: string) => void, _sourceFiles?: ts.SourceFile[]): void => {
-      fileName = this._resolve(fileName);
+
+      fileName = this.resolve(fileName);
       this._setFileContent(fileName, data);
     };
   }
@@ -259,7 +266,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   getCanonicalFileName(fileName: string): string {
-    fileName = this._resolve(fileName);
+    fileName = this.resolve(fileName);
     return this._delegate.getCanonicalFileName(fileName);
   }
 
