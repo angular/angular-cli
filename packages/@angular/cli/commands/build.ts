@@ -2,6 +2,7 @@ import { CliConfig } from '../models/config';
 import { BuildOptions } from '../models/build-options';
 import { Version } from '../upgrade/version';
 import { oneLine } from 'common-tags';
+import { AngularCompilerPlugin } from '@ngtools/webpack';
 
 const Command = require('../ember-cli/lib/models/command');
 
@@ -176,6 +177,13 @@ export const baseBuildCommandOptions: any = [
     aliases: ['nc'],
     description: 'Use file name for lazy loaded chunks.',
     default: buildConfigDefaults['namedChunks']
+  },
+  {
+    name: 'experimental-angular-compiler',
+    type: Boolean,
+    aliases: ['eac'],
+    description: 'Use new Angular Compiler (Angular version 5 and greater only).',
+    default: AngularCompilerPlugin.isSupported()
   }
 ];
 

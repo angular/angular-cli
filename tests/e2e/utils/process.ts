@@ -162,6 +162,8 @@ export function ng(...args: string[]) {
       // Wait 1 second before running any end-to-end test.
       return new Promise(resolve => setTimeout(resolve, 1000))
         .then(() => maybeSilentNg(...args));
+    } else if (argv.nightly && args.includes('--aot')) {
+      args.push('--experimental-angular-compiler');
     }
 
     return maybeSilentNg(...args);

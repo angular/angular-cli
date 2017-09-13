@@ -2,8 +2,9 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
-
 const MagicString = require('magic-string');
+
+import { findAstNodes } from './transformers';
 
 
 export interface TranspileOutput {
@@ -88,40 +89,7 @@ export class TypeScriptFileRefactor {
                kind: ts.SyntaxKind,
                recursive = false,
                max = Infinity): ts.Node[] {
-    if (max == 0) {
-      return [];
-    }
-    if (!node) {
-      node = this._sourceFile;
-    }
-
-    let arr: ts.Node[] = [];
-    if (node.kind === kind) {
-      // If we're not recursively looking for children, stop here.
-      if (!recursive) {
-        return [node];
-      }
-
-      arr.push(node);
-      max--;
-    }
-
-    if (max > 0) {
-      for (const child of node.getChildren(this._sourceFile)) {
-        this.findAstNodes(child, kind, recursive, max)
-          .forEach((node: ts.Node) => {
-            if (max > 0) {
-              arr.push(node);
-            }
-            max--;
-          });
-
-        if (max <= 0) {
-          break;
-        }
-      }
-    }
-    return arr;
+    return findAstNodes(node, this._sourceFile, kind, recursive, max);
   }
 
   findFirstAstNode(node: ts.Node | null, kind: ts.SyntaxKind): ts.Node | null {

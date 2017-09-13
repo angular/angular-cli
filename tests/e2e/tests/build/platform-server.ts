@@ -2,7 +2,7 @@ import { normalize } from 'path';
 
 import { updateJsonFile, updateTsConfig } from '../../utils/project';
 import { expectFileToMatch, writeFile, replaceInFile, prependToFile } from '../../utils/fs';
-import { ng, silentNpm, silentExec } from '../../utils/process';
+import { ng, silentNpm, exec } from '../../utils/process';
 import { getGlobalVariable } from '../../utils/env';
 
 export default function () {
@@ -16,6 +16,12 @@ export default function () {
     return Promise.resolve();
   }
 
+  let platformServerVersion = '^4.0.0';
+
+  if (getGlobalVariable('argv').nightly) {
+    platformServerVersion = 'github:angular/platform-server-builds';
+  }
+
   return Promise.resolve()
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
@@ -25,7 +31,7 @@ export default function () {
     }))
     .then(() => updateJsonFile('package.json', packageJson => {
       const dependencies = packageJson['dependencies'];
-      dependencies['@angular/platform-server'] = '^4.0.0';
+      dependencies['@angular/platform-server'] = platformServerVersion;
     }))
     .then(() => updateTsConfig(tsConfig => {
       tsConfig['angularCompilerOptions'] = {
@@ -56,7 +62,7 @@ export default function () {
         fs.writeFileSync('dist/index.html', html);
       \});
     `))
-    .then(() => silentExec(normalize('node'), 'index.js'))
+    .then(() => exec(normalize('node'), 'index.js'))
     .then(() => expectFileToMatch('dist/index.html',
       new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
     .then(() => ng('build', '--aot'))
@@ -65,7 +71,7 @@ export default function () {
       /__webpack_exports__, "AppModuleNgFactory"/))
     .then(() => replaceInFile('./index.js', /AppModule/g, 'AppModuleNgFactory'))
     .then(() => replaceInFile('./index.js', /renderModule/g, 'renderModuleFactory'))
-    .then(() => silentExec(normalize('node'), 'index.js'))
+    .then(() => exec(normalize('node'), 'index.js'))
     .then(() => expectFileToMatch('dist/index.html',
       new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')));
 }

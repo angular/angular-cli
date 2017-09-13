@@ -24,7 +24,8 @@ export class XI18nWebpackConfig extends NgCliWebpackConfig {
     super({
       target: 'development',
       verbose: extractOptions.verbose,
-      progress: extractOptions.progress
+      progress: extractOptions.progress,
+      experimentalAngularCompiler: false,
     }, appConfig);
     super.buildConfig();
   }

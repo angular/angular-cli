@@ -76,10 +76,39 @@ export default function() {
     // Change multiple files and check that all of them are invalidated and recompiled.
     .then(() => writeMultipleFiles({
       'src/app/app.module.ts': `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule
+          ],
+          providers: [],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+
         console.log('$$_E2E_GOLDEN_VALUE_1');
         export let X = '$$_E2E_GOLDEN_VALUE_2';
       `,
       'src/main.ts': `
+        import { enableProdMode } from '@angular/core';
+        import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+        import { AppModule } from './app/app.module';
+        import { environment } from './environments/environment';
+
+        if (environment.production) {
+          enableProdMode();
+        }
+
+        platformBrowserDynamic().bootstrapModule(AppModule);
+
         import * as m from './app/app.module';
         console.log(m.X);
         console.log('$$_E2E_GOLDEN_VALUE_3');
