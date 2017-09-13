@@ -206,7 +206,8 @@ export class TypeScriptFileRefactor {
   }
 
   transpile(compilerOptions: ts.CompilerOptions): TranspileOutput {
-    if (this._fileName.endsWith('.d.ts') && this._fileName.indexOf('node_modules') > -1) {
+    if (this._fileName.endsWith('.d.ts')
+        && this._fileName.split(path.sep).indexOf('node_modules') >= 0) {
       return this._getCompiledFromPackage();
     }
     const source = this.sourceText;
