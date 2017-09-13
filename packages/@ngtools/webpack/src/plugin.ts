@@ -530,8 +530,10 @@ export class AotPlugin implements Tapable {
       })
       .then(() => {
         // Re-diagnose changed files.
-        const changedFilePaths = this._compilerHost.getChangedFilePaths();
-        changedFilePaths.forEach(filePath => this.diagnose(filePath));
+        if (this._typeCheck) {
+          const changedFilePaths = this._compilerHost.getChangedFilePaths();
+          changedFilePaths.forEach(filePath => this.diagnose(filePath));
+        }
       })
       .then(() => {
         if (this._typeCheck) {

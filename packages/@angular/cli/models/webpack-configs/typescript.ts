@@ -1,7 +1,8 @@
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
-import {AotPlugin} from '@ngtools/webpack';
+import { AotPlugin } from '@ngtools/webpack';
 import { WebpackConfigOptions } from '../webpack-config';
+import { BuildOptions } from '../build-options';
 
 const SilentError = require('silent-error');
 
@@ -10,7 +11,9 @@ const g: any = global;
 const webpackLoader: string = g['angularCliIsLocal']
   ? g.angularCliPackages['@ngtools/webpack'].main
   : '@ngtools/webpack';
-
+const getDefaultPluginOptions = (buildOptions: BuildOptions) => ({
+  typeChecking: buildOptions.typeChecking
+});
 
 function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
   const { appConfig, projectRoot, buildOptions } = wco;
@@ -77,12 +80,16 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
 }
 
 export const getNonAotConfig = function(wco: WebpackConfigOptions) {
-  const { appConfig, projectRoot } = wco;
+  const { appConfig, buildOptions, projectRoot } = wco;
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
+  const pluginOptions = Object.assign(
+    {}, getDefaultPluginOptions(buildOptions),
+    { tsConfigPath, skipCodeGeneration: true }
+  );
 
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
-    plugins: [ _createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }) ]
+    plugins: [ _createAotPlugin(wco, pluginOptions) ]
   };
 };
 
@@ -91,7 +98,10 @@ export const getAotConfig = function(wco: WebpackConfigOptions) {
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
   const testTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.testTsconfig);
 
-  let pluginOptions: any = { tsConfigPath };
+  let pluginOptions: any = Object.assign(
+    {}, getDefaultPluginOptions(buildOptions),
+    { tsConfigPath }
+  );
 
   // Fallback to exclude spec files from AoT compilation on projects using a shared tsconfig.
   if (testTsConfigPath === tsConfigPath) {
@@ -115,11 +125,14 @@ export const getAotConfig = function(wco: WebpackConfigOptions) {
 };
 
 export const getNonAotTestConfig = function(wco: WebpackConfigOptions) {
-  const { projectRoot, appConfig } = wco;
+  const { projectRoot, buildOptions, appConfig } = wco;
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.testTsconfig);
   const appTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
 
-  let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true };
+  let pluginOptions: any = Object.assign(
+    {}, getDefaultPluginOptions(buildOptions),
+    { tsConfigPath, skipCodeGeneration: true }
+  );
 
   // Fallback to correct module format on projects using a shared tsconfig.
   if (tsConfigPath === appTsConfigPath) {
