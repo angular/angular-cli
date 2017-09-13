@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { readFileSync } from 'fs';
-import { dirname, join } from 'path';
 import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
 
@@ -62,79 +60,48 @@ export function transformJavascript(
     }
   };
 
-  // Make a in-memory host and populate it with a single file
-  const fileMap = new Map<string, string>();
-  const sourcesMap = new Map<string, ts.SourceFile>();
   const outputs = new Map<string, string>();
-
-  // We're not actually writing anything to disk, but still need to define an outDir
-  // because otherwise TS will fail to emit JS since it would overwrite the original.
-  const tempOutDir = '$$_temp/';
   const tempFilename = 'bo-default-file.js';
-  fileMap.set(tempFilename, content);
-
-  // We need to load the default lib for noEmitOnError to work properly.
-  const defaultLibFileName = 'lib.d.ts';
-  const defaultLibContent = readFileSync(join(dirname(require.resolve('typescript')),
-    defaultLibFileName), 'UTF-8');
-  fileMap.set(defaultLibFileName, defaultLibContent);
-
-  fileMap.forEach((v, k) => sourcesMap.set(
-    k, ts.createSourceFile(k, v, ts.ScriptTarget.ES2015)));
+  const tempSourceFile = ts.createSourceFile(tempFilename, content, ts.ScriptTarget.Latest);
 
   const host: ts.CompilerHost = {
     getSourceFile: (fileName) => {
-      const sourceFile = sourcesMap.get(fileName);
-      if (!sourceFile) {
+      if (fileName !== tempFilename) {
         throw new Error(`File ${fileName} does not have a sourceFile.`);
       }
 
-      return sourceFile;
+      return tempSourceFile;
     },
-    getDefaultLibFileName: () => defaultLibFileName,
+    getDefaultLibFileName: () => 'lib.d.ts',
     getCurrentDirectory: () => '',
     getDirectories: () => [],
     getCanonicalFileName: (fileName) => fileName,
     useCaseSensitiveFileNames: () => true,
     getNewLine: () => '\n',
-    fileExists: (fileName) => fileMap.has(fileName),
-    readFile: (fileName) => {
-      const content = fileMap.get(fileName);
-      if (!content) {
-        throw new Error(`File ${fileName} does not exist.`);
-      }
-
-      return content;
-    },
+    fileExists: (fileName) => fileName === tempFilename,
+    readFile: (_fileName) => '',
     writeFile: (fileName, text) => outputs.set(fileName, text),
   };
 
   const tsOptions: ts.CompilerOptions = {
-    noEmitOnError: true,
-    allowJs: true,
-    // Using just line feed makes test comparisons easier, and doesn't matter for generated files.
-    newLine: ts.NewLineKind.LineFeed,
-    // We target next so that there is no downleveling.
-    target: ts.ScriptTarget.ESNext,
-    skipLibCheck: true,
-    outDir: '$$_temp/',
+    // We target latest so that there is no downleveling.
+    target: ts.ScriptTarget.Latest,
+    isolatedModules: true,
+    suppressOutputPathCheck: true,
+    allowNonTsExtensions: true,
+    noLib: true,
+    noResolve: true,
     sourceMap: emitSourceMap,
     inlineSources: emitSourceMap,
     inlineSourceMap: false,
   };
 
-  const program = ts.createProgram(Array.from(fileMap.keys()), tsOptions, host);
+  const program = ts.createProgram([tempFilename], tsOptions, host);
 
-  // We need the checker inside transforms.
-  const transforms = getTransforms.map((getTf) => getTf(program));
+  const diagnostics = program.getSyntacticDiagnostics(tempSourceFile);
+  const hasError = diagnostics.some(diag => diag.category === ts.DiagnosticCategory.Error);
 
-  const { emitSkipped, diagnostics } = program.emit(
-    undefined, host.writeFile, undefined, undefined,
-    { before: transforms, after: [] });
-
-  let transformedContent = outputs.get(`${tempOutDir}${tempFilename}`);
-
-  if (emitSkipped || !transformedContent) {
+  if (hasError) {
     // Throw only if we're in strict mode, otherwise return original content.
     if (strict) {
       throw new Error(`
@@ -151,12 +118,27 @@ export function transformJavascript(
     }
   }
 
-  let sourceMap: RawSourceMap | null = null;
+  // We need the checker inside transforms.
+  const transforms = getTransforms.map((getTf) => getTf(program));
 
-  if (emitSourceMap) {
-    const tsSourceMap = outputs.get(`${tempOutDir}${tempFilename}.map`);
+  program.emit(undefined, undefined, undefined, undefined, { before: transforms, after: [] });
+
+  let transformedContent = outputs.get(tempFilename);
+
+  if (!transformedContent) {
+    return {
+      content: null,
+      sourceMap: null,
+      emitSkipped: true,
+    };
+  }
+
+  let sourceMap: RawSourceMap | null = null;
+  const tsSourceMap = outputs.get(`${tempFilename}.map`);
+
+  if (emitSourceMap && tsSourceMap) {
     const urlRegExp = /^\/\/# sourceMappingURL=[^\r\n]*/gm;
-    sourceMap = JSON.parse(tsSourceMap as string) as RawSourceMap;
+    sourceMap = JSON.parse(tsSourceMap) as RawSourceMap;
     // Fix sourcemaps file references.
     if (outputFilePath) {
       sourceMap.file = outputFilePath;
