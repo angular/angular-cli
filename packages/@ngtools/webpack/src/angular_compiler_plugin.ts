@@ -71,8 +71,8 @@ export interface AngularCompilerPluginOptions {
 }
 
 enum PLATFORM {
-  browser,
-  server
+  Browser,
+  Server
 }
 
 export class AngularCompilerPlugin implements Tapable {
@@ -265,7 +265,7 @@ export class AngularCompilerPlugin implements Tapable {
     }
 
     // TODO: consider really using platform names in the plugin options.
-    this._platform = options.replaceExport ? PLATFORM.server : PLATFORM.browser;
+    this._platform = options.replaceExport ? PLATFORM.Server : PLATFORM.Browser;
   }
 
   private _findLazyRoutesInAst(changedFilePaths: string[]): LazyRouteMap {
@@ -539,9 +539,9 @@ export class AngularCompilerPlugin implements Tapable {
           changedTsFiles.forEach((fileName) => {
             const sourceFile = this._program.getTsProgram().getSourceFile(fileName);
             let transformOps;
-            if (this._platform === PLATFORM.browser) {
+            if (this._platform === PLATFORM.Browser) {
               transformOps = replaceBootstrap(sourceFile, this.entryModule);
-            } else if (this._platform === PLATFORM.server) {
+            } else if (this._platform === PLATFORM.Server) {
               // export_module_map
               transformOps = [
                 ...exportNgFactory(sourceFile, this.entryModule),

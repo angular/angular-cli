@@ -2,9 +2,9 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
-const MagicString = require('magic-string');
-
 import { findAstNodes } from './transformers';
+
+const MagicString = require('magic-string');
 
 
 export interface TranspileOutput {

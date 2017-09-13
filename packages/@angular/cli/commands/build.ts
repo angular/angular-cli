@@ -181,8 +181,8 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'experimental-angular-compiler',
     type: Boolean,
-    aliases: ['eac'],
-    description: 'Use new Angular Compiler (Angular version 5 and greater only).',
+    // aliases: ['eac'],  // We should not have shorthand aliases for experimental flags.
+    description: '(Experimental) Use new Angular Compiler (Angular version 5 and greater only).',
     default: AngularCompilerPlugin.isSupported()
   }
 ];
