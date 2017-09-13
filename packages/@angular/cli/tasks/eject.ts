@@ -122,7 +122,7 @@ class JsonWebpackSerializer {
     const basePath = path.dirname(tsConfigPath);
     return Object.assign({}, value.options, {
       tsConfigPath,
-      mainPath: path.relative(value.basePath, value.options.mainPath),
+      mainPath: path.relative(basePath, value.options.mainPath),
       hostReplacementPaths: Object.keys(value.options.hostReplacementPaths)
         .reduce((acc: any, key: string) => {
           const replacementPath = value.options.hostReplacementPaths[key];
@@ -132,7 +132,7 @@ class JsonWebpackSerializer {
         }, {}),
       exclude: Array.isArray(value.options.exclude)
         ? value.options.exclude.map((p: any) => {
-          return p.startsWith('/') ? path.relative(value.basePath, p) : p;
+          return p.startsWith('/') ? path.relative(basePath, p) : p;
         })
         : value.options.exclude
     });

@@ -80,7 +80,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
     exclude: []
   }, options);
 
-  if (wco.buildOptions.experimentalAngularCompiler && !options.skipCodeGeneration) {
+  if (wco.buildOptions.experimentalAngularCompiler) {
     return new AngularCompilerPlugin(pluginOptions);
   } else {
     return new AotPlugin(pluginOptions);

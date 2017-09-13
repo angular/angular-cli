@@ -5,7 +5,7 @@ import {getGlobalVariable} from '../../../utils/env';
 
 export default function() {
 
-  // TODO: re-enable this test for ng5
+  // TODO: re-enable this test for ng5.
   // now we only remove decorators via --build-optimizer
   if (getGlobalVariable('argv').nightly) {
     return Promise.resolve();

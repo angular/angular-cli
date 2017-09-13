@@ -120,6 +120,7 @@ export function useSha() {
           json['devDependencies'][`@angular/${pkgName}`]
             = `github:angular/${pkgName}-builds${label}`;
         });
+      json['devDependencies']['typescript'] = '~2.4.0';
     });
   } else {
     return Promise.resolve();
