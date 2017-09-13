@@ -40,7 +40,7 @@ export function insertImport(
       });
     });
     if (hasImportAlready) {
-      return;
+      return ops;
     }
 
     // Just pick the first one and insert at the end of its identifier list.

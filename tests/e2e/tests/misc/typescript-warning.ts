@@ -7,9 +7,11 @@ export default function () {
   // Update as needed.
   let unsupportedTsVersion = '2.5';
 
-    // Skip this in Appveyor tests.
+  // TODO: re-enable for ng5, adjust as needed. This test fails on ng5 because the 2.5 is supported.
+  // When ng5 because the default this test will need to be adjusted to use 2.3 as the unsupported
+  // version, and to disable the experimental angular compiler (transforms need 2.4 minimum).
   if (getGlobalVariable('argv').nightly) {
-    unsupportedTsVersion = '2.3';
+    return;
   }
 
   return Promise.resolve()
