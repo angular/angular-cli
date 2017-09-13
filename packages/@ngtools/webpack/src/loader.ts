@@ -79,8 +79,8 @@ function _angularImportsFromNode(node: ts.ImportDeclaration, _sourceFile: ts.Sou
 
 
 function _ctorParameterFromTypeReference(paramNode: ts.ParameterDeclaration,
-  angularImports: string[],
-  refactor: TypeScriptFileRefactor) {
+                                         angularImports: string[],
+                                         refactor: TypeScriptFileRefactor) {
   let typeName = 'undefined';
 
   if (paramNode.type) {
@@ -136,8 +136,8 @@ function _ctorParameterFromTypeReference(paramNode: ts.ParameterDeclaration,
 
 
 function _addCtorParameters(classNode: ts.ClassDeclaration,
-  angularImports: string[],
-  refactor: TypeScriptFileRefactor) {
+                            angularImports: string[],
+                            refactor: TypeScriptFileRefactor) {
   // For every classes with constructors, output the ctorParameters function which contains a list
   // of injectable types.
   const ctor = (
@@ -445,7 +445,7 @@ function _diagnoseDeps(reasons: ModuleReason[], plugin: AotPlugin, checked: Set<
 
 
 export function _getModuleExports(plugin: AotPlugin,
-  refactor: TypeScriptFileRefactor): ts.Identifier[] {
+                                  refactor: TypeScriptFileRefactor): ts.Identifier[] {
   const exports = refactor
     .findAstNodes(refactor.sourceFile, ts.SyntaxKind.ExportDeclaration, true);
 
