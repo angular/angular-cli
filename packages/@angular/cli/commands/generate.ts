@@ -142,9 +142,10 @@ export default Command.extend({
     commandOptions.appRoot = parsedPath.appRoot.startsWith(root)
       ? parsedPath.appRoot.substr(root.length)
       : parsedPath.appRoot;
-    commandOptions.path = parsedPath.dir
-      .replace(appConfig.root + path.sep, '')
-      .replace(separatorRegEx, '/');
+    commandOptions.path = parsedPath.dir.replace(separatorRegEx, '/');
+    if (parsedPath.dir.startsWith(root)) {
+      commandOptions.path = commandOptions.path.substr(root.length);
+    }
 
     const cwd = this.project.root;
     const schematicName = rawArgs[0];
