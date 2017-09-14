@@ -42,16 +42,16 @@ import {
   SOURCE,
   Program,
   CompilerHost,
-  createProgram as createProgramInterface,
-  createCompilerHost as createCompilerHostInterface,
+  CreateProgramInterface,
+  CreateCompilerHostInterface,
   Diagnostics,
-  formatDiagnostics as formatDiagnosticsInterface,
+  FormatDiagnosticsInterface,
   CustomTransformers as CustomTransformers,
-} from './ngtools_api2.d';
+} from './ngtools_api2';
 
-const createProgram: createProgramInterface = compilerCliNgtools.createProgram;
-const createCompilerHost: createCompilerHostInterface = compilerCliNgtools.createCompilerHost;
-const formatDiagnostics: formatDiagnosticsInterface = compilerCliNgtools.formatDiagnostics;
+const createProgram: CreateProgramInterface = compilerCliNgtools.createProgram;
+const createCompilerHost: CreateCompilerHostInterface = compilerCliNgtools.createCompilerHost;
+const formatDiagnostics: FormatDiagnosticsInterface = compilerCliNgtools.formatDiagnostics;
 const EmitFlags: any = compilerCliNgtools.EmitFlags;
 
 /**
@@ -665,9 +665,6 @@ export class AngularCompilerPlugin implements Tapable {
 
   getFile(fileName: string) {
     const outputFile = fileName.replace(/.ts$/, '.js');
-    if (!this._compilerHost.fileExists(outputFile)) {
-      return null;
-    }
     return {
       outputText: this._compilerHost.readFile(outputFile),
       sourceMap: this._compilerHost.readFile(outputFile + '.map')
