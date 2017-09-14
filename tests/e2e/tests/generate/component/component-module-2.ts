@@ -6,18 +6,16 @@ import {expectFileToMatch} from '../../../utils/fs';
 
 export default function() {
   const root = process.cwd();
-  const modulePath = join(root, 'src', 'app', 'app.module.ts');
+  const modulePath = join(root, 'src/app/admin/module/module.module.ts');
 
   fs.mkdirSync('./src/app/sub-dir');
 
-  return ng('generate', 'component', 'test-component', '--module', 'app.module.ts')
+  return Promise.resolve()
+    .then(() => ng('generate', 'module', 'admin/module'))
+    .then(() => ng('generate', 'component', 'other/test-component', '--module', 'admin/module'))
     .then(() => expectFileToMatch(modulePath,
-      /import { TestComponentComponent } from '.\/test-component\/test-component.component'/))
-
-    .then(() => process.chdir(join(root, 'src', 'app')))
-    .then(() => ng('generate', 'component', 'test-component2', '--module', 'app.module.ts'))
-    .then(() => expectFileToMatch(modulePath,
-      /import { TestComponent2Component } from '.\/test-component2\/test-component2.component'/))
+      new RegExp(/import { TestComponentComponent } /.source +
+                 /from '..\/..\/other\/test-component\/test-component.component'/.source))
 
     // Try to run the unit tests.
     .then(() => ng('build'));
