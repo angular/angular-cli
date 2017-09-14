@@ -16,6 +16,7 @@ export interface ModuleOptions {
   sourceDir?: string;
   path?: string;
   skipImport?: boolean;
+  appRoot?: string;
 }
 
 
@@ -35,7 +36,7 @@ export function findModuleFromOptions(host: Tree,
     return normalizePath(findModule(host, pathToCheck));
   } else {
     const modulePath = normalizePath(
-      options.sourceDir + '/' + options.path + '/' + options.module);
+      options.sourceDir + '/' + (options.appRoot || options.path) + '/' + options.module);
     const moduleBaseName = normalizePath(modulePath).split('/').pop();
 
     if (host.exists(modulePath)) {

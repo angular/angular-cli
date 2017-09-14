@@ -9,6 +9,7 @@
 export interface Schema {
     name: string;
     path?: string;
+    appRoot?: string;
     /**
      * The prefix to apply to generated selectors.
      */

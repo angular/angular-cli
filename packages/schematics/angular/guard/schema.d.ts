@@ -15,5 +15,6 @@ export interface Schema {
      */
     module?: string;
     path?: string;
+    appRoot?: string;
     sourceDir?: string;
 }

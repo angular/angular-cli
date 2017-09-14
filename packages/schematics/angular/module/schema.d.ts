@@ -9,8 +9,10 @@
 export interface Schema {
     name: string;
     path?: string;
+    appRoot?: string;
     sourceDir?: string;
     routing?: boolean;
+    routingScope?: ('Child' | 'Root');
     spec?: boolean;
     flat?: boolean;
     commonModule?: boolean;

@@ -9,6 +9,7 @@
 export interface Schema {
     name: string;
     path?: string;
+    appRoot?: string;
     sourceDir?: string;
     /**
      * Flag to indicate if a dir is created.

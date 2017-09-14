@@ -11,6 +11,9 @@
       "type": "string",
       "default": "app"
     },
+    "appRoot": {
+      "type": "string"
+    },
     "sourceDir": {
       "type": "string",
       "default": "src"

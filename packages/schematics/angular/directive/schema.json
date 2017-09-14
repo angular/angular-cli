@@ -11,6 +11,9 @@
       "type": "string",
       "default": "app"
     },
+    "appRoot": {
+      "type": "string"
+    },
     "prefix": {
       "type": "string",
       "description": "The prefix to apply to generated selectors.",

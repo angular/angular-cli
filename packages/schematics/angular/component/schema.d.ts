@@ -8,6 +8,7 @@
 
 export interface Schema {
     path?: string;
+    appRoot?: string;
     sourceDir?: string;
     name: string;
     /**
