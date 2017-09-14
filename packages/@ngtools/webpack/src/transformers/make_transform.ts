@@ -1,5 +1,11 @@
 import * as ts from 'typescript';
+import { satisfies } from 'semver';
 
+
+// Typescript below 2.5.0 needs a workaround.
+const visitEachChild = satisfies(ts.version, '^2.5.0')
+  ? ts.visitEachChild
+  : visitEachChildWorkaround;
 
 export enum OPERATION_KIND {
   Remove,
@@ -34,9 +40,6 @@ export class ReplaceNodeOperation extends TransformOperation {
     super(OPERATION_KIND.Replace, sourceFile, target);
   }
 }
-
-// TODO: add symbol workaround for https://github.com/Microsoft/TypeScript/issues/17551 and
-// https://github.com/Microsoft/TypeScript/issues/17384
 
 export function makeTransform(ops: TransformOperation[]): ts.TransformerFactory<ts.SourceFile> {
 
@@ -83,7 +86,7 @@ export function makeTransform(ops: TransformOperation[]): ts.TransformerFactory<
           return modifiedNodes;
         } else {
           // Otherwise return node as is and visit children.
-          return ts.visitEachChild(node, visitor, context);
+          return visitEachChild(node, visitor, context);
         }
       };
 
@@ -93,4 +96,35 @@ export function makeTransform(ops: TransformOperation[]): ts.TransformerFactory<
 
     return transformer;
   };
+}
+
+/**
+ * This is a version of `ts.visitEachChild` that works that calls our version
+ * of `updateSourceFileNode`, so that typescript doesn't lose type information
+ * for property decorators.
+ * See https://github.com/Microsoft/TypeScript/issues/17384 and
+ * https://github.com/Microsoft/TypeScript/issues/17551, fixed by
+ * https://github.com/Microsoft/TypeScript/pull/18051 and released on TS 2.5.0.
+ *
+ * @param sf
+ * @param statements
+ */
+function visitEachChildWorkaround(node: ts.Node, visitor: ts.Visitor,
+  context: ts.TransformationContext) {
+
+  if (node.kind === ts.SyntaxKind.SourceFile) {
+    const sf = node as ts.SourceFile;
+    const statements = ts.visitLexicalEnvironment(sf.statements, visitor, context);
+
+    if (statements === sf.statements) {
+      return sf;
+    }
+    // Note: Need to clone the original file (and not use `ts.updateSourceFileNode`)
+    // as otherwise TS fails when resolving types for decorators.
+    const sfClone = ts.getMutableClone(sf);
+    sfClone.statements = statements;
+    return sfClone;
+  }
+
+  return ts.visitEachChild(node, visitor, context);
 }

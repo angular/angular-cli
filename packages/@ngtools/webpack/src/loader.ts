@@ -539,12 +539,6 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
       plugin.done
         .then(() => {
           const result = plugin.getFile(sourceFileName);
-          if (result === null && !plugin.failedCompilation) {
-            throw new Error(
-              `${sourceFileName} is loaded but is not part of the TypeScript compilation. ` +
-              'Please add it to your tsconfig file.'
-            );
-          }
           if (plugin.failedCompilation) {
             // Return an empty string if there is no result to prevent extra loader errors.
             // Plugin errors were already pushed to the compilation errors.
