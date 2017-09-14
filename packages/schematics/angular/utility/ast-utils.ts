@@ -399,4 +399,3 @@ export function addBootstrapToModule(source: ts.SourceFile,
                                      importPath: string): Change[] {
   return _addSymbolToNgModuleMetadata(source, modulePath, 'bootstrap', classifiedName, importPath);
 }
-

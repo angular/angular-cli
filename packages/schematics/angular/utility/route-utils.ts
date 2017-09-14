@@ -87,4 +87,3 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
     ts.SyntaxKind.StringLiteral,
   );
 }
-

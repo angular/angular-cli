@@ -114,4 +114,3 @@ export class DryRunSink extends FileSystemSink {
     return Observable.empty<void>();
   }
 }
-

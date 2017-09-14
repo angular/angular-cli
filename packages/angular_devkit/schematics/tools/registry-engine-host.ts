@@ -118,4 +118,3 @@ export class RegistryEngineHost extends FileSystemEngineHostBase {
     return desc as FileSystemSchematicDesc;
   }
 }
-

@@ -203,4 +203,3 @@ describe('scrub-file', () => {
     });
   });
 });
-

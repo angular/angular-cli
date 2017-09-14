@@ -49,4 +49,3 @@ export declare type FileSystemSchematicDesc
   = SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 export declare type FileSystemSchematicContext
   = TypedSchematicContext<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-

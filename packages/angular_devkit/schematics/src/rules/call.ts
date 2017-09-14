@@ -68,4 +68,3 @@ export function callRule(rule: Rule,
     }
   });
 }
-
