@@ -1,7 +1,6 @@
 /**
  * This is a copy of @compiler-cli/src/ngtools_api.d.ts file.
  */
-import { ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 
 export const DEFAULT_ERROR_CODE = 100;
@@ -9,7 +8,7 @@ export const UNKNOWN_ERROR_CODE = 500;
 export const SOURCE = 'angular' as 'angular';
 export interface Diagnostic {
   messageText: string;
-  span?: ParseSourceSpan;
+  span?: any;
   category: ts.DiagnosticCategory;
   code: number;
   source: 'angular';
@@ -99,7 +98,7 @@ export declare type Diagnostics = Array<ts.Diagnostic | Diagnostic>;
 export declare function formatDiagnostics(options: CompilerOptions, diags: Diagnostics): string;
 
 // Interfaces for the function declarations.
-export interface createProgram {
+export interface CreateProgramInterface {
   ({ rootNames, options, host, oldProgram }: {
     rootNames: string[];
     options: CompilerOptions;
@@ -107,12 +106,12 @@ export interface createProgram {
     oldProgram?: Program;
   }): Program;
 }
-export interface createCompilerHost {
+export interface CreateCompilerHostInterface {
   ({ options, tsHost }: {
     options: CompilerOptions;
     tsHost?: ts.CompilerHost;
   }): CompilerHost;
 }
-export interface formatDiagnostics {
+export interface FormatDiagnosticsInterface {
   (options: CompilerOptions, diags: Diagnostics): string;
 }
