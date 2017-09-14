@@ -358,6 +358,14 @@ export class AotPlugin implements Tapable {
       // being built.
       const angularCoreModuleDir = path.dirname(angularCoreModulePath).split(/node_modules/).pop();
 
+      // Also support the es2015 in Angular versions that have it.
+      let angularCoreEs2015Dir: string | undefined;
+      if (angularCorePackageJson['es2015']) {
+        const angularCoreEs2015Path = path.resolve(path.dirname(angularCorePackagePath),
+        angularCorePackageJson['es2015']);
+        angularCoreEs2015Dir = path.dirname(angularCoreEs2015Path).split(/node_modules/).pop();
+      }
+
       cmf.plugin('after-resolve', (result: any, callback: (err?: any, request?: any) => void) => {
         if (!result) {
           return callback();
@@ -368,7 +376,8 @@ export class AotPlugin implements Tapable {
         //   The other logic is for flat modules and requires reading the package.json of angular
         //     (see above).
         if (!result.resource.endsWith(path.join('@angular/core/src/linker'))
-            && (angularCoreModuleDir && !result.resource.endsWith(angularCoreModuleDir))) {
+            && !(angularCoreModuleDir && result.resource.endsWith(angularCoreModuleDir))
+            && !(angularCoreEs2015Dir && result.resource.endsWith(angularCoreEs2015Dir))) {
           return callback(null, result);
         }
 
