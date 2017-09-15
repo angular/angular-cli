@@ -32,4 +32,5 @@ export interface BuildOptions {
   subresourceIntegrity?: boolean;
   forceTsCommonjs?: boolean;
   serviceWorker?: boolean;
+  skipAppShell?: boolean;
 }

@@ -2,6 +2,9 @@ import { CliConfig } from '../models/config';
 import { BuildOptions } from '../models/build-options';
 import { Version } from '../upgrade/version';
 import { oneLine } from 'common-tags';
+import { getAppFromConfig } from '../utilities/app-utils';
+import { join } from 'path';
+import { RenderUniversalTaskOptions } from '../tasks/render-universal';
 
 const Command = require('../ember-cli/lib/models/command');
 
@@ -198,6 +201,12 @@ export const baseBuildCommandOptions: any = [
     aliases: ['sw'],
     description: 'Generates a service worker config for production builds, if the app has '
                + 'service worker enabled.'
+  },
+  {
+    name: 'skip-app-shell',
+    type: Boolean,
+    description: 'Flag to prevent building an app shell',
+    default: false
   }
 ];
 
@@ -237,7 +246,45 @@ const BuildCommand = Command.extend({
       ui: this.ui,
     });
 
-    return buildTask.run(commandOptions);
+
+    const buildPromise = buildTask.run(commandOptions);
+
+
+    const clientApp = getAppFromConfig(commandOptions.app);
+
+    const doAppShell = commandOptions.target === 'production' &&
+      (commandOptions.aot === undefined || commandOptions.aot === true) &&
+      !commandOptions.skipAppShell;
+    if (!clientApp.appShell || !doAppShell) {
+      return buildPromise;
+    }
+    const serverApp = getAppFromConfig(clientApp.appShell.app);
+
+    return buildPromise
+      .then(() => {
+
+        const serverOptions = {
+          ...commandOptions,
+          app: clientApp.appShell.app
+        };
+        return buildTask.run(serverOptions);
+      })
+      .then(() => {
+        const RenderUniversalTask = require('../tasks/render-universal').default;
+
+        const renderUniversalTask = new RenderUniversalTask({
+          project: this.project,
+          ui: this.ui,
+        });
+        const renderUniversalOptions: RenderUniversalTaskOptions = {
+          inputIndexPath: join(this.project.root, clientApp.outDir, clientApp.index),
+          route: clientApp.appShell.route,
+          serverOutDir: join(this.project.root, serverApp.outDir),
+          outputIndexPath: join(this.project.root, clientApp.outDir, clientApp.index)
+        };
+
+        return renderUniversalTask.run(renderUniversalOptions);
+      });
   }
 });
 
