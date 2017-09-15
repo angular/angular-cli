@@ -38,6 +38,20 @@
             "description": "Directory where app files are placed.",
             "default": "app"
           },
+          "appShell": {
+            "type": "object",
+            "description": "AppShell configuration.",
+            "properties": {
+              "app": {
+                "type": "string",
+                "description": "Index or name of the related AppShell app."
+              },
+              "route": {
+                "type": "string",
+                "description": "Default AppShell route to render."
+              }
+            }
+          },
           "root": {
             "type": "string",
             "description": "The root directory of the app."
