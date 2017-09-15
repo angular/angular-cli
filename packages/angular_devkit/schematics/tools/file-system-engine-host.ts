@@ -8,7 +8,6 @@
 import { RuleFactory } from '@angular-devkit/schematics';
 import {
   CollectionCannotBeResolvedException,
-  CollectionMissingFieldsException,
   CollectionMissingSchematicsMapException,
   SchematicMissingFieldsException,
 } from '@angular-devkit/schematics/tools';
@@ -54,9 +53,6 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
     name: string,
     desc: Partial<FileSystemCollectionDesc>,
   ): FileSystemCollectionDesc {
-    if (!desc.name || !desc.path || !desc.version) {
-      throw new CollectionMissingFieldsException(name);
-    }
     if (!desc.schematics || typeof desc.schematics != 'object') {
       throw new CollectionMissingSchematicsMapException(name);
     }

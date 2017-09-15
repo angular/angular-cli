@@ -33,7 +33,7 @@ export class VirtualTree implements Tree {
    * @returns {string} A path that is resolved and normalized.
    */
   protected _normalizePath(path: string): Path {
-    return normalize(path);
+    return normalize('/' + path);
   }
 
   /**

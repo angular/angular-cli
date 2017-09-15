@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, normalize, relative } from '@angular-devkit/core';
+import { Path, normalize, relative, dirname } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import { dasherize } from '../strings';
 
@@ -37,7 +37,7 @@ export function findModuleFromOptions(host: Tree,
     return normalize(findModule(host, pathToCheck));
   } else {
     const modulePath = normalize(
-      options.sourceDir + '/' + (options.appRoot || options.path) + '/' + options.module);
+      '/' + options.sourceDir + '/' + (options.appRoot || options.path) + '/' + options.module);
     const moduleBaseName = normalize(modulePath).split('/').pop();
 
     if (host.exists(modulePath)) {
@@ -58,7 +58,7 @@ export function findModuleFromOptions(host: Tree,
  * Function to find the "closest" module to a generated file's path.
  */
 export function findModule(host: Tree, generateDir: string): Path {
-  let closestModule: string = normalize(generateDir.replace(/[\\/]$/, ''));
+  let closestModule = normalize('/' + generateDir);
   const allFiles = host.files;
 
   let modulePath: string | null = null;
@@ -66,11 +66,10 @@ export function findModule(host: Tree, generateDir: string): Path {
   const routingModuleRe = /-routing\.module\.ts/;
 
   while (closestModule) {
-    const normalizedRoot = normalize(closestModule);
     const matches = allFiles
       .filter(p => moduleRe.test(p) &&
         !routingModuleRe.test(p) &&
-        !/\//g.test(p.replace(normalizedRoot + '/', '')));
+        !/\//g.test(p.replace(closestModule + '/', '')));
 
     if (matches.length == 1) {
       modulePath = matches[0];
@@ -79,7 +78,7 @@ export function findModule(host: Tree, generateDir: string): Path {
       throw new Error('More than one module matches. Use skip-import option to skip importing '
         + 'the component into the closest module.');
     }
-    closestModule = closestModule.split('/').slice(0, -1).join('/');
+    closestModule = dirname(closestModule);
   }
 
   if (!modulePath) {

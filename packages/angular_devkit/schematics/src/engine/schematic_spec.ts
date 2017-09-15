@@ -42,7 +42,7 @@ describe('Schematic', () => {
       collection,
       name: 'test',
       description: '',
-      path: 'a/b/c',
+      path: '/a/b/c',
       factory: () => (tree: Tree) => {
         inner = branch(tree);
         tree.create('a/b/c', 'some content');

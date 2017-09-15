@@ -8,8 +8,8 @@
 import { RuleFactory } from '@angular-devkit/schematics';
 import {
   CollectionCannotBeResolvedException,
-  CollectionMissingFieldsException,
-  CollectionMissingSchematicsMapException, SchematicMissingFieldsException,
+  CollectionMissingSchematicsMapException,
+  SchematicMissingFieldsException,
 } from '@angular-devkit/schematics/tools';
 import { join } from 'path';
 import {

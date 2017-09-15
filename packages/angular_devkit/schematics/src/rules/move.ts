@@ -17,8 +17,8 @@ export function moveOp(from: string, to?: string): FileOperator {
     from = '/';
   }
 
-  const fromPath = normalize(from);
-  const toPath = normalize(to);
+  const fromPath = normalize('/' + from);
+  const toPath = normalize('/' + to);
 
   return (entry: FileEntry) => {
     if (entry.path.startsWith(fromPath)) {

@@ -12,7 +12,6 @@ import {
   UnknownCollectionException,
 } from '@angular-devkit/schematics';
 import {
-  CollectionMissingFieldsException,
   CollectionMissingSchematicsMapException,
   SchematicMissingFieldsException,
 } from '@angular-devkit/schematics/tools';
@@ -107,9 +106,6 @@ export class RegistryEngineHost extends FileSystemEngineHostBase {
 
   protected _transformCollectionDescription(name: string,
                                             desc: Partial<FileSystemCollectionDesc>) {
-    if (!desc.name || !desc.path || !desc.version) {
-      throw new CollectionMissingFieldsException(name);
-    }
     if (!desc.schematics || typeof desc.schematics != 'object') {
       throw new CollectionMissingSchematicsMapException(name);
     }
