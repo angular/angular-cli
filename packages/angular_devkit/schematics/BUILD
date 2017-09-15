@@ -14,6 +14,7 @@ ts_library(
         exclude = ["src/**/*_spec.ts", "src/**/*_benchmark.ts"],
     ),
     deps = [
+      "//packages/angular_devkit/core",
         # @deps: rxjs
     ],
     tsconfig = "//:tsconfig.json",

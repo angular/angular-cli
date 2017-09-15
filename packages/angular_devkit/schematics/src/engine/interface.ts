@@ -37,11 +37,11 @@ export type SchematicDescription<CollectionMetadataT extends object,
  * parameters contain additional metadata that you want to store while remaining type-safe.
  */
 export interface EngineHost<CollectionMetadataT extends object, SchematicMetadataT extends object> {
-  createCollectionDescription(name: string): CollectionDescription<CollectionMetadataT> | null;
+  createCollectionDescription(name: string): CollectionDescription<CollectionMetadataT>;
   createSchematicDescription(
       name: string,
       collection: CollectionDescription<CollectionMetadataT>):
-        SchematicDescription<CollectionMetadataT, SchematicMetadataT> | null;
+        SchematicDescription<CollectionMetadataT, SchematicMetadataT>;
   getSchematicRuleFactory<OptionT extends object>(
       schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
       collection: CollectionDescription<CollectionMetadataT>): RuleFactory<OptionT>;

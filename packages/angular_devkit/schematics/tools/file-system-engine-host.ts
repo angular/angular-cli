@@ -6,6 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { RuleFactory } from '@angular-devkit/schematics';
+import {
+  CollectionCannotBeResolvedException,
+  CollectionMissingFieldsException,
+  CollectionMissingSchematicsMapException,
+  SchematicMissingFieldsException,
+} from '@angular-devkit/schematics/tools';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
@@ -20,7 +26,7 @@ import { FileSystemEngineHostBase } from './file-system-engine-host-base';
 export class FileSystemEngineHost extends FileSystemEngineHostBase {
   constructor(protected _root: string) { super(); }
 
-  protected _resolveCollectionPath(name: string): string | null {
+  protected _resolveCollectionPath(name: string): string {
     // Allow `${_root}/${name}.json` as a collection.
     if (existsSync(join(this._root, name + '.json'))) {
       return join(this._root, name + '.json');
@@ -31,7 +37,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
       return join(this._root, name, 'collection.json');
     }
 
-    return null;
+    throw new CollectionCannotBeResolvedException(name);
   }
 
   protected _resolveReferenceString(refString: string, parentPath: string) {
@@ -45,26 +51,26 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
   }
 
   protected _transformCollectionDescription(
-    _name: string,
+    name: string,
     desc: Partial<FileSystemCollectionDesc>,
-  ): FileSystemCollectionDesc | null {
-    if (!desc.name || !desc.path || !desc.schematics || !desc.version) {
-      return null;
+  ): FileSystemCollectionDesc {
+    if (!desc.name || !desc.path || !desc.version) {
+      throw new CollectionMissingFieldsException(name);
     }
-    if (typeof desc.schematics != 'object') {
-      return null;
+    if (!desc.schematics || typeof desc.schematics != 'object') {
+      throw new CollectionMissingSchematicsMapException(name);
     }
 
     return desc as FileSystemCollectionDesc;
   }
 
   protected _transformSchematicDescription(
-    _name: string,
+    name: string,
     _collection: FileSystemCollectionDesc,
     desc: Partial<FileSystemSchematicDesc>,
-  ): FileSystemSchematicDesc | null {
+  ): FileSystemSchematicDesc {
     if (!desc.factoryFn || !desc.path || !desc.description) {
-      return null;
+      throw new SchematicMissingFieldsException(name);
     }
 
     return desc as FileSystemSchematicDesc;

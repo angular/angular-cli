@@ -5,12 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject } from '@angular-devkit/core';
+import { BaseException, JsonObject } from '@angular-devkit/core';
 import {
   EngineHost,
   FileSystemTree,
   RuleFactory,
   Source,
+  UnknownSchematicException,
 } from '@angular-devkit/schematics';
 import { dirname, isAbsolute, join, resolve } from 'path';
 import { Url } from 'url';
@@ -30,27 +31,61 @@ export declare type OptionTransform<T extends object, R extends object>
     = (schematic: FileSystemSchematicDescription, options: T) => R;
 
 
+export class CollectionCannotBeResolvedException extends BaseException {
+  constructor(name: string) {
+    super(`Collection ${JSON.stringify(name)} cannot be resolved.`);
+  }
+}
+export class InvalidCollectionJsonException extends BaseException {
+  constructor(_name: string, path: string) {
+    super(`Collection JSON at path ${JSON.stringify(path)} is invalid.`);
+  }
+}
+export class SchematicMissingFactoryException extends BaseException {
+  constructor(name: string) {
+    super(`Schematic ${JSON.stringify(name)} is missing a factory.`);
+  }
+}
+export class FactoryCannotBeResolvedException extends BaseException {
+  constructor(name: string) {
+    super(`Schematic ${JSON.stringify(name)} cannot resolve the factory.`);
+  }
+}
+export class CollectionMissingSchematicsMapException extends BaseException {
+  constructor(name: string) { super(`Collection "${name}" does not have a schematics map.`); }
+}
+export class CollectionMissingFieldsException extends BaseException {
+  constructor(name: string) { super(`Collection "${name}" is missing fields.`); }
+}
+export class SchematicMissingFieldsException extends BaseException {
+  constructor(name: string) { super(`Schematic "${name}" is missing fields.`); }
+}
+export class SchematicMissingDescriptionException extends BaseException {
+  constructor(name: string) { super(`Schematics "${name}" does not have a description.`); }
+}
+
+
 /**
  * A EngineHost base class that uses the file system to resolve collections. This is the base of
  * all other EngineHost provided by the tooling part of the Schematics library.
  */
 export abstract class FileSystemEngineHostBase implements
     EngineHost<FileSystemCollectionDescription, FileSystemSchematicDescription> {
-  protected abstract _resolveCollectionPath(name: string): string | null;
+  protected abstract _resolveCollectionPath(name: string): string;
   protected abstract _resolveReferenceString(
       name: string, parentPath: string): { ref: RuleFactory<{}>, path: string } | null;
   protected abstract _transformCollectionDescription(
-      name: string, desc: Partial<FileSystemCollectionDesc>): FileSystemCollectionDesc | null;
+      name: string, desc: Partial<FileSystemCollectionDesc>): FileSystemCollectionDesc;
   protected abstract _transformSchematicDescription(
       name: string,
       collection: FileSystemCollectionDesc,
-      desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc | null;
+      desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc;
 
   private _transforms: OptionTransform<object, object>[] = [];
 
   listSchematics(collection: FileSystemCollection) {
     const schematics: string[] = [];
-    for (const key in collection.description.schematics) {
+    for (const key of Object.keys(collection.description.schematics)) {
       const schematic = collection.description.schematics[key];
 
       // If extends is present without a factory it is an alias, do not return it
@@ -74,42 +109,36 @@ export abstract class FileSystemEngineHostBase implements
    * @param name
    * @return {{path: string}}
    */
-  createCollectionDescription(name: string): FileSystemCollectionDesc | null {
-    try {
-      const path = this._resolveCollectionPath(name);
-      if (!path) {
-        return null;
-      }
-
-      const partialDesc: Partial<FileSystemCollectionDesc> | null = readJsonFile(path);
-      if (!partialDesc) {
-        return null;
-      }
-
-      const description = this._transformCollectionDescription(name, {
-        ...partialDesc,
-        path,
-      });
-      if (!description || !description.name) {
-        return null;
-      }
-
-      return description;
-    } catch (e) {
-      return null;
+  createCollectionDescription(name: string): FileSystemCollectionDesc {
+    const path = this._resolveCollectionPath(name);
+    const jsonValue = readJsonFile(path);
+    if (!jsonValue || typeof jsonValue != 'object') {
+      throw new InvalidCollectionJsonException(name, path);
     }
+
+    const description = this._transformCollectionDescription(name, {
+      ...jsonValue,
+      path,
+    });
+    if (!description || !description.name) {
+      throw new InvalidCollectionJsonException(name, path);
+    }
+
+    return description;
   }
 
   createSchematicDescription(
-      name: string, collection: FileSystemCollectionDesc): FileSystemSchematicDesc | null {
+    name: string,
+    collection: FileSystemCollectionDesc,
+  ): FileSystemSchematicDesc {
     if (!(name in collection.schematics)) {
-      return null;
+      throw new UnknownSchematicException(name, collection);
     }
 
     const collectionPath = dirname(collection.path);
     let partialDesc: Partial<FileSystemSchematicDesc> | null = collection.schematics[name];
     if (!partialDesc) {
-      return null;
+      throw new UnknownSchematicException(name, collection);
     }
 
     if (partialDesc.extends) {
@@ -121,26 +150,23 @@ export abstract class FileSystemEngineHostBase implements
       if (collectionName !== null) {
         // const extendCollection = engine.createCollection(collectionName);
         const extendCollection = this.createCollectionDescription(collectionName);
-        if (!extendCollection) {
-          return null;
-        }
         partialDesc = this.createSchematicDescription(schematicName, extendCollection);
       } else {
         partialDesc = this.createSchematicDescription(schematicName, collection);
       }
     }
     if (!partialDesc) {
-      return null;
+      throw new UnknownSchematicException(name, collection);
     }
 
     // Use any on this ref as we don't have the OptionT here, but we don't need it (we only need
     // the path).
     if (!partialDesc.factory) {
-      return null;
+      throw new SchematicMissingFactoryException(name);
     }
     const resolvedRef = this._resolveReferenceString(partialDesc.factory, collectionPath);
     if (!resolvedRef) {
-      return null;
+      throw new FactoryCannotBeResolvedException(name);
     }
 
     const { path } = resolvedRef;
@@ -153,7 +179,7 @@ export abstract class FileSystemEngineHostBase implements
       schemaJson = readJsonFile(schema) as JsonObject;
     }
 
-    const description = this._transformSchematicDescription(name, collection, {
+    return this._transformSchematicDescription(name, collection, {
       ...partialDesc,
       schema,
       schemaJson,
@@ -162,12 +188,6 @@ export abstract class FileSystemEngineHostBase implements
       factoryFn: resolvedRef.ref,
       collection,
     });
-
-    if (!description) {
-      return null;
-    }
-
-    return description;
   }
 
   createSourceFromUrl(url: Url): Source | null {

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException } from '@angular-devkit/core';
+import { CollectionDescription } from '@angular-devkit/schematics';
 import 'rxjs/add/operator/map';
 import { Url } from 'url';
 import { MergeStrategy } from '../tree/interface';
@@ -30,8 +31,8 @@ export class UnknownCollectionException extends BaseException {
   constructor(name: string) { super(`Unknown collection "${name}".`); }
 }
 export class UnknownSchematicException extends BaseException {
-  constructor(name: string, collection: Collection<{}, {}>) {
-    super(`Schematic "${name}" not found in collection "${collection.description.name}".`);
+  constructor(name: string, collection: CollectionDescription<{}>) {
+    super(`Schematic "${name}" not found in collection "${collection.name}".`);
   }
 }
 
@@ -83,7 +84,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
 
     const description = this._host.createSchematicDescription(name, collection.description);
     if (!description) {
-      throw new UnknownSchematicException(name, collection);
+      throw new UnknownSchematicException(name, collection.description);
     }
 
     const factory = this._host.getSchematicRuleFactory(description, collection.description);
