@@ -6,6 +6,7 @@ import { Component } from '@angular/core';
     <p>
       app Works!
     </p>
+    <router-outlet></router-outlet>
   `,<% } else { %>
   templateUrl: './app.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
