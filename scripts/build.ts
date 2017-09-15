@@ -141,7 +141,7 @@ function _build(logger: Logger) {
 }
 
 
-export default function(_: {}, logger: Logger) {
+export default function(argv: { local?: boolean }, logger: Logger) {
   _clean(logger);
 
   const sortedPackages = _sortPackages();
@@ -250,8 +250,12 @@ export default function(_: {}, logger: Logger) {
       const v = versions[depName];
       for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies']) {
         const obj = packageJson[depKey] as JsonObject | null;
-        if (obj && obj[depName] == '0.0.0') {
-          obj[depName] = v;
+        if (obj && obj[depName]) {
+          if (argv.local) {
+            obj[depName] = packages[depName].tar;
+          } else if (obj[depName] == '0.0.0') {
+            obj[depName] = v;
+          }
         }
       }
     }
