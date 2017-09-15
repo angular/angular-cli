@@ -5,8 +5,8 @@ import { Component } from '@angular/core';
   template: `
     <p>
       app Works!
-    </p>
-    <router-outlet></router-outlet>
+    </p><% if(routing) { %>
+    <router-outlet></router-outlet><% } %>
   `,<% } else { %>
   templateUrl: './app.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
