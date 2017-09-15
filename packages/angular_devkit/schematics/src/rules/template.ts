@@ -5,12 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException } from '@angular-devkit/core';
+import { BaseException, normalize } from '@angular-devkit/core';
 import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
-import { normalizePath } from '../utility/path';
 import { chain, forEach } from './base';
-import {template as templateImpl } from './template/template';
+import { template as templateImpl } from './template/template';
 import { isBinary } from './utils/is-binary';
 
 
@@ -67,7 +66,7 @@ export function applyPathTemplate<T extends TemplateOptions>(options: T): FileOp
     const original = path;
 
     // Path template.
-    path = normalizePath(path.replace(kPathTemplateComponentRE, (_, match) => {
+    path = normalize(path.replace(kPathTemplateComponentRE, (_, match) => {
       const [name, ...pipes] = match.split(kPathTemplatePipeRE);
       const value = typeof options[name] == 'function'
         ? (options[name] as TemplatePipeFunction).call(options, original)

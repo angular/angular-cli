@@ -5,7 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { SchematicPath, Tree, normalizePath, relativePath } from '@angular-devkit/schematics';
+import { Path, normalize, relative } from '@angular-devkit/core';
+import { Tree } from '@angular-devkit/schematics';
 import { dasherize } from '../strings';
 
 
@@ -21,10 +22,10 @@ export interface ModuleOptions {
 
 
 /**
- * Find the module refered by a set of options passed to the schematics.
+ * Find the module referred by a set of options passed to the schematics.
  */
 export function findModuleFromOptions(host: Tree,
-                                      options: ModuleOptions): SchematicPath | undefined {
+                                      options: ModuleOptions): Path | undefined {
   if (options.hasOwnProperty('skipImport') && options.skipImport) {
     return undefined;
   }
@@ -33,20 +34,20 @@ export function findModuleFromOptions(host: Tree,
     const pathToCheck = (options.sourceDir || '') + '/' + (options.path || '')
                       + (options.flat ? '' : '/' + dasherize(options.name));
 
-    return normalizePath(findModule(host, pathToCheck));
+    return normalize(findModule(host, pathToCheck));
   } else {
-    const modulePath = normalizePath(
+    const modulePath = normalize(
       options.sourceDir + '/' + (options.appRoot || options.path) + '/' + options.module);
-    const moduleBaseName = normalizePath(modulePath).split('/').pop();
+    const moduleBaseName = normalize(modulePath).split('/').pop();
 
     if (host.exists(modulePath)) {
-      return normalizePath(modulePath);
+      return normalize(modulePath);
     } else if (host.exists(modulePath + '.ts')) {
-      return normalizePath(modulePath + '.ts');
+      return normalize(modulePath + '.ts');
     } else if (host.exists(modulePath + '.module.ts')) {
-      return normalizePath(modulePath + '.module.ts');
+      return normalize(modulePath + '.module.ts');
     } else if (host.exists(modulePath + '/' + moduleBaseName + '.module.ts')) {
-      return normalizePath(modulePath + '/' + moduleBaseName + '.module.ts');
+      return normalize(modulePath + '/' + moduleBaseName + '.module.ts');
     } else {
       throw new Error('Specified module does not exist');
     }
@@ -56,8 +57,8 @@ export function findModuleFromOptions(host: Tree,
 /**
  * Function to find the "closest" module to a generated file's path.
  */
-export function findModule(host: Tree, generateDir: string): SchematicPath {
-  let closestModule: string = normalizePath(generateDir.replace(/[\\/]$/, ''));
+export function findModule(host: Tree, generateDir: string): Path {
+  let closestModule: string = normalize(generateDir.replace(/[\\/]$/, ''));
   const allFiles = host.files;
 
   let modulePath: string | null = null;
@@ -65,7 +66,7 @@ export function findModule(host: Tree, generateDir: string): SchematicPath {
   const routingModuleRe = /-routing\.module\.ts/;
 
   while (closestModule) {
-    const normalizedRoot = normalizePath(closestModule);
+    const normalizedRoot = normalize(closestModule);
     const matches = allFiles
       .filter(p => moduleRe.test(p) &&
         !routingModuleRe.test(p) &&
@@ -86,15 +87,15 @@ export function findModule(host: Tree, generateDir: string): SchematicPath {
       + 'option to skip importing components in NgModule.');
   }
 
-  return normalizePath(modulePath);
+  return normalize(modulePath);
 }
 
 /**
  * Build a relative path from one file path to another file path.
  */
 export function buildRelativePath(from: string, to: string): string {
-  from = normalizePath(from);
-  to = normalizePath(to);
+  from = normalize(from);
+  to = normalize(to);
 
   // Convert to arrays.
   const fromParts = from.split('/');
@@ -104,19 +105,18 @@ export function buildRelativePath(from: string, to: string): string {
   fromParts.pop();
   const toFileName = toParts.pop();
 
-  const relative = relativePath(normalizePath(fromParts.join('/')),
-                                normalizePath(toParts.join('/')));
+  const relativePath = relative(normalize(fromParts.join('/')), normalize(toParts.join('/')));
   let pathPrefix = '';
 
   // Set the path prefix for same dir or child dir, parent dir starts with `..`
-  if (!relative) {
+  if (!relativePath) {
     pathPrefix = '.';
-  } else if (!relative.startsWith('.')) {
+  } else if (!relativePath.startsWith('.')) {
     pathPrefix = `./`;
   }
   if (pathPrefix && !pathPrefix.endsWith('/')) {
     pathPrefix += '/';
   }
 
-  return pathPrefix + (relative ? relative + '/' : '') + toFileName;
+  return pathPrefix + (relativePath ? relativePath + '/' : '') + toFileName;
 }

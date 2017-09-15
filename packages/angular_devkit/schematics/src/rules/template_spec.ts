@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize } from '@angular-devkit/core';
 import { FileEntry } from '../tree/interface';
-import { normalizePath } from '../utility/path';
 import {
   InvalidPipeException,
   OptionIsNotDefinedException,
@@ -25,7 +25,7 @@ function _entry(path?: string, content?: string): FileEntry {
   }
 
   return {
-    path: normalizePath(path),
+    path: normalize(path),
     content: new Buffer(content),
   };
 }

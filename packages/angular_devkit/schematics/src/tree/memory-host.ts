@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalizePath } from '../utility/path';
+import { normalize } from '@angular-devkit/core';
 import { FileSystemTreeHost } from './filesystem';
 
 
@@ -15,14 +15,14 @@ export class InMemoryFileSystemTreeHost implements FileSystemTreeHost {
   constructor(content: { [path: string]: string }) {
     this._content = Object.create(null);
     Object.keys(content).forEach(path => {
-      path = normalizePath(path);
+      path = normalize(path);
       this._content[path] = new Buffer(content[path]);
     });
     this._files = Object.keys(this._content);
   }
 
   listDirectory(path: string) {
-    path = normalizePath(path).replace(/\/?$/, '/');
+    path = normalize(path).replace(/\/?$/, '/');
 
     return Object.keys(
       this._files
@@ -33,17 +33,17 @@ export class InMemoryFileSystemTreeHost implements FileSystemTreeHost {
     ).sort();
   }
   isDirectory(path: string) {
-    path = normalizePath(path);
+    path = normalize(path);
 
     return path == '/' || this._files.some(p => p.split('/').slice(0, -1).join('/') == path);
   }
   readFile(path: string) {
-    path = normalizePath(path);
+    path = normalize(path);
 
     return this._content[path] || new Buffer('');
   }
 
   join(path1: string, path2: string) {
-    return normalizePath(path1 + '/' + path2);
+    return normalize(path1 + '/' + path2);
   }
 }

@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException } from '@angular-devkit/core';
-import { SchematicPath } from '../utility/path';
+import { BaseException, Path } from '@angular-devkit/core';
 
 
 export class UnknownActionException extends BaseException {
@@ -23,7 +22,7 @@ export type Action = CreateFileAction
 export interface ActionBase {
   readonly id: number;
   readonly parent: number;
-  readonly path: SchematicPath;
+  readonly path: Path;
 }
 
 
@@ -39,16 +38,16 @@ export class ActionList implements Iterable<Action> {
     }, action) as Action);
   }
 
-  create(path: SchematicPath, content: Buffer) {
+  create(path: Path, content: Buffer) {
     this._action({ kind: 'c', path, content });
   }
-  overwrite(path: SchematicPath, content: Buffer) {
+  overwrite(path: Path, content: Buffer) {
     this._action({ kind: 'o', path, content });
   }
-  rename(path: SchematicPath, to: SchematicPath) {
+  rename(path: Path, to: Path) {
     this._action({ kind: 'r', path, to });
   }
-  delete(path: SchematicPath) {
+  delete(path: Path) {
     this._action({ kind: 'd', path });
   }
 
@@ -156,7 +155,7 @@ export interface OverwriteFileAction extends ActionBase {
 // If the target path already exists, this is an error.
 export interface RenameFileAction extends ActionBase {
   readonly kind: 'r';
-  readonly to: SchematicPath;
+  readonly to: Path;
 }
 
 // Delete a file. If the file does not exist, this is an error.

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalizePath } from '../utility/path';
+import { normalize } from '@angular-devkit/core';
 import { ActionList } from './action';
 
 
@@ -14,9 +14,9 @@ describe('Action', () => {
     it('works with create', () => {
       const actions = new ActionList;
 
-      actions.create(normalizePath('/a/b'), new Buffer('1'));
-      actions.create(normalizePath('/a/c'), new Buffer('2'));
-      actions.create(normalizePath('/a/c'), new Buffer('3'));
+      actions.create(normalize('/a/b'), new Buffer('1'));
+      actions.create(normalize('/a/c'), new Buffer('2'));
+      actions.create(normalize('/a/c'), new Buffer('3'));
 
       expect(actions.length).toBe(3);
       actions.optimize();
@@ -25,10 +25,10 @@ describe('Action', () => {
     it('works with overwrite', () => {
       const actions = new ActionList;
 
-      actions.create(normalizePath('/a/b'), new Buffer('1'));
-      actions.create(normalizePath('/a/c'), new Buffer('2'));
-      actions.overwrite(normalizePath('/a/c'), new Buffer('3'));
-      actions.overwrite(normalizePath('/a/b'), new Buffer('4'));
+      actions.create(normalize('/a/b'), new Buffer('1'));
+      actions.create(normalize('/a/c'), new Buffer('2'));
+      actions.overwrite(normalize('/a/c'), new Buffer('3'));
+      actions.overwrite(normalize('/a/b'), new Buffer('4'));
 
       expect(actions.length).toBe(4);
       actions.optimize();
@@ -38,11 +38,11 @@ describe('Action', () => {
     it('works with cloning a list', () => {
       const actions = new ActionList;
 
-      actions.create(normalizePath('/a/b'), new Buffer('1'));
-      actions.create(normalizePath('/a/c'), new Buffer('2'));
-      actions.overwrite(normalizePath('/a/c'), new Buffer('3'));
-      actions.overwrite(normalizePath('/a/b'), new Buffer('4'));
-      actions.create(normalizePath('/a/d'), new Buffer('5'));
+      actions.create(normalize('/a/b'), new Buffer('1'));
+      actions.create(normalize('/a/c'), new Buffer('2'));
+      actions.overwrite(normalize('/a/c'), new Buffer('3'));
+      actions.overwrite(normalize('/a/b'), new Buffer('4'));
+      actions.create(normalize('/a/d'), new Buffer('5'));
 
       const actions2 = new ActionList;
       actions.forEach(x => actions2.push(x));
@@ -59,10 +59,10 @@ describe('Action', () => {
     it('handles edge cases (1)', () => {
       const actions = new ActionList;
 
-      actions.create(normalizePath('/test'), new Buffer('1'));
-      actions.overwrite(normalizePath('/test'), new Buffer('3'));
-      actions.overwrite(normalizePath('/hello'), new Buffer('2'));
-      actions.overwrite(normalizePath('/test'), new Buffer('4'));
+      actions.create(normalize('/test'), new Buffer('1'));
+      actions.overwrite(normalize('/test'), new Buffer('3'));
+      actions.overwrite(normalize('/hello'), new Buffer('2'));
+      actions.overwrite(normalize('/test'), new Buffer('4'));
 
       const actions2 = new ActionList;
       actions.forEach(x => actions2.push(x));

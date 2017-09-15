@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Path, normalize } from '@angular-devkit/core';
 import {
   ContentHasMutatedException,
   FileAlreadyExistException,
@@ -12,7 +13,6 @@ import {
   InvalidUpdateRecordException,
   MergeConflictException,
 } from '../exception/exception';
-import { SchematicPath, normalizePath } from '../utility/path';
 import { Action, ActionList, UnknownActionException } from './action';
 import { SimpleFileEntry } from './entry';
 import { FileEntry, MergeStrategy, Tree, UpdateRecorder } from './interface';
@@ -23,17 +23,17 @@ import { UpdateRecorderBase } from './recorder';
  * The root class of most trees.
  */
 export class VirtualTree implements Tree {
-  protected _root = new Map<SchematicPath, FileEntry>();
+  protected _root = new Map<Path, FileEntry>();
   protected _actions = new ActionList();
-  protected _cacheMap = new Map<SchematicPath, FileEntry>();
+  protected _cacheMap = new Map<Path, FileEntry>();
 
   /**
    * Normalize the path. Made available to subclasses to overload.
    * @param path The path to normalize.
    * @returns {string} A path that is resolved and normalized.
    */
-  protected _normalizePath(path: string): SchematicPath {
-    return normalizePath(path);
+  protected _normalizePath(path: string): Path {
+    return normalize(path);
   }
 
   /**
@@ -129,7 +129,7 @@ export class VirtualTree implements Tree {
     this._delete(this._normalizePath(path));
   }
 
-  protected _overwrite(path: SchematicPath, content: Buffer, action?: Action) {
+  protected _overwrite(path: Path, content: Buffer, action?: Action) {
     if (!this.has(path)) {
       throw new FileDoesNotExistException(path);
     }
@@ -141,7 +141,7 @@ export class VirtualTree implements Tree {
     }
     this.set(new SimpleFileEntry(path, content));
   }
-  protected _create(path: SchematicPath, content: Buffer, action?: Action) {
+  protected _create(path: Path, content: Buffer, action?: Action) {
     if (this._cacheMap.has(path)) {
       throw new FileAlreadyExistException(path);
     }
@@ -153,7 +153,7 @@ export class VirtualTree implements Tree {
     }
     this.set(new SimpleFileEntry(path, content as Buffer));
   }
-  protected _rename(path: SchematicPath, to: SchematicPath, action?: Action, force = false) {
+  protected _rename(path: Path, to: Path, action?: Action, force = false) {
     const entry = this.get(path);
     if (!entry) {
       throw new FileDoesNotExistException(path);
@@ -171,7 +171,7 @@ export class VirtualTree implements Tree {
     this.set(new SimpleFileEntry(to, entry.content));
     this._cacheMap.delete(path);
   }
-  protected _delete(path: SchematicPath, action?: Action) {
+  protected _delete(path: Path, action?: Action) {
     if (!this.has(path)) {
       throw new FileDoesNotExistException(path);
     }

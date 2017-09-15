@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize } from '@angular-devkit/core';
 import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
-import { normalizePath } from '../utility/path';
 import { forEach } from './base';
 
 
@@ -17,14 +17,14 @@ export function moveOp(from: string, to?: string): FileOperator {
     from = '/';
   }
 
-  const fromPath = normalizePath(from);
-  const toPath = normalizePath(to);
+  const fromPath = normalize(from);
+  const toPath = normalize(to);
 
   return (entry: FileEntry) => {
     if (entry.path.startsWith(fromPath)) {
       return {
         content: entry.content,
-        path: normalizePath(toPath + '/' + entry.path.substr(fromPath.length)),
+        path: normalize(toPath + '/' + entry.path.substr(fromPath.length)),
       };
     }
 

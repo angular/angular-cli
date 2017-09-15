@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { SchematicPath, normalizePath } from '../utility/path';
+import { Path, normalize } from '@angular-devkit/core';
 import { LazyFileEntry } from './entry';
 import { VirtualTree } from './virtual';
 
@@ -32,14 +32,14 @@ export class FileSystemTree extends VirtualTree {
     });
   }
 
-  protected _recursiveFileList(): [ string, SchematicPath ][] {
+  protected _recursiveFileList(): [ string, Path ][] {
     const host = this._host;
-    const list: [string, SchematicPath][] = [];
+    const list: [string, Path][] = [];
 
     function recurse(systemPath: string, schematicPath: string) {
       for (const name of host.listDirectory(systemPath)) {
         const systemName = host.join(systemPath, name);
-        const normalizedPath = normalizePath(schematicPath + '/' + name);
+        const normalizedPath = normalize(schematicPath + '/' + name);
         if (host.isDirectory(normalizedPath)) {
           recurse(systemName, normalizedPath);
         } else {

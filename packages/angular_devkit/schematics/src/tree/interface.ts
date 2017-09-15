@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { SchematicPath } from '../utility/path';
+import { Path } from '@angular-devkit/core';
 import { Action } from './action';
 
 
@@ -32,13 +32,13 @@ export enum MergeStrategy {
 
 
 export interface FileEntry {
-  readonly path: SchematicPath;
+  readonly path: Path;
   readonly content: Buffer;
 }
 
 
 export interface FilePredicate<T> {
-  (path: SchematicPath, entry?: Readonly<FileEntry> | null): T;
+  (path: Path, entry?: Readonly<FileEntry> | null): T;
 }
 
 
