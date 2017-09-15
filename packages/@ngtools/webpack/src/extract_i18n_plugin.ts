@@ -106,10 +106,11 @@ export class ExtractI18nPlugin implements Tapable {
 
     this._compilerOptions = tsConfig.options;
     this._angularCompilerOptions = Object.assign(
+      // kept for compatibility with Angular <v5.0.0-beta.7+
       { genDir },
       this._compilerOptions,
       tsConfig.raw['angularCompilerOptions'],
-      { basePath }
+      { basePath, outDir: genDir }
     );
 
     this._basePath = basePath;
