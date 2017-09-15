@@ -8,7 +8,7 @@
 import {
   Rule,
   SchematicContext,
-  SchematicsError,
+  SchematicsException,
   Tree,
   apply,
   branchAndMerge,
@@ -43,7 +43,7 @@ function addProviderToNgModule(options: ServiceOptions): Rule {
 
     const text = host.read(modulePath);
     if (text === null) {
-      throw new SchematicsError(`File ${modulePath} does not exist.`);
+      throw new SchematicsException(`File ${modulePath} does not exist.`);
     }
     const sourceText = text.toString('utf-8');
 
@@ -73,7 +73,7 @@ export default function (options: ServiceOptions): Rule {
   options.path = options.path ? normalizePath(options.path) : options.path;
   const sourceDir = options.sourceDir;
   if (!sourceDir) {
-    throw new SchematicsError(`sourceDir option is required.`);
+    throw new SchematicsException(`sourceDir option is required.`);
   }
 
   return (host: Tree, context: SchematicContext) => {

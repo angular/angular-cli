@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { BaseException } from '@angular-devkit/core';
 import 'rxjs/add/operator/map';
 import { Url } from 'url';
-import { BaseException } from '../exception/exception';
 import { MergeStrategy } from '../tree/interface';
 import { NullTree } from '../tree/null';
 import { empty } from '../tree/static';

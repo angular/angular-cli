@@ -7,7 +7,7 @@
  */
 import {
   Rule,
-  SchematicsError,
+  SchematicsException,
   apply,
   branchAndMerge,
   chain,
@@ -27,7 +27,7 @@ export default function (options: InterfaceOptions): Rule {
   options.path = options.path ? normalizePath(options.path) : options.path;
   const sourceDir = options.sourceDir;
   if (!sourceDir) {
-    throw new SchematicsError(`sourceDir option is required.`);
+    throw new SchematicsException(`sourceDir option is required.`);
   }
 
   const templateSource = apply(url('./files'), [

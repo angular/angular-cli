@@ -9,7 +9,7 @@ import {
   MergeStrategy,
   Rule,
   SchematicContext,
-  SchematicsError,
+  SchematicsException,
   Tree,
   apply,
   chain,
@@ -33,7 +33,7 @@ function addBootstrapToNgModule(directory: string, sourceDir: string): Rule {
     const modulePath = `${directory}/${sourceDir}/app/app.module.ts`;
     const content = host.read(modulePath);
     if (!content) {
-      throw new SchematicsError(`File ${modulePath} does not exist.`);
+      throw new SchematicsException(`File ${modulePath} does not exist.`);
     }
     const sourceText = content.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);

@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { BaseException } from '@angular-devkit/core';
 import { RuleFactory } from '@angular-devkit/schematics';
 import { join } from 'path';
 import {
@@ -13,6 +14,14 @@ import {
 } from './description';
 import { ExportStringRef } from './export-ref';
 import { FileSystemEngineHostBase } from './file-system-engine-host-base';
+
+
+export class CollectionMissingSchematicsMapException extends BaseException {
+  constructor(name: string) { super(`Collection "${name}" does not have a schematics map.`); }
+}
+export class SchematicMissingDescriptionException extends BaseException {
+  constructor(name: string) { super(`Schematics "${name}" does not have a description.`); }
+}
 
 
 /**
@@ -41,11 +50,8 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     name: string,
     desc: Partial<FileSystemCollectionDesc>,
   ): FileSystemCollectionDesc | null {
-    if (!desc.path || !desc.schematics) {
-      return null;
-    }
-    if (typeof desc.schematics != 'object') {
-      return null;
+    if (!desc.schematics || typeof desc.schematics != 'object') {
+      throw new CollectionMissingSchematicsMapException(name);
     }
     const version = require(join(name, 'package.json'))['version'];
 

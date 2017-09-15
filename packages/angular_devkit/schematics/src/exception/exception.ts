@@ -5,16 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-export class BaseException extends Error {
-  constructor(message = '') {
-    super(message);
-  }
-}
+import { BaseException } from '@angular-devkit/core';
 
 
 // Used by schematics to throw exceptions.
-export class SchematicsError extends BaseException {}
+export class SchematicsException extends BaseException {}
 
 
 // Exceptions
