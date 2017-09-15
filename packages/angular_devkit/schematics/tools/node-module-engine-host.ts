@@ -5,24 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  CollectionDescription,
-  RuleFactory,
-  SchematicDescription,
-} from '@angular-devkit/schematics';
+import { RuleFactory } from '@angular-devkit/schematics';
 import { join } from 'path';
-import { FileSystemCollectionDescription, FileSystemSchematicDescription } from './description';
+import {
+  FileSystemCollectionDesc,
+  FileSystemSchematicDesc,
+} from './description';
 import { ExportStringRef } from './export-ref';
 import { FileSystemEngineHostBase } from './file-system-engine-host-base';
-
-
-/**
- * Used to simplify typings.
- */
-export declare type FileSystemCollectionDesc
-  = CollectionDescription<FileSystemCollectionDescription>;
-export declare type FileSystemSchematicDesc
-  = SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 
 
 /**
@@ -47,8 +37,10 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     return { ref: ref.ref, path: ref.module };
   }
 
-  protected _transformCollectionDescription(name: string,
-                                            desc: Partial<FileSystemCollectionDesc>) {
+  protected _transformCollectionDescription(
+    name: string,
+    desc: Partial<FileSystemCollectionDesc>,
+  ): FileSystemCollectionDesc | null {
     if (!desc.path || !desc.schematics) {
       return null;
     }
@@ -64,9 +56,11 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     } as FileSystemCollectionDesc;
   }
 
-  protected _transformSchematicDescription(_name: string,
-                                           _collection: FileSystemCollectionDesc,
-                                           desc: Partial<FileSystemSchematicDesc>) {
+  protected _transformSchematicDescription(
+    _name: string,
+    _collection: FileSystemCollectionDesc,
+    desc: Partial<FileSystemSchematicDesc>,
+  ): FileSystemSchematicDesc | null {
     if (!desc.factoryFn || !desc.path || !desc.description) {
       return null;
     }

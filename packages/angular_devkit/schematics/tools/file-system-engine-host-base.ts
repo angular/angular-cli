@@ -7,33 +7,24 @@
  */
 import { JsonObject } from '@angular-devkit/core';
 import {
-  Collection,
-  CollectionDescription,
   EngineHost,
   FileSystemTree,
   RuleFactory,
-  SchematicDescription,
   Source,
-  TypedSchematicContext,
 } from '@angular-devkit/schematics';
 import { dirname, isAbsolute, join, resolve } from 'path';
 import { Url } from 'url';
-import { FileSystemCollectionDescription, FileSystemSchematicDescription } from './description';
+import {
+  FileSystemCollection,
+  FileSystemCollectionDesc,
+  FileSystemCollectionDescription,
+  FileSystemSchematicContext,
+  FileSystemSchematicDesc,
+  FileSystemSchematicDescription,
+} from './description';
 import { FileSystemHost } from './file-system-host';
 import { readJsonFile } from './file-system-utility';
 
-
-/**
- * Used to simplify typings.
- */
-export declare type FileSystemCollection
-    = Collection<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-export declare type FileSystemCollectionDesc
-    = CollectionDescription<FileSystemCollectionDescription>;
-export declare type FileSystemSchematicDesc
-    = SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-export declare type FileSystemSchematicContext
-    = TypedSchematicContext<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 
 export declare type OptionTransform<T extends object, R extends object>
     = (schematic: FileSystemSchematicDescription, options: T) => R;
