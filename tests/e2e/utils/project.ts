@@ -47,6 +47,32 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => silentNpm('install'));
 }
 
+
+export function useDevKit(devkitRoot: string) {
+  return Promise.resolve()
+    .then(() => {
+      // Load the packages info for devkit.
+      const devkitPackages = require(devkitRoot + '/lib/packages').packages;
+
+      return updateJsonFile('package.json', json => {
+          if (!json['dependencies']) {
+            json['dependencies'] = {};
+          }
+          if (!json['devDependencies']) {
+            json['devDependencies'] = {};
+          }
+
+          for (const packageName of Object.keys(devkitPackages)) {
+            if (json['dependencies'].hasOwnProperty(packageName)) {
+              json['dependencies'][packageName] = devkitPackages[packageName].tar;
+            } else if (json['devDependencies'].hasOwnProperty(packageName)) {
+              json['devDependencies'][packageName] = devkitPackages[packageName].tar;
+            }
+          }
+        });
+    });
+}
+
 export function useBuiltPackages() {
   return Promise.resolve()
     .then(() => updateJsonFile('package.json', json => {
