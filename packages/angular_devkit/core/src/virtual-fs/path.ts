@@ -221,7 +221,7 @@ export function normalize(path: string): Path {
     } else if (p[i] == '..') {
       if (i < 2 && !relative) {
         throw new InvalidPathException(original);
-      } else if (i >= 2) {
+      } else if (i >= 2 && p[i - 1] != '..') {
         p.splice(i - 1, 2);
         i--;
       } else {

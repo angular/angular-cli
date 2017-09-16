@@ -47,6 +47,9 @@ describe('path', () => {
 
     // Out of directory.
     expect(normalize('..')).toBe('..');
+    expect(normalize('../..')).toBe('../..');
+    expect(normalize('../../a')).toBe('../../a');
+    expect(normalize('b/../../a')).toBe('../a');
     expect(normalize('./..')).toBe('..');
     expect(normalize('../a/b/c')).toBe('../a/b/c');
     expect(normalize('./a/../../a/b/c')).toBe('../a/b/c');
@@ -116,8 +119,14 @@ describe('path', () => {
     const tests = [
       ['/a/b/c', '/a/b/c', ''],
       ['/a/b', '/a/b/c', 'c'],
+      ['/a/b', '/a/b/c/d', 'c/d'],
       ['/a/b/c', '/a/b', '..'],
       ['/a/b/c', '/a/b/d', '../d'],
+      ['/a/b/c/d/e', '/a/f/g', '../../../../f/g'],
+      [
+        '/src/app/sub1/test1', '/src/app/sub2/test2',
+        '../../sub2/test2',
+      ],
     ];
 
     for (const [from, to, result] of tests) {

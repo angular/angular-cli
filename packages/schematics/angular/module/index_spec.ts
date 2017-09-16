@@ -47,7 +47,28 @@ describe('Module Schematic', () => {
     expect(content).toMatch(/imports: \[(.|\s)*FooModule(.|\s)*\]/m);
   });
 
-  it('should createa routing module', () => {
+  it('should import into another module (deep)', () => {
+    let tree = appTree;
+
+    tree = schematicRunner.runSchematic('module', {
+      ...defaultOptions,
+      path: 'app/sub1',
+      appRoot: 'app',
+      name: 'test1',
+    }, tree);
+    tree = schematicRunner.runSchematic('module', {
+      ...defaultOptions,
+      path: 'app/sub2',
+      appRoot: 'app',
+      name: 'test2',
+      module: 'sub1/test1',
+    }, tree);
+
+    const content = getFileContent(tree, '/src/app/sub1/test1/test1.module.ts');
+    expect(content).toMatch(/import { Test2Module } from '..\/..\/sub2\/test2\/test2.module'/);
+  });
+
+  it('should create a routing module', () => {
     const options = { ...defaultOptions, routing: true };
 
     const tree = schematicRunner.runSchematic('module', options, appTree);
