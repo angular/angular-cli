@@ -7,8 +7,9 @@ import {
   useNg2,
   useSha,
   useCIChrome,
-  useCIDefaults
+  useCIDefaults,
   useBuiltPackages,
+  useDevKit,
 } from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';
@@ -40,6 +41,7 @@ export default function() {
   return Promise.resolve()
     .then(() => createProject)
     .then(() => useBuiltPackages())
+    .then(() => argv.devkit && useDevKit(argv.devkit))
     .then(() => useCIChrome())
     .then(() => useCIDefaults())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())

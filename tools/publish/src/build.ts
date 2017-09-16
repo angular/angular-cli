@@ -57,7 +57,8 @@ function getDeps(pkg: any): any {
 }
 
 
-export default function build(packagesToBuild: string[], opts: { local: boolean },
+export default function build(packagesToBuild: string[],
+                              opts: { local: boolean, devkit: string },
                               logger: Logger): Promise<void> {
   const { packages, tools } = require('../../../lib/packages');
 
@@ -253,6 +254,20 @@ export default function build(packagesToBuild: string[], opts: { local: boolean 
             json['dependencies'][packageName] = packages[packageName].tar;
           } else if (json['devDependencies'].hasOwnProperty(packageName)) {
             json['devDependencies'][packageName] = packages[packageName].tar;
+          }
+        }
+
+        if (opts.devkit) {
+          // Load the packages info for devkit.
+          const devkitPackages = require(opts.devkit + '/lib/packages').packages;
+
+          for (const packageName of Object.keys(devkitPackages)) {
+            console.log(pkgName, packageName);
+            if (json['dependencies'].hasOwnProperty(packageName)) {
+              json['dependencies'][packageName] = devkitPackages[packageName].tar;
+            } else if (json['devDependencies'].hasOwnProperty(packageName)) {
+              json['devDependencies'][packageName] = devkitPackages[packageName].tar;
+            }
           }
         }
 
