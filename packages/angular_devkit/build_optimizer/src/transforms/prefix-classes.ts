@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { satisfies } from 'semver';
 import * as ts from 'typescript';
 
 
@@ -18,25 +19,41 @@ export function testPrefixClasses(content: string) {
   return regexes.some((regex) => regex.test(content));
 }
 
+const superParameterName = '_super';
+const extendsHelperName = (satisfies(ts.version, '< 2.5') ? '_' : '') + '__extends';
+
 export function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
       const pureFunctionComment = '@__PURE__';
 
-      const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
+      const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
 
         // Add pure comment to downleveled classes.
-        if (isDownleveledClass(node)) {
-          const varDecl = node as ts.VariableDeclaration;
-          const varDeclInit = varDecl.initializer as ts.Expression;
+        if (isVariableStatement(node) && isDownleveledClass(node)) {
+          const varDecl = node.declarationList.declarations[0];
+          const varInitializer = varDecl.initializer as ts.Expression;
 
-          // Create a new node with the pure comment before the variable declaration initializer.
-          const newNode = ts.createVariableDeclaration(
-            varDecl.name,
-            undefined,
-            ts.addSyntheticLeadingComment(
-              varDeclInit, ts.SyntaxKind.MultiLineCommentTrivia, pureFunctionComment, false,
+          // Update node with the pure comment before the variable declaration initializer.
+          const newNode = ts.updateVariableStatement(
+            node,
+            node.modifiers,
+            ts.updateVariableDeclarationList(
+              node.declarationList,
+              [
+                ts.updateVariableDeclaration(
+                  varDecl,
+                  varDecl.name,
+                  varDecl.type,
+                  ts.addSyntheticLeadingComment(
+                    varInitializer,
+                    ts.SyntaxKind.MultiLineCommentTrivia,
+                    pureFunctionComment,
+                    false,
+                  ),
+                ),
+              ],
             ),
           );
 
@@ -48,132 +65,165 @@ export function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFi
         return ts.visitEachChild(node, visitor, context);
       };
 
-      return ts.visitNode(sf, visitor);
+      return ts.visitEachChild(sf, visitor, context);
     };
 
     return transformer;
   };
 }
 
+function isVariableStatement(node: ts.Node): node is ts.VariableStatement {
+  return node.kind === ts.SyntaxKind.VariableStatement;
+}
+
+function isIdentifier(node: ts.Node): node is ts.Identifier {
+  return node.kind === ts.SyntaxKind.Identifier;
+}
+
+function isExpressionStatement(node: ts.Node): node is ts.ExpressionStatement {
+  return node.kind === ts.SyntaxKind.ExpressionStatement;
+}
+
+function isParenthesizedExpression(node: ts.Node): node is ts.ParenthesizedExpression {
+  return node.kind === ts.SyntaxKind.ParenthesizedExpression;
+}
+
+function isCallExpression(node: ts.Node): node is ts.CallExpression {
+  return node.kind === ts.SyntaxKind.CallExpression;
+}
+
+function isFunctionExpression(node: ts.Node): node is ts.FunctionExpression {
+  return node.kind === ts.SyntaxKind.FunctionExpression;
+}
+
+function isArrowFunction(node: ts.Node): node is ts.ArrowFunction {
+  return node.kind === ts.SyntaxKind.ArrowFunction;
+}
+
+function isFunctionDeclaration(node: ts.Node): node is ts.FunctionDeclaration {
+  return node.kind === ts.SyntaxKind.FunctionDeclaration;
+}
+
+function isReturnStatement(node: ts.Node): node is ts.ReturnStatement {
+  return node.kind === ts.SyntaxKind.ReturnStatement;
+}
+
+function isBlock(node: ts.Node): node is ts.Block {
+  return node.kind === ts.SyntaxKind.Block;
+}
+
 // Determine if a node matched the structure of a downleveled TS class.
 function isDownleveledClass(node: ts.Node): boolean {
-  let isExtendedClass = false;
 
-  if (node.kind !== ts.SyntaxKind.VariableDeclaration) {
+  if (!isVariableStatement(node)) {
     return false;
   }
 
-  const varDecl = node as ts.VariableDeclaration;
+  if (node.declarationList.declarations.length !== 1) {
+    return false;
+  }
 
-  if (varDecl.name.kind !== ts.SyntaxKind.Identifier) {
+  const variableDeclaration = node.declarationList.declarations[0];
+
+  if (!isIdentifier(variableDeclaration.name)
+      || !variableDeclaration.initializer) {
+    return false;
+  }
+
+  let potentialClass = variableDeclaration.initializer;
+
+  // TS 2.3 has an unwrapped class IIFE
+  // TS 2.4 uses a function expression wrapper
+  // TS 2.5 uses an arrow function wrapper
+  if (isParenthesizedExpression(potentialClass)) {
+    potentialClass = potentialClass.expression;
+  }
+
+  if (!isCallExpression(potentialClass) || potentialClass.arguments.length > 1) {
+    return false;
+  }
+
+  let wrapperBody: ts.Block;
+  if (isFunctionExpression(potentialClass.expression)) {
+    wrapperBody = potentialClass.expression.body;
+  } else if (isArrowFunction(potentialClass.expression)
+             && isBlock(potentialClass.expression.body)) {
+    wrapperBody = potentialClass.expression.body;
+  } else {
+    return false;
+  }
+
+  if (wrapperBody.statements.length === 0) {
+    return false;
+  }
+
+  const functionExpression = potentialClass.expression;
+  const functionStatements = wrapperBody.statements;
+
+  // need a minimum of two for a function declaration and return statement
+  if (functionStatements.length < 2) {
     return false;
   }
 
   // The variable name should be the class name.
-  const className = (varDecl.name as ts.Identifier).text;
+  const className = variableDeclaration.name.text;
 
-  if (!varDecl.initializer || varDecl.initializer.kind !== ts.SyntaxKind.ParenthesizedExpression) {
+  const firstStatement = functionStatements[0];
+  const lastStatement = functionStatements[functionStatements.length - 1];
+
+  if (functionExpression.parameters.length === 0) {
+    // potential non-extended class
+    return isFunctionDeclaration(firstStatement)
+           && firstStatement.name !== undefined
+           && firstStatement.name.text === className
+           && isReturnStatement(lastStatement)
+           && lastStatement.expression != undefined
+           && isIdentifier(lastStatement.expression)
+           && lastStatement.expression.text === firstStatement.name.text;
+  } else if (functionExpression.parameters.length !== 1) {
     return false;
   }
 
-  const parenExpr = varDecl.initializer as ts.ParenthesizedExpression;
+  // Potential extended class
 
-  if (parenExpr.expression.kind !== ts.SyntaxKind.CallExpression) {
+  const functionParameter = functionExpression.parameters[0];
+
+  if (!isIdentifier(functionParameter.name) || functionParameter.name.text !== superParameterName) {
     return false;
   }
 
-  const callExpr = parenExpr.expression as ts.CallExpression;
-
-  if (callExpr.expression.kind !== ts.SyntaxKind.FunctionExpression) {
+  if (functionStatements.length < 3) {
     return false;
   }
 
-  const funcExpr = callExpr.expression as ts.FunctionExpression;
-
-  // Extended classes have the `_super` parameter.
-  if (funcExpr.parameters.length === 1
-    && (funcExpr.parameters[0].name as ts.Identifier).text === '_super') {
-    isExtendedClass = true;
-  }
-
-  // IIFE inner parameters should be empty or `_super`.
-  if (funcExpr.parameters.length !== 0 && !isExtendedClass) {
+  if (!isExpressionStatement(firstStatement) || !isCallExpression(firstStatement.expression)) {
     return false;
   }
 
-  const stmts = funcExpr.body.statements;
+  const extendCallExpression = firstStatement.expression;
 
-  if (stmts.length === 0) {
+  if (!isIdentifier(extendCallExpression.expression)
+      || extendCallExpression.expression.text !== extendsHelperName) {
     return false;
   }
 
-  const firstStatement = stmts[0];
-
-  // Check if `node` is a FunctionDeclaration named `name`.
-  function isFunDeclNamed(node: ts.Node, name: string) {
-    if (node.kind === ts.SyntaxKind.FunctionDeclaration) {
-      const funcDecl = node as ts.FunctionDeclaration;
-      if (funcDecl.name && funcDecl.name.text === name) {
-        return true;
-      }
-    } else {
-      return false;
-    }
+  if (extendCallExpression.arguments.length === 0) {
+    return false;
   }
 
-  // If the class is extending another, the first statement is a _extends(..., _super) call.
-  if (isExtendedClass) {
-    if (firstStatement.kind !== ts.SyntaxKind.ExpressionStatement) {
-      return false;
-    }
-    const exprStmt = firstStatement as ts.ExpressionStatement;
+  const lastArgument = extendCallExpression.arguments[extendCallExpression.arguments.length - 1];
 
-    if (exprStmt.expression.kind !== ts.SyntaxKind.CallExpression) {
-      return false;
-    }
-
-    const extendsCallExpr = exprStmt.expression as ts.CallExpression;
-
-    // Function should be called `__extends`.
-    if (extendsCallExpr.expression.kind !== ts.SyntaxKind.Identifier) {
-      return false;
-    }
-
-    const callExprName = (extendsCallExpr.expression as ts.Identifier).text;
-
-    // Reserved TS names are retrieved with three underscores instead of two.
-    if (callExprName !== '___extends') {
-      return false;
-    }
-
-    // Function should have 1+ arguments, with the last being named `_super`.
-    if (extendsCallExpr.arguments.length === 0) {
-      return false;
-    }
-
-    const lastArg = extendsCallExpr.arguments[extendsCallExpr.arguments.length - 1];
-
-    if (lastArg.kind !== ts.SyntaxKind.Identifier) {
-      return false;
-    }
-
-    const lastArgName = (lastArg as ts.Identifier).text;
-
-    if (lastArgName !== '_super') {
-      return false;
-    }
-
-    const secondStatement = stmts[1];
-
-    if (secondStatement && isFunDeclNamed(secondStatement, className)) {
-      // This seems to be downleveled class that extends another class.
-      return true;
-    }
-
-  } else if (isFunDeclNamed(firstStatement, className)) {
-    // This seems to be downleveled class.
-    return true;
+  if (!isIdentifier(lastArgument) || lastArgument.text !== functionParameter.name.text) {
+    return false;
   }
 
-  return false;
+  const secondStatement = functionStatements[1];
+
+  return isFunctionDeclaration(secondStatement)
+         && secondStatement.name !== undefined
+         && secondStatement.name.text === className
+         && isReturnStatement(lastStatement)
+         && lastStatement.expression !== undefined
+         && isIdentifier(lastStatement.expression)
+         && lastStatement.expression.text === secondStatement.name.text;
 }
