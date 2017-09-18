@@ -20,7 +20,8 @@ import {
   makeTransform,
   replaceBootstrap,
   exportNgFactory,
-  exportLazyModuleMap
+  exportLazyModuleMap,
+  registerLocaleData
 } from './transformers';
 
 // These imports do not exist on Angular versions lower than 5.
@@ -549,7 +550,18 @@ export class AngularCompilerPlugin implements Tapable {
             const sourceFile = this._program.getTsProgram().getSourceFile(fileName);
             let transformOps;
             if (this._platform === PLATFORM.Browser) {
-              transformOps = replaceBootstrap(sourceFile, this.entryModule);
+              transformOps = [
+                ...replaceBootstrap(sourceFile, this.entryModule)
+              ];
+
+              // if we have a locale, auto import the locale data file
+              if (this._angularCompilerOptions.i18nInLocale) {
+                transformOps.push(...registerLocaleData(
+                  sourceFile,
+                  this.entryModule,
+                  this._angularCompilerOptions.i18nInLocale
+                ));
+              }
             } else if (this._platform === PLATFORM.Server) {
               // export_module_map
               transformOps = [

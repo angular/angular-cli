@@ -5,3 +5,4 @@ export * from './remove_import';
 export * from './replace_bootstrap';
 export * from './export_ngfactory';
 export * from './export_lazy_module_map';
+export * from './register_locale_data';
