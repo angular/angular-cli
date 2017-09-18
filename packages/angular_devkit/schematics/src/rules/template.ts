@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException, normalize } from '@angular-devkit/core';
+import { BaseException, normalize, template as templateImpl } from '@angular-devkit/core';
 import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
 import { chain, forEach } from './base';
-import { template as templateImpl } from './template/template';
 import { isBinary } from './utils/is-binary';
 
 
