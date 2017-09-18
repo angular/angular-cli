@@ -4,6 +4,7 @@ import {AotPlugin} from './plugin';
 import {AngularCompilerPlugin} from './angular_compiler_plugin';
 import {TypeScriptFileRefactor} from './refactor';
 import {LoaderContext, ModuleReason} from './webpack';
+import {time, timeEnd} from './benchmark';
 
 interface Platform {
   name: string;
@@ -523,6 +524,8 @@ export function _exportModuleMap(plugin: AotPlugin, refactor: TypeScriptFileRefa
 export function ngcLoader(this: LoaderContext & { _compilation: any }, source: string | null) {
   const cb = this.async();
   const sourceFileName: string = this.resourcePath;
+  const timeLabel = `ngcLoader+${sourceFileName}+`;
+  time(timeLabel);
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance;
   if (plugin) {
@@ -536,19 +539,27 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
     }
 
     if (plugin instanceof AngularCompilerPlugin) {
+      time(timeLabel + '.ngcLoader.AngularCompilerPlugin');
       plugin.done
         .then(() => {
+          timeEnd(timeLabel + '.ngcLoader.AngularCompilerPlugin');
           const result = plugin.getFile(sourceFileName);
           if (plugin.failedCompilation) {
             // Return an empty string if there is no result to prevent extra loader errors.
             // Plugin errors were already pushed to the compilation errors.
+            timeEnd(timeLabel);
             cb(null, result.outputText || '', result.sourceMap);
           } else {
-            cb(null, result.outputText, result.sourceMap);
-          }
-        })
-        .catch(err => cb(err));
+            timeEnd(timeLabel);
+          cb(null, result.outputText, result.sourceMap);
+        }
+      })
+      .catch(err => {
+        timeEnd(timeLabel + '.ngcLoader.AngularCompilerPlugin');
+        cb(err);
+        });
     } else if (plugin instanceof AotPlugin) {
+      time(timeLabel + '.ngcLoader.AotPlugin');
       if (plugin.compilerHost.readFile(sourceFileName) == source) {
         // In the case where the source is the same as the one in compilerHost, we don't have
         // extra TS loaders and there's no need to do any trickery.
@@ -557,23 +568,28 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
       const refactor = new TypeScriptFileRefactor(
         sourceFileName, plugin.compilerHost, plugin.program, source);
 
+
       Promise.resolve()
         .then(() => {
+          time(timeLabel + '.ngcLoader.AotPlugin.refactor');
+          let promise: Promise<any>;
           if (!plugin.skipCodeGeneration) {
-            return Promise.resolve()
+            promise = Promise.resolve()
               .then(() => _removeDecorators(refactor))
               .then(() => _refactorBootstrap(plugin, refactor))
               .then(() => _replaceExport(plugin, refactor))
               .then(() => _exportModuleMap(plugin, refactor));
           } else {
-            return Promise.resolve()
+            promise = Promise.resolve()
               .then(() => _replaceResources(refactor))
               .then(() => _removeModuleId(refactor))
               .then(() => _exportModuleMap(plugin, refactor));
           }
+          return promise.then(() => timeEnd(timeLabel + '.ngcLoader.AotPlugin.refactor'));
         })
         .then(() => {
           if (plugin.typeCheck) {
+            time(timeLabel + '.ngcLoader.AotPlugin.typeCheck');
             // Check all diagnostics from this and reverse dependencies also.
             if (!plugin.firstRun) {
               _diagnoseDeps(this._module.reasons, plugin, new Set<string>());
@@ -581,16 +597,20 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
             // We do this here because it will throw on error, resulting in rebuilding this file
             // the next time around if it changes.
             plugin.diagnose(sourceFileName);
+            timeEnd(timeLabel + '.ngcLoader.AotPlugin.typeCheck');
           }
         })
         .then(() => {
+          time(timeLabel + '.ngcLoader.AotPlugin.addDependency');
           // Add resources as dependencies.
           _getResourcesUrls(refactor).forEach((url: string) => {
             this.addDependency(path.resolve(path.dirname(sourceFileName), url));
           });
+          timeEnd(timeLabel + '.ngcLoader.AotPlugin.addDependency');
         })
         .then(() => {
           if (source) {
+            time(timeLabel + '.ngcLoader.AotPlugin.getDiagnostics');
             // We need to validate diagnostics. We ignore type checking though, to save time.
             const diagnostics = refactor.getDiagnostics(false);
             if (diagnostics.length) {
@@ -610,6 +630,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
               });
               throw new Error(message);
             }
+            timeEnd(timeLabel + '.ngcLoader.AotPlugin.getDiagnostics');
           }
 
           // Force a few compiler options to make sure we get the result we want.
@@ -619,13 +640,18 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
             sourceRoot: plugin.basePath
           });
 
+          time(timeLabel + '.ngcLoader.AotPlugin.transpile');
           const result = refactor.transpile(compilerOptions);
+          timeEnd(timeLabel + '.ngcLoader.AotPlugin.transpile');
 
+          timeEnd(timeLabel + '.ngcLoader.AotPlugin');
           if (plugin.failedCompilation && plugin.compilerOptions.noEmitOnError) {
             // Return an empty string to prevent extra loader errors (missing imports etc).
             // Plugin errors were already pushed to the compilation errors.
+            timeEnd(timeLabel);
             cb(null, '');
           } else {
+            timeEnd(timeLabel);
             cb(null, result.outputText, result.sourceMap);
           }
         })
@@ -661,6 +687,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
     const result = refactor.transpile(compilerOptions);
     // Webpack is going to take care of this.
     result.outputText = result.outputText.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+    timeEnd(timeLabel);
     cb(null, result.outputText, result.sourceMap);
   }
 }
