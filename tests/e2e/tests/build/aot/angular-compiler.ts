@@ -2,6 +2,7 @@ import { ng, npm } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 import { expectFileToMatch, rimraf, moveFile } from '../../../utils/fs';
 import { getGlobalVariable } from '../../../utils/env';
+import { expectToFail } from '../../../utils/utils';
 
 
 // THIS TEST REQUIRES TO MOVE NODE_MODULES AND MOVE IT BACK.
@@ -34,6 +35,18 @@ export default function () {
     .then(() => ng('build', '--aot'))
     .then(() => expectFileToMatch('dist/main.bundle.js',
       /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//))
+
+    // tests for register_locale_data transformer
+    .then(() => rimraf('dist'))
+    .then(() => ng('build', '--aot', '--locale=fr'))
+    .then(() => expectFileToMatch('dist/main.bundle.js',
+      /registerLocaleData/))
+    .then(() => expectFileToMatch('dist/main.bundle.js',
+      /angular_common_locales_fr/))
+    .then(() => rimraf('dist'))
+    .then(() => expectToFail(() =>
+      ng('build', '--aot', '--locale=no-locale')))
+
     // Cleanup
     .then(() => {
       return rimraf('node_modules')
