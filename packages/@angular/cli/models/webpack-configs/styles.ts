@@ -97,6 +97,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // use includePaths from appConfig
   const includePaths: string[] = [];
+  let lessPathOptions: { paths: string[] };
 
   if (appConfig.stylePreprocessorOptions
     && appConfig.stylePreprocessorOptions.includePaths
@@ -104,6 +105,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   ) {
     appConfig.stylePreprocessorOptions.includePaths.forEach((includePath: string) =>
       includePaths.push(path.resolve(appRoot, includePath)));
+    lessPathOptions = {
+      paths: includePaths,
+    };
   }
 
   // process global styles
@@ -136,7 +140,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         loader: 'less-loader',
         options: {
           sourceMap: cssSourceMap,
-          paths: includePaths
+          ...lessPathOptions,
         }
       }]
     },
