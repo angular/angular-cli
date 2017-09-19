@@ -73,6 +73,22 @@ describe('Acceptance: ng generate component', () => {
       .then(done, done.fail);
   });
 
+  it('mycomp should use styleExt from the angular-cli.json for style file', (done) => {
+    return ng(['generate', 'component', 'mycomp']).then(() => {
+      const cliJson = JSON.parse(readFileSync('.angular-cli.json', 'utf8'));
+      const styleExt = cliJson.defaults.styleExt;
+      expect(styleExt).toBe('css');
+      const scssFilePath =
+        path.join(root, 'tmp', 'foo', 'src', 'app', 'mycomp', `mycomp.component.${styleExt}`);
+      const compPath =
+        path.join(root, 'tmp', 'foo', 'src', 'app', 'mycomp', 'mycomp.component.ts');
+      expect(pathExistsSync(scssFilePath)).toBe(true);
+      const contents = readFileSync(compPath, 'utf8');
+      expect(contents.indexOf(`styleUrls: [\'./mycomp.component.${styleExt}\']`) === -1).toBe(false);
+    })
+    .then(done, done.fail);
+  });
+
   it('child-dir' + path.sep + 'my-comp from a child dir', (done) => {
     mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', '1', 'child-dir'));
     return new Promise(function (resolve) {
