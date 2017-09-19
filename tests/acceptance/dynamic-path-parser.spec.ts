@@ -4,7 +4,8 @@ import mockFs = require('mock-fs');
 
 const appDir = `src${path.sep}app`;
 const appConfig = {
-  root: 'src'
+  root: 'src',
+  appDir: true
 };
 
 describe('dynamic path parser', () => {
@@ -47,6 +48,19 @@ describe('dynamic path parser', () => {
     };
     const result = dynamicPathParser(options);
     expect(result.dir).toBe(appDir);
+    expect(result.name).toBe(entityName);
+  });
+
+  it('parse from proj root dir (appDir = false)', () => {
+    process.env.PWD = project.root;
+    const options = {
+      project,
+      entityName,
+      appConfig: {root: 'src', appDir: false},
+      dryRun: false
+    };
+    const result = dynamicPathParser(options);
+    expect(result.dir).toBe('src' );
     expect(result.name).toBe(entityName);
   });
 

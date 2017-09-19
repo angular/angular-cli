@@ -43,7 +43,7 @@ export default Command.extend({
     {
       name: 'app',
       type: String,
-      aliases: ['a'],
+      aliases: ['a', 'lib'],
       description: 'Specifies app name to use.'
     },
     {
@@ -148,9 +148,13 @@ export default Command.extend({
       };
       const parsedPath = dynamicPathParser(dynamicPathOptions);
       commandOptions.sourceDir = appConfig.root;
-      commandOptions.path = parsedPath.dir
-      .replace(appConfig.root + path.sep, '')
-      .replace(separatorRegEx, '/');
+      if (parsedPath.dir === commandOptions.sourceDir) {
+        commandOptions.path = '';
+      } else {
+        commandOptions.path = parsedPath.dir
+          .replace(appConfig.root + path.sep, '')
+          .replace(separatorRegEx, '/');
+      }
     }
 
     const cwd = this.project.root;

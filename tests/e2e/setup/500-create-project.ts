@@ -33,7 +33,7 @@ export default function() {
   } else {
     // Otherwise create a project from scratch.
     createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--collection=@nrwl/nx', '--skip-install'))
+      .then(() => ng('new', 'test-project', '--collection=@nrwl/bazel', '--skip-install'))
       .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
       .then(() => process.chdir('./test-project'));
   }

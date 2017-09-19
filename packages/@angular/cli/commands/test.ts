@@ -91,15 +91,19 @@ const TestCommand = Command.extend({
     {
       name: 'app',
       type: String,
-      aliases: ['a'],
+      aliases: ['a', 'lib'],
       description: 'Specifies app name to use.'
     }
   ],
 
-  run: function (commandOptions: TestOptions) {
+  run: function (commandOptions: TestOptions, rawArgs: string[]) {
+    const app = (rawArgs.length > 0 && !rawArgs[0].startsWith('-')) ?
+      rawArgs[0] : commandOptions.app;
+
     const testTask = new TestTask({
       ui: this.ui,
-      project: this.project
+      project: this.project,
+      app
     });
 
     if (commandOptions.watch !== undefined && !commandOptions.watch) {

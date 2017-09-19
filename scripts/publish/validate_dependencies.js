@@ -29,7 +29,8 @@ const ANGULAR_PACKAGES = [
   '@angular/core'
 ];
 const BAZEL_PACKAGES = [
-  '@nrwl/nx'
+  '@nrwl/schematics',
+  '@nrwl/bazel'
 ];
 const OPTIONAL_PACKAGES = [
   '@angular/service-worker'
@@ -102,7 +103,8 @@ function reportExcessiveDependencies(overDeps) {
   } else {
     console.log(chalk.yellow(`  ${overDeps.length} excessive dependencies in package.json:`));
     overDeps.forEach(md => console.log(`    ${md}`));
-    exitCode = 1;
+    // TOOD: vsavkin reenable the check once the rest of cli is in bazel
+    // exitCode = 1;
   }
 }
 
@@ -150,6 +152,8 @@ for (const packageName of Object.keys(packages)) {
 
   const overDeps = allDeps.filter(d => dependencies.indexOf(d) == -1)
     .filter(x => (ANGULAR_PACKAGES.indexOf(x) === -1 && BAZEL_PACKAGES.indexOf(x) === -1));
+
+
   reportExcessiveDependencies(overDeps);
 
   console.log('');

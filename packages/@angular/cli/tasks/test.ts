@@ -15,7 +15,7 @@ export default Task.extend({
   run: function (options: TestOptions) {
     const projectConfig = CliConfig.fromProject().config;
     const projectRoot = this.project.root;
-    const appConfig = getAppFromConfig(options.app);
+    const appConfig = getAppFromConfig(this.app);
 
     if (projectConfig.project && projectConfig.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
@@ -37,7 +37,7 @@ export default Task.extend({
       }
 
       karmaOptions.opts = {
-        bin: bazelBinDirectory(),
+        bin_dir: bazelBinDirectory(),
         app: appConfig.root,
         color: options.colors,
         progress: options.progress,
