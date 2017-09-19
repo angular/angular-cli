@@ -37,10 +37,10 @@
             "type": "string",
             "description": "The root directory of the app."
           },
-          "outDir": {
-            "type": "string",
-            "default": "dist/",
-            "description": "The output directory for build results."
+          "appDir": {
+            "type": "boolean",
+            "description": "Has a nested app directory",
+            "default": true
           },
           "assets": {
             "type": "array",
@@ -105,15 +105,6 @@
           "test": {
             "type": "string",
             "description": "The name of the test entry-point file."
-          },
-          "tsconfig": {
-            "type": "string",
-            "default": "tsconfig.app.json",
-            "description": "The name of the TypeScript configuration file."
-          },
-          "testTsconfig": {
-            "type": "string",
-            "description": "The name of the TypeScript configuration file for unit tests."
           },
           "prefix": {
             "type": "string",

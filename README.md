@@ -1,4 +1,4 @@
-## Angular CLI
+## Angular CLI: Bazel Branch
 ### CLI for Angular applications based on the [ember-cli](http://www.ember-cli.com/) project.
 
 <!-- Badges section here. -->
@@ -19,29 +19,31 @@
 [![GitHub stars](https://img.shields.io/github/stars/angular/angular-cli.svg?style=social&label=Star)](https://github.com/angular/angular-cli)
 
 
-## Note
+## EXPERIMENTAL
 
-The CLI is now in 1.0.
-If you are updating from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
+**This is an EXPERIMENTAL early version of the bazel support. **
 
-If you wish to collaborate, check out [our issue list](https://github.com/angular/angular-cli/issues).
+Read more about bazel here: [Building Angular apps at scale](https://medium.com/@Jakeherringbone/building-angular-apps-at-scale-813ef42add04).
 
 Before submitting new issues, have a look at [issues marked with the `type: faq` label](https://github.com/angular/angular-cli/issues?utf8=%E2%9C%93&q=is%3Aissue%20label%3A%22type%3A%20faq%22%20).
+
+
+
 
 ## Prerequisites
 
 Both the CLI and generated project have dependencies that require Node 6.9.0 or higher, together
 with NPM 3 or higher.
 
+### Bazel and iBazel
+
+* Make sure you have [Bazel](https://bazel.build/) installed.
+* Make sure you have [Bazel Watcher](https://github.com/bazelbuild/bazel-watcher) compiled and installed.
+
 ## Table of Contents
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [Generating a New Project](#generating-and-serving-an-angular-project-via-a-development-server)
-* [Generating Components, Directives, Pipes and Services](#generating-components-directives-pipes-and-services)
-* [Updating Angular CLI](#updating-angular-cli)
-* [Development Hints for working on Angular CLI](#development-hints-for-working-on-angular-cli)
-* [Documentation](#documentation)
 * [License](#license)
 
 ## Installation
@@ -49,149 +51,170 @@ with NPM 3 or higher.
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 ```bash
 npm install -g @angular/cli
+npm install -g @nrwl/bazel
 ```
 
-## Usage
+### @Nrwl/Bazel?
+
+THe bazel support is a collaboration of the Angular team at Google and the [Nrwl](http://nrwl.io) team. At the moment, some code lives under `@nrwl`, but it will move under `@angular` once it stabilizes.
+
+
+
+## [Usage](#usage)
+
+### Generate an Angular Workspace
 
 ```bash
-ng help
-```
-
-### Generating and serving an Angular project via a development server
-
-```bash
-ng new PROJECT-NAME
+ng new PROJECT-NAME --collection=@nrwl/bazel
 cd PROJECT-NAME
-ng serve
 ```
+
+This is an empty Angular workspace.
+
+
+
+
+### Three Types of Projects
+
+You can generate three types of projects inside a workspace:
+
+* `lib`-a typescript library
+* `nglib`-an Angular library exporting an NgModule
+* `app`-an Angular application that can be built, served, and shipped to the user
+
+Most of the code in a workspace will be in libs and nglibs. Apps should merely assemble a few nglibs and add some environment-specific parameters.
+
+
+
+
+### Generate an Angular Library
+
+```bash
+ng generate nglib shared
+```
+
+Open `libs/shared` to find an empty NgModule.
+
+
+
+
+### Generate a Component in an NgLibrary
+
+```bash
+ng generate component logo --lib=shared --module=shared.module.ts --export
+```
+
+This will create `LogoComponent` declared and exported from the `SharedModule`.
+
+### Build a Library
+
+We can build the library by running the following command:
+
+```bash
+ng build shared
+```
+
+### Test a Library
+
+We can also test it by running:
+
+```bash
+ng test shared
+```
+
+
+
+
+### Generate an Angular Application
+
+```bash
+ng generate app main
+```
+
+Open `libs/shared` to find an empty application.
+
+First, let's add a dependency to the shared library.
+
+Open `apps/main/BUILD.bazel` and add `//libs/shared` to the list of deps, like this:
+
+```bash
+ng_module(
+  name = "module",
+  srcs = glob(["**/*.ts"], exclude = ["e2e/**/*.ts"]),
+  deps = [
+    '//libs/shared:module'
+  ],
+  tsconfig = "//:tsconfig.json"
+)
+```
+
+This tells `Bazel` that if `shared` changes, the `main` application should be rebuilt.
+
+
+Next, open `app.module.ts` and change it to imports `SharedModule`, like this:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { AppComponent } from './app.component';
+import { BrowserModule } from '@angular/platform-browser';
+import { SharedModule } from 'shared';
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    SharedModule
+  ],
+  declarations: [AppComponent],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Note that we can use the `shared` library name to import the module. In other words, use relative imports within a library or an application, and absolute imports to import libraries.
+
+Finally, open `app.component.html` and change it to look like this:
+
+```html
+App:
+<app-logo></app-logo>
+```
+
+
+
+
+### Serve an Angular Application
+
+```bash
+ng serve main
+```
+
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-You can configure the default HTTP host and port used by the development server with two command-line options :
+
+
+### Build an Application
+
+The following command will build the main application.
 
 ```bash
-ng serve --host 0.0.0.0 --port 4201
+ng build main
 ```
 
-### Generating Components, Directives, Pipes and Services
+### Test an Application
 
-You can use the `ng generate` (or just `ng g`) command to generate Angular components:
+The following command will build the main application.
 
 ```bash
-ng generate component my-new-component
-ng g component my-new-component # using the alias
-
-# components support relative path generation
-# if in the directory src/app/feature/ and you run
-ng g component new-cmp
-# your component will be generated in src/app/feature/new-cmp
-# but if you were to run
-ng g component ../newer-cmp
-# your component will be generated in src/app/newer-cmp
-# if in the directory src/app you can also run
-ng g component feature/new-cmp
-# and your component will be generated in src/app/feature/new-cmp
-```
-You can find all possible blueprints in the table below:
-
-Scaffold  | Usage
----       | ---
-[Component](https://github.com/angular/angular-cli/wiki/generate-component) | `ng g component my-new-component`
-[Directive](https://github.com/angular/angular-cli/wiki/generate-directive) | `ng g directive my-new-directive`
-[Pipe](https://github.com/angular/angular-cli/wiki/generate-pipe)           | `ng g pipe my-new-pipe`
-[Service](https://github.com/angular/angular-cli/wiki/generate-service)     | `ng g service my-new-service`
-[Class](https://github.com/angular/angular-cli/wiki/generate-class)         | `ng g class my-new-class`
-[Guard](https://github.com/angular/angular-cli/wiki/generate-guard)         | `ng g guard my-new-guard`
-[Interface](https://github.com/angular/angular-cli/wiki/generate-interface) | `ng g interface my-new-interface`
-[Enum](https://github.com/angular/angular-cli/wiki/generate-enum)           | `ng g enum my-new-enum`
-[Module](https://github.com/angular/angular-cli/wiki/generate-module)       | `ng g module my-module`
-
-
-
-
-angular-cli will add reference to `components`, `directives` and `pipes` automatically in the `app.module.ts`. If you need to add this references to another custom module, follow this steps:
- 
- 1. `ng g module new-module` to create a new module
- 2.  call `ng g component new-module/new-component`
- 
-This should add the new `component`, `directive` or `pipe` reference to the `new-module` you've created.
- 
-### Updating Angular CLI
-
-If you're using Angular CLI `1.0.0-beta.28` or less, you need to uninstall `angular-cli` package. It should be done due to changing of package's name and scope from `angular-cli` to `@angular/cli`:
-```bash
-npm uninstall -g angular-cli
-npm uninstall --save-dev angular-cli
+ng test main
 ```
 
-To update Angular CLI to a new version, you must update both the global package and your project's local package.
-
-Global package:
-```bash
-npm uninstall -g @angular/cli
-npm cache clean
-npm install -g @angular/cli@latest
-```
-
-Local project package:
-```bash
-rm -rf node_modules dist # use rmdir /S/Q node_modules dist in Windows Command Prompt; use rm -r -fo node_modules,dist in Windows PowerShell
-npm install --save-dev @angular/cli@latest
-npm install
-```
-
-If you are updating to 1.0 from a beta or RC version, check out our [1.0 Update Guide](https://github.com/angular/angular-cli/wiki/stories-1.0-update).
-
-You can find more details about changes between versions in [the Releases tab on GitHub](https://github.com/angular/angular-cli/releases).
 
 
-## Development Hints for working on Angular CLI
+## Extra Notes
 
-### Working with master
+* Read [Building Angular apps at scale](https://medium.com/@Jakeherringbone/building-angular-apps-at-scale-813ef42add04) to understand the advantages of using Bazel.
+* In this branch everything is always built in the AOT mode to make production and dev builds as close as possible.
 
-```bash
-git clone https://github.com/angular/angular-cli.git
-cd angular-cli
-npm link
-```
-
-`npm link` is very similar to `npm install -g` except that instead of downloading the package
-from the repo, the just cloned `angular-cli/` folder becomes the global package.
-Additionally, this repository publishes several packages and we use special logic to load all of them
-on development setups.
-
-Any changes to the files in the `angular-cli/` folder will immediately affect the global `@angular/cli` package,
-allowing you to quickly test any changes you make to the cli project.
-
-Now you can use `@angular/cli` via the command line:
-
-```bash
-ng new foo
-cd foo
-npm link @angular/cli
-ng serve
-```
-
-`npm link @angular/cli` is needed because by default the globally installed `@angular/cli` just loads
-the local `@angular/cli` from the project which was fetched remotely from npm.
-`npm link @angular/cli` symlinks the global `@angular/cli` package to the local `@angular/cli` package.
-Now the `angular-cli` you cloned before is in three places:
-The folder you cloned it into, npm's folder where it stores global packages and the Angular CLI project you just created.
-
-You can also use `ng new foo --link-cli` to automatically link the `@angular/cli` package.
-
-Please read the official [npm-link documentation](https://docs.npmjs.com/cli/link)
-and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
-
-To run the Angular CLI test suite use the `node tests/run_e2e.js` command.
-It can also receive a filename to only run that test (e.g. `node tests/run_e2e.js tests/e2e/tests/build/dev-build.ts`).
-
-As part of the test procedure, all packages will be built and linked.
-You will need to re-run `npm link` to re-link the development Angular CLI environment after tests finish.
-
-
-## Documentation
-
-The documentation for the Angular CLI is located in this repo's [wiki](https://github.com/angular/angular-cli/wiki).
 
 ## License
 

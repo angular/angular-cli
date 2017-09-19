@@ -8,7 +8,7 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'app',
     type: String,
-    aliases: ['a'],
+    aliases: ['a', 'lib'],
     description: 'Specifies app name or index to use.'
   },
   {
