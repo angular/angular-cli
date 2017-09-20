@@ -13,17 +13,17 @@ import { getWrapEnumsTransformer, testWrapEnums } from './wrap-enums';
 const transform = (content: string) => transformJavascript(
   { content, getTransforms: [getWrapEnumsTransformer] }).content;
 
-describe('prefix-classes', () => {
+describe('wrap-enums', () => {
   it('wraps ts 2.2 enums in IIFE', () => {
     const input = stripIndent`
-      var ChangeDetectionStrategy = {};
+      export var ChangeDetectionStrategy = {};
       ChangeDetectionStrategy.OnPush = 0;
       ChangeDetectionStrategy.Default = 1;
       ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = "OnPush";
       ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = "Default";
     `;
     const output = stripIndent`
-      var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
+      export var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
         var ChangeDetectionStrategy = {};
         ChangeDetectionStrategy.OnPush = 0;
         ChangeDetectionStrategy.Default = 1;
@@ -39,14 +39,14 @@ describe('prefix-classes', () => {
 
   it('wraps ts 2.3 enums in IIFE', () => {
     const input = stripIndent`
-      var ChangeDetectionStrategy;
+      export var ChangeDetectionStrategy;
       (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
           ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
       })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
     `;
     const output = stripIndent`
-      var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
+      export var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
         var ChangeDetectionStrategy = {};
         ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
         ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
