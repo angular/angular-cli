@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as webpack from 'webpack';
-import { ConcatSource, RawSource } from 'webpack-sources';
-import { purify } from './purify';
+import { ReplaceSource } from 'webpack-sources';
+import { purifyReplacements } from './purify';
 
 
 interface Chunk {
@@ -24,8 +24,12 @@ export class PurifyPlugin {
           chunk.files
             .filter((fileName: string) => fileName.endsWith('.js'))
             .forEach((fileName: string) => {
-              const purified: string = purify(compilation.assets[fileName].source());
-              compilation.assets[fileName] = new ConcatSource(new RawSource(purified));
+              const replacements = purifyReplacements(compilation.assets[fileName].source());
+              const replaceSource = new ReplaceSource(compilation.assets[fileName], fileName);
+              replacements.forEach((replacement) => {
+                replaceSource.replace(replacement.start, replacement.end, replacement.content);
+              });
+              compilation.assets[fileName] = replaceSource;
             });
         });
         callback();

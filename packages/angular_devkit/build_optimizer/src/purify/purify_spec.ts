@@ -27,12 +27,16 @@ describe('purify', () => {
 
   it('prefixes safe default imports with /*@__PURE__*/', () => {
     const input = stripIndent`
+      /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_Subject__ = __webpack_require__("rlar");
+      /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_Subject___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_Subject__);
       /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_zone_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_zone_js__);
-      /** PURE_IMPORTS_START zone_js PURE_IMPORTS_END */
+      /** PURE_IMPORTS_START rxjs_Subject,zone_js PURE_IMPORTS_END */
     `;
     const output = stripIndent`
+      /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_Subject__ = /*@__PURE__*/__webpack_require__("rlar");
+      /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_Subject___default = /*@__PURE__*/__webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_Subject__);
       /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_zone_js___default = /*@__PURE__*/__webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_zone_js__);
-      /** PURE_IMPORTS_START zone_js PURE_IMPORTS_END */
+      /** PURE_IMPORTS_START rxjs_Subject,zone_js PURE_IMPORTS_END */
     `;
 
     expect(oneLine`${purify(input)}`).toEqual(oneLine`${output}`);
