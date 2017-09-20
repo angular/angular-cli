@@ -1,12 +1,13 @@
 // @ignoreDep @angular/compiler-cli
-// @ignoreDep @angular/compiler-cli/ngtools2
 import * as fs from 'fs';
+import { fork, ChildProcess } from 'child_process';
 import * as path from 'path';
 import * as ts from 'typescript';
 
 const { __NGTOOLS_PRIVATE_API_2, VERSION } = require('@angular/compiler-cli');
 const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 const NodeWatchFileSystem = require('webpack/lib/node/NodeWatchFileSystem');
+const treeKill = require('tree-kill');
 
 import { WebpackResourceLoader } from './resource_loader';
 import { WebpackCompilerHost } from './compiler_host';
@@ -25,35 +26,23 @@ import {
   replaceResources,
 } from './transformers';
 import { time, timeEnd } from './benchmark';
-
-// These imports do not exist on Angular versions lower than 5, so we cannot use a static ES6
-// import. Instead we copy their types into './ngtools_api2.d.ts'.
-// @ignoreDep @angular/compiler-cli/src/transformers/api
-let compilerCliNgtools: any = {};
-try {
-  compilerCliNgtools = require('@angular/compiler-cli/ngtools2');
-} catch (e) {
-  // Don't throw an error if the private API does not exist.
-  // Instead, the `isSupported` method should return false and indicate the plugin cannot be used.
-}
-
+import { InitMessage, UpdateMessage } from './type_checker';
+import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
 import {
   DEFAULT_ERROR_CODE,
   UNKNOWN_ERROR_CODE,
   SOURCE,
   Program,
+  CompilerOptions,
   CompilerHost,
-  CreateProgramInterface,
-  CreateCompilerHostInterface,
   Diagnostics,
-  FormatDiagnosticsInterface,
-  CustomTransformers as CustomTransformers,
+  CustomTransformers,
+  createProgram,
+  createCompilerHost,
+  formatDiagnostics,
+  EmitFlags,
 } from './ngtools_api2';
 
-const createProgram: CreateProgramInterface = compilerCliNgtools.createProgram;
-const createCompilerHost: CreateCompilerHostInterface = compilerCliNgtools.createCompilerHost;
-const formatDiagnostics: FormatDiagnosticsInterface = compilerCliNgtools.formatDiagnostics;
-const EmitFlags: any = compilerCliNgtools.EmitFlags;
 
 /**
  * Option Constants
@@ -89,9 +78,9 @@ export class AngularCompilerPlugin implements Tapable {
 
   // TS compilation.
   private _compilerOptions: ts.CompilerOptions;
-  private _angularCompilerOptions: any;
+  private _angularCompilerOptions: CompilerOptions;
   private _tsFilenames: string[];
-  private _program: ts.Program & Program;
+  private _program: ts.Program | Program;
   private _compilerHost: WebpackCompilerHost;
   private _angularCompilerHost: WebpackCompilerHost & CompilerHost;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
@@ -109,6 +98,10 @@ export class AngularCompilerPlugin implements Tapable {
   private _compiler: any = null;
   private _compilation: any = null;
   private _failedCompilation = false;
+
+  // TypeChecker process.
+  private _forkTypeChecker = true;
+  private _typeCheckerProcess: ChildProcess;
 
   constructor(options: AngularCompilerPluginOptions) {
     this._options = Object.assign({}, options);
@@ -130,6 +123,7 @@ export class AngularCompilerPlugin implements Tapable {
   }
 
   private _setupOptions(options: AngularCompilerPluginOptions) {
+    time('AngularCompilerPlugin._setupOptions');
     // Fill in the missing options.
     if (!options.hasOwnProperty('tsConfigPath')) {
       throw new Error('Must specify "tsConfigPath" in the configuration of @ngtools/webpack.');
@@ -246,7 +240,8 @@ export class AngularCompilerPlugin implements Tapable {
       this._angularCompilerOptions.i18nInLocale = options.locale;
     }
     if (options.hasOwnProperty('missingTranslation')) {
-      this._angularCompilerOptions.i18nInMissingTranslations = options.missingTranslation;
+      this._angularCompilerOptions.i18nInMissingTranslations =
+        options.missingTranslation as 'error' | 'warning' | 'ignore';
     }
 
     // Use entryModule if available in options, otherwise resolve it from mainPath after program
@@ -280,10 +275,11 @@ export class AngularCompilerPlugin implements Tapable {
 
     // TODO: consider really using platform names in the plugin options.
     this._platform = options.replaceExport ? PLATFORM.Server : PLATFORM.Browser;
+    timeEnd('AngularCompilerPlugin._setupOptions');
   }
 
   private _getTsProgram() {
-    return this._JitMode ? this._program : this._program.getTsProgram();
+    return this._JitMode ? this._program as ts.Program : (this._program as Program).getTsProgram();
   }
 
   private _getChangedTsFiles() {
@@ -293,44 +289,52 @@ export class AngularCompilerPlugin implements Tapable {
   }
 
   private _createOrUpdateProgram() {
-    this._getChangedTsFiles().forEach((file) => {
+    const changedTsFiles = this._getChangedTsFiles();
+    changedTsFiles.forEach((file) => {
       if (!this._tsFilenames.includes(file)) {
+        // TODO: figure out if action is needed for files that were removed from the compilation.
         this._tsFilenames.push(file);
       }
     });
 
+    // Update the forked type checker.
+    if (this._forkTypeChecker && !this._firstRun) {
+      this._updateForkedTypeChecker(changedTsFiles);
+    }
+
     if (this._JitMode) {
+
       // Create the TypeScript program.
-      time('_createOrUpdateProgram.ts.createProgram');
+      time('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
       this._program = ts.createProgram(
         this._tsFilenames,
         this._angularCompilerOptions,
         this._angularCompilerHost,
-        this._program
-      ) as ts.Program & Program;
-      timeEnd('_createOrUpdateProgram.ts.createProgram');
+        this._program as ts.Program
+      );
+      timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
 
       return Promise.resolve();
     } else {
-      time('_createOrUpdateProgram.ng.createProgram');
+      time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
       // Create the Angular program.
       this._program = createProgram({
         rootNames: this._tsFilenames,
         options: this._angularCompilerOptions,
         host: this._angularCompilerHost,
-        oldProgram: this._program
-      }) as ts.Program & Program;
-      timeEnd('_createOrUpdateProgram.ng.createProgram');
+        oldProgram: this._program as Program
+      });
+      timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
 
-      time('_createOrUpdateProgram.ng.loadNgStructureAsync');
-      return this._program.loadNgStructureAsync()
-        .then(() => timeEnd('_createOrUpdateProgram.ng.loadNgStructureAsync'));
+      time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+      return this._program.loadNgStructureAsync().then(() =>
+        timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync'));
     }
   }
 
   private _getLazyRoutesFromNgtools() {
     try {
-      time('_getLazyRoutesFromNgtools');
+      time('AngularCompilerPlugin._getLazyRoutesFromNgtools');
       const result = __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
         program: this._getTsProgram(),
         host: this._compilerHost,
@@ -340,7 +344,7 @@ export class AngularCompilerPlugin implements Tapable {
         }),
         entryModule: this._entryModule
       });
-      timeEnd('_getLazyRoutesFromNgtools');
+      timeEnd('AngularCompilerPlugin._getLazyRoutesFromNgtools');
       return result;
     } catch (err) {
       // We silence the error that the @angular/router could not be found. In that case, there is
@@ -354,7 +358,7 @@ export class AngularCompilerPlugin implements Tapable {
   }
 
   private _findLazyRoutesInAst(changedFilePaths: string[]): LazyRouteMap {
-    time('_findLazyRoutesInAst');
+    time('AngularCompilerPlugin._findLazyRoutesInAst');
     const result: LazyRouteMap = Object.create(null);
     for (const filePath of changedFilePaths) {
       const fileLazyRoutes = findLazyRoutes(filePath, this._compilerHost, undefined,
@@ -364,7 +368,7 @@ export class AngularCompilerPlugin implements Tapable {
         result[routeKey] = route;
       }
     }
-    timeEnd('_findLazyRoutesInAst');
+    timeEnd('AngularCompilerPlugin._findLazyRoutesInAst');
     return result;
   }
 
@@ -408,6 +412,28 @@ export class AngularCompilerPlugin implements Tapable {
           this._angularCompilerHost.invalidate(lazyRouteTSFile);
         }
       });
+  }
+
+  private _createForkedTypeChecker() {
+    // Bootstrap type checker is using local CLI.
+    const g: any = global;
+    const typeCheckerFile: string = g['angularCliIsLocal']
+      ? './type_checker_bootstrap.js'
+      : './type_checker.js';
+
+    this._typeCheckerProcess = fork(path.resolve(__dirname, typeCheckerFile));
+    this._typeCheckerProcess.send(new InitMessage(this._compilerOptions, this._basePath,
+      this._JitMode, this._tsFilenames));
+
+    // Cleanup.
+    const killTypeCheckerProcess = () => treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
+    process.on('exit', killTypeCheckerProcess);
+    process.on('SIGINT', killTypeCheckerProcess);
+    process.on('uncaughtException', killTypeCheckerProcess);
+  }
+
+  private _updateForkedTypeChecker(changedTsFiles: string[]) {
+    this._typeCheckerProcess.send(new UpdateMessage(changedTsFiles));
   }
 
 
@@ -519,7 +545,7 @@ export class AngularCompilerPlugin implements Tapable {
   }
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
-    time('_make');
+    time('AngularCompilerPlugin._make');
     this._compilation = compilation;
     if (this._compilation._ngToolsWebpackPluginInstance) {
       return cb(new Error('An @ngtools/webpack plugin already exist for this compilation.'));
@@ -528,15 +554,21 @@ export class AngularCompilerPlugin implements Tapable {
     this._compilation._ngToolsWebpackPluginInstance = this;
 
     // Create the resource loader with the webpack compilation.
-    time('_make.setResourceLoader');
+    time('AngularCompilerPlugin._make.setResourceLoader');
     const resourceLoader = new WebpackResourceLoader(compilation);
     this._compilerHost.setResourceLoader(resourceLoader);
-    timeEnd('_make.setResourceLoader');
+    timeEnd('AngularCompilerPlugin._make.setResourceLoader');
 
     this._donePromise = Promise.resolve()
       .then(() => {
+        // Create a new process for the type checker.
+        if (!this._firstRun && !this._typeCheckerProcess) {
+          this._createForkedTypeChecker();
+        }
+      })
+      .then(() => {
         if (this._firstRun) {
-          // Use the WebpackResourceLoaderwith a resource loader to create an AngularCompilerHost.
+          // Use the WebpackResourceLoader with a resource loader to create an AngularCompilerHost.
           this._angularCompilerHost = createCompilerHost({
             options: this._angularCompilerOptions,
             tsHost: this._compilerHost
@@ -546,23 +578,23 @@ export class AngularCompilerPlugin implements Tapable {
             .then(() => {
               // If there's still no entryModule try to resolve from mainPath.
               if (!this._entryModule && this._options.mainPath) {
-                time('_make.resolveEntryModuleFromMain');
+                time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
                 const mainPath = path.resolve(this._basePath, this._options.mainPath);
                 this._entryModule = resolveEntryModuleFromMain(
                   mainPath, this._compilerHost, this._getTsProgram());
-                timeEnd('_make.resolveEntryModuleFromMain');
+                timeEnd('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
               }
             });
         }
       })
       .then(() => this._update())
       .then(() => {
-        timeEnd('_make');
+        timeEnd('AngularCompilerPlugin._make');
         cb();
       }, (err: any) => {
         this._failedCompilation = true;
         compilation.errors.push(err.stack);
-        timeEnd('_make');
+        timeEnd('AngularCompilerPlugin._make');
         cb();
       });
   }
@@ -570,7 +602,7 @@ export class AngularCompilerPlugin implements Tapable {
   private _update() {
     // We only want to update on TS and template changes, but all kinds of files are on this
     // list, like package.json and .ngsummary.json files.
-    time('_update');
+    time('AngularCompilerPlugin._update');
     let changedFiles = this._compilerHost.getChangedFilePaths()
       .filter(k => /(ts|html|css|scss|sass|less|styl)/.test(k));
 
@@ -598,17 +630,20 @@ export class AngularCompilerPlugin implements Tapable {
         // Build transforms, emit and report errors if there are changes or it's the first run.
         if (changedFiles.length > 0 || this._firstRun) {
 
+          // We now have the final list of changed TS files.
           // Go through each changed file and add transforms as needed.
-          time('_update.transformOps');
           const sourceFiles = this._getChangedTsFiles().map((fileName) => {
+            time('AngularCompilerPlugin._update.getSourceFile');
             const sourceFile = this._getTsProgram().getSourceFile(fileName);
             if (!sourceFile) {
               throw new Error(`${fileName} is not part of the TypeScript compilation. `
                 + `Please include it in your tsconfig via the 'files' or 'include' property.`);
             }
+            timeEnd('AngularCompilerPlugin._update.getSourceFile');
             return sourceFile;
           });
 
+          time('AngularCompilerPlugin._update.transformOps');
           sourceFiles.forEach((sf) => {
             const fileName = this._compilerHost.resolve(sf.fileName);
             let transformOps = [];
@@ -647,21 +682,20 @@ export class AngularCompilerPlugin implements Tapable {
           for (let fileTransformOps of this._transformMap.values()) {
             transformOps.push(...fileTransformOps);
           }
-          timeEnd('_update.transformOps');
+          timeEnd('AngularCompilerPlugin._update.transformOps');
 
-          time('_update.makeTransform');
+          time('AngularCompilerPlugin._update.makeTransform');
           const transformers: CustomTransformers = {
             beforeTs: transformOps.length > 0 ? [makeTransform(transformOps)] : []
           };
-          timeEnd('_update.makeTransform');
+          timeEnd('AngularCompilerPlugin._update.makeTransform');
 
           // Emit files.
-          time('_update._emit');
+          time('AngularCompilerPlugin._update._emit');
           const { emitResult, diagnostics } = this._emit(sourceFiles, transformers);
-          timeEnd('_update._emit');
+          timeEnd('AngularCompilerPlugin._update._emit');
 
           // Report diagnostics.
-          // TODO: check if the old _translateSourceMap function is needed.
           const errors = diagnostics
             .filter((diag) => diag.category === ts.DiagnosticCategory.Error);
           const warnings = diagnostics
@@ -684,7 +718,7 @@ export class AngularCompilerPlugin implements Tapable {
             this._failedCompilation = true;
           }
         }
-        timeEnd('_update');
+        timeEnd('AngularCompilerPlugin._update');
       });
   }
 
@@ -704,44 +738,30 @@ export class AngularCompilerPlugin implements Tapable {
     sourceFiles: ts.SourceFile[],
     customTransformers: ts.CustomTransformers & CustomTransformers
   ) {
-    time('_emit');
+    time('AngularCompilerPlugin._emit');
     const program = this._program;
     const allDiagnostics: Diagnostics = [];
 
-    function checkDiagnostics(diags: Diagnostics | undefined) {
-      if (diags) {
-        allDiagnostics.push(...diags);
-        return diags.every(d => d.category !== ts.DiagnosticCategory.Error);
-      }
-      return true;
-    }
-
     let emitResult: ts.EmitResult | undefined;
     try {
-      let shouldEmit = true;
-
       if (this._JitMode) {
-        const tsProgram: ts.Program = program;
+        const tsProgram = program as ts.Program;
 
-        // Check parameter diagnostics.
-        // TODO: check this only on initial program creation.
-        time('_emit.ts.getOptionsDiagnostics');
-        shouldEmit = shouldEmit && checkDiagnostics(tsProgram.getOptionsDiagnostics());
-        timeEnd('_emit.ts.getOptionsDiagnostics');
+        if (this._firstRun) {
+          // Check parameter diagnostics.
+          time('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
+          allDiagnostics.push(...tsProgram.getOptionsDiagnostics());
+          timeEnd('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
+        }
 
-        // Check syntactic diagnostics.
-        time('_emit.ts.getSyntacticDiagnostics');
-        shouldEmit = shouldEmit && checkDiagnostics(tsProgram.getSyntacticDiagnostics());
-        timeEnd('_emit.ts.getSyntacticDiagnostics');
+        if (this._firstRun || !this._forkTypeChecker) {
+          allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
+            'AngularCompilerPluginOptions'));
+        }
 
-        // Check semantic diagnostics.
-        time('_emit.ts.getSemanticDiagnostics');
-        shouldEmit = shouldEmit && checkDiagnostics(tsProgram.getSemanticDiagnostics());
-        timeEnd('_emit.ts.getSemanticDiagnostics');
-
-        if (shouldEmit) {
+        if (!hasErrors(allDiagnostics)) {
           sourceFiles.forEach((sf) => {
-            const timeLabel = `_emit.ts+${sf.fileName}+.emit`;
+            const timeLabel = `AngularCompilerPlugin._emit.ts+${sf.fileName}+.emit`;
             time(timeLabel);
             emitResult = tsProgram.emit(sf, undefined, undefined, undefined,
               { before: customTransformers.beforeTs }
@@ -751,41 +771,34 @@ export class AngularCompilerPlugin implements Tapable {
           });
         }
       } else {
-        const angularProgram: Program = program;
+        const angularProgram = program as Program;
 
-        // Check parameter diagnostics.
-        // TODO: check this only on initial program creation.
-        time('_emit.ng.getTsOptionDiagnostics+getNgOptionDiagnostics');
-        shouldEmit = shouldEmit && checkDiagnostics([
-          ...angularProgram.getTsOptionDiagnostics(), ...angularProgram.getNgOptionDiagnostics()
-        ]);
-        timeEnd('_emit.ng.getTsOptionDiagnostics+getNgOptionDiagnostics');
+        if (this._firstRun) {
+          // Check TypeScript parameter diagnostics.
+          time('AngularCompilerPlugin._emit.ng.getTsOptionDiagnostics');
+          allDiagnostics.push(...angularProgram.getTsOptionDiagnostics());
+          timeEnd('AngularCompilerPlugin._emit.ng.getTsOptionDiagnostics');
 
-        // Check syntactic diagnostics.
-        time('_emit.ng.getTsSyntacticDiagnostics');
-        shouldEmit = shouldEmit && checkDiagnostics(angularProgram.getTsSyntacticDiagnostics());
-        timeEnd('_emit.ng.getTsSyntacticDiagnostics');
+          // Check Angular parameter diagnostics.
+          time('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
+          allDiagnostics.push(...angularProgram.getNgOptionDiagnostics());
+          timeEnd('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
+        }
 
-        // Check TypeScript semantic and Angular structure diagnostics.
-        time('_emit.ng.getTsSemanticDiagnostics+getNgStructuralDiagnostics');
-        shouldEmit = shouldEmit && checkDiagnostics(
-          [...angularProgram.getTsSemanticDiagnostics(),
-          ...angularProgram.getNgStructuralDiagnostics()
-          ]);
-        timeEnd('_emit.ng.getTsSemanticDiagnostics+getNgStructuralDiagnostics');
+        if (this._firstRun || !this._forkTypeChecker) {
+          allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
+            'AngularCompilerPluginOptions'));
+        }
 
-        // Check Angular semantic diagnostics
-        shouldEmit = shouldEmit && checkDiagnostics(angularProgram.getNgSemanticDiagnostics());
-
-        if (shouldEmit) {
-          time('_emit.ng.emit');
+        if (!hasErrors(allDiagnostics)) {
+          time('AngularCompilerPlugin._emit.ng.emit');
           emitResult = angularProgram.emit({ emitFlags: EmitFlags.Default, customTransformers });
           allDiagnostics.push(...emitResult.diagnostics);
-          timeEnd('_emit.ng.emit');
+          timeEnd('AngularCompilerPlugin._emit.ng.emit');
         }
       }
     } catch (e) {
-      time('_emit.catch');
+      time('AngularCompilerPlugin._emit.catch');
       // This function is available in the import below, but this way we avoid the dependency.
       // import { isSyntaxError } from '@angular/compiler';
       function isSyntaxError(error: Error): boolean {
@@ -806,9 +819,9 @@ export class AngularCompilerPlugin implements Tapable {
       }
       allDiagnostics.push(
         { category: ts.DiagnosticCategory.Error, messageText: errMsg, code, source: SOURCE });
-      timeEnd('_emit.catch');
+      timeEnd('AngularCompilerPlugin._emit.catch');
     }
-    timeEnd('_emit');
+    timeEnd('AngularCompilerPlugin._emit');
     return { program, emitResult, diagnostics: allDiagnostics };
   }
 }
