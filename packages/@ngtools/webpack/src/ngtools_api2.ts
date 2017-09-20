@@ -1,5 +1,6 @@
 /**
- * This is a copy of @compiler-cli/src/ngtools_api.d.ts file.
+ * This is a copy of types in @compiler-cli/src/ngtools_api.d.ts file,
+ * together with a safe import to support cases where Angular versions is below 5.
  */
 import * as ts from 'typescript';
 
@@ -43,11 +44,6 @@ export interface CompilerHost extends ts.CompilerHost {
   fromSummaryFileName(fileName: string, referringLibFileName: string): string;
   readResource?(fileName: string): Promise<string> | string;
 }
-export declare enum EmitFlags {
-  DTS = 1,
-  JS = 2,
-  Default = 3,
-}
 export interface CustomTransformers {
   beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
   afterTs?: ts.TransformerFactory<ts.SourceFile>[];
@@ -78,24 +74,14 @@ export interface Program {
     Diagnostic[];
   loadNgStructureAsync(): Promise<void>;
   emit({ emitFlags, cancellationToken, customTransformers, emitCallback }: {
-    emitFlags?: EmitFlags;
+    emitFlags?: any;
     cancellationToken?: ts.CancellationToken;
     customTransformers?: CustomTransformers;
     emitCallback?: TsEmitCallback;
   }): ts.EmitResult;
 }
-export declare function createProgram({ rootNames, options, host, oldProgram }: {
-  rootNames: string[];
-  options: CompilerOptions;
-  host: CompilerHost;
-  oldProgram?: Program;
-}): Program;
-export declare function createCompilerHost({ options, tsHost }: {
-  options: CompilerOptions;
-  tsHost?: ts.CompilerHost;
-}): CompilerHost;
+
 export declare type Diagnostics = Array<ts.Diagnostic | Diagnostic>;
-export declare function formatDiagnostics(options: CompilerOptions, diags: Diagnostics): string;
 
 // Interfaces for the function declarations.
 export interface CreateProgramInterface {
@@ -115,3 +101,19 @@ export interface CreateCompilerHostInterface {
 export interface FormatDiagnosticsInterface {
   (options: CompilerOptions, diags: Diagnostics): string;
 }
+
+// These imports do not exist on Angular versions lower than 5, so we cannot use a static ES6
+// import.
+let ngtools2: any = {};
+try {
+  ngtools2 = require('@angular/compiler-cli/ngtools2');
+} catch (e) {
+  // Don't throw an error if the private API does not exist.
+  // Instead, the `AngularCompilerPlugin.isSupported` method should return false and indicate the
+  // plugin cannot be used.
+}
+
+export const createProgram: CreateProgramInterface = ngtools2.createProgram;
+export const createCompilerHost: CreateCompilerHostInterface = ngtools2.createCompilerHost;
+export const formatDiagnostics: FormatDiagnosticsInterface = ngtools2.formatDiagnostics;
+export const EmitFlags = ngtools2.EmitFlags;

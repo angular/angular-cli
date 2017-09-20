@@ -9,6 +9,7 @@ import {getGlobalVariable} from '../../utils/env';
 
 const doneRe =
   /webpack: bundle is now VALID|webpack: Compiled successfully.|webpack: Failed to compile./;
+const errorRe = /ERROR in/;
 
 
 export default function() {
@@ -41,7 +42,7 @@ export default function() {
     // Make an invalid version of the file.
     // Should trigger a rebuild, this time an error is expected.
     .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(doneRe, 20000),
+      waitForAnyProcessOutputToMatch(errorRe, 20000),
       writeFile('src/funky2.ts', `
         export function funky2(value: number): number {
           return value + 1;
@@ -57,7 +58,7 @@ export default function() {
     // Change an UNRELATED file and the error should still happen.
     // Should trigger a rebuild, this time an error is also expected.
     .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(doneRe, 20000),
+      waitForAnyProcessOutputToMatch(errorRe, 20000),
       appendToFile('src/app/app.module.ts', `
         function anything(): number { return 1; }
       `)
