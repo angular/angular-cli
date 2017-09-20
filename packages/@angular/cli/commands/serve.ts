@@ -10,7 +10,7 @@ const Command = require('../ember-cli/lib/models/command');
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const serveConfigDefaults = config.getPaths('defaults.serve', [
-  'port', 'host', 'ssl', 'sslKey', 'sslCert', 'proxyConfig'
+  'port', 'host', 'ssl', 'sslKey', 'sslCert', 'proxyConfig', 'disableHostCheck'
 ]);
 const defaultPort = process.env.PORT || serveConfigDefaults['port'];
 
@@ -94,7 +94,7 @@ export const baseServeCommandOptions: any = overrideOptions([
   {
     name: 'disable-host-check',
     type: Boolean,
-    default: false,
+    default: serveConfigDefaults['disableHostCheck'],
     description: 'Don\'t verify connected clients are part of allowed hosts.',
   },
   {

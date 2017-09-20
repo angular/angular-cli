@@ -512,7 +512,11 @@
               "description": "The host the application will be served on.",
               "type": "string",
               "default": "localhost"
-
+            },
+            "disableHostCheck": {
+              "description": "Don't verify connected clients are part of allowed hosts.",
+              "type": "boolean",
+              "default": false
             },
             "ssl": {
               "description": "Enables ssl for the application.",
