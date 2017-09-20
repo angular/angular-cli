@@ -16,8 +16,17 @@ or
 $ yarn add @angular/platform-server --dev
 ```
 
+## Step 1: Install `@nguniversal/express-engine` and `@nguniversal/express-engine`
 
-## Step 1: Prepare your app for Universal rendering
+```bash
+$ npm install --save @nguniversal/express-engine @nguniversal/module-map-ngfactory-loader
+```
+or
+```bash
+$ yarn add @nguniversal/express-engine @nguniversal/module-map-ngfactory-loader
+```
+
+## Step 2: Prepare your app for Universal rendering
 
 The first thing you need to do is make your `AppModule` compatible with Universal by addding `.withServerTransition()` and an application ID to your `BrowserModule` import:
 
@@ -49,6 +58,7 @@ This example places it alongside `app.module.ts` in a file named `app.server.mod
 ```javascript
 import {NgModule} from '@angular/core';
 import {ServerModule} from '@angular/platform-server';
+import {ModuleMapLoaderModule} from '@nguniversal/module-map-ngfactory-loader';
 
 import {AppModule} from './app.module';
 import {AppComponent} from './app.component';
@@ -59,6 +69,7 @@ import {AppComponent} from './app.component';
     // by the ServerModule from @angular/platform-server.
     AppModule,
     ServerModule,
+    ModuleMapLoaderModule
   ],
   // Since the bootstrapped component is not inherited from your
   // imported AppModule, it needs to be repeated here.
@@ -67,13 +78,20 @@ import {AppComponent} from './app.component';
 export class AppServerModule {}
 ```
 
-## Step 2: Create a server main file and tsconfig to build it
+## Step 3: Create a server main file and tsconfig to build it
 
-Create a main file for your Universal bundle. This file only needs to export your `AppServerModule`. It can go in `src`. This example calls this file `main.server.ts`:
+Create a main file for your Universal bundle. This file exports your `AppServerModule` and enables production mode if build target is set to production. It can go in `src`. This example calls this file `main.server.ts`:
 
 ### src/main.server.ts:
 
 ```javascript
+import { environment } from './environments/environment';
+import { enableProdMode } from '@angular/core';
+
+if (environment.production) {
+  enableProdMode();
+}
+
 export {AppServerModule} from './app/app.server.module';
 ```
 
@@ -105,7 +123,7 @@ Add a section for `"angularCompilerOptions"` and set `"entryModule"` to your `Ap
 }
 ```
 
-## Step 3: Create a new project in `.angular-cli.json`
+## Step 4: Create a new project in `.angular-cli.json`
 
 In `.angular-cli.json` there is an array under the key `"apps"`. Copy the configuration for your client application there, and paste it as a new entry in the array, with an additional key `"platform"` set to `"server"`.
 
@@ -166,8 +184,8 @@ With these steps complete, you should be able to build a server bundle for your 
 # This builds the client application in dist/
 $ ng build --prod
 ...
-# This builds the server bundle in dist-server/
-$ ng build --prod --app 1
+# This builds the server bundle in dist-server/ and disables output hashing
+$ ng build --prod --app 1 --output-hashing=false
 Date: 2017-07-24T22:42:09.739Z
 Hash: 9cac7d8e9434007fd8da
 Time: 4933ms
@@ -179,25 +197,105 @@ chunk {1} styles.d41d8cd98f00b204e980.bundle.css (styles) 0 bytes [entry] [rende
 
 With this bundle built, you can use `renderModuleFactory` from `@angular/platform-server` to test it out.
 
+### prerender.js:
+
 ```javascript
 // Load zone.js for the server.
 require('zone.js/dist/zone-node');
+require('reflect-metadata')
+const fs = require('fs');
 
 // Import renderModuleFactory from @angular/platform-server.
-var renderModuleFactory = require('@angular/platform-server').renderModuleFactory;
+const { renderModuleFactory } = require('@angular/platform-server');
+
+// Import module map for lazy loading
+const { provideModuleMap } = require('@nguniversal/module-map-ngfactory-loader');
 
 // Import the AOT compiled factory for your AppServerModule.
 // This import will change with the hash of your built server bundle.
-var AppServerModuleNgFactory = require('./dist-server/main.988d7a161bd984b7eb54.bundle').AppServerModuleNgFactory;
+const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require(`./dist-server/main.bundle`);
 
-// Load the index.html file.
-var index = require('fs').readFileSync('./src/index.html', 'utf8');
+// Load the index.html file containing referances to your application bundle.
+const index = fs.readFileSync('./dist/index.html', 'utf8');
 
-// Render to HTML and log it to the console.
-renderModuleFactory(AppServerModuleNgFactory, {document: index, url: '/'}).then(html => console.log(html));
+// Writes rendered HTML to ./dist/index.html, replacing the file if it already exists.
+renderModuleFactory(AppServerModuleNgFactory, {
+  document: index,
+  url: '/',
+  extraProviders: [
+    provideModuleMap(LAZY_MODULE_MAP)
+  ]
+})
+.then(html => fs.writeFileSync('./dist/index.html', html));
+```
+
+After pre rendering the application with `renderModuleFactory` we can now serve the application, to do this create a server.js file within the dist folder
+
+### server.js:
+
+```javascript
+require('zone.js/dist/zone-node');
+require('reflect-metadata');
+const express = require('express');
+const fs = require('fs');
+
+const { platformServer, renderModuleFactory } = require('@angular/platform-server');
+const { ngExpressEngine } = require('@nguniversal/express-engine');
+// Import module map for lazy loading
+const { provideModuleMap } = require('@nguniversal/module-map-ngfactory-loader');
+
+// Import the AOT compiled factory for your AppServerModule.
+// This import will change with the hash of your built server bundle.
+const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require(`./dist-server/main.bundle`);
+
+const app = express();
+const port = 8000;
+const baseUrl = `http://localhost:${port}`;
+
+// Set the engine
+app.engine('html', ngExpressEngine({
+  bootstrap: AppServerModuleNgFactory,
+  providers: [
+    provideModuleMap(LAZY_MODULE_MAP)
+  ]
+}));
+
+app.set('view engine', 'html');
+
+app.set('views', './dist');
+app.use('/', express.static('./dist', {index: false}));
+
+app.get('*', (req, res) => {
+  res.render('index', {
+    req,
+    res
+  });
+});
+
+app.listen(port, () => {
+	console.log(`Listening at ${baseUrl}`);
+});
+```
+
+Test it out by running the server
+```bash
+$ node server.js
+```
+
+An easy way to build and serve this application is to add the following scripts to package.json
+
+DOS
+```bash
+"build:ssr": "ng build --prod && ng build --prod --app 1 --output-hashing=false && node prerender && node server.js",
+"start:ssr": "node server.js"
+```
+or
+BASH
+```bash
+"build:ssr": "ng build --prod && ng build --prod --app 1 --output-hashing=false && node prerender && node server.js",
+"start:ssr": "node server.js",
 ```
 
 ## Caveats
 
-* Lazy loading is not yet supported, but coming very soon. Currently lazy loaded routes aren't available for prerendering, and you will get a `System is not defined` error.
 * The bundle produced has a hash in the filename from webpack. When deploying this to a production server, you will need to ensure the correct bundle is required, either by renaming the file or passing the bundle name as an argument to your server.
