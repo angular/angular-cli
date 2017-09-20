@@ -117,6 +117,9 @@ export function waitForAnyProcessOutputToMatch(match: RegExp,
       });
       childProcess.stderr.on('data', (data: Buffer) => {
         stderr += data.toString();
+        if (data.toString().match(match)) {
+          resolve({ stdout, stderr });
+        }
       });
     }));
 
