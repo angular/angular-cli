@@ -41,6 +41,7 @@ const acceptedSpdxLicenses = [
   'BSD-4-Clause',
   'CC-BY-3.0',
   'CC-BY-4.0',
+  'CC0-1.0',
   'Beerware',
   'Unlicense'
 ];
@@ -57,7 +58,8 @@ const licenseReplacements = [
   { name: 'MIT/X11', replacement: 'MIT' },
   // Not sure how to deal with public domain.
   // http://wiki.spdx.org/view/Legal_Team/Decisions/Dealing_with_Public_Domain_within_SPDX_Files
-  { name: 'Public Domain', replacement: 'MIT' }
+  { name: 'Public Domain', replacement: 'MIT' },
+  { name: 'MIT (http://mootools.net/license.txt)', replacement: 'MIT' }
 ];
 
 // Specific packages to ignore, add a reason in a comment. Format: package-name@version.
@@ -66,6 +68,7 @@ const ignoredPackages = [
   'async-foreach@0.1.3', // MIT, but doesn't list it in package.json
   'buffer-indexof@1.1.0', // MIT, but doesn't list it in package.json.
   'directory-encoder@0.7.2', // MIT, but doesn't list it in package.json
+  'debug@0.7.4', // MIT, but doesn't list it in package.json.
   'domelementtype@1.1.3', // Looks like MIT
   'domelementtype@1.3.0', // Looks like MIT
   'domhandler@2.1.0', // Looks like MIT
@@ -73,9 +76,12 @@ const ignoredPackages = [
   'domutils@1.1.6', // Looks like MIT
   'extsprintf@1.0.2', // Looks like MIT
   'indexof@0.0.1', // MIT, but doesn't list it in package.json
+  'isnumeric@0.2.0', // MIT, but doesn't list it in package.json.
   'jschardet@1.5.1', // LGPL-2.1, listed as LGPL-2.1+.
   'map-stream@0.1.0', // MIT, license but it's not listed in package.json.
   'pause-stream@0.0.11', // MIT AND Apache-2.0, but broken license field in package.json lists.
+  'pixrem@4.0.1', // MIT in GitHub, BSD-new in package.json.
+  'pleeease-filters@4.0.0', // MIT, but doesn't list it in package.json.
   'progress@1.1.8', // MIT, but doesn't list it in package.json
   'stdout-stream@1.4.0', // MIT, but doesn't list it in package.json
   'thunky@0.1.0', // MIT, but doesn't list it in package.json.
