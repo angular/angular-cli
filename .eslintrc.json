@@ -143,7 +143,7 @@
     "brace-style": [2, "1tbs", { "allowSingleLine": false }],
     "callback-return": "off",
     "camelcase": "off",
-    "comma-dangle": "error",
+    "comma-dangle": "off",
     "comma-spacing": "off",
     "comma-style": "off",
     "complexity": ["off", 11],
