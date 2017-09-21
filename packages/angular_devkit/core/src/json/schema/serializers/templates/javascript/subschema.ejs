@@ -12,29 +12,27 @@ if (!schema) {
   %>null<%
 } else if (schema === true) {
 %><%=
-  templates.prop_any({
+  templates.prop_any(Object.assign({
     name,
     required,
     schema: {},
-    ...extras,
-  })
+  }, extras))
 %><%
 } else if (!('type' in schema)) {
 %><%=
-  templates.prop_any({
+  templates.prop_any(Object.assign({
     name,
     required,
     schema: {},
-    ...extras,
-})
+  }, extras))
 %><%
 } else {
 %><%=
-  templates['prop_' + schema.type]({
+  templates['prop_' + schema.type](Object.assign({
     name: name,
     required,
     schema: schema,
-    ...extras,
-}) %><%
+  }, extras))
+%><%
 }
 %>

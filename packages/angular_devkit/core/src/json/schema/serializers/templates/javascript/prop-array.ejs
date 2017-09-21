@@ -9,29 +9,28 @@
 
   const required = (schema.required || []);
   const extras = {
-    exceptions,
-    options,
-    path,
-    strings,
-    symbols,
-    templates,
+    exceptions: exceptions,
+    options: options,
+    path: path,
+    strings: strings,
+    symbols: symbols,
+    templates: templates,
   };
 %>
 
-const itemHandler = () => (<%=
-  templates.subschema({
+const itemHandler = function() { return (<%=
+  templates.subschema(Object.assign({
     name: '???',
     required: false,
     schema: schema.additionalProperties,
-    ...extras,
-  })
-%>);
+  }, extras))
+%>); };
 
 
 const items = [];
 const arrayFunctions = {
   get length() { return items.length; },
-  push(...x) { items.push(...x); },
+  push() { items.push.apply(items, arguments); },
   pop() { return items.pop(); },
   shift() { return items.shift(); },
   unshift() { return items.unshift(); },
@@ -48,9 +47,6 @@ const proxy = new Proxy({}, {
   get(target, prop) {
     if (prop === symbols.Schema) {
       return arrayHandler.schema;
-    }
-    if (prop === symbols.Serialize) {
-      return () => arrayHandler.serialize();
     }
 
     if (prop >= 0 && prop in value) {

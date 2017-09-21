@@ -8,13 +8,13 @@ const extras = {
 };
 %>
 
-const holder = <%= templates.subschema({
+const holder = <%= templates.subschema(Object.assign({
   name: name,
   path: '',
   required: false,
   schema: schema,
-  ...extras,
-}) %>;
+}, extras))
+%>;
 
 holder.set(value);
 return holder.get();

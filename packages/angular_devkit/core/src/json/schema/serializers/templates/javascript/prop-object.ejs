@@ -2,24 +2,23 @@
 <%
   const required = (schema.required || []);
   const extras = {
-    exceptions,
-    options,
-    path,
-    strings,
-    symbols,
-    templates,
+    exceptions: exceptions,
+    options: options,
+    path: path,
+    strings: strings,
+    symbols: symbols,
+    templates: templates,
   };
 %>
 
 const additionalProperties = {};
 const additionalPropertyHandler = <%
-if (!('additionalProperties' in schema)) { %>null<% } else { %> () => (<%=
-  templates.subschema({
+if (!('additionalProperties' in schema)) { %>null<% } else { %> function() { return (<%=
+  templates.subschema(Object.assign({
     name: '???',
     required: false,
     schema: schema.additionalProperties,
-    ...extras,
-  }) %>)<%
+  }, extras)) %>); }<%
 }
 %>;
 
@@ -29,12 +28,12 @@ const handlers = Object.create(null);
     const _key = JSON.stringify(propName);
     const _name = propName.match(/^[_a-zA-Z][_a-zA-Z0-9]*$/) ? propName : `[${_key}]`;
 %>handlers[<%= JSON.stringify(_name) %>] = <%=
-  templates.subschema({
+  templates.subschema(Object.assign({
     name: _name,
     required: required.indexOf(propName) != -1,
     schema: schema.properties[propName],
-    ...extras,
-}) %><%
+  }, extras))
+%><%
 }
 %>
 
@@ -51,9 +50,6 @@ const proxy = new Proxy({}, {
   get(target, prop) {
     if (prop === symbols.Schema) {
       return objectHandler.schema;
-    }
-    if (prop === symbols.Serialize) {
-      return () => objectHandler.serialize();
     }
     if (prop in handlers) {
       return handlers[prop].get();
@@ -98,8 +94,8 @@ const proxy = new Proxy({}, {
   },
   ownKeys(target) {
     return [].concat(
-      Object.keys(handlers).filter(key => handlers[key].isDefined()),
-      additionalPropertyHandler ? Object.keys(additionalProperties) : [],
+      Object.keys(handlers).filter(function(key) { return handlers[key].isDefined(); }),
+      additionalPropertyHandler ? Object.keys(additionalProperties) : []
     );
   },
 });
@@ -131,8 +127,10 @@ const objectHandler = {
   },
   isDefined() {
     return defined
-      && (Object.keys(handlers).some(x => handlers[x].isDefined())
-          || Object.keys(additionalProperties).some(x => additionalProperties[x].isDefined()));
+      && (Object.keys(handlers).some(function(x) { return handlers[x].isDefined(); })
+          || Object.keys(additionalProperties).some(function(x) {
+            return additionalProperties[x].isDefined();
+          }));
   },
   remove() { this.set(undefined); },
   schema: <%= JSON.stringify(schema) %>,
