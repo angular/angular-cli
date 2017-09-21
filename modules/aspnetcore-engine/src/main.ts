@@ -18,7 +18,7 @@ export function ngAspnetCoreEngine(
   const compiler: Compiler = compilerFactory.createCompiler([
     {
       providers: [
-        { provide: ResourceLoader, useClass: FileLoader }
+        { provide: ResourceLoader, useClass: FileLoader, deps: [] }
       ]
     }
   ]);
@@ -72,7 +72,7 @@ export function ngAspnetCoreEngine(
                 const bootstrap = (<{ ngOnBootstrap?: Function }> moduleRef.instance).ngOnBootstrap;
                 bootstrap && bootstrap();
 
-                // The parse5 Document itself
+                // The Document itself
                 const AST_DOCUMENT = state.getDocument();
 
                 // Strip out the Angular application

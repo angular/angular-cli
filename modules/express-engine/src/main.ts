@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Request, Response } from 'express';
 
-import { Provider, NgModuleFactory, Type, CompilerFactory, Compiler } from '@angular/core';
+import { NgModuleFactory, Type, CompilerFactory, Compiler, StaticProvider } from '@angular/core';
 import { ResourceLoader } from '@angular/compiler';
 import { INITIAL_CONFIG, renderModuleFactory, platformDynamicServer } from '@angular/platform-server';
 
@@ -13,7 +13,7 @@ import { REQUEST, RESPONSE } from './tokens';
  */
 export interface NgSetupOptions {
   bootstrap: Type<{}> | NgModuleFactory<{}>;
-  providers?: Provider[];
+  providers?: StaticProvider[];
 }
 
 /**
@@ -43,7 +43,7 @@ export function ngExpressEngine(setupOptions: NgSetupOptions) {
   const compiler: Compiler = compilerFactory.createCompiler([
     {
       providers: [
-        { provide: ResourceLoader, useClass: FileLoader }
+        { provide: ResourceLoader, useClass: FileLoader, deps: [] }
       ]
     }
   ]);
@@ -126,8 +126,8 @@ function getFactory(
 /**
  * Get providers of the request and response
  */
-function getReqResProviders(req: Request, res?: Response): Provider[] {
-  const providers: Provider[] = [
+function getReqResProviders(req: Request, res?: Response): StaticProvider[] {
+  const providers: StaticProvider[] = [
     {
       provide: REQUEST,
       useValue: req
