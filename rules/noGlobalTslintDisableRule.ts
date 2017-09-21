@@ -46,6 +46,10 @@ class Walker extends Lint.RuleWalker {
     if (sourceFile.fileName.match(/_spec.ts$/)) {
       return;
     }
+    // Ignore benchmark files.
+    if (sourceFile.fileName.match(/_benchmark.ts$/)) {
+      return;
+    }
 
     // Find all comment nodes.
     const ranges = this._findComments(sourceFile);
