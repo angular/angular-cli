@@ -50,6 +50,32 @@ describe('dynamic path parser', () => {
     expect(result.name).toBe(entityName);
   });
 
+  it('respects the appRoot configuration', () => {
+    process.env.PWD = project.root;
+    const options = {
+      project,
+      entityName,
+      appConfig: {...appConfig, appRoot: 'other'},
+      dryRun: false
+    };
+    const result = dynamicPathParser(options);
+    expect(result.dir).toBe(`src${path.sep}other`);
+    expect(result.name).toBe(entityName);
+  });
+
+  it('respects the empty appRoot configuration', () => {
+    process.env.PWD = project.root;
+    const options = {
+      project,
+      entityName,
+      appConfig: <any>{...appConfig, appRoot: ''},
+      dryRun: false
+    };
+    const result = dynamicPathParser(options);
+    expect(result.dir).toBe(`src`);
+    expect(result.name).toBe(entityName);
+  });
+
   it('parse from proj src dir', () => {
     process.env.PWD = path.join(project.root, 'src');
     const options = {
