@@ -42,7 +42,7 @@ export class RequiredValueMissingException extends BaseException {
 }
 
 
-const exceptions = {
+export const exceptions = {
   InvalidRangeException,
   InvalidSchemaException,
   InvalidValueException,

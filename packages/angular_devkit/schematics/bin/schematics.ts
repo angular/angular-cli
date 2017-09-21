@@ -248,7 +248,12 @@ schematic.call(args, host)
   })
   .subscribe({
     error(err: Error) {
-      logger.fatal(err.toString());
+      // Add extra processing to output better error messages.
+      if (err instanceof schema.javascript.RequiredValueMissingException) {
+        logger.fatal('Missing argument on the command line: ' + err.path.split('/').pop());
+      } else {
+        logger.fatal(err.message);
+      }
       process.exit(1);
     },
   });
