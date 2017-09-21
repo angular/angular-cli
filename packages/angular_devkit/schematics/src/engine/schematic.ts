@@ -48,9 +48,10 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
       schematic: this,
       strategy: this._engine.defaultMergeStrategy,
     };
-    const transformedOptions = this._engine.transformOptions(this, options);
 
     return host.concatMap(tree => {
+      const transformedOptions = this._engine.transformOptions(this, options);
+
       const result = this._factory(transformedOptions)(tree, context);
       if (result instanceof Observable) {
         return result;
