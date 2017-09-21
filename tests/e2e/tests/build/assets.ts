@@ -26,6 +26,14 @@ export default function () {
       './src/output-asset.txt': 'output-asset.txt',
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
     }))
+    // Add invalid asset config in .angular-cli.json.
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+      const app = configJson['apps'][0];
+      app['assets'] = [
+        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../package-folder' }
+      ];
+    }))
+    .then(() => expectToFail(() => ng('build')))
     // Add asset config in .angular-cli.json.
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
