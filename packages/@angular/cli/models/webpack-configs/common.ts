@@ -12,6 +12,7 @@ import { readTsconfig } from '../../utilities/read-tsconfig';
 const ConcatPlugin = require('webpack-concat-plugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const SilentError = require('silent-error');
 
 
 /**
@@ -95,6 +96,13 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       asset.input = path.resolve(appRoot, asset.input || '');
       asset.output = asset.output || '';
       asset.glob = asset.glob || '';
+
+      // Prevent asset configurations from writing outside of the output path
+      const fullOutputPath = path.resolve(buildOptions.outputPath, asset.output);
+      if (!fullOutputPath.startsWith(path.resolve(buildOptions.outputPath))) {
+        const message = 'An asset cannot be written to a location outside of the output path.';
+        throw new SilentError(message);
+      }
 
       // Ensure trailing slash.
       if (isDirectory(path.resolve(asset.input))) {
