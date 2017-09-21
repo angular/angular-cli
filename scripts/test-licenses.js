@@ -79,6 +79,8 @@ const ignoredPackages = [
   'spdx-license-ids@2.0.1',  // CC0 but it's content only (index.json, no code) and not distributed.
   'map-stream@0.1.0', // MIT, license but it's not listed in package.json.
   'xmldom@0.1.27', // LGPL,MIT but has a broken licenses array.
+  'isnumeric@0.2.0', // MIT license, but it's not listed in package.json.
+  'pixrem@4.0.1', // MIT in GitHub, but package.json wrongly says 'BSD-new'
 
   'jsonify@0.0.0', // TODO(hansl): fix this. this is not an acceptable license, but is 8 deps down
                    // so hard to manage. In talk with owner and users to switch over.
