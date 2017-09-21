@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { createLogger } from '@angular-devkit/core';
+import { createLogger, schema } from '@angular-devkit/core';
 import {
   DryRunEvent,
   DryRunSink,
@@ -20,7 +20,6 @@ import {
   FileSystemSchematicDesc,
   NodeModulesEngineHost,
 } from '@angular-devkit/schematics/tools';
-import { SchemaClassFactory } from '@ngtools/json-schema';
 import * as minimist from 'minimist';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/ignoreElements';
@@ -110,13 +109,18 @@ const {
 const engineHost = new NodeModulesEngineHost();
 const engine = new SchematicEngine(engineHost);
 
+const schemaRegistry = new schema.JsonSchemaRegistry();
+
 // Add support for schemaJson.
 engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options: {}) => {
   if (schematic.schema && schematic.schemaJson) {
-    const SchemaMetaClass = SchemaClassFactory<{}>(schematic.schemaJson);
-    const schemaClass = new SchemaMetaClass(options);
+    const schemaJson = schematic.schemaJson as schema.JsonSchemaObject;
+    const ref = schemaJson.$id || ('/' + schematic.collection.name + '/' + schematic.name);
+    schemaRegistry.addSchema(ref, schemaJson);
+    const serializer = new schema.serializers.JavascriptSerializer();
+    const fn = serializer.serialize(ref, schemaRegistry);
 
-    return schemaClass.$$root();
+    return fn(options);
   }
 
   return options;
@@ -192,6 +196,16 @@ dryRunSink.reporter.subscribe((event: DryRunEvent) => {
 
 
 /**
+ * Remove every options from argv that we support in schematics.
+ */
+const args = argv;
+delete args._;
+for (const a of [ 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ]) {
+  delete args[a];
+}
+
+
+/**
  * The main path. Call the schematic with the host. This creates a new Context for the schematic
  * to run in, then call the schematic rule using the input Tree. This returns a new Tree as if
  * the schematic was applied to it.
@@ -203,7 +217,7 @@ dryRunSink.reporter.subscribe((event: DryRunEvent) => {
  * Then we proceed to run the dryRun commit. We run this before we then commit to the filesystem
  * (if --dry-run was not passed or an error was detected by dryRun).
  */
-schematic.call(argv, host)
+schematic.call(args, host)
   .map((tree: Tree) => Tree.optimize(tree))
   .concatMap((tree: Tree) => {
     return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));
