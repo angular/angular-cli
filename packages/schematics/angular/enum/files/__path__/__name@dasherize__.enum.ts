@@ -1,2 +1,2 @@
-export class <%= classify(name) %> {
+export enum <%= classify(name) %> {
 }
