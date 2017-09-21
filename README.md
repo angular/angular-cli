@@ -1,7 +1,3 @@
-# Current Status: Universal platform API has been merged into Angular 4.0!
-## https://github.com/angular/angular/tree/master/packages/platform-server
-(The code for the 2.x version of angular2-universal has been archived at https://github.com/angular/universal/tree/2.x)
-
 [![Build Status](https://travis-ci.org/angular/universal.svg?branch=master)](https://travis-ci.org/angular/universal)
 [![Join the chat at https://gitter.im/angular/universal](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/angular/universal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -10,6 +6,7 @@
 
 # Table of Contents
 * [Introduction](#introduction)
+* [Packages and Versioning](#packages)
 * [Upgrading from Angular2-Universal](#upgrading-from-angular2-universal)
 * [Roadmap](#roadmap)
 * [Getting Started with Universal](#getting-started)
@@ -28,6 +25,17 @@ The Angular Universal project consists of the base platform API and the surround
 
 This repository will host the various tools like engines to integrate with various backends(NodeJS, ASP.NET etc.) and also extra modules and examples to help you started with server side rendering.
 
+# Packages
+The packages from this repo are published as scoped packages under [@nguniversal](https://www.npmjs.com/search?q=%40nguniversal)
+
+- [@nguniversal/express-engine](https://github.com/angular/universal/blob/master/modules/express-engine/README.md)
+- [@nguniversal/aspnetcore-engine](https://github.com/angular/universal/blob/master/modules/aspnetcore-engine/README.md)
+- [@nguniversal/hapi-engine](https://github.com/angular/universal/blob/master/modules/hapi-engine/README.md)
+- [@nguniversal/module-map-ngfactory-loader](https://github.com/angular/universal/tree/master/modules/module-map-ngfactory-loader) (for handling lazy loaded modules on the server).
+
+
+The 1.x packages work with Angular 4.x while the 2.x packages will work with Angular 5.x.
+
 # Upgrading from Angular2-Universal
 > If you're coming from the original `angular2-universal` (2.x) here are some helpful steps for porting your application to Angular 4 & platform-server.
 
@@ -37,27 +45,27 @@ This repository will host the various tools like engines to integrate with vario
 
 # Roadmap
 
-## Angular 4.0
-- Integrate the platform API into core (Done)
-- Support Title and Meta services on the server (Done)
-- Write documentation for core API (In Progress)
-- Develop Express, ASP.NET Core, Hapi engines (In Progress)
-
-## Angular 4.1+
+## Completed
+- Integrate the platform API into core
+- Support Title and Meta services on the server
+- Develop Express, ASP.NET Core, Hapi engines
+- Angular CLI support for Universal
+- Provide a DOM implementation on the server
 - Hooks in `renderModule*` to do stuff just before rendering to string
+
+## In Progress
+- Write documentation for core API
 - Generic state transfer API in the platform
 - Http Transfer State Module that uses HTTP interceptors and state transfer API
+- Material 2 works on Universal
 - Better internal performance and stress tests
 - Make it easier to write unit tests for Universal components
 - Support [AppShell](https://developers.google.com/web/updates/2015/11/app-shell) use cases
-- Unified Document Service that combines Meta and Title services and adds more features
-- Angular CLI support for Universal
-- Material 2 works on Universal
-- Provide a solution for Java backends
-
-## Angular 5.0 and Beyond
-- Full client rehydration strategy that reuses DOM elements/CSS rendered on the server
 - Make it easier to support other 3rd part libraries like jQuery/d3 that aren't Universal aware
+
+## Planning
+- Full client rehydration strategy that reuses DOM elements/CSS rendered on the server
+- Provide a solution for Java backends
 - Node.js bridge protocol to communicate with different language backends - Django, Go, PHP etc.
 
 # Getting Started
