@@ -33,6 +33,11 @@
             "type": "string",
             "description": "Name of the app."
           },
+          "appRoot": {
+            "type": "string",
+            "description": "Directory where app files are placed.",
+            "default": "app"
+          },
           "root": {
             "type": "string",
             "description": "The root directory of the app."

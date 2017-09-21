@@ -345,5 +345,22 @@ describe('Acceptance: ng generate component', () => {
         })
         .then(done, done.fail);
     });
+
+    describe('should generate components in apps with empty appRoot', () => {
+      it('should work', (done) => {
+        const appRoot = path.join(root, 'tmp/foo');
+        mkdirsSync(path.join(appRoot, 'other', 'src'));
+
+        return ng(['generate', 'module', 'm', '--app', 'other']).then(() => {
+          const expectedModule = path.join(appRoot, 'other', 'src', 'm', 'm.module.ts');
+          expect(pathExistsSync(expectedModule)).toBe(true);
+
+          return ng(['generate', 'component', 'm/c', '--app', 'other', '--module', 'm']).then(() => {
+            expect(pathExistsSync(path.join(appRoot, 'other', 'src', 'm', 'c', 'c.component.ts'))).toBe(true);
+            expect(readFileSync(expectedModule, 'utf-8')).toContain(`import { CComponent } from './c/c.component'`);
+          });
+        }).then(done, done.fail);
+      });
+    });
   });
 });

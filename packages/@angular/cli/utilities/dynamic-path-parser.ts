@@ -13,7 +13,9 @@ export interface DynamicPathOptions {
 export function dynamicPathParser(options: DynamicPathOptions) {
   const projectRoot = options.project.root;
   const sourceDir = options.appConfig.root;
-  const appRoot = path.join(sourceDir, 'app');
+
+  const p = options.appConfig.appRoot === undefined ? 'app' : options.appConfig.appRoot;
+  const appRoot = path.join(sourceDir, p);
   const cwd = process.env.PWD;
 
   const rootPath = path.join(projectRoot, appRoot);
