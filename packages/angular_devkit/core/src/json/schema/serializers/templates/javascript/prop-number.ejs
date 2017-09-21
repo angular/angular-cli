@@ -1,0 +1,47 @@
+{
+<%
+  if ('default' in schema && typeof schema.default != 'number'
+      || 'minimum' in schema && typeof schema.minimum != 'number'
+      || 'maximum' in schema && typeof schema.maximum != 'number'
+      || 'multipleOf' in schema && typeof schema.multipleOf != 'number'
+      || (!('minimum' in schema) && 'exclusiveMinimum' in schema)
+      || (!('maximum' in schema) && 'exclusiveMaximum' in schema)) {
+    throw new exceptions.InvalidSchemaException(schema);
+  }
+%>
+  value: undefined,
+  get() { return this.value === undefined ? <%= schema.default || 'undefined' %> : this.value; },
+  set(v) {
+    if (v === undefined && <%= !required %>) {
+      this.value = undefined;
+      return;
+    }
+    if (typeof v != 'number') {
+      throw new exceptions.InvalidValueException(<%= JSON.stringify(name) %>, typeof v, 'number');
+    }<%
+if (schema.type == 'integer') { %>
+    if (v % 1 != 0) {
+      throw new exceptions.InvalidValueException(<%= JSON.stringify(name) %>, v, 'integer');
+    }<%
+}
+if ('minimum' in schema) { %>
+    if (v <%= schema.exclusiveMinimum ? '<=' : '<' %> <%= schema.minimum %>) {
+      throw new exceptions.InvalidRangeException(<%= JSON.stringify(name) %>, v, '>=', <%= schema.minimum %>);
+    }<%
+}
+if ('maximum' in schema) { %>
+  if (v <%= schema.exclusiveMaximum ? '>=' : '>' %> <%= schema.maximum %>) {
+    throw new exceptions.InvalidRangeException(<%= JSON.stringify(name) %>, v, '>=', <%= schema.maximum %>);
+  }<%
+}
+if ('multipleOf' in schema) { %>
+  if (v % <%= schema.multipleOf %> != 0) {
+    throw new exceptions.InvalidRangeException(<%= JSON.stringify(name) %>, v, 'multiple of', <%= schema.maximum %>);
+  }<%
+} %>
+    this.value = v;
+  },
+  isDefined() { return this.value !== undefined; },
+  remove() { this.set(undefined); },
+  schema() { return <%= JSON.stringify(schema) %>; },
+}

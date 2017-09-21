@@ -1,0 +1,143 @@
+(function() {
+<%
+  const required = (schema.required || []);
+  const extras = {
+    exceptions,
+    options,
+    path,
+    strings,
+    symbols,
+    templates,
+  };
+%>
+
+const additionalProperties = {};
+const additionalPropertyHandler = <%
+if (!('additionalProperties' in schema)) { %>null<% } else { %> () => (<%=
+  templates.subschema({
+    name: '???',
+    required: false,
+    schema: schema.additionalProperties,
+    ...extras,
+  }) %>)<%
+}
+%>;
+
+const handlers = Object.create(null);
+<%
+  for (const propName of Object.keys(schema.properties)) {
+    const _key = JSON.stringify(propName);
+    const _name = propName.match(/^[_a-zA-Z][_a-zA-Z0-9]*$/) ? propName : `[${_key}]`;
+%>handlers[<%= JSON.stringify(_name) %>] = <%=
+  templates.subschema({
+    name: _name,
+    required: required.indexOf(propName) != -1,
+    schema: schema.properties[propName],
+    ...extras,
+}) %><%
+}
+%>
+
+
+let defined = false;
+const proxy = new Proxy({}, {
+  isExtensible() { return false; },
+  has(target, prop) {
+    return (prop in handlers && handlers[prop].isDefined())
+        || (additionalPropertyHandler
+            ? (prop in additionalProperties && additionalProperties[prop].isDefined())
+            : false);
+  },
+  get(target, prop) {
+    if (prop === symbols.Schema) {
+      return objectHandler.schema;
+    }
+    if (prop === symbols.Serialize) {
+      return () => objectHandler.serialize();
+    }
+    if (prop in handlers) {
+      return handlers[prop].get();
+    }
+    return undefined;
+  },
+  set(target, prop, v) {
+    defined = true;
+    if (prop in handlers) {
+      handlers[prop].set(v);
+      return true;
+    } else if (additionalPropertyHandler) {
+      if (!(prop in additionalProperties)) {
+        additionalProperties[prop] = additionalPropertyHandler(prop);
+      }
+      additionalProperties[prop].set(v);
+      return true;
+    } else {
+      <% if (options.ignoreExtraProperties !== true) {
+      %>throw new exceptions.InvalidPropertyNameException(<%= JSON.stringify(path) %> + '/' + prop);<%
+      } else {
+        // Just ignore the property.
+      %>return true;<%
+      } %>
+    }
+  },
+  deleteProperty(target, prop) {
+    if (prop in handlers) {
+      handlers[prop].remove();
+      return true;
+    } else if (additionalPropertyHandler && prop in additionalProperties) {
+      delete additionalProperties[prop];
+    }
+  },
+  defineProperty(target, prop, descriptor) {
+    return false;
+  },
+  getOwnPropertyDescriptor(target, prop) {
+    if (prop in handlers) {
+      return { configurable: true, enumerable: true };
+    }
+  },
+  ownKeys(target) {
+    return [].concat(
+      Object.keys(handlers).filter(key => handlers[key].isDefined()),
+      additionalPropertyHandler ? Object.keys(additionalProperties) : [],
+    );
+  },
+});
+
+const objectHandler = {
+  set(v) {
+    if (v === undefined) {
+      defined = false;
+      return;
+    }
+
+    defined = true;
+    for (const key of Object.keys(v)) {
+      proxy[key] = v[key];
+    }
+
+    // Validate required fields.
+    <% for (const key of required) { %>
+    if (!(<%= JSON.stringify(key) %> in v)) {
+      throw new exceptions.RequiredValueMissingException(<%= JSON.stringify(path) %> + '/' + <%= JSON.stringify(key) %>);
+    }<% } %>
+  },
+  get() {
+    if (<%= options.allowAccessUndefinedObjects === true %> || this.isDefined()) {
+      return proxy;
+    } else {
+      return <%= 'default' in schema ? JSON.stringify(schema.default) : 'undefined' %>;
+    }
+  },
+  isDefined() {
+    return defined
+      && (Object.keys(handlers).some(x => handlers[x].isDefined())
+          || Object.keys(additionalProperties).some(x => additionalProperties[x].isDefined()));
+  },
+  remove() { this.set(undefined); },
+  schema: <%= JSON.stringify(schema) %>,
+};
+
+return objectHandler;
+
+})()

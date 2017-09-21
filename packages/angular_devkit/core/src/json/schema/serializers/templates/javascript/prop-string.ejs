@@ -1,0 +1,39 @@
+{
+<%
+if ('default' in schema && typeof schema.default != 'string'
+    || 'minLength' in schema && (typeof schema.minLength != 'number' || schema.minLength < 0)
+    || 'maxLength' in schema && (typeof schema.maxLength != 'number' || schema.maxLength < 0)
+    || 'pattern' in schema && typeof schema.pattern != 'string'
+    || 'format' in schema && typeof schema.format != 'string') {
+  throw new exceptions.InvalidSchemaException(schema);
+}
+
+const pattern = ('pattern' in schema) ? new RegExp(schema.pattern) : null;
+%>
+  value: undefined,
+  get() { return this.value === undefined ? <%= JSON.stringify(schema.default) || 'undefined' %> : this.value; },
+  set(v) {
+    if (v === undefined && <%= !required %>) {
+      this.value = undefined;
+      return;
+    }
+    if (typeof v != 'string') {
+      throw new exceptions.InvalidValueException(<%= JSON.stringify(name) %>, typeof v, 'string');
+    }<%
+if ('minLength' in schema) { %>
+    if (v.length <= <%= schema.minLength %>) {
+      throw new exceptions.InvalidRangeException(<%= JSON.stringify(name) %>, v, 'longer', <%= schema.minLength %>);
+    }<%
+}
+if ('maxLength' in schema) { %>
+    if (v.length >= <%= schema.maxLength %>) {
+      throw new exceptions.InvalidRangeException(<%= JSON.stringify(name) %>, v, 'smaller', <%= schema.maxLength %>);
+    }<%
+}
+%>
+    this.value = v;
+  },
+  isDefined() { return this.value !== undefined; },
+  remove() { this.set(undefined); },
+  schema() { return <%= JSON.stringify(schema) %>; },
+}

@@ -1,0 +1,40 @@
+<%
+const extras = {
+  exceptions,
+  options,
+  path: (path ? path + '/' : '') + name,
+  strings,
+  symbols,
+  templates,
+};
+
+if (!schema) {
+  %>null<%
+} else if (schema === true) {
+%><%=
+  templates.prop_any({
+    name,
+    required,
+    schema: {},
+    ...extras,
+  })
+%><%
+} else if (!('type' in schema)) {
+%><%=
+  templates.prop_any({
+    name,
+    required,
+    schema: {},
+    ...extras,
+})
+%><%
+} else {
+%><%=
+  templates['prop_' + schema.type]({
+    name: name,
+    required,
+    schema: schema,
+    ...extras,
+}) %><%
+}
+%>

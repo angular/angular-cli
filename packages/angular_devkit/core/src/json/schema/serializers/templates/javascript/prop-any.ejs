@@ -1,0 +1,14 @@
+{
+  value: undefined,
+  get() { return this.value === undefined ? <%= 'default' in schema ? JSON.stringify(schema.default) : 'undefined' %> : this.value; },
+  set(v) {
+    if (v === undefined && <%= !required %>) {
+      this.value = undefined;
+      return;
+    }
+    this.value = v;
+  },
+  isDefined() { return this.value !== undefined; },
+  remove() { this.set(undefined); },
+  schema() { return <%= JSON.stringify(schema) %>; },
+}

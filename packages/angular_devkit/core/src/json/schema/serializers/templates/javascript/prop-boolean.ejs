@@ -1,0 +1,22 @@
+{
+<%
+  if ('default' in schema && typeof schema.default != 'boolean') {
+    throw new exceptions.InvalidSchemaException(schema);
+  }
+%>
+  value: undefined,
+  get() { return this.value === undefined ? <%= schema.default || 'undefined' %> : this.value; },
+  set(v) {
+    if (v === undefined && <%= !required %>) {
+      this.value = undefined;
+      return;
+    }
+    if (typeof v != 'boolean') {
+      throw new exceptions.InvalidValueException(<%= JSON.stringify(name) %>, typeof v, 'boolean');
+    }
+    this.value = v;
+  },
+  isDefined() { return this.value !== undefined; },
+  remove() { this.set(undefined); },
+  schema() { return <%= JSON.stringify(schema) %>; },
+}

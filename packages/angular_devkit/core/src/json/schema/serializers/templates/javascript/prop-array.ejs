@@ -1,0 +1,126 @@
+(function() {
+<%
+  if ('default' in schema && !Array.isArray(schema.default)
+    || 'minItems' in schema && (typeof schema.minItems != 'number' || schema.minItems < 0)
+    || 'maxItems' in schema && (typeof schema.maxItems != 'number' || schema.maxItems < 0)
+    || 'uniqueItems' in schema && typeof schema.uniqueItems != 'boolean') {
+    throw new exceptions.InvalidSchemaException(schema);
+  }
+
+  const required = (schema.required || []);
+  const extras = {
+    exceptions,
+    options,
+    path,
+    strings,
+    symbols,
+    templates,
+  };
+%>
+
+const itemHandler = () => (<%=
+  templates.subschema({
+    name: '???',
+    required: false,
+    schema: schema.additionalProperties,
+    ...extras,
+  })
+%>);
+
+
+const items = [];
+const arrayFunctions = {
+  get length() { return items.length; },
+  push(...x) { items.push(...x); },
+  pop() { return items.pop(); },
+  shift() { return items.shift(); },
+  unshift() { return items.unshift(); },
+  slice(start, end) { return items.slice(start, end); },
+};
+
+
+let defined = false;
+const proxy = new Proxy({}, {
+  isExtensible() { return false; },
+  has(target, prop) {
+    return (prop in items);
+  },
+  get(target, prop) {
+    if (prop === symbols.Schema) {
+      return arrayHandler.schema;
+    }
+    if (prop === symbols.Serialize) {
+      return () => arrayHandler.serialize();
+    }
+
+    if (prop >= 0 && prop in value) {
+      return value[prop].get();
+    }
+    if (prop in arrayFunctions) {
+      return arrayFunctions[prop];
+    }
+    return undefined;
+  },
+  set(target, prop, v) {
+    if (prop >= 0) {
+      if (!(prop in items)) {
+        items[prop] = itemHandler();
+      }
+      items[prop].set(v);
+      return true;
+    }
+    return false;
+  },
+  deleteProperty(target, prop) {
+    if (prop >= 0 && prop in value) {
+      value[prop].remove();
+      return true;
+    }
+    return false;
+  },
+  defineProperty(target, prop, descriptor) {
+    return false;
+  },
+  getOwnPropertyDescriptor(target, prop) {
+    if (prop >= 0 && prop in value) {
+      return { configurable: true, enumerable: true };
+    }
+  },
+  ownKeys(target) {
+    return Object.keys(items);
+  },
+});
+
+const arrayHandler = {
+  set(v) {
+    if (v === undefined) {
+      defined = false;
+      return;
+    }
+
+    defined = true;
+    for (const key of Object.keys(v)) {
+      proxy[key] = v[key];
+    }
+
+    // Validate required fields.
+    <% for (const key of required) { %>
+    if (!(<%= JSON.stringify(key) %> in v)) {
+      throw new exceptions.RequiredValueMissingException(<%= JSON.stringify(path) %> + '/' + <%= JSON.stringify(key) %>);
+    }<% } %>
+  },
+  get() {
+    if (defined) {
+      return proxy;
+    } else {
+      return <%= 'default' in schema ? JSON.stringify(schema.default) : 'undefined' %>;
+    }
+  },
+  isDefined() { return defined; },
+  remove() { this.set(undefined); },
+  schema: <%= JSON.stringify(schema) %>,
+};
+
+return arrayHandler;
+
+})()

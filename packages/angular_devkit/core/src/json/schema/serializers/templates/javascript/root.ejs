@@ -1,0 +1,20 @@
+<%
+const extras = {
+  exceptions,
+  options,
+  strings,
+  symbols,
+  templates,
+};
+%>
+
+const holder = <%= templates.subschema({
+  name: name,
+  path: '',
+  required: false,
+  schema: schema,
+  ...extras,
+}) %>;
+
+holder.set(value);
+return holder.get();
