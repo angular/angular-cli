@@ -251,6 +251,8 @@ schematic.call(args, host)
       // Add extra processing to output better error messages.
       if (err instanceof schema.javascript.RequiredValueMissingException) {
         logger.fatal('Missing argument on the command line: ' + err.path.split('/').pop());
+      } else if (err instanceof schema.javascript.InvalidPropertyNameException) {
+        logger.fatal('A non-supported argument was passed: ' + err.path.split('/').pop());
       } else {
         logger.fatal(err.message);
       }
