@@ -85,9 +85,12 @@ function parseSchematicName(str: string | null): { collection: string, schematic
 
 
 /** Parse the command line. */
+const booleanArgs = [ 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ];
 const argv = minimist(process.argv.slice(2), {
-  boolean: [ 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ],
+  boolean: booleanArgs,
+  '--': true,
 });
+
 /** Create the DevKit Logger used through the CLI. */
 const logger = createLogger(argv['verbose']);
 
@@ -196,13 +199,22 @@ dryRunSink.reporter.subscribe((event: DryRunEvent) => {
 
 
 /**
- * Remove every options from argv that we support in schematics.
+ * Remove every options from argv that we support in schematics itself.
  */
-const args = argv;
-delete args._;
-for (const a of [ 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ]) {
-  delete args[a];
+const args = Object.assign({}, argv);
+delete args['--'];
+for (const key of booleanArgs) {
+  delete args[key];
 }
+
+/**
+ * Add options from `--` to args.
+ */
+const argv2 = minimist(argv['--']);
+for (const key of Object.keys(argv2)) {
+  args[key] = argv2[key];
+}
+delete args._;
 
 
 /**
