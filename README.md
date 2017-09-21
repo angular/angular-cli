@@ -6,7 +6,7 @@
 
 # Table of Contents
 * [Introduction](#introduction)
-* [Packages and Versioning](#packages)
+* [Packages](#packages)
 * [Upgrading from Angular2-Universal](#upgrading-from-angular2-universal)
 * [Roadmap](#roadmap)
 * [Getting Started with Universal](#getting-started)
