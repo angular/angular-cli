@@ -54,11 +54,6 @@ const stringEscapes: {[char: string]: string} = {
 const reUnescapedString = /['\n\r\u2028\u2029\\]/g;
 
 
-function _escape(s: string) {
-  return s ? s.replace(reUnescapedHtml, key => kHtmlEscapes[key]) : '';
-}
-
-
 /**
  * An equivalent of lodash templates, which is based on John Resig's `tmpl` implementation
  * (http://ejohn.org/blog/javascript-micro-templating/) and Laura Doktorova's doT.js
@@ -71,11 +66,13 @@ function _escape(s: string) {
  * @param options
  * @return {any}
  */
-export function template<T>(content: string, options: TemplateOptions): (input: T) => string {
+export function template<T>(content: string, options?: TemplateOptions): (input: T) => string {
   const interpolate = kInterpolateRe;
   let isEvaluating;
   let index = 0;
   let source = `__p += '`;
+
+  options = options || {};
 
   // Compile the regexp to match each delimiter.
   const reDelimiters = RegExp(
@@ -117,7 +114,13 @@ export function template<T>(content: string, options: TemplateOptions): (input: 
     obj || (obj = {});
     let __t;
     let __p = '';
-    const __e = _.escape;
+
+    const __escapes = ${JSON.stringify(kHtmlEscapes)};
+    const __escapesre = new RegExp('${reUnescapedHtml.source.replace(/'/g, '\\\'')}', 'g');
+
+    const __e = function(s) {
+      return s ? s.replace(__escapesre, key => __escapes[key]) : '';
+    };
     with (obj) {
       ${source.replace(/\n/g, '\n      ')}
     }
@@ -125,8 +128,8 @@ export function template<T>(content: string, options: TemplateOptions): (input: 
   };
   `;
 
-  const fn = Function('_', sourceURL + source);
-  const result = fn({ escape: _escape });
+  const fn = Function(sourceURL + source);
+  const result = fn();
 
   // Provide the compiled function's source by its `toString` method or
   // the `source` property as a convenience for inlining compiled templates.

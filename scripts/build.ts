@@ -230,6 +230,24 @@ export default function(argv: { local?: boolean }, logger: Logger) {
     files.forEach(fileName => _rm(fileName));
   }
 
+  logger.info('Building ejs templates...');
+  const templateLogger = new Logger('templates', logger);
+  const templateCompiler = require('@angular-devkit/core').template;
+  for (const packageName of sortedPackages) {
+    templateLogger.info(packageName);
+    const pkg = packages[packageName];
+    const files = glob.sync(path.join(pkg.dist, '**/*.ejs'));
+    templateLogger.info(`  ${files.length} ejs files found...`);
+    files.forEach(fileName => {
+      const fn = templateCompiler(fs.readFileSync(fileName).toString());
+      _rm(fileName);
+      fs.writeFileSync(
+        fileName.replace(/\.ejs$/, '.js'),
+        fn.source.replace(/^\s*return /, 'module.exports.default = '),
+      );
+    });
+  }
+
   logger.info('Setting versions...');
 
   const { versions } = require(path.join(__dirname, '../versions.json'));
