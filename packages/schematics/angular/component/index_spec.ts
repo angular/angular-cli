@@ -9,7 +9,7 @@ import { Tree, VirtualTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import * as path from 'path';
 import { createAppModule, getFileContent } from '../utility/test';
-import { Schema as ComponentSchema } from './schema';
+import { Schema as ComponentOptions } from './schema';
 
 
 describe('Component Schematic', () => {
@@ -17,7 +17,7 @@ describe('Component Schematic', () => {
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
-  const defaultOptions: ComponentSchema = {
+  const defaultOptions: ComponentOptions = {
     name: 'foo',
     path: 'app',
     sourceDir: 'src',

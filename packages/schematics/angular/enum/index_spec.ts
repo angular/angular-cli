@@ -7,7 +7,7 @@
  */
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import * as path from 'path';
-import { Schema as EnumSchematic } from './schema';
+import { Schema as EnumOptions } from './schema';
 
 
 describe('Enum Schematic', () => {
@@ -15,7 +15,7 @@ describe('Enum Schematic', () => {
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
-  const defaultOptions: EnumSchematic = {
+  const defaultOptions: EnumOptions = {
     name: 'foo',
     path: 'app',
     sourceDir: 'src',

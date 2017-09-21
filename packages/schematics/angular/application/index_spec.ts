@@ -9,7 +9,7 @@ import { Tree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import * as path from 'path';
 import { getFileContent } from '../utility/test';
-import { Schema as AppSchema } from './schema';
+import { Schema as ApplicationOptions } from './schema';
 
 
 describe('Application Schematic', () => {
@@ -17,7 +17,7 @@ describe('Application Schematic', () => {
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
-  const defaultOptions: AppSchema = {
+  const defaultOptions: ApplicationOptions = {
     directory: 'foo',
     name: 'foo',
     path: 'src',

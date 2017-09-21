@@ -8,7 +8,7 @@
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import * as path from 'path';
 import { getFileContent } from '../utility/test';
-import { Schema as InterfaceSchema } from './schema';
+import { Schema as InterfaceOptions } from './schema';
 
 
 describe('Interface Schematic', () => {
@@ -16,7 +16,7 @@ describe('Interface Schematic', () => {
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
-  const defaultOptions: InterfaceSchema = {
+  const defaultOptions: InterfaceOptions = {
     name: 'foo',
     path: 'app',
     prefix: '',

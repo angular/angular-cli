@@ -9,7 +9,7 @@ import { Tree, VirtualTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import * as path from 'path';
 import { createAppModule, getFileContent } from '../utility/test';
-import { Schema as ServiceSchema } from './schema';
+import { Schema as ServiceOptions } from './schema';
 
 
 describe('Pipe Schematic', () => {
@@ -17,7 +17,7 @@ describe('Pipe Schematic', () => {
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
-  const defaultOptions: ServiceSchema = {
+  const defaultOptions: ServiceOptions = {
     name: 'foo',
     path: 'app',
     sourceDir: 'src',

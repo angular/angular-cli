@@ -8,7 +8,7 @@
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import * as path from 'path';
 import { getFileContent } from '../utility/test';
-import { Schema as ClassSchema } from './schema';
+import { Schema as ClassOptions } from './schema';
 
 
 describe('Class Schematic', () => {
@@ -16,7 +16,7 @@ describe('Class Schematic', () => {
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
-  const defaultOptions: ClassSchema = {
+  const defaultOptions: ClassOptions = {
     name: 'foo',
     path: 'app',
     sourceDir: 'src',

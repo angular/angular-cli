@@ -9,7 +9,7 @@ import { Tree, VirtualTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import * as path from 'path';
 import { createAppModule, getFileContent } from '../utility/test';
-import { Schema as GuardSchema } from './schema';
+import { Schema as GuardOptions } from './schema';
 
 
 describe('Guard Schematic', () => {
@@ -17,7 +17,7 @@ describe('Guard Schematic', () => {
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
-  const defaultOptions: GuardSchema = {
+  const defaultOptions: GuardOptions = {
     name: 'foo',
     path: 'app',
     sourceDir: 'src',

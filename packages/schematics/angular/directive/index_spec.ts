@@ -9,7 +9,7 @@ import { Tree, VirtualTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
 import * as path from 'path';
 import { createAppModule, getFileContent } from '../utility/test';
-import { Schema as DirectiveSchema } from './schema';
+import { Schema as DirectiveOptions } from './schema';
 
 
 describe('Directive Schematic', () => {
@@ -17,7 +17,7 @@ describe('Directive Schematic', () => {
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
-  const defaultOptions: DirectiveSchema = {
+  const defaultOptions: DirectiveOptions = {
     name: 'foo',
     path: 'app',
     sourceDir: 'src',
