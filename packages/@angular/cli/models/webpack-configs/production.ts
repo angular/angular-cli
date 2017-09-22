@@ -14,7 +14,7 @@ import { readTsconfig } from '../../utilities/read-tsconfig';
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 
-export const getProdConfig = function (wco: WebpackConfigOptions) {
+export function getProdConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
   let extraPlugins: any[] = [];
@@ -159,4 +159,4 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       ...extraPlugins
     ]
   };
-};
+}
