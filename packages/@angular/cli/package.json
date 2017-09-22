@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "1.5.0-beta.0",
+  "version": "1.5.0-beta.1",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -30,7 +30,7 @@
     "@angular-devkit/build-optimizer": "~0.0.18",
     "@angular-devkit/schematics": "~0.0.21",
     "@ngtools/json-schema": "1.1.0",
-    "@ngtools/webpack": "1.8.0-beta.0",
+    "@ngtools/webpack": "1.8.0-beta.1",
     "@schematics/angular": "~0.0.30",
     "autoprefixer": "^6.5.3",
     "chalk": "^2.0.1",
