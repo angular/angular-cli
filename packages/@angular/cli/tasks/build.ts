@@ -26,6 +26,9 @@ export default Task.extend({
     if (config.project && config.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }
+    if (! app.main) {
+      throw new SilentError(`An app without 'main' cannot use the build command.`);
+    }
     if (runTaskOptions.deleteOutputPath) {
       fs.removeSync(path.resolve(this.project.root, outputPath));
     }
