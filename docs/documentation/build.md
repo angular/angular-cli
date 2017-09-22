@@ -360,7 +360,7 @@ Note: service worker support is experimental and subject to change.
 <details>
   <summary>named-chunks</summary>
   <p>
-    <code>--named-chunks</code> (aliases: <code>-nm</code>)
+    <code>--named-chunks</code> (aliases: <code>-nc</code>)
   </p>
   <p>
     Use file name for lazy loaded chunks.
