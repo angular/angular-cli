@@ -4,7 +4,7 @@ The Angular CLI supports generation of a Universal build for your application. T
 
 ---
 
-### Example CLI Integration:
+## Example CLI Integration:
 
 [Angular Universal-Starter](https://github.com/angular/universal-starter/tree/master/cli) - Clone the universal-starter, and check out the `/cli` folder for a working example.
 
@@ -12,28 +12,25 @@ The Angular CLI supports generation of a Universal build for your application. T
 
 # Integrating Angular Universal into existing CLI Applications
 
-This story will show you how to set up Universal bundling for an existing `@angular/cli` project in 4 steps.
-
-**Want to see the Angular CLI with Universal in Action?**
-
-[Check out the Angular Universal-Starter (/cli folder)](https://github.com/angular/universal-starter)
+This story will show you how to set up Universal bundling for an existing `@angular/cli` project in 5 steps.
 
 ---
 
-## Step 0: Install `@angular/platform-server`
+## Install Dependencies
 
 Install `@angular/platform-server` into your project. Make sure you use the same version as the other `@angular` packages in your project.
 
+> You'll also need @nguniversal/module-map-ngfactory-loader, as it's used to handle lazy-loading in the context of a server-render. (by loading the chunks right away)
+
 ```bash
-$ npm install --save @angular/platform-server
-```
-or
-```bash
-$ yarn add @angular/platform-server
+$ npm install --save @angular/platform-server @nguniversal/module-map-ngfactory-loader
 ```
 
+<<<<<<< HEAD
+=======
 
-## Step 1: Prepare your app for Universal rendering
+>>>>>>> de27c0e6... docs: update with changes requested
+## Step 1: Prepare your App for Universal rendering
 
 The first thing you need to do is make your `AppModule` compatible with Universal by addding `.withServerTransition()` and an application ID to your `BrowserModule` import:
 
@@ -91,7 +88,7 @@ Create a main file for your Universal bundle. This file only needs to export you
 ### src/main.server.ts:
 
 ```typescript
-export {AppServerModule} from './app/app.server.module';
+export { AppServerModule } from './app/app.server.module';
 ```
 
 Copy `tsconfig.app.json` to `tsconfig.server.json` and change it to build with a `"module"` target of `"commonjs"`.
@@ -239,6 +236,9 @@ Below we can see a TypeScript implementation of a -very- simple Express server t
 
 > Note: This is a very bare bones Express application, and is just for demonstrations sake. In a real production environment, you'd want to make sure you have other authentication and security things setup here as well. This is just meant just to show the specific things needed that are relevant to Universal itself. The rest is up to you!
 
+At the ROOT level of your project (where package.json / etc are), created a file named: **`server.ts`**
+
+### ./server.ts (root project level)
 
 ```typescript
 // These are important and needed before anything else
@@ -284,16 +284,14 @@ app.engine('html', (_, options, callback) => {
 });
 
 app.set('view engine', 'html');
-app.set('views', 'src');
-
-// app.get('/sitemap.txt', express.static(DIST_FOLDER));
+app.set('views', join(DIST_FOLDER, 'browser'));
 
 // Server static files from /browser
 app.get('*.*', express.static(join(DIST_FOLDER, 'browser')));
 
-// ALl regular routes use the Universal engine
+// All regular routes use the Universal engine
 app.get('*', (req, res) => {
-  res.render('index', { req });
+  res.render(join(DIST_FOLDER, 'browser', 'index.html'), { req });
 });
 
 // Start up the Node server
@@ -302,7 +300,97 @@ app.listen(PORT, () => {
 });
 ```
 
-## Gotchas & Caveats
+## Step 5: Setup a webpack config to handle this Node server.ts file and serve your application!
+
+Now that we have our Node Express server setup, we need to pack it and serve it!
+
+Create a file named `webpack.server.config.js` at the ROOT of your application.
+
+> This file basically takes that server.ts file, and takes it and compiles it and every dependency it has into `dist/server.js`.
+
+### ./webpack.server.config.js (root project level)
+
+```typescript
+const path = require('path');
+const webpack = require('webpack');
+
+module.exports = {
+  entry: {  server: './server.ts' },
+  resolve: { extensions: ['.ts', '.js'] },
+  target: 'node',
+  // this makes sure we include node_modules and other 3rd party libraries
+  externals: [/(node_modules|main\..*\.js)/],
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: '[name].js'
+  },
+  module: {
+    rules: [
+      { test: /\.ts$/, loader: 'ts-loader' }
+    ]
+  },
+  plugins: [
+    // Temporary Fix for issue: https://github.com/angular/angular/issues/11580
+    // for "WARNING Critical dependency: the request of a dependency is an expression"
+    new webpack.ContextReplacementPlugin(
+      /(.+)?angular(\\|\/)core(.+)?/,
+      path.join(__dirname, 'src'), // location of your src
+      {} // a map of your routes
+    ),
+    new webpack.ContextReplacementPlugin(
+      /(.+)?express(\\|\/)(.+)?/,
+      path.join(__dirname, 'src'),
+    )
+  ]
+}
+```
+
+**Almost there!**
+
+Now let's see what our resulting structure should look like, if we open up our `/dist/` folder we should see:
+
+```
+/dist/
+   /browser/
+   /server/
+```
+
+To fire up the application, in your terminal enter
+
+```bash
+node dist/server.js
+```
+
+:sparkles:
+
+Now lets create a few handy scripts to help us do all of this in the future.
+
+```json
+"scripts": {
+
+  // These will be your common scripts
+  "build:dynamic": "npm run build:client-and-server-bundles && npm run webpack:server",
+  "serve:dynamic": "node dist/server.js",
+
+  // Helpers for the above scripts
+  "build:client-and-server-bundles": "ng build --prod && ng build --prod --app 1 --output-hashing=false",
+  "webpack:server": "webpack --config webpack.server.config.js --progress --colors"
+}
+```
+
+In the future when you want to see a Production build of your app with Universal (locally), you can simply run:
+
+```bash
+npm run build:dynamic && npm run serve:dynamic
+```
+
+Enjoy!
+
+Once again to see a working version of everything, check out the [universal-starter](https://github.com/angular/universal-starter/tree/master/cli).
+
+---
+
+# Gotchas & Caveats
 
 [Full list of important Gotchas available here](https://github.com/angular/universal#universal-gotchas)
 
