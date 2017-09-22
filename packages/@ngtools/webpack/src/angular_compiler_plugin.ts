@@ -236,8 +236,8 @@ export class AngularCompilerPlugin implements Tapable {
     if (options.hasOwnProperty('i18nFormat')) {
       this._angularCompilerOptions.i18nInFormat = options.i18nFormat;
     }
-    if (options.hasOwnProperty('locale')) {
-      this._angularCompilerOptions.i18nInLocale = options.locale;
+    if (options.hasOwnProperty('locale') && options.locale) {
+      this._angularCompilerOptions.i18nInLocale = this._validateLocale(options.locale);
     }
     if (options.hasOwnProperty('missingTranslation')) {
       this._angularCompilerOptions.i18nInMissingTranslations =
@@ -657,7 +657,7 @@ export class AngularCompilerPlugin implements Tapable {
                 transformOps.push(...replaceBootstrap(sf, this.entryModule));
               }
 
-              // if we have a locale, auto import the locale data file
+              // If we have a locale, auto import the locale data file.
               if (this._angularCompilerOptions.i18nInLocale) {
                 transformOps.push(...registerLocaleData(
                   sf,
@@ -823,5 +823,42 @@ export class AngularCompilerPlugin implements Tapable {
     }
     timeEnd('AngularCompilerPlugin._emit');
     return { program, emitResult, diagnostics: allDiagnostics };
+  }
+
+  private _validateLocale(locale: string) {
+    // Get the path of the common module.
+    const commonPath = path.dirname(require.resolve('@angular/common/package.json'));
+    // Check if the locale file exists
+    if (!fs.existsSync(path.resolve(commonPath, 'locales', `${locale}.js`))) {
+      // Check for an alternative locale (if the locale id was badly formatted).
+      const locales = fs.readdirSync(path.resolve(commonPath, 'locales'))
+        .filter(file => file.endsWith('.js'))
+        .map(file => file.replace('.js', ''));
+
+      let newLocale;
+      const normalizedLocale = locale.toLowerCase().replace(/_/g, '-');
+      for (const l of locales) {
+        if (l.toLowerCase() === normalizedLocale) {
+          newLocale = l;
+          break;
+        }
+      }
+
+      if (newLocale) {
+        locale = newLocale;
+      } else {
+        // Check for a parent locale
+        const parentLocale = normalizedLocale.split('-')[0];
+        if (locales.indexOf(parentLocale) !== -1) {
+          locale = parentLocale;
+        } else {
+          throw new Error(
+            `Unable to load the locale data file "@angular/common/locales/${locale}", ` +
+            `please check that "${locale}" is a valid locale id.`);
+        }
+      }
+    }
+
+    return locale;
   }
 }
