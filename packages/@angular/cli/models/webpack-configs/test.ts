@@ -4,6 +4,7 @@ import * as webpack from 'webpack';
 
 import { CliConfig } from '../config';
 import { WebpackTestOptions } from '../webpack-test-config';
+import { WebpackConfigOptions } from '../webpack-config';
 
 
 /**
@@ -15,16 +16,14 @@ import { WebpackTestOptions } from '../webpack-test-config';
  */
 
 
-export function getTestConfig(testConfig: WebpackTestOptions) {
+export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
+  const { projectRoot, buildOptions, appConfig } = wco;
 
-  const configPath = CliConfig.configFilePath();
-  const projectRoot = path.dirname(configPath);
-  const appConfig = CliConfig.fromProject().config.apps[0];
   const nodeModules = path.resolve(projectRoot, 'node_modules');
   const extraRules: any[] = [];
   const extraPlugins: any[] = [];
 
-  if (testConfig.codeCoverage && CliConfig.fromProject()) {
+  if (buildOptions.codeCoverage && CliConfig.fromProject()) {
     const codeCoverageExclude = CliConfig.fromProject().get('test.codeCoverage.exclude');
     let exclude: (string | RegExp)[] = [
       /\.(e2e|spec)\.ts$/,
@@ -49,7 +48,7 @@ export function getTestConfig(testConfig: WebpackTestOptions) {
   }
 
   return {
-    devtool: testConfig.sourcemaps ? 'inline-source-map' : 'eval',
+    devtool: buildOptions.sourcemaps ? 'inline-source-map' : 'eval',
     entry: {
       main: path.resolve(projectRoot, appConfig.root, appConfig.test)
     },

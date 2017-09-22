@@ -14,16 +14,16 @@ import {
 import * as path from 'path';
 import { AngularCompilerPlugin } from '@ngtools/webpack';
 
-export interface WebpackConfigOptions {
+export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
   projectRoot: string;
-  buildOptions: BuildOptions;
+  buildOptions: T;
   appConfig: any;
 }
 
-export class NgCliWebpackConfig {
+export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
   public config: any;
-  public wco: WebpackConfigOptions;
-  constructor(buildOptions: BuildOptions, appConfig: any) {
+  public wco: WebpackConfigOptions<T>;
+  constructor(buildOptions: T, appConfig: any) {
 
     this.validateBuildOptions(buildOptions);
 
@@ -59,7 +59,7 @@ export class NgCliWebpackConfig {
     return this.config;
   }
 
-  public getTargetConfig(webpackConfigOptions: WebpackConfigOptions): any {
+  public getTargetConfig(webpackConfigOptions: WebpackConfigOptions<T>): any {
     switch (webpackConfigOptions.buildOptions.target) {
       case 'development':
         return getDevConfig(webpackConfigOptions);
@@ -86,8 +86,8 @@ export class NgCliWebpackConfig {
   }
 
   // Fill in defaults for build targets
-  public addTargetDefaults(buildOptions: BuildOptions): BuildOptions {
-    const targetDefaults: { [target: string]: BuildOptions } = {
+  public addTargetDefaults(buildOptions: T): T {
+    const targetDefaults: { [target: string]: Partial<BuildOptions> } = {
       development: {
         environment: 'dev',
         outputHashing: 'media',
@@ -110,8 +110,8 @@ export class NgCliWebpackConfig {
   }
 
   // Fill in defaults from .angular-cli.json
-  public mergeConfigs(buildOptions: BuildOptions, appConfig: any, projectRoot: string) {
-    const mergeableOptions = {
+  public mergeConfigs(buildOptions: T, appConfig: any, projectRoot: string): T {
+    const mergeableOptions: Partial<BuildOptions> = {
       outputPath: path.resolve(projectRoot, appConfig.outDir),
       deployUrl: appConfig.deployUrl,
       baseHref: appConfig.baseHref

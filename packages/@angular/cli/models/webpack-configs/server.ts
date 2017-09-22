@@ -4,7 +4,7 @@ import { WebpackConfigOptions } from '../webpack-config';
  * Returns a partial specific to creating a bundle for node
  * @param _wco Options which are include the build options and app config
  */
-export const getServerConfig = function (_wco: WebpackConfigOptions) {
+export function getServerConfig(_wco: WebpackConfigOptions) {
   return {
     target: 'node',
     output: {
@@ -35,4 +35,4 @@ export const getServerConfig = function (_wco: WebpackConfigOptions) {
       }
     ]
   };
-};
+}
