@@ -136,7 +136,7 @@ export abstract class FileSystemEngineHostBase implements
     }
 
     const collectionPath = dirname(collection.path);
-    let partialDesc: Partial<FileSystemSchematicDesc> | null = collection.schematics[name];
+    const partialDesc: Partial<FileSystemSchematicDesc> | null = collection.schematics[name];
     if (!partialDesc) {
       throw new UnknownSchematicException(name, collection);
     }
@@ -144,21 +144,17 @@ export abstract class FileSystemEngineHostBase implements
     if (partialDesc.extends) {
       const index = partialDesc.extends.indexOf(':');
       const collectionName = index !== -1 ? partialDesc.extends.substr(0, index) : null;
-      const schematicName = index !== -1 ?
+      const schematicName = index === -1 ?
         partialDesc.extends : partialDesc.extends.substr(index + 1);
 
       if (collectionName !== null) {
-        // const extendCollection = engine.createCollection(collectionName);
         const extendCollection = this.createCollectionDescription(collectionName);
-        partialDesc = this.createSchematicDescription(schematicName, extendCollection);
+
+        return this.createSchematicDescription(schematicName, extendCollection);
       } else {
-        partialDesc = this.createSchematicDescription(schematicName, collection);
+        return this.createSchematicDescription(schematicName, collection);
       }
     }
-    if (!partialDesc) {
-      throw new UnknownSchematicException(name, collection);
-    }
-
     // Use any on this ref as we don't have the OptionT here, but we don't need it (we only need
     // the path).
     if (!partialDesc.factory) {
