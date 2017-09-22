@@ -10,7 +10,7 @@ import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 
 
-export const getProdConfig = function (wco: WebpackConfigOptions) {
+export function getProdConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
   let extraPlugins: any[] = [];
@@ -127,4 +127,4 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       })
     ])
   };
-};
+}
