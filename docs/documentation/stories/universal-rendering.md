@@ -4,7 +4,7 @@ The Angular CLI supports generation of a Universal build for your application. T
 
 ---
 
-### Example CLI Integration:
+## Example CLI Integration:
 
 [Angular Universal-Starter](https://github.com/angular/universal-starter/tree/master/cli) - Clone the universal-starter, and check out the `/cli` folder for a working example.
 
@@ -12,7 +12,7 @@ The Angular CLI supports generation of a Universal build for your application. T
 
 # Integrating Angular Universal into existing CLI Applications
 
-This story will show you how to set up Universal bundling for an existing `@angular/cli` project in 4 steps.
+This story will show you how to set up Universal bundling for an existing `@angular/cli` project in 5 steps.
 
 **Want to see the Angular CLI with Universal in Action?**
 
@@ -239,6 +239,7 @@ Below we can see a TypeScript implementation of a -very- simple Express server t
 
 > Note: This is a very bare bones Express application, and is just for demonstrations sake. In a real production environment, you'd want to make sure you have other authentication and security things setup here as well. This is just meant just to show the specific things needed that are relevant to Universal itself. The rest is up to you!
 
+At the ROOT level of your project (where package.json etc are), created a file named: **`server.ts`**
 
 ```typescript
 // These are important and needed before anything else
@@ -286,8 +287,6 @@ app.engine('html', (_, options, callback) => {
 app.set('view engine', 'html');
 app.set('views', 'src');
 
-// app.get('/sitemap.txt', express.static(DIST_FOLDER));
-
 // Server static files from /browser
 app.get('*.*', express.static(join(DIST_FOLDER, 'browser')));
 
@@ -302,7 +301,83 @@ app.listen(PORT, () => {
 });
 ```
 
-## Gotchas & Caveats
+## Step 5: Setup a webpack config to handle this Node server.ts file and serve your application!
+
+Now that we have our Node Express server setup, we need to pack it and serve it!
+
+Create a file named `webpack.server.config.js` at the ROOT of your application.
+
+> This file basically takes that server.ts file, and takes it and compiles it and every dependency it has into `dist/server.js`.
+
+```typescript
+const path = require('path');
+
+module.exports = {
+  entry: {
+    server: './server.ts'
+  },
+  resolve: {
+    extensions: ['.ts', '.js']
+  },
+  target: 'node',
+  // this makes sure we include node_modules and other 3rd party libraries
+  externals: [/(node_modules|main\..*\.js)/],
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: '[name].js'
+  },
+  module: {
+    rules: [
+      { test: /\.ts$/, loader: 'ts-loader' }
+    ]
+  }
+}
+```
+
+**Almost there!**
+
+Now let's see what our resulting structure should look like, if we open up our `/dist/` folder we should see:
+
+```
+/dist/
+   /browser/
+   /server/
+   server.js
+```
+
+To fire up the application, in your terminal enter
+
+```bash
+node dist/server.js
+```
+
+**Tada!**
+
+Now we can create a few handy scripts to help us do all of this in the future.
+
+```json
+"scripts": {
+   // your other scripts
+  "build:client-and-server-bundles": "ng build --prod && ng build --prod --app 1 --output-hashing=false",
+  "build:dynamic": "npm run build:client-and-server-bundles && npm run webpack:server",
+  "webpack:server": "webpack --config webpack.server.config.js --progress --colors",
+  "serve:dynamic": "node dist/server.js"
+}
+```
+
+In the future when you want to see a Production build of your app (locally), you can simply run
+
+```bash
+npm run build:dynamic && npm run serve:dynamic
+```
+
+Enjoy!
+
+Once again to see a working version of everything, check out the [universal-starter](https://github.com/angular/universal-starter/).
+
+---
+
+# Gotchas & Caveats
 
 [Full list of important Gotchas available here](https://github.com/angular/universal#universal-gotchas)
 
