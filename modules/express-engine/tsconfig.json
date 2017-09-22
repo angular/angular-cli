@@ -4,7 +4,7 @@
     "outDir": "../../dist/express-engine"
   },
   "angularCompilerOptions": {
-    "genDir": "ngfactory"
+    "skipTemplateCodegen": true
   },
   "files": [
     "index.ts",

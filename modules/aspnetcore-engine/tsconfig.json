@@ -4,7 +4,7 @@
     "outDir": "../../dist/aspnetcore-engine"
   },
   "angularCompilerOptions": {
-    "genDir": "ngfactory"
+    "skipTemplateCodegen": true
   },
   "files": [
     "index.ts"
