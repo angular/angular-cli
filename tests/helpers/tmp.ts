@@ -1,10 +1,8 @@
-'use strict';
-
-const fs = require('fs-extra');
+import * as fs from 'fs-extra';
 
 const root = process.cwd();
 
-module.exports.setup = function (path) {
+export function setup(path: string) {
   process.chdir(root);
 
   return fs.remove(path).then(function () {
@@ -12,7 +10,7 @@ module.exports.setup = function (path) {
   });
 };
 
-module.exports.teardown = function (path) {
+export function teardown(path: string) {
   process.chdir(root);
 
   if (fs.pathExistsSync(path)) {
