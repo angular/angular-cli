@@ -37,6 +37,7 @@
     "paths": {
       "@_/benchmark": [ "./packages/_/benchmark/src/index" ],
       "@angular-devkit/core": [ "./packages/angular_devkit/core/src/index" ],
+      "@angular-devkit/core/node": [ "./packages/angular_devkit/core/node/index" ],
       "@angular-devkit/schematics": [ "./packages/angular_devkit/schematics/src/index" ],
       "@angular-devkit/schematics/tools": [ "./packages/angular_devkit/schematics/tools/index" ],
       "@angular-devkit/schematics/test": [ "./packages/angular_devkit/schematics/test/index" ],
