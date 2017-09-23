@@ -281,7 +281,7 @@ app.engine('html', (_, options, callback) => {
 });
 
 app.set('view engine', 'html');
-app.set('views', 'src');
+app.set('views', join(DIST_FOLDER, 'browser'));
 
 // Server static files from /browser
 app.get('*.*', express.static(join(DIST_FOLDER, 'browser')));
