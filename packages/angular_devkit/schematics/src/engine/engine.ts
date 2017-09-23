@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException } from '@angular-devkit/core';
-import { CollectionDescription } from '@angular-devkit/schematics';
+import { CollectionDescription, TypedSchematicContext } from '@angular-devkit/schematics';
 import 'rxjs/add/operator/map';
 import { Url } from 'url';
 import { MergeStrategy } from '../tree/interface';
@@ -103,12 +103,12 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     );
   }
 
-  createSourceFromUrl(url: Url): Source {
+  createSourceFromUrl(url: Url, context: TypedSchematicContext<CollectionT, SchematicT>): Source {
     switch (url.protocol) {
       case 'null:': return () => new NullTree();
       case 'empty:': return () => empty();
       default:
-        const hostSource = this._host.createSourceFromUrl(url);
+        const hostSource = this._host.createSourceFromUrl(url, context);
         if (!hostSource) {
           throw new UnknownUrlSourceProtocol(url.toString());
         }

@@ -6,11 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
+import * as path from 'path';
 import { Schema as EnumSchematic } from './schema';
 
 
 describe('Enum Schematic', () => {
-  const schematicRunner = new SchematicTestRunner('@schematics/angular');
+  const schematicRunner = new SchematicTestRunner(
+    '@schematics/angular',
+    path.join(__dirname, '../collection.json'),
+  );
   const defaultOptions: EnumSchematic = {
     name: 'foo',
     path: 'app',

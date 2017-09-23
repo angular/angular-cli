@@ -5,13 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { resolve } from '@angular-devkit/core/node';
 import { RuleFactory } from '@angular-devkit/schematics';
 import {
   CollectionCannotBeResolvedException,
   CollectionMissingSchematicsMapException,
   SchematicMissingFieldsException,
 } from '@angular-devkit/schematics/tools';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import {
   FileSystemCollectionDesc,
   FileSystemSchematicDesc,
@@ -24,13 +25,25 @@ import { FileSystemEngineHostBase } from './file-system-engine-host-base';
  * A simple EngineHost that uses NodeModules to resolve collections.
  */
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
+  constructor() { super(); }
+
   protected _resolveCollectionPath(name: string): string {
-    const pkgJsonSchematics = require(join(name, 'package.json'))['schematics'];
+    const packageJsonPath = resolve(join(name, 'package.json'), {
+      basedir: process.cwd(),
+      checkLocal: true,
+      checkGlobal: true,
+    });
+
+    const pkgJsonSchematics = require(packageJsonPath)['schematics'];
     if (!pkgJsonSchematics) {
       throw new CollectionCannotBeResolvedException(name);
     }
 
-    return require.resolve(join(name, pkgJsonSchematics));
+    return resolve(join(dirname(packageJsonPath), pkgJsonSchematics), {
+      basedir: process.cwd(),
+      checkLocal: true,
+      checkGlobal: true,
+    });
   }
 
   protected _resolveReferenceString(refString: string, parentPath: string) {
@@ -49,12 +62,10 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     if (!desc.schematics || typeof desc.schematics != 'object') {
       throw new CollectionMissingSchematicsMapException(name);
     }
-    const version = require(join(name, 'package.json'))['version'];
 
     return {
       ...desc,
       name,
-      version,
     } as FileSystemCollectionDesc;
   }
 

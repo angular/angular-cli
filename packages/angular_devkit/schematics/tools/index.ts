@@ -9,6 +9,7 @@ export * from './description';
 export * from './file-system-host';
 export * from './file-system-engine-host-base';
 
+export { FallbackEngineHost } from './fallback-engine-host';
 export {FileSystemEngineHost} from './file-system-engine-host';
 export {NodeModulesEngineHost} from './node-module-engine-host';
-export {RegistryEngineHost} from './registry-engine-host';
+export { NodeModulesTestEngineHost } from './node-modules-test-engine-host';

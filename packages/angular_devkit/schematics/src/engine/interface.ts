@@ -45,7 +45,10 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
   getSchematicRuleFactory<OptionT extends object>(
       schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
       collection: CollectionDescription<CollectionMetadataT>): RuleFactory<OptionT>;
-  createSourceFromUrl(url: Url): Source | null;
+  createSourceFromUrl(
+    url: Url,
+    context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
+  ): Source | null;
   transformOptions<OptionT extends object, ResultT extends object>(
     schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
     options: OptionT,
@@ -72,7 +75,10 @@ export interface Engine<CollectionMetadataT extends object, SchematicMetadataT e
       name: string,
       collection: Collection<CollectionMetadataT, SchematicMetadataT>,
   ): Schematic<CollectionMetadataT, SchematicMetadataT>;
-  createSourceFromUrl(url: Url): Source;
+  createSourceFromUrl(
+    url: Url,
+    context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
+  ): Source;
   transformOptions<OptionT extends object, ResultT extends object>(
       schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
       options: OptionT,

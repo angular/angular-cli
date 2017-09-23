@@ -6,12 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicTestRunner } from '@angular-devkit/schematics/test';
+import * as path from 'path';
 import { getFileContent } from '../utility/test';
 import { Schema as ClassSchema } from './schema';
 
 
 describe('Class Schematic', () => {
-  const schematicRunner = new SchematicTestRunner('@schematics/angular');
+  const schematicRunner = new SchematicTestRunner(
+    '@schematics/angular',
+    path.join(__dirname, '../collection.json'),
+  );
   const defaultOptions: ClassSchema = {
     name: 'foo',
     path: 'app',

@@ -12,5 +12,5 @@ import { SchematicContext, Source } from '../engine/interface';
 export function url(urlString: string): Source {
   const url = parse(urlString);
 
-  return (context: SchematicContext) => context.engine.createSourceFromUrl(url)(context);
+  return (context: SchematicContext) => context.engine.createSourceFromUrl(url, context)(context);
 }

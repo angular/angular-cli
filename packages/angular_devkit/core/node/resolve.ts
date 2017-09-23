@@ -83,6 +83,7 @@ export interface ResolveOptions {
   paths?: string[];
   preserveSymlinks?: boolean;
   checkGlobal?: boolean;
+  checkLocal?: boolean;
 }
 
 
@@ -111,6 +112,26 @@ export function resolve(x: string, options: ResolveOptions = {}): string {
     }
   }
 
+  // Fallback to checking the local (callee) node modules.
+  if (options.checkLocal) {
+    const localDir = path.dirname(_caller());
+    if (localDir !== options.basedir) {
+      try {
+        return resolve(x, {
+          ...options,
+          checkLocal: false,
+          checkGlobal: false,
+          basedir: localDir,
+        });
+      } catch (e) {
+        // Just swap the basePath with the original call one.
+        if (!(e instanceof ModuleNotFoundException)) {
+          throw e;
+        }
+      }
+    }
+  }
+
   // Fallback to checking the global node modules.
   if (options.checkGlobal) {
     const globalDir = path.dirname(_getGlobalNodeModules());
@@ -118,15 +139,15 @@ export function resolve(x: string, options: ResolveOptions = {}): string {
       try {
         return resolve(x, {
           ...options,
+          checkLocal: false,
           checkGlobal: false,
           basedir: globalDir,
         });
       } catch (e) {
         // Just swap the basePath with the original call one.
-        if (e instanceof ModuleNotFoundException) {
-          throw new ModuleNotFoundException(x, basePath);
+        if (!(e instanceof ModuleNotFoundException)) {
+          throw e;
         }
-        throw e;
       }
     }
   }

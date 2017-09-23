@@ -31,6 +31,7 @@ ts_library(
     deps = [
         ":schematics",
         "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node",
         # @deps: rxjs
     ],
     tsconfig = "//:tsconfig.json",

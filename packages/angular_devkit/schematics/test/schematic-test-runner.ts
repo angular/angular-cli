@@ -13,7 +13,7 @@ import {
 } from '@angular-devkit/schematics';
 import {
   FileSystemSchematicDesc,
-  NodeModulesEngineHost,
+  NodeModulesTestEngineHost,
 } from '@angular-devkit/schematics/tools';
 import { SchemaClassFactory } from '@ngtools/json-schema';
 import { Observable } from 'rxjs/Observable';
@@ -22,19 +22,19 @@ import { Observable } from 'rxjs/Observable';
 export interface SchematicSchemaT {}
 
 export class SchematicTestRunner {
-  private engineHost: NodeModulesEngineHost;
-  private engine: SchematicEngine<{}, {}>;
-  private collection: Collection<{}, {}>;
+  private _engineHost = new NodeModulesTestEngineHost();
+  private _engine: SchematicEngine<{}, {}> = new SchematicEngine(this._engineHost);
+  private _collection: Collection<{}, {}>;
 
-  constructor(private collectionName: string) {
-    this.prepareCollection();
-  }
+  constructor(private _collectionName: string, collectionPath: string) {
+    this._engineHost.registerCollection(_collectionName, collectionPath);
 
-  private prepareCollection() {
-    this.engineHost = new NodeModulesEngineHost();
-    this.engine = new SchematicEngine(this.engineHost);
-    this.engineHost.registerOptionsTransform((
-      schematic: FileSystemSchematicDesc, opts: SchematicSchemaT) => {
+    this._engineHost.registerOptionsTransform((
+      schematicDescription: {},
+      opts: SchematicSchemaT,
+    ) => {
+      const schematic: FileSystemSchematicDesc = schematicDescription as FileSystemSchematicDesc;
+
       if (schematic.schema && schematic.schemaJson) {
         const SchemaMetaClass = SchemaClassFactory<SchematicSchemaT>(schematic.schemaJson);
         const schemaClass = new SchemaMetaClass(opts);
@@ -44,18 +44,19 @@ export class SchematicTestRunner {
 
       return opts;
     });
-    this.collection = this.engine.createCollection(this.collectionName);
+
+    this._collection = this._engine.createCollection(this._collectionName);
   }
 
   runSchematicAsync(schematicName: string, opts?: SchematicSchemaT, tree?: Tree): Observable<Tree> {
-    const schematic = this.collection.createSchematic(schematicName);
+    const schematic = this._collection.createSchematic(schematicName);
     const host = Observable.of(tree || new VirtualTree);
 
     return schematic.call(opts || {}, host);
   }
 
   runSchematic(schematicName: string, opts?: SchematicSchemaT, tree?: Tree): Tree {
-    const schematic = this.collection.createSchematic(schematicName);
+    const schematic = this._collection.createSchematic(schematicName);
 
     let result: Tree | null = null;
     const host = Observable.of(tree || new VirtualTree);
