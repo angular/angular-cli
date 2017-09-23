@@ -48,7 +48,7 @@ describe('Module Schematic', () => {
     const tree = schematicRunner.runSchematic('module', options, appTree);
     const content = getFileContent(tree, '/src/app/app.module.ts');
     expect(content).toMatch(/import { FooModule } from '.\/foo\/foo.module'/);
-    expect(content).toMatch(/imports: \[(.|\s)*FooModule(.|\s)*\]/m);
+    expect(content).toMatch(/imports: \[[^\]]*FooModule[^\]]*\]/m);
   });
 
   it('should import into another module (deep)', () => {
