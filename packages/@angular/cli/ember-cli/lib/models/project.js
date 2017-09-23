@@ -9,7 +9,6 @@ const findUp = require('../../../utilities/find-up').findUp;
 let resolve = denodeify(require('resolve'));
 const fs = require('fs-extra');
 const _ = require('lodash');
-let logger = require('heimdalljs-logger')('ember-cli:project');
 const nodeModulesPath = require('node-modules-path');
 
 let processCwd = process.cwd();
@@ -29,8 +28,6 @@ class Project {
     @param {CLI} cli
   */
   constructor(root, pkg, ui, cli) {
-    logger.info('init root: %s', root);
-
     this.root = root;
     this.pkg = pkg;
     this.ui = ui;
@@ -75,8 +72,6 @@ class Project {
    */
   setupNodeModulesPath() {
     this.nodeModulesPath = nodeModulesPath(this.root);
-
-    logger.info('nodeModulesPath: %s', this.nodeModulesPath);
   }
 
   static nullProject(ui, cli) {
@@ -244,7 +239,6 @@ class Project {
     ui.writeDeprecateLine('`Project.closest` is a private method that will be removed, please use `Project.closestSync` instead.');
 
     return closestPackageJSON(pathName).then(result => {
-      logger.info('closest %s -> %s', pathName, result);
       if (result.pkg && result.pkg.name === 'ember-cli') {
         return Project.nullProject(_ui, _cli);
       }
@@ -264,24 +258,18 @@ class Project {
     @return {Project}         Project instance
    */
   static closestSync(pathName, _ui, _cli) {
-    logger.info('looking for package.json starting at %s', pathName);
-
     let ui = ensureUI(_ui);
 
     let directory = findupPath(pathName);
-    logger.info('found package.json at %s', directory);
 
     let relative = path.relative(directory, pathName);
     if (relative.indexOf('tmp') === 0) {
-      logger.info('ignoring parent project since we are in the tmp folder of the project');
       return Project.nullProject(_ui, _cli);
     }
 
     let pkg = fs.readJsonSync(path.join(directory, 'package.json'));
-    logger.info('project name: %s', pkg && pkg.name);
 
     if (!isEmberCliProject(pkg)) {
-      logger.info('ignoring parent project since it is not an Angular CLI project');
       return Project.nullProject(_ui, _cli);
     }
 
@@ -319,7 +307,6 @@ class Project {
   static getProjectRoot() {
     let packagePath = findUp(process.cwd(), 'package.json');
     if (!packagePath) {
-      logger.info('getProjectRoot: not found. Will use cwd: %s', process.cwd());
       return process.cwd();
     }
 
@@ -327,11 +314,9 @@ class Project {
     const pkg = require(packagePath);
 
     if (pkg && pkg.name === 'ember-cli') {
-      logger.info('getProjectRoot: named \'ember-cli\'. Will use cwd: %s', process.cwd());
       return process.cwd();
     }
 
-    logger.info('getProjectRoot %s -> %s', process.cwd(), directory);
     return directory;
   }
 }
