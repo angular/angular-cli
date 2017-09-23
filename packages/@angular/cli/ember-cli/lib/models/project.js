@@ -11,7 +11,6 @@ const fs = require('fs-extra');
 const _ = require('lodash');
 let logger = require('heimdalljs-logger')('ember-cli:project');
 const nodeModulesPath = require('node-modules-path');
-const heimdall = require('heimdalljs');
 
 let processCwd = process.cwd();
 // ensure NULL_PROJECT is a singleton
@@ -89,15 +88,9 @@ class Project {
       return false;
     };
 
-    NULL_PROJECT.isEmberCLIAddon = function() {
-      return false;
-    };
-
     NULL_PROJECT.name = function() {
       return path.basename(process.cwd());
     };
-
-    NULL_PROJECT.initializeAddons();
 
     return NULL_PROJECT;
   }
@@ -127,15 +120,6 @@ class Project {
   }
 
   /**
-    Returns whether or not this is an Ember CLI addon.
-    @method isEmberCLIAddon
-    @return {Boolean} Whether or not this is an Ember CLI Addon.
-   */
-  isEmberCLIAddon() {
-    return !!this.pkg.keywords && this.pkg.keywords.indexOf('ember-addon') > -1;
-  }
-
-  /**
     Loads the configuration for this project and its addons.
     @public
     @method config
@@ -143,8 +127,6 @@ class Project {
     @return {Object}     Merged confiration object
    */
   config(env) {
-    this.initializeAddons();
-
     let initialConfig = {};
 
     return this.addons.reduce((config, addon) => {
@@ -232,139 +214,6 @@ class Project {
   }
 
   /**
-    Provides the list of paths to consult for addons that may be provided
-    internally to this project. Used for middleware addons with built-in support.
-    @private
-    @method supportedInternalAddonPaths
-  */
-  supportedInternalAddonPaths() {
-    if (!this.root) { return []; }
-
-    let internalMiddlewarePath = path.join(__dirname, '../tasks/server/middleware');
-    let legacyBlueprintsPath = require.resolve('ember-cli-legacy-blueprints');
-    let emberTryPath = require.resolve('ember-try');
-    return [
-      path.join(internalMiddlewarePath, 'testem-url-rewriter'),
-      path.join(internalMiddlewarePath, 'tests-server'),
-      path.join(internalMiddlewarePath, 'history-support'),
-      path.join(internalMiddlewarePath, 'broccoli-watcher'),
-      path.join(internalMiddlewarePath, 'broccoli-serve-files'),
-      path.join(internalMiddlewarePath, 'proxy-server'),
-      path.dirname(legacyBlueprintsPath),
-      path.dirname(emberTryPath),
-    ];
-  }
-
-  /**
-    Loads and initializes all addons for this project.
-    @private
-    @method initializeAddons
-   */
-  initializeAddons() {
-    if (this._addonsInitialized) {
-      return;
-    }
-    this._addonsInitialized = true;
-
-    logger.info('initializeAddons for: %s', this.name());
-  }
-
-  /**
-    Returns what commands are made available by addons by inspecting
-    `includedCommands` for every addon.
-    @private
-    @method addonCommands
-    @return {Object} Addon names and command maps as key-value pairs
-   */
-  addonCommands() {
-    const Command = require('../models/command');
-    let commands = {};
-    this.addons.forEach(addon => {
-      if (!addon.includedCommands) { return; }
-
-      let token = heimdall.start({
-        name: `lookup-commands: ${addon.name}`,
-        addonName: addon.name,
-        addonCommandInitialization: true,
-      });
-
-      let includedCommands = addon.includedCommands();
-      let addonCommands = {};
-
-      for (let key in includedCommands) {
-        if (typeof includedCommands[key] === 'function') {
-          addonCommands[key] = includedCommands[key];
-        } else {
-          addonCommands[key] = Command.extend(includedCommands[key]);
-        }
-      }
-      if (Object.keys(addonCommands).length) {
-        commands[addon.name] = addonCommands;
-      }
-
-      token.stop();
-    });
-    return commands;
-  }
-
-  /**
-    Execute a given callback for every addon command.
-    Example:
-    ```
-    project.eachAddonCommand(function(addonName, commands) {
-      console.log('Addon ' + addonName + ' exported the following commands:' + commands.keys().join(', '));
-    });
-    ```
-    @private
-    @method eachAddonCommand
-    @param  {Function} callback [description]
-   */
-  eachAddonCommand(callback) {
-    if (this.initializeAddons && this.addonCommands) {
-      this.initializeAddons();
-      let addonCommands = this.addonCommands();
-
-      _.forOwn(addonCommands, (commands, addonName) => callback(addonName, commands));
-    }
-  }
-
-  /**
-    Path to the blueprints for this project.
-    @private
-    @method localBlueprintLookupPath
-    @return {String} Path to blueprints
-   */
-  localBlueprintLookupPath() {
-    return path.join(this.cli.root, 'blueprints');
-  }
-
-  /**
-    Returns a list of paths (including addon paths) where blueprints will be looked up.
-    @private
-    @method blueprintLookupPaths
-    @return {Array} List of paths
-   */
-  blueprintLookupPaths() {
-    return [this.localBlueprintLookupPath()];
-  }
-
-  /**
-    Returns a list of addon paths where blueprints will be looked up.
-    @private
-    @method addonBlueprintLookupPaths
-    @return {Array} List of paths
-   */
-  addonBlueprintLookupPaths() {
-    let addonPaths = this.addons.map(addon => {
-      if (addon.blueprintsPath) {
-        return addon.blueprintsPath();
-      }
-    }, this);
-
-    return addonPaths.filter(Boolean).reverse();
-  }
-
-  /**
     Reloads package.json
     @private
     @method reloadPkg
@@ -377,62 +226,6 @@ class Project {
     this.pkg = fs.readJsonSync(pkgPath);
 
     return this.pkg;
-  }
-
-  /**
-    Re-initializes addons.
-    @private
-    @method reloadAddons
-   */
-  reloadAddons() {
-    this.reloadPkg();
-    this._addonsInitialized = false;
-    return this.initializeAddons();
-  }
-
-  /**
-    Find an addon by its name
-    @private
-    @method findAddonByName
-    @param  {String} name Addon name as specified in package.json
-    @return {Addon}       Addon instance
-   */
-  findAddonByName(name) {
-    this.initializeAddons();
-
-    var exactMatch = _.find(this.addons, function(addon) {
-      return name === addon.name || (addon.pkg && name === addon.pkg.name);
-    });
-
-    if (exactMatch) {
-      return exactMatch;
-    }
-
-    return _.find(this.addons, function(addon) {
-      return name.indexOf(addon.name) > -1 || (addon.pkg && name.indexOf(addon.pkg.name) > -1);
-    });
-  }
-
-  /**
-    Generate test file contents.
-    This method is supposed to be overwritten by test framework addons
-    like `ember-cli-qunit` and `ember-cli-mocha`.
-    @public
-    @method generateTestFile
-    @param {String} moduleName Name of the test module (e.g. `JSHint`)
-    @param {Object[]} tests Array of tests with `name`, `passed` and `errorMessage` properties
-    @return {String} The test file content
-   */
-  generateTestFile() {
-    let message = 'Please install an Ember.js test framework addon or update your dependencies.';
-
-    if (this.ui) {
-      this.ui.writeDeprecateLine(message);
-    } else {
-      console.warn(message);
-    }
-
-    return '';
   }
 
   /**
