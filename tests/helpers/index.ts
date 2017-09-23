@@ -1,21 +1,19 @@
-const ng: ((parameters: string[]) => Promise<any>) = require('./ng');
-const tmp = require('./tmp');
+import { ng } from './ng';
+import { setup, teardown } from './tmp';
+
+export { ng };
 
 export function setupProject() {
   beforeEach((done) => {
     spyOn(console, 'error');
 
-    tmp.setup('./tmp')
+    setup('./tmp')
       .then(() => process.chdir('./tmp'))
       .then(() => ng(['new', 'foo', '--skip-install']))
       .then(done, done.fail);
   }, 10000);
 
   afterEach((done) => {
-    tmp.teardown('./tmp').then(done, done.fail);
+    teardown('./tmp').then(done, done.fail);
   });
 }
-
-export {
-  ng
-};
