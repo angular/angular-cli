@@ -22,7 +22,7 @@
     "test:messages": "node scripts/test-commit-messages.js",
     "test:packages": "node scripts/run-packages-spec.js",
     "eslint": "eslint .",
-    "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/config/schema.d.ts\" -e \"**/tests/**\" -e \"**/blueprints/*/files/**/*.ts\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
+    "tslint": "tslint \"**/*.ts\" -c tslint.json -e \"**/config/schema.d.ts\" -e \"**/tests/**\" -e \"node_modules/**\" -e \"tmp/**\" -e \"dist/**\"",
     "lint": "npm-run-all -c eslint tslint",
     "tool": "node scripts/run-tool.js"
   },
