@@ -4,7 +4,6 @@ const nopt = require('nopt');
 const chalk = require('chalk');
 const path = require('path');
 const camelize = require('ember-cli-string-utils').camelize;
-const getCallerFile = require('get-caller-file');
 const printCommand = require('../utilities/print-command');
 const _ = require('lodash');
 const EOL = require('os').EOL;
@@ -84,7 +83,7 @@ let Command = CoreObject.extend({
      * @type String
      * @example `new` or `generate`
      */
-    this.name = this.name || path.basename(getCallerFile(), '.js');
+    this.name = this.name || '<undefined>';
 
     logger.info('initialize: name: %s, name: %s', this.name);
 
