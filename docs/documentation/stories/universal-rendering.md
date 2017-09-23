@@ -26,10 +26,6 @@ Install `@angular/platform-server` into your project. Make sure you use the same
 $ npm install --save @angular/platform-server @nguniversal/module-map-ngfactory-loader
 ```
 
-<<<<<<< HEAD
-=======
-
->>>>>>> de27c0e6... docs: update with changes requested
 ## Step 1: Prepare your App for Universal rendering
 
 The first thing you need to do is make your `AppModule` compatible with Universal by addding `.withServerTransition()` and an application ID to your `BrowserModule` import:
