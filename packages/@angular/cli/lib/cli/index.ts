@@ -1,14 +1,12 @@
-/*eslint-disable no-console */
-
 // Prevent the dependency validation from tripping because we don't import these. We need
 // it as a peer dependency of @angular/core.
 // require('zone.js')
 
+import * as path from 'path';
 
-// This file hooks up on require calls to transpile TypeScript.
 const cli = require('../../ember-cli/lib/cli');
 const UI = require('../../ember-cli/lib/ui');
-const path = require('path');
+
 
 function loadCommands() {
   return {
@@ -36,10 +34,10 @@ function loadCommands() {
   };
 }
 
-module.exports = function(options) {
+export default function(options: any) {
 
   // patch UI to not print Ember-CLI warnings (which don't apply to Angular CLI)
-  UI.prototype.writeWarnLine = function () { }
+  UI.prototype.writeWarnLine = function () { };
 
   options.cli = {
     name: 'ng',
@@ -54,4 +52,4 @@ module.exports = function(options) {
   process.env.CLI_ROOT = process.env.CLI_ROOT || path.resolve(__dirname, '..', '..');
 
   return cli(options);
-};
+}
