@@ -14,10 +14,6 @@ The Angular CLI supports generation of a Universal build for your application. T
 
 This story will show you how to set up Universal bundling for an existing `@angular/cli` project in 5 steps.
 
-**Want to see the Angular CLI with Universal in Action?**
-
-[Check out the Angular Universal-Starter (/cli folder)](https://github.com/angular/universal-starter)
-
 ---
 
 ## Step 0: Install `@angular/platform-server`
