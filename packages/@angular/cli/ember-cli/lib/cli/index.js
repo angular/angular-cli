@@ -1,9 +1,7 @@
 'use strict';
 
 // Main entry point
-let logger = require('heimdalljs-logger')('ember-cli:cli/index');
 const path = require('path');
-const heimdall = require('heimdalljs');
 
 // ember-cli and user apps have many dependencies, many of which require
 // process.addListener('exit', ....) for cleanup, by default this limit for
@@ -14,21 +12,11 @@ const heimdall = require('heimdalljs');
 // https://github.com/babel/ember-cli-babel/issues/76
 process.setMaxListeners(1000);
 
-function configureLogger(env) {
-  let depth = Number(env['DEBUG_DEPTH']);
-  if (depth) {
-    let logConfig = require('heimdalljs').configFor('logging');
-    logConfig.depth = depth;
-  }
-}
-
 // Options: Array cliArgs, Stream inputStream, Stream outputStream
 module.exports = function(options) {
   let UI = options.UI || require('../ui');
   const CLI = require('./cli');
   const Project = require('../models/project');
-
-  configureLogger(process.env);
 
   // TODO: one UI (lib/models/project.js also has one for now...)
   let ui = new UI({

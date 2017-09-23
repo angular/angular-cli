@@ -1,6 +1,5 @@
 'use strict';
 
-let logger = require('heimdalljs-logger')('ember-cli:installation-checker');
 const fs = require('fs-extra');
 const path = require('path');
 const SilentError = require('silent-error');
@@ -24,11 +23,9 @@ class InstallationChecker {
     let commands = [];
 
     if (this.usingNpm() && this.npmDependenciesNotPresent()) {
-      logger.info('npm dependencies not installed');
       commands.push('`npm install`');
     }
     if (this.usingBower() && this.bowerDependenciesNotPresent()) {
-      logger.info('bower dependencies not installed');
       commands.push('`bower install`');
     }
     if (commands.length) {

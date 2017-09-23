@@ -47,8 +47,6 @@
     "file-loader": "^0.10.0",
     "fs-extra": "^4.0.0",
     "glob": "^7.0.3",
-    "heimdalljs": "^0.2.4",
-    "heimdalljs-logger": "^0.1.9",
     "html-webpack-plugin": "^2.29.0",
     "karma-source-map-support": "^1.2.0",
     "less": "^2.7.2",
