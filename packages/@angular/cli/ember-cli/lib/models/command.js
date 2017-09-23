@@ -8,7 +8,6 @@ const printCommand = require('../utilities/print-command');
 const _ = require('lodash');
 const EOL = require('os').EOL;
 const CoreObject = require('core-object');
-let logger = require('heimdalljs-logger')('ember-cli:command');
 const SilentError = require('silent-error');
 const fs = require('fs');
 
@@ -84,8 +83,6 @@ let Command = CoreObject.extend({
      * @example `new` or `generate`
      */
     this.name = this.name || '<undefined>';
-
-    logger.info('initialize: name: %s, name: %s', this.name);
 
     /**
      * An array of aliases for the command
@@ -210,8 +207,6 @@ let Command = CoreObject.extend({
       throw new Error(`Concurrent tasks are not supported`);
     }
 
-    logger.info(`\`${this.name}\` command running \`${name}\` task`);
-
     let Task = this.tasks[name];
     if (!Task) {
       throw new Error(`Unknown task "${name}"`);
@@ -222,11 +217,6 @@ let Command = CoreObject.extend({
     this._currentTask = task;
 
     return Promise.resolve().then(() => task.run(options))
-      .catch(error => {
-        logger.info(`An error occurred running \`${name}\` from the \`${this.name}\` command.`, error.stack);
-
-        throw error;
-      })
       .finally(() => {
         delete this._currentTask;
       });
@@ -251,7 +241,6 @@ let Command = CoreObject.extend({
       let commandOptions = this.parseArgs(args);
       // if the help option was passed, resolve with 'callHelp' to call help command
       if (commandOptions && (commandOptions.options.help || commandOptions.options.h)) {
-        logger.info(`${this.name} called with help option`);
         return resolve('callHelp');
       }
 
@@ -429,8 +418,6 @@ let Command = CoreObject.extend({
         try {
           aliasValue = JSON.parse(alias);
         } catch (e) {
-          let logger = require('heimdalljs-logger')('@angular/cli/ember-cli/models/command');
-          logger.error(e);
         }
       }
       throw new Error(`The "${aliasValue}" [type:${aliasType}] alias is not an acceptable value. ` +
