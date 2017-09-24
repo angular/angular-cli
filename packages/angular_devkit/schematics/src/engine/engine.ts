@@ -81,6 +81,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     }
 
     return {
+      debug: parent && parent.debug || false,
       schematic,
       engine: this,
       strategy: (parent && parent.strategy !== undefined)

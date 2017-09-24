@@ -6,6 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+export function oneLine(strings: TemplateStringsArray, ...values: string[]) {
+  const endResult = strings.map((s, i) => s + (i < values.length ? values[i] : '')).join('');
+
+  return endResult.replace(/\n\s*/gm, ' ');
+}
+
 export function stripIndents(strings: TemplateStringsArray, ...values: string[]) {
   const endResult = strings.map((s, i) => s + (i < values.length ? values[i] : '')).join('');
 

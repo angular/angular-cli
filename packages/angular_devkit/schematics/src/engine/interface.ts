@@ -125,6 +125,7 @@ export interface Schematic<CollectionMetadataT extends object, SchematicMetadata
  */
 export interface TypedSchematicContext<CollectionMetadataT extends object,
                                        SchematicMetadataT extends object> {
+  readonly debug: boolean;
   readonly engine: Engine<CollectionMetadataT, SchematicMetadataT>;
   readonly schematic: Schematic<CollectionMetadataT, SchematicMetadataT>;
   readonly strategy: MergeStrategy;

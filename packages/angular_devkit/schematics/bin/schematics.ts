@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { createLogger, schema } from '@angular-devkit/core';
+import { createLogger, schema, tags } from '@angular-devkit/core';
 import {
   DryRunEvent,
   DryRunSink,
@@ -29,21 +29,25 @@ import 'rxjs/add/operator/ignoreElements';
  * Show usage of the CLI tool, and exit the process.
  */
 function usage(exitCode = 0): never {
-  logger.info(`
+  logger.info(tags.stripIndents`
     schematics [CollectionName:]SchematicName [options, ...]
 
     By default, if the collection name is not specified, use the internal collection provided
     by the Schematics CLI.
 
     Options:
+        --debug             Debug mode. This is true by default if the collection is a relative
+                            path (in that case, turn off with --debug=false).
         --dry-run           Do not output anything, but instead just show what actions would be
-                            performed.
+                            performed. Default to true if debug is also true.
         --force             Force overwriting files that would otherwise be an error.
         --list-schematics   List all schematics from the collection, by name.
+        --verbose           Show more information.
+
         --help              Show this message.
 
     Any additional option is passed to the Schematics depending on
-  `.replace(/^\s\s\s\s/g, ''));  // To remove the indentation.
+  `);
 
   process.exit(exitCode);
   throw 0;  // The node typing sometimes don't have a never type for process.exit().
@@ -85,9 +89,13 @@ function parseSchematicName(str: string | null): { collection: string, schematic
 
 
 /** Parse the command line. */
-const booleanArgs = [ 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ];
+const booleanArgs = [ 'debug', 'dry-run', 'force', 'help', 'list-schematics', 'verbose' ];
 const argv = minimist(process.argv.slice(2), {
   boolean: booleanArgs,
+  default: {
+    'debug': null,
+    'dry-run': null,
+  },
   '--': true,
 });
 
@@ -103,6 +111,7 @@ const {
   collection: collectionName,
   schematic: schematicName,
 } = parseSchematicName(argv._.shift() || null);
+const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
 
 
 /**
@@ -154,8 +163,9 @@ if (argv['list-schematics']) {
 const schematic = collection.createSchematic(schematicName);
 
 /** Gather the arguments for later use. */
+const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
+const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
 const force = argv['force'];
-const dryRun = argv['dry-run'];
 
 /** This host is the original Tree created from the current directory. */
 const host = Observable.of(new FileSystemTree(new FileSystemHost(process.cwd())));
@@ -229,7 +239,7 @@ delete args._;
  * Then we proceed to run the dryRun commit. We run this before we then commit to the filesystem
  * (if --dry-run was not passed or an error was detected by dryRun).
  */
-schematic.call(args, host)
+schematic.call(args, host, { debug })
   .map((tree: Tree) => Tree.optimize(tree))
   .concatMap((tree: Tree) => {
     return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));
