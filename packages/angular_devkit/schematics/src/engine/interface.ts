@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Logger } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { Url } from 'url';
 import { FileEntry, MergeStrategy, Tree } from '../tree/interface';
@@ -127,6 +128,7 @@ export interface TypedSchematicContext<CollectionMetadataT extends object,
                                        SchematicMetadataT extends object> {
   readonly debug: boolean;
   readonly engine: Engine<CollectionMetadataT, SchematicMetadataT>;
+  readonly logger: Logger;
   readonly schematic: Schematic<CollectionMetadataT, SchematicMetadataT>;
   readonly strategy: MergeStrategy;
 }

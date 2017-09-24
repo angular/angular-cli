@@ -41,6 +41,6 @@ export function schematic<OptionT extends object>(schematicName: string, options
     const collection = context.schematic.collection;
     const schematic = collection.createSchematic(schematicName);
 
-    return schematic.call(options, Observable.of(branch(input)));
+    return schematic.call(options, Observable.of(branch(input)), context);
   };
 }
