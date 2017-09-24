@@ -34,6 +34,7 @@ process.chdir(path.join(__dirname, '..'));
 let logger = null;
 try {
   logger = new (require('@angular-devkit/core').IndentLogger)('root');
+  require('rxjs/add/operator/filter');
 
   logger
     .filter(entry => (entry.level !== 'debug' || args.verbose))
