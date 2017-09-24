@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { yellow } from '@angular-devkit/core';
+import { tags, terminal } from '@angular-devkit/core';
 import * as glob from 'glob';
 import 'jasmine';
 import {SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
@@ -84,17 +84,21 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
         const baseAverage = pad(Math.floor(stat.base.average));
         const baseAverageMult = pad(precision(stat.average / stat.base.average), multPad);
 
-        console.log(yellow(`      fastest: ${fastest}`));
-        console.log(yellow(`        (base) ${baseFastest}`));
-        console.log(yellow(`      slowest: ${slowest}`));
-        console.log(yellow(`        (base) ${baseSlowest}`));
-        console.log(yellow(`      mean:    ${mean} (${baseMean}) (${baseMeanMult}x)`));
-        console.log(yellow(`      average: ${average} (${baseAverage}) (${baseAverageMult}x)`));
+        console.log(terminal.yellow(tags.indentBy(6)`
+          fastest: ${fastest}
+            (base) ${baseFastest}
+          slowest: ${slowest}
+            (base) ${baseSlowest}
+          mean:    ${mean} (${baseMean}) (${baseMeanMult}x)
+          average: ${average} (${baseAverage}) (${baseAverageMult}x)
+        `));
       } else {
-        console.log(yellow(`      fastest: ${fastest}`));
-        console.log(yellow(`      slowest: ${slowest}`));
-        console.log(yellow(`      mean:    ${mean}`));
-        console.log(yellow(`      average: ${average}`));
+        console.log(terminal.yellow(tags.indentBy(6)`
+          fastest: ${fastest}
+          slowest: ${slowest}
+          mean:    ${mean}
+          average: ${average}
+        `));
       }
     }
   }

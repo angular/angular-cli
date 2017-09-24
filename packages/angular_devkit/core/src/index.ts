@@ -8,6 +8,9 @@
 export * from './exception/exception';
 export * from './json';
 export * from './logger';
-export * from './terminal';
+import * as terminal from './terminal';
 export * from './utils';
 export * from './virtual-fs';
+
+
+export { terminal };
