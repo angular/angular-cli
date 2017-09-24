@@ -36,6 +36,10 @@ export class UnknownSchematicException extends BaseException {
   }
 }
 
+export class SchematicEngineConflictingException extends BaseException {
+  constructor() { super(`A schematic was called from a different engine as its parent.`); }
+}
+
 
 export class SchematicEngine<CollectionT extends object, SchematicT extends object>
     implements Engine<CollectionT, SchematicT> {
@@ -65,6 +69,23 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     this._schematicCache.set(name, new Map());
 
     return collection;
+  }
+
+  createContext(
+    schematic: Schematic<CollectionT, SchematicT>,
+    parent?: Partial<TypedSchematicContext<CollectionT, SchematicT>>,
+  ): TypedSchematicContext<CollectionT, SchematicT> {
+    // Check for inconsistencies.
+    if (parent && parent.engine && parent.engine !== this) {
+      throw new SchematicEngineConflictingException();
+    }
+
+    return {
+      schematic,
+      engine: this,
+      strategy: (parent && parent.strategy !== undefined)
+        ? parent.strategy : this.defaultMergeStrategy,
+    };
   }
 
   createSchematic(

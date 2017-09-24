@@ -71,6 +71,10 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
  */
 export interface Engine<CollectionMetadataT extends object, SchematicMetadataT extends object> {
   createCollection(name: string): Collection<CollectionMetadataT, SchematicMetadataT>;
+  createContext(
+    schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
+    parent?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>,
+  ): TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>;
   createSchematic(
       name: string,
       collection: Collection<CollectionMetadataT, SchematicMetadataT>,
@@ -107,7 +111,11 @@ export interface Schematic<CollectionMetadataT extends object, SchematicMetadata
   readonly description: SchematicDescription<CollectionMetadataT, SchematicMetadataT>;
   readonly collection: Collection<CollectionMetadataT, SchematicMetadataT>;
 
-  call<OptionT extends object>(options: OptionT, host: Observable<Tree>): Observable<Tree>;
+  call<OptionT extends object>(
+    options: OptionT,
+    host: Observable<Tree>,
+    parentContext?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>,
+  ): Observable<Tree>;
 }
 
 

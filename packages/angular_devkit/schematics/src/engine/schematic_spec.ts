@@ -6,12 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:non-null-operator
+import { NullLogger } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch, empty } from '../tree/static';
-import { CollectionDescription, Engine, Rule, SchematicDescription } from './interface';
+import { CollectionDescription, Engine, Rule, Schematic, SchematicDescription } from './interface';
 import { SchematicImpl } from './schematic';
 
 
@@ -25,7 +26,13 @@ type SchematicT = {
   factory: <T>(options: T) => Rule;
 };
 
-const engine = {
+const context = {
+  debug: false,
+  logger: new NullLogger(),
+  strategy: MergeStrategy.Default,
+};
+const engine: Engine<CollectionT, SchematicT> = {
+  createContext: (schematic: Schematic<{}, {}>) => ({ engine, schematic, ...context }),
   transformOptions: (_: {}, options: {}) => options,
   defaultMergeStrategy: MergeStrategy.Default,
 } as Engine<CollectionT, SchematicT>;
