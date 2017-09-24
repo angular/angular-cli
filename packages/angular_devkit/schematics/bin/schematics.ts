@@ -6,7 +6,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { createLogger, schema, tags, terminal } from '@angular-devkit/core';
+import { schema, tags, terminal } from '@angular-devkit/core';
+import { createConsoleLogger } from '@angular-devkit/core/node';
 import {
   DryRunEvent,
   DryRunSink,
@@ -100,7 +101,7 @@ const argv = minimist(process.argv.slice(2), {
 });
 
 /** Create the DevKit Logger used through the CLI. */
-const logger = createLogger(argv['verbose']);
+const logger = createConsoleLogger(argv['verbose']);
 
 if (argv.help) {
   usage();

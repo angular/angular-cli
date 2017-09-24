@@ -5,36 +5,34 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { IndentLogger, LogEntry, Logger, terminal } from '@angular-devkit/core';
 import 'rxjs/add/operator/filter';
-import { bold, dim, red, white, yellow } from '../terminal';
-import { IndentLogger } from './indent';
-import { LogEntry, Logger } from './logger';
 
 
 /**
  * A Logger that sends information to STDOUT and STDERR.
  */
-export function createLogger(verbose = false): Logger {
+export function createConsoleLogger(verbose = false): Logger {
   const logger = new IndentLogger('cling');
 
   logger
     .filter((entry: LogEntry) => (entry.level != 'debug' || verbose))
     .subscribe((entry: LogEntry) => {
-      let color: (s: string) => string = x => dim(white(x));
+      let color: (s: string) => string = x => terminal.dim(terminal.white(x));
       let output = process.stdout;
       switch (entry.level) {
         case 'info':
-          color = white;
+          color = terminal.white;
           break;
         case 'warn':
-          color = yellow;
+          color = terminal.yellow;
           break;
         case 'error':
-          color = red;
+          color = terminal.red;
           output = process.stderr;
           break;
         case 'fatal':
-          color = (x: string) => bold(red(x));
+          color = (x: string) => terminal.bold(terminal.red(x));
           output = process.stderr;
           break;
       }
