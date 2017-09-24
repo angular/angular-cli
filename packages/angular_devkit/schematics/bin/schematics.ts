@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { createLogger, schema, tags } from '@angular-devkit/core';
+import { createLogger, schema, tags, terminal } from '@angular-devkit/core';
 import {
   DryRunEvent,
   DryRunSink,
@@ -193,16 +193,20 @@ dryRunSink.reporter.subscribe((event: DryRunEvent) => {
       error = true;
       break;
     case 'update':
-      loggingQueue.push(`UPDATE ${event.path} (${event.content.length} bytes)`);
+      loggingQueue.push(tags.oneLine`
+        ${terminal.white('UPDATE')} ${event.path} (${event.content.length} bytes)
+      `);
       break;
     case 'create':
-      loggingQueue.push(`CREATE ${event.path} (${event.content.length} bytes)`);
+      loggingQueue.push(tags.oneLine`
+        ${terminal.green('CREATE')} ${event.path} (${event.content.length} bytes)
+      `);
       break;
     case 'delete':
-      loggingQueue.push(`DELETE ${event.path}`);
+      loggingQueue.push(`${terminal.yellow('DELETE')} ${event.path}`);
       break;
     case 'rename':
-      loggingQueue.push(`RENAME ${event.path} => ${event.to}`);
+      loggingQueue.push(`${terminal.blue('RENAME')} ${event.path} => ${event.to}`);
       break;
   }
 });
