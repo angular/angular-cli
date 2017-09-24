@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { oneLine, stripIndent } from 'common-tags';
+import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import { getFoldFileTransformer } from './class-fold';
 
@@ -16,31 +16,31 @@ const transform = (content: string) => transformJavascript(
 describe('class-fold', () => {
   it('folds static properties into class', () => {
     const staticProperty = 'Clazz.prop = 1;';
-    const input = stripIndent`
+    const input = tags.stripIndent`
       var Clazz = (function () { function Clazz() { } return Clazz; }());
       ${staticProperty}
     `;
-    const output = stripIndent`
+    const output = tags.stripIndent`
       var Clazz = (function () { function Clazz() { }
       ${staticProperty} return Clazz; }());
     `;
 
-    expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
   it('folds multiple static properties into class', () => {
     const staticProperty = 'Clazz.prop = 1;';
     const anotherStaticProperty = 'Clazz.anotherProp = 2;';
-    const input = stripIndent`
+    const input = tags.stripIndent`
       var Clazz = (function () { function Clazz() { } return Clazz; }());
       ${staticProperty}
       ${anotherStaticProperty}
     `;
-    const output = stripIndent`
+    const output = tags.stripIndent`
       var Clazz = (function () { function Clazz() { }
       ${staticProperty} ${anotherStaticProperty} return Clazz; }());
     `;
 
-    expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 });

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { oneLine, stripIndent } from 'common-tags';
+import { tags } from '@angular-devkit/core';
 import { RawSourceMap } from 'source-map';
 import { buildOptimizer } from './build-optimizer';
 
@@ -18,7 +18,7 @@ describe('build-optimizer', () => {
 
   describe('basic functionality', () => {
     it('applies class-fold, scrub-file and prefix-functions', () => {
-      const input = stripIndent`
+      const input = tags.stripIndent`
         ${imports}
         var __extends = (this && this.__extends) || function (d, b) {
             for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -37,7 +37,7 @@ describe('build-optimizer', () => {
         Clazz.ctorParameters = function () { return [{type: Injector}]; };
       `;
       // tslint:disable:max-line-length
-      const output = oneLine`
+      const output = tags.oneLine`
         /** PURE_IMPORTS_START _angular_core,tslib PURE_IMPORTS_END */
         ${imports}
         import { __extends } from "tslib";
@@ -52,12 +52,12 @@ describe('build-optimizer', () => {
 
       const inputFilePath = '/node_modules/@angular/core/@angular/core.es5.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });
-      expect(oneLine`${boOutput.content}`).toEqual(output);
+      expect(tags.oneLine`${boOutput.content}`).toEqual(output);
       expect(boOutput.emitSkipped).toEqual(false);
     });
 
     it('doesn\'t process files without decorators/ctorParameters/outside Angular', () => {
-      const input = oneLine`
+      const input = tags.oneLine`
         var Clazz = (function () { function Clazz() { } return Clazz; }());
         ${staticProperty}
       `;
@@ -70,18 +70,18 @@ describe('build-optimizer', () => {
     it('supports es2015 modules', () => {
       // prefix-functions would add PURE_IMPORTS_START and PURE to the super call.
       // This test ensures it isn't applied to es2015 modules.
-      const output = oneLine`
+      const output = tags.oneLine`
         import { Injectable } from '@angular/core';
         class Clazz extends BaseClazz { constructor(e) { super(e); } }
       `;
-      const input = stripIndent`
+      const input = tags.stripIndent`
         ${output}
         Clazz.ctorParameters = () => [ { type: Injectable } ];
       `;
 
       const inputFilePath = '/node_modules/@angular/core/@angular/core.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });
-      expect(oneLine`${boOutput.content}`).toEqual(output);
+      expect(tags.oneLine`${boOutput.content}`).toEqual(output);
       expect(boOutput.emitSkipped).toEqual(false);
     });
   });
@@ -89,7 +89,7 @@ describe('build-optimizer', () => {
 
   describe('resilience', () => {
     it('doesn\'t process files with invalid syntax by default', () => {
-      const input = oneLine`
+      const input = tags.oneLine`
         ))))invalid syntax
         ${clazz}
         Clazz.decorators = [ { type: Injectable } ];
@@ -101,7 +101,7 @@ describe('build-optimizer', () => {
     });
 
     it('throws on files with invalid syntax in strict mode', () => {
-      const input = oneLine`
+      const input = tags.oneLine`
         ))))invalid syntax
         ${clazz}
         Clazz.decorators = [ { type: Injectable } ];
@@ -137,7 +137,7 @@ describe('build-optimizer', () => {
   });
 
   describe('sourcemaps', () => {
-    const transformableInput = oneLine`
+    const transformableInput = tags.oneLine`
       ${imports}
       ${clazz}
       ${decorators}
@@ -154,11 +154,11 @@ describe('build-optimizer', () => {
     });
 
     it('doesn\'t produce sourcemaps when emitting was skipped', () => {
-      const ignoredInput = oneLine`
+      const ignoredInput = tags.oneLine`
         var Clazz = (function () { function Clazz() { } return Clazz; }());
         ${staticProperty}
       `;
-      const invalidInput = oneLine`
+      const invalidInput = tags.oneLine`
         ))))invalid syntax
         ${clazz}
         Clazz.decorators = [ { type: Injectable } ];

@@ -5,9 +5,21 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { stripIndents } from './literals';
+import { oneLine, stripIndent, stripIndents } from './literals';
 
 describe('literals', () => {
+  describe('stripIndent', () => {
+    it('works', () => {
+      const test = stripIndent`
+        hello world
+          how are you?
+        test
+      `;
+
+      expect(test).toBe('hello world\n  how are you?\ntest');
+    });
+  });
+
   describe('stripIndents', () => {
     it('works', () => {
       const test = stripIndents`
@@ -16,7 +28,19 @@ describe('literals', () => {
         test
       `;
 
-      expect(test).toBe('\nhello world\n  how are you?\ntest\n');
+      expect(test).toBe('hello world\nhow are you?\ntest');
+    });
+  });
+
+  describe('oneLine', () => {
+    it('works', () => {
+      const test = oneLine`
+        hello world
+          how are you?  blue  red
+        test
+      `;
+
+      expect(test).toBe('hello world how are you?  blue  red test');
     });
   });
 });

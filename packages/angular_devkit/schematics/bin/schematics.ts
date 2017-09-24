@@ -29,7 +29,7 @@ import 'rxjs/add/operator/ignoreElements';
  * Show usage of the CLI tool, and exit the process.
  */
 function usage(exitCode = 0): never {
-  logger.info(tags.stripIndents`
+  logger.info(tags.stripIndent`
     schematics [CollectionName:]SchematicName [options, ...]
 
     By default, if the collection name is not specified, use the internal collection provided

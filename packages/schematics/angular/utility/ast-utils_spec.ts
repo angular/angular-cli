@@ -6,8 +6,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { tags } from '@angular-devkit/core';
 import { VirtualTree } from '@angular-devkit/schematics';
-import { stripIndent } from 'common-tags';
 import * as ts from 'typescript';
 import { Change, InsertChange } from '../utility/change';
 import { getFileContent } from '../utility/test';
@@ -65,7 +65,7 @@ describe('ast utils', () => {
   });
 
   it('should add export to module if not indented', () => {
-    moduleContent = stripIndent`${moduleContent}`;
+    moduleContent = tags.stripIndent`${moduleContent}`;
     const source = getTsSource(modulePath, moduleContent);
     const changes = addExportToModule(source, modulePath, 'FooComponent', './foo.component');
     const output = applyChanges(modulePath, moduleContent, changes);

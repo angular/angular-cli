@@ -5,32 +5,38 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable-next-line:no-any
+export type TemplateTag = (template: TemplateStringsArray, ...substitutions: any[]) => string;
 
-export function oneLine(strings: TemplateStringsArray, ...values: string[]) {
-  const endResult = strings.map((s, i) => s + (i < values.length ? values[i] : '')).join('');
 
-  return endResult.trim().replace(/\n\s*/gm, ' ');
+// tslint:disable-next-line:no-any
+export function oneLine(strings: TemplateStringsArray, ...values: any[]) {
+  const endResult = String.raw(strings, ...values);
+
+  return endResult.replace(/(?:\n(?:\s*))+/gm, ' ').trim();
 }
 
-export function indentBy(indentations: number) {
+export function indentBy(indentations: number): TemplateTag {
   let i = '';
   while (indentations--) {
     i += ' ';
   }
 
-  return (strings: TemplateStringsArray, ...values: string[]) => {
-    return stripIndents(strings, ...values)
+  return (strings, ...values) => {
+    return stripIndent(strings, ...values)
       .replace(/\n/g, '\n' + i);
   };
 }
 
-export function stripIndents(strings: TemplateStringsArray, ...values: string[]) {
-  const endResult = strings.map((s, i) => s + (i < values.length ? values[i] : '')).join('').trim();
 
-  // Remove the shortest leading indentation from each line.
+// tslint:disable-next-line:no-any
+export function stripIndent(strings: TemplateStringsArray, ...values: any[]) {
+  const endResult = String.raw(strings, ...values);
+
+  // remove the shortest leading indentation from each line
   const match = endResult.match(/^[ \t]*(?=\S)/gm);
 
-  // Return early if there's nothing to strip.
+  // return early if there's nothing to strip
   if (match === null) {
     return endResult;
   }
@@ -38,5 +44,15 @@ export function stripIndents(strings: TemplateStringsArray, ...values: string[])
   const indent = Math.min(...match.map(el => el.length));
   const regexp = new RegExp('^[ \\t]{' + indent + '}', 'gm');
 
-  return (indent > 0 ? endResult.replace(regexp, '') : endResult).replace(/[ \t]*$/, '');
+  return (indent > 0 ? endResult.replace(regexp, '') : endResult).trim();
+}
+
+
+// tslint:disable-next-line:no-any
+export function stripIndents(strings: TemplateStringsArray, ...values: any[]) {
+  return String.raw(strings, ...values)
+    .split('\n')
+    .map(line => line.trim())
+    .join('\n')
+    .trim();
 }

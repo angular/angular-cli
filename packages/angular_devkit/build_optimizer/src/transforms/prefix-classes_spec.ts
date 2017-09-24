@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { oneLine, stripIndent } from 'common-tags';
+import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import { getPrefixClassesTransformer, testPrefixClasses } from './prefix-classes';
 
@@ -15,7 +15,7 @@ const transform = (content: string) => transformJavascript(
 
 describe('prefix-classes', () => {
   it('prefix downleveled classes with /*@__PURE__*/', () => {
-    const input = stripIndent`
+    const input = tags.stripIndent`
       var ReplayEvent = (function () {
           function ReplayEvent(time, value) {
               this.time = time;
@@ -24,7 +24,7 @@ describe('prefix-classes', () => {
           return ReplayEvent;
       }());
     `;
-    const output = stripIndent`
+    const output = tags.stripIndent`
       var ReplayEvent = /*@__PURE__*/ (function () {
           function ReplayEvent(time, value) {
               this.time = time;
@@ -35,12 +35,12 @@ describe('prefix-classes', () => {
     `;
 
     expect(testPrefixClasses(input)).toBeTruthy();
-    expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
   // tslint:disable:max-line-length
   it('prefix downleveled classes that extend another class with /*@__PURE__*/', () => {
-    const input = stripIndent`
+    const input = tags.stripIndent`
       var TakeUntilSubscriber = (function (_super) {
           __extends(TakeUntilSubscriber, _super);
           function TakeUntilSubscriber(destination, notifier) {
@@ -57,7 +57,7 @@ describe('prefix-classes', () => {
           return TakeUntilSubscriber;
       }(OuterSubscriber_1.OuterSubscriber));
     `;
-    const output = stripIndent`
+    const output = tags.stripIndent`
       var TakeUntilSubscriber = /*@__PURE__*/ (function (_super) {
           __extends(TakeUntilSubscriber, _super);
           function TakeUntilSubscriber(destination, notifier) {
@@ -76,7 +76,7 @@ describe('prefix-classes', () => {
     `;
 
     expect(testPrefixClasses(input)).toBeTruthy();
-    expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
   // tslint:enable:max-line-length
 });
