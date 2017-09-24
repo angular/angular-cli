@@ -1,6 +1,6 @@
 # Multiple Apps integration
 
-Angular CLI support multiple applications within one project.
+Angular CLI supports multiple applications within one project.
 You use the `apps` array in `.angular-cli.json` to list files and folders you want to use for different apps.
 
 By default one app is created when then new project is created and `apps` array looks like:
