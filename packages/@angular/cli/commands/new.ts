@@ -2,14 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
 
-import InitCommand from './init';
 import { CliConfig } from '../models/config';
 import { validateProjectName } from '../utilities/validate-project-name';
 import { oneLine } from 'common-tags';
 import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 
 const Command = require('../ember-cli/lib/models/command');
-const Project = require('../ember-cli/lib/models/project');
 const SilentError = require('silent-error');
 
 const NewCommand = Command.extend({
@@ -150,15 +148,15 @@ const NewCommand = Command.extend({
       commandOptions.collectionName = this.getCollectionName(rawArgs);
     }
 
-    const initCommand = new InitCommand({
-      ui: this.ui,
+    const InitTask = require('../tasks/init').default;
+
+    const initTask = new InitTask({
+      project: this.project,
       tasks: this.tasks,
-      project: Project.nullProject(this.ui, this.cli)
+      ui: this.ui,
     });
 
-    return Promise.resolve()
-      .then(initCommand.run.bind(initCommand, commandOptions, rawArgs));
-
+    return initTask.run(commandOptions, rawArgs);
   }
 });
 
