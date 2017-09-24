@@ -8,6 +8,7 @@
 import { BaseException } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
+import { isFile } from './fs';
 
 
 export class ModuleNotFoundException extends BaseException {
@@ -29,21 +30,6 @@ function _caller() {
   error.prepareStackTrace = origPrepareStackTrace;
 
   return stack ? stack[2].getFileName() : '';
-}
-
-
-function _isFile(filePath: string) {
-  let stat;
-  try {
-    stat = fs.statSync(filePath);
-  } catch (e) {
-    if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR')) {
-      return false;
-    }
-    throw e;
-  }
-
-  return stat.isFile() || stat.isFIFO();
 }
 
 
@@ -155,16 +141,16 @@ export function resolve(x: string, options: ResolveOptions = {}): string {
   throw new ModuleNotFoundException(x, basePath);
 
   function loadAsFileSync(x: string): string | null {
-    if (_isFile(x)) {
+    if (isFile(x)) {
       return x;
     }
 
-    return extensions.map(ex => x + ex).find(f => _isFile(f)) || null;
+    return extensions.map(ex => x + ex).find(f => isFile(f)) || null;
   }
 
   function loadAsDirectorySync(x: string): string | null {
     const pkgfile = path.join(x, 'package.json');
-    if (_isFile(pkgfile)) {
+    if (isFile(pkgfile)) {
       try {
         const body = readFileSync(pkgfile, 'UTF8');
         const pkg = JSON.parse(body);

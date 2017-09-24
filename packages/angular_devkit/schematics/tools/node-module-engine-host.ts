@@ -5,14 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { resolve } from '@angular-devkit/core/node';
+import * as core from '@angular-devkit/core/node';
 import { RuleFactory } from '@angular-devkit/schematics';
 import {
   CollectionCannotBeResolvedException,
   CollectionMissingSchematicsMapException,
   SchematicMissingFieldsException,
 } from '@angular-devkit/schematics/tools';
-import { dirname, join } from 'path';
+import { dirname, join, resolve as resolvePath } from 'path';
 import {
   FileSystemCollectionDesc,
   FileSystemSchematicDesc,
@@ -27,23 +27,37 @@ import { FileSystemEngineHostBase } from './file-system-engine-host-base';
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
   constructor() { super(); }
 
-  protected _resolveCollectionPath(name: string): string {
-    const packageJsonPath = resolve(join(name, 'package.json'), {
-      basedir: process.cwd(),
-      checkLocal: true,
-      checkGlobal: true,
-    });
+  protected _resolvePath(name: string, basedir = process.cwd(), extraChecks = true): string {
+    // Allow relative / absolute paths.
+    if (name.startsWith('.') || name.startsWith('/')) {
+      return resolvePath(process.cwd(), name);
+    } else {
+      return core.resolve(name, {
+        basedir,
+        checkLocal: extraChecks,
+        checkGlobal: extraChecks,
+      });
+    }
+  }
 
-    const pkgJsonSchematics = require(packageJsonPath)['schematics'];
-    if (!pkgJsonSchematics) {
-      throw new CollectionCannotBeResolvedException(name);
+  protected _resolveCollectionPath(name: string): string {
+    let packageJsonPath = this._resolvePath(name);
+    // If it's a file, use it as is. Otherwise append package.json to it.
+    if (!core.fs.isFile(packageJsonPath)) {
+      packageJsonPath = join(packageJsonPath, 'package.json');
     }
 
-    return resolve(join(dirname(packageJsonPath), pkgJsonSchematics), {
-      basedir: process.cwd(),
-      checkLocal: true,
-      checkGlobal: true,
-    });
+    try {
+      const pkgJsonSchematics = require(packageJsonPath)['schematics'];
+      if (pkgJsonSchematics) {
+        const resolvedPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath), false);
+        require(resolvedPath);
+
+        return resolvedPath;
+      }
+    } catch (e) {
+    }
+    throw new CollectionCannotBeResolvedException(name);
   }
 
   protected _resolveReferenceString(refString: string, parentPath: string) {
