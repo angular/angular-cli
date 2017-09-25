@@ -23,8 +23,7 @@ export function indentBy(indentations: number): TemplateTag {
   }
 
   return (strings, ...values) => {
-    return stripIndent(strings, ...values)
-      .replace(/\n/g, '\n' + i);
+    return i + stripIndent(strings, ...values).replace(/\n/g, '\n' + i);
   };
 }
 
