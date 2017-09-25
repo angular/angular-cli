@@ -2,6 +2,7 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
+import { satisfies } from 'semver';
 import * as ts from 'typescript';
 import { requireProjectModule } from '../utilities/require-project-module';
 
@@ -57,16 +58,20 @@ export default Task.extend({
           fix: options.fix,
           formatter: options.format
         };
-        const lintProgram = options.typeCheck ? program : undefined;
-        const linter = new Linter(lintOptions, lintProgram);
+
+        // TSLint < 5.5 has a bug with fix and project used in combination.
+        // previous behavior of typeCheck option is maintained for those versions
+        if (satisfies(Linter.VERSION, '< 5.5') && !options.typeCheck) {
+          program = undefined;
+        }
+
+        const linter = new Linter(lintOptions, program);
 
         let lastDirectory: string;
         let configLoad: any;
         files.forEach((file) => {
-          const fileContents = getFileContents(file, program);
-          if (!fileContents) {
-            return;
-          }
+          // The linter retrieves the SourceFile TS node directly if a program is used
+          const fileContents = program ? undefined : getFileContents(file);
 
           // Only check for a new tslint config if path changes
           const currentDirectory = path.dirname(file);
@@ -153,21 +158,14 @@ function getFilesToLint(program: ts.Program, lintConfig: CliLintConfig, Linter: 
   return files;
 }
 
-function getFileContents(file: string, program?: ts.Program): string {
+function getFileContents(file: string): string {
   let contents: string;
 
-  if (program) {
-    const sourceFile = program.getSourceFile(file);
-    if (sourceFile) {
-       contents = sourceFile.getFullText();
-    }
-  } else {
-    // NOTE: The tslint CLI checks for and excludes MPEG transport streams; this does not.
-    try {
-      contents = fs.readFileSync(file, 'utf8');
-    } catch (e) {
-      throw new SilentError(`Could not read file "${file}".`);
-    }
+  // NOTE: The tslint CLI checks for and excludes MPEG transport streams; this does not.
+  try {
+    contents = fs.readFileSync(file, 'utf8');
+  } catch (e) {
+    throw new SilentError(`Could not read file "${file}".`);
   }
 
   return contents;
