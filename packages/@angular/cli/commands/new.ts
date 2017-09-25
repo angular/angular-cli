@@ -50,13 +50,6 @@ const NewCommand = Command.extend({
       description: 'Skip installing packages.'
     },
     {
-      name: 'skip-git',
-      type: Boolean,
-      default: false,
-      aliases: ['sg'],
-      description: 'Skip initializing a git repository.'
-    },
-    {
       name: 'skip-commit',
       type: Boolean,
       default: false,
@@ -155,6 +148,9 @@ const NewCommand = Command.extend({
       tasks: this.tasks,
       ui: this.ui,
     });
+
+    // Ensure skipGit has a boolean value.
+    commandOptions.skipGit = commandOptions.skipGit === undefined ? false : commandOptions.skipGit;
 
     return initTask.run(commandOptions, rawArgs);
   }
