@@ -45,6 +45,10 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
+     * Skip initializing a git repository.
+     */
+    skipGit?: boolean;
+    /**
      * Should create a minimal app.
      */
     minimal?: boolean;

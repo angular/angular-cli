@@ -69,6 +69,12 @@
       "default": false,
       "alias": "st"
     },
+    "skipGit": {
+      "description": "Skip initializing a git repository.",
+      "type": "boolean",
+      "default": false,
+      "alias": "sg"
+    },
     "minimal": {
       "description": "Should create a minimal app.",
       "type": "boolean",

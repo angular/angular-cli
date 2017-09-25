@@ -94,6 +94,7 @@ export default function (options: ApplicationOptions): Rule {
       mergeWith(
         apply(url('./files'), [
           options.minimal ? filter(minimalPathFilter) : noop(),
+          options.skipGit ? filter(path => !path.endsWith('/__dot__gitignore')) : noop(),
           template({
             utils: stringUtils,
             'dot': '.',

@@ -95,4 +95,12 @@ describe('Application Schematic', () => {
     const routingModuleContent = getFileContent(tree, '/foo/src/app/app-routing.module.ts');
     expect(routingModuleContent).toMatch(/RouterModule.forRoot\(routes\)/);
   });
+
+  it('should handle the skip git flag', () => {
+    const options = { ...defaultOptions, skipGit: true };
+
+    const tree = schematicRunner.runSchematic('application', options);
+    const files = tree.files;
+    expect(files.indexOf('/foo/.gitignore')).toEqual(-1);
+  });
 });
