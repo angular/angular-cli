@@ -22,11 +22,20 @@ export interface LogEntry extends LoggerMetadata {
   message: string;
   timestamp: number;
 }
+export interface LoggerApi {
+  createChild(name: string): Logger;
+  log(level: LogLevel, message: string, metadata?: JsonObject): void;
+  debug(message: string, metadata?: JsonObject): void;
+  info(message: string, metadata?: JsonObject): void;
+  warn(message: string, metadata?: JsonObject): void;
+  error(message: string, metadata?: JsonObject): void;
+  fatal(message: string, metadata?: JsonObject): void;
+}
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
 
-export class Logger extends Observable<LogEntry> {
+export class Logger extends Observable<LogEntry> implements LoggerApi {
   protected readonly _subject: Subject<LogEntry> = new Subject<LogEntry>();
   protected _metadata: LoggerMetadata;
 
@@ -72,6 +81,24 @@ export class Logger extends Observable<LogEntry> {
       // When the parent completes, complete us as well.
       this.parent._subject.subscribe(undefined, undefined, () => this.complete());
     }
+  }
+
+  asApi(): LoggerApi {
+    return {
+      createChild: (name: string) => this.createChild(name),
+      log: (level: LogLevel, message: string, metadata?: JsonObject) => {
+        return this.log(level, message, metadata);
+      },
+      debug: (message: string, metadata?: JsonObject) => this.debug(message, metadata),
+      info: (message: string, metadata?: JsonObject) => this.info(message, metadata),
+      warn: (message: string, metadata?: JsonObject) => this.warn(message, metadata),
+      error: (message: string, metadata?: JsonObject) => this.error(message, metadata),
+      fatal: (message: string, metadata?: JsonObject) => this.fatal(message, metadata),
+    };
+  }
+
+  createChild(name: string) {
+    return new Logger(name, this);
   }
 
   complete() {

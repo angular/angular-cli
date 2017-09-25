@@ -244,7 +244,7 @@ delete args._;
  * Then we proceed to run the dryRun commit. We run this before we then commit to the filesystem
  * (if --dry-run was not passed or an error was detected by dryRun).
  */
-schematic.call(args, host, { debug, logger })
+schematic.call(args, host, { debug, logger: logger.asApi() })
   .map((tree: Tree) => Tree.optimize(tree))
   .concatMap((tree: Tree) => {
     return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));

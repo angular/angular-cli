@@ -52,4 +52,22 @@ describe('Logger', () => {
     childLogger.info('world');
     logger.complete();
   });
+
+  it('misses messages if not subscribed', (done: DoneFn) => {
+    const logger = new Logger('test');
+    logger.debug('woah');
+
+    logger
+      .toArray()
+      .toPromise()
+      .then((observed: JsonValue[]) => {
+        expect(observed).toEqual([
+          jasmine.objectContaining({ message: 'hello', level: 'debug', name: 'test' }) as any,
+        ]);
+      })
+      .then(() => done(), err => done.fail(err));
+
+    logger.debug('hello');
+    logger.complete();
+  });
 });
