@@ -28,10 +28,10 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-devkit/build-optimizer": "~0.0.18",
-    "@angular-devkit/schematics": "~0.0.21",
+    "@angular-devkit/schematics": "~0.0.25",
     "@ngtools/json-schema": "1.1.0",
     "@ngtools/webpack": "1.7.1",
-    "@schematics/angular": "~0.0.30",
+    "@schematics/angular": "~0.0.38",
     "autoprefixer": "^6.5.3",
     "chalk": "^2.0.1",
     "circular-dependency-plugin": "^3.0.0",
