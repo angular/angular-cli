@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Position, SourceNode } from 'source-map';
 
 // Matches <%= expr %>. This does not support structural JavaScript (for/if/...).
 const kInterpolateRe = /<%=([\s\S]+?)%>/g;
@@ -31,105 +32,329 @@ const reUnescapedHtml = new RegExp(`[${Object.keys(kHtmlEscapes).join('')}]`, 'g
 // Options to pass to template.
 export interface TemplateOptions {
   sourceURL?: string;
+  sourceMap?: boolean;
+  module?: boolean | { exports: {} };
+  sourceRoot?: string;
+  fileName?: string;
 }
 
 
-// Used to match empty string literals in compiled template source.
-const reEmptyStringLeading = /\b__p \+= '';/g;
-const reEmptyStringMiddle = /\b(__p \+=) '' \+/g;
-const reEmptyStringTrailing = /(__e\(.*?\)|\b__t\)) \+\n'';/g;
+function _positionFor(content: string, offset: number): Position {
+  let line = 1;
+  let column = 0;
+  for (let i = 0; i < offset - 1; i++) {
+    if (content[i] == '\n') {
+      line++;
+      column = 0;
+    } else {
+      column++;
+    }
+  }
 
+  return {
+    line,
+    column,
+  };
+}
 
-// Used to escape characters for inclusion in compiled string literals.
-const stringEscapes: {[char: string]: string} = {
-  '\\': '\\\\',
-  "'": "\\'",
-  '\n': '\\n',
-  '\r': '\\r',
-  '\u2028': '\\u2028',
-  '\u2029': '\\u2029',
-};
+/**
+ * A simple AST for templates. There's only one level of AST nodes, but it's still useful
+ * to have the information you're looking for.
+ */
+export interface TemplateAst {
+  fileName: string;
+  content: string;
+  children: TemplateAstNode[];
+}
 
-// Used to match unescaped characters in compiled string literals.
-const reUnescapedString = /['\n\r\u2028\u2029\\]/g;
+/**
+ * The base, which contains positions.
+ */
+export interface TemplateAstBase {
+  start: Position;
+  end: Position;
+}
+
+/**
+ * A static content node.
+ */
+export interface TemplateAstContent extends TemplateAstBase {
+  kind: 'content';
+  content: string;
+}
+
+/**
+ * An evaluate node, which is the code between `<% ... %>`.
+ */
+export interface TemplateAstEvaluate extends TemplateAstBase {
+  kind: 'evaluate';
+  expression: string;
+}
+
+/**
+ * An escape node, which is the code between `<%- ... %>`.
+ */
+export interface TemplateAstEscape extends TemplateAstBase {
+  kind: 'escape';
+  expression: string;
+}
+
+/**
+ * An interpolation node, which is the code between `<%= ... %>`.
+ */
+export interface TemplateAstInterpolate extends TemplateAstBase {
+  kind: 'interpolate';
+  expression: string;
+}
+
+export type TemplateAstNode = TemplateAstContent
+                            | TemplateAstEvaluate
+                            | TemplateAstEscape
+                            | TemplateAstInterpolate;
+
+/**
+ * Given a source text (and a fileName), returns a TemplateAst.
+ */
+export function templateParser(sourceText: string, fileName: string): TemplateAst {
+  const children = [];
+
+  // Compile the regexp to match each delimiter.
+  const reDelimiters = RegExp(
+    `${kEscapeRe.source}|${kInterpolateRe.source}|${kEvaluateRe.source}|$`, 'g');
+
+  const parsed = sourceText.split(reDelimiters);
+  let offset = 0;
+  // Optimization that uses the fact that the end of a node is always the beginning of the next
+  // node, so we keep the positioning of the nodes in memory.
+  let start = _positionFor(sourceText, offset);
+  let end = null as Position | null;
+
+  for (let i = 0; i < parsed.length; i += 4) {
+    const [content, escape, interpolate, evaluate] = parsed.slice(i, i + 4);
+    if (content) {
+      end = _positionFor(sourceText, offset + content.length);
+      offset += content.length;
+      children.push({ kind: 'content', content, start, end } as TemplateAstContent);
+      start = end;
+    }
+    if (escape) {
+      end = _positionFor(sourceText, offset + escape.length + 5);
+      offset += escape.length + 5;
+      children.push({ kind: 'escape', expression: escape, start, end } as TemplateAstEscape);
+      start = end;
+    }
+    if (interpolate) {
+      end = _positionFor(sourceText, offset + interpolate.length + 5);
+      offset += interpolate.length + 5;
+      children.push({
+        kind: 'interpolate',
+        expression: interpolate,
+        start,
+        end,
+      } as TemplateAstInterpolate);
+      start = end;
+    }
+    if (evaluate) {
+      end = _positionFor(sourceText, offset + evaluate.length + 5);
+      offset += evaluate.length + 5;
+      children.push({ kind: 'evaluate', expression: evaluate, start, end } as TemplateAstEvaluate);
+      start = end;
+    }
+  }
+
+  return {
+    fileName,
+    content: sourceText,
+    children,
+  };
+}
+
+/**
+ * Fastest implementation of the templating algorithm. It only add strings and does not bother
+ * with source maps.
+ */
+function templateFast(ast: TemplateAst, options?: TemplateOptions): string {
+  const module = options && options.module ? 'module.exports.default =' : '';
+  const reHtmlEscape = reUnescapedHtml.source.replace(/[']/g, '\\\\\\\'');
+
+  return `
+    return ${module} function(obj) {
+      obj || (obj = {});
+      let __t;
+      let __p = '';
+      const __escapes = ${JSON.stringify(kHtmlEscapes)};
+      const __escapesre = new RegExp('${reHtmlEscape}', 'g');
+
+      const __e = function(s) {
+        return s ? s.replace(__escapesre, function(key) { return __escapes[key]; }) : '';
+      };
+      with (obj) {
+        ${ast.children.map(node => {
+            switch (node.kind) {
+              case 'content':
+                return `__p += ${JSON.stringify(node.content)};`;
+              case 'interpolate':
+                return `__p += ((__t = (${node.expression})) == null) ? '' : __t;`;
+              case 'escape':
+                return `__p += __e(${node.expression});`;
+              case 'evaluate':
+                return node.expression;
+            }
+          }).join('\n')
+        }
+      }
+
+      return __p;
+    };
+  `;
+}
+
+/**
+ * Templating algorithm with source map support. The map is outputted as //# sourceMapUrl=...
+ */
+function templateWithSourceMap(ast: TemplateAst, options?: TemplateOptions): string {
+  const sourceUrl = ast.fileName;
+  const module = options && options.module ? 'module.exports.default =' : '';
+  const reHtmlEscape = reUnescapedHtml.source.replace(/[']/g, '\\\\\\\'');
+
+  const preamble = (new SourceNode(1, 0, sourceUrl, ''))
+    .add(new SourceNode(1, 0, sourceUrl, [
+      `return ${module} function(obj) {\n`,
+      '  obj || (obj = {});\n',
+      '  let __t;\n',
+      '  let __p = "";\n',
+      `  const __escapes = ${JSON.stringify(kHtmlEscapes)};\n`,
+      `  const __escapesre = new RegExp('${reHtmlEscape}', 'g');\n`,
+      `\n`,
+      `  const __e = function(s) { `,
+      `    return s ? s.replace(__escapesre, function(key) { return __escapes[key]; }) : '';`,
+      `  };\n`,
+      `  with (obj) {\n`,
+    ]));
+
+  const end = ast.children.length
+    ? ast.children[ast.children.length - 1].end
+    : { line: 0, column: 0 };
+  const nodes = ast.children.reduce((chunk, node) => {
+    let code: string | SourceNode | (SourceNode | string)[] = '';
+    switch (node.kind) {
+      case 'content':
+        code = [
+          new SourceNode(node.start.line, node.start.column, sourceUrl, '__p = __p'),
+          ...node.content.split('\n').map((line, i, arr) => {
+            return new SourceNode(
+              node.start.line + i,
+              i == 0 ? node.start.column : 0,
+              sourceUrl,
+              '\n    + '
+              + JSON.stringify(line + (i == arr.length - 1 ? '' : '\n')),
+            );
+          }),
+          new SourceNode(node.end.line, node.end.column, sourceUrl, ';\n'),
+        ];
+        break;
+      case 'interpolate':
+        code = [
+          new SourceNode(node.start.line, node.start.column, sourceUrl, '__p += ((__t = '),
+          ...node.expression.split('\n').map((line, i, arr) => {
+            return new SourceNode(
+              node.start.line + i,
+              i == 0 ? node.start.column : 0,
+              sourceUrl,
+              line + ((i == arr.length - 1) ? '' : '\n'),
+            );
+          }),
+          new SourceNode(node.end.line, node.end.column, sourceUrl, ') == null ? "" : __t);\n'),
+        ];
+        break;
+      case 'escape':
+        code = [
+          new SourceNode(node.start.line, node.start.column, sourceUrl, '__p += __e('),
+          ...node.expression.split('\n').map((line, i, arr) => {
+            return new SourceNode(
+              node.start.line + i,
+              i == 0 ? node.start.column : 0,
+              sourceUrl,
+              line + ((i == arr.length - 1) ? '' : '\n'),
+            );
+          }),
+          new SourceNode(node.end.line, node.end.column, sourceUrl, ');\n'),
+        ];
+        break;
+      case 'evaluate':
+        code = [
+          ...node.expression.split('\n').map((line, i, arr) => {
+            return new SourceNode(
+              node.start.line + i,
+              i == 0 ? node.start.column : 0,
+              sourceUrl,
+              line + ((i == arr.length - 1) ? '' : '\n'),
+            );
+          }),
+          new SourceNode(node.end.line, node.end.column, sourceUrl, '\n'),
+        ];
+        break;
+    }
+
+    return chunk.add(new SourceNode(node.start.line, node.start.column, sourceUrl, code));
+  }, preamble)
+  .add(new SourceNode(end.line, end.column, sourceUrl, [
+    '  };\n',
+    '\n',
+    '  return __p;\n',
+    '}\n',
+  ]));
+
+  const code = nodes.toStringWithSourceMap({
+    file: sourceUrl,
+    sourceRoot: options && options.sourceRoot || '.',
+  });
+
+  // Set the source content in the source map, otherwise the sourceUrl is not enough
+  // to find the content.
+  code.map.setSourceContent(sourceUrl, ast.content);
+
+  return code.code
+       + '\n//# sourceMappingURL=data:application/json;base64,'
+       + new Buffer(code.map.toString()).toString('base64');
+}
 
 
 /**
- * An equivalent of lodash templates, which is based on John Resig's `tmpl` implementation
+ * An equivalent of EJS templates, which is based on John Resig's `tmpl` implementation
  * (http://ejohn.org/blog/javascript-micro-templating/) and Laura Doktorova's doT.js
  * (https://github.com/olado/doT).
  *
  * This version differs from lodash by removing support from ES6 quasi-literals, and making the
  * code slightly simpler to follow. It also does not depend on any third party, which is nice.
  *
- * @param content
- * @param options
- * @return {any}
+ * Finally, it supports SourceMap, if you ever need to debug, which is super nice.
+ *
+ * @param content The template content.
+ * @param options Optional Options. See TemplateOptions for more description.
+ * @return {(input: T) => string} A function that accept an input object and returns the content
+ *         of the template with the input applied.
  */
 export function template<T>(content: string, options?: TemplateOptions): (input: T) => string {
-  const interpolate = kInterpolateRe;
-  let isEvaluating;
-  let index = 0;
-  let source = `__p += '`;
+  const sourceUrl = options && options.sourceURL || 'ejs';
+  const ast = templateParser(content, sourceUrl);
 
-  options = options || {};
+  let source: string;
+  // If there's no need for source map support, we revert back to the fast implementation.
+  if (options && options.sourceMap) {
+    source = templateWithSourceMap(ast, options);
+  } else {
+    source = templateFast(ast, options);
+  }
 
-  // Compile the regexp to match each delimiter.
-  const reDelimiters = RegExp(
-    `${kEscapeRe.source}|${interpolate.source}|${kEvaluateRe.source}|$`, 'g');
-
-  // Use a sourceURL for easier debugging.
-  const sourceURL = options.sourceURL ? '//# sourceURL=' + options.sourceURL + '\n' : '';
-
-  content.replace(reDelimiters, (match, escapeValue, interpolateValue, evaluateValue, offset) => {
-    // Escape characters that can't be included in string literals.
-    source += content.slice(index, offset).replace(reUnescapedString, chr => stringEscapes[chr]);
-
-    // Replace delimiters with snippets.
-    if (escapeValue) {
-      source += `' +\n__e(${escapeValue}) +\n  '`;
-    }
-    if (evaluateValue) {
-      isEvaluating = true;
-      source += `';\n${evaluateValue};\n__p += '`;
-    }
-    if (interpolateValue) {
-      source += `' +\n((__t = (${interpolateValue})) == null ? '' : __t) +\n  '`;
-    }
-    index = offset + match.length;
-
-    return match;
-  });
-
-  source += "';\n";
-
-  // Cleanup code by stripping empty strings.
-  source = (isEvaluating ? source.replace(reEmptyStringLeading, '') : source)
-    .replace(reEmptyStringMiddle, '$1')
-    .replace(reEmptyStringTrailing, '$1;');
-
-  // Frame code as the function body.
-  source = `
-  return function(obj) {
-    obj || (obj = {});
-    let __t;
-    let __p = '';
-
-    const __escapes = ${JSON.stringify(kHtmlEscapes)};
-    const __escapesre = new RegExp('${reUnescapedHtml.source.replace(/'/g, '\\\'')}', 'g');
-
-    const __e = function(s) {
-      return s ? s.replace(__escapesre, key => __escapes[key]) : '';
-    };
-    with (obj) {
-      ${source.replace(/\n/g, '\n      ')}
-    }
-    return __p;
-  };
-  `;
-
-  const fn = Function(sourceURL + source);
-  const result = fn();
+  // We pass a dummy module in case the module option is passed. If `module: true` is passed, we
+  // need to only use the source, not the function itself. Otherwise expect a module object to be
+  // passed, and we use that one.
+  const fn = Function('module', source);
+  const module = options && options.module
+               ? (options.module === true ? { exports: {} } : options.module)
+               : null;
+  const result = fn(module);
 
   // Provide the compiled function's source by its `toString` method or
   // the `source` property as a convenience for inlining compiled templates.

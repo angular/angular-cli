@@ -239,12 +239,19 @@ export default function(argv: { local?: boolean }, logger: Logger) {
     const files = glob.sync(path.join(pkg.dist, '**/*.ejs'));
     templateLogger.info(`  ${files.length} ejs files found...`);
     files.forEach(fileName => {
-      const fn = templateCompiler(fs.readFileSync(fileName).toString());
-      _rm(fileName);
-      fs.writeFileSync(
-        fileName.replace(/\.ejs$/, '.js'),
-        fn.source.replace(/^\s*return /, 'module.exports.default = '),
+      const p = path.relative(
+        path.dirname(__dirname),
+        path.join(pkg.root, path.relative(pkg.dist, fileName)),
       );
+      const fn = templateCompiler(fs.readFileSync(fileName).toString(), {
+        module: true,
+        sourceURL: p,
+        sourceMap: true,
+        sourceRoot: path.join(__dirname, '..'),
+        fileName: fileName.replace(/\.ejs$/, '.js'),
+      });
+      _rm(fileName);
+      fs.writeFileSync(fileName.replace(/\.ejs$/, '.js'), fn.source);
     });
   }
 

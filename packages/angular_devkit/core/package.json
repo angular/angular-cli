@@ -8,5 +8,6 @@
     "core"
   ],
   "dependencies": {
+    "source-map": "^0.5.6"
   }
 }
