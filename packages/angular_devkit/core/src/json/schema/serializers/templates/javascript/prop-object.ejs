@@ -37,9 +37,13 @@ const handlers = Object.create(null);
 }
 %>
 
+const objectFunctions = {
+  hasOwnProperty(name) { return objectProxyHandler.has(null, name); },
+};
+
 
 let defined = false;
-const proxy = new Proxy({}, {
+const objectProxyHandler = {
   isExtensible() { return false; },
   has(target, prop) {
     return (prop in handlers && handlers[prop].isDefined())
@@ -53,6 +57,9 @@ const proxy = new Proxy({}, {
     }
     if (prop in handlers) {
       return handlers[prop].get();
+    }
+    if (prop in objectFunctions) {
+      return objectFunctions[prop];
     }
     return undefined;
   },
@@ -90,15 +97,20 @@ const proxy = new Proxy({}, {
   getOwnPropertyDescriptor(target, prop) {
     if (prop in handlers) {
       return { configurable: true, enumerable: true };
+    } else if (additionalPropertyHandler && prop in additionalPropertyHandler) {
+      return { configurable: true, enumerable: true };
     }
   },
   ownKeys(target) {
     return [].concat(
-      Object.keys(handlers).filter(function(key) { return handlers[key].isDefined(); }),
+      Object.keys(handlers),
       additionalPropertyHandler ? Object.keys(additionalProperties) : []
     );
   },
-});
+};
+
+
+const proxy = new Proxy({}, objectProxyHandler);
 
 const objectHandler = {
   set(v) {

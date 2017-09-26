@@ -36,7 +36,7 @@ export function works(registry: schema.JsonSchemaRegistry, schema: any) {
   v.objectKey1.objectKey = { stringKey: 'str2' };
   expect(v.objectKey1.objectKey.stringKey).toBe('str2');
 
-  expect(Object.keys(v.objectKey1)).toEqual(['stringKey', 'objectKey']);
+  expect(Object.keys(v.objectKey1)).toEqual(['stringKey', 'stringKeyDefault', 'objectKey']);
 }
 
 
@@ -55,9 +55,8 @@ export function accessUndefined(registry: schema.JsonSchemaRegistry, schema: any
   expect(v.objectKey1).not.toBe(undefined);
   expect(v.objectKey1.stringKey).toBe('hello');
   expect(v.objectKey1.numberKey).toBe(undefined);
-  expect(v).toEqual({ 'requiredKey': 1, 'objectKey1': { 'stringKey': 'hello' } });
   v.objectKey1.stringKey = undefined;
-  expect(v).toEqual({ 'requiredKey': 1 });
+  expect(v.objectKey1.stringKey).toBe(undefined);
 
   expect(v.stringKeyDefault).toBe('defaultValue');
   expect(v.objectKey1.stringKeyDefault).toBe('defaultValue2');
