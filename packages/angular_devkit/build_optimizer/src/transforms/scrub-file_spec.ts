@@ -173,6 +173,20 @@ describe('scrub-file', () => {
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
     });
 
+
+    fit('removes top-level Angular constructor parameters in es2015', () => {
+      const output = stripIndent`
+        class Clazz extends BaseClazz { constructor(e) { super(e); } }
+      `;
+      const input = stripIndent`
+        ${output}
+        Clazz.ctorParameters = () => [ { type: Injectable } ];
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    });
+
     it('removes nested constructor parameters', () => {
       const output = stripIndent`
         import { Injector } from '@angular/core';

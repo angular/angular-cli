@@ -226,7 +226,9 @@ function isCtorParamsAssignmentExpression(exprStmt: ts.ExpressionStatement): boo
   if (expr.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
     return false;
   }
-  if (expr.right.kind !== ts.SyntaxKind.FunctionExpression) {
+  if (expr.right.kind !== ts.SyntaxKind.FunctionExpression
+    && expr.right.kind !== ts.SyntaxKind.ArrowFunction
+  ) {
     return false;
   }
 
