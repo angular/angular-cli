@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsCollectionSchema",
+  "title": "Collection Schema for validating a 'collection.json'.",
+  "type": "object",
+  "properties": {
+    "schematics": {
+      "type": "object",
+      "properties": {
+        "additionalProperty": {
+          "type": "object",
+          "properties": {
+            "factory": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "extends": {
+              "type": "string"
+            },
+            "schema": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "factory",
+            "description"
+          ]
+        }
+      }
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schematics"
+  ]
+}
