@@ -127,7 +127,7 @@ To update Angular CLI to a new version, you must update both the global package 
 Global package:
 ```bash
 npm uninstall -g @angular/cli
-npm cache clean
+npm cache verify // clean cache in npm v5
 npm install -g @angular/cli@latest
 ```
 
