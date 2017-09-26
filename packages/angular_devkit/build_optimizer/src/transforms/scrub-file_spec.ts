@@ -174,7 +174,7 @@ describe('scrub-file', () => {
     });
 
 
-    fit('removes top-level Angular constructor parameters in es2015', () => {
+    it('removes top-level Angular constructor parameters in es2015', () => {
       const output = stripIndent`
         class Clazz extends BaseClazz { constructor(e) { super(e); } }
       `;
