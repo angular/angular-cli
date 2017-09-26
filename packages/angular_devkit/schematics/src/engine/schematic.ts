@@ -55,6 +55,8 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
       const result = this._factory(transformedOptions)(tree, context);
       if (result instanceof Observable) {
         return result;
+      } else if (result === undefined) {
+        return Observable.of(tree);
       } else {
         return Observable.of(result);
       }

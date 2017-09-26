@@ -16,7 +16,7 @@ import { VirtualTree } from '../tree/virtual';
  * When a rule or source returns an invalid value.
  */
 export class InvalidRuleResultException extends BaseException {
-  constructor(value: {}) {
+  constructor(value?: {}) {
     let v = 'Unknown Type';
     if (value === undefined) {
       v = 'undefined';
@@ -56,13 +56,15 @@ export function callSource(source: Source, context: SchematicContext): Observabl
 export function callRule(rule: Rule,
                          input: Observable<Tree>,
                          context: SchematicContext): Observable<Tree> {
-  return input.mergeMap(i => {
-    const result = rule(i, context);
+  return input.mergeMap(inputTree => {
+    const result = rule(inputTree, context);
 
     if (result instanceof VirtualTree) {
       return Observable.of(result as Tree);
     } else if (result instanceof Observable) {
       return result;
+    } else if (result === undefined) {
+      return Observable.of(inputTree);
     } else {
       throw new InvalidRuleResultException(result);
     }

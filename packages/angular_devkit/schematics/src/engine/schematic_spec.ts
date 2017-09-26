@@ -35,7 +35,7 @@ const engine: Engine<CollectionT, SchematicT> = {
   createContext: (schematic: Schematic<{}, {}>) => ({ engine, schematic, ...context }),
   transformOptions: (_: {}, options: {}) => options,
   defaultMergeStrategy: MergeStrategy.Default,
-} as Engine<CollectionT, SchematicT>;
+} as {} as Engine<CollectionT, SchematicT>;
 const collection = {
   name: 'collection',
   description: 'description',
