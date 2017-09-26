@@ -90,6 +90,7 @@ export default function (_: {}, logger: Logger) {
 
       // Types that MUST NOT contain a scope.
       case 'build':
+      case 'revert':
       case 'ci':
         if (scope) {
           _invalid(sha, message, 'should not have a scope');
