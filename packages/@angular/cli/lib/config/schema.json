@@ -496,6 +496,32 @@
             "namedChunks": {
               "description": "Use file name for lazy loaded chunks.",
               "type": "boolean"
+            },
+            "license": {
+              "description": "Options for the license-webpack-plugin.",
+              "type": "object",
+              "properties": {
+                "pattern": {
+                  "description": "Use custom regular expression as pattern.",
+                  "type": "string",
+                  "default": "^(MIT|ISC|BSD.*)$"
+                },
+                "unacceptablePattern": {
+                  "description": "Use custom regular expression to filter unacceptable licenses.",
+                  "type": "string",
+                  "default": ""
+                },
+                "abortOnUnacceptableLicense": {
+                  "description": "Abort the build if an unacceptable license is detected.",
+                  "type": "boolean",
+                  "default": false
+                },
+                "includePackagesWithoutLicense": {
+                  "description": "Include packages that are missing a license.",
+                  "type": "boolean",
+                  "default": false
+                }
+              }
             }
           }
         },
