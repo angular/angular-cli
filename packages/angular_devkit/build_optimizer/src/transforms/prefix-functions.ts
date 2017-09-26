@@ -70,6 +70,7 @@ export function findTopLevelFunctions(parentNode: ts.Node): ts.Node[] {
       topLevelFunctions.push(node.parent);
     } else if ((node.kind === ts.SyntaxKind.CallExpression
               || node.kind === ts.SyntaxKind.NewExpression)
+        && !isSuperCall(node)
         && !hasPureComment(node)
     ) {
       topLevelFunctions.push(node);
@@ -116,4 +117,10 @@ function hasPureComment(node: ts.Node) {
   const leadingComment = ts.getSyntheticLeadingComments(node);
 
   return leadingComment && leadingComment.some((comment) => comment.text === pureFunctionComment);
+}
+
+function isSuperCall(node: ts.Node) {
+  const callExpr = node as ts.CallExpression;
+
+  return callExpr.expression && callExpr.expression.kind === ts.SyntaxKind.SuperKeyword;
 }

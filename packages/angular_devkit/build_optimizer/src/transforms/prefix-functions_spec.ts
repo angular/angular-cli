@@ -83,7 +83,7 @@ describe('prefix-functions', () => {
       expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
     });
 
-    it('doesn\'t adds comment when inside function declarations or expressions', () => {
+    it('doesn\'t add comment when inside function declarations or expressions', () => {
       const input = stripIndent`
         function funcDecl() {
           var newClazz = Clazz();
@@ -94,6 +94,22 @@ describe('prefix-functions', () => {
           var newClazz = Clazz();
           var newClazzTwo = new Clazz();
         };
+      `;
+      const output = stripIndent`
+        ${emptyImportsComment}
+        ${input}
+      `;
+
+      expect(oneLine`${transform(input)}`).toEqual(oneLine`${output}`);
+    });
+
+    it('doesn\'t add comment to super calls', () => {
+      const input = oneLine`
+        class ExtendedClass extends BaseClass {
+          constructor(e) {
+            super(e);
+          }
+        }
       `;
       const output = stripIndent`
         ${emptyImportsComment}
