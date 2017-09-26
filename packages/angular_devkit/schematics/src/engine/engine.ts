@@ -83,7 +83,8 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     return {
       debug: parent && parent.debug || false,
       engine: this,
-      logger: (parent && parent.logger) || new NullLogger(),
+      logger: (parent && parent.logger && parent.logger.createChild(schematic.description.name))
+              || new NullLogger(),
       schematic,
       strategy: (parent && parent.strategy !== undefined)
         ? parent.strategy : this.defaultMergeStrategy,
