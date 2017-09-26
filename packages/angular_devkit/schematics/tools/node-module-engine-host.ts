@@ -19,6 +19,7 @@ import {
 } from './description';
 import { ExportStringRef } from './export-ref';
 import { FileSystemEngineHostBase } from './file-system-engine-host-base';
+import { readJsonFile } from './file-system-utility';
 
 
 /**
@@ -51,7 +52,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
       const pkgJsonSchematics = require(packageJsonPath)['schematics'];
       if (pkgJsonSchematics) {
         const resolvedPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath), false);
-        require(resolvedPath);
+        readJsonFile(resolvedPath);
 
         return resolvedPath;
       }
