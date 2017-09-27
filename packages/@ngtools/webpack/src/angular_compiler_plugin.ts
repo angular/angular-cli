@@ -56,11 +56,13 @@ export interface AngularCompilerPluginOptions {
   skipCodeGeneration?: boolean;
   hostOverrideFileSystem?: { [path: string]: string };
   hostReplacementPaths?: { [path: string]: string };
-  i18nFile?: string;
-  i18nFormat?: string;
+  i18nInFile?: string;
+  i18nInFormat?: string;
+  i18nOutFile?: string;
+  i18nOutFormat?: string;
   locale?: string;
   missingTranslation?: string;
-  replaceExport?: boolean;
+  platform?: PLATFORM;
 
   // Use tsconfig to include path globs.
   exclude?: string | string[];
@@ -68,7 +70,7 @@ export interface AngularCompilerPluginOptions {
   compilerOptions?: ts.CompilerOptions;
 }
 
-enum PLATFORM {
+export enum PLATFORM {
   Browser,
   Server
 }
@@ -230,11 +232,17 @@ export class AngularCompilerPlugin implements Tapable {
     }
 
     // Process i18n options.
-    if (options.hasOwnProperty('i18nFile')) {
-      this._angularCompilerOptions.i18nInFile = options.i18nFile;
+    if (options.hasOwnProperty('i18nInFile')) {
+      this._angularCompilerOptions.i18nInFile = options.i18nInFile;
     }
-    if (options.hasOwnProperty('i18nFormat')) {
-      this._angularCompilerOptions.i18nInFormat = options.i18nFormat;
+    if (options.hasOwnProperty('i18nInFormat')) {
+      this._angularCompilerOptions.i18nInFormat = options.i18nInFormat;
+    }
+    if (options.hasOwnProperty('i18nOutFile')) {
+      this._angularCompilerOptions.i18nOutFile = options.i18nOutFile;
+    }
+    if (options.hasOwnProperty('i18nOutFormat')) {
+      this._angularCompilerOptions.i18nOutFormat = options.i18nOutFormat;
     }
     if (options.hasOwnProperty('locale') && options.locale) {
       this._angularCompilerOptions.i18nInLocale = this._validateLocale(options.locale);
@@ -273,8 +281,7 @@ export class AngularCompilerPlugin implements Tapable {
       }
     }
 
-    // TODO: consider really using platform names in the plugin options.
-    this._platform = options.replaceExport ? PLATFORM.Server : PLATFORM.Browser;
+    this._platform = options.platform || PLATFORM.Browser;
     timeEnd('AngularCompilerPlugin._setupOptions');
   }
 
@@ -722,6 +729,24 @@ export class AngularCompilerPlugin implements Tapable {
       });
   }
 
+  writeI18nOutFile() {
+    function _recursiveMkDir(p: string): Promise<void> {
+      if (fs.existsSync(p)) {
+        return Promise.resolve();
+      } else {
+        return _recursiveMkDir(path.dirname(p))
+          .then(() => fs.mkdirSync(p));
+      }
+    }
+
+    // Write the extracted messages to disk.
+    const i18nOutFilePath = path.resolve(this._basePath, this._angularCompilerOptions.i18nOutFile);
+    const i18nOutFileContent = this._compilerHost.readFile(i18nOutFilePath);
+    if (i18nOutFileContent) {
+      _recursiveMkDir(path.dirname(i18nOutFilePath))
+        .then(() => fs.writeFileSync(i18nOutFilePath, i18nOutFileContent));
+    }
+  }
 
   getFile(fileName: string) {
     const outputFile = fileName.replace(/.ts$/, '.js');
@@ -792,8 +817,13 @@ export class AngularCompilerPlugin implements Tapable {
 
         if (!hasErrors(allDiagnostics)) {
           time('AngularCompilerPlugin._emit.ng.emit');
-          emitResult = angularProgram.emit({ emitFlags: EmitFlags.Default, customTransformers });
+          const extractI18n = !!this._angularCompilerOptions.i18nOutFile;
+          const emitFlags = extractI18n ? EmitFlags.I18nBundle : EmitFlags.Default;
+          emitResult = angularProgram.emit({ emitFlags, customTransformers });
           allDiagnostics.push(...emitResult.diagnostics);
+          if (extractI18n) {
+            this.writeI18nOutFile();
+          }
           timeEnd('AngularCompilerPlugin._emit.ng.emit');
         }
       }
