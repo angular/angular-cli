@@ -10,9 +10,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { isFile } from './fs';
 
-
+/**
+ * Exception thrown when a module could not be resolved.
+ */
 export class ModuleNotFoundException extends BaseException {
-  public code: string;
+  public readonly code: string;
 
   constructor(public readonly moduleName: string, public readonly basePath: string) {
     super(`Could not find module ${JSON.stringify(moduleName)} from ${JSON.stringify(basePath)}.`);
@@ -20,8 +22,12 @@ export class ModuleNotFoundException extends BaseException {
   }
 }
 
-
-function _caller() {
+/**
+ * Returns a list of all the callers from the resolve() call.
+ * @returns {string[]}
+ * @private
+ */
+function _caller(): string[] {
   // see https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
   const error = Error as {} as { prepareStackTrace: (x: {}, stack: {}) => {} };
   const origPrepareStackTrace = error.prepareStackTrace;
@@ -29,7 +35,7 @@ function _caller() {
   const stack = (new Error()).stack as {}[] | undefined as { getFileName(): string }[] | undefined;
   error.prepareStackTrace = origPrepareStackTrace;
 
-  return stack ? stack[2].getFileName() : '';
+  return stack ? stack.map(x => x.getFileName()) : [];
 }
 
 
@@ -64,20 +70,57 @@ function _getGlobalNodeModules() {
 
 
 export interface ResolveOptions {
+  /**
+   * The basedir to use from which to resolve.
+   */
+  basedir: string;
+
+  /**
+   * The list of extensions to resolve. By default uses Object.keys(require.extensions).
+   */
   extensions?: string[];
-  basedir?: string;
+
+  /**
+   * An additional list of paths to look into.
+   */
   paths?: string[];
+
+  /**
+   * Whether or not to preserve symbolic links. If false, the actual paths pointed by
+   * the symbolic links will be used. This defaults to true.
+   */
   preserveSymlinks?: boolean;
+
+  /**
+   * Whether to fallback to a global lookup if the basedir one failed.
+   */
   checkGlobal?: boolean;
+
+  /**
+   * Whether to fallback to using the local caller's directory if the basedir failed.
+   */
   checkLocal?: boolean;
+
+  /**
+   * Whether to only resolve and return the first package.json file found. By default,
+   * resolves the main field or the index of the package.
+   */
+  resolvePackageJson?: boolean;
 }
 
-
-export function resolve(x: string, options: ResolveOptions = {}): string {
+/**
+ * Resolve a package using a logic similar to npm require.resolve, but with more options.
+ * @param x The package name to resolve.
+ * @param options A list of options. See documentation of those options.
+ * @returns {string} Path to the index to include, or if `resolvePackageJson` option was
+ *                   passed, a path to that file.
+ * @throws {ModuleNotFoundException} If no module with that name was found anywhere.
+ */
+export function resolve(x: string, options: ResolveOptions): string {
   const readFileSync = fs.readFileSync;
 
   const extensions: string[] = options.extensions || Object.keys(require.extensions);
-  const basePath = options.basedir || path.dirname(_caller());
+  const basePath = options.basedir;
 
   options.paths = options.paths || [];
 
@@ -100,19 +143,22 @@ export function resolve(x: string, options: ResolveOptions = {}): string {
 
   // Fallback to checking the local (callee) node modules.
   if (options.checkLocal) {
-    const localDir = path.dirname(_caller());
-    if (localDir !== options.basedir) {
-      try {
-        return resolve(x, {
-          ...options,
-          checkLocal: false,
-          checkGlobal: false,
-          basedir: localDir,
-        });
-      } catch (e) {
-        // Just swap the basePath with the original call one.
-        if (!(e instanceof ModuleNotFoundException)) {
-          throw e;
+    const callers = _caller();
+    for (const caller of callers) {
+      const localDir = path.dirname(caller);
+      if (localDir !== options.basedir) {
+        try {
+          return resolve(x, {
+            ...options,
+            checkLocal: false,
+            checkGlobal: false,
+            basedir: localDir,
+          });
+        } catch (e) {
+          // Just swap the basePath with the original call one.
+          if (!(e instanceof ModuleNotFoundException)) {
+            throw e;
+          }
         }
       }
     }
@@ -151,6 +197,10 @@ export function resolve(x: string, options: ResolveOptions = {}): string {
   function loadAsDirectorySync(x: string): string | null {
     const pkgfile = path.join(x, 'package.json');
     if (isFile(pkgfile)) {
+      if (options.resolvePackageJson) {
+        return pkgfile;
+      }
+
       try {
         const body = readFileSync(pkgfile, 'UTF8');
         const pkg = JSON.parse(body);

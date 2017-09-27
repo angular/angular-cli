@@ -5,16 +5,21 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, JsonValue, parseJson } from '@angular-devkit/core';
+import {
+  FileDoesNotExistException,
+  JsonParseMode,
+  JsonValue,
+  parseJson,
+} from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 
 
 /**
  * Read a file and returns its content. This supports different file encoding.
  */
-export function readFile(fileName: string): string | null {
+export function readFile(fileName: string): string {
   if (!existsSync(fileName)) {
-    return null;
+    throw new FileDoesNotExistException(fileName);
   }
   const buffer = readFileSync(fileName);
   let len = buffer.length;
@@ -45,5 +50,5 @@ export function readFile(fileName: string): string | null {
 
 
 export function readJsonFile(path: string): JsonValue {
-  return parseJson(readFile(path) || '{}', JsonParseMode.Loose);
+  return parseJson(readFile(path), JsonParseMode.Loose);
 }

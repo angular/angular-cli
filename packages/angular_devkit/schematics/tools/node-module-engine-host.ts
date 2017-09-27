@@ -28,21 +28,30 @@ import { readJsonFile } from './file-system-utility';
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
   constructor() { super(); }
 
-  protected _resolvePath(name: string, basedir = process.cwd(), extraChecks = true): string {
+  protected _resolvePackageJson(name: string, basedir = process.cwd()) {
+    return core.resolve(name, {
+      basedir,
+      checkLocal: true,
+      checkGlobal: true,
+      resolvePackageJson: true,
+    });
+  }
+
+  protected _resolvePath(name: string, basedir = process.cwd()) {
     // Allow relative / absolute paths.
     if (name.startsWith('.') || name.startsWith('/')) {
-      return resolvePath(process.cwd(), name);
+      return resolvePath(basedir, name);
     } else {
       return core.resolve(name, {
         basedir,
-        checkLocal: extraChecks,
-        checkGlobal: extraChecks,
+        checkLocal: true,
+        checkGlobal: true,
       });
     }
   }
 
   protected _resolveCollectionPath(name: string): string {
-    let packageJsonPath = this._resolvePath(name);
+    let packageJsonPath = this._resolvePackageJson(name, process.cwd());
     // If it's a file, use it as is. Otherwise append package.json to it.
     if (!core.fs.isFile(packageJsonPath)) {
       packageJsonPath = join(packageJsonPath, 'package.json');
@@ -51,7 +60,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     try {
       const pkgJsonSchematics = require(packageJsonPath)['schematics'];
       if (pkgJsonSchematics) {
-        const resolvedPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath), false);
+        const resolvedPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath));
         readJsonFile(resolvedPath);
 
         return resolvedPath;
