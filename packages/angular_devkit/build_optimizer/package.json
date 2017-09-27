@@ -8,6 +8,9 @@
     "build-optimizer": "./src/build-optimizer/cli.js",
     "purify": "./src/purify/cli.js"
   },
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
   "dependencies": {
     "loader-utils": "^1.1.0",
     "source-map": "^0.5.6",

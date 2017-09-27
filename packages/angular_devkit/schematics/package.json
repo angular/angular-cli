@@ -5,6 +5,9 @@
   "bin": {
     "schematics": "./bin/schematics.js"
   },
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "keywords": [

@@ -74,18 +74,24 @@ function loadPackageJson(p: string) {
 
   for (const key of Object.keys(root)) {
     switch (key) {
+      // Keep the following keys from the package.json of the package itself.
       case 'bin':
       case 'description':
       case 'dependencies':
-      case 'devDependencies':
       case 'name':
       case 'main':
       case 'peerDependencies':
-      case 'scripts':
       case 'typings':
       case 'version':
         continue;
 
+      // Remove the following keys from the package.json.
+      case 'devDependencies':
+      case 'scripts':
+        delete pkg[key];
+        continue;
+
+      // Merge the following keys with the root package.json.
       case 'keywords':
         const a = pkg[key] || [];
         const b = Object.keys(
@@ -97,6 +103,7 @@ function loadPackageJson(p: string) {
         pkg[key] = b;
         break;
 
+      // Overwrite the package's key with to root one.
       default:
         pkg[key] = root[key];
     }
