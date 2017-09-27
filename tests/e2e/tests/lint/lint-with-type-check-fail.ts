@@ -24,8 +24,8 @@ const c = {
 
 function check(val: any, fxState: any) {
   if (typeof val === "string" && val.indexOf(" ") < 0) {
-    let r = val.match(ANIMATION_CSS_VALUE_REGEX);
-    let num = parseFloat(r[1]);
+    var r = val.match(ANIMATION_CSS_VALUE_REGEX);
+    var num = parseFloat(r[1]);
 
     if (!isNaN(num)) {
       fxState.num = num + "";
