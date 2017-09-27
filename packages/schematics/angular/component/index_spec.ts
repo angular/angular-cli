@@ -215,4 +215,14 @@ describe('Component Schematic', () => {
     expect(tree.files.indexOf('/src/app/foo/foo.component.scss')).toBeGreaterThanOrEqual(0);
     expect(tree.files.indexOf('/src/app/foo/foo.component.css')).toEqual(-1);
   });
+
+  it('should use the module flag even if the module is a routing module', () => {
+    const routingFileName = 'app-routing.module.ts';
+    const routingModulePath = `/src/app/${routingFileName}`;
+    const newTree = createAppModule(appTree, routingModulePath);
+    const options = { ...defaultOptions, module: routingFileName };
+    const tree = schematicRunner.runSchematic('component', options, newTree);
+    const content = getFileContent(tree, routingModulePath);
+    expect(content).toMatch(/import { FooComponent } from '.\/foo\/foo.component/);
+  });
 });

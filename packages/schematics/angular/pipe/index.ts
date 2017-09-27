@@ -107,7 +107,6 @@ export default function (options: PipeOptions): Rule {
 
     return chain([
       branchAndMerge(chain([
-        filter(path => path.endsWith('.module.ts') && !path.endsWith('-routing.module.ts')),
         addDeclarationToNgModule(options),
         mergeWith(templateSource),
       ])),

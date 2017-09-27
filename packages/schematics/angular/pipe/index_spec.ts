@@ -85,4 +85,14 @@ describe('Pipe Schematic', () => {
     expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo\/foo.pipe'/);
     expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
   });
+
+  it('should use the module flag even if the module is a routing module', () => {
+    const routingFileName = 'app-routing.module.ts';
+    const routingModulePath = `/src/app/${routingFileName}`;
+    const newTree = createAppModule(appTree, routingModulePath);
+    const options = { ...defaultOptions, module: routingFileName };
+    const tree = schematicRunner.runSchematic('pipe', options, newTree);
+    const content = getFileContent(tree, routingModulePath);
+    expect(content).toMatch(/import { FooPipe } from '.\/foo.pipe/);
+  });
 });
