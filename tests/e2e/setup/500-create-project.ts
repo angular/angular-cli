@@ -47,7 +47,6 @@ export default function() {
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
     .then(() => silentNpm('install'))
     .then(() => ng('generate', 'app', 'myapp'))
-    .then(() => execSync('bazel build :init'))
     // Force sourcemaps to be from the root of the filesystem.
     .then(() => updateTsConfig(json => {
       json['compilerOptions']['sourceRoot'] = '/';

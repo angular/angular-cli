@@ -156,6 +156,11 @@ export function expectFileNotToExist(fileName: string) {
 }
 
 export function expectFileToExist(fileName: string) {
+  try {
+    fileName = fileName.replace('__DIST__', bazelBinDirectory());
+  } catch (e) {
+  }
+
   return new Promise((resolve, reject) => {
     fs.exists(fileName, (exist) => {
       if (exist) {

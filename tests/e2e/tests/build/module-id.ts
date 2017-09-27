@@ -10,7 +10,7 @@ export default function() {
   }
 
   return Promise.resolve()
-    .then(() => replaceInFile('src/app/app.component.ts',
+    .then(() => replaceInFile('apps/myapp/src/app/app.component.ts',
       '@Component({',
       '@Component({ moduleId: module.id,'))
     .then(() => ng('build'));

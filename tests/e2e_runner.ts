@@ -104,17 +104,7 @@ const allSetups = glob.sync(path.join(e2eRoot, 'setup/**/*.ts'), { nodir: true }
   .map(name => path.relative(e2eRoot, name))
   .sort();
 let allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: argv.ignore })
-  .map(name => path.relative(e2eRoot, name))
-  // TODO: savkin this should be removed once all the features are implemented in bazel
-  .filter(name =>
-    (name.indexOf('generate/') > -1 ||
-    name.indexOf('bazelbuild/') > -1 ||
-    name.indexOf('test/test.ts') > -1 ||
-    name.indexOf('test/test-fail-single-run') > -1) &&
-    name.indexOf('module-routing-child-folder') === -1 &&
-    name.indexOf('module-routing') === -1
-  ).sort();
-
+  .map(name => path.relative(e2eRoot, name)).sort();
 
 const shardId = ('shard' in argv) ? argv['shard'] : null;
 const nbShards = (shardId === null ? 1 : argv['nb-shards']) || 2;
