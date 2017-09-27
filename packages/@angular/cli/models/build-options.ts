@@ -12,6 +12,8 @@ export interface BuildOptions {
   progress?: boolean;
   i18nFile?: string;
   i18nFormat?: string;
+  i18nOutFile?: string;
+  i18nOutFormat?: string;
   locale?: string;
   missingTranslation?: string;
   extractCss?: boolean;

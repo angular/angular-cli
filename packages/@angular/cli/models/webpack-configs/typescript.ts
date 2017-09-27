@@ -1,6 +1,12 @@
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
-import { AotPlugin, AngularCompilerPlugin } from '@ngtools/webpack';
+import {
+  AotPlugin,
+  AotPluginOptions,
+  AngularCompilerPlugin,
+  AngularCompilerPluginOptions,
+  PLATFORM
+} from '@ngtools/webpack';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const SilentError = require('silent-error');
@@ -67,22 +73,35 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
     };
   }
 
-  const pluginOptions = Object.assign({}, {
-    mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
-    i18nFile: buildOptions.i18nFile,
-    i18nFormat: buildOptions.i18nFormat,
-    locale: buildOptions.locale,
-    replaceExport: appConfig.platform === 'server',
-    missingTranslation: buildOptions.missingTranslation,
-    hostReplacementPaths,
-    sourceMap: buildOptions.sourcemaps,
-    // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
-    exclude: []
-  }, options);
-
-  if (wco.buildOptions.experimentalAngularCompiler) {
+if (wco.buildOptions.experimentalAngularCompiler) {
+    const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
+      mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
+      i18nInFile: buildOptions.i18nFile,
+      i18nInFormat: buildOptions.i18nFormat,
+      i18nOutFile: buildOptions.i18nOutFile,
+      i18nOutFormat: buildOptions.i18nOutFormat,
+      locale: buildOptions.locale,
+      platform: appConfig.platform === 'server' ? PLATFORM.Server : PLATFORM.Browser,
+      missingTranslation: buildOptions.missingTranslation,
+      hostReplacementPaths,
+      sourceMap: buildOptions.sourcemaps,
+      // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
+      exclude: []
+    }, options);
     return new AngularCompilerPlugin(pluginOptions);
   } else {
+    const pluginOptions: AotPluginOptions = Object.assign({}, {
+      mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
+      i18nFile: buildOptions.i18nFile,
+      i18nFormat: buildOptions.i18nFormat,
+      locale: buildOptions.locale,
+      replaceExport: appConfig.platform === 'server',
+      missingTranslation: buildOptions.missingTranslation,
+      hostReplacementPaths,
+      sourceMap: buildOptions.sourcemaps,
+      // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
+      exclude: []
+    }, options);
     return new AotPlugin(pluginOptions);
   }
 }
