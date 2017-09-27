@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { JsonObject } from '@angular-devkit/core';
 import {
   Collection,
   CollectionDescription,
@@ -22,6 +23,7 @@ export interface FileSystemCollectionDescription {
 
 
 export interface FileSystemSchematicJsonDescription {
+  readonly aliases?: string[];
   readonly factory: string;
   readonly description: string;
   readonly schema?: string;
@@ -31,7 +33,7 @@ export interface FileSystemSchematicJsonDescription {
 export interface FileSystemSchematicDescription extends FileSystemSchematicJsonDescription {
   // Processed by the EngineHost.
   readonly path: string;
-  readonly schemaJson?: Object;
+  readonly schemaJson?: JsonObject;
   // Using `any` here is okay because the type isn't resolved when we read this value,
   // but rather when the Engine asks for it.
   readonly factoryFn: RuleFactory<{}>;

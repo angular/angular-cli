@@ -63,6 +63,12 @@ export class SchematicMissingFieldsException extends BaseException {
 export class SchematicMissingDescriptionException extends BaseException {
   constructor(name: string) { super(`Schematics "${name}" does not have a description.`); }
 }
+export class SchematicNameCollisionException extends BaseException {
+  constructor(name: string) {
+    super(`Schematics/alias ${JSON.stringify(name)} collides with another alias or schematic`
+          + ' name.');
+  }
+}
 
 
 /**
@@ -124,6 +130,19 @@ export abstract class FileSystemEngineHostBase implements
       throw new InvalidCollectionJsonException(name, path);
     }
 
+    // Validate aliases.
+    const allNames = Object.keys(description.schematics);
+    for (const schematicName of Object.keys(description.schematics)) {
+      const aliases = description.schematics[schematicName].aliases || [];
+
+      for (const alias of aliases) {
+        if (allNames.indexOf(alias) != -1) {
+          throw new SchematicNameCollisionException(alias);
+        }
+        allNames.push(...aliases);
+      }
+    }
+
     return description;
   }
 
@@ -131,6 +150,15 @@ export abstract class FileSystemEngineHostBase implements
     name: string,
     collection: FileSystemCollectionDesc,
   ): FileSystemSchematicDesc {
+    // Resolve aliases first.
+    for (const schematicName of Object.keys(collection.schematics)) {
+      const schematicDescription = collection.schematics[schematicName];
+      if (schematicDescription.aliases && schematicDescription.aliases.indexOf(name) != -1) {
+        name = schematicName;
+        break;
+      }
+    }
+
     if (!(name in collection.schematics)) {
       throw new UnknownSchematicException(name, collection);
     }

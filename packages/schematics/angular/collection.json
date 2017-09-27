@@ -6,76 +6,58 @@
       "description": "Create an Angular application."
     },
     "class": {
+      "aliases": [ "cl" ],
       "factory": "./class",
       "description": "Create a class.",
       "schema": "./class/schema.json"
     },
-    "cl": {
-      "extends": "class"
-    },
     "component": {
+      "aliases": [ "c" ],
       "factory": "./component",
       "description": "Create an Angular component.",
       "schema": "./component/schema.json"
     },
-    "c": {
-      "extends": "component"
-    },
     "directive": {
+      "aliases": [ "d" ],
       "factory": "./directive",
       "description": "Create an Angular directive.",
       "schema": "./directive/schema.json"
     },
-    "d": {
-      "extends": "directive"
-    },
     "enum": {
+      "aliases": [ "e" ],
       "factory": "./enum",
       "description": "Create an enumeration.",
       "schema": "./enum/schema.json"
     },
-    "e": {
-      "extends": "enum"
-    },
     "guard": {
+      "aliases": [ "g" ],
       "factory": "./guard",
       "description": "Create a guard.",
       "schema": "./guard/schema.json"
     },
-    "g": {
-      "extends": "guard"
-    },
     "interface": {
+      "aliases": [ "i" ],
       "factory": "./interface",
       "description": "Create an interface.",
       "schema": "./interface/schema.json"
     },
-    "i": {
-      "extends": "interface"
-    },
     "module": {
+      "aliases": [ "m" ],
       "factory": "./module",
       "description": "Create an Angular module.",
       "schema": "./module/schema.json"
     },
-    "m": {
-      "extends": "module"
-    },
     "pipe": {
+      "aliases": [ "p" ],
       "factory": "./pipe",
       "description": "Create an Angular pipe.",
       "schema": "./pipe/schema.json"
     },
-    "p": {
-      "extends": "pipe"
-    },
     "service": {
+      "aliases": [ "s" ],
       "factory": "./service",
       "description": "Create an Angular service.",
       "schema": "./service/schema.json"
-    },
-    "s": {
-      "extends": "service"
     }
   }
 }
