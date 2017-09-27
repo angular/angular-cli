@@ -281,7 +281,7 @@ export default Task.extend({
             return reject(err);
           }
           if (serveTaskOptions.open) {
-            opn(serverAddress);
+            opn(serverAddress + servePath);
           }
         });
       // Node 8 has a keepAliveTimeout bug which doesn't respect active connections.
