@@ -157,7 +157,15 @@ class JsonWebpackSerializer {
   }
 
   private _concatPlugin(plugin: any) {
-    return plugin.settings;
+    const options = plugin.settings;
+    if (!options || !options.filesToConcat) {
+      return options;
+    }
+
+    const filesToConcat = options.filesToConcat
+      .map((file: string) => path.relative(process.cwd(), file));
+
+    return { ...options, filesToConcat };
   }
 
   private _uglifyjsPlugin(plugin: any) {
@@ -253,7 +261,14 @@ class JsonWebpackSerializer {
           } else if (plugin['copyWebpackPluginPatterns']) {
             // CopyWebpackPlugin doesn't have a constructor nor save args.
             this.variableImports['copy-webpack-plugin'] = 'CopyWebpackPlugin';
-            const patternsSerialized = serializer(plugin['copyWebpackPluginPatterns']);
+            const patternOptions = plugin['copyWebpackPluginPatterns'].map((pattern: any) => {
+              if (!pattern.context) {
+                return pattern;
+              }
+              const context = path.relative(process.cwd(), pattern.context);
+              return { ...pattern, context };
+            });
+            const patternsSerialized = serializer(patternOptions);
             const optionsSerialized = serializer(plugin['copyWebpackPluginOptions']) || 'undefined';
             return `\uFF02CopyWebpackPlugin(${patternsSerialized}, ${optionsSerialized})\uFF02`;
           }
