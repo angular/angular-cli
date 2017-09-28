@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonArray, JsonValue } from '../interface';
+import { JsonArray, JsonObject, JsonValue } from '../interface';
 
 
-export interface JsonSchemaBase {
+export interface JsonSchemaBase extends Partial<JsonObject> {
   $schema?: string;
   $id?: string;
 
@@ -20,12 +20,12 @@ export interface JsonSchemaBase {
 
   // Reference properties.
   $ref?: string;
-  allOf?: JsonSchema[];
-  anyOf?: JsonSchema[];
-  oneOf?: JsonSchema[];
+  allOf?: (JsonObject & JsonSchema)[];
+  anyOf?: (JsonObject & JsonSchema)[];
+  oneOf?: (JsonObject & JsonSchema)[];
 
   // Structural properties.
-  definitions?: { [name: string]: JsonSchema };
+  definitions?: { [name: string]: (JsonObject & JsonSchema) };
 }
 
 export interface JsonSchemaString {
@@ -66,29 +66,29 @@ export interface JsonSchemaObject extends JsonSchemaBase {
   type: 'object';
 
   // Object properties.
-  properties?: { [name: string]: JsonSchema };
-  patternProperties?: { [pattern: string]: JsonSchema };
+  properties?: { [name: string]: (JsonObject & JsonSchema) };
+  patternProperties?: { [pattern: string]: (JsonObject & JsonSchema) };
   required?: string[];
   minProperties?: number;
   maxProperties?: number;
 
-  dependencies?: { [name: string]: JsonSchema | string[]; };
+  dependencies?: { [name: string]: (string & JsonSchema) | string[]; };
 
-  additionalProperties?: boolean | JsonSchema;
+  additionalProperties?: boolean | (JsonObject & JsonSchema);
 }
 
 export interface JsonSchemaArray extends JsonSchemaBase {
   type: 'array';
 
-  additionalItems?: boolean | JsonSchema;
-  items?: JsonSchema | JsonSchema[];
+  additionalItems?: boolean | (JsonObject & JsonSchema);
+  items?: JsonArray;
   maxItems?: number;
   minItems?: number;
   uniqueItems?: boolean;
 }
 
 export interface JsonSchemaOneOfType extends JsonSchemaBase {
-  type: JsonSchemaBaseType[];
+  type: JsonArray & (JsonSchemaBaseType[]);
 }
 
 export interface JsonSchemaAny {
