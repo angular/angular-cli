@@ -532,6 +532,11 @@ export class AotPlugin implements Tapable {
           return;
         }
 
+        // Create a new Program before compiling to get the latest source file contents,
+        // otherwise when using webpack-dev-server the files will be outdated at this point
+        this._program = ts.createProgram(
+          this._rootFilePath, this._compilerOptions, this._compilerHost, this._program);
+
         // Create the Code Generator.
         return __NGTOOLS_PRIVATE_API_2.codeGen({
           basePath: this._basePath,
