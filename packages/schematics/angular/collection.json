@@ -58,6 +58,11 @@
       "factory": "./service",
       "description": "Create an Angular service.",
       "schema": "./service/schema.json"
+    },
+    "universal": {
+      "factory": "./universal",
+      "description": "Create an Angular universal app.",
+      "schema": "./universal/schema.json"
     }
   }
 }

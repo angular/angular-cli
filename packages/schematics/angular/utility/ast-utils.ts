@@ -69,6 +69,20 @@ export function getSourceNodes(sourceFile: ts.SourceFile): ts.Node[] {
   return result;
 }
 
+export function findNode(node: ts.Node, kind: ts.SyntaxKind, text: string): ts.Node | null {
+  if (node.kind === kind && node.getText() === text) {
+    // throw new Error(node.getText());
+    return node;
+  }
+
+  let foundNode: ts.Node | null = null;
+  ts.forEachChild(node, childNode => {
+    foundNode = foundNode || findNode(childNode, kind, text);
+  });
+
+  return foundNode;
+}
+
 
 /**
  * Helper for sorting nodes.
