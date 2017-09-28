@@ -1,7 +1,6 @@
-import { ng, npm } from '../../../utils/process';
+import { ng, silentNpm } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 import { expectFileToMatch, rimraf, moveFile } from '../../../utils/fs';
-import { expectToFail } from '../../../utils/utils';
 import { getGlobalVariable } from '../../../utils/env';
 import { expectToFail } from '../../../utils/utils';
 
@@ -32,10 +31,7 @@ export default function () {
       devDependencies['@angular/language-service'] = '5.0.0-beta.6';
       devDependencies['typescript'] = '2.4.2';
     }))
-    .then(() => npm('install'))
-    .then(() => ng('build'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.bundle.js',
-      /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//)))
+    .then(() => silentNpm('install'))
     .then(() => ng('build', '--aot'))
     .then(() => expectFileToMatch('dist/main.bundle.js',
       /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//))
