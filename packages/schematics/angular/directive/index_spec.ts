@@ -109,11 +109,4 @@ describe('Directive Schematic', () => {
     const content = getFileContent(tree, '/src/app/my-dir.directive.ts');
     expect(content).toMatch(/selector: '\[appMyDir\]'/);
   });
-
-  it('should not duplicate the "Directive" sufix', () => {
-    const options = { ...defaultOptions, name: 'foo.directive' };
-    const tree = schematicRunner.runSchematic('directive', options, appTree);
-    const content = getFileContent(tree, '/src/app/foo.directive.ts');
-    expect(content).toMatch(/export class FooDirective/);
-  });
 });

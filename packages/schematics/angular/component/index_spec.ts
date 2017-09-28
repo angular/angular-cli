@@ -225,11 +225,4 @@ describe('Component Schematic', () => {
     const content = getFileContent(tree, routingModulePath);
     expect(content).toMatch(/import { FooComponent } from '.\/foo\/foo.component/);
   });
-
-  it('should not duplicate the "Component" sufix', () => {
-    const options = { ...defaultOptions, name: 'foo.component' };
-    const tree = schematicRunner.runSchematic('component', options, appTree);
-    const content = getFileContent(tree, '/src/app/foo/foo.component.ts');
-    expect(content).toMatch(/export class FooComponent/);
-  });
 });

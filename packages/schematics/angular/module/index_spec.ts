@@ -102,11 +102,4 @@ describe('Module Schematic', () => {
     expect(files.indexOf('/src/app/two-word/two-word.module.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/src/app/two-word/two-word.module.spec.ts')).toBeGreaterThanOrEqual(0);
   });
-
-  it('should not duplicate the "Module" sufix', () => {
-    const options = { ...defaultOptions, name: 'foo.module' };
-    const tree = schematicRunner.runSchematic('module', options, appTree);
-    const content = getFileContent(tree, '/src/app/foo/foo.module.ts');
-    expect(content).toMatch(/export class FooModule/);
-  });
 });

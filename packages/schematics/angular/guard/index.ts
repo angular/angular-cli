@@ -27,7 +27,6 @@ import * as stringUtils from '../strings';
 import { addProviderToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
-import preventNameDuplication from '../utility/prevent-name-duplication';
 import { Schema as GuardOptions } from './schema';
 
 
@@ -67,7 +66,6 @@ function addDeclarationToNgModule(options: GuardOptions): Rule {
 }
 
 export default function (options: GuardOptions): Rule {
-  options.name = preventNameDuplication(options.name, 'guard');
   options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;
   if (!sourceDir) {

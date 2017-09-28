@@ -27,7 +27,6 @@ import * as stringUtils from '../strings';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
-import preventNameDuplication from '../utility/prevent-name-duplication';
 import { Schema as PipeOptions } from './schema';
 
 
@@ -87,7 +86,6 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 }
 
 export default function (options: PipeOptions): Rule {
-  options.name = preventNameDuplication(options.name, 'pipe');
   options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;
   if (!sourceDir) {
@@ -95,9 +93,6 @@ export default function (options: PipeOptions): Rule {
   }
 
   return (host: Tree, context: SchematicContext) => {
-    if (options.name.toLowerCase().endsWith('pipe')) {
-      options.name = options.name.substring(0, options.name.length - 4);
-    }
     options.module = findModuleFromOptions(host, options);
 
     const templateSource = apply(url('./files'), [

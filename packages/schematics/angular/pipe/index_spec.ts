@@ -95,11 +95,4 @@ describe('Pipe Schematic', () => {
     const content = getFileContent(tree, routingModulePath);
     expect(content).toMatch(/import { FooPipe } from '.\/foo.pipe/);
   });
-
-  it('should not duplicate the "Pipe" sufix', () => {
-    const options = { ...defaultOptions, name: 'foo.pipe' };
-    const tree = schematicRunner.runSchematic('pipe', options, appTree);
-    const content = getFileContent(tree, '/src/app/foo.pipe.ts');
-    expect(content).toMatch(/export class FooPipe/);
-  });
 });
