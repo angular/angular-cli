@@ -1,5 +1,6 @@
 import * as child_process from 'child_process';
 import {blue, yellow} from 'chalk';
+import {Subject, Observable} from 'rxjs';
 import {getGlobalVariable} from './env';
 import {rimraf} from './fs';
 import {wait} from './utils';
@@ -91,6 +92,11 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
           resolve({ stdout, stderr });
         }
       });
+      childProcess.stderr.on('data', (data: Buffer) => {
+        if (data.toString().match(options.waitForMatch)) {
+          resolve({ stdout, stderr });
+        }
+      });
     }
   });
 }
@@ -140,24 +146,26 @@ export function silentExec(cmd: string, ...args: string[]) {
 }
 
 export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
-  let maybeWait = Promise.resolve();
   if (cmd === 'ng' && args[0] === 'serve') {
-    // Webpack watcher can rebuild a few times due to files changes that happened just before the
-    // build (e.g. `git clean`), so we wait here.
-    maybeWait = wait(5000);
+    // Accept matches up to 20 times after the initial match.
+    // Useful because the Webpack watcher can rebuild a few times due to files changes that
+    // happened just before the build (e.g. `git clean`).
+    // This seems to be due to host file system differences, see
+    // https://nodejs.org/docs/latest/api/fs.html#fs_caveats
+    return Observable.fromPromise(_exec({ waitForMatch: match }, cmd, args))
+      .concat(
+        Observable.defer(() =>
+          Observable.fromPromise(waitForAnyProcessOutputToMatch(match, 2500))
+            .repeat(20)
+            .catch(_x => Observable.empty())
+        )
+      )
+      .takeLast(1)
+      .toPromise();
+  } else {
+    return _exec({ waitForMatch: match }, cmd, args);
   }
-  return maybeWait.then(() => _exec({ waitForMatch: match }, cmd, args));
 }
-
-export function silentExecAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
-  let maybeWait = Promise.resolve();
-  if (cmd === 'ng' && args[0] === 'serve') {
-    // See execAndWaitForOutputToMatch for why the wait.
-    maybeWait = wait(5000);
-  }
-  return maybeWait.then(() => _exec({ silent: true, waitForMatch: match }, cmd, args));
-}
-
 
 let npmInstalledEject = false;
 export function ng(...args: string[]) {
