@@ -202,6 +202,11 @@ export class AotPlugin implements Tapable {
       this._compilerOptions.mapRoot = undefined;
     }
 
+    // Default noEmitOnError to true
+    if (this._compilerOptions.noEmitOnError !== false) {
+      this._compilerOptions.noEmitOnError = true;
+    }
+
     // Compose Angular Compiler Options.
     this._angularCompilerOptions = Object.assign(
       { genDir },
