@@ -1,20 +1,137 @@
 version: 2
+
+# Settings common to each job.
+anchor_1: &defaults
+  working_directory: ~/angular-cli
+  docker:
+    - image: angular/ngcontainer
+
+# Restore cache based on package-lock.json checksum for branch.
+anchor_2: &restore_cache_defaults
+    key: angular-cli-{{ checksum "package-lock.json" }}
+
+# Attach workspace that contains:
+# - dist/ : built cli
+# - angular-cli-e2e-default/ : initialized e2e test project
+anchor_3: &attach_workspace_defaults
+    at: /workspace
+
 jobs:
   build:
-    working_directory: ~/angular-cli
-    docker:
-      - image: angular/ngcontainer
-      - image: node:8.4
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
-          key: angular-cli-{{ .Branch }}-{{ checksum "package-lock.json" }}
-      - run: |
-          node --version
-          npm --version
-          npm install --quiet
+          <<: *restore_cache_defaults
+      - run: node --version
+      - run: npm --version
+      - run: npm install --quiet
+      - run: npm run build
       - save_cache:
-          key: angular-cli-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          key: angular-cli-{{ checksum "package-lock.json" }}
           paths:
             - "node_modules"
-      - run: xvfb-run -a node tests/run_e2e.js --glob=tests/build/**
+
+  lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - run: npm run lint
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - run: npm run test
+
+  e2e-setup:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - run: mkdir /workspace
+      - run: mkdir /workspace/angular-cli-e2e-default
+      # Ignore all tests, we just want the setup step to persist it to the workspace.
+      - run: node tests/run_e2e.js --tmpdir=/workspace/angular-cli-e2e-default --ignore=**/*
+      - run: mv dist /workspace/
+      - persist_to_workspace:
+          root: /workspace
+          paths:
+            - dist/
+            - angular-cli-e2e-default/
+
+  e2e-0:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - attach_workspace:
+          <<: *attach_workspace_defaults
+      - run: cp -r /workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent
+
+  e2e-1:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - attach_workspace:
+          <<: *attach_workspace_defaults
+      - run: cp -r /workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent
+
+  e2e-2:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - attach_workspace:
+          <<: *attach_workspace_defaults
+      - run: cp -r /workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent
+
+  e2e-3:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - attach_workspace:
+          <<: *attach_workspace_defaults
+      - run: cp -r /workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - lint:
+          requires:
+            - build
+      - test:
+          requires:
+            - build
+      - e2e-setup:
+          requires:
+            - build
+      - e2e-0:
+          requires:
+            - e2e-setup
+      - e2e-1:
+          requires:
+            - e2e-setup
+      - e2e-2:
+          requires:
+            - e2e-setup
+      - e2e-3:
+          requires:
+            - e2e-setup

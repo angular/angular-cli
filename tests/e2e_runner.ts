@@ -41,6 +41,7 @@ Error.stackTraceLimit = Infinity;
  *                    passed in.
  *   --shard          Index of this processes' shard.
  *   --devkit=path    Path to the devkit to use. The devkit will be built prior to running.
+ *   --tmpdir=path    Override temporary directory to use for new projects.
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = minimist(process.argv.slice(2), {
@@ -54,7 +55,7 @@ const argv = minimist(process.argv.slice(2), {
     'noproject',
     'verbose',
   ],
-  'string': ['devkit', 'glob', 'ignore', 'reuse', 'ng-sha', ],
+  'string': ['devkit', 'glob', 'ignore', 'reuse', 'ng-sha', 'tmpdir'],
   'number': ['nb-shards', 'shard']
 });
 
