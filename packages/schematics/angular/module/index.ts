@@ -26,6 +26,7 @@ import * as stringUtils from '../strings';
 import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { findModuleFromOptions } from '../utility/find-module';
+import preventNameDuplication from '../utility/prevent-name-duplication';
 import { Schema as ModuleOptions } from './schema';
 
 
@@ -70,6 +71,7 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 }
 
 export default function (options: ModuleOptions): Rule {
+  options.name = preventNameDuplication(options.name, 'module');
   options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;
   if (!sourceDir) {

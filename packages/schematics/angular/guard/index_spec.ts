@@ -89,5 +89,10 @@ describe('Guard Schematic', () => {
     expect(content).not.toMatch(/providers:\s*\[FooGuard\]/m);
   });
 
-
+  it('should not duplicate the "Guard" sufix', () => {
+    const options = { ...defaultOptions, name: 'foo.guard' };
+    const tree = schematicRunner.runSchematic('guard', options, appTree);
+    const content = getFileContent(tree, '/src/app/foo.guard.ts');
+    expect(content).toMatch(/export class FooGuard/);
+  });
 });

@@ -27,6 +27,7 @@ import * as stringUtils from '../strings';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import preventNameDuplication from '../utility/prevent-name-duplication';
 import { Schema as DirectiveOptions } from './schema';
 
 
@@ -99,6 +100,7 @@ function buildSelector(options: DirectiveOptions) {
 }
 
 export default function (options: DirectiveOptions): Rule {
+  options.name = preventNameDuplication(options.name, 'directive');
   options.selector = options.selector || buildSelector(options);
   options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;

@@ -77,4 +77,11 @@ describe('Pipe Schematic', () => {
     expect(files.indexOf('/src/app/foo/foo.service.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/src/app/foo/foo.service.spec.ts')).toEqual(-1);
   });
+
+  it('should not duplicate the "Service" sufix', () => {
+    const options = { ...defaultOptions, name: 'foo.service' };
+    const tree = schematicRunner.runSchematic('service', options, appTree);
+    const content = getFileContent(tree, '/src/app/foo/foo.service.ts');
+    expect(content).toMatch(/export class FooService/);
+  });
 });

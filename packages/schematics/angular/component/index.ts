@@ -27,6 +27,7 @@ import * as stringUtils from '../strings';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import preventNameDuplication from '../utility/prevent-name-duplication';
 import { Schema as ComponentOptions } from './schema';
 
 
@@ -108,6 +109,7 @@ export default function(options: ComponentOptions): Rule {
   }
 
   return (host: Tree, context: SchematicContext) => {
+    options.name = preventNameDuplication(options.name, 'component');
     options.selector = options.selector || buildSelector(options);
     options.path = options.path ? normalize(options.path) : options.path;
     options.module = findModuleFromOptions(host, options);
