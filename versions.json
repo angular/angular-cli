@@ -1,7 +1,7 @@
 {
   "versions": {
     "@_/benchmark": "0.0.8",
-    "@angular-devkit/build-optimizer": "0.0.22",
+    "@angular-devkit/build-optimizer": "0.0.23",
     "@angular-devkit/core": "0.0.15",
     "@angular-devkit/schematics": "0.0.25",
     "@schematics/angular": "0.0.38"
@@ -11,6 +11,6 @@
     "@angular-devkit/core": "ebd6a15f136bc847acccba793ce2f63e",
     "@angular-devkit/schematics": "514bd2b86bd4131aebeedab577c69dfc",
     "@schematics/angular": "41cb6367e9d40789c878e8f92d7f485a",
-    "@angular-devkit/build-optimizer": "364dda2b518dc3a8cc7b0594aaa3a105"
+    "@angular-devkit/build-optimizer": "cacaabe8138e33ef723c7961b8270de1"
   }
 }
