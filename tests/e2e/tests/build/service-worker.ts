@@ -1,7 +1,7 @@
 import {join} from 'path';
 import {getGlobalVariable} from '../../utils/env';
 import {expectFileToExist, expectFileToMatch, writeFile, moveFile} from '../../utils/fs';
-import {ng, npm} from '../../utils/process';
+import {ng, silentNpm} from '../../utils/process';
 
 export default function() {
   // Skip this in ejected tests.
@@ -13,7 +13,7 @@ export default function() {
 
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  return npm('install', '@angular/service-worker')
+  return silentNpm('install', '@angular/service-worker')
     .then(() => ng('set', 'apps.0.serviceWorker=true'))
     .then(() => ng('build', '--prod'))
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
