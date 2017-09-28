@@ -15,13 +15,6 @@ export default function () {
   }
 
   return Promise.resolve()
-    .then(() => silentNpm('uninstall', 'typescript', '--no-save'))
-    .then(() => ng('build'))
-    .catch((err) => {
-      if (!err.message.match('Versions of @angular/compiler-cli and typescript could not')) {
-        throw new Error('Expected to have missing dependency error in output.');
-      }
-    })
     // Warning should show.
     .then(() => silentNpm('install', `typescript@${unsupportedTsVersion}`, '--no-save'))
     .then(() => ng('build'))
