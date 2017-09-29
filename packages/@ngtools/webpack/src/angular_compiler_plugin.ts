@@ -433,7 +433,10 @@ export class AngularCompilerPlugin implements Tapable {
       this._JitMode, this._tsFilenames));
 
     // Cleanup.
-    const killTypeCheckerProcess = () => treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
+    const killTypeCheckerProcess = () => {
+      treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
+      process.exit();
+    };
     process.on('exit', killTypeCheckerProcess);
     process.on('SIGINT', killTypeCheckerProcess);
     process.on('uncaughtException', killTypeCheckerProcess);
