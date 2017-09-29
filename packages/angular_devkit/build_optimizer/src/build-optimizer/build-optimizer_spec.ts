@@ -17,7 +17,7 @@ describe('build-optimizer', () => {
   const decorators = 'Clazz.decorators = [ { type: Injectable } ];';
 
   describe('basic functionality', () => {
-    it('applies class-fold, scrub-file and prefix-functions', () => {
+    it('applies class-fold, scrub-file and prefix-functions to whitelisted es5 modules', () => {
       const input = tags.stripIndent`
         ${imports}
         var __extends = (this && this.__extends) || function (d, b) {
@@ -50,10 +50,19 @@ describe('build-optimizer', () => {
         var Clazz = /*@__PURE__*/ (function () { function Clazz() { } ${staticProperty} return Clazz; }());
       `;
 
-      const inputFilePath = '/node_modules/@angular/core/@angular/core.es5.js';
-      const boOutput = buildOptimizer({ content: input, inputFilePath });
-      expect(tags.oneLine`${boOutput.content}`).toEqual(output);
-      expect(boOutput.emitSkipped).toEqual(false);
+      // Check Angular 4/5 and unix/windows paths.
+      const inputPaths = [
+        '/node_modules/@angular/core/@angular/core.es5.js',
+        '/node_modules/@angular/core/esm5/core.js',
+        '\\node_modules\\@angular\\core\\@angular\\core.es5.js',
+        '\\node_modules\\@angular\\core\\esm5\\core.js',
+      ];
+
+      inputPaths.forEach((inputFilePath) => {
+        const boOutput = buildOptimizer({ content: input, inputFilePath });
+        expect(tags.oneLine`${boOutput.content}`).toEqual(output);
+        expect(boOutput.emitSkipped).toEqual(false);
+      });
     });
 
     it('doesn\'t process files without decorators/ctorParameters/outside Angular', () => {
