@@ -569,7 +569,7 @@ export class AngularCompilerPlugin implements Tapable {
     this._donePromise = Promise.resolve()
       .then(() => {
         // Create a new process for the type checker.
-        if (!this._firstRun && !this._typeCheckerProcess) {
+        if (this._forkTypeChecker && !this._firstRun && !this._typeCheckerProcess) {
           this._createForkedTypeChecker();
         }
       })
