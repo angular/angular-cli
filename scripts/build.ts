@@ -268,7 +268,7 @@ export default function(argv: { local?: boolean }, logger: Logger) {
     if (versions[packageName]) {
       packageJson['version'] = versions[packageName];
     } else {
-      versionLogger.fatal('No version found... Only updating dependencies.');
+      versionLogger.error('No version found... Only updating dependencies.');
     }
 
     for (const depName of Object.keys(versions)) {

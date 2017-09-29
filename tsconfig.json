@@ -48,8 +48,7 @@
     "bazel-*/**/*",
     "dist/**/*",
     "node_modules/**/*",
-    "packages/schematics/angular/*/files/**/*",
-    "packages/schematics/angular/*/other-files/**/*",
+    "packages/schematics/*/*/*files/**/*",
     "tmp/**/*",
     "tests/**/*"
   ]
