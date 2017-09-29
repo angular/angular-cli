@@ -784,7 +784,7 @@ export class AngularCompilerPlugin implements Tapable {
 
         if (this._firstRun || !this._forkTypeChecker) {
           allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
-            'AngularCompilerPluginOptions'));
+            'AngularCompilerPlugin._emit.ts'));
         }
 
         if (!hasErrors(allDiagnostics)) {
@@ -815,7 +815,7 @@ export class AngularCompilerPlugin implements Tapable {
 
         if (this._firstRun || !this._forkTypeChecker) {
           allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
-            'AngularCompilerPluginOptions'));
+            'AngularCompilerPlugin._emit.ng'));
         }
 
         if (!hasErrors(allDiagnostics)) {
