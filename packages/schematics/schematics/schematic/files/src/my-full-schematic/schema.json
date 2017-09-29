@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "MyFullSchematicsSchema",
+  "title": "My Full Schematics Schema",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "number",
+      "default": 1
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

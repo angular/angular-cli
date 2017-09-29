@@ -1,0 +1,18 @@
+{
+  "name": "@schematics/schematics",
+  "version": "0.0.0",
+  "description": "Schematics specific to Angular",
+  "keywords": [
+    "blueprints",
+    "code generation",
+    "schematics",
+    "schematic"
+  ],
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
+  "schematics": "./collection.json",
+  "peerDependencies": {
+    "@angular-devkit/schematics": "0.0.0"
+  }
+}
