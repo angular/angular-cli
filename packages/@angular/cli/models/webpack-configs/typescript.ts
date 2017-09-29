@@ -73,7 +73,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
     };
   }
 
-if (wco.buildOptions.experimentalAngularCompiler) {
+  if (AngularCompilerPlugin.isSupported()) {
     const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
       mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
       i18nInFile: buildOptions.i18nFile,

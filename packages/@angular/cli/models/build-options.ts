@@ -27,6 +27,5 @@ export interface BuildOptions {
   showCircularDependencies?: boolean;
   buildOptimizer?: boolean;
   namedChunks?: boolean;
-  experimentalAngularCompiler?: boolean;
   subresourceIntegrity?: boolean;
 }

@@ -12,7 +12,6 @@ import {
   getAotConfig
 } from './webpack-configs';
 import * as path from 'path';
-import { AngularCompilerPlugin } from '@ngtools/webpack';
 
 export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
   projectRoot: string;
@@ -78,10 +77,6 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
     if (buildOptions.buildOptimizer
       && !(buildOptions.aot || buildOptions.target === 'production')) {
       throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
-    }
-
-    if (buildOptions.experimentalAngularCompiler && !AngularCompilerPlugin.isSupported()) {
-      throw new Error('You need Angular 5 and up to use --experimental-angular-compiler.');
     }
   }
 
