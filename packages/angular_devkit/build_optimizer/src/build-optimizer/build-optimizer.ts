@@ -16,20 +16,29 @@ import { getWrapEnumsTransformer, testWrapEnums } from '../transforms/wrap-enums
 
 
 const whitelistedAngularModules = [
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)animations(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)common(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)compiler(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)core(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)forms(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)http(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)platform-browser-dynamic(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)platform-browser(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)platform-webworker-dynamic(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)platform-webworker(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)router(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)upgrade(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)material(\\|\/)/,
-  /(\\|\/)node_modules(\\|\/)@angular(\\|\/)cdk(\\|\/)/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]animations[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]common[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]compiler[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]core[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]forms[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]http[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]platform-browser-dynamic[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]platform-browser[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]platform-webworker-dynamic[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]platform-webworker[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]router[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]upgrade[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]material[\\\/]/,
+  /[\\\/]node_modules[\\\/]@angular[\\\/]cdk[\\\/]/,
+];
+
+const es5AngularModules = [
+  // Angular 4 packaging format has .es5.js as the extension.
+  /.es5.js$/, // Angular 4
+  // Angular 5 has esm5 folders.
+  /[\\\/]node_modules[\\\/]@angular[\\\/][^\\/][\\\/]esm5[\\\/]/,
+  // All Angular versions have UMD with es5.
+  /.umd.js$/,
 ];
 
 export interface BuildOptimizerOptions {
@@ -70,9 +79,10 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
 
   if (inputFilePath
     && whitelistedAngularModules.some((re) => re.test(inputFilePath))
+    && es5AngularModules.some((re) => re.test(inputFilePath))
   ) {
     getTransforms.push(
-      // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure modules.
+      // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
       // It will mark both `require()` calls and `console.log(stuff)` as pure.
       // We only apply it to whitelisted modules, since we know they are safe.
       // getPrefixFunctionsTransformer needs to be before getFoldFileTransformer.
