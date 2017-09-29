@@ -14,7 +14,7 @@ export interface XI18WebpackOptions {
   verbose?: boolean;
   progress?: boolean;
   app?: string;
-  experimentalAngularCompiler?: boolean;
+  aot?: boolean;
 }
 export class XI18nWebpackConfig extends NgCliWebpackConfig {
 
@@ -26,18 +26,17 @@ export class XI18nWebpackConfig extends NgCliWebpackConfig {
       target: 'development',
       verbose: extractOptions.verbose,
       progress: extractOptions.progress,
-      experimentalAngularCompiler: extractOptions.experimentalAngularCompiler,
       locale: extractOptions.locale,
       i18nOutFormat: extractOptions.i18nFormat,
       i18nOutFile: extractOptions.outFile,
-      aot: extractOptions.experimentalAngularCompiler
+      aot: extractOptions.aot
     }, appConfig);
     super.buildConfig();
   }
 
   public buildConfig() {
     // The extra extraction config is only needed in Angular 2/4.
-    if (!this.extractOptions.experimentalAngularCompiler) {
+    if (!this.extractOptions.aot) {
       const configPath = CliConfig.configFilePath();
       const projectRoot = path.dirname(configPath);
 
