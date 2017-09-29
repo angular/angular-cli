@@ -76,7 +76,7 @@
     "typescript": ">=2.0.0 <2.6.0",
     "uglifyjs-webpack-plugin": "1.0.0-beta.1",
     "url-loader": "^0.5.7",
-    "webpack": "~3.5.5",
+    "webpack": "~3.6.0",
     "webpack-concat-plugin": "1.4.0",
     "webpack-dev-middleware": "~1.12.0",
     "webpack-dev-server": "~2.7.1",
