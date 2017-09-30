@@ -56,9 +56,9 @@ export function getWrapEnumsTransformer(): ts.TransformerFactory<ts.SourceFile> 
 }
 
 function visitBlockStatements(
-  statements: Array<ts.Statement>,
+  statements: ts.NodeArray<ts.Statement>,
   context: ts.TransformationContext,
-): Array<ts.Statement> {
+): ts.NodeArray<ts.Statement> {
 
   // copy of statements to modify; lazy initialized
   let updatedStatements: Array<ts.Statement> | undefined;
@@ -162,7 +162,7 @@ function visitBlockStatements(
 
   // if changes, return updated statements
   // otherwise, return original array instance
-  return updatedStatements ? updatedStatements : statements;
+  return updatedStatements ? ts.createNodeArray(updatedStatements) : statements;
 }
 
 // TS 2.3 enums have statements that are inside a IIFE.

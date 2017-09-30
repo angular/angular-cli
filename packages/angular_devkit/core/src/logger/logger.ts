@@ -132,7 +132,7 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     return `<Logger(${this.name})>`;
   }
 
-  lift(operator: Operator<LogEntry, LogEntry>): Observable<LogEntry> {
+  lift<R>(operator: Operator<LogEntry, R>): Observable<R> {
     return this._observable.lift(operator);
   }
 

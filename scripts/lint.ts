@@ -49,7 +49,7 @@ export default function (options: ParsedArgs, logger: Logger) {
   const tsLintConfig = Configuration.loadConfigurationFromPath(tsLintPath);
 
   program.getRootFileNames().forEach(fileName => {
-    linter.lint(fileName, ts.sys.readFile(fileName), tsLintConfig);
+    linter.lint(fileName, ts.sys.readFile(fileName) || '', tsLintConfig);
   });
 
   const result = linter.getResult();

@@ -253,7 +253,7 @@ function pickDecorationNodesToRemove(
   if (!literal.elements.every((elem) => elem.kind === ts.SyntaxKind.ObjectLiteralExpression)) {
     return [];
   }
-  const elements = literal.elements as ts.Node[] as ts.ObjectLiteralExpression[];
+  const elements = literal.elements as ts.NodeArray<ts.ObjectLiteralExpression>;
   const ngDecorators = elements.filter((elem) => isAngularDecorator(elem, ngMetadata, checker));
 
   return (elements.length > ngDecorators.length) ? ngDecorators : [exprStmt];
@@ -272,7 +272,7 @@ function pickPropDecorationNodesToRemove(
     (elem as ts.PropertyAssignment).initializer.kind === ts.SyntaxKind.ArrayLiteralExpression)) {
     return [];
   }
-  const assignments = literal.properties as ts.Node[] as ts.PropertyAssignment[];
+  const assignments = literal.properties as ts.NodeArray<ts.PropertyAssignment>;
   // Consider each assignment individually. Either the whole assignment will be removed or
   // a particular decorator within will.
   const toRemove = assignments
