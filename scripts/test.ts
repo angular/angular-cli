@@ -13,13 +13,14 @@ import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
 import { ParsedArgs } from 'minimist';
 import { join, relative } from 'path';
 import { Position, SourceMapConsumer, SourceMapGenerator } from 'source-map';
+import * as ts from 'typescript';
 import { packages } from '../lib/packages';
 
 
 const Jasmine = require('jasmine');
 const { versions } = require('../versions.json');
 
-const projectBaseDir = join(__dirname, '../packages');
+const projectBaseDir = join(__dirname, '..');
 require('source-map-support').install({
   hookRequire: true,
 });
@@ -221,7 +222,21 @@ export default function (args: ParsedArgs, logger: Logger) {
     glob.sync(regex)
       .map(p => relative(projectBaseDir, p));
 
-  let tests = allTests;
+  const tsConfigPath = join(__dirname, '../tsconfig.json');
+  const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+  const pattern = '^('
+                  + (tsConfig.config.exclude as string[])
+                    .map(ex => '('
+                      + ex
+                        .replace(/[\-\[\]{}()+?./\\^$|]/g, '\\$&')
+                        .replace(/(\\\\|\\\/)\*\*/g, '((\/|\\\\).+?)?')
+                        .replace(/\*/g, '[^/\\\\]*')
+                      + ')')
+                    .join('|')
+                  + ')($|/|\\\\)';
+  const excludeRe = new RegExp(pattern);
+  let tests = allTests.filter(x => !excludeRe.test(x));
+
   if (!args.full) {
     // Remove the tests from packages that haven't changed.
     tests = tests
