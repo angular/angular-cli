@@ -8,6 +8,6 @@
 import * as fs from './fs';
 
 export * from './cli-logger';
-export * from './resolve';
+export { ModuleNotFoundException, ResolveOptions, resolve } from './resolve';
 
 export { fs };

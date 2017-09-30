@@ -108,6 +108,15 @@ export interface ResolveOptions {
   resolvePackageJson?: boolean;
 }
 
+
+let _resolveHook: ((x: string, options: ResolveOptions) => string | null) | null = null;
+export function setResolveHook(
+  hook: ((x: string, options: ResolveOptions) => string | null) | null,
+) {
+  _resolveHook = hook;
+}
+
+
 /**
  * Resolve a package using a logic similar to npm require.resolve, but with more options.
  * @param x The package name to resolve.
@@ -117,6 +126,13 @@ export interface ResolveOptions {
  * @throws {ModuleNotFoundException} If no module with that name was found anywhere.
  */
 export function resolve(x: string, options: ResolveOptions): string {
+  if (_resolveHook) {
+    const maybe = _resolveHook(x, options);
+    if (maybe) {
+      return maybe;
+    }
+  }
+
   const readFileSync = fs.readFileSync;
 
   const extensions: string[] = options.extensions || Object.keys(require.extensions);
