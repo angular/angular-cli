@@ -12,7 +12,12 @@ import 'rxjs/add/operator/mergeMap';
 import { FileOperator, Rule, SchematicContext, Source } from '../engine/interface';
 import { FilteredTree } from '../tree/filtered';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
-import { branch, empty as staticEmpty, merge as staticMerge } from '../tree/static';
+import {
+  branch,
+  empty as staticEmpty,
+  merge as staticMerge,
+  partition as staticPartition,
+} from '../tree/static';
 import { VirtualTree } from '../tree/virtual';
 import { callRule, callSource } from './call';
 
@@ -99,6 +104,29 @@ export function when(predicate: FilePredicate<boolean>, operator: FileOperator):
     } else {
       return entry;
     }
+  };
+}
+
+
+export function partitionApplyMerge(
+  predicate: FilePredicate<boolean>,
+  ruleYes: Rule,
+  ruleNo?: Rule,
+): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    const [yes, no] = staticPartition(tree, predicate);
+
+    if (!ruleNo) {
+      // Shortcut.
+      return callRule(ruleYes, Observable.of(staticPartition(tree, predicate)[0]), context)
+        .map(yesTree => staticMerge(yesTree, no, context.strategy));
+    }
+
+    return callRule(ruleYes, Observable.of(yes), context)
+      .concatMap(yesTree => {
+        return callRule(ruleNo, Observable.of(no), context)
+          .map(noTree => staticMerge(yesTree, noTree, context.strategy));
+      });
   };
 }
 

@@ -6,6 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:non-null-operator
+import { Path } from '@angular-devkit/core';
+import {
+  FileSystemTree,
+  InMemoryFileSystemTreeHost,
+  MergeStrategy,
+  partitionApplyMerge,
+} from '@angular-devkit/schematics';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 import { Rule, SchematicContext, Source } from '../engine/interface';
@@ -15,7 +22,11 @@ import { apply, chain } from './base';
 import { callRule, callSource } from './call';
 
 
-const context: SchematicContext = null !;
+const context: SchematicContext = {
+  engine: null,
+  debug: false,
+  strategy: MergeStrategy.Default,
+} as {} as SchematicContext;
 
 
 describe('chain', () => {
@@ -117,6 +128,38 @@ describe('apply', () => {
         expect(rulesCalled[1]).toBe(tree1);
         expect(rulesCalled[2]).toBe(tree2);
         expect(result).toBe(tree3);
+      })
+      .then(done, done.fail);
+  });
+});
+
+describe('partitionApplyMerge', () => {
+  it('works with simple rules', done => {
+    const host = new InMemoryFileSystemTreeHost({
+      '/test1': '',
+      '/test2': '',
+    });
+    const tree = new FileSystemTree(host);
+    const predicate = (path: Path) => path.indexOf('1') != -1;
+
+    const ruleYes: Rule = (tree: Tree) => {
+      expect(tree.exists('/test1')).toBe(true);
+      expect(tree.exists('/test2')).toBe(false);
+
+      return empty();
+    };
+    const ruleNo: Rule = (tree: Tree) => {
+      expect(tree.exists('/test1')).toBe(false);
+      expect(tree.exists('/test2')).toBe(true);
+
+      return empty();
+    };
+
+    callRule(partitionApplyMerge(predicate, ruleYes, ruleNo), Observable.of(tree), context)
+      .toPromise()
+      .then(result => {
+        expect(result.exists('/test1')).toBe(false);
+        expect(result.exists('/test2')).toBe(false);
       })
       .then(done, done.fail);
   });
