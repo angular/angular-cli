@@ -49,6 +49,10 @@ describe('applyPathTemplate', () => {
     expect(_applyPathTemplate('/a__c__b__d__c', { c: '1', d: '2' })).toBe('/a1b2c');
   });
 
+  it('works with single _', () => {
+    expect(_applyPathTemplate('/a_b_c/d__e_f__g', { e_f: 1 })).toBe('/a_b_c/d1g');
+  });
+
   it('works with functions', () => {
     let arg = '';
     expect(_applyPathTemplate('/a__c__b', {

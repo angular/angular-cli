@@ -27,7 +27,7 @@ export class InvalidPipeException extends BaseException {
 }
 
 
-export const kPathTemplateComponentRE = /__([^_]+)__/g;
+export const kPathTemplateComponentRE = /__(.+?)__/g;
 export const kPathTemplatePipeRE = /@([^@]+)/;
 
 
