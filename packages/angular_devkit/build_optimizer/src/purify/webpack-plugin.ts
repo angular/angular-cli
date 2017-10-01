@@ -25,11 +25,14 @@ export class PurifyPlugin {
             .filter((fileName: string) => fileName.endsWith('.js'))
             .forEach((fileName: string) => {
               const replacements = purifyReplacements(compilation.assets[fileName].source());
-              const replaceSource = new ReplaceSource(compilation.assets[fileName], fileName);
-              replacements.forEach((replacement) => {
-                replaceSource.replace(replacement.start, replacement.end, replacement.content);
-              });
-              compilation.assets[fileName] = replaceSource;
+
+              if (replacements.length > 0) {
+                const replaceSource = new ReplaceSource(compilation.assets[fileName], fileName);
+                replacements.forEach((replacement) => {
+                  replaceSource.replace(replacement.start, replacement.end, replacement.content);
+                });
+                compilation.assets[fileName] = replaceSource;
+              }
             });
         });
         callback();
