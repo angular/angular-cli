@@ -42,6 +42,9 @@ End-to-end tests are run via [Protractor] (https://angular.github.io/protractor/
   <p>
     Compile and Serve the app. All serve options are also available. The live-reload option defaults to false, and the default port will be random.
   </p>
+  <p>
+    NOTE: Build failure will not launch the e2e task. You must first fix error(s) and run e2e again.
+  </p>
 </details>
 
 <details>
