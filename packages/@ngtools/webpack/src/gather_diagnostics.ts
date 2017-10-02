@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 
 import { time, timeEnd } from './benchmark';
-import { Program, Diagnostics } from './ngtools_api2';
+import { Program, Diagnostics } from './ngtools_api';
 
 
 export class CancellationToken implements ts.CancellationToken {

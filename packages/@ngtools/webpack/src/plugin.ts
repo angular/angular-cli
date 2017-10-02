@@ -1,13 +1,12 @@
-// @ignoreDep @angular/compiler-cli
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as SourceMap from 'source-map';
 
-const {__NGTOOLS_PRIVATE_API_2, VERSION} = require('@angular/compiler-cli');
 const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 const NodeWatchFileSystem = require('webpack/lib/node/NodeWatchFileSystem');
 
+import {CompilerCliIsSupported, __NGTOOLS_PRIVATE_API_2, VERSION} from './ngtools_api';
 import {WebpackResourceLoader} from './resource_loader';
 import {WebpackCompilerHost} from './compiler_host';
 import {resolveEntryModuleFromMain} from './entry_resolver';
@@ -80,6 +79,7 @@ export class AotPlugin implements Tapable {
   private _firstRun = true;
 
   constructor(options: AotPluginOptions) {
+    CompilerCliIsSupported();
     this._options = Object.assign({}, options);
     this._setupOptions(this._options);
   }
