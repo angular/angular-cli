@@ -1,10 +1,8 @@
-// @ignoreDep @angular/compiler-cli
 import * as ts from 'typescript';
 import * as path from 'path';
 import * as fs from 'fs';
 
-const {__NGTOOLS_PRIVATE_API_2, VERSION} = require('@angular/compiler-cli');
-
+import {__NGTOOLS_PRIVATE_API_2, VERSION} from './ngtools_api';
 import {Tapable} from './webpack';
 import {WebpackResourceLoader} from './resource_loader';
 

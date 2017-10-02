@@ -1,4 +1,3 @@
-// @ignoreDep @angular/compiler-cli
 import * as process from 'process';
 import * as ts from 'typescript';
 import * as chalk from 'chalk';
@@ -13,7 +12,7 @@ import {
   createProgram,
   createCompilerHost,
   formatDiagnostics,
-} from './ngtools_api2';
+} from './ngtools_api';
 
 // Force basic color support on terminals with no color support.
 // Chalk typings don't have the correct constructor parameters.
