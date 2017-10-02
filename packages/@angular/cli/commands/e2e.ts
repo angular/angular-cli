@@ -107,11 +107,14 @@ const E2eCommand = Command.extend({
       // Protractor will end the proccess, so we don't need to kill the dev server
       return new Promise((resolve, reject) => {
         let firstRebuild = true;
-        function rebuildCb() {
+        function rebuildCb(stats: any) {
           // don't run re-run tests on subsequent rebuilds
-          if (firstRebuild) {
+          const cleanBuild = !!!stats.compilation.errors.length;
+          if (firstRebuild && cleanBuild) {
             firstRebuild = false;
             return resolve(e2eTask.run(commandOptions));
+          } else {
+            return reject('Build did not succeed. Please fix errors before running e2e task');
           }
         }
 
