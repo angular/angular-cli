@@ -7,7 +7,7 @@
  */
 import { fs } from '@angular-devkit/core/node';
 import { FileSystemTreeHost } from '@angular-devkit/schematics';
-import { readFileSync, readdirSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 export class FileSystemHost implements FileSystemTreeHost {
@@ -21,6 +21,9 @@ export class FileSystemHost implements FileSystemTreeHost {
   }
   readFile(path: string) {
     return readFileSync(join(this._root, path));
+  }
+  exists(path: string) {
+    return existsSync(this.join(this._root, path));
   }
 
   join(path1: string, path2: string) {

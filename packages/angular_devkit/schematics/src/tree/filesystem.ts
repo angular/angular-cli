@@ -15,7 +15,7 @@ import {
   normalize,
 } from '@angular-devkit/core';
 import { LazyFileEntry } from './entry';
-import { DirEntry, FileEntry } from './interface';
+import { DirEntry, FileEntry, Tree } from './interface';
 import { VirtualDirEntry, VirtualTree } from './virtual';
 
 
@@ -23,6 +23,7 @@ export interface FileSystemTreeHost {
   listDirectory: (path: string) => string[];
   isDirectory: (path: string) => boolean;
   readFile: (path: string) => Buffer;
+  exists: (path: string) => boolean;
 
   join: (path1: string, other: string) => string;
 }
@@ -122,7 +123,27 @@ export class FileSystemTree extends VirtualTree {
   get(path: string): FileEntry | null {
     const normalizedPath = this._normalizePath(path);
 
-    return this._cacheMap.get(normalizedPath) || this.tree.get(normalizedPath) || null;
+    let entry = this._cacheMap.get(normalizedPath) || this._tree.get(normalizedPath) || null;
+
+    if (entry == null && !this._initialized) {
+      const systemPath = normalizedPath;
+      const fileExists = this._host.exists(systemPath) && !this._host.isDirectory(systemPath);
+
+      if (fileExists) {
+        const host = this._host;
+        entry = new LazyFileEntry(normalizedPath, () => host.readFile(systemPath));
+        this._tree.set(normalizedPath, entry);
+      }
+    }
+
+    return entry;
+  }
+
+  branch(): Tree {
+    const newTree = new FileSystemTree(this._host);
+    this._copyTo(newTree);
+
+    return newTree;
   }
 
   protected _copyTo<T extends VirtualTree>(tree: T): void {

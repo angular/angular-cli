@@ -22,6 +22,9 @@ export class NodeJsHost implements FileSystemTreeHost {
   readFile(path: string) {
     return fs.readFileSync(this.join(this._root, path));
   }
+  exists(path: string) {
+    return fs.existsSync(this.join(this._root, path));
+  }
 
   join(path1: string, path2: string) {
     return join(path1, path2);

@@ -42,6 +42,11 @@ export class InMemoryFileSystemTreeHost implements FileSystemTreeHost {
 
     return this._content[path] || new Buffer('');
   }
+  exists(path: string) {
+    path = normalize(path);
+
+    return this._content[path] != undefined;
+  }
 
   join(path1: string, path2: string) {
     return normalize(path1 + '/' + path2);
