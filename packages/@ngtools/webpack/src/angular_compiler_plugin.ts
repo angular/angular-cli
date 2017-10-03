@@ -212,13 +212,17 @@ export class AngularCompilerPlugin implements Tapable {
       this._compilerOptions.sourceMap = true;
       this._compilerOptions.inlineSources = true;
       this._compilerOptions.inlineSourceMap = false;
-      this._compilerOptions.sourceRoot = basePath;
+      this._compilerOptions.mapRoot = undefined;
+      // We will set the source to the full path of the file in the loader, so we don't
+      // need sourceRoot here.
+      this._compilerOptions.sourceRoot = undefined;
     } else {
       this._compilerOptions.sourceMap = false;
       this._compilerOptions.sourceRoot = undefined;
       this._compilerOptions.inlineSources = undefined;
       this._compilerOptions.inlineSourceMap = undefined;
       this._compilerOptions.mapRoot = undefined;
+      this._compilerOptions.sourceRoot = undefined;
     }
 
     // Compose Angular Compiler Options.
