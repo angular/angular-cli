@@ -256,6 +256,8 @@ export class AotPlugin implements Tapable {
     // because we don't want SourceFile instances to be cached past this point.
     this._compilerHost.enableCaching();
 
+    this._resourceLoader = new WebpackResourceLoader();
+
     if (options.entryModule) {
       this._entryModule = options.entryModule;
     } else if ((tsConfig.raw['angularCompilerOptions'] as any)
@@ -533,7 +535,7 @@ export class AotPlugin implements Tapable {
 
     this._compilation._ngToolsWebpackPluginInstance = this;
 
-    this._resourceLoader = new WebpackResourceLoader(compilation);
+    this._resourceLoader.update(compilation);
 
     this._donePromise = Promise.resolve()
       .then(() => {

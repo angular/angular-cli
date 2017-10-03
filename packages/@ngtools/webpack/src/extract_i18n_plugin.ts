@@ -135,6 +135,8 @@ export class ExtractI18nPlugin implements Tapable {
       }
       this._outFile = options.outFile;
     }
+
+    this._resourceLoader = new WebpackResourceLoader();
   }
 
   apply(compiler: any) {
@@ -163,7 +165,7 @@ export class ExtractI18nPlugin implements Tapable {
 
     this._compilation._ngToolsWebpackXi18nPluginInstance = this;
 
-    this._resourceLoader = new WebpackResourceLoader(compilation);
+    this._resourceLoader.update(compilation);
 
     this._donePromise = Promise.resolve()
       .then(() => {
