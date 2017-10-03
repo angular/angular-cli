@@ -86,6 +86,7 @@ export class AngularCompilerPlugin implements Tapable {
   private _program: ts.Program | Program;
   private _compilerHost: WebpackCompilerHost;
   private _angularCompilerHost: WebpackCompilerHost & CompilerHost;
+  private _resourceLoader: WebpackResourceLoader;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = Object.create(null);
   private _tsConfigPath: string;
@@ -267,6 +268,10 @@ export class AngularCompilerPlugin implements Tapable {
     this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
     this._compilerHost.enableCaching();
 
+    // Create and set a new WebpackResourceLoader.
+    this._resourceLoader = new WebpackResourceLoader();
+    this._compilerHost.setResourceLoader(this._resourceLoader);
+
     // Override some files in the FileSystem.
     if (this._options.hostOverrideFileSystem) {
       for (const filePath of Object.keys(this._options.hostOverrideFileSystem)) {
@@ -283,6 +288,7 @@ export class AngularCompilerPlugin implements Tapable {
       }
     }
 
+    // Set platform.
     this._platform = options.platform || PLATFORM.Browser;
     timeEnd('AngularCompilerPlugin._setupOptions');
   }
@@ -563,13 +569,11 @@ export class AngularCompilerPlugin implements Tapable {
       return cb(new Error('An @ngtools/webpack plugin already exist for this compilation.'));
     }
 
+    // Set a private variable for this plugin instance.
     this._compilation._ngToolsWebpackPluginInstance = this;
 
-    // Create the resource loader with the webpack compilation.
-    time('AngularCompilerPlugin._make.setResourceLoader');
-    const resourceLoader = new WebpackResourceLoader(compilation);
-    this._compilerHost.setResourceLoader(resourceLoader);
-    timeEnd('AngularCompilerPlugin._make.setResourceLoader');
+    // Update the resource loader with the new webpack compilation.
+    this._resourceLoader.update(compilation);
 
     this._donePromise = Promise.resolve()
       .then(() => {
