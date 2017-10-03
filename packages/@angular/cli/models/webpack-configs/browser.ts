@@ -45,12 +45,22 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.sourcemaps) {
-    extraPlugins.push(new webpack.SourceMapDevToolPlugin({
-      filename: '[file].map[query]',
-      moduleFilenameTemplate: '[resource-path]',
-      fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
-      sourceRoot: 'webpack:///'
-    }));
+    // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
+    if (buildOptions.evalSourcemaps && buildOptions.target === 'development') {
+      // Produce eval sourcemaps for development with serve, which are faster.
+      extraPlugins.push(new webpack.EvalSourceMapDevToolPlugin({
+        moduleFilenameTemplate: '[resource-path]',
+        sourceRoot: 'webpack:///'
+      }));
+    } else {
+      // Produce full separate sourcemaps for production.
+      extraPlugins.push(new webpack.SourceMapDevToolPlugin({
+        filename: '[file].map[query]',
+        moduleFilenameTemplate: '[resource-path]',
+        fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
+        sourceRoot: 'webpack:///'
+      }));
+    }
   }
 
   if (buildOptions.commonChunk) {
