@@ -128,6 +128,7 @@ Global package:
 ```bash
 npm uninstall -g @angular/cli
 npm cache clean
+# if npm version is > 5 then use `npm cache verify` to avoid errors (or to avoid using --force)
 npm install -g @angular/cli@latest
 ```
 
