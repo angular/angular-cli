@@ -14,6 +14,8 @@ export { purify } from './purify/purify';
 export { transformJavascript } from './helpers/transform-javascript';
 
 export { getFoldFileTransformer } from './transforms/class-fold';
+export { getImportTslibTransformer, testImportTslib } from './transforms/import-tslib';
+export { getPrefixClassesTransformer, testPrefixClasses } from './transforms/prefix-classes';
 export { getPrefixFunctionsTransformer } from './transforms/prefix-functions';
-export { getScrubFileTransformer } from './transforms/scrub-file';
-export { getImportTslibTransformer } from './transforms/import-tslib';
+export { getScrubFileTransformer, testScrubFile } from './transforms/scrub-file';
+export { getWrapEnumsTransformer, testWrapEnums } from './transforms/wrap-enums';
