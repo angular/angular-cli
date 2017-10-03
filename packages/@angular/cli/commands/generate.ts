@@ -167,7 +167,8 @@ export default Command.extend({
       ui: this.ui,
       project: this.project
     });
-    const collectionName = this.getCollectionName(rawArgs);
+    const collectionName = commandOptions.collection ||
+      CliConfig.getValue('defaults.schematics.collection');
 
     if (collectionName === '@schematics/angular' && schematicName === 'interface' && rawArgs[2]) {
       commandOptions.type = rawArgs[2];
