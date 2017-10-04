@@ -557,15 +557,11 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
             result.sourceMap = JSON.stringify(sourceMap);
           }
 
-          if (plugin.failedCompilation) {
-            // Return an empty string if there is no result to prevent extra loader errors.
-            // Plugin errors were already pushed to the compilation errors.
-            timeEnd(timeLabel);
-            cb(null, result.outputText || '', result.sourceMap);
-          } else {
-            timeEnd(timeLabel);
-            cb(null, result.outputText, result.sourceMap);
+          timeEnd(timeLabel);
+          if (result.outputText === undefined) {
+            throw new Error('TypeScript compilation failed.');
           }
+          cb(null, result.outputText, result.sourceMap);
         })
         .catch(err => {
           timeEnd(timeLabel + '.ngcLoader.AngularCompilerPlugin');
@@ -658,15 +654,12 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
           timeEnd(timeLabel + '.ngcLoader.AotPlugin.transpile');
 
           timeEnd(timeLabel + '.ngcLoader.AotPlugin');
-          if (plugin.failedCompilation && plugin.compilerOptions.noEmitOnError) {
-            // Return an empty string to prevent extra loader errors (missing imports etc).
-            // Plugin errors were already pushed to the compilation errors.
-            timeEnd(timeLabel);
-            cb(null, '');
-          } else {
-            timeEnd(timeLabel);
-            cb(null, result.outputText, result.sourceMap);
+          timeEnd(timeLabel);
+
+          if (result.outputText === undefined) {
+            throw new Error('TypeScript compilation failed.');
           }
+          cb(null, result.outputText, result.sourceMap);
         })
         .catch(err => cb(err));
       }

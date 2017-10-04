@@ -101,7 +101,6 @@ export class AngularCompilerPlugin implements Tapable {
   private _donePromise: Promise<void> | null;
   private _compiler: any = null;
   private _compilation: any = null;
-  private _failedCompilation = false;
 
   // TypeChecker process.
   private _forkTypeChecker = true;
@@ -115,7 +114,6 @@ export class AngularCompilerPlugin implements Tapable {
 
   get options() { return this._options; }
   get done() { return this._donePromise; }
-  get failedCompilation() { return this._failedCompilation; }
   get entryModule() {
     const splitted = this._entryModule.split('#');
     const path = splitted[0];
@@ -327,13 +325,19 @@ export class AngularCompilerPlugin implements Tapable {
       this._updateForkedTypeChecker(changedTsFiles);
     }
 
-    if (this._JitMode) {
+    // We want to allow emitting with errors on the first run so that imports can be added
+    // to the webpack dependency tree and rebuilds triggered by file edits.
+    const compilerOptions = {
+      ...this._angularCompilerOptions,
+      noEmitOnError: !this._firstRun
+    };
 
+    if (this._JitMode) {
       // Create the TypeScript program.
       time('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
       this._program = ts.createProgram(
         this._tsFilenames,
-        this._angularCompilerOptions,
+        compilerOptions,
         this._angularCompilerHost,
         this._program as ts.Program
       );
@@ -345,7 +349,7 @@ export class AngularCompilerPlugin implements Tapable {
       // Create the Angular program.
       this._program = createProgram({
         rootNames: this._tsFilenames,
-        options: this._angularCompilerOptions,
+        options: compilerOptions,
         host: this._angularCompilerHost,
         oldProgram: this._program as Program
       });
@@ -543,7 +547,6 @@ export class AngularCompilerPlugin implements Tapable {
     compiler.plugin('done', () => {
       this._donePromise = null;
       this._compilation = null;
-      this._failedCompilation = false;
     });
 
     // TODO: consider if it's better to remove this plugin and instead make it wait on the
@@ -618,7 +621,6 @@ export class AngularCompilerPlugin implements Tapable {
         timeEnd('AngularCompilerPlugin._make');
         cb();
       }, (err: any) => {
-        this._failedCompilation = true;
         compilation.errors.push(err.stack);
         timeEnd('AngularCompilerPlugin._make');
         cb();
@@ -740,8 +742,6 @@ export class AngularCompilerPlugin implements Tapable {
           // Reset changed files on successful compilation.
           if (emitResult && !emitResult.emitSkipped && this._compilation.errors.length === 0) {
             this._compilerHost.resetChangedFileTracker();
-          } else {
-            this._failedCompilation = true;
           }
         }
         timeEnd('AngularCompilerPlugin._update');
@@ -803,7 +803,9 @@ export class AngularCompilerPlugin implements Tapable {
             'AngularCompilerPlugin._emit.ts'));
         }
 
-        if (!hasErrors(allDiagnostics)) {
+        // Always emit on the first run, so that imports are processed by webpack and the user
+        // can trigger a rebuild by editing any file.
+        if (!hasErrors(allDiagnostics) || this._firstRun) {
           sourceFiles.forEach((sf) => {
             const timeLabel = `AngularCompilerPlugin._emit.ts+${sf.fileName}+.emit`;
             time(timeLabel);
@@ -834,7 +836,9 @@ export class AngularCompilerPlugin implements Tapable {
             'AngularCompilerPlugin._emit.ng'));
         }
 
-        if (!hasErrors(allDiagnostics)) {
+        // Always emit on the first run, so that imports are processed by webpack and the user
+        // can trigger a rebuild by editing any file.
+        if (!hasErrors(allDiagnostics) || this._firstRun) {
           time('AngularCompilerPlugin._emit.ng.emit');
           const extractI18n = !!this._angularCompilerOptions.i18nOutFile;
           const emitFlags = extractI18n ? EmitFlags.I18nBundle : EmitFlags.Default;
