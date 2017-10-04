@@ -7,7 +7,7 @@
  */
 import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
-import { getPrefixClassesTransformer } from './prefix-classes';
+import { getPrefixClassesTransformer, testPrefixClasses } from './prefix-classes';
 
 
 const transform = (content: string) => transformJavascript(
@@ -30,6 +30,7 @@ describe('prefix-classes', () => {
       }());
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -54,6 +55,7 @@ describe('prefix-classes', () => {
       }());
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -77,6 +79,7 @@ describe('prefix-classes', () => {
       }(StaticTestCase));
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -98,6 +101,7 @@ describe('prefix-classes', () => {
       StaticTestCase.StaticTest = true;
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -121,6 +125,7 @@ describe('prefix-classes', () => {
       }(StaticTestCase));
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -142,6 +147,7 @@ describe('prefix-classes', () => {
       }());
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -161,6 +167,7 @@ describe('prefix-classes', () => {
       }());
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -182,6 +189,7 @@ describe('prefix-classes', () => {
       }());
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -205,6 +213,7 @@ describe('prefix-classes', () => {
       }(StaticTestCase));
     `;
 
+    expect(testPrefixClasses(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 

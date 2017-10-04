@@ -12,8 +12,8 @@ import * as ts from 'typescript';
 export function testPrefixClasses(content: string) {
   const regexes = [
     // tslint:disable-next-line:max-line-length
-    /^(var (\S+) = )(\(function \(\) \{\r?\n(?:    (?:\/\*\*| \*|\*\/|\/\/)[^\r?\n]*\r?\n)*    function \2\([^\)]*\) \{\r?\n)/,
-    /^(var (\S+) = )(\(function \(_super\) \{\r?\n    \w*__extends\(\w+, _super\);\r?\n)/,
+    /^(?:export )?(var (\S+) = )(?:\/\*\* @class \*\/ )?(\(function \(\) \{\r?\n(?:\s+(?:\/\*\*| \*|\*\/|\/\/)[^\r?\n]*\r?\n)*\s+function \2\([^\)]*\) \{\r?\n)/,
+    /^(?:export )?(var (\S+) = )(?:\/\*\* @class \*\/ )?(\(function \(_super\) \{\r?\n\s+\w*__extends\(\w+, _super\);\r?\n)/,
   ];
 
   return regexes.some((regex) => regex.test(content));
