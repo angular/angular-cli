@@ -62,7 +62,6 @@ export class AotPlugin implements Tapable {
   private _donePromise: Promise<void> | null;
   private _compiler: any = null;
   private _compilation: any = null;
-  private _failedCompilation = false;
 
   private _typeCheck = true;
   private _skipCodeGeneration = false;
@@ -90,7 +89,6 @@ export class AotPlugin implements Tapable {
   get compilerHost() { return this._compilerHost; }
   get compilerOptions() { return this._compilerOptions; }
   get done() { return this._donePromise; }
-  get failedCompilation() { return this._failedCompilation; }
   get entryModule() {
     const splitted = this._entryModule.split('#');
     const path = splitted[0];
@@ -428,7 +426,6 @@ export class AotPlugin implements Tapable {
     compiler.plugin('done', () => {
       this._donePromise = null;
       this._compilation = null;
-      this._failedCompilation = false;
     });
 
     compiler.plugin('after-resolvers', (compiler: any) => {
@@ -640,14 +637,11 @@ export class AotPlugin implements Tapable {
       .then(() => {
         if (this._compilation.errors == 0) {
           this._compilerHost.resetChangedFileTracker();
-        } else {
-          this._failedCompilation = true;
         }
 
         timeEnd('AotPlugin._make');
         cb();
       }, (err: any) => {
-        this._failedCompilation = true;
         compilation.errors.push(err.stack);
         timeEnd('AotPlugin._make');
         cb();
