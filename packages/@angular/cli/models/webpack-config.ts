@@ -1,3 +1,4 @@
+import { readTsconfig } from '../utilities/read-tsconfig';
 const webpackMerge = require('webpack-merge');
 import { CliConfig } from './config';
 import { BuildOptions } from './build-options';
@@ -17,6 +18,7 @@ export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
   projectRoot: string;
   buildOptions: T;
   appConfig: any;
+  tsConfig: any;
 }
 
 export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
@@ -33,7 +35,10 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
     buildOptions = this.addTargetDefaults(buildOptions);
     buildOptions = this.mergeConfigs(buildOptions, appConfig, projectRoot);
 
-    this.wco = { projectRoot, buildOptions, appConfig };
+    const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
+    const tsConfig = readTsconfig(tsconfigPath);
+
+    this.wco = { projectRoot, buildOptions, appConfig, tsConfig };
   }
 
   public buildConfig() {
