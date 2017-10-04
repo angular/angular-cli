@@ -126,41 +126,42 @@ export default Command.extend({
       throw 'The `ng generate module` command requires a name to be specified.';
     }
 
+    const cwd = this.project.root;
+    const schematicName = rawArgs[0];
     const entityName = rawArgs[1];
     commandOptions.name = stringUtils.dasherize(entityName.split(separatorRegEx).pop());
 
-    const appConfig = getAppFromConfig(commandOptions.app);
-    const dynamicPathOptions: DynamicPathOptions = {
-      project: this.project,
-      entityName: entityName,
-      appConfig: appConfig,
-      dryRun: commandOptions.dryRun
-    };
-    const parsedPath = dynamicPathParser(dynamicPathOptions);
-    commandOptions.sourceDir = appConfig.root;
-    const root = appConfig.root + path.sep;
-    commandOptions.appRoot = parsedPath.appRoot === appConfig.root ? '' :
-      parsedPath.appRoot.startsWith(root)
-        ? parsedPath.appRoot.substr(root.length)
-        : parsedPath.appRoot;
+    const newProject = CliConfig.getValue('defaults.schematics.newProject');
+    if (!newProject || newProject.indexOf(schematicName) === -1) {
+      const appConfig = getAppFromConfig(commandOptions.app);
+      const dynamicPathOptions: DynamicPathOptions = {
+        project: this.project,
+        entityName: entityName,
+        appConfig: appConfig,
+        dryRun: commandOptions.dryRun
+      };
+      const parsedPath = dynamicPathParser(dynamicPathOptions);
+      commandOptions.sourceDir = appConfig.root;
+      const root = appConfig.root + path.sep;
+      commandOptions.appRoot = parsedPath.appRoot === appConfig.root ? '' :
+        parsedPath.appRoot.startsWith(root)
+          ? parsedPath.appRoot.substr(root.length)
+          : parsedPath.appRoot;
+      commandOptions.path = parsedPath.dir.replace(separatorRegEx, '/');
+      commandOptions.path = parsedPath.dir === appConfig.root ? '' :
+          parsedPath.dir.startsWith(root)
+            ? commandOptions.path.substr(root.length)
+            : commandOptions.path;
 
-    commandOptions.path = parsedPath.dir.replace(separatorRegEx, '/');
-    commandOptions.path = parsedPath.dir === appConfig.root ? '' :
-      parsedPath.dir.startsWith(root)
-        ? commandOptions.path.substr(root.length)
-        : commandOptions.path;
+      if (['component', 'c', 'directive', 'd'].indexOf(schematicName) !== -1) {
+        if (commandOptions.prefix === undefined) {
+          commandOptions.prefix = appConfig.prefix;
+        }
 
-    const cwd = this.project.root;
-    const schematicName = rawArgs[0];
-
-    if (['component', 'c', 'directive', 'd'].indexOf(schematicName) !== -1) {
-      if (commandOptions.prefix === undefined) {
-        commandOptions.prefix = appConfig.prefix;
-      }
-
-      if (schematicName === 'component' || schematicName === 'c') {
-        if (commandOptions.styleext === undefined) {
-          commandOptions.styleext = CliConfig.getValue('defaults.styleExt');
+        if (schematicName === 'component' || schematicName === 'c') {
+          if (commandOptions.styleext === undefined) {
+            commandOptions.styleext = CliConfig.getValue('defaults.styleExt');
+          }
         }
       }
     }

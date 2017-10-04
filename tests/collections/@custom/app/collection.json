@@ -1,0 +1,11 @@
+{
+  "name": "@custom/app",
+  "version": "0.1",
+  "schematics": {
+    "app": {
+      "factory": "./index.js",
+      "schema": "./schema.json",
+      "description": "Create an empty app"
+    }
+  }
+}
