@@ -117,7 +117,13 @@ export function getProdConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  const uglifyCompressOptions: any = {};
+  const uglifyCompressOptions: any = {
+      // Disabled because of an issue with Uglify breaking seemingly valid code:
+      // https://github.com/angular/angular-cli/issues/5804
+      // Further investigation:
+      // https://github.com/mishoo/UglifyJS2/issues/2011
+      comparisons: false
+  };
 
   if (buildOptions.buildOptimizer) {
     // This plugin must be before webpack.optimize.UglifyJsPlugin.
