@@ -112,6 +112,10 @@ function isBlock(node: ts.Node): node is ts.Block {
   return node.kind === ts.SyntaxKind.Block;
 }
 
+function isClassDeclaration(node: ts.Node): node is ts.ClassDeclaration {
+  return node.kind === ts.SyntaxKind.ClassDeclaration;
+}
+
 // Determine if a node matched the structure of a downleveled TS class.
 function isDownleveledClass(node: ts.Node): boolean {
 
@@ -169,17 +173,28 @@ function isDownleveledClass(node: ts.Node): boolean {
   const className = variableDeclaration.name.text;
 
   const firstStatement = functionStatements[0];
-  const lastStatement = functionStatements[functionStatements.length - 1];
+
+  // find return statement - may not be last statement
+  let returnStatement: ts.ReturnStatement | undefined;
+  for (let i = functionStatements.length - 1; i > 0; i--) {
+    if (isReturnStatement(functionStatements[i])) {
+      returnStatement = functionStatements[i] as ts.ReturnStatement;
+      break;
+    }
+  }
+
+  if (returnStatement == undefined
+      || returnStatement.expression == undefined
+      || !isIdentifier(returnStatement.expression)) {
+    return false;
+  }
 
   if (functionExpression.parameters.length === 0) {
-    // potential non-extended class
-    return isFunctionDeclaration(firstStatement)
+    // potential non-extended class or wrapped es2015 class
+    return (isFunctionDeclaration(firstStatement) || isClassDeclaration(firstStatement))
            && firstStatement.name !== undefined
            && firstStatement.name.text === className
-           && isReturnStatement(lastStatement)
-           && lastStatement.expression != undefined
-           && isIdentifier(lastStatement.expression)
-           && lastStatement.expression.text === firstStatement.name.text;
+           && returnStatement.expression.text === firstStatement.name.text;
   } else if (functionExpression.parameters.length !== 1) {
     return false;
   }
@@ -222,8 +237,5 @@ function isDownleveledClass(node: ts.Node): boolean {
   return isFunctionDeclaration(secondStatement)
          && secondStatement.name !== undefined
          && secondStatement.name.text === className
-         && isReturnStatement(lastStatement)
-         && lastStatement.expression !== undefined
-         && isIdentifier(lastStatement.expression)
-         && lastStatement.expression.text === secondStatement.name.text;
+         && returnStatement.expression.text === secondStatement.name.text;
 }
