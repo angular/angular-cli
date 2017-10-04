@@ -183,6 +183,13 @@ export const baseBuildCommandOptions: any = [
     default: false,
     aliases: ['sri'],
     description: 'Enables the use of subresource integrity validation.'
+  },
+  {
+    name: 'bundle-dependencies',
+    type: ['none', 'all'],
+    default: 'none',
+    description: 'Available on server platform only. Which external dependencies to bundle into '
+               + 'the module. By default, all of node_modules will be kept as requires.'
   }
 ];
 
