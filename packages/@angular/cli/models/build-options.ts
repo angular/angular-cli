@@ -17,6 +17,7 @@ export interface BuildOptions {
   locale?: string;
   missingTranslation?: string;
   extractCss?: boolean;
+  bundleDependencies?: 'none' | 'all';
   watch?: boolean;
   outputHashing?: string;
   poll?: number;
