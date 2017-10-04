@@ -193,6 +193,12 @@ export class AngularCompilerPlugin implements Tapable {
       tsConfigJson.exclude = tsConfigJson.exclude.concat(options.exclude);
     }
 
+    // Add extra includes.
+    if (options.hasOwnProperty('include') && Array.isArray(options.include)) {
+      tsConfigJson.include = tsConfigJson.include || [];
+      tsConfigJson.include.push(...options.include);
+    }
+
     // Parse the tsconfig contents.
     const tsConfig = ts.parseJsonConfigFileContent(
       tsConfigJson, ts.sys, basePath, undefined, this._tsConfigPath);
