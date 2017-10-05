@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import { join } from 'path';
@@ -37,7 +38,7 @@ describe('FileSystemSink', () => {
     tree.commitUpdate(recorder);
 
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-    expect(tree.files).toEqual(files);
+    expect(tree.files).toEqual(files.map(normalize));
 
     const sink = new FileSystemSink(outputRoot);
     sink.commit(optimize(tree))

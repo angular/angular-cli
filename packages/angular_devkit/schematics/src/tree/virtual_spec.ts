@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:non-null-operator
+import { normalize } from '@angular-devkit/core';
 import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import { FileSystemTree } from './filesystem';
 import { FileEntry, MergeStrategy } from './interface';
@@ -40,7 +41,7 @@ describe('VirtualTree', () => {
 
       expect(tree.files).toEqual([
         '/some/file', '/some/other-file', '/some/other-file2',
-      ]);
+      ].map(normalize));
     });
   });
 
@@ -127,7 +128,7 @@ describe('VirtualTree', () => {
       tree.overwrite('/test', 'test 3');
 
       const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-      expect(tree.files).toEqual(files);
+      expect(tree.files).toEqual(files.map(normalize));
 
       const tree2 = tree.branch() as VirtualTree;
       expect(tree.actions.length).toBe(4);

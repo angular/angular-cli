@@ -82,9 +82,8 @@ export class VirtualTree implements Tree {
   protected _normalizePath(path: string): Path {
     return normalize('/' + path);
   }
-  protected get tree() {
-    return this._tree;
-  }
+  protected get tree(): ReadonlyMap<Path, FileEntry> { return this._tree; }
+  get staging(): ReadonlyMap<Path, FileEntry> { return this._cacheMap; }
 
   /**
    * A list of file names contained by this Tree.
@@ -95,9 +94,6 @@ export class VirtualTree implements Tree {
   }
 
   get root(): DirEntry { return this._root; }
-  get staging() {
-    return new Map(this._cacheMap);
-  }
 
   get(path: string): FileEntry | null {
     const normalizedPath = this._normalizePath(path);

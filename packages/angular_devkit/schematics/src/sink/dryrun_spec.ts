@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import 'rxjs/add/operator/toArray';
@@ -41,7 +42,7 @@ describe('DryRunSink', () => {
     tree.overwrite('/hello', 'world');
 
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-    expect(tree.files).toEqual(files);
+    expect(tree.files).toEqual(files.map(normalize));
 
     const sink = new DryRunSink(outputRoot);
     sink.reporter
@@ -69,7 +70,7 @@ describe('DryRunSink', () => {
     tree.overwrite('/hello', 'world');
 
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-    expect(tree.files).toEqual(files);
+    expect(tree.files).toEqual(files.map(normalize));
 
     // Need to create this file on the filesystem, otherwise the commit phase will fail.
     fs.writeFileSync(path.join(outputRoot, 'hello'), '');

@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize } from '@angular-devkit/core';
 import { FilteredTree } from './filtered';
 import { VirtualTree } from './virtual';
 
@@ -17,6 +18,6 @@ describe('FilteredTree', () => {
     tree.create('/file3', '');
 
     const filtered = new FilteredTree(tree, p => p != '/file2');
-    expect(filtered.files.sort()).toEqual(['/file1', '/file3']);
+    expect(filtered.files.sort()).toEqual(['/file1', '/file3'].map(normalize));
   });
 });

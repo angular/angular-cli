@@ -5,10 +5,17 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException } from '@angular-devkit/core';
+import {
+  BaseException,
+  Path,
+  PathFragment,
+  dirname,
+  join,
+  normalize,
+} from '@angular-devkit/core';
 import { FileDoesNotExistException } from '../exception/exception';
 import { Action } from './action';
-import { MergeStrategy, Tree, UpdateRecorder } from './interface';
+import { DirEntry, MergeStrategy, Tree, UpdateRecorder } from './interface';
 import { UpdateRecorderBase } from './recorder';
 
 
@@ -17,11 +24,31 @@ export class CannotCreateFileException extends BaseException {
 }
 
 
+export class NullTreeDirEntry implements DirEntry {
+  get parent(): DirEntry | null {
+    return this.path == '/' ? null : new NullTreeDirEntry(dirname(this.path));
+  }
+
+  constructor(public readonly path: Path) {}
+
+  readonly subdirs: PathFragment[] = [];
+  readonly subfiles: PathFragment[] = [];
+
+  dir(name: PathFragment): DirEntry {
+    return new NullTreeDirEntry(join(this.path, name));
+  }
+  file(_name: PathFragment) { return null; }
+}
+
+
 export class NullTree implements Tree {
+  readonly root: DirEntry = new NullTreeDirEntry(normalize('/'));
+
   // Simple readonly file system operations.
   exists(_path: string) { return false; }
   read(_path: string) { return null; }
   get(_path: string) { return null; }
+  getDir(path: string) { return new NullTreeDirEntry(normalize('/' + path)); }
   get files(): string[] { return []; }
 
   // Change content of host files.
