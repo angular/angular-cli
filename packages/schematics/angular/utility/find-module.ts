@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, dirname, normalize, relative } from '@angular-devkit/core';
-import { Tree } from '@angular-devkit/schematics';
+import { Path, join, normalize, relative } from '@angular-devkit/core';
+import { DirEntry, Tree } from '@angular-devkit/schematics';
 import { dasherize } from '../strings';
 
 
@@ -24,8 +24,7 @@ export interface ModuleOptions {
 /**
  * Find the module referred by a set of options passed to the schematics.
  */
-export function findModuleFromOptions(host: Tree,
-                                      options: ModuleOptions): Path | undefined {
+export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path | undefined {
   if (options.hasOwnProperty('skipImport') && options.skipImport) {
     return undefined;
   }
@@ -58,35 +57,26 @@ export function findModuleFromOptions(host: Tree,
  * Function to find the "closest" module to a generated file's path.
  */
 export function findModule(host: Tree, generateDir: string): Path {
-  let closestModule = normalize('/' + generateDir);
-  const allFiles = host.files;
+  let dir: DirEntry | null = host.getDir('/' + generateDir);
 
-  let modulePath: string | null = null;
   const moduleRe = /\.module\.ts$/;
   const routingModuleRe = /-routing\.module\.ts/;
 
-  while (closestModule) {
-    const matches = allFiles
-      .filter(p => moduleRe.test(p) &&
-        !routingModuleRe.test(p) &&
-        !/\//g.test(p.replace(closestModule + '/', '')));
+  while (dir) {
+    const matches = dir.subfiles.filter(p => moduleRe.test(p) && !routingModuleRe.test(p));
 
     if (matches.length == 1) {
-      modulePath = matches[0];
-      break;
+      return join(dir.path, matches[0]);
     } else if (matches.length > 1) {
       throw new Error('More than one module matches. Use skip-import option to skip importing '
         + 'the component into the closest module.');
     }
-    closestModule = dirname(closestModule);
+
+    dir = dir.parent;
   }
 
-  if (!modulePath) {
-    throw new Error('Could not find an NgModule for the new component. Use the skip-import '
-      + 'option to skip importing components in NgModule.');
-  }
-
-  return normalize(modulePath);
+  throw new Error('Could not find an NgModule for the new component. Use the skip-import '
+    + 'option to skip importing components in NgModule.');
 }
 
 /**

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path } from '@angular-devkit/core';
+import { Path, PathFragment } from '@angular-devkit/core';
 import { Action } from './action';
 
 
@@ -36,6 +36,16 @@ export interface FileEntry {
   readonly content: Buffer;
 }
 
+export interface DirEntry {
+  readonly parent: DirEntry | null;
+  readonly path: Path;
+
+  readonly subdirs: PathFragment[];
+  readonly subfiles: PathFragment[];
+
+  dir(name: PathFragment): DirEntry;
+  file(name: PathFragment): FileEntry | null;
+}
 
 export interface FilePredicate<T> {
   (path: Path, entry?: Readonly<FileEntry> | null): T;
@@ -43,6 +53,8 @@ export interface FilePredicate<T> {
 
 
 export interface Tree {
+  readonly root: DirEntry;
+
   // Readonly.
   readonly files: string[];
   exists(path: string): boolean;
@@ -50,6 +62,7 @@ export interface Tree {
   // Content access.
   read(path: string): Buffer | null;
   get(path: string): FileEntry | null;
+  getDir(path: string): DirEntry;
 
   // Change content of host files.
   overwrite(path: string, content: Buffer | string): void;

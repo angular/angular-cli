@@ -27,28 +27,28 @@ export class FileSystemTree extends VirtualTree {
     super();
   }
 
-  get root(): Map<Path, FileEntry> {
+  get tree(): Map<Path, FileEntry> {
     const host = this._host;
     if (!this._initialized) {
       this._initialized = true;
       this._recursiveFileList().forEach(([system, schematic]) => {
-        this._root.set(schematic, new LazyFileEntry(schematic, () => host.readFile(system)));
+        this._tree.set(schematic, new LazyFileEntry(schematic, () => host.readFile(system)));
       });
     }
 
-    return this._root;
+    return this._tree;
   }
 
   get(path: string): FileEntry | null {
     const normalizedPath = this._normalizePath(path);
 
-    return this._cacheMap.get(normalizedPath) || this.root.get(normalizedPath) || null;
+    return this._cacheMap.get(normalizedPath) || this.tree.get(normalizedPath) || null;
   }
 
   protected _copyTo<T extends VirtualTree>(tree: T): void {
     if (tree instanceof FileSystemTree) {
       const x = tree as FileSystemTree;
-      x._root = this._root;
+      x._tree = this._tree;
       x._initialized = this._initialized;
 
       this._actions.forEach(action => x._actions.push(action));

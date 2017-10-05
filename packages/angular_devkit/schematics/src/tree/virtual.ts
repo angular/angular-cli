@@ -5,7 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, normalize } from '@angular-devkit/core';
+import {
+  Path,
+  PathFragment,
+  basename,
+  dirname,
+  join,
+  normalize,
+  split,
+} from '@angular-devkit/core';
 import {
   ContentHasMutatedException,
   FileAlreadyExistException,
@@ -15,17 +23,56 @@ import {
 } from '../exception/exception';
 import { Action, ActionList, UnknownActionException } from './action';
 import { SimpleFileEntry } from './entry';
-import { FileEntry, MergeStrategy, Tree, UpdateRecorder } from './interface';
+import { DirEntry, FileEntry, MergeStrategy, Tree, UpdateRecorder } from './interface';
 import { UpdateRecorderBase } from './recorder';
+
+
+export class VirtualDirEntry implements DirEntry {
+  protected _subdirs = new Map<PathFragment, DirEntry>();
+
+  constructor(protected _tree: VirtualTree, protected _path: Path = normalize('/')) {}
+
+  protected _createDir(name: PathFragment): DirEntry {
+    return new VirtualDirEntry(this._tree, join(this._path, name));
+  }
+
+  get parent() {
+    return this._path == '/' ? null : this._tree.getDir(dirname(this._path));
+  }
+  get path() { return this._path; }
+  get subdirs() {
+    return this._tree.files
+               .filter(path => path.startsWith(this._path) && dirname(path) != this._path)
+               .map(path => basename(path));
+  }
+  get subfiles() {
+    return this._tree.files
+               .filter(path => path.startsWith(this._path) && dirname(path) == this._path)
+               .map(path => basename(path));
+  }
+
+  dir(name: PathFragment) {
+    let maybe = this._subdirs.get(name);
+    if (!maybe) {
+      this._subdirs.set(name, maybe = this._createDir(name));
+    }
+
+    return maybe;
+  }
+  file(name: PathFragment) {
+    return this._tree.get(join(this._path, name));
+  }
+}
 
 
 /**
  * The root class of most trees.
  */
 export class VirtualTree implements Tree {
-  protected _root = new Map<Path, FileEntry>();
   protected _actions = new ActionList();
   protected _cacheMap = new Map<Path, FileEntry>();
+  protected _root = new VirtualDirEntry(this);
+  protected _tree = new Map<Path, FileEntry>();
 
   /**
    * Normalize the path. Made available to subclasses to overload.
@@ -35,18 +82,19 @@ export class VirtualTree implements Tree {
   protected _normalizePath(path: string): Path {
     return normalize('/' + path);
   }
+  protected get tree() {
+    return this._tree;
+  }
 
   /**
    * A list of file names contained by this Tree.
    * @returns {[string]} File paths.
    */
-  get files(): string[] {
-    return [...new Set<string>([...this.root.keys(), ...this._cacheMap.keys()]).values()];
+  get files(): Path[] {
+    return [...new Set<Path>([...this.tree.keys(), ...this._cacheMap.keys()]).values()];
   }
 
-  get root() {
-    return this._root;
-  }
+  get root(): DirEntry { return this._root; }
   get staging() {
     return new Map(this._cacheMap);
   }
@@ -54,7 +102,7 @@ export class VirtualTree implements Tree {
   get(path: string): FileEntry | null {
     const normalizedPath = this._normalizePath(path);
 
-    return this._cacheMap.get(normalizedPath) || this.root.get(normalizedPath) || null;
+    return this._cacheMap.get(normalizedPath) || this.tree.get(normalizedPath) || null;
   }
   has(path: string) {
     return this.get(path) != null;
@@ -71,6 +119,15 @@ export class VirtualTree implements Tree {
     const entry = this.get(path);
 
     return entry ? entry.content : null;
+  }
+
+  getDir(path: string): DirEntry {
+    let dir: DirEntry = this.root;
+    split(this._normalizePath(path)).slice(1).forEach(fragment => {
+      dir = dir.dir(fragment);
+    });
+
+    return dir;
   }
 
   beginUpdate(path: string): UpdateRecorder {
@@ -230,7 +287,7 @@ export class VirtualTree implements Tree {
    * @private
    */
   protected _copyTo<T extends VirtualTree>(tree: T): void {
-    tree._root = new Map(this.root);
+    tree._tree = new Map(this.tree);
     this._actions.forEach(action => tree._actions.push(action));
     [...this._cacheMap.entries()].forEach(([path, entry]) => {
       tree._cacheMap.set(path, entry);

@@ -16,12 +16,14 @@ export class FilteredTree extends VirtualTree {
     const virtualTree = (tree instanceof VirtualTree
       ? tree : VirtualTree.optimize(tree)) as VirtualTree;
 
-    const root = virtualTree.root;
+    // We don't know for sure that it's a FilteredTree, but we don't care;
+    // VirtualTree has `tree`, we just need access to it because it's protected.
+    const root = (virtualTree as FilteredTree).tree;
     const staging = virtualTree.staging;
 
     [...root.entries()].forEach(([path, entry]) => {
       if (filter(path, entry)) {
-        this._root.set(path, entry);
+        this._tree.set(path, entry);
       }
     });
     [...staging.entries()].forEach(([path, entry]) => {
@@ -30,7 +32,7 @@ export class FilteredTree extends VirtualTree {
       }
     });
     virtualTree.actions.forEach(action => {
-      if (this._cacheMap.has(action.path) || this._root.has(action.path)) {
+      if (this._cacheMap.has(action.path) || this._tree.has(action.path)) {
         this._actions.push(action);
       }
     });
