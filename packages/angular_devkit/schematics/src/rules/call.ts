@@ -12,6 +12,11 @@ import { Tree } from '../tree/interface';
 import { VirtualTree } from '../tree/virtual';
 
 
+declare const Symbol: Symbol & {
+  readonly observable: symbol;
+};
+
+
 /**
  * When a rule or source returns an invalid value.
  */
@@ -45,8 +50,8 @@ export function callSource(source: Source, context: SchematicContext): Observabl
 
   if (result instanceof VirtualTree) {
     return Observable.of(result);
-  } else if (result instanceof Observable) {
-    return result;
+  } else if (Symbol.observable in result) {
+    return result as Observable<Tree>;
   } else {
     throw new InvalidRuleResultException(result);
   }
@@ -57,12 +62,12 @@ export function callRule(rule: Rule,
                          input: Observable<Tree>,
                          context: SchematicContext): Observable<Tree> {
   return input.mergeMap(inputTree => {
-    const result = rule(inputTree, context);
+    const result = rule(inputTree, context) as object;
 
     if (result instanceof VirtualTree) {
       return Observable.of(result as Tree);
-    } else if (result instanceof Observable) {
-      return result;
+    } else if (Symbol.observable in result) {
+      return result as Observable<Tree>;
     } else if (result === undefined) {
       return Observable.of(inputTree);
     } else {
