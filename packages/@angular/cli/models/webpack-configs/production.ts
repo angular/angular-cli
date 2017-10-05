@@ -15,7 +15,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 
 export function getProdConfig(wco: WebpackConfigOptions) {
-  const { projectRoot, buildOptions, appConfig } = wco;
+  const { projectRoot, buildOptions, appConfig, cliConfig } = wco;
 
   let extraPlugins: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
@@ -95,8 +95,18 @@ export function getProdConfig(wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.extractLicenses) {
+    const pattern = cliConfig.fromProject().get('defaults.build.license.pattern');
+    const unacceptablePattern = cliConfig.fromProject()
+      .get('defaults.build.license.unacceptablePattern');
+    const abortOnUnacceptableLicense = cliConfig.fromProject()
+      .get('defaults.build.license.abortOnUnacceptableLicense');
+    const includePackagesWithoutLicense = cliConfig.fromProject()
+      .get('defaults.build.license.includePackagesWithoutLicense');
     extraPlugins.push(new LicenseWebpackPlugin({
-      pattern: /^(MIT|ISC|BSD.*)$/,
+      pattern: new RegExp(pattern),
+      unacceptablePattern: (unacceptablePattern ? new RegExp(unacceptablePattern) : undefined),
+      abortOnUnacceptableLicense,
+      includePackagesWithoutLicense,
       suppressErrors: true,
       perChunkOutput: false,
       outputFilename: `3rdpartylicenses.txt`

@@ -86,6 +86,11 @@
     - *preserveSymlinks* (`boolean`): Do not use the real path when resolving modules. Default is `false`.
     - *showCircularDependencies* (`boolean`): Show circular dependency warnings on builds. Default is `true`.
     - *namedChunks* (`boolean`): Use file name for lazy loaded chunks.
+    - *license*: Options for the license-webpack-plugin.
+      - *pattern* (`string`): Use custom regular expression as pattern. Default is `^(MIT|ISC|BSD.*)$`
+      - *unacceptablePattern* (`string`): Use custom regular expression to filter unacceptable licenses.
+      - *abortOnUnacceptableLicense* (`boolean`): Abort the build if an unacceptable license is detected. Default is `false`.
+      - *includePackagesWithoutLicense* (`boolean`): Include packages that are missing a license. Default is `false`.
   - *serve*: Properties to be passed to the serve command
     - *port* (`number`): The port the application will be served on. Default is `4200`.
     - *host* (`string`): The host the application will be served on. Default is `localhost`.

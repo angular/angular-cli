@@ -17,6 +17,7 @@ export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
   projectRoot: string;
   buildOptions: T;
   appConfig: any;
+  cliConfig: any;
 }
 
 export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
@@ -28,12 +29,13 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
 
     const configPath = CliConfig.configFilePath();
     const projectRoot = path.dirname(configPath);
+    const cliConfig = CliConfig;
 
     appConfig = this.addAppConfigDefaults(appConfig);
     buildOptions = this.addTargetDefaults(buildOptions);
     buildOptions = this.mergeConfigs(buildOptions, appConfig, projectRoot);
 
-    this.wco = { projectRoot, buildOptions, appConfig };
+    this.wco = { projectRoot, buildOptions, appConfig, cliConfig };
   }
 
   public buildConfig() {
