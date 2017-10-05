@@ -14,6 +14,9 @@ export class InvalidPathException extends BaseException {
 export class PathMustBeAbsoluteException extends BaseException {
   constructor(path: string) { super(`Path ${JSON.stringify(path)} must be absolute.`); }
 }
+export class PathCannotBeFragmentException extends BaseException {
+  constructor(path: string) { super(`Path ${JSON.stringify(path)} cannot be made a fragment.`); }
+}
 
 
 /**
@@ -21,6 +24,13 @@ export class PathMustBeAbsoluteException extends BaseException {
  */
 export type Path = string & {
   __PRIVATE_DEVKIT_PATH: void;
+};
+
+/**
+ * A Path fragment (file or directory name) recognized by most methods in the DevKit.
+ */
+export type PathFragment = Path & {
+  __PRIVATE_DEVKIT_PATH_FRAGMENT: void;
 };
 
 
@@ -44,10 +54,8 @@ export const NormalizedRoot = NormalizedSep as Path;
  * @param {Path} path The path to split.
  * @returns {Path[]} An array of path fragments.
  */
-export function split(path: Path): Path[] {
-  const arr = path.split(NormalizedSep);
-
-  return arr.map((fragment, i) => fragment + (i < arr.length - 1 ? NormalizedSep : '')) as Path[];
+export function split(path: Path): PathFragment[] {
+  return path.split(NormalizedSep).map(x => fragment(x));
 }
 
 /**
@@ -63,36 +71,16 @@ export function extname(path: Path): string {
   }
 }
 
-/**
- * This is the equivalent of calling dirname() over and over, until the root, then getting the
- * basename.
- *
- * @example rootname('/a/b/c') == 'a'
- * @example rootname('a/b') == '.'
- * @param path The path to get the rootname from.
- * @returns {Path} The first directory name.
- */
-export function rootname(path: Path): Path {
-  const i = path.indexOf(NormalizedSep);
-  if (!isAbsolute(path)) {
-    return '.' as Path;
-  } else if (i == -1) {
-    return path;
-  } else {
-    return path.substr(path.lastIndexOf(NormalizedSep) + 1) as Path;
-  }
-}
-
 
 /**
  * Return the basename of the path, as a Path. See path.basename
  */
-export function basename(path: Path): Path {
+export function basename(path: Path): PathFragment {
   const i = path.lastIndexOf(NormalizedSep);
   if (i == -1) {
-    return path;
+    return fragment(path);
   } else {
-    return path.substr(path.lastIndexOf(NormalizedSep) + 1) as Path;
+    return fragment(path.substr(path.lastIndexOf(NormalizedSep) + 1));
   }
 }
 
@@ -177,6 +165,15 @@ export function resolve(p1: Path, p2: Path) {
   } else {
     return join(p1, p2);
   }
+}
+
+
+export function fragment(path: string): PathFragment {
+  if (path.indexOf(NormalizedSep) != -1) {
+    throw new PathCannotBeFragmentException(path);
+  }
+
+  return path as PathFragment;
 }
 
 
