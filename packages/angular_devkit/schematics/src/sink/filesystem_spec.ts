@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import { join } from 'path';
-import { FileSystemTree } from '../tree/filesystem';
+import { FileSystemCreateTree } from '../tree/filesystem';
 import { InMemoryFileSystemTreeHost } from '../tree/memory-host';
 import { optimize } from '../tree/static';
 import { FileSystemSink } from './filesystem';
@@ -29,7 +29,7 @@ describe('FileSystemSink', () => {
       '/sub/directory/file2': '',
       '/sub/file1': '',
     });
-    const tree = new FileSystemTree(host, true);
+    const tree = new FileSystemCreateTree(host);
 
     tree.create('/test', 'testing 1 2');
     const recorder = tree.beginUpdate('/test');

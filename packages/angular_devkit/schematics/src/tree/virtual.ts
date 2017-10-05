@@ -41,11 +41,11 @@ export class VirtualTree implements Tree {
    * @returns {[string]} File paths.
    */
   get files(): string[] {
-    return [...new Set<string>([...this._root.keys(), ...this._cacheMap.keys()]).values()];
+    return [...new Set<string>([...this.root.keys(), ...this._cacheMap.keys()]).values()];
   }
 
   get root() {
-    return new Map(this._root);
+    return this._root;
   }
   get staging() {
     return new Map(this._cacheMap);
@@ -54,7 +54,7 @@ export class VirtualTree implements Tree {
   get(path: string): FileEntry | null {
     const normalizedPath = this._normalizePath(path);
 
-    return this._cacheMap.get(normalizedPath) || this._root.get(normalizedPath) || null;
+    return this._cacheMap.get(normalizedPath) || this.root.get(normalizedPath) || null;
   }
   has(path: string) {
     return this.get(path) != null;
@@ -230,7 +230,7 @@ export class VirtualTree implements Tree {
    * @private
    */
   protected _copyTo<T extends VirtualTree>(tree: T): void {
-    tree._root = new Map(this._root);
+    tree._root = new Map(this.root);
     this._actions.forEach(action => tree._actions.push(action));
     [...this._cacheMap.entries()].forEach(([path, entry]) => {
       tree._cacheMap.set(path, entry);

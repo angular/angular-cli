@@ -8,7 +8,7 @@
 import { BaseException, JsonObject } from '@angular-devkit/core';
 import {
   EngineHost,
-  FileSystemTree,
+  FileSystemCreateTree,
   RuleFactory,
   Source,
   UnknownSchematicException,
@@ -223,7 +223,7 @@ export abstract class FileSystemEngineHostBase implements
           // path.
           const root = resolve(dirname(context.schematic.description.path), url.path);
 
-          return new FileSystemTree(new FileSystemHost(root), true);
+          return new FileSystemCreateTree(new FileSystemHost(root));
         };
     }
 

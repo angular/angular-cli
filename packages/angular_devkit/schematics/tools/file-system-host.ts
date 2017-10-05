@@ -13,17 +13,7 @@ export class FileSystemHost implements FileSystemTreeHost {
   constructor(private _root: string) {}
 
   listDirectory(path: string) {
-    let files = readdirSync(join(this._root, path));
-    if (path == '/' || path == '') {
-      files = files
-      // Remove .git.
-        .filter(path => path !== '.git')
-        // Remove node_modules.
-        .filter(path => path !== 'node_modules');
-    }
-
-    // Add the path as root is part of the file list.
-    return files;
+    return readdirSync(join(this._root, path));
   }
   isDirectory(path: string) {
     return statSync(join(this._root, path)).isDirectory();

@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
-import { FileSystemTree } from '../tree/filesystem';
+import { FileSystemCreateTree, FileSystemTree } from '../tree/filesystem';
 import { InMemoryFileSystemTreeHost } from '../tree/memory-host';
 import { optimize } from '../tree/static';
 import { DryRunSink } from './dryrun';
@@ -32,7 +32,7 @@ describe('DryRunSink', () => {
   });
 
   it('works when creating everything', done => {
-    const tree = new FileSystemTree(host, true);
+    const tree = new FileSystemCreateTree(host);
 
     tree.create('/test', 'testing 1 2');
     const recorder = tree.beginUpdate('/test');
