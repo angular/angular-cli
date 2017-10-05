@@ -33,13 +33,16 @@ logger
 
 // Note: This is based on the gulp task found in the angular/angular repository
 execSync('git fetch origin');
-// Travis doesn't have master when running jobs on other branches (minor/patch/etc).
-execSync('git fetch origin master:master --force');
 
 // Get PR target branch, default to master for running locally.
 const currentBranch = process.env.TRAVIS_BRANCH
   || process.env.APPVEYOR_REPO_BRANCH
   || 'master';
+
+if (currentBranch !== 'master') {
+  // Travis doesn't have master when running jobs on other branches (minor/patch/etc).
+  execSync('git fetch origin master:master --force');
+}
 
 const output = execSync('git log ' + currentBranch + '..HEAD --reverse --format="%H %s" --no-merges', {
   encoding: 'utf-8'
