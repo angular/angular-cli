@@ -1,12 +1,11 @@
 # Proxy To Backend
 
-Using the proxying support in webpack's dev server we can highjack certain urls and send them to a backend server.
+Using the [proxying support](https://webpack.github.io/docs/webpack-dev-server.html#proxy) in webpack's dev server we can highjack certain URLs and send them to a backend server.
 We do this by passing a file to `--proxy-config`
 
 Say we have a server running on `http://localhost:3000/api` and we want all calls to `http://localhost:4200/api` to go to that server.
 
-We create a file next to projects `package.json` called `proxy.conf.json`
-with the content
+We create a file next to our project's `package.json` called `proxy.conf.json` with the content
 
 ```json
 {
@@ -17,19 +16,72 @@ with the content
 }
 ```
 
-You can read more about what options are available here [webpack-dev-server proxy settings](https://webpack.github.io/docs/webpack-dev-server.html#proxy)
+You can read more about what options are available [here](https://webpack.github.io/docs/webpack-dev-server.html#proxy).
 
-and then we edit the `package.json` file's start script to be
+We can then edit the `package.json` file's start script to be
 
 ```json
 "start": "ng serve --proxy-config proxy.conf.json",
 ```
 
-now run it with `npm start`
+Now in order to run our dev server with our proxy config, we can simply call `npm start`.
+
+### Rewriting the URL path
+
+One option that comes up a lot is rewriting the URL path for the proxy. This is supported by the `pathRewrite` option.
+
+Say we have a server running on `http://localhost:3000` and we want all calls to `http://localhost:4200/api` to go to that server.
+
+In our `proxy.conf.json` file, we add the following content
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "pathRewrite": {
+      "^/api": ""
+    }
+  }
+}
+```
+
+If you need to access a backend that is not on localhost, you will need to add the `changeOrigin` option as follows:
+
+```json
+{
+  "/api": {
+    "target": "http://npmjs.org",
+    "secure": false,
+    "pathRewrite": {
+      "^/api": ""
+    },
+    "changeOrigin": true
+  }
+}
+```
+
+To help debug whether or not your proxy is working properly, you can also add the `logLevel` option as follows:
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "pathRewrite": {
+      "^/api": ""
+    },
+    "logLevel": "debug"
+  }
+}
+```
+
+Possible options for `logLevel` include `debug`, `info`, `warn`, `error`, and `silent` (default is `info`)
+
 
 ### Multiple entries
 
-If you need to proxy multiple entries to the same target define the configuration in `proxy.conf.js` e.g.
+If you need to proxy multiple entries to the same target define the configuration in `proxy.conf.js` instead of `proxy.conf.json` e.g.
 
 ```js
 const PROXY_CONFIG = [
