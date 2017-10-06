@@ -383,17 +383,3 @@ npm run build:dynamic && npm run serve:dynamic
 Enjoy!
 
 Once again to see a working version of everything, check out the [universal-starter](https://github.com/angular/universal-starter/tree/master/cli).
-
----
-
-# Gotchas & Caveats
-
-[Full list of important Gotchas available here](https://github.com/angular/universal#universal-gotchas)
-
-Brief summary of a few important gotchas:
-
-- Http calls will be executed **twice**
-  - Once on the server, and again on the client
-- window/document/location/localStorage/etc **do not exist on the server**
-- Avoid or limit setTimeout/setInterval use
-- Never manipulate the DOM directly (it doesn't exist on the server)
