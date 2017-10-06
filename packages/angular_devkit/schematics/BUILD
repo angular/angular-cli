@@ -40,9 +40,9 @@ ts_library(
 )
 
 ts_library(
-    name = "test",
+    name = "testing",
     srcs = glob(
-        include = ["test/**/*.ts"],
+        include = ["testing/**/*.ts"],
         exclude = [],
     ),
     deps = [
@@ -52,8 +52,8 @@ ts_library(
         # @deps: rxjs
     ],
     tsconfig = "//:tsconfig.json",
-    module_name = "@angular-devkit/schematics/test",
-    module_root = "test"
+    module_name = "@angular-devkit/schematics/testing",
+    module_root = "testing"
 )
 
 ts_library(
