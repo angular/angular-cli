@@ -1,4 +1,4 @@
-# Contributing to Angular CLI
+# Contributing to Angular DevKit
 
 We would love for you to contribute to Angular CLI and help make it even better
 than it is today! As a contributor, here are the guidelines we would like you
