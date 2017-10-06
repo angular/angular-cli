@@ -257,22 +257,22 @@ export default function(argv: { local?: boolean }, logger: Logger) {
 
   logger.info('Setting versions...');
 
-  const { versions } = require(path.join(__dirname, '../versions.json'));
   const versionLogger = new Logger('versions', logger);
   for (const packageName of sortedPackages) {
     versionLogger.info(packageName);
     const pkg = packages[packageName];
     const packageJsonPath = path.join(pkg.dist, 'package.json');
     const packageJson = pkg.packageJson;
+    const version = pkg.version;
 
-    if (versions[packageName]) {
-      packageJson['version'] = versions[packageName];
+    if (version) {
+      packageJson['version'] = version;
     } else {
       versionLogger.error('No version found... Only updating dependencies.');
     }
 
-    for (const depName of Object.keys(versions)) {
-      const v = versions[depName];
+    for (const depName of Object.keys(packages)) {
+      const v = packages[depName].version;
       for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies']) {
         const obj = packageJson[depKey] as JsonObject | null;
         if (obj && obj[depName]) {

@@ -12,23 +12,22 @@ import * as semver from 'semver';
 import { ReleaseType } from 'semver';
 import { packages } from '../lib/packages';
 
-const { hashes, versions } = require('../versions.json');
+
+const { packages: monorepo } = require('../.monorepo.json');
 
 
 function _showVersions(logger: Logger) {
-  for (const pkg of Object.keys(versions)) {
-    if (!(pkg in packages)) {
-      logger.fatal(`"${pkg}" not an official package...`);
-    }
+  for (const pkgName of Object.keys(packages)) {
+    const pkg = packages[pkgName];
 
-    const version = versions[pkg] || '???';
-    const hash = packages[pkg].hash;
-    const diff = hashes[pkg] !== hash ? '!' : '';
+    const version = pkg.version || '???';
+    const hash = pkg.hash;
+    const diff = pkg.dirty ? '!' : '';
 
-    const pad1 = '                                  '.slice(pkg.length);
+    const pad1 = '                                  '.slice(pkgName.length);
     const pad2 = '          '.slice(version.length);
-    const message = `${pkg} ${pad1}v${version}${pad2}${hash} ${diff}`;
-    if (packages[pkg].private) {
+    const message = `${pkgName} ${pad1}v${version}${pad2}${hash} ${diff}`;
+    if (pkg.private) {
       logger.debug(message);
     } else {
       logger.info(message);
@@ -39,16 +38,13 @@ function _showVersions(logger: Logger) {
 
 function _upgrade(release: string, logger: Logger) {
   for (const pkg of Object.keys(packages)) {
-    if (!(pkg in versions)) {
-      versions[pkg] = '0.0.0';
-    }
-
     const hash = packages[pkg].hash;
-    const version = versions[pkg] || '0.0.0';
+    const version = packages[pkg].version;
+    const dirty = packages[pkg].dirty;
     let newVersion: string | null = version;
 
     if (release == 'minor-beta') {
-      if (hash !== hashes[pkg]) {
+      if (dirty) {
         if (version.match(/-beta\.\d+$/)) {
           newVersion = semver.inc(version, 'prerelease');
         } else {
@@ -56,7 +52,7 @@ function _upgrade(release: string, logger: Logger) {
         }
       }
     } else if (release == 'minor-rc') {
-      if (hash !== hashes[pkg]) {
+      if (dirty) {
         if (version.match(/-rc/)) {
           newVersion = semver.inc(version, 'prerelease');
         } else if (version.match(/-beta\.\d+$/)) {
@@ -66,7 +62,7 @@ function _upgrade(release: string, logger: Logger) {
         }
       }
     } else if (release == 'major-beta') {
-      if (hash !== hashes[pkg]) {
+      if (dirty) {
         if (version.match(/-beta\.\d+$/)) {
           newVersion = semver.inc(version, 'prerelease');
         } else {
@@ -74,7 +70,7 @@ function _upgrade(release: string, logger: Logger) {
         }
       }
     } else if (release == 'major-rc') {
-      if (hash !== hashes[pkg]) {
+      if (dirty) {
         if (version.match(/-rc/)) {
           newVersion = semver.inc(version, 'prerelease');
         } else if (version.match(/-beta\.\d+$/)) {
@@ -83,15 +79,15 @@ function _upgrade(release: string, logger: Logger) {
           newVersion = semver.inc(version, 'major') + '-rc.0';
         }
       }
-    } else if (hash !== hashes[pkg] || release !== 'patch') {
+    } else if (dirty || release !== 'patch') {
       newVersion = semver.inc(version, release as ReleaseType);
     }
 
     let message = '';
     if (newVersion && version !== newVersion) {
       message = `${pkg} changed... updating v${version} => v${newVersion}`;
-      versions[pkg] = newVersion;
-      hashes[pkg] = hash;
+      monorepo[pkg].version = newVersion;
+      monorepo[pkg].hash = hash;
     } else {
       message = `${pkg} SAME: v${version}`;
     }
@@ -123,8 +119,8 @@ export default function(args: { _: string[], 'dry-run'?: boolean }, logger: Logg
     case 'patch':
       _upgrade(maybeRelease, logger);
       if (!dryRun) {
-        fs.writeFileSync(path.join(__dirname, '../versions.json'),
-                         JSON.stringify({ versions, hashes }, null, 2) + '\n');
+        fs.writeFileSync(path.join(__dirname, '../.monorepo.json'),
+                         JSON.stringify({ packages: monorepo }, null, 2) + '\n');
       }
       process.exit(0);
       break;

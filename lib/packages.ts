@@ -15,6 +15,7 @@ import * as ts from 'typescript';
 
 const glob = require('glob');
 const distRoot = path.join(__dirname, '../dist');
+const { packages: monorepoPackages } = require('../.monorepo.json');
 
 
 export interface PackageInfo {
@@ -30,7 +31,9 @@ export interface PackageInfo {
   packageJson: JsonObject;
   dependencies: string[];
 
+  dirty: boolean;
   hash: string;
+  version: string;
 }
 export type PackageMap = { [name: string]: PackageInfo };
 
@@ -190,6 +193,8 @@ export const packages: PackageMap =
 
         dependencies: [],
         hash: '',
+        dirty: false,
+        version: monorepoPackages[name].version || '0.0.0',
       };
 
       return packages;
@@ -211,4 +216,7 @@ for (const pkgName of Object.keys(packages)) {
 // Update the hash values of each.
 for (const pkgName of Object.keys(packages)) {
   packages[pkgName].hash = _getHashOf(packages[pkgName]);
+  if (packages[pkgName].hash != monorepoPackages[pkgName].hash) {
+    packages[pkgName].dirty = true;
+  }
 }

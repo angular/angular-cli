@@ -18,7 +18,6 @@ import { packages } from '../lib/packages';
 
 
 const Jasmine = require('jasmine');
-const { versions } = require('../versions.json');
 
 const projectBaseDir = join(__dirname, '..');
 require('source-map-support').install({
@@ -243,7 +242,7 @@ export default function (args: ParsedArgs, logger: Logger) {
       .filter(p => Object.keys(packages).some(name => {
         const relativeRoot = relative(projectBaseDir, packages[name].root);
 
-        return p.startsWith(relativeRoot) && packages[name].hash !== versions[name];
+        return p.startsWith(relativeRoot) && packages[name].dirty;
       }));
 
     logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
