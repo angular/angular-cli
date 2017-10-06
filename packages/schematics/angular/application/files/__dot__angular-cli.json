@@ -54,13 +54,14 @@
     }
   },
   "defaults": {
-    "styleExt": "<%= style %>",<% if (!minimal) { %>
-    "component": {}<% } else { %>
-    "component": {
-      "spec": false,
-      "inlineStyle": true,
+    "styleExt": "<%= style %>",
+    "component": {<% if (minimal || inlineStyle) { %>
+      "inlineStyle": true
+    <% } %><% if (minimal || (inlineTemplate && inlineStyle)) { %>,<% } %><% if (minimal || inlineTemplate) { %>
       "inlineTemplate": true
-    },
+    <% } %><% if (minimal || (skipTests && (inlineStyle || inlineTemplate))) { %>,<% } %><% if (minimal || skipTests) { %>
+      "spec": false
+    <% } %>}<% if (minimal || skipTests) { %>,
     "directive": {
       "spec": false
     },
@@ -78,6 +79,6 @@
     },
     "service": {
       "spec": false
-    } <% } %>
+    }<% } %>
   }
 }
