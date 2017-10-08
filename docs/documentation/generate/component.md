@@ -73,6 +73,11 @@
   </p>
   <p>
     Allows specification of the declaring module's file name (e.g `app.module.ts`).
+
+    For any submodules, e.g. in `app/profile/bar-mod/bar-mod.module.ts`, specify either of following:
+    * --module ./profile/bar-mod/bar-mod.module.ts
+    * --module ./profile/bar-mod/bar-mod
+    * --module ./profile/bar-mod/BarMod
   </p>
 </details>
 

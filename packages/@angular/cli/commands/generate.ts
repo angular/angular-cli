@@ -173,8 +173,15 @@ export default Command.extend({
     const collectionName = commandOptions.collection ||
       CliConfig.getValue('defaults.schematics.collection');
 
-    if (collectionName === '@schematics/angular' && schematicName === 'interface' && rawArgs[2]) {
-      commandOptions.type = rawArgs[2];
+    if (collectionName === '@schematics/angular' ) {
+      if (['interface', 'i'].indexOf(schematicName) !== -1 && rawArgs[2] ) {
+        commandOptions.type = rawArgs[2];
+      }
+      if (commandOptions.module && commandOptions.module !== '') {
+        commandOptions.module = stringUtils.dasherize(
+          commandOptions.module
+        );
+      }
     }
 
     return schematicRunTask.run({

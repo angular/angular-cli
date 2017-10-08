@@ -300,6 +300,21 @@ describe('Acceptance: ng generate component', () => {
         .then(done, done.fail);
     });
 
+    it('when given a submodule with module name', (done) => {
+      const appRoot = path.join(root, 'tmp/foo');
+      const modulePath = path.join(appRoot, 'src/app/foo-test/foo-test.module.ts');
+
+      return Promise.resolve()
+        .then(() => ng(['generate', 'module', 'FooTest']))
+        .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo-test', 'FooTest')]))
+        .then(() => readFile(modulePath, 'utf-8'))
+        .then(content => {
+          expect(content).toMatch(/import.*BazComponent.*from '..\/baz\/baz.component';/);
+          expect(content).toMatch(/declarations:\s+\[BazComponent]/m);
+        })
+        .then(done, done.fail);
+    });
+
     it('when given a submodule with missing module.ts suffix', (done) => {
       const appRoot = path.join(root, 'tmp/foo');
       const modulePath = path.join(appRoot, 'src/app/foo/foo.module.ts');
@@ -338,6 +353,22 @@ describe('Acceptance: ng generate component', () => {
         .then(() => ng(['generate', 'module', 'foo']))
         .then(() => ng(['generate', 'module', path.join('foo', 'bar')]))
         .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo', 'bar')]))
+        .then(() => readFile(modulePath, 'utf-8'))
+        .then(content => {
+          expect(content).toMatch(/import.*BazComponent.*from '..\/..\/baz\/baz.component';/);
+          expect(content).toMatch(/declarations:\s+\[BazComponent]/m);
+        })
+        .then(done, done.fail);
+    });
+
+    it('when given deep submodule folder module name only', (done) => {
+      const appRoot = path.join(root, 'tmp/foo');
+      const modulePath = path.join(appRoot, 'src/app/foo/bar-mod/bar-mod.module.ts');
+
+      return Promise.resolve()
+        .then(() => ng(['generate', 'module', 'foo']))
+        .then(() => ng(['generate', 'module', path.join('foo', 'BarMod')]))
+        .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo', 'bar-mod/BarMod')]))
         .then(() => readFile(modulePath, 'utf-8'))
         .then(content => {
           expect(content).toMatch(/import.*BazComponent.*from '..\/..\/baz\/baz.component';/);
