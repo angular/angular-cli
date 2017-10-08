@@ -1,24 +1,91 @@
 {
+  "badges": [
+    [
+      {
+        "image": "https://img.shields.io/circleci/project/github/angular/devkit/master.svg?label=circleci",
+        "label": "CircleCI branch",
+        "url": "https://circleci.com/gh/angular/devkit"
+      },
+      {
+        "title": "![Dependency Status][david-badge]",
+        "url": "[david-badge-url]"
+      },
+      {
+        "title": "![devDependency Status][david-dev-badge]",
+        "url": "[david-dev-badge-url]"
+      }
+    ],
+    [
+      {
+        "label": "License",
+        "image": "https://img.shields.io/npm/l/@angular/devkit.svg",
+        "url": "[npm-badge-url]"
+      },
+      {
+        "label": "Downloads",
+        "image": "https://img.shields.io/npm/dm/@angular/devkit.svg",
+        "url": "[npm-badge-url]"
+      }
+    ],
+    [
+      {
+        "label": "GitHub forks",
+        "image": "https://img.shields.io/github/forks/angular/devkit.svg?style=social&label=Fork",
+        "url": "https://github.com/angular/devkit/fork"
+      },
+      {
+        "label": "GitHub stars",
+        "image": "https://img.shields.io/github/stars/angular/devkit.svg?style=social&label=Star",
+        "url": "https://github.com/angular/devkit"
+      }
+    ]
+  ],
+  "links": {
+    "Gitter": "https://gitter.im/angular/angular-cli",
+    "Contributing": "https://github.com/angular/devkit/blob/master/CONTRIBUTING.md",
+    "Angular CLI": "http://github.com/angular/angular-cli"
+  },
   "packages": {
     "@_/benchmark": {
-      "version": "0.0.9",
-      "hash": "d8f46247086fb87b670c039256b02fa4"
+      "version": "0.0.11",
+      "hash": "37ed7e417435c92dbf301e7b26ea37ca"
     },
     "@angular-devkit/build-optimizer": {
-      "version": "0.0.25",
-      "hash": "4ad20c668e59d3dc1397dc61722e8a35"
+      "name": "Build Optimizer",
+      "links": [
+        {
+          "label": "README",
+          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md"
+        }
+      ],
+      "version": "0.0.26",
+      "hash": "e2c0761a3c38064f24e89b1dd6be6dac"
     },
     "@angular-devkit/core": {
-      "version": "0.0.17",
-      "hash": "22ccb2169d795924bc532fedff34b532"
+      "name": "Core",
+      "version": "0.0.19",
+      "hash": "5d058b61cd6c14405f26fb664184baf9"
     },
     "@angular-devkit/schematics": {
-      "version": "0.0.30",
-      "hash": "7740fc3b41c4201045695b89d3f36f9f"
+      "name": "Schematics",
+      "links": [
+        {
+          "label": "README",
+          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
+        }
+      ],
+      "version": "0.0.32",
+      "hash": "ba766f92c5adc83a31be8619740626b8"
     },
     "@schematics/angular": {
-      "version": "0.0.41",
-      "hash": "e9ded458a88d07b5f0b5f4a33ef820cb"
+      "name": "Angular Schematics",
+      "section": "Schematics",
+      "version": "0.0.43",
+      "hash": "9694dcfcaae0639c4a6d832d2241ff65"
+    },
+    "@schematics/schematics": {
+      "version": "0.0.1",
+      "hash": "ed572f54ac86841171ed00723d1173cb"
     }
   }
 }

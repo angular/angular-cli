@@ -9,6 +9,8 @@ import { Position, SourceNode } from 'source-map';
 
 // Matches <%= expr %>. This does not support structural JavaScript (for/if/...).
 const kInterpolateRe = /<%=([\s\S]+?)%>/g;
+// Matches <%# text %>. It's a comment and will be entirely ignored.
+const kCommentRe = /<%#([\s\S]+?)%>/g;
 
 // Used to match template delimiters.
 // <%- expr %>: HTML escape the value.
@@ -84,6 +86,14 @@ export interface TemplateAstContent extends TemplateAstBase {
 }
 
 /**
+ * A comment node.
+ */
+export interface TemplateAstComment extends TemplateAstBase {
+  kind: 'comment';
+  text: string;
+}
+
+/**
  * An evaluate node, which is the code between `<% ... %>`.
  */
 export interface TemplateAstEvaluate extends TemplateAstBase {
@@ -109,6 +119,7 @@ export interface TemplateAstInterpolate extends TemplateAstBase {
 
 export type TemplateAstNode = TemplateAstContent
                             | TemplateAstEvaluate
+                            | TemplateAstComment
                             | TemplateAstEscape
                             | TemplateAstInterpolate;
 
@@ -119,8 +130,8 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
   const children = [];
 
   // Compile the regexp to match each delimiter.
-  const reDelimiters = RegExp(
-    `${kEscapeRe.source}|${kInterpolateRe.source}|${kEvaluateRe.source}|$`, 'g');
+  const reExpressions = [kEscapeRe, kCommentRe, kInterpolateRe, kEvaluateRe];
+  const reDelimiters = RegExp(reExpressions.map(x => x.source).join('|') + '|$', 'g');
 
   const parsed = sourceText.split(reDelimiters);
   let offset = 0;
@@ -129,8 +140,9 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
   let start = _positionFor(sourceText, offset);
   let end = null as Position | null;
 
-  for (let i = 0; i < parsed.length; i += 4) {
-    const [content, escape, interpolate, evaluate] = parsed.slice(i, i + 4);
+  const increment = reExpressions.length + 1;
+  for (let i = 0; i < parsed.length; i += increment) {
+    const [content, escape, comment, interpolate, evaluate] = parsed.slice(i, i + increment);
     if (content) {
       end = _positionFor(sourceText, offset + content.length);
       offset += content.length;
@@ -141,6 +153,12 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
       end = _positionFor(sourceText, offset + escape.length + 5);
       offset += escape.length + 5;
       children.push({ kind: 'escape', expression: escape, start, end } as TemplateAstEscape);
+      start = end;
+    }
+    if (comment) {
+      end = _positionFor(sourceText, offset + comment.length + 5);
+      offset += comment.length + 5;
+      children.push({ kind: 'comment', text: comment, start, end } as TemplateAstComment);
       start = end;
     }
     if (interpolate) {

@@ -13,7 +13,7 @@ import { ReleaseType } from 'semver';
 import { packages } from '../lib/packages';
 
 
-const { packages: monorepo } = require('../.monorepo.json');
+const monorepo = require('../.monorepo.json');
 
 
 function _showVersions(logger: Logger) {
@@ -84,10 +84,16 @@ function _upgrade(release: string, logger: Logger) {
     }
 
     let message = '';
-    if (newVersion && version !== newVersion) {
+    if (!(pkg in monorepo.packages)) {
+      message = `${pkg} is new... setting v${newVersion}`;
+      monorepo.packages[pkg] = {
+        version: newVersion,
+        hash: hash,
+      };
+    } else if (newVersion && version !== newVersion) {
       message = `${pkg} changed... updating v${version} => v${newVersion}`;
-      monorepo[pkg].version = newVersion;
-      monorepo[pkg].hash = hash;
+      monorepo.packages[pkg].version = newVersion;
+      monorepo.packages[pkg].hash = hash;
     } else {
       message = `${pkg} SAME: v${version}`;
     }
@@ -120,7 +126,7 @@ export default function(args: { _: string[], 'dry-run'?: boolean }, logger: Logg
       _upgrade(maybeRelease, logger);
       if (!dryRun) {
         fs.writeFileSync(path.join(__dirname, '../.monorepo.json'),
-                         JSON.stringify({ packages: monorepo }, null, 2) + '\n');
+                         JSON.stringify(monorepo, null, 2) + '\n');
       }
       process.exit(0);
       break;

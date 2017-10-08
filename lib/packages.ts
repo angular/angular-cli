@@ -194,7 +194,7 @@ export const packages: PackageMap =
         dependencies: [],
         hash: '',
         dirty: false,
-        version: monorepoPackages[name].version || '0.0.0',
+        version: monorepoPackages[name] && monorepoPackages[name].version || '0.0.0',
       };
 
       return packages;
@@ -216,7 +216,7 @@ for (const pkgName of Object.keys(packages)) {
 // Update the hash values of each.
 for (const pkgName of Object.keys(packages)) {
   packages[pkgName].hash = _getHashOf(packages[pkgName]);
-  if (packages[pkgName].hash != monorepoPackages[pkgName].hash) {
+  if (!monorepoPackages[pkgName] || packages[pkgName].hash != monorepoPackages[pkgName].hash) {
     packages[pkgName].dirty = true;
   }
 }
