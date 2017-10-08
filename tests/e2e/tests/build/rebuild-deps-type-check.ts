@@ -9,7 +9,7 @@ import {getGlobalVariable} from '../../utils/env';
 
 
 const doneRe =
-  /webpack: bundle is now VALID|webpack: Compiled successfully.|webpack: Failed to compile./;
+  /webpack: bundle is now VALID|webpack: Compiled|webpack: Failed to compile./;
 
 
 export default function() {
@@ -23,57 +23,57 @@ export default function() {
 
   return Promise.resolve()
     // Create and import files.
-    .then(() => writeFile('src/funky2.ts', `
+    .then(() => writeFile('apps/myapp/src/funky2.ts', `
       export function funky2(value: string): string {
         return value + 'hello';
       }
     `))
-    .then(() => writeFile('src/funky.ts', `
+    .then(() => writeFile('apps/myapp/src/funky.ts', `
       export * from './funky2';
     `))
-    .then(() => prependToFile('src/main.ts', `
+    .then(() => prependToFile('apps/myapp/src/main.ts', `
       import { funky2 } from './funky';
     `))
-    .then(() => appendToFile('src/main.ts', `
+    .then(() => appendToFile('apps/myapp/src/main.ts', `
       console.log(funky2('town'));
     `))
     .then(() => wait(2000))
     // Should trigger a rebuild, no error expected.
     .then(() => execAndWaitForOutputToMatch('ng', ['serve'], doneRe))
     // Make an invalid version of the file.
-    .then(() => writeFile('src/funky2.ts', `
+    .then(() => writeFile('apps/myapp/src/funky2.ts', `
       export function funky2(value: number): number {
         return value + 1;
       }
     `))
     // Should trigger a rebuild, this time an error is expected.
     .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
-    .then(({ stderr }) => {
-      if (!/ERROR in .*\/src\/main\.ts \(/.test(stderr)) {
+    .then(({ stdout }) => {
+      if (!/error TS2345/.test(stdout)) { // this should be stderr
         throw new Error('Expected an error but none happened.');
       }
     })
     // Change an UNRELATED file and the error should still happen.
     .then(() => wait(2000))
-    .then(() => appendToFile('src/app/app.module.ts', `
+    .then(() => appendToFile('apps/myapp/src/app/app.module.ts', `
       function anything(): number {}
     `))
     // Should trigger a rebuild, this time an error is expected.
     .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
-    .then(({ stderr }) => {
-      if (!/ERROR in .*\/src\/main\.ts \(/.test(stderr)) {
+    .then(({ stdout }) => {
+      if (!/error TS2345/.test(stdout)) { // should be stderr
         throw new Error('Expected an error but none happened.');
       }
     })
     // Fix the error!
-    .then(() => writeFile('src/funky2.ts', `
+    .then(() => writeFile('apps/myapp/src/funky2.ts', `
       export function funky2(value: string): string {
         return value + 'hello';
       }
     `))
     .then(() => waitForAnyProcessOutputToMatch(doneRe, 10000))
-    .then(({ stderr }) => {
-      if (/ERROR in .*\/src\/main\.ts \(/.test(stderr)) {
+    .then(({ stdout }) => {
+      if (/error TS2345/.test(stdout)) {
         throw new Error('Expected no error but an error was shown.');
       }
     })

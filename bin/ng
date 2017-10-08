@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+console.log('>>Bazel CLI<<');
+
 // Provide a title to the process in `ps`
 process.title = '@angular/cli';
 

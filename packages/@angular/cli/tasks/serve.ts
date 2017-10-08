@@ -12,14 +12,14 @@ export default Task.extend({
     const bazelTarget = path.parse(app.root).dir;
     if (serveTaskOptions.watch) {
       // TODO vsavkin: remove the first build once the webpack rule handles static
-      return buildBazel(this.ui, bazelTarget).then(() => {
+      return buildBazel(this.ui, `${bazelTarget}:compile_and_static`, true).then(() => {
         return startIBazelAndWebpack(this.ui, bazelTarget, serveTaskOptions);
       }).catch(() => {
         return startIBazelAndWebpack(this.ui, bazelTarget, serveTaskOptions);
       });
     } else {
       // TODO vsavkin: remove the first build once the webpack rule handles static
-      return buildBazel(this.ui, bazelTarget).then(() => {
+      return buildBazel(this.ui, `${bazelTarget}:compile_and_static`, true).then(() => {
         return buildBazel(this.ui, bazelTarget).then(() => {
           return startWebpackDevServer(this.ui, bazelTarget, serveTaskOptions);
         });
@@ -35,10 +35,10 @@ function startIBazelAndWebpack(ui: string, bazelTarget: string,
   return Promise.race([a, b]);
 }
 
-function startWebpackDevServer(ui: any, app: string,
+function startWebpackDevServer(_ui: any, app: string,
                                serveTaskOptions: ServeTaskOptions): Promise<any> {
   return new Promise((resolve, reject) => {
-    const r = spawn('webpack-dev-server', [
+    const webpack = spawn('webpack-dev-server', [
       '--config',
       'node_modules/@nrwl/bazel/src/utils/webpack.config.js',
       '--env.bin_dir',
@@ -51,19 +51,11 @@ function startWebpackDevServer(ui: any, app: string,
       serveTaskOptions.port.toString(),
       '--host',
       serveTaskOptions.host.toString()
-    ]);
+    ], {stdio: [0, 1, 1]});
 
-    r.stdout.on('data', (data) => {
-      ui.write(data.toString().toString());
-    });
-
-    r.stderr.on('data', (data) => {
-      ui.write(data.toString().toString());
-    });
-
-    r.on('close', (code) => {
+    webpack.on('close', (code) => {
       if (code === 0) {
-        resolve(null);
+        resolve();
       } else {
         // print an error here
         reject();
