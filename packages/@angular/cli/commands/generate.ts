@@ -1,5 +1,4 @@
 import { cyan, yellow } from 'chalk';
-const stringUtils = require('ember-cli-string-utils');
 import { oneLine } from 'common-tags';
 import { CliConfig } from '../models/config';
 
@@ -11,13 +10,10 @@ import {
 } from '../utilities/schematics';
 import { DynamicPathOptions, dynamicPathParser } from '../utilities/dynamic-path-parser';
 import { getAppFromConfig } from '../utilities/app-utils';
-import * as path from 'path';
 import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 
 const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
-
-const separatorRegEx = /[\/\\]/g;
 
 
 export default Command.extend({
@@ -77,7 +73,7 @@ export default Command.extend({
 
   beforeRun: function(rawArgs: string[]) {
 
-    const isHelp = ['--help', '-h'].includes(rawArgs[0]);
+    const isHelp = ['--help', '-h'].indexOf(rawArgs[0]) != -1;
     if (isHelp) {
       return;
     }
@@ -85,8 +81,7 @@ export default Command.extend({
     const schematicName = rawArgs[0];
     if (!schematicName) {
       return Promise.reject(new SilentError(oneLine`
-          The "ng generate" command requires a
-          schematic name to be specified.
+          The "ng generate" command requires a schematic name to be specified.
           For more details, use "ng help".
       `));
     }
@@ -127,7 +122,6 @@ export default Command.extend({
     }
 
     const entityName = rawArgs[1];
-    commandOptions.name = stringUtils.dasherize(entityName.split(separatorRegEx).pop());
 
     const appConfig = getAppFromConfig(commandOptions.app);
     const dynamicPathOptions: DynamicPathOptions = {
@@ -137,33 +131,15 @@ export default Command.extend({
       dryRun: commandOptions.dryRun
     };
     const parsedPath = dynamicPathParser(dynamicPathOptions);
-    commandOptions.sourceDir = appConfig.root;
-    const root = appConfig.root + path.sep;
-    commandOptions.appRoot = parsedPath.appRoot === appConfig.root ? '' :
-      parsedPath.appRoot.startsWith(root)
-        ? parsedPath.appRoot.substr(root.length)
-        : parsedPath.appRoot;
 
-    commandOptions.path = parsedPath.dir.replace(separatorRegEx, '/');
-    commandOptions.path = parsedPath.dir === appConfig.root ? '' :
-      parsedPath.dir.startsWith(root)
-        ? commandOptions.path.substr(root.length)
-        : commandOptions.path;
+    // Do not pass the schematics name itself, that's not useful.
+    commandOptions._ = rawArgs.slice(1);
+    commandOptions._angularCliConfig = (CliConfig.fromProject() || CliConfig.fromGlobal()).config;
+    commandOptions._angularCliAppConfig = appConfig;
+    commandOptions._angularCliParsedPath = parsedPath;
 
     const cwd = this.project.root;
     const schematicName = rawArgs[0];
-
-    if (['component', 'c', 'directive', 'd'].indexOf(schematicName) !== -1) {
-      if (commandOptions.prefix === undefined) {
-        commandOptions.prefix = appConfig.prefix;
-      }
-
-      if (schematicName === 'component' || schematicName === 'c') {
-        if (commandOptions.styleext === undefined) {
-          commandOptions.styleext = CliConfig.getValue('defaults.styleExt');
-        }
-      }
-    }
 
     const SchematicRunTask = require('../tasks/schematic-run').default;
     const schematicRunTask = new SchematicRunTask({
@@ -172,10 +148,6 @@ export default Command.extend({
     });
     const collectionName = commandOptions.collection ||
       CliConfig.getValue('defaults.schematics.collection');
-
-    if (collectionName === '@schematics/angular' && schematicName === 'interface' && rawArgs[2]) {
-      commandOptions.type = rawArgs[2];
-    }
 
     return schematicRunTask.run({
         taskOptions: commandOptions,

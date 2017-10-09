@@ -111,6 +111,9 @@ const NewCommand = Command.extend({
   },
 
   run: function (commandOptions: any, rawArgs: string[]) {
+    commandOptions._ = [...rawArgs];
+    commandOptions._angularCliConfig = (CliConfig.fromProject() || CliConfig.fromGlobal()).config;
+
     const packageName = rawArgs.shift();
 
     if (!packageName) {
@@ -121,7 +124,7 @@ const NewCommand = Command.extend({
     }
 
     validateProjectName(packageName);
-    commandOptions.name = packageName;
+
     if (commandOptions.dryRun) {
       commandOptions.skipGit = true;
     }
