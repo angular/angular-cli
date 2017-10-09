@@ -4,6 +4,11 @@
   "title": "Angular Enum Options Schema",
   "type": "object",
   "properties": {
+    "_": {},
+    "_angularCliConfig": {},
+    "_angularCliAppConfig": {},
+    "_angularCliParsedPath": {},
+
     "name": {
       "type": "string"
     },

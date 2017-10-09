@@ -73,6 +73,10 @@ function minimalPathFilter(path: string): boolean {
   return !toRemoveList.some(re => re.test(path));
 }
 export default function (options: ApplicationOptions): Rule {
+  if (!options.name) {
+    options.name = options._[0];
+  }
+
   return (host: Tree, context: SchematicContext) => {
     const appRootSelector = `${options.prefix}-root`;
     const componentOptions = !options.minimal ?

@@ -23,6 +23,7 @@ import {
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
+import { parseOptions } from '../utility/args';
 import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { findModuleFromOptions } from '../utility/find-module';
@@ -70,6 +71,8 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 }
 
 export default function (options: ModuleOptions): Rule {
+  parseOptions('module', options);
+
   options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;
   if (!sourceDir) {

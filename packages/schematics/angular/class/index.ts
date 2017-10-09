@@ -20,10 +20,13 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as stringUtils from '../strings';
+import { parseOptions } from '../utility/args';
 import { Schema as ClassOptions } from './schema';
 
 
 export default function (options: ClassOptions): Rule {
+  parseOptions('class', options);
+
   options.type = !!options.type ? `.${options.type}` : '';
   options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;

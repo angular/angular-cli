@@ -7,6 +7,15 @@
  */
 
 export interface Schema {
+    // tslint:disable-next-line:no-any
+    _?: any;
+    // tslint:disable-next-line:no-any
+    _angularCliConfig?: any;
+    // tslint:disable-next-line:no-any
+    _angularCliAppConfig?: any;
+    // tslint:disable-next-line:no-any
+    _angularCliParsedPath?: any;
+
     name: string;
     spec?: boolean;
     flat?: boolean;

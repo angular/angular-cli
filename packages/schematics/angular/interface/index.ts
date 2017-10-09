@@ -18,10 +18,13 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as stringUtils from '../strings';
+import { parseOptions } from '../utility/args';
 import { Schema as InterfaceOptions } from './schema';
 
 
 export default function (options: InterfaceOptions): Rule {
+  parseOptions('interface', options);
+
   options.prefix = options.prefix ? options.prefix : '';
   options.type = !!options.type ? `.${options.type}` : '';
   options.path = options.path ? normalize(options.path) : options.path;

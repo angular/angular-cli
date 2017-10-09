@@ -4,6 +4,11 @@
   "title": "Angular Application Options Schema",
   "type": "object",
   "properties": {
+    "_": {},
+    "_angularCliConfig": {},
+    "_angularCliAppConfig": {},
+    "_angularCliParsedPath": {},
+
     "path": {
       "type": "string",
       "default": "app"

@@ -24,6 +24,7 @@ import {
 import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
+import { parseOptions } from '../utility/args';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
@@ -99,6 +100,8 @@ function buildSelector(options: DirectiveOptions) {
 }
 
 export default function (options: DirectiveOptions): Rule {
+  parseOptions('directive', options);
+
   options.selector = options.selector || buildSelector(options);
   options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;
