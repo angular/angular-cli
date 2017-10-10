@@ -4,7 +4,7 @@ import { Component, OnInit<% if(viewEncapsulation !== 'None') { %>, ViewEncapsul
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
   template: `
     <p>
-      <%= dasherize(name) %> Works!
+      <%= dasherize(name) %> works!
     </p>
   `,<% } else { %>
   templateUrl: './<%= dasherize(name) %>.component.html',<% } if(inlineStyle) { %>
