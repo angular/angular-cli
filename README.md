@@ -86,7 +86,7 @@ The 1.x packages work with Angular 4.x while the 5.x packages will work with Ang
  - **`window`**, **`document`**, **`navigator`**, and other browser types - _do not exist on the server_ - so using them, or any library that uses them (jQuery for example) will not work. You do have some options, if you truly need some of this functionality:
     - If you need to use them, consider limiting them to only your client and wrapping them situationally. You can use the Object injected using the PLATFORM_ID token to check whether the current platform is browser or server. 
     
-    ```
+    ```typescript
      import { PLATFORM_ID } from '@angular/core';
      import { isPlatformBrowser, isPlatformServer } from '@angular/common';
      
