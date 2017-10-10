@@ -4,11 +4,6 @@
   "title": "Angular Application Options Schema",
   "type": "object",
   "properties": {
-    "_": {},
-    "_angularCliConfig": {},
-    "_angularCliAppConfig": {},
-    "_angularCliParsedPath": {},
-
     "directory": {
       "type": "string",
       "description": "The directory name to create the app in.",

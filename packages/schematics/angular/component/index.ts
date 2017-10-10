@@ -24,7 +24,6 @@ import {
 import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
-import { parseOptions } from '../utility/args';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
@@ -103,8 +102,6 @@ function buildSelector(options: ComponentOptions) {
 
 
 export default function(options: ComponentOptions): Rule {
-  parseOptions('component', options);
-
   const sourceDir = options.sourceDir;
   if (!sourceDir) {
     throw new SchematicsException(`sourceDir option is required.`);
