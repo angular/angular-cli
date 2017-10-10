@@ -1,4 +1,4 @@
-import { NgModule, NgModuleFactoryLoader, ModuleWithProviders, Provider } from '@angular/core';
+import { NgModule, NgModuleFactoryLoader, ModuleWithProviders, StaticProvider } from '@angular/core';
 
 import { ModuleMapNgFactoryLoader, ModuleMap, MODULE_MAP } from './module-map-ngfactory-loader';
 
@@ -7,7 +7,7 @@ import { ModuleMapNgFactoryLoader, ModuleMap, MODULE_MAP } from './module-map-ng
  *
  * @param {ModuleMap} moduleMap Map to use as a value for MODULE_MAP
  */
-export function provideModuleMap(moduleMap: ModuleMap): Provider {
+export function provideModuleMap(moduleMap: ModuleMap): StaticProvider {
   return {
     provide: MODULE_MAP,
     useValue: moduleMap
