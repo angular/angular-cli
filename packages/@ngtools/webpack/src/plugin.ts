@@ -50,6 +50,7 @@ export class AotPlugin implements Tapable {
   private _compilerOptions: ts.CompilerOptions;
   private _angularCompilerOptions: any;
   private _program: ts.Program;
+  private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _rootFilePath: string[];
   private _compilerHost: WebpackCompilerHost;
   private _resourceLoader: WebpackResourceLoader;
@@ -97,6 +98,7 @@ export class AotPlugin implements Tapable {
   }
   get genDir() { return this._genDir; }
   get program() { return this._program; }
+  get moduleResolutionCache() { return this._moduleResolutionCache; }
   get skipCodeGeneration() { return this._skipCodeGeneration; }
   get replaceExport() { return this._replaceExport; }
   get typeCheck() { return this._typeCheck; }
@@ -222,6 +224,10 @@ export class AotPlugin implements Tapable {
 
     this._program = ts.createProgram(
       this._rootFilePath, this._compilerOptions, this._compilerHost);
+
+    // We use absolute paths everywhere.
+    this._moduleResolutionCache = ts.createModuleResolutionCache(
+      this._basePath, (fileName: string) => fileName);
 
     // We enable caching of the filesystem in compilerHost _after_ the program has been created,
     // because we don't want SourceFile instances to be cached past this point.
