@@ -43,6 +43,7 @@ import {
   formatDiagnostics,
   EmitFlags,
 } from './ngtools_api';
+import { findAstNodes } from './transformers/ast_helpers';
 
 
 /**
@@ -85,6 +86,7 @@ export class AngularCompilerPlugin implements Tapable {
   private _tsFilenames: string[];
   private _program: ts.Program | Program;
   private _compilerHost: WebpackCompilerHost;
+  private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _angularCompilerHost: WebpackCompilerHost & CompilerHost;
   private _resourceLoader: WebpackResourceLoader;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
@@ -295,6 +297,9 @@ export class AngularCompilerPlugin implements Tapable {
         this._compilerHost.writeFile(filePath, content, false);
       }
     }
+
+    // Use an identity function as all our paths are absolute already.
+    this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
     // Set platform.
     this._platform = options.platform || PLATFORM.Browser;
@@ -773,6 +778,26 @@ export class AngularCompilerPlugin implements Tapable {
       outputText: this._compilerHost.readFile(outputFile),
       sourceMap: this._compilerHost.readFile(outputFile + '.map')
     };
+  }
+
+  getDependencies(fileName: string): string[] {
+    const sourceFile = this._compilerHost.getSourceFile(fileName, ts.ScriptTarget.Latest);
+    const options = this._compilerOptions;
+    const host = this._compilerHost;
+    const cache = this._moduleResolutionCache;
+
+    return findAstNodes<ts.ImportDeclaration>(null, sourceFile, ts.SyntaxKind.ImportDeclaration)
+      .map(decl => {
+        const moduleName = (decl.moduleSpecifier as ts.StringLiteral).text;
+        const resolved = ts.resolveModuleName(moduleName, fileName, options, host, cache);
+
+        if (resolved.resolvedModule) {
+          return resolved.resolvedModule.resolvedFileName;
+        } else {
+          return null;
+        }
+      })
+      .filter(x => x);
   }
 
   // This code mostly comes from `performCompilation` in `@angular/compiler-cli`.
