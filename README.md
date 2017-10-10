@@ -36,6 +36,8 @@ The packages from this repo are published as scoped packages under [@nguniversal
 
 The 1.x packages work with Angular 4.x while the 5.x packages will work with Angular 5.x. We will match the major version with Angular starting from 5.0 to avoid confusion.
 
+NOTE: The current `latest` tag on npm points to v1.x version of the packages to be in sync with Angular CLI that uses Angular 4.x. To install the 5.0 compatible versions of the packages use the `@next` tag(Ex. `npm install @nguniversal/express-engine@next`).
+
 # Upgrading from Angular2-Universal
 > If you're coming from the original `angular2-universal` (2.x) here are some helpful steps for porting your application to Angular 4 & platform-server.
 
