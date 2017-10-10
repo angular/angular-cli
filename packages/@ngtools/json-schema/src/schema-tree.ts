@@ -168,8 +168,6 @@ export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
       case 'enum': Klass = EnumSchemaTreeNode; break;
       case 'oneOf': Klass = OneOfSchemaTreeNode; break;
 
-      case undefined: Klass = AnySchemaTreeNode; break;
-
       default:
         throw new InvalidSchema('Type ' + type + ' not understood by SchemaClassFactory.');
     }
@@ -451,24 +449,6 @@ export abstract class LeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
   serialize(serializer: Serializer) {
     serializer.outputValue(this);
   }
-}
-
-
-class AnySchemaTreeNode extends LeafSchemaTreeNode<any> {
-  serialize(serializer: Serializer) {
-    switch (typeof this.value) {
-      case 'string': serializer.outputString(this); break;
-      case 'number': serializer.outputNumber(this); break;
-      case 'boolean': serializer.outputBoolean(this); break;
-
-      default: serializer.outputValue(this);
-    }
-  }
-
-  isCompatible(_: any) { return true; }
-  convert(v: any) { return v; }
-  get type() { return 'any'; }
-  get tsType(): null { return null; }
 }
 
 

@@ -4,7 +4,6 @@
   "title": "Angular Bazel Workspace Options Schema",
   "type": "object",
   "properties": {
-    "_": {},
     "name": {
       "type": "string"
     }

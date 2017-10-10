@@ -1,10 +1,12 @@
 import * as chalk from 'chalk';
 import LinkCli from '../tasks/link-cli';
 import NpmInstall from '../tasks/npm-install';
+import { validateProjectName } from '../utilities/validate-project-name';
 import {checkYarnOrCNPM} from '../utilities/check-package-manager';
 import {CliConfig} from '../models/config';
 
 const Task = require('../ember-cli/lib/models/task');
+const SilentError = require('silent-error');
 const GitInit = require('../tasks/git-init');
 const packageJson = require('../package.json');
 
@@ -46,9 +48,22 @@ export default Task.extend({
       });
     }
 
+    const project = this.project;
+    const packageName = commandOptions.name !== '.' && commandOptions.name || project.name();
+
     if (commandOptions.style === undefined) {
       commandOptions.style = CliConfig.fromGlobal().get('defaults.styleExt');
     }
+
+    if (!packageName) {
+      const message = 'The `ng ' + this.name + '` command requires a ' +
+        'package.json in current folder with name attribute or a specified name via arguments. ' +
+        'For more details, use `ng help`.';
+
+      return Promise.reject(new SilentError(message));
+    }
+
+    validateProjectName(packageName);
 
     const SchematicRunTask = require('../tasks/schematic-run').default;
     const schematicRunTask = new SchematicRunTask({
@@ -91,7 +106,7 @@ export default Task.extend({
       })
       .then(() => {
         if (!commandOptions.dryRun) {
-          this.ui.writeLine(chalk.green(`Project '${commandOptions.name}' successfully created.`));
+          this.ui.writeLine(chalk.green(`Project '${packageName}' successfully created.`));
         }
       });
   }
