@@ -9,7 +9,6 @@ import {getGlobalVariable} from '../../utils/env';
 
 const failedRe = /webpack: Failed to compile/;
 const successRe = /webpack: Compiled successfully/;
-const errorRe = /ERROR in/;
 
 export default function() {
   if (process.platform.startsWith('win')) {
@@ -30,12 +29,6 @@ export default function() {
       waitForAnyProcessOutputToMatch(successRe, 20000),
       replaceInFile('src/app/app.component.ts', ']]]]]', '')
     ]))
-    .then((results) => {
-      const stderr = results[0].stderr;
-      if (errorRe.test(stderr)) {
-        throw new Error('Expected no error but an error was shown.');
-      }
-    })
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();
       throw err;
