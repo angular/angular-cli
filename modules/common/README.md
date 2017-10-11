@@ -23,11 +23,11 @@ To use the `TransferHttpCacheModule` just install it as part of the top-level Ap
 That's it!
 
 ```ts
-import {TransferHttpCacheModule} from ‘@nguniversal/common’;
+import {TransferHttpCacheModule} from '@nguniversal/common';
 
 @NgModule({
   imports: [
-    BrowserModule.withServerTransition({appId: ‘my-app’}),
+    BrowserModule.withServerTransition({appId: 'my-app'}),
     TransferHttpCacheModule,
   ],
   bootstrap: [MyApp]
