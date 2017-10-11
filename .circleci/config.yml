@@ -20,7 +20,7 @@ jobs:
       - run: npm install --quiet
       - run: npm run lint
 
-  commits:
+  validate:
     <<: *defaults
     steps:
       - checkout
@@ -28,7 +28,7 @@ jobs:
           key: angular_devkit-{{ checksum "package-lock.json" }}
 
       - run: npm install --quiet
-      - run: npm run validate-commits
+      - run: npm run validate
 
   test:
     <<: *defaults
@@ -87,7 +87,7 @@ workflows:
   default_workflow:
     jobs:
       - lint
-      - commits
+      - validate
       - build
       - test
       - integration
