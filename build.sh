@@ -2,6 +2,11 @@ rm -rf dist
 
 set -x
 
+npm run build:common || exit 1
+
+cp modules/common/package.json dist/common/package.json
+cp modules/common/README.md dist/common/README.md
+
 npm run build:express-engine || exit 1
 
 cp modules/express-engine/package.json dist/express-engine/package.json

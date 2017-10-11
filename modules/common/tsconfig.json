@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/common",
+    "rootDir": "./"
+  },
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true
+  },
+  "files": [
+    "index.ts"
+  ]
+}

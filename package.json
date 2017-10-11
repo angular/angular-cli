@@ -60,6 +60,7 @@
   "scripts": {
     "ngc": "ngc",
     "jasmine": "jasmine",
+    "build:common": "ngc -p modules/common/tsconfig.json",
     "build:express-engine": "ngc -p modules/express-engine/tsconfig.json",
     "build:aspnetcore-engine": "ngc -p modules/aspnetcore-engine/tsconfig.json",
     "build:hapi-engine": "ngc -p modules/hapi-engine/tsconfig.json",
