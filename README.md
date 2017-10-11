@@ -14,9 +14,9 @@
 ### Development tools and libraries specialized for Angular
 
 
-[![CircleCI branch](https://img.shields.io/circleci/project/github/angular/devkit/master.svg?label=circleci)](https://circleci.com/gh/angular/devkit) [![Dependency Status][david-badge]][david-badge-url] [![devDependency Status][david-dev-badge]][david-dev-badge-url] 
+[![CircleCI branch](https://img.shields.io/circleci/project/github/angular/devkit/master.svg?label=circleci)](https://circleci.com/gh/angular/devkit) [![Dependency Status](https://david-dm.org/angular/devkit.svg)](https://david-dm.org/angular/devkit) [![devDependency Status](https://david-dm.org/angular/devkit/dev-status.svg)](https://david-dm.org/angular/devkit?type=dev) 
 
-[![npm](https://img.shields.io/npm/v/%40angular/cli.svg)][npm-badge-url] [![npm](https://img.shields.io/npm/v/%40angular/cli/next.svg)][npm-badge-url] [![License](https://img.shields.io/npm/l/@angular/cli.svg)][npm-badge-url] [![Downloads](https://img.shields.io/npm/dm/@angular/cli.svg)][npm-badge-url] 
+[![License](https://img.shields.io/npm/l/@angular-devkit/core.svg)](https://github.com/angular/devkit/blob/master/LICENSE) 
 
 [![GitHub forks](https://img.shields.io/github/forks/angular/devkit.svg?style=social&label=Fork)](https://github.com/angular/devkit/fork) [![GitHub stars](https://img.shields.io/github/stars/angular/devkit.svg?style=social&label=Star)](https://github.com/angular/devkit) 
 
@@ -53,6 +53,7 @@ This is a monorepo which contains many packages:
 **Build Optimizer** | [`@angular-devkit/build-optimizer`](http://npmjs.com/packages/@angular-devkit/build-optimizer) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fbuild-optimizer/latest.svg)](http://npmjs.com/packages/@angular-devkit/build-optimizer) | [![README](https://img.shields.io/badge/README--green.svg)](https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md)
 **Core** | [`@angular-devkit/core`](http://npmjs.com/packages/@angular-devkit/core) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fcore/latest.svg)](http://npmjs.com/packages/@angular-devkit/core) | 
 **Schematics** | [`@angular-devkit/schematics`](http://npmjs.com/packages/@angular-devkit/schematics) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fschematics/latest.svg)](http://npmjs.com/packages/@angular-devkit/schematics) | [![README](https://img.shields.io/badge/README--green.svg)](https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md)
+**** | [`@schematics/schematics`](http://npmjs.com/packages/@schematics/schematics) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fschematics/latest.svg)](http://npmjs.com/packages/@schematics/schematics) | 
 
 #### Schematics
 

@@ -5,13 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Logger } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { packages } from '../lib/packages';
 
-export default function(_options: {}) {
+export default function(_options: {}, logger: Logger) {
   const monorepo = require('../.monorepo.json');
 
+  logger.info('Building README...');
   const readme = require('./templates/readme').default;
   const content = readme({
     monorepo,

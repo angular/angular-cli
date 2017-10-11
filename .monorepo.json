@@ -7,24 +7,19 @@
         "url": "https://circleci.com/gh/angular/devkit"
       },
       {
-        "title": "![Dependency Status][david-badge]",
-        "url": "[david-badge-url]"
+        "title": "![Dependency Status](https://david-dm.org/angular/devkit.svg)",
+        "url": "https://david-dm.org/angular/devkit"
       },
       {
-        "title": "![devDependency Status][david-dev-badge]",
-        "url": "[david-dev-badge-url]"
+        "title": "![devDependency Status](https://david-dm.org/angular/devkit/dev-status.svg)",
+        "url": "https://david-dm.org/angular/devkit?type=dev"
       }
     ],
     [
       {
         "label": "License",
-        "image": "https://img.shields.io/npm/l/@angular/devkit.svg",
-        "url": "[npm-badge-url]"
-      },
-      {
-        "label": "Downloads",
-        "image": "https://img.shields.io/npm/dm/@angular/devkit.svg",
-        "url": "[npm-badge-url]"
+        "image": "https://img.shields.io/npm/l/@angular-devkit/core.svg",
+        "url": "https://github.com/angular/devkit/blob/master/LICENSE"
       }
     ],
     [
