@@ -38,6 +38,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
   i18nInFile?: string;
   i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
   preserveWhitespaces?: boolean;
+  enableSummariesForJit?: boolean;
 }
 export interface CompilerHost extends ts.CompilerHost {
   moduleNameToFileName(moduleName: string, containingFile?: string): string | null;

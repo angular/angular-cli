@@ -18,6 +18,7 @@ import {
   TransformOperation,
   makeTransform,
   replaceBootstrap,
+  replaceInitTestEnv,
   exportNgFactory,
   exportLazyModuleMap,
   registerLocaleData,
@@ -69,6 +70,7 @@ export interface AngularCompilerPluginOptions {
   exclude?: string | string[];
   include?: string[];
   compilerOptions?: ts.CompilerOptions;
+  enableSummariesForJit?: boolean;
 }
 
 export enum PLATFORM {
@@ -108,7 +110,7 @@ export class AngularCompilerPlugin implements Tapable {
 
   constructor(options: AngularCompilerPluginOptions) {
     CompilerCliIsSupported();
-    this._options = Object.assign({}, options);
+    this._options = Object.assign({ enableSummariesForJit: true }, options);
     this._setupOptions(this._options);
   }
 
@@ -240,6 +242,14 @@ export class AngularCompilerPlugin implements Tapable {
     // Set JIT (no code generation) or AOT mode.
     if (options.skipCodeGeneration !== undefined) {
       this._JitMode = options.skipCodeGeneration;
+    }
+
+    // Set ngsummaries option if AOT mode.
+    if (!this._JitMode || options.enableSummariesForJit !== undefined) {
+      this._angularCompilerOptions.enableSummariesForJit = options.enableSummariesForJit;
+      // If module option is 'commonjs', `ReferenceError: AppModuleNgSummary is not defined`
+      // is thrown at runtime. So overwrite it with 'ES2015' to suppres this error.
+      this._angularCompilerOptions.module = ts.ModuleKind.ES2015;
     }
 
     // Process i18n options.
@@ -683,6 +693,10 @@ export class AngularCompilerPlugin implements Tapable {
             if (this._platform === PLATFORM.Browser) {
               if (!this._JitMode) {
                 transformOps.push(...replaceBootstrap(sf, this.entryModule));
+              }
+
+              if (this.options.enableSummariesForJit) {
+                transformOps.push(...replaceInitTestEnv(sf, [this.entryModule]));
               }
 
               // If we have a locale, auto import the locale data file.
