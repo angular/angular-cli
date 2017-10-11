@@ -1,4 +1,5 @@
 {
+  "defaultSeverity": "warning",
   "rules": {
     "comment-format": [true, "check-space"],
     "class-name": true,
