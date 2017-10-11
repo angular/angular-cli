@@ -96,4 +96,19 @@ describe('import-tslib', () => {
 
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
+
+  it('tests false for files using __webpack_require__', () => {
+    const input = tags.stripIndent`
+      function __webpack_require__(moduleId) {
+          var __extends = (this && this.__extends) || function (d, b) {
+              for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+              function __() { this.constructor = d; }
+              d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+          };
+          exports.meaning = 42;
+      }
+    `;
+
+    expect(testImportTslib(input)).toBeFalsy();
+  });
 });

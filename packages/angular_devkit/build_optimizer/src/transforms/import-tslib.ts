@@ -11,7 +11,13 @@ import * as ts from 'typescript';
 export function testImportTslib(content: string) {
   const regex = /var (__extends|__decorate|__metadata|__param) = \(.*\r?\n(    .*\r?\n)*\};/;
 
-  return regex.test(content);
+  // This transform introduces import/require() calls, but this won't work properly on libraries
+  // built with Webpack. These libraries use __webpack_require__() calls instead, which will break
+  // with a new import that wasn't part of it's original module list.
+  // We ignore this transform for such libraries.
+  const webpackRequireRegex = /__webpack_require__/;
+
+  return regex.test(content) && !webpackRequireRegex.test(content);
 }
 
 export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile> {
