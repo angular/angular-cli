@@ -36,7 +36,7 @@ export class IndentLogger extends Logger {
         }
       }
 
-      entry.message = map[l] + entry.message;
+      entry.message = map[l] + entry.message.split(/\n/).join('\n' + map[l]);
 
       return entry;
     });
