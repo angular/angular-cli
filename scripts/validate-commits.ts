@@ -32,12 +32,12 @@ export default function (_: {}, logger: Logger) {
       .toString().trim();
     sha = 'HEAD';
   }
-  logger.info('  Base: ' + baseSha);
-  logger.info('  HEAD: ' + sha);
+
+  logger.createChild('sha').info(`Base: ${baseSha}\nHEAD: ${sha}`);
 
   const log = execSync(`git log --oneline "${baseSha}..${sha}"`).toString().trim();
   logger.debug('Commits:');
-  logger.debug('  ' + log.split(/\n/).join('\n  '));
+  logger.createChild('commits').debug(log);
   logger.debug('');
 
   const commits = log.split(/\n/)
