@@ -20,10 +20,10 @@ This story will show you how to set up Universal bundling for an existing `@angu
 
 Install `@angular/platform-server` into your project. Make sure you use the same version as the other `@angular` packages in your project.
 
-> You'll also need @nguniversal/module-map-ngfactory-loader, as it's used to handle lazy-loading in the context of a server-render. (by loading the chunks right away)
+> You'll also need ts-loader (for your webpack build we'll show later) and @nguniversal/module-map-ngfactory-loader, as it's used to handle lazy-loading in the context of a server-render. (by loading the chunks right away)
 
 ```bash
-$ npm install --save @angular/platform-server @nguniversal/module-map-ngfactory-loader
+$ npm install --save @angular/platform-server @nguniversal/module-map-ngfactory-loader ts-loader
 ```
 
 ## Step 1: Prepare your App for Universal rendering
