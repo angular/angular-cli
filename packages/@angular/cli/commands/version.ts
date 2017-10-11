@@ -1,4 +1,6 @@
 const Command = require('../ember-cli/lib/models/command');
+import { stripIndents } from 'common-tags';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as child_process from 'child_process';
 import * as chalk from 'chalk';
@@ -11,15 +13,13 @@ const VersionCommand = Command.extend({
   aliases: ['v', '--version', '-v'],
   works: 'everywhere',
 
-  availableOptions: [{
-    name: 'verbose',
-    type: Boolean,
-    'default': false,
-    description: 'Adds more details to output logging.'
-  }],
+  availableOptions: [],
 
-  run: function (options: any) {
-    let versions: any = process.versions;
+  run: function (_options: any) {
+    let versions: { [name: string]: string } = {};
+    let angular: { [name: string]: string } = {};
+    let angularCoreVersion = '';
+    let angularSameAsCore: string[] = [];
     const pkg = require(path.resolve(__dirname, '..', 'package.json'));
     let projPkg: any;
     try {
@@ -28,10 +28,7 @@ const VersionCommand = Command.extend({
       projPkg = undefined;
     }
 
-    versions.os = process.platform + ' ' + process.arch;
-
-    const alwaysPrint = ['node', 'os'];
-    const roots = ['@angular/', '@ngtools/', 'typescript'];
+    const roots = ['@angular-devkit/', '@ngtools/', '@schematics/', 'typescript', 'webpack'];
 
     let ngCliVersion = pkg.version;
     if (!__dirname.match(/node_modules/)) {
@@ -55,31 +52,70 @@ const VersionCommand = Command.extend({
       roots.forEach(root => {
         versions = Object.assign(versions, this.getDependencyVersions(projPkg, root));
       });
+      angular = this.getDependencyVersions(projPkg, '@angular/');
+
+      // Filter all angular versions that are the same as core.
+      angularCoreVersion = angular['@angular/core'];
+      if (angularCoreVersion) {
+        for (const angularPackage of Object.keys(angular)) {
+          if (angular[angularPackage] == angularCoreVersion) {
+            angularSameAsCore.push(angularPackage.replace(/^@angular\//, ''));
+            delete angular[angularPackage];
+          }
+        }
+      }
     }
-    const asciiArt = `    _                      _                 ____ _     ___
+    const asciiArt = `
+    _                      _                 ____ _     ___
    / \\   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
   / △ \\ | '_ \\ / _\` | | | | |/ _\` | '__|   | |   | |    | |
  / ___ \\| | | | (_| | |_| | | (_| | |      | |___| |___ | |
 /_/   \\_\\_| |_|\\__, |\\__,_|_|\\__,_|_|       \\____|_____|___|
-               |___/`;
-    this.ui.writeLine(chalk.red(asciiArt));
-    this.printVersion('@angular/cli', ngCliVersion);
+               |___/
+    `;
 
-    for (const module of Object.keys(versions)) {
-      const isRoot = roots.some(root => module.startsWith(root));
-      if (options.verbose || alwaysPrint.indexOf(module) > -1 || isRoot) {
-        this.printVersion(module, versions[module]);
+    this.ui.writeLine(stripIndents`
+    ${chalk.red(asciiArt)}
+    Angular CLI: ${ngCliVersion}
+    Node: ${process.versions.node}
+    OS: ${process.platform} ${process.arch}
+    Angular: ${angularCoreVersion}
+    ... ${angularSameAsCore.sort().reduce((acc, name) => {
+      // Perform a simple word wrap around 60.
+      if (acc.length == 0) {
+        return [name];
       }
-    }
+      const line = (acc[acc.length - 1] + ', ' + name);
+      if (line.length > 60) {
+        acc.push(name);
+      } else {
+        acc[acc.length - 1] = line;
+      }
+      return acc;
+    }, []).join('\n... ')}
+
+    ${Object.keys(angular).map(module => module + ': ' + angular[module]).sort().join('\n')}
+    ${Object.keys(versions).map(module => module + ': ' + versions[module]).sort().join('\n')}
+    `);
   },
 
-  getDependencyVersions: function(pkg: any, prefix: string): any {
+  getDependencyVersions: function(pkg: any, prefix: string): { [name: string]: string } {
     const modules: any = {};
-
-    Object.keys(pkg['dependencies'] || {})
+    const deps = Object.keys(pkg['dependencies'] || {})
       .concat(Object.keys(pkg['devDependencies'] || {}))
-      .filter(depName => depName && depName.startsWith(prefix))
-      .forEach(key => modules[key] = this.getVersion(key));
+      .filter(depName => depName && depName.startsWith(prefix));
+
+    if (prefix[0] == '@') {
+      try {
+        fs.readdirSync(path.resolve(this.project.root, 'node_modules', prefix))
+          .map(name => prefix + name)
+          .forEach(name => deps.push(name));
+      } catch (_) {}
+    } else {
+      modules[prefix] = this.getVersion(prefix);
+    }
+
+    deps.forEach(name => modules[name] = this.getVersion(name));
 
     return modules;
   },
@@ -95,10 +131,6 @@ const VersionCommand = Command.extend({
     } catch (e) {
       return 'error';
     }
-  },
-
-  printVersion: function (module: string, version: string) {
-    this.ui.writeLine(module + ': ' + version);
   }
 });
 
