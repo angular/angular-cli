@@ -23,7 +23,15 @@ import {
 } from '../exception/exception';
 import { Action, ActionList, UnknownActionException } from './action';
 import { SimpleFileEntry } from './entry';
-import { DirEntry, FileEntry, MergeStrategy, Tree, UpdateRecorder } from './interface';
+import {
+  DirEntry,
+  FileEntry,
+  FileVisitor,
+  FileVisitorCancelToken,
+  MergeStrategy,
+  Tree,
+  UpdateRecorder,
+} from './interface';
 import { UpdateRecorderBase } from './recorder';
 
 
@@ -124,6 +132,16 @@ export class VirtualTree implements Tree {
     });
 
     return dir;
+  }
+
+  visit(visitor: FileVisitor) {
+    try {
+      this.files.forEach(path => visitor(path, this.get(path)));
+    } catch (e) {
+      if (e !== FileVisitorCancelToken) {
+        throw e;
+      }
+    }
   }
 
   beginUpdate(path: string): UpdateRecorder {
@@ -308,12 +326,12 @@ export class VirtualTree implements Tree {
   }
 
   static branch(tree: Tree) {
-    return (tree as VirtualTree).branch();
+    return tree.branch();
   }
 
   static merge(tree: Tree, other: Tree, strategy: MergeStrategy = MergeStrategy.Default): Tree {
-    const newTree = (tree as VirtualTree).branch() as VirtualTree;
-    newTree.merge((other as VirtualTree), strategy);
+    const newTree = tree.branch();
+    newTree.merge(other, strategy);
 
     return newTree;
   }

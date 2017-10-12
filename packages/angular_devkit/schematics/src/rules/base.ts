@@ -133,8 +133,7 @@ export function partitionApplyMerge(
 
 export function forEach(operator: FileOperator): Rule {
   return (tree: Tree) => {
-    tree.files.forEach(path => {
-      const entry = tree.get(path);
+    tree.visit((path, entry) => {
       if (!entry) {
         return;
       }

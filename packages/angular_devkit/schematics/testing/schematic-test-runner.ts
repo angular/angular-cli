@@ -8,6 +8,7 @@
 import { Logger, schema } from '@angular-devkit/core';
 import {
   Collection,
+  DelegateTree,
   SchematicEngine,
   Tree,
   VirtualTree,
@@ -20,6 +21,16 @@ import { Observable } from 'rxjs/Observable';
 
 
 export interface SchematicSchemaT {}
+
+
+export class UnitTestTree extends DelegateTree {
+  get files() {
+    const result: string[] = [];
+    this.visit(path => result.push(path));
+
+    return result;
+  }
+}
 
 export class SchematicTestRunner {
   private _engineHost = new NodeModulesTestEngineHost();
@@ -57,21 +68,26 @@ export class SchematicTestRunner {
 
   get logger() { return this._logger; }
 
-  runSchematicAsync(schematicName: string, opts?: SchematicSchemaT, tree?: Tree): Observable<Tree> {
+  runSchematicAsync(
+    schematicName: string,
+    opts?: SchematicSchemaT,
+    tree?: Tree,
+  ): Observable<UnitTestTree> {
     const schematic = this._collection.createSchematic(schematicName);
     const host = Observable.of(tree || new VirtualTree);
 
-    return schematic.call(opts || {}, host, { logger: this._logger });
+    return schematic.call(opts || {}, host, { logger: this._logger })
+      .map(tree => new UnitTestTree(tree));
   }
 
-  runSchematic(schematicName: string, opts?: SchematicSchemaT, tree?: Tree): Tree {
+  runSchematic(schematicName: string, opts?: SchematicSchemaT, tree?: Tree): UnitTestTree {
     const schematic = this._collection.createSchematic(schematicName);
 
-    let result: Tree | null = null;
+    let result: UnitTestTree | null = null;
     const host = Observable.of(tree || new VirtualTree);
 
     schematic.call(opts || {}, host, { logger: this._logger })
-      .subscribe(t => result = t);
+      .subscribe(t => result = new UnitTestTree(t));
 
     if (result === null) {
       throw new Error('Schematic is async, please use runSchematicAsync');

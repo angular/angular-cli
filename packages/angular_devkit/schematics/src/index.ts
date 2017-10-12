@@ -24,6 +24,7 @@ export * from './rules/random';
 export * from './rules/schematic';
 export * from './rules/template';
 export * from './rules/url';
+export * from './tree/delegate';
 export * from './tree/empty';
 export * from './tree/filesystem';
 export * from './tree/memory-host';

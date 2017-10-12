@@ -9,10 +9,18 @@
 import { normalize } from '@angular-devkit/core';
 import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import { FileSystemTree } from './filesystem';
-import { FileEntry, MergeStrategy } from './interface';
+import { FileEntry, MergeStrategy, Tree } from './interface';
 import { InMemoryFileSystemTreeHost } from './memory-host';
 import { merge, partition } from './static';
 import { VirtualTree } from './virtual';
+
+
+function files(tree: Tree) {
+  const treeFiles: string[] = [];
+  tree.visit(x => treeFiles.push(x));
+
+  return treeFiles;
+}
 
 
 describe('VirtualTree', () => {
@@ -39,7 +47,7 @@ describe('VirtualTree', () => {
       tree.create('/some/other-file', 'some _content');
       tree.create('/some/other-file2', 'some _content');
 
-      expect(tree.files).toEqual([
+      expect(files(tree)).toEqual([
         '/some/file', '/some/other-file', '/some/other-file2',
       ].map(normalize));
     });
@@ -91,7 +99,7 @@ describe('VirtualTree', () => {
       expect(tree2.exists('file3')).toBe(true);
 
       const tree3 = merge(tree1, tree2, MergeStrategy.Error);
-      expect(tree3.files.sort()).toEqual(tree.files.sort());
+      expect(files(tree3).sort()).toEqual(files(tree).sort());
     });
   });
 
@@ -127,8 +135,8 @@ describe('VirtualTree', () => {
       tree.overwrite('/hello', 'world');
       tree.overwrite('/test', 'test 3');
 
-      const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-      expect(tree.files).toEqual(files.map(normalize));
+      const expected = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
+      expect(files(tree)).toEqual(expected.map(normalize));
 
       const tree2 = tree.branch() as VirtualTree;
       expect(tree.actions.length).toBe(4);

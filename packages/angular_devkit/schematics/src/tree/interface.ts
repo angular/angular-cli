@@ -51,18 +51,22 @@ export interface FilePredicate<T> {
   (path: Path, entry?: Readonly<FileEntry> | null): T;
 }
 
+export const FileVisitorCancelToken = Symbol();
+export type FileVisitor = FilePredicate<void>;
+
 
 export interface Tree {
+  branch(): Tree;
+  merge(other: Tree, strategy?: MergeStrategy): void;
+
   readonly root: DirEntry;
 
   // Readonly.
-  readonly files: string[];
-  exists(path: string): boolean;
-
-  // Content access.
   read(path: string): Buffer | null;
+  exists(path: string): boolean;
   get(path: string): FileEntry | null;
   getDir(path: string): DirEntry;
+  visit(visitor: FileVisitor): void;
 
   // Change content of host files.
   overwrite(path: string, content: Buffer | string): void;

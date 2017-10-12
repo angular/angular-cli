@@ -42,6 +42,14 @@ const collection = {
 } as CollectionDescription<CollectionT>;
 
 
+function files(tree: Tree) {
+  const files: string[] = [];
+  tree.visit(x => files.push(x));
+
+  return files;
+}
+
+
 describe('Schematic', () => {
   it('works with a rule', done => {
     let inner: Tree | null = null;
@@ -62,8 +70,8 @@ describe('Schematic', () => {
     schematic.call({}, Observable.of(empty()))
       .toPromise()
       .then(x => {
-        expect(inner !.files).toEqual([]);
-        expect(x.files).toEqual(['/a/b/c']);
+        expect(files(inner !)).toEqual([]);
+        expect(files(x)).toEqual(['/a/b/c']);
       })
       .then(done, done.fail);
   });
@@ -87,8 +95,8 @@ describe('Schematic', () => {
     schematic.call({}, Observable.of(empty()))
       .toPromise()
       .then(x => {
-        expect(inner !.files).toEqual([]);
-        expect(x.files).toEqual([]);
+        expect(files(inner !)).toEqual([]);
+        expect(files(x)).toEqual([]);
         expect(inner).not.toBe(x);
       })
       .then(done, done.fail);

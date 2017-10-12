@@ -42,6 +42,11 @@ export class NullTreeDirEntry implements DirEntry {
 
 
 export class NullTree implements Tree {
+  branch(): Tree {
+    return new NullTree();
+  }
+  merge(_other: Tree, _strategy?: MergeStrategy): void {}
+
   readonly root: DirEntry = new NullTreeDirEntry(normalize('/'));
 
   // Simple readonly file system operations.
@@ -49,7 +54,7 @@ export class NullTree implements Tree {
   read(_path: string) { return null; }
   get(_path: string) { return null; }
   getDir(path: string) { return new NullTreeDirEntry(normalize('/' + path)); }
-  get files(): string[] { return []; }
+  visit() {}
 
   // Change content of host files.
   beginUpdate(path: string): never {
