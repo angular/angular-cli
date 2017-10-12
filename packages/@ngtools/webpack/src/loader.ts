@@ -568,7 +568,6 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
         .then(() => {
           timeEnd(timeLabel + '.ngcLoader.AngularCompilerPlugin');
           const result = plugin.getFile(sourceFileName);
-          const dependencies = plugin.getDependencies(sourceFileName);
 
           if (result.sourceMap) {
             // Process sourcemaps for Webpack.
@@ -585,7 +584,10 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
             throw new Error('TypeScript compilation failed.');
           }
 
-          dependencies.forEach(dep => this.addDependency(dep));
+          // Dependencies must use system path separator.
+          const dependencies = plugin.getDependencies(sourceFileName);
+          dependencies.forEach(dep => this.addDependency(dep.replace(/\//g, path.sep)));
+
           cb(null, result.outputText, result.sourceMap);
         })
         .catch(err => {
@@ -646,8 +648,9 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
           _getResourcesUrls(refactor).forEach((url: string) => {
             this.addDependency(path.resolve(path.dirname(sourceFileName), url));
           });
+          // Dependencies must use system path separator.
           _getImports(refactor, compilerOptions, plugin.compilerHost, plugin.moduleResolutionCache)
-            .forEach((importString: string) => this.addDependency(importString));
+            .forEach((dep) => this.addDependency(dep.replace(/\//g, path.sep)));
           timeEnd(timeLabel + '.ngcLoader.AotPlugin.addDependency');
         })
         .then(() => {
