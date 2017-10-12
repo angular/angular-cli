@@ -599,8 +599,9 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
         _getResourcesUrls(refactor).forEach((url: string) => {
           this.addDependency(path.resolve(path.dirname(sourceFileName), url));
         });
+        // Dependencies must use system path separator.
         _getImports(refactor, compilerOptions, plugin.compilerHost, plugin.moduleResolutionCache)
-          .forEach((importString: string) => this.addDependency(importString));
+          .forEach(dep => this.addDependency(dep.replace(/\//g, path.sep)));
       })
       .then(() => {
         if (source) {
