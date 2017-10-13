@@ -75,3 +75,10 @@ export interface InputFileSystem {
   readlinkSync(path: string): string;
   purge(changes?: string[] | string): void;
 }
+
+export interface NodeWatchFileSystemInterface {
+  inputFileSystem: InputFileSystem;
+  new(inputFileSystem: InputFileSystem): NodeWatchFileSystemInterface;
+  watch(files: any, dirs: any, missing: any, startTime: any, options: any, callback: any,
+    callbackUndelayed: any): any;
+}

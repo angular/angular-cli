@@ -3,7 +3,35 @@
 Webpack plugin that AoT compiles your Angular components and modules.
 
 ## Usage
-In your webpack config, add the following plugin and loader:
+
+In your webpack config, add the following plugin and loader.
+
+Angular version 5 and up, use `AngularCompilerPlugin`:
+
+```typescript
+import {AotPlugin} from '@ngtools/webpack'
+
+exports = { /* ... */
+  module: {
+    rules: [
+      {
+        test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+        loader: '@ngtools/webpack',
+        sourcemap: true
+      }
+    ]
+  },
+
+  plugins: [
+    new AngularCompilerPlugin({
+      tsConfigPath: 'path/to/tsconfig.json',
+      entryModule: 'path/to/app.module#AppModule'
+    })
+  ]
+}
+```
+
+Angular version 2 and 4, use `AotPlugin`:
 
 ```typescript
 import {AotPlugin} from '@ngtools/webpack'
@@ -14,6 +42,7 @@ exports = { /* ... */
       {
         test: /\.ts$/,
         loader: '@ngtools/webpack',
+        sourcemap: true
       }
     ]
   },
@@ -27,9 +56,7 @@ exports = { /* ... */
 }
 ```
 
-The loader works with the webpack plugin to compile your TypeScript. It's important to include both, and to not include any other TypeScript compiler loader.
-
-For Angular version 5 and up, import `AngularCompilerPlugin` instead of `AotPlugin`.
+The loader works with webpack plugin to compile your TypeScript. It's important to include both, and to not include any other TypeScript compiler loader.
 
 ## Options
 
