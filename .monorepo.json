@@ -79,7 +79,9 @@
       "hash": "14dc7a451be0135b884733efa2f186d4"
     },
     "@schematics/schematics": {
+      "name": "Schematics Schematics",
       "version": "0.0.2",
+      "section": "Schematics",
       "hash": "81d5cecc08fdb89b2e1b3b1de00ed793"
     }
   }
