@@ -15,7 +15,6 @@ import { CliConfig } from '../models/config';
 import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/map';
 import { getCollection, getSchematic } from '../utilities/schematics';
-import { getAppFromConfig } from '../utilities/app-utils';
 
 
 const Task = require('../ember-cli/lib/models/task');
@@ -53,13 +52,6 @@ export default Task.extend({
     const collection = getCollection(collectionName);
     const schematic = getSchematic(collection, schematicName);
 
-    let modifiedFiles: string[] = [];
-
-    let appConfig;
-    try {
-      appConfig = getAppFromConfig(taskOptions.app);
-    } catch (err) {}
-
     const projectRoot = !!this.project ? this.project.root : workingDir;
 
     const preppedOptions = prepOptions(schematic, taskOptions);
@@ -73,6 +65,7 @@ export default Task.extend({
 
     let error = false;
     const loggingQueue: OutputLogging[] = [];
+    const modifiedFiles: string[] = [];
 
     dryRunSink.reporter.subscribe((event: DryRunEvent) => {
       const eventPath = event.path.startsWith('/') ? event.path.substr(1) : event.path;
@@ -88,7 +81,7 @@ export default Task.extend({
             keyword: 'update',
             message: `${eventPath} (${event.content.length} bytes)`
           });
-          modifiedFiles = [...modifiedFiles, event.path];
+          modifiedFiles.push(event.path);
           break;
         case 'create':
           loggingQueue.push({
@@ -96,7 +89,7 @@ export default Task.extend({
             keyword: 'create',
             message: `${eventPath} (${event.content.length} bytes)`
           });
-          modifiedFiles = [...modifiedFiles, event.path];
+          modifiedFiles.push(event.path);
           break;
         case 'delete':
           loggingQueue.push({
@@ -112,6 +105,7 @@ export default Task.extend({
             keyword: 'rename',
             message: `${eventPath} => ${eventToPath}`
           });
+          modifiedFiles.push(event.to);
           break;
       }
     });
