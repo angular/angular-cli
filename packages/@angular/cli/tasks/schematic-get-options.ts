@@ -37,6 +37,14 @@ export default Task.extend({
           case 'boolean':
             type = Boolean;
             break;
+          case 'integer':
+          case 'number':
+            type = Number;
+            break;
+
+          // Ignore arrays / objects.
+          default:
+            return null;
         }
         let aliases: string[] = [];
         if (opt.alias) {
@@ -52,7 +60,8 @@ export default Task.extend({
           type,
           default: undefined // do not carry over schematics defaults
         };
-      });
+      })
+      .filter(x => x);
 
     return Promise.resolve(availableOptions);
   }
