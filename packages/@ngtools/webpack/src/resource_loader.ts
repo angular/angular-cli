@@ -8,21 +8,15 @@ const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
 
 interface CompilationOutput {
-  rendered: boolean;
   outputName: string;
   source: string;
-}
-
-interface CachedCompilation {
-  outputName: string;
-  evaluatedSource?: string;
 }
 
 export class WebpackResourceLoader {
   private _parentCompilation: any;
   private _context: string;
   private _uniqueId = 0;
-  private _cache = new Map<string, CachedCompilation>();
+  private _resourceDependencies = new Map<string, string[]>();
 
   constructor() {}
 
@@ -30,6 +24,10 @@ export class WebpackResourceLoader {
     this._parentCompilation = parentCompilation;
     this._context = parentCompilation.context;
     this._uniqueId = 0;
+  }
+
+  getResourceDependencies(filePath: string) {
+    return this._resourceDependencies.get(filePath) || [];
   }
 
   private _compile(filePath: string): Promise<CompilationOutput> {
@@ -98,9 +96,10 @@ export class WebpackResourceLoader {
             }
           });
 
+          // Save the dependencies for this resource.
+          this._resourceDependencies.set(outputName, childCompilation.fileDependencies);
+
           resolve({
-            // Boolean showing if this entry was changed since the last compilation.
-            rendered: entries[0].rendered,
             // Output name.
             outputName,
             // Compiled code.
@@ -113,19 +112,19 @@ export class WebpackResourceLoader {
 
   private _evaluate(output: CompilationOutput): Promise<string> {
     try {
+      const outputName = output.outputName;
       const vmContext = vm.createContext(Object.assign({ require: require }, global));
-      const vmScript = new vm.Script(output.source, { filename: output.outputName });
+      const vmScript = new vm.Script(output.source, { filename: outputName });
 
       // Evaluate code and cast to string
       let evaluatedSource: string;
       evaluatedSource = vmScript.runInContext(vmContext);
 
       if (typeof evaluatedSource == 'string') {
-        this._cache.set(output.outputName, { outputName: output.outputName, evaluatedSource });
         return Promise.resolve(evaluatedSource);
       }
 
-      return Promise.reject('The loader "' + output.outputName + '" didn\'t return a string.');
+      return Promise.reject('The loader "' + outputName + '" didn\'t return a string.');
     } catch (e) {
       return Promise.reject(e);
     }
@@ -133,18 +132,6 @@ export class WebpackResourceLoader {
 
   get(filePath: string): Promise<string> {
     return this._compile(filePath)
-      .then((result: CompilationOutput) => {
-        if (!result.rendered) {
-          // Check cache.
-          const outputName = result.outputName;
-          const cachedOutput = this._cache.get(outputName);
-          if (cachedOutput) {
-            // Return cached evaluatedSource.
-            return Promise.resolve(cachedOutput.evaluatedSource);
-          }
-        }
-
-        return this._evaluate(result);
-      });
+      .then((result: CompilationOutput) => this._evaluate(result));
   }
 }
