@@ -7,10 +7,12 @@
 
 import {
   Collection,
+  Engine,
   Schematic,
   SchematicEngine,
 } from '@angular-devkit/schematics';
 import {
+  FileSystemCollectionDesc,
   FileSystemSchematicDesc,
   NodeModulesEngineHost
 } from '@angular-devkit/schematics/tools';
@@ -20,14 +22,22 @@ import 'rxjs/add/operator/map';
 
 const SilentError = require('silent-error');
 
+const engineHost = new NodeModulesEngineHost();
+const engine: Engine<FileSystemCollectionDesc, FileSystemSchematicDesc>
+  = new SchematicEngine(engineHost);
+
+
 export function getEngineHost() {
-  const engineHost = new NodeModulesEngineHost();
   return engineHost;
 }
+export function getEngine(): Engine<FileSystemCollectionDesc, FileSystemSchematicDesc> {
+  return engine;
+}
+
 
 export function getCollection(collectionName: string): Collection<any, any> {
   const engineHost = getEngineHost();
-  const engine = new SchematicEngine(engineHost);
+  const engine = getEngine();
 
   // Add support for schemaJson.
   engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options: any) => {
