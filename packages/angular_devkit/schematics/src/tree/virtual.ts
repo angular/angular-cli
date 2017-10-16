@@ -30,6 +30,7 @@ import {
   FileVisitorCancelToken,
   MergeStrategy,
   Tree,
+  TreeSymbol,
   UpdateRecorder,
 } from './interface';
 import { UpdateRecorderBase } from './recorder';
@@ -92,6 +93,10 @@ export class VirtualTree implements Tree {
   }
   protected get tree(): ReadonlyMap<Path, FileEntry> { return this._tree; }
   get staging(): ReadonlyMap<Path, FileEntry> { return this._cacheMap; }
+
+  [TreeSymbol]() {
+    return this;
+  }
 
   /**
    * A list of file names contained by this Tree.

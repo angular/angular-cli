@@ -15,7 +15,7 @@ import {
 } from '@angular-devkit/core';
 import { FileDoesNotExistException } from '../exception/exception';
 import { Action } from './action';
-import { DirEntry, MergeStrategy, Tree, UpdateRecorder } from './interface';
+import { DirEntry, MergeStrategy, Tree, TreeSymbol, UpdateRecorder } from './interface';
 import { UpdateRecorderBase } from './recorder';
 
 
@@ -42,6 +42,10 @@ export class NullTreeDirEntry implements DirEntry {
 
 
 export class NullTree implements Tree {
+  [TreeSymbol]() {
+    return this;
+  }
+
   branch(): Tree {
     return new NullTree();
   }

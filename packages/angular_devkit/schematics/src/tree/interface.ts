@@ -55,6 +55,27 @@ export const FileVisitorCancelToken = Symbol();
 export type FileVisitor = FilePredicate<void>;
 
 
+declare const window: { Symbol: { schematicTree: symbol }, window: {} };
+declare const self: { Symbol: { schematicTree: symbol }, self: {} };
+declare const global: { Symbol: { schematicTree: symbol }, global: {} };
+
+export const TreeSymbol: symbol = (function() {
+  const globalSymbol = (typeof window == 'object' && window.window === window && window.Symbol)
+                    || (typeof self == 'object' && self.self === self && self.Symbol)
+                    || (typeof global == 'object' && global.global === global && global.Symbol);
+
+  if (!globalSymbol) {
+    return Symbol('schematic-tree');
+  }
+
+  if (!globalSymbol.schematicTree) {
+    globalSymbol.schematicTree = Symbol('schematic-tree');
+  }
+
+  return globalSymbol.schematicTree;
+})();
+
+
 export interface Tree {
   branch(): Tree;
   merge(other: Tree, strategy?: MergeStrategy): void;
