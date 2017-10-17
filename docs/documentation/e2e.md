@@ -11,18 +11,11 @@
 ng e2e
 ```
 
-End-to-end tests are run via [Protractor] (https://angular.github.io/protractor/).
+End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
 ## Options
-<details>
-  <summary>base href</summary>
-  <p>
-    <code>--base-href</code>
-  </p>
-  <p>
-    Override the baseUrl in the protractor config. Defaults to the baseUrl in the protractor config.
-  </p>
-</details>
+
+Please note that options that are supported by `ng serve` are also supported by `ng e2e`
 
 <details>
   <summary>config</summary>
