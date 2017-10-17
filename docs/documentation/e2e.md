@@ -15,6 +15,16 @@ End-to-end tests are run via [Protractor] (https://angular.github.io/protractor/
 
 ## Options
 <details>
+  <summary>base href</summary>
+  <p>
+    <code>--base-href</code>
+  </p>
+  <p>
+    Override the baseUrl in the protractor config. Defaults to the baseUrl in the protractor config.
+  </p>
+</details>
+
+<details>
   <summary>config</summary>
   <p>
     <code>--config</code> (aliases: <code>-c</code>)
