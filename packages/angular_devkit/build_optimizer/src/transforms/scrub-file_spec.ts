@@ -79,6 +79,69 @@ describe('scrub-file', () => {
     });
   });
 
+  describe('__decorate', () => {
+    it('removes Angular decorators calls in __decorate', () => {
+      const output = tags.stripIndent`
+        import { Component, Injectable } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          return Clazz;
+        }());
+      `;
+      const input = tags.stripIndent`
+        import { Component, Injectable } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          Clazz = __decorate([
+            Injectable(),
+            Component({
+              selector: 'app-root',
+              templateUrl: './app.component.html',
+              styleUrls: ['./app.component.css']
+            })
+          ], Clazz);
+          return Clazz;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('removes only Angular decorators calls in __decorate', () => {
+      const output = tags.stripIndent`
+        import { Component } from '@angular/core';
+        import { NotComponent } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() { }
+          Clazz = __decorate([
+            NotComponent()
+          ], Clazz);
+          return Clazz;
+        }());
+      `;
+      const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+        import { NotComponent } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() { }
+          Clazz = __decorate([
+            NotComponent(),
+            Component({
+              selector: 'app-root',
+              templateUrl: './app.component.html',
+              styleUrls: ['./app.component.css']
+            })
+          ], Clazz);
+          return Clazz;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+  });
+
   describe('propDecorators', () => {
     it('removes top-level Angular propDecorators', () => {
       const output = tags.stripIndent`

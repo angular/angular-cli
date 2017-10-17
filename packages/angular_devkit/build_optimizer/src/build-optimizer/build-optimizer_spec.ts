@@ -11,7 +11,7 @@ import { buildOptimizer } from './build-optimizer';
 
 
 describe('build-optimizer', () => {
-  const imports = 'import { Injectable, Input } from \'@angular/core\';';
+  const imports = 'import { Injectable, Input, Component } from \'@angular/core\';';
   const clazz = 'var Clazz = (function () { function Clazz() { } return Clazz; }());';
   const staticProperty = 'Clazz.prop = 1;';
   const decorators = 'Clazz.decorators = [ { type: Injectable } ];';
@@ -35,6 +35,17 @@ describe('build-optimizer', () => {
         ${decorators}
         Clazz.propDecorators = { 'ngIf': [{ type: Input }] };
         Clazz.ctorParameters = function () { return [{type: Injector}]; };
+        var ComponentClazz = (function () {
+          function ComponentClazz() { }
+          ComponentClazz = __decorate([
+            Component({
+              selector: 'app-root',
+              templateUrl: './app.component.html',
+              styleUrls: ['./app.component.css']
+            })
+          ], ComponentClazz);
+          return ComponentClazz;
+        }());
       `;
       // tslint:disable:max-line-length
       const output = tags.oneLine`
@@ -48,6 +59,10 @@ describe('build-optimizer', () => {
           return ChangeDetectionStrategy;
         })();
         var Clazz = /*@__PURE__*/ (function () { function Clazz() { } ${staticProperty} return Clazz; }());
+        var ComponentClazz = /*@__PURE__*/ (function () {
+          function ComponentClazz() { }
+          return ComponentClazz;
+        }());
       `;
 
       // Check Angular 4/5 and unix/windows paths.

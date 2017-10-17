@@ -12,6 +12,7 @@ import { collectDeepNodes } from '../helpers/ast-utils';
 export function testScrubFile(content: string) {
   const markers = [
     'decorators',
+    '__decorate',
     'propDecorators',
     'ctorParameters',
   ];
@@ -68,6 +69,9 @@ export function getScrubFileTransformer(program: ts.Program): ts.TransformerFact
         if (isDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickDecorationNodesToRemove(exprStmt, ngMetadata, checker));
         }
+        if (isDecorateAssignmentExpression(exprStmt)) {
+          nodes.push(...pickDecorateNodesToRemove(exprStmt, ngMetadata, checker));
+        }
         if (isPropDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickPropDecorationNodesToRemove(exprStmt, ngMetadata, checker));
         }
@@ -99,7 +103,7 @@ export function getScrubFileTransformer(program: ts.Program): ts.TransformerFact
 
 export function expect<T extends ts.Node>(node: ts.Node, kind: ts.SyntaxKind): T {
   if (node.kind !== kind) {
-    throw new Error('Invalid!');
+    throw new Error('Invalid node type.');
   }
 
   return node as T;
@@ -158,6 +162,7 @@ function isAngularCoreSpecifier(node: ts.ImportSpecifier): boolean {
   return angularSpecifiers.indexOf(nameOfSpecifier(node)) !== -1;
 }
 
+// Check if assignment is `Clazz.decorators = [...];`.
 function isDecoratorAssignmentExpression(exprStmt: ts.ExpressionStatement): boolean {
   if (exprStmt.expression.kind !== ts.SyntaxKind.BinaryExpression) {
     return false;
@@ -183,6 +188,46 @@ function isDecoratorAssignmentExpression(exprStmt: ts.ExpressionStatement): bool
   return true;
 }
 
+// Check if assignment is `Clazz = __decorate([...], Clazz)`.
+function isDecorateAssignmentExpression(exprStmt: ts.ExpressionStatement): boolean {
+  if (exprStmt.expression.kind !== ts.SyntaxKind.BinaryExpression) {
+    return false;
+  }
+  const expr = exprStmt.expression as ts.BinaryExpression;
+  if (expr.left.kind !== ts.SyntaxKind.Identifier) {
+    return false;
+  }
+  if (expr.right.kind !== ts.SyntaxKind.CallExpression) {
+    return false;
+  }
+  const classIdent = expr.left as ts.Identifier;
+  const callExpr = expr.right as ts.CallExpression;
+  if (callExpr.expression.kind !== ts.SyntaxKind.Identifier) {
+    return false;
+  }
+  const callExprIdent = callExpr.expression as ts.Identifier;
+  // node.text on a name that starts with two underscores will return three instead.
+  if (callExprIdent.text !== '___decorate') {
+    return false;
+  }
+  if (callExpr.arguments.length !== 2) {
+    return false;
+  }
+  if (callExpr.arguments[1].kind !== ts.SyntaxKind.Identifier) {
+    return false;
+  }
+  const classArg = callExpr.arguments[1] as ts.Identifier;
+  if (classIdent.text !== classArg.text) {
+    return false;
+  }
+  if (callExpr.arguments[0].kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+    return false;
+  }
+
+  return true;
+}
+
+// Check if assignment is `Clazz.propDecorators = [...];`.
 function isPropDecoratorAssignmentExpression(exprStmt: ts.ExpressionStatement): boolean {
   if (exprStmt.expression.kind !== ts.SyntaxKind.BinaryExpression) {
     return false;
@@ -208,6 +253,7 @@ function isPropDecoratorAssignmentExpression(exprStmt: ts.ExpressionStatement): 
   return true;
 }
 
+// Check if assignment is `Clazz.ctorParameters = [...];`.
 function isCtorParamsAssignmentExpression(exprStmt: ts.ExpressionStatement): boolean {
   if (exprStmt.expression.kind !== ts.SyntaxKind.BinaryExpression) {
     return false;
@@ -243,6 +289,8 @@ function isCtorParamsWhitelistedService(exprStmt: ts.ExpressionStatement): boole
   return platformWhitelist.indexOf(serviceId.text) !== -1;
 }
 
+// Remove Angular decorators from`Clazz.decorators = [...];`, or expression itself if all are
+// removed.
 function pickDecorationNodesToRemove(
   exprStmt: ts.ExpressionStatement,
   ngMetadata: ts.Node[],
@@ -261,6 +309,38 @@ function pickDecorationNodesToRemove(
   return (elements.length > ngDecorators.length) ? ngDecorators : [exprStmt];
 }
 
+// Remove Angular decorators from `Clazz = __decorate([...], Clazz)`, or expression itself if all
+// are removed.
+function pickDecorateNodesToRemove(
+  exprStmt: ts.ExpressionStatement,
+  ngMetadata: ts.Node[],
+  checker: ts.TypeChecker,
+): ts.Node[] {
+
+  const expr = expect<ts.BinaryExpression>(exprStmt.expression, ts.SyntaxKind.BinaryExpression);
+  const callExpr = expect<ts.CallExpression>(expr.right, ts.SyntaxKind.CallExpression);
+  const arrLiteral = expect<ts.ArrayLiteralExpression>(callExpr.arguments[0],
+    ts.SyntaxKind.ArrayLiteralExpression);
+  if (!arrLiteral.elements.every((elem) => elem.kind === ts.SyntaxKind.CallExpression)) {
+    return [];
+  }
+  const elements = arrLiteral.elements as ts.NodeArray<ts.CallExpression>;
+  const ngDecoratorCalls = elements.filter((el) => {
+    if (el.expression.kind !== ts.SyntaxKind.Identifier) {
+      return false;
+    }
+    const id = el.expression as ts.Identifier;
+
+    return identifierIsMetadata(id, ngMetadata, checker);
+  });
+
+  // If all decorators are metadata decorators then return the whole `Class = __decorate([...])'`
+  // statement so that it is removed in entirety
+  return (elements.length === ngDecoratorCalls.length) ? [exprStmt] : ngDecoratorCalls;
+}
+
+// Remove Angular decorators from`Clazz.propDecorators = [...];`, or expression itself if all
+// are removed.
 function pickPropDecorationNodesToRemove(
   exprStmt: ts.ExpressionStatement,
   ngMetadata: ts.Node[],
