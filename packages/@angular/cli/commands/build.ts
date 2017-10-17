@@ -188,6 +188,14 @@ export const baseBuildCommandOptions: any = [
     default: 'none',
     description: 'Available on server platform only. Which external dependencies to bundle into '
                + 'the module. By default, all of node_modules will be kept as requires.'
+  },
+  {
+    name: 'service-worker',
+    type: Boolean,
+    default: true,
+    aliases: ['sw'],
+    description: 'Generates a service worker config for production builds, if the app has '
+               + 'service worker enabled.'
   }
 ];
 
