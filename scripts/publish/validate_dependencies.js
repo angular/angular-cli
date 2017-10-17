@@ -14,6 +14,7 @@ const REQUIRE_RE = /\brequire\('[^)]+?'\)/g;
 const IGNORE_RE = /\s+@ignoreDep\s+\S+/g;
 const NODE_PACKAGES = [
   'child_process',
+  'crypto',
   'fs',
   'https',
   'os',

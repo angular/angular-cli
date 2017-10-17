@@ -8,6 +8,7 @@ import { NgCliWebpackConfig } from '../models/webpack-config';
 import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { CliConfig } from '../models/config';
 import { statsToString, statsWarningsToString, statsErrorsToString } from '../utilities/stats';
+import { augmentAppWithServiceWorker, usesServiceWorker } from '../utilities/service-worker';
 
 const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
@@ -69,7 +70,15 @@ export default Task.extend({
         if (stats.hasErrors()) {
           reject();
         } else {
-          resolve();
+          if (!!app.serviceWorker && runTaskOptions.target === 'production' &&
+              usesServiceWorker(this.project.root) && runTaskOptions.serviceWorker !== false) {
+            const appRoot = path.resolve(this.project.root, app.root);
+            augmentAppWithServiceWorker(this.project.root, appRoot, path.resolve(outputPath),
+                runTaskOptions.baseHref || '/')
+              .then(() => resolve(), (err: any) => reject(err));
+          } else {
+            resolve();
+          }
         }
       };
 
