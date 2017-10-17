@@ -1,3 +1,4 @@
+import { AngularCompilerPlugin } from '@ngtools/webpack';
 import { readTsconfig } from '../utilities/read-tsconfig';
 const webpackMerge = require('webpack-merge');
 import { CliConfig } from './config';
@@ -94,7 +95,8 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
         sourcemaps: true,
         extractCss: false,
         namedChunks: true,
-        aot: false
+        aot: false,
+        buildOptimizer: false
       },
       production: {
         environment: 'prod',
@@ -106,7 +108,14 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
       }
     };
 
-    return Object.assign({}, targetDefaults[buildOptions.target], buildOptions);
+    const merged = Object.assign({}, targetDefaults[buildOptions.target], buildOptions);
+
+    // Use Build Optimizer on prod AOT builds by default when AngularCompilerPlugin is supported.
+    const buildOptimizer = {
+      buildOptimizer: merged.aot && AngularCompilerPlugin.isSupported()
+    };
+
+    return Object.assign({}, buildOptimizer, merged);
   }
 
   // Fill in defaults from .angular-cli.json
