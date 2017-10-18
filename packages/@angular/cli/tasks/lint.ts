@@ -18,7 +18,6 @@ const Task = require('../ember-cli/lib/models/task');
 export interface CliLintConfig {
   files?: (string | string[]);
   project?: string;
-  projectOnly?: boolean;
   tslintConfig?: string;
   exclude?: (string | string[]);
 }
@@ -77,8 +76,7 @@ export default Task.extend({
         let lastDirectory;
         let configLoad;
         for (const file of files) {
-          // The linter retrieves the SourceFile TS node directly if a program is used
-          const fileContents = program ? undefined : getFileContents(file);
+          const contents = getFileContents(file, config, program);
 
           // Only check for a new tslint config if path changes
           const currentDirectory = path.dirname(file);
@@ -87,7 +85,7 @@ export default Task.extend({
             lastDirectory = currentDirectory;
           }
 
-          linter.lint(file, fileContents, configLoad.results);
+          linter.lint(file, contents, configLoad.results);
         }
 
         return linter.getResult();
@@ -173,11 +171,25 @@ function getFilesToLint(
   return programFiles;
 }
 
-function getFileContents(file: string): string {
+function getFileContents(
+  file: string,
+  config: CliLintConfig,
+  program?: ts.Program,
+): string | undefined {
+  // The linter retrieves the SourceFile TS node directly if a program is used
+  if (program) {
+    if (program.getSourceFile(file) == undefined) {
+      const message = `File '${file}' is not part of the TypeScript project '${config.project}'.`;
+      throw new SilentError(chalk.red(message));
+    }
+
+    return undefined;
+  }
+
   // NOTE: The tslint CLI checks for and excludes MPEG transport streams; this does not.
   try {
     return stripBom(fs.readFileSync(file, 'utf-8'));
   } catch (e) {
-    throw new SilentError(`Could not read file "${file}".`);
+    throw new SilentError(`Could not read file '${file}'.`);
   }
 }
