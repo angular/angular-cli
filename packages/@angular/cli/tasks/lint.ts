@@ -3,6 +3,7 @@
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as glob from 'glob';
+import { Minimatch } from 'minimatch';
 import * as path from 'path';
 import { satisfies } from 'semver';
 import * as ts from 'typescript';
@@ -17,6 +18,7 @@ const Task = require('../ember-cli/lib/models/task');
 export interface CliLintConfig {
   files?: (string | string[]);
   project?: string;
+  projectOnly?: boolean;
   tslintConfig?: string;
   exclude?: (string | string[]);
 }
@@ -137,34 +139,38 @@ export default Task.extend({
   }
 });
 
+function normalizeArrayOption<T>(option: T | Array<T>): Array<T> {
+  return Array.isArray(option) ? option : [option];
+}
+
 function getFilesToLint(
   program: ts.Program,
   lintConfig: CliLintConfig,
   linter: typeof tslint.Linter,
 ): string[] {
-  let files: string[] = [];
+  const providedFiles = lintConfig.files && normalizeArrayOption(lintConfig.files);
+  const ignore = lintConfig.exclude && normalizeArrayOption(lintConfig.exclude);
 
-  if (lintConfig.files) {
-    files = Array.isArray(lintConfig.files) ? lintConfig.files : [lintConfig.files];
-  } else if (program) {
-    files = linter.getFileNames(program);
+  if (providedFiles) {
+    return providedFiles
+      .map(file => glob.sync(file, { ignore, nodir: true }))
+      .reduce((prev, curr) => prev.concat(curr), []);
   }
 
-  let globOptions = {};
-
-  if (lintConfig.exclude) {
-    const excludePatterns = Array.isArray(lintConfig.exclude)
-      ? lintConfig.exclude
-      : [lintConfig.exclude];
-
-    globOptions = { ignore: excludePatterns, nodir: true };
+  if (!program) {
+    return [];
   }
 
-  files = files
-    .map((file: string) => glob.sync(file, globOptions))
-    .reduce((a: string[], b: string[]) => a.concat(b), []);
+  let programFiles = linter.getFileNames(program);
 
-  return files;
+  if (ignore && ignore.length > 0) {
+    const ignoreMatchers = ignore.map(pattern => new Minimatch(pattern));
+
+    programFiles = programFiles
+      .filter(file => !ignoreMatchers.some(matcher => matcher.match(file)));
+  }
+
+  return programFiles;
 }
 
 function getFileContents(file: string): string {

@@ -70,6 +70,7 @@
     "lodash": "^4.11.1",
     "magic-string": "^0.22.3",
     "memory-fs": "^0.4.1",
+    "minimatch": "^3.0.4",
     "node-modules-path": "^1.0.0",
     "nopt": "^4.0.1",
     "opn": "~5.1.0",
