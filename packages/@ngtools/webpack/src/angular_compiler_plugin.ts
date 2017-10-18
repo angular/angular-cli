@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { fork, ChildProcess } from 'child_process';
+import { fork, ForkOptions, ChildProcess } from 'child_process';
 import * as path from 'path';
 import * as ts from 'typescript';
 
@@ -458,7 +458,17 @@ export class AngularCompilerPlugin implements Tapable {
       ? './type_checker_bootstrap.js'
       : './type_checker.js';
 
-    this._typeCheckerProcess = fork(path.resolve(__dirname, typeCheckerFile));
+
+    const execArgv = process.execArgv.filter((arg) => {
+      // Remove debug args.
+      // Workaround for https://github.com/nodejs/node/issues/9435
+      const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
+      return !debugArgRegex.test(arg);
+    });
+
+    const forkOptions: ForkOptions = { execArgv };
+
+    this._typeCheckerProcess = fork(path.resolve(__dirname, typeCheckerFile), [], forkOptions);
     this._typeCheckerProcess.send(new InitMessage(this._compilerOptions, this._basePath,
       this._JitMode, this._tsFilenames));
 
