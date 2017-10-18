@@ -459,12 +459,25 @@ export class AngularCompilerPlugin implements Tapable {
       : './type_checker.js';
 
 
+    let hasMemoryFlag = false;
+    const memoryFlagRegex = /--max-old-space-size/;
+    const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
+
     const execArgv = process.execArgv.filter((arg) => {
+      // Check if memory is being set by parent process.
+      if (memoryFlagRegex.test(arg)) {
+        hasMemoryFlag = true;
+      }
+
       // Remove debug args.
       // Workaround for https://github.com/nodejs/node/issues/9435
-      const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
       return !debugArgRegex.test(arg);
     });
+
+    if (!hasMemoryFlag) {
+      // Force max 8gb ram.
+      execArgv.push('--max-old-space-size=8192');
+    }
 
     const forkOptions: ForkOptions = { execArgv };
 
