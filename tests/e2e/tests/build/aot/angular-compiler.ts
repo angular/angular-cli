@@ -1,6 +1,6 @@
 import { ng, silentNpm } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
-import { expectFileToMatch, rimraf, moveFile } from '../../../utils/fs';
+import { expectFileToMatch, rimraf, moveFile, expectFileToExist } from '../../../utils/fs';
 import { getGlobalVariable } from '../../../utils/env';
 import { expectToFail } from '../../../utils/utils';
 
@@ -13,6 +13,7 @@ export default function () {
     return Promise.resolve();
   }
 
+  // These tests should be moved to the default when we use ng5 in new projects.
   return Promise.resolve()
     .then(() => moveFile('node_modules', '../node_modules'))
     .then(() => updateJsonFile('package.json', packageJson => {
@@ -35,6 +36,11 @@ export default function () {
     .then(() => ng('build', '--aot'))
     .then(() => expectFileToMatch('dist/main.bundle.js',
       /bootstrapModuleFactory.*\/\* AppModuleNgFactory \*\//))
+
+    // Build optimizer should default to true on prod builds.
+    .then(() => ng('build', '--prod', '--output-hashing=none'))
+    .then(() => expectToFail(() => expectFileToExist('dist/vendor.js')))
+    .then(() => expectToFail(() => expectFileToMatch('dist/main.js', /\.decorators =/)))
 
     // tests for register_locale_data transformer
     .then(() => rimraf('dist'))
