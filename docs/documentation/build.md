@@ -81,6 +81,7 @@ Flag                | `--dev` | `--prod`
 `--sourcemaps`      | `true`  | `false`
 `--extract-css`     | `false` | `true`
 `--named-chunks`    | `true`  | `false`
+`--build-optimizer` | `false` | `true` with AOT and Angular 5
 
 `--extract-licenses` Extract all licenses in a separate file, in the case of production builds only.
 `--i18n-file` Localization file to use for i18n.
@@ -353,7 +354,7 @@ Note: service worker support is experimental and subject to change.
     <code>--build-optimizer</code>
   </p>
   <p>
-    (Experimental) Enables @angular-devkit/build-optimizer optimizations when using `--aot`.
+    Enables @angular-devkit/build-optimizer optimizations when using `--aot`.
   </p>
 </details>
 
