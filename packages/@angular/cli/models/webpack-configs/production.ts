@@ -13,6 +13,13 @@ import { readTsconfig } from '../../utilities/read-tsconfig';
 
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
+/**
+ * license-webpack-plugin has a peer dependency on webpack-sources, list it in a comment to
+ * let the dependency validator know it is used.
+ *
+ * require('webpack-sources')
+ */
+
 
 export function getProdConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
