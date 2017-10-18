@@ -9,6 +9,7 @@ import * as ts from 'typescript';
 // @ignoreDep tslint - used only for type information
 import * as tslint from 'tslint';
 import { requireProjectModule } from '../utilities/require-project-module';
+import { stripBom } from '../utilities/strip-bom';
 
 const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
@@ -167,14 +168,10 @@ function getFilesToLint(
 }
 
 function getFileContents(file: string): string {
-  let contents: string;
-
   // NOTE: The tslint CLI checks for and excludes MPEG transport streams; this does not.
   try {
-    contents = fs.readFileSync(file, 'utf8');
+    return stripBom(fs.readFileSync(file, 'utf-8'));
   } catch (e) {
     throw new SilentError(`Could not read file "${file}".`);
   }
-
-  return contents;
 }
