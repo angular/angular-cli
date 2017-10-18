@@ -52,4 +52,8 @@ export interface Schema {
      * Should create a minimal app.
      */
     minimal?: boolean;
+    /**
+     * Should install the @angular/service-worker.
+     */
+    serviceWorker?: boolean;
 }

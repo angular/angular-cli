@@ -79,6 +79,11 @@
       "description": "Should create a minimal app.",
       "type": "boolean",
       "default": false
+    },
+    "serviceWorker": {
+      "description": "Should install the @angular/service-worker.",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
