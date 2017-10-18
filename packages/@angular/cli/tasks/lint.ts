@@ -6,6 +6,8 @@ import * as glob from 'glob';
 import * as path from 'path';
 import { satisfies } from 'semver';
 import * as ts from 'typescript';
+// @ignoreDep tslint - used only for type information
+import * as tslint from 'tslint';
 import { requireProjectModule } from '../utilities/require-project-module';
 
 const SilentError = require('silent-error');
@@ -41,9 +43,9 @@ export default Task.extend({
       return Promise.resolve(0);
     }
 
-    const tslint = requireProjectModule(projectRoot, 'tslint');
-    const Linter = tslint.Linter;
-    const Configuration = tslint.Configuration;
+    const projectTslint = requireProjectModule(projectRoot, 'tslint') as typeof tslint;
+    const Linter = projectTslint.Linter;
+    const Configuration = projectTslint.Configuration;
 
     const result = lintConfigs
       .map((config) => {
@@ -69,9 +71,9 @@ export default Task.extend({
 
         const linter = new Linter(lintOptions, program);
 
-        let lastDirectory: string;
-        let configLoad: any;
-        files.forEach((file) => {
+        let lastDirectory;
+        let configLoad;
+        for (const file of files) {
           // The linter retrieves the SourceFile TS node directly if a program is used
           const fileContents = program ? undefined : getFileContents(file);
 
@@ -83,13 +85,13 @@ export default Task.extend({
           }
 
           linter.lint(file, fileContents, configLoad.results);
-        });
+        }
 
         return linter.getResult();
       })
       .reduce((total, current) => {
         const failures = current.failures
-          .filter((cf: any) => !total.failures.some((ef: any) => ef.equals(cf)));
+          .filter(cf => !total.failures.some(ef => ef.equals(cf)));
         total.failures = total.failures.concat(...failures);
 
         if (current.fixes) {
@@ -102,7 +104,7 @@ export default Task.extend({
       });
 
     if (!options.silent) {
-      const Formatter = tslint.findFormatter(options.format);
+      const Formatter = projectTslint.findFormatter(options.format);
       if (!Formatter) {
         throw new SilentError(chalk.red(`Invalid lint format "${options.format}".`));
       }
@@ -134,13 +136,17 @@ export default Task.extend({
   }
 });
 
-function getFilesToLint(program: ts.Program, lintConfig: CliLintConfig, Linter: any): string[] {
+function getFilesToLint(
+  program: ts.Program,
+  lintConfig: CliLintConfig,
+  linter: typeof tslint.Linter,
+): string[] {
   let files: string[] = [];
 
   if (lintConfig.files) {
     files = Array.isArray(lintConfig.files) ? lintConfig.files : [lintConfig.files];
   } else if (program) {
-    files = Linter.getFileNames(program);
+    files = linter.getFileNames(program);
   }
 
   let globOptions = {};
