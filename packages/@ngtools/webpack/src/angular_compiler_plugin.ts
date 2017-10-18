@@ -458,7 +458,6 @@ export class AngularCompilerPlugin implements Tapable {
       ? './type_checker_bootstrap.js'
       : './type_checker.js';
 
-
     let hasMemoryFlag = false;
     const memoryFlagRegex = /--max-old-space-size/;
     const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
@@ -490,9 +489,9 @@ export class AngularCompilerPlugin implements Tapable {
       treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
       process.exit();
     };
-    process.on('exit', killTypeCheckerProcess);
-    process.on('SIGINT', killTypeCheckerProcess);
-    process.on('uncaughtException', killTypeCheckerProcess);
+    process.once('exit', killTypeCheckerProcess);
+    process.once('SIGINT', killTypeCheckerProcess);
+    process.once('uncaughtException', killTypeCheckerProcess);
   }
 
   private _updateForkedTypeChecker(changedTsFiles: string[]) {
