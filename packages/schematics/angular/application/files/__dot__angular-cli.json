@@ -55,6 +55,9 @@
   },
   "defaults": {
     "styleExt": "<%= style %>",
+    "class": {
+      "spec": false
+    },
     "component": {<% if (minimal || inlineStyle) { %>
       "inlineStyle": true
     <% } %><% if (minimal || (inlineTemplate && inlineStyle)) { %>,<% } %><% if (minimal || inlineTemplate) { %>
@@ -63,9 +66,6 @@
       "spec": false
     <% } %>}<% if (minimal || skipTests) { %>,
     "directive": {
-      "spec": false
-    },
-    "class": {
       "spec": false
     },
     "guard": {
