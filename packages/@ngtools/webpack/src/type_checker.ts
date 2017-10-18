@@ -97,7 +97,6 @@ class TypeChecker {
       options: this._angularCompilerOptions,
       tsHost: compilerHost
     }) as CompilerHost & WebpackCompilerHost;
-    this._tsFilenames = [];
     timeEnd('TypeChecker.constructor');
   }
 
