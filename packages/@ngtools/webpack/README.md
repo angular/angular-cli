@@ -9,7 +9,7 @@ In your webpack config, add the following plugin and loader.
 Angular version 5 and up, use `AngularCompilerPlugin`:
 
 ```typescript
-import {AotPlugin} from '@ngtools/webpack'
+import {AngularCompilerPlugin} from '@ngtools/webpack'
 
 exports = { /* ... */
   module: {
