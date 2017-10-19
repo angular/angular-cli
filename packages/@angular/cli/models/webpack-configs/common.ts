@@ -190,7 +190,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           test: /\.(jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
           loader: 'url-loader',
           options: {
-            name: `[name]${hashFormat.file}`,
+            name: `[name]${hashFormat.file}.[ext]`,
             limit: 10000
           }
         }
