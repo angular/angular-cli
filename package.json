@@ -43,7 +43,7 @@
   "dependencies": {
     "@angular-devkit/build-optimizer": "~0.0.28",
     "@angular-devkit/schematics": "~0.0.34",
-    "@schematics/angular": "~0.0.46",
+    "@schematics/angular": "~0.0.48",
     "autoprefixer": "^6.5.3",
     "chalk": "^2.0.1",
     "circular-dependency-plugin": "^3.0.0",
