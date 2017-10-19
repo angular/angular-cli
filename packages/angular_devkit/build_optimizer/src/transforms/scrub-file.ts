@@ -8,9 +8,6 @@
 import * as ts from 'typescript';
 import { collectDeepNodes } from '../helpers/ast-utils';
 
-const tslibDecorateRe = /\btslib(?:_\d+)?\.__decorate\b/;
-const tslibRe = /\btslib(?:_\d+)?\b/;
-
 
 export function testScrubFile(content: string) {
   const markers = [
@@ -20,8 +17,7 @@ export function testScrubFile(content: string) {
     'ctorParameters',
   ];
 
-  return markers.some((marker) => content.indexOf(marker) !== -1)
-      || tslibDecorateRe.test(content);
+  return markers.some((marker) => content.indexOf(marker) !== -1);
 }
 
 // Don't remove `ctorParameters` from these.
@@ -59,6 +55,7 @@ export function getScrubFileTransformer(program: ts.Program): ts.TransformerFact
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
       const ngMetadata = findAngularMetadata(sf);
+      const tslibImports = findTslibImports(sf);
 
       const nodes: ts.Node[] = [];
       ts.forEachChild(sf, checkNodeForDecorators);
@@ -73,7 +70,7 @@ export function getScrubFileTransformer(program: ts.Program): ts.TransformerFact
         if (isDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickDecorationNodesToRemove(exprStmt, ngMetadata, checker));
         }
-        if (isDecorateAssignmentExpression(exprStmt)) {
+        if (isDecorateAssignmentExpression(exprStmt, tslibImports, checker)) {
           nodes.push(...pickDecorateNodesToRemove(exprStmt, ngMetadata, checker));
         }
         if (isPropDecoratorAssignmentExpression(exprStmt)) {
@@ -193,7 +190,12 @@ function isDecoratorAssignmentExpression(exprStmt: ts.ExpressionStatement): bool
 }
 
 // Check if assignment is `Clazz = __decorate([...], Clazz)`.
-function isDecorateAssignmentExpression(exprStmt: ts.ExpressionStatement): boolean {
+function isDecorateAssignmentExpression(
+  exprStmt: ts.ExpressionStatement,
+  tslibIdentifiers: ts.NamespaceImport[],
+  checker: ts.TypeChecker,
+): boolean {
+
   if (exprStmt.expression.kind !== ts.SyntaxKind.BinaryExpression) {
     return false;
   }
@@ -206,27 +208,11 @@ function isDecorateAssignmentExpression(exprStmt: ts.ExpressionStatement): boole
   }
   const classIdent = expr.left as ts.Identifier;
   const callExpr = expr.right as ts.CallExpression;
-  let callExprIdent = callExpr.expression as ts.Identifier;
 
-  if (callExpr.expression.kind !== ts.SyntaxKind.Identifier) {
-    if (callExpr.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
-      const propAccess = callExpr.expression as ts.PropertyAccessExpression;
-      const left = propAccess.expression;
-      callExprIdent = propAccess.name;
-
-      if (!(left.kind === ts.SyntaxKind.Identifier && tslibRe.test((left as ts.Identifier).text))) {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  // node.text on a name that starts with two underscores will return three instead.
-  // Unless it's an expression like tslib.__decorate, in which case it's only 2.
-  if (callExprIdent.text !== '___decorate' && callExprIdent.text !== '__decorate') {
+  if (!isTslibHelper(callExpr, '__decorate', tslibIdentifiers, checker)) {
     return false;
   }
+
   if (callExpr.arguments.length !== 2) {
     return false;
   }
@@ -453,4 +439,87 @@ function identifierIsMetadata(
   return symbol
     .declarations
     .some((spec) => metadata.indexOf(spec) !== -1);
+}
+
+// Check if an import is a tslib helper import (`import * as tslib from "tslib";`)
+function isTslibImport(node: ts.ImportDeclaration): boolean {
+  return !!(node.moduleSpecifier &&
+    node.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral &&
+    (node.moduleSpecifier as ts.StringLiteral).text === 'tslib' &&
+    node.importClause &&
+    node.importClause.namedBindings &&
+    node.importClause.namedBindings.kind === ts.SyntaxKind.NamespaceImport);
+}
+
+// Find all namespace imports for `tslib`.
+function findTslibImports(node: ts.Node): ts.NamespaceImport[] {
+  const imports: ts.NamespaceImport[] = [];
+  ts.forEachChild(node, (child) => {
+    if (child.kind === ts.SyntaxKind.ImportDeclaration) {
+      const importDecl = child as ts.ImportDeclaration;
+      if (isTslibImport(importDecl)) {
+        const importClause = importDecl.importClause as ts.ImportClause;
+        const namespaceImport = importClause.namedBindings as ts.NamespaceImport;
+        imports.push(namespaceImport);
+      }
+    }
+  });
+
+  return imports;
+}
+
+// Check if an identifier is part of the known tslib identifiers.
+function identifierIsTslib(
+  id: ts.Identifier,
+  tslibImports: ts.NamespaceImport[],
+  checker: ts.TypeChecker,
+): boolean {
+  const symbol = checker.getSymbolAtLocation(id);
+  if (!symbol || !symbol.declarations || !symbol.declarations.length) {
+    return false;
+  }
+
+  return symbol
+    .declarations
+    .some((spec) => tslibImports.indexOf(spec as ts.NamespaceImport) !== -1);
+}
+
+// Check if a function call is a tslib helper.
+function isTslibHelper(
+  callExpr: ts.CallExpression,
+  helper: string,
+  tslibImports: ts.NamespaceImport[],
+  checker: ts.TypeChecker,
+) {
+
+  let callExprIdent = callExpr.expression as ts.Identifier;
+
+  if (callExpr.expression.kind !== ts.SyntaxKind.Identifier) {
+    if (callExpr.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
+      const propAccess = callExpr.expression as ts.PropertyAccessExpression;
+      const left = propAccess.expression;
+      callExprIdent = propAccess.name;
+
+      if (left.kind !== ts.SyntaxKind.Identifier) {
+        return false;
+      }
+
+      const id = left as ts.Identifier;
+
+      if (!identifierIsTslib(id, tslibImports, checker)) {
+        return false;
+      }
+
+    } else {
+      return false;
+    }
+  }
+
+  // node.text on a name that starts with two underscores will return three instead.
+  // Unless it's an expression like tslib.__decorate, in which case it's only 2.
+  if (callExprIdent.text !== `_${helper}` && callExprIdent.text !== helper) {
+    return false;
+  }
+
+  return true;
 }

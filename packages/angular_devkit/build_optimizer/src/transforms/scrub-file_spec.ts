@@ -143,6 +143,8 @@ describe('scrub-file', () => {
 
     it('recognizes tslib as well', () => {
       const input = tags.stripIndent`
+        import * as tslib from "tslib";
+        import * as tslib_2 from "tslib";
         import { Component } from '@angular/core';
         import { NotComponent } from 'another-lib';
         var Clazz = (function () {
@@ -172,6 +174,8 @@ describe('scrub-file', () => {
         }());
       `;
       const output = tags.stripIndent`
+        import * as tslib from "tslib";
+        import * as tslib_2 from "tslib";
         import { Component } from '@angular/core';
         import { NotComponent } from 'another-lib';
         var Clazz = (function () {
