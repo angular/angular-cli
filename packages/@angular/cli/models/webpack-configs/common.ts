@@ -5,13 +5,13 @@ import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-we
 import { InsertConcatAssetsWebpackPlugin } from '../../plugins/insert-concat-assets-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
+import { requireProjectModule } from '../../utilities/require-project-module';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const ConcatPlugin = require('webpack-concat-plugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const SilentError = require('silent-error');
-
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -159,11 +159,21 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // Read the tsconfig to determine if we should prefer ES2015 modules.
 
+  // Load rxjs path aliases.
+  // https://github.com/ReactiveX/rxjs/blob/master/doc/lettable-operators.md#build-and-treeshaking
+  let alias = {};
+  try {
+    const rxjsPathMappingImport = 'rxjs/_esm5/path-mapping';
+    const rxPaths = requireProjectModule(projectRoot, rxjsPathMappingImport);
+    alias = rxPaths(nodeModules);
+  } catch (e) { }
+
   return {
     resolve: {
       extensions: ['.ts', '.js'],
       modules: ['node_modules', nodeModules],
-      symlinks: !buildOptions.preserveSymlinks
+      symlinks: !buildOptions.preserveSymlinks,
+      alias
     },
     resolveLoader: {
       modules: [nodeModules, 'node_modules']
