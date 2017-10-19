@@ -37,13 +37,21 @@ Angular decorators, property decorators and constructor parameters are removed, 
 ```typescript
 // input
 import { Injectable, Input, Component } from '@angular/core';
-import { NotInjectable, NotComponent } from 'another-lib';
+import { NotInjectable, NotComponent, NotInput } from 'another-lib';
 var Clazz = (function () { function Clazz() { } return Clazz; }());
 Clazz.decorators = [{ type: Injectable }, { type: NotInjectable }];
 Clazz.propDecorators = { 'ngIf': [{ type: Input }] };
 Clazz.ctorParameters = function () { return [{type: Injector}]; };
 var ComponentClazz = (function () {
   function ComponentClazz() { }
+  __decorate([
+    Input(),
+    __metadata("design:type", Object)
+  ], Clazz.prototype, "selected", void 0);
+  __decorate([
+    NotInput(),
+    __metadata("design:type", Object)
+  ], Clazz.prototype, "notSelected", void 0);
   ComponentClazz = __decorate([
     NotComponent(),
     Component({
@@ -62,6 +70,10 @@ var Clazz = (function () { function Clazz() { } return Clazz; }());
 Clazz.decorators = [{ type: NotInjectable }];
 var ComponentClazz = (function () {
   function ComponentClazz() { }
+  __decorate([
+    NotInput(),
+    __metadata("design:type", Object)
+  ], Clazz.prototype, "notSelected", void 0);
   ComponentClazz = __decorate([
     NotComponent()
   ], ComponentClazz);

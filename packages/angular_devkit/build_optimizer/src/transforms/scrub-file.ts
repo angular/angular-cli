@@ -73,6 +73,9 @@ export function getScrubFileTransformer(program: ts.Program): ts.TransformerFact
         if (isDecorateAssignmentExpression(exprStmt, tslibImports, checker)) {
           nodes.push(...pickDecorateNodesToRemove(exprStmt, ngMetadata, checker));
         }
+        if (isAngularDecoratorMetadataExpression(exprStmt, ngMetadata, tslibImports, checker)) {
+          nodes.push(node);
+        }
         if (isPropDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickPropDecorationNodesToRemove(exprStmt, ngMetadata, checker));
         }
@@ -224,6 +227,52 @@ function isDecorateAssignmentExpression(
     return false;
   }
   if (callExpr.arguments[0].kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+    return false;
+  }
+
+  return true;
+}
+
+// Check if expression is `__decorate([smt, __metadata("design:type", Object)], ...)`.
+function isAngularDecoratorMetadataExpression(
+  exprStmt: ts.ExpressionStatement,
+  ngMetadata: ts.Node[],
+  tslibIdentifiers: ts.NamespaceImport[],
+  checker: ts.TypeChecker,
+): boolean {
+
+  if (exprStmt.expression.kind !== ts.SyntaxKind.CallExpression) {
+    return false;
+  }
+  const callExpr = exprStmt.expression as ts.CallExpression;
+  if (!isTslibHelper(callExpr, '__decorate', tslibIdentifiers, checker)) {
+    return false;
+  }
+  if (callExpr.arguments.length !== 4) {
+    return false;
+  }
+  if (callExpr.arguments[0].kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+    return false;
+  }
+  const decorateArray = callExpr.arguments[0] as ts.ArrayLiteralExpression;
+  // Check first array entry for Angular decorators.
+  if (decorateArray.elements[0].kind !== ts.SyntaxKind.CallExpression) {
+    return false;
+  }
+  const decoratorCall = decorateArray.elements[0] as ts.CallExpression;
+  if (decoratorCall.expression.kind !== ts.SyntaxKind.Identifier) {
+    return false;
+  }
+  const decoratorId = decoratorCall.expression as ts.Identifier;
+  if (!identifierIsMetadata(decoratorId, ngMetadata, checker)) {
+    return false;
+  }
+  // Check second array entry for __metadata call.
+  if (decorateArray.elements[1].kind !== ts.SyntaxKind.CallExpression) {
+    return false;
+  }
+  const metadataCall = decorateArray.elements[1] as ts.CallExpression;
+  if (!isTslibHelper(metadataCall, '__metadata', tslibIdentifiers, checker)) {
     return false;
   }
 

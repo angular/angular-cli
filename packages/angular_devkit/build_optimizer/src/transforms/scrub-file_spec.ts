@@ -200,6 +200,123 @@ describe('scrub-file', () => {
     });
   });
 
+  describe('__metadata', () => {
+    it('removes Angular decorators metadata', () => {
+      const output = tags.stripIndent`
+        import { Input, Output, EventEmitter, HostListener } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() {
+            this.change = new EventEmitter();
+          }
+          return Clazz;
+        }());
+      `;
+      const input = tags.stripIndent`
+        import { Input, Output, EventEmitter, HostListener } from '@angular/core';
+        import { NotInput } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() {
+            this.change = new EventEmitter();
+          }
+          __decorate([
+            Input(),
+            __metadata("design:type", Object)
+          ], Clazz.prototype, "selected", void 0);
+          __decorate([
+              Output(),
+              __metadata("design:type", Object)
+          ], Clazz.prototype, "change", void 0);
+          __decorate([
+            HostListener('document:keydown.escape'),
+            __metadata("design:type", Function),
+            __metadata("design:paramtypes", []),
+            __metadata("design:returntype", void 0)
+          ], Clazz.prototype, "onKeyDown", null);
+          return Clazz;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('removes only Angular decorator metadata', () => {
+      const output = tags.stripIndent`
+        import { Input } from '@angular/core';
+        import { NotInput } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() { }
+          __decorate([
+            NotInput(),
+            __metadata("design:type", Object)
+          ], Clazz.prototype, "other", void 0);
+          return Clazz;
+        }());
+      `;
+      const input = tags.stripIndent`
+        import { Input } from '@angular/core';
+        import { NotInput } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() { }
+          __decorate([
+            Input(),
+            __metadata("design:type", Object)
+          ], Clazz.prototype, "selected", void 0);
+          __decorate([
+            NotInput(),
+            __metadata("design:type", Object)
+          ], Clazz.prototype, "other", void 0);
+          return Clazz;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('recognizes tslib as well', () => {
+      const input = tags.stripIndent`
+        import * as tslib from "tslib";
+        import * as tslib_2 from "tslib";
+        import { Input } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          tslib.__decorate([
+            Input(),
+            tslib.__metadata("design:type", Object)
+          ], Clazz.prototype, "selected", void 0);
+          return Clazz;
+        }());
+
+        var Clazz2 = (function () {
+          function Clazz2() { }
+          tslib_2.__decorate([
+            Input(),
+            tslib_2.__metadata("design:type", Object)
+          ], Clazz.prototype, "selected", void 0);
+          return Clazz2;
+        }());
+      `;
+      const output = tags.stripIndent`
+        import * as tslib from "tslib";
+        import * as tslib_2 from "tslib";
+        import { Input } from '@angular/core';
+        var Clazz = (function () {
+          function Clazz() { }
+          return Clazz;
+        }());
+
+        var Clazz2 = (function () {
+          function Clazz2() { }
+          return Clazz2;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+  });
+
   describe('propDecorators', () => {
     it('removes top-level Angular propDecorators', () => {
       const output = tags.stripIndent`

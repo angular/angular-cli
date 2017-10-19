@@ -37,6 +37,10 @@ describe('build-optimizer', () => {
         Clazz.ctorParameters = function () { return [{type: Injector}]; };
         var ComponentClazz = (function () {
           function ComponentClazz() { }
+          __decorate([
+            Input(),
+            __metadata("design:type", Object)
+          ], Clazz.prototype, "selected", void 0);
           ComponentClazz = __decorate([
             Component({
               selector: 'app-root',
