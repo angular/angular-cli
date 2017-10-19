@@ -217,4 +217,65 @@ describe('prefix-classes', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
+  it('fixes the RxJS use case (issue #214)', () => {
+    const input = `
+      var ExtendedClass = /*@__PURE__*/ (/*@__PURE__*/ function (_super) {
+        __extends(ExtendedClass, _super);
+        function ExtendedClass() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return ExtendedClass;
+      }(StaticTestCase));
+
+      /**
+       * We need this JSDoc comment for affecting ESDoc.
+       * @ignore
+       * @extends {Ignored}
+       */
+      var zip_ZipSubscriber = /*@__PURE__*/ (/*@__PURE__*/ function (_super) {
+          zip___extends(ZipSubscriber, _super);
+          function ZipSubscriber(destination, project, values) {
+              if (values === void 0) {
+                  values = Object.create(null);
+              }
+              _super.call(this, destination);
+              this.iterators = [];
+              this.active = 0;
+              this.project = (typeof project === 'function') ? project : null;
+              this.values = values;
+          }
+          return ZipSubscriber;
+      }(Subscriber));
+    `;
+    const output = `
+      var ExtendedClass = /*@__PURE__*/ (function (_super) {
+        __extends(ExtendedClass, _super);
+        function ExtendedClass() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return ExtendedClass;
+      }(StaticTestCase));
+
+      /**
+       * We need this JSDoc comment for affecting ESDoc.
+       * @ignore
+       * @extends {Ignored}
+       */
+      var zip_ZipSubscriber = /*@__PURE__*/ (function (_super) {
+          zip___extends(ZipSubscriber, _super);
+          function ZipSubscriber(destination, project, values) {
+              if (values === void 0) {
+                  values = Object.create(null);
+              }
+              _super.call(this, destination);
+              this.iterators = [];
+              this.active = 0;
+              this.project = (typeof project === 'function') ? project : null;
+              this.values = values;
+          }
+          return ZipSubscriber;
+      }(Subscriber));
+    `;
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
 });

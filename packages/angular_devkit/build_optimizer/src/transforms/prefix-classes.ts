@@ -5,22 +5,37 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { satisfies } from 'semver';
 import * as ts from 'typescript';
 
 
 export function testPrefixClasses(content: string) {
+  const exportVarSetter = /(?:export )?(?:var|const)\s+(\S+)\s*=\s*/;
+  const multiLineComment = /\s*(?:\/\*[\s\S]*?\*\/)?\s*/;
+  const newLine = /\s*\r?\n\s*/;
+
   const regexes = [
-    // tslint:disable-next-line:max-line-length
-    /^(?:export )?(var (\S+) = )(?:\/\*\* @class \*\/ )?(\(function \(\) \{\r?\n(?:\s+(?:\/\*\*| \*|\*\/|\/\/)[^\r?\n]*\r?\n)*\s+function \2\([^\)]*\) \{\r?\n)/,
-    /^(?:export )?(var (\S+) = )(?:\/\*\* @class \*\/ )?(\(function \(_super\) \{\r?\n\s+\w*__extends\(\w+, _super\);\r?\n)/,
-  ];
+    [
+      /^/,
+      exportVarSetter, multiLineComment,
+      /\(/, multiLineComment,
+      /\s*function \(\) {/, newLine,
+      multiLineComment,
+      /function \1\([^\)]*\) \{/, newLine,
+    ],
+    [
+      /^/,
+      exportVarSetter, multiLineComment,
+      /\(/, multiLineComment,
+      /\s*function \(_super\) {/, newLine,
+      /\w*__extends\(\w+, _super\);/,
+    ],
+  ].map(arr => new RegExp(arr.map(x => x.source).join(''), 'm'));
 
   return regexes.some((regex) => regex.test(content));
 }
 
 const superParameterName = '_super';
-const extendsHelperName = (satisfies(ts.version, '< 2.5') ? '_' : '') + '__extends';
+const extendsHelperName = '__extends';
 
 export function getPrefixClassesTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
@@ -218,7 +233,7 @@ function isDownleveledClass(node: ts.Node): boolean {
   const extendCallExpression = firstStatement.expression;
 
   if (!isIdentifier(extendCallExpression.expression)
-      || extendCallExpression.expression.text !== extendsHelperName) {
+      || !extendCallExpression.expression.text.endsWith(extendsHelperName)) {
     return false;
   }
 
@@ -236,6 +251,6 @@ function isDownleveledClass(node: ts.Node): boolean {
 
   return isFunctionDeclaration(secondStatement)
          && secondStatement.name !== undefined
-         && secondStatement.name.text === className
+         && className.endsWith(secondStatement.name.text)
          && returnStatement.expression.text === secondStatement.name.text;
 }
