@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Software Development Kit for Angular",
   "bin": {
+    "build-optimizer": "./bin/build-optimizer",
     "devkit-admin": "./bin/devkit-admin",
+    "purify": "./bin/purify",
     "schematics": "./bin/schematics"
   },
   "keywords": [
