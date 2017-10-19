@@ -9,7 +9,6 @@ import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
-import { readTsconfig } from '../../utilities/read-tsconfig';
 
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
@@ -121,11 +120,8 @@ export function getProdConfig(wco: WebpackConfigOptions) {
     uglifyCompressOptions.passes = 3;
   }
 
-  // Read the tsconfig to determine if we should apply ES6 uglify.
-  const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
-  const tsConfig = readTsconfig(tsconfigPath);
-  const supportES2015 = tsConfig.options.target !== ts.ScriptTarget.ES3
-    && tsConfig.options.target !== ts.ScriptTarget.ES5;
+  const supportES2015 = wco.tsConfig.options.target !== ts.ScriptTarget.ES3
+    && wco.tsConfig.options.target !== ts.ScriptTarget.ES5;
 
   if (supportES2015) {
     extraPlugins.push(new UglifyJSPlugin({

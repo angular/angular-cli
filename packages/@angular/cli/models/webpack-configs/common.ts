@@ -157,8 +157,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new NamedLazyChunksWebpackPlugin());
   }
 
-  // Read the tsconfig to determine if we should prefer ES2015 modules.
-
   return {
     resolve: {
       extensions: ['.ts', '.js'],
