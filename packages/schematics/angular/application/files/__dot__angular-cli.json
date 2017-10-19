@@ -54,15 +54,13 @@
     }
   },
   "defaults": {
-    "styleExt": "<%= style %>",
+    "styleExt": "<%= style %>",<% if (minimal || skipTests) { %>
     "class": {
       "spec": false
-    },
+    },<% } %>
     "component": {<% if (minimal || inlineStyle) { %>
-      "inlineStyle": true
-    <% } %><% if (minimal || (inlineTemplate && inlineStyle)) { %>,<% } %><% if (minimal || inlineTemplate) { %>
-      "inlineTemplate": true
-    <% } %><% if (minimal || (skipTests && (inlineStyle || inlineTemplate))) { %>,<% } %><% if (minimal || skipTests) { %>
+      "inlineStyle": true<% } %><% if (minimal || (inlineTemplate && inlineStyle)) { %>,<% } %><% if (minimal || inlineTemplate) { %>
+      "inlineTemplate": true<% } %><% if (minimal || (skipTests && (inlineStyle || inlineTemplate))) { %>,<% } %><% if (minimal || skipTests) { %>
       "spec": false
     <% } %>}<% if (minimal || skipTests) { %>,
     "directive": {
