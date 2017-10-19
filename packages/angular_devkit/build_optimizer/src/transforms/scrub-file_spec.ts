@@ -108,6 +108,53 @@ describe('scrub-file', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
+    it('removes constructor parameter metadata in __decorate', () => {
+      const output = tags.stripIndent`
+        import { Component, ElementRef } from '@angular/core';
+        import { LibService } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() { }
+          return Clazz;
+        }());
+      `;
+      const input = tags.stripIndent`
+        import { Component, ElementRef } from '@angular/core';
+        import { LibService } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() { }
+          Clazz = __decorate([
+            Component({
+              selector: 'app-root',
+              templateUrl: './app.component.html',
+              styleUrls: ['./app.component.css']
+            }),
+            __metadata("design:paramtypes", [ElementRef, LibService])
+          ], Clazz);
+          return Clazz;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('doesn\t remove constructor parameter metadata for whitelisted classes', () => {
+      const input = tags.stripIndent`
+        import { ElementRef } from '@angular/core';
+        import { LibService } from 'another-lib';
+        var BrowserPlatformLocation = (function () {
+          function BrowserPlatformLocation() { }
+          BrowserPlatformLocation = __decorate([
+            __metadata("design:paramtypes", [ElementRef, LibService])
+          ], BrowserPlatformLocation);
+          return BrowserPlatformLocation;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${input}`);
+    });
+
     it('removes only Angular decorators calls in __decorate', () => {
       const output = tags.stripIndent`
         import { Component } from '@angular/core';

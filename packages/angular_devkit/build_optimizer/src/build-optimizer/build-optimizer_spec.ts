@@ -34,7 +34,7 @@ describe('build-optimizer', () => {
         ${staticProperty}
         ${decorators}
         Clazz.propDecorators = { 'ngIf': [{ type: Input }] };
-        Clazz.ctorParameters = function () { return [{type: Injector}]; };
+        Clazz.ctorParameters = function () { return [{type: Injectable}]; };
         var ComponentClazz = (function () {
           function ComponentClazz() { }
           __decorate([
@@ -46,7 +46,8 @@ describe('build-optimizer', () => {
               selector: 'app-root',
               templateUrl: './app.component.html',
               styleUrls: ['./app.component.css']
-            })
+            }),
+            __metadata("design:paramtypes", [Injectable])
           ], ComponentClazz);
           return ComponentClazz;
         }());
