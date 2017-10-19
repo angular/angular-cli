@@ -75,8 +75,8 @@
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
-      "version": "0.0.47",
-      "hash": "5a2e3404aa5a37285a20755dd236cb3f"
+      "version": "0.0.48",
+      "hash": "9b2d7a33eba317e8b5f57028d83950ca"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
