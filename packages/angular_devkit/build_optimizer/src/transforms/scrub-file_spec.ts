@@ -140,6 +140,60 @@ describe('scrub-file', () => {
       expect(testScrubFile(input)).toBeTruthy();
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
+
+    it('recognizes tslib as well', () => {
+      const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+        import { NotComponent } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() { }
+          Clazz = tslib.__decorate([
+            NotComponent(),
+            Component({
+              selector: 'app-root',
+              templateUrl: './app.component.html',
+              styleUrls: ['./app.component.css']
+            })
+          ], Clazz);
+          return Clazz;
+        }());
+
+        var Clazz2 = (function () {
+          function Clazz2() { }
+          Clazz2 = tslib_2.__decorate([
+            NotComponent(),
+            Component({
+              selector: 'app-root',
+              templateUrl: './app.component.html',
+              styleUrls: ['./app.component.css']
+            })
+          ], Clazz2);
+          return Clazz2;
+        }());
+      `;
+      const output = tags.stripIndent`
+        import { Component } from '@angular/core';
+        import { NotComponent } from 'another-lib';
+        var Clazz = (function () {
+          function Clazz() { }
+          Clazz = tslib.__decorate([
+            NotComponent()
+          ], Clazz);
+          return Clazz;
+        }());
+
+        var Clazz2 = (function () {
+          function Clazz2() { }
+          Clazz2 = tslib_2.__decorate([
+            NotComponent()
+          ], Clazz2);
+          return Clazz2;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
   });
 
   describe('propDecorators', () => {

@@ -8,6 +8,9 @@
 import * as ts from 'typescript';
 import { collectDeepNodes } from '../helpers/ast-utils';
 
+const tslibDecorateRe = /\btslib(?:_\d+)?\.__decorate\b/;
+const tslibRe = /\btslib(?:_\d+)?\b/;
+
 
 export function testScrubFile(content: string) {
   const markers = [
@@ -17,7 +20,8 @@ export function testScrubFile(content: string) {
     'ctorParameters',
   ];
 
-  return markers.some((marker) => content.indexOf(marker) !== -1);
+  return markers.some((marker) => content.indexOf(marker) !== -1)
+      || tslibDecorateRe.test(content);
 }
 
 // Don't remove `ctorParameters` from these.
@@ -202,12 +206,25 @@ function isDecorateAssignmentExpression(exprStmt: ts.ExpressionStatement): boole
   }
   const classIdent = expr.left as ts.Identifier;
   const callExpr = expr.right as ts.CallExpression;
+  let callExprIdent = callExpr.expression as ts.Identifier;
+
   if (callExpr.expression.kind !== ts.SyntaxKind.Identifier) {
-    return false;
+    if (callExpr.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
+      const propAccess = callExpr.expression as ts.PropertyAccessExpression;
+      const left = propAccess.expression;
+      callExprIdent = propAccess.name;
+
+      if (!(left.kind === ts.SyntaxKind.Identifier && tslibRe.test((left as ts.Identifier).text))) {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
-  const callExprIdent = callExpr.expression as ts.Identifier;
+
   // node.text on a name that starts with two underscores will return three instead.
-  if (callExprIdent.text !== '___decorate') {
+  // Unless it's an expression like tslib.__decorate, in which case it's only 2.
+  if (callExprIdent.text !== '___decorate' && callExprIdent.text !== '__decorate') {
     return false;
   }
   if (callExpr.arguments.length !== 2) {
