@@ -102,7 +102,7 @@ export interface CreateCompilerHostInterface {
   }): CompilerHost;
 }
 export interface FormatDiagnosticsInterface {
-  (options: CompilerOptions, diags: Diagnostics): string;
+  (diags: Diagnostics): string;
 }
 
 // Manually check for Compiler CLI availability and supported version.

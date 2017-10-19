@@ -760,12 +760,12 @@ export class AngularCompilerPlugin implements Tapable {
             .filter((diag) => diag.category === ts.DiagnosticCategory.Warning);
 
           if (errors.length > 0) {
-            const message = formatDiagnostics(this._angularCompilerOptions, errors);
+            const message = formatDiagnostics(errors);
             this._compilation.errors.push(message);
           }
 
           if (warnings.length > 0) {
-            const message = formatDiagnostics(this._angularCompilerOptions, warnings);
+            const message = formatDiagnostics(warnings);
             this._compilation.warnings.push(message);
           }
 
