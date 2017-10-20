@@ -4,9 +4,6 @@
     "outDir": "../../dist/common",
     "rootDir": "./"
   },
-  "angularCompilerOptions": {
-    "skipTemplateCodegen": true
-  },
   "files": [
     "index.ts"
   ]

@@ -1,10 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/hapi-engine"
-  },
-  "angularCompilerOptions": {
-    "skipTemplateCodegen": true
+    "outDir": "../../dist/hapi-engine",
+    "rootDir": "./"
   },
   "files": [
     "index.ts"

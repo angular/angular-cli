@@ -1,10 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/module-map-ngfactory-loader"
-  },
-  "angularCompilerOptions": {
-    "skipTemplateCodegen": true
+    "outDir": "../../dist/module-map-ngfactory-loader",
+    "rootDir": "./"
   },
   "files": [
     "index.ts"
