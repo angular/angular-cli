@@ -312,7 +312,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {  server: './server.ts' },
-  resolve: { extensions: ['.ts', '.js'] },
+  resolve: { extensions: ['.js', '.ts'] },
   target: 'node',
   // this makes sure we include node_modules and other 3rd party libraries
   externals: [/(node_modules|main\..*\.js)/],
@@ -336,6 +336,7 @@ module.exports = {
     new webpack.ContextReplacementPlugin(
       /(.+)?express(\\|\/)(.+)?/,
       path.join(__dirname, 'src'),
+      {}
     )
   ]
 }
