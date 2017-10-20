@@ -41,10 +41,11 @@ import {
   CompilerHost,
   Diagnostics,
   CustomTransformers,
+  EmitFlags,
+  LazyRoute,
   createProgram,
   createCompilerHost,
   formatDiagnostics,
-  EmitFlags,
 } from './ngtools_api';
 import { findAstNodes } from './transformers/ast_helpers';
 
@@ -87,7 +88,7 @@ export class AngularCompilerPlugin implements Tapable {
   private _compilerOptions: ts.CompilerOptions;
   private _angularCompilerOptions: CompilerOptions;
   private _tsFilenames: string[];
-  private _program: ts.Program | Program;
+  private _program: (ts.Program | Program);
   private _compilerHost: WebpackCompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _angularCompilerHost: WebpackCompilerHost & CompilerHost;
@@ -110,6 +111,14 @@ export class AngularCompilerPlugin implements Tapable {
   // TypeChecker process.
   private _forkTypeChecker = true;
   private _typeCheckerProcess: ChildProcess;
+
+  private get _ngCompilerSupportsNewApi() {
+    if (this._JitMode) {
+      return false;
+    } else {
+      return !!(this._program as Program).listLazyRoutes;
+    }
+  }
 
   constructor(options: AngularCompilerPluginOptions) {
     CompilerCliIsSupported();
@@ -364,8 +373,10 @@ export class AngularCompilerPlugin implements Tapable {
       timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
 
       time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
-      return this._program.loadNgStructureAsync().then(() =>
-        timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync'));
+      return this._program.loadNgStructureAsync()
+        .then(() => {
+          timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+        });
     }
   }
 
@@ -407,6 +418,32 @@ export class AngularCompilerPlugin implements Tapable {
     }
     timeEnd('AngularCompilerPlugin._findLazyRoutesInAst');
     return result;
+  }
+
+  private _listLazyRoutesFromProgram(): LazyRouteMap {
+    const ngProgram = this._program as Program;
+    if (!ngProgram.listLazyRoutes) {
+      throw new Error('_listLazyRoutesFromProgram was called with an old program.');
+    }
+
+    const lazyRoutes = ngProgram.listLazyRoutes();
+
+    return lazyRoutes.reduce(
+      (acc: LazyRouteMap, curr: LazyRoute) => {
+        const ref = curr.route;
+        if (ref in acc && acc[ref] !== curr.referencedModule.filePath) {
+          throw new Error(
+            + `Duplicated path in loadChildren detected: "${ref}" is used in 2 loadChildren, `
+            + `but they point to different modules "(${acc[ref]} and `
+            + `"${curr.referencedModule.filePath}"). Webpack cannot distinguish on context and `
+            + 'would fail to load the proper one.'
+          );
+        }
+        acc[ref] = curr.referencedModule.filePath;
+        return acc;
+      },
+      {} as LazyRouteMap
+    );
   }
 
   // Process the lazy routes discovered, adding then to _lazyRoutes.
@@ -666,6 +703,10 @@ export class AngularCompilerPlugin implements Tapable {
 
     return Promise.resolve()
       .then(() => {
+        if (this._ngCompilerSupportsNewApi) {
+          return;
+        }
+
         // Try to find lazy routes.
         // We need to run the `listLazyRoutes` the first time because it also navigates libraries
         // and other things that we might miss using the (faster) findLazyRoutesInAst.
@@ -682,6 +723,12 @@ export class AngularCompilerPlugin implements Tapable {
         // Make a new program and load the Angular structure if there are changes.
         if (changedFiles.length > 0) {
           return this._createOrUpdateProgram();
+        }
+      })
+      .then(() => {
+        if (this._ngCompilerSupportsNewApi) {
+          // TODO: keep this when the new ngCompiler supports the new lazy routes API.
+          this._lazyRoutes = this._listLazyRoutesFromProgram();
         }
       })
       .then(() => {
