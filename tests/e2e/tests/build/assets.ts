@@ -30,10 +30,31 @@ export default function () {
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['assets'] = [
-        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../package-folder' }
+        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../temp' }
       ];
     }))
     .then(() => expectToFail(() => ng('build')))
+
+    // Set an exception for the invalid asset config in .angular-cli.json.
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+      const app = configJson['apps'][0];
+      app['assets'] = [
+        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../temp',
+          'allowOutsideOutDir': true }
+      ];
+    }))
+    .then(() => ng('build'))
+
+    // This asset should fail even with the exception above.
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+      const app = configJson['apps'][0];
+      app['assets'] = [
+        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../../temp',
+          'allowOutsideOutDir': true }
+      ];
+    }))
+    .then(() => expectToFail(() => ng('build')))
+
     // Add asset config in .angular-cli.json.
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];

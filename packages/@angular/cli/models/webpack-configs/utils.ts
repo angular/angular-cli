@@ -92,4 +92,5 @@ export interface AssetPattern {
   glob: string;
   input?: string;
   output?: string;
+  allowOutsideOutDir?: boolean;
 }
