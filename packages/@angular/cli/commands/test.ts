@@ -24,6 +24,7 @@ export interface TestOptions {
   environment?: string;
   app?: string;
   preserveSymlinks?: boolean;
+  forceTsCommonjs?: boolean;
 }
 
 
@@ -134,6 +135,13 @@ const TestCommand = Command.extend({
       // if not watching ensure karma is doing a single run
       commandOptions.singleRun = true;
     }
+
+    // Don't force commonjs for code coverage builds, some setups need es2015 for it.
+    // https://github.com/angular/angular-cli/issues/5526
+    if (!commandOptions.codeCoverage) {
+      commandOptions.forceTsCommonjs = true;
+    }
+
     return testTask.run(commandOptions);
   }
 });

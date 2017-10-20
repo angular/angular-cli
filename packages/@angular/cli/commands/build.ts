@@ -220,6 +220,11 @@ const BuildCommand = Command.extend({
       commandOptions.vendorChunk = !commandOptions.buildOptimizer;
     }
 
+    // Force commonjs module format for TS on dev watch builds.
+    if (commandOptions.target === 'development' && commandOptions.watch === true) {
+      commandOptions.forceTsCommonjs = true;
+    }
+
     const BuildTask = require('../tasks/build').default;
 
     const buildTask = new BuildTask({

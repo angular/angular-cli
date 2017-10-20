@@ -21,8 +21,15 @@ const webpackLoader: string = g['angularCliIsLocal']
 function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
   const { appConfig, projectRoot, buildOptions } = wco;
   options.compilerOptions = options.compilerOptions || {};
+
   if (wco.buildOptions.preserveSymlinks) {
     options.compilerOptions.preserveSymlinks = true;
+  }
+
+  // Forcing commonjs seems to drastically improve rebuild speeds on webpack.
+  // Dev builds on watch mode will set this option to true.
+  if (wco.buildOptions.forceTsCommonjs) {
+    options.compilerOptions.module = 'commonjs';
   }
 
   // Read the environment, and set it in the compiler host.
