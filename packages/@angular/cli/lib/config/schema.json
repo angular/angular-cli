@@ -72,6 +72,11 @@
                       "type": "string",
                       "default": "",
                       "description": "The output path (relative to the outDir)."
+                    },
+                    "allowOutsideOutDir": {
+                      "type": "boolean",
+                      "description": "Allow assets to be copied outside the outDir.",
+                      "default": false
                     }
                   },
                   "additionalProperties": false
