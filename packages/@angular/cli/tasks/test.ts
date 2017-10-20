@@ -44,6 +44,7 @@ export default Task.extend({
         poll: options.poll,
         environment: options.environment,
         preserveSymlinks: options.preserveSymlinks,
+        forceTsCommonjs: options.forceTsCommonjs,
         app: options.app
       };
 
