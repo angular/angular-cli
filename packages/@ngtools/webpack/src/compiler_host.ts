@@ -2,6 +2,8 @@ import * as ts from 'typescript';
 import {basename, dirname, join, sep} from 'path';
 import * as fs from 'fs';
 import {WebpackResourceLoader} from './resource_loader';
+import {TypeScriptFileRefactor} from './refactor';
+const MagicString = require('magic-string');
 
 
 export interface OnErrorFn {
@@ -11,6 +13,49 @@ export interface OnErrorFn {
 
 const dev = Math.floor(Math.random() * 10000);
 
+// partial copy of TypeScriptFileRefactor
+class InlineResourceRefactor {
+  private _sourceString: string;
+  private _changed = false;
+
+  constructor(content: string, private _sourceFile: ts.SourceFile) {
+    this._sourceString = new MagicString(content);
+  }
+
+  getResourcesNodes() {
+    return this.findAstNodes(this._sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
+      .map(node => this.findAstNodes(node, ts.SyntaxKind.PropertyAssignment))
+      .filter(node => !!node)
+      .reduce((prev, curr: ts.PropertyAssignment[]) => prev.concat(curr
+        .filter(node =>
+          node.name.kind == ts.SyntaxKind.Identifier ||
+          node.name.kind == ts.SyntaxKind.StringLiteral
+        )
+      ), [] ) as ts.PropertyAssignment[];
+  }
+
+  getResourceContentAndType(_content: string, defaultType: string) {
+    let type = defaultType;
+    const content = _content
+      .replace(/!(\w*)!/, (_, _type) => {
+        type = _type;
+        return '';
+      });
+    return {content, type};
+  }
+
+  get hasChanged() {
+    return this._changed;
+  }
+
+  getNewContent() {
+    return this._sourceString.toString();
+  }
+
+  findAstNodes = TypeScriptFileRefactor.prototype.findAstNodes;
+  replaceNode = TypeScriptFileRefactor.prototype.replaceNode;
+
+}
 
 export class VirtualStats implements fs.Stats {
   protected _ctime = new Date();
@@ -61,6 +106,8 @@ export class VirtualDirStats extends VirtualStats {
 
 export class VirtualFileStats extends VirtualStats {
   private _sourceFile: ts.SourceFile | null;
+  private _resources: string[] = [];
+
   constructor(_fileName: string, private _content: string) {
     super(_fileName);
   }
@@ -71,20 +118,18 @@ export class VirtualFileStats extends VirtualStats {
     this._mtime = new Date();
     this._sourceFile = null;
   }
-  setSourceFile(sourceFile: ts.SourceFile) {
+  set sourceFile(sourceFile: ts.SourceFile) {
     this._sourceFile = sourceFile;
   }
-  getSourceFile(languageVersion: ts.ScriptTarget, setParentNodes: boolean) {
-    if (!this._sourceFile) {
-      this._sourceFile = ts.createSourceFile(
-        this._path,
-        this._content,
-        languageVersion,
-        setParentNodes);
-    }
-
+  get sourceFile() {
     return this._sourceFile;
   }
+
+  addResource(resourcePath: string) {
+    this._resources.push(resourcePath);
+  }
+
+  get resources(){ return this._resources; }
 
   isFile() { return true; }
 
@@ -107,7 +152,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _cache = false;
   private _resourceLoader?: WebpackResourceLoader | undefined;
 
-  constructor(private _options: ts.CompilerOptions, basePath: string) {
+  constructor(private _options: ts.CompilerOptions, basePath: string,
+    private _defaultTemplateType = 'html', private _defaultStyleType = 'css') {
     this._setParentNodes = true;
     this._delegate = ts.createCompilerHost(this._options, this._setParentNodes);
     this._basePath = this._normalizePath(basePath);
@@ -128,7 +174,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     }
   }
 
-  private _setFileContent(fileName: string, content: string) {
+  private _setFileContent(fileName: string, content: string, resource?: boolean) {
     this._files[fileName] = new VirtualFileStats(fileName, content);
 
     let p = dirname(fileName);
@@ -138,7 +184,10 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       p = dirname(p);
     }
 
-    this._changedFiles[fileName] = true;
+    // only ts files are expected on getChangedFiles()
+    if (!resource) {
+      this._changedFiles[fileName] = true;
+    }
   }
 
   get dirty() {
@@ -165,15 +214,50 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   invalidate(fileName: string): void {
     fileName = this.resolve(fileName);
-    if (fileName in this._files) {
+    const file = this._files[fileName];
+    if (file != null) {
+      file.resources
+        .forEach(r => this.invalidate(r));
+
       this._files[fileName] = null;
-      this._changedFiles[fileName] = true;
+    }
+    if (fileName in this._changedFiles) {
+        this._changedFiles[fileName] = true;
+    }
+  }
+
+  /**
+   * Return the corresponding component path
+   * or undefined if path isn't considered a resource
+   */
+  private _getComponentPath(path: string) {
+    const match = path.match(
+      // match ngtemplate, ngstyles but not shim nor summaries
+      /(.*)\.(?:ngtemplate|(?:ngstyles[\d]*))(?!.*(?:shim.ngstyle.ts|ngsummary.json)$).*$/
+    );
+
+    if (match != null) {
+      return match[1] + '.ts';
     }
   }
 
   fileExists(fileName: string, delegate = true): boolean {
     fileName = this.resolve(fileName);
-    return this._files[fileName] != null || (delegate && this._delegate.fileExists(fileName));
+    if (this._files[fileName] != null) {
+      return true;
+    }
+
+    const componentPath = this._getComponentPath(fileName);
+    if (componentPath != null) {
+      return this._files[componentPath] == null &&
+        this._readResource(fileName, componentPath) != null;
+    } else {
+      if (delegate) {
+        return this._delegate.fileExists(fileName);
+      }
+    }
+
+    return false;
   }
 
   readFile(fileName: string): string {
@@ -181,15 +265,29 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
     const stats = this._files[fileName];
     if (stats == null) {
+      const componentPath = this._getComponentPath(fileName);
+      if (componentPath != null) {
+        return this._readResource(fileName, componentPath);
+      }
+
       const result = this._delegate.readFile(fileName);
       if (result !== undefined && this._cache) {
         this._setFileContent(fileName, result);
-        return result;
-      } else {
-        return result;
       }
+
+      return result;
     }
     return stats.content;
+  }
+
+  private _readResource(resourcePath: string, componentPath: string) {
+    // Trigger source file build which will create and cache associated resources
+    this.getSourceFile(componentPath);
+
+    const stats = this._files[resourcePath];
+    if (stats != null) {
+      return stats.content;
+    }
   }
 
   // Does not delegate, use with `fileExists/directoryExists()`.
@@ -228,24 +326,98 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     return delegated.concat(subdirs);
   }
 
-  getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, _onError?: OnErrorFn) {
+  private _buildSourceFile(fileName: string, content: string, languageVersion: ts.ScriptTarget) {
+    let sourceFile = ts.createSourceFile(fileName, content, languageVersion, this._setParentNodes);
+
+    const refactor = new InlineResourceRefactor(content, sourceFile);
+
+    const prefix = fileName.substring(0, fileName.lastIndexOf('.'));
+    const resources: string[] = [];
+
+    refactor.getResourcesNodes()
+      .forEach( (node: any) => {
+        const name = node.name.text;
+
+        if (name === 'template') {
+          const {content, type} = refactor.getResourceContentAndType(
+            node.initializer.text,
+            this._defaultTemplateType
+          );
+          const path = `${prefix}.ngtemplate.${type}`;
+
+          // always cache resources
+          this._setFileContent(path, content, true);
+          resources.push(path);
+
+          refactor.replaceNode(node, `templateUrl: './${basename(path)}'`);
+        } else {
+          if (name === 'styles') {
+            const arr = <ts.ArrayLiteralExpression[]>
+              refactor.findAstNodes(node, ts.SyntaxKind.ArrayLiteralExpression, false);
+
+            if (arr && arr.length > 0 && arr[0].elements.length > 0) {
+              const styles = arr[0].elements
+                .map( (element: any) => element.text)
+                .map( (_content, idx) => {
+                  const {content, type} = refactor.getResourceContentAndType(
+                    _content,
+                    this._defaultStyleType
+                  );
+
+                  return {path: `${prefix}.ngstyles${idx}.${type}`, content};
+                });
+
+              styles.forEach(({path, content}) => {
+                  // always cache resources
+                  this._setFileContent(path, content, true);
+                  resources.push(path);
+              });
+
+              const styleUrls = styles
+                .map( ({path}) => `'./${basename(path)}'`)
+                .join(',');
+
+              refactor.replaceNode(node, `styleUrls: [${styleUrls}]`);
+            }
+          }
+        }
+      });
+
+    if (refactor.hasChanged) {
+      sourceFile = ts.createSourceFile(
+        fileName, refactor.getNewContent(), languageVersion, this._setParentNodes
+      );
+    }
+
+    return {
+      sourceFile,
+      resources
+    };
+  }
+
+  getSourceFile(fileName: string, languageVersion = ts.ScriptTarget.Latest, _onError?: OnErrorFn) {
     fileName = this.resolve(fileName);
 
     const stats = this._files[fileName];
-    if (stats == null) {
-      const content = this.readFile(fileName);
-
-      if (!this._cache) {
-        return ts.createSourceFile(fileName, content, languageVersion, this._setParentNodes);
-      } else if (!this._files[fileName]) {
-        // If cache is turned on and the file exists, the readFile call will have populated stats.
-        // Empty stats at this point mean the file doesn't exist at and so we should return
-        // undefined.
-        return undefined;
-      }
+    if (stats != null && stats.sourceFile != null) {
+      return stats.sourceFile;
     }
 
-    return this._files[fileName]!.getSourceFile(languageVersion, this._setParentNodes);
+    const content = this.readFile(fileName);
+    if (!content) {
+      return;
+    }
+
+    const {sourceFile, resources} = this._buildSourceFile(fileName, content, languageVersion);
+
+    if (this._cache) {
+      const stats = this._files[fileName];
+      stats.sourceFile = sourceFile;
+
+      resources.forEach(r => stats.addResource(r));
+    }
+
+    return sourceFile;
   }
 
   getCancellationToken() {
@@ -288,6 +460,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     this._resourceLoader = resourceLoader;
   }
 
+  // this function and resourceLoader is pretty new and seem unusued so I ignored it for the moment.
   readResource(fileName: string) {
     if (this._resourceLoader) {
       const denormalizedFileName = fileName.replace(/\//g, sep);

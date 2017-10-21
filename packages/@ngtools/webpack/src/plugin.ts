@@ -36,6 +36,9 @@ export interface AotPluginOptions {
   locale?: string;
   missingTranslation?: string;
 
+  defaultTemplateType?: string;
+  defaultStyleType?: string;
+
   // Use tsconfig to include path globs.
   exclude?: string | string[];
   compilerOptions?: ts.CompilerOptions;
@@ -232,7 +235,12 @@ export class AotPlugin implements Tapable {
       this._skipCodeGeneration = options.skipCodeGeneration;
     }
 
-    this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
+    this._compilerHost = new WebpackCompilerHost(
+      this._compilerOptions,
+      this._basePath,
+      options.defaultTemplateType,
+      options.defaultStyleType
+    );
 
     // Override some files in the FileSystem.
     if (options.hostOverrideFileSystem) {

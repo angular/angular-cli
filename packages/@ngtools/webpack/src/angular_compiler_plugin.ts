@@ -69,6 +69,9 @@ export interface AngularCompilerPluginOptions {
   missingTranslation?: string;
   platform?: PLATFORM;
 
+  defaultTemplateType?: string;
+  defaultStyleType?: string;
+
   // Use tsconfig to include path globs.
   exclude?: string | string[];
   include?: string[];
@@ -278,7 +281,12 @@ export class AngularCompilerPlugin implements Tapable {
     }
 
     // Create the webpack compiler host.
-    this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
+    this._compilerHost = new WebpackCompilerHost(
+      this._compilerOptions,
+      this._basePath,
+      this._options.defaultTemplateType,
+      this._options.defaultStyleType
+    );
     this._compilerHost.enableCaching();
 
     // Create and set a new WebpackResourceLoader.
