@@ -14,6 +14,7 @@ export function testWrapEnums(content: string) {
     // tslint:disable:max-line-length
     /var (\S+) = \{\};\r?\n(\1\.(\S+) = \d+;\r?\n)+\1\[\1\.(\S+)\] = "\4";\r?\n(\1\[\1\.(\S+)\] = "\S+";\r?\n*)+/,
     /var (\S+);(\/\*@__PURE__\*\/)*\r?\n\(function \(\1\) \{\s+(\1\[\1\["(\S+)"\] = 0\] = "\4";(\s+\1\[\1\["\S+"\] = \d\] = "\S+";)*\r?\n)\}\)\(\1 \|\| \(\1 = \{\}\)\);/,
+    /\/\*\* @enum \{\w+\} \*\//,
   // tslint:enable:max-line-length
   ];
 
@@ -122,6 +123,7 @@ function visitBlockStatements(
               name,
               currentStatement,
               enumStatements,
+              undefined,
             ));
             // skip IIFE statement
             oIndex++;
@@ -141,13 +143,34 @@ function visitBlockStatements(
               name,
               currentStatement,
               enumStatements,
+              variableDeclaration.initializer,
+            ));
+            // skip enum member declarations
+            oIndex += enumStatements.length;
+            continue;
+          }
+        } else if (isObjectLiteralExpression(variableDeclaration.initializer)
+          && variableDeclaration.initializer.properties.length !== 0) {
+          const literalPropertyCount = variableDeclaration.initializer.properties.length;
+          const nextStatements = statements.slice(oIndex + 1);
+          const enumStatements = findTsickleEnumStatements(name, nextStatements);
+          if (enumStatements.length === literalPropertyCount) {
+            // found an enum
+            if (!updatedStatements) {
+              updatedStatements = statements.slice();
+            }
+            // create wrapper and replace variable statement and enum member statements
+            updatedStatements.splice(uIndex, enumStatements.length + 1, createWrappedEnum(
+              name,
+              currentStatement,
+              enumStatements,
+              variableDeclaration.initializer,
             ));
             // skip enum member declarations
             oIndex += enumStatements.length;
             continue;
           }
         }
-
       }
     }
 
@@ -285,17 +308,54 @@ function findTs2_2EnumStatements(
   return enumStatements;
 }
 
+// Tsickle enums have a variable statement with indexes, followed by value statements.
+// See https://github.com/angular/devkit/issues/229#issuecomment-338512056 fore more information.
+function findTsickleEnumStatements(
+  name: string,
+  statements: ts.Statement[],
+): ts.ExpressionStatement[] {
+  const enumStatements: ts.ExpressionStatement[] = [];
+  // let beforeValueStatements = true;
+
+  for (const stmt of statements) {
+    // Ensure all statements are of the expected format and using the right identifer.
+    // When we find a statement that isn't part of the enum, return what we collected so far.
+    const binExpr = drilldownNodes<ts.BinaryExpression>(stmt,
+      [
+        { prop: null, kind: ts.SyntaxKind.ExpressionStatement },
+        { prop: 'expression', kind: ts.SyntaxKind.BinaryExpression },
+      ]);
+
+    if (binExpr === null || binExpr.left.kind !== ts.SyntaxKind.ElementAccessExpression) {
+      return enumStatements;
+    }
+
+    const exprStmt = stmt as ts.ExpressionStatement;
+    const leftExpr = binExpr.left as ts.ElementAccessExpression;
+
+    if (!(leftExpr.expression.kind === ts.SyntaxKind.Identifier
+        && (leftExpr.expression as ts.Identifier).text === name)) {
+      return enumStatements;
+    }
+    enumStatements.push(exprStmt);
+  }
+
+  return enumStatements;
+}
+
 function createWrappedEnum(
   name: string,
   hostNode: ts.VariableStatement,
   statements: Array<ts.Statement>,
+  literalInitializer: ts.ObjectLiteralExpression | undefined,
 ): ts.Statement {
   const pureFunctionComment = '@__PURE__';
 
+  literalInitializer = literalInitializer || ts.createObjectLiteral();
   const innerVarStmt = ts.createVariableStatement(
     undefined,
     ts.createVariableDeclarationList([
-      ts.createVariableDeclaration(name, undefined, ts.createObjectLiteral()),
+      ts.createVariableDeclaration(name, undefined, literalInitializer),
     ]),
   );
 

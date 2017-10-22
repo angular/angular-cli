@@ -57,4 +57,38 @@ describe('wrap-enums', () => {
     expect(testWrapEnums(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
+
+  it('wraps tsickle enums in IIFE', () => {
+    const input = tags.stripIndent`
+      /** @enum {number} */
+      var FormatWidth = {
+        Short: 0,
+        Medium: 1,
+        Long: 2,
+        Full: 3,
+      };
+      FormatWidth[FormatWidth.Short] = "Short";
+      FormatWidth[FormatWidth.Medium] = "Medium";
+      FormatWidth[FormatWidth.Long] = "Long";
+      FormatWidth[FormatWidth.Full] = "Full";
+    `;
+    const output = tags.stripIndent`
+      /** @enum {number} */ var FormatWidth = /*@__PURE__*/ (function () {
+        var FormatWidth = {
+          Short: 0,
+          Medium: 1,
+          Long: 2,
+          Full: 3,
+        };
+        FormatWidth[FormatWidth.Short] = "Short";
+        FormatWidth[FormatWidth.Medium] = "Medium";
+        FormatWidth[FormatWidth.Long] = "Long";
+        FormatWidth[FormatWidth.Full] = "Full";
+        return FormatWidth;
+      })();
+    `;
+
+    expect(testWrapEnums(input)).toBeTruthy();
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
 });
