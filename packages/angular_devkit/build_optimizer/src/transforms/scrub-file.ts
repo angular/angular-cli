@@ -206,11 +206,23 @@ function isDecorateAssignmentExpression(
   if (expr.left.kind !== ts.SyntaxKind.Identifier) {
     return false;
   }
-  if (expr.right.kind !== ts.SyntaxKind.CallExpression) {
+  const classIdent = expr.left as ts.Identifier;
+  let callExpr: ts.CallExpression;
+
+  if (expr.right.kind === ts.SyntaxKind.CallExpression) {
+    callExpr = expr.right as ts.CallExpression;
+  } else if (expr.right.kind === ts.SyntaxKind.BinaryExpression) {
+    // `Clazz = Clazz_1 = __decorate([...], Clazz)` can be found when there are static property
+    // accesses.
+    const innerExpr = expr.right as ts.BinaryExpression;
+    if (innerExpr.left.kind !== ts.SyntaxKind.Identifier
+      || innerExpr.right.kind !== ts.SyntaxKind.CallExpression) {
+      return false;
+    }
+    callExpr = innerExpr.right as ts.CallExpression;
+  } else {
     return false;
   }
-  const classIdent = expr.left as ts.Identifier;
-  const callExpr = expr.right as ts.CallExpression;
 
   if (!isTslibHelper(callExpr, '__decorate', tslibImports, checker)) {
     return false;
@@ -372,9 +384,20 @@ function pickDecorateNodesToRemove(
 
   const expr = expect<ts.BinaryExpression>(exprStmt.expression, ts.SyntaxKind.BinaryExpression);
   const classId = expect<ts.Identifier>(expr.left, ts.SyntaxKind.Identifier);
-  const callExpr = expect<ts.CallExpression>(expr.right, ts.SyntaxKind.CallExpression);
+  let callExpr: ts.CallExpression;
+
+  if (expr.right.kind === ts.SyntaxKind.CallExpression) {
+    callExpr = expect<ts.CallExpression>(expr.right, ts.SyntaxKind.CallExpression);
+  } else if (expr.right.kind === ts.SyntaxKind.BinaryExpression) {
+    const innerExpr = expr.right as ts.BinaryExpression;
+    callExpr = expect<ts.CallExpression>(innerExpr.right, ts.SyntaxKind.CallExpression);
+  } else {
+    return [];
+  }
+
   const arrLiteral = expect<ts.ArrayLiteralExpression>(callExpr.arguments[0],
     ts.SyntaxKind.ArrayLiteralExpression);
+
   if (!arrLiteral.elements.every((elem) => elem.kind === ts.SyntaxKind.CallExpression)) {
     return [];
   }

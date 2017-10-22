@@ -138,6 +138,48 @@ describe('scrub-file', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
+    it('removes constructor parameter metadata when static properties are present', () => {
+      const output = tags.stripIndent`
+        import { Injectable } from '@angular/core';
+        import { Logger } from 'another-lib';
+        var GaService = (function () {
+          function GaService(logger) {
+            this.logger = logger;
+          }
+          GaService_1 = GaService;
+          GaService.prototype.initializeGa = function () {
+            console.log(GaService_1.initializeDelay);
+          };
+          GaService.initializeDelay = 1000;
+          return GaService;
+          var GaService_1;
+        }());
+      `;
+      const input = tags.stripIndent`
+        import { Injectable } from '@angular/core';
+        import { Logger } from 'another-lib';
+        var GaService = (function () {
+          function GaService(logger) {
+            this.logger = logger;
+          }
+          GaService_1 = GaService;
+          GaService.prototype.initializeGa = function () {
+            console.log(GaService_1.initializeDelay);
+          };
+          GaService.initializeDelay = 1000;
+          GaService = GaService_1 = __decorate([
+            Injectable(),
+            __metadata("design:paramtypes", [Logger])
+          ], GaService);
+          return GaService;
+          var GaService_1;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('doesn\t remove constructor parameter metadata for whitelisted classes', () => {
       const input = tags.stripIndent`
         import { ElementRef } from '@angular/core';
