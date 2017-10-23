@@ -1,6 +1,6 @@
 const Task = require('../ember-cli/lib/models/task');
 import chalk from 'chalk';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 
 
 export default Task.extend({
@@ -12,24 +12,28 @@ export default Task.extend({
     }
 
     ui.writeLine(chalk.green(`Installing packages for tooling via ${packageManager}.`));
-    let installCommand = `${packageManager} install`;
+
+    const installArgs = ['install'];
     if (packageManager === 'npm') {
-      installCommand = `${packageManager} --quiet install`;
+      installArgs.push('--quiet');
     }
+    const installOptions = {
+      stdio: 'inherit',
+      shell: true
+    };
 
     return new Promise((resolve, reject) => {
-      exec(installCommand,
-        (err: NodeJS.ErrnoException, _stdout: string, stderr: string) => {
-          if (err) {
-            ui.writeLine(stderr);
+      spawn(packageManager, installArgs, installOptions)
+        .on('close', (code: number) => {
+          if (code === 0) {
+            ui.writeLine(chalk.green(`Installed packages for tooling via ${packageManager}.`));
+            resolve();
+          } else {
             const message = 'Package install failed, see above.';
             ui.writeLine(chalk.red(message));
             reject(message);
-          } else {
-            ui.writeLine(chalk.green(`Installed packages for tooling via ${packageManager}.`));
-            resolve();
           }
-        });
+      });
     });
   }
 });
