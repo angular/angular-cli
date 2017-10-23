@@ -48,6 +48,7 @@ jobs:
           <<: *restore_cache_defaults
       - run: npm run test
 
+# E2E test for current Angular.
   e2e-setup:
     <<: *defaults
     steps:
@@ -109,6 +110,68 @@ jobs:
       - run: cp -r /workspace/dist/ ./
       - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent
 
+# E2E test for Angular nightly.
+  e2e-setup-nightly:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - run: mkdir /workspace
+      - run: mkdir /workspace/angular-cli-e2e-nightly
+      # Ignore all tests, we just want the setup step to persist it to the workspace.
+      - run: node tests/run_e2e.js --tmpdir=/workspace/angular-cli-e2e-nightly --ignore=**/* --nightly
+      - run: mv dist /workspace/
+      - persist_to_workspace:
+          root: /workspace
+          paths:
+            - dist/
+            - angular-cli-e2e-nightly/
+
+  e2e-0-nightly:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - attach_workspace:
+          <<: *attach_workspace_defaults
+      - run: cp -r /workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-nightly/test-project --nb-shards=4 --shard=0 --nosilent --nightly
+
+  e2e-1-nightly:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - attach_workspace:
+          <<: *attach_workspace_defaults
+      - run: cp -r /workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-nightly/test-project --nb-shards=4 --shard=1 --nosilent --nightly
+
+  e2e-2-nightly:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - attach_workspace:
+          <<: *attach_workspace_defaults
+      - run: cp -r /workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-nightly/test-project --nb-shards=4 --shard=2 --nosilent --nightly
+
+  e2e-3-nightly:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache_defaults
+      - attach_workspace:
+          <<: *attach_workspace_defaults
+      - run: cp -r /workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-nightly/test-project --nb-shards=4 --shard=3 --nosilent --nightly
+
 workflows:
   version: 2
   build_and_test:
@@ -120,6 +183,7 @@ workflows:
       - test:
           requires:
             - build
+      # E2E test for current Angular.
       - e2e-setup:
           requires:
             - build
@@ -135,3 +199,23 @@ workflows:
       - e2e-3:
           requires:
             - e2e-setup
+      # E2E test for Angular nightly.
+      - e2e-setup-nightly:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+      - e2e-0-nightly:
+          requires:
+            - e2e-setup-nightly
+      - e2e-1-nightly:
+          requires:
+            - e2e-setup-nightly
+      - e2e-2-nightly:
+          requires:
+            - e2e-setup-nightly
+      - e2e-3-nightly:
+          requires:
+            - e2e-setup-nightly
