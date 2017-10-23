@@ -74,7 +74,7 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "typescript": ">=2.0.0 <2.6.0",
-    "uglifyjs-webpack-plugin": "1.0.0-beta.1",
+    "uglifyjs-webpack-plugin": "1.0.0",
     "url-loader": "^0.6.2",
     "webpack": "~3.8.1",
     "webpack-concat-plugin": "1.4.0",
