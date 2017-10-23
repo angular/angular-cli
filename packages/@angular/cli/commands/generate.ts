@@ -1,4 +1,4 @@
-import { cyan, yellow } from 'chalk';
+import chalk from 'chalk';
 const stringUtils = require('ember-cli-string-utils');
 import { oneLine } from 'common-tags';
 import { CliConfig } from '../models/config';
@@ -17,6 +17,7 @@ import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 
+const { cyan, yellow } = chalk;
 const separatorRegEx = /[\/\\]/g;
 
 

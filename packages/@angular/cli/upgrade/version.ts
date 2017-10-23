@@ -1,5 +1,5 @@
 import {SemVer, satisfies} from 'semver';
-import {bold, red, yellow} from 'chalk';
+import chalk from 'chalk';
 import {stripIndents, stripIndent} from 'common-tags';
 import {readFileSync, existsSync} from 'fs';
 import * as path from 'path';
@@ -10,6 +10,8 @@ import {requireProjectModule} from '../utilities/require-project-module';
 
 const resolve = require('resolve');
 
+
+const { bold, red, yellow } = chalk;
 
 function _hasOldCliBuildFile() {
   return existsSync(findUp('angular-cli-build.js', process.cwd()))

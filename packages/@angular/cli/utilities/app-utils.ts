@@ -1,6 +1,6 @@
 const SilentError = require('silent-error');
-const chalk = require('chalk');
 
+import chalk from 'chalk';
 import { oneLine } from 'common-tags';
 import { CliConfig } from '../models/config';
 

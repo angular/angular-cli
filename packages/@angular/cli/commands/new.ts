@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 
 import { CliConfig } from '../models/config';
 import { validateProjectName } from '../utilities/validate-project-name';

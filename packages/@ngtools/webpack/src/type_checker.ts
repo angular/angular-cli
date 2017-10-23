@@ -1,6 +1,6 @@
 import * as process from 'process';
 import * as ts from 'typescript';
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 
 import { WebpackCompilerHost } from './compiler_host';
 import { time, timeEnd } from './benchmark';

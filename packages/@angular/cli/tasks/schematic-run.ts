@@ -10,13 +10,13 @@ import {
 import { FileSystemHost } from '@angular-devkit/schematics/tools';
 import { Observable } from 'rxjs/Observable';
 import * as path from 'path';
-import { green, red, yellow } from 'chalk';
+import chalk from 'chalk';
 import { CliConfig } from '../models/config';
 import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/map';
 import { getCollection, getSchematic } from '../utilities/schematics';
 
-
+const { green, red, yellow } = chalk;
 const Task = require('../ember-cli/lib/models/task');
 
 export interface SchematicRunOptions {

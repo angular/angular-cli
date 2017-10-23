@@ -1,6 +1,6 @@
 const Command = require('../ember-cli/lib/models/command');
 const stringUtils = require('ember-cli-string-utils');
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 
 
 function pickOne(of: string[]): string {
