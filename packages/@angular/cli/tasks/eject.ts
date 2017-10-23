@@ -2,13 +2,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as webpack from 'webpack';
+import chalk from 'chalk';
 
 import { getAppFromConfig } from '../utilities/app-utils';
 import { EjectTaskOptions } from '../commands/eject';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { CliConfig } from '../models/config';
 import { AotPlugin, AngularCompilerPlugin } from '@ngtools/webpack';
-import { yellow } from 'chalk';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 
 import denodeify = require('denodeify');
@@ -34,6 +34,7 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 export const pluginArgs = Symbol('plugin-args');
 export const postcssArgs = Symbol('postcss-args');
 
+const yellow = chalk.yellow;
 const pree2eNpmScript = `webdriver-manager update --standalone false --gecko false --quiet`;
 
 

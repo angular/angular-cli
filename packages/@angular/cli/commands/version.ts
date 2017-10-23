@@ -3,7 +3,7 @@ import { stripIndents } from 'common-tags';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as child_process from 'child_process';
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import { CliConfig } from '../models/config';
 
 

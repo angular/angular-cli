@@ -1,5 +1,5 @@
 const Task = require('../ember-cli/lib/models/task');
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import {exec} from 'child_process';
 
 export default Task.extend({

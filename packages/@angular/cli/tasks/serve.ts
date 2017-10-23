@@ -1,8 +1,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as chalk from 'chalk';
 import * as webpack from 'webpack';
 import * as url from 'url';
+import chalk from 'chalk';
 import { oneLine, stripIndents } from 'common-tags';
 import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { NgCliWebpackConfig } from '../models/webpack-config';
@@ -15,7 +15,7 @@ const WebpackDevServer = require('webpack-dev-server');
 const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
 const opn = require('opn');
-const yellow = require('chalk').yellow;
+const yellow = chalk.yellow;
 
 function findDefaultServePath(baseHref: string, deployUrl: string): string | null {
   if (!baseHref && !deployUrl) {

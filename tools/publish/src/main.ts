@@ -1,12 +1,14 @@
 import 'reflect-metadata';
 
 import {IndentLogger, LogEntry} from '@ngtools/logger';
-import {bold, red, yellow, white} from 'chalk';
+import chalk from 'chalk';
 import * as minimist from 'minimist';
 
 
 import 'rxjs/add/operator/filter';
 
+
+const { bold, red, yellow, white } = chalk;
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ['verbose']

@@ -1,9 +1,9 @@
 import * as fs from 'fs';
+import chalk from 'chalk';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
 const SilentError = require('silent-error');
-const chalk = require('chalk');
 const Command = require('../ember-cli/lib/models/command');
 
 export interface SetOptions {
