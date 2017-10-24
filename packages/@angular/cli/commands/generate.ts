@@ -154,15 +154,32 @@ export default Command.extend({
     const cwd = this.project.root;
     const schematicName = rawArgs[0];
 
+    const mergeDefaultOptionsFor = (type: string) => {
+      const defaultOptions = CliConfig.getValue(`defaults.${type}`);
+
+      if (Array.isArray(defaultOptions) || typeof defaultOptions !== 'object') {
+        return;
+      }
+      Object.keys(defaultOptions)
+        .filter(key => commandOptions[key] === undefined)
+        .filter(key => defaultOptions[key] !== undefined)
+        .forEach(key => commandOptions[key] = defaultOptions[key]);
+    };
+
     if (['component', 'c', 'directive', 'd'].indexOf(schematicName) !== -1) {
       if (commandOptions.prefix === undefined) {
         commandOptions.prefix = appConfig.prefix;
+      }
+
+      if (schematicName == 'directive' || schematicName === 'd') {
+        mergeDefaultOptionsFor('directive');
       }
 
       if (schematicName === 'component' || schematicName === 'c') {
         if (commandOptions.styleext === undefined) {
           commandOptions.styleext = CliConfig.getValue('defaults.styleExt');
         }
+        mergeDefaultOptionsFor('component');
       }
     }
 
