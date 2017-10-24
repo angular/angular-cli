@@ -134,7 +134,9 @@ export function getAotConfig(wco: WebpackConfigOptions) {
   // Fallback to exclude spec files from AoT compilation on projects using a shared tsconfig.
   if (testTsConfigPath === tsConfigPath) {
     let exclude = [ '**/*.spec.ts' ];
-    if (appConfig.test) { exclude.push(path.join(projectRoot, appConfig.root, appConfig.test)); }
+    if (appConfig.test) {
+      exclude.push(path.join(projectRoot, appConfig.root, appConfig.test));
+    }
     pluginOptions.exclude = exclude;
   }
 
@@ -164,7 +166,10 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
   // Force include main and polyfills.
   // This is needed for AngularCompilerPlugin compatibility with existing projects,
   // since TS compilation there is stricter and tsconfig.spec.ts doesn't include them.
-  const include = [appConfig.main, appConfig.polyfills];
+  const include = [appConfig.main, appConfig.polyfills, '**/*.spec.ts'];
+  if (appConfig.test) {
+    include.push(appConfig.test);
+  }
 
   let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true, include };
 
