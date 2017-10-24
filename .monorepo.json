@@ -53,8 +53,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md"
         }
       ],
-      "version": "0.0.30",
-      "hash": "9449bbcbf8a7accb14d4e90399116df2"
+      "version": "0.0.31",
+      "hash": "15586aec53f8c67856d8bb5d4984c4ea"
     },
     "@angular-devkit/core": {
       "name": "Core",
