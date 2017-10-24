@@ -9,7 +9,7 @@ export default function () {
       const compilerOptions = configJson['compilerOptions'];
       compilerOptions['target'] = 'es2015';
     }))
-    .then(() => ng('build', '--prod', '--output-hashing=none'))
+    .then(() => ng('build', '--prod', '--output-hashing=none', '--vendor-chunk'))
     // Check class constructors are present in the vendor output.
     .then(() => expectFileToMatch('dist/vendor.bundle.js', /class \w{constructor\(\){/));
 }
