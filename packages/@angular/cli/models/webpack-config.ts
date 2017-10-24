@@ -108,14 +108,23 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
       }
     };
 
-    const merged = Object.assign({}, targetDefaults[buildOptions.target], buildOptions);
+    let merged = Object.assign({}, targetDefaults[buildOptions.target], buildOptions);
 
     // Use Build Optimizer on prod AOT builds by default when AngularCompilerPlugin is supported.
-    const buildOptimizer = {
+    const buildOptimizerDefault = {
       buildOptimizer: merged.aot && AngularCompilerPlugin.isSupported()
     };
 
-    return Object.assign({}, buildOptimizer, merged);
+    merged = Object.assign({}, buildOptimizerDefault, merged);
+
+    // Default vendor chunk to false when build optimizer is on.
+    const vendorChunkDefault = {
+      vendorChunk: !merged.buildOptimizer
+    };
+
+    merged = Object.assign({}, vendorChunkDefault, merged);
+
+    return merged;
   }
 
   // Fill in defaults from .angular-cli.json

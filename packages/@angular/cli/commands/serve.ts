@@ -130,11 +130,6 @@ const ServeCommand = Command.extend({
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     Version.assertTypescriptVersion(this.project.root);
 
-    // Default vendor chunk to false when build optimizer is on.
-    if (commandOptions.vendorChunk === undefined) {
-      commandOptions.vendorChunk = !commandOptions.buildOptimizer;
-    }
-
     // Force commonjs module format for TS on dev builds.
     if (commandOptions.target === 'development') {
       commandOptions.forceTsCommonjs = true;
