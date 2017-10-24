@@ -53,28 +53,6 @@ export function purifyReplacements(content: string) {
     },
   );
 
-  /* Prefix CCF and CMF statements */
-  content.replace(
-    /\w*__WEBPACK_IMPORTED_MODULE_\d+__angular_core__\["\w+" \/\* (ɵccf|ɵcmf|ɵcrt) \*\/\]\(/mg,
-    (match, _p1, offset) => {
-      const newContent = `/*@__PURE__*/${match}`;
-      addReplacement(offset, match.length, newContent);
-
-      return newContent;
-    },
-  );
-
-  /* Prefix module statements */
-  content.replace(
-    /new \w*__WEBPACK_IMPORTED_MODULE_\d+__angular_core__\["\w+" \/\* NgModuleFactory \*\/\]/mg,
-    (match, offset) => {
-      const newContent = `/*@__PURE__*/${match}`;
-      addReplacement(offset, match.length, newContent);
-
-      return newContent;
-    },
-  );
-
   return replacements;
 }
 

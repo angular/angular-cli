@@ -15,6 +15,7 @@ import { getScrubFileTransformer, testScrubFile } from '../transforms/scrub-file
 import { getWrapEnumsTransformer, testWrapEnums } from '../transforms/wrap-enums';
 
 
+// Angular packages are known to have no side effects.
 const whitelistedAngularModules = [
   /[\\/]node_modules[\\/]@angular[\\/]animations[\\/]/,
   /[\\/]node_modules[\\/]@angular[\\/]common[\\/]/,
@@ -40,6 +41,20 @@ const es5AngularModules = [
   // All Angular versions have UMD with es5.
   /\.umd\.js$/,
 ];
+
+// Factories created by AOT are known to have no side effects and contain es5 code.
+// In Angular 2/4 the file path for factories can be `.ts`, but in Angular 5 it is `.js`.
+const ngFactories = [
+  /\.ngfactory\.[jt]s/,
+  /\.ngstyle\.[jt]s/,
+];
+
+function isKnownSideEffectFree(filePath: string) {
+  return ngFactories.some((re) => re.test(filePath)) || (
+    whitelistedAngularModules.some((re) => re.test(filePath))
+    && es5AngularModules.some((re) => re.test(filePath))
+  );
+}
 
 export interface BuildOptimizerOptions {
   content?: string;
@@ -77,10 +92,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.push(getPrefixClassesTransformer);
   }
 
-  if (inputFilePath
-    && whitelistedAngularModules.some((re) => re.test(inputFilePath))
-    && es5AngularModules.some((re) => re.test(inputFilePath))
-  ) {
+  if (inputFilePath && isKnownSideEffectFree(inputFilePath)) {
     getTransforms.push(
       // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
       // It will mark both `require()` calls and `console.log(stuff)` as pure.

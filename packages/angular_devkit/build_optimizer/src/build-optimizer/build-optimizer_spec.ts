@@ -17,7 +17,7 @@ describe('build-optimizer', () => {
   const decorators = 'Clazz.decorators = [ { type: Injectable } ];';
 
   describe('basic functionality', () => {
-    it('applies class-fold, scrub-file and prefix-functions to whitelisted es5 modules', () => {
+    fit('applies class-fold, scrub-file and prefix-functions to side-effect free modules', () => {
       const input = tags.stripIndent`
         ${imports}
         var __extends = (this && this.__extends) || function (d, b) {
@@ -51,6 +51,7 @@ describe('build-optimizer', () => {
           ], ComponentClazz);
           return ComponentClazz;
         }());
+        var RenderType_MdOption = ɵcrt({ encapsulation: 2, styles: styles_MdOption});
       `;
       // tslint:disable:max-line-length
       const output = tags.oneLine`
@@ -68,6 +69,7 @@ describe('build-optimizer', () => {
           function ComponentClazz() { }
           return ComponentClazz;
         }());
+        var RenderType_MdOption = /*@__PURE__*/ ɵcrt({ encapsulation: 2, styles: styles_MdOption });
       `;
 
       // Check Angular 4/5 and unix/windows paths.
@@ -76,6 +78,8 @@ describe('build-optimizer', () => {
         '/node_modules/@angular/core/esm5/core.js',
         '\\node_modules\\@angular\\core\\@angular\\core.es5.js',
         '\\node_modules\\@angular\\core\\esm5\\core.js',
+        '/project/file.ngfactory.js',
+        '/project/file.ngstyle.js',
       ];
 
       inputPaths.forEach((inputFilePath) => {
