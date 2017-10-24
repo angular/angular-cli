@@ -20,7 +20,7 @@ export function exportLazyModuleMap(
       let [, moduleName] = loadChildrenString.split('#');
       let modulePath = lazyRoutes[loadChildrenString];
 
-      if (modulePath.endsWith('.ngfactory.ts')) {
+      if (modulePath.match(/\.ngfactory\.[jt]s$/)) {
         modulePath = modulePath.replace('.ngfactory', '');
         moduleName = moduleName.replace('NgFactory', '');
         loadChildrenString = loadChildrenString
