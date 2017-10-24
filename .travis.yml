@@ -43,6 +43,24 @@ matrix:
       os: linux
       script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent
       env: e2e-3
+
+    - node_js: "6"
+      os: linux
+      script: node tests/run_e2e.js --nb-shards=4 --shard=0 --nosilent --nightly
+      env: nightly-0
+    - node_js: "6"
+      os: linux
+      script: node tests/run_e2e.js --nb-shards=4 --shard=1 --nosilent --nightly
+      env: nightly-1
+    - node_js: "6"
+      os: linux
+      script: node tests/run_e2e.js --nb-shards=4 --shard=2 --nosilent --nightly
+      env: nightly-2
+    - node_js: "6"
+      os: linux
+      script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent --nightly
+      env: nightly-3
+
     - node_js: "6"
       os: linux
       script: node tests/run_e2e.js --eject "--glob=tests/build/**"
@@ -54,11 +72,6 @@ matrix:
       before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js --ng2 "--glob=tests/{build,test,misc}/**"
       env: ng2
-    - node_js: "6"
-      os: linux
-      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
-      script: node tests/run_e2e.js "--nightly --glob=tests/{build,test,misc}/**"
-      env: nightly
     - node_js: "7"
       os: linux
       before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
