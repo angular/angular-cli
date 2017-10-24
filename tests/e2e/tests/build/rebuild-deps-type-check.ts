@@ -51,7 +51,7 @@ export default function() {
     ]))
     .then((results) => {
       const stderr = results[0].stderr;
-      if (!/ERROR in (.*\/src\/)?main\.ts/.test(stderr)) {
+      if (!/ERROR in (.*src\/)?main\.ts/.test(stderr)) {
         throw new Error('Expected an error but none happened.');
       }
     })
@@ -65,8 +65,8 @@ export default function() {
     ]))
     .then((results) => {
       const stderr = results[0].stderr;
-      if (!/ERROR in (.*\/src\/)?main\.ts/.test(stderr)) {
-        throw new Error('Expected an error but none happened.');
+      if (!/ERROR in (.*src\/)?main\.ts/.test(stderr)) {
+        throw new Error('Expected an error to still be there but none was.');
       }
     })
     // Fix the error!
@@ -80,7 +80,7 @@ export default function() {
     ]))
     .then((results) => {
       const stderr = results[0].stderr;
-      if (/ERROR in (.*\/src\/)?main\.ts/.test(stderr)) {
+      if (/ERROR in (.*src\/)?main\.ts/.test(stderr)) {
         throw new Error('Expected no error but an error was shown.');
       }
     })
