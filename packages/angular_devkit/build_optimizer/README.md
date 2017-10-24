@@ -187,6 +187,7 @@ export interface BuildOptimizerOptions {
   outputFilePath?: string;
   emitSourceMap?: boolean;
   strict?: boolean;
+  isSideEffectFree?: boolean;
 }
 ```
 

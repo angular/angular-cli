@@ -17,7 +17,7 @@ describe('build-optimizer', () => {
   const decorators = 'Clazz.decorators = [ { type: Injectable } ];';
 
   describe('basic functionality', () => {
-    fit('applies class-fold, scrub-file and prefix-functions to side-effect free modules', () => {
+    it('applies class-fold, scrub-file and prefix-functions to side-effect free modules', () => {
       const input = tags.stripIndent`
         ${imports}
         var __extends = (this && this.__extends) || function (d, b) {
@@ -114,6 +114,20 @@ describe('build-optimizer', () => {
 
       const inputFilePath = '/node_modules/@angular/core/@angular/core.js';
       const boOutput = buildOptimizer({ content: input, inputFilePath });
+      expect(tags.oneLine`${boOutput.content}`).toEqual(output);
+      expect(boOutput.emitSkipped).toEqual(false);
+    });
+
+    it('supports flagging module as side-effect free', () => {
+      const output = tags.oneLine`
+        /** PURE_IMPORTS_START  PURE_IMPORTS_END */
+        var RenderType_MdOption = /*@__PURE__*/ ɵcrt({ encapsulation: 2, styles: styles_MdOption });
+      `;
+      const input = tags.stripIndent`
+        var RenderType_MdOption = ɵcrt({ encapsulation: 2, styles: styles_MdOption});
+      `;
+
+      const boOutput = buildOptimizer({ content: input, isSideEffectFree: true });
       expect(tags.oneLine`${boOutput.content}`).toEqual(output);
       expect(boOutput.emitSkipped).toEqual(false);
     });

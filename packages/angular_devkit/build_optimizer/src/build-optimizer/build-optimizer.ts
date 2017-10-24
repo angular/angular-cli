@@ -6,7 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { readFileSync } from 'fs';
-import { TransformJavascriptOutput, transformJavascript } from '../helpers/transform-javascript';
+import {
+  TransformJavascriptOptions,
+  TransformJavascriptOutput,
+  transformJavascript,
+} from '../helpers/transform-javascript';
 import { getFoldFileTransformer } from '../transforms/class-fold';
 import { getImportTslibTransformer, testImportTslib } from '../transforms/import-tslib';
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
@@ -62,6 +66,7 @@ export interface BuildOptimizerOptions {
   outputFilePath?: string;
   emitSourceMap?: boolean;
   strict?: boolean;
+  isSideEffectFree?: boolean;
 }
 
 export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascriptOutput {
@@ -92,7 +97,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.push(getPrefixClassesTransformer);
   }
 
-  if (inputFilePath && isKnownSideEffectFree(inputFilePath)) {
+  if (options.isSideEffectFree || inputFilePath && isKnownSideEffectFree(inputFilePath)) {
     getTransforms.push(
       // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
       // It will mark both `require()` calls and `console.log(stuff)` as pure.
@@ -109,5 +114,14 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     );
   }
 
-  return transformJavascript({ ...options, getTransforms, content });
+  const transformJavascriptOpts: TransformJavascriptOptions = {
+    content: content,
+    inputFilePath: options.inputFilePath,
+    outputFilePath: options.outputFilePath,
+    emitSourceMap: options.emitSourceMap,
+    strict: options.strict,
+    getTransforms,
+  };
+
+  return transformJavascript(transformJavascriptOpts);
 }
