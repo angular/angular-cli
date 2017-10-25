@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ts from 'typescript';
 import { stripIndent } from 'common-tags';
 
 import {SchemaClass, SchemaClassFactory} from '@ngtools/json-schema';
+
+import { stripBom } from '../../utilities/strip-bom';
 
 
 const DEFAULT_CONFIG_SCHEMA_PATH = path.join(__dirname, '../../lib/config/schema.json');
@@ -80,13 +81,22 @@ export class CliConfig<JsonType> {
   }
 
   static fromConfigPath<T>(configPath: string, otherPath: string[] = []): CliConfig<T> {
-    const configContent = ts.sys.readFile(configPath) || '{}';
     const schemaContent = fs.readFileSync(DEFAULT_CONFIG_SCHEMA_PATH, 'utf-8');
+    let configContent = '{}';
+    if (fs.existsSync(configPath)) {
+      configContent = stripBom(fs.readFileSync(configPath, 'utf-8') || '{}');
+    }
+
 
     let otherContents = new Array<string>();
     if (configPath !== otherPath[0]) {
       otherContents = otherPath
-        .map(path => ts.sys.readFile(path))
+        .map(path => {
+          if (fs.existsSync(path)) {
+            return stripBom(fs.readFileSync(path, 'utf-8'));
+          }
+          return undefined;
+        })
         .filter(content => !!content);
     }
 

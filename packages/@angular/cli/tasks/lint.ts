@@ -1,3 +1,5 @@
+// We only use typescript for type information here.
+// @ignoreDep typescript
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as glob from 'glob';
