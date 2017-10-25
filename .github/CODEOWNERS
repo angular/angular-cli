@@ -1,0 +1,8 @@
+packages/_/*                                @hansl
+packages/angular_devkit/build_optimizer/*   @filipesilva
+packages/angular_devkit/core/*              @hansl
+packages/angular_devkit/schematics/*        @hansl
+packages/schematics/angular/*               @hansl @Brocco
+packages/schematics/schematics/*            @hansl
+rules/*                                     @hansl
+scripts/*                                   @hansl
