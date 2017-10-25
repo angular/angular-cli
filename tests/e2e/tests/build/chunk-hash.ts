@@ -1,9 +1,7 @@
-import {oneLine} from 'common-tags';
 import * as fs from 'fs';
 
 import {ng} from '../../utils/process';
-import {writeFile} from '../../utils/fs';
-import {addImportToModule} from '../../utils/ast';
+import {writeFile, prependToFile, replaceInFile} from '../../utils/fs';
 import {getGlobalVariable} from '../../utils/env';
 
 const OUTPUT_RE = /(main|polyfills|vendor|inline|styles|\d+)\.[a-z0-9]+\.(chunk|bundle)\.(js|css)$/;
@@ -56,11 +54,14 @@ export default function() {
   // First, collect the hashes.
   return Promise.resolve()
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
-    .then(() => addImportToModule('src/app/app.module.ts', oneLine`
-      RouterModule.forRoot([{ path: "lazy", loadChildren: "./lazy/lazy.module#LazyModule" }])
-    `, '@angular/router'))
-    .then(() => addImportToModule(
-      'src/app/app.module.ts', 'ReactiveFormsModule', '@angular/forms'))
+    .then(() => prependToFile('src/app/app.module.ts', `
+      import { RouterModule } from '@angular/router';
+      import { ReactiveFormsModule } from '@angular/forms';
+    `))
+    .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
+      RouterModule.forRoot([{ path: "lazy", loadChildren: "./lazy/lazy.module#LazyModule" }]),
+      ReactiveFormsModule,
+    `))
     .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       oldHashes = generateFileHashMap();
@@ -91,8 +92,13 @@ export default function() {
       validateHashes(oldHashes, newHashes, ['inline', 'main']);
       oldHashes = newHashes;
     })
-    .then(() => addImportToModule(
-      'src/app/lazy/lazy.module.ts', 'ReactiveFormsModule', '@angular/forms'))
+    .then(() => prependToFile('src/app/lazy/lazy.module.ts', `
+      import { ReactiveFormsModule } from '@angular/forms';
+    `))
+    .then(() => replaceInFile('src/app/lazy/lazy.module.ts', 'imports: [', `
+      imports: [
+         ReactiveFormsModule,
+    `))
     .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       newHashes = generateFileHashMap();

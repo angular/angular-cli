@@ -1,9 +1,7 @@
 import {readdirSync} from 'fs';
-import {oneLine} from 'common-tags';
 
 import {ng, silentNpm} from '../../utils/process';
-import {addImportToModule} from '../../utils/ast';
-import {appendToFile, writeFile} from '../../utils/fs';
+import {appendToFile, writeFile, prependToFile, replaceInFile} from '../../utils/fs';
 
 
 export default function() {
@@ -13,11 +11,14 @@ export default function() {
     .then(() => oldNumberOfFiles = readdirSync('dist').length)
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
     .then(() => ng('generate', 'module', 'too/lazy', '--routing'))
-    .then(() => addImportToModule('src/app/app.module.ts', oneLine`
+    .then(() => prependToFile('src/app/app.module.ts', `
+      import { RouterModule } from '@angular/router';
+    `))
+    .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
       RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }]),
       RouterModule.forRoot([{ path: "lazy1", loadChildren: "./lazy/lazy.module#LazyModule" }]),
-      RouterModule.forRoot([{ path: "lazy2", loadChildren: "./too/lazy/lazy.module#LazyModule" }])
-      `, '@angular/router'))
+      RouterModule.forRoot([{ path: "lazy2", loadChildren: "./too/lazy/lazy.module#LazyModule" }]),
+    `))
     .then(() => ng('build', '--named-chunks'))
     .then(() => readdirSync('dist'))
     .then((distFiles) => {
