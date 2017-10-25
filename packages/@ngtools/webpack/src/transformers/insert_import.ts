@@ -5,6 +5,43 @@ import { findAstNodes, getFirstNode } from './ast_helpers';
 import { AddNodeOperation, TransformOperation } from './make_transform';
 
 
+export function insertStarImport(
+  sourceFile: ts.SourceFile,
+  identifier: ts.Identifier,
+  modulePath: string,
+): TransformOperation[] {
+  const ops: TransformOperation[] = [];
+  const allImports = findAstNodes(null, sourceFile, ts.SyntaxKind.ImportDeclaration);
+
+  // We don't need to verify if the symbol is already imported, star imports should be unique.
+
+  // Create the new import node.
+  const namespaceImport = ts.createNamespaceImport(identifier);
+  const importClause = ts.createImportClause(undefined, namespaceImport);
+  const newImport = ts.createImportDeclaration(undefined, undefined, importClause,
+    ts.createLiteral(modulePath));
+
+  if (allImports.length > 0) {
+    // Find the last import and insert after.
+    ops.push(new AddNodeOperation(
+      sourceFile,
+      allImports[allImports.length - 1],
+      undefined,
+      newImport
+    ));
+  } else {
+    // Insert before the first node.
+    ops.push(new AddNodeOperation(
+      sourceFile,
+      getFirstNode(sourceFile),
+      newImport
+    ));
+  }
+
+  return ops;
+}
+
+
 export function insertImport(
   sourceFile: ts.SourceFile,
   symbolName: string,

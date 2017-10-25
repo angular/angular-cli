@@ -20,19 +20,21 @@ describe('@ngtools/webpack transformers', () => {
 
         platformBrowserDynamic().bootstrapModule(AppModule);
       `;
+
+      // tslint:disable:max-line-length
       const output = stripIndent`
         import { enableProdMode } from '@angular/core';
         import { environment } from './environments/environment';
 
-        import { AppModuleNgFactory } from "./app/app.module.ngfactory";
-        import { platformBrowser } from "@angular/platform-browser";
+        import * as __NgCli_bootstrap_1 from "./app/app.module.ngfactory";
+        import * as __NgCli_bootstrap_2 from "@angular/platform-browser";
 
         if (environment.production) {
           enableProdMode();
         }
-
-        platformBrowser().bootstrapModuleFactory(AppModuleNgFactory);
+        __NgCli_bootstrap_2.platformBrowser().bootstrapModuleFactory(__NgCli_bootstrap_1.AppModuleNgFactory);
       `;
+      // tslint:enable:max-line-length
 
       const transformOpsCb = (sourceFile: ts.SourceFile) =>
         replaceBootstrap(sourceFile, { path: '/app.module', className: 'AppModule' });
