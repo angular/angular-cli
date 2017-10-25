@@ -52,7 +52,7 @@ export default function () {
     .then(() => replaceInFile('./src/app/app.module.ts', /\[\s*BrowserModule/g,
       `[BrowserModule.withServerTransition(\{ appId: 'app' \}), ServerModule`))
     .then(() => silentNpm('install'))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--aot=false'))
     // files were created successfully
     .then(() => expectFileToMatch('dist/main.bundle.js',
       /__webpack_exports__, "AppModule"/))

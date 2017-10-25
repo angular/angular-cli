@@ -52,7 +52,7 @@ export default function () {
     .then(() => replaceInFile('./src/app/app.module.ts', /\[\s*BrowserModule/g,
       `[BrowserModule.withServerTransition(\{ appId: 'app' \}), ServerModule`))
     .then(() => silentNpm('install'))
-    .then(() => ng('build'))
+    .then(() => ng('build', '--aot=false'))
     // files were created successfully
     .then(() => expectFileToMatch('dist/main.bundle.js',
       /__webpack_exports__, "AppModule"/))
@@ -101,7 +101,7 @@ export default function () {
         fs.writeFileSync('dist/index.html', html);
       \});
     `)))
-    .then(() => ng('build', '--bundle-dependencies=all'))
+    .then(() => ng('build', '--bundle-dependencies=all', '--aot=false'))
     .then(() => expectToFail(() => expectFileToMatch('./dist/main.bundle.js',
       /require\(["']@angular\/[^"']*["']\)/)))
     .then(() => exec(normalize('node'), 'dist/main.bundle.js'));
