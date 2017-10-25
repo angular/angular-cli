@@ -704,32 +704,25 @@ export class AngularCompilerPlugin implements Tapable {
 
     return Promise.resolve()
       .then(() => {
-        if (this._ngCompilerSupportsNewApi) {
-          return;
-        }
-
-        // Try to find lazy routes.
-        // We need to run the `listLazyRoutes` the first time because it also navigates libraries
-        // and other things that we might miss using the (faster) findLazyRoutesInAst.
-        // Lazy routes modules will be read with compilerHost and added to the changed files.
-        const changedTsFiles = this._compilerHost.getChangedFilePaths()
-          .filter(k => k.endsWith('.ts'));
-        if (this._firstRun) {
-          this._processLazyRoutes(this._getLazyRoutesFromNgtools());
-        } else if (changedTsFiles.length > 0) {
-          this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
-        }
-      })
-      .then(() => {
         // Make a new program and load the Angular structure if there are changes.
         if (changedFiles.length > 0) {
           return this._createOrUpdateProgram();
         }
       })
       .then(() => {
+        // Try to find lazy routes.
+        // We need to run the `listLazyRoutes` the first time because it also navigates libraries
+        // and other things that we might miss using the (faster) findLazyRoutesInAst.
+        // Lazy routes modules will be read with compilerHost and added to the changed files.
+        const changedTsFiles = this._compilerHost.getChangedFilePaths()
+          .filter(k => k.endsWith('.ts'));
         if (this._ngCompilerSupportsNewApi) {
-          // TODO: keep this when the new ngCompiler supports the new lazy routes API.
-          this._lazyRoutes = this._listLazyRoutesFromProgram();
+          this._processLazyRoutes(this._listLazyRoutesFromProgram());
+          return this._createOrUpdateProgram();
+        } else if (this._firstRun) {
+          this._processLazyRoutes(this._getLazyRoutesFromNgtools());
+        } else if (changedTsFiles.length > 0) {
+          this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
         }
       })
       .then(() => {
