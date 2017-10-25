@@ -8,13 +8,10 @@ import { packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { extraEntryParser, lazyChunksFilter } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
-import { requireProjectModule } from '../../utilities/require-project-module';
 
 
 export function getBrowserConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
-
-  const projectTs = requireProjectModule(projectRoot, 'typescript');
 
   const appRoot = path.resolve(projectRoot, appConfig.root);
 
@@ -80,13 +77,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  const supportES2015 = wco.tsConfig.options.target !== projectTs.ScriptTarget.ES3
-                     && wco.tsConfig.options.target !== projectTs.ScriptTarget.ES5;
-
   return {
     resolve: {
       mainFields: [
-        ...(supportES2015 ? ['es2015'] : []),
+        ...(wco.supportES2015 ? ['es2015'] : []),
         'browser', 'module', 'main'
       ]
     },

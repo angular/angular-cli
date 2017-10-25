@@ -30,8 +30,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const nodeModules = path.resolve(projectRoot, 'node_modules');
 
-  const projectTs = requireProjectModule(projectRoot, 'typescript');
-
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
@@ -159,18 +157,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new NamedLazyChunksWebpackPlugin());
   }
 
-  // Read the tsconfig to determine if we should prefer ES2015 modules.
-
   // Load rxjs path aliases.
   // https://github.com/ReactiveX/rxjs/blob/master/doc/lettable-operators.md#build-and-treeshaking
-
-  const supportES2015 =
-    wco.tsConfig.options.target !== projectTs.ScriptTarget.ES3 &&
-    wco.tsConfig.options.target !== projectTs.ScriptTarget.ES5;
-
   let alias = {};
   try {
-    const rxjsPathMappingImport = supportES2015
+    const rxjsPathMappingImport = wco.supportES2015
       ? 'rxjs/_esm2015/path-mapping'
       : 'rxjs/_esm5/path-mapping';
     const rxPaths = requireProjectModule(projectRoot, rxjsPathMappingImport);
