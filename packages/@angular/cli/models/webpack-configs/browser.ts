@@ -116,7 +116,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     ].concat(extraPlugins),
     node: {
       fs: 'empty',
-      global: false,
+      global: !!buildOptions.includeNodeGlobal,
       crypto: 'empty',
       tls: 'empty',
       net: 'empty',

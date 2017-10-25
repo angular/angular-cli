@@ -29,6 +29,7 @@ export interface BuildOptions {
   showCircularDependencies?: boolean;
   buildOptimizer?: boolean;
   namedChunks?: boolean;
+  includeNodeGlobal?: boolean;
   subresourceIntegrity?: boolean;
   forceTsCommonjs?: boolean;
 }
