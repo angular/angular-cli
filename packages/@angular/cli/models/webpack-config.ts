@@ -1,5 +1,8 @@
+// @ignoreDep typescript - used only for type information
+import * as ts from 'typescript';
 import { AngularCompilerPlugin } from '@ngtools/webpack';
 import { readTsconfig } from '../utilities/read-tsconfig';
+import { requireProjectModule } from '../utilities/require-project-module';
 const webpackMerge = require('webpack-merge');
 import { CliConfig } from './config';
 import { BuildOptions } from './build-options';
@@ -20,6 +23,7 @@ export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
   buildOptions: T;
   appConfig: any;
   tsConfig: any;
+  supportES2015: boolean;
 }
 
 export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
@@ -39,7 +43,12 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
     const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
     const tsConfig = readTsconfig(tsconfigPath);
 
-    this.wco = { projectRoot, buildOptions, appConfig, tsConfig };
+    const projectTs = requireProjectModule(projectRoot, 'typescript') as typeof ts;
+
+    const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
+                        && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
+
+    this.wco = { projectRoot, buildOptions, appConfig, tsConfig, supportES2015 };
   }
 
   public buildConfig() {

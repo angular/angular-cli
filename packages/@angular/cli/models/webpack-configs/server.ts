@@ -1,5 +1,4 @@
 import { WebpackConfigOptions } from '../webpack-config';
-import { requireProjectModule } from '../../utilities/require-project-module';
 
 /**
  * Returns a partial specific to creating a bundle for node
@@ -7,15 +6,10 @@ import { requireProjectModule } from '../../utilities/require-project-module';
  */
 export function getServerConfig(wco: WebpackConfigOptions) {
 
-  const projectTs = requireProjectModule(wco.projectRoot, 'typescript');
-
-  const supportES2015 = wco.tsConfig.options.target !== projectTs.ScriptTarget.ES3
-                     && wco.tsConfig.options.target !== projectTs.ScriptTarget.ES5;
-
   const config: any = {
     resolve: {
       mainFields: [
-        ...(supportES2015 ? ['es2015'] : []),
+        ...(wco.supportES2015 ? ['es2015'] : []),
         'main', 'module',
       ],
     },
