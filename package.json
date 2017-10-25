@@ -103,9 +103,9 @@
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
-    "@angular/compiler": "^4.0.0",
-    "@angular/compiler-cli": "^4.0.0",
-    "@angular/core": "^4.0.0",
+    "@angular/compiler": "^5.0.0-rc.8",
+    "@angular/compiler-cli": "^5.0.0-rc.8",
+    "@angular/core": "^5.0.0-rc.8",
     "@types/common-tags": "^1.2.4",
     "@types/copy-webpack-plugin": "^4.0.0",
     "@types/denodeify": "^1.2.30",

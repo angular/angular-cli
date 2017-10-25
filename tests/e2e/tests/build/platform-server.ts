@@ -10,6 +10,7 @@ import {
 } from '../../utils/fs';
 import { ng, silentNpm, exec } from '../../utils/process';
 import { getGlobalVariable } from '../../utils/env';
+import { readNgVersion } from '../../utils/version';
 import { expectToFail } from '../../utils/utils';
 
 export default function () {
@@ -23,7 +24,7 @@ export default function () {
     return Promise.resolve();
   }
 
-  let platformServerVersion = '^4.0.0';
+  let platformServerVersion = readNgVersion();
 
   if (getGlobalVariable('argv').nightly) {
     platformServerVersion = 'github:angular/platform-server-builds';
