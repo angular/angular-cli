@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 import * as process from 'process';
 import * as ts from 'typescript';
 import chalk from 'chalk';

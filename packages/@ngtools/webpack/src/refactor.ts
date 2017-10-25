@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 // TODO: move this in its own package.
 import * as path from 'path';
 import * as ts from 'typescript';

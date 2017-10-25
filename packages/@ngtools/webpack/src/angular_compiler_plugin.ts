@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 import * as fs from 'fs';
 import { fork, ForkOptions, ChildProcess } from 'child_process';
 import * as path from 'path';

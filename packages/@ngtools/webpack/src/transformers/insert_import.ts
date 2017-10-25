@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 import * as ts from 'typescript';
 
 import { findAstNodes, getFirstNode } from './ast_helpers';

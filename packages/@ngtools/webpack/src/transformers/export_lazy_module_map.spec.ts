@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 import * as ts from 'typescript';
 import { oneLine, stripIndent } from 'common-tags';
 import { transformTypescript } from './ast_helpers';

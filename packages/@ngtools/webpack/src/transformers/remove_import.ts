@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 import * as ts from 'typescript';
 
 import { findAstNodes } from './ast_helpers';
