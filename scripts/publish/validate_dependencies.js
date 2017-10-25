@@ -29,7 +29,10 @@ const ANGULAR_PACKAGES = [
   '@angular/core'
 ];
 const OPTIONAL_PACKAGES = [
-  '@angular/service-worker'
+  '@angular/service-worker',
+];
+const PEERDEP_HACK_PACKAGES = [
+  'typescript',
 ];
 
 
@@ -168,7 +171,8 @@ const missingRootDeps = overallDeps.filter(d => allRootDeps.indexOf(d) == -1)
 reportMissingDependencies(missingRootDeps);
 
 const overRootDeps = allRootDeps.filter(d => overallDeps.indexOf(d) == -1)
-  .filter(x => ANGULAR_PACKAGES.indexOf(x) == -1);
+  .filter(x => ANGULAR_PACKAGES.indexOf(x) == -1)
+  .filter(x => PEERDEP_HACK_PACKAGES.indexOf(x) == -1);
 reportExcessiveDependencies(overRootDeps);
 
 process.exit(exitCode);
