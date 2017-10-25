@@ -95,7 +95,7 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
         sourcemaps: true,
         extractCss: false,
         namedChunks: true,
-        aot: false,
+        aot: AngularCompilerPlugin.isSupported(),
         buildOptimizer: false
       },
       production: {
@@ -112,7 +112,7 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
 
     // Use Build Optimizer on prod AOT builds by default when AngularCompilerPlugin is supported.
     const buildOptimizerDefault = {
-      buildOptimizer: merged.aot && AngularCompilerPlugin.isSupported()
+      buildOptimizer: buildOptions.target == 'production' && AngularCompilerPlugin.isSupported()
     };
 
     merged = Object.assign({}, buildOptimizerDefault, merged);
