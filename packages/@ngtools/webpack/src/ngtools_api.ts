@@ -1,4 +1,5 @@
 // @ignoreDep @angular/compiler-cli
+// @ignoreDep typescript
 /**
  * This is a copy of types in @compiler-cli/src/ngtools_api.d.ts file,
  * together with safe imports for private apis for cases where @angular/compiler-cli isn't

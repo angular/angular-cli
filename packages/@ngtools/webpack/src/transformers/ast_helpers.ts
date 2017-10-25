@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 import * as ts from 'typescript';
 import { WebpackCompilerHost } from '../compiler_host';
 import { makeTransform, TransformOperation } from './make_transform';

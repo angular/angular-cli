@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 import * as ts from 'typescript';
 import {basename, dirname, join, sep} from 'path';
 import * as fs from 'fs';
