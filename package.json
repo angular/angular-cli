@@ -42,8 +42,8 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-devkit/build-optimizer": "~0.0.28",
-    "@angular-devkit/schematics": "~0.0.34",
-    "@schematics/angular": "~0.0.48",
+    "@angular-devkit/schematics": "~0.0.35",
+    "@schematics/angular": "~0.1.0",
     "autoprefixer": "^6.5.3",
     "chalk": "~2.2.0",
     "circular-dependency-plugin": "^3.0.0",
@@ -79,7 +79,7 @@
     "postcss-url": "^5.1.2",
     "raw-loader": "^0.5.1",
     "resolve": "^1.1.7",
-    "rxjs": "^5.4.2",
+    "rxjs": "^5.5.2",
     "sass-loader": "^6.0.3",
     "semver": "^5.3.0",
     "silent-error": "^1.0.0",
@@ -103,9 +103,9 @@
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
-    "@angular/compiler": "^4.0.0",
-    "@angular/compiler-cli": "^4.0.0",
-    "@angular/core": "^4.0.0",
+    "@angular/compiler": "^5.0.0",
+    "@angular/compiler-cli": "^5.0.0",
+    "@angular/core": "^5.0.0",
     "@types/common-tags": "^1.2.4",
     "@types/copy-webpack-plugin": "^4.0.0",
     "@types/denodeify": "^1.2.30",

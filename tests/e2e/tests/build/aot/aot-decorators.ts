@@ -1,13 +1,10 @@
 import {ng} from '../../../utils/process';
 import {appendToFile, expectFileToMatch, prependToFile, replaceInFile} from '../../../utils/fs';
 import {expectToFail} from '../../../utils/utils';
-import {getGlobalVariable} from '../../../utils/env';
+import {ngVersionMatches} from '../../../utils/version';
 
 export default function() {
-
-  // TODO: re-enable this test for ng5.
-  // now we only remove decorators via --build-optimizer
-  if (getGlobalVariable('argv').nightly) {
+  if (!ngVersionMatches('^4.0.0')) {
     return Promise.resolve();
   }
 
