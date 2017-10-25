@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as webpack from 'webpack';
 import * as fs from 'fs';
 import * as semver from 'semver';
-import * as ts from 'typescript';
 import { stripIndent } from 'common-tags';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { PurifyPlugin } from '@angular-devkit/build-optimizer';
@@ -10,6 +9,7 @@ import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 import { readTsconfig } from '../../utilities/read-tsconfig';
+import { requireProjectModule } from '../../utilities/require-project-module';
 
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
@@ -23,6 +23,8 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 export function getProdConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
+
+  const projectTs = requireProjectModule(projectRoot, 'typescript');
 
   let extraPlugins: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
@@ -124,8 +126,8 @@ export function getProdConfig(wco: WebpackConfigOptions) {
   // Read the tsconfig to determine if we should apply ES6 uglify.
   const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
   const tsConfig = readTsconfig(tsconfigPath);
-  const supportES2015 = tsConfig.options.target !== ts.ScriptTarget.ES3
-    && tsConfig.options.target !== ts.ScriptTarget.ES5;
+  const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
+    && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
 
   return {
     entry: entryPoints,
