@@ -72,12 +72,6 @@ export function gatherDiagnostics(
       checkDiagnostics(angularProgram.getTsSemanticDiagnostics(undefined, cancellationToken));
     timeEnd(`${benchmarkLabel}.gatherDiagnostics.ng.getTsSemanticDiagnostics`);
 
-    // Check Angular structural diagnostics.
-    time(`${benchmarkLabel}.gatherDiagnostics.ng.getNgStructuralDiagnostics`);
-    checkOtherDiagnostics = checkOtherDiagnostics &&
-      checkDiagnostics(angularProgram.getNgStructuralDiagnostics(cancellationToken));
-    timeEnd(`${benchmarkLabel}.gatherDiagnostics.ng.getNgStructuralDiagnostics`);
-
     // Check Angular semantic diagnostics
     time(`${benchmarkLabel}.gatherDiagnostics.ng.getNgSemanticDiagnostics`);
     checkOtherDiagnostics = checkOtherDiagnostics &&
