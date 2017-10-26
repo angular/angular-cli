@@ -234,7 +234,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>progress</summary>
   <p>
-    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true</em>
+    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true inside TTY, false otherwise</em>
   </p>
   <p>
     Log progress to the console while building.

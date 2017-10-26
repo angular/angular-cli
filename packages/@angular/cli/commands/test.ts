@@ -64,8 +64,10 @@ const TestCommand = Command.extend({
     {
       name: 'progress',
       type: Boolean,
-      default: testConfigDefaults['progress'],
-      description: 'Log progress to the console while in progress.'
+      description: 'Log progress to the console while in progress.',
+      default: typeof testConfigDefaults['progress'] !== 'undefined'
+        ? testConfigDefaults['progress']
+        : process.stdout.isTTY === true,
     },
     {
       name: 'browsers',

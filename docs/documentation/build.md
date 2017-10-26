@@ -261,7 +261,7 @@ Note: service worker support is experimental and subject to change.
 <details>
   <summary>progress</summary>
   <p>
-    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true</<em>
+    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true inside TTY, false otherwise</<em>
   </p>
   <p>
     Log progress to the console while building.

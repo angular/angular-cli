@@ -83,7 +83,9 @@ export const baseBuildCommandOptions: any = [
     type: Boolean,
     aliases: ['pr'],
     description: 'Log progress to the console while building.',
-    default: buildConfigDefaults['progress']
+    default: typeof buildConfigDefaults['progress'] !== 'undefined'
+      ? buildConfigDefaults['progress']
+      : process.stdout.isTTY === true
   },
   {
     name: 'i18n-file',

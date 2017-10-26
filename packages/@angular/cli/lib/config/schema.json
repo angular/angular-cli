@@ -476,8 +476,7 @@
             },
             "progress": {
               "description": "The ssl key used by the server.",
-              "type": "boolean",
-              "default": true
+              "type": "boolean"
             },
             "poll": {
               "description": "Enable and define the file watching poll time period (milliseconds).",
