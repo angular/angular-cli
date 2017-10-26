@@ -1,5 +1,6 @@
 // @ignoreDep typescript
 import * as ts from 'typescript';
+import { relative, dirname } from 'path';
 
 import { findAstNodes } from './ast_helpers';
 import { insertStarImport } from './insert_import';
@@ -16,7 +17,7 @@ export function replaceBootstrap(
 ): TransformOperation[] {
   const ops: TransformOperation[] = [];
 
-  // Find all identifiers using the entry module class name.
+  // Find all identifiers.
   const entryModuleIdentifiers = findAstNodes<ts.Identifier>(null, sourceFile,
     ts.SyntaxKind.Identifier, true)
     .filter(identifier => identifier.getText() === entryModule.className);
@@ -25,27 +26,8 @@ export function replaceBootstrap(
     return [];
   }
 
-  // Get the module path from the import.
-  let modulePath: string;
-  entryModuleIdentifiers.forEach((entryModuleIdentifier) => {
-    // TODO: only supports `import {A, B, C} from 'modulePath'` atm, add other import support later.
-    if (entryModuleIdentifier.parent.kind !== ts.SyntaxKind.ImportSpecifier) {
-      return;
-    }
-
-    const importSpec = entryModuleIdentifier.parent as ts.ImportSpecifier;
-    const moduleSpecifier = importSpec.parent.parent.parent.moduleSpecifier;
-
-    if (moduleSpecifier.kind !== ts.SyntaxKind.StringLiteral) {
-      return;
-    }
-
-    modulePath = (moduleSpecifier as ts.StringLiteral).text;
-  });
-
-  if (!modulePath) {
-    return [];
-  }
+  const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
+  const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
 
   // Find the bootstrap calls.
   const removedEntryModuleIdentifiers: ts.Identifier[] = [];
@@ -89,7 +71,7 @@ export function replaceBootstrap(
 
     // Add the transform operations.
     const factoryClassName = entryModule.className + 'NgFactory';
-    const factoryModulePath = modulePath + '.ngfactory';
+    const factoryModulePath = normalizedEntryModulePath + '.ngfactory';
     ops.push(
       // Replace the entry module import.
       ...insertStarImport(sourceFile, idNgFactory, factoryModulePath),
