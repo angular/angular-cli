@@ -34,11 +34,11 @@ describe('export_lazy_module_map', () => {
       export { AppModule } from './app/app.module';
     `;
     // tslint:disable:max-line-length
-    const output = stripIndent`
-      import * as __lazy_0__ from "app/lazy/lazy.module.ts";
-      import * as __lazy_1__ from "app/lazy2/lazy2.module.ts";
+    const expected = stripIndent`
+      import * as __lazy_0__ from "app/lazy/lazy.module.ngfactory.ts";
+      import * as __lazy_1__ from "app/lazy2/lazy2.module.ngfactory.ts";
       export { AppModule } from './app/app.module';
-      export var LAZY_MODULE_MAP = { "./lazy/lazy.module#LazyModule": __lazy_0__.LazyModule, "./lazy2/lazy2.module#LazyModule2": __lazy_1__.LazyModule2 };
+      export var LAZY_MODULE_MAP = { "./lazy/lazy.module#LazyModule": __lazy_0__.LazyModuleNgFactory, "./lazy2/lazy2.module#LazyModule2": __lazy_1__.LazyModule2NgFactory };
     `;
     // tslint:enable:max-line-length
 
@@ -50,6 +50,6 @@ describe('export_lazy_module_map', () => {
     });
     const result = transformTypescript(input, transformOpsCb);
 
-    expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+    expect(oneLine`${result}`).toEqual(oneLine`${expected}`);
   });
 });
