@@ -37,7 +37,7 @@
 </details>
 
 <details>
-  <summary>outfile</summary>
+  <summary>out-file</summary>
   <p>
     <code>--out-file</code> (aliases: <code>-of</code>)
   </p>
