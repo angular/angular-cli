@@ -21,9 +21,9 @@ describe('@ngtools/webpack transformers', () => {
         platformBrowserDynamic().bootstrapModule(AppModule);
       `;
       const output = stripIndent`
-        import __locale_fr__ from "@angular/common/locales/fr";
-        import { registerLocaleData } from "@angular/common";
-        registerLocaleData(__locale_fr__);
+        import * as __NgCli_locale_1 from "@angular/common/locales/fr";
+        import * as __NgCli_locale_2 from "@angular/common";
+        __NgCli_locale_2.registerLocaleData(__NgCli_locale_1.default);
 
         import { enableProdMode } from '@angular/core';
         import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';

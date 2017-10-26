@@ -3,6 +3,7 @@ import * as ts from 'typescript';
 
 import { findAstNodes, getFirstNode } from './ast_helpers';
 import { AddNodeOperation, TransformOperation } from './make_transform';
+import { insertStarImport } from './insert_import';
 
 
 export function registerLocaleData(
@@ -44,40 +45,33 @@ export function registerLocaleData(
       return;
     }
 
-    // Create the import node for the locale.
-    const localeIdentifier = ts.createIdentifier(`__locale_${locale.replace(/-/g, '')}__`);
-    const localeImportClause = ts.createImportClause(localeIdentifier, undefined);
-    const localeNewImport = ts.createImportDeclaration(undefined, undefined, localeImportClause,
-      ts.createLiteral(`@angular/common/locales/${locale}`));
+    const firstNode = getFirstNode(sourceFile);
 
-    ops.push(new AddNodeOperation(
-      sourceFile,
-      getFirstNode(sourceFile),
-      localeNewImport
+    // Create the import node for the locale.
+    const localeNamespaceId = ts.createUniqueName('__NgCli_locale_');
+    ops.push(...insertStarImport(
+      sourceFile, localeNamespaceId, `@angular/common/locales/${locale}`, firstNode, true
     ));
 
     // Create the import node for the registerLocaleData function.
     const regIdentifier = ts.createIdentifier(`registerLocaleData`);
-    const regImportSpecifier = ts.createImportSpecifier(undefined, regIdentifier);
-    const regNamedImport = ts.createNamedImports([regImportSpecifier]);
-    const regImportClause = ts.createImportClause(undefined, regNamedImport);
-    const regNewImport = ts.createImportDeclaration(undefined, undefined, regImportClause,
-      ts.createLiteral('@angular/common'));
-
-    ops.push(new AddNodeOperation(
-      sourceFile,
-      getFirstNode(sourceFile),
-      regNewImport
-    ));
+    const regNamespaceId = ts.createUniqueName('__NgCli_locale_');
+    ops.push(
+      ...insertStarImport(sourceFile, regNamespaceId, '@angular/common', firstNode, true)
+    );
 
     // Create the register function call
-    const registerFunctionCall = ts.createCall(regIdentifier, undefined, [localeIdentifier]);
+    const registerFunctionCall = ts.createCall(
+      ts.createPropertyAccess(regNamespaceId, regIdentifier),
+      undefined,
+      [ts.createPropertyAccess(localeNamespaceId, 'default')],
+    );
     const registerFunctionStatement = ts.createStatement(registerFunctionCall);
 
     ops.push(new AddNodeOperation(
       sourceFile,
-      getFirstNode(sourceFile),
-      registerFunctionStatement
+      firstNode,
+      registerFunctionStatement,
     ));
   });
 
