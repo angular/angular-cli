@@ -9,6 +9,8 @@ export function insertStarImport(
   sourceFile: ts.SourceFile,
   identifier: ts.Identifier,
   modulePath: string,
+  target?: ts.Node,
+  before = false,
 ): TransformOperation[] {
   const ops: TransformOperation[] = [];
   const allImports = findAstNodes(null, sourceFile, ts.SyntaxKind.ImportDeclaration);
@@ -21,7 +23,14 @@ export function insertStarImport(
   const newImport = ts.createImportDeclaration(undefined, undefined, importClause,
     ts.createLiteral(modulePath));
 
-  if (allImports.length > 0) {
+  if (target) {
+    ops.push(new AddNodeOperation(
+      sourceFile,
+      target,
+      before ? newImport : undefined,
+      before ? undefined : newImport
+    ));
+  } else if (allImports.length > 0) {
     // Find the last import and insert after.
     ops.push(new AddNodeOperation(
       sourceFile,
