@@ -109,7 +109,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>progress</summary>
   <p>
-    <code>--progress</code> <em>default value: true</em>
+    <code>--progress</code> <em>default value: true inside TTY, false otherwise</em>
   </p>
   <p>
     Log progress to the console while in progress.

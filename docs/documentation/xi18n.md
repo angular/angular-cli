@@ -59,7 +59,7 @@
 <details>
   <summary>progress</summary>
   <p>
-    <code>--progress</code>
+    <code>--progress</code> <em>default value: true inside TTY, false otherwise</<em>
   </p>
   <p>
     Log progress to the console while running.
