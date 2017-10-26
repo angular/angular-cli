@@ -12,6 +12,7 @@ export interface TestOptions {
   watch?: boolean;
   codeCoverage?: boolean;
   singleRun?: boolean;
+  aot?: boolean;
   browsers?: string;
   colors?: boolean;
   log?: string;
@@ -54,6 +55,11 @@ const TestCommand = Command.extend({
       aliases: ['c'],
       description: oneLine`Use a specific config file.
         Defaults to the karma config file in .angular-cli.json.`
+    },
+    {
+      name: 'aot',
+      type: Boolean,
+      description: 'Build using Ahead of Time compilation.'
     },
     {
       name: 'single-run',

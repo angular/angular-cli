@@ -55,6 +55,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     sourcemaps: true,
     progress: true,
     preserveSymlinks: false,
+    aot: config.aot,
   }, config.angularCli);
 
   if (testConfig.sourcemaps) {

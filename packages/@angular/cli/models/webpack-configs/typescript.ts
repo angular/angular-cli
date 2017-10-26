@@ -159,7 +159,8 @@ export function getAotConfig(wco: WebpackConfigOptions) {
 }
 
 export function getNonAotTestConfig(wco: WebpackConfigOptions) {
-  const { projectRoot, appConfig } = wco;
+  const { projectRoot, appConfig, buildOptions } = wco;
+  const { aot } = buildOptions;
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.testTsconfig);
   const appTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
 
@@ -171,7 +172,8 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
     include.push(appConfig.test);
   }
 
-  let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true, include };
+  let pluginOptions: any = { tsConfigPath, skipCodeGeneration: !aot,
+    enableSummariesForJit: aot, include };
 
   // Fallback to correct module format on projects using a shared tsconfig.
   if (tsConfigPath === appTsConfigPath) {
