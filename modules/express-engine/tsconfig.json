@@ -4,6 +4,9 @@
     "outDir": "../../dist/express-engine",
     "rootDir": "./"
   },
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true
+  },
   "files": [
     "index.ts",
     "tokens.ts"

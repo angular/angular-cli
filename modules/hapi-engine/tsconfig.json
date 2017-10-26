@@ -4,6 +4,9 @@
     "outDir": "../../dist/hapi-engine",
     "rootDir": "./"
   },
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true
+  },
   "files": [
     "index.ts"
   ]

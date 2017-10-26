@@ -4,6 +4,9 @@
     "outDir": "../../dist/module-map-ngfactory-loader",
     "rootDir": "./"
   },
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true
+  },
   "files": [
     "index.ts"
   ]
