@@ -1,5 +1,6 @@
 // @ignoreDep typescript
 import * as ts from 'typescript';
+import { relative, dirname } from 'path';
 
 import { findAstNodes, getFirstNode } from './ast_helpers';
 import { TransformOperation, AddNodeOperation } from './make_transform';
@@ -19,6 +20,9 @@ export function exportNgFactory(
     return [];
   }
 
+  const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
+  const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
+
   // Get the module path from the import.
   let modulePath: string;
   entryModuleIdentifiers.forEach((entryModuleIdentifier) => {
@@ -37,7 +41,7 @@ export function exportNgFactory(
 
     // Add the transform operations.
     const factoryClassName = entryModule.className + 'NgFactory';
-    const factoryModulePath = modulePath + '.ngfactory';
+    const factoryModulePath = normalizedEntryModulePath + '.ngfactory';
 
     const namedExports = ts.createNamedExports([ts.createExportSpecifier(undefined,
       ts.createIdentifier(factoryClassName))]);
