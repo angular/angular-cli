@@ -18,16 +18,8 @@ export function exportLazyModuleMap(
 
   const modules = Object.keys(lazyRoutes)
     .map((loadChildrenString) => {
-      let [, moduleName] = loadChildrenString.split('#');
-      let modulePath = lazyRoutes[loadChildrenString];
-
-      if (modulePath.match(/\.ngfactory\.[jt]s$/)) {
-        modulePath = modulePath.replace('.ngfactory', '');
-        moduleName = moduleName.replace('NgFactory', '');
-        loadChildrenString = loadChildrenString
-          .replace('.ngfactory', '')
-          .replace('NgFactory', '');
-      }
+      const [, moduleName] = loadChildrenString.split('#');
+      const modulePath = lazyRoutes[loadChildrenString];
 
       return {
         modulePath,
@@ -52,10 +44,17 @@ export function exportLazyModuleMap(
   });
 
   const lazyModuleObjectLiteral = ts.createObjectLiteral(
-    modules.map((mod, idx) => ts.createPropertyAssignment(
-      ts.createLiteral(mod.loadChildrenString),
-      ts.createPropertyAccess(ts.createIdentifier(`__lazy_${idx}__`), mod.moduleName))
-    )
+    modules.map((mod, idx) => {
+      let [modulePath, moduleName] = mod.loadChildrenString.split('#');
+      if (modulePath.match(/\.ngfactory/)) {
+        modulePath = modulePath.replace('.ngfactory', '');
+        moduleName = moduleName.replace('NgFactory', '');
+      }
+
+      return ts.createPropertyAssignment(
+        ts.createLiteral(`${modulePath}#${moduleName}`),
+        ts.createPropertyAccess(ts.createIdentifier(`__lazy_${idx}__`), mod.moduleName));
+    })
   );
 
   const lazyModuleVariableStmt = ts.createVariableStatement(
