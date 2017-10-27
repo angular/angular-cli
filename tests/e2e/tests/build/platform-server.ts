@@ -55,7 +55,7 @@ export default function () {
     .then(() => ng('build', '--aot=false'))
     // files were created successfully
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      /__webpack_exports__, "AppModule"/))
+      /exports.*AppModule/))
     .then(() => writeFile('./index.js', `
       require('zone.js/dist/zone-node');
       require('reflect-metadata');
@@ -76,7 +76,7 @@ export default function () {
     .then(() => ng('build', '--aot'))
     // files were created successfully
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      /__webpack_exports__, "AppModuleNgFactory"/))
+      /exports.*AppModuleNgFactory/))
     .then(() => replaceInFile('./index.js', /AppModule/g, 'AppModuleNgFactory'))
     .then(() => replaceInFile('./index.js', /renderModule/g, 'renderModuleFactory'))
     .then(() => exec(normalize('node'), 'index.js'))
