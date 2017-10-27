@@ -90,6 +90,13 @@ export class VirtualFileStats extends VirtualStats {
   get size() { return this._content.length; }
 }
 
+/**
+ * FileTransform can be passed into the AoT plugin to transform loaded
+ * TypeScript files, before they're parsed.
+ */
+export interface FileTransform {
+  (contents: string, filename: string): string;
+}
 
 export class WebpackCompilerHost implements ts.CompilerHost {
   private _delegate: ts.CompilerHost;
@@ -104,7 +111,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   private _cache = false;
 
-  constructor(private _options: ts.CompilerOptions, basePath: string) {
+  constructor(
+      private _options: ts.CompilerOptions,
+      basePath: string,
+      private _transform?: FileTransform,
+   ) {
     this._setParentNodes = true;
     this._delegate = ts.createCompilerHost(this._options, this._setParentNodes);
     this._basePath = this._normalizePath(basePath);
@@ -172,7 +183,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
     const stats = this._files[fileName];
     if (stats == null) {
-      const result = this._delegate.readFile(fileName);
+      let result = this._delegate.readFile(fileName);
+      if (this._transform && result !== undefined) {
+        result = this._transform(result, fileName);
+      }
+
       if (result !== undefined && this._cache) {
         this._setFileContent(fileName, result);
         return result;
