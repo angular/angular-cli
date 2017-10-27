@@ -575,7 +575,9 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
             result.outputText = result.outputText.replace(sourceMappingUrlRe, '');
             // Set the map source to use the full path of the file.
             const sourceMap = JSON.parse(result.sourceMap);
-            sourceMap.sources[0] = sourceFileName;
+            sourceMap.sources = sourceMap.sources.map((fileName: string) => {
+              return path.join(path.dirname(sourceFileName), fileName);
+            });
             result.sourceMap = JSON.stringify(sourceMap);
           }
 
