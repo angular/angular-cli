@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "tree-kill": "^1.0.0",
-    "chalk": "^2.0.1",
+    "chalk": "~2.2.0",
     "loader-utils": "^1.0.2",
     "enhanced-resolve": "^3.1.0",
     "magic-string": "^0.22.3",
