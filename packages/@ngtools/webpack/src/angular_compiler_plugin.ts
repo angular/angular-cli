@@ -828,7 +828,7 @@ export class AngularCompilerPlugin implements Tapable {
         this._emitSkipped = !emitResult || emitResult.emitSkipped;
 
         // Reset changed files on successful compilation.
-        if (this._emitSkipped && this._compilation.errors.length === 0) {
+        if (!this._emitSkipped && this._compilation.errors.length === 0) {
           this._compilerHost.resetChangedFileTracker();
         }
         timeEnd('AngularCompilerPlugin._update');
@@ -872,7 +872,9 @@ export class AngularCompilerPlugin implements Tapable {
         // We also need to all changed files as dependencies of this file, so that all of them
         // will be watched and trigger a rebuild next time.
         outputText = '';
-        errorDependencies = this._getChangedCompilationFiles();
+        errorDependencies = this._getChangedCompilationFiles()
+          // These paths are used by the loader so we must denormalize them.
+          .map((p) => this._compilerHost.denormalizePath(p));
       }
     } else {
       // Check if the TS file exists.
@@ -923,9 +925,14 @@ export class AngularCompilerPlugin implements Tapable {
       .reduce((prev, curr) => prev.concat(curr), [])
       .map((resourcePath) => path.resolve(path.dirname(resolvedFileName), resourcePath))
       .reduce((prev, curr) =>
-        prev.concat(...this._resourceLoader.getResourceDependencies(curr)), []);
+        prev.concat(...this.getResourceDependencies(curr)), []);
 
-    return [...esImports, ...resourceImports];
+    // These paths are meant to be used by the loader so we must denormalize them.
+    return [...esImports, ...resourceImports].map((p) => this._compilerHost.denormalizePath(p));
+  }
+
+  getResourceDependencies(fileName: string): string[] {
+    return this._resourceLoader.getResourceDependencies(fileName);
   }
 
   // This code mostly comes from `performCompilation` in `@angular/compiler-cli`.
