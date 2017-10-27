@@ -92,9 +92,6 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
       missingTranslation: buildOptions.missingTranslation,
       hostReplacementPaths,
       sourceMap: buildOptions.sourcemaps,
-      // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
-      exclude: [],
-      include: options.include,
     }, options);
     return new AngularCompilerPlugin(pluginOptions);
   } else {

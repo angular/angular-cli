@@ -112,6 +112,16 @@ export interface CreateCompilerHostInterface {
 export interface FormatDiagnosticsInterface {
   (diags: Diagnostics): string;
 }
+export interface ParsedConfiguration {
+  project: string;
+  options: CompilerOptions;
+  rootNames: string[];
+  emitFlags: any;
+  errors: Diagnostics;
+}
+export interface ReadConfigurationInterface {
+  (project: string, existingOptions?: ts.CompilerOptions): ParsedConfiguration;
+}
 
 // Manually check for Compiler CLI availability and supported version.
 // This is needed because @ngtools/webpack does not depend directly on @angular/compiler-cli, since
@@ -173,4 +183,5 @@ try {
 export const createProgram: CreateProgramInterface = ngtools2.createProgram;
 export const createCompilerHost: CreateCompilerHostInterface = ngtools2.createCompilerHost;
 export const formatDiagnostics: FormatDiagnosticsInterface = ngtools2.formatDiagnostics;
+export const readConfiguration: ReadConfigurationInterface = compilerCli.readConfiguration;
 export const EmitFlags = ngtools2.EmitFlags;

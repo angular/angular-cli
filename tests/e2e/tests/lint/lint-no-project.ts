@@ -24,6 +24,13 @@ export default function () {
       return stdout;
     })
     .then(() => ng('set', 'lint.0.files', '"**/baz.ts"'))
+    .then(() => {
+      // Starting with ng5, tsconfig.spec.json includes all ts files, so linting for it must
+      // also set the files.
+      if (getGlobalVariable('argv').nightly) {
+        return ng('set', 'lint.1.files', '"**/baz.ts"');
+      }
+    })
     .then(() => writeFile('src/app/foo.ts', 'const foo = "";\n'))
     .then(() => writeFile('src/app/baz.ts', 'const baz = \'\';\n'))
     .then(() => ng('lint'))

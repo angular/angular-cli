@@ -13,6 +13,13 @@ export default function () {
 
   return Promise.resolve()
     .then(() => ng('set', 'lint.0.exclude', '"**/foo.ts"'))
+    .then(() => {
+      // Starting with ng5, tsconfig.spec.json includes all ts files, so linting for it must
+      // also set the files.
+      if (getGlobalVariable('argv').nightly) {
+        return ng('set', 'lint.1.exclude', '"**/foo.ts"');
+      }
+    })
     .then(() => writeFile(fileName, 'const foo = "";\n'))
     .then(() => ng('lint'))
     .then(({ stdout }) => {
