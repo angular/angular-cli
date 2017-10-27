@@ -581,18 +581,35 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
             result.sourceMap = JSON.stringify(sourceMap);
           }
 
-          // Dependencies must use system path separator.
-          // TODO: move the denormalizer into it's own helper.
-          result.errorDependencies.forEach(dep => this.addDependency(dep.replace(/\//g, path.sep)));
-          const dependencies = plugin.getDependencies(sourceFileName);
-          dependencies.forEach(dep => this.addDependency(dep.replace(/\//g, path.sep)));
+          // Manually add the dependencies for TS files.
+          // Type only imports will be stripped out by compilation so we need to add them as
+          // as dependencies.
+          // Component resources files (html and css templates) also need to be added manually for
+          // AOT, so that this file is reloaded when they change.
+          if (sourceFileName.endsWith('.ts')) {
+            result.errorDependencies.forEach(dep => this.addDependency(dep));
+            const dependencies = plugin.getDependencies(sourceFileName);
+            dependencies.forEach(dep => this.addDependency(dep));
+          }
 
-          // Also add the original file dependencies to virtual files.
-          const virtualFilesRe = /\.(?:ngfactory|css\.shim\.ngstyle)\.js$/;
-          if (virtualFilesRe.test(sourceFileName)) {
-            const originalFile = sourceFileName.replace(virtualFilesRe, '.ts');
+          // NgFactory files depend on the component template, but we can't know what that file
+          // is (if any). So we add all the dependencies that the original component file has
+          // to the factory as well, which includes html and css templates.
+          const ngFactoryRe = /\.ngfactory.js$/;
+          if (ngFactoryRe.test(sourceFileName)) {
+            const originalFile = sourceFileName.replace(ngFactoryRe, '.ts');
             const origDependencies = plugin.getDependencies(originalFile);
-            origDependencies.forEach(dep => this.addDependency(dep.replace(/\//g, path.sep)));
+            origDependencies.forEach(dep => this.addDependency(dep));
+          }
+
+          // NgStyle files depend on the style file they represent.
+          // E.g. `some-style.less.shim.ngstyle.js` depends on `some-style.less`.
+          // Those files can in turn depend on others, so we have to add them all.
+          const ngStyleRe = /\.shim\.ngstyle\.js$/;
+          if (ngStyleRe.test(sourceFileName)) {
+            const styleFile = sourceFileName.replace(ngStyleRe, '');
+            const styleDependencies = plugin.getResourceDependencies(styleFile);
+            styleDependencies.forEach(dep => this.addDependency(dep));
           }
 
           timeEnd(timeLabel);

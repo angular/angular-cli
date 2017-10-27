@@ -118,6 +118,10 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     return path.replace(/\\/g, '/');
   }
 
+  denormalizePath(path: string) {
+    return path.replace(/\//g, sep);
+  }
+
   resolve(path: string) {
     path = this._normalizePath(path);
     if (path[0] == '.') {
@@ -161,7 +165,9 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   getNgFactoryPaths(): string[] {
     return Object.keys(this._files)
-      .filter(fileName => fileName.endsWith('.ngfactory.js') || fileName.endsWith('.ngstyle.js'));
+      .filter(fileName => fileName.endsWith('.ngfactory.js') || fileName.endsWith('.ngstyle.js'))
+      // These paths are used by the virtual file system decorator so we must denormalize them.
+      .map((path) => this.denormalizePath(path));
   }
 
   invalidate(fileName: string): void {
@@ -291,7 +297,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   readResource(fileName: string) {
     if (this._resourceLoader) {
-      const denormalizedFileName = fileName.replace(/\//g, sep);
+      // These paths are meant to be used by the loader so we must denormalize them.
+      const denormalizedFileName = this.denormalizePath(fileName);
       const resourceDeps = this._resourceLoader.getResourceDependencies(denormalizedFileName);
 
       if (this._cachedResources[fileName] === undefined

@@ -1,5 +1,4 @@
 import { Stats } from 'fs';
-import { sep } from 'path';
 
 import { InputFileSystem, NodeWatchFileSystemInterface, Callback } from './webpack';
 import { WebpackCompilerHost } from './compiler_host';
@@ -31,8 +30,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   getVirtualFilesPaths() {
-    return this._webpackCompilerHost.getNgFactoryPaths()
-      .map((fileName) => fileName.replace(/\//g, sep));
+    return this._webpackCompilerHost.getNgFactoryPaths();
   }
 
   stat(path: string, callback: Callback<any>): void {
