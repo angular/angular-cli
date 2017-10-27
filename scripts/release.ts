@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
@@ -16,7 +16,7 @@ import { packages } from '../lib/packages';
 const monorepo = require('../.monorepo.json');
 
 
-function _showVersions(logger: Logger) {
+function _showVersions(logger: logging.Logger) {
   for (const pkgName of Object.keys(packages)) {
     const pkg = packages[pkgName];
 
@@ -36,7 +36,7 @@ function _showVersions(logger: Logger) {
 }
 
 
-function _upgrade(release: string, logger: Logger) {
+function _upgrade(release: string, logger: logging.Logger) {
   for (const pkg of Object.keys(packages)) {
     const hash = packages[pkg].hash;
     const version = packages[pkg].version;
@@ -107,7 +107,7 @@ function _upgrade(release: string, logger: Logger) {
 }
 
 
-export default function(args: { _: string[], 'dry-run'?: boolean }, logger: Logger) {
+export default function(args: { _: string[], 'dry-run'?: boolean }, logger: logging.Logger) {
   const maybeRelease = args._.shift();
   const dryRun = args['dry-run'] !== undefined;
   switch (maybeRelease) {

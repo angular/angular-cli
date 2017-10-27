@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import * as stream from 'stream';
 import { packages } from '../lib/packages';
 
@@ -16,10 +16,10 @@ class NullStream extends stream.Writable {
 }
 
 
-export default function (_: {}, logger: Logger) {
+export default function (_: {}, logger: logging.Logger) {
   logger.info('Building...');
   const build = require('./build').default;
-  build({}, new Logger('build', logger));
+  build({}, logger.createChild('build'));
 
   return new Promise<void>((resolve, reject) => {
     const loadOptions = { progress: false, logstream: new NullStream() };

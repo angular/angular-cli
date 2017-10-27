@@ -5,14 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
 import { Configuration, ILinterOptions, Linter, findFormatter } from 'tslint';
 import * as ts from 'typescript';
 
 
-function _buildRules(logger: Logger) {
+function _buildRules(logger: logging.Logger) {
   const tsConfigPath = path.join(__dirname, '../rules/tsconfig.json');
   const configFile = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
 
@@ -36,7 +36,7 @@ function _buildRules(logger: Logger) {
 }
 
 
-export default function (options: ParsedArgs, logger: Logger) {
+export default function (options: ParsedArgs, logger: logging.Logger) {
   _buildRules(logger);
 
   const lintOptions: ILinterOptions = {

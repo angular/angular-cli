@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, Logger } from '@angular-devkit/core';
+import { JsonObject, logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
@@ -63,7 +63,7 @@ function _copy(from: string, to: string) {
 }
 
 
-function _recursiveCopy(from: string, to: string, logger: Logger) {
+function _recursiveCopy(from: string, to: string, logger: logging.Logger) {
   if (!fs.existsSync(from)) {
     logger.error(`File "${from}" does not exist.`);
     process.exit(4);
@@ -93,7 +93,7 @@ function _rimraf(p: string) {
 }
 
 
-function _clean(logger: Logger) {
+function _clean(logger: logging.Logger) {
   logger.info('Cleaning...');
   logger.info('  Removing dist/...');
   _rimraf(path.join(__dirname, '../dist'));
@@ -128,7 +128,7 @@ function _sortPackages() {
 }
 
 
-function _build(logger: Logger) {
+function _build(logger: logging.Logger) {
   logger.info('Building...');
   const tsConfigPath = path.relative(process.cwd(), path.join(__dirname, '../tsconfig.json'));
   try {
@@ -141,14 +141,14 @@ function _build(logger: Logger) {
 }
 
 
-export default function(argv: { local?: boolean }, logger: Logger) {
+export default function(argv: { local?: boolean }, logger: logging.Logger) {
   _clean(logger);
 
   const sortedPackages = _sortPackages();
   _build(logger);
 
   logger.info('Moving packages to dist/');
-  const packageLogger = new Logger('packages', logger);
+  const packageLogger = logger.createChild('packages');
   for (const packageName of sortedPackages) {
     packageLogger.info(packageName);
     const pkg = packages[packageName];
@@ -157,13 +157,13 @@ export default function(argv: { local?: boolean }, logger: Logger) {
   }
 
   logger.info('Copying resources...');
-  const resourceLogger = new Logger('resources', logger);
+  const resourceLogger = logger.createChild('resources');
   for (const packageName of sortedPackages) {
     resourceLogger.info(packageName);
     const pkg = packages[packageName];
     const pkgJson = pkg.packageJson;
     const files = glob.sync(path.join(pkg.root, '**/*'), { dot: true, nodir: true });
-    const subSubLogger = new Logger(packageName, resourceLogger);
+    const subSubLogger = resourceLogger.createChild(packageName);
     subSubLogger.info(`${files.length} files total...`);
     const resources = files
       .map((fileName) => path.relative(pkg.root, fileName))
@@ -221,7 +221,7 @@ export default function(argv: { local?: boolean }, logger: Logger) {
   }
 
   logger.info('Removing spec files...');
-  const specLogger = new Logger('specfiles', logger);
+  const specLogger = logger.createChild('specfiles');
   for (const packageName of sortedPackages) {
     specLogger.info(packageName);
     const pkg = packages[packageName];
@@ -231,7 +231,7 @@ export default function(argv: { local?: boolean }, logger: Logger) {
   }
 
   logger.info('Building ejs templates...');
-  const templateLogger = new Logger('templates', logger);
+  const templateLogger = logger.createChild('templates');
   const templateCompiler = require('@angular-devkit/core').template;
   for (const packageName of sortedPackages) {
     templateLogger.info(packageName);
@@ -257,7 +257,7 @@ export default function(argv: { local?: boolean }, logger: Logger) {
 
   logger.info('Setting versions...');
 
-  const versionLogger = new Logger('versions', logger);
+  const versionLogger = logger.createChild('versions');
   for (const packageName of sortedPackages) {
     versionLogger.info(packageName);
     const pkg = packages[packageName];
@@ -289,7 +289,7 @@ export default function(argv: { local?: boolean }, logger: Logger) {
   }
 
   logger.info('Tarring all packages...');
-  const tarLogger = new Logger('license', logger);
+  const tarLogger = logger.createChild('license');
   Object.keys(packages).forEach(pkgName => {
     const pkg = packages[pkgName];
     tarLogger.info(`${pkgName} => ${pkg.tar}`);

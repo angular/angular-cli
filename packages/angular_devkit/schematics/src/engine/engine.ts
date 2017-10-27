@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException, NullLogger } from '@angular-devkit/core';
+import { BaseException, logging } from '@angular-devkit/core';
 import { CollectionDescription, TypedSchematicContext } from '@angular-devkit/schematics';
 import 'rxjs/add/operator/map';
 import { Url } from 'url';
@@ -84,7 +84,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
       debug: parent && parent.debug || false,
       engine: this,
       logger: (parent && parent.logger && parent.logger.createChild(schematic.description.name))
-              || new NullLogger(),
+              || new logging.NullLogger(),
       schematic,
       strategy: (parent && parent.strategy !== undefined)
         ? parent.strategy : this.defaultMergeStrategy,

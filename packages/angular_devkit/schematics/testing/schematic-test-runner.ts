@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger, schema } from '@angular-devkit/core';
+import { logging, schema } from '@angular-devkit/core';
 import {
   Collection,
   DelegateTree,
@@ -36,12 +36,12 @@ export class SchematicTestRunner {
   private _engineHost = new NodeModulesTestEngineHost();
   private _engine: SchematicEngine<{}, {}> = new SchematicEngine(this._engineHost);
   private _collection: Collection<{}, {}>;
-  private _logger: Logger;
+  private _logger: logging.Logger;
   private _registry: schema.JsonSchemaRegistry;
 
   constructor(private _collectionName: string, collectionPath: string) {
     this._engineHost.registerCollection(_collectionName, collectionPath);
-    this._logger = new Logger('test');
+    this._logger = new logging.Logger('test');
     this._registry = new schema.JsonSchemaRegistry();
 
     this._engineHost.registerOptionsTransform((
@@ -66,7 +66,7 @@ export class SchematicTestRunner {
     this._collection = this._engine.createCollection(this._collectionName);
   }
 
-  get logger() { return this._logger; }
+  get logger(): logging.Logger { return this._logger; }
 
   runSchematicAsync(
     schematicName: string,

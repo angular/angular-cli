@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import * as glob from 'glob';
 import * as Istanbul from 'istanbul';
 import 'jasmine';
@@ -205,7 +205,7 @@ glob.sync('packages/**/*.spec.ts')
     console.error(`Invalid spec file name: ${path}. You're using the old convention.`);
   });
 
-export default function (args: ParsedArgs, logger: Logger) {
+export default function (args: ParsedArgs, logger: logging.Logger) {
   let regex = 'packages/**/*_spec.ts';
   if (args.glob) {
     regex = `packages/**/${args.glob}/**/*_spec.ts`;

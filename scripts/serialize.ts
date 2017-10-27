@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger, classify } from '@angular-devkit/core';
+import { classify, logging } from '@angular-devkit/core';
 import { SchemaClassFactory } from '@ngtools/json-schema';
 import * as fs from 'fs';
 
@@ -34,7 +34,7 @@ export function buildSchema(inFile: string, mimetype: string): string {
 }
 
 
-export default function(opts: { _: string[], mimetype?: string }, logger: Logger) {
+export default function(opts: { _: string[], mimetype?: string }, logger: logging.Logger) {
   const inFile = opts._[0] as string;
   const outFile = opts._[1] as string;
   const mimetype = opts.mimetype || 'text/x.dts';

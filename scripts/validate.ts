@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger, tags } from '@angular-devkit/core';
+import { logging, tags } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import templates from './templates';
 import validateCommits from './validate-commits';
 
-export default function (options: { verbose: boolean }, logger: Logger) {
+export default function (options: { verbose: boolean }, logger: logging.Logger) {
   let error = false;
 
   logger.info('Running templates validation...');

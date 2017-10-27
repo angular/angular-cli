@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:non-null-operator
-import { NullLogger } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
@@ -28,7 +28,7 @@ type SchematicT = {
 
 const context = {
   debug: false,
-  logger: new NullLogger(),
+  logger: new logging.NullLogger(),
   strategy: MergeStrategy.Default,
 };
 const engine: Engine<CollectionT, SchematicT> = {

@@ -46,13 +46,13 @@ export class GaService {
       // Then send queued commands to either real or e2e test ga();
       // after waiting to allow possible e2e test to replace global ga function
       ga(() => setTimeout(() => {
-        // this.logger.log('GA fn:', window['ga'].toString());
+        // this.logging.log('GA fn:', window['ga'].toString());
         this.ga = window['ga'];
         gaQueue.forEach((command) => this.ga.apply(null, command));
       }, GaService.initializeDelay));
 
     } else {
-      // delegate `ga` calls to the logger if no ga installed
+      // delegate `ga` calls to the logging if no ga installed
       this.ga = (...rest: any[]) => { this.logger.log('ga:', rest); };
     }
   }

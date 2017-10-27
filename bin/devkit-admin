@@ -33,7 +33,7 @@ process.chdir(path.join(__dirname, '..'));
 // This might get awkward, so we fallback to console if there was an error.
 let logger = null;
 try {
-  logger = new (require('@angular-devkit/core').IndentLogger)('root');
+  logger = new (require('@angular-devkit/core').logging.IndentLogger)('root');
   require('rxjs/add/operator/filter');
 
   logger
@@ -65,6 +65,7 @@ try {
     warn: console.warn.bind(console),
     error: console.error.bind(console),
     fatal: x => { console.error(x); process.exit(100); },
+    createChild: () => logger,
   };
 }
 

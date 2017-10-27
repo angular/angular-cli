@@ -6,7 +6,7 @@ import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 export function mySchematic(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
     // Show the options for this Schematics.
-    // The logger here is at the discretion of the tooling. It can be ignored or only showing
+    // The logging here is at the discretion of the tooling. It can be ignored or only showing
     // info/warnings/errors. If you use console.log() there is not guarantee it will be
     // propagated to a user in any way (for example, an IDE running this schematic might
     // have a logging window but no support for console.log).

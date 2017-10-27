@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import { packages } from '../lib/packages';
 
 
-export default function (_: {}, logger: Logger) {
+export default function (_: {}, logger: logging.Logger) {
   logger.info('Getting merge base...');
 
   const prNumber = process.env['CIRCLE_PR_NUMBER'] || '';
@@ -46,7 +46,7 @@ export default function (_: {}, logger: Logger) {
     .filter(x => !!x) as [string, string][];
   logger.info(`Found ${commits.length} commits...`);
 
-  const output = new Logger('check', logger);
+  const output = logger.createChild('check');
   let invalidCount = 0;
 
   function _invalid(sha: string, message: string, error: string) {
