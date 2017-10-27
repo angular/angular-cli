@@ -88,6 +88,7 @@ process.on('message', (message: TypeCheckerMessage) => {
 
 class TypeChecker {
   private _program: ts.Program | Program;
+  private _lastErrorlessProgram: ts.Program | Program;
   private _angularCompilerHost: WebpackCompilerHost & CompilerHost;
 
   constructor(
@@ -118,6 +119,7 @@ class TypeChecker {
   }
 
   private _createOrUpdateProgram() {
+    const oldProgram = this._program || this._lastErrorlessProgram;
     if (this._JitMode) {
       // Create the TypeScript program.
       time('TypeChecker._createOrUpdateProgram.ts.createProgram');
@@ -125,7 +127,7 @@ class TypeChecker {
         this._tsFilenames,
         this._angularCompilerOptions,
         this._angularCompilerHost,
-        this._program as ts.Program
+        oldProgram as ts.Program
       ) as ts.Program;
       timeEnd('TypeChecker._createOrUpdateProgram.ts.createProgram');
     } else {
@@ -135,7 +137,7 @@ class TypeChecker {
         rootNames: this._tsFilenames,
         options: this._angularCompilerOptions,
         host: this._angularCompilerHost,
-        oldProgram: this._program as Program
+        oldProgram: oldProgram as Program
       }) as Program;
       timeEnd('TypeChecker._createOrUpdateProgram.ng.createProgram');
     }
@@ -153,6 +155,9 @@ class TypeChecker {
       if (errors.length > 0) {
         const message = formatDiagnostics(errors);
         console.error(bold(red('ERROR in ' + message)));
+      } else {
+        // Save the last program if it didn't have errors.
+        this._lastErrorlessProgram = this._program;
       }
 
       if (warnings.length > 0) {

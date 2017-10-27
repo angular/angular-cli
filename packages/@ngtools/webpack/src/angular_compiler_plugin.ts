@@ -90,6 +90,7 @@ export class AngularCompilerPlugin implements Tapable {
   private _angularCompilerOptions: CompilerOptions;
   private _tsFilenames: string[];
   private _program: (ts.Program | Program);
+  private _lastErrorlessProgram: (ts.Program | Program);
   private _compilerHost: WebpackCompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _angularCompilerHost: WebpackCompilerHost & CompilerHost;
@@ -343,6 +344,7 @@ export class AngularCompilerPlugin implements Tapable {
     return Promise.resolve()
       .then(() => {
         const changedTsFiles = this._getChangedTsFiles();
+        const oldProgram = this._program || this._lastErrorlessProgram;
 
         changedTsFiles.forEach((file) => {
           if (!this._tsFilenames.includes(file)) {
@@ -364,7 +366,7 @@ export class AngularCompilerPlugin implements Tapable {
             this._tsFilenames,
             this._angularCompilerOptions,
             this._angularCompilerHost,
-            this._program as ts.Program
+            oldProgram as ts.Program
           );
           timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
 
@@ -372,26 +374,19 @@ export class AngularCompilerPlugin implements Tapable {
         } else {
           time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
           // Create the Angular program.
-          try {
-            this._program = createProgram({
-              rootNames: this._tsFilenames,
-              options: this._angularCompilerOptions,
-              host: this._angularCompilerHost,
-              oldProgram: this._program as Program
-            });
-            timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
+          this._program = createProgram({
+            rootNames: this._tsFilenames,
+            options: this._angularCompilerOptions,
+            host: this._angularCompilerHost,
+            oldProgram: oldProgram as Program
+          });
+          timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
 
-            time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
-            return this._program.loadNgStructureAsync()
-              .then(() => {
-                timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
-              });
-          } catch (e) {
-            // TODO: remove this when the issue is addressed.
-            // Temporary workaround for https://github.com/angular/angular/issues/19951
-            this._program = undefined;
-            throw e;
-          }
+          time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+          return this._program.loadNgStructureAsync()
+            .then(() => {
+              timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+            });
         }
       })
       .then(() => {
@@ -828,8 +823,13 @@ export class AngularCompilerPlugin implements Tapable {
         this._emitSkipped = !emitResult || emitResult.emitSkipped;
 
         // Reset changed files on successful compilation.
-        if (this._emitSkipped && this._compilation.errors.length === 0) {
+        if (!this._emitSkipped && this._compilation.errors.length === 0) {
           this._compilerHost.resetChangedFileTracker();
+          // Save the last program if it emitted without errors.
+          this._lastErrorlessProgram = this._program;
+        } else {
+          // Throw away the old program if there was an error.
+          this._program = undefined;
         }
         timeEnd('AngularCompilerPlugin._update');
       });
@@ -1002,9 +1002,6 @@ export class AngularCompilerPlugin implements Tapable {
             this.writeI18nOutFile();
           }
           timeEnd('AngularCompilerPlugin._emit.ng.emit');
-        } else {
-          // Throw away the old program if there was an error.
-          this._program = undefined;
         }
       }
     } catch (e) {
