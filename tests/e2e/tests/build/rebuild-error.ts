@@ -5,11 +5,12 @@ import {
 } from '../../utils/process';
 import { replaceInFile, readFile, writeFile } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
-import { wait } from '../../utils/utils';
+import { wait, expectToFail } from '../../utils/utils';
 
 
 const failedRe = /webpack: Failed to compile/;
 const successRe = /webpack: Compiled successfully/;
+const errorRe = /ERROR in/;
 const extraErrors = [
   `Final loader didn't return a Buffer or String`,
   `doesn't contain a valid alias configuration`,
@@ -58,7 +59,7 @@ export default function () {
     // Add an syntax error to a non-main file.
     // Build should still be successfull and error reported on forked type checker.
     .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(successRe, 20000),
+      waitForAnyProcessOutputToMatch(errorRe, 20000),
       writeFile('src/app/app.component.ts', origContent + '\n]]]]]')
     ]))
     .then((results) => {
@@ -71,8 +72,10 @@ export default function () {
       }
     })
     // Fix the error, should trigger a successful rebuild.
+    // We have to wait for the type checker to run, so we expect to NOT
+    // have an error message in 5s.
     .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(successRe, 20000),
+      expectToFail(() => waitForAnyProcessOutputToMatch(errorRe, 5000)),
       replaceInFile('src/app/app.component.ts', ']]]]]', '')
     ]))
     .then(() => wait(2000))
