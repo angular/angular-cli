@@ -7,6 +7,12 @@ export default function () {
   // Disable parts of it in webpack tests.
   const ejected = getGlobalVariable('argv').eject;
 
+  // Skip this in ng5 tests, it only happens in ng2/4.
+  // This check should be changed once ng5 because the default.
+  if (getGlobalVariable('argv').nightly) {
+    return Promise.resolve();
+  }
+
   // Check if **/*.spec.ts files are excluded by default.
   return Promise.resolve()
     // This import would cause aot to fail.

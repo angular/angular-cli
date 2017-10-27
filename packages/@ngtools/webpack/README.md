@@ -66,7 +66,7 @@ The loader works with webpack plugin to compile your TypeScript. It's important 
 * `mainPath`. Optional if `entryModule` is specified. The `main.ts` file containing the bootstrap code. The plugin will use AST to determine the `entryModule`.
 * `skipCodeGeneration`. Optional, defaults to false. Disable code generation and do not refactor the code to bootstrap. This replaces `templateUrl: "string"` with `template: require("string")` (and similar for styles) to allow for webpack to properly link the resources. Only available in `AotPlugin`.
 * `typeChecking`. Optional, defaults to true. Enable type checking through your application. This will slow down compilation, but show syntactic and semantic errors in webpack. Only available in `AotPlugin`.
-* `exclude`. Optional. Extra files to exclude from TypeScript compilation.
+* `exclude`. Optional. Extra files to exclude from TypeScript compilation. Not supported with `AngularCompilerPlugin`.
 * `sourceMap`. Optional. Include sourcemaps.
 * `compilerOptions`. Optional. Override options in `tsconfig.json`.
 
