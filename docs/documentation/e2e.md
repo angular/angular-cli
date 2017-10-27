@@ -61,9 +61,9 @@ Please note that options that are supported by `ng serve` are also supported by 
 </details>
 
 <details>
-  <summary>webdrive-update</summary>
+  <summary>webdriver-update</summary>
   <p>
-    <code>--webdrive-update</code> (aliases: <code>-wu</code>) <em>default value: true</em>
+    <code>--webdriver-update</code> (aliases: <code>-wu</code>) <em>default value: true</em>
   </p>
   <p>
     Try to update webdriver.

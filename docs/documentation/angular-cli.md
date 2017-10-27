@@ -31,7 +31,7 @@
   - *environmentSource* (`string`): Source file for environment config.
   - *environments* (`object`): Name and corresponding file for environment config.
 
-- **e2e**: Confirguration for end-to-end tests.
+- **e2e**: Configuration for end-to-end tests.
   - *protractor*
     - *config* (`string`): Path to the config file.
 
