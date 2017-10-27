@@ -1,6 +1,6 @@
 # Internationalization (i18n)
 
-If you are working on internationalization, the CLI can help you with the following steps: 
+If you are working on internationalization, the CLI can help you with the following steps:
 - extraction
 - serve
 - build
@@ -23,7 +23,7 @@ ng xi18n --output-path src/locale
 
 ### Serve
 Now that you have generated a messages bundle source file, you can translate it.
-Let's say that your file containing the french translations is named `messages.fr.xlf` 
+Let's say that your file containing the french translations is named `messages.fr.xlf`
 and is located in the `src/locale` folder.
 If you want to use it when you serve your application you can use the 4 following commands:
 - `--i18n-file` Localization file to use for i18n.
@@ -64,7 +64,7 @@ For example if the french version of your application is served from https://mya
 then you would build the french version like this:
 
 ```sh
-ng build --aot --output-path dist/fr --base-href fr --locale fr --i18n-format xlf --i18n-file src/locale/messages.fr.xlf --missing-translation error
+ng build --aot --output-path dist/fr --base-href /fr/ --locale fr --i18n-format xlf --i18n-file src/locale/messages.fr.xlf --missing-translation error
 ```
 
 If you need more details about how to create scripts to generate the app in multiple
