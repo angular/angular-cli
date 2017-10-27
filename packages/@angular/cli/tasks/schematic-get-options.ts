@@ -13,6 +13,8 @@ export interface SchematicAvailableOptions {
   description: string;
   aliases: string[];
   type: any;
+  schematicType: any;
+  schematicDefault: any;
 }
 
 export default Task.extend({
@@ -30,6 +32,7 @@ export default Task.extend({
       .map(key => ({...properties[key], ...{name: stringUtils.dasherize(key)}}))
       .map(opt => {
         let type;
+        const schematicType = opt.type;
         switch (opt.type) {
           case 'string':
             type = String;
@@ -54,11 +57,15 @@ export default Task.extend({
           aliases = [...aliases, ...opt.aliases];
         }
 
+        const schematicDefault = opt.default;
+
         return {
           ...opt,
           aliases,
           type,
-          default: undefined // do not carry over schematics defaults
+          schematicType,
+          default: undefined, // do not carry over schematics defaults
+          schematicDefault
         };
       })
       .filter(x => x);
