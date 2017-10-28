@@ -594,10 +594,12 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
 
           // NgFactory files depend on the component template, but we can't know what that file
           // is (if any). So we add all the dependencies that the original component file has
-          // to the factory as well, which includes html and css templates.
+          // to the factory as well, which includes html and css templates, and the component
+          // itself (for inline html/templates templates).
           const ngFactoryRe = /\.ngfactory.js$/;
           if (ngFactoryRe.test(sourceFileName)) {
             const originalFile = sourceFileName.replace(ngFactoryRe, '.ts');
+            this.addDependency(originalFile);
             const origDependencies = plugin.getDependencies(originalFile);
             origDependencies.forEach(dep => this.addDependency(dep));
           }
@@ -605,7 +607,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
           // NgStyle files depend on the style file they represent.
           // E.g. `some-style.less.shim.ngstyle.js` depends on `some-style.less`.
           // Those files can in turn depend on others, so we have to add them all.
-          const ngStyleRe = /\.shim\.ngstyle\.js$/;
+          const ngStyleRe = /(?:\.shim)?\.ngstyle\.js$/;
           if (ngStyleRe.test(sourceFileName)) {
             const styleFile = sourceFileName.replace(ngStyleRe, '');
             const styleDependencies = plugin.getResourceDependencies(styleFile);
