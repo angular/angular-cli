@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
-// Provide a title to the process in `ps`
-process.title = '@angular/cli';
+// Provide a title to the process in `ps`.
+// Due to an obscure Mac bug, do not start this title with any symbol.
+process.title = 'ng';
 
 require('../lib/bootstrap-local');
 require('../packages/@angular/cli/bin/ng');
