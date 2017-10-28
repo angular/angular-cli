@@ -55,7 +55,7 @@ Update `.angular-cli.json` by adding the new environment the existing environmen
 Run `ng serve` with the flag `--hmr -e=hmr` to enable hmr and select the new environment:
 
 ```bash
-ng serve --hmr -e=hmr
+ng serve --hmr -e=hmr --no-aot
 ```
 
 Create a shortcut for this by updating  `package.json` and adding an entry to the script object:
@@ -63,9 +63,11 @@ Create a shortcut for this by updating  `package.json` and adding an entry to th
 ```json
 "scripts": {
   ...
-  "hmr": "ng serve --hmr -e=hmr"
+  "hmr": "ng serve --hmr -e=hmr --no-aot"
 }
 ```
+
+Note: you cannot use HMR when AOT is turned on, so you must force it off with `--no-aot`.
 
 
 ### Add dependency for @angularclass/hmr and configure app
