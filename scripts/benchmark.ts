@@ -8,7 +8,7 @@
 import { tags, terminal } from '@angular-devkit/core';
 import * as glob from 'glob';
 import 'jasmine';
-import {SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
+import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
 import { join, relative } from 'path';
 
 
@@ -84,7 +84,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
         const baseAverage = pad(Math.floor(stat.base.average));
         const baseAverageMult = pad(precision(stat.average / stat.base.average), multPad);
 
-        console.log(terminal.yellow(tags.indentBy(6)`
+        console.log(terminal.colors.yellow(tags.indentBy(6)`
           fastest: ${fastest}
             (base) ${baseFastest}
           slowest: ${slowest}
@@ -93,7 +93,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
           average: ${average} (${baseAverage}) (${baseAverageMult}x)
         `));
       } else {
-        console.log(terminal.yellow(tags.indentBy(6)`
+        console.log(terminal.colors.yellow(tags.indentBy(6)`
           fastest: ${fastest}
           slowest: ${slowest}
           mean:    ${mean}
