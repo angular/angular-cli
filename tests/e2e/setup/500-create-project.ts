@@ -52,20 +52,6 @@ export default function() {
     .then(() => updateTsConfig(json => {
       json['compilerOptions']['sourceRoot'] = '/';
     }))
-    .then(() => {
-      if (argv.nightly) {
-        // *************************************************************************************
-        // REMOVE THIS WITH UPDATED NG5 SCHEMATICS
-        // In ng5 we have to tell users users to update their tsconfig.json.
-        // `src/tsconfig.spec.json` needs to be updated with "polyfills.ts" on `include`.
-        // *************************************************************************************
-        return updateJsonFile('src/tsconfig.spec.json', json => {
-          json['include'] = json['include'].concat('polyfills.ts');
-        })
-        // Ignore error if file doesn't exist.
-        .catch(() => { return; });
-      }
-    })
     .then(() => git('config', 'user.email', 'angular-core+e2e@google.com'))
     .then(() => git('config', 'user.name', 'Angular CLI E2e'))
     .then(() => git('config', 'commit.gpgSign', 'false'))
