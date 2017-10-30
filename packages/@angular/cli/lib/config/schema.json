@@ -501,6 +501,11 @@
             "namedChunks": {
               "description": "Use file name for lazy loaded chunks.",
               "type": "boolean"
+            },
+            "includeNodeGlobal": {
+              "description": "Include node global for browser applications.",
+              "type": "boolean",
+              "default": false
             }
           }
         },
