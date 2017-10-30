@@ -19,11 +19,16 @@ import { Schema } from './schema';
 
 
 export default function (options: Schema): Rule {
+  const schematicsVersion = require('@angular-devkit/schematics/package.json').version;
+  const coreVersion = require('@angular-devkit/core/package.json').version;
+
   return mergeWith(apply(url('./files'), [
     partitionApplyMerge(
       (p: Path) => !/\/src\/.*?\/files\//.test(p),
       template({
         ...options as object,
+        coreVersion,
+        schematicsVersion,
         dot: '.',
         dasherize,
       }),

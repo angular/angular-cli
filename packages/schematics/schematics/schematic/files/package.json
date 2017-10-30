@@ -13,8 +13,8 @@
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {
-    "@angular-devkit/core": "^0.0.15",
-    "@angular-devkit/schematics": "^0.0.25",
+    "@angular-devkit/core": "^<%= coreVersion %>",
+    "@angular-devkit/schematics": "^<%= schematicsVersion %>",
     "@types/jasmine": "^2.6.0",
     "@types/node": "^8.0.31",
     "jasmine": "^2.8.0",
