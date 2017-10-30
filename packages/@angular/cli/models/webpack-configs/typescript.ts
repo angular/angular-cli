@@ -162,8 +162,15 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
 
   let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true };
 
-  // The options below only apply to AoTPlugin.
-  if (!AngularCompilerPlugin.isSupported()) {
+  if (AngularCompilerPlugin.isSupported()) {
+    if (appConfig.polyfills) {
+      // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
+      // include 'polyfills.ts' in `tsconfig.spec.json'.
+      const polyfillsPath = path.resolve(projectRoot, appConfig.root, appConfig.polyfills);
+      pluginOptions.singleFileIncludes = [polyfillsPath];
+    }
+  } else {
+    // The options below only apply to AoTPlugin.
     // Force include main and polyfills.
     // This is needed for AngularCompilerPlugin compatibility with existing projects,
     // since TS compilation there is stricter and tsconfig.spec.ts doesn't include them.

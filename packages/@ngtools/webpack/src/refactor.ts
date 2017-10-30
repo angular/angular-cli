@@ -16,6 +16,7 @@ const MagicString = require('magic-string');
  * @param max The maximum number of items to return.
  * @return all nodes of kind, or [] if none is found
  */
+// TODO: replace this with collectDeepNodes and add limits to collectDeepNodes
 export function findAstNodes<T extends ts.Node>(
   node: ts.Node | null,
   sourceFile: ts.SourceFile,
