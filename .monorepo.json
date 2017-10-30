@@ -42,8 +42,8 @@
   },
   "packages": {
     "@_/benchmark": {
-      "version": "0.0.13",
-      "hash": "37ed7e417435c92dbf301e7b26ea37ca"
+      "version": "0.0.14",
+      "hash": "b1f9f2d8e1eca2a865d39263f0ca5a38"
     },
     "@angular-devkit/build-optimizer": {
       "name": "Build Optimizer",
@@ -75,14 +75,14 @@
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
-      "version": "0.0.48",
-      "hash": "9b2d7a33eba317e8b5f57028d83950ca"
+      "version": "0.0.49",
+      "hash": "10a5062c7d5395e40f89053b11047447"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
-      "version": "0.0.3",
+      "version": "0.0.4",
       "section": "Schematics",
-      "hash": "c7880ef8664bda2302e6529d566492be"
+      "hash": "6fe1b8436678ba62eeddc68371d41298"
     }
   }
 }
