@@ -372,8 +372,8 @@ Now lets create a few handy scripts to help us do all of this in the future.
 "scripts": {
 
   // These will be your common scripts
-  "build:dynamic": "npm run build:client-and-server-bundles && npm run webpack:server",
-  "serve:dynamic": "node dist/server.js",
+  "build:ssr": "npm run build:client-and-server-bundles && npm run webpack:server",
+  "serve:ssr": "node dist/server.js",
 
   // Helpers for the above scripts
   "build:client-and-server-bundles": "ng build --prod && ng build --prod --app 1 --output-hashing=false",
@@ -384,7 +384,7 @@ Now lets create a few handy scripts to help us do all of this in the future.
 In the future when you want to see a Production build of your app with Universal (locally), you can simply run:
 
 ```bash
-npm run build:dynamic && npm run serve:dynamic
+npm run build:ssr && npm run serve:ssr
 ```
 
 Enjoy!
