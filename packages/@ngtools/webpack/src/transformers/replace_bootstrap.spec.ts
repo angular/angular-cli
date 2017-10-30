@@ -1,5 +1,3 @@
-// @ignoreDep typescript
-import * as ts from 'typescript';
 import { oneLine, stripIndent } from 'common-tags';
 import { transformTypescript } from './ast_helpers';
 import { replaceBootstrap } from './replace_bootstrap';
@@ -36,9 +34,11 @@ describe('@ngtools/webpack transformers', () => {
       `;
       // tslint:enable:max-line-length
 
-      const transformOpsCb = (sourceFile: ts.SourceFile) => replaceBootstrap(sourceFile,
-        { path: '/project/src/app/app.module', className: 'AppModule' });
-      const result = transformTypescript(input, transformOpsCb);
+      const transformer = replaceBootstrap(
+        () => true,
+        () => ({ path: '/project/src/app/app.module', className: 'AppModule' })
+      );
+      const result = transformTypescript(input, [transformer]);
 
       expect(oneLine`${result}`).toEqual(oneLine`${output}`);
     });
@@ -73,11 +73,34 @@ describe('@ngtools/webpack transformers', () => {
       `;
       // tslint:enable:max-line-length
 
-      const transformOpsCb = (sourceFile: ts.SourceFile) => replaceBootstrap(sourceFile,
-        { path: '/project/src/app/app.module', className: 'AppModule' });
-      const result = transformTypescript(input, transformOpsCb);
+      const transformer = replaceBootstrap(
+        () => true,
+        () => ({ path: '/project/src/app/app.module', className: 'AppModule' })
+      );
+      const result = transformTypescript(input, [transformer]);
 
       expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+    });
+
+    it('should not replace bootstrap when there is no entry module', () => {
+      const input = stripIndent`
+        import { enableProdMode } from '@angular/core';
+        import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+        import { AppModule } from './app/app.module';
+        import { environment } from './environments/environment';
+
+        if (environment.production) {
+          enableProdMode();
+        }
+
+        platformBrowserDynamic().bootstrapModule(AppModule);
+      `;
+
+      const transformer = replaceBootstrap(() => true, () => undefined);
+      const result = transformTypescript(input, [transformer]);
+
+      expect(oneLine`${result}`).toEqual(oneLine`${input}`);
     });
   });
 });

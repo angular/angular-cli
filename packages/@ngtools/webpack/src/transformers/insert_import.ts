@@ -1,8 +1,8 @@
 // @ignoreDep typescript
 import * as ts from 'typescript';
 
-import { findAstNodes, getFirstNode } from './ast_helpers';
-import { AddNodeOperation, TransformOperation } from './make_transform';
+import { collectDeepNodes, getFirstNode } from './ast_helpers';
+import { AddNodeOperation, TransformOperation } from './interfaces';
 
 
 export function insertStarImport(
@@ -13,7 +13,7 @@ export function insertStarImport(
   before = false,
 ): TransformOperation[] {
   const ops: TransformOperation[] = [];
-  const allImports = findAstNodes(null, sourceFile, ts.SyntaxKind.ImportDeclaration);
+  const allImports = collectDeepNodes(sourceFile, ts.SyntaxKind.ImportDeclaration);
 
   // We don't need to verify if the symbol is already imported, star imports should be unique.
 
@@ -58,7 +58,7 @@ export function insertImport(
 ): TransformOperation[] {
   const ops: TransformOperation[] = [];
   // Find all imports.
-  const allImports = findAstNodes(null, sourceFile, ts.SyntaxKind.ImportDeclaration);
+  const allImports = collectDeepNodes(sourceFile, ts.SyntaxKind.ImportDeclaration);
   const maybeImports = allImports
     .filter((node: ts.ImportDeclaration) => {
       // Filter all imports that do not match the modulePath.

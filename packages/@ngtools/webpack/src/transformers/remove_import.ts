@@ -1,8 +1,8 @@
 // @ignoreDep typescript
 import * as ts from 'typescript';
 
-import { findAstNodes } from './ast_helpers';
-import { RemoveNodeOperation, TransformOperation } from './make_transform';
+import { collectDeepNodes } from './ast_helpers';
+import { RemoveNodeOperation, TransformOperation } from './interfaces';
 
 // Remove an import if we have removed all identifiers for it.
 // Mainly workaround for https://github.com/Microsoft/TypeScript/issues/17552.
@@ -19,7 +19,7 @@ export function removeImport(
   const identifierText = removedIdentifiers[0].text;
 
   // Find all imports that import `identifierText`.
-  const allImports = findAstNodes(null, sourceFile, ts.SyntaxKind.ImportDeclaration);
+  const allImports = collectDeepNodes(sourceFile, ts.SyntaxKind.ImportDeclaration);
   const identifierImports = allImports
     .filter((node: ts.ImportDeclaration) => {
       // TODO: try to support removing `import * as X from 'XYZ'`.
@@ -40,8 +40,8 @@ export function removeImport(
 
 
   // Find all identifiers with `identifierText` in the source file.
-  const allNodes = findAstNodes<ts.Identifier>(null, sourceFile, ts.SyntaxKind.Identifier, true)
-    .filter(identifier => identifier.getText() === identifierText);
+  const allNodes = collectDeepNodes<ts.Identifier>(sourceFile, ts.SyntaxKind.Identifier)
+    .filter(identifier => identifier.text === identifierText);
 
   // If there are more identifiers than the ones we already removed plus the ones we're going to
   // remove from imports, don't do anything.

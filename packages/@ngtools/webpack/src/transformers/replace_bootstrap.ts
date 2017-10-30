@@ -2,99 +2,110 @@
 import * as ts from 'typescript';
 import { relative, dirname } from 'path';
 
-import { findAstNodes } from './ast_helpers';
+import { collectDeepNodes } from './ast_helpers';
 import { insertStarImport } from './insert_import';
 import { removeImport } from './remove_import';
-import {
-  ReplaceNodeOperation,
-  TransformOperation
-} from './make_transform';
+import { StandardTransform, ReplaceNodeOperation, TransformOperation } from './interfaces';
+import { makeTransform } from './make_transform';
 
 
 export function replaceBootstrap(
-  sourceFile: ts.SourceFile,
-  entryModule: { path: string, className: string }
-): TransformOperation[] {
-  const ops: TransformOperation[] = [];
+  shouldTransform: (fileName: string) => boolean,
+  getEntryModule: () => { path: string, className: string }
+): ts.TransformerFactory<ts.SourceFile> {
 
-  // Find all identifiers.
-  const entryModuleIdentifiers = findAstNodes<ts.Identifier>(null, sourceFile,
-    ts.SyntaxKind.Identifier, true)
-    .filter(identifier => identifier.getText() === entryModule.className);
+  const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
+    const ops: TransformOperation[] = [];
 
-  if (entryModuleIdentifiers.length === 0) {
-    return [];
-  }
+    const entryModule = getEntryModule();
 
-  const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
-  const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
-
-  // Find the bootstrap calls.
-  const removedEntryModuleIdentifiers: ts.Identifier[] = [];
-  const removedPlatformBrowserDynamicIdentifier: ts.Identifier[] = [];
-  entryModuleIdentifiers.forEach(entryModuleIdentifier => {
-    // Figure out if it's a `platformBrowserDynamic().bootstrapModule(AppModule)` call.
-    if (!(
-      entryModuleIdentifier.parent
-      && entryModuleIdentifier.parent.kind === ts.SyntaxKind.CallExpression
-    )) {
-      return;
+    if (!shouldTransform(sourceFile.fileName) || !entryModule) {
+      return ops;
     }
 
-    const callExpr = entryModuleIdentifier.parent as ts.CallExpression;
+    // Find all identifiers.
+    // const entryModuleIdentifiers = findAstNodes<ts.Identifier>(null, sourceFile,
+    //   ts.SyntaxKind.Identifier, true)
+    const entryModuleIdentifiers = collectDeepNodes<ts.Identifier>(sourceFile,
+      ts.SyntaxKind.Identifier)
+      .filter(identifier => identifier.text === entryModule.className);
 
-    if (callExpr.expression.kind !== ts.SyntaxKind.PropertyAccessExpression) {
-      return;
+    if (entryModuleIdentifiers.length === 0) {
+      return [];
     }
 
-    const propAccessExpr = callExpr.expression as ts.PropertyAccessExpression;
+    const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
+    const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
 
-    if (propAccessExpr.name.text !== 'bootstrapModule'
-      || propAccessExpr.expression.kind !== ts.SyntaxKind.CallExpression) {
-      return;
-    }
+    // Find the bootstrap calls.
+    const removedEntryModuleIdentifiers: ts.Identifier[] = [];
+    const removedPlatformBrowserDynamicIdentifier: ts.Identifier[] = [];
+    entryModuleIdentifiers.forEach(entryModuleIdentifier => {
+      // Figure out if it's a `platformBrowserDynamic().bootstrapModule(AppModule)` call.
+      if (!(
+        entryModuleIdentifier.parent
+        && entryModuleIdentifier.parent.kind === ts.SyntaxKind.CallExpression
+      )) {
+        return;
+      }
 
-    const bootstrapModuleIdentifier = propAccessExpr.name;
-    const innerCallExpr = propAccessExpr.expression as ts.CallExpression;
+      const callExpr = entryModuleIdentifier.parent as ts.CallExpression;
 
-    if (!(
-      innerCallExpr.expression.kind === ts.SyntaxKind.Identifier
-      && (innerCallExpr.expression as ts.Identifier).text === 'platformBrowserDynamic'
-    )) {
-      return;
-    }
+      if (callExpr.expression.kind !== ts.SyntaxKind.PropertyAccessExpression) {
+        return;
+      }
 
-    const platformBrowserDynamicIdentifier = innerCallExpr.expression as ts.Identifier;
+      const propAccessExpr = callExpr.expression as ts.PropertyAccessExpression;
 
-    const idPlatformBrowser = ts.createUniqueName('__NgCli_bootstrap_');
-    const idNgFactory = ts.createUniqueName('__NgCli_bootstrap_');
+      if (propAccessExpr.name.text !== 'bootstrapModule'
+        || propAccessExpr.expression.kind !== ts.SyntaxKind.CallExpression) {
+        return;
+      }
 
-    // Add the transform operations.
-    const factoryClassName = entryModule.className + 'NgFactory';
-    const factoryModulePath = normalizedEntryModulePath + '.ngfactory';
+      const bootstrapModuleIdentifier = propAccessExpr.name;
+      const innerCallExpr = propAccessExpr.expression as ts.CallExpression;
+
+      if (!(
+        innerCallExpr.expression.kind === ts.SyntaxKind.Identifier
+        && (innerCallExpr.expression as ts.Identifier).text === 'platformBrowserDynamic'
+      )) {
+        return;
+      }
+
+      const platformBrowserDynamicIdentifier = innerCallExpr.expression as ts.Identifier;
+
+      const idPlatformBrowser = ts.createUniqueName('__NgCli_bootstrap_');
+      const idNgFactory = ts.createUniqueName('__NgCli_bootstrap_');
+
+      // Add the transform operations.
+      const factoryClassName = entryModule.className + 'NgFactory';
+      const factoryModulePath = normalizedEntryModulePath + '.ngfactory';
+      ops.push(
+        // Replace the entry module import.
+        ...insertStarImport(sourceFile, idNgFactory, factoryModulePath),
+        new ReplaceNodeOperation(sourceFile, entryModuleIdentifier,
+          ts.createPropertyAccess(idNgFactory, ts.createIdentifier(factoryClassName))),
+        // Replace the platformBrowserDynamic import.
+        ...insertStarImport(sourceFile, idPlatformBrowser, '@angular/platform-browser'),
+        new ReplaceNodeOperation(sourceFile, platformBrowserDynamicIdentifier,
+          ts.createPropertyAccess(idPlatformBrowser, 'platformBrowser')),
+        new ReplaceNodeOperation(sourceFile, bootstrapModuleIdentifier,
+          ts.createIdentifier('bootstrapModuleFactory')),
+      );
+
+      // Save the import identifiers that we replaced for removal.
+      removedEntryModuleIdentifiers.push(entryModuleIdentifier);
+      removedPlatformBrowserDynamicIdentifier.push(platformBrowserDynamicIdentifier);
+    });
+
+    // Now that we know all the import identifiers we removed, we can remove the import.
     ops.push(
-      // Replace the entry module import.
-      ...insertStarImport(sourceFile, idNgFactory, factoryModulePath),
-      new ReplaceNodeOperation(sourceFile, entryModuleIdentifier,
-        ts.createPropertyAccess(idNgFactory, ts.createIdentifier(factoryClassName))),
-      // Replace the platformBrowserDynamic import.
-      ...insertStarImport(sourceFile, idPlatformBrowser, '@angular/platform-browser'),
-      new ReplaceNodeOperation(sourceFile, platformBrowserDynamicIdentifier,
-        ts.createPropertyAccess(idPlatformBrowser, 'platformBrowser')),
-      new ReplaceNodeOperation(sourceFile, bootstrapModuleIdentifier,
-        ts.createIdentifier('bootstrapModuleFactory')),
+      ...removeImport(sourceFile, removedEntryModuleIdentifiers),
+      ...removeImport(sourceFile, removedPlatformBrowserDynamicIdentifier),
     );
 
-    // Save the import identifiers that we replaced for removal.
-    removedEntryModuleIdentifiers.push(entryModuleIdentifier);
-    removedPlatformBrowserDynamicIdentifier.push(platformBrowserDynamicIdentifier);
-  });
+    return ops;
+  };
 
-  // Now that we know all the import identifiers we removed, we can remove the import.
-  ops.push(
-    ...removeImport(sourceFile, removedEntryModuleIdentifiers),
-    ...removeImport(sourceFile, removedPlatformBrowserDynamicIdentifier),
-  );
-
-  return ops;
+  return makeTransform(standardTransform);
 }

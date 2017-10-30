@@ -18,8 +18,6 @@ import {
 } from './virtual_file_system_decorator';
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import {
-  TransformOperation,
-  makeTransform,
   replaceBootstrap,
   exportNgFactory,
   exportLazyModuleMap,
@@ -41,7 +39,6 @@ import {
   CompilerOptions,
   CompilerHost,
   Diagnostics,
-  CustomTransformers,
   EmitFlags,
   LazyRoute,
   createProgram,
@@ -49,7 +46,7 @@ import {
   formatDiagnostics,
   readConfiguration,
 } from './ngtools_api';
-import { findAstNodes } from './transformers/ast_helpers';
+import { collectDeepNodes } from './transformers/ast_helpers';
 
 
 /**
@@ -95,8 +92,9 @@ export class AngularCompilerPlugin implements Tapable {
   private _lazyRoutes: LazyRouteMap = Object.create(null);
   private _tsConfigPath: string;
   private _entryModule: string;
+  private _mainPath: string | undefined;
   private _basePath: string;
-  private _transformMap: Map<string, TransformOperation[]> = new Map();
+  private _transformers: ts.TransformerFactory<ts.SourceFile>[] = [];
   private _platform: PLATFORM;
   private _JitMode = false;
   private _emitSkipped = true;
@@ -128,6 +126,9 @@ export class AngularCompilerPlugin implements Tapable {
   get options() { return this._options; }
   get done() { return this._donePromise; }
   get entryModule() {
+    if (!this._entryModule) {
+      return undefined;
+    }
     const splitted = this._entryModule.split('#');
     const path = splitted[0];
     const className = splitted[1] || 'default';
@@ -157,6 +158,7 @@ export class AngularCompilerPlugin implements Tapable {
       basePath = path.resolve(process.cwd(), options.basePath);
     }
 
+    // TODO: check if we can get this from readConfiguration
     this._basePath = basePath;
 
     // Parse the tsconfig contents.
@@ -224,15 +226,6 @@ export class AngularCompilerPlugin implements Tapable {
         options.missingTranslation as 'error' | 'warning' | 'ignore';
     }
 
-    // Use entryModule if available in options, otherwise resolve it from mainPath after program
-    // creation.
-    if (this._options.entryModule) {
-      this._entryModule = this._options.entryModule;
-    } else if (this._compilerOptions.entryModule) {
-      this._entryModule = path.resolve(this._basePath,
-        this._compilerOptions.entryModule);
-    }
-
     // Create the webpack compiler host.
     const webpackCompilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
     webpackCompilerHost.enableCaching();
@@ -266,8 +259,26 @@ export class AngularCompilerPlugin implements Tapable {
     // Use an identity function as all our paths are absolute already.
     this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
+    // Resolve mainPath if provided.
+    if (options.mainPath) {
+      this._mainPath = this._compilerHost.resolve(options.mainPath);
+    }
+
+    // Use entryModule if available in options, otherwise resolve it from mainPath after program
+    // creation.
+    if (this._options.entryModule) {
+      this._entryModule = this._options.entryModule;
+    } else if (this._compilerOptions.entryModule) {
+      this._entryModule = path.resolve(this._basePath,
+        this._compilerOptions.entryModule);
+    }
+
     // Set platform.
     this._platform = options.platform || PLATFORM.Browser;
+
+    // Make transformers.
+    this._makeTransformers();
+
     timeEnd('AngularCompilerPlugin._setupOptions');
   }
 
@@ -332,11 +343,10 @@ export class AngularCompilerPlugin implements Tapable {
       })
       .then(() => {
         // If there's still no entryModule try to resolve from mainPath.
-        if (!this._entryModule && this._options.mainPath) {
+        if (!this._entryModule && this._mainPath) {
           time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
-          const mainPath = path.resolve(this._basePath, this._options.mainPath);
           this._entryModule = resolveEntryModuleFromMain(
-            mainPath, this._compilerHost, this._getTsProgram());
+            this._mainPath, this._compilerHost, this._getTsProgram());
           timeEnd('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
         }
       });
@@ -633,6 +643,41 @@ export class AngularCompilerPlugin implements Tapable {
       });
   }
 
+  private _makeTransformers() {
+
+    // TODO use compilerhost.denormalize when #8210 is merged.
+    const isAppPath = (fileName: string) =>
+      this._rootNames.includes(fileName.replace(/\//g, path.sep));
+    const isMainPath = (fileName: string) => fileName === this._mainPath;
+    const getEntryModule = () => this.entryModule;
+    const getLazyRoutes = () => this._lazyRoutes;
+
+    if (this._JitMode) {
+      // Replace resources in JIT.
+      this._transformers.push(replaceResources(isAppPath));
+    }
+
+    if (this._platform === PLATFORM.Browser) {
+      // If we have a locale, auto import the locale data file.
+      // This transform must go before replaceBootstrap because it looks for the entry module
+      // import, which will be replaced.
+      if (this._compilerOptions.i18nInLocale) {
+        this._transformers.push(registerLocaleData(isAppPath, getEntryModule,
+          this._compilerOptions.i18nInLocale));
+      }
+
+      if (!this._JitMode) {
+        // Replace bootstrap in browser AOT.
+        this._transformers.push(replaceBootstrap(isAppPath, getEntryModule));
+      }
+    } else if (this._platform === PLATFORM.Server) {
+      this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
+      if (!this._JitMode) {
+        this._transformers.push(exportNgFactory(isMainPath, getEntryModule));
+      }
+    }
+  }
+
   private _update() {
     time('AngularCompilerPlugin._update');
     // We only want to update on TS and template changes, but all kinds of files are on this
@@ -662,7 +707,7 @@ export class AngularCompilerPlugin implements Tapable {
         }
       })
       .then(() => {
-        // Build transforms, emit and report errors.
+        // Emit and report errors.
 
         // We now have the final list of changed TS files.
         // Go through each changed file and add transforms as needed.
@@ -677,56 +722,9 @@ export class AngularCompilerPlugin implements Tapable {
           return sourceFile;
         });
 
-        time('AngularCompilerPlugin._update.transformOps');
-        sourceFiles.forEach((sf) => {
-          const fileName = this._compilerHost.resolve(sf.fileName);
-          let transformOps = [];
-
-          if (this._JitMode) {
-            transformOps.push(...replaceResources(sf));
-          }
-
-          if (this._platform === PLATFORM.Browser) {
-            if (!this._JitMode) {
-              transformOps.push(...replaceBootstrap(sf, this.entryModule));
-            }
-
-            // If we have a locale, auto import the locale data file.
-            if (this._compilerOptions.i18nInLocale) {
-              transformOps.push(...registerLocaleData(
-                sf,
-                this.entryModule,
-                this._compilerOptions.i18nInLocale
-              ));
-            }
-          } else if (this._platform === PLATFORM.Server) {
-            if (fileName === this._compilerHost.resolve(this._options.mainPath)) {
-              transformOps.push(...exportLazyModuleMap(sf, this._lazyRoutes));
-              if (!this._JitMode) {
-                transformOps.push(...exportNgFactory(sf, this.entryModule));
-              }
-            }
-          }
-
-          // We need to keep a map of transforms for each file, to reapply on each update.
-          this._transformMap.set(fileName, transformOps);
-        });
-
-        const transformOps: TransformOperation[] = [];
-        for (let fileTransformOps of this._transformMap.values()) {
-          transformOps.push(...fileTransformOps);
-        }
-        timeEnd('AngularCompilerPlugin._update.transformOps');
-
-        time('AngularCompilerPlugin._update.makeTransform');
-        const transformers: CustomTransformers = {
-          beforeTs: transformOps.length > 0 ? [makeTransform(transformOps)] : []
-        };
-        timeEnd('AngularCompilerPlugin._update.makeTransform');
-
         // Emit files.
         time('AngularCompilerPlugin._update._emit');
-        const { emitResult, diagnostics } = this._emit(sourceFiles, transformers);
+        const { emitResult, diagnostics } = this._emit(sourceFiles);
         timeEnd('AngularCompilerPlugin._update._emit');
 
         // Report diagnostics.
@@ -826,7 +824,7 @@ export class AngularCompilerPlugin implements Tapable {
     const host = this._compilerHost;
     const cache = this._moduleResolutionCache;
 
-    const esImports = findAstNodes<ts.ImportDeclaration>(null, sourceFile,
+    const esImports = collectDeepNodes<ts.ImportDeclaration>(sourceFile,
       ts.SyntaxKind.ImportDeclaration)
       .map(decl => {
         const moduleName = (decl.moduleSpecifier as ts.StringLiteral).text;
@@ -858,10 +856,7 @@ export class AngularCompilerPlugin implements Tapable {
   // This code mostly comes from `performCompilation` in `@angular/compiler-cli`.
   // It skips the program creation because we need to use `loadNgStructureAsync()`,
   // and uses CustomTransformers.
-  private _emit(
-    sourceFiles: ts.SourceFile[],
-    customTransformers: ts.CustomTransformers & CustomTransformers
-  ) {
+  private _emit(sourceFiles: ts.SourceFile[]) {
     time('AngularCompilerPlugin._emit');
     const program = this._program;
     const allDiagnostics: Diagnostics = [];
@@ -888,7 +883,7 @@ export class AngularCompilerPlugin implements Tapable {
             const timeLabel = `AngularCompilerPlugin._emit.ts+${sf.fileName}+.emit`;
             time(timeLabel);
             emitResult = tsProgram.emit(sf, undefined, undefined, undefined,
-              { before: customTransformers.beforeTs }
+              { before: this._transformers }
             );
             allDiagnostics.push(...emitResult.diagnostics);
             timeEnd(timeLabel);
@@ -923,7 +918,11 @@ export class AngularCompilerPlugin implements Tapable {
           time('AngularCompilerPlugin._emit.ng.emit');
           const extractI18n = !!this._compilerOptions.i18nOutFile;
           const emitFlags = extractI18n ? EmitFlags.I18nBundle : EmitFlags.Default;
-          emitResult = angularProgram.emit({ emitFlags, customTransformers });
+          emitResult = angularProgram.emit({
+            emitFlags, customTransformers: {
+              beforeTs: this._transformers
+            }
+          });
           allDiagnostics.push(...emitResult.diagnostics);
           if (extractI18n) {
             this.writeI18nOutFile();
