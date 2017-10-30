@@ -1,58 +1,34 @@
 import * as ts from 'typescript';
 import { satisfies } from 'semver';
 
+import {
+  OPERATION_KIND,
+  StandardTransform,
+  TransformOperation,
+  RemoveNodeOperation,
+  AddNodeOperation,
+  ReplaceNodeOperation,
+} from './interfaces';
+
 
 // Typescript below 2.5.0 needs a workaround.
 const visitEachChild = satisfies(ts.version, '^2.5.0')
   ? ts.visitEachChild
   : visitEachChildWorkaround;
 
-export enum OPERATION_KIND {
-  Remove,
-  Add,
-  Replace
-}
-
-export abstract class TransformOperation {
-  constructor(
-    public kind: OPERATION_KIND,
-    public sourceFile: ts.SourceFile,
-    public target: ts.Node
-  ) { }
-}
-
-export class RemoveNodeOperation extends TransformOperation {
-  constructor(sourceFile: ts.SourceFile, target: ts.Node) {
-    super(OPERATION_KIND.Remove, sourceFile, target);
-  }
-}
-
-export class AddNodeOperation extends TransformOperation {
-  constructor(sourceFile: ts.SourceFile, target: ts.Node,
-    public before?: ts.Node, public after?: ts.Node) {
-    super(OPERATION_KIND.Add, sourceFile, target);
-  }
-}
-
-export class ReplaceNodeOperation extends TransformOperation {
-  kind: OPERATION_KIND.Replace;
-  constructor(sourceFile: ts.SourceFile, target: ts.Node, public replacement: ts.Node) {
-    super(OPERATION_KIND.Replace, sourceFile, target);
-  }
-}
-
-export function makeTransform(ops: TransformOperation[]): ts.TransformerFactory<ts.SourceFile> {
-
-  const sourceFiles = ops.reduce((prev, curr) =>
-    prev.includes(curr.sourceFile) ? prev : prev.concat(curr.sourceFile), []);
-
-  const removeOps = ops.filter((op) => op.kind === OPERATION_KIND.Remove) as RemoveNodeOperation[];
-  const addOps = ops.filter((op) => op.kind === OPERATION_KIND.Add) as AddNodeOperation[];
-  const replaceOps = ops
-    .filter((op) => op.kind === OPERATION_KIND.Replace) as ReplaceNodeOperation[];
+export function makeTransform(
+  standardTransform: StandardTransform
+): ts.TransformerFactory<ts.SourceFile> {
 
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
+
+      const ops: TransformOperation[] = standardTransform(sf);
+      const removeOps = ops
+        .filter((op) => op.kind === OPERATION_KIND.Remove) as RemoveNodeOperation[];
+      const addOps = ops.filter((op) => op.kind === OPERATION_KIND.Add) as AddNodeOperation[];
+      const replaceOps = ops
+        .filter((op) => op.kind === OPERATION_KIND.Replace) as ReplaceNodeOperation[];
 
       const visitor: ts.Visitor = (node) => {
         let modified = false;
@@ -91,7 +67,7 @@ export function makeTransform(ops: TransformOperation[]): ts.TransformerFactory<
       };
 
       // Only visit source files we have ops for.
-      return sourceFiles.includes(sf) ? ts.visitNode(sf, visitor) : sf;
+      return ops.length > 0 ? ts.visitNode(sf, visitor) : sf;
     };
 
     return transformer;

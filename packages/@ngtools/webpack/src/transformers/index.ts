@@ -1,3 +1,4 @@
+export * from './interfaces';
 export * from './ast_helpers';
 export * from './make_transform';
 export * from './insert_import';
