@@ -59,7 +59,6 @@ export interface AngularCompilerPluginOptions {
   entryModule?: string;
   mainPath?: string;
   skipCodeGeneration?: boolean;
-  hostOverrideFileSystem?: { [path: string]: string };
   hostReplacementPaths?: { [path: string]: string };
   i18nInFile?: string;
   i18nInFormat?: string;
@@ -240,13 +239,6 @@ export class AngularCompilerPlugin implements Tapable {
       tsHost: webpackCompilerHost
     }) as CompilerHost & WebpackCompilerHost;
 
-    // Override some files in the FileSystem.
-    if (this._options.hostOverrideFileSystem) {
-      for (const filePath of Object.keys(this._options.hostOverrideFileSystem)) {
-        this._compilerHost.writeFile(filePath,
-          this._options.hostOverrideFileSystem[filePath], false);
-      }
-    }
     // Override some files in the FileSystem with paths from the actual file system.
     if (this._options.hostReplacementPaths) {
       for (const filePath of Object.keys(this._options.hostReplacementPaths)) {
@@ -645,9 +637,8 @@ export class AngularCompilerPlugin implements Tapable {
 
   private _makeTransformers() {
 
-    // TODO use compilerhost.denormalize when #8210 is merged.
     const isAppPath = (fileName: string) =>
-      this._rootNames.includes(fileName.replace(/\//g, path.sep));
+      !fileName.endsWith('.ngfactory.ts') && !fileName.endsWith('.ngstyle.ts');
     const isMainPath = (fileName: string) => fileName === this._mainPath;
     const getEntryModule = () => this.entryModule;
     const getLazyRoutes = () => this._lazyRoutes;
@@ -693,17 +684,19 @@ export class AngularCompilerPlugin implements Tapable {
       // Make a new program and load the Angular structure.
       .then(() => this._createOrUpdateProgram())
       .then(() => {
-        // Try to find lazy routes.
-        // We need to run the `listLazyRoutes` the first time because it also navigates libraries
-        // and other things that we might miss using the (faster) findLazyRoutesInAst.
-        // Lazy routes modules will be read with compilerHost and added to the changed files.
-        const changedTsFiles = this._getChangedTsFiles();
-        if (this._ngCompilerSupportsNewApi) {
-          this._processLazyRoutes(this._listLazyRoutesFromProgram());
-        } else if (this._firstRun) {
-          this._processLazyRoutes(this._getLazyRoutesFromNgtools());
-        } else if (changedTsFiles.length > 0) {
-          this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
+        if (this.entryModule) {
+          // Try to find lazy routes if we have an entry module.
+          // We need to run the `listLazyRoutes` the first time because it also navigates libraries
+          // and other things that we might miss using the (faster) findLazyRoutesInAst.
+          // Lazy routes modules will be read with compilerHost and added to the changed files.
+          const changedTsFiles = this._getChangedTsFiles();
+          if (this._ngCompilerSupportsNewApi) {
+            this._processLazyRoutes(this._listLazyRoutesFromProgram());
+          } else if (this._firstRun) {
+            this._processLazyRoutes(this._getLazyRoutesFromNgtools());
+          } else if (changedTsFiles.length > 0) {
+            this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
+          }
         }
       })
       .then(() => {
@@ -711,16 +704,16 @@ export class AngularCompilerPlugin implements Tapable {
 
         // We now have the final list of changed TS files.
         // Go through each changed file and add transforms as needed.
-        const sourceFiles = this._getChangedTsFiles().map((fileName) => {
-          time('AngularCompilerPlugin._update.getSourceFile');
-          const sourceFile = this._getTsProgram().getSourceFile(fileName);
-          if (!sourceFile) {
-            throw new Error(`${fileName} is not part of the TypeScript compilation. `
-              + `Please include it in your tsconfig via the 'files' or 'include' property.`);
-          }
-          timeEnd('AngularCompilerPlugin._update.getSourceFile');
-          return sourceFile;
-        });
+        const sourceFiles = this._getChangedTsFiles()
+          .map((fileName) => this._getTsProgram().getSourceFile(fileName))
+          // At this point we shouldn't need to filter out undefined files, because any ts file
+          // that changed should be emitted.
+          // But due to hostReplacementPaths there can be files (the environment files)
+          // that changed but aren't part of the compilation, specially on `ng test`.
+          // So we ignore missing source files files here.
+          // hostReplacementPaths needs to be fixed anyway to take care of the following issue.
+          // https://github.com/angular/angular-cli/issues/7305#issuecomment-332150230
+          .filter((x) => !!x);
 
         // Emit files.
         time('AngularCompilerPlugin._update._emit');

@@ -44,18 +44,18 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
     .then(() => {
-      // *************************************************************************************
-      // REMOVE THIS WITH UPDATED NG5 SCHEMATICS
-      // In ng5 we have to tell users users to update their tsconfig.json.
-      // `src/tsconfig.spec.json` needs to be updated with `"include": [ "**/*.ts" ]`
-      // *************************************************************************************
-      return updateJsonFile('src/tsconfig.spec.json', json => {
-        if (argv.nightly) {
-          json['include'] = ['**/*.ts'];
-        }
-      })
-      // Ignore error if file doesn't exist.
-      .catch(() => { return; });
+      if (argv.nightly) {
+        // *************************************************************************************
+        // REMOVE THIS WITH UPDATED NG5 SCHEMATICS
+        // In ng5 we have to tell users users to update their tsconfig.json.
+        // `src/tsconfig.spec.json` needs to be updated with "polyfills.ts" on `include`.
+        // *************************************************************************************
+        return updateJsonFile('src/tsconfig.spec.json', json => {
+          json['include'] = json['include'].concat('polyfills.ts');
+        })
+        // Ignore error if file doesn't exist.
+        .catch(() => { return; });
+      }
     })
     .then(() => console.log(`Project ${name} created... Installing npm.`))
     .then(() => silentNpm('install'));

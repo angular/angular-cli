@@ -18,7 +18,7 @@ const webpackLoader: string = g['angularCliIsLocal']
   : '@ngtools/webpack';
 
 
-function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
+function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = true) {
   const { appConfig, projectRoot, buildOptions } = wco;
   options.compilerOptions = options.compilerOptions || {};
 
@@ -82,7 +82,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any) {
 
   if (AngularCompilerPlugin.isSupported()) {
     const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
-      mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
+      mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
       i18nInFile: buildOptions.i18nFile,
       i18nInFormat: buildOptions.i18nFormat,
       i18nOutFile: buildOptions.i18nOutFile,
@@ -160,23 +160,28 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.testTsconfig);
   const appTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
 
-  // Force include main and polyfills.
-  // This is needed for AngularCompilerPlugin compatibility with existing projects,
-  // since TS compilation there is stricter and tsconfig.spec.ts doesn't include them.
-  const include = [appConfig.main, appConfig.polyfills, '**/*.spec.ts'];
-  if (appConfig.test) {
-    include.push(appConfig.test);
-  }
+  let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true };
 
-  let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true, include };
+  // The options below only apply to AoTPlugin.
+  if (!AngularCompilerPlugin.isSupported()) {
+    // Force include main and polyfills.
+    // This is needed for AngularCompilerPlugin compatibility with existing projects,
+    // since TS compilation there is stricter and tsconfig.spec.ts doesn't include them.
+    const include = [appConfig.main, appConfig.polyfills, '**/*.spec.ts'];
+    if (appConfig.test) {
+      include.push(appConfig.test);
+    }
 
-  // Fallback to correct module format on projects using a shared tsconfig.
-  if (tsConfigPath === appTsConfigPath) {
-    pluginOptions.compilerOptions = { module: 'commonjs' };
+    pluginOptions.include = include;
+
+    // Fallback to correct module format on projects using a shared tsconfig.
+    if (tsConfigPath === appTsConfigPath) {
+      pluginOptions.compilerOptions = { module: 'commonjs' };
+    }
   }
 
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
-    plugins: [ _createAotPlugin(wco, pluginOptions) ]
+    plugins: [ _createAotPlugin(wco, pluginOptions, false) ]
   };
 }
