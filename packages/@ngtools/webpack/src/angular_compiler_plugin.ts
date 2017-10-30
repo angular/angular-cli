@@ -60,6 +60,9 @@ export interface AngularCompilerPluginOptions {
   mainPath?: string;
   skipCodeGeneration?: boolean;
   hostReplacementPaths?: { [path: string]: string };
+  // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
+  // include 'polyfills.ts' in `tsconfig.spec.json'.
+  singleFileIncludes?: string[];
   i18nInFile?: string;
   i18nInFormat?: string;
   i18nOutFile?: string;
@@ -83,6 +86,7 @@ export class AngularCompilerPlugin implements Tapable {
   // TS compilation.
   private _compilerOptions: CompilerOptions;
   private _rootNames: string[];
+  private _singleFileIncludes: string[] = [];
   private _program: (ts.Program | Program);
   private _compilerHost: WebpackCompilerHost & CompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
@@ -157,8 +161,9 @@ export class AngularCompilerPlugin implements Tapable {
       basePath = path.resolve(process.cwd(), options.basePath);
     }
 
-    // TODO: check if we can get this from readConfiguration
-    this._basePath = basePath;
+    if (options.singleFileIncludes !== undefined) {
+      this._singleFileIncludes.push(...options.singleFileIncludes);
+    }
 
     // Parse the tsconfig contents.
     const config = readConfiguration(this._tsConfigPath);
@@ -166,8 +171,9 @@ export class AngularCompilerPlugin implements Tapable {
       throw new Error(formatDiagnostics(config.errors));
     }
 
-    this._rootNames = config.rootNames;
+    this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
     this._compilerOptions = config.options;
+    this._basePath = config.options.basePath;
 
     // Overwrite outDir so we can find generated files next to their .ts origin in compilerHost.
     this._compilerOptions.outDir = '';
@@ -295,7 +301,8 @@ export class AngularCompilerPlugin implements Tapable {
         // Get the root files from the ts config.
         // When a new root name (like a lazy route) is added, it won't be available from
         // following imports on the existing files, so we need to get the new list of root files.
-        this._rootNames = readConfiguration(this._tsConfigPath).rootNames;
+        const config = readConfiguration(this._tsConfigPath);
+        this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
 
         // Update the forked type checker with all changed compilation files.
         // This includes templates, that also need to be reloaded on the type checker.
