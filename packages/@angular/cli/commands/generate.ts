@@ -17,7 +17,7 @@ import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 
-const { cyan, grey, yellow } = chalk;
+const { cyan, yellow } = chalk;
 const separatorRegEx = /[\/\\]/g;
 
 
@@ -199,7 +199,8 @@ export default Command.extend({
       });
       return getHelpOutputTask.run({
         schematicName,
-        collectionName
+        collectionName,
+        nonSchematicOptions: this.availableOptions.filter((o: any) => !o.hidden)
       })
       .then((output: string[]) => {
         return [
