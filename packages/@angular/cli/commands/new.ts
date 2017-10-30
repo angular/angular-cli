@@ -3,13 +3,11 @@ import * as path from 'path';
 import chalk from 'chalk';
 
 import { CliConfig } from '../models/config';
-import { getCollection, getEngineHost } from '../utilities/schematics';
 import { validateProjectName } from '../utilities/validate-project-name';
 import { oneLine } from 'common-tags';
 import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
-import { outputFile } from 'fs-extra';
 
-const { cyan, yellow } = chalk;
+const { cyan } = chalk;
 
 const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');

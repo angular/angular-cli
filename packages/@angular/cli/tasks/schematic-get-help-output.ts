@@ -18,6 +18,13 @@ export interface SchematicAvailableOptions {
   schematicDefault: any;
 }
 
+const hiddenOptions = [
+  'name',
+  'path',
+  'source-dir',
+  'app-root'
+];
+
 export default Task.extend({
   run: function ({schematicName, collectionName, nonSchematicOptions}: SchematicGetHelpOptions):
     Promise<string[]> {
@@ -34,7 +41,7 @@ export default Task.extend({
     .then(([availableOptions, nonSchematicOptions]: [SchematicAvailableOptions[], any[]]) => {
       const output: string[] = [];
       [...(nonSchematicOptions || []), ...availableOptions]
-        .filter(opt => opt.name !== 'name')
+        .filter(opt => hiddenOptions.indexOf(opt.name) === -1)
         .forEach(opt => {
           let text = cyan(`    --${opt.name}`);
           if (opt.schematicType) {
