@@ -192,42 +192,20 @@ export default Command.extend({
     const collection = getCollection(collectionName);
     const schematicName = rawArgs[1];
     if (schematicName) {
-      const SchematicGetOptionsTask = require('../tasks/schematic-get-options').default;
-      const getOptionsTask = new SchematicGetOptionsTask({
+      const SchematicGetHelpOutputTask = require('../tasks/schematic-get-help-output').default;
+      const getHelpOutputTask = new SchematicGetHelpOutputTask({
         ui: this.ui,
         project: this.project
       });
-      return getOptionsTask.run({
+      return getHelpOutputTask.run({
         schematicName,
         collectionName
       })
-      .then((availableOptions: SchematicAvailableOptions[]) => {
-        const output: string[] = [];
-        output.push(cyan(`ng generate ${schematicName} ${cyan('[name]')} ${cyan('<options...>')}`));
-        availableOptions
-          .filter(opt => opt.name !== 'name')
-          .forEach(opt => {
-            let text = cyan(`    --${opt.name}`);
-            if (opt.schematicType) {
-              text += cyan(` (${opt.schematicType})`);
-            }
-            if (opt.schematicDefault) {
-              text += cyan(` (Default: ${opt.schematicDefault})`);
-            }
-            if (opt.description) {
-              text += ` ${opt.description}`;
-            }
-            output.push(text);
-            if (opt.aliases && opt.aliases.length > 0) {
-              const aliasText = opt.aliases.reduce(
-                (acc, curr) => {
-                  return acc + ` -${curr}`;
-                },
-                '');
-              output.push(grey(`      aliases: ${aliasText}`));
-            }
-          });
-        return output.join('\n');
+      .then((output: string[]) => {
+        return [
+          cyan(`ng generate ${schematicName} ${cyan('[name]')} ${cyan('<options...>')}`),
+          ...output
+        ].join('\n');
       });
     } else {
       const schematicNames: string[] = engineHost.listSchematics(collection);
