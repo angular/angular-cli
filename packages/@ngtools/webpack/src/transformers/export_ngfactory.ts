@@ -2,58 +2,70 @@
 import * as ts from 'typescript';
 import { relative, dirname } from 'path';
 
-import { findAstNodes, getFirstNode } from './ast_helpers';
-import { TransformOperation, AddNodeOperation } from './make_transform';
+import { collectDeepNodes, getFirstNode } from './ast_helpers';
+import { StandardTransform, TransformOperation, AddNodeOperation } from './interfaces';
+import { makeTransform } from './make_transform';
 
 export function exportNgFactory(
-  sourceFile: ts.SourceFile,
-  entryModule: { path: string, className: string }
-): TransformOperation[] {
-  const ops: TransformOperation[] = [];
+  shouldTransform: (fileName: string) => boolean,
+  getEntryModule: () => { path: string, className: string },
+): ts.TransformerFactory<ts.SourceFile> {
 
-  // Find all identifiers using the entry module class name.
-  const entryModuleIdentifiers = findAstNodes<ts.Identifier>(null, sourceFile,
-    ts.SyntaxKind.Identifier, true)
-    .filter(identifier => identifier.getText() === entryModule.className);
+  const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
+    const ops: TransformOperation[] = [];
 
-  if (entryModuleIdentifiers.length === 0) {
-    return [];
-  }
+    const entryModule = getEntryModule();
 
-  const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
-  const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
-
-  // Get the module path from the import.
-  let modulePath: string;
-  entryModuleIdentifiers.forEach((entryModuleIdentifier) => {
-    if (entryModuleIdentifier.parent.kind !== ts.SyntaxKind.ExportSpecifier) {
-      return;
+    if (!shouldTransform(sourceFile.fileName) || !entryModule) {
+      return ops;
     }
 
-    const exportSpec = entryModuleIdentifier.parent as ts.ExportSpecifier;
-    const moduleSpecifier = exportSpec.parent.parent.moduleSpecifier;
+    // Find all identifiers using the entry module class name.
+    const entryModuleIdentifiers = collectDeepNodes<ts.Identifier>(sourceFile,
+      ts.SyntaxKind.Identifier)
+      .filter(identifier => identifier.text === entryModule.className);
 
-    if (moduleSpecifier.kind !== ts.SyntaxKind.StringLiteral) {
-      return;
+    if (entryModuleIdentifiers.length === 0) {
+      return [];
     }
 
-    modulePath = (moduleSpecifier as ts.StringLiteral).text;
+    const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
+    const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
 
-    // Add the transform operations.
-    const factoryClassName = entryModule.className + 'NgFactory';
-    const factoryModulePath = normalizedEntryModulePath + '.ngfactory';
+    // Get the module path from the import.
+    let modulePath: string;
+    entryModuleIdentifiers.forEach((entryModuleIdentifier) => {
+      if (entryModuleIdentifier.parent.kind !== ts.SyntaxKind.ExportSpecifier) {
+        return;
+      }
 
-    const namedExports = ts.createNamedExports([ts.createExportSpecifier(undefined,
-      ts.createIdentifier(factoryClassName))]);
-    const newImport = ts.createExportDeclaration(undefined, undefined, namedExports,
-      ts.createLiteral(factoryModulePath));
+      const exportSpec = entryModuleIdentifier.parent as ts.ExportSpecifier;
+      const moduleSpecifier = exportSpec.parent.parent.moduleSpecifier;
 
-    ops.push(new AddNodeOperation(
-      sourceFile,
-      getFirstNode(sourceFile),
-      newImport
-    ));
-  });
+      if (moduleSpecifier.kind !== ts.SyntaxKind.StringLiteral) {
+        return;
+      }
 
-  return ops;
+      modulePath = (moduleSpecifier as ts.StringLiteral).text;
+
+      // Add the transform operations.
+      const factoryClassName = entryModule.className + 'NgFactory';
+      const factoryModulePath = normalizedEntryModulePath + '.ngfactory';
+
+      const namedExports = ts.createNamedExports([ts.createExportSpecifier(undefined,
+        ts.createIdentifier(factoryClassName))]);
+      const newImport = ts.createExportDeclaration(undefined, undefined, namedExports,
+        ts.createLiteral(factoryModulePath));
+
+      ops.push(new AddNodeOperation(
+        sourceFile,
+        getFirstNode(sourceFile),
+        newImport
+      ));
+    });
+
+    return ops;
+  };
+
+  return makeTransform(standardTransform);
 }
