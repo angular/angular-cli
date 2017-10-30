@@ -6,6 +6,7 @@ const { cyan, grey } = chalk;
 export interface SchematicGetHelpOptions {
   collectionName: string;
   schematicName: string;
+  nonSchematicOptions: any[];
 }
 
 export interface SchematicAvailableOptions {
@@ -18,21 +19,21 @@ export interface SchematicAvailableOptions {
 }
 
 export default Task.extend({
-  run: function ({schematicName, collectionName}: SchematicGetHelpOptions):
-    Promise<SchematicAvailableOptions[]> {
+  run: function ({schematicName, collectionName, nonSchematicOptions}: SchematicGetHelpOptions):
+    Promise<string[]> {
 
     const SchematicGetOptionsTask = require('./schematic-get-options').default;
     const getOptionsTask = new SchematicGetOptionsTask({
       ui: this.ui,
       project: this.project
     });
-    return getOptionsTask.run({
+    return Promise.all([getOptionsTask.run({
       schematicName: schematicName,
       collectionName: collectionName,
-    })
-    .then((availableOptions: SchematicAvailableOptions[]) => {
+    }), nonSchematicOptions])
+    .then(([availableOptions, nonSchematicOptions]: [SchematicAvailableOptions[], any[]]) => {
       const output: string[] = [];
-      availableOptions
+      [...(nonSchematicOptions || []), ...availableOptions]
         .filter(opt => opt.name !== 'name')
         .forEach(opt => {
           let text = cyan(`    --${opt.name}`);
@@ -48,7 +49,7 @@ export default Task.extend({
           output.push(text);
           if (opt.aliases && opt.aliases.length > 0) {
             const aliasText = opt.aliases.reduce(
-              (acc, curr) => {
+              (acc: string, curr: string) => {
                 return acc + ` -${curr}`;
               },
               '');
