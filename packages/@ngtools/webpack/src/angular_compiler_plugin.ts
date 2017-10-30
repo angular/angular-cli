@@ -18,7 +18,7 @@ import {
 } from './virtual_file_system_decorator';
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import {
-  replaceBootstrap,
+  createEntryModuleReplacer,
   exportNgFactory,
   exportLazyModuleMap,
   registerLocaleData,
@@ -342,7 +342,7 @@ export class AngularCompilerPlugin implements Tapable {
       })
       .then(() => {
         // If there's still no entryModule try to resolve from mainPath.
-        if (!this._entryModule && this._mainPath) {
+        if (!this._ngCompilerSupportsNewApi && !this._entryModule && this._mainPath) {
           time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
           this._entryModule = resolveEntryModuleFromMain(
             this._mainPath, this._compilerHost, this._getTsProgram());
@@ -638,6 +638,36 @@ export class AngularCompilerPlugin implements Tapable {
     const getEntryModule = () => this.entryModule;
     const getLazyRoutes = () => this._lazyRoutes;
 
+    if (this._platform === PLATFORM.Browser && !this._JitMode) {
+      const entryModuleReplacer = createEntryModuleReplacer(
+        () => this._getTsProgram().getTypeChecker(),
+        {
+          resolveModule: (moduleName, containingFile) => {
+            const resolved = ts.resolveModuleName(
+              moduleName,
+              containingFile,
+              this._compilerOptions,
+              this._compilerHost,
+            );
+            if (!resolved || !resolved.resolvedModule) {
+              return undefined;
+            }
+            if (resolved.resolvedModule.extension !== ts.Extension.Ts) {
+              return undefined;
+            }
+            const resolvedFileName = resolved.resolvedModule.resolvedFileName;
+            return resolvedFileName.replace(/\.ts$/, '');
+          },
+          onEntryFound: (entryPath, entryClass) => {
+            if (!this._entryModule) {
+              this._entryModule = `${entryPath}#${entryClass}`;
+            }
+          },
+        },
+      );
+      this._transformers.push(entryModuleReplacer);
+    }
+
     if (this._JitMode) {
       // Replace resources in JIT.
       this._transformers.push(replaceResources(isAppPath));
@@ -650,11 +680,6 @@ export class AngularCompilerPlugin implements Tapable {
       if (this._compilerOptions.i18nInLocale) {
         this._transformers.push(registerLocaleData(isAppPath, getEntryModule,
           this._compilerOptions.i18nInLocale));
-      }
-
-      if (!this._JitMode) {
-        // Replace bootstrap in browser AOT.
-        this._transformers.push(replaceBootstrap(isAppPath, getEntryModule));
       }
     } else if (this._platform === PLATFORM.Server) {
       this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
