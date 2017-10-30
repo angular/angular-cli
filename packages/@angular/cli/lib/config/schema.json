@@ -197,6 +197,10 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "defaultStyleType": {
+            "description": "Default file type for inline styles.",
+            "type": "string"
           }
         },
         "additionalProperties": false
