@@ -2,7 +2,7 @@
   "name": "@nguniversal/common",
   "main": "index.js",
   "types": "index.d.ts",
-  "version": "5.0.0-beta.4",
+  "version": "5.0.0-beta.5",
   "description": "Angular Universal common ",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
