@@ -35,13 +35,12 @@ export function statsToString(json: any, statsConfig: any) {
       const size = asset ? ` ${_formatSize(asset.size)}` : '';
       const files = chunk.files.join(', ');
       const names = chunk.names ? ` (${chunk.names.join(', ')})` : '';
-      const parents = chunk.parents.map((id: string) => ` {${y(id)}}`).join('');
       const initial = y(chunk.entry ? '[entry]' : chunk.initial ? '[initial]' : '');
       const flags = ['rendered', 'recorded']
         .map(f => f && chunk[f] ? g(` [${f}]`) : '')
         .join('');
 
-      return `chunk {${y(chunk.id)}} ${g(files)}${names}${size}${parents} ${initial}${flags}`;
+      return `chunk {${y(chunk.id)}} ${g(files)}${names}${size} ${initial}${flags}`;
     }).join('\n')}
     `);
 }
