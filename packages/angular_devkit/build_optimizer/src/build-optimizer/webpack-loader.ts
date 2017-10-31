@@ -53,8 +53,10 @@ export default function buildOptimizerLoader
       // source map chaining example.
       // Use http://sokra.github.io/source-map-visualization/ to validate sourcemaps make sense.
 
-      // Fill in the intermediate sourcemap source as the previous sourcemap file.
-      intermediateSourceMap.sources = [previousSourceMap.file];
+      // Fill in the intermediate sourcemap sources as the previous sourcemap sources.
+      if (previousSourceMap.sources) {
+        intermediateSourceMap.sources = previousSourceMap.sources;
+      }
 
       // Chain the sourcemaps.
       const consumer = new SourceMapConsumer(intermediateSourceMap);
