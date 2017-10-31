@@ -95,7 +95,7 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
         sourcemaps: true,
         extractCss: false,
         namedChunks: true,
-        aot: AngularCompilerPlugin.isSupported(),
+        aot: false,
         buildOptimizer: false
       },
       production: {
