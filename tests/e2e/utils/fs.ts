@@ -1,4 +1,5 @@
 import * as fs from 'fs-extra';
+import * as glob from 'glob';
 import {dirname} from 'path';
 import {stripIndents} from 'common-tags';
 
@@ -193,6 +194,19 @@ export function expectFileSizeToBeUnder(fileName: string, sizeInBytes: number) {
     .then(content => {
       if (content.length > sizeInBytes) {
         throw new Error(`File "${fileName}" exceeded file size of "${sizeInBytes}".`);
+      }
+    });
+}
+
+export function expectGlobFileSizeToBeUnder(fileGlob: string, sizeInBytes: number) {
+  let assets = glob.sync(fileGlob, { dir: false });
+
+  return Promise.all(assets.map(fileName => readFile(fileName).then(content => content.length)))
+    .then(lengths => {
+      const total = lengths.reduce((acc, curr) => acc + curr);
+
+      if (total > sizeInBytes) {
+        throw new Error(`Files matching glob "${glob}" exceeded total size of "${sizeInBytes}".`);
       }
     });
 }
