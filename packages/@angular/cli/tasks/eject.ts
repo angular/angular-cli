@@ -9,6 +9,7 @@ import { NgCliWebpackConfig } from '../models/webpack-config';
 import { CliConfig } from '../models/config';
 import { stripBom } from '../utilities/strip-bom';
 import { AotPlugin, AngularCompilerPlugin } from '@ngtools/webpack';
+import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 
 import denodeify = require('denodeify');
@@ -227,6 +228,9 @@ class JsonWebpackSerializer {
         case AotPlugin:
           args = this._aotPluginSerialize(plugin);
           this._addImport('@ngtools/webpack', 'AotPlugin');
+          break;
+        case PurifyPlugin:
+          this._addImport('@angular-devkit/build-optimizer', 'PurifyPlugin');
           break;
         case AngularCompilerPlugin:
           args = this._aotPluginSerialize(plugin);
