@@ -13,7 +13,7 @@ export default function() {
 
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  return silentNpm('install', '@angular/service-worker')
+  return silentNpm('install', '@angular/service-worker@1.0.0-beta.16')
     .then(() => ng('set', 'apps.0.serviceWorker=true'))
     .then(() => ng('build', '--prod'))
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
