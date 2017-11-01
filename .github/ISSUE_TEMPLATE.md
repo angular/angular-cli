@@ -1,39 +1,40 @@
 <!--
-IF YOU DON'T FILL OUT THE FOLLOWING INFORMATION YOUR ISSUE MIGHT BE CLOSED WITHOUT INVESTIGATING
+We will close this issue if you don't provide the needed information.
+For feature requests, delete the form below and describe the requirements and use case.
 -->
-### Bug Report or Feature Request (mark with an `x`)
-```
-- [ ] bug report -> please search issues before submitting
-- [ ] feature request
-```
 
-### Versions.
+### Versions
+```
 <!--
 Output from: `ng --version`.
 If nothing, output from: `node --version` and `npm --version`.
   Windows (7/8/10). Linux (incl. distribution). macOS (El Capitan? Sierra?)
 -->
+```
 
-
-### Repro steps.
+### Repro steps
 <!--
 Simple steps to reproduce this bug.
 Please include: commands run, packages added, related code changes.
 A link to a sample repo would help too.
 -->
+* Step 1
+* Step 2
+* Step 3
 
 
-### The log given by the failure.
-<!-- Normally this include a stack trace and some more information. -->
+### Observed behavior
+```
+<!-- Normally this includes a stack trace and some more information. -->
+```
 
-
-### Desired functionality.
+### Desired behavior
 <!--
 What would like to see implemented?
 What is the usecase?
+What did you expect to see?
 -->
 
 
-### Mention any other details that might be useful.
-<!-- Please include a link to the repo if this is related to an OSS project. -->
+### Mention any other details that might be useful (optional)
 
