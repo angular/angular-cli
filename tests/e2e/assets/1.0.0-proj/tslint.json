@@ -100,6 +100,8 @@
 
     "directive-selector": [true, "attribute", "app", "camelCase"],
     "component-selector": [true, "element", "app", "kebab-case"],
+    "angular-whitespace": [true, "check-interpolation"],
+    "no-on-prefix-output-name": true,
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
     "use-host-property-decorator": true,
