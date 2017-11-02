@@ -39,7 +39,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // style-loader does not support sourcemaps without absolute publicPath, so it's
   // better to disable them when not extracting css
   // https://github.com/webpack-contrib/style-loader#recommended-configuration
-  const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemaps;
+  const cssSourceMap = buildOptions.sourcemaps;
 
   // Minify/optimize css in production.
   const minimizeCss = buildOptions.target === 'production';
@@ -199,8 +199,12 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       const ret: any = {
         include: globalStylePaths,
         test,
-        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin)
-                                     : ['style-loader', ...extractTextPlugin.use]
+        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin) : [{
+          loader: 'style-loader',
+          options: {
+            convertToAbsoluteUrls: cssSourceMap,
+          },
+        }, ...extractTextPlugin.use],
       };
       // Save the original options as arguments for eject.
       if (buildOptions.extractCss) {
