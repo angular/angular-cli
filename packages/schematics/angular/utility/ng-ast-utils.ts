@@ -5,9 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize } from '@angular-devkit/core';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import { findNode, getSourceNodes } from '../utility/ast-utils';
+import { AppConfig } from '../utility/config';
 
 export function findBootstrapModuleCall(host: Tree, mainPath: string): ts.CallExpression | null {
   const mainBuffer = host.read(mainPath);
@@ -42,4 +44,41 @@ export function findBootstrapModuleCall(host: Tree, mainPath: string): ts.CallEx
   }
 
   return bootstrapCall;
+}
+
+export function findBootstrapModulePath(host: Tree, mainPath: string): string {
+  const bootstrapCall = findBootstrapModuleCall(host, mainPath);
+  if (!bootstrapCall) {
+    throw new SchematicsException('Bootstrap call not found');
+  }
+
+  const bootstrapModule = bootstrapCall.arguments[0];
+
+  const mainBuffer = host.read(mainPath);
+  if (!mainBuffer) {
+    throw new SchematicsException(`Client app main file (${mainPath}) not found`);
+  }
+  const mainText = mainBuffer.toString('utf-8');
+  const source = ts.createSourceFile(mainPath, mainText, ts.ScriptTarget.Latest, true);
+  const allNodes = getSourceNodes(source);
+  const bootstrapModuleRelativePath = allNodes
+    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+    .filter(imp => {
+      return findNode(imp, ts.SyntaxKind.Identifier, bootstrapModule.getText());
+    })
+    .map((imp: ts.ImportDeclaration) => {
+      const modulePathStringLiteral = <ts.StringLiteral> imp.moduleSpecifier;
+
+      return modulePathStringLiteral.text;
+    })[0];
+
+  return bootstrapModuleRelativePath;
+}
+
+export function getAppModulePath(host: Tree, app: AppConfig) {
+  const mainPath = normalize(`/${app.root}/${app.main}`);
+  const moduleRelativePath = findBootstrapModulePath(host, mainPath);
+  const modulePath = normalize(`/${app.root}/${moduleRelativePath}.ts`);
+
+  return modulePath;
 }

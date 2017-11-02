@@ -63,6 +63,12 @@
       "factory": "./universal",
       "description": "Create an Angular universal app.",
       "schema": "./universal/schema.json"
+    },
+    "appShell": {
+      "aliases": [ "app-shell" ],
+      "factory": "./app-shell",
+      "description": "Create an app shell.",
+      "schema": "./app-shell/schema.json"
     }
   }
 }

@@ -11,7 +11,7 @@ import { VirtualTree } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import { Change, InsertChange } from '../utility/change';
 import { getFileContent } from '../utility/test';
-import { addExportToModule } from './ast-utils';
+import { addExportToModule, addSymbolToNgModuleMetadata } from './ast-utils';
 
 
 function getTsSource(path: string, content: string): ts.SourceFile {
@@ -65,11 +65,90 @@ describe('ast utils', () => {
   });
 
   it('should add export to module if not indented', () => {
-    moduleContent = tags.stripIndent`${moduleContent}`;
+    moduleContent = tags.stripIndents`${moduleContent}`;
     const source = getTsSource(modulePath, moduleContent);
     const changes = addExportToModule(source, modulePath, 'FooComponent', './foo.component');
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
     expect(output).toMatch(/exports: \[FooComponent\]/);
+  });
+
+  it('should add metadata', () => {
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addSymbolToNgModuleMetadata(source, modulePath, 'imports', 'HelloWorld');
+    expect(changes).not.toBeNull();
+
+    const output = applyChanges(modulePath, moduleContent, changes || []);
+    expect(output).toMatch(/imports: [\s\S]+,\n\s+HelloWorld\n\s+\]/m);
+  });
+
+  it('should add metadata (comma)', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule,
+        ],
+        providers: [],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `;
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addSymbolToNgModuleMetadata(source, modulePath, 'imports', 'HelloWorld');
+    expect(changes).not.toBeNull();
+
+    const output = applyChanges(modulePath, moduleContent, changes || []);
+    expect(output).toMatch(/imports: [\s\S]+,\n\s+HelloWorld,\n\s+\]/m);
+  });
+
+  it('should add metadata (missing)', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        providers: [],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `;
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addSymbolToNgModuleMetadata(source, modulePath, 'imports', 'HelloWorld');
+    expect(changes).not.toBeNull();
+
+    const output = applyChanges(modulePath, moduleContent, changes || []);
+    expect(output).toMatch(/imports: \[HelloWorld]\r?\n/m);
+  });
+
+  it('should add metadata (empty)', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        providers: [],
+        imports: [],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `;
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addSymbolToNgModuleMetadata(source, modulePath, 'imports', 'HelloWorld');
+    expect(changes).not.toBeNull();
+
+    const output = applyChanges(modulePath, moduleContent, changes || []);
+    expect(output).toMatch(/imports: \[HelloWorld],\r?\n/m);
   });
 });

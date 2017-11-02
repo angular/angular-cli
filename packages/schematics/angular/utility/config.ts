@@ -121,6 +121,10 @@ export interface AppConfig {
   environments?: {
       [name: string]: any; // tslint:disable-line:no-any
   };
+  appShell?: {
+    app: string;
+    route: string;
+  };
 }
 
 export interface CliConfig {
@@ -448,7 +452,7 @@ export function getConfig(host: Tree): CliConfig {
   return config;
 }
 
-export function getAppFromConfig(config: CliConfig, appIndexOrName = '0'): AppConfig | null {
+export function getAppFromConfig(config: CliConfig, appIndexOrName: string): AppConfig | null {
   if (!config.apps) {
     return null;
   }

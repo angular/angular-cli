@@ -233,10 +233,13 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
     .map(expr => expr.arguments[0] as ts.ObjectLiteralExpression);
 }
 
-
-function _addSymbolToNgModuleMetadata(source: ts.SourceFile,
-                                      ngModulePath: string, metadataField: string,
-                                      symbolName: string, importPath: string): Change[] {
+export function addSymbolToNgModuleMetadata(
+  source: ts.SourceFile,
+  ngModulePath: string,
+  metadataField: string,
+  symbolName: string,
+  importPath: string | null = null,
+): Change[] {
   const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
   let node: any = nodes[0];  // tslint:disable-line:no-any
 
@@ -287,13 +290,15 @@ function _addSymbolToNgModuleMetadata(source: ts.SourceFile,
         toInsert = `, ${metadataField}: [${symbolName}]`;
       }
     }
-    const newMetadataProperty = new InsertChange(ngModulePath, position, toInsert);
-    const newMetadataImport = insertImport(source,
-      ngModulePath, symbolName.replace(/\..*$/, ''), importPath);
-
-    return [newMetadataProperty, newMetadataImport];
+    if (importPath !== null) {
+      return [
+        new InsertChange(ngModulePath, position, toInsert),
+        insertImport(source, ngModulePath, symbolName.replace(/\..*$/, ''), importPath),
+      ];
+    } else {
+      return [new InsertChange(ngModulePath, position, toInsert)];
+    }
   }
-
   const assignment = matchingProperties[0] as ts.PropertyAssignment;
 
   // If it's not an array, nothing we can do really.
@@ -358,11 +363,14 @@ function _addSymbolToNgModuleMetadata(source: ts.SourceFile,
       toInsert = `, ${symbolName}`;
     }
   }
-  const insert = new InsertChange(ngModulePath, position, toInsert);
-  const importInsert: Change = insertImport(source,
-    ngModulePath, symbolName.replace(/\..*$/, ''), importPath);
+  if (importPath !== null) {
+    return [
+      new InsertChange(ngModulePath, position, toInsert),
+      insertImport(source, ngModulePath, symbolName.replace(/\..*$/, ''), importPath),
+    ];
+  }
 
-  return [insert, importInsert];
+  return [new InsertChange(ngModulePath, position, toInsert)];
 }
 
 /**
@@ -372,19 +380,18 @@ function _addSymbolToNgModuleMetadata(source: ts.SourceFile,
 export function addDeclarationToModule(source: ts.SourceFile,
                                        modulePath: string, classifiedName: string,
                                        importPath: string): Change[] {
-  return _addSymbolToNgModuleMetadata(source, modulePath, 'declarations', classifiedName,
-    importPath);
+  return addSymbolToNgModuleMetadata(
+    source, modulePath, 'declarations', classifiedName, importPath);
 }
 
 /**
- * Custom function to insert a declaration (component, pipe, directive)
- * into NgModule declarations. It also imports the component.
+ * Custom function to insert an NgModule into NgModule imports. It also imports the module.
  */
 export function addImportToModule(source: ts.SourceFile,
                                   modulePath: string, classifiedName: string,
                                   importPath: string): Change[] {
 
-  return _addSymbolToNgModuleMetadata(source, modulePath, 'imports', classifiedName, importPath);
+  return addSymbolToNgModuleMetadata(source, modulePath, 'imports', classifiedName, importPath);
 }
 
 /**
@@ -393,7 +400,7 @@ export function addImportToModule(source: ts.SourceFile,
 export function addProviderToModule(source: ts.SourceFile,
                                     modulePath: string, classifiedName: string,
                                     importPath: string): Change[] {
-  return _addSymbolToNgModuleMetadata(source, modulePath, 'providers', classifiedName, importPath);
+  return addSymbolToNgModuleMetadata(source, modulePath, 'providers', classifiedName, importPath);
 }
 
 /**
@@ -402,7 +409,7 @@ export function addProviderToModule(source: ts.SourceFile,
 export function addExportToModule(source: ts.SourceFile,
                                   modulePath: string, classifiedName: string,
                                   importPath: string): Change[] {
-  return _addSymbolToNgModuleMetadata(source, modulePath, 'exports', classifiedName, importPath);
+  return addSymbolToNgModuleMetadata(source, modulePath, 'exports', classifiedName, importPath);
 }
 
 /**
@@ -411,5 +418,31 @@ export function addExportToModule(source: ts.SourceFile,
 export function addBootstrapToModule(source: ts.SourceFile,
                                      modulePath: string, classifiedName: string,
                                      importPath: string): Change[] {
-  return _addSymbolToNgModuleMetadata(source, modulePath, 'bootstrap', classifiedName, importPath);
+  return addSymbolToNgModuleMetadata(source, modulePath, 'bootstrap', classifiedName, importPath);
+}
+
+/**
+ * Determine if an import already exists.
+ */
+export function isImported(source: ts.SourceFile,
+                           classifiedName: string,
+                           importPath: string): boolean {
+  const allNodes = getSourceNodes(source);
+  const matchingNodes = allNodes
+    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+    .filter((imp: ts.ImportDeclaration) => imp.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral)
+    .filter((imp: ts.ImportDeclaration) => {
+      return (<ts.StringLiteral> imp.moduleSpecifier).text === importPath;
+    })
+    .filter((imp: ts.ImportDeclaration) => {
+      if (!imp.importClause) {
+        return false;
+      }
+      const nodes = findNodes(imp.importClause, ts.SyntaxKind.ImportSpecifier)
+        .filter(n => n.getText() === classifiedName);
+
+      return nodes.length > 0;
+    });
+
+  return matchingNodes.length > 0;
 }

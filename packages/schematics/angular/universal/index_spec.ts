@@ -89,8 +89,8 @@ describe('Universal Schematic', () => {
     expect(app.index).toEqual('index.html');
     expect(app.main).toEqual('main.server.ts');
     expect(app.test).toEqual('test.ts');
-    expect(app.tsconfig).toEqual('tsconfig.server');
-    expect(app.testTsconfig).toEqual('tsconfig.spec');
+    expect(app.tsconfig).toEqual('tsconfig.server.json');
+    expect(app.testTsconfig).toEqual('tsconfig.spec.json');
     expect(app.environmentSource).toEqual('environments/environment.ts');
   });
 
