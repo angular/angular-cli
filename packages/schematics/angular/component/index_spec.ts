@@ -62,12 +62,12 @@ describe('Component Schematic', () => {
     expect(tsContent).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
   });
 
-  it('should set view encapsulation to Emulated', () => {
-    const options = { ...defaultOptions, viewEncapsulation: 'Emulated' };
+  it('should set view encapsulation to None', () => {
+    const options = { ...defaultOptions, viewEncapsulation: 'None' };
 
     const tree = schematicRunner.runSchematic('component', options, appTree);
     const tsContent = getFileContent(tree, '/src/app/foo/foo.component.ts');
-    expect(tsContent).toMatch(/encapsulation: ViewEncapsulation.Emulated/);
+    expect(tsContent).toMatch(/encapsulation: ViewEncapsulation.None/);
   });
 
   it('should create a flat component', () => {
