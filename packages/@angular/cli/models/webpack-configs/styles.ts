@@ -163,6 +163,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       loader: 'css-loader',
       options: {
         sourceMap: cssSourceMap,
+        root: appRoot,
         importLoaders: 1
       }
     },
