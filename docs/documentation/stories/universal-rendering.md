@@ -185,14 +185,14 @@ With these steps complete, you should be able to build a server bundle for your 
 $ ng build --prod
 ...
 # This builds the server bundle in dist/server/
-$ ng build --prod --app 1 --output
+$ ng build --prod --app 1 --output-hashing=false
 
 # outputs:
 Date: 2017-07-24T22:42:09.739Z
 Hash: 9cac7d8e9434007fd8da
 Time: 4933ms
-chunk {0} main.988d7a161bd984b7eb54.bundle.js (main) 9.49 kB [entry] [rendered]
-chunk {1} styles.d41d8cd98f00b204e980.bundle.css (styles) 0 bytes [entry] [rendered]
+chunk {0} main.bundle.js (main) 9.49 kB [entry] [rendered]
+chunk {1} styles.bundle.css (styles) 0 bytes [entry] [rendered]
 ```
 
 ---
