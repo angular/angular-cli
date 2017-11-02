@@ -30,7 +30,7 @@ server.route({
     hapiEngine({
       req
     }).then(html => reply(html))
-      .then(err => reply(boom.wrap(err));
+      .then(err => reply(boom.wrap(err)));
   }
 });
 
@@ -47,7 +47,7 @@ const hapiEngine = ngHapiEngine({
   providers: [
     ServerService
   ]
-}));
+});
 ```
 
 ## Advanced Usage
@@ -68,7 +68,7 @@ server.route({
       ],
       req
     }).then(html => reply(html))
-      .then(err => reply(boom.wrap(err));
+      .then(err => reply(boom.wrap(err)));
   }
 });
 ```
