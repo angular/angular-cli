@@ -8,6 +8,8 @@ In your webpack config, add the following plugin and loader.
 
 Angular version 5 and up, use `AngularCompilerPlugin`:
 
+**Notice**: You will be needed to add your angular app `.ts` files to `include` option on your `tsconfig.json` file.
+
 ```typescript
 import {AngularCompilerPlugin} from '@ngtools/webpack'
 
