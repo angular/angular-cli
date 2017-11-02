@@ -16,8 +16,7 @@ exports = { /* ... */
     rules: [
       {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
-        loader: '@ngtools/webpack',
-        sourcemap: true
+        loader: '@ngtools/webpack'
       }
     ]
   },
@@ -25,7 +24,8 @@ exports = { /* ... */
   plugins: [
     new AngularCompilerPlugin({
       tsConfigPath: 'path/to/tsconfig.json',
-      entryModule: 'path/to/app.module#AppModule'
+      entryModule: 'path/to/app.module#AppModule',
+      sourceMap: true
     })
   ]
 }
@@ -41,8 +41,7 @@ exports = { /* ... */
     rules: [
       {
         test: /\.ts$/,
-        loader: '@ngtools/webpack',
-        sourcemap: true
+        loader: '@ngtools/webpack'
       }
     ]
   },
@@ -50,7 +49,8 @@ exports = { /* ... */
   plugins: [
     new AotPlugin({
       tsConfigPath: 'path/to/tsconfig.json',
-      entryModule: 'path/to/app.module#AppModule'
+      entryModule: 'path/to/app.module#AppModule',
+      sourceMap: true
     })
   ]
 }
