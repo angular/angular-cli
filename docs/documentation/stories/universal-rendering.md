@@ -6,7 +6,7 @@ The Angular CLI supports generation of a Universal build for your application. T
 
 ## Example CLI Integration:
 
-[Angular Universal-Starter](https://github.com/angular/universal-starter/tree/master/cli) - Clone the universal-starter, and check out the `/cli` folder for a working example.
+[Angular Universal-Starter](https://github.com/angular/universal-starter) - Clone the universal-starter for a working example.
 
 ---
 
@@ -389,4 +389,4 @@ npm run build:ssr && npm run serve:ssr
 
 Enjoy!
 
-Once again to see a working version of everything, check out the [universal-starter](https://github.com/angular/universal-starter/tree/master/cli).
+Once again to see a working version of everything, check out the [universal-starter](https://github.com/angular/universal-starter).
