@@ -73,7 +73,7 @@ NOTE: The current `latest` tag on npm points to v1.x version of the packages to 
 # Getting Started
 
 [* **NodeJS** :: Example repo](https://github.com/angular/universal-starter)
-  - Minimal webpack & universal example with Angular 4.0
+  - Minimal webpack & universal example with Angular 5.0
 
 [* ASP.NET Core :: Universal Starter repo](https://github.com/MarkPieszak/aspnetcore-angular2-universal)
   - **Installation**: Clone the above repo, `npm i && dotnet restore` *(VStudio will run these automatically when opening the project)*
