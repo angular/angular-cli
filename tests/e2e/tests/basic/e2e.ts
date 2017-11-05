@@ -4,9 +4,9 @@ import {
   execAndWaitForOutputToMatch,
   killAllProcesses
 } from '../../utils/process';
-import { updateJsonFile } from '../../utils/project';
-import { expectToFail } from '../../utils/utils';
-import { moveFile, copyFile } from '../../utils/fs';
+import {updateJsonFile} from '../../utils/project';
+import {expectToFail} from '../../utils/utils';
+import {moveFile, copyFile, replaceInFile} from '../../utils/fs';
 
 
 export default function () {
@@ -34,6 +34,21 @@ export default function () {
     .then(() => copyFile('./e2e/renamed-app.e2e-spec.ts', './e2e/another-app.e2e-spec.ts'))
     .then(() => ng('e2e', '--specs', './e2e/renamed-app.e2e-spec.ts',
       '--specs', './e2e/another-app.e2e-spec.ts'))
+    // Suites block need to be added in the protractor.conf.js file to test suites
+    .then(() => replaceInFile('protractor.conf.js', `allScriptsTimeout: 11000,`,
+      `allScriptsTimeout: 11000,
+          suites: {
+            app: './e2e/app.e2e-spec.ts'
+          },
+    `))
+    .then(() => ng('e2e', '--suite=app'))
+    // remove suites block from protractor.conf.js file after testing suites
+    .then(() => replaceInFile('protractor.conf.js', `allScriptsTimeout: 11000,
+          suites: {
+            app: './e2e/app.e2e-spec.ts'
+          },
+    `, `allScriptsTimeout: 11000,`
+    ))
     // Should start up Element Explorer
     .then(() => execAndWaitForOutputToMatch('ng', ['e2e', '--element-explorer'],
       /Element Explorer/))
