@@ -17,6 +17,6 @@
     "url": "https://github.com/angular/universal/issues"
   },
   "peerDependencies": {
-    "@angular/core": "^5.0.0-rc.6"
+    "@angular/core": "^5.0.0"
   }
 }

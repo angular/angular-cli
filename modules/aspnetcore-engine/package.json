@@ -33,16 +33,16 @@
     "prebuild": "rimraf dist"
   },
   "peerDependencies": {
-    "@angular/core": "^5.0.0-rc.6",
-    "@angular/platform-server": "^5.0.0-rc.6"
+    "@angular/core": "^5.0.0",
+    "@angular/platform-server": "^5.0.0"
   },
   "devDependencies": {
-    "@angular/common": "^5.0.0-rc.6",
-    "@angular/compiler": "^5.0.0-rc.6",
-    "@angular/core": "^5.0.0-rc.6",
-    "@angular/http": "^5.0.0-rc.6",
-    "@angular/platform-browser": "^5.0.0-rc.6",
-    "@angular/platform-server": "^5.0.0-rc.6",
+    "@angular/common": "^5.0.0",
+    "@angular/compiler": "^5.0.0",
+    "@angular/core": "^5.0.0",
+    "@angular/http": "^5.0.0",
+    "@angular/platform-browser": "^5.0.0",
+    "@angular/platform-server": "^5.0.0",
     "rimraf": "^2.6.1",
     "rxjs": "^5.2.0",
     "typescript": "2.4.2",
