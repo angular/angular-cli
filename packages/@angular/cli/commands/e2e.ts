@@ -13,6 +13,7 @@ export interface E2eTaskOptions extends ServeTaskOptions {
   serve: boolean;
   webdriverUpdate: boolean;
   specs: string[];
+  suite: string;
   elementExplorer: boolean;
 }
 
@@ -40,6 +41,15 @@ const E2eCommand = Command.extend({
       description: oneLine`
         Override specs in the protractor config.
         Can send in multiple specs by repeating flag (ng e2e --specs=spec1.ts --specs=spec2.ts).
+      `
+    },
+    {
+      name: 'suite',
+      type: String,
+      aliases: ['su'],
+      description: oneLine`
+        Override suite in the protractor config.
+        Can send in multiple suite by comma separated values (ng e2e --suite=suiteA,suiteB).
       `
     },
     {
