@@ -121,7 +121,8 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
 
     // Use Build Optimizer on prod AOT builds by default when AngularCompilerPlugin is supported.
     const buildOptimizerDefault = {
-      buildOptimizer: buildOptions.target == 'production' && AngularCompilerPlugin.isSupported()
+      buildOptimizer: buildOptions.target == 'production' && buildOptions.aot !== false
+        && AngularCompilerPlugin.isSupported()
     };
 
     merged = Object.assign({}, buildOptimizerDefault, merged);
