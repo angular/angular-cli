@@ -21,6 +21,10 @@ export interface Replacement {
 export function purifyReplacements(content: string) {
 
   const pureImportMatches = getMatches(content, importCommentRegex, 1).join('|');
+  if (!pureImportMatches) {
+    return [];
+  }
+
   const replacements: Replacement[] = [];
   const addReplacement = (start: number, length: number, content: string) =>
     replacements.push({
