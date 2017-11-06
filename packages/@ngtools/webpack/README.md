@@ -68,7 +68,7 @@ The loader works with webpack plugin to compile your TypeScript. It's important 
 * `typeChecking`. Optional, defaults to true. Enable type checking through your application. This will slow down compilation, but show syntactic and semantic errors in webpack. Only available in `AotPlugin`.
 * `exclude`. Optional. Extra files to exclude from TypeScript compilation. Not supported with `AngularCompilerPlugin`.
 * `sourceMap`. Optional. Include sourcemaps.
-* `compilerOptions`. Optional. Override options in `tsconfig.json`.
+* `compilerOptions`. Optional. Override options in `tsconfig.json`. Not supported with `AngularCompilerPlugin`.
 
 ## Features
 The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ngtools) standalone from the Angular CLI as presented in [Stephen Fluin's Angular CLI talk](https://youtu.be/uBRK6cTr4Vk?t=6m45s) at Angular Connect 2016:
