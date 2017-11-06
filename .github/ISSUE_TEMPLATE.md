@@ -24,13 +24,13 @@ A link to a sample repo would help too.
 
 
 ### The log given by the failure.
-<!-- Normally this include a stack trace and some more information. -->
+<!-- Normally this includes a stack trace and some more information. -->
 
 
 ### Desired functionality.
 <!--
 What would like to see implemented?
-What is the usecase?
+What is the use case?
 -->
 
 
