@@ -8,3 +8,4 @@ export * from './export_ngfactory';
 export * from './export_lazy_module_map';
 export * from './register_locale_data';
 export * from './replace_resources';
+export * from './entry_module_replacer';
