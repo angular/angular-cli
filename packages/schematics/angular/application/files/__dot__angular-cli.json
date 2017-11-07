@@ -26,7 +26,8 @@
       "environments": {
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
-      }
+      }<% if (serviceWorker) { %>,
+      "serviceWorker": true<% } %>
     }
   ],
   "e2e": {
