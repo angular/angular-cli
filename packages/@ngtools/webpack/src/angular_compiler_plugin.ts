@@ -18,13 +18,14 @@ import {
 } from './virtual_file_system_decorator';
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import {
+  createTransformerFactory,
+  ComponentResourceTransformer,
   replaceBootstrap,
   exportNgFactory,
   exportLazyModuleMap,
   removeDecorators,
   registerLocaleData,
   findResources,
-  replaceResources,
 } from './transformers';
 import { time, timeEnd } from './benchmark';
 import { InitMessage, UpdateMessage } from './type_checker';
@@ -642,7 +643,13 @@ export class AngularCompilerPlugin implements Tapable {
 
     if (this._JitMode) {
       // Replace resources in JIT.
-      this._transformers.push(replaceResources(isAppPath));
+      this._transformers.push(createTransformerFactory(
+        new ComponentResourceTransformer(),
+        {
+            getTypeChecker,
+            exclude: node => !isAppPath(node.fileName),
+        },
+      ));
     } else {
       // Remove unneeded angular decorators.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
