@@ -151,6 +151,7 @@ resolve('@angular/cli', { basedir: process.cwd() },
         localVersion = _fromPackageJson();
         shouldWarn = localVersion && globalVersion.compare(localVersion) > 0;
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error(e);
         shouldWarn = true;
       }
@@ -163,14 +164,14 @@ resolve('@angular/cli', { basedir: process.cwd() },
         To disable this warning use "ng set --global warnings.versionMismatch=false".
         `);
         // Don't show warning colorised on `ng completion`
-         if (process.argv[2] !== 'completion') {
-           // eslint-disable no-console
-           console.log(warning);
-         } else {
-           // eslint-disable no-console
-           console.error(warning);
-           process.exit(1);
-         }
+        if (process.argv[2] !== 'completion') {
+           // eslint-disable-next-line no-console
+          console.log(warning);
+        } else {
+           // eslint-disable-next-line no-console
+          console.error(warning);
+          process.exit(1);
+        }
       }
 
       // No error implies a projectLocalCli, which will load whatever
