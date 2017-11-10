@@ -23,7 +23,7 @@ describe('Component Schematic', () => {
     sourceDir: 'src',
     inlineStyle: false,
     inlineTemplate: false,
-    viewEncapsulation: 'None',
+    viewEncapsulation: 'Emulated',
     changeDetection: 'Default',
     routing: false,
     styleext: 'css',

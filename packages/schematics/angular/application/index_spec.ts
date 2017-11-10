@@ -24,7 +24,7 @@ describe('Application Schematic', () => {
     sourceDir: 'src',
     inlineStyle: false,
     inlineTemplate: false,
-    viewEncapsulation: 'None',
+    viewEncapsulation: 'Emulated',
     changeDetection: 'Default',
     version: '1.2.3',
     routing: false,
