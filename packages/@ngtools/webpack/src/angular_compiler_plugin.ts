@@ -18,9 +18,11 @@ import {
 } from './virtual_file_system_decorator';
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import {
+  createTransformerFactory,
   replaceBootstrap,
   exportNgFactory,
   exportLazyModuleMap,
+  AngularDecoratorRemover,
   registerLocaleData,
   findResources,
   replaceResources,
@@ -655,6 +657,15 @@ export class AngularCompilerPlugin implements Tapable {
       if (!this._JitMode) {
         // Replace bootstrap in browser AOT.
         this._transformers.push(replaceBootstrap(isAppPath, getEntryModule));
+
+        // Remove unneeded angular decorators
+        this._transformers.push(createTransformerFactory(
+          new AngularDecoratorRemover(),
+          {
+            getTypeChecker: () => this._getTsProgram().getTypeChecker(),
+            exclude: node => !isAppPath(node.fileName),
+          },
+        ));
       }
     } else if (this._platform === PLATFORM.Server) {
       this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));

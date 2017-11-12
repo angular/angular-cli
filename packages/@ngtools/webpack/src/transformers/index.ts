@@ -1,3 +1,4 @@
+export { createTransformerFactory } from './transformer';
 export * from './interfaces';
 export * from './ast_helpers';
 export * from './make_transform';
@@ -8,3 +9,4 @@ export * from './export_ngfactory';
 export * from './export_lazy_module_map';
 export * from './register_locale_data';
 export * from './replace_resources';
+export * from './decorator_remover';
