@@ -126,7 +126,7 @@ Add a section for `"angularCompilerOptions"` and set `"entryModule"` to your `Ap
 
 In `.angular-cli.json` there is an array under the key `"apps"`. Copy the configuration for your client application there, and paste it as a new entry in the array, with an additional key `"platform"` set to `"server"`.
 
-Then, remove the `"polyfills"` key - those aren't needed on the server, and adjust `"main"`, and `"tsconfig"` to point to the files you wrote in step 2. Finally, adjust `"outDir"` to a new location (this example uses `dist-server`).
+Then, remove the `"polyfills"` key - those aren't needed on the server, and adjust `"main"`, and `"tsconfig"` to point to the files you wrote in step 2. Finally, adjust `"outDir"` to a new location (this example uses `dist/server`).
 
 ### .angular-cli.json:
 
