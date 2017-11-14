@@ -3,6 +3,8 @@ import * as webpack from 'webpack';
 import { AngularCompilerPlugin } from '@ngtools/webpack';
 import { XI18nWebpackConfig } from '../models/webpack-xi18n-config';
 import { getAppFromConfig } from '../utilities/app-utils';
+import {getWebpackStatsConfig} from '../models/webpack-configs';
+import {statsErrorsToString, statsWarningsToString} from '../utilities/stats';
 
 const Task = require('../ember-cli/lib/models/task');
 const MemoryFS = require('memory-fs');
@@ -34,6 +36,7 @@ export const Extracti18nTask = Task.extend({
 
     const webpackCompiler = webpack(config);
     webpackCompiler.outputFileSystem = new MemoryFS();
+    const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
 
     return new Promise((resolve, reject) => {
       const callback: webpack.compiler.CompilerCallback = (err, stats) => {
@@ -41,20 +44,18 @@ export const Extracti18nTask = Task.extend({
           return reject(err);
         }
 
+        const json = stats.toJson('verbose');
+        if (stats.hasWarnings()) {
+          this.ui.writeLine(statsWarningsToString(json, statsConfig));
+        }
         if (stats.hasErrors()) {
-          reject();
+          reject(statsErrorsToString(json, statsConfig));
         } else {
           resolve();
         }
       };
 
       webpackCompiler.run(callback);
-    })
-    .catch((err: Error) => {
-      if (err) {
-        this.ui.writeError('\nAn error occured during the i18n extraction:\n'
-          + ((err && err.stack) || err));
-      }
     });
   }
 });
