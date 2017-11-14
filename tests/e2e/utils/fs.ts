@@ -1,7 +1,8 @@
 import * as fs from 'fs-extra';
-import {dirname} from 'path';
+import * as glob from 'glob';
+import * as zlib from 'zlib';
+import {basename, dirname} from 'path';
 import {stripIndents} from 'common-tags';
-
 
 export function readFile(fileName: string) {
   return new Promise<string>((resolve, reject) => {
@@ -195,4 +196,40 @@ export function expectFileSizeToBeUnder(fileName: string, sizeInBytes: number) {
         throw new Error(`File "${fileName}" exceeded file size of "${sizeInBytes}".`);
       }
     });
+}
+
+export function expectGlobFileSizeToBeUnder(fileGlob: string, sizeInBytes: number) {
+  let assets = glob.sync(fileGlob, { dir: false });
+
+  return Promise.all(assets.map(fileName => readFile(fileName).then(content => content.length)))
+    .then(lengths => {
+      const total = lengths.reduce((acc, curr) => acc + curr);
+
+      if (total > sizeInBytes) {
+        throw new Error(`Files matching glob "${glob}" exceeded total size of "${sizeInBytes}".`);
+      }
+    });
+}
+
+export function uploadBundleJsFileSize(fileGlob: string) {
+  const assets = glob.sync(fileGlob, { dir: false });
+  const payloadData = {};
+
+  return Promise.all(assets.map(fileName => {
+    return new Promise((resolve, reject) => {
+      const content = fs.readFileSync(fileName);
+      const name = basename(fileName);
+      const label = name.slice(0, name.indexOf('.'));
+      payloadData[`uncompressed/${label}`] = content.length;
+
+      zlib.gzip(content, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          payloadData[`gzip/${label}`] = result.length;
+          resolve(result);
+        }
+      });
+    });
+  })).then(() => payloadData);
 }
