@@ -66,8 +66,19 @@ export function makeTransform(
         }
       };
 
-      // Only visit source files we have ops for.
-      return ops.length > 0 ? ts.visitNode(sf, visitor) : sf;
+      // Don't visit the sourcefile at all if we don't have ops for it.
+      if (ops.length === 0) {
+        return sf;
+      }
+
+      const result = ts.visitNode(sf, visitor);
+
+      // If we removed any decorators, we need to clean up the decorator arrays.
+      if (removeOps.some((op) => op.target.kind === ts.SyntaxKind.Decorator)) {
+        cleanupDecorators(result);
+      }
+
+      return result;
     };
 
     return transformer;
@@ -103,4 +114,15 @@ function visitEachChildWorkaround(node: ts.Node, visitor: ts.Visitor,
   }
 
   return ts.visitEachChild(node, visitor, context);
+}
+
+
+// If TS sees an empty decorator array, it will still emit a `__decorate` call.
+// This seems to be a TS bug.
+function cleanupDecorators(node: ts.Node) {
+  if (node.decorators && node.decorators.length == 0) {
+    node.decorators = undefined;
+  }
+
+  ts.forEachChild(node, node => cleanupDecorators(node));
 }
