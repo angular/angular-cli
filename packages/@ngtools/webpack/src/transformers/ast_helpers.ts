@@ -32,11 +32,11 @@ export function getLastNode(sourceFile: ts.SourceFile): ts.Node | null {
 }
 
 
-export function transformTypescript(
-  content: string,
-  transformers: ts.TransformerFactory<ts.SourceFile>[]
-) {
+// Test transform helpers.
+const basePath = '/project/src/';
+const fileName = basePath + 'test-file.ts';
 
+export function createTypescriptContext(content: string) {
   // Set compiler options.
   const compilerOptions: ts.CompilerOptions = {
     noEmitOnError: false,
@@ -49,15 +49,31 @@ export function transformTypescript(
   };
 
   // Create compiler host.
-  const basePath = '/project/src/';
   const compilerHost = new WebpackCompilerHost(compilerOptions, basePath);
 
   // Add a dummy file to host content.
-  const fileName = basePath + 'test-file.ts';
   compilerHost.writeFile(fileName, content, false);
 
   // Create the TypeScript program.
   const program = ts.createProgram([fileName], compilerOptions, compilerHost);
+  return { compilerHost, program };
+}
+
+export function transformTypescript(
+  content: string | undefined,
+  transformers: ts.TransformerFactory<ts.SourceFile>[],
+  program?: ts.Program,
+  compilerHost?: WebpackCompilerHost
+) {
+
+  // Use given context or create a new one.
+  if (content !== undefined) {
+    const typescriptContext = createTypescriptContext(content);
+    program = typescriptContext.program;
+    compilerHost = typescriptContext.compilerHost;
+  } else if (!program || !compilerHost) {
+    throw new Error('transformTypescript needs either `content` or a `program` and `compilerHost');
+  }
 
   // Emit.
   const { emitSkipped, diagnostics } = program.emit(

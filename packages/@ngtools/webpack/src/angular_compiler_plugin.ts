@@ -21,6 +21,7 @@ import {
   replaceBootstrap,
   exportNgFactory,
   exportLazyModuleMap,
+  removeDecorators,
   registerLocaleData,
   findResources,
   replaceResources,
@@ -641,6 +642,12 @@ export class AngularCompilerPlugin implements Tapable {
     if (this._JitMode) {
       // Replace resources in JIT.
       this._transformers.push(replaceResources(isAppPath));
+    } else {
+      // Remove unneeded angular decorators.
+      this._transformers.push(removeDecorators(
+        () => this._getTsProgram().getTypeChecker(),
+        isAppPath
+      ));
     }
 
     if (this._platform === PLATFORM.Browser) {
