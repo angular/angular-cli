@@ -1,4 +1,4 @@
-import { Component, OnInit<% if(viewEncapsulation !== 'Emulated') { %>, ViewEncapsulation<% }%><% if(changeDetection !== 'Default') { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';
+import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%><% if(changeDetection !== 'Default') { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';
 
 @Component({
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
@@ -9,7 +9,7 @@ import { Component, OnInit<% if(viewEncapsulation !== 'Emulated') { %>, ViewEnca
   `,<% } else { %>
   templateUrl: './<%= dasherize(name) %>.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['./<%= dasherize(name) %>.component.<%= styleext %>']<% } %><% if(viewEncapsulation !== 'Emulated') { %>,
+  styleUrls: ['./<%= dasherize(name) %>.component.<%= styleext %>']<% } %><% if(!!viewEncapsulation) { %>,
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })

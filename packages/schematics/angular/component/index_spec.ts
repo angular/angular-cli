@@ -23,7 +23,6 @@ describe('Component Schematic', () => {
     sourceDir: 'src',
     inlineStyle: false,
     inlineTemplate: false,
-    viewEncapsulation: 'Emulated',
     changeDetection: 'Default',
     routing: false,
     styleext: 'css',
@@ -60,6 +59,22 @@ describe('Component Schematic', () => {
     const tree = schematicRunner.runSchematic('component', options, appTree);
     const tsContent = getFileContent(tree, '/src/app/foo/foo.component.ts');
     expect(tsContent).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
+  });
+
+  it('should not set view encapsulation', () => {
+    const options = { ...defaultOptions };
+
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const tsContent = getFileContent(tree, '/src/app/foo/foo.component.ts');
+    expect(tsContent).not.toMatch(/encapsulation: ViewEncapsulation/);
+  });
+
+  it('should set view encapsulation to Emulated', () => {
+    const options = { ...defaultOptions, viewEncapsulation: 'Emulated' };
+
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const tsContent = getFileContent(tree, '/src/app/foo/foo.component.ts');
+    expect(tsContent).toMatch(/encapsulation: ViewEncapsulation.Emulated/);
   });
 
   it('should set view encapsulation to None', () => {
