@@ -18,7 +18,7 @@ const SilentError = require('silent-error');
  * know they are used.
  *
  * require('source-map-loader')
- * require('raw-loader')
+ * require('html-loader')
  * require('url-loader')
  * require('file-loader')
  * require('@angular-devkit/build-optimizer')
@@ -188,7 +188,13 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     },
     module: {
       rules: [
-        { test: /\.html$/, loader: 'raw-loader' },
+        {
+          test: /\.html$/,
+          loader: 'html-loader',
+          options: {
+            root: appRoot,
+          }
+        },
         {
           test: /\.(eot|svg|cur)$/,
           loader: 'file-loader',
