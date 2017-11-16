@@ -4,14 +4,14 @@ import { relative, dirname } from 'path';
 
 import { collectDeepNodes } from './ast_helpers';
 import { insertStarImport } from './insert_import';
-import { removeImport } from './remove_import';
 import { StandardTransform, ReplaceNodeOperation, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
 
 
 export function replaceBootstrap(
   shouldTransform: (fileName: string) => boolean,
-  getEntryModule: () => { path: string, className: string }
+  getEntryModule: () => { path: string, className: string },
+  getTypeChecker: () => ts.TypeChecker,
 ): ts.TransformerFactory<ts.SourceFile> {
 
   const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
@@ -24,8 +24,6 @@ export function replaceBootstrap(
     }
 
     // Find all identifiers.
-    // const entryModuleIdentifiers = findAstNodes<ts.Identifier>(null, sourceFile,
-    //   ts.SyntaxKind.Identifier, true)
     const entryModuleIdentifiers = collectDeepNodes<ts.Identifier>(sourceFile,
       ts.SyntaxKind.Identifier)
       .filter(identifier => identifier.text === entryModule.className);
@@ -38,8 +36,6 @@ export function replaceBootstrap(
     const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
 
     // Find the bootstrap calls.
-    const removedEntryModuleIdentifiers: ts.Identifier[] = [];
-    const removedPlatformBrowserDynamicIdentifier: ts.Identifier[] = [];
     entryModuleIdentifiers.forEach(entryModuleIdentifier => {
       // Figure out if it's a `platformBrowserDynamic().bootstrapModule(AppModule)` call.
       if (!(
@@ -92,20 +88,10 @@ export function replaceBootstrap(
         new ReplaceNodeOperation(sourceFile, bootstrapModuleIdentifier,
           ts.createIdentifier('bootstrapModuleFactory')),
       );
-
-      // Save the import identifiers that we replaced for removal.
-      removedEntryModuleIdentifiers.push(entryModuleIdentifier);
-      removedPlatformBrowserDynamicIdentifier.push(platformBrowserDynamicIdentifier);
     });
-
-    // Now that we know all the import identifiers we removed, we can remove the import.
-    ops.push(
-      ...removeImport(sourceFile, removedEntryModuleIdentifiers),
-      ...removeImport(sourceFile, removedPlatformBrowserDynamicIdentifier),
-    );
 
     return ops;
   };
 
-  return makeTransform(standardTransform);
+  return makeTransform(standardTransform, getTypeChecker);
 }

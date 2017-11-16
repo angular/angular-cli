@@ -1,5 +1,5 @@
 import { oneLine, stripIndent } from 'common-tags';
-import { transformTypescript } from './ast_helpers';
+import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { replaceBootstrap } from './replace_bootstrap';
 
 describe('@ngtools/webpack transformers', () => {
@@ -34,11 +34,13 @@ describe('@ngtools/webpack transformers', () => {
       `;
       // tslint:enable:max-line-length
 
+      const { program, compilerHost } = createTypescriptContext(input);
       const transformer = replaceBootstrap(
         () => true,
-        () => ({ path: '/project/src/app/app.module', className: 'AppModule' })
+        () => ({ path: '/project/src/app/app.module', className: 'AppModule' }),
+        () => program.getTypeChecker(),
       );
-      const result = transformTypescript(input, [transformer]);
+      const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
       expect(oneLine`${result}`).toEqual(oneLine`${output}`);
     });
@@ -73,11 +75,13 @@ describe('@ngtools/webpack transformers', () => {
       `;
       // tslint:enable:max-line-length
 
+      const { program, compilerHost } = createTypescriptContext(input);
       const transformer = replaceBootstrap(
         () => true,
-        () => ({ path: '/project/src/app/app.module', className: 'AppModule' })
+        () => ({ path: '/project/src/app/app.module', className: 'AppModule' }),
+        () => program.getTypeChecker(),
       );
-      const result = transformTypescript(input, [transformer]);
+      const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
       expect(oneLine`${result}`).toEqual(oneLine`${output}`);
     });
@@ -97,8 +101,13 @@ describe('@ngtools/webpack transformers', () => {
         platformBrowserDynamic().bootstrapModule(AppModule);
       `;
 
-      const transformer = replaceBootstrap(() => true, () => undefined);
-      const result = transformTypescript(input, [transformer]);
+      const { program, compilerHost } = createTypescriptContext(input);
+      const transformer = replaceBootstrap(
+        () => true,
+        () => undefined,
+        () => program.getTypeChecker(),
+      );
+      const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
       expect(oneLine`${result}`).toEqual(oneLine`${input}`);
     });

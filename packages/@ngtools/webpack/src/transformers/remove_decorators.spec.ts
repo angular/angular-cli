@@ -27,8 +27,8 @@ describe('@ngtools/webpack transformers', () => {
 
       const { program, compilerHost } = createTypescriptContext(input);
       const transformer = removeDecorators(
-        () => program.getTypeChecker(),
         () => true,
+        () => program.getTypeChecker(),
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
@@ -68,8 +68,8 @@ describe('@ngtools/webpack transformers', () => {
 
       const { program, compilerHost } = createTypescriptContext(input);
       const transformer = removeDecorators(
-        () => program.getTypeChecker(),
         () => true,
+        () => program.getTypeChecker(),
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
@@ -101,8 +101,8 @@ describe('@ngtools/webpack transformers', () => {
 
       const { program, compilerHost } = createTypescriptContext(input);
       const transformer = removeDecorators(
-        () => program.getTypeChecker(),
         () => true,
+        () => program.getTypeChecker(),
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
