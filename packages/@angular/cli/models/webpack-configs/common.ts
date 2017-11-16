@@ -112,6 +112,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         }
       }
 
+      // Prevent asset configurations from reading files outside of the project.
+      if (!asset.input.startsWith(projectRoot)) {
+        const message = 'An asset cannot be read from a location outside the project.';
+        throw new SilentError(message);
+      }
+
       // Ensure trailing slash.
       if (isDirectory(path.resolve(asset.input))) {
         asset.input += '/';
