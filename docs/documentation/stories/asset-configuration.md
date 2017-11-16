@@ -37,3 +37,26 @@ The array below does the same as the default one:
 ```
 
 The contents of `node_modules/some-package/images/` will be available in `dist/some-package/`.
+
+## Writing assets outside of `dist/`
+
+Because of the security implications, the CLI will always refuse to read or write files outside of
+the project itself (scoped by `.angular-cli.json`). It is however possible to write assets outside
+the `dist/` build output folder during build.
+
+Because writing files in your project isn't an expected effect of `ng build`, it is disabled by 
+default on every assets. In order to allow this behaviour, you need to set `allowOutsideOutDir` 
+to `true` on your asset definition, like so:
+
+```json
+"assets": [
+  {
+    "glob": "**/*",
+    "input": "./assets/",
+    "output": "../not-dist/some/folder/",
+    "allowOutsideOutDir": true
+  },
+]
+```
+
+This needs to be set for every assets you want to write outside of your build output directory.
