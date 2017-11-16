@@ -55,6 +55,15 @@ export default function () {
     }))
     .then(() => expectToFail(() => ng('build')))
 
+    // This asset should also fail from reading from outside the project.
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+      const app = configJson['apps'][0];
+      app['assets'] = [
+        { 'glob': '**/*', 'input': '/temp-folder/outside/of/project', 'output': 'temp' }
+      ];
+    }))
+    .then(() => expectToFail(() => ng('build')))
+
     // Add asset config in .angular-cli.json.
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
