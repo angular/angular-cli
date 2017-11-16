@@ -14,6 +14,8 @@ import {
   UnknownSchematicException,
 } from '@angular-devkit/schematics';
 import { dirname, isAbsolute, join, resolve } from 'path';
+import { Observable } from 'rxjs/Observable';
+import { mergeMap } from 'rxjs/operators/mergeMap';
 import { Url } from 'url';
 import {
   FileSystemCollectionDesc,
@@ -27,7 +29,7 @@ import { readJsonFile } from './file-system-utility';
 
 
 export declare type OptionTransform<T extends object, R extends object>
-    = (schematic: FileSystemSchematicDescription, options: T) => R;
+    = (schematic: FileSystemSchematicDescription, options: T) => Observable<R>;
 
 
 export class CollectionCannotBeResolvedException extends BaseException {
@@ -230,8 +232,12 @@ export abstract class FileSystemEngineHostBase implements
   }
 
   transformOptions<OptionT extends object, ResultT extends object>(
-      schematic: FileSystemSchematicDesc, options: OptionT): ResultT {
-    return this._transforms.reduce((acc: ResultT, t) => t(schematic, acc), options) as ResultT;
+    schematic: FileSystemSchematicDesc,
+    options: OptionT,
+  ): Observable<ResultT> {
+    return (Observable.of(options)
+      .pipe(...this._transforms.map(tFn => mergeMap(opt => tFn(schematic, opt))))
+    ) as {} as Observable<ResultT>;
   }
 
   getSchematicRuleFactory<OptionT extends object>(

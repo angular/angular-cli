@@ -7,7 +7,7 @@
  */
 import { BaseException, logging } from '@angular-devkit/core';
 import { CollectionDescription, TypedSchematicContext } from '@angular-devkit/schematics';
-import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs/Observable';
 import { Url } from 'url';
 import { MergeStrategy } from '../tree/interface';
 import { NullTree } from '../tree/null';
@@ -124,11 +124,10 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
   }
 
   transformOptions<OptionT extends object, ResultT extends object>(
-      schematic: Schematic<CollectionT, SchematicT>, options: OptionT): ResultT {
-    return this._host.transformOptions<OptionT, ResultT>(
-      schematic.description,
-      options,
-    );
+    schematic: Schematic<CollectionT, SchematicT>,
+    options: OptionT,
+  ): Observable<ResultT> {
+    return this._host.transformOptions<OptionT, ResultT>(schematic.description, options);
   }
 
   createSourceFromUrl(url: Url, context: TypedSchematicContext<CollectionT, SchematicT>): Source {

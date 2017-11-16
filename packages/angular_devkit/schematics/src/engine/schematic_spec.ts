@@ -33,7 +33,7 @@ const context = {
 };
 const engine: Engine<CollectionT, SchematicT> = {
   createContext: (schematic: Schematic<{}, {}>) => ({ engine, schematic, ...context }),
-  transformOptions: (_: {}, options: {}) => options,
+  transformOptions: (_: {}, options: {}) => Observable.of(options),
   defaultMergeStrategy: MergeStrategy.Default,
 } as {} as Engine<CollectionT, SchematicT>;
 const collection = {

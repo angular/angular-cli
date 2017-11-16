@@ -17,7 +17,8 @@
   ],
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
-    "@ngtools/json-schema": "^1.1.0"
+    "@ngtools/json-schema": "^1.1.0",
+    "ajv": "~5.5.1"
   },
   "peerDependencies": {
     "rxjs": "^5.5.2"

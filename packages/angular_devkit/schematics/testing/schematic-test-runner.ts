@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { logging, schema } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import {
   Collection,
   DelegateTree,
@@ -17,8 +17,9 @@ import {
   VirtualTree,
 } from '@angular-devkit/schematics';
 import {
-  FileSystemSchematicDesc,
+  AjvSchemaRegistry,
   NodeModulesTestEngineHost,
+  validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
 import { Observable } from 'rxjs/Observable';
 import { callRule } from '../src/rules/call';
@@ -38,29 +39,12 @@ export class SchematicTestRunner {
   private _engine: SchematicEngine<{}, {}> = new SchematicEngine(this._engineHost);
   private _collection: Collection<{}, {}>;
   private _logger: logging.Logger;
-  private _registry: schema.JsonSchemaRegistry;
 
   constructor(private _collectionName: string, collectionPath: string) {
     this._engineHost.registerCollection(_collectionName, collectionPath);
     this._logger = new logging.Logger('test');
-    this._registry = new schema.JsonSchemaRegistry();
 
-    this._engineHost.registerOptionsTransform((schematicDescription: {}, opts: object) => {
-      const schematic: FileSystemSchematicDesc = schematicDescription as FileSystemSchematicDesc;
-
-      if (schematic.schema && schematic.schemaJson) {
-        const schemaJson = schematic.schemaJson as schema.JsonSchemaObject;
-        const name = schemaJson.id || schematic.name;
-        this._registry.addSchema(name, schemaJson);
-        const serializer = new schema.serializers.JavascriptSerializer();
-        const fn = serializer.serialize(name, this._registry);
-
-        return fn(opts);
-      }
-
-      return opts;
-    });
-
+    this._engineHost.registerOptionsTransform(validateOptionsWithSchema(new AjvSchemaRegistry()));
     this._collection = this._engine.createCollection(this._collectionName);
   }
 

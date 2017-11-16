@@ -9,6 +9,7 @@ import { BaseException } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { _throw } from 'rxjs/observable/throw';
 import { last } from 'rxjs/operators/last';
+import { mergeMap } from 'rxjs/operators/mergeMap';
 import { tap } from 'rxjs/operators/tap';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
@@ -83,29 +84,31 @@ export function callSource(source: Source, context: SchematicContext): Observabl
 export function callRule(rule: Rule,
                          input: Observable<Tree>,
                          context: SchematicContext): Observable<Tree> {
-  return input.mergeMap(inputTree => {
-    const result = rule(inputTree, context) as object;
+  return input.pipe(
+    mergeMap(inputTree => {
+      const result = rule(inputTree, context) as object;
 
-    if (result === undefined) {
-      return Observable.of(inputTree);
-    } else if (TreeSymbol in result) {
-      return Observable.of(result as Tree);
-    } else if (Symbol.observable in result) {
-      const obs = result as Observable<Tree>;
+      if (result === undefined) {
+        return Observable.of(inputTree);
+      } else if (TreeSymbol in result) {
+        return Observable.of(result as Tree);
+      } else if (Symbol.observable in result) {
+        const obs = result as Observable<Tree>;
 
-      // Only return the last Tree, and make sure it's a Tree.
-      return obs.pipe(
-        last(),
-        tap(inner => {
-          if (!(TreeSymbol in inner)) {
-            throw new InvalidRuleResultException(inner);
-          }
-        }),
-      );
-    } else if (result === undefined) {
-      return Observable.of(inputTree);
-    } else {
-      return _throw(new InvalidRuleResultException(result));
-    }
-  });
+        // Only return the last Tree, and make sure it's a Tree.
+        return obs.pipe(
+          last(),
+          tap(inner => {
+            if (!(TreeSymbol in inner)) {
+              throw new InvalidRuleResultException(inner);
+            }
+          }),
+        );
+      } else if (result === undefined) {
+        return Observable.of(inputTree);
+      } else {
+        return _throw(new InvalidRuleResultException(result));
+      }
+    }),
+  );
 }

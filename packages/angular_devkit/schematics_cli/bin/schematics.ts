@@ -17,9 +17,10 @@ import {
   Tree,
 } from '@angular-devkit/schematics';
 import {
+  AjvSchemaRegistry,
   FileSystemHost,
-  FileSystemSchematicDesc,
   NodeModulesEngineHost,
+  validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
 import * as minimist from 'minimist';
 import { Observable } from 'rxjs/Observable';
@@ -122,22 +123,9 @@ const isLocalCollection = collectionName.startsWith('.') || collectionName.start
 const engineHost = new NodeModulesEngineHost();
 const engine = new SchematicEngine(engineHost);
 
-const schemaRegistry = new schema.JsonSchemaRegistry();
 
 // Add support for schemaJson.
-engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options: {}) => {
-  if (schematic.schema && schematic.schemaJson) {
-    const schemaJson = schematic.schemaJson as schema.JsonSchemaObject;
-    const ref = schemaJson.$id || ('/' + schematic.collection.name + '/' + schematic.name);
-    schemaRegistry.addSchema(ref, schemaJson);
-    const serializer = new schema.serializers.JavascriptSerializer();
-    const fn = serializer.serialize(ref, schemaRegistry);
-
-    return fn(options);
-  }
-
-  return options;
-});
+engineHost.registerOptionsTransform(validateOptionsWithSchema(new AjvSchemaRegistry()));
 
 
 /**

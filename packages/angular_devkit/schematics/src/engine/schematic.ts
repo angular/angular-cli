@@ -9,6 +9,9 @@ import { BaseException } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/concatMap';
+import { concatMap } from 'rxjs/operators/concatMap';
+import { first } from 'rxjs/operators/first';
+import { map } from 'rxjs/operators/map';
 import { callRule } from '../rules/call';
 import { Tree } from '../tree/interface';
 import {
@@ -49,8 +52,16 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
     parentContext?: Partial<TypedSchematicContext<CollectionT, SchematicT>>,
   ): Observable<Tree> {
     const context = this._engine.createContext(this, parentContext);
-    const transformedOptions = this._engine.transformOptions(this, options);
 
-    return callRule(this._factory(transformedOptions), host, context);
+    return host
+      .pipe(
+        first(),
+        concatMap(tree => this._engine.transformOptions(this, options).pipe(
+          map(o => [tree, o]),
+        )),
+        concatMap(([tree, transformedOptions]: [Tree, OptionT]) => {
+          return callRule(this._factory(transformedOptions), Observable.of(tree), context);
+        }),
+      );
   }
 }

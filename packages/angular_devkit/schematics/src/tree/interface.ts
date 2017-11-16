@@ -105,6 +105,13 @@ export interface Tree {
 }
 
 
+namespace Tree {
+  export function isTree(maybeTree: object): maybeTree is Tree {
+    return TreeSymbol in maybeTree;
+  }
+}
+
+
 export interface UpdateRecorder {
   // These just record changes.
   insertLeft(index: number, content: Buffer | string): UpdateRecorder;

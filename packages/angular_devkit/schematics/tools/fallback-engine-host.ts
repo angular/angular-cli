@@ -13,6 +13,8 @@ import {
   Source, TypedSchematicContext,
   UnknownCollectionException,
 } from '@angular-devkit/schematics';
+import { Observable } from 'rxjs/Observable';
+import { mergeMap } from 'rxjs/operators/mergeMap';
 import { Url } from 'url';
 
 
@@ -26,7 +28,7 @@ export type FallbackSchematicDescription = {
 export declare type OptionTransform<T extends object, R extends object> = (
   schematic: SchematicDescription<FallbackCollectionDescription, FallbackSchematicDescription>,
   options: T,
-) => R;
+) => Observable<R>;
 
 
 /**
@@ -35,7 +37,6 @@ export declare type OptionTransform<T extends object, R extends object> = (
  */
 export class FallbackEngineHost implements EngineHost<{}, {}> {
   private _hosts: EngineHost<{}, {}>[] = [];
-  private _transforms: OptionTransform<object, object>[] = [];
 
   constructor() {}
 
@@ -43,10 +44,6 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     host: EngineHost<CollectionT, SchematicT>,
   ) {
     this._hosts.push(host);
-  }
-
-  registerOptionsTransform<T extends object, R extends object>(t: OptionTransform<T, R>) {
-    this._transforms.push(t);
   }
 
   createCollectionDescription(name: string): CollectionDescription<FallbackCollectionDescription> {
@@ -87,8 +84,10 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
   transformOptions<OptionT extends object, ResultT extends object>(
     schematic: SchematicDescription<FallbackCollectionDescription, FallbackSchematicDescription>,
     options: OptionT,
-  ): ResultT {
-    return this._transforms.reduce((acc: ResultT, t) => t(schematic, acc), options) as ResultT;
+  ): Observable<ResultT> {
+    return (Observable.of(options)
+      .pipe(...this._hosts.map(host => mergeMap(opt => host.transformOptions(schematic, opt))))
+    ) as {} as Observable<ResultT>;
   }
 
   listSchematicNames(collection: CollectionDescription<FallbackCollectionDescription>): string[] {

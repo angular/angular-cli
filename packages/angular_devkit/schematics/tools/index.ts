@@ -13,3 +13,6 @@ export { FallbackEngineHost } from './fallback-engine-host';
 export { FileSystemEngineHost } from './file-system-engine-host';
 export { NodeModulesEngineHost } from './node-module-engine-host';
 export { NodeModulesTestEngineHost } from './node-modules-test-engine-host';
+
+export { AjvSchemaRegistry } from './ajv-option-transform';
+export { validateOptionsWithSchema } from './schema-option-transform';
