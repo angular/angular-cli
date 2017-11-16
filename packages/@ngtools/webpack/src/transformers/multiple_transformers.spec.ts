@@ -1,8 +1,10 @@
 import { oneLine, stripIndent } from 'common-tags';
-import { transformTypescript } from './ast_helpers';
+import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { replaceBootstrap } from './replace_bootstrap';
 import { exportNgFactory } from './export_ngfactory';
 import { exportLazyModuleMap } from './export_lazy_module_map';
+import { removeDecorators } from './remove_decorators';
+
 
 describe('@ngtools/webpack transformers', () => {
   describe('multiple_transformers', () => {
@@ -10,9 +12,19 @@ describe('@ngtools/webpack transformers', () => {
       const input = stripIndent`
         import { enableProdMode } from '@angular/core';
         import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+        import { Component } from '@angular/core';
 
         import { AppModule } from './app/app.module';
         import { environment } from './environments/environment';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.css']
+        })
+        class AppComponent {
+          title = 'app';
+        }
 
         if (environment.production) {
           enableProdMode();
@@ -31,6 +43,11 @@ describe('@ngtools/webpack transformers', () => {
 
         import * as __NgCli_bootstrap_1 from "./app/app.module.ngfactory";
         import * as __NgCli_bootstrap_2 from "@angular/platform-browser";
+
+        class AppComponent {
+          constructor() { this.title = 'app'; }
+        }
+
         if (environment.production) {
           enableProdMode();
         }
@@ -40,12 +57,16 @@ describe('@ngtools/webpack transformers', () => {
       `;
       // tslint:enable:max-line-length
 
+      const { program, compilerHost } = createTypescriptContext(input);
+
       const shouldTransform = () => true;
       const getEntryModule = () =>
         ({ path: '/project/src/app/app.module', className: 'AppModule' });
+      const getTypeChecker = () => program.getTypeChecker();
+
 
       const transformers = [
-        replaceBootstrap(shouldTransform, getEntryModule),
+        replaceBootstrap(shouldTransform, getEntryModule, getTypeChecker),
         exportNgFactory(shouldTransform, getEntryModule),
         exportLazyModuleMap(shouldTransform,
           () => ({
@@ -54,9 +75,10 @@ describe('@ngtools/webpack transformers', () => {
             './lazy2/lazy2.module.ngfactory#LazyModule2NgFactory':
             '/project/src/app/lazy2/lazy2.module.ngfactory.ts',
           })),
+        removeDecorators(shouldTransform, getTypeChecker),
       ];
 
-      const result = transformTypescript(input, transformers);
+      const result = transformTypescript(undefined, transformers, program, compilerHost);
 
       expect(oneLine`${result}`).toEqual(oneLine`${output}`);
     });

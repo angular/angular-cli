@@ -9,6 +9,7 @@ import {
   AddNodeOperation,
   ReplaceNodeOperation,
 } from './interfaces';
+import { elideImports } from './elide_imports';
 
 
 // Typescript below 2.5.0 needs a workaround.
@@ -17,7 +18,8 @@ const visitEachChild = satisfies(ts.version, '^2.5.0')
   : visitEachChildWorkaround;
 
 export function makeTransform(
-  standardTransform: StandardTransform
+  standardTransform: StandardTransform,
+  getTypeChecker?: () => ts.TypeChecker,
 ): ts.TransformerFactory<ts.SourceFile> {
 
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
@@ -29,6 +31,16 @@ export function makeTransform(
       const addOps = ops.filter((op) => op.kind === OPERATION_KIND.Add) as AddNodeOperation[];
       const replaceOps = ops
         .filter((op) => op.kind === OPERATION_KIND.Replace) as ReplaceNodeOperation[];
+
+      // If nodes are removed, elide the imports as well.
+      // Mainly a workaround for https://github.com/Microsoft/TypeScript/issues/17552.
+      // WARNING: this assumes that replaceOps DO NOT reuse any of the nodes they are replacing.
+      // This is currently true for transforms that use replaceOps (replace_bootstrap and
+      // replace_resources), but may not be true for new transforms.
+      if (getTypeChecker && removeOps.length + replaceOps.length > 0) {
+        const removedNodes = removeOps.concat(replaceOps).map((op) => op.target);
+        removeOps.push(...elideImports(sf, removedNodes, getTypeChecker));
+      }
 
       const visitor: ts.Visitor = (node) => {
         let modified = false;
