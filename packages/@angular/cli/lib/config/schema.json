@@ -555,6 +555,13 @@
               "description": "The new app schematic.",
               "type": "string",
               "default": "application"
+            },
+            "newProject": {
+              "description": "The new project schematic.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           "additionalProperties": false
