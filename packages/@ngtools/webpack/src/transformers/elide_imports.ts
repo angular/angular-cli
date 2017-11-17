@@ -113,7 +113,7 @@ export function elideImports(
     })
     .forEach((symbol) => {
       // Remove the whole declaration if it's a single import.
-      const nodeToRemove = symbol.singleImport ? symbol.importSpec : symbol.importDecl;
+      const nodeToRemove = symbol.singleImport ? symbol.importDecl : symbol.importSpec;
       ops.push(new RemoveNodeOperation(sourceFile, nodeToRemove));
     });
 
