@@ -2,6 +2,7 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
+import { ProgressBarWebpackPlugin } from '../../plugins/progress-bar-webpack-plugin';
 import { InsertConcatAssetsWebpackPlugin } from '../../plugins/insert-concat-assets-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
@@ -9,7 +10,6 @@ import { requireProjectModule } from '../../utilities/require-project-module';
 import { WebpackConfigOptions } from '../webpack-config';
 
 const ConcatPlugin = require('webpack-concat-plugin');
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const SilentError = require('silent-error');
 
@@ -134,7 +134,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.progress) {
-    extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose, colors: true }));
+    extraPlugins.push(new ProgressBarWebpackPlugin(
+        { profile: buildOptions.verbose, colors: true }));
   }
 
   if (buildOptions.showCircularDependencies) {
