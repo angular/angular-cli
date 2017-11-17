@@ -108,5 +108,41 @@ describe('@ngtools/webpack transformers', () => {
 
       expect(oneLine`${result}`).toEqual(oneLine`${output}`);
     });
+
+    it('should not remove imports from types that are still used', () => {
+      const input = stripIndent`
+        import { Component, EventEmitter } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          changeDetection: ChangeDetectionStrategy.OnPush,
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.css']
+        })
+        export class AppComponent {
+          notify: EventEmitter<string> = new EventEmitter<string>();
+          title = 'app';
+        }
+      `;
+      const output = stripIndent`
+        import { EventEmitter } from '@angular/core';
+
+        export class AppComponent {
+          constructor() {
+            this.notify = new EventEmitter();
+            this.title = 'app';
+          }
+        }
+      `;
+
+      const { program, compilerHost } = createTypescriptContext(input);
+      const transformer = removeDecorators(
+        () => true,
+        () => program.getTypeChecker(),
+      );
+      const result = transformTypescript(undefined, [transformer], program, compilerHost);
+
+      expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+    });
   });
 });
