@@ -55,8 +55,9 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
 
     // insert import if it's not there
     if (importTextNodes.length === 0) {
-      const fallbackPos = findNodes(relevantImports[0], ts.SyntaxKind.CloseBraceToken)[0].pos ||
-                          findNodes(relevantImports[0], ts.SyntaxKind.FromKeyword)[0].pos;
+      const fallbackPos =
+        findNodes(relevantImports[0], ts.SyntaxKind.CloseBraceToken)[0].getStart() ||
+        findNodes(relevantImports[0], ts.SyntaxKind.FromKeyword)[0].getStart();
 
       return insertAfterLastOccurrence(imports, `, ${symbolName}`, fileToEdit, fallbackPos);
     }
