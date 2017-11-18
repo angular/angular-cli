@@ -1,5 +1,10 @@
 {
   "schematics": {
+    "blank": {
+      "factory": "./blank/factory",
+      "schema": "./blank/schema.json",
+      "description": "Create an empty schematic project or add a blank schematic to the current project."
+    },
     "schematic": {
       "factory": "./schematic/factory",
       "schema": "./schematic/schema.json",
