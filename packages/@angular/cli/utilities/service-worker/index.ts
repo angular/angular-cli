@@ -1,5 +1,5 @@
 import { Filesystem } from '@angular/service-worker/config';
-import { stripIndent } from 'common-tags';
+import { oneLine } from 'common-tags';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -71,9 +71,9 @@ export function augmentAppWithServiceWorker(projectRoot: string, appRoot: string
   const configPath = path.resolve(appRoot, 'ngsw-config.json');
 
   if (!fs.existsSync(configPath)) {
-    throw new Error(stripIndent`Expected to find an ngsw-config.json configuration file in the
-                                application root. Either provide one or disable Service Worker
-                                build support in angular-cli.json.`);
+    throw new Error(oneLine`Error: Expected to find an ngsw-config.json configuration
+      file in the ${appRoot} folder. Either provide one or disable Service Worker
+      in .angular-cli.json.`);
   }
   const config = fs.readFileSync(configPath, 'utf8');
 
