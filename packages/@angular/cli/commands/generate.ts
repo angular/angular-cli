@@ -178,6 +178,11 @@ export default Command.extend({
       commandOptions.type = rawArgs[2];
     }
 
+    if (collectionName === '@schematics/angular' && schematicName === 'class' && rawArgs[2]) {
+      const fileNameArgs = rawArgs.slice(1, rawArgs.length);
+      commandOptions.name = fileNameArgs.join('.');
+    }
+
     return schematicRunTask.run({
         taskOptions: commandOptions,
         workingDir: cwd,
