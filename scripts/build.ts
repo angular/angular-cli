@@ -170,7 +170,7 @@ export default function(argv: { local?: boolean }, logger: Logger) {
       .filter(fileName => {
         // Schematics template files.
         if (pkgJson['schematics'] &&
-         (fileName.match(/(\/|\\)files(\/|\\)/) || fileName.match(/(\/|\\)other-files(\/|\\)/))) {
+         (fileName.match(/(\/|\\)files(\/|\\)/) || fileName.match(/(\/|\\)\w+-files(\/|\\)/))) {
           return true;
         }
 
