@@ -137,7 +137,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         }
       };
     });
-    const copyWebpackPluginOptions = { ignore: ['.gitkeep'] };
+    const copyWebpackPluginOptions = { ignore: ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'] };
 
     const copyWebpackPluginInstance = new CopyWebpackPlugin(copyWebpackPluginPatterns,
       copyWebpackPluginOptions);
