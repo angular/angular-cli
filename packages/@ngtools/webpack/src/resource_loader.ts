@@ -36,6 +36,11 @@ export class WebpackResourceLoader {
       throw new Error('WebpackResourceLoader cannot be used without parentCompilation');
     }
 
+    // Simple sanity check.
+    if (filePath.match(/\.[jt]s$/)) {
+      return Promise.reject('Cannot use a JavaScript or TypeScript file for styleUrl.');
+    }
+
     const compilerName = `compiler(${this._uniqueId++})`;
     const outputOptions = { filename: filePath };
     const relativePath = path.relative(this._context || '', filePath);
