@@ -117,7 +117,7 @@ Verify the bootstrap styled button appears.
 To ensure your variables are used open `_variables.scss` and add the following:
 
 ```sass
-$brand-primary: red;
+$blue: #dc3545;
 ```
 
 Return the browser to see the font color changed.
