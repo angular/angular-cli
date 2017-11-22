@@ -18,9 +18,7 @@ on the server and store the response in the `TransferState` key-value store. Thi
 
 ### Usage
 
-To use the `TransferHttpCacheModule` just install it as part of the top-level App module.
-
-That's it!
+To use the `TransferHttpCacheModule`, first install it as part of the top-level App module.
 
 ```ts
 import {TransferHttpCacheModule} from '@nguniversal/common';
@@ -33,4 +31,45 @@ import {TransferHttpCacheModule} from '@nguniversal/common';
   bootstrap: [MyApp]
 })
 export class AppBrowserModule() {}
+```
+Then, import `ServerTransferStateModule` in your Server module.
+
+```ts
+import { NgModule } from "@angular/core";
+import {
+  ServerModule,
+  ServerTransferStateModule
+} from "@angular/platform-server";
+
+import { AppModule } from "./app.module";
+import { AppComponent } from "./app.component";
+
+@NgModule({
+  imports: [
+    AppModule,
+    ServerModule,
+    ServerTransferStateModule
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppServerModule {}
+
+```
+Finally, in `main.ts` change this:
+
+```ts
+...
+
+platformBrowserDynamic().bootstrapModule(AppBrowserModule);
+```
+To this: 
+
+```ts
+...
+
+document.addEventListener("DOMContentLoaded", () => {
+  platformBrowserDynamic()
+    .bootstrapModule(AppBrowserModule)
+    .catch(err => console.log(err));
+});
 ```
