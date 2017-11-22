@@ -18,5 +18,9 @@ export default function () {
     .then(() => expectFileToMatch('dist/main.bundle.js', /registerLocaleData/))
     .then(() => expectFileToMatch('dist/main.bundle.js', /angular_common_locales_fr/))
     .then(() => rimraf('dist'))
-    .then(() => expectToFail(() => ng('build', '--aot', '--locale=no-locale')))
+    .then(() => ng('build', '--aot', '--locale=fr_FR'))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /registerLocaleData/))
+    .then(() => expectFileToMatch('dist/main.bundle.js', /angular_common_locales_fr/))
+    .then(() => rimraf('dist'))
+    .then(() => expectToFail(() => ng('build', '--aot', '--locale=no-locale')));
 }
