@@ -35,7 +35,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
 
   stat(path: string, callback: Callback<any>): void {
     const result = this._statSync(path);
-    if (result) {
+    if (result != undefined) {
       callback(null, result);
     } else {
       this._inputFileSystem.stat(path, callback);
@@ -48,7 +48,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
 
   readFile(path: string, callback: Callback<any>): void {
     const result = this._readFileSync(path);
-    if (result) {
+    if (result != undefined) {
       callback(null, result);
     } else {
       this._inputFileSystem.readFile(path, callback);
