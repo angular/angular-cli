@@ -108,6 +108,7 @@ export class AngularCompilerPlugin implements Tapable {
   private _donePromise: Promise<void> | null;
   private _compiler: any = null;
   private _compilation: any = null;
+  private _normalizedLocale: string;
 
   // TypeChecker process.
   private _forkTypeChecker = true;
@@ -225,7 +226,8 @@ export class AngularCompilerPlugin implements Tapable {
       this._compilerOptions.i18nOutFormat = options.i18nOutFormat;
     }
     if (options.locale !== undefined) {
-      this._compilerOptions.i18nInLocale = this._validateLocale(options.locale);
+      this._compilerOptions.i18nInLocale = options.locale;
+      this._normalizedLocale = this._validateLocale(options.locale);
     }
     if (options.missingTranslation !== undefined) {
       this._compilerOptions.i18nInMissingTranslations =
@@ -652,9 +654,9 @@ export class AngularCompilerPlugin implements Tapable {
       // If we have a locale, auto import the locale data file.
       // This transform must go before replaceBootstrap because it looks for the entry module
       // import, which will be replaced.
-      if (this._compilerOptions.i18nInLocale) {
+      if (this._normalizedLocale) {
         this._transformers.push(registerLocaleData(isAppPath, getEntryModule,
-          this._compilerOptions.i18nInLocale));
+          this._normalizedLocale));
       }
 
       if (!this._JitMode) {
