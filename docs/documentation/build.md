@@ -83,12 +83,19 @@ Flag                | `--dev` | `--prod`
 `--named-chunks`    | `true`  | `false`
 `--build-optimizer` | `false` | `true` with AOT and Angular 5
 
-`--extract-licenses` Extract all licenses in a separate file, in the case of production builds only.
-`--i18n-file` Localization file to use for i18n.
 `--prod` also sets the following non-flaggable settings:
 - Adds service worker if configured in `.angular-cli.json`.
 - Replaces `process.env.NODE_ENV` in modules with the `production` value (this is needed for some libraries, like react).
 - Runs UglifyJS on the code.
+
+### `--build-optimizer` and `--vendor-chunk`
+
+When using Build Optimizer the vendor chunk will be disabled by default.
+You can override this with `--vendor-chunk=true`.
+
+Total bundle sizes with Build Optimizer are smaller if there is no separate vendor chunk because
+having vendor code in the same chunk as app code makes it possible for Uglify to remove more unused
+code.
 
 ### CSS resources
 
@@ -375,5 +382,16 @@ Note: service worker support is experimental and subject to change.
   </p>
   <p>
     In a server build, state whether `all` or `none` dependencies should be bundles in the output.
+  </p>
+</details>
+
+
+<details>
+  <summary>extract-licenses</summary>
+  <p>
+    <code>--extract-licenses</code> <em>default value: true</<em>
+  </p>
+  <p>
+    Extract all licenses in a separate file, in the case of production builds only.
   </p>
 </details>
