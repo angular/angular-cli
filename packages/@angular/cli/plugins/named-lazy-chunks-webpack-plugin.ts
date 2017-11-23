@@ -26,15 +26,15 @@ export class NamedLazyChunksWebpackPlugin extends webpack.NamedChunksPlugin {
       }
 
       // Try to figure out if it's a lazy loaded route or import().
-      if (chunk.blocks
-        && chunk.blocks.length > 0
-        && chunk.blocks[0] instanceof AsyncDependenciesBlock
-        && chunk.blocks[0].dependencies.length === 1
-        && (chunk.blocks[0].dependencies[0] instanceof ContextElementDependency
-          || chunk.blocks[0].dependencies[0] instanceof ImportDependency)
+      const blocks = chunk.getBlocks();
+      if (blocks.length > 0
+        && blocks[0] instanceof AsyncDependenciesBlock
+        && blocks[0].dependencies.length === 1
+        && (blocks[0].dependencies[0] instanceof ContextElementDependency
+          || blocks[0].dependencies[0] instanceof ImportDependency)
       ) {
         // Create chunkname from file request, stripping ngfactory and extension.
-        const request = chunk.blocks[0].dependencies[0].request;
+        const request = blocks[0].dependencies[0].request;
         const chunkName = basename(request).replace(/(\.ngfactory)?\.(js|ts)$/, '');
         if (!chunkName || chunkName === '') {
           // Bail out if something went wrong with the name.

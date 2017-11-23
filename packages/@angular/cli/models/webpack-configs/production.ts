@@ -9,6 +9,7 @@ import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 import { NEW_SW_VERSION } from '../../utilities/service-worker';
+import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
@@ -136,6 +137,7 @@ export function getProdConfig(wco: WebpackConfigOptions) {
 
   return {
     entry: entryPoints,
+    mode: 'production',
     plugins: [
       new webpack.EnvironmentPlugin({
         'NODE_ENV': 'production'
@@ -143,25 +145,30 @@ export function getProdConfig(wco: WebpackConfigOptions) {
       new webpack.HashedModuleIdsPlugin(),
       new webpack.optimize.ModuleConcatenationPlugin(),
       ...extraPlugins,
-      // Uglify should be the last plugin as PurifyPlugin needs to be before it.
-      new UglifyJSPlugin({
-        sourceMap: buildOptions.sourcemaps,
-        parallel: true,
-        uglifyOptions: {
-          ecma: wco.supportES2015 ? 6 : 5,
-          warnings: buildOptions.verbose,
-          ie8: false,
-          mangle: {
-            safari10: true,
-          },
-          compress: uglifyCompressOptions,
-          output: {
-            ascii_only: true,
-            comments: false,
-            webkit: true,
-          },
-        }
-      }),
-    ]
+    ],
+    optimization: {
+      minimizer: [
+        new CleanCssWebpackPlugin({ sourceMap: buildOptions.sourcemaps }),
+        // Uglify should be the last plugin as PurifyPlugin needs to be before it.
+        new UglifyJSPlugin({
+          sourceMap: buildOptions.sourcemaps,
+          parallel: true,
+          uglifyOptions: {
+            ecma: wco.supportES2015 ? 6 : 5,
+            warnings: buildOptions.verbose,
+            ie8: false,
+            mangle: {
+              safari10: true,
+            },
+            compress: uglifyCompressOptions,
+            output: {
+              ascii_only: true,
+              comments: false,
+              webkit: true,
+            },
+          }
+        }),
+      ]
+    },
   };
 }

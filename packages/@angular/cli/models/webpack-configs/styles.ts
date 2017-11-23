@@ -6,7 +6,6 @@ import {
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 import { pluginArgs, postcssArgs } from '../../tasks/eject';
-import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
@@ -212,10 +211,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.bundle.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
-  }
-
-  if (minimizeCss) {
-    extraPlugins.push(new CleanCssWebpackPlugin({ sourceMap: cssSourceMap }));
   }
 
   return {

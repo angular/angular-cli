@@ -217,7 +217,13 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ].concat(extraRules)
     },
     plugins: [
-      new webpack.NoEmitOnErrorsPlugin()
+      new webpack.NoEmitOnErrorsPlugin(),
+      // Workaround for plugins relying on `this.options`.
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          context: process.cwd() // or the same value as `context`
+        }
+      })
     ].concat(extraPlugins)
   };
 }

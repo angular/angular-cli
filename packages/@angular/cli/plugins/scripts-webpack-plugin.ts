@@ -76,7 +76,7 @@ export class ScriptsWebpackPlugin {
           if (this._cachedOutput) {
             this._insertOutput(compilation, this._cachedOutput, true);
           }
-          compilation.fileDependencies.push(...scripts);
+          scripts.forEach((script) => compilation.fileDependencies.add(script));
 
           callback();
 
@@ -129,7 +129,7 @@ export class ScriptsWebpackPlugin {
             const output = { filename, source: combinedSource };
             this._insertOutput(compilation, output);
             this._cachedOutput = output;
-            compilation.fileDependencies.push(...scripts);
+            scripts.forEach((script) => compilation.fileDependencies.add(script));
 
             callback();
           })
