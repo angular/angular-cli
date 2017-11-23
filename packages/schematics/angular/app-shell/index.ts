@@ -215,52 +215,50 @@ function addServerRoutes(options: AppShellOptions): Rule {
     if (modulePath === null) {
       throw new SchematicsException('Universal/server app not found.');
     }
+
     let moduleSource = getSourceFile(host, modulePath);
     if (!isImported(moduleSource, 'Routes', '@angular/router')) {
+      const recorder = host.beginUpdate(modulePath);
       const routesChange = insertImport(moduleSource,
                                         modulePath,
                                         'Routes',
                                         '@angular/router') as InsertChange;
       if (routesChange.toAdd) {
-        const recorder = host.beginUpdate(modulePath);
         recorder.insertLeft(routesChange.pos, routesChange.toAdd);
-        host.commitUpdate(recorder);
       }
-      moduleSource = getSourceFile(host, modulePath);
+
       const imports = getSourceNodes(moduleSource)
         .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
         .sort((a, b) => a.getStart() - b.getStart());
       const insertPosition = imports[imports.length - 1].getEnd();
       const routeText =
         `\n\nconst routes: Routes = [ { path: '${options.route}', component: AppShellComponent }];`;
-      const routeRecorder = host.beginUpdate(modulePath);
-      routeRecorder.insertRight(insertPosition, routeText);
-      host.commitUpdate(routeRecorder);
+      recorder.insertRight(insertPosition, routeText);
+      host.commitUpdate(recorder);
     }
-    moduleSource = getSourceFile(host, modulePath);
 
+    moduleSource = getSourceFile(host, modulePath);
     if (!isImported(moduleSource, 'RouterModule', '@angular/router')) {
+      const recorder = host.beginUpdate(modulePath);
       const routerModuleChange = insertImport(moduleSource,
                                               modulePath,
                                               'RouterModule',
                                               '@angular/router') as InsertChange;
 
       if (routerModuleChange.toAdd) {
-        const recorder = host.beginUpdate(modulePath);
         recorder.insertLeft(routerModuleChange.pos, routerModuleChange.toAdd);
-        host.commitUpdate(recorder);
       }
+
       const metadataChange = addSymbolToNgModuleMetadata(
           moduleSource, modulePath, 'imports', 'RouterModule.forRoot(routes)');
-
       if (metadataChange) {
-        const recorder = host.beginUpdate(modulePath);
         metadataChange.forEach((change: InsertChange) => {
           recorder.insertRight(change.pos, change.toAdd);
         });
-        host.commitUpdate(recorder);
       }
+      host.commitUpdate(recorder);
     }
+
 
     return host;
   };

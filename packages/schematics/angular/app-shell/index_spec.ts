@@ -151,8 +151,10 @@ describe('App Shell Schematic', () => {
     const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
     const filePath = '/src/app/app.server.module.ts';
     const content = tree.read(filePath) || new Buffer('');
-    // tslint:disable-next-line:max-line-length
-    expect(content.toString()).toMatch(/const routes: Routes = \[ { path: 'shell', component: AppShellComponent }\];/);
+    expect(content.toString())
+      .toMatch(/const routes: Routes = \[ { path: 'shell', component: AppShellComponent }\];/);
+    expect(content.toString())
+      .toMatch(/ServerModule,\r?\n\s*RouterModule\.forRoot\(routes\),/);
   });
 
   it('should create the shell component', () => {
