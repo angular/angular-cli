@@ -130,11 +130,6 @@ const ServeCommand = Command.extend({
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     Version.assertTypescriptVersion(this.project.root);
 
-    // Force commonjs module format for TS on dev builds.
-    if (commandOptions.target === 'development') {
-      commandOptions.forceTsCommonjs = true;
-    }
-
     // Default evalSourcemaps to true for serve. This makes rebuilds faster.
     commandOptions.evalSourcemaps = true;
 

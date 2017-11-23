@@ -88,18 +88,19 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false
     },
     plugins: [
-      new HtmlWebpackPlugin({
-        template: path.resolve(appRoot, appConfig.index),
-        filename: path.resolve(buildOptions.outputPath, appConfig.index),
-        chunksSortMode: packageChunkSort(appConfig),
-        excludeChunks: lazyChunks,
-        xhtml: true,
-        minify: buildOptions.target === 'production' ? {
-          caseSensitive: true,
-          collapseWhitespace: true,
-          keepClosingSlash: true
-        } : false
-      }),
+      // Not yet supported in webpack 4.
+      // new HtmlWebpackPlugin({
+      //   template: path.resolve(appRoot, appConfig.index),
+      //   filename: path.resolve(buildOptions.outputPath, appConfig.index),
+      //   chunksSortMode: packageChunkSort(appConfig),
+      //   excludeChunks: lazyChunks,
+      //   xhtml: true,
+      //   minify: buildOptions.target === 'production' ? {
+      //     caseSensitive: true,
+      //     collapseWhitespace: true,
+      //     keepClosingSlash: true
+      //   } : false
+      // }),
       new BaseHrefWebpackPlugin({
         baseHref: buildOptions.baseHref
       }),
