@@ -72,7 +72,7 @@ const CompletionCommand = Command.extend({
     commandOptions.all = !commandOptions.bash && !commandOptions.zsh;
 
     const commandFiles = fs.readdirSync(__dirname)
-      .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
+      .filter(file => file.match(/\.(js|tsx?)$/) && !file.match(/\.d.ts$/))
       .map(file => path.parse(file).name)
       .map(file => file.toLowerCase());
 

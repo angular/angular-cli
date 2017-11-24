@@ -586,7 +586,7 @@ export function ngcLoader(this: LoaderContext & { _compilation: any }, source: s
           // as dependencies.
           // Component resources files (html and css templates) also need to be added manually for
           // AOT, so that this file is reloaded when they change.
-          if (sourceFileName.endsWith('.ts')) {
+          if (sourceFileName.endsWith('.ts') || sourceFileName.endsWith('.tsx')) {
             result.errorDependencies.forEach(dep => this.addDependency(dep));
             const dependencies = plugin.getDependencies(sourceFileName);
             dependencies.forEach(dep => this.addDependency(dep));

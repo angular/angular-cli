@@ -124,7 +124,9 @@ export class PathsPlugin implements Tapable {
     this._nmf.plugin('before-resolve', (request: NormalModuleFactoryRequest,
                                         callback: Callback<any>) => {
       // Only work on TypeScript issuers.
-      if (!request.contextInfo.issuer || !request.contextInfo.issuer.endsWith('.ts')) {
+      if (!request.contextInfo.issuer
+        || !request.contextInfo.issuer.endsWith('.ts')
+        || !request.contextInfo.issuer.endsWith('.tsx')) {
         return callback(null, request);
       }
 

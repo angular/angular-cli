@@ -158,7 +158,7 @@ export default Task.extend({
           silent: true,
           configs: [{
             files: modifiedFiles
-              .filter((file: string) => /.ts$/.test(file))
+              .filter((file: string) => /.tsx?$/.test(file))
               .map((file: string) => path.join(projectRoot, file))
           }]
         });

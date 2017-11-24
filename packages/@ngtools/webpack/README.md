@@ -6,6 +6,9 @@ Webpack plugin that AoT compiles your Angular components and modules.
 
 In your webpack config, add the following plugin and loader.
 
+**Note**: If you are not using `.tsx` syntax, you can simplify `module.rules[0].test` RegExp to
+`/(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/`
+
 Angular version 5 and up, use `AngularCompilerPlugin`:
 
 ```typescript
@@ -15,7 +18,7 @@ exports = { /* ... */
   module: {
     rules: [
       {
-        test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+        test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.tsx?)$/,
         loader: '@ngtools/webpack'
       }
     ]
@@ -33,6 +36,8 @@ exports = { /* ... */
 
 Angular version 2 and 4, use `AotPlugin`:
 
+**Note**: If you are not using `.tsx` syntax, you can simplify `module.rules[0].test` RegExp to `/\.ts$/`
+
 ```typescript
 import {AotPlugin} from '@ngtools/webpack'
 
@@ -40,7 +45,7 @@ exports = { /* ... */
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         loader: '@ngtools/webpack'
       }
     ]

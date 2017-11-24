@@ -289,13 +289,13 @@ export class AngularCompilerPlugin implements Tapable {
 
   private _getChangedTsFiles() {
     return this._compilerHost.getChangedFilePaths()
-      .filter(k => k.endsWith('.ts') && !k.endsWith('.d.ts'))
+      .filter(k => k.endsWith('.tsx') || (k.endsWith('.ts') && !k.endsWith('.d.ts')))
       .filter(k => this._compilerHost.fileExists(k));
   }
 
   private _getChangedCompilationFiles() {
     return this._compilerHost.getChangedFilePaths()
-      .filter(k => /\.(?:ts|html|css|scss|sass|less|styl)$/.test(k));
+      .filter(k => /\.(?:tsx?|html|css|scss|sass|less|styl)$/.test(k));
   }
 
   private _createOrUpdateProgram() {
@@ -440,7 +440,7 @@ export class AngularCompilerPlugin implements Tapable {
           modulePath = lazyRouteTSFile;
           moduleKey = lazyRouteKey;
         } else {
-          modulePath = lazyRouteTSFile.replace(/(\.d)?\.ts$/, `.ngfactory.js`);
+          modulePath = lazyRouteTSFile.replace(/(\.d)?\.tsx?$/, `.ngfactory.js`);
           moduleKey = `${lazyRouteModule}.ngfactory#${moduleName}NgFactory`;
         }
 
@@ -583,8 +583,8 @@ export class AngularCompilerPlugin implements Tapable {
       // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
       // when the issuer is a `.ts` or `.ngfactory.js` file.
       compiler.resolvers.normal.plugin('before-resolve', (request: any, cb: () => void) => {
-        if (request.request.endsWith('.ts')
-          || (request.context.issuer && /\.ts|ngfactory\.js$/.test(request.context.issuer))) {
+        if ((request.request.endsWith('.ts') || request.request.endsWith('.tsx'))
+          || (request.context.issuer && /\.tsx?|ngfactory\.js$/.test(request.context.issuer))) {
           this.done!.then(() => cb(), () => cb());
         } else {
           cb();
@@ -791,7 +791,8 @@ export class AngularCompilerPlugin implements Tapable {
       }
     } else {
       // Check if the TS file exists.
-      if (fileName.endsWith('.ts') && !this._compilerHost.fileExists(fileName, false)) {
+      if ((fileName.endsWith('.ts') || fileName.endsWith('.tsx'))
+      && !this._compilerHost.fileExists(fileName, false)) {
         throw new Error(`${fileName} is not part of the compilation. `
           + `Please make sure it is in your tsconfig via the 'files' or 'include' property.`);
       }

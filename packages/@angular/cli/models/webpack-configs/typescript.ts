@@ -116,7 +116,7 @@ export function getNonAotConfig(wco: WebpackConfigOptions) {
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
 
   return {
-    module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
+    module: { rules: [{ test: /\.tsx?$/, loader: webpackLoader }] },
     plugins: [ _createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }) ]
   };
 }
@@ -130,7 +130,7 @@ export function getAotConfig(wco: WebpackConfigOptions) {
 
   // Fallback to exclude spec files from AoT compilation on projects using a shared tsconfig.
   if (testTsConfigPath === tsConfigPath) {
-    let exclude = [ '**/*.spec.ts' ];
+    let exclude = ['**/*.spec.ts', '**/*.spec.tsx' ];
     if (appConfig.test) {
       exclude.push(path.join(projectRoot, appConfig.root, appConfig.test));
     }
@@ -146,8 +146,8 @@ export function getAotConfig(wco: WebpackConfigOptions) {
   }
 
   const test = AngularCompilerPlugin.isSupported()
-    ? /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/
-    : /\.ts$/;
+    ? /(?:\.ngfactory\.js|\.ngstyle\.js|\.tsx?)$/
+    : /\.tsx?$/;
 
   return {
     module: { rules: [{ test, use: [...boLoader, webpackLoader] }] },
@@ -174,7 +174,7 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
     // Force include main and polyfills.
     // This is needed for AngularCompilerPlugin compatibility with existing projects,
     // since TS compilation there is stricter and tsconfig.spec.ts doesn't include them.
-    const include = [appConfig.main, appConfig.polyfills, '**/*.spec.ts'];
+    const include = [appConfig.main, appConfig.polyfills, '**/*.spec.ts', '**/*.spec.tsx'];
     if (appConfig.test) {
       include.push(appConfig.test);
     }
@@ -188,7 +188,7 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
   }
 
   return {
-    module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
+    module: { rules: [{ test: /\.tsx?$/, loader: webpackLoader }] },
     plugins: [ _createAotPlugin(wco, pluginOptions, false) ]
   };
 }

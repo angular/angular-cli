@@ -152,9 +152,9 @@ export class AotPlugin implements Tapable {
       );
     }
 
-    // Default exclude to **/*.spec.ts files.
+    // Default exclude to **/*.spec.ts & **/*.spec.tsx files.
     if (!options.hasOwnProperty('exclude')) {
-      options['exclude'] = ['**/*.spec.ts'];
+      options['exclude'] = ['**/*.spec.ts', '**/*.spec.tsx'];
     }
 
     // Add custom excludes to default TypeScript excludes.
@@ -441,11 +441,14 @@ export class AotPlugin implements Tapable {
 
     compiler.plugin('after-resolvers', (compiler: any) => {
       // Virtual file system.
-      // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
-      // when the issuer is a `.ts` file.
+      // Wait for the plugin to be done when requesting both `.ts` and `.tsx`
+      // files directly (entry points), or when the issuer is a `.ts` or `.tsx` file.
       compiler.resolvers.normal.plugin('before-resolve', (request: any, cb: () => void) => {
-        if (this.done && (request.request.endsWith('.ts')
-          || (request.context.issuer && request.context.issuer.endsWith('.ts')))) {
+        if (this.done && ((request.request.endsWith('.ts') || request.request.endsWith('.tsx'))
+          || (request.context.issuer
+            && (request.context.issuer.endsWith('.ts')
+            || request.context.issuer.endsWith('.tsx'))
+          ))) {
           this.done.then(() => cb(), () => cb());
         } else {
           cb();
