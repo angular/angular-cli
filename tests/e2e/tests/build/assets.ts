@@ -1,3 +1,4 @@
+import * as path from 'path';
 import {
   writeMultipleFiles,
   createDir,
@@ -8,6 +9,10 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import {getGlobalVariable} from '../../utils/env';
+
+
+const temp = require('temp');
+const tempDir = path.join(temp.mkdirSync('angular-cli-e2e-assets-'), 'out');
 
 
 export default function () {
@@ -54,6 +59,21 @@ export default function () {
       ];
     }))
     .then(() => expectToFail(() => ng('build')))
+
+    // This asset will not fail with the exception above.
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+      const app = configJson['apps'][0];
+      app['outDir'] = tempDir;
+      app['assets'] = [
+        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': tempDir,
+          'allowOutsideOutDir': true }
+      ];
+    }))
+    .then(() => ng('build'))
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+      const app = configJson['apps'][0];
+      app['outDir'] = 'dist';
+    })
 
     // This asset should also fail from reading from outside the project.
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
