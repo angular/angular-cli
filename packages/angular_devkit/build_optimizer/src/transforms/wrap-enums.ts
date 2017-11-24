@@ -29,20 +29,6 @@ function isBlockLike(node: ts.Node): node is ts.BlockLike {
       || node.kind === ts.SyntaxKind.SourceFile;
 }
 
-// NOTE: 'isXXXX' helper functions can be replaced with native TS helpers with TS 2.4+
-
-function isVariableStatement(node: ts.Node): node is ts.VariableStatement {
-  return node.kind === ts.SyntaxKind.VariableStatement;
-}
-
-function isIdentifier(node: ts.Node): node is ts.Identifier {
-  return node.kind === ts.SyntaxKind.Identifier;
-}
-
-function isObjectLiteralExpression(node: ts.Node): node is ts.ObjectLiteralExpression {
-  return node.kind === ts.SyntaxKind.ObjectLiteralExpression;
-}
-
 export function getWrapEnumsTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
@@ -104,11 +90,11 @@ function visitBlockStatements(
     //   * have only one declaration
     //   * have an identifer as a declaration name
     if (oIndex < statements.length - 1
-        && isVariableStatement(currentStatement)
+        && ts.isVariableStatement(currentStatement)
         && currentStatement.declarationList.declarations.length === 1) {
 
       const variableDeclaration = currentStatement.declarationList.declarations[0];
-      if (isIdentifier(variableDeclaration.name)) {
+      if (ts.isIdentifier(variableDeclaration.name)) {
         const name = variableDeclaration.name.text;
 
         if (!variableDeclaration.initializer) {
@@ -129,7 +115,7 @@ function visitBlockStatements(
             oIndex++;
             continue;
           }
-        } else if (isObjectLiteralExpression(variableDeclaration.initializer)
+        } else if (ts.isObjectLiteralExpression(variableDeclaration.initializer)
                    && variableDeclaration.initializer.properties.length === 0) {
           const nextStatements = statements.slice(oIndex + 1);
           const enumStatements = findTs2_2EnumStatements(name, nextStatements);
@@ -149,7 +135,7 @@ function visitBlockStatements(
             oIndex += enumStatements.length;
             continue;
           }
-        } else if (isObjectLiteralExpression(variableDeclaration.initializer)
+        } else if (ts.isObjectLiteralExpression(variableDeclaration.initializer)
           && variableDeclaration.initializer.properties.length !== 0) {
           const literalPropertyCount = variableDeclaration.initializer.properties.length;
           const nextStatements = statements.slice(oIndex + 1);
