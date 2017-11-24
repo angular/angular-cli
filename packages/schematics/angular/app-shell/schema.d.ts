@@ -56,7 +56,7 @@ export interface Schema {
      */
     testTsconfigFileName?: string;
     /**
-     * The name of the applicatino directory.
+     * The name of the application directory.
      */
     appDir?: string;
     /**

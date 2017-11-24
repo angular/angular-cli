@@ -65,7 +65,7 @@
     },
     "appDir": {
       "type": "string",
-      "description": "The name of the applicatino directory.",
+      "description": "The name of the application directory.",
       "default": "app"
     },
     "rootModuleFileName": {
