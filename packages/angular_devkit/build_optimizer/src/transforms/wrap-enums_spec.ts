@@ -37,7 +37,7 @@ describe('wrap-enums', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
-  it('wraps ts 2.3 enums in IIFE', () => {
+  it('wraps ts 2.3 - 2.6 enums in IIFE', () => {
     const input = tags.stripIndent`
       export var ChangeDetectionStrategy;
       (function (ChangeDetectionStrategy) {

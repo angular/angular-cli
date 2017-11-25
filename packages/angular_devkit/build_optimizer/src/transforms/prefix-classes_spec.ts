@@ -151,7 +151,7 @@ describe('prefix-classes', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
-  it('prefix TS 2.5 downlevel class', () => {
+  it('prefix TS 2.5 - 2.6 downlevel class', () => {
     const input = tags.stripIndent`
       var BasicTestCase = /** @class */ (function () {
         function BasicTestCase() {
@@ -171,7 +171,7 @@ describe('prefix-classes', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
-  it('prefix TS 2.5 downlevel class with static variable', () => {
+  it('prefix TS 2.5 - 2.6 downlevel class with static variable', () => {
     const input = tags.stripIndent`
       var StaticTestCase = /** @class */ (function () {
         function StaticTestCase() {
@@ -193,7 +193,7 @@ describe('prefix-classes', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
-  it('prefix TS 2.5 downlevel class with extends', () => {
+  it('prefix TS 2.5 - 2.6 downlevel class with extends', () => {
     const input = tags.stripIndent`
       var ExtendedClass = /** @class */ (function (_super) {
         __extends(ExtendedClass, _super);
