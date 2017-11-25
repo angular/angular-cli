@@ -30,30 +30,33 @@ export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile
 
       const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
 
-        // Check if node is a TS helper declaration.
-        if (isTsHelper(node)) {
-          // Replace node with import for that helper.
-          return ts.visitEachChild(createTslibImport(node, useRequire), visitor, context);
+        // Check if node is a TS helper declaration and replace with import if yes
+        if (ts.isVariableStatement(node)) {
+          const declarations = node.declarationList.declarations;
+
+          if (declarations.length === 1 && ts.isIdentifier(declarations[0].name)) {
+            // NOTE: the replace is unnecessary with TS2.5+; tests currently run with TS2.4
+            const name = (declarations[0].name as ts.Identifier).text.replace(/^___/, '__');
+
+            if (isHelperName(name)) {
+              // TODO: maybe add a few more checks, like checking the first part of the assignment.
+
+              return createTslibImport(name, useRequire);
+            }
+          }
         }
 
-        // Otherwise return node as is.
         return ts.visitEachChild(node, visitor, context);
       };
 
-      return ts.visitNode(sf, visitor);
+      return ts.visitEachChild(sf, visitor, context);
     };
 
     return transformer;
   };
 }
 
-function createTslibImport(node: ts.Node, useRequire = false): ts.Node {
-  const name = getVariableStatementName(node);
-
-  if (!name) {
-    return node;
-  }
-
+function createTslibImport(name: string, useRequire = false): ts.Node {
   if (useRequire) {
     // Use `var __helper = /*@__PURE__*/ require("tslib").__helper`.
     const requireCall = ts.createCall(ts.createIdentifier('require'), undefined,
@@ -69,11 +72,7 @@ function createTslibImport(node: ts.Node, useRequire = false): ts.Node {
     // Use `import { __helper } from "tslib"`.
     const namedImports = ts.createNamedImports([ts.createImportSpecifier(undefined,
       ts.createIdentifier(name))]);
-    // typescript@2.4 is needed for a fix to the function parameter types of ts.createImportClause.
-    // https://github.com/Microsoft/TypeScript/pull/15999
-    // Hiding it from lint until we upgrade.
-    // tslint:disable-next-line:no-any
-    const importClause = (ts.createImportClause as any)(undefined, namedImports);
+    const importClause = ts.createImportClause(undefined, namedImports);
     const newNode = ts.createImportDeclaration(undefined, undefined, importClause,
       ts.createLiteral('tslib'));
 
@@ -81,25 +80,7 @@ function createTslibImport(node: ts.Node, useRequire = false): ts.Node {
   }
 }
 
-function isTsHelper(node: ts.Node): boolean {
-  if (node.kind !== ts.SyntaxKind.VariableStatement) {
-    return false;
-  }
-  const varStmt = node as ts.VariableStatement;
-  if (varStmt.declarationList.declarations.length > 1) {
-    return false;
-  }
-  const varDecl = varStmt.declarationList.declarations[0];
-  if (varDecl.name.kind !== ts.SyntaxKind.Identifier) {
-    return false;
-  }
-
-  const name = getVariableStatementName(node);
-
-  if (!name) {
-    return false;
-  }
-
+function isHelperName(name: string): boolean {
   // TODO: there are more helpers than these, should we replace them all?
   const tsHelpers = [
     '__extends',
@@ -108,27 +89,5 @@ function isTsHelper(node: ts.Node): boolean {
     '__param',
   ];
 
-  if (tsHelpers.indexOf(name) === -1) {
-    return false;
-  }
-
-  // TODO: maybe add a few more checks, like checking the first part of the assignment.
-
-  return true;
-}
-
-function getVariableStatementName(node: ts.Node) {
-  const varStmt = node as ts.VariableStatement;
-  if (varStmt.declarationList.declarations.length > 1) {
-    return null;
-  }
-  const varDecl = varStmt.declarationList.declarations[0];
-  if (varDecl.name.kind !== ts.SyntaxKind.Identifier) {
-    return null;
-  }
-
-  const name = (varDecl.name as ts.Identifier).text;
-
-  // node.getText() on a name that starts with two underscores will return three instead.
-  return name.replace(/^___/, '__');
+  return tsHelpers.indexOf(name) !== -1;
 }
