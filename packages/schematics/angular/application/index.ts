@@ -98,7 +98,7 @@ export default function (options: ApplicationOptions): Rule {
           options.serviceWorker ? noop() : filter(path => !path.endsWith('/ngsw-config.json')),
           template({
             utils: stringUtils,
-            ...options as object,
+            ...options,
             'dot': '.',
             sourcedir: sourceDir,
           }),

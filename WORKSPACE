@@ -1,13 +1,18 @@
 git_repository(
     name = "build_bazel_rules_nodejs",
     remote = "https://github.com/bazelbuild/rules_nodejs.git",
-    tag = "0.1.0",
+    tag = "0.3.1",
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories")
 node_repositories(package_json = ["//:package.json"])
 
-local_repository(
+git_repository(
     name = "build_bazel_rules_typescript",
-    path = "node_modules/@bazel/typescript",
+    remote = "https://github.com/bazelbuild/rules_typescript.git",
+    tag = "0.6.0",
 )
+
+load("@build_bazel_rules_typescript//:defs.bzl", "ts_repositories")
+
+ts_repositories()

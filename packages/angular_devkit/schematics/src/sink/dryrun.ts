@@ -84,8 +84,7 @@ export class DryRunSink extends FileSystemSink {
         }
       }
 
-      const content = null;
-      this._subject.next({ kind: 'delete', path, content });
+      this._subject.next({ kind: 'delete', path });
     });
     this._filesToCreate.forEach((content, path) => {
       // Check if this is a renaming.
@@ -106,7 +105,7 @@ export class DryRunSink extends FileSystemSink {
       this._subject.next({ kind: 'update', path, content: content.generate() });
     });
     this._filesToRename.forEach(([path, to]) => {
-      this._subject.next({ kind: 'rename', path, to, content: null });
+      this._subject.next({ kind: 'rename', path, to });
     });
 
     this._subject.complete();

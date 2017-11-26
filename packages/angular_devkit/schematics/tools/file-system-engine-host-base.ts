@@ -118,7 +118,7 @@ export abstract class FileSystemEngineHostBase implements
   createCollectionDescription(name: string): FileSystemCollectionDesc {
     const path = this._resolveCollectionPath(name);
     const jsonValue = readJsonFile(path);
-    if (!jsonValue || typeof jsonValue != 'object') {
+    if (!jsonValue || typeof jsonValue != 'object' || Array.isArray(jsonValue)) {
       throw new InvalidCollectionJsonException(name, path);
     }
 

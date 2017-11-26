@@ -31,7 +31,7 @@ export default function (options: EnumOptions): Rule {
   const templateSource = apply(url('./files'), [
     template({
       ...stringUtils,
-      ...options as object,
+      ...options,
     }),
     move(sourceDir),
   ]);

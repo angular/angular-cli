@@ -100,7 +100,7 @@ export default function (options: PipeOptions): Rule {
       template({
         ...stringUtils,
         'if-flat': (s: string) => options.flat ? '' : s,
-        ...options as object,
+        ...options,
       }),
       move(sourceDir),
     ]);

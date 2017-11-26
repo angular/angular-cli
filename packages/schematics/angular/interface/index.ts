@@ -33,7 +33,7 @@ export default function (options: InterfaceOptions): Rule {
   const templateSource = apply(url('./files'), [
     template({
       ...stringUtils,
-      ...options as object,
+      ...options,
     }),
     move(sourceDir),
   ]);

@@ -31,7 +31,7 @@ export const kPathTemplateComponentRE = /__(.+?)__/g;
 export const kPathTemplatePipeRE = /@([^@]+)/;
 
 
-export type TemplateValue = boolean | string | number;
+export type TemplateValue = boolean | string | number | undefined;
 export type TemplatePipeFunction = (x: string) => TemplateValue;
 export type TemplateOptions = {
   [key: string]: TemplateValue | TemplateOptions | TemplatePipeFunction,

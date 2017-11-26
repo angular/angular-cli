@@ -72,11 +72,8 @@
     "temp": "^0.8.3",
     "ts-node": "^2.0.0",
     "tslint": "^5.5.0",
-    "typescript": "~2.4.0",
+    "typescript": "~2.6.1",
     "v8-profiler": "^5.7.0",
     "webpack-sources": "^1.0.1"
-  },
-  "devDependencies": {
-    "@bazel/typescript": "0.0.10"
   }
 }

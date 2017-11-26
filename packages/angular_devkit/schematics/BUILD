@@ -63,6 +63,7 @@ ts_library(
     ),
     deps = [
         ":schematics",
+        "//packages/angular_devkit/core",
         # @deps: rxjs
         # @typings: jasmine
     ],
@@ -75,6 +76,7 @@ ts_library(
         include = ["tools/**/*_spec.ts"],
     ),
     deps = [
+        ":schematics",
         ":tools",
         # @deps: rxjs
         # @typings: jasmine

@@ -86,7 +86,7 @@ export default function (options: ServiceOptions): Rule {
       template({
         ...stringUtils,
         'if-flat': (s: string) => options.flat ? '' : s,
-        ...options as object,
+        ...options,
       }),
       move(sourceDir),
     ]);

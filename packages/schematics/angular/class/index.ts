@@ -35,7 +35,7 @@ export default function (options: ClassOptions): Rule {
     options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
     template({
       ...stringUtils,
-      ...options as object,
+      ...options,
     }),
     move(sourceDir),
   ]);

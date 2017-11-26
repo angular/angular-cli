@@ -47,7 +47,7 @@ export function transformJavascript(
   }
 
   // Print error diagnostics.
-  const checkDiagnostics = (diagnostics: ts.Diagnostic[]) => {
+  const checkDiagnostics = (diagnostics: ReadonlyArray<ts.Diagnostic>) => {
     if (diagnostics && diagnostics.length > 0) {
       let errors = '';
       errors = errors + '\n' + ts.formatDiagnostics(diagnostics, {
