@@ -144,11 +144,14 @@ export function getProdConfig(wco: WebpackConfigOptions) {
           ecma: wco.supportES2015 ? 6 : 5,
           warnings: buildOptions.verbose,
           ie8: false,
-          mangle: true,
+          mangle: {
+            safari10: true,
+          },
           compress: uglifyCompressOptions,
           output: {
             ascii_only: true,
-            comments: false
+            comments: false,
+            webkit: true,
           },
         }
       }),
