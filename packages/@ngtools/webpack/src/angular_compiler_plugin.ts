@@ -106,9 +106,9 @@ export class AngularCompilerPlugin implements Tapable {
   // Webpack plugin.
   private _firstRun = true;
   private _donePromise: Promise<void> | null;
-  private _compiler: any = null;
-  private _compilation: any = null;
   private _normalizedLocale: string;
+  private _warnings: (string | Error)[] = [];
+  private _errors: (string | Error)[] = [];
 
   // TypeChecker process.
   private _forkTypeChecker = true;
@@ -447,7 +447,7 @@ export class AngularCompilerPlugin implements Tapable {
         if (moduleKey in this._lazyRoutes) {
           if (this._lazyRoutes[moduleKey] !== modulePath) {
             // Found a duplicate, this is an error.
-            this._compilation.warnings.push(
+            this._warnings.push(
               new Error(`Duplicated path in loadChildren detected during a rebuild. `
                 + `We will take the latest version detected and override it to save rebuild time. `
                 + `You should perform a full build to validate that your routes don't overlap.`)
@@ -483,12 +483,32 @@ export class AngularCompilerPlugin implements Tapable {
 
     // Cleanup.
     const killTypeCheckerProcess = () => {
-      treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
+      if (this._typeCheckerProcess && this._typeCheckerProcess.pid) {
+        treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
+        this._typeCheckerProcess = undefined;
+        this._forkTypeChecker = false;
+      }
+    };
+
+    // Handle child process exit.
+    const handleChildProcessExit = () => {
+      killTypeCheckerProcess();
+      const msg = 'AngularCompilerPlugin: Forked Type Checker exited unexpectedly. ' +
+        'Falling back to typechecking on main thread.';
+      this._warnings.push(msg);
+    };
+    this._typeCheckerProcess.once('exit', handleChildProcessExit);
+    this._typeCheckerProcess.once('SIGINT', handleChildProcessExit);
+    this._typeCheckerProcess.once('uncaughtException', handleChildProcessExit);
+
+    // Handle parent process exit.
+    const handleParentProcessExit = () => {
+      killTypeCheckerProcess();
       process.exit();
     };
-    process.once('exit', killTypeCheckerProcess);
-    process.once('SIGINT', killTypeCheckerProcess);
-    process.once('uncaughtException', killTypeCheckerProcess);
+    process.once('exit', handleParentProcessExit);
+    process.once('SIGINT', handleParentProcessExit);
+    process.once('uncaughtException', handleParentProcessExit);
   }
 
   private _updateForkedTypeChecker(rootNames: string[], changedCompilationFiles: string[]) {
@@ -498,8 +518,6 @@ export class AngularCompilerPlugin implements Tapable {
 
   // Registration hook for webpack plugin.
   apply(compiler: any) {
-    this._compiler = compiler;
-
     // Decorate inputFileSystem to serve contents of CompilerHost.
     // Use decorated inputFileSystem in watchFileSystem.
     compiler.plugin('environment', () => {
@@ -573,7 +591,6 @@ export class AngularCompilerPlugin implements Tapable {
     });
     compiler.plugin('done', () => {
       this._donePromise = null;
-      this._compilation = null;
     });
 
     // TODO: consider if it's better to remove this plugin and instead make it wait on the
@@ -604,14 +621,13 @@ export class AngularCompilerPlugin implements Tapable {
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
     time('AngularCompilerPlugin._make');
-    this._compilation = compilation;
     this._emitSkipped = true;
-    if (this._compilation._ngToolsWebpackPluginInstance) {
+    if (compilation._ngToolsWebpackPluginInstance) {
       return cb(new Error('An @ngtools/webpack plugin already exist for this compilation.'));
     }
 
     // Set a private variable for this plugin instance.
-    this._compilation._ngToolsWebpackPluginInstance = this;
+    compilation._ngToolsWebpackPluginInstance = this;
 
     // Update the resource loader with the new webpack compilation.
     this._resourceLoader.update(compilation);
@@ -624,13 +640,22 @@ export class AngularCompilerPlugin implements Tapable {
     this._donePromise = Promise.resolve()
       .then(() => this._update())
       .then(() => {
+        this.pushCompilationErrors(compilation);
         timeEnd('AngularCompilerPlugin._make');
         cb();
       }, (err: any) => {
         compilation.errors.push(err.stack);
+        this.pushCompilationErrors(compilation);
         timeEnd('AngularCompilerPlugin._make');
         cb();
       });
+  }
+
+  private pushCompilationErrors(compilation: any) {
+    compilation.errors.push(...this._errors);
+    compilation.warnings.push(...this._warnings);
+    this._errors = [];
+    this._warnings = [];
   }
 
   private _makeTransformers() {
@@ -730,18 +755,18 @@ export class AngularCompilerPlugin implements Tapable {
 
         if (errors.length > 0) {
           const message = formatDiagnostics(errors);
-          this._compilation.errors.push(message);
+          this._errors.push(message);
         }
 
         if (warnings.length > 0) {
           const message = formatDiagnostics(warnings);
-          this._compilation.warnings.push(message);
+          this._warnings.push(message);
         }
 
         this._emitSkipped = !emitResult || emitResult.emitSkipped;
 
         // Reset changed files on successful compilation.
-        if (!this._emitSkipped && this._compilation.errors.length === 0) {
+        if (!this._emitSkipped && this._errors.length === 0) {
           this._compilerHost.resetChangedFileTracker();
         }
         timeEnd('AngularCompilerPlugin._update');
