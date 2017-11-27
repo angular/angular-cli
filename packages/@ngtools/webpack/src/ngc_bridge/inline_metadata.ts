@@ -1,3 +1,4 @@
+// @ignoreDep @angular/core
 import * as Path from 'path';
 
 import { Component } from '@angular/core';

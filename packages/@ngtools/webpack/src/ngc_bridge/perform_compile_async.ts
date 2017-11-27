@@ -11,6 +11,8 @@ Additional code copied per need (e.g. `createEmitCallback`).
 This code should also get removed once async is implemented in compiler-cli.
 */
 
+// @ignoreDep tsickle
+// @ignoreDep @angular/compiler
 import * as ts from 'typescript';
 import * as tsickle from 'tsickle';
 import {isSyntaxError} from '@angular/compiler';
