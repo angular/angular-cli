@@ -32,6 +32,12 @@ import { Schema as AppShellOptions } from './schema';
 
 
 // Helper functions. (possible refactors to utils)
+function formatMissingAppMsg(label: string, nameOrIndex: string | undefined): string {
+  const nameOrIndexText = nameOrIndex ? ` (${nameOrIndex})` : '';
+
+  return `${label} app ${nameOrIndexText} not found.`;
+}
+
 function getSourceFile(host: Tree, path: string): ts.SourceFile {
   const buffer = host.read(path);
   if (!buffer) {
@@ -80,7 +86,7 @@ function addAppShellConfig(options: AppShellOptions): Rule {
     const app = getAppFromConfig(config, options.clientApp || '0');
 
     if (!app) {
-      throw new SchematicsException(`Client app (${options.clientApp}) could not be found.`);
+      throw new SchematicsException(formatMissingAppMsg('Client', options.clientApp));
     }
 
     if (!options.route) {
@@ -103,7 +109,7 @@ function addRouterModule(options: AppShellOptions): Rule {
     const config = getConfig(host);
     const app = getAppFromConfig(config, options.clientApp || '0');
     if (app === null) {
-      throw new SchematicsException('Client app not found.');
+      throw new SchematicsException(formatMissingAppMsg('Client', options.clientApp));
     }
     const modulePath = getAppModulePath(host, app);
     const moduleSource = getSourceFile(host, modulePath);
@@ -144,10 +150,9 @@ function addRouterOutlet(options: AppShellOptions): Rule {
     const config = getConfig(host);
     const app = getAppFromConfig(config, options.clientApp || '0');
     if (app === null) {
-      throw new SchematicsException('Client app not found.');
+      throw new SchematicsException(formatMissingAppMsg('Client', options.clientApp));
     }
     const modulePath = getAppModulePath(host, app);
-    // const modulePath = getAppModulePath(host, options);
     const moduleSource = getSourceFile(host, modulePath);
 
     const metadataNode = getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
@@ -209,11 +214,11 @@ function addServerRoutes(options: AppShellOptions): Rule {
     const config = getConfig(host);
     const app = getAppFromConfig(config, options.universalApp);
     if (app === null) {
-      throw new SchematicsException('Universal/server app not found.');
+      throw new SchematicsException(formatMissingAppMsg('Universal/server', options.universalApp));
     }
     const modulePath = getServerModulePath(host, app);
     if (modulePath === null) {
-      throw new SchematicsException('Universal/server app not found.');
+      throw new SchematicsException('Universal/server module not found.');
     }
 
     let moduleSource = getSourceFile(host, modulePath);
