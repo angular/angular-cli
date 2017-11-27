@@ -7,6 +7,9 @@
  */
 import { BaseException } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
+import { _throw } from 'rxjs/observable/throw';
+import { last } from 'rxjs/operators/last';
+import { tap } from 'rxjs/operators/tap';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
 
@@ -58,13 +61,21 @@ export function callSource(source: Source, context: SchematicContext): Observabl
   const result = source(context) as object;
 
   if (result === undefined) {
-    throw new InvalidSourceResultException(result);
+    return _throw(new InvalidSourceResultException(result));
   } else if (TreeSymbol in result) {
     return Observable.of(result as Tree);
   } else if (Symbol.observable in result) {
-    return result as Observable<Tree>;
+    // Only return the last Tree, and make sure it's a Tree.
+    return (result as Observable<Tree>).pipe(
+      last(),
+      tap(inner => {
+        if (!(TreeSymbol in inner)) {
+          throw new InvalidSourceResultException(inner);
+        }
+      }),
+    );
   } else {
-    throw new InvalidSourceResultException(result);
+    return _throw(new InvalidSourceResultException(result));
   }
 }
 
@@ -80,9 +91,21 @@ export function callRule(rule: Rule,
     } else if (TreeSymbol in result) {
       return Observable.of(result as Tree);
     } else if (Symbol.observable in result) {
-      return result as Observable<Tree>;
+      const obs = result as Observable<Tree>;
+
+      // Only return the last Tree, and make sure it's a Tree.
+      return obs.pipe(
+        last(),
+        tap(inner => {
+          if (!(TreeSymbol in inner)) {
+            throw new InvalidRuleResultException(inner);
+          }
+        }),
+      );
+    } else if (result === undefined) {
+      return Observable.of(inputTree);
     } else {
-      throw new InvalidRuleResultException(result);
+      return _throw(new InvalidRuleResultException(result));
     }
   });
 }
