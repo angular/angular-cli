@@ -15,6 +15,7 @@ try {
     + e);
 }
 
+export * from './ngc_bridge';
 export * from './plugin';
 export * from './angular_compiler_plugin';
 export * from './extract_i18n_plugin';

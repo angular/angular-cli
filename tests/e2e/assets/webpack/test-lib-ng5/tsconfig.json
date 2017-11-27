@@ -1,0 +1,33 @@
+{
+  // Test comment
+  "compilerOptions": {
+    "baseUrl": "",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "target": "es5",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "declaration": true,
+    "noEmitHelpers": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "outDir": "lib",
+    "skipLibCheck": true,
+    "rootDir": "."
+  },
+  "files": [
+    "index.ts"
+  ],
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "skipMetadataEmit": false,
+    "skipTemplateCodegen": true,
+    "strictMetadataEmit": true,
+    "flatModuleOutFile": "my-lib.js",
+    "flatModuleId": "my-lib"
+  }
+}
