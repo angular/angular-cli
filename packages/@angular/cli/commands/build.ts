@@ -7,7 +7,7 @@ import { join } from 'path';
 import { RenderUniversalTaskOptions } from '../tasks/render-universal';
 
 const Command = require('../ember-cli/lib/models/command');
-
+const SilentError = require('silent-error');
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const buildConfigDefaults = config.getPaths('defaults.build', [
@@ -246,19 +246,25 @@ const BuildCommand = Command.extend({
       ui: this.ui,
     });
 
-
-    const buildPromise = buildTask.run(commandOptions);
-
-
     const clientApp = getAppFromConfig(commandOptions.app);
 
     const doAppShell = commandOptions.target === 'production' &&
       (commandOptions.aot === undefined || commandOptions.aot === true) &&
       !commandOptions.skipAppShell;
+
+    let serverApp: any = null;
+    if (clientApp.appShell && doAppShell) {
+      serverApp = getAppFromConfig(clientApp.appShell.app);
+      if (serverApp.platform !== 'server') {
+        throw new SilentError(`Shell app's platform is not "server"`);
+      }
+    }
+
+    const buildPromise = buildTask.run(commandOptions);
+
     if (!clientApp.appShell || !doAppShell) {
       return buildPromise;
     }
-    const serverApp = getAppFromConfig(clientApp.appShell.app);
 
     return buildPromise
       .then(() => {
