@@ -1,7 +1,3 @@
-// Prevent the dependency validation from tripping because we don't import these. We need
-// it as a peer dependency of @angular/core.
-// require('zone.js')
-
 import * as path from 'path';
 
 const cli = require('../../ember-cli/lib/cli');
