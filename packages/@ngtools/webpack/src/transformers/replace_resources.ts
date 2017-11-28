@@ -131,7 +131,10 @@ function _getContentOfKeyLiteral(node?: ts.Node): string | null {
 }
 
 function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) {
-  if (element.kind == ts.SyntaxKind.StringLiteral) {
+  if (
+    element.kind === ts.SyntaxKind.StringLiteral ||
+    element.kind === ts.SyntaxKind.NoSubstitutionTemplateLiteral
+  ) {
     const url = (element as ts.StringLiteral).text;
     // If the URL does not start with ./ or ../, prepends ./ to it.
     return `${/^\.?\.\//.test(url) ? '' : './'}${url}`;
