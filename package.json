@@ -142,8 +142,7 @@
     "temp": "0.8.3",
     "through": "^2.3.6",
     "ts-node": "^3.2.0",
-    "tslint": "^5.1.0",
-    "walk-sync": "^0.3.1"
+    "tslint": "^5.1.0"
   },
   "optionalDependencies": {
     "node-sass": "^4.3.0"
