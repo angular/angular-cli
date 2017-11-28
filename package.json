@@ -60,6 +60,7 @@
     "file-loader": "^1.1.5",
     "fs-extra": "^4.0.0",
     "glob": "^7.0.3",
+    "hard-source-webpack-plugin": "git+https://github.com/filipesilva/hard-source-webpack-plugin.git#export-star",
     "html-webpack-plugin": "^2.29.0",
     "istanbul-instrumenter-loader": "^2.0.0",
     "karma-source-map-support": "^1.2.0",
