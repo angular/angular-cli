@@ -46,6 +46,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // Convert absolute resource URLs to account for base-href and deploy-url.
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
+  const withPostCssWarnings = wco.buildOptions.withPostCssWarnings || true;
 
   const postcssPluginCreator = function() {
     // safe settings based on: https://github.com/ben-eb/cssnano/issues/358#issuecomment-283696193
@@ -86,7 +87,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         }
       ]),
       autoprefixer(),
-      customProperties({ preserve: true })
+      customProperties({ preserve: true, warnings: withPostCssWarnings })
     ].concat(
         minimizeCss ? [cssnano(minimizeOptions)] : []
     );

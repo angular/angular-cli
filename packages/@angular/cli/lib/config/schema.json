@@ -519,6 +519,11 @@
             "namedChunks": {
               "description": "Use file name for lazy loaded chunks.",
               "type": "boolean"
+            },
+            "withPostCssWarnings": {
+              "description": "Flag to have post CSS warnings.",
+              "type": "boolean",
+              "default": true
             }
           }
         },

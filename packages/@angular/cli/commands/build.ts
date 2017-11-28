@@ -12,7 +12,7 @@ const Command = require('../ember-cli/lib/models/command');
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const buildConfigDefaults = config.getPaths('defaults.build', [
   'sourcemaps', 'baseHref', 'progress', 'poll', 'deleteOutputPath', 'preserveSymlinks',
-  'showCircularDependencies', 'commonChunk', 'namedChunks'
+  'showCircularDependencies', 'commonChunk', 'namedChunks', 'withPostCssWarnings'
 ]);
 
 // defaults for BuildOptions
@@ -207,6 +207,12 @@ export const baseBuildCommandOptions: any = [
     type: Boolean,
     description: 'Flag to prevent building an app shell',
     default: false
+  },
+  {
+    name: 'with-post-css-warnings',
+    type: Boolean,
+    description: 'Flag to have post CSS warnings.',
+    default: buildConfigDefaults['withPostCssWarnings']
   }
 ];
 
