@@ -5,6 +5,7 @@ import {
   updateTsConfig,
   updateJsonFile,
   useNg2,
+  useNg4,
   useSha,
   useCIChrome,
   useCIDefaults,
@@ -45,6 +46,7 @@ export default function() {
     .then(() => useCIChrome())
     .then(() => useCIDefaults())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
+    .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
     // npm link on Circle CI is very noisy.
     .then(() => silentNpm('install'))

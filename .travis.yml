@@ -46,23 +46,6 @@ matrix:
 
     - node_js: "6"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=0 --nosilent --nightly
-      env: nightly-0
-    - node_js: "6"
-      os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=1 --nosilent --nightly
-      env: nightly-1
-    - node_js: "6"
-      os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=2 --nosilent --nightly
-      env: nightly-2
-    - node_js: "6"
-      os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent --nightly
-      env: nightly-3
-
-    - node_js: "6"
-      os: linux
       script: node tests/run_e2e.js --eject "--glob=tests/build/**"
       env: eject
 
