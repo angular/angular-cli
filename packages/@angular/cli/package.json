@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "1.6.0-rc.0",
+  "version": "1.6.0-rc.1",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -27,11 +27,11 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "@angular-devkit/build-optimizer": "~0.0.31",
-    "@angular-devkit/schematics": "~0.0.34",
+    "@angular-devkit/build-optimizer": "~0.0.34",
+    "@angular-devkit/schematics": "~0.0.38",
     "@ngtools/json-schema": "1.1.0",
-    "@ngtools/webpack": "1.9.0-rc.0",
-    "@schematics/angular": "~0.1.5",
+    "@ngtools/webpack": "1.9.0-rc.1",
+    "@schematics/angular": "~0.1.8",
     "autoprefixer": "^6.5.3",
     "chalk": "~2.2.0",
     "circular-dependency-plugin": "^3.0.0",
