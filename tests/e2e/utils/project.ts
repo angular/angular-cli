@@ -42,6 +42,7 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => useCIChrome())
     .then(() => useCIDefaults())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
+    .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
     .then(() => console.log(`Project ${name} created... Installing npm.`))
     .then(() => silentNpm('install'));
@@ -172,7 +173,7 @@ export function useCIChrome() {
     .catch(() => null);
 }
 
-// Convert a Angular 4 project to Angular 2.
+// Convert a Angular 5 project to Angular 2.
 export function useNg2() {
   const ng2Deps: any = {
     'dependencies': {
@@ -283,4 +284,37 @@ export function useNg2() {
       Object.assign(json, tsconfigSpecJson)))
     .then(() => updateJsonFile('e2e/tsconfig.e2e.json', json =>
       Object.assign(json, tsconfigE2eJson)));
+}
+
+// Convert a Angular 5 project to Angular 4.
+export function useNg4() {
+  const ng4Deps: any = {
+    'dependencies': {
+      '@angular/common': '^4.4.6',
+      '@angular/compiler': '^4.4.6',
+      '@angular/core': '^4.4.6',
+      '@angular/forms': '^4.4.6',
+      '@angular/http': '^4.4.6',
+      '@angular/platform-browser': '^4.4.6',
+      '@angular/platform-browser-dynamic': '^4.4.6',
+      '@angular/router': '^4.4.6',
+      'zone.js': '^0.8.14'
+    },
+    'devDependencies': {
+      '@angular/compiler-cli': '^4.4.6',
+      'typescript': '~2.3.3'
+    }
+  };
+
+
+  return Promise.resolve()
+    .then(() => updateJsonFile('package.json', json => {
+      Object.keys(ng4Deps['dependencies']).forEach(pkgName => {
+        json['dependencies'][pkgName] = ng4Deps['dependencies'][pkgName];
+      });
+      Object.keys(ng4Deps['devDependencies']).forEach(pkgName => {
+        json['devDependencies'][pkgName] = ng4Deps['devDependencies'][pkgName];
+      });
+      console.log(JSON.stringify(json))
+    }));
 }
