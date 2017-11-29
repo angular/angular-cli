@@ -9,12 +9,12 @@ export default function () {
     .then(() => expectToFail(() => expectFileToExist('dist/vendor.js')))
     .then(() => expectToFail(() => expectFileToMatch('dist/main.js', /\.decorators =/)))
     .then(() => {
-      // Check if build optimizer is on by default in ng5 prod builds
-      // This check should be changed once ng5 because the default.
-      if (!getGlobalVariable('argv').nightly) {
+      // Skip this part of the test in Angular 2/4.
+      if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
         return Promise.resolve();
       }
 
+      // Check if build optimizer is on by default in ng5 prod builds
       return Promise.resolve()
         .then(() => ng('build', '--prod'))
         .then(() => expectToFail(() => expectFileToExist('dist/vendor.js')))

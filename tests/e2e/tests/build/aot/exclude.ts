@@ -7,9 +7,8 @@ export default function () {
   // Disable parts of it in webpack tests.
   const ejected = getGlobalVariable('argv').eject;
 
-  // Skip this in ng5 tests, it only happens in ng2/4.
-  // This check should be changed once ng5 because the default.
-  if (getGlobalVariable('argv').nightly) {
+  // This test is only for Angular 2/4 projects.
+  if (!getGlobalVariable('argv').ng2 && !getGlobalVariable('argv').ng4) {
     return Promise.resolve();
   }
 

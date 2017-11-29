@@ -15,13 +15,14 @@ export default function () {
   if (process.platform.startsWith('win')) {
     return Promise.resolve();
   }
+
   // Skip this in ejected tests.
   if (getGlobalVariable('argv').eject) {
     return Promise.resolve();
   }
 
-  // Skip in non-nightly tests. Switch this check around when ng5 is out.
-  if (!getGlobalVariable('argv').nightly) {
+  // Skip this test in Angular 2/4.
+  if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
     return Promise.resolve();
   }
 

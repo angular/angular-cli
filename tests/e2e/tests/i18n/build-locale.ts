@@ -5,9 +5,8 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default function () {
-  // Check if register locale works in ng5 prod builds
-  // This check should be changed once ng5 because the default.
-  if (!getGlobalVariable('argv').nightly) {
+  // Skip this test in Angular 2/4.
+  if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
     return Promise.resolve();
   }
 
