@@ -24,12 +24,12 @@ export class PurifyPlugin {
           chunk.files
             .filter((fileName: string) => fileName.endsWith('.js'))
             .forEach((fileName: string) => {
-              const replacements = purifyReplacements(compilation.assets[fileName].source());
+              const inserts = purifyReplacements(compilation.assets[fileName].source());
 
-              if (replacements.length > 0) {
+              if (inserts.length > 0) {
                 const replaceSource = new ReplaceSource(compilation.assets[fileName], fileName);
-                replacements.forEach((replacement) => {
-                  replaceSource.replace(replacement.start, replacement.end, replacement.content);
+                inserts.forEach((insert) => {
+                  replaceSource.insert(insert.pos, insert.content);
                 });
                 compilation.assets[fileName] = replaceSource;
               }
