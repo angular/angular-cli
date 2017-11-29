@@ -53,12 +53,12 @@ matrix:
     - node_js: "6"
       os: linux
       before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
-      script: node tests/run_e2e.js --ng2 "--glob=tests/{build,test,misc}/**"
+      script: node tests/run_e2e.js --ng2 "--glob=tests/build/**"
       env: ng2
     - node_js: "7"
       os: linux
       before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
-      script: node tests/run_e2e.js "--glob=tests/{build,test,misc}/**"
+      script: node tests/run_e2e.js "--glob=tests/build/**"
       env: node7
     - node_js: "8"
       os: linux
