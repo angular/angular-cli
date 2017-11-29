@@ -1,7 +1,7 @@
 import {join} from 'path';
 import {getGlobalVariable} from '../../utils/env';
 import {expectFileNotToExist, expectFileToExist, expectFileToMatch, writeFile} from '../../utils/fs';
-import {ng, silentNpm} from '../../utils/process';
+import {ng, npm, silentNpm} from '../../utils/process';
 
 const MANIFEST = {
   index: '/index.html',
@@ -42,5 +42,11 @@ export default function() {
     .then(() => expectFileToMatch('dist/ngsw.json', /"\/foo\/bar\/index.html"/))
     .then(() => ng('build', '--prod', '--service-worker=false'))
     .then(() => expectFileNotToExist('dist/ngsw.json'))
+    .then(() => ng('eject', '--prod'))
+    .then(() => silentNpm('install'))
+    .then(() => npm('run', 'build'))
+    .then(() => expectFileToMatch('package.json', /"sw-config"/))
+    .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw-worker.js')))
+    .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw.json')))
     .then(() => ng('set', 'apps.0.serviceWorker=false'));
 }
