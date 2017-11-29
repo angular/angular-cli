@@ -7,6 +7,7 @@ import { getAppFromConfig } from '../utilities/app-utils';
 import { EjectTaskOptions } from '../commands/eject';
 import { NgCliWebpackConfig } from '../models/webpack-config';
 import { CliConfig } from '../models/config';
+import { usesServiceWorker } from '../utilities/service-worker';
 import { stripBom } from '../utilities/strip-bom';
 import { AotPlugin, AngularCompilerPlugin } from '@ngtools/webpack';
 import { PurifyPlugin } from '@angular-devkit/build-optimizer';
@@ -484,7 +485,6 @@ class JsonWebpackSerializer {
   }
 }
 
-
 export default Task.extend({
   run: function (runTaskOptions: EjectTaskOptions) {
     const project = this.project;
@@ -553,6 +553,16 @@ export default Task.extend({
         packageJson['scripts']['test'] = 'karma start ./karma.conf.js';
         packageJson['scripts']['pree2e'] = pree2eNpmScript;
         packageJson['scripts']['e2e'] = 'protractor ./protractor.conf.js';
+
+        if (!!appConfig.serviceWorker && runTaskOptions.target === 'production' &&
+            usesServiceWorker(project.root) && !!runTaskOptions.serviceWorker) {
+          packageJson['scripts']['build'] += ' && npm run sw-config && npm run sw-copy';
+          packageJson['scripts']['sw-config'] = `ngsw-config ${outputPath} src/ngsw-config.json`;
+          packageJson['scripts']['sw-copy'] =
+              `cpx node_modules/@angular/service-worker/ngsw-worker.js ${outputPath}`;
+
+          packageJson['devDependencies']['cpx'] = '^1.5.0';
+        }
 
         // Add new dependencies based on our dependencies.
         const ourPackageJson = require('../package.json');
