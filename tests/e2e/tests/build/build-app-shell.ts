@@ -13,6 +13,11 @@ export default function () {
     return Promise.resolve();
   }
 
+  // Skip this test in Angular 2/4.
+  if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
+    return Promise.resolve();
+  }
+
   let platformServerVersion = readNgVersion();
 
   if (getGlobalVariable('argv').nightly) {

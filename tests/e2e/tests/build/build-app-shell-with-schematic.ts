@@ -10,8 +10,8 @@ export default function () {
     return Promise.resolve();
   }
 
-  // Skip in nightly tests.
-  if (getGlobalVariable('argv').nightly) {
+  // Skip this test in Angular 2/4.
+  if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
     return Promise.resolve();
   }
 
