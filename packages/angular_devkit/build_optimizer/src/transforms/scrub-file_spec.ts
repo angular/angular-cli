@@ -11,7 +11,7 @@ import { getScrubFileTransformer, testScrubFile } from './scrub-file';
 
 
 const transform = (content: string) => transformJavascript(
-  { content, getTransforms: [getScrubFileTransformer] }).content;
+  { content, getTransforms: [getScrubFileTransformer], typeCheck: true }).content;
 
 describe('scrub-file', () => {
   const clazz = 'var Clazz = (function () { function Clazz() { } return Clazz; }());';

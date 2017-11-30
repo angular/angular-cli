@@ -88,17 +88,6 @@ describe('build-optimizer', () => {
       });
     });
 
-    it('doesn\'t process files without decorators/ctorParameters/outside Angular', () => {
-      const input = tags.oneLine`
-        var Clazz = (function () { function Clazz() { } return Clazz; }());
-        ${staticProperty}
-      `;
-
-      const boOutput = buildOptimizer({ content: input });
-      expect(boOutput.content).toBeFalsy();
-      expect(boOutput.emitSkipped).toEqual(true);
-    });
-
     it('supports es2015 modules', () => {
       // prefix-functions would add PURE_IMPORTS_START and PURE to the super call.
       // This test ensures it isn't applied to es2015 modules.

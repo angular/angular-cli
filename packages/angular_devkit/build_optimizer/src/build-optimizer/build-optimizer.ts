@@ -90,18 +90,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   // Determine which transforms to apply.
   const getTransforms = [];
 
-  if (testWrapEnums(content)) {
-    getTransforms.push(getWrapEnumsTransformer);
-  }
-
-  if (testImportTslib(content)) {
-    getTransforms.push(getImportTslibTransformer);
-  }
-
-  if (testPrefixClasses(content)) {
-    getTransforms.push(getPrefixClassesTransformer);
-  }
-
+  let typeCheck = false;
   if (options.isSideEffectFree || originalFilePath && isKnownSideEffectFree(originalFilePath)) {
     getTransforms.push(
       // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
@@ -112,11 +101,29 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
       getScrubFileTransformer,
       getFoldFileTransformer,
     );
+    typeCheck = true;
   } else if (testScrubFile(content)) {
+    // Always test as these require the type checker
     getTransforms.push(
       getScrubFileTransformer,
       getFoldFileTransformer,
     );
+    typeCheck = true;
+  }
+
+  // tests are not needed for fast path
+  const ignoreTest = !options.emitSourceMap && !typeCheck;
+
+  if (ignoreTest || testPrefixClasses(content)) {
+    getTransforms.unshift(getPrefixClassesTransformer);
+  }
+
+  if (ignoreTest || testImportTslib(content)) {
+    getTransforms.unshift(getImportTslibTransformer);
+  }
+
+  if (ignoreTest || testWrapEnums(content)) {
+    getTransforms.unshift(getWrapEnumsTransformer);
   }
 
   const transformJavascriptOpts: TransformJavascriptOptions = {
@@ -126,6 +133,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     emitSourceMap: options.emitSourceMap,
     strict: options.strict,
     getTransforms,
+    typeCheck,
   };
 
   return transformJavascript(transformJavascriptOpts);

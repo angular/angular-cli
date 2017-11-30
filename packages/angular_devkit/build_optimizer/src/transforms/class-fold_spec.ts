@@ -11,7 +11,7 @@ import { getFoldFileTransformer } from './class-fold';
 
 
 const transform = (content: string) => transformJavascript(
-  { content, getTransforms: [getFoldFileTransformer] }).content;
+  { content, getTransforms: [getFoldFileTransformer], typeCheck: true }).content;
 
 describe('class-fold', () => {
   it('folds static properties into class', () => {

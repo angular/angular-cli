@@ -15,13 +15,50 @@ export interface TransformJavascriptOptions {
   outputFilePath?: string;
   emitSourceMap?: boolean;
   strict?: boolean;
-  getTransforms: Array<(program: ts.Program) => ts.TransformerFactory<ts.SourceFile>>;
+  typeCheck?: boolean;
+  getTransforms: Array<(program?: ts.Program) => ts.TransformerFactory<ts.SourceFile>>;
 }
 
 export interface TransformJavascriptOutput {
   content: string | null;
   sourceMap: RawSourceMap | null;
   emitSkipped: boolean;
+}
+
+interface DiagnosticSourceFile extends ts.SourceFile {
+  readonly parseDiagnostics?: ReadonlyArray<ts.Diagnostic>;
+}
+
+function validateDiagnostics(diagnostics: ReadonlyArray<ts.Diagnostic>, strict?: boolean): boolean {
+  // Print error diagnostics.
+  const checkDiagnostics = (diagnostics: ReadonlyArray<ts.Diagnostic>) => {
+    if (diagnostics && diagnostics.length > 0) {
+      let errors = '';
+      errors = errors + '\n' + ts.formatDiagnostics(diagnostics, {
+        getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
+        getNewLine: () => ts.sys.newLine,
+        getCanonicalFileName: (f: string) => f,
+      });
+
+      return errors;
+    }
+  };
+
+  const hasError = diagnostics.some(diag => diag.category === ts.DiagnosticCategory.Error);
+  if (hasError) {
+    // Throw only if we're in strict mode, otherwise return original content.
+    if (strict) {
+      throw new Error(`
+        TS failed with the following error messages:
+
+        ${checkDiagnostics(diagnostics)}
+      `);
+    } else {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export function transformJavascript(
@@ -46,23 +83,68 @@ export function transformJavascript(
     };
   }
 
-  // Print error diagnostics.
-  const checkDiagnostics = (diagnostics: ReadonlyArray<ts.Diagnostic>) => {
-    if (diagnostics && diagnostics.length > 0) {
-      let errors = '';
-      errors = errors + '\n' + ts.formatDiagnostics(diagnostics, {
-        getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
-        getNewLine: () => ts.sys.newLine,
-        getCanonicalFileName: (f: string) => f,
-      });
-
-      return errors;
-    }
-  };
-
+  const allowFastPath = options.typeCheck === false && !emitSourceMap;
   const outputs = new Map<string, string>();
   const tempFilename = 'bo-default-file.js';
-  const tempSourceFile = ts.createSourceFile(tempFilename, content, ts.ScriptTarget.Latest);
+  const tempSourceFile = ts.createSourceFile(
+    tempFilename,
+    content,
+    ts.ScriptTarget.Latest,
+    allowFastPath,
+  );
+  const parseDiagnostics = (tempSourceFile as DiagnosticSourceFile).parseDiagnostics;
+
+  const tsOptions: ts.CompilerOptions = {
+    // We target latest so that there is no downleveling.
+    target: ts.ScriptTarget.Latest,
+    isolatedModules: true,
+    suppressOutputPathCheck: true,
+    allowNonTsExtensions: true,
+    noLib: true,
+    noResolve: true,
+    sourceMap: emitSourceMap,
+    inlineSources: emitSourceMap,
+    inlineSourceMap: false,
+  };
+
+  if (allowFastPath && parseDiagnostics) {
+    if (!validateDiagnostics(parseDiagnostics, strict)) {
+      return {
+        content: null,
+        sourceMap: null,
+        emitSkipped: true,
+      };
+    }
+
+    const transforms = getTransforms.map((getTf) => getTf(undefined));
+
+    const result = ts.transform(tempSourceFile, transforms, tsOptions);
+    if (result.transformed.length === 0 || result.transformed[0] === tempSourceFile) {
+      return {
+        content: null,
+        sourceMap: null,
+        emitSkipped: true,
+      };
+    }
+
+    const printer = ts.createPrinter(
+      undefined,
+      {
+        onEmitNode: result.emitNodeWithNotification,
+        substituteNode: result.substituteNode,
+      },
+    );
+
+    const output = printer.printFile(result.transformed[0]);
+
+    result.dispose();
+
+    return {
+      content: output,
+      sourceMap: null,
+      emitSkipped: false,
+    };
+  }
 
   const host: ts.CompilerHost = {
     getSourceFile: (fileName) => {
@@ -83,39 +165,15 @@ export function transformJavascript(
     writeFile: (fileName, text) => outputs.set(fileName, text),
   };
 
-  const tsOptions: ts.CompilerOptions = {
-    // We target latest so that there is no downleveling.
-    target: ts.ScriptTarget.Latest,
-    isolatedModules: true,
-    suppressOutputPathCheck: true,
-    allowNonTsExtensions: true,
-    noLib: true,
-    noResolve: true,
-    sourceMap: emitSourceMap,
-    inlineSources: emitSourceMap,
-    inlineSourceMap: false,
-  };
-
   const program = ts.createProgram([tempFilename], tsOptions, host);
 
   const diagnostics = program.getSyntacticDiagnostics(tempSourceFile);
-  const hasError = diagnostics.some(diag => diag.category === ts.DiagnosticCategory.Error);
-
-  if (hasError) {
-    // Throw only if we're in strict mode, otherwise return original content.
-    if (strict) {
-      throw new Error(`
-        TS failed with the following error messages:
-
-        ${checkDiagnostics(diagnostics)}
-      `);
-    } else {
-      return {
-        content: null,
-        sourceMap: null,
-        emitSkipped: true,
-      };
-    }
+  if (!validateDiagnostics(diagnostics, strict)) {
+    return {
+      content: null,
+      sourceMap: null,
+      emitSkipped: true,
+    };
   }
 
   // We need the checker inside transforms.
