@@ -3,7 +3,7 @@ version: 2
 _defaults: &defaults
   working_directory: ~/ng
   docker:
-    - image: angular/ngcontainer
+    - image: angular/ngcontainer:0.0.5
 
 _post_checkout: &post_checkout
   post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
@@ -17,7 +17,7 @@ jobs:
       - restore_cache:
           key: angular_devkit-{{ checksum "package-lock.json" }}
 
-      - run: npm install --quiet
+      - run: npm install --no-save
       - run: npm run lint
 
   validate:
@@ -27,7 +27,7 @@ jobs:
       - restore_cache:
           key: angular_devkit-{{ checksum "package-lock.json" }}
 
-      - run: npm install --quiet
+      - run: npm install --no-save
       - run: npm run validate
 
   test:
@@ -38,7 +38,7 @@ jobs:
       - restore_cache:
           key: angular_devkit-{{ checksum "package-lock.json" }}
 
-      - run: npm install --quiet
+      - run: npm install --no-save
       - run: npm run test -- --code-coverage --full
 
   integration:
@@ -53,7 +53,7 @@ jobs:
       - restore_cache:
           key: angular_devkit-integration-aio-{{ checksum "tests/@angular_devkit/build_optimizer/webpack/aio-app/package-lock.json" }}
 
-      - run: npm install --quiet
+      - run: npm install --no-save
       - run: xvfb-run -a npm run integration
 
       - save_cache:
