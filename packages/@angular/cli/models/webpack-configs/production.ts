@@ -118,11 +118,11 @@ export function getProdConfig(wco: WebpackConfigOptions) {
   }
 
   const uglifyCompressOptions: any = {
-      // Disabled because of an issue with Uglify breaking seemingly valid code:
-      // https://github.com/angular/angular-cli/issues/5804
-      // Further investigation:
-      // https://github.com/mishoo/UglifyJS2/issues/2011
-      comparisons: false
+    // Disabled because of an issue with Mapbox GL when using the Webpack node global and UglifyJS:
+    // https://github.com/mapbox/mapbox-gl-js/issues/4359#issuecomment-303880888
+    // https://github.com/angular/angular-cli/issues/5804
+    // https://github.com/angular/angular-cli/pull/7931
+    typeofs : false
   };
 
   if (buildOptions.buildOptimizer) {
