@@ -30,3 +30,5 @@ Or set the default style on an existing project:
 ```bash
 ng set defaults.styleExt scss
 ```
+
+Style strings added to the `@Component.styles` array _must be written in CSS_ because the CLI cannot apply a pre-processor to inline styles.
