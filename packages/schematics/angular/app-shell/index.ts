@@ -62,7 +62,93 @@ function getServerModulePath(host: Tree, app: AppConfig): string | null {
 
   return modulePath;
 }
+
+interface TemplateInfo {
+  templateProp?: ts.PropertyAssignment;
+  templateUrlProp?: ts.PropertyAssignment;
+}
+
+function getComponentTemplateInfo(host: Tree, componentPath: string): TemplateInfo {
+  const compSource = getSourceFile(host, componentPath);
+  const compMetadata = getDecoratorMetadata(compSource, 'Component', '@angular/core')[0];
+
+  return {
+    templateProp: getMetadataProperty(compMetadata, 'template'),
+    templateUrlProp: getMetadataProperty(compMetadata, 'templateUrl'),
+  };
+}
+
+function getComponentTemplate(host: Tree, compPath: string, tmplInfo: TemplateInfo): string {
+  let template = '';
+
+  if (tmplInfo.templateProp) {
+    template = tmplInfo.templateProp.getFullText();
+  } else if (tmplInfo.templateUrlProp) {
+    const templateUrl = (tmplInfo.templateUrlProp.initializer as ts.StringLiteral).text;
+    const dirEntry = host.getDir(compPath);
+    const dir = dirEntry.parent ? dirEntry.parent.path : '/';
+    const templatePath = normalize(`/${dir}/${templateUrl}`);
+    const buffer = host.read(templatePath);
+    if (buffer) {
+      template = buffer.toString();
+    }
+  }
+
+  return template;
+}
+
+function getBootstrapComponentPath(host: Tree, appConfig: AppConfig): string {
+  const modulePath = getAppModulePath(host, appConfig);
+  const moduleSource = getSourceFile(host, modulePath);
+
+  const metadataNode = getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
+  const bootstrapProperty = getMetadataProperty(metadataNode, 'bootstrap');
+
+  const arrLiteral = (<ts.PropertyAssignment> bootstrapProperty)
+    .initializer as ts.ArrayLiteralExpression;
+
+  const componentSymbol = arrLiteral.elements[0].getText();
+
+  const relativePath = getSourceNodes(moduleSource)
+    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+    .filter(imp => {
+      return findNode(imp, ts.SyntaxKind.Identifier, componentSymbol);
+    })
+    .map((imp: ts.ImportDeclaration) => {
+      const pathStringLiteral = <ts.StringLiteral> imp.moduleSpecifier;
+
+      return pathStringLiteral.text;
+    })[0];
+
+  const dirEntry = host.getDir(modulePath);
+  const dir = dirEntry.parent ? dirEntry.parent.path : '/';
+  const compPath = normalize(`/${dir}/${relativePath}.ts`);
+
+  return compPath;
+}
 // end helper functions.
+
+function validateProject(options: AppShellOptions): Rule {
+  return (host: Tree, context: SchematicContext) => {
+    const routerOutletCheckRegex = /<router\-outlet.*?>([\s\S]*?)<\/router\-outlet>/;
+
+    const config = getConfig(host);
+    const app = getAppFromConfig(config, options.clientApp || '0');
+    if (app === null) {
+      throw new SchematicsException(formatMissingAppMsg('Client', options.clientApp));
+    }
+
+    const componentPath = getBootstrapComponentPath(host, app);
+    const tmpl = getComponentTemplateInfo(host, componentPath);
+    const template = getComponentTemplate(host, componentPath, tmpl);
+    if (!routerOutletCheckRegex.test(template)) {
+      const errorMsg =
+        `Prerequisite for app shell is to define a router-outlet in your root component.`;
+      context.logger.error(errorMsg);
+      throw new SchematicsException(errorMsg);
+    }
+  };
+}
 
 function addUniversalApp(options: AppShellOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
@@ -153,72 +239,6 @@ function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.Proper
   return property as ts.PropertyAssignment;
 }
 
-function addRouterOutlet(options: AppShellOptions): Rule {
-  return (host: Tree) => {
-    const routerOutletMarkup = `<router-outlet></router-outlet>`;
-
-    const config = getConfig(host);
-    const app = getAppFromConfig(config, options.clientApp || '0');
-    if (app === null) {
-      throw new SchematicsException(formatMissingAppMsg('Client', options.clientApp));
-    }
-    const modulePath = getAppModulePath(host, app);
-    const moduleSource = getSourceFile(host, modulePath);
-
-    const metadataNode = getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
-    const bootstrapProperty = getMetadataProperty(metadataNode, 'bootstrap');
-
-    const arrLiteral = (<ts.PropertyAssignment> bootstrapProperty)
-      .initializer as ts.ArrayLiteralExpression;
-
-    const componentSymbol = arrLiteral.elements[0].getText();
-
-    const relativePath = getSourceNodes(moduleSource)
-      .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
-      .filter(imp => {
-        return findNode(imp, ts.SyntaxKind.Identifier, componentSymbol);
-      })
-      .map((imp: ts.ImportDeclaration) => {
-        const pathStringLiteral = <ts.StringLiteral> imp.moduleSpecifier;
-
-        return pathStringLiteral.text;
-      })[0];
-
-    const dirEntry = host.getDir(modulePath);
-    const dir = dirEntry.parent ? dirEntry.parent.path : '/';
-    const compPath = normalize(`/${dir}/${relativePath}.ts`);
-
-    const compSource = getSourceFile(host, compPath);
-    const compMetadata = getDecoratorMetadata(compSource, 'Component', '@angular/core')[0];
-    const templateProp = getMetadataProperty(compMetadata, 'template');
-    const templateUrlProp = getMetadataProperty(compMetadata, 'templateUrl');
-
-    if (templateProp) {
-      if (!/<router\-outlet>/.test(templateProp.initializer.getText())) {
-        const recorder = host.beginUpdate(compPath);
-        recorder.insertRight(templateProp.initializer.getEnd() - 1, routerOutletMarkup);
-        host.commitUpdate(recorder);
-      }
-    } else {
-      const templateUrl = (templateUrlProp.initializer as ts.StringLiteral).text;
-      const dirEntry = host.getDir(compPath);
-      const dir = dirEntry.parent ? dirEntry.parent.path : '/';
-      const templatePath = normalize(`/${dir}/${templateUrl}`);
-      const buffer = host.read(templatePath);
-      if (buffer) {
-        const content = buffer.toString();
-        if (!/<router\-outlet>/.test(content)) {
-          const recorder = host.beginUpdate(templatePath);
-          recorder.insertRight(buffer.length, routerOutletMarkup);
-          host.commitUpdate(recorder);
-        }
-      }
-    }
-
-    return host;
-  };
-}
-
 function addServerRoutes(options: AppShellOptions): Rule {
   return (host: Tree) => {
     const config = getConfig(host);
@@ -293,10 +313,10 @@ function addShellComponent(options: AppShellOptions): Rule {
 
 export default function (options: AppShellOptions): Rule {
   return chain([
+    validateProject(options),
     addUniversalApp(options),
     addAppShellConfig(options),
     addRouterModule(options),
-    addRouterOutlet(options),
     addServerRoutes(options),
     addShellComponent(options),
   ]);

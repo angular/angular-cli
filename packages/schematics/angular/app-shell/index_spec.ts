@@ -23,24 +23,32 @@ describe('App Shell Schematic', () => {
   };
 
   let appTree: Tree;
+  const appOptions: ApplicationOptions = {
+    directory: '',
+    name: 'app',
+    path: 'src',
+    prefix: '',
+    sourceDir: 'src',
+    inlineStyle: false,
+    inlineTemplate: false,
+    viewEncapsulation: 'None',
+    changeDetection: 'Default',
+    version: '1.2.3',
+    routing: true,
+    style: 'css',
+    skipTests: false,
+    minimal: false,
+  };
+
   beforeEach(() => {
-    const appOptions: ApplicationOptions = {
-      directory: '',
-      name: 'app',
-      path: 'src',
-      prefix: '',
-      sourceDir: 'src',
-      inlineStyle: false,
-      inlineTemplate: false,
-      viewEncapsulation: 'None',
-      changeDetection: 'Default',
-      version: '1.2.3',
-      routing: false,
-      style: 'css',
-      skipTests: false,
-      minimal: false,
-    };
     appTree = schematicRunner.runSchematic('application', appOptions);
+  });
+
+  it('should ensure the client app has a router-outlet', () => {
+    appTree = schematicRunner.runSchematic('application', {...appOptions, routing: false});
+    expect(() => {
+      schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+    }).toThrowError();
   });
 
   it('should add a universal app', () => {
@@ -115,12 +123,6 @@ describe('App Shell Schematic', () => {
       tree.delete('/src/app/app.component.html');
     }
 
-    it('should add the router outlet (external template)', () => {
-      const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
-      const content = tree.read('/src/app/app.component.html') || new Buffer('');
-      expect(content.toString()).toMatch(/<router\-outlet><\/router\-outlet>/g);
-    });
-
     it('should not re-add the router outlet (external template)', () => {
       const htmlPath = '/src/app/app.component.html';
       appTree.overwrite(htmlPath, '<router-outlet></router-outlet>');
@@ -130,13 +132,6 @@ describe('App Shell Schematic', () => {
       const matches = content.toString().match(/<router\-outlet><\/router\-outlet>/g);
       const numMatches = matches ? matches.length : 0;
       expect(numMatches).toEqual(1);
-    });
-
-    it('should add the router outlet (inline template)', () => {
-      makeInlineTemplate(appTree);
-      const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
-      const content = tree.read('/src/app/app.component.ts') || new Buffer('');
-      expect(content.toString()).toMatch(/<router\-outlet><\/router\-outlet>/g);
     });
 
     it('should not re-add the router outlet (inline template)', () => {
