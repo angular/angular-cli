@@ -4,7 +4,7 @@ version: 2
 anchor_1: &defaults
   working_directory: ~/angular-cli
   docker:
-    - image: angular/ngcontainer
+    - image: angular/ngcontainer:0.0.5
 
 # Restore cache based on package-lock.json checksum for branch.
 anchor_2: &restore_cache_defaults
@@ -25,7 +25,7 @@ jobs:
           <<: *restore_cache_defaults
       - run: node --version
       - run: npm --version
-      - run: npm install --quiet
+      - run: npm install --no-save
       - run: npm run build
       - save_cache:
           key: angular-cli-{{ checksum "package-lock.json" }}
