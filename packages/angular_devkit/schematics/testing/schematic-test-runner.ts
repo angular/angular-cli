@@ -20,9 +20,6 @@ import {
 import { Observable } from 'rxjs/Observable';
 
 
-export interface SchematicSchemaT {}
-
-
 export class UnitTestTree extends DelegateTree {
   get files() {
     const result: string[] = [];
@@ -44,10 +41,7 @@ export class SchematicTestRunner {
     this._logger = new logging.Logger('test');
     this._registry = new schema.JsonSchemaRegistry();
 
-    this._engineHost.registerOptionsTransform((
-      schematicDescription: {},
-      opts: SchematicSchemaT,
-    ) => {
+    this._engineHost.registerOptionsTransform((schematicDescription: {}, opts: object) => {
       const schematic: FileSystemSchematicDesc = schematicDescription as FileSystemSchematicDesc;
 
       if (schematic.schema && schematic.schemaJson) {
@@ -68,7 +62,7 @@ export class SchematicTestRunner {
 
   get logger(): logging.Logger { return this._logger; }
 
-  runSchematicAsync(
+  runSchematicAsync<SchematicSchemaT>(
     schematicName: string,
     opts?: SchematicSchemaT,
     tree?: Tree,
@@ -80,7 +74,11 @@ export class SchematicTestRunner {
       .map(tree => new UnitTestTree(tree));
   }
 
-  runSchematic(schematicName: string, opts?: SchematicSchemaT, tree?: Tree): UnitTestTree {
+  runSchematic<SchematicSchemaT>(
+    schematicName: string,
+    opts?: SchematicSchemaT,
+    tree?: Tree,
+  ): UnitTestTree {
     const schematic = this._collection.createSchematic(schematicName);
 
     let result: UnitTestTree | null = null;
