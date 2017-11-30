@@ -7,13 +7,15 @@ matrix:
 
 install:
   - ps: Install-Product node $env:nodejs_version
-  - npm install -g npm@~5.3.0
+  - npm install -g npm@~5.6.0
   - npm install
 
 test_script:
   - node --version
   - npm --version
-  - node tests\run_e2e.js --appveyor
+  - npm run test:packages
+  - npm run test:cli
+  - node tests\run_e2e.js --appveyor "--glob=tests/{basic,commands,generate}/**"
 
 build: off
 

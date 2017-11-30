@@ -44,5 +44,9 @@ export default function () {
     // Should run side-by-side with `ng serve`
     .then(() => execAndWaitForOutputToMatch('ng', ['serve'],
       /webpack: Compiled successfully./))
-    .then(() => ng('e2e'));
+    .then(() => ng('e2e'))
+    .then(() => killAllProcesses(), (err: any) => {
+      killAllProcesses();
+      throw err;
+    });
 }
