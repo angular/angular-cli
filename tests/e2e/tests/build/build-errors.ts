@@ -1,6 +1,6 @@
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
-import { writeFile, appendToFile, readFile } from '../../utils/fs';
+import { writeFile, appendToFile, readFile, replaceInFile } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
 import { expectToFail } from '../../utils/utils';
 
@@ -62,11 +62,12 @@ export default function () {
       }
     })
     .then(() => writeFile('./src/app/app.component.ts', origContent))
-    // Check errors when files were not emitted.
-    .then(() => writeFile('./src/app/app.component.ts', ''))
+    // Check errors when files were not emitted due to static analysis errors.
+    .then(() => replaceInFile('./src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`))
     .then(() => expectToFail(() => ng('build', '--aot')))
     .then(({ message }) => {
-      if (!message.includes(`Unexpected value 'AppComponent`)) {
+      if (!message.includes('Function calls are not supported')
+        && !message.includes('Function expressions are not supported in decorators')) {
         throw new Error(`Expected static analysis error, got this instead:\n${message}`);
       }
       if (extraErrors.some((e) => message.includes(e))) {
