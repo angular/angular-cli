@@ -1,9 +1,15 @@
 import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
+import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
+  // Skip this test in Angular 2, it had different bundles.
+  if (getGlobalVariable('argv').ng2) {
+    return Promise.resolve();
+  }
+
   return Promise.resolve()
     .then(() => updateJsonFile('tsconfig.json', configJson => {
       const compilerOptions = configJson['compilerOptions'];

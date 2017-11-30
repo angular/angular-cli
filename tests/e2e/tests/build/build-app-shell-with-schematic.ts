@@ -2,6 +2,8 @@ import { ng, npm } from '../../utils/process';
 import { expectFileToMatch } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
 import { expectToFail } from '../../utils/utils';
+import { updateJsonFile } from '../../utils/project';
+import { readNgVersion } from '../../utils/version';
 
 
 export default function () {
@@ -15,8 +17,19 @@ export default function () {
     return Promise.resolve();
   }
 
+  let platformServerVersion = readNgVersion();
+
+  if (getGlobalVariable('argv').nightly) {
+    platformServerVersion = 'github:angular/platform-server-builds';
+  }
+
+
   return Promise.resolve()
     .then(() => ng('generate', 'appShell', 'name', '--universal-app', 'universal'))
+    .then(() => updateJsonFile('package.json', packageJson => {
+      const dependencies = packageJson['dependencies'];
+      dependencies['@angular/platform-server'] = platformServerVersion;
+    })
     .then(() => npm('install'))
     .then(() => ng('build', '--prod'))
     .then(() => expectFileToMatch('dist/index.html', /app-shell works!/))

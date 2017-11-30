@@ -37,13 +37,14 @@ export default function () {
     // Save the original contents of `./src/app/app.component.ts`.
     .then(() => readFile('./src/app/app.component.ts'))
     .then((contents) => origContent = contents)
-    // Add a major error on a non-main file to the initial build.
-    .then(() => writeFile('src/app/app.component.ts', ''))
+    // Add a major static analysis error on a non-main file to the initial build.
+    .then(() => replaceInFile('./src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`))
     // Should have an error.
     .then(() => execAndWaitForOutputToMatch('ng', ['serve', '--aot'], failedRe))
     .then((results) => {
       const stderr = results.stderr;
-      if (!stderr.includes(`Unexpected value 'AppComponent`)) {
+      if (!stderr.includes('Function calls are not supported')
+        && !stderr.includes('Function expressions are not supported in decorators')) {
         throw new Error(`Expected static analysis error, got this instead:\n${stderr}`);
       }
       if (extraErrors.some((e) => stderr.includes(e))) {
@@ -76,18 +77,19 @@ export default function () {
     // have an error message in 5s.
     .then(() => Promise.all([
       expectToFail(() => waitForAnyProcessOutputToMatch(errorRe, 5000)),
-      replaceInFile('src/app/app.component.ts', ']]]]]', '')
+      writeFile('src/app/app.component.ts', origContent)
     ]))
     .then(() => wait(2000))
-    // Add a major error on a rebuild.
+    // Add a major static analysis error on a rebuild.
     // Should fail the rebuild.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(failedRe, 20000),
-      writeFile('src/app/app.component.ts', '')
+      replaceInFile('./src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`)
     ]))
     .then((results) => {
       const stderr = results[0].stderr;
-      if (!stderr.includes(`Unexpected value 'AppComponent`)) {
+      if (!stderr.includes('Function calls are not supported')
+        && !stderr.includes('Function expressions are not supported in decorators')) {
         throw new Error(`Expected static analysis error, got this instead:\n${stderr}`);
       }
       if (extraErrors.some((e) => stderr.includes(e))) {
