@@ -1,5 +1,5 @@
 import { ng, npm } from '../../utils/process';
-import { expectFileToMatch } from '../../utils/fs';
+import { expectFileToMatch, appendToFile } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
 import { expectToFail } from '../../utils/utils';
 import { updateJsonFile } from '../../utils/project';
@@ -25,6 +25,10 @@ export default function () {
 
 
   return Promise.resolve()
+    .then(() => expectToFail(() => {
+      return ng('generate', 'appShell', 'name', '--universal-app', 'universal');
+    })
+    .then(() => appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>'))
     .then(() => ng('generate', 'appShell', 'name', '--universal-app', 'universal'))
     .then(() => updateJsonFile('package.json', packageJson => {
       const dependencies = packageJson['dependencies'];
