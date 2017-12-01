@@ -7,7 +7,6 @@ import {
 } from '../../utils/fs';
 import { copyProjectAsset } from '../../utils/assets';
 import { expectToFail } from '../../utils/utils';
-import { getGlobalVariable } from '../../utils/env';
 
 const imgSvg = `
   <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
@@ -16,11 +15,6 @@ const imgSvg = `
 `;
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   return Promise.resolve()
     // Verify absolute/relative paths in global/component css.
     .then(() => writeMultipleFiles({

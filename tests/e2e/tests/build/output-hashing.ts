@@ -1,7 +1,7 @@
 import {ng} from '../../utils/process';
 import { copyProjectAsset } from '../../utils/assets';
 import { writeMultipleFiles, expectFileToMatch, expectFileMatchToExist } from '../../utils/fs';
-import { getGlobalVariable } from '../../utils/env';
+
 
 function verifyMedia(css: RegExp, content: RegExp) {
   return expectFileMatchToExist('./dist', css)
@@ -9,11 +9,6 @@ function verifyMedia(css: RegExp, content: RegExp) {
 }
 
 export default function() {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/styles.css': 'body { background-image: url("./assets/image.png"); }'

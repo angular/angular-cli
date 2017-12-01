@@ -1,15 +1,9 @@
 import { ng } from '../../utils/process';
 import { writeFile } from '../../utils/fs';
 import { expectToFail } from '../../utils/utils';
-import { getGlobalVariable } from '../../utils/env';
 import { oneLine } from 'common-tags';
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   return Promise.resolve()
     .then(() => ng('set', 'lint.0.project', ''))
     .then(() => ng('lint', '--type-check'))

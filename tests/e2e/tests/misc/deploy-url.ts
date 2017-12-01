@@ -1,15 +1,9 @@
 import { killAllProcesses } from '../../utils/process';
 import { request } from '../../utils/http';
 import { ngServe, updateJsonFile } from '../../utils/project';
-import { getGlobalVariable } from '../../utils/env';
 import { writeMultipleFiles } from '../../utils/fs';
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/string-script.js': 'console.log(\'string-script\'); var number = 1+1;',

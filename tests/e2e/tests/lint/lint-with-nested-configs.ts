@@ -1,14 +1,9 @@
 import { createDir, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
-import { getGlobalVariable } from '../../utils/env';
+
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   const fileName = 'src/app/foo/foo.ts';
   const nestedConfigContent = `
   {

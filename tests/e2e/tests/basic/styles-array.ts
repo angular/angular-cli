@@ -1,9 +1,9 @@
 import {
   writeMultipleFiles,
   expectFileToMatch
-} from '../../../utils/fs';
-import { ng } from '../../../utils/process';
-import { updateJsonFile } from '../../../utils/project';
+} from '../../utils/fs';
+import { ng } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
 import { oneLineTrim } from 'common-tags';
 
 export default function () {
