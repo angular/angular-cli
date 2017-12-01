@@ -1,16 +1,10 @@
 import {ng} from '../../utils/process';
 import {expectFileToExist, moveFile} from '../../utils/fs';
-import {updateJsonFile} from '../../utils/project';
 import {getGlobalVariable} from '../../utils/env';
 import * as path from 'path';
 
 
 export default function() {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   const tmp = getGlobalVariable('tmp-root');
 
   return Promise.resolve()

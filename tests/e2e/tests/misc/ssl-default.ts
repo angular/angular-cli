@@ -1,15 +1,9 @@
 import { request } from '../../utils/http';
 import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
-import { getGlobalVariable } from '../../utils/env';
 
 
 export default function() {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   return Promise.resolve()
     .then(() => ngServe('--ssl', 'true'))
     .then(() => request('https://localhost:4200/'))

@@ -3,15 +3,9 @@ import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 import { updateJsonFile } from '../../utils/project';
 import { moveFile } from '../../utils/fs';
-import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   // should fallback to config.app[0].index (index.html by default)
   return Promise.resolve()
     .then(() => ngServe())

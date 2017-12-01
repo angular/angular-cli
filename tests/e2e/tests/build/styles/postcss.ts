@@ -1,15 +1,9 @@
 import * as glob from 'glob';
 import { writeFile, expectFileToMatch } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
-import { getGlobalVariable } from '../../../utils/env';
 import { stripIndents } from 'common-tags';
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   return writeFile('src/styles.css', stripIndents`
       /* normal-comment */
       /*! important-comment */

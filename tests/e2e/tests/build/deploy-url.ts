@@ -2,16 +2,9 @@ import { ng } from '../../utils/process';
 import { copyProjectAsset } from '../../utils/assets';
 import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
-import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
-
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/styles.css': 'div { background: url("./assets/more.png"); }',
