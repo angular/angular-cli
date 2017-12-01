@@ -101,9 +101,12 @@ export function findPureImports(parentNode: ts.Node): string[] {
     if (node.kind === ts.SyntaxKind.ImportDeclaration
       && (node as ts.ImportDeclaration).importClause) {
 
-      // Save the path of the import transformed into snake case
+      // Save the path of the import transformed into snake case and remove relative paths.
       const moduleSpecifier = (node as ts.ImportDeclaration).moduleSpecifier as ts.StringLiteral;
-      pureImports.push(moduleSpecifier.text.replace(/[\/@\-]/g, '_'));
+      const pureImport = moduleSpecifier.text
+        .replace(/[\/@\-]/g, '_')
+        .replace(/^\.+/, '');
+      pureImports.push(pureImport);
     }
 
     ts.forEachChild(node, cb);

@@ -19,7 +19,12 @@ export interface Insert {
 
 export function purifyReplacements(content: string) {
 
-  const pureImportMatches = getMatches(content, importCommentRegex, 1).join('|');
+  const pureImportMatches = getMatches(content, importCommentRegex, 1)
+    // Remove dots at the start of matches.
+    // Older versions of Purify added dots for relative imports.
+    .map(match => match.replace(/^\.+/, ''))
+    .join('|');
+
   if (!pureImportMatches) {
     return [];
   }

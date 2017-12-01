@@ -21,10 +21,12 @@ describe('prefix-functions', () => {
     it('adds import list', () => {
       const input = tags.stripIndent`
         import { Injectable } from '@angular/core';
+        import { Something } from './relative/pure_import';
         var foo = Injectable;
+        var bar = Something;
       `;
       const output = tags.stripIndent`
-        /** PURE_IMPORTS_START _angular_core PURE_IMPORTS_END */
+        /** PURE_IMPORTS_START _angular_core,_relative_pure_import PURE_IMPORTS_END */
         ${input}
       `;
 
