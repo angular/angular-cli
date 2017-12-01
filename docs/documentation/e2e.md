@@ -23,7 +23,7 @@ Please note that options that are supported by `ng serve` are also supported by 
     <code>--config</code> (aliases: <code>-c</code>)
   </p>
   <p>
-    Use a specific config file. Defaults to the protractor config file in `.angular-cli.json`.
+    Use a specific config file. Defaults to the protractor config file in <code>.angular-cli.json</code>.
   </p>
 </details>
 
@@ -33,7 +33,7 @@ Please note that options that are supported by `ng serve` are also supported by 
     <code>--element-explorer</code> (aliases: <code>-ee</code>) <em>default value: false</em>
   </p>
   <p>
-    Start Protractor's [Element Explorer](https://github.com/angular/protractor/blob/master/docs/debugging.md#testing-out-protractor-interactively) for debugging.
+    Start Protractor's <a href="https://github.com/angular/protractor/blob/master/docs/debugging.md#testing-out-protractor-interactively">Element Explorer</a> for debugging.
   </p>
 </details>
 
@@ -56,7 +56,7 @@ Please note that options that are supported by `ng serve` are also supported by 
     <code>--specs</code> (aliases: <code>-sp</code>) <em>default value: []</em>
   </p>
   <p>
-    Override specs in the protractor config. Can send in multiple specs by repeating flag (ng e2e --specs=spec1.ts --specs=spec2.ts).
+    Override specs in the protractor config. Can send in multiple specs by repeating flag (<code>ng e2e --specs=spec1.ts --specs=spec2.ts</code>).
   </p>
 </details>
 
