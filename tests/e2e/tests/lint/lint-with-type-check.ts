@@ -1,13 +1,8 @@
 import { ng } from '../../utils/process';
 import { writeFile } from '../../utils/fs';
-import { getGlobalVariable } from '../../utils/env';
+
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   const fileName = 'src/app/foo.ts';
   const fileContents = `
 const ANIMATION_CSS_VALUE_REGEX = 'asda';

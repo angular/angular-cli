@@ -2,14 +2,9 @@ import { request } from '../../utils/http';
 import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 import { updateJsonFile } from '../../utils/project';
-import { getGlobalVariable } from '../../utils/env';
+
 
 export default function() {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   return Promise.resolve()
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson.defaults;

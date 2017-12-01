@@ -14,11 +14,6 @@ import { readNgVersion } from '../../utils/version';
 import { expectToFail } from '../../utils/utils';
 
 export default function () {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
   // Skip this for ejected tests.
   if (getGlobalVariable('argv').eject) {
     return Promise.resolve();

@@ -2,7 +2,6 @@ import * as fs from 'fs';
 
 import {ng} from '../../utils/process';
 import {writeFile, prependToFile, replaceInFile} from '../../utils/fs';
-import {getGlobalVariable} from '../../utils/env';
 
 const OUTPUT_RE = /(main|polyfills|vendor|inline|styles|\d+)\.[a-z0-9]+\.(chunk|bundle)\.(js|css)$/;
 
@@ -43,12 +42,6 @@ function validateHashes(
 }
 
 export default function() {
-  // Skip this in Appveyor tests.
-  if (getGlobalVariable('argv').appveyor) {
-    return Promise.resolve();
-  }
-
-
   let oldHashes: Map<string, string>;
   let newHashes: Map<string, string>;
   // First, collect the hashes.
