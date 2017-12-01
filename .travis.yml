@@ -10,6 +10,13 @@ cache:
   directories:
      - ./node_modules
 
+stages:
+  - build
+  - test
+  - name: optional
+    if: (NOT type IN (pull_request)) AND (branch = master)
+  - deploy
+
 matrix:
   fast_finish: true
   allow_failures:
@@ -18,12 +25,14 @@ matrix:
     - node_js: "7"
     - node_js: "8"
   include:
+    # Build stage
     - stage: build
       script: npm run lint
       env: lint
     - script: npm run build
       env: build
 
+    # Test stage
     - stage: test
       script: npm run test
       env: test
@@ -48,33 +57,30 @@ matrix:
       script: node tests/run_e2e.js --eject "--glob=tests/build/**"
       env: eject
 
-    # Optional builds.
-    - node_js: "6"
+    # Optional stage.
+    - stage: optional
+      node_js: "6"
       os: linux
-      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js --ng2 "--glob=tests/build/**"
       env: ng2
     - node_js: "6"
       os: linux
-      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js --ng4 "--glob=tests/build/**"
       env: ng4
     - node_js: "6"
       os: linux
-      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js --nightly "--glob=tests/build/**"
       env: nightly
     - node_js: "7"
       os: linux
-      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js "--glob=tests/build/**"
       env: node7
     - node_js: "8"
       os: linux
-      before_script: if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
       script: node tests/run_e2e.js "--glob=tests/build/**"
       env: node8
 
+    # Deploy stage
     - stage: deploy
       script: skip
       env: builds
@@ -84,8 +90,7 @@ matrix:
         skip_cleanup: true
         on:
           all_branches: true
-    - stage: deploy
-      script: skip
+    - script: skip
       env: publish
       deploy:
       - provider: script
