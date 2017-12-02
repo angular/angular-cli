@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
 
-export const NEW_SW_VERSION = '>= 5.0.0-rc.0';
+export const NEW_SW_VERSION = '5.0.0-rc.0';
 
 class CliFilesystem implements Filesystem {
   constructor(private base: string) {}
@@ -58,7 +58,7 @@ export function usesServiceWorker(projectRoot: string): boolean {
   const swPackageJson = fs.readFileSync(`${swModule}/package.json`).toString();
   const swVersion = JSON.parse(swPackageJson)['version'];
 
-  return semver.satisfies(swVersion, NEW_SW_VERSION);
+  return semver.gte(swVersion, NEW_SW_VERSION);
 }
 
 export function augmentAppWithServiceWorker(projectRoot: string, appRoot: string,
