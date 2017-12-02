@@ -47,7 +47,7 @@ export function getProdConfig(wco: WebpackConfigOptions) {
     const swVersion = JSON.parse(swPackageJson)['version'];
 
     const isLegacySw = semver.satisfies(swVersion, OLD_SW_VERSION);
-    const isModernSw = semver.satisfies(swVersion, NEW_SW_VERSION);
+    const isModernSw = semver.gte(swVersion, NEW_SW_VERSION);
 
     if (!isLegacySw && !isModernSw) {
       throw new Error(stripIndent`
