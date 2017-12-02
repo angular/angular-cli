@@ -207,6 +207,13 @@ export const baseBuildCommandOptions: any = [
     type: Boolean,
     description: 'Flag to prevent building an app shell',
     default: false
+  },
+  {
+    name: 'cache',
+    type: Boolean,
+    description: '(Experimenta) Use cache between builds.',
+    // TODO: Change this to false before merging.
+    default: true
   }
 ];
 

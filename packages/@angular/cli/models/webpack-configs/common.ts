@@ -11,6 +11,7 @@ import { WebpackConfigOptions } from '../webpack-config';
 const ConcatPlugin = require('webpack-concat-plugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const SilentError = require('silent-error');
 
 /**
@@ -172,6 +173,13 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   if (buildOptions.namedChunks) {
     extraPlugins.push(new NamedLazyChunksWebpackPlugin());
+  }
+
+  if (buildOptions.cache) {
+    extraPlugins.push(new HardSourceWebpackPlugin({
+      cacheDirectory: path.resolve(nodeModules, '.cache/hard-source/[confighash]'),
+      recordsPath: path.resolve(nodeModules, '.cache/hard-source/[confighash]/records.json'),
+    }));
   }
 
   // Load rxjs path aliases.

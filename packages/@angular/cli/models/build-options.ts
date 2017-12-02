@@ -33,4 +33,5 @@ export interface BuildOptions {
   forceTsCommonjs?: boolean;
   serviceWorker?: boolean;
   skipAppShell?: boolean;
+  cache?: boolean;
 }
