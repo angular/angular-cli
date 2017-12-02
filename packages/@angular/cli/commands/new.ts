@@ -6,8 +6,12 @@ import { CliConfig } from '../models/config';
 import { validateProjectName } from '../utilities/validate-project-name';
 import { oneLine } from 'common-tags';
 import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
+import {
+  getCollectionNameForSchematicName,
+  getCollectionNames
+} from '../utilities/schematics';
 
-const { cyan } = chalk;
+const { cyan, yellow } = chalk;
 
 const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
@@ -70,8 +74,9 @@ const NewCommand = Command.extend({
     return CliConfig.fromProject(projectPath) !== null;
   },
 
-  getCollectionName(rawArgs: string[]) {
-    let collectionName = CliConfig.fromGlobal().get('defaults.schematics.collection');
+  getCollectionName(schematicName: string, rawArgs: string[]) {
+    let collectionName = getCollectionNameForSchematicName(
+      getCollectionNames(), schematicName);
     if (rawArgs) {
       const parsedArgs = this.parseArgs(rawArgs, false);
       if (parsedArgs.options.collection) {
@@ -88,6 +93,7 @@ const NewCommand = Command.extend({
     }
 
     const schematicName = CliConfig.getValue('defaults.schematics.newApp');
+    const collectionName = this.getCollectionName(schematicName, rawArgs);
 
     if (/^\d/.test(rawArgs[1])) {
       SilentError.debugOrThrow('@angular/cli/commands/generate',
@@ -103,7 +109,7 @@ const NewCommand = Command.extend({
 
     return getOptionsTask.run({
       schematicName,
-      collectionName: this.getCollectionName(rawArgs)
+      collectionName
     })
       .then((availableOptions: SchematicAvailableOptions) => {
         this.registerOptions({
@@ -137,10 +143,11 @@ const NewCommand = Command.extend({
       `);
     }
 
+    commandOptions.schematicName = CliConfig.fromGlobal().get('defaults.schematics.newApp');
     if (commandOptions.collection) {
       commandOptions.collectionName = commandOptions.collection;
     } else {
-      commandOptions.collectionName = this.getCollectionName(rawArgs);
+      commandOptions.collectionName = this.getCollectionName(commandOptions.schematicName, rawArgs);
     }
 
     const InitTask = require('../tasks/init').default;
@@ -158,8 +165,8 @@ const NewCommand = Command.extend({
   },
 
   printDetailedHelp: function (): string | Promise<string> {
-    const collectionName = this.getCollectionName();
     const schematicName = CliConfig.getValue('defaults.schematics.newApp');
+    const collectionName = this.getCollectionName(schematicName);
     const SchematicGetHelpOutputTask = require('../tasks/schematic-get-help-output').default;
     const getHelpOutputTask = new SchematicGetHelpOutputTask({
       ui: this.ui,
@@ -172,6 +179,7 @@ const NewCommand = Command.extend({
     })
     .then((output: string[]) => {
       const outputLines = [
+        yellow(collectionName),
         cyan(`ng new ${cyan('[name]')} ${cyan('<options...>')}`),
         ...output
       ];

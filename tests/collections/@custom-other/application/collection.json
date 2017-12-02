@@ -1,0 +1,11 @@
+{
+  "name": "@custom-other/application",
+  "version": "0.1",
+  "schematics": {
+    "application": {
+      "factory": "./index.js",
+      "schema": "./schema.json",
+      "description": "Create an very empty application"
+    }
+  }
+}

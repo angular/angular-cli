@@ -565,9 +565,17 @@
           "type": "object",
           "properties": {
             "collection": {
-              "description": "The schematics collection to use.",
+              "description": "The base schematics collection to use.",
               "type": "string",
               "default": "@schematics/angular"
+            },
+            "collections": {
+              "description": "The additional schematics collections to use.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": []
             },
             "newApp": {
               "description": "The new app schematic.",

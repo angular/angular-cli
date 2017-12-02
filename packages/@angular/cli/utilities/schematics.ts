@@ -20,6 +20,7 @@ import { SchemaClassFactory } from '@ngtools/json-schema';
 import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/map';
 
+import { CliConfig } from '../models/config';
 const SilentError = require('silent-error');
 
 const engineHost = new NodeModulesEngineHost();
@@ -60,4 +61,26 @@ export function getCollection(collectionName: string): Collection<any, any> {
 export function getSchematic(collection: Collection<any, any>,
                              schematicName: string): Schematic<any, any> {
   return collection.createSchematic(schematicName);
+}
+
+export function getCollectionNames() {
+  const collectionNames = [CliConfig.getValue('defaults.schematics.collection')];
+  const additionalCollections = CliConfig.getValue('defaults.schematics.collections');
+  if (additionalCollections && additionalCollections.length) {
+    collectionNames.unshift(...additionalCollections);
+  }
+  return collectionNames;
+}
+
+export function getCollectionNameForSchematicName(collectionNames: string[],
+                                                  schematicName: string): string {
+  return collectionNames.filter((collectionName: string) => {
+    let schematic;
+    try {
+      schematic = getSchematic(getCollection(collectionName), schematicName);
+    } catch (e) {
+      // it's OK, schematic doesn't exists in collection
+    }
+    return !!schematic;
+  })[0];
 }

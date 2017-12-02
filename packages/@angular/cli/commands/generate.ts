@@ -7,6 +7,8 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/ignoreElements';
 import {
   getCollection,
+  getCollectionNameForSchematicName,
+  getCollectionNames,
   getEngineHost
 } from '../utilities/schematics';
 import { DynamicPathOptions, dynamicPathParser } from '../utilities/dynamic-path-parser';
@@ -17,7 +19,7 @@ import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 
-const { cyan, yellow } = chalk;
+const { cyan, yellow, white } = chalk;
 const separatorRegEx = /[\/\\]/g;
 
 
@@ -65,8 +67,10 @@ export default Command.extend({
     '<schematic>'
   ],
 
-  getCollectionName(rawArgs: string[]) {
-    let collectionName = CliConfig.getValue('defaults.schematics.collection');
+  getCollectionName(schematicName: string, rawArgs: string[]) {
+    let collectionName = getCollectionNameForSchematicName(
+      getCollectionNames(), schematicName);
+
     if (rawArgs) {
       const parsedArgs = this.parseArgs(rawArgs, false);
       if (parsedArgs.options.collection) {
@@ -103,7 +107,7 @@ export default Command.extend({
       ui: this.ui,
       project: this.project
     });
-    const collectionName = this.getCollectionName(rawArgs);
+    const collectionName = this.getCollectionName(schematicName, rawArgs);
 
     return getOptionsTask.run({
         schematicName,
@@ -172,7 +176,7 @@ export default Command.extend({
       project: this.project
     });
     const collectionName = commandOptions.collection ||
-      CliConfig.getValue('defaults.schematics.collection');
+      this.getCollectionName(schematicName);
 
     if (collectionName === '@schematics/angular' && schematicName === 'interface' && rawArgs[2]) {
       commandOptions.type = rawArgs[2];
@@ -188,10 +192,9 @@ export default Command.extend({
 
   printDetailedHelp: function (_options: any, rawArgs: any): string | Promise<string> {
     const engineHost = getEngineHost();
-    const collectionName = this.getCollectionName();
-    const collection = getCollection(collectionName);
     const schematicName = rawArgs[1];
     if (schematicName) {
+      const collectionName = this.getCollectionName(schematicName);
       const SchematicGetHelpOutputTask = require('../tasks/schematic-get-help-output').default;
       const getHelpOutputTask = new SchematicGetHelpOutputTask({
         ui: this.ui,
@@ -204,16 +207,22 @@ export default Command.extend({
       })
       .then((output: string[]) => {
         return [
+          yellow(collectionName),
           cyan(`ng generate ${schematicName} ${cyan('[name]')} ${cyan('<options...>')}`),
           ...output
         ].join('\n');
       });
     } else {
-      const schematicNames: string[] = engineHost.listSchematics(collection);
       const output: string[] = [];
-      output.push(cyan('Available schematics:'));
-      schematicNames.forEach(schematicName => {
-        output.push(yellow(`    ${schematicName}`));
+      output.push(cyan('Available collections & schematics:'));
+      const collections = getCollectionNames()
+        .map((collectionName: string) => getCollection(collectionName));
+      collections.forEach((collection: any) => {
+        output.push(yellow(`\n${collection.name}`));
+        const schematicNames: string[] = engineHost.listSchematics(collection);
+        schematicNames.forEach(schematicName => {
+          output.push(white(`    ${schematicName}`));
+        });
       });
       return Promise.resolve(output.join('\n'));
     }

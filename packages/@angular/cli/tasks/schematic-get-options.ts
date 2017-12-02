@@ -1,6 +1,5 @@
 const Task = require('../ember-cli/lib/models/task');
 const stringUtils = require('ember-cli-string-utils');
-import { CliConfig } from '../models/config';
 import { getCollection, getSchematic } from '../utilities/schematics';
 
 export interface SchematicGetOptions {
@@ -19,10 +18,7 @@ export interface SchematicAvailableOptions {
 
 export default Task.extend({
   run: function (options: SchematicGetOptions): Promise<SchematicAvailableOptions[]> {
-    const collectionName = options.collectionName ||
-      CliConfig.getValue('defaults.schematics.collection');
-
-    const collection = getCollection(collectionName);
+    const collection = getCollection(options.collectionName);
 
     const schematic = getSchematic(collection, options.schematicName);
 
