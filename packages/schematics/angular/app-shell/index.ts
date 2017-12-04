@@ -66,6 +66,16 @@ function getServerModulePath(host: Tree, app: AppConfig): string | null {
 
 function addUniversalApp(options: AppShellOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
+    const config = getConfig(host);
+    const appConfig = getAppFromConfig(config, options.universalApp);
+
+    if (appConfig && appConfig.platform === 'server') {
+      return host;
+    } else if (appConfig && appConfig.platform !== 'server') {
+      throw new SchematicsException(
+        `Invalid platform for universal app (${options.universalApp}), value must be "server".`);
+    }
+
     // Copy options.
     const universalOptions = {
       ...options,

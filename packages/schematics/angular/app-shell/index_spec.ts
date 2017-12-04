@@ -50,6 +50,23 @@ describe('App Shell Schematic', () => {
     expect(file).toBeDefined();
   });
 
+  it('should use an existing universal app', () => {
+    const universalOptions = {
+      name: defaultOptions.universalApp,
+    };
+
+    let tree: Tree = schematicRunner.runSchematic('universal', universalOptions, appTree);
+    const filePath = '/.angular-cli.json';
+    let content = tree.read(filePath) || new Buffer('');
+    let config = JSON.parse(content.toString());
+    const appCount = config.apps.length;
+
+    tree = schematicRunner.runSchematic('appShell', defaultOptions, tree);
+    content = tree.read(filePath) || new Buffer('');
+    config = JSON.parse(content.toString());
+    expect(config.apps.length).toBe(appCount);
+  });
+
   it('should add app shell configuration', () => {
     const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
     const filePath = '/.angular-cli.json';
