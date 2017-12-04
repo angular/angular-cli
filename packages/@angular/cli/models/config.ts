@@ -9,7 +9,7 @@ import { homedir } from 'os';
 import {findUp} from '../utilities/find-up';
 
 
-export const CLI_CONFIG_FILE_NAME = '.angular-cli.json';
+export const CLI_CONFIG_FILE_NAME = '.angular.json';
 const CLI_CONFIG_FILE_NAME_ALT = 'angular-cli.json';
 
 

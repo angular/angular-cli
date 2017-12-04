@@ -74,12 +74,13 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
   }
 
   public getTargetConfig(webpackConfigOptions: WebpackConfigOptions<T>): any {
-    switch (webpackConfigOptions.buildOptions.target) {
-      case 'development':
-        return getDevConfig(webpackConfigOptions);
-      case 'production':
-        return getProdConfig(webpackConfigOptions);
-    }
+    // switch (webpackConfigOptions.buildOptions.target) {
+    //   case 'development':
+    // Always return dev config since we're using target for something else now.
+    return getDevConfig(webpackConfigOptions);
+    //   case 'production':
+    //     return getProdConfig(webpackConfigOptions);
+    // }
   }
 
   // Validate build options

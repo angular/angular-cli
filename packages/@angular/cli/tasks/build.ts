@@ -18,7 +18,8 @@ export default Task.extend({
   run: function (runTaskOptions: BuildTaskOptions) {
     const config = CliConfig.fromProject().config;
 
-    const app = getAppFromConfig(runTaskOptions.app);
+    const app = getAppFromConfig(runTaskOptions.app, runTaskOptions.target,
+      runTaskOptions.configuration);
 
     const outputPath = runTaskOptions.outputPath || app.outDir;
     if (this.project.root === path.resolve(outputPath)) {

@@ -7,6 +7,10 @@
     "$schema": {
       "type": "string"
     },
+    "projects": {
+      "type": "object",
+      "additionalProperties": true
+    },
     "project": {
       "description": "The global configuration of the project.",
       "type": "object",

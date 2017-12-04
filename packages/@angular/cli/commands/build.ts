@@ -20,8 +20,6 @@ export const baseBuildCommandOptions: any = [
   {
     name: 'target',
     type: String,
-    default: 'development',
-    aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }],
     description: 'Defines the build target.'
   },
   {
@@ -207,6 +205,11 @@ export const baseBuildCommandOptions: any = [
     type: Boolean,
     description: 'Flag to prevent building an app shell',
     default: false
+  },
+  {
+    name: 'configuration',
+    type: String,
+    description: 'Configuration',
   }
 ];
 
