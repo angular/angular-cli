@@ -12,6 +12,7 @@ import {
   FileVisitor,
   MergeStrategy,
   Tree,
+  TreeSymbol,
   UpdateRecorder,
 } from './interface';
 
@@ -48,4 +49,8 @@ export class DelegateTree implements Tree {
     return this._other.apply(action, strategy);
   }
   get actions(): Action[] { return this._other.actions; }
+
+  [TreeSymbol]() {
+    return this;
+  }
 }
