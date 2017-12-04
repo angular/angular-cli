@@ -94,7 +94,7 @@
     "typescript": "~2.4.2",
     "uglifyjs-webpack-plugin": "~1.1.2",
     "url-loader": "^0.6.2",
-    "webpack": "~3.9.1",
+    "webpack": "~3.10.0",
     "webpack-concat-plugin": "^1.4.2",
     "webpack-dev-middleware": "~1.12.0",
     "webpack-dev-server": "~2.9.3",
