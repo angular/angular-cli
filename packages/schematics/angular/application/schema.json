@@ -12,7 +12,7 @@
     "path": {
       "type": "string",
       "description": "The path of the application.",
-      "default": "src",
+      "default": "app",
       "visible": false
     },
     "sourceDir": {

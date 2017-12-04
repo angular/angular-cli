@@ -19,7 +19,6 @@ describe('Application Schematic', () => {
   const defaultOptions: ApplicationOptions = {
     directory: 'foo',
     name: 'foo',
-    path: 'src',
     prefix: '',
     sourceDir: 'src',
     inlineStyle: false,
@@ -78,6 +77,7 @@ describe('Application Schematic', () => {
       // tslint:disable-next-line:non-null-operator
       const files = tree !.files;
       expect(files.indexOf('/foo/some/custom/path/app/app.module.ts')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/foo/some/custom/path/tsconfig.app.json')).toBeGreaterThanOrEqual(0);
     }
   });
 

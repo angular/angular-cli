@@ -26,7 +26,6 @@ describe('App Shell Schematic', () => {
   const appOptions: ApplicationOptions = {
     directory: '',
     name: 'app',
-    path: 'src',
     prefix: '',
     sourceDir: 'src',
     inlineStyle: false,
