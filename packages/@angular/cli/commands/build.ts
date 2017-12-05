@@ -239,6 +239,11 @@ const BuildCommand = Command.extend({
       commandOptions.forceTsCommonjs = true;
     }
 
+    // Add trailing slash if missing to prevent https://github.com/angular/angular-cli/issues/7295
+    if (commandOptions.deployUrl && commandOptions.deployUrl.substr(-1) !== '/') {
+      commandOptions.deployUrl += '/';
+    }
+
     const BuildTask = require('../tasks/build').default;
 
     const buildTask = new BuildTask({
