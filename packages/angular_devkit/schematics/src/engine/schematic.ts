@@ -9,6 +9,7 @@ import { BaseException } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/concatMap';
+import { callRule } from '../rules/call';
 import { Tree } from '../tree/interface';
 import {
   Collection,
@@ -48,18 +49,8 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
     parentContext?: Partial<TypedSchematicContext<CollectionT, SchematicT>>,
   ): Observable<Tree> {
     const context = this._engine.createContext(this, parentContext);
+    const transformedOptions = this._engine.transformOptions(this, options);
 
-    return host.concatMap(tree => {
-      const transformedOptions = this._engine.transformOptions(this, options);
-
-      const result = this._factory(transformedOptions)(tree, context);
-      if (result instanceof Observable) {
-        return result;
-      } else if (result === undefined) {
-        return Observable.of(tree);
-      } else {
-        return Observable.of(result);
-      }
-    });
+    return callRule(this._factory(transformedOptions), host, context);
   }
 }
