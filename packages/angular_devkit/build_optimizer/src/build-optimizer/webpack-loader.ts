@@ -21,12 +21,15 @@ export default function buildOptimizerLoader
   this.cacheable();
   const options: BuildOptimizerLoaderOptions = loaderUtils.getOptions(this) || {};
 
+  // Make up names of the intermediate files so we can chain the sourcemaps.
+  const inputFilePath = this.resourcePath + '.pre-build-optimizer.js';
+  const outputFilePath = this.resourcePath + '.post-build-optimizer.js';
+
   const boOutput = buildOptimizer({
     content,
-    inputFilePath: this.resourcePath,
-    // Add a name to the build optimizer output.
-    // Without a name the sourcemaps cannot be properly chained.
-    outputFilePath: this.resourcePath + '.build-optimizer.js',
+    originalFilePath: this.resourcePath,
+    inputFilePath,
+    outputFilePath,
     emitSourceMap: options.sourceMap,
   });
 
@@ -53,10 +56,10 @@ export default function buildOptimizerLoader
       // source map chaining example.
       // Use http://sokra.github.io/source-map-visualization/ to validate sourcemaps make sense.
 
-      // Fill in the intermediate sourcemap sources as the previous sourcemap sources.
-      if (previousSourceMap.sources) {
-        intermediateSourceMap.sources = previousSourceMap.sources;
-      }
+      // Force the previous sourcemap to use the filename we made up for it.
+      // In order for source maps to be chained, the consumed source map `file` needs to be in the
+      // consumers source map `sources` array.
+      previousSourceMap.file = inputFilePath;
 
       // Chain the sourcemaps.
       const consumer = new SourceMapConsumer(intermediateSourceMap);

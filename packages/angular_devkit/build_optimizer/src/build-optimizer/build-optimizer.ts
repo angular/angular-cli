@@ -62,6 +62,7 @@ function isKnownSideEffectFree(filePath: string) {
 
 export interface BuildOptimizerOptions {
   content?: string;
+  originalFilePath?: string;
   inputFilePath?: string;
   outputFilePath?: string;
   emitSourceMap?: boolean;
@@ -72,7 +73,11 @@ export interface BuildOptimizerOptions {
 export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascriptOutput {
 
   const { inputFilePath } = options;
-  let { content } = options;
+  let { originalFilePath, content } = options;
+
+  if (!originalFilePath && inputFilePath) {
+    originalFilePath = inputFilePath;
+  }
 
   if (!inputFilePath && content === undefined) {
     throw new Error('Either filePath or content must be specified in options.');
@@ -97,7 +102,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.push(getPrefixClassesTransformer);
   }
 
-  if (options.isSideEffectFree || inputFilePath && isKnownSideEffectFree(inputFilePath)) {
+  if (options.isSideEffectFree || originalFilePath && isKnownSideEffectFree(originalFilePath)) {
     getTransforms.push(
       // getPrefixFunctionsTransformer is rather dangerous, apply only to known pure es5 modules.
       // It will mark both `require()` calls and `console.log(stuff)` as pure.
