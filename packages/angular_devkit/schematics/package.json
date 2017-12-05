@@ -21,6 +21,7 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "@ngtools/json-schema": "^1.1.0",
+    "@schematics/schematics": "0.0.0",
     "minimist": "^1.2.0",
     "rxjs": "^5.5.2"
   }
