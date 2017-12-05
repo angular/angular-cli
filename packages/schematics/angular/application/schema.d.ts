@@ -36,10 +36,6 @@ export interface Schema {
      */
     viewEncapsulation?: ('Emulated' | 'Native' | 'None');
     /**
-     * Specifies the change detection strategy.
-     */
-    changeDetection?: ('Default' | 'OnPush');
-    /**
      * The version of the Angular CLI to use.
      */
     version?: string;

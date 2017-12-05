@@ -43,12 +43,6 @@
       "enum": ["Emulated", "Native", "None"],
       "type": "string"
     },
-    "changeDetection": {
-      "description": "Specifies the change detection strategy.",
-      "enum": ["Default", "OnPush"],
-      "type": "string",
-      "default": "Default"
-    },
     "version": {
       "type": "string",
       "description": "The version of the Angular CLI to use.",

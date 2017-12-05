@@ -25,7 +25,6 @@ describe('Application Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     viewEncapsulation: 'Emulated',
-    changeDetection: 'Default',
     version: '1.2.3',
     routing: false,
     style: 'css',

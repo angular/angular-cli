@@ -33,7 +33,6 @@ describe('Universal Schematic', () => {
       inlineStyle: false,
       inlineTemplate: false,
       viewEncapsulation: 'None',
-      changeDetection: 'Default',
       version: '1.2.3',
       routing: false,
       style: 'css',
