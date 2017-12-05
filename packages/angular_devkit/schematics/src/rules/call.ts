@@ -81,8 +81,6 @@ export function callRule(rule: Rule,
       return Observable.of(result as Tree);
     } else if (Symbol.observable in result) {
       return result as Observable<Tree>;
-    } else if (result === undefined) {
-      return Observable.of(inputTree);
     } else {
       throw new InvalidRuleResultException(result);
     }
