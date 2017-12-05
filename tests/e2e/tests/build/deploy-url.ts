@@ -2,6 +2,7 @@ import { ng } from '../../utils/process';
 import { copyProjectAsset } from '../../utils/assets';
 import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
+import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
@@ -27,5 +28,13 @@ export default function () {
     // verify --deploy-url is applied to non-extracted css urls
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css=false'))
     .then(() => expectFileToMatch('dist/styles.bundle.js',
-      /__webpack_require__.p \+ \"more\.[0-9a-f]{20}\.png\"/));
+      /__webpack_require__.p \+ \"more\.[0-9a-f]{20}\.png\"/))
+    .then(() => expectFileToMatch('dist/inline.bundle.js',
+      /__webpack_require__\.p = "deployUrl\/";/))
+    // verify slash is appended to the end of --deploy-url if missing
+    .then(() => ng('build', '--deploy-url=deployUrl', '--extract-css=false'))
+    // skip this in ejected tests
+    .then(() => getGlobalVariable('argv').eject
+      ? Promise.resolve()
+      : expectFileToMatch('dist/inline.bundle.js', /__webpack_require__\.p = "deployUrl\/";/));
 }
