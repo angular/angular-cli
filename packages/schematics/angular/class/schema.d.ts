@@ -7,10 +7,22 @@
  */
 
 export interface Schema {
+    /**
+     * The name of the class.
+     */
     name: string;
-    appRoot?: string;
+    /**
+     * The path to create the class.
+     */
     path?: string;
+    /**
+     * The path of the source directory.
+     */
     sourceDir?: string;
+    /**
+     * The root of the application.
+     */
+    appRoot?: string;
     /**
      * Specifies if a spec file is generated.
      */

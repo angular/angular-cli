@@ -5,18 +5,25 @@
   "type": "object",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "description": "The name of the pipe."
     },
     "path": {
       "type": "string",
-      "default": "app"
-    },
-    "appRoot": {
-      "type": "string"
+      "description": "The path to create the pipe.",
+      "default": "app",
+      "visible": false
     },
     "sourceDir": {
       "type": "string",
-      "default": "src"
+      "description": "The path of the source directory.",
+      "default": "src",
+      "visible": false
+    },
+    "appRoot": {
+      "type": "string",
+      "description": "The root of the application.",
+      "visible": false
     },
     "flat": {
       "type": "boolean",

@@ -24,7 +24,6 @@ describe('Component Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     changeDetection: 'Default',
-    routing: false,
     styleext: 'css',
     spec: true,
     module: undefined,

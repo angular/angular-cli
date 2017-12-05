@@ -80,6 +80,7 @@
     },
     "sourceDir": {
       "type": "string",
+      "description": "The path of the source directory.",
       "default": "src",
       "alias": "sd"
     }

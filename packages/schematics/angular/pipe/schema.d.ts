@@ -7,10 +7,22 @@
  */
 
 export interface Schema {
+    /**
+     * The name of the pipe.
+     */
     name: string;
+    /**
+     * The path to create the pipe.
+     */
     path?: string;
-    appRoot?: string;
+    /**
+     * The path of the source directory.
+     */
     sourceDir?: string;
+    /**
+     * The root of the application.
+     */
+    appRoot?: string;
     /**
      * Flag to indicate if a dir is created.
      */

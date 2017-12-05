@@ -7,10 +7,22 @@
  */
 
 export interface Schema {
+    /**
+     * The name of the service.
+     */
     name: string;
+    /**
+     * The path to create the service.
+     */
     path?: string;
-    appRoot?: string;
+    /**
+     * The path of the source directory.
+     */
     sourceDir?: string;
+    /**
+     * The root of the application.
+     */
+    appRoot?: string;
     /**
      * Flag to indicate if a dir is created.
      */
@@ -20,7 +32,7 @@ export interface Schema {
      */
     spec?: boolean;
     /**
-     * Allows specification of the declaring module.
+     * Allows specification of the providing module.
      */
     module?: string;
 }

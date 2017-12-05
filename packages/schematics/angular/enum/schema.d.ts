@@ -7,8 +7,20 @@
  */
 
 export interface Schema {
+    /**
+     * The name of the enum.
+     */
     name: string;
+    /**
+     * The path to create the enum.
+     */
     path?: string;
-    appRoot?: string;
+    /**
+     * The path of the source directory.
+     */
     sourceDir?: string;
+    /**
+     * The root of the application.
+     */
+    appRoot?: string;
 }

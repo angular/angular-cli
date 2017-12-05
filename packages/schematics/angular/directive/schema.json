@@ -1,18 +1,23 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularClass",
-  "title": "Angular Class Options Schema",
+  "id": "SchematicsAngularDirective",
+  "title": "Angular Directive Options Schema",
   "type": "object",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "description": "The name of the directive."
     },
     "path": {
       "type": "string",
-      "default": "app"
+      "description": "The path to create the directive.",
+      "default": "app",
+      "visible": false
     },
     "appRoot": {
-      "type": "string"
+      "type": "string",
+      "description": "The root of the application.",
+      "visible": false
     },
     "prefix": {
       "type": "string",
@@ -22,7 +27,9 @@
     },
     "sourceDir": {
       "type": "string",
-      "default": "src"
+      "description": "The path of the source directory.",
+      "default": "src",
+      "visible": false
     },
     "spec": {
       "type": "boolean",
@@ -31,10 +38,12 @@
     },
     "skipImport": {
       "type": "boolean",
+      "description": "Flag to skip the module import.",
       "default": false
     },
     "selector": {
-      "type": "string"
+      "type": "string",
+      "description": "The selector to use for the directive."
     },
     "flat": {
       "type": "boolean",

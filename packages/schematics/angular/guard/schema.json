@@ -5,14 +5,17 @@
   "type": "object",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "description": "The name of the guard."
     },
     "spec": {
       "type": "boolean",
+      "description": "Specifies if a spec file is generated.",
       "default": true
     },
     "flat": {
       "type": "boolean",
+      "description": "Flag to indicate if a dir is created.",
       "default": true
     },
     "module":  {
@@ -23,14 +26,20 @@
     },
     "path": {
       "type": "string",
-      "default": "app"
-    },
-    "appRoot": {
-      "type": "string"
+      "description": "The path to create the guard.",
+      "default": "app",
+      "visible": false
     },
     "sourceDir": {
       "type": "string",
-      "default": "src"
+      "description": "The path of the source directory.",
+      "default": "src",
+      "visible": false
+    },
+    "appRoot": {
+      "type": "string",
+      "description": "The root of the application.",
+      "visible": false
     }
   },
   "required": [

@@ -11,14 +11,19 @@
     },
     "path": {
       "type": "string",
-      "default": "src"
+      "description": "The path of the application.",
+      "default": "src",
+      "visible": false
     },
     "sourceDir": {
       "type": "string",
+      "description": "The path of the source directory.",
       "default": "src",
-      "alias": "sd"
+      "alias": "sd",
+      "visible": false
     },
     "name": {
+      "description": "The name of the application.",
       "type": "string"
     },
     "inlineStyle": {
@@ -45,10 +50,13 @@
       "default": "Default"
     },
     "version": {
-      "type": "string"
+      "type": "string",
+      "description": "The version of the Angular CLI to use.",
+      "visible": false
     },
     "routing": {
       "type": "boolean",
+      "description": "Generates a routing module.",
       "default": false
     },
     "prefix": {
@@ -75,12 +83,12 @@
       "alias": "sg"
     },
     "minimal": {
-      "description": "Should create a minimal app.",
+      "description": "Create a minimal app (no test structure, inline styles/templates).",
       "type": "boolean",
       "default": false
     },
     "serviceWorker": {
-      "description": "Should install the @angular/service-worker.",
+      "description": "Installs the @angular/service-worker.",
       "type": "boolean",
       "default": false
     }

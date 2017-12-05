@@ -6,7 +6,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "Name of the universal app"
+      "description": "Name of the universal app."
     },
     "clientApp": {
       "type": "string",
@@ -69,6 +69,7 @@
     },
     "sourceDir": {
       "type": "string",
+      "description": "The path of the source directory.",
       "default": "src",
       "alias": "sd"
     }

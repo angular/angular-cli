@@ -7,10 +7,22 @@
  */
 
 export interface Schema {
+    /**
+     * The name of the interface.
+     */
     name: string;
+    /**
+     * The path to create the interface.
+     */
     path?: string;
-    appRoot?: string;
+    /**
+     * The path of the source directory.
+     */
     sourceDir?: string;
+    /**
+     * The root of the application.
+     */
+    appRoot?: string;
     /**
      * Specifies the prefix to use.
      */
