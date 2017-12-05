@@ -207,8 +207,7 @@ for (const pkgName of Object.keys(packages)) {
   const pkgJson = require(path.join(pkg.root, 'package.json'));
   pkg.dependencies = Object.keys(packages).filter(name => {
     return name in (pkgJson.dependencies || {})
-        || name in (pkgJson.devDependencies || {})
-        || name in (pkgJson.peerDependencies || {});
+        || name in (pkgJson.devDependencies || {});
   });
 }
 
