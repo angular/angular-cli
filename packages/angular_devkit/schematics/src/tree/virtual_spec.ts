@@ -178,5 +178,51 @@ describe('VirtualTree', () => {
       const fileEntry = tree.get('/hello');
       expect((fileEntry as FileEntry).content.toString()).toEqual(newContent);
     });
+
+    it('can rename files in base', () => {
+      const host = new InMemoryFileSystemTreeHost({
+        '/hello': 'world',
+      });
+      const tree = new FileSystemTree(host);
+
+      tree.rename('/hello', '/world');
+
+      const fileEntry = tree.get('/hello');
+      const fileEntry2 = tree.get('/world');
+      expect((fileEntry as FileEntry).content.toString())
+        .toEqual((fileEntry2 as FileEntry).content.toString());
+    });
+
+    it('can rename files created in staging', () => {
+      const host = new InMemoryFileSystemTreeHost({
+      });
+      const tree = new FileSystemTree(host);
+
+      tree.create('/hello', 'world');
+      tree.rename('/hello', '/hello2');
+
+      expect(tree.exists('/hello')).toBe(false);
+      const fileEntry = tree.get('/hello2');
+      expect((fileEntry as FileEntry).content.toString())
+        .toEqual('world');
+    });
+
+    it('can rename branched and merged trees', () => {
+      const host = new InMemoryFileSystemTreeHost({
+        '/hello': 'world',
+      });
+      const tree = new FileSystemTree(host);
+      const tree2 = tree.branch();
+
+      expect(tree2.exists('/hello')).toBe(true);
+      tree2.rename('/hello', '/hello2');
+      expect(tree2.exists('/hello2')).toBe(true);
+
+      tree.merge(tree2);
+      expect(tree.exists('/hello2')).toBe(true);
+      const fileEntry = tree.get('/hello2');
+      expect((fileEntry as FileEntry).content.toString())
+        .toEqual('world');
+    });
   });
 });
