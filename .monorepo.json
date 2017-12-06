@@ -69,8 +69,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
         }
       ],
-      "version": "0.0.40",
-      "hash": "0693678d7a0aea83c55dc808e1f1f13e"
+      "version": "0.0.41",
+      "hash": "96e71fbcb1b2dd32f452ace07b1681d3"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
