@@ -13,7 +13,6 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/reduce';
-import { FileDoesNotExistException } from '../exception/exception';
 import { CreateFileAction } from '../tree/action';
 import { UpdateBuffer } from '../utility/update-buffer';
 import { SimpleSinkBase } from './sink';
@@ -39,20 +38,6 @@ export abstract class VirtualFileSystemSink extends SimpleSinkBase {
     return this._force ? Observable.empty<void>() : super._validateCreateAction(action);
   }
 
-  protected _readFile(p: string): Observable<UpdateBuffer> {
-    const maybeCreate = this._filesToCreate.get(p);
-    if (maybeCreate) {
-      return Observable.of(maybeCreate);
-    }
-
-    const maybeUpdate = this._filesToUpdate.get(p);
-    if (maybeUpdate) {
-      return Observable.of(maybeUpdate);
-    }
-
-    throw new FileDoesNotExistException(p);
-  }
-
   protected _validateFileExists(p: string): Observable<boolean> {
     if (this._filesToCreate.has(p) || this._filesToUpdate.has(p)) {
       return Observable.of(true);
@@ -76,10 +61,7 @@ export abstract class VirtualFileSystemSink extends SimpleSinkBase {
   protected _renameFile(from: string, to: string): Observable<void> {
     this._filesToRename.add([from, to]);
 
-    return this._readFile(from)
-      .do(buffer => this._filesToCreate.set(to, buffer))
-      .do(() => this._filesToDelete.add(from))
-      .map(() => {});
+    return Observable.empty<void>();
   }
   protected _deleteFile(path: string): Observable<void> {
     if (this._filesToCreate.has(path)) {
