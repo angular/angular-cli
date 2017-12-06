@@ -53,6 +53,7 @@ export class ActionList implements Iterable<Action> {
 
 
   optimize() {
+    let changed = false;
     const actions = this._actions;
     const deleted = new Set<string>();
     this._actions = [];
@@ -69,6 +70,7 @@ export class ActionList implements Iterable<Action> {
         for (let j = i + 1; j < actions.length; j++) {
           const action = actions[j];
           if (path == action.path) {
+            changed = true;
             switch (action.kind) {
               case 'c': content = action.content; actions.splice(j--, 1); break;
               case 'o': content = action.content; actions.splice(j--, 1); break;
@@ -95,6 +97,11 @@ export class ActionList implements Iterable<Action> {
           case 'd': this.delete(iAction.path); break;
         }
       }
+    }
+
+    // TODO: fix the optimization and remove this recursivity.
+    if (changed) {
+      this.optimize();
     }
   }
 
