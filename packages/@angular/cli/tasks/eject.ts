@@ -190,6 +190,7 @@ class JsonWebpackSerializer {
           this._addImport('webpack.optimize', 'ModuleConcatenationPlugin');
           break;
         case angularCliPlugins.BaseHrefWebpackPlugin:
+        case angularCliPlugins.CleanCssWebpackPlugin:
         case angularCliPlugins.NamedLazyChunksWebpackPlugin:
         case angularCliPlugins.ScriptsWebpackPlugin:
         case angularCliPlugins.SuppressExtractedTextChunksWebpackPlugin:
@@ -565,7 +566,6 @@ export default Task.extend({
           'webpack',
           'autoprefixer',
           'css-loader',
-          'cssnano',
           'exports-loader',
           'file-loader',
           'html-webpack-plugin',
