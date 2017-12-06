@@ -5,7 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export * from './path';
 
-import * as virtualFs from './host';
-export { virtualFs };
+export * from './buffer';
+export * from './interface';
+export * from './memory';
+export * from './scoped';
+export * from './sync';

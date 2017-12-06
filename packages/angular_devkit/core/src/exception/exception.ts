@@ -20,6 +20,12 @@ export class FileDoesNotExistException extends BaseException {
 export class FileAlreadyExistException extends BaseException {
   constructor(path: string) { super(`Path "${path}" already exist.`); }
 }
+export class PathIsDirectoryException extends BaseException {
+  constructor(path: string) { super(`Path "${path}" is a directory.`); }
+}
+export class PathIsFileException extends BaseException {
+  constructor(path: string) { super(`Path "${path}" is a file.`); }
+}
 export class ContentHasMutatedException extends BaseException {
   constructor(path: string) {
     super(`Content at path "${path}" has changed between the start and the end of an update.`);
@@ -36,4 +42,8 @@ export class MergeConflictException extends BaseException {
 
 export class UnimplementedException extends BaseException {
   constructor() { super('This function is unimplemented.'); }
+}
+
+export class UnsupportedPlatformException extends BaseException {
+  constructor() { super('This platform is not supported by this code path.'); }
 }
