@@ -130,10 +130,10 @@ export abstract class SimpleSinkBase implements Sink {
           return maybeAction;
         }
       })
-      .mergeMap((action: Action) => {
+      .concatMap((action: Action) => {
         return this.commitSingleAction(action).ignoreElements().concat([action]);
       })
-      .mergeMap((action: Action) => this.postCommitAction(action) || Observable.empty<void>())
+      .concatMap((action: Action) => this.postCommitAction(action) || Observable.empty<void>())
       .concat(Observable.defer(() => this._done()))
       .concat(Observable.defer(() => this.postCommit() || Observable.empty<void>()));
   }
