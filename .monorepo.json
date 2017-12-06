@@ -53,8 +53,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md"
         }
       ],
-      "version": "0.0.34",
-      "hash": "bf3b25ed5f8c6b5f4c3de1fc20c3b317"
+      "version": "0.0.35",
+      "hash": "88c0abf84c28c0423049af9e433d1fad"
     },
     "@angular-devkit/core": {
       "name": "Core",
@@ -69,20 +69,20 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
         }
       ],
-      "version": "0.0.39",
-      "hash": "ba64f250a7c6a14c83f455471d99906b"
+      "version": "0.0.40",
+      "hash": "0693678d7a0aea83c55dc808e1f1f13e"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
-      "version": "0.1.9",
-      "hash": "c658f683345f0179e704364447617ec5"
+      "version": "0.1.10",
+      "hash": "6cd8b4e0065d6d5745104f5f8bcc4597"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
-      "version": "0.0.9",
+      "version": "0.0.10",
       "section": "Schematics",
-      "hash": "39f5fbf5bc3c8cb74922e2632d6876bb"
+      "hash": "787acac400e274f3f40ecab6909d0c8d"
     }
   }
 }
