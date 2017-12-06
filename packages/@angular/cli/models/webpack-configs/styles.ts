@@ -6,8 +6,8 @@ import {
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 import { pluginArgs, postcssArgs } from '../../tasks/eject';
+import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 
-const cssnano = require('cssnano');
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -45,15 +45,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const deployUrl = wco.buildOptions.deployUrl || '';
 
   const postcssPluginCreator = function() {
-    // safe settings based on: https://github.com/ben-eb/cssnano/issues/358#issuecomment-283696193
-    const importantCommentRe = /@preserve|@licen[cs]e|[@#]\s*source(?:Mapping)?URL|^!/i;
-    const minimizeOptions = {
-      autoprefixer: false, // full pass with autoprefixer is run separately
-      safe: true,
-      mergeLonghand: false, // version 3+ should be safe; cssnano currently uses 2.x
-      discardComments : { remove: (comment: string) => !importantCommentRe.test(comment) }
-    };
-
     return [
       postcssUrl([
         {
@@ -84,15 +75,12 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       ]),
       autoprefixer(),
       customProperties({ preserve: true })
-    ].concat(
-        minimizeCss ? [cssnano(minimizeOptions)] : []
-    );
+    ];
   };
   (postcssPluginCreator as any)[postcssArgs] = {
     variableImports: {
       'autoprefixer': 'autoprefixer',
       'postcss-url': 'postcssUrl',
-      'cssnano': 'cssnano',
       'postcss-custom-properties': 'customProperties'
     },
     variables: { minimizeCss, baseHref, deployUrl }
@@ -220,6 +208,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.bundle.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
+  }
+
+  if (minimizeCss) {
+    extraPlugins.push(new CleanCssWebpackPlugin({ sourceMap: cssSourceMap }));
   }
 
   return {
