@@ -87,12 +87,12 @@ export function asSource(rule: Rule): Source {
 }
 
 
-export function branchAndMerge(rule: Rule): Rule {
+export function branchAndMerge(rule: Rule, strategy = MergeStrategy.Default): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const branchedTree = branch(tree);
 
     return callRule(rule, Observable.of(branchedTree), context)
-      .map(t => staticMerge(tree, t));
+      .map(t => staticMerge(tree, t, strategy));
   };
 }
 
