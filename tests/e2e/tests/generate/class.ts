@@ -10,6 +10,8 @@ export default function() {
     .then(() => expectFileToExist(classDir))
     .then(() => expectFileToExist(join(classDir, 'test-class.ts')))
     .then(() => expectFileToExist(join(classDir, 'test-class.spec.ts')))
+    .then(() => ng('generate', 'class', 'test', 'model'))
+    .then(() => expectFileToExist(join(classDir, 'test.model.ts')))
 
     // Try to run the unit tests.
     .then(() => ng('test', '--single-run'));
