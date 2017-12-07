@@ -31,6 +31,9 @@ export enum MergeStrategy {
 }
 
 
+export const FileVisitorCancelToken = Symbol();
+export type FileVisitor = FilePredicate<void>;
+
 export interface FileEntry {
   readonly path: Path;
   readonly content: Buffer;
@@ -45,15 +48,13 @@ export interface DirEntry {
 
   dir(name: PathFragment): DirEntry;
   file(name: PathFragment): FileEntry | null;
+
+  visit(visitor: FileVisitor): void;
 }
 
 export interface FilePredicate<T> {
   (path: Path, entry?: Readonly<FileEntry> | null): T;
 }
-
-export const FileVisitorCancelToken = Symbol();
-export type FileVisitor = FilePredicate<void>;
-
 
 declare const window: { Symbol: { schematicTree: symbol }, window: {} };
 declare const self: { Symbol: { schematicTree: symbol }, self: {} };

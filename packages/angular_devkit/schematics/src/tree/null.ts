@@ -38,6 +38,8 @@ export class NullTreeDirEntry implements DirEntry {
     return new NullTreeDirEntry(join(this.path, name));
   }
   file(_name: PathFragment) { return null; }
+
+  visit() {}
 }
 
 

@@ -71,6 +71,25 @@ export class VirtualDirEntry implements DirEntry {
   file(name: PathFragment) {
     return this._tree.get(join(this._path, name));
   }
+
+  visit(visitor: FileVisitor) {
+    function _recurse(entry: VirtualDirEntry) {
+      entry.subfiles.forEach(path => {
+        visitor(join(entry._path, path), entry.file(path));
+      });
+      entry.subdirs.forEach(path => {
+        _recurse(entry.dir(path) as VirtualDirEntry);
+      });
+    }
+
+    try {
+      _recurse(this);
+    } catch (e) {
+      if (e !== FileVisitorCancelToken) {
+        throw e;
+      }
+    }
+  }
 }
 
 
