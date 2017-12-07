@@ -1,4 +1,4 @@
-import { ng } from '../../../utils/process';
+import { ng, silentNpm } from '../../../utils/process';
 import {
   expectFileToMatch,
   expectFileToExist,
@@ -7,6 +7,7 @@ import {
 } from '../../../utils/fs';
 import { copyProjectAsset } from '../../../utils/assets';
 import { expectToFail } from '../../../utils/utils';
+import { updateJsonFile } from '../../../utils/project';
 
 const imgSvg = `
   <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
@@ -16,8 +17,11 @@ const imgSvg = `
 
 export default function () {
   return Promise.resolve()
+    .then(() => silentNpm('install', 'font-awesome@4.7.0'))
     .then(() => writeMultipleFiles({
-      'src/styles.css': `
+      'src/styles.scss': `
+        $fa-font-path: "~font-awesome/font";
+        @import "~font-awesome/scss/font-awesome";
         h1 { background: url('./assets/large.png'); }
         h2 { background: url('./assets/small.svg'); }
         p  { background: url('./assets/small-id.svg#testID'); }
@@ -30,7 +34,16 @@ export default function () {
       'src/assets/small-id.svg': imgSvg
     }))
     .then(() => copyProjectAsset('images/spectrum.png', './assets/large.png'))
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+      const app = configJson['apps'][0];
+      app['styles'] = ['styles.scss'];
+    }))
     .then(() => ng('build', '--extract-css', '--aot'))
+    .then(({ stdout }) => {
+      if (stdout.match(/postcss-url: \.+: Can't read file '\.+', ignoring/)) {
+        throw new Error('Expected no postcss-url file read warnings.');
+      }
+    })
     // Check paths are correctly generated.
     .then(() => expectFileToMatch('dist/styles.bundle.css',
       /url\([\'"]?large\.[0-9a-f]{20}\.png[\'"]?\)/))

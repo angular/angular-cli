@@ -46,6 +46,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   const postcssPluginCreator = function() {
     return [
+      postcssUrl({
+        filter: ({ url }: { url: string }) => url.startsWith('~'),
+        url: ({ url }: { url: string }) => path.join(projectRoot, 'node_modules', url.substr(1)),
+      }),
       postcssUrl([
         {
           // Only convert root relative URLs, which CSS-Loader won't process into require().
@@ -83,7 +87,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       'postcss-url': 'postcssUrl',
       'postcss-custom-properties': 'customProperties'
     },
-    variables: { minimizeCss, baseHref, deployUrl }
+    variables: { minimizeCss, baseHref, deployUrl, projectRoot }
   };
 
   // determine hashing format
