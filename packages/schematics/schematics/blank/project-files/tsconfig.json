@@ -5,6 +5,7 @@
       "es2017",
       "dom"
     ],
+    "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
