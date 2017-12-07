@@ -3,9 +3,9 @@ import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
-  // typescript@2.5 is not part of the officially supported range in latest stable.
+  // typescript@2.6 is not part of the officially supported range in latest stable.
   // Update as needed.
-  let unsupportedTsVersion = '2.5';
+  let unsupportedTsVersion = '2.6';
 
   // Skip this test in Angular 2/4.
   if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
