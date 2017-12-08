@@ -241,3 +241,25 @@ export function normalize(path: string): Path {
     return p.join(NormalizedSep) as Path;
   }
 }
+
+
+// Platform-specific paths.
+export type WindowsPath = string & {
+  __PRIVATE_DEVKIT_WINDOWS_PATH: void;
+};
+export type PosixPath = string & {
+  __PRIVATE_DEVKIT_POSIX_PATH: void;
+};
+
+export function asWindowsPath(path: Path): WindowsPath {
+  const drive = path.match(/^\/(\w)\/(.*)$/);
+  if (drive) {
+    return `${drive[1]}:\\${drive[2].replace(/\//g, '\\')}` as WindowsPath;
+  }
+
+  return path.replace(/\//g, '\\') as WindowsPath;
+}
+
+export function asPosixPath(path: Path): PosixPath {
+  return path as string as PosixPath;
+}

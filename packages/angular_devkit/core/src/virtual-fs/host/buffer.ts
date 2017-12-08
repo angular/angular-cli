@@ -5,8 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { UnsupportedPlatformException } from '../../exception/exception';
 import { FileBuffer } from './interface';
+
+declare const TextEncoder: {
+  new (encoding: string): {
+    encode(str: string): Uint8Array;
+  };
+};
 
 export function stringToFileBuffer(str: string): FileBuffer {
   // If we're in Node...
@@ -19,7 +24,17 @@ export function stringToFileBuffer(str: string): FileBuffer {
     }
 
     return ab;
-  }
+  } else if (typeof TextEncoder !== 'undefined') {
+    // Modern browsers implement TextEncode.
+    return new TextEncoder('utf-8').encode(str).buffer as ArrayBuffer;
+  } else {
+    // Slowest method but sure to be compatible with every platform.
+    const buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+    const bufView = new Uint16Array(buf);
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
+      bufView[i] = str.charCodeAt(i);
+    }
 
-  throw new UnsupportedPlatformException();
+    return buf;
+  }
 }

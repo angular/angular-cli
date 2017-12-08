@@ -29,6 +29,7 @@ ts_library(
     ),
     deps = [
         "//packages/angular_devkit/core",
+        # @deps: rxjs
     ],
     tsconfig = "//:tsconfig.json",
     module_name = "@angular-devkit/core/node",
