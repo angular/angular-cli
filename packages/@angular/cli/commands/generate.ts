@@ -109,10 +109,16 @@ export default Command.extend({
         schematicName,
         collectionName
       })
-      .then((availableOptions: SchematicAvailableOptions) => {
+      .then((availableOptions: SchematicAvailableOptions[]) => {
         let anonymousOptions: string[] = [];
+
+        const nameOption = availableOptions.filter(opt => opt.name === 'name')[0];
+        if (nameOption) {
+          anonymousOptions = [...anonymousOptions, '<name>'];
+        }
+
         if (collectionName === '@schematics/angular' && schematicName === 'interface') {
-          anonymousOptions = ['<type>'];
+          anonymousOptions = [...anonymousOptions, '<type>'];
         }
 
         this.registerOptions({
@@ -127,8 +133,12 @@ export default Command.extend({
       throw 'The `ng generate module` command requires a name to be specified.';
     }
 
-    const entityName = rawArgs[1];
-    commandOptions.name = stringUtils.dasherize(entityName.split(separatorRegEx).pop());
+    let entityName = rawArgs[1];
+    if (entityName) {
+      commandOptions.name = stringUtils.dasherize(entityName.split(separatorRegEx).pop());
+    } else {
+      entityName = '';
+    }
 
     const appConfig = getAppFromConfig(commandOptions.app);
     const dynamicPathOptions: DynamicPathOptions = {
