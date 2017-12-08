@@ -31,7 +31,8 @@
     "enhanced-resolve": "^3.1.0",
     "magic-string": "^0.22.3",
     "semver": "^5.3.0",
-    "source-map": "^0.5.6"
+    "source-map": "^0.5.6",
+    "webpack-sources": "^1.1.0"
   },
   "peerDependencies": {
     "webpack": "^2.2.0 || ^3.0.0"
