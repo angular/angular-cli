@@ -249,7 +249,8 @@ const BuildCommand = Command.extend({
       ui: this.ui,
     });
 
-    const clientApp = getAppFromConfig(commandOptions.app);
+    const clientApp = getAppFromConfig(
+      commandOptions.app, commandOptions.target, commandOptions.configuration);
 
     const doAppShell = commandOptions.target === 'production' &&
       (commandOptions.aot === undefined || commandOptions.aot === true) &&

@@ -40,7 +40,7 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
     buildOptions = this.addTargetDefaults(buildOptions);
     buildOptions = this.mergeConfigs(buildOptions, appConfig, projectRoot);
 
-    const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
+    const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsConfigPath);
     const tsConfig = readTsconfig(tsconfigPath);
 
     const projectTs = requireProjectModule(projectRoot, 'typescript') as typeof ts;
@@ -62,7 +62,7 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
       this.getTargetConfig(this.wco)
     ];
 
-    if (this.wco.appConfig.main || this.wco.appConfig.polyfills) {
+    if (this.wco.appConfig.entryPoints.main || this.wco.appConfig.polyfills) {
       const typescriptConfigPartial = this.wco.buildOptions.aot
         ? getAotConfig(this.wco)
         : getNonAotConfig(this.wco);
@@ -151,7 +151,7 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
 
   public addAppConfigDefaults(appConfig: any) {
     const appConfigDefaults: any = {
-      testTsconfig: appConfig.tsconfig,
+      testTsconfig: appConfig.tsConfigPath,
       scripts: [],
       styles: []
     };

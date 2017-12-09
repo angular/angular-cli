@@ -17,7 +17,7 @@ export const getWebpackExtractI18nConfig = function(
   return  {
     plugins: [
       new ExtractI18nPlugin({
-        tsConfigPath: path.resolve(projectRoot, appConfig.root, appConfig.tsconfig),
+        tsConfigPath: path.resolve(projectRoot, appConfig.root, appConfig.tsConfigPath),
         exclude: exclude,
         genDir: genDir,
         i18nFormat: i18nFormat,

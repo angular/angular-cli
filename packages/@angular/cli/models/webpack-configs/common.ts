@@ -34,12 +34,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   let extraRules: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
 
-  if (appConfig.main) {
-    entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
-  }
-
-  if (appConfig.polyfills) {
-    entryPoints['polyfills'] = [path.resolve(appRoot, appConfig.polyfills)];
+  for (const epName of Object.keys(appConfig.entryPoints)) {
+    entryPoints[epName] = [path.resolve(appRoot, appConfig.entryPoints[epName])];
   }
 
   // determine hashing format

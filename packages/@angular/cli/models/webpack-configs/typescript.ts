@@ -82,7 +82,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
 
   if (AngularCompilerPlugin.isSupported()) {
     const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
-      mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
+      mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.entryPoints.main) : undefined,
       i18nInFile: buildOptions.i18nFile,
       i18nInFormat: buildOptions.i18nFormat,
       i18nOutFile: buildOptions.i18nOutFile,
@@ -96,7 +96,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     return new AngularCompilerPlugin(pluginOptions);
   } else {
     const pluginOptions: AotPluginOptions = Object.assign({}, {
-      mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
+      mainPath: path.join(projectRoot, appConfig.root, appConfig.entryPoints.main),
       i18nFile: buildOptions.i18nFile,
       i18nFormat: buildOptions.i18nFormat,
       locale: buildOptions.locale,
@@ -113,7 +113,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
 
 export function getNonAotConfig(wco: WebpackConfigOptions) {
   const { appConfig, projectRoot } = wco;
-  const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
+  const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsConfigPath);
 
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
@@ -123,7 +123,7 @@ export function getNonAotConfig(wco: WebpackConfigOptions) {
 
 export function getAotConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
-  const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
+  const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsConfigPath);
   const testTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.testTsconfig);
 
   let pluginOptions: any = { tsConfigPath };
@@ -158,7 +158,7 @@ export function getAotConfig(wco: WebpackConfigOptions) {
 export function getNonAotTestConfig(wco: WebpackConfigOptions) {
   const { projectRoot, appConfig } = wco;
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.testTsconfig);
-  const appTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
+  const appTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsConfigPath);
 
   let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true };
 
@@ -174,7 +174,7 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
     // Force include main and polyfills.
     // This is needed for AngularCompilerPlugin compatibility with existing projects,
     // since TS compilation there is stricter and tsconfig.spec.ts doesn't include them.
-    const include = [appConfig.main, appConfig.polyfills, '**/*.spec.ts'];
+    const include = [appConfig.entryPoints.main, appConfig.polyfills, '**/*.spec.ts'];
     if (appConfig.test) {
       include.push(appConfig.test);
     }
