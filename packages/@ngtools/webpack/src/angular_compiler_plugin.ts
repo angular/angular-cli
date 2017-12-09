@@ -174,7 +174,7 @@ export class AngularCompilerPlugin implements Tapable {
     }
 
     this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
-    this._compilerOptions = config.options;
+    this._compilerOptions = { ...config.options, ...options.compilerOptions };
     this._basePath = config.options.basePath;
 
     // Overwrite outDir so we can find generated files next to their .ts origin in compilerHost.
