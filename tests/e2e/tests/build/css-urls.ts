@@ -79,5 +79,27 @@ export default function () {
     .then(() => expectFileToMatch('dist/main.bundle.js',
       '/base/deploy/assets/component-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      /deploy\/component-img-relative\.[0-9a-f]{20}\.png/));
+      /deploy\/component-img-relative\.[0-9a-f]{20}\.png/))
+    // Check with identical base-href and deploy-url flags.
+    .then(() => ng('build', '--base-href=/base/', '--deploy-url=/base/',
+      '--extract-css', '--aot'))
+    .then(() => expectFileToMatch('dist/styles.bundle.css',
+      '/base/assets/global-img-absolute.svg'))
+    .then(() => expectFileToMatch('dist/styles.bundle.css',
+      /global-img-relative\.[0-9a-f]{20}\.png/))
+    .then(() => expectFileToMatch('dist/main.bundle.js',
+      '/base/assets/component-img-absolute.svg'))
+    .then(() => expectFileToMatch('dist/main.bundle.js',
+      /\/base\/component-img-relative\.[0-9a-f]{20}\.png/))
+    // Check with only base-href flag.
+    .then(() => ng('build', '--base-href=/base/',
+      '--extract-css', '--aot'))
+    .then(() => expectFileToMatch('dist/styles.bundle.css',
+      '/base/assets/global-img-absolute.svg'))
+    .then(() => expectFileToMatch('dist/styles.bundle.css',
+      /global-img-relative\.[0-9a-f]{20}\.png/))
+    .then(() => expectFileToMatch('dist/main.bundle.js',
+      '/base/assets/component-img-absolute.svg'))
+    .then(() => expectFileToMatch('dist/main.bundle.js',
+      /component-img-relative\.[0-9a-f]{20}\.png/));
 }
