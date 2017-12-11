@@ -63,8 +63,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           // Only convert root relative URLs, which CSS-Loader won't process into require().
           filter: ({ url }: { url: string }) => url.startsWith('/') && !url.startsWith('//'),
           url: ({ url }: { url: string }) => {
-            if (deployUrl.match(/:\/\//)) {
-              // If deployUrl contains a scheme, ignore baseHref use deployUrl as is.
+            if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
+              // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
               return `${deployUrl.replace(/\/$/, '')}${url}`;
             } else if (baseHref.match(/:\/\//)) {
               // If baseHref contains a scheme, include it as is.
