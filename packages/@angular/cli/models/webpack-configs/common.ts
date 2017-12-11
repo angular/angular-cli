@@ -205,7 +205,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     },
     module: {
       rules: [
-        { test: /\.html$/, loader: 'raw-loader' },
+        { test: /(\.html|!raw)$/, loader: 'raw-loader' },
         {
           test: /\.(eot|svg|cur)$/,
           loader: 'file-loader',
