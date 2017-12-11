@@ -2,13 +2,12 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
-import { InsertConcatAssetsWebpackPlugin } from '../../plugins/insert-concat-assets-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
 import { requireProjectModule } from '../../utilities/require-project-module';
 import { WebpackConfigOptions } from '../webpack-config';
+import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 
-const ConcatPlugin = require('webpack-concat-plugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const SilentError = require('silent-error');
@@ -65,23 +64,16 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
     // Add a new asset for each entry.
     globalScriptsByEntry.forEach((script) => {
-      const hash = hashFormat.chunk !== '' && !script.lazy ? '.[hash]' : '';
-      extraPlugins.push(new ConcatPlugin({
-        uglify: buildOptions.target === 'production' ? { sourceMapIncludeSources: true } : false,
-        sourceMap: buildOptions.sourcemaps,
+      // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
+      const hash = script.lazy ? '' : hashFormat.script;
+      extraPlugins.push(new ScriptsWebpackPlugin({
         name: script.entry,
-        // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
-        fileName: `[name]${script.lazy ? '' : hash}.bundle.js`,
-        filesToConcat: script.paths
+        sourceMap: buildOptions.sourcemaps,
+        filename: `${script.entry}${hash}.bundle.js`,
+        scripts: script.paths,
+        basePath: projectRoot,
       }));
     });
-
-    // Insert all the assets created by ConcatPlugin in the right place in index.html.
-    extraPlugins.push(new InsertConcatAssetsWebpackPlugin(
-      globalScriptsByEntry
-        .filter((el) => !el.lazy)
-        .map((el) => el.entry)
-    ));
   }
 
   // process asset entries
