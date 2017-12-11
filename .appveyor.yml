@@ -1,0 +1,21 @@
+environment:
+  matrix:
+    - nodejs_version: "6"
+
+matrix:
+  fast_finish: true
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - npm install -g npm@~5.6.0
+  - npm install
+
+test_script:
+  - node --version
+  - npm --version
+  - npm run test
+
+build: off
+
+cache:
+  - node_modules -> package-lock.json

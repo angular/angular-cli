@@ -16,9 +16,9 @@ describe('my-full-schematic', () => {
 
   it('works', () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
-    const tree = runner.runSchematic('my-full-schematic', { required: 'str' }, Tree.empty());
+    const tree = runner.runSchematic('my-full-schematic', { name: 'str' }, Tree.empty());
 
     // Listing files
-    expect(tree.files.sort()).toEqual(['/allo', '/hola']);
+    expect(tree.files.sort()).toEqual(['/allo', '/hola', '/test1', '/test2']);
   });
 });

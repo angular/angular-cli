@@ -226,10 +226,11 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
   const pattern = '^('
                   + (tsConfig.config.exclude as string[])
                     .map(ex => '('
-                      + ex
-                        .replace(/[\-\[\]{}()+?./\\^$|]/g, '\\$&')
-                        .replace(/(\\\\|\\\/)\*\*/g, '((\/|\\\\).+?)?')
-                        .replace(/\*/g, '[^/\\\\]*')
+                      + ex.split(/[\/\\]/g).map(f => f
+                          .replace(/[\-\[\]{}()+?.^$|]/g, '\\$&')
+                          .replace(/^\*\*/g, '(.+?)?')
+                          .replace(/\*/g, '[^/\\\\]*'))
+                        .join('[\/\\\\]')
                       + ')')
                     .join('|')
                   + ')($|/|\\\\)';
