@@ -26,7 +26,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 const SilentError = require('silent-error');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
-const ConcatPlugin = require('webpack-concat-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const Task = require('../ember-cli/lib/models/task');
 
@@ -159,18 +158,6 @@ class JsonWebpackSerializer {
     return plugin.options;
   }
 
-  private _concatPlugin(plugin: any) {
-    const options = plugin.settings;
-    if (!options || !options.filesToConcat) {
-      return options;
-    }
-
-    const filesToConcat = options.filesToConcat
-      .map((file: string) => path.relative(process.cwd(), file));
-
-    return { ...options, filesToConcat };
-  }
-
   private _uglifyjsPlugin(plugin: any) {
     return plugin.options;
   }
@@ -204,6 +191,7 @@ class JsonWebpackSerializer {
           break;
         case angularCliPlugins.BaseHrefWebpackPlugin:
         case angularCliPlugins.NamedLazyChunksWebpackPlugin:
+        case angularCliPlugins.ScriptsWebpackPlugin:
         case angularCliPlugins.SuppressExtractedTextChunksWebpackPlugin:
           this._addImport('@angular/cli/plugins/webpack', plugin.constructor.name);
           break;
@@ -248,10 +236,6 @@ class JsonWebpackSerializer {
         case LicenseWebpackPlugin:
           args = this._licenseWebpackPlugin(plugin);
           this._addImport('license-webpack-plugin', 'LicenseWebpackPlugin');
-          break;
-        case ConcatPlugin:
-          args = this._concatPlugin(plugin);
-          this.variableImports['webpack-concat-plugin'] = 'ConcatPlugin';
           break;
         case UglifyJSPlugin:
           args = this._uglifyjsPlugin(plugin);
@@ -594,7 +578,6 @@ export default Task.extend({
           'stylus-loader',
           'url-loader',
           'circular-dependency-plugin',
-          'webpack-concat-plugin',
           'copy-webpack-plugin',
           'uglifyjs-webpack-plugin',
         ].forEach((packageName: string) => {

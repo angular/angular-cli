@@ -15,6 +15,10 @@ export function packageChunkSort(appConfig: any) {
     extraEntryParser(appConfig.styles, './', 'styles').forEach(pushExtraEntries);
   }
 
+  if (appConfig.scripts) {
+    extraEntryParser(appConfig.scripts, './', 'scripts').forEach(pushExtraEntries);
+  }
+
   entryPoints.push(...['vendor', 'main']);
 
   function sort(left: any, right: any) {
