@@ -12,11 +12,11 @@ import 'jasmine';
 import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
 import { ParsedArgs } from 'minimist';
 import { join, relative } from 'path';
-import { Position, SourceMapConsumer, SourceMapGenerator } from 'source-map';
+import { Position, SourceMapConsumer } from 'source-map';
 import * as ts from 'typescript';
 import { packages } from '../lib/packages';
 
-
+const codeMap = require('../lib/istanbul-local').codeMap;
 const Jasmine = require('jasmine');
 
 const projectBaseDir = join(__dirname, '..');
@@ -25,70 +25,15 @@ require('source-map-support').install({
 });
 
 
-declare const global: {
-  _DevKitRequireHook: Function,
-  __coverage__: CoverageType;
-};
-
-
-interface Instrumenter extends Istanbul.Instrumenter {
-  sourceMap: SourceMapGenerator;
-}
-
-
 interface CoverageLocation {
   start: Position;
   end: Position;
 }
+
 type CoverageType = any;  // tslint:disable-line:no-any
-
-
-const inlineSourceMapRe = /\/\/# sourceMappingURL=data:application\/json;base64,(\S+)$/;
-
-
-// Use the internal DevKit Hook of the require extension installed by our bootstrapping code to add
-// Istanbul (not Constantinople) collection to the code.
-const codeMap = new Map<string, { code: string, map: SourceMapConsumer }>();
-
-function istanbulDevKitRequireHook(code: string, filename: string) {
-  // Skip spec files.
-  if (filename.match(/_spec\.ts$/)) {
-    return code;
-  }
-  const codeFile = codeMap.get(filename);
-  if (codeFile) {
-    return codeFile.code;
-  }
-
-  const instrumenter = new Istanbul.Instrumenter({
-    esModules: true,
-    codeGenerationOptions: {
-      sourceMap: filename,
-      sourceMapWithCode: true,
-    },
-  }) as Instrumenter;
-  let instrumentedCode = instrumenter.instrumentSync(code, filename);
-  const match = code.match(inlineSourceMapRe);
-
-  if (match) {
-    const sourceMapGenerator: SourceMapGenerator = instrumenter.sourceMap;
-    // Fix source maps for exception reporting (since the exceptions happen in the instrumented
-    // code.
-    const sourceMapJson = JSON.parse(Buffer.from(match[1], 'base64').toString());
-    const consumer = new SourceMapConsumer(sourceMapJson);
-    sourceMapGenerator.applySourceMap(consumer, filename);
-
-    instrumentedCode = instrumentedCode.replace(inlineSourceMapRe, '')
-                     + '//# sourceMappingURL=data:application/json;base64,'
-                     + new Buffer(sourceMapGenerator.toString()).toString('base64');
-
-    // Keep the consumer from the original source map, because the reports from Istanbul (not
-    // Constantinople) are already mapped against the code.
-    codeMap.set(filename, { code: instrumentedCode, map: consumer });
-  }
-
-  return instrumentedCode;
-}
+declare const global: {
+  __coverage__: CoverageType;
+};
 
 
 // Add the Istanbul (not Constantinople) reporter.
@@ -158,9 +103,9 @@ class IstanbulReporter implements jasmine.CustomReporter {
     if (global.__coverage__) {
       this._updateCoverageJsonSourceMap(global.__coverage__);
       istanbulCollector.add(global.__coverage__);
-    }
 
-    istanbulReporter.write(istanbulCollector, true, () => {});
+      istanbulReporter.write(istanbulCollector, true, () => {});
+    }
   }
 }
 
@@ -212,7 +157,6 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
   }
 
   if (args['code-coverage']) {
-    global._DevKitRequireHook = istanbulDevKitRequireHook;
     runner.env.addReporter(new IstanbulReporter());
   }
 
