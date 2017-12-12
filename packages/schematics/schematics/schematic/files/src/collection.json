@@ -12,7 +12,7 @@
   // an extends field and a schema reference.
   // The extends field points to another schematic (either in the same collection or a
   // separate collection using the format collectionName:schematicName).
-  // The factory is required, except when using the extends field. The the factory can
+  // The factory is required, except when using the extends field. Then the factory can
   // overwrite the extended schematic factory.
   "schematics": {
     "my-schematic": {
