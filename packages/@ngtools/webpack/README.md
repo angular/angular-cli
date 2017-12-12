@@ -82,3 +82,32 @@ The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ng
 * Live-reload via websockets
 * Code splitting
  * Recognizing the use of `loadChildren` in the router, and bundling those modules separately so that any dependencies of those modules are not going to be loaded as part of your main bundle. These separate bundles will be pulled out of the critical path of your application, making your total application bundle much smaller and loading it much more performant.
+ 
+## Troubleshooting
+
+### Child compilations with extract-text-webpack-plugin
+You can't use extract-text-webpack-plugin for components CSS templates, because it does not support / or do not work with "Child compilations" - however you can with global CSS files.
+Use two CSS rules in webpack config: 
+1. with "normal" CSS loader like 'css-loader' and 
+2. with extract-text-webpack-plugin and include statement, for your global CSS files.
+```javascript
+  // COMPONENT CSS LOADER
+      , { test: /\.css$/
+        , use: ['css-to-string-loader'].concat(['css-loader'])
+        }
+  // GLOBAL CSS LOADER
+      , { test: /\.css$/
+         , include: helpers.getPath('src/client/style')
+         , use: ['css-to-string-loader'].concat(
+            ExtractTextPlugin.extract({
+                fallback: 'style-loader'
+              , use: ['css-loader']
+            })
+          )
+        }
+```
+* Global CSS files are stored in a separate chunk and components CSS templates are stored as module references within the app chunk. 
+* Use "css-to-string-loader" and ".concat" to get rid of `Loader expecting string array`-error!
+
+
+
