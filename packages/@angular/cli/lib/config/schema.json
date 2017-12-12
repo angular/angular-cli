@@ -91,6 +91,11 @@
                       "type": "boolean",
                       "description": "Allow assets to be copied outside the outDir.",
                       "default": false
+                    },
+                    "allowOutsideReadDir": {
+                      "type": "boolean",
+                      "description": "Allow assets to be read outside the project dir.",
+                      "default": false
                     }
                   },
                   "additionalProperties": false

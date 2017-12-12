@@ -60,3 +60,24 @@ to `true` on your asset definition, like so:
 ```
 
 This needs to be set for every assets you want to write outside of your build output directory.
+
+## Read assets outside of `dist/`
+
+This needs to be set for every assets you want to write outside of your build output directory.
+
+Because reading files in your project isn't an expected effect of `ng build`, it is disabled by 
+default on every assets. In order to allow this behaviour, you need to set `allowOutsideReadDir` 
+to `true` on your asset definition, like so:
+
+```json
+"assets": [
+  {
+    "glob": "**/*",
+    "input": "../not-dist/some/folder/",
+    "output": "./assets/",
+    "allowOutsideReadDir": true
+  },
+]
+```
+
+This needs to be set for every assets you want to write outside of your build output directory.

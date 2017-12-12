@@ -93,4 +93,5 @@ export interface AssetPattern {
   input?: string;
   output?: string;
   allowOutsideOutDir?: boolean;
+  allowOutsideReadDir?: boolean;
 }
