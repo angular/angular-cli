@@ -1,11 +1,14 @@
 import chalk from 'chalk';
-import { stripIndents } from 'common-tags';
+import {stripIndents} from 'common-tags';
 
 
 // Force basic color support on terminals with no color support.
 // Chalk typings don't have the correct constructor parameters.
-const chalkCtx = new (chalk.constructor as any)(chalk.supportsColor ? {} : { level: 1 });
-const { bold, green, red, reset, white, yellow } = chalkCtx;
+const chalkCtx =
+    new (chalk.constructor as any)(chalk.supportsColor ? {} : {level: 1});
+const {bold, green, red, reset, white, yellow} = chalkCtx;
+
+let statsToStringFirstCall = true;
 
 function _formatSize(size: number): string {
   if (size <= 0) {
@@ -15,34 +18,49 @@ function _formatSize(size: number): string {
   const abbreviations = ['bytes', 'kB', 'MB', 'GB'];
   const index = Math.floor(Math.log(size) / Math.log(1000));
 
-  return `${+(size / Math.pow(1000, index)).toPrecision(3)} ${abbreviations[index]}`;
+  return `${+ (size / Math.pow(1000, index)).toPrecision(3)} ${
+      abbreviations[index]}`;
 }
 
+export function statsToStringFirstCallOnlyForTest() {
+    statsToStringFirstCall = true;
+}
 
 export function statsToString(json: any, statsConfig: any) {
-  const colors = statsConfig.colors;
-  const rs = (x: string) => colors ? reset(x) : x;
-  const w = (x: string) => colors ? bold(white(x)) : x;
-  const g = (x: string) => colors ? bold(green(x)) : x;
-  const y = (x: string) => colors ? bold(yellow(x)) : x;
+  if (statsToStringFirstCall) {
+    statsToStringFirstCall = false;
+    const colors = statsConfig.colors;
+    const rs = (x: string) => colors ? reset(x) : x;
+    const w = (x: string) => colors ? bold(white(x)) : x;
+    const g = (x: string) => colors ? bold(green(x)) : x;
+    const y = (x: string) => colors ? bold(yellow(x)) : x;
 
-  return rs(stripIndents`
+    return rs(stripIndents`
     Date: ${w(new Date().toISOString())}
     Hash: ${w(json.hash)}
     Time: ${w('' + json.time)}ms
-    ${json.chunks.map((chunk: any) => {
-      const asset = json.assets.filter((x: any) => x.name == chunk.files[0])[0];
-      const size = asset ? ` ${_formatSize(asset.size)}` : '';
-      const files = chunk.files.join(', ');
-      const names = chunk.names ? ` (${chunk.names.join(', ')})` : '';
-      const initial = y(chunk.entry ? '[entry]' : chunk.initial ? '[initial]' : '');
-      const flags = ['rendered', 'recorded']
-        .map(f => f && chunk[f] ? g(` [${f}]`) : '')
-        .join('');
+    ${
+        json.chunks
+            .map((chunk: any) => {
+              const asset =
+                  json.assets.filter((x: any) => x.name == chunk.files[0])[0];
+              const size = asset ? ` ${_formatSize(asset.size)}` : '';
+              const files = chunk.files.join(', ');
+              const names = chunk.names ? ` (${chunk.names.join(', ')})` : '';
+              const initial =
+                  y(chunk.entry ? '[entry]' : chunk.initial ? '[initial]' : '');
+              const flags = ['rendered', 'recorded']
+                                .map(f => f && chunk[f] ? g(` [${f}]`) : '')
+                                .join('');
 
-      return `chunk {${y(chunk.id)}} ${g(files)}${names}${size} ${initial}${flags}`;
-    }).join('\n')}
+              return `chunk {${y(chunk.id)}} ${g(files)}${names}${size} ${
+                  initial}${flags}`;
+            })
+            .join('\n')}
     `);
+  } else {
+    return '';
+  }
 }
 
 export function statsWarningsToString(json: any, statsConfig: any) {
@@ -50,7 +68,10 @@ export function statsWarningsToString(json: any, statsConfig: any) {
   const rs = (x: string) => colors ? reset(x) : x;
   const y = (x: string) => colors ? bold(yellow(x)) : x;
 
-  return rs('\n' + json.warnings.map((warning: any) => y(`WARNING in ${warning}`)).join('\n\n'));
+  return rs(
+      '\n' +
+      json.warnings.map((warning: any) => y(`WARNING in ${warning}`))
+          .join('\n\n'));
 }
 
 export function statsErrorsToString(json: any, statsConfig: any) {
@@ -58,5 +79,7 @@ export function statsErrorsToString(json: any, statsConfig: any) {
   const rs = (x: string) => colors ? reset(x) : x;
   const r = (x: string) => colors ? bold(red(x)) : x;
 
-  return rs('\n' + json.errors.map((error: any) => r(`ERROR in ${error}`)).join('\n'));
+  return rs(
+      '\n' +
+      json.errors.map((error: any) => r(`ERROR in ${error}`)).join('\n'));
 }
