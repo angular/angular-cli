@@ -8,6 +8,7 @@ import {writeFile, writeMultipleFiles} from '../../utils/fs';
 import {wait} from '../../utils/utils';
 import {request} from '../../utils/http';
 import {getGlobalVariable} from '../../utils/env';
+import { statsToStringFirstCallOnlyForTest } from '@angular/cli/utilities/stats';
 
 const validBundleRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
 
@@ -35,6 +36,7 @@ export default function() {
     // the file, otherwise rebuilds can be too fast and fail CI.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      statsToStringFirstCallOnlyForTest(),
       writeFile('src/app/app.module.ts', `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
@@ -73,6 +75,7 @@ export default function() {
     // Change multiple files and check that all of them are invalidated and recompiled.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      statsToStringFirstCallOnlyForTest(),
       writeMultipleFiles({
         'src/app/app.module.ts': `
           import { BrowserModule } from '@angular/platform-browser';

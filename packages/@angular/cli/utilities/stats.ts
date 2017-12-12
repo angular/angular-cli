@@ -22,6 +22,9 @@ function _formatSize(size: number): string {
       abbreviations[index]}`;
 }
 
+export function statsToStringFirstCallOnlyForTest() {
+    statsToStringFirstCall = true;
+}
 
 export function statsToString(json: any, statsConfig: any) {
   if (statsToStringFirstCall) {
