@@ -74,7 +74,7 @@ jobs:
           key: angular_devkit-{{ checksum "package-lock.json" }}
 
       - run: bazel run @nodejs//:npm install
-      - run: bazel build ...
+      - run: bazel build //packages/...
 
       - save_cache:
           key: angular_devkit-{{ checksum "package-lock.json" }}
