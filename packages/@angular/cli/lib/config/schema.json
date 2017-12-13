@@ -99,6 +99,53 @@
             },
             "default": []
           },
+          "budgets": {
+            "type": "array",
+            "description": "Threshold definitions for bundle sizes.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["bundle", "initial", "allScript", "all", "anyScript", "any"],
+                  "description": "The type of budget"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the bundle"
+                },
+                "baseline": {
+                  "type": "string",
+                  "description": "The baseline size for comparison."
+                },
+                "maximumWarning": {
+                  "type": "string",
+                  "description": "The maximum threshold for warning relative to the baseline."
+                },
+                "maximumError": {
+                  "type": "string",
+                  "description": "The maximum threshold for error relative to the baseline."
+                },
+                "minimumWarning": {
+                  "type": "string",
+                  "description": "The minimum threshold for warning relative to the baseline."
+                },
+                "minimumError": {
+                  "type": "string",
+                  "description": "The minimum threshold for error relative to the baseline."
+                },
+                "warning": {
+                  "type": "string",
+                  "description": "The threshold for warning relative to the baseline (min & max)."
+                },
+                "error": {
+                  "type": "string",
+                  "description": "The threshold for error relative to the baseline (min & max)."
+                }
+              }
+            },
+            "default": []
+          },
           "deployUrl": {
             "type": "string",
             "description": "URL where files will be deployed."
