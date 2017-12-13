@@ -26,7 +26,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
   if (buildOptions.codeCoverage && CliConfig.fromProject()) {
     const codeCoverageExclude = CliConfig.fromProject().get('test.codeCoverage.exclude');
     let exclude: (string | RegExp)[] = [
-      /\.(e2e|spec)\.ts$/,
+      /\.(e2e|spec)\.tsx?$/,
       /node_modules/
     ];
 
@@ -40,7 +40,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
     }
 
     extraRules.push({
-      test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
+      test: /\.(js|tsx?)$/, loader: 'istanbul-instrumenter-loader',
       options: { esModules: true },
       enforce: 'post',
       exclude

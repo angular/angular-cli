@@ -187,7 +187,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   return {
     resolve: {
-      extensions: ['.ts', '.js'],
+      extensions: ['.ts', '.tsx', '.js'],
       modules: ['node_modules', nodeModules],
       symlinks: !buildOptions.preserveSymlinks,
       alias

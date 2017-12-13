@@ -91,7 +91,7 @@ export class ExtractI18nPlugin implements Tapable {
         fileNames = fileNames.filter(x => !x.replace(/\\/g, '/').match(re));
       });
     } else {
-      fileNames = fileNames.filter(fileName => !/\.spec\.ts$/.test(fileName));
+      fileNames = fileNames.filter(fileName => !/\.spec\.tsx?$/.test(fileName));
     }
     this._rootFilePath = fileNames;
 

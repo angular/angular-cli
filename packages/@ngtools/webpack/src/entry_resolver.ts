@@ -50,8 +50,16 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
       if (specifier.name.text == symbolName) {
         // If it's a directory, load its index and recursively lookup.
         if (fs.statSync(module).isDirectory()) {
-          const indexModule = join(module, 'index.ts');
-          if (fs.existsSync(indexModule)) {
+          let indexModule;
+          const indexTsModulePath = join(module, 'index.ts');
+          const indexTsxModulePath = indexTsModulePath + 'x';
+          if (fs.existsSync(indexTsModulePath)) {
+            indexModule = indexTsModulePath;
+          } else if (fs.existsSync(indexTsxModulePath)) {
+            indexModule = indexTsxModulePath;
+          }
+
+          if (indexModule) {
             const indexRefactor = new TypeScriptFileRefactor(indexModule, host, program);
             const maybeModule = _recursiveSymbolExportLookup(
               indexRefactor, symbolName, host, program);
@@ -153,7 +161,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
   const bootstrapSymbolName = bootstrap[0].text;
   const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);
   if (module) {
-    return `${module.replace(/\.ts$/, '')}#${bootstrapSymbolName}`;
+    return `${module.replace(/\.tsx?$/, '')}#${bootstrapSymbolName}`;
   }
 
   // shrug... something bad happened and we couldn't find the import statement.

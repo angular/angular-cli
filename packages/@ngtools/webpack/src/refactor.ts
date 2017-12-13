@@ -246,7 +246,7 @@ export class TypeScriptFileRefactor {
       const map = SourceMapGenerator.fromSourceMap(consumer);
       if (this._changed) {
         const sourceMap = this._sourceString.generateMap({
-          file: path.basename(this._fileName.replace(/\.ts$/, '.js')),
+          file: path.basename(this._fileName.replace(/\.tsx?$/, '.js')),
           source: this._fileName,
           hires: true,
         });
@@ -258,7 +258,8 @@ export class TypeScriptFileRefactor {
                      ? this._fileName.replace(/\//g, '\\')
                      : this._fileName;
       sourceMap.sources = [ fileName ];
-      sourceMap.file = path.basename(fileName, '.ts') + '.js';
+      const fileNameExtension = fileName.endsWith('.tsx') ? '.tsx' : '.ts';
+      sourceMap.file = path.basename(fileName, fileNameExtension) + '.js';
       sourceMap.sourcesContent = [ this._sourceText ];
 
       return { outputText: result.outputText, sourceMap };

@@ -35,7 +35,7 @@ export class NamedLazyChunksWebpackPlugin extends webpack.NamedChunksPlugin {
       ) {
         // Create chunkname from file request, stripping ngfactory and extension.
         const request = chunk.blocks[0].dependencies[0].request;
-        const chunkName = basename(request).replace(/(\.ngfactory)?\.(js|ts)$/, '');
+        const chunkName = basename(request).replace(/(\.ngfactory)?\.(js|tsx?)$/, '');
         if (!chunkName || chunkName === '') {
           // Bail out if something went wrong with the name.
           return null;
