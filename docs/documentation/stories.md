@@ -14,6 +14,7 @@
  - [Angular Material](stories/include-angular-material)
  - [AngularFire](stories/include-angularfire)
  - [Bootstrap](stories/include-bootstrap)
+ - [Budgets](stories/budgets)
  - [Font Awesome](stories/include-font-awesome)
  - [Moving Into the CLI](stories/moving-into-the-cli)
  - [Moving Out of the CLI](stories/moving-out-of-the-cli)
