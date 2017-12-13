@@ -226,7 +226,7 @@ export class AngularCompilerPlugin implements Tapable {
       this._compilerOptions.i18nOutFormat = options.i18nOutFormat;
     }
     if (options.locale !== undefined) {
-      this._compilerOptions.i18nInLocale = options.locale;
+      this._compilerOptions.i18nOutLocale = options.locale;
       this._normalizedLocale = this._validateLocale(options.locale);
     }
     if (options.missingTranslation !== undefined) {
