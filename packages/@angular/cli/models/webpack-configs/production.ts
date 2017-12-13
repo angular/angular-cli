@@ -5,6 +5,7 @@ import * as semver from 'semver';
 import { stripIndent } from 'common-tags';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { PurifyPlugin } from '@angular-devkit/build-optimizer';
+import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
@@ -107,6 +108,10 @@ export function getProdConfig(wco: WebpackConfigOptions) {
       entryPoints['sw-register'] = [registerPath];
     }
   }
+
+  extraPlugins.push(new BundleBudgetPlugin({
+    budgets: appConfig.budgets
+  }));
 
   if (buildOptions.extractLicenses) {
     extraPlugins.push(new LicenseWebpackPlugin({
