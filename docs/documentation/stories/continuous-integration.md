@@ -119,6 +119,13 @@ sudo: false
 language: node_js
 node_js:
   - "6"
+  
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
 
 cache:
   directories:
