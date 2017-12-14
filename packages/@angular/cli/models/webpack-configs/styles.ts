@@ -36,10 +36,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
   const extraPlugins: any[] = [];
-  // style-loader does not support sourcemaps without absolute publicPath, so it's
-  // better to disable them when not extracting css
-  // https://github.com/webpack-contrib/style-loader#recommended-configuration
-  const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemaps;
+  const cssSourceMap = buildOptions.sourcemaps;
 
   // Minify/optimize css in production.
   const minimizeCss = buildOptions.target === 'production';
