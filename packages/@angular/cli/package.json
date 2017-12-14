@@ -60,7 +60,6 @@
     "nopt": "^4.0.1",
     "opn": "~5.1.0",
     "portfinder": "~1.0.12",
-    "postcss-custom-properties": "^6.1.0",
     "postcss-import": "^11.0.0",
     "postcss-loader": "^2.0.10",
     "postcss-url": "^7.1.2",
