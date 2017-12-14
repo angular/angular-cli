@@ -20,14 +20,9 @@ export default function() {
     return Promise.resolve();
   }
 
-  let oldNumberOfChunks = 0;
-  const chunkRegExp = /chunk\s+\{/g;
+  const lazyChunkRegExp = /lazy\.module\.chunk\.js/g;
 
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
-    // Count the bundles.
-    .then(({ stdout }) => {
-      oldNumberOfChunks = stdout.split(chunkRegExp).length;
-    })
     // Add a lazy module.
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
     // Should trigger a rebuild with a new bundle.
@@ -65,8 +60,7 @@ export default function() {
     // Count the bundles.
     .then((results) => {
       const stdout = results[0].stdout;
-      let newNumberOfChunks = stdout.split(chunkRegExp).length;
-      if (oldNumberOfChunks >= newNumberOfChunks) {
+      if (!lazyChunkRegExp.test(stdout)) {
         throw new Error('Expected webpack to create a new chunk, but did not.');
       }
     })
