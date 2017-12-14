@@ -193,7 +193,8 @@ export default Task.extend({
     if (!servePath && servePath !== '') {
       const defaultServePath =
         findDefaultServePath(serveTaskOptions.baseHref, serveTaskOptions.deployUrl);
-      if (defaultServePath == null) {
+      const showWarning = CliConfig.fromProject().get('warnings.servePathDefault');
+      if (defaultServePath == null && showWarning) {
         ui.writeLine(oneLine`
             ${chalk.yellow('WARNING')} --deploy-url and/or --base-href contain
             unsupported values for ng serve.  Default serve path of '/' used.

@@ -614,6 +614,11 @@
           "description": "Show a warning when the TypeScript version is incompatible",
           "type": "boolean",
           "default": true
+        },
+        "servePathDefault": {
+          "description": "Show a warning when deploy-url/base-href use unsupported serve path values.",
+          "type": "boolean",
+          "default": true
         }
       }
     }
