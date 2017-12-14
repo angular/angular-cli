@@ -26,11 +26,9 @@ export function statsToString(json: any, statsConfig: any) {
   const g = (x: string) => colors ? bold(green(x)) : x;
   const y = (x: string) => colors ? bold(yellow(x)) : x;
 
-  return rs(stripIndents`
-    Date: ${w(new Date().toISOString())}
-    Hash: ${w(json.hash)}
-    Time: ${w('' + json.time)}ms
-    ${json.chunks.map((chunk: any) => {
+  const changedChunksStats = json.chunks
+    .filter((chunk: any) => chunk.rendered)
+    .map((chunk: any) => {
       const asset = json.assets.filter((x: any) => x.name == chunk.files[0])[0];
       const size = asset ? ` ${_formatSize(asset.size)}` : '';
       const files = chunk.files.join(', ');
@@ -41,8 +39,24 @@ export function statsToString(json: any, statsConfig: any) {
         .join('');
 
       return `chunk {${y(chunk.id)}} ${g(files)}${names}${size} ${initial}${flags}`;
-    }).join('\n')}
-    `);
+    });
+
+  const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
+
+  if (unchangedChunkNumber > 0) {
+    return rs(stripIndents`
+      Date: ${w(new Date().toISOString())} • Hash: ${w(json.hash)} • Time: ${w('' + json.time)}ms
+      ${unchangedChunkNumber} unchanged chunks
+      ${changedChunksStats.join('\n')}
+      `);
+  } else {
+    return rs(stripIndents`
+      Date: ${w(new Date().toISOString())}
+      Hash: ${w(json.hash)}
+      Time: ${w('' + json.time)}ms
+      ${changedChunksStats.join('\n')}
+      `);
+  }
 }
 
 export function statsWarningsToString(json: any, statsConfig: any) {
