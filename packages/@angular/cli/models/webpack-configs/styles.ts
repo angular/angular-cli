@@ -11,7 +11,6 @@ import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const customProperties = require('postcss-custom-properties');
 const postcssImports = require('postcss-import');
 
 /**
@@ -115,14 +114,12 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         }
       ]),
       autoprefixer(),
-      customProperties({ preserve: true })
     ];
   };
   (postcssPluginCreator as any)[postcssArgs] = {
     variableImports: {
       'autoprefixer': 'autoprefixer',
       'postcss-url': 'postcssUrl',
-      'postcss-custom-properties': 'customProperties',
       'postcss-import': 'postcssImports',
     },
     variables: { minimizeCss, baseHref, deployUrl, projectRoot }
