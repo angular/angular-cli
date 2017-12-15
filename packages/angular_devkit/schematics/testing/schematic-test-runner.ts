@@ -9,6 +9,7 @@ import { logging, schema } from '@angular-devkit/core';
 import {
   Collection,
   DelegateTree,
+  Rule, Schematic, SchematicContext,
   SchematicEngine,
   Tree,
   VirtualTree,
@@ -18,6 +19,7 @@ import {
   NodeModulesTestEngineHost,
 } from '@angular-devkit/schematics/tools';
 import { Observable } from 'rxjs/Observable';
+import { callRule } from '../src/rules/call';
 
 
 export class UnitTestTree extends DelegateTree {
@@ -92,5 +94,11 @@ export class SchematicTestRunner {
     }
 
     return result;
+  }
+
+  callRule(rule: Rule, tree: Tree, parentContext?: Partial<SchematicContext>): Observable<Tree> {
+    const context = this._engine.createContext({} as Schematic<{}, {}>, parentContext);
+
+    return callRule(rule, Observable.of(tree), context);
   }
 }

@@ -182,11 +182,16 @@ const fsSink = new FileSystemSink(process.cwd(), force);
 // actual filesystem. In this case we simply show the dry-run, but skip the fsSink commit.
 let error = false;
 
+// Indicate to the user when nothing has been done.
+let nothingDone = true;
+
 
 const loggingQueue: string[] = [];
 
 // Logs out dry run events.
 dryRunSink.reporter.subscribe((event: DryRunEvent) => {
+  nothingDone = false;
+
   switch (event.kind) {
     case 'error':
       const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist.';
@@ -255,6 +260,10 @@ schematic.call(args, host, { debug, logger: logger.asApi() })
       loggingQueue.forEach(log => logger.info(log));
     }
 
+    if (nothingDone) {
+      logger.info('Nothing to be done.');
+    }
+
     if (dryRun || error) {
       return Observable.of(tree);
     }
@@ -269,7 +278,11 @@ schematic.call(args, host, { debug, logger: logger.asApi() })
       } else if (err instanceof schema.javascript.InvalidPropertyNameException) {
         logger.fatal('A non-supported argument was passed: ' + err.path.split('/').pop());
       } else {
-        logger.fatal(err.message);
+        if (debug) {
+          logger.fatal('An error occured:\n' + err.stack);
+        } else {
+          logger.fatal(err.message);
+        }
       }
       process.exit(1);
     },
