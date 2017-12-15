@@ -35,7 +35,7 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
               private _factory: RuleFactory<{}>,
               private _collection: Collection<CollectionT, SchematicT>,
               private _engine: Engine<CollectionT, SchematicT>) {
-    if (!_description.name.match(/^[-_.a-zA-Z0-9]+$/)) {
+    if (!_description.name.match(/^[-@/_.a-zA-Z0-9]+$/)) {
       throw new InvalidSchematicsNameException(_description.name);
     }
   }

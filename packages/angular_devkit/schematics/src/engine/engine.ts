@@ -119,6 +119,10 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     return schematic;
   }
 
+  listSchematicNames(collection: Collection<CollectionT, SchematicT>) {
+    return this._host.listSchematicNames(collection.description);
+  }
+
   transformOptions<OptionT extends object, ResultT extends object>(
       schematic: Schematic<CollectionT, SchematicT>, options: OptionT): ResultT {
     return this._host.transformOptions<OptionT, ResultT>(

@@ -39,6 +39,8 @@ export type SchematicDescription<CollectionMetadataT extends object,
  */
 export interface EngineHost<CollectionMetadataT extends object, SchematicMetadataT extends object> {
   createCollectionDescription(name: string): CollectionDescription<CollectionMetadataT>;
+  listSchematicNames(collection: CollectionDescription<CollectionMetadataT>): string[];
+
   createSchematicDescription(
       name: string,
       collection: CollectionDescription<CollectionMetadataT>):
@@ -54,7 +56,6 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
     schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
     options: OptionT,
   ): ResultT;
-
 
   readonly defaultMergeStrategy?: MergeStrategy;
 }
@@ -101,6 +102,7 @@ export interface Collection<CollectionMetadataT extends object, SchematicMetadat
   readonly description: CollectionDescription<CollectionMetadataT>;
 
   createSchematic(name: string): Schematic<CollectionMetadataT, SchematicMetadataT>;
+  listSchematics(): string[];
 }
 
 

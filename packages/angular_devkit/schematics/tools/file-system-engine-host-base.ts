@@ -16,7 +16,6 @@ import {
 import { dirname, isAbsolute, join, resolve } from 'path';
 import { Url } from 'url';
 import {
-  FileSystemCollection,
   FileSystemCollectionDesc,
   FileSystemCollectionDescription,
   FileSystemSchematicContext,
@@ -89,10 +88,10 @@ export abstract class FileSystemEngineHostBase implements
 
   private _transforms: OptionTransform<object, object>[] = [];
 
-  listSchematics(collection: FileSystemCollection) {
+  listSchematicNames(collection: FileSystemCollectionDescription) {
     const schematics: string[] = [];
-    for (const key of Object.keys(collection.description.schematics)) {
-      const schematic = collection.description.schematics[key];
+    for (const key of Object.keys(collection.schematics)) {
+      const schematic = collection.schematics[key];
 
       // If extends is present without a factory it is an alias, do not return it
       //   unless it is from another collection.

@@ -21,4 +21,8 @@ export class CollectionImpl<CollectionT extends object, SchematicT extends objec
   createSchematic(name: string): Schematic<CollectionT, SchematicT> {
     return this._engine.createSchematic(name, this);
   }
+
+  listSchematics(): string[] {
+    return this._engine.listSchematicNames(this);
+  }
 }

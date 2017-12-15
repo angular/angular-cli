@@ -154,7 +154,7 @@ if (collection === null) {
 
 /** If the user wants to list schematics, we simply show all the schematic names. */
 if (argv['list-schematics']) {
-  logger.info(engineHost.listSchematics(collection).join('\n'));
+  logger.info(engine.listSchematicNames(collection).join('\n'));
   process.exit(0);
   throw 0;  // TypeScript doesn't know that process.exit() never returns.
 }

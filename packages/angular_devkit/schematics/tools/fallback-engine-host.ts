@@ -90,4 +90,15 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
   ): ResultT {
     return this._transforms.reduce((acc: ResultT, t) => t(schematic, acc), options) as ResultT;
   }
+
+  listSchematicNames(collection: CollectionDescription<FallbackCollectionDescription>): string[] {
+    const allNames = new Set<string>();
+    this._hosts.forEach(host => {
+      try {
+        host.listSchematicNames(collection.description).forEach(name => allNames.add(name));
+      } catch (_) {}
+    });
+
+    return [...allNames];
+  }
 }
