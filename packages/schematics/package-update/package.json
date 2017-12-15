@@ -1,0 +1,22 @@
+{
+  "name": "@schematics/package-update",
+  "version": "0.0.0",
+  "description": "Schematics specific to updating Angular",
+  "keywords": [
+    "blueprints",
+    "code generation",
+    "schematics",
+    "schematic"
+  ],
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
+  "schematics": "./collection.json",
+  "peerDependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/schematics": "0.0.0",
+    "rxjs": "^5.5.2",
+    "semver": "^5.3.0",
+    "semver-intersect": "^1.1.2"
+  }
+}

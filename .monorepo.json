@@ -83,6 +83,12 @@
       "version": "0.0.11",
       "section": "Schematics",
       "hash": "e5e524d6f6c523d4aed505bd7e6344cf"
+    },
+    "@schematics/package-update": {
+      "name": "Package JSON Update Schematics",
+      "version": "0.0.1",
+      "section": "Schematics",
+      "hash": ""
     }
   }
 }
