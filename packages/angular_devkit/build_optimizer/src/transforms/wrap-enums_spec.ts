@@ -30,7 +30,7 @@ describe('wrap-enums', () => {
         ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = "OnPush";
         ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = "Default";
         return ChangeDetectionStrategy;
-      })();
+      }());
     `;
 
     expect(testWrapEnums(input)).toBeTruthy();
@@ -46,12 +46,11 @@ describe('wrap-enums', () => {
       })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
     `;
     const output = tags.stripIndent`
-      export var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
-        var ChangeDetectionStrategy = {};
+      export var ChangeDetectionStrategy = /*@__PURE__*/ (function (ChangeDetectionStrategy) {
         ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
         ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
         return ChangeDetectionStrategy;
-      })();
+      })({});
     `;
 
     expect(testWrapEnums(input)).toBeTruthy();
@@ -85,7 +84,7 @@ describe('wrap-enums', () => {
         FormatWidth[FormatWidth.Long] = "Long";
         FormatWidth[FormatWidth.Full] = "Full";
         return FormatWidth;
-      })();
+      }());
     `;
 
     expect(testWrapEnums(input)).toBeTruthy();

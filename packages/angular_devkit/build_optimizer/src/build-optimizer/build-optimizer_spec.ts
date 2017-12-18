@@ -58,12 +58,11 @@ describe('build-optimizer', () => {
         /** PURE_IMPORTS_START _angular_core,tslib PURE_IMPORTS_END */
         ${imports}
         import { __extends } from "tslib";
-        var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
-          var ChangeDetectionStrategy = {};
+        var ChangeDetectionStrategy = /*@__PURE__*/ (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
           ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
           return ChangeDetectionStrategy;
-        })();
+        })({});
         var Clazz = /*@__PURE__*/ (function () { function Clazz() { } ${staticProperty} return Clazz; }());
         var ComponentClazz = /*@__PURE__*/ (function () {
           function ComponentClazz() { }
