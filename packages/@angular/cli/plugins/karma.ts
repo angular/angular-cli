@@ -53,7 +53,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     environment: 'dev',
     codeCoverage: false,
     sourcemaps: true,
-    progress: true,
+    progress: process.stdout.isTTY === true,
     preserveSymlinks: false,
   }, config.angularCli);
 
