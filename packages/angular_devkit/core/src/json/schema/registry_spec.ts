@@ -7,12 +7,12 @@
  */
 // tslint:disable:no-any
 import 'rxjs/add/operator/mergeMap';
-import { AjvSchemaRegistry } from './ajv-option-transform';
+import { CoreSchemaRegistry } from './registry';
 
 
-describe('AjvSchemaRegistry', () => {
+describe('CoreSchemaRegistry', () => {
   it('works asynchronously', done => {
-    const registry  = new AjvSchemaRegistry();
+    const registry  = new CoreSchemaRegistry();
     const data: any = {};  // tslint:disable:no-any
 
     registry
@@ -44,7 +44,7 @@ describe('AjvSchemaRegistry', () => {
   // If it's meant to be used externally then this test should change to truly be synchronous
   // (i.e. not relyign on the observable).
   it('works synchronously', done => {
-    const registry  = new AjvSchemaRegistry();
+    const registry  = new CoreSchemaRegistry();
     const data: any = {};  // tslint:disable:no-any
     let isDone = false;
 

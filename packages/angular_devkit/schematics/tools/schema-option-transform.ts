@@ -5,7 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException } from '@angular-devkit/core';
+import {
+  BaseException,
+  schema,
+} from '@angular-devkit/core';
 import { SchematicDescription } from '@angular-devkit/schematics';
 import { Observable } from 'rxjs/Observable';
 import { first } from 'rxjs/operators/first';
@@ -26,20 +29,6 @@ export class InvalidInputOptions extends BaseException {
 }
 
 
-export interface OptionsSchemaValidatorResult {
-  success: boolean;
-  errors?: string[];
-}
-
-export interface OptionsSchemaValidator {
-  // tslint:disable-next-line:no-any
-  (data: any): Observable<OptionsSchemaValidatorResult>;
-}
-
-export interface OptionsSchemaRegistry {
-  compile(schema: Object): Observable<OptionsSchemaValidator>;
-}
-
 // tslint:disable-next-line:no-any
 function _deepCopy<T extends {[key: string]: any}>(object: T): T {
   const copy = {} as T;
@@ -57,7 +46,7 @@ function _deepCopy<T extends {[key: string]: any}>(object: T): T {
 
 
 // This can only be used in NodeJS.
-export function validateOptionsWithSchema(registry: OptionsSchemaRegistry) {
+export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
   return <T extends {}>(schematic: SchematicDesc, options: T): Observable<T> => {
     // Prevent a schematic from changing the options object by making a copy of it.
     options = _deepCopy(options);

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { logging } from '@angular-devkit/core';
+import { logging, schema } from '@angular-devkit/core';
 import {
   Collection,
   DelegateTree,
@@ -17,7 +17,6 @@ import {
   VirtualTree,
 } from '@angular-devkit/schematics';
 import {
-  AjvSchemaRegistry,
   NodeModulesTestEngineHost,
   validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
@@ -44,7 +43,8 @@ export class SchematicTestRunner {
     this._engineHost.registerCollection(_collectionName, collectionPath);
     this._logger = new logging.Logger('test');
 
-    this._engineHost.registerOptionsTransform(validateOptionsWithSchema(new AjvSchemaRegistry()));
+    this._engineHost.registerOptionsTransform(
+      validateOptionsWithSchema(new schema.CoreSchemaRegistry()));
     this._collection = this._engine.createCollection(this._collectionName);
   }
 

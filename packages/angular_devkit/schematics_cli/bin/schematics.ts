@@ -6,7 +6,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { schema, tags, terminal } from '@angular-devkit/core';
+import {
+  schema,
+  tags,
+  terminal,
+} from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import {
   DryRunEvent,
@@ -17,7 +21,6 @@ import {
   Tree,
 } from '@angular-devkit/schematics';
 import {
-  AjvSchemaRegistry,
   FileSystemHost,
   NodeModulesEngineHost,
   validateOptionsWithSchema,
@@ -125,7 +128,7 @@ const engine = new SchematicEngine(engineHost);
 
 
 // Add support for schemaJson.
-engineHost.registerOptionsTransform(validateOptionsWithSchema(new AjvSchemaRegistry()));
+engineHost.registerOptionsTransform(validateOptionsWithSchema(new schema.CoreSchemaRegistry()));
 
 
 /**
@@ -260,17 +263,10 @@ schematic.call(args, host, { debug, logger: logger.asApi() })
   })
   .subscribe({
     error(err: Error) {
-      // Add extra processing to output better error messages.
-      if (err instanceof schema.javascript.RequiredValueMissingException) {
-        logger.fatal('Missing argument on the command line: ' + err.path.split('/').pop());
-      } else if (err instanceof schema.javascript.InvalidPropertyNameException) {
-        logger.fatal('A non-supported argument was passed: ' + err.path.split('/').pop());
+      if (debug) {
+        logger.fatal('An error occured:\n' + err.stack);
       } else {
-        if (debug) {
-          logger.fatal('An error occured:\n' + err.stack);
-        } else {
-          logger.fatal(err.message);
-        }
+        logger.fatal(err.message);
       }
       process.exit(1);
     },
