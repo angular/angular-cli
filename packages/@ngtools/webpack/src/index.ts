@@ -1,12 +1,12 @@
 // @ignoreDep typescript
-import { satisfies } from 'semver';
+import { gte } from 'semver';
 
 // Test if typescript is available. This is a hack. We should be using peerDependencies instead
 // but can't until we split global and local packages.
 // See https://github.com/angular/angular-cli/issues/8107#issuecomment-338185872
 try {
   const version = require('typescript').version;
-  if (!satisfies(version, '^2.0.2')) {
+  if (!gte(version, '2.0.2')) {
     throw new Error();
   }
 } catch (e) {
