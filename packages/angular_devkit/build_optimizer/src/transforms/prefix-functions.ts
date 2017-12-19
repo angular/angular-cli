@@ -52,7 +52,6 @@ export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.Source
 export function findTopLevelFunctions(parentNode: ts.Node): ts.Node[] {
   const topLevelFunctions: ts.Node[] = [];
 
-  let previousNode: ts.Node;
   function cb(node: ts.Node) {
     // Stop recursing into this branch if it's a function expression or declaration
     if (node.kind === ts.SyntaxKind.FunctionDeclaration
@@ -60,32 +59,25 @@ export function findTopLevelFunctions(parentNode: ts.Node): ts.Node[] {
       return;
     }
 
-    // We need to check specially for IIFEs formatted as call expressions inside parenthesized
-    // expressions: `(function() {}())` Their start pos doesn't include the opening paren
-    // and must be adjusted.
-    if (isIIFE(node)
-        && previousNode.kind === ts.SyntaxKind.ParenthesizedExpression
-        && node.parent
-        && !hasPureComment(node.parent)) {
-      topLevelFunctions.push(node.parent);
-    } else if ((node.kind === ts.SyntaxKind.CallExpression
-              || node.kind === ts.SyntaxKind.NewExpression)
-        && !hasPureComment(node)
-    ) {
-      topLevelFunctions.push(node);
+    let noPureComment = !hasPureComment(node);
+    let innerNode = node;
+    while (innerNode && ts.isParenthesizedExpression(innerNode)) {
+      innerNode = innerNode.expression;
+      noPureComment = noPureComment && !hasPureComment(innerNode);
     }
 
-    previousNode = node;
+    if (!innerNode) {
+      return;
+    }
 
-    ts.forEachChild(node, cb);
-  }
+    if (noPureComment) {
+      if (innerNode.kind === ts.SyntaxKind.CallExpression
+          || innerNode.kind === ts.SyntaxKind.NewExpression) {
+        topLevelFunctions.push(node);
+      }
+    }
 
-  function isIIFE(node: ts.Node): boolean {
-    return node.kind === ts.SyntaxKind.CallExpression
-      // This check was in the old ngo but it doesn't seem to make sense with the typings.
-      // TODO(filipesilva): ask Alex Rickabaugh about it.
-      // && !(<ts.CallExpression>node).expression.text
-      && (node as ts.CallExpression).expression.kind !== ts.SyntaxKind.PropertyAccessExpression;
+    ts.forEachChild(innerNode, cb);
   }
 
   ts.forEachChild(parentNode, cb);
@@ -116,6 +108,9 @@ export function findPureImports(parentNode: ts.Node): string[] {
 }
 
 function hasPureComment(node: ts.Node) {
+  if (!node) {
+    return false;
+  }
   const leadingComment = ts.getSyntheticLeadingComments(node);
 
   return leadingComment && leadingComment.some((comment) => comment.text === pureFunctionComment);
