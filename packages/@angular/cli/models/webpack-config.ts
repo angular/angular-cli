@@ -105,7 +105,8 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
         extractCss: false,
         namedChunks: true,
         aot: false,
-        buildOptimizer: false
+        buildOptimizer: false,
+        withPostCssWarnings: true
       },
       production: {
         environment: 'prod',

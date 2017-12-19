@@ -86,6 +86,7 @@
     - *preserveSymlinks* (`boolean`): Do not use the real path when resolving modules. Default is `false`.
     - *showCircularDependencies* (`boolean`): Show circular dependency warnings on builds. Default is `true`.
     - *namedChunks* (`boolean`): Use file name for lazy loaded chunks.
+    - *withPostCssWarnings* (`boolean`): Flag to have post CSS warnings. Default is `true`.
   - *serve*: Properties to be passed to the serve command
     - *port* (`number`): The port the application will be served on. Default is `4200`.
     - *host* (`string`): The host the application will be served on. Default is `localhost`.
