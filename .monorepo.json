@@ -58,6 +58,12 @@
     },
     "@angular-devkit/core": {
       "name": "Core",
+      "links": [
+        {
+          "label": "README",
+          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/core/README.md"
+        }
+      ],
       "version": "0.0.23",
       "hash": "45c3c8b7d60b038bbedd3000ebca1b88"
     },
