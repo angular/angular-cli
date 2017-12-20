@@ -19,6 +19,7 @@ import {
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import {
   replaceBootstrap,
+  replaceServerBootstrap,
   exportNgFactory,
   exportLazyModuleMap,
   removeDecorators,
@@ -697,7 +698,9 @@ export class AngularCompilerPlugin implements Tapable {
     } else if (this._platform === PLATFORM.Server) {
       this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
       if (!this._JitMode) {
-        this._transformers.push(exportNgFactory(isMainPath, getEntryModule));
+        this._transformers.push(
+          exportNgFactory(isMainPath, getEntryModule),
+          replaceServerBootstrap(isMainPath, getEntryModule, getTypeChecker));
       }
     }
   }
