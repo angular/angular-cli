@@ -18,6 +18,7 @@ export class WebpackResourceLoader {
   private _context: string;
   private _uniqueId = 0;
   private _resourceDependencies = new Map<string, string[]>();
+  private _cachedResources = new Map<string, string>();
 
   constructor() {}
 
@@ -69,6 +70,11 @@ export class WebpackResourceLoader {
 
     childCompiler.plugin('this-compilation', (compilation: any) => {
       compilation.plugin('additional-assets', (callback: (err?: Error) => void) => {
+        if (this._cachedResources.has(compilation.fullHash)) {
+          callback();
+          return;
+        }
+
         const asset = compilation.assets[filePath];
         if (asset) {
           this._evaluate({ outputName: filePath, source: asset.source() })
@@ -104,12 +110,17 @@ export class WebpackResourceLoader {
           // Save the dependencies for this resource.
           this._resourceDependencies.set(filePath, childCompilation.fileDependencies);
 
-          resolve({
-            // Output name.
-            outputName: filePath,
-            // Compiled code.
-            source: childCompilation.assets[filePath].source()
-          });
+          const compilationHash = childCompilation.fullHash;
+          if (this._cachedResources.has(compilationHash)) {
+            resolve({
+              outputName: filePath,
+              source: this._cachedResources.get(compilationHash),
+            });
+          } else {
+            const source = childCompilation.assets[filePath].source();
+            this._cachedResources.set(compilationHash, source);
+            resolve({ outputName: filePath, source });
+          }
         }
       });
     });
