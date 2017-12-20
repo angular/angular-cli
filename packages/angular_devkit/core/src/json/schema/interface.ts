@@ -13,13 +13,23 @@ export interface SchemaValidatorResult {
   errors?: string[];
 }
 
-
 export interface SchemaValidator {
   // tslint:disable-next-line:no-any
   (data: any): Observable<SchemaValidatorResult>;
 }
 
+export interface SchemaFormatter {
+  readonly async: boolean;
+  // tslint:disable-next-line:no-any
+  validate(data: any): boolean | Observable<boolean>;
+}
+
+export interface SchemaFormat {
+  name: string;
+  formatter: SchemaFormatter;
+}
 
 export interface SchemaRegistry {
   compile(schema: Object): Observable<SchemaValidator>;
+  addFormat(format: SchemaFormat): void;
 }

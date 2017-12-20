@@ -12,7 +12,13 @@ import 'rxjs/add/observable/of';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { map } from 'rxjs/operators/map';
 import { JsonArray, JsonObject } from '../interface';
-import { SchemaRegistry, SchemaValidator, SchemaValidatorResult } from './interface';
+import {
+  SchemaFormat,
+  SchemaFormatter,
+  SchemaRegistry,
+  SchemaValidator,
+  SchemaValidatorResult,
+} from './interface';
 
 
 function _parseJsonPointer(pointer: string): string[] {
@@ -101,13 +107,21 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   private _ajv: ajv.Ajv;
   private _uriCache = new Map<string, JsonObject>();
 
-  constructor() {
+  constructor(formats: SchemaFormat[] = []) {
     /**
      * Build an AJV instance that will be used to validate schemas.
      */
+
+    const formatsObj: { [name: string]: SchemaFormatter } = {};
+
+    for (const format of formats) {
+      formatsObj[format.name] = format.formatter;
+    }
+
     this._ajv = ajv({
       removeAdditional: 'all',
       useDefaults: true,
+      formats: formatsObj,
       loadSchema: (uri: string) => this._fetch(uri) as ajv.Thenable<object>,
     });
 
@@ -265,11 +279,28 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
                 return {
                   success: false,
-                  errors: (validate.errors || []).map((err: ajv.ErrorObject) => err.message),
+                  errors: (validate.errors || [])
+                    .map((err: ajv.ErrorObject) => `${err.dataPath} ${err.message}`),
                 } as SchemaValidatorResult;
               }),
             );
         }),
       );
+  }
+
+  addFormat(format: SchemaFormat): void {
+    // tslint:disable-next-line:no-any
+    const validate = (data: any) => {
+      const result = format.formatter.validate(data);
+
+      return result instanceof Observable ? result.toPromise() : result;
+    };
+
+    this._ajv.addFormat(format.name, {
+      async: format.formatter.async,
+      validate,
+    // AJV typings list `compare` as required, but it is optional.
+    // tslint:disable-next-line:no-any
+    } as any);
   }
 }
