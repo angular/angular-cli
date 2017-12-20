@@ -22,7 +22,7 @@ export class CollectionImpl<CollectionT extends object, SchematicT extends objec
     return this._engine.createSchematic(name, this);
   }
 
-  listSchematics(): string[] {
+  listSchematicNames(): string[] {
     return this._engine.listSchematicNames(this);
   }
 }

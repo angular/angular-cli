@@ -9,7 +9,9 @@ import { logging, schema } from '@angular-devkit/core';
 import {
   Collection,
   DelegateTree,
-  Rule, Schematic, SchematicContext,
+  Rule,
+  Schematic,
+  SchematicContext,
   SchematicEngine,
   Tree,
   VirtualTree,

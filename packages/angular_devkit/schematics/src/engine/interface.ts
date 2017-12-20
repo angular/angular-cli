@@ -102,7 +102,7 @@ export interface Collection<CollectionMetadataT extends object, SchematicMetadat
   readonly description: CollectionDescription<CollectionMetadataT>;
 
   createSchematic(name: string): Schematic<CollectionMetadataT, SchematicMetadataT>;
-  listSchematics(): string[];
+  listSchematicNames(): string[];
 }
 
 

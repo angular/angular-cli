@@ -34,7 +34,7 @@ const npmPackageJsonCache = new Map<string, Observable<JsonObject>>();
 function _getVersionFromNpmPackage(json: JsonObject, version: string, loose: boolean): string {
   const distTags = json['dist-tags'] as JsonObject;
   if (distTags && distTags[version]) {
-    return (loose ? '^' : '') + distTags[version] as string;
+    return (loose ? '~' : '') + distTags[version] as string;
   } else {
     if (!semver.validRange(version)) {
       throw new SchematicsException(`Invalid range or version: "${version}".`);

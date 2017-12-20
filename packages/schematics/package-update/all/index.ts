@@ -12,7 +12,7 @@ import { SchematicsUpdateSchema } from '../schema';
 export default function(options: SchematicsUpdateSchema): Rule {
   return (tree: Tree, context: SchematicContext) => {
     return chain(
-      context.schematic.collection.listSchematics()
+      context.schematic.collection.listSchematicNames()
         .filter(name => name != context.schematic.description.name)
         .map(name => schematic(name, options)),
     )(tree, context);
