@@ -816,16 +816,20 @@ export class AngularCompilerPlugin implements Tapable {
           .map((p) => this._compilerHost.denormalizePath(p));
       }
     } else {
-      // Check if the TS file exists.
-      if (fileName.endsWith('.ts') && !this._compilerHost.fileExists(fileName, false)) {
-        throw new Error(`${fileName} is not part of the compilation. `
-          + `Please make sure it is in your tsconfig via the 'files' or 'include' property.`);
-      }
+      // Check if the TS input file and the JS output file exist.
+      if ((fileName.endsWith('.ts') && !this._compilerHost.fileExists(fileName, false))
+        || !this._compilerHost.fileExists(outputFile, false)) {
+        let msg = `${fileName} is missing from the TypeScript compilation. `
+          + `Please make sure it is in your tsconfig via the 'files' or 'include' property.`;
 
-      // Check if the output file exists.
-      if (!this._compilerHost.fileExists(outputFile, false)) {
-        throw new Error(`${fileName} is not part of the compilation output. `
-          + `Please check the other error messages for details.`);
+        if (/(\\|\/)node_modules(\\|\/)/.test(fileName)) {
+          msg += '\nThe missing file seems to be part of a third party library. '
+            + 'TS files in published libraries are often a sign of a badly packaged library. '
+            + 'Please open an issue in the library repository to alert its author and ask them '
+            + 'to package the library using the Angular Package Format (https://goo.gl/jB3GVv).';
+        }
+
+        throw new Error(msg);
       }
 
       outputText = this._compilerHost.readFile(outputFile);
