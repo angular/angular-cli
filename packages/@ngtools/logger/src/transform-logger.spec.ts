@@ -1,22 +1,19 @@
 import {TransformLogger} from './transform-logger';
 import {LogEntry} from './logger';
-
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
+import {filter, map, toArray} from 'rxjs/operators';
 
 
 describe('TransformLogger', () => {
   it('works', (done: DoneFn) => {
     const logger = new TransformLogger('test', stream => {
-      return stream
-        .filter(entry => entry.message != 'hello')
-        .map(entry => {
+      return stream.pipe(
+        filter(entry => entry.message != 'hello'),
+        map(entry => {
           entry.message += '1';
           return entry;
-        });
+        }));
     });
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([

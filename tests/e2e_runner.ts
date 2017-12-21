@@ -14,8 +14,7 @@ import * as path from 'path';
 import {setGlobalVariable} from './e2e/utils/env';
 
 // RxJS
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/observable/empty';
+import {filter} from 'rxjs/operators';
 
 
 Error.stackTraceLimit = Infinity;
@@ -73,7 +72,7 @@ process.exitCode = 255;
 
 
 ConsoleLoggerStack.start(new IndentLogger('name'))
-  .filter((entry: LogEntry) => (entry.level != 'debug' || argv.verbose))
+  .pipe(filter((entry: LogEntry) => (entry.level != 'debug' || argv.verbose)))
   .subscribe((entry: LogEntry) => {
     let color: (s: string) => string = white;
     let output = process.stdout;

@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import * as minimist from 'minimist';
 
 
-import 'rxjs/add/operator/filter';
+import {filter} from 'rxjs/operators';
 
 
 const { bold, red, yellow, white } = chalk;
@@ -17,7 +17,7 @@ const argv = minimist(process.argv.slice(2), {
 const rootLogger = new IndentLogger('cling');
 
 rootLogger
-  .filter((entry: LogEntry) => (entry.level != 'debug' || argv['verbose']))
+  .pipe(filter((entry: LogEntry) => (entry.level != 'debug' || argv['verbose'])))
   .subscribe((entry: LogEntry) => {
     let color: (s: string) => string = white;
     let output = process.stdout;
@@ -32,7 +32,7 @@ rootLogger
   });
 
 rootLogger
-  .filter((entry: LogEntry) => entry.level == 'fatal')
+  .pipe(filter((entry: LogEntry) => entry.level == 'fatal'))
   .subscribe(() => {
     process.stderr.write('A fatal error happened. See details above.');
     process.exit(100);
