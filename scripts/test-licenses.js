@@ -4,7 +4,7 @@ const path = require('path');
 const chalk = require('chalk');
 const spdxSatisfies = require('spdx-satisfies');
 const Logger = require('@ngtools/logger').Logger;
-require('rxjs/add/operator/filter');
+const filter = require('rxjs/operators').filter;
 
 // Configure logger
 const logger = new Logger('test-licenses');
@@ -23,7 +23,7 @@ logger.subscribe((entry) => {
 });
 
 logger
-  .filter((entry) => entry.level == 'fatal')
+  .pipe(filter((entry) => entry.level == 'fatal'))
   .subscribe(() => {
     process.stderr.write('A fatal error happened. See details above.');
     process.exit(1);

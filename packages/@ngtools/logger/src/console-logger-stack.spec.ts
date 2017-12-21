@@ -1,13 +1,13 @@
 import {LogEntry, Logger} from './logger';
 import {ConsoleLoggerStack} from './console-logger-stack';
 import {NullLogger} from './null-logger';
+import {toArray} from 'rxjs/operators';
 
 
 describe('ConsoleLoggerStack', () => {
   it('works', (done: DoneFn) => {
     const logger = ConsoleLoggerStack.start('test');
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([
@@ -26,8 +26,7 @@ describe('ConsoleLoggerStack', () => {
     const oldConsoleLog = console.log;
     const logger = ConsoleLoggerStack.start('test');
     expect(console.log).not.toBe(oldConsoleLog);
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([
@@ -55,8 +54,7 @@ describe('ConsoleLoggerStack', () => {
     const logger = new Logger('test');
     ConsoleLoggerStack.start(logger);
     expect(console.log).not.toBe(oldConsoleLog);
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([

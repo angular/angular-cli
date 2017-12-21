@@ -17,8 +17,6 @@ import {
   NodeModulesEngineHost
 } from '@angular-devkit/schematics/tools';
 import { SchemaClassFactory } from '@ngtools/json-schema';
-import 'rxjs/add/operator/concatMap';
-import 'rxjs/add/operator/map';
 
 const SilentError = require('silent-error');
 

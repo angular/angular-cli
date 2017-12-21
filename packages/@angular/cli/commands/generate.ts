@@ -3,8 +3,6 @@ const stringUtils = require('ember-cli-string-utils');
 import { oneLine } from 'common-tags';
 import { CliConfig } from '../models/config';
 
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/ignoreElements';
 import {
   getCollection,
   getEngineHost
