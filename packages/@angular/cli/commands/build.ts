@@ -117,6 +117,11 @@ export const baseBuildCommandOptions: any = [
     description: 'Extract css from global styles onto css files instead of js ones.'
   },
   {
+    name: 'inline-asset-max-size',
+    type: Number,
+    description: 'Maximum size (in Kb) of assets to be inlined'
+  },
+  {
     name: 'watch',
     type: Boolean,
     default: false,
