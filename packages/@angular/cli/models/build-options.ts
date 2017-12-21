@@ -18,6 +18,7 @@ export interface BuildOptions {
   locale?: string;
   missingTranslation?: string;
   extractCss?: boolean;
+  inlineAssetMaxSize?: number;
   bundleDependencies?: 'none' | 'all';
   watch?: boolean;
   outputHashing?: string;
