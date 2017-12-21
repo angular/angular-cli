@@ -36,16 +36,60 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
   const extraPlugins: any[] = [];
-  // style-loader does not support sourcemaps without absolute publicPath, so it's
-  // better to disable them when not extracting css
-  // https://github.com/webpack-contrib/style-loader#recommended-configuration
-  const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemaps;
+  const cssSourceMap = buildOptions.sourcemaps;
 
   // Minify/optimize css in production.
   const minimizeCss = buildOptions.target === 'production';
   // Convert absolute resource URLs to account for base-href and deploy-url.
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
+
+  const getPostcssUrlConfig = function() {
+    interface PostcssUrlConfig {
+      filter({ url }: { url: string}): boolean;
+      url: string | Function;
+      maxSize?: number;
+    }
+
+    let config: PostcssUrlConfig[] = [];
+
+    const convertRelativeUrlConfig: PostcssUrlConfig = {
+      // Only convert root relative URLs, which CSS-Loader won't process into require().
+      filter: ({ url }: { url: string}) => url.startsWith('/') && !url.startsWith('//'),
+      url: ({ url }: { url: string }) => {
+        if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
+          // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
+          return `${deployUrl.replace(/\/$/, '')}${url}`;
+        } else if (baseHref.match(/:\/\//)) {
+          // If baseHref contains a scheme, include it as is.
+          return baseHref.replace(/\/$/, '') +
+              `/${deployUrl}/${url}`.replace(/\/\/+/g, '/');
+        } else {
+          // Join together base-href, deploy-url and the original URL.
+          // Also dedupe multiple slashes into single ones.
+          return `/${baseHref}/${deployUrl}/${url}`.replace(/\/\/+/g, '/');
+        }
+      }
+    };
+
+    config.push(convertRelativeUrlConfig);
+
+    // Do not inline any assets if the inline-asset-max-size option is negative
+    if (!buildOptions.inlineAssetMaxSize || buildOptions.inlineAssetMaxSize >= 0) {
+      const inlineAssetsConfig: PostcssUrlConfig = {
+        // TODO: inline .cur if not supporting IE (use browserslist to check)
+        filter: (asset: any) => !asset.hash && !asset.absolutePath.endsWith('.cur'),
+        url: 'inline',
+        // NOTE: maxSize is in KB
+        maxSize: Number.isInteger(buildOptions.inlineAssetMaxSize) ?
+          buildOptions.inlineAssetMaxSize : 10,
+      };
+
+      config.push(inlineAssetsConfig);
+    }
+
+    return config;
+  };
 
   const postcssPluginCreator = function() {
     // safe settings based on: https://github.com/ben-eb/cssnano/issues/358#issuecomment-283696193
@@ -58,33 +102,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     };
 
     return [
-      postcssUrl([
-        {
-          // Only convert root relative URLs, which CSS-Loader won't process into require().
-          filter: ({ url }: { url: string }) => url.startsWith('/') && !url.startsWith('//'),
-          url: ({ url }: { url: string }) => {
-            if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
-              // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
-              return `${deployUrl.replace(/\/$/, '')}${url}`;
-            } else if (baseHref.match(/:\/\//)) {
-              // If baseHref contains a scheme, include it as is.
-              return baseHref.replace(/\/$/, '') +
-                  `/${deployUrl}/${url}`.replace(/\/\/+/g, '/');
-            } else {
-              // Join together base-href, deploy-url and the original URL.
-              // Also dedupe multiple slashes into single ones.
-              return `/${baseHref}/${deployUrl}/${url}`.replace(/\/\/+/g, '/');
-            }
-          }
-        },
-        {
-          // TODO: inline .cur if not supporting IE (use browserslist to check)
-          filter: (asset: any) => !asset.hash && !asset.absolutePath.endsWith('.cur'),
-          url: 'inline',
-          // NOTE: maxSize is in KB
-          maxSize: 10
-        }
-      ]),
+      postcssUrl(getPostcssUrlConfig()),
       autoprefixer(),
       customProperties({ preserve: true })
     ].concat(
@@ -206,7 +224,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       const ret: any = {
         include: globalStylePaths,
         test,
-        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin)
+        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin)
                                      : ['style-loader', ...extractTextPlugin.use]
       };
       // Save the original options as arguments for eject.

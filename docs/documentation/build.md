@@ -73,15 +73,15 @@ dead code elimination via UglifyJS.
 Both `--dev`/`--target=development` and `--prod`/`--target=production` are 'meta' flags, that set other flags.
 If you do not specify either you will get the `--dev` defaults.
 
-Flag                | `--dev` | `--prod`
----                 | ---     | ---
-`--aot`             | `false` | `true`
-`--environment`     | `dev`   | `prod`
-`--output-hashing`  | `media` | `all`
-`--sourcemaps`      | `true`  | `false`
-`--extract-css`     | `false` | `true`
-`--named-chunks`    | `true`  | `false`
-`--build-optimizer` | `false` | `true` with AOT and Angular 5
+Flag                      | `--dev` | `--prod`
+---                       | ---     | ---
+`--aot`                   | `false` | `true`
+`--environment`           | `dev`   | `prod`
+`--output-hashing`        | `media` | `all`
+`--sourcemaps`            | `true`  | `false`
+`--extract-css`           | `false` | `true`
+`--named-chunks`          | `true`  | `false`
+`--build-optimizer`       | `false` | `true` with AOT and Angular 5
 
 `--prod` also sets the following non-flaggable settings:
 - Adds service worker if configured in `.angular-cli.json`.
@@ -100,7 +100,11 @@ code.
 ### CSS resources
 
 Resources in CSS, such as images and fonts, will be copied over automatically as part of a build.
-If a resource is less than 10kb it will also be inlined.
+If a resource is less than 10kb it will also be inlined by default.
+
+By using flaf `--inline-asset-max-size` it's possible to define the max size of the
+assets that have to be inlined. Negative values will result in no assets to be inlined.
+
 
 You'll see these resources be outputted and fingerprinted at the root of `dist/`.
 
@@ -186,6 +190,19 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
   </p>
   <p>
     Extract css from global styles onto css files instead of js ones.
+  </p>
+</details>
+
+<details>
+  <summary>inline-asset-max-size</summary>
+  <p>
+    <code>--inline-asset-max-size</code>
+  </p>
+  <p>
+    Maximum size (in Kb) of assets to be inlined
+  </p>
+  <p>
+    Values: <code>-1</code> - must not inline any assets, <code>positive integer</code> - size in Kb of assets to inline
   </p>
 </details>
 
