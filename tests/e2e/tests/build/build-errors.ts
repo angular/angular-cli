@@ -39,7 +39,7 @@ export default function () {
     }))
     .then(() => expectToFail(() => ng('build')))
     .then(({ message }) => {
-      if (!message.includes('polyfills.ts is not part of the compilation')) {
+      if (!message.includes('polyfills.ts is missing from the TypeScript compilation')) {
         throw new Error(`Expected missing TS file error, got this instead:\n${message}`);
       }
       if (extraErrors.some((e) => message.includes(e))) {
