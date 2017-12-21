@@ -273,7 +273,7 @@ export class AngularCompilerPlugin implements Tapable {
       this._entryModule = this._options.entryModule;
     } else if (this._compilerOptions.entryModule) {
       this._entryModule = path.resolve(this._basePath,
-        this._compilerOptions.entryModule);
+        this._compilerOptions.entryModule as string); // temporary cast for type issue
     }
 
     // Set platform.

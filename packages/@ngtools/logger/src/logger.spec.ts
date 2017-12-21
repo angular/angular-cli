@@ -1,13 +1,11 @@
 import {Logger, JsonValue} from './logger';
-import 'rxjs/add/operator/toArray';
-import 'rxjs/add/operator/toPromise';
+import {toArray} from 'rxjs/operators';
 
 
 describe('Logger', () => {
   it('works', (done: DoneFn) => {
     const logger = new Logger('test');
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
@@ -25,8 +23,7 @@ describe('Logger', () => {
   it('works with children', (done: DoneFn) => {
     const logger = new Logger('test');
     let hasCompleted = false;
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([

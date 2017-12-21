@@ -25,9 +25,9 @@ export interface CliLintConfig {
 export class LintTaskOptions {
   fix: boolean;
   force: boolean;
-  format? = 'prose';
-  silent? = false;
-  typeCheck? = false;
+  format ? = 'prose';
+  silent ? = false;
+  typeCheck ? = false;
   configs: Array<CliLintConfig>;
 }
 

@@ -8,12 +8,11 @@ import {
   Tree
 } from '@angular-devkit/schematics';
 import { FileSystemHost } from '@angular-devkit/schematics/tools';
-import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
 import * as path from 'path';
 import chalk from 'chalk';
 import { CliConfig } from '../models/config';
-import 'rxjs/add/operator/concatMap';
-import 'rxjs/add/operator/map';
+import { concat, concatMap, ignoreElements, map } from 'rxjs/operators';
 import { getCollection, getSchematic } from '../utilities/schematics';
 
 const { green, red, yellow } = chalk;
@@ -58,7 +57,7 @@ export default Task.extend({
     const opts = { ...taskOptions, ...preppedOptions };
 
     const tree = emptyHost ? new EmptyTree() : new FileSystemTree(new FileSystemHost(workingDir));
-    const host = Observable.of(tree);
+    const host = observableOf(tree);
 
     const dryRunSink = new DryRunSink(workingDir, opts.force);
     const fsSink = new FileSystemSink(workingDir, opts.force);
@@ -111,22 +110,26 @@ export default Task.extend({
     });
 
     return new Promise((resolve, reject) => {
-      schematic.call(opts, host)
-        .map((tree: Tree) => Tree.optimize(tree))
-        .concatMap((tree: Tree) => {
-          return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));
-        })
-        .concatMap((tree: Tree) => {
+      schematic.call(opts, host).pipe(
+        map((tree: Tree) => Tree.optimize(tree)),
+        concatMap((tree: Tree) => {
+          return dryRunSink.commit(tree).pipe(
+            ignoreElements(),
+            concat(observableOf(tree)));
+        }),
+        concatMap((tree: Tree) => {
           if (!error) {
             // Output the logging queue.
             loggingQueue.forEach(log => ui.writeLine(`  ${log.color(log.keyword)} ${log.message}`));
           }
 
           if (opts.dryRun || error) {
-            return Observable.of(tree);
+            return observableOf(tree);
           }
-          return fsSink.commit(tree).ignoreElements().concat(Observable.of(tree));
-        })
+          return fsSink.commit(tree).pipe(
+            ignoreElements(),
+            concat(observableOf(tree)));
+        }))
         .subscribe({
           error(err) {
             ui.writeLine(red(`Error: ${err.message}`));
