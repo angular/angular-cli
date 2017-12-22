@@ -15,6 +15,7 @@ import {
 } from '@angular-devkit/schematics';
 import { dirname, isAbsolute, join, resolve } from 'path';
 import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { Url } from 'url';
 import {
@@ -247,7 +248,7 @@ export abstract class FileSystemEngineHostBase implements
     schematic: FileSystemSchematicDesc,
     options: OptionT,
   ): Observable<ResultT> {
-    return (Observable.of(options)
+    return (observableOf(options)
       .pipe(
         ...this._transforms.map(tFn => mergeMap(opt => {
           const newOptions = tFn(schematic, opt);

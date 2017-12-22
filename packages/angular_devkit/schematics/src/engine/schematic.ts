@@ -7,8 +7,7 @@
  */
 import { BaseException } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/concatMap';
+import { of as observableOf } from 'rxjs/observable/of';
 import { concatMap } from 'rxjs/operators/concatMap';
 import { first } from 'rxjs/operators/first';
 import { map } from 'rxjs/operators/map';
@@ -60,7 +59,7 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
           map(o => [tree, o]),
         )),
         concatMap(([tree, transformedOptions]: [Tree, OptionT]) => {
-          return callRule(this._factory(transformedOptions), Observable.of(tree), context);
+          return callRule(this._factory(transformedOptions), observableOf(tree), context);
         }),
       );
   }

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-any
+import { toArray } from 'rxjs/operators';
 import { IndentLogger } from './indent';
 import { LogEntry, Logger } from './logger';
 
@@ -13,8 +14,7 @@ import { LogEntry, Logger } from './logger';
 describe('IndentSpec', () => {
   it('works', (done: DoneFn) => {
     const logger = new IndentLogger('test');
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([

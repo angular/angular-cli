@@ -11,6 +11,7 @@ import {
 } from '@angular-devkit/core';
 import { SchematicDescription } from '@angular-devkit/schematics';
 import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
 import { first } from 'rxjs/operators/first';
 import { map } from 'rxjs/operators/map';
 import { mergeMap } from 'rxjs/operators/mergeMap';
@@ -68,6 +69,6 @@ export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
         );
     }
 
-    return Observable.of(options);
+    return observableOf(options);
   };
 }

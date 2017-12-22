@@ -17,7 +17,6 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
-import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
 import * as stringUtils from '../strings';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';

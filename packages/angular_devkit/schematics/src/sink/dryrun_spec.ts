@@ -8,8 +8,7 @@
 import { normalize } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
-import 'rxjs/add/operator/toArray';
-import 'rxjs/add/operator/toPromise';
+import { toArray } from 'rxjs/operators';
 import { FileSystemCreateTree, FileSystemTree } from '../tree/filesystem';
 import { InMemoryFileSystemTreeHost } from '../tree/memory-host';
 import { optimize } from '../tree/static';
@@ -45,8 +44,7 @@ describe('DryRunSink', () => {
     expect(tree.files).toEqual(files.map(normalize));
 
     const sink = new DryRunSink(outputRoot);
-    sink.reporter
-      .toArray()
+    sink.reporter.pipe(toArray())
       .toPromise()
       .then(infos => {
         expect(infos.length).toBe(4);
@@ -75,8 +73,7 @@ describe('DryRunSink', () => {
     // Need to create this file on the filesystem, otherwise the commit phase will fail.
     fs.writeFileSync(path.join(outputRoot, 'hello'), '');
     const sink = new DryRunSink(outputRoot);
-    sink.reporter
-      .toArray()
+    sink.reporter.pipe(toArray())
       .toPromise()
       .then(infos => {
         expect(infos.length).toBe(2);

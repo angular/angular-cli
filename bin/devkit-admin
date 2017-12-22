@@ -34,10 +34,10 @@ process.chdir(path.join(__dirname, '..'));
 let logger = null;
 try {
   logger = new (require('@angular-devkit/core').logging.IndentLogger)('root');
-  require('rxjs/add/operator/filter');
+  const filter = require('rxjs/operators').filter;
 
   logger
-    .filter(entry => (entry.level !== 'debug' || args.verbose))
+    .pipe(filter(entry => (entry.level !== 'debug' || args.verbose)))
     .subscribe(entry => {
       let color = gray;
       let output = process.stdout;
@@ -52,7 +52,7 @@ try {
     });
 
   logger
-    .filter(entry => entry.level === 'fatal')
+    .pipe(filter(entry => entry.level === 'fatal'))
     .subscribe(() => {
       process.stderr.write('A fatal error happened. See details above.\n');
       process.exit(100);

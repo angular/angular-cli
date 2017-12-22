@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-any
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
+import { filter, map, toArray } from 'rxjs/operators';
 import { LogEntry } from './logger';
 import { TransformLogger } from './transform-logger';
 
@@ -15,12 +14,11 @@ import { TransformLogger } from './transform-logger';
 describe('TransformLogger', () => {
   it('works', (done: DoneFn) => {
     const logger = new TransformLogger('test', stream => {
-      return stream
-        .filter(entry => entry.message != 'hello')
-        .map(entry => (entry.message += '1', entry));
+      return stream.pipe(
+        filter(entry => entry.message != 'hello'),
+        map(entry => (entry.message += '1', entry)));
     });
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([

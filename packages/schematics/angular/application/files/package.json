@@ -23,7 +23,7 @@
     "@angular/router": "^5.1.0",<% if (serviceWorker) { %>
     "@angular/service-worker": "^5.1.0",<% } %>
     "core-js": "^2.4.1",
-    "rxjs": "^5.5.2",
+    "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {

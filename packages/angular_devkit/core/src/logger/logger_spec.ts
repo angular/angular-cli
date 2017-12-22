@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-any
-import 'rxjs/add/operator/toArray';
-import 'rxjs/add/operator/toPromise';
+import { toArray } from 'rxjs/operators';
 import { JsonValue } from '../json/interface';
 import { Logger } from './logger';
 
@@ -15,8 +14,7 @@ import { Logger } from './logger';
 describe('Logger', () => {
   it('works', (done: DoneFn) => {
     const logger = new Logger('test');
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
@@ -34,8 +32,7 @@ describe('Logger', () => {
   it('works with children', (done: DoneFn) => {
     const logger = new Logger('test');
     let hasCompleted = false;
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([
@@ -57,8 +54,7 @@ describe('Logger', () => {
     const logger = new Logger('test');
     logger.debug('woah');
 
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: JsonValue[]) => {
         expect(observed).toEqual([

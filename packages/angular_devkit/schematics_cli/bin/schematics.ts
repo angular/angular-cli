@@ -27,9 +27,13 @@ import {
   validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
 import * as minimist from 'minimist';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/ignoreElements';
-
+import { of as observableOf } from 'rxjs/observable/of';
+import {
+  concat,
+  concatMap,
+  ignoreElements,
+  map,
+} from 'rxjs/operators';
 
 /**
  * Show usage of the CLI tool, and exit the process.
@@ -162,7 +166,7 @@ const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
 const force = argv['force'];
 
 /** This host is the original Tree created from the current directory. */
-const host = Observable.of(new FileSystemTree(new FileSystemHost(process.cwd())));
+const host = observableOf(new FileSystemTree(new FileSystemHost(process.cwd())));
 
 // We need two sinks if we want to output what will happen, and actually do the work.
 // Note that fsSink is technically not used if `--dry-run` is passed, but creating the Sink
@@ -243,26 +247,31 @@ delete args._;
  * (if --dry-run was not passed or an error was detected by dryRun).
  */
 schematic.call(args, host, { debug, logger: logger.asApi() })
-  .map((tree: Tree) => Tree.optimize(tree))
-  .concatMap((tree: Tree) => {
-    return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));
-  })
-  .concatMap((tree: Tree) => {
-    if (!error) {
-      // Output the logging queue.
-      loggingQueue.forEach(log => logger.info(log));
-    }
+  .pipe(
+    map((tree: Tree) => Tree.optimize(tree)),
+    concatMap((tree: Tree) => {
+      return dryRunSink.commit(tree).pipe(
+        ignoreElements(),
+        concat(observableOf(tree)));
+    }),
+    concatMap((tree: Tree) => {
+      if (!error) {
+        // Output the logging queue.
+        loggingQueue.forEach(log => logger.info(log));
+      }
 
-    if (nothingDone) {
-      logger.info('Nothing to be done.');
-    }
+      if (nothingDone) {
+        logger.info('Nothing to be done.');
+      }
 
-    if (dryRun || error) {
-      return Observable.of(tree);
-    }
+      if (dryRun || error) {
+        return observableOf(tree);
+      }
 
-    return fsSink.commit(tree).ignoreElements().concat(Observable.of(tree));
-  })
+      return fsSink.commit(tree).pipe(
+        ignoreElements(),
+        concat(observableOf(tree)));
+    }))
   .subscribe({
     error(err: Error) {
       if (debug) {

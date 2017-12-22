@@ -16,6 +16,9 @@ import {
 import * as http from 'http';
 import { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { empty } from 'rxjs/observable/empty';
+import { from as observableFrom } from 'rxjs/observable/from';
+import { of as observableOf } from 'rxjs/observable/of';
 import { concat, ignoreElements, map, mergeMap } from 'rxjs/operators';
 import * as semver from 'semver';
 
@@ -122,27 +125,27 @@ function _getRecursiveVersions(
   logger: logging.LoggerApi,
   loose: boolean,
 ): Observable<void> {
-  return Observable.from(kPackageJsonDependencyFields).pipe(
+  return observableFrom(kPackageJsonDependencyFields).pipe(
     mergeMap(field => {
       const deps = packageJson[field] as JsonObject;
       if (deps) {
-        return Observable.from(
+        return observableFrom(
           Object.keys(deps)
             .map(depName => depName in deps ? [depName, deps[depName]] : null)
             .filter(x => !!x),
         );
       } else {
-        return Observable.empty();
+        return empty();
       }
     }),
     mergeMap(([depName, depVersion]: [string, string]) => {
       if (!packages[depName] || packages[depName] === depVersion) {
-        return Observable.empty();
+        return empty();
       }
       if (allVersions[depName] && semver.intersects(allVersions[depName], depVersion)) {
         allVersions[depName] = semverIntersect.intersect(allVersions[depName], depVersion);
 
-        return Observable.empty();
+        return empty();
       }
 
       return _getNpmPackageJson(depName, logger).pipe(
@@ -154,7 +157,7 @@ function _getRecursiveVersions(
       const npmPackageVersions = Object.keys(npmPackageJson['versions'] as JsonObject);
       const match = semver.maxSatisfying(npmPackageVersions, updateVersion);
       if (!match) {
-        return Observable.empty();
+        return empty();
       }
       if (semver.lt(
         semverIntersect.parseRange(updateVersion).version,
@@ -234,7 +237,7 @@ export function updatePackageJson(
 
       return _getRecursiveVersions(packageJson, packages, allVersions, context.logger, loose).pipe(
         ignoreElements(),
-        concat(Observable.of(tree)),
+        concat(observableOf(tree)),
         map(_ => tree),  // Just to get the TypeScript typesystem fixed.
       );
     },

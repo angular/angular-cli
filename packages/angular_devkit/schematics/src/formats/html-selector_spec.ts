@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { map } from 'rxjs/operators';
 import { formatValidator } from './format-validator';
 import { htmlSelectorFormat } from './html-selector';
 
@@ -18,7 +19,7 @@ describe('Schematics HTML selector format', () => {
     };
 
     formatValidator(data, dataSchema, [htmlSelectorFormat])
-      .map(result => expect(result.success).toBe(true))
+      .pipe(map(result => expect(result.success).toBe(true)))
       .subscribe(done, done.fail);
   });
 
@@ -29,7 +30,7 @@ describe('Schematics HTML selector format', () => {
     };
 
     formatValidator(data, dataSchema, [htmlSelectorFormat])
-      .map(result => expect(result.success).toBe(false))
+      .pipe(map(result => expect(result.success).toBe(false)))
       .subscribe(done, done.fail);
   });
 
@@ -40,7 +41,7 @@ describe('Schematics HTML selector format', () => {
     };
 
     formatValidator(data, dataSchema, [htmlSelectorFormat])
-      .map(result => expect(result.success).toBe(false))
+      .pipe(map(result => expect(result.success).toBe(false)))
       .subscribe(done, done.fail);
   });
 
@@ -51,7 +52,7 @@ describe('Schematics HTML selector format', () => {
     };
 
     formatValidator(data, dataSchema, [htmlSelectorFormat])
-      .map(result => expect(result.success).toBe(false))
+      .pipe(map(result => expect(result.success).toBe(false)))
       .subscribe(done, done.fail);
   });
 });

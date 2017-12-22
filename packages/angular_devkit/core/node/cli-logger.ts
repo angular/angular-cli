@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging, terminal } from '@angular-devkit/core';
-import 'rxjs/add/operator/filter';
+import { filter } from 'rxjs/operators';
 
 
 /**
@@ -16,7 +16,7 @@ export function createConsoleLogger(verbose = false): logging.Logger {
   const logger = new logging.IndentLogger('cling');
 
   logger
-    .filter(entry => (entry.level != 'debug' || verbose))
+    .pipe(filter(entry => (entry.level != 'debug' || verbose)))
     .subscribe(entry => {
       let color: (s: string) => string = x => terminal.dim(terminal.white(x));
       let output = process.stdout;

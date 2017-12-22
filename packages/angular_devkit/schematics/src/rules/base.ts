@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeMap';
+import { of as observableOf } from 'rxjs/observable/of';
+import { concatMap, map } from 'rxjs/operators';
 import { FileOperator, Rule, SchematicContext, Source } from '../engine/interface';
 import { FilteredTree } from '../tree/filtered';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
@@ -45,7 +44,7 @@ export function chain(rules: Rule[]): Rule {
   return (tree: Tree, context: SchematicContext) => {
     return rules.reduce((acc: Observable<Tree>, curr: Rule) => {
       return callRule(curr, acc, context);
-    }, Observable.of(tree));
+    }, observableOf(tree));
   };
 }
 
@@ -67,7 +66,7 @@ export function mergeWith(source: Source, strategy: MergeStrategy = MergeStrateg
   return (tree: Tree, context: SchematicContext) => {
     const result = callSource(source, context);
 
-    return result.map(other => VirtualTree.merge(tree, other, strategy || context.strategy));
+    return result.pipe(map(other => VirtualTree.merge(tree, other, strategy || context.strategy)));
   };
 }
 
@@ -91,8 +90,8 @@ export function branchAndMerge(rule: Rule, strategy = MergeStrategy.Default): Ru
   return (tree: Tree, context: SchematicContext) => {
     const branchedTree = branch(tree);
 
-    return callRule(rule, Observable.of(branchedTree), context)
-      .map(t => staticMerge(tree, t, strategy));
+    return callRule(rule, observableOf(branchedTree), context)
+      .pipe(map(t => staticMerge(tree, t, strategy)));
   };
 }
 
@@ -118,15 +117,15 @@ export function partitionApplyMerge(
 
     if (!ruleNo) {
       // Shortcut.
-      return callRule(ruleYes, Observable.of(staticPartition(tree, predicate)[0]), context)
-        .map(yesTree => staticMerge(yesTree, no, context.strategy));
+      return callRule(ruleYes, observableOf(staticPartition(tree, predicate)[0]), context)
+        .pipe(map(yesTree => staticMerge(yesTree, no, context.strategy)));
     }
 
-    return callRule(ruleYes, Observable.of(yes), context)
-      .concatMap(yesTree => {
-        return callRule(ruleNo, Observable.of(no), context)
-          .map(noTree => staticMerge(yesTree, noTree, context.strategy));
-      });
+    return callRule(ruleYes, observableOf(yes), context)
+      .pipe(concatMap(yesTree => {
+        return callRule(ruleNo, observableOf(no), context)
+          .pipe(map(noTree => staticMerge(yesTree, noTree, context.strategy)));
+      }));
   };
 }
 

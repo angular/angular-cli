@@ -8,8 +8,7 @@
 // tslint:disable:non-null-operator
 // tslint:disable:no-any
 import { MergeStrategy } from '@angular-devkit/schematics';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/toPromise';
+import { of as observableOf } from 'rxjs/observable/of';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree } from '../tree/interface';
 import { empty } from '../tree/static';
@@ -52,7 +51,7 @@ describe('callSource', () => {
   });
 
   it('errors if Observable of invalid source object', done => {
-    const source0: Source = () => Observable.of({} as Tree);
+    const source0: Source = () => observableOf({} as Tree);
 
     callSource(source0, context)
       .toPromise()
@@ -76,7 +75,7 @@ describe('callSource', () => {
 
   it('works with an Observable', done => {
     const tree0 = empty();
-    const source0: Source = () => Observable.of(tree0);
+    const source0: Source = () => observableOf(tree0);
 
     callSource(source0, context)
       .toPromise()
@@ -89,7 +88,7 @@ describe('callSource', () => {
 
 describe('callRule', () => {
   it('errors if invalid source object', done => {
-    const tree0 = Observable.of(empty());
+    const tree0 = observableOf(empty());
     const rule0: Rule = () => ({} as Tree);
 
     callRule(rule0, tree0, context)
@@ -101,8 +100,8 @@ describe('callRule', () => {
   });
 
   it('errors if Observable of invalid source object', done => {
-    const tree0 = Observable.of(empty());
-    const rule0: Rule = () => Observable.of({} as Tree);
+    const tree0 = observableOf(empty());
+    const rule0: Rule = () => observableOf({} as Tree);
 
     callRule(rule0, tree0, context)
       .toPromise()
@@ -116,7 +115,7 @@ describe('callRule', () => {
     const tree0 = empty();
     const rule0: Rule = () => undefined;
 
-    callRule(rule0, Observable.of(tree0), context)
+    callRule(rule0, observableOf(tree0), context)
       .toPromise()
       .then(tree => {
         expect(tree).toBe(tree0);
@@ -128,7 +127,7 @@ describe('callRule', () => {
     const tree0 = empty();
     const rule0: Rule = () => tree0;
 
-    callRule(rule0, Observable.of(tree0), context)
+    callRule(rule0, observableOf(tree0), context)
       .toPromise()
       .then(tree => {
         expect(tree).toBe(tree0);
@@ -138,9 +137,9 @@ describe('callRule', () => {
 
   it('works with an Observable', done => {
     const tree0 = empty();
-    const rule0: Rule = () => Observable.of(tree0);
+    const rule0: Rule = () => observableOf(tree0);
 
-    callRule(rule0, Observable.of(tree0), context)
+    callRule(rule0, observableOf(tree0), context)
       .toPromise()
       .then(tree => {
         expect(tree).toBe(tree0);

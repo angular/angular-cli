@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { toArray } from 'rxjs/operators';
 import { LogEntry, Logger } from './logger';
 import { NullLogger } from './null-logger';
 
@@ -12,8 +13,7 @@ import { NullLogger } from './null-logger';
 describe('NullLogger', () => {
   it('works', (done: DoneFn) => {
     const logger = new NullLogger();
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([]);
@@ -27,8 +27,7 @@ describe('NullLogger', () => {
 
   it('nullifies children', (done: DoneFn) => {
     const logger = new Logger('test');
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([]);

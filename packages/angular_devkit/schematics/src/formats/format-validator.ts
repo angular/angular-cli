@@ -8,7 +8,7 @@
 
 import { schema } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/mergeMap';
+import { mergeMap } from 'rxjs/operators';
 
 
 export function formatValidator(
@@ -24,5 +24,5 @@ export function formatValidator(
 
   return registry
     .compile(dataSchema)
-    .mergeMap(validator => validator(data));
+    .pipe(mergeMap(validator => validator(data)));
 }

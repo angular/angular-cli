@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
 import { Rule, SchematicContext } from '../engine/interface';
 import { Tree } from '../tree/interface';
 import { branch } from '../tree/static';
@@ -25,7 +25,7 @@ export function externalSchematic<OptionT extends object>(collectionName: string
     const collection = context.engine.createCollection(collectionName);
     const schematic = collection.createSchematic(schematicName);
 
-    return schematic.call(options, Observable.of(branch(input)), context);
+    return schematic.call(options, observableOf(branch(input)), context);
   };
 }
 
@@ -41,6 +41,6 @@ export function schematic<OptionT extends object>(schematicName: string, options
     const collection = context.schematic.collection;
     const schematic = collection.createSchematic(schematicName);
 
-    return schematic.call(options, Observable.of(branch(input)), context);
+    return schematic.call(options, observableOf(branch(input)), context);
   };
 }

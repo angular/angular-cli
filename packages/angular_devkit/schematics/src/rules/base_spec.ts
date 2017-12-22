@@ -13,8 +13,7 @@ import {
   MergeStrategy,
   partitionApplyMerge,
 } from '@angular-devkit/schematics';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/toPromise';
+import { of as observableOf } from 'rxjs/observable/of';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree } from '../tree/interface';
 import { empty } from '../tree/static';
@@ -42,7 +41,7 @@ describe('chain', () => {
     const rule1: Rule = (tree: Tree) => (rulesCalled[1] = tree, tree2);
     const rule2: Rule = (tree: Tree) => (rulesCalled[2] = tree, tree3);
 
-    callRule(chain([ rule0, rule1, rule2 ]), Observable.of(tree0), context)
+    callRule(chain([ rule0, rule1, rule2 ]), observableOf(tree0), context)
       .toPromise()
       .then(result => {
         expect(result).not.toBe(tree0);
@@ -62,11 +61,11 @@ describe('chain', () => {
     const tree2 = empty();
     const tree3 = empty();
 
-    const rule0: Rule = (tree: Tree) => (rulesCalled[0] = tree, Observable.of(tree1));
-    const rule1: Rule = (tree: Tree) => (rulesCalled[1] = tree, Observable.of(tree2));
+    const rule0: Rule = (tree: Tree) => (rulesCalled[0] = tree, observableOf(tree1));
+    const rule1: Rule = (tree: Tree) => (rulesCalled[1] = tree, observableOf(tree2));
     const rule2: Rule = (tree: Tree) => (rulesCalled[2] = tree, tree3);
 
-    callRule(chain([ rule0, rule1, rule2 ]), Observable.of(tree0), context)
+    callRule(chain([ rule0, rule1, rule2 ]), observableOf(tree0), context)
       .toPromise()
       .then(result => {
         expect(result).not.toBe(tree0);
@@ -116,8 +115,8 @@ describe('apply', () => {
     const tree3 = empty();
 
     const source: Source = () => (sourceCalled = true, tree0);
-    const rule0: Rule = (tree: Tree) => (rulesCalled[0] = tree, Observable.of(tree1));
-    const rule1: Rule = (tree: Tree) => (rulesCalled[1] = tree, Observable.of(tree2));
+    const rule0: Rule = (tree: Tree) => (rulesCalled[0] = tree, observableOf(tree1));
+    const rule1: Rule = (tree: Tree) => (rulesCalled[1] = tree, observableOf(tree2));
     const rule2: Rule = (tree: Tree) => (rulesCalled[2] = tree, tree3);
 
     callSource(apply(source, [ rule0, rule1, rule2 ]), context)
@@ -155,7 +154,7 @@ describe('partitionApplyMerge', () => {
       return empty();
     };
 
-    callRule(partitionApplyMerge(predicate, ruleYes, ruleNo), Observable.of(tree), context)
+    callRule(partitionApplyMerge(predicate, ruleYes, ruleNo), observableOf(tree), context)
       .toPromise()
       .then(result => {
         expect(result.exists('/test1')).toBe(false);

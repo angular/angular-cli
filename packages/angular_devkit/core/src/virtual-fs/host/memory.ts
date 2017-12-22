@@ -7,7 +7,8 @@
  */
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
+import { empty } from 'rxjs/observable/empty';
+import { of as observableOf } from 'rxjs/observable/of';
 import { _throw } from 'rxjs/observable/throw';
 import {
   FileAlreadyExistException,
@@ -106,7 +107,7 @@ export class SimpleMemoryHost implements Host<{}> {
     this._cache.set(path, content);
     this._updateWatchers(path, existed ? HostWatchEventType.Changed : HostWatchEventType.Created);
 
-    return Observable.empty<void>();
+    return empty<void>();
   }
   read(path: Path): Observable<FileBuffer> {
     if (this._isDir(path)) {
@@ -116,7 +117,7 @@ export class SimpleMemoryHost implements Host<{}> {
     if (!maybeBuffer) {
       return _throw(new FileDoesNotExistException(path));
     } else {
-      return ArrayObservable.of(maybeBuffer);
+      return observableOf(maybeBuffer);
     }
   }
   delete(path: Path): Observable<void> {
@@ -131,7 +132,7 @@ export class SimpleMemoryHost implements Host<{}> {
     }
     this._updateWatchers(path, HostWatchEventType.Deleted);
 
-    return Observable.empty();
+    return empty();
   }
   rename(from: Path, to: Path): Observable<void> {
     if (!this._cache.has(from)) {
@@ -158,7 +159,7 @@ export class SimpleMemoryHost implements Host<{}> {
 
     this._updateWatchers(from, HostWatchEventType.Renamed);
 
-    return Observable.empty();
+    return empty();
   }
 
   list(path: Path): Observable<PathFragment[]> {
@@ -173,17 +174,17 @@ export class SimpleMemoryHost implements Host<{}> {
       }
     }
 
-    return ArrayObservable.of([...result]);
+    return observableOf([...result]);
   }
 
   exists(path: Path): Observable<boolean> {
-    return ArrayObservable.of(this._cache.has(path) || this._isDir(path));
+    return observableOf(this._cache.has(path) || this._isDir(path));
   }
   isDirectory(path: Path): Observable<boolean> {
-    return ArrayObservable.of(this._isDir(path));
+    return observableOf(this._isDir(path));
   }
   isFile(path: Path): Observable<boolean> {
-    return ArrayObservable.of(this._cache.has(path));
+    return observableOf(this._cache.has(path));
   }
 
   stats(_path: Path): Observable<Stats<{}>> | null {

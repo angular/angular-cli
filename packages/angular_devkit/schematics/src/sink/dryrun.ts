@@ -7,7 +7,7 @@
  */
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/observable/empty';
+import { empty } from 'rxjs/observable/empty';
 import { FileSystemSink } from './filesystem';
 
 
@@ -110,6 +110,6 @@ export class DryRunSink extends FileSystemSink {
 
     this._subject.complete();
 
-    return Observable.empty<void>();
+    return empty<void>();
   }
 }

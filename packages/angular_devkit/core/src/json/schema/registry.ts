@@ -8,8 +8,8 @@
 import * as ajv from 'ajv';
 import * as http from 'http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
 import { fromPromise } from 'rxjs/observable/fromPromise';
+import { of as observableOf } from 'rxjs/observable/of';
 import { map } from 'rxjs/operators/map';
 import { JsonArray, JsonObject } from '../interface';
 import {
@@ -237,7 +237,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     let validator: Observable<ajv.ValidateFunction>;
     try {
       const maybeFnValidate = this._ajv.compile(schema);
-      validator = Observable.of(maybeFnValidate);
+      validator = observableOf(maybeFnValidate);
     } catch (e) {
       // Propagate the error.
       if (!(e instanceof (ajv.MissingRefError as {} as Function))) {
@@ -261,7 +261,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
         map(validate => (data: any): Observable<SchemaValidatorResult> => {
           const result = validate(data);
           const resultObs = typeof result == 'boolean'
-            ? Observable.of(result)
+            ? observableOf(result)
             : fromPromise(result as PromiseLike<boolean>);
 
           return resultObs

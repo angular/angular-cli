@@ -16,6 +16,7 @@ import {
   UnknownCollectionException,
 } from '@angular-devkit/schematics';
 import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { Url } from 'url';
 
@@ -87,7 +88,7 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     schematic: SchematicDescription<FallbackCollectionDescription, FallbackSchematicDescription>,
     options: OptionT,
   ): Observable<ResultT> {
-    return (Observable.of(options)
+    return (observableOf(options)
       .pipe(...this._hosts.map(host => mergeMap(opt => host.transformOptions(schematic, opt))))
     ) as {} as Observable<ResultT>;
   }

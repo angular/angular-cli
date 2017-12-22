@@ -7,9 +7,7 @@
  */
 // tslint:disable:non-null-operator
 import { logging } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/toArray';
-import 'rxjs/add/operator/toPromise';
+import { of as observableOf } from 'rxjs/observable/of';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch, empty } from '../tree/static';
 import { CollectionDescription, Engine, Rule, Schematic, SchematicDescription } from './interface';
@@ -33,7 +31,7 @@ const context = {
 };
 const engine: Engine<CollectionT, SchematicT> = {
   createContext: (schematic: Schematic<{}, {}>) => ({ engine, schematic, ...context }),
-  transformOptions: (_: {}, options: {}) => Observable.of(options),
+  transformOptions: (_: {}, options: {}) => observableOf(options),
   defaultMergeStrategy: MergeStrategy.Default,
 } as {} as Engine<CollectionT, SchematicT>;
 const collection = {
@@ -67,7 +65,7 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null !, engine);
-    schematic.call({}, Observable.of(empty()))
+    schematic.call({}, observableOf(empty()))
       .toPromise()
       .then(x => {
         expect(files(inner !)).toEqual([]);
@@ -86,13 +84,13 @@ describe('Schematic', () => {
       factory: () => (fem: Tree) => {
         inner = fem;
 
-        return Observable.of(empty());
+        return observableOf(empty());
       },
     };
 
 
     const schematic = new SchematicImpl(desc, desc.factory, null !, engine);
-    schematic.call({}, Observable.of(empty()))
+    schematic.call({}, observableOf(empty()))
       .toPromise()
       .then(x => {
         expect(files(inner !)).toEqual([]);

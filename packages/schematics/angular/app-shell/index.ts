@@ -14,7 +14,6 @@ import {
   chain,
   schematic,
 } from '@angular-devkit/schematics';
-import 'rxjs/add/operator/merge';
 import * as ts from 'typescript';
 import {
   addImportToModule,

@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/mergeMap';
+import { of as observableOf } from 'rxjs/observable/of';
+import { map, mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
 
 
@@ -31,12 +31,14 @@ describe('CoreSchemaRegistry', () => {
           },
         },
       })
-      .mergeMap(validator => validator(data))
-      .map(result => {
-        expect(result.success).toBe(true);
-        expect(data.obj.num).toBeUndefined();
-        expect(data.tslint).not.toBeUndefined();
-      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(true);
+          expect(data.obj.num).toBeUndefined();
+          expect(data.tslint).not.toBeUndefined();
+        }),
+      )
       .subscribe(done, done.fail);
   });
 
@@ -61,11 +63,13 @@ describe('CoreSchemaRegistry', () => {
           },
         },
       })
-      .mergeMap(validator => validator(data))
-      .map(result => {
-        expect(result.success).toBe(true);
-        expect(data.obj.num).toBeUndefined();
-      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(true);
+          expect(data.obj.num).toBeUndefined();
+        }),
+      )
       .subscribe(() => {
         isDone = true;
       }, done.fail);
@@ -93,10 +97,12 @@ describe('CoreSchemaRegistry', () => {
           str: { type: 'string', format: 'is-hotdog' },
         },
       })
-      .mergeMap(validator => validator(data))
-      .map(result => {
-        expect(result.success).toBe(true);
-      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(true);
+        }),
+      )
       .subscribe(done, done.fail);
   });
 
@@ -107,7 +113,7 @@ describe('CoreSchemaRegistry', () => {
       name: 'is-hotdog',
       formatter: {
         async: true,
-        validate: (str: string) => Observable.of(str === 'hotdog'),
+        validate: (str: string) => observableOf(str === 'hotdog'),
       },
     };
 
@@ -120,10 +126,12 @@ describe('CoreSchemaRegistry', () => {
           str: { type: 'string', format: 'is-hotdog' },
         },
       })
-      .mergeMap(validator => validator(data))
-      .map(result => {
-        expect(result.success).toBe(true);
-      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(true);
+        }),
+      )
       .subscribe(done, done.fail);
   });
 
@@ -147,11 +155,13 @@ describe('CoreSchemaRegistry', () => {
           banana: { type: 'string', format: 'is-hotdog' },
         },
       })
-      .mergeMap(validator => validator(data))
-      .map(result => {
-        expect(result.success).toBe(false);
-        expect(result.errors && result.errors[0]).toBe('.banana should match format "is-hotdog"');
-      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(false);
+          expect(result.errors && result.errors[0]).toBe('.banana should match format "is-hotdog"');
+        }),
+      )
       .subscribe(done, done.fail);
   });
 });

@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:non-null-operator
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/toPromise';
+import { of as observableOf } from 'rxjs/observable/of';
 import { SchematicContext } from '../engine/interface';
 import { VirtualTree } from '../tree/virtual';
 import { callRule } from './call';
@@ -24,7 +23,7 @@ describe('move', () => {
     tree.create('a/b/file2', 'hello world');
     tree.create('a/c/file3', 'hello world');
 
-    callRule(move('sub'), Observable.of(tree), context)
+    callRule(move('sub'), observableOf(tree), context)
       .toPromise()
       .then(result => {
         expect(result.exists('sub/a/b/file1')).toBe(true);
@@ -40,7 +39,7 @@ describe('move', () => {
     tree.create('a/b/file2', 'hello world');
     tree.create('a/c/file3', 'hello world');
 
-    callRule(move('a/b', 'sub'), Observable.of(tree), context)
+    callRule(move('a/b', 'sub'), observableOf(tree), context)
       .toPromise()
       .then(result => {
         expect(result.exists('sub/file1')).toBe(true);

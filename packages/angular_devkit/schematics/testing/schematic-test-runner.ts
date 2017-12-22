@@ -22,6 +22,8 @@ import {
   validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
 import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
+import { map } from 'rxjs/operators';
 import { callRule } from '../src/rules/call';
 
 
@@ -58,10 +60,10 @@ export class SchematicTestRunner {
     tree?: Tree,
   ): Observable<UnitTestTree> {
     const schematic = this._collection.createSchematic(schematicName);
-    const host = Observable.of(tree || new VirtualTree);
+    const host = observableOf(tree || new VirtualTree);
 
     return schematic.call(opts || {}, host, { logger: this._logger })
-      .map(tree => new UnitTestTree(tree));
+      .pipe(map(tree => new UnitTestTree(tree)));
   }
 
   runSchematic<SchematicSchemaT>(
@@ -72,7 +74,7 @@ export class SchematicTestRunner {
     const schematic = this._collection.createSchematic(schematicName);
 
     let result: UnitTestTree | null = null;
-    const host = Observable.of(tree || new VirtualTree);
+    const host = observableOf(tree || new VirtualTree);
 
     schematic.call(opts || {}, host, { logger: this._logger })
       .subscribe(t => result = new UnitTestTree(t));
@@ -87,6 +89,6 @@ export class SchematicTestRunner {
   callRule(rule: Rule, tree: Tree, parentContext?: Partial<SchematicContext>): Observable<Tree> {
     const context = this._engine.createContext({} as Schematic<{}, {}>, parentContext);
 
-    return callRule(rule, Observable.of(tree), context);
+    return callRule(rule, observableOf(tree), context);
   }
 }
