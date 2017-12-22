@@ -33,6 +33,8 @@ export {UpdateRecorder} from './tree/interface';
 export * from './engine/schematic';
 export * from './sink/dryrun';
 export {FileSystemSink} from './sink/filesystem';
+import * as formats from './formats';
+export { formats };
 
 
 export interface TreeConstructor {

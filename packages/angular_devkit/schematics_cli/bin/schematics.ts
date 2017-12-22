@@ -19,6 +19,7 @@ import {
   FileSystemTree,
   SchematicEngine,
   Tree,
+  formats,
 } from '@angular-devkit/schematics';
 import {
   FileSystemHost,
@@ -128,7 +129,13 @@ const engine = new SchematicEngine(engineHost);
 
 
 // Add support for schemaJson.
-engineHost.registerOptionsTransform(validateOptionsWithSchema(new schema.CoreSchemaRegistry()));
+const schemaFormats = [
+  formats.appNameFormat,
+  formats.htmlSelectorFormat,
+  formats.pathFormat,
+];
+const registry = new schema.CoreSchemaRegistry(schemaFormats);
+engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
 
 
 /**

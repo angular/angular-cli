@@ -15,6 +15,7 @@ import {
   SchematicEngine,
   Tree,
   VirtualTree,
+  formats,
 } from '@angular-devkit/schematics';
 import {
   NodeModulesTestEngineHost,
@@ -43,8 +44,14 @@ export class SchematicTestRunner {
     this._engineHost.registerCollection(_collectionName, collectionPath);
     this._logger = new logging.Logger('test');
 
-    this._engineHost.registerOptionsTransform(
-      validateOptionsWithSchema(new schema.CoreSchemaRegistry()));
+    const schemaFormats = [
+      formats.appNameFormat,
+      formats.htmlSelectorFormat,
+      formats.pathFormat,
+    ];
+    const registry = new schema.CoreSchemaRegistry(schemaFormats);
+
+    this._engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
     this._collection = this._engine.createCollection(this._collectionName);
   }
 
