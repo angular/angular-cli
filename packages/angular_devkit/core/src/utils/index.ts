@@ -9,5 +9,6 @@ import * as tags from './literals';
 export * from './object';
 export * from './strings';
 export * from './template';
+export * from './priority-queue';
 
 export { tags };
