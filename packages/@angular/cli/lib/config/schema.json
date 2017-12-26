@@ -33,6 +33,21 @@
             "type": "string",
             "description": "Name of the app."
           },
+          "extends": {
+            "description": "Can be used to extend from another apps by name",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "default": []
+          },
           "appRoot": {
             "type": "string",
             "description": "Directory where app files are placed.",
