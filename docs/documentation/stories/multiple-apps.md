@@ -64,3 +64,78 @@ You can also add the `name` property to the app object in `apps` array and then 
 ```
 To serve application by name `ng serve --app=app1` or `ng serve --app app1`.
 
+### Apps inheritance 
+
+If you use multiple applications in the same project so that you do not copy the common configuration for all applications, 
+you can use property `extends` to inherit the configuration from common application:
+
+**Single inheritance:**
+```
+"apps": [
+  {
+    "name": "base",
+    "root": "src",
+    "test": "test.ts",
+    "tsconfig": "tsconfig.app.json",
+    "testTsconfig": "tsconfig.spec.json",
+    ...
+  },
+  {
+    "name": "app1",
+    "extends": "base",
+    "outDir": "dist-app1",
+    "prefix": "app1",
+    "assets": [
+      "assets/app1"
+    ]
+  },
+  {
+    "name": "app2",
+    "extends": "base",
+    "outDir": "dist-app2",
+    "prefix": "app2",
+    "assets": [
+      "assets/app2"
+    ]
+  },
+  ...
+],
+
+```
+
+
+**Multiple inheritance:**
+
+```
+"apps": [
+  {
+    "name": "base",
+    "root": "src",
+    "test": "test.ts",
+    "tsconfig": "tsconfig.app.json",
+    "testTsconfig": "tsconfig.spec.json",
+    ...
+  },
+  {
+    "name": "app1",
+    "outDir": "dist",
+    "prefix": "app1",
+    "index.html"
+    "assets": [
+      "assets/app1"
+    ],
+    ...
+  },
+  {
+    "name": "app2",
+    "extends": ["base", "app1"]
+    "outDir": "dist-app2",
+    "prefix": "app2",
+    "assets": [
+      "assets/app2"
+    ]
+  },
+  ...
+],
+
+```
