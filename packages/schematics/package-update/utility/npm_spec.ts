@@ -41,7 +41,7 @@ describe('Schematic Update', () => {
 
         expect(packageJson.dependencies['@angular/core']).toBe('4.1.0');
         expect(packageJson.dependencies['@angular/compiler']).toBe('4.1.0');
-        expect(packageJson.dependencies['rxjs']).toBe('^5.5.5');
+        expect(packageJson.dependencies['rxjs']).toMatch(/^\^5\.\d+\.\d+$/);
 
         done();
       }, (err) => done.fail(err));
@@ -57,7 +57,7 @@ describe('Schematic Update', () => {
 
                      expect(packageJson.dependencies['@angular/core']).toBe('4.1.0');
                      expect(packageJson.dependencies['@angular/compiler']).toBe('4.1.0');
-                     expect(packageJson.dependencies['rxjs']).toBe('^5.5.5');
+                     expect(packageJson.dependencies['rxjs']).toMatch(/^\^5\.\d+\.\d+$/);
 
                      done();
                    }, (err) => done.fail(err));
@@ -72,7 +72,7 @@ describe('Schematic Update', () => {
 
         expect(packageJson.dependencies['@angular/core']).toBe('~4.1.3');
         expect(packageJson.dependencies['@angular/compiler']).toBe('~4.1.3');
-        expect(packageJson.dependencies['rxjs']).toBe('^5.5.5');
+        expect(packageJson.dependencies['rxjs']).toMatch(/^\^5\.\d+\.\d+$/);
 
         done();
       }, (err) => done.fail(err));
