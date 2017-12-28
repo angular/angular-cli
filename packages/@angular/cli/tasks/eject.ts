@@ -288,7 +288,6 @@ class JsonWebpackSerializer {
   private _resolveReplacer(value: any) {
     this.variableImports['rxjs/_esm5/path-mapping'] = 'rxPaths';
     return Object.assign({}, value, {
-      modules: value.modules.map((x: string) => './' + path.relative(this._root, x)),
       alias: this._escape('rxPaths()')
     });
   }
