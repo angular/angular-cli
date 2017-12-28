@@ -10,7 +10,7 @@ const treeKill = require('tree-kill');
 import { WebpackResourceLoader } from './resource_loader';
 import { WebpackCompilerHost } from './compiler_host';
 import { Tapable } from './webpack';
-import { PathsPlugin } from './paths-plugin';
+import { resolveWithPaths } from './paths-plugin';
 import { findLazyRoutes, LazyRouteMap } from './lazy_routes';
 import {
   VirtualFileSystemDecorator,
@@ -259,9 +259,6 @@ export class AngularCompilerPlugin implements Tapable {
       }
     }
 
-    // Use an identity function as all our paths are absolute already.
-    this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
-
     // Resolve mainPath if provided.
     if (options.mainPath) {
       this._mainPath = this._compilerHost.resolve(options.mainPath);
@@ -314,6 +311,9 @@ export class AngularCompilerPlugin implements Tapable {
         if (this._forkTypeChecker && !this._firstRun) {
           this._updateForkedTypeChecker(this._rootNames, this._getChangedCompilationFiles());
         }
+
+         // Use an identity function as all our paths are absolute already.
+        this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
         if (this._JitMode) {
           // Create the TypeScript program.
@@ -617,12 +617,15 @@ export class AngularCompilerPlugin implements Tapable {
     });
 
     compiler.plugin('normal-module-factory', (nmf: any) => {
-      compiler.resolvers.normal.apply(new PathsPlugin({
-        nmf,
-        tsConfigPath: this._tsConfigPath,
-        compilerOptions: this._compilerOptions,
-        compilerHost: this._compilerHost
-      }));
+      nmf.plugin('before-resolve', (request: any, callback: any) => {
+        resolveWithPaths(
+          request,
+          callback,
+          this._compilerOptions,
+          this._compilerHost,
+          this._moduleResolutionCache,
+        );
+      });
     });
   }
 
