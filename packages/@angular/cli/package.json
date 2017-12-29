@@ -32,7 +32,7 @@
     "@ngtools/json-schema": "1.1.0",
     "@ngtools/webpack": "1.9.3",
     "@schematics/angular": "~0.1.11",
-    "autoprefixer": "^6.5.3",
+    "autoprefixer": "^7.2.3",
     "chalk": "~2.2.0",
     "circular-dependency-plugin": "^4.2.1",
     "clean-css": "^4.1.9",
