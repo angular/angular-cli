@@ -15,31 +15,37 @@
     },
     "appId": {
       "type": "string",
+      "format": "app-name",
       "description": "The appId to use withServerTransition.",
       "default": "serverApp"
     },
     "outDir": {
       "type": "string",
+      "format": "path",
       "description": "The output directory for build results.",
-      "default": "dist-server/"
+      "default": "dist-server"
     },
     "root": {
       "type": "string",
+      "format": "path",
       "description": "The root directory of the app.",
       "default": "src"
     },
     "index": {
       "type": "string",
+      "format": "path",
       "description": "Name of the index file",
       "default": "index.html"
     },
     "main": {
       "type": "string",
+      "format": "path",
       "description": "The name of the main entry-point file.",
       "default": "main.server.ts"
     },
     "test": {
       "type": "string",
+      "format": "path",
       "description": "The name of the test entry-point file."
     },
     "tsconfigFileName": {
@@ -49,16 +55,19 @@
     },
     "testTsconfigFileName": {
       "type": "string",
+      "format": "path",
       "description": "The name of the TypeScript configuration file for tests.",
       "default": "tsconfig.spec"
     },
     "appDir": {
       "type": "string",
+      "format": "path",
       "description": "The name of the application directory.",
       "default": "app"
     },
     "rootModuleFileName": {
       "type": "string",
+      "format": "path",
       "description": "The name of the root module file",
       "default": "app.server.module.ts"
     },
@@ -69,6 +78,7 @@
     },
     "sourceDir": {
       "type": "string",
+      "format": "path",
       "description": "The path of the source directory.",
       "default": "src",
       "alias": "sd"

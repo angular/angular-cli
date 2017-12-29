@@ -19,7 +19,6 @@ describe('Application Schematic', () => {
   const defaultOptions: ApplicationOptions = {
     directory: 'foo',
     name: 'foo',
-    prefix: '',
     sourceDir: 'src',
     inlineStyle: false,
     inlineTemplate: false,

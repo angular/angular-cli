@@ -28,7 +28,7 @@ describe('Component Schematic', () => {
     spec: true,
     module: undefined,
     export: false,
-    prefix: undefined,
+    prefix: 'app',
   };
 
   let appTree: Tree;
@@ -175,18 +175,6 @@ describe('Component Schematic', () => {
     expect(files.indexOf(`${root}.ts`)).toBeGreaterThanOrEqual(0);
   });
 
-  it('should handle ".." in a path', () => {
-    const options = { ...defaultOptions, path: 'app/a/../c' };
-
-    const tree = schematicRunner.runSchematic('component', options, appTree);
-    const files = tree.files;
-    const root = `/src/app/c/foo/foo.component`;
-    expect(files.indexOf(`${root}.css`)).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf(`${root}.html`)).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf(`${root}.spec.ts`)).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf(`${root}.ts`)).toBeGreaterThanOrEqual(0);
-  });
-
   it('should use the prefix', () => {
     const options = { ...defaultOptions, prefix: 'pre' };
 
@@ -196,7 +184,7 @@ describe('Component Schematic', () => {
   });
 
   it('should not use a prefix if none is passed', () => {
-    const options = { ...defaultOptions, prefix: '' };
+    const options = { ...defaultOptions, prefix: undefined };
 
     const tree = schematicRunner.runSchematic('component', options, appTree);
     const content = getFileContent(tree, '/src/app/foo/foo.component.ts');

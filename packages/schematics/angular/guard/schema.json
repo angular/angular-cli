@@ -21,23 +21,25 @@
     "module":  {
       "type": "string",
       "description": "Allows specification of the declaring module.",
-      "alias": "m",
-      "subtype": "filepath"
+      "alias": "m"
     },
     "path": {
       "type": "string",
+      "format": "path",
       "description": "The path to create the guard.",
       "default": "app",
       "visible": false
     },
     "sourceDir": {
       "type": "string",
+      "format": "path",
       "description": "The path of the source directory.",
       "default": "src",
       "visible": false
     },
     "appRoot": {
       "type": "string",
+      "format": "path",
       "description": "The root of the application.",
       "visible": false
     }

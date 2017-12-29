@@ -25,8 +25,7 @@ describe('App Shell Schematic', () => {
   let appTree: Tree;
   const appOptions: ApplicationOptions = {
     directory: '',
-    name: 'app',
-    prefix: '',
+    name: 'appshell-app',
     sourceDir: 'src',
     inlineStyle: false,
     inlineTemplate: false,

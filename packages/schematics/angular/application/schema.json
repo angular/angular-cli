@@ -6,17 +6,20 @@
   "properties": {
     "directory": {
       "type": "string",
+      "format": "path",
       "description": "The directory name to create the app in.",
       "alias": "dir"
     },
     "path": {
       "type": "string",
+      "format": "path",
       "description": "The path of the application.",
       "default": "app",
       "visible": false
     },
     "sourceDir": {
       "type": "string",
+      "format": "path",
       "description": "The path of the source directory.",
       "default": "src",
       "alias": "sd",
@@ -24,7 +27,8 @@
     },
     "name": {
       "description": "The name of the application.",
-      "type": "string"
+      "type": "string",
+      "format": "app-name"
     },
     "inlineStyle": {
       "description": "Specifies if the style will be in the ts file.",
@@ -55,6 +59,7 @@
     },
     "prefix": {
       "type": "string",
+      "format": "html-selector",
       "description": "The prefix to apply to generated selectors.",
       "default": "app",
       "alias": "p"

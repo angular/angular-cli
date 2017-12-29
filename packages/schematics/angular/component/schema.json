@@ -6,12 +6,14 @@
   "properties": {
     "path": {
       "type": "string",
+      "format": "path",
       "description": "The path to create the component.",
       "default": "app",
       "visible": false
     },
     "sourceDir": {
       "type": "string",
+      "format": "path",
       "description": "The path of the source directory.",
       "default": "src",
       "alias": "sd",
@@ -19,6 +21,7 @@
     },
     "appRoot": {
       "type": "string",
+      "format": "path",
       "description": "The root of the application.",
       "visible": false
     },
@@ -53,8 +56,8 @@
     },
     "prefix": {
       "type": "string",
+      "format": "html-selector",
       "description": "The prefix to apply to generated selectors.",
-      "default": "app",
       "alias": "p"
     },
     "styleext": {
@@ -79,6 +82,7 @@
     },
     "selector": {
       "type": "string",
+      "format": "html-selector",
       "description": "The selector to use for the component."
     },
     "module":  {

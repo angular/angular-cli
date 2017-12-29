@@ -26,8 +26,7 @@ describe('Universal Schematic', () => {
   beforeEach(() => {
     const appOptions: ApplicationOptions = {
       directory: '',
-      name: 'app',
-      prefix: '',
+      name: 'universal-app',
       sourceDir: 'src',
       inlineStyle: false,
       inlineTemplate: false,
@@ -63,7 +62,7 @@ describe('Universal Schematic', () => {
     const file = tree.files.filter(f => f === filePath)[0];
     expect(file).toBeDefined();
     const contents = tree.read(filePath);
-    expect(contents).toMatch(/\"outDir\": \"\.\.\/dist-server\/\"/);
+    expect(contents).toMatch(/\"outDir\": \"\.\.\/dist-server\"/);
   });
 
   it('should add dependency: @angular/platform-server', () => {
@@ -83,7 +82,7 @@ describe('Universal Schematic', () => {
     const app = config.apps[1];
     expect(app.platform).toEqual('server');
     expect(app.root).toEqual('src');
-    expect(app.outDir).toEqual('dist-server/');
+    expect(app.outDir).toEqual('dist-server');
     expect(app.index).toEqual('index.html');
     expect(app.main).toEqual('main.server.ts');
     expect(app.test).toEqual('test.ts');

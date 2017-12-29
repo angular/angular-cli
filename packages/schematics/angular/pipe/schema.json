@@ -10,18 +10,21 @@
     },
     "path": {
       "type": "string",
+      "format": "path",
       "description": "The path to create the pipe.",
       "default": "app",
       "visible": false
     },
     "sourceDir": {
       "type": "string",
+      "format": "path",
       "description": "The path of the source directory.",
       "default": "src",
       "visible": false
     },
     "appRoot": {
       "type": "string",
+      "format": "path",
       "description": "The root of the application.",
       "visible": false
     },
@@ -44,8 +47,7 @@
       "type": "string",
       "default": "",
       "description": "Allows specification of the declaring module.",
-      "alias": "m",
-      "subtype": "filepath"
+      "alias": "m"
     },
     "export": {
       "type": "boolean",
