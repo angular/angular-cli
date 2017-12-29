@@ -44,7 +44,7 @@
     "@angular-devkit/build-optimizer": "~0.0.36",
     "@angular-devkit/schematics": "~0.0.42",
     "@schematics/angular": "~0.1.11",
-    "autoprefixer": "^6.5.3",
+    "autoprefixer": "^7.2.3",
     "chalk": "~2.2.0",
     "circular-dependency-plugin": "^4.2.1",
     "clean-css": "^4.1.9",
