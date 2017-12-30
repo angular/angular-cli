@@ -601,9 +601,9 @@ export class AngularCompilerPlugin implements Tapable {
       // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
       // when the issuer is a `.ts` or `.ngfactory.js` file.
       compiler.resolvers.normal.plugin('before-resolve', (request: any, cb: () => void) => {
-        if (request.request.endsWith('.ts')
-          || (request.context.issuer && /\.ts|ngfactory\.js$/.test(request.context.issuer))) {
-          this.done!.then(() => cb(), () => cb());
+        if (this.done && (request.request.endsWith('.ts')
+          || (request.context.issuer && /\.ts|ngfactory\.js$/.test(request.context.issuer)))) {
+          this.done.then(() => cb(), () => cb());
         } else {
           cb();
         }
