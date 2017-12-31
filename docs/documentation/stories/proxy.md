@@ -26,6 +26,8 @@ We can then edit the `package.json` file's start script to be
 
 Now in order to run our dev server with our proxy config, we can simply call `npm start`.
 
+**After each edit to the proxy.conf.json file remember to relaunch the `npm start` process to make your changes effective.**
+
 ### Rewriting the URL path
 
 One option that comes up a lot is rewriting the URL path for the proxy. This is supported by the `pathRewrite` option.
