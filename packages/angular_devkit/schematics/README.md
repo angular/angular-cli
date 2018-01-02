@@ -27,6 +27,7 @@ The tooling is responsible for the following tasks:
 1. Create the Schematic Engine, and pass in a Collection and Schematic loader.
 1. Understand and respect the Schematics metadata and dependencies between collections. Schematics can refer to dependencies, and it's the responsibility of the tool to honor those dependencies. The reference CLI uses NPM packages for its collections.
 1. Create the Options object. Options can be anything, but the schematics can specify a JSON Schema that should be respected. The reference CLI, for example, parse the arguments as a JSON object and validate it with the Schema specified by the collection.
+  1. Schematics provides some JSON Schema formats for validation that tooling should add. These validate paths, html selectors and app names. Please check the reference CLI for how these can be added.
 1. Call the schematics with the original Tree. The tree should represent the initial state of the filesystem. The reference CLI uses the current directory for this.
 1. Create a Sink and commit the result of the schematics to the Sink. Many sinks are provided by the library; FileSystemSink and DryRunSink are examples.
 1. Output any logs propagated by the library, including debugging information.
