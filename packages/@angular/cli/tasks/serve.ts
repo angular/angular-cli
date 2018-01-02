@@ -108,12 +108,12 @@ export default Task.extend({
 
     if (serveTaskOptions.liveReload) {
       // This allows for live reload of page when changes are made to repo.
-      // https://webpack.github.io/docs/webpack-dev-server.html#inline-mode
+      // https://webpack.js.org/configuration/dev-server/#devserver-inline
       let entryPoints = [
         `webpack-dev-server/client?${clientAddress}`
       ];
       if (serveTaskOptions.hmr) {
-        const webpackHmrLink = 'https://webpack.github.io/docs/hot-module-replacement.html';
+        const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
 
         ui.writeLine(oneLine`
           ${yellow('NOTICE')} Hot Module Replacement (HMR) is enabled for the dev server.
