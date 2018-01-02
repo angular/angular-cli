@@ -73,8 +73,8 @@ export default Task.extend({
     }
 
     const serveDefaults = {
-      // default deployUrl to '' on serve to prevent the default from .angular-cli.json
-      deployUrl: ''
+      deployUrl: appConfig.deployUrl || '',
+      baseHref: appConfig.baseHref || '',
     };
 
     serveTaskOptions = Object.assign({}, serveDefaults, serveTaskOptions);
