@@ -129,12 +129,7 @@ const engine = new SchematicEngine(engineHost);
 
 
 // Add support for schemaJson.
-const schemaFormats = [
-  formats.appNameFormat,
-  formats.htmlSelectorFormat,
-  formats.pathFormat,
-];
-const registry = new schema.CoreSchemaRegistry(schemaFormats);
+const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
 engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
 
 
