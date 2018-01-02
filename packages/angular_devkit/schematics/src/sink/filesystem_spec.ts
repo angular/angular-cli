@@ -122,6 +122,21 @@ describe('FileSystemSink', () => {
           .then(done, done.fail);
     });
 
+
+    it('can rename nested files', done => {
+      const tree = new FileSystemTree(new FileSystemHost(outputRoot));
+      tree.rename('/sub/directory/file2', '/another-directory/file2');
+
+      const sink = new FileSystemSink(outputRoot);
+      sink.commit(optimize(tree))
+          .toPromise()
+          .then(() => {
+            expect(fs.existsSync(join(outputRoot, '/sub/directory/file2'))).toBe(false);
+            expect(fs.existsSync(join(outputRoot, '/another-directory/file2'))).toBe(true);
+          })
+          .then(done, done.fail);
+    });
+
     it('can delete and create the same file', done => {
       const tree = new FileSystemTree(new FileSystemHost(outputRoot));
       tree.delete('/file0');

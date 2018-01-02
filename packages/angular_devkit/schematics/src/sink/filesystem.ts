@@ -84,6 +84,8 @@ export class FileSystemSinkHost implements VirtualFileSystemSinkHost {
     to = join(this._root, to);
 
     return new Observable<void>(o => {
+      this.mkDir(dirname(to));
+
       fs.rename(from, to, err => {
         if (err) {
           o.error(err);
