@@ -155,7 +155,7 @@ class JsonWebpackSerializer {
   }
 
   private _licenseWebpackPlugin(plugin: any) {
-    return plugin.options;
+    return this._licenseReplacer(plugin.options);
   }
 
   private _uglifyjsPlugin(plugin: any) {
@@ -392,6 +392,13 @@ class JsonWebpackSerializer {
   private _globReplacer(value: any) {
     return Object.assign({}, value, {
       cwd: this._relativePath('process.cwd()', path.relative(this._root, value.cwd))
+    });
+  }
+
+  private _licenseReplacer(value: any) {
+    return Object.assign({}, value, {
+      outputTemplate: this._relativePath(
+        'process.cwd()', path.relative(this._root, value.outputTemplate))
     });
   }
 
