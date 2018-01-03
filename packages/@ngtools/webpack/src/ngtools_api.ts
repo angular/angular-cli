@@ -92,7 +92,7 @@ export interface LazyRoute {
   referencedModule: { name: string, filePath: string };
 }
 
-export declare type Diagnostics = Array<ts.Diagnostic | Diagnostic>;
+export declare type Diagnostics = ReadonlyArray<ts.Diagnostic | Diagnostic>;
 
 // Interfaces for the function declarations.
 export interface CreateProgramInterface {
