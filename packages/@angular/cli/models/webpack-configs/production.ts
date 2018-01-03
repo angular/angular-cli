@@ -136,6 +136,7 @@ export function getProdConfig(wco: WebpackConfigOptions) {
 
   return {
     entry: entryPoints,
+    mode: 'production',
     plugins: [
       new webpack.EnvironmentPlugin({
         'NODE_ENV': 'production'

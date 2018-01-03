@@ -562,8 +562,7 @@ export class AngularCompilerPlugin implements Tapable {
           // TODO: check if we can't just leave it as is (angularCoreModuleDir).
           result.resource = path.join(this._basePath, '$$_lazy_route_resource');
           result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = (_fs: any, _resource: any, _recursive: any,
-            _regExp: RegExp, cb: any) => {
+          result.resolveDependencies = (_fs: any, _options: any, cb: any) => {
             const dependencies = Object.keys(this._lazyRoutes)
               .map((key) => {
                 const modulePath = this._lazyRoutes[key];
@@ -596,27 +595,29 @@ export class AngularCompilerPlugin implements Tapable {
 
     // TODO: consider if it's better to remove this plugin and instead make it wait on the
     // VirtualFileSystemDecorator.
-    compiler.plugin('after-resolvers', (compiler: any) => {
+    compiler.plugin('normal-module-factory', (nmf: any) => {
       // Virtual file system.
       // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
       // when the issuer is a `.ts` or `.ngfactory.js` file.
-      compiler.resolvers.normal.plugin('before-resolve', (request: any, cb: () => void) => {
-        if (this.done && (request.request.endsWith('.ts')
+      nmf.plugin('before-resolve', (request: any, cb: any) => {
+        if ((this.done && request.request.endsWith('.ts')
           || (request.context.issuer && /\.ts|ngfactory\.js$/.test(request.context.issuer)))) {
-          this.done.then(() => cb(), () => cb());
+          this.done.then(() => cb(null, request), () => cb(null, request));
         } else {
-          cb();
+          cb(null, request);
         }
       });
     });
 
     compiler.plugin('normal-module-factory', (nmf: any) => {
-      compiler.resolvers.normal.apply(new PathsPlugin({
-        nmf,
-        tsConfigPath: this._tsConfigPath,
-        compilerOptions: this._compilerOptions,
-        compilerHost: this._compilerHost
-      }));
+      compiler.resolverFactory.plugin('resolver normal', (resolver: any) => {
+        resolver.apply(new PathsPlugin({
+          nmf,
+          tsConfigPath: this._tsConfigPath,
+          compilerOptions: this._compilerOptions,
+          compilerHost: this._compilerHost
+        }));
+      });
     });
   }
 

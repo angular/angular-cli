@@ -37,16 +37,17 @@ export class SuppressExtractedTextChunksWebpackPlugin {
           });
         callback();
       });
+      // html-webpack-plugin not yet supported in webpack 4.
       // Remove scripts tags with a css file as source, because HtmlWebpackPlugin will use
       // a css file as a script for chunks without js files.
-      compilation.plugin('html-webpack-plugin-alter-asset-tags',
-        (htmlPluginData: any, callback: any) => {
-          const filterFn = (tag: any) =>
-            !(tag.tagName === 'script' && tag.attributes.src.match(/\.css$/));
-          htmlPluginData.head = htmlPluginData.head.filter(filterFn);
-          htmlPluginData.body = htmlPluginData.body.filter(filterFn);
-          callback(null, htmlPluginData);
-        });
+      // compilation.plugin('html-webpack-plugin-alter-asset-tags',
+      //   (htmlPluginData: any, callback: any) => {
+      //     const filterFn = (tag: any) =>
+      //       !(tag.tagName === 'script' && tag.attributes.src.match(/\.css$/));
+      //     htmlPluginData.head = htmlPluginData.head.filter(filterFn);
+      //     htmlPluginData.body = htmlPluginData.body.filter(filterFn);
+      //     callback(null, htmlPluginData);
+      //   });
     });
   }
 }
