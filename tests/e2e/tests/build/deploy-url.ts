@@ -15,7 +15,8 @@ export default function () {
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css'))
     .then(() => expectFileToMatch('dist/index.html', 'deployUrl/main.bundle.js'))
     // verify --deploy-url isn't applied to extracted css urls
-    .then(() => expectFileToMatch('dist/styles.bundle.css', /url\(more\.[0-9a-f]{20}\.png\)/))
+    .then(() => expectFileToMatch('dist/styles.bundle.css',
+      /url\(['"]?more\.[0-9a-f]{20}\.png['"]?\)/))
     .then(() => ng('build', '--deploy-url=http://example.com/some/path/', '--extract-css'))
     .then(() => expectFileToMatch('dist/index.html', 'http://example.com/some/path/main.bundle.js'))
     // verify option also works in config
@@ -28,7 +29,7 @@ export default function () {
     // verify --deploy-url is applied to non-extracted css urls
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css=false'))
     .then(() => expectFileToMatch('dist/styles.bundle.js',
-      /__webpack_require__.p \+ \"more\.[0-9a-f]{20}\.png\"/))
+      /\(['"]?deployUrl\/more\.[0-9a-f]{20}\.png['"]?\)/))
     .then(() => expectFileToMatch('dist/inline.bundle.js',
       /__webpack_require__\.p = "deployUrl\/";/))
     // verify slash is appended to the end of --deploy-url if missing
