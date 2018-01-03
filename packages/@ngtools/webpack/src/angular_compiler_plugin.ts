@@ -40,7 +40,7 @@ import {
   Program,
   CompilerOptions,
   CompilerHost,
-  Diagnostics,
+  Diagnostic,
   EmitFlags,
   LazyRoute,
   createProgram,
@@ -919,7 +919,7 @@ export class AngularCompilerPlugin implements Tapable {
   private _emit(sourceFiles: ts.SourceFile[]) {
     time('AngularCompilerPlugin._emit');
     const program = this._program;
-    const allDiagnostics: Diagnostics = [];
+    const allDiagnostics: Array<ts.Diagnostic | Diagnostic> = [];
 
     let emitResult: ts.EmitResult | undefined;
     try {

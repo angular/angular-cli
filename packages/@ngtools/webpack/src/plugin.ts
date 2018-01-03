@@ -62,7 +62,6 @@ export class AotPlugin implements Tapable {
   private _entryModule: string;
 
   private _donePromise: Promise<void> | null;
-  private _compiler: any = null;
   private _compilation: any = null;
 
   private _typeCheck = true;
@@ -356,8 +355,6 @@ export class AotPlugin implements Tapable {
 
   // registration hook for webpack plugin
   apply(compiler: any) {
-    this._compiler = compiler;
-
     // Decorate inputFileSystem to serve contents of CompilerHost.
     // Use decorated inputFileSystem in watchFileSystem.
     compiler.plugin('environment', () => {
