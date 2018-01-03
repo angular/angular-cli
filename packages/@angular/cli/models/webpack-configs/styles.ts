@@ -29,6 +29,12 @@ const customProperties = require('postcss-custom-properties');
  * require('sass-loader')
  */
 
+interface PostcssUrlAsset {
+  url: string;
+  hash: string;
+  absolutePath: string;
+}
+
 export function getStylesConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
@@ -44,17 +50,20 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
 
-  const postcssPluginCreator = function() {
+  const postcssPluginCreator = function(loader: webpack.loader.LoaderContext) {
     return [
       postcssUrl({
-        filter: ({ url }: { url: string }) => url.startsWith('~'),
-        url: ({ url }: { url: string }) => path.join(projectRoot, 'node_modules', url.substr(1)),
+        filter: ({ url }: PostcssUrlAsset) => url.startsWith('~'),
+        url: ({ url }: PostcssUrlAsset) => {
+          const fullPath = path.join(projectRoot, 'node_modules', url.substr(1));
+          return path.relative(loader.context, fullPath).replace(/\\/g, '/');
+        }
       }),
       postcssUrl([
         {
           // Only convert root relative URLs, which CSS-Loader won't process into require().
-          filter: ({ url }: { url: string }) => url.startsWith('/') && !url.startsWith('//'),
-          url: ({ url }: { url: string }) => {
+          filter: ({ url }: PostcssUrlAsset) => url.startsWith('/') && !url.startsWith('//'),
+          url: ({ url }: PostcssUrlAsset) => {
             if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
               // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
               return `${deployUrl.replace(/\/$/, '')}${url}`;
@@ -71,7 +80,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         },
         {
           // TODO: inline .cur if not supporting IE (use browserslist to check)
-          filter: (asset: any) => !asset.hash && !asset.absolutePath.endsWith('.cur'),
+          filter: (asset: PostcssUrlAsset) => !asset.hash && !asset.absolutePath.endsWith('.cur'),
           url: 'inline',
           // NOTE: maxSize is in KB
           maxSize: 10

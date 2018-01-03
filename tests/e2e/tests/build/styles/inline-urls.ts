@@ -20,7 +20,7 @@ export default function () {
     .then(() => silentNpm('install', 'font-awesome@4.7.0'))
     .then(() => writeMultipleFiles({
       'src/styles.scss': `
-        $fa-font-path: "~font-awesome/font";
+        $fa-font-path: "~font-awesome/fonts";
         @import "~font-awesome/scss/font-awesome";
         h1 { background: url('./assets/large.png'); }
         h2 { background: url('./assets/small.svg'); }
