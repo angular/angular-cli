@@ -323,9 +323,12 @@ class JsonWebpackSerializer {
       if (loader.loader) {
         loader.loader = this._loaderReplacer(loader.loader);
       }
-      if (loader.loader === 'postcss-loader' && !this._postcssProcessed) {
-        const args: any = loader.options.plugins[postcssArgs];
+      if (loader.loader === 'postcss-loader') {
+        if (!this._postcssProcessed) {
+          const args: any = loader.options.plugins[postcssArgs];
 
+        Object.keys(args.imports)
+          .forEach(key => this._addImport(key, args.imports[key]));
         Object.keys(args.variableImports)
           .forEach(key => this.variableImports[key] = args.variableImports[key]);
         Object.keys(args.variables)
@@ -341,10 +344,12 @@ class JsonWebpackSerializer {
             }
           });
 
-        this.variables['postcssPlugins'] = loader.options.plugins;
-        loader.options.plugins = this._escape('postcssPlugins');
+          this.variables['postcssPlugins'] = loader.options.plugins;
 
-        this._postcssProcessed = true;
+          this._postcssProcessed = true;
+        }
+
+        loader.options.plugins = this._escape('postcssPlugins');
       }
     }
     return loader;
@@ -368,13 +373,16 @@ class JsonWebpackSerializer {
     };
 
     if (value[pluginArgs]) {
+      const options = value[pluginArgs];
+      options.use = options.use.map((loader: any) => this._loaderReplacer(loader));
+
       return {
         include: Array.isArray(value.include)
           ? value.include.map((x: any) => replaceExcludeInclude(x))
           : replaceExcludeInclude(value.include),
         test: this._serializeRegExp(value.test),
         loaders: this._escape(
-          `ExtractTextPlugin.extract(${JSON.stringify(value[pluginArgs], null, 2)})`)
+          `ExtractTextPlugin.extract(${JSON.stringify(options, null, 2)})`)
       };
     }
 
