@@ -19,13 +19,10 @@ export interface ExtractI18nPluginOptions {
 export class ExtractI18nPlugin implements Tapable {
   private _resourceLoader: WebpackResourceLoader;
 
-  private _donePromise: Promise<void> | null;
-  private _compiler: any = null;
   private _compilation: any = null;
 
   private _tsConfigPath: string;
   private _basePath: string;
-  private _genDir: string;
   private _rootFilePath: string[];
   private _compilerOptions: any = null;
   private _angularCompilerOptions: any = null;
@@ -112,7 +109,6 @@ export class ExtractI18nPlugin implements Tapable {
     );
 
     this._basePath = basePath;
-    this._genDir = genDir;
 
     // this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
     this._compilerHost = ts.createCompilerHost(this._compilerOptions, true);
@@ -141,12 +137,9 @@ export class ExtractI18nPlugin implements Tapable {
   }
 
   apply(compiler: any) {
-    this._compiler = compiler;
-
     compiler.plugin('make', (compilation: any, cb: any) => this._make(compilation, cb));
 
     compiler.plugin('after-emit', (compilation: any, cb: any) => {
-      this._donePromise = null;
       this._compilation = null;
       compilation._ngToolsWebpackXi18nPluginInstance = null;
       cb();
@@ -168,7 +161,7 @@ export class ExtractI18nPlugin implements Tapable {
 
     this._resourceLoader.update(compilation);
 
-    this._donePromise = Promise.resolve()
+    Promise.resolve()
       .then(() => {
         return __NGTOOLS_PRIVATE_API_2.extractI18n({
           basePath: this._basePath,
