@@ -104,4 +104,14 @@ describe('Universal Schematic', () => {
     const contents = tree.read(filePath);
     expect(contents).toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {/);
   });
+
+  it('should update .gitignore with the server outDir', () => {
+    const outDir = 'my-out-dir';
+    const options = {...defaultOptions, outDir: outDir};
+    const tree = schematicRunner.runSchematic('universal', options, appTree);
+    const filePath = '/.gitignore';
+    const contents = tree.read(filePath) || new Buffer('');
+
+    expect(contents).toMatch(outDir);
+  });
 });

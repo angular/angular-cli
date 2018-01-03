@@ -161,6 +161,22 @@ function addDependencies(): Rule {
   };
 }
 
+function updateGitignore(options: UniversalOptions): Rule {
+  return (host: Tree) => {
+    const ignorePath = normalize('/.gitignore');
+    const buffer = host.read(ignorePath);
+    if (buffer === null) {
+      // Assumption is made that there is no git repository.
+      return host;
+    } else {
+      const content = buffer.toString();
+      host.overwrite(ignorePath, `${content}\n${options.outDir}`);
+    }
+
+    return host;
+  };
+}
+
 export default function (options: UniversalOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const templateSource = apply(url('./files'), [
@@ -177,6 +193,7 @@ export default function (options: UniversalOptions): Rule {
       updateConfigFile(options),
       wrapBootstrapCall(options),
       addServerTransition(options),
+      updateGitignore(options),
     ])(host, context);
   };
 }
