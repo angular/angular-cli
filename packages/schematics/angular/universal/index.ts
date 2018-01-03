@@ -51,6 +51,7 @@ function updateConfigFile(options: UniversalOptions): Rule {
       test: options.test,
       tsconfig: tsCfg,
       testTsconfig: testTsCfg,
+      polyfills: undefined,
     };
     if (options.name) {
       serverApp.name = options.name;

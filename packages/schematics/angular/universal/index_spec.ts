@@ -89,6 +89,7 @@ describe('Universal Schematic', () => {
     expect(app.tsconfig).toEqual('tsconfig.server.json');
     expect(app.testTsconfig).toEqual('tsconfig.spec.json');
     expect(app.environmentSource).toEqual('environments/environment.ts');
+    expect(app.polyfills).not.toBeDefined();
   });
 
   it('should add a server transition to BrowerModule import', () => {
