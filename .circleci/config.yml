@@ -3,7 +3,7 @@ version: 2
 _defaults: &defaults
   working_directory: ~/ng
   docker:
-    - image: angular/ngcontainer:0.0.5
+    - image: angular/ngcontainer:0.0.8
 
 _post_checkout: &post_checkout
   post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
