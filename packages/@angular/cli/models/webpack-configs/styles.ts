@@ -48,7 +48,13 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     return [
       postcssUrl({
         filter: ({ url }: { url: string }) => url.startsWith('~'),
-        url: ({ url }: { url: string }) => path.join(projectRoot, 'node_modules', url.substr(1)),
+        url: ({ url }: { url: string }, { file }: { file: string }) => {
+          const relativePathToRoot = path.relative(file, projectRoot);
+          return path.join(relativePathToRoot, 'node_modules', url.substr(1))
+            // Ensure that, on Windows, the path doesn't contain back slashes to
+            // be PostCSS friendly :)
+            .replace(/\\/g, '/');
+        },
       }),
       postcssUrl([
         {
