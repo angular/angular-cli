@@ -12,6 +12,7 @@ const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const customProperties = require('postcss-custom-properties');
+const postcssImports = require('postcss-import');
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -52,6 +53,33 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   const postcssPluginCreator = function(loader: webpack.loader.LoaderContext) {
     return [
+      postcssImports({
+        resolve: (url: string, context: string) => {
+          return new Promise<string>((resolve, reject) => {
+            loader.resolve(context, url, (err: Error, result: string) => {
+              if (err) {
+                reject(err);
+                return;
+              }
+
+              resolve(result);
+            });
+          });
+        },
+        load: (filename: string) => {
+          return new Promise<string>((resolve, reject) => {
+            loader.fs.readFile(filename, (err: Error, data: Buffer) => {
+              if (err) {
+                reject(err);
+                return;
+              }
+
+              const content = data.toString();
+              resolve(content);
+            });
+          });
+        }
+      }),
       postcssUrl({
         filter: ({ url }: PostcssUrlAsset) => url.startsWith('~'),
         url: ({ url }: PostcssUrlAsset) => {
@@ -94,7 +122,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     variableImports: {
       'autoprefixer': 'autoprefixer',
       'postcss-url': 'postcssUrl',
-      'postcss-custom-properties': 'customProperties'
+      'postcss-custom-properties': 'customProperties',
+      'postcss-import': 'postcssImports',
     },
     variables: { minimizeCss, baseHref, deployUrl, projectRoot }
   };
@@ -167,7 +196,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       loader: 'css-loader',
       options: {
         sourceMap: cssSourceMap,
-        importLoaders: 1,
+        import: false,
       }
     },
     {

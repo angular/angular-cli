@@ -579,6 +579,7 @@ export default Task.extend({
           'json-loader',
           'karma-sourcemap-loader',
           'less-loader',
+          'postcss-import',
           'postcss-loader',
           'postcss-url',
           'raw-loader',
