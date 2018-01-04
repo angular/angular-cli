@@ -72,6 +72,11 @@
       "version": "0.0.42",
       "hash": "33e9d31bdce777d0010265fcf99b8469"
     },
+    "@angular-devkit/schematics-cli": {
+      "name": "Schematics CLI",
+      "version": "0.0.0",
+      "hash": ""
+    },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",

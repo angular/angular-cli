@@ -1,12 +1,13 @@
 {
-  "name": "@angular-devkit/schematics",
+  "name": "@angular-devkit/schematics-cli",
   "version": "0.0.0",
-  "description": "Angular Schematics - Library",
+  "description": "Angular Schematics - CLI",
+  "bin": {
+    "schematics": "./bin/schematics.js"
+  },
   "scripts": {
     "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
   },
-  "main": "src/index.js",
-  "typings": "src/index.d.ts",
   "keywords": [
     "blueprints",
     "scaffolding",
@@ -17,9 +18,9 @@
   ],
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
-    "@ngtools/json-schema": "^1.1.0"
-  },
-  "peerDependencies": {
+    "@angular-devkit/schematics": "0.0.0",
+    "@schematics/schematics": "0.0.0",
+    "minimist": "^1.2.0",
     "rxjs": "^5.5.2"
   }
 }

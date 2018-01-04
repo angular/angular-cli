@@ -53,6 +53,7 @@ This is a monorepo which contains many packages:
 **Build Optimizer** | [`@angular-devkit/build-optimizer`](http://npmjs.com/packages/@angular-devkit/build-optimizer) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fbuild-optimizer/latest.svg)](http://npmjs.com/packages/@angular-devkit/build-optimizer) | [![README](https://img.shields.io/badge/README--green.svg)](https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md)
 **Core** | [`@angular-devkit/core`](http://npmjs.com/packages/@angular-devkit/core) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fcore/latest.svg)](http://npmjs.com/packages/@angular-devkit/core) | 
 **Schematics** | [`@angular-devkit/schematics`](http://npmjs.com/packages/@angular-devkit/schematics) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fschematics/latest.svg)](http://npmjs.com/packages/@angular-devkit/schematics) | [![README](https://img.shields.io/badge/README--green.svg)](https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md)
+**Schematics CLI** | [`@angular-devkit/schematics-cli`](http://npmjs.com/packages/@angular-devkit/schematics-cli) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fschematics-cli/latest.svg)](http://npmjs.com/packages/@angular-devkit/schematics-cli) | 
 
 #### Schematics
 
