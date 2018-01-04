@@ -89,7 +89,7 @@ export function findNode(node: ts.Node, kind: ts.SyntaxKind, text: string): ts.N
  * @return function to sort nodes in increasing order of position in sourceFile
  */
 function nodesByPosition(first: ts.Node, second: ts.Node): number {
-  return first.pos - second.pos;
+  return first.getStart() - second.getStart();
 }
 
 
@@ -121,7 +121,7 @@ export function insertAfterLastOccurrence(nodes: ts.Node[],
   if (!lastItem && fallbackPos == undefined) {
     throw new Error(`tried to insert ${toInsert} as first occurence with no fallback position`);
   }
-  const lastItemPosition: number = lastItem ? lastItem.end : fallbackPos;
+  const lastItemPosition: number = lastItem ? lastItem.getEnd() : fallbackPos;
 
   return new InsertChange(file, lastItemPosition, toInsert);
 }
