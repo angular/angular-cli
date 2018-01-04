@@ -164,16 +164,22 @@ workflows:
             - e2e-setup
       # Master only E2E.
       - ng2-e2e:
+          requires:
+            - build
           filters:
             branches:
               only:
                 - master
       - ng4-e2e:
+          requires:
+            - build
           filters:
             branches:
               only:
                 - master
       - nightly-e2e:
+          requires:
+            - build
           filters:
             branches:
               only:
