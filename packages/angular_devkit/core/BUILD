@@ -16,7 +16,6 @@ ts_library(
     deps = [
         # @deps: rxjs
     ],
-    tsconfig = "//:tsconfig.json",
     module_name = "@angular-devkit/core",
     module_root = "src"
 )
@@ -31,7 +30,6 @@ ts_library(
         "//packages/angular_devkit/core",
         # @deps: rxjs
     ],
-    tsconfig = "//:tsconfig.json",
     module_name = "@angular-devkit/core/node",
     module_root = "node"
 )
@@ -47,5 +45,4 @@ ts_library(
         # @deps: rxjs
         # @typings: jasmine
     ],
-    tsconfig = "//:tsconfig.json",
 )

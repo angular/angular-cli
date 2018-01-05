@@ -17,7 +17,6 @@ ts_library(
       "//packages/angular_devkit/core",
         # @deps: rxjs
     ],
-    tsconfig = "//:tsconfig.json",
     module_name = "@angular-devkit/schematics",
     module_root = "src"
 )
@@ -34,7 +33,6 @@ ts_library(
         "//packages/angular_devkit/core:node",
         # @deps: rxjs
     ],
-    tsconfig = "//:tsconfig.json",
     module_name = "@angular-devkit/schematics/tools",
     module_root = "tools"
 )
@@ -51,7 +49,6 @@ ts_library(
         "//packages/angular_devkit/core",
         # @deps: rxjs
     ],
-    tsconfig = "//:tsconfig.json",
     module_name = "@angular-devkit/schematics/testing",
     module_root = "testing"
 )
@@ -67,7 +64,6 @@ ts_library(
         # @deps: rxjs
         # @typings: jasmine
     ],
-    tsconfig = "//:tsconfig.json",
 )
 
 ts_library(
@@ -81,5 +77,4 @@ ts_library(
         # @deps: rxjs
         # @typings: jasmine
     ],
-    tsconfig = "//:tsconfig.json",
 )
