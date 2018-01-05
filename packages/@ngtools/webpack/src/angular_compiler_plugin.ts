@@ -27,7 +27,7 @@ import {
   replaceResources,
 } from './transformers';
 import { time, timeEnd } from './benchmark';
-import { InitMessage, UpdateMessage } from './type_checker';
+import { InitMessage, UpdateMessage, AUTO_START_ARG } from './type_checker';
 import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
 import {
   CompilerCliIsSupported,
@@ -466,7 +466,7 @@ export class AngularCompilerPlugin implements Tapable {
     const g: any = global;
     const typeCheckerFile: string = g['angularCliIsLocal']
       ? './type_checker_bootstrap.js'
-      : './type_checker.js';
+      : './type_checker_worker.js';
 
     const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
 
@@ -475,10 +475,15 @@ export class AngularCompilerPlugin implements Tapable {
       // Workaround for https://github.com/nodejs/node/issues/9435
       return !debugArgRegex.test(arg);
     });
-
+    // Signal the process to start listening for messages
+    // Solves https://github.com/angular/angular-cli/issues/9071
+    const forkArgs = [AUTO_START_ARG];
     const forkOptions: ForkOptions = { execArgv };
 
-    this._typeCheckerProcess = fork(path.resolve(__dirname, typeCheckerFile), [], forkOptions);
+    this._typeCheckerProcess = fork(
+      path.resolve(__dirname, typeCheckerFile),
+      forkArgs,
+      forkOptions);
     this._typeCheckerProcess.send(new InitMessage(this._compilerOptions, this._basePath,
       this._JitMode, this._rootNames));
 
