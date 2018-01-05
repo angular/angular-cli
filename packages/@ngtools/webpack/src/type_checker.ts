@@ -1,11 +1,6 @@
 // @ignoreDep typescript
-import * as process from 'process';
 import * as ts from 'typescript';
 import chalk from 'chalk';
-
-import { WebpackCompilerHost } from './compiler_host';
-import { time, timeEnd } from './benchmark';
-import { CancellationToken, gatherDiagnostics } from './gather_diagnostics';
 import {
   Program,
   CompilerOptions,
@@ -14,11 +9,18 @@ import {
   createCompilerHost,
   formatDiagnostics,
 } from './ngtools_api';
+import { WebpackCompilerHost } from './compiler_host';
+import { time, timeEnd } from './benchmark';
+import { CancellationToken, gatherDiagnostics } from './gather_diagnostics';
+
+
+// This file should run in a child process with the AUTO_START_ARG argument
 
 // Force basic color support on terminals with no color support.
 // Chalk typings don't have the correct constructor parameters.
 const chalkCtx = new (chalk.constructor as any)(chalk.supportsColor ? {} : { level: 1 });
 const { bold, red, yellow } = chalkCtx;
+
 
 export enum MESSAGE_KIND {
   Init,
@@ -46,43 +48,9 @@ export class UpdateMessage extends TypeCheckerMessage {
   }
 }
 
-let typeChecker: TypeChecker;
-let lastCancellationToken: CancellationToken;
+export const AUTO_START_ARG = '9d93e901-158a-4cf9-ba1b-2f0582ffcfeb';
 
-process.on('message', (message: TypeCheckerMessage) => {
-  time('TypeChecker.message');
-  switch (message.kind) {
-    case MESSAGE_KIND.Init:
-      const initMessage = message as InitMessage;
-      typeChecker = new TypeChecker(
-        initMessage.compilerOptions,
-        initMessage.basePath,
-        initMessage.jitMode,
-        initMessage.rootNames,
-      );
-      break;
-    case MESSAGE_KIND.Update:
-      if (!typeChecker) {
-        throw new Error('TypeChecker: update message received before initialization');
-      }
-      if (lastCancellationToken) {
-        // This cancellation token doesn't seem to do much, messages don't seem to be processed
-        // before the diagnostics finish.
-        lastCancellationToken.requestCancellation();
-      }
-      const updateMessage = message as UpdateMessage;
-      lastCancellationToken = new CancellationToken();
-      typeChecker.update(updateMessage.rootNames, updateMessage.changedCompilationFiles,
-        lastCancellationToken);
-      break;
-    default:
-      throw new Error(`TypeChecker: Unexpected message received: ${message}.`);
-  }
-  timeEnd('TypeChecker.message');
-});
-
-
-class TypeChecker {
+export class TypeChecker {
   private _program: ts.Program | Program;
   private _compilerHost: WebpackCompilerHost & CompilerHost;
 
@@ -171,3 +139,4 @@ class TypeChecker {
     this._diagnose(cancellationToken);
   }
 }
+
