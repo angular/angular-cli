@@ -5,6 +5,8 @@
 ## Overview
 `ng generate [name]` generates the specified blueprint
 
+`[name]` is read from the prefix property of an object in the apps array within .angular-cli.json
+
 ## Available blueprints:
  - [class](generate/class)
  - [component](generate/component)
