@@ -116,7 +116,7 @@ export class ScriptsWebpackPlugin {
             const concatSource = new ConcatSource();
             sources.forEach(source => {
               concatSource.add(source);
-              concatSource.add('\n');
+              concatSource.add('\n;');
             });
 
             const combinedSource = new CachedSource(concatSource);
