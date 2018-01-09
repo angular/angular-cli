@@ -45,14 +45,13 @@ export default Task.extend({
         }
 
         const json = stats.toJson('verbose');
+        if (stats.hasWarnings()) {
+          this.ui.writeLine(statsWarningsToString(json, statsConfig));
+        }
         if (runTaskOptions.verbose) {
           this.ui.writeLine(stats.toString(statsConfig));
         } else {
           this.ui.writeLine(statsToString(json, statsConfig));
-        }
-
-        if (stats.hasWarnings()) {
-          this.ui.writeLine(statsWarningsToString(json, statsConfig));
         }
         if (stats.hasErrors()) {
           this.ui.writeError(statsErrorsToString(json, statsConfig));
