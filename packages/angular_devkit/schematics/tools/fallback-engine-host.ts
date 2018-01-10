@@ -12,11 +12,14 @@ import {
   RuleFactory,
   SchematicDescription,
   Source,
+  TaskExecutor,
   TypedSchematicContext,
   UnknownCollectionException,
+  UnregisteredTaskException,
 } from '@angular-devkit/schematics';
 import { Observable } from 'rxjs/Observable';
 import { of as observableOf } from 'rxjs/observable/of';
+import { _throw } from 'rxjs/observable/throw';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { Url } from 'url';
 
@@ -112,4 +115,25 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
 
     return [...allNames];
   }
+
+  createTaskExecutor(name: string): Observable<TaskExecutor> {
+    for (const host of this._hosts) {
+      if (host.hasTaskExecutor(name)) {
+        return host.createTaskExecutor(name);
+      }
+    }
+
+    return _throw(new UnregisteredTaskException(name));
+  }
+
+  hasTaskExecutor(name: string): boolean {
+    for (const host of this._hosts) {
+      if (host.hasTaskExecutor(name)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 }

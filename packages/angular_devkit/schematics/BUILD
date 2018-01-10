@@ -22,6 +22,23 @@ ts_library(
 )
 
 ts_library(
+    name = "tasks",
+    srcs = glob(
+        include = ["tasks/**/*.ts"],
+        exclude = ["tasks/**/*_spec.ts", "tasks/**/*_benchmark.ts"],
+    ),
+    deps = [
+        ":schematics",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node",
+        # @deps: rxjs
+    ],
+    tsconfig = "//:tsconfig.json",
+    module_name = "@angular-devkit/schematics/tasks",
+    module_root = "tasks"
+)
+
+ts_library(
     name = "tools",
     srcs = glob(
         include = ["tools/**/*.ts"],

@@ -271,7 +271,8 @@ schematic.call(args, host, { debug, logger: logger.asApi() })
       return fsSink.commit(tree).pipe(
         ignoreElements(),
         concat(observableOf(tree)));
-    }))
+    }),
+    concatMap(() => engine.executePostTasks()))
   .subscribe({
     error(err: Error) {
       if (debug) {

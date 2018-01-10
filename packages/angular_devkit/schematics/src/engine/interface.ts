@@ -9,6 +9,7 @@ import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { Url } from 'url';
 import { FileEntry, MergeStrategy, Tree } from '../tree/interface';
+import { TaskConfigurationGenerator, TaskExecutor, TaskId } from './task';
 
 
 /**
@@ -60,6 +61,8 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
     schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
     options: OptionT,
   ): Observable<ResultT>;
+  createTaskExecutor(name: string): Observable<TaskExecutor>;
+  hasTaskExecutor(name: string): boolean;
 
   readonly defaultMergeStrategy?: MergeStrategy;
 }
@@ -93,6 +96,7 @@ export interface Engine<CollectionMetadataT extends object, SchematicMetadataT e
       schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
       options: OptionT,
   ): Observable<ResultT>;
+  executePostTasks(): Observable<void>;
 
   readonly defaultMergeStrategy: MergeStrategy;
 }
@@ -137,6 +141,7 @@ export interface TypedSchematicContext<CollectionMetadataT extends object,
   readonly logger: logging.LoggerApi;
   readonly schematic: Schematic<CollectionMetadataT, SchematicMetadataT>;
   readonly strategy: MergeStrategy;
+  addTask<T>(task: TaskConfigurationGenerator<T>, dependencies?: Array<TaskId>): TaskId;
 }
 
 

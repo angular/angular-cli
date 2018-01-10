@@ -11,11 +11,16 @@ import {
   FileSystemCreateTree,
   RuleFactory,
   Source,
+  TaskExecutor,
+  TaskExecutorFactory,
   UnknownSchematicException,
+  UnregisteredTaskException,
 } from '@angular-devkit/schematics';
 import { dirname, isAbsolute, join, resolve } from 'path';
 import { Observable } from 'rxjs/Observable';
+import { from as observableFrom } from 'rxjs/observable/from';
 import { of as observableOf } from 'rxjs/observable/of';
+import { _throw } from 'rxjs/observable/throw';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { Url } from 'url';
 import {
@@ -96,6 +101,7 @@ export abstract class FileSystemEngineHostBase implements
       desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc;
 
   private _transforms: OptionTransform<{}, {}>[] = [];
+  private _taskFactories = new Map<string, () => Observable<TaskExecutor>>();
 
   /**
    * @deprecated Use `listSchematicNames`.
@@ -267,4 +273,20 @@ export abstract class FileSystemEngineHostBase implements
     return schematic.factoryFn;
   }
 
+  registerTaskExecutor<T>(factory: TaskExecutorFactory<T>, options?: T): void {
+    this._taskFactories.set(factory.name, () => observableFrom(factory.create(options)));
+  }
+
+  createTaskExecutor(name: string): Observable<TaskExecutor> {
+    const factory = this._taskFactories.get(name);
+    if (factory) {
+      return factory();
+    }
+
+    return _throw(new UnregisteredTaskException(name));
+  }
+
+  hasTaskExecutor(name: string): boolean {
+    return this._taskFactories.has(name);
+  }
 }

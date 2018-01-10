@@ -39,6 +39,7 @@
       "@angular-devkit/core": [ "./packages/angular_devkit/core/src/index" ],
       "@angular-devkit/core/node": [ "./packages/angular_devkit/core/node/index" ],
       "@angular-devkit/schematics": [ "./packages/angular_devkit/schematics/src/index" ],
+      "@angular-devkit/schematics/tasks": [ "./packages/angular_devkit/schematics/tasks/index" ],
       "@angular-devkit/schematics/tools": [ "./packages/angular_devkit/schematics/tools/index" ],
       "@angular-devkit/schematics/testing": [ "./packages/angular_devkit/schematics/testing/index" ],
       "@angular-devkit/build_optimizer": [ "./packages/angular_devkit/build_optimizer/src/index" ]
