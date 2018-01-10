@@ -100,7 +100,7 @@
     "webpack-merge": "^4.1.0",
     "webpack-sources": "^1.0.0",
     "webpack-subresource-integrity": "^1.0.1",
-    "zone.js": "^0.8.14"
+    "zone.js": "^0.8.19"
   },
   "devDependencies": {
     "@angular/compiler": "^5.0.0",
