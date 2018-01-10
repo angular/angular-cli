@@ -28,7 +28,7 @@
     "name": {
       "description": "The name of the application.",
       "type": "string",
-      "format": "app-name"
+      "format": "html-selector"
     },
     "inlineStyle": {
       "description": "Specifies if the style will be in the ts file.",

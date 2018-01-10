@@ -44,12 +44,7 @@ export class SchematicTestRunner {
     this._engineHost.registerCollection(_collectionName, collectionPath);
     this._logger = new logging.Logger('test');
 
-    const schemaFormats = [
-      formats.appNameFormat,
-      formats.htmlSelectorFormat,
-      formats.pathFormat,
-    ];
-    const registry = new schema.CoreSchemaRegistry(schemaFormats);
+    const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
 
     this._engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
     this._collection = this._engine.createCollection(this._collectionName);

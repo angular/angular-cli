@@ -7,15 +7,12 @@
  */
 
 import { schema } from '@angular-devkit/core';
-import { appNameFormat } from './app-name';
-export { appNameFormat } from './app-name';
 import { htmlSelectorFormat } from './html-selector';
 export { htmlSelectorFormat } from './html-selector';
 import { pathFormat } from './path';
 export { pathFormat } from './path';
 
 export const standardFormats: schema.SchemaFormat[] = [
-  appNameFormat,
   htmlSelectorFormat,
   pathFormat,
 ];

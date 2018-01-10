@@ -15,7 +15,7 @@
     },
     "appId": {
       "type": "string",
-      "format": "app-name",
+      "format": "html-selector",
       "description": "The appId to use withServerTransition.",
       "default": "serverApp"
     },

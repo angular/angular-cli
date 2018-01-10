@@ -22,12 +22,12 @@
 
     "name": {
       "type": "string",
-      "format": "app-name",
+      "format": "html-selector",
       "description": "Name of the universal app"
     },
     "appId": {
       "type": "string",
-      "format": "app-name",
+      "format": "html-selector",
       "description": "The appId to use withServerTransition.",
       "default": "serverApp"
     },
@@ -86,7 +86,7 @@
     },
     "rootModuleClassName": {
       "type": "string",
-      "format": "app-name",
+      "format": "html-selector",
       "description": "The name of the root module class.",
       "default": "AppServerModule"
     },
