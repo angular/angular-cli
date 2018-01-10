@@ -6,3 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export { NodePackageInstallTask } from './node-package/install-task';
+export { NodePackageLinkTask } from './node-package/link-task';

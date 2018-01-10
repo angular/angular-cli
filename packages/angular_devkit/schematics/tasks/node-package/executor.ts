@@ -46,6 +46,10 @@ export default function(
     };
     const args = [ options.command ];
 
+    if (options.packageName) {
+      args.push(options.packageName);
+    }
+
     if (options.quiet && packageManagerProfile.quietArgument) {
       args.push(packageManagerProfile.quietArgument);
     }

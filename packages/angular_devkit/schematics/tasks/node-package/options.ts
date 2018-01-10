@@ -16,4 +16,5 @@ export interface NodePackageTaskOptions {
   command: string;
   quiet?: boolean;
   workingDirectory?: string;
+  packageName?: string;
 }
