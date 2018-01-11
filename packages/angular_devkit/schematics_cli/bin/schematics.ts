@@ -21,6 +21,7 @@ import {
   Tree,
   formats,
 } from '@angular-devkit/schematics';
+import { BuiltinTaskExecutor } from '@angular-devkit/schematics/tasks/node';
 import {
   FileSystemHost,
   NodeModulesEngineHost,
@@ -136,6 +137,8 @@ const engine = new SchematicEngine(engineHost);
 const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
 engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
 
+engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage);
+engineHost.registerTaskExecutor(BuiltinTaskExecutor.RepositoryInitializer);
 
 /**
  * The collection to be used.
