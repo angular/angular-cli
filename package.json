@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "1.6.3",
+  "version": "1.7.0-beta.0",
   "description": "CLI tool for Angular",
   "main": "packages/@angular/cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -41,9 +41,9 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "@angular-devkit/build-optimizer": "~0.0.36",
-    "@angular-devkit/schematics": "~0.0.42",
-    "@schematics/angular": "~0.1.11",
+    "@angular-devkit/build-optimizer": "~0.0.37",
+    "@angular-devkit/schematics": "~0.0.45",
+    "@schematics/angular": "~0.1.12",
     "autoprefixer": "^7.2.3",
     "chalk": "~2.2.0",
     "circular-dependency-plugin": "^4.2.1",
