@@ -6,11 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  Collection,
   CollectionDescription,
   EngineHost,
   RuleFactory,
   SchematicDescription,
-  Source, TypedSchematicContext,
+  Source,
+  TypedSchematicContext,
   UnknownCollectionException,
 } from '@angular-devkit/schematics';
 import { Observable } from 'rxjs/Observable';
@@ -88,6 +90,15 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     return (Observable.of(options)
       .pipe(...this._hosts.map(host => mergeMap(opt => host.transformOptions(schematic, opt))))
     ) as {} as Observable<ResultT>;
+  }
+
+  /**
+   * @deprecated Use `listSchematicNames`.
+   */
+  listSchematics(
+    collection: Collection<FallbackCollectionDescription, FallbackSchematicDescription>,
+  ): string[] {
+    return this.listSchematicNames(collection.description);
   }
 
   listSchematicNames(collection: CollectionDescription<FallbackCollectionDescription>): string[] {

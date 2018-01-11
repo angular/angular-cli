@@ -18,6 +18,7 @@ import { Observable } from 'rxjs/Observable';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { Url } from 'url';
 import {
+  FileSystemCollection,
   FileSystemCollectionDesc,
   FileSystemCollectionDescription,
   FileSystemSchematicContext,
@@ -90,6 +91,12 @@ export abstract class FileSystemEngineHostBase implements
 
   private _transforms: OptionTransform<object, object>[] = [];
 
+  /**
+   * @deprecated Use `listSchematicNames`.
+   */
+  listSchematics(collection: FileSystemCollection): string[] {
+    return this.listSchematicNames(collection.description);
+  }
   listSchematicNames(collection: FileSystemCollectionDescription) {
     const schematics: string[] = [];
     for (const key of Object.keys(collection.schematics)) {
