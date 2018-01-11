@@ -27,6 +27,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema } from './schema';
 
 
@@ -134,6 +135,8 @@ export default function (options: Schema): Rule {
         mergeWith(source),
         move(options.name),
       ]);
+
+      context.addTask(new NodePackageInstallTask(options.name));
     }
 
     return chain([
