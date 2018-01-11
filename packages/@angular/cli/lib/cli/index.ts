@@ -20,6 +20,7 @@ function loadCommands() {
     'completion': require('../../commands/completion').default,
     'doc': require('../../commands/doc').default,
     'xi18n': require('../../commands/xi18n').default,
+    'update': require('../../commands/update').default,
 
     // Easter eggs.
     'make-this-awesome': require('../../commands/easter-egg').default,
