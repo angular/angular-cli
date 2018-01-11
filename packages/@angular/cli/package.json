@@ -33,6 +33,7 @@
     "@ngtools/json-schema": "1.1.0",
     "@ngtools/webpack": "1.10.0-beta.1",
     "@schematics/angular": "~0.1.16",
+    "@schematics/package-update": "0.0.6",
     "autoprefixer": "^7.2.3",
     "cache-loader": "^1.2.0",
     "chalk": "~2.2.0",

@@ -45,6 +45,7 @@
     "@angular-devkit/core": "~0.0.28",
     "@angular-devkit/schematics": "~0.0.51",
     "@schematics/angular": "~0.1.16",
+    "@schematics/package-update": "0.0.6",
     "autoprefixer": "^7.2.3",
     "cache-loader": "^1.2.0",
     "chalk": "~2.2.0",
