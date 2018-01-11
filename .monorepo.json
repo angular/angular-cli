@@ -75,13 +75,13 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
         }
       ],
-      "version": "0.0.43",
-      "hash": "667cc7ee32ff992537560ea9beed15f2"
+      "version": "0.0.44",
+      "hash": "42d1fca645a63b33a2310c2642f1bbe8"
     },
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",
-      "version": "0.0.1",
-      "hash": "efaf2bbc19b91c48cdab5f897c11699e"
+      "version": "0.0.2",
+      "hash": "691a0d3a61d2f3b6b2766d1989650887"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
