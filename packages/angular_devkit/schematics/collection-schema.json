@@ -7,32 +7,30 @@
     "schematics": {
       "type": "object",
       "description": "A map of schematic names to schematic details",
-      "properties": {
-        "additionalProperty": {
-          "type": "object",
-          "properties": {
-            "factory": {
-              "type": "string",
-              "description": "A folder or file path to the schematic factory"
-            },
-            "description": {
-              "type": "string",
-              "description": "A description for the schematic"
-            },
-            "extends": {
-              "type": "string",
-              "description": "An schematic override. It can be a local schematic or from another collection (in the format 'collection:schematic')"
-            },
-            "schema": {
-              "type": "string",
-              "description": "Location of the schema.json file of the schematic"
-            }
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "factory": {
+            "type": "string",
+            "description": "A folder or file path to the schematic factory"
           },
-          "required": [
-            "factory",
-            "description"
-          ]
-        }
+          "description": {
+            "type": "string",
+            "description": "A description for the schematic"
+          },
+          "extends": {
+            "type": "string",
+            "description": "An schematic override. It can be a local schematic or from another collection (in the format 'collection:schematic')"
+          },
+          "schema": {
+            "type": "string",
+            "description": "Location of the schema.json file of the schematic"
+          }
+        },
+        "required": [
+          "factory",
+          "description"
+        ]
       }
     },
     "version": {
