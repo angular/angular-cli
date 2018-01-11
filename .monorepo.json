@@ -53,8 +53,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md"
         }
       ],
-      "version": "0.0.36",
-      "hash": "718b816298c9ab7b7b12bd4c2f56423b"
+      "version": "0.0.37",
+      "hash": "d1eb36849df450c49b53987ed4635040"
     },
     "@angular-devkit/core": {
       "name": "Core",
@@ -64,8 +64,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/core/README.md"
         }
       ],
-      "version": "0.0.23",
-      "hash": "45c3c8b7d60b038bbedd3000ebca1b88"
+      "version": "0.0.24",
+      "hash": "64d0a02a2e02e518b20ebecdd49e633b"
     },
     "@angular-devkit/schematics": {
       "name": "Schematics",
@@ -75,31 +75,31 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
         }
       ],
-      "version": "0.0.42",
-      "hash": "33e9d31bdce777d0010265fcf99b8469"
+      "version": "0.0.43",
+      "hash": "667cc7ee32ff992537560ea9beed15f2"
     },
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",
-      "version": "0.0.0",
-      "hash": ""
+      "version": "0.0.1",
+      "hash": "efaf2bbc19b91c48cdab5f897c11699e"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
-      "version": "0.1.11",
-      "hash": "94b15bcd6aafddd2cfa32c10bf1d46ab"
+      "version": "0.1.12",
+      "hash": "783fe48838794f2e8a4ef60a34dc7c4d"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
-      "version": "0.0.11",
+      "version": "0.0.12",
       "section": "Schematics",
-      "hash": "e5e524d6f6c523d4aed505bd7e6344cf"
+      "hash": "67a71a68bde3c29171f10fdad718ecc9"
     },
     "@schematics/package-update": {
       "name": "Package JSON Update Schematics",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "section": "Schematics",
-      "hash": ""
+      "hash": "6ba69d0f7fe59dd32c57f243dbb4b131"
     }
   }
 }
