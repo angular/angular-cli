@@ -22,8 +22,9 @@ export class WebpackTestConfig extends NgCliWebpackConfig<WebpackTestOptions> {
       getCommonConfig(this.wco),
       getStylesConfig(this.wco),
       this.getTargetConfig(this.wco),
+      this.getTargetConfigCustom(this.wco),
       getNonAotTestConfig(this.wco),
-      getTestConfig(this.wco)
+      getTestConfig(this.wco),
     ];
 
     this.config = webpackMerge(webpackConfigs);
