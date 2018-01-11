@@ -29,6 +29,11 @@ import { FileSystemHost } from './file-system-host';
 import { readJsonFile } from './file-system-utility';
 
 
+declare const Symbol: Symbol & {
+  readonly observable: symbol;
+};
+
+
 export declare type OptionTransform<T extends object, R extends object>
     = (schematic: FileSystemSchematicDescription, options: T) => Observable<R>;
 
@@ -89,7 +94,7 @@ export abstract class FileSystemEngineHostBase implements
       collection: FileSystemCollectionDesc,
       desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc;
 
-  private _transforms: OptionTransform<object, object>[] = [];
+  private _transforms: OptionTransform<{}, {}>[] = [];
 
   /**
    * @deprecated Use `listSchematicNames`.
@@ -244,7 +249,14 @@ export abstract class FileSystemEngineHostBase implements
   ): Observable<ResultT> {
     return (Observable.of(options)
       .pipe(
-        ...this._transforms.map(tFn => mergeMap(opt => tFn(schematic, opt))),
+        ...this._transforms.map(tFn => mergeMap(opt => {
+          const newOptions = tFn(schematic, opt);
+          if (Symbol.observable in newOptions) {
+            return newOptions;
+          } else {
+            return Observable.of(newOptions);
+          }
+        })),
       )) as {} as Observable<ResultT>;
   }
 
