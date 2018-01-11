@@ -222,7 +222,7 @@ export abstract class FileSystemEngineHostBase implements
         return (context: FileSystemSchematicContext) => {
           // Resolve all file:///a/b/c/d from the schematic's own path, and not the current
           // path.
-          const root = resolve(dirname(context.schematic.description.path), url.path);
+          const root = resolve(dirname(context.schematic.description.path), url.path || '');
 
           return new FileSystemCreateTree(new FileSystemHost(root));
         };
@@ -236,8 +236,9 @@ export abstract class FileSystemEngineHostBase implements
     options: OptionT,
   ): Observable<ResultT> {
     return (Observable.of(options)
-      .pipe(...this._transforms.map(tFn => mergeMap(opt => tFn(schematic, opt))))
-    ) as {} as Observable<ResultT>;
+      .pipe(
+        ...this._transforms.map(tFn => mergeMap(opt => tFn(schematic, opt))),
+      )) as {} as Observable<ResultT>;
   }
 
   getSchematicRuleFactory<OptionT extends object>(
