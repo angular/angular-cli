@@ -12,7 +12,10 @@ import { Observable } from 'rxjs/Observable';
 import * as path from 'path';
 import chalk from 'chalk';
 import { CliConfig } from '../models/config';
+import 'rxjs/add/operator/concat';
+import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/concatMap';
+import 'rxjs/add/operator/ignoreElements';
 import 'rxjs/add/operator/map';
 import { getCollection, getSchematic } from '../utilities/schematics';
 
@@ -114,7 +117,8 @@ export default Task.extend({
       schematic.call(opts, host)
         .map((tree: Tree) => Tree.optimize(tree))
         .concatMap((tree: Tree) => {
-          return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));
+          return Observable.from(dryRunSink.commit(tree))
+            .ignoreElements().concat(Observable.of(tree));
         })
         .concatMap((tree: Tree) => {
           if (!error) {
@@ -125,7 +129,7 @@ export default Task.extend({
           if (opts.dryRun || error) {
             return Observable.of(tree);
           }
-          return fsSink.commit(tree).ignoreElements().concat(Observable.of(tree));
+          return Observable.from(fsSink.commit(tree)).ignoreElements().concat(Observable.of(tree));
         })
         .subscribe({
           error(err) {
