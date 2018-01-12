@@ -32,4 +32,34 @@ const MakeThisAwesomeCommand = Command.extend({
   }
 });
 
-export default MakeThisAwesomeCommand;
+export MakeThisAwesomeCommand;
+
+export const HoustonCommand = Command.extend({
+  name: 'make-this-awesome',
+  works: 'insideProject',
+  hidden: true,
+
+  run: function (commandOptions: any, rawArgs: string[]): Promise<void> {
+    console.log(chalk.green('\n'
+      + '      .~~~~\`\\~~\\\n'
+      + '     ;       ~~ \\\n'
+      + '     |           ;\n'
+      + ' ,--------,______|---.\n'
+      + '/          \\-----\`    \\\n'
+      + '\`.__________\`-_______-\'\n'));
+
+    return Promise.resolve();
+  },
+
+  makeThisAwesome: function() {
+    const phrase = pickOne([
+      `You're on it, there's nothing for me to do!`,
+      `Let's take a look... nope, it's all good!`,
+      `You're doing fine.`,
+      `You're already doing great.`,
+      `Nothing to do; already awesome. Exiting.`,
+      `Error 418: As Awesome As Can Get.`
+    ]);
+    console.log(chalk.green(phrase));
+  }
+});

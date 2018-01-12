@@ -22,7 +22,8 @@ function loadCommands() {
     'xi18n': require('../../commands/xi18n').default,
 
     // Easter eggs.
-    'make-this-awesome': require('../../commands/easter-egg').default,
+    'make-this-awesome': require('../../commands/easter-egg').MakeThisAwesomeCommand,
+    'houston': require('../../commands/easter-egg').HoustonCommand,
 
     // Configuration.
     'set': require('../../commands/set').default,
