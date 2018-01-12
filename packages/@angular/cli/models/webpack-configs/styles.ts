@@ -55,6 +55,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       postcssImports({
         resolve: (url: string, context: string) => {
           return new Promise<string>((resolve, reject) => {
+            if (url && url.startsWith('~')) {
+              url = url.substr(1);
+            }
             loader.resolve(context, url, (err: Error, result: string) => {
               if (err) {
                 reject(err);
@@ -110,7 +113,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           filter: (asset: PostcssUrlAsset) => !asset.hash && !asset.absolutePath.endsWith('.cur'),
           url: 'inline',
           // NOTE: maxSize is in KB
-          maxSize: 10
+          maxSize: 10,
+          fallback: 'rebase',
         }
       ]),
       autoprefixer(),
