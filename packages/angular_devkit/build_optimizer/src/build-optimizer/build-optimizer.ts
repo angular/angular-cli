@@ -112,9 +112,10 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   }
 
   // tests are not needed for fast path
+  // usage will be expanded once transformers are verified safe
   const ignoreTest = !options.emitSourceMap && !typeCheck;
 
-  if (ignoreTest || testPrefixClasses(content)) {
+  if (testPrefixClasses(content)) {
     getTransforms.unshift(getPrefixClassesTransformer);
   }
 
@@ -122,7 +123,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.unshift(getImportTslibTransformer);
   }
 
-  if (ignoreTest || testWrapEnums(content)) {
+  if (testWrapEnums(content)) {
     getTransforms.unshift(getWrapEnumsTransformer);
   }
 
