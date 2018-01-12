@@ -12,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
 import * as path from 'path';
 import chalk from 'chalk';
 import { CliConfig } from '../models/config';
+import 'rxjs/add/operator/concat';
 import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/map';
 import { getCollection, getSchematic } from '../utilities/schematics';
