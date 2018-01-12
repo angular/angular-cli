@@ -255,7 +255,7 @@ export abstract class FileSystemEngineHostBase implements
           if (Symbol.observable in newOptions) {
             return newOptions;
           } else {
-            return Observable.of(newOptions);
+            return observableOf(newOptions);
           }
         })),
       )) as {} as Observable<ResultT>;
