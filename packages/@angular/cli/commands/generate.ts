@@ -128,6 +128,13 @@ export default Command.extend({
     }
 
     const entityName = rawArgs[1];
+    if (!entityName) {
+      return Promise.reject(new SilentError(oneLine`
+          The "ng generate ${rawArgs[0]}" command requires a
+          name to be specified.
+          For more details, use "ng generate ${rawArgs[0]} --help".
+      `));
+    }
     commandOptions.name = stringUtils.dasherize(entityName.split(separatorRegEx).pop());
 
     const appConfig = getAppFromConfig(commandOptions.app);
