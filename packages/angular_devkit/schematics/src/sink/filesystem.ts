@@ -8,6 +8,7 @@
 import * as fs from 'fs';
 import { dirname, join } from 'path';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/concat';  // provides support for CLI < 1.6.5/1.7.0-beta.1
 import { VirtualFileSystemSink, VirtualFileSystemSinkHost } from './virtual-filesystem';
 
 
