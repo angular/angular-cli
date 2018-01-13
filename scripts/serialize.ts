@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { classify, logging } from '@angular-devkit/core';
+import { logging, strings } from '@angular-devkit/core';
 import { SchemaClassFactory } from '@ngtools/json-schema';
 import * as fs from 'fs';
 
@@ -17,7 +17,7 @@ export function buildSchema(inFile: string, mimetype: string): string {
 
   let name = inFile.split(/[\/\\]/g).pop();
   if (name) {
-    name = classify(name.replace(/\.[^.]*$/, ''));
+    name = strings.classify(name.replace(/\.[^.]*$/, ''));
   }
 
   const license = `/**

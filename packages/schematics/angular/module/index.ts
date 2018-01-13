@@ -5,7 +5,7 @@
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.io/license
 */
-import { basename, dirname, normalize, relative } from '@angular-devkit/core';
+import { basename, dirname, normalize, relative, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -22,7 +22,6 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
-import * as stringUtils from '../strings';
 import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { findModuleFromOptions } from '../utility/find-module';
@@ -46,15 +45,15 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 
     const importModulePath = normalize(
       `/${options.sourceDir}/${options.path}/`
-      + (options.flat ? '' : stringUtils.dasherize(options.name) + '/')
-      + stringUtils.dasherize(options.name)
+      + (options.flat ? '' : strings.dasherize(options.name) + '/')
+      + strings.dasherize(options.name)
       + '.module',
     );
     const relativeDir = relative(dirname(modulePath), dirname(importModulePath));
     const relativePath = (relativeDir.startsWith('.') ? relativeDir : './' + relativeDir)
       + '/' + basename(importModulePath);
     const changes = addImportToModule(source, modulePath,
-                                      stringUtils.classify(`${options.name}Module`),
+                                      strings.classify(`${options.name}Module`),
                                       relativePath);
 
     const recorder = host.beginUpdate(modulePath);
@@ -85,7 +84,7 @@ export default function (options: ModuleOptions): Rule {
       options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
       options.routing ? noop() : filter(path => !path.endsWith('-routing.module.ts')),
       template({
-        ...stringUtils,
+        ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
       }),

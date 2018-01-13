@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, dasherize } from '@angular-devkit/core';
+import { Path, strings } from '@angular-devkit/core';
 import {
   Rule,
   apply,
@@ -30,7 +30,7 @@ export default function (options: Schema): Rule {
         coreVersion,
         schematicsVersion,
         dot: '.',
-        dasherize,
+        dasherize: strings.dasherize,
       }),
     ),
     move(options.name),

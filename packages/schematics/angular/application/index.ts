@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { strings } from '@angular-devkit/core';
 import {
   MergeStrategy,
   Rule,
@@ -22,7 +23,6 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
-import * as stringUtils from '../strings';
 import { addBootstrapToModule, addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { Schema as ApplicationOptions } from './schema';
@@ -97,7 +97,7 @@ export default function (options: ApplicationOptions): Rule {
           options.skipGit ? filter(path => !path.endsWith('/__dot__gitignore')) : noop(),
           options.serviceWorker ? noop() : filter(path => !path.endsWith('/ngsw-config.json')),
           template({
-            utils: stringUtils,
+            utils: strings,
             ...options,
             'dot': '.',
             sourcedir: sourceDir,
@@ -128,7 +128,7 @@ export default function (options: ApplicationOptions): Rule {
           componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
           !componentOptions.spec ? filter(path => !path.endsWith('.spec.ts')) : noop(),
           template({
-            utils: stringUtils,
+            utils: strings,
             ...options as any,  // tslint:disable-line:no-any
             selector: appRootSelector,
             ...componentOptions,

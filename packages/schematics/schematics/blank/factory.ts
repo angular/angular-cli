@@ -10,10 +10,9 @@ import {
   JsonObject,
   JsonValue,
   Path,
-  camelize,
-  dasherize,
   normalize,
   parseJsonAst,
+  strings,
 } from '@angular-devkit/core';
 import {
   Rule,
@@ -115,8 +114,8 @@ export default function (options: Schema): Rule {
           coreVersion,
           schematicsVersion,
           dot: '.',
-          camelize,
-          dasherize,
+          camelize: strings.camelize,
+          dasherize: strings.dasherize,
         }),
       ]);
 
@@ -129,8 +128,8 @@ export default function (options: Schema): Rule {
           coreVersion,
           schematicsVersion,
           dot: '.',
-          camelize,
-          dasherize,
+          camelize: strings.camelize,
+          dasherize: strings.dasherize,
         }),
         mergeWith(source),
         move(options.name),
@@ -141,9 +140,10 @@ export default function (options: Schema): Rule {
 
     return chain([
       mergeWith(source),
-      addSchematicToCollectionJson(collectionPath, dasherize(options.name), {
+      addSchematicToCollectionJson(collectionPath, strings.dasherize(options.name), {
         description: 'A blank schematic.',
-        factory: './' + dasherize(options.name) + '/index#' + camelize(options.name),
+        factory: './' + strings.dasherize(options.name) + '/index#' +
+          strings.camelize(options.name),
       }),
     ])(tree, context);
   };

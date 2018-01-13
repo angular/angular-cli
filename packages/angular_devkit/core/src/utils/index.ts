@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as tags from './literals';
+import * as strings from './strings';
+
 export * from './object';
-export * from './strings';
 export * from './template';
 export * from './priority-queue';
 
-export { tags };
+export { tags, strings };

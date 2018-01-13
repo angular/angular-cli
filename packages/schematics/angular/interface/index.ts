@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize } from '@angular-devkit/core';
+import { normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -17,7 +17,6 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
-import * as stringUtils from '../strings';
 import { Schema as InterfaceOptions } from './schema';
 
 
@@ -32,7 +31,7 @@ export default function (options: InterfaceOptions): Rule {
 
   const templateSource = apply(url('./files'), [
     template({
-      ...stringUtils,
+      ...strings,
       ...options,
     }),
     move(sourceDir),
