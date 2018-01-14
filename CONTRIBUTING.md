@@ -197,6 +197,7 @@ The following is the list of supported scopes:
 * **@angular-devkit/core**
 * **@angular-devkit/build-optimizer**
 * **@angular-devkit/schematics**
+* **@angular-devkit/schematics-cli**
 * **@schematics/angular**
 * **@schematics/schematics**
 
