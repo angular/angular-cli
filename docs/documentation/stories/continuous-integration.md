@@ -76,7 +76,7 @@ jobs:
   build:
     working_directory: ~/my-project
     docker:
-      - image: circleci/node:6-browsers
+      - image: circleci/node:8-browsers
     steps:
       - checkout
       - restore_cache:
@@ -118,7 +118,7 @@ sudo: false
 
 language: node_js
 node_js:
-  - "6"
+  - "8"
   
 addons:
   apt:
