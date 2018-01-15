@@ -7,13 +7,14 @@ import {
   Schematic,
   Tree
 } from '@angular-devkit/schematics';
+import { BuiltinTaskExecutor } from '@angular-devkit/schematics/tasks/node';
 import { FileSystemHost } from '@angular-devkit/schematics/tools';
 import { of as observableOf } from 'rxjs/observable/of';
 import * as path from 'path';
 import chalk from 'chalk';
 import { CliConfig } from '../models/config';
 import { concat, concatMap, ignoreElements, map } from 'rxjs/operators';
-import { getCollection, getSchematic } from '../utilities/schematics';
+import { getCollection, getSchematic, getEngineHost, getEngine } from '../utilities/schematics';
 
 const { green, red, yellow } = chalk;
 const Task = require('../ember-cli/lib/models/task');
@@ -47,6 +48,20 @@ export default Task.extend({
     const { taskOptions, workingDir, emptyHost, collectionName, schematicName } = options;
 
     const ui = this.ui;
+
+    const packageManager = CliConfig.fromGlobal().get('packageManager');
+    const engineHost = getEngineHost();
+    engineHost.registerTaskExecutor(
+      BuiltinTaskExecutor.NodePackage,
+      {
+        rootDirectory: workingDir,
+        packageManager: packageManager === 'default' ? 'npm' : packageManager,
+      },
+    );
+    engineHost.registerTaskExecutor(
+      BuiltinTaskExecutor.RepositoryInitializer,
+      { rootDirectory: workingDir },
+    );
 
     const collection = getCollection(collectionName);
     const schematic = getSchematic(collection, schematicName);
@@ -129,6 +144,13 @@ export default Task.extend({
           return fsSink.commit(tree).pipe(
             ignoreElements(),
             concat(observableOf(tree)));
+        }),
+        concatMap(() => {
+          if (!opts.dryRun) {
+            return getEngine().executePostTasks();
+          } else {
+            return [];
+          }
         }))
         .subscribe({
           error(err) {

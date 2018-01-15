@@ -37,28 +37,6 @@ const NewCommand = Command.extend({
       description: 'Adds more details to output logging.'
     },
     {
-      name: 'link-cli',
-      type: Boolean,
-      default: false,
-      aliases: ['lc'],
-      description: 'Automatically link the `@angular/cli` package.',
-      hidden: true
-    },
-    {
-      name: 'skip-install',
-      type: Boolean,
-      default: false,
-      aliases: ['si'],
-      description: 'Skip installing packages.'
-    },
-    {
-      name: 'skip-commit',
-      type: Boolean,
-      default: false,
-      aliases: ['sc'],
-      description: 'Skip committing the first commit to git.'
-    },
-    {
       name: 'collection',
       type: String,
       aliases: ['c'],
