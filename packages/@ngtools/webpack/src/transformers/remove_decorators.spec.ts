@@ -76,6 +76,54 @@ describe('@ngtools/webpack transformers', () => {
       expect(oneLine`${result}`).toEqual(oneLine`${output}`);
     });
 
+    it('should keep other decorators on class member', () => {
+      const input = stripIndent`
+        import { Component, HostListener } from '@angular/core';
+        import { AnotherDecorator } from 'another-lib';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.css']
+        })
+        export class AppComponent {
+          title = 'app';
+
+          @HostListener('document:keydown.escape')
+          @AnotherDecorator()
+          onEscape() {
+            console.log('run');
+          }
+        }
+      `;
+      const output = stripIndent`
+        import * as tslib_1 from "tslib";
+        import { AnotherDecorator } from 'another-lib';
+
+        export class AppComponent {
+          constructor() {
+              this.title = 'app';
+          }
+
+          onEscape() {
+            console.log('run');
+          }
+        }
+        tslib_1.__decorate([
+          AnotherDecorator()
+        ], AppComponent.prototype, "onEscape", null);
+      `;
+
+      const { program, compilerHost } = createTypescriptContext(input);
+      const transformer = removeDecorators(
+        () => true,
+        () => program.getTypeChecker(),
+      );
+      const result = transformTypescript(undefined, [transformer], program, compilerHost);
+
+      expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+    });
+
     it('should remove imports for identifiers within the decorator', () => {
       const input = stripIndent`
         import { Component } from '@angular/core';
