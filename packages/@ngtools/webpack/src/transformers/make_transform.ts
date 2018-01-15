@@ -129,11 +129,18 @@ function visitEachChildWorkaround(node: ts.Node, visitor: ts.Visitor,
 }
 
 
-// If TS sees an empty decorator array, it will still emit a `__decorate` call.
-// This seems to be a TS bug.
+// 1) If TS sees an empty decorator array, it will still emit a `__decorate` call.
+//    This seems to be a TS bug.
+// 2) Also ensure nodes with modified decorators have parents
+//    built in TS transformers assume certain nodes have parents (fixed in TS 2.7+)
 function cleanupDecorators(node: ts.Node) {
-  if (node.decorators && node.decorators.length == 0) {
-    node.decorators = undefined;
+  if (node.decorators) {
+    if (node.decorators.length == 0) {
+      node.decorators = undefined;
+    } else if (node.parent == undefined) {
+      const originalNode = ts.getParseTreeNode(node);
+      node.parent = originalNode.parent;
+    }
   }
 
   ts.forEachChild(node, node => cleanupDecorators(node));
