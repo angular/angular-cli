@@ -22,7 +22,8 @@ const hiddenOptions = [
   'name',
   'path',
   'source-dir',
-  'app-root'
+  'app-root',
+  'link-cli',
 ];
 
 export default Task.extend({
