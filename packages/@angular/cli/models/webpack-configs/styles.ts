@@ -47,6 +47,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // https://github.com/webpack-contrib/style-loader#recommended-configuration
   const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemaps;
 
+  // Maximum resource size to inline (KiB)
+  const maximumInlineSize = 10;
   // Minify/optimize css in production.
   const minimizeCss = buildOptions.target === 'production';
   // Convert absolute resource URLs to account for base-href and deploy-url.
@@ -122,12 +124,15 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         },
         {
           // TODO: inline .cur if not supporting IE (use browserslist to check)
-          filter: (asset: PostcssUrlAsset) => !asset.hash && !asset.absolutePath.endsWith('.cur'),
+          filter: (asset: PostcssUrlAsset) => {
+            return maximumInlineSize > 0 && !asset.hash && !asset.absolutePath.endsWith('.cur');
+          },
           url: 'inline',
           // NOTE: maxSize is in KB
-          maxSize: 10,
+          maxSize: maximumInlineSize,
           fallback: 'rebase',
-        }
+        },
+        { url: 'rebase' },
       ]),
       autoprefixer(),
     ].concat(
@@ -141,7 +146,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       'cssnano': 'cssnano',
       'postcss-import': 'postcssImports',
     },
-    variables: { minimizeCss, baseHref, deployUrl, projectRoot }
+    variables: { minimizeCss, baseHref, deployUrl, projectRoot, maximumInlineSize }
   };
 
   // determine hashing format
