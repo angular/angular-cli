@@ -7,10 +7,19 @@
  */
 import { TaskExecutorFactory } from '@angular-devkit/schematics';
 import { NodePackageName, NodePackageTaskFactoryOptions } from '../node-package/options';
+import {
+  RepositoryInitializerName,
+  RepositoryInitializerTaskFactoryOptions,
+ } from '../repo-init/options';
 
 export class BuiltinTaskExecutor {
   static readonly NodePackage: TaskExecutorFactory<NodePackageTaskFactoryOptions> = {
     name: NodePackageName,
     create: (options) => import('../node-package/executor').then(mod => mod.default(options)),
+  };
+  static readonly RepositoryInitializer:
+    TaskExecutorFactory<RepositoryInitializerTaskFactoryOptions> = {
+    name: RepositoryInitializerName,
+    create: (options) => import('../repo-init/executor').then(mod => mod.default(options)),
   };
 }
