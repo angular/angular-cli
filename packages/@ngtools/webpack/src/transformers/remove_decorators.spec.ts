@@ -111,7 +111,7 @@ describe('@ngtools/webpack transformers', () => {
 
     it('should not remove imports from types that are still used', () => {
       const input = stripIndent`
-        import { Component, EventEmitter } from '@angular/core';
+        import { Component, ChangeDetectionStrategy, EventEmitter } from '@angular/core';
 
         @Component({
           selector: 'app-root',
@@ -123,9 +123,11 @@ describe('@ngtools/webpack transformers', () => {
           notify: EventEmitter<string> = new EventEmitter<string>();
           title = 'app';
         }
+
+        export { ChangeDetectionStrategy };
       `;
       const output = stripIndent`
-        import { EventEmitter } from '@angular/core';
+        import { ChangeDetectionStrategy, EventEmitter } from '@angular/core';
 
         export class AppComponent {
           constructor() {
@@ -133,6 +135,8 @@ describe('@ngtools/webpack transformers', () => {
             this.title = 'app';
           }
         }
+
+        export { ChangeDetectionStrategy };
       `;
 
       const { program, compilerHost } = createTypescriptContext(input);
