@@ -135,9 +135,9 @@ export class AngularCompilerPlugin implements Tapable {
     if (!this._entryModule) {
       return undefined;
     }
-    const splitted = this._entryModule.split('#');
+    const splitted = this._entryModule.split(/(#[a-zA-Z_]([\w]+))$/);
     const path = splitted[0];
-    const className = splitted[1] || 'default';
+    const className = !!splitted[1] ? splitted[1].substring(1) : 'default';
     return { path, className };
   }
 
