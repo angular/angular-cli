@@ -56,9 +56,21 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
+     * Skip installing dependency packages.
+     */
+    skipInstall?: boolean;
+    /**
+     * Link CLI to global version (internal development only).
+     */
+    linkCli?: boolean;
+    /**
      * Skip initializing a git repository.
      */
     skipGit?: boolean;
+    /**
+     * Initial repository commit information.
+     */
+    commit?: { name: string, email: string, message?: string };
     /**
      * Create a minimal app (no test structure, inline styles/templates).
      */

@@ -21,6 +21,11 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import {
+  NodePackageInstallTask,
+  NodePackageLinkTask,
+  RepositoryInitializerTask,
+} from '@angular-devkit/schematics/tasks';
 import { Schema as ApplicationOptions } from './schema';
 
 
@@ -48,6 +53,26 @@ export default function (options: ApplicationOptions): Rule {
         styleext: options.style,
       };
     const sourceDir = options.sourceDir || 'src';
+
+    let packageTask;
+    if (!options.skipInstall) {
+      packageTask = context.addTask(new NodePackageInstallTask(options.directory));
+      if (options.linkCli) {
+        packageTask = context.addTask(
+          new NodePackageLinkTask('@angular/cli', options.directory),
+          [packageTask],
+        );
+      }
+    }
+    if (!options.skipGit) {
+      context.addTask(
+        new RepositoryInitializerTask(
+          options.directory,
+          options.commit,
+        ),
+        packageTask ? [packageTask] : [],
+      );
+    }
 
     return chain([
       mergeWith(

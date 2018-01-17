@@ -21,6 +21,7 @@ import {
   formats,
 } from '../src';
 import { callRule } from '../src/rules/call';
+import { BuiltinTaskExecutor } from '../tasks/node';
 import {
   NodeModulesTestEngineHost,
   validateOptionsWithSchema,
@@ -58,6 +59,9 @@ export class SchematicTestRunner {
     const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
 
     this._engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
+    this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage);
+    this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.RepositoryInitializer);
+
     this._collection = this._engine.createCollection(this._collectionName);
   }
 
