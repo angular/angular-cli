@@ -83,16 +83,21 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       asset = typeof asset === 'string' ? { glob: asset } : asset;
       // Add defaults.
       // Input is always resolved relative to the appRoot.
-      asset.input = path.resolve(appRoot, asset.input || '');
+      asset.input = path.resolve(appRoot, asset.input || '').replace(/\\/g, '/');
       asset.output = asset.output || '';
       asset.glob = asset.glob || '';
 
       // Prevent asset configurations from writing outside of the output path, except if the user
       // specify a configuration flag.
       // Also prevent writing outside the project path. That is not overridable.
-      const fullOutputPath = path.resolve(buildOptions.outputPath, asset.output);
-      if (!fullOutputPath.startsWith(path.resolve(buildOptions.outputPath))) {
-        if (!fullOutputPath.startsWith(projectRoot)) {
+      const absoluteOutputPath = path.resolve(buildOptions.outputPath);
+      const absoluteAssetOutput = path.resolve(absoluteOutputPath, asset.output);
+      const outputRelativeOutput = path.relative(absoluteOutputPath, absoluteAssetOutput);
+
+      if (outputRelativeOutput.startsWith('..') || path.isAbsolute(outputRelativeOutput)) {
+
+        const projectRelativeOutput = path.relative(projectRoot, absoluteAssetOutput);
+        if (projectRelativeOutput.startsWith('..') || path.isAbsolute(projectRelativeOutput)) {
           const message = 'An asset cannot be written to a location outside the project.';
           throw new SilentError(message);
         }
@@ -106,7 +111,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       }
 
       // Prevent asset configurations from reading files outside of the project.
-      if (!asset.input.startsWith(projectRoot)) {
+      const projectRelativeInput = path.relative(projectRoot, asset.input);
+      if (projectRelativeInput.startsWith('..') || path.isAbsolute(projectRelativeInput)) {
         const message = 'An asset cannot be read from a location outside the project.';
         throw new SilentError(message);
       }
