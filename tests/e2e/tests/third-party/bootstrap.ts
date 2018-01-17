@@ -23,5 +23,19 @@ export default function() {
       <script type="text/javascript" src="scripts.bundle.js"></script>
       <script type="text/javascript" src="vendor.bundle.js"></script>
       <script type="text/javascript" src="main.bundle.js"></script>
+    `))
+    .then(() => ng(
+      'build',
+      '--prod',
+      '--extract-css',
+      '--output-hashing=none'
+    ))
+    .then(() => expectFileToMatch('dist/scripts.bundle.js', 'jQuery'))
+    .then(() => expectFileToMatch('dist/styles.bundle.css', '* Bootstrap'))
+    .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
+      <script type="text/javascript" src="inline.bundle.js"></script>
+      <script type="text/javascript" src="polyfills.bundle.js"></script>
+      <script type="text/javascript" src="scripts.bundle.js"></script>
+      <script type="text/javascript" src="main.bundle.js"></script>
     `));
 }
