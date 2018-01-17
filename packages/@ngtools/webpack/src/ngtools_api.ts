@@ -144,8 +144,9 @@ export function CompilerCliIsSupported() {
       + 'Please clean your node_modules and reinstall.');
   }
 
-  // Throw if we're neither 2.3.1 or more, nor 4.x.y, nor 5.x.y.
-  if (!(version.major == '5'
+  // Throw if we're neither 2.3.1 or more, nor 4.x.y, nor 5.x.y, nor 6.x.y.
+  if (!(version.major == '6'
+    || version.major == '5'
     || version.major == '4'
     || (version.major == '2'
       && (version.minor == '4'
