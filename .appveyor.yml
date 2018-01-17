@@ -16,7 +16,7 @@ test_script:
   - npm --version
   - npm run test:packages
   - npm run test:cli
-  - node tests\run_e2e.js --appveyor "--glob=tests/{basic,commands,generate}/**"
+  - node tests\run_e2e.js --appveyor "--glob=tests/{basic,commands,generate,build/styles}/**"
 
 build: off
 
