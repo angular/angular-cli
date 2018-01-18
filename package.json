@@ -100,8 +100,7 @@
     "webpack-dev-server": "~2.11.0",
     "webpack-merge": "^4.1.0",
     "webpack-sources": "^1.0.0",
-    "webpack-subresource-integrity": "^1.0.1",
-    "zone.js": "^0.8.14"
+    "webpack-subresource-integrity": "^1.0.1"
   },
   "devDependencies": {
     "@angular/compiler": "^5.0.0",
@@ -143,7 +142,8 @@
     "temp": "0.8.3",
     "through": "^2.3.6",
     "ts-node": "^3.2.0",
-    "tslint": "^5.1.0"
+    "tslint": "^5.1.0",
+    "zone.js": "^0.8.20"
   },
   "optionalDependencies": {
     "node-sass": "^4.7.2"
