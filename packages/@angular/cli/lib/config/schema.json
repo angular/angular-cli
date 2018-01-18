@@ -216,6 +216,20 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "extraWebpack": {
+            "description": "Experimental support for custom webpack configuration per build target in commonjs format. Paths will be resolved to project root.",
+            "type": "object",
+            "properties": {
+              "development": {
+                "description": "Path to development webpack configuration file.",
+                "type": "string"
+              },
+              "production": {
+                "description": "Path to production webpack configuration file.",
+                "type": "string"
+              }
+            }
           }
         },
         "additionalProperties": false

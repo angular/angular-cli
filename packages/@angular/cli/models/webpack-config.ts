@@ -1,9 +1,11 @@
 // @ignoreDep typescript - used only for type information
 import * as ts from 'typescript';
+import * as fs from 'fs';
 import { AngularCompilerPlugin } from '@ngtools/webpack';
 import { readTsconfig } from '../utilities/read-tsconfig';
 import { requireProjectModule } from '../utilities/require-project-module';
 const webpackMerge = require('webpack-merge');
+const SilentError = require('silent-error');
 import { CliConfig } from './config';
 import { BuildOptions } from './build-options';
 import {
@@ -17,6 +19,7 @@ import {
   getAotConfig
 } from './webpack-configs';
 import * as path from 'path';
+import { oneLine } from 'common-tags';
 
 export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
   projectRoot: string;
@@ -59,7 +62,8 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
       getCommonConfig(this.wco),
       platformConfig,
       getStylesConfig(this.wco),
-      this.getTargetConfig(this.wco)
+      this.getTargetConfig(this.wco),
+      this.getTargetConfigCustom(this.wco)
     ];
 
     if (this.wco.appConfig.main || this.wco.appConfig.polyfills) {
@@ -80,6 +84,34 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
       case 'production':
         return getProdConfig(webpackConfigOptions);
     }
+  }
+
+  public getTargetConfigCustom(webpackConfigOptions: WebpackConfigOptions<T>): any {
+    const { appConfig, buildOptions: { target }, projectRoot } = webpackConfigOptions;
+
+    const appRoot = path.resolve(projectRoot, appConfig.root);
+    let customConfig = {};
+
+    if (appConfig.extraWebpack) {
+      const extraWebpackConfig = appConfig.extraWebpack;
+      if (extraWebpackConfig[target]) {
+        const extraWebpackConfigFilePath = path.resolve(appRoot, extraWebpackConfig[target]);
+
+        if (fs.existsSync(extraWebpackConfigFilePath)) {
+          try {
+            customConfig = require(extraWebpackConfigFilePath);
+          } catch (e) {
+            const message = oneLine`
+              The custom webpack configuration file at ${extraWebpackConfigFilePath}
+              is not valid.`;
+            throw new SilentError(message);
+          }
+        }
+
+      }
+    }
+
+    return customConfig;
   }
 
   // Validate build options
