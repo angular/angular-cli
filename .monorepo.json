@@ -53,8 +53,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md"
         }
       ],
-      "version": "0.0.40",
-      "hash": "a2183a9dfc0de865c5a1007c784b7dfb"
+      "version": "0.0.41",
+      "hash": "d33ea15e49b95f0d2b38bba7991e94d0"
     },
     "@angular-devkit/core": {
       "name": "Core",
@@ -64,8 +64,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/core/README.md"
         }
       ],
-      "version": "0.0.27",
-      "hash": "6a320fc28a581075d57120a83f4e3d78"
+      "version": "0.0.28",
+      "hash": "42ee618f548ef57ed2a606db12dcf719"
     },
     "@angular-devkit/schematics": {
       "name": "Schematics",
@@ -75,31 +75,31 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
         }
       ],
-      "version": "0.0.50",
-      "hash": "dc7d8a328d5cb0fc09951359b54f09ed"
+      "version": "0.0.51",
+      "hash": "03d9a2f80bc8d590b6e1113b84f183e9"
     },
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",
-      "version": "0.0.7",
-      "hash": "7a904658491c5e11ddb18a6c68766004"
+      "version": "0.0.8",
+      "hash": "51b96b1f651fddcc1b44a95005dceb29"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
-      "version": "0.1.15",
-      "hash": "371d7c4336abb5c548f38f21df397fe0"
+      "version": "0.1.16",
+      "hash": "c7f5c3e3724df9cf9f51947fdd9f8a77"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
-      "version": "0.0.15",
+      "version": "0.0.16",
       "section": "Schematics",
-      "hash": "d53bdc7553eaecf7fb271d5b6d439248"
+      "hash": "0737267c88f3ed4ff28843f85d113144"
     },
     "@schematics/package-update": {
       "name": "Package JSON Update Schematics",
-      "version": "0.0.5",
+      "version": "0.0.6",
       "section": "Schematics",
-      "hash": "68d109e710cdb5620e097287055c2b2b"
+      "hash": "142ca446a6c3c9b321ef2ba78538dc37"
     }
   }
 }
