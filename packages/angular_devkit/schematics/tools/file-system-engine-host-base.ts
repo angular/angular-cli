@@ -20,7 +20,6 @@ import {
   Source,
   TaskExecutor,
   TaskExecutorFactory,
-  UnknownSchematicException,
   UnregisteredTaskException,
 } from '../src';
 import {
@@ -142,6 +141,11 @@ export abstract class FileSystemEngineHostBase implements
       throw new InvalidCollectionJsonException(name, path);
     }
 
+    // normalize extends property to an array
+    if (typeof jsonValue['extends'] === 'string') {
+      jsonValue['extends'] = [jsonValue['extends']];
+    }
+
     const description = this._transformCollectionDescription(name, {
       ...jsonValue,
       path,
@@ -169,7 +173,7 @@ export abstract class FileSystemEngineHostBase implements
   createSchematicDescription(
     name: string,
     collection: FileSystemCollectionDesc,
-  ): FileSystemSchematicDesc {
+  ): FileSystemSchematicDesc | null {
     // Resolve aliases first.
     for (const schematicName of Object.keys(collection.schematics)) {
       const schematicDescription = collection.schematics[schematicName];
@@ -180,13 +184,13 @@ export abstract class FileSystemEngineHostBase implements
     }
 
     if (!(name in collection.schematics)) {
-      throw new UnknownSchematicException(name, collection);
+      return null;
     }
 
     const collectionPath = dirname(collection.path);
     const partialDesc: Partial<FileSystemSchematicDesc> | null = collection.schematics[name];
     if (!partialDesc) {
-      throw new UnknownSchematicException(name, collection);
+      return null;
     }
 
     if (partialDesc.extends) {

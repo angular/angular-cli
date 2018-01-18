@@ -40,6 +40,13 @@ export class UnknownUrlSourceProtocol extends BaseException {
 export class UnknownCollectionException extends BaseException {
   constructor(name: string) { super(`Unknown collection "${name}".`); }
 }
+
+export class CircularCollectionException extends BaseException {
+  constructor(name: string) {
+    super(`Circular collection reference "${name}".`);
+  }
+}
+
 export class UnknownSchematicException extends BaseException {
   constructor(name: string, collection: CollectionDescription<{}>) {
     super(`Schematic "${name}" not found in collection "${collection.name}".`);
@@ -76,16 +83,38 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
       return collection;
     }
 
-    const description = this._host.createCollectionDescription(name);
-    if (!description) {
-      throw new UnknownCollectionException(name);
-    }
+    const [description, bases] = this._createCollectionDescription(name);
 
-    collection = new CollectionImpl<CollectionT, SchematicT>(description, this);
+    collection = new CollectionImpl<CollectionT, SchematicT>(description, this, bases);
     this._collectionCache.set(name, collection);
     this._schematicCache.set(name, new Map());
 
     return collection;
+  }
+
+  private _createCollectionDescription(
+    name: string,
+    parentNames?: Set<string>,
+  ): [CollectionDescription<CollectionT>, Array<CollectionDescription<CollectionT>>] {
+    const description = this._host.createCollectionDescription(name);
+    if (!description) {
+      throw new UnknownCollectionException(name);
+    }
+    if (parentNames && parentNames.has(description.name)) {
+      throw new CircularCollectionException(name);
+    }
+
+    const bases = new Array<CollectionDescription<CollectionT>>();
+    if (description.extends) {
+      parentNames = (parentNames || new Set<string>()).add(description.name);
+      for (const baseName of description.extends) {
+        const [base, baseBases] = this._createCollectionDescription(baseName, new Set(parentNames));
+
+        bases.unshift(base, ...baseBases);
+      }
+    }
+
+    return [description, bases];
   }
 
   createContext(
@@ -148,12 +177,25 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
       return schematic;
     }
 
-    const description = this._host.createSchematicDescription(name, collection.description);
+    let collectionDescription = collection.description;
+    let description = this._host.createSchematicDescription(name, collection.description);
     if (!description) {
-      throw new UnknownSchematicException(name, collection.description);
+      if (collection.baseDescriptions) {
+        for (const base of collection.baseDescriptions) {
+          description = this._host.createSchematicDescription(name, base);
+          if (description) {
+            collectionDescription = base;
+            break;
+          }
+        }
+      }
+      if (!description) {
+        // Report the error for the top level schematic collection
+        throw new UnknownSchematicException(name, collection.description);
+      }
     }
 
-    const factory = this._host.getSchematicRuleFactory(description, collection.description);
+    const factory = this._host.getSchematicRuleFactory(description, collectionDescription);
     schematic = new SchematicImpl<CollectionT, SchematicT>(description, factory, collection, this);
 
     schematicMap.set(name, schematic);
@@ -161,8 +203,17 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     return schematic;
   }
 
-  listSchematicNames(collection: Collection<CollectionT, SchematicT>) {
-    return this._host.listSchematicNames(collection.description);
+  listSchematicNames(collection: Collection<CollectionT, SchematicT>): string[] {
+    const names = this._host.listSchematicNames(collection.description);
+
+    if (collection.baseDescriptions) {
+      for (const base of collection.baseDescriptions) {
+        names.push(...this._host.listSchematicNames(base));
+      }
+    }
+
+    // remove duplicates
+    return [...new Set(names)];
   }
 
   transformOptions<OptionT extends object, ResultT extends object>(

@@ -19,6 +19,7 @@ import { TaskConfigurationGenerator, TaskExecutor, TaskId } from './task';
  */
 export type CollectionDescription<CollectionMetadataT extends object> = CollectionMetadataT & {
   readonly name: string;
+  readonly extends?: string[];
 };
 
 /**
@@ -49,7 +50,7 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
   createSchematicDescription(
       name: string,
       collection: CollectionDescription<CollectionMetadataT>):
-        SchematicDescription<CollectionMetadataT, SchematicMetadataT>;
+        SchematicDescription<CollectionMetadataT, SchematicMetadataT> | null;
   getSchematicRuleFactory<OptionT extends object>(
       schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
       collection: CollectionDescription<CollectionMetadataT>): RuleFactory<OptionT>;
@@ -108,6 +109,7 @@ export interface Engine<CollectionMetadataT extends object, SchematicMetadataT e
  */
 export interface Collection<CollectionMetadataT extends object, SchematicMetadataT extends object> {
   readonly description: CollectionDescription<CollectionMetadataT>;
+  readonly baseDescriptions?: Array<CollectionDescription<CollectionMetadataT>>;
 
   createSchematic(name: string): Schematic<CollectionMetadataT, SchematicMetadataT>;
   listSchematicNames(): string[];

@@ -4,6 +4,22 @@
   "title": "Collection Schema for validating a 'collection.json'.",
   "type": "object",
   "properties": {
+    "extends": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      ]
+    },
     "schematics": {
       "type": "object",
       "description": "A map of schematic names to schematic details",

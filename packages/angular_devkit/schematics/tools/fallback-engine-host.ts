@@ -68,8 +68,11 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
   createSchematicDescription(
     name: string,
     collection: CollectionDescription<FallbackCollectionDescription>,
-  ): SchematicDescription<FallbackCollectionDescription, FallbackSchematicDescription> {
+  ): SchematicDescription<FallbackCollectionDescription, FallbackSchematicDescription> | null {
     const description = collection.host.createSchematicDescription(name, collection.description);
+    if (!description) {
+      return null;
+    }
 
     return { name, collection, description };
   }
