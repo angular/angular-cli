@@ -42,8 +42,8 @@
   },
   "packages": {
     "@_/benchmark": {
-      "version": "0.0.19",
-      "hash": "9ccd85dc54ab247d40693a944048dd11"
+      "version": "0.0.20",
+      "hash": "b1f9f2d8e1eca2a865d39263f0ca5a38"
     },
     "@angular-devkit/build-optimizer": {
       "name": "Build Optimizer",
@@ -53,8 +53,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md"
         }
       ],
-      "version": "0.0.38",
-      "hash": "c761ff4c56bb246d2de7e3d0e61b129f"
+      "version": "0.0.39",
+      "hash": "d33ea15e49b95f0d2b38bba7991e94d0"
     },
     "@angular-devkit/core": {
       "name": "Core",
@@ -64,8 +64,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/core/README.md"
         }
       ],
-      "version": "0.0.25",
-      "hash": "6ee145e7539d671c8f80244d5f6f5834"
+      "version": "0.0.26",
+      "hash": "42ee618f548ef57ed2a606db12dcf719"
     },
     "@angular-devkit/schematics": {
       "name": "Schematics",
@@ -75,31 +75,31 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
         }
       ],
-      "version": "0.0.48",
-      "hash": "6eb5fd28153bf934ae2ff56117ef1cd2"
+      "version": "0.0.49",
+      "hash": "03d9a2f80bc8d590b6e1113b84f183e9"
     },
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",
-      "version": "0.0.5",
-      "hash": "f2f4f4539198a7731efd37c13e5581b7"
+      "version": "0.0.6",
+      "hash": "51b96b1f651fddcc1b44a95005dceb29"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
-      "version": "0.1.13",
-      "hash": "b76cc4a5d165349e0b10b6ed49d64603"
+      "version": "0.1.14",
+      "hash": "c7f5c3e3724df9cf9f51947fdd9f8a77"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
-      "version": "0.0.13",
+      "version": "0.0.14",
       "section": "Schematics",
-      "hash": "9f113ad0f15ab50c25fc96c3c0f36fb1"
+      "hash": "0737267c88f3ed4ff28843f85d113144"
     },
     "@schematics/package-update": {
       "name": "Package JSON Update Schematics",
-      "version": "0.0.3",
+      "version": "0.0.4",
       "section": "Schematics",
-      "hash": "49aa6e68b802f7e5f1b6da3ef5e34337"
+      "hash": "142ca446a6c3c9b321ef2ba78538dc37"
     }
   }
 }
