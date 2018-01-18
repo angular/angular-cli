@@ -83,8 +83,7 @@
     "webpack-dev-server": "~2.11.0",
     "webpack-merge": "^4.1.0",
     "webpack-sources": "^1.0.0",
-    "webpack-subresource-integrity": "^1.0.1",
-    "zone.js": "^0.8.14"
+    "webpack-subresource-integrity": "^1.0.1"
   },
   "optionalDependencies": {
     "node-sass": "^4.7.2"

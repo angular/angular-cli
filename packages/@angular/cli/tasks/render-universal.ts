@@ -13,7 +13,7 @@ export interface RenderUniversalTaskOptions {
 
 export default Task.extend({
   run: function(options: RenderUniversalTaskOptions): Promise<any> {
-    require('zone.js/dist/zone-node');
+    requireProjectModule(this.project.root, 'zone.js/dist/zone-node');
 
     const renderModuleFactory =
       requireProjectModule(this.project.root, '@angular/platform-server').renderModuleFactory;
