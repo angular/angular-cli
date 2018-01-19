@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { BaseException } from '@angular-devkit/core';
 import { TaskExecutor } from '@angular-devkit/schematics';
 import { SpawnOptions, spawn } from 'child_process';
 import * as path from 'path';
@@ -25,13 +26,19 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
   },
 };
 
+export class UnknownPackageManagerException extends BaseException {
+  constructor(name: string) {
+    super(`Unknown package manager "${name}".`);
+  }
+}
+
 export default function(
   factoryOptions: NodePackageTaskFactoryOptions = {},
 ): TaskExecutor<NodePackageTaskOptions> {
   const packageManagerName = factoryOptions.packageManager || 'npm';
   const packageManagerProfile = packageManagers[packageManagerName];
   if (!packageManagerProfile) {
-    throw new Error(`Invalid package manager '${packageManagerName}' requested.`);
+    throw new UnknownPackageManagerException(packageManagerName);
   }
 
   const rootDirectory = factoryOptions.rootDirectory || process.cwd();

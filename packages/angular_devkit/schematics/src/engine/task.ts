@@ -5,10 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { PriorityQueue } from '@angular-devkit/core';
+import { BaseException, PriorityQueue } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { SchematicContext } from './interface';
 
+export class UnknownTaskDependencyException extends BaseException {
+  constructor(id: TaskId) {
+    super(`Unknown task dependency [ID: ${id.id}].`);
+  }
+}
 
 export interface TaskConfiguration<T = {}> {
   name: string;
@@ -64,7 +69,7 @@ export class TaskScheduler {
     const tasks = dependencies.map(dep => {
       const task = this._taskIds.get(dep);
       if (!task) {
-        throw new Error('Unknown task dependency');
+        throw new UnknownTaskDependencyException(dep);
       }
 
       return task;
