@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
 
+import { resolveProjectModule } from '../require-project-module';
+
 export const NEW_SW_VERSION = '5.0.0-rc.0';
 
 class CliFilesystem implements Filesystem {
@@ -49,13 +51,16 @@ class CliFilesystem implements Filesystem {
 }
 
 export function usesServiceWorker(projectRoot: string): boolean {
-  const nodeModules = path.resolve(projectRoot, 'node_modules');
-  const swModule = path.resolve(nodeModules, '@angular/service-worker');
-  if (!fs.existsSync(swModule)) {
+  let swPackageJsonPath;
+
+  try {
+    swPackageJsonPath = resolveProjectModule(projectRoot, '@angular/service-worker/package.json');
+  } catch (_) {
+    // @angular/service-worker is not installed
     return false;
   }
 
-  const swPackageJson = fs.readFileSync(`${swModule}/package.json`).toString();
+  const swPackageJson = fs.readFileSync(swPackageJsonPath).toString();
   const swVersion = JSON.parse(swPackageJson)['version'];
 
   return semver.gte(swVersion, NEW_SW_VERSION);
@@ -63,11 +68,8 @@ export function usesServiceWorker(projectRoot: string): boolean {
 
 export function augmentAppWithServiceWorker(projectRoot: string, appRoot: string,
     outputPath: string, baseHref: string): Promise<void> {
-  const nodeModules = path.resolve(projectRoot, 'node_modules');
-  const swModule = path.resolve(nodeModules, '@angular/service-worker');
-
   // Path to the worker script itself.
-  const workerPath = path.resolve(swModule, 'ngsw-worker.js');
+  const workerPath = resolveProjectModule(projectRoot, '@angular/service-worker/ngsw-worker.js');
   const configPath = path.resolve(appRoot, 'ngsw-config.json');
 
   if (!fs.existsSync(configPath)) {
