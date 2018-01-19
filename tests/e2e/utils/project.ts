@@ -140,7 +140,7 @@ export function useCIDefaults() {
       sourcemaps: false,
       progress: false
     };
-  })
+  });
 }
 
 export function useCIChrome() {
@@ -276,14 +276,22 @@ export function useNg2() {
       Object.keys(ng2Deps['devDependencies']).forEach(pkgName => {
         json['devDependencies'][pkgName] = ng2Deps['devDependencies'][pkgName];
       });
-      console.log(JSON.stringify(json))
+      console.log(JSON.stringify(json));
     }))
     .then(() => updateJsonFile('src/tsconfig.app.json', json =>
       Object.assign(json, tsconfigAppJson)))
     .then(() => updateJsonFile('src/tsconfig.spec.json', json =>
       Object.assign(json, tsconfigSpecJson)))
     .then(() => updateJsonFile('e2e/tsconfig.e2e.json', json =>
-      Object.assign(json, tsconfigE2eJson)));
+      Object.assign(json, tsconfigE2eJson)))
+    .then(() => replaceInFile('src/test.ts', 'import \'zone.js/dist/zone-testing\';', `
+      import 'zone.js/dist/long-stack-trace-zone';
+      import 'zone.js/dist/proxy.js';
+      import 'zone.js/dist/sync-test';
+      import 'zone.js/dist/jasmine-patch';
+      import 'zone.js/dist/async-test';
+      import 'zone.js/dist/fake-async-test';
+    `));
 }
 
 // Convert a Angular 5 project to Angular 4.
@@ -315,6 +323,6 @@ export function useNg4() {
       Object.keys(ng4Deps['devDependencies']).forEach(pkgName => {
         json['devDependencies'][pkgName] = ng4Deps['devDependencies'][pkgName];
       });
-      console.log(JSON.stringify(json))
+      console.log(JSON.stringify(json));
     }));
 }
