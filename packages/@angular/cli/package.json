@@ -34,6 +34,7 @@
     "@ngtools/webpack": "1.10.0-beta.1",
     "@schematics/angular": "~0.1.16",
     "autoprefixer": "^7.2.3",
+    "cache-loader": "^1.2.0",
     "chalk": "~2.2.0",
     "circular-dependency-plugin": "^4.2.1",
     "clean-css": "^4.1.9",
