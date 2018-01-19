@@ -9,6 +9,7 @@ import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
+import { resolveProjectModule } from '../../utilities/require-project-module';
 import { NEW_SW_VERSION } from '../../utilities/service-worker';
 
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
@@ -30,11 +31,12 @@ export function getProdConfig(wco: WebpackConfigOptions) {
   let entryPoints: { [key: string]: string[] } = {};
 
   if (appConfig.serviceWorker) {
-    const nodeModules = path.resolve(projectRoot, 'node_modules');
-    const swModule = path.resolve(nodeModules, '@angular/service-worker');
+    let swPackageJsonPath;
 
-    // @angular/service-worker is required to be installed when serviceWorker is true.
-    if (!fs.existsSync(swModule)) {
+    try {
+      swPackageJsonPath = resolveProjectModule(projectRoot, '@angular/service-worker/package.json');
+    } catch (_) {
+      // @angular/service-worker is required to be installed when serviceWorker is true.
       throw new Error(stripIndent`
         Your project is configured with serviceWorker = true, but @angular/service-worker
         is not installed. Run \`npm install --save-dev @angular/service-worker\`
@@ -44,7 +46,7 @@ export function getProdConfig(wco: WebpackConfigOptions) {
 
     // Read the version of @angular/service-worker and throw if it doesn't match the
     // expected version.
-    const swPackageJson = fs.readFileSync(`${swModule}/package.json`).toString();
+    const swPackageJson = fs.readFileSync(swPackageJsonPath).toString();
     const swVersion = JSON.parse(swPackageJson)['version'];
 
     const isLegacySw = semver.satisfies(swVersion, OLD_SW_VERSION);
@@ -59,6 +61,9 @@ export function getProdConfig(wco: WebpackConfigOptions) {
     }
 
     if (isLegacySw) {
+      // Path to the @angular/service-worker package
+      const swModule = path.dirname(swPackageJsonPath);
+
       // Path to the worker script itself.
       const workerPath = path.resolve(swModule, 'bundles/worker-basic.min.js');
 
