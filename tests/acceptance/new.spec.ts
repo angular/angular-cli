@@ -12,12 +12,13 @@ describe('Acceptance: ng new', function () {
   beforeEach((done) => {
     // Increase timeout for these tests only.
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
 
     spyOn(console, 'error');
     // symlink custom collections to node_modules, so we can use with ng new
     // it is a bit dirty, but bootstrap-local tricks won't work here
     fs.symlinkSync(`${process.cwd()}/tests/collections/@custom`, `./node_modules/@custom`, 'dir');
+    fs.symlinkSync(`${process.cwd()}/tests/collections/@custom-other`, `./node_modules/@custom-other`, 'dir');
 
     tmp.setup('./tmp')
       .then(() => process.chdir('./tmp'))
@@ -25,7 +26,9 @@ describe('Acceptance: ng new', function () {
   }, 10000);
 
   afterEach((done) => {
+    ng(['set', 'defaults.schematics.collections=null', '--global']);
     fs.unlinkSync(path.join(__dirname, '/../../node_modules/@custom'));
+    fs.unlinkSync(path.join(__dirname, '/../../node_modules/@custom-other'));
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     tmp.teardown('./tmp').then(() => done());
   });
@@ -184,4 +187,19 @@ describe('Acceptance: ng new', function () {
     })
     .then(done, done.fail);
   });
+
+  it('should use schematic from default collections', (done) => {
+    return ng(['set', 'defaults.schematics.collections=["@custom/application"]', '--global'])
+      .then(() => ng(['new', 'foo', '--skip-install', '--skip-git']))
+      .then(() => expect(() => fs.readFileSync('emptyapp', 'utf8')).not.toThrow())
+      .then(done, done.fail);
+  });
+
+  it('should use schematic from first matching collection from default collections', (done) => {
+    return ng(['set', 'defaults.schematics.collections=["@custom-other/application","@custom/application"]', '--global'])
+      .then(() => ng(['new', 'foo', '--skip-install', '--skip-git']))
+      .then(() => expect(() => fs.readFileSync('veryemptyapp', 'utf8')).not.toThrow())
+      .then(done, done.fail);
+  });
+
 });

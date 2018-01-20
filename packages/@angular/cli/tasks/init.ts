@@ -72,7 +72,6 @@ export default Task.extend({
     });
 
     const cwd = this.project.root;
-    const schematicName = CliConfig.fromGlobal().get('defaults.schematics.newApp');
     commandOptions.version = packageJson.version;
 
     const runOptions = {
@@ -80,7 +79,7 @@ export default Task.extend({
       workingDir: cwd,
       emptyHost: true,
       collectionName: commandOptions.collectionName,
-      schematicName
+      schematicName: commandOptions.schematicName
     };
 
     return schematicRunTask.run(runOptions)
