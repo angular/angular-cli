@@ -18,13 +18,17 @@ export interface SchematicAvailableOptions {
 }
 
 export default Task.extend({
-  run: function (options: SchematicGetOptions): Promise<SchematicAvailableOptions[]> {
+  run: function (options: SchematicGetOptions): Promise<SchematicAvailableOptions[] | null> {
     const collectionName = options.collectionName ||
       CliConfig.getValue('defaults.schematics.collection');
 
     const collection = getCollection(collectionName);
 
     const schematic = getSchematic(collection, options.schematicName);
+
+    if (!schematic.description.schemaJson) {
+      return Promise.resolve(null);
+    }
 
     const properties = schematic.description.schemaJson.properties;
     const keys = Object.keys(properties);
