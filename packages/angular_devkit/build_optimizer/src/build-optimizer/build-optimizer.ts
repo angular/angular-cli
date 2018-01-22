@@ -87,6 +87,16 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     content = readFileSync(inputFilePath as string, 'UTF-8');
   }
 
+  if (!content) {
+    return {
+      content: null,
+      sourceMap: null,
+      emitSkipped: true,
+    };
+  }
+
+  const isWebpackBundle = content.indexOf('__webpack_require__') !== -1;
+
   // Determine which transforms to apply.
   const getTransforms = [];
 
@@ -119,7 +129,11 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.unshift(getPrefixClassesTransformer);
   }
 
-  if (ignoreTest || testImportTslib(content)) {
+  // This transform introduces import/require() calls, but this won't work properly on libraries
+  // built with Webpack. These libraries use __webpack_require__() calls instead, which will break
+  // with a new import that wasn't part of it's original module list.
+  // We ignore this transform for such libraries.
+  if (!isWebpackBundle && (ignoreTest || testImportTslib(content))) {
     getTransforms.unshift(getImportTslibTransformer);
   }
 
