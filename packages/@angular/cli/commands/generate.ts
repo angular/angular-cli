@@ -65,15 +65,24 @@ export default Command.extend({
     '<schematic>'
   ],
 
-  getCollectionName(rawArgs: string[]) {
+  getCollectionName(rawArgs: string[], parsedOptions?: { collection?: string }): [string, string] {
+    let schematicName = rawArgs[0];
     let collectionName = CliConfig.getValue('defaults.schematics.collection');
-    if (rawArgs) {
+
+    if (schematicName.match(/:/)) {
+      [collectionName, schematicName] = schematicName.split(':', 2);
+    } else if (parsedOptions) {
+      if (parsedOptions.collection) {
+        collectionName = parsedOptions.collection;
+      }
+    } else {
       const parsedArgs = this.parseArgs(rawArgs, false);
       if (parsedArgs.options.collection) {
         collectionName = parsedArgs.options.collection;
       }
     }
-    return collectionName;
+
+    return [collectionName, schematicName];
   },
 
   beforeRun: function(rawArgs: string[]) {
@@ -83,7 +92,7 @@ export default Command.extend({
       return;
     }
 
-    const schematicName = rawArgs[0];
+    const [collectionName, schematicName] = this.getCollectionName(rawArgs);
     if (!schematicName) {
       return Promise.reject(new SilentError(oneLine`
           The "ng generate" command requires a
@@ -103,7 +112,6 @@ export default Command.extend({
       ui: this.ui,
       project: this.project
     });
-    const collectionName = this.getCollectionName(rawArgs);
 
     return getOptionsTask.run({
         schematicName,
@@ -166,7 +174,7 @@ export default Command.extend({
         : commandOptions.path;
 
     const cwd = this.project.root;
-    const schematicName = rawArgs[0];
+    const [collectionName, schematicName] = this.getCollectionName(rawArgs, commandOptions);
 
     if (['component', 'c', 'directive', 'd'].indexOf(schematicName) !== -1) {
       if (commandOptions.prefix === undefined) {
@@ -185,8 +193,6 @@ export default Command.extend({
       ui: this.ui,
       project: this.project
     });
-    const collectionName = commandOptions.collection ||
-      CliConfig.getValue('defaults.schematics.collection');
 
     if (collectionName === '@schematics/angular' && schematicName === 'interface' && rawArgs[2]) {
       commandOptions.type = rawArgs[2];
