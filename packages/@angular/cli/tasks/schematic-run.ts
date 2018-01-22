@@ -168,8 +168,10 @@ export default Task.extend({
 });
 
 function prepOptions(schematic: Schematic<{}, {}>, options: SchematicOptions): SchematicOptions {
+  const properties = (<any>schematic.description).schemaJson
+    ? (<any>schematic.description).schemaJson.properties
+    : options;
 
-  const properties = (<any>schematic.description).schemaJson.properties;
   const keys = Object.keys(properties);
   if (['component', 'c', 'directive', 'd'].indexOf(schematic.description.name) !== -1) {
     options.prefix = (options.prefix === 'false' || options.prefix === '')

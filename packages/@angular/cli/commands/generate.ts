@@ -112,8 +112,12 @@ export default Command.extend({
       .then((availableOptions: SchematicAvailableOptions[]) => {
         let anonymousOptions: string[] = [];
 
-        const nameOption = availableOptions.filter(opt => opt.name === 'name')[0];
-        if (nameOption) {
+        if (availableOptions) {
+          const nameOption = availableOptions.filter(opt => opt.name === 'name')[0];
+          if (nameOption) {
+            anonymousOptions = [...anonymousOptions, '<name>'];
+          }
+        } else {
           anonymousOptions = [...anonymousOptions, '<name>'];
         }
 
@@ -123,7 +127,7 @@ export default Command.extend({
 
         this.registerOptions({
           anonymousOptions: anonymousOptions,
-          availableOptions: availableOptions
+          availableOptions: availableOptions || []
         });
       });
   },

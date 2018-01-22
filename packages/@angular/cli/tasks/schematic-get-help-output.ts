@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 const Task = require('../ember-cli/lib/models/task');
 
-const { cyan, grey } = chalk;
+const { cyan, green, grey } = chalk;
 
 export interface SchematicGetHelpOptions {
   collectionName: string;
@@ -40,7 +40,7 @@ export default Task.extend({
     }), nonSchematicOptions])
     .then(([availableOptions, nonSchematicOptions]: [SchematicAvailableOptions[], any[]]) => {
       const output: string[] = [];
-      [...(nonSchematicOptions || []), ...availableOptions]
+      [...(nonSchematicOptions || []), ...availableOptions || []]
         .filter(opt => hiddenOptions.indexOf(opt.name) === -1)
         .forEach(opt => {
           let text = cyan(`    --${opt.name}`);
@@ -63,6 +63,11 @@ export default Task.extend({
             output.push(grey(`      aliases: ${aliasText}`));
           }
         });
+      if (availableOptions === null) {
+        output.push(green('This schematic accept additional options, but did not provide '
+                        + 'documentation.'));
+      }
+
       return output;
     });
   }
