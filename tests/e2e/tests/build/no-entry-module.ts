@@ -1,9 +1,11 @@
-import { AppModule } from '../../assets/1.0.0-proj/src/app/app.module';
 import { readFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 
 export default async function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   const mainTs = await readFile('src/main.ts');
 
   const newMainTs = mainTs

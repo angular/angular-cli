@@ -4,6 +4,9 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   const fileName = 'src/app/foo/foo.ts';
   const nestedConfigContent = `
   {

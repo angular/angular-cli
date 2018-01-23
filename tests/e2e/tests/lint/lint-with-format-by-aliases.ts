@@ -3,6 +3,9 @@ import { writeFile } from '../../utils/fs';
 import { oneLine } from 'common-tags';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   const fileName = 'src/app/foo.ts';
 
   return Promise.resolve()

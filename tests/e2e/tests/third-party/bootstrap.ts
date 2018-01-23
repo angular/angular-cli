@@ -5,6 +5,9 @@ import {oneLineTrim} from 'common-tags';
 
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => silentNpm('install', 'bootstrap@4.0.0-beta.3'))
     .then(() => updateJsonFile('.angular-cli.json', configJson => {

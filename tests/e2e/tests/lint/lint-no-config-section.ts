@@ -2,6 +2,9 @@ import { ng } from '../../utils/process';
 import { oneLine } from 'common-tags';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => ng('set', 'lint', '[]'))
     .then(() => ng('lint'))

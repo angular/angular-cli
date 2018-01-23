@@ -1,98 +1,45 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as webpack from 'webpack';
+import { normalize } from '@angular-devkit/core';
+import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
+import { Architect } from '@angular-devkit/architect';
+import { concatMap } from 'rxjs/operators';
 
 import { getAppFromConfig } from '../utilities/app-utils';
 import { BuildTaskOptions } from '../commands/build';
-import { NgCliWebpackConfig } from '../models/webpack-config';
-import { getWebpackStatsConfig } from '../models/webpack-configs/utils';
 import { CliConfig } from '../models/config';
-import { statsToString, statsWarningsToString, statsErrorsToString } from '../utilities/stats';
-import { augmentAppWithServiceWorker, usesServiceWorker } from '../utilities/service-worker';
+import {
+  createArchitectWorkspace,
+  getProjectName,
+  convertOptions,
+} from '../utilities/build-webpack-compat';
 
 const Task = require('../ember-cli/lib/models/task');
-const SilentError = require('silent-error');
 
 
 export default Task.extend({
-  run: function (runTaskOptions: BuildTaskOptions) {
+  run: function (options: BuildTaskOptions) {
     const config = CliConfig.fromProject().config;
+    const app = getAppFromConfig(options.app);
 
-    const app = getAppFromConfig(runTaskOptions.app);
+    const host = new NodeJsSyncHost();
+    const logger = createConsoleLogger();
+    const architect = new Architect(normalize(this.project.root), host);
 
-    const outputPath = runTaskOptions.outputPath || app.outDir;
-    if (this.project.root === path.resolve(outputPath)) {
-      throw new SilentError('Output path MUST not be project root directory!');
-    }
-    if (config.project && config.project.ejected) {
-      throw new SilentError('An ejected project cannot use the build command anymore.');
-    }
-    if (! app.main) {
-      throw new SilentError(`An app without 'main' cannot use the build command.`);
-    }
-    if (runTaskOptions.deleteOutputPath) {
-      fs.removeSync(path.resolve(this.project.root, outputPath));
-    }
+    const workspaceConfig = createArchitectWorkspace(config);
+    const project = getProjectName(app, options.app);
+    const overrides: any = convertOptions({ ...options });
+    const targetOptions = {
+      project,
+      target: 'browser',
+      overrides
+    };
+    const context = { logger };
 
-    const webpackConfig = new NgCliWebpackConfig(runTaskOptions, app).buildConfig();
-    const webpackCompiler = webpack(webpackConfig);
-    const statsConfig = getWebpackStatsConfig(runTaskOptions.verbose);
-
-    return new Promise((resolve, reject) => {
-      const callback: webpack.compiler.CompilerCallback = (err, stats) => {
-        if (err) {
-          return reject(err);
-        }
-
-        const json = stats.toJson(statsConfig);
-        if (runTaskOptions.verbose) {
-          this.ui.writeLine(stats.toString(statsConfig));
-        } else {
-          this.ui.writeLine(statsToString(json, statsConfig));
-        }
-
-        if (stats.hasWarnings()) {
-          this.ui.writeLine(statsWarningsToString(json, statsConfig));
-        }
-        if (stats.hasErrors()) {
-          this.ui.writeError(statsErrorsToString(json, statsConfig));
-        }
-
-        if (runTaskOptions.watch) {
-          return;
-        } else if (runTaskOptions.statsJson) {
-          fs.writeFileSync(
-            path.resolve(this.project.root, outputPath, 'stats.json'),
-            JSON.stringify(stats.toJson(), null, 2)
-          );
-        }
-
-        if (stats.hasErrors()) {
-          reject();
-        } else {
-          if (!!app.serviceWorker && runTaskOptions.target === 'production' &&
-              usesServiceWorker(this.project.root) && runTaskOptions.serviceWorker !== false) {
-            const appRoot = path.resolve(this.project.root, app.root);
-            augmentAppWithServiceWorker(this.project.root, appRoot, path.resolve(outputPath),
-                runTaskOptions.baseHref || '/')
-              .then(() => resolve(), (err: any) => reject(err));
-          } else {
-            resolve();
-          }
-        }
-      };
-
-      if (runTaskOptions.watch) {
-        webpackCompiler.watch({ poll: runTaskOptions.poll }, callback);
-      } else {
-        webpackCompiler.run(callback);
+    return architect.loadWorkspaceFromJson(workspaceConfig).pipe(
+      concatMap(() => architect.run(architect.getTarget(targetOptions), context)),
+    ).toPromise().then(buildEvent => {
+      if (buildEvent.success === false) {
+        return Promise.reject('Build failed');
       }
-    })
-    .catch((err: Error) => {
-      if (err) {
-        this.ui.writeError('\nAn error occured during the build:\n' + ((err && err.stack) || err));
-      }
-      throw err;
     });
   }
 });

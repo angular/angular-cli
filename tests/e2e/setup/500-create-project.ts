@@ -48,6 +48,10 @@ export default function() {
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
+    // TODO(architect): remove the force build-webpack dep when schematics are in.
+    .then(() => updateJsonFile('package.json', (json) => {
+      json['devDependencies']['@angular-devkit/build-webpack'] = '0.0.4';
+    })
     // npm link on Circle CI is very noisy.
     .then(() => silentNpm('install'))
     // Force sourcemaps to be from the root of the filesystem.
@@ -57,5 +61,9 @@ export default function() {
     .then(() => git('config', 'user.email', 'angular-core+e2e@google.com'))
     .then(() => git('config', 'user.name', 'Angular CLI E2e'))
     .then(() => git('config', 'commit.gpgSign', 'false'))
+    // TODO(architect): remove the changes to karma config when schematics are in
+    .then(() => replaceInFile('karma.conf.js', /@angular\/cli/g, '@angular-devkit/build-webpack'))
+    .then(() => replaceInFile('karma.conf.js', 'reports',
+      `dir: require('path').join(__dirname, 'coverage'), reports`))
     .then(() => gitCommit('tsconfig-e2e-update'));
 }

@@ -4,6 +4,9 @@ import { updateJsonFile } from '../../utils/project';
 
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return ng('build', '--base-href', '/myUrl')
     .then(() => expectFileToMatch('dist/index.html', /<base href="\/myUrl">/))
     .then(() => updateJsonFile('.angular-cli.json', configJson => {

@@ -4,6 +4,9 @@ import {expectToFail} from '../../utils/utils';
 import {ng} from '../../utils/process';
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return ng('build', '--prod', '--extract-licenses=false')
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     .then(() => expectToFail(() => expectFileToExist('dist/3rdpartylicenses.txt')));

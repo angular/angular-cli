@@ -10,6 +10,9 @@ import { stripIndents } from 'common-tags';
 import { updateJsonFile } from '../../../utils/project';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return writeMultipleFiles({
     'src/styles.scss': stripIndents`
       @import './imported-styles.scss';

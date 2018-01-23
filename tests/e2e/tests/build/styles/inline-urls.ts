@@ -16,6 +16,9 @@ const imgSvg = `
 `;
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => silentNpm('install', 'font-awesome@4.7.0'))
     .then(() => writeMultipleFiles({

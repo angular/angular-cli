@@ -4,6 +4,9 @@ import { ngServe, updateJsonFile } from '../../utils/project';
 import { writeMultipleFiles } from '../../utils/fs';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/string-script.js': 'console.log(\'string-script\'); var number = 1+1;',

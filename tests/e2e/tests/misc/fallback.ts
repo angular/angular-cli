@@ -6,6 +6,9 @@ import { moveFile } from '../../utils/fs';
 
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   // should fallback to config.app[0].index (index.html by default)
   return Promise.resolve()
     .then(() => ngServe())

@@ -7,6 +7,9 @@ import {expectToFail} from '../../utils/utils';
 
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve();
 
   let oldNumberOfFiles = 0;
