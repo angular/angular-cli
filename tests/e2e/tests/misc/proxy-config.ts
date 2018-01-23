@@ -9,6 +9,9 @@ import {updateJsonFile} from '../../utils/project';
 import {expectToFail} from "../../utils/utils";
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   // Create an express app that serves as a proxy.
   const app = express();
   const server = http.createServer(app);

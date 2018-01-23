@@ -2,6 +2,9 @@ import { ng } from '../../utils/process';
 import { writeFile } from '../../utils/fs';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   // Tests run in 'dev' environment by default.
   return writeFile('src/app/environment.spec.ts', `
       import { environment } from '../environments/environment';
@@ -12,7 +15,7 @@ export default function () {
         });
       });
     `)
-    .then(() => ng('test', '--single-run'))
+    .then(() => ng('test', '--watch=false'))
 
     // Tests can run in different environment.
     .then(() => writeFile('src/app/environment.spec.ts', `
@@ -24,5 +27,5 @@ export default function () {
         });
       });
     `))
-    .then(() => ng('test', '-e', 'prod', '--single-run'));
+    .then(() => ng('test', '-e', 'prod', '--watch=false'));
 }

@@ -5,6 +5,9 @@ import {appendToFile, writeFile, prependToFile, replaceInFile} from '../../utils
 
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   let oldNumberOfFiles = 0;
   return Promise.resolve()
     .then(() => ng('build'))

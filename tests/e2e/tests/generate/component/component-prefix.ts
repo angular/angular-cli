@@ -20,5 +20,5 @@ export default function() {
       /selector: 'pre-/))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

@@ -10,5 +10,5 @@ export default function() {
     .then(() => expectToFail(() => expectGitToBeClean()))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

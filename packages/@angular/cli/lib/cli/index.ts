@@ -16,7 +16,6 @@ function loadCommands() {
     'add': require('../../commands/add').default,
     'build': require('../../commands/build').default,
     'serve': require('../../commands/serve').default,
-    'eject': require('../../commands/eject').default,
     'new': require('../../commands/new').default,
     'generate': require('../../commands/generate').default,
     'test': require('../../commands/test').default,

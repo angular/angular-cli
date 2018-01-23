@@ -1,4 +1,4 @@
-import * as path from 'path';
+// import * as path from 'path';
 import {
   writeMultipleFiles,
   createDir,
@@ -11,8 +11,8 @@ import { expectToFail } from '../../utils/utils';
 import {getGlobalVariable} from '../../utils/env';
 
 
-const temp = require('temp');
-const tempDir = path.join(temp.mkdirSync('angular-cli-e2e-assets-'), 'out');
+// const temp = require('temp');
+// const tempDir = path.join(temp.mkdirSync('angular-cli-e2e-assets-'), 'out');
 
 
 export default function () {
@@ -26,70 +26,69 @@ export default function () {
     .then(_ => writeMultipleFiles({
       './src/folder/.gitkeep': '',
       './src/folder/folder-asset.txt': 'folder-asset.txt',
-      './src/string-asset.txt': 'string-asset.txt',
       './src/glob-asset.txt': 'glob-asset.txt',
       './src/output-asset.txt': 'output-asset.txt',
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
     }))
-    // Add invalid asset config in .angular-cli.json.
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['assets'] = [
-        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../temp' }
-      ];
-    }))
-    .then(() => expectToFail(() => ng('build')))
+    // TODO(architect): Review allowOutsideOutDir logic inside build-webpack.
+    // // Add invalid asset config in .angular-cli.json.
+    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    //   const app = configJson['apps'][0];
+    //   app['assets'] = [
+    //     { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../temp' }
+    //   ];
+    // }))
+    // .then(() => expectToFail(() => ng('build')))
 
-    // Set an exception for the invalid asset config in .angular-cli.json.
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['assets'] = [
-        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../temp',
-          'allowOutsideOutDir': true }
-      ];
-    }))
-    .then(() => ng('build'))
+    // // Set an exception for the invalid asset config in .angular-cli.json.
+    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    //   const app = configJson['apps'][0];
+    //   app['assets'] = [
+    //     { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../temp',
+    //       'allowOutsideOutDir': true }
+    //   ];
+    // }))
+    // .then(() => ng('build'))
 
-    // This asset should fail even with the exception above.
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['assets'] = [
-        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../../temp',
-          'allowOutsideOutDir': true }
-      ];
-    }))
-    .then(() => expectToFail(() => ng('build')))
+    // // This asset should fail even with the exception above.
+    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    //   const app = configJson['apps'][0];
+    //   app['assets'] = [
+    //     { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../../temp',
+    //       'allowOutsideOutDir': true }
+    //   ];
+    // }))
+    // .then(() => expectToFail(() => ng('build')))
 
-    // This asset will not fail with the exception above.
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['outDir'] = tempDir;
-      app['assets'] = [
-        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': tempDir,
-          'allowOutsideOutDir': true }
-      ];
-    }))
-    .then(() => ng('build'))
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['outDir'] = 'dist';
-    })
+    // // This asset will not fail with the exception above.
+    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    //   const app = configJson['apps'][0];
+    //   app['outDir'] = tempDir;
+    //   app['assets'] = [
+    //     { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': tempDir,
+    //       'allowOutsideOutDir': true }
+    //   ];
+    // }))
+    // .then(() => ng('build'))
+    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    //   const app = configJson['apps'][0];
+    //   app['outDir'] = 'dist';
+    // })
 
-    // This asset should also fail from reading from outside the project.
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['assets'] = [
-        { 'glob': '**/*', 'input': '/temp-folder/outside/of/project', 'output': 'temp' }
-      ];
-    }))
-    .then(() => expectToFail(() => ng('build')))
+    // // This asset should also fail from reading from outside the project.
+    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    //   const app = configJson['apps'][0];
+    //   app['assets'] = [
+    //     { 'glob': '**/*', 'input': '/temp-folder/outside/of/project', 'output': 'temp' }
+    //   ];
+    // }))
+    // .then(() => expectToFail(() => ng('build')))
 
     // Add asset config in .angular-cli.json.
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['assets'] = [
-        'folder',
-        'string-asset.txt',
+        { 'glob': '**/*', 'input': 'folder', 'output': 'folder' },
         { 'glob': 'glob-asset.txt' },
         { 'glob': 'output-asset.txt', 'output': 'output-folder' },
         { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': 'package-folder' }
@@ -98,7 +97,6 @@ export default function () {
     // Test files are present on build output.
     .then(() => ng('build'))
     .then(() => expectFileToMatch('./dist/folder/folder-asset.txt', 'folder-asset.txt'))
-    .then(() => expectFileToMatch('./dist/string-asset.txt', 'string-asset.txt'))
     .then(() => expectFileToMatch('./dist/glob-asset.txt', 'glob-asset.txt'))
     .then(() => expectFileToMatch('./dist/output-folder/output-asset.txt', 'output-asset.txt'))
     .then(() => expectFileToMatch('./dist/package-folder/node_modules-asset.txt',
@@ -139,7 +137,6 @@ export default function () {
         export class AppComponent {
           public assets = [
             { path: './folder/folder-asset.txt', content: '' },
-            { path: './string-asset.txt', content: '' },
             { path: './glob-asset.txt', content: '' },
             { path: './output-folder/output-asset.txt', content: '' },
             { path: './package-folder/node_modules-asset.txt', content: '' },
@@ -179,16 +176,15 @@ export default function () {
           it('should display asset contents', () => {
             browser.get('/');
             element.all(by.css('app-root p')).then(function (assets) {
-              expect(assets.length).toBe(5);
+              expect(assets.length).toBe(4);
               expect(assets[0].getText()).toBe('folder-asset.txt');
-              expect(assets[1].getText()).toBe('string-asset.txt');
-              expect(assets[2].getText()).toBe('glob-asset.txt');
-              expect(assets[3].getText()).toBe('output-asset.txt');
-              expect(assets[4].getText()).toBe('node_modules-asset.txt');
+              expect(assets[1].getText()).toBe('glob-asset.txt');
+              expect(assets[2].getText()).toBe('output-asset.txt');
+              expect(assets[3].getText()).toBe('node_modules-asset.txt');
             });
           });
         });`,
     }))
-    .then(() => !ejected && ng('test', '--single-run'))
+    .then(() => !ejected && ng('test', '--watch=false'))
     .then(() => !ejected && ng('e2e'));
 }

@@ -89,8 +89,8 @@ class CLI {
     };
 
     try {
-      await runCommand(environment.commands, environment.cliArgs, logger, context);
-      return 0;
+      const maybeExitCode = await runCommand(environment.commands, environment.cliArgs, logger, context);
+      return Number.isInteger(maybeExitCode) ? maybeExitCode : 0;
     } catch (err) {
       if (err) {
         const msg = typeof err === 'string' ? err : err.message;

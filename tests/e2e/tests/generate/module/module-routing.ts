@@ -13,5 +13,5 @@ export default function() {
     .then(() => expectFileToExist(join(moduleDir, 'test-routing.module.ts')))
     .then(() => expectToFail(() => expectFileToExist(join(moduleDir, 'test.spec.ts'))))
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

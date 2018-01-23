@@ -22,6 +22,6 @@ export default function () {
           expectFileToExist(join(testPath, 'sub-dir/child', 'child.spec.ts'))
         ))
         // Try to run the unit tests.
-        .then(() => ng('test', '--single-run'))
+        .then(() => ng('test', '--watch=false'))
     );
 }

@@ -10,6 +10,9 @@ import {getGlobalVariable} from '../../utils/env';
 const successRe = /: Compiled successfully/;
 
 export default async function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   if (process.platform.startsWith('win')) {
     return;
   }

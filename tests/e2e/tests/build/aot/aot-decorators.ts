@@ -4,6 +4,9 @@ import {expectToFail} from '../../../utils/utils';
 import {ngVersionMatches} from '../../../utils/version';
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   if (!ngVersionMatches('^4.0.0')) {
     return Promise.resolve();
   }

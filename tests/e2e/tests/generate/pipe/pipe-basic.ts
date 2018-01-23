@@ -13,5 +13,5 @@ export default function() {
     .then(() => expectFileToExist(join(pipeDir, 'test-pipe.pipe.spec.ts')))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

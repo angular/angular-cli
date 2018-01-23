@@ -5,6 +5,9 @@ import { ngServe } from '../../utils/project';
 
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => ngServe(
       '--ssl', 'true',

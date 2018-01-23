@@ -11,5 +11,5 @@ export default function() {
     .then(() => expectFileToExist(join(interfaceDir, 'test-interface.model.ts')))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

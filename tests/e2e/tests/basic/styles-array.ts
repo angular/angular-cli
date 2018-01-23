@@ -1,3 +1,5 @@
+// TODO(architect): edit the architect config instead of the cli config.
+
 import {
   writeMultipleFiles,
   expectFileToMatch

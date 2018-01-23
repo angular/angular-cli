@@ -1,3 +1,5 @@
+// TODO(architect): edit the architect config instead of the cli config.
+
 import {
   writeMultipleFiles,
   expectFileToMatch,
@@ -58,33 +60,34 @@ export default function () {
       <script type="text/javascript" src="main.js"></script>
     `))
     // Ensure scripts can be separately imported from the app.
-    .then(() => expectFileToMatch('dist/main.js', 'console.log(\'string-script\');'))
+    .then(() => expectFileToMatch('dist/main.js', 'console.log(\'string-script\');'));
+    // TODO(architect): disabled until --prod is added.
     // Verify uglify, sourcemaps and hashes. Lazy scripts should not get hashes.
-    .then(() => ng('build', '--target', 'production', '--sourcemaps'))
-    .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.js/))
-    .then(fileName => expectFileToMatch(`dist/${fileName}`, 'var number=2;'))
-    .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.js\.map/))
-    .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.js/))
-    .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.js.map/))
-    .then(() => expectFileToMatch('dist/lazy-script.js', 'lazy-script'))
-    .then(() => expectFileToMatch('dist/renamed-lazy-script.js', 'pre-rename-lazy-script'))
+    // .then(() => ng('build', '--prod', '--source-map'))
+    // .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.js/))
+    // .then(fileName => expectFileToMatch(`dist/${fileName}`, 'var number=2;'))
+    // .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.js\.map/))
+    // .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.js/))
+    // .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.js.map/))
+    // .then(() => expectFileToMatch('dist/lazy-script.js', 'lazy-script'))
+    // .then(() => expectFileToMatch('dist/renamed-lazy-script.js', 'pre-rename-lazy-script'))
 
-    // Expect order to be preserved.
-    .then(() => {
-      const [fileName] = fs.readdirSync('dist')
-        .filter(name => name.match(/^scripts\..*\.js$/));
+    // // Expect order to be preserved.
+    // .then(() => {
+    //   const [fileName] = fs.readdirSync('dist')
+    //     .filter(name => name.match(/^scripts\..*\.js$/));
 
-      const content = fs.readFileSync(path.join('dist', fileName), 'utf-8');
-      const re = new RegExp(/['"]string-script['"].*/.source
-                          + /['"]zstring-script['"].*/.source
-                          + /['"]fstring-script['"].*/.source
-                          + /['"]ustring-script['"].*/.source
-                          + /['"]bstring-script['"].*/.source
-                          + /['"]astring-script['"].*/.source
-                          + /['"]cstring-script['"].*/.source
-                          + /['"]input-script['"]/.source);
-      if (!content.match(re)) {
-        throw new Error('Scripts are not included in order.');
-      }
-    });
+    //   const content = fs.readFileSync(path.join('dist', fileName), 'utf-8');
+    //   const re = new RegExp(/['"]string-script['"].*/.source
+    //                       + /['"]zstring-script['"].*/.source
+    //                       + /['"]fstring-script['"].*/.source
+    //                       + /['"]ustring-script['"].*/.source
+    //                       + /['"]bstring-script['"].*/.source
+    //                       + /['"]astring-script['"].*/.source
+    //                       + /['"]cstring-script['"].*/.source
+    //                       + /['"]input-script['"]/.source);
+    //   if (!content.match(re)) {
+    //     throw new Error('Scripts are not included in order.');
+    //   }
+    // });
 }
