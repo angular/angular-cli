@@ -4,6 +4,9 @@ import { expectToFail } from '../../utils/utils';
 import { oneLine } from 'common-tags';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => ng('set', 'lint.0.project', ''))
     .then(() => ng('lint', '--type-check'))

@@ -2,6 +2,9 @@ import { ng } from '../../utils/process';
 import { readFile, writeFile } from '../../utils/fs';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   const fileName = 'src/app/foo.ts';
 
   return Promise.resolve()

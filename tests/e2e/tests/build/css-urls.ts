@@ -15,6 +15,9 @@ const imgSvg = `
 `;
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     // Verify absolute/relative paths in global/component css.
     .then(() => writeMultipleFiles({

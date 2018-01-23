@@ -9,6 +9,9 @@ function verifyMedia(css: RegExp, content: RegExp) {
 }
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/styles.css': 'body { background-image: url("./assets/image.png"); }'

@@ -9,6 +9,9 @@ import { expectToFail } from '../../../utils/utils';
 import { oneLineTrim } from 'common-tags';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/string-style.css': '.string-style { color: red }',

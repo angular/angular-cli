@@ -8,6 +8,9 @@ import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => createDir('src/style-paths'))
     .then(() => writeMultipleFiles({

@@ -5,6 +5,9 @@ import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   // Skip this test in Angular 2, it had different bundles.
   if (getGlobalVariable('argv').ng2) {
     return Promise.resolve();

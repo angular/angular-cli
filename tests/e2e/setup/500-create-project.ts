@@ -57,5 +57,9 @@ export default function() {
     .then(() => git('config', 'user.email', 'angular-core+e2e@google.com'))
     .then(() => git('config', 'user.name', 'Angular CLI E2e'))
     .then(() => git('config', 'commit.gpgSign', 'false'))
+    // TODO(architect): remove the changes to karma config when schematics are in
+    .then(() => replaceInFile('karma.conf.js', /@angular\/cli/g, '@angular-devkit/build-webpack'))
+    .then(() => replaceInFile('karma.conf.js', 'reports',
+      `dir: require('path').join(__dirname, 'coverage'), reports`))
     .then(() => gitCommit('tsconfig-e2e-update'));
 }

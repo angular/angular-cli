@@ -5,6 +5,9 @@ import {Version} from '../../../../../packages/@angular/cli/upgrade/version';
 import {SemVer} from 'semver';
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => createDir('src/locale'))
     .then(() => writeFile('src/locale/messages.fr.xlf', `

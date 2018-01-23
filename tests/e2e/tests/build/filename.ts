@@ -5,6 +5,9 @@ import {copyFile} from '../../utils/fs';
 
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => copyFile('src/index.html', 'src/config-index.html'))
     .then(() => updateJsonFile('.angular-cli.json', configJson => {

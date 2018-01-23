@@ -3,6 +3,9 @@ import { killAllProcesses } from '../../../utils/process';
 import { ngServe } from '../../../utils/project';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => ngServe('--serve-path', 'test/'))
     .then(() => request('http://localhost:4200/test'))
