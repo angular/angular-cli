@@ -581,6 +581,8 @@ export default Task.extend({
 
         // Update all loaders from webpack, plus postcss plugins.
         [
+          '@angular-devkit/core',
+          '@ngtools/webpack',
           'webpack',
           'autoprefixer',
           'css-loader',
