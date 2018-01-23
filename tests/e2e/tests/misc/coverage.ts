@@ -5,7 +5,10 @@ import {ng} from '../../utils/process';
 
 
 export default function () {
-  return ng('test', '--single-run', '--code-coverage')
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
+  return ng('test', '--watch=false', '--code-coverage')
     .then(() => expectFileToExist('coverage/src/app'))
     .then(() => expectFileToExist('coverage/lcov.info'))
     // Verify code coverage exclude work
@@ -20,7 +23,7 @@ export default function () {
         ]
       };
     }))
-    .then(() => ng('test', '--single-run', '--code-coverage'))
+    .then(() => ng('test', '--watch=false', '--code-coverage'))
     .then(() => expectToFail(() => expectFileToMatch('coverage/lcov.info', 'polyfills.ts')))
     .then(() => expectToFail(() => expectFileToMatch('coverage/lcov.info', 'test.ts')));
 }

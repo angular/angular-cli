@@ -15,5 +15,5 @@ export default function() {
     .then(() => expectFileToMatch(join(moduleDir, 'test.module.ts'), 'TestModule'))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

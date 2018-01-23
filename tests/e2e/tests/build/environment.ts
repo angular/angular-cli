@@ -6,6 +6,9 @@ import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
+  // TODO(architect): re-enable after build-webpack supports this functionality.
+  return;
+
   // Disable parts of it in webpack tests.
   const ejected = getGlobalVariable('argv').eject;
 

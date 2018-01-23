@@ -20,5 +20,5 @@ export default function() {
     .then(() => expectFileToExist(join(compDir, 'test-component.component.css')))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

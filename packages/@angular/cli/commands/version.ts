@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as child_process from 'child_process';
 import chalk from 'chalk';
-import { CliConfig } from '../models/config';
 
 
 export default class VersionCommand extends Command {
@@ -39,12 +38,6 @@ export default class VersionCommand extends Command {
       }
 
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
-    }
-    const config = CliConfig.fromProject();
-    if (config && config.config && config.config.project) {
-      if (config.config.project.ejected) {
-        ngCliVersion += ' (e)';
-      }
     }
 
     if (projPkg) {

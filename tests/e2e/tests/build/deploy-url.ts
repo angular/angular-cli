@@ -6,6 +6,9 @@ import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/styles.css': 'div { background: url("./assets/more.png"); }',

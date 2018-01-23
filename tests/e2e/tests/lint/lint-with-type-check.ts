@@ -3,6 +3,9 @@ import { writeFile } from '../../utils/fs';
 
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   const fileName = 'src/app/foo.ts';
   const fileContents = `
 const ANIMATION_CSS_VALUE_REGEX = 'asda';

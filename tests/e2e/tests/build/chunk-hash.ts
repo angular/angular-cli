@@ -42,6 +42,9 @@ function validateHashes(
 }
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   let oldHashes: Map<string, string>;
   let newHashes: Map<string, string>;
   // First, collect the hashes.

@@ -10,5 +10,5 @@ export default function() {
     .then(() => expectFileToMatch(modulePath, 'exports: [TestDirectiveDirective]'))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

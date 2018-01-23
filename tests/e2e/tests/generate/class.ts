@@ -12,5 +12,5 @@ export default function() {
     .then(() => expectFileToExist(join(classDir, 'test-class.spec.ts')))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }

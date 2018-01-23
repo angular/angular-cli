@@ -13,5 +13,5 @@ export default function() {
     .then(() => expectFileToExist(join(serviceDir, 'test-service.service.spec.ts')))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--single-run'));
+    .then(() => ng('test', '--watch=false'));
 }
