@@ -96,7 +96,7 @@ export class AngularCompilerPlugin implements Tapable {
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = Object.create(null);
   private _tsConfigPath: string;
-  private _entryModule: string;
+  private _entryModule: string | null;
   private _mainPath: string | undefined;
   private _basePath: string;
   private _transformers: ts.TransformerFactory<ts.SourceFile>[] = [];
