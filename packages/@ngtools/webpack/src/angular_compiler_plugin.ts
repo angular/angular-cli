@@ -73,6 +73,9 @@ export interface AngularCompilerPluginOptions {
   missingTranslation?: string;
   platform?: PLATFORM;
 
+  // added to the list of lazy routes
+  additionalLazyModules?: { [module: string]: string };
+
   // Use tsconfig to include path globs.
   compilerOptions?: ts.CompilerOptions;
 }
@@ -759,6 +762,9 @@ export class AngularCompilerPlugin implements Tapable {
             this._processLazyRoutes(this._getLazyRoutesFromNgtools());
           } else if (changedTsFiles.length > 0) {
             this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
+          }
+          if (this._options.additionalLazyModules) {
+            this._processLazyRoutes(this._options.additionalLazyModules);
           }
         }
       })
