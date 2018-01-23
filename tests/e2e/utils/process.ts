@@ -178,8 +178,8 @@ export function ng(...args: string[]) {
         .then(() => {
           if (!npmInstalledEject) {
             npmInstalledEject = true;
-            // We need to run npm install on the first eject.
-            return silentNpm('install');
+            // We need to delete node_modules, then run npm install on the first eject.
+            return rimraf('node_modules').then(() => silentNpm('install'));
           }
         })
         .then(() => rimraf('dist'))
