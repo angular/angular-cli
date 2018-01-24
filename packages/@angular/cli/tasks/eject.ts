@@ -225,6 +225,7 @@ class JsonWebpackSerializer {
           break;
         case CircularDependencyPlugin:
           this.variableImports['circular-dependency-plugin'] = 'CircularDependencyPlugin';
+          args.cwd = this._escape('projectRoot');
           break;
         case AotPlugin:
           args = this._aotPluginSerialize(plugin);
@@ -264,11 +265,13 @@ class JsonWebpackSerializer {
             // CopyWebpackPlugin doesn't have a constructor nor save args.
             this.variableImports['copy-webpack-plugin'] = 'CopyWebpackPlugin';
             const patternOptions = plugin['copyWebpackPluginPatterns'].map((pattern: any) => {
-              if (!pattern.context) {
-                return pattern;
+              if (pattern.context) {
+                pattern.context = path.relative(process.cwd(), pattern.context);
               }
-              const context = path.relative(process.cwd(), pattern.context);
-              return { ...pattern, context };
+              if (pattern.from && pattern.from.glob) {
+                pattern.from.glob = path.relative(process.cwd(), pattern.from.glob);
+              }
+              return pattern;
             });
             const patternsSerialized = serializer(patternOptions);
             const optionsSerialized = serializer(plugin['copyWebpackPluginOptions']) || 'undefined';
@@ -315,7 +318,7 @@ class JsonWebpackSerializer {
       if (loader.match(/\/node_modules\/extract-text-webpack-plugin\//)) {
         return 'extract-text-webpack-plugin';
       } else if (loader.match(/@ngtools\/webpack\/src\/index.ts/)) {
-        // return '@ngtools/webpack';
+        return '@ngtools/webpack';
       }
     } else {
       if (loader.loader) {
@@ -327,7 +330,17 @@ class JsonWebpackSerializer {
         Object.keys(args.variableImports)
           .forEach(key => this.variableImports[key] = args.variableImports[key]);
         Object.keys(args.variables)
-          .forEach(key => this.variables[key] = JSON.stringify(args.variables[key]));
+          .forEach(key => {
+            const value = args.variables[key];
+            if (value === process.cwd()) {
+              this.variables[key] = 'process.cwd()';
+            } else if (typeof value == 'string' && value.startsWith(process.cwd())) {
+              this.variables[key] = 'process.cwd() + '
+                                  + JSON.stringify(value.substr(process.cwd().length));
+            } else {
+              this.variables[key] = JSON.stringify(value);
+            }
+          });
 
         this.variables['postcssPlugins'] = loader.options.plugins;
         loader.options.plugins = this._escape('postcssPlugins');
