@@ -134,7 +134,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         },
         { url: 'rebase' },
       ]),
-      autoprefixer(),
+      autoprefixer({ grid: true }),
     ].concat(
         minimizeCss ? [cssnano(minimizeOptions)] : []
     );
