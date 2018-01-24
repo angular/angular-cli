@@ -122,7 +122,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         },
         { url: 'rebase' },
       ]),
-      autoprefixer(),
+      autoprefixer({ grid: true }),
     ];
   };
   (postcssPluginCreator as any)[postcssArgs] = {
