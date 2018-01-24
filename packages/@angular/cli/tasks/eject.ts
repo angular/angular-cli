@@ -602,6 +602,7 @@ export default Task.extend({
           'file-loader',
           'html-webpack-plugin',
           'json-loader',
+          'karma-cli',
           'karma-sourcemap-loader',
           'less-loader',
           'postcss-import',
