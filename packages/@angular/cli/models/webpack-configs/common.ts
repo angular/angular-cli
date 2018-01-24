@@ -92,7 +92,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       // Prevent asset configurations from writing outside of the output path, except if the user
       // specify a configuration flag.
       // Also prevent writing outside the project path. That is not overridable.
-      const absoluteOutputPath = path.resolve(buildOptions.outputPath);
+      const absoluteOutputPath = path.resolve(projectRoot, buildOptions.outputPath);
       const absoluteAssetOutput = path.resolve(absoluteOutputPath, asset.output);
       const outputRelativeOutput = path.relative(absoluteOutputPath, absoluteAssetOutput);
 
