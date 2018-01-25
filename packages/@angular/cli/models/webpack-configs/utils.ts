@@ -6,16 +6,19 @@ export const ngAppResolve = (resolvePath: string): string => {
 
 const webpackOutputOptions = {
   colors: true,
-  hash: true,
-  timings: true,
-  chunks: true,
+  hash: true, // required by custom stat output
+  timings: true, // required by custom stat output
+  chunks: true, // required by custom stat output
   chunkModules: false,
   children: false, // listing all children is very noisy in AOT and hides warnings/errors
   modules: false,
   reasons: false,
   warnings: true,
-  assets: false, // listing all assets is very noisy when using assets directories
-  version: false
+  errors: true,
+  assets: true, // required by custom stat output
+  version: false,
+  errorDetails: false,
+  moduleTrace: false,
 };
 
 const verboseWebpackOutputOptions = {
@@ -23,7 +26,9 @@ const verboseWebpackOutputOptions = {
   assets: true,
   version: true,
   reasons: true,
-  chunkModules: false // TODO: set to true when console to file output is fixed
+  chunkModules: false, // TODO: set to true when console to file output is fixed
+  errorDetails: true,
+  moduleTrace: true,
 };
 
 export function getWebpackStatsConfig(verbose = false) {
