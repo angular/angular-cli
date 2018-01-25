@@ -64,9 +64,6 @@
     "jasmine-spec-reporter": "^3.2.0",
     "loader-utils": "^1.1.0",
     "minimist": "^1.2.0",
-    "npm": "^5.2.0",
-    "npm-run": "^4.1.2",
-    "npm-run-all": "^4.0.0",
     "rxjs": "^5.5.6",
     "semver": "^5.3.0",
     "semver-intersect": "^1.1.2",
@@ -78,5 +75,8 @@
     "typescript": "~2.6.1",
     "v8-profiler": "^5.7.0",
     "webpack-sources": "^1.0.1"
+  },
+  "devDependencies": {
+    "license-checker": "^16.0.0"
   }
 }

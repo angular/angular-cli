@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
+import { resolve } from '@angular-devkit/core/node';
 import * as stream from 'stream';
 import { packages } from '../lib/packages';
 
-const npm = require('npm');
+const npm = require(resolve('npm', { basedir: '/', checkGlobal: true }));
 
 class NullStream extends stream.Writable {
   _write() {}

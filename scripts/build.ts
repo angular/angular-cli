@@ -9,10 +9,10 @@ import { JsonObject, logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
+import * as ts from 'typescript';
 import { packages } from '../lib/packages';
 
 const minimatch = require('minimatch');
-const npmRun = require('npm-run');
 const tar = require('tar');
 
 const gitIgnore = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8')
@@ -132,7 +132,13 @@ function _build(logger: logging.Logger) {
   logger.info('Building...');
   const tsConfigPath = path.relative(process.cwd(), path.join(__dirname, '../tsconfig.json'));
   try {
-    npmRun.execSync(`tsc -p "${tsConfigPath}"`);
+    // Load the Compiler Options.
+    const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+    const parsedTsConfig = ts.parseJsonConfigFileContent(tsConfig.config, ts.sys, '.');
+
+    // Create the program and emit.
+    const program = ts.createProgram(parsedTsConfig.fileNames, parsedTsConfig.options);
+    program.emit();
   } catch (err) {
     const stdout = err.stdout.toString().split('\n').join('\n  ');
     logger.error(`TypeScript compiler failed:\n\nSTDOUT:\n  ${stdout}`);
