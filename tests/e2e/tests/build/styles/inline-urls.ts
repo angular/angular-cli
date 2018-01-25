@@ -54,7 +54,7 @@ export default function () {
     .then(() => expectFileToMatch('dist/main.bundle.js',
       /url\(\\?[\'"]data:image\/svg\+xml/))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      /url\([\'"]?large\.[0-9a-f]{20}\.png[\'"]?\)/))
+      /url\((?:[\'"]|\\')?large\.[0-9a-f]{20}\.png(?:[\'"]|\\')?\)/))
     // Check files are correctly created.
     .then(() => expectToFail(() => expectFileToExist('dist/small.svg')))
     .then(() => expectFileMatchToExist('./dist', /large\.[0-9a-f]{20}\.png/))
