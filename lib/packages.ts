@@ -8,6 +8,7 @@
 'use strict';
 
 import { JsonObject } from '@angular-devkit/core';
+import { execSync } from 'child_process';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -30,6 +31,10 @@ export interface PackageInfo {
   private: boolean;
   packageJson: JsonObject;
   dependencies: string[];
+
+  snapshot: boolean;
+  snapshotRepo: string;
+  snapshotHash: string;
 
   dirty: boolean;
   hash: string;
@@ -156,6 +161,16 @@ const packageJsonPaths = _findAllPackageJson(path.join(__dirname, '..'), exclude
   .filter(p => p != path.join(__dirname, '../package.json'));
 
 
+let gitShaCache: string;
+function _getSnapshotHash(_pkg: PackageInfo): string {
+  if (!gitShaCache) {
+    gitShaCache = execSync('git log --format=%h -n1').toString().trim();
+  }
+
+  return gitShaCache;
+}
+
+
 // All the supported packages. Go through the packages directory and create a map of
 // name => PackageInfo. This map is partial as it lacks some information that requires the
 // map itself to finish building.
@@ -190,6 +205,12 @@ export const packages: PackageMap =
         bin,
         name,
         packageJson,
+
+        snapshot: !!monorepoPackages[name].snapshotRepo,
+        snapshotRepo: monorepoPackages[name].snapshotRepo,
+        get snapshotHash() {
+          return _getSnapshotHash(this);
+        },
 
         dependencies: [],
         hash: '',

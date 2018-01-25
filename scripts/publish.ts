@@ -9,6 +9,7 @@ import { logging } from '@angular-devkit/core';
 import { resolve } from '@angular-devkit/core/node';
 import * as stream from 'stream';
 import { packages } from '../lib/packages';
+import build from './build';
 
 const npm = require(resolve('npm', { basedir: '/', checkGlobal: true }));
 
@@ -19,7 +20,6 @@ class NullStream extends stream.Writable {
 
 export default function (_: {}, logger: logging.Logger) {
   logger.info('Building...');
-  const build = require('./build').default;
   build({}, logger.createChild('build'));
 
   return new Promise<void>((resolve, reject) => {

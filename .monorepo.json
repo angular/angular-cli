@@ -65,7 +65,8 @@
         }
       ],
       "version": "0.0.29",
-      "hash": "c5b7ac4219d4e5bd7beb2230043fb876"
+      "hash": "c5b7ac4219d4e5bd7beb2230043fb876",
+      "snapshotRepo": "angular/angular-devkit-core-builds"
     },
     "@angular-devkit/schematics": {
       "name": "Schematics",
@@ -76,7 +77,8 @@
         }
       ],
       "version": "0.0.52",
-      "hash": "5da7eec7e29add6e2d9f6018df033025"
+      "hash": "5da7eec7e29add6e2d9f6018df033025",
+      "snapshotRepo": "angular/angular-devkit-schematics-builds"
     },
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",

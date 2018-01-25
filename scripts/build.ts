@@ -158,7 +158,7 @@ function _build(logger: logging.Logger) {
 }
 
 
-export default function(argv: { local?: boolean }, logger: logging.Logger) {
+export default function(argv: { local?: boolean, snapshot?: boolean }, logger: logging.Logger) {
   _clean(logger);
 
   const sortedPackages = _sortPackages();
@@ -295,8 +295,19 @@ export default function(argv: { local?: boolean }, logger: logging.Logger) {
         if (obj && obj[depName]) {
           if (argv.local) {
             obj[depName] = packages[depName].tar;
-          } else if (obj[depName] == '0.0.0') {
-            obj[depName] = v;
+          } else if (argv.snapshot) {
+            const pkg = packages[depName];
+            if (!pkg.snapshotRepo) {
+              versionLogger.error(
+                `Package ${JSON.stringify(depName)} is not published as a snapshot. `
+                + `Fixing to current version ${v}.`,
+              );
+              obj[depName] = v;
+            } else {
+              obj[depName] = `github:${pkg.snapshotRepo}#${pkg.snapshotHash}`;
+            }
+          } else if ((obj[depName] as string).match(/\b0\.0\.0\b/)) {
+            obj[depName] = (obj[depName] as string).replace(/\b0\.0\.0\b/, v);
           }
         }
       }
