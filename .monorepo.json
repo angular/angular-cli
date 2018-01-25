@@ -53,8 +53,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md"
         }
       ],
-      "version": "0.0.41",
-      "hash": "d33ea15e49b95f0d2b38bba7991e94d0"
+      "version": "0.0.42",
+      "hash": "00462760d0add5ae790e49030c24fc9a"
     },
     "@angular-devkit/core": {
       "name": "Core",
@@ -64,8 +64,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/core/README.md"
         }
       ],
-      "version": "0.0.28",
-      "hash": "42ee618f548ef57ed2a606db12dcf719"
+      "version": "0.0.29",
+      "hash": "c5b7ac4219d4e5bd7beb2230043fb876"
     },
     "@angular-devkit/schematics": {
       "name": "Schematics",
@@ -75,31 +75,31 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
         }
       ],
-      "version": "0.0.51",
-      "hash": "03d9a2f80bc8d590b6e1113b84f183e9"
+      "version": "0.0.52",
+      "hash": "5da7eec7e29add6e2d9f6018df033025"
     },
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",
-      "version": "0.0.8",
-      "hash": "51b96b1f651fddcc1b44a95005dceb29"
+      "version": "0.0.9",
+      "hash": "c02482a7ec2071567393709d79c25e8a"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
-      "version": "0.1.16",
-      "hash": "c7f5c3e3724df9cf9f51947fdd9f8a77"
+      "version": "0.1.17",
+      "hash": "4a270480c210fdb2b3fd373e6ba55b14"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "section": "Schematics",
-      "hash": "0737267c88f3ed4ff28843f85d113144"
+      "hash": "7c0def54978ad8e45bdf8da42b1ddf73"
     },
     "@schematics/package-update": {
       "name": "Package JSON Update Schematics",
-      "version": "0.0.6",
+      "version": "0.0.7",
       "section": "Schematics",
-      "hash": "142ca446a6c3c9b321ef2ba78538dc37"
+      "hash": "fa063063c05223c7ebf82e999476d2ba"
     }
   }
 }
