@@ -39,18 +39,66 @@ export function resolveWithPaths(
     cache
   );
 
-  let moduleFilePath = moduleResolver.resolvedModule
-                    && moduleResolver.resolvedModule.resolvedFileName;
+  const moduleFilePath = moduleResolver.resolvedModule
+                         && moduleResolver.resolvedModule.resolvedFileName;
 
-  // If TypeScript gives us a .d.ts it's probably a node module and we need to let webpack
-  // do the resolution.
-  if (moduleFilePath) {
-    moduleFilePath = moduleFilePath.replace(/\.d\.ts$/, '.js');
-    if (host.fileExists(moduleFilePath)) {
-      request.request = moduleFilePath;
+  // If there is no result, let webpack try to resolve
+  if (!moduleFilePath) {
+    callback(null, request);
+    return;
+  }
+
+  // If TypeScript gives us a `.d.ts`, it is probably a node module
+  if (moduleFilePath.endsWith('.d.ts')) {
+    // If in a package, let webpack resolve the package
+    const packageRootPath = path.join(path.dirname(moduleFilePath), 'package.json');
+    if (!host.fileExists(packageRootPath)) {
+      // Otherwise, if there is a file with a .js extension use that
+      const jsFilePath = moduleFilePath.slice(0, -5) + '.js';
+      if (host.fileExists(jsFilePath)) {
+        request.request = jsFilePath;
+      }
+    }
+
+    callback(null, request);
+    return;
+  }
+
+  // TypeScript gives `index.ts` and the request is not for the specific file,
+  // check if it is a module
+  const requestFilePath = path.basename(request.request);
+  if (path.basename(moduleFilePath) === 'index.ts'
+      && requestFilePath !== 'index' && requestFilePath !== 'index.ts') {
+    const packageRootPath = path.join(path.dirname(moduleFilePath), 'package.json');
+    if (host.fileExists(packageRootPath)) {
+      // potential module request
+      let isPathMapped = false;
+      if (compilerOptions.paths) {
+        // check if any path mapping rules are relevant
+        isPathMapped = Object.keys(compilerOptions.paths)
+          .some(pattern => {
+            // can only contain zero or one
+            const starIndex = pattern.indexOf('*');
+            if (starIndex === -1) {
+              return pattern === request.request;
+            } else if (starIndex === pattern.length - 1) {
+              return request.request.startsWith(pattern.slice(0, -1));
+            } else {
+              const [prefix, suffix] = pattern.split('*');
+              return request.request.startsWith(prefix) && request.request.endsWith(suffix);
+            }
+          });
+      }
+      if (!isPathMapped) {
+        // path mapping not involved, let webpack handle the module request
+        request.request = path.dirname(moduleFilePath);
+        callback(null, request);
+        return;
+      }
     }
   }
 
+  request.request = moduleFilePath;
   callback(null, request);
 }
 
