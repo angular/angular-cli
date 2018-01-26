@@ -294,7 +294,7 @@ export class AngularCompilerPlugin implements Tapable {
 
   private _getChangedCompilationFiles() {
     return this._compilerHost.getChangedFilePaths()
-      .filter(k => /\.(?:ts|html|css|scss|sass|less|styl)$/.test(k));
+      .filter(k => /\.(?:ts|html|css|scss|sass|less|styl|pug)$/.test(k));
   }
 
   private _createOrUpdateProgram() {
