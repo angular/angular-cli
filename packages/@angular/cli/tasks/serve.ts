@@ -74,7 +74,7 @@ export default Task.extend({
 
     const serveDefaults = {
       deployUrl: appConfig.deployUrl || '',
-      baseHref: appConfig.baseHref || '',
+      baseHref: appConfig.baseHref,
     };
 
     serveTaskOptions = Object.assign({}, serveDefaults, serveTaskOptions);
