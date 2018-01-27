@@ -5,7 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Budget, calculateBytes, calculateSizes } from '../utilities/bundle-calculator';
+import { Budget, Size, calculateBytes, calculateSizes } from '../utilities/bundle-calculator';
+import { formatSize } from '../utilities/stats';
 
 interface Thresholds {
   maximumWarning?: number;
@@ -34,7 +35,7 @@ export class BundleBudgetPlugin {
       }
 
       budgets.map(budget => {
-        const thresholds = this.calcualte(budget);
+        const thresholds = this.calculate(budget);
         return {
           budget,
           thresholds,
@@ -43,46 +44,14 @@ export class BundleBudgetPlugin {
       })
       .forEach(budgetCheck => {
         budgetCheck.sizes.forEach(size => {
-          if (budgetCheck.thresholds.maximumWarning) {
-            if (budgetCheck.thresholds.maximumWarning < size.size) {
-              compilation.warnings.push(`budgets, maximum exceeded for ${size.label}.`);
-            }
-          }
-          if (budgetCheck.thresholds.maximumError) {
-            if (budgetCheck.thresholds.maximumError < size.size) {
-              compilation.errors.push(`budgets, maximum exceeded for ${size.label}.`);
-            }
-          }
-          if (budgetCheck.thresholds.minimumWarning) {
-            if (budgetCheck.thresholds.minimumWarning > size.size) {
-              compilation.warnings.push(`budgets, minimum exceeded for ${size.label}.`);
-            }
-          }
-          if (budgetCheck.thresholds.minimumError) {
-            if (budgetCheck.thresholds.minimumError > size.size) {
-              compilation.errors.push(`budgets, minimum exceeded for ${size.label}.`);
-            }
-          }
-          if (budgetCheck.thresholds.warningLow) {
-            if (budgetCheck.thresholds.warningLow > size.size) {
-              compilation.warnings.push(`budgets, minimum exceeded for ${size.label}.`);
-            }
-          }
-          if (budgetCheck.thresholds.warningHigh) {
-            if (budgetCheck.thresholds.warningHigh < size.size) {
-              compilation.warnings.push(`budgets, maximum exceeded for ${size.label}.`);
-            }
-          }
-          if (budgetCheck.thresholds.errorLow) {
-            if (budgetCheck.thresholds.errorLow > size.size) {
-              compilation.errors.push(`budgets, minimum exceeded for ${size.label}.`);
-            }
-          }
-          if (budgetCheck.thresholds.errorHigh) {
-            if (budgetCheck.thresholds.errorHigh < size.size) {
-              compilation.errors.push(`budgets, maximum exceeded for ${size.label}.`);
-            }
-          }
+          this.checkMaximum(budgetCheck.thresholds.maximumWarning, size, compilation.warnings);
+          this.checkMaximum(budgetCheck.thresholds.maximumError, size, compilation.errors);
+          this.checkMinimum(budgetCheck.thresholds.minimumWarning, size, compilation.warnings);
+          this.checkMinimum(budgetCheck.thresholds.minimumError, size, compilation.errors);
+          this.checkMinimum(budgetCheck.thresholds.warningLow, size, compilation.warnings);
+          this.checkMaximum(budgetCheck.thresholds.warningHigh, size, compilation.warnings);
+          this.checkMinimum(budgetCheck.thresholds.errorLow, size, compilation.errors);
+          this.checkMaximum(budgetCheck.thresholds.errorHigh, size, compilation.errors);
         });
 
       });
@@ -90,7 +59,27 @@ export class BundleBudgetPlugin {
     });
   }
 
-  private calcualte(budget: Budget): Thresholds {
+  private checkMinimum(threshold: number, size: Size, messages: any) {
+    if (threshold) {
+      if (threshold > size.size) {
+        const sizeDifference = formatSize(threshold - size.size);
+        messages.push(`budgets, minimum exceeded for ${size.label}. `
+        + `Budget ${formatSize(threshold)} was not reached by ${sizeDifference}.`);
+      }
+    }
+  }
+
+  private checkMaximum(threshold: number, size: Size, messages: any) {
+    if (threshold) {
+      if (threshold < size.size) {
+        const sizeDifference = formatSize(size.size - threshold);
+        messages.push(`budgets, maximum exceeded for ${size.label}. `
+        + `Budget ${formatSize(threshold)} was exceeded by ${sizeDifference}.`);
+      }
+    }
+  }
+
+  private calculate(budget: Budget): Thresholds {
     let thresholds: Thresholds = {};
     if (budget.maximumWarning) {
       thresholds.maximumWarning = calculateBytes(budget.maximumWarning, budget.baseline, 'pos');
