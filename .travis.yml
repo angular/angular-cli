@@ -50,10 +50,11 @@ matrix:
       os: linux
       script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent
       env: e2e-3
-    - node_js: "8"
-      os: linux
-      script: node tests/run_e2e.js --eject "--glob=tests/build/**"
-      env: eject
+    # WEBPACK4_DISABLED - eject temporarily disabled for webpack 4 integration
+    # - node_js: "8"
+    #   os: linux
+    #   script: node tests/run_e2e.js --eject "--glob=tests/build/**"
+    #   env: eject
 
     # Optional stage.
     - stage: optional

@@ -1,15 +1,12 @@
-import * as webpack from 'webpack';
 import * as fs from 'fs';
 import * as semver from 'semver';
 import { stripIndent } from 'common-tags';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
-import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { WebpackConfigOptions } from '../webpack-config';
 import { resolveProjectModule } from '../../utilities/require-project-module';
 import { NEW_SW_VERSION } from '../../utilities/service-worker';
 
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 
 /**
@@ -67,51 +64,7 @@ export function getProdConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  const uglifyCompressOptions: any = {
-    // Disabled because of an issue with Mapbox GL when using the Webpack node global and UglifyJS:
-    // https://github.com/mapbox/mapbox-gl-js/issues/4359#issuecomment-303880888
-    // https://github.com/angular/angular-cli/issues/5804
-    // https://github.com/angular/angular-cli/pull/7931
-    typeofs : false
-  };
-
-  if (buildOptions.buildOptimizer) {
-    // This plugin must be before webpack.optimize.UglifyJsPlugin.
-    extraPlugins.push(new PurifyPlugin());
-    uglifyCompressOptions.pure_getters = true;
-    // PURE comments work best with 3 passes.
-    // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-    uglifyCompressOptions.passes = 3;
-  }
-
   return {
-    plugins: [
-      new webpack.EnvironmentPlugin({
-        'NODE_ENV': 'production'
-      }),
-      new webpack.HashedModuleIdsPlugin(),
-      new webpack.optimize.ModuleConcatenationPlugin(),
-      ...extraPlugins,
-      // Uglify should be the last plugin as PurifyPlugin needs to be before it.
-      new UglifyJSPlugin({
-        sourceMap: buildOptions.sourcemaps,
-        parallel: true,
-        cache: true,
-        uglifyOptions: {
-          ecma: wco.supportES2015 ? 6 : 5,
-          warnings: buildOptions.verbose,
-          ie8: false,
-          mangle: {
-            safari10: true,
-          },
-          compress: uglifyCompressOptions,
-          output: {
-            ascii_only: true,
-            comments: false,
-            webkit: true,
-          },
-        }
-      }),
-    ]
+    plugins: extraPlugins,
   };
 }
