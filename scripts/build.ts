@@ -131,17 +131,28 @@ function _sortPackages() {
 function _build(logger: logging.Logger) {
   logger.info('Building...');
   const tsConfigPath = path.relative(process.cwd(), path.join(__dirname, '../tsconfig.json'));
-  try {
-    // Load the Compiler Options.
-    const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
-    const parsedTsConfig = ts.parseJsonConfigFileContent(tsConfig.config, ts.sys, '.');
+  // Load the Compiler Options.
+  const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+  const parsedTsConfig = ts.parseJsonConfigFileContent(tsConfig.config, ts.sys, '.');
 
-    // Create the program and emit.
-    const program = ts.createProgram(parsedTsConfig.fileNames, parsedTsConfig.options);
-    program.emit();
-  } catch (err) {
-    const stdout = err.stdout.toString().split('\n').join('\n  ');
-    logger.error(`TypeScript compiler failed:\n\nSTDOUT:\n  ${stdout}`);
+  // Create the program and emit.
+  const program = ts.createProgram(parsedTsConfig.fileNames, parsedTsConfig.options);
+  const result = program.emit();
+  if (result.emitSkipped) {
+    logger.error(`TypeScript compiler failed:`);
+    const diagLogger = logger.createChild('diagnostics');
+    result.diagnostics.forEach(diagnostic => {
+      const messageText = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+
+      if (diagnostic.file) {
+        const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start || 0);
+        const fileName = diagnostic.file.fileName;
+        const { line, character } = position;
+        diagLogger.error(`${fileName} (${line + 1},${character + 1}): ${messageText}`);
+      } else {
+        diagLogger.error(messageText);
+      }
+    });
     process.exit(1);
   }
 }
