@@ -20,7 +20,7 @@ export default function() {
     return Promise.resolve();
   }
 
-  const lazyChunkRegExp = /lazy\.module\.chunk\.js/g;
+  const lazyChunkRegExp = /lazy-module\.chunk\.js/g;
 
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
     // Add a lazy module.

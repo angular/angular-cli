@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -23,23 +22,23 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     ...extraEntryParser(appConfig.styles, appRoot, 'styles')
   ]);
 
-  if (buildOptions.vendorChunk) {
-    // Separate modules from node_modules into a vendor chunk.
-    const nodeModules = path.resolve(projectRoot, 'node_modules');
-    // Resolves all symlink to get the actual node modules folder.
-    const realNodeModules = fs.realpathSync(nodeModules);
-    // --aot puts the generated *.ngfactory.ts in src/$$_gendir/node_modules.
-    const genDirNodeModules = path.resolve(appRoot, '$$_gendir', 'node_modules');
-
-    extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      chunks: ['main'],
-      minChunks: (module: any) => {
-        return module.resource
-            && (   module.resource.startsWith(nodeModules)
-                || module.resource.startsWith(genDirNodeModules)
-                || module.resource.startsWith(realNodeModules));
-      }
+  // TODO: Enable this once HtmlWebpackPlugin supports Webpack 4
+  const generateIndexHtml = false;
+  if (generateIndexHtml) {
+    extraPlugins.push(new HtmlWebpackPlugin({
+        template: path.resolve(appRoot, appConfig.index),
+        filename: path.resolve(buildOptions.outputPath, appConfig.index),
+        chunksSortMode: packageChunkSort(appConfig),
+        excludeChunks: lazyChunks,
+        xhtml: true,
+        minify: buildOptions.target === 'production' ? {
+          caseSensitive: true,
+          collapseWhitespace: true,
+          keepClosingSlash: true
+        } : false
+    }));
+    extraPlugins.push(new BaseHrefWebpackPlugin({
+        baseHref: buildOptions.baseHref
     }));
   }
 
@@ -62,20 +61,14 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }
   }
 
-  if (buildOptions.commonChunk) {
-    extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
-      name: 'main',
-      async: 'common',
-      children: true,
-      minChunks: 2
-    }));
-  }
-
   if (buildOptions.subresourceIntegrity) {
     extraPlugins.push(new SubresourceIntegrityPlugin({
       hashFuncNames: ['sha384']
     }));
   }
+
+  const globalStylesEntries = extraEntryParser(appConfig.styles, appRoot, 'styles')
+    .map(style => style.entry);
 
   return {
     resolve: {
@@ -87,27 +80,26 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     output: {
       crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false
     },
-    plugins: [
-      new HtmlWebpackPlugin({
-        template: path.resolve(appRoot, appConfig.index),
-        filename: path.resolve(buildOptions.outputPath, appConfig.index),
-        chunksSortMode: packageChunkSort(appConfig),
-        excludeChunks: lazyChunks,
-        xhtml: true,
-        minify: buildOptions.target === 'production' ? {
-          caseSensitive: true,
-          collapseWhitespace: true,
-          keepClosingSlash: true
-        } : false
-      }),
-      new BaseHrefWebpackPlugin({
-        baseHref: buildOptions.baseHref
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        minChunks: Infinity,
-        name: 'inline'
-      })
-    ].concat(extraPlugins),
+    optimization: {
+      // runtimeChunk: 'single',
+      splitChunks: {
+        chunks: buildOptions.commonChunk ? 'all' : 'initial',
+        cacheGroups: {
+          vendors: false,
+          vendor: buildOptions.vendorChunk && {
+            name: 'vendor',
+            chunks: 'initial',
+            test: (module: any, chunks: Array<{name: string}>) => {
+              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
+              return /[\\/]node_modules[\\/]/.test(moduleName)
+                     && !chunks.some(({ name }) => name === 'polyfills'
+                        || globalStylesEntries.includes(name));
+            },
+          },
+        }
+      }
+    },
+    plugins: extraPlugins,
     node: {
       fs: 'empty',
       global: true,

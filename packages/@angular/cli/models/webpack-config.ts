@@ -9,7 +9,6 @@ import { BuildOptions } from './build-options';
 import {
   getBrowserConfig,
   getCommonConfig,
-  getDevConfig,
   getProdConfig,
   getStylesConfig,
   getServerConfig,
@@ -48,10 +47,8 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
     const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
                         && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
 
-    // Only force if the default module kind is used (ES2015)
-    // Allows user to adjust module kind (to esNext for example)
-    buildOptions.forceTsCommonjs = buildOptions.forceTsCommonjs
-                                 && tsConfig.options.module === projectTs.ModuleKind.ES2015;
+    // TODO: Remove this functionality completely as it is no longer needed with Webpack 4
+    buildOptions.forceTsCommonjs = false;
 
     this.wco = { projectRoot, buildOptions, appConfig, tsConfig, supportES2015 };
   }
@@ -80,8 +77,6 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
 
   public getTargetConfig(webpackConfigOptions: WebpackConfigOptions<T>): any {
     switch (webpackConfigOptions.buildOptions.target) {
-      case 'development':
-        return getDevConfig(webpackConfigOptions);
       case 'production':
         return getProdConfig(webpackConfigOptions);
     }
