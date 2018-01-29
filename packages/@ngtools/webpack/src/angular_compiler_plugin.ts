@@ -9,7 +9,6 @@ const treeKill = require('tree-kill');
 
 import { WebpackResourceLoader } from './resource_loader';
 import { WebpackCompilerHost } from './compiler_host';
-import { Tapable } from './webpack';
 import { resolveWithPaths } from './paths-plugin';
 import { findLazyRoutes, LazyRouteMap } from './lazy_routes';
 import {
@@ -72,6 +71,7 @@ export interface AngularCompilerPluginOptions {
   locale?: string;
   missingTranslation?: string;
   platform?: PLATFORM;
+  nameLazyFiles?: boolean;
 
   // added to the list of lazy routes
   additionalLazyModules?: { [module: string]: string };
@@ -85,7 +85,7 @@ export enum PLATFORM {
   Server
 }
 
-export class AngularCompilerPlugin implements Tapable {
+export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
 
   // TS compilation.
@@ -582,14 +582,15 @@ export class AngularCompilerPlugin implements Tapable {
           // TODO: check if we can't just leave it as is (angularCoreModuleDir).
           result.resource = path.join(this._basePath, '$$_lazy_route_resource');
           result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = (_fs: any, _resourceOrOptions: any, recursiveOrCallback: any,
+          result.resolveDependencies = (_fs: any, resourceOrOptions: any, recursiveOrCallback: any,
             _regExp: RegExp, cb: any) => {
             const dependencies = Object.keys(this._lazyRoutes)
               .map((key) => {
                 const modulePath = this._lazyRoutes[key];
                 const importPath = key.split('#')[0];
                 if (modulePath !== null) {
-                  return new ContextElementDependency(modulePath, importPath);
+                  const name = path.basename(importPath).replace(/(\.ngfactory)?\.(js|ts)$/, '');
+                  return new ContextElementDependency(modulePath, name);
                 } else {
                   return null;
                 }
@@ -598,6 +599,9 @@ export class AngularCompilerPlugin implements Tapable {
             if (typeof cb !== 'function' && typeof recursiveOrCallback === 'function') {
               // Webpack 4 only has 3 parameters
               cb = recursiveOrCallback;
+              if (this._options.nameLazyFiles) {
+                resourceOrOptions.chunkName = '[request]';
+              }
             }
             cb(null, dependencies);
           };

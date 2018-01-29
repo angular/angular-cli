@@ -12,11 +12,15 @@ export function packageChunkSort(appConfig: any) {
   };
 
   if (appConfig.styles) {
-    extraEntryParser(appConfig.styles, './', 'styles').forEach(pushExtraEntries);
+    extraEntryParser(appConfig.styles, './', 'styles')
+      .filter(entry => !entry.lazy)
+      .forEach(pushExtraEntries);
   }
 
   if (appConfig.scripts) {
-    extraEntryParser(appConfig.scripts, './', 'scripts').forEach(pushExtraEntries);
+    extraEntryParser(appConfig.scripts, './', 'scripts')
+      .filter(entry => !entry.lazy)
+      .forEach(pushExtraEntries);
   }
 
   entryPoints.push(...['vendor', 'main']);

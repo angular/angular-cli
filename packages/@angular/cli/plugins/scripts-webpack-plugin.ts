@@ -11,6 +11,7 @@ import { interpolateName } from 'loader-utils';
 import * as path from 'path';
 
 const Chunk = require('webpack/lib/Chunk');
+const EntryPoint = require('webpack/lib/Entrypoint');
 
 export interface ScriptsWebpackPluginOptions {
   name: string;
@@ -88,14 +89,16 @@ export class ScriptsWebpackPlugin {
   }
 
   private _insertOutput(compilation: any, { filename, source }: ScriptOutput, cached = false) {
-    const chunk = new Chunk();
+    const chunk = new Chunk(this.options.name);
     chunk.rendered = !cached;
     chunk.id = this.options.name;
     chunk.ids = [chunk.id];
-    chunk.name = this.options.name;
-    chunk.isInitial = () => true;
     chunk.files.push(filename);
 
+    const entrypoint = new EntryPoint(this.options.name);
+    entrypoint.pushChunk(chunk);
+
+    compilation.entrypoints.set(this.options.name, entrypoint);
     compilation.chunks.push(chunk);
     compilation.assets[filename] = source;
   }

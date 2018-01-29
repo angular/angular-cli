@@ -89,7 +89,7 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     }
   }
 
-  const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
+  const pluginOptions: AngularCompilerPluginOptions = {
     mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
     i18nInFile: buildOptions.i18nFile,
     i18nInFormat: buildOptions.i18nFormat,
@@ -101,7 +101,9 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     hostReplacementPaths,
     sourceMap: buildOptions.sourcemaps,
     additionalLazyModules,
-  }, options);
+    nameLazyFiles: buildOptions.namedChunks,
+    ...options
+  };
   return new AngularCompilerPlugin(pluginOptions);
 }
 
