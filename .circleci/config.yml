@@ -81,6 +81,22 @@ jobs:
           paths:
             - "node_modules"
 
+  snapshot_publish:
+    <<: *defaults
+    steps:
+      - checkout:
+          <<: *post_checkout
+      - restore_cache:
+          key: angular_devkit-{{ checksum "package-lock.json" }}
+
+      - run:
+          name: Decrypt Credentials
+          command: |
+            openssl aes-256-cbc -d -in .circleci/github_token -k "${KEY}" -out ~/github_token
+      - run:
+          name: Deployment to Snapshot
+          command: |
+            npm run admin -- snapshots --verbose --githubToken="$(cat ~/github_token)"
 
 workflows:
   version: 2
@@ -91,3 +107,10 @@ workflows:
       - build
       - test
       - integration
+      - snapshot_publish:
+          requires:
+            - test
+            - integration
+          filters:
+            branches:
+              only: master

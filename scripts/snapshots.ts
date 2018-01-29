@@ -31,7 +31,7 @@ function _copy(from: string, to: string) {
 }
 
 
-export default function(opts: { force?: boolean }, logger: logging.Logger) {
+export default function(opts: { force?: boolean, githubToken: string }, logger: logging.Logger) {
   // Get the SHA.
   if (execSync(`git status --porcelain`).toString() && !opts.force) {
     logger.error('You cannot run snapshots with local changes.');
@@ -66,7 +66,7 @@ export default function(opts: { force?: boolean }, logger: logging.Logger) {
 
     execSync(`git config credential.helper "store --file=.git/credentials"`, { cwd: destPath });
     fs.writeFileSync(path.join(destPath, '.git/credentials'),
-      `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`);
+      `https://${opts.githubToken}@github.com`);
 
     // Make sure that every snapshots is unique.
     fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
