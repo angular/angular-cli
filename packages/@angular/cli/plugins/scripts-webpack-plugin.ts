@@ -25,6 +25,18 @@ interface ScriptOutput {
   source: CachedSource;
 }
 
+function addDependencies(compilation: any, scripts: string[]): void {
+  if (compilation.fileDependencies.add) {
+    // Webpack 4+ uses a Set
+    for (const script of scripts) {
+      compilation.fileDependencies.add(script);
+    }
+  } else {
+    // Webpack 3
+    compilation.fileDependencies.push(...scripts);
+  }
+}
+
 export class ScriptsWebpackPlugin {
   private _lastBuildTime?: number;
   private _cachedOutput?: ScriptOutput;
@@ -38,7 +50,14 @@ export class ScriptsWebpackPlugin {
     }
 
     for (let i = 0; i < scripts.length; i++) {
-      const scriptTime = compilation.fileTimestamps[scripts[i]];
+      let scriptTime;
+      if (compilation.fileTimestamps.get) {
+        // Webpack 4+ uses a Map
+        scriptTime = compilation.fileTimestamps.get(scripts[i]);
+      } else {
+        // Webpack 3
+        scriptTime = compilation.fileTimestamps[scripts[i]];
+      }
       if (!scriptTime || scriptTime > this._lastBuildTime) {
         this._lastBuildTime = Date.now();
         return false;
@@ -76,8 +95,8 @@ export class ScriptsWebpackPlugin {
           if (this._cachedOutput) {
             this._insertOutput(compilation, this._cachedOutput, true);
           }
-          compilation.fileDependencies.push(...scripts);
 
+          addDependencies(compilation, scripts);
           callback();
 
           return;
@@ -129,7 +148,7 @@ export class ScriptsWebpackPlugin {
             const output = { filename, source: combinedSource };
             this._insertOutput(compilation, output);
             this._cachedOutput = output;
-            compilation.fileDependencies.push(...scripts);
+            addDependencies(compilation, scripts);
 
             callback();
           })
