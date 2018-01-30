@@ -97,7 +97,7 @@ jobs:
       - run:
           name: Deployment to Snapshot
           command: |
-            npm run admin -- snapshots --verbose --githubTokenFile=~/github_token
+            npm run admin -- snapshots --verbose --githubTokenFile=${HOME}/github_token
 
 workflows:
   version: 2
