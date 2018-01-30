@@ -17,7 +17,6 @@ const resolve = require('resolve');
  * Enumerate loaders and their dependencies from this file to let the dependency validator
  * know they are used.
  *
- * require('source-map-loader')
  * require('raw-loader')
  * require('url-loader')
  * require('file-loader')
