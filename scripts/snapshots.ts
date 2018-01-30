@@ -32,17 +32,11 @@ function _copy(from: string, to: string) {
 
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
-  const { stdout, stderr, status, error } = spawnSync(command, args, { ...opts });
+  const { status, error } = spawnSync(command, args, { ...opts });
 
-  if (stderr.length) {
-    logger.error(stderr.toString());
-  }
   if (status != 0) {
     logger.fatal(error.message);
     throw error;
-  }
-  if (stdout.length) {
-    logger.info(stdout.toString());
   }
 }
 
