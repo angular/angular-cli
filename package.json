@@ -94,7 +94,7 @@
     "stylus-loader": "^3.0.1",
     "tree-kill": "^1.0.0",
     "typescript": "~2.4.2",
-    "uglifyjs-webpack-plugin": "^1.1.5",
+    "uglifyjs-webpack-plugin": "1.1.6",
     "url-loader": "^0.6.2",
     "webpack": "~3.10.0",
     "webpack-dev-middleware": "~1.12.0",
