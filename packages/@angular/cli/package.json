@@ -71,7 +71,6 @@
     "sass-loader": "^6.0.6",
     "semver": "^5.1.0",
     "silent-error": "^1.0.0",
-    "source-map-loader": "^0.2.0",
     "source-map-support": "^0.4.1",
     "istanbul-instrumenter-loader": "^3.0.0",
     "style-loader": "^0.19.1",
