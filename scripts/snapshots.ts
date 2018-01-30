@@ -52,6 +52,7 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
 export interface SnapshotsOptions {
   force?: boolean;
   githubTokenFile?: string;
+  githubToken?: string;
 }
 
 export default function(opts: SnapshotsOptions, logger: logging.Logger) {
@@ -64,12 +65,17 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-devkit-publish-'));
   const message = execSync(`git log --format="%h %s" -n1`).toString().trim();
 
-  const githubToken = opts.githubTokenFile && fs.readFileSync(opts.githubTokenFile, 'utf-8');
+  const githubToken = opts.githubToken ||
+                      (opts.githubTokenFile && fs.readFileSync(opts.githubTokenFile, 'utf-8'));
   logger.info('Setting up global git name.');
-  if (opts.githubTokenFile) {
+  if (githubToken) {
     _exec('git', ['config', '--global', 'user.email', 'circleci@angular.io'], {}, logger);
     _exec('git', ['config', '--global', 'user.name', 'Angular Builds'], {}, logger);
+    _exec('git', ['config', '--global', 'push.default', 'simple'], {}, logger);
   }
+
+  const gitCredentials = path.join(process.env['HOME'], '.git-credentials');
+  fs.writeFileSync(gitCredentials, `https://${githubToken}@github.com`);
 
   // Run build.
   logger.info('Building...');
@@ -95,12 +101,8 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
     _copy(pkg.dist, destPath);
 
     if (githubToken) {
-      _exec('git', ['config', 'credential.helper', 'store --file=.git/credentials'],
-            { cwd: destPath }, publishLogger);
       _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
-
-      fs.writeFileSync(path.join(destPath, '.git/credentials'),
-          `https://${githubToken}@github.com`);
+      _exec('git', ['config', 'credential.helper', 'store'], { cwd: destPath }, publishLogger);
     }
 
     // Make sure that every snapshots is unique.
