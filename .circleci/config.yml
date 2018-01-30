@@ -14,6 +14,10 @@ jobs:
     steps:
       - checkout:
           <<: *post_checkout
+      # Check BUILD.bazel formatting before we have a node_modules directory
+      # Then we don't need any exclude pattern to avoid checking those files
+      - run: 'buildifier -mode=check $(find . -type f \( -name BUILD.bazel -or -name BUILD \)) ||
+              (echo "BUILD files not formatted. Please run ''npm run buildifier''" ; exit 1)'
       - restore_cache:
           key: angular_devkit-{{ checksum "package-lock.json" }}
 
