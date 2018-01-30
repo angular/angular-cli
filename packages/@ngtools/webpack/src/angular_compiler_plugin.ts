@@ -582,7 +582,7 @@ export class AngularCompilerPlugin implements Tapable {
           // TODO: check if we can't just leave it as is (angularCoreModuleDir).
           result.resource = path.join(this._basePath, '$$_lazy_route_resource');
           result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = (_fs: any, _resource: any, _recursive: any,
+          result.resolveDependencies = (_fs: any, _resourceOrOptions: any, recursiveOrCallback: any,
             _regExp: RegExp, cb: any) => {
             const dependencies = Object.keys(this._lazyRoutes)
               .map((key) => {
@@ -595,6 +595,10 @@ export class AngularCompilerPlugin implements Tapable {
                 }
               })
               .filter(x => !!x);
+            if (typeof cb !== 'function' && typeof recursiveOrCallback === 'function') {
+              // Webpack 4 only has 3 parameters
+              cb = recursiveOrCallback;
+            }
             cb(null, dependencies);
           };
           return callback(null, result);
