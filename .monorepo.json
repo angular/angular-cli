@@ -54,7 +54,8 @@
         }
       ],
       "version": "0.0.42",
-      "hash": "00462760d0add5ae790e49030c24fc9a"
+      "hash": "00462760d0add5ae790e49030c24fc9a",
+      "snapshotRepo": "angular/angular-devkit-build-optimizer-builds"
     },
     "@angular-devkit/core": {
       "name": "Core",
@@ -83,13 +84,15 @@
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",
       "version": "0.0.9",
-      "hash": "c02482a7ec2071567393709d79c25e8a"
+      "hash": "c02482a7ec2071567393709d79c25e8a",
+      "snapshotRepo": "angular/angular-devkit-schematics-cli-builds"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
       "version": "0.1.17",
-      "hash": "4a270480c210fdb2b3fd373e6ba55b14"
+      "hash": "4a270480c210fdb2b3fd373e6ba55b14",
+      "snapshotRepo": "angular/schematics-angular-builds"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
@@ -101,7 +104,8 @@
       "name": "Package JSON Update Schematics",
       "version": "0.0.7",
       "section": "Schematics",
-      "hash": "fa063063c05223c7ebf82e999476d2ba"
+      "hash": "fa063063c05223c7ebf82e999476d2ba",
+      "snapshotRepo": "angular/schematics-package-update-builds"
     }
   }
 }
