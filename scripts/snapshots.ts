@@ -31,7 +31,12 @@ function _copy(from: string, to: string) {
 }
 
 
-export default function(opts: { force?: boolean, githubToken: string }, logger: logging.Logger) {
+export interface SnapshotsOptions {
+  force?: boolean;
+  githubTokenFile: string;
+}
+
+export default function(opts: SnapshotsOptions, logger: logging.Logger) {
   // Get the SHA.
   if (execSync(`git status --porcelain`).toString() && !opts.force) {
     logger.error('You cannot run snapshots with local changes.');
@@ -40,6 +45,8 @@ export default function(opts: { force?: boolean, githubToken: string }, logger: 
 
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-devkit-publish-'));
   const message = execSync(`git log --format="%h %s" -n1`).toString().trim();
+
+  const githubToken = fs.readFileSync(opts.githubTokenFile, 'utf-8');
 
   // Run build.
   logger.info('Building...');
@@ -65,8 +72,7 @@ export default function(opts: { force?: boolean, githubToken: string }, logger: 
     _copy(pkg.dist, destPath);
 
     execSync(`git config credential.helper "store --file=.git/credentials"`, { cwd: destPath });
-    fs.writeFileSync(path.join(destPath, '.git/credentials'),
-      `https://${opts.githubToken}@github.com`);
+    fs.writeFileSync(path.join(destPath, '.git/credentials'), `https://${githubToken}@github.com`);
 
     // Make sure that every snapshots is unique.
     fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
