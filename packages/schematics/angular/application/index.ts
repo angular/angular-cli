@@ -10,7 +10,6 @@ import {
   MergeStrategy,
   Rule,
   SchematicContext,
-  SchematicsException,
   Tree,
   apply,
   chain,
@@ -22,48 +21,8 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
-import * as ts from 'typescript';
-import { addBootstrapToModule, addImportToModule } from '../utility/ast-utils';
-import { InsertChange } from '../utility/change';
 import { Schema as ApplicationOptions } from './schema';
 
-
-function addBootstrapToNgModule(directory: string, sourceDir: string): Rule {
-  return (host: Tree) => {
-    const modulePath = `${directory}/${sourceDir}/app/app.module.ts`;
-    const content = host.read(modulePath);
-    if (!content) {
-      throw new SchematicsException(`File ${modulePath} does not exist.`);
-    }
-    const sourceText = content.toString('utf-8');
-    const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
-
-    const componentModule = './app.component';
-
-    const importChanges = addImportToModule(source,
-                                            modulePath,
-                                            'BrowserModule',
-                                            '@angular/platform-browser');
-    const bootstrapChanges = addBootstrapToModule(source,
-                                                  modulePath,
-                                                  'AppComponent',
-                                                  componentModule);
-    const changes = [
-      ...importChanges,
-      ...bootstrapChanges,
-    ];
-
-    const recorder = host.beginUpdate(modulePath);
-    for (const change of changes) {
-      if (change instanceof InsertChange) {
-        recorder.insertLeft(change.pos, change.toAdd);
-      }
-    }
-    host.commitUpdate(recorder);
-
-    return host;
-  };
-}
 
 function minimalPathFilter(path: string): boolean {
   const toRemoveList: RegExp[] = [/e2e\//, /editorconfig/, /README/, /karma.conf.js/,
@@ -120,9 +79,9 @@ export default function (options: ApplicationOptions): Rule {
         sourceDir: options.directory + '/' + sourceDir,
         flat: true,
         path: options.path,
+        skipImport: true,
         ...componentOptions,
       }),
-      addBootstrapToNgModule(options.directory, sourceDir),
       mergeWith(
         apply(url('./other-files'), [
           componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),

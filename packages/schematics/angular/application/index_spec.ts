@@ -100,4 +100,18 @@ describe('Application Schematic', () => {
     const files = tree.files;
     expect(files.indexOf('/foo/.gitignore')).toEqual(-1);
   });
+
+  it('should import BrowserModule in the app module', () => {
+    const tree = schematicRunner.runSchematic('application', defaultOptions);
+    const path = '/foo/src/app/app.module.ts';
+    const content = tree.readContent(path);
+    expect(content).toMatch(/import { BrowserModule } from \'@angular\/platform-browser\';/);
+  });
+
+  it('should declare app component in the app module', () => {
+    const tree = schematicRunner.runSchematic('application', defaultOptions);
+    const path = '/foo/src/app/app.module.ts';
+    const content = tree.readContent(path);
+    expect(content).toMatch(/import { AppComponent } from \'\.\/app\.component\';/);
+  });
 });
