@@ -10,6 +10,7 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import { Writable } from 'stream';
 import { packages } from '../lib/packages';
 import build from './build';
 
@@ -31,6 +32,28 @@ function _copy(from: string, to: string) {
 }
 
 
+function _exec(command: string, opts: { cwd?: string }, logger: logging.Logger) {
+  const infoLoggerStream = new Writable({
+    write(chunk, _encoding, callback) {
+      logger.info(chunk.toString());
+      callback();
+    },
+  });
+  const errorLoggerStream = new Writable({
+    write(chunk, _encoding, callback) {
+      logger.error(chunk.toString());
+      callback();
+    },
+  });
+
+  logger.debug(`Running command "${JSON.stringify(command)}"...`);
+  execSync(command, {
+    ...opts,
+    stdio: [0, infoLoggerStream, errorLoggerStream],
+  });
+}
+
+
 export interface SnapshotsOptions {
   force?: boolean;
   githubTokenFile: string;
@@ -47,6 +70,11 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
   const message = execSync(`git log --format="%h %s" -n1`).toString().trim();
 
   const githubToken = fs.readFileSync(opts.githubTokenFile, 'utf-8');
+
+  logger.info('Setting up global git name.');
+  _exec(`git config --global user.email "circleci@angular.io"`, {}, logger);
+  _exec(`git config --global user.name "Angular Builds"`, {}, logger);
+
 
   // Run build.
   logger.info('Building...');
@@ -66,22 +94,23 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
     publishLogger.debug('Temporary directory: ' + root);
 
     const url = `https://github.com/${pkg.snapshotRepo}.git`;
-    execSync(`git clone ${JSON.stringify(url)}`, { cwd: root });
+    _exec(`git clone ${JSON.stringify(url)}`, { cwd: root }, publishLogger);
 
     const destPath = path.join(root, path.basename(pkg.snapshotRepo));
     _copy(pkg.dist, destPath);
 
-    execSync(`git config credential.helper "store --file=.git/credentials"`, { cwd: destPath });
+    _exec(`git config credential.helper "store --file=.git/credentials"`, { cwd: destPath },
+          publishLogger);
     fs.writeFileSync(path.join(destPath, '.git/credentials'), `https://${githubToken}@github.com`);
 
     // Make sure that every snapshots is unique.
     fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
 
     // Commit and push.
-    execSync(`git add -A`, { cwd: destPath });
-    execSync(`git commit -am ${JSON.stringify(message)}`, { cwd: destPath });
-    execSync(`git tag ${pkg.snapshotHash}`, { cwd: destPath });
-    execSync(`git push origin`, { cwd: destPath });
-    execSync(`git push --tags origin`, { cwd: destPath });
+    _exec(`git add -A`, { cwd: destPath }, publishLogger);
+    _exec(`git commit -am ${JSON.stringify(message)}`, { cwd: destPath }, publishLogger);
+    _exec(`git tag ${pkg.snapshotHash}`, { cwd: destPath }, publishLogger);
+    _exec(`git push origin`, { cwd: destPath }, publishLogger);
+    _exec(`git push --tags origin`, { cwd: destPath }, publishLogger);
   }
 }
