@@ -75,6 +75,7 @@ jobs:
 
       - run: bazel run @nodejs//:npm install
       - run: bazel build //packages/...
+      - run: npm run admin -- build
 
       - save_cache:
           key: angular_devkit-{{ checksum "package-lock.json" }}
@@ -111,7 +112,7 @@ workflows:
       - snapshot_publish:
           requires:
             - test
-            - integration
+            - build
           filters:
             branches:
               only: master
