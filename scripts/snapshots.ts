@@ -32,8 +32,6 @@ function _copy(from: string, to: string) {
 
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
-  logger.debug(`Running command ${JSON.stringify(command)} ${
-    args.map(x => JSON.stringify(x)).join(' ')}...`);
   const { stdout, stderr, status, error } = spawnSync(command, args, { ...opts });
 
   if (stderr.length) {
@@ -78,9 +76,6 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
     _exec('git', ['config', '--global', 'push.default', 'simple'], {}, logger);
   }
 
-  const gitCredentials = path.join(process.env['HOME'], '.git-credentials');
-  fs.writeFileSync(gitCredentials, `https://${githubToken}@github.com`);
-
   // Run build.
   logger.info('Building...');
   build({ snapshot: true }, logger.createChild('build'));
@@ -98,7 +93,7 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
     const publishLogger = logger.createChild('publish');
     publishLogger.debug('Temporary directory: ' + root);
 
-    const url = `https://github.com/${pkg.snapshotRepo}.git`;
+    const url = `https://${githubToken ? githubToken + '@' : ''}github.com/${pkg.snapshotRepo}.git`;
     _exec('git', ['clone', url], { cwd: root }, publishLogger);
 
     const destPath = path.join(root, path.basename(pkg.snapshotRepo));
@@ -106,8 +101,6 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
 
     if (githubToken) {
       _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
-      _exec('git', ['config', 'credential.helper', `store --file="${gitCredentials}"`],
-          { cwd: destPath }, publishLogger);
     }
 
     // Make sure that every snapshots is unique.
