@@ -32,23 +32,26 @@ function _copy(from: string, to: string) {
 
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
-  logger.debug(`Running command "${JSON.stringify(command)}"...`);
-  const { stdout, stderr, status, error } = spawnSync(command, args, {
-    ...opts,
-  });
+  logger.debug(`Running command ${JSON.stringify(command)} ${
+    args.map(x => JSON.stringify(x)).join(' ')}...`);
+  const { stdout, stderr, status, error } = spawnSync(command, args, { ...opts });
 
-  logger.error(stderr.toString());
+  if (stderr.length) {
+    logger.error(stderr.toString());
+  }
   if (status != 0) {
     logger.fatal(error.message);
     throw error;
   }
-  logger.info(stdout.toString());
+  if (stdout.length) {
+    logger.info(stdout.toString());
+  }
 }
 
 
 export interface SnapshotsOptions {
   force?: boolean;
-  githubTokenFile: string;
+  githubTokenFile?: string;
 }
 
 export default function(opts: SnapshotsOptions, logger: logging.Logger) {
@@ -61,11 +64,12 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-devkit-publish-'));
   const message = execSync(`git log --format="%h %s" -n1`).toString().trim();
 
-  const githubToken = fs.readFileSync(opts.githubTokenFile, 'utf-8');
+  const githubToken = opts.githubTokenFile && fs.readFileSync(opts.githubTokenFile, 'utf-8');
   logger.info('Setting up global git name.');
-  _exec('git', ['config', '--global', 'user.email', 'circleci@angular.io'], {}, logger);
-  _exec('git', ['config', '--global', 'user.name', 'Angular Builds'], {}, logger);
-
+  if (opts.githubTokenFile) {
+    _exec('git', ['config', '--global', 'user.email', 'circleci@angular.io'], {}, logger);
+    _exec('git', ['config', '--global', 'user.name', 'Angular Builds'], {}, logger);
+  }
 
   // Run build.
   logger.info('Building...');
@@ -90,16 +94,21 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
     const destPath = path.join(root, path.basename(pkg.snapshotRepo));
     _copy(pkg.dist, destPath);
 
-    _exec('git', ['config', 'credential.helper', 'store --file=.git/credentials'],
-          { cwd: root }, publishLogger);
-    fs.writeFileSync(path.join(destPath, '.git/credentials'), `https://${githubToken}@github.com`);
+    if (githubToken) {
+      _exec('git', ['config', 'credential.helper', 'store --file=.git/credentials'],
+            { cwd: destPath }, publishLogger);
+      _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
+
+      fs.writeFileSync(path.join(destPath, '.git/credentials'),
+          `https://${githubToken}@github.com`);
+    }
 
     // Make sure that every snapshots is unique.
     fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
 
     // Commit and push.
     _exec('git', ['add', '.'], { cwd: destPath }, publishLogger);
-    _exec('git', ['commit', '-am', message], { cwd: destPath }, publishLogger);
+    _exec('git', ['commit', '-a', '-m', message], { cwd: destPath }, publishLogger);
     _exec('git', ['tag', pkg.snapshotHash], { cwd: destPath }, publishLogger);
     _exec('git', ['push', 'origin'], { cwd: destPath }, publishLogger);
     _exec('git', ['push', '--tags', 'origin'], { cwd: destPath }, publishLogger);
