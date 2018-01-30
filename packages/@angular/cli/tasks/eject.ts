@@ -600,7 +600,6 @@ export default Task.extend({
           'postcss-url',
           'raw-loader',
           'sass-loader',
-          'source-map-loader',
           'istanbul-instrumenter-loader',
           'style-loader',
           'stylus-loader',
