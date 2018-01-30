@@ -106,7 +106,8 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
 
     if (githubToken) {
       _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
-      _exec('git', ['config', 'credential.helper', 'store'], { cwd: destPath }, publishLogger);
+      _exec('git', ['config', 'credential.helper', `store --file="${gitCredentials}"`],
+          { cwd: destPath }, publishLogger);
     }
 
     // Make sure that every snapshots is unique.
