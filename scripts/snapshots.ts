@@ -65,8 +65,12 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-devkit-publish-'));
   const message = execSync(`git log --format="%h %s" -n1`).toString().trim();
 
-  const githubToken = opts.githubToken ||
-                      (opts.githubTokenFile && fs.readFileSync(opts.githubTokenFile, 'utf-8'));
+  const githubToken = (
+    opts.githubToken
+    || (opts.githubTokenFile && fs.readFileSync(opts.githubTokenFile, 'utf-8'))
+    || ''
+  ).trim();
+
   logger.info('Setting up global git name.');
   if (githubToken) {
     _exec('git', ['config', '--global', 'user.email', 'circleci@angular.io'], {}, logger);
