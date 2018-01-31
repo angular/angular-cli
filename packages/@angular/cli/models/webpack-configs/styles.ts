@@ -58,13 +58,25 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       postcssImports({
         resolve: (url: string, context: string) => {
           return new Promise<string>((resolve, reject) => {
+            let hadTilde = false;
             if (url && url.startsWith('~')) {
               url = url.substr(1);
+              hadTilde = true;
             }
-            loader.resolve(context, url, (err: Error, result: string) => {
+            loader.resolve(context, (hadTilde ? '' : './') + url, (err: Error, result: string) => {
               if (err) {
-                reject(err);
-                return;
+                if (hadTilde) {
+                  reject(err);
+                  return;
+                }
+                loader.resolve(context, url, (err: Error, result: string) => {
+                  if (err) {
+                    reject(err);
+                    return;
+                  }
+
+                  resolve(result);
+                });
               }
 
               resolve(result);
