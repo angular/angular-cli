@@ -42,7 +42,7 @@ export class SuppressExtractedTextChunksWebpackPlugin {
       compilation.plugin('html-webpack-plugin-alter-asset-tags',
         (htmlPluginData: any, callback: any) => {
           const filterFn = (tag: any) =>
-            !(tag.tagName === 'script' && tag.attributes.src.match(/\.css$/));
+            !(tag.tagName === 'script' && tag.attributes.src && tag.attributes.src.match(/\.css$/));
           htmlPluginData.head = htmlPluginData.head.filter(filterFn);
           htmlPluginData.body = htmlPluginData.body.filter(filterFn);
           callback(null, htmlPluginData);
