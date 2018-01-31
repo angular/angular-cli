@@ -247,7 +247,7 @@ function requestBlocker() {
 }
 
 // Strip the server address and webpack scheme (webpack://) from error log.
-const initSourcemapReporter: any = function (baseReporterDecorator: any) {
+const initSourcemapReporter: any = function (this: any, baseReporterDecorator: any) {
   baseReporterDecorator(this);
   const urlRegexp = /\(http:\/\/localhost:\d+\/_karma_webpack_\/webpack:\//gi;
 
