@@ -37,6 +37,26 @@ function addDependencies(compilation: any, scripts: string[]): void {
   }
 }
 
+function hook(compiler: any, action: (compilation: any, callback: (err?: Error) => void) => void) {
+  if (compiler.hooks) {
+    // Webpack 4
+    compiler.hooks.thisCompilation.tap('scripts-webpack-plugin', (compilation: any) => {
+      compilation.hooks.additionalAssets.tapAsync(
+        'scripts-webpack-plugin',
+        (callback: (err?: Error) => void) => action(compilation, callback),
+      );
+    });
+  } else {
+    // Webpack 3
+    compiler.plugin('this-compilation', (compilation: any) => {
+      compilation.plugin(
+        'additional-assets',
+        (callback: (err?: Error) => void) => action(compilation, callback),
+      );
+    });
+  }
+}
+
 export class ScriptsWebpackPlugin {
   private _lastBuildTime?: number;
   private _cachedOutput?: ScriptOutput;
@@ -89,71 +109,69 @@ export class ScriptsWebpackPlugin {
       .filter(script => !!script)
       .map(script => path.resolve(this.options.basePath || '', script));
 
-    compiler.plugin('this-compilation', (compilation: any) => {
-      compilation.plugin('additional-assets', (callback: (err?: Error) => void) => {
-        if (this.shouldSkip(compilation, scripts)) {
-          if (this._cachedOutput) {
-            this._insertOutput(compilation, this._cachedOutput, true);
-          }
-
-          addDependencies(compilation, scripts);
-          callback();
-
-          return;
+    hook(compiler, (compilation, callback) => {
+      if (this.shouldSkip(compilation, scripts)) {
+        if (this._cachedOutput) {
+          this._insertOutput(compilation, this._cachedOutput, true);
         }
 
-        const sourceGetters = scripts.map(fullPath => {
-          return new Promise<Source>((resolve, reject) => {
-            compilation.inputFileSystem.readFile(fullPath, (err: Error, data: Buffer) => {
-              if (err) {
-                reject(err);
-                return;
+        addDependencies(compilation, scripts);
+        callback();
+
+        return;
+      }
+
+      const sourceGetters = scripts.map(fullPath => {
+        return new Promise<Source>((resolve, reject) => {
+          compilation.inputFileSystem.readFile(fullPath, (err: Error, data: Buffer) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+
+            const content = data.toString();
+
+            let source;
+            if (this.options.sourceMap) {
+              // TODO: Look for source map file (for '.min' scripts, etc.)
+
+              let adjustedPath = fullPath;
+              if (this.options.basePath) {
+                adjustedPath = path.relative(this.options.basePath, fullPath);
               }
+              source = new OriginalSource(content, adjustedPath);
+            } else {
+              source = new RawSource(content);
+            }
 
-              const content = data.toString();
-
-              let source;
-              if (this.options.sourceMap) {
-                // TODO: Look for source map file (for '.min' scripts, etc.)
-
-                let adjustedPath = fullPath;
-                if (this.options.basePath) {
-                  adjustedPath = path.relative(this.options.basePath, fullPath);
-                }
-                source = new OriginalSource(content, adjustedPath);
-              } else {
-                source = new RawSource(content);
-              }
-
-              resolve(source);
-            });
+            resolve(source);
           });
         });
-
-        Promise.all(sourceGetters)
-          .then(sources => {
-            const concatSource = new ConcatSource();
-            sources.forEach(source => {
-              concatSource.add(source);
-              concatSource.add('\n;');
-            });
-
-            const combinedSource = new CachedSource(concatSource);
-            const filename = interpolateName(
-              { resourcePath: 'scripts.js' } as loader.LoaderContext,
-              this.options.filename,
-              { content: combinedSource.source() },
-            );
-
-            const output = { filename, source: combinedSource };
-            this._insertOutput(compilation, output);
-            this._cachedOutput = output;
-            addDependencies(compilation, scripts);
-
-            callback();
-          })
-          .catch((err: Error) => callback(err));
       });
+
+      Promise.all(sourceGetters)
+        .then(sources => {
+          const concatSource = new ConcatSource();
+          sources.forEach(source => {
+            concatSource.add(source);
+            concatSource.add('\n;');
+          });
+
+          const combinedSource = new CachedSource(concatSource);
+          const filename = interpolateName(
+            { resourcePath: 'scripts.js' } as loader.LoaderContext,
+            this.options.filename,
+            { content: combinedSource.source() },
+          );
+
+          const output = { filename, source: combinedSource };
+          this._insertOutput(compilation, output);
+          this._cachedOutput = output;
+          addDependencies(compilation, scripts);
+
+          callback();
+        })
+        .catch((err: Error) => callback(err));
     });
   }
 }
