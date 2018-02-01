@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-any
+// tslint:disable:no-implicit-dependencies
 import { SchematicEngine } from '@angular-devkit/schematics';
 import { FileSystemEngineHost } from '@angular-devkit/schematics/tools';
 import * as path from 'path';

@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as path from 'path';
 import * as Lint from 'tslint';
 import * as ts from 'typescript';
 
@@ -48,6 +49,9 @@ class Walker extends Lint.RuleWalker {
     }
     // Ignore benchmark files.
     if (sourceFile.fileName.match(/_benchmark.ts$/)) {
+      return;
+    }
+    if (sourceFile.fileName.startsWith(path.join(process.cwd(), 'scripts'))) {
       return;
     }
 

@@ -5,6 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
+import { _throw } from 'rxjs/observable/throw';
+import { mergeMap } from 'rxjs/operators/mergeMap';
+import { Url } from 'url';
 import {
   Collection,
   CollectionDescription,
@@ -16,12 +21,7 @@ import {
   TypedSchematicContext,
   UnknownCollectionException,
   UnregisteredTaskException,
-} from '@angular-devkit/schematics';
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
-import { mergeMap } from 'rxjs/operators/mergeMap';
-import { Url } from 'url';
+} from '../src';
 
 
 export type FallbackCollectionDescription = {

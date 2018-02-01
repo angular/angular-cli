@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { fs } from '@angular-devkit/core/node';
-import { FileSystemTreeHost } from '@angular-devkit/schematics';
 import { existsSync, readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
+import { FileSystemTreeHost } from '../src';
 
 export class FileSystemHost implements FileSystemTreeHost {
   constructor(private _root: string) {}

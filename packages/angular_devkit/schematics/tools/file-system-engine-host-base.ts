@@ -6,6 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException, JsonObject } from '@angular-devkit/core';
+import { dirname, isAbsolute, join, resolve } from 'path';
+import { Observable } from 'rxjs/Observable';
+import { from as observableFrom } from 'rxjs/observable/from';
+import { of as observableOf } from 'rxjs/observable/of';
+import { _throw } from 'rxjs/observable/throw';
+import { mergeMap } from 'rxjs/operators/mergeMap';
+import { Url } from 'url';
 import {
   EngineHost,
   FileSystemCreateTree,
@@ -15,14 +22,7 @@ import {
   TaskExecutorFactory,
   UnknownSchematicException,
   UnregisteredTaskException,
-} from '@angular-devkit/schematics';
-import { dirname, isAbsolute, join, resolve } from 'path';
-import { Observable } from 'rxjs/Observable';
-import { from as observableFrom } from 'rxjs/observable/from';
-import { of as observableOf } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
-import { mergeMap } from 'rxjs/operators/mergeMap';
-import { Url } from 'url';
+} from '../src';
 import {
   FileSystemCollection,
   FileSystemCollectionDesc,

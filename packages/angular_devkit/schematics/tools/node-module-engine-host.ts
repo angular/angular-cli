@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as core from '@angular-devkit/core/node';
-import { RuleFactory } from '@angular-devkit/schematics';
+import { dirname, join, resolve as resolvePath } from 'path';
+import { RuleFactory } from '../src';
 import {
   CollectionCannotBeResolvedException,
   CollectionMissingSchematicsMapException,
   SchematicMissingFieldsException,
-} from '@angular-devkit/schematics/tools';
-import { dirname, join, resolve as resolvePath } from 'path';
+} from '../tools';
 import {
   FileSystemCollectionDesc,
   FileSystemSchematicDesc,

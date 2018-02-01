@@ -10,6 +10,7 @@
     "single-eof-line": true,
 
 
+    "no-implicit-dependencies": true,
     "import-blacklist": [
       true,
       "rxjs"

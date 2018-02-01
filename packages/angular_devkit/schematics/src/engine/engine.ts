@@ -6,11 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException, logging } from '@angular-devkit/core';
-import {
-  CollectionDescription,
-  SchematicDescription,
-  TypedSchematicContext,
- } from '@angular-devkit/schematics';
 import { Observable } from 'rxjs/Observable';
 import { from as observableFrom } from 'rxjs/observable/from';
 import { concatMap } from 'rxjs/operators';
@@ -21,10 +16,13 @@ import { empty } from '../tree/static';
 import { CollectionImpl } from './collection';
 import {
   Collection,
+  CollectionDescription,
   Engine,
   EngineHost,
   Schematic,
+  SchematicDescription,
   Source,
+  TypedSchematicContext,
 } from './interface';
 import { SchematicImpl } from './schematic';
 import {

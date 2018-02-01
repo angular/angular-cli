@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { tags } from '@angular-devkit/core';
-import { SchematicContext, TaskExecutor } from '@angular-devkit/schematics';
 import { SpawnOptions, spawn } from 'child_process';
 import * as path from 'path';
+import { SchematicContext, TaskExecutor } from '../../src';
 import {
   RepositoryInitializerTaskFactoryOptions,
   RepositoryInitializerTaskOptions,

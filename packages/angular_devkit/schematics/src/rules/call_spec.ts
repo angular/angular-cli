@@ -7,6 +7,7 @@
  */
 // tslint:disable:non-null-operator
 // tslint:disable:no-any
+// tslint:disable:no-implicit-dependencies
 import { MergeStrategy } from '@angular-devkit/schematics';
 import { of as observableOf } from 'rxjs/observable/of';
 import { Rule, SchematicContext, Source } from '../engine/interface';

@@ -7,6 +7,7 @@
  */
 // tslint:disable:no-any
 // tslint:disable:non-null-operator
+// tslint:disable:no-implicit-dependencies
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsAsyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';

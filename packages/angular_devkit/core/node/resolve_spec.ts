@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-any
+// tslint:disable-next-line:no-implicit-dependencies
 import { resolve } from '@angular-devkit/core/node';
 import * as path from 'path';
 

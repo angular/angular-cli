@@ -5,17 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  Path,
-  PathFragment,
-  asPosixPath,
-  asWindowsPath,
-  dirname,
-  fragment,
-  join,
-  normalize,
-  virtualFs,
-} from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs/Observable';
 import { empty } from 'rxjs/observable/empty';
@@ -28,6 +17,17 @@ import { map } from 'rxjs/operators/map';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { publish } from 'rxjs/operators/publish';
 import { refCount } from 'rxjs/operators/refCount';
+import {
+  Path,
+  PathFragment,
+  asPosixPath,
+  asWindowsPath,
+  dirname,
+  fragment,
+  join,
+  normalize,
+  virtualFs,
+} from '../src';
 
 
 interface ChokidarWatcher {

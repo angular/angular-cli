@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-'use strict';
-
+// tslint:disable-next-line:no-implicit-dependencies
 import { JsonObject } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import * as crypto from 'crypto';

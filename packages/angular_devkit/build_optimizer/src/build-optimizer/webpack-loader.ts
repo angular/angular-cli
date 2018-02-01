@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
-import * as webpack from 'webpack';
+import * as webpack from 'webpack';  // tslint:disable-line:no-implicit-dependencies
+
 const loaderUtils = require('loader-utils');
 
 import { buildOptimizer } from './build-optimizer';

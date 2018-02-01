@@ -6,6 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging, schema } from '@angular-devkit/core';
+import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
+import { map } from 'rxjs/operators';
 import {
   Collection,
   DelegateTree,
@@ -16,15 +19,12 @@ import {
   Tree,
   VirtualTree,
   formats,
-} from '@angular-devkit/schematics';
+} from '../src';
+import { callRule } from '../src/rules/call';
 import {
   NodeModulesTestEngineHost,
   validateOptionsWithSchema,
-} from '@angular-devkit/schematics/tools';
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from 'rxjs/observable/of';
-import { map } from 'rxjs/operators';
-import { callRule } from '../src/rules/call';
+} from '../tools';
 
 
 export class UnitTestTree extends DelegateTree {

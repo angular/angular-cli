@@ -5,14 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { RuleFactory } from '@angular-devkit/schematics';
+import { existsSync } from 'fs';
+import { join } from 'path';
+import { RuleFactory } from '../src';
 import {
   CollectionCannotBeResolvedException,
   CollectionMissingSchematicsMapException,
   SchematicMissingFieldsException,
-} from '@angular-devkit/schematics/tools';
-import { existsSync } from 'fs';
-import { join } from 'path';
+} from '../tools';
 import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
 import { ExportStringRef } from './export-ref';
 import { FileSystemEngineHostBase } from './file-system-engine-host-base';
