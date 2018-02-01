@@ -1,0 +1,4 @@
+{
+  "tsConfigPath": "./not/so/source/tsconfig.json",
+  "mainPath": "app/main.jit.ts"
+}

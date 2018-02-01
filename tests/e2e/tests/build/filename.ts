@@ -7,7 +7,7 @@ import {copyFile} from '../../utils/fs';
 export default function() {
   return Promise.resolve()
     .then(() => copyFile('src/index.html', 'src/config-index.html'))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['outDir'] = 'config-build-output';
       app['index'] = 'config-index.html';

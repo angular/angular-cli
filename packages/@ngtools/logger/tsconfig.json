@@ -1,25 +1,9 @@
 {
+  "extends": "../../../tsconfig.json",
+
   "compilerOptions": {
-    "declaration": true,
-    "experimentalDecorators": true,
-    "mapRoot": "",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": true,
     "outDir": "../../../dist/@ngtools/logger",
     "rootDir": ".",
-    "lib": ["es2015", "es6", "dom"],
-    "target": "es5",
-    "sourceMap": true,
-    "sourceRoot": "/",
-    "baseUrl": ".",
-    "typeRoots": [
-      "../../node_modules/@types"
-    ],
-    "types": [
-      "jasmine",
-      "node"
-    ]
+    "baseUrl": ""
   }
 }

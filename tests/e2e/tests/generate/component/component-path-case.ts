@@ -1,21 +1,22 @@
 import {join} from 'path';
 import {ng} from '../../../utils/process';
-import {expectFileToExist, createDir} from '../../../utils/fs';
+import {expectFileToExist} from '../../../utils/fs';
 
 
 export default function() {
-  const rootDir = join('src', 'app', 'Upper-Dir');
-  createDir(rootDir);
+  const upperDirs = join('non', 'existing', 'dir');
+  const rootDir = join('src', 'app', upperDirs);
+
   const componentDir = join(rootDir, 'test-component');
   const componentTwoDir = join(rootDir, 'test-component-two');
 
-  return ng('generate', 'component', 'Upper-Dir/test-component')
+  return ng('generate', 'component', `${upperDirs}/test-component`)
     .then(() => expectFileToExist(componentDir))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.ts')))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.spec.ts')))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.html')))
     .then(() => expectFileToExist(join(componentDir, 'test-component.component.css')))
-    .then(() => ng('generate', 'component', 'Upper-Dir/Test-Component-Two'))
+    .then(() => ng('generate', 'component', `${upperDirs}/Test-Component-Two`))
     .then(() => expectFileToExist(join(componentTwoDir, 'test-component-two.component.ts')))
     .then(() => expectFileToExist(join(componentTwoDir, 'test-component-two.component.spec.ts')))
     .then(() => expectFileToExist(join(componentTwoDir, 'test-component-two.component.html')))

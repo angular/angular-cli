@@ -26,7 +26,7 @@ export default function () {
         }
       `})
     .then(() => deleteFile('src/app/app.component.css'))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['styles'] = ['styles.scss'];
     }))

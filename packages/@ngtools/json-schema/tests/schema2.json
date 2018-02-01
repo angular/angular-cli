@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "JsonSchema",
+  "type": "object",
+  "properties": {
+    "a": {
+      "type": "array",
+      "items": {
+        "enum": [ "v1", "v2", "v3" ]
+      }
+    },
+    "b": {
+      "enum": [ "default", "v1", "v2" ],
+      "default": "default"
+    }
+  }
+}

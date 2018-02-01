@@ -1,22 +1,23 @@
-/* eslint-disable no-console */
+#!/usr/bin/env node
 'use strict';
 
 require('../lib/bootstrap-local');
+const glob = require('glob');
 
-var Mocha = require('mocha');
-var glob = require('glob');
-var path = require('path');
+const path = require('path');
+const Jasmine = require('jasmine');
 
-var root = 'tests/{acceptance,models}';
-var specFiles = glob.sync(root + '/**/*.spec.*');
-var mocha = new Mocha({ timeout: 5000, reporter: 'spec' });
+const projectBaseDir = path.join(__dirname, '');
 
-process.env.CLI_ROOT = process.env.CLI_ROOT || path.resolve(__dirname, '..');
+// Create a Jasmine runner and configure it.
+const jasmine = new Jasmine({ projectBaseDir: projectBaseDir });
+jasmine.loadConfig({});
+// Manually set exit code (needed with custom reporters)
+jasmine.onComplete((success) => process.exitCode = !success);
 
-specFiles.forEach(mocha.addFile.bind(mocha));
+// Run the tests.
+const allTests =
+  glob.sync('tests/acceptance/**/*.spec.ts')
+    .map(p => path.relative(projectBaseDir, p));
 
-mocha.run(function (failures) {
-  process.on('exit', function () {
-    process.exit(failures);
-  });
-});
+jasmine.execute(allTests);

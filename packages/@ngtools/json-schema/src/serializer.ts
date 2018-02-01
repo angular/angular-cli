@@ -16,6 +16,7 @@ export abstract class Serializer {
   abstract array(node: SchemaNode): void;
 
   abstract outputOneOf(node: SchemaNode): void;
+  abstract outputEnum(node: SchemaNode): void;
 
   abstract outputString(node: SchemaNode): void;
   abstract outputNumber(node: SchemaNode): void;

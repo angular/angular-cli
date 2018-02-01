@@ -1,33 +1,15 @@
 import {join} from 'path';
-import {isMobileTest} from '../../utils/utils';
+import {readdirSync} from 'fs';
 import {expectFileToExist, expectFileToMatch} from '../../utils/fs';
 import {ng} from '../../utils/process';
 import {expectGitToBeClean} from '../../utils/git';
-
-
-
-function mobileOnlyChecks() {
-  if (!isMobileTest()) {
-    return;
-  }
-
-  // Check for mobile-specific features in prod builds.
-  return Promise.resolve()
-    // Service Worker
-    .then(() => expectFileToExist('dist/sw.js'))
-    .then(() => expectFileToMatch('dist/index.html', /sw-install\.[0-9a-f]{20}\.bundle\.js/))
-
-    // App Manifest
-    .then(() => expectFileToExist('dist/manifest.webapp'))
-    .then(() => expectFileToMatch('dist/index.html',
-                                  '<link rel="manifest" href="/manifest.webapp">'))
-
-    // Icons folder
-    .then(() => expectFileToExist('dist/icons'));
-}
+import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
+  // Skip this in ejected tests.
+  const ejected = getGlobalVariable('argv').eject;
+
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
   return ng('build', '--prod')
@@ -35,8 +17,12 @@ export default function() {
     // Check for cache busting hash script src
     .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
     .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{20}\.bundle\.css/))
-
+    .then(() => expectFileToMatch('dist/3rdpartylicenses.txt', /MIT/))
+    // Defaults to AoT
+    .then(() => {
+      const main = readdirSync('./dist').find(name => !!name.match(/main.[a-z0-9]+\.bundle\.js/));
+      expectFileToMatch(`dist/${main}`, /bootstrapModuleFactory\(/);
+    })
     // Check that the process didn't change local files.
-    .then(() => expectGitToBeClean())
-    .then(() => mobileOnlyChecks());
+    .then(() => !ejected && expectGitToBeClean());
 }

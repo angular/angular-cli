@@ -4,7 +4,7 @@ tmp/
 typings/
 
 # Ignore all blueprint files. We e2e tests those later on.
-packages/angular-cli/blueprints/*/files/
+packages/@angular/cli/blueprints/*/files/
 
 # Ignore ember cli.
-packages/angular-cli/ember-cli/
+packages/@angular/cli/ember-cli/

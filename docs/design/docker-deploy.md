@@ -15,7 +15,7 @@ Provide tasks for common Docker workflows:
 
 1. Requires user to have Docker CLI tools installed.
    (See also: ["Implementation Approaches"](#implementation-approaches))
-1. User is free to use the Angular CLI without Docker (and vice versa). By default, do not generate Docker files upon creation of a new project (`ng new`, `ng init`).
+1. User is free to use the Angular CLI without Docker (and vice versa). By default, do not generate Docker files upon creation of a new project (`ng new`).
 1. Don't recreate the wheel. Docker CLI tools are very full featured on their own. Implement the common Docker use cases that make it convenient for Angular applications.
 1. Don't inhibit users from using the standalone Docker CLI tools for other use cases.
 1. Assumes 1:1 Dockerfile with the Angular project. Support for multiple services under the same project is outside the scope of this initial design.
@@ -97,7 +97,7 @@ If an `env` name is provided, other than "default", generate compose files with 
 
 If `--use-image == false` and the selected machine for the environment is a Docker Swarm machine, warn the user. Docker Swarm clusters cannot use the `build:` option in compose, since the resulting built image will not be distributed to other nodes. Swarm requires using the `image:` option in compose, pushing the image to a registry beforehand so that the Swarm nodes have a place to pull the image from (see [Swarm Limitations](https://docs.docker.com/compose/swarm/#building-images)).
 
-Certain configuration values will be stored in the project's ngConfig `angular-cli.json` for use with other docker commands (ie. deploy, logs, exec). See also: [Saved State](#saved-state) section.
+Certain configuration values will be stored in the project's ngConfig `.angular-cli.json` for use with other docker commands (ie. deploy, logs, exec). See also: [Saved State](#saved-state) section.
 
 Provide instructions on what the user can do after initialization completes (push, deploy).
 
@@ -290,7 +290,7 @@ Example ngConfig model for saved docker command state (per project):
         isImageDeploy: true,
         serviceName: 'ngapp'
       }
-    }    
+    }
   }
 }
 ```

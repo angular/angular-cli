@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 // TODO: move this in its own package.
 import * as path from 'path';
 import * as ts from 'typescript';
@@ -6,13 +7,67 @@ import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
 const MagicString = require('magic-string');
 
 
+/**
+ * Find all nodes from the AST in the subtree of node of SyntaxKind kind.
+ * @param node The root node to check, or null if the whole tree should be searched.
+ * @param sourceFile The source file where the node is.
+ * @param kind The kind of nodes to find.
+ * @param recursive Whether to go in matched nodes to keep matching.
+ * @param max The maximum number of items to return.
+ * @return all nodes of kind, or [] if none is found
+ */
+// TODO: replace this with collectDeepNodes and add limits to collectDeepNodes
+export function findAstNodes<T extends ts.Node>(
+  node: ts.Node | null,
+  sourceFile: ts.SourceFile,
+  kind: ts.SyntaxKind,
+  recursive = false,
+  max = Infinity
+): T[] {
+  // TODO: refactor operations that only need `refactor.findAstNodes()` to use this instead.
+  if (max == 0) {
+    return [];
+  }
+  if (!node) {
+    node = sourceFile;
+  }
+
+  let arr: T[] = [];
+  if (node.kind === kind) {
+    // If we're not recursively looking for children, stop here.
+    if (!recursive) {
+      return [node as T];
+    }
+
+    arr.push(node as T);
+    max--;
+  }
+
+  if (max > 0) {
+    for (const child of node.getChildren(sourceFile)) {
+      findAstNodes(child, sourceFile, kind, recursive, max)
+        .forEach((node: ts.Node) => {
+          if (max > 0) {
+            arr.push(node as T);
+          }
+          max--;
+        });
+
+      if (max <= 0) {
+        break;
+      }
+    }
+  }
+  return arr;
+}
+
 export interface TranspileOutput {
   outputText: string;
   sourceMap: any | null;
 }
 
 
-function resolve(filePath: string, host: ts.CompilerHost, program: ts.Program) {
+function resolve(filePath: string, _host: ts.CompilerHost, program: ts.Program) {
   if (path.isAbsolute(filePath)) {
     return filePath;
   }
@@ -30,24 +85,28 @@ export class TypeScriptFileRefactor {
   private _sourceFile: ts.SourceFile;
   private _sourceString: any;
   private _sourceText: string;
-  private _changed: boolean = false;
+  private _changed = false;
 
   get fileName() { return this._fileName; }
   get sourceFile() { return this._sourceFile; }
   get sourceText() { return this._sourceString.toString(); }
 
   constructor(fileName: string,
-              private _host: ts.CompilerHost,
-              private _program?: ts.Program) {
-    fileName = resolve(fileName, _host, _program).replace(/\\/g, '/');
+              _host: ts.CompilerHost,
+              private _program?: ts.Program,
+              source?: string | null) {
+    fileName = resolve(fileName, _host, _program!).replace(/\\/g, '/');
     this._fileName = fileName;
     if (_program) {
-      this._sourceFile = _program.getSourceFile(fileName);
+      if (source) {
+        this._sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
+      } else {
+        this._sourceFile = _program.getSourceFile(fileName);
+      }
     }
     if (!this._sourceFile) {
-      this._program = null;
-      this._sourceFile = ts.createSourceFile(fileName, _host.readFile(fileName),
-        ts.ScriptTarget.Latest);
+      this._sourceFile = ts.createSourceFile(fileName, source || _host.readFile(fileName),
+        ts.ScriptTarget.Latest, true);
     }
     this._sourceText = this._sourceFile.getFullText(this._sourceFile);
     this._sourceString = new MagicString(this._sourceText);
@@ -56,16 +115,19 @@ export class TypeScriptFileRefactor {
   /**
    * Collates the diagnostic messages for the current source file
    */
-  getDiagnostics(): ts.Diagnostic[] {
+  getDiagnostics(typeCheck = true): ts.Diagnostic[] {
     if (!this._program) {
       return [];
     }
-    let diagnostics: ts.Diagnostic[] = this._program.getSyntacticDiagnostics(this._sourceFile)
-                              .concat(this._program.getSemanticDiagnostics(this._sourceFile));
+    let diagnostics: ts.Diagnostic[] = [];
     // only concat the declaration diagnostics if the tsconfig config sets it to true.
     if (this._program.getCompilerOptions().declaration == true) {
       diagnostics = diagnostics.concat(this._program.getDeclarationDiagnostics(this._sourceFile));
     }
+    diagnostics = diagnostics.concat(
+      this._program.getSyntacticDiagnostics(this._sourceFile),
+      typeCheck ? this._program.getSemanticDiagnostics(this._sourceFile) : []);
+
     return diagnostics;
   }
 
@@ -80,45 +142,23 @@ export class TypeScriptFileRefactor {
   findAstNodes(node: ts.Node | null,
                kind: ts.SyntaxKind,
                recursive = false,
-               max: number = Infinity): ts.Node[] {
-    if (max == 0) {
-      return [];
-    }
-    if (!node) {
-      node = this._sourceFile;
-    }
+               max = Infinity): ts.Node[] {
+    return findAstNodes(node, this._sourceFile, kind, recursive, max);
+  }
 
-    let arr: ts.Node[] = [];
-    if (node.kind === kind) {
-      // If we're not recursively looking for children, stop here.
-      if (!recursive) {
-        return [node];
-      }
-
-      arr.push(node);
-      max--;
-    }
-
-    if (max > 0) {
-      for (const child of node.getChildren(this._sourceFile)) {
-        this.findAstNodes(child, kind, recursive, max)
-          .forEach((node: ts.Node) => {
-            if (max > 0) {
-              arr.push(node);
-            }
-            max--;
-          });
-
-        if (max <= 0) {
-          break;
-        }
-      }
-    }
-    return arr;
+  findFirstAstNode(node: ts.Node | null, kind: ts.SyntaxKind): ts.Node | null {
+    return this.findAstNodes(node, kind, false, 1)[0] || null;
   }
 
   appendAfter(node: ts.Node, text: string): void {
-    this._sourceString.insertRight(node.getEnd(), text);
+    this._sourceString.appendRight(node.getEnd(), text);
+  }
+  append(node: ts.Node, text: string): void {
+    this._sourceString.appendLeft(node.getEnd(), text);
+  }
+
+  prependBefore(node: ts.Node, text: string) {
+    this._sourceString.appendLeft(node.getStart(), text);
   }
 
   insertImport(symbolName: string, modulePath: string): void {
@@ -169,8 +209,8 @@ export class TypeScriptFileRefactor {
     this._changed = true;
   }
 
-  removeNodes(...nodes: ts.Node[]) {
-    nodes.forEach(node => this.removeNode(node));
+  removeNodes(...nodes: Array<ts.Node | null>) {
+    nodes.forEach(node => node && this.removeNode(node));
   }
 
   replaceNode(node: ts.Node, replacement: string) {
@@ -178,7 +218,7 @@ export class TypeScriptFileRefactor {
     this._sourceString.overwrite(node.getStart(this._sourceFile),
                                  node.getEnd(),
                                  replacement,
-                                 replaceSymbolName);
+                                 { storeName: replaceSymbolName });
     this._changed = true;
   }
 

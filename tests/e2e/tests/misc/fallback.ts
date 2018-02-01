@@ -11,21 +11,21 @@ export default function () {
     .then(() => ngServe())
     .then(() => request('http://localhost:4200/'))
     .then(body => {
-      if (!body.match(/<app-root>Loading...<\/app-root>/)) {
+      if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value.');
       }
     })
     .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
     // should correctly fallback to a changed index
     .then(() => moveFile('src/index.html', 'src/not-index.html'))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['index'] = 'not-index.html';
     }))
     .then(() => ngServe())
     .then(() => request('http://localhost:4200/'))
     .then(body => {
-      if (!body.match(/<app-root>Loading...<\/app-root>/)) {
+      if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value.');
       }
     })

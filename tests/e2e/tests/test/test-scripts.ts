@@ -4,6 +4,7 @@ import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { stripIndent } from 'common-tags';
 
+
 export default function () {
   return Promise.resolve()
     .then(() => ng('test', '--watch=false'))
@@ -29,10 +30,11 @@ export default function () {
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(() => {
-            TestBed.configureTestingModule({ declarations: [ AppComponent ] });
-            TestBed.compileComponents();
-          });
+          beforeEach(async(() => {
+            TestBed.configureTestingModule({
+              declarations: [ AppComponent ]
+            }).compileComponents();
+          }));
 
           it('should have access to string-script.js', async(() => {
             let app = TestBed.createComponent(AppComponent).debugElement.componentInstance;
@@ -58,7 +60,7 @@ export default function () {
     }))
     // should fail because the global scripts were not added to scripts array
     .then(() => expectToFail(() => ng('test', '--single-run')))
-    .then(() => updateJsonFile('angular-cli.json', configJson => {
+    .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
       app['scripts'] = [
         'string-script.js',

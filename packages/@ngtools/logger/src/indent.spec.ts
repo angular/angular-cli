@@ -1,12 +1,12 @@
 import {LogEntry, Logger} from './logger';
 import {IndentLogger} from './indent';
+import {toArray} from 'rxjs/operators';
 
 
 describe('IndentSpec', () => {
   it('works', (done: DoneFn) => {
     const logger = new IndentLogger('test');
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([

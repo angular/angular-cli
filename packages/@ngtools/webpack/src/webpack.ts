@@ -1,3 +1,5 @@
+import { Stats } from 'fs';
+
 // Declarations for (some) Webpack types. Only what's needed.
 
 export interface Request {
@@ -23,3 +25,60 @@ export interface ResolverPlugin extends Tapable {
   join(relativePath: string, innerRequest: Request): Request;
 }
 
+export interface LoaderCallback {
+  (err: Error | null, source?: string, sourceMap?: string): void;
+}
+
+export interface ModuleReason {
+  dependency: any;
+  module: NormalModule;
+}
+
+export interface NormalModule {
+  buildTimestamp: number;
+  built: boolean;
+  reasons: ModuleReason[];
+  resource: string;
+}
+
+export interface NormalModuleFactory {
+  plugin(event: string,
+         callback: (data: NormalModuleFactoryRequest, callback: Callback<any>) => void): any;
+}
+
+export interface NormalModuleFactoryRequest {
+  request: string;
+  contextInfo: { issuer: string };
+}
+
+export interface LoaderContext {
+  _module: NormalModule;
+
+  addDependency(path: string): void;
+  async(): LoaderCallback;
+  cacheable(): void;
+
+  readonly resourcePath: string;
+  readonly query: any;
+}
+
+export interface InputFileSystem {
+  stat(path: string, callback: Callback<any>): void;
+  readdir(path: string, callback: Callback<any>): void;
+  readFile(path: string, callback: Callback<any>): void;
+  readJson(path: string, callback: Callback<any>): void;
+  readlink(path: string, callback: Callback<any>): void;
+  statSync(path: string): Stats;
+  readdirSync(path: string): string[];
+  readFileSync(path: string): string;
+  readJsonSync(path: string): string;
+  readlinkSync(path: string): string;
+  purge(changes?: string[] | string): void;
+}
+
+export interface NodeWatchFileSystemInterface {
+  inputFileSystem: InputFileSystem;
+  new(inputFileSystem: InputFileSystem): NodeWatchFileSystemInterface;
+  watch(files: any, dirs: any, missing: any, startTime: any, options: any, callback: any,
+    callbackUndelayed: any): any;
+}

@@ -29,7 +29,7 @@ export class Logger extends Observable<LogEntry> {
   protected _metadata: LoggerMetadata;
 
   private _obs: Observable<LogEntry>;
-  private _subscription: Subscription;
+  private _subscription: Subscription | null;
 
   protected get _observable() { return this._obs; }
   protected set _observable(v: Observable<LogEntry>) {
@@ -39,11 +39,17 @@ export class Logger extends Observable<LogEntry> {
     this._obs = v;
     if (this.parent) {
       this._subscription = this.subscribe((value: LogEntry) => {
-        this.parent._subject.next(value);
+        if (this.parent) {
+          this.parent._subject.next(value);
+        }
       }, (error: any) => {
-        this.parent._subject.error(error);
+        if (this.parent) {
+          this.parent._subject.error(error);
+        }
       }, () => {
-        this._subscription.unsubscribe();
+        if (this._subscription) {
+          this._subscription.unsubscribe();
+        }
         this._subscription = null;
       });
     }
@@ -60,9 +66,9 @@ export class Logger extends Observable<LogEntry> {
     }
     this._metadata = { name, path };
     this._observable = this._subject.asObservable();
-    if (parent) {
+    if (this.parent) {
       // When the parent completes, complete us as well.
-      this.parent._subject.subscribe(null, null, () => this.complete());
+      this.parent._subject.subscribe(undefined, undefined, () => this.complete());
     }
   }
 
@@ -97,7 +103,7 @@ export class Logger extends Observable<LogEntry> {
     return `<Logger(${this.name})>`;
   }
 
-  lift(operator: Operator<LogEntry, LogEntry>): Observable<LogEntry> {
+  lift<R>(operator: Operator<LogEntry, R>): Observable<R> {
     return this._observable.lift(operator);
   }
 
@@ -105,9 +111,9 @@ export class Logger extends Observable<LogEntry> {
   subscribe(observer: PartialObserver<LogEntry>): Subscription;
   subscribe(next?: (value: LogEntry) => void, error?: (error: any) => void,
             complete?: () => void): Subscription;
-  subscribe(observerOrNext?: PartialObserver<LogEntry> | ((value: LogEntry) => void),
-            error?: (error: any) => void,
-            complete?: () => void): Subscription {
+  subscribe(_observerOrNext?: PartialObserver<LogEntry> | ((value: LogEntry) => void),
+            _error?: (error: any) => void,
+            _complete?: () => void): Subscription {
     return this._observable.subscribe.apply(this._observable, arguments);
   }
   forEach(next: (value: LogEntry) => void, PromiseCtor?: typeof Promise): Promise<void> {

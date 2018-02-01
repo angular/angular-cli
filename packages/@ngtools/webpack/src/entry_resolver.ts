@@ -1,3 +1,4 @@
+// @ignoreDep typescript
 import * as fs from 'fs';
 import {join} from 'path';
 import * as ts from 'typescript';
@@ -12,7 +13,7 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
   // Check this file.
   const hasSymbol = refactor.findAstNodes(null, ts.SyntaxKind.ClassDeclaration)
     .some((cd: ts.ClassDeclaration) => {
-      return cd.name && cd.name.text == symbolName;
+      return cd.name != undefined && cd.name.text == symbolName;
     });
   if (hasSymbol) {
     return refactor.fileName;
@@ -64,7 +65,7 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
         const source = new TypeScriptFileRefactor(module, host, program);
         const hasSymbol = source.findAstNodes(null, ts.SyntaxKind.ClassDeclaration)
           .some((cd: ts.ClassDeclaration) => {
-            return cd.name && cd.name.text == symbolName;
+            return cd.name != undefined && cd.name.text == symbolName;
           });
 
         if (hasSymbol) {
@@ -97,17 +98,19 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
       (decl.moduleSpecifier as ts.StringLiteral).text,
       refactor.fileName, program.getCompilerOptions(), host);
     if (!resolvedModule.resolvedModule || !resolvedModule.resolvedModule.resolvedFileName) {
-      return null;
+      continue;
     }
 
     const module = resolvedModule.resolvedModule.resolvedFileName;
-    if (decl.importClause.namedBindings.kind == ts.SyntaxKind.NamespaceImport) {
+    if (decl.importClause.namedBindings
+        && decl.importClause.namedBindings.kind == ts.SyntaxKind.NamespaceImport) {
       const binding = decl.importClause.namedBindings as ts.NamespaceImport;
       if (binding.name.text == symbolName) {
         // This is a default export.
         return module;
       }
-    } else if (decl.importClause.namedBindings.kind == ts.SyntaxKind.NamedImports) {
+    } else if (decl.importClause.namedBindings
+               && decl.importClause.namedBindings.kind == ts.SyntaxKind.NamedImports) {
       const binding = decl.importClause.namedBindings as ts.NamedImports;
       for (const specifier of binding.elements) {
         if (specifier.name.text == symbolName) {
@@ -127,7 +130,7 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
 
 export function resolveEntryModuleFromMain(mainPath: string,
                                            host: ts.CompilerHost,
-                                           program: ts.Program) {
+                                           program: ts.Program): string | null {
   const source = new TypeScriptFileRefactor(mainPath, host, program);
 
   const bootstrap = source.findAstNodes(source.sourceFile, ts.SyntaxKind.CallExpression, true)
@@ -143,9 +146,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
     .filter(node => node.kind == ts.SyntaxKind.Identifier);
 
   if (bootstrap.length != 1) {
-    throw new Error('Tried to find bootstrap code, but could not. Specify either '
-      + 'statically analyzable bootstrap code or pass in an entryModule '
-      + 'to the plugins options.');
+    return null;
   }
   const bootstrapSymbolName = bootstrap[0].text;
   const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);

@@ -1,23 +1,40 @@
-> Please provide us with the following information:
-> ---------------------------------------------------------------
+<!--
+We will close this issue if you don't provide the needed information.
+For feature requests, delete the form below and describe the requirements and use case.
+-->
 
-### OS?
-> Windows 7, 8 or 10. Linux (which distribution). Mac OSX (Yosemite? El Capitan?)
+### Versions
+```
+<!--
+Output from: `ng --version`.
+If nothing, output from: `node --version` and `npm --version`.
+  Windows (7/8/10). Linux (incl. distribution). macOS (El Capitan? Sierra?)
+-->
+```
+
+### Repro steps
+<!--
+Simple steps to reproduce this bug.
+Please include: commands run, packages added, related code changes.
+A link to a sample repo would help too.
+-->
+* Step 1
+* Step 2
+* Step 3
 
 
-### Versions.
-> Please run `ng --version`. If there's nothing outputted, please run in a Terminal: `node --version` and paste the result here:
+### Observed behavior
+```
+<!-- Normally this includes a stack trace and some more information. -->
+```
+
+### Desired behavior
+<!--
+What would like to see implemented?
+What is the usecase?
+What did you expect to see?
+-->
 
 
-### Repro steps.
-> Was this an app that wasn't created using the CLI? What change did you do on your code? etc.
+### Mention any other details that might be useful (optional)
 
-
-### The log given by the failure.
-> Normally this include a stack trace and some more information.
-
-
-### Mention any other details that might be useful.
-
-> ---------------------------------------------------------------
-> Thanks! We'll be in touch soon.

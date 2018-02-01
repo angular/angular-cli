@@ -8,7 +8,7 @@ export function gitClean() {
     .then(() => {
       // Checkout missing files
       return silentGit('status', '--porcelain')
-        .then(output => output
+        .then(({ stdout }) => stdout
           .split(/[\n\r]+/g)
           .filter(line => line.match(/^ D/))
           .map(line => line.replace(/^\s*\S+\s+/, '')))
@@ -19,8 +19,8 @@ export function gitClean() {
 
 export function expectGitToBeClean() {
   return git('status', '--porcelain')
-    .then(output => {
-      if (output != '') {
+    .then(({ stdout }) => {
+      if (stdout != '') {
         throw new Error('Git repo is not clean...');
       }
     });
@@ -29,8 +29,8 @@ export function expectGitToBeClean() {
 export function gitCommit(message: string) {
   return git('add', '-A')
     .then(() => git('status', '--porcelain'))
-    .then(output => {
-      if (output != '') {
+    .then(({ stdout }) => {
+      if (stdout != '') {
         return git('commit', '-am', message);
       }
     });

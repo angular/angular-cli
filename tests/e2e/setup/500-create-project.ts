@@ -1,13 +1,22 @@
 import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
-import {isMobileTest} from '../utils/utils';
-import {expectFileToExist} from '../utils/fs';
-import {updateTsConfig, updateJsonFile} from '../utils/project';
+import {expectFileToExist, replaceInFile} from '../utils/fs';
+import {
+  updateTsConfig,
+  updateJsonFile,
+  useNg2,
+  useNg4,
+  useSha,
+  useCIChrome,
+  useCIDefaults,
+  useBuiltPackages,
+  useDevKit,
+} from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';
 
 
-let packages = require('../../../lib/packages');
+let packages = require('../../../lib/packages').packages;
 
 
 export default function() {
@@ -25,41 +34,21 @@ export default function() {
   } else {
     // Otherwise create a project from scratch.
     createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--skip-npm', isMobileTest() ? '--mobile' : undefined))
+      .then(() => ng('new', 'test-project', '--skip-install'))
       .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
       .then(() => process.chdir('./test-project'));
   }
 
   return Promise.resolve()
     .then(() => createProject)
-    .then(() => updateJsonFile('package.json', json => {
-      Object.keys(packages).forEach(pkgName => {
-        json['dependencies'][pkgName] = packages[pkgName].dist;
-      });
-    }))
-    .then(() => {
-      if (argv.nightly || argv['ng-sha']) {
-        const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
-        return updateJsonFile('package.json', json => {
-          // Install over the project with nightly builds.
-          Object.keys(json['dependencies'] || {})
-            .filter(name => name.match(/^@angular\//))
-            .forEach(name => {
-              const pkgName = name.split(/\//)[1];
-              json['dependencies'][`@angular/${pkgName}`]
-                = `github:angular/${pkgName}-builds${label}`;
-            });
-
-          Object.keys(json['devDependencies'] || {})
-            .filter(name => name.match(/^@angular\//))
-            .forEach(name => {
-              const pkgName = name.split(/\//)[1];
-              json['devDependencies'][`@angular/${pkgName}`]
-                = `github:angular/${pkgName}-builds${label}`;
-            });
-        });
-      }
-    })
+    .then(() => useBuiltPackages())
+    .then(() => argv.devkit && useDevKit(argv.devkit))
+    .then(() => useCIChrome())
+    .then(() => useCIDefaults())
+    .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
+    .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
+    .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
+    // npm link on Circle CI is very noisy.
     .then(() => silentNpm('install'))
     // Force sourcemaps to be from the root of the filesystem.
     .then(() => updateTsConfig(json => {
