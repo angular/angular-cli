@@ -107,15 +107,21 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
   };
 
   return (root) => {
+    const urlDeclarations: Array<postcss.Declaration> = [];
+    root.walkDecls(decl => {
+      if (decl.value && decl.value.includes('url')) {
+        urlDeclarations.push(decl);
+      }
+    });
+
+    if (urlDeclarations.length === 0) {
+      return;
+    }
+
     const resourceCache = new Map<string, string>();
 
-    return root.walkDecls(async decl => {
+    return Promise.all(urlDeclarations.map(async decl => {
       const value = decl.value;
-
-      if (!value || value.indexOf('url') === -1) {
-        return;
-      }
-
       const urlRegex = /url\(\s*['"]?([ \S]+?)['"]??\s*\)/g;
       const segments: string[] = [];
 
@@ -149,6 +155,6 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       if (modified) {
         decl.value = segments.join('');
       }
-    });
+    }));
   };
 });
