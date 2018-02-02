@@ -1,0 +1,18 @@
+--- node_modules/rxjs/src/observable/dom/AjaxObservable.ts	2017-12-21 16:48:41.000000000 -0500
++++ node_modules/rxjs/src/observable/dom/AjaxObservable.ts	2018-02-20 11:00:21.000000000 -0500
+@@ -462,13 +462,13 @@
+           //IE does not support json as responseType, parse it internally
+           return xhr.responseType ? xhr.response : JSON.parse(xhr.response || xhr.responseText || 'null');
+         } else {
+-          return JSON.parse(xhr.responseText || 'null');
++          return JSON.parse((xhr as any).responseText || 'null');
+         }
+       case 'xml':
+         return xhr.responseXML;
+       case 'text':
+       default:
+-        return  ('response' in xhr) ? xhr.response : xhr.responseText;
++        return  ('response' in xhr) ? xhr.response : (xhr as any).responseText;
+   }
+ }
+

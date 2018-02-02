@@ -32,6 +32,7 @@
     "integration:build-optimizer": "npm run integration:build-optimizer:simple && npm run integration:build-optimizer:aio",
     "integration:build-optimizer:simple": "cd tests/@angular_devkit/build_optimizer/webpack/simple-app && npm i -q && npm run reinstall-bo && npm run e2e && npm run benchmark",
     "integration:build-optimizer:aio": "cd tests/@angular_devkit/build_optimizer/webpack/aio-app && npm i -q && npm run reinstall-bo && npm run e2e && npm run benchmark",
+    "postinstall": "npm run admin -- patch-dependencies",
     "prepush": "node ./bin/devkit-admin hooks/pre-push"
   },
   "repository": {
@@ -131,9 +132,9 @@
     "tar": "^3.1.5",
     "temp": "^0.8.3",
     "tree-kill": "^1.2.0",
-    "ts-node": "^4.1.0",
-    "tslint": "^5.5.0",
-    "typescript": "~2.6.1",
+    "ts-node": "^5.0.0",
+    "tslint": "^5.9.1",
+    "typescript": "~2.7.2",
     "uglifyjs-webpack-plugin": "^1.1.6",
     "url-loader": "^0.6.2",
     "webpack": "^3.10.0",
