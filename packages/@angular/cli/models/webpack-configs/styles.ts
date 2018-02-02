@@ -72,14 +72,13 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
                 loader.resolve(context, url, (err: Error, result: string) => {
                   if (err) {
                     reject(err);
-                    return;
+                  } else {
+                    resolve(result);
                   }
-
-                  resolve(result);
                 });
+              } else {
+                resolve(result);
               }
-
-              resolve(result);
             });
           });
         },
