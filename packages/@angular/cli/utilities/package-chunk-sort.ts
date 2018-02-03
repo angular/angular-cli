@@ -23,11 +23,11 @@ export function packageChunkSort(appConfig: any) {
 
   function sort(left: any, right: any) {
     let leftIndex = entryPoints.indexOf(left.names[0]);
-    let rightindex = entryPoints.indexOf(right.names[0]);
+    let rightIndex = entryPoints.indexOf(right.names[0]);
 
-    if (leftIndex > rightindex) {
+    if (leftIndex > rightIndex) {
       return 1;
-    } else if (leftIndex < rightindex) {
+    } else if (leftIndex < rightIndex) {
       return -1;
     } else {
       return 0;
