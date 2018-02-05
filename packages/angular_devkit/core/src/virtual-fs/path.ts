@@ -55,7 +55,12 @@ export const NormalizedRoot = NormalizedSep as Path;
  * @returns {Path[]} An array of path fragments.
  */
 export function split(path: Path): PathFragment[] {
-  return path.split(NormalizedSep).map(x => fragment(x));
+  const fragments = path.split(NormalizedSep).map(x => fragment(x));
+  if (fragments[fragments.length - 1].length === 0) {
+    fragments.pop();
+  }
+
+  return fragments;
 }
 
 /**
@@ -89,12 +94,14 @@ export function basename(path: Path): PathFragment {
  * Return the dirname of the path, as a Path. See path.dirname
  */
 export function dirname(path: Path): Path {
-  const i = path.lastIndexOf(NormalizedSep);
-  if (i == -1) {
+  const index = path.lastIndexOf(NormalizedSep);
+  if (index === -1) {
     return '' as Path;
-  } else {
-    return normalize(path.substr(0, i));
   }
+
+  const endIndex = index === 0 ? 1 : index; // case of file under root: '/file'
+
+  return normalize(path.substr(0, endIndex));
 }
 
 

@@ -107,6 +107,7 @@ describe('SimpleMemoryHost', () => {
 
     expect(host.isFile(normalize('/sub'))).toBe(false);
     expect(host.isFile(normalize('/sub1'))).toBe(false);
+    expect(host.isDirectory(normalize('/'))).toBe(true);
     expect(host.isDirectory(normalize('/sub'))).toBe(true);
     expect(host.isDirectory(normalize('/sub/sub1'))).toBe(true);
     expect(host.isDirectory(normalize('/sub/file1'))).toBe(false);

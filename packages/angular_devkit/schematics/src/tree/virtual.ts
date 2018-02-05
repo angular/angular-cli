@@ -49,15 +49,27 @@ export class VirtualDirEntry implements DirEntry {
     return this._path == '/' ? null : this._tree.getDir(dirname(this._path));
   }
   get path() { return this._path; }
+
   get subdirs() {
-    return this._tree.files
-               .filter(path => path.startsWith(this._path) && dirname(path) != this._path)
-               .map(path => basename(path));
+    const directChildPartsCount = split(normalize(this._path)).length + 1;
+
+    const directories = this._tree.files
+    // make sure entries belong to proper subbranch
+    .filter(path => path.startsWith(this._path))
+    // get all existing directories & prune to direct children
+    .map(path => split(normalize(path)).slice(0, -1).slice(0, directChildPartsCount))
+    // exclude current directory
+    .filter(parts => parts.length === directChildPartsCount)
+    // get directory name only
+    .map(parts => parts[parts.length - 1]);
+
+    // make sure to have a unique set (directories contain multiple files so appear multiple times)
+    return Array.from(new Set(directories));
   }
   get subfiles() {
     return this._tree.files
-               .filter(path => path.startsWith(this._path) && dirname(path) == this._path)
-               .map(path => basename(path));
+      .filter(path => dirname(path) === this._path)
+      .map(path => basename(path));
   }
 
   dir(name: PathFragment) {

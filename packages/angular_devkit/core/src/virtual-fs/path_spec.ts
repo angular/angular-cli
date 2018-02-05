@@ -85,6 +85,9 @@ describe('path', () => {
       ['a', ['a']],
       ['/a/b', ['', 'a', 'b']],
       ['a/b', ['a', 'b']],
+      ['a/b/', ['a', 'b']],
+      ['', []],
+      ['/', ['']],
     ];
 
     for (const goldens of tests) {
@@ -142,6 +145,7 @@ describe('path', () => {
 
   it('dirname', () => {
     expect(dirname(normalize('a'))).toBe('');
+    expect(dirname(normalize('/a'))).toBe('/');
     expect(dirname(normalize('/a/b/c'))).toBe('/a/b');
     expect(dirname(normalize('./c'))).toBe('');
     expect(dirname(normalize('./a/b/c'))).toBe('a/b');

@@ -41,6 +41,10 @@ export class SimpleMemoryHost implements Host<{}> {
   private _watchers = new Map<Path, [HostWatchOptions, Subject<HostWatchEvent>][]>();
 
   protected _isDir(path: Path) {
+    if (path === '/') {
+      return true;
+    }
+
     for (const p of this._cache.keys()) {
       if (p.startsWith(path + NormalizedSep)) {
         return true;
