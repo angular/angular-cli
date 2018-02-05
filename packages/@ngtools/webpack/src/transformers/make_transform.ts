@@ -101,9 +101,10 @@ export function makeTransform(
  * This is a version of `ts.visitEachChild` that works that calls our version
  * of `updateSourceFileNode`, so that typescript doesn't lose type information
  * for property decorators.
- * See https://github.com/Microsoft/TypeScript/issues/17384 and
- * https://github.com/Microsoft/TypeScript/issues/17551, fixed by
- * https://github.com/Microsoft/TypeScript/pull/18051 and released on TS 2.5.0.
+ * See https://github.com/Microsoft/TypeScript/issues/17384 (fixed by
+ * https://github.com/Microsoft/TypeScript/pull/20314 and released in TS 2.7.0) and
+ * https://github.com/Microsoft/TypeScript/issues/17551 (fixed by
+ * https://github.com/Microsoft/TypeScript/pull/18051 and released on TS 2.5.0).
  *
  * @param sf
  * @param statements
