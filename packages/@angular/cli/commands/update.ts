@@ -16,6 +16,12 @@ const UpdateCommand = Command.extend({
       default: false,
       aliases: ['d'],
       description: 'Run through without making any changes.'
+    },
+    {
+      name: 'next',
+      type: Boolean,
+      default: false,
+      description: 'Install the next version, instead of the latest.'
     }
   ],
 
