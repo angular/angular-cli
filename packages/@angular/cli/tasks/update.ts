@@ -4,6 +4,7 @@ import SchematicRunTask from './schematic-run';
 export interface UpdateTaskOptions {
   dryRun: boolean;
   force: boolean;
+  next: boolean;
 }
 
 export const UpdateTask: any = Task.extend({
@@ -17,7 +18,8 @@ export const UpdateTask: any = Task.extend({
 
     const schematicRunOptions = {
       taskOptions: {
-        dryRun: options.dryRun
+        dryRun: options.dryRun,
+        version: options.next ? 'next' : undefined
       },
       workingDir: this.project.root,
       collectionName,
