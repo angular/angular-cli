@@ -263,6 +263,14 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "lazyModules": {
+            "description": "List of additional NgModule files that will be lazy loaded. (lazy router modules with be discovered automatically)",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
         "additionalProperties": false
