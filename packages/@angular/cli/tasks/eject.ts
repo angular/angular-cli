@@ -307,7 +307,11 @@ class JsonWebpackSerializer {
   private _entryReplacer(value: any) {
     const newValue = Object.assign({}, value);
     for (const key of Object.keys(newValue)) {
-      newValue[key] = newValue[key].map((l: string) => this._path(l));
+      if (Array.isArray(newValue[key])) {
+        newValue[key] = newValue[key].map((l: string) => this._path(l));
+      } else {
+        newValue[key] = this._path(newValue[key]);
+      }
     }
     return newValue;
   }

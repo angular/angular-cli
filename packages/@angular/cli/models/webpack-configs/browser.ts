@@ -80,8 +80,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   return {
     resolve: {
       mainFields: [
+        'module',
         ...(wco.supportES2015 ? ['es2015'] : []),
-        'browser', 'module', 'main'
+        'browser',
+        'main'
       ]
     },
     output: {
@@ -108,16 +110,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         name: 'inline'
       })
     ].concat(extraPlugins),
-    node: {
-      fs: 'empty',
-      global: true,
-      crypto: 'empty',
-      tls: 'empty',
-      net: 'empty',
-      process: true,
-      module: false,
-      clearImmediate: false,
-      setImmediate: false
-    }
+    node: false
   };
 }
