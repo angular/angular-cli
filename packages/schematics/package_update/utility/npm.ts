@@ -13,6 +13,7 @@ import {
   Tree,
   chain,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as http from 'http';
 import { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
@@ -264,6 +265,9 @@ export function updatePackageJson(
       tree.overwrite('/package.json', JSON.stringify(packageJson, null, 2) + '\n');
 
       return tree;
+    },
+    (_tree: Tree, context: SchematicContext) => {
+      context.addTask(new NodePackageInstallTask());
     },
   ]);
 }
