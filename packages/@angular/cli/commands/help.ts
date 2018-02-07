@@ -1,6 +1,8 @@
+import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 
+const { cyan } = chalk;
 const Command = require('../ember-cli/lib/models/command');
 const stringUtils = require('ember-cli-string-utils');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
@@ -10,19 +12,11 @@ const HelpCommand = Command.extend({
   description: 'Shows help for the CLI.',
   works: 'everywhere',
 
-  availableOptions: [
-    {
-      name: 'short',
-      type: Boolean,
-      default: false,
-      aliases: ['s'],
-      description: 'Display command name and description only.'
-    },
-  ],
+  availableOptions: [],
 
-  anonymousOptions: ['command-name (Default: all)'],
+  anonymousOptions: [],
 
-  run: function (commandOptions: any, rawArgs: any) {
+  run: function (_commandOptions: any, _rawArgs: any) {
     let commandFiles = fs.readdirSync(__dirname)
       // Remove files that are not JavaScript or Typescript
       .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
@@ -38,54 +32,26 @@ const HelpCommand = Command.extend({
       return acc;
     }, {});
 
-    if (rawArgs.indexOf('all') !== -1) {
-      rawArgs = []; // just act as if command not specified
-    }
+    const commands = commandFiles
+      .map(commandFile => {
+        const Command = lookupCommand(commandMap, commandFile);
 
-    commandFiles.forEach(cmd => {
-      const Command = lookupCommand(commandMap, cmd);
+        const cmd = new Command({
+          ui: this.ui,
+          project: this.project,
+          commands: this.commands,
+          tasks: this.tasks
+        });
 
-      const command = new Command({
-        ui: this.ui,
-        project: this.project,
-        commands: this.commands,
-        tasks: this.tasks
-      });
-
-      if (command.hidden || command.unknown) {
-        return;
-      }
-
-      if (rawArgs.length > 0) {
-        let commandInput = rawArgs[0];
-        const aliases = Command.prototype.aliases;
-        if (aliases && aliases.indexOf(commandInput) > -1) {
-          commandInput = Command.prototype.name;
-        }
-
-        if (cmd === commandInput) {
-          if (commandOptions.short) {
-            this.ui.writeLine(command.printShortHelp(commandOptions));
-          } else if (command.printDetailedHelp(commandOptions, rawArgs)) {
-            const result = command.printDetailedHelp(commandOptions, rawArgs);
-            if (result instanceof Promise) {
-              result.then(r => this.ui.writeLine(r));
-            } else {
-              this.ui.writeLine(result);
-            }
-          } else {
-            this.ui.writeLine(command.printBasicHelp(commandOptions));
-          }
-        }
-      } else {
-        if (commandOptions.short) {
-          this.ui.writeLine(command.printShortHelp(commandOptions));
-        } else {
-          this.ui.writeLine(command.printBasicHelp(commandOptions));
-        }
-      }
-
+        return cmd;
+      })
+      .filter(cmd => !cmd.hidden && !cmd.unknown)
+      .map(cmd => ({ name: cmd.name, description: cmd.description }));
+    this.ui.writeLine(`Available Commands:`);
+    commands.forEach(cmd => {
+      this.ui.writeLine(`  ${cyan(cmd.name)} ${cmd.description}`);
     });
+    this.ui.writeLine(`\nFor more detailed help run "ng [command name] --help"`);
   }
 });
 
