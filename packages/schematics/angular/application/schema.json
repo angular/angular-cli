@@ -83,7 +83,8 @@
     "linkCli": {
       "description": "Link CLI to global version (internal development only).",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "visible": false
     },
     "skipGit": {
       "description": "Skip initializing a git repository.",
