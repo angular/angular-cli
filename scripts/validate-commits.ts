@@ -99,6 +99,17 @@ export default function (_: {}, logger: logging.Logger) {
         }
         break;
 
+      case 'release':
+        if (scope) {
+          _invalid(sha, message, 'should not have a scope');
+          continue;
+        }
+        if (commits.length > 1) {
+          _invalid(sha, message, 'release should always be alone in a PR');
+          continue;
+        }
+        break;
+
       // Unknown types.
       default:
         _invalid(sha, message, 'has an unknown type');
