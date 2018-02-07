@@ -100,15 +100,40 @@ jobs:
           command: |
             npm run admin -- snapshots --verbose --githubTokenFile=${HOME}/github_token
 
+  publish:
+    <<: *defaults
+    steps:
+      - checkout:
+          <<: *post_checkout
+      - restore_cache:
+          key: angular_devkit-{{ checksum "package-lock.json" }}
+
+      - run: npm install --no-save
+      - run:
+          name: Decrypt Credentials
+          command: |
+            openssl aes-256-cbc -d -in .circleci/npm_token -k "${KEY}" -out ~/.npmrc
+      - run:
+          name: Deployment to NPM
+          command: |
+            npm run admin -- publish --verbose
+
 workflows:
   version: 2
   default_workflow:
     jobs:
       - lint
       - validate
-      - build
-      - test
-      - integration
+      - build:
+          requires:
+            - lint
+            - validate
+      - test:
+          requires:
+            - build
+      - integration:
+          requires:
+            - build
       - snapshot_publish:
           requires:
             - test
@@ -116,3 +141,14 @@ workflows:
           filters:
             branches:
               only: master
+      - publish:
+          requires:
+            - test
+            - build
+            - integration
+            - snapshot_publish
+          filters:
+            tags:
+              only: /^v\d+/
+            branches:
+              ignore: /.*/
