@@ -45,6 +45,22 @@
       "version": "0.4.0",
       "hash": "b1f9f2d8e1eca2a865d39263f0ca5a38"
     },
+    "@angular-devkit/architect": {
+      "name": "Build Facade",
+      "links": [
+        {
+          "label": "README",
+          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/architect/README.md"
+        }
+      ],
+      "version": "0.0.1",
+      "hash": ""
+    },
+    "@angular-devkit/architect-cli": {
+      "name": "Architect CLI",
+      "version": "0.0.1",
+      "hash": ""
+    },
     "@angular-devkit/build-optimizer": {
       "name": "Build Optimizer",
       "links": [

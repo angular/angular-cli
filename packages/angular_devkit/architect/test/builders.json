@@ -1,0 +1,10 @@
+{
+  "$schema": "../src/builders-schema.json",
+  "builders": {
+    "browser": {
+      "class": "./browser",
+      "schema": "./browser/schema.json",
+      "description": "Build a browser app."
+    }
+  }
+}

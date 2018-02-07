@@ -1,0 +1,92 @@
+{
+  "$schema": "../../../packages/angular_devkit/architect/src/workspace-schema.json",
+  "name": "pet-finder",
+  "version": 1,
+  "root": "src",
+  "defaultProject": "myApp",
+  "projects": {
+    "myApp": {
+      "projectType": "application",
+      "root": "src/my-app",
+      "defaultTarget": "browser",
+      "targets": {
+        "browser": {
+          "builder": "@angular-devkit/build-webpack:browser",
+          "options": {
+            "tsConfigPath": "tsconfig.app.json",
+            "outputPath": "dist",
+            "indexPath": "index.html",
+            "entryPoints": {
+              "main": "main.ts",
+              "polyfills": "polyfills.ts"
+            }
+          },
+          "configurations": {
+            "production": {
+              "optimizationLevel": 1
+            }
+          }
+        },
+        "devServer": {
+          "builder": "@angular-devkit/build-webpack:devServer",
+          "options": {
+            "browserTarget": "myApp:browser"
+          }
+        },
+        "extractI18n": {
+          "builder": "@angular-devkit/build-webpack:extractI18n",
+          "options": {
+            "browserTarget": "myApp:browser"
+          }
+        },
+        "karma": {
+          "builder": "@angular-devkit/build-webpack:karma",
+          "options": {
+            "tsConfigPath": "tsconfig.app.json",
+            "karmaConfigPath": "karma.conf.js",
+            "entryPoints": {
+              "main": "main.ts",
+              "polyfills": "polyfills.ts"
+            }
+          }
+        },
+        "tslint": {
+          "builder": "@angular-devkit/build-webpack:tslint",
+          "options": {
+            "tsConfigPath": "tsconfig.app.json"
+          }
+        }
+      }
+    },
+    "myLibrary": {
+      "projectType": "library",
+      "root": "./src/library",
+      "targets": {
+        "nodeModule": {
+          "builder": "@angular-devkit/build-ng-packagr:nodeModule",
+          "options": {
+            "tsConfigPath": "tsconfig.json",
+            "packageJsonPath": "package.json",
+            "entryPoints": {
+              "index": "index.ts"
+            }
+          }
+        }
+      }
+    },
+    "e2e": {
+      "projectType": "application",
+      "root": "./e2e",
+      "defaultTarget": "browser",
+      "targets": {
+        "browser": {
+          "builder": "@angular-devkit/build-webpack:protractor",
+          "options": {
+            "protractorConfigPath": "protractor.conf.js",
+            "devServerTarget": "myApp:browser"
+          }
+        }
+      }
+    }
+  }
+}
