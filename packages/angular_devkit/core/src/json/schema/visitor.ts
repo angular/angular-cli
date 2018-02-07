@@ -195,7 +195,9 @@ export function visitJsonSchema(schema: JsonObject, visitor: JsonSchemaVisitor) 
     definitions: true,
     properties: true,
     patternProperties: true,
+    additionalProperties: true,
     dependencies: true,
+    items: true,
   };
 
   function _traverse(

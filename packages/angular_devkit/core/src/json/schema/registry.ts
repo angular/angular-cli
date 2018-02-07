@@ -43,7 +43,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     }
 
     this._ajv = ajv({
-      removeAdditional: 'all',
       useDefaults: true,
       formats: formatsObj,
       loadSchema: (uri: string) => this._fetch(uri) as ajv.Thenable<object>,
@@ -215,7 +214,12 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 data,
                 success: false,
                 errors: (validate.errors || [])
-                  .map((err: ajv.ErrorObject) => `${err.dataPath} ${err.message}`),
+                  .map((err) => `Data path ${JSON.stringify(err.dataPath)} ${err.message}${
+                    err.keyword === 'additionalProperties' && err.params
+                      // tslint:disable-next-line:no-any
+                      ? ` (${(err.params as any)['additionalProperty']}).`
+                      : '.'
+                    }`),
               } as SchemaValidatorResult;
             }),
           );
