@@ -1,0 +1,85 @@
+{
+  "title": "Karma Target",
+  "description": "Karma target options for Build Facade.",
+  "type": "object",
+  "properties": {
+    "browserTarget": {
+      "type": "string",
+      "description": "Target to serve."
+    },
+    "port": {
+      "type": "number",
+      "description": "Port to listen on.",
+      "default": 4200
+    },
+    "host": {
+      "type": "string",
+      "description": "Host to listen on.",
+      "default": "localhost"
+    },
+    "proxyConfig": {
+      "type": "string",
+      "description": "Proxy configuration file."
+    },
+    "ssl": {
+      "type": "boolean",
+      "description": "Serve using HTTPS.",
+      "default": false
+    },
+    "sslKey": {
+      "type": "string",
+      "description": "SSL key to use for serving HTTPS."
+    },
+    "sslCert": {
+      "type": "string",
+      "description": "SSL certificate to use for serving HTTPS."
+    },
+    "open": {
+      "type": "boolean",
+      "description": "Opens the url in default browser.",
+      "default": false
+    },
+    "liveReload": {
+      "type": "boolean",
+      "description": "Whether to reload the page on change, using live-reload.",
+      "default": true
+    },
+    "publicHost": {
+      "type": "string",
+      "description": "Specify the URL that the browser client will use."
+    },
+    "servePath": {
+      "type": "string",
+      "description": "The pathname where the app will be served."
+    },
+    "disableHostCheck": {
+      "type": "boolean",
+      "description": "Don't verify connected clients are part of allowed hosts.",
+      "default": false
+    },
+    "hmr": {
+      "type": "boolean",
+      "description": "Enable hot module replacement.",
+      "default": false
+    },
+    "watch": {
+      "type": "boolean",
+      "description": "Rebuild on change.",
+      "default": true
+    },
+    "hmrWarning": {
+      "type": "boolean",
+      "description": "Show a warning when the --hmr option is enabled.",
+      "default": true
+    },
+    "servePathDefaultWarning": {
+      "type": "boolean",
+      "description": "Show a warning when deploy-url/base-href use unsupported serve path values.",
+      "default": true
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "browserTarget"
+  ]
+}

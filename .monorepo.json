@@ -46,7 +46,7 @@
       "hash": "b1f9f2d8e1eca2a865d39263f0ca5a38"
     },
     "@angular-devkit/architect": {
-      "name": "Build Facade",
+      "name": "Architect",
       "links": [
         {
           "label": "README",
@@ -72,6 +72,17 @@
       "version": "0.4.0",
       "hash": "5ff2fd3bdd025fe62471a4f3f7b77771",
       "snapshotRepo": "angular/angular-devkit-build-optimizer-builds"
+    },
+    "@angular-devkit/build-webpack": {
+      "name": "Build Webpack",
+      "links": [
+        {
+          "label": "README",
+          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_webpack/README.md"
+        }
+      ],
+      "version": "0.0.1",
+      "hash": ""
     },
     "@angular-devkit/core": {
       "name": "Core",

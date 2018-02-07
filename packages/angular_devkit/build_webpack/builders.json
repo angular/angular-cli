@@ -1,0 +1,35 @@
+{
+  "$schema": "../architect/src/builders-schema.json",
+  "builders": {
+    "browser": {
+      "class": "./src/browser",
+      "schema": "./src/browser/schema.json",
+      "description": "Build a browser app."
+    },
+    "devServer": {
+      "class": "./src/dev-server",
+      "schema": "./src/dev-server/schema.json",
+      "description": "Serve a browser app."
+    },
+    "extractI18n": {
+      "class": "./src/extract-i18n",
+      "schema": "./src/extract-i18n/schema.json",
+      "description": "Extract i18n strings from a browser app."
+    },
+    "karma": {
+      "class": "./src/karma",
+      "schema": "./src/karma/schema.json",
+      "description": "Run Karma unit tests."
+    },
+    "protractor": {
+      "class": "./src/protractor",
+      "schema": "./src/protractor/schema.json",
+      "description": "Run protractor over a dev server."
+    },
+    "tslint": {
+      "class": "./src/tslint",
+      "schema": "./src/tslint/schema.json",
+      "description": "Run tslint over a TS project."
+    }
+  }
+}
