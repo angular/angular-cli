@@ -10,6 +10,7 @@ import * as strings from './strings';
 
 export * from './object';
 export * from './template';
+export * from './partially-ordered-set';
 export * from './priority-queue';
 
 export { tags, strings };
