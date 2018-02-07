@@ -77,10 +77,12 @@
     "ts-node": "^2.0.0",
     "tslint": "^5.5.0",
     "typescript": "~2.6.1",
-    "v8-profiler": "^5.7.0",
     "webpack-sources": "^1.0.1"
   },
   "devDependencies": {
     "license-checker": "^16.0.0"
+  },
+  "optionalDependencies": {
+    "v8-profiler": "^5.7.0"
   }
 }

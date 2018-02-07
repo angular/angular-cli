@@ -88,6 +88,7 @@ function loadPackageJson(p: string) {
       case 'name':
       case 'main':
       case 'peerDependencies':
+      case 'optionalDependencies':
       case 'typings':
       case 'version':
         continue;
