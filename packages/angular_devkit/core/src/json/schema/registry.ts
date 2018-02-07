@@ -11,7 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { of as observableOf } from 'rxjs/observable/of';
 import { map } from 'rxjs/operators/map';
-import { JsonArray, JsonObject } from '../interface';
+import { JsonObject } from '../interface';
 import {
   SchemaFormat,
   SchemaFormatter,
@@ -19,88 +19,7 @@ import {
   SchemaValidator,
   SchemaValidatorResult,
 } from './interface';
-
-
-function _parseJsonPointer(pointer: string): string[] {
-  if (pointer === '') { return []; }
-  if (pointer.charAt(0) !== '/') { throw new Error('Invalid JSON pointer: ' + pointer); }
-
-  return pointer.substring(1).split(/\//).map(str => str.replace(/~1/g, '/').replace(/~0/g, '~'));
-}
-
-
-interface JsonVisitor {
-  (
-    current: JsonObject | JsonArray,
-    pointer: string,
-    parentSchema?: JsonObject | JsonArray,
-    index?: string,
-  ): void;
-}
-
-
-function _visitJsonSchema(schema: JsonObject, visitor: JsonVisitor) {
-  const keywords = {
-    additionalItems: true,
-    items: true,
-    contains: true,
-    additionalProperties: true,
-    propertyNames: true,
-    not: true,
-  };
-
-  const propsKeywords = {
-    definitions: true,
-    properties: true,
-    patternProperties: true,
-    dependencies: true,
-  };
-
-  function _traverse(
-    schema: JsonObject | JsonArray,
-    jsonPtr: string,
-    rootSchema: JsonObject,
-    parentSchema?: JsonObject | JsonArray,
-    keyIndex?: string,
-  ) {
-    if (schema && typeof schema == 'object' && !Array.isArray(schema)) {
-      visitor(schema, jsonPtr, parentSchema, keyIndex);
-
-      for (const key of Object.keys(schema)) {
-        const sch = schema[key];
-        if (Array.isArray(sch)) {
-          if (key == 'items') {
-            for (let i = 0; i < sch.length; i++) {
-              _traverse(
-                sch[i] as JsonArray,
-                jsonPtr + '/' + key + '/' + i,
-                rootSchema,
-                schema,
-                '' + i,
-              );
-            }
-          }
-        } else if (key in propsKeywords) {
-          if (sch && typeof sch == 'object') {
-            for (const prop of Object.keys(sch)) {
-              _traverse(
-                sch[prop] as JsonObject,
-                jsonPtr + '/' + key + '/' + prop.replace(/~/g, '~0').replace(/\//g, '~1'),
-                rootSchema,
-                schema,
-                prop,
-              );
-            }
-          }
-        } else if (key in keywords) {
-          _traverse(sch as JsonObject, jsonPtr + '/' + key, rootSchema, schema, key);
-        }
-      }
-    }
-  }
-
-  _traverse(schema, '', schema);
-}
+import { JsonPointer, parseJsonPointer, visitJsonSchema } from './visitor';
 
 
 export class CoreSchemaRegistry implements SchemaRegistry {
@@ -134,15 +53,15 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     validate: ajv.ValidateFunction,
     parentDataCache: WeakMap<object, any>,  // tslint:disable-line:no-any
   ) {
-    _visitJsonSchema(
+    visitJsonSchema(
       schema,
-      (currentSchema: object, pointer: string, parentSchema?: object, index?: string) => {
+      (currentSchema: object, pointer: JsonPointer, parentSchema?: object, index?: string) => {
       // If we're at the root, skip.
       if (parentSchema === undefined || index === undefined) {
         return;
       }
 
-      const parsedPointer = _parseJsonPointer(pointer);
+      const parsedPointer = parseJsonPointer(pointer);
       // Every other path fragment is either 'properties', 'items', 'allOf', ...
       const nonPropertyParsedPP = parsedPointer.filter((_, i) => !(i % 2));
       // Skip if it's part of a definitions or too complex for us to analyze.
