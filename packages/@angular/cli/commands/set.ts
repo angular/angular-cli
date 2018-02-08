@@ -86,23 +86,32 @@ const SetCommand = Command.extend({
 });
 
 function updateLintForPrefix(filePath: string, prefix: string): void {
-    const tsLint = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    const componentLint = tsLint.rules['component-selector'][2];
-    if (componentLint instanceof Array) {
-      tsLint.rules['component-selector'][2].push(prefix);
-    } else {
-      tsLint.rules['component-selector'][2] = prefix;
-    }
+  if (!fs.existsSync(filePath)) {
+    return;
+  }
 
-    const directiveLint = tsLint.rules['directive-selector'][2];
-    if (directiveLint instanceof Array) {
-      tsLint.rules['directive-selector'][2].push(prefix);
-    } else {
-      tsLint.rules['directive-selector'][2] = prefix;
-    }
-    fs.writeFileSync(filePath, JSON.stringify(tsLint, null, 2));
-    console.log(chalk.yellow(oneLine`we have updated tslint to match prefix,
-     you may want to fix linting errors.`));
+  const tsLint = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+  const componentLint = tsLint.rules['component-selector'][2];
+  if (componentLint instanceof Array) {
+    tsLint.rules['component-selector'][2].push(prefix);
+  } else {
+    tsLint.rules['component-selector'][2] = prefix;
+  }
+
+  const directiveLint = tsLint.rules['directive-selector'][2];
+  if (directiveLint instanceof Array) {
+    tsLint.rules['directive-selector'][2].push(prefix);
+  } else {
+    tsLint.rules['directive-selector'][2] = prefix;
+  }
+
+  fs.writeFileSync(filePath, JSON.stringify(tsLint, null, 2));
+
+  console.log(chalk.yellow(oneLine`
+    tslint configuration updated to match new prefix,
+    you may need to fix any linting errors.
+  `));
 }
 
 function parseValue(rawValue: string, path: string) {
