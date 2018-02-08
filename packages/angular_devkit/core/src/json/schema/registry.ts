@@ -10,8 +10,10 @@ import * as http from 'http';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { of as observableOf } from 'rxjs/observable/of';
+import { concatMap, switchMap } from 'rxjs/operators';
 import { map } from 'rxjs/operators/map';
-import { JsonObject } from '../interface';
+import { PartiallyOrderedSet } from '../../utils';
+import { JsonObject, JsonValue } from '../interface';
 import {
   SchemaFormat,
   SchemaFormatter,
@@ -19,12 +21,13 @@ import {
   SchemaValidator,
   SchemaValidatorResult,
 } from './interface';
-import { JsonPointer, parseJsonPointer, visitJsonSchema } from './visitor';
+import { JsonPointer, JsonVisitor, parseJsonPointer, visitJson, visitJsonSchema } from './visitor';
 
 
 export class CoreSchemaRegistry implements SchemaRegistry {
   private _ajv: ajv.Ajv;
   private _uriCache = new Map<string, JsonObject>();
+  private _pre = new PartiallyOrderedSet<JsonVisitor>();
 
   constructor(formats: SchemaFormat[] = []) {
     /**
@@ -148,6 +151,15 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     });
   }
 
+  /**
+   * Add a transformation step before the validation of any Json.
+   * @param {JsonVisitor} visitor The visitor to transform every value.
+   * @param {JsonVisitor[]} deps A list of other visitors to run before.
+   */
+  addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]) {
+    this._pre.add(visitor, deps);
+  }
+
   compile(schema: Object): Observable<SchemaValidator> {
     // Supports both synchronous and asynchronous compilation, by trying the synchronous
     // version first, then if refs are missing this will fails.
@@ -178,31 +190,41 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       .pipe(
         // tslint:disable-next-line:no-any
         map(validate => (data: any): Observable<SchemaValidatorResult> => {
-          const result = validate(data);
-          const resultObs = typeof result == 'boolean'
-            ? observableOf(result)
-            : fromPromise(result as PromiseLike<boolean>);
+          let dataObs = observableOf(data);
+          this._pre.forEach(visitor =>
+            dataObs = dataObs.pipe(
+              concatMap(data => visitJson(data as JsonValue, visitor)),
+            ),
+          );
 
-          return resultObs
-            .pipe(
-              map(result => {
-                if (result) {
-                  // tslint:disable-next-line:no-any
-                  const schemaDataMap = new WeakMap<object, any>();
-                  schemaDataMap.set(schema, data);
+          return dataObs.pipe(
+            switchMap(updatedData => {
+              const result = validate(updatedData);
 
-                  this._clean(data, schema as JsonObject, validate, schemaDataMap);
+              return typeof result == 'boolean'
+                ? observableOf([updatedData, result])
+                : fromPromise((result as PromiseLike<boolean>)
+                  .then(result => [updatedData, result]));
+            }),
+            map(([data, valid]) => {
+              if (valid) {
+                // tslint:disable-next-line:no-any
+                const schemaDataMap = new WeakMap<object, any>();
+                schemaDataMap.set(schema, data);
 
-                  return { success: true } as SchemaValidatorResult;
-                }
+                this._clean(data, schema as JsonObject, validate, schemaDataMap);
 
-                return {
-                  success: false,
-                  errors: (validate.errors || [])
-                    .map((err: ajv.ErrorObject) => `${err.dataPath} ${err.message}`),
-                } as SchemaValidatorResult;
-              }),
-            );
+                return { data, success: true } as SchemaValidatorResult;
+              }
+
+              return {
+                data,
+                success: false,
+                errors: (validate.errors || [])
+                  .map((err: ajv.ErrorObject) => `${err.dataPath} ${err.message}`),
+              } as SchemaValidatorResult;
+            }),
+          );
         }),
       );
   }
