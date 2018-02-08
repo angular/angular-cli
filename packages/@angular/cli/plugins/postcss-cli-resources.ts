@@ -74,13 +74,12 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
     const result = await resolve(pathname, loader.context, resolver);
 
     return new Promise<string>((resolve, reject) => {
-      loader.fs.readFile(result, (err: Error, data: Buffer) => {
+      loader.fs.readFile(result, (err: Error, content: Buffer) => {
         if (err) {
           reject(err);
           return;
         }
 
-        const content = data.toString();
         const outputPath = interpolateName(
           { resourcePath: result } as webpack.loader.LoaderContext,
           filename,
