@@ -151,6 +151,4 @@ workflows:
             tags:
               only: /^v\d+/
             branches:
-              only:
-                - master
-                - /^\d+\.\d+\.x/
+              ignore: /.*/
