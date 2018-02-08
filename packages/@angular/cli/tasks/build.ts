@@ -18,7 +18,8 @@ export default Task.extend({
   run: function (runTaskOptions: BuildTaskOptions) {
     const config = CliConfig.fromProject().config;
 
-    const app = getAppFromConfig(runTaskOptions.app);
+    const app = getAppFromConfig(runTaskOptions.app, runTaskOptions.target,
+      runTaskOptions.configuration);
 
     const outputPath = runTaskOptions.outputPath || app.outDir;
     if (this.project.root === path.resolve(outputPath)) {
@@ -27,7 +28,7 @@ export default Task.extend({
     if (config.project && config.project.ejected) {
       throw new SilentError('An ejected project cannot use the build command anymore.');
     }
-    if (! app.main) {
+    if (! app.entryPoints.main) {
       throw new SilentError(`An app without 'main' cannot use the build command.`);
     }
     if (runTaskOptions.deleteOutputPath) {

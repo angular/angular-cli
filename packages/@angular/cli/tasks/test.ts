@@ -21,7 +21,7 @@ export default Task.extend({
     if (appConfig.platform === 'server') {
       throw new SilentError('ng test for platform server applications is coming soon!');
     }
-    if (! appConfig.main) {
+    if (! appConfig.entryPoints.main) {
       throw new SilentError(`An app without 'main' cannot use the test command.`);
     }
 
