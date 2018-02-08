@@ -128,15 +128,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         asset.glob = asset.glob + '/**/*';
       }
 
-      // Escape the input in case it has special charaters and use to make glob absolute
-      const escapedInput = asset.input
-        .replace(/[\\|\*|\?|\!|\(|\)|\[|\]|\{|\}]/g, (substring) => `\\${substring}`);
-
       return {
         context: asset.input,
         to: asset.output,
         from: {
-          glob: path.resolve(escapedInput, asset.glob),
+          glob: asset.glob,
           dot: true
         }
       };
