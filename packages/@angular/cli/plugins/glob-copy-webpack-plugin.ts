@@ -1,13 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
-import * as denodeify from 'denodeify';
+import { promisify } from 'util';
 import { AssetPattern } from '../models/webpack-configs/utils';
 import { isDirectory } from '../utilities/is-directory';
 
 const flattenDeep = require('lodash/flattenDeep');
-const globPromise = <any>denodeify(glob);
-const statPromise = <any>denodeify(fs.stat);
+const globPromise = <any>promisify(glob);
+const statPromise = promisify(fs.stat);
 
 interface Asset {
   originPath: string;

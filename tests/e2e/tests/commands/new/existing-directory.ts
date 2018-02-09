@@ -1,10 +1,9 @@
 import * as fs from 'fs';
-import denodeify = require('denodeify');
-
+import { promisify } from 'util';
 import {ng} from '../../../utils/process';
 import {getGlobalVariable} from '../../../utils/env';
 
-const mkdir = denodeify(fs.mkdir);
+const mkdir = promisify(fs.mkdir);
 
 
 export default function() {

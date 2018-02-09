@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { promisify } from 'util';
 import * as webpack from 'webpack';
 import chalk from 'chalk';
 
@@ -13,11 +14,10 @@ import { AotPlugin, AngularCompilerPlugin } from '@ngtools/webpack';
 import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 
-import denodeify = require('denodeify');
 import {oneLine, stripIndent} from 'common-tags';
 
 const exists = (p: string) => Promise.resolve(fs.existsSync(p));
-const writeFile = (denodeify(fs.writeFile) as (...args: any[]) => Promise<any>);
+const writeFile = promisify(fs.writeFile);
 const angularCliPlugins = require('../plugins/webpack');
 
 

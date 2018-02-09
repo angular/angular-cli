@@ -1,8 +1,8 @@
-import * as denodeify from 'denodeify';
+import { promisify } from 'util';
 
 const SilentError = require('silent-error');
 const PortFinder = require('portfinder');
-const getPort = denodeify<{host: string, port: number}, number>(PortFinder.getPort);
+const getPort = promisify<{host: string, port: number}, number>(PortFinder.getPort);
 
 export function checkPort(port: number, host: string, basePort = 49152): Promise<number> {
   PortFinder.basePort = basePort;

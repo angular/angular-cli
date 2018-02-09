@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 import {exec} from 'child_process';
+import { promisify } from 'util';
 import {CliConfig} from '../models/config';
-import denodeify = require('denodeify');
 
-const execPromise = denodeify(exec);
+const execPromise = promisify(exec);
 const packageManager = CliConfig.fromGlobal().get('packageManager');
 
 
