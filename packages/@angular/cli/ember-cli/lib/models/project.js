@@ -3,10 +3,10 @@
 /**
 @module ember-cli
 */
-const denodeify = require('denodeify');
 const path = require('path');
 const findUp = require('../../../utilities/find-up').findUp;
-let resolve = denodeify(require('resolve'));
+const { promisify } = require('util');
+let resolve = promisify(require('resolve'));
 const fs = require('fs-extra');
 const _ = require('lodash');
 const nodeModulesPath = require('node-modules-path');
