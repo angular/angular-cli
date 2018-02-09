@@ -16,11 +16,19 @@ interface Chunk {
 
 export interface CleanCssWebpackPluginOptions {
   sourceMap: boolean;
+  test: (file: string) => boolean;
 }
 
 export class CleanCssWebpackPlugin {
+  private readonly _options: CleanCssWebpackPluginOptions;
 
-  constructor(private options: Partial<CleanCssWebpackPluginOptions> = {}) {}
+  constructor(options: Partial<CleanCssWebpackPluginOptions>) {
+    this._options = {
+      sourceMap: false,
+      test: (file) => file.endsWith('.css'),
+      ...options,
+    };
+  }
 
   apply(compiler: Compiler): void {
     compiler.plugin('compilation', (compilation: any) => {
@@ -32,7 +40,7 @@ export class CleanCssWebpackPlugin {
           level: 2,
           inline: false,
           returnPromise: true,
-          sourceMap: this.options.sourceMap,
+          sourceMap: this._options.sourceMap,
         });
 
         const files: string[] = [...compilation.additionalChunkAssets];
@@ -44,7 +52,7 @@ export class CleanCssWebpackPlugin {
         });
 
         const actions = files
-          .filter(file => file.endsWith('.css'))
+          .filter(file => this._options.test(file))
           .map(file => {
             const asset = compilation.assets[file];
             if (!asset) {
