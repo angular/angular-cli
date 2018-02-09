@@ -119,7 +119,7 @@
     "@types/lodash": "~4.14.50",
     "@types/minimist": "^1.2.0",
     "@types/mock-fs": "^3.6.30",
-    "@types/node": "^6.0.84",
+    "@types/node": "^8.9.1",
     "@types/request": "~2.0.0",
     "@types/semver": "^5.3.30",
     "@types/source-map": "0.5.2",

@@ -21,8 +21,8 @@ export class VirtualStats implements fs.Stats {
   protected _dev = dev;
   protected _ino = Math.floor(Math.random() * 100000);
   protected _mode = parseInt('777', 8);  // RWX for everyone.
-  protected _uid = process.env['UID'] || 0;
-  protected _gid = process.env['GID'] || 0;
+  protected _uid = Number(process.env['UID']) || 0;
+  protected _gid = Number(process.env['GID']) || 0;
 
   constructor(protected _path: string) {}
 
@@ -45,9 +45,13 @@ export class VirtualStats implements fs.Stats {
   get blksize() { return 512; }
   get blocks() { return Math.ceil(this.size / this.blksize); }
   get atime() { return this._atime; }
+  get atimeMs() { return this._atime.getTime(); }
   get mtime() { return this._mtime; }
+  get mtimeMs() { return this._mtime.getTime(); }
   get ctime() { return this._ctime; }
+  get ctimeMs() { return this._ctime.getTime(); }
   get birthtime() { return this._btime; }
+  get birthtimeMs() { return this._btime.getTime(); }
 }
 
 export class VirtualDirStats extends VirtualStats {
