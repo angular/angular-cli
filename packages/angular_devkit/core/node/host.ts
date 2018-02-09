@@ -247,7 +247,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
         return;
       }
       _createDir(dirname(path));
-      fs.mkdirSync(path);
+      fs.mkdirSync(this._getSystemPath(path));
     };
     _createDir(dirname(path));
     fs.writeFileSync(this._getSystemPath(path), new Uint8Array(content));
@@ -262,17 +262,21 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   }
 
   delete(path: Path): Observable<void> {
-    if (this.isDirectory(path)) {
-      // Since this is synchronous, we can recurse and safely ignore the result.
-      for (const name of fs.readdirSync(this._getSystemPath(path))) {
-        this.delete(join(path, name));
-      }
-      fs.rmdirSync(this._getSystemPath(path));
-    } else {
-      fs.unlinkSync(this._getSystemPath(path));
-    }
+    return this.isDirectory(path).pipe(
+      concatMap(isDir => {
+        if (isDir) {
+          // Since this is synchronous, we can recurse and safely ignore the result.
+          for (const name of fs.readdirSync(this._getSystemPath(path))) {
+            this.delete(join(path, name)).subscribe();
+          }
+          fs.rmdirSync(this._getSystemPath(path));
+        } else {
+          fs.unlinkSync(this._getSystemPath(path));
+        }
 
-    return empty();
+        return empty();
+      }),
+    );
   }
 
   rename(from: Path, to: Path): Observable<void> {
