@@ -20,13 +20,33 @@ export function resolveWithPaths(
   host: ts.CompilerHost,
   cache?: ts.ModuleResolutionCache,
 ) {
-  if (!request) {
+  if (!request || !request.request) {
     callback(null, request);
     return;
   }
 
   // Only work on Javascript/TypeScript issuers.
   if (!request.contextInfo.issuer || !request.contextInfo.issuer.match(/\.[jt]s$/)) {
+    callback(null, request);
+    return;
+  }
+
+  // check if any path mapping rules are relevant
+  const isPathMapped = compilerOptions.paths && Object.keys(compilerOptions.paths)
+    .some(pattern => {
+      // can only contain zero or one
+      const starIndex = pattern.indexOf('*');
+      if (starIndex === -1) {
+        return pattern === request.request;
+      } else if (starIndex === pattern.length - 1) {
+        return request.request.startsWith(pattern.slice(0, -1));
+      } else {
+        const [prefix, suffix] = pattern.split('*');
+        return request.request.startsWith(prefix) && request.request.endsWith(suffix);
+      }
+    });
+
+  if (!isPathMapped) {
     callback(null, request);
     return;
   }
@@ -62,40 +82,6 @@ export function resolveWithPaths(
 
     callback(null, request);
     return;
-  }
-
-  // TypeScript gives `index.ts` and the request is not for the specific file,
-  // check if it is a module
-  const requestFilePath = path.basename(request.request);
-  if (path.basename(moduleFilePath) === 'index.ts'
-      && requestFilePath !== 'index' && requestFilePath !== 'index.ts') {
-    const packageRootPath = path.join(path.dirname(moduleFilePath), 'package.json');
-    if (host.fileExists(packageRootPath)) {
-      // potential module request
-      let isPathMapped = false;
-      if (compilerOptions.paths) {
-        // check if any path mapping rules are relevant
-        isPathMapped = Object.keys(compilerOptions.paths)
-          .some(pattern => {
-            // can only contain zero or one
-            const starIndex = pattern.indexOf('*');
-            if (starIndex === -1) {
-              return pattern === request.request;
-            } else if (starIndex === pattern.length - 1) {
-              return request.request.startsWith(pattern.slice(0, -1));
-            } else {
-              const [prefix, suffix] = pattern.split('*');
-              return request.request.startsWith(prefix) && request.request.endsWith(suffix);
-            }
-          });
-      }
-      if (!isPathMapped) {
-        // path mapping not involved, let webpack handle the module request
-        request.request = path.dirname(moduleFilePath);
-        callback(null, request);
-        return;
-      }
-    }
   }
 
   request.request = moduleFilePath;
