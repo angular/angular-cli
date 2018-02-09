@@ -7,7 +7,6 @@ import { CliConfig } from '../models/config';
 
 const Task = require('../ember-cli/lib/models/task');
 const SilentError = require('silent-error');
-const packageJson = require('../package.json');
 
 
 export default Task.extend({
@@ -43,7 +42,15 @@ export default Task.extend({
 
     const cwd = this.project.root;
     const schematicName = CliConfig.fromGlobal().get('defaults.schematics.newApp');
-    commandOptions.version = packageJson.version;
+
+    if (commandOptions.version) {
+      this.ui.writeLine(chalk.yellow(
+        '*** The "--version" option is intended for internal development purposes only.'
+        + '  Use at your own risk. ***'));
+    } else {
+      const packageJson = require('../package.json');
+      commandOptions.version = packageJson.version;
+    }
 
     if (!commandOptions.skipCommit) {
       const commitMessage = fs.readFileSync(
