@@ -270,3 +270,11 @@ export function asWindowsPath(path: Path): WindowsPath {
 export function asPosixPath(path: Path): PosixPath {
   return path as string as PosixPath;
 }
+
+export function getSystemPath(path: Path): string {
+  if (process.platform.startsWith('win32')) {
+    return asWindowsPath(path);
+  } else {
+    return asPosixPath(path);
+  }
+}

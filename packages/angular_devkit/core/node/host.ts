@@ -20,10 +20,9 @@ import { refCount } from 'rxjs/operators/refCount';
 import {
   Path,
   PathFragment,
-  asPosixPath,
-  asWindowsPath,
   dirname,
   fragment,
+  getSystemPath,
   join,
   normalize,
   virtualFs,
@@ -73,14 +72,6 @@ function _callFs<ResultT>(fn: Function, ...args: {}[]): Observable<ResultT> {
  * synchronous and one asynchronous.
  */
 export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
-  protected _getSystemPath(path: Path): string {
-    if (process.platform.startsWith('win32')) {
-      return asWindowsPath(path);
-    } else {
-      return asPosixPath(path);
-    }
-  }
-
   get capabilities(): virtualFs.HostCapabilities {
     return { synchronous: false };
   }
@@ -89,27 +80,27 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
     return new Observable<void>(obs => {
       // Create folders if necessary.
       const _createDir = (path: Path) => {
-        if (fs.existsSync(this._getSystemPath(path))) {
+        if (fs.existsSync(getSystemPath(path))) {
           return;
         }
         if (dirname(path) === path) {
           throw new Error();
         }
         _createDir(dirname(path));
-        fs.mkdirSync(this._getSystemPath(path));
+        fs.mkdirSync(getSystemPath(path));
       };
       _createDir(dirname(path));
 
       _callFs<void, string, Uint8Array>(
         fs.writeFile,
-        this._getSystemPath(path),
+        getSystemPath(path),
         new Uint8Array(content),
       ).subscribe(obs);
     });
   }
 
   read(path: Path): Observable<virtualFs.FileBuffer> {
-    return _callFs(fs.readFile, this._getSystemPath(path)).pipe(
+    return _callFs(fs.readFile, getSystemPath(path)).pipe(
       map(buffer => new Uint8Array(buffer).buffer as virtualFs.FileBuffer),
     );
   }
@@ -121,8 +112,8 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
           const allFiles: Path[] = [];
           const allDirs: Path[] = [];
           const _recurseList = (path: Path) => {
-            for (const fragment of fs.readdirSync(this._getSystemPath(path))) {
-              if (fs.statSync(this._getSystemPath(join(path, fragment))).isDirectory()) {
+            for (const fragment of fs.readdirSync(getSystemPath(path))) {
+              if (fs.statSync(getSystemPath(join(path, fragment))).isDirectory()) {
                 _recurseList(join(path, fragment));
                 allDirs.push(join(path, fragment));
               } else {
@@ -134,26 +125,26 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
 
           return observableFrom(allFiles)
             .pipe(
-              mergeMap(p => _callFs(fs.unlink, this._getSystemPath(p))),
+              mergeMap(p => _callFs(fs.unlink, getSystemPath(p))),
               ignoreElements(),
               concat(observableFrom(allDirs).pipe(
-                concatMap(p => _callFs(fs.rmdir, this._getSystemPath(p))),
+                concatMap(p => _callFs(fs.rmdir, getSystemPath(p))),
               )),
               map(() => {}),
             );
         } else {
-          return _callFs(fs.unlink, this._getSystemPath(path));
+          return _callFs(fs.unlink, getSystemPath(path));
         }
       }),
     );
   }
 
   rename(from: Path, to: Path): Observable<void> {
-    return _callFs(fs.rename, this._getSystemPath(from), this._getSystemPath(to));
+    return _callFs(fs.rename, getSystemPath(from), getSystemPath(to));
   }
 
   list(path: Path): Observable<PathFragment[]> {
-    return _callFs(fs.readdir, this._getSystemPath(path)).pipe(
+    return _callFs(fs.readdir, getSystemPath(path)).pipe(
       map(names => names.map(name => fragment(name))),
     );
   }
@@ -169,19 +160,19 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
   }
 
   isDirectory(path: Path): Observable<boolean> {
-    return _callFs(fs.stat, this._getSystemPath(path)).pipe(
+    return _callFs(fs.stat, getSystemPath(path)).pipe(
       map(stat => stat.isDirectory()),
     );
   }
   isFile(path: Path): Observable<boolean> {
-    return _callFs(fs.stat, this._getSystemPath(path)).pipe(
+    return _callFs(fs.stat, getSystemPath(path)).pipe(
       map(stat => stat.isDirectory()),
     );
   }
 
   // Some hosts may not support stats.
   stats(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null {
-    return _callFs(fs.stat, this._getSystemPath(path));
+    return _callFs(fs.stat, getSystemPath(path));
   }
 
   // Some hosts may not support watching.
@@ -190,7 +181,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
     _options?: virtualFs.HostWatchOptions,
   ): Observable<virtualFs.HostWatchEvent> | null {
     return new Observable<virtualFs.HostWatchEvent>(obs => {
-      const watcher = new FSWatcher({ persistent: true }).add(this._getSystemPath(path));
+      const watcher = new FSWatcher({ persistent: true }).add(getSystemPath(path));
 
       watcher
         .on('change', path => {
@@ -228,14 +219,6 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
  * An implementation of the Virtual FS using Node as the backend, synchronously.
  */
 export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
-  protected _getSystemPath(path: Path): string {
-    if (process.platform.startsWith('win32')) {
-      return asWindowsPath(path);
-    } else {
-      return asPosixPath(path);
-    }
-  }
-
   get capabilities(): virtualFs.HostCapabilities {
     return { synchronous: true };
   }
@@ -243,20 +226,20 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   write(path: Path, content: virtualFs.FileBuffer): Observable<void> {
     // Create folders if necessary.
     const _createDir = (path: Path) => {
-      if (fs.existsSync(this._getSystemPath(path))) {
+      if (fs.existsSync(getSystemPath(path))) {
         return;
       }
       _createDir(dirname(path));
-      fs.mkdirSync(this._getSystemPath(path));
+      fs.mkdirSync(getSystemPath(path));
     };
     _createDir(dirname(path));
-    fs.writeFileSync(this._getSystemPath(path), new Uint8Array(content));
+    fs.writeFileSync(getSystemPath(path), new Uint8Array(content));
 
     return empty<void>();
   }
 
   read(path: Path): Observable<virtualFs.FileBuffer> {
-    const buffer = fs.readFileSync(this._getSystemPath(path));
+    const buffer = fs.readFileSync(getSystemPath(path));
 
     return observableOf(new Uint8Array(buffer).buffer as virtualFs.FileBuffer);
   }
@@ -266,12 +249,12 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
       concatMap(isDir => {
         if (isDir) {
           // Since this is synchronous, we can recurse and safely ignore the result.
-          for (const name of fs.readdirSync(this._getSystemPath(path))) {
+          for (const name of fs.readdirSync(getSystemPath(path))) {
             this.delete(join(path, name)).subscribe();
           }
-          fs.rmdirSync(this._getSystemPath(path));
+          fs.rmdirSync(getSystemPath(path));
         } else {
-          fs.unlinkSync(this._getSystemPath(path));
+          fs.unlinkSync(getSystemPath(path));
         }
 
         return empty();
@@ -280,19 +263,19 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   }
 
   rename(from: Path, to: Path): Observable<void> {
-    fs.renameSync(this._getSystemPath(from), this._getSystemPath(to));
+    fs.renameSync(getSystemPath(from), getSystemPath(to));
 
     return empty();
   }
 
   list(path: Path): Observable<PathFragment[]> {
-    return observableOf(fs.readdirSync(this._getSystemPath(path))).pipe(
+    return observableOf(fs.readdirSync(getSystemPath(path))).pipe(
       map(names => names.map(name => fragment(name))),
     );
   }
 
   exists(path: Path): Observable<boolean> {
-    return observableOf(fs.existsSync(this._getSystemPath(path)));
+    return observableOf(fs.existsSync(getSystemPath(path)));
   }
 
   isDirectory(path: Path): Observable<boolean> {
@@ -306,7 +289,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
 
   // Some hosts may not support stats.
   stats(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null {
-    return observableOf(fs.statSync(this._getSystemPath(path)));
+    return observableOf(fs.statSync(getSystemPath(path)));
   }
 
   // Some hosts may not support watching.
@@ -316,7 +299,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   ): Observable<virtualFs.HostWatchEvent> | null {
     return new Observable<virtualFs.HostWatchEvent>(obs => {
       const opts = { persistent: false };
-      const watcher = new FSWatcher(opts).add(this._getSystemPath(path));
+      const watcher = new FSWatcher(opts).add(getSystemPath(path));
 
       watcher
         .on('change', path => {
