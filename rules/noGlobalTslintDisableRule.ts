@@ -51,7 +51,15 @@ class Walker extends Lint.RuleWalker {
     if (sourceFile.fileName.match(/_benchmark.ts$/)) {
       return;
     }
-    if (sourceFile.fileName.startsWith(path.join(process.cwd(), 'scripts'))) {
+
+    // TODO(filipesilva): remove this once the files are cleaned up.
+    // Ignore Angular CLI files files.
+    if (sourceFile.fileName.includes('/angular-cli-files/')) {
+      return;
+    }
+
+    const scriptsPath = path.join(process.cwd(), 'scripts').replace(/\\/g, '/');
+    if (sourceFile.fileName.startsWith(scriptsPath)) {
       return;
     }
 
