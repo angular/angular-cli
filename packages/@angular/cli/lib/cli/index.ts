@@ -13,6 +13,7 @@ const UI = require('../../ember-cli/lib/ui');
 
 function loadCommands() {
   return {
+    'add': require('../../commands/add').default,
     'build': require('../../commands/build').default,
     'serve': require('../../commands/serve').default,
     'eject': require('../../commands/eject').default,

@@ -1,0 +1,9 @@
+{
+  "name": "@angular-devkit-tests/ng-add-simple",
+  "schematics": {
+    "ng-add": {
+      "factory": "./index.js",
+      "description": "Create an empty application"
+    }
+  }
+}
