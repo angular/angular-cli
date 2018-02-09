@@ -28,6 +28,7 @@ export interface SchematicRunOptions {
   emptyHost: boolean;
   collectionName: string;
   schematicName: string;
+  allowPrivate?: boolean;
 }
 
 export interface SchematicOptions {
@@ -73,7 +74,7 @@ export default Task.extend({
     );
 
     const collection = getCollection(collectionName);
-    const schematic = getSchematic(collection, schematicName);
+    const schematic = getSchematic(collection, schematicName, options.allowPrivate);
 
     const projectRoot = !!this.project ? this.project.root : workingDir;
 

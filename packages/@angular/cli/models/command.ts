@@ -14,6 +14,8 @@ export enum CommandScope {
 }
 
 export abstract class Command {
+  protected _rawArgs: string[];
+
   constructor(context: CommandContext, logger: logging.Logger) {
     this.logger = logger;
     if (context) {
@@ -22,7 +24,8 @@ export abstract class Command {
     }
   }
 
-  async initializeRaw(args: any): Promise<any> {
+  async initializeRaw(args: string[]): Promise<any> {
+    this._rawArgs = args;
     return args;
   }
   async initialize(_options: any): Promise<void> {

@@ -1,0 +1,5 @@
+{
+  "name": "@angular-devkit-tests/ng-add-simple",
+  "version": "1.0.0",
+  "schematics": "./collection.json"
+}

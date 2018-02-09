@@ -63,6 +63,7 @@ export function getCollection(collectionName: string): Collection<any, any> {
 }
 
 export function getSchematic(collection: Collection<any, any>,
-                             schematicName: string): Schematic<any, any> {
-  return collection.createSchematic(schematicName);
+                             schematicName: string,
+                             allowPrivate?: boolean): Schematic<any, any> {
+  return collection.createSchematic(schematicName, allowPrivate);
 }
