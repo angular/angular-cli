@@ -10,7 +10,7 @@ import { NgCliWebpackConfig } from '../models/webpack-config';
 import { CliConfig } from '../models/config';
 import { usesServiceWorker } from '../utilities/service-worker';
 import { stripBom } from '../utilities/strip-bom';
-import { AotPlugin, AngularCompilerPlugin } from '@ngtools/webpack';
+import { AngularCompilerPlugin } from '@ngtools/webpack';
 import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 
@@ -126,7 +126,7 @@ class JsonWebpackSerializer {
     };
   }
 
-  private _aotPluginSerialize(value: AotPlugin): any {
+  private _aotPluginSerialize(value: AngularCompilerPlugin): any {
     const tsConfigPath = path.relative(this._root, value.options.tsConfigPath);
     const basePath = path.dirname(tsConfigPath);
     return Object.assign({}, value.options, {
@@ -139,11 +139,6 @@ class JsonWebpackSerializer {
           acc[key] = path.relative(basePath, replacementPath);
           return acc;
         }, {}),
-      exclude: Array.isArray(value.options.exclude)
-        ? value.options.exclude.map((p: any) => {
-          return p.startsWith('/') ? path.relative(basePath, p) : p;
-        })
-        : value.options.exclude
     });
   }
 
@@ -226,10 +221,6 @@ class JsonWebpackSerializer {
         case CircularDependencyPlugin:
           this.variableImports['circular-dependency-plugin'] = 'CircularDependencyPlugin';
           args.cwd = this._escape('projectRoot');
-          break;
-        case AotPlugin:
-          args = this._aotPluginSerialize(plugin);
-          this._addImport('@ngtools/webpack', 'AotPlugin');
           break;
         case PurifyPlugin:
           this._addImport('@angular-devkit/build-optimizer', 'PurifyPlugin');
