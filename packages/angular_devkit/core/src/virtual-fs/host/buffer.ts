@@ -13,6 +13,12 @@ declare const TextEncoder: {
   };
 };
 
+declare const TextDecoder: {
+  new(encoding: string): {
+    decode(bytes: Uint8Array): string;
+  };
+};
+
 export function stringToFileBuffer(str: string): FileBuffer {
   // If we're in Node...
   if (typeof Buffer !== 'undefined' && typeof Buffer.from === 'function') {
@@ -36,5 +42,14 @@ export function stringToFileBuffer(str: string): FileBuffer {
     }
 
     return buf;
+  }
+}
+
+export function fileBufferToString(fileBuffer: FileBuffer): string {
+  if (typeof TextDecoder !== 'undefined') {
+    // Modern browsers implement TextEncode.
+    return new TextDecoder('utf-8').decode(new Uint8Array(fileBuffer));
+  } else {
+    return String.fromCharCode.apply(null, new Uint8Array(fileBuffer));
   }
 }
