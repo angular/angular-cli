@@ -1,8 +1,6 @@
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
 import {
-  AotPlugin,
-  AotPluginOptions,
   AngularCompilerPlugin,
   AngularCompilerPluginOptions,
   PLATFORM
@@ -80,47 +78,31 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     };
   }
 
-  if (AngularCompilerPlugin.isSupported()) {
-    const additionalLazyModules: { [module: string]: string } = {};
-    if (appConfig.lazyModules) {
-      for (const lazyModule of appConfig.lazyModules) {
-        additionalLazyModules[lazyModule] = path.resolve(
-          projectRoot,
-          appConfig.root,
-          lazyModule,
-        );
-      }
+  const additionalLazyModules: { [module: string]: string } = {};
+  if (appConfig.lazyModules) {
+    for (const lazyModule of appConfig.lazyModules) {
+      additionalLazyModules[lazyModule] = path.resolve(
+        projectRoot,
+        appConfig.root,
+        lazyModule,
+      );
     }
-
-    const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
-      mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
-      i18nInFile: buildOptions.i18nFile,
-      i18nInFormat: buildOptions.i18nFormat,
-      i18nOutFile: buildOptions.i18nOutFile,
-      i18nOutFormat: buildOptions.i18nOutFormat,
-      locale: buildOptions.locale,
-      platform: appConfig.platform === 'server' ? PLATFORM.Server : PLATFORM.Browser,
-      missingTranslation: buildOptions.missingTranslation,
-      hostReplacementPaths,
-      sourceMap: buildOptions.sourcemaps,
-      additionalLazyModules,
-    }, options);
-    return new AngularCompilerPlugin(pluginOptions);
-  } else {
-    const pluginOptions: AotPluginOptions = Object.assign({}, {
-      mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
-      i18nFile: buildOptions.i18nFile,
-      i18nFormat: buildOptions.i18nFormat,
-      locale: buildOptions.locale,
-      replaceExport: appConfig.platform === 'server',
-      missingTranslation: buildOptions.missingTranslation,
-      hostReplacementPaths,
-      sourceMap: buildOptions.sourcemaps,
-      // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
-      exclude: []
-    }, options);
-    return new AotPlugin(pluginOptions);
   }
+
+  const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
+    mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
+    i18nInFile: buildOptions.i18nFile,
+    i18nInFormat: buildOptions.i18nFormat,
+    i18nOutFile: buildOptions.i18nOutFile,
+    i18nOutFormat: buildOptions.i18nOutFormat,
+    locale: buildOptions.locale,
+    platform: appConfig.platform === 'server' ? PLATFORM.Server : PLATFORM.Browser,
+    missingTranslation: buildOptions.missingTranslation,
+    hostReplacementPaths,
+    sourceMap: buildOptions.sourcemaps,
+    additionalLazyModules,
+  }, options);
+  return new AngularCompilerPlugin(pluginOptions);
 }
 
 export function getNonAotConfig(wco: WebpackConfigOptions) {
@@ -136,67 +118,34 @@ export function getNonAotConfig(wco: WebpackConfigOptions) {
 export function getAotConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
-  const testTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.testTsconfig);
 
-  let pluginOptions: any = { tsConfigPath };
-
-  // Fallback to exclude spec files from AoT compilation on projects using a shared tsconfig.
-  if (testTsConfigPath === tsConfigPath) {
-    let exclude = [ '**/*.spec.ts' ];
-    if (appConfig.test) {
-      exclude.push(path.join(projectRoot, appConfig.root, appConfig.test));
-    }
-    pluginOptions.exclude = exclude;
-  }
-
-  let boLoader: any = [];
+  const loaders: any[] = [ webpackLoader ];
   if (buildOptions.buildOptimizer) {
-    boLoader = [{
+    loaders.unshift({
       loader: '@angular-devkit/build-optimizer/webpack-loader',
       options: { sourceMap: buildOptions.sourcemaps }
-    }];
+    });
   }
 
-  const test = AngularCompilerPlugin.isSupported()
-    ? /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/
-    : /\.ts$/;
+  const test = /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/;
 
   return {
-    module: { rules: [{ test, use: [...boLoader, webpackLoader] }] },
-    plugins: [ _createAotPlugin(wco, pluginOptions) ]
+    module: { rules: [{ test, use: loaders }] },
+    plugins: [ _createAotPlugin(wco, { tsConfigPath }) ]
   };
 }
 
 export function getNonAotTestConfig(wco: WebpackConfigOptions) {
   const { projectRoot, appConfig } = wco;
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.testTsconfig);
-  const appTsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
 
   let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true };
 
-  if (AngularCompilerPlugin.isSupported()) {
-    if (appConfig.polyfills) {
-      // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
-      // include 'polyfills.ts' in `tsconfig.spec.json'.
-      const polyfillsPath = path.resolve(projectRoot, appConfig.root, appConfig.polyfills);
-      pluginOptions.singleFileIncludes = [polyfillsPath];
-    }
-  } else {
-    // The options below only apply to AoTPlugin.
-    // Force include main and polyfills.
-    // This is needed for AngularCompilerPlugin compatibility with existing projects,
-    // since TS compilation there is stricter and tsconfig.spec.ts doesn't include them.
-    const include = [appConfig.main, appConfig.polyfills, '**/*.spec.ts'];
-    if (appConfig.test) {
-      include.push(appConfig.test);
-    }
-
-    pluginOptions.include = include;
-
-    // Fallback to correct module format on projects using a shared tsconfig.
-    if (tsConfigPath === appTsConfigPath) {
-      pluginOptions.compilerOptions = { module: 'commonjs' };
-    }
+  if (appConfig.polyfills) {
+    // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
+    // include 'polyfills.ts' in `tsconfig.spec.json'.
+    const polyfillsPath = path.resolve(projectRoot, appConfig.root, appConfig.polyfills);
+    pluginOptions.singleFileIncludes = [polyfillsPath];
   }
 
   return {

@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as webpack from 'webpack';
 import * as fs from 'fs';
 import * as semver from 'semver';
@@ -6,15 +5,12 @@ import { stripIndent } from 'common-tags';
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { PurifyPlugin } from '@angular-devkit/build-optimizer';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
-import { StaticAssetPlugin } from '../../plugins/static-asset';
-import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 import { resolveProjectModule } from '../../utilities/require-project-module';
 import { NEW_SW_VERSION } from '../../utilities/service-worker';
 
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
-const OLD_SW_VERSION = '>= 1.0.0-beta.5 < 2.0.0';
 
 /**
  * license-webpack-plugin has a peer dependency on webpack-sources, list it in a comment to
@@ -28,7 +24,6 @@ export function getProdConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
   let extraPlugins: any[] = [];
-  let entryPoints: { [key: string]: string[] } = {};
 
   if (appConfig.serviceWorker) {
     let swPackageJsonPath;
@@ -48,69 +43,14 @@ export function getProdConfig(wco: WebpackConfigOptions) {
     // expected version.
     const swPackageJson = fs.readFileSync(swPackageJsonPath).toString();
     const swVersion = JSON.parse(swPackageJson)['version'];
-
-    const isLegacySw = semver.satisfies(swVersion, OLD_SW_VERSION);
     const isModernSw = semver.gte(swVersion, NEW_SW_VERSION);
 
-    if (!isLegacySw && !isModernSw) {
+    if (!isModernSw) {
       throw new Error(stripIndent`
         The installed version of @angular/service-worker is ${swVersion}. This version of the CLI
-        requires the @angular/service-worker version to satisfy ${OLD_SW_VERSION}. Please upgrade
+        requires the @angular/service-worker version to satisfy ${NEW_SW_VERSION}. Please upgrade
         your service worker version.
       `);
-    }
-
-    if (isLegacySw) {
-      // Path to the @angular/service-worker package
-      const swModule = path.dirname(swPackageJsonPath);
-
-      // Path to the worker script itself.
-      const workerPath = path.resolve(swModule, 'bundles/worker-basic.min.js');
-
-      // Path to a small script to register a service worker.
-      const registerPath = path.resolve(swModule, 'build/assets/register-basic.min.js');
-
-      // Sanity check - both of these files should be present in @angular/service-worker.
-      if (!fs.existsSync(workerPath) || !fs.existsSync(registerPath)) {
-        throw new Error(stripIndent`
-          The installed version of @angular/service-worker isn't supported by the CLI.
-          Please install a supported version. The following files should exist:
-          - ${registerPath}
-          - ${workerPath}
-        `);
-      }
-
-      // CopyWebpackPlugin replaces GlobCopyWebpackPlugin, but AngularServiceWorkerPlugin depends
-      // on specific behaviour from latter.
-      // AngularServiceWorkerPlugin expects the ngsw-manifest.json to be present in the 'emit' phase
-      // but with CopyWebpackPlugin it's only there on 'after-emit'.
-      // So for now we keep it here, but if AngularServiceWorkerPlugin changes we remove it.
-      extraPlugins.push(new GlobCopyWebpackPlugin({
-        patterns: [
-          'ngsw-manifest.json',
-          { glob: 'ngsw-manifest.json',
-            input: path.resolve(projectRoot, appConfig.root), output: '' }
-        ],
-        globOptions: {
-          cwd: projectRoot,
-          optional: true,
-        },
-      }));
-
-      // Load the Webpack plugin for manifest generation and install it.
-      const AngularServiceWorkerPlugin = require('@angular/service-worker/build/webpack')
-        .AngularServiceWorkerPlugin;
-      extraPlugins.push(new AngularServiceWorkerPlugin({
-        baseHref: buildOptions.baseHref || '/',
-      }));
-
-      // Copy the worker script into assets.
-      const workerContents = fs.readFileSync(workerPath).toString();
-      extraPlugins.push(new StaticAssetPlugin('worker-basic.min.js', workerContents));
-
-      // Add a script to index.html that registers the service worker.
-      // TODO(alxhub): inline this script somehow.
-      entryPoints['sw-register'] = [registerPath];
     }
   }
 
@@ -145,7 +85,6 @@ export function getProdConfig(wco: WebpackConfigOptions) {
   }
 
   return {
-    entry: entryPoints,
     plugins: [
       new webpack.EnvironmentPlugin({
         'NODE_ENV': 'production'
