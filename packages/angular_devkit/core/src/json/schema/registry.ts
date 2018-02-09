@@ -21,13 +21,15 @@ import {
   SchemaValidator,
   SchemaValidatorResult,
 } from './interface';
-import { JsonPointer, JsonVisitor, parseJsonPointer, visitJson, visitJsonSchema } from './visitor';
+import { addUndefinedDefaults } from './transforms';
+import { JsonVisitor, visitJson } from './visitor';
 
 
 export class CoreSchemaRegistry implements SchemaRegistry {
   private _ajv: ajv.Ajv;
   private _uriCache = new Map<string, JsonObject>();
   private _pre = new PartiallyOrderedSet<JsonVisitor>();
+  private _post = new PartiallyOrderedSet<JsonVisitor>();
 
   constructor(formats: SchemaFormat[] = []) {
     /**
@@ -48,74 +50,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     });
 
     this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
-  }
 
-  private _clean(
-    data: any,  // tslint:disable-line:no-any
-    schema: JsonObject,
-    validate: ajv.ValidateFunction,
-    parentDataCache: WeakMap<object, any>,  // tslint:disable-line:no-any
-  ) {
-    visitJsonSchema(
-      schema,
-      (currentSchema: object, pointer: JsonPointer, parentSchema?: object, index?: string) => {
-      // If we're at the root, skip.
-      if (parentSchema === undefined || index === undefined) {
-        return;
-      }
-
-      const parsedPointer = parseJsonPointer(pointer);
-      // Every other path fragment is either 'properties', 'items', 'allOf', ...
-      const nonPropertyParsedPP = parsedPointer.filter((_, i) => !(i % 2));
-      // Skip if it's part of a definitions or too complex for us to analyze.
-      if (nonPropertyParsedPP.some(f => f == 'definitions' || f == 'allOf' || f == 'anyOf')) {
-        return;
-      }
-
-      let maybeParentData = parentDataCache.get(parentSchema);
-      if (!maybeParentData) {
-        // Every other path fragment is either 'properties' or 'items' in this model.
-        const parentDataPointer = parsedPointer.filter((_, i) => i % 2);
-
-        // Find the parentData from the list.
-        maybeParentData = data;
-        for (const index of parentDataPointer.slice(0, -1)) {
-          if (maybeParentData[index] === undefined) {
-            // tslint:disable-next-line:no-any
-            if (parentSchema.hasOwnProperty('items') || (parentSchema as any)['type'] == 'array') {
-              maybeParentData[index] = [];
-            } else {
-              maybeParentData[index] = {};
-            }
-          }
-          maybeParentData = maybeParentData[index];
-        }
-        parentDataCache.set(parentSchema, maybeParentData);
-      }
-
-      if (currentSchema.hasOwnProperty('$ref')) {
-        const $ref = (currentSchema as { $ref: string })['$ref'];
-        const refHash = $ref.split('#', 2)[1];
-        const refUrl = $ref.startsWith('#') ? $ref : $ref.split('#', 1);
-
-        let refVal = validate;
-        if (!$ref.startsWith('#')) {
-          // tslint:disable-next-line:no-any
-          refVal = (validate.refVal as any)[(validate.refs as any)[refUrl[0]]];
-        }
-        if (refHash) {
-          // tslint:disable-next-line:no-any
-          refVal = (refVal.refVal as any)[(refVal.refs as any)['#' + refHash]];
-        }
-
-        maybeParentData[index] = {};
-        this._clean(maybeParentData[index], refVal.schema as JsonObject, refVal, parentDataCache);
-
-        return;
-      } else if (!maybeParentData.hasOwnProperty(index)) {
-        maybeParentData[index] = undefined;
-      }
-    });
+    this.addPostTransform(addUndefinedDefaults);
   }
 
   private _fetch(uri: string): Promise<JsonObject> {
@@ -160,7 +96,41 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     this._pre.add(visitor, deps);
   }
 
-  compile(schema: Object): Observable<SchemaValidator> {
+  /**
+   * Add a transformation step after the validation of any Json. The JSON will not be validated
+   * after the POST, so if transformations are not compatible with the Schema it will not result
+   * in an error.
+   * @param {JsonVisitor} visitor The visitor to transform every value.
+   * @param {JsonVisitor[]} deps A list of other visitors to run before.
+   */
+  addPostTransform(visitor: JsonVisitor, deps?: JsonVisitor[]) {
+    this._post.add(visitor, deps);
+  }
+
+  protected _resolver(
+    ref: string,
+    validate: ajv.ValidateFunction,
+  ): { context?: ajv.ValidateFunction, schema?: JsonObject } {
+    if (!validate) {
+      return {};
+    }
+
+    const refHash = ref.split('#', 2)[1];
+    const refUrl = ref.startsWith('#') ? ref : ref.split('#', 1);
+
+    if (!ref.startsWith('#')) {
+      // tslint:disable-next-line:no-any
+      validate = (validate.refVal as any)[(validate.refs as any)[refUrl[0]]];
+    }
+    if (validate && refHash) {
+      // tslint:disable-next-line:no-any
+      validate = (validate.refVal as any)[(validate.refs as any)['#' + refHash]];
+    }
+
+    return { context: validate, schema: validate && validate.schema as JsonObject };
+  }
+
+  compile(schema: JsonObject): Observable<SchemaValidator> {
     // Supports both synchronous and asynchronous compilation, by trying the synchronous
     // version first, then if refs are missing this will fails.
     // We also add any refs from external fetched schemas so that those will also be used
@@ -193,7 +163,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           let dataObs = observableOf(data);
           this._pre.forEach(visitor =>
             dataObs = dataObs.pipe(
-              concatMap(data => visitJson(data as JsonValue, visitor)),
+              concatMap(data => {
+                return visitJson(data as JsonValue, visitor, schema, this._resolver, validate);
+              }),
             ),
           );
 
@@ -206,13 +178,35 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 : fromPromise((result as PromiseLike<boolean>)
                   .then(result => [updatedData, result]));
             }),
+            switchMap(([data, valid]) => {
+              if (valid) {
+                let dataObs = observableOf(data);
+                this._post.forEach(visitor =>
+                  dataObs = dataObs.pipe(
+                    concatMap(data => {
+                      return visitJson(
+                        data as JsonValue,
+                        visitor,
+                        schema,
+                        this._resolver,
+                        validate,
+                      );
+                    }),
+                  ),
+                );
+
+                return dataObs.pipe(
+                  map(data => [data, valid]),
+                );
+              } else {
+                return observableOf([data, valid]);
+              }
+            }),
             map(([data, valid]) => {
               if (valid) {
                 // tslint:disable-next-line:no-any
                 const schemaDataMap = new WeakMap<object, any>();
                 schemaDataMap.set(schema, data);
-
-                this._clean(data, schema as JsonObject, validate, schemaDataMap);
 
                 return { data, success: true } as SchemaValidatorResult;
               }

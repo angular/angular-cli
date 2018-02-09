@@ -5,15 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { schema } from '@angular-devkit/core';
+import { JsonObject, JsonValue, schema } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { mergeMap } from 'rxjs/operators';
 
 
 export function formatValidator(
-  data: Object,
-  dataSchema: Object,
+  data: JsonValue,
+  dataSchema: JsonObject,
   formats: schema.SchemaFormat[],
 ): Observable<schema.SchemaValidatorResult> {
   const registry = new schema.CoreSchemaRegistry();
