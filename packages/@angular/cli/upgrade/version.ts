@@ -199,7 +199,7 @@ export class Version {
     if (version && version.isKnown()) {
       if (version.major == 0) {
         return true;
-      } else if (version.minor != 0) {
+      } else if (version.major > 1 || version.minor != 0) {
         return false;
       } else if (version.isBeta() && !version.toString().match(/webpack/)) {
         const betaVersion = version.extra;
