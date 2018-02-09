@@ -108,4 +108,50 @@ describe('visitJson', () => {
       error: done.fail,
     });
   });
+
+  it('works with schema', () => {
+    const schema = {
+      properties: {
+        bool: { type: 'boolean' },
+        str: { type: 'string', default: 'someString' },
+        obj: {
+          properties: {
+            num: { type: 'number' },
+            other: { type: 'number', default: 0 },
+          },
+        },
+      },
+    };
+
+    const allPointers: { [ptr: string]: JsonObject | undefined } = {};
+    function visitor(value: JsonValue, ptr: string, schema?: JsonObject) {
+      expect(allPointers[ptr]).toBeUndefined();
+      allPointers[ptr] = schema;
+
+      return value;
+    }
+
+    const json = {
+      bool: true,
+      str: 'hello',
+      obj: {
+        num: 1,
+      },
+    };
+
+    const result = syncObs(visitJson(json, visitor, schema));
+
+    expect(result).toEqual({
+      bool: true,
+      str: 'hello',
+      obj: { num: 1 },
+    });
+    expect(allPointers).toEqual({
+      '/': schema,
+      '/bool': schema.properties.bool,
+      '/str': schema.properties.str,
+      '/obj': schema.properties.obj,
+      '/obj/num': schema.properties.obj.properties.num,
+    });
+  });
 });
