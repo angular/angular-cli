@@ -21,9 +21,7 @@ matrix:
   fast_finish: true
   allow_failures:
     - env: nightly
-    - env: ng2
-    - node_js: "7"
-    - node_js: "8"
+    - env: node9
   include:
     # Build stage
     - stage: build
@@ -36,49 +34,37 @@ matrix:
     - stage: test
       script: npm run test
       env: test
-    - node_js: "6"
+    - node_js: "8"
       os: linux
       script: node tests/run_e2e.js --nb-shards=4 --shard=0 --nosilent
       env: e2e-0
-    - node_js: "6"
+    - node_js: "8"
       os: linux
       script: node tests/run_e2e.js --nb-shards=4 --shard=1 --nosilent
       env: e2e-1
-    - node_js: "6"
+    - node_js: "8"
       os: linux
       script: node tests/run_e2e.js --nb-shards=4 --shard=2 --nosilent
       env: e2e-2
-    - node_js: "6"
+    - node_js: "8"
       os: linux
       script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent
       env: e2e-3
-    - node_js: "6"
+    - node_js: "8"
       os: linux
       script: node tests/run_e2e.js --eject "--glob=tests/build/**"
       env: eject
 
     # Optional stage.
     - stage: optional
-      node_js: "6"
-      os: linux
-      script: node tests/run_e2e.js --ng2 "--glob=tests/build/**"
-      env: ng2
-    - node_js: "6"
-      os: linux
-      script: node tests/run_e2e.js --ng4 "--glob=tests/build/**"
-      env: ng4
-    - node_js: "6"
+      node_js: "8"
       os: linux
       script: node tests/run_e2e.js --nightly "--glob=tests/build/**"
       env: nightly
-    - node_js: "7"
+    - node_js: "9"
       os: linux
       script: node tests/run_e2e.js "--glob=tests/build/**"
-      env: node7
-    - node_js: "8"
-      os: linux
-      script: node tests/run_e2e.js "--glob=tests/build/**"
-      env: node8
+      env: node9
 
     # Deploy stage
     - stage: deploy
@@ -102,7 +88,7 @@ matrix:
 
 before_install:
   # Install npm 5.
-  - npm install -g npm@~5.3.0
+  - npm install -g npm@~5.5.1
 
 install:
   - npm install
