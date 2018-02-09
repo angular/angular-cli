@@ -276,7 +276,11 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   if (minimizeCss) {
-    extraPlugins.push(new CleanCssWebpackPlugin({ sourceMap: cssSourceMap }));
+    extraPlugins.push(new CleanCssWebpackPlugin({
+      sourceMap: cssSourceMap,
+      // component styles retain their original file name
+      test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
+    }));
   }
 
   return {
