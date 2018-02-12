@@ -93,10 +93,10 @@ export default Task.extend({
       .reduce((total, current) => {
         const failures = current.failures
           .filter(cf => !total.failures.some(ef => ef.equals(cf)));
-        total.failures = total.failures.concat(...failures);
+        total.failures = total.failures.concat(failures);
 
         if (current.fixes) {
-          total.fixes = (total.fixes || []).concat(...current.fixes);
+          total.fixes = (total.fixes || []).concat(current.fixes);
         }
 
         if (current.errorCount !== undefined) {
