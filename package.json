@@ -38,8 +38,8 @@
     "url": "https://github.com/angular/devkit.git"
   },
   "engines": {
-    "node": ">= 6.9.0",
-    "npm": ">= 3.0.0"
+    "node": ">= 8.9.0",
+    "npm": ">= 5.5.1"
   },
   "author": "Angular Authors",
   "license": "MIT",
