@@ -73,7 +73,7 @@ export default function() {
       newHashes = generateFileHashMap();
     })
     .then(() => {
-      validateHashes(oldHashes, newHashes, ['inline', 'styles']);
+      validateHashes(oldHashes, newHashes, ['styles']);
       oldHashes = newHashes;
     })
     .then(() => writeFile('src/app/app.component.css', 'h1 { margin: 10px; }'))
@@ -82,7 +82,7 @@ export default function() {
       newHashes = generateFileHashMap();
     })
     .then(() => {
-      validateHashes(oldHashes, newHashes, ['inline', 'main']);
+      validateHashes(oldHashes, newHashes, ['main']);
       oldHashes = newHashes;
     })
     .then(() => prependToFile('src/app/lazy/lazy.module.ts', `

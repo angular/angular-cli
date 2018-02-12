@@ -80,6 +80,7 @@ const ignoredPackages = [
   'map-stream@0.1.0', // MIT, license but it's not listed in package.json.
   'xmldom@0.1.27', // LGPL,MIT but has a broken licenses array.
   'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
+  'pako@1.0.6', // SPDX expression (MIT AND Zlib) in package.json
 
   'jsonify@0.0.0', // TODO(hansl): fix this. this is not an acceptable license, but is 8 deps down
                    // so hard to manage. In talk with owner and users to switch over.
