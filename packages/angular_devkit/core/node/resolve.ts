@@ -58,14 +58,15 @@ function _getGlobalNodeModules() {
     globalPrefix = path.dirname(path.dirname(process.execPath));
 
     // destdir only is respected on Unix
-    if (process.env.DESTDIR) {
-      globalPrefix = path.join(process.env.DESTDIR, globalPrefix);
+    const destdir = process.env.DESTDIR;
+    if (destdir) {
+      globalPrefix = path.join(destdir, globalPrefix);
     }
   }
 
   return (process.platform !== 'win32')
-    ? path.resolve(globalPrefix, 'lib', 'node_modules')
-    : path.resolve(globalPrefix, 'node_modules');
+    ? path.resolve(globalPrefix || '', 'lib', 'node_modules')
+    : path.resolve(globalPrefix || '', 'node_modules');
 }
 
 
