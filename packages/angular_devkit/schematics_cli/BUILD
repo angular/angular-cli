@@ -4,7 +4,7 @@
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility = ["//visibility:public"])
 
-load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
+load("//tools:defaults.bzl", "ts_library")
 
 licenses(["notice"])  # MIT License
 
