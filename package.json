@@ -30,7 +30,8 @@
     "integration": "npm run build && npm run integration:build-optimizer",
     "integration:build-optimizer": "npm run integration:build-optimizer:simple && npm run integration:build-optimizer:aio",
     "integration:build-optimizer:simple": "cd tests/@angular_devkit/build_optimizer/webpack/simple-app && npm i -q && npm run reinstall-bo && npm run e2e && npm run benchmark",
-    "integration:build-optimizer:aio": "cd tests/@angular_devkit/build_optimizer/webpack/aio-app && npm i -q && npm run reinstall-bo && npm run e2e && npm run benchmark"
+    "integration:build-optimizer:aio": "cd tests/@angular_devkit/build_optimizer/webpack/aio-app && npm i -q && npm run reinstall-bo && npm run e2e && npm run benchmark",
+    "prepush": "node ./bin/devkit-admin hooks/pre-push"
   },
   "repository": {
     "type": "git",
@@ -61,6 +62,7 @@
     "chokidar": "^1.7.0",
     "conventional-changelog": "^1.1.0",
     "glob": "^7.0.3",
+    "husky": "^0.14.3",
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0",
     "jasmine-spec-reporter": "^3.2.0",

@@ -11,7 +11,14 @@ import { execSync } from 'child_process';
 import { packages } from '../lib/packages';
 
 
-export default function (_: {}, logger: logging.Logger) {
+export interface ValidateCommitsOptions {
+  ci?: boolean;
+  base?: string;
+  head?: string;
+}
+
+
+export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
   logger.info('Getting merge base...');
 
   const prNumber = process.env['CIRCLE_PR_NUMBER'] || '';
@@ -26,6 +33,9 @@ export default function (_: {}, logger: logging.Logger) {
     }).toString());
     baseSha = prJson['base']['sha'];
     sha = prJson['head']['sha'];
+  } else if (argv.base) {
+    baseSha = argv.base;
+    sha = argv.head || 'HEAD';
   } else {
     const parentRemote = process.env['GIT_REMOTE'] ? process.env['GIT_REMOTE'] + '/' : '';
     const parentBranch = process.env['GIT_BRANCH'] || 'master';
@@ -110,9 +120,15 @@ export default function (_: {}, logger: logging.Logger) {
         }
         break;
 
+      case 'wip':
+        if (argv.ci) {
+          _invalid(sha, message, 'wip are not allowed in a PR');
+        }
+        break;
+
       // Unknown types.
       default:
-        _invalid(sha, message, 'has an unknown type');
+        _invalid(sha, message, 'has an unknown type. You can use wip: to avoid this.');
     }
   }
 

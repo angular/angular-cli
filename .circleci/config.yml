@@ -28,7 +28,7 @@ jobs:
           key: angular_devkit-{{ checksum "package-lock.json" }}
 
       - run: npm install --no-save
-      - run: npm run validate
+      - run: npm run validate -- --ci
 
   test:
     <<: *defaults
