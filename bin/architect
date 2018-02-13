@@ -11,4 +11,4 @@
 
 require('../lib/bootstrap-local');
 const packages = require('../lib/packages').packages;
-require(packages['@angular-devkit/architect'].bin['architect']);
+require(packages['@angular-devkit/architect-cli'].bin['architect']);
