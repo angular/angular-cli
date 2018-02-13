@@ -2,23 +2,22 @@ import * as fs from 'fs';
 import * as path from 'path';
 import chalk from 'chalk';
 
+import { Command, CommandScope } from '../models/command';
 import { CliConfig } from '../models/config';
 import { validateProjectName } from '../utilities/validate-project-name';
 import { oneLine } from 'common-tags';
 import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 
-const { cyan } = chalk;
-
-const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 
-const NewCommand = Command.extend({
-  name: 'new',
-  aliases: ['n'],
-  description: `Creates a new directory and a new Angular app eg. "ng new [name]".`,
-  works: 'outsideProject',
-
-  availableOptions: [
+export default class NewCommand extends Command {
+  public readonly name = 'new';
+  public readonly description =
+    'Creates a new directory and a new Angular app eg. "ng new [name]".';
+  public static aliases = ['n'];
+  public scope = CommandScope.outsideProject;
+  public arguments = ['name'];
+  public options = [
     {
       name: 'dry-run',
       type: Boolean,
@@ -42,35 +41,17 @@ const NewCommand = Command.extend({
       aliases: ['c'],
       description: 'Schematics collection to use.'
     }
-  ],
+  ];
 
-  isProject: function (projectPath: string) {
-    return CliConfig.fromProject(projectPath) !== null;
-  },
-
-  getCollectionName(rawArgs: string[]) {
-    let collectionName = CliConfig.fromGlobal().get('defaults.schematics.collection');
-    if (rawArgs) {
-      const parsedArgs = this.parseArgs(rawArgs, false);
-      if (parsedArgs.options.collection) {
-        collectionName = parsedArgs.options.collection;
-      }
+  private initialized = false;
+  public initialize(options: any) {
+    if (this.initialized) {
+      return Promise.resolve();
     }
-    return collectionName;
-  },
+    this.initialized = true;
 
-  beforeRun: function (rawArgs: string[]) {
-    const isHelp = ['--help', '-h'].includes(rawArgs[0]);
-    if (isHelp) {
-      return;
-    }
-
-    const schematicName = CliConfig.getValue('defaults.schematics.newApp');
-
-    if (/^\d/.test(rawArgs[1])) {
-      SilentError.debugOrThrow('@angular/cli/commands/generate',
-        `The \`ng new ${rawArgs[0]}\` file name cannot begin with a digit.`);
-    }
+    const collectionName = this.parseCollectionName(options);
+    const schematicName = CliConfig.fromGlobal().get('defaults.schematics.newApp');
 
     const SchematicGetOptionsTask = require('../tasks/schematic-get-options').default;
 
@@ -80,34 +61,34 @@ const NewCommand = Command.extend({
     });
 
     return getOptionsTask.run({
-      schematicName,
-      collectionName: this.getCollectionName(rawArgs)
-    })
-      .then((availableOptions: SchematicAvailableOptions) => {
-        this.registerOptions({
-          availableOptions: availableOptions
-        });
+        schematicName,
+        collectionName
+      })
+      .then((availableOptions: SchematicAvailableOptions[]) => {
+        if (availableOptions) {
+          availableOptions = availableOptions.filter(opt => opt.name !== 'name');
+        }
+
+        this.options = this.options.concat( availableOptions || []);
       });
-  },
+  }
 
-  run: function (commandOptions: any, rawArgs: string[]) {
-    const packageName = rawArgs.shift();
-
-    if (!packageName) {
+  public async run(options: any) {
+    if (!options.name) {
       return Promise.reject(new SilentError(
-        `The "ng ${this.name}" command requires a name argument to be specified eg. ` +
+        `The "ng ${options.name}" command requires a name argument to be specified eg. ` +
         chalk.yellow('ng new [name] ') +
         `For more details, use "ng help".`));
     }
 
-    validateProjectName(packageName);
-    commandOptions.name = packageName;
-    if (commandOptions.dryRun) {
-      commandOptions.skipGit = true;
+    validateProjectName(options.name);
+    options.name = options.name;
+    if (options.dryRun) {
+      options.skipGit = true;
     }
 
-    commandOptions.directory = commandOptions.directory || packageName;
-    const directoryName = path.join(process.cwd(), commandOptions.directory);
+    options.directory = options.directory || options.name;
+    const directoryName = path.join(process.cwd(), options.directory);
 
     if (fs.existsSync(directoryName) && this.isProject(directoryName)) {
       throw new SilentError(oneLine`
@@ -115,49 +96,35 @@ const NewCommand = Command.extend({
       `);
     }
 
-    if (commandOptions.collection) {
-      commandOptions.collectionName = commandOptions.collection;
+    if (options.collection) {
+      options.collectionName = options.collection;
     } else {
-      commandOptions.collectionName = this.getCollectionName(rawArgs);
+      options.collectionName = this.parseCollectionName(options);
     }
 
     const InitTask = require('../tasks/init').default;
 
     const initTask = new InitTask({
       project: this.project,
-      tasks: this.tasks,
       ui: this.ui,
     });
 
     // Ensure skipGit has a boolean value.
-    commandOptions.skipGit = commandOptions.skipGit === undefined ? false : commandOptions.skipGit;
+    options.skipGit = options.skipGit === undefined ? false : options.skipGit;
 
-    return initTask.run(commandOptions, rawArgs);
-  },
-
-  printDetailedHelp: function (): string | Promise<string> {
-    const collectionName = this.getCollectionName();
-    const schematicName = CliConfig.getValue('defaults.schematics.newApp');
-    const SchematicGetHelpOutputTask = require('../tasks/schematic-get-help-output').default;
-    const getHelpOutputTask = new SchematicGetHelpOutputTask({
-      ui: this.ui,
-      project: this.project
-    });
-    return getHelpOutputTask.run({
-      schematicName,
-      collectionName,
-      nonSchematicOptions: this.availableOptions.filter((o: any) => !o.hidden)
-    })
-    .then((output: string[]) => {
-      const outputLines = [
-        cyan(`ng new ${cyan('[name]')} ${cyan('<options...>')}`),
-        ...output
-      ];
-      return outputLines.join('\n');
-    });
+    return await initTask.run(options);
   }
-});
 
+  private isProject(projectPath: string): boolean {
+    return CliConfig.fromProject(projectPath) !== null;
+  }
 
-NewCommand.overrideCore = true;
-export default NewCommand;
+  private parseCollectionName(options: any): string {
+    let collectionName: string =
+      options.collection ||
+      options.c ||
+      CliConfig.getValue('defaults.schematics.collection');
+
+    return collectionName;
+  }
+}

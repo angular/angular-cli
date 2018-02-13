@@ -124,71 +124,64 @@ export default Task.extend({
       }
     });
 
-    return new Promise((resolve, reject) => {
-      schematic.call(opts, host).pipe(
-        map((tree: Tree) => Tree.optimize(tree)),
-        concatMap((tree: Tree) => {
-          return dryRunSink.commit(tree).pipe(
-            ignoreElements(),
-            concat(observableOf(tree)));
-        }),
-        concatMap((tree: Tree) => {
-          if (!error) {
-            // Output the logging queue.
-            loggingQueue.forEach(log => ui.writeLine(`  ${log.color(log.keyword)} ${log.message}`));
-          }
+    return schematic.call(opts, host).pipe(
+      map((tree: Tree) => Tree.optimize(tree)),
+      concatMap((tree: Tree) => {
+        return dryRunSink.commit(tree).pipe(
+          ignoreElements(),
+          concat(observableOf(tree)));
+      }),
+      concatMap((tree: Tree) => {
+        if (!error) {
+          // Output the logging queue.
+          loggingQueue.forEach(log => ui.writeLine(`  ${log.color(log.keyword)} ${log.message}`));
+        }
 
-          if (opts.dryRun || error) {
-            return observableOf(tree);
-          }
-          return fsSink.commit(tree).pipe(
-            ignoreElements(),
-            concat(observableOf(tree)));
-        }),
-        concatMap(() => {
-          if (!opts.dryRun) {
-            return getEngine().executePostTasks();
-          } else {
-            return [];
-          }
-        }))
-        .subscribe({
-          error(err) {
-            ui.writeLine(red(`Error: ${err.message}`));
-            reject(err.message);
-          },
-          complete() {
-            if (opts.dryRun) {
-              ui.writeLine(yellow(`\nNOTE: Run with "dry run" no changes were made.`));
-            }
-            resolve({modifiedFiles});
-          }
-        });
-    })
-    .then((output: SchematicOutput) => {
-      const modifiedFiles = output.modifiedFiles;
-      const lintFix = taskOptions.lintFix !== undefined ?
-        taskOptions.lintFix : CliConfig.getValue('defaults.lintFix');
+        if (opts.dryRun || error) {
+          return observableOf(tree);
+        }
+        return fsSink.commit(tree).pipe(
+          ignoreElements(),
+          concat(observableOf(tree)));
+      }),
+      concatMap(() => {
+        if (!opts.dryRun) {
+          return getEngine().executePostTasks();
+        } else {
+          return [];
+        }
+      }))
+      .toPromise()
+      .then(() => {
+        if (opts.dryRun) {
+          ui.writeLine(yellow(`\nNOTE: Run with "dry run" no changes were made.`));
+        }
+        return {modifiedFiles};
+      })
+      .then((output: SchematicOutput) => {
+        const modifiedFiles = output.modifiedFiles;
+        const lintFix = taskOptions.lintFix !== undefined ?
+          taskOptions.lintFix : CliConfig.getValue('defaults.lintFix');
 
-      if (lintFix && modifiedFiles) {
-        const LintTask = require('./lint').default;
-        const lintTask = new LintTask({
-          ui: this.ui,
-          project: this.project
-        });
+        if (lintFix && modifiedFiles) {
+          const LintTask = require('./lint').default;
+          const lintTask = new LintTask({
+            ui: this.ui,
+            project: this.project
+          });
 
-        return lintTask.run({
-          fix: true,
-          force: true,
-          silent: true,
-          configs: [{
-            files: modifiedFiles
-              .filter((file: string) => /.ts$/.test(file))
-              .map((file: string) => path.join(projectRoot, file))
-          }]
-        });
-      }
-    });
+          return lintTask.run({
+            fix: true,
+            force: true,
+            silent: true,
+            configs: [{
+              files: modifiedFiles
+                .filter((file: string) => /.ts$/.test(file))
+                .map((file: string) => path.join(projectRoot, file))
+            }]
+          });
+        }
+      });
   }
 });
 
@@ -199,7 +192,8 @@ function prepOptions(schematic: Schematic<{}, {}>, options: SchematicOptions): S
 
   const keys = Object.keys(properties);
   if (['component', 'c', 'directive', 'd'].indexOf(schematic.description.name) !== -1) {
-    options.prefix = (options.prefix === 'false' || options.prefix === '')
+    options.prefix =
+      (options.prefix === 'false' || options.prefix === false || options.prefix === '')
       ? undefined : options.prefix;
   }
 
@@ -217,7 +211,10 @@ function prepOptions(schematic: Schematic<{}, {}>, options: SchematicOptions): S
 
 function readDefaults(schematicName: string, optionKeys: string[], options: any): any {
   return optionKeys.reduce((acc: any, key) => {
-    acc[key] = options[key] !== undefined ? options[key] : readDefault(schematicName, key);
+    const value = options[key] !== undefined ? options[key] : readDefault(schematicName, key);
+    if (value !== undefined) {
+      acc[key] = value;
+    }
     return acc;
   }, {});
 }

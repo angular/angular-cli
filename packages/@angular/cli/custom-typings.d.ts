@@ -24,3 +24,5 @@ interface IWebpackDevServerConfigurationOptions {
   public?: string;
   disableHostCheck?: boolean;
 }
+
+declare module 'yargs-parser';

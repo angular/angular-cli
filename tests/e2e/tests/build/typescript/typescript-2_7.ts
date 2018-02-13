@@ -12,6 +12,6 @@ export default async function () {
 
   await npm('install', 'typescript@2.7');
   await ng('build');
-  await ng('build', '--prod');
+  await ng('build', '--target', 'production');
   await npm('install', 'typescript@2.6');
 }

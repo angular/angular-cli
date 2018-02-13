@@ -6,7 +6,7 @@ import { expectToFail } from '../../utils/utils';
 export default function () {
   return ng('build', '--aot', '--build-optimizer')
     .then(() => expectToFail(() => expectFileToMatch('dist/main.js', /\.decorators =/)))
-    .then(() => ng('build', '--prod'))
+    .then(() => ng('build', '--target', 'production'))
     .then(() => expectToFail(() => expectFileToExist('dist/vendor.js')))
     .then(() => expectToFail(() => expectFileToMatch('dist/main.js', /\.decorators =/)));
 }

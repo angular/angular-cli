@@ -30,7 +30,7 @@
 <details>
   <summary>lint-fix</summary>
   <p>
-    <code>--lint-fix</code> (aliases: <code>-lf</code>)
+    <code>--lint-fix</code> (aliases: <code>-l</code>)
   </p>
   <p>
     Use lint to fix files after generation.

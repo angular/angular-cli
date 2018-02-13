@@ -84,7 +84,8 @@
     "webpack-dev-server": "^3.0.1-beta.0",
     "webpack-merge": "^4.1.2",
     "webpack-sources": "^1.1.0",
-    "webpack-subresource-integrity": "^1.0.1"
+    "webpack-subresource-integrity": "^1.0.1",
+    "yargs-parser": "^9.0.2"
   },
   "optionalDependencies": {
     "node-sass": "^4.7.2"

@@ -7,12 +7,12 @@ export default function() {
   return ng('build', '--sourcemaps')
     .then(() => expectFileToExist('dist/main.js.map'))
 
-    .then(() => ng('build', '--no-sourcemap'))
+    .then(() => ng('build', '--sourcemaps', 'false'))
     .then(() => expectToFail(() => expectFileToExist('dist/main.js.map')))
 
-    .then(() => ng('build', '--prod', '--output-hashing=none'))
+    .then(() => ng('build', '--target', 'production', '--output-hashing=none'))
     .then(() => expectToFail(() => expectFileToExist('dist/main..js.map')))
 
-    .then(() => ng('build', '--prod', '--output-hashing=none', '--sourcemap'))
+    .then(() => ng('build', '--target', 'production', '--output-hashing=none', '--sourcemaps'))
     .then(() => expectFileToExist('dist/main.js.map'));
 }

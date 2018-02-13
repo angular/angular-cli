@@ -1,81 +1,65 @@
+import { Command } from '../models/command';
 import * as fs from 'fs';
-import chalk from 'chalk';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
 
 const SilentError = require('silent-error');
-const Command = require('../ember-cli/lib/models/command');
 
 export interface SetOptions {
+  jsonPath: string;
+  value: string;
   global?: boolean;
 }
 
 
-const SetCommand = Command.extend({
-  name: 'set',
-  description: 'Set a value in the configuration.',
-  works: 'everywhere',
-
-  availableOptions: [
+export default class SetCommand extends Command {
+  public readonly name = 'set';
+  public readonly description = 'Set a value in the configuration.';
+  public static aliases = ['jsonPath'];
+  public readonly arguments = ['jsonPath', 'value'];
+  public readonly options = [
     {
       name: 'global',
       type: Boolean,
       'default': false,
       aliases: ['g'],
       description: 'Set the value in the global configuration rather than in your project\'s.'
-    },
-  ],
+    }];
 
-  asBoolean: function (raw: string): boolean {
-    if (raw == 'true' || raw == '1') {
-      return true;
-    } else if (raw == 'false' || raw == '' || raw == '0') {
-      return false;
-    } else {
-      throw new SilentError(`Invalid boolean value: "${raw}"`);
-    }
-  },
-  asNumber: function (raw: string): number {
-    if (Number.isNaN(+raw)) {
-      throw new SilentError(`Invalid number value: "${raw}"`);
-    }
-    return +raw;
-  },
 
-  run: function (commandOptions: SetOptions, rawArgs: string[]): Promise<void> {
+  public run(options: SetOptions) {
     return new Promise<void>(resolve => {
-      const config = commandOptions.global ? CliConfig.fromGlobal() : CliConfig.fromProject();
+      const config = options.global ? CliConfig.fromGlobal() : CliConfig.fromProject();
       if (config === null) {
         throw new SilentError('No config found. If you want to use global configuration, '
           + 'you need the --global argument.');
       }
 
-      let [jsonPath, rawValue] = rawArgs;
-
-      if (rawValue === undefined) {
-        [jsonPath, rawValue] = jsonPath.split('=', 2);
-        if (rawValue === undefined) {
-          throw new SilentError('Must specify a value.');
-        }
+      if (options.value === undefined && options.jsonPath.indexOf('=') !== -1) {
+        [options.jsonPath, options.value] = options.jsonPath.split('=', 2);
       }
 
-      const type = config.typeOf(jsonPath);
-      let value: any = rawValue;
+      if (options.value === undefined) {
+        throw new SilentError('Must specify a value.');
+      }
+
+      const type = config.typeOf(options.jsonPath);
+      let value: any = options.value;
       switch (type) {
-        case 'boolean': value = this.asBoolean(rawValue); break;
-        case 'number': value = this.asNumber(rawValue); break;
-        case 'string': value = rawValue; break;
+        case 'boolean': value = this.asBoolean(options.value); break;
+        case 'number': value = this.asNumber(options.value); break;
+        case 'string': value = options.value; break;
 
-        default: value = parseValue(rawValue, jsonPath);
+        default: value = this.parseValue(options.value, options.jsonPath);
       }
 
-      if (jsonPath.indexOf('prefix') > 0) {
+      if (options.jsonPath.indexOf('prefix') > 0) {
         // update tslint if prefix is updated
-        updateLintForPrefix(this.project.root + '/tslint.json', value);
+        this.updateLintForPrefix(this.project.root + '/tslint.json', value);
       }
 
       try {
-        config.set(jsonPath, value);
+        config.set(options.jsonPath, value);
         config.save();
       } catch (error) {
         throw new SilentError(error.message);
@@ -83,43 +67,58 @@ const SetCommand = Command.extend({
       resolve();
     });
   }
-});
 
-function updateLintForPrefix(filePath: string, prefix: string): void {
-  if (!fs.existsSync(filePath)) {
-    return;
+  private asBoolean(raw: string): boolean {
+    if (raw == 'true' || raw == '1') {
+      return true;
+    } else if (raw == 'false' || raw == '' || raw == '0') {
+      return false;
+    } else {
+      throw new SilentError(`Invalid boolean value: "${raw}"`);
+    }
   }
 
-  const tsLint = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
-  const componentLint = tsLint.rules['component-selector'][2];
-  if (componentLint instanceof Array) {
-    tsLint.rules['component-selector'][2].push(prefix);
-  } else {
-    tsLint.rules['component-selector'][2] = prefix;
+  private asNumber(raw: string): number {
+    if (Number.isNaN(+raw)) {
+      throw new SilentError(`Invalid number value: "${raw}"`);
+    }
+    return +raw;
   }
 
-  const directiveLint = tsLint.rules['directive-selector'][2];
-  if (directiveLint instanceof Array) {
-    tsLint.rules['directive-selector'][2].push(prefix);
-  } else {
-    tsLint.rules['directive-selector'][2] = prefix;
+  private parseValue(rawValue: string, path: string) {
+    try {
+      return JSON.parse(rawValue);
+    } catch (error) {
+      throw new SilentError(`No node found at path ${path}`);
+    }
   }
 
-  fs.writeFileSync(filePath, JSON.stringify(tsLint, null, 2));
+  private updateLintForPrefix(filePath: string, prefix: string): void {
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
 
-  console.log(chalk.yellow(oneLine`
-    tslint configuration updated to match new prefix,
-    you may need to fix any linting errors.
-  `));
+    const tsLint = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+    const componentLint = tsLint.rules['component-selector'][2];
+    if (componentLint instanceof Array) {
+      tsLint.rules['component-selector'][2].push(prefix);
+    } else {
+      tsLint.rules['component-selector'][2] = prefix;
+    }
+
+    const directiveLint = tsLint.rules['directive-selector'][2];
+    if (directiveLint instanceof Array) {
+      tsLint.rules['directive-selector'][2].push(prefix);
+    } else {
+      tsLint.rules['directive-selector'][2] = prefix;
+    }
+
+    fs.writeFileSync(filePath, JSON.stringify(tsLint, null, 2));
+
+    this.logger.warn(oneLine`
+      tslint configuration updated to match new prefix,
+      you may need to fix any linting errors.
+    `);
+  }
 }
-
-function parseValue(rawValue: string, path: string) {
-  try {
-    return JSON.parse(rawValue);
-  } catch (error) {
-    throw new SilentError(`No node found at path ${path}`);
-  }
-}
-
-export default SetCommand;

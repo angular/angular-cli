@@ -26,7 +26,7 @@ export default function() {
     `))
     .then(() => ng(
       'build',
-      '--prod',
+      '--target', 'production',
       '--extract-css',
       '--output-hashing=none'
     ))

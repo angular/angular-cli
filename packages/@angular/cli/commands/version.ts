@@ -1,4 +1,4 @@
-const Command = require('../ember-cli/lib/models/command');
+import { Command, Option } from '../models/command';
 import { stripIndents } from 'common-tags';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -7,15 +7,14 @@ import chalk from 'chalk';
 import { CliConfig } from '../models/config';
 
 
-const VersionCommand = Command.extend({
-  name: 'version',
-  description: 'Outputs Angular CLI version.',
-  aliases: ['v', '--version', '-v'],
-  works: 'everywhere',
+export default class VersionCommand extends Command {
+  public readonly name = 'version';
+  public readonly description = 'Outputs Angular CLI version.';
+  public static aliases = ['v'];
+  public readonly arguments: string[] = [];
+  public readonly options: Option[] = [];
 
-  availableOptions: [],
-
-  run: function (_options: any) {
+  public run(_options: any) {
     let versions: { [name: string]: string } = {};
     let angular: { [name: string]: string } = {};
     let angularCoreVersion = '';
@@ -74,7 +73,7 @@ const VersionCommand = Command.extend({
                |___/
     `;
 
-    this.ui.writeLine(stripIndents`
+    this.logger.info(stripIndents`
     ${chalk.red(asciiArt)}
     Angular CLI: ${ngCliVersion}
     Node: ${process.versions.node}
@@ -97,9 +96,9 @@ const VersionCommand = Command.extend({
     ${Object.keys(angular).map(module => module + ': ' + angular[module]).sort().join('\n')}
     ${Object.keys(versions).map(module => module + ': ' + versions[module]).sort().join('\n')}
     `);
-  },
+  }
 
-  getDependencyVersions: function(pkg: any, prefix: string): { [name: string]: string } {
+  private getDependencyVersions(pkg: any, prefix: string): { [name: string]: string } {
     const modules: any = {};
     const deps = Object.keys(pkg['dependencies'] || {})
       .concat(Object.keys(pkg['devDependencies'] || {}))
@@ -118,9 +117,9 @@ const VersionCommand = Command.extend({
     deps.forEach(name => modules[name] = this.getVersion(name));
 
     return modules;
-  },
+  }
 
-  getVersion: function(moduleName: string): string {
+  private getVersion(moduleName: string): string {
     try {
       const modulePkg = require(path.resolve(
         this.project.root,
@@ -132,8 +131,4 @@ const VersionCommand = Command.extend({
       return 'error';
     }
   }
-});
-
-
-VersionCommand.overrideCore = true;
-export default VersionCommand;
+}

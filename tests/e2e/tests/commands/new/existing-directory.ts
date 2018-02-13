@@ -10,5 +10,5 @@ export default function() {
   return Promise.resolve()
     .then(() => process.chdir(getGlobalVariable('tmp-root')))
     .then(() => mkdir('empty-directory'))
-    .then(() => ng('new', 'foo', '--dir=empty-directory', '--skip-install', '--skip-git'));
+    .then(() => ng('new', 'foo', '--directory=empty-directory', '--skip-install', '--skip-git'));
 }

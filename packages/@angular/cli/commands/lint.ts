@@ -1,7 +1,6 @@
+import { Command, CommandScope } from '../models/command';
 import { oneLine } from 'common-tags';
 import { CliConfig } from '../models/config';
-
-const Command = require('../ember-cli/lib/models/command');
 
 
 export interface LintCommandOptions {
@@ -11,12 +10,13 @@ export interface LintCommandOptions {
   force?: boolean;
 }
 
-export default Command.extend({
-  name: 'lint',
-  aliases: ['l'],
-  description: 'Lints code in existing project.',
-  works: 'insideProject',
-  availableOptions: [
+export default class LintCommand extends Command {
+  public readonly name = 'lint';
+  public readonly description = 'Lints code in existing project.';
+  public static aliases = ['l'];
+  public readonly scope = CommandScope.inProject;
+  public readonly arguments: string[] = [];
+  public readonly options = [
     {
       name: 'fix',
       type: Boolean,
@@ -44,8 +44,9 @@ export default Command.extend({
         Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).
       `
     }
-  ],
-  run: function (commandOptions: LintCommandOptions) {
+  ];
+
+  public async run(options: LintCommandOptions) {
     const LintTask = require('../tasks/lint').default;
 
     const lintTask = new LintTask({
@@ -53,9 +54,15 @@ export default Command.extend({
       project: this.project
     });
 
-    return lintTask.run({
-      ...commandOptions,
+    const lintResults: number = await lintTask.run({
+      ...options,
       configs: CliConfig.fromProject().config.lint
     });
+
+    if (lintResults != 0) {
+      throw '';
+    }
+
+    return lintResults;
   }
-});
+}

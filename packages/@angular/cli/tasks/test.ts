@@ -25,7 +25,7 @@ export default Task.extend({
       throw new SilentError(`An app without 'main' cannot use the test command.`);
     }
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const karma = requireProjectModule(projectRoot, 'karma');
       const karmaConfig = path.join(projectRoot, options.config ||
         CliConfig.getValue('test.karma.config'));
@@ -51,7 +51,13 @@ export default Task.extend({
       karmaOptions.configFile = karmaConfig;
 
       // :shipit:
-      const karmaServer = new karma.Server(karmaOptions, resolve);
+      const karmaServer = new karma.Server(karmaOptions, function(exitCode: number) {
+        if (exitCode === 0) {
+          resolve();
+        } else {
+          reject(null);
+        }
+      });
       karmaServer.start();
     });
   }

@@ -32,7 +32,7 @@ export default function () {
     }))
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.styl'))
-    .then(() => ng('build', '--extract-css', '--sourcemap'))
+    .then(() => ng('build', '--extract-css', '--sourcemaps'))
     .then(() => expectFileToMatch('dist/styles.css',
       /body\s*{\s*background-color: #00f;\s*}/))
     .then(() => expectFileToMatch('dist/styles.css',
