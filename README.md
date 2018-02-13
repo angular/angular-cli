@@ -21,7 +21,7 @@
 ---
 
 # Introduction
-The Angular Universal project consists of the base platform API and the surrounding tools that enables developer to do server side rendering(or pre-rendering) of Angular applications. The platform API part has been merged into Angular core as of 4.0. 
+The Angular Universal project consists of the base platform API and the surrounding tools that enables developer to do server side rendering (or pre-rendering) of Angular applications. The platform API part has been merged into Angular core as of 4.0. 
 
 This repository will host the various tools like engines to integrate with various backends(NodeJS, ASP.NET etc.) and also extra modules and examples to help you started with server side rendering.
 
