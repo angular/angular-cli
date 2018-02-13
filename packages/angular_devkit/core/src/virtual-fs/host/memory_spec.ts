@@ -91,6 +91,8 @@ describe('SimpleMemoryHost', () => {
 
     expect(host.list(normalize('/sub')))
       .toEqual([fragment('file1'), fragment('file2'), fragment('sub1')]);
+    expect(host.list(normalize('/')))
+      .toEqual([fragment('sub'), fragment('file4')]);
   });
 
   it('supports isFile / isDirectory', () => {

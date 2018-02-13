@@ -11,3 +11,7 @@ export * from './interface';
 export * from './memory';
 export * from './scoped';
 export * from './sync';
+
+import * as test from './test';
+
+export { test };

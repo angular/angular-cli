@@ -6,19 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-implicit-dependencies
-import { normalize } from '@angular-devkit/core';
-import * as fs from 'fs';
-import * as path from 'path';
+import { normalize, virtualFs } from '@angular-devkit/core';
 import { toArray } from 'rxjs/operators';
 import { FileSystemCreateTree, FileSystemTree } from '../tree/filesystem';
-import { InMemoryFileSystemTreeHost } from '../tree/memory-host';
 import { optimize } from '../tree/static';
 import { DryRunSink } from './dryrun';
 
-const temp = require('temp');
 
-
-const host = new InMemoryFileSystemTreeHost({
+const host = new virtualFs.test.TestHost({
   '/hello': '',
   '/sub/file1': '',
   '/sub/directory/file2': '',
@@ -26,12 +21,6 @@ const host = new InMemoryFileSystemTreeHost({
 
 
 describe('DryRunSink', () => {
-  let outputRoot: string;
-
-  beforeEach(() => {
-    outputRoot = temp.mkdirSync('schematics-spec-');
-  });
-
   it('works when creating everything', done => {
     const tree = new FileSystemCreateTree(host);
 
@@ -42,9 +31,9 @@ describe('DryRunSink', () => {
     tree.overwrite('/hello', 'world');
 
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-    expect(tree.files).toEqual(files.map(normalize));
+    expect(tree.files.sort()).toEqual(files.map(normalize));
 
-    const sink = new DryRunSink(outputRoot);
+    const sink = new DryRunSink(new virtualFs.SimpleMemoryHost());
     sink.reporter.pipe(toArray())
       .toPromise()
       .then(infos => {
@@ -69,15 +58,16 @@ describe('DryRunSink', () => {
     tree.overwrite('/hello', 'world');
 
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-    expect(tree.files).toEqual(files.map(normalize));
+    expect(tree.files.sort()).toEqual(files.map(normalize));
 
     // Need to create this file on the filesystem, otherwise the commit phase will fail.
-    fs.writeFileSync(path.join(outputRoot, 'hello'), '');
-    const sink = new DryRunSink(outputRoot);
+    const outputHost = new virtualFs.SimpleMemoryHost();
+    outputHost.write(normalize('/hello'), virtualFs.stringToFileBuffer(''));
+
+    const sink = new DryRunSink(outputHost);
     sink.reporter.pipe(toArray())
       .toPromise()
       .then(infos => {
-        expect(infos.length).toBe(2);
         expect(infos.map(x => x.kind)).toEqual(['create', 'update']);
       })
       .then(done, done.fail);

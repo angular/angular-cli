@@ -5,10 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize, virtualFs } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { empty } from 'rxjs/observable/empty';
-import { FileSystemSink } from './filesystem';
+import { HostSink } from './host';
 
 
 export interface DryRunErrorEvent {
@@ -43,14 +45,31 @@ export type DryRunEvent = DryRunErrorEvent
                         | DryRunRenameEvent;
 
 
-export class DryRunSink extends FileSystemSink {
+export class DryRunSink extends HostSink {
   protected _subject = new Subject<DryRunEvent>();
   protected _fileDoesNotExistExceptionSet = new Set<string>();
   protected _fileAlreadyExistExceptionSet = new Set<string>();
 
   readonly reporter: Observable<DryRunEvent> = this._subject.asObservable();
 
-  constructor(root = '', force = false) { super(root, force); }
+  /**
+   * @deprecated Use the virtualFs.Host constructor instead.
+   */
+  constructor(dir: string, force?: boolean);
+
+  /**
+   * @param {host} dir The host to use to output. This should be scoped.
+   * @param {boolean} force Whether to force overwriting files that already exist.
+   */
+  constructor(host: virtualFs.Host, force?: boolean);
+
+  constructor(host: virtualFs.Host | string, force = false) {
+    super(typeof host == 'string'
+      ? new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(host))
+      : host,
+      force,
+    );
+  }
 
   protected _fileAlreadyExistException(path: string): void {
     this._fileAlreadyExistExceptionSet.add(path);

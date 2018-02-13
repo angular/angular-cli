@@ -34,12 +34,12 @@ export * from './rules/url';
 export * from './tree/delegate';
 export * from './tree/empty';
 export * from './tree/filesystem';
-export * from './tree/memory-host';
 export * from './tree/virtual';
 export {UpdateRecorder} from './tree/interface';
 export * from './engine/schematic';
 export * from './sink/dryrun';
-export {FileSystemSink} from './sink/filesystem';
+export * from './sink/filesystem';
+export * from './sink/host';
 import * as formats from './formats';
 export { formats };
 

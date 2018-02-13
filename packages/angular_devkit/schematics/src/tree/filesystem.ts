@@ -13,39 +13,24 @@ import {
   fragment,
   join,
   normalize,
+  virtualFs,
 } from '@angular-devkit/core';
 import { LazyFileEntry } from './entry';
 import { DirEntry, FileEntry, Tree } from './interface';
 import { VirtualDirEntry, VirtualTree } from './virtual';
 
 
-export interface FileSystemTreeHost {
-  listDirectory: (path: string) => string[];
-  isDirectory: (path: string) => boolean;
-  readFile: (path: string) => Buffer;
-  exists: (path: string) => boolean;
-
-  join: (path1: string, other: string) => string;
-}
-
-
 export class FileSystemDirEntry extends VirtualDirEntry {
   constructor(
-    protected _host: FileSystemTreeHost,
+    protected _host: virtualFs.SyncDelegateHost<{}>,
     tree: FileSystemTree,
-    protected _systemPath = '',
     path: Path = normalize('/'),
   ) {
     super(tree, path);
   }
 
   protected _createDir(name: PathFragment): DirEntry {
-    return new FileSystemDirEntry(
-      this._host,
-      this._tree as FileSystemTree,
-      this._host.join(this._systemPath, name),
-      join(this._path, name),
-    );
+    return new FileSystemDirEntry(this._host, this._tree as FileSystemTree, join(this._path, name));
   }
 
   get parent() {
@@ -55,8 +40,8 @@ export class FileSystemDirEntry extends VirtualDirEntry {
     const result = new Set<PathFragment>();
 
     try {
-      this._host.listDirectory(this._systemPath)
-          .filter(name => this._host.isDirectory(this._host.join(this._systemPath, name)))
+      this._host.list(this._path)
+          .filter(name => this._host.isDirectory(join(this._path, name)))
           .forEach(name => result.add(fragment(name)));
     } catch (e) {
       if (e.code != 'ENOENT' && e.code != 'ENOTDIR') {
@@ -76,8 +61,8 @@ export class FileSystemDirEntry extends VirtualDirEntry {
     const result = new Set<PathFragment>();
 
     try {
-      this._host.listDirectory(this._systemPath)
-        .filter(name => !this._host.isDirectory(this._host.join(this._systemPath, name)))
+      this._host.list(this._path)
+        .filter(name => !this._host.isDirectory(join(this._path, name)))
         .forEach(name => result.add(fragment(name)));
     } catch (e) {
       if (e.code != 'ENOENT' && e.code != 'ENOTDIR') {
@@ -101,19 +86,24 @@ export class FileSystemDirEntry extends VirtualDirEntry {
 
 
 export class FileSystemTree extends VirtualTree {
+  // This needs to be SyncDelegateHost because schematics Trees are synchronous.
+  protected _host: virtualFs.SyncDelegateHost<{}>;
   protected _initialized = false;
 
-  constructor(private _host: FileSystemTreeHost) {
+  constructor(host: virtualFs.Host) {
     super();
-    this._root = new FileSystemDirEntry(_host, this);
+    this._host = new virtualFs.SyncDelegateHost<{}>(host);
+    this._root = new FileSystemDirEntry(this._host, this);
   }
 
   get tree(): Map<Path, FileEntry> {
     const host = this._host;
     if (!this._initialized) {
       this._initialized = true;
-      this._recursiveFileList().forEach(([system, schematic]) => {
-        this._tree.set(schematic, new LazyFileEntry(schematic, () => host.readFile(system)));
+      this._recursiveFileList().forEach(path => {
+        this._tree.set(path, new LazyFileEntry(path, () => {
+          return new Buffer(host.read(path));
+        }));
       });
     }
 
@@ -131,7 +121,7 @@ export class FileSystemTree extends VirtualTree {
 
       if (fileExists) {
         const host = this._host;
-        entry = new LazyFileEntry(normalizedPath, () => host.readFile(systemPath));
+        entry = new LazyFileEntry(normalizedPath, () => new Buffer(host.read(systemPath)));
         this._tree.set(normalizedPath, entry);
       }
     }
@@ -140,7 +130,7 @@ export class FileSystemTree extends VirtualTree {
   }
 
   branch(): Tree {
-    const newTree = new FileSystemTree(this._host);
+    const newTree = new FileSystemTree(this._host.delegate);
     this._copyTo(newTree);
 
     return newTree;
@@ -161,23 +151,22 @@ export class FileSystemTree extends VirtualTree {
     }
   }
 
-  protected _recursiveFileList(): [ string, Path ][] {
+  protected _recursiveFileList(): Path[] {
     const host = this._host;
-    const list: [string, Path][] = [];
+    const list: Path[] = [];
 
-    function recurse(systemPath: string, schematicPath: string) {
-      for (const name of host.listDirectory(systemPath)) {
-        const systemName = host.join(systemPath, name);
-        const normalizedPath = normalize(schematicPath + '/' + name);
+    function recurse(schematicPath: Path) {
+      for (const name of host.list(schematicPath)) {
+        const normalizedPath = join(schematicPath, name);
         if (host.isDirectory(normalizedPath)) {
-          recurse(systemName, normalizedPath);
+          recurse(normalizedPath);
         } else {
-          list.push([systemName, normalizedPath]);
+          list.push(normalizedPath);
         }
       }
     }
 
-    recurse('', '/');
+    recurse(normalize('/'));
 
     return list;
   }
@@ -185,11 +174,11 @@ export class FileSystemTree extends VirtualTree {
 
 
 export class FileSystemCreateTree extends FileSystemTree {
-  constructor(host: FileSystemTreeHost) {
+  constructor(host: virtualFs.Host) {
     super(host);
 
-    this._recursiveFileList().forEach(([system, schematic]) => {
-      this.create(schematic, host.readFile(system));
+    this._recursiveFileList().forEach(path => {
+      this.create(path, new Buffer(this._host.read(path)));
     });
     this._initialized = true;
   }

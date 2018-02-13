@@ -5,7 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException, JsonObject } from '@angular-devkit/core';
+import { BaseException, JsonObject, normalize, virtualFs } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { dirname, isAbsolute, join, resolve } from 'path';
 import { Observable } from 'rxjs/Observable';
 import { from as observableFrom } from 'rxjs/observable/from';
@@ -30,7 +31,6 @@ import {
   FileSystemSchematicDesc,
   FileSystemSchematicDescription,
 } from './description';
-import { FileSystemHost } from './file-system-host';
 import { readJsonFile } from './file-system-utility';
 
 
@@ -245,9 +245,11 @@ export abstract class FileSystemEngineHostBase implements
         return (context: FileSystemSchematicContext) => {
           // Resolve all file:///a/b/c/d from the schematic's own path, and not the current
           // path.
-          const root = resolve(dirname(context.schematic.description.path), url.path || '');
+          const root = normalize(
+            resolve(dirname(context.schematic.description.path), url.path || ''),
+          );
 
-          return new FileSystemCreateTree(new FileSystemHost(root));
+          return new FileSystemCreateTree(new virtualFs.ScopedHost(new NodeJsSyncHost(), root));
         };
     }
 

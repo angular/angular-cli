@@ -21,6 +21,7 @@ ts_library(
     module_root = "src",
     deps = [
         "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node",  # TODO: get rid of this for 6.0
         # @deps: rxjs
     ],
 )

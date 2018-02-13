@@ -7,23 +7,24 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  normalize,
   schema,
   tags,
   terminal,
+  virtualFs,
 } from '@angular-devkit/core';
-import { createConsoleLogger } from '@angular-devkit/core/node';
+import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import {
   DryRunEvent,
   DryRunSink,
-  FileSystemSink,
   FileSystemTree,
+  HostSink,
   SchematicEngine,
   Tree,
   formats,
 } from '@angular-devkit/schematics';
 import { BuiltinTaskExecutor } from '@angular-devkit/schematics/tasks/node';
 import {
-  FileSystemHost,
   NodeModulesEngineHost,
   validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
@@ -168,14 +169,17 @@ const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
 const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
 const force = argv['force'];
 
+/** Create a Virtual FS Host scoped to where the process is being run. **/
+const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
+
 /** This host is the original Tree created from the current directory. */
-const host = observableOf(new FileSystemTree(new FileSystemHost(process.cwd())));
+const host = observableOf(new FileSystemTree(fsHost));
 
 // We need two sinks if we want to output what will happen, and actually do the work.
 // Note that fsSink is technically not used if `--dry-run` is passed, but creating the Sink
 // does not have any side effect.
-const dryRunSink = new DryRunSink(process.cwd(), force);
-const fsSink = new FileSystemSink(process.cwd(), force);
+const dryRunSink = new DryRunSink(fsHost, force);
+const fsSink = new HostSink(fsHost, force);
 
 
 // We keep a boolean to tell us whether an error would occur if we were to commit to an

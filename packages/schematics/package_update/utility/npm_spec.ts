@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:non-null-operator
-import { FileSystemTree, InMemoryFileSystemTreeHost, Tree } from '@angular-devkit/schematics';
+import { virtualFs } from '@angular-devkit/core';
+import { FileSystemTree, Tree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
 import { updatePackageJson } from './npm';
@@ -20,7 +21,7 @@ describe('Schematic Update', () => {
   let inputTree: Tree;
 
   beforeEach(() => {
-    inputTree = new FileSystemTree(new InMemoryFileSystemTreeHost({
+    inputTree = new FileSystemTree(new virtualFs.test.TestHost({
       '/package.json': `{
         "dependencies": {
           "@angular/core": "4.0.0",
@@ -32,7 +33,6 @@ describe('Schematic Update', () => {
   });
 
   it('works with a fixed version', done => {
-    debugger;
     const rule = updatePackageJson(['@angular/core', '@angular/compiler'], '4.1.0', false);
 
     schematicRunner.callRule(rule, inputTree)

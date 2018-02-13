@@ -5,14 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize } from '@angular-devkit/core';
+import { normalize, virtualFs } from '@angular-devkit/core';
 import { FileSystemTree } from './filesystem';
-import { InMemoryFileSystemTreeHost } from './memory-host';
 
 
 describe('FileSystem', () => {
   it('can create files', () => {
-    const host = new InMemoryFileSystemTreeHost({
+    const host = new virtualFs.test.TestHost({
       '/hello': 'world',
       '/sub/directory/file2': '',
       '/sub/file1': '',

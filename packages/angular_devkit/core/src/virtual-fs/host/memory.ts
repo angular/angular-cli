@@ -17,6 +17,7 @@ import {
   PathIsFileException,
 } from '../../exception/exception';
 import {
+  NormalizedRoot,
   NormalizedSep,
   Path,
   PathFragment,
@@ -168,9 +169,17 @@ export class SimpleMemoryHost implements Host<{}> {
     }
     const fragments = split(path);
     const result = new Set<PathFragment>();
-    for (const p of this._cache.keys()) {
-      if (p.startsWith(path + NormalizedSep)) {
-        result.add(split(p)[fragments.length]);
+    if (path !== NormalizedRoot) {
+      for (const p of this._cache.keys()) {
+        if (p.startsWith(path + NormalizedSep)) {
+          result.add(split(p)[fragments.length]);
+        }
+      }
+    } else {
+      for (const p of this._cache.keys()) {
+        if (p.startsWith(NormalizedSep)) {
+          result.add(split(p)[1]);
+        }
       }
     }
 

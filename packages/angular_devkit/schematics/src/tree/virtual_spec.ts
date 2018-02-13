@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:non-null-operator
-import { normalize } from '@angular-devkit/core';
+import { normalize, virtualFs } from '@angular-devkit/core';
 import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import { FileSystemTree } from './filesystem';
 import { FileEntry, MergeStrategy, Tree } from './interface';
-import { InMemoryFileSystemTreeHost } from './memory-host';
 import { merge, partition } from './static';
 import { VirtualTree } from './virtual';
 
@@ -33,7 +32,7 @@ describe('VirtualDirEntry', () => {
       '/sub1/sub2/file5': '/sub1/sub2/file5',
       '/sub3/file6': '',
     };
-    const host = new InMemoryFileSystemTreeHost(files);
+    const host = new virtualFs.test.TestHost(files);
     const tree = new FileSystemTree(host);
 
     let allPaths: string[] = [];
@@ -145,7 +144,7 @@ describe('VirtualTree', () => {
 
   describe('optimize', () => {
     it('works', () => {
-      const host = new InMemoryFileSystemTreeHost({
+      const host = new virtualFs.test.TestHost({
         '/hello': 'world',
       });
       const tree = new FileSystemTree(host);
@@ -161,7 +160,7 @@ describe('VirtualTree', () => {
     });
 
     it('works with branching', () => {
-      const host = new InMemoryFileSystemTreeHost({
+      const host = new virtualFs.test.TestHost({
         '/hello': '',
         '/sub/file1': '',
         '/sub/directory/file2': '',
@@ -176,7 +175,7 @@ describe('VirtualTree', () => {
       tree.overwrite('/test', 'test 3');
 
       const expected = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-      expect(files(tree)).toEqual(expected.map(normalize));
+      expect(files(tree).sort()).toEqual(expected.map(normalize));
 
       const tree2 = tree.branch() as VirtualTree;
       expect(tree.actions.length).toBe(4);
@@ -190,7 +189,7 @@ describe('VirtualTree', () => {
 
   describe('rename', () => {
     it('conflict fails', () => {
-      const host = new InMemoryFileSystemTreeHost({
+      const host = new virtualFs.test.TestHost({
         '/hello': 'world',
       });
       const tree = new FileSystemTree(host);
@@ -204,7 +203,7 @@ describe('VirtualTree', () => {
     });
 
     it('conflict works with overwrite', () => {
-      const host = new InMemoryFileSystemTreeHost({
+      const host = new virtualFs.test.TestHost({
         '/hello': 'world',
       });
       const tree = new FileSystemTree(host);
@@ -220,7 +219,7 @@ describe('VirtualTree', () => {
     });
 
     it('can rename files in base', () => {
-      const host = new InMemoryFileSystemTreeHost({
+      const host = new virtualFs.test.TestHost({
         '/hello': 'world',
       });
       const tree = new FileSystemTree(host);
@@ -234,7 +233,7 @@ describe('VirtualTree', () => {
     });
 
     it('can rename files created in staging', () => {
-      const host = new InMemoryFileSystemTreeHost({
+      const host = new virtualFs.test.TestHost({
       });
       const tree = new FileSystemTree(host);
 
@@ -248,7 +247,7 @@ describe('VirtualTree', () => {
     });
 
     it('can rename branched and merged trees', () => {
-      const host = new InMemoryFileSystemTreeHost({
+      const host = new virtualFs.test.TestHost({
         '/hello': 'world',
       });
       const tree = new FileSystemTree(host);

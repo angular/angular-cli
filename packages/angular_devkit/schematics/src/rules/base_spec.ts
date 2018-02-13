@@ -7,10 +7,9 @@
  */
 // tslint:disable:no-implicit-dependencies
 // tslint:disable:non-null-operator
-import { Path } from '@angular-devkit/core';
+import { Path, virtualFs } from '@angular-devkit/core';
 import {
   FileSystemTree,
-  InMemoryFileSystemTreeHost,
   MergeStrategy,
   partitionApplyMerge,
 } from '@angular-devkit/schematics';
@@ -135,7 +134,7 @@ describe('apply', () => {
 
 describe('partitionApplyMerge', () => {
   it('works with simple rules', done => {
-    const host = new InMemoryFileSystemTreeHost({
+    const host = new virtualFs.test.TestHost({
       '/test1': '',
       '/test2': '',
     });

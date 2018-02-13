@@ -59,6 +59,9 @@ export class SyncDelegateHost<T extends object> {
   get capabilities(): HostCapabilities {
     return this._delegate.capabilities;
   }
+  get delegate() {
+    return this._delegate;
+  }
 
   write(path: Path, content: FileBuffer): void {
     return this._doSyncCall(this._delegate.write(path, content));

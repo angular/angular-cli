@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as path from 'path';
+import { CollectionCannotBeResolvedException } from '.';
 import { ExportStringRef } from './export-ref';
-import { FileSystemHost } from './file-system-host';
 
 
 describe('ExportStringRef', () => {
@@ -37,8 +37,10 @@ describe('ExportStringRef', () => {
 
   it('works on package names', () => {
     // META
-    const ref = new ExportStringRef('@angular-devkit/schematics/tools#FileSystemHost');
-    expect(ref.ref).toEqual(FileSystemHost);
+    const ref = new ExportStringRef(
+      '@angular-devkit/schematics/tools#CollectionCannotBeResolvedException',
+    );
+    expect(ref.ref).toEqual(CollectionCannotBeResolvedException);
     expect(ref.path).toBe(__dirname);
     expect(ref.module).toBe(path.join(__dirname, 'index.ts'));
   });
