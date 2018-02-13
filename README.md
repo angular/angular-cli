@@ -52,12 +52,12 @@ The 1.x packages work with Angular 4.x while the 5.x packages will work with Ang
 - Angular CLI support for Universal
 - Provide a DOM implementation on the server
 - Hooks in `renderModule*` to do stuff just before rendering to string
-
-## In Progress
-- Write documentation for core API
 - Generic state transfer API in the platform
 - Http Transfer State Module that uses HTTP interceptors and state transfer API
 - Material 2 works on Universal
+
+## In Progress
+- Write documentation for core API
 - Better internal performance and stress tests
 - Make it easier to write unit tests for Universal components
 - Support [AppShell](https://developers.google.com/web/updates/2015/11/app-shell) use cases
