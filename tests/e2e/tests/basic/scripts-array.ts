@@ -60,7 +60,7 @@ export default function () {
     // Ensure scripts can be separately imported from the app.
     .then(() => expectFileToMatch('dist/main.js', 'console.log(\'string-script\');'))
     // Verify uglify, sourcemaps and hashes. Lazy scripts should not get hashes.
-    .then(() => ng('build', '--prod', '--sourcemap'))
+    .then(() => ng('build', '--target', 'production', '--sourcemaps'))
     .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.js/))
     .then(fileName => expectFileToMatch(`dist/${fileName}`, 'var number=2;'))
     .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.js\.map/))

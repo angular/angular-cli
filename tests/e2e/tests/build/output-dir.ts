@@ -12,7 +12,7 @@ export default function() {
     return Promise.resolve();
   }
 
-  return ng('build', '-op', './build-output')
+  return ng('build', '--output-path', './build-output')
     .then(() => expectFileToExist('./build-output/index.html'))
     .then(() => expectFileToExist('./build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean))

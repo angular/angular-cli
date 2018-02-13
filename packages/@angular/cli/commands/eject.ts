@@ -1,7 +1,6 @@
+import { Command, CommandScope } from '../models/command';
 import { BuildOptions } from '../models/build-options';
 import {baseBuildCommandOptions} from './build';
-
-const Command = require('../ember-cli/lib/models/command');
 
 // defaults for BuildOptions
 export const baseEjectCommandOptions: any = [
@@ -24,14 +23,15 @@ export interface EjectTaskOptions extends BuildOptions {
   app?: string;
 }
 
+export default class EjectCommand extends Command {
+  public readonly name = 'eject';
+  public readonly description =
+    'Ejects your app and output the proper webpack configuration and scripts.';
+  public readonly scope = CommandScope.inProject;
+  public readonly arguments: string[] = [];
+  public readonly options = baseEjectCommandOptions;
 
-const EjectCommand = Command.extend({
-  name: 'eject',
-  description: 'Ejects your app and output the proper webpack configuration and scripts.',
-
-  availableOptions: baseEjectCommandOptions,
-
-  run: function (commandOptions: EjectTaskOptions) {
+  public async run(options: EjectTaskOptions) {
 
     const EjectTask = require('../tasks/eject').default;
     const ejectTask = new EjectTask({
@@ -39,9 +39,6 @@ const EjectCommand = Command.extend({
       ui: this.ui,
     });
 
-    return ejectTask.run(commandOptions);
+    return await ejectTask.run(options);
   }
-});
-
-
-export default EjectCommand;
+}

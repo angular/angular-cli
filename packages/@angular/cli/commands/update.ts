@@ -1,15 +1,18 @@
-const Command = require('../ember-cli/lib/models/command');
+import { Command, CommandScope } from '../models/command';
 import { UpdateTask } from '../tasks/update';
 
 export interface UpdateOptions {
   schematic?: boolean;
 }
 
-const UpdateCommand = Command.extend({
-  name: 'update',
-  description: 'Updates your application.',
-  works: 'everywhere',
-  availableOptions: [
+
+export default class UpdateCommand extends Command {
+  public readonly name = 'update';
+  public readonly description = 'Updates your application.';
+  public static aliases: string[] = [];
+  public readonly scope = CommandScope.inProject;
+  public readonly arguments: string[] = [];
+  public readonly options = [
     {
       name: 'dry-run',
       type: Boolean,
@@ -23,11 +26,9 @@ const UpdateCommand = Command.extend({
       default: false,
       description: 'Install the next version, instead of the latest.'
     }
-  ],
+  ];
 
-  anonymousOptions: [],
-
-  run: function(commandOptions: any) {
+  public async run(options: any) {
     const schematic = '@schematics/package-update:all';
 
     const updateTask = new UpdateTask({
@@ -35,8 +36,6 @@ const UpdateCommand = Command.extend({
       project: this.project
     });
 
-    return updateTask.run(schematic, commandOptions);
+    return await updateTask.run(schematic, options);
   }
-});
-
-export default UpdateCommand;
+}

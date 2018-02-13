@@ -11,7 +11,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>directory</summary>
   <p>
-    <code>--directory</code> (alias: <code>-dir</code>) <em>default value: dir</em>
+    <code>--directory</code> (alias: <code>-d</code>) <em>default value: dir</em>
   </p>
   <p>
     The directory name to create the app in.
@@ -31,7 +31,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>inline-style</summary>
   <p>
-    <code>--inline-style</code> (alias: <code>-is</code>) <em>default value: false</em>
+    <code>--inline-style</code> (alias: <code>-s</code>) <em>default value: false</em>
   </p>
   <p>
     Should have an inline style.
@@ -41,7 +41,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>inline-template</summary>
   <p>
-    <code>--inline-template</code> (alias: <code>-it</code>) <em>default value: false</em>
+    <code>--inline-template</code> (alias: <code>-t</code>) <em>default value: false</em>
   </p>
   <p>
     Should have an inline template.
@@ -94,7 +94,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>skip-git</summary>
   <p>
-    <code>--skip-git</code> (alias: <code>-sg</code>) <em>default value: false</em>
+    <code>--skip-git</code> (alias: <code>-g</code>) <em>default value: false</em>
   </p>
   <p>
     Skip initializing a git repository.
@@ -114,7 +114,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>skip-tests</summary>
   <p>
-    <code>--skip-tests (aliases: </code>-st) <em>default value: false</em>
+    <code>--skip-tests (aliases: </code>-S) <em>default value: false</em>
   </p>
   <p>
     Skip creating spec files.
@@ -127,7 +127,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>source-dir</summary>
   <p>
-    <code>--source-dir</code> (alias: <code>-sd</code>) <em>default value: src</em>
+    <code>--source-dir</code> (alias: <code>-D</code>) <em>default value: src</em>
   </p>
   <p>
     The name of the source directory.

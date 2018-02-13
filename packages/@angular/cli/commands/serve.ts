@@ -1,3 +1,4 @@
+import { Command, CommandScope } from '../models/command';
 import { BuildOptions } from '../models/build-options';
 import { baseBuildCommandOptions } from './build';
 import { CliConfig } from '../models/config';
@@ -6,7 +7,7 @@ import { ServeTaskOptions } from './serve';
 import { checkPort } from '../utilities/check-port';
 import { overrideOptions } from '../utilities/override-options';
 
-const Command = require('../ember-cli/lib/models/command');
+// const Command = require('../ember-cli/lib/models/command');
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
 const serveConfigDefaults = config.getPaths('defaults.serve', [
@@ -116,35 +117,35 @@ export const baseServeCommandOptions: any = overrideOptions([
   }
 ]);
 
-const ServeCommand = Command.extend({
-  name: 'serve',
-  description: 'Builds and serves your app, rebuilding on file changes.',
-  aliases: ['server', 's'],
+export default class ServeCommand extends Command {
+  public readonly name = 'serve';
+  public readonly description = 'Builds and serves your app, rebuilding on file changes.';
+  public static aliases = ['server', 's'];
+  public readonly scope = CommandScope.inProject;
+  public readonly arguments: string[] = [];
+  public readonly options = baseServeCommandOptions;
 
-  availableOptions: baseServeCommandOptions,
-
-  run: function (commandOptions: ServeTaskOptions) {
-    const ServeTask = require('../tasks/serve').default;
-
+  public validate(_options: ServeTaskOptions) {
     // Check Angular and TypeScript versions.
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     Version.assertTypescriptVersion(this.project.root);
+    return true;
+  }
+
+  public async run(options: ServeTaskOptions) {
+    const ServeTask = require('../tasks/serve').default;
 
     // Default evalSourcemaps to true for serve. This makes rebuilds faster.
-    commandOptions.evalSourcemaps = true;
+    options.evalSourcemaps = true;
 
-    return checkPort(commandOptions.port, commandOptions.host, defaultPort)
-      .then(port => {
-        commandOptions.port = port;
+    const port = await checkPort(options.port, options.host, defaultPort);
+    options.port = port;
 
-        const serve = new ServeTask({
-          ui: this.ui,
-          project: this.project,
-        });
+    const serve = new ServeTask({
+      ui: this.ui,
+      project: this.project,
+    });
 
-        return serve.run(commandOptions);
-      });
+    return await serve.run(options);
   }
-});
-
-export default ServeCommand;
+}

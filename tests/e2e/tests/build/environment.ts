@@ -10,7 +10,7 @@ export default function() {
   const ejected = getGlobalVariable('argv').eject;
 
   // Try a prod build.
-  return ng('build', '--env=prod')
+  return ng('build', '--environment=prod')
     .then(() => expectFileToMatch('dist/main.js', 'production: true'))
     // If this is an ejected test, the eject will create files so git will not be clean.
     .then(() => !ejected && expectGitToBeClean())

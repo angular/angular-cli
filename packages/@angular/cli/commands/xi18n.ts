@@ -1,4 +1,4 @@
-const Command = require('../ember-cli/lib/models/command');
+import { Command, CommandScope } from '../models/command';
 
 export interface Xi18nOptions {
   outputPath?: string;
@@ -8,22 +8,26 @@ export interface Xi18nOptions {
   outFile?: string;
 }
 
-const Xi18nCommand = Command.extend({
-  name: 'xi18n',
-  description: 'Extracts i18n messages from source code.',
-  works: 'insideProject',
-  availableOptions: [
+export default class Xi18nCommand extends Command {
+  public readonly name = 'xi18n';
+  public readonly description = 'Extracts i18n messages from source code.';
+  public static aliases: string[] = [];
+  public readonly scope = CommandScope.inProject;
+  public readonly arguments: string[] = [];
+  public readonly options = [
     {
       name: 'i18n-format',
       type: String,
       default: 'xlf',
-      aliases: ['f', {'xmb': 'xmb'}, {'xlf': 'xlf'}, {'xliff': 'xlf'}, {'xliff2': 'xliff2'} ],
+      // TODO: re-add options for removed aliases:
+      // aliases: ['f', {'xmb': 'xmb'}, {'xlf': 'xlf'}, {'xliff': 'xlf'}, {'xliff2': 'xliff2'} ],
+      aliases: ['f'],
       description: 'Output format for the generated file.'
     },
     {
       name: 'output-path',
       type: 'Path',
-      default: null,
+      default: null as string,
       aliases: ['op'],
       description: 'Path where output will be placed.'
     },
@@ -57,8 +61,9 @@ const Xi18nCommand = Command.extend({
       aliases: ['of'],
       description: 'Name of the file to output.'
     },
-  ],
-  run: function (commandOptions: any) {
+  ];
+
+  public async run(options: any) {
     const {Extracti18nTask} = require('../tasks/extract-i18n');
 
     const xi18nTask = new Extracti18nTask({
@@ -66,10 +71,6 @@ const Xi18nCommand = Command.extend({
       project: this.project
     });
 
-    return xi18nTask.run(commandOptions);
+    return await xi18nTask.run(options);
   }
-});
-
-
-export default Xi18nCommand;
-
+}

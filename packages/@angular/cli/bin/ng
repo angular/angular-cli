@@ -196,7 +196,10 @@ resolve('@angular/cli', { basedir: process.cwd() },
       cliArgs: process.argv.slice(2),
       inputStream: standardInput,
       outputStream: process.stdout
-    }).then(function (result) {
-      process.exit(typeof result === 'object' ? result.exitCode : result);
+    }).then(function (exitCode) {
+      process.exit(exitCode);
+    }).catch(function(err) {
+      console.log('Unknown error: ' + err.toString());
+      process.exit(127);
     });
   });

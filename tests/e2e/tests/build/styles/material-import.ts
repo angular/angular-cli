@@ -29,7 +29,7 @@ export default function () {
         .then(() => replaceInFile('src/app/app.component.ts',
           './app.component.css', `./app.component.${ext}`))
         // run build app
-        .then(() => ng('build', '--extract-css', '--sourcemap'))
+        .then(() => ng('build', '--extract-css', '--sourcemaps'))
         .then(() => writeMultipleFiles({
           [`src/styles.${ext}`]: stripIndents`
             @import "@angular/material/prebuilt-themes/indigo-pink.css";

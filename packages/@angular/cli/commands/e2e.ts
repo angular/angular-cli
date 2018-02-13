@@ -1,11 +1,11 @@
 const SilentError = require('silent-error');
 
+import { Command, CommandScope } from '../models/command';
 import { overrideOptions } from '../utilities/override-options';
 import { CliConfig } from '../models/config';
 import { ServeTaskOptions, baseServeCommandOptions } from './serve';
 import { checkPort } from '../utilities/check-port';
 import { oneLine } from 'common-tags';
-const Command = require('../ember-cli/lib/models/command');
 
 
 export interface E2eTaskOptions extends ServeTaskOptions {
@@ -17,12 +17,14 @@ export interface E2eTaskOptions extends ServeTaskOptions {
   elementExplorer: boolean;
 }
 
-const E2eCommand = Command.extend({
-  name: 'e2e',
-  aliases: ['e'],
-  description: 'Run e2e tests in existing project.',
-  works: 'insideProject',
-  availableOptions: overrideOptions([
+export default class E2eCommand extends Command {
+  public readonly name = 'e2e';
+  public readonly description = 'Run e2e tests in existing project.';
+  public static aliases: string[] = ['e'];
+  public readonly scope = CommandScope.inProject;
+  public readonly arguments: string[] = [];
+
+  public options = overrideOptions([
     ...baseServeCommandOptions,
     {
       name: 'config',
@@ -87,8 +89,19 @@ const E2eCommand = Command.extend({
       default: false,
       description: 'Run build when files change.'
     },
-  ]),
-  run: function (commandOptions: E2eTaskOptions) {
+  ]);
+
+  validate(options: E2eTaskOptions) {
+    if (!options.config) {
+      const e2eConfig = CliConfig.fromProject().config.e2e;
+      if (!e2eConfig.protractor.config) {
+        throw new SilentError('No protractor config found in .angular-cli.json.');
+      }
+    }
+    return true;
+  }
+
+  run(options: E2eTaskOptions) {
     const E2eTask = require('../tasks/e2e').E2eTask;
 
     const e2eTask = new E2eTask({
@@ -96,17 +109,13 @@ const E2eCommand = Command.extend({
       project: this.project
     });
 
-    if (!commandOptions.config) {
+    if (!options.config) {
       const e2eConfig = CliConfig.fromProject().config.e2e;
 
-      if (!e2eConfig.protractor.config) {
-        throw new SilentError('No protractor config found in .angular-cli.json.');
-      }
-
-      commandOptions.config = e2eConfig.protractor.config;
+      options.config = e2eConfig.protractor.config;
     }
 
-    if (commandOptions.serve) {
+    if (options.serve) {
       const ServeTask = require('../tasks/serve').default;
 
       const serve = new ServeTask({
@@ -115,6 +124,7 @@ const E2eCommand = Command.extend({
       });
 
       // Protractor will end the proccess, so we don't need to kill the dev server
+      // TODO: Convert this promise to use observables which will allow for retries.
       return new Promise((resolve, reject) => {
         let firstRebuild = true;
         function rebuildCb(stats: any) {
@@ -122,22 +132,19 @@ const E2eCommand = Command.extend({
           const cleanBuild = !!!stats.compilation.errors.length;
           if (firstRebuild && cleanBuild) {
             firstRebuild = false;
-            return resolve(e2eTask.run(commandOptions));
+            return resolve(e2eTask.run(options));
           } else {
             return reject('Build did not succeed. Please fix errors before running e2e task');
           }
         }
 
-        checkPort(commandOptions.port, commandOptions.host)
-          .then((port: number) => commandOptions.port = port)
-          .then(() => serve.run(commandOptions, rebuildCb))
+        checkPort(options.port, options.host)
+          .then((port: number) => options.port = port)
+          .then(() => serve.run(options, rebuildCb))
           .catch(reject);
       });
     } else {
-      return e2eTask.run(commandOptions);
+      return e2eTask.run(options);
     }
   }
-});
-
-
-export default E2eCommand;
+}

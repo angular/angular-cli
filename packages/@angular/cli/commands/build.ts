@@ -1,3 +1,4 @@
+import { Command, Option, CommandScope } from '../models/command';
 import { CliConfig } from '../models/config';
 import { BuildOptions } from '../models/build-options';
 import { Version } from '../upgrade/version';
@@ -6,7 +7,6 @@ import { getAppFromConfig } from '../utilities/app-utils';
 import { join } from 'path';
 import { RenderUniversalTaskOptions } from '../tasks/render-universal';
 
-const Command = require('../ember-cli/lib/models/command');
 const SilentError = require('silent-error');
 
 const config = CliConfig.fromProject() || CliConfig.fromGlobal();
@@ -16,12 +16,13 @@ const buildConfigDefaults = config.getPaths('defaults.build', [
 ]);
 
 // defaults for BuildOptions
-export const baseBuildCommandOptions: any = [
+export const baseBuildCommandOptions: Option[] = [
   {
     name: 'target',
     type: String,
     default: 'development',
-    aliases: ['t', { 'dev': 'development' }, { 'prod': 'production' }],
+    // TODO: re-add support for `--prod`
+    aliases: ['t'],
     description: 'Defines the build target.'
   },
   {
@@ -213,12 +214,14 @@ export interface BuildTaskOptions extends BuildOptions {
   statsJson?: boolean;
 }
 
-const BuildCommand = Command.extend({
-  name: 'build',
-  description: 'Builds your app and places it into the output path (dist/ by default).',
-  aliases: ['b'],
-
-  availableOptions: baseBuildCommandOptions.concat([
+export default class BuildCommand extends Command {
+  public readonly name = 'build';
+  public readonly description =
+    'Builds your app and places it into the output path (dist/ by default).';
+  public static aliases = ['b'];
+  public scope = CommandScope.inProject;
+  public arguments: string[];
+  public options = baseBuildCommandOptions.concat([
     {
       name: 'stats-json',
       type: Boolean,
@@ -226,16 +229,18 @@ const BuildCommand = Command.extend({
       description: oneLine`Generates a \`stats.json\` file which can be analyzed using tools
        such as: \`webpack-bundle-analyzer\` or https://webpack.github.io/analyse.`
     }
-  ]),
+  ]);
 
-  run: function (commandOptions: BuildTaskOptions) {
-    // Check Angular and TypeScript versions.
+  public validate(_options: BuildTaskOptions) {
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     Version.assertTypescriptVersion(this.project.root);
+    return true;
+  }
 
+  public async run(options: BuildTaskOptions) {
     // Add trailing slash if missing to prevent https://github.com/angular/angular-cli/issues/7295
-    if (commandOptions.deployUrl && commandOptions.deployUrl.substr(-1) !== '/') {
-      commandOptions.deployUrl += '/';
+    if (options.deployUrl && options.deployUrl.substr(-1) !== '/') {
+      options.deployUrl += '/';
     }
 
     const BuildTask = require('../tasks/build').default;
@@ -245,11 +250,11 @@ const BuildCommand = Command.extend({
       ui: this.ui,
     });
 
-    const clientApp = getAppFromConfig(commandOptions.app);
+    const clientApp = getAppFromConfig(options.app);
 
-    const doAppShell = commandOptions.target === 'production' &&
-      (commandOptions.aot === undefined || commandOptions.aot === true) &&
-      !commandOptions.skipAppShell;
+    const doAppShell = options.target === 'production' &&
+      (options.aot === undefined || options.aot === true) &&
+      !options.skipAppShell;
 
     let serverApp: any = null;
     if (clientApp.appShell && doAppShell) {
@@ -259,40 +264,30 @@ const BuildCommand = Command.extend({
       }
     }
 
-    const buildPromise = buildTask.run(commandOptions);
-
+    const buildTaskResult = await buildTask.run(options);
     if (!clientApp.appShell || !doAppShell) {
-      return buildPromise;
+      return buildTaskResult;
     }
 
-    return buildPromise
-      .then(() => {
+    const serverOptions = {
+      ...options,
+      app: clientApp.appShell.app
+    };
+    await buildTask.run(serverOptions);
 
-        const serverOptions = {
-          ...commandOptions,
-          app: clientApp.appShell.app
-        };
-        return buildTask.run(serverOptions);
-      })
-      .then(() => {
-        const RenderUniversalTask = require('../tasks/render-universal').default;
+    const RenderUniversalTask = require('../tasks/render-universal').default;
 
-        const renderUniversalTask = new RenderUniversalTask({
-          project: this.project,
-          ui: this.ui,
-        });
-        const renderUniversalOptions: RenderUniversalTaskOptions = {
-          inputIndexPath: join(this.project.root, clientApp.outDir, clientApp.index),
-          route: clientApp.appShell.route,
-          serverOutDir: join(this.project.root, serverApp.outDir),
-          outputIndexPath: join(this.project.root, clientApp.outDir, clientApp.index)
-        };
+    const renderUniversalTask = new RenderUniversalTask({
+      project: this.project,
+      ui: this.ui,
+    });
+    const renderUniversalOptions: RenderUniversalTaskOptions = {
+      inputIndexPath: join(this.project.root, clientApp.outDir, clientApp.index),
+      route: clientApp.appShell.route,
+      serverOutDir: join(this.project.root, serverApp.outDir),
+      outputIndexPath: join(this.project.root, clientApp.outDir, clientApp.index)
+    };
 
-        return renderUniversalTask.run(renderUniversalOptions);
-      });
+    return await renderUniversalTask.run(renderUniversalOptions);
   }
-});
-
-
-BuildCommand.overrideCore = true;
-export default BuildCommand;
+}
