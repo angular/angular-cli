@@ -64,8 +64,11 @@ export default Command.extend({
   ],
 
   getCollectionName(rawArgs: string[], parsedOptions?: { collection?: string }): [string, string] {
+    let collectionName: string = CliConfig.getValue('defaults.schematics.collection');
+    if (!rawArgs || rawArgs.length === 0) {
+      return [collectionName, null];
+    }
     let schematicName = rawArgs[0];
-    let collectionName = CliConfig.getValue('defaults.schematics.collection');
 
     if (schematicName.match(/:/)) {
       [collectionName, schematicName] = schematicName.split(':', 2);
@@ -206,7 +209,7 @@ export default Command.extend({
 
   printDetailedHelp: function (_options: any, rawArgs: any): string | Promise<string> {
     const engineHost = getEngineHost();
-    const collectionName = this.getCollectionName();
+    const [collectionName] = this.getCollectionName();
     const collection = getCollection(collectionName);
     const schematicName = rawArgs[1];
     if (schematicName) {
