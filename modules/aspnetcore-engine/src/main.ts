@@ -1,72 +1,92 @@
 import { Type, NgModuleFactory, CompilerFactory, Compiler } from '@angular/core';
-import { platformDynamicServer, BEFORE_APP_SERIALIZED, renderModuleFactory } from '@angular/platform-server';
+import { platformDynamicServer } from '@angular/platform-server';
+import { DOCUMENT } from '@angular/platform-browser';
 import { ResourceLoader } from '@angular/compiler';
 
 import { REQUEST, ORIGIN_URL } from './tokens';
 import { FileLoader } from './file-loader';
-
 import { IEngineOptions } from './interfaces/engine-options';
-import { DOCUMENT } from '@angular/platform-browser';
+import { IEngineRenderResult } from './interfaces/engine-render-result';
+import { renderModuleFactory } from './platform-server-utils';
 
 /* @internal */
 export class UniversalData {
-  public static appNode = '';
-  public static title = '';
-  public static scripts = '';
-  public static styles = '';
-  public static meta = '';
-  public static links = '';
+  public appNode = '';
+  public title = '';
+  public scripts = '';
+  public styles = '';
+  public meta = '';
+  public links = '';
 }
 
 /* @internal */
 let appSelector = 'app-root'; // default
 
 /* @internal */
-function beforeAppSerialized(
+function _getUniversalData(
   doc: any /* TODO: type definition for Domino - DomAPI Spec (similar to "Document") */
-) {
+): UniversalData {
 
-  return () => {
-    const STYLES = [];
-    const SCRIPTS = [];
-    const META = [];
-    const LINKS = [];
+  const STYLES = [];
+  const SCRIPTS = [];
+  const META = [];
+  const LINKS = [];
 
-    for (let i = 0; i < doc.head.children.length; i++) {
-      const element = doc.head.children[i];
-      const tagName = element.tagName.toUpperCase();
+  for (let i = 0; i < doc.head.children.length; i++) {
+    const element = doc.head.children[i];
+    const tagName = element.tagName.toUpperCase();
 
-      switch (tagName) {
-        case 'SCRIPT':
-          SCRIPTS.push(element.outerHTML);
-          break;
-        case 'STYLE':
-          STYLES.push(element.outerHTML);
-          break;
-        case 'LINK':
-          LINKS.push(element.outerHTML);
-          break;
-        case 'META':
-          META.push(element.outerHTML);
-          break;
-        default:
-          break;
-      }
+    switch (tagName) {
+      case 'SCRIPT':
+        SCRIPTS.push(element.outerHTML);
+        break;
+      case 'STYLE':
+        STYLES.push(element.outerHTML);
+        break;
+      case 'LINK':
+        LINKS.push(element.outerHTML);
+        break;
+      case 'META':
+        META.push(element.outerHTML);
+        break;
+      default:
+        break;
     }
+  }
 
-    UniversalData.title = doc.title;
-    UniversalData.appNode = doc.querySelector(appSelector).outerHTML;
-    UniversalData.scripts = SCRIPTS.join(' ');
-    UniversalData.styles = STYLES.join(' ');
-    UniversalData.meta = META.join(' ');
-    UniversalData.links = LINKS.join(' ');
+  for (let i = 0; i < doc.body.children.length; i++) {
+    const element: Element = doc.body.children[i];
+    const tagName = element.tagName.toUpperCase();
+
+    switch (tagName) {
+      case 'SCRIPT':
+        SCRIPTS.push(element.outerHTML);
+        break;
+      case 'STYLE':
+        STYLES.push(element.outerHTML);
+        break;
+      case 'LINK':
+        LINKS.push(element.outerHTML);
+        break;
+      case 'META':
+        META.push(element.outerHTML);
+        break;
+      default:
+        break;
+    }
+  }
+
+  return {
+    title: doc.title,
+    appNode: doc.querySelector(appSelector).outerHTML,
+    scripts: SCRIPTS.join('\n'),
+    styles: STYLES.join('\n'),
+    meta: META.join('\n'),
+    links: LINKS.join('\n')
   };
 }
 
-
-export function ngAspnetCoreEngine(
-  options: IEngineOptions
-): Promise<{ html: string, globals: { styles: string, title: string, meta: string, transferData?: {}, [key: string]: any } }> {
+export function ngAspnetCoreEngine(options: IEngineOptions): Promise<IEngineRenderResult> {
 
   if (!options.appSelector) {
     throw new Error(`appSelector is required! Pass in " appSelector: '<app-root></app-root>' ", for your root App component.`);
@@ -95,17 +115,13 @@ export function ngAspnetCoreEngine(
       options.providers = options.providers || [];
 
       const extraProviders = options.providers.concat(
-        ...options.providers,
-          [{
-            provide: ORIGIN_URL,
-            useValue: options.request.origin
-          }, {
-            provide: REQUEST,
-            useValue: options.request.data.request
-          }, {
-            provide: BEFORE_APP_SERIALIZED,
-            useFactory: beforeAppSerialized, multi: true, deps: [ DOCUMENT ]
-          }
+        [{
+          provide: ORIGIN_URL,
+          useValue: options.request.origin
+        }, {
+          provide: REQUEST,
+          useValue: options.request.data.request
+        }
         ]
       );
 
@@ -117,18 +133,20 @@ export function ngAspnetCoreEngine(
             extraProviders: extraProviders
           });
         })
-        .then(() => {
+        .then(result => {
+          const doc = result.moduleRef.injector.get(DOCUMENT);
+          const universalData = _getUniversalData(doc);
 
           resolve({
-            html: UniversalData.appNode,
+            html: universalData.appNode,
+            moduleRef: result.moduleRef,
             globals: {
-              styles: UniversalData.styles,
-              title: UniversalData.title,
-              scripts: UniversalData.scripts,
-              meta: UniversalData.meta,
-              links: UniversalData.links
+              styles: universalData.styles,
+              title: universalData.title,
+              scripts: universalData.scripts,
+              meta: universalData.meta,
+              links: universalData.links
             }
-
           });
         }, (err) => {
           reject(err);
