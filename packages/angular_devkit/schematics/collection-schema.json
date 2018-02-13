@@ -41,6 +41,16 @@
           "schema": {
             "type": "string",
             "description": "Location of the schema.json file of the schematic"
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not this schematic should be listed by the tooling. This does not prevent the tooling to run this schematic, just remove it name from listSchematicNames()."
+          },
+          "private": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not this schematic can be called from an external schematic, or a tool. This implies hidden: true."
           }
         },
         "required": [

@@ -31,6 +31,8 @@ export type SchematicDescription<CollectionMetadataT extends object,
                                  SchematicMetadataT extends object> = SchematicMetadataT & {
   readonly collection: CollectionDescription<CollectionMetadataT>;
   readonly name: string;
+  readonly private?: boolean;
+  readonly hidden?: boolean;
 };
 
 
@@ -111,7 +113,10 @@ export interface Collection<CollectionMetadataT extends object, SchematicMetadat
   readonly description: CollectionDescription<CollectionMetadataT>;
   readonly baseDescriptions?: Array<CollectionDescription<CollectionMetadataT>>;
 
-  createSchematic(name: string): Schematic<CollectionMetadataT, SchematicMetadataT>;
+  createSchematic(
+    name: string,
+    allowPrivate?: boolean,
+  ): Schematic<CollectionMetadataT, SchematicMetadataT>;
   listSchematicNames(): string[];
 }
 

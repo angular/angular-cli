@@ -209,4 +209,36 @@ describe('FileSystemEngineHost', () => {
 
     expect(() => engine.createCollection('invalid-aliases-2')).toThrow();
   });
+
+  it('does not list hidden schematics', () => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+    const collection = engine.createCollection('hidden-schematics');
+
+    expect(collection.listSchematicNames()).toEqual([
+      'schematic-1',
+      'schematic-2',
+    ]);
+  });
+
+  it('does not list private schematics', () => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+    const collection = engine.createCollection('private-schematics');
+
+    expect(collection.listSchematicNames()).toEqual([
+      'schematic-1',
+      'schematic-2',
+    ]);
+  });
+
+  it('cannot instanciate a private schematic', () => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+
+    const collection = engine.createCollection('private-schematics');
+    expect(() => engine.createSchematic('schematic-1', collection)).not.toThrow();
+    expect(() => engine.createSchematic('private-schematic', collection)).toThrow();
+    expect(() => collection.createSchematic('private-schematic')).toThrow();
+  });
 });

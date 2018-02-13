@@ -19,8 +19,8 @@ export class CollectionImpl<CollectionT extends object, SchematicT extends objec
   get description() { return this._description; }
   get name() { return this.description.name || '<unknown>'; }
 
-  createSchematic(name: string): Schematic<CollectionT, SchematicT> {
-    return this._engine.createSchematic(name, this);
+  createSchematic(name: string, allowPrivate = false): Schematic<CollectionT, SchematicT> {
+    return this._engine.createSchematic(name, this, allowPrivate);
   }
 
   listSchematicNames(): string[] {

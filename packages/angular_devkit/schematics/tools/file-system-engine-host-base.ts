@@ -108,10 +108,14 @@ export abstract class FileSystemEngineHostBase implements
   listSchematics(collection: FileSystemCollection): string[] {
     return this.listSchematicNames(collection.description);
   }
-  listSchematicNames(collection: FileSystemCollectionDescription) {
+  listSchematicNames(collection: FileSystemCollectionDesc) {
     const schematics: string[] = [];
     for (const key of Object.keys(collection.schematics)) {
       const schematic = collection.schematics[key];
+
+      if (schematic.hidden || schematic.private) {
+        continue;
+      }
 
       // If extends is present without a factory it is an alias, do not return it
       //   unless it is from another collection.

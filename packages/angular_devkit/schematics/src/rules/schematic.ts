@@ -39,7 +39,7 @@ export function externalSchematic<OptionT extends object>(collectionName: string
 export function schematic<OptionT extends object>(schematicName: string, options: OptionT): Rule {
   return (input: Tree, context: SchematicContext) => {
     const collection = context.schematic.collection;
-    const schematic = collection.createSchematic(schematicName);
+    const schematic = collection.createSchematic(schematicName, true);
 
     return schematic.call(options, observableOf(branch(input)), context);
   };

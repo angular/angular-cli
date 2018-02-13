@@ -53,6 +53,12 @@ export class UnknownSchematicException extends BaseException {
   }
 }
 
+export class PrivateSchematicException extends BaseException {
+  constructor(name: string, collection: CollectionDescription<{}>) {
+    super(`Schematic "${name}" not found in collection "${collection.name}".`);
+  }
+}
+
 export class SchematicEngineConflictingException extends BaseException {
   constructor() { super(`A schematic was called from a different engine as its parent.`); }
 }
@@ -163,8 +169,10 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
   }
 
   createSchematic(
-      name: string,
-      collection: Collection<CollectionT, SchematicT>): Schematic<CollectionT, SchematicT> {
+    name: string,
+    collection: Collection<CollectionT, SchematicT>,
+    allowPrivate = false,
+  ): Schematic<CollectionT, SchematicT> {
     const collectionImpl = this._collectionCache.get(collection.description.name);
     const schematicMap = this._schematicCache.get(collection.description.name);
     if (!collectionImpl || !schematicMap || collectionImpl !== collection) {
@@ -193,6 +201,10 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
         // Report the error for the top level schematic collection
         throw new UnknownSchematicException(name, collection.description);
       }
+    }
+
+    if (description.private && !allowPrivate) {
+      throw new PrivateSchematicException(name, collection.description);
     }
 
     const factory = this._host.getSchematicRuleFactory(description, collectionDescription);
