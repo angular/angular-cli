@@ -378,7 +378,11 @@ function _readArray(context: JsonParserContext, comments = _readBlanks(context))
   while (_peek(context) != ']') {
     _token(context, ',');
 
-    const node = _readValue(context);
+    const valueComments = _readBlanks(context);
+    if ((context.mode & JsonParseMode.TrailingCommasAllowed) !== 0 && _peek(context) === ']') {
+      break;
+    }
+    const node = _readValue(context, valueComments);
     elements.push(node);
     value.push(node.value);
   }
@@ -505,7 +509,11 @@ function _readObject(context: JsonParserContext,
     while (_peek(context) != '}') {
       _token(context, ',');
 
-      const property = _readProperty(context);
+      const propertyComments = _readBlanks(context);
+      if ((context.mode & JsonParseMode.TrailingCommasAllowed) !== 0 && _peek(context) === '}') {
+        break;
+      }
+      const property = _readProperty(context, propertyComments);
       value[property.key.value] = property.value.value;
       properties.push(property);
     }
@@ -607,11 +615,10 @@ function _readBlanks(context: JsonParserContext): (JsonAstComment | JsonAstMulti
  * Read a JSON value from the context, which can be any form of JSON value.
  * @private
  */
-function _readValue(context: JsonParserContext): JsonAstNode {
+function _readValue(context: JsonParserContext, comments = _readBlanks(context)): JsonAstNode {
   let result: JsonAstNode;
 
   // Clean up before.
-  const comments = _readBlanks(context);
   const char = _peek(context);
   switch (char) {
     case undefined:
@@ -673,9 +680,11 @@ export enum JsonParseMode {
   CommentsAllowed           = 1 << 0,  // Allows comments, both single or multi lines.
   SingleQuotesAllowed       = 1 << 1,  // Allow single quoted strings.
   IdentifierKeyNamesAllowed = 1 << 2,  // Allow identifiers as objectp properties.
+  TrailingCommasAllowed     = 1 << 3,
 
   Default                   = Strict,
-  Loose                     = CommentsAllowed | SingleQuotesAllowed | IdentifierKeyNamesAllowed,
+  Loose                     = CommentsAllowed | SingleQuotesAllowed |
+                              IdentifierKeyNamesAllowed | TrailingCommasAllowed,
 }
 
 
