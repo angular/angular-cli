@@ -60,6 +60,7 @@
     "node-modules-path": "^1.0.0",
     "nopt": "^4.0.1",
     "opn": "~5.1.0",
+    "parse5": "^4.0.0",
     "portfinder": "~1.0.12",
     "postcss": "^6.0.16",
     "postcss-import": "^11.0.0",
