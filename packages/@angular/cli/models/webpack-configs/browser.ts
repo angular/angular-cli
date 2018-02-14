@@ -3,8 +3,9 @@ import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 
-import { packageChunkSort } from '../../utilities/package-chunk-sort';
+import { generateEntryPoints, packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
+import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
 import { extraEntryParser, lazyChunksFilter } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
@@ -99,7 +100,15 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         }
       }
     },
-    plugins: extraPlugins,
+    plugins: extraPlugins.concat([
+      new IndexHtmlWebpackPlugin({
+        input: path.resolve(appRoot, appConfig.index),
+        output: appConfig.index,
+        baseHref: buildOptions.baseHref,
+        entrypoints: generateEntryPoints(appConfig),
+        deployUrl: buildOptions.deployUrl,
+      }),
+    ]),
     node: {
       fs: 'empty',
       global: true,
