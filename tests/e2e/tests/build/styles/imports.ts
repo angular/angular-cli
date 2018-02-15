@@ -47,17 +47,17 @@ export default function () {
         // run build app
         .then(() => ng('build', '--extract-css', '--sourcemap'))
         // verify global styles
-        .then(() => expectFileToMatch('dist/styles.bundle.css',
+        .then(() => expectFileToMatch('dist/styles.css',
           /body\s*{\s*background-color: #00f;\s*}/))
-        .then(() => expectFileToMatch('dist/styles.bundle.css',
+        .then(() => expectFileToMatch('dist/styles.css',
           /p\s*{\s*background-color: #f00;\s*}/))
         // verify global styles sourcemap
         .then(() => expectToFail(() =>
-          expectFileToMatch('dist/styles.bundle.css', '"mappings":""')))
+          expectFileToMatch('dist/styles.css', '"mappings":""')))
         // verify component styles
-        .then(() => expectFileToMatch('dist/main.bundle.js',
+        .then(() => expectFileToMatch('dist/main.js',
           /.outer.*.inner.*background:\s*#[fF]+/))
-        .then(() => expectFileToMatch('dist/main.bundle.js',
+        .then(() => expectFileToMatch('dist/main.js',
           /h1.*background:\s*#000+/))
         // Also check imports work on ng test
         .then(() => !ejected && ng('test', '--single-run'))

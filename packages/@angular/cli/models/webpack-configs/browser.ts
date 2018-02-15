@@ -82,7 +82,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false
     },
     optimization: {
-      // runtimeChunk: 'single',
+      runtimeChunk: 'single',
       splitChunks: {
         chunks: buildOptions.commonChunk ? 'all' : 'initial',
         cacheGroups: {

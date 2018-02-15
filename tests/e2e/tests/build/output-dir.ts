@@ -14,7 +14,7 @@ export default function() {
 
   return ng('build', '-op', './build-output')
     .then(() => expectFileToExist('./build-output/index.html'))
-    .then(() => expectFileToExist('./build-output/main.bundle.js'))
+    .then(() => expectFileToExist('./build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean))
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson['apps'][0];
@@ -22,6 +22,6 @@ export default function() {
     }))
     .then(() => ng('build'))
     .then(() => expectFileToExist('./config-build-output/index.html'))
-    .then(() => expectFileToExist('./config-build-output/main.bundle.js'))
+    .then(() => expectFileToExist('./config-build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean));
 }

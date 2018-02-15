@@ -20,7 +20,7 @@ export default function() {
     return Promise.resolve();
   }
 
-  const lazyChunkRegExp = /lazy-module\.chunk\.js/g;
+  const lazyChunkRegExp = /lazy-module\.js/g;
 
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
     // Add a lazy module.
@@ -109,7 +109,7 @@ export default function() {
       })
     ]))
     .then(() => wait(2000))
-    .then(() => request('http://localhost:4200/main.bundle.js'))
+    .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
       if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
         throw new Error('Expected golden value 1.');

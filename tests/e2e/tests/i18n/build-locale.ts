@@ -14,12 +14,12 @@ export default function () {
   return Promise.resolve()
     // tests for register_locale_data transformer
     .then(() => ng('build', '--aot', '--locale=fr'))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /registerLocaleData/))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /angular_common_locales_fr/))
+    .then(() => expectFileToMatch('dist/main.js', /registerLocaleData/))
+    .then(() => expectFileToMatch('dist/main.js', /angular_common_locales_fr/))
     .then(() => rimraf('dist'))
     .then(() => ng('build', '--aot', '--locale=fr_FR'))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /registerLocaleData/))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /angular_common_locales_fr/))
+    .then(() => expectFileToMatch('dist/main.js', /registerLocaleData/))
+    .then(() => expectFileToMatch('dist/main.js', /angular_common_locales_fr/))
     .then(() => rimraf('dist'))
     .then(() => expectToFail(() => ng('build', '--aot', '--locale=no-locale')));
 }

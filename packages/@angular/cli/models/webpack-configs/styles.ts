@@ -265,12 +265,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   if (buildOptions.extractCss) {
     // extract global css from js files into own css file
     extraPlugins.push(
-      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.bundle.css` }));
+      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
 
   return {
+    // Workaround stylus-loader defect: https://github.com/shama/stylus-loader/issues/189
+    loader: { stylus: {} },
     entry: entryPoints,
     module: { rules },
     plugins: [].concat(extraPlugins)
