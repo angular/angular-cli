@@ -7,8 +7,7 @@
     "directory": {
       "type": "string",
       "format": "path",
-      "description": "The directory name to create the app in.",
-      "alias": "dir"
+      "description": "The directory name to create the app in."
     },
     "path": {
       "type": "string",
@@ -22,7 +21,7 @@
       "format": "path",
       "description": "The path of the source directory.",
       "default": "src",
-      "alias": "sd",
+      "alias": "D",
       "visible": false
     },
     "name": {
@@ -34,13 +33,13 @@
       "description": "Specifies if the style will be in the ts file.",
       "type": "boolean",
       "default": false,
-      "alias": "is"
+      "alias": "s"
     },
     "inlineTemplate": {
       "description": "Specifies if the template will be in the ts file.",
       "type": "boolean",
       "default": false,
-      "alias": "it"
+      "alias": "t"
     },
     "viewEncapsulation": {
       "description": "Specifies the view encapsulation strategy.",
@@ -73,7 +72,7 @@
       "description": "Skip creating spec files.",
       "type": "boolean",
       "default": false,
-      "alias": "st"
+      "alias": "S"
     },
     "skipInstall": {
       "description": "Skip installing dependency packages.",
@@ -90,7 +89,7 @@
       "description": "Skip initializing a git repository.",
       "type": "boolean",
       "default": false,
-      "alias": "sg"
+      "alias": "g"
     },
     "commit": {
       "description": "Initial repository commit information.",

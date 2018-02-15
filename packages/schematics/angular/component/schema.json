@@ -16,7 +16,7 @@
       "format": "path",
       "description": "The path of the source directory.",
       "default": "src",
-      "alias": "sd",
+      "alias": "D",
       "visible": false
     },
     "appRoot": {
@@ -33,26 +33,26 @@
       "description": "Specifies if the style will be in the ts file.",
       "type": "boolean",
       "default": false,
-      "alias": "is"
+      "alias": "s"
     },
     "inlineTemplate": {
       "description": "Specifies if the template will be in the ts file.",
       "type": "boolean",
       "default": false,
-      "alias": "it"
+      "alias": "t"
     },
     "viewEncapsulation": {
       "description": "Specifies the view encapsulation strategy.",
       "enum": ["Emulated", "Native", "None"],
       "type": "string",
-      "alias": "ve"
+      "alias": "v"
     },
     "changeDetection": {
       "description": "Specifies the change detection strategy.",
       "enum": ["Default", "OnPush"],
       "type": "string",
       "default": "Default",
-      "alias": "cd"
+      "alias": "c"
     },
     "prefix": {
       "type": "string",

@@ -114,4 +114,10 @@ describe('Application Schematic', () => {
     const content = tree.readContent(path);
     expect(content).toMatch(/import { AppComponent } from \'\.\/app\.component\';/);
   });
+
+  it('should use the directory option', () => {
+    const options = { ...defaultOptions, directory: 'my-dir' };
+    const tree = schematicRunner.runSchematic('application', options);
+    expect(tree.exists('/my-dir/package.json')).toEqual(true);
+  });
 });

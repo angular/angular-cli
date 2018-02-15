@@ -81,7 +81,7 @@
       "format": "path",
       "description": "The path of the source directory.",
       "default": "src",
-      "alias": "sd"
+      "alias": "D"
     }
   },
   "required": [
