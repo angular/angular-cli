@@ -21,7 +21,7 @@ export default Task.extend({
     // Get the main bundle from the server build's output directory.
     const serverDir = fs.readdirSync(options.serverOutDir);
     const serverMainBundle = serverDir
-      .filter((file: string) => /main\.(?:[a-zA-Z0-9]{20}\.)?bundle\.js/.test(file))[0];
+      .filter((file: string) => /main\.(?:[a-zA-Z0-9]{20}\.)?js/.test(file))[0];
     const serverBundlePath = join(options.serverOutDir, serverMainBundle);
     const AppServerModuleNgFactory = require(serverBundlePath).AppServerModuleNgFactory;
 

@@ -33,10 +33,10 @@ export default function () {
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.scss'))
     .then(() => ng('build', '--extract-css', '--sourcemap'))
-    .then(() => expectFileToMatch('dist/styles.bundle.css',
+    .then(() => expectFileToMatch('dist/styles.css',
       /body\s*{\s*background-color: blue;\s*}/))
-    .then(() => expectFileToMatch('dist/styles.bundle.css',
+    .then(() => expectFileToMatch('dist/styles.css',
       /p\s*{\s*background-color: red;\s*}/))
-    .then(() => expectToFail(() => expectFileToMatch('dist/styles.bundle.css', '"mappings":""')))
-    .then(() => expectFileToMatch('dist/main.bundle.js', /.outer.*.inner.*background:\s*#[fF]+/));
+    .then(() => expectToFail(() => expectFileToMatch('dist/styles.css', '"mappings":""')))
+    .then(() => expectFileToMatch('dist/main.js', /.outer.*.inner.*background:\s*#[fF]+/));
 }

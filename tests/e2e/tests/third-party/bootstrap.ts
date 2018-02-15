@@ -15,14 +15,14 @@ export default function() {
       );
     }))
     .then(() => ng('build', '--extract-css'))
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', '* Bootstrap'))
-    .then(() => expectFileToMatch('dist/styles.bundle.css', '* Bootstrap'))
+    .then(() => expectFileToMatch('dist/scripts.js', '* Bootstrap'))
+    .then(() => expectFileToMatch('dist/styles.css', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <script type="text/javascript" src="inline.bundle.js"></script>
-      <script type="text/javascript" src="polyfills.bundle.js"></script>
-      <script type="text/javascript" src="scripts.bundle.js"></script>
-      <script type="text/javascript" src="vendor.bundle.js"></script>
-      <script type="text/javascript" src="main.bundle.js"></script>
+      <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="polyfills.js"></script>
+      <script type="text/javascript" src="scripts.js"></script>
+      <script type="text/javascript" src="vendor.js"></script>
+      <script type="text/javascript" src="main.js"></script>
     `))
     .then(() => ng(
       'build',
@@ -30,12 +30,12 @@ export default function() {
       '--extract-css',
       '--output-hashing=none'
     ))
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', 'jQuery'))
-    .then(() => expectFileToMatch('dist/styles.bundle.css', '* Bootstrap'))
+    .then(() => expectFileToMatch('dist/scripts.js', 'jQuery'))
+    .then(() => expectFileToMatch('dist/styles.css', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <script type="text/javascript" src="inline.bundle.js"></script>
-      <script type="text/javascript" src="polyfills.bundle.js"></script>
-      <script type="text/javascript" src="scripts.bundle.js"></script>
-      <script type="text/javascript" src="main.bundle.js"></script>
+      <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="polyfills.js"></script>
+      <script type="text/javascript" src="scripts.js"></script>
+      <script type="text/javascript" src="main.js"></script>
     `));
 }

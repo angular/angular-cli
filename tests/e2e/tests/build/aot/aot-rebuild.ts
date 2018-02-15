@@ -24,7 +24,7 @@ export default function () {
     // Editing too soon seems to trigger a rebuild and throw polling/watch out of whack.
     .then(() => wait(2000))
     // Check AOT templates are up to date with current code.
-    .then(() => request('http://localhost:4200/main.bundle.js'))
+    .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
       if (body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
         throw new Error('Expected golden value 1 to not be present.');
@@ -32,7 +32,7 @@ export default function () {
     })
     .then(() => appendToFile('src/app/app.component.html', '<p> $$_E2E_GOLDEN_VALUE_1 </p>'))
     .then(() => waitForAnyProcessOutputToMatch(validBundleRegEx, 20000))
-    .then(() => request('http://localhost:4200/main.bundle.js'))
+    .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
       if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
         throw new Error('Expected golden value 1.');

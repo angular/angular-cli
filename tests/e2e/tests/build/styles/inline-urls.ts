@@ -46,15 +46,15 @@ export default function () {
       }
     })
     // Check paths are correctly generated.
-    .then(() => expectFileToMatch('dist/styles.bundle.css',
+    .then(() => expectFileToMatch('dist/styles.css',
       /url\(['"]?large\.[0-9a-f]{20}\.png['"]?\),\s+linear-gradient\(to bottom, #0e40fa 25%, #0654f4 75%\);/))
-    .then(() => expectFileToMatch('dist/styles.bundle.css',
+    .then(() => expectFileToMatch('dist/styles.css',
       /url\(\\?['"]data:image\/svg\+xml/))
-    .then(() => expectFileToMatch('dist/styles.bundle.css',
+    .then(() => expectFileToMatch('dist/styles.css',
       /url\(['"]?small-id\.[0-9a-f]{20}\.svg#testID['"]?\)/))
-    .then(() => expectFileToMatch('dist/main.bundle.js',
+    .then(() => expectFileToMatch('dist/main.js',
       /url\(\\?['"]data:image\/svg\+xml/))
-    .then(() => expectFileToMatch('dist/main.bundle.js',
+    .then(() => expectFileToMatch('dist/main.js',
       /url\((?:['"]|\\')?large\.[0-9a-f]{20}\.png(?:['"]|\\')?\)/))
     // Check files are correctly created.
     .then(() => expectToFail(() => expectFileToExist('dist/small.svg')))

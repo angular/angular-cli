@@ -207,10 +207,10 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
         // Ensure script and style bundles are served.
         // They are mentioned in the custom karma context page and we don't want them to 404.
         const alwaysServe = [
-          '/_karma_webpack_/inline.bundle.js',
-          '/_karma_webpack_/polyfills.bundle.js',
-          '/_karma_webpack_/scripts.bundle.js',
-          '/_karma_webpack_/vendor.bundle.js',
+          '/_karma_webpack_/runtime.js',
+          '/_karma_webpack_/polyfills.js',
+          '/_karma_webpack_/scripts.js',
+          '/_karma_webpack_/vendor.js',
         ];
         if (alwaysServe.indexOf(req.url) != -1) {
           res.statusCode = 200;
