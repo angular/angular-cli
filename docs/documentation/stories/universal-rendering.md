@@ -72,7 +72,7 @@ import {AppComponent} from './app.component';
     // The AppServerModule should import your AppModule followed
     // by the ServerModule from @angular/platform-server.
     AppModule,
-    ServerModule, 
+    ServerModule,
     ModuleMapLoaderModule // <-- *Important* to have lazy-loaded routes work
   ],
   // Since the bootstrapped component is not inherited from your
@@ -191,8 +191,8 @@ $ ng build --prod --app 1 --output-hashing=false
 Date: 2017-07-24T22:42:09.739Z
 Hash: 9cac7d8e9434007fd8da
 Time: 4933ms
-chunk {0} main.bundle.js (main) 9.49 kB [entry] [rendered]
-chunk {1} styles.bundle.css (styles) 0 bytes [entry] [rendered]
+chunk {0} main.js (main) 9.49 kB [entry] [rendered]
+chunk {1} styles.css (styles) 0 bytes [entry] [rendered]
 ```
 
 ---

@@ -26,20 +26,20 @@ export default function () {
     }))
     .then(() => ng('build', '--extract-css'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/styles.bundle.css', '.string-style'))
-    .then(() => expectFileToMatch('dist/styles.bundle.css', '.input-style'))
-    .then(() => expectFileToMatch('dist/lazy-style.bundle.css', '.lazy-style'))
-    .then(() => expectFileToMatch('dist/renamed-style.bundle.css', '.pre-rename-style'))
-    .then(() => expectFileToMatch('dist/renamed-lazy-style.bundle.css', '.pre-rename-lazy-style'))
+    .then(() => expectFileToMatch('dist/styles.css', '.string-style'))
+    .then(() => expectFileToMatch('dist/styles.css', '.input-style'))
+    .then(() => expectFileToMatch('dist/lazy-style.css', '.lazy-style'))
+    .then(() => expectFileToMatch('dist/renamed-style.css', '.pre-rename-style'))
+    .then(() => expectFileToMatch('dist/renamed-lazy-style.css', '.pre-rename-lazy-style'))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <link href="styles.bundle.css" rel="stylesheet"/>
-      <link href="renamed-style.bundle.css" rel="stylesheet"/>
+      <link rel="stylesheet" href="styles.css">
+      <link rel="stylesheet" href="renamed-style.css">
     `))
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <script type="text/javascript" src="inline.bundle.js"></script>
-      <script type="text/javascript" src="polyfills.bundle.js"></script>
-      <script type="text/javascript" src="vendor.bundle.js"></script>
-      <script type="text/javascript" src="main.bundle.js"></script>
+      <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="polyfills.js"></script>
+      <script type="text/javascript" src="vendor.js"></script>
+      <script type="text/javascript" src="main.js"></script>
     `));
 }

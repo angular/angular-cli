@@ -20,7 +20,7 @@ export default function () {
       if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value. (1)');
       }
-      if (!body.match(/"\/deployurl\/scripts.bundle.js"/)) {
+      if (!body.match(/"\/deployurl\/scripts.js"/)) {
         throw new Error('Response does not match expected value. (2)');
       }
     })

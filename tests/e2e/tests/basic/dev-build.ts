@@ -9,7 +9,7 @@ export default function() {
   const ejected = getGlobalVariable('argv').eject;
 
   return ng('build', '--env=dev')
-    .then(() => expectFileToMatch('dist/index.html', 'main.bundle.js'))
+    .then(() => expectFileToMatch('dist/index.html', 'main.js'))
     .then(() => expectToFail(() => expectFileToExist('dist/3rdpartylicenses.txt')))
     // If this is an ejected test, the eject will create files so git will not be clean.
     .then(() => !ejected && expectGitToBeClean());

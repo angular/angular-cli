@@ -43,36 +43,36 @@ export default function () {
     }))
     .then(() => ng('build', '--extract-css'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', 'string-script'))
-    .then(() => expectFileToMatch('dist/scripts.bundle.js', 'input-script'))
-    .then(() => expectFileToMatch('dist/lazy-script.bundle.js', 'lazy-script'))
-    .then(() => expectFileToMatch('dist/renamed-script.bundle.js', 'pre-rename-script'))
-    .then(() => expectFileToMatch('dist/renamed-lazy-script.bundle.js', 'pre-rename-lazy-script'))
+    .then(() => expectFileToMatch('dist/scripts.js', 'string-script'))
+    .then(() => expectFileToMatch('dist/scripts.js', 'input-script'))
+    .then(() => expectFileToMatch('dist/lazy-script.js', 'lazy-script'))
+    .then(() => expectFileToMatch('dist/renamed-script.js', 'pre-rename-script'))
+    .then(() => expectFileToMatch('dist/renamed-lazy-script.js', 'pre-rename-lazy-script'))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
-      <script type="text/javascript" src="inline.bundle.js"></script>
-      <script type="text/javascript" src="polyfills.bundle.js"></script>
-      <script type="text/javascript" src="scripts.bundle.js"></script>
-      <script type="text/javascript" src="renamed-script.bundle.js"></script>
-      <script type="text/javascript" src="vendor.bundle.js"></script>
-      <script type="text/javascript" src="main.bundle.js"></script>
+      <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="polyfills.js"></script>
+      <script type="text/javascript" src="scripts.js"></script>
+      <script type="text/javascript" src="renamed-script.js"></script>
+      <script type="text/javascript" src="vendor.js"></script>
+      <script type="text/javascript" src="main.js"></script>
     `))
     // Ensure scripts can be separately imported from the app.
-    .then(() => expectFileToMatch('dist/main.bundle.js', 'console.log(\'string-script\');'))
+    .then(() => expectFileToMatch('dist/main.js', 'console.log(\'string-script\');'))
     // Verify uglify, sourcemaps and hashes. Lazy scripts should not get hashes.
     .then(() => ng('build', '--prod', '--sourcemap'))
-    .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.bundle\.js/))
+    .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.js/))
     .then(fileName => expectFileToMatch(`dist/${fileName}`, 'var number=2;'))
-    .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.bundle\.js\.map/))
-    .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.bundle\.js/))
-    .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.bundle\.js.map/))
-    .then(() => expectFileToMatch('dist/lazy-script.bundle.js', 'lazy-script'))
-    .then(() => expectFileToMatch('dist/renamed-lazy-script.bundle.js', 'pre-rename-lazy-script'))
+    .then(() => expectFileMatchToExist('dist', /scripts\.[0-9a-f]{20}\.js\.map/))
+    .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.js/))
+    .then(() => expectFileMatchToExist('dist', /renamed-script\.[0-9a-f]{20}\.js.map/))
+    .then(() => expectFileToMatch('dist/lazy-script.js', 'lazy-script'))
+    .then(() => expectFileToMatch('dist/renamed-lazy-script.js', 'pre-rename-lazy-script'))
 
     // Expect order to be preserved.
     .then(() => {
       const [fileName] = fs.readdirSync('dist')
-        .filter(name => name.match(/^scripts\..*\.bundle\.js$/));
+        .filter(name => name.match(/^scripts\..*\.js$/));
 
       const content = fs.readFileSync(path.join('dist', fileName), 'utf-8');
       const re = new RegExp(/['"]string-script['"].*/.source
@@ -82,7 +82,7 @@ export default function () {
                           + /['"]bstring-script['"].*/.source
                           + /['"]astring-script['"].*/.source
                           + /['"]cstring-script['"].*/.source
-                          + /['"]input-script['"]/.source;
+                          + /['"]input-script['"]/.source);
       if (!content.match(re)) {
         throw new Error('Scripts are not included in order.');
       }

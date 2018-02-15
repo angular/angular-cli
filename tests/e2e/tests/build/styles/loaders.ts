@@ -33,7 +33,7 @@ export default function () {
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.scss'))
     .then(() => ng('build'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/styles.bundle.css', /exports/)))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.bundle.js',
+    .then(() => expectToFail(() => expectFileToMatch('dist/styles.css', /exports/)))
+    .then(() => expectToFail(() => expectFileToMatch('dist/main.js',
       /".*module\.exports.*\.outer.*background:/)));
 }

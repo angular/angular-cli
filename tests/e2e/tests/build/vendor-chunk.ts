@@ -5,7 +5,7 @@ import {expectToFail} from '../../utils/utils';
 
 export default function() {
   return ng('build')
-    .then(() => expectFileToExist('dist/vendor.bundle.js'))
+    .then(() => expectFileToExist('dist/vendor.js'))
     .then(() => ng('build', '--no-vendor-chunk'))
-    .then(() => expectToFail(() => expectFileToExist('dist/vendor.bundle.js')));
+    .then(() => expectToFail(() => expectFileToExist('dist/vendor.js')));
 }

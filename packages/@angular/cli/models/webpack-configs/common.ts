@@ -70,7 +70,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       extraPlugins.push(new ScriptsWebpackPlugin({
         name: script.entry,
         sourceMap: buildOptions.sourcemaps,
-        filename: `${script.entry}${hash}.bundle.js`,
+        filename: `${script.entry}${hash}.js`,
         scripts: script.paths,
         basePath: projectRoot,
       }));
@@ -215,8 +215,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     output: {
       path: path.resolve(buildOptions.outputPath),
       publicPath: buildOptions.deployUrl,
-      filename: `[name]${hashFormat.chunk}.bundle.js`,
-      chunkFilename: `[id]${hashFormat.chunk}.chunk.js`
+      filename: `[name]${hashFormat.chunk}.js`,
     },
     module: {
       rules: [
