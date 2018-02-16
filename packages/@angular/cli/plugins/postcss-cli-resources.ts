@@ -121,7 +121,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
 
     return Promise.all(urlDeclarations.map(async decl => {
       const value = decl.value;
-      const urlRegex = /url\(\s*['"]?([ \S]+?)['"]??\s*\)/g;
+      const urlRegex = /url\(\s*(?:"([^"]+)"|'([^']+)'|(.+))\s*\)/g;
       const segments: string[] = [];
 
       let match;
@@ -129,26 +129,31 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       let modified = false;
       // tslint:disable-next-line:no-conditional-assignment
       while (match = urlRegex.exec(value)) {
+        const originalUrl = match[1] || match[2] || match[3];
         let processedUrl;
         try {
-          processedUrl = await process(match[1], resourceCache);
+          processedUrl = await process(originalUrl, resourceCache);
         } catch (err) {
-          loader.emitError(decl.error(err.message, { word: match[1] }).toString());
+          loader.emitError(decl.error(err.message, { word: originalUrl }).toString());
           continue;
         }
 
-        if (lastIndex !== match.index) {
+        if (lastIndex < match.index) {
           segments.push(value.slice(lastIndex, match.index));
         }
 
-        if (!processedUrl || match[1] === processedUrl) {
+        if (!processedUrl || originalUrl === processedUrl) {
           segments.push(match[0]);
         } else {
           segments.push(wrapUrl(processedUrl));
           modified = true;
         }
 
-        lastIndex = urlRegex.lastIndex;
+        lastIndex = match.index + match[0].length;
+      }
+
+      if (lastIndex < value.length) {
+        segments.push(value.slice(lastIndex));
       }
 
       if (modified) {

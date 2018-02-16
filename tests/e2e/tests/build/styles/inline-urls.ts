@@ -22,13 +22,14 @@ export default function () {
       'src/styles.scss': `
         $fa-font-path: "~font-awesome/fonts";
         @import "~font-awesome/scss/font-awesome";
-        h1 { background: url('./assets/large.png'); }
+        h1 { background: url('./assets/large.png'),
+                         linear-gradient(to bottom, #0e40fa 25%, #0654f4 75%); }
         h2 { background: url('./assets/small.svg'); }
-        p  { background: url('./assets/small-id.svg#testID'); }
+        p  { background: url(./assets/small-id.svg#testID); }
       `,
       'src/app/app.component.css': `
         h3 { background: url('../assets/small.svg'); }
-        h4 { background: url('../assets/large.png'); }
+        h4 { background: url("../assets/large.png"); }
       `,
       'src/assets/small.svg': imgSvg,
       'src/assets/small-id.svg': imgSvg
@@ -46,15 +47,15 @@ export default function () {
     })
     // Check paths are correctly generated.
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      /url\([\'"]?large\.[0-9a-f]{20}\.png[\'"]?\)/))
+      /url\(['"]?large\.[0-9a-f]{20}\.png['"]?\),\s+linear-gradient\(to bottom, #0e40fa 25%, #0654f4 75%\);/))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      /url\(\\?[\'"]data:image\/svg\+xml/))
+      /url\(\\?['"]data:image\/svg\+xml/))
     .then(() => expectFileToMatch('dist/styles.bundle.css',
-      /url\([\'"]?small-id\.[0-9a-f]{20}\.svg#testID[\'"]?\)/))
+      /url\(['"]?small-id\.[0-9a-f]{20}\.svg#testID['"]?\)/))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      /url\(\\?[\'"]data:image\/svg\+xml/))
+      /url\(\\?['"]data:image\/svg\+xml/))
     .then(() => expectFileToMatch('dist/main.bundle.js',
-      /url\((?:[\'"]|\\')?large\.[0-9a-f]{20}\.png(?:[\'"]|\\')?\)/))
+      /url\((?:['"]|\\')?large\.[0-9a-f]{20}\.png(?:['"]|\\')?\)/))
     // Check files are correctly created.
     .then(() => expectToFail(() => expectFileToExist('dist/small.svg')))
     .then(() => expectFileMatchToExist('./dist', /large\.[0-9a-f]{20}\.png/))
