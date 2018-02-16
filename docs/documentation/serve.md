@@ -59,6 +59,16 @@ All the build Options are available in serve, below are the additional options.
 </details>
 
 <details>
+  <summary>history-api-fallback</summary>
+  <p>
+    <code>--history-api-fallback</code> <em>default value: true</em>
+  </p>
+  <p>
+    Serves the index page instead of HTTP 404 "Not Found" errors (but only when the `Accept` HTTP header includes "html" content-types).
+  </p>
+</details>
+
+<details>
   <summary>open</summary>
   <p>
     <code>--open</code> (aliases: <code>-o</code>) <em>default value: false</em>
