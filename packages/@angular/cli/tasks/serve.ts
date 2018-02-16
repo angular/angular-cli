@@ -211,11 +211,11 @@ export default Task.extend({
     }
     const webpackDevServerConfiguration: IWebpackDevServerConfigurationOptions = {
       headers: { 'Access-Control-Allow-Origin': '*' },
-      historyApiFallback: {
+      historyApiFallback: !!serveTaskOptions.historyApiFallback ? {
         index: `${servePath}/${appConfig.index}`,
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
-      },
+      } : false,
       stats: serveTaskOptions.verbose ? statsConfig : 'none',
       inline: true,
       proxy: proxyConfig,
