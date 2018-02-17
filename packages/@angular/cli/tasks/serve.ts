@@ -109,8 +109,14 @@ export default Task.extend({
     if (serveTaskOptions.liveReload) {
       // This allows for live reload of page when changes are made to repo.
       // https://webpack.js.org/configuration/dev-server/#devserver-inline
+      let webpackDevServerPath;
+      try {
+        webpackDevServerPath = require.resolve('webpack-dev-server/client');
+      } catch {
+        throw new SilentError('The "webpack-dev-server" package could not be found.');
+      }
       let entryPoints = [
-        `webpack-dev-server/client?${clientAddress}`
+        `${webpackDevServerPath}?${clientAddress}`
       ];
       if (serveTaskOptions.hmr) {
         const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
