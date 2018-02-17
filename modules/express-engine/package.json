@@ -20,7 +20,7 @@
     "engine-strict": true
   },
   "engines": {
-    "node": ">= 5.4.1 <= 8",
+    "node": ">= 5.4.1 <= 9",
     "npm": ">= 3"
   },
   "scripts": {
