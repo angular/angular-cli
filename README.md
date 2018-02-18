@@ -6,6 +6,7 @@
 [![CircleCI branch](https://img.shields.io/circleci/project/github/RedSparr0w/node-csgo-parser/master.svg?label=circleci)](https://circleci.com/gh/angular/angular-cli)
 [![Dependency Status][david-badge]][david-badge-url]
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
+[![Open Source Helpers](https://www.codetriage.com/angular/angular-cli/badges/users.svg)](https://www.codetriage.com/angular/angular-cli)
 
 [![npm](https://img.shields.io/npm/v/%40angular/cli.svg)][npm-badge-url]
 [![npm](https://img.shields.io/npm/v/%40angular/cli/next.svg)][npm-badge-url]
