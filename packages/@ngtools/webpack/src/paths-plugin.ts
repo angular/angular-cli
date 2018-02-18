@@ -32,23 +32,25 @@ export function resolveWithPaths(
   }
 
   // check if any path mapping rules are relevant
-  const isPathMapped = compilerOptions.paths && Object.keys(compilerOptions.paths)
-    .some(pattern => {
-      // can only contain zero or one
-      const starIndex = pattern.indexOf('*');
-      if (starIndex === -1) {
-        return pattern === request.request;
-      } else if (starIndex === pattern.length - 1) {
-        return request.request.startsWith(pattern.slice(0, -1));
-      } else {
-        const [prefix, suffix] = pattern.split('*');
-        return request.request.startsWith(prefix) && request.request.endsWith(suffix);
-      }
-    });
+  if (compilerOptions.paths) {
+    const isPathMapped = Object.keys(compilerOptions.paths)
+      .some(pattern => {
+        // can only contain zero or one
+        const starIndex = pattern.indexOf('*');
+        if (starIndex === -1) {
+          return pattern === request.request;
+        } else if (starIndex === pattern.length - 1) {
+          return request.request.startsWith(pattern.slice(0, -1));
+        } else {
+          const [prefix, suffix] = pattern.split('*');
+          return request.request.startsWith(prefix) && request.request.endsWith(suffix);
+        }
+      });
 
-  if (!isPathMapped) {
-    callback(null, request);
-    return;
+    if (!isPathMapped) {
+      callback(null, request);
+      return;
+    }
   }
 
   const moduleResolver = ts.resolveModuleName(
