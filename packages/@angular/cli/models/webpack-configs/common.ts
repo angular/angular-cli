@@ -200,6 +200,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   return {
+    devtool: 'source-map',
     resolve: {
       extensions: ['.ts', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
