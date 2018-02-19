@@ -22,7 +22,7 @@ export function elideImports(
   const typeChecker = getTypeChecker();
 
   // Collect all imports and used identifiers
-  const exportSpecifiers = new Set<string>();
+  const specialCaseNames = new Set<string>();
   const usedSymbols = new Set<ts.Symbol>();
   const imports = new Array<ts.ImportDeclaration>();
   ts.forEachChild(sourceFile, function visit(node) {
@@ -42,8 +42,11 @@ export function elideImports(
     } else if (ts.isExportSpecifier(node)) {
       // Export specifiers return the non-local symbol from the above
       // so check the name string instead
-      exportSpecifiers.add((node.propertyName || node.name).text);
+      specialCaseNames.add((node.propertyName || node.name).text);
       return;
+    } else if (ts.isShorthandPropertyAssignment(node)) {
+      // Shorthand property assignments return the object property's symbol not the import's
+      specialCaseNames.add(node.name.text);
     }
 
     ts.forEachChild(node, visit);
@@ -54,7 +57,7 @@ export function elideImports(
   }
 
   const isUnused = (node: ts.Identifier) => {
-    if (exportSpecifiers.has(node.text)) {
+    if (specialCaseNames.has(node.text)) {
       return false;
     }
 
