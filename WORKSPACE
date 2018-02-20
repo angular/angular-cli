@@ -12,11 +12,13 @@ load("@build_bazel_rules_nodejs//:defs.bzl", "check_bazel_version", "node_reposi
 check_bazel_version("0.9.0")
 node_repositories(package_json = ["//:package.json"])
 
+# Pick up the fix for source-map typings
+RULES_TYPESCRIPT_VERSION = "00f8fd5467f2b12ac2fbb8d74ea81d2dd5636d31"
 http_archive(
     name = "build_bazel_rules_typescript",
-    url = "https://github.com/bazelbuild/rules_typescript/archive/0.10.1.zip",
-    strip_prefix = "rules_typescript-0.10.1",
-    sha256 = "a2c81776a4a492ff9f878f9705639f5647bef345f7f3e1da09c9eeb8dec80485",
+    url = "https://github.com/bazelbuild/rules_typescript/archive/%s.zip" % RULES_TYPESCRIPT_VERSION,
+    strip_prefix = "rules_typescript-%s" % RULES_TYPESCRIPT_VERSION,
+    sha256 = "3606b97a4859cc3f73b47888618b14290cf4b93c411b1bedd821e8bb39b3442b",
 )
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
