@@ -7,9 +7,12 @@
  */
 // tslint:disable:no-any
 // tslint:disable:no-implicit-dependencies
-import { SchematicEngine } from '@angular-devkit/schematics';
+import { normalize, virtualFs } from '@angular-devkit/core';
+import { FileSystemTree, HostSink, SchematicEngine } from '@angular-devkit/schematics';
 import { FileSystemEngineHost } from '@angular-devkit/schematics/tools';
 import * as path from 'path';
+import { of as observableOf } from 'rxjs/observable/of';
+
 
 describe('FileSystemEngineHost', () => {
   const devkitRoot = (global as any)._DevKitRoot;
@@ -240,5 +243,25 @@ describe('FileSystemEngineHost', () => {
     expect(() => engine.createSchematic('schematic-1', collection)).not.toThrow();
     expect(() => engine.createSchematic('private-schematic', collection)).toThrow();
     expect(() => collection.createSchematic('private-schematic')).toThrow();
+  });
+
+  it('allows extra properties on schema', done => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+    const host = new virtualFs.test.TestHost();
+
+    const collection = engine.createCollection('extra-properties');
+    const schematic = collection.createSchematic('schematic1');
+
+    schematic.call({}, observableOf(new FileSystemTree(host))).toPromise()
+      .then(tree => {
+        return new HostSink(host).commit(tree).toPromise();
+      })
+      .then(() => {
+        expect(host.files as string[]).toEqual(['/extra-schematic']);
+        expect(host.sync.read(normalize('/extra-schematic')).toString())
+          .toEqual('extra-collection');
+      })
+      .then(done, done.fail);
   });
 });

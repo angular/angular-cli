@@ -48,7 +48,6 @@ describe('Schematic Update', () => {
   });
 
   it('works with a peer dependencies', done => {
-    debugger;
     const rule = updatePackageJson(['@angular/compiler'], '4.1.0', false);
 
     schematicRunner.callRule(rule, inputTree)

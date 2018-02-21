@@ -19,7 +19,6 @@ export class TestHost extends SimpleMemoryHost {
     for (const filePath of Object.getOwnPropertyNames(map)) {
       this.write(normalize(filePath), stringToFileBuffer(map[filePath]));
     }
-    debugger;
   }
 
   get files(): Path[] {
