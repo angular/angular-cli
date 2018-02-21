@@ -507,28 +507,24 @@ export class AngularCompilerPlugin implements Tapable {
       forkOptions);
 
     // Handle child process exit.
-    const handleChildProcessExit = () => {
-      this._killForkedTypeChecker();
-      const msg = 'AngularCompilerPlugin: Forked Type Checker exited unexpectedly. ' +
-        'Falling back to type checking on main thread.';
-      this._warnings.push(msg);
-    };
-    this._typeCheckerProcess.once('exit', handleChildProcessExit);
-    this._typeCheckerProcess.once('SIGINT', handleChildProcessExit);
-    this._typeCheckerProcess.once('uncaughtException', handleChildProcessExit);
+    this._typeCheckerProcess.once('exit', (_, signal) => {
+      this._typeCheckerProcess = undefined;
 
-    // Handle parent process exit.
-    const handleParentProcessExit = () => this._killForkedTypeChecker();
-    process.once('exit', handleParentProcessExit);
-    process.once('SIGINT', handleParentProcessExit);
-    process.once('uncaughtException', handleParentProcessExit);
+      // If process exited not because of SIGTERM (see _killForkedTypeChecker), than something
+      // went wrong and it should fallback to type checking on the main thread.
+      if (signal !== 'SIGTERM') {
+        this._forkTypeChecker = false;
+        const msg = 'AngularCompilerPlugin: Forked Type Checker exited unexpectedly. ' +
+          'Falling back to type checking on main thread.';
+        this._warnings.push(msg);
+      }
+    });
   }
 
   private _killForkedTypeChecker() {
     if (this._typeCheckerProcess && this._typeCheckerProcess.pid) {
       treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
       this._typeCheckerProcess = undefined;
-      this._forkTypeChecker = false;
     }
   }
 
