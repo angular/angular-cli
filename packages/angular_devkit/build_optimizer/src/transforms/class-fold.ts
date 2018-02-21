@@ -162,15 +162,14 @@ function findClassStaticPropertyAssignments(
     }
 
     const decls = symbol.declarations;
-    if (decls === undefined || decls.length !== 1) {
+    if (decls == undefined || decls.length === 0) {
       return;
     }
-    const classIdx = classes
-      .map((clazz) => clazz.class).indexOf(decls[0] as ts.VariableDeclaration);
-    if (classIdx === -1) {
+
+    const hostClass = classes.find((clazz => decls.includes(clazz.class)));
+    if (!hostClass) {
       return;
     }
-    const hostClass = classes[classIdx];
     const statement: StatementData = { expressionStatement, hostClass };
 
     hostClass.statements.push(statement);
