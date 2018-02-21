@@ -11,6 +11,12 @@ import { execSync } from 'child_process';
 import { packages } from '../lib/packages';
 
 
+const blacklist = [
+  '9ce1aed331ad0742463b587f1f5555486ccc202f',
+  'de7a44f23514594274394322adaf40ac87c38d8b',
+];
+
+
 export interface ValidateCommitsOptions {
   ci?: boolean;
   base?: string;
@@ -67,6 +73,11 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
   }
 
   for (const [sha, message] of commits) {
+    if (blacklist.indexOf(sha) !== -1) {
+      // Some commits are better ignored.
+      continue;
+    }
+
     const subject = message.match(/^([^:(]+)(?:\((.*?)\))?:/);
     if (!subject) {
       _invalid(sha, message, 'does not have a subject');
