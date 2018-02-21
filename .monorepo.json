@@ -54,12 +54,14 @@
         }
       ],
       "version": "0.0.1",
-      "hash": ""
+      "hash": "",
+      "snapshotRepo": "angular/angular-devkit-architect-builds"
     },
     "@angular-devkit/architect-cli": {
       "name": "Architect CLI",
       "version": "0.0.1",
-      "hash": ""
+      "hash": "",
+      "snapshotRepo": "angular/angular-devkit-architect-cli-builds"
     },
     "@angular-devkit/build-optimizer": {
       "name": "Build Optimizer",
@@ -82,7 +84,8 @@
         }
       ],
       "version": "0.0.1",
-      "hash": ""
+      "hash": "",
+      "snapshotRepo": "angular/angular-devkit-build-webpack-builds"
     },
     "@angular-devkit/core": {
       "name": "Core",
