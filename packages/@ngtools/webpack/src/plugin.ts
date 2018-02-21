@@ -294,7 +294,7 @@ export class AotPlugin implements Tapable {
     }
     if (options.hasOwnProperty('missingTranslation')) {
       const [MAJOR, MINOR, PATCH] = VERSION.full.split('.').map((x: string) => parseInt(x, 10));
-      if (MAJOR < 4 || (MINOR == 2 && PATCH < 2)) {
+      if (MAJOR < 4 || (MAJOR == 4 && (MINOR < 2 || (MINOR == 2 && PATCH < 2)))) {
         console.warn((`The --missing-translation parameter will be ignored because it is only `
           + `compatible with Angular version 4.2.0 or higher. If you want to use it, please `
           + `upgrade your Angular version.\n`));
