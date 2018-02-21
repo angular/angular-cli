@@ -98,10 +98,13 @@ if (packageJsonProjectPath && fs.existsSync(packageJsonProjectPath)) {
   const hasDep = !!deps['@angular/cli'];
   const hasOldDevDep = !!devDeps['angular-cli'];
   const hasDevDep = !!devDeps['@angular/cli'];
+  // prioritize pulling from project configuration if available otherwise fallback to global
+  const baseConfiguration = CliConfig.fromProject() || CliConfig.fromGlobal();
+  const hasDependencyWarning = baseConfiguration.get('warnings.cliDependency');
 
-  if (hasOldDep || hasOldDevDep || !(hasDevDep || hasDep)) {
+  if (hasDependencyWarning && ( hasOldDep || hasOldDevDep || !(hasDevDep || hasDep) )) {
     const warnings = [
-      'Unable to find "@angular/cli" in devDependencies.',
+      'Unable to find "@angular/cli" in devDependencies or dependencies.',
       ''
     ];
 
