@@ -73,7 +73,7 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
   }
 
   for (const [sha, message] of commits) {
-    if (blacklist.indexOf(sha) !== -1) {
+    if (blacklist.find(i => i.startsWith(sha)) !== -1) {
       // Some commits are better ignored.
       continue;
     }
