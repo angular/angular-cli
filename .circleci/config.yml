@@ -111,22 +111,6 @@ jobs:
       - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent
 
   # Master only E2E.
-  ng2-e2e:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: xvfb-run -a node tests/run_e2e.js --ng2 "--glob=tests/build/**"
-
-  ng4-e2e:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: xvfb-run -a node tests/run_e2e.js --ng4 "--glob=tests/build/**"
-
   nightly-e2e:
     <<: *defaults
     steps:
@@ -163,20 +147,6 @@ workflows:
           requires:
             - e2e-setup
       # Master only E2E.
-      - ng2-e2e:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
-      - ng4-e2e:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
       - nightly-e2e:
           requires:
             - build
