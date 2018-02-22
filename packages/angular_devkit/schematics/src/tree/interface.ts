@@ -31,7 +31,7 @@ export enum MergeStrategy {
 }
 
 
-export const FileVisitorCancelToken = Symbol();
+export const FileVisitorCancelToken: symbol = Symbol();
 export type FileVisitor = FilePredicate<void>;
 
 export interface FileEntry {
