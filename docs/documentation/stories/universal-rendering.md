@@ -72,7 +72,7 @@ import {AppComponent} from './app.component';
     // The AppServerModule should import your AppModule followed
     // by the ServerModule from @angular/platform-server.
     AppModule,
-    ServerModule, 
+    ServerModule,
     ModuleMapLoaderModule // <-- *Important* to have lazy-loaded routes work
   ],
   // Since the bootstrapped component is not inherited from your
@@ -390,3 +390,45 @@ npm run build:ssr && npm run serve:ssr
 Enjoy!
 
 Once again to see a working version of everything, check out the [universal-starter](https://github.com/angular/universal-starter).
+
+### Concurrent builds
+
+As your application grows you will notice that the total build time will rapidly increase,
+as the current setup would first run the "browser" build and will wait
+until that finishes to then run the "server" build.
+
+To avoid this you could run both builds concurrently.
+
+#### Step 1: Install Dependencies
+
+[Concurrently](https://github.com/kimmobrunfeldt/concurrently) allows to execute
+multiple commands concurrently and display the outputs for each command in a
+legible way.
+
+```bash
+npm install concurrently --save
+```
+
+#### Step 2: Change the build task
+
+You can refactor your `package.json` scripts into:
+
+```json
+"scripts": {
+  // These will be your common scripts
+  "build:ssr": "npm run build:client-and-server-bundles && npm run webpack:server",
+  "serve:ssr": "node dist/server.js",
+  // Helpers for the above scripts
+  "build:browser": "ng build --prod",
+  "build:server": "ng build --prod --app 1 --output-hashing=false",
+  "build:client-and-server-bundles": "concurrently \"npm run build:browser\" \"npm run build:server\""
+}
+```
+
+Now you can still run the same commands as before like the following:
+
+```bash
+npm run build:ssr && npm run serve:ssr
+```
+
+`concurrently` will run both builds at the same time and identify the output for each command.
