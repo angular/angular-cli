@@ -1,11 +1,20 @@
 {
   "name": "@nguniversal/common",
-  "main": "index.js",
-  "types": "index.d.ts",
   "version": "5.0.0-beta.5",
-  "description": "Angular Universal common ",
-  "homepage": "https://github.com/angular/universal",
+  "description": "Angular Universal common utilities",
+  "main": "./bundles/common.umd.js",
+  "module": "./esm5/common.es5.js",
+  "es2015": "./esm2015/common.js",
+  "typings": "./common.d.ts",
   "license": "MIT",
+  "keywords": [
+    "ssr",
+    "universal"
+  ],
+  "peerDependencies": {
+    "@angular/common": "^5.0.0",
+    "@angular/core": "^5.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/universal"
@@ -13,25 +22,5 @@
   "bugs": {
     "url": "https://github.com/angular/universal/issues"
   },
-  "config": {
-    "engine-strict": true
-  },
-  "engines": {
-    "node": ">= 6.9.0",
-    "npm": ">= 3"
-  },
-  "peerDependencies": {
-    "@angular/common": "^5.0.0",
-    "@angular/core": "^5.0.0"
-  },
-  "devDependencies": {
-    "@angular/animations": "^5.0.0",
-    "@angular/common": "^5.0.0",
-    "@angular/core": "^5.0.0",
-    "@angular/platform-browser": "^5.0.0",
-    "@angular/platform-server": "^5.0.0",
-    "rxjs": "^5.2.0",
-    "typescript": "2.4.2",
-    "zone.js": "^0.8.12"
-  }
+  "homepage": "https://github.com/angular/universal"
 }

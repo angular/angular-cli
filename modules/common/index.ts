@@ -1,1 +1,1 @@
-export { TransferHttpCacheModule } from './src/transfer_http';
+export * from './public-api';

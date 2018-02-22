@@ -1,13 +1,19 @@
-import {HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, HttpResponse} from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  HttpEvent,
+  HttpHandler,
+  HttpHeaders,
+  HttpInterceptor,
+  HttpRequest,
+  HttpResponse
+} from '@angular/common/http';
 import {ApplicationRef, Injectable, NgModule} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
-import {filter} from 'rxjs/operator/filter';
-import {first} from 'rxjs/operator/first';
-import {toPromise} from 'rxjs/operator/toPromise';
-import {_do} from 'rxjs/operator/do';
-
 import {BrowserTransferStateModule, TransferState, makeStateKey} from '@angular/platform-browser';
+import {Observable} from 'rxjs/Observable';
+import {of as observableOf} from 'rxjs/observable/of';
+import {filter} from 'rxjs/operators/filter';
+import {tap} from 'rxjs/operators/tap';
+import {take} from 'rxjs/operators/take';
 
 export interface TransferHttpResponse {
   body?: any | null;
@@ -38,8 +44,11 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
   constructor(appRef: ApplicationRef, private transferState: TransferState) {
     // Stop using the cache if the application has stabilized, indicating initial rendering is
     // complete.
-    toPromise
-      .call(first.call(filter.call(appRef.isStable, (isStable: boolean) => isStable)))
+    appRef.isStable
+      .pipe(
+        filter((isStable: boolean) => isStable),
+        take(1)
+      ).toPromise()
       .then(() => { this.isCacheActive = false; });
   }
 
@@ -61,7 +70,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     if (this.transferState.hasKey(storeKey)) {
       // Request found in cache. Respond using it.
       const response = this.transferState.get(storeKey, {} as TransferHttpResponse);
-      return of(new HttpResponse<any>({
+      return observableOf(new HttpResponse<any>({
         body: response.body,
         headers: new HttpHeaders(response.headers),
         status: response.status,
@@ -71,17 +80,20 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     } else {
       // Request not found in cache. Make the request and cache it.
       const httpEvent = next.handle(req);
-      return _do.call(httpEvent, (event: HttpEvent<any>) => {
-        if (event instanceof HttpResponse) {
-          this.transferState.set(storeKey, {
-            body: event.body,
-            headers: getHeadersMap(event.headers),
-            status: event.status,
-            statusText: event.statusText,
-            url: event.url!,
-          });
-        }
-      });
+      return httpEvent
+        .pipe(
+          tap((event: HttpEvent<any>) => {
+            if (event instanceof HttpResponse) {
+              this.transferState.set(storeKey, {
+                body: event.body,
+                headers: getHeadersMap(event.headers),
+                status: event.status,
+                statusText: event.statusText,
+                url: event.url!,
+              });
+            }
+          })
+        );
     }
   }
 }

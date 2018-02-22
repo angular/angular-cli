@@ -1,1 +1,1 @@
-export { ngExpressEngine, NgSetupOptions, RenderOptions } from './src/main';
+export * from './public-api';

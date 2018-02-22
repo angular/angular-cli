@@ -1,1 +1,1 @@
-export { ngHapiEngine, NgSetupOptions, RenderOptions } from './src/main';
+export * from './public-api';

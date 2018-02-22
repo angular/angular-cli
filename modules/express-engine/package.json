@@ -1,14 +1,23 @@
 {
   "name": "@nguniversal/express-engine",
-  "main": "index.js",
-  "types": "index.d.ts",
   "version": "5.0.0-beta.5",
   "description": "Express Engine for running Server Angular Apps",
-  "homepage": "https://github.com/angular/universal",
+  "main": "./bundles/express-engine.umd.js",
+  "module": "./esm5/express-engine.es5.js",
+  "es2015": "./esm2015/express-engine.js",
+  "typings": "./express-engine.d.ts",
   "license": "MIT",
-  "contributors": [
-    "FrozenPandaz"
+  "keywords": [
+    "express",
+    "ssr",
+    "universal"
   ],
+  "peerDependencies": {
+    "@angular/common": "^5.0.0",
+    "@angular/core": "^5.0.0",
+    "@angular/platform-server": "^5.0.0",
+    "express": "^4.15.2"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/universal"
@@ -16,33 +25,5 @@
   "bugs": {
     "url": "https://github.com/angular/universal/issues"
   },
-  "config": {
-    "engine-strict": true
-  },
-  "engines": {
-    "node": ">= 5.4.1 <= 9",
-    "npm": ">= 3"
-  },
-  "scripts": {
-    "build": "tsc",
-    "prebuild": "rimraf dist"
-  },
-  "peerDependencies": {
-    "@angular/core": "^5.0.0",
-    "@angular/platform-server": "^5.0.0",
-    "express": "^4.15.2"
-  },
-  "devDependencies": {
-    "@angular/animations": "^5.0.0",
-    "@angular/common": "^5.0.0",
-    "@angular/compiler": "^5.0.0",
-    "@angular/core": "^5.0.0",
-    "@angular/platform-browser": "^5.0.0",
-    "@angular/platform-server": "^5.0.0",
-    "express": "^4.15.2",
-    "rimraf": "^2.6.1",
-    "rxjs": "^5.2.0",
-    "typescript": "2.4.2",
-    "zone.js": "^0.8.12"
-  }
+  "homepage": "https://github.com/angular/universal"
 }

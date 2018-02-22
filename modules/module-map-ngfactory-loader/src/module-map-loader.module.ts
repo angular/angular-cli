@@ -1,11 +1,12 @@
 import { NgModule, NgModuleFactoryLoader, ModuleWithProviders, StaticProvider } from '@angular/core';
 
-import { ModuleMapNgFactoryLoader, ModuleMap, MODULE_MAP } from './module-map-ngfactory-loader';
+import { ModuleMapNgFactoryLoader, MODULE_MAP } from './module-map-ngfactory-loader';
+import {ModuleMap} from './module-map';
 
 /**
  * Helper function for getting the providers object for the MODULE_MAP
  *
- * @param {ModuleMap} moduleMap Map to use as a value for MODULE_MAP
+ * @param moduleMap Map to use as a value for MODULE_MAP
  */
 export function provideModuleMap(moduleMap: ModuleMap): StaticProvider {
   return {
@@ -29,7 +30,7 @@ export class ModuleMapLoaderModule {
   /**
    * Returns a ModuleMapLoaderModule along with a MODULE_MAP
    *
-   * @param {ModuleMap} moduleMap Map to use as a value for MODULE_MAP
+   * @param moduleMap Map to use as a value for MODULE_MAP
    */
   static withMap(moduleMap: ModuleMap): ModuleWithProviders {
     return {

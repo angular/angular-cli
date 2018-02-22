@@ -3,12 +3,17 @@
    Github issue to avoid copy/paste: https://github.com/angular/angular/issues/22049#issuecomment-363638743
  */
 
-import { ApplicationRef, NgModuleFactory, NgModuleRef, PlatformRef, StaticProvider, Type } from '@angular/core';
-import { ɵTRANSITION_ID } from '@angular/platform-browser';
-import { filter } from 'rxjs/operator/filter';
-import { first } from 'rxjs/operator/first';
-import { toPromise } from 'rxjs/operator/toPromise';
-import { platformDynamicServer, platformServer, BEFORE_APP_SERIALIZED, INITIAL_CONFIG, PlatformState } from '@angular/platform-server';
+import {ApplicationRef, NgModuleFactory, NgModuleRef, PlatformRef, StaticProvider, Type} from '@angular/core';
+import {ɵTRANSITION_ID} from '@angular/platform-browser';
+import {
+  platformDynamicServer,
+  platformServer,
+  BEFORE_APP_SERIALIZED,
+  INITIAL_CONFIG,
+  PlatformState
+} from '@angular/platform-server';
+import {filter} from 'rxjs/operators/filter';
+import {take} from 'rxjs/operators/take';
 
 interface PlatformOptions {
   document?: string;
@@ -41,8 +46,11 @@ function _render<T>(
   the server-rendered app can be properly bootstrapped into a client app.`);
     }
     const applicationRef: ApplicationRef = moduleRef.injector.get(ApplicationRef);
-    return toPromise
-      .call(first.call(filter.call(applicationRef.isStable, (isStable: boolean) => isStable)))
+    return applicationRef.isStable
+      .pipe(
+        filter((isStable: boolean) => isStable),
+        take(1)
+      ).toPromise()
       .then(() => {
         const platformState = platform.injector.get(PlatformState);
 

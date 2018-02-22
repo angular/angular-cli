@@ -1,11 +1,5 @@
 import { Injectable, NgModuleFactoryLoader, InjectionToken, NgModuleFactory, Inject, Type, Compiler } from '@angular/core';
-
-/**
- * A map key'd by loadChildren strings and Modules or NgModuleFactories as vaules
- */
-export type ModuleMap = {
-  [key: string]: Type<any> | NgModuleFactory<any>;
-};
+import {ModuleMap} from './module-map';
 
 /**
  * Token used by the ModuleMapNgFactoryLoader to load modules
