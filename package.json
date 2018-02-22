@@ -147,8 +147,5 @@
   },
   "devDependencies": {
     "license-checker": "^16.0.0"
-  },
-  "optionalDependencies": {
-    "v8-profiler": "^5.7.0"
   }
 }
