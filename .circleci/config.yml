@@ -8,48 +8,47 @@ _defaults: &defaults
 _post_checkout: &post_checkout
   post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
 
+_root_package_lock_key: &_root_package_lock_key
+  key: angular_devkit-{{ checksum "package-lock.json" }}
+
 jobs:
+  install:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: npm install --no-save
+      - save_cache:
+          <<: *_root_package_lock_key
+          paths:
+            - "node_modules"
+  
   lint:
     <<: *defaults
     steps:
-      - checkout:
-          <<: *post_checkout
-      - restore_cache:
-          key: angular_devkit-{{ checksum "package-lock.json" }}
-
-      - run: npm install --no-save
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
       - run: npm run lint
 
   validate:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          key: angular_devkit-{{ checksum "package-lock.json" }}
-
-      - run: npm install --no-save
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
       - run: npm run validate -- --ci
 
   test:
     <<: *defaults
     steps:
-      - checkout:
-          <<: *post_checkout
-      - restore_cache:
-          key: angular_devkit-{{ checksum "package-lock.json" }}
-
-      - run: npm install --no-save
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
       - run: npm run test -- --code-coverage --full
 
   test-big:
     <<: *defaults
     steps:
-      - checkout:
-          <<: *post_checkout
-      - restore_cache:
-          key: angular_devkit-{{ checksum "package-lock.json" }}
-
-      - run: npm install --no-save
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
       - run: npm run test -- --code-coverage --full --big
 
   integration:
@@ -64,7 +63,6 @@ jobs:
       - restore_cache:
           key: angular_devkit-integration-aio-{{ checksum "tests/@angular_devkit/build_optimizer/webpack/aio-app/package-lock.json" }}
 
-      - run: npm install --no-save
       - run: xvfb-run -a npm run integration
 
       - save_cache:
@@ -79,29 +77,22 @@ jobs:
   build:
     <<: *defaults
     steps:
-      - checkout:
-          <<: *post_checkout
-      - restore_cache:
-          key: angular_devkit-{{ checksum "package-lock.json" }}
-
-      - run: bazel run @nodejs//:npm install
-      - run: bazel build //packages/...
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
       - run: npm run admin -- build
 
-      - save_cache:
-          key: angular_devkit-{{ checksum "package-lock.json" }}
-          paths:
-            - "node_modules"
+  build-bazel:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - run: bazel run @nodejs//:npm install
+      - run: bazel build //packages/...
 
   snapshot_publish:
     <<: *defaults
     steps:
-      - checkout:
-          <<: *post_checkout
-      - restore_cache:
-          key: angular_devkit-{{ checksum "package-lock.json" }}
-
-      - run: npm install --no-save
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
       - run:
           name: Decrypt Credentials
           command: |
@@ -114,12 +105,8 @@ jobs:
   publish:
     <<: *defaults
     steps:
-      - checkout:
-          <<: *post_checkout
-      - restore_cache:
-          key: angular_devkit-{{ checksum "package-lock.json" }}
-
-      - run: npm install --no-save
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
       - run:
           name: Decrypt Credentials
           command: |
@@ -133,9 +120,18 @@ workflows:
   version: 2
   default_workflow:
     jobs:
-      - lint
-      - validate
+      - install
+      - lint:
+          requires:
+            - install
+      - validate:
+          requires:
+            - install
       - build:
+          requires:
+            - lint
+            - validate
+      - build-bazel:
           requires:
             - lint
             - validate

@@ -30,8 +30,8 @@
     "validate-commits": "./bin/devkit-admin validate-commits",
     "integration": "npm run build && npm run integration:build-optimizer",
     "integration:build-optimizer": "npm run integration:build-optimizer:simple && npm run integration:build-optimizer:aio",
-    "integration:build-optimizer:simple": "cd tests/@angular_devkit/build_optimizer/webpack/simple-app && npm i -q && npm run reinstall-bo && npm run e2e && npm run benchmark",
-    "integration:build-optimizer:aio": "cd tests/@angular_devkit/build_optimizer/webpack/aio-app && npm i -q && npm run reinstall-bo && npm run e2e && npm run benchmark",
+    "integration:build-optimizer:simple": "cd tests/@angular_devkit/build_optimizer/webpack/simple-app && npm i -q --no-save && npm run e2e && npm run benchmark",
+    "integration:build-optimizer:aio": "cd tests/@angular_devkit/build_optimizer/webpack/aio-app && npm i -q --no-save && npm run e2e && npm run benchmark",
     "postinstall": "npm run admin -- patch-dependencies",
     "prepush": "node ./bin/devkit-admin hooks/pre-push"
   },
