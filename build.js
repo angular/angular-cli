@@ -37,14 +37,7 @@ const rollupGlobals = {
   'fs': 'fs'
 };
 
-const namespace = '@nguniversal';
-const libNames = [
-  'aspnetcore-engine',
-  'common',
-  'express-engine',
-  'hapi-engine',
-  'module-map-ngfactory-loader',
-];
+const {namespace, libNames} = require('./build-config');
 
 async function buildLib(libName) {
 
@@ -155,6 +148,7 @@ rimraf(distFolder, async () => {
   for (const lib of libNames) {
     const exitCode = await buildLib(lib);
     console.log(exitCode === 0 ? `Build succeeded for ${lib}` : `Build failed for ${lib}`);
+    console.log();
   }
 });
 

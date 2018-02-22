@@ -4,16 +4,10 @@ const path = require('path');
 const ngc = require('@angular/compiler-cli/src/main').main;
 const rimraf = require('rimraf');
 
+const {libNames} = require('./build-config');
+
 const rootFolder = path.join(__dirname);
 const distFolder = path.join(rootFolder, 'dist');
-
-const libNames = [
-  'aspnetcore-engine',
-  'common',
-  'express-engine',
-  'hapi-engine',
-  'module-map-ngfactory-loader',
-];
 
 async function buildLib(libName) {
 

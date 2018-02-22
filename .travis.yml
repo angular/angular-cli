@@ -13,11 +13,9 @@ branches:
   - master
 
 install:
-  - npm install
+  - yarn install --frozen-lockfile
 
 script:
-  - ./build.sh
+  - npm run build
 
-cache:
-  directories:
-    - ./node_modules/
+cache: yarn
