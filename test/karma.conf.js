@@ -29,7 +29,12 @@ module.exports = function(config) {
       {pattern: 'dist/packages/**/*', included: false, watched: true},
     ],
 
-    customLaunchers: require('./remote-browsers'),
+    customLaunchers: {
+      CustomChrome: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
 
     preprocessors: {
       'dist/packages/**/*.js': ['sourcemap']
@@ -41,7 +46,7 @@ module.exports = function(config) {
     browserDisconnectTimeout: 20000,
     browserNoActivityTimeout: 240000,
     captureTimeout: 120000,
-    browsers: ['ChromeHeadlessCISandbox'],
+    browsers: ['CustomChrome'],
 
     singleRun: false,
 

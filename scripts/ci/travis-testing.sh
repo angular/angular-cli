@@ -39,5 +39,6 @@ elif is_karma; then
   npm run test:browser
 elif is_jasmine; then
   npm run test:server
+fi
 
 teardown_tunnel

@@ -19,9 +19,6 @@ jobs:
     - env: "MODE=karma"
     - env: "MODE=jasmine"
 
-before_install:
-  - source ./scripts/ci/env.sh
-
 install:
   - yarn install --frozen-lockfile
 
