@@ -146,6 +146,9 @@ export default Task.extend({
         }
       }
       if (!webpackConfig.entry.main) { webpackConfig.entry.main = []; }
+      if (!Array.isArray(webpackConfig.entry.main)) {
+        webpackConfig.entry.main = [webpackConfig.entry.main];
+      }
       webpackConfig.entry.main.unshift(...entryPoints);
     } else if (serveTaskOptions.hmr) {
       ui.writeLine(yellow('Live reload is disabled. HMR option ignored.'));

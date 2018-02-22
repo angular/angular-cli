@@ -32,14 +32,14 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   let extraPlugins: any[] = [];
   let extraRules: any[] = [];
-  let entryPoints: { [key: string]: string[] } = {};
+  let entryPoints: { [key: string]: string[] | string } = {};
 
   if (appConfig.main) {
-    entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
+    entryPoints['main'] = path.resolve(appRoot, appConfig.main);
   }
 
   if (appConfig.polyfills) {
-    entryPoints['polyfills'] = [path.resolve(appRoot, appConfig.polyfills)];
+    entryPoints['polyfills'] = path.resolve(appRoot, appConfig.polyfills);
   }
 
   // determine hashing format

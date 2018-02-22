@@ -645,17 +645,20 @@ export class AngularCompilerPlugin implements Tapable {
       });
     });
 
-    compiler.plugin('normal-module-factory', (nmf: any) => {
-      nmf.plugin('before-resolve', (request: any, callback: any) => {
-        resolveWithPaths(
-          request,
-          callback,
-          this._compilerOptions,
-          this._compilerHost,
-          this._moduleResolutionCache,
-        );
+    // Only import the path mapping plugin if there are paths to map.
+    if (Object.keys(this._compilerOptions.paths || {}).length > 0) {
+      compiler.plugin('normal-module-factory', (nmf: any) => {
+        nmf.plugin('before-resolve', (request: any, callback: any) => {
+          resolveWithPaths(
+            request,
+            callback,
+            this._compilerOptions,
+            this._compilerHost,
+            this._moduleResolutionCache,
+          );
+        });
       });
-    });
+    }
   }
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
