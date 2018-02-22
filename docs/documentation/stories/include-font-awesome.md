@@ -33,13 +33,13 @@ Create an empty file _variables.scss in src/.
 Add the following to _variables.scss:
 
 ```
-$fa-font-path : '../node_modules/font-awesome/fonts';
+$fa-font-path : '~font-awesome/fonts';
 ```
 In styles.scss add the following:
 
 ```
 @import 'variables';
-@import '../node_modules/font-awesome/scss/font-awesome';
+@import '~font-awesome/scss/font-awesome';
 ```
 ### Test
 
