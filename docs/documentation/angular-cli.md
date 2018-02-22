@@ -11,6 +11,7 @@
 
 - **apps** (`array`): Properties of the different applications in this project.
   - *name* (`string`): Name of the app.
+  - *extends* (`string|array`): Can be used to extend from another apps by name.
   - *root* (`string`): The root directory of the app.
   - *outDir* (`string`): The output directory for build results. Default is `dist/`.
   - *assets* (`array`): List of application assets.

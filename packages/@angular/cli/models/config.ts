@@ -85,6 +85,8 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     const cliConfig = CliConfigBase.fromConfigPath<ConfigInterface>(configPath, [globalConfigPath]);
 
     CliConfig.addAliases(cliConfig);
+    CliConfig.resolveAppsInheritance(cliConfig);
+
     configCacheMap.set(configPath, cliConfig);
     return cliConfig as CliConfig;
   }
@@ -117,5 +119,47 @@ export class CliConfig extends CliConfigBase<ConfigInterface> {
     cliConfig.alias('defaults.component.pipe', 'defaults.spec.pipe');
     cliConfig.alias('defaults.component.service', 'defaults.spec.service');
     cliConfig.alias('defaults.build.poll', 'defaults.poll');
+  }
+
+  static resolveAppsInheritance(cliConfig: CliConfigBase<ConfigInterface>) {
+
+    const apps = cliConfig.get('apps');
+    apps.forEach((appConfig: any, index: number) => {
+
+      let _extends = appConfig['extends'] || [];
+
+      if (typeof _extends === 'string') {
+        _extends = [_extends];
+      }
+
+      _extends
+        .reverse()
+        .forEach((name: string) => {
+
+          const indexParent = apps.findIndex((value: any) => name === value.name);
+          const excludeProperties = [
+            'extends'
+          ];
+
+          for (const property in appConfig) {
+
+            if (excludeProperties.includes(property)) {
+              continue;
+            }
+
+            const source = `apps.${index}.${property}`;
+            const destination = `apps.${indexParent}.${property}`;
+
+            // Override property only if it is not defined
+            if (!cliConfig.isDefined(source)) {
+              cliConfig.alias(source, destination);
+            }
+
+          }
+
+        });
+
+    });
+
   }
 }
