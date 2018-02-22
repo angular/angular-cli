@@ -21,6 +21,7 @@ export interface ServeTaskOptions extends BuildOptions {
   liveReload?: boolean;
   publicHost?: string;
   disableHostCheck?: boolean;
+  historyApiFallback?: boolean;
   ssl?: boolean;
   sslKey?: string;
   sslCert?: string;
@@ -96,6 +97,12 @@ export const baseServeCommandOptions: any = overrideOptions([
     type: Boolean,
     default: false,
     description: 'Don\'t verify connected clients are part of allowed hosts.',
+  },
+  {
+    name: 'history-api-fallback',
+    type: Boolean,
+    default: true,
+    description: 'Serves the index page instead of HTTP 404 "Not Found" errors',
   },
   {
     name: 'serve-path',
