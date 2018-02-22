@@ -37,11 +37,11 @@ function _showVersions(logger: logging.Logger) {
 }
 
 
-function _upgrade(release: string, logger: logging.Logger) {
+function _upgrade(release: string, force: boolean, logger: logging.Logger) {
   for (const pkg of Object.keys(packages)) {
     const hash = packages[pkg].hash;
     const version = packages[pkg].version;
-    const dirty = packages[pkg].dirty;
+    const dirty = packages[pkg].dirty || force;
     let newVersion: string | null = version;
 
     if (release == 'minor-beta') {
@@ -108,7 +108,13 @@ function _upgrade(release: string, logger: logging.Logger) {
 }
 
 
-export default function(args: { _: string[], 'dry-run'?: boolean }, logger: logging.Logger) {
+export interface ReleaseOptions {
+  _: string[];
+  'force'?: boolean;
+  'dry-run'?: boolean;
+}
+
+export default function(args: ReleaseOptions, logger: logging.Logger) {
   const maybeRelease = args._.shift();
   const dryRun = args['dry-run'] !== undefined;
   switch (maybeRelease) {
@@ -124,7 +130,7 @@ export default function(args: { _: string[], 'dry-run'?: boolean }, logger: logg
     case 'major':
     case 'minor':
     case 'patch':
-      _upgrade(maybeRelease, logger);
+      _upgrade(maybeRelease, args.force || false, logger);
       if (!dryRun) {
         fs.writeFileSync(path.join(__dirname, '../.monorepo.json'),
                          JSON.stringify(monorepo, null, 2) + '\n');
