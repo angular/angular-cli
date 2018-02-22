@@ -2,7 +2,7 @@
   "name": "nguniversal",
   "main": "index.js",
   "version": "5.0.0-beta.5",
-  "description": "Universal (isomorphic) javascript support for Angular",
+  "description": "Universal (isomorphic) JavaScript support for Angular",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
   "contributors": [
@@ -63,15 +63,15 @@
     "test:server": "node build-test.js && ts-node test/test-server.ts"
   },
   "devDependencies": {
-    "@angular/animations": "^5.0.0",
-    "@angular/common": "^5.0.0",
-    "@angular/compiler": "^5.0.0",
-    "@angular/compiler-cli": "^5.0.0",
-    "@angular/core": "^5.0.0",
-    "@angular/http": "^5.0.0",
-    "@angular/platform-browser": "^5.0.0",
-    "@angular/platform-browser-dynamic": "^5.0.0",
-    "@angular/platform-server": "^5.0.0",
+    "@angular/animations": "^5.2.0",
+    "@angular/common": "^5.2.0",
+    "@angular/compiler": "^5.2.0",
+    "@angular/compiler-cli": "^5.2.0",
+    "@angular/core": "^5.2.0",
+    "@angular/http": "^5.2.0",
+    "@angular/platform-browser": "^5.2.0",
+    "@angular/platform-browser-dynamic": "^5.2.0",
+    "@angular/platform-server": "^5.2.0",
     "@types/express": "^4.0.39",
     "@types/hapi": "^16.1.2",
     "@types/jasmine": "^2.8.6",
@@ -97,7 +97,7 @@
     "rxjs": "^5.5.2",
     "systemjs": "0.19.43",
     "ts-node": "^3.0.4",
-    "typescript": "2.4.2",
+    "typescript": "~2.6.2",
     "zone.js": "^0.8.12"
   }
 }
