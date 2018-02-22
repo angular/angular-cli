@@ -45,7 +45,7 @@ export default Command.extend({
       `
     }
   ],
-  run: function (commandOptions: LintCommandOptions) {
+  run: function (commandOptions: LintCommandOptions, args: string[]) {
     const LintTask = require('../tasks/lint').default;
 
     const lintTask = new LintTask({
@@ -53,9 +53,18 @@ export default Command.extend({
       project: this.project
     });
 
+    const configs = CliConfig.fromProject().config.lint || [];
+
+    if (args.length) {
+      configs.forEach(config => {
+        config.files = args;
+        config.project = '';
+      });
+    }
+
     return lintTask.run({
       ...commandOptions,
-      configs: CliConfig.fromProject().config.lint
+      configs
     });
   }
 });
