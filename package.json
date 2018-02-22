@@ -86,7 +86,6 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-typescript": "^3.0.12",
     "protractor": "^5.2.0",
-    "puppeteer": "^1.0.0",
     "rimraf": "^2.6.1",
     "rollup": "~0.41.6",
     "rollup-plugin-alias": "^1.4.0",
