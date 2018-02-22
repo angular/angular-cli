@@ -58,7 +58,7 @@
   },
   "scripts": {
     "build": "node build.js",
-    "test:watch": "karma start karma.conf.js",
+    "test:watch": "node build-test.js && karma start karma.conf.js",
     "test:browser": "node build-test.js && ts-node test/test-browser.ts",
     "test:server": "node build-test.js && ts-node test/test-server.ts"
   },
