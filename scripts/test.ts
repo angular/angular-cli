@@ -152,10 +152,9 @@ glob.sync('packages/**/*.spec.ts')
   });
 
 export default function (args: ParsedArgs, logger: logging.Logger) {
-  let regex = 'packages/**/*_spec.ts';
-  if (args.glob) {
-    regex = `packages/**/${args.glob}/**/*_spec.ts`;
-  }
+  const packageGlob = args.glob ? `**/${args.glob}/**` : '**';
+  const specGlob = args.big ? '*_spec_big.ts' : '*_spec.ts';
+  const regex = `packages/${packageGlob}/${specGlob}`;
 
   if (args['code-coverage']) {
     runner.env.addReporter(new IstanbulReporter());

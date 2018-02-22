@@ -44,7 +44,7 @@ class Walker extends Lint.RuleWalker {
     super.walk(sourceFile);
 
     // Ignore spec files.
-    if (sourceFile.fileName.match(/_spec.ts$/)) {
+    if (sourceFile.fileName.match(/_spec(_big)?.ts$/)) {
       return;
     }
     // Ignore benchmark files.

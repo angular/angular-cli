@@ -23,6 +23,7 @@ ts_library(
             "src/purify/**",
             "src/index.ts",
             "**/*_spec.ts",
+            "**/*_spec_big.ts",
         ],
     ),
     tsconfig = "//:tsconfig.json",

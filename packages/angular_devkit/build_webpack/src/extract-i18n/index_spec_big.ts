@@ -9,37 +9,49 @@
 import { Architect, Workspace } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { relative, resolve } from 'path';
-import { concatMap, take } from 'rxjs/operators';
-import { getWorkspace as getDevServerWorkspace } from '../dev-server/index_spec';
+import { concatMap, tap, toArray } from 'rxjs/operators';
+import { getWorkspace as getBrowserWorkspace } from '../browser/index_spec_big';
 
 
-describe('Protractor Target', () => {
+describe('Extract i18n Target', () => {
   const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
   const root = resolve(devkitRoot, 'tests/@angular_devkit/build_webpack/hello-world-app/');
   const builderPath = resolve(devkitRoot, 'packages/angular_devkit/build_webpack');
   const relativeBuilderPath = relative(root, builderPath);
   const host = new NodeJsSyncHost();
+  const extractionFile = resolve(root, 'src', 'messages.xlf');
 
   const getWorkspace = (): Workspace => {
-    const workspace = getDevServerWorkspace();
-    workspace.projects.app.defaultTarget = 'protractor';
-    workspace.projects.app.targets['protractor'] = {
-      builder: `${relativeBuilderPath}:protractor`,
+    const workspace = getBrowserWorkspace();
+    workspace.projects.app.defaultTarget = 'extractI18n';
+    workspace.projects.app.targets['extractI18n'] = {
+      builder: `${relativeBuilderPath}:extractI18n`,
       options: {
-        protractorConfig: '../protractor.conf.js',
-        devServerTarget: 'app:devServer',
+        browserTarget: 'app:browser',
       },
     };
 
     return workspace;
   };
 
-  it('runs', (done) => {
+  beforeEach(() => {
+    if (existsSync(extractionFile)) {
+      unlinkSync(extractionFile);
+    }
+  });
+
+  it('builds targets', (done) => {
     const architect = new Architect(normalize(root), host);
     architect.loadWorkspaceFromJson(getWorkspace()).pipe(
       concatMap((architect) => architect.run(architect.getTarget())),
-      take(1),
+      toArray(),
+      tap(events => expect(events.length).toBe(0)),
+      tap(() => {
+        expect(existsSync(extractionFile)).toBe(true);
+        expect(readFileSync(extractionFile)).toMatch(/i18n test/);
+      }),
     ).subscribe(done, done.fail);
   }, 30000);
 });

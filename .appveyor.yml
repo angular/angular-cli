@@ -13,7 +13,8 @@ install:
 test_script:
   - node --version
   - npm --version
-  - npm run test
+  - npm test
+  - npm test -- --big
 
 build: off
 

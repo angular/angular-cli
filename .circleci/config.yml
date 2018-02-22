@@ -41,6 +41,17 @@ jobs:
       - run: npm install --no-save
       - run: npm run test -- --code-coverage --full
 
+  test-big:
+    <<: *defaults
+    steps:
+      - checkout:
+          <<: *post_checkout
+      - restore_cache:
+          key: angular_devkit-{{ checksum "package-lock.json" }}
+
+      - run: npm install --no-save
+      - run: npm run test -- --code-coverage --full --big
+
   integration:
     <<: *defaults
     steps:
@@ -129,6 +140,9 @@ workflows:
             - lint
             - validate
       - test:
+          requires:
+            - build
+      - test-big:
           requires:
             - build
       - integration:

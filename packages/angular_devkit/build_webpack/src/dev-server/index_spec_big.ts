@@ -14,7 +14,7 @@ import { relative, resolve } from 'path';
 import * as _request from 'request';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { concatMap, take, tap } from 'rxjs/operators';
-import { getWorkspace as getBrowserWorkspace } from '../browser/index_spec';
+import { getWorkspace as getBrowserWorkspace } from '../browser/index_spec_big';
 
 
 const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any

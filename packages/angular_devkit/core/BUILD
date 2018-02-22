@@ -14,6 +14,7 @@ ts_library(
         include = ["src/**/*.ts"],
         exclude = [
             "src/**/*_spec.ts",
+            "src/**/*_spec_big.ts",
             "src/**/*_benchmark.ts",
         ],
     ),
@@ -30,6 +31,7 @@ ts_library(
         include = ["node/**/*.ts"],
         exclude = [
             "node/**/*_spec.ts",
+            "node/**/*_spec_big.ts",
             "tools/**/*_benchmark.ts",
         ],
     ),
@@ -44,7 +46,10 @@ ts_library(
 ts_library(
     name = "spec",
     srcs = glob(
-        include = ["**/*_spec.ts"],
+        include = [
+            "**/*_spec.ts",
+            "**/*_spec_big.ts",
+        ],
     ),
     deps = [
         ":core",
