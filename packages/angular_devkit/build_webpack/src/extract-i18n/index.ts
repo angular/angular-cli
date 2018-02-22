@@ -7,7 +7,6 @@
  */
 
 import { BuildEvent, Builder, BuilderContext, Target } from '@angular-devkit/architect';
-import { getSystemPath } from '@angular-devkit/core';
 import * as path from 'path';
 import { Observable } from 'rxjs/Observable';
 import { concatMap } from 'rxjs/operators';
@@ -31,11 +30,7 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
   constructor(public context: BuilderContext) { }
 
   run(target: Target<ExtractI18nBuilderOptions>): Observable<BuildEvent> {
-
-    const root = getSystemPath(target.root);
     const options = target.options;
-
-
     const [project, targetName, configuration] = options.browserTarget.split(':');
     // Override browser build watch setting.
     const overrides = { watch: false };
@@ -59,7 +54,7 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
         }
 
         // Extracting i18n uses the browser target webpack config with some specific options.
-        const webpackConfig = browserBuilder.buildWebpackConfig(root, {
+        const webpackConfig = browserBuilder.buildWebpackConfig(target.root, {
           ...browserOptions,
           optimizationLevel: 0,
           i18nLocale: options.i18nLocale,
@@ -83,10 +78,12 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
           }
 
           if (stats.hasErrors()) {
-            obs.error(statsErrorsToString(json, statsConfig));
-          } else {
-            obs.complete();
+            this.context.logger.error(statsErrorsToString(json, statsConfig));
           }
+
+          obs.next({ success: !stats.hasErrors() });
+
+          obs.complete();
         };
 
         try {

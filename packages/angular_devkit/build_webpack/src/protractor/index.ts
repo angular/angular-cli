@@ -16,10 +16,9 @@ import {
 import { getSystemPath, tags } from '@angular-devkit/core';
 import { resolve } from 'path';
 import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { of } from 'rxjs/observable/of';
-import { concatMap } from 'rxjs/operators';
+import { concatMap, take } from 'rxjs/operators';
 import * as url from 'url';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { DevServerBuilderOptions } from '../dev-server';
@@ -47,9 +46,12 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     const root = getSystemPath(target.root);
     const options = target.options;
 
-    return (options.devServerTarget ? this._startDevServer(options) : empty()).pipe(
-      concatMap(() => options.webdriverUpdate ? this._updateWebdriver(root) : empty()),
+    // TODO: verify using of(null) to kickstart things is a pattern.
+    return of(null).pipe(
+      concatMap(() => options.devServerTarget ? this._startDevServer(options) : of(null)),
+      concatMap(() => options.webdriverUpdate ? this._updateWebdriver(root) : of(null)),
       concatMap(() => this._runProtractor(root, options)),
+      take(1),
     );
   }
 

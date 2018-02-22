@@ -14,6 +14,7 @@ import { findUp } from '../../utilities/find-up';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const StatsPlugin = require('stats-webpack-plugin');
 const SilentError = require('silent-error');
 
 /**
@@ -33,7 +34,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   const appRoot = path.resolve(projectRoot, appConfig.root);
   const nodeModules = findUp('node_modules', projectRoot);
   if (!nodeModules) {
-    throw new Error('Cannot locale node_modules directory.')
+    throw new Error('Cannot locate node_modules directory.')
   }
 
   let extraPlugins: any[] = [];
@@ -76,7 +77,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       const hash = script.lazy ? '' : hashFormat.script;
       extraPlugins.push(new ScriptsWebpackPlugin({
         name: script.entry,
-        sourceMap: buildOptions.sourcemaps,
+        sourceMap: buildOptions.sourceMap,
         filename: `${script.entry}${hash}.bundle.js`,
         scripts: script.paths,
         basePath: projectRoot,
@@ -98,17 +99,18 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       // Prevent asset configurations from writing outside of the output path, except if the user
       // specify a configuration flag.
       // Also prevent writing outside the project path. That is not overridable.
-      const absoluteOutputPath = path.resolve(buildOptions.outputPath as string);
+      const absoluteOutputPath = path.resolve(projectRoot, buildOptions.outputPath as string);
       const absoluteAssetOutput = path.resolve(absoluteOutputPath, asset.output);
       const outputRelativeOutput = path.relative(absoluteOutputPath, absoluteAssetOutput);
 
       if (outputRelativeOutput.startsWith('..') || path.isAbsolute(outputRelativeOutput)) {
 
-        const projectRelativeOutput = path.relative(projectRoot, absoluteAssetOutput);
-        if (projectRelativeOutput.startsWith('..') || path.isAbsolute(projectRelativeOutput)) {
-          const message = 'An asset cannot be written to a location outside the project.';
-          throw new SilentError(message);
-        }
+        // const projectRelativeOutput = path.relative(projectRoot, absoluteAssetOutput);
+        // TODO: This check doesn't make a lot of sense anymore with multiple project. Review it.
+        // if (projectRelativeOutput.startsWith('..') || path.isAbsolute(projectRelativeOutput)) {
+        //   const message = 'An asset cannot be written to a location outside the project.';
+        //   throw new SilentError(message);
+        // }
 
         if (!asset.allowOutsideOutDir) {
           const message = 'An asset cannot be written to a location outside of the output path. '
@@ -118,12 +120,13 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         }
       }
 
+      // TODO: This check doesn't make a lot of sense anymore with multiple project. Review it.
       // Prevent asset configurations from reading files outside of the project.
-      const projectRelativeInput = path.relative(projectRoot, asset.input);
-      if (projectRelativeInput.startsWith('..') || path.isAbsolute(projectRelativeInput)) {
-        const message = 'An asset cannot be read from a location outside the project.';
-        throw new SilentError(message);
-      }
+      // const projectRelativeInput = path.relative(projectRoot, asset.input);
+      // if (projectRelativeInput.startsWith('..') || path.isAbsolute(projectRelativeInput)) {
+      //   const message = 'An asset cannot be read from a location outside the project.';
+      //   throw new SilentError(message);
+      // }
 
       // Ensure trailing slash.
       if (isDirectory(path.resolve(asset.input))) {
@@ -170,12 +173,16 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  if (buildOptions.statsJson) {
+    extraPlugins.push(new StatsPlugin('stats.json', 'verbose'));
+  }
+
   if (buildOptions.buildOptimizer) {
     extraRules.push({
       test: /\.js$/,
       use: [{
         loader: '@angular-devkit/build-optimizer/webpack-loader',
-        options: { sourceMap: buildOptions.sourcemaps }
+        options: { sourceMap: buildOptions.sourceMap }
       }]
     });
   }

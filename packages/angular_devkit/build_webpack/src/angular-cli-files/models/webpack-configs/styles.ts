@@ -10,6 +10,7 @@ import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../build-options';
 // import { pluginArgs, postcssArgs } from '../../tasks/eject';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
+import { findUp } from '../../utilities/find-up';
 
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
@@ -45,12 +46,12 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
   const extraPlugins: any[] = [];
-  const cssSourceMap = buildOptions.sourcemaps;
+  const cssSourceMap = buildOptions.sourceMap;
 
   // Maximum resource size to inline (KiB)
   const maximumInlineSize = 10;
   // Minify/optimize css in production.
-  const minimizeCss = buildOptions.target === 'production';
+  const minimizeCss = buildOptions.optimizationLevel === 1;
   // Convert absolute resource URLs to account for base-href and deploy-url.
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
@@ -90,7 +91,12 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       postcssUrl({
         filter: ({ url }: PostcssUrlAsset) => url.startsWith('~'),
         url: ({ url }: PostcssUrlAsset) => {
-          const fullPath = path.join(projectRoot, 'node_modules', url.substr(1));
+          // Note: This will only find the first node_modules folder.
+          const nodeModules = findUp('node_modules', projectRoot);
+          if (!nodeModules) {
+            throw new Error('Cannot locate node_modules directory.')
+          }
+          const fullPath = path.join(nodeModules, url.substr(1));
           return path.relative(loader.context, fullPath).replace(/\\/g, '/');
         }
       }),

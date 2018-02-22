@@ -27,8 +27,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
 
   // if (buildOptions.codeCoverage && CliConfig.fromProject()) {
   if (buildOptions.codeCoverage) {
-    // const codeCoverageExclude = CliConfig.fromProject().get('test.codeCoverage.exclude');
-    const codeCoverageExclude: string[] = [];
+    const codeCoverageExclude = buildOptions.codeCoverageExclude;
     let exclude: (string | RegExp)[] = [
       /\.(e2e|spec)\.ts$/,
       /node_modules/
@@ -58,7 +57,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
         'browser', 'module', 'main'
       ]
     },
-    devtool: buildOptions.sourcemaps ? 'inline-source-map' : 'eval',
+    devtool: buildOptions.sourceMap ? 'inline-source-map' : 'eval',
     entry: {
       main: path.resolve(projectRoot, appConfig.root, appConfig.main)
     },

@@ -2,12 +2,12 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
 export interface BuildOptions {
-  target?: string;
+  optimizationLevel: number;
   environment?: string;
   outputPath: string;
   aot?: boolean;
-  sourcemaps?: boolean;
-  evalSourcemaps?: boolean;
+  sourceMap?: boolean;
+  evalSourceMap?: boolean;
   vendorChunk?: boolean;
   commonChunk?: boolean;
   baseHref?: string;
@@ -18,8 +18,8 @@ export interface BuildOptions {
   i18nFormat?: string;
   i18nOutFile?: string;
   i18nOutFormat?: string;
-  locale?: string;
-  missingTranslation?: string;
+  i18nLocale?: string;
+  i18nMissingTranslation?: string;
   extractCss?: boolean;
   bundleDependencies?: 'none' | 'all';
   watch?: boolean;
@@ -36,6 +36,8 @@ export interface BuildOptions {
   forceTsCommonjs?: boolean;
   serviceWorker?: boolean;
   skipAppShell?: boolean;
+  statsJson: boolean;
+  forkTypeChecker: boolean;
 }
 
 export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
@@ -48,4 +50,5 @@ export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
 
 export interface WebpackTestOptions extends BuildOptions {
   codeCoverage?: boolean;
+  codeCoverageExclude: string[];
 }

@@ -153,7 +153,7 @@ export function getProdConfig(wco: WebpackConfigOptions) {
       ...extraPlugins,
       // Uglify should be the last plugin as PurifyPlugin needs to be before it.
       new UglifyJSPlugin({
-        sourceMap: buildOptions.sourcemaps,
+        sourceMap: buildOptions.sourceMap,
         parallel: true,
         uglifyOptions: {
           ecma: wco.supportES2015 ? 6 : 5,

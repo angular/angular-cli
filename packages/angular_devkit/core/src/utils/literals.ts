@@ -13,7 +13,7 @@ export type TemplateTag = (template: TemplateStringsArray, ...substitutions: any
 export function oneLine(strings: TemplateStringsArray, ...values: any[]) {
   const endResult = String.raw(strings, ...values);
 
-  return endResult.replace(/(?:\n(?:\s*))+/gm, ' ').trim();
+  return endResult.replace(/(?:\r?\n(?:\s*))+/gm, ' ').trim();
 }
 
 export function indentBy(indentations: number): TemplateTag {

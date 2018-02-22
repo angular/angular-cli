@@ -94,8 +94,16 @@
     },
     "codeCoverage": {
       "type": "boolean",
-      "description": "Override which browsers tests are run against.",
+      "description": "Output a code coverage report.",
       "default": false
+    },
+    "codeCoverageExclude": {
+      "type": "array",
+      "description": "Globs to exclude from code coverage.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
     }
   },
   "additionalProperties": false,

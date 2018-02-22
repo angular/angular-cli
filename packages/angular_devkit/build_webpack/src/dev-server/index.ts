@@ -91,10 +91,18 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       }),
       concatMap((browserOptions) => new Observable(obs => {
         const browserBuilder = new BrowserBuilder(this.context);
-        const webpackConfig = browserBuilder.buildWebpackConfig(root, browserOptions);
+        const webpackConfig = browserBuilder.buildWebpackConfig(target.root, browserOptions);
         const webpackCompiler = webpack(webpackConfig);
         const statsConfig = getWebpackStatsConfig(browserOptions.verbose);
-        const webpackDevServerConfig = this._buildServerConfig(root, options, browserOptions);
+
+        let webpackDevServerConfig: WebpackDevServerConfigurationOptions;
+        try {
+          webpackDevServerConfig = this._buildServerConfig(root, options, browserOptions);
+        } catch (err) {
+          obs.error(err);
+
+          return;
+        }
 
         // Resolve public host and client address.
         let clientAddress = `${options.ssl ? 'https' : 'http'}://0.0.0.0:0`;
@@ -163,7 +171,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
             if (stats.hasErrors()) {
               this.context.logger.info(statsErrorsToString(json, statsConfig));
             }
-            obs.next();
+            obs.next({ success: true });
           });
         }
 
@@ -294,13 +302,17 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   ) {
     let sslKey: string | undefined = undefined;
     let sslCert: string | undefined = undefined;
-    const keyPath = path.resolve(root, options.sslKey as string);
-    if (existsSync(keyPath)) {
-      sslKey = readFileSync(keyPath, 'utf-8');
+    if (options.sslKey) {
+      const keyPath = path.resolve(root, options.sslKey as string);
+      if (existsSync(keyPath)) {
+        sslKey = readFileSync(keyPath, 'utf-8');
+      }
     }
-    const certPath = path.resolve(root, options.sslCert as string);
-    if (existsSync(certPath)) {
-      sslCert = readFileSync(certPath, 'utf-8');
+    if (options.sslCert) {
+      const certPath = path.resolve(root, options.sslCert as string);
+      if (existsSync(certPath)) {
+        sslCert = readFileSync(certPath, 'utf-8');
+      }
     }
 
     config.https = true;

@@ -9,7 +9,7 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 
 import { AssetPattern } from '../models/webpack-configs/utils';
 import { isDirectory } from '../utilities/is-directory';
-import { KarmaWebpackThrowError } from './karma-webpack-throw-error';
+import { KarmaWebpackFailureCb } from './karma-webpack-failure-cb';
 
 /**
  * Enumerate needed (but not require/imported) dependencies from this file
@@ -22,6 +22,8 @@ import { KarmaWebpackThrowError } from './karma-webpack-throw-error';
 
 let blocked: any[] = [];
 let isBlocked = false;
+let successCb: () => void;
+let failureCb: () => void;
 
 // Add files to the Karma files array.
 function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
@@ -49,10 +51,13 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
 const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   const options: any = config.webpackBuildFacade.options;
   const appRoot = path.join(config.basePath, options.root);
+  successCb = config.webpackBuildFacade.successCb;
+  failureCb = config.webpackBuildFacade.failureCb;
 
-  if (options.sourcemaps) {
-    // Add a reporter that fixes sourcemap urls.
-    config.reporters.unshift('@angular-devkit/build-webpack');
+  config.reporters.unshift('@angular-devkit/build-webpack--event-reporter');
+  // Add a reporter that fixes sourcemap urls.
+  if (options.sourceMap) {
+    config.reporters.unshift('@angular-devkit/build-webpack--sourcemap-reporter');
 
     // Code taken from https://github.com/tschaub/karma-source-map-support.
     // We can't use it directly because we need to add it conditionally in this file, and karma
@@ -118,10 +123,9 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     }
   };
 
-  // If Karma is being ran in single run mode, throw errors.
-  if (config.singleRun) {
-    webpackConfig.plugins.push(new KarmaWebpackThrowError());
-  }
+  // Finish Karma run early in case of compilation error.
+  const compilationErrorCb = () => emitter.emit('run_complete', [], { exitCode: 1 });
+  webpackConfig.plugins.push(new KarmaWebpackFailureCb(compilationErrorCb));
 
   // Use existing config if any.
   config.webpack = Object.assign(webpackConfig, config.webpack);
@@ -140,7 +144,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
 
   // Add the request blocker.
   config.beforeMiddleware = config.beforeMiddleware || [];
-  config.beforeMiddleware.push('devkitBuildWebpackBlocker');
+  config.beforeMiddleware.push('@angular-devkit/build-webpack--blocker');
 
   // Delete global styles entry, we don't want to load them.
   delete webpackConfig.entry.styles;
@@ -227,10 +231,6 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
 
 init.$inject = ['config', 'emitter', 'customFileHandlers'];
 
-// Dummy preprocessor, just to keep karma from showing a warning.
-const preprocessor: any = () => (content: any, _file: string, done: any) => done(null, content);
-preprocessor.$inject = [];
-
 // Block requests until the Webpack compilation is done.
 function requestBlocker() {
   return function (_request: any, _response: any, next: () => void) {
@@ -242,8 +242,23 @@ function requestBlocker() {
   };
 }
 
+// Emits builder events.
+const eventReporter: any = function (this: any, baseReporterDecorator: any) {
+  baseReporterDecorator(this);
+
+  this.onRunComplete = function (_browsers: any, results: any) {
+    if (results.exitCode === 0) {
+      successCb && successCb();
+    } else {
+      failureCb && failureCb();
+    }
+  }
+};
+
+eventReporter.$inject = ['baseReporterDecorator'];
+
 // Strip the server address and webpack scheme (webpack://) from error log.
-const initSourcemapReporter: any = function (this: any, baseReporterDecorator: any) {
+const sourceMapReporter: any = function (this: any, baseReporterDecorator: any) {
   baseReporterDecorator(this);
   const urlRegexp = /\(http:\/\/localhost:\d+\/_karma_webpack_\/webpack:\//gi;
 
@@ -256,11 +271,11 @@ const initSourcemapReporter: any = function (this: any, baseReporterDecorator: a
   };
 };
 
-initSourcemapReporter.$inject = ['baseReporterDecorator'];
+sourceMapReporter.$inject = ['baseReporterDecorator'];
 
-module.exports = Object.assign({
+module.exports = {
   'framework:@angular-devkit/build-webpack': ['factory', init],
-  'preprocessor:@angular-devkit/build-webpack': ['factory', preprocessor],
-  'reporter:@angular-devkit/build-webpack': ['type', initSourcemapReporter],
-  'middleware:devkitBuildWebpackBlocker': ['factory', requestBlocker]
-});
+  'reporter:@angular-devkit/build-webpack--sourcemap-reporter': ['type', sourceMapReporter],
+  'reporter:@angular-devkit/build-webpack--event-reporter': ['type', eventReporter],
+  'middleware:@angular-devkit/build-webpack--blocker': ['factory', requestBlocker]
+};

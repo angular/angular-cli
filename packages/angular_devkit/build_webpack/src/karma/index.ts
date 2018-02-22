@@ -33,6 +33,7 @@ export interface KarmaBuilderOptions {
   karmaConfig: string; // previously 'config'.
   watch: boolean;
   codeCoverage: boolean;
+  codeCoverageExclude: string[];
   progress: boolean;
   preserveSymlinks?: boolean;
 
@@ -90,6 +91,9 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
       karmaOptions.webpackBuildFacade = {
         options: options,
         webpackConfig: this._buildWebpackConfig(root, options),
+        // Pass onto Karma to emit BuildEvents.
+        successCb: () => obs.next({ success: true }),
+        failureCb: () => obs.next({ success: false }),
       };
 
       // TODO: inside the configs, always use the project root and not the workspace root.
@@ -99,9 +103,18 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
       // Assign additional karmaConfig options to the local ngapp config
       karmaOptions.configFile = karmaConfig;
 
-      // :shipit:
+      // Complete the observable once the Karma server returns.
       const karmaServer = new karma.Server(karmaOptions, () => obs.complete());
       karmaServer.start();
+
+      // Cleanup, signal Karma to exit.
+      return () => {
+        // Karma does not seem to have a way to exit the server gracefully.
+        // See https://github.com/karma-runner/karma/issues/2867#issuecomment-369912167
+        // TODO: make a PR for karma to add `karmaServer.close(code)`, that
+        // calls `disconnectBrowsers(code);`
+        // karmaServer.close();
+      };
     });
   }
 

@@ -7,10 +7,10 @@
  */
 
 import { BuildEvent, Builder, BuilderContext, Target } from '@angular-devkit/architect';
-import { getSystemPath } from '@angular-devkit/core';
-import { writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { Path, getSystemPath, normalize, resolve } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { concat, concatMap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import * as webpack from 'webpack';
 import {
@@ -58,6 +58,7 @@ export interface BrowserBuilderOptions {
   subresourceIntegrity: boolean;
   serviceWorker: boolean;
   skipAppShell: boolean;
+  forkTypeChecker: boolean;
 
   // Options with no defaults.
   // TODO: reconsider this list.
@@ -119,95 +120,99 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
   constructor(public context: BuilderContext) { }
 
   run(target: Target<BrowserBuilderOptions>): Observable<BuildEvent> {
-    return new Observable(obs => {
-      const root = getSystemPath(target.root);
-      const options = target.options;
+    const options = target.options;
 
-      // Ensure Build Optimizer is only used with AOT.
-      if (options.buildOptimizer && !options.aot) {
-        throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
-      }
-
-      if (options.deleteOutputPath) {
-        // TODO: do this in a webpack plugin https://github.com/johnagan/clean-webpack-plugin
-        // fs.removeSync(resolve(options.root, options.outputPath));
-      }
-
-      const webpackConfig = this.buildWebpackConfig(root, options);
-      const webpackCompiler = webpack(webpackConfig);
-      const statsConfig = getWebpackStatsConfig(options.verbose);
-
-      const callback: webpack.compiler.CompilerCallback = (err, stats) => {
-        if (err) {
-          return obs.error(err);
+    // TODO: verify using of(null) to kickstart things is a pattern.
+    return of(null).pipe(
+      concatMap(() => options.deleteOutputPath
+        ? this._deleteOutputDir(target.root, normalize(options.outputPath))
+        : of(null)),
+      concatMap(() => new Observable(obs => {
+        // Ensure Build Optimizer is only used with AOT.
+        if (options.buildOptimizer && !options.aot) {
+          throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
         }
 
-        const json = stats.toJson('verbose');
-        if (options.verbose) {
-          this.context.logger.info(stats.toString(statsConfig));
-        } else {
-          this.context.logger.info(statsToString(json, statsConfig));
-        }
+        let webpackConfig;
+        try {
+          webpackConfig = this.buildWebpackConfig(target.root, options);
+        } catch (e) {
+          // TODO: why do I have to catch this error? I thought throwing inside an observable
+          // always got converted into an error.
+          obs.error(e);
 
-        if (stats.hasWarnings()) {
-          this.context.logger.warn(statsWarningsToString(json, statsConfig));
-        }
-        if (stats.hasErrors()) {
-          this.context.logger.error(statsErrorsToString(json, statsConfig));
-        }
-
-        // TODO: what should these events look like and contain?
-        obs.next({ success: true });
-
-        if (options.watch) {
           return;
-        } else if (options.statsJson) {
-          writeFileSync(
-            resolve(root, options.outputPath, 'stats.json'),
-            JSON.stringify(stats.toJson(), null, 2),
-          );
         }
+        const webpackCompiler = webpack(webpackConfig);
+        const statsConfig = getWebpackStatsConfig(options.verbose);
 
-        if (stats.hasErrors()) {
-          obs.error();
-        } else {
-          // if (!!app.serviceWorker && runTaskOptions.target === 'production' &&
-          //   usesServiceWorker(this.project.root) && runTaskOptions.serviceWorker !== false) {
-          //   const appRoot = path.resolve(this.project.root, app.root);
-          //   augmentAppWithServiceWorker(this.project.root, appRoot, path.resolve(outputPath),
-          //     runTaskOptions.baseHref || '/')
-          //     .then(() => resolve(), (err: any) => reject(err));
-          // } else {
-          obs.complete();
-        }
-      };
+        const callback: webpack.compiler.CompilerCallback = (err, stats) => {
+          if (err) {
+            return obs.error(err);
+          }
 
-      try {
-        // if (options.watch) {
-        //   webpackCompiler.watch({ poll: options.poll }, callback);
-        // } else {
-        webpackCompiler.run(callback);
-        // }
-      } catch (err) {
-        if (err) {
-          this.context.logger.error(
-            '\nAn error occured during the build:\n' + ((err && err.stack) || err));
+          const json = stats.toJson('verbose');
+          if (options.verbose) {
+            this.context.logger.info(stats.toString(statsConfig));
+          } else {
+            this.context.logger.info(statsToString(json, statsConfig));
+          }
+
+          if (stats.hasWarnings()) {
+            this.context.logger.warn(statsWarningsToString(json, statsConfig));
+          }
+          if (stats.hasErrors()) {
+            this.context.logger.error(statsErrorsToString(json, statsConfig));
+          }
+
+          obs.next({ success: !stats.hasErrors() });
+
+          if (options.watch) {
+            // Never complete on watch mode.
+            return;
+          } else {
+            // if (!!app.serviceWorker && runTaskOptions.target === 'production' &&
+            //   usesServiceWorker(this.project.root) && runTaskOptions.serviceWorker !== false) {
+            //   const appRoot = path.resolve(this.project.root, app.root);
+            //   augmentAppWithServiceWorker(this.project.root, appRoot, path.resolve(outputPath),
+            //     runTaskOptions.baseHref || '/')
+            //     .then(() => resolve(), (err: any) => reject(err));
+            // }
+            obs.complete();
+          }
+        };
+
+        try {
+          if (options.watch) {
+            const watching = webpackCompiler.watch({ poll: options.poll }, callback);
+
+            // Teardown logic. Close the watcher when unsubscribed from.
+            return () => watching.close(() => { });
+          } else {
+            webpackCompiler.run(callback);
+          }
+        } catch (err) {
+          if (err) {
+            this.context.logger.error(
+              '\nAn error occured during the build:\n' + ((err && err.stack) || err));
+          }
+          throw err;
         }
-        throw err;
-      }
-    });
+      })),
+    );
   }
 
-  buildWebpackConfig(projectRoot: string, options: BrowserBuilderOptions) {
+  buildWebpackConfig(root: Path, options: BrowserBuilderOptions) {
+    const systemRoot = getSystemPath(root);
     let wco: WebpackConfigOptions;
 
     // TODO: make target defaults into configurations instead
     // options = this.addTargetDefaults(options);
 
-    const tsconfigPath = resolve(projectRoot, options.tsConfig as string);
-    const tsConfig = readTsconfig(tsconfigPath);
+    const tsconfigPath = normalize(resolve(root, normalize(options.tsConfig as string)));
+    const tsConfig = readTsconfig(getSystemPath(tsconfigPath));
 
-    const projectTs = requireProjectModule(projectRoot, 'typescript') as typeof ts;
+    const projectTs = requireProjectModule(systemRoot, 'typescript') as typeof ts;
 
     const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
       && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
@@ -218,7 +223,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     (options as any).root = ''; // tslint:disable-line:no-any
 
     wco = {
-      projectRoot,
+      projectRoot: systemRoot,
       // TODO: use only this.options, it contains all flags and configs items already.
       buildOptions: options,
       appConfig: options,
@@ -252,6 +257,21 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     }
 
     return webpackMerge(webpackConfigs);
+  }
+
+  private _deleteOutputDir(root: Path, outputPath: Path) {
+    const resolvedOutputPath = resolve(root, outputPath);
+    if (resolvedOutputPath === root) {
+      throw new Error('Output path MUST not be project root directory!');
+    }
+
+    return this.context.host.exists(resolvedOutputPath).pipe(
+      concatMap(exists => exists
+        // TODO: remove this concat once host ops emit an event.
+        ? this.context.host.delete(resolvedOutputPath).pipe(concat(of(null)))
+        // ? of(null)
+        : of(null)),
+    );
   }
 }
 

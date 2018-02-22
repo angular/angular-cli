@@ -20,7 +20,7 @@ import { stripBom } from '../angular-cli-files/utilities/strip-bom';
 
 
 export interface TslintBuilderOptions {
-  tslintConfig: string;
+  tslintConfig?: string;
   tsConfig?: string;
   fix: boolean;
   typeCheck: boolean;
@@ -46,6 +46,9 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
 
     return new Observable(obs => {
       const projectTslint = requireProjectModule(root, 'tslint') as typeof tslint;
+      const tslintConfigPath = options.tslintConfig
+        ? path.resolve(root, options.tslintConfig)
+        : null;
       const Linter = projectTslint.Linter;
       const Configuration = projectTslint.Configuration;
 
@@ -54,7 +57,7 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
         program = Linter.createProgram(path.resolve(root, options.tsConfig));
       }
 
-      const files = getFilesToLint(options, Linter, program);
+      const files = getFilesToLint(root, options, Linter, program);
       const lintOptions = {
         fix: options.fix,
         formatter: options.format,
@@ -67,11 +70,10 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
       for (const file of files) {
         const contents = getFileContents(file, options, program);
 
-        // Only check for a new tslint config if path changes
+        // Only check for a new tslint config if the path changes.
         const currentDirectory = path.dirname(file);
         if (currentDirectory !== lastDirectory) {
-          configLoad = Configuration.findConfiguration(
-            path.resolve(root, options.tslintConfig), file);
+          configLoad = Configuration.findConfiguration(tslintConfigPath, file);
           lastDirectory = currentDirectory;
         }
 
@@ -112,12 +114,16 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
         this.context.logger.info('All files pass linting.');
       }
 
-      return options.force || result.errorCount === 0 ? obs.complete() : obs.error();
+      const success = options.force || result.errorCount === 0;
+      obs.next({ success });
+
+      return obs.complete();
     });
   }
 }
 
 function getFilesToLint(
+  root: string,
   options: TslintBuilderOptions,
   linter: typeof tslint.Linter,
   program?: ts.Program,
@@ -126,8 +132,9 @@ function getFilesToLint(
 
   if (options.files.length > 0) {
     return options.files
-      .map(file => glob.sync(file, { ignore, nodir: true }))
-      .reduce((prev, curr) => prev.concat(curr), []);
+      .map(file => glob.sync(file, { cwd: root, ignore, nodir: true }))
+      .reduce((prev, curr) => prev.concat(curr), [])
+      .map(file => path.join(root, file));
   }
 
   if (!program) {
@@ -158,7 +165,8 @@ function getFileContents(
       throw new Error(message);
     }
 
-    return undefined;
+    // TODO: this return had to be commented out otherwise no file would be linted, figure out why.
+    // return undefined;
   }
 
   // NOTE: The tslint CLI checks for and excludes MPEG transport streams; this does not.

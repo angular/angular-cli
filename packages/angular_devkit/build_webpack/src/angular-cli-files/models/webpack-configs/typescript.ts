@@ -4,8 +4,6 @@
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
 import {
-  AotPlugin,
-  AotPluginOptions,
   AngularCompilerPlugin,
   AngularCompilerPluginOptions,
   PLATFORM
@@ -23,6 +21,7 @@ const webpackLoader: string = g['angularCliIsLocal']
 
 function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = true) {
   const { appConfig, projectRoot, buildOptions } = wco;
+  const appRoot = path.resolve(projectRoot, appConfig.root);
   options.compilerOptions = options.compilerOptions || {};
 
   if (wco.buildOptions.preserveSymlinks) {
@@ -74,7 +73,6 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
       throw new SilentError(`Environment "${buildOptions.environment}" does not exist.`);
     }
 
-    const appRoot = path.resolve(projectRoot, appConfig.root);
     const sourcePath = appConfig.environmentSource;
     const envFile = appConfig.environments[buildOptions.environment as any];
 
@@ -83,35 +81,24 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     };
   }
 
-  if (AngularCompilerPlugin.isSupported()) {
-    const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
-      mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
-      i18nInFile: buildOptions.i18nFile,
-      i18nInFormat: buildOptions.i18nFormat,
-      i18nOutFile: buildOptions.i18nOutFile,
-      i18nOutFormat: buildOptions.i18nOutFormat,
-      locale: buildOptions.locale,
-      platform: appConfig.platform === 'server' ? PLATFORM.Server : PLATFORM.Browser,
-      missingTranslation: buildOptions.missingTranslation,
-      hostReplacementPaths,
-      sourceMap: buildOptions.sourcemaps,
-    }, options);
-    return new AngularCompilerPlugin(pluginOptions);
-  } else {
-    const pluginOptions: AotPluginOptions = Object.assign({}, {
-      mainPath: path.join(projectRoot, appConfig.root, appConfig.main),
-      i18nFile: buildOptions.i18nFile,
-      i18nFormat: buildOptions.i18nFormat,
-      locale: buildOptions.locale,
-      replaceExport: appConfig.platform === 'server',
-      missingTranslation: buildOptions.missingTranslation,
-      hostReplacementPaths,
-      sourceMap: buildOptions.sourcemaps,
-      // If we don't explicitely list excludes, it will default to `['**/*.spec.ts']`.
-      exclude: []
-    }, options);
-    return new AotPlugin(pluginOptions);
-  }
+  let i18nInFile = buildOptions.i18nFile
+    ? path.resolve(appRoot, buildOptions.i18nFile)
+    : undefined;
+
+  const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
+    mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
+    i18nInFile: i18nInFile,
+    i18nInFormat: buildOptions.i18nFormat,
+    i18nOutFile: buildOptions.i18nOutFile,
+    i18nOutFormat: buildOptions.i18nOutFormat,
+    locale: buildOptions.i18nLocale,
+    platform: appConfig.platform === 'server' ? PLATFORM.Server : PLATFORM.Browser,
+    missingTranslation: buildOptions.i18nMissingTranslation,
+    hostReplacementPaths,
+    sourceMap: buildOptions.sourceMap,
+    forkTypeChecker: buildOptions.forkTypeChecker
+  }, options);
+  return new AngularCompilerPlugin(pluginOptions);
 }
 
 export function getNonAotConfig(wco: WebpackConfigOptions) {
@@ -120,7 +107,7 @@ export function getNonAotConfig(wco: WebpackConfigOptions) {
 
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
-    plugins: [ _createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }) ]
+    plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true })]
   };
 }
 
@@ -134,7 +121,7 @@ export function getAotConfig(wco: WebpackConfigOptions) {
   if (buildOptions.buildOptimizer) {
     boLoader = [{
       loader: '@angular-devkit/build-optimizer/webpack-loader',
-      options: { sourceMap: buildOptions.sourcemaps }
+      options: { sourceMap: buildOptions.sourceMap }
     }];
   }
 
@@ -144,7 +131,7 @@ export function getAotConfig(wco: WebpackConfigOptions) {
 
   return {
     module: { rules: [{ test, use: [...boLoader, webpackLoader] }] },
-    plugins: [ _createAotPlugin(wco, pluginOptions) ]
+    plugins: [_createAotPlugin(wco, pluginOptions)]
   };
 }
 
@@ -163,6 +150,6 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
 
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
-    plugins: [ _createAotPlugin(wco, pluginOptions, false) ]
+    plugins: [_createAotPlugin(wco, pluginOptions, false)]
   };
 }

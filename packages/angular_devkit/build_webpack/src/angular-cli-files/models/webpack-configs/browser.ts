@@ -1,14 +1,12 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import * as fs from 'fs';
 import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
-import { findUp } from '../../utilities/find-up';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { extraEntryParser, lazyChunksFilter } from './utils';
 import { WebpackConfigOptions } from '../build-options';
@@ -28,32 +26,18 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   ]);
 
   if (buildOptions.vendorChunk) {
-    // Separate modules from node_modules into a vendor chunk.
-    // const nodeModules = path.resolve(projectRoot, 'node_modules');
-    const nodeModules = findUp('node_modules', projectRoot);
-    if (!nodeModules) {
-      throw new Error('Cannot locale node_modules directory.')
-    }
-    // Resolves all symlink to get the actual node modules folder.
-    const realNodeModules = fs.realpathSync(nodeModules);
-    // --aot puts the generated *.ngfactory.ts in src/$$_gendir/node_modules.
-    const genDirNodeModules = path.resolve(appRoot, '$$_gendir', 'node_modules');
-
     extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       chunks: ['main'],
-      minChunks: (module: any) => {
-        return module.resource
-            && (   module.resource.startsWith(nodeModules)
-                || module.resource.startsWith(genDirNodeModules)
-                || module.resource.startsWith(realNodeModules));
-      }
+      minChunks: (module: any) =>
+        module.resource && /[\\\/]node_modules[\\\/]/.test(module.resource)
     }));
   }
 
-  if (buildOptions.sourcemaps) {
+  if (buildOptions.sourceMap) {
+    // TODO: see if this is still needed with webpack 4 'mode'.
     // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
-    if (buildOptions.evalSourcemaps && buildOptions.target === 'development') {
+    if (buildOptions.evalSourceMap && buildOptions.optimizationLevel === 0) {
       // Produce eval sourcemaps for development with serve, which are faster.
       extraPlugins.push(new webpack.EvalSourceMapDevToolPlugin({
         moduleFilenameTemplate: '[resource-path]',
@@ -102,7 +86,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         chunksSortMode: packageChunkSort(appConfig),
         excludeChunks: lazyChunks,
         xhtml: true,
-        minify: buildOptions.target === 'production' ? {
+        minify: buildOptions.optimizationLevel === 1? {
           caseSensitive: true,
           collapseWhitespace: true,
           keepClosingSlash: true

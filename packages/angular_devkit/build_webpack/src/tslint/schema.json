@@ -65,7 +65,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "tslintConfig"
-  ]
+  "required": []
 }
