@@ -250,6 +250,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     },
     optimization: {
       noEmitOnErrors: true,
+      removeAvailableModules: buildOptions.target === 'production',
       minimizer: [
         new HashedModuleIdsPlugin(),
         new CleanCssWebpackPlugin({
