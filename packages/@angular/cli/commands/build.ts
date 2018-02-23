@@ -234,11 +234,6 @@ const BuildCommand = Command.extend({
     Version.assertAngularVersionIs2_3_1OrHigher(this.project.root);
     Version.assertTypescriptVersion(this.project.root);
 
-    // Force commonjs module format for TS on dev watch builds.
-    if (commandOptions.target === 'development' && commandOptions.watch === true) {
-      commandOptions.forceTsCommonjs = true;
-    }
-
     // Add trailing slash if missing to prevent https://github.com/angular/angular-cli/issues/7295
     if (commandOptions.deployUrl && commandOptions.deployUrl.substr(-1) !== '/') {
       commandOptions.deployUrl += '/';
