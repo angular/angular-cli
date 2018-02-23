@@ -125,7 +125,7 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
           _invalid(sha, message, 'should not have a scope');
           continue;
         }
-        if (commits.length > 1) {
+        if (argv.ci && commits.length > 1) {
           _invalid(sha, message, 'release should always be alone in a PR');
           continue;
         }
