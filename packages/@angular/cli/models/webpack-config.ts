@@ -9,7 +9,6 @@ import { BuildOptions } from './build-options';
 import {
   getBrowserConfig,
   getCommonConfig,
-  getProdConfig,
   getStylesConfig,
   getServerConfig,
   getNonAotConfig,
@@ -58,7 +57,6 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
       getCommonConfig(this.wco),
       platformConfig,
       getStylesConfig(this.wco),
-      this.getTargetConfig(this.wco)
     ];
 
     if (this.wco.appConfig.main || this.wco.appConfig.polyfills) {
@@ -70,13 +68,6 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
 
     this.config = webpackMerge(webpackConfigs);
     return this.config;
-  }
-
-  public getTargetConfig(webpackConfigOptions: WebpackConfigOptions<T>): any {
-    switch (webpackConfigOptions.buildOptions.target) {
-      case 'production':
-        return getProdConfig(webpackConfigOptions);
-    }
   }
 
   // Validate build options
@@ -110,7 +101,8 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
         sourcemaps: false,
         extractCss: true,
         namedChunks: false,
-        aot: true
+        aot: true,
+        extractLicenses: true,
       }
     };
 

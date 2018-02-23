@@ -2,13 +2,19 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
-
+import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { generateEntryPoints, packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
 import { extraEntryParser, lazyChunksFilter } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 
+/**
+ * license-webpack-plugin has a peer dependency on webpack-sources, list it in a comment to
+ * let the dependency validator know it is used.
+ *
+ * require('webpack-sources')
+ */
 
 export function getBrowserConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
@@ -65,6 +71,15 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   if (buildOptions.subresourceIntegrity) {
     extraPlugins.push(new SubresourceIntegrityPlugin({
       hashFuncNames: ['sha384']
+    }));
+  }
+
+  if (buildOptions.extractLicenses) {
+    extraPlugins.push(new LicenseWebpackPlugin({
+      pattern: /^(MIT|ISC|BSD.*)$/,
+      suppressErrors: true,
+      perChunkOutput: false,
+      outputFilename: `3rdpartylicenses.txt`
     }));
   }
 

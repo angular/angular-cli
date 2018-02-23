@@ -1,5 +1,5 @@
 import { Filesystem } from '@angular/service-worker/config';
-import { oneLine } from 'common-tags';
+import { oneLine, stripIndent } from 'common-tags';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -57,13 +57,25 @@ export function usesServiceWorker(projectRoot: string): boolean {
     swPackageJsonPath = resolveProjectModule(projectRoot, '@angular/service-worker/package.json');
   } catch (_) {
     // @angular/service-worker is not installed
-    return false;
+    throw new Error(stripIndent`
+    Your project is configured with serviceWorker = true, but @angular/service-worker
+    is not installed. Run \`npm install --save-dev @angular/service-worker\`
+    and try again, or run \`ng set apps.0.serviceWorker=false\` in your .angular-cli.json.
+  `);
   }
 
   const swPackageJson = fs.readFileSync(swPackageJsonPath).toString();
   const swVersion = JSON.parse(swPackageJson)['version'];
 
-  return semver.gte(swVersion, NEW_SW_VERSION);
+  if (!semver.gte(swVersion, NEW_SW_VERSION)) {
+    throw new Error(stripIndent`
+    The installed version of @angular/service-worker is ${swVersion}. This version of the CLI
+    requires the @angular/service-worker version to satisfy ${NEW_SW_VERSION}. Please upgrade
+    your service worker version.
+  `);
+  }
+
+  return true;
 }
 
 export function augmentAppWithServiceWorker(projectRoot: string, appRoot: string,
