@@ -3,6 +3,7 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
+const findWorkspaceRoot = require('find-yarn-workspace-root');
 
 import { packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
@@ -24,8 +25,12 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   ]);
 
   if (buildOptions.vendorChunk) {
+    // Determine if project is in a Yarn workspace or not.
+    const yarnWorkspaceRoot = findWorkspaceRoot(projectRoot) as string | null;
+    // If we're not in a Yarn workspace, use projectRoot.
+    const nodeModulesParent = yarnWorkspaceRoot || projectRoot;
     // Separate modules from node_modules into a vendor chunk.
-    const nodeModules = path.resolve(projectRoot, 'node_modules');
+    const nodeModules = path.resolve(nodeModulesParent, 'node_modules');
     // Resolves all symlink to get the actual node modules folder.
     const realNodeModules = fs.realpathSync(nodeModules);
     // --aot puts the generated *.ngfactory.ts in src/$$_gendir/node_modules.
