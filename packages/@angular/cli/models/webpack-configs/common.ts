@@ -5,6 +5,7 @@ import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
 import { requireProjectModule } from '../../utilities/require-project-module';
 import { WebpackConfigOptions } from '../webpack-config';
+import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 
@@ -252,6 +253,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       noEmitOnErrors: true,
       minimizer: [
         new HashedModuleIdsPlugin(),
+        new BundleBudgetPlugin({ budgets: appConfig.budgets }),
         new CleanCssWebpackPlugin({
           sourceMap: buildOptions.sourcemaps,
           // component styles retain their original file name
