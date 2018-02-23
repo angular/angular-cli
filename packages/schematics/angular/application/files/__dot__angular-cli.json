@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "<%= utils.dasherize(name) %>"
+  },
+  "apps": [
+    {
+      "root": "<%= sourceDir %>",
+      "prefix": "<%= prefix %>",
+      "main": "main.ts",
+      "styles": [
+        "styles.<%= style %>"
+      ],
+      "scripts": [],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    }
+  ],
+  "defaults": {
+    "styleExt": "<%= style %>",<% if (minimal || skipTests) { %>
+    "class": {
+      "spec": false
+    },<% } %>
+    "component": {<% if (minimal || inlineStyle) { %>
+      "inlineStyle": true<% } %><% if (minimal || (inlineTemplate && inlineStyle)) { %>,<% } %><% if (minimal || inlineTemplate) { %>
+      "inlineTemplate": true<% } %><% if (minimal || (skipTests && (inlineStyle || inlineTemplate))) { %>,<% } %><% if (minimal || skipTests) { %>
+      "spec": false
+    <% } %>}<% if (minimal || skipTests) { %>,
+    "directive": {
+      "spec": false
+    },
+    "guard": {
+      "spec": false
+    },
+    "module": {
+      "spec": false
+    },
+    "pipe": {
+      "spec": false
+    },
+    "service": {
+      "spec": false
+    }<% } %>
+  }
+}

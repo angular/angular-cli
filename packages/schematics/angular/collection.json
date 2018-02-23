@@ -12,6 +12,12 @@
       "description": "Create an Angular workspace.",
       "hidden": true
     },
+    "serviceWorker": {
+      "aliases": [ "service-worker" ],
+      "factory": "./service-worker",
+      "description": "Initializes a service worker setup.",
+      "schema": "./service-worker/schema.json"
+    },
     "application": {
       "factory": "./application",
       "schema": "./application/schema.json",

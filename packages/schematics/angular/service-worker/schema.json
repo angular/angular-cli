@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularServiceWorker",
+  "title": "Angular Service Worker Options Schema",
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "string",
+      "description": "Name or index of related client app.",
+      "default": "0"
+    }
+  },
+  "required": []
+}
