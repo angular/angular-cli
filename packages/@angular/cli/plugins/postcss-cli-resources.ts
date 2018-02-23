@@ -121,7 +121,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
 
     return Promise.all(urlDeclarations.map(async decl => {
       const value = decl.value;
-      const urlRegex = /url\(\s*(?:"([^"]+)"|'([^']+)'|(.+))\s*\)/g;
+      const urlRegex = /url\(\s*(?:"([^"]+)"|'([^']+)'|(.+?))\s*\)/g;
       const segments: string[] = [];
 
       let match;
