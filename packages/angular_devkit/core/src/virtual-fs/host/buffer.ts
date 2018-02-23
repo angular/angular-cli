@@ -50,6 +50,21 @@ export function fileBufferToString(fileBuffer: FileBuffer): string {
     // Modern browsers implement TextEncode.
     return new TextDecoder('utf-8').decode(new Uint8Array(fileBuffer));
   } else {
-    return String.fromCharCode.apply(null, new Uint8Array(fileBuffer));
+    // Slowest method but sure to be compatible with every platform.
+    const bufView = new Uint8Array(fileBuffer);
+    const bufLength = bufView.length;
+    let result = '';
+    let chunkLength = Math.pow(2, 16) - 1;
+
+    // We have to chunk it because String.fromCharCode.apply will throw
+    // `Maximum call stack size exceeded` on big inputs.
+    for (let i = 0; i < bufLength; i += chunkLength) {
+      if (i + chunkLength > bufLength) {
+        chunkLength = bufLength - i;
+      }
+      result += String.fromCharCode.apply(null, bufView.subarray(i, i + chunkLength));
+    }
+
+    return result;
   }
 }
