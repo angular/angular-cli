@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 export interface IRequestParams {
   location: any;              // e.g., Location object containing information '/some/path'
   origin: string;             // e.g., 'https://example.com:1234'

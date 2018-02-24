@@ -1,6 +1,13 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import { Type, NgModuleFactory, CompilerFactory, Compiler } from '@angular/core';
 import { platformDynamicServer } from '@angular/platform-server';
-import { DOCUMENT } from '@angular/platform-browser';
+import { DOCUMENT } from '@angular/common';
 import { ResourceLoader } from '@angular/compiler';
 
 import { REQUEST, ORIGIN_URL } from './tokens';
@@ -11,21 +18,19 @@ import { renderModuleFactory } from './platform-server-utils';
 
 /* @internal */
 export class UniversalData {
-  public appNode = '';
-  public title = '';
-  public scripts = '';
-  public styles = '';
-  public meta = '';
-  public links = '';
+  appNode = '';
+  title = '';
+  scripts = '';
+  styles = '';
+  meta = '';
+  links = '';
 }
 
 /* @internal */
 let appSelector = 'app-root'; // default
 
 /* @internal */
-function _getUniversalData(
-  doc: any /* TODO: type definition for Domino - DomAPI Spec (similar to "Document") */
-): UniversalData {
+function _getUniversalData(doc: Document): UniversalData {
 
   const STYLES: string[] = [];
   const SCRIPTS: string[] = [];
@@ -78,7 +83,7 @@ function _getUniversalData(
 
   return {
     title: doc.title,
-    appNode: doc.querySelector(appSelector).outerHTML,
+    appNode: doc.querySelector(appSelector)!.outerHTML,
     scripts: SCRIPTS.join('\n'),
     styles: STYLES.join('\n'),
     meta: META.join('\n'),
@@ -89,7 +94,9 @@ function _getUniversalData(
 export function ngAspnetCoreEngine(options: IEngineOptions): Promise<IEngineRenderResult> {
 
   if (!options.appSelector) {
-    throw new Error(`appSelector is required! Pass in " appSelector: '<app-root></app-root>' ", for your root App component.`);
+    const selector = `" appSelector: '<${appSelector}></${appSelector}>' "`;
+    throw new Error(`appSelector is required! Pass in ${selector},
+     for your root App component.`);
   }
 
   // Grab the DOM "selector" from the passed in Template <app-root> for example = "app-root"

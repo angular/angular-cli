@@ -1,4 +1,19 @@
-import { Injectable, NgModuleFactoryLoader, InjectionToken, NgModuleFactory, Inject, Type, Compiler } from '@angular/core';
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import {
+  Injectable,
+  NgModuleFactoryLoader,
+  InjectionToken,
+  NgModuleFactory,
+  Inject,
+  Type,
+  Compiler
+} from '@angular/core';
 import {ModuleMap} from './module-map';
 
 /**
@@ -21,7 +36,8 @@ export class ModuleMapNgFactoryLoader implements NgModuleFactoryLoader {
       throw new Error(`${loadChildrenString} did not exist in the MODULE_MAP`);
     }
 
-    return offlineMode ? this.loadFactory(<NgModuleFactory<any>> type) : this.loadAndCompile(<Type<any>> type);
+    return offlineMode ?
+      this.loadFactory(<NgModuleFactory<any>> type) : this.loadAndCompile(<Type<any>> type);
   }
 
   private loadFactory(factory: NgModuleFactory<any>): Promise<NgModuleFactory<any>> {

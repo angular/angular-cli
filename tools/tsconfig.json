@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "noUnusedParameters": true,
+    "lib": ["es2015", "dom", "es2016.array.include"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "../dist/tools/build",
+    "strictNullChecks": false,
+    "noEmitOnError": false,
+    "noImplicitAny": false,
+    "target": "es5",
+    "removeComments": true,
+    "types": [
+      "node"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "lib-build-tools": ["./package-tools/index"]
+    }
+  },
+  "files": [
+    "./package-tools/index.ts"
+  ]
+}

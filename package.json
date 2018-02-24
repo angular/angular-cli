@@ -57,10 +57,11 @@
     "node": ">= 8.9.x"
   },
   "scripts": {
-    "build": "node build.js",
-    "test:watch": "node build-test.js && karma start karma.conf.js",
-    "test:browser": "node build-test.js && ts-node test/test-browser.ts",
-    "test:server": "node build-test.js && ts-node test/test-server.ts"
+    "lint": "tslint -c tslint.json '+(modules|tools)/**/*.ts' --exclude '**/node_modules/**/*'",
+    "build": "ts-node --project ./tools/tsconfig.json build.ts",
+    "test:watch": "ts-node --project ./tools/tsconfig.json build-test.ts && karma start karma.conf.js",
+    "test:browser": "ts-node --project ./tools/tsconfig.json build-test.ts && ts-node test/test-browser.ts",
+    "test:server": "ts-node --project ./tools/tsconfig.json build-test.ts && ts-node test/test-server.ts"
   },
   "devDependencies": {
     "@angular/animations": "^5.2.0",
@@ -85,6 +86,7 @@
     "karma-jasmine": "^1.1.1",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-typescript": "^3.0.12",
+    "minimatch": "^3.0.4",
     "protractor": "^5.2.0",
     "rimraf": "^2.6.1",
     "rollup": "~0.41.6",
@@ -96,6 +98,9 @@
     "rxjs": "^5.5.2",
     "systemjs": "0.19.43",
     "ts-node": "^3.0.4",
+    "tsconfig-paths": "^2.3.0",
+    "tslint": "^5.9.1",
+    "tsutils": "^2.6.0",
     "typescript": "~2.6.2",
     "zone.js": "^0.8.12"
   }

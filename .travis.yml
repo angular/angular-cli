@@ -14,7 +14,7 @@ branches:
 
 jobs:
   include:
-#    - env: "MODE=lint"
+    - env: "MODE=lint"
     - env: "MODE=build"
     - env: "MODE=karma"
     - env: "MODE=jasmine"

@@ -1,9 +1,20 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as fs from 'fs';
 import { Request, Response } from 'express';
 
 import { NgModuleFactory, Type, CompilerFactory, Compiler, StaticProvider } from '@angular/core';
 import { ResourceLoader } from '@angular/compiler';
-import { INITIAL_CONFIG, renderModuleFactory, platformDynamicServer } from '@angular/platform-server';
+import {
+  INITIAL_CONFIG,
+  renderModuleFactory,
+  platformDynamicServer
+} from '@angular/platform-server';
 
 import { FileLoader } from './file-loader';
 import { REQUEST, RESPONSE } from './tokens';
@@ -48,7 +59,9 @@ export function ngExpressEngine(setupOptions: NgSetupOptions) {
     }
   ]);
 
-  return function (filePath: string, options: RenderOptions, callback: (err?: Error | null, html?: string) => void) {
+  return function (filePath: string,
+                   options: RenderOptions,
+                   callback: (err?: Error | null, html?: string) => void) {
 
     options.providers = options.providers || [];
 

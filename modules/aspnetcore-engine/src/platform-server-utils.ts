@@ -1,9 +1,25 @@
 /**
- * Copied from @angular/platform-server utils. https://github.com/angular/angular/blob/master/packages/platform-server/src/utils.ts
-   Github issue to avoid copy/paste: https://github.com/angular/angular/issues/22049#issuecomment-363638743
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * Copied from @angular/platform-server utils:
+ * https://github.com/angular/angular/blob/master/packages/platform-server/src/utils.ts
+ * Github issue to avoid copy/paste:
+ * https://github.com/angular/angular/issues/22049#issuecomment-363638743
  */
 
-import {ApplicationRef, NgModuleFactory, NgModuleRef, PlatformRef, StaticProvider, Type} from '@angular/core';
+import {
+  ApplicationRef,
+  NgModuleFactory,
+  NgModuleRef,
+  PlatformRef,
+  StaticProvider,
+  Type
+} from '@angular/core';
 import {ɵTRANSITION_ID} from '@angular/platform-browser';
 import {
   platformDynamicServer,
@@ -36,8 +52,8 @@ function _getPlatform(
   ]);
 }
 
-function _render<T>(
-  platform: PlatformRef, moduleRefPromise: Promise<NgModuleRef<T>>): Promise<ModuleRenderResult<T>> {
+function _render<T>(platform: PlatformRef,
+                    moduleRefPromise: Promise<NgModuleRef<T>>): Promise<ModuleRenderResult<T>> {
   return moduleRefPromise.then(moduleRef => {
     const transitionId = moduleRef.injector.get(ɵTRANSITION_ID, null);
     if (!transitionId) {

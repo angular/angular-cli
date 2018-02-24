@@ -1,54 +1,107 @@
 {
-  "defaultSeverity": "warning",
+  "rulesDirectory": [
+    "./tools/tslint-rules/"
+  ],
   "rules": {
-    "comment-format": [true, "check-space"],
+    "max-line-length": [true, 100],
+    // Disable this flag because of SHA tslint#48b0c597f9257712c7d1f04b55ed0aa60e333f6a
+    // TSLint now shows warnings if types for properties are inferred. This rule needs to be
+    // disabled because all properties need to have explicit types set to work for Dgeni.
+    "no-inferrable-types": false,
     "class-name": true,
-    "curly": true,
-    "eofline": true,
-    "forin": true,
-    "indent": [true, "spaces"],
-    "label-position": true,
-    "label-undefined": true,
-    "max-line-length": [true, 140],
-    "no-arg": true,
-    "no-bitwise": false,
-    "no-console": [true,
-      "debug",
-      "info"
+    "comment-format": [
+      true,
+      "check-space"
     ],
-    "no-construct": true,
-    "no-debugger": true,
-    "no-duplicate-key": true,
+    "indent": [
+      true,
+      "spaces"
+    ],
+    "eofline": true,
     "no-duplicate-variable": true,
-    "no-empty": false,
     "no-eval": true,
-    "no-string-literal": false,
-    "no-switch-case-fall-through": true,
-    "trailing-comma": true,
-    "no-trailing-whitespace": false,
-    "no-unused-expression": false,
-    "no-unused-variable": false,
-    "no-unreachable": true,
-    "no-use-before-declare": true,
-    "no-var-keyword": false,
-    "one-line": [true,
-      "check-open-brace",
+    "no-arg": true,
+    "no-internal-module": true,
+    "no-trailing-whitespace": true,
+    "no-bitwise": true,
+    "no-shadowed-variable": true,
+    "no-unused-expression": true,
+    "no-var-keyword": true,
+    "member-access": [true, "no-public"],
+    "no-debugger": true,
+    "no-unused-variable": true,
+    "one-line": [
+      true,
       "check-catch",
       "check-else",
+      "check-open-brace",
       "check-whitespace"
     ],
-    "quotemark": false,
-    "radix": true,
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
     "semicolon": true,
-    "object-literal-sort-keys": false,
-    "triple-equals": [true, "allow-null-check"],
-    "variable-name": false,
-    "whitespace": [true,
+    "typedef-whitespace": [
+      true,
+      {
+        "call-signature": "nospace",
+        "index-signature": "nospace",
+        "parameter": "nospace",
+        "property-declaration": "nospace",
+        "variable-declaration": "nospace"
+      }
+    ],
+    "curly": true,
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
+    ],
+    "whitespace": [
+      true,
       "check-branch",
       "check-decl",
       "check-operator",
       "check-separator",
-      "check-type"
-    ]
+      "check-type",
+      "check-preblock"
+    ],
+    // Bans jasmine helper functions that will prevent the CI from properly running tests.
+    "ban": [
+      true,
+      ["fit"],
+      ["fdescribe"],
+      ["xit"],
+      ["xdescribe"],
+      {"name": "Object.assign", "message": "Use the spread operator instead."}
+    ],
+    // Disallows importing the whole RxJS library. Submodules can be still imported.
+    "import-blacklist": [true, "rxjs", "rxjs/operators"],
+    // Avoids inconsistent linebreak styles in source files. Forces developers to use LF linebreaks.
+    "linebreak-style": [true, "LF"],
+    // Namespaces are no allowed, because of Closure compiler.
+    "no-namespace": true,
+    "jsdoc-format": [true, "check-multiline-start"],
+
+    // Custom Rules
+    "ts-loader": true,
+    "no-exposed-todo": true,
+    "require-license-banner": [
+      true,
+      "modules/**/!(*.spec).ts"
+    ],
+    "no-rxjs-patch-imports": [
+      true,
+      "modules/**/*.ts"
+    ],
+    "missing-rollup-globals": [
+      true,
+      "./tools/package-tools/rollup-globals.ts",
+      "modules/**/*.ts"
+    ],
+    "deletion-target": true
   }
 }

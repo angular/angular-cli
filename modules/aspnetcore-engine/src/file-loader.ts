@@ -1,10 +1,16 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as fs from 'fs';
 import { ResourceLoader } from '@angular/compiler';
 
 export class FileLoader implements ResourceLoader {
   get(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      // install node types
       fs.readFile(url, (err: NodeJS.ErrnoException, buffer: Buffer) => {
         if (err) {
           return reject(err);
