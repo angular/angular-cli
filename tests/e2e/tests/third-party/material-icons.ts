@@ -11,12 +11,12 @@ export default function() {
       app['styles'].push('../node_modules/material-design-icons/iconfont/material-icons.css');
     }))
     .then(() => ng('build', '--extract-css'))
-    .then(() => expectFileToMatch('dist/styles.bundle.css', 'Material Icons'))
+    .then(() => expectFileToMatch('dist/styles.css', 'Material Icons'))
     .then(() => ng(
       'build',
       '--prod',
       '--extract-css',
       '--output-hashing=none'
     ))
-    .then(() => expectFileToMatch('dist/styles.bundle.css', 'Material Icons'));
+    .then(() => expectFileToMatch('dist/styles.css', 'Material Icons'));
 }
