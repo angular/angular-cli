@@ -82,7 +82,7 @@ export function ngcLoader(this: loader.LoaderContext) {
       }
 
       timeEnd(timeLabel);
-      cb(null, result.outputText, result.sourceMap);
+      cb(null, result.outputText, result.sourceMap as any);
     })
     .catch(err => {
       timeEnd(timeLabel);
