@@ -1,4 +1,6 @@
-**Note: for support questions, please use one of these channels:** https://github.com/angular/universal/blob/master/CONTRIBUTING.md#question. This repository's issues are reserved for feature requests and bug reports. Also, **Preboot has moved** to https://github.com/angular/preboot - please make preboot-related issues there.
+**Note: for support questions, please use one of [these channels][Channels]**. This repository's issues are reserved 
+for feature requests and bug reports. Also, **Preboot has moved** [here][preboot] - please make preboot-related issues 
+there.
 
 * **I'm submitting a ...**
 ```
@@ -10,8 +12,10 @@
 * **What modules are related to this Issue?**
 ```
 - [ ] aspnetcore-engine
+- [ ] common
 - [ ] express-engine
 - [ ] hapi-engine
+- [ ] module-map-ngfactory-loader
 ```
 
 * **Do you want to request a *feature* or report a *bug*?**
@@ -22,7 +26,8 @@
 
 
 
-* **If the current behavior is a bug, please provide the steps to reproduce and if possible a minimal demo of the problem** by creating a github repo.
+* **If the current behavior is a bug**, please provide the steps to reproduce and if possible a minimal demo of the 
+problem by creating a github repo.
 
 
 
@@ -36,12 +41,16 @@
 
 * **Please tell us about your environment:**
 
-- Angular version: 4.X
+- Angular version: X.Y.Z
 - Browser: [all | Chrome XX | Firefox XX | IE XX | Safari XX ]
 - Language: [all | TypeScript X.X | ES6/7 | ES5 ]
 - OS:  [all | Mac OS X | Windows | Linux ]
-- Platform: [all | NodeJs | Java | PHP | .NETCore | Ruby]
+- Platform: [all | NodeJS | Java | PHP | .NETCore | Ruby]
 
 
 
-* **Other information** (e.g. detailed explanation, stacktraces, related issues, suggestions how to fix, links for us to have context, eg. stackoverflow, gitter, etc)
+* **Other information** (e.g. detailed explanation, stacktraces, related issues, suggestions how to fix, links for us 
+to have context, eg. stackoverflow, gitter, etc)
+
+[Channels]: https://github.com/angular/universal/blob/master/CONTRIBUTING.md#question
+[preboot]: https://github.com/angular/preboot

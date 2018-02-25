@@ -1,0 +1,15 @@
+/modules/aspnetcore-engine/*                           @MarkPieszak @vikerman
+/modules/common/*                                      @vikerman @CaerusKaru
+/modules/express-engine/*                              @vikerman @FrozenPandaz
+/modules/hapi-engine/*                                 @vikerman @CaerusKaru
+/modules/module-map-ngfactory-loader                   @vikerman @Toxicable @FrozenPandaz
+
+# Tooling
+/scripts/**                                        @CaerusKaru @vikerman
+/test/**                                           @CaerusKaru @vikerman
+/tools/**                                          @CaerusKaru @vikerman
+
+# Misc
+/*                                                 @vikerman
+/.github/**                                        @vikerman
+/modules/*                                         @vikerman

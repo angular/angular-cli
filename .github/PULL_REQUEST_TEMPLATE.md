@@ -1,6 +1,6 @@
 * **Please check if the PR fulfills these requirements**
 ```
-- [ ] The commit message follows our guidelines: https://github.com/angular/universal/blob/master/CONTRIBUTING.md#commit-message-format
+- [ ] The commit message follows [our guidelines](https://github.com/angular/universal/blob/master/CONTRIBUTING.md#commit-message-format)
 - [ ] Tests for the changes have been added (for bug fixes / features)
 - [ ] Docs have been added / updated (for bug fixes / features)
 ```
@@ -8,8 +8,10 @@
 * **What modules are related to this pull-request**
 ```
 - [ ] aspnetcore-engine
+- [ ] common
 - [ ] express-engine
 - [ ] hapi-engine
+- [ ] module-map-ngfactory-loader
 ```
 
 * **What kind of change does this PR introduce?** (Bug fix, feature, docs update, ...)
