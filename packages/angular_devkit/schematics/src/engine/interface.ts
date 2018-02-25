@@ -9,6 +9,7 @@ import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { Url } from 'url';
 import { FileEntry, MergeStrategy, Tree } from '../tree/interface';
+import { Workflow } from '../workflow';
 import { TaskConfigurationGenerator, TaskExecutor, TaskId } from './task';
 
 
@@ -102,6 +103,7 @@ export interface Engine<CollectionMetadataT extends object, SchematicMetadataT e
   executePostTasks(): Observable<void>;
 
   readonly defaultMergeStrategy: MergeStrategy;
+  readonly workflow: Workflow | null;
 }
 
 

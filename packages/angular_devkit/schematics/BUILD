@@ -59,6 +59,7 @@ ts_library(
     module_root = "tools",
     deps = [
         ":schematics",
+        ":tasks",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         # @deps: rxjs

@@ -13,6 +13,7 @@ import { Url } from 'url';
 import { MergeStrategy } from '../tree/interface';
 import { NullTree } from '../tree/null';
 import { empty } from '../tree/static';
+import { Workflow } from '../workflow';
 import { CollectionImpl } from './collection';
 import {
   Collection,
@@ -78,9 +79,10 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     = new Map<string, Map<string, SchematicImpl<CollectionT, SchematicT>>>();
   private _taskSchedulers = new Array<TaskScheduler>();
 
-  constructor(private _host: EngineHost<CollectionT, SchematicT>) {
+  constructor(private _host: EngineHost<CollectionT, SchematicT>, protected _workflow?: Workflow) {
   }
 
+  get workflow() { return this._workflow || null; }
   get defaultMergeStrategy() { return this._host.defaultMergeStrategy || MergeStrategy.Default; }
 
   createCollection(name: string): Collection<CollectionT, SchematicT> {

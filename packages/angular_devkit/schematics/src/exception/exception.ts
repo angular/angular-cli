@@ -33,6 +33,12 @@ export class MergeConflictException extends BaseException {
   }
 }
 
+export class UnsuccessfulWorkflowExecution extends BaseException {
+  constructor() {
+    super('Workflow did not execute successfully.');
+  }
+}
+
 export class UnimplementedException extends BaseException {
   constructor() { super('This function is unimplemented.'); }
 }

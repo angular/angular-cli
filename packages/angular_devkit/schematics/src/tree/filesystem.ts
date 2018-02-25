@@ -173,6 +173,9 @@ export class FileSystemTree extends VirtualTree {
 }
 
 
+export class HostTree extends FileSystemTree {}
+
+
 export class FileSystemCreateTree extends FileSystemTree {
   constructor(host: virtualFs.Host) {
     super(host);

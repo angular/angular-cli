@@ -8,34 +8,15 @@
  */
 import {
   normalize,
-  schema,
   tags,
   terminal,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
-import {
-  DryRunEvent,
-  DryRunSink,
-  FileSystemTree,
-  HostSink,
-  SchematicEngine,
-  Tree,
-  formats,
-} from '@angular-devkit/schematics';
-import { BuiltinTaskExecutor } from '@angular-devkit/schematics/tasks/node';
-import {
-  NodeModulesEngineHost,
-  validateOptionsWithSchema,
-} from '@angular-devkit/schematics/tools';
+import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
+import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as minimist from 'minimist';
-import { of as observableOf } from 'rxjs/observable/of';
-import {
-  concat,
-  concatMap,
-  ignoreElements,
-  map,
-} from 'rxjs/operators';
+
 
 /**
  * Show usage of the CLI tool, and exit the process.
@@ -126,43 +107,13 @@ const {
 const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
 
 
-/**
- * Create the SchematicEngine, which is used by the Schematic library as callbacks to load a
- * Collection or a Schematic.
- */
-const engineHost = new NodeModulesEngineHost();
-const engine = new SchematicEngine(engineHost);
-
-
-// Add support for schemaJson.
-const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
-engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
-
-engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage);
-engineHost.registerTaskExecutor(BuiltinTaskExecutor.RepositoryInitializer);
-
-/**
- * The collection to be used.
- * @type {Collection|any}
- */
-const collection = engine.createCollection(collectionName);
-if (collection === null) {
-  logger.fatal(`Invalid collection name: "${collectionName}".`);
-  process.exit(3);
-  throw 3;  // TypeScript doesn't know that process.exit() never returns.
-}
-
-
 /** If the user wants to list schematics, we simply show all the schematic names. */
 if (argv['list-schematics']) {
-  logger.info(engine.listSchematicNames(collection).join('\n'));
+  // logger.info(engine.listSchematicNames(collection).join('\n'));
   process.exit(0);
   throw 0;  // TypeScript doesn't know that process.exit() never returns.
 }
 
-
-/** Create the schematic from the collection. */
-const schematic = collection.createSchematic(schematicName);
 
 /** Gather the arguments for later use. */
 const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
@@ -172,35 +123,34 @@ const force = argv['force'];
 /** Create a Virtual FS Host scoped to where the process is being run. **/
 const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
 
-/** This host is the original Tree created from the current directory. */
-const host = observableOf(new FileSystemTree(fsHost));
+/** Create the workflow that will be executed with this run. */
+const workflow = new NodeWorkflow(fsHost, { force, dryRun });
 
-// We need two sinks if we want to output what will happen, and actually do the work.
-// Note that fsSink is technically not used if `--dry-run` is passed, but creating the Sink
-// does not have any side effect.
-const dryRunSink = new DryRunSink(fsHost, force);
-const fsSink = new HostSink(fsHost, force);
-
-
-// We keep a boolean to tell us whether an error would occur if we were to commit to an
-// actual filesystem. In this case we simply show the dry-run, but skip the fsSink commit.
-let error = false;
-
-// Indicate to the user when nothing has been done.
+// Indicate to the user when nothing has been done. This is automatically set to off when there's
+// a new DryRunEvent.
 let nothingDone = true;
 
-
+// Logging queue that receives all the messages to show the users. This only get shown when no
+// errors happened.
 const loggingQueue: string[] = [];
 
-// Logs out dry run events.
-dryRunSink.reporter.subscribe((event: DryRunEvent) => {
+/**
+ * Logs out dry run events.
+ *
+ * All events will always be executed here, in order of discovery. That means that an error would
+ * be shown along other events when it happens. Since errors in workflows will stop the Observable
+ * from completing successfully, we record any events other than errors, then on completion we
+ * show them.
+ *
+ * This is a simple way to only show errors when an error occur.
+ */
+workflow.reporter.subscribe((event: DryRunEvent) => {
   nothingDone = false;
 
   switch (event.kind) {
     case 'error':
       const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist.';
       logger.warn(`ERROR! ${event.path} ${desc}.`);
-      error = true;
       break;
     case 'update':
       loggingQueue.push(tags.oneLine`
@@ -242,51 +192,40 @@ delete args._;
 
 
 /**
- * The main path. Call the schematic with the host. This creates a new Context for the schematic
- * to run in, then call the schematic rule using the input Tree. This returns a new Tree as if
- * the schematic was applied to it.
+ *  Execute the workflow, which will report the dry run events, run the tasks, and complete
+ *  after all is done.
  *
- * We then optimize this tree. This removes any duplicated actions or actions that would result
- * in a noop (for example, creating then deleting a file). This is not necessary but will greatly
- * improve performance as hitting the file system is costly.
- *
- * Then we proceed to run the dryRun commit. We run this before we then commit to the filesystem
- * (if --dry-run was not passed or an error was detected by dryRun).
+ *  The Observable returned will properly cancel the workflow if unsubscribed, error out if ANY
+ *  step of the workflow failed (sink or task), with details included, and will only complete
+ *  when everything is done.
  */
-schematic.call(args, host, { debug, logger: logger.asApi() })
-  .pipe(
-    map((tree: Tree) => Tree.optimize(tree)),
-    concatMap((tree: Tree) => {
-      return dryRunSink.commit(tree).pipe(
-        ignoreElements(),
-        concat(observableOf(tree)));
-    }),
-    concatMap((tree: Tree) => {
-      if (!error) {
-        // Output the logging queue.
-        loggingQueue.forEach(log => logger.info(log));
-      }
+workflow.execute({
+  collection: collectionName,
+  schematic: schematicName,
+  options: args,
+  debug: debug,
+  logger: logger,
+})
+.subscribe({
+  error(err: Error) {
+    // In case the workflow was not successful, show an appropriate error message.
+    if (err instanceof UnsuccessfulWorkflowExecution) {
+      // "See above" because we already printed the error.
+      logger.fatal('The Schematic workflow failed. See above.');
+    } else if (debug) {
+      logger.fatal('An error occured:\n' + err.stack);
+    } else {
+      logger.fatal(err.message);
+    }
 
-      if (nothingDone) {
-        logger.info('Nothing to be done.');
-      }
+    process.exit(1);
+  },
+  complete() {
+    // Output the logging queue, no error happened.
+    loggingQueue.forEach(log => logger.info(log));
 
-      if (dryRun || error) {
-        return observableOf(tree);
-      }
-
-      return fsSink.commit(tree).pipe(
-        ignoreElements(),
-        concat(observableOf(tree)));
-    }),
-    concatMap(() => engine.executePostTasks()))
-  .subscribe({
-    error(err: Error) {
-      if (debug) {
-        logger.fatal('An error occured:\n' + err.stack);
-      } else {
-        logger.fatal(err.message);
-      }
-      process.exit(1);
-    },
-  });
+    if (nothingDone) {
+      logger.info('Nothing to be done.');
+    }
+  },
+});
