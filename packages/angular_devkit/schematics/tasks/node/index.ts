@@ -11,6 +11,7 @@ import {
   RepositoryInitializerName,
   RepositoryInitializerTaskFactoryOptions,
  } from '../repo-init/options';
+import { RunSchematicName } from '../run-schematic/options';
 
 export class BuiltinTaskExecutor {
   static readonly NodePackage: TaskExecutorFactory<NodePackageTaskFactoryOptions> = {
@@ -21,5 +22,9 @@ export class BuiltinTaskExecutor {
     TaskExecutorFactory<RepositoryInitializerTaskFactoryOptions> = {
     name: RepositoryInitializerName,
     create: (options) => import('../repo-init/executor').then(mod => mod.default(options)),
+  };
+  static readonly RunSchematic: TaskExecutorFactory<{}> = {
+    name: RunSchematicName,
+    create: () => import('../run-schematic/executor').then(mod => mod.default()),
   };
 }
