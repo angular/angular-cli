@@ -8,13 +8,13 @@
 
 export interface Schema {
     /**
-     * Name or index of related client app.
+     * Name of related client app.
      */
-    clientApp?: string;
+    clientProject: string;
     /**
-     * Name or index of related universal app.
+     * Name of related universal app.
      */
-    universalApp: string;
+    universalProject: string;
     /**
      * Route path used to produce the app shell.
      */

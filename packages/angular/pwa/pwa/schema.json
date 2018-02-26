@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsAngularServiceWorker",
-  "title": "Angular Service Worker Options Schema",
+  "id": "SchematicsAngularPWA",
+  "title": "Angular PWA Options Schema",
   "type": "object",
   "properties": {
     "project": {
@@ -17,6 +17,10 @@
       "type": "string",
       "description": "The configuration to apply service worker to.",
       "default": "production"
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the application."
     }
   },
   "required": [

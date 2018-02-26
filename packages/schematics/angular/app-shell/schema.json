@@ -4,13 +4,13 @@
   "title": "Angular AppShell Options Schema",
   "type": "object",
   "properties": {
-    "clientApp": {
+    "clientProject": {
       "type": "string",
-      "description": "Name or index of related client app."
+      "description": "Name of related client app."
     },
-    "universalApp": {
+    "universalProject": {
       "type": "string",
-      "description": "Name or index of related universal app."
+      "description": "Name of related universal app."
     },
     "route": {
       "type": "string",
@@ -99,6 +99,7 @@
     }
   },
   "required": [
-    "universalApp"
+    "clientProject",
+    "universalProject"
   ]
 }

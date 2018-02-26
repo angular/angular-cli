@@ -91,11 +91,15 @@ export interface Project {
   /**
    * Tool options.
    */
-  architect?: {
-    /**
-     * Link to schema.
-     */
-    $schema?: string;
-    [k: string]: any;
-  };
+  architect?: Architect;
+}
+/**
+ * Architect options.
+ */
+export interface Architect {
+  /**
+   * Link to schema.
+   */
+  $schema?: string;
+  [k: string]: any;
 }

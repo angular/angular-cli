@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize } from '@angular-devkit/core';
+import { JsonObject, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -16,6 +16,12 @@ import {
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import {
+  Architect,
+  Project,
+  WorkspaceSchema,
+} from '../../../angular_devkit/core/src/workspace/workspace-schema';
+import { Schema as ComponentOptions } from '../component/schema';
+import {
   addImportToModule,
   addSymbolToNgModuleMetadata,
   findNode,
@@ -24,7 +30,7 @@ import {
   isImported,
 } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { AppConfig, getAppFromConfig, getConfig } from '../utility/config';
+import { getWorkspace, getWorkspacePath } from '../utility/config';
 import { getAppModulePath } from '../utility/ng-ast-utils';
 import { insertImport } from '../utility/route-utils';
 import { Schema as AppShellOptions } from './schema';
@@ -40,7 +46,7 @@ function formatMissingAppMsg(label: string, nameOrIndex: string | undefined): st
 function getSourceFile(host: Tree, path: string): ts.SourceFile {
   const buffer = host.read(path);
   if (!buffer) {
-    throw new SchematicsException(`Could not find bootstrapped module.`);
+    throw new SchematicsException(`Could not find ${path}.`);
   }
   const content = buffer.toString();
   const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
@@ -48,8 +54,8 @@ function getSourceFile(host: Tree, path: string): ts.SourceFile {
   return source;
 }
 
-function getServerModulePath(host: Tree, app: AppConfig): string | null {
-  const mainPath = `/${app.root}/${app.main}`;
+function getServerModulePath(host: Tree, project: Project, architect: Architect): string | null {
+  const mainPath = architect.server.options.main;
   const mainSource = getSourceFile(host, mainPath);
   const allNodes = getSourceNodes(mainSource);
   const expNode = allNodes.filter(node => node.kind === ts.SyntaxKind.ExportDeclaration)[0];
@@ -57,7 +63,7 @@ function getServerModulePath(host: Tree, app: AppConfig): string | null {
     return null;
   }
   const relativePath = <ts.StringLiteral> (<ts.ExportDeclaration> expNode).moduleSpecifier;
-  const modulePath = normalize(`/${app.root}/${relativePath.text}.ts`);
+  const modulePath = normalize(`/${project.root}/src/${relativePath.text}.ts`);
 
   return modulePath;
 }
@@ -96,8 +102,12 @@ function getComponentTemplate(host: Tree, compPath: string, tmplInfo: TemplateIn
   return template;
 }
 
-function getBootstrapComponentPath(host: Tree, appConfig: AppConfig): string {
-  const modulePath = getAppModulePath(host, appConfig);
+function getBootstrapComponentPath(host: Tree, project: Project): string {
+  if (!project.architect) {
+    throw new Error('Project architect not found.');
+  }
+  const mainPath = project.architect.build.options.main;
+  const modulePath = getAppModulePath(host, mainPath);
   const moduleSource = getSourceFile(host, modulePath);
 
   const metadataNode = getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
@@ -131,13 +141,8 @@ function validateProject(options: AppShellOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const routerOutletCheckRegex = /<router\-outlet.*?>([\s\S]*?)<\/router\-outlet>/;
 
-    const config = getConfig(host);
-    const app = getAppFromConfig(config, options.clientApp || '0');
-    if (app === null) {
-      throw new SchematicsException(formatMissingAppMsg('Client', options.clientApp));
-    }
-
-    const componentPath = getBootstrapComponentPath(host, app);
+    const clientProject = getClientProject(host, options);
+    const componentPath = getBootstrapComponentPath(host, clientProject);
     const tmpl = getComponentTemplateInfo(host, componentPath);
     const template = getComponentTemplate(host, componentPath, tmpl);
     if (!routerOutletCheckRegex.test(template)) {
@@ -149,51 +154,54 @@ function validateProject(options: AppShellOptions): Rule {
   };
 }
 
-function addUniversalApp(options: AppShellOptions): Rule {
+function addUniversalTarget(options: AppShellOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
-    const config = getConfig(host);
-    const appConfig = getAppFromConfig(config, options.universalApp);
-
-    if (appConfig && appConfig.platform === 'server') {
-      return host;
-    } else if (appConfig && appConfig.platform !== 'server') {
-      throw new SchematicsException(
-        `Invalid platform for universal app (${options.universalApp}), value must be "server".`);
+    const architect = getClientArchitect(host, options);
+    if (architect !== null) {
+      if (architect.server !== undefined) {
+        return host;
+      }
     }
 
     // Copy options.
     const universalOptions = {
       ...options,
-      name: options.universalApp,
+      name: options.universalProject,
     };
 
     // Delete non-universal options.
-    delete universalOptions.universalApp;
+    delete universalOptions.universalProject;
     delete universalOptions.route;
 
     return schematic('universal', universalOptions)(host, context);
   };
 }
 
-function addAppShellConfig(options: AppShellOptions): Rule {
+function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
   return (host: Tree) => {
-    const config = getConfig(host);
-    const app = getAppFromConfig(config, options.clientApp || '0');
-
-    if (!app) {
-      throw new SchematicsException(formatMissingAppMsg('Client', options.clientApp));
-    }
-
     if (!options.route) {
       throw new SchematicsException(`Route is not defined`);
     }
 
-    app.appShell = {
-      app: options.universalApp,
+    const workspace = getWorkspace(host);
+    const workspacePath = getWorkspacePath(host);
+
+    const appShellTarget: JsonObject = {
+      browserTarget: `${options.clientProject}:build`,
+      serverTarget: `${options.clientProject}:server`,
       route: options.route,
     };
 
-    host.overwrite('/.angular-cli.json', JSON.stringify(config, null, 2));
+    if (!workspace.projects[options.clientProject]) {
+      throw new SchematicsException(`Client app ${options.clientProject} not found.`);
+    }
+    const clientProject = workspace.projects[options.clientProject];
+    if (!clientProject.architect) {
+      throw new Error('Client project architect not found.');
+    }
+    clientProject.architect['app-shell'] = appShellTarget;
+
+    host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
 
     return host;
   };
@@ -201,12 +209,9 @@ function addAppShellConfig(options: AppShellOptions): Rule {
 
 function addRouterModule(options: AppShellOptions): Rule {
   return (host: Tree) => {
-    const config = getConfig(host);
-    const app = getAppFromConfig(config, options.clientApp || '0');
-    if (app === null) {
-      throw new SchematicsException(formatMissingAppMsg('Client', options.clientApp));
-    }
-    const modulePath = getAppModulePath(host, app);
+    const clientArchitect = getClientArchitect(host, options);
+    const mainPath = clientArchitect.build.options.main;
+    const modulePath = getAppModulePath(host, mainPath);
     const moduleSource = getSourceFile(host, modulePath);
     const changes = addImportToModule(moduleSource, modulePath, 'RouterModule', '@angular/router');
     const recorder = host.beginUpdate(modulePath);
@@ -240,12 +245,10 @@ function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.Proper
 
 function addServerRoutes(options: AppShellOptions): Rule {
   return (host: Tree) => {
-    const config = getConfig(host);
-    const app = getAppFromConfig(config, options.universalApp);
-    if (app === null) {
-      throw new SchematicsException(formatMissingAppMsg('Universal/server', options.universalApp));
-    }
-    const modulePath = getServerModulePath(host, app);
+    const clientProject = getClientProject(host, options);
+    const architect = getClientArchitect(host, options);
+    // const mainPath = universalArchitect.build.options.main;
+    const modulePath = getServerModulePath(host, clientProject, architect);
     if (modulePath === null) {
       throw new SchematicsException('Universal/server module not found.');
     }
@@ -301,20 +304,41 @@ function addServerRoutes(options: AppShellOptions): Rule {
 function addShellComponent(options: AppShellOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
 
-    const componentOptions = {
+    const componentOptions: ComponentOptions = {
       name: 'app-shell',
       module: options.rootModuleFileName,
+      project: options.clientProject,
     };
 
     return schematic('component', componentOptions)(host, context);
   };
 }
 
+function getClientProject(host: Tree, options: AppShellOptions): Project {
+  const workspace = getWorkspace(host);
+  const clientProject = workspace.projects[options.clientProject];
+  if (!clientProject) {
+    throw new SchematicsException(formatMissingAppMsg('Client', options.clientProject));
+  }
+
+  return clientProject;
+}
+
+function getClientArchitect(host: Tree, options: AppShellOptions): Architect {
+  const clientArchitect = getClientProject(host, options).architect;
+
+  if (!clientArchitect) {
+    throw new Error('Client project architect not found.');
+  }
+
+  return clientArchitect;
+}
+
 export default function (options: AppShellOptions): Rule {
   return chain([
     validateProject(options),
-    addUniversalApp(options),
-    addAppShellConfig(options),
+    addUniversalTarget(options),
+    addAppShellConfigToWorkspace(options),
     addRouterModule(options),
     addServerRoutes(options),
     addShellComponent(options),

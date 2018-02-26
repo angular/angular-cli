@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize, strings } from '@angular-devkit/core';
+import { JsonObject, normalize, parseJson, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -14,52 +14,69 @@ import {
   apply,
   chain,
   mergeWith,
+  move,
   template,
   url,
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
+import { getWorkspacePath } from '../../../angular/pwa/utility/config';
+import {
+  Architect,
+  Project,
+  WorkspaceSchema,
+} from '../../../angular_devkit/core/src/workspace/workspace-schema';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { AppConfig, getAppFromConfig, getConfig } from '../utility/config';
+import { getWorkspace } from '../utility/config';
 import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
 import { Schema as UniversalOptions } from './schema';
 
 
+function getClientProject(host: Tree, options: UniversalOptions): Project {
+  const workspace = getWorkspace(host);
+  const clientProject = workspace.projects[options.clientProject];
+  if (!clientProject) {
+    throw new SchematicsException(`Client app ${options.clientProject} not found.`);
+  }
+
+  return clientProject;
+}
+
+function getClientArchitect(host: Tree, options: UniversalOptions): Architect {
+  const clientArchitect = getClientProject(host, options).architect;
+
+  if (!clientArchitect) {
+    throw new Error('Client project architect not found.');
+  }
+
+  return clientArchitect;
+}
+
 function updateConfigFile(options: UniversalOptions): Rule {
   return (host: Tree) => {
-    const config = getConfig(host);
-    const clientApp = getAppFromConfig(config, options.clientApp || '0');
-    if (clientApp === null) {
-      throw new SchematicsException('Client app not found.');
-    }
-    options.test = options.test || clientApp.test;
-
-    const tsCfg = options.tsconfigFileName && options.tsconfigFileName.endsWith('.json')
-      ? options.tsconfigFileName : `${options.tsconfigFileName}.json`;
-    const testTsCfg = options.testTsconfigFileName && options.testTsconfigFileName.endsWith('.json')
-      ? options.testTsconfigFileName : `${options.testTsconfigFileName}.json`;
-
-    const serverApp: AppConfig = {
-      ...clientApp,
-      platform: 'server',
-      root: options.root,
-      outDir: options.outDir,
-      index: options.index,
-      main: options.main,
-      test: options.test,
-      tsconfig: tsCfg,
-      testTsconfig: testTsCfg,
-      polyfills: undefined,
+    const builderOptions: JsonObject = {
+      outputPath: `dist/${options.clientProject}-server`,
+      main: `projects/${options.clientProject}/src/main.server.ts`,
+      tsConfig: `projects/${options.clientProject}/tsconfig.server.json`,
     };
-    if (options.name) {
-      serverApp.name = options.name;
-    }
-    if (!config.apps) {
-      config.apps = [];
-    }
-    config.apps.push(serverApp);
+    const serverTarget: JsonObject = {
+      builder: '@angular-devkit/build-webpack:server',
+      options: builderOptions,
+    };
+    const workspace = getWorkspace(host);
 
-    host.overwrite('/.angular-cli.json', JSON.stringify(config, null, 2));
+    if (!workspace.projects[options.clientProject]) {
+      throw new SchematicsException(`Client app ${options.clientProject} not found.`);
+    }
+    const clientProject = workspace.projects[options.clientProject];
+    if (!clientProject.architect) {
+      throw new Error('Client project architect not found.');
+    }
+    clientProject.architect.server = serverTarget;
+
+    const workspacePath = getWorkspacePath(host);
+
+    host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
 
     return host;
   };
@@ -86,12 +103,8 @@ function findBrowserModuleImport(host: Tree, modulePath: string): ts.Node {
 
 function wrapBootstrapCall(options: UniversalOptions): Rule {
   return (host: Tree) => {
-    const config = getConfig(host);
-    const clientApp = getAppFromConfig(config, options.clientApp || '0');
-    if (clientApp === null) {
-      throw new SchematicsException('Client app not found.');
-    }
-    const mainPath = normalize(`/${clientApp.root}/${clientApp.main}`);
+    const clientArchitect = getClientArchitect(host, options);
+    const mainPath = normalize('/' + clientArchitect.build.options.main);
     let bootstrapCall: ts.Node | null = findBootstrapModuleCall(host, mainPath);
     if (bootstrapCall === null) {
       throw new SchematicsException('Bootstrap module not found.');
@@ -118,15 +131,13 @@ function wrapBootstrapCall(options: UniversalOptions): Rule {
 
 function addServerTransition(options: UniversalOptions): Rule {
   return (host: Tree) => {
-    const config = getConfig(host);
-    const clientApp = getAppFromConfig(config, options.clientApp || '0');
-    if (clientApp === null) {
-      throw new SchematicsException('Client app not found.');
-    }
-    const mainPath = normalize(`/${clientApp.root}/${clientApp.main}`);
+    const clientProject = getClientProject(host, options);
+    const clientArchitect = getClientArchitect(host, options);
+    const mainPath = normalize('/' + clientArchitect.build.options.main);
 
     const bootstrapModuleRelativePath = findBootstrapModulePath(host, mainPath);
-    const bootstrapModulePath = normalize(`/${clientApp.root}/${bootstrapModuleRelativePath}.ts`);
+    const bootstrapModulePath = normalize(
+      `/${clientProject.root}/src/${bootstrapModuleRelativePath}.ts`);
 
     const browserModuleImport = findBrowserModuleImport(host, bootstrapModulePath);
     const appId = options.appId;
@@ -160,30 +171,37 @@ function addDependencies(): Rule {
   };
 }
 
-function updateGitignore(options: UniversalOptions): Rule {
-  return (host: Tree) => {
-    const ignorePath = normalize('/.gitignore');
-    const buffer = host.read(ignorePath);
-    if (buffer === null) {
-      // Assumption is made that there is no git repository.
-      return host;
-    } else {
-      const content = buffer.toString();
-      host.overwrite(ignorePath, `${content}\n${options.outDir}`);
-    }
+function getTsConfigOutDir(host: Tree, architect: Architect): string {
+  const tsConfigPath = architect.build.options.tsConfig;
+  const tsConfigBuffer = host.read(tsConfigPath);
+  if (!tsConfigBuffer) {
+    throw new SchematicsException(`Could not read ${tsConfigPath}`);
+  }
+  const tsConfigContent = tsConfigBuffer.toString();
+  const tsConfig = parseJson(tsConfigContent);
+  if (tsConfig === null || typeof tsConfig !== 'object' || Array.isArray(tsConfig) ||
+      tsConfig.compilerOptions === null || typeof tsConfig.compilerOptions !== 'object' ||
+      Array.isArray(tsConfig.compilerOptions)) {
+    throw new SchematicsException(`Invalid tsconfig - ${tsConfigPath}`);
+  }
+  const outDir = tsConfig.compilerOptions.outDir;
 
-    return host;
-  };
+  return outDir as string;
 }
 
 export default function (options: UniversalOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
+    const clientProject = getClientProject(host, options);
+    const clientArchitect = getClientArchitect(host, options);
+    const outDir = getTsConfigOutDir(host, clientArchitect);
     const templateSource = apply(url('./files'), [
       template({
         ...strings,
         ...options as object,
         stripTsExtension: (s: string) => { return s.replace(/\.ts$/, ''); },
+        outDir,
       }),
+      move(clientProject.root),
     ]);
 
     return chain([
@@ -192,7 +210,6 @@ export default function (options: UniversalOptions): Rule {
       updateConfigFile(options),
       wrapBootstrapCall(options),
       addServerTransition(options),
-      updateGitignore(options),
     ])(host, context);
   };
 }

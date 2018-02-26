@@ -8,29 +8,13 @@
 
 export interface Schema {
     /**
-     * Name of the universal app
-     */
-    name?: string;
-    /**
      * Name or index of related client app.
      */
-    clientApp?: string;
+    clientProject: string;
     /**
      * The appId to use withServerTransition.
      */
     appId?: string;
-    /**
-     * The output directory for build results.
-     */
-    outDir?: string;
-    /**
-     * The root directory of the app.
-     */
-    root?: string;
-    /**
-     * Name of the index file
-     */
-    index?: string;
     /**
      * The name of the main entry-point file.
      */
@@ -59,5 +43,4 @@ export interface Schema {
      * The name of the root module class.
      */
     rootModuleClassName?: string;
-    sourceDir?: string;
 }

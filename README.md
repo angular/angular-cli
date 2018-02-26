@@ -59,19 +59,20 @@ This is a monorepo which contains many packages:
 **Schematics** | [`@angular-devkit/schematics`](http://npmjs.com/packages/@angular-devkit/schematics) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fschematics/latest.svg)](http://npmjs.com/packages/@angular-devkit/schematics) | [![README](https://img.shields.io/badge/README--green.svg)](https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md)
 **Schematics CLI** | [`@angular-devkit/schematics-cli`](http://npmjs.com/packages/@angular-devkit/schematics-cli) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fschematics-cli/latest.svg)](http://npmjs.com/packages/@angular-devkit/schematics-cli) | 
 
+#### Schematics
+
+| Project | Package | Version | Links |
+|---|---|---|---|
+**Angular PWA Schematics** | [`@angular/pwa`](http://npmjs.com/packages/@angular/pwa) | [![latest](https://img.shields.io/npm/v/%40angular%2Fpwa/latest.svg)](http://npmjs.com/packages/@angular/pwa) | 
+**Angular Schematics** | [`@schematics/angular`](http://npmjs.com/packages/@schematics/angular) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fangular/latest.svg)](http://npmjs.com/packages/@schematics/angular) | 
+**Package JSON Update Schematics** | [`@schematics/package-update`](http://npmjs.com/packages/@schematics/package-update) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fpackage-update/latest.svg)](http://npmjs.com/packages/@schematics/package-update) | 
+**Schematics Schematics** | [`@schematics/schematics`](http://npmjs.com/packages/@schematics/schematics) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fschematics/latest.svg)](http://npmjs.com/packages/@schematics/schematics) | 
+**Package Update Schematics** | [`@schematics/update`](http://npmjs.com/packages/@schematics/update) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fupdate/latest.svg)](http://npmjs.com/packages/@schematics/update) | 
+
 #### Misc
 
 | Project | Package | Version | Links |
 |---|---|---|---|
 **Webpack Angular Plugin** | [`@ngtools/webpack`](http://npmjs.com/packages/@ngtools/webpack) | [![latest](https://img.shields.io/npm/v/%40ngtools%2Fwebpack/latest.svg)](http://npmjs.com/packages/@ngtools/webpack) | 
-
-#### Schematics
-
-| Project | Package | Version | Links |
-|---|---|---|---|
-**Angular Schematics** | [`@schematics/angular`](http://npmjs.com/packages/@schematics/angular) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fangular/latest.svg)](http://npmjs.com/packages/@schematics/angular) | 
-**Package JSON Update Schematics** | [`@schematics/package-update`](http://npmjs.com/packages/@schematics/package-update) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fpackage-update/latest.svg)](http://npmjs.com/packages/@schematics/package-update) | 
-**Schematics Schematics** | [`@schematics/schematics`](http://npmjs.com/packages/@schematics/schematics) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fschematics/latest.svg)](http://npmjs.com/packages/@schematics/schematics) | 
-**Package Update Schematics** | [`@schematics/update`](http://npmjs.com/packages/@schematics/update) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fupdate/latest.svg)](http://npmjs.com/packages/@schematics/update) | 
 
 

@@ -8,7 +8,15 @@
 
 export interface Schema {
     /**
-     * Name or index of related client app.
+     * The name of the project.
      */
-    app?: string;
+    project: string;
+    /**
+     * ": "The target to apply service worker to.
+     */
+    target: string;
+    /**
+     * The configuration to apply service worker to.
+     */
+    configuration: string;
 }

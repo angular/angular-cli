@@ -5,62 +5,64 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Tree } from '@angular-devkit/schematics';
-import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
+import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
-import { Schema as NgNewOptions } from '../ng-new/schema';
+import { Schema as ApplicationOptions } from '../application/schema';
+import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as UniversalOptions } from './schema';
 
-// TODO: fix these tests once workspace is implemented
-xdescribe('Universal Schematic', () => {
+describe('Universal Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
   );
   const defaultOptions: UniversalOptions = {
-    name: 'foo',
+    clientProject: 'bar',
   };
 
-  let appTree: Tree;
+  const workspaceOptions: WorkspaceOptions = {
+    name: 'workspace',
+    newProjectRoot: 'projects',
+    version: '6.0.0',
+  };
+
+  const appOptions: ApplicationOptions = {
+    name: 'bar',
+    inlineStyle: false,
+    inlineTemplate: false,
+    viewEncapsulation: 'Emulated',
+    routing: false,
+    style: 'css',
+    skipTests: false,
+  };
+
+  let appTree: UnitTestTree;
 
   beforeEach(() => {
-    const ngNewOptions: NgNewOptions = {
-      directory: '',
-      name: 'universal-app',
-      inlineStyle: false,
-      inlineTemplate: false,
-      viewEncapsulation: 'None',
-      version: '1.2.3',
-      routing: false,
-      style: 'css',
-      skipTests: false,
-    };
-    appTree = schematicRunner.runSchematic('ng-new', ngNewOptions);
+    appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
+    appTree = schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
   it('should create a root module file', () => {
     const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/src/app/app.server.module.ts';
-    const file = tree.files.filter(f => f === filePath)[0];
-    expect(file).toBeDefined();
+    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    expect(tree.exists(filePath)).toEqual(true);
   });
 
   it('should create a main file', () => {
     const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/src/main.server.ts';
-    const file = tree.files.filter(f => f === filePath)[0];
-    expect(file).toBeDefined();
+    const filePath = '/projects/bar/src/main.server.ts';
+    expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/export { AppServerModule } from '\.\/app\/app\.server\.module'/);
   });
 
   it('should create a tsconfig file', () => {
     const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/src/tsconfig.server.json';
-    const file = tree.files.filter(f => f === filePath)[0];
-    expect(file).toBeDefined();
+    const filePath = '/projects/bar/tsconfig.server.json';
+    expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/\"outDir\": \"\.\.\/dist-server\"/);
+    expect(contents).toMatch('../../out-tsc/app-server');
   });
 
   it('should add dependency: @angular/platform-server', () => {
@@ -70,49 +72,31 @@ xdescribe('Universal Schematic', () => {
     expect(contents).toMatch(/\"@angular\/platform-server\": \"/);
   });
 
-  it('should update .angular-cli.json with a server app', () => {
+  it('should update workspace with a server target', () => {
     const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/.angular-cli.json';
+    const filePath = '/angular.json';
     const contents = tree.readContent(filePath);
-
     const config = JSON.parse(contents.toString());
-    expect(config.apps.length).toEqual(2);
-    const app = config.apps[1];
-    expect(app.platform).toEqual('server');
-    expect(app.root).toEqual('src');
-    expect(app.outDir).toEqual('dist-server');
-    expect(app.index).toEqual('index.html');
-    expect(app.main).toEqual('main.server.ts');
-    // // TODO: re-add this check when updating this schematic to use workspace.
-    // expect(app.test).toEqual('test.ts');
-    expect(app.tsconfig).toEqual('tsconfig.server.json');
-    expect(app.testTsconfig).toEqual('tsconfig.spec.json');
-    // TODO: re-add this check when updating this schematic to use workspace.
-    // expect(app.environmentSource).toEqual('environments/environment.ts');
-    expect(app.polyfills).not.toBeDefined();
+    const arch = config.projects.bar.architect;
+    expect(arch.server).toBeDefined();
+    expect(arch.server.builder).toBeDefined();
+    const opts = arch.server.options;
+    expect(opts.outputPath).toEqual('dist/bar-server');
+    expect(opts.main).toEqual('projects/bar/src/main.server.ts');
+    expect(opts.tsConfig).toEqual('projects/bar/tsconfig.server.json');
   });
 
   it('should add a server transition to BrowerModule import', () => {
     const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/src/app/app.module.ts';
+    const filePath = '/projects/bar/src/app/app.module.ts';
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/BrowserModule\.withServerTransition\({ appId: 'serverApp' }\)/);
   });
 
   it('should wrap the bootstrap call in a DOMContentLoaded event handler', () => {
     const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/src/main.ts';
+    const filePath = '/projects/bar/src/main.ts';
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {/);
-  });
-
-  it('should update .gitignore with the server outDir', () => {
-    const outDir = 'my-out-dir';
-    const options = {...defaultOptions, outDir: outDir};
-    const tree = schematicRunner.runSchematic('universal', options, appTree);
-    const filePath = '/.gitignore';
-    const contents = tree.readContent(filePath);
-
-    expect(contents).toMatch(outDir);
   });
 });

@@ -6,4 +6,4 @@ if (environment.production) {
   enableProdMode();
 }
 
-export { <%= rootModuleClassName %> } from './<%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>';
+export { <%= rootModuleClassName %> } from './app/<%= stripTsExtension(rootModuleFileName) %>';

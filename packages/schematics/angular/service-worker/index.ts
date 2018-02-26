@@ -10,35 +10,54 @@ import {
   SchematicContext,
   SchematicsException,
   Tree,
+  UpdateRecorder,
   chain,
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import { addSymbolToNgModuleMetadata, isImported } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { AppConfig, CliConfig, getAppFromConfig, getConfig } from '../utility/config';
+import {
+  getWorkspace,
+  getWorkspacePath,
+} from '../utility/config';
 import { getAppModulePath } from '../utility/ng-ast-utils';
 import { insertImport } from '../utility/route-utils';
 import { Schema as ServiceWorkerOptions } from './schema';
 
-const configFilePath = '/.angular-cli.json';
 const packageJsonPath = '/package.json';
-
-function getAppConfig(config: CliConfig, nameOrIndex: string): AppConfig {
-  const appConfig = getAppFromConfig(config, nameOrIndex);
-  if (!appConfig) {
-    throw new SchematicsException(`App (${nameOrIndex}) not found.`);
-  }
-
-  return appConfig;
-}
 
 function updateConfigFile(options: ServiceWorkerOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
-    context.logger.debug(`updating config file (${configFilePath})`);
-    const config = getConfig(host);
-    const appConfig = getAppConfig(config, options.app || '0');
-    appConfig.serviceWorker = true;
-    host.overwrite(configFilePath, JSON.stringify(config, null, 2));
+    context.logger.debug('updating config file.');
+    const workspacePath = getWorkspacePath(host);
+
+    const workspace = getWorkspace(host);
+
+    const project = workspace.projects[options.project];
+
+    if (!project) {
+      throw new Error(`Project is not defined in this workspace.`);
+    }
+
+    if (!project.architect) {
+      throw new Error(`Architect is not defined for this project.`);
+    }
+
+    if (!project.architect[options.target]) {
+      throw new Error(`Target is not defined for this project.`);
+    }
+
+    let applyTo = project.architect[options.target].options;
+
+    if (options.configuration &&
+        project.architect[options.target].configurations &&
+        project.architect[options.target].configurations[options.configuration]) {
+      applyTo = project.architect[options.target].configurations[options.configuration];
+    }
+
+    applyTo.serviceWorker = true;
+
+    host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
 
     return host;
   };
@@ -69,8 +88,13 @@ function updateAppModule(options: ServiceWorkerOptions): Rule {
     context.logger.debug('Updating appmodule');
 
     // find app module
-    const appConfig = getAppConfig(getConfig(host), options.app || '0');
-    const modulePath = getAppModulePath(host, appConfig);
+    const workspace = getWorkspace(host);
+    const project = workspace.projects[options.project];
+    if (!project.architect) {
+      throw new Error('Project architect not found.');
+    }
+    const mainPath = project.architect.build.options.main;
+    const modulePath = getAppModulePath(host, mainPath);
     context.logger.debug(`module path: ${modulePath}`);
 
     // add import
