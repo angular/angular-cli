@@ -8,8 +8,8 @@ import { getGlobalVariable } from '../../utils/env';
 import { wait, expectToFail } from '../../utils/utils';
 
 
-const failedRe = /webpack: Failed to compile/;
-const successRe = /webpack: Compiled successfully/;
+const failedRe = /: Failed to compile/;
+const successRe = /: Compiled successfully/;
 const errorRe = /ERROR in/;
 const extraErrors = [
   `Final loader didn't return a Buffer or String`,

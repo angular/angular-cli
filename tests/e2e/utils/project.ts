@@ -27,7 +27,7 @@ export function updateTsConfig(fn: (json: any) => any | void) {
 export function ngServe(...args: string[]) {
   return execAndWaitForOutputToMatch('ng',
     ['serve', ...args],
-    /webpack: bundle is now VALID|webpack: Compiled successfully./);
+    /: Compiled successfully./);
 }
 
 

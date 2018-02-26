@@ -6,7 +6,7 @@ import {
 import {appendToFile} from '../../utils/fs';
 import {expectToFail, wait} from '../../utils/utils';
 
-const webpackGoodRegEx = /webpack: Compiled successfully./;
+const webpackGoodRegEx = /: Compiled successfully./;
 
 export default function() {
 
