@@ -25,30 +25,43 @@ export function resolveWithPaths(
     return;
   }
 
+  const originalRequest = request.request.trim();
+
+  // Relative requests are not mapped
+  if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
+    callback(null, request);
+    return;
+  }
+
   // check if any path mapping rules are relevant
   const pathMapOptions = [];
   for (const pattern in compilerOptions.paths) {
       // can only contain zero or one
       const starIndex = pattern.indexOf('*');
       if (starIndex === -1) {
-        if (pattern === request.request) {
+        if (pattern === originalRequest) {
           pathMapOptions.push({
             partial: '',
             potentials: compilerOptions.paths[pattern]
           });
         }
+      } else if (starIndex === 0 && pattern.length === 1) {
+        pathMapOptions.push({
+          partial: originalRequest,
+          potentials: compilerOptions.paths[pattern],
+        });
       } else if (starIndex === pattern.length - 1) {
-        if (request.request.startsWith(pattern.slice(0, -1))) {
+        if (originalRequest.startsWith(pattern.slice(0, -1))) {
           pathMapOptions.push({
-            partial: request.request.slice(pattern.length - 1),
+            partial: originalRequest.slice(pattern.length - 1),
             potentials: compilerOptions.paths[pattern]
           });
         }
       } else {
         const [prefix, suffix] = pattern.split('*');
-        if (request.request.startsWith(prefix) && request.request.endsWith(suffix)) {
+        if (originalRequest.startsWith(prefix) && originalRequest.endsWith(suffix)) {
           pathMapOptions.push({
-            partial: request.request.slice(prefix.length).slice(0, -suffix.length),
+            partial: originalRequest.slice(prefix.length).slice(0, -suffix.length),
             potentials: compilerOptions.paths[pattern]
           });
         }
@@ -79,7 +92,7 @@ export function resolveWithPaths(
   }
 
   const moduleResolver = ts.resolveModuleName(
-    request.request,
+    originalRequest,
     request.contextInfo.issuer,
     compilerOptions,
     host,

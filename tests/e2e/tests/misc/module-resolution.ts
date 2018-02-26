@@ -5,6 +5,13 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default async function () {
+  await updateJsonFile('src/tsconfig.app.json', tsconfig => {
+    tsconfig.compilerOptions.paths = {
+      '*': [ '../node_modules/*' ],
+    };
+  });
+  await ng('build');
+
   await createDir('xyz');
   await moveFile(
     'node_modules/@angular/common',
