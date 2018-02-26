@@ -7,7 +7,7 @@ import { writeFile, prependToFile } from '../../utils/fs';
 import {getGlobalVariable} from '../../utils/env';
 
 
-const successRe = /webpack: Compiled successfully/;
+const successRe = /: Compiled successfully/;
 
 export default async function() {
   if (process.platform.startsWith('win')) {
