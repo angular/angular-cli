@@ -8,7 +8,7 @@ import { getGlobalVariable } from '../../../utils/env';
 import { request } from '../../../utils/http';
 import { wait } from '../../../utils/utils';
 
-const validBundleRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
+const validBundleRegEx = /: Compiled successfully./;
 
 export default function () {
   if (process.platform.startsWith('win')) {

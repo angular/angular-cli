@@ -14,7 +14,7 @@ import { wait } from '../../utils/utils';
 
 export default function () {
   const protractorGoodRegEx = /Jasmine started/;
-  const webpackGoodRegEx = /webpack: Compiled successfully./;
+  const webpackGoodRegEx = /: Compiled successfully./;
 
   // Create an express api for the Angular app to call.
   const app = express();

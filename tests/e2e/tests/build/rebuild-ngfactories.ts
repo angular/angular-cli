@@ -7,7 +7,7 @@ import { appendToFile, writeMultipleFiles, replaceInFile } from '../../utils/fs'
 import { request } from '../../utils/http';
 import { getGlobalVariable } from '../../utils/env';
 
-const validBundleRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
+const validBundleRegEx = /: Compiled successfully./;
 
 export default function () {
   if (process.platform.startsWith('win')) {

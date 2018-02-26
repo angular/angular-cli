@@ -6,7 +6,7 @@ import {
 import {appendToFile} from '../../utils/fs';
 import {getGlobalVariable} from '../../utils/env';
 
-const webpackGoodRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
+const webpackGoodRegEx = /: Compiled successfully./;
 
 export default function() {
   if (process.platform.startsWith('win')) {

@@ -156,7 +156,7 @@ export default Task.extend({
       // we can override the file watcher instead.
       webpackConfig.plugins.unshift({
         apply: (compiler: any) => {
-          compiler.plugin('after-environment', () => {
+          compiler.hooks.afterEnvironment.tap('angular-cli', () => {
             compiler.watchFileSystem = { watch: () => { } };
           });
         }
@@ -166,7 +166,7 @@ export default Task.extend({
     webpackCompiler = webpack(webpackConfig);
 
     if (rebuildDoneCb) {
-      webpackCompiler.plugin('done', rebuildDoneCb);
+      webpackCompiler.hooks.done.tap('angular-cli', rebuildDoneCb);
     }
 
     const statsConfig = getWebpackStatsConfig(serveTaskOptions.verbose);
@@ -222,8 +222,7 @@ export default Task.extend({
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
       },
-      stats: serveTaskOptions.verbose ? statsConfig : 'none',
-      inline: true,
+      stats: serveTaskOptions.verbose ? statsConfig : false,
       proxy: proxyConfig,
       compress: serveTaskOptions.target === 'production',
       watchOptions: {
@@ -237,15 +236,14 @@ export default Task.extend({
       contentBase: false,
       public: serveTaskOptions.publicHost,
       disableHostCheck: serveTaskOptions.disableHostCheck,
-      publicPath: servePath
+      publicPath: servePath,
+      hot: serveTaskOptions.hmr,
     };
 
     if (sslKey != null && sslCert != null) {
       webpackDevServerConfiguration.key = sslKey;
       webpackDevServerConfiguration.cert = sslCert;
     }
-
-    webpackDevServerConfiguration.hot = serveTaskOptions.hmr;
 
     if (serveTaskOptions.target === 'production') {
       ui.writeLine(chalk.red(stripIndents`
@@ -266,8 +264,9 @@ export default Task.extend({
     `));
 
     const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfiguration);
-    if (!serveTaskOptions.verbose) {
-      webpackCompiler.plugin('done', (stats: any) => {
+
+    webpackCompiler.hooks.done.tap('angular-cli', (stats: webpack.Stats) => {
+      if (!serveTaskOptions.verbose) {
         const json = stats.toJson(statsConfig);
         this.ui.writeLine(statsToString(json, statsConfig));
         if (stats.hasWarnings()) {
@@ -276,21 +275,23 @@ export default Task.extend({
         if (stats.hasErrors()) {
           this.ui.writeError(statsErrorsToString(json, statsConfig));
         }
-      });
-    }
+      }
+
+      if (serveTaskOptions.open) {
+        opn(serverAddress + servePath);
+      }
+    });
 
     return new Promise((_resolve, reject) => {
       const httpServer = server.listen(
         serveTaskOptions.port,
         serveTaskOptions.host,
-        (err: any, _stats: any) => {
+        (err: any) => {
           if (err) {
-            return reject(err);
+            reject(err);
           }
-          if (serveTaskOptions.open) {
-            opn(serverAddress + servePath);
-          }
-        });
+        },
+      );
       // Node 8 has a keepAliveTimeout bug which doesn't respect active connections.
       // Connections will end after ~5 seconds (arbitrary), often not letting the full download
       // of large pieces of content, such as a vendor javascript file.  This results in browsers
@@ -304,9 +305,8 @@ export default Task.extend({
     })
     .catch((err: Error) => {
       if (err) {
-        this.ui.writeError('\nAn error occured during the build:\n' + ((err && err.stack) || err));
+        this.ui.writeError('\nAn error occured during the build:\n' + (err.stack || err));
       }
-      throw err;
     });
   }
 });
