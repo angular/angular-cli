@@ -33,8 +33,28 @@ server.route({
       .then(err => reply(boom.wrap(err)));
   }
 });
+```
 
+## Configuring the URL and Document
 
+It is possible to override the default URL and document fetched when the rendering engine
+is called. To do so, simply pass in a `url` and/or `document` string to the renderer as follows:
+
+```ts
+server.route({
+  method: 'GET',
+  path: '/{path*}',
+  handler: (req: Request, reply: Base_Reply) => {
+    let url = 'http://someurl.com';
+    let doc = '<html><head><title>New doc</title></head></html>';
+    hapiEngine({
+      req,
+      url,
+      document: doc
+    }).then(html => reply(html))
+      .then(err => reply(boom.wrap(err)));
+  }
+});
 ```
 
 ## Extra Providers

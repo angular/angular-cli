@@ -27,6 +27,24 @@ app.get('/**/*', (req: Request, res: Response) => {
 });
 ```
 
+## Configuring the URL and Document
+
+It is possible to override the default URL and document fetched when the rendering engine
+is called. To do so, simply pass in a `url` and/or `document` string to the renderer as follows:
+
+```ts
+app.get('/**/*', (req: Request, res: Response) => {
+  let url = 'http://someurl.com';
+  let doc = '<html><head><title>New doc</title></head></html>';
+  res.render('../dist/index', {
+    req,
+    res,
+    url,
+    document: doc
+  });
+});
+```
+
 ## Extra Providers
 
 Extra Providers can be provided either on engine setup

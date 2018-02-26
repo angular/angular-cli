@@ -89,6 +89,32 @@ export default createServerRenderer(params => {
 
 ```
 
+## Configuring the URL and Document
+
+It is possible to override the default URL and document fetched when the rendering engine
+is called. To do so, simply pass in a `url` and/or `document` string to the renderer as follows:
+
+```ts
+// Platform-server provider configuration
+let url = 'http://someurl.com';
+let doc = '<html><head><title>New doc</title></head></html>';
+const setupOptions: IEngineOptions = {
+  appSelector: '<app></app>',
+  ngModule: ServerAppModule,
+  request: params,
+  providers: [
+    /* Other providers you want to pass into the App would go here
+    *    { provide: CookieService, useClass: ServerCookieService }
+
+    * ie: Just an example of Dependency injecting a Class for providing Cookies (that you passed down from the server)
+      (Where on the browser you'd have a different class handling cookies normally)
+    */
+  ],
+  url,
+  document: doc
+};
+```
+
 # What about on the .NET side?
 
 Previously, this was all done with TagHelpers and you passed in your main.server file to it: `<app asp-prerender-module="dist/main.server.js"></app>`, but this hindered us from getting the SEO benefits of prerendering.

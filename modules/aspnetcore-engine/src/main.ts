@@ -135,8 +135,8 @@ export function ngAspnetCoreEngine(options: IEngineOptions): Promise<IEngineRend
       getFactory(moduleOrFactory, compiler)
         .then(factory => {
           return renderModuleFactory(factory, {
-            document: options.appSelector,
-            url: options.request.url,
+            document: options.document || options.appSelector,
+            url: options.url || options.request.url,
             extraProviders: extraProviders
           });
         })

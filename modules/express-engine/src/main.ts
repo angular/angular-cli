@@ -33,6 +33,8 @@ export interface NgSetupOptions {
 export interface RenderOptions extends NgSetupOptions {
   req: Request;
   res?: Response;
+  url?: string;
+  document?: string;
 }
 
 /**
@@ -81,8 +83,8 @@ export function ngExpressEngine(setupOptions: NgSetupOptions) {
           {
             provide: INITIAL_CONFIG,
             useValue: {
-              document: getDocument(filePath),
-              url: options.req.originalUrl
+              document: options.document || getDocument(filePath),
+              url: options.url || options.req.originalUrl
             }
           }
         ]);
@@ -90,7 +92,7 @@ export function ngExpressEngine(setupOptions: NgSetupOptions) {
       getFactory(moduleOrFactory, compiler)
         .then(factory => {
           return renderModuleFactory(factory, {
-            extraProviders: extraProviders
+            extraProviders
           });
         })
         .then((html: string) => {
