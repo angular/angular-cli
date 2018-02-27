@@ -23,6 +23,7 @@
     "raw-loader": "^0.5.1",
     "sass-loader": "^6.0.3",
     "typescript": "~2.5.0",
-    "webpack": "2.2.1"
+    "webpack": "~4.0.1",
+    "webpack-cli": "~2.0.9"
   }
 }

@@ -1,4 +1,5 @@
 const ngToolsWebpack = require('@ngtools/webpack');
+const path = require('path');
 
 const flags = require('./webpack.flags.json');
 
@@ -11,7 +12,7 @@ module.exports = {
   },
   entry: './not/so/source/app/main.jit.ts',
   output: {
-    path: './dist',
+    path: path.resolve('./dist'),
     publicPath: 'dist/',
     filename: 'app.main.js'
   },
@@ -19,7 +20,7 @@ module.exports = {
     new ngToolsWebpack.AngularCompilerPlugin(require('./aotplugin.config.json'))
   ],
   module: {
-    loaders: [
+    rules: [
       { test: /\.scss$/, loaders: ['raw-loader', 'sass-loader', preprocessLoader] },
       { test: /\.css$/, loader: 'raw-loader' },
       { test: /\.html$/, loaders: ['raw-loader', preprocessLoader] },

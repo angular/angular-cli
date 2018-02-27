@@ -17,11 +17,12 @@
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
-    "node-sass": "^3.7.0",
+    "node-sass": "^4.7.0",
     "performance-now": "^0.2.0",
     "raw-loader": "^0.5.1",
-    "sass-loader": "^3.2.0",
+    "sass-loader": "^6.0.0",
     "typescript": "~2.4.2",
-    "webpack": "2.2.0"
+    "webpack": "~4.0.1",
+    "webpack-cli": "~2.0.9"
   }
 }
