@@ -10,7 +10,7 @@ import {expectToFail} from '../../../utils/utils';
 export default function(skipCleaning: () => void) {
   return Promise.resolve()
     .then(() => createProjectFromAsset('webpack/test-app-weird-ng5'))
-    .then(() => exec(normalize('node_modules/.bin/webpack'), '-p'))
+    .then(() => exec(normalize('node_modules/.bin/webpack-cli')))
     .then(() => expectFileToExist('dist/app.main.js'))
     .then(() => expectFileToExist('dist/0.app.main.js'))
     .then(() => expectFileToExist('dist/1.app.main.js'))
@@ -26,7 +26,7 @@ export default function(skipCleaning: () => void) {
     .then(() => updateJsonFile('webpack.flags.json', json => {
       json['DEBUG'] = true;
     }))
-    .then(() => exec(normalize('node_modules/.bin/webpack'), '-p'))
+    .then(() => exec(normalize('node_modules/.bin/webpack-cli')))
     .then(() => expectFileToMatch('dist/app.main.js', /DEBUG_ONLY/))
     .then(() => expectToFail(() => expectFileToMatch('dist/app.main.js', /PRODUCTION_ONLY/)))
 

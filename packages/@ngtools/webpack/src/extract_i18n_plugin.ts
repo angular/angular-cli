@@ -19,8 +19,6 @@ export interface ExtractI18nPluginOptions {
 export class ExtractI18nPlugin implements Tapable {
   private _resourceLoader: WebpackResourceLoader;
 
-  private _compilation: any = null;
-
   private _tsConfigPath: string;
   private _basePath: string;
   private _rootFilePath: string[];
@@ -137,27 +135,28 @@ export class ExtractI18nPlugin implements Tapable {
   }
 
   apply(compiler: any) {
-    compiler.plugin('make', (compilation: any, cb: any) => this._make(compilation, cb));
+    compiler.hooks.make.tapAsync(
+      'extract-i8n',
+      (compilation: any, cb: any) => this._make(compilation, cb)
+    );
 
-    compiler.plugin('after-emit', (compilation: any, cb: any) => {
-      this._compilation = null;
+    compiler.hooks.afterEmit.tapAsync('extract-i8n', (compilation: any, cb: any) => {
       compilation._ngToolsWebpackXi18nPluginInstance = null;
       cb();
     });
   }
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
-    this._compilation = compilation;
-    if (this._compilation._ngToolsWebpackXi18nPluginInstance) {
+    if (compilation._ngToolsWebpackXi18nPluginInstance) {
       return cb(new Error('An @ngtools/webpack xi18n plugin already exist for ' +
         'this compilation.'));
     }
-    if (!this._compilation._ngToolsWebpackPluginInstance) {
+    if (!compilation._ngToolsWebpackPluginInstance) {
       return cb(new Error('An @ngtools/webpack aot plugin does not exists ' +
         'for this compilation'));
     }
 
-    this._compilation._ngToolsWebpackXi18nPluginInstance = this;
+    compilation._ngToolsWebpackXi18nPluginInstance = this;
 
     this._resourceLoader.update(compilation);
 
@@ -177,7 +176,7 @@ export class ExtractI18nPlugin implements Tapable {
         });
       })
       .then(() => cb(), (err: any) => {
-        this._compilation.errors.push(err);
+        compilation.errors.push(err);
         cb(err);
       });
 
