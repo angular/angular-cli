@@ -41,7 +41,9 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         minify: buildOptions.target === 'production' ? {
           caseSensitive: true,
           collapseWhitespace: true,
-          keepClosingSlash: true
+          keepClosingSlash: true,
+          minifyCSS: true,
+          minifyJS: true
         } : false
     }));
     extraPlugins.push(new BaseHrefWebpackPlugin({
