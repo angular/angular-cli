@@ -11,10 +11,8 @@ import { of as observableOf } from 'rxjs/observable/of';
 import { concat, concatMap, ignoreElements, mergeMap, tap } from 'rxjs/operators';
 import { observable } from 'rxjs/symbol/observable';
 import { JsonArray, JsonObject, JsonValue } from '..';
-
-export type JsonPointer = string & {
-  __PRIVATE_DEVKIT_JSON_POINTER: void;
-};
+import { JsonPointer } from './interface';
+import { buildJsonPointer, joinJsonPointer } from './pointer';
 
 export interface JsonSchemaVisitor {
   (
@@ -37,29 +35,6 @@ export interface JsonVisitor {
 
 export interface ReferenceResolver<ContextT> {
   (ref: string, context?: ContextT): { context?: ContextT, schema?: JsonObject };
-}
-
-
-export function buildJsonPointer(fragments: string[]): JsonPointer {
-  return (
-    '/' + fragments.map(f => {
-      return f.replace(/~/g, '~0')
-              .replace(/\//g, '~1');
-    }).join('/')
-  ) as JsonPointer;
-}
-export function joinJsonPointer(root: JsonPointer, ...others: string[]): JsonPointer {
-  if (root == '/') {
-    return buildJsonPointer(others);
-  }
-
-  return (root + buildJsonPointer(others)) as JsonPointer;
-}
-export function parseJsonPointer(pointer: JsonPointer): string[] {
-  if (pointer === '') { return []; }
-  if (pointer.charAt(0) !== '/') { throw new Error('Relative pointer: ' + pointer); }
-
-  return pointer.substring(1).split(/\//).map(str => str.replace(/~1/g, '/').replace(/~0/g, '~'));
 }
 
 function _getObjectSubSchema(

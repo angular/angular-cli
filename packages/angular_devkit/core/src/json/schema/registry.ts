@@ -10,8 +10,8 @@ import * as http from 'http';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { of as observableOf } from 'rxjs/observable/of';
-import { concatMap, switchMap } from 'rxjs/operators';
-import { map } from 'rxjs/operators/map';
+import { concat, concatMap, ignoreElements, map, switchMap } from 'rxjs/operators';
+import { observable } from 'rxjs/symbol/observable';
 import { PartiallyOrderedSet } from '../../utils';
 import { JsonObject, JsonValue } from '../interface';
 import {
@@ -20,6 +20,7 @@ import {
   SchemaRegistry,
   SchemaValidator,
   SchemaValidatorResult,
+  SmartDefaultProvider,
 } from './interface';
 import { addUndefinedDefaults } from './transforms';
 import { JsonVisitor, visitJson } from './visitor';
@@ -30,6 +31,10 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   private _uriCache = new Map<string, JsonObject>();
   private _pre = new PartiallyOrderedSet<JsonVisitor>();
   private _post = new PartiallyOrderedSet<JsonVisitor>();
+
+  private _smartDefaultKeyword = false;
+  private _sourceMap = new Map<string, SmartDefaultProvider<{}>>();
+  private _smartDefaultRecord = new Map<string, JsonObject>();
 
   constructor(formats: SchemaFormat[] = []) {
     /**
@@ -136,7 +141,10 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     // in synchronous (if available).
     let validator: Observable<ajv.ValidateFunction>;
     try {
-      const maybeFnValidate = this._ajv.compile(schema);
+      const maybeFnValidate = this._ajv.compile({
+        $async: this._smartDefaultKeyword ? true : undefined,
+        ...schema,
+      });
       validator = observableOf(maybeFnValidate);
     } catch (e) {
       // Propagate the error.
@@ -195,6 +203,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 );
 
                 return dataObs.pipe(
+                  // Apply smart defaults.
+                  concatMap(data => this._applySmartDefaults(data)),
                   map(data => [data, valid]),
                 );
               } else {
@@ -232,7 +242,11 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     const validate = (data: any) => {
       const result = format.formatter.validate(data);
 
-      return result instanceof Observable ? result.toPromise() : result;
+      if (typeof result == 'boolean') {
+        return result;
+      } else {
+        return result.toPromise();
+      }
     };
 
     this._ajv.addFormat(format.name, {
@@ -241,5 +255,119 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     // AJV typings list `compare` as required, but it is optional.
     // tslint:disable-next-line:no-any
     } as any);
+  }
+
+  addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>) {
+    if (this._sourceMap.has(source)) {
+      throw new Error(source);
+    }
+
+    this._sourceMap.set(source, provider);
+
+    if (!this._smartDefaultKeyword) {
+      this._smartDefaultKeyword = true;
+
+      this._ajv.addKeyword('$default', {
+        modifying: true,
+        async: true,
+        compile: (schema, _parentSchema, it) => {
+          const source = this._sourceMap.get((schema as JsonObject).$source as string);
+
+          if (!source) {
+            throw new Error(`Invalid source: ${JSON.stringify(source)}.`);
+          }
+
+          // We cheat, heavily.
+          this._smartDefaultRecord.set(
+            // tslint:disable-next-line:no-any
+            JSON.stringify((it as any).dataPathArr.slice(1) as string[]),
+            schema,
+          );
+
+          return function() {
+            return true;
+          };
+        },
+      });
+    }
+  }
+
+  // tslint:disable-next-line:no-any
+  private _applySmartDefaults(data: any): Observable<any> {
+    function _set(
+      // tslint:disable-next-line:no-any
+      data: any,
+      fragments: string[],
+      value: {},
+      // tslint:disable-next-line:no-any
+      parent: any | null = null,
+      parentProperty?: string,
+    ): void {
+      for (let i = 0; i < fragments.length; i++) {
+        const f = fragments[i];
+
+        if (f[0] == 'i') {
+          if (!Array.isArray(data)) {
+            return;
+          }
+
+          for (let j = 0; j < data.length; j++) {
+            _set(data[j], fragments.slice(i + 1), value, data, '' + j);
+          }
+
+          return;
+        } else if (f.startsWith('key')) {
+          if (typeof data !== 'object') {
+            return;
+          }
+
+          Object.getOwnPropertyNames(data).forEach(property => {
+            _set(data[property], fragments.slice(i + 1), value, data, property);
+          });
+
+          return;
+        } else if (f.startsWith('\'') && f[f.length - 1] == '\'') {
+          const property = f
+            .slice(1, -1)
+            .replace(/\\'/g, '\'')
+            .replace(/\\n/g, '\n')
+            .replace(/\\r/g, '\r')
+            .replace(/\\f/g, '\f')
+            .replace(/\\t/g, '\t');
+          parent = data;
+          parentProperty = property;
+          data = data[property];
+        } else {
+          return;
+        }
+      }
+
+      if (parent && parentProperty) {
+        parent[parentProperty] = value;
+      }
+    }
+
+    return [...this._smartDefaultRecord.entries()].reduce((acc, [pointer, schema]) => {
+      const fragments = JSON.parse(pointer);
+      const source = this._sourceMap.get((schema as JsonObject).$source as string);
+
+      if (!source) {
+        throw new Error('Invalid source.');
+      }
+
+      let value = source(schema);
+      if (typeof value != 'object' || !(observable in value)) {
+        value = observableOf(value);
+      }
+
+      return acc.pipe(
+        concatMap(() => (value as Observable<{}>).pipe(
+          map(x => _set(data, fragments, x)),
+        )),
+      );
+    }, observableOf<void>(undefined)).pipe(
+      ignoreElements(),
+      concat(observableOf(data)),
+    );
   }
 }

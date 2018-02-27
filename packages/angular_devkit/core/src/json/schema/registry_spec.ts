@@ -251,4 +251,69 @@ describe('CoreSchemaRegistry', () => {
       )
       .subscribe(done, done.fail);
   });
+
+  it('supports smart defaults', done => {
+    const registry = new CoreSchemaRegistry();
+    const data: any = {
+      arr: [{}],
+    };
+
+    registry.addSmartDefaultProvider('test', (schema) => {
+      expect(schema).toEqual({
+        $source: 'test',
+      });
+
+      return true;
+    });
+    registry.addSmartDefaultProvider('test2', (schema) => {
+      expect(schema).toEqual({
+        $source: 'test2',
+        blue: 'yep',
+      });
+
+      return schema['blue'];
+    });
+
+    registry
+      .compile({
+        properties: {
+          bool: {
+            $ref: '#/definitions/example',
+          },
+          arr: {
+            items: {
+              properties: {
+                'test': {
+                  $ref: '#/definitions/other',
+                },
+              },
+            },
+          },
+        },
+        definitions: {
+          example: {
+            type: 'boolean',
+            $default: {
+              $source: 'test',
+            },
+          },
+          other: {
+            type: 'string',
+            $default: {
+              $source: 'test2',
+              blue: 'yep',
+            },
+          },
+        },
+      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(true);
+          expect(data.bool).toBe(true);
+          expect(data.arr[0].test).toBe('yep');
+        }),
+      )
+      .subscribe(done, done.fail);
+  });
 });

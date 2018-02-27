@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonArray, JsonObject, JsonValue } from '..';
-import { JsonPointer } from './visitor';
+import { JsonPointer } from './interface';
 
 
 export function addUndefinedDefaults(
