@@ -162,7 +162,9 @@ export class Architect {
       } as OptionsT,
     };
 
-    return target;
+    // Return a copy of the target object, JSON validation changes objects and we don't
+    // want the original properties to be modified.
+    return JSON.parse(JSON.stringify(target));
   }
 
   // Will run the target using the target.
