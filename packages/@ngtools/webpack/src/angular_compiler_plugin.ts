@@ -336,7 +336,7 @@ export class AngularCompilerPlugin {
           this._updateForkedTypeChecker(this._rootNames, this._getChangedCompilationFiles());
         }
 
-        // Use an identity function as all our paths are absolute already.
+         // Use an identity function as all our paths are absolute already.
         this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
         if (this._JitMode) {
@@ -649,7 +649,7 @@ export class AngularCompilerPlugin {
         // when the issuer is a `.ts` or `.ngfactory.js` file.
         nmf.hooks.beforeResolve.tapAsync('angular-compiler', (request: any, callback: any) => {
           if (this.done && (request.request.endsWith('.ts')
-            || (request.context.issuer && /\.ts|ngfactory\.js$/.test(request.context.issuer)))) {
+              || (request.context.issuer && /\.ts|ngfactory\.js$/.test(request.context.issuer)))) {
             this.done.then(() => callback(null, request), () => callback(null, request));
           } else {
             callback(null, request);
@@ -920,7 +920,7 @@ export class AngularCompilerPlugin {
       .map((resourcePath) => path.resolve(path.dirname(resolvedFileName), resourcePath));
 
     // These paths are meant to be used by the loader so we must denormalize them.
-    const uniqueDependencies = new Set([
+    const uniqueDependencies =  new Set([
       ...esImports,
       ...resourceImports,
       ...this.getResourceDependencies(resolvedFileName)
@@ -1069,6 +1069,7 @@ export class AngularCompilerPlugin {
             `please check that "${locale}" is a valid locale id.
             Proceeding with default locale data registration i.e. 'en'.
             If needed, localeData can be registered against custom locale in application module.`);
+          locale = 'en';
         }
       }
     }
