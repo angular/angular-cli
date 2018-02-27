@@ -1066,8 +1066,9 @@ export class AngularCompilerPlugin {
           locale = parentLocale;
         } else {
           console.log(`Unable to load the locale data file "@angular/common/locales/${locale}", ` +
-            `please check that "${locale}" is a valid locale id. Proceeding with default locale data registration i.e. 'en'. If needed, localeData can be registered against custom locale in application module.`);
-          locale = 'en';
+            `please check that "${locale}" is a valid locale id.
+            Proceeding with default locale data registration i.e. 'en'.
+            If needed, localeData can be registered against custom locale in application module.`);
         }
       }
     }
