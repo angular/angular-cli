@@ -16,7 +16,6 @@ interface CompilationOutput {
 export class WebpackResourceLoader {
   private _parentCompilation: any;
   private _context: string;
-  private _uniqueId = 0;
   private _resourceDependencies = new Map<string, string[]>();
   private _cachedResources = new Map<string, string>();
 
@@ -25,7 +24,6 @@ export class WebpackResourceLoader {
   update(parentCompilation: any) {
     this._parentCompilation = parentCompilation;
     this._context = parentCompilation.context;
-    this._uniqueId = 0;
   }
 
   getResourceDependencies(filePath: string) {
@@ -43,33 +41,19 @@ export class WebpackResourceLoader {
       return Promise.reject('Cannot use a JavaScript or TypeScript file for styleUrl.');
     }
 
-    const compilerName = `compiler(${this._uniqueId++})`;
     const outputOptions = { filename: filePath };
     const relativePath = path.relative(this._context || '', filePath);
     const childCompiler = this._parentCompilation.createChildCompiler(relativePath, outputOptions);
     childCompiler.context = this._context;
-    childCompiler.apply(
-      new NodeTemplatePlugin(outputOptions),
-      new NodeTargetPlugin(),
-      new SingleEntryPlugin(this._context, filePath),
-      new LoaderTargetPlugin('node')
-    );
 
-    // NOTE: This is not needed with webpack 3.6+
-    // Fix for "Uncaught TypeError: __webpack_require__(...) is not a function"
-    // Hot module replacement requires that every child compiler has its own
-    // cache. @see https://github.com/ampedandwired/html-webpack-plugin/pull/179
-    childCompiler.plugin('compilation', function (compilation: any) {
-      if (compilation.cache) {
-        if (!compilation.cache[compilerName]) {
-          compilation.cache[compilerName] = {};
-        }
-        compilation.cache = compilation.cache[compilerName];
-      }
-    });
+    new NodeTemplatePlugin(outputOptions).apply(childCompiler);
+    new NodeTargetPlugin().apply(childCompiler);
+    new SingleEntryPlugin(this._context, filePath).apply(childCompiler);
+    new LoaderTargetPlugin('node').apply(childCompiler);
 
-    childCompiler.plugin('this-compilation', (compilation: any) => {
-      compilation.plugin('additional-assets', (callback: (err?: Error) => void) => {
+    childCompiler.hooks.thisCompilation.tap('ngtools-webpack', (compilation: any) => {
+      compilation.hooks.additionalAssets.tapAsync('ngtools-webpack',
+      (callback: (err?: Error) => void) => {
         if (this._cachedResources.has(compilation.fullHash)) {
           callback();
           return;
