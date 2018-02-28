@@ -103,8 +103,8 @@ app.get('/**/*', (req: Request, res: Response) => {
   res.render('../dist/index', {
     req,
     res
+  }, (err: Error, html: string) => {
+    res.status(html ? 200 : 500).send(html || err.message);
   });
-}, (err: Error, html: string) => {
-  res.status(html ? 200 : 500).send(html || err.message);
 });
 ```
