@@ -61,6 +61,7 @@ export interface AngularCompilerPluginOptions {
   mainPath?: string;
   skipCodeGeneration?: boolean;
   hostReplacementPaths?: { [path: string]: string };
+  forkTypeChecker?: boolean;
   // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
   // include 'polyfills.ts' in `tsconfig.spec.json'.
   singleFileIncludes?: string[];
@@ -240,6 +241,11 @@ export class AngularCompilerPlugin {
     if (options.missingTranslation !== undefined) {
       this._compilerOptions.i18nInMissingTranslations =
         options.missingTranslation as 'error' | 'warning' | 'ignore';
+    }
+
+    // Process forked type checker options.
+    if (options.forkTypeChecker !== undefined) {
+      this._forkTypeChecker = options.forkTypeChecker;
     }
 
     // Create the webpack compiler host.
