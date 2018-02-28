@@ -20,6 +20,7 @@ export interface BuilderContext {
 // TODO: use Build Event Protocol
 // https://docs.bazel.build/versions/master/build-event-protocol.html
 // https://github.com/googleapis/googleapis/tree/master/google/devtools/build/v1
+// http://dcode.io/protobuf.js/Message.html#toJSON
 export interface BuildEvent {
   success: boolean;
 }
