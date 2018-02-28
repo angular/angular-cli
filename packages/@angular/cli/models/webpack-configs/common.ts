@@ -271,11 +271,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
             warnings: buildOptions.verbose,
             safari10: true,
             compress: {
-              // Disabled because of an issue with Mapbox GL when using the Webpack node global:
-              // https://github.com/mapbox/mapbox-gl-js/issues/4359#issuecomment-303880888
-              // https://github.com/angular/angular-cli/issues/5804
-              // https://github.com/angular/angular-cli/pull/7931
-              typeofs : false,
               pure_getters: buildOptions.buildOptimizer,
               // PURE comments work best with 3 passes.
               // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
