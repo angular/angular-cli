@@ -218,6 +218,9 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       publicPath: buildOptions.deployUrl,
       filename: `[name]${hashFormat.chunk}.js`,
     },
+    performance: {
+      hints: false,
+    },
     module: {
       rules: [
         { test: /\.html$/, loader: 'raw-loader' },
