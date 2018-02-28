@@ -1,7 +1,7 @@
 {
   "name": "nguniversal",
   "main": "index.js",
-  "version": "5.0.0-beta.5",
+  "version": "5.0.0-beta.6",
   "description": "Universal (isomorphic) JavaScript support for Angular",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",

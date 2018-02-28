@@ -1,6 +1,6 @@
 {
   "name": "@nguniversal/common",
-  "version": "5.0.0-beta.5",
+  "version": "5.0.0-beta.6",
   "description": "Angular Universal common utilities",
   "main": "./bundles/common.umd.js",
   "module": "./esm5/common.es5.js",

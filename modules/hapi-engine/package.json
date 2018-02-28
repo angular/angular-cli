@@ -1,6 +1,6 @@
 {
   "name": "@nguniversal/hapi-engine",
-  "version": "5.0.0-beta.5",
+  "version": "5.0.0-beta.6",
   "description": "Hapi Engine for running Server Angular Apps",
   "main": "./bundles/hapi-engine.umd.js",
   "module": "./esm5/hapi-engine.es5.js",
