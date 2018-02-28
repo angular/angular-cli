@@ -89,7 +89,7 @@ matrix:
 
 before_install:
   # Install npm 5.
-  - npm install -g npm@~5.5.1
+  - npm install -g npm@~5.6.0
 
 install:
   - npm install
