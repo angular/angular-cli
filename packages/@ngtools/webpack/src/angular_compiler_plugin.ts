@@ -41,7 +41,6 @@ import {
   CompilerHost,
   Diagnostic,
   EmitFlags,
-  LazyRoute,
   createProgram,
   createCompilerHost,
   formatDiagnostics,
@@ -430,7 +429,7 @@ export class AngularCompilerPlugin {
     const lazyRoutes = ngProgram.listLazyRoutes();
 
     return lazyRoutes.reduce(
-      (acc: LazyRouteMap, curr: LazyRoute) => {
+      (acc, curr) => {
         const ref = curr.route;
         if (ref in acc && acc[ref] !== curr.referencedModule.filePath) {
           throw new Error(
