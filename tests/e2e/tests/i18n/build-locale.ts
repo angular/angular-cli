@@ -1,7 +1,6 @@
 import { ng } from '../../utils/process';
 import { expectFileToMatch, rimraf } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
-import { expectToFail } from '../../utils/utils';
 
 
 export default function () {
@@ -21,5 +20,4 @@ export default function () {
     .then(() => expectFileToMatch('dist/main.js', /registerLocaleData/))
     .then(() => expectFileToMatch('dist/main.js', /angular_common_locales_fr/))
     .then(() => rimraf('dist'))
-    .then(() => expectToFail(() => ng('build', '--aot', '--locale=no-locale')));
 }
