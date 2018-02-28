@@ -15,3 +15,13 @@
     Run through without making any changes. Will list all files that would have been created when running <code>ng update</code>.
   </p>
 </details>
+
+<details>
+  <summary>next</summary>
+  <p>
+    <code>--next</code> <em>default value: false</em>
+  </p>
+  <p>
+    Install the next version published as `@next` on npm, instead of the latest.
+  </p>
+</details>
