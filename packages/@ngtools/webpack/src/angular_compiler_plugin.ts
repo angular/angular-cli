@@ -1068,7 +1068,7 @@ export class AngularCompilerPlugin {
           this._warnings.push(`AngularCompilerPlugin: Unable to load the locale data file ` +
             `"@angular/common/locales/${locale}", ` +
             `please check that "${locale}" is a valid locale id.
-            If needed, localeData can be registered against custom locale in application module.`);
+            If needed, you can use "registerLocaleData" manually.`);
           return null;
         }
       }
