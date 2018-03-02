@@ -8,3 +8,4 @@
 export { NodePackageInstallTask } from './node-package/install-task';
 export { NodePackageLinkTask } from './node-package/link-task';
 export { RepositoryInitializerTask } from './repo-init/init-task';
+export { RunSchematicTask } from './run-schematic/init-task';
