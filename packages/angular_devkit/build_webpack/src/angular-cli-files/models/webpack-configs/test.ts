@@ -3,7 +3,6 @@
 
 import * as path from 'path';
 import * as glob from 'glob';
-import * as webpack from 'webpack';
 
 // import { CliConfig } from '../config';
 import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
@@ -21,7 +20,6 @@ import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
 export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
-  const nodeModules = path.resolve(projectRoot, 'node_modules');
   const extraRules: any[] = [];
   const extraPlugins: any[] = [];
 
@@ -64,16 +62,24 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
     module: {
       rules: [].concat(extraRules as any)
     },
-    plugins: [
-      new webpack.optimize.CommonsChunkPlugin({
-        minChunks: Infinity,
-        name: 'inline'
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-        chunks: ['main'],
-        minChunks: (module: any) => module.resource && module.resource.startsWith(nodeModules)
-      })
-    ].concat(extraPlugins)
+    plugins: extraPlugins,
+    optimization: {
+      // runtimeChunk: 'single',
+      splitChunks: {
+        chunks: buildOptions.commonChunk ? 'all' : 'initial',
+        cacheGroups: {
+          vendors: false,
+          vendor: {
+            name: 'vendor',
+            chunks: 'initial',
+            test: (module: any, chunks: Array<{ name: string }>) => {
+              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
+              return /[\\/]node_modules[\\/]/.test(moduleName)
+                && !chunks.some(({ name }) => name === 'polyfills');
+            },
+          },
+        }
+      }
+    },
   };
 }

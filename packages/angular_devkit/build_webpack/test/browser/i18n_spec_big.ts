@@ -60,7 +60,7 @@ describe('Browser Builder i18n', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'main.bundle.js');
+        const fileName = join(outputPath, 'main.js');
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         expect(content).toMatch(/Bonjour i18n!/);
       }),
@@ -83,7 +83,7 @@ describe('Browser Builder i18n', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'main.bundle.js');
+        const fileName = join(outputPath, 'main.js');
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         expect(content).toMatch(/Other content/);
       }),
@@ -115,19 +115,11 @@ describe('Browser Builder i18n', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'main.bundle.js');
+        const fileName = join(outputPath, 'main.js');
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         expect(content).toMatch(/registerLocaleData/);
         expect(content).toMatch(/angular_common_locales_fr/);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
-
-  it('fails while registering unknown locale', (done) => {
-    const overrides = { aot: true, i18nLocale: 'no-locale' };
-
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
-    ).subscribe(undefined, done, done.fail);
   }, 30000);
 });

@@ -85,7 +85,7 @@ describe('Browser Builder lazy modules', () => {
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget())),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy.module.chunk.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -100,21 +100,24 @@ describe('Browser Builder lazy modules', () => {
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget())),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-module.chunk.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
   it(`supports lazy bundle for dynamic import() calls`, (done) => {
     host.writeMultipleFiles({
       'src/lazy-module.ts': 'export const value = 42;',
-      'src/main.ts': `const lazyFileName = 'module'; import('./lazy-' + lazyFileName);`,
+      'src/main.ts': `
+        const lazyFileName = 'module';
+        import(/*webpackChunkName: '[request]'*/'./lazy-' + lazyFileName);
+      `,
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget())),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-module.chunk.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-module.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -127,7 +130,7 @@ describe('Browser Builder lazy modules', () => {
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget())),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-module.chunk.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -143,7 +146,7 @@ describe('Browser Builder lazy modules', () => {
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '0.chunk.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -158,9 +161,10 @@ describe('Browser Builder lazy modules', () => {
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget())),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'one.chunk.js'))).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'two.chunk.js'))).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'common.chunk.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, '1.js'))).toBe(true)),
+      // TODO: the chunk with common modules used to be called `common`, see why that changed.
+      tap(() => expect(host.asSync().exists(join(outputPath, '2.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -177,9 +181,42 @@ describe('Browser Builder lazy modules', () => {
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'one.chunk.js'))).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'two.chunk.js'))).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'common.chunk.js'))).toBe(false)),
+      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, '1.js'))).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, '2.js'))).toBe(false)),
+    ).subscribe(undefined, done.fail, done);
+  }, 30000);
+
+  it(`supports extra lazy modules array`, (done) => {
+    host.writeMultipleFiles(lazyModuleFiles);
+    host.writeMultipleFiles(lazyModuleImport);
+    host.writeMultipleFiles({
+      'src/app/app.component.ts': `
+        import { Component, SystemJsNgModuleLoader } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.css'],
+        })
+        export class AppComponent {
+          title = 'app';
+          constructor(loader: SystemJsNgModuleLoader) {
+            // Module will be split at build time and loaded when requested below
+            loader.load('app/lazy/lazy.module#LazyModule')
+              .then((factory) => { /* Use factory here */ });
+          }
+        }`,
+    });
+    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
+
+    const overrides: Partial<BrowserBuilderOptions> = { lazyModules: ['app/lazy/lazy.module'] };
+
+    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
+      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-lazy-module.js')))
+        .toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 });

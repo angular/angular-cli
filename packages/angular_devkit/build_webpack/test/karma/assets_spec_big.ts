@@ -101,5 +101,5 @@ describe('Karma Builder assets', () => {
     architect.loadWorkspaceFromJson(makeWorkspace(karmaWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, 45000);
 });

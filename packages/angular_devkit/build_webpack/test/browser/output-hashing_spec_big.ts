@@ -126,11 +126,11 @@ describe('Browser Builder output hashing', () => {
         { overrides: { outputHashing: 'all', extractCss: true } },
       ))),
       tap(() => {
-        expect(host.fileMatchExists('dist', /inline\.[0-9a-f]{20}\.bundle\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.bundle\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.bundle\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.bundle\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.bundle\.css/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeTruthy();
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
       }),
       // 'none' should hash nothing.
@@ -138,11 +138,11 @@ describe('Browser Builder output hashing', () => {
         { overrides: { outputHashing: 'none', extractCss: true } },
       ))),
       tap(() => {
-        expect(host.fileMatchExists('dist', /inline\.[0-9a-f]{20}\.bundle\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.bundle\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.bundle\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.bundle\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.bundle\.css/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeFalsy();
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
       }),
       // 'media' should hash css resources only.
@@ -150,11 +150,11 @@ describe('Browser Builder output hashing', () => {
         { overrides: { outputHashing: 'media', extractCss: true } },
       ))),
       tap(() => {
-        expect(host.fileMatchExists('dist', /inline\.[0-9a-f]{20}\.bundle\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.bundle\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.bundle\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.bundle\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.bundle\.css/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeFalsy();
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
       }),
       // 'bundles' should hash bundles only.
@@ -162,11 +162,11 @@ describe('Browser Builder output hashing', () => {
         { overrides: { outputHashing: 'bundles', extractCss: true } },
       ))),
       tap(() => {
-        expect(host.fileMatchExists('dist', /inline\.[0-9a-f]{20}\.bundle\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.bundle\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.bundle\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.bundle\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.bundle\.css/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeTruthy();
+        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeTruthy();
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
       }),
     ).subscribe(undefined, done.fail, done);

@@ -29,7 +29,7 @@ describe('Browser Builder deploy url', () => {
       tap(() => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
-        expect(content).toContain('deployUrl/main.bundle.js');
+        expect(content).toContain('deployUrl/main.js');
       }),
       concatMap(() => architect.run(architect.getTarget({
         overrides: { deployUrl: 'http://example.com/some/path/' },
@@ -38,7 +38,7 @@ describe('Browser Builder deploy url', () => {
       tap(() => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
-        expect(content).toContain('http://example.com/some/path/main.bundle.js');
+        expect(content).toContain('http://example.com/some/path/main.js');
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -50,9 +50,9 @@ describe('Browser Builder deploy url', () => {
       }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'inline.bundle.js');
+        const fileName = join(outputPath, 'runtime.js');
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
-        expect(content).toContain('__webpack_require__.p = "deployUrl/";');
+        expect(content).toContain('deployUrl/');
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

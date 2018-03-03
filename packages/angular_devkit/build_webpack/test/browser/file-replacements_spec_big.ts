@@ -31,7 +31,7 @@
 //     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
 //       concatMap(() => architect.run(architect.getTarget({ overrides }))),
 //       tap(() => {
-//         const fileName = join(outputPath, 'main.bundle.js');
+//         const fileName = join(outputPath, 'main.js');
 //         const content = virtualFs.fileBufferToString(host.asSync().read(fileName));
 //         expect(content).toContain('production: true');
 //       }),

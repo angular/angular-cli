@@ -3,10 +3,8 @@
 
 import { ExtraEntry, extraEntryParser } from '../models/webpack-configs/utils';
 
-// Sort chunks according to a predefined order:
-// inline, polyfills, all styles, vendor, main
-export function packageChunkSort(appConfig: any) {
-  let entryPoints = ['inline', 'polyfills', 'sw-register'];
+export function generateEntryPoints(appConfig: any) {
+  let entryPoints = ['polyfills', 'sw-register'];
 
   const pushExtraEntries = (extraEntry: ExtraEntry) => {
     if (entryPoints.indexOf(extraEntry.entry as string) === -1) {
@@ -15,14 +13,26 @@ export function packageChunkSort(appConfig: any) {
   };
 
   if (appConfig.styles) {
-    extraEntryParser(appConfig.styles, './', 'styles').forEach(pushExtraEntries);
+    extraEntryParser(appConfig.styles, './', 'styles')
+      .filter(entry => !entry.lazy)
+      .forEach(pushExtraEntries);
   }
 
   if (appConfig.scripts) {
-    extraEntryParser(appConfig.scripts, './', 'scripts').forEach(pushExtraEntries);
+    extraEntryParser(appConfig.scripts, './', 'scripts')
+      .filter(entry => !entry.lazy)
+      .forEach(pushExtraEntries);
   }
 
-  entryPoints.push(...['vendor', 'main']);
+  entryPoints.push('main');
+
+  return entryPoints;
+}
+
+// Sort chunks according to a predefined order:
+// inline, polyfills, all styles, vendor, main
+export function packageChunkSort(appConfig: any) {
+  const entryPoints = generateEntryPoints(appConfig);
 
   function sort(left: any, right: any) {
     let leftIndex = entryPoints.indexOf(left.names[0]);

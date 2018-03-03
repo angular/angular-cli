@@ -92,7 +92,7 @@ describe('Browser Builder', () => {
         switch (buildNumber) {
           case 1:
             // No lazy chunk should exist.
-            expect(host.asSync().exists(join(outputPath, 'lazy.chunk.js'))).toBe(false);
+            expect(host.asSync().exists(join(outputPath, 'lazy-module.js'))).toBe(false);
             // Write the lazy chunk files. Order matters when writing these, because of imports.
             host.writeMultipleFiles(lazyModuleFiles);
             host.writeMultipleFiles(lazyModuleImport);
@@ -100,7 +100,7 @@ describe('Browser Builder', () => {
 
           case 2:
             // A lazy chunk should have been with the filename.
-            expect(host.asSync().exists(join(outputPath, 'lazy.module.chunk.js'))).toBe(true);
+            expect(host.asSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
             host.writeMultipleFiles(goldenValueFiles);
             break;
 
@@ -111,7 +111,7 @@ describe('Browser Builder', () => {
               + /\$\$_E2E_GOLDEN_VALUE_2(.|\n|\r)*/.source
               + /\$\$_E2E_GOLDEN_VALUE_3/.source,
             );
-            const fileName = './dist/main.bundle.js';
+            const fileName = './dist/main.js';
             const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
             expect(content).toMatch(re);
             break;
@@ -302,7 +302,7 @@ describe('Browser Builder', () => {
       debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;
-        const fileName = './dist/main.bundle.js';
+        const fileName = './dist/main.js';
         let content;
         switch (buildNumber) {
           case 1:

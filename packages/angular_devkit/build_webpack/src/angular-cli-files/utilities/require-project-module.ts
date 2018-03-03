@@ -3,7 +3,12 @@
 
 const resolve = require('resolve');
 
-// require dependencies within the target project
+// Resolve dependencies within the target project.
+export function resolveProjectModule(root: string, moduleName: string) {
+  return resolve.sync(moduleName, { basedir: root });
+}
+
+// Require dependencies within the target project.
 export function requireProjectModule(root: string, moduleName: string) {
-  return require(resolve.sync(moduleName, { basedir: root }));
+  return require(resolveProjectModule(root, moduleName));
 }

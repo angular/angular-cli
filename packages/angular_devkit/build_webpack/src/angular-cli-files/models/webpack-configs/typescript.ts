@@ -28,12 +28,6 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     options.compilerOptions.preserveSymlinks = true;
   }
 
-  // Forcing commonjs seems to drastically improve rebuild speeds on webpack.
-  // Dev builds on watch mode will set this option to true.
-  if (wco.buildOptions.forceTsCommonjs) {
-    options.compilerOptions.module = 'commonjs';
-  }
-
   // Read the environment, and set it in the compiler host.
   let hostReplacementPaths: any = {};
   // process environment file replacement
@@ -85,7 +79,18 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     ? path.resolve(appRoot, buildOptions.i18nFile)
     : undefined;
 
-  const pluginOptions: AngularCompilerPluginOptions = Object.assign({}, {
+  const additionalLazyModules: { [module: string]: string } = {};
+  if (appConfig.lazyModules) {
+    for (const lazyModule of appConfig.lazyModules) {
+      additionalLazyModules[lazyModule] = path.resolve(
+        projectRoot,
+        appConfig.root,
+        lazyModule,
+      );
+    }
+  }
+
+  const pluginOptions: AngularCompilerPluginOptions = {
     mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
     i18nInFile: i18nInFile,
     i18nInFormat: buildOptions.i18nFormat,
@@ -96,8 +101,11 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     missingTranslation: buildOptions.i18nMissingTranslation,
     hostReplacementPaths,
     sourceMap: buildOptions.sourceMap,
-    forkTypeChecker: buildOptions.forkTypeChecker
-  }, options);
+    additionalLazyModules,
+    nameLazyFiles: buildOptions.namedChunks,
+    forkTypeChecker: buildOptions.forkTypeChecker,
+    ...options
+  };
   return new AngularCompilerPlugin(pluginOptions);
 }
 
@@ -115,23 +123,19 @@ export function getAotConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
   const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsConfig);
 
-  let pluginOptions: any = { tsConfigPath };
-
-  let boLoader: any = [];
+  const loaders: any[] = [webpackLoader];
   if (buildOptions.buildOptimizer) {
-    boLoader = [{
+    loaders.unshift({
       loader: '@angular-devkit/build-optimizer/webpack-loader',
       options: { sourceMap: buildOptions.sourceMap }
-    }];
+    });
   }
 
-  const test = AngularCompilerPlugin.isSupported()
-    ? /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/
-    : /\.ts$/;
+  const test = /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/;
 
   return {
-    module: { rules: [{ test, use: [...boLoader, webpackLoader] }] },
-    plugins: [_createAotPlugin(wco, pluginOptions)]
+    module: { rules: [{ test, use: loaders }] },
+    plugins: [_createAotPlugin(wco, { tsConfigPath })]
   };
 }
 

@@ -14,12 +14,12 @@ export class SuppressExtractedTextChunksWebpackPlugin {
       const entryPoints = compilation.options.entry;
       // determine which entry points are composed entirely of css files
       for (let entryPoint of Object.keys(entryPoints)) {
-        let entryFiles: string[]|string = entryPoints[entryPoint];
+        let entryFiles: string[] | string = entryPoints[entryPoint];
         // when type of entryFiles is not array, make it as an array
         entryFiles = entryFiles instanceof Array ? entryFiles : [entryFiles];
         if (entryFiles.every((el: string) =>
           el.match(/\.(css|scss|sass|less|styl)$/) !== null)) {
-            cssOnlyChunks.push(entryPoint);
+          cssOnlyChunks.push(entryPoint);
         }
       }
       // Remove the js file for supressed chunks
@@ -42,14 +42,15 @@ export class SuppressExtractedTextChunksWebpackPlugin {
       });
       // Remove scripts tags with a css file as source, because HtmlWebpackPlugin will use
       // a css file as a script for chunks without js files.
-      compilation.plugin('html-webpack-plugin-alter-asset-tags',
-        (htmlPluginData: any, callback: any) => {
-          const filterFn = (tag: any) =>
-            !(tag.tagName === 'script' && tag.attributes.src.match(/\.css$/));
-          htmlPluginData.head = htmlPluginData.head.filter(filterFn);
-          htmlPluginData.body = htmlPluginData.body.filter(filterFn);
-          callback(null, htmlPluginData);
-        });
+      // TODO: Enable this once HtmlWebpackPlugin supports Webpack 4
+      // compilation.plugin('html-webpack-plugin-alter-asset-tags',
+      //   (htmlPluginData: any, callback: any) => {
+      //     const filterFn = (tag: any) =>
+      //       !(tag.tagName === 'script' && tag.attributes.src.match(/\.css$/));
+      //     htmlPluginData.head = htmlPluginData.head.filter(filterFn);
+      //     htmlPluginData.body = htmlPluginData.body.filter(filterFn);
+      //     callback(null, htmlPluginData);
+      //   });
     });
   }
 }

@@ -1,21 +1,24 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import * as webpack from 'webpack';
 import * as path from 'path';
+import { HashedModuleIdsPlugin } from 'webpack';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
-import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
 import { requireProjectModule } from '../../utilities/require-project-module';
 import { WebpackConfigOptions } from '../build-options';
+import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
+import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const StatsPlugin = require('stats-webpack-plugin');
 const SilentError = require('silent-error');
+const resolve = require('resolve');
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -25,6 +28,7 @@ const SilentError = require('silent-error');
  * require('raw-loader')
  * require('url-loader')
  * require('file-loader')
+ * require('cache-loader')
  * require('@angular-devkit/build-optimizer')
  */
 
@@ -38,7 +42,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   let extraPlugins: any[] = [];
-  let extraRules: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
 
   if (appConfig.main) {
@@ -64,8 +67,10 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           // All entries have to be lazy for the bundle to be lazy.
           (existingEntry as any).lazy = existingEntry.lazy && curr.lazy;
         } else {
-          prev.push({ entry: curr.entry as string, paths: [curr.path as string],
-            lazy: curr.lazy as boolean });
+          prev.push({
+            entry: curr.entry as string, paths: [curr.path as string],
+            lazy: curr.lazy as boolean
+          });
         }
         return prev;
       }, []);
@@ -78,7 +83,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       extraPlugins.push(new ScriptsWebpackPlugin({
         name: script.entry,
         sourceMap: buildOptions.sourceMap,
-        filename: `${script.entry}${hash}.bundle.js`,
+        filename: `${script.entry}${hash}.js`,
         scripts: script.paths,
         basePath: projectRoot,
       }));
@@ -105,8 +110,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
       if (outputRelativeOutput.startsWith('..') || path.isAbsolute(outputRelativeOutput)) {
 
-        // const projectRelativeOutput = path.relative(projectRoot, absoluteAssetOutput);
         // TODO: This check doesn't make a lot of sense anymore with multiple project. Review it.
+        // const projectRelativeOutput = path.relative(projectRoot, absoluteAssetOutput);
         // if (projectRelativeOutput.startsWith('..') || path.isAbsolute(projectRelativeOutput)) {
         //   const message = 'An asset cannot be written to a location outside the project.';
         //   throw new SilentError(message);
@@ -114,8 +119,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
         if (!asset.allowOutsideOutDir) {
           const message = 'An asset cannot be written to a location outside of the output path. '
-                        + 'You can override this message by setting the `allowOutsideOutDir` '
-                        + 'property on the asset to true in the CLI configuration.';
+            + 'You can override this message by setting the `allowOutsideOutDir` '
+            + 'property on the asset to true in the CLI configuration.';
           throw new SilentError(message);
         }
       }
@@ -138,15 +143,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         asset.glob = asset.glob + '/**/*';
       }
 
-      // Escape the input in case it has special charaters and use to make glob absolute
-      const escapedInput = asset.input
-        .replace(/[\\|\*|\?|\!|\(|\)|\[|\]|\{|\}]/g, (substring) => `\\${substring}`);
-
       return {
         context: asset.input,
         to: asset.output,
         from: {
-          glob: path.resolve(escapedInput, asset.glob),
+          glob: asset.glob,
           dot: true
         }
       };
@@ -169,7 +170,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   if (buildOptions.showCircularDependencies) {
     extraPlugins.push(new CircularDependencyPlugin({
-      exclude: /(\\|\/)node_modules(\\|\/)/
+      exclude: /[\\\/]node_modules[\\\/]/
     }));
   }
 
@@ -177,18 +178,32 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new StatsPlugin('stats.json', 'verbose'));
   }
 
+  let buildOptimizerUseRule;
   if (buildOptions.buildOptimizer) {
-    extraRules.push({
-      test: /\.js$/,
-      use: [{
-        loader: '@angular-devkit/build-optimizer/webpack-loader',
-        options: { sourceMap: buildOptions.sourceMap }
-      }]
-    });
+    // Set the cache directory to the Build Optimizer dir, so that package updates will delete it.
+    const buildOptimizerDir = path.dirname(
+      resolve.sync('@angular-devkit/build-optimizer', { basedir: projectRoot }));
+    const cacheDirectory = path.resolve(buildOptimizerDir, './.cache/');
+
+    buildOptimizerUseRule = {
+      use: [
+        {
+          loader: 'cache-loader',
+          options: { cacheDirectory }
+        },
+        {
+          loader: '@angular-devkit/build-optimizer/webpack-loader',
+          options: { sourceMap: buildOptions.sourceMap }
+        },
+      ],
+    };
   }
 
-  if (buildOptions.namedChunks) {
-    extraPlugins.push(new NamedLazyChunksWebpackPlugin());
+  // Allow loaders to be in a node_modules nested inside the CLI package
+  const loaderNodeModules = ['node_modules'];
+  const potentialNodeModules = path.join(__dirname, '..', '..', 'node_modules');
+  if (isDirectory(potentialNodeModules)) {
+    loaderNodeModules.push(potentialNodeModules);
   }
 
   // Load rxjs path aliases.
@@ -203,22 +218,26 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   } catch (e) { }
 
   return {
+    mode: buildOptions.optimizationLevel === 0 ? 'development' : 'production',
+    devtool: false,
     resolve: {
       extensions: ['.ts', '.js'],
-      modules: ['node_modules', nodeModules],
       symlinks: !buildOptions.preserveSymlinks,
+      modules: [appRoot, 'node_modules'],
       alias
     },
     resolveLoader: {
-      modules: [nodeModules, 'node_modules']
+      modules: loaderNodeModules
     },
-    context: __dirname,
+    context: projectRoot,
     entry: entryPoints,
     output: {
       path: path.resolve(projectRoot, buildOptions.outputPath as string),
       publicPath: buildOptions.deployUrl,
-      filename: `[name]${hashFormat.chunk}.bundle.js`,
-      chunkFilename: `[id]${hashFormat.chunk}.chunk.js`
+      filename: `[name]${hashFormat.chunk}.js`,
+    },
+    performance: {
+      hints: false,
     },
     module: {
       rules: [
@@ -238,11 +257,53 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
             name: `[name]${hashFormat.file}.[ext]`,
             limit: 10000
           }
-        }
-      ].concat(extraRules)
+        },
+        {
+          test: /[\/\\]@angular[\/\\].+\.js$/,
+          sideEffects: false,
+          parser: { system: true },
+          ...buildOptimizerUseRule,
+        },
+        {
+          test: /\.js$/,
+          ...buildOptimizerUseRule,
+        },
+      ]
     },
-    plugins: [
-      new webpack.NoEmitOnErrorsPlugin()
-    ].concat(extraPlugins)
+    optimization: {
+      noEmitOnErrors: true,
+      minimizer: [
+        new HashedModuleIdsPlugin(),
+        // TODO: check with Mike what this feature needs.
+        new BundleBudgetPlugin({ budgets: appConfig.budgets }),
+        new CleanCssWebpackPlugin({
+          sourceMap: buildOptions.sourceMap,
+          // component styles retain their original file name
+          test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
+        }),
+        new UglifyJSPlugin({
+          sourceMap: buildOptions.sourceMap,
+          parallel: true,
+          cache: true,
+          uglifyOptions: {
+            ecma: wco.supportES2015 ? 6 : 5,
+            warnings: buildOptions.verbose,
+            safari10: true,
+            compress: {
+              pure_getters: buildOptions.buildOptimizer,
+              // PURE comments work best with 3 passes.
+              // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
+              passes: buildOptions.buildOptimizer ? 3 : 1,
+            },
+            output: {
+              ascii_only: true,
+              comments: false,
+              webkit: true,
+            },
+          }
+        }),
+      ],
+    },
+    plugins: extraPlugins,
   };
 }

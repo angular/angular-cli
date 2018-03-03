@@ -26,11 +26,11 @@ describe('Browser Builder', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         // Default files should be in outputPath.
-        expect(host.asSync().exists(join(outputPath, 'inline.bundle.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'main.bundle.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'polyfills.bundle.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'styles.bundle.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'vendor.bundle.js'))).toBe(true);
+        expect(host.asSync().exists(join(outputPath, 'runtime.js'))).toBe(true);
+        expect(host.asSync().exists(join(outputPath, 'main.js'))).toBe(true);
+        expect(host.asSync().exists(join(outputPath, 'polyfills.js'))).toBe(true);
+        expect(host.asSync().exists(join(outputPath, 'styles.js'))).toBe(true);
+        expect(host.asSync().exists(join(outputPath, 'vendor.js'))).toBe(true);
         expect(host.asSync().exists(join(outputPath, 'favicon.ico'))).toBe(true);
         expect(host.asSync().exists(join(outputPath, 'index.html'))).toBe(true);
       }),

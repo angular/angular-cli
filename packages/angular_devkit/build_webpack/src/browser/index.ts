@@ -17,9 +17,7 @@ import {
   getAotConfig,
   getBrowserConfig,
   getCommonConfig,
-  getDevConfig,
   getNonAotConfig,
-  getProdConfig,
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
@@ -59,6 +57,8 @@ export interface BrowserBuilderOptions {
   serviceWorker: boolean;
   skipAppShell: boolean;
   forkTypeChecker: boolean;
+  statsJson: boolean;
+  lazyModules: string[];
 
   // Options with no defaults.
   // TODO: reconsider this list.
@@ -90,8 +90,6 @@ export interface BrowserBuilderOptions {
 
   // TODO: figure out what to do about these.
   environment?: string; // Maybe replace with 'fileReplacement' object?
-  forceTsCommonjs?: boolean; // Remove with webpack 4.
-  statsJson: boolean;
 }
 
 export interface AssetPattern {
@@ -151,7 +149,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
             return obs.error(err);
           }
 
-          const json = stats.toJson('verbose');
+          const json = stats.toJson(statsConfig);
           if (options.verbose) {
             this.context.logger.info(stats.toString(statsConfig));
           } else {
@@ -231,22 +229,34 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
       supportES2015,
     };
 
-    let targetConfig = {};
-    switch (options.optimizationLevel) {
-      case 0:
-        targetConfig = getDevConfig(wco);
-        break;
-      case 1:
-        targetConfig = getProdConfig(wco);
-        break;
-    }
+
+    // TODO: add the old dev options as the default, and the prod one as a configuration:
+    // development: {
+    //   environment: 'dev',
+    //   outputHashing: 'media',
+    //   sourcemaps: true,
+    //   extractCss: false,
+    //   namedChunks: true,
+    //   aot: false,
+    //   vendorChunk: true,
+    //   buildOptimizer: false,
+    // },
+    // production: {
+    //   environment: 'prod',
+    //   outputHashing: 'all',
+    //   sourcemaps: false,
+    //   extractCss: true,
+    //   namedChunks: false,
+    //   aot: true,
+    //   extractLicenses: true,
+    //   vendorChunk: false,
+    //   buildOptimizer: buildOptions.aot !== false,
+    // }
 
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
       getBrowserConfig(wco),
       getStylesConfig(wco),
-      // TODO: use project configurations for the --prod meta options.
-      targetConfig,
     ];
 
     if (wco.appConfig.main || wco.appConfig.polyfills) {

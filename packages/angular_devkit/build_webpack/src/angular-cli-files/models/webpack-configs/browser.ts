@@ -5,12 +5,19 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
-
-import { packageChunkSort } from '../../utilities/package-chunk-sort';
+import { LicenseWebpackPlugin } from 'license-webpack-plugin';
+import { generateEntryPoints, packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
+import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
 import { extraEntryParser, lazyChunksFilter } from './utils';
 import { WebpackConfigOptions } from '../build-options';
 
+/**
++ * license-webpack-plugin has a peer dependency on webpack-sources, list it in a comment to
++ * let the dependency validator know it is used.
++ *
++ * require('webpack-sources')
++ */
 
 export function getBrowserConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
@@ -25,12 +32,23 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     ...extraEntryParser(appConfig.styles, appRoot, 'styles')
   ]);
 
-  if (buildOptions.vendorChunk) {
-    extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      chunks: ['main'],
-      minChunks: (module: any) =>
-        module.resource && /[\\\/]node_modules[\\\/]/.test(module.resource)
+  // TODO: Enable this once HtmlWebpackPlugin supports Webpack 4
+  const generateIndexHtml = false;
+  if (generateIndexHtml) {
+    extraPlugins.push(new HtmlWebpackPlugin({
+      template: path.resolve(appRoot, appConfig.index),
+      filename: path.resolve(buildOptions.outputPath, appConfig.index),
+      chunksSortMode: packageChunkSort(appConfig),
+      excludeChunks: lazyChunks,
+      xhtml: true,
+      minify: buildOptions.optimizationLevel === 1 ? {
+        caseSensitive: true,
+        collapseWhitespace: true,
+        keepClosingSlash: true
+      } : false
+    }));
+    extraPlugins.push(new BaseHrefWebpackPlugin({
+      baseHref: buildOptions.baseHref as string
     }));
   }
 
@@ -54,20 +72,23 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }
   }
 
-  if (buildOptions.commonChunk) {
-    extraPlugins.push(new webpack.optimize.CommonsChunkPlugin({
-      name: 'main',
-      async: 'common',
-      children: true,
-      minChunks: 2
-    }));
-  }
-
   if (buildOptions.subresourceIntegrity) {
     extraPlugins.push(new SubresourceIntegrityPlugin({
       hashFuncNames: ['sha384']
     }));
   }
+
+  if (buildOptions.extractLicenses) {
+    extraPlugins.push(new LicenseWebpackPlugin({
+      pattern: /.*/,
+      suppressErrors: true,
+      perChunkOutput: false,
+      outputFilename: `3rdpartylicenses.txt`
+    }));
+  }
+
+  const globalStylesEntries = extraEntryParser(appConfig.styles, appRoot, 'styles')
+    .map(style => style.entry);
 
   return {
     resolve: {
@@ -79,37 +100,34 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     output: {
       crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false
     },
-    plugins: [
-      new HtmlWebpackPlugin({
-        template: path.resolve(appRoot, appConfig.index),
-        filename: path.resolve(projectRoot, buildOptions.outputPath as any, appConfig.index),
-        chunksSortMode: packageChunkSort(appConfig),
-        excludeChunks: lazyChunks,
-        xhtml: true,
-        minify: buildOptions.optimizationLevel === 1? {
-          caseSensitive: true,
-          collapseWhitespace: true,
-          keepClosingSlash: true
-        } : false
+    optimization: {
+      runtimeChunk: 'single',
+      splitChunks: {
+        chunks: buildOptions.commonChunk ? 'all' : 'initial',
+        cacheGroups: {
+          vendors: false,
+          vendor: buildOptions.vendorChunk && {
+            name: 'vendor',
+            chunks: 'initial',
+            test: (module: any, chunks: Array<{ name: string }>) => {
+              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
+              return /[\\/]node_modules[\\/]/.test(moduleName)
+                && !chunks.some(({ name }) => name === 'polyfills'
+                  || globalStylesEntries.includes(name));
+            },
+          },
+        }
+      }
+    },
+    plugins: extraPlugins.concat([
+      new IndexHtmlWebpackPlugin({
+        input: path.resolve(appRoot, appConfig.index),
+        output: appConfig.index,
+        baseHref: buildOptions.baseHref,
+        entrypoints: generateEntryPoints(appConfig),
+        deployUrl: buildOptions.deployUrl,
       }),
-      new BaseHrefWebpackPlugin({
-        baseHref: buildOptions.baseHref as any
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        minChunks: Infinity,
-        name: 'inline'
-      })
-    ].concat(extraPlugins),
-    node: {
-      fs: 'empty',
-      global: true,
-      crypto: 'empty',
-      tls: 'empty',
-      net: 'empty',
-      process: true,
-      module: false,
-      clearImmediate: false,
-      setImmediate: false
-    }
+    ]),
+    node: false,
   };
 }

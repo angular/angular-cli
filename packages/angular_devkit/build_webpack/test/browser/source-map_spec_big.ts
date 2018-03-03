@@ -27,7 +27,7 @@ describe('Browser Builder source map', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'main.bundle.js.map');
+        const fileName = join(outputPath, 'main.js.map');
         expect(host.asSync().exists(fileName)).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
@@ -40,7 +40,7 @@ describe('Browser Builder source map', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'main.bundle.js.map');
+        const fileName = join(outputPath, 'main.js.map');
         expect(host.asSync().exists(fileName)).toBe(false);
       }),
     ).subscribe(undefined, done.fail, done);
@@ -53,10 +53,10 @@ describe('Browser Builder source map', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        expect(host.asSync().exists(join(outputPath, 'main.bundle.js.map'))).toBe(false);
-        const fileName = join(outputPath, 'main.bundle.js');
+        expect(host.asSync().exists(join(outputPath, 'main.js.map'))).toBe(false);
+        const fileName = join(outputPath, 'main.js');
         const content = virtualFs.fileBufferToString(host.asSync().read(fileName));
-        expect(content).toContain('eval("/* harmony export (binding) */');
+        expect(content).toContain('eval("function webpackEmptyAsyncContext');
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

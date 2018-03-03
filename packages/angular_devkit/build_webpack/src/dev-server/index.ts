@@ -65,8 +65,7 @@ interface WebpackDevServerConfigurationOptions {
   };
   publicPath?: string;
   headers?: { [key: string]: string };
-  stats?: { [key: string]: boolean } | string;
-  inline: boolean;
+  stats?: { [key: string]: boolean } | string | boolean;
   https?: boolean;
   key?: string;
   cert?: string;
@@ -134,8 +133,9 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
           // There's no option to turn off file watching in webpack-dev-server, but
           // we can override the file watcher instead.
           webpackConfig.plugins.unshift({
-            apply: (compiler: any) => { // tslint:disable-line:no-any
-              compiler.plugin('after-environment', () => {
+            // tslint:disable-next-line:no-any
+            apply: (compiler: any) => {
+              compiler.hooks.afterEnvironment.tap('angular-cli', () => {
                 compiler.watchFileSystem = { watch: () => { } };
               });
             },
@@ -161,8 +161,10 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         `);
 
         const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfig);
-        if (!browserOptions.verbose) {
-          webpackCompiler.plugin('done', (stats: any) => { // tslint:disable-line:no-any
+
+        // tslint:disable-next-line:no-any
+        (webpackCompiler as any).hooks.done.tap('angular-cli', (stats: webpack.Stats) => {
+          if (!browserOptions.verbose) {
             const json = stats.toJson(statsConfig);
             this.context.logger.info(statsToString(json, statsConfig));
             if (stats.hasWarnings()) {
@@ -171,22 +173,23 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
             if (stats.hasErrors()) {
               this.context.logger.info(statsErrorsToString(json, statsConfig));
             }
-            obs.next({ success: true });
-          });
-        }
+          }
+          obs.next({ success: true });
+
+          if (options.open) {
+            opn(serverAddress + webpackDevServerConfig.publicPath);
+          }
+        });
 
         const httpServer = server.listen(
           options.port,
           options.host,
-          (err: any, _stats: any) => { // tslint:disable-line:no-any
+          (err: any) => { // tslint:disable-line:no-any
             if (err) {
               obs.error(err);
-
-              return;
-            } else if (options.open) {
-              opn(serverAddress + webpackDevServerConfig.publicPath);
             }
-          });
+          },
+        );
 
         // Node 8 has a keepAliveTimeout bug which doesn't respect active connections.
         // Connections will end after ~5 seconds (arbitrary), often not letting the full download
@@ -226,8 +229,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
       },
-      stats: 'none', // We have our own stats function.
-      inline: true,
+      stats: browserOptions.verbose ? getWebpackStatsConfig(browserOptions.verbose) : false,
       compress: browserOptions.optimizationLevel > 0,
       watchOptions: {
         poll: browserOptions.poll,
@@ -263,9 +265,13 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   ) {
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.js.org/configuration/dev-server/#devserver-inline
-    const entryPoints = [
-      `webpack-dev-server/client?${clientAddress}`,
-    ];
+    let webpackDevServerPath;
+    try {
+      webpackDevServerPath = require.resolve('webpack-dev-server/client');
+    } catch {
+      throw new Error('The "webpack-dev-server" package could not be found.');
+    }
+    const entryPoints = [`${webpackDevServerPath}?${clientAddress}`];
     if (options.hmr) {
       const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
 

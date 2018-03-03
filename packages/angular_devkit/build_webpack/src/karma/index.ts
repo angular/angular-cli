@@ -13,7 +13,6 @@ import { Observable } from 'rxjs/Observable';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import {
   getCommonConfig,
-  getDevConfig,
   getNonAotTestConfig,
   getStylesConfig,
   getTestConfig,
@@ -61,7 +60,6 @@ export interface KarmaBuilderOptions {
 
   // TODO: figure out what to do about these.
   environment?: string; // Maybe replace with 'fileReplacement' object?
-  forceTsCommonjs?: boolean; // Remove with webpack 4.
 }
 
 export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
@@ -151,7 +149,6 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
       getStylesConfig(wco),
-      getDevConfig(wco),
       getNonAotTestConfig(wco),
       getTestConfig(wco),
     ];

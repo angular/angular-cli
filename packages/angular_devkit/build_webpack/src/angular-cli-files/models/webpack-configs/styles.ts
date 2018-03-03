@@ -3,19 +3,16 @@
 
 import * as webpack from 'webpack';
 import * as path from 'path';
-import {
-  SuppressExtractedTextChunksWebpackPlugin
-} from '../../plugins/suppress-entry-chunks-webpack-plugin';
+import { SuppressExtractedTextChunksWebpackPlugin } from '../../plugins/webpack';
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../build-options';
-// import { pluginArgs, postcssArgs } from '../../tasks/eject';
-import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
 
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const postcssImports = require('postcss-import');
+const PostcssCliResources = require('../../plugins/webpack').PostcssCliResources;
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -50,27 +47,38 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // Maximum resource size to inline (KiB)
   const maximumInlineSize = 10;
-  // Minify/optimize css in production.
-  const minimizeCss = buildOptions.optimizationLevel === 1;
+  // Determine hashing format.
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
   // Convert absolute resource URLs to account for base-href and deploy-url.
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
 
-  const postcssPluginCreator = function(loader: webpack.loader.LoaderContext) {
+  const postcssPluginCreator = function (loader: webpack.loader.LoaderContext) {
     return [
       postcssImports({
         resolve: (url: string, context: string) => {
           return new Promise<string>((resolve, reject) => {
+            let hadTilde = false;
             if (url && url.startsWith('~')) {
               url = url.substr(1);
+              hadTilde = true;
             }
-            loader.resolve(context, url, (err: Error, result: string) => {
+            loader.resolve(context, (hadTilde ? '' : './') + url, (err: Error, result: string) => {
               if (err) {
-                reject(err);
-                return;
+                if (hadTilde) {
+                  reject(err);
+                  return;
+                }
+                loader.resolve(context, url, (err: Error, result: string) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(result);
+                  }
+                });
+              } else {
+                resolve(result);
               }
-
-              resolve(result);
             });
           });
         },
@@ -111,7 +119,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             } else if (baseHref.match(/:\/\//)) {
               // If baseHref contains a scheme, include it as is.
               return baseHref.replace(/\/$/, '') +
-                  `/${deployUrl}/${url}`.replace(/\/\/+/g, '/');
+                `/${deployUrl}/${url}`.replace(/\/\/+/g, '/');
             } else {
               // Join together base-href, deploy-url and the original URL.
               // Also dedupe multiple slashes into single ones.
@@ -131,24 +139,18 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         },
         { url: 'rebase' },
       ]),
-      autoprefixer(),
+      PostcssCliResources({
+        deployUrl: loader.loaders[loader.loaderIndex].options.ident == 'extracted' ? '' : deployUrl,
+        loader,
+        filename: `[name]${hashFormat.file}.[ext]`,
+      }),
+      autoprefixer({ grid: true }),
     ];
   };
-  // (postcssPluginCreator as any)[postcssArgs] = {
-  //   variableImports: {
-  //     'autoprefixer': 'autoprefixer',
-  //     'postcss-url': 'postcssUrl',
-  //     'postcss-import': 'postcssImports',
-  //   },
-  //   variables: { minimizeCss, baseHref, deployUrl, projectRoot, maximumInlineSize }
-  // };
-
-  // determine hashing format
-  const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
 
   // use includePaths from appConfig
   const includePaths: string[] = [];
-  let lessPathOptions: { paths: string[] } = {paths: []};
+  let lessPathOptions: { paths: string[] } = { paths: [] };
 
   if (appConfig.stylePreprocessorOptions
     && appConfig.stylePreprocessorOptions.includePaths
@@ -177,7 +179,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // set base rules to derive final rules from
   const baseRules: webpack.NewUseRule[] = [
     { test: /\.css$/, use: [] },
-    { test: /\.scss$|\.sass$/, use: [{
+    {
+      test: /\.scss$|\.sass$/, use: [{
         loader: 'sass-loader',
         options: {
           sourceMap: cssSourceMap,
@@ -187,7 +190,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         }
       }]
     },
-    { test: /\.less$/, use: [{
+    {
+      test: /\.less$/, use: [{
         loader: 'less-loader',
         options: {
           sourceMap: cssSourceMap,
@@ -207,39 +211,39 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   ];
 
   const commonLoaders: webpack.Loader[] = [
-    {
-      loader: 'css-loader',
-      options: {
-        sourceMap: cssSourceMap,
-        import: false,
-      }
-    },
-    {
-      loader: 'postcss-loader',
-      options: {
-        // A non-function property is required to workaround a webpack option handling bug
-        ident: 'postcss',
-        plugins: postcssPluginCreator,
-        sourceMap: cssSourceMap
-      }
-    }
+    { loader: 'raw-loader' },
   ];
 
   // load component css as raw strings
-  const rules: webpack.Rule[] = baseRules.map(({test, use}) => ({
+  const rules: webpack.Rule[] = baseRules.map(({ test, use }) => ({
     exclude: globalStylePaths, test, use: [
-      'exports-loader?module.exports.toString()',
       ...commonLoaders,
+      {
+        loader: 'postcss-loader',
+        options: {
+          ident: 'embedded',
+          plugins: postcssPluginCreator,
+          sourceMap: cssSourceMap
+        }
+      },
       ...(use as webpack.Loader[])
     ]
   }));
 
   // load global css as css files
   if (globalStylePaths.length > 0) {
-    rules.push(...baseRules.map(({test, use}) => {
+    rules.push(...baseRules.map(({ test, use }) => {
       const extractTextPlugin = {
         use: [
           ...commonLoaders,
+          {
+            loader: 'postcss-loader',
+            options: {
+              ident: buildOptions.extractCss ? 'extracted' : 'embedded',
+              plugins: postcssPluginCreator,
+              sourceMap: cssSourceMap
+            }
+          },
           ...(use as webpack.Loader[])
         ],
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
@@ -248,8 +252,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       const ret: any = {
         include: globalStylePaths,
         test,
-        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin)
-                                     : ['style-loader', ...extractTextPlugin.use]
+        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin)
+          : ['style-loader', ...extractTextPlugin.use]
       };
       // Save the original options as arguments for eject.
       // if (buildOptions.extractCss) {
@@ -262,16 +266,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   if (buildOptions.extractCss) {
     // extract global css from js files into own css file
     extraPlugins.push(
-      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.bundle.css` }));
+      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
 
-  if (minimizeCss) {
-    extraPlugins.push(new CleanCssWebpackPlugin({ sourceMap: cssSourceMap }));
-  }
-
   return {
+    // Workaround stylus-loader defect: https://github.com/shama/stylus-loader/issues/189
+    loader: { stylus: {} },
     entry: entryPoints,
     module: { rules },
     plugins: [].concat(extraPlugins as any)

@@ -27,7 +27,7 @@ describe('Browser Builder vendor chunk', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'vendor.bundle.js');
+        const fileName = join(outputPath, 'vendor.js');
         expect(host.asSync().exists(fileName)).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);

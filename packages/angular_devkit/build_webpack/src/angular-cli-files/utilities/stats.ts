@@ -10,7 +10,7 @@ import { stripIndents } from 'common-tags';
 const chalkCtx = new (chalk.constructor as any)(chalk.supportsColor ? {} : { level: 1 });
 const { bold, green, red, reset, white, yellow } = chalkCtx;
 
-function _formatSize(size: number): string {
+export function formatSize(size: number): string {
   if (size <= 0) {
     return '0 bytes';
   }
@@ -32,8 +32,8 @@ export function statsToString(json: any, statsConfig: any) {
   const changedChunksStats = json.chunks
     .filter((chunk: any) => chunk.rendered)
     .map((chunk: any) => {
-      const asset = (json.assets || []).filter((x: any) => x.name == chunk.files[0])[0];
-      const size = asset ? ` ${_formatSize(asset.size)}` : '';
+      const asset = json.assets.filter((x: any) => x.name == chunk.files[0])[0];
+      const size = asset ? ` ${formatSize(asset.size)}` : '';
       const files = chunk.files.join(', ');
       const names = chunk.names ? ` (${chunk.names.join(', ')})` : '';
       const initial = y(chunk.entry ? '[entry]' : chunk.initial ? '[initial]' : '');
@@ -48,7 +48,7 @@ export function statsToString(json: any, statsConfig: any) {
 
   if (unchangedChunkNumber > 0) {
     return rs(stripIndents`
-      Date: ${w(new Date().toISOString())} • Hash: ${w(json.hash)} • Time: ${w('' + json.time)}ms
+      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
       ${unchangedChunkNumber} unchanged chunks
       ${changedChunksStats.join('\n')}
       `);

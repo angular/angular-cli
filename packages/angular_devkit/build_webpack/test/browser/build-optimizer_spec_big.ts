@@ -26,7 +26,7 @@ describe('Browser Builder build optimizer', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'main.bundle.js');
+        const fileName = join(outputPath, 'main.js');
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         expect(content).not.toMatch(/\.decorators =/);
       }),

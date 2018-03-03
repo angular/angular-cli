@@ -25,6 +25,9 @@ describe('Browser Builder allow js', () => {
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
     });
 
+    // TODO: this test originally edited tsconfig to have `"allowJs": true` but works without it.
+    // Investigate.
+
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       concatMap(() => architect.run(architect.getTarget())),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

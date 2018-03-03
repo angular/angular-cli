@@ -41,28 +41,28 @@ describe('Browser Builder styles', () => {
       { input: 'pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true },
     ];
     const cssMatches: { [path: string]: string } = {
-      './dist/styles.bundle.css': '.input-style',
-      './dist/lazy-style.bundle.css': '.lazy-style',
-      './dist/renamed-style.bundle.css': '.pre-rename-style',
-      './dist/renamed-lazy-style.bundle.css': '.pre-rename-lazy-style',
+      './dist/styles.css': '.input-style',
+      './dist/lazy-style.css': '.lazy-style',
+      './dist/renamed-style.css': '.pre-rename-style',
+      './dist/renamed-lazy-style.css': '.pre-rename-lazy-style',
     };
     const cssIndexMatches: { [path: string]: string } = {
-      './dist/index.html': '<link href="styles.bundle.css" rel="stylesheet"/>'
-        + '<link href="renamed-style.bundle.css" rel="stylesheet"/>',
+      './dist/index.html': '<link rel="stylesheet" href="styles.css">'
+        + '<link rel="stylesheet" href="renamed-style.css">',
     };
     const jsMatches: { [path: string]: string } = {
-      './dist/styles.bundle.js': '.input-style',
-      './dist/lazy-style.bundle.js': '.lazy-style',
-      './dist/renamed-style.bundle.js': '.pre-rename-style',
-      './dist/renamed-lazy-style.bundle.js': '.pre-rename-lazy-style',
+      './dist/styles.js': '.input-style',
+      './dist/lazy-style.js': '.lazy-style',
+      './dist/renamed-style.js': '.pre-rename-style',
+      './dist/renamed-lazy-style.js': '.pre-rename-lazy-style',
     };
     const jsIndexMatches: { [path: string]: string } = {
-      './dist/index.html': '<script type="text/javascript" src="inline.bundle.js"></script>'
-        + '<script type="text/javascript" src="polyfills.bundle.js"></script>'
-        + '<script type="text/javascript" src="styles.bundle.js"></script>'
-        + '<script type="text/javascript" src="renamed-style.bundle.js"></script>'
-        + '<script type="text/javascript" src="vendor.bundle.js"></script>'
-        + '<script type="text/javascript" src="main.bundle.js"></script>',
+      './dist/index.html': '<script type="text/javascript" src="runtime.js"></script>'
+        + '<script type="text/javascript" src="polyfills.js"></script>'
+        + '<script type="text/javascript" src="styles.js"></script>'
+        + '<script type="text/javascript" src="renamed-style.js"></script>'
+        + '<script type="text/javascript" src="vendor.js"></script>'
+        + '<script type="text/javascript" src="main.js"></script>',
     };
 
     host.writeMultipleFiles(styles);
@@ -153,18 +153,18 @@ describe('Browser Builder styles', () => {
       });
 
       const matches: { [path: string]: RegExp } = {
-        'dist/styles.bundle.css': new RegExp(
+        'dist/styles.css': new RegExp(
           // The global style should be there
           /p\s*{\s*background-color: #f00;\s*}(.|\n|\r)*/.source
           // The global style via import should be there
           + /body\s*{\s*background-color: #00f;\s*}/.source,
         ),
-        'dist/styles.bundle.css.map': /"mappings":".+"/,
-        'dist/main.bundle.js': new RegExp(
-          // The component style via import should be there
-          /.outer.*.inner.*background:\s*#[fF]+(.|\n|\r)*/.source
+        'dist/styles.css.map': /"mappings":".+"/,
+        'dist/main.js': new RegExp(
           // The component style should be there
-          + /h1.*background:\s*#000+/.source,
+          /h1(.|\n|\r)*background:\s*#000(.|\n|\r)*/.source
+          // The component style via import should be there
+          + /.outer(.|\n|\r)*.inner(.|\n|\r)*background:\s*#[fF]+/.source,
         ),
       };
 
@@ -215,6 +215,21 @@ describe('Browser Builder styles', () => {
     }, 30000);
   });
 
+  it(`supports material icons`, (done) => {
+    const overrides = {
+      extractCss: true,
+      optimizationLevel: 1,
+      styles: [
+        { input: '../../../../../node_modules/material-design-icons/iconfont/material-icons.css' },
+      ],
+    };
+
+    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
+      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).subscribe(undefined, done.fail, done);
+  }, 30000);
+
   extensionsWithVariableSupport.forEach(ext => {
     it(`supports ${ext} includePaths`, (done) => {
 
@@ -244,8 +259,8 @@ describe('Browser Builder styles', () => {
       });
 
       const matches: { [path: string]: RegExp } = {
-        'dist/styles.bundle.css': /h1\s*{\s*color: #f00;\s*}/,
-        'dist/main.bundle.js': /h2.*{.*color: #f00;.*}/,
+        'dist/styles.css': /h1\s*{\s*color: #f00;\s*}/,
+        'dist/main.js': /h2.*{.*color: #f00;.*}/,
       };
 
       host.replaceInFile('src/app/app.component.ts', './app.component.css',
@@ -297,7 +312,7 @@ describe('Browser Builder styles', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = 'dist/styles.bundle.css';
+        const fileName = 'dist/styles.css';
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         // Large image should not be inlined, and gradient should be there.
         expect(content).toMatch(
@@ -308,7 +323,7 @@ describe('Browser Builder styles', () => {
         expect(content).toMatch(/url\(['"]?small-id\.svg#testID['"]?\)/);
       }),
       tap(() => {
-        const fileName = 'dist/main.bundle.js';
+        const fileName = 'dist/main.js';
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         // Large image should not be inlined.
         expect(content).toMatch(/url\((?:['"]|\\')?large\.png(?:['"]|\\')?\)/);
@@ -361,7 +376,7 @@ describe('Browser Builder styles', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = 'dist/styles.bundle.css';
+        const fileName = 'dist/styles.css';
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         expect(content).toContain(tags.stripIndents`
           /* normal-comment */
@@ -385,7 +400,7 @@ describe('Browser Builder styles', () => {
       concatMap(() => architect.run(architect.getTarget({ overrides }))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = 'dist/styles.bundle.css';
+        const fileName = 'dist/styles.css';
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         expect(content).toContain(
           '/*! important-comment */div{-webkit-box-flex:1;-ms-flex:1;flex:1}');
@@ -413,8 +428,8 @@ describe('Browser Builder styles', () => {
       'src/assets/component-img-absolute.svg': imgSvg,
     });
 
-    const stylesBundle = 'dist/styles.bundle.css';
-    const mainBundle = 'dist/main.bundle.js';
+    const stylesBundle = 'dist/styles.css';
+    const mainBundle = 'dist/main.js';
 
     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
       // Check base paths are correctly generated.
@@ -425,9 +440,9 @@ describe('Browser Builder styles', () => {
         const styles = virtualFs.fileBufferToString(host.asSync().read(normalize(stylesBundle)));
         const main = virtualFs.fileBufferToString(host.asSync().read(normalize(mainBundle)));
         expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-        expect(styles).toContain(`url(global-img-relative.png)`);
+        expect(styles).toContain(`url('global-img-relative.png')`);
         expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-        expect(main).toContain(`url(component-img-relative.png)`);
+        expect(main).toContain(`url('component-img-relative.png')`);
         expect(host.asSync().exists(normalize('dist/global-img-absolute.svg'))).toBe(false);
         expect(host.asSync().exists(normalize('dist/global-img-relative.png'))).toBe(true);
         expect(host.asSync().exists(normalize('dist/component-img-absolute.svg'))).toBe(false);
