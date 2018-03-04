@@ -22,7 +22,9 @@ import {
   Path,
   PathFragment,
   dirname,
+  isAbsolute,
   join,
+  normalize,
   split,
 } from '../path';
 import {
@@ -39,6 +41,10 @@ import {
 export class SimpleMemoryHost implements Host<{}> {
   private _cache = new Map<Path, FileBuffer>();
   private _watchers = new Map<Path, [HostWatchOptions, Subject<HostWatchEvent>][]>();
+
+  protected _toAbsolute(path: Path) {
+    return isAbsolute(path) ? path : normalize('/' + path);
+  }
 
   protected _isDir(path: Path) {
     if (path === '/') {
@@ -104,6 +110,7 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   write(path: Path, content: FileBuffer): Observable<void> {
+    path = this._toAbsolute(path);
     if (this._isDir(path)) {
       return _throw(new PathIsDirectoryException(path));
     }
@@ -115,6 +122,7 @@ export class SimpleMemoryHost implements Host<{}> {
     return empty<void>();
   }
   read(path: Path): Observable<FileBuffer> {
+    path = this._toAbsolute(path);
     if (this._isDir(path)) {
       return _throw(new PathIsDirectoryException(path));
     }
@@ -126,6 +134,7 @@ export class SimpleMemoryHost implements Host<{}> {
     }
   }
   delete(path: Path): Observable<void> {
+    path = this._toAbsolute(path);
     if (this._isDir(path)) {
       for (const [cachePath, _] of this._cache.entries()) {
         if (path.startsWith(cachePath + NormalizedSep)) {
@@ -140,6 +149,8 @@ export class SimpleMemoryHost implements Host<{}> {
     return empty();
   }
   rename(from: Path, to: Path): Observable<void> {
+    from = this._toAbsolute(from);
+    to = this._toAbsolute(to);
     if (!this._cache.has(from)) {
       return _throw(new FileDoesNotExistException(from));
     } else if (this._cache.has(to)) {
@@ -168,6 +179,7 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   list(path: Path): Observable<PathFragment[]> {
+    path = this._toAbsolute(path);
     if (this._cache.has(path)) {
       return _throw(new PathIsFileException(path));
     }
@@ -191,13 +203,15 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   exists(path: Path): Observable<boolean> {
+    path = this._toAbsolute(path);
+
     return observableOf(this._cache.has(path) || this._isDir(path));
   }
   isDirectory(path: Path): Observable<boolean> {
-    return observableOf(this._isDir(path));
+    return observableOf(this._isDir(this._toAbsolute(path)));
   }
   isFile(path: Path): Observable<boolean> {
-    return observableOf(this._cache.has(path));
+    return observableOf(this._cache.has(this._toAbsolute(path)));
   }
 
   stats(_path: Path): Observable<Stats<{}>> | null {
@@ -205,6 +219,8 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> | null {
+    path = this._toAbsolute(path);
+
     const subject = new Subject<HostWatchEvent>();
     let maybeWatcherArray = this._watchers.get(path);
     if (!maybeWatcherArray) {

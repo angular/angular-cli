@@ -113,4 +113,21 @@ describe('SimpleMemoryHost', () => {
     expect(host.isDirectory(normalize('/sub/file1'))).toBe(false);
     expect(host.isDirectory(normalize('/sub/sub1/file3'))).toBe(false);
   });
+
+  it('makes every path absolute', () => {
+    const host = new SyncDelegateHost(new SimpleMemoryHost());
+
+    const buffer = stringToFileBuffer('hello');
+    const buffer2 = stringToFileBuffer('hello 2');
+
+    host.write(normalize('file1'), buffer);
+    host.write(normalize('/sub/file2'), buffer);
+    host.write(normalize('sub/file2'), buffer2);
+    expect(host.isFile(normalize('file1'))).toBe(true);
+    expect(host.isFile(normalize('/file1'))).toBe(true);
+    expect(host.isFile(normalize('/sub/file2'))).toBe(true);
+    expect(host.read(normalize('sub/file2'))).toBe(buffer2);
+    expect(host.isDirectory(normalize('/sub'))).toBe(true);
+    expect(host.isDirectory(normalize('sub'))).toBe(true);
+  });
 });
