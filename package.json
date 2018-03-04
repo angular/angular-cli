@@ -61,7 +61,10 @@
     "build": "ts-node --project ./tools/tsconfig.json build.ts",
     "test:watch": "ts-node --project ./tools/tsconfig.json build-test.ts && karma start karma.conf.js",
     "test:browser": "ts-node --project ./tools/tsconfig.json build-test.ts && ts-node test/test-browser.ts",
-    "test:server": "ts-node --project ./tools/tsconfig.json build-test.ts && ts-node test/test-server.ts"
+    "test:server": "ts-node --project ./tools/tsconfig.json build-test.ts && ts-node test/test-server.ts",
+    "upver": "standard-version",
+    "upver:beta": "standard-version --prerelease beta",
+    "upver:rc": "standard-version --prerelease rc"
   },
   "devDependencies": {
     "@angular/animations": "^5.2.0",
@@ -103,5 +106,8 @@
     "tsutils": "^2.6.0",
     "typescript": "~2.6.2",
     "zone.js": "^0.8.12"
+  },
+  "dependencies": {
+    "standard-version": "^4.3.0"
   }
 }
