@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@angular-devkit/build-optimizer": "0.0.0",
-    "@angular-devkit/architect": "0.0.0",
-    "@angular-devkit/core": "0.0.0",
     "@ngtools/webpack": "6.0.0-beta.4",
     "autoprefixer": "^7.2.3",
     "cache-loader": "^1.2.0",
@@ -58,5 +56,9 @@
     "webpack-merge": "^4.1.2",
     "webpack-sources": "^1.1.0",
     "webpack-subresource-integrity": "^1.0.3"
+  },
+  "peerDependencies": {
+    "@angular-devkit/architect": "0.0.0",
+    "@angular-devkit/core": "0.0.0"
   }
 }
