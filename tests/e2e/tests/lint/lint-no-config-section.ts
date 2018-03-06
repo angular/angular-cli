@@ -3,7 +3,7 @@ import { oneLine } from 'common-tags';
 
 export default function () {
   return Promise.resolve()
-    .then(() => ng('set', 'lint', '[]'))
+    .then(() => ng('config', 'lint', '[]'))
     .then(() => ng('lint'))
     .then(({ stdout }) => {
       if (!stdout.match(/No lint configuration\(s\) found\./)) {

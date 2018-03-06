@@ -10,7 +10,7 @@ export default async function () {
     throw new Error('Expected to have circular dependency warning in output.');
   }
 
-  await ng('set', 'defaults.build.showCircularDependencies=false');
+  await ng('config', 'defaults.build.showCircularDependencies', 'false');
   output = await ng('build');
   if (output.stdout.match(/WARNING in Circular dependency detected/)) {
     throw new Error('Expected to not have circular dependency warning in output.');
