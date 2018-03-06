@@ -675,7 +675,7 @@ export class AngularCompilerPlugin implements Tapable {
         timeEnd('AngularCompilerPlugin._make');
         cb();
       }, (err: any) => {
-        compilation.errors.push(err.stack);
+        compilation.errors.push(err);
         this.pushCompilationErrors(compilation);
         timeEnd('AngularCompilerPlugin._make');
         cb();
@@ -788,7 +788,7 @@ export class AngularCompilerPlugin implements Tapable {
 
         if (errors.length > 0) {
           const message = formatDiagnostics(errors);
-          this._errors.push(message);
+          this._errors.push(new Error(message));
         }
 
         if (warnings.length > 0) {
