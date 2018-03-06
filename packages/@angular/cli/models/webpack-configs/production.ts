@@ -132,7 +132,10 @@ export function getProdConfig(wco: WebpackConfigOptions) {
     // https://github.com/mapbox/mapbox-gl-js/issues/4359#issuecomment-303880888
     // https://github.com/angular/angular-cli/issues/5804
     // https://github.com/angular/angular-cli/pull/7931
-    typeofs : false
+    typeofs : false,
+    // Workaround known uglify-es issue
+    // See https://github.com/mishoo/UglifyJS2/issues/2949#issuecomment-368070307
+    inline: wco.supportES2015 ? 1 : 3,
   };
 
   if (buildOptions.buildOptimizer) {
