@@ -44,12 +44,12 @@ jobs:
       - restore_cache: *_root_package_lock_key
       - run: npm run test -- --code-coverage --full
 
-  test-big:
+  test-large:
     <<: *defaults
     steps:
       - checkout: *post_checkout
       - restore_cache: *_root_package_lock_key
-      - run: npm run test -- --code-coverage --full --big
+      - run: npm run test-large -- --code-coverage --full
 
   integration:
     <<: *defaults
@@ -138,7 +138,7 @@ workflows:
       - test:
           requires:
             - build
-      - test-big:
+      - test-large:
           requires:
             - build
       - integration:

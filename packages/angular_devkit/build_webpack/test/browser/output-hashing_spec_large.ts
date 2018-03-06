@@ -10,7 +10,7 @@ import { Architect } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
 import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
-import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_big';
+import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
 describe('Browser Builder output hashing', () => {

@@ -153,7 +153,7 @@ glob.sync('packages/**/*.spec.ts')
 
 export default function (args: ParsedArgs, logger: logging.Logger) {
   const packageGlob = args.glob ? `**/${args.glob}/**` : '**';
-  const specGlob = args.big ? '*_spec_big.ts' : '*_spec.ts';
+  const specGlob = args.large ? '*_spec_large.ts' : '*_spec.ts';
   const regex = `packages/${packageGlob}/${specGlob}`;
 
   if (args['code-coverage']) {

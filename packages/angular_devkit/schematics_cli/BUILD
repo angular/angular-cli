@@ -14,7 +14,7 @@ ts_library(
         include = ["bin/**/*.ts"],
         exclude = [
             "bin/**/*_spec.ts",
-            "bin/**/*_spec_big.ts",
+            "bin/**/*_spec_large.ts",
             "bin/**/*_benchmark.ts",
         ],
     ),

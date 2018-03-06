@@ -10,7 +10,7 @@
 // import { join, normalize } from '@angular-devkit/core';
 // import { concatMap, tap, toArray } from 'rxjs/operators';
 // import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
-// import { lazyModuleFiles, lazyModuleImport } from './rebuild_spec_big';
+// import { lazyModuleFiles, lazyModuleImport } from './rebuild_spec_large';
 
 
 // TODO: re-enable this test when the custom lazy module changes have been ported over to

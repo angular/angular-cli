@@ -14,7 +14,7 @@ test_script:
   - node --version
   - npm --version
   - npm test
-  - npm test -- --big
+  - npm run test-large
 
 build: off
 

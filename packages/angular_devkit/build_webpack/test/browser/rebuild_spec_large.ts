@@ -16,7 +16,7 @@ import {
   makeWorkspace,
   workspaceRoot,
 } from '../utils';
-import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_big';
+import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
 describe('Browser Builder', () => {

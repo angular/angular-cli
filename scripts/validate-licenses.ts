@@ -70,7 +70,7 @@ const ignoredPackages = [
                    // so hard to manage. In talk with owner and users to switch over.
 
   'uws@0.14.5', // TODO(filipesilva): remove this when karma is moved to e2e tests.
-  // TODO(filipesilva): remove this when spec_big is moved to e2e tests.
+  // TODO(filipesilva): remove this when spec_large is moved to e2e tests.
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
 
 ];
