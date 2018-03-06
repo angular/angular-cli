@@ -12,3 +12,5 @@ export {
   PostcssCliResourcesOptions,
 } from './postcss-cli-resources';
 
+import { join } from 'path';
+export const RawCssLoader = require.resolve(join(__dirname, 'raw-css-loader'));

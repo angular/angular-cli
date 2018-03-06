@@ -87,7 +87,7 @@ export class CleanCssWebpackPlugin {
 
           let content: string;
           let map: any;
-          if (asset.sourceAndMap) {
+          if (this._options.sourceMap && asset.sourceAndMap) {
             const sourceAndMap = asset.sourceAndMap();
             content = sourceAndMap.source;
             map = sourceAndMap.map;

@@ -7,10 +7,11 @@ import { SuppressExtractedTextChunksWebpackPlugin } from '../../plugins/webpack'
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../build-options';
 import { findUp } from '../../utilities/find-up';
+import { RawCssLoader } from '../../plugins/webpack';
 
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const postcssImports = require('postcss-import');
 const PostcssCliResources = require('../../plugins/webpack').PostcssCliResources;
 
@@ -210,14 +211,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     }
   ];
 
-  const commonLoaders: webpack.Loader[] = [
-    { loader: 'raw-loader' },
-  ];
-
   // load component css as raw strings
   const rules: webpack.Rule[] = baseRules.map(({ test, use }) => ({
     exclude: globalStylePaths, test, use: [
-      ...commonLoaders,
+      { loader: 'raw-loader' },
       {
         loader: 'postcss-loader',
         options: {
@@ -235,7 +232,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     rules.push(...baseRules.map(({ test, use }) => {
       const extractTextPlugin = {
         use: [
-          ...commonLoaders,
+          { loader: RawCssLoader },
           {
             loader: 'postcss-loader',
             options: {
@@ -252,8 +249,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       const ret: any = {
         include: globalStylePaths,
         test,
-        use: buildOptions.extractCss ? ExtractTextPlugin.extract(extractTextPlugin)
-          : ['style-loader', ...extractTextPlugin.use]
+        use: [
+          buildOptions.extractCss ? MiniCssExtractPlugin.loader : 'style-loader',
+          ...extractTextPlugin.use,
+        ]
       };
       // Save the original options as arguments for eject.
       // if (buildOptions.extractCss) {
@@ -266,7 +265,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   if (buildOptions.extractCss) {
     // extract global css from js files into own css file
     extraPlugins.push(
-      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.css` }));
+      new MiniCssExtractPlugin({ filename: `[name]${hashFormat.script}.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
