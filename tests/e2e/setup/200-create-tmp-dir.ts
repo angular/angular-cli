@@ -8,7 +8,7 @@ export default function() {
   const argv = getGlobalVariable('argv');
 
   // Get to a temporary directory.
-  let tempRoot = argv.tmpdir || temp.mkdirSync('angular-cli-e2e-');;
+  let tempRoot = argv.tmpdir || temp.mkdirSync('angular-cli-e2e-');
   if (argv.reuse) {
     tempRoot = dirname(argv.reuse);
   }

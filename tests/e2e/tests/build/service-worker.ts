@@ -32,7 +32,7 @@ export default function() {
   // stuck to the first build done
   return silentNpm('remove', '@angular/service-worker')
     .then(() => silentNpm('install', '@angular/service-worker'))
-    .then(() => ng('set', 'apps.0.serviceWorker=true'))
+    .then(() => ng('config', 'apps.0.serviceWorker', 'true'))
     .then(() => writeFile('src/ngsw-config.json', JSON.stringify(MANIFEST, null, 2)))
     .then(() => ng('build', '--target', 'production'))
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))

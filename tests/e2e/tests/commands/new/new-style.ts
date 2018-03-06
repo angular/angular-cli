@@ -5,7 +5,7 @@ import {expectFileToExist} from '../../../utils/fs';
 
 export default function() {
   return Promise.resolve()
-    .then(() => ng('set', 'defaults.styleExt', 'scss', '--global'))
+    .then(() => ng('config', 'defaults.styleExt', 'scss', '--global'))
     .then(() => createProject('style-project'))
     .then(() => expectFileToExist('src/app/app.component.scss'))
 

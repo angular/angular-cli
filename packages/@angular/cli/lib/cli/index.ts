@@ -32,8 +32,7 @@ function loadCommands() {
     'make-this-awesome': require('../../commands/easter-egg').default,
 
     // Configuration.
-    'set': require('../../commands/set').default,
-    'get': require('../../commands/get').default
+    'config': require('../../commands/config').default,
   };
 }
 
