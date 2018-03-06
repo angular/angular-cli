@@ -9,6 +9,16 @@ Default applications are created in a directory of the same name, with an initia
 
 ## Options
 <details>
+  <summary>collection</summary>
+  <p>
+    <code>--collection</code> (alias: <code>-c</code>) <em>default value: @schematics/angular</em>
+  </p>
+  <p>
+    Schematics collection to use.
+  </p>
+</details>
+
+<details>
   <summary>directory</summary>
   <p>
     <code>--directory</code> (alias: <code>-dir</code>) <em>default value: dir</em>
@@ -21,7 +31,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>dry-run</summary>
   <p>
-    <code>--dry-run</code> (alias: <code>-d</code>) <em>default value: false</em>
+    <code>--dry-run</code> (aliases: <code>-d</code> <code>-dryRun</code>) <em>default value: false</em>
   </p>
   <p>
     Run through without making any changes. Will list all files that would have been created when running <code>ng new</code>.
@@ -34,7 +44,7 @@ Default applications are created in a directory of the same name, with an initia
     <code>--inline-style</code> (alias: <code>-is</code>) <em>default value: false</em>
   </p>
   <p>
-    Should have an inline style.
+    Specifies if the style will be in the ts file.
   </p>
 </details>
 
@@ -44,7 +54,7 @@ Default applications are created in a directory of the same name, with an initia
     <code>--inline-template</code> (alias: <code>-it</code>) <em>default value: false</em>
   </p>
   <p>
-    Should have an inline template.
+    Specifies if the template will be in the ts file.
   </p>
 </details>
 
@@ -54,7 +64,7 @@ Default applications are created in a directory of the same name, with an initia
     <code>--minimal</code> <em>default value: false</em>
   </p>
   <p>
-    Should create a minimal app.
+    Create a minimal app (no test structure, inline styles/templates).
   </p>
 </details>
 
@@ -64,7 +74,7 @@ Default applications are created in a directory of the same name, with an initia
     <code>--prefix</code> (alias: <code>-p</code>) <em>default value: app</em>
   </p>
   <p>
-    The prefix to use for all component selectors.
+    The prefix to apply to generated selectors.
   </p>
   <p>
     You can later change the value in <em>.angular-cli.json</em> (<code>apps[0].prefix</code>).
@@ -77,14 +87,24 @@ Default applications are created in a directory of the same name, with an initia
     <code>--routing</code> <em>default value: false</em>
   </p>
   <p>
-    Generate a routing module.
+    Generates a routing module.
+  </p>
+</details>
+
+<details>
+  <summary>service-worker</summary>
+  <p>
+    <code>--service-worker</code> <em>default value: false</em>
+  </p>
+  <p>
+    Installs the @angular/service-worker.
   </p>
 </details>
 
 <details>
   <summary>skip-commit</summary>
   <p>
-    <code>--skip-commit</code> (alias: <code>-sc</code>) <em>default value: false</em>
+    <code>--skip-commit</code> (aliases: <code>-sc</code> <code>-skipCommit</code>) <em>default value: false</em>
   </p>
   <p>
     Skip committing the first commit to git.
@@ -104,7 +124,7 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>skip-install</summary>
   <p>
-    <code>--skip-install</code> (alias: <code>-si</code>) <em>default value: false</em>
+    <code>--skip-install</code> (aliases: <code>-si</code> <code>-skipInstall</code>) <em>default value: false</em>
   </p>
   <p>
     Skip installing packages.
@@ -125,31 +145,18 @@ Default applications are created in a directory of the same name, with an initia
 </details>
 
 <details>
-  <summary>source-dir</summary>
-  <p>
-    <code>--source-dir</code> (alias: <code>-sd</code>) <em>default value: src</em>
-  </p>
-  <p>
-    The name of the source directory.
-  </p>
-  <p>
-    You can later change the value in <em>.angular-cli.json</em> (<code>apps[0].root</code>).
-  </p>
-</details>
-
-<details>
   <summary>style</summary>
   <p>
     <code>--style</code> <em>default value: css</em>
   </p>
   <div>
-    The style file default extension. Possible values:
+    The file extension to be used for style files. Possible values:
     <ul>
       <li>css</li>
       <li>scss</li>
       <li>less</li>
       <li>sass</li>
-      <li>styl (<code>stylus</code>)<li>
+      <li>styl (<code>stylus</code>)</li>
     </ul>
   </div>
   <p>
@@ -160,9 +167,24 @@ Default applications are created in a directory of the same name, with an initia
 <details>
   <summary>verbose</summary>
   <p>
-    <code>--verbose</code> (alias: <code>-v</code>) <em>default value: false</em>
+    <code>--verbose</code> (aliases: <code>-v</code> <code>-verbose</code>) <em>default value: false</em>
   </p>
   <p>
     Adds more details to output logging.
   </p>
+</details>
+
+<details>
+  <summary>view-encapsulation</summary>
+  <p>
+    <code>--view-encapsulation</code>
+  </p>
+  <div>
+    Specifies the view encapsulation strategy. Possible values:
+    <ul>
+      <li>Emulated</li>
+      <li>Native</li>
+      <li>None</li>
+    </ul>
+  </div>
 </details>
