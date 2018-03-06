@@ -2,30 +2,33 @@ import {oneLine, stripIndent} from 'common-tags';
 
 const SilentError = require('silent-error');
 
-const projectNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$/;
+const projectNameRegexp = /^[a-zA-Z][0-9a-zA-Z]*([-. ][a-zA-Z][0-9a-zA-Z]*)*$/;
 const unsupportedProjectNames = ['test', 'ember', 'ember-cli', 'vendor', 'app'];
 
-function getRegExpFailPosition(str: string): number | null {
+function getRegExpFailPosition(str: string): number {
+  if (projectNameRegexp.test(str)) { return -1; }
+
   const parts = str.split('-');
   const matched: string[] = [];
 
   parts.forEach(part => {
-    if (part.match(projectNameRegexp)) {
+    if (projectNameRegexp.test(part)) {
       matched.push(part);
     }
   });
 
   const compare = matched.join('-');
-  return (str !== compare) ? compare.length : null;
+  return (str !== compare) ? compare.length : -1;
 }
 
 export function validateProjectName(projectName: string) {
   const errorIndex = getRegExpFailPosition(projectName);
-  if (errorIndex !== null) {
+  if (errorIndex !== -1) {
     const firstMessage = oneLine`
       Project name "${projectName}" is not valid. New project names must
-      start with a letter, and must contain only alphanumeric characters or dashes.
-      When adding a dash the segment after the dash must also start with a letter.
+      start with a letter, and must contain only alphanumeric characters, spaces, dots or dashes.
+      New project name must end with alphanumeric characters.
+      When adding a dash, space or dot the segment after the it must also start with a letter.
     `;
     const msg = stripIndent`
       ${firstMessage}
