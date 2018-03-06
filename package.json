@@ -51,7 +51,7 @@
     "cache-loader": "^1.2.0",
     "chalk": "~2.2.0",
     "circular-dependency-plugin": "^4.2.1",
-    "clean-css": "^4.1.9",
+    "clean-css": "^4.1.11",
     "common-tags": "^1.3.1",
     "copy-webpack-plugin": "~4.4.1",
     "core-object": "^3.1.0",
