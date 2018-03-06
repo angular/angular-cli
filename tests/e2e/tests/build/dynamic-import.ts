@@ -5,6 +5,9 @@ import { updateJsonFile } from '../../utils/project';
 
 
 export default async function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   // Add a lazy module
   await ng('generate', 'module', 'lazy');
   await updateJsonFile('.angular-cli.json', configJson => {

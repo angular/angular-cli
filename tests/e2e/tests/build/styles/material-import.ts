@@ -7,6 +7,9 @@ import { stripIndents } from 'common-tags';
 import { updateJsonFile } from '../../../utils/project';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   const extensions = ['css', 'scss', 'less', 'styl'];
   let promise: Promise<any> = Promise.resolve()
     .then(() => silentNpm('install', '@angular/material@5.0.4'));

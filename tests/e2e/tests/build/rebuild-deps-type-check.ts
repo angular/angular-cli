@@ -13,6 +13,9 @@ const errorRe = /ERROR in/;
 
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   if (process.platform.startsWith('win')) {
     return Promise.resolve();
   }

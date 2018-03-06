@@ -9,6 +9,9 @@ import {expectToFail, wait} from '../../utils/utils';
 const webpackGoodRegEx = /: Compiled successfully./;
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
 
   // @filipesilva: This test doesn't work correctly on CircleCI while being ran by the test script.
   // Polling time seems to be ignored and several builds are fired per second.

@@ -30,7 +30,7 @@ module.exports = function(options) {
 
 
   let defaultUpdateCheckerOptions = {
-    checkForUpdates: false,
+    // checkForUpdates: false,
   };
 
   let cli = new CLI({

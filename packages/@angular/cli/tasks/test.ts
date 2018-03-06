@@ -1,58 +1,45 @@
-import * as path from 'path';
+import { normalize } from '@angular-devkit/core';
+import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
+import { Architect } from '@angular-devkit/architect';
+import { concatMap } from 'rxjs/operators';
 
 import { TestOptions } from '../commands/test';
 import { CliConfig } from '../models/config';
-import { requireProjectModule } from '../utilities/require-project-module';
 import { getAppFromConfig } from '../utilities/app-utils';
+import {
+  createArchitectWorkspace,
+  getProjectName,
+  convertOptions,
+} from '../utilities/build-webpack-compat';
 
 const Task = require('../ember-cli/lib/models/task');
-const SilentError = require('silent-error');
 
 
 export default Task.extend({
   run: function (options: TestOptions) {
-    const projectConfig = CliConfig.fromProject().config;
-    const projectRoot = this.project.root;
-    const appConfig = getAppFromConfig(options.app);
+    const config = CliConfig.fromProject().config;
+    const app = getAppFromConfig(options.app);
 
-    if (projectConfig.project && projectConfig.project.ejected) {
-      throw new SilentError('An ejected project cannot use the build command anymore.');
-    }
-    if (appConfig.platform === 'server') {
-      throw new SilentError('ng test for platform server applications is coming soon!');
-    }
-    if (! appConfig.main) {
-      throw new SilentError(`An app without 'main' cannot use the test command.`);
-    }
+    const host = new NodeJsSyncHost();
+    const logger = createConsoleLogger();
+    const architect = new Architect(normalize(this.project.root), host);
 
-    return new Promise((resolve) => {
-      const karma = requireProjectModule(projectRoot, 'karma');
-      const karmaConfig = path.join(projectRoot, options.config ||
-        CliConfig.getValue('test.karma.config'));
+    const workspaceConfig = createArchitectWorkspace(config);
+    const project = getProjectName(app, options.app);
+    const overrides: any = convertOptions({ ...options });
+    const targetOptions = {
+      project,
+      target: 'karma',
+      overrides
+    };
+    const context = { logger };
 
-      let karmaOptions: any = Object.assign({}, options);
-
-      // Convert browsers from a string to an array
-      if (options.browsers) {
-        karmaOptions.browsers = options.browsers.split(',');
+    return architect.loadWorkspaceFromJson(workspaceConfig).pipe(
+      concatMap(() => architect.run(architect.getTarget(targetOptions), context)),
+    ).toPromise().then(buildEvent => {
+      if (buildEvent.success === false) {
+        return Promise.reject('Build failed');
       }
-
-      karmaOptions.angularCli = {
-        codeCoverage: options.codeCoverage,
-        sourcemaps: options.sourcemaps,
-        progress: options.progress,
-        poll: options.poll,
-        environment: options.environment,
-        preserveSymlinks: options.preserveSymlinks,
-        app: options.app
-      };
-
-      // Assign additional karmaConfig options to the local ngapp config
-      karmaOptions.configFile = karmaConfig;
-
-      // :shipit:
-      const karmaServer = new karma.Server(karmaOptions, resolve);
-      karmaServer.start();
     });
   }
 });

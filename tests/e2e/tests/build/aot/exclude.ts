@@ -4,6 +4,9 @@ import { updateJsonFile } from '../../../utils/project';
 import { getGlobalVariable } from '../../../utils/env';
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   // Disable parts of it in webpack tests.
   const ejected = getGlobalVariable('argv').eject;
 

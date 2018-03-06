@@ -6,6 +6,9 @@ import { updateJsonFile } from '../../utils/project';
 
 
 export default function() {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       const app = configJson.defaults;

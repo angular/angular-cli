@@ -11,6 +11,9 @@ import { readFile, writeFile } from '../../utils/fs';
 const karmaGoodRegEx = /Executed 3 of 3 SUCCESS \(\d+\.\d+ secs/;
 
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   let originalSpec: string;
   return execAndWaitForOutputToMatch('ng', ['test'], karmaGoodRegEx)
     .then(() => readFile('src/app/app.component.spec.ts'))

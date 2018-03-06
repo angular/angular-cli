@@ -6,6 +6,9 @@ import { stripIndent } from 'common-tags';
 
 // Make sure asset files are served
 export default function () {
+  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  return;
+
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/assets/file.txt': 'assets-folder-content',
