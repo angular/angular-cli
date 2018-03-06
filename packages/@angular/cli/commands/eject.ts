@@ -16,12 +16,18 @@ export const baseEjectCommandOptions: any = [
     type: String,
     aliases: ['a'],
     description: 'Specifies app name to use.'
+  },
+  {
+    name: 'config',
+    type: String,
+    description: 'Ejects webpack config to specified file without modifying your project.'
   }
 ];
 
 export interface EjectTaskOptions extends BuildOptions {
   force?: boolean;
   app?: string;
+  config?: string;
 }
 
 

@@ -12,6 +12,9 @@ You can use `--force` to overwrite existing configurations.
 You can eject multiple times, to have a dev and prod config for instance, by renaming the ejected
 configuration and using the `--force` flag.
 
+You can also use the `--config <file>` option to eject only the webpack configuration without
+modifying your project.
+
 ### Ejecting the CLI
 
 ```bash
@@ -46,6 +49,16 @@ ng eject
   </p>
   <p>
     Base url for the application being built.
+  </p>
+</details>
+
+<details>
+  <summary>config</summary>
+  <p>
+    <code>--config</code>
+  </p>
+  <p>
+    Ejects webpack config to specified file without modifying your project.
   </p>
 </details>
 
