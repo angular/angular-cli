@@ -173,12 +173,20 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       .map((path) => this.denormalizePath(path));
   }
 
-  invalidate(fileName: string): void {
-    fileName = this.resolve(fileName);
-    if (fileName in this._files) {
-      this._files[fileName] = null;
+  invalidate(path: string): void {
+    const fullPath = this.resolve(path);
+    if (fullPath in this._files) {
+      this._files[fullPath] = null;
+    } else {
+      for (const file in this._files) {
+        if (file.startsWith(fullPath + '/')) {
+          this._files[file] = null;
+        }
+      }
     }
-    this._changedFiles[fileName] = true;
+    if (this.fileExists(fullPath)) {
+      this._changedFiles[fullPath] = true;
+    }
   }
 
   fileExists(fileName: string, delegate = true): boolean {
