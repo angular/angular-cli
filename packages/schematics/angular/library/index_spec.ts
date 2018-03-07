@@ -5,13 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { HostTree, VirtualTree, Tree } from '@angular-devkit/schematics';
+import { normalize } from '@angular-devkit/core';
+import { HostTree, Tree, VirtualTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
+import {
+  SimpleMemoryHost,
+  stringToFileBuffer } from '../../../angular_devkit/core/src/virtual-fs/host';
 import { getFileContent } from '../../angular/utility/test';
 import { Schema as GenerateLibrarySchema } from './schema';
-import { SimpleMemoryHost, stringToFileBuffer, fileBufferToString } from '../../../angular_devkit/core/src/virtual-fs/host';
-import { normalize } from '@angular-devkit/core';
 
 function getJsonFileContent(tree: Tree, path: string) {
   return JSON.parse(getFileContent(tree, path));
@@ -49,7 +51,7 @@ describe('Library Schematic', () => {
 
   it('should use default value for sourceDir and entryFile', () => {
     const tree = schematicRunner.runSchematic('library', {
-      name: 'foobar'
+      name: 'foobar',
     });
     expect(tree.files.length).toEqual(2);
     expect(tree.files[1]).toEqual('/lib/foobar/public_api.ts');
@@ -62,8 +64,8 @@ describe('Library Schematic', () => {
       mockTree.create('tsconfig.json', JSON.stringify({
         compilerOptions: {
           target: 'es2015',
-          module: 'es2015'
-        }
+          module: 'es2015',
+        },
       }));
     });
 
@@ -83,9 +85,9 @@ describe('Library Schematic', () => {
           module: 'es2015',
           paths: {
             'unrelated': ['./something/else.ts'],
-            'foo': ['libs/*']
-          }
-        }
+            'foo': ['libs/*'],
+          },
+        },
       }));
       const tree = schematicRunner.runSchematic('library', defaultOptions, mockTree);
 
@@ -98,7 +100,7 @@ describe('Library Schematic', () => {
     it(`should not modify the file when --skipTsConfig`, () => {
       const tree = schematicRunner.runSchematic('library', {
         name: 'foo',
-        skipTsConfig: true
+        skipTsConfig: true,
       }, mockTree);
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
@@ -113,8 +115,8 @@ describe('Library Schematic', () => {
       memoryfs = new SimpleMemoryHost();
       memoryfs.write(normalize('/package.json'), stringToFileBuffer(JSON.stringify({
         devDependencies: {
-          typescript: '~2.5.0'
-        }
+          typescript: '~2.5.0',
+        },
       })));
       mockTree = new HostTree(memoryfs);
     });
@@ -131,7 +133,8 @@ describe('Library Schematic', () => {
       const tree = schematicRunner.runSchematic('library', defaultOptions, mockTree);
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.scripts['libs:foo:build']).toEqual('ng-packagr -p my-libs/foo/package.json');
+      expect(packageJson.scripts['libs:foo:build'])
+        .toEqual('ng-packagr -p my-libs/foo/package.json');
     });
 
     it(`should not override existing users dependencies`, () => {
@@ -144,7 +147,7 @@ describe('Library Schematic', () => {
     it(`should not modify the file when --skipPackageJson`, () => {
       const tree = schematicRunner.runSchematic('library', {
         name: 'foo',
-        skipPackageJson: true
+        skipPackageJson: true,
       }, mockTree);
 
       const packageJson = getJsonFileContent(tree, 'package.json');

@@ -34,7 +34,7 @@ describe('NgPackagr Target', () => {
           build: {
             builder: `${relativeBuilderPath}:build`,
             options: {
-              project: './package.json'
+              project: './package.json',
             },
           },
         },

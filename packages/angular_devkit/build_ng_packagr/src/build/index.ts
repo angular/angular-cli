@@ -1,3 +1,11 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
 import { BuildEvent, Builder, BuilderContext, Target } from '@angular-devkit/architect';
 import { getSystemPath } from '@angular-devkit/core';
 import * as ngPackagr from 'ng-packagr';
@@ -35,7 +43,7 @@ export class NgPackagrBuilder implements Builder<NgPackagrBuilderOptions> {
         .forProject(packageJsonPath)
         .build()
         .then(() => obs.complete())
-        .catch((e: any) => obs.error(e));
+        .catch((e) => obs.error(e));
     });
   }
 

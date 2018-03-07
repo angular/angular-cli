@@ -12,6 +12,7 @@
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
     "rxjs": "0.0.0",
-    "ng-packagr": "^2.0.0"
+    "resolve": "0.0.0",
+    "ng-packagr": "0.0.0"
   }
 }
