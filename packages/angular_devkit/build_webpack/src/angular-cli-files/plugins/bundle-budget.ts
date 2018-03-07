@@ -32,9 +32,8 @@ export class BundleBudgetPlugin {
 
   apply(compiler: any): void {
     const { budgets } = this.options;
-    compiler.plugin('after-emit', (compilation: any, cb: Function) => {
+    compiler.hooks.afterEmit.tap('BundleBudgetPlugin', (compilation: any) => {
       if (!budgets || budgets.length === 0) {
-        cb();
         return;
       }
 
@@ -59,7 +58,6 @@ export class BundleBudgetPlugin {
           });
 
         });
-      cb();
     });
   }
 

@@ -8,7 +8,7 @@ export class KarmaWebpackFailureCb {
   constructor(private callback: () => void) { }
 
   apply(compiler: any): void {
-    compiler.plugin('done', (stats: any) => {
+    compiler.hooks.done.tap('KarmaWebpackFailureCb', (stats: any) => {
       if (stats.compilation.errors.length > 0) {
         this.callback();
       }

@@ -8,7 +8,7 @@ export class SuppressExtractedTextChunksWebpackPlugin {
   constructor() { }
 
   apply(compiler: any): void {
-    compiler.plugin('compilation', function (compilation: any) {
+    compiler.hooks.compilation.tap('SuppressExtractedTextChunks', (compilation: any) => {
       // find which chunks have css only entry points
       const cssOnlyChunks: string[] = [];
       const entryPoints = compilation.options.entry;
@@ -23,7 +23,7 @@ export class SuppressExtractedTextChunksWebpackPlugin {
         }
       }
       // Remove the js file for supressed chunks
-      compilation.plugin('after-seal', (callback: any) => {
+      compilation.hooks.afterSeal.tap('SuppressExtractedTextChunks', () => {
         compilation.chunks
           .filter((chunk: any) => cssOnlyChunks.indexOf(chunk.name) !== -1)
           .forEach((chunk: any) => {
@@ -38,7 +38,6 @@ export class SuppressExtractedTextChunksWebpackPlugin {
             });
             chunk.files = newFiles;
           });
-        callback();
       });
       // Remove scripts tags with a css file as source, because HtmlWebpackPlugin will use
       // a css file as a script for chunks without js files.
