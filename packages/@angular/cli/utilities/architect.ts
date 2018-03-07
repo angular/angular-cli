@@ -32,3 +32,36 @@ export function runTarget(root: string, target: string, options: any): Observabl
   );
 }
 
+export interface RunOptions {
+  root: string;
+  app: string;
+  target: string;
+  configuration?: string;
+  overrides?: object;
+}
+
+export function run(options: RunOptions) {
+  const {root, app, target, configuration, overrides} = options;
+
+  const host = new NodeJsSyncHost();
+  const logger = createConsoleLogger();
+  const cliConfig = CliConfig.fromProject().config;
+  const architect = new Architect(normalize(root), host);
+
+  const appConfig = getAppFromConfig(app);
+  const workspaceConfig = createArchitectWorkspace(cliConfig);
+  const project = getProjectName(appConfig, app);
+  const convertOverrides: any = convertOptions({ ...overrides });
+  const context = { logger };
+
+  const targetOptions = {
+    project,
+    target,
+    configuration,
+    overrides: convertOverrides
+  };
+
+  return architect.loadWorkspaceFromJson(workspaceConfig).pipe(
+    concatMap(() => architect.run(architect.getTarget(targetOptions), context)),
+  );
+}
