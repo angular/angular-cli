@@ -33,7 +33,7 @@ export function findLazyRoutes(
   if (program) {
     sourceFile = program.getSourceFile(fileName);
   }
-  if (!sourceFile) {
+  if (!sourceFile && host.fileExists(fileName)) {
     sourceFile = ts.createSourceFile(
       fileName,
       host.readFile(fileName),
