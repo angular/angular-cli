@@ -15,16 +15,16 @@ export abstract class ArchitectCommand extends Command {
 
   protected prodOption: Option = {
     name: 'prod',
-    description: '',
+    description: 'Flag to set configuration to "prod".',
     type: Boolean
   };
 
-
-  // root: string;
-  // project: string;
-  // target: string;
-  // configuration?: string;
-  // overrides?: object;
+  protected configurationOption: Option = {
+    name: 'configuration',
+    description: 'Specify the configuration to use.',
+    type: String,
+    aliases: ['c']
+  };
 
   protected async runArchitect(options: RunArchitectOptions): Promise<boolean> {
     const runOptions: RunOptions = {
