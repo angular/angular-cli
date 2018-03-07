@@ -1,0 +1,15 @@
+{
+  "title": "ng-packagr Target",
+  "description": "ng-packagr target options for Build Architect.",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The file path of the package.json for distribution via npm."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "project"
+  ]
+}

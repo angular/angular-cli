@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../../../../node_modules/ng-packagr/package.schema.json",
+  "name": "ng-packaged-one",
+  "ngPackage": {
+    "lib": {
+      "entryFile": "index.ts"
+    }
+  }
+}
