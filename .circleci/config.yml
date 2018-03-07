@@ -49,7 +49,7 @@ jobs:
     steps:
       - checkout: *post_checkout
       - restore_cache: *_root_package_lock_key
-      - run: npm run test-large -- --code-coverage --full
+      - run: npm run test-large -- --code-coverage --full --spec-reporter
 
   integration:
     <<: *defaults

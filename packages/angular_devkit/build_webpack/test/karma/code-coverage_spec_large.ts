@@ -36,7 +36,7 @@ describe('Karma Builder code coverage', () => {
         expect(content).toContain('test.ts');
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, 120000);
 
   it('supports exclude', (done) => {
     const overrides: Partial<KarmaBuilderOptions> = {
@@ -59,5 +59,5 @@ describe('Karma Builder code coverage', () => {
         expect(content).not.toContain('test.ts');
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, 120000);
 });

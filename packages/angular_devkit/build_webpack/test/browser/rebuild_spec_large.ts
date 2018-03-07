@@ -122,7 +122,7 @@ describe('Browser Builder', () => {
       }),
       take(3),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, 60000);
 
   it('rebuilds on CSS changes', (done) => {
     const overrides = { watch: true };
@@ -134,7 +134,7 @@ describe('Browser Builder', () => {
       tap(() => host.appendToFile('src/app/app.component.css', ':host { color: blue; }')),
       take(2),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, 60000);
 
   it('type checks on rebuilds', (done) => {
     host.writeMultipleFiles({
@@ -194,7 +194,7 @@ describe('Browser Builder', () => {
       }),
       take(4),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, 120000);
 
   it('rebuilds on type changes', (done) => {
     host.writeMultipleFiles({ 'src/type.ts': `export type MyType = number;` });
