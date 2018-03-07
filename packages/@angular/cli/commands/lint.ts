@@ -1,28 +1,29 @@
-import { Command, CommandScope, Option } from '../models/command';
+import { CommandScope, Option } from '../models/command';
+import { ArchitectCommand } from '../models/architect-command';
 
-export interface LintCommandOptions {
-  fix?: boolean;
-  typeCheck?: boolean;
-  format?: string;
-  force?: boolean;
+export interface RunOptions {
+  app?: string;
+  configuration?: string;
 }
 
-export default class LintCommand extends Command {
+export default class LintCommand extends ArchitectCommand {
   public readonly name = 'lint';
+  public readonly target = 'tslint';
   public readonly description = 'Lints code in existing project.';
   public static aliases = ['l'];
   public readonly scope = CommandScope.inProject;
-  public readonly arguments: string[] = [];
-  public readonly options: Option[] = [];
+  public readonly arguments: string[] = ['app'];
+  public readonly options: Option[] = [
+    this.configurationOption
+  ];
 
-  public async run(options: LintCommandOptions) {
-    const LintTask = require('../tasks/lint').default;
-
-    const lintTask = new LintTask({
-      ui: this.ui,
-      project: this.project
+  public async run(options: RunOptions) {
+    const overrides = {...options};
+    delete overrides.app;
+    return this.runArchitect({
+      app: options.app,
+      configuration: options.configuration,
+      overrides
     });
-
-    return await lintTask.run(options);
   }
 }
