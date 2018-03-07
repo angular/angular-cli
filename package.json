@@ -118,6 +118,7 @@
     "mini-css-extract-plugin": "~0.2.0",
     "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
+    "ng-packagr": "^2.1.0",
     "node-sass": "^4.7.2",
     "opn": "^5.1.0",
     "parse5": "^4.0.0",

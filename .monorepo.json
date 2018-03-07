@@ -79,6 +79,17 @@
       "hash": "16619356762199de42e1641d35e5ec7d",
       "snapshotRepo": "angular/angular-devkit-build-optimizer-builds"
     },
+    "@angular-devkit/build-ng-packagr": {
+      "name": "Build NgPackagr",
+      "links": [
+        {
+          "label": "README",
+          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_ng_packagr/README.md"
+        }
+      ],
+      "version": "0.0.1",
+      "hash": ""
+    },
     "@angular-devkit/build-webpack": {
       "name": "Build Webpack",
       "links": [
