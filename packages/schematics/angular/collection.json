@@ -69,6 +69,12 @@
       "factory": "./app-shell",
       "description": "Create an app shell.",
       "schema": "./app-shell/schema.json"
+    },
+    "library": {
+      "aliases": ["lib"],
+      "factory": "./library",
+      "schema": "./library/schema.json",
+      "description": "Generate a library project for Angular."
     }
   }
 }

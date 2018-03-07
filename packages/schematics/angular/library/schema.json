@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsLibrary",
+  "title": "Library Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the library."
+    },
+    "entryFile": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the library's public API file.",
+      "default": "public_api.ts"
+    },
+    "baseDir": {
+      "type": "string",
+      "format": "path",
+      "description": "The base path where the library sources will be created.",
+      "default": "lib",
+      "visible": false
+    },
+    "skipPackageJson": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not add dependencies to package.json (e.g., --skipPackageJson)"
+    },
+    "skipTsConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not update tsconfig.json for development experience (e.g., --skipTsConfig)"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

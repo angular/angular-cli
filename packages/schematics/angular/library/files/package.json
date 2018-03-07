@@ -1,0 +1,10 @@
+{
+  "name": "<%= name %>",
+  "version": "1.0.0",
+  "peerDependencies": [],
+  "ngPackage": {
+    "lib": {
+      "entryFile": "<%= entryFile %>.ts"
+    }
+  }
+}
