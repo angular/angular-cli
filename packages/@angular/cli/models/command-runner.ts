@@ -6,7 +6,7 @@ import {
   CommandScope
 } from '../models/command';
 import { oneLine } from 'common-tags';
-import { Logger } from '@angular-devkit/core/src/logger';
+import { logging } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
 
 const yargsParser = require('yargs-parser');
@@ -19,12 +19,13 @@ export interface CommandMap {
  * Run a command.
  * @param commandMap Map of available commands.
  * @param args Raw unparsed arguments.
+ * @param logger The logger to use.
  * @param context Execution context.
  */
 export async function runCommand(commandMap: CommandMap,
-                           args: string[],
-                           logger: Logger,
-                           context: CommandContext): Promise<any> {
+                                 args: string[],
+                                 logger: logging.Logger,
+                                 context: CommandContext): Promise<any> {
 
   const rawOptions = yargsParser(args, { alias: { help: ['h'] }, boolean: [ 'help' ] });
   let commandName = rawOptions._[0];
@@ -55,11 +56,10 @@ export async function runCommand(commandMap: CommandMap,
 
   const command = new Cmd(context, logger);
 
-  let options = parseOptions(yargsParser, args, command.options);
-  options = mapArguments(options, command.arguments);
+  args = await command.initializeRaw(args);
+  let options = parseOptions(args, command.options, command.arguments);
   await command.initialize(options);
-  options = parseOptions(yargsParser, args, command.options);
-  options = mapArguments(options, command.arguments);
+  options = parseOptions(args, command.options, command.arguments);
   if (commandName === 'help') {
     options.commandMap = commandMap;
   }
@@ -74,9 +74,13 @@ export async function runCommand(commandMap: CommandMap,
   }
 }
 
-function parseOptions(parser: Function,
-                      args: string[],
-                      cmdOpts: Option[]): any {
+export function parseOptions<T = any>(
+  args: string[],
+  cmdOpts: Option[],
+  commandArguments: string[],
+): T {
+  const parser = yargsParser;
+
   const aliases = cmdOpts.concat()
     .filter(o => o.aliases && o.aliases.length > 0)
     .reduce((aliases: any, opt: Option) => {
@@ -131,23 +135,17 @@ function parseOptions(parser: Function,
     .filter(key => key.indexOf('-') !== -1)
     .forEach(key => delete parsedOptions[key]);
 
-  return parsedOptions;
-}
-
-// Map arguments to options.
-function mapArguments(options: any, args: string[]): any {
-  const optsWithMappedArgs = {...options};
-  optsWithMappedArgs._.forEach((value: string, index: number) => {
+  parsedOptions._.forEach((value: string, index: number) => {
     // Remove the starting "<" and trailing ">".
-    const arg = args[index];
+    const arg = commandArguments[index];
     if (arg) {
-      optsWithMappedArgs[arg] = value;
+      parsedOptions[arg] = value;
     }
   });
 
-  delete optsWithMappedArgs._;
+  delete parsedOptions._;
 
-  return optsWithMappedArgs;
+  return parsedOptions;
 }
 
 // Find a command.
