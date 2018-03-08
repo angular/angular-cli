@@ -1,39 +1,36 @@
-import { Command, CommandScope, Option } from '../models/command';
-import TestTask from '../tasks/test';
+import { CommandScope, Option } from '../models/command';
+import { ArchitectCommand } from '../models/architect-command';
 
-
-export interface TestOptions {
-  watch?: boolean;
-  codeCoverage?: boolean;
-  singleRun?: boolean;
-  browsers?: string;
-  colors?: boolean;
-  log?: string;
-  port?: number;
-  reporters?: string;
-  sourcemaps?: boolean;
-  progress?: boolean;
-  config: string;
-  poll?: number;
-  environment?: string;
+export interface Options {
   app?: string;
-  preserveSymlinks?: boolean;
+  configuration?: string;
+  prod: boolean;
 }
 
-export default class TestCommand extends Command {
+export default class TestCommand extends ArchitectCommand {
   public readonly name = 'test';
+  public readonly target = 'karma';
   public readonly description = 'Run unit tests in existing project.';
   public static aliases = ['t'];
   public readonly scope = CommandScope.inProject;
   public readonly arguments: string[] = [];
-  public readonly options: Option[] = [];
+  public readonly options: Option[] = [
+    this.prodOption,
+    this.configurationOption
+  ];
 
-  public async run(options: TestOptions) {
-    const testTask = new TestTask({
-      ui: this.ui,
-      project: this.project
+  public async run(options: Options) {
+    let configuration = options.configuration;
+    if (!configuration && options.prod) {
+      configuration = 'production';
+    }
+    const overrides = {...options};
+    delete overrides.app;
+    delete overrides.prod;
+    return this.runArchitect({
+      app: options.app,
+      configuration,
+      overrides
     });
-
-    return await testTask.run(options);
   }
 }
