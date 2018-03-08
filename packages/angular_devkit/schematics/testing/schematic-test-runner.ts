@@ -72,7 +72,7 @@ export class SchematicTestRunner {
     opts?: SchematicSchemaT,
     tree?: Tree,
   ): Observable<UnitTestTree> {
-    const schematic = this._collection.createSchematic(schematicName);
+    const schematic = this._collection.createSchematic(schematicName, true);
     const host = observableOf(tree || new VirtualTree);
 
     return schematic.call(opts || {}, host, { logger: this._logger })
@@ -84,7 +84,7 @@ export class SchematicTestRunner {
     opts?: SchematicSchemaT,
     tree?: Tree,
   ): UnitTestTree {
-    const schematic = this._collection.createSchematic(schematicName);
+    const schematic = this._collection.createSchematic(schematicName, true);
 
     let result: UnitTestTree | null = null;
     const host = observableOf(tree || new VirtualTree);
@@ -106,7 +106,7 @@ export class SchematicTestRunner {
     tree?: Tree,
   ): Observable<UnitTestTree> {
     const externalCollection = this._engine.createCollection(collectionName);
-    const schematic = externalCollection.createSchematic(schematicName);
+    const schematic = externalCollection.createSchematic(schematicName, true);
     const host = observableOf(tree || new VirtualTree);
 
     return schematic.call(opts || {}, host, { logger: this._logger })
@@ -120,7 +120,7 @@ export class SchematicTestRunner {
     tree?: Tree,
   ): UnitTestTree {
     const externalCollection = this._engine.createCollection(collectionName);
-    const schematic = externalCollection.createSchematic(schematicName);
+    const schematic = externalCollection.createSchematic(schematicName, true);
 
     let result: UnitTestTree | null = null;
     const host = observableOf(tree || new VirtualTree);
