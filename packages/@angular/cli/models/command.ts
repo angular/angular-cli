@@ -1,8 +1,8 @@
-import { Logger } from '@angular-devkit/core/src/logger';
+import { logging } from '@angular-devkit/core';
 const { cyan } = require('chalk');
 
 export interface CommandConstructor {
-  new(context: CommandContext, logger: Logger): Command;
+  new(context: CommandContext, logger: logging.Logger): Command;
   aliases: string[];
   scope: CommandScope.everywhere;
 }
@@ -14,7 +14,7 @@ export enum CommandScope {
 }
 
 export abstract class Command {
-  constructor(context: CommandContext, logger: Logger) {
+  constructor(context: CommandContext, logger: logging.Logger) {
     this.logger = logger;
     if (context) {
       this.project = context.project;
@@ -22,8 +22,11 @@ export abstract class Command {
     }
   }
 
-  initialize(_options: any): Promise<void> {
-    return Promise.resolve();
+  async initializeRaw(args: any): Promise<any> {
+    return args;
+  }
+  async initialize(_options: any): Promise<void> {
+    return;
   }
 
   validate(_options: any): boolean | Promise<boolean> {
@@ -68,7 +71,7 @@ export abstract class Command {
   public hidden = false;
   public unknown = false;
   public scope = CommandScope.everywhere;
-  protected readonly logger: Logger;
+  protected readonly logger: logging.Logger;
   protected readonly project: any;
   protected readonly ui: Ui;
 }
