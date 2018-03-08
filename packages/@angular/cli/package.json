@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -31,7 +31,7 @@
     "@angular-devkit/core": "0.3.2",
     "@angular-devkit/schematics": "0.3.2",
     "@ngtools/json-schema": "1.2.0",
-    "@ngtools/webpack": "1.10.1",
+    "@ngtools/webpack": "1.10.2",
     "@schematics/angular": "0.3.2",
     "@schematics/package-update": "0.3.2",
     "ajv": "^6.1.1",
