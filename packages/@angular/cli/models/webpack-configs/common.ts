@@ -215,7 +215,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     entry: entryPoints,
     output: {
       path: path.resolve(buildOptions.outputPath),
-      publicPath: buildOptions.deployUrl,
       filename: `[name]${hashFormat.chunk}.js`,
     },
     performance: {

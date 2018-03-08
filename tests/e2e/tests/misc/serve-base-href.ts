@@ -7,24 +7,24 @@ export default function () {
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'src/string-script.js': 'console.log(\'string-script\'); var number = 1+1;',
-    })
+    }))
     .then(() => updateJsonFile('.angular-cli.json', configJson => {
       configJson['apps'][0]['scripts'] = [
         'string-script.js',
       ];
     }))
     // check when setup through command line arguments
-    .then(() => ngServe('--deploy-url', '/deployurl/', '--base-href', '/deployurl/'))
+    .then(() => ngServe('--base-href', '/nested/'))
     .then(() => request('http://localhost:4200'))
     .then(body => {
       if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value. (1)');
       }
-      if (!body.match(/"\/deployurl\/scripts.js"/)) {
+      if (!body.match(/"scripts.js"/)) {
         throw new Error('Response does not match expected value. (2)');
       }
     })
-    .then(() => request('http://localhost:4200/deployurl/'))
+    .then(() => request('http://localhost:4200/nested/'))
     .then(body => {
       if (!body.match(/<app-root><\/app-root>/)) {
         throw new Error('Response does not match expected value. (3)');
