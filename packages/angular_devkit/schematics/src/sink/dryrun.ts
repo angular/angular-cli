@@ -105,6 +105,9 @@ export class DryRunSink extends HostSink {
 
       this._subject.next({ kind: 'delete', path });
     });
+    this._filesToRename.forEach(([path, to]) => {
+      this._subject.next({ kind: 'rename', path, to });
+    });
     this._filesToCreate.forEach((content, path) => {
       // Check if this is a renaming.
       for (const [_, to] of this._filesToRename) {
@@ -122,9 +125,6 @@ export class DryRunSink extends HostSink {
     });
     this._filesToUpdate.forEach((content, path) => {
       this._subject.next({ kind: 'update', path, content: content.generate() });
-    });
-    this._filesToRename.forEach(([path, to]) => {
-      this._subject.next({ kind: 'rename', path, to });
     });
 
     this._subject.complete();
