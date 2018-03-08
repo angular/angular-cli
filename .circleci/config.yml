@@ -85,6 +85,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout: *post_checkout
+      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel run @nodejs//:npm install
       - run: bazel build //packages/...
 
