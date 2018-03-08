@@ -26,6 +26,7 @@ export {
 export * from './exception/exception';
 export * from './tree/interface';
 export * from './rules/base';
+export * from './rules/call';
 export * from './rules/move';
 export * from './rules/random';
 export * from './rules/schematic';
