@@ -35,7 +35,7 @@ function _caller(): string[] {
   const stack = (new Error()).stack as {}[] | undefined as { getFileName(): string }[] | undefined;
   error.prepareStackTrace = origPrepareStackTrace;
 
-  return stack ? stack.map(x => x.getFileName()) : [];
+  return stack ? stack.map(x => x.getFileName()).filter(x => !!x) : [];
 }
 
 
