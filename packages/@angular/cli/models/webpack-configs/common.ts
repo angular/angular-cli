@@ -107,23 +107,26 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
         if (!asset.allowOutsideOutDir) {
           const message = 'An asset cannot be written to a location outside of the output path. '
-                        + 'You can override this message by setting the `allowOutsideOutDir` '
-                        + 'property on the asset to true in the CLI configuration.';
+            + 'You can override this message by setting the `allowOutsideOutDir` '
+            + 'property on the asset to true in the CLI configuration.';
           throw new SilentError(message);
         }
       }
 
       // Prevent asset configurations from reading files outside of the project.
       const projectRelativeInput = path.relative(projectRoot, asset.input);
-      if ((projectRelativeInput.startsWith('..') || path.isAbsolute(projectRelativeInput)) && !asset.allowOutsideReadDir) {
+      if ((projectRelativeInput.startsWith('..') || path.isAbsolute(projectRelativeInput))
+        && !asset.allowOutsideReadDir) {
+
         const message = `${asset.input} cannot be read from a location outside the project.`
-                        + 'You can override this message by setting the `allowOutsideReadDir` '
-                        + 'property on the asset to true in the CLI configuration.';
-          throw new SilentError(message);
+          + 'You can override this message by setting the `allowOutsideReadDir` '
+          + 'property on the asset to true in the CLI configuration.';
+        throw new SilentError(message);
       }
 
-      if (asset.allowOutsideOutDir) {
-        console.log(chalk.yellow('The allowOutsideOutDir option is on that could be a security risk'));
+      if (asset.allowOutsideReadDir) {
+        console.log(chalk.yellow('The allowOutsideReadDir option'
+          + ' is on that could be a security risk'));
       }
 
       // Ensure trailing slash.
@@ -197,7 +200,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       : 'rxjs/_esm5/path-mapping';
     const rxPaths = requireProjectModule(projectRoot, rxjsPathMappingImport);
     alias = rxPaths(nodeModules);
-  } catch (e) { }
+  } catch (e) {
+  }
 
   // Allow loaders to be in a node_modules nested inside the CLI package
   const loaderNodeModules = ['node_modules'];
