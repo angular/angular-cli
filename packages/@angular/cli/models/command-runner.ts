@@ -9,7 +9,7 @@ import { oneLine } from 'common-tags';
 import { logging } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
 
-const yargsParser = require('yargs-parser');
+import * as yargsParser from 'yargs-parser';
 
 export interface CommandMap {
   [key: string]: CommandConstructor;

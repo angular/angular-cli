@@ -25,4 +25,14 @@ interface IWebpackDevServerConfigurationOptions {
   disableHostCheck?: boolean;
 }
 
-declare module 'yargs-parser';
+declare module 'yargs-parser' {
+  const parseOptions: any;
+  const yargsParser: <T = any>(args: string | string[], options?: parseOptions) => T;
+  export = yargsParser;
+}
+
+
+
+declare module 'opn' {
+  export default function(url: string, options?: any): Promise<any>;
+}

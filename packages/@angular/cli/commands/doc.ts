@@ -1,7 +1,8 @@
-import { DocTask } from '../tasks/doc';
 import { Command } from '../models/command';
+import opn from 'opn';
 
-export interface DocOptions {
+export interface Options {
+  keyword: string;
   search?: boolean;
 }
 
@@ -20,14 +21,19 @@ export default class DocCommand extends Command {
     }
   ];
 
-  public async run(options: any) {
-    const keyword = options.keyword;
+  public validate(options: Options) {
+    if (!options.keyword) {
+      this.logger.error(`keyword argument is required.`);
+      return false;
+    }
+  }
 
-    const docTask = new DocTask({
-      ui: this.ui,
-      project: this.project
-    });
+  public async run(options: Options) {
+    let searchUrl = `https://angular.io/api?query=${options.keyword}`;
+    if (options.search) {
+      searchUrl = `https://www.google.com/search?q=site%3Aangular.io+${options.keyword}`;
+    }
 
-    return await docTask.run(keyword, options.search);
+    return opn(searchUrl, { wait: false });
   }
 }

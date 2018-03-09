@@ -1,5 +1,5 @@
 import { Command, CommandScope } from '../models/command';
-import { UpdateTask } from '../tasks/update';
+import SchematicRunTask from '../tasks/schematic-run';
 
 export interface UpdateOptions {
   schematic?: boolean;
@@ -29,13 +29,24 @@ export default class UpdateCommand extends Command {
   ];
 
   public async run(options: any) {
-    const schematic = '@schematics/package-update:all';
+    const collectionName = '@schematics/package-update';
+    const schematicName = 'all';
 
-    const updateTask = new UpdateTask({
+    const schematicRunTask = new SchematicRunTask({
       ui: this.ui,
       project: this.project
     });
 
-    return await updateTask.run(schematic, options);
+    const schematicRunOptions = {
+      taskOptions: {
+        dryRun: options.dryRun,
+        version: options.next ? 'next' : undefined
+      },
+      workingDir: this.project.root,
+      collectionName,
+      schematicName
+    };
+
+    return schematicRunTask.run(schematicRunOptions);
   }
 }
