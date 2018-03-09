@@ -100,7 +100,7 @@ You can access them by @Inject
 
 ```ts
 import { Request } from 'hapi';
-import { REQUEST } from '@nguniversal/hapi-engine/tokens';
+import { REQUEST } from '@nguniversal/hapi-engine';
 
 @Injectable()
 export class RequestService {
