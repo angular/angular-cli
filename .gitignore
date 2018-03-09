@@ -21,3 +21,11 @@ web_modules
 
 /compiled
 *.metadata.json
+
+# Build Artifacts #
+release
+dist
+bazel-out
+/node_modules/
+lerna-debug.log
+/lib/

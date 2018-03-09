@@ -1,0 +1,33 @@
+load("//tools:defaults.bzl", "ts_library", "ng_module", "ng_package")
+load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+
+ng_module(
+    name = "common_module",
+    srcs = glob([
+        "*.ts",
+        "src/**/*.ts",
+    ]),
+    deps = [],
+)
+
+ng_package(
+    name = "@nguniversal/common",
+    srcs = [":package.json"],
+    entry_point = "index.js",
+    deps = [":common_module"],
+)
+ts_library(
+    name = "unit_test_lib",
+    srcs = glob([
+      "spec/**/*.spec.ts"
+    ]),
+    testonly=True,
+    deps = [
+      ":common_module"
+    ],
+)
+
+jasmine_node_test(
+    name = "unit_test",
+    srcs = [":unit_test_lib"],
+)
