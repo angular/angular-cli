@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  JsonObject,
   normalize,
   tags,
   terminal,
@@ -188,6 +189,15 @@ const argv2 = minimist(argv['--']);
 for (const key of Object.keys(argv2)) {
   args[key] = argv2[key];
 }
+
+// Pass the rest of the arguments as the smart default "argv". Then delete it.
+workflow.registry.addSmartDefaultProvider('argv', (schema: JsonObject) => {
+  if ('index' in schema) {
+    return argv._[Number(schema['index'])];
+  } else {
+    return argv._;
+  }
+});
 delete args._;
 
 
