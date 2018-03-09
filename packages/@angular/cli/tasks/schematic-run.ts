@@ -17,6 +17,7 @@ import { concat, concatMap, ignoreElements, map } from 'rxjs/operators';
 import { getCollection, getSchematic, getEngineHost, getEngine } from '../utilities/schematics';
 
 const { green, red, yellow } = chalk;
+const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
 
 export interface SchematicRunOptions {
@@ -135,9 +136,11 @@ export default Task.extend({
         if (!error) {
           // Output the logging queue.
           loggingQueue.forEach(log => ui.writeLine(`  ${log.color(log.keyword)} ${log.message}`));
+        } else {
+          throw new SilentError();
         }
 
-        if (opts.dryRun || error) {
+        if (opts.dryRun) {
           return observableOf(tree);
         }
         return fsSink.commit(tree).pipe(
