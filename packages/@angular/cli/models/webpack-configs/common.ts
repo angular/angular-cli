@@ -1,6 +1,7 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
+import chalk from 'chalk';
 import { NamedLazyChunksWebpackPlugin } from '../../plugins/named-lazy-chunks-webpack-plugin';
 import { InsertConcatAssetsWebpackPlugin } from '../../plugins/insert-concat-assets-webpack-plugin';
 import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
@@ -114,11 +115,16 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       }
 
       // Prevent asset configurations from reading files outside of the project.
-      if (!asset.input.startsWith(projectRoot) && !asset.allowOutsideReadDir) {
-          const message = `${asset.input} cannot be read from a location outside the project.`
+      const projectRelativeInput = path.relative(projectRoot, asset.input);
+      if ((projectRelativeInput.startsWith('..') || path.isAbsolute(projectRelativeInput)) && !asset.allowOutsideReadDir) {
+        const message = `${asset.input} cannot be read from a location outside the project.`
                         + 'You can override this message by setting the `allowOutsideReadDir` '
                         + 'property on the asset to true in the CLI configuration.';
           throw new SilentError(message);
+      }
+
+      if (asset.allowOutsideOutDir) {
+        console.log(chalk.yellow('The allowOutsideOutDir option is on that could be a security risk'));
       }
 
       // Ensure trailing slash.
