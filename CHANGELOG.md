@@ -10,6 +10,22 @@ All notable changes to this project will be documented in this file. See [standa
 * **express-engine:** node 9 strict engine error ([853](https://github.com/angular/universal/pull/853)) ([e4a9775](https://github.com/angular/universal/commit/e4a97754e62d5418faad3837a88a21b710aa3d8d)), closes [851](https://github.com/angular/universal/issues/851)
 * **aspnetcore-engine:** fix ServerTransferStateModule and TransferState ([889](https://github.com/angular/universal/pull/889)) ([14c7616](https://github.com/angular/universal/commit/14c76166ac36c2de619c733531432fd109e4bb67))
 
+**BREAKING CHANGE**:
+
+The tokens for `express-engine` and `hapi-engine` are now imported at top-level. Do the following:
+
+```ts
+import {REQUEST, RESPONSE} from '@nguniversal/express-engine';
+```
+
+instead of
+
+```ts
+import {REQUEST, RESPONSE} from '@nguniversal/express-engine/tokens';
+```
+
+Note: there is a slight bundling/tree-shaking issue with this new structure which should be resolved in the next release. The current workaround is to temporarily downgrade to the previous version.
+
 
 ### Features
 
