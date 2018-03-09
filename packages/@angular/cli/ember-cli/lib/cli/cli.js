@@ -4,14 +4,8 @@ const { logging, terminal } = require('@angular-devkit/core');
 const filter = require('rxjs/operators').filter;
 
 const yargsParser = require('yargs-parser');
-const lookupCommand = require('./lookup-command');
-const getOptionArgs = require('../utilities/get-option-args');
 const runCommand = require('../../../models/command-runner').runCommand;
 
-const DocCommand = require('../../../commands/doc').default;
-
-// Disabled until e2e and serve command can be evaluated/corrected -- require('../utilities/will-interrupt-process');
-const onProcessInterrupt = { addHandler: (_handler) => { }, removeHandler: (_handler) => { } };
 
 class CLI {
   /**

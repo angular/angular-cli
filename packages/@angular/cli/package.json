@@ -58,7 +58,6 @@
     "memory-fs": "^0.4.1",
     "minimatch": "^3.0.4",
     "node-modules-path": "^1.0.0",
-    "nopt": "^4.0.1",
     "opn": "~5.1.0",
     "parse5": "^4.0.0",
     "portfinder": "~1.0.12",

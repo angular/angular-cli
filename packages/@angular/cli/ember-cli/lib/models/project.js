@@ -97,9 +97,12 @@ class Project {
     @return {String} Package name
    */
   name() {
-    const getPackageBaseName = require('../utilities/get-package-base-name');
+    if (!this.pkg.name) {
+      return null;
+    }
 
-    return getPackageBaseName(this.pkg.name);
+    const packageParts = this.pkg.name.split('/');
+    return packageParts[(packageParts.length - 1)];
   }
 
   /**
