@@ -21,6 +21,8 @@ const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
 
 export interface SchematicRunOptions {
+  dryRun: boolean;
+  force: boolean;
   taskOptions: SchematicOptions;
   workingDir: string;
   emptyHost: boolean;
@@ -29,8 +31,6 @@ export interface SchematicRunOptions {
 }
 
 export interface SchematicOptions {
-  dryRun: boolean;
-  force: boolean;
   [key: string]: any;
 }
 
@@ -46,7 +46,15 @@ interface OutputLogging {
 
 export default Task.extend({
   run: function (options: SchematicRunOptions): Promise<SchematicOutput> {
-    const { taskOptions, workingDir, emptyHost, collectionName, schematicName } = options;
+    const {
+      taskOptions,
+      force,
+      dryRun,
+      workingDir,
+      emptyHost,
+      collectionName,
+      schematicName
+    } = options;
 
     const ui = this.ui;
 
@@ -75,8 +83,8 @@ export default Task.extend({
     const tree = emptyHost ? new EmptyTree() : new FileSystemTree(new FileSystemHost(workingDir));
     const host = observableOf(tree);
 
-    const dryRunSink = new DryRunSink(workingDir, opts.force);
-    const fsSink = new FileSystemSink(workingDir, opts.force);
+    const dryRunSink = new DryRunSink(workingDir, force);
+    const fsSink = new FileSystemSink(workingDir, force);
 
     let error = false;
     const loggingQueue: OutputLogging[] = [];
@@ -140,7 +148,7 @@ export default Task.extend({
           throw new SilentError();
         }
 
-        if (opts.dryRun) {
+        if (dryRun) {
           return observableOf(tree);
         }
         return fsSink.commit(tree).pipe(
@@ -148,7 +156,7 @@ export default Task.extend({
           concat(observableOf(tree)));
       }),
       concatMap(() => {
-        if (!opts.dryRun) {
+        if (!dryRun) {
           return getEngine().executePostTasks();
         } else {
           return [];
@@ -156,7 +164,7 @@ export default Task.extend({
       }))
       .toPromise()
       .then(() => {
-        if (opts.dryRun) {
+        if (dryRun) {
           ui.writeLine(yellow(`\nNOTE: Run with "dry run" no changes were made.`));
         }
         return {modifiedFiles};

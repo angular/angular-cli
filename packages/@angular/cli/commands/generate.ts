@@ -1,4 +1,4 @@
-import { Command, CommandScope } from '../models/command';
+import { Command, CommandScope, Option } from '../models/command';
 import chalk from 'chalk';
 const stringUtils = require('ember-cli-string-utils');
 import { CliConfig } from '../models/config';
@@ -21,7 +21,7 @@ export default class GenerateCommand extends Command {
   public static aliases = ['g'];
   public readonly scope = CommandScope.inProject;
   public arguments = ['schematic'];
-  public options = [
+  public options: Option[] = [
     {
       name: 'dry-run',
       type: Boolean,
@@ -39,20 +39,7 @@ export default class GenerateCommand extends Command {
     {
       name: 'app',
       type: String,
-      aliases: ['a'],
       description: 'Specifies app name to use.'
-    },
-    {
-      name: 'collection',
-      type: String,
-      aliases: ['c'],
-      description: 'Schematics collection to use.'
-    },
-    {
-      name: 'lint-fix',
-      type: Boolean,
-      aliases: ['l'],
-      description: 'Use lint to fix files after generation.'
     }
   ];
 
@@ -170,8 +157,11 @@ export default class GenerateCommand extends Command {
       options.type = options.type;
     }
 
+    const schematicOptions = this.stripLocalOptions(options);
     return schematicRunTask.run({
-        taskOptions: options,
+        taskOptions: schematicOptions,
+        dryRun: options.dryRun,
+        force: options.force,
         workingDir: cwd,
         collectionName,
         schematicName
@@ -179,10 +169,7 @@ export default class GenerateCommand extends Command {
   }
 
   private parseSchematicInfo(options: any) {
-    let collectionName: string =
-      options.collection ||
-      options.c ||
-      CliConfig.getValue('defaults.schematics.collection');
+    let collectionName: string = CliConfig.getValue('defaults.schematics.collection');
 
     let schematicName = options.schematic;
 
@@ -212,5 +199,13 @@ export default class GenerateCommand extends Command {
       this.logger.warn(`\nTo see help for a schematic run:`);
       this.logger.info(cyan(`  ng generate <schematic> --help`));
     }
+  }
+
+  private stripLocalOptions(options: any): any {
+    const opts = Object.assign({}, options);
+    delete opts.dryRun;
+    delete opts.force;
+    delete opts.app;
+    return opts;
   }
 }

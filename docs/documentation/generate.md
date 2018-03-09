@@ -23,39 +23,26 @@
     <code>--dry-run</code> (aliases: <code>-d</code>) <em>default value: false</em>
   </p>
   <p>
-     Run through without making any changes. Will list all files that would have been created when running <code>ng generate</code>.
+    Run through without making any changes.
   </p>
 </details>
 
 <details>
-  <summary>lint-fix</summary>
+  <summary>force</summary>
   <p>
-    <code>--lint-fix</code> (aliases: <code>-l</code>)
+    <code>--force</code> (aliases: <code>-f</code>) <em>default value: false</em>
   </p>
   <p>
-    Use lint to fix files after generation.
-  </p>
-  <p>
-    You can also set default true to use lint every time after generation. To do this, change the value in <em>.angular-cli.json</em> (<code>defaults.lintFix</code>).
+    Forces overwriting of files.
   </p>
 </details>
 
 <details>
-  <summary>verbose</summary>
+  <summary>app</summary>
   <p>
-    <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
+    <code>--app</code>
   </p>
   <p>
-    Adds more details to output logging.
-  </p>
-</details>
-
-<details>
-  <summary>collection</summary>
-  <p>
-    <code>--collection</code> (aliases: <code>-c</code>) <em>default value: @schematics/angular</em>
-  </p>
-  <p>
-    Schematics collection to use.
+    Specifies app name to use.
   </p>
 </details>
