@@ -27,6 +27,10 @@ export async function runCommand(commandMap: CommandMap,
                                  logger: logging.Logger,
                                  context: CommandContext): Promise<any> {
 
+  // if not args supplied, just run the help command.
+  if (!args || args.length === 0) {
+    args = ['help'];
+  }
   const rawOptions = yargsParser(args, { alias: { help: ['h'] }, boolean: [ 'help' ] });
   let commandName = rawOptions._[0];
   // remove the command name
@@ -38,8 +42,7 @@ export async function runCommand(commandMap: CommandMap,
   let Cmd: CommandConstructor;
   Cmd = findCommand(commandMap, commandName);
 
-  const versionAliases = ['-v', '--version'];
-  if (!Cmd && versionAliases.indexOf(commandName) !== -1) {
+  if (!Cmd && !commandName && (rawOptions.v || rawOptions.version)) {
     commandName = 'version';
     Cmd = findCommand(commandMap, commandName);
   }
@@ -50,8 +53,9 @@ export async function runCommand(commandMap: CommandMap,
   }
 
   if (!Cmd) {
-    throw new Error(oneLine`The specified command (${commandName}) is invalid.
-      For available options, see \`ng help\`.`);
+    logger.error(oneLine`The specified command (${commandName}) is invalid.
+    For a list of available options, run \`ng help\`.`);
+    throw '';
   }
 
   const command = new Cmd(context, logger);
