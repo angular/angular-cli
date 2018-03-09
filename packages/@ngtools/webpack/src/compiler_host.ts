@@ -21,8 +21,8 @@ export class VirtualStats implements fs.Stats {
   protected _dev = dev;
   protected _ino = Math.floor(Math.random() * 100000);
   protected _mode = parseInt('777', 8);  // RWX for everyone.
-  protected _uid = process.env['UID'] || 0;
-  protected _gid = process.env['GID'] || 0;
+  protected _uid = Number(process.env['UID']) || 0;
+  protected _gid = Number(process.env['GID']) || 0;
 
   constructor(protected _path: string) {}
 
@@ -45,9 +45,13 @@ export class VirtualStats implements fs.Stats {
   get blksize() { return 512; }
   get blocks() { return Math.ceil(this.size / this.blksize); }
   get atime() { return this._atime; }
+  get atimeMs() { return this._atime.getTime(); }
   get mtime() { return this._mtime; }
+  get mtimeMs() { return this._mtime.getTime(); }
   get ctime() { return this._ctime; }
+  get ctimeMs() { return this._ctime.getTime(); }
   get birthtime() { return this._btime; }
+  get birthtimeMs() { return this._btime.getTime(); }
 }
 
 export class VirtualDirStats extends VirtualStats {
@@ -97,7 +101,6 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _delegate: ts.CompilerHost;
   private _files: {[path: string]: VirtualFileStats | null} = Object.create(null);
   private _directories: {[path: string]: VirtualDirStats | null} = Object.create(null);
-  private _cachedResources: {[path: string]: string | undefined} = Object.create(null);
 
   private _changedFiles: {[path: string]: boolean} = Object.create(null);
   private _changedDirs: {[path: string]: boolean} = Object.create(null);
@@ -174,8 +177,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     fileName = this.resolve(fileName);
     if (fileName in this._files) {
       this._files[fileName] = null;
-      this._changedFiles[fileName] = true;
     }
+    this._changedFiles[fileName] = true;
   }
 
   fileExists(fileName: string, delegate = true): boolean {
@@ -299,22 +302,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     if (this._resourceLoader) {
       // These paths are meant to be used by the loader so we must denormalize them.
       const denormalizedFileName = this.denormalizePath(fileName);
-      const resourceDeps = this._resourceLoader.getResourceDependencies(denormalizedFileName);
-
-      if (this._cachedResources[fileName] === undefined
-        || resourceDeps.some((dep) => this._changedFiles[this.resolve(dep)])) {
-        return this._resourceLoader.get(denormalizedFileName)
-          .then((resource) => {
-            // Add resource dependencies to the compiler host file list.
-            // This way we can check the changed files list to determine whether to use cache.
-            this._resourceLoader.getResourceDependencies(denormalizedFileName)
-              .forEach((dep) => this.readFile(dep));
-            this._cachedResources[fileName] = resource;
-            return resource;
-          });
-      } else {
-        return this._cachedResources[fileName];
-      }
+      return this._resourceLoader.get(denormalizedFileName);
     } else {
       return this.readFile(fileName);
     }

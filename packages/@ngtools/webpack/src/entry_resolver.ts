@@ -130,7 +130,7 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
 
 export function resolveEntryModuleFromMain(mainPath: string,
                                            host: ts.CompilerHost,
-                                           program: ts.Program) {
+                                           program: ts.Program): string | null {
   const source = new TypeScriptFileRefactor(mainPath, host, program);
 
   const bootstrap = source.findAstNodes(source.sourceFile, ts.SyntaxKind.CallExpression, true)
@@ -146,9 +146,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
     .filter(node => node.kind == ts.SyntaxKind.Identifier);
 
   if (bootstrap.length != 1) {
-    throw new Error('Tried to find bootstrap code, but could not. Specify either '
-      + 'statically analyzable bootstrap code or pass in an entryModule '
-      + 'to the plugins options.');
+    return null;
   }
   const bootstrapSymbolName = bootstrap[0].text;
   const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);

@@ -54,7 +54,7 @@ export class Version {
       const angularCliPath = resolve.sync('@angular/cli', {
         basedir: process.cwd(),
         packageFilter: (pkg: any, _pkgFile: string) => {
-          packageJson = pkg;
+          return packageJson = pkg;
         }
       });
       if (angularCliPath && packageJson) {
@@ -169,7 +169,9 @@ export class Version {
     const versionCombos = [
       { compiler: '>=2.3.1 <3.0.0', typescript: '>=2.0.2 <2.3.0' },
       { compiler: '>=4.0.0 <5.0.0', typescript: '>=2.1.0 <2.4.0' },
-      { compiler: '>=5.0.0 <6.0.0', typescript: '>=2.4.2 <2.5.0' }
+      { compiler: '>=5.0.0 <5.1.0', typescript: '>=2.4.2 <2.5.0' },
+      { compiler: '>=5.1.0 <5.2.0', typescript: '>=2.4.2 <2.6.0' },
+      { compiler: '>=5.2.0 <6.0.0', typescript: '>=2.4.2 <2.7.0' }
     ];
 
     const currentCombo = versionCombos.find((combo) => satisfies(compilerVersion, combo.compiler));
@@ -197,7 +199,7 @@ export class Version {
     if (version && version.isKnown()) {
       if (version.major == 0) {
         return true;
-      } else if (version.minor != 0) {
+      } else if (version.major > 1 || version.minor != 0) {
         return false;
       } else if (version.isBeta() && !version.toString().match(/webpack/)) {
         const betaVersion = version.extra;

@@ -59,6 +59,10 @@ export const E2eTask = Task.extend({
         additionalProtractorConfig['specs'] = e2eTaskOptions.specs;
       }
 
+      if (e2eTaskOptions.suite && e2eTaskOptions.suite.length !== 0) {
+        additionalProtractorConfig['suite'] = e2eTaskOptions.suite;
+      }
+
       if (e2eTaskOptions.webdriverUpdate) {
         // The webdriver-manager update command can only be accessed via a deep import.
         const webdriverDeepImport = 'webdriver-manager/built/lib/cmds/update';

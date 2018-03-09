@@ -1,9 +1,6 @@
 import { join } from 'path';
 import { ng } from '../../utils/process';
-import {
-  expectFileToExist, writeFile,
-  expectFileToMatch
-} from '../../utils/fs';
+import { writeFile, expectFileToMatch } from '../../utils/fs';
 
 
 export default function() {
@@ -14,8 +11,7 @@ export default function() {
     .then(() => ng('xi18n', '--locale', 'fr'))
     .then((output) => {
       if (!output.stdout.match(/starting from Angular v4/)) {
-        expectFileToExist(join('src', 'messages.xlf'));
-        expectFileToMatch(join('src', 'messages.xlf'), /source-language="fr"/);
+        return expectFileToMatch(join('src', 'messages.xlf'), 'source-language="fr"');
       }
     });
 }

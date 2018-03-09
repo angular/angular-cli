@@ -1,12 +1,12 @@
 import {NullLogger} from './null-logger';
 import {LogEntry, Logger} from './logger';
+import {toArray} from 'rxjs/operators';
 
 
 describe('NullLogger', () => {
   it('works', (done: DoneFn) => {
     const logger = new NullLogger();
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([]);
@@ -20,8 +20,7 @@ describe('NullLogger', () => {
 
   it('nullifies children', (done: DoneFn) => {
     const logger = new Logger('test');
-    logger
-      .toArray()
+    logger.pipe(toArray())
       .toPromise()
       .then((observed: LogEntry[]) => {
         expect(observed).toEqual([]);

@@ -101,9 +101,10 @@ export function makeTransform(
  * This is a version of `ts.visitEachChild` that works that calls our version
  * of `updateSourceFileNode`, so that typescript doesn't lose type information
  * for property decorators.
- * See https://github.com/Microsoft/TypeScript/issues/17384 and
- * https://github.com/Microsoft/TypeScript/issues/17551, fixed by
- * https://github.com/Microsoft/TypeScript/pull/18051 and released on TS 2.5.0.
+ * See https://github.com/Microsoft/TypeScript/issues/17384 (fixed by
+ * https://github.com/Microsoft/TypeScript/pull/20314 and released in TS 2.7.0) and
+ * https://github.com/Microsoft/TypeScript/issues/17551 (fixed by
+ * https://github.com/Microsoft/TypeScript/pull/18051 and released on TS 2.5.0).
  *
  * @param sf
  * @param statements
@@ -129,11 +130,18 @@ function visitEachChildWorkaround(node: ts.Node, visitor: ts.Visitor,
 }
 
 
-// If TS sees an empty decorator array, it will still emit a `__decorate` call.
-// This seems to be a TS bug.
+// 1) If TS sees an empty decorator array, it will still emit a `__decorate` call.
+//    This seems to be a TS bug.
+// 2) Also ensure nodes with modified decorators have parents
+//    built in TS transformers assume certain nodes have parents (fixed in TS 2.7+)
 function cleanupDecorators(node: ts.Node) {
-  if (node.decorators && node.decorators.length == 0) {
-    node.decorators = undefined;
+  if (node.decorators) {
+    if (node.decorators.length == 0) {
+      node.decorators = undefined;
+    } else if (node.parent == undefined) {
+      const originalNode = ts.getParseTreeNode(node);
+      node.parent = originalNode.parent;
+    }
   }
 
   ts.forEachChild(node, node => cleanupDecorators(node));

@@ -4,7 +4,7 @@ const path = require('path');
 const chalk = require('chalk');
 const spdxSatisfies = require('spdx-satisfies');
 const Logger = require('@ngtools/logger').Logger;
-require('rxjs/add/operator/filter');
+const filter = require('rxjs/operators').filter;
 
 // Configure logger
 const logger = new Logger('test-licenses');
@@ -23,7 +23,7 @@ logger.subscribe((entry) => {
 });
 
 logger
-  .filter((entry) => entry.level == 'fatal')
+  .pipe(filter((entry) => entry.level == 'fatal'))
   .subscribe(() => {
     process.stderr.write('A fatal error happened. See details above.');
     process.exit(1);
@@ -79,6 +79,8 @@ const ignoredPackages = [
   'spdx-license-ids@2.0.1',  // CC0 but it's content only (index.json, no code) and not distributed.
   'map-stream@0.1.0', // MIT, license but it's not listed in package.json.
   'xmldom@0.1.27', // LGPL,MIT but has a broken licenses array.
+  'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
+  'pako@1.0.6', // SPDX expression (MIT AND Zlib) in package.json
 
   'jsonify@0.0.0', // TODO(hansl): fix this. this is not an acceptable license, but is 8 deps down
                    // so hard to manage. In talk with owner and users to switch over.

@@ -12,22 +12,12 @@ const path = require('path');
 const IMPORT_RE = /(^|\n)\s*import\b(?:.|\n)*?\'[^\']*\'/g;
 const REQUIRE_RE = /\brequire\('[^)]+?'\)/g;
 const IGNORE_RE = /\s+@ignoreDep\s+\S+/g;
-const NODE_PACKAGES = [
-  'child_process',
-  'crypto',
-  'fs',
-  'https',
-  'os',
-  'path',
-  'process',
-  'url',
-  'vm',
-  'zlib'
-];
+const NODE_PACKAGES = Object.keys(process.binding('natives'));
 const ANGULAR_PACKAGES = [
   '@angular/compiler',
   '@angular/compiler-cli',
-  '@angular/core'
+  '@angular/core',
+  '@schematics/package-update'
 ];
 const OPTIONAL_PACKAGES = [
   '@angular/service-worker',

@@ -22,8 +22,8 @@ export default function() {
       <app-test-component></app-test-component>
     `))
     .then(() => ng('build', '--aot'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.bundle.js', /\bComponent\b/)))
+    .then(() => expectToFail(() => expectFileToMatch('dist/main.js', /\bComponent\b/)))
     // Check that the decorators are still kept.
-    .then(() => expectFileToMatch('dist/main.bundle.js', /ctorParameters.*Optional.*SkipSelf/))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.bundle.js', /\bNgModule\b/)));
+    .then(() => expectFileToMatch('dist/main.js', /ctorParameters.*Optional.*SkipSelf/))
+    .then(() => expectToFail(() => expectFileToMatch('dist/main.js', /\bNgModule\b/)));
 }

@@ -1,93 +1,35 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { Command, Option } from '../models/command';
+import chalk from 'chalk';
 
-const Command = require('../ember-cli/lib/models/command');
-const stringUtils = require('ember-cli-string-utils');
-const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
+const { cyan } = chalk;
 
-const HelpCommand = Command.extend({
-  name: 'help',
-  description: 'Shows help for the CLI.',
-  works: 'everywhere',
+export default class HelpCommand extends Command {
+  public readonly name = 'help';
+  public readonly description = 'Help.';
+  public readonly arguments: string[] = [];
+  public readonly options: Option[] = [];
 
-  availableOptions: [
-    {
-      name: 'short',
-      type: Boolean,
-      default: false,
-      aliases: ['s'],
-      description: 'Display command name and description only.'
-    },
-  ],
-
-  anonymousOptions: ['command-name (Default: all)'],
-
-  run: function (commandOptions: any, rawArgs: any) {
-    let commandFiles = fs.readdirSync(__dirname)
-      // Remove files that are not JavaScript or Typescript
-      .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
-      .map(file => path.parse(file).name)
-      .map(file => file.toLowerCase());
-
-    let commandMap = commandFiles.reduce((acc: any, curr: string) => {
-      let classifiedName = stringUtils.classify(curr);
-      let defaultImport = require(`./${curr}`).default;
-
-      acc[classifiedName] = defaultImport;
-
-      return acc;
-    }, {});
-
-    if (rawArgs.indexOf('all') !== -1) {
-      rawArgs = []; // just act as if command not specified
-    }
-
-    commandFiles.forEach(cmd => {
-      const Command = lookupCommand(commandMap, cmd);
-
-      const command = new Command({
-        ui: this.ui,
-        project: this.project,
-        commands: this.commands,
-        tasks: this.tasks
-      });
-
-      if (command.hidden || command.unknown) {
-        return;
-      }
-
-      if (rawArgs.length > 0) {
-        let commandInput = rawArgs[0];
-        const aliases = Command.prototype.aliases;
-        if (aliases && aliases.indexOf(commandInput) > -1) {
-          commandInput = Command.prototype.name;
-        }
-
-        if (cmd === commandInput) {
-          if (commandOptions.short) {
-            this.ui.writeLine(command.printShortHelp(commandOptions));
-          } else if (command.printDetailedHelp(commandOptions, rawArgs)) {
-            const result = command.printDetailedHelp(commandOptions, rawArgs);
-            if (result instanceof Promise) {
-              result.then(r => this.ui.writeLine(r));
-            } else {
-              this.ui.writeLine(result);
-            }
-          } else {
-            this.ui.writeLine(command.printBasicHelp(commandOptions));
-          }
-        }
-      } else {
-        if (commandOptions.short) {
-          this.ui.writeLine(command.printShortHelp(commandOptions));
-        } else {
-          this.ui.writeLine(command.printBasicHelp(commandOptions));
-        }
-      }
-
+  run(options: any) {
+    const commands = Object.keys(options.commandMap)
+      .map(key => {
+        const Cmd = options.commandMap[key];
+        const command: Command = new Cmd(null, null);
+        return command;
+      })
+      .filter(cmd => !cmd.hidden && !cmd.unknown)
+      .map(cmd => ({
+        name: cmd.name,
+        description: cmd.description
+      }));
+    this.logger.info(`Available Commands:`);
+    commands.forEach(cmd => {
+      this.logger.info(`  ${cyan(cmd.name)} ${cmd.description}`);
     });
-  }
-});
 
-HelpCommand.overrideCore = true;
-export default HelpCommand;
+    this.logger.info(`\nFor more detailed help run "ng [command name] --help"`);
+  }
+
+  printHelp(options: any) {
+    return this.run(options);
+  }
+}

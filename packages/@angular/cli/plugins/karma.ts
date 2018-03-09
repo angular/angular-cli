@@ -53,7 +53,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     environment: 'dev',
     codeCoverage: false,
     sourcemaps: true,
-    progress: true,
+    progress: process.stdout.isTTY === true,
     preserveSymlinks: false,
   }, config.angularCli);
 
@@ -207,10 +207,10 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
         // Ensure script and style bundles are served.
         // They are mentioned in the custom karma context page and we don't want them to 404.
         const alwaysServe = [
-          '/_karma_webpack_/inline.bundle.js',
-          '/_karma_webpack_/polyfills.bundle.js',
-          '/_karma_webpack_/scripts.bundle.js',
-          '/_karma_webpack_/vendor.bundle.js',
+          '/_karma_webpack_/runtime.js',
+          '/_karma_webpack_/polyfills.js',
+          '/_karma_webpack_/scripts.js',
+          '/_karma_webpack_/vendor.js',
         ];
         if (alwaysServe.indexOf(req.url) != -1) {
           res.statusCode = 200;
@@ -247,8 +247,23 @@ function requestBlocker() {
 }
 
 // Strip the server address and webpack scheme (webpack://) from error log.
-const initSourcemapReporter: any = function (baseReporterDecorator: any) {
+const initSourcemapReporter: any = function (this: any, baseReporterDecorator: any, config: any) {
   baseReporterDecorator(this);
+
+  const reporterName = '@angular/cli';
+  const hasTrailingReporters = config.reporters.slice(-1).pop() !== reporterName;
+
+  // Copied from "karma-jasmine-diff-reporter" source code:
+  // In case, when multiple reporters are used in conjunction
+  // with initSourcemapReporter, they both will show repetitive log
+  // messages when displaying everything that supposed to write to terminal.
+  // So just suppress any logs from initSourcemapReporter by doing nothing on
+  // browser log, because it is an utility reporter,
+  // unless it's alone in the "reporters" option and base reporter is used.
+  if (hasTrailingReporters) {
+      this.writeCommonMsg = function () {};
+  }
+
   const urlRegexp = /\(http:\/\/localhost:\d+\/_karma_webpack_\/webpack:\//gi;
 
   this.onSpecComplete = function (_browser: any, result: any) {
@@ -260,7 +275,7 @@ const initSourcemapReporter: any = function (baseReporterDecorator: any) {
   };
 };
 
-initSourcemapReporter.$inject = ['baseReporterDecorator'];
+initSourcemapReporter.$inject = ['baseReporterDecorator', 'config'];
 
 module.exports = Object.assign({
   'framework:@angular/cli': ['factory', init],

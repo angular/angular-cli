@@ -12,15 +12,15 @@ export default function() {
 
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  return ng('build', '--prod')
+  return ng('build', '--target', 'production')
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     // Check for cache busting hash script src
-    .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.bundle\.js/))
-    .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{20}\.bundle\.css/))
+    .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.js/))
+    .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{20}\.css/))
     .then(() => expectFileToMatch('dist/3rdpartylicenses.txt', /MIT/))
     // Defaults to AoT
     .then(() => {
-      const main = readdirSync('./dist').find(name => !!name.match(/main.[a-z0-9]+\.bundle\.js/));
+      const main = readdirSync('./dist').find(name => !!name.match(/main.[a-z0-9]+\.js/));
       expectFileToMatch(`dist/${main}`, /bootstrapModuleFactory\(/);
     })
     // Check that the process didn't change local files.

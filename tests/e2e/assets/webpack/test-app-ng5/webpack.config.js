@@ -1,4 +1,5 @@
 const ngToolsWebpack = require('@ngtools/webpack');
+const path = require('path');
 
 module.exports = {
   resolve: {
@@ -6,7 +7,7 @@ module.exports = {
   },
   entry: './app/main.ts',
   output: {
-    path: './dist',
+    path: path.resolve('./dist'),
     publicPath: 'dist/',
     filename: 'app.main.js'
   },
@@ -16,7 +17,7 @@ module.exports = {
     })
   ],
   module: {
-    loaders: [
+    rules: [
       { test: /\.scss$/, loaders: ['raw-loader', 'sass-loader'] },
       { test: /\.css$/, loader: 'raw-loader' },
       { test: /\.html$/, loader: 'raw-loader' },

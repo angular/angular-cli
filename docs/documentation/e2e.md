@@ -61,6 +61,16 @@ Please note that options that are supported by `ng serve` are also supported by 
 </details>
 
 <details>
+  <summary>suite</summary>
+  <p>
+    <code>--suite</code> (aliases: <code>-su</code>)
+  </p>
+  <p>
+    Override suite in the protractor config. Can send in multiple suite by comma separated values (<code>ng e2e --suite=suiteA,suiteB</code>).
+  </p>
+</details>
+
+<details>
   <summary>webdriver-update</summary>
   <p>
     <code>--webdriver-update</code> (aliases: <code>-wu</code>) <em>default value: true</em>

@@ -26,7 +26,7 @@ export class BaseHrefWebpackPlugin {
           } else {
             // Replace only href attribute if exists
             const modifiedBaseTag = baseTagMatches[0].replace(
-              /href="\S+"/i, `href="${this.options.baseHref}"`
+              /href="\S*?"/i, `href="${this.options.baseHref}"`
             );
             htmlPluginData.html = htmlPluginData.html.replace(baseTagRegex, modifiedBaseTag);
           }

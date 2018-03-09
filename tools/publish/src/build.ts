@@ -1,10 +1,10 @@
 import {Logger} from '@ngtools/logger';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { promisify } from 'util';
 import {buildSchema} from './build-schema';
 
-const denodeify = require('denodeify');
-const glob = denodeify(require('glob'));
+const glob = promisify(require('glob'));
 const tar = require('tar');
 const npmRun = require('npm-run');
 

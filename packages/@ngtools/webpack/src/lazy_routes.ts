@@ -1,7 +1,6 @@
 import {dirname, join} from 'path';
 import * as ts from 'typescript';
-
-import {TypeScriptFileRefactor} from './refactor';
+import { findAstNodes, resolve } from './refactor';
 
 
 function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string | null {
@@ -20,23 +19,41 @@ export interface LazyRouteMap {
 }
 
 
-export function findLazyRoutes(filePath: string,
-                               host: ts.CompilerHost,
-                               program?: ts.Program,
-                               compilerOptions?: ts.CompilerOptions): LazyRouteMap {
-  const refactor = new TypeScriptFileRefactor(filePath, host, program);
+export function findLazyRoutes(
+  filePath: string,
+  host: ts.CompilerHost,
+  program?: ts.Program,
+  compilerOptions?: ts.CompilerOptions
+): LazyRouteMap {
+  if (!compilerOptions && program) {
+    compilerOptions = program.getCompilerOptions();
+  }
+  const fileName = resolve(filePath, host, compilerOptions).replace(/\\/g, '/');
+  let sourceFile: ts.SourceFile;
+  if (program) {
+    sourceFile = program.getSourceFile(fileName);
+  }
+  if (!sourceFile) {
+    sourceFile = ts.createSourceFile(
+      fileName,
+      host.readFile(fileName),
+      ts.ScriptTarget.Latest,
+      true,
+    );
+  }
+  if (!sourceFile) {
+    throw new Error(`Source file not found: '${fileName}'.`);
+  }
 
-  return refactor
-    // Find all object literals in the file.
-    .findAstNodes(null, ts.SyntaxKind.ObjectLiteralExpression, true)
+  return findAstNodes(null, sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
     // Get all their property assignments.
     .map((node: ts.ObjectLiteralExpression) => {
-      return refactor.findAstNodes(node, ts.SyntaxKind.PropertyAssignment, false);
+      return findAstNodes(node, sourceFile, ts.SyntaxKind.PropertyAssignment, false);
     })
     // Take all `loadChildren` elements.
     .reduce((acc: ts.PropertyAssignment[], props: ts.PropertyAssignment[]) => {
       return acc.concat(props.filter(literal => {
-        return _getContentOfKeyLiteral(refactor.sourceFile, literal.name) == 'loadChildren';
+        return _getContentOfKeyLiteral(sourceFile, literal.name) == 'loadChildren';
       }));
     }, [])
     // Get only string values.

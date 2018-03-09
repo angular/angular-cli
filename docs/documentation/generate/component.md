@@ -19,7 +19,7 @@
 <details>
   <summary>change-detection</summary>
   <p>
-    <code>--change-detection</code> (aliases: <code>-cd</code>)
+    <code>--change-detection</code> (aliases: <code>-c</code>)
   </p>
   <p>
     Specifies the change detection strategy.
@@ -49,7 +49,7 @@
 <details>
   <summary>inline-style</summary>
   <p>
-    <code>--inline-style</code> (aliases: <code>-is</code>) <em>default value: false</em>
+    <code>--inline-style</code> (aliases: <code>-s</code>) <em>default value: false</em>
   </p>
   <p>
     Specifies if the style will be in the ts file.
@@ -59,7 +59,7 @@
 <details>
   <summary>inline-template</summary>
   <p>
-    <code>--inline-template</code> (aliases: <code>-it</code>) <em>default value: false</em>
+    <code>--inline-template</code> (aliases: <code>-t</code>) <em>default value: false</em>
   </p>
   <p>
     Specifies if the template will be in the ts file.
@@ -109,7 +109,7 @@
 <details>
   <summary>view-encapsulation</summary>
   <p>
-    <code>--view-encapsulation</code> (aliases: <code>-ve</code>)
+    <code>--view-encapsulation</code> (aliases: <code>-v</code>)
   </p>
   <p>
     Specifies the view encapsulation strategy.

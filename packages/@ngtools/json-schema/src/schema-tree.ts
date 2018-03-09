@@ -164,6 +164,7 @@ export abstract class NonLeafSchemaTreeNode<T> extends SchemaTreeNode<T> {
       case 'boolean': Klass = BooleanSchemaTreeNode; break;
       case 'number': Klass = NumberSchemaTreeNode; break;
       case 'integer': Klass = IntegerSchemaTreeNode; break;
+      case 'null': Klass = NullSchemaTreeNode; break;
 
       case 'enum': Klass = EnumSchemaTreeNode; break;
       case 'oneOf': Klass = OneOfSchemaTreeNode; break;
@@ -460,6 +461,13 @@ class StringSchemaTreeNode extends LeafSchemaTreeNode<string> {
   convert(v: any) { return v === undefined ? undefined : '' + v; }
   get type() { return 'string'; }
   get tsType() { return String; }
+}
+
+class NullSchemaTreeNode extends LeafSchemaTreeNode<string> {
+  isCompatible(v: any) { return v == undefined || v == null; }
+  convert(_v: any): null { return null; }
+  get type() { return 'null'; }
+  get tsType() { return Object; }
 }
 
 

@@ -7,7 +7,7 @@ import { appendToFile, writeMultipleFiles, replaceInFile } from '../../utils/fs'
 import { request } from '../../utils/http';
 import { getGlobalVariable } from '../../utils/env';
 
-const validBundleRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
+const validBundleRegEx = /: Compiled successfully./;
 
 export default function () {
   if (process.platform.startsWith('win')) {
@@ -15,6 +15,11 @@ export default function () {
   }
   // Skip this in ejected tests.
   if (getGlobalVariable('argv').eject) {
+    return Promise.resolve();
+  }
+
+  // Skip this test in Angular 2/4.
+  if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
     return Promise.resolve();
   }
 
@@ -41,7 +46,7 @@ export default function () {
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
       appendToFile('src/app/app.component.html', '<p>HTML_REBUILD_STRING<p>')
     ]))
-    .then(() => request('http://localhost:4200/main.bundle.js'))
+    .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
       if (!body.match(/HTML_REBUILD_STRING/)) {
         throw new Error('Expected HTML_REBUILD_STRING but it wasn\'t in bundle.');
@@ -52,7 +57,7 @@ export default function () {
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
       appendToFile('src/app/app.component.css', 'CSS_REBUILD_STRING {color: #f00;}')
     ]))
-    .then(() => request('http://localhost:4200/main.bundle.js'))
+    .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
       if (!body.match(/CSS_REBUILD_STRING/)) {
         throw new Error('Expected CSS_REBUILD_STRING but it wasn\'t in bundle.');
@@ -63,7 +68,7 @@ export default function () {
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
       appendToFile('src/app/imported-styles.css', 'CSS_DEP_REBUILD_STRING {color: #f00;}')
     ]))
-    .then(() => request('http://localhost:4200/main.bundle.js'))
+    .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
       if (!body.match(/CSS_DEP_REBUILD_STRING/)) {
         throw new Error('Expected CSS_DEP_REBUILD_STRING but it wasn\'t in bundle.');
@@ -81,7 +86,7 @@ export default function () {
           waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
           replaceInFile('src/app/app.component.ts', 'app-root', 'app-root-FACTORY_REBUILD_STRING')
         ]))
-        .then(() => request('http://localhost:4200/main.bundle.js'))
+        .then(() => request('http://localhost:4200/main.js'))
         .then((body) => {
           if (!body.match(/FACTORY_REBUILD_STRING/)) {
             throw new Error('Expected FACTORY_REBUILD_STRING but it wasn\'t in bundle.');

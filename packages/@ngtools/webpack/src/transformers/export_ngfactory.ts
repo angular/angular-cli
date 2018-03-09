@@ -33,7 +33,6 @@ export function exportNgFactory(
     const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
 
     // Get the module path from the import.
-    let modulePath: string;
     entryModuleIdentifiers.forEach((entryModuleIdentifier) => {
       if (entryModuleIdentifier.parent.kind !== ts.SyntaxKind.ExportSpecifier) {
         return;
@@ -45,8 +44,6 @@ export function exportNgFactory(
       if (moduleSpecifier.kind !== ts.SyntaxKind.StringLiteral) {
         return;
       }
-
-      modulePath = (moduleSpecifier as ts.StringLiteral).text;
 
       // Add the transform operations.
       const factoryClassName = entryModule.className + 'NgFactory';

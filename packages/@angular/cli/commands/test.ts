@@ -1,4 +1,4 @@
-const Command = require('../ember-cli/lib/models/command');
+import { Command, CommandScope } from '../models/command';
 import TestTask from '../tasks/test';
 import { CliConfig } from '../models/config';
 import { oneLine } from 'common-tags';
@@ -24,17 +24,15 @@ export interface TestOptions {
   environment?: string;
   app?: string;
   preserveSymlinks?: boolean;
-  forceTsCommonjs?: boolean;
 }
 
-
-const TestCommand = Command.extend({
-  name: 'test',
-  aliases: ['t'],
-  description: 'Run unit tests in existing project.',
-  works: 'insideProject',
-
-  availableOptions: [
+export default class TestCommand extends Command {
+  public readonly name = 'test';
+  public readonly description = 'Run unit tests in existing project.';
+  public static aliases = ['t'];
+  public readonly scope = CommandScope.inProject;
+  public readonly arguments: string[] = [];
+  public readonly options = [
     {
       name: 'watch',
       type: Boolean,
@@ -125,28 +123,19 @@ const TestCommand = Command.extend({
       aliases: ['a'],
       description: 'Specifies app name to use.'
     }
-  ],
+  ];
 
-  run: function (commandOptions: TestOptions) {
+  public async run(options: TestOptions) {
     const testTask = new TestTask({
       ui: this.ui,
       project: this.project
     });
 
-    if (commandOptions.watch !== undefined && !commandOptions.watch) {
+    if (options.watch !== undefined && !options.watch) {
       // if not watching ensure karma is doing a single run
-      commandOptions.singleRun = true;
+      options.singleRun = true;
     }
 
-    // Don't force commonjs for code coverage builds, some setups need es2015 for it.
-    // https://github.com/angular/angular-cli/issues/5526
-    if (!commandOptions.codeCoverage) {
-      commandOptions.forceTsCommonjs = true;
-    }
-
-    return testTask.run(commandOptions);
+    return await testTask.run(options);
   }
-});
-
-TestCommand.overrideCore = true;
-export default TestCommand;
+}

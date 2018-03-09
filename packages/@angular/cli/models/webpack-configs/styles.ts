@@ -1,26 +1,22 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
-import {
-  SuppressExtractedTextChunksWebpackPlugin
-} from '../../plugins/suppress-entry-chunks-webpack-plugin';
+import { SuppressExtractedTextChunksWebpackPlugin } from '../../plugins/webpack';
 import { extraEntryParser, getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../webpack-config';
 import { pluginArgs, postcssArgs } from '../../tasks/eject';
 
-const cssnano = require('cssnano');
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const customProperties = require('postcss-custom-properties');
+const postcssImports = require('postcss-import');
+const PostcssCliResources = require('../../plugins/webpack').PostcssCliResources;
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
  * know they are used.
  *
- * require('exports-loader')
  * require('style-loader')
  * require('postcss-loader')
- * require('css-loader')
  * require('stylus')
  * require('stylus-loader')
  * require('less')
@@ -29,6 +25,12 @@ const customProperties = require('postcss-custom-properties');
  * require('sass-loader')
  */
 
+interface PostcssUrlAsset {
+  url: string;
+  hash: string;
+  absolutePath: string;
+}
+
 export function getStylesConfig(wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
 
@@ -36,35 +38,73 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
   const extraPlugins: any[] = [];
-  // style-loader does not support sourcemaps without absolute publicPath, so it's
-  // better to disable them when not extracting css
-  // https://github.com/webpack-contrib/style-loader#recommended-configuration
-  const cssSourceMap = buildOptions.extractCss && buildOptions.sourcemaps;
+  const cssSourceMap = buildOptions.sourcemaps;
 
-  // Minify/optimize css in production.
-  const minimizeCss = buildOptions.target === 'production';
+  // Maximum resource size to inline (KiB)
+  const maximumInlineSize = 10;
+  // determine hashing format
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
   // Convert absolute resource URLs to account for base-href and deploy-url.
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
 
-  const postcssPluginCreator = function() {
-    // safe settings based on: https://github.com/ben-eb/cssnano/issues/358#issuecomment-283696193
-    const importantCommentRe = /@preserve|@licen[cs]e|[@#]\s*source(?:Mapping)?URL|^!/i;
-    const minimizeOptions = {
-      autoprefixer: false, // full pass with autoprefixer is run separately
-      safe: true,
-      mergeLonghand: false, // version 3+ should be safe; cssnano currently uses 2.x
-      discardComments : { remove: (comment: string) => !importantCommentRe.test(comment) }
-    };
-
+  const postcssPluginCreator = function(loader: webpack.loader.LoaderContext) {
     return [
+      postcssImports({
+        resolve: (url: string, context: string) => {
+          return new Promise<string>((resolve, reject) => {
+            let hadTilde = false;
+            if (url && url.startsWith('~')) {
+              url = url.substr(1);
+              hadTilde = true;
+            }
+            loader.resolve(context, (hadTilde ? '' : './') + url, (err: Error, result: string) => {
+              if (err) {
+                if (hadTilde) {
+                  reject(err);
+                  return;
+                }
+                loader.resolve(context, url, (err: Error, result: string) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(result);
+                  }
+                });
+              } else {
+                resolve(result);
+              }
+            });
+          });
+        },
+        load: (filename: string) => {
+          return new Promise<string>((resolve, reject) => {
+            loader.fs.readFile(filename, (err: Error, data: Buffer) => {
+              if (err) {
+                reject(err);
+                return;
+              }
+
+              const content = data.toString();
+              resolve(content);
+            });
+          });
+        }
+      }),
+      postcssUrl({
+        filter: ({ url }: PostcssUrlAsset) => url.startsWith('~'),
+        url: ({ url }: PostcssUrlAsset) => {
+          const fullPath = path.join(projectRoot, 'node_modules', url.substr(1));
+          return path.relative(loader.context, fullPath).replace(/\\/g, '/');
+        }
+      }),
       postcssUrl([
         {
           // Only convert root relative URLs, which CSS-Loader won't process into require().
-          filter: ({ url }: { url: string }) => url.startsWith('/') && !url.startsWith('//'),
-          url: ({ url }: { url: string }) => {
-            if (deployUrl.match(/:\/\//)) {
-              // If deployUrl contains a scheme, ignore baseHref use deployUrl as is.
+          filter: ({ url }: PostcssUrlAsset) => url.startsWith('/') && !url.startsWith('//'),
+          url: ({ url }: PostcssUrlAsset) => {
+            if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
+              // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
               return `${deployUrl.replace(/\/$/, '')}${url}`;
             } else if (baseHref.match(/:\/\//)) {
               // If baseHref contains a scheme, include it as is.
@@ -79,30 +119,35 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         },
         {
           // TODO: inline .cur if not supporting IE (use browserslist to check)
-          filter: (asset: any) => !asset.hash && !asset.absolutePath.endsWith('.cur'),
+          filter: (asset: PostcssUrlAsset) => {
+            return maximumInlineSize > 0 && !asset.hash && !asset.absolutePath.endsWith('.cur');
+          },
           url: 'inline',
           // NOTE: maxSize is in KB
-          maxSize: 10
-        }
+          maxSize: maximumInlineSize,
+          fallback: 'rebase',
+        },
+        { url: 'rebase' },
       ]),
-      autoprefixer(),
-      customProperties({ preserve: true })
-    ].concat(
-        minimizeCss ? [cssnano(minimizeOptions)] : []
-    );
+      PostcssCliResources({
+        deployUrl: loader.loaders[loader.loaderIndex].options.ident == 'extracted' ? '' : deployUrl,
+        loader,
+        filename: `[name]${hashFormat.file}.[ext]`,
+      }),
+      autoprefixer({ grid: true }),
+    ];
   };
   (postcssPluginCreator as any)[postcssArgs] = {
+    imports: {
+      '@angular/cli/plugins/webpack': 'PostcssCliResources',
+    },
     variableImports: {
       'autoprefixer': 'autoprefixer',
       'postcss-url': 'postcssUrl',
-      'cssnano': 'cssnano',
-      'postcss-custom-properties': 'customProperties'
+      'postcss-import': 'postcssImports',
     },
-    variables: { minimizeCss, baseHref, deployUrl }
+    variables: { hashFormat, baseHref, deployUrl, projectRoot, maximumInlineSize }
   };
-
-  // determine hashing format
-  const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
 
   // use includePaths from appConfig
   const includePaths: string[] = [];
@@ -165,29 +210,21 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   ];
 
   const commonLoaders: webpack.Loader[] = [
-    {
-      loader: 'css-loader',
-      options: {
-        sourceMap: cssSourceMap,
-        importLoaders: 1,
-      }
-    },
-    {
-      loader: 'postcss-loader',
-      options: {
-        // A non-function property is required to workaround a webpack option handling bug
-        ident: 'postcss',
-        plugins: postcssPluginCreator,
-        sourceMap: cssSourceMap
-      }
-    }
+    { loader: 'raw-loader' },
   ];
 
   // load component css as raw strings
   const rules: webpack.Rule[] = baseRules.map(({test, use}) => ({
     exclude: globalStylePaths, test, use: [
-      'exports-loader?module.exports.toString()',
       ...commonLoaders,
+      {
+        loader: 'postcss-loader',
+        options: {
+          ident: 'embedded',
+          plugins: postcssPluginCreator,
+          sourceMap: cssSourceMap
+        }
+      },
       ...(use as webpack.Loader[])
     ]
   }));
@@ -198,6 +235,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       const extractTextPlugin = {
         use: [
           ...commonLoaders,
+          {
+            loader: 'postcss-loader',
+            options: {
+              ident: buildOptions.extractCss ? 'extracted' : 'embedded',
+              plugins: postcssPluginCreator,
+              sourceMap: cssSourceMap
+            }
+          },
           ...(use as webpack.Loader[])
         ],
         // publicPath needed as a workaround https://github.com/angular/angular-cli/issues/4035
@@ -220,12 +265,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   if (buildOptions.extractCss) {
     // extract global css from js files into own css file
     extraPlugins.push(
-      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.bundle.css` }));
+      new ExtractTextPlugin({ filename: `[name]${hashFormat.extract}.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
 
   return {
+    // Workaround stylus-loader defect: https://github.com/shama/stylus-loader/issues/189
+    loader: { stylus: {} },
     entry: entryPoints,
     module: { rules },
     plugins: [].concat(extraPlugins)

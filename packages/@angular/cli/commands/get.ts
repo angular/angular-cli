@@ -1,49 +1,47 @@
 import {CliConfig} from '../models/config';
+import { Command } from '../models/command';
 
 const SilentError = require('silent-error');
-const Command = require('../ember-cli/lib/models/command');
 
 
 export interface GetOptions {
+  jsonPath: string;
   global?: boolean;
 }
 
-
-const GetCommand = Command.extend({
-  name: 'get',
-  description: 'Get a value from the configuration. Example: ng get [key]',
-  works: 'everywhere',
-
-  availableOptions: [
+export default class GetCommand extends Command {
+  public readonly name = 'get';
+  public readonly description = 'Get a value from the configuration. Example: ng get [key]';
+  public readonly arguments = ['jsonPath'];
+  public readonly options = [
     {
       name: 'global',
       type: Boolean,
       'default': false,
+      aliases: ['g'],
       description: 'Get the value in the global configuration (in your home directory).'
     }
-  ],
+  ];
 
-  run: function (commandOptions: GetOptions, rawArgs: string[]): Promise<void> {
+  public run(options: GetOptions) {
     return new Promise<void>(resolve => {
-      const config = commandOptions.global ? CliConfig.fromGlobal() : CliConfig.fromProject();
+      const config = options.global ? CliConfig.fromGlobal() : CliConfig.fromProject();
 
       if (config === null) {
         throw new SilentError('No config found. If you want to use global configuration, '
           + 'you need the --global argument.');
       }
 
-      const value = config.get(rawArgs[0]);
+      const value = config.get(options.jsonPath);
 
       if (value === null || value === undefined) {
         throw new SilentError('Value cannot be found.');
       } else if (typeof value == 'object') {
-        console.log(JSON.stringify(value, null, 2));
+        this.logger.info(JSON.stringify(value, null, 2));
       } else {
-        console.log(value);
+        this.logger.info(value.toString());
       }
       resolve();
     });
   }
-});
-
-export default GetCommand;
+}

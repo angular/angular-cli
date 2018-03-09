@@ -18,7 +18,7 @@ export interface SchematicAvailableOptions {
 }
 
 export default Task.extend({
-  run: function (options: SchematicGetOptions): Promise<SchematicAvailableOptions[]> {
+  run: function (options: SchematicGetOptions): Promise<SchematicAvailableOptions[] | null> {
     const collectionName = options.collectionName ||
       CliConfig.getValue('defaults.schematics.collection');
 
@@ -26,11 +26,14 @@ export default Task.extend({
 
     const schematic = getSchematic(collection, options.schematicName);
 
+    if (!schematic.description.schemaJson) {
+      return Promise.resolve(null);
+    }
+
     const properties = schematic.description.schemaJson.properties;
     const keys = Object.keys(properties);
     const availableOptions = keys
       .map(key => ({...properties[key], ...{name: stringUtils.dasherize(key)}}))
-      .filter(opt => opt.visible !== false)
       .map(opt => {
         let type;
         const schematicType = opt.type;
@@ -66,7 +69,8 @@ export default Task.extend({
           type,
           schematicType,
           default: undefined, // do not carry over schematics defaults
-          schematicDefault
+          schematicDefault,
+          hidden: opt.visible === false,
         };
       })
       .filter(x => x);

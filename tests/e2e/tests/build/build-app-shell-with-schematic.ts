@@ -26,17 +26,17 @@ export default function () {
 
   return Promise.resolve()
     .then(() => expectToFail(() => {
-      return ng('generate', 'appShell', 'name', '--universal-app', 'universal');
+      return ng('generate', 'appShell', '--universal-app', 'universal');
     })
     .then(() => appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>'))
-    .then(() => ng('generate', 'appShell', 'name', '--universal-app', 'universal'))
+    .then(() => ng('generate', 'appShell', '--universal-app', 'universal'))
     .then(() => updateJsonFile('package.json', packageJson => {
       const dependencies = packageJson['dependencies'];
       dependencies['@angular/platform-server'] = platformServerVersion;
     })
     .then(() => npm('install'))
-    .then(() => ng('build', '--prod'))
+    .then(() => ng('build', '--target', 'production'))
     .then(() => expectFileToMatch('dist/index.html', /app-shell works!/))
-    .then(() => ng('build', '--prod', '--skip-app-shell'))
+    .then(() => ng('build', '--target', 'production', '--skip-app-shell'))
     .then(() => expectToFail(() => expectFileToMatch('dist/index.html', /app-shell works!/)));
 }

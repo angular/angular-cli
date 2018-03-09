@@ -1,3 +1,10 @@
+// TODO: remove this commented AJV require.
+// We don't actually require AJV, but there is a bug with NPM and peer dependencies that is
+// whose workaround is to depend on AJV.
+// See https://github.com/angular/angular-cli/issues/9691#issuecomment-367322703 for details.
+// We need to add a require here to satisfy the dependency checker.
+// require('ajv');
+
 import * as path from 'path';
 
 const cli = require('../../ember-cli/lib/cli');
@@ -6,20 +13,20 @@ const UI = require('../../ember-cli/lib/ui');
 
 function loadCommands() {
   return {
+    'add': require('../../commands/add').default,
     'build': require('../../commands/build').default,
     'serve': require('../../commands/serve').default,
     'eject': require('../../commands/eject').default,
     'new': require('../../commands/new').default,
     'generate': require('../../commands/generate').default,
-    'destroy': require('../../commands/destroy').default,
     'test': require('../../commands/test').default,
     'e2e': require('../../commands/e2e').default,
     'help': require('../../commands/help').default,
     'lint': require('../../commands/lint').default,
     'version': require('../../commands/version').default,
-    'completion': require('../../commands/completion').default,
     'doc': require('../../commands/doc').default,
     'xi18n': require('../../commands/xi18n').default,
+    'update': require('../../commands/update').default,
 
     // Easter eggs.
     'make-this-awesome': require('../../commands/easter-egg').default,

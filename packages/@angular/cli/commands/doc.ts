@@ -1,15 +1,16 @@
-const Command = require('../ember-cli/lib/models/command');
 import { DocTask } from '../tasks/doc';
+import { Command } from '../models/command';
 
 export interface DocOptions {
   search?: boolean;
 }
 
-const DocCommand = Command.extend({
-  name: 'doc',
-  description: 'Opens the official Angular API documentation for a given keyword.',
-  works: 'everywhere',
-  availableOptions: [
+export default class DocCommand extends Command {
+  public readonly name = 'doc';
+  public readonly description = 'Opens the official Angular API documentation for a given keyword.';
+  public static aliases = ['d'];
+  public readonly arguments = ['keyword'];
+  public readonly options = [
     {
       name: 'search',
       aliases: ['s'],
@@ -17,22 +18,16 @@ const DocCommand = Command.extend({
       default: false,
       description: 'Search whole angular.io instead of just api.'
     }
-  ],
+  ];
 
-  anonymousOptions: [
-    '<keyword>'
-  ],
-
-  run: function(commandOptions: DocOptions, rawArgs: Array<string>) {
-    const keyword = rawArgs[0];
+  public async run(options: any) {
+    const keyword = options.keyword;
 
     const docTask = new DocTask({
       ui: this.ui,
       project: this.project
     });
 
-    return docTask.run(keyword, commandOptions.search);
+    return await docTask.run(keyword, options.search);
   }
-});
-
-export default DocCommand;
+}

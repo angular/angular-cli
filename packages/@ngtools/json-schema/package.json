@@ -1,6 +1,6 @@
 {
   "name": "@ngtools/json-schema",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Schema validating and reading for configurations, similar to Angular CLI config.",
   "main": "./src/index.js",
   "typings": "src/index.d.ts",
@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/angular/angular-cli/tree/master/packages/@ngtools/json-schema",
   "engines": {
-    "node": ">= 4.1.0",
-    "npm": ">= 3.0.0"
+    "node": ">= 8.9.0",
+    "npm": ">= 5.5.1"
   },
   "dependencies": {
   },

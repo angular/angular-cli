@@ -2,7 +2,7 @@
 import * as ts from 'typescript';
 
 import { time, timeEnd } from './benchmark';
-import { Program, Diagnostics } from './ngtools_api';
+import { Program, Diagnostic, Diagnostics } from './ngtools_api';
 
 
 export class CancellationToken implements ts.CancellationToken {
@@ -33,7 +33,7 @@ export function gatherDiagnostics(
   benchmarkLabel: string,
   cancellationToken?: CancellationToken,
 ): Diagnostics {
-  const allDiagnostics: Diagnostics = [];
+  const allDiagnostics: Array<ts.Diagnostic | Diagnostic> = [];
   let checkOtherDiagnostics = true;
 
   function checkDiagnostics(diags: Diagnostics | undefined) {

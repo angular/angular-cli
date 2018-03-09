@@ -1,6 +1,5 @@
+import { map } from 'rxjs/operators';
 import {Logger} from './logger';
-
-import 'rxjs/add/operator/map';
 
 
 /**
@@ -18,20 +17,20 @@ export class IndentLogger extends Logger {
     super(name, parent);
 
     indentationMap[indentation] = indentationMap[indentation] || [''];
-    const map = indentationMap[indentation];
+    const indentMap = indentationMap[indentation];
 
-    this._observable = this._observable.map(entry => {
+    this._observable = this._observable.pipe(map(entry => {
       const l = entry.path.length;
-      if (l >= map.length) {
-        let current = map[map.length - 1];
-        while (l >= map.length) {
+      if (l >= indentMap.length) {
+        let current = indentMap[indentMap.length - 1];
+        while (l >= indentMap.length) {
           current += indentation;
-          map.push(current);
+          indentMap.push(current);
         }
       }
 
-      entry.message = map[l] + entry.message;
+      entry.message = indentMap[l] + entry.message;
       return entry;
-    });
+    }));
   }
 }

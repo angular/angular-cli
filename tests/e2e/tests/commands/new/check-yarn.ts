@@ -7,7 +7,7 @@ export default function() {
   return Promise.resolve()
     .then(() => process.chdir(getGlobalVariable('tmp-root')))
     .then(() =>  ng('set', '--global', 'packageManager=default'))
-    .then(() =>  ng('new', 'foo'))
+    .then(() =>  ng('new', 'foo', '--version=1.6.8'))
     .then(({ stdout }) => {
       // Assuming yarn is installed and checking for message with yarn.
       if (!stdout.match(yarnRegEx)) {

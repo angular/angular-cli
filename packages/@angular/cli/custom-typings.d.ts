@@ -15,8 +15,8 @@ interface IWebpackDevServerConfigurationOptions {
   };
   publicPath?: string;
   headers?: { [key: string]: string };
-  stats?: { [key: string]: boolean } | string;
-  inline: boolean;
+  stats?: { [key: string]: boolean } | string | boolean;
+  inline?: boolean;
   https?: boolean;
   key?: string;
   cert?: string;
@@ -24,3 +24,5 @@ interface IWebpackDevServerConfigurationOptions {
   public?: string;
   disableHostCheck?: boolean;
 }
+
+declare module 'yargs-parser';

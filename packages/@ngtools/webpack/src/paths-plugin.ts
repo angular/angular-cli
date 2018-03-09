@@ -2,162 +2,128 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import {
-  ResolverPlugin,
   Callback,
-  Tapable,
-  NormalModuleFactory,
   NormalModuleFactoryRequest,
 } from './webpack';
 
 
-const ModulesInRootPlugin: new (a: string, b: string, c: string) => ResolverPlugin
-  = require('enhanced-resolve/lib/ModulesInRootPlugin');
-
-export interface Mapping {
-  onlyModule: boolean;
-  alias: string;
-  aliasPattern: RegExp;
-  target: string;
-}
-
-
-function escapeRegExp(str: string): string {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-}
-
-
-export interface PathsPluginOptions {
-  nmf: NormalModuleFactory;
-  tsConfigPath: string;
-  compilerOptions?: ts.CompilerOptions;
-  compilerHost?: ts.CompilerHost;
-}
-
-export class PathsPlugin implements Tapable {
-  private _nmf: NormalModuleFactory;
-  private _tsConfigPath: string;
-  private _compilerOptions: ts.CompilerOptions;
-  private _host: ts.CompilerHost;
-
-  source: string;
-  target: string;
-
-  private _mappings: Mapping[];
-
-  private _absoluteBaseUrl: string;
-
-  private static _loadOptionsFromTsConfig(tsConfigPath: string, host?: ts.CompilerHost):
-      ts.CompilerOptions {
-    const tsConfig = ts.readConfigFile(tsConfigPath, (path: string) => {
-      if (host) {
-        return host.readFile(path);
-      } else {
-        return ts.sys.readFile(path);
-      }
-    });
-    if (tsConfig.error) {
-      throw tsConfig.error;
-    }
-    return tsConfig.config.compilerOptions;
+export function resolveWithPaths(
+  request: NormalModuleFactoryRequest,
+  callback: Callback<NormalModuleFactoryRequest>,
+  compilerOptions: ts.CompilerOptions,
+  host: ts.CompilerHost,
+  cache?: ts.ModuleResolutionCache,
+) {
+  if (!request || !request.request || !compilerOptions.paths) {
+    callback(null, request);
+    return;
   }
 
-  constructor(options: PathsPluginOptions) {
-    if (!options.hasOwnProperty('tsConfigPath')) {
-      // This could happen in JavaScript.
-      throw new Error('tsConfigPath option is mandatory.');
-    }
-    this._tsConfigPath = options.tsConfigPath;
+  // Only work on Javascript/TypeScript issuers.
+  if (!request.contextInfo.issuer || !request.contextInfo.issuer.match(/\.[jt]s$/)) {
+    callback(null, request);
+    return;
+  }
 
-    if (options.compilerOptions) {
-      this._compilerOptions = options.compilerOptions;
-    } else {
-      this._compilerOptions = PathsPlugin._loadOptionsFromTsConfig(this._tsConfigPath);
-    }
+  const originalRequest = request.request.trim();
 
-    if (options.compilerHost) {
-      this._host = options.compilerHost;
-    } else {
-      this._host = ts.createCompilerHost(this._compilerOptions, false);
-    }
+  // Relative requests are not mapped
+  if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
+    callback(null, request);
+    return;
+  }
 
-    this._nmf = options.nmf;
-    this.source = 'described-resolve';
-    this.target = 'resolve';
-
-    this._absoluteBaseUrl = path.resolve(
-      path.dirname(this._tsConfigPath),
-      this._compilerOptions.baseUrl || '.'
-    );
-
-    this._mappings = [];
-    let paths = this._compilerOptions.paths || {};
-    Object.keys(paths).forEach(alias => {
-      let onlyModule = alias.indexOf('*') === -1;
-      let excapedAlias = escapeRegExp(alias);
-      let targets = paths[alias];
-      targets.forEach(target => {
-        let aliasPattern: RegExp;
-        if (onlyModule) {
-          aliasPattern = new RegExp(`^${excapedAlias}$`);
-        } else {
-          let withStarCapturing = excapedAlias.replace('\\*', '(.*)');
-          aliasPattern = new RegExp(`^${withStarCapturing}`);
+  // check if any path mapping rules are relevant
+  const pathMapOptions = [];
+  for (const pattern in compilerOptions.paths) {
+      // can only contain zero or one
+      const starIndex = pattern.indexOf('*');
+      if (starIndex === -1) {
+        if (pattern === originalRequest) {
+          pathMapOptions.push({
+            partial: '',
+            potentials: compilerOptions.paths[pattern]
+          });
         }
-
-        this._mappings.push({
-          onlyModule,
-          alias,
-          aliasPattern,
-          target: target
+      } else if (starIndex === 0 && pattern.length === 1) {
+        pathMapOptions.push({
+          partial: originalRequest,
+          potentials: compilerOptions.paths[pattern],
         });
-      });
-    });
+      } else if (starIndex === pattern.length - 1) {
+        if (originalRequest.startsWith(pattern.slice(0, -1))) {
+          pathMapOptions.push({
+            partial: originalRequest.slice(pattern.length - 1),
+            potentials: compilerOptions.paths[pattern]
+          });
+        }
+      } else {
+        const [prefix, suffix] = pattern.split('*');
+        if (originalRequest.startsWith(prefix) && originalRequest.endsWith(suffix)) {
+          pathMapOptions.push({
+            partial: originalRequest.slice(prefix.length).slice(0, -suffix.length),
+            potentials: compilerOptions.paths[pattern]
+          });
+        }
+      }
   }
 
-  apply(resolver: ResolverPlugin): void {
-    let baseUrl = this._compilerOptions.baseUrl || '.';
+  if (pathMapOptions.length === 0) {
+    callback(null, request);
+    return;
+  }
 
-    if (baseUrl) {
-      resolver.apply(new ModulesInRootPlugin('module', this._absoluteBaseUrl, 'resolve'));
+  if (pathMapOptions.length === 1 && pathMapOptions[0].potentials.length === 1) {
+    const onlyPotential = pathMapOptions[0].potentials[0];
+    let replacement;
+    const starIndex = onlyPotential.indexOf('*');
+    if (starIndex === -1) {
+      replacement = onlyPotential;
+    } else if (starIndex === onlyPotential.length - 1) {
+      replacement = onlyPotential.slice(0, -1) + pathMapOptions[0].partial;
+    } else {
+      const [prefix, suffix] = onlyPotential.split('*');
+      replacement = prefix + pathMapOptions[0].partial + suffix;
     }
 
-    this._nmf.plugin('before-resolve', (request: NormalModuleFactoryRequest,
-                                        callback: Callback<any>) => {
-      // Only work on TypeScript issuers.
-      if (!request.contextInfo.issuer || !request.contextInfo.issuer.endsWith('.ts')) {
-        return callback(null, request);
-      }
-
-      for (let mapping of this._mappings) {
-        const match = request.request.match(mapping.aliasPattern);
-        if (!match) { continue; }
-        let newRequestStr = mapping.target;
-        if (!mapping.onlyModule) {
-          newRequestStr = newRequestStr.replace('*', match[1]);
-        }
-        const moduleResolver = ts.resolveModuleName(
-          request.request,
-          request.contextInfo.issuer,
-          this._compilerOptions,
-          this._host
-        );
-        let moduleFilePath = moduleResolver.resolvedModule
-                          && moduleResolver.resolvedModule.resolvedFileName;
-
-        // If TypeScript gives us a .d.ts it's probably a node module and we need to let webpack
-        // do the resolution.
-        if (moduleFilePath && moduleFilePath.endsWith('.d.ts')) {
-          moduleFilePath = moduleFilePath.replace(/\.d\.ts$/, '.js');
-          if (!this._host.fileExists(moduleFilePath)) {
-            continue;
-          }
-        }
-        if (moduleFilePath) {
-          return callback(null, Object.assign({}, request, { request: moduleFilePath }));
-        }
-      }
-
-      return callback(null, request);
-    });
+    request.request = path.resolve(compilerOptions.baseUrl, replacement);
+    callback(null, request);
+    return;
   }
+
+  const moduleResolver = ts.resolveModuleName(
+    originalRequest,
+    request.contextInfo.issuer,
+    compilerOptions,
+    host,
+    cache
+  );
+
+  const moduleFilePath = moduleResolver.resolvedModule
+                         && moduleResolver.resolvedModule.resolvedFileName;
+
+  // If there is no result, let webpack try to resolve
+  if (!moduleFilePath) {
+    callback(null, request);
+    return;
+  }
+
+  // If TypeScript gives us a `.d.ts`, it is probably a node module
+  if (moduleFilePath.endsWith('.d.ts')) {
+    // If in a package, let webpack resolve the package
+    const packageRootPath = path.join(path.dirname(moduleFilePath), 'package.json');
+    if (!host.fileExists(packageRootPath)) {
+      // Otherwise, if there is a file with a .js extension use that
+      const jsFilePath = moduleFilePath.slice(0, -5) + '.js';
+      if (host.fileExists(jsFilePath)) {
+        request.request = jsFilePath;
+      }
+    }
+
+    callback(null, request);
+    return;
+  }
+
+  request.request = moduleFilePath;
+  callback(null, request);
 }

@@ -19,13 +19,8 @@ export interface ExtractI18nPluginOptions {
 export class ExtractI18nPlugin implements Tapable {
   private _resourceLoader: WebpackResourceLoader;
 
-  private _donePromise: Promise<void> | null;
-  private _compiler: any = null;
-  private _compilation: any = null;
-
   private _tsConfigPath: string;
   private _basePath: string;
-  private _genDir: string;
   private _rootFilePath: string[];
   private _compilerOptions: any = null;
   private _angularCompilerOptions: any = null;
@@ -112,7 +107,6 @@ export class ExtractI18nPlugin implements Tapable {
     );
 
     this._basePath = basePath;
-    this._genDir = genDir;
 
     // this._compilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
     this._compilerHost = ts.createCompilerHost(this._compilerOptions, true);
@@ -141,34 +135,32 @@ export class ExtractI18nPlugin implements Tapable {
   }
 
   apply(compiler: any) {
-    this._compiler = compiler;
+    compiler.hooks.make.tapAsync(
+      'extract-i8n',
+      (compilation: any, cb: any) => this._make(compilation, cb)
+    );
 
-    compiler.plugin('make', (compilation: any, cb: any) => this._make(compilation, cb));
-
-    compiler.plugin('after-emit', (compilation: any, cb: any) => {
-      this._donePromise = null;
-      this._compilation = null;
+    compiler.hooks.afterEmit.tapAsync('extract-i8n', (compilation: any, cb: any) => {
       compilation._ngToolsWebpackXi18nPluginInstance = null;
       cb();
     });
   }
 
   private _make(compilation: any, cb: (err?: any, request?: any) => void) {
-    this._compilation = compilation;
-    if (this._compilation._ngToolsWebpackXi18nPluginInstance) {
+    if (compilation._ngToolsWebpackXi18nPluginInstance) {
       return cb(new Error('An @ngtools/webpack xi18n plugin already exist for ' +
         'this compilation.'));
     }
-    if (!this._compilation._ngToolsWebpackPluginInstance) {
+    if (!compilation._ngToolsWebpackPluginInstance) {
       return cb(new Error('An @ngtools/webpack aot plugin does not exists ' +
         'for this compilation'));
     }
 
-    this._compilation._ngToolsWebpackXi18nPluginInstance = this;
+    compilation._ngToolsWebpackXi18nPluginInstance = this;
 
     this._resourceLoader.update(compilation);
 
-    this._donePromise = Promise.resolve()
+    Promise.resolve()
       .then(() => {
         return __NGTOOLS_PRIVATE_API_2.extractI18n({
           basePath: this._basePath,
@@ -184,7 +176,7 @@ export class ExtractI18nPlugin implements Tapable {
         });
       })
       .then(() => cb(), (err: any) => {
-        this._compilation.errors.push(err);
+        compilation.errors.push(err);
         cb(err);
       });
 

@@ -118,6 +118,16 @@ Remember to disable the service worker while developing to avoid stale code.
 
 Note: service worker support is experimental and subject to change.
 
+### ES2015 support
+
+To build in ES2015 mode, edit `./tsconfig.json` to use `"target": "es2015"` (instead of `es5`).
+
+This will cause application TypeScript and Uglify be output as ES2015, and third party libraries
+to be loaded through the `es2015` entry in `package.json` if available.
+
+Be aware that JIT does not support ES2015 and so you should build/serve your app with `--aot`.
+See https://github.com/angular/angular-cli/issues/7797 for details.
+
 ## Options
 <details>
   <summary>aot</summary>

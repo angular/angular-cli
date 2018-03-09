@@ -9,7 +9,7 @@ import {wait} from '../../utils/utils';
 import {request} from '../../utils/http';
 import {getGlobalVariable} from '../../utils/env';
 
-const validBundleRegEx = /webpack: bundle is now VALID|webpack: Compiled successfully./;
+const validBundleRegEx = /: Compiled successfully./;
 
 export default function() {
   if (process.platform.startsWith('win')) {
@@ -20,14 +20,9 @@ export default function() {
     return Promise.resolve();
   }
 
-  let oldNumberOfChunks = 0;
-  const chunkRegExp = /chunk\s+\{/g;
+  const lazyChunkRegExp = /lazy-module\.js/g;
 
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
-    // Count the bundles.
-    .then(({ stdout }) => {
-      oldNumberOfChunks = stdout.split(chunkRegExp).length;
-    })
     // Add a lazy module.
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
     // Should trigger a rebuild with a new bundle.
@@ -65,8 +60,7 @@ export default function() {
     // Count the bundles.
     .then((results) => {
       const stdout = results[0].stdout;
-      let newNumberOfChunks = stdout.split(chunkRegExp).length;
-      if (oldNumberOfChunks >= newNumberOfChunks) {
+      if (!lazyChunkRegExp.test(stdout)) {
         throw new Error('Expected webpack to create a new chunk, but did not.');
       }
     })
@@ -115,7 +109,7 @@ export default function() {
       })
     ]))
     .then(() => wait(2000))
-    .then(() => request('http://localhost:4200/main.bundle.js'))
+    .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
       if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
         throw new Error('Expected golden value 1.');

@@ -1,6 +1,6 @@
 # Proxy To Backend
 
-Using the [proxying support](https://webpack.github.io/docs/webpack-dev-server.html#proxy) in webpack's dev server we can highjack certain URLs and send them to a backend server.
+Using the [proxying support](https://webpack.js.org/configuration/dev-server/#devserver-proxy) in webpack's dev server we can highjack certain URLs and send them to a backend server.
 We do this by passing a file to `--proxy-config`
 
 Say we have a server running on `http://localhost:3000/api` and we want all calls to `http://localhost:4200/api` to go to that server.
@@ -16,7 +16,7 @@ We create a file next to our project's `package.json` called `proxy.conf.json` w
 }
 ```
 
-You can read more about what options are available [here](https://webpack.github.io/docs/webpack-dev-server.html#proxy).
+You can read more about what options are available [here](https://webpack.js.org/configuration/dev-server/#devserver-proxy).
 
 We can then edit the `package.json` file's start script to be
 
@@ -25,6 +25,8 @@ We can then edit the `package.json` file's start script to be
 ```
 
 Now in order to run our dev server with our proxy config, we can simply call `npm start`.
+
+**After each edit to the proxy.conf.json file remember to relaunch the `npm start` process to make your changes effective.**
 
 ### Rewriting the URL path
 

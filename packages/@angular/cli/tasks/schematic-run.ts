@@ -7,29 +7,31 @@ import {
   Schematic,
   Tree
 } from '@angular-devkit/schematics';
+import { BuiltinTaskExecutor } from '@angular-devkit/schematics/tasks/node';
 import { FileSystemHost } from '@angular-devkit/schematics/tools';
-import { Observable } from 'rxjs/Observable';
+import { of as observableOf } from 'rxjs/observable/of';
 import * as path from 'path';
 import chalk from 'chalk';
 import { CliConfig } from '../models/config';
-import 'rxjs/add/operator/concatMap';
-import 'rxjs/add/operator/map';
-import { getCollection, getSchematic } from '../utilities/schematics';
+import { concat, concatMap, ignoreElements, map } from 'rxjs/operators';
+import { getCollection, getSchematic, getEngineHost, getEngine } from '../utilities/schematics';
 
 const { green, red, yellow } = chalk;
+const SilentError = require('silent-error');
 const Task = require('../ember-cli/lib/models/task');
 
 export interface SchematicRunOptions {
+  dryRun: boolean;
+  force: boolean;
   taskOptions: SchematicOptions;
   workingDir: string;
   emptyHost: boolean;
   collectionName: string;
   schematicName: string;
+  allowPrivate?: boolean;
 }
 
 export interface SchematicOptions {
-  dryRun: boolean;
-  force: boolean;
   [key: string]: any;
 }
 
@@ -45,12 +47,34 @@ interface OutputLogging {
 
 export default Task.extend({
   run: function (options: SchematicRunOptions): Promise<SchematicOutput> {
-    const { taskOptions, workingDir, emptyHost, collectionName, schematicName } = options;
+    const {
+      taskOptions,
+      force,
+      dryRun,
+      workingDir,
+      emptyHost,
+      collectionName,
+      schematicName
+    } = options;
 
     const ui = this.ui;
 
+    const packageManager = CliConfig.fromGlobal().get('packageManager');
+    const engineHost = getEngineHost();
+    engineHost.registerTaskExecutor(
+      BuiltinTaskExecutor.NodePackage,
+      {
+        rootDirectory: workingDir,
+        packageManager: packageManager === 'default' ? 'npm' : packageManager,
+      },
+    );
+    engineHost.registerTaskExecutor(
+      BuiltinTaskExecutor.RepositoryInitializer,
+      { rootDirectory: workingDir },
+    );
+
     const collection = getCollection(collectionName);
-    const schematic = getSchematic(collection, schematicName);
+    const schematic = getSchematic(collection, schematicName, options.allowPrivate);
 
     const projectRoot = !!this.project ? this.project.root : workingDir;
 
@@ -58,10 +82,10 @@ export default Task.extend({
     const opts = { ...taskOptions, ...preppedOptions };
 
     const tree = emptyHost ? new EmptyTree() : new FileSystemTree(new FileSystemHost(workingDir));
-    const host = Observable.of(tree);
+    const host = observableOf(tree);
 
-    const dryRunSink = new DryRunSink(workingDir, opts.force);
-    const fsSink = new FileSystemSink(workingDir, opts.force);
+    const dryRunSink = new DryRunSink(workingDir, force);
+    const fsSink = new FileSystemSink(workingDir, force);
 
     let error = false;
     const loggingQueue: OutputLogging[] = [];
@@ -110,70 +134,79 @@ export default Task.extend({
       }
     });
 
-    return new Promise((resolve, reject) => {
-      schematic.call(opts, host)
-        .map((tree: Tree) => Tree.optimize(tree))
-        .concatMap((tree: Tree) => {
-          return dryRunSink.commit(tree).ignoreElements().concat(Observable.of(tree));
-        })
-        .concatMap((tree: Tree) => {
-          if (!error) {
-            // Output the logging queue.
-            loggingQueue.forEach(log => ui.writeLine(`  ${log.color(log.keyword)} ${log.message}`));
-          }
+    return schematic.call(opts, host).pipe(
+      map((tree: Tree) => Tree.optimize(tree)),
+      concatMap((tree: Tree) => {
+        return dryRunSink.commit(tree).pipe(
+          ignoreElements(),
+          concat(observableOf(tree)));
+      }),
+      concatMap((tree: Tree) => {
+        if (!error) {
+          // Output the logging queue.
+          loggingQueue.forEach(log => ui.writeLine(`  ${log.color(log.keyword)} ${log.message}`));
+        } else {
+          throw new SilentError();
+        }
 
-          if (opts.dryRun || error) {
-            return Observable.of(tree);
-          }
-          return fsSink.commit(tree).ignoreElements().concat(Observable.of(tree));
-        })
-        .subscribe({
-          error(err) {
-            ui.writeLine(red(`Error: ${err.message}`));
-            reject(err.message);
-          },
-          complete() {
-            if (opts.dryRun) {
-              ui.writeLine(yellow(`\nNOTE: Run with "dry run" no changes were made.`));
-            }
-            resolve({modifiedFiles});
-          }
-        });
-    })
-    .then((output: SchematicOutput) => {
-      const modifiedFiles = output.modifiedFiles;
-      const lintFix = taskOptions.lintFix !== undefined ?
-        taskOptions.lintFix : CliConfig.getValue('defaults.lintFix');
+        if (dryRun) {
+          return observableOf(tree);
+        }
+        return fsSink.commit(tree).pipe(
+          ignoreElements(),
+          concat(observableOf(tree)));
+      }),
+      concatMap(() => {
+        if (!dryRun) {
+          return getEngine().executePostTasks();
+        } else {
+          return [];
+        }
+      }))
+      .toPromise()
+      .then(() => {
+        if (dryRun) {
+          ui.writeLine(yellow(`\nNOTE: Run with "dry run" no changes were made.`));
+        }
+        return {modifiedFiles};
+      })
+      .then((output: SchematicOutput) => {
+        const modifiedFiles = output.modifiedFiles;
+        const lintFix = taskOptions.lintFix !== undefined ?
+          taskOptions.lintFix : CliConfig.getValue('defaults.lintFix');
 
-      if (lintFix && modifiedFiles) {
-        const LintTask = require('./lint').default;
-        const lintTask = new LintTask({
-          ui: this.ui,
-          project: this.project
-        });
+        if (lintFix && modifiedFiles) {
+          const LintTask = require('./lint').default;
+          const lintTask = new LintTask({
+            ui: this.ui,
+            project: this.project
+          });
 
-        return lintTask.run({
-          fix: true,
-          force: true,
-          silent: true,
-          configs: [{
-            files: modifiedFiles
-              .filter((file: string) => /.ts$/.test(file))
-              .map((file: string) => path.join(projectRoot, file))
-          }]
-        });
-      }
-    });
+          return lintTask.run({
+            fix: true,
+            force: true,
+            silent: true,
+            configs: [{
+              files: modifiedFiles
+                .filter((file: string) => /.ts$/.test(file))
+                .map((file: string) => path.join(projectRoot, file))
+            }]
+          });
+        }
+      });
   }
 });
 
 function prepOptions(schematic: Schematic<{}, {}>, options: SchematicOptions): SchematicOptions {
+  const properties = (<any>schematic.description).schemaJson
+    ? (<any>schematic.description).schemaJson.properties
+    : options;
 
-  const properties = (<any>schematic.description).schemaJson.properties;
   const keys = Object.keys(properties);
   if (['component', 'c', 'directive', 'd'].indexOf(schematic.description.name) !== -1) {
-    options.prefix = (options.prefix === 'false' || options.prefix === '')
-      ? '' : options.prefix;
+    options.prefix =
+      (options.prefix === 'false' || options.prefix === false || options.prefix === '')
+      ? undefined : options.prefix;
   }
 
   let preppedOptions = {
@@ -190,7 +223,10 @@ function prepOptions(schematic: Schematic<{}, {}>, options: SchematicOptions): S
 
 function readDefaults(schematicName: string, optionKeys: string[], options: any): any {
   return optionKeys.reduce((acc: any, key) => {
-    acc[key] = options[key] !== undefined ? options[key] : readDefault(schematicName, key);
+    const value = options[key] !== undefined ? options[key] : readDefault(schematicName, key);
+    if (value !== undefined) {
+      acc[key] = value;
+    }
     return acc;
   }, {});
 }
