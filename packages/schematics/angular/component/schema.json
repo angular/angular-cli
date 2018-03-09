@@ -8,21 +8,11 @@
       "type": "string",
       "format": "path",
       "description": "The path to create the component.",
-      "default": "app",
       "visible": false
     },
-    "sourceDir": {
+    "project": {
       "type": "string",
-      "format": "path",
-      "description": "The path of the source directory.",
-      "default": "src",
-      "alias": "D",
-      "visible": false
-    },
-    "appRoot": {
-      "type": "string",
-      "format": "path",
-      "description": "The root of the application.",
+      "description": "The name of the project.",
       "visible": false
     },
     "name": {

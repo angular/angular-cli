@@ -19,8 +19,7 @@ describe('Guard Schematic', () => {
   );
   const defaultOptions: GuardOptions = {
     name: 'foo',
-    path: 'app',
-    sourceDir: 'src',
+    path: 'src/app',
     spec: true,
     module: undefined,
     flat: true,

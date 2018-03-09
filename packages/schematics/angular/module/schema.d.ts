@@ -12,17 +12,13 @@ export interface Schema {
      */
     name: string;
     /**
-     * The path to create the module.
+     * The path to create the pipe.
      */
     path?: string;
     /**
-     * The path of the source directory.
+     * The name of the project.
      */
-    sourceDir?: string;
-    /**
-     * The root of the application.
-     */
-    appRoot?: string;
+    project?: string;
     /**
      * Generates a routing module.
      */

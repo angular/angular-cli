@@ -18,9 +18,8 @@ describe('Interface Schematic', () => {
   );
   const defaultOptions: InterfaceOptions = {
     name: 'foo',
-    path: 'app',
+    path: 'src/app',
     prefix: '',
-    sourceDir: 'src',
     type: '',
   };
 

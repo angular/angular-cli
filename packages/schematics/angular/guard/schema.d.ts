@@ -24,15 +24,11 @@ export interface Schema {
      */
     module?: string;
     /**
-     * The path to create the guard.
+     * The path to create the interface.
      */
     path?: string;
     /**
-     * The path of the source directory.
+     * The name of the project.
      */
-    sourceDir?: string;
-    /**
-     * The root of the application.
-     */
-    appRoot?: string;
+    project?: string;
 }

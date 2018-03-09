@@ -17,8 +17,7 @@ describe('Enum Schematic', () => {
   );
   const defaultOptions: EnumOptions = {
     name: 'foo',
-    path: 'app',
-    sourceDir: 'src',
+    path: 'src/app',
   };
 
   it('should create an enumeration', () => {

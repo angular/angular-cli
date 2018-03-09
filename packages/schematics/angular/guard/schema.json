@@ -26,21 +26,12 @@
     "path": {
       "type": "string",
       "format": "path",
-      "description": "The path to create the guard.",
-      "default": "app",
+      "description": "The path to create the interface.",
       "visible": false
     },
-    "sourceDir": {
+    "project": {
       "type": "string",
-      "format": "path",
-      "description": "The path of the source directory.",
-      "default": "src",
-      "visible": false
-    },
-    "appRoot": {
-      "type": "string",
-      "format": "path",
-      "description": "The root of the application.",
+      "description": "The name of the project.",
       "visible": false
     }
   },

@@ -19,8 +19,7 @@ describe('Directive Schematic', () => {
   );
   const defaultOptions: DirectiveOptions = {
     name: 'foo',
-    path: 'app',
-    sourceDir: 'src',
+    path: 'src/app',
     spec: true,
     module: undefined,
     export: false,

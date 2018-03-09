@@ -29,13 +29,13 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
   }
 
   if (!options.module) {
-    const pathToCheck = (options.sourceDir || '') + '/' + (options.path || '')
+    const pathToCheck = (options.path || '')
                       + (options.flat ? '' : '/' + strings.dasherize(options.name));
 
     return normalize(findModule(host, pathToCheck));
   } else {
     const modulePath = normalize(
-      '/' + options.sourceDir + '/' + (options.appRoot || options.path) + '/' + options.module);
+      '/' + (options.appRoot || options.path) + '/' + options.module);
     const moduleBaseName = normalize(modulePath).split('/').pop();
 
     if (host.exists(modulePath)) {

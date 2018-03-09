@@ -19,8 +19,7 @@ describe('Module Schematic', () => {
   );
   const defaultOptions: ModuleOptions = {
     name: 'foo',
-    path: 'app',
-    sourceDir: 'src',
+    path: 'src/app',
     spec: true,
     module: undefined,
     flat: false,
@@ -56,16 +55,14 @@ describe('Module Schematic', () => {
 
     tree = schematicRunner.runSchematic('module', {
       ...defaultOptions,
-      path: 'app/sub1',
-      appRoot: 'app',
+      path: 'src/app/sub1',
       name: 'test1',
     }, tree);
     tree = schematicRunner.runSchematic('module', {
       ...defaultOptions,
-      path: 'app/sub2',
-      appRoot: 'app',
+      path: 'src/app/sub2',
       name: 'test2',
-      module: 'sub1/test1',
+      module: '../sub1/test1',
     }, tree);
 
     const content = getFileContent(tree, '/src/app/sub1/test1/test1.module.ts');

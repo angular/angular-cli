@@ -18,8 +18,7 @@ describe('Class Schematic', () => {
   );
   const defaultOptions: ClassOptions = {
     name: 'foo',
-    path: 'app',
-    sourceDir: 'src',
+    path: 'src/app',
     type: '',
     spec: false,
   };
@@ -64,5 +63,12 @@ describe('Class Schematic', () => {
     expect(tree.files[0]).toEqual('/src/app/foo.model.ts');
     const content = getFileContent(tree, '/src/app/foo.model.ts');
     expect(content).toMatch(/export class Foo/);
+  });
+
+  it('should respect the path option', () => {
+    const options = { ...defaultOptions, path: 'zzz' };
+    const tree = schematicRunner.runSchematic('class', options);
+    expect(tree.files.length).toEqual(1);
+    expect(tree.files[0]).toEqual('/zzz/foo.ts');
   });
 });

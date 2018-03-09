@@ -19,8 +19,7 @@ describe('Component Schematic', () => {
   );
   const defaultOptions: ComponentOptions = {
     name: 'foo',
-    path: 'app',
-    sourceDir: 'src',
+    path: 'src/app',
     inlineStyle: false,
     inlineTemplate: false,
     changeDetection: 'Default',
@@ -142,12 +141,12 @@ describe('Component Schematic', () => {
   });
 
   it('should handle upper case paths', () => {
-    const pathOption = 'app/SOME/UPPER/DIR';
+    const pathOption = 'src/app/SOME/UPPER/DIR';
     const options = { ...defaultOptions, path: pathOption };
 
     const tree = schematicRunner.runSchematic('component', options, appTree);
     let files = tree.files;
-    let root = `/src/${pathOption}/foo/foo.component`;
+    let root = `/${pathOption}/foo/foo.component`;
     expect(files.indexOf(`${root}.css`)).toBeGreaterThanOrEqual(0);
     expect(files.indexOf(`${root}.html`)).toBeGreaterThanOrEqual(0);
     expect(files.indexOf(`${root}.spec.ts`)).toBeGreaterThanOrEqual(0);
@@ -156,7 +155,7 @@ describe('Component Schematic', () => {
     const options2 = { ...options, name: 'BAR' };
     const tree2 = schematicRunner.runSchematic('component', options2, tree);
     files = tree2.files;
-    root = `/src/${pathOption}/bar/bar.component`;
+    root = `/${pathOption}/bar/bar.component`;
     expect(files.indexOf(`${root}.css`)).toBeGreaterThanOrEqual(0);
     expect(files.indexOf(`${root}.html`)).toBeGreaterThanOrEqual(0);
     expect(files.indexOf(`${root}.spec.ts`)).toBeGreaterThanOrEqual(0);
@@ -164,11 +163,11 @@ describe('Component Schematic', () => {
   });
 
   it('should create a component in a sub-directory', () => {
-    const options = { ...defaultOptions, path: 'app/a/b/c' };
+    const options = { ...defaultOptions, path: 'src/app/a/b/c' };
 
     const tree = schematicRunner.runSchematic('component', options, appTree);
     const files = tree.files;
-    const root = `/src/${options.path}/foo/foo.component`;
+    const root = `/${options.path}/foo/foo.component`;
     expect(files.indexOf(`${root}.css`)).toBeGreaterThanOrEqual(0);
     expect(files.indexOf(`${root}.html`)).toBeGreaterThanOrEqual(0);
     expect(files.indexOf(`${root}.spec.ts`)).toBeGreaterThanOrEqual(0);

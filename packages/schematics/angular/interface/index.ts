@@ -5,10 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize, strings } from '@angular-devkit/core';
+import { strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicsException,
   apply,
   branchAndMerge,
   chain,
@@ -17,24 +16,27 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { parseName } from '../utility/parse-name';
 import { Schema as InterfaceOptions } from './schema';
 
 
 export default function (options: InterfaceOptions): Rule {
+  if (options.path === undefined) {
+    // TODO: read this default value from the config file
+    options.path = 'src/app';
+  }
+  const parsedPath = parseName(options.path, options.name);
+  options.name = parsedPath.name;
+
   options.prefix = options.prefix ? options.prefix : '';
   options.type = !!options.type ? `.${options.type}` : '';
-  options.path = options.path ? normalize(options.path) : options.path;
-  const sourceDir = options.sourceDir;
-  if (!sourceDir) {
-    throw new SchematicsException(`sourceDir option is required.`);
-  }
 
   const templateSource = apply(url('./files'), [
     template({
       ...strings,
       ...options,
     }),
-    move(sourceDir),
+    move(parsedPath.path),
   ]);
 
   return chain([

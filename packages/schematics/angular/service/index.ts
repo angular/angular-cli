@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, normalize, strings } from '@angular-devkit/core';
+import { Path, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -22,6 +22,7 @@ import {
 import * as ts from 'typescript';
 import { getFirstNgModuleName } from '../utility/ast-utils';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { parseName } from '../utility/parse-name';
 import { Schema as ServiceOptions } from './schema';
 
 function getModuleNameFromPath(host: Tree, modulePath: Path) {
@@ -48,15 +49,16 @@ function stripTsExtension(path: string): string {
 }
 
 export default function (options: ServiceOptions): Rule {
-  options.path = options.path ? normalize(options.path) : options.path;
-  const sourceDir = options.sourceDir;
-  if (sourceDir === undefined) {
-    throw new SchematicsException(`sourceDir option is required.`);
-  }
-
   return (host: Tree, context: SchematicContext) => {
     let providedByModule = '';
     let providedInPath = '';
+
+    if (options.path === undefined) {
+      // TODO: read this default value from the config file
+      options.path = 'src/app';
+    }
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
 
     if (options.module) {
       const modulePath = findModuleFromOptions(host, options);
@@ -86,7 +88,7 @@ export default function (options: ServiceOptions): Rule {
         providedIn: providedByModule,
         providedInPath: providedInPath,
       }),
-      move(sourceDir),
+      move(parsedPath.path),
     ]);
 
     return mergeWith(templateSource)(host, context);

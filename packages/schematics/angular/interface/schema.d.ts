@@ -16,13 +16,9 @@ export interface Schema {
      */
     path?: string;
     /**
-     * The path of the source directory.
+     * The name of the project.
      */
-    sourceDir?: string;
-    /**
-     * The root of the application.
-     */
-    appRoot?: string;
+    project?: string;
     /**
      * Specifies the prefix to use.
      */

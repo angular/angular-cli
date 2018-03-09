@@ -19,8 +19,7 @@ describe('Pipe Schematic', () => {
   );
   const defaultOptions: PipeOptions = {
     name: 'foo',
-    path: 'app',
-    sourceDir: 'src',
+    path: 'src/app',
     spec: true,
     module: undefined,
     export: false,

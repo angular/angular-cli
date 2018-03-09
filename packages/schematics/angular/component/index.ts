@@ -25,6 +25,7 @@ import * as ts from 'typescript';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { parseName } from '../utility/parse-name';
 import { Schema as ComponentOptions } from './schema';
 
 
@@ -42,7 +43,7 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
     const sourceText = text.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
-    const componentPath = `/${options.sourceDir}/${options.path}/`
+    const componentPath = `/${options.path}/`
                           + (options.flat ? '' : strings.dasherize(options.name) + '/')
                           + strings.dasherize(options.name)
                           + '.component';
@@ -100,12 +101,14 @@ function buildSelector(options: ComponentOptions) {
 
 
 export default function(options: ComponentOptions): Rule {
-  const sourceDir = options.sourceDir;
-  if (!sourceDir) {
-    throw new SchematicsException(`sourceDir option is required.`);
-  }
-
   return (host: Tree, context: SchematicContext) => {
+    if (options.path === undefined) {
+      // TODO: read this default value from the config file
+      options.path = 'src/app';
+    }
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+
     options.selector = options.selector || buildSelector(options);
     options.path = options.path ? normalize(options.path) : options.path;
     options.module = findModuleFromOptions(host, options);
@@ -119,7 +122,7 @@ export default function(options: ComponentOptions): Rule {
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
       }),
-      move(sourceDir),
+      move(parsedPath.path),
     ]);
 
     return chain([

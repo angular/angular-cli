@@ -12,21 +12,17 @@ export interface Schema {
      */
     name: string;
     /**
-     * The path to create the directive.
+     * The path to create the interface.
      */
     path?: string;
     /**
-     * The root of the application.
+     * The name of the project.
      */
-    appRoot?: string;
+    project?: string;
     /**
      * The prefix to apply to generated selectors.
      */
     prefix?: string;
-    /**
-     * The path of the source directory.
-     */
-    sourceDir?: string;
     /**
      * Specifies if a spec file is generated.
      */

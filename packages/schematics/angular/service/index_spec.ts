@@ -19,8 +19,7 @@ describe('Service Schematic', () => {
   );
   const defaultOptions: ServiceOptions = {
     name: 'foo',
-    path: 'app',
-    sourceDir: 'src',
+    path: 'src/app',
     spec: true,
     module: undefined,
     flat: false,
