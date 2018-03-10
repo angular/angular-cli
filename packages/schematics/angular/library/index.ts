@@ -23,6 +23,10 @@ import {
 import * as path from 'path';
 import { Schema as GenerateLibraryOptions } from './schema';
 
+function forwardSlashes(value: string): string {
+  return value.replace(/\\/g, '/');
+}
+
 type PackageJsonPartialType = {
   scripts: {
     [key: string]: string;
@@ -134,8 +138,10 @@ export default function (options: GenerateLibraryOptions): Rule {
       branchAndMerge(chain([
         mergeWith(templateSource),
       ])),
-      options.skipPackageJson ? noop() : addDependenciesAndScriptsToPackageJson(name, sourceDir),
-      options.skipTsConfig ? noop() : updateTsConfig(name, entryFilePath),
+      options.skipPackageJson ? noop() : addDependenciesAndScriptsToPackageJson(name,
+        forwardSlashes(sourceDir)),
+      options.skipTsConfig ? noop() : updateTsConfig(name,
+        forwardSlashes(entryFilePath)),
     ])(host, context);
   };
 }
