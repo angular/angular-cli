@@ -67,25 +67,25 @@ jobs:
       #- run: bazel query //... | xargs bazel test --config=ci
       - run: bazel test //...
 
-      # - store_artifacts:
-      #   path: dist/bin/modules/aspnetcore-engine/@nguniversal/aspnetcore-engine
-      #   destination: @nguniversal/aspnetcore-engine
+      - store_artifacts:
+          path: dist/bin/modules/aspnetcore-engine/@nguniversal/aspnetcore-engine/esm2015/aspnetcore-engine.js
+          destination: aspnetcore-engine.js
 
-      # - store_artifacts:
-      #   path: dist/bin/modules/common-engine/@nguniversal/common
-      #   destination: @nguniversal/common
+      - store_artifacts:
+          path: dist/bin/modules/common/@nguniversal/common/esm2015/common.js
+          destination: common.js
 
-      # - store_artifacts:
-      #   path: dist/bin/modules/express-engine/@nguniversal/express-engine
-      #   destination: @nguniversal/express-engine
+      - store_artifacts:
+          path: dist/bin/modules/express-engine/@nguniversal/express-engine/esm2015/express-engine.js
+          destination: express-engine.js
 
-      # - store_artifacts:
-      #   path: dist/bin/modules/hapi-engine/@nguniversal/hapi-engine
-      #   destination: @nguniversal/hapi-engine
+      - store_artifacts:
+          path: dist/bin/modules/hapi-engine/@nguniversal/hapi-engine/esm2015/hapi-engine.js
+          destination: hapi-engine.js
 
-      # - store_artifacts:
-      #   path: dist/bin/modules/module-map-ngfactory-loader/@nguniversal/module-map-ngfactory-loader
-      #   destination: @nguniversal/module-map-ngfactory-loader
+      - store_artifacts:
+          path: dist/bin/modules/module-mapngfactory-loader/@nguniversal/module-mapngfactory-loader/esm2015/module-mapngfactory-loader.js
+          destination: module-mapngfactory-loader.js
 
       # If we get this far, save the node_modules directory for use next time.
       - save_cache:
