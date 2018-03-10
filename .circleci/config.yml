@@ -98,4 +98,4 @@ workflows:
   default_workflow:
     jobs:
       - build
-      #- lint
+      - lint

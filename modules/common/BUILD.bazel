@@ -16,14 +16,15 @@ ng_package(
     entry_point = "index.js",
     deps = [":common_module"],
 )
+
 ts_library(
     name = "unit_test_lib",
+    testonly = True,
     srcs = glob([
-      "spec/**/*.spec.ts"
+        "spec/**/*.spec.ts",
     ]),
-    testonly=True,
     deps = [
-      ":common_module"
+        ":common_module",
     ],
 )
 

@@ -19,12 +19,12 @@ ng_package(
 
 ts_library(
     name = "unit_test_lib",
+    testonly = True,
     srcs = glob([
-      "spec/**/*.spec.ts"
+        "spec/**/*.spec.ts",
     ]),
-    testonly=True,
     deps = [
-      ":aspnetcore-engine_module"
+        ":aspnetcore-engine_module",
     ],
 )
 

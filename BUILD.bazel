@@ -1,6 +1,6 @@
 # Marker file indicating this folder is a Bazel package.
 # Needed so that tsconfig.json can be referenced from BUILD rules.
-package(default_visibility=["//visibility:public"])
+package(default_visibility = ["//visibility:public"])
 
 exports_files(["tsconfig.json"])
 

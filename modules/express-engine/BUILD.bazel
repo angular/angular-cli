@@ -11,7 +11,6 @@ ng_module(
 )
 
 ng_package(
-
     name = "@nguniversal/express-engine",
     srcs = [":package.json"],
     entry_point = "index.js",
@@ -20,12 +19,12 @@ ng_package(
 
 ts_library(
     name = "unit_test_lib",
+    testonly = True,
     srcs = glob([
-      "spec/**/*.spec.ts"
+        "spec/**/*.spec.ts",
     ]),
-    testonly=True,
     deps = [
-      ":express-engine_module"
+        ":express-engine_module",
     ],
 )
 
