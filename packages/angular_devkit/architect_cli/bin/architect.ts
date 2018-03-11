@@ -97,12 +97,12 @@ const workspaceJson = JSON.parse(configContent);
 
 const host = new NodeJsSyncHost();
 const workspace = new experimental.workspace.Workspace(root, host);
-let architect: Architect;
+
+let lastBuildEvent = { success: true };
 
 workspace.loadWorkspaceFromJson(workspaceJson).pipe(
   concatMap(ws => new Architect(ws).loadArchitect()),
-  concatMap(arch => {
-    architect = arch;
+  concatMap(architect => {
 
     const overrides = { ...argv };
     delete overrides['help'];
@@ -127,8 +127,8 @@ workspace.loadWorkspaceFromJson(workspaceJson).pipe(
     }
   }),
 ).subscribe({
-  next: (event => logger.info(JSON.stringify(event, null, 2))),
-  complete: () => process.exit(0),
+  next: (buildEvent => lastBuildEvent = buildEvent),
+  complete: () => process.exit(lastBuildEvent.success ? 0 : 1),
   error: (err: Error) => {
     logger.fatal(err.message);
     if (err.stack) {
