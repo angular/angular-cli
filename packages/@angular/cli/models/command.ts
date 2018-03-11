@@ -94,8 +94,9 @@ export abstract class Option {
   abstract readonly description: string;
   readonly default?: string | number | boolean;
   readonly required?: boolean;
-  abstract readonly aliases?: string[]; // (string | { [key: string]: string })[];
+  abstract readonly aliases?: string[];
   abstract readonly type: any;
+  readonly format?: string;
   readonly values?: any[];
   readonly hidden?: boolean = false;
 }

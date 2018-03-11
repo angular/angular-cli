@@ -13,6 +13,7 @@ export interface SchematicAvailableOptions {
   description: string;
   aliases: string[];
   type: any;
+  format?: string;
   schematicType: any;
   schematicDefault: any;
 }
