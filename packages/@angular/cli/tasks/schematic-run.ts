@@ -4,7 +4,6 @@ import {
   EmptyTree,
   FileSystemSink,
   FileSystemTree,
-  Schematic,
   Tree
 } from '@angular-devkit/schematics';
 import { BuiltinTaskExecutor } from '@angular-devkit/schematics/tasks/node';
@@ -75,9 +74,6 @@ export default Task.extend({
     const collection = getCollection(collectionName);
     const schematic = getSchematic(collection, schematicName, options.allowPrivate);
 
-    const preppedOptions = prepOptions(schematic, taskOptions);
-    const opts = { ...taskOptions, ...preppedOptions };
-
     const tree = emptyHost ? new EmptyTree() : new FileSystemTree(new FileSystemHost(workingDir));
     const host = observableOf(tree);
 
@@ -131,7 +127,7 @@ export default Task.extend({
       }
     });
 
-    return schematic.call(opts, host).pipe(
+    return schematic.call(taskOptions, host).pipe(
       map((tree: Tree) => Tree.optimize(tree)),
       concatMap((tree: Tree) => {
         return dryRunSink.commit(tree).pipe(
@@ -167,94 +163,5 @@ export default Task.extend({
         }
         return {modifiedFiles};
       });
-      // TODO (architect): figure out what to do about lintFix
-      // .then((output: SchematicOutput) => {
-      //   const modifiedFiles = output.modifiedFiles;
-      //   const lintFix = taskOptions.lintFix !== undefined ?
-      //     taskOptions.lintFix : CliConfig.getValue('defaults.lintFix');
-
-      //   if (lintFix && modifiedFiles) {
-      //     const LintTask = require('./lint').default;
-      //     const lintTask = new LintTask({
-      //       ui: this.ui,
-      //       project: this.project
-      //     });
-
-      //     return lintTask.run({
-      //       fix: true,
-      //       force: true,
-      //       silent: true,
-      //       configs: [{
-      //         files: modifiedFiles
-      //           .filter((file: string) => /.ts$/.test(file))
-      //           .map((file: string) => path.join(projectRoot, file))
-      //       }]
-      //     });
-      //   }
-      // });
   }
 });
-
-function prepOptions(schematic: Schematic<{}, {}>, options: SchematicOptions): SchematicOptions {
-  const properties = (<any>schematic.description).schemaJson
-    ? (<any>schematic.description).schemaJson.properties
-    : options;
-
-  const keys = Object.keys(properties);
-  if (['component', 'c', 'directive', 'd'].indexOf(schematic.description.name) !== -1) {
-    options.prefix =
-      (options.prefix === 'false' || options.prefix === false || options.prefix === '')
-      ? undefined : options.prefix;
-  }
-
-  let preppedOptions = {
-    ...options,
-    ...readDefaults(schematic.description.name, keys, options)
-  };
-  preppedOptions = {
-    ...preppedOptions,
-    ...normalizeOptions(schematic.description.name, keys, options)
-  };
-
-  return preppedOptions;
-}
-
-function readDefaults(schematicName: string, optionKeys: string[], options: any): any {
-  return optionKeys.reduce((acc: any, key) => {
-    const value = options[key] !== undefined ? options[key] : readDefault(schematicName, key);
-    if (value !== undefined) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
-}
-
-const viewEncapsulationMap: any = {
-  'emulated': 'Emulated',
-  'native': 'Native',
-  'none': 'None'
-};
-
-const changeDetectionMap: any = {
-  'default': 'Default',
-  'onpush': 'OnPush'
-};
-
-function normalizeOptions(schematicName: string, optionKeys: string[], options: any): any {
-  return optionKeys.reduce((acc: any, key) => {
-
-    if (schematicName === 'application' || schematicName === 'component') {
-      if (key === 'viewEncapsulation' && options[key]) {
-        acc[key] = viewEncapsulationMap[options[key].toLowerCase()];
-      } else if (key === 'changeDetection' && options[key]) {
-        acc[key] = changeDetectionMap[options[key].toLowerCase()];
-      }
-    }
-    return acc;
-  }, {});
-}
-
-function readDefault(schematicName: String, key: string) {
-  const jsonPath = `defaults.${schematicName}.${key}`;
-  return CliConfig.getValue(jsonPath);
-}

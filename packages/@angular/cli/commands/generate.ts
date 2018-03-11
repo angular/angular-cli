@@ -1,19 +1,14 @@
 import { Command, CommandScope, Option } from '../models/command';
 import chalk from 'chalk';
-const stringUtils = require('ember-cli-string-utils');
 import { CliConfig } from '../models/config';
 import {
   getCollection,
   getEngineHost
 } from '../utilities/schematics';
-import { DynamicPathOptions, dynamicPathParser } from '../utilities/dynamic-path-parser';
-import { getAppFromConfig } from '../utilities/app-utils';
-import * as path from 'path';
 import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 import { oneLine } from 'common-tags';
 
 const { cyan } = chalk;
-const separatorRegEx = /[\/\\]/g;
 
 export default class GenerateCommand extends Command {
   public readonly name = 'generate';
@@ -103,49 +98,12 @@ export default class GenerateCommand extends Command {
   }
 
   public run(options: any) {
-    let entityName = options.name;
-
-    if (entityName) {
-      options.name = stringUtils.dasherize(entityName.split(separatorRegEx).pop());
-    } else {
-      entityName = '';
-    }
-
-    const appConfig = getAppFromConfig(options.app);
-    const dynamicPathOptions: DynamicPathOptions = {
-      project: this.project,
-      entityName: entityName,
-      appConfig: appConfig,
-      dryRun: options.dryRun
-    };
-    const parsedPath = dynamicPathParser(dynamicPathOptions);
-    options.sourceDir = parsedPath.sourceDir.replace(separatorRegEx, '/');
-    const root = parsedPath.sourceDir + path.sep;
-    options.appRoot = parsedPath.appRoot === parsedPath.sourceDir ? '' :
-      parsedPath.appRoot.startsWith(root)
-        ? parsedPath.appRoot.substr(root.length)
-        : parsedPath.appRoot;
-
-    options.path = parsedPath.dir.replace(separatorRegEx, '/');
-    options.path = parsedPath.dir === parsedPath.sourceDir ? '' :
-      parsedPath.dir.startsWith(root)
-        ? options.path.substr(root.length)
-        : options.path;
-
-    const cwd = this.project.root;
+    const cwd = process.env.PWD;
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
 
-    if (['component', 'c', 'directive', 'd'].indexOf(schematicName) !== -1) {
-      if (options.prefix === undefined) {
-        options.prefix = appConfig.prefix;
-      }
-
-      if (schematicName === 'component' || schematicName === 'c') {
-        if (options.styleext === undefined) {
-          options.styleext = CliConfig.getValue('defaults.styleExt');
-        }
-      }
-    }
+    const workingDir = cwd.replace(this.project.root, '');
+    const pathOptions = this.getPathOptions(options, workingDir);
+    options = { ...options, ...pathOptions };
 
     const SchematicRunTask = require('../tasks/schematic-run').default;
     const schematicRunTask = new SchematicRunTask({
@@ -153,19 +111,23 @@ export default class GenerateCommand extends Command {
       project: this.project
     });
 
-    if (collectionName === '@schematics/angular' && schematicName === 'interface' && options.type) {
-      options.type = options.type;
-    }
-
     const schematicOptions = this.stripLocalOptions(options);
     return schematicRunTask.run({
         taskOptions: schematicOptions,
         dryRun: options.dryRun,
         force: options.force,
-        workingDir: cwd,
+        workingDir: this.project.root,
         collectionName,
         schematicName
       });
+  }
+
+  protected getPathOptions(options: any, workingDir: string): any {
+    return this.options
+      .filter(o => o.format === 'path')
+      .map(o => o.name)
+      .filter(name => options[name] === undefined)
+      .reduce((acc: any, curr) => acc[curr] = workingDir, {});
   }
 
   private parseSchematicInfo(options: any) {
