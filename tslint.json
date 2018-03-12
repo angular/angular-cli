@@ -46,6 +46,7 @@
     "no-internal-module": true,
     "no-trailing-whitespace": true,
     "no-unused-expression": true,
+    "no-unused-variable": [true, {"ignore-pattern": "^_"}],
     "no-var-keyword": true,
     "one-line": [
       true,
