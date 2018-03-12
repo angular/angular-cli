@@ -8,6 +8,7 @@
 // tslint:disable:no-implicit-dependencies
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { FileSystemTree, HostSink } from '@angular-devkit/schematics';
+import { fileBufferToString } from '../../../core/src/virtual-fs/host';
 import { FileSystemCreateTree } from '../tree/filesystem';
 import { optimize } from '../tree/static';
 
@@ -107,6 +108,24 @@ describe('FileSystemSink', () => {
           .toPromise()
           .then(() => {
             expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
+          })
+          .then(done, done.fail);
+    });
+
+    it('can rename then create the same file', done => {
+      const host = new virtualFs.test.TestHost({
+        '/file0': 'world',
+      });
+      const tree = new FileSystemTree(host);
+      tree.rename('/file0', '/file1');
+      tree.create('/file0', 'hello');
+
+      const sink = new HostSink(host);
+      sink.commit(optimize(tree))
+          .toPromise()
+          .then(() => {
+            expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
+            expect(fileBufferToString(host.sync.read(normalize('/file1')))).toBe('world');
           })
           .then(done, done.fail);
     });
