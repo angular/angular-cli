@@ -41,9 +41,9 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "@angular-devkit/architect": "angular/angular-devkit-architect-builds#7b1aa387",
-    "@angular-devkit/build-webpack": "angular/angular-devkit-build-webpack-builds#7b1aa387",
-    "@angular-devkit/core": "angular/angular-devkit-core-builds#7b1aa387",
+    "@angular-devkit/architect": "angular/angular-devkit-architect-builds#891f470",
+    "@angular-devkit/build-webpack": "angular/angular-devkit-build-webpack-builds#891f470",
+    "@angular-devkit/core": "angular/angular-devkit-core-builds#891f470",
     "@angular-devkit/schematics": "0.4.3",
     "@schematics/angular": "0.4.3",
     "@schematics/package-update": "0.4.3",
