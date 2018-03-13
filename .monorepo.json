@@ -136,6 +136,13 @@
       "section": "Schematics",
       "hash": "1abc8090ac37083ca02f92ab794c6d7f",
       "snapshotRepo": "angular/schematics-package-update-builds"
+    },
+    "@schematics/update": {
+      "name": "Package Update Schematics",
+      "version": "0.3.1",
+      "section": "Schematics",
+      "hash": "",
+      "snapshotRepo": ""
     }
   }
 }

@@ -65,5 +65,6 @@ This is a monorepo which contains many packages:
 **Angular Schematics** | [`@schematics/angular`](http://npmjs.com/packages/@schematics/angular) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fangular/latest.svg)](http://npmjs.com/packages/@schematics/angular) | 
 **Package JSON Update Schematics** | [`@schematics/package-update`](http://npmjs.com/packages/@schematics/package-update) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fpackage-update/latest.svg)](http://npmjs.com/packages/@schematics/package-update) | 
 **Schematics Schematics** | [`@schematics/schematics`](http://npmjs.com/packages/@schematics/schematics) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fschematics/latest.svg)](http://npmjs.com/packages/@schematics/schematics) | 
+**Package Update Schematics** | [`@schematics/update`](http://npmjs.com/packages/@schematics/update) | [![latest](https://img.shields.io/npm/v/%40schematics%2Fupdate/latest.svg)](http://npmjs.com/packages/@schematics/update) | 
 
 

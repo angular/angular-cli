@@ -44,7 +44,8 @@
       "@angular-devkit/schematics/tools": [ "./packages/angular_devkit/schematics/tools/index" ],
       "@angular-devkit/schematics/testing": [ "./packages/angular_devkit/schematics/testing/index" ],
       "@angular-devkit/build-optimizer": [ "./packages/angular_devkit/build_optimizer/src/index" ],
-      "@angular-devkit/architect": [ "./packages/angular_devkit/architect/src/index" ]
+      "@angular-devkit/architect": [ "./packages/angular_devkit/architect/src/index" ],
+      "@schematics/angular": [ "./packages/schematics/angular/index" ]
     }
   },
   "bazelOptions": {
