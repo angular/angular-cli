@@ -16,6 +16,7 @@ import {
   ignoreElements,
   map,
   mergeMap,
+  reduce,
 } from 'rxjs/operators';
 import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import {
@@ -140,6 +141,8 @@ export abstract class SimpleSinkBase implements Sink {
       }),
       concatMap((action: Action) => this.postCommitAction(action) || empty<void>()),
       concat(deferObservable(() => this._done())),
-      concat(deferObservable(() => this.postCommit() || empty<void>())));
+      concat(deferObservable(() => this.postCommit() || empty<void>())),
+      reduce(() => {}),
+    );
   }
 }

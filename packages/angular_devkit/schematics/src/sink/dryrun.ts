@@ -9,7 +9,7 @@ import { normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { empty } from 'rxjs/observable/empty';
+import { of } from 'rxjs/observable/of';
 import { HostSink } from './host';
 
 
@@ -129,6 +129,6 @@ export class DryRunSink extends HostSink {
 
     this._subject.complete();
 
-    return empty<void>();
+    return of<void>(undefined);
   }
 }
