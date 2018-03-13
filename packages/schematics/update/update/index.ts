@@ -113,9 +113,9 @@ function _validateReversePeerDependencies(
 
 function _validateUpdatePackages(
   infoMap: Map<string, PackageInfo>,
+  force: boolean,
   logger: logging.LoggerApi,
 ): void {
-  logger = logger.createChild('validateUpdate');
   logger.debug('Updating the following packages:');
   infoMap.forEach(info => {
     if (info.target) {
@@ -140,7 +140,7 @@ function _validateUpdatePackages(
       || peerErrors;
   });
 
-  if (peerErrors) {
+  if (!force && peerErrors) {
     throw new SchematicsException(`Incompatible peer dependencies found. See above.`);
   }
 }
@@ -619,9 +619,12 @@ export default function(options: UpdateSchema): Rule {
       switchMap(infoMap => {
         // Now that we have all the information, check the flags.
         if (packages.size > 0) {
-          if (!options.force) {
-            _validateUpdatePackages(infoMap, logger);
-          }
+          const sublog = new logging.LevelCapLogger(
+            'validation',
+            logger.createChild(''),
+            'warn',
+          );
+          _validateUpdatePackages(infoMap, options.force, sublog);
 
           return _performUpdate(tree, context, infoMap, logger);
         } else {
