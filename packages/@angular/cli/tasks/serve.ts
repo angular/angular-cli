@@ -17,7 +17,7 @@ const SilentError = require('silent-error');
 const opn = require('opn');
 const yellow = chalk.yellow;
 
-function findDefaultServePath(baseHref: string, deployUrl: string): string | null {
+function findDefaultServePath(baseHref: string, deployUrl = ''): string | null {
   if (!baseHref && !deployUrl) {
     return '';
   }
@@ -73,7 +73,6 @@ export default Task.extend({
     }
 
     const serveDefaults = {
-      deployUrl: appConfig.deployUrl || '',
       baseHref: appConfig.baseHref,
     };
 
@@ -198,7 +197,7 @@ export default Task.extend({
     let servePath = serveTaskOptions.servePath;
     if (!servePath && servePath !== '') {
       const defaultServePath =
-        findDefaultServePath(serveTaskOptions.baseHref, serveTaskOptions.deployUrl);
+        findDefaultServePath(serveTaskOptions.baseHref);
       const showWarning = CliConfig.fromProject().get('warnings.servePathDefault');
       if (defaultServePath == null && showWarning) {
         ui.writeLine(oneLine`

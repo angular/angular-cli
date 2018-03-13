@@ -146,10 +146,6 @@
             },
             "default": []
           },
-          "deployUrl": {
-            "type": "string",
-            "description": "URL where files will be deployed."
-          },
           "baseHref": {
             "type": "string",
             "description": "Base url for the application being built."

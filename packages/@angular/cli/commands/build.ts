@@ -238,11 +238,6 @@ export default class BuildCommand extends Command {
   }
 
   public async run(options: BuildTaskOptions) {
-    // Add trailing slash if missing to prevent https://github.com/angular/angular-cli/issues/7295
-    if (options.deployUrl && options.deployUrl.substr(-1) !== '/') {
-      options.deployUrl += '/';
-    }
-
     const BuildTask = require('../tasks/build').default;
 
     const buildTask = new BuildTask({
