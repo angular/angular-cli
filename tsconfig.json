@@ -55,6 +55,7 @@
     "bazel-*/**/*",
     "dist/**/*",
     "node_modules/**/*",
+    "packages/_/devkit/**/*files/**/*",
     "packages/schematics/*/*/*files/**/*",
     "tmp/**/*",
     "scripts/patches/**/*",

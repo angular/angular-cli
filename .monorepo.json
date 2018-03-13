@@ -45,6 +45,10 @@
       "version": "0.4.6",
       "hash": "37ed7e417435c92dbf301e7b26ea37ca"
     },
+    "devkit": {
+      "version": "0.4.5",
+      "hash": ""
+    },
     "@angular-devkit/architect": {
       "name": "Architect",
       "links": [
