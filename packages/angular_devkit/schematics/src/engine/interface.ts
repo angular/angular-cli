@@ -65,6 +65,9 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
     schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
     options: OptionT,
   ): Observable<ResultT>;
+  transformContext(
+    context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
+  ): TypedSchematicContext<CollectionMetadataT, SchematicMetadataT> | void;
   createTaskExecutor(name: string): Observable<TaskExecutor>;
   hasTaskExecutor(name: string): boolean;
 

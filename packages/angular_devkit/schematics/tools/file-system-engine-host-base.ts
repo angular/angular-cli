@@ -277,6 +277,10 @@ export abstract class FileSystemEngineHostBase implements
       )) as {} as Observable<ResultT>;
   }
 
+  transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext {
+    return context;
+  }
+
   getSchematicRuleFactory<OptionT extends object>(
     schematic: FileSystemSchematicDesc,
     _collection: FileSystemCollectionDesc): RuleFactory<OptionT> {

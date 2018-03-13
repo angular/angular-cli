@@ -42,6 +42,19 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     if (name.startsWith('.') || name.startsWith('/')) {
       return resolvePath(basedir, name);
     } else {
+      // If it's a file inside a package, resolve the package then return the file...
+      if (name.split('/').length > (name[0] == '@' ? 2 : 1)) {
+        const rest = name.split('/');
+        const packageName = rest.shift() + (name[0] == '@' ? '/' + rest.shift() : '');
+
+        return resolvePath(core.resolve(packageName, {
+          basedir,
+          checkLocal: true,
+          checkGlobal: true,
+          resolvePackageJson: true,
+        }), '..', ...rest);
+      }
+
       return core.resolve(name, {
         basedir,
         checkLocal: true,
@@ -51,19 +64,31 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
   }
 
   protected _resolveCollectionPath(name: string): string {
-    let packageJsonPath = this._resolvePackageJson(name, process.cwd());
-    // If it's a file, use it as is. Otherwise append package.json to it.
-    if (!core.fs.isFile(packageJsonPath)) {
-      packageJsonPath = join(packageJsonPath, 'package.json');
+    let collectionPath: string | undefined = undefined;
+
+    if (name.split('/').length > (name[0] == '@' ? 2 : 1)) {
+      try {
+        collectionPath = this._resolvePath(name, process.cwd());
+      } catch (_) {
+      }
+    }
+
+    if (!collectionPath) {
+      let packageJsonPath = this._resolvePackageJson(name, process.cwd());
+      // If it's a file, use it as is. Otherwise append package.json to it.
+      if (!core.fs.isFile(packageJsonPath)) {
+        packageJsonPath = join(packageJsonPath, 'package.json');
+      }
+
+      const pkgJsonSchematics = require(packageJsonPath)['schematics'];
+      collectionPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath));
     }
 
     try {
-      const pkgJsonSchematics = require(packageJsonPath)['schematics'];
-      if (pkgJsonSchematics) {
-        const resolvedPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath));
-        readJsonFile(resolvedPath);
+      if (collectionPath) {
+        readJsonFile(collectionPath);
 
-        return resolvedPath;
+        return collectionPath;
       }
     } catch (e) {
     }

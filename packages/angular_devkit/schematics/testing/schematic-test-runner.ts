@@ -16,6 +16,7 @@ import {
   Schematic,
   SchematicContext,
   SchematicEngine,
+  TaskConfiguration,
   Tree,
   VirtualTree,
   formats,
@@ -61,11 +62,13 @@ export class SchematicTestRunner {
     this._engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
     this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage);
     this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.RepositoryInitializer);
+    this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.RunSchematic);
 
     this._collection = this._engine.createCollection(this._collectionName);
   }
 
   get logger(): logging.Logger { return this._logger; }
+  get tasks(): TaskConfiguration[] { return [...this._engineHost.tasks]; }
 
   runSchematicAsync<SchematicSchemaT>(
     schematicName: string,
@@ -74,6 +77,7 @@ export class SchematicTestRunner {
   ): Observable<UnitTestTree> {
     const schematic = this._collection.createSchematic(schematicName, true);
     const host = observableOf(tree || new VirtualTree);
+    this._engineHost.clearTasks();
 
     return schematic.call(opts || {}, host, { logger: this._logger })
       .pipe(map(tree => new UnitTestTree(tree)));
@@ -88,6 +92,7 @@ export class SchematicTestRunner {
 
     let result: UnitTestTree | null = null;
     const host = observableOf(tree || new VirtualTree);
+    this._engineHost.clearTasks();
 
     schematic.call(opts || {}, host, { logger: this._logger })
       .subscribe(t => result = new UnitTestTree(t));
@@ -108,6 +113,7 @@ export class SchematicTestRunner {
     const externalCollection = this._engine.createCollection(collectionName);
     const schematic = externalCollection.createSchematic(schematicName, true);
     const host = observableOf(tree || new VirtualTree);
+    this._engineHost.clearTasks();
 
     return schematic.call(opts || {}, host, { logger: this._logger })
       .pipe(map(tree => new UnitTestTree(tree)));
@@ -124,6 +130,7 @@ export class SchematicTestRunner {
 
     let result: UnitTestTree | null = null;
     const host = observableOf(tree || new VirtualTree);
+    this._engineHost.clearTasks();
 
     schematic.call(opts || {}, host, { logger: this._logger })
       .subscribe(t => result = new UnitTestTree(t));

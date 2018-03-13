@@ -134,7 +134,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
       throw new SchematicEngineConflictingException();
     }
 
-    const context = {
+    let context: TypedSchematicContext<CollectionT, SchematicT> = {
       debug: parent && parent.debug || false,
       engine: this,
       logger: (parent && parent.logger && parent.logger.createChild(schematic.description.name))
@@ -144,6 +144,11 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
         ? parent.strategy : this.defaultMergeStrategy,
       addTask,
     };
+
+    const maybeNewContext = this._host.transformContext(context);
+    if (maybeNewContext) {
+      context = maybeNewContext;
+    }
 
     const taskScheduler = new TaskScheduler(context);
     const host = this._host;

@@ -31,6 +31,8 @@ export type FallbackCollectionDescription = {
 export type FallbackSchematicDescription = {
   description: SchematicDescription<{}, {}>;
 };
+export type FallbackContext =
+  TypedSchematicContext<FallbackCollectionDescription, FallbackSchematicDescription>;
 export declare type OptionTransform<T extends object, R extends object> = (
   schematic: SchematicDescription<FallbackCollectionDescription, FallbackSchematicDescription>,
   options: T,
@@ -85,7 +87,7 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
 
   createSourceFromUrl(
     url: Url,
-    context: TypedSchematicContext<FallbackCollectionDescription, FallbackSchematicDescription>,
+    context: FallbackContext,
   ): Source | null {
     return context.schematic.collection.description.host.createSourceFromUrl(url, context);
   }
@@ -97,6 +99,16 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     return (observableOf(options)
       .pipe(...this._hosts.map(host => mergeMap(opt => host.transformOptions(schematic, opt))))
     ) as {} as Observable<ResultT>;
+  }
+
+  transformContext(context: FallbackContext): FallbackContext {
+    let result = context;
+
+    this._hosts.forEach(host => {
+      result = (host.transformContext(result) || result) as FallbackContext;
+    });
+
+    return result;
   }
 
   /**
