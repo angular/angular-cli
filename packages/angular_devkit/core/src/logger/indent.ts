@@ -27,7 +27,7 @@ export class IndentLogger extends Logger {
     const indentMap = indentationMap[indentation];
 
     this._observable = this._observable.pipe(map(entry => {
-      const l = entry.path.length;
+      const l = entry.path.filter(x => !!x).length;
       if (l >= indentMap.length) {
         let current = indentMap[indentMap.length - 1];
         while (l >= indentMap.length) {

@@ -98,7 +98,7 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
   }
 
   createChild(name: string) {
-    return new Logger(name, this);
+    return new (this.constructor as typeof Logger)(name, this);
   }
 
   complete() {
