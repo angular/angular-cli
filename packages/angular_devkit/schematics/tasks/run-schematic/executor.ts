@@ -20,7 +20,7 @@ export default function(): TaskExecutor<RunSchematicTaskOptions> {
     return maybeWorkflow.execute({
       collection: options.collection,
       schematic: options.name,
-      options: options as object,
+      options: options.options,
     });
   };
 }
