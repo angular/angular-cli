@@ -106,6 +106,7 @@ Scaffold  | Usage
 [Interface](https://github.com/angular/angular-cli/wiki/generate-interface) | `ng g interface my-new-interface`
 [Enum](https://github.com/angular/angular-cli/wiki/generate-enum)           | `ng g enum my-new-enum`
 [Module](https://github.com/angular/angular-cli/wiki/generate-module)       | `ng g module my-module`
+[Route](https://github.com/angular/angular-cli/wiki/generate-module)       | `ng g module my-module --routing`
 
 
 
