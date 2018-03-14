@@ -7,6 +7,7 @@ import {
 } from '../utilities/schematics';
 import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
 import { oneLine } from 'common-tags';
+import { getConfigValues } from '../tasks/schematic-get-config-values';
 
 const { cyan } = chalk;
 
@@ -104,6 +105,8 @@ export default class GenerateCommand extends Command {
     const workingDir = cwd.replace(this.project.root, '');
     const pathOptions = this.getPathOptions(options, workingDir);
     options = { ...options, ...pathOptions };
+
+    options = getConfigValues(this.name, options.schematic, this.options, options);
 
     const SchematicRunTask = require('../tasks/schematic-run').default;
     const schematicRunTask = new SchematicRunTask({
