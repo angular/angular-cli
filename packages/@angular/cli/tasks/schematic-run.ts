@@ -15,6 +15,7 @@ import chalk from 'chalk';
 import { CliConfig } from '../models/config';
 import { concat, concatMap, ignoreElements, map } from 'rxjs/operators';
 import { getCollection, getSchematic, getEngineHost, getEngine } from '../utilities/schematics';
+import { logging } from '@angular-devkit/core';
 
 const { green, red, yellow } = chalk;
 const Task = require('../ember-cli/lib/models/task');
@@ -25,6 +26,7 @@ export interface SchematicRunOptions {
   emptyHost: boolean;
   collectionName: string;
   schematicName: string;
+  logger: logging.Logger;
 }
 
 export interface SchematicOptions {
@@ -45,7 +47,7 @@ interface OutputLogging {
 
 export default Task.extend({
   run: function (options: SchematicRunOptions): Promise<SchematicOutput> {
-    const { taskOptions, workingDir, emptyHost, collectionName, schematicName } = options;
+    const { taskOptions, workingDir, emptyHost, collectionName, schematicName, logger } = options;
 
     const ui = this.ui;
 
@@ -125,7 +127,7 @@ export default Task.extend({
     });
 
     return new Promise((resolve, reject) => {
-      schematic.call(opts, host).pipe(
+      schematic.call(opts, host, { logger }).pipe(
         map((tree: Tree) => Tree.optimize(tree)),
         concatMap((tree: Tree) => {
           return dryRunSink.commit(tree).pipe(

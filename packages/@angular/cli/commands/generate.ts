@@ -2,6 +2,8 @@ import chalk from 'chalk';
 const stringUtils = require('ember-cli-string-utils');
 import { oneLine } from 'common-tags';
 import { CliConfig } from '../models/config';
+import { logging, terminal } from '@angular-devkit/core';
+import { filter } from 'rxjs/operators';
 
 import {
   getCollection,
@@ -199,12 +201,40 @@ export default Command.extend({
       commandOptions.type = rawArgs[2];
     }
 
+    const logger = new logging.IndentLogger('cling');
+    const loggerSubscription = logger.pipe(
+      filter(entry => (entry.level != 'debug')))
+      .subscribe(entry => {
+        let color = (x: any) => terminal.dim(terminal.white(x));
+        let output = process.stdout;
+        switch (entry.level) {
+          case 'info':
+            color = terminal.white;
+            break;
+          case 'warn':
+            color = terminal.yellow;
+            break;
+          case 'error':
+            color = terminal.red;
+            output = process.stderr;
+            break;
+          case 'fatal':
+            color = (x) => terminal.bold(terminal.red(x));
+            output = process.stderr;
+            break;
+        }
+
+        output.write(color(entry.message) + '\n');
+      });
+
     return schematicRunTask.run({
         taskOptions: commandOptions,
         workingDir: cwd,
         collectionName,
-        schematicName
-      });
+        schematicName,
+        logger: this.logger
+      })
+      .then(() => loggerSubscription.unsubscribe());
   },
 
   printDetailedHelp: function (_options: any, rawArgs: any): string | Promise<string> {
